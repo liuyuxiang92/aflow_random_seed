@@ -4317,16 +4317,26 @@ namespace KBIN {
     // ***************************************************************************
     // LS_COUPLING LS_COUPLING LS_COUPLING LS_COUPLING LS_COUPLING LS_COUPLING
     else if(command=="LS_COUPLING") {
-      //need to add scheme to check if mods have already been made, come back later
+      keyword="LSORBIT";
+      
+      //do a check that we're not already doing the ls-coupling-type calculation, LSORBIT is a good enough check
+      if(Krun){
+        incar_input=keyword+"="+(OPTION==ON?".TRUE.":".FALSE.");
+        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+          if(incar_input==incar_input_old){Krun=false;}
+        }
+      }
+
       if(Krun){
         //REMOVE LINES
         // strip magmom from incar and make the magmom from the order parameter
-        XVASP_INCAR_REMOVE_ENTRY(xvasp,"LSORBIT,LNONCOLLINEAR,MAGMOM",operation_option,VERBOSE);  //CO20200624
+        XVASP_INCAR_REMOVE_ENTRY(xvasp,keyword+",LNONCOLLINEAR,MAGMOM",operation_option,VERBOSE);  //CO20200624
         //ADD LINES
         if(VERBOSE) xvasp.INCAR << "# Performing " << operation_option << " [AFLOW] begin" << endl;
+        xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation_option << endl;
         if(OPTION==ON){
-          xvasp.INCAR << aurostd::PaddedPOST("LSORBIT=.TRUE.",_incarpad_) << " # " << operation_option << " LSORBIT=ON" << endl;
-          xvasp.INCAR << aurostd::PaddedPOST("LNONCOLLINEAR=.TRUE.",_incarpad_) << " # " << operation_option << " LNONCOLLINEAR=ON" << endl;
+          xvasp.INCAR << aurostd::PaddedPOST("LNONCOLLINEAR=.TRUE.",_incarpad_) << " # " << operation_option << endl;
           incar_input="MAGMOM=";
           for(uint i=0;i<xvasp.str.atoms.size();i++){
             incar_input+=(i>0?" ":"");
@@ -4334,8 +4344,7 @@ namespace KBIN {
           }
           xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation_option << " MAGMOM 3*" << xvasp.str.atoms.size() << " atoms" << endl;
         }else{ //OPTION==OFF
-          xvasp.INCAR << aurostd::PaddedPOST("LSORBIT=.FALSE.",_incarpad_) << " # " << operation_option << " LSORBIT=OFF" << endl;
-          xvasp.INCAR << aurostd::PaddedPOST("LNONCOLLINEAR=.FALSE.",_incarpad_) << " # " << operation_option << " LNONCOLLINEAR=OFF" << endl;
+          xvasp.INCAR << aurostd::PaddedPOST("LNONCOLLINEAR=.FALSE.",_incarpad_) << " # " << operation_option << endl;
         }
         if(VERBOSE) xvasp.INCAR << "# Performing " << operation_option << " [AFLOW] end" << endl;
       }
@@ -4522,6 +4531,48 @@ namespace KBIN {
     // ***************************************************************************
     
     // ***************************************************************************
+    // SPIN SPIN SPIN SPIN SPIN SPIN
+    else if(command=="SPIN") {
+      keyword="ISPIN";
+      
+      //do a check that we're not already doing the spin-type calculation, ISPIN is a good enough check
+      if(Krun){
+        incar_input=keyword+"="+(OPTION==ON?"2":"1");
+        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+          if(incar_input==incar_input_old){Krun=false;}
+        }
+      }
+
+      if(Krun){
+        //REMOVE LINES
+        XVASP_INCAR_REMOVE_ENTRY(xvasp,keyword+",ISPIND",operation_option,VERBOSE);  //CO20200624
+        bool remove_magmom=false;
+        if(OPTION==OFF){remove_magmom=true;}
+        else{ //OPTION==ON
+          //if AUTO_MAGMOM, remove MAGMOM from INCAR
+          if(vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.isentry && vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option){remove_magmom=true;}
+        }
+        if(remove_magmom){XVASP_INCAR_REMOVE_ENTRY(xvasp,"MAGMOM",operation_option,VERBOSE);}  //CO20200624
+        //otherwise, check if has already been specified (e.g., in INCAR section of _AFLOWIN_)
+        bool magmom_already_specified=aurostd::kvpairfound(xvasp.INCAR,"MAGMOM","=");  //CO20210315 - must use kvpairfound instead of substring2bool() since magmom values have spaces
+        //ADD LINES
+        if(VERBOSE)  xvasp.INCAR << "# Performing " << operation_option << " [AFLOW] begin" << endl;
+        xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation_option << endl;
+        if(OPTION==ON){xvasp.INCAR << aurostd::PaddedPOST("ISPIND=2",_incarpad_) << " # " << operation_option << endl;}
+        if(OPTION==ON && magmom_already_specified==FALSE && vflags.KBIN_VASP_FORCE_OPTION_LSCOUPLING.option==FALSE) { //CO
+          if(vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.isentry && vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option){  // with spin, make the mag mom +5
+            xvasp.INCAR << aurostd::PaddedPOST("MAGMOM="+aurostd::utype2string(xvasp.str.atoms.size())+"*5",_incarpad_) << " # " << operation_option << " " << xvasp.str.atoms.size() << " atom" << (xvasp.str.atoms.size()>1?"s":"") << endl;
+          }else{  // otherwise, make the magmom +1
+            xvasp.INCAR << aurostd::PaddedPOST("MAGMOM="+aurostd::utype2string(xvasp.str.atoms.size())+"*1",_incarpad_) << " # " << operation_option << " " << xvasp.str.atoms.size() << " atom" << (xvasp.str.atoms.size()>1?"s":"") << " (default)" << endl;
+          }
+        }
+        if(VERBOSE)  xvasp.INCAR << "# Performing " << operation_option << " [AFLOW] end" << endl;
+      }
+    }
+    // ***************************************************************************
+
+    // ***************************************************************************
     // SYM SYM SYM SYM SYM SYM
     else if(command=="SYM") {
       //https://www.vasp.at/wiki/index.php/ISYM
@@ -4573,42 +4624,6 @@ namespace KBIN {
         if(VERBOSE) xvasp.INCAR << "# Performing " << operation << " [AFLOW] begin" << endl;
         xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation << endl;  //no real point trying other values, better to try another fix
         if(VERBOSE) xvasp.INCAR << "# Performing " << operation << " [AFLOW] end" << endl;
-      }
-    }
-    // ***************************************************************************
-
-    // ***************************************************************************
-    // SPIN SPIN SPIN SPIN SPIN SPIN
-    else if(command=="SPIN") {
-      //need to add scheme to check if mods have already been made, come back later
-      if(Krun){
-        //REMOVE LINES
-        XVASP_INCAR_REMOVE_ENTRY(xvasp,"ISPIN,ISPIND",operation_option,VERBOSE);  //CO20200624
-        bool remove_magmom=false;
-        if(OPTION==OFF){remove_magmom=true;}
-        else{ //OPTION==ON
-          //if AUTO_MAGMOM, remove MAGMOM from INCAR
-          if(vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.isentry && vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option){remove_magmom=true;}
-        }
-        if(remove_magmom){XVASP_INCAR_REMOVE_ENTRY(xvasp,"MAGMOM",operation_option,VERBOSE);}  //CO20200624
-        //otherwise, check if has already been specified (e.g., in INCAR section of _AFLOWIN_)
-        bool magmom_already_specified=aurostd::kvpairfound(xvasp.INCAR,"MAGMOM","=");  //CO20210315 - must use kvpairfound instead of substring2bool() since magmom values have spaces
-        //ADD LINES
-        if(VERBOSE)  xvasp.INCAR << "# Performing " << operation_option << " [AFLOW] begin" << endl;
-        if(OPTION==ON){
-          xvasp.INCAR << aurostd::PaddedPOST("ISPIND=2",_incarpad_) << " # " << operation_option << endl;
-          xvasp.INCAR << aurostd::PaddedPOST("ISPIN=2",_incarpad_) << " # " << operation_option << endl;
-        }else{  //OPTION==OFF
-          xvasp.INCAR << aurostd::PaddedPOST("ISPIN=1",_incarpad_) << " # " << operation_option << endl;
-        }
-        if(OPTION==ON && magmom_already_specified==FALSE && vflags.KBIN_VASP_FORCE_OPTION_LSCOUPLING.option==FALSE) { //CO
-          if(vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.isentry && vflags.KBIN_VASP_FORCE_OPTION_AUTO_MAGMOM.option){  // with spin, make the mag mom +5
-            xvasp.INCAR << aurostd::PaddedPOST("MAGMOM="+aurostd::utype2string(xvasp.str.atoms.size())+"*5",_incarpad_) << " # " << operation_option << " " << xvasp.str.atoms.size() << " atom" << (xvasp.str.atoms.size()>1?"s":"") << endl;
-          }else{  // otherwise, make the magmom +1
-            xvasp.INCAR << aurostd::PaddedPOST("MAGMOM="+aurostd::utype2string(xvasp.str.atoms.size())+"*1",_incarpad_) << " # " << operation_option << " " << xvasp.str.atoms.size() << " atom" << (xvasp.str.atoms.size()>1?"s":"") << " (default)" << endl;
-          }
-        }
-        if(VERBOSE)  xvasp.INCAR << "# Performing " << operation_option << " [AFLOW] end" << endl;
       }
     }
     // ***************************************************************************
