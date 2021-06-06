@@ -2312,8 +2312,8 @@ namespace KBIN {
                   // UNZIP EVERYTHING
                   for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed 
                     // aurostd::execute("cd "+xvasp.Directory+" && "+"bzip2 -dfq *bz2 "); // ORIGINAL
-                    aus << "00000  MESSAGE attempting UNZIP=" << XHOST.vzip.at(iext) << endl; aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
-                    aurostd::execute(XHOST.vzip.at(iext)+" -dfq `find \""+aurostd::CleanFileName(xvasp.Directory)+"\" -name \"*"+XHOST.vext.at(iext)+"\"`");
+                    aus << "00000  MESSAGE attempting UNZIP=" << XHOST.vzip[iext] << endl; aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
+                    aurostd::execute(XHOST.vzip[iext]+" -dfq `find \""+aurostd::CleanFileName(xvasp.Directory)+"\" -name \"*"+XHOST.vext[iext]+"\"`");
                   }		
                   if(aurostd::FileExist(xvasp.Directory+string("/POSCAR.relax2"))) {
                     KBIN::VASP_Recycle(xvasp,"relax2");
@@ -2346,8 +2346,8 @@ namespace KBIN {
                   // UNZIP EVERYTHING
                   for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed 
                     // aurostd::execute("cd "+xvasp.Directory+" && "+"bzip2 -dfq *bz2 "); // ORIGINAL
-                    aus << "00000  MESSAGE attempting UNZIP=" << XHOST.vzip.at(iext) << endl; aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
-                    aurostd::execute(XHOST.vzip.at(iext)+" -dfq `find \""+aurostd::CleanFileName(xvasp.Directory)+"\" -name \"*"+XHOST.vext.at(iext)+"\"`");
+                    aus << "00000  MESSAGE attempting UNZIP=" << XHOST.vzip[iext] << endl; aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
+                    aurostd::execute(XHOST.vzip[iext]+" -dfq `find \""+aurostd::CleanFileName(xvasp.Directory)+"\" -name \"*"+XHOST.vext[iext]+"\"`");
                   }		
                   if(aurostd::FileExist(xvasp.Directory+string("/POSCAR.relax2"))) {
                     KBIN::VASP_Recycle(xvasp,"relax2");
@@ -2380,8 +2380,8 @@ namespace KBIN {
                   // UNZIP EVERYTHING
                   for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed 
                     // aurostd::execute("cd "+xvasp.Directory+" && "+"bzip2 -dfq *bz2 "); // ORIGINAL
-                    aus << "00000  MESSAGE attempting UNZIP=" << XHOST.vzip.at(iext) << endl; aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
-                    aurostd::execute(XHOST.vzip.at(iext)+" -dfq `find \""+aurostd::CleanFileName(xvasp.Directory)+"\" -name \"*"+XHOST.vext.at(iext)+"\"`");
+                    aus << "00000  MESSAGE attempting UNZIP=" << XHOST.vzip[iext] << endl; aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
+                    aurostd::execute(XHOST.vzip[iext]+" -dfq `find \""+aurostd::CleanFileName(xvasp.Directory)+"\" -name \"*"+XHOST.vext[iext]+"\"`");
                   }		
 
                   if(aurostd::FileExist(xvasp.Directory+string("/POSCAR.static"))) {
@@ -2758,8 +2758,8 @@ namespace KBIN {
                   // command.clear();command.str(std::string());  // ORIGINAL
                   // command << "cd " <<  xvasp.Directory << endl; command << "bzip2" << " -dfq *bz2 " << endl;  // ORIGINAL
                   // aurostd::execute(command);  // ORIGINAL
-                  aus << "00000  MESSAGE attempting UNZIP=" << XHOST.vzip.at(iext) << endl; aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
-                  aurostd::execute(XHOST.vzip.at(iext)+" -dfq `find \""+aurostd::CleanFileName(xvasp.Directory)+"\" -name \"*"+XHOST.vext.at(iext)+"\"`");
+                  aus << "00000  MESSAGE attempting UNZIP=" << XHOST.vzip[iext] << endl; aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);		  
+                  aurostd::execute(XHOST.vzip[iext]+" -dfq `find \""+aurostd::CleanFileName(xvasp.Directory)+"\" -name \"*"+XHOST.vext[iext]+"\"`");
                 }		
 
                 // copy INCAR, POSCAR, KPOINTS, POTCAR from *.static
@@ -3941,7 +3941,7 @@ namespace KBIN {
         }
 
         //CO20210315
-        //print out these schemes so they can picked up by the vasp monitor
+        //print out these schemes so they can be picked up by the vasp monitor
         for(uint i=0;i<xvasp.aopts.vxscheme.size();i++){
           const string& flag=xvasp.aopts.vxscheme[i];
           if(flag.find("FLAG::")!=string::npos && flag.find("_PRESERVED")!=string::npos){
@@ -4853,8 +4853,8 @@ namespace KBIN {
     ostringstream aus;
 
     for(uint iext=0;iext<XHOST.vext.size();iext++) { 
-      if(aurostd::FileExist(xvasp.Directory+"/core"+XHOST.vext.at(iext)))
-        aurostd::execute("rm -f "+xvasp.Directory+"/core"+XHOST.vext.at(iext));
+      if(aurostd::FileExist(xvasp.Directory+"/core"+XHOST.vext[iext]))
+        aurostd::execute("rm -f "+xvasp.Directory+"/core"+XHOST.vext[iext]);
     }
     if(!xvasp.aopts.flag("FLAG::WAVECAR_PRESERVED") && aurostd::FileExist(xvasp.Directory+"/WAVECAR")) aurostd::RemoveFile(xvasp.Directory+"/WAVECAR");
     if(!xvasp.aopts.flag("FLAG::WAVEDER_PRESERVED") && aurostd::FileExist(xvasp.Directory+"/WAVEDER")) aurostd::RemoveFile(xvasp.Directory+"/WAVEDER");
@@ -4921,7 +4921,7 @@ namespace KBIN {
 namespace KBIN {
   void VASP_Recycle(const _xvasp& xvasp,int relax_number) {        // AFLOW_FUNCTION_IMPLEMENTATION //CO20210315
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-      aurostd::execute(XHOST.vzip.at(iext)+" -dqf "+aurostd::CleanFileName(xvasp.Directory+"/*"+XHOST.vext.at(iext)));
+      aurostd::execute(XHOST.vzip[iext]+" -dqf "+aurostd::CleanFileName(xvasp.Directory+"/*"+XHOST.vext[iext]));
     }
     aurostd::CopyFile(xvasp.Directory+"/CONTCAR.relax"+aurostd::utype2string<int>(relax_number),xvasp.Directory+"/POSCAR");
     aurostd::CopyFile(xvasp.Directory+"/INCAR.relax"+aurostd::utype2string<int>(relax_number),xvasp.Directory+"/INCAR");
@@ -4939,7 +4939,7 @@ namespace KBIN {
 namespace KBIN {
   void VASP_RecycleExtraFile(const _xvasp& xvasp,const string& xfile,int relax_number) {        // AFLOW_FUNCTION_IMPLEMENTATION  //CO20210315
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed 
-      aurostd::execute(XHOST.vzip.at(iext)+" -dqf "+aurostd::CleanFileName(xvasp.Directory+"/"+xfile+XHOST.vext.at(iext)));
+      aurostd::execute(XHOST.vzip[iext]+" -dqf "+aurostd::CleanFileName(xvasp.Directory+"/"+xfile+XHOST.vext[iext]));
     }
     aurostd::CopyFile(xvasp.Directory+"/"+xfile+".relax"+aurostd::utype2string<int>(relax_number),xvasp.Directory+"/"+xfile);
   }
@@ -5256,7 +5256,7 @@ namespace KBIN {
     //vasp.4.6.35 -> 4.635
     //vasp.5.4.4.18Apr17-6-g9f103f2a35 -> 5.44
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::VASPVersionString2Number():";
+    string soliloquy=XPID+"KBIN::VASPVersionString2Double():";
     string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vasp_version);
     if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
     if(version_str.empty()){return 0.0;}
