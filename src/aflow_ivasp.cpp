@@ -4631,26 +4631,33 @@ namespace KBIN {
     // ***************************************************************************
     // TYPE TYPE TYPE TYPE TYPE TYPE
     else if(command=="TYPE") {
-      //need to add scheme to check if mods have already been made, come back later
+      keyword="ISMEAR";
+      string keyword2="SIGMA",incar_input2="";
+      
+      if(Krun){
+        if(svalue=="DEFAULT") {incar_input=keyword+"=1";incar_input2=keyword2+"=0.1";incar_comment="for default (as metal)";}
+        else if(svalue=="METAL") {incar_input=keyword+"=1";incar_input2=keyword2+"=0.1";incar_comment="as metal";}
+        else if(svalue=="SEMICONDUCTOR" || svalue=="INSULATOR") {incar_input=keyword+"=0";incar_input2=keyword2+"=0.05";incar_comment="for insulators/semiconductors";}
+        else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"svalue="+svalue+" unknown (command="+command+")",_INPUT_ILLEGAL_);}
+        bool Krun1=true,Krun2=true;
+        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+          if(incar_input==incar_input_old){Krun1=false;}
+        }
+        if(aurostd::kvpairfound(xvasp.INCAR,keyword2,"=")){
+          incar_input_old=keyword2+"="+aurostd::kvpair2value(xvasp.INCAR,keyword2,"=");
+          if(incar_input2==incar_input_old){Krun2=false;}
+        }
+        if(Krun1==false&&Krun2==false){Krun=false;}
+      }
+      
       if(Krun){
         //REMOVE LINES
-        XVASP_INCAR_REMOVE_ENTRY(xvasp,"ISMEAR,SIGMA",operation,VERBOSE);  //CO20200624
+        XVASP_INCAR_REMOVE_ENTRY(xvasp,keyword+","+keyword2,operation,VERBOSE);  //CO20200624
         //ADD LINES
         if(VERBOSE) xvasp.INCAR << "# Performing " << operation_svalue << " [AFLOW] begin" << endl;
-        if(svalue=="DEFAULT") {
-          xvasp.INCAR << aurostd::PaddedPOST("ISMEAR=1",_incarpad_) << " # " << operation << " for default (as metal)" << endl;
-          xvasp.INCAR << aurostd::PaddedPOST("SIGMA=0.1",_incarpad_) << " # " << operation << " for default (as metal)" << endl;
-          //    xvasp.INCAR << aurostd::PaddedPOST("ISMEAR=2",_incarpad_) << " # " << operation << " default" << endl;
-          //   xvasp.INCAR << aurostd::PaddedPOST("SIGMA=0.2",_incarpad_) << " # " << operation << " default" << endl;
-        }
-        if(svalue=="METAL") {
-          xvasp.INCAR << aurostd::PaddedPOST("ISMEAR=1",_incarpad_) << " # " << operation << " for metal" << endl;
-          xvasp.INCAR << aurostd::PaddedPOST("SIGMA=0.1",_incarpad_) << " # " << operation << " for metal" << endl;
-        }
-        if(svalue=="SEMICONDUCTOR" || svalue=="INSULATOR") {
-          xvasp.INCAR << aurostd::PaddedPOST("ISMEAR=0",_incarpad_) << " # " << operation << " for insulators/semiconductors" << endl;
-          xvasp.INCAR << aurostd::PaddedPOST("SIGMA=0.05",_incarpad_) << " # " << operation << " for insulators/semiconductors" << endl;
-        }
+        xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation << " " << incar_comment << endl;
+        xvasp.INCAR << aurostd::PaddedPOST(incar_input2,_incarpad_) << " # " << operation << " " << incar_comment << endl;
         if(VERBOSE) xvasp.INCAR << "# Performing " << operation_svalue << " [AFLOW] end" << endl;
       }
     }
