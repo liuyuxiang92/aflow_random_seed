@@ -1874,20 +1874,20 @@ bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin,int& ncpus){
   if(!aurostd::FileExist(directory+"/"+_AFLOWLOCK_)){return false;}
   if(LDEBUG){cerr << soliloquy << " FOUND " << directory+"/"+_AFLOWLOCK_ << endl;}
 
+  uint i=0,j=0,vlines_size=0,vtokens_size=0;
   vector<string> vlines,vtokens;
-  aurostd::file2vectorstring(directory+"/"+_AFLOWLOCK_,vlines);
-  if(LDEBUG){cerr << soliloquy << " " << directory+"/"+_AFLOWLOCK_ << " contains " << vlines.size() << " lines" << endl;}
+  vlines_size=aurostd::file2vectorstring(directory+"/"+_AFLOWLOCK_,vlines);
+  if(LDEBUG){cerr << soliloquy << " " << directory+"/"+_AFLOWLOCK_ << " contains " << vlines_size << " lines" << endl;}
 
-  uint i=0,j=0;
-  for(i=vlines.size()-1;i<vlines.size();i--){ //go backwards
+  for(i=vlines_size-1;i<vlines_size;i--){ //go backwards
     if(vlines[i].find(VASP_KEYWORD_EXECUTION)==string::npos){continue;} //look for 'Executing:' line
     if(LDEBUG){cerr << soliloquy << " found line containing execution command: \"" << vlines[i] << "\"" << endl;}
-    aurostd::string2tokens(vlines[i],vtokens," ");
-    for(j=0;j<vtokens.size();j++){
-      if((j-2)<vtokens.size() && (vtokens[j]==DEFAULT_VASP_OUT||vtokens[j]==DEFAULT_VASP_OUT+";")){ //looking for sequence VASP_BIN >> VASP_OUT //if j goes below 0, then it goes to max uint //CO20210315 - adding semicolon as NO HOST mode used to print it
+    vtokens_size=aurostd::string2tokens(vlines[i],vtokens," ");
+    for(j=0;j<vtokens_size;j++){
+      if((j-2)<vtokens_size && (vtokens[j]==DEFAULT_VASP_OUT||vtokens[j]==DEFAULT_VASP_OUT+";")){ //looking for sequence VASP_BIN >> VASP_OUT //if j goes below 0, then it goes to max uint //CO20210315 - adding semicolon as NO HOST mode used to print it
         vasp_bin=vtokens[j-2];
         ncpus=1;  //set default
-        if((j-3)<vtokens.size() && aurostd::isfloat(vtokens[j-3])){ncpus=aurostd::string2utype<int>(vtokens[j-3]);} //grab if available, it will be just before the bin
+        if((j-3)<vtokens_size && aurostd::isfloat(vtokens[j-3])){ncpus=aurostd::string2utype<int>(vtokens[j-3]);} //grab if available, it will be just before the bin
         return true;
       }
     }
@@ -1920,8 +1920,9 @@ void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed
   vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved=false;
   xfixed.clear();
 
+  uint vlines_size=0;
   vector<string> vlines,vtokens;
-  aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines);
+  vlines_size=aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines);
 
   string str_xvasp_aopts_start="xvasp.aopts.flag(\"";
   string str_vflags_ignore_afix_start="vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"";
@@ -1932,7 +1933,7 @@ void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed
   string::size_type loc_start=0,loc_end=0;
 
   uint nexecuting=0;
-  for(i=vlines.size()-1;i<vlines.size();i--){ //go backwards
+  for(i=vlines_size-1;i<vlines_size;i--){ //go backwards
     const string& line=vlines[i];
     if(line.find(VASP_KEYWORD_EXECUTION)!=string::npos){nexecuting++;} //look for 'Executing:' line
     if(LDEBUG){
@@ -2014,7 +2015,10 @@ bool VASP_instance_running(const string& vasp_bin){ //CO20210315
 // AFLOW_monitor_VASP
 // ***************************************************************************
 #define NCOUNTS_WAIT_MONITOR 10 //wait no more than 10*sleep_secounds (should be 10 minutes)
-void AFLOW_monitor_VASP(){
+void AFLOW_monitor_VASP(){  //CO20210601
+  //AFLOW_monitor_VASP() with no input arguments will look for FILE/DIRECTORY input from XHOST (--FILE or --D)
+  //then it will pass the path to AFLOW_monitor_VASP(const string& directory)
+  //this function will keep reading the --FILE input for new directories
   bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || XHOST.DEBUG);
   string soliloquy=XPID+"AFLOW_monitor_VASP():";
 
@@ -2028,7 +2032,7 @@ void AFLOW_monitor_VASP(){
     string file=XHOST.vflag_control.getattachedscheme("FILE");
     string file_dir=aurostd::dirname(file);
     vector<string> vlines,vtokens;
-    uint i=0,j=0;
+    uint i=0,j=0,vlines_size=0,vtokens_size=0;
     bool found=false;
     string search_str="[dir=";
     string directory_old="";
@@ -2041,14 +2045,14 @@ void AFLOW_monitor_VASP(){
       }
       if(LDEBUG){cerr << soliloquy << " FILE found: FILE=" << file << endl;}
       nfailures=0;  //reset
-      aurostd::file2vectorstring(file,vlines);
+      vlines_size=aurostd::file2vectorstring(file,vlines);
       found=false;
-      for(i=vlines.size()-1;i<vlines.size()&&!found;i--){ //go backwards
+      for(i=vlines_size-1;i<vlines_size&&!found;i--){ //go backwards
         //looking for "... - [dir=.] - [user=aflow] ..."
         if(vlines[i].find(search_str)==string::npos){continue;}
         if(LDEBUG){cerr << soliloquy << " found line containing \"" << search_str << "\": " << vlines[i] << endl;}
-        aurostd::string2tokens(vlines[i],vtokens," ");
-        for(j=0;j<vtokens.size()&&!found;j++){
+        vtokens_size=aurostd::string2tokens(vlines[i],vtokens," ");
+        for(j=0;j<vtokens_size&&!found;j++){
           if(vtokens[j].find(search_str)==string::npos){continue;}
           directory=vtokens[j];
           aurostd::StringSubst(directory,search_str,"");aurostd::StringSubst(directory,"]","");
@@ -2085,7 +2089,10 @@ void AFLOW_monitor_VASP(){
   if(LDEBUG){cerr << soliloquy << " END" << endl;}
 }
 
-void AFLOW_monitor_VASP(const string& directory){
+void AFLOW_monitor_VASP(const string& directory){ //CO20210601
+  //AFLOW_monitor_VASP() with no input arguments will look for FILE/DIRECTORY input from XHOST (--FILE or --D)
+  //then it will pass the path to AFLOW_monitor_VASP(const string& directory)
+  //this function will finish once the calculation in the particular directory finishes
   string soliloquy=XPID+"AFLOW_monitor_VASP():";
   stringstream message;
 
@@ -2132,6 +2139,7 @@ void AFLOW_monitor_VASP(const string& directory){
   aurostd::xoption xmessage,xwarning,xmonitor,xfixed;
   bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP);
   bool vasp_running=false;
+  uint vlines_lock_size=0;
   vector<string> vlines_lock;
   
   //there are issues getting the correct vasp binary since this is an entirely different aflow instance
@@ -2182,8 +2190,8 @@ void AFLOW_monitor_VASP(const string& directory){
     
     //determine whether we need to clear xmonitor with new vasp instance (relax1->relax2)
     nexecuting=0;
-    aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines_lock);  //we already checked above that it exists
-    for(i=0;i<vlines_lock.size();i++){
+    vlines_lock_size=aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines_lock);  //we already checked above that it exists
+    for(i=0;i<vlines_lock_size;i++){
       if(vlines_lock[i].find(VASP_KEYWORD_EXECUTION)==string::npos){continue;}
       nexecuting++;
     }
@@ -2238,8 +2246,8 @@ void AFLOW_monitor_VASP(const string& directory){
     //it's possible KBIN::VASP_ProcessWarnings() takes a long time (big vasp.out)
     //double check that there isn't a new instance of vasp running
     nexecuting=0;
-    aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines_lock);  //we already checked above that it exists
-    for(i=0;i<vlines_lock.size();i++){
+    vlines_lock_size=aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines_lock);  //we already checked above that it exists
+    for(i=0;i<vlines_lock_size;i++){
       if(vlines_lock[i].find(VASP_KEYWORD_EXECUTION)==string::npos){continue;}
       nexecuting++;
     }

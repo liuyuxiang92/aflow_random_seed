@@ -3375,7 +3375,7 @@ namespace KBIN {
     //
     scheme="NPAR_REMOVE";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Please remove the tag NPAR from the INCAR file and restart the",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Please remove the tag NPAR from the INCAR file",true,true,true,grep_stop_condition));  //and restart the
     xwarning.flag(scheme,found_warning);
     //
     scheme="PSMAXN";

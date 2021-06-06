@@ -42,6 +42,7 @@ aflow
                                     --FILE=LOCK to point to the AFLOW LOCK file for the run of interest.
 
                                     Example use case in qsub file:
+                                    [QSUB_EXAMPLE]START
                                     aflow --monitor_vasp --kill_vasp_all --FILE=$RUN_PATH/LOCK --use_aflow.in=aflow.in --use_LOCK=LOCK &
                                     MONITOR_PID=$!
                                     aflow --run --mpi --np=64 --force --use_aflow.in=aflow.in --use_LOCK=LOCK -D $RUN_PATH >> $LOG_PATH
@@ -50,6 +51,7 @@ aflow
                                     [ -n "`ps -p $MONITOR_PID | grep $MONITOR_PID`" ] && touch $RUN_PATH/STOPFLOW && sleep 65;
                                     [ -n "`ps -p $MONITOR_PID | grep $MONITOR_PID`" ] && kill -9 $MONITOR_PID
                                     rm  -f $RUN_PATH/STOPFLOW
+                                    [QSUB_EXAMPLE]STOP
 
                                     The STOPFLOW file will trigger the monitor to exit gracefully.
                                     Otherwise, a kill command for the monitor is issued.
@@ -205,11 +207,9 @@ aflow
        ACTION:  Generates xCARs from aflow.in
        NOTE:    This option does not run any simulation.
 
-   //DX and CO - START
    --generate_symmetry | --generate_sym
        ACTION:  Generates symmetry files: aflow.pgroup.out, aflow.fgroup.out, aflow.pgroup_xtal.out, aflow.iatoms.out, and aflow.agroup.out.
        NOTE:    This option does not run any simulation.
-   //DX and CO - END
 
   MPI/SERIAL PARAMETERS
    --mpi        Force turn ON MPI
@@ -1378,7 +1378,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     AFLOW will change the mixing parameters in the INCAR: AMIX=0.1 and BMIX=0.01.
     Should the error occur again, AFLOW will change the mixing parameters in the INCAR: BMIX=3 and AMIN=0.01.
     Should the error occur again, AFLOW will set NELM to MAX_VASP_NELM (see README_AFLOW_AFLOWRC.TXT).
-    Should the error occur again, AFLOW will set NELM to MAX_VASP_NELM (see README_AFLOW_AFLOWRC.TXT) while decreasing EDIFF by a factor of 10.
+    Should the error occur again, AFLOW will set NELM to MAX_VASP_NELM (see README_AFLOW_AFLOWRC.TXT) while decreasing EDIFF (loosening the tolerance) by a factor of 10.
     
   ERROR:NIRMAT
     The NIRMAT error is triggered when the following text is found in the vasp.out: "Found some non-integer element in rotation matrix".
@@ -1402,7 +1402,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     AFLOW will apply the following change to the INCAR: NPAR=4.
 
   ERROR:NPAR_REMOVE
-    The NPAR_REMOVE error is triggered when the following text is found in the vasp.out: "Please remove the tag NPAR from the INCAR file and restart the".
+    The NPAR_REMOVE error is triggered when the following text is found in the vasp.out: "Please remove the tag NPAR from the INCAR file".
     AFLOW will remove the NPAR tag from the INCAR.
 
   ERROR:NUM_PROB
@@ -1438,7 +1438,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     Should the error occur again, AFLOW will switch to an odd Gamma-centered KPOINTS scheme.
     Should the error occur again, AFLOW will switch to a RELAX_MODE=FORCES scheme.
     Should the error occur again, AFLOW will halve the default POTIM parameter (0.5) and apply it as an input in the INCAR.
-    Should the error occur again, AFLOW will continue to halve POTIM until 
+    Should the error occur again, AFLOW will continue to halve POTIM until POTIM is smaller than 0.01.
     Should the error occur again, AFLOW will half POTIM until it falls below 0.01.
     Should the error occur again, AFLOW will apply the following change to the INCAR: ISMEAR=-1.
 
@@ -1478,16 +1478,16 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     AFLOW will ignore all fixes. This is equivalent to ERROR:ALL.
 
   FIX:ALGO
-    This input will avoid any ALGO fixes. Relevant errors: ERROR:BRMIX, ERROR:CSLOSHING, ERROR:DAV, ERROR:RMM_DIIS, .
+    This input will avoid any ALGO fixes. Relevant errors: ERROR:BRMIX, ERROR:CSLOSHING, ERROR:DAV, and ERROR:RMM_DIIS.
 
   FIX:ALGO=FAST
-    This input will avoid the ALGO=FAST fix. Relevant errors: ERROR:CSLOSHING, ERROR:DAV, ERROR:RMM_DIIS.
+    This input will avoid the ALGO=FAST fix. Relevant errors: ERROR:CSLOSHING, ERROR:DAV, and ERROR:RMM_DIIS.
 
   FIX:ALGO=NORMAL
-    This input will avoid the ALGO=NORMAL fix. Relevant errors: ERROR:CSLOSHING, ERROR:RMM_DIIS.
+    This input will avoid the ALGO=NORMAL fix. Relevant errors: ERROR:CSLOSHING and ERROR:RMM_DIIS.
 
   FIX:ALGO=VERYFAST
-    This input will avoid the ALGO=VERYFAST fix. Relevant errors: ERROR:BRMIX, ERROR:DAV.
+    This input will avoid the ALGO=VERYFAST fix. Relevant errors: ERROR:BRMIX and ERROR:DAV.
 
   FIX:AMIN
     This input will avoid any AMIN fixes. Relevant errors: ERROR:NELM.
@@ -1520,7 +1520,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     This input will avoid the ENMAX fix. Relevant errors: ERROR:PSMAXN.
 
   FIX:ISMEAR
-    This input will avoid any ISMEAR fixes. Relevant errors: ERROR:DENTET, ERROR:RMM_DIIS.
+    This input will avoid any ISMEAR fixes. Relevant errors: ERROR:DENTET and ERROR:RMM_DIIS.
 
   FIX:ISMEAR=2
     This input will avoid the ISMEAR=2 fix. Relevant errors: ERROR:DENTET.
@@ -1529,49 +1529,49 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     This input will avoid the ISMEAR=-1 fix. Relevant errors: ERROR:RMM_DIIS.
 
   FIX:KPOINTS
-    This input will avoid any KPOINTS fixes. Relevant errors: ERROR:GAMMA_SHIFT, ERROR:IBZKPT, ERROR:KKSYM, ERROR:MEMORY, ERROR:MPICH139, ERROR:NKXYZ_IKPTD, ERROR:READ_KPOINTS_RD_SYM, ERROR:RMM_DIIS, ERROR:ROTMAT.
+    This input will avoid any KPOINTS fixes. Relevant errors: ERROR:GAMMA_SHIFT, ERROR:IBZKPT, ERROR:KKSYM, ERROR:MEMORY, ERROR:MPICH139, ERROR:NKXYZ_IKPTD, ERROR:READ_KPOINTS_RD_SYM, ERROR:RMM_DIIS, and ERROR:ROTMAT.
 
   FIX:KPOINTS=GAMMA
-    This input will avoid the KPOINTS=GAMMA fix. Relevant errors: ERROR:GAMMA_SHIFT, ERROR:IBZKPT, ERROR:ROTMAT.
+    This input will avoid the KPOINTS=GAMMA fix. Relevant errors: ERROR:GAMMA_SHIFT, ERROR:IBZKPT, and ERROR:ROTMAT.
 
   FIX:KPOINTS=GAMMA_EVEN
     This input will avoid the KPOINTS=GAMMA_EVEN fix. Relevant errors: ERROR:ROTMAT.
 
   FIX:KPOINTS=GAMMA_ODD
-    This input will avoid the KPOINTS=GAMMA_ODD fix. Relevant errors: ERROR:RMM_DIIS, ERROR:ROTMAT.
+    This input will avoid the KPOINTS=GAMMA_ODD fix. Relevant errors: ERROR:RMM_DIIS and ERROR:ROTMAT.
 
   FIX:KPOINTS=KMAX
-    This input will avoid the KPOINTS=KMAX fix. Relevant errors: ERROR:KKSYM, ERROR:ROTMAT.
+    This input will avoid the KPOINTS=KMAX fix. Relevant errors: ERROR:KKSYM and ERROR:ROTMAT.
 
   FIX:KPOINTS--
-    This input will avoid the KPOINTS-- fix. Relevant errors: ERROR:MEMORY, ERROR:NKXYZ_IKPTD.
+    This input will avoid the KPOINTS-- fix. Relevant errors: ERROR:MEMORY and ERROR:NKXYZ_IKPTD.
 
   FIX:KPOINTS-=2
     This input will avoid the KPOINTS-=2 fix. Relevant errors: ERROR:MPICH139.
 
   FIX:LREAL
-    This input will avoid the LREAL fix. Relevant errors: ERROR:REAL_OPT, ERROR:REAL_OPTLAY_1.
+    This input will avoid the LREAL fix. Relevant errors: ERROR:REAL_OPT and ERROR:REAL_OPTLAY_1.
   
   FIX:NBANDS++
     This input will avoid the NBANDS increase fix. Relevant errors: ERROR:NBANDS.
   
   FIX:NBANDS--
-    This input will avoid the NBANDS decrease fix. Relevant errors: ERROR:EXCCOR, ERROR:MEMORY, ERROR:ZPOTRF.
+    This input will avoid the NBANDS decrease fix. Relevant errors: ERROR:EXCCOR, ERROR:MEMORY, and ERROR:ZPOTRF.
 
   FIX:NPAR
-    This input will avoid any NPAR fixes. Relevant errors: ERROR:NPAR, ERROR:NPARC, ERROR:NPARN, ERROR:NPAR_REMOVE.
+    This input will avoid any NPAR fixes. Relevant errors: ERROR:NPAR, ERROR:NPARC, ERROR:NPARN, and ERROR:NPAR_REMOVE.
 
   FIX:NPAR=1
     This input will avoid the NPAR=1 fix. Relevant errors: ERROR:NPAR.
 
   FIX:NPAR=4
-    This input will avoid the NPAR=4 fix. Relevant errors: ERROR:NPARC, ERROR:NPARN.
+    This input will avoid the NPAR=4 fix. Relevant errors: ERROR:NPARC and ERROR:NPARN.
 
   FIX:NPAR_REMOVE
     This input will avoid the NPAR_REMOVE fix. Relevant errors: ERROR:NPAR_REMOVE.
 
   FIX:POSCAR
-    This input will avoid any POSCAR fixes. Relevant errors: ERROR:EXCCOR, ERROR:NATOMS, ERROR:ZPOTRF.
+    This input will avoid any POSCAR fixes. Relevant errors: ERROR:EXCCOR, ERROR:NATOMS, and ERROR:ZPOTRF.
 
   FIX:POSCAR_SCALE
     This input will avoid any POSCAR scale fixes. Relevant errors: ERROR:EXCCOR.
@@ -1580,7 +1580,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     This input will avoid the POSCAR_SCALE*=1.2 fix. Relevant errors: ERROR:EXCCOR.
 
   FIX:POSCAR_VOLUME
-    This input will avoid any POSCAR volume fixes. Relevant errors: ERROR:NATOMS, ERROR:ZPOTRF.
+    This input will avoid any POSCAR volume fixes. Relevant errors: ERROR:NATOMS and ERROR:ZPOTRF.
 
   FIX:POSCAR_VOLUME*=1.05
     This input will avoid the POSCAR_VOLUME*=1.05 fix. Relevant errors: ERROR:ZPOTRF.
@@ -1592,16 +1592,16 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     This input will avoid the POSCAR=STANDARD_CONVENTIONAL fix. Relevant errors: ERROR:ZPOTRF.
   
   FIX:POTIM
-    This input will avoid the POTIM fix. Relevant errors: ERROR:RMM_DIIS, ERROR:ZPOTRF.
+    This input will avoid the POTIM fix. Relevant errors: ERROR:RMM_DIIS and ERROR:ZPOTRF.
 
   FIX:RECYCLE_CONTCAR
     This input will avoid restarting the calculation from most up-to-date CONTCAR. Relevant errors: ERROR:CALC_FROZEN.
   
   FIX:RELAX_MODE
-    This input will avoid any RELAX_MODE fixes. Relevant errors: ERROR:RMM_DIIS, ERROR:ZBRENT.
+    This input will avoid any RELAX_MODE fixes. Relevant errors: ERROR:RMM_DIIS and ERROR:ZBRENT.
 
   FIX:RELAX_MODE=FORCES
-    This input will avoid the RELAX_MODE=FORCES fix. Relevant errors: ERROR:RMM_DIIS, ERROR:ZBRENT.
+    This input will avoid the RELAX_MODE=FORCES fix. Relevant errors: ERROR:RMM_DIIS and ERROR:ZBRENT.
   
   FIX:RESTART_CALC
     This input will avoid the restarting of the calculation with no changes to the input files.
@@ -1610,16 +1610,16 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     This input will avoid the SKIP_RUN fix. Relevant errors: ERROR:MEMORY.
 
   FIX:SYM
-    This input will avoid any SYM fixes. Relevant errors: ERROR:READ_KPOINTS_RD_SYM, ERROR:ROTMAT.
+    This input will avoid any SYM fixes. Relevant errors: ERROR:READ_KPOINTS_RD_SYM and ERROR:ROTMAT.
   
   FIX:SYM=OFF
-    This input will avoid the SYM=OFF fix. Relevant errors: ERROR:READ_KPOINTS_RD_SYM, ERROR:ROTMAT.
+    This input will avoid the SYM=OFF fix. Relevant errors: ERROR:READ_KPOINTS_RD_SYM and ERROR:ROTMAT.
 
   FIX:SYMPREC
-    This input will avoid the SYMPREC fix. Relevant errors: ERROR:INVGRP, ERROR:ROTMAT, ERROR:SGRCON, ERROR:SYMPREC.
+    This input will avoid the SYMPREC fix. Relevant errors: ERROR:INVGRP, ERROR:ROTMAT, ERROR:SGRCON, and ERROR:SYMPREC.
   
   FIX:ULIMIT
-    This input will avoid the ULIMIT fix. Relevant errors: ERROR:MPICH11, ERROR:MPICH139.
+    This input will avoid the ULIMIT fix. Relevant errors: ERROR:MPICH11 and ERROR:MPICH139.
 
 <----------------cut here------------------------------------>
 EXAMPLE

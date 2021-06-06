@@ -2357,7 +2357,7 @@ namespace aurostd {
   //ME20191001 - Changed to unsigned long long int to accommodate large files
   unsigned long long int FileSize(const string& _FileName) {
     string FileName(CleanFileName(_FileName));
-    if(0){
+    if(0){  //CO20210601 - found much faster approach below, we don't want to read the whole file if it's big
       ifstream FileStream;
       FileStream.open(FileName.c_str(),std::ios::in);
       if(!FileStream.good()){return 0;}
