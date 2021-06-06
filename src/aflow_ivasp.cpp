@@ -5604,7 +5604,7 @@ namespace KBIN {
     }
     if(operation.find("YODDSHIFT")!=string::npos){
       if(_isodd(xvasp.str.kpoints_k2)){
-        if(!aurostd::isequal(xvasp.str.kpoints_s2,0.5)){xvasp.str.kpoints_s2=0.5;nchanges_made++;if(LDEBUG) cerr << "Xoddshift s2=" << xvasp.str.kpoints_s2 << endl;}
+        if(!aurostd::isequal(xvasp.str.kpoints_s2,0.5)){xvasp.str.kpoints_s2=0.5;nchanges_made++;if(LDEBUG) cerr << "Yoddshift s2=" << xvasp.str.kpoints_s2 << endl;}
       }
       else{ //_iseven()
         if(!aurostd::isequal(xvasp.str.kpoints_s2,0.0)){xvasp.str.kpoints_s2=0.0;nchanges_made++;if(LDEBUG) cerr << "Yoddshift s2=" << xvasp.str.kpoints_s2 << endl;}
