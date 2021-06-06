@@ -5266,7 +5266,7 @@ namespace KBIN {
     //CO20210315 - modifying this function, not using substring2bool() which might match IALGO with ALGO or NELM with NELMIN, keyword is specific key to remove
     //do NOT preload/rewrite the INCAR file, only modify xvasp.INCAR
     bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
-    string function="KBIN::AFLOWIN_REMOVE";
+    string function="KBIN::XVASP_INCAR_REMOVE_ENTRY";
     string soliloquy=XPID+function+"():";
     
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
