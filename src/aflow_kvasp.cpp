@@ -3212,7 +3212,11 @@ namespace KBIN {
     //
     scheme="NKXYZ_IKPTD"; //usually goes with IBZKPT
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NKX>IKPTD",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NKY>IKPTD",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NKZ>IKPTD",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) ));
+    bool found_nkxyz_ikptd=false; //break up for readability
+    found_nkxyz_ikptd=(found_nkxyz_ikptd || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NKX>IKPTD",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) );
+    found_nkxyz_ikptd=(found_nkxyz_ikptd || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NKY>IKPTD",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) );
+    found_nkxyz_ikptd=(found_nkxyz_ikptd || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NKZ>IKPTD",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) );
+    found_warning=(found_warning && found_nkxyz_ikptd);
     xwarning.flag(scheme,found_warning);
     //
     scheme="INVGRP";  //usually goes with SYMPREC
@@ -3329,24 +3333,36 @@ namespace KBIN {
     //=   KILLED BY SIGNAL: 9 (Killed)
     //===================================================================================
     //
+    bool found_bad_termination=aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition);
+    bool found_exit_code=false; //specific exit code
+    //
     scheme="MPICH0";  //0 just means that it is generic, maybe fix name later
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
+    found_warning=(found_warning && found_bad_termination);
     xwarning.flag(scheme,found_warning);
     //
     scheme="MPICH11";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 11",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"KILLED BY SIGNAL: 11",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition)) ));
+    found_exit_code=false;
+    found_exit_code=(found_exit_code || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 11",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) );
+    found_exit_code=(found_exit_code || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"KILLED BY SIGNAL: 11",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) );
+    found_warning=(found_warning && (found_bad_termination && found_exit_code));
     xwarning.flag(scheme,found_warning);
     //
     scheme="MPICH139";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 139",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"KILLED BY SIGNAL: 139",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition)) ));
+    found_exit_code=false;
+    found_exit_code=(found_exit_code || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 139",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) );
+    found_exit_code=(found_exit_code || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"KILLED BY SIGNAL: 139",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) );
+    found_warning=(found_warning && (found_bad_termination && found_exit_code));
     xwarning.flag(scheme,found_warning);
     //
     scheme="MPICH174";  //CO20210315
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 174",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"KILLED BY SIGNAL: 174",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition)) ));
+    found_exit_code=false;
+    found_exit_code=(found_exit_code || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 174",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) );
+    found_exit_code=(found_exit_code || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"KILLED BY SIGNAL: 174",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) );
+    found_warning=(found_warning && (found_bad_termination && found_exit_code));
     xwarning.flag(scheme,found_warning);
     //
     scheme="NATOMS";  //look for problem for distance
@@ -3920,6 +3936,9 @@ namespace KBIN {
     }
     if(kflags.KBIN_MPI) kflags.KBIN_BIN=kflags.KBIN_MPI_BIN; // forcing, no matter what
 
+    uint xvasp_aopts_vxscheme_size=0;
+    uint vflags_KBIN_VASP_FORCE_OPTION_IGNORE_AFIX_vxscheme_size=0;
+
     while(vasp_start) {
       // ********* RUN VASP                
       { // ERRORS
@@ -3948,13 +3967,15 @@ namespace KBIN {
 
         //CO20210315
         //print out these schemes so they can be picked up by the vasp monitor
-        for(uint i=0;i<xvasp.aopts.vxscheme.size();i++){
+        xvasp_aopts_vxscheme_size=xvasp.aopts.vxscheme.size();
+        for(uint i=0;i<xvasp_aopts_vxscheme_size;i++){
           const string& flag=xvasp.aopts.vxscheme[i];
           if(flag.find("FLAG::")!=string::npos && flag.find("_PRESERVED")!=string::npos){
             if(xvasp.aopts.flag(flag)){aus << "MMMMM  MESSAGE xvasp.aopts.flag(\"" << flag << "\")=" << xvasp.aopts.flag(flag) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
           }
         }
-        for(uint i=0;i<vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.vxscheme.size();i++){
+        vflags_KBIN_VASP_FORCE_OPTION_IGNORE_AFIX_vxscheme_size=vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.vxscheme.size();
+        for(uint i=0;i<vflags_KBIN_VASP_FORCE_OPTION_IGNORE_AFIX_vxscheme_size;i++){
           const string& flag=vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.vxscheme[i];
           if(vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(flag)){aus << "MMMMM  MESSAGE vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"" << flag << "\")=" << vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(flag) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
         }
@@ -5013,7 +5034,9 @@ namespace KBIN {
     }
     return NSTEPS;
   }
-  bool VASP_OSZICARUnconverging(const string& dir,uint cutoff) {
+  bool VASP_OSZICARUnconverging(const string& dir,uint cutoff) {  //CO20210601
+    //this function will read the whole OSZICAR looking for electronic sloshing issues
+    //if there are $cutoff ionic steps that did not converge electronically, return true
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::VASP_OSZICARUnconverging():";
     vector<string> vlines,vrelax,tokens;
@@ -5041,8 +5064,9 @@ namespace KBIN {
     if(nissues==cutoff) return true;
     return false;
   }
-  bool VASP_OSZICARUnconverged(const string& oszicar,const string& outcar) {
-    //we only care about the last electronic SC steps
+  bool VASP_OSZICARUnconverged(const string& oszicar,const string& outcar) {  //CO20210601
+    //this function only looks at the last electronic SC step (different than VASP_OSZICARUnconverging, good for STATIC calcs)
+    //if it is unconverged, return true
     bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::VASP_OSZICARUnconverged():";
     uint NELM=KBIN::VASP_getNELM(outcar);
@@ -5193,18 +5217,19 @@ namespace KBIN {
     //outcar -> vasp.4.6.35
     //outcar -> vasp.5.4.4.18Apr17-6-g9f103f2a35
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::OUTCAR2VASPVersionString():";
+    string soliloquy=XPID+"KBIN::OUTCAR2VASPVersion():";
     if(LDEBUG){cerr << soliloquy << " outcar=" << outcar << endl;}
     if(!aurostd::FileExist(outcar)){return "";}
     vector<string> vlines;
-    aurostd::file2vectorstring(outcar,vlines);
+    uint vlines_size=aurostd::file2vectorstring(outcar,vlines);
     vector<string> tokens;
-    for(uint iline=0;iline<vlines.size();iline++){
+    uint tokens_size=0;
+    for(uint iline=0;iline<vlines_size;iline++){
       if(LDEBUG){cerr << soliloquy << " vlines[iline]=\"" << vlines[iline] << "\"" << endl;}
       if(vlines[iline].find("vasp.")!=string::npos){
         if(LDEBUG){cerr << soliloquy << " FOUND 'vasp.' line" << endl;}
-        aurostd::string2tokens(vlines[iline],tokens," ");
-        for(uint i=0;i<tokens.size();i++){
+        tokens_size=aurostd::string2tokens(vlines[iline],tokens," ");
+        for(uint i=0;i<tokens_size;i++){
           if(tokens[i].find("vasp.")!=string::npos){
             return tokens[i];
           }
@@ -5261,6 +5286,7 @@ namespace KBIN {
   double VASPVersionString2Double(const string& vasp_version){  //CO20210315
     //vasp.4.6.35 -> 4.635
     //vasp.5.4.4.18Apr17-6-g9f103f2a35 -> 5.44
+    //differs from 2Number in that it returns a double, might be good for `if(VASPVersionString2Double(vasp_bin)>4.6)`
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::VASPVersionString2Double():";
     string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vasp_version);

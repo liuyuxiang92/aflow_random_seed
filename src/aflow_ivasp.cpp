@@ -6805,6 +6805,8 @@ namespace KBIN {
       //END - add fix to _AFLOWIN_ 
     }
     else if(fix=="RELAX_MODE=FORCES") {
+      //do not move to XVASP_INCAR_PREPARE_GENERIC, this fix will affect many parameters
+      //aflow relies on specialized function to initialize INCAR with these kind of settings (XVASP_INCAR_Relax_ON())
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - load INCAR into xvasp, modify, then write out new INCAR
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
@@ -7453,6 +7455,9 @@ namespace KBIN {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //last-ditch efforts
     
+    //try_last_ditch_efforts controls whether we try ANY last_ditch_efforts
+    //the local variable try_last_ditch_effort targets each individual effort
+    //think XHOST.DBEUG vs. LDEBUG
     bool try_last_ditch_effort=try_last_ditch_efforts;
 
     if(LDEBUG){aus << soliloquy << " Krun=" << Krun << " [1]" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
@@ -7461,7 +7466,7 @@ namespace KBIN {
     if(mode=="MEMORY") {try_last_ditch_effort=false;} //changing POSCAR doesn't help
     else if(mode=="MPICH11") {try_last_ditch_effort=false;} //changing POSCAR doesn't help
     else if(mode=="MPICH139") {try_last_ditch_effort=false;} //changing POSCAR doesn't help
-    else if(mode=="MPICH174") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
+    else if(mode=="MPICH174") {try_last_ditch_effort=false;} //changing POSCAR doesn't help
 
     if(Krun==false && try_last_ditch_effort){
       //last-ditch effort, increase volume
@@ -7474,10 +7479,10 @@ namespace KBIN {
     
     try_last_ditch_effort=try_last_ditch_efforts;
     if(mode=="EXCCOR") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
-    else if(mode=="MEMORY") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
-    else if(mode=="MPICH11") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
-    else if(mode=="MPICH139") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
-    else if(mode=="MPICH174") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
+    else if(mode=="MEMORY") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    else if(mode=="MPICH11") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    else if(mode=="MPICH139") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    else if(mode=="MPICH174") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
     else if(mode=="NATOMS") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
     
     if(Krun==false && try_last_ditch_effort){
@@ -7491,10 +7496,10 @@ namespace KBIN {
     
     try_last_ditch_effort=try_last_ditch_efforts;
     if(mode=="EXCCOR") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
-    else if(mode=="MEMORY") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
-    else if(mode=="MPICH11") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
-    else if(mode=="MPICH139") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
-    else if(mode=="MPICH174") {try_last_ditch_effort=false;} //increasing KPOINTS doesn't help
+    else if(mode=="MEMORY") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    else if(mode=="MPICH11") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    else if(mode=="MPICH139") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    else if(mode=="MPICH174") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
     else if(mode=="NATOMS") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
     
     if(Krun==false && try_last_ditch_effort){
