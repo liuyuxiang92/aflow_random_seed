@@ -3155,11 +3155,15 @@ namespace KBIN {
 
     bool vasp_oszicar_unconverged=KBIN::VASP_OSZICARUnconverged(xvasp.Directory+"/OSZICAR",xvasp.Directory+"/OUTCAR");
 
+    bool RemoveWS=true; //remove whitespaces
+    bool case_insensitive=true;
+    bool expect_near_end=true;  //cat vs. tac
+
     //WARNINGS START
     if(LDEBUG){aus << soliloquy << " checking warnings" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     xwarning.flag("OUTCAR_INCOMPLETE",vasp_still_running==false && !KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,false));  //CO20201111
     xmessage.flag("REACHED_ACCURACY",vasp_still_running==false &&
-        ( ( relaxing==true  && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"reached required accuracy",true,true,true,grep_stop_condition) ) ||
+        ( ( relaxing==true  && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"reached required accuracy",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) ) ||
           ( relaxing==false && vasp_oszicar_unconverged==false && xwarning.flag("OUTCAR_INCOMPLETE")==false ) || //CO20210315 - "reached accuracy" for static/bands calculation is a converged electronic scf, need to also check OUTCAR_INCOMPLETE, as a converged OSZICAR might actually be a run that ended because of an error
           FALSE) 
         );
@@ -3186,54 +3190,54 @@ namespace KBIN {
     //
     scheme="SGRCON";  //usually goes with NIRMAT
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"VERY BAD NEWS! internal error in subroutine SGRCON",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"VERY BAD NEWS! internal error in subroutine SGRCON",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     scheme="NIRMAT"; //usually goes with SGRCON
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Found some non-integer element in rotation matrix",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Found some non-integer element in rotation matrix",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     scheme="IBZKPT";  //usually goes with KKSYM or NKXYZ_IKPTD
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"VERY BAD NEWS! internal error in subroutine IBZKPT",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"VERY BAD NEWS! internal error in subroutine IBZKPT",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     scheme="KKSYM"; //usually goes with IBZKPT
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Reciprocal lattice and k-lattice belong to different class of lattices",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Reciprocal lattice and k-lattice belong to different class of lattices",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     scheme="NKXYZ_IKPTD"; //usually goes with IBZKPT
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NKX>IKPTD",true,true,true,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NKY>IKPTD",true,true,true,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NKZ>IKPTD",true,true,true,grep_stop_condition) ));
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NKX>IKPTD",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NKY>IKPTD",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NKZ>IKPTD",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) ));
     xwarning.flag(scheme,found_warning);
     //
     scheme="INVGRP";  //usually goes with SYMPREC
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"VERY BAD NEWS! internal error in subroutine INVGRP",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"VERY BAD NEWS! internal error in subroutine INVGRP",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     scheme="SYMPREC"; //usually goes with INVGR
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"inverse of rotation matrix was not found (increase SYMPREC)",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"inverse of rotation matrix was not found (increase SYMPREC)",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //VASP's internal symmetry routines END
     
     //VASP issues with RMM-DIIS START
     scheme="EDDRMM"; //CO20210315 - look here https://www.vasp.at/wiki/index.php/IALGO#RMM-DIIS
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"WARNING in EDDRMM: call to ZHEGV failed",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"WARNING in EDDRMM: call to ZHEGV failed",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     scheme="NUM_PROB";  //CO20210315 - look here https://www.vasp.at/wiki/index.php/IALGO#RMM-DIIS  //CO20210315 - num prob can be a big problem for the DOS: https://www.vasp.at/forum/viewtopic.php?f=3&t=18028
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"num prob",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"num prob",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     scheme="ZBRENT";  //CO20210315 - look here https://www.vasp.at/wiki/index.php/IALGO#RMM-DIIS
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"ZBRENT: can't locate minimum",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"ZBRENT: can't locate minimum",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //VASP issues with RMM-DIIS END
     
@@ -3255,7 +3259,7 @@ namespace KBIN {
     //ALL OTHERS (in alphabetic order) START
     scheme="BRMIX";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BRMIX: very serious problems",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BRMIX: very serious problems",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     scheme="CALC_FROZEN"; //CO20210315
@@ -3264,42 +3268,42 @@ namespace KBIN {
     //
     scheme="DAV";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"WARNING: Sub-Space-Matrix is not hermitian in DAV",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"WARNING: Sub-Space-Matrix is not hermitian in DAV",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     scheme="DENTET";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"WARNING: DENTET: can't reach specified precision",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"WARNING: DENTET: can't reach specified precision",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     scheme="EDDDAV";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Error EDDDAV: Call to ZHEGV failed",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Error EDDDAV: Call to ZHEGV failed",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     scheme="EFIELD_PEAD";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EFIELD_PEAD is too large",true,true,true,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EFIELD_PEAD are too large for comfort",true,true,true,grep_stop_condition) )); //20190704 - new VASP
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EFIELD_PEAD is too large",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EFIELD_PEAD are too large for comfort",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) )); //20190704 - new VASP
     xwarning.flag(scheme,found_warning);
     //
     scheme="EXCCOR";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"ERROR FEXCF: supplied exchange-correlation table",true,true,true,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"ERROR FEXCP: supplied Exchange-correletion table",true,true,true,grep_stop_condition) ));  //CO20210315 - some formatting changes between versions (also some bad spelling)
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"ERROR FEXCF: supplied exchange-correlation table",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"ERROR FEXCP: supplied Exchange-correletion table",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) ));  //CO20210315 - some formatting changes between versions (also some bad spelling)
     xwarning.flag(scheme,found_warning);
     //
     scheme="GAMMA_SHIFT";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"shift your grid to Gamma",true,true,true,grep_stop_condition));  //CO20190704 - captures both old/new versions of VASP
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"shift your grid to Gamma",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));  //CO20190704 - captures both old/new versions of VASP
     xwarning.flag(scheme,found_warning);
     //
     scheme="LRF_COMMUTATOR";   // GET ALL TIMES
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"LRF_COMMUTATOR internal error: the vector",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"LRF_COMMUTATOR internal error: the vector",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     scheme="MEMORY";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,AFLOW_MEMORY_TAG,true,true,true,grep_stop_condition) || approaching_oom));
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,AFLOW_MEMORY_TAG,RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || approaching_oom));
     xwarning.flag(scheme,found_warning);
     //
     //on qrats, we see this
@@ -3325,27 +3329,27 @@ namespace KBIN {
     //
     scheme="MPICH0";  //0 just means that it is generic, maybe fix name later
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     scheme="MPICH11";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",true,true,true,grep_stop_condition) && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 11",true,true,true,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"KILLED BY SIGNAL: 11",true,true,true,grep_stop_condition)) ));
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 11",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"KILLED BY SIGNAL: 11",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition)) ));
     xwarning.flag(scheme,found_warning);
     //
     scheme="MPICH139";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",true,true,true,grep_stop_condition) && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 139",true,true,true,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"KILLED BY SIGNAL: 139",true,true,true,grep_stop_condition)) ));
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 139",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"KILLED BY SIGNAL: 139",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition)) ));
     xwarning.flag(scheme,found_warning);
     //
     scheme="MPICH174";  //CO20210315
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",true,true,true,grep_stop_condition) && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 174",true,true,true,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"KILLED BY SIGNAL: 174",true,true,true,grep_stop_condition)) ));
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"BAD TERMINATION OF ONE OF YOUR APPLICATION PROCESSES",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"EXIT CODE: 174",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"KILLED BY SIGNAL: 174",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition)) ));
     xwarning.flag(scheme,found_warning);
     //
     scheme="NATOMS";  //look for problem for distance
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"distance between some ions is very small",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"distance between some ions is very small",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     //CO+ME20210315 - simplified
@@ -3353,55 +3357,55 @@ namespace KBIN {
     //However, if you have that warning AND the error that the number of bands is not sufficient, aflow needs to act.
     scheme="NBANDS";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,scheme,true,true,true,grep_stop_condition) && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"number of bands is not sufficient to hold all electrons",true,true,true,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Number of bands NBANDS too small to hold electrons",true,true,true,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Your highest band is occupied at some k-points",true,true,true,grep_stop_condition)) ));  // The NBANDS warning due to NPAR is not an error we want to fix, so set to false if found
-    bool vasp_corrected=(aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"number of bands has been changed from the values supplied",true,true,true,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"now  NBANDS  =",true,true,true,grep_stop_condition));  // Need explicit check or else the NPAR warning prevents this NBANDS error from being corrected
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,scheme,RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"number of bands is not sufficient to hold all electrons",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Number of bands NBANDS too small to hold electrons",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Your highest band is occupied at some k-points",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition)) ));  // The NBANDS warning due to NPAR is not an error we want to fix, so set to false if found
+    bool vasp_corrected=(aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"number of bands has been changed from the values supplied",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"now  NBANDS  =",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));  // Need explicit check or else the NPAR warning prevents this NBANDS error from being corrected
     found_warning=(found_warning && vasp_corrected==false);
     xwarning.flag(scheme,found_warning);
     //
     scheme="NPAR";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"please rerun with NPAR=",true,true,true,grep_stop_condition)); //not only npar==1
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"please rerun with NPAR=",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition)); //not only npar==1
     xwarning.flag(scheme,found_warning);
     //
     scheme="NPARC";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NPAR = 4",true,true,true,grep_stop_condition) && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NPAR=number of cores",true,true,true,grep_stop_condition)));  // fix with NPAR=cores in MPI
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NPAR = 4",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NPAR=number of cores",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition)));  // fix with NPAR=cores in MPI
     xwarning.flag(scheme,found_warning);
     //
     scheme="NPARN";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NPAR = 4",true,true,true,grep_stop_condition) && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NPAR=number of nodes",true,true,true,grep_stop_condition)));  // fix with NPAR=nodes in MPI
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NPAR = 4",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"NPAR=number of nodes",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition)));  // fix with NPAR=nodes in MPI
     xwarning.flag(scheme,found_warning);
     //
     scheme="NPAR_REMOVE";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Please remove the tag NPAR from the INCAR file",true,true,true,grep_stop_condition));  //and restart the
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"Please remove the tag NPAR from the INCAR file",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));  //and restart the
     xwarning.flag(scheme,found_warning);
     //
     scheme="PSMAXN";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    //found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"WARNING: PSMAXN for non-local potential too small",true,true,true,grep_stop_condition));
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"REAL_OPT: internal ERROR",true,true,true,grep_stop_condition));
+    //found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"WARNING: PSMAXN for non-local potential too small",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"REAL_OPT: internal ERROR",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     scheme="READ_KPOINTS_RD_SYM";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"ERROR in RE_READ_KPOINTS_RD",true,true,true,grep_stop_condition) && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"switch off symmetry",true,true,true,grep_stop_condition) ));
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"ERROR in RE_READ_KPOINTS_RD",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"switch off symmetry",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) ));
     xwarning.flag(scheme,found_warning);
     //
     scheme="REAL_OPT";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"REAL_OPT: internal ERROR",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"REAL_OPT: internal ERROR",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     scheme="REAL_OPTLAY_1";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"REAL_OPTLAY: internal error (1)",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"REAL_OPTLAY: internal error (1)",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //
     scheme="ZPOTRF";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"LAPACK: Routine ZPOTRF failed",true,true,true,grep_stop_condition));
+    found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"LAPACK: Routine ZPOTRF failed",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //ALL OTHERS (in alphabetic order) END
     
