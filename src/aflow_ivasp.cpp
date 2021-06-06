@@ -5802,7 +5802,7 @@ namespace KBIN {
     //CO20210315 - can only read auto-meshes of MP or G
     //https://www.vasp.at/wiki/index.php/KPOINTS
     bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::XVASP_KPOINTS_string2numbers():";
+    string soliloquy=XPID+"KBIN::XVASP_KPOINTS_numbers2string():";
 
     if(LDEBUG){cerr << soliloquy << " xvasp.KPOINTS(pre)=" << endl;cerr << xvasp.KPOINTS.str() << endl;}
     
