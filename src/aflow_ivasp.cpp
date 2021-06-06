@@ -4609,7 +4609,7 @@ namespace KBIN {
       keyword=command;
       
       if(Krun){
-        incar_input=keyword+"=1E-7";
+        incar_input=keyword+"=1E-7";  //no other value worth trying. hacking SYMPREC is a cheap way to avoid the error, it's better to get to more robust solutions
         if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
           incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
