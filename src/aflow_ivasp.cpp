@@ -5736,7 +5736,7 @@ namespace KBIN {
   bool XVASP_KPOINTS_isAutoMesh(const _xvasp& xvasp){ //CO20210315
     //returns if KPOINTS is automatic generation scheme: https://www.vasp.at/wiki/index.php/KPOINTS
     bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_IVASP_ || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::XVASP_KPOINTS_string2numbers():";
+    string soliloquy=XPID+"KBIN::XVASP_KPOINTS_isAutoMesh():";
     
     if(LDEBUG){cerr << soliloquy << " xvasp.KPOINTS=" << endl;cerr << xvasp.KPOINTS.str() << endl;}
 
