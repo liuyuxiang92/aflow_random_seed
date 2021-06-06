@@ -3066,18 +3066,19 @@ namespace KBIN {
     //[CO20210315 - does not work for big files]content_vasp_out=aurostd::toupper(content_vasp_out);  //put toupper to eliminate case-sensitivity 
     
     //do memory check
-    unsigned long long int memory_free=0,memory_total=0;
-    double memory_usage_percentage=0;
-    if(aurostd::GetMemory(memory_free,memory_total)){memory_usage_percentage=100.0*(((double)(memory_total-memory_free))/((double)(memory_total)));}
-    else{
-      if(LDEBUG){cerr << soliloquy << " unable to query memory on the node" << endl;}
+    double memory_usage_percentage=0.0;
+    bool approaching_oom=false;
+    if(aurostd::GetMemoryUsagePercentage(memory_usage_percentage)){approaching_oom=(memory_usage_percentage>=MEMORY_MAX_USAGE);}
+    if(approaching_oom){  //might be a quick memory spike, try again
+      if(VERBOSE){
+        aus << "00000  MESSAGE memory used: " << aurostd::utype2string(memory_usage_percentage,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+        aus << "00000  MESSAGE reading memory again after " << SECONDS_SLEEP_VASP_MONITOR << " second sleep" << endl;
+        if(LDEBUG){cerr << aus.str();}
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      }
+      aurostd::Sleep(SECONDS_SLEEP_VASP_MONITOR);
+      if(aurostd::GetMemoryUsagePercentage(memory_usage_percentage)){approaching_oom=(memory_usage_percentage>=MEMORY_MAX_USAGE);}
     }
-    if(LDEBUG){
-      cerr << soliloquy << " memory_free=" << memory_free << endl;
-      cerr << soliloquy << " memory_used=" << memory_total-memory_free << endl;
-      cerr << soliloquy << " memory_total=" << memory_total << endl;
-    }
-    bool approaching_oom=(memory_usage_percentage>=MEMORY_MAX_USAGE);
     if(VERBOSE||approaching_oom){
       aus << "00000  MESSAGE memory used: " << aurostd::utype2string(memory_usage_percentage,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       if(LDEBUG){cerr << aus.str();}

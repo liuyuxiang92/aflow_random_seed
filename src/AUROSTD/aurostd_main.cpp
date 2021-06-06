@@ -2364,6 +2364,28 @@ namespace aurostd {
     return sizeout;
   }
 
+  bool GetMemoryUsagePercentage(double& memory_usage_percentage){ //CO20210601
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"aurostd::GetMemoryUsagePercentage():";
+
+    unsigned long long int memory_free=0,memory_total=0;
+    memory_usage_percentage=0.0;
+    bool memory_read=aurostd::GetMemory(memory_free,memory_total);
+    if(memory_read){
+      memory_usage_percentage=100.0*(((double)(memory_total-memory_free))/((double)(memory_total)));
+      if(LDEBUG){
+        cerr << soliloquy << " memory_free=" << memory_free << endl;
+        cerr << soliloquy << " memory_used=" << memory_total-memory_free << endl;
+        cerr << soliloquy << " memory_total=" << memory_total << endl;
+        cerr << soliloquy << " memory_usage_percentage=" << memory_usage_percentage << endl;
+      }
+    }
+    else{
+      if(LDEBUG){cerr << soliloquy << " unable to query memory on the node" << endl;}
+    }
+    return memory_read;
+  }
+
   bool GetMemory(unsigned long long int& free,unsigned long long int& total){ //CO20210315 - only works for linux: needs `free` command
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::GetMemory():";

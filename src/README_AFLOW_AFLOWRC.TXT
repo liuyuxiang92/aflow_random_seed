@@ -1758,7 +1758,7 @@ SECONDS_SLEEP_VASP_MONITOR
 SECONDS_STALE_VASP_OUT
   description: Time (seconds) at which the DEFAULT_VASP_OUT file is considered stale (since last modified).
   type: integer
-  default: 10800 (3 hours)
+  default: 21600 (6 hours)
 
 BYTES_MAX_VASP_OUT
   description: Maximum size of the DEFAULT_VASP_OUT file. The larger the size, the longer the delays in applying patches. Keep as large as possible, it is better to let vasp finish gracefully.
@@ -1768,7 +1768,7 @@ BYTES_MAX_VASP_OUT
 MEMORY_MAX_USAGE
   description: The memory limit (in percentage) before a MEMORY error is issued by --monitor_vasp.
   type: integer
-  default: 95%
+  default: 98%
 
 FILE_VASP_MONITOR
   description: File name for the aflow vasp monitor (--monitor_vasp). In the default case, the name would be LOCK.monitor_vasp.
