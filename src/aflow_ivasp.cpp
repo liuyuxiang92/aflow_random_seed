@@ -5612,7 +5612,7 @@ namespace KBIN {
     }
     if(operation.find("ZODDSHIFT")!=string::npos){
       if(_isodd(xvasp.str.kpoints_k3)){
-        if(!aurostd::isequal(xvasp.str.kpoints_s3,0.5)){xvasp.str.kpoints_s3=0.5;nchanges_made++;if(LDEBUG) cerr << "Xoddshift s3=" << xvasp.str.kpoints_s3 << endl;}
+        if(!aurostd::isequal(xvasp.str.kpoints_s3,0.5)){xvasp.str.kpoints_s3=0.5;nchanges_made++;if(LDEBUG) cerr << "Zoddshift s3=" << xvasp.str.kpoints_s3 << endl;}
       } 
       else{ //_iseven()
         if(!aurostd::isequal(xvasp.str.kpoints_s3,0.0)){xvasp.str.kpoints_s3=0.0;nchanges_made++;if(LDEBUG) cerr << "Zoddshift s3=" << xvasp.str.kpoints_s3 << endl;}
