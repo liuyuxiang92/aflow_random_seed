@@ -6003,6 +6003,10 @@ namespace KBIN {
     }
     if(nbands==0){nbands=KBIN::XVASP_INCAR_GetNBANDS(xvasp,aflags,TRUE);}
     else{
+      //increment choices are arbitrary, the increase is historical
+      //decrease reduces by 10% every time
+      //it is good to reduce more slowly than we increase, decreasing NBANDS can lead to issues with the calculation
+      //increasing NBANDS can only lead to memory issues
       if(increase){nbands+=(int)(20+(double)nbands*0.2);}
       else{nbands=(int)((double)nbands*0.9);}  //CO20210315
     }
