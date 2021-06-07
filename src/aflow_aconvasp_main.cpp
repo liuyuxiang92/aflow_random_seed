@@ -14424,7 +14424,6 @@ namespace pflow {
       else ss_output << json.toString(standalone);
       if(standalone) { ss_output << endl; }
     }
-    
     return ss_output.str(); 
   }
 }

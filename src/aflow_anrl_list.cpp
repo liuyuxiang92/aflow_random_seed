@@ -753,6 +753,7 @@ namespace anrl {
     // binaries
     vproto.push_back("A2B3_cI80_206_ad_e;2;40;206;4;5;cI80;a,x2,x3,y3,z3;-;N2Zn3;N2Zn3 (ICSD #84918)");
     // ternaries
+    vproto.push_back("A3B3C_mC56_9_6a_6a_2a;3;28;9;5;46;mC56;a,b/a,c/a,beta,x1,y1,z1,x2,y2,z2,x3,y3,z3,x4,y4,z4,x5,y5,z5,x6,y6,z6,x7,y7,z7,x8,y8,z8,x9,y9,z9,x10,y10,z10,x11,y11,z11,x12,y12,z12,x13,y13,z13,x14,y14,z14;-;N3Na3W1;N3Na3W1 (ICSD #75364)"); //DX20210604 - added nitride for R. Friedrich (N3Na3W1, ICSD #75364)
     vproto.push_back("ABC_oP12_62_c_c_c;3;12;62;5;9;oP12;a,b/a,c/a,x1,z1,x2,z2,x3,z3;-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-;CaLiN/Li1Mg1N1/Ca1Mg1Sn1 (CuMnP)/Ni1Sn1Tb1/Co1Dy1Sn1/Bi1Ca1Li1/Ni1Sc1Sn1/Co1Dy1Sn1/La1Ni1Sn1/Al1Ce1Pt1/La1Ni1Sn1/Pt1Yb1Zn1/Er1Ga1Rh1/Ga1Pd1Sc1/Li1O1Rb1/C1Li1N1;CaLiN (ICSD #107304)/Li1Mg1N1 (ICSD #93259)/Ca1Mg1Sn1 (ICSD #42757) and CuMnP (part 3)/Ni1Sn1Tb1 (ICSD #54301)/Co1Dy1Sn1 (ICSD #54415)/Bi1Ca1Li1 (ICSD #58762)/Ni1Sc1Sn1 (ICSD #105338)/Co1Dy1Sn1 (ICSD #106459)/La1Ni1Sn1 (ICSD #108571)/Al1Ce1Pt1 (ICSD #150172)/La1Ni1Sn1 (ICSD #157921)/Pt1Yb1Zn1 (ICSD #159305)/Er1Ga1Rh1 (ICSD #630573)/Ga1Pd1Sc1 (ICSD #635080)/C1Li1N1 (ICSD #77321)"); //DX20201016 - added another metal-nitride system //DX20201028 - added 12 metal systems //DX20210106 - added metal-oxide //DX20210221 - added carbo-nitride //DX20210428 - added equivalent part 3 prototype (CuMnP, http://aflow.org/prototype-encyclopedia/ABC_oP12_62_c_c_c.html)
     vproto.push_back("A2B2C_tI10_139_e_e_a;3;5;139;5;4;tI10;a,c/a,z2,z3;-/-/-;Ca2N2Zn/N2Sr2Zn1/Ba2N2Zn1;Ca2N2Zn (ICSD #69049)/N2Sr2Zn1 (ICSD #80376)/Ba2N2Zn1 (ICSD #80377)"); //DX20201016 - added two metal-nitride prototypes
     vproto.push_back("A3BC2_hP6_191_f_a_d;3;6;191;5;2;hP6;a,c/a;-;Na3TaTi2;Na3TaTi2 (ICSD #186418)");
@@ -5010,6 +5011,9 @@ namespace anrl {
       // ternaries
       // ---------------------------------------------------------------------------
       // ---------------------------------------------------------------------------
+      if(anrl_label=="A3B3C_mC56_9_6a_6a_2a"){ //DX20210604 - added nitride for R. Friedrich (N3Na3W1, ICSD #75364) 
+        vparameters.push_back("13.81,0.795293,0.887176,152.415,0.602,0.856,0.1,0.691,0.123,0.16,0.999,0.86,0.253,0.505,0.622,0.213,0.78,0.469,0.177,0.9,0.457,0.546,0.4729,0.5309,0.98,0.8144,0.733,0.436,0.81,0.733,0.185,0.708,0.002,0.971,0.4876,0.724,0.371,0.732,0.763,0.865,0.5,0.01238,0,0.681555,0.499645,0.4312");
+      }
       if(anrl_label=="ABC_oP12_62_c_c_c"){
         vparameters.push_back("9.95851159,0.433951127369,0.653641836852,0.15617,0.97349,0.04761,0.42551,0.40749,0.75982");
         vparameters.push_back("7.1586,0.48988629,0.70044422,0.0948,0.4719,0.1442,0.9797,0.3792,0.731");  // 002, ternary metal-nitride prototype (ICSD #93259)

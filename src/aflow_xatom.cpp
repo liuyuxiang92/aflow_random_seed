@@ -3017,7 +3017,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     if(a_iomode==IOVASP_AUTO)    oss << a.title <<endl; // << " (AUTO) " << endl;
     if(a_iomode==IOVASP_POSCAR)  oss << a.title <<endl; // << " (POSCAR) " << endl;
     if(a_iomode==IOVASP_ABCCAR)  oss << a.title <<endl; // << " (ABCCAR) " << endl;
-    if(a_iomode==IOVASP_WYCKCAR) oss << a.title <<endl; // << " (WYCKCAR) " << endl;
+    if(a_iomode==IOVASP_WYCKCAR) oss << a.title << "| SG: " << GetSpaceGroupName(a.space_group_ITC,a.directory) << " " << a.space_group_ITC << " PG: " << a.point_group_ITC << " BL: " << a.bravais_label_ITC << " | sym_eps: " << a.sym_eps << endl; //DX20210526 - extend title
     if(a.neg_scale==FALSE) {
       oss.precision(6);  //DM
       oss << a.scale; // << endl; //CO20170630
@@ -3055,7 +3055,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       }
     }
     // ----------------------------------------------------------------------
-    if(a_iomode==IOVASP_ABCCAR || a_iomode==IOVASP_WYCKCAR) {
+    if(a_iomode==IOVASP_ABCCAR){ //DX20210525 - separated a_iomode==IOVASP_WYCKCAR
       oss << " ";
       oss.precision(10);  //SC to cut/paste from matlab in format long
       if(abs(a.a)<10.0) oss << " ";
@@ -3081,6 +3081,33 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       oss << endl;
       oss.precision(_precision_);  //SC to cut/paste from matlab in format long
     }
+    else if(a_iomode==IOVASP_WYCKCAR){ //DX20210525
+      xvector<double> data = Getabc_angles(a.standard_lattice_ITC,DEGREES);
+      oss << " ";
+      oss.precision(10);  //SC to cut/paste from matlab in format long
+      if(abs(data(1))<10.0) oss << " ";
+      if(!std::signbit(a.a)) oss << " ";
+      oss << data(1) << "";
+      if(abs(data(2))<10.0) oss << " ";
+      if(!std::signbit(data(2))) oss << " ";
+      oss << data(2) << "";
+      if(abs(data(3))<10.0) oss << " ";
+      if(!std::signbit(data(3))) oss << " ";
+      oss << data(3) << "";
+      oss.precision(4);  //SC to cut/paste from matlab in format long
+      if(abs(data(4))<10.0) oss << " ";
+      if(!std::signbit(data(4))) oss << " ";
+      oss << data(4) << "";
+      if(abs(data(5))<10.0)  oss << " ";
+      if(!std::signbit(data(5)))  oss << " ";
+      oss << data(5) << "";
+      if(abs(a.gamma)<10.0) oss << " ";
+      if(!std::signbit(data(6))) oss << " ";
+      oss << data(6) << "";
+      if(a_iomode==IOVASP_WYCKCAR) oss << " " << a.space_group_ITC << " " << a.setting_ITC;
+      oss << endl;
+      oss.precision(_precision_);  //SC to cut/paste from matlab in format long
+    }
     // ----------------------------------------------------------------------
     if(a.is_vasp4_poscar_format==TRUE) {
     } // nothing to do
@@ -3092,6 +3119,28 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       }
       oss << endl;
     }
+    //DX20210526 - add WYCCAR format - START
+    if(a_iomode==IOVASP_WYCKCAR) {
+      oss << aurostd::joinWDelimiter(SYM::countWyckoffTypes(a.wyckoff_sites_ITC), " ") << endl;
+      oss << "Direct(WYCCAR)" << endl; // wyccar is always in direct/fractional
+      uint nWyckoff_sites = a.wyckoff_sites_ITC.size();
+      for(uint i=0;i<nWyckoff_sites;i++){
+        oss << "  " << setw(5) << a.wyckoff_sites_ITC[i].type // set(5): species have max of two characters + pseudopoential (up to three characters)
+          << " " << setw(3) << a.wyckoff_sites_ITC[i].multiplicity  // set(3): Wyckoff positions have a max of three digits
+          << " " << setw(5) << a.wyckoff_sites_ITC[i].letter        // set(5): space group #47 has Wyckoff letter "alpha" (i.e, five letters)
+          << " " << setw(8) << a.wyckoff_sites_ITC[i].site_symmetry // set(8): Wyckoff site symmetry generally lists three/four directions, each with one to two characters (e.g., inversion)
+          << std::setprecision(_precision_) << std::fixed;
+        double _coord = AUROSTD_MAX_DOUBLE;
+        for(uint j=1;j<=3;j++) {
+          _coord=aurostd::roundoff(a.wyckoff_sites_ITC[i].coord(j),pow(10.0,-(double)_precision_));
+          if(abs(_coord)<10.0) oss << " ";
+          if(!std::signbit(_coord)) oss << " ";
+          oss << _coord << " ";
+        }
+        oss << endl;
+      }
+    }
+    //DX20210526 - add WYCCAR format - END
     // ----------------------------------------------------------------------
     //CO20170630 - fixing for POCC
     //[CO20180705 - we have const str&, so we can't modify atom arrangement, this MUST be done before structure is printed]a.MakeTypes();  //CO20180705 - repetita iuvant

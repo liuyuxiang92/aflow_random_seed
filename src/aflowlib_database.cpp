@@ -970,21 +970,21 @@ namespace aflowlib {
       // Check for synonyms for changed parameter names
       if (value.empty()) {
         if (cols[c] == "aflow_prototype_label_relax") {
-          value = aurostd::extractJsonValueAflow(entry, "anrl_label_relax");
+          value = aurostd::extractJsonValueAflow(entry, "anrl_label_relax"); //replace anrl_label_relax with aflow_prototype_label_relax - DO NOT TOUCH
         } else if (cols[c] == "aflow_prototype_label_orig") {
-          value = aurostd::extractJsonValueAflow(entry, "anrl_label_orig");
+          value = aurostd::extractJsonValueAflow(entry, "anrl_label_orig"); //replace anrl_label_orig with aflow_prototype_label_orig - DO NOT TOUCH
         } else if (cols[c] == "aflow_prototype_params_list_relax") {
-          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_list_relax");
-          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_list_relax");
+          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_list_relax"); //replace anrl_parameter_list_relax with aflow_prototype_params_list_relax - DO NOT TOUCH
+          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_list_relax"); //replace anrl_prototype_parameter_list_relax with aflow_prototype_params_list_relax - DO NOT TOUCH
         } else if (cols[c] == "aflow_prototype_params_list_orig") {
-          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_list_orig");
-          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_list_orig");
+          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_list_orig"); //replace anrl_parameter_list_orig with aflow_prototype_params_list_orig - DO NOT TOUCH
+          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_list_orig"); //replace anrl_prototype_parameter_list_orig with aflow_prototype_params_list_orig - DO NOT TOUCH
         } else if (cols[c] == "aflow_prototype_params_values_relax") {
-          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_values_relax");
-          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_values_relax");
+          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_values_relax"); //replace anrl_parameter_values_relax with aflow_prototype_params_values_relax - DO NOT TOUCH
+          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_values_relax"); //replace aflow_prototype_parameter_values_relax with aflow_prototype_params_values_relax - DO NOT TOUCH
         } else if (cols[c] == "aflow_prototype_params_values_orig") {
-          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_values_orig");
-          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_values_orig");
+          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_values_orig"); //replace anrl_parameter_values_orig with aflow_prototype_params_values_orig - DO NOT TOUCH
+          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_values_orig"); //replace aflow_prototype_parameter_values_orig with aflow_prototype_params_values_orig - DO NOT TOUCH
         }
       }
 
