@@ -1468,7 +1468,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   ERROR:ZPOTRF
     The ZPOTRF error is triggered when the following text is found in the vasp.out: "LAPACK: Routine ZPOTRF failed".
     AFLOW will halve the default POTIM parameter (0.5) and apply it as an input in the INCAR.
-    Should the error occur again, AFLOW will continue to halve POTIM until 
+    Should the error occur again, AFLOW will continue to halve POTIM until POTIM is smaller than 0.01.
     Should the error occur again, AFLOW will half POTIM until it falls below 0.01.
     Should the error occur again, AFLOW will increase the volume of the structure by a factor of 1.05.
     Should the error occur again, AFLOW will decrease the NBANDS.
