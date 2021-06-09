@@ -1432,7 +1432,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     AFLOW will apply the following change to the INCAR: LREAL=.TRUE. .
 
   ERROR:RMM_DIIS
-    The RMM_DIIS error is triggered when the following errors are triggered: ERROR:EDDRMM, ERROR:NUM_PROB, ERROR:ZBRENT.
+    The RMM_DIIS error is triggered when the following errors are triggered: ERROR:EDDRMM, ERROR:NUM_PROB, or ERROR:ZBRENT.
     AFLOW will apply the following change to the INCAR: ALGO=FAST.
     Should the error occur again, AFLOW will apply the following change to the INCAR: ALGO=NORMAL.
     Should the error occur again, AFLOW will switch to an odd Gamma-centered KPOINTS scheme.
@@ -1443,7 +1443,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     Should the error occur again, AFLOW will apply the following change to the INCAR: ISMEAR=-1.
 
   ERROR:ROTMAT
-    The ROTMAT error is triggered when the following errors are triggered: ERROR:SGRCON, ERROR:NIRMAT, ERROR:IBZKPT, ERROR:KKSYM, ERROR:INVGRP, ERROR:SYMPREC.
+    The ROTMAT error is triggered when the following errors are triggered: ERROR:SGRCON, ERROR:NIRMAT, ERROR:IBZKPT, ERROR:KKSYM, ERROR:INVGRP, or ERROR:SYMPREC.
     AFLOW will apply the following change to the INCAR: SYMPREC=1E-7.
     Should the error occur again, AFLOW will switch to a Gamma-centered KPOINTS scheme.
     Should the error occur again, AFLOW will switch to an even Gamma-centered KPOINTS scheme.
