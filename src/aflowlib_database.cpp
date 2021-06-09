@@ -188,8 +188,8 @@ namespace aflowlib {
 
   void AflowDB::initializeExtraSchema() {
     vschema_extra.clear();
-    vschema_extra.push_attached("SCHEMA::NAME::ALLOY", "alloy");
-    vschema_extra.push_attached("SCHEMA::TYPE::ALLOY", "string");
+    vschema_extra.push_attached("SCHEMA::NAME:ALLOY", "alloy");
+    vschema_extra.push_attached("SCHEMA::TYPE:ALLOY", "string");
   }
 
 }  // namespace aflowlib
