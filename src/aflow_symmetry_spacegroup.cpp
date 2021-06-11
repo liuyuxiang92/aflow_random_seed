@@ -774,21 +774,21 @@ namespace SYM {
   }
 } //namespace SYM
 
-// **************************************************************************************************************************************************
-// Prints Wyccar from xstructure
-// **************************************************************************************************************************************************
-namespace SYM {
-  void printWyccar(ofstream& FileMESSAGE, xstructure& str, const bool& osswrite, ostream& oss) {
-    ostringstream aus;
-    for (uint i = 0; i < str.wyccar_ITC.size(); i++) {
-      aus << str.wyccar_ITC[i];
-      if(i < str.wyccar_ITC.size() - 1) {
-        aus << endl;
-      }
-    }
-    aurostd::PrintMessageStream(FileMESSAGE, aus, XHOST.QUIET, osswrite, oss);
-  }
-} // namespace SYM
+//DX20210611 [OBSOLETE - integrated into structure printing function in aflow_xatom] // **************************************************************************************************************************************************
+//DX20210611 [OBSOLETE - integrated into structure printing function in aflow_xatom] // Prints Wyccar from xstructure
+//DX20210611 [OBSOLETE - integrated into structure printing function in aflow_xatom] // **************************************************************************************************************************************************
+//DX20210611 [OBSOLETE - integrated into structure printing function in aflow_xatom] namespace SYM {
+//DX20210611 [OBSOLETE - integrated into structure printing function in aflow_xatom]   void printWyccar(ofstream& FileMESSAGE, xstructure& str, const bool& osswrite, ostream& oss) {
+//DX20210611 [OBSOLETE - integrated into structure printing function in aflow_xatom]     ostringstream aus;
+//DX20210611 [OBSOLETE - integrated into structure printing function in aflow_xatom]     for (uint i = 0; i < str.wyccar_ITC.size(); i++) {
+//DX20210611 [OBSOLETE - integrated into structure printing function in aflow_xatom]       aus << str.wyccar_ITC[i];
+//DX20210611 [OBSOLETE - integrated into structure printing function in aflow_xatom]       if(i < str.wyccar_ITC.size() - 1) {
+//DX20210611 [OBSOLETE - integrated into structure printing function in aflow_xatom]         aus << endl;
+//DX20210611 [OBSOLETE - integrated into structure printing function in aflow_xatom]       }
+//DX20210611 [OBSOLETE - integrated into structure printing function in aflow_xatom]     }
+//DX20210611 [OBSOLETE - integrated into structure printing function in aflow_xatom]     aurostd::PrintMessageStream(FileMESSAGE, aus, XHOST.QUIET, osswrite, oss);
+//DX20210611 [OBSOLETE - integrated into structure printing function in aflow_xatom]   }
+//DX20210611 [OBSOLETE - integrated into structure printing function in aflow_xatom] } // namespace SYM
 
 // **************************************************************************************************************************************************
 // Primitive Cell Routine (Created by RHT, slightly different from SC version)

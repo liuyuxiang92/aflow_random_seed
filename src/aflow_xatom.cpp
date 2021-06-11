@@ -3124,19 +3124,21 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       oss << aurostd::joinWDelimiter(SYM::countWyckoffTypes(a.wyckoff_sites_ITC), " ") << endl;
       oss << "Direct(WYCCAR)" << endl; // wyccar is always in direct/fractional
       uint nWyckoff_sites = a.wyckoff_sites_ITC.size();
+      double _coord = AUROSTD_MAX_DOUBLE;
       for(uint i=0;i<nWyckoff_sites;i++){
-        oss << "  " << setw(5) << a.wyckoff_sites_ITC[i].type // set(5): species have max of two characters + pseudopoential (up to three characters)
-          << " " << setw(3) << a.wyckoff_sites_ITC[i].multiplicity  // set(3): Wyckoff positions have a max of three digits
-          << " " << setw(5) << a.wyckoff_sites_ITC[i].letter        // set(5): space group #47 has Wyckoff letter "alpha" (i.e, five letters)
-          << " " << setw(8) << a.wyckoff_sites_ITC[i].site_symmetry // set(8): Wyckoff site symmetry generally lists three/four directions, each with one to two characters (e.g., inversion)
-          << std::setprecision(_precision_) << std::fixed;
-        double _coord = AUROSTD_MAX_DOUBLE;
+        _coord = AUROSTD_MAX_DOUBLE;
+        oss << " ";
         for(uint j=1;j<=3;j++) {
           _coord=aurostd::roundoff(a.wyckoff_sites_ITC[i].coord(j),pow(10.0,-(double)_precision_));
           if(abs(_coord)<10.0) oss << " ";
           if(!std::signbit(_coord)) oss << " ";
           oss << _coord << " ";
         }
+        oss << std::setprecision(_precision_) << std::left
+          << " " << a.wyckoff_sites_ITC[i].type
+          << " " << a.wyckoff_sites_ITC[i].multiplicity
+          << " " << a.wyckoff_sites_ITC[i].letter
+          << " " << a.wyckoff_sites_ITC[i].site_symmetry;
         oss << endl;
       }
     }
@@ -3145,6 +3147,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     //CO20170630 - fixing for POCC
     //[CO20180705 - we have const str&, so we can't modify atom arrangement, this MUST be done before structure is printed]a.MakeTypes();  //CO20180705 - repetita iuvant
     //[CO20180705 - we have const str&, so we can't modify atom arrangement, this MUST be done before structure is printed]std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsType);  //CO20180705 - this makes it necessary that atoms are properly typed
+    if(a_iomode!=IOVASP_WYCKCAR) { //DX20210611 - do not do for Wyccar, atom count is not the same as number of Wyckoff positiosn
     if(a.partial_occupation_flag==TRUE) {
       //need to figure out the '+'
       uint iatom=0;
@@ -3229,7 +3232,9 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     }
     // done
     oss << endl;
+    }
 
+    if(a_iomode!=IOVASP_WYCKCAR) { //DX20210610
     double _coord;  //CO20190322 - remove annoying -0.0000000
     for(uint iat=0;iat<a.atoms.size();iat++) {
       oss << " ";
@@ -3310,6 +3315,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       }
       oss << endl;oss.flush();
     } // iat
+    } //DX20210610
     if(a.write_lattice_flag) {
       oss << "DIRECT LATTICE per raw" << endl;
       for(uint i=1;i<=3;i++) {
