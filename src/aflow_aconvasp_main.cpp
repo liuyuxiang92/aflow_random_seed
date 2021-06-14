@@ -1468,12 +1468,12 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("WYCKOFF_POSITIONS::PRINT_SITE_SYMMETRIES_ONLY",aurostd::args2flag(argv,cmds,"--site_symmetries_only"));
     vpflow.flag("WYCKOFF_POSITIONS::PRINT_MULTIPLICITIES_ONLY",aurostd::args2flag(argv,cmds,"--multiplicities_only"));
     if(aurostd::args2attachedflag(argv,"--Wyckoff=|--Wyckoff_positions=|--wyckoff=|--wyckoff_positions=|--wyccar=")){
-      vpflow.args2addattachedscheme(argv,cmds,"WYCKOFF_POSITION::TOLERANCE","--Wyckoff=|--Wyckoff_positions=|--wyckoff=|--wyckoff_positions=|--wyccar=",""); //DX20200907 - default is system specific, leaving empty
+      vpflow.args2addattachedscheme(argv,cmds,"WYCKOFF_POSITIONS::TOLERANCE","--Wyckoff=|--Wyckoff_positions=|--wyckoff=|--wyckoff_positions=|--wyccar=",""); //DX20200907 - default is system specific, leaving empty
     }
     if(aurostd::args2attachedflag(argv,"--setting=")){
       vpflow.args2addattachedscheme(argv,cmds,"WYCKOFF_POSITIONS::SETTING","--setting=","1");
     }
-    vpflow.args2addattachedscheme(argv,cmds,"WYCCAR_POSITION::MAGNETIC","--mag=|--magnetic=|--magmom=","");
+    vpflow.args2addattachedscheme(argv,cmds,"WYCKOFF_POSITIONS::MAGNETIC","--mag=|--magnetic=|--magmom=","");
     //DX20180807 - added more wyccar flags (--usage, --no_scan, setting, --magmom) - END
   }
   // [OBSOLETE]  vpflow.flag("AFLOWSG",aurostd::args2flag(argv,cmds, "--aflowSG")); //RHT  // FIX
