@@ -326,7 +326,7 @@ class XtalFinderCalculator : public xStream {
 
     // ---------------------------------------------------------------------------
     // get command line options
-    string getSpaceGroupMatchbookFromOptions(const aurostd::xoption& vpflow, bool relaxation_step);
+    string getSpaceGroupMatchbookFromOptions(const aurostd::xoption& vpflow, uint relaxation_step); //DX20210615 - uint not bool
 
     // ---------------------------------------------------------------------------
     // add structures to container

@@ -1096,8 +1096,8 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   // ---------------------------------------------------------------------------
   // FLAG: catalog (icsd, lib1, lib2, lib3, ...)
   if(vpflow.flag("COMPARE2DATABASE::CATALOG")) {
-    string catalog = aurostd::tolower(vpflow.getattachedscheme("COMPARE2DATABASE::CATALOG"));
-    if(catalog != "all"){ vmatchbook.push_back("catalog(\'" + catalog + "\')"); }
+    string catalog = aurostd::toupper(vpflow.getattachedscheme("COMPARE2DATABASE::CATALOG")); //DX20210615 - new aflux requires uppercase
+    if(catalog != "ALL"){ vmatchbook.push_back("catalog(\'" + catalog + "\')"); }
     message << "OPTIONS: Specify catalog/library (icsd, lib1, lib2, lib3, ...): " << catalog << " (default=all)" << endl;
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
@@ -1486,8 +1486,8 @@ namespace compare {
     // FLAG: catalog (icsd, lib1, lib2, lib3, ...)
     string catalog = "";
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::CATALOG")) {
-      catalog = aurostd::tolower(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::CATALOG")); //DX20190718
-      if(catalog != "all"){ vmatchbook.push_back("catalog(\'" + catalog + "\')"); }
+      catalog = aurostd::toupper(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::CATALOG")); //DX20190718 //DX20210612 - new aflux requires uppercase
+      if(catalog != "ALL"){ vmatchbook.push_back("catalog(\'" + catalog + "\')"); }
       message << "OPTIONS: Specify catalog/library (icsd, lib1, lib2, lib3, ...): " << catalog << " (default=all)" << endl;
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }

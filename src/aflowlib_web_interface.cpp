@@ -4503,8 +4503,10 @@ namespace aflowlib {
   void APIget::reset( string a_Summons, string a_API_Path, string a_Domain ) {
     if( a_Summons == "#" ) {
       Summons = "";
-      API_Path = "/search/API/?";
-      Domain = "aflowlib.duke.edu";
+      //DX20210615 [OBSOLETE - old path] API_Path = "/search/API/?";
+      //DX20210615 [OBSOLETE - old domain] Domain = "aflowlib.duke.edu";
+      API_Path = "/API/aflux/?"; //DX20210615 - new path
+      Domain = "aflow.org"; //DX20210615 - new domain
     } else {
       Summons = a_Summons;
       if( ! a_API_Path.empty() ) API_Path = a_API_Path;
@@ -4646,7 +4648,10 @@ namespace aflowlib {
     for(uint i=0;i<space_groups.size();i++){
       vsummons[i] = getSpaceGroupAFLUXSummons(space_groups[i], relaxation_step, false); //false - signals more than one space group
     }
-    return "sg2(" + aurostd::joinWDelimiter(vsummons,":") + ")";
+    if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){ return "spacegroup_orig(" + aurostd::joinWDelimiter(vsummons,":") + ")"; }
+    else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){ return "sg2(" + aurostd::joinWDelimiter(vsummons,":") + ")"; }
+    else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){ return "spacegroup_relax(" + aurostd::joinWDelimiter(vsummons,":") + ")"; }
+    return ""; //DX20210615 - no other relaxations supported, return empty so the compiler will not complain
   }
 }
 
@@ -4666,13 +4671,16 @@ namespace aflowlib {
     if(space_group_number == enantiomorph_space_group_number){
       // relaxed: need to match last in string, i.e., "*,<sg_symbol> <sg_number>" (comma necessary or we may grab the orig symmetry)
       if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){
-        space_group_summons = "%27" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+        //DX20210615 [OBOSLETE] space_group_summons = "%27" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+        space_group_summons = aurostd::utype2string<int>(space_group_number); //DX20210615
       }
       else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){
-        space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+        //DX20210615 [OBSOLETE] space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+        space_group_summons = "%27,\"" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "\",%27"; //DX20210615
       }
       else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){
-        space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27";
+        //DX20210615 [OBSOLETE] space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27";
+        space_group_summons = aurostd::utype2string<int>(space_group_number); //DX20210615
       }
       else{
         throw aurostd::xerror(_AFLOW_FILE_NAME_, "aflowlib::getSpaceGroupAFLUXSummons():", "Unexpected relaxation step input: " + aurostd::utype2string(_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_), _FILE_NOT_FOUND_);
@@ -4680,16 +4688,22 @@ namespace aflowlib {
     }
     else { // need to get enantiomorph too
       if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){
-        space_group_summons = "%27" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
-        space_group_summons += ":%27" + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + ",%27*";
+        //DX20210615 [OBSOLETE] space_group_summons = "%27" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+        //DX20210615 [OBSOLETE] space_group_summons += ":%27" + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + ",%27*";
+        space_group_summons = aurostd::utype2string<int>(space_group_number); //DX20210615
+        space_group_summons += ":" + aurostd::utype2string<int>(enantiomorph_space_group_number); //DX20210615
       }
       else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){
-        space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
-        space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + ",%27*";
+        //DX20210615 [OBSOLETE] space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
+        //DX20210615 [OBSOLETE] space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + ",%27*";
+        space_group_summons = "%27,\"" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "\",%27"; //DX20210615
+        space_group_summons += ":%27,\"" + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + "\",%27"; //DX20210615
       }
       else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){
-        space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27";
-        space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + "%27";
+        //DX20210615 [OBSOLETE] space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27";
+        //DX20210615 [OBSOLETE] space_group_summons += ":*%27," + GetSpaceGroupName(enantiomorph_space_group_number) + "%20%23" + aurostd::utype2string<int>(enantiomorph_space_group_number) + "%27";
+        space_group_summons = aurostd::utype2string<int>(space_group_number); //DX20210615
+        space_group_summons += ":" + aurostd::utype2string<int>(enantiomorph_space_group_number); //DX20210615
       }
       else{
         throw aurostd::xerror(_AFLOW_FILE_NAME_, "aflowlib::getSpaceGroupAFLUXSummons():", "Unexpected relaxation step input: " + aurostd::utype2string(_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_), _FILE_NOT_FOUND_);
@@ -4699,7 +4713,12 @@ namespace aflowlib {
     // ---------------------------------------------------------------------------
     // if there is only one space group in the query, put summons in sg2();
     // otherwise this is down outside this function
-    if(only_one_sg) { space_group_summons = "sg2(" + space_group_summons + ")"; }
+    if(only_one_sg) { 
+      //DX20210615 [OBSOLETE] space_group_summons = "sg2(" + space_group_summons + ")"; }
+      if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){ space_group_summons = "spacegroup_orig(" + space_group_summons + ")"; } //DX20210615
+      else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){ space_group_summons = "sg2(" + space_group_summons + ")"; } //DX20210615
+      else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){ space_group_summons = "spacegroup_relax(" + space_group_summons + ")"; } //DX20210615
+    }
 
     return space_group_summons;
   }

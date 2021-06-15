@@ -389,7 +389,7 @@ void XtalFinderCalculator::getOptions(
 // ***************************************************************************
 string XtalFinderCalculator::getSpaceGroupMatchbookFromOptions(
     const aurostd::xoption& vpflow,
-    bool relaxation_step){
+    uint relaxation_step){ //DX20210615 - uint not bool
 
   string function_name = XPID + "XtalFinderCalculator::getSpaceGroupMatchbookFromOptions():";
   stringstream message;
