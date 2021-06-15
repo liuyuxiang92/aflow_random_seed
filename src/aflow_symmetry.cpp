@@ -293,7 +293,7 @@ namespace SYM {
 namespace SYM { 
   double defaultTolerance(const xstructure& xstr){
     double min_dist = xstr.dist_nn_min; //CO20180409
-    if(min_dist == AUROSTD_NAN){min_dist=SYM::minimumDistance(xstr);} //CO20180409
+    if(min_dist == AUROSTD_NAN || min_dist == AUROSTD_MAX_DOUBLE){min_dist=SYM::minimumDistance(xstr);} //CO20180409 //DX20210615 - add AUROSTD_MAX_DOUBLE
     //if(xstr.dist_nn_min == AUROSTD_NAN){xstr.MinDist();}  //CO20180409
     //min_dist = xstr.dist_nn_min; //CO20180409
     double tolerance = min_dist/100.0;
