@@ -5359,7 +5359,7 @@ namespace KBIN {
       if(!aurostd::FileExist("OUTCAR")){
         //first re-try, source intel
         vector<string> vintel_paths;
-        aurostd::string2tokens(INTEL_COMPILER_PATH,vintel_paths,",");
+        aurostd::string2tokens(INTEL_COMPILER_PATHS,vintel_paths,",");
         for(uint i=0;i<vintel_paths.size();i++){
           if(aurostd::FileExist("/bin/bash") && aurostd::FileExist(vintel_paths[i])){
             string command="/bin/bash -c \"source "+vintel_paths[i]+" intel64; "+ binfile + " > /dev/null 2>&1\"";  //ME20200610 - no output from vasp  //CO20210315 - source only works in bash

@@ -1775,7 +1775,7 @@ FILE_VASP_MONITOR
   type: string
   default: "monitor_vasp"
 
-INTEL_COMPILER_PATH
+INTEL_COMPILER_PATHS
   description: Comma-separated paths to search for sourcing the Intel compiler environmental variables.
   type: string
   default: "/opt/intel/bin/compilervars.sh,/opt/intel/bin/compilervars.csh,/app/intel/parallel_studio_xe_2020_update1/bin/compilervars.sh"
