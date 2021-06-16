@@ -144,7 +144,7 @@ namespace pflow {
   bool GetNonCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<xvector<double> >& vmag_noncoll); //DX20171205 - Magnetic symmetry non-collinear //DX20191107 - int to uint
   //DX20200225 [OBSOLETE - moved to XtalFinder header] vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog); //DX20190314 
   void GLASS_FORMING_ABILITY(aurostd::xoption& vpflow); //DF20190329
-  void ATOMIC_ENVIRONMENT(aurostd::xoption& vpflow); //HE20210331
+  void ATOMIC_ENVIRONMENT(const aurostd::xoption& vpflow); //HE20210331
   void GULP(istream& input);
   void HKL(const string& options,_aflags &aflags,istream& input);
   void HKLSearch(const string& options,_aflags &aflags,istream& input,const string& smode);

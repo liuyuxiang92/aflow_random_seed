@@ -688,7 +688,7 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 
   // setup test environment
   vector<string> results;
-  stringstream result = "";
+  stringstream result;
   uint passed_checks = 0;
   string check_name = "";
   uint check_num = 0;
@@ -906,13 +906,13 @@ bool AtomicEnvironmentTest(ostream& oss){ofstream FileMESSAGE;return AtomicEnvir
 bool AtomicEnvironmentTest(ofstream& FileMESSAGE, ostream& oss){ //HE20210511
 
   string function_name="AtomicEnvironmentTest():";
-  stringstream message = "";
+  stringstream message;
   _aflags aflags;
   aflags.Directory=aurostd::getPWD();
 
   // setup test environment
   vector<string> results;
-  stringstream result = "";
+  stringstream result;
   uint passed_checks = 0;
   string check_name = "";
   uint check_num = 0;

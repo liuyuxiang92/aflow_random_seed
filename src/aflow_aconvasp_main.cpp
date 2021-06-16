@@ -7502,10 +7502,10 @@ namespace pflow {
 // pflow::ATOMIC_ENVIRONMENT
 // ***************************************************************************
 namespace pflow { //HE20210331
-  void ATOMIC_ENVIRONMENT(aurostd::xoption& vpflow){
+  void ATOMIC_ENVIRONMENT(const aurostd::xoption& vpflow){
     string soliloquy=XPID+"pflow::ATOMIC_ENVIRONMENT():";
     string auid = "";
-    uint ae_mode = 1;
+    uint ae_mode = ATOM_ENVIRONMENT_MODE_1;
     string aeOutBase = "AE_out/";
     if (vpflow.flag("ATOMIC_ENVIRONMENT::AUID")) auid = vpflow.getattachedscheme("ATOMIC_ENVIRONMENT::AUID");
     else throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "missing auid - could not load structure", _INPUT_ERROR_);
