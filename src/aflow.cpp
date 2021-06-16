@@ -634,9 +634,12 @@ bool FoldAtomsInCellTest(ofstream& FileMESSAGE,ostream& oss){ //DX20210129
 
   return true;
 }
+
+// Collection of generic check functions, to streamline testing.
+// HE20210616
 template <typename utype>
 void check(const bool &passed, const utype &calculated, const utype &expected, const string &check_name,
-           const uint& check_num, uint &passed_checks, vector<string> &results){
+           const uint check_num, uint &passed_checks, vector<string> &results){
   stringstream result;
   if (passed) {
     passed_checks++;
@@ -650,26 +653,26 @@ void check(const bool &passed, const utype &calculated, const utype &expected, c
 
 template <typename utype>
 void check_equal(const utype &calculated, const utype &expected, const string &check_name,
-                 const uint& check_num, uint &passed_checks, vector<string> &results){
+                 const uint check_num, uint &passed_checks, vector<string> &results){
   bool passed = false;
   if (aurostd::isequal(calculated, expected)) passed = true;
   check(passed, calculated, expected, check_name, check_num, passed_checks, results);
 }
 void check_equal(const string &calculated, const string &expected, const string &check_name,
-                 const uint& check_num, uint &passed_checks, vector<string> &results){
+                 const uint check_num, uint &passed_checks, vector<string> &results){
   bool passed = false;
   if (calculated == expected) passed = true;
   check(passed, calculated, expected, check_name, check_num, passed_checks, results);
 }
 void check_equal(const bool &calculated, const bool &expected, const string &check_name,
-                 const uint& check_num, uint &passed_checks, vector<string> &results){
+                 const uint check_num, uint &passed_checks, vector<string> &results){
   bool passed = false;
   if (calculated == expected) passed = true;
   check(passed, calculated, expected, check_name, check_num, passed_checks, results);
 }
 
 void check_similar(const double &calculated, const double &expected, const string &check_name,
-                   const uint& check_num, uint &passed_checks, vector<string> &results, const double &relative=1E-10){
+                   const uint check_num, uint &passed_checks, vector<string> &results, const double &relative=1E-10){
   bool passed = false;
   if (std::abs(expected - calculated) <= expected * relative) passed = true;
   check(passed, calculated, expected, check_name, check_num, passed_checks, results);
