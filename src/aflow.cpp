@@ -688,22 +688,22 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 
   // setup test environment
   vector<string> results;
-  stringstream result;
+  stringstream result = "";
   uint passed_checks = 0;
-  string check_name;
+  string check_name = "";
   uint check_num = 0;
 
-  double expected;
-  double calculated;
+  double expected = 0.0;
+  double calculated = 0.0;
 
-  int expected_int;
-//  int calculated_int;
-  std::string expected_error;
+  int expected_int = 0;
+  string expected_error = "";
 
   vector<xvector<double>> points;
   vector<xvector<int>> ipoints;
   vector<vector<uint>> facets;
 
+  // variables to store examples as doubles (p#) and int (p#i) variants
   xvector<double> p0(3,1); xvector<int> p0i(3,1);
   xvector<double> p1(3,1); xvector<int> p1i(3,1);
   xvector<double> p2(3,1); xvector<int> p2i(3,1);
@@ -716,7 +716,6 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   xvector<double> p9(3,1); xvector<int> p9i(3,1);
   xvector<double> p10(3,1); xvector<int> p10i(3,1);
   xvector<double> p11(3,1); xvector<int> p11i(3,1);
-
 
   // define convex solid
   p0i(1) = p0(1) = 0.0; p0i(2) = p0(2) = 0.0; p0i(3) = p0(3) = 0.0;
@@ -797,8 +796,8 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   check_num++;
   check_name = "error facet/normals mismatch";
   vector<xvector<double>> normals;
-  expected_error = "xerror code 30";
-  expected_int = 30;
+  expected_error = "xerror code 30 (VALUE_ERROR)";
+  expected_int = _VALUE_ERROR_;
 
   try {
     calculated = aurostd::volume(points, facets, normals);
@@ -826,8 +825,8 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   // Check | error facet size
   check_num++;
   check_name = "error facet size";
-  expected_error = "xerror code 30";
-  expected_int = 30;
+  expected_error = "xerror code 30 (VALUE_ERROR)";
+  expected_int = _VALUE_ERROR_;
 
   facets.push_back({1,2});
   try {
@@ -907,15 +906,15 @@ bool AtomicEnvironmentTest(ostream& oss){ofstream FileMESSAGE;return AtomicEnvir
 bool AtomicEnvironmentTest(ofstream& FileMESSAGE, ostream& oss){ //HE20210511
 
   string function_name="AtomicEnvironmentTest():";
-  stringstream message;
+  stringstream message = "";
   _aflags aflags;
   aflags.Directory=aurostd::getPWD();
 
   // setup test environment
   vector<string> results;
-  stringstream result;
+  stringstream result = "";
   uint passed_checks = 0;
-  string check_name;
+  string check_name = "";
   uint check_num = 0;
 
   // ---------------------------------------------------------------------------
