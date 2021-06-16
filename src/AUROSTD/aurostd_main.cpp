@@ -60,7 +60,7 @@ namespace aurostd {
   int get_offset_utc(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_offset_utc(now);}  //CO20210601: https://codereview.stackexchange.com/questions/175353/getting-current-timezone
   int get_offset_utc(tm* tstruct) {  //CO20210601
     //https://codereview.stackexchange.com/questions/175353/getting-current-timezone
-    bool LDEBUG=(true || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::get_offset_utc():";
     char buffer[26];
     //mktime might modify tstruct
@@ -5371,29 +5371,12 @@ namespace aurostd {
       if(fsize>=size_max){return false;}  //CO20210315 - in the future, consider throwing instead, and create a special function for vasp.out greps in kvasp
     }
     
-    bool use_regex=true;
+    bool use_regex=true;  //do we want to use regex?
+    bool is_regex_used=false; //do we actually use regex?
+
     string strsub1=_strsub1;
-
-    string grep_command="grep";
-    if(( (RemoveWS==false && case_insensitive==false) ||
-        (!(use_regex==true && (RemoveWS==true||case_insensitive==true))) ) && 
-        aurostd::IsCommandAvailable("fgrep")){grep_command="fgrep";}  //fixed string search
-    if(LDEBUG){cerr << soliloquy << " grep_command=\"" << grep_command << "\"" << endl;}
+    if(case_insensitive==true){strsub1=aurostd::tolower(strsub1);}
     
-    string grep_flags="-c";
-    if(case_insensitive==true){
-      grep_flags="-ic";
-      strsub1=aurostd::tolower(strsub1);
-    }
-    if(use_regex){
-      grep_flags="-E "+grep_flags;
-    }
-    if(LDEBUG){cerr << soliloquy << " grep_flags=\"" << grep_flags << "\"" << endl;}
-
-    string cat_command="cat";
-    if(expect_near_end && aurostd::IsCommandAvailable("tac")){cat_command="tac";}
-    if(LDEBUG){cerr << soliloquy << " cat_command=\"" << cat_command << "\"" << endl;}
-
     if(RemoveWS){
       if(use_regex){  //use regex
         aurostd::StringSubst(strsub1,"\t"," ");
@@ -5404,6 +5387,7 @@ namespace aurostd {
         if(!strsub1_keep.empty() && strsub1_keep[0]==' '){strsub1="\\s*"+strsub1;}  //insert at the front
         if(!strsub1_keep.empty() && strsub1_keep[strsub1_keep.size()-1]==' '){strsub1+="\\s*";} //append at the back
         if(LDEBUG){cerr << soliloquy << " strsub1(regex)=\"" << strsub1 << "\"" << endl;}
+        if(strsub1.find("\\s*")!=string::npos){is_regex_used=(is_regex_used || true);}
       }else{
         strsub1=aurostd::RemoveWhiteSpaces(strsub1);
         if(LDEBUG){cerr << soliloquy << " strsub1(!regex)=\"" << strsub1 << "\"" << endl;}
@@ -5417,10 +5401,24 @@ namespace aurostd {
     aurostd::StringstreamClean(aus);
     aus << "rm -f " << temp_file  << endl;
     if(1){aus << "LC_ALL=C ";}  //speed up grep
+
+    string cat_command="cat";
+    if(expect_near_end && aurostd::IsCommandAvailable("tac")){cat_command="tac";}
+    if(LDEBUG){cerr << soliloquy << " cat_command=\"" << cat_command << "\"" << endl;}
+
     aus << cat_command << " \"" << FileName << "\"";
-    if(use_regex==false && RemoveWS==TRUE){
-      aus << " | sed \"s/ //g\" | sed \"s/\\t//g\"";
-    }
+    if(use_regex==false && RemoveWS==true){aus << " | sed \"s/ //g\" | sed \"s/\\t//g\"";}
+    
+    //decide is_regex_used above here
+
+    string grep_command="grep";
+    if(aurostd::IsCommandAvailable("fgrep") && is_regex_used==false){grep_command="fgrep";}  //fixed string search
+    if(LDEBUG){cerr << soliloquy << " grep_command=\"" << grep_command << "\"" << endl;}
+    
+    string grep_flags="-c"; //return count instead of strings matching
+    if(case_insensitive==true){grep_flags="-ic";} //case-insensitive, should work with both grep and fgrep (tested by CO20210601)
+    if(is_regex_used){grep_flags="-E "+grep_flags;} //regex flag
+    if(LDEBUG){cerr << soliloquy << " grep_flags=\"" << grep_flags << "\"" << endl;}
 
     aus << " | " << grep_command << " " << grep_flags << " -m 1 \"" << strsub1 << "\" > " << temp_file  << endl;  //-m 1: stop when you find a match
     aus << "echo >> " << temp_file << endl; // to give EOL
@@ -5438,8 +5436,8 @@ namespace aurostd {
 #ifndef _AFLOW_TEMP_PRESERVE_
     aurostd::RemoveFile(temp_file);
 #endif
-    if(found>0) return TRUE;
-    return FALSE;
+    if(found>0) return true;
+    return false;
   }
 
   // ***************************************************************************
