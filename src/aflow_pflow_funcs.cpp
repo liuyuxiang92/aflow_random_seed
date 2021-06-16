@@ -8297,6 +8297,7 @@ namespace pflow{
 // ***************************************************************************
 // pflow::getAtomicEnvironment() //HE20210504
 // ***************************************************************************
+
 namespace pflow {
   /**
    * @brief write collection of atomic environments into json files
@@ -8311,17 +8312,20 @@ namespace pflow {
     string soliloquy=XPID+"pflow::getAtomicEnvironment(): ";
     if(LDEBUG) cerr << soliloquy << "Start" << endl;
 
-    string aurl;
-    bool foundAUID = false;
+    string aurl = "";
     aflowlib::_aflowlib_entry entry;
     xstructure str;
 
-    // TODO: speed up AURL lookup
-    if (auid != "") foundAUID = aflowlib::AflowlibLocator(auid, aurl, "AFLOWLIB_AUID2AURL");
+    if (auid != "") aurl = aurostd::execute2string(XHOST.command("aflow_data")+" vLIBS | grep -B1 \"" + auid + "\" | head -n 1");
 
-    if (aeOutBase != "") mkdir(aeOutBase.c_str(), 0777);
+    if (!auid.empty() && aurl.empty()) {
+      if(LDEBUG) cerr << soliloquy << "Quick search failed! Trying standard methode.";
+      aflowlib::AflowlibLocator(auid, aurl, "AFLOWLIB_AUID2AURL");
+    }
 
-    if (foundAUID){
+    if (!aeOutBase.empty()) mkdir(aeOutBase.c_str(), 0777);
+
+    if (!aurl.empty()){
       aeOutBase += auid.substr(6);
       entry.aurl=aurl;
       entry.auid=auid;
