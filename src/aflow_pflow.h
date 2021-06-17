@@ -1122,8 +1122,8 @@ namespace pflow {
 }
 
 namespace  pflow {
-  void getAtomicEnvironment(const string &auid, const uint &aeMode=1, string aeOutBase="AE_out/");
-  void getAtomicEnvironment(const string &auid, string aeOutBase);
+  void getAtomicEnvironment(const string &auid, uint aeMode=1, string aeOutBase="AE_out/");
+  void getAtomicEnvironment(const string &auid, string &aeOutBase);
 }
 
 #endif

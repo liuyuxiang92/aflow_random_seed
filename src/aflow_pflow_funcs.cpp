@@ -8307,7 +8307,7 @@ namespace pflow {
    *
    * Feature request: analyse a structure file directly
    */
-  void getAtomicEnvironment(const string &auid, const uint &aeMode, string aeOutBase) {
+  void getAtomicEnvironment(const string &auid, uint aeMode, string aeOutBase) {
     bool LDEBUG=(false || XHOST.DEBUG);
     string soliloquy=XPID+"pflow::getAtomicEnvironment(): ";
     if(LDEBUG) cerr << soliloquy << "Start" << endl;
@@ -8338,8 +8338,7 @@ namespace pflow {
     else {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "could not load a structure", _INPUT_ERROR_);
     }
-
-    mkdir(aeOutBase.c_str(), 0777);
+    aurostd::DirectoryMake(aeOutBase);
     vector<AtomEnvironment> AE = getAtomEnvironments(str, aeMode);
 
     string file_name;
@@ -8348,15 +8347,12 @@ namespace pflow {
     for(uint i=0; i<AE.size(); i++) {
       file_name = aeOutBase + "/" + std::to_string(i) + "_" + AE[i].element_center + ".json";
       AE[i].constructAtomEnvironmentHull();
-      string json_content = AE[i].toJSON();
-      AEData.open(file_name.c_str());
-      AEData << json_content << endl;
-      AEData.close();
+      aurostd::string2file(AE[i].toJSON(), file_name, "WRITE");
       if(LDEBUG) cerr << soliloquy << file_name << endl;
     }
   }
 
-  void getAtomicEnvironment(const string &auid, string aeOutBase) {
+  void getAtomicEnvironment(const string &auid, string &aeOutBase) {
     getAtomicEnvironment(auid, 1, aeOutBase);
   }
 }
