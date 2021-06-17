@@ -1429,8 +1429,9 @@ class AtomEnvironment{
     const AtomEnvironment& operator=(const AtomEnvironment& b);                             // assignment operator
     AtomEnvironment(const AtomEnvironment& b);                                              // copy constructor
     string element_center;                                                                  // species/element at center of environment                                                                   
-    uint type_center;                                                                       // type (uint) at center of environment
     uint num_neighbors;
+    uint type_center;                                                                       // type (uint) at center of environment
+    uint num_types;
     vector<string> elements_neighbor;                                                       // species/element of atoms neighboring center atom
     vector<uint> types_neighbor;                                                            // types (uint) of atoms neighboring center atom
     vector<double> distances_neighbor;                                                      // distances to atoms neighboring atoms (typically put in a bin with small tolerance threshold)                                             
@@ -1447,7 +1448,7 @@ class AtomEnvironment{
     void getAtomEnvironment(const xstructure& xstr, uint center_index, const vector<string>& neighbor_elements, uint mode=ATOM_ENVIRONMENT_MODE_1); // get restricted environment (via specified elements) around atom index
     void constructAtomEnvironmentHull(void);                                                                                                        // construct hull around an environment //HE20210408
     xvector<double> index2Point(uint index);                                                                                                        // flat view on coordinates_neighbor //HE20210408
-    string toJSON(void);
+    string toJSON(bool full=true) const;
   private:
     void free();                                                                            // free operator
     void copy(const AtomEnvironment& b);                                                    // copy constructor

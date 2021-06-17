@@ -8295,7 +8295,7 @@ namespace pflow{
 
 
 // ***************************************************************************
-// pflow::getAtomicEnvironment() //HE20210504
+// pflow::getAtomicEnvironment() //HE20210617
 // ***************************************************************************
 
 namespace pflow {
@@ -8316,10 +8316,11 @@ namespace pflow {
     aflowlib::_aflowlib_entry entry;
     xstructure str;
 
+    // Quickly match auid to aurl (speedup from 15s to 0.5s compared to single use of AflowlibLocator)
     if (auid != "") aurl = aurostd::execute2string(XHOST.command("aflow_data")+" vLIBS | grep -B1 \"" + auid + "\" | head -n 1");
-
+    // Fallback if quick search failed
     if (!auid.empty() && aurl.empty()) {
-      if(LDEBUG) cerr << soliloquy << "Quick search failed! Trying standard methode.";
+      cerr << soliloquy << "Quick search failed! Trying standard methode." << endl;
       aflowlib::AflowlibLocator(auid, aurl, "AFLOWLIB_AUID2AURL");
     }
 
@@ -8342,7 +8343,6 @@ namespace pflow {
     vector<AtomEnvironment> AE = getAtomEnvironments(str, aeMode);
 
     string file_name;
-    ofstream AEData;
     if(LDEBUG) cerr << soliloquy << "Saving " << AE.size() << " atomic environments" << endl;
     for(uint i=0; i<AE.size(); i++) {
       file_name = aeOutBase + "/" + std::to_string(i) + "_" + AE[i].element_center + ".json";

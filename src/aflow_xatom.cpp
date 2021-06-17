@@ -1884,12 +1884,18 @@ AtomEnvironment::AtomEnvironment(){
 void AtomEnvironment::free(){
   element_center="";
   type_center=0;
-  has_hull=false;
+  num_types=0;
+  num_neighbors=0;
   elements_neighbor.clear();
   types_neighbor.clear();
   distances_neighbor.clear();
   coordinations_neighbor.clear();
   coordinates_neighbor.clear();
+  facets.clear();
+  facet_area.clear();
+  area=0;
+  volume=0;
+  has_hull=false;
   facet_order = {0,0,0,0,0,0,0,0};
 }
 
@@ -1911,6 +1917,7 @@ void AtomEnvironment::copy(const AtomEnvironment& b) {
   element_center=b.element_center;
   type_center=b.type_center;
   num_neighbors=b.num_neighbors;
+  num_types=b.num_types;
   elements_neighbor=b.elements_neighbor;
   types_neighbor=b.types_neighbor;
   distances_neighbor=b.distances_neighbor;
@@ -1921,7 +1928,7 @@ void AtomEnvironment::copy(const AtomEnvironment& b) {
   facet_area=b.facet_area;
   area=b.area;
   volume=b.volume;
-  has_hull=has_hull;
+  has_hull=b.has_hull;
 }
 
 // ---------------------------------------------------------------------------
@@ -1937,54 +1944,7 @@ const AtomEnvironment& AtomEnvironment::operator=(const AtomEnvironment& b){
 // AtomEnvironment::operator<< 
 ostream& operator<<(ostream& oss, const AtomEnvironment& AtomEnvironment){
 
-  // operator<< for the AtomEnvironment object (looks like a JSON)
-
-  //if(AtomEnvironment.iomode!=JSON_MODE){ //A safeguard until we construct more output schemes.
-  //  AtomEnvironment.iomode=JSON_MODE;
-  //}
-
-  string eendl="";
-  stringstream sscontent_json;
-  vector<string> vcontent_json, tmp;
-
-  // element_center 
-  sscontent_json << "\"element_center\":\"" << AtomEnvironment.element_center << "\"" << eendl;
-  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-  // type_center
-  sscontent_json << "\"type_center\":" << AtomEnvironment.type_center << eendl;
-  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-  // elements_neighbor
-  sscontent_json << "\"elements_neighbor\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(AtomEnvironment.elements_neighbor,"\""),",") << "]" << eendl;
-  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-  // distances_neighbor
-  sscontent_json << "\"distances_neighbor\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(AtomEnvironment.distances_neighbor,8,true,1e-6),",") << "]" << eendl;
-  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-  // coordinations_neighbor
-  sscontent_json << "\"coordinations_neighbor\":[" << aurostd::joinWDelimiter(AtomEnvironment.coordinations_neighbor,",") << "]" << eendl;
-  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-  // coordinates_neighbor
-  sscontent_json << "\"coordinates_neighbor\":[";
-  vector<string> coordinate_sets;
-  for(uint i=0;i<AtomEnvironment.coordinates_neighbor.size();i++){
-    vector<string> coordinates;
-    for(uint j=0;j<AtomEnvironment.coordinates_neighbor[i].size();j++){
-      stringstream ss_tmp; ss_tmp << "[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(AtomEnvironment.coordinates_neighbor[i][j],8,true,1e-6),",") << "]";
-      coordinates.push_back(ss_tmp.str());
-      ss_tmp.clear();
-    }
-    coordinate_sets.push_back("["+aurostd::joinWDelimiter(coordinates,",")+"]");
-  }
-  sscontent_json << aurostd::joinWDelimiter(coordinate_sets,",") << "]" << eendl;
-  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-  // Put into json AtomEnvironment object
-  oss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}";
-  vcontent_json.clear();
+  oss << AtomEnvironment.toJSON(false);
 
   return oss;
 }
@@ -2021,15 +1981,16 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
   vector<vector<uint>> facet_collection;
   AEhull.getJoinedFacets(facet_collection);
 
-  for (vector<uint> f: facet_collection){
+//  for (vector<uint> f: facet_collection){
+  for (std::vector<vector<uint>>::const_iterator f = facet_collection.begin(); f != facet_collection.end(); ++f) {
     vector<uint> nf;
-    for (uint v: f) nf.push_back(v);
+    for (std::vector<uint>::const_iterator v = f->begin(); v != f->end(); ++v) nf.push_back(*v);
     facets.push_back(nf);
   }
   if(LDEBUG) cerr << soliloquy << "after joining " << facets.size() << " facets are remaining" << endl;
 
-  for (vector<uint> f: facets){
-    if (f.size()<10) facet_order[f.size()-3]++;
+  for (std::vector<vector<uint>>::const_iterator f = facets.begin(); f != facets.end(); ++f) {
+    if (f->size()<10) facet_order[f->size()-3]++;
     else facet_order[7]++;
   }
 
@@ -2067,50 +2028,70 @@ xvector<double> AtomEnvironment::index2Point(uint index){
  * @brief serialize AtomEnvironment class to json
  * @return json string
  */
-string AtomEnvironment::toJSON(void){
+string AtomEnvironment::toJSON(bool full) const{
     string soliloquy=XPID+"AtomEnvironment::toJSON(): ";
 
-    stringstream json_content;
+    aurostd::JSONwriter ae_json;
 
-    json_content << "{" << endl;
-    json_content << "  \"center_element\": \"" << element_center << "\"," << endl;
-    if (has_hull){
-      json_content << "  \"volume\": \"" << volume << "\"," << endl;
-      json_content << "  \"area\": \"" << area << "\"," << endl;
-    }
-    json_content << "  \"neighbors\": [" << endl;
-    uint index=0;
-    for (uint i = 0; i < coordinations_neighbor.size(); i++){
-        for (uint k = 0; k < coordinations_neighbor[i]; k++){
-            json_content << "    {\"index\": " << index << ", ";
-            json_content << "\"element\": \"" << elements_neighbor[i] << "\", ";
-            json_content << "\"element_index\": " << types_neighbor[i] << ", ";
-            json_content << "\"coordinate\": [" << coordinates_neighbor[i][k][1] << ", " << coordinates_neighbor[i][k][2] << ", " << coordinates_neighbor[i][k][3] << "]}," << endl;
-            index++;
-        }
-    }
-    json_content.seekp(-2,json_content.cur);
-    json_content << endl << "    ]," << endl;
+    ae_json.addString("center_element", element_center);
+    ae_json.addNumber("center_element_index", type_center);
+    ae_json.addNumber("element_count", num_types);
 
-    if (has_hull) {
-      json_content << "  \"facets\": [" << endl;
-      for (uint i = 0; i < facets.size(); i++) {
-        json_content << "    {\"area\": " << facet_area[i] << ", ";
-        json_content << "\"vertices\": [";
-        json_content << aurostd::joinWDelimiter(facets[i], ", ");
-        json_content << "]}," << endl;
+//    "elements_neighbor"
+    if (full) {
+      vector <aurostd::JSONwriter> distance_collection;
+      for (uint i = 0; i < elements_neighbor.size(); i++) {
+        aurostd::JSONwriter distance_element;
+        distance_element.addNumber("index", i);
+        distance_element.addString("name", elements_neighbor[i]);
+        distance_element.addNumber("min_distance", distances_neighbor[i]);
+        distance_element.addNumber("coordination", coordinations_neighbor[i]);
+        distance_collection.push_back(distance_element);
       }
-      json_content.seekp(-2, json_content.cur);
-      json_content << endl << "    ]," << endl;
+      ae_json.addVector("neighbor_elements", distance_collection);
+    }
+    if (has_hull){
+      ae_json.addNumber("volume", volume);
+      ae_json.addNumber("area", area);
+    }
+    vector<aurostd::JSONwriter> neighbors;
+    uint index=0;
+    for (uint i = 0; i < coordinations_neighbor.size(); i++) {
+      for (uint k = 0; k < coordinations_neighbor[i]; k++) {
+        aurostd::JSONwriter neighbor;
+        if (full) {
+          neighbor.addNumber("index", index);
+          neighbor.addString("element", elements_neighbor[i]);
+          neighbor.addNumber("element_index", types_neighbor[i]);
+          neighbor.addVector("coordinate", coordinates_neighbor[i][k]);
+        }
+        else {
+          neighbor.addString("element", elements_neighbor[i]);
+          neighbor.addVector("coordinate", coordinates_neighbor[i][k]);
+        }
+        neighbors.push_back(neighbor);
+        index++;
 
-      json_content << "  \"facet_orders\": [";
-      for (std::array<uint, 8>::iterator order = facet_order.begin(); order != facet_order.end(); ++order) json_content << *order << ", ";
-      json_content.seekp(-2, json_content.cur);
-      json_content << "]";
-      json_content << endl << "}";
+      }
+    }
+    ae_json.addVector("neighbors", neighbors);
+
+    if (has_hull && full) {
+      vector <aurostd::JSONwriter> facets_collection;
+      for (uint i = 0; i < facets.size(); i++) {
+        aurostd::JSONwriter facet_entry;
+        facet_entry.addNumber("area", facet_area[i]);
+        facet_entry.addVector("vertices", facets[i]);
+        facets_collection.push_back(facet_entry);
+      }
+      ae_json.addVector("facets", facets_collection);
+      vector<uint> fo;
+      for (std::array<uint, 8>::const_iterator order = facet_order.begin(); order != facet_order.end(); ++order) fo.push_back(*order);
+      ae_json.addVector("facet_order", fo);
     }
 
-    return json_content.str();
+    return ae_json.toString();
+
 }
 
 
@@ -2149,6 +2130,7 @@ void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_ind
   area = 0.0;
   volume = 0.0;
   num_neighbors= 0;
+  num_types = xstr.species.size();
 
   // ---------------------------------------------------------------------------
   // ATOM_ENVIRONMENT_MODE_1 : minimum coordination environment for each type 
