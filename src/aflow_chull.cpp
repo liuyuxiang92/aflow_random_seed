@@ -1713,17 +1713,17 @@ namespace chull {
       uint p_ind;
       double angle;
     };
+    uint num_points = facet.size();
     vector<sa> angle;
-    for (uint p_id: facet){
-      center += m_points[p_id].m_coords;
-    }
-    center /= facet.size();
+    for (std::vector<uint>::const_iterator p_id = facet.begin(); p_id != facet.end(); ++p_id) center += m_points[*p_id].m_coords;
+
+    center /= num_points;
     const xvector<double> start_vector = m_points[facet[0]].m_coords - center;
     const xvector<double> normal = m_facets[facet_id].m_normal;
 
     // first index is used for the start_vector, therefore the angle is set to 0.0
     angle.push_back({facet[0], 0.0});
-    for (uint i=1; i<facet.size(); i++){
+    for (uint i=1; i<num_points; i++){
       const xvector<double> next_vector = m_points[facet[i]].m_coords - center;
       const double dot = aurostd::scalar_product(start_vector, next_vector);
       const double det = start_vector[1]*next_vector[2]*normal[3] + next_vector[1]*normal[2]*start_vector[3] + normal[1]*start_vector[2]*next_vector[3]
@@ -1731,7 +1731,7 @@ namespace chull {
       angle.push_back({facet[i], atan2(det, dot)});
     }
     sort(angle.begin(),angle.end(), [&](sa i,sa j){return i.angle<j.angle;});
-    for (uint i=0; i<facet.size(); i++) facet[i] = angle[i].p_ind;
+    for (uint i=0; i<num_points; i++) facet[i] = angle[i].p_ind;
   }
 
   /**
@@ -1752,26 +1752,31 @@ namespace chull {
     std::set<uint> remove_facet;
 
     // Collect information on each facet
-    for (ChullFacet facet: h_facets) {
+    for (std::vector<ChullFacet>::const_iterator facet = h_facets.begin(); facet != h_facets.end(); ++facet){
+
       vector <uint> vertices;
 
       // Represent facet based on the vertices indexes
-      for(chull::FacetPoint vert: facet.m_vertices) vertices.push_back(vert.ch_index);
+      for(std::vector<chull::FacetPoint>::const_iterator vert = facet->m_vertices.begin(); vert != facet->m_vertices.end(); ++vert){
+        vertices.push_back(vert->ch_index);
+      }
       raw_facets.push_back(vertices);
-      normals.push_back(facet.m_normal);
+      normals.push_back(facet->m_normal);
     }
 
     // Build lookup for neighboring points
     // (Base point is included to make a check easier)
-    for (vector<uint> facet: raw_facets){
-      for (uint ind: facet) std::copy(facet.begin(),facet.end(), std::inserter(point_neighbors[ind],point_neighbors[ind].end()));
+    for (std::vector<vector<uint>>::const_iterator facet = raw_facets.begin(); facet != raw_facets.end(); ++facet){
+      for (std::vector<uint>::const_iterator ind = facet->begin(); ind != facet->end(); ++ind){
+        std::copy(facet->begin(),facet->end(), std::inserter(point_neighbors[*ind],point_neighbors[*ind].end()));
+      }
     }
-
+    uint raw_facets_size = raw_facets.size();
     // Check for each facet, if their neighbors have an equivalent normal vector
     if (LDEBUG) cerr << soliloquy << " coplanar | angle | facets | n1 | n2" << endl;
-    for (uint i1=0; i1<raw_facets.size(); i1++){
+    for (uint i1=0; i1<raw_facets_size; i1++){
       const vector<uint> base_facet = raw_facets[i1];
-      for (uint i2=i1+1; i2<raw_facets.size(); i2++){
+      for (uint i2=i1+1; i2<raw_facets_size; i2++){
         uint check=0;
         const vector<uint> compare_facet = raw_facets[i2];
         for (uint k=0; k<3; k++) {
@@ -1783,32 +1788,33 @@ namespace chull {
         if (check != 2) continue;
         double check_angle = aurostd::angle(normals[i1], normals[i2]);
         if (check_angle<angle_threshold){
-          if(LDEBUG) cerr << soliloquy << "Y | ";
+          if(LDEBUG) cerr << soliloquy << "YES | ";
           raw_join_list.insert({i1, i2});
           remove_facet.insert(i1);
           remove_facet.insert(i2);
         }
         else {
-          if (LDEBUG) cerr << soliloquy << "N | ";
+          if (LDEBUG) cerr << soliloquy << "NO  | ";
         }
         if (LDEBUG) {
           cerr << check_angle << " | ";
           cerr << i1 << ", " << i2 << " | ";
-          for (uint k: {1, 2, 3}) cerr << normals[i1][k] << ", ";
+          for (uint k=1; k<4; k++) cerr << normals[i1][k] << ", ";
           cerr << "| ";
-          for (uint k: {1, 2, 3}) cerr << normals[i2][k] << ", ";
+          for (uint k=1; k<4; k++) cerr << normals[i2][k] << ", ";
           cerr << endl;
         }
       }
     }
 
-    // Combine the join pairs into complete facets
+    // Combine the joined pairs into complete facets
     while (raw_join_list.size()){
       std::array<uint,2> start=*raw_join_list.begin();
       std::set<uint> new_facet(start.begin(), start.end());
       raw_join_list.erase(start);
       std::vector<std::array<uint,2>> to_delete;
-      for (std::array<uint,2> next: raw_join_list){
+      for (std::set<std::array<uint,2>>::const_iterator next_ptr = raw_join_list.begin(); next_ptr != raw_join_list.end(); ++next_ptr) {
+        std::array<uint,2> next = *next_ptr;
         if (new_facet.count(next[0])) {
           new_facet.insert(next[1]);
           to_delete.push_back(next);
@@ -1818,32 +1824,40 @@ namespace chull {
           to_delete.push_back(next);
         }
       }
-      for (std::array<uint,2> next: to_delete) raw_join_list.erase(next);
+      for (std::vector<std::array<uint,2>>::const_iterator next = to_delete.begin(); next != to_delete.end(); ++next) {
+        raw_join_list.erase(*next);
+      }
       join_list.push_back(new_facet);
     }
 
     // Build the new facet collection
     // Add unchanged facets (no sorting, as they should all be triangles)
-    for (uint i=0; i<raw_facets.size(); i++){
+    for (uint i=0; i<raw_facets_size; i++){
       if (!remove_facet.count(i)) facet_collection.push_back(raw_facets[i]);
     }
     // Add joined facets
-    for (std::set<uint> to_join: join_list){
+    for (std::vector<std::set<uint>>::const_iterator to_join = join_list.begin(); to_join != join_list.end(); ++to_join) {
       std::set<uint> vertices;
-      for (uint f_id: to_join){
-        for (uint p_id: raw_facets[f_id]) vertices.insert(p_id);
+      for (std::set<uint>::const_iterator f_id = to_join->begin(); f_id != to_join->end(); ++f_id) {
+        for (std::vector<uint>::const_iterator p_id = raw_facets[*f_id].begin(); p_id != raw_facets[*f_id].end(); ++p_id) {
+          vertices.insert(*p_id);
+        }
       }
       // If a vertex has no outside neighbor it is removed
       vector<uint> vertices_to_remove;
-      for (uint p_id: vertices){
+      for (std::set<uint>::const_iterator p_id = vertices.begin(); p_id != vertices.end(); ++p_id){
         std::vector<uint> diff_result;
-        std::set_difference(point_neighbors[p_id].begin(), point_neighbors[p_id].end(), vertices.begin(), vertices.end(), std::inserter(diff_result, diff_result.end()));
-        if (!diff_result.size()) vertices_to_remove.push_back(p_id);
+        std::set_difference(point_neighbors[*p_id].begin(), point_neighbors[*p_id].end(), vertices.begin(), vertices.end(), std::inserter(diff_result, diff_result.end()));
+        if (!diff_result.size()) vertices_to_remove.push_back(*p_id);
       }
-      for (uint p_id: vertices_to_remove) vertices.erase(p_id);
+      for (std::vector<uint>::const_iterator p_id = vertices_to_remove.begin(); p_id != vertices_to_remove.end(); ++p_id) {
+        vertices.erase(*p_id);
+      }
       vector<uint> vec_vertices;
-      for (uint p_id: vertices) vec_vertices.push_back(p_id);
-      sortFacetVertices(vec_vertices, *to_join.begin());
+      for (std::set<uint>::const_iterator p_id = vertices.begin(); p_id != vertices.end(); ++p_id) {
+        vec_vertices.push_back(*p_id);
+      }
+      sortFacetVertices(vec_vertices, *to_join->begin());
       facet_collection.push_back(vec_vertices);
     }
   }
