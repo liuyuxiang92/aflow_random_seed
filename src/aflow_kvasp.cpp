@@ -3029,7 +3029,12 @@ namespace KBIN {
 
     if(xRequiresAccuracy.flag(scheme)==false){return true;}  //this scheme does not require xmessage.flag("REACHED_ACCURACY"), return true for '&&' logic
 
-    return (vasp_still_running==false && xmessage.flag("REACHED_ACCURACY")==false);
+    //CO20210601 - I am decoupling vasp_still_running and xmessage.flag("REACHED_ACCURACY") FOR RELAXATIONS ONLY
+    //on qrats, I noticed that a calculation can reach accuracy, but not finish (incomplete OUTCAR), thus it is frozen
+    //a good solution would be to take the CONTCAR as the new input and restart (RELAXATIONS ONLY)
+    //to diagnose and treat this problem correctly, we need to consider vasp_still_running and xmessage.flag("REACHED_ACCURACY") independently (for this case only)
+    //[CO20210602 - must use, otherwise NUM_PROB appears early]if(vasp_still_running==false){;}  //keep busy
+    return (vasp_still_running==false && xmessage.flag("REACHED_ACCURACY")==false);  //vasp_still_running==false && - xmessage.flag("REACHED_ACCURACY") should already understand whether to consider vasp_still_running
   }
   void VASP_ProcessWarnings(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,aurostd::xoption& xmessage,aurostd::xoption& xwarning,ofstream &FileMESSAGE) { //CO20210315
     aurostd::xoption xmonitor;
@@ -3164,9 +3169,13 @@ namespace KBIN {
     //WARNINGS START
     if(LDEBUG){aus << soliloquy << " checking warnings" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     xwarning.flag("OUTCAR_INCOMPLETE",vasp_still_running==false && !KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,false));  //CO20201111
-    xmessage.flag("REACHED_ACCURACY",vasp_still_running==false &&
+    //CO20210601 - I am decoupling vasp_still_running and xmessage.flag("REACHED_ACCURACY") FOR RELAXATIONS ONLY
+    //on qrats, I noticed that a calculation can reach accuracy, but not finish (incomplete OUTCAR), thus it is frozen
+    //a good solution would be to take the CONTCAR as the new input and restart (RELAXATIONS ONLY)
+    //to diagnose and treat this problem correctly, we need to consider vasp_still_running and xmessage.flag("REACHED_ACCURACY") independently (for this case only)
+    xmessage.flag("REACHED_ACCURACY",//[CO20210601 - only check for static, not relax (might be frozen, and we can fix by appending CONTCAR)]vasp_still_running==false &&
         ( ( relaxing==true  && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"reached required accuracy",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) ) ||
-          ( relaxing==false && vasp_oszicar_unconverged==false && xwarning.flag("OUTCAR_INCOMPLETE")==false ) || //CO20210315 - "reached accuracy" for static/bands calculation is a converged electronic scf, need to also check OUTCAR_INCOMPLETE, as a converged OSZICAR might actually be a run that ended because of an error
+          ( relaxing==false && vasp_still_running==false && vasp_oszicar_unconverged==false && xwarning.flag("OUTCAR_INCOMPLETE")==false ) || //CO20210315 - "reached accuracy" for static/bands calculation is a converged electronic scf, need to also check OUTCAR_INCOMPLETE, as a converged OSZICAR might actually be a run that ended because of an error
           FALSE) 
         );
     
@@ -3453,7 +3462,7 @@ namespace KBIN {
     bool wdebug=(FALSE && LDEBUG);
     if(1) {
       if(LDEBUG){aus << soliloquy << " printing warnings" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-      if(wdebug || xmessage.flag("REACHED_ACCURACY")) aus << "MMMMM  MESSAGE xmessage.flag(\"REACHED_ACCURACY\")=" << xmessage.flag("REACHED_ACCURACY") << endl;
+      if(!xmonitor.flag("IGNORING_MESSAGES:REACHED_ACCURACY") && (wdebug || xmessage.flag("REACHED_ACCURACY"))) aus << "MMMMM  MESSAGE xmessage.flag(\"REACHED_ACCURACY\")=" << xmessage.flag("REACHED_ACCURACY") << endl;
       if(wdebug) aus << "MMMMM  MESSAGE VASP_release=" << xmessage.getattachedscheme("SVERSION") << endl;
       if(wdebug) aus << "MMMMM  MESSAGE VASP_version=" << xmessage.getattachedscheme("DVERSION") << endl;
       if(wdebug) aus << "MMMMM  MESSAGE AFLOW_version=" << AFLOW_VERSION << endl;
@@ -3500,6 +3509,9 @@ namespace KBIN {
       if(LDEBUG){cerr << aus.str();}
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
+
+    //CO20210601 - only print reached accuracy message once, if calc is frozen this can be printed out many times
+    if(xmessage.flag("REACHED_ACCURACY")){xmonitor.flag("IGNORING_MESSAGES:REACHED_ACCURACY",TRUE);} 
 
     //[CO20210315 - doesn't work]//CO20210315 - this appears to fix ICSD/LIB/CUB/Ag1Sm1_ICSD_604546
     //[CO20210315 - doesn't work]if(xwarning.flag("EDDRMM") && xwarning.flag("ZPOTRF")){ // fix EDDRMM first
@@ -4507,8 +4519,7 @@ namespace KBIN {
 
 namespace KBIN {
   bool VASP_RunFinished(_xvasp &xvasp,_aflags &aflags,ofstream &FileMESSAGE,bool verbose) {
-    ostringstream aus_exec,aus;
-    aurostd::StringstreamClean(aus_exec);
+    ostringstream aus;
     aurostd::StringstreamClean(aus);
     // if(verbose) aus << "00000  MESSAGE RUN CHECK FINISHED :" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
     // if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -4518,27 +4529,37 @@ namespace KBIN {
       if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       return FALSE;
     }
-    // OTUCAR ESISTS BUT EMPTY
+    // OUTCAR EXISTS BUT EMPTY
     if(aurostd::FileEmpty(xvasp.Directory+"/OUTCAR")) {
       if(verbose) aus << "00000  MESSAGE RUN NOT FINISHED (OUTCAR is empty) :" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       return FALSE;
     }
-    // OTUCAR EXISTS
-    aus_exec << "cd " << xvasp.Directory << endl;
-    aus_exec << "cat OUTCAR | grep CPU > aflow.check_outcar.tmp " << endl;
-    aurostd::execute(aus_exec);
-    aurostd::StringstreamClean(aus_exec);
-    aus_exec << "cd " << xvasp.Directory << endl;
-    aus_exec << "rm -f aflow.check_outcar.tmp " << endl;
-    //CO20201111 - not super efficient with cat/grep into file, but it's safe for the spaces, may change later
-    if(aurostd::substring_present_file(xvasp.Directory+"/aflow.check_outcar.tmp",aurostd::RemoveWhiteSpaces("Total CPU time used (sec)"),TRUE)) {
+    // OUTCAR EXISTS
+    bool RemoveWS=true,case_insensitive=true,expect_near_end=true;
+    if(aurostd::substring_present_file_FAST(xvasp.Directory+"/OUTCAR","Total CPU time used (sec)",RemoveWS,case_insensitive,expect_near_end)){  //CO20210601
       if(verbose) aus << "00000  MESSAGE RUN FINISHED (OUTCAR is complete) :" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      aurostd::execute(aus_exec);
       return TRUE;
     }
-    aurostd::execute(aus_exec);
+    if(0){  //faster approach above
+      ostringstream aus_exec;
+      aurostd::StringstreamClean(aus_exec);
+      aus_exec << "cd " << xvasp.Directory << endl;
+      aus_exec << "cat OUTCAR | grep CPU > aflow.check_outcar.tmp " << endl;
+      aurostd::execute(aus_exec);
+      aurostd::StringstreamClean(aus_exec);
+      aus_exec << "cd " << xvasp.Directory << endl;
+      aus_exec << "rm -f aflow.check_outcar.tmp " << endl;
+      //CO20201111 - not super efficient with cat/grep into file, but it's safe for the spaces, may change later
+      if(aurostd::substring_present_file(xvasp.Directory+"/aflow.check_outcar.tmp",aurostd::RemoveWhiteSpaces("Total CPU time used (sec)"),TRUE)) {
+        if(verbose) aus << "00000  MESSAGE RUN FINISHED (OUTCAR is complete) :" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+        if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        aurostd::execute(aus_exec);
+        return TRUE;
+      }
+      aurostd::execute(aus_exec);
+    }
     if(verbose) aus << "00000  MESSAGE RUN NOT FINISHED (OUTCAR is incomplete) :" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
     if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
@@ -5337,9 +5358,16 @@ namespace KBIN {
       if(LDEBUG){cerr << soliloquy << " ls[2]=" << endl << aurostd::execute2string("ls") << endl;}
       if(!aurostd::FileExist("OUTCAR")){
         //first re-try, source intel
-        if(aurostd::FileExist("/bin/bash") && aurostd::FileExist("/opt/intel/bin/compilervars.sh")){
-          aurostd::execute("/bin/bash -c \"source /opt/intel/bin/compilervars.sh intel64; "+ binfile + " > /dev/null 2>&1\"");  //ME20200610 - no output from vasp  //CO20210315 - source only works in bash
-          if(LDEBUG){cerr << soliloquy << " ls[3]=" << endl << aurostd::execute2string("ls") << endl;}
+        vector<string> vintel_paths;
+        aurostd::string2tokens(INTEL_COMPILER_PATHS,vintel_paths,",");
+        for(uint i=0;i<vintel_paths.size();i++){
+          if(aurostd::FileExist("/bin/bash") && aurostd::FileExist(vintel_paths[i])){
+            string command="/bin/bash -c \"source "+vintel_paths[i]+" intel64; "+ binfile + " > /dev/null 2>&1\"";  //ME20200610 - no output from vasp  //CO20210315 - source only works in bash
+            if(LDEBUG){cerr << soliloquy << " running command: \"" << command << "\"" << endl;}
+            aurostd::execute(command);
+            if(LDEBUG){cerr << soliloquy << " ls[3]=" << endl << aurostd::execute2string("ls") << endl;}
+            if(aurostd::FileExist("OUTCAR")){break;}
+          }
         }
       }
       string vasp_version_outcar=KBIN::OUTCAR2VASPVersion("OUTCAR");
