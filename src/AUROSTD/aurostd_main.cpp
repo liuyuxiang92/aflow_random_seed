@@ -2404,6 +2404,14 @@ namespace aurostd {
   }
 
   bool GetMemory(unsigned long long int& free,unsigned long long int& total){ //CO20210315 - only works for linux: needs `free` command
+    //https://www.howtogeek.com/456943/how-to-use-the-free-command-on-linux/
+    //will grab the total and the free
+    //the free is the memory unused by anything
+    //used column includes buff/cache, some of which the kernel can sacrifice for other applications if necessary
+    //available column is an "estimate" of what could become available if needed
+    //it's best to make decisions based on the free column
+    //https://unix.stackexchange.com/questions/14102/real-memory-usage
+    //free will follow real memory (physical RAM), using the available column will follow the actual memory (what could become available if necessary)
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::GetMemory():";
 
