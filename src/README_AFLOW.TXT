@@ -1253,7 +1253,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
 
 --- IGNORE OPTIONS ---------------------------------------
 [VASP_FORCE_OPTION]IGNORE_AFIX=STRING1,STRING2,... etc.
-  Avoid automatic patches for VASP errors, which are detected by analyzing the vasp.out.
+  Avoid automatic patches for VASP errors, which are detected by analyzing the vasp.out file.
   Each type of error may come with a series of patches that are applied sequentially should 
   the error occur repeatedly.
   Specific patches can be avoided with the "FIX:" prefix, whereas the error and the full series of
