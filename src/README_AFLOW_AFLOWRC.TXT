@@ -1766,7 +1766,7 @@ BYTES_MAX_VASP_OUT
   default: 20000000000 (20GB)
 
 MEMORY_MAX_USAGE
-  description: The memory limit (in percentage) before a MEMORY error is issued by --monitor_vasp.
+  description: The memory limit (in percent) before a MEMORY error is issued by --monitor_vasp.
   type: integer
   default: 98
 
