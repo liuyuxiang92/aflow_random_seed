@@ -1768,7 +1768,7 @@ BYTES_MAX_VASP_OUT
 MEMORY_MAX_USAGE
   description: The memory limit (in percentage) before a MEMORY error is issued by --monitor_vasp.
   type: integer
-  default: 98%
+  default: 98
 
 FILE_VASP_MONITOR
   description: File name for the aflow vasp monitor (--monitor_vasp). In the default case, the name would be LOCK.monitor_vasp.
