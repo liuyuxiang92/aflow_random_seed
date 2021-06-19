@@ -693,7 +693,7 @@ DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_SCHEME
 DEFAULT_VASP_FORCE_OPTION_SIGMA
   description: Default VASP SIGMA value.
   type: double
-  default: 0.01
+  default: 0.1
 
 DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC
   description: Default VASP SIGMA value for STATIC runs.
