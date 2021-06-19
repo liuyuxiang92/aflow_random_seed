@@ -2161,7 +2161,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
     vasp_bin=aurostd::basename(vasp_bin); //remove directory stuff
     if(vasp_bin.empty()){
       if(VERBOSE){message << "sleeping for " << sleep_seconds_afterkill << " seconds, waiting for VASP binary to start running and " << _AFLOWLOCK_ << " to be written";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
-      aurostd::Sleep(sleep_seconds_afterkill); //sleep at least a minute to let aflow startup
+      aurostd::Sleep(sleep_seconds_afterkill); //sleep at least a minute to let aflow start up
       continue;
     }
   }
