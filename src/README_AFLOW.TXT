@@ -1309,7 +1309,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   ERROR:EFIELD_PEAD
     The EFIELD_PEAD error is triggered when the following text is found in the vasp.out: "EFIELD_PEAD is too large" or "EFIELD_PEAD are too large for comfort".
     AFLOW will read in the EFIELD_PEAD vector from the OUTCAR, reduce it by 80%, and apply it as an input in the INCAR.
-    Should the error occur again, AFLOW will continue to reduce the EFIELD_PEAD vector by 80%.
+    Should the error occur again, AFLOW will continue to reduce the EFIELD_PEAD vector by another 80%.
 
   ERROR:EXCCOR
     The EXCCOR error is triggered when the following text is found in the vasp.out: "ERROR FEXCF: supplied exchange-correlation table" or "ERROR FEXCP: supplied Exchange-correletion table".
