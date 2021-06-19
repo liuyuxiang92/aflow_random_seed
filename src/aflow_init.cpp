@@ -2014,7 +2014,7 @@ bool VASP_instance_running(const string& vasp_bin){ //CO20210315
 // ***************************************************************************
 // AFLOW_monitor_VASP
 // ***************************************************************************
-#define NCOUNTS_WAIT_MONITOR 10 //wait no more than 10*sleep_secounds (should be 10 minutes)
+#define NCOUNTS_WAIT_MONITOR 10 //wait no more than 10*sleep_seconds (should be 10 minutes)
 void AFLOW_monitor_VASP(){  //CO20210601
   //AFLOW_monitor_VASP() with no input arguments will look for FILE/DIRECTORY input from XHOST (--FILE or --D)
   //then it will pass the path to AFLOW_monitor_VASP(const string& directory)
