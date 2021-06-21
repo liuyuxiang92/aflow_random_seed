@@ -1346,8 +1346,8 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     allocate all possible resources to VASP by executing the following command before executing VASP again: ulimit -s unlimited.
     Should the error occur again, AFLOW will decrease NBANDS.
     Should the error occur again, AFLOW will continue to decrease the NBANDS until ERROR:NBANDS is triggered.
-    Should the error occur again, AFLOW will reduce the KPOINTS mesh in all direction by 1.
-    Should the error occur again, AFLOW will continue to reduce the KPOINTS mesh in all direction by 1.
+    Should the error occur again, AFLOW will reduce the KPOINTS mesh in all directions by 1.
+    Should the error occur again, AFLOW will continue to reduce the KPOINTS mesh in all directions by 1.
     Should the error occur again, AFLOW will skip the run.
 
   ERROR:MPICH11
