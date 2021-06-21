@@ -1747,7 +1747,8 @@ namespace aurostd {
         }
       }
     }
-    //can add here checks if the process wasn't killed completely
+    //can add checks here if the process wasn't killed completely
+
     if(!process_killed){
       throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::ProcessRunning():","process could not be kill",_RUNTIME_ERROR_);
     }
