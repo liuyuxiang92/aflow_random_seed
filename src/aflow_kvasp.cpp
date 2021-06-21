@@ -3614,8 +3614,22 @@ namespace KBIN {
     }
 
     //do last
-    xwarning.flag("RMM_DIIS",xwarning.flag("EDDRMM") || xwarning.flag("NUM_PROB") || xwarning.flag("ZBRENT"));  //CO20210315 - can probably add others to this list as well
-    xwarning.flag("ROTMAT",xwarning.flag("SGRCON") || xwarning.flag("NIRMAT") || xwarning.flag("IBZKPT") || xwarning.flag("KKSYM") || xwarning.flag("INVGRP") || xwarning.flag("SYMPREC"));  //CO20210315 - can probably add others to this list as well
+    bool rmm_diis_warning=false;
+    rmm_diis_warning=(rmm_diis_warning || xwarning.flag("EDDRMM"));
+    rmm_diis_warning=(rmm_diis_warning || xwarning.flag("NUM_PROB"));
+    rmm_diis_warning=(rmm_diis_warning || xwarning.flag("ZBRENT"));
+    //CO20210315 - can probably add others to this list as well
+    xwarning.flag("RMM_DIIS",rmm_diis_warning);
+
+    bool rotmat_warning=false;
+    rotmat_warning=(rotmat_warning || xwarning.flag("SGRCON"));
+    rotmat_warning=(rotmat_warning || xwarning.flag("NIRMAT"));
+    rotmat_warning=(rotmat_warning || xwarning.flag("IBZKPT"));
+    rotmat_warning=(rotmat_warning || xwarning.flag("KKSYM"));
+    rotmat_warning=(rotmat_warning || xwarning.flag("INVGRP"));
+    rotmat_warning=(rotmat_warning || xwarning.flag("SYMPREC"));
+    //CO20210315 - can probably add others to this list as well
+    xwarning.flag("ROTMAT",rotmat_warning);
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     if(1){
