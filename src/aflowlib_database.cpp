@@ -944,11 +944,11 @@ namespace aflowlib {
       type = XHOST.vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
       if (type.empty()) type = vschema_extra.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
       if (unique && (keys[k] == "AUID")) {
-        types[k] = "TEXT UNIQUE NOT NULL";
+        types[k] = "TEXT UNIQUE NOT NULL COLLATE NOCASE";  // Make string search not case sensitive
       } else if (type == "number") {
         types[k] = "REAL";
       } else {
-        types[k] = "TEXT";
+        types[k] = "TEXT COLLATE NOCASE";  // Make string search not case sensitive
       }
     }
     return types;
