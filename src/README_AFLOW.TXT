@@ -1344,7 +1344,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     Exceeding the MEMORY_MAX_USAGE (see README_AFLOW_AFLOWRC.TXT) will also trigger this error.
     AFLOW will divide NCPUS by two to allow more memory per process and
     allocate all possible resources to VASP by executing the following command before executing VASP again: ulimit -s unlimited.
-    Should the error occur again, AFLOW will decrease the NBANDS.
+    Should the error occur again, AFLOW will decrease NBANDS.
     Should the error occur again, AFLOW will continue to decrease the NBANDS until ERROR:NBANDS is triggered.
     Should the error occur again, AFLOW will reduce the KPOINTS mesh in all direction by 1.
     Should the error occur again, AFLOW will continue to reduce the KPOINTS mesh in all direction by 1.
