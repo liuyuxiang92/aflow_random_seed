@@ -343,13 +343,12 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
            A value can also be specified. (Note, it must be below the minimum 
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location 
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found 
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects 
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
           [_label|_number]                         : Prints the space group label or number, respectively (both are printed by default) (option is appended to command without spaces)
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
@@ -1184,13 +1183,12 @@ LATTICES = (the ones with "")
           For rhombohedral systems, setting 1=rhl and 2=hex.
           For monoclinic systems, setting 1=unique axis-b and 2=unique axis-c.
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
@@ -1230,13 +1228,12 @@ LATTICES = (the ones with "")
            A value can also be specified. (Note, it must not be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
@@ -1321,13 +1318,12 @@ LATTICES = (the ones with "")
            A value can also be specified. (Note, it must not be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
@@ -1365,13 +1361,12 @@ LATTICES = (the ones with "")
            A value can also be specified. (Note, it must not be below the minimum 
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
@@ -1839,13 +1834,12 @@ LATTICES = (the ones with "")
            A value can also be specified. (Note, it must not be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
@@ -2157,13 +2151,12 @@ LATTICES = (the ones with "")
            A value can also be specified. (Note, it must not be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Performs crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
@@ -2619,13 +2612,12 @@ LATTICES = (the ones with "")
            A value can also be specified. (Note, it must not be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
@@ -2647,13 +2639,12 @@ LATTICES = (the ones with "")
            A value can also be specified. (Note, it must not be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
@@ -2694,13 +2685,12 @@ LATTICES = (the ones with "")
            A value can also be specified. (Note, it must not be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
@@ -3212,13 +3202,12 @@ LATTICES = (the ones with "")
            A value can also be specified. (Note, it must not be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Space group setting:
           The space group setting can be specified with the optional flag [--setting=1| =2] (the default is setting 1).
           For rhombohedral systems, setting 1=rhl and 2=hex.
@@ -3274,13 +3263,12 @@ LATTICES = (the ones with "")
            A value can also be specified. (Note, it must not be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
@@ -3308,13 +3296,12 @@ LATTICES = (the ones with "")
            A value can also be specified. (Note, it must not be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
@@ -3598,13 +3585,12 @@ LATTICES = (the ones with "")
           For monoclinic systems, setting 1=unique axis-b, 2=unique axis-c, and aflow=unique axis-b.
           For centrosymmetric systems, setting 1=origin on high-symmetry site, 2=origin on inversion site, aflow=origin on inversion site
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
@@ -3629,13 +3615,12 @@ LATTICES = (the ones with "")
           For monoclinic systems, setting 1=unique axis-b, 2=unique axis-c, and aflow=unique axis-b.
           For centrosymmetric systems, setting 1=origin on high-symmetry site, 2=origin on inversion site, aflow=origin on inversion site
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--letters_only]                         : Prints the Wyckoff letters only (colons separate elements, commas separate Wyckoff positions for a given element)
