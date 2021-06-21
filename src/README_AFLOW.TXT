@@ -1314,8 +1314,8 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   ERROR:EXCCOR
     The EXCCOR error is triggered when the following text is found in the vasp.out: "ERROR FEXCF: supplied exchange-correlation table" or "ERROR FEXCP: supplied Exchange-correletion table".
     AFLOW will increase the volume of the structure by a factor of 1.2.
-    Should the error occur again, AFLOW will decrease the NBANDS.
-    Should the error occur again, AFLOW will continue to decrease the NBANDS until ERROR:NBANDS is triggered.
+    Should the error occur again, AFLOW will decrease NBANDS.
+    Should the error occur again, AFLOW will continue to decrease NBANDS until ERROR:NBANDS is triggered.
 
   ERROR:GAMMA_SHIFT
     The GAMMA_SHIFT error is triggered when the following text is found in the vasp.out: "shift your grid to Gamma".
