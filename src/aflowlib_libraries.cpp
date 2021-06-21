@@ -6677,10 +6677,9 @@ namespace aflowlib {
     for(uint irelax=0;irelax<vrelax.size();irelax++) {
       for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
         if(aurostd::FileExist(dir+"/OSZICAR"+vrelax[irelax]+XHOST.vext[iext]) && aurostd::FileExist(dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext])) {
-          if(KBIN::VASP_OSZICARUnconverged(dir+"/OSZICAR"+vrelax[irelax]+XHOST.vext[iext],dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext])){
-            if(KBIN::VASP_getNSTEPS(dir+"/OSZICAR"+vrelax[irelax]+XHOST.vext[iext])<AFLOWRC_MAX_VASP_NELM){ //do as a nested if, keeps from having too many long booleans in one line. let's not penalize calculations that have exhausted NELM
-              ok=FALSE;obb << ". error(unconverged)=OSZICAR"+vrelax[irelax]+".EXT";continue;
-            }
+          if(KBIN::VASP_OSZICARUnconverged(dir+"/OSZICAR"+vrelax[irelax]+XHOST.vext[iext],dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext]) &&
+             KBIN::VASP_getNSTEPS(dir+"/OSZICAR"+vrelax[irelax]+XHOST.vext[iext])<AFLOWRC_MAX_VASP_NELM){ //let's not penalize calculations that have exhausted NELM
+            ok=FALSE;obb << ". error(unconverged)=OSZICAR"+vrelax[irelax]+".EXT";continue;
           }
         }
       }
