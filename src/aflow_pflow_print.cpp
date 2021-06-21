@@ -3609,15 +3609,19 @@ namespace pflow {
           }
         }
         ss_output << "WYCCAR" << endl;
-        // convert vector<string> of WYCCAR to xstructure
-        stringstream wss;
-        for(uint i=0;i<str_sg.wyccar_ITC.size();i++){
-          wss << str_sg.wyccar_ITC[i] << endl;
-        }
-        if(str_sg.wyccar_ITC.size()!=0){ //DX20180526 - skip if fails
-          xstructure xstr_wyccar(wss,IOVASP_WYCKCAR);
-          ss_output << xstr_wyccar;
-        }
+        int iomode_orig = str_sg.iomode; //DX20210621 - store original iomode
+        str_sg.iomode = IOVASP_WYCKCAR; //DX20210621
+        ss_output << str_sg; //DX20210621
+        str_sg.iomode = iomode_orig; //DX20210621 - revert to original iomode
+        //DX20210621 [OBSOLETE] convert vector<string> of WYCCAR to xstructure
+        //DX20210621 [OBSOLETE] stringstream wss;
+        //DX20210621 [OBSOLETE] for(uint i=0;i<str_sg.wyccar_ITC.size();i++){
+        //DX20210621 [OBSOLETE]   wss << str_sg.wyccar_ITC[i] << endl;
+        //DX20210621 [OBSOLETE] }
+        //DX20210621 [OBSOLETE] if(str_sg.wyccar_ITC.size()!=0){ //DX20180526 - skip if fails
+        //DX20210621 [OBSOLETE]   xstructure xstr_wyccar(wss,IOVASP_WYCKCAR);
+        //DX20210621 [OBSOLETE]   ss_output << xstr_wyccar;
+        //DX20210621 [OBSOLETE] }
       }
       // ME20210402 - Convert to array of strings for web
       if (XHOST.vflag_control.flag("WWW") && standalone) { //DX20210521 - add standalone
