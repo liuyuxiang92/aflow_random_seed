@@ -4563,7 +4563,7 @@ namespace KBIN {
       }
       aurostd::execute(aus_exec);
     }
-    if(verbose) aus << "00000  MESSAGE RUN NOT FINISHED (OUTCAR is incomplete) :" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    if(verbose) aus << "00000  MESSAGE RUN NOT FINISHED (OUTCAR is incomplete)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
     if(verbose) aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
     return FALSE;
