@@ -5395,7 +5395,7 @@ namespace aurostd {
         if(!strsub1_keep.empty() && strsub1_keep[0]==' '){strsub1="\\s*"+strsub1;}  //insert at the front
         if(!strsub1_keep.empty() && strsub1_keep[strsub1_keep.size()-1]==' '){strsub1+="\\s*";} //append at the back
         if(LDEBUG){cerr << soliloquy << " strsub1(regex)=\"" << strsub1 << "\"" << endl;}
-        if(strsub1.find("\\s*")!=string::npos){is_regex_used=(is_regex_used || true);}
+        if(strsub1.find("\\s*")!=string::npos){is_regex_used=true;}
       }else{
         strsub1=aurostd::RemoveWhiteSpaces(strsub1);
         if(LDEBUG){cerr << soliloquy << " strsub1(!regex)=\"" << strsub1 << "\"" << endl;}
@@ -5418,6 +5418,13 @@ namespace aurostd {
     if(use_regex==false && RemoveWS==true){aus << " | sed \"s/ //g\" | sed \"s/\\t//g\"";}
     
     //decide is_regex_used above here
+    
+    //if using regex, protect against incoming ()
+    //e.g., "Total CPU time used (sec)"
+    if(is_regex_used){
+      aurostd::StringSubst(strsub1,"(","\\(");
+      aurostd::StringSubst(strsub1,")","\\)");
+    }
 
     string grep_command="grep";
     if(aurostd::IsCommandAvailable("fgrep") && is_regex_used==false){grep_command="fgrep";}  //fixed string search

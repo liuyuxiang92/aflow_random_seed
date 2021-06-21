@@ -3834,9 +3834,12 @@ namespace KBIN {
     //might be a threading/NFS issue
     //this means any errors inside that require REACHED_ACCURACY will not be triggered
     //in this case, try restarting the calculation from CONTCAR
+    //lowering NCPUS has been shown to work, indicating that this is indeed a threading/mpi issue
+    //try from the most relaxed CONTCAR to save time
     if(fixed_applied==false && xwarning.flag("CALC_FROZEN") && xmessage.flag("REACHED_ACCURACY") && xwarning.flag("OUTCAR_INCOMPLETE")){
       //[CO20210315 - not shown to work]fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","RESTART_CALC",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","RECYCLE_CONTCAR",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      //[CO20210621 - not shown to work (alone)]fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","RECYCLE_CONTCAR",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
+      fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","THREADS",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
     }
     
     //print out all xfixed BEFORE adding "ALL"

@@ -7117,6 +7117,7 @@ namespace KBIN {
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="MEMORY") { //CO20210315
+      //for memory issues, always try to save the CONTCAR, it should be a good starting point for the next calc
       if(submode<0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no submode set: \""+mode+"\"",_INPUT_ILLEGAL_);}  //CO20210315
       if(submode==0){ //lower NCPUS
         bool Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
@@ -7127,7 +7128,11 @@ namespace KBIN {
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
         Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
-        Krun=(Krun1||Krun2);
+        bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun3=false;}
+        Krun3=(Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        
+        Krun=(Krun1||Krun2||Krun3);
         //no need to remove these settings if it fails
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
@@ -7139,8 +7144,12 @@ namespace KBIN {
         bool Krun2=true;fix="NBANDS--";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
         Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        
+        bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun3=false;}
+        Krun3=(Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
-        Krun=(Krun1||Krun2);
+        Krun=(Krun1||Krun2||Krun3);
         //no need to remove these settings if it fails
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
@@ -7153,7 +7162,11 @@ namespace KBIN {
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
         Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         
-        Krun=(Krun1||Krun2);
+        bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun3=false;}
+        Krun3=(Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        
+        Krun=(Krun1||Krun2||Krun3);
         //no need to remove these settings if it fails
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
@@ -7410,6 +7423,21 @@ namespace KBIN {
       fix="SYMPREC";
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+    }
+    else if(mode=="THREADS") {
+      bool Krun1=true;fix="ULIMIT"; //always apply ULIMIT for memory stuff
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun1=false;}
+      Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+
+      bool Krun2=true;fix="NCPUS";
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
+      Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+
+      bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
+      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun3=false;}
+      Krun3=(Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+
+      Krun=(Krun1||Krun2||Krun3);
     }
     else if(mode=="ZBRENT") { //other RMM-DIIS patches will follow
       //https://www.vasp.at/forum/viewtopic.php?t=1856
