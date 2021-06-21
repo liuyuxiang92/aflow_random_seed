@@ -1336,7 +1336,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
   ERROR:KKSYM
     The KKSYM error is triggered when the following text is found in the vasp.out: "Reciprocal lattice and k-lattice belong to different class of lattices".
     This error also triggers ERROR:ROTMAT.
-    AFLOW will create an equi-dimensional KPOINTS mesh with n=max(nx,ny,nz).
+    AFLOW will create an equi-dimensional KPOINTS mesh with n=max(nx,ny,nz) (KMAX fix).
     Should the error occur again, AFLOW will apply the patches for ERROR:ROTMAT.
 
   ERROR:MEMORY
@@ -1439,7 +1439,6 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     Should the error occur again, AFLOW will switch to a RELAX_MODE=FORCES scheme.
     Should the error occur again, AFLOW will halve the default POTIM parameter (0.5) and apply it as an input in the INCAR.
     Should the error occur again, AFLOW will continue to halve POTIM until POTIM is smaller than 0.01.
-    Should the error occur again, AFLOW will half POTIM until it falls below 0.01.
     Should the error occur again, AFLOW will apply the following change to the INCAR: ISMEAR=-1.
 
   ERROR:ROTMAT
@@ -1448,7 +1447,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     Should the error occur again, AFLOW will switch to a Gamma-centered KPOINTS scheme.
     Should the error occur again, AFLOW will switch to an even Gamma-centered KPOINTS scheme.
     Should the error occur again, AFLOW will switch to an odd Gamma-centered KPOINTS scheme.
-    Should the error occur again, AFLOW will create an equi-dimensional KPOINTS mesh with n=max(nx,ny,nz).
+    Should the error occur again, AFLOW will create an equi-dimensional KPOINTS mesh with n=max(nx,ny,nz) (KMAX fix).
     Should the error occur again, AFLOW will turn off symmetry (ISYM=0 or ISYM=-1).
 
   ERROR:SGRCON
@@ -1469,7 +1468,6 @@ IVDW=number_for_VASP_see_manual_for_IVDW
     The ZPOTRF error is triggered when the following text is found in the vasp.out: "LAPACK: Routine ZPOTRF failed".
     AFLOW will halve the default POTIM parameter (0.5) and apply it as an input in the INCAR.
     Should the error occur again, AFLOW will continue to halve POTIM until POTIM is smaller than 0.01.
-    Should the error occur again, AFLOW will half POTIM until it falls below 0.01.
     Should the error occur again, AFLOW will increase the volume of the structure by a factor of 1.05.
     Should the error occur again, AFLOW will decrease the NBANDS.
     Should the error occur again, AFLOW will continue to decrease the NBANDS until ERROR:NBANDS is triggered.
