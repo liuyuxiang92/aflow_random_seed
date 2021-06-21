@@ -693,7 +693,7 @@ DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_SCHEME
 DEFAULT_VASP_FORCE_OPTION_SIGMA
   description: Default VASP SIGMA value.
   type: double
-  default: 0.01
+  default: 0.1
 
 DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC
   description: Default VASP SIGMA value for STATIC runs.
@@ -1766,9 +1766,9 @@ BYTES_MAX_VASP_OUT
   default: 20000000000 (20GB)
 
 MEMORY_MAX_USAGE
-  description: The memory limit (in percentage) before a MEMORY error is issued by --monitor_vasp.
+  description: The memory limit (in percent) before a MEMORY error is issued by --monitor_vasp.
   type: integer
-  default: 98%
+  default: 98
 
 FILE_VASP_MONITOR
   description: File name for the aflow vasp monitor (--monitor_vasp). In the default case, the name would be LOCK.monitor_vasp.

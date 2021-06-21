@@ -2014,7 +2014,7 @@ bool VASP_instance_running(const string& vasp_bin){ //CO20210315
 // ***************************************************************************
 // AFLOW_monitor_VASP
 // ***************************************************************************
-#define NCOUNTS_WAIT_MONITOR 10 //wait no more than 10*sleep_secounds (should be 10 minutes)
+#define NCOUNTS_WAIT_MONITOR 10 //wait no more than 10*sleep_seconds (should be 10 minutes)
 void AFLOW_monitor_VASP(){  //CO20210601
   //AFLOW_monitor_VASP() with no input arguments will look for FILE/DIRECTORY input from XHOST (--FILE or --D)
   //then it will pass the path to AFLOW_monitor_VASP(const string& directory)
@@ -2161,7 +2161,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
     vasp_bin=aurostd::basename(vasp_bin); //remove directory stuff
     if(vasp_bin.empty()){
       if(VERBOSE){message << "sleeping for " << sleep_seconds_afterkill << " seconds, waiting for VASP binary to start running and " << _AFLOWLOCK_ << " to be written";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
-      aurostd::Sleep(sleep_seconds_afterkill); //sleep at least a minute to let aflow startup
+      aurostd::Sleep(sleep_seconds_afterkill); //sleep at least a minute to let aflow start up
       continue;
     }
   }
@@ -2206,7 +2206,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
 
     //check memory again, it's possible it floated above the threshold only for a second
     memory_usage_percentage=0.0;
-    if(0){  //do not turn off MEMORY because it fails the GetMemory(), it's possible MEMORY was triggered for other reasons (e.g., FROZEN_CALC)
+    if(0){  //do not turn off MEMORY because it fails GetMemory(), it's possible MEMORY was triggered for other reasons (e.g., FROZEN_CALC)
       if(xwarning.flag("MEMORY")){
         bool ignore_memory=false;
         if(aurostd::GetMemoryUsagePercentage(memory_usage_percentage)==false){
