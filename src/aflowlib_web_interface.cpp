@@ -4648,9 +4648,9 @@ namespace aflowlib {
     for(uint i=0;i<space_groups.size();i++){
       vsummons[i] = getSpaceGroupAFLUXSummons(space_groups[i], relaxation_step, false); //false - signals more than one space group
     }
-    if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){ return "spacegroup_orig(" + aurostd::joinWDelimiter(vsummons,":") + ")"; }
-    else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){ return "sg2(" + aurostd::joinWDelimiter(vsummons,":") + ")"; }
-    else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){ return "spacegroup_relax(" + aurostd::joinWDelimiter(vsummons,":") + ")"; }
+    if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){ return "spacegroup_orig(" + aurostd::joinWDelimiter(vsummons,":") + ")"; } //DX20210615 - relaxation-step specific keyword
+    else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){ return "sg2(" + aurostd::joinWDelimiter(vsummons,":") + ")"; } //DX20210615 - relaxation-step specific keyword
+    else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){ return "spacegroup_relax(" + aurostd::joinWDelimiter(vsummons,":") + ")"; } //DX20210615 - relaxation-step specific keyword
     return ""; //DX20210615 - no other relaxations supported, return empty so the compiler will not complain
   }
 }
@@ -4715,9 +4715,9 @@ namespace aflowlib {
     // otherwise this is down outside this function
     if(only_one_sg) { 
       //DX20210615 [OBSOLETE] space_group_summons = "sg2(" + space_group_summons + ")"; }
-      if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){ space_group_summons = "spacegroup_orig(" + space_group_summons + ")"; } //DX20210615
-      else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){ space_group_summons = "sg2(" + space_group_summons + ")"; } //DX20210615
-      else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){ space_group_summons = "spacegroup_relax(" + space_group_summons + ")"; } //DX20210615
+      if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){ space_group_summons = "spacegroup_orig(" + space_group_summons + ")"; } //DX20210615 - relaxation-step specific keyword
+      else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){ space_group_summons = "sg2(" + space_group_summons + ")"; } //DX20210615 - relaxation-step specific keyword
+      else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){ space_group_summons = "spacegroup_relax(" + space_group_summons + ")"; } //DX20210615 - relaxation-step specific keyword
     }
 
     return space_group_summons;

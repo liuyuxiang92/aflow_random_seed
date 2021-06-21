@@ -350,7 +350,7 @@ AFLOW COMMANDS USAGE:
           [--screen_only]                          : Prints symmetry elements to string and does not write to a file.
   
   aflow --lattice_data|--data_lattice|--real_lattice_data|--data_real_lattice[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--print=text|json] < file
-        Returns the lattice type data, includeing the lattice vectors, lattice parameters (Angstroms/Bohrs and degrees)
+        Returns the lattice type data, including the lattice vectors, lattice parameters (Angstroms/Bohrs and degrees)
         volume, c/a ratio, lattice type, lattice variation, lattice system, and Pearson symbol.
 
         Options:
@@ -413,7 +413,7 @@ AFLOW COMMANDS USAGE:
           [--screen_only]                          : Prints symmetry elements to string and does not write to a file.
   
   aflow --point_group_crystal_data|--pointgroup_crystal_data|--pgroupxtal_data|--pgroup_xtal_data[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--print=text|json] < file
-        Returns the crystallographic point group data, includeing the crystal family, crystal system, crystal class,
+        Returns the crystallographic point group data, including the crystal family, crystal system, crystal class,
         point group symbols (Hermann Mauguin and Schoenflies), point group orbifold, point group type, point group
         order, and point group structure.
 
@@ -466,7 +466,7 @@ AFLOW COMMANDS USAGE:
           [--screen_only]                          : Prints symmetry elements to string and does not write to a file.
   
    aflow --reciprocal_lattice_data|--reciprocallattice_data|--klattice_data|--data_reciprocal_lattice[=<tolerance_value>|=tight|=loose] [--no_scan] [--print=text|json] < file
-        Returns the reciprocal lattice type data, includeing the lattice vectors, lattice parameters (Angstroms/Bohrs and degrees)
+        Returns the reciprocal lattice type data, including the lattice vectors, lattice parameters (Angstroms/Bohrs and degrees)
         volume, c/a ratio, lattice type, lattice variation, lattice system, and Pearson symbol.
 
         Options:
@@ -535,7 +535,7 @@ AFLOW COMMANDS USAGE:
           [--screen_only]                          : Prints symmetry elements to string and does not write to a file.
   
   aflow --superlattice_data|--data_superlattice[=<tolerance_value>|=tight|=loose] [--no_scan] [--print=text|json] < file
-        Returns the superlattice type data, includeing the lattice vectors, lattice parameters (Angstroms/Bohrs and degrees)
+        Returns the superlattice type data, including the lattice vectors, lattice parameters (Angstroms/Bohrs and degrees)
         volume, c/a ratio, lattice type, lattice variation, lattice system, and Pearson symbol.
 
         Options:
