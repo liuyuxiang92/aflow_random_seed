@@ -6472,6 +6472,9 @@ namespace KBIN {
         else{param_double=DEFAULT_VASP_PREC_ENMAX_ACCURATE*xvasp.POTCAR_ENMAX;}
         if(param_double==AUROSTD_MAX_DOUBLE || aurostd::isequal(param_double,0.0)){param_double=500.0;}  //CO20210315
         param_double*=0.97; // reduce 3%.... if enough // param_double*=0.99; // reduce 1%.... if enough
+        if(aurostd::isequal(xvasp.POTCAR_ENMAX,0.0)==false){
+          if(param_double<DEFAULT_VASP_ENMAX_MINIMUM*xvasp.POTCAR_ENMAX){Krun=false;} //so it doesn't run forever
+        }
         KBIN::XVASP_INCAR_PREPARE_GENERIC("LREAL",xvasp,vflags,"",0,0.0,ON);  //no Krun here, if it's already there, we're set
       }
       Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("ENMAX",xvasp,vflags,"",0,param_double,FALSE));
