@@ -56,8 +56,8 @@ namespace aflowlib {
       if(VERBOSE) acerr << soliloquy << " **********************************" << endl;
       if(VERBOSE) acerr << soliloquy << " TESTING vlib.at(i)=" << vlib.at(i) << endl;
       vector<string> list2found;
-      vector<string> listLIB2RAW,listRM,listANRL,listENTHALPY,listppAUID,listINCOMPLETE,listAGL2FIX,listTOUCH,listLIB2AUID,listREMOVE_MARYLOU,listICSD2LINK,listZIPNOMIX,listBROKEN,listAUIDerrors;
-      stringstream ossLIB2RAW,ossRM,ossANRL,ossENTHALPY,ossppAUID,ossINCOMPLETE,ossAGL2FIX,ossTOUCH,ossLIB2AUID,ossREMOVE_MARYLOU,ossICSD2LINK,ossZIPNOMIX,ossBROKEN,ossAUIDerrors;
+      vector<string> listLIB2RAW,listRM,listANRL,listANRL_subst,listENTHALPY,listppAUID,listINCOMPLETE,listAGL2FIX,listTOUCH,listLIB2AUID,listREMOVE_MARYLOU,listICSD2LINK,listZIPNOMIX,listBROKEN,listAUIDerrors;
+      stringstream ossLIB2RAW,ossRM,ossANRL,ossANRL_subst,ossENTHALPY,ossppAUID,ossINCOMPLETE,ossAGL2FIX,ossTOUCH,ossLIB2AUID,ossREMOVE_MARYLOU,ossICSD2LINK,ossZIPNOMIX,ossBROKEN,ossAUIDerrors;
       vector<string> tokens;
 
       if(vlib.at(i)=="AUID") {
@@ -142,6 +142,7 @@ namespace aflowlib {
           bool FileExist_directory_LIB_AFLOW_IN=aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_);  // 6 times
           bool FileExist_directory_RAW_AFLOW_IN=aurostd::FileExist(directory_RAW+"/"+_AFLOWIN_);  // 5 times
           bool FileExist_directory_RAW_AFLOWLIB_ENTRY_OUT=aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT); // 8 times
+	  bool FileExist_directory_RAW_AFLOWLIB_ENTRY_JSON=aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON); // 1 times
 
           vector<string> files2found;
           //	aurostd::execute2string("find "+directory_RAW);
@@ -247,8 +248,7 @@ namespace aflowlib {
           }
 
           // check LIB2RAW MISSING	
-          if(!FileExist_directory_RAW_AFLOW_IN || !FileExist_directory_RAW_AFLOWLIB_ENTRY_OUT ||
-              !aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON)) {
+          if(!FileExist_directory_RAW_AFLOW_IN || !FileExist_directory_RAW_AFLOWLIB_ENTRY_OUT || !aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON)) {
             if(!aurostd::FileExist(directory_LIB+"/"+"aflow.immiscibility.out")) {
               //    acerr << soliloquy << " fixing " << directory_LIB << endl;
               listLIB2RAW.push_back(directory_LIB);
@@ -321,13 +321,72 @@ namespace aflowlib {
 
           // check LIB2RAW - ANRL	
           if(FileExist_directory_RAW_AFLOW_IN && FileExist_directory_RAW_AFLOWLIB_ENTRY_OUT) {
-            if(!aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"anrl_label")) {
+            if(!aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"anrl_label") && !aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"aflow_prototype_label")) {
               listANRL.push_back(directory_LIB);
               ossANRL << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --beep --force --showPID --lib2raw=\"" << directory_LIB << "\"" << endl;
               fixes++;
             }	
           }
-
+          // check LIB2RAW - ANRL_subst
+	  if(FileExist_directory_RAW_AFLOW_IN && FileExist_directory_RAW_AFLOWLIB_ENTRY_OUT) {
+	    if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"anrl")) { // to speed up
+	      if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"anrl_label")) { // anrl_label
+		listANRL_subst.push_back(directory_LIB);
+		ossANRL_subst << "subst anrl_label aflow_prototype_label " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << " && " << " rm -fv " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << "~" << endl;
+		fixes++;
+	      }
+	      if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"anrl_parameter_list")) { // anrl_parameter_list
+		listANRL_subst.push_back(directory_LIB);
+		ossANRL_subst << "subst anrl_parameter_list aflow_prototype_params_list " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << " && " << " rm -fv " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << "~" << endl;
+		fixes++;
+	      }
+	      if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"anrl_parameter_values")) { // anrl_parameter_values
+		listANRL_subst.push_back(directory_LIB);
+		ossANRL_subst << "subst anrl_parameter_values aflow_prototype_params_values " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << " && " << " rm -fv " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << "~" << endl;
+		fixes++;
+	      }
+	      if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"aflow_prototype_parameter_list")) { // aflow_prototype_parameter_list
+		listANRL_subst.push_back(directory_LIB);
+		ossANRL_subst << "subst aflow_prototype_parameter_list aflow_prototype_params_list " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << " && " << " rm -fv " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << "~" << endl;
+		fixes++;
+	      }
+	      if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT),"aflow_prototype_parameter_values")) { // aflow_prototype_parameter_values
+		listANRL_subst.push_back(directory_LIB);
+		ossANRL_subst << "subst aflow_prototype_parameter_values aflow_prototype_params_values " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << " && " << " rm -fv " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << "~" << endl;
+		fixes++;
+	      }	    
+	    }
+	  }
+	  if(FileExist_directory_RAW_AFLOW_IN && FileExist_directory_RAW_AFLOWLIB_ENTRY_JSON) {
+	    if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON),"anrl")) { // to speed up
+	      if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON),"anrl_label")) { // anrl_label
+		listANRL_subst.push_back(directory_LIB);
+		ossANRL_subst << "subst anrl_label aflow_prototype_label " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << " && " << " rm -fv " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << "~" << endl;
+		fixes++;
+	      }
+	      if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON),"anrl_parameter_list")) { // anrl_parameter_list
+		listANRL_subst.push_back(directory_LIB);
+		ossANRL_subst << "subst anrl_parameter_list aflow_prototype_params_list " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << " && " << " rm -fv " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << "~" << endl;
+		fixes++;
+	      }
+	      if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON),"anrl_parameter_values")) { // anrl_parameter_values
+		listANRL_subst.push_back(directory_LIB);
+		ossANRL_subst << "subst anrl_parameter_values aflow_prototype_params_values " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << " && " << " rm -fv " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << "~" << endl;
+		fixes++;
+	      }
+	      if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON),"aflow_prototype_parameter_list")) { // aflow_prototype_parameter_list
+		listANRL_subst.push_back(directory_LIB);
+		ossANRL_subst << "subst aflow_prototype_parameter_list aflow_prototype_params_list " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << " && " << " rm -fv " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << "~" << endl;
+		fixes++;
+	      }
+	      if(aurostd::substring2bool(aurostd::file2string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON),"aflow_prototype_parameter_values")) { // aflow_prototype_parameter_values
+		listANRL_subst.push_back(directory_LIB);
+		ossANRL_subst << "subst aflow_prototype_parameter_values aflow_prototype_params_values " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << " && " << " rm -fv " << directory_RAW << "/" << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << "~" << endl;
+		fixes++;
+	      }	    
+	    }
+	  }
+	  
           // check LIB2RAW - ENTHALPY	
           if(FileExist_directory_RAW_AFLOW_IN && FileExist_directory_RAW_AFLOWLIB_ENTRY_OUT) {
             if(!aurostd::substring2bool(directory_LIB,"LDAU2")) {
@@ -422,6 +481,11 @@ namespace aflowlib {
       if(listANRL.size()) {
         aurostd::stringstream2file(ossANRL,XHOST.tmpfs+"/xscrubber_ANRL."+vlib.at(i));
         aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_ANRL."+vlib.at(i));
+      }
+      acerr << soliloquy << " listANRL_subst.size()=" << listANRL_subst.size() << endl;
+      if(listANRL_subst.size()) {
+        aurostd::stringstream2file(ossANRL_subst,XHOST.tmpfs+"/xscrubber_ANRL_subst."+vlib.at(i));
+        aurostd::ChmodFile("755",XHOST.tmpfs+"/xscrubber_ANRL_subst."+vlib.at(i));
       }
       acerr << soliloquy << " listENTHALPY.size()=" << listENTHALPY.size() << endl;
       if(listENTHALPY.size()) {
