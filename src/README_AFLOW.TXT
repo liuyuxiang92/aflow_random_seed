@@ -41,7 +41,7 @@ aflow
                                     Use the --DIRECTORY=. command to specify the directory where VASP is running, or the
                                     --FILE=LOCK to point to the AFLOW LOCK file for the run of interest.
 
-                                    Example use case in qsub file:
+                                    Example use case in a qsub file:
                                     [QSUB_EXAMPLE]START
                                     aflow --monitor_vasp --kill_vasp_all --FILE=$RUN_PATH/LOCK --use_aflow.in=aflow.in --use_LOCK=LOCK &
                                     MONITOR_PID=$!
