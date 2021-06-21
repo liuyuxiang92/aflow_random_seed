@@ -2206,7 +2206,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
 
     //check memory again, it's possible it floated above the threshold only for a second
     memory_usage_percentage=0.0;
-    if(0){  //do not turn off MEMORY because it fails the GetMemory(), it's possible MEMORY was triggered for other reasons (e.g., FROZEN_CALC)
+    if(0){  //do not turn off MEMORY because it fails GetMemory(), it's possible MEMORY was triggered for other reasons (e.g., FROZEN_CALC)
       if(xwarning.flag("MEMORY")){
         bool ignore_memory=false;
         if(aurostd::GetMemoryUsagePercentage(memory_usage_percentage)==false){
