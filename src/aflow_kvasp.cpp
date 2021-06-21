@@ -3173,11 +3173,9 @@ namespace KBIN {
     //on qrats, I noticed that a calculation can reach accuracy, but not finish (incomplete OUTCAR), thus it is frozen
     //a good solution would be to take the CONTCAR as the new input and restart (RELAXATIONS ONLY)
     //to diagnose and treat this problem correctly, we need to consider vasp_still_running and xmessage.flag("REACHED_ACCURACY") independently (for this case only)
-    xmessage.flag("REACHED_ACCURACY",//[CO20210601 - only check for static, not relax (might be frozen, and we can fix by appending CONTCAR)]vasp_still_running==false &&
-        ( ( relaxing==true  && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"reached required accuracy",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) ) ||
-          ( relaxing==false && vasp_still_running==false && vasp_oszicar_unconverged==false && xwarning.flag("OUTCAR_INCOMPLETE")==false ) || //CO20210315 - "reached accuracy" for static/bands calculation is a converged electronic scf, need to also check OUTCAR_INCOMPLETE, as a converged OSZICAR might actually be a run that ended because of an error
-          FALSE) 
-        );
+    bool reached_accuracy_relaxing=(relaxing==true  && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"reached required accuracy",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) );  //[CO20210601 - only check for static, not relax (might be frozen, and we can fix by appending CONTCAR)]vasp_still_running==false &&
+    bool reached_accuracy_static  =(relaxing==false && vasp_still_running==false && vasp_oszicar_unconverged==false && xwarning.flag("OUTCAR_INCOMPLETE")==false); //CO20210315 - "reached accuracy" for static/bands calculation is a converged electronic scf, need to also check OUTCAR_INCOMPLETE, as a converged OSZICAR might actually be a run that ended because of an error
+    xmessage.flag("REACHED_ACCURACY",(reached_accuracy_relaxing || reached_accuracy_static));
     
     if(LDEBUG){
       aus << soliloquy << " relaxing=" << relaxing << endl;
