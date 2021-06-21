@@ -17,6 +17,8 @@
         -- fixed tolerance spectrum delimiter (colon to comma) (DX)
         -- updated AFLUX call via AFLOW; uses new API route (DX)
         -- updated space group queries via AFLUX in the XtalFinder routines (DX)
+        -- Made string search in database case insensitive (ME)
+        -- Supressed file output for interstitials calculation in web mode (ME)
 3.2.9 - 2021/05/05
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.9.tar.xz
         -- Fixed bug with APL overwriting *.orig files. (AS)
