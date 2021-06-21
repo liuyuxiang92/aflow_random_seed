@@ -2106,7 +2106,8 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   ofstream FileMESSAGE,FileMESSAGE_devnull;
   string FileNameLOCK=aflags.Directory+"/"+_AFLOWLOCK_+"."+FILE_VASP_MONITOR;
   FileMESSAGE.open(FileNameLOCK.c_str(),std::ios::out);
-  ostream& oss=cout;if(true){oss.setstate(std::ios_base::badbit);}  //like NULL - cannot print to cout with two instances of aflow running
+  bool oss_silent=true;
+  ostream& oss=cout;if(oss_silent){oss.setstate(std::ios_base::badbit);}  //like NULL - cannot print to cout with two instances of aflow running
       
   message << aflow::Banner("BANNER_NORMAL");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
 
@@ -2279,7 +2280,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
         }
         xmonitor.clear(); //new run, clear IGNORE_WARNINGS
         message << "sleeping for " << sleep_seconds_afterkill << " seconds after kill command";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-        aurostd::Sleep(sleep_seconds_afterkill); //sleep at least a minute to let aflow sleep since OUTCAR is incomplete
+        aurostd::Sleep(sleep_seconds_afterkill); //there are two aflow instances. the aflow monitor should sleep at least a minute, as (in the worst case) aflow-vasp needs 15-30 seconds to sleep while it waits for an incomplete OUTCAR to finish writing. you don't want aflow-vasp to pick up AFTER aflow-monitor.
       }else{  //to be developed
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a targeted kill command for VASP not available yet: try --kill_vasp_all",_INPUT_ILLEGAL_);
       }
