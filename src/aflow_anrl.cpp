@@ -427,7 +427,15 @@ namespace anrl {
     // space group setting
     setting = pflow::getSpaceGroupSetting(vpflow.getattachedscheme("STRUCTURE2ANRL::SETTING"),SG_SETTING_ANRL); //DX20210421 - consolidated space group setting into function
 
-    return structure2anrl(xstr,tolerance,setting,recalculate_symmetry);
+    // print element names //DX20210622
+    bool print_element_names = false;
+    if(vpflow.flag("STRUCTURE2ANRL::PRINT_ELEMENT_NAMES")){ print_element_names = true; }
+
+    // print atomic number //DX20210622
+    bool print_atomic_numbers = false;
+    if(vpflow.flag("STRUCTURE2ANRL::PRINT_ATOMIC_NUMBERS")){ print_atomic_numbers = true; }
+
+    return structure2anrl(xstr,tolerance,setting,recalculate_symmetry,print_element_names,print_atomic_numbers);
   }
 }   
 
@@ -465,7 +473,8 @@ namespace anrl {
 // anrl::structure2anrl() [MAIN]
 // *************************************************************************** 
 namespace anrl {
-  string structure2anrl(xstructure& xstr, double tolerance, uint input_setting, bool recalculate_symmetry){  //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190829 - added recalculate_symmetry //DX20191031 - removed reference
+  string structure2anrl(xstructure& xstr, double tolerance, uint input_setting, bool recalculate_symmetry,
+      bool print_element_names, bool print_atomic_numbers){  //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190829 - added recalculate_symmetry //DX20191031 - removed reference
     // determine anrl label, parameters, and parameter values of the input structure
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_ANRL_);
 
@@ -612,6 +621,14 @@ namespace anrl {
       format="json";
     }
 
+    // store atomic number //DX20210622
+    vector<uint> atomic_numbers;
+    if(print_atomic_numbers && pflow::hasRealElements(xstr)){
+      for(uint i=0;i<xstr.species.size();i++){
+        atomic_numbers.push_back(xelement::symbol2Z(KBIN::VASP_PseudoPotential_CleanName(xstr.species[i])));
+      }
+    }
+
     if(format=="json"){
       string eendl="";
       bool roff=true; //round off
@@ -624,13 +641,23 @@ namespace anrl {
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
       sscontent_json << "\"aflow_prototype_params_values\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(parameter_values,8,roff),",") << "]" << eendl;
       vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      if(print_element_names){ //DX20210622
+        sscontent_json << "\"element_names\":[" << aurostd::joinWDelimiter(xstr.species,",") << "]" << eendl;
+        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      }
+      if(print_atomic_numbers){ //DX20210622
+        sscontent_json << "\"atomic_numbers\":[" << aurostd::joinWDelimiter(atomic_numbers,",") << "]" << eendl;
+        vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+      }
 
       oss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}";
     }
     else{
-      oss << "AFLOW label   : " << aflow_label << endl;
-      oss << "params        : " << aurostd::joinWDelimiter(parameter_list,",") << endl;
-      oss << "params values : " << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(parameter_values,6),",") << endl;
+      oss << "AFLOW label    : " << aflow_label << endl;
+      oss << "params         : " << aurostd::joinWDelimiter(parameter_list,",") << endl;
+      oss << "params values  : " << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(parameter_values,6),",") << endl;
+      if(print_element_names){ oss << "element names  : " << aurostd::joinWDelimiter(xstr.species,",") << endl; } //DX20210622
+      if(print_atomic_numbers){ oss << "atomic numbers : " << aurostd::joinWDelimiter(atomic_numbers,",") << endl; } //DX20210622
     }
 
     return oss.str();

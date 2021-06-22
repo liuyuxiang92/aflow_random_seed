@@ -2785,7 +2785,7 @@ namespace anrl {
   string structure2anrl(xstructure& xstr, bool recalculate_symmetry=true);   // use default options //DX20191031 - added recalculate_symmetry
   string structure2anrl(xstructure& xstr, double tolerance);                 // specify symmetry tolerance //CO20190520 - removed pointers for bools and doubles, added const where possible
   string structure2anrl(xstructure& xstr, uint setting);                     // specify setting
-  string structure2anrl(xstructure& xstr, double tolerance, uint setting, bool recalculate_symmetry=true);  // main function //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190829 - added recalculate_symmetry //DX20191031 - removed reference
+  string structure2anrl(xstructure& xstr, double tolerance, uint setting, bool recalculate_symmetry=true, bool print_element_names=false, bool print_atomic_numbers=false);  // main function //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190829 - added recalculate_symmetry //DX20191031 - removed reference //DX20210622 - added printing options
   // ---------------------------------------------------------------------------
   // generic prototype generator (main function)
   xstructure PrototypeANRL_Generator(string& label, string& parameters, deque<string> &vatomX,deque<double> &vvolumeX, ostream& logstream=cout, bool silence_logger=true); //DX20200528 - command line = no logger

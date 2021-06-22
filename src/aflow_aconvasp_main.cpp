@@ -1354,6 +1354,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"STRUCTURE2ANRL::TOLERANCE","--tolerance=",""); //DX20191028
     vpflow.args2addattachedscheme(argv,cmds,"STRUCTURE2ANRL::TOLERANCE_SPECTRUM","--tolerance_spectrum=",""); //DX20200820
     vpflow.flag("STRUCTURE2ANRL::FORCE_WYCKOFF",aurostd::args2flag(argv,cmds,"--force_Wyckoff|--force_wyckoff|--force_Wyckoff_order|--force_wyckoff_order")); //DX20191028
+    vpflow.flag("STRUCTURE2ANRL::PRINT_ELEMENT_NAMES",aurostd::args2flag(argv,cmds,"--print_element_names|--print_element_name|--print_element")); //DX20210622
+    vpflow.flag("STRUCTURE2ANRL::PRINT_ATOMIC_NUMBERS",aurostd::args2flag(argv,cmds,"--print_atomic_numbers|--print_atomic_number")); //DX20210622
   }
   //DX20190128 - add structure2ANRL - END
 
