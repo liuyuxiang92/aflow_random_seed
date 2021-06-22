@@ -258,12 +258,14 @@ General options - applicable to all commands - is listed at the bottom of this s
 
         [PROTOTYPE_OPTIONS] : Options specific to this command:
 
-            [--setting=1|2|aflow] : Specify the space group setting for the conventional cell/Wyckoff positions.
-              The `aflow' setting follows the choices of the AFLOW Prototype Encyclopedia:
-                  - axis-b for monoclinic space groups,
-                  - rhombohedral setting for rhombohedral space groups, and
-                  - origin centered on the inversion for centrosymmetric space groups
-              (default: aflow).
+            [--setting=1|2|aflow]    : Specify the space group setting for the conventional cell/Wyckoff positions.
+                                       The `aflow' setting follows the choices of the AFLOW Prototype Encyclopedia:
+                                         - axis-b for monoclinic space groups,
+                                         - rhombohedral setting for rhombohedral space groups, and
+                                         - origin centered on the inversion for centrosymmetric space groups
+                                       (default: aflow).
+            [--print_element_names]  : Print the element names from the input structure
+            [--print_atomic_numbers] : Print the atomic number for the elements in the input structure
 
 
     aflow --get_isopointal_prototype [ISOPOINTAL_OPTIONS] < file
