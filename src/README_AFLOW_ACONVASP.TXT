@@ -814,7 +814,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Space group setting:
           The space group setting can be specified with the optional flag [--setting=1| =2] (the default is setting 1).
@@ -1121,7 +1121,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Options:
           [--no_scan] : Will not perform tolerance scan.
@@ -1176,7 +1176,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Space group setting:
           The space group setting can be specified with the optional flag [--setting=1| =2] (the default is setting 1).
@@ -1225,7 +1225,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
           The magnetic tag specifies the magnetic moment on each of the atoms.
@@ -1315,7 +1315,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
           The magnetic tag specifies the magnetic moment on each of the atoms.
@@ -1358,7 +1358,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum 
+           A value can also be specified. (Note, it must be below the minimum 
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
           The magnetic tag specifies the magnetic moment on each of the atoms.
@@ -1831,7 +1831,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
           The magnetic tag specifies the magnetic moment on each of the atoms.
@@ -2148,7 +2148,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
           The magnetic tag specifies the magnetic moment on each of the atoms.
@@ -2590,7 +2590,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
@@ -2609,7 +2609,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
           The magnetic tag specifies the magnetic moment on each of the atoms.
@@ -2636,7 +2636,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
           The magnetic tag specifies the magnetic moment on each of the atoms.
@@ -2663,7 +2663,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
@@ -2682,7 +2682,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
           The magnetic tag specifies the magnetic moment on each of the atoms.
@@ -3118,7 +3118,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
@@ -3199,7 +3199,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
           The magnetic tag specifies the magnetic moment on each of the atoms.
@@ -3260,7 +3260,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
           The magnetic tag specifies the magnetic moment on each of the atoms.
@@ -3293,7 +3293,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
           The magnetic tag specifies the magnetic moment on each of the atoms.
@@ -3364,7 +3364,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
@@ -3577,7 +3577,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Space group setting:
           The space group setting can be specified with the optional flag [--setting=1|=2|=aflow] (the default is setting 1).
@@ -3607,7 +3607,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Space group setting:
           The space group setting can be specified with the optional flag [--setting=1| =2] (the default is setting 1).

@@ -135,7 +135,7 @@ The initial tolerance can be specified by appending it to the command with an "=
 
     Ex: aflow --aflow-sym=1e-2
 
-    Note, the value must be greater than the interatomic distance,
+    Note, the value must be below the minimum interatomic distance,
     otherwise an error will be thrown.
 
 No tolerance scan option:
