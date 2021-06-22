@@ -2848,13 +2848,14 @@ LATTICES = (the ones with "")
       or README_AFLOW_ANRL.TXT.
       
       Options:
-        [--setting=1|2|anrl] : Specify the space group setting for the conventional cell/Wyckoff positions.  
-          The `anrl' setting follows the choices of the AFLOW Library of Crystallographic Prototypes: 
-              - axis-b for monoclinic space groups, 
-              - rhombohedral setting for rhombohedral space groups, and 
-              - origin centered on the inversion for centrosymmetric space groups 
-          (default: anrl).
-  
+        [--setting=1|2|aflow]    : Specify the space group setting for the conventional cell/Wyckoff positions.
+                                   The `aflow' setting follows the choices of the AFLOW Prototype Encyclopedia:
+                                     - axis-b for monoclinic space groups,
+                                     - rhombohedral setting for rhombohedral space groups, and
+                                     - origin centered on the inversion for centrosymmetric space groups
+                                   (default: aflow).
+        [--print_element_names]  : Print the element names from the input structure
+        [--print_atomic_numbers] : Print the atomic number for the elements in the input structure
 
   aflow --prototype_labels|--proto_labels [--library=htqc|anrl|all] [--arity=|--number_of_species=|--species_count=<number>] [--stoichiometry=|--stoich=<number>,<number>,...] [--space_group_number=|--space_group=|--sg=<number>] 
         Returns a list of the AFLOW prototype labels.
