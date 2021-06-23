@@ -2728,11 +2728,11 @@ namespace cce {
             }
             if ( corrections_line.find("*") != string::npos ) {
               message << " The correction for " << structure.atoms[i].cleanname << " (atom " << i+1 << ")" << " in oxidation state +" << cce_vars.oxidation_states[i] << " when coordinated by " << considered_anion_species << " might be less accurate since it was obtained from less well validated experimental data as the other corrections!";
-              pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, oss, _LOGGER_WARNING_);
+              pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, oss, _LOGGER_WARNING_,XHOST.vflag_control.flag("PRINT_MODE::JSON")); //CO20210623 - silent with json output
             }
             if ( corrections_line.find("^") != string::npos ) {
               message << " The correction for " << structure.atoms[i].cleanname << " (atom " << i+1 << ")" << " in oxidation state +" << cce_vars.oxidation_states[i] << " when coordinated by " << considered_anion_species << " is only approximate since in this case the explicit oxidation state dependence was lifted!";
-              pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, oss, _LOGGER_WARNING_);
+              pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, oss, _LOGGER_WARNING_,XHOST.vflag_control.flag("PRINT_MODE::JSON"));  //CO20210623 - silent with json output
             }
             // load cation corrections
             load_cation_corrections(structure, cce_vars, corrections_line, corrections_atom, i);
