@@ -16,7 +16,10 @@ Implementation to obtain corrected DFT formation enthalpies based on the coordin
 enthalpies (CCE) methodology described in:
 Friedrich et al., Coordination corrected ab initio formation enthalpies, npj Comput. Mater. 5, 59 (2019);
 https://doi.org/10.1038/s41524-019-0192-1
-Please cite this article when using this method and/or this implementation.
+and
+Friedrich et al., Automated coordination corrected enthalpies with AFLOW-CCE, Phys. Rev. Mater. 5, 043803 (2021)
+https://doi.org/10.1103/PhysRevMaterials.5.043803
+Please cite these articles when using this method and/or this implementation.
 The corrections depend on the number of cation-anion bonds and on the cation oxidation state.
 The current implementation requires a structure file as input and will return the CCE corrections for
 the DFT formation enthalpies for PBE, LDA and SCAN if the oxidation numbers can be determined.
@@ -34,9 +37,7 @@ Details for the options available are explained in the following.
 (ii) AVAILABLE OPTIONS:
 --cce                            Prints user instructions.
 
---cce=STRUCTURE_FILE_PATH        Prints the results of the full CCE anaysis, i.e. cation coordination
-                                 numbers, oxidation numbers, and CCE corrections and formation enthalpies,
-                                 for the given structure file. It can be in any structure
+--cce=STRUCTURE_FILE_PATH        Provide the path to the structure file. It can be in any structure
                                  format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF.
                                  For VASP, a VASP5 POSCAR is required or if a VASP4 POSCAR is used, the species
                                  must be written on the right side next to the coordinates for each atom
