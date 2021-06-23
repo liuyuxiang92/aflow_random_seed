@@ -104,7 +104,7 @@ namespace KBIN {
     if (!date.empty() && date[date.length()-1] == '\n') date.erase(date.length()-1); // remove last newline
 
     string WRITE="[VASP_POTCAR_AUID]"+aurostd::joinWDelimiter(vppAUIDs,",");
-    if(1||!aurostd::substring2bool(aurostd::file2string(directory+"/"+_AFLOWIN_),WRITE)){  //CO20210315 - better to write many times in case the file is run on another computer //CO20210315 - it write many times
+    if(1||!aurostd::substring2bool(aurostd::file2string(directory+"/"+_AFLOWIN_),WRITE)){  //CO20210315 - better to write many times in case the file is run on another computer
       KBIN::AFLOWIN_ADD(directory+"/"+_AFLOWIN_,WRITE,"");
       //[CO20210315 - OBSOLETE]for(uint i=0;i<vppAUIDs.size();i++) {
       //[CO20210315 - OBSOLETE]  WRITE+=vppAUIDs.at(i);
