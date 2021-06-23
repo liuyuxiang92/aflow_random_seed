@@ -6046,7 +6046,7 @@ namespace KBIN {
     //this is all done inside the main XVASP_Afix() function
     //BE CAREFUL not to overwrite xvasp.INCAR
     //there is no need for increasing POTIM, as increasing POTIM simply speeds up the calculation
-    //you can ignore "BRIONS problems: POTIM should be increase", not a problem
+    //you can ignore "BRIONS problems: POTIM should be increased", not a problem
     bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string function="KBIN::XVASP_Afix_POTIM";
     string soliloquy=XPID+function+"():";  //CO20200624
