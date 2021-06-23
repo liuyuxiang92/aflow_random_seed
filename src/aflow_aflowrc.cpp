@@ -246,6 +246,8 @@
 #define         DEFAULT_VASP_PREC_ENMAX_HIGH                  XHOST.adefault.getattachedutype<double>("DEFAULT_VASP_PREC_ENMAX_HIGH")
 #define AFLOWRC_DEFAULT_VASP_PREC_ENMAX_ACCURATE              1.4
 #define         DEFAULT_VASP_PREC_ENMAX_ACCURATE              XHOST.adefault.getattachedutype<double>("DEFAULT_VASP_PREC_ENMAX_ACCURATE")
+#define AFLOWRC_DEFAULT_VASP_ENMAX_MINIMUM                    0.25
+#define         DEFAULT_VASP_ENMAX_MINIMUM                    XHOST.adefault.getattachedutype<double>("DEFAULT_VASP_ENMAX_MINIMUM")
 #define AFLOWRC_DEFAULT_VASP_SPIN_REMOVE_CUTOFF               0.05
 #define         DEFAULT_VASP_SPIN_REMOVE_CUTOFF               XHOST.adefault.getattachedutype<double>("DEFAULT_VASP_SPIN_REMOVE_CUTOFF")
 #define AFLOWRC_DEFAULT_VASP_PREC_POTIM                       0.5
@@ -1316,6 +1318,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_VASP_PREC_ENMAX_NORMAL",AFLOWRC_DEFAULT_VASP_PREC_ENMAX_NORMAL);
     aflowrc::load_default("DEFAULT_VASP_PREC_ENMAX_HIGH",AFLOWRC_DEFAULT_VASP_PREC_ENMAX_HIGH);
     aflowrc::load_default("DEFAULT_VASP_PREC_ENMAX_ACCURATE",AFLOWRC_DEFAULT_VASP_PREC_ENMAX_ACCURATE);
+    aflowrc::load_default("DEFAULT_VASP_ENMAX_MINIMUM",AFLOWRC_DEFAULT_VASP_ENMAX_MINIMUM);
     aflowrc::load_default("DEFAULT_VASP_SPIN_REMOVE_CUTOFF",AFLOWRC_DEFAULT_VASP_SPIN_REMOVE_CUTOFF);
     aflowrc::load_default("DEFAULT_VASP_PREC_POTIM",AFLOWRC_DEFAULT_VASP_PREC_POTIM);
     aflowrc::load_default("DEFAULT_VASP_PREC_EDIFFG",AFLOWRC_DEFAULT_VASP_PREC_EDIFFG);
@@ -1928,6 +1931,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_VASP_PREC_ENMAX_NORMAL=" << AFLOWRC_DEFAULT_VASP_PREC_ENMAX_NORMAL << endl;
     aflowrc << "DEFAULT_VASP_PREC_ENMAX_HIGH=" << AFLOWRC_DEFAULT_VASP_PREC_ENMAX_HIGH << endl;
     aflowrc << "DEFAULT_VASP_PREC_ENMAX_ACCURATE=" << AFLOWRC_DEFAULT_VASP_PREC_ENMAX_ACCURATE << endl;
+    aflowrc << "DEFAULT_VASP_ENMAX_MINIMUM=" << AFLOWRC_DEFAULT_VASP_ENMAX_MINIMUM << endl;
     aflowrc << "DEFAULT_VASP_SPIN_REMOVE_CUTOFF=" << AFLOWRC_DEFAULT_VASP_SPIN_REMOVE_CUTOFF << endl;
     aflowrc << "DEFAULT_VASP_PREC_POTIM=" << AFLOWRC_DEFAULT_VASP_PREC_POTIM << endl;
     aflowrc << "DEFAULT_VASP_PREC_EDIFFG=" << AFLOWRC_DEFAULT_VASP_PREC_EDIFFG << endl;
@@ -2520,6 +2524,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_PREC_ENMAX_NORMAL\")=" << DEFAULT_VASP_PREC_ENMAX_NORMAL << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_PREC_ENMAX_HIGH\")=" << DEFAULT_VASP_PREC_ENMAX_HIGH << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_PREC_ENMAX_ACCURATE\")=" << DEFAULT_VASP_PREC_ENMAX_ACCURATE << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_ENMAX_MINIMUM\")=" << DEFAULT_VASP_ENMAX_MINIMUM << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_SPIN_REMOVE_CUTOFF\")=" << DEFAULT_VASP_SPIN_REMOVE_CUTOFF << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_PREC_POTIM\")=" << DEFAULT_VASP_PREC_POTIM << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_PREC_EDIFFG\")=" << DEFAULT_VASP_PREC_EDIFFG << endl;

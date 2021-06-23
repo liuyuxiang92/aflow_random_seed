@@ -19,6 +19,9 @@ aflow
                                     List of directories to run from file
                                     containing a list of aflow.in one per line.
    --quiet | -quiet | -q            Quiet: remove all 'MMMMM MESSAGES'
+   --quiet=cerr                     Quiet in cerr: remove some cerr messages
+   --quiet=cout                     Quiet in cout: remove some cout messages
+   
    -c | --clean         cleans everything except aflow.in
               (if .gz or .bz2 inputs are present, they are decompressed)
 

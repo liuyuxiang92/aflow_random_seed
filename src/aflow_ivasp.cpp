@@ -104,7 +104,7 @@ namespace KBIN {
     if (!date.empty() && date[date.length()-1] == '\n') date.erase(date.length()-1); // remove last newline
 
     string WRITE="[VASP_POTCAR_AUID]"+aurostd::joinWDelimiter(vppAUIDs,",");
-    if(1||!aurostd::substring2bool(aurostd::file2string(directory+"/"+_AFLOWIN_),WRITE)){  //CO20210315 - better to write many times in case the file is run on another computer //CO20210315 - it write many times
+    if(1||!aurostd::substring2bool(aurostd::file2string(directory+"/"+_AFLOWIN_),WRITE)){  //CO20210315 - better to write many times in case the file is run on another computer
       KBIN::AFLOWIN_ADD(directory+"/"+_AFLOWIN_,WRITE,"");
       //[CO20210315 - OBSOLETE]for(uint i=0;i<vppAUIDs.size();i++) {
       //[CO20210315 - OBSOLETE]  WRITE+=vppAUIDs.at(i);
@@ -6046,7 +6046,7 @@ namespace KBIN {
     //this is all done inside the main XVASP_Afix() function
     //BE CAREFUL not to overwrite xvasp.INCAR
     //there is no need for increasing POTIM, as increasing POTIM simply speeds up the calculation
-    //you can ignore "BRIONS problems: POTIM should be increase", not a problem
+    //you can ignore "BRIONS problems: POTIM should be increased", not a problem
     bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string function="KBIN::XVASP_Afix_POTIM";
     string soliloquy=XPID+function+"():";  //CO20200624
@@ -6472,6 +6472,9 @@ namespace KBIN {
         else{param_double=DEFAULT_VASP_PREC_ENMAX_ACCURATE*xvasp.POTCAR_ENMAX;}
         if(param_double==AUROSTD_MAX_DOUBLE || aurostd::isequal(param_double,0.0)){param_double=500.0;}  //CO20210315
         param_double*=0.97; // reduce 3%.... if enough // param_double*=0.99; // reduce 1%.... if enough
+        if(aurostd::isequal(xvasp.POTCAR_ENMAX,0.0)==false){
+          if(param_double<DEFAULT_VASP_ENMAX_MINIMUM*xvasp.POTCAR_ENMAX){Krun=false;} //so it doesn't run forever
+        }
         KBIN::XVASP_INCAR_PREPARE_GENERIC("LREAL",xvasp,vflags,"",0,0.0,ON);  //no Krun here, if it's already there, we're set
       }
       Krun=(Krun && KBIN::XVASP_INCAR_PREPARE_GENERIC("ENMAX",xvasp,vflags,"",0,param_double,FALSE));

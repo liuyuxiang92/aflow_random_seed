@@ -576,6 +576,11 @@ DEFAULT_VASP_PREC_ENMAX_ACCURATE
   type: double
   default: 1.4
 
+DEFAULT_VASP_ENMAX_MINIMUM
+  description: Minimum multiplier for the max energy cutoff of the pseudopotentials (if PSMAXN error is encountered).
+  type: double
+  default: 0.25
+
 DEFAULT_VASP_SPIN_REMOVE_CUTOFF
   description: Magnetic moment threshold below which the spin-polarization setting will be turned off.
   type: double
