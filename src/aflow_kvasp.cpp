@@ -3848,6 +3848,9 @@ namespace KBIN {
     //in this case, try restarting the calculation from CONTCAR
     //lowering NCPUS has been shown to work, indicating that this is indeed a threading/mpi issue
     //try from the most relaxed CONTCAR to save time
+    //this is NOT a magic bullet, it looks like the threading solution works for some structures and not others
+    //I am leaving "THREADS" vs. going to "MEMORY" solutions which will change NBANDS, KPOINTS, etc.
+    //better to run on another machine/different binary
     if(fixed_applied==false && xwarning.flag("CALC_FROZEN") && xmessage.flag("REACHED_ACCURACY") && xwarning.flag("OUTCAR_INCOMPLETE")){
       //[CO20210315 - not shown to work]fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","RESTART_CALC",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       //[CO20210621 - not shown to work (alone)]fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","RECYCLE_CONTCAR",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
