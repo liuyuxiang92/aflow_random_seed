@@ -73,6 +73,8 @@ namespace init {
 
     // IMMEDIATELY
     XHOST.QUIET=aurostd::args2flag(argv,cmds,"--quiet|-q");
+    XHOST.QUIET_CERR=aurostd::args2flag(argv,cmds,"--quiet=cerr"); // extra quiet SC20210617
+    XHOST.QUIET_COUT=aurostd::args2flag(argv,cmds,"--quiet=cout"); // extra quiet SC20210617
     XHOST.DEBUG=aurostd::args2flag(argv,cmds,"--debug");
     XHOST.TEST=aurostd::args2flag(argv,cmds,"--test|-test");
     XHOST.SKEW_TEST=aurostd::args2flag(argv,cmds,"--skew_test"); //DX20171025
@@ -1130,15 +1132,16 @@ namespace init {
     }
     if(LDEBUG) cerr << soliloquy << " out.length()=" << out.length() << endl;
     if(LDEBUG) cerr.flush();
-    if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << endl;
-
+    if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << " [1]" << endl;
+    if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << " [1]" << endl;
+    
     if((str2load=="vLIBS" || str2load=="XHOST_vLIBS")) { // && XHOST_vLIBS.size()!=3)
       if(XHOST_vLIBS.size()) for(uint i=0;i<XHOST_vLIBS.size();i++) XHOST_vLIBS.at(i).clear();
       XHOST_vLIBS.clear();
       XHOST_vLIBS.push_back(vector<string>()); // AURL
       XHOST_vLIBS.push_back(vector<string>()); // AUID
       XHOST_vLIBS.push_back(vector<string>()); // LOOP
-      if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << endl;
+      if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << " [2]" << endl;
       vector<string> vout;
       string aurl,auid,loop;
       bool found=FALSE;
@@ -1381,7 +1384,17 @@ namespace init {
     if(str=="AFLOW_PSEUDOPOTENTIALS") { if(XHOST_AFLOW_PSEUDOPOTENTIALS.empty()) { return XHOST_AFLOW_PSEUDOPOTENTIALS=init::InitLoadString(str,LVERBOSE);} else { return XHOST_AFLOW_PSEUDOPOTENTIALS;}} // LOADED TXTS
     if(str=="AFLOW_PSEUDOPOTENTIALS_TXT") { if(XHOST_AFLOW_PSEUDOPOTENTIALS_TXT.empty()) { return XHOST_AFLOW_PSEUDOPOTENTIALS_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_AFLOW_PSEUDOPOTENTIALS_TXT;}} // LOADED TXTS
     if(str=="AFLOW_PSEUDOPOTENTIALS_LIST_TXT") { if(XHOST_AFLOW_PSEUDOPOTENTIALS_LIST_TXT.empty()) { return XHOST_AFLOW_PSEUDOPOTENTIALS_LIST_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_AFLOW_PSEUDOPOTENTIALS_LIST_TXT;}} // LOADED TXTS
-    if(str=="f144468a7ccc2d3a72ba44000715efdb") { if(XHOST_f144468a7ccc2d3a72ba44000715efdb.empty()) { return XHOST_f144468a7ccc2d3a72ba44000715efdb=init::InitLoadString(str,LVERBOSE);} else { return XHOST_f144468a7ccc2d3a72ba44000715efdb;}} // LOADED TXTS
+    if(str=="f144468a7ccc2d3a72ba44000715efdb") {
+      if(XHOST_f144468a7ccc2d3a72ba44000715efdb.empty()) {
+	//	cerr << "init::InitGlobalObject" << " [1a]" << endl;
+	XHOST_f144468a7ccc2d3a72ba44000715efdb=init::InitLoadString(str,LVERBOSE);
+	//	cerr << "init::InitGlobalObject" << " [1b]" << endl;
+        return XHOST_f144468a7ccc2d3a72ba44000715efdb;
+      } else {
+	//	cerr << "init::InitGlobalObject" << " [2]" << endl;
+	return XHOST_f144468a7ccc2d3a72ba44000715efdb;
+      }
+    } // LOADED TXTS
     // [OBSOLETE] if(str=="d0f1b0e47f178ae627a388d3bf65d2d2") { if(XHOST_d0f1b0e47f178ae627a388d3bf65d2d2.empty()) { return XHOST_d0f1b0e47f178ae627a388d3bf65d2d2=init::InitLoadString(str,LVERBOSE);} else { return XHOST_d0f1b0e47f178ae627a388d3bf65d2d2;}} // LOADED TXTS
     // [OBSOLETE] if(str=="decf00ca3ad2fe494eea8e543e929068") { if(XHOST_decf00ca3ad2fe494eea8e543e929068.empty()) { return XHOST_decf00ca3ad2fe494eea8e543e929068=init::InitLoadString(str,LVERBOSE);} else { return XHOST_decf00ca3ad2fe494eea8e543e929068;}} // LOADED TXTS
 
