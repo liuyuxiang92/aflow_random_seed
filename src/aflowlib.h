@@ -476,7 +476,8 @@ class _outreach {
     vector<string> vkeyword,vsponsor,valloy;
     // operators/functions                                    // operator/functions
     friend ostream& operator<<(ostream &,const _outreach&);   // print
-  private:                                                   // ---------------------------------------
+    string print_string(void);                                // print string from <<
+  private:                                                    // ---------------------------------------
     void free();                                              // to free everything
     void copy(const _outreach& b);                            // the flag is necessary because sometimes you need to allocate the space.
 };

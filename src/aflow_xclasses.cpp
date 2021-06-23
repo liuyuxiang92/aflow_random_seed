@@ -30,6 +30,8 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   showPID=FALSE;
   showTID=FALSE;
   QUIET=FALSE;
+  QUIET_CERR=FALSE; // extra quiet SC20210617
+  QUIET_COUT=FALSE; // extra quiet SC20210617
   TEST=FALSE;
   DEBUG=FALSE;
   MPI=FALSE;
@@ -143,6 +145,8 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   showPID=b.showPID;
   showTID=b.showTID;
   QUIET=b.QUIET;
+  QUIET_CERR=b.QUIET_CERR; // extra quiet SC20210617
+  QUIET_COUT=b.QUIET_COUT; // extra quiet SC20210617
   TEST=b.TEST;
   DEBUG=b.DEBUG;
   MPI=b.MPI;

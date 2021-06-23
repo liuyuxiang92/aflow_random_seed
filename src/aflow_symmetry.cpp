@@ -8963,6 +8963,7 @@ bool KBIN_StepSymmetryPerform_20161205(xstructure& a,string AflowIn,ofstream &Fi
     kflags.KBIN_SYMMETRY_AGROUP_WRITE=TRUE;
     Krun=(Krun && pflow::PerformFullSymmetry(a,kflags.KBIN_SYMMETRY_EPS,kflags.KBIN_SYMMETRY_NO_SCAN,true,FileMESSAGE,aflags,kflags,osswrite,oss));
   }
+  if(a.bravais_lattice_type.empty()){a.GetRealLatticeType();} //CO+DX20210616 - needed for AEL/AGL
   return Krun;
 }
 //DX+CO END
