@@ -266,6 +266,7 @@ General options - applicable to all commands - is listed at the bottom of this s
                                        (default: aflow).
             [--print_element_names]  : Print the element names from the input structure
             [--print_atomic_numbers] : Print the atomic number for the elements in the input structure
+            [--print=TEXT|JSON]      : Print the output into human-readable text or JSON, respectively.
 
 
     aflow --get_isopointal_prototype [ISOPOINTAL_OPTIONS] < file
@@ -277,7 +278,8 @@ General options - applicable to all commands - is listed at the bottom of this s
 
         [ISOPOINTAL_OPTIONS] : Options specific to this command:
 
-          [--catalog=aflow|htqc|all] : Restrict the entries to compare with to a specific catalog/library (e.g., `aflow' or `htqc').
+            [--catalog=aflow|htqc|all] : Restrict the entries to compare with to a specific catalog/library (e.g., `aflow' or `htqc').
+            [--print=TEXT|JSON]      : Print the output into human-readable text or JSON, respectively.
 
 
     aflow --unique_atom_decorations [GENERAL_COMPARISON_OPTIONS] < file
