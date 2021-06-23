@@ -1264,7 +1264,7 @@ namespace KBIN {
     xvasp.INCAR.clear();xvasp.INCAR.str(std::string());
     //[need additional endl]xvasp.INCAR << aurostd::joinWDelimiter(vlines,"\n");
     for(uint iline=0;iline<vlines.size();iline++){
-      if(iline==vlines.size()-1 && aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vlines[iline]).empty()){continue;} //remove last extra line
+      if(iline==vlines.size()-1 && aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vlines[iline]).empty()){continue;} //remove last extra line, without this line, clean will add newlines everytime (growing INCAR unnecessarily)
       xvasp.INCAR << vlines[iline] << endl;
     }
   }
