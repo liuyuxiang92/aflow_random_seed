@@ -5231,7 +5231,17 @@ namespace aurostd {
   // Function SubStringsPresent
   // ***************************************************************************
   bool substring2bool(const string& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
-    //an AFLOW-specific substring matcher: will remove comments before searching
+    //substring2bool and kvpairfound are similar but distinct
+    //substring2bool will match any strsub1 and return true
+    //kvpairfound will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return true
+    //matching KEY exactly is useful, e.g.:
+    //_FILE_START_
+    //IALGO=48
+    //_FILE_END_
+    //strsub1="ALGO": substring2bool will return true
+    //keyword="ALGO,delim="=": kvpairfound will return false
+    //kvpairfound must match KEY exactly! skips the rest
+    //substring2bool is good for aflow.in's which has no set delimiter style: [AFLOW_BIN_XZ] vs. [AFLOW_BIN=XZ] vs. [AFLOW_BIN]XZ vs. [AFLOW]BIN=XZ
     bool LDEBUG=FALSE;//TRUE;
     if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): BEGIN [substring=\"" << strsub1 << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
     string _strstream(strstream);
@@ -5460,7 +5470,18 @@ namespace aurostd {
   // Function SubStringsPresent and EXTRACT
   // ***************************************************************************
   string substring2string(const string& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
-    //an AFLOW-specific substring matcher: will remove comments before searching
+    //substring2string and kvpair2value are similar but distinct
+    //substring2string will match any strsub1 and return everything AFTER strsub1
+    //kvpair2value will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return VALUE
+    //matching KEY exactly is useful, e.g.:
+    //_FILE_START_
+    //IALGO=48
+    //ALGO=FAST
+    //_FILE_END_
+    //strsub1="ALGO": substring2string will return "=48"
+    //keyword="ALGO,delim="=": kvpair2value will return "FAST"
+    //kvpair2value must match KEY exactly! skips the rest
+    //substring2string is good for aflow.in's which has no set delimiter style: [AFLOW_BIN_XZ] vs. [AFLOW_BIN=XZ] vs. [AFLOW_BIN]XZ vs. [AFLOW]BIN=XZ
     bool LDEBUG=FALSE;//TRUE;
     if(LDEBUG) cerr << XPID << "aurostd::substring2string(): BEGIN [substring=\"" << strsub1 << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
     string _strstream(strstream);
@@ -5530,7 +5551,17 @@ namespace aurostd {
   //[CO20210315 - not used, not sure the purpose of strsub2]}
   
   bool kvpairfound(const string& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315
-    //an AFLOW-specific substring matcher: will remove comments before searching
+    //substring2bool and kvpairfound are similar but distinct
+    //substring2bool will match any strsub1 and return true
+    //kvpairfound will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return true
+    //matching KEY exactly is useful, e.g.:
+    //_FILE_START_
+    //IALGO=48
+    //_FILE_END_
+    //strsub1="ALGO": substring2bool will return true
+    //keyword="ALGO,delim="=": kvpairfound will return false
+    //kvpairfound must match KEY exactly! skips the rest
+    //substring2bool is good for aflow.in's which has no set delimiter style: [AFLOW_BIN_XZ] vs. [AFLOW_BIN=XZ] vs. [AFLOW_BIN]XZ vs. [AFLOW]BIN=XZ
     bool LDEBUG=FALSE;//TRUE;
     if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
     string _strstream(strstream);
@@ -5563,7 +5594,18 @@ namespace aurostd {
   }
 
   string kvpair2value(const string& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315
-    //an AFLOW-specific substring matcher: will remove comments before searching
+    //substring2string and kvpair2value are similar but distinct
+    //substring2string will match any strsub1 and return everything AFTER strsub1
+    //kvpair2value will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return VALUE
+    //matching KEY exactly is useful, e.g.:
+    //_FILE_START_
+    //IALGO=48
+    //ALGO=FAST
+    //_FILE_END_
+    //strsub1="ALGO": substring2string will return "=48"
+    //keyword="ALGO,delim="=": kvpair2value will return "FAST"
+    //kvpair2value must match KEY exactly! skips the rest
+    //substring2string is good for aflow.in's which has no set delimiter style: [AFLOW_BIN_XZ] vs. [AFLOW_BIN=XZ] vs. [AFLOW_BIN]XZ vs. [AFLOW]BIN=XZ
     bool LDEBUG=FALSE;//TRUE;
     if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
     string _strstream(strstream);
