@@ -2726,6 +2726,14 @@ namespace cce {
             if(LDEBUG){
               cerr << soliloquy << " corrections line: " << corrections_line << endl;
             }
+            if ( corrections_line.find("*") != string::npos ) {
+              message << " The correction for " << structure.atoms[i].cleanname << " (atom " << i+1 << ")" << " in oxidation state +" << cce_vars.oxidation_states[i] << " when coordinated by " << considered_anion_species << " might be less accurate since it was obtained from less well validated experimental data as the other corrections!";
+              pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, oss, _LOGGER_WARNING_,XHOST.vflag_control.flag("PRINT_MODE::JSON")); //CO20210623 - silent with json output
+            }
+            if ( corrections_line.find("^") != string::npos ) {
+              message << " The correction for " << structure.atoms[i].cleanname << " (atom " << i+1 << ")" << " in oxidation state +" << cce_vars.oxidation_states[i] << " when coordinated by " << considered_anion_species << " is only approximate since in this case the explicit oxidation state dependence was lifted!";
+              pflow::logger(_AFLOW_FILE_NAME_,soliloquy, message, oss, _LOGGER_WARNING_,XHOST.vflag_control.flag("PRINT_MODE::JSON"));  //CO20210623 - silent with json output
+            }
             // load cation corrections
             load_cation_corrections(structure, cce_vars, corrections_line, corrections_atom, i);
           }
@@ -3224,10 +3232,10 @@ namespace cce {
   // print citation information at end of output
   string print_citation() {
     stringstream oss;
-    oss << "############################################################################################" << endl;
-    oss << "When you use results from CCE and/or this implementation, please cite the following article:" << endl;
-    oss << "Friedrich et al., npj Comput. Mater. 5, 59 (2019); https://doi.org/10.1038/s41524-019-0192-1" << endl;
-    oss << "############################################################################################" << endl;
+    oss << "#############################################################################################" << endl;
+    oss << "When you use results from CCE and/or this implementation, please cite the following articles:" << endl;
+    oss << "https://doi.org/10.1038/s41524-019-0192-1; https://doi.org/10.1103/PhysRevMaterials.5.043803" << endl;
+    oss << "#############################################################################################" << endl;
     return oss.str();
   }
 
@@ -3245,7 +3253,10 @@ namespace cce {
     oss << "enthalpies (CCE) methodology described in:" << endl; 
     oss << "Friedrich et al., Coordination corrected ab initio formation enthalpies, npj Comput. Mater. 5, 59 (2019);" << endl;
     oss << "https://doi.org/10.1038/s41524-019-0192-1" << endl;
-    oss << "Please cite this article when using this method and/or this implementation." << endl;
+    oss << "and" << endl;
+    oss << "Friedrich et al., Automated coordination corrected enthalpies with AFLOW-CCE, Phys. Rev. Mater. 5, 043803 (2021);" << endl;
+    oss << "https://doi.org/10.1103/PhysRevMaterials.5.043803" << endl;
+    oss << "Please cite these articles when using this method and/or this implementation." << endl;
     oss << "The corrections depend on the number of cation-anion bonds and on the cation oxidation state." << endl;
     oss << "More general information and a list of elements and oxidation states for which corrections are available" << endl; 
     oss << "can be found in README_AFLOW_CCE.TXT." << endl;
@@ -3253,9 +3264,7 @@ namespace cce {
     oss << "(ii) AVAILABLE OPTIONS:" << endl;
     oss << "--cce                            Prints these user instructions." << endl;
     oss << endl;
-    oss << "--cce=STRUCTURE_FILE_PATH        Prints the results of the full CCE anaysis, i.e. cation coordination" << endl;
-    oss << "                                 numbers, oxidation numbers, and CCE corrections and formation enthalpies," << endl;
-    oss << "                                 for the given structure file. It can be in any structure" << endl;
+    oss << "--cce=STRUCTURE_FILE_PATH        Provide the path to the structure file. It can be in any structure" << endl;
     oss << "                                 format that AFLOW supports, e.g. VASP POSCAR, QE, AIMS, ABINIT, ELK, and CIF." << endl;
     oss << "                                 For VASP, a VASP5 POSCAR is required or, if a VASP4 POSCAR is used, the species" << endl;
     oss << "                                 must be written on the right side next to the coordinates for each atom" << endl;
@@ -3378,7 +3387,7 @@ namespace cce {
     //They can be used to recalculate the used experimental values by multiplying with the exp. corrections per bond in the previous column.
     //For per- and superoxides the number given is the number of O-O bonds per formula unit of the compound used to get the correction.
     //                                            cation species          ox. state  PBE (for 298.15K)  PBE (for 0K)  LDA (for 298.15K)  LDA (for 0K)  SCAN (for 298.15K)  SCAN (for 0K)  PBE(+U)_ICSD (for 298.15K)  PBE(+U)_ICSD (for 0K)  Exp. (for 298.15K)  M-X bonds        Protos                              n cations   n anions        H_f^exp  (for 298.15K)
-    //                                                                               (eV/bond)          (eV/bond)     (eV/bond)          (eV/bond)     (eV/bond)           (eV/bond)      (eV/bond)                   (eV/bond)              (eV/bond)           per f. u.                                            per f. u.   per f. u.        (eV/bond) TABLE IV in supp.
+    //                                                                               (eV/bond)          (eV/bond)     (eV/bond)          (eV/bond)     (eV/bond)           (eV/bond)      (eV/bond)                   (eV/bond)              (eV/bond)           per f. u.                                            per f. u.   per f. u.       (eV/bond) TABLE IV in supp.
     //OXIDES                                                                                                                                                                                                                                                                                                                                 
     if (cor_identifier=="Ag_+1_O")       {return "Ag_+1_Ag2O             +1         -0.00825           -0.00700      -0.05400           -0.05375      -0.06525            -0.06450       -0.06150                    -0.06000               -0.08050            4                 AgO/A2B_cP6_224_b_a.AB              2           1                -0.107   ";}
     else if (cor_identifier=="Al_+3_O")  {return "Al_+3_Al2O3            +3          0.18692            0.17783      -0.00733           -0.01683      -0.01242            -0.02217        0.18667                     0.17758               -1.44725            12                AlO/A2B3_hR10_167_c_e-001.AB        2           3                -3.473   ";}
@@ -3459,7 +3468,7 @@ namespace cce {
     //However when I compare the values with my calculated LDA, PBE and SCAN data, the -1.10 eV/formula unit fits better to the overall fact that LDA and SCAN overestimate the formation enthalpy (too negative value) and PBE does the opposite. 
     //With the newer value of -1.62 eV/formula unit this would not be the case. Therefore I took the old tabulated value for deducing the corrections (January 07 2020).
     //                                          cation species            ox. state  PBE (for 298.15K)  PBE (for 0K)  LDA (for 298.15K)  LDA (for 0K)  SCAN (for 298.15K)  SCAN (for 0K)  PBE(+U)_ICSD (for 298.15K)  PBE(+U)_ICSD (for 0K)  Exp. (for 298.15K)  M-X bonds       Protos                               n cations   n anions        H_f^exp (for 298.15K)
-    //                                                                               (eV/bond)          (eV/bond)     (eV/bond)          (eV/bond)     (eV/bond)           (eV/bond)      (eV/bond)                   (eV/bond)              (eV/bond)           per f. u.                                            per f. u.   per f. u.        (eV/bond) TABLE IV in supp.
+    //                                                                               (eV/bond)          (eV/bond)     (eV/bond)          (eV/bond)     (eV/bond)           (eV/bond)      (eV/bond)                   (eV/bond)              (eV/bond)           per f. u.                                            per f. u.   per f. u.       (eV/bond) TABLE IV in supp.
     //NITRIDES                                                                                                                                                                                                                                                                                                                               
     if (cor_identifier=="Al_+3_N")       {return "Al_+3_AlN              +3          0.11875            0.10850      -0.04575           -0.05575      -0.03850            -0.04875        0.11800                     0.10825               -0.82500            4                AlN/AB_hP4_186_b_b-001.AB            1            1                0.0    ";}
     else if (cor_identifier=="B_+3_N")   {return "B_+3_BN_NJ             +3          0.00100           -0.00867      -0.15933           -0.17000      -0.11000            -0.12067        0.00167                    -0.00767               -0.86700            3                B_hN/AB_hP4_194_c_d-001.AB           1            1                0.0    ";}
@@ -3481,6 +3490,13 @@ namespace cce {
     else if (cor_identifier=="V_+3_N")   {return "V_+3_VN                +3          0.04500            0.03917      -0.09483           -0.10100      -0.01683            -0.02250        0.03283                     0.03100               -0.37650            6                NV_sv/AB_cF8_225_a_b.AB              1            1                0.0    ";}
     else if (cor_identifier=="Y_+3_N")   {return "Y_+3_YN                +3         -0.06283           -0.06750      -0.18267           -0.18783      -0.16950            -0.17450       -0.04933                    -0.05400               -0.51683            6                NY_sv/AB_cF8_225_a_b.AB              1            1                0.0    ";}
     else if (cor_identifier=="Zr_+3_N")  {return "Zr_+3_ZrN_NJ           +3          0.04250            0.03733      -0.09933           -0.10500      -0.04067            -0.04617        0.06783                     0.06267               -0.63100            6                NZr_sv/AB_cF8_225_a_b.AB             1            1                0.0    ";}
+    // following corrections (marked with *) might be less accurate since they were fitted to less well validated experimental data; Elder93: https://doi.org/10.1021/cm00034a027; Vajenine07: https://doi.org/10.1021/ic700406q
+    else if (cor_identifier=="Na_+1_N")  {return "Na_+1_Na3N_Vajenine07* +1          0.03850            0.03400      -0.04367           -0.04883      -0.01150            -0.01683        0.03850                     0.03400                0.11050            6                -                                    3            1                0.663  ";}
+    else if (cor_identifier=="W_+6_N")   {return "W_+6_Na3WN3_Elder93*   +6         -0.02325           -0.03050      -0.08401           -0.10626      -0.02850            -0.03251       -0.00025                    -0.00750               -1.26100            4                -                                    1            3                -3.718 ";}
+    else if (cor_identifier=="Mo_+5_N")  {return "Mo_+5_LiMoN2_Elder93*  +5          0.28370            0.28038       0.15583            0.15129       0.24888             0.24488        0.28625                     0.28304               -0.45333            6                -                                    1            2                -4.001 ";}
+    // following corrections (marked with ^) are only approximate as they were obtained from previous ones by lifting the explicit oxidation state dependence of the corrections
+    else if (cor_identifier=="W_+4_N")   {return "W_+4_Na3WN3_Elder93*^  +4         -0.02325           -0.03050      -0.08401           -0.10626      -0.02850            -0.03251       -0.00025                    -0.00750               -1.26100            4                -                                    1            3                -3.718 ";}
+    else if (cor_identifier=="Mo_+4_N")  {return "Mo_+4_LiMoN2_Elder93*^ +4          0.28370            0.28038       0.15583            0.15129       0.24888             0.24488        0.28625                     0.28304               -0.45333            6                -                                    1            2                -4.001 ";}
     else {return "";}                                                                                                      
   }
 
