@@ -1450,7 +1450,7 @@ class AtomEnvironment{
     void getAtomEnvironment(const xstructure& xstr, uint center_index, const vector<string>& neighbor_elements, uint mode=ATOM_ENVIRONMENT_MODE_1); // get restricted environment (via specified elements) around atom index
     void constructAtomEnvironmentHull(void);                                                                                                        // construct hull around an environment //HE20210408
     xvector<double> index2Point(uint index);                                                                                                        // flat view on coordinates_neighbor //HE20210408
-    string toJSON(bool full=true) const;
+    string toJSON(uint mode=ATOM_ENVIRONMENT_MODE_3, bool full=true) const;                 //HE20210408 //DX20210624 - added mode input
   private:
     void free();                                                                            // free operator
     void copy(const AtomEnvironment& b);                                                    // copy constructor
