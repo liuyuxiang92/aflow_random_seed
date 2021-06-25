@@ -2558,7 +2558,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy=XPID+"xOUTCAR::GetBandGap():";
   stringstream message;
-  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+  bool force_exit=false; //[CO20210621 - we will now exit gracefully]XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   if((content == "") || (vcontent.size() == 0)) {
     //[CO20200404 - OBSOLETE]ERROR = soliloquy + " xOUTCAR needs to be loaded before. \n"
@@ -2680,14 +2680,35 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _FILE_CORRUPT_);
       }
 
+      //keep vedges, vVBT, vCBB same size as vkpoints
+      vedges[ispin].push_back(AUROSTD_MAX_UINT);
+      vVBT[ispin].push_back(AUROSTD_MAX_DOUBLE);
+      vCBB[ispin].push_back(AUROSTD_MAX_DOUBLE);
+
       band_edge_found=GetBandEdge(b_energies,b_occs,EFERMI,iedge,efermi_tol,energy_tol,occ_tol);
 
-      if(!band_edge_found){ //special case
+      if(band_edge_found){  //normal case
+        if(empty_channel[ispin]==1){  
+          //if we get here, empty channel detected for k-point 1, but not for current k-point
+          //therefore, 1 is the outlier
+          //inconsistency within channel
+          partially_empty_channel[ispin]=1;
+          if(first_kpt_empty==-1){first_kpt_empty=1;}
+          if(first_spin_empty==-1){first_spin_empty=ispin;}
+          //ERROR = soliloquy + " unable to detetc band edge for k-point "+aurostd::utype2string(1)+
+          //  " (spin="+aurostd::utype2string(ispin+1)+") \n";
+          //return false;
+        }//[CO20210621 - always save good vedges, even if empty channel] else {
+        vedges[ispin].back()=iedge;
+        vVBT[ispin].back()=b_energies[iedge];
+        vCBB[ispin].back()=b_energies[iedge+1];
+        //[CO20210621 - always save good vedges, even if empty channel]}
+      }else{  //special case
         if(LDEBUG) {cerr << soliloquy << " no band edge found for k-point[" << ikpt << "]=" << kpoint << " (spin=" << ispin+1 << ")" << endl;}
         if(ikpt!=1){  
           //if we get here, kpt==1 presents an edge, but current k-point does not
           //therefore, current k-point is the outlier
-          //inconsistency among within channel
+          //inconsistency within channel
           partially_empty_channel[ispin]=1;
           //ERROR = soliloquy + " unable to detect band edge for k-point "+aurostd::utype2string(ikpt)+
           //  " (spin="+aurostd::utype2string(ispin+1)+") \n";
@@ -2696,22 +2717,6 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
         empty_channel[ispin]=1;
         if(first_kpt_empty==-1){first_kpt_empty=ikpt;}
         if(first_spin_empty==-1){first_spin_empty=ispin;}
-      } else {  //normal case
-        if(empty_channel[ispin]==1){  
-          //if we get here, empty channel detected for k-point 1, but not for current k-point
-          //therefore, 1 is the outlier
-          //inconsistency among within channel
-          partially_empty_channel[ispin]=1;
-          if(first_kpt_empty==-1){first_kpt_empty=1;}
-          if(first_spin_empty==-1){first_spin_empty=ispin;}
-          //ERROR = soliloquy + " unable to detetc band edge for k-point "+aurostd::utype2string(1)+
-          //  " (spin="+aurostd::utype2string(ispin+1)+") \n";
-          //return false;
-        } else {
-          vedges[ispin].push_back(iedge);
-          vVBT[ispin].push_back(b_energies[iedge]);
-          vCBB[ispin].push_back(b_energies[iedge+1]);
-        }
       }
 
       //BANDS analysis - STOP
@@ -2731,13 +2736,15 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   //CO20171007 - this code can handle empty types (returning empty(-partial))
   //but after talking with SC, I decided to simply return false!
   //these runs should be rerun - they are garbage!
-  if(empty_channel[0]==1 || (ISPIN==2 && empty_channel[1]==1)){
-    //[CO20200404 - OBSOLETE]ERROR = soliloquy + " unable to detect band edge for k-point "+aurostd::utype2string(first_kpt_empty)+
-    //[CO20200404 - OBSOLETE]  " (spin="+aurostd::utype2string(first_spin_empty+1)+"),"+
-    //[CO20200404 - OBSOLETE]  " this system should be rerun with a wider energy range \n";
-    message << "Unable to detect band edge for k-point " << first_kpt_empty << " (spin=" << first_spin_empty+1 << ")," << " this system should be rerun with a wider energy range";
-    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
-    else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
+  if(0){  //CO20210621 - moved below
+    if(empty_channel[0]==1 || (ISPIN==2 && empty_channel[1]==1)){
+      //[CO20200404 - OBSOLETE]ERROR = soliloquy + " unable to detect band edge for k-point "+aurostd::utype2string(first_kpt_empty)+
+      //[CO20200404 - OBSOLETE]  " (spin="+aurostd::utype2string(first_spin_empty+1)+"),"+
+      //[CO20200404 - OBSOLETE]  " this system should be rerun with a wider energy range \n";
+      message << "Unable to detect band edge for k-point " << first_kpt_empty << " (spin=" << first_spin_empty+1 << ")," << " this system should be rerun with a wider energy range";
+      if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+      else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
+    }
   }
 
   //first, we differentiate between metals / insulators
@@ -2761,13 +2768,24 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
 
   //broad_type
   for(uint ispin=0;ispin<(uint)ISPIN;ispin++){
-    if(empty_channel[ispin]){broad_type[ispin]=empty;continue;}
+    //[CO20210621 - check for metal first, even if empty]if(empty_channel[ispin]){broad_type[ispin]=empty;continue;}
     broad_type[ispin]=insulator;  //insulator unless proven otherwise
     for(uint ikpt=1;ikpt<vedges[ispin].size();ikpt++){
+      if(LDEBUG){cerr << soliloquy << " looking at vedges[ispin=" << ispin << "][ikpt-1=" << ikpt-1 << "]=" << vedges[ispin][ikpt-1] << " vs. " << vedges[ispin][ikpt] << "=vedges[ispin=" << ispin << "][ikpt=" << ikpt << "]" << endl;}
+      if(vedges[ispin][ikpt-1]==AUROSTD_MAX_UINT||vedges[ispin][ikpt]==AUROSTD_MAX_UINT){continue;}
       if(vedges[ispin][ikpt-1]!=vedges[ispin][ikpt]){
         broad_type[ispin]=metal; //metal
         break;
       }
+    }
+    if(empty_channel[ispin] && broad_type[ispin]!=metal){broad_type[ispin]=empty;}
+  }
+
+  for(uint ispin=0;ispin<(uint)ISPIN;ispin++){
+    if(broad_type[ispin]==empty){
+      message << "Unable to detect band edge for k-point " << first_kpt_empty << " (spin=" << first_spin_empty+1 << ")," << " this system should be rerun with a wider energy range";
+      if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+      else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
     }
   }
 
