@@ -3215,6 +3215,7 @@ struct _AVASP_PROTO{
   aurostd::xoption vparams;
 };
 
+void PARAMS2xvasp(_AVASP_PROTO *PARAMS,_xvasp& xvasp);  //CO20210624 - avoid duplicate code: AVASP_MakePrototype_AFLOWIN() and AVASP_MakePrototypeICSD_AFLOWIN()
 bool AVASP_MakePrototype_AFLOWIN(_AVASP_PROTO *PARAMS);
 bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS);
 bool AVASP_MakePrototype_AFLOWIN_20180101(_AVASP_PROTO *PARAMS);
