@@ -753,9 +753,14 @@ DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2
   default: 0
 
 DEFAULT_VASP_FORCE_OPTION_BADER
-  description: Adapts INCAR for VASP to retrieve core charge (AECCARx) for Bader partial charge calculation.
+  description: Adapts INCAR for VASP to retrieve core charge (AECCARx) for Bader partial charge calculation. Turning this setting on will write these files out for any calculation type (RELAX, STATIC, STATIC_BANDS, etc.).
   type: bool
   default: 0
+
+DEFAULT_VASP_FORCE_OPTION_BADER_STATIC
+  description: Adapts INCAR for VASP to retrieve core charge (AECCARx) for Bader partial charge calculation. Turning this setting on will write these files out if the calculation type includes STATIC (RELAX_STATIC, RELAX_STATIC_BANDS, STATIC_BANDS, etc.).
+  type: bool
+  default: 1
 
 DEFAULT_VASP_FORCE_OPTION_ELF
   description: Adapts INCAR for VASP to calculate the electron localization function.

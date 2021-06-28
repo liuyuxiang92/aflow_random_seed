@@ -1395,6 +1395,13 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   deque<double> vmass(xvasp.str.species_mass); // BACKUP
   //  for(uint i=0;i<xvasp.str.species.size();i++) cerr << "xvasp.str.species_mass=" << xvasp.str.species_mass.at(i) << endl;
 
+  //CO202010624 - final modification for bader calc
+  //DEFAULT_VASP_FORCE_OPTION_BADER_STATIC depends on RUN type, it must be fixed above here
+  if(DEFAULT_VASP_FORCE_OPTION_BADER_STATIC && 
+    (xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS || xvasp.AVASP_flag_RUN_RELAX_STATIC || xvasp.AVASP_flag_RUN_STATIC || xvasp.AVASP_flag_RUN_STATIC_BANDS)){
+    xvasp.aopts.flag("FLAG::AVASP_BADER",TRUE);
+  }
+
   //CO20181226 - force CHGCAR if BADER
   if(xvasp.aopts.flag("FLAG::AVASP_BADER")) {xvasp.aopts.flag("FLAG::AVASP_CHGCAR",TRUE);}
 
@@ -2238,12 +2245,12 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
 
-  if(0) {
-    if(xvasp.str.species.size()==1 || xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC || xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD) {
-      xvasp.AVASP_flag_RUN_RELAX=FALSE;
-      xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS=TRUE;
-    }
-  }
+  //[CO20210624 - do NOT modify RUN settings here, too late (see bader)]if(0) {
+  //[CO20210624 - do NOT modify RUN settings here, too late (see bader)]  if(xvasp.str.species.size()==1 || xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC || xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD) {
+  //[CO20210624 - do NOT modify RUN settings here, too late (see bader)]    xvasp.AVASP_flag_RUN_RELAX=FALSE;
+  //[CO20210624 - do NOT modify RUN settings here, too late (see bader)]    xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS=TRUE;
+  //[CO20210624 - do NOT modify RUN settings here, too late (see bader)]  }
+  //[CO20210624 - do NOT modify RUN settings here, too late (see bader)]}
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[12.3]" << endl;
 
@@ -6872,6 +6879,8 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
   xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS=TRUE;
   xvasp.AVASP_flag_RUN_STATIC=FALSE; //CO20190219
   xvasp.AVASP_flag_RUN_STATIC_BANDS=FALSE;
+
+  xvasp.aopts.flag("FLAG::AVASP_BADER",TRUE); //CO20210624 - always turn Bader on
 
   xvasp.aopts.flag("FLAG::PRECISION_SET",TRUE);
   xvasp.AVASP_flag_PRECISION_scheme=DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME;
