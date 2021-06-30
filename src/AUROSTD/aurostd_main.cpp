@@ -60,7 +60,7 @@ namespace aurostd {
   void get_offset_utc(int& offset_hours,int& offset_mins) {time_t t=time(0);struct tm *ptr_now=localtime(&t);return get_offset_utc(*ptr_now,offset_hours,offset_mins);}  //CO20210601: https://codereview.stackexchange.com/questions/175353/getting-current-timezone
   void get_offset_utc(const tm& _tstruct_inp,int& offset_hours,int& offset_mins) {  //CO20210601
     //https://codereview.stackexchange.com/questions/175353/getting-current-timezone
-    bool LDEBUG=(true || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::get_offset_utc():";
     char buffer[30];
     tm tstruct_inp=_tstruct_inp; //mktime modifies tstruct, make copy
