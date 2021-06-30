@@ -2127,7 +2127,7 @@ namespace aurostd { //HE20210511
    * Their volumes (1/3 * base area * height) is then summed up.
    * The height of the pyramids is the scalar product of the normal vector and a point on the facet.
    * Depending upon the normal direction, the height and, therefore, the volume can be negative.
-   * This ensures that overlapping volumes are handled probably.
+   * This ensures that overlapping volumes are handled properly.
    *
    * \frac{1}{3} \left| \sum_F (P0_F \cdot N_F) A_F \right|
    * P0_F first point of a facet (could be any point on facet F)

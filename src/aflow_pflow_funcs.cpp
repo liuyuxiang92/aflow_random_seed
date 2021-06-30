@@ -8317,7 +8317,7 @@ namespace pflow {
     xstructure str;
 
     // Quickly match auid to aurl (speedup from 15s to 0.5s compared to single use of AflowlibLocator)
-    if (auid != "") aurl = aurostd::execute2string(XHOST.command("aflow_data")+" vLIBS | grep -B1 \"" + auid + "\" | head -n 1");
+    if (!auid.empty()) aurl = aurostd::execute2string(XHOST.command("aflow_data")+" vLIBS | grep -B1 \"" + auid + "\" | head -n 1");
     // Fallback if quick search failed
     if (!auid.empty() && aurl.empty()) {
       cerr << soliloquy << "Quick search failed! Trying standard methode." << endl;

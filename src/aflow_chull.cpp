@@ -1736,9 +1736,9 @@ namespace chull {
   /**
    * @brief generates list of facets, if two neighboring facets are coplanar join them
    * @param facet_collection output vector containing lists of vertex indexes
-   * @param angle_threshold max angle between two facts in radian to be still coplanar
+   * @param angle_threshold max angle between two facts in radian to be still considered coplanar
    */
-  void ConvexHull::getJoinedFacets(vector<vector<uint> > &facet_collection, const double &angle_threshold) {//HE20210510
+  void ConvexHull::getJoinedFacets(vector<vector<uint> > &facet_collection, const double angle_threshold) {//HE20210510
     bool LDEBUG=(false || XHOST.DEBUG);
     string soliloquy=XPID+"ConvexHull::getJoinedFacets(): ";
 
