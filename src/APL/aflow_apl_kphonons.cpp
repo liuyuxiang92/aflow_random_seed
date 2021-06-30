@@ -659,7 +659,7 @@ namespace KBIN {
           //[CO20210315 - new style]vaspVersion = getVASPVersionNumber( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );
           double vaspVersion=KBIN::getVASPVersionDouble( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );  //CO20210315
           //[CO20210315 - new style]if (!vaspVersion.empty())
-          if (aurostd::isequal(vaspVersion,0.0)){  //CO20210315
+          if (aurostd::isequal(vaspVersion,0.0)==false){  //CO20210315
             //[CO20210315 - new style]message << "[" << vaspVersion[0] << "]."; //CO20210315
             //[CO20210315 - new style]if ((vaspVersion[0] - '0') < 5) //cool way of getting ascii value:  https://stackoverflow.com/questions/36310181/char-subtraction-in-c
             message << "[" << vaspVersion << "]."; //CO20210315

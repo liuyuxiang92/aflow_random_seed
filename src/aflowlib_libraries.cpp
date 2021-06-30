@@ -1785,7 +1785,7 @@ namespace aflowlib {
     if(aflowlib_data.vaflowlib_date.size()!=2){ //CO20200624 - this means we didn't get the LOCK dates, spit warning
       pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"LOCK dates NOT found",_LOGGER_WARNING_);
     }
-    aflowlib_data.vaflowlib_date.push_back(aurostd::get_datetime()+"_GMT"+aurostd::utype2string(aurostd::get_offset_utc())); //CO20200624 - adding LOCK date
+    aflowlib_data.vaflowlib_date.push_back(aurostd::get_datetime(true)); //CO20200624 - adding LOCK date  //CO20210624 - adding UTC offset
 
     //     cout << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << ": " << aflowlib_data.aflowlib2file(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT);
     //      aurostd::LinkFile("../../"+_XENTRY_","directory_RAW+"/"+_XENTRY_);
@@ -6287,12 +6287,12 @@ namespace aflowlib {
         aurostd::StringSubst(tmp,"[","");aurostd::StringSubst(tmp,"]","");  //just in case
         aurostd::StringSubst(tmp,"date=",""); //just in case
         if(LDEBUG) cerr << soliloquy << " FOUND LOCK date = " << tmp << endl;
-        tmp=aflow_convert_time_ctime2aurostd(tmp);
+        tmp=aflow_convert_time_ctime2aurostd(tmp);  //CO20210626 - utc_offset already included inside
         if(!tmp.empty()){
-          if(data.vaflowlib_date.empty()){data.vaflowlib_date.push_back(tmp+"_GMT"+aurostd::utype2string(aurostd::get_offset_utc()));} //get first date
+          if(data.vaflowlib_date.empty()){data.vaflowlib_date.push_back(tmp);} //get first date
           else{ //get last date
             if(data.vaflowlib_date.size()>1){data.vaflowlib_date.pop_back();}
-            data.vaflowlib_date.push_back(tmp+"_GMT"+aurostd::utype2string(aurostd::get_offset_utc()));
+            data.vaflowlib_date.push_back(tmp);
           }
         }
       }
@@ -6314,12 +6314,12 @@ namespace aflowlib {
               aurostd::StringSubst(tmp,"[","");aurostd::StringSubst(tmp,"]","");  //just in case
               aurostd::StringSubst(tmp,"date=",""); //just in case
               if(LDEBUG) cerr << soliloquy << " FOUND LOCK date = " << tmp << endl;
-              tmp=aflow_convert_time_ctime2aurostd(tmp);
+              tmp=aflow_convert_time_ctime2aurostd(tmp);  //CO20210626 - utc_offset already included inside
               if(!tmp.empty()){
-                if(data.vaflowlib_date.empty()){data.vaflowlib_date.push_back(tmp+"_GMT"+aurostd::utype2string(aurostd::get_offset_utc()));} //get first date
+                if(data.vaflowlib_date.empty()){data.vaflowlib_date.push_back(tmp);} //get first date
                 else{ //get last date
                   if(data.vaflowlib_date.size()>1){data.vaflowlib_date.pop_back();}
-                  data.vaflowlib_date.push_back(tmp+"_GMT"+aurostd::utype2string(aurostd::get_offset_utc()));
+                  data.vaflowlib_date.push_back(tmp);
                 }
               }
               //STOP taken from above

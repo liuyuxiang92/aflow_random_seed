@@ -281,21 +281,21 @@ template<class utype> std::ostream& operator<<(std::ostream&,const std::deque<ut
 // TIME stuff
 namespace aurostd {
   int get_day(void);
-  int get_day(tm* tstruct); //CO20200624
+  int get_day(const tm& tstruct); //CO20200624
   int get_month(void);
-  int get_month(tm* tsruct);  //CO20200624
+  int get_month(const tm& tstruct);  //CO20200624
   int get_year(void);
-  int get_year(tm* tstruct);  //CO20200624
-  int get_offset_utc(void); //CO20210601
-  int get_offset_utc(tm* tstruct);  //CO20210601
+  int get_year(const tm& tsruct);  //CO20200624
+  void get_offset_utc(int& offset_hours,int& offset_mins); //CO20210601
+  void get_offset_utc(const tm& tstruct,int& offset_hours,int& offset_mins);  //CO20210601
   long int get_date(void);
-  long int get_date(tm* tstruct);  //CO20200624
+  long int get_date(const tm& tsruct);  //CO20200624
   int get_hour(void);
-  int get_hour(tm* tstruct);  //CO20200624
+  int get_hour(const tm& tsruct);  //CO20200624
   int get_min(void);
-  int get_min(tm* tstruct); //CO20200624
+  int get_min(const tm& tsruct); //CO20200624
   int get_sec(void);
-  int get_sec(tm* tstruct); //CO20200624
+  int get_sec(const tm& tsruct); //CO20200624
   long double get_seconds(void);
   long double get_seconds(long double reference_seconds);
   long double get_delta_seconds(long double& seconds_begin);
@@ -306,11 +306,11 @@ namespace aurostd {
   long double get_useconds(long double reference_useconds);
   long double get_delta_useconds(long double& useconds_begin);
   string get_time(void);
-  string get_time(tm* tstruct); //CO20200624
-  string get_datetime(void);
-  string get_datetime(tm* tstruct); //CO20200624
+  string get_time(const tm& tsruct); //CO20200624
+  string get_datetime(bool include_utc_offset=false);
+  string get_datetime(const tm& tsruct,bool include_utc_offset=false); //CO20200624
   string get_datetime_formatted(const string& date_delim="/",bool include_time=true,const string& date_time_sep=" ",const string& time_delim=":");  //CO20171215
-  string get_datetime_formatted(tm* tstruct,const string& date_delim="/",bool include_time=true,const string& date_time_sep=" ",const string& time_delim=":");  //CO20171215  //CO20200624
+  string get_datetime_formatted(const tm& tsruct,const string& date_delim="/",bool include_time=true,const string& date_time_sep=" ",const string& time_delim=":");  //CO20171215  //CO20200624
   bool beep(uint=2000,uint=100); // standard values
 }
 // ----------------------------------------------------------------------------
@@ -448,8 +448,8 @@ namespace aurostd {
   bool DirectoryWritable(string directory);
   bool DirectoryUnwritable(string directory);
   string TmpStrCreate(const string& _identifier="",const string& _tmpdir="",bool hidden=false,bool directory=false);  //CO20210624
-  string TmpFileCreate(const string& identifier="",const string& tmpdir="",bool hidden=false);  //CO20210315 - empty means use XHOST.tmpfs
-  string TmpDirectoryCreate(const string& identifier="",const string& tmpdir="",bool hidden=false);  //CO20210315 - empty means use XHOST.tmpfs
+  string TmpFileCreate(const string& identifier="",const string& tmpdir="",bool hidden=false);  //CO20210315 - empty tmpdir means use XHOST.tmpfs
+  string TmpDirectoryCreate(const string& identifier="",const string& tmpdir="",bool hidden=false);  //CO20210315 - empty tmpdir means use XHOST.tmpfs
   string CleanFileName(const string& fileIN);
   string ProperFileName(string fileIN);
   bool CopyFile(string file_from,string file_to);
