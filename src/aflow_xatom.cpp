@@ -1944,7 +1944,7 @@ const AtomEnvironment& AtomEnvironment::operator=(const AtomEnvironment& b){
 // AtomEnvironment::operator<< 
 ostream& operator<<(ostream& oss, const AtomEnvironment& AtomEnvironment){
 
-  oss << AtomEnvironment.toJSON(false);
+  oss << AtomEnvironment.toJSON(ATOM_ENVIRONMENT_MODE_3,false);
 
   return oss;
 }
@@ -2028,18 +2028,50 @@ xvector<double> AtomEnvironment::index2Point(uint index){
  * @brief serialize AtomEnvironment class to json
  * @return json string
  */
-string AtomEnvironment::toJSON(bool full) const{
-    string soliloquy=XPID+"AtomEnvironment::toJSON(): ";
+string AtomEnvironment::toJSON(uint mode, bool full) const{
+  string soliloquy=XPID+"AtomEnvironment::toJSON(): ";
 
-    aurostd::JSONwriter ae_json;
+  aurostd::JSONwriter ae_json;
 
+  // this is the XtalFinder printing mode, we need to retain
+  // this printing mode since the work has been published
+  // this is flatter than the other printing method //DX20210624
+  if(mode == ATOM_ENVIRONMENT_MODE_1){
+    // element_center
+    ae_json.addString("element_center", element_center);
+    // type_center
+    ae_json.addNumber("type_center", type_center);
+    // elements_neighbor
+    ae_json.addVector("elements_neighbor", elements_neighbor);
+    // distances_neighbor
+    ae_json.addVector("distances_neighbor", distances_neighbor, 8, true);
+    // coordinations_neighbor
+    ae_json.addVector("coordinations_neighbor", coordinations_neighbor);
+
+    // coordinates_neighbor
+    vector<string> coordinates_all;
+    for(uint i=0;i<coordinates_neighbor.size();i++){
+      vector<string> coordinates_set;
+      for(uint j=0;j<coordinates_neighbor[i].size();j++){
+        aurostd::JSONwriter neighbor;
+        neighbor.mergeRawJSON("["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(coordinates_neighbor[i][j],8,true,1e-6),",")+"]");
+        coordinates_set.push_back(neighbor.toString(false));
+      }
+      aurostd::JSONwriter json_tmp;
+      json_tmp.mergeRawJSON("["+aurostd::joinWDelimiter(coordinates_set,",")+"]");
+      coordinates_all.push_back(json_tmp.toString(false));
+    }
+    ae_json.addVector("coordinates_neighbor",coordinates_all,false);
+  }
+
+  else{
     ae_json.addString("center_element", element_center);
     ae_json.addNumber("center_element_index", type_center);
     ae_json.addNumber("element_count", num_types);
 
-//    "elements_neighbor"
+    //    "elements_neighbor"
     if (full) {
-      vector <aurostd::JSONwriter> distance_collection;
+      vector<aurostd::JSONwriter> distance_collection;
       for (uint i = 0; i < elements_neighbor.size(); i++) {
         aurostd::JSONwriter distance_element;
         distance_element.addNumber("index", i);
@@ -2088,9 +2120,8 @@ string AtomEnvironment::toJSON(bool full) const{
       vector<uint> fo(facet_order, facet_order+8);
       ae_json.addVector("facet_order", fo);
     }
-
-    return ae_json.toString();
-
+  }
+  return ae_json.toString();
 }
 
 

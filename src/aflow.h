@@ -323,7 +323,7 @@ class _XHOST {
     string sPID,sTID;           // aflow_init.cpp  [PID=12345678]  [TID=12345678]
     bool showPID,showTID;       // aflow_init.cpp  check if --showPID
     // machinery
-    bool QUIET,TEST,DEBUG,MPI;
+    bool QUIET,QUIET_CERR,QUIET_COUT,TEST,DEBUG,MPI;    // extra quiet SC20210617
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
     bool POSTPROCESS; //CO20200624 - generic postprocessing, including --lib2raw and --lib2lib
     bool ARUN_POSTPROCESS; //CT20181212 - this is for the --postprocess flag needed for AEL/AGL, can be extended to other modules too
@@ -473,6 +473,8 @@ class _XHOST {
 //  vector<string> vLibrary_ICSD;     // ordered by #species
 //  vector<string> vLibrary_ICSD_ALL; // line by line
 
+// all the at(N) need to be sequetial !!!
+  
 #define XHOST_README_AFLOW_LICENSE_GPL3_TXT            XHOST.vGlobal_string.at(40)
 #define XHOST_README_AFLOW_TXT                         XHOST.vGlobal_string.at(41)
 #define XHOST_README_AFLOW_VERSIONS_HISTORY_TXT        XHOST.vGlobal_string.at(42)
@@ -487,14 +489,14 @@ class _XHOST {
 #define XHOST_README_AFLOW_AEL_TXT                     XHOST.vGlobal_string.at(51)
 #define XHOST_README_AFLOW_ANRL_TXT                    XHOST.vGlobal_string.at(52)
 #define XHOST_README_AFLOW_COMPARE_TXT                 XHOST.vGlobal_string.at(53)
-#define XHOST_README_AFLOW_GFA_TXT                     XHOST.vGlobal_string.at(53)  //CO20190401
-#define XHOST_README_AFLOW_SYM_TXT                     XHOST.vGlobal_string.at(54)
-#define XHOST_README_AFLOW_CCE_TXT                     XHOST.vGlobal_string.at(55)  //CO20190620
-#define XHOST_README_AFLOW_CHULL_TXT                   XHOST.vGlobal_string.at(56)  //CO20190620
-#define XHOST_README_AFLOW_EXCEPTIONS_TXT              XHOST.vGlobal_string.at(57)  //ME20180705
-#define XHOST_README_PROTO_TXT                         XHOST.vGlobal_string.at(58)
-#define XHOST_README_AFLOW_XAFLOW_TXT                  XHOST.vGlobal_string.at(59)
-#define XHOST_README_AFLOW_AFLOWRC_TXT                 XHOST.vGlobal_string.at(60)
+#define XHOST_README_AFLOW_GFA_TXT                     XHOST.vGlobal_string.at(54)  //CO20190401
+#define XHOST_README_AFLOW_SYM_TXT                     XHOST.vGlobal_string.at(55)
+#define XHOST_README_AFLOW_CCE_TXT                     XHOST.vGlobal_string.at(56)  //CO20190620
+#define XHOST_README_AFLOW_CHULL_TXT                   XHOST.vGlobal_string.at(57)  //CO20190620
+#define XHOST_README_AFLOW_EXCEPTIONS_TXT              XHOST.vGlobal_string.at(58)  //ME20180705
+#define XHOST_README_PROTO_TXT                         XHOST.vGlobal_string.at(59)
+#define XHOST_README_AFLOW_XAFLOW_TXT                  XHOST.vGlobal_string.at(60)
+#define XHOST_README_AFLOW_AFLOWRC_TXT                 XHOST.vGlobal_string.at(61)
 
 #define XHOST_FINDSYM_data_space_txt                   XHOST.vGlobal_string.at(70)
 #define XHOST_FINDSYM_data_wyckoff_txt                 XHOST.vGlobal_string.at(71)
@@ -1448,7 +1450,7 @@ class AtomEnvironment{
     void getAtomEnvironment(const xstructure& xstr, uint center_index, const vector<string>& neighbor_elements, uint mode=ATOM_ENVIRONMENT_MODE_1); // get restricted environment (via specified elements) around atom index
     void constructAtomEnvironmentHull(void);                                                                                                        // construct hull around an environment //HE20210408
     xvector<double> index2Point(uint index);                                                                                                        // flat view on coordinates_neighbor //HE20210408
-    string toJSON(bool full=true) const;
+    string toJSON(uint mode=ATOM_ENVIRONMENT_MODE_3, bool full=true) const;                 //HE20210408 //DX20210624 - added mode input
   private:
     void free();                                                                            // free operator
     void copy(const AtomEnvironment& b);                                                    // copy constructor
