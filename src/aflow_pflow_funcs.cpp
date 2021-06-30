@@ -7245,10 +7245,15 @@ namespace pflow {
 
   string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // main function //char mode //CO20190629
     // 2-D, we usually want vred=gcd_vrt true for convex points, and no_vrt elsewhere
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "pflow::prettyPrintCompound():";
     stringstream message;
     uint precision=COEF_PRECISION;
     stringstream output;output.precision(precision);
+    if(LDEBUG){
+      cerr << soliloquy << " vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;
+      cerr << soliloquy << " vcomposition=" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(vcomposition),",") << endl;
+    }
     if(vspecies.size()!=(uint)vcomposition.rows) {
       message << "vspecies.size() != vcomposition.rows" << endl;
       message << "vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;

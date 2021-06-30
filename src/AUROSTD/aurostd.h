@@ -447,10 +447,9 @@ namespace aurostd {
   bool DirectorySkipped(string directory);
   bool DirectoryWritable(string directory);
   bool DirectoryUnwritable(string directory);
-  string TmpFileCreate(const string& prefix,const string& _tmpdir="",bool hidden=false);  //CO20210315 - empty means use XHOST.tmpfs
-  string TmpFileCreate(void);
-  string TmpDirectoryCreate(const string& prefix,const string& _tmpdir="",bool hidden=false);  //CO20210315 - empty means use XHOST.tmpfs
-  string TmpDirectoryCreate(void);
+  string TmpStrCreate(const string& _identifier="",const string& _tmpdir="",bool hidden=false,bool directory=false);  //CO20210624
+  string TmpFileCreate(const string& identifier="",const string& tmpdir="",bool hidden=false);  //CO20210315 - empty means use XHOST.tmpfs
+  string TmpDirectoryCreate(const string& identifier="",const string& tmpdir="",bool hidden=false);  //CO20210315 - empty means use XHOST.tmpfs
   string CleanFileName(const string& fileIN);
   string ProperFileName(string fileIN);
   bool CopyFile(string file_from,string file_to);
@@ -458,7 +457,8 @@ namespace aurostd {
   //CO START
   bool MatchCompressed(const string& CompressedFileName,const string& FileNameOUT);
   // [OBSOLETE]  bool DecompressFile(const string& CompressedFileName);
-  bool efile2tempfile(string _FileNameIN, string& FileNameOUT); //CO20180220
+  bool efile2tempfile(const string& _FileNameIN, string& FileNameOUT); //CO20180220
+  bool efile2tempfile(const string& _FileNameIN, string& FileNameOUT,bool& tempfile_created); //CO20180220
   bool IsCompressed(const string& FileNameIn,string& FileNameOut);
   bool IsCompressed(const string& FileNameIn);
   string GetCompressionExtension(const string& CompressedFileName);
@@ -573,6 +573,7 @@ namespace aurostd {
   // about sleeping
   unsigned int Sleep(unsigned int seconds);
   // about extracting from to files
+  vector<string> GrepFile(const string& filename,const string& keyword,bool RemoveWS=false,bool RemoveComments=true); //CO20210623
   bool ExtractToFileEXPLICIT(ifstream& FileIN,string FileNameOUTPUT,string Keyword);
   bool ExtractToFileEXPLICIT(string StringIN,string FileNameOUTPUT,string Keyword);
   bool ExtractToFileEXPLICIT(ifstream& FileIN,string FileNameOUTPUT,string Keyword_start,string Keyword_stop);

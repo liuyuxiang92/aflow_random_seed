@@ -150,24 +150,23 @@ namespace aurostd {
 // ***************************************************************************
 // FILES creation/destruction
 namespace aurostd {
-  string TmpFileCreate(const string& identifier,const string& _tmpdir,bool hidden) {  //CO20210315
-    string tmpdir=_tmpdir;  //CO20210315
-    if(tmpdir.empty()){tmpdir=XHOST.tmpfs;} //CO20210315
-    string str=tmpdir+"/"+(hidden?".":"")+"_aflow_"+identifier+"."+XHOST.user+".pid"+XHOST.ostrPID.str()+".tid"+XHOST.ostrTID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+".tmp"; //CO20200502 - threadID
-    // cerr << str << endl;
+  string TmpStrCreate(const string& _identifier,const string& _tmpdir,bool hidden,bool directory){
+    string identifier=_identifier;if(identifier.empty()){identifier="tmp";} //CO20210624
+    string tmpdir=_tmpdir;if(tmpdir.empty()){tmpdir=XHOST.tmpfs;} //CO20210315
+    string str=tmpdir+"/"+(hidden?".":"")+"_aflow_"+identifier+"."+XHOST.user+".pid"+XHOST.ostrPID.str()+".tid"+XHOST.ostrTID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+(directory?"_":".")+"tmp"; //CO20200502 - threadID
     str=aurostd::CleanFileName(str);
     return str;
   }
-  string TmpFileCreate(void) {return TmpFileCreate("");}
-  string TmpDirectoryCreate(const string& identifier,const string& _tmpdir,bool hidden) { //CO20210315
-    string tmpdir=_tmpdir;  //CO20210315
-    if(tmpdir.empty()){tmpdir=XHOST.tmpfs;} //CO20210315
-    string dir=tmpdir+"/"+(hidden?".":"")+"_aflow_"+identifier+"_"+XHOST.user+"_pid"+XHOST.ostrPID.str()+"_tid"+XHOST.ostrTID.str()+"_a"+AFLOW_VERSION+"_rnd"+aurostd::utype2string(uint((double) std::floor((double) 100000*aurostd::ran0())))+"_u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_tmp";  //CO20200502 - threadID
-    dir=aurostd::CleanFileName(dir);
+  string TmpFileCreate(const string& identifier,const string& tmpdir,bool hidden) {  //CO20210315
+    bool directory=false; //creating a file
+    return TmpStrCreate(identifier,tmpdir,hidden,directory);
+  }
+  string TmpDirectoryCreate(const string& identifier,const string& tmpdir,bool hidden) { //CO20210315
+    bool directory=true; //creating a directory
+    string dir=TmpStrCreate(identifier,tmpdir,hidden,directory);
     DirectoryMake(dir);
     return dir;
   }
-  string TmpDirectoryCreate(void) {return TmpDirectoryCreate("");}
 }
 
 // ***************************************************************************
@@ -2049,11 +2048,16 @@ namespace aurostd {
   //***************************************************************************//
   // aurostd::efile2tempfile
   //***************************************************************************//
-  bool efile2tempfile(string _FileNameIN, string& FileNameOUT) {
+  bool efile2tempfile(const string& _FileNameIN,string& FileNameOUT) {  //CO20210623
+    bool tempfile_created=false;
+    return efile2tempfile(_FileNameIN,FileNameOUT,tempfile_created);
+  }
+  bool efile2tempfile(const string& _FileNameIN,string& FileNameOUT,bool& tempfile_created) { //CO20210623
     //Corey Oses
     //Decompresses file to temp file, and return its path
     //SAFE: Will return FileNameIn if compression not needed
     string FileNameIN="";
+    tempfile_created=false;
     if(!(aurostd::FileExist(_FileNameIN,FileNameIN) || aurostd::EFileExist(_FileNameIN,FileNameIN))) {  //CO20191110 - get FileNameIN from functions
       cerr << endl;
       cerr << "ERROR - aurostd::efile2tempfile: file=" << _FileNameIN << " not present !" << endl;  ///is empty
@@ -2068,6 +2072,7 @@ namespace aurostd {
     stringstream FileNameIN_ss;
     aurostd::efile2stringstream(FileNameIN, FileNameIN_ss);
     FileNameOUT = aurostd::TmpFileCreate();
+    tempfile_created=true;
     aurostd::stringstream2file(FileNameIN_ss, FileNameOUT);
     return TRUE;
   }
@@ -2304,6 +2309,7 @@ namespace aurostd {
   // return a simple bool, nothing else, from a string (which is supposed to be
   // a file name)
   bool FileExist(const string& FileName) {
+    if(FileName.empty()){return false;} //CO20210623
     string file(CleanFileName(FileName));
     //   cerr << file << endl;
     bool exist=FALSE;
@@ -3306,6 +3312,31 @@ namespace aurostd {
     // aus << "sleep " << (int) seconds << " " << endl;
     // aurostd::execute(aus);
     return sleep(seconds);
+  }
+
+  // *******************************************************************************************
+  // *******************************************************************************************
+  vector<string> GrepFile(const string& filename,const string& keyword,bool RemoveWS,bool RemoveComments){  //CO20210623 - update after integrating new substring2bool (RemoveWS,RemoveComments)
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"aurostd::GrepFile():";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+    vector<string> vout;
+    if(aurostd::FileExist(filename)==false){return vout;}
+
+    if(RemoveWS && RemoveComments){;} //keep busy until we update substring2bool
+
+    string strline="";
+    ifstream FileStream;FileStream.open(filename.c_str(),std::ios::in);
+    while(getline(FileStream,strline)){
+      if(aurostd::substring2bool(strline,keyword,RemoveWS)) {
+        if(LDEBUG){cerr << soliloquy << " found matching line: \"" << strline << "\"" << endl;}
+        vout.push_back(strline);
+      }
+    }
+
+    if(LDEBUG){cerr << soliloquy << " END" << endl;}
+    return vout;
   }
 
   // *******************************************************************************************

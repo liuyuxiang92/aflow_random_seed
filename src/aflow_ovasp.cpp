@@ -1467,7 +1467,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
             vline.push_back(vcontent.at(iline));
 
   if(vline.size()!=0) {
-    if(LDEBUG) cout << soliloquy << " LDAU calculation in OUTCAR" << endl;
+    if(LDEBUG) cerr << soliloquy << " LDAU calculation in OUTCAR" << endl;
     int LDAUT=0;
     vector<int> vLDAUL;vector<double> vLDAUU,vLDAUJ;
     for(uint j=0;j<vline.size();j++) {
@@ -1536,7 +1536,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     for(uint i=0;i<vLDAUJ.size();i++) sdata_ldau << vLDAUJ.at(i) << ((i<vLDAUJ.size()-1)?",":"");
     //sdata_ldau << ";";
     string_LDAU=sdata_ldau.str();
-    if(LDEBUG) cout << soliloquy << " string_LDAU=" << string_LDAU << endl;
+    if(LDEBUG) cerr << soliloquy << " string_LDAU=" << string_LDAU << endl;
   }
 
   if(LDEBUG) cerr << soliloquy << " species_pp_vLDAU.size()=" << species_pp_vLDAU.size() << endl;
@@ -1769,7 +1769,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(tokens.size()>2) calculation_cores=aurostd::string2utype<uint>(tokens.at(2));
   }
   if(calculation_cores<1) calculation_cores=1; 
-  if(LDEBUG) cout << soliloquy << " calculation_cores=" << calculation_cores << endl;
+  if(LDEBUG) cerr << soliloquy << " calculation_cores=" << calculation_cores << endl;
   // CALCULATION_TIME
   calculation_time=0.0;
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--){  // NEW FROM THE BACK
@@ -1788,7 +1788,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   }
   aurostd::string2tokens(line,tokens);
   if(tokens.size()>1) calculation_time=aurostd::string2utype<double>(tokens.at(tokens.size()-1));
-  if(LDEBUG) cout << soliloquy << " calculation_time=" << calculation_time << endl;
+  if(LDEBUG) cerr << soliloquy << " calculation_time=" << calculation_time << endl;
   // CALCULATION_MEMORY 
   calculation_memory=0.0;
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW FROM THE BACK
@@ -1805,7 +1805,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   }
   aurostd::string2tokens(line,tokens); //   cerr << tokens.at(3) << endl;
   if(tokens.size()>3) calculation_memory=aurostd::string2utype<double>(tokens.at(3));
-  if(LDEBUG) cout << soliloquy << " calculation_memory=" << calculation_memory << endl;
+  if(LDEBUG) cerr << soliloquy << " calculation_memory=" << calculation_memory << endl;
   if(LDEBUG) cerr << soliloquy << " ---------------------------------" << endl;
 
   // ----------------------------------------------------------------------
@@ -4259,7 +4259,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
-  if(LDEBUG) cout << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -4544,32 +4544,32 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(0) cout << " spinF = " << ((spinF!=AUROSTD_NAN)?aurostd::utype2string(spinF,5):"unavailable") << endl;
 
   // ----------------------------------------------------------------------
-  if(LDEBUG) cout << soliloquy << " title=" << title << endl;
-  if(LDEBUG) cout << soliloquy << " spin=" << spin << endl;
-  if(LDEBUG) cout << soliloquy << " Vol=" << Vol << endl;
-  if(LDEBUG) cout << soliloquy << " lattice=" << lattice << endl;
-  if(LDEBUG) cout << soliloquy << " POTIM=" << POTIM << endl;
-  if(LDEBUG) cout << soliloquy << " temperature=" << temperature << endl;
-  if(LDEBUG) cout << soliloquy << " RWIGS=" << RWIGS << endl;
-  if(LDEBUG) cout << soliloquy << " Efermi=" << Efermi << endl;
-  if(LDEBUG) cout << soliloquy << " spinF=" << spinF << endl;
-  if(LDEBUG) cout << soliloquy << " number_energies=" << number_energies << endl;
-  if(LDEBUG) cout << soliloquy << " energy_max=" << energy_max << " energy_min=" << energy_min << endl;
-  if(LDEBUG) cout << soliloquy << " denergy=" << denergy << endl;
-  if(LDEBUG) cout << soliloquy << " venergy.size()=" << venergy.size() << " venergyEf.size()=" << venergyEf.size() << endl;
-  if(LDEBUG) cout << soliloquy << " vDOS.size()=" << vDOS.size() << ", " << vDOS[0].size() << ", " << vDOS[0][0].size() << ", " << vDOS[0][0][0].size() << std::endl;  //ME20190614 - new vDOS format
-  if(LDEBUG) cout << soliloquy << " viDOS.size()=" << viDOS.size() << ", " << viDOS[0].size() << ", " << std::endl;  //ME20190614 - new viDOS format
-  //if(LDEBUG) cout << soliloquy << " vDOS.size()=" << vDOS.size() << " vDOS.at(max).size()=" << vDOS.at(vDOS.size()-1).size() << endl;  OBSOLETE ME20190614
-  //if(LDEBUG) cout << soliloquy << " viDOS.size()=" << viDOS.size() << " viDOS.at(max).size()=" << viDOS.at(viDOS.size()-1).size() << endl;  OBSOLETE ME20190614
-  //if(LDEBUG) cout << soliloquy << " vDOSs.size()=" << vDOSs.size() << endl;  OBSOLETE ME20190614
-  // if(LDEBUG) cout << soliloquy << " vDOSs.at(max).size()=" << vDOSs.at(vDOSs.size()-1).size() << endl;
-  //if(LDEBUG) cout << soliloquy << " vDOSp.size()=" << vDOSp.size() << endl;  OBSOLETE ME20190614
-  // if(LDEBUG) cout << soliloquy << " vDOSp.at(max).size()=" << vDOSp.at(vDOSp.size()-1).size() << endl;
-  //if(LDEBUG) cout << soliloquy << " vDOSd.size()=" << vDOSd.size() << endl;  OBSOLETE ME20190614
-  // if(LDEBUG) cout << soliloquy << " vDOSd.at(max).size()=" << vDOSd.at(vDOSd.size()-1).size() << endl;
+  if(LDEBUG) cerr << soliloquy << " title=" << title << endl;
+  if(LDEBUG) cerr << soliloquy << " spin=" << spin << endl;
+  if(LDEBUG) cerr << soliloquy << " Vol=" << Vol << endl;
+  if(LDEBUG) cerr << soliloquy << " lattice=" << lattice << endl;
+  if(LDEBUG) cerr << soliloquy << " POTIM=" << POTIM << endl;
+  if(LDEBUG) cerr << soliloquy << " temperature=" << temperature << endl;
+  if(LDEBUG) cerr << soliloquy << " RWIGS=" << RWIGS << endl;
+  if(LDEBUG) cerr << soliloquy << " Efermi=" << Efermi << endl;
+  if(LDEBUG) cerr << soliloquy << " spinF=" << spinF << endl;
+  if(LDEBUG) cerr << soliloquy << " number_energies=" << number_energies << endl;
+  if(LDEBUG) cerr << soliloquy << " energy_max=" << energy_max << " energy_min=" << energy_min << endl;
+  if(LDEBUG) cerr << soliloquy << " denergy=" << denergy << endl;
+  if(LDEBUG) cerr << soliloquy << " venergy.size()=" << venergy.size() << " venergyEf.size()=" << venergyEf.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " vDOS.size()=" << vDOS.size() << ", " << vDOS[0].size() << ", " << vDOS[0][0].size() << ", " << vDOS[0][0][0].size() << std::endl;  //ME20190614 - new vDOS format
+  if(LDEBUG) cerr << soliloquy << " viDOS.size()=" << viDOS.size() << ", " << viDOS[0].size() << ", " << std::endl;  //ME20190614 - new viDOS format
+  //if(LDEBUG) cerr << soliloquy << " vDOS.size()=" << vDOS.size() << " vDOS.at(max).size()=" << vDOS.at(vDOS.size()-1).size() << endl;  OBSOLETE ME20190614
+  //if(LDEBUG) cerr << soliloquy << " viDOS.size()=" << viDOS.size() << " viDOS.at(max).size()=" << viDOS.at(viDOS.size()-1).size() << endl;  OBSOLETE ME20190614
+  //if(LDEBUG) cerr << soliloquy << " vDOSs.size()=" << vDOSs.size() << endl;  OBSOLETE ME20190614
+  // if(LDEBUG) cerr << soliloquy << " vDOSs.at(max).size()=" << vDOSs.at(vDOSs.size()-1).size() << endl;
+  //if(LDEBUG) cerr << soliloquy << " vDOSp.size()=" << vDOSp.size() << endl;  OBSOLETE ME20190614
+  // if(LDEBUG) cerr << soliloquy << " vDOSp.at(max).size()=" << vDOSp.at(vDOSp.size()-1).size() << endl;
+  //if(LDEBUG) cerr << soliloquy << " vDOSd.size()=" << vDOSd.size() << endl;  OBSOLETE ME20190614
+  // if(LDEBUG) cerr << soliloquy << " vDOSd.at(max).size()=" << vDOSd.at(vDOSd.size()-1).size() << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
-  if(LDEBUG) cout << soliloquy << " END (" << time_delay(seconds) << ")" << endl;  
+  if(LDEBUG) cerr << soliloquy << " END (" << time_delay(seconds) << ")" << endl;  
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
   //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - xDOSCAR::GetProperties: ERROR_flag set in xDOSCAR" << endl;
@@ -5155,7 +5155,7 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
-  if(LDEBUG) cout << "xEIGENVAL::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << "xEIGENVAL::GetProperties: BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -5238,31 +5238,31 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     }
   }
   // ----------------------------------------------------------------------
-  if(LDEBUG) cout << "xEIGENVAL::GetProperties: title=" << title << endl;
-  if(LDEBUG) cout << "xEIGENVAL::GetProperties: spin=" << spin << endl;
-  if(LDEBUG) cout << "xEIGENVAL::GetProperties: Vol=" << Vol << endl;
-  if(LDEBUG) cout << "xEIGENVAL::GetProperties: lattice=" << lattice << endl;
-  if(LDEBUG) cout << "xEIGENVAL::GetProperties: POTIM=" << POTIM << endl;
-  if(LDEBUG) cout << "xEIGENVAL::GetProperties: temperature=" << temperature << endl;
-  if(LDEBUG) cout << "xEIGENVAL::GetProperties: number_electrons=" << number_electrons << endl;
-  if(LDEBUG) cout << "xEIGENVAL::GetProperties: number_kpoints=" << number_kpoints << endl;
-  if(LDEBUG) cout << "xEIGENVAL::GetProperties: number_bands=" << number_bands << endl;
-  if(LDEBUG) cout << "xEIGENVAL::GetProperties: vweight.size()=" << vweight.size() << endl;
-  if(LDEBUG) cout << "xEIGENVAL::GetProperties: vkpoint.size()=" << vkpoint.size() << endl;
-  if(LDEBUG) cout << "xEIGENVAL::GetProperties: venergy.size()=" << venergy.size() << endl;
-  if(LDEBUG) cout << "xEIGENVAL::GetProperties: venergy.at(max).size()=" << venergy.at(venergy.size()-1).size() << endl;
-  if(LDEBUG) cout << "xEIGENVAL::GetProperties: venergy.at(max).at(max).size()=" 
+  if(LDEBUG) cerr << "xEIGENVAL::GetProperties: title=" << title << endl;
+  if(LDEBUG) cerr << "xEIGENVAL::GetProperties: spin=" << spin << endl;
+  if(LDEBUG) cerr << "xEIGENVAL::GetProperties: Vol=" << Vol << endl;
+  if(LDEBUG) cerr << "xEIGENVAL::GetProperties: lattice=" << lattice << endl;
+  if(LDEBUG) cerr << "xEIGENVAL::GetProperties: POTIM=" << POTIM << endl;
+  if(LDEBUG) cerr << "xEIGENVAL::GetProperties: temperature=" << temperature << endl;
+  if(LDEBUG) cerr << "xEIGENVAL::GetProperties: number_electrons=" << number_electrons << endl;
+  if(LDEBUG) cerr << "xEIGENVAL::GetProperties: number_kpoints=" << number_kpoints << endl;
+  if(LDEBUG) cerr << "xEIGENVAL::GetProperties: number_bands=" << number_bands << endl;
+  if(LDEBUG) cerr << "xEIGENVAL::GetProperties: vweight.size()=" << vweight.size() << endl;
+  if(LDEBUG) cerr << "xEIGENVAL::GetProperties: vkpoint.size()=" << vkpoint.size() << endl;
+  if(LDEBUG) cerr << "xEIGENVAL::GetProperties: venergy.size()=" << venergy.size() << endl;
+  if(LDEBUG) cerr << "xEIGENVAL::GetProperties: venergy.at(max).size()=" << venergy.at(venergy.size()-1).size() << endl;
+  if(LDEBUG) cerr << "xEIGENVAL::GetProperties: venergy.at(max).at(max).size()=" 
     << venergy.at(venergy.size()-1).at(venergy.at(venergy.size()-1).size()-1).size() << endl;
 
   // for(uint i=0;i<venergy.size();i++)
-  //   if(LDEBUG) cout << "xEIGENVAL::GetProperties: venergy.at.(" << i << ").size()=" << venergy.at(i).size() << endl;
+  //   if(LDEBUG) cerr << "xEIGENVAL::GetProperties: venergy.at.(" << i << ").size()=" << venergy.at(i).size() << endl;
   // for(uint i=0;i<venergy.size();i++)
   //   for(uint j=0;j<venergy.at(i).size();j++)
-  //     if(LDEBUG) cout << "xEIGENVAL::GetProperties: venergy.at.(" << i << ").at.(" << j << ").size()=" << venergy.at(i).at(j).size() << endl;
+  //     if(LDEBUG) cerr << "xEIGENVAL::GetProperties: venergy.at.(" << i << ").at.(" << j << ").size()=" << venergy.at(i).at(j).size() << endl;
 
   // ----------------------------------------------------------------------
   // DONE NOW RETURN  
-  if(LDEBUG) cout << "xEIGENVAL::GetProperties: END (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << "xEIGENVAL::GetProperties: END (" << time_delay(seconds) << ")" << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
   //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - xEIGENVAL::GetProperties: ERROR_flag set in xEIGENVAL" << endl;
@@ -8091,7 +8091,7 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
-  if(LDEBUG) cout << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -8423,7 +8423,7 @@ bool xIBZKPT::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   bool ERROR_flag=FALSE;
 
   long double seconds=aurostd::get_seconds();
-  if(LDEBUG) cout << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -8637,7 +8637,7 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   clear(); // so it does not mess up vector/deque
 
   long double seconds=aurostd::get_seconds();
-  if(LDEBUG) cout << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
 
   content=stringstreamIN.str();
   vcontent.clear();
@@ -8949,7 +8949,7 @@ bool xCHGCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
-  if(LDEBUG) cout << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
