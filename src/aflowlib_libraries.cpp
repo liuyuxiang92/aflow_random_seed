@@ -3438,12 +3438,12 @@ namespace aflowlib {
     for(uint i=0;i<(uint) data.natoms;i++) {
       data.positions_cartesian+=aurostd::utype2string(data_vpositions_cartesian.at(i)[1],precfp)+","+aurostd::utype2string(data_vpositions_cartesian.at(i)[2],precfp)+","+aurostd::utype2string(data_vpositions_cartesian.at(i)[3],precfp);
       if(i<data.natoms-1) data.positions_cartesian+=";";
-      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " POSITIONS_CARTESIAN = " << data_vpositions_cartesian.at(i)[1] << "," << data_vpositions_cartesian.at(i)[2] << "," << data_vpositions_cartesian.at(i)[3] << "," << endl;
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " POSITIONS_CARTESIAN = " << data_vpositions_cartesian.at(i)[1] << "," << data_vpositions_cartesian.at(i)[2] << "," << data_vpositions_cartesian.at(i)[3] << endl;
     }
     for(uint i=0;i<(uint) data.natoms;i++) {
       data.forces+=aurostd::utype2string(data_vforces.at(i)[1],precfp)+","+aurostd::utype2string(data_vforces.at(i)[2],precfp)+","+aurostd::utype2string(data_vforces.at(i)[3],precfp);
       if(i<data.natoms-1) data.forces+=";";
-      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " FORCES(eV/Angst) = " << data_vforces.at(i)[1] << "," << data_vforces.at(i)[2] << "," << data_vforces.at(i)[3] << "," << endl;
+      if(AFLOWLIB_VERBOSE) cout << MESSAGE << " FORCES(eV/Angst) = " << data_vforces.at(i)[1] << "," << data_vforces.at(i)[2] << "," << data_vforces.at(i)[3] << endl;
     }
 
     // LOAD SPECIES
@@ -6883,7 +6883,7 @@ namespace aflowlib {
 }
 
 // ***************************************************************************
-// void aflowlib::vaspfile2stringstream(string& str_dir, const string& FILE, stringstream& ss_vaspfile)
+// void aflowlib::VaspFileExist(const string& str_dir, const string& FILE)
 // ***************************************************************************
 namespace aflowlib {
   bool VaspFileExist(const string& str_dir, const string& FILE) {
@@ -6908,15 +6908,15 @@ namespace aflowlib {
   uint _OLD_vaspfile2stringstream(const string& str_dir, const string& FILE, stringstream& sss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    string soliloquy = XPID + "aflowlib::vaspfile2stringstream():";
+    string soliloquy=XPID+"aflowlib::vaspfile2stringstream():";
     string message = "";
-    if(LDEBUG) cerr << XPID << "vaspfile2stringstream: BEGIN" << endl;
+    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
     //if XXXX.bands exists, you may also use this function by setting FILE=vaspfile.bands
     sss.clear(); sss.str(std::string(""));
     bool gfound=FALSE;
     if(!gfound && (FILE=="EIGENVAL" || FILE=="KPOINTS")) {
       gfound=TRUE;
-      if(LDEBUG) cerr << XPID << "vaspfile2stringstream: 1=" << FILE << endl;
+      if(LDEBUG) cerr << soliloquy << " 1=" << FILE << endl;
       for(uint iext=0;iext<XHOST.vext.size();iext++) {
         if(aurostd::FileExist(str_dir+"/"+FILE+XHOST.vext.at(iext))) { sss << aurostd::execute2string(XHOST.vcat.at(iext)+" \""+ str_dir+"/"+FILE+XHOST.vext.at(iext)+"\"");return sss.str().length(); }
         if(aurostd::FileExist(str_dir+"/"+FILE+".bands"+XHOST.vext.at(iext))) { sss << aurostd::execute2string(XHOST.vcat.at(iext)+" \""+ str_dir+"/"+FILE+".bands"+XHOST.vext.at(iext)+"\"");return sss.str().length(); }
@@ -6926,7 +6926,7 @@ namespace aflowlib {
     }
     if(!gfound && (FILE=="DOSCAR")) {
       gfound=TRUE;
-      if(LDEBUG) cerr << XPID << "vaspfile2stringstream: 2=" << FILE << endl;
+      if(LDEBUG) cerr << soliloquy << " 2=" << FILE << endl;
       for(uint iext=0;iext<XHOST.vext.size();iext++) {
         if(aurostd::FileExist(str_dir+"/"+FILE+XHOST.vext.at(iext))) { sss << aurostd::execute2string(XHOST.vcat.at(iext)+" \""+ str_dir+"/"+FILE+XHOST.vext.at(iext)+"\"");return sss.str().length(); }
         if(aurostd::FileExist(str_dir+"/"+FILE+".static"+XHOST.vext.at(iext))) { sss << aurostd::execute2string(XHOST.vcat.at(iext)+" \""+ str_dir+"/"+FILE+".static"+XHOST.vext.at(iext)+"\"");return sss.str().length(); }
@@ -6936,7 +6936,7 @@ namespace aflowlib {
     }
     if(!gfound && (FILE=="POSCAR")) {
       gfound=TRUE;
-      if(LDEBUG) cerr << XPID << "vaspfile2stringstream: 1=" << FILE << endl;
+      if(LDEBUG) cerr << soliloquy << " 1=" << FILE << endl;
       for(uint iext=0;iext<XHOST.vext.size();iext++) {
         if(aurostd::FileExist(str_dir+"/"+FILE+XHOST.vext.at(iext))) { sss << aurostd::execute2string(XHOST.vcat.at(iext)+" \""+ str_dir+"/"+FILE+XHOST.vext.at(iext)+"\"");return sss.str().length(); }
         if(aurostd::FileExist(str_dir+"/"+FILE+".bands"+XHOST.vext.at(iext))) { sss << aurostd::execute2string(XHOST.vcat.at(iext)+" \""+ str_dir+"/"+FILE+".bands"+XHOST.vext.at(iext)+"\"");return sss.str().length(); }
@@ -6947,7 +6947,7 @@ namespace aflowlib {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
     }
     if(!gfound) {
-      if(LDEBUG) cerr << XPID << "vaspfile2stringstream: 3=" << FILE << endl;
+      if(LDEBUG) cerr << soliloquy << " 3=" << FILE << endl;
       for(uint iext=0;iext<XHOST.vext.size();iext++) {
         if(aurostd::FileExist(str_dir+"/"+FILE+XHOST.vext.at(iext))) { sss << aurostd::execute2string(XHOST.vcat.at(iext)+" \""+ str_dir+"/"+FILE+XHOST.vext.at(iext)+"\"");return sss.str().length(); }
         if(aurostd::FileExist(str_dir+"/"+FILE+".static"+XHOST.vext.at(iext))) { sss << aurostd::execute2string(XHOST.vcat.at(iext)+" \""+ str_dir+"/"+FILE+".static"+XHOST.vext.at(iext)+"\"");return sss.str().length(); }
@@ -6957,7 +6957,7 @@ namespace aflowlib {
       message = FILE+" or "+FILE+".static/relax1/bands or "+FILE+".static/relax1/bands.EXT not found in the directory, aborting!";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
     }
-    if(LDEBUG) cerr << XPID << "vaspfile2stringstream: END" << endl;
+    if(LDEBUG) cerr << soliloquy << " END" << endl;
     return sss.str().length();
   }
 }
@@ -6969,21 +6969,22 @@ namespace aflowlib {
 namespace aflowlib {
   string vaspfile2stringstream(const string& str_dir, const string& FILE, stringstream& sss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "aflowlib::vaspfile2stringstream: BEGIN" << endl;
+    string soliloquy=XPID+"aflowlib::vaspfile2stringstream():";
+    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
     //if XXXX.bands exists, you may also use this function by setting FILE=vaspfile.bands
     sss.clear(); sss.str(std::string(""));
     bool gfound=FALSE;
     if(!gfound && (FILE=="EIGENVAL" || FILE=="KPOINTS")) {
       gfound=TRUE;
-      if(LDEBUG) cerr << XPID << "aflowlib::vaspfile2stringstream: FILE=" << FILE << endl;
+      if(LDEBUG) cerr << soliloquy << " FILE=" << FILE << endl;
       string extension=".bz2,.gz,.xz,.bands,.bands.bz2,.bands.gz,.bands.xz";
       deque<string> vtype;aurostd::string2tokens(extension,vtype,",");vtype.push_front(""); // have to add emptyness to vtype at the beginning
       //     if(LDEBUG) aurostd::execute("ls -las \""+str_dir+"\"");
       for(uint i=0;i<vtype.size();i++) {
-        if(LDEBUG) cerr << XPID << "aflowlib::vaspfile2stringstream: TESTING FILE=[" << str_dir+"/"+FILE+vtype.at(i) << "]" << endl;
+        if(LDEBUG) cerr << soliloquy << " TESTING FILE=[" << str_dir+"/"+FILE+vtype.at(i) << "]" << endl;
         if(aurostd::FileExist(str_dir+"/"+FILE+vtype.at(i))) {
           aurostd::efile2stringstream(str_dir+"/"+FILE+vtype.at(i),sss);
-          if(LDEBUG) cerr << XPID << "aflowlib::vaspfile2stringstream: FOUND FILE=[" << str_dir+"/"+FILE+vtype.at(i) << "]" << endl;
+          if(LDEBUG) cerr << soliloquy << " FOUND FILE=[" << str_dir+"/"+FILE+vtype.at(i) << "]" << endl;
           return aurostd::CleanFileName(str_dir+"/"+FILE+vtype.at(i));
         }
       }
@@ -6994,15 +6995,15 @@ namespace aflowlib {
     }
     if(!gfound && (FILE=="DOSCAR")) {
       gfound=TRUE;
-      if(LDEBUG) cerr << XPID << "aflowlib::vaspfile2stringstream: FILE=" << FILE << endl;
+      if(LDEBUG) cerr << soliloquy << " FILE=" << FILE << endl;
       string extension=".bz2,.gz,.xz,.static,.static.bz2,.static.gz,.static.xz";
       deque<string> vtype;aurostd::string2tokens(extension,vtype,",");vtype.push_front("");  // have to add emptyness to vtype at the beginning
       //     if(LDEBUG) aurostd::execute("ls -las \""+str_dir+"\"");
       for(uint i=0;i<vtype.size();i++) {
-        if(LDEBUG) cerr << XPID << "aflowlib::vaspfile2stringstream: TESTING FILE=[" << str_dir+"/"+FILE+vtype.at(i) << "]" << endl;
+        if(LDEBUG) cerr << soliloquy << " TESTING FILE=[" << str_dir+"/"+FILE+vtype.at(i) << "]" << endl;
         if(aurostd::FileExist(str_dir+"/"+FILE+vtype.at(i))) {
           aurostd::efile2stringstream(str_dir+"/"+FILE+vtype.at(i),sss);
-          if(LDEBUG) cerr << XPID << "aflowlib::vaspfile2stringstream: FOUND FILE=[" << str_dir+"/"+FILE+vtype.at(i) << "]" << endl;
+          if(LDEBUG) cerr << soliloquy << " FOUND FILE=[" << str_dir+"/"+FILE+vtype.at(i) << "]" << endl;
           return aurostd::CleanFileName(str_dir+"/"+FILE+vtype.at(i));
         }
       }
@@ -7018,10 +7019,10 @@ namespace aflowlib {
       deque<string> vtype;aurostd::string2tokens(extension,vtype,",");vtype.push_front(""); // have to add emptyness to vtype at the beginning
       //     if(LDEBUG) aurostd::execute("ls -las \""+str_dir+"\"");
       for(uint i=0;i<vtype.size();i++) {
-        if(LDEBUG) cerr << XPID << "aflowlib::vaspfile2stringstream: TESTING FILE=[" << str_dir+"/"+FILE+vtype.at(i) << "]" << endl;
+        if(LDEBUG) cerr << soliloquy << " TESTING FILE=[" << str_dir+"/"+FILE+vtype.at(i) << "]" << endl;
         if(aurostd::FileExist(str_dir+"/"+FILE+vtype.at(i))) {
           aurostd::efile2stringstream(str_dir+"/"+FILE+vtype.at(i),sss);
-          if(LDEBUG) cerr << XPID << "aflowlib::vaspfile2stringstream: FOUND FILE=" << str_dir+"/"+FILE+vtype.at(i) << "]" << endl;
+          if(LDEBUG) cerr << soliloquy << " FOUND FILE=" << str_dir+"/"+FILE+vtype.at(i) << "]" << endl;
           return aurostd::CleanFileName(str_dir+"/"+FILE+vtype.at(i));
         }
       }
@@ -7031,15 +7032,15 @@ namespace aflowlib {
       //ME20190627 END
     }
     if(!gfound) {
-      if(LDEBUG) cerr << XPID << "aflowlib::vaspfile2stringstream: FILE=" << FILE << endl;
+      if(LDEBUG) cerr << soliloquy << " FILE=" << FILE << endl;
       string extension=".bz2,.gz,.xz,.static,.static.bz2,.static.gz,.static.xz,.relax1,.relax1.bz2,.relax1.gz,.relax1.xz,.bands,.bands.bz2,.bands.gz,.bands.xz";
       deque<string> vtype;aurostd::string2tokens(extension,vtype,",");vtype.push_front(""); // have to add emptyness to vtype at the beginning
       //     if(LDEBUG) aurostd::execute("ls -las \""+str_dir+"\"");
       for(uint i=0;i<vtype.size();i++) {
-        if(LDEBUG) cerr << XPID << "aflowlib::vaspfile2stringstream: TESTING FILE=[" << str_dir+"/"+FILE+vtype.at(i) << "]" << endl;
+        if(LDEBUG) cerr << soliloquy << " TESTING FILE=[" << str_dir+"/"+FILE+vtype.at(i) << "]" << endl;
         if(aurostd::FileExist(str_dir+"/"+FILE+vtype.at(i))) {
           aurostd::efile2stringstream(str_dir+"/"+FILE+vtype.at(i),sss);
-          if(LDEBUG) cerr << XPID << "aflowlib::vaspfile2stringstream: FOUND FILE=[" << str_dir+"/"+FILE+vtype.at(i) << "]" << endl;
+          if(LDEBUG) cerr << soliloquy << " FOUND FILE=[" << str_dir+"/"+FILE+vtype.at(i) << "]" << endl;
           return aurostd::CleanFileName(str_dir+"/"+FILE+vtype.at(i));
         }
       }
@@ -7048,7 +7049,7 @@ namespace aflowlib {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
       //ME20190627 END
     }
-    if(LDEBUG) cerr << XPID << "vaspfile2stringstream: END" << endl;
+    if(LDEBUG) cerr << soliloquy << " END" << endl;
     return string("");
   }
 }
