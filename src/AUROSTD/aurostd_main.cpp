@@ -79,8 +79,8 @@ namespace aurostd {
       cerr << soliloquy << " tstruct_inp.tm_isdst=" << tstruct_inp.tm_isdst << endl;
       cerr << soliloquy << " mktime(tstruct_inp)=" << t_inp << endl;
       strftime(buffer,30,"%F %T %Z",&tstruct_inp);cerr << soliloquy << " tstruct_inp=" << buffer << endl;  //%Y:%m:%d %H:%M:%S
-    }
       cerr << soliloquy << " ///////////////////////////////////////////////" << endl;
+    }
     //
     time_t t_local=t_inp;
     bool fix_utc_2_now=false; //this is good for debugging different time zones
