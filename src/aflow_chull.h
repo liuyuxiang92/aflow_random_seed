@@ -760,7 +760,7 @@ namespace chull {
       double getNPlus1EnthalpyGain(uint cpoint,ConvexHull& fake_hull,bool hull_set) const;
       vector<double> getNPlus1EnthalpyGain(const vector<uint>& vcpoints) const;
       vector<double> getNPlus1EnthalpyGain(const vector<uint>& vcpoint,ConvexHull& fake_hull,bool hull_set) const;
-      void getJoinedFacets(vector<vector<uint> > &facet_collection, const double angle_threshold = 0.018); //HE20210510 - 0.018 radiance ~ 1 degree
+      void getJoinedFacets(vector<vector<uint> > &facet_collection, const double angle_threshold = 0.018); //HE20210510 - 0.018 radians ~ 1 degree
 
       //writer
       bool write(filetype ftype=latex_ft) const;

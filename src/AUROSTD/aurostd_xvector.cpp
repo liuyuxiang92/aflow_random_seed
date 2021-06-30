@@ -2106,12 +2106,12 @@ namespace aurostd { //HE20210511
       if (points.size() < 3){
         throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "there must be at least three points to calculate an area", _VALUE_ERROR_);
       }
-      double result = 0.0;
+      utype result = 0.0;
       uint upper_border = points.size()-2;
       xvector<utype> sum_temp(points[0].lrows,points[0].urows);
       for (uint k=1; k<=upper_border;k++) sum_temp += aurostd::vector_product(points[k]-points[0], points[k+1]-points[0]);
-      for (int i=sum_temp.lrows;i<=sum_temp.urows;i++) result += (double) sum_temp[i]*sum_temp[i];
-      return 0.5 * std::sqrt(result);
+      for (int i=sum_temp.lrows;i<=sum_temp.urows;i++) result += sum_temp[i]*sum_temp[i];
+      return 0.5 * std::sqrt((double) result);
   }
 }
 
@@ -2188,7 +2188,7 @@ namespace aurostd { //HE20210511
         throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "there must be at least three vertices in each facets", _VALUE_ERROR_);
       }
       facet_points.clear();
-      for (uint p_id: facets[f_id]) facet_points.push_back(points[p_id]);
+      for (std::vector<uint>::const_iterator p_id = facets[f_id].begin(); p_id != facets[f_id].end(); ++p_id) facet_points.push_back(points[*p_id]);
       index_start = 0;
       while (true) {
         facet_direction.clear();
