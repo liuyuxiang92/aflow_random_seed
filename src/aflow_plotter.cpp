@@ -265,7 +265,7 @@ namespace plotter {
       // Execute gnuplot and pdflatex
       aurostd::stringstream2file(gpfile, filename + ".plt");
       aurostd::execute(XHOST.command("gnuplot") + " \"" + filename + ".plt\"");
-      if(LDEBUG) cerr << soliloquy << "directory_tmp = " << directory_tmp << endl;
+      if(LDEBUG) cerr << soliloquy << " directory_tmp = " << directory_tmp << endl;
       if(LDEBUG) cerr << soliloquy << aurostd::execute("ls -las "+directory_tmp) << endl;
       // ME20200609 - old pdfatex versions cannot process eps files
       if (pdflatex_version >= 2010) {
@@ -1238,6 +1238,7 @@ namespace plotter {
       aflowlib::vaspfile2stringstream(directory + "", poscar_file, poscar);  //CO20200404
     }
 
+    if(LDEBUG){cerr << soliloquy << " poscar=" << endl << poscar.str() << endl;}
     xstructure xstr(poscar);
     if (xstr.is_vasp4_poscar_format) {  //PARTCAR has species and it is NOT vasp4 format  //CO20191110
       // No special case for phonons needed because PHPOSCAR is always in VASP5 format
