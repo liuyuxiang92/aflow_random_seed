@@ -2194,10 +2194,10 @@ namespace aurostd { //HE20210511
   // integer xvectors are converted into double vectors, to enable a correct volume calculation
   double volume(const vector<xvector<int> > &points, const vector<vector<uint> > &facets){ //HE20210514
     vector<xvector<double> > mapped_points;
-    for (std::vector<xvector<int> >::const_iterator p_point = points.begin(); p_point != points.end(); ++p_point){
-      xvector<int> point = *p_point;
+    uint num_points = points.size();
+    for (uint p_id=0; p_id<num_points; p_id++){
       xvector<double> new_point(3,1);
-      for (int i=point.lrows;i<=point.urows;i++) new_point(i) = (double) point(i);
+      for (int i=points[p_id].lrows;i<=points[p_id].urows;i++) new_point(i) = (double) points[p_id](i);
       mapped_points.push_back(new_point);
     }
     return volume(mapped_points, facets);
