@@ -1882,6 +1882,7 @@ AtomEnvironment::AtomEnvironment(){
 // ---------------------------------------------------------------------------
 // AtomEnvironment::free
 void AtomEnvironment::free(){
+  mode=0;
   element_center="";
   type_center=0;
   num_types=0;
@@ -1914,6 +1915,7 @@ AtomEnvironment::AtomEnvironment(const AtomEnvironment& b){
 // ---------------------------------------------------------------------------
 // AtomEnvironment::copy
 void AtomEnvironment::copy(const AtomEnvironment& b) {
+  mode=b.mode;
   element_center=b.element_center;
   type_center=b.type_center;
   num_neighbors=b.num_neighbors;
@@ -1944,7 +1946,7 @@ const AtomEnvironment& AtomEnvironment::operator=(const AtomEnvironment& b){
 // AtomEnvironment::operator<< 
 ostream& operator<<(ostream& oss, const AtomEnvironment& AtomEnvironment){
 
-  oss << AtomEnvironment.toJSON(ATOM_ENVIRONMENT_MODE_3,false);
+  oss << AtomEnvironment.toJSON(false).toString();
 
   return oss;
 }
@@ -2027,7 +2029,7 @@ xvector<double> AtomEnvironment::index2Point(uint index){
  * @brief serialize AtomEnvironment class to json
  * @return json string
  */
-string AtomEnvironment::toJSON(uint mode, bool full) const{
+aurostd::JSONwriter AtomEnvironment::toJSON(bool full) const{
   string soliloquy=XPID+"AtomEnvironment::toJSON(): ";
 
   aurostd::JSONwriter ae_json;
@@ -2064,6 +2066,7 @@ string AtomEnvironment::toJSON(uint mode, bool full) const{
   }
 
   else{
+    ae_json.addNumber("ae_mode", mode);
     ae_json.addString("center_element", element_center);
     ae_json.addNumber("center_element_index", type_center);
     ae_json.addNumber("element_count", num_types);
@@ -2120,7 +2123,7 @@ string AtomEnvironment::toJSON(uint mode, bool full) const{
       ae_json.addVector("facet_order", fo);
     }
   }
-  return ae_json.toString();
+  return ae_json;
 }
 
 
@@ -2147,6 +2150,7 @@ void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_ind
 
   // ---------------------------------------------------------------------------
   // get central atom info
+  mode=mode;
   for(uint i=0;i<xstr.atoms.size();i++){
     if(i==center_index){
       element_center = xstr.atoms[i].name;

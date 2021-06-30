@@ -683,7 +683,7 @@ ostream& operator<<(ostream& oss, const StructurePrototype& StructurePrototype){
     for(uint i=0;i<StructurePrototype.environments_LFA.size();i++){
       stringstream ss_tmp;
       //DX20210624 [OBSOLETE] ss_tmp << StructurePrototype.environments_LFA[i];
-      ss_tmp << StructurePrototype.environments_LFA[i].toJSON(ATOM_ENVIRONMENT_MODE_1); //DX20210624
+      ss_tmp << StructurePrototype.environments_LFA[i].toJSON().toString(); //DX20210624
       tmp_vstring.push_back(ss_tmp.str());
     }
     sscontent_json << aurostd::joinWDelimiter(tmp_vstring,",") << "]" << eendl;

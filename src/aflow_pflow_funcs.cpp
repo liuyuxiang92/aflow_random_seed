@@ -8352,7 +8352,7 @@ namespace pflow {
     for(uint i=0; i<AE.size(); i++) {
       file_name = aeOutBase + "/" + aurostd::utype2string(i) + "_" + AE[i].element_center + ".json";
       AE[i].constructAtomEnvironmentHull();
-      aurostd::string2file(AE[i].toJSON(), file_name, "WRITE");
+      aurostd::string2file(AE[i].toJSON().toString(), file_name, "WRITE");
       if(LDEBUG) cerr << soliloquy << file_name << endl;
     }
   }
