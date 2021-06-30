@@ -8320,6 +8320,7 @@ namespace pflow {
     string aurl = "";
     aflowlib::_aflowlib_entry entry;
     xstructure str;
+    string aeOutAUID = "";
 
     // Quickly match auid to aurl (speedup from 15s to 0.5s compared to single use of AflowlibLocator)
     if (!auid.empty()) aurl = aurostd::execute2string(XHOST.command("aflow_data")+" vLIBS | grep -B1 \"" + auid + "\" | head -n 1");
@@ -8332,7 +8333,8 @@ namespace pflow {
     if (!aeOutBase.empty()) aurostd::DirectoryMake(aeOutBase);
 
     if (!aurl.empty()){
-      aeOutBase += auid.substr(6);
+
+      aeOutAUID = aeOutBase + auid.substr(6);
       entry.aurl=aurl;
       entry.auid=auid;
       loadXstructures(entry);
@@ -8344,13 +8346,13 @@ namespace pflow {
     else {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "could not load a structure", _INPUT_ERROR_);
     }
-    aurostd::DirectoryMake(aeOutBase);
+    aurostd::DirectoryMake(aeOutAUID);
     vector<AtomEnvironment> AE = getAtomEnvironments(str, aeMode);
 
     string file_name;
     if(LDEBUG) cerr << soliloquy << "Saving " << AE.size() << " atomic environments" << endl;
     for(uint i=0; i<AE.size(); i++) {
-      file_name = aeOutBase + "/" + aurostd::utype2string(i) + "_" + AE[i].element_center + ".json";
+      file_name = aeOutAUID + "/" + aurostd::utype2string(i) + "_" + AE[i].element_center + ".json";
       AE[i].constructAtomEnvironmentHull();
       aurostd::string2file(AE[i].toJSON().toString(), file_name, "WRITE");
       if(LDEBUG) cerr << soliloquy << file_name << endl;
