@@ -892,10 +892,10 @@ class _vflags {
     xoption KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_EQUAL;  // isentry and content_double //CO20181129
     // SIGMA_STATIC
     xoption KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_EQUAL;  // isentry and content_double //CO20181129
-    // ISMEAR_STATIC_BANDS
-    xoption KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL;  // isentry and content_double //CO20181129
-    // SIGMA_STATIC_BANDS
-    xoption KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL;  // isentry and content_double //CO20181129
+    // ISMEAR_BANDS
+    xoption KBIN_VASP_FORCE_OPTION_ISMEAR_BANDS_EQUAL;  // isentry and content_double //CO20181129
+    // SIGMA_BANDS
+    xoption KBIN_VASP_FORCE_OPTION_SIGMA_BANDS_EQUAL;  // isentry and content_double //CO20181129
     // RWIGS
     bool KBIN_VASP_FORCE_OPTION_RWIGS_STATIC;  
     xoption KBIN_VASP_FORCE_OPTION_SKIP_NOMIX;    // SKIP_NOMIX
@@ -3130,7 +3130,7 @@ namespace KBIN {
   void XVASP_INCAR_Relax_ON(_xvasp& xvasp,_vflags& vflags,int number); // for steps
   void XVASP_INCAR_Static_ON(_xvasp& xvasp,_vflags& vflags);
   void XVASP_INCAR_Relax_Static_ON(_xvasp& xvasp,_vflags& vflags);
-  void XVASP_INCAR_Relax_Static_Bands_ON(_xvasp& xvasp,_vflags& vflags);
+  void XVASP_INCAR_Bands_ON(_xvasp& xvasp,_vflags& vflags);
   void XVASP_INCAR_RWIGS_Static(_xvasp& xvasp,_vflags& vflags,ofstream &FileMESSAGE,bool OPERATION);
   void XVASP_INCAR_Precision(_xvasp& xvasp,_vflags& vflags);
   void XVASP_INCAR_Metagga(_xvasp& xvasp,_vflags& vflags);

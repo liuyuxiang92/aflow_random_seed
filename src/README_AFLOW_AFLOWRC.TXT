@@ -690,8 +690,8 @@ DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME
   type: int
   default: -5
 
-DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_SCHEME
-  description: Default VASP ISMEAR scheme for STATIC_BANDS runs.
+DEFAULT_VASP_FORCE_OPTION_ISMEAR_BANDS_SCHEME
+  description: Default VASP ISMEAR scheme for BANDS runs.
   type: int
   default: 0
 
@@ -705,8 +705,8 @@ DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC
   type: double
   default: 0.05
 
-DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS
-  description: Default VASP SIGMA value for STATIC_BANDS runs.
+DEFAULT_VASP_FORCE_OPTION_SIGMA_BANDS
+  description: Default VASP SIGMA value for BANDS runs.
   type: double
   default: 0.05
 

@@ -1108,11 +1108,11 @@ namespace KBIN {
     
     //CO20181128
     //this must come AFTER TYPE
-    // with KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.isentry && KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.content_int
-    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.isentry && xvasp.NRELAXING>xvasp.NRELAX+1) {      /*************** INCAR **************/
-      aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]ISMEAR_STATIC_BANDS=" << vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.content_int << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    // with KBIN_VASP_FORCE_OPTION_ISMEAR_BANDS_EQUAL.isentry && KBIN_VASP_FORCE_OPTION_ISMEAR_BANDS_EQUAL.content_int
+    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_BANDS_EQUAL.isentry && xvasp.NRELAXING>xvasp.NRELAX+1) {      /*************** INCAR **************/
+      aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]ISMEAR_BANDS=" << vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_BANDS_EQUAL.content_int << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      KBIN::XVASP_INCAR_PREPARE_GENERIC("ISMEAR_STATIC_BANDS",xvasp,vflags,"",vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.content_int,0.0,FALSE);
+      KBIN::XVASP_INCAR_PREPARE_GENERIC("ISMEAR_BANDS",xvasp,vflags,"",vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_BANDS_EQUAL.content_int,0.0,FALSE);
       xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
     }
 
@@ -1138,11 +1138,11 @@ namespace KBIN {
     
     //CO20181128
     //this must come AFTER TYPE
-    // with KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.isentry && KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.content_double
-    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.isentry && xvasp.NRELAXING>xvasp.NRELAX+1) {      /*************** INCAR **************/
-      aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]SIGMA_STATIC_BANDS=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_) << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    // with KBIN_VASP_FORCE_OPTION_SIGMA_BANDS_EQUAL.isentry && KBIN_VASP_FORCE_OPTION_SIGMA_BANDS_EQUAL.content_double
+    if(Krun && vflags.KBIN_VASP_FORCE_OPTION_NOTUNE.isentry==FALSE && vflags.KBIN_VASP_FORCE_OPTION_SIGMA_BANDS_EQUAL.isentry && xvasp.NRELAXING>xvasp.NRELAX+1) {      /*************** INCAR **************/
+      aus << "00000  MESSAGE-OPTION  [VASP_FORCE_OPTION]SIGMA_BANDS=" << aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_BANDS_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_) << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      KBIN::XVASP_INCAR_PREPARE_GENERIC("SIGMA_STATIC_BANDS",xvasp,vflags,"",0,vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.content_double,FALSE);
+      KBIN::XVASP_INCAR_PREPARE_GENERIC("SIGMA_BANDS",xvasp,vflags,"",0,vflags.KBIN_VASP_FORCE_OPTION_SIGMA_BANDS_EQUAL.content_double,FALSE);
       xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
     }
 
@@ -1205,7 +1205,7 @@ namespace KBIN {
     // if(Krun && vflags.KBIN_VASP_RUN_RELAX_STATIC_BANDS_PATCH_STATIC_BANDS) {                                       /*************** INCAR **************/
     // aus << "00000  MESSAGE-OPTION  [VASP_RUN_RELAX_STATIC_BANDS] - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
     // aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-    // KBIN::XVASP_INCAR_Relax_Static_Bands_ON(xvasp,vflags.KBIN_VASP_INCAR_VERBOSE);     // FIX
+    // KBIN::XVASP_INCAR_Bands_ON(xvasp,vflags.KBIN_VASP_INCAR_VERBOSE);     // FIX
     // xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE);
     // }
 
@@ -3381,9 +3381,9 @@ namespace KBIN {
 
 
 // ***************************************************************************
-// KBIN::XVASP_INCAR_Relax_Static_Bands_ON
+// KBIN::XVASP_INCAR_Bands_ON
 namespace KBIN {
-  void XVASP_INCAR_Relax_Static_Bands_ON(_xvasp& xvasp,_vflags& vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  void XVASP_INCAR_Bands_ON(_xvasp& xvasp,_vflags& vflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
     string FileContent,strline;
     FileContent=xvasp.INCAR.str();
     xvasp.INCAR.str(std::string());
@@ -3416,7 +3416,7 @@ namespace KBIN {
           (aurostd::substring2bool(strline,"LAECHG",TRUE) && vflags.KBIN_VASP_FORCE_OPTION_BADER.isentry) || (aurostd::substring2bool(strline,"#LAECHG",TRUE) && vflags.KBIN_VASP_FORCE_OPTION_BADER.isentry)||
           (aurostd::substring2bool(strline,"LELF",TRUE) && vflags.KBIN_VASP_FORCE_OPTION_ELF.isentry) || (aurostd::substring2bool(strline,"#LELF",TRUE) && vflags.KBIN_VASP_FORCE_OPTION_ELF.isentry)||
           aurostd::substring2bool(strline,"LWAVE",TRUE) || aurostd::substring2bool(strline,"#LWAVE",TRUE)) {
-            if(vflags.KBIN_VASP_INCAR_VERBOSE){xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::XVASP_INCAR_Relax_Static_Bands_ON)" << endl;}
+            if(vflags.KBIN_VASP_INCAR_VERBOSE){xvasp.INCAR << "# " << strline << " # AFLOW REMOVED (KBIN::XVASP_INCAR_Bands_ON)" << endl;}
           } else {
             if(vflags.KBIN_VASP_INCAR_VERBOSE||strline.length()){xvasp.INCAR << strline << endl;} //CO20210315
           }
@@ -3424,9 +3424,9 @@ namespace KBIN {
     // xvasp.INCAR << endl;
     if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing RELAX_STATIC_BANDS [AFLOW]" << endl;
     if(vflags.KBIN_VASP_FORCE_OPTION_PREC.preserved==FALSE) xvasp.INCAR << aurostd::PaddedPOST("PREC=Accurate",_incarpad_) << " # Performing RELAX_STATIC_BANDS (aleksey)" << endl;
-    xvasp.INCAR << aurostd::PaddedPOST("ISMEAR="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.content_int),_incarpad_) << " # Performing RELAX_STATIC_BANDS (put back Gauss, use 1 if metals)" << endl; //CO20200624
+    xvasp.INCAR << aurostd::PaddedPOST("ISMEAR="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_BANDS_EQUAL.content_int),_incarpad_) << " # Performing RELAX_STATIC_BANDS (put back Gauss, use 1 if metals)" << endl; //CO20200624
     // xvasp.INCAR << aurostd::PaddedPOST("ISMEAR=-5",_incarpad_) << " # Performing RELAX_STATIC (tetrahedron method with Blochl corrections : WSETYAWAN+SC20091009)" << endl;
-    xvasp.INCAR << aurostd::PaddedPOST("SIGMA="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_),_incarpad_) << " # Performing RELAX_STATIC_BANDS (so the DOS will not spill too much from band edges)" << endl; //CO20200624
+    xvasp.INCAR << aurostd::PaddedPOST("SIGMA="+aurostd::utype2string(vflags.KBIN_VASP_FORCE_OPTION_SIGMA_BANDS_EQUAL.content_double,_IVASP_DOUBLE2STRING_PRECISION_),_incarpad_) << " # Performing RELAX_STATIC_BANDS (so the DOS will not spill too much from band edges)" << endl; //CO20200624
     if(vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved==FALSE) xvasp.INCAR << aurostd::PaddedPOST("ALGO=Normal",_incarpad_) << " # Performing RELAX_STATIC_BANDS (stefano from ICSD)" << endl;
     xvasp.INCAR << aurostd::PaddedPOST("ISIF=2",_incarpad_) << " # Performing RELAX_STATIC_BANDS" << endl;
     xvasp.INCAR << aurostd::PaddedPOST("IBRION=2",_incarpad_) << " # Performing RELAX_STATIC_BANDS" << endl;
@@ -4205,7 +4205,7 @@ namespace KBIN {
 
     // ***************************************************************************
     // ISMEAR ISMEAR ISMEAR ISMEAR ISMEAR ISMEAR
-    else if(command=="ISMEAR" || command=="ISMEAR_STATIC" || command=="ISMEAR_STATIC_BANDS") { //CO20181129
+    else if(command=="ISMEAR" || command=="ISMEAR_STATIC" || command=="ISMEAR_BANDS") { //CO20181129
       //https://www.vasp.at/wiki/index.php/ISMEAR
       keyword="ISMEAR";
       
@@ -4507,7 +4507,7 @@ namespace KBIN {
     
     // ***************************************************************************
     // SIGMA SIGMA SIGMA SIGMA SIGMA SIGMA
-    else if(command=="SIGMA" || command=="SIGMA_STATIC" || command=="SIGMA_STATIC_BANDS") { //CO20181129
+    else if(command=="SIGMA" || command=="SIGMA_STATIC" || command=="SIGMA_BANDS") { //CO20181129
       keyword="SIGMA";
       
       if(Krun){
