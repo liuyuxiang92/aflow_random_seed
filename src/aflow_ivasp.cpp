@@ -5615,91 +5615,109 @@ namespace KBIN {
 namespace KBIN {
   vector<string> ExtractAtomicSpecies(const string& directory,ostream& oss) {ofstream FileMESSAGE;return ExtractAtomicSpecies(directory,FileMESSAGE,oss);} //CO20200404 - added ofstream
   vector<string> ExtractAtomicSpecies(const string& directory,ofstream& FileMESSAGE,ostream& oss) { //CO20200404 - added ofstream
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="KBIN::ExtractAtomicSpecies():"; //CO20200404
     stringstream message;
-    string OUTCARfile; //, POSCARfile;
-    string file_outcar_tmp=aurostd::TmpFileCreate("OUTCAR.tmp");
 
-    if(XHOST.vext.size()!=XHOST.vcat.size()) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "XHOST.vext.size()!=XHOST.vcat.size(), aborting", _RUNTIME_ERROR_); //CO20200404
-    }
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
     xstructure xstr_name=GetMostRelaxedStructure(directory); //CO20180626
 
+    if(LDEBUG){cerr << soliloquy << " most relaxed structure:" << endl << xstr_name << endl;}
+
     //WARNING!!!!
-    if(aurostd::FileExist(directory+"/POSCAR.orig")) {
-      xstructure xstr_poscar_orig(directory+"/POSCAR.orig", IOVASP_POSCAR);
-      if(xstr_poscar_orig.atoms.size()!=xstr_name.atoms.size()) {
-        //[CO20200404 - OBSOLETE]cerr << "!!!!!!!!!!!!!!!!!!!!!WARNING!!!!!!!!!!!!!!!!!" << endl;
-        //[CO20200404 - OBSOLETE]cerr << "I tell you--'POSCAR.orig' has different atoms number from 'POSCAR.bands', though I can still produce PEDOS plots for you!" << endl;
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "POSCAR.orig has different atoms number from POSCAR.bands", directory, FileMESSAGE, oss, _LOGGER_WARNING_);
+    if(0){  //CO20210623 - this warning is useless, there are good reasons the two will not be same
+      if(aurostd::FileExist(directory+"/POSCAR.orig")) {
+        xstructure xstr_poscar_orig(directory+"/POSCAR.orig", IOVASP_POSCAR);
+        if(xstr_poscar_orig.atoms.size()!=xstr_name.atoms.size()) {
+          //[CO20200404 - OBSOLETE]cerr << "!!!!!!!!!!!!!!!!!!!!!WARNING!!!!!!!!!!!!!!!!!" << endl;
+          //[CO20200404 - OBSOLETE]cerr << "I tell you--'POSCAR.orig' has different atoms number from 'POSCAR.bands', though I can still produce PEDOS plots for you!" << endl;
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "POSCAR.orig has different atoms number from POSCAR.bands", directory, FileMESSAGE, oss, _LOGGER_WARNING_);
+        }
       }
     }
 
-    //Extract the atom label (name) from POSCAR.relax1
-    vector<string> AtomicName;
-    for(unsigned int i=0; i<xstr_name.species.size(); i++) {
-      if(xstr_name.species.at(i).compare("")!=0) {
-        for (int j=0; j<xstr_name.num_each_type.at(i); j++) {
-          xstr_name.species.at(i)=KBIN::VASP_PseudoPotential_CleanName(xstr_name.species.at(i));
-          AtomicName.push_back(xstr_name.species.at(i));
-        }
+    vector<string> AtomNames;
+    uint i=0;
+    int j=0;
+
+    // ********************************************************************************  
+    //READ XSTRUCTURE
+    if(AtomNames.empty()){
+      for(i=0;i<xstr_name.species.size();i++) {
+        if(!aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr_name.species[i]).empty()) {
+          aurostd::VASP_PseudoPotential_CleanName_InPlace(xstr_name.species[i]);
+          for(j=0;j<xstr_name.num_each_type[i];j++){AtomNames.push_back(xstr_name.species[i]);}
+        }else{AtomNames.clear();break;} //go on to next extraction method
       }
-      else { // cout << "no name given taking from OUTCAR" << endl;
-        // ********************************************************************************  
-        //READ  OUTCAR
-        bool found_OUTCAR=FALSE;
-        if(aurostd::FileExist(directory+"./OUTCARfile.tmp")) aurostd::RemoveFile(directory+"./OUTCARfile.tmp");
-        if(!found_OUTCAR && aurostd::FileExist(directory+"/OUTCAR")) {
-          found_OUTCAR=TRUE;
-          OUTCARfile=directory+"/OUTCAR";
-        }
-        if(!found_OUTCAR && aurostd::FileExist(directory+"/OUTCAR.static")) {
-          found_OUTCAR=TRUE;
-          OUTCARfile=directory+"/OUTCAR.static";
-        }
-        for(uint iext=0;iext<XHOST.vext.size();iext++) {
-          if(!found_OUTCAR && aurostd::FileExist(directory+"/OUTCAR.static"+XHOST.vext.at(iext))) {
-            found_OUTCAR=TRUE;	  
-            aurostd::execute(XHOST.vcat.at(iext)+" "+directory+"/OUTCAR.static"+XHOST.vext.at(iext)+" > "+file_outcar_tmp);
-            OUTCARfile=file_outcar_tmp;
+    }
+    // ********************************************************************************  
+    //READ OUTCAR
+    if(AtomNames.empty()){
+      if(XHOST.vext.size()!=XHOST.vcat.size()) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "XHOST.vext.size()!=XHOST.vcat.size(), aborting", _RUNTIME_ERROR_); //CO20200404
+      }
+      if(aurostd::FileExist(directory+"./OUTCARfile.tmp")) aurostd::RemoveFile(directory+"./OUTCARfile.tmp"); //keep for legacy
+      string OUTCARfile="";
+      vector<string> vstages;
+      aurostd::string2tokens(".bands,.static,.relax,.relax2,.relax1,.orig",vstages,",");
+      vstages.insert(vstages.begin(),"");  //look for just OUTCAR
+      uint istage=0,iext=0;
+      for(istage=0;istage<vstages.size()&&OUTCARfile.empty();istage++){
+        if(aurostd::FileExist(directory+"/OUTCAR"+vstages[istage])){OUTCARfile=directory+"/OUTCAR"+vstages[istage];}
+      }
+      string file_outcar_tmp="";
+      bool delete_OUTCARfile=false;
+      for(istage=0;istage<vstages.size()&&OUTCARfile.empty();istage++){
+        for(iext=0;iext<XHOST.vext.size()&&OUTCARfile.empty();iext++){
+          if(aurostd::FileExist(directory+"/OUTCAR"+vstages[istage]+XHOST.vext[iext])){
+            aurostd::efile2tempfile(directory+"/OUTCAR"+vstages[istage]+XHOST.vext[iext],OUTCARfile,delete_OUTCARfile);
           }
         }
-        if(!found_OUTCAR) {
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "No OUTCAR[.static][.EXT] found in the directory, aborting", _INPUT_MISSING_);  //CO20200404
-        }
+      }
+      if(OUTCARfile.empty()){
+        if(delete_OUTCARfile){aurostd::RemoveFile(OUTCARfile);}
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "No OUTCAR[.static][.EXT] found in the directory, aborting", _INPUT_MISSING_);  //CO20200404
+      }
 
-        vector<string> vposcars, vpp;
-        vector<string> AtomSpeciesName;
-        string str_grep=aurostd::execute2string("grep TITEL "+OUTCARfile);
-        aurostd::string2tokens(str_grep, vposcars, "\n");
+      if(LDEBUG){cerr << soliloquy << " OUTCARfile=" << OUTCARfile << endl;}
 
-        for(unsigned int k=0;k<vposcars.size();k++) {
-          aurostd::string2tokens(vposcars.at(k),vpp," ");
-          AtomSpeciesName.push_back(vpp.at(3));
-          AtomSpeciesName.at(k)=KBIN::VASP_PseudoPotential_CleanName(AtomSpeciesName.at(k));
+      vector<string> vpotcars;
+      if(0){  //avoid making system call if we can
+        string str_grep=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(aurostd::execute2string("grep TITEL "+OUTCARfile+" 2>/dev/null"));
+        if(LDEBUG){cerr << soliloquy << " grep output [1]=\"" << str_grep << "\"" << endl;}
+        if(str_grep.empty()){
+          str_grep=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(aurostd::execute2string("grep --text TITEL "+OUTCARfile+" 2>/dev/null"));  //CO20210623 - sometimes grep finds binary characters inside, --text will force grep to read file as text and return results
+          if(LDEBUG){cerr << soliloquy << " grep output [2]=\"" << str_grep << "\"" << endl;}
         }
-        // ********************************************************************************  
-        xstr_name.species.at(i)=AtomSpeciesName.at(i);
-        for (int j=0; j<xstr_name.num_each_type.at(i); j++) {
-          AtomicName.push_back(xstr_name.species.at(i));
+        aurostd::string2tokens(str_grep,vpotcars,"\n");
+      }
+
+      vpotcars=aurostd::GrepFile(OUTCARfile,"TITEL");
+      if(delete_OUTCARfile){aurostd::RemoveFile(OUTCARfile);}
+
+      vector<string> AtomSpeciesName,vpp;
+      for(i=0;i<vpotcars.size();i++){
+        if(LDEBUG){cerr << soliloquy << " found \"TITEL\" line=\"" << vpotcars[i] << "\"" << endl;}
+        aurostd::string2tokens(vpotcars[i],vpp," ");
+        if(vpp.size()<4){
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,OUTCARfile+" has weird \"TITEL\" line: \""+vpotcars[i]+"\"",_FILE_CORRUPT_);  //CO20200404
         }
+        AtomSpeciesName.push_back(vpp[3]);
+        aurostd::VASP_PseudoPotential_CleanName_InPlace(AtomSpeciesName.back());
+        for(j=0;j<xstr_name.num_each_type[i];j++){AtomNames.push_back(AtomSpeciesName.back());}
       }
     }
+    // ********************************************************************************  
+    //ERROR
+    if(AtomNames.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AtomNames cannot be extracted",_RUNTIME_ERROR_);}  //CO20200404
 
-    //Double Check
-    for (unsigned int i=0; i<AtomicName.size(); i++) {
-      AtomicName.at(i)=KBIN::VASP_PseudoPotential_CleanName(AtomicName.at(i));
-    }
+    for(i=0;i<AtomNames.size();i++){aurostd::VASP_PseudoPotential_CleanName_InPlace(AtomNames[i]);} //repetita iuvant
+    if(LDEBUG){cerr << soliloquy << " AtomNames=" << aurostd::joinWDelimiter(AtomNames,",") << endl;}
 
-    if(aurostd::FileExist(file_outcar_tmp)) aurostd::RemoveFile(file_outcar_tmp);
+    if(LDEBUG){cerr << soliloquy << " END" << endl;}
 
-    /****************************************************************************************************
-      for (unsigned int i=0; i<AtomicName.size(); i++) {
-      cout <<AtomicName.at(i) << endl;
-      }
-      */
-    return AtomicName;
+    return AtomNames;
   }
 } // namespace KBIN
 

@@ -29,7 +29,7 @@ const string CAPITAL_LETTERS_PP_LIST="_GW2"    //CO20190712 - potpaw_LDA/potpaw_
 "";
 
 namespace aurostd {
-  void VASP_PseudoPotential_CleanName_InPlace(string& species,bool capital_letters_only=false); //CO20190712
+  void VASP_PseudoPotential_CleanName_InPlace(string& species,bool capital_letters_only=false,bool remove_floats=true); //CO20190712  //CO20210623 - added remove_floats
   ////////////////////////////////////////////////////////////////////////////////
   void elementsFromCompositionString(const string& input);  //CO20190712
   template<class utype> void elementsFromCompositionString(const string& input,vector<string>& velements,vector<utype>& vcomposition); //CO20190712

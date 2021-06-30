@@ -382,7 +382,8 @@ namespace bader_functions {
     //DEFAULT, take AECCAR0+AECCAR2=REFERENCE_FILE (aflow.CHGCAR_sum), otherwise get from FLAGS
     //get REFERENCE_FILE if specified, otherwise DEFAULT
     if(LDEBUG) cerr << soliloquy << " CHECK REFERENCE FILE" << endl;
-    string ref_file, tmp_file;
+    string ref_file="", tmp_file="";
+    bool tempfile_created=false;
     if(vpflow.flag("BADER::REFERENCE")) {
       if(LDEBUG) cerr << soliloquy << " vpflow.getattachedscheme(\"BADER::REFERENCE\")=" << vpflow.flag("BADER::REFERENCE") << endl;
       ref_file = execution_path + "/" + vpflow.getattachedscheme("BADER::REFERENCE");  //might need to decompress
@@ -400,7 +401,7 @@ namespace bader_functions {
       }
       if(aurostd::IsCompressed(ref_file)) {
         oss << soliloquy << " decompressing " << ref_file << "." << endl;
-        if(!aurostd::efile2tempfile(ref_file, ref_file)) {
+        if(!aurostd::efile2tempfile(ref_file, ref_file, tempfile_created)) {
           oss << endl;
           oss << soliloquy << " ERROR: Unable to decompress " << ref_file << "." << " "; //<< endl //CO20180502;
           oss << soliloquy << " [dir=" << directory << "]" << endl; //CO20180220
@@ -412,7 +413,7 @@ namespace bader_functions {
           return FALSE;
         }
         oss << soliloquy << " created temporary file " << ref_file << "." << endl;
-        remove_files.push_back(ref_file);
+        if(tempfile_created){remove_files.push_back(ref_file);}
       }
       oss << soliloquy << " referencing " << ref_file << "." << endl;
     } else {
@@ -438,7 +439,7 @@ namespace bader_functions {
       if(LDEBUG) cerr << soliloquy << " FOUND " << required_files.at(i) << endl;
       if(aurostd::IsCompressed(required_files.at(i))) {
         oss << soliloquy << " decompressing " << required_files.at(i) << "." << endl;
-        if(!aurostd::efile2tempfile(required_files.at(i), tmp_file)) {
+        if(!aurostd::efile2tempfile(required_files.at(i), tmp_file, tempfile_created)) {
           oss << endl;
           oss << soliloquy << " ERROR: Unable to decompress " << required_files.at(i) << "." << " "; //<< endl //CO20180502;
           oss << soliloquy << " [dir=" << directory << "]" << endl; //CO20180220
@@ -450,7 +451,7 @@ namespace bader_functions {
           return FALSE;
         }
         oss << soliloquy << " created temporary file " << tmp_file << "." << endl;
-        remove_files.push_back(tmp_file);
+        if(tempfile_created){remove_files.push_back(tmp_file);}
         if(aurostd::FileEmpty(tmp_file)) {
           oss << endl;
           oss << soliloquy << " ERROR: " << required_files.at(i) << " is empty." << " "; //<< endl //CO20180502;
@@ -2835,10 +2836,11 @@ namespace pflow {
     bool clean_up = false;
     //check if INPUT is compressed, and decompress
     if(LDEBUG) cerr << soliloquy << " FIND / DECOMPRESS INPUT" << endl;
+    bool tempfile_created=false;
     if(aurostd::IsCompressed(chgcar_file)) {
       clean_up = true;
       oss << soliloquy << " decompressing " << chgcar_file << "." << endl;
-      if(!aurostd::efile2tempfile(chgcar_file, chgcar_file)) {
+      if(!aurostd::efile2tempfile(chgcar_file, chgcar_file, tempfile_created)) {
         oss << endl;
         oss << soliloquy << " ERROR: Unable to decompress " << chgcar_file << "." << " "; //<< endl //CO20180502;
         oss << soliloquy << " [dir=" << directory << "]" << endl; //CO20180220
@@ -2879,7 +2881,7 @@ namespace pflow {
     //  oss << soliloquy << " Exiting." << endl;
     //  oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
-    //  aurostd::RemoveFile(chgcar_file);
+    //  if(tempfile_created){aurostd::RemoveFile(chgcar_file);}
 #endif
     //  return FALSE;
     //}
@@ -2893,7 +2895,7 @@ namespace pflow {
     //  oss << soliloquy << " Exiting." << endl;
     //  oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
-    //  aurostd::RemoveFile(chgcar_file);
+    //  if(tempfile_created){aurostd::RemoveFile(chgcar_file);}
 #endif
     //  return FALSE;
     //}
@@ -2905,7 +2907,7 @@ namespace pflow {
       oss << soliloquy << " Exiting." << endl;
       oss << endl;
 #ifndef _AFLOW_TEMP_PRESERVE_
-      aurostd::RemoveFile(chgcar_file);
+      if(tempfile_created){aurostd::RemoveFile(chgcar_file);}
 #endif
       return FALSE;
     }
@@ -2914,7 +2916,7 @@ namespace pflow {
 #ifndef _AFLOW_TEMP_PRESERVE_
     if(clean_up) {
       oss << soliloquy << " removing temporary file " << chgcar_file << "." << endl;
-      aurostd::RemoveFile(chgcar_file);
+      if(tempfile_created){aurostd::RemoveFile(chgcar_file);}
     }
 #endif
     return TRUE;

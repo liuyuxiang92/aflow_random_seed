@@ -14,7 +14,7 @@
 
 namespace aurostd {
 
-  void VASP_PseudoPotential_CleanName_InPlace(string& species,bool capital_letters_only) { //CO20190712
+  void VASP_PseudoPotential_CleanName_InPlace(string& species,bool capital_letters_only,bool remove_floats) { //CO20190712  //CO20210623 - added remove_floats
     //WARNING: to anyone adding to this list, BE CAREFUL to avoid adding entries that contain capital letters
     //they must be added to CAPITAL_LETTERS_PP_LIST in aurostd.h
     //these pp suffixes cause problems when parsing compounds (capital letters)
@@ -81,18 +81,21 @@ namespace aurostd {
       aurostd::RemoveSubStringInPlace(species,"_2");
       aurostd::RemoveSubStringInPlace(species,"_3");
 
-      aurostd::RemoveSubStringInPlace(species,"1.75"); //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H1.75
-      aurostd::RemoveSubStringInPlace(species,"1.66"); //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H1.66
-      aurostd::RemoveSubStringInPlace(species,"1.33"); //CO20190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H1.33
-      aurostd::RemoveSubStringInPlace(species,"1.25"); //CO20190712 - before all other decimal numbers
-      aurostd::RemoveSubStringInPlace(species,"1.5"); //CO20190712 - potpaw_PBE/potpaw_PBE.06May2010/H1.5
-      aurostd::RemoveSubStringInPlace(species,".75");  //CO20190712 - before 0.5
-      aurostd::RemoveSubStringInPlace(species,".25");  //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.25
-      aurostd::RemoveSubStringInPlace(species,".66"); //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.66
-      aurostd::RemoveSubStringInPlace(species,".33"); //CO20190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.33
-      aurostd::RemoveSubStringInPlace(species,".42"); //CO20190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.42
-      aurostd::RemoveSubStringInPlace(species,".58"); //CO20190712 - before 0.5 //potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.58
-      aurostd::RemoveSubStringInPlace(species,".5");
+      //CO20210623 - selectively remove floats, this might interfere with extracting composition
+      if(remove_floats){
+        aurostd::RemoveSubStringInPlace(species,"1.75"); //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H1.75
+        aurostd::RemoveSubStringInPlace(species,"1.66"); //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H1.66
+        aurostd::RemoveSubStringInPlace(species,"1.33"); //CO20190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H1.33
+        aurostd::RemoveSubStringInPlace(species,"1.25"); //CO20190712 - before all other decimal numbers
+        aurostd::RemoveSubStringInPlace(species,"1.5"); //CO20190712 - potpaw_PBE/potpaw_PBE.06May2010/H1.5
+        aurostd::RemoveSubStringInPlace(species,".75");  //CO20190712 - before 0.5
+        aurostd::RemoveSubStringInPlace(species,".25");  //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.25
+        aurostd::RemoveSubStringInPlace(species,".66"); //CO20190712 - potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.66
+        aurostd::RemoveSubStringInPlace(species,".33"); //CO20190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.33
+        aurostd::RemoveSubStringInPlace(species,".42"); //CO20190712 - potpaw_PBE.54/potpaw_PBE.54.04Sep2015/H.42
+        aurostd::RemoveSubStringInPlace(species,".58"); //CO20190712 - before 0.5 //potpaw_LDA.52/potpaw_LDA.52.19Apr2012/H.58
+        aurostd::RemoveSubStringInPlace(species,".5");
+      }
 
       aurostd::RemoveSubStringInPlace(species,"+1");
       aurostd::RemoveSubStringInPlace(species,"+3");
@@ -305,7 +308,14 @@ namespace aurostd {
 
     string input=_input;
 
-    if(clean && (e_str_type==composition_string || (e_str_type==pp_string && keep_pp==false))){aurostd::VASP_PseudoPotential_CleanName_InPlace(input);}  //in case we run into potpaw_PBE/Na, but only works for single elements, must be before check for isupper(input[0])
+    if(clean && (e_str_type==composition_string || (e_str_type==pp_string && keep_pp==false))){
+      //in case we run into potpaw_PBE/Na, but only works for single elements, must be before check for isupper(input[0]) 
+      bool capital_letters_only=false;  //default
+      bool remove_floats=false; //CO20210623 - explicitly KEEP floats for composition
+      aurostd::VASP_PseudoPotential_CleanName_InPlace(input,capital_letters_only,remove_floats);
+    }
+
+    if(LDEBUG) {cerr << soliloquy << " checking input [1] =" << input << endl;}
 
     if(!isupper(input[0])) {
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "Elements must be properly capitalized (input="+input+")", FileMESSAGE, oss, _LOGGER_ERROR_);
@@ -328,7 +338,7 @@ namespace aurostd {
       //input=tokens[0];
     }
 
-    if(LDEBUG) {cerr << soliloquy << " checking input=" << input << endl;}
+    if(LDEBUG) {cerr << soliloquy << " checking input [2] =" << input << endl;}
 
     //CO20180409 - running through input twice, no need, simply check at the end
     //uint numberOfElements = 0;

@@ -433,10 +433,8 @@ namespace aurostd {
   bool DirectorySkipped(string directory);
   bool DirectoryWritable(string directory);
   bool DirectoryUnwritable(string directory);
-  string TmpFileCreate(string prefix);
-  string TmpFileCreate(void);
-  string TmpDirectoryCreate(string prefix);
-  string TmpDirectoryCreate(void);
+  string TmpFileCreate(const string& prefix="");
+  string TmpDirectoryCreate(const string& prefix="");
   string CleanFileName(const string& fileIN);
   string ProperFileName(string fileIN);
   bool CopyFile(string file_from,string file_to);
@@ -444,7 +442,8 @@ namespace aurostd {
   //CO START
   bool MatchCompressed(const string& CompressedFileName,const string& FileNameOUT);
   // [OBSOLETE]  bool DecompressFile(const string& CompressedFileName);
-  bool efile2tempfile(string _FileNameIN, string& FileNameOUT); //CO20180220
+  bool efile2tempfile(const string& _FileNameIN, string& FileNameOUT); //CO20180220
+  bool efile2tempfile(const string& _FileNameIN, string& FileNameOUT,bool& tempfile_created); //CO20180220
   bool IsCompressed(const string& FileNameIn,string& FileNameOut);
   bool IsCompressed(const string& FileNameIn);
   string GetCompressionExtension(const string& CompressedFileName);
@@ -554,6 +553,7 @@ namespace aurostd {
   // about sleeping
   unsigned int Sleep(unsigned int seconds);
   // about extracting from to files
+  vector<string> GrepFile(const string& filename,const string& keyword,bool RemoveWS=false,bool RemoveComments=true); //CO20210623
   bool ExtractToFileEXPLICIT(ifstream& FileIN,string FileNameOUTPUT,string Keyword);
   bool ExtractToFileEXPLICIT(string StringIN,string FileNameOUTPUT,string Keyword);
   bool ExtractToFileEXPLICIT(ifstream& FileIN,string FileNameOUTPUT,string Keyword_start,string Keyword_stop);

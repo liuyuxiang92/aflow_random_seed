@@ -10769,6 +10769,7 @@ void xstructure::GetExtendedCrystallographicData(xstructure& str_sp,
   // update tolerance info in *this
   (*this).sym_eps=tolerance;
   (*this).sym_eps_calculated=true;
+  double tolerance_orig=tolerance; //DX20210623
 
   // ---------------------------------------------------------------------------
   // loop over the real, reciprocal, and superlattice analysis until all
@@ -10791,7 +10792,7 @@ void xstructure::GetExtendedCrystallographicData(xstructure& str_sp,
     // turn off scan
     if(count==count_max){
       no_scan=(*this).sym_eps_no_scan=true;
-      tolerance = sym_eps; // set to original eps
+      tolerance = tolerance_orig; // set to original tolerance //DX20210623 - originally sym_eps, but this could be AUROSTD_MAX_DOUBLE;
       cerr << function_name << " Unable to calculate consistent symmetry. Calculating at original tolerance (sym_eps=" << sym_eps << ") and ignoring consistency checks." << endl;
     }
 
@@ -10824,7 +10825,7 @@ void xstructure::GetExtendedCrystallographicData(xstructure& str_sp,
               cerr << function_name << " WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << (*this).directory << endl;
             }
             no_scan = (*this).sym_eps_no_scan = true; //DX20210331
-            (*this).sym_eps = sym_eps; //set to original tolerance
+            (*this).sym_eps = tolerance_orig; // set to original tolerance //DX20210623 - originally sym_eps, but this could be AUROSTD_MAX_DOUBLE;
           }
         }
         continue;
@@ -13444,8 +13445,19 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
 
   // no messed up volume
   // this is checked in TransformStructure, but kept as a safety
+  // DX20210623 - the check has been improved:
+  // first, check if the reduction factor (inverse of fraction) is an integer
+  // then, check if that factor is consistent with the number of atoms
+  // this method is less sensitive to the tolerance threshold
   double fraction=aurostd::det(prim.lattice)/aurostd::det((*this).lattice);
-  if(abs(natoms_orig*fraction-prim.atoms.size())>0.1) {
+  double reduction_factor = 1.0/fraction;
+  if(!aurostd::isinteger(reduction_factor,0.1)){
+    stringstream message;
+    message << "The original volume is not an integer multiple of the new volume: " << reduction_factor;
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+  }
+  uint reduction_factor_integer = (uint)round(reduction_factor);
+  if(abs(natoms_orig-(double)reduction_factor_integer*prim.atoms.size())>0.1) {
     stringstream message;
     message << "ERROR   " << function_name << endl;
     message << "        supercell has the wrong number of atoms" << endl;
@@ -13456,9 +13468,10 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
     message << "        a.atoms.size()     = " << (*this).atoms.size() << endl;
     message << "        b.atoms.size()     = " << prim.atoms.size() << endl;
     message << "        fraction           = " << fraction << endl;
-    message << "        supercell atoms    = " << fraction*prim.atoms.size() << endl;
+    message << "        reduction_factor   = " << reduction_factor << endl; //DX20210623
+    message << "        supercell atoms    = " << reduction_factor*prim.atoms.size() << endl; //DX20210623
     message << prim << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::GetPrimitive(void)",message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
   }
   // everything ok
   if(LDEBUG){ cerr << function_name << " END [ok]=" << fraction << endl; }
