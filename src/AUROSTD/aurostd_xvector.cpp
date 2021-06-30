@@ -2102,6 +2102,10 @@ namespace aurostd { //HE20210511
    */
   template<class utype> double
     area(const vector<xvector<utype> >& points){ //HE20210511
+      string soliloquy=XPID+"aurostd::area(): ";
+      if (points.size() < 3){
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "there must be at least three points to calculate an area", _VALUE_ERROR_);
+      }
       double result = 0.0;
       uint upper_border = points.size()-2;
       xvector<utype> sum_temp(points[0].lrows,points[0].urows);

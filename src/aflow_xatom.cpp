@@ -1980,7 +1980,6 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
 
   vector<vector<uint> > facet_collection;
   AEhull.getJoinedFacets(facet_collection);
-//  for (vector<uint> f: facet_collection){
   for (std::vector<vector<uint> >::const_iterator f = facet_collection.begin(); f != facet_collection.end(); ++f) {
     vector<uint> nf;
     for (std::vector<uint>::const_iterator v = f->begin(); v != f->end(); ++v) nf.push_back(*v);
@@ -2016,7 +2015,7 @@ xvector<double> AtomEnvironment::index2Point(uint index){
     string soliloquy=XPID+"AtomEnvironment::index2Point(): ";
     for(uint i=0;i<coordinates_neighbor.size();i++){
         if (index < coordinations_neighbor[i]) return coordinates_neighbor[i][index];
-        else index += - coordinations_neighbor[i];
+        else index -= coordinations_neighbor[i];
     }
     throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "index out of bounds", _INDEX_BOUNDS_);
 }
@@ -2187,21 +2186,6 @@ void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_ind
   // ---------------------------------------------------------------------------
   // [FUTURE] ATOM_ENVIRONMENT_MODE_3 : environment out to largest gap in radial distribution function 
   // i.e., GFA convention
-
-  if(mode==ATOM_ENVIRONMENT_MODE_3){
-    uint frequency = 0;
-    double min_dist = AUROSTD_MAX_DOUBLE;
-    vector<xvector<double> > coordinates;
-    minimumCoordinationShell(xstr, center_index, min_dist, frequency, coordinates);
-
-   elements_neighbor.push_back("Mix");
-   types_neighbor.push_back(0);
-   distances_neighbor.push_back(min_dist);
-   coordinations_neighbor.push_back(frequency);
-   coordinates_neighbor.push_back(coordinates);
-   num_neighbors += frequency;
-
-   }
 
 }
 
