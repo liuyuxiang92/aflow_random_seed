@@ -184,7 +184,7 @@ namespace KBIN {
         if (i < _NUM_RELAX_) {
           Krun = VASP_Run(xvasp, aflags, kflags, vflags, _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), true, fileMessage);
           XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, true, fileMessage); //CO20210315 - always write_incar
-          XVASP_KPOINTS_IBZKPT_UPDATE(xvasp, aflags, vflags, i, true, fileMessage); //CO20210315 - always write_incar
+          XVASP_KPOINTS_IBZKPT_UPDATE(xvasp, aflags, vflags, i, true, fileMessage); //CO20210315 - always write_kpoints
         } else { 
           Krun = VASP_Run(xvasp, aflags, kflags, vflags, _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), true, fileMessage);
           XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, false, fileMessage);  //ME20200115 - or else SPIN_REMOVE_RELAX_2 does not work  //CO20210315 - write_incar only if (i<num_relax), no static afterward
