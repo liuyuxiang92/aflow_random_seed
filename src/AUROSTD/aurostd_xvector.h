@@ -504,7 +504,7 @@ namespace aurostd {
     isCollinear(const xvector<utype>& v0,const xvector<utype>& v1,const utype& tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype;
 
   template<class utype> double // area encapsulated by ordered points (on the same plane) //HE20210511
-    area(const vector<xvector<utype> >& points) __xprototype;
+    areaPointsOnPlane(const vector<xvector<utype> >& points) __xprototype;
   template<class utype> double // volume defined by points, facets and all outward or inward facing normals (needs to be consistent) //HE20210511
     volume(const vector<xvector<utype> >& points, const vector<vector<uint> >& facets, const vector<xvector<utype> >& normals) __xprototype;
   double // volume defined by points and ordered facets //HE20210511

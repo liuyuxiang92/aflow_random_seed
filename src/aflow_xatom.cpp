@@ -1998,7 +1998,7 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
     for (std::vector<uint>::const_iterator ind=facet_collection[t].begin(); ind != facet_collection[t].end(); ind++){
       facet_coords.push_back(points[*ind]);
     }
-    facet_area.push_back(aurostd::area(facet_coords));
+    facet_area.push_back(aurostd::areaPointsOnPlane(facet_coords));
   }
   volume = aurostd::volumeConvex(points, facets);
   area = aurostd::sum(facet_area);

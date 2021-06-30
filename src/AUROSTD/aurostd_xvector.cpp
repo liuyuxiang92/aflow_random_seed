@@ -2101,8 +2101,8 @@ namespace aurostd { //HE20210511
    * doi: 10.1109/ICIP.2001.958278.
    */
   template<class utype> double
-    area(const vector<xvector<utype> >& points){ //HE20210511
-      string soliloquy=XPID+"aurostd::area(): ";
+    areaPointsOnPlane(const vector<xvector<utype> >& points){ //HE20210511
+      string soliloquy=XPID+"aurostd::areaPointsOnPlane(): ";
       if (points.size() < 3){
         throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "there must be at least three points to calculate an area", _VALUE_ERROR_);
       }
@@ -2157,7 +2157,7 @@ namespace aurostd { //HE20210511
       }
       facet_points.clear();
       for (std::vector<uint>::const_iterator p_id = facets[f_id].begin(); p_id != facets[f_id].end(); ++p_id) facet_points.push_back(points[*p_id]);
-      double area = aurostd::area(facet_points);
+      double area = aurostd::areaPointsOnPlane(facet_points);
       double scalar_prod = aurostd::scalar_product(normals[f_id], facet_points[0]);
       if (LDEBUG) cerr << soliloquy  << f_id << " | " << scalar_prod * area / 3.0 << " | " << area << " | " << normals[f_id] << " | " << scalar_prod << endl;
       result += scalar_prod * area;

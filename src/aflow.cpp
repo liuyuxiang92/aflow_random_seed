@@ -866,7 +866,7 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   ipoints.push_back(p0i); ipoints.push_back(p1i); ipoints.push_back(p2i); ipoints.push_back(p3i); ipoints.push_back(p4i);
   ipoints.push_back(p5i);
 
-  calculated = aurostd::area(points);
+  calculated = aurostd::areaPointsOnPlane(points);
   check_equal(calculated, expected, check_name, check_num, passed_checks, results);
 
   // ---------------------------------------------------------------------------
@@ -875,7 +875,7 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   check_name = "non convex area (int)";
   expected = 10.0;
 
-  calculated = aurostd::area(ipoints);
+  calculated = aurostd::areaPointsOnPlane(ipoints);
   check_equal(calculated, expected, check_name, check_num, passed_checks, results);
 
 
@@ -894,7 +894,7 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   check_name = "3d triangle area (double)";
   expected = 3.5355339059;
 
-  calculated = aurostd::area(points);
+  calculated = aurostd::areaPointsOnPlane(points);
   check_similar(calculated, expected, check_name, check_num, passed_checks, results);
 
   // ---------------------------------------------------------------------------
@@ -903,7 +903,7 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   check_name = "3d triangle area (int)";
   expected = 3.5355339059;
 
-  calculated = aurostd::area(ipoints);
+  calculated = aurostd::areaPointsOnPlane(ipoints);
   check_similar(calculated, expected, check_name, check_num, passed_checks, results);
 
   // present overall result
