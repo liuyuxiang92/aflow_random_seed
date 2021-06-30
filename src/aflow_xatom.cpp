@@ -2136,12 +2136,12 @@ aurostd::JSONwriter AtomEnvironment::toJSON(bool full) const{
 //     the neighbor elements, types, distance, coordination, and coordinates are stored in the object
 //     only one distance is sto
 // preliminary functionality, can/will be expanded in the future
-void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_index, uint mode){ 
+void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_index, uint ae_mode){
   vector<string> neighbor_elements;
-  getAtomEnvironment(xstr, center_index, neighbor_elements, mode); 
+  getAtomEnvironment(xstr, center_index, neighbor_elements, ae_mode);
 }
 
-void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_index, const vector<string>& neighbor_elements, uint mode){ 
+void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_index, const vector<string>& neighbor_elements, uint ae_mode){
 
   // ---------------------------------------------------------------------------
   // ATOM_ENVIRONMENT_MODE_1 : default minimum coordination shell
@@ -2150,7 +2150,7 @@ void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_ind
 
   // ---------------------------------------------------------------------------
   // get central atom info
-  mode=mode;
+  mode=ae_mode;
   for(uint i=0;i<xstr.atoms.size();i++){
     if(i==center_index){
       element_center = xstr.atoms[i].name;

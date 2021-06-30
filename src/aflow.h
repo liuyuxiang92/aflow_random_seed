@@ -1447,8 +1447,8 @@ class AtomEnvironment{
     double area;                                                                            // surface area of each environment //HE20210408
     double volume;                                                                          // volume of each environment //HE20210408
     //functions
-    void getAtomEnvironment(const xstructure& xstr, uint center_index, uint mode=ATOM_ENVIRONMENT_MODE_1);                                          // get environment around atom index                                               
-    void getAtomEnvironment(const xstructure& xstr, uint center_index, const vector<string>& neighbor_elements, uint mode=ATOM_ENVIRONMENT_MODE_1); // get restricted environment (via specified elements) around atom index
+    void getAtomEnvironment(const xstructure& xstr, uint center_index, uint ae_mode=ATOM_ENVIRONMENT_MODE_1);                                          // get environment around atom index
+    void getAtomEnvironment(const xstructure& xstr, uint center_index, const vector<string>& neighbor_elements, uint ae_mode=ATOM_ENVIRONMENT_MODE_1); // get restricted environment (via specified elements) around atom index
     void constructAtomEnvironmentHull(void);                                                                                                        // construct hull around an environment //HE20210408
     xvector<double> index2Point(uint index);                                                                                                        // flat view on coordinates_neighbor //HE20210408
     aurostd::JSONwriter toJSON(bool full=true) const;    //HE20210408 //DX20210624 - added mode input
