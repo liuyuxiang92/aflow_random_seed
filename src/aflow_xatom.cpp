@@ -3440,7 +3440,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   // ----------------------------------------------------------------------
   //  CIF OUTPUT
   if(a.iomode==IOCIF) { // CIF
-    pflow::PrintCIF(oss, a, a.spacegroupnumber);
+    pflow::PrintCIF(oss, a, a.spacegroupnumber, a.setting_ITC); //DX20210630 - add setting (otherwise, this will mess up rhl systems by mixing the hex and rhl setting)
     return oss;
   }
 
