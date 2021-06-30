@@ -177,12 +177,12 @@ uint bibtex2file(string bibtex,string _authors,string _title,string journal,stri
   if(authors.size()) bibcontent << " authors={" << authors << "}";  // AUTHORS
   if(title.size()) bibcontent << "," << endl << " title={" << aurostd::html2latex(title) << "}"; // TITLE
   if(journal.size()) bibcontent << "," << endl << " journal={" << journal << "}";   // JOURNAL
-  if(volume.size()) bibcontent << "," << endl << " volume={" << volume << "}";   // VOLUME
-  if(issue.size()) bibcontent << "," << endl << " issue={" << issue << "}";   // ISSUE
-  if(pages.size()) bibcontent << "," << endl << " pages={" << pages << "}";   // PAGES
-  if(year.size()) bibcontent << "," << endl << " year={" << year << "}";   // YEAR
+  if(volume.size()) bibcontent << "," << "volume={" << volume << "}";   // VOLUME
+  if(issue.size()) bibcontent << "," << "issue={" << issue << "}";   // ISSUE
+  if(pages.size()) bibcontent << "," << "pages={" << pages << "}";   // PAGES
+  if(year.size()) bibcontent << "," << "year={" << year << "}";   // YEAR
   if(abstract.size()) bibcontent << "," << endl << " abstract={" << abstract << "}";   // ABSTRACT
-  if(doi.size()) bibcontent << "," << endl << " doi={" << doi << "}";   // DOI
+  if(doi.size()) bibcontent << "," << "doi={" << doi << "}";   // DOI
   bibcontent << endl << "}" << endl;
   bibcontent << "% Automatically generated - AFLOW " << AFLOW_VERSION << endl;
 
