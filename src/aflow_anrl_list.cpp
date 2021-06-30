@@ -2526,8 +2526,8 @@ namespace anrl {
         vparameters.push_back("8.74,0.575514874142,0.0048,0.1685,0.1305,0.628,0.1695,0.5228,0.1635,0.0753,0.3383,0.1485");
       }
       // ---------------------------------------------------------------------------
-      if(anrl_label=="A_tP30_136_bf2ij"){
-        vparameters.push_back("10.59,0.532011331445,0.1033,0.3667,0.0383,0.5608,0.2354,0.3183,0.27");
+      if(anrl_label=="sigma_tP30_136_bf2ij" || anrl_label == "A_tP30_136_bf2ij"){ //DX20210630 - combined disordered and unary version (they are structurally the same)
+        vparameters.push_back("10.59,0.532011331445,0.1033,0.3667,0.0383,0.5608,0.2354,0.3183,0.27"); //DX20210630 - the explicit sigma parameters are slightly different: 8.7966,0.518177,0.10136,0.36878,0.03651,0.56609,0.23933,0.31733,0.25202
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="AB_tP8_136_g_f"){
@@ -2538,10 +2538,6 @@ namespace anrl {
         vparameters.push_back("4.5922,0.644005052045,0.30496");
         vparameters.push_back("4.86,0.56995885,0.305");  // 002, binary metal-oxide prototype (ICSD #647647)
         vparameters.push_back("3.9342,1.2762442,0.6092");  // 003, binary metal-carbide prototype (ICSD #88057)
-      }
-      // ---------------------------------------------------------------------------
-      if(anrl_label=="sigma_tP30_136_bf2ij" || anrl_label == "A_tP30_136_bf2ij"){ //DX20200929 - added "correct" label version
-        vparameters.push_back("8.7966,0.518177477662,0.39864,0.13122,0.46349,0.06609,0.73933,0.18267,0.25202");
       }
       // ---------------------------------------------------------------------------
       if(anrl_label=="A_tP4_136_f"){
