@@ -678,10 +678,13 @@ void check_similar(const double &calculated, const double &expected, const strin
   check(passed, calculated, expected, check_name, check_num, passed_checks, results);
 }
 
+
+// This should become a collection of tests regarding aurostd.
+// At the moment, just the functions aurostd::volume and aurostd::area are tested here.
 bool AurostdTest(ostream& oss){ofstream FileMESSAGE; return AurostdTest(FileMESSAGE,oss);} //HE20210511
 bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 
-  string function_name="AurostdTest():";
+  string function_name = XPID + "AurostdTest():";
   stringstream message;
   _aflags aflags;
   aflags.Directory=aurostd::getPWD();
@@ -919,7 +922,7 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 bool AtomicEnvironmentTest(ostream& oss){ofstream FileMESSAGE;return AtomicEnvironmentTest(FileMESSAGE,oss);} //HE20210511
 bool AtomicEnvironmentTest(ofstream& FileMESSAGE, ostream& oss){ //HE20210511
 
-  string function_name="AtomicEnvironmentTest():";
+  string function_name = XPID + "AtomicEnvironmentTest():";
   stringstream message;
   _aflags aflags;
   aflags.Directory=aurostd::getPWD();

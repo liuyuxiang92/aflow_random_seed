@@ -8324,7 +8324,7 @@ namespace pflow {
       aflowlib::AflowlibLocator(auid, aurl, "AFLOWLIB_AUID2AURL");
     }
 
-    if (!aeOutBase.empty()) mkdir(aeOutBase.c_str(), 0777);
+    if (!aeOutBase.empty()) aurostd::DirectoryMake(aeOutBase);
 
     if (!aurl.empty()){
       aeOutBase += auid.substr(6);
