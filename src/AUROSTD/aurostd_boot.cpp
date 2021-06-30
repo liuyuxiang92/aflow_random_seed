@@ -261,7 +261,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
 
   vector<vector<utype> > vvu;sort(vvu.begin(),vvu.end(),aurostd::compareVecElements<utype>);  //CO20190629
   vector<xvector<utype> > vxvu;sort(vxvu.begin(),vxvu.end(),aurostd::compareXVecElements<utype>);  //CO20190629
-  vector<vector<uint>> vvui; //HE20210511
+  vector<vector<uint> > vvui; //HE20210511
   std::sort(vvu.begin(),vvu.end(),aurostd::compareVecElement<utype>()); //CO20190629
   std::sort(vxvu.begin(),vxvu.end(),aurostd::compareVecElement<utype>()); //CO20190629
 

@@ -1709,12 +1709,9 @@ namespace chull {
    */
   void ConvexHull::sortFacetVertices(vector<uint> &facet, const uint &facet_id){//HE20210510
     xvector<double> center(3,1);
-    struct sa {
-      uint p_ind;
-      double angle;
-    };
-    uint num_points = facet.size();
-    vector<sa> angle;
+    const uint num_points = facet.size();
+    xvector<uint> index_list(num_points,1);
+    xvector<double> angle_list(num_points,1);
     for (std::vector<uint>::const_iterator p_id = facet.begin(); p_id != facet.end(); ++p_id) center += m_points[*p_id].m_coords;
 
     center /= num_points;
@@ -1722,16 +1719,18 @@ namespace chull {
     const xvector<double> normal = m_facets[facet_id].m_normal;
 
     // first index is used for the start_vector, therefore the angle is set to 0.0
-    angle.push_back({facet[0], 0.0});
+    angle_list[1] = 0;
+    index_list[1] = 0;
     for (uint i=1; i<num_points; i++){
       const xvector<double> next_vector = m_points[facet[i]].m_coords - center;
       const double dot = aurostd::scalar_product(start_vector, next_vector);
       const double det = start_vector[1]*next_vector[2]*normal[3] + next_vector[1]*normal[2]*start_vector[3] + normal[1]*start_vector[2]*next_vector[3]
                          - start_vector[3]*next_vector[2]*normal[1] - next_vector[3]*normal[2]*start_vector[1] - normal[3]*start_vector[2]*next_vector[1];
-      angle.push_back({facet[i], atan2(det, dot)});
+      angle_list[i+1] = atan2(det, dot);
+      index_list[i+1] = facet[i];
     }
-    sort(angle.begin(),angle.end(), [&](sa i,sa j){return i.angle<j.angle;});
-    for (uint i=0; i<num_points; i++) facet[i] = angle[i].p_ind;
+    aurostd::quicksort2(num_points, angle_list, index_list);
+    for (uint i=0; i<num_points; i++) facet[i] = index_list[i+1];
   }
 
   /**
@@ -1739,16 +1738,16 @@ namespace chull {
    * @param facet_collection output vector containing lists of vertex indexes
    * @param angle_threshold max angle between two facts in radian to be still coplanar
    */
-  void ConvexHull::getJoinedFacets(vector<vector<uint>> &facet_collection, const double &angle_threshold) {//HE20210510
+  void ConvexHull::getJoinedFacets(vector<vector<uint> > &facet_collection, const double &angle_threshold) {//HE20210510
     bool LDEBUG=(false || XHOST.DEBUG);
     string soliloquy=XPID+"ConvexHull::getJoinedFacets(): ";
 
     if (m_dim != 3) throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "facet joining is just available in 3D", _VALUE_RANGE_);
-    vector <vector<uint>> raw_facets;
-    vector<xvector<double>> normals;
-    std::map<uint, std::set<uint>>  point_neighbors;
-    std::set<std::array<uint, 2>> raw_join_list;
-    vector<std::set<uint>> join_list;
+    vector <vector<uint> > raw_facets;
+    vector<xvector<double> > normals;
+    std::map<uint, std::set<uint> >  point_neighbors;
+    std::set<std::pair<uint, uint> > raw_join_list;
+    vector<std::set<uint> > join_list;
     std::set<uint> remove_facet;
 
     // Collect information on each facet
@@ -1766,14 +1765,14 @@ namespace chull {
 
     // Build lookup for neighboring points
     // (Base point is included to make a check easier)
-    for (std::vector<vector<uint>>::const_iterator facet = raw_facets.begin(); facet != raw_facets.end(); ++facet){
+    for (std::vector<vector<uint> >::const_iterator facet = raw_facets.begin(); facet != raw_facets.end(); ++facet){
       for (std::vector<uint>::const_iterator ind = facet->begin(); ind != facet->end(); ++ind){
         std::copy(facet->begin(),facet->end(), std::inserter(point_neighbors[*ind],point_neighbors[*ind].end()));
       }
     }
     uint raw_facets_size = raw_facets.size();
     // Check for each facet, if their neighbors have an equivalent normal vector
-    if (LDEBUG) cerr << soliloquy << " coplanar | angle | facets | n1 | n2" << endl;
+    if (LDEBUG) cerr << soliloquy << "coplanar | angle | facets | n1 | n2" << endl;
     for (uint i1=0; i1<raw_facets_size; i1++){
       const vector<uint> base_facet = raw_facets[i1];
       for (uint i2=i1+1; i2<raw_facets_size; i2++){
@@ -1789,7 +1788,7 @@ namespace chull {
         double check_angle = aurostd::angle(normals[i1], normals[i2]);
         if (check_angle<angle_threshold){
           if(LDEBUG) cerr << soliloquy << "YES | ";
-          raw_join_list.insert({i1, i2});
+          raw_join_list.insert(std::make_pair(i1, i2));
           remove_facet.insert(i1);
           remove_facet.insert(i2);
         }
@@ -1809,22 +1808,23 @@ namespace chull {
 
     // Combine the joined pairs into complete facets
     while (raw_join_list.size()){
-      std::array<uint,2> start=*raw_join_list.begin();
-      std::set<uint> new_facet(start.begin(), start.end());
+      std::pair<uint, uint> start=*raw_join_list.begin();
+      std::set<uint> new_facet;
+      new_facet.insert(start.first); new_facet.insert(start.second);
       raw_join_list.erase(start);
-      std::vector<std::array<uint,2>> to_delete;
-      for (std::set<std::array<uint,2>>::const_iterator next_ptr = raw_join_list.begin(); next_ptr != raw_join_list.end(); ++next_ptr) {
-        std::array<uint,2> next = *next_ptr;
-        if (new_facet.count(next[0])) {
-          new_facet.insert(next[1]);
+      std::vector<std::pair<uint, uint> > to_delete;
+      for (std::set< std::pair<uint, uint> >::const_iterator next_ptr = raw_join_list.begin(); next_ptr != raw_join_list.end(); ++next_ptr) {
+        std::pair<uint, uint> next = *next_ptr;
+        if (new_facet.count(next.first)) {
+          new_facet.insert(next.second);
           to_delete.push_back(next);
         }
-        else if (new_facet.count(next[1])) {
-          new_facet.insert(next[0]);
+        else if (new_facet.count(next.second)) {
+          new_facet.insert(next.first);
           to_delete.push_back(next);
         }
       }
-      for (std::vector<std::array<uint,2>>::const_iterator next = to_delete.begin(); next != to_delete.end(); ++next) {
+      for (std::vector<std::pair<uint, uint> >::const_iterator next = to_delete.begin(); next != to_delete.end(); ++next) {
         raw_join_list.erase(*next);
       }
       join_list.push_back(new_facet);
@@ -1836,7 +1836,7 @@ namespace chull {
       if (!remove_facet.count(i)) facet_collection.push_back(raw_facets[i]);
     }
     // Add joined facets
-    for (std::vector<std::set<uint>>::const_iterator to_join = join_list.begin(); to_join != join_list.end(); ++to_join) {
+    for (std::vector<std::set<uint> >::const_iterator to_join = join_list.begin(); to_join != join_list.end(); ++to_join) {
       std::set<uint> vertices;
       for (std::set<uint>::const_iterator f_id = to_join->begin(); f_id != to_join->end(); ++f_id) {
         for (std::vector<uint>::const_iterator p_id = raw_facets[*f_id].begin(); p_id != raw_facets[*f_id].end(); ++p_id) {

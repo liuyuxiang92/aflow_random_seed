@@ -179,6 +179,16 @@ static_no_pdf: aflow aflow_data
 static: static_no_pdf
 #	tar Jcfvp /www/AFLOW/CURRENT/aflow_$(VERSNUMBER)_amd64_debian_static.tar.xz aflow aflow_data	
 #ME190313 - Change compiler to clang because g++ fails to compile on some Macs
+
+#HE20210629 build with the oldest supported c++ standard
+.PHONY: min_cpp
+min_cpp: CPP+= -std=c++98
+min_cpp: aflow aflow_data
+
+#HE20210318 - add debug build
+.PHONY: debug
+debug: CPP += -ggdb
+debug: aflow aflow_data
 .PHONY: mac
 mac:
 #	[CO20200508 - OBSOLETE]$(MAKE) CC=clang CPP=clang++ aflow_data

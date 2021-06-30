@@ -8345,7 +8345,7 @@ namespace pflow {
     string file_name;
     if(LDEBUG) cerr << soliloquy << "Saving " << AE.size() << " atomic environments" << endl;
     for(uint i=0; i<AE.size(); i++) {
-      file_name = aeOutBase + "/" + std::to_string(i) + "_" + AE[i].element_center + ".json";
+      file_name = aeOutBase + "/" + aurostd::utype2string(i) + "_" + AE[i].element_center + ".json";
       AE[i].constructAtomEnvironmentHull();
       aurostd::string2file(AE[i].toJSON(), file_name, "WRITE");
       if(LDEBUG) cerr << soliloquy << file_name << endl;

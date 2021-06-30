@@ -504,17 +504,17 @@ namespace aurostd {
     isCollinear(const xvector<utype>& v0,const xvector<utype>& v1,const utype& tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype;
 
   template<class utype> double // area encapsulated by ordered points (on the same plane) //HE20210511
-    area(const vector<xvector<utype>>& points) __xprototype;
+    area(const vector<xvector<utype> >& points) __xprototype;
   template<class utype> double // volume defined by points, facets and all outward or inward facing normals (needs to be consistent) //HE20210511
-    volume(const vector<xvector<utype>>& points, const vector<vector<uint>>& facets, const vector<xvector<utype>>& normals) __xprototype;
+    volume(const vector<xvector<utype> >& points, const vector<vector<uint> >& facets, const vector<xvector<utype> >& normals) __xprototype;
   double // volume defined by points and ordered facets //HE20210511
-    volume(const vector<xvector<int>>& points, const vector<vector<uint>>& facets);
+    volume(const vector<xvector<int> >& points, const vector<vector<uint> >& facets);
   template<class utype> double // volume defined by points and ordered facets //HE20210511
-    volume(const vector<xvector<utype>>& points, const vector<vector<uint>>& facets) __xprototype;
+    volume(const vector<xvector<utype> >& points, const vector<vector<uint> >& facets) __xprototype;
   double // volume defined by points an facets of a convex solid //HE20210511
-    volumeConvex(const vector<xvector<int>>& points, const vector<vector<uint>>& facets);
+    volumeConvex(const vector<xvector<int> >& points, const vector<vector<uint> >& facets);
   template<class utype> double // volume defined by points an facets of a convex solid //HE20210511
-    volumeConvex(const vector<xvector<utype>>& points, const vector<vector<uint>>& facets) __xprototype;
+    volumeConvex(const vector<xvector<utype> >& points, const vector<vector<uint> >& facets) __xprototype;
 
   template<class utype> xvector<utype> //get centroid of data points //CO20180409
     getCentroid(const vector<xvector<utype> >& points) __xprototype;

@@ -698,10 +698,10 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 
   int expected_int = 0;
   string expected_error = "";
-
-  vector<xvector<double>> points;
-  vector<xvector<int>> ipoints;
-  vector<vector<uint>> facets;
+  vector<xvector<double> > points;
+  vector<xvector<int> > ipoints;
+  vector<vector<uint> > facets;
+  vector<uint> facet;
 
   // variables to store examples as doubles (p#) and int (p#i) variants
   xvector<double> p0(3,1); xvector<int> p0i(3,1);
@@ -727,14 +727,18 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   p6i(1) = p6(1) = 1.0; p6i(2) = p6(2) = 1.0; p6i(3) = p6(3) = 3.0;
   p7i(1) = p7(1) = 0.0; p7i(2) = p7(2) = 1.0; p7i(3) = p7(3) = 3.0;
 
-  points = {p0, p1, p2, p3, p4, p5, p6, p7};
-  ipoints = {p0i, p1i, p2i, p3i, p4i, p5i, p6i, p7i};
-  facets.push_back({0,1,2,3});
-  facets.push_back({4,5,6,7});
-  facets.push_back({1,2,6,5});
-  facets.push_back({0,3,7,4});
-  facets.push_back({0,1,5,4});
-  facets.push_back({3,2,6,7});
+  // transfer data into vectors
+  points.clear(); ipoints.clear(); facets.clear();
+  points.push_back(p0); points.push_back(p1); points.push_back(p2); points.push_back(p3); points.push_back(p4);
+  points.push_back(p5); points.push_back(p6); points.push_back(p7);
+  ipoints.push_back(p0i); ipoints.push_back(p1i); ipoints.push_back(p2i); ipoints.push_back(p3i); ipoints.push_back(p4i);
+  ipoints.push_back(p5i); ipoints.push_back(p6i); ipoints.push_back(p7i);
+  facet.clear(); facet.resize(4); facet[0]=0; facet[1]=1; facet[2]=2; facet[3]=3; facets.push_back(facet);
+  facet.clear(); facet.resize(4); facet[0]=4; facet[1]=5; facet[2]=6; facet[3]=7; facets.push_back(facet);
+  facet.clear(); facet.resize(4); facet[0]=1; facet[1]=2; facet[2]=6; facet[3]=5; facets.push_back(facet);
+  facet.clear(); facet.resize(4); facet[0]=0; facet[1]=3; facet[2]=7; facet[3]=7; facets.push_back(facet);
+  facet.clear(); facet.resize(4); facet[0]=0; facet[1]=1; facet[2]=5; facet[3]=4; facets.push_back(facet);
+  facet.clear(); facet.resize(4); facet[0]=3; facet[1]=2; facet[2]=6; facet[3]=7; facets.push_back(facet);
 
   // ---------------------------------------------------------------------------
   // Check | convex solid volume (double)
@@ -761,7 +765,6 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   p3i(1) = p3(1)   = 1.0; p3i(2) = p3(2)   = 1.0; p3i(3) = p3(3)   = 0.0;
   p4i(1) = p4(1)   = 4.0; p4i(2) = p4(2)   = 2.0; p4i(3) = p4(3)   = 0.0;
   p5i(1) = p5(1)   = 4.0; p5i(2) = p5(2)   = 0.0; p5i(3) = p5(3)   = 0.0;
-
   p6i(1) = p6(1)   = 0.0; p6i(2) = p6(2)   = 0.0; p6i(3) = p6(3)   = 4.0;
   p7i(1) = p7(1)   = 0.0; p7i(2) = p7(2)   = 4.0; p7i(3) = p7(3)   = 4.0;
   p8i(1) = p8(1)   = 2.0; p8i(2) = p8(2)   = 4.0; p8i(3) = p8(3)   = 4.0;
@@ -769,18 +772,23 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   p10i(1) = p10(1) = 4.0; p10i(2) = p10(2) = 2.0; p10i(3) = p10(3) = 4.0;
   p11i(1) = p11(1) = 4.0; p11i(2) = p11(2) = 0.0; p11i(3) = p11(3) = 4.0;
 
+  // transfer data into vectors
+  points.clear(); ipoints.clear(); facets.clear();
+  points.push_back(p0); points.push_back(p1); points.push_back(p2); points.push_back(p3); points.push_back(p4);
+  points.push_back(p5); points.push_back(p6); points.push_back(p7); points.push_back(p8); points.push_back(p9);
+  points.push_back(p10); points.push_back(p11);
+  ipoints.push_back(p0i); ipoints.push_back(p1i); ipoints.push_back(p2i); ipoints.push_back(p3i); ipoints.push_back(p4i);
+  ipoints.push_back(p5i); ipoints.push_back(p6i); ipoints.push_back(p7i); ipoints.push_back(p8i); ipoints.push_back(p9i);
+  ipoints.push_back(p10i); ipoints.push_back(p11i);
 
-  points = {p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11};
-  ipoints = {p0i, p1i, p2i, p3i, p4i, p5i, p6i, p7i, p8i, p9i, p10i, p11i};
-  facets.clear();
-  facets.push_back({5,4,3,2,1,0});
-  facets.push_back({6,7,8,9,10,11});
-  facets.push_back({0,6,11,5});
-  facets.push_back({4,5,11,10});
-  facets.push_back({3,4,10,9});
-  facets.push_back({3,9,8,2});
-  facets.push_back({1,2,8,7});
-  facets.push_back({0,1,7,6});
+  facet.clear(); facet.resize(6); facet[0]=5; facet[1]=4; facet[2]=3; facet[3]=2; facet[4]=1; facet[5]=0; facets.push_back(facet);
+  facet.clear(); facet.resize(6); facet[0]=6; facet[1]=7; facet[2]=8; facet[3]=9; facet[4]=10; facet[5]=11; facets.push_back(facet);
+  facet.clear(); facet.resize(4); facet[0]=0; facet[1]=6; facet[2]=11; facet[3]=5; facets.push_back(facet);
+  facet.clear(); facet.resize(4); facet[0]=4; facet[1]=5; facet[2]=11; facet[3]=10; facets.push_back(facet);
+  facet.clear(); facet.resize(4); facet[0]=3; facet[1]=4; facet[2]=10; facet[3]=9; facets.push_back(facet);
+  facet.clear(); facet.resize(4); facet[0]=3; facet[1]=9; facet[2]=8; facet[3]=2; facets.push_back(facet);
+  facet.clear(); facet.resize(4); facet[0]=1; facet[1]=2; facet[2]=8; facet[3]=7; facets.push_back(facet);
+  facet.clear(); facet.resize(4); facet[0]=0; facet[1]=1; facet[2]=7; facet[3]=6; facets.push_back(facet);
 
   // ---------------------------------------------------------------------------
   // Check | non convex solid volume (double)
@@ -795,7 +803,7 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   // Check | error facet/normals mismatch
   check_num++;
   check_name = "error facet/normals mismatch";
-  vector<xvector<double>> normals;
+  vector<xvector<double> > normals;
   expected_error = "xerror code 30 (VALUE_ERROR)";
   expected_int = _VALUE_ERROR_;
 
@@ -806,7 +814,7 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   catch (aurostd::xerror e)
   {
     if (e.error_code == expected_int) check(true, "", "", check_name, check_num, passed_checks, results);
-    else check(false, std::to_string(e.error_code), expected_error, check_name, check_num, passed_checks, results);
+    else check(false, aurostd::utype2string(e.error_code), expected_error, check_name, check_num, passed_checks, results);
   }
   catch (...) {
     check(false, std::string("not an xerror"), expected_error, check_name, check_num, passed_checks, results);
@@ -828,7 +836,7 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   expected_error = "xerror code 30 (VALUE_ERROR)";
   expected_int = _VALUE_ERROR_;
 
-  facets.push_back({1,2});
+  facet.clear(); facet.resize(2); facet[0]=1; facet[1]=2; facets.push_back(facet);
   try {
     calculated = aurostd::volume(points, facets);
     check(false, std::string("no error"), expected_error, check_name, check_num, passed_checks, results);
@@ -836,7 +844,7 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   catch (aurostd::xerror e)
   {
     if (e.error_code == expected_int) check(true, "", "", check_name, check_num, passed_checks, results);
-    else check(false, std::to_string(e.error_code), expected_error, check_name, check_num, passed_checks, results);
+    else check(false, aurostd::utype2string(e.error_code), expected_error, check_name, check_num, passed_checks, results);
   }
   catch (...) {
     check(false, std::string("not an xerror"), expected_error, check_name, check_num, passed_checks, results);
@@ -847,8 +855,13 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   check_num++;
   check_name = "non convex area (double)";
   expected = 10.0;
-  points = {p0, p1, p2, p3, p4, p5};
-  ipoints = {p0i, p1i, p2i, p3i, p4i, p5i};
+
+  //fill vectors with data
+  points.clear(); ipoints.clear(); facets.clear();
+  points.push_back(p0); points.push_back(p1); points.push_back(p2); points.push_back(p3); points.push_back(p4);
+  points.push_back(p5);
+  ipoints.push_back(p0i); ipoints.push_back(p1i); ipoints.push_back(p2i); ipoints.push_back(p3i); ipoints.push_back(p4i);
+  ipoints.push_back(p5i);
 
   calculated = aurostd::area(points);
   check_equal(calculated, expected, check_name, check_num, passed_checks, results);
@@ -868,8 +881,9 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   p1i(1) = p1(1) = 1.0; p1i(2) = p1(2) = 1.0; p1i(3) = p1(3) = 1.0;
   p2i(1) = p2(1) = 5.0; p2i(2) = p2(2) = 0.0; p2i(3) = p2(3) = 5.0;
 
-  points = {p0, p1, p2};
-  ipoints = {p0i, p1i, p2i};
+  points.clear(); ipoints.clear(); facets.clear();
+  points.push_back(p0); points.push_back(p1); points.push_back(p2);
+  ipoints.push_back(p0i); ipoints.push_back(p1i); ipoints.push_back(p2i);
 
   // ---------------------------------------------------------------------------
   // Check | 3d triangle area (double)

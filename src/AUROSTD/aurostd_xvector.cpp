@@ -2101,7 +2101,7 @@ namespace aurostd { //HE20210511
    * doi: 10.1109/ICIP.2001.958278.
    */
   template<class utype> double
-    area(const vector<xvector<utype>>& points){ //HE20210511
+    area(const vector<xvector<utype> >& points){ //HE20210511
       double result = 0.0;
       uint upper_border = points.size()-2;
       xvector<utype> sum_temp(points[0].lrows,points[0].urows);
@@ -2136,7 +2136,7 @@ namespace aurostd { //HE20210511
    * doi: 10.1109/ICIP.2001.958278.
    */
   template<class utype> double
-  volume(const vector<xvector<utype>>& points, const vector<vector<uint>>& facets, const vector<xvector<utype>>& normals){ //HE20210511
+  volume(const vector<xvector<utype> >& points, const vector<vector<uint> >& facets, const vector<xvector<utype> >& normals){ //HE20210511
     bool LDEBUG=(false || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::volume(): ";
 
@@ -2145,7 +2145,7 @@ namespace aurostd { //HE20210511
     }
     double result = 0.0;
 
-    vector<xvector<utype>> facet_points;
+    vector<xvector<utype> > facet_points;
     if (LDEBUG) cerr << soliloquy << "facet id | contribution | area | normal | scalar_prod" << endl;
     for (uint f_id=0; f_id<facets.size();f_id++){
       if (facets[f_id].size() < 3){
@@ -2171,16 +2171,16 @@ namespace aurostd { //HE20210511
    * All facets need to be sorted consistently clockwise or anticlockwise in regards to the outside facing facet normal.
    */
   template<class utype> double
-  volume(const vector<xvector<utype>>& points, const vector<vector<uint>>& facets){ //HE20210511
-    vector<xvector<utype>> facet_points;
-    vector<xvector<utype>> facet_direction;
-    vector<xvector<utype>> normals;
+  volume(const vector<xvector<utype> >& points, const vector<vector<uint> >& facets){ //HE20210511
+    vector<xvector<utype> > facet_points;
+    vector<xvector<utype> > facet_direction;
+    vector<xvector<utype> > normals;
     for (uint f_id=0; f_id<facets.size();f_id++){
       if (facets[f_id].size() < 3){
         throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "aurostd::xvector::volume():", "there must be at least three vertices in each facets", _VALUE_ERROR_);
       }
       facet_points.clear(); facet_direction.clear();
-      for (uint p_id: facets[f_id]) facet_points.push_back(points[p_id]);
+      for (std::vector<uint>::const_iterator p_id = facets[f_id].begin(); p_id != facets[f_id].end(); ++p_id) facet_points.push_back(points[*p_id]);
       facet_direction.push_back(facet_points[0] - facet_points[1]);
       facet_direction.push_back(facet_points[1] - facet_points[2]);
       normals.push_back(aurostd::getGeneralNormal(facet_direction));
@@ -2188,9 +2188,9 @@ namespace aurostd { //HE20210511
     return volume(points, facets, normals);
   }
   // integer xvectors are converted into double vectors, to enable a correct volume calculation
-  double volume(const vector<xvector<int>>& points, const vector<vector<uint>>& facets){//HE20210514
-    vector<xvector<double>> mapped_points;
-    for (std::vector<xvector<int>>::const_iterator p_point = points.begin(); p_point != points.end(); ++p_point){
+  double volume(const vector<xvector<int> > &points, const vector<vector<uint> > &facets){ //HE20210514
+    vector<xvector<double> > mapped_points;
+    for (std::vector<xvector<int> >::const_iterator p_point = points.begin(); p_point != points.end(); ++p_point){
       xvector<int> point = *p_point;
       xvector<double> new_point(3,1);
       for (int i=point.lrows;i<=point.urows;i++) new_point(i) = (double) point(i);
@@ -2208,17 +2208,17 @@ namespace aurostd { //HE20210511
    * In a convex solid it is not necessary that all facets are ordered in the same manner.
    */
   template<class utype> double // volume defined by points and facets of a convex solid
-  volumeConvex(const vector<xvector<utype>>& points, const vector<vector<uint>>& facets){ //HE20210511
-    vector<xvector<utype>> facet_points;
-    vector<xvector<utype>> facet_direction;
+  volumeConvex(const vector<xvector<utype> >& points, const vector<vector<uint> >& facets){ //HE20210511
+    vector<xvector<utype> > facet_points;
+    vector<xvector<utype> > facet_direction;
     xvector<utype> center = aurostd::getCentroid(points);
-    vector<xvector<utype>> normals;
+    vector<xvector<utype> > normals;
     for (uint f_id=0; f_id<facets.size();f_id++){
       if (facets[f_id].size() < 3){
         throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "aurostd::xvector::volumeConvex():", "there must be at least three vertices in each facets", _VALUE_ERROR_);
       }
       facet_points.clear(); facet_direction.clear();
-      for (uint p_id: facets[f_id]) facet_points.push_back(points[p_id]);
+      for (std::vector<uint>::const_iterator p_id = facets[f_id].begin(); p_id != facets[f_id].end(); ++p_id) facet_points.push_back(points[*p_id]);
       facet_direction.push_back(facet_points[0]-facet_points[1]);
       facet_direction.push_back(facet_points[1]-facet_points[2]);
       xvector<utype> normal = aurostd::getGeneralNormal(facet_direction);
@@ -2229,11 +2229,12 @@ namespace aurostd { //HE20210511
     return volume(points, facets, normals);
   }
   // integer xvectors are converted into double vectors, to enable a correct volume calculation
-  double volumeConvex(const vector<xvector<int>>& points, const vector<vector<uint>>& facets){//HE20210514
-    vector<xvector<double>> mapped_points;
-    for (xvector<int> point : points){
+  double volumeConvex(const vector<xvector<int> >& points, const vector<vector<uint> >& facets){//HE20210514
+    vector<xvector<double> > mapped_points;
+    uint num_points = points.size();
+    for (uint pid=0; pid<num_points; pid++){
       xvector<double> new_point(3,1);
-      for (int i=point.lrows;i<=point.urows;i++) new_point(i) = (double) point(i);
+      for (int i=points[pid].lrows;i<=points[pid].urows;i++) new_point(i) = (double) points[pid](i);
       mapped_points.push_back(new_point);
     }
     return volumeConvex(mapped_points, facets);

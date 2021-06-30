@@ -1896,7 +1896,7 @@ void AtomEnvironment::free(){
   area=0;
   volume=0;
   has_hull=false;
-  facet_order = {0,0,0,0,0,0,0,0};
+  std::fill(facet_order, facet_order+8, 0);
 }
 
 // ---------------------------------------------------------------------------
@@ -1924,7 +1924,7 @@ void AtomEnvironment::copy(const AtomEnvironment& b) {
   coordinations_neighbor=b.coordinations_neighbor;
   coordinates_neighbor=b.coordinates_neighbor;
   facets=b.facets;
-  facet_order=b.facet_order;
+  std::copy(b.facet_order, b.facet_order+8, facet_order);
   facet_area=b.facet_area;
   area=b.area;
   volume=b.volume;
@@ -1963,7 +1963,7 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
     return;
   }
 
-  vector<xvector<double>> points;
+  vector<xvector<double> > points;
   for (uint t = 0; t < num_neighbors; t++) {
     points.push_back(index2Point(t));
   }
@@ -1978,25 +1978,25 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
 
   if(LDEBUG) cerr << soliloquy << "resulting hull has " << AEhull.m_facets.size() << " raw facets" << endl;
 
-  vector<vector<uint>> facet_collection;
+  vector<vector<uint> > facet_collection;
   AEhull.getJoinedFacets(facet_collection);
-
 //  for (vector<uint> f: facet_collection){
-  for (std::vector<vector<uint>>::const_iterator f = facet_collection.begin(); f != facet_collection.end(); ++f) {
+  for (std::vector<vector<uint> >::const_iterator f = facet_collection.begin(); f != facet_collection.end(); ++f) {
     vector<uint> nf;
     for (std::vector<uint>::const_iterator v = f->begin(); v != f->end(); ++v) nf.push_back(*v);
     facets.push_back(nf);
   }
   if(LDEBUG) cerr << soliloquy << "after joining " << facets.size() << " facets are remaining" << endl;
 
-  for (std::vector<vector<uint>>::const_iterator f = facets.begin(); f != facets.end(); ++f) {
+  for (std::vector<vector<uint> >::const_iterator f = facets.begin(); f != facets.end(); ++f) {
     if (f->size()<10) facet_order[f->size()-3]++;
     else facet_order[7]++;
   }
-
   for (uint t = 0; t < facet_collection.size(); t++) {
-    vector<xvector<double>> facet_coords;
-    for (uint ind: facet_collection[t]) facet_coords.push_back(points[ind]);
+    vector<xvector<double> > facet_coords;
+    for (std::vector<uint>::const_iterator ind=facet_collection[t].begin(); ind != facet_collection[t].end(); ind++){
+      facet_coords.push_back(points[*ind]);
+    }
     facet_area.push_back(aurostd::area(facet_coords));
   }
   volume = aurostd::volumeConvex(points, facets);
@@ -2085,8 +2085,7 @@ string AtomEnvironment::toJSON(bool full) const{
         facets_collection.push_back(facet_entry);
       }
       ae_json.addVector("facets", facets_collection);
-      vector<uint> fo;
-      for (std::array<uint, 8>::const_iterator order = facet_order.begin(); order != facet_order.end(); ++order) fo.push_back(*order);
+      vector<uint> fo(facet_order, facet_order+8);
       ae_json.addVector("facet_order", fo);
     }
 
@@ -2125,11 +2124,6 @@ void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_ind
     }
   }
 
-  // init parameters that are filled later by constructAtomEnvironmentHull \\HE20210409
-  std::fill(facet_order.begin(), facet_order.end(), 0.0);
-  area = 0.0;
-  volume = 0.0;
-  num_neighbors= 0;
   num_types = xstr.species.size();
 
   // ---------------------------------------------------------------------------

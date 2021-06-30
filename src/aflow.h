@@ -1437,10 +1437,10 @@ class AtomEnvironment{
     vector<double> distances_neighbor;                                                      // distances to atoms neighboring atoms (typically put in a bin with small tolerance threshold)                                             
     vector<uint> coordinations_neighbor;                                                    // coordination of neighboring distance                                              
     vector<vector<xvector<double> > > coordinates_neighbor;                                 // coordinates of atoms neighboring atoms (center is assumed to be zero,i.e. coord=neighbor-origin)
-    vector<vector<uint>> facets;                                                            // list of facet vertices in order (coordinates_neighbor_flat indexes)  //HE20210408
+    vector<vector<uint> > facets;                                                           // list of facet vertices in order (coordinates_neighbor_flat indexes)  //HE20210408
     vector<double> facet_area;                                                              // area of each facet //HE20210408
-    std::array<uint, 8> facet_order;                                                        // count of facet with (index+3) vertices - index 7 counts facets with more than 9 vertices //HE20210408
-    bool has_hull=false;
+    uint facet_order [8];                                                                   // count of facet with (index+3) vertices - index 7 counts facets with more than 9 vertices //HE20210408
+    bool has_hull;
     double area;                                                                            // surface area of each environment //HE20210408
     double volume;                                                                          // volume of each environment //HE20210408
     //functions
