@@ -3492,8 +3492,6 @@ namespace aflowlib {
       //////////////////////////////////////////////////////////////////////////
 
       //////////////////////////////////////////////////////////////////////////
-      //[CO20200624 - OBSOLETE]sscontent_json << "\"aflowlib_date\":\"" << aurostd::get_datetime() << "_GMT" << aurostd::get_offset_utc() << "\"";
-      //[CO20200624 - OBSOLETE]vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       if(vaflowlib_date.size()) {
         sscontent_json << "\"aflowlib_date\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(vaflowlib_date,"\""),",") << "]";
       } else {

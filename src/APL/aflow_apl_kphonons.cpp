@@ -184,7 +184,7 @@ namespace KBIN {
         if (i < _NUM_RELAX_) {
           Krun = VASP_Run(xvasp, aflags, kflags, vflags, _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), true, fileMessage);
           XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, true, fileMessage); //CO20210315 - always write_incar
-          XVASP_KPOINTS_IBZKPT_UPDATE(xvasp, aflags, vflags, i, true, fileMessage); //CO20210315 - always write_incar
+          XVASP_KPOINTS_IBZKPT_UPDATE(xvasp, aflags, vflags, i, true, fileMessage); //CO20210315 - always write_kpoints
         } else { 
           Krun = VASP_Run(xvasp, aflags, kflags, vflags, _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), true, fileMessage);
           XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, false, fileMessage);  //ME20200115 - or else SPIN_REMOVE_RELAX_2 does not work  //CO20210315 - write_incar only if (i<num_relax), no static afterward
@@ -659,7 +659,7 @@ namespace KBIN {
           //[CO20210315 - new style]vaspVersion = getVASPVersionNumber( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );
           double vaspVersion=KBIN::getVASPVersionDouble( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );  //CO20210315
           //[CO20210315 - new style]if (!vaspVersion.empty())
-          if (aurostd::isequal(vaspVersion,0.0)){  //CO20210315
+          if (aurostd::isequal(vaspVersion,0.0)==false){  //CO20210315
             //[CO20210315 - new style]message << "[" << vaspVersion[0] << "]."; //CO20210315
             //[CO20210315 - new style]if ((vaspVersion[0] - '0') < 5) //cool way of getting ascii value:  https://stackoverflow.com/questions/36310181/char-subtraction-in-c
             message << "[" << vaspVersion << "]."; //CO20210315

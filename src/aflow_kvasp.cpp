@@ -1031,13 +1031,13 @@ namespace KBIN {
     // cerr << "SIGMA_STATIC" << endl;
     vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_EQUAL.options2entry(AflowIn,_STROPT_+"SIGMA_STATIC=",FALSE,vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_EQUAL.xscheme); // scheme already loaded in aflow_xclasses.cpp is "0.1" - default  //CO20181128
 
-    // ISMEAR_STATIC_BANDS  //CO20210315
-    // cerr << "ISMEAR_STATIC_BANDS" << endl;
-    vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.options2entry(AflowIn,_STROPT_+"ISMEAR_STATIC_BANDS=",FALSE,vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_BANDS_EQUAL.xscheme); // scheme already loaded in aflow_xclasses.cpp is "1" - default  //CO20181128
+    // ISMEAR_BANDS  //CO20210315
+    // cerr << "ISMEAR_BANDS" << endl;
+    vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_BANDS_EQUAL.options2entry(AflowIn,_STROPT_+"ISMEAR_BANDS="+"|"+_STROPT_+"ISMEAR_STATIC_BANDS=",FALSE,vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_BANDS_EQUAL.xscheme); // scheme already loaded in aflow_xclasses.cpp is "1" - default  //CO20181128  //CO20210624 - backwards compatibility with ISMEAR_STATIC_BANDS
 
-    // SIGMA_STATIC_BANDS //CO20210315
-    // cerr << "SIGMA_STATIC_BANDS" << endl;
-    vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.options2entry(AflowIn,_STROPT_+"SIGMA_STATIC_BANDS=",FALSE,vflags.KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_BANDS_EQUAL.xscheme); // scheme already loaded in aflow_xclasses.cpp is "0.1" - default  //CO20181128
+    // SIGMA_BANDS //CO20210315
+    // cerr << "SIGMA_BANDS" << endl;
+    vflags.KBIN_VASP_FORCE_OPTION_SIGMA_BANDS_EQUAL.options2entry(AflowIn,_STROPT_+"SIGMA_BANDS="+"|"+_STROPT_+"SIGMA_STATIC_BANDS=",FALSE,vflags.KBIN_VASP_FORCE_OPTION_SIGMA_BANDS_EQUAL.xscheme); // scheme already loaded in aflow_xclasses.cpp is "0.1" - default  //CO20181128  //CO20210624 - backwards compatibility with SIGMA_STATIC_BANDS
 
     // NBANDS and/or NBANDS=
     //  cerr << "NBANDS_AUTO" << endl;
@@ -2570,7 +2570,7 @@ namespace KBIN {
                   //  KBIN::VASP_Produce_INCAR(xvasp,AflowIn,FileAFLOWIN,FileMESSAGE,aflags,kflags,vflags); // BETTER than produce, SHOULD reread it
                   KBIN::VASP_Reread_INCAR(xvasp,FileMESSAGE,aflags); // REREAD IT
                   // KBIN::VASP_Modify_INCAR(xvasp,FileMESSAGE,aflags,kflags,vflags); // MODIFY ACCORDINGLY
-                  KBIN::XVASP_INCAR_Relax_Static_Bands_ON(xvasp,vflags);     // FIX
+                  KBIN::XVASP_INCAR_Bands_ON(xvasp,vflags);     // FIX
                   // do the RWIGS OFF
                   if(vflags.KBIN_VASP_FORCE_OPTION_RWIGS_STATIC)
                     KBIN::XVASP_INCAR_RWIGS_Static(xvasp,vflags,FileMESSAGE,OFF);

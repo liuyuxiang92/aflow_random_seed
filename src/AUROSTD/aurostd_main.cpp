@@ -51,37 +51,92 @@ using aurostd::ran0;
 // ***************************************************************************
 // TIME evolution stuff
 namespace aurostd {
-  int get_day(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_day(now);} //CO20200624
-  int get_day(tm* tstruct) {return tstruct->tm_mday;} //CO20200624
-  int get_month(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_month(now);} //CO20200624
-  int get_month(tm* tstruct) {return tstruct->tm_mon+1;}  //CO20200624
-  int get_year(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_year(now);}
-  int get_year(tm* tstruct) {return tstruct->tm_year+1900;} //CO20200624
-  int get_offset_utc(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_offset_utc(now);}  //CO20210601: https://codereview.stackexchange.com/questions/175353/getting-current-timezone
-  int get_offset_utc(tm* tstruct) {  //CO20210601
+  int get_day(void) {time_t t=time(0);struct tm *ptr_now=localtime(&t);return get_day(*ptr_now);} //CO20200624
+  int get_day(const tm& tstruct) {return tstruct.tm_mday;} //CO20200624
+  int get_month(void) {time_t t=time(0);struct tm *ptr_now=localtime(&t);return get_month(*ptr_now);} //CO20200624
+  int get_month(const tm& tstruct) {return tstruct.tm_mon+1;}  //CO20200624
+  int get_year(void) {time_t t=time(0);struct tm *ptr_now=localtime(&t);return get_year(*ptr_now);}
+  int get_year(const tm& tstruct) {return tstruct.tm_year+1900;} //CO20200624
+  void get_offset_utc(int& offset_hours,int& offset_mins) {time_t t=time(0);struct tm *ptr_now=localtime(&t);return get_offset_utc(*ptr_now,offset_hours,offset_mins);}  //CO20210601: https://codereview.stackexchange.com/questions/175353/getting-current-timezone
+  void get_offset_utc(const tm& _tstruct_inp,int& offset_hours,int& offset_mins) {  //CO20210601
     //https://codereview.stackexchange.com/questions/175353/getting-current-timezone
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::get_offset_utc():";
-    char buffer[26];
-    //mktime might modify tstruct
-    tm* tstruct_local=tstruct;
-    if(LDEBUG){strftime(buffer,26,"%Y:%m:%d %H:%M:%S",tstruct_local);cerr << soliloquy << " tstruct_local=" << buffer << endl;}
-    std::time_t local=std::mktime(tstruct_local);
-    struct tm* tstruct_gmt=std::gmtime(&local);
-    if(LDEBUG){strftime(buffer,26,"%Y:%m:%d %H:%M:%S",tstruct_gmt);cerr << soliloquy << " tstruct_gmt=" << buffer << endl;}
-    tstruct_gmt->tm_isdst=-1; //VERY IMPORTANT, forces mktime to figure out dst
-    std::time_t gmt=std::mktime(tstruct_gmt);
-    long timezone=static_cast<long>(local-gmt); //flip gmt-local to get right sign
-    return (int)(timezone/3600);
+    char buffer[30];
+    tm tstruct_inp=_tstruct_inp; //mktime modifies tstruct, make copy
+    time_t t_inp=std::mktime(&tstruct_inp);
+    if(LDEBUG){
+      cerr << soliloquy << " ///////////////////////////////////////////////" << endl;
+      cerr << soliloquy << " LOOKING AT: tstruct_inp" << endl;
+      cerr << soliloquy << " tstruct_inp.tm_sec=" << tstruct_inp.tm_sec << endl;
+      cerr << soliloquy << " tstruct_inp.tm_min=" << tstruct_inp.tm_min << endl;
+      cerr << soliloquy << " tstruct_inp.tm_hour=" << tstruct_inp.tm_hour << endl;
+      cerr << soliloquy << " tstruct_inp.tm_mday=" << tstruct_inp.tm_mday << endl;
+      cerr << soliloquy << " tstruct_inp.tm_mon=" << tstruct_inp.tm_mon << endl;
+      cerr << soliloquy << " tstruct_inp.tm_year=" << tstruct_inp.tm_year << endl;
+      cerr << soliloquy << " tstruct_inp.tm_wday=" << tstruct_inp.tm_wday << endl;
+      cerr << soliloquy << " tstruct_inp.tm_yday=" << tstruct_inp.tm_yday << endl;
+      cerr << soliloquy << " tstruct_inp.tm_isdst=" << tstruct_inp.tm_isdst << endl;
+      cerr << soliloquy << " mktime(tstruct_inp)=" << t_inp << endl;
+      strftime(buffer,30,"%F %T %Z",&tstruct_inp);cerr << soliloquy << " tstruct_inp=" << buffer << endl;  //%Y:%m:%d %H:%M:%S
+      cerr << soliloquy << " ///////////////////////////////////////////////" << endl;
+    }
+    //
+    time_t t_local=t_inp;
+    bool fix_utc_2_now=false; //this is good for debugging different time zones
+    if(fix_utc_2_now){t_local=time(0);} //struct tm *tstruct_now=localtime(&t_now);
+    struct tm *ptr_tstruct_gmt=std::gmtime(&t_local); //get gmt wrt to local (now vs. input)
+    if(LDEBUG){
+      cerr << soliloquy << " ///////////////////////////////////////////////" << endl;
+      cerr << soliloquy << " LOOKING AT: ptr_tstruct_gmt (BEFORE DST CHANGE)" << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_sec=" << ptr_tstruct_gmt->tm_sec << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_min=" << ptr_tstruct_gmt->tm_min << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_hour=" << ptr_tstruct_gmt->tm_hour << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_mday=" << ptr_tstruct_gmt->tm_mday << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_mon=" << ptr_tstruct_gmt->tm_mon << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_year=" << ptr_tstruct_gmt->tm_year << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_wday=" << ptr_tstruct_gmt->tm_wday << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_yday=" << ptr_tstruct_gmt->tm_yday << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_isdst=" << ptr_tstruct_gmt->tm_isdst << endl;
+      tm tstruct_tmp=*ptr_tstruct_gmt;  //mktime modifies tstruct
+      cerr << soliloquy << " mktime(ptr_tstruct_gmt)=" << std::mktime(&tstruct_tmp) << endl;
+      strftime(buffer,30,"%F %T %Z",ptr_tstruct_gmt);cerr << soliloquy << " tstruct_gmt=" << buffer << endl;  //%Y:%m:%d %H:%M:%S
+      cerr << soliloquy << " ///////////////////////////////////////////////" << endl;
+    }
+    //NB: before the following DST change, the %Z of ptr_struct_gmt is GMT, after it is EST (or EDT)
+    ptr_tstruct_gmt->tm_isdst=-1; //VERY IMPORTANT, forces mktime to figure out dst
+    time_t t_gmt=std::mktime(ptr_tstruct_gmt);
+    if(LDEBUG){
+      cerr << soliloquy << " ///////////////////////////////////////////////" << endl;
+      cerr << soliloquy << " LOOKING AT: ptr_tstruct_gmt (AFTER DST CHANGE)" << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_sec=" << ptr_tstruct_gmt->tm_sec << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_min=" << ptr_tstruct_gmt->tm_min << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_hour=" << ptr_tstruct_gmt->tm_hour << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_mday=" << ptr_tstruct_gmt->tm_mday << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_mon=" << ptr_tstruct_gmt->tm_mon << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_year=" << ptr_tstruct_gmt->tm_year << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_wday=" << ptr_tstruct_gmt->tm_wday << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_yday=" << ptr_tstruct_gmt->tm_yday << endl;
+      cerr << soliloquy << " ptr_tstruct_gmt->tm_isdst=" << ptr_tstruct_gmt->tm_isdst << endl;
+      cerr << soliloquy << " mktime(ptr_tstruct_gmt)=" << t_gmt << endl;
+      strftime(buffer,30,"%F %T %Z",ptr_tstruct_gmt);cerr << soliloquy << " tstruct_gmt=" << buffer << endl;  //%Y:%m:%d %H:%M:%S
+      cerr << soliloquy << " ///////////////////////////////////////////////" << endl;
+    }
+    //
+    long int t_diff=static_cast<long int>(t_inp-t_gmt); //flip to get right sign
+    if(LDEBUG){cerr << soliloquy << " t_diff=" << t_diff << endl;}
+    double offset=(double)t_diff/3600.0;
+    offset_hours=(int)std::floor(offset);
+    offset_mins=(int)(std::round((offset-(double)offset_hours)*60.0));
   }
-  long int get_date(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_date(now);}  //CO20200624
-  long int get_date(tm* tstruct) {return aurostd::get_year(tstruct)*10000+aurostd::get_month(tstruct)*100+aurostd::get_day(tstruct);}  //CO20200624
-  int get_hour(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_hour(now);}  //CO20200624
-  int get_hour(tm* tstruct) {return tstruct->tm_hour;}  //CO20200624
-  int get_min(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_min(now);}  //CO20200624
-  int get_min(tm* tstruct) {return tstruct->tm_min;}  //CO20200624
-  int get_sec(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_sec(now);}  //CO20200624
-  int get_sec(tm* tstruct) {return tstruct->tm_sec;}  //CO20200624
+  long int get_date(void) {time_t t=time(0);struct tm *ptr_now=localtime(&t);return get_date(*ptr_now);}  //CO20200624
+  long int get_date(const tm& tstruct) {return aurostd::get_year(tstruct)*10000+aurostd::get_month(tstruct)*100+aurostd::get_day(tstruct);}  //CO20200624
+  int get_hour(void) {time_t t=time(0);struct tm *ptr_now=localtime(&t);return get_hour(*ptr_now);}  //CO20200624
+  int get_hour(const tm& tstruct) {return tstruct.tm_hour;}  //CO20200624
+  int get_min(void) {time_t t=time(0);struct tm *ptr_now=localtime(&t);return get_min(*ptr_now);}  //CO20200624
+  int get_min(const tm& tstruct) {return tstruct.tm_min;}  //CO20200624
+  int get_sec(void) {time_t t=time(0);struct tm *ptr_now=localtime(&t);return get_sec(*ptr_now);}  //CO20200624
+  int get_sec(const tm& tstruct) {return tstruct.tm_sec;}  //CO20200624
   long double get_seconds(void) {timeval tim;gettimeofday(&tim,NULL);return tim.tv_sec+tim.tv_usec/1e6;}
   long double get_seconds(long double reference_seconds) {return get_seconds()-reference_seconds;}
   long double get_delta_seconds(long double& seconds_begin) {long double out=get_seconds()-seconds_begin;seconds_begin=get_seconds();return out;}
@@ -91,12 +146,25 @@ namespace aurostd {
   long double get_useconds(void) {timeval tim;gettimeofday(&tim,NULL);return tim.tv_usec;}
   long double get_useconds(long double reference_useconds) {return aurostd::get_useconds()-reference_useconds;}
   long double get_delta_useconds(long double& useconds_begin) {long double out=aurostd::get_useconds()-useconds_begin;useconds_begin=aurostd::get_useconds();return out;}
-  string get_time(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_time(now);} //CO20200624
-  string get_time(tm* tstruct) {int h=get_hour(tstruct),m=get_min(tstruct),s=get_sec(tstruct);return (h<10?"0":"")+aurostd::utype2string(h)+":"+(m<10?"0":"")+aurostd::utype2string(m)+":"+(s<10?"0":"")+aurostd::utype2string(s);} //CO20200624
-  string get_datetime(void) {time_t t=time(0);struct tm *now=localtime(&t);return get_datetime(now);} //CO20200624
-  string get_datetime(tm* tstruct) {return utype2string(get_date(tstruct))+"_"+get_time(tstruct);}  //CO20200624
-  string get_datetime_formatted(const string& date_delim,bool include_time,const string& date_time_sep,const string& time_delim){time_t t=time(0);struct tm *now=localtime(&t);return get_datetime_formatted(now,date_delim,include_time,date_time_sep,time_delim);}  //CO20171215  //CO20200624
-  string get_datetime_formatted(tm* tstruct,const string& date_delim,bool include_time,const string& date_time_sep,const string& time_delim){  //CO20171215 //CO20200624
+  string get_time(void) {time_t t=time(0);struct tm *ptr_now=localtime(&t);return get_time(*ptr_now);} //CO20200624
+  string get_time(const tm& tstruct) {int h=get_hour(tstruct),m=get_min(tstruct),s=get_sec(tstruct);return (h<10?"0":"")+aurostd::utype2string(h)+":"+(m<10?"0":"")+aurostd::utype2string(m)+":"+(s<10?"0":"")+aurostd::utype2string(s);} //CO20200624
+  string get_datetime(bool include_utc_offset) {time_t t=time(0);struct tm *ptr_now=localtime(&t);return get_datetime(*ptr_now,include_utc_offset);} //CO20200624
+  string get_datetime(const tm& tstruct,bool include_utc_offset) {  //CO20200624
+    string datetime=utype2string(get_date(tstruct))+"_"+get_time(tstruct);
+    if(include_utc_offset){ //CO20210624
+      int offset_hours=0,offset_mins=0;
+      get_offset_utc(tstruct,offset_hours,offset_mins);
+      datetime+="_GMT";
+      datetime+=(std::signbit(offset_hours)?string("-"):string("+")); //sign +/-
+      bool pad_hours=false; //default AFLOW behavior does not pad hours
+      datetime+=aurostd::PaddedNumString(abs(offset_hours),(pad_hours?2:1)); //CO20210624 - PaddedNumString() struggles with negative numbers
+      bool print_mins=false;  //default AFLOW behavior does not print mins
+      if(print_mins||offset_mins!=0){datetime+=":"+aurostd::PaddedNumString(offset_mins,2);}
+    }
+    return datetime;
+  }
+  string get_datetime_formatted(const string& date_delim,bool include_time,const string& date_time_sep,const string& time_delim){time_t t=time(0);struct tm *ptr_now=localtime(&t);return get_datetime_formatted(*ptr_now,date_delim,include_time,date_time_sep,time_delim);}  //CO20171215  //CO20200624
+  string get_datetime_formatted(const tm& tstruct,const string& date_delim,bool include_time,const string& date_time_sep,const string& time_delim){  //CO20171215 //CO20200624
     stringstream misc_ss;
     int y=aurostd::get_year(tstruct),b=aurostd::get_month(tstruct),d=aurostd::get_day(tstruct); //CO20200624
     misc_ss << y << date_delim << (b<10?"0":"") << b << date_delim << (d<10?"0":"") << d;
@@ -150,24 +218,23 @@ namespace aurostd {
 // ***************************************************************************
 // FILES creation/destruction
 namespace aurostd {
-  string TmpFileCreate(const string& identifier,const string& _tmpdir,bool hidden) {  //CO20210315
-    string tmpdir=_tmpdir;  //CO20210315
-    if(tmpdir.empty()){tmpdir=XHOST.tmpfs;} //CO20210315
-    string str=tmpdir+"/"+(hidden?".":"")+"_aflow_"+identifier+"."+XHOST.user+".pid"+XHOST.ostrPID.str()+".tid"+XHOST.ostrTID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+".tmp"; //CO20200502 - threadID
-    // cerr << str << endl;
+  string TmpStrCreate(const string& _identifier,const string& _tmpdir,bool hidden,bool directory){
+    string identifier=_identifier;if(identifier.empty()){identifier="tmp";} //CO20210624
+    string tmpdir=_tmpdir;if(tmpdir.empty()){tmpdir=XHOST.tmpfs;} //CO20210315
+    string str=tmpdir+"/"+(hidden?".":"")+"_aflow_"+identifier+"."+XHOST.user+".pid"+XHOST.ostrPID.str()+".tid"+XHOST.ostrTID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+(directory?"_":".")+"tmp"; //CO20200502 - threadID
     str=aurostd::CleanFileName(str);
     return str;
   }
-  string TmpFileCreate(void) {return TmpFileCreate("");}
-  string TmpDirectoryCreate(const string& identifier,const string& _tmpdir,bool hidden) { //CO20210315
-    string tmpdir=_tmpdir;  //CO20210315
-    if(tmpdir.empty()){tmpdir=XHOST.tmpfs;} //CO20210315
-    string dir=tmpdir+"/"+(hidden?".":"")+"_aflow_"+identifier+"_"+XHOST.user+"_pid"+XHOST.ostrPID.str()+"_tid"+XHOST.ostrTID.str()+"_a"+AFLOW_VERSION+"_rnd"+aurostd::utype2string(uint((double) std::floor((double) 100000*aurostd::ran0())))+"_u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_tmp";  //CO20200502 - threadID
-    dir=aurostd::CleanFileName(dir);
+  string TmpFileCreate(const string& identifier,const string& tmpdir,bool hidden) {  //CO20210315
+    bool directory=false; //creating a file
+    return TmpStrCreate(identifier,tmpdir,hidden,directory);
+  }
+  string TmpDirectoryCreate(const string& identifier,const string& tmpdir,bool hidden) { //CO20210315
+    bool directory=true; //creating a directory
+    string dir=TmpStrCreate(identifier,tmpdir,hidden,directory);
     DirectoryMake(dir);
     return dir;
   }
-  string TmpDirectoryCreate(void) {return TmpDirectoryCreate("");}
 }
 
 // ***************************************************************************
@@ -2049,11 +2116,16 @@ namespace aurostd {
   //***************************************************************************//
   // aurostd::efile2tempfile
   //***************************************************************************//
-  bool efile2tempfile(string _FileNameIN, string& FileNameOUT) {
+  bool efile2tempfile(const string& _FileNameIN,string& FileNameOUT) {  //CO20210623
+    bool tempfile_created=false;
+    return efile2tempfile(_FileNameIN,FileNameOUT,tempfile_created);
+  }
+  bool efile2tempfile(const string& _FileNameIN,string& FileNameOUT,bool& tempfile_created) { //CO20210623
     //Corey Oses
     //Decompresses file to temp file, and return its path
     //SAFE: Will return FileNameIn if compression not needed
     string FileNameIN="";
+    tempfile_created=false;
     if(!(aurostd::FileExist(_FileNameIN,FileNameIN) || aurostd::EFileExist(_FileNameIN,FileNameIN))) {  //CO20191110 - get FileNameIN from functions
       cerr << endl;
       cerr << "ERROR - aurostd::efile2tempfile: file=" << _FileNameIN << " not present !" << endl;  ///is empty
@@ -2068,6 +2140,7 @@ namespace aurostd {
     stringstream FileNameIN_ss;
     aurostd::efile2stringstream(FileNameIN, FileNameIN_ss);
     FileNameOUT = aurostd::TmpFileCreate();
+    tempfile_created=true;
     aurostd::stringstream2file(FileNameIN_ss, FileNameOUT);
     return TRUE;
   }
@@ -2304,6 +2377,7 @@ namespace aurostd {
   // return a simple bool, nothing else, from a string (which is supposed to be
   // a file name)
   bool FileExist(const string& FileName) {
+    if(FileName.empty()){return false;} //CO20210623
     string file(CleanFileName(FileName));
     //   cerr << file << endl;
     bool exist=FALSE;
@@ -3305,6 +3379,31 @@ namespace aurostd {
     // aus << "sleep " << (int) seconds << " " << endl;
     // aurostd::execute(aus);
     return sleep(seconds);
+  }
+
+  // *******************************************************************************************
+  // *******************************************************************************************
+  vector<string> GrepFile(const string& filename,const string& keyword,bool RemoveWS,bool RemoveComments){  //CO20210623 - update after integrating new substring2bool (RemoveWS,RemoveComments)
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"aurostd::GrepFile():";
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+    vector<string> vout;
+    if(aurostd::FileExist(filename)==false){return vout;}
+
+    if(RemoveWS && RemoveComments){;} //keep busy until we update substring2bool
+
+    string strline="";
+    ifstream FileStream;FileStream.open(filename.c_str(),std::ios::in);
+    while(getline(FileStream,strline)){
+      if(aurostd::substring2bool(strline,keyword,RemoveWS)) {
+        if(LDEBUG){cerr << soliloquy << " found matching line: \"" << strline << "\"" << endl;}
+        vout.push_back(strline);
+      }
+    }
+
+    if(LDEBUG){cerr << soliloquy << " END" << endl;}
+    return vout;
   }
 
   // *******************************************************************************************

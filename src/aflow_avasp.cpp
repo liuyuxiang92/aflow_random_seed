@@ -5004,6 +5004,51 @@ bool AVASP_MakePrototype_AFLOWIN_LOOP(deque<_xvasp>& dxvasp,bool flag_WRITE) {
 }
 
 // ***************************************************************************
+void PARAMS2xvasp(_AVASP_PROTO *PARAMS,_xvasp& xvasp){  //CO20210624 - avoid duplicate code: AVASP_MakePrototype_AFLOWIN() and AVASP_MakePrototypeICSD_AFLOWIN()
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"PARAMS2xvasp():";
+
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::NOAUTOPP")) xvasp.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS",FALSE); //CO20190712
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_LDAU",TRUE);
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTONOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_NOLDAU",TRUE);
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VASP")) xvasp.aopts.flag("AFLOWIN_FLAG::VASP",TRUE);
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ABCCAR")) xvasp.aopts.flag("AFLOWIN_FLAG::ABCCAR",TRUE); //DX20190123 - add ABCCAR
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ABINIT")) xvasp.aopts.flag("AFLOWIN_FLAG::ABINIT",TRUE);
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AIMS")) xvasp.aopts.flag("AFLOWIN_FLAG::AIMS",TRUE);
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::CIF")) xvasp.aopts.flag("AFLOWIN_FLAG::CIF",TRUE); //DX20190123 - add CIF
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::QE")) xvasp.aopts.flag("AFLOWIN_FLAG::QE",TRUE);
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::HTQC_ICSD")) xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC_ICSD;
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::POTIM")) {xvasp.aopts.flag("AFLOWIN_FLAG::POTIM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::POTIM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::POTIM"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::BADER")) xvasp.aopts.flag("FLAG::AVASP_BADER",TRUE); //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_1")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_1",TRUE); //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_2")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_2",TRUE); //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PRECISION")) {xvasp.aopts.flag("AFLOWIN_FLAG::PRECISION",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::PRECISION",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PRECISION"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ALGORITHM")) {xvasp.aopts.flag("AFLOWIN_FLAG::ALGORITHM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ALGORITHM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ALGORITHM"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::METAGGA")) {xvasp.aopts.flag("AFLOWIN_FLAG::METAGGA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::METAGGA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::METAGGA"));}  
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::IVDW")) {xvasp.aopts.flag("AFLOWIN_FLAG::IVDW",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::IVDW",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::IVDW"));}  
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_MODE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_MODE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::TYPE"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::CONVERT_UNIT_CELL"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PRESERVED")) xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE); //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::EDIFFG")) {xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::EDIFFG",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::EDIFFG"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KSCHEME")) {xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KSCHEME"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KSCHEME_STATIC"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::BANDS_GRID")) {xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::BANDS_GRID",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY")) {xvasp.aopts.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ENMAX_MULTIPLY",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ENMAX_MULTIPLY"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PARAMS")) xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS",TRUE); //DX20180123 - added ANRL parameters to PARAMS
+
+}
+
+// ***************************************************************************
 // struct _AVASP_PROTO {
 //   vector<string> ucell;
 //   string label;
@@ -5103,41 +5148,7 @@ bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
   if(!pocc_tol_raw.empty()){aurostd::string2tokens(pocc_tol_raw,pocc_tol_sets,",");}
   else {pocc_tol_sets.push_back("");} //so that it enters the for loop later just once
 
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::NOAUTOPP")) xvasp.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS",FALSE); //CO20190712
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_LDAU",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTONOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_NOLDAU",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VASP")) xvasp.aopts.flag("AFLOWIN_FLAG::VASP",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ABCCAR")) xvasp.aopts.flag("AFLOWIN_FLAG::ABCCAR",TRUE); //DX20190123 - add ABCCAR
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ABINIT")) xvasp.aopts.flag("AFLOWIN_FLAG::ABINIT",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AIMS")) xvasp.aopts.flag("AFLOWIN_FLAG::AIMS",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::CIF")) xvasp.aopts.flag("AFLOWIN_FLAG::CIF",TRUE); //DX20190123 - add CIF
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::QE")) xvasp.aopts.flag("AFLOWIN_FLAG::QE",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::HTQC_ICSD")) xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC_ICSD;
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::POTIM")) {xvasp.aopts.flag("AFLOWIN_FLAG::POTIM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::POTIM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::POTIM"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::BADER")) xvasp.aopts.flag("FLAG::AVASP_BADER",TRUE); //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_1")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_1",TRUE); //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_2")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_2",TRUE); //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PRECISION")) {xvasp.aopts.flag("AFLOWIN_FLAG::PRECISION",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::PRECISION",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PRECISION"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ALGORITHM")) {xvasp.aopts.flag("AFLOWIN_FLAG::ALGORITHM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ALGORITHM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ALGORITHM"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::METAGGA")) {xvasp.aopts.flag("AFLOWIN_FLAG::METAGGA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::METAGGA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::METAGGA"));}  
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::IVDW")) {xvasp.aopts.flag("AFLOWIN_FLAG::IVDW",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::IVDW",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::IVDW"));}  
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_MODE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_MODE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::TYPE"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::CONVERT_UNIT_CELL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PRESERVED")) xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE); //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::EDIFFG")) {xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::EDIFFG",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::EDIFFG"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KSCHEME")) {xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KSCHEME"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KSCHEME_STATIC"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::BANDS_GRID")) {xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::BANDS_GRID",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY")) {xvasp.aopts.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ENMAX_MULTIPLY",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ENMAX_MULTIPLY"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PARAMS")) xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS",TRUE); //DX20180123 - added ANRL parameters to PARAMS
+  PARAMS2xvasp(PARAMS,xvasp); //CO20210624 - integrate more above/below inside this function as needed, be careful of order of operations
 
   string string_POTENTIAL=PARAMS->vparams.getattachedscheme("AFLOWIN_STRING::POTENTIAL");
   if(LDEBUG)  cerr << "DEBUG - " << soliloquy << " string_POTENTIAL=" << string_POTENTIAL << endl;
@@ -6715,33 +6726,7 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
   KBIN::setModules(xvasp);  //CO20181226
   string parameters="";
 
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_LDAU",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTONOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_NOLDAU",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VASP")) xvasp.aopts.flag("AFLOWIN_FLAG::VASP",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ABCCAR")) xvasp.aopts.flag("AFLOWIN_FLAG::ABCCAR",TRUE); //DX20190123 - add ABCCAR
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ABINIT")) xvasp.aopts.flag("AFLOWIN_FLAG::ABINIT",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AIMS")) xvasp.aopts.flag("AFLOWIN_FLAG::AIMS",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::CIF")) xvasp.aopts.flag("AFLOWIN_FLAG::CIF",TRUE); //DX20190123 - add CIF
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::QE")) xvasp.aopts.flag("AFLOWIN_FLAG::QE",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::POTIM")) {xvasp.aopts.flag("AFLOWIN_FLAG::POTIM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::POTIM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::POTIM"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PRECISION")) {xvasp.aopts.flag("AFLOWIN_FLAG::PRECISION",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::PRECISION",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PRECISION"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ALGORITHM")) {xvasp.aopts.flag("AFLOWIN_FLAG::ALGORITHM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ALGORITHM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ALGORITHM"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::METAGGA")) {xvasp.aopts.flag("AFLOWIN_FLAG::METAGGA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::METAGGA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::METAGGA"));}  
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::IVDW")) {xvasp.aopts.flag("AFLOWIN_FLAG::IVDW",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::IVDW",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::IVDW"));}  
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_MODE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_MODE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::TYPE"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::CONVERT_UNIT_CELL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PRESERVED")) xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE); //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::EDIFFG")) {xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::EDIFFG",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::EDIFFG"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::BANDS_GRID")) {xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::BANDS_GRID",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY")) {xvasp.aopts.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ENMAX_MULTIPLY",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ENMAX_MULTIPLY"));}
+  PARAMS2xvasp(PARAMS,xvasp); //CO20210624 - integrate more above/below inside this function as needed, be careful of order of operations
 
   // recompile and ahave fun
   // cerr << soliloquy << " 0b" << endl;

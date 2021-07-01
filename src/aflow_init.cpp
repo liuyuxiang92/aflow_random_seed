@@ -1788,12 +1788,21 @@ string aflow_convert_time_ctime2aurostd(const string& time_LOCK){ //CO20200624
   //https://en.cppreference.com/w/c/chrono/strftime
   //'Www Mmm dd hh:mm:ss yyyy' === '%a %b %d %H:%M:%S %Y'
   //https://stackoverflow.com/questions/19524720/using-strptime-converting-string-to-time-but-getting-garbage
-  struct tm tstruct;
+  tm tstruct;
   if(!strptime(time_LOCK.c_str(),"%a %b %d %H:%M:%S %Y",&tstruct)){return "";}
+  tstruct.tm_isdst=-1;  //let computer figure it out
+  std::mktime(&tstruct);  //get is_dst
+  
+  if(LDEBUG){
+    char buffer[30];
+    strftime(buffer,30,"%F %T %Z",&tstruct);
+    cerr << soliloquy << " tstruct=" << buffer << endl;
+  }
 
   if(LDEBUG){cerr << soliloquy << " END" << endl;}
 
-  return aurostd::get_datetime(&tstruct);
+  bool include_utc_offset=true;
+  return aurostd::get_datetime(tstruct,include_utc_offset);
 }
 
 // ***************************************************************************

@@ -1,5 +1,5 @@
-3.2.10 - 2021/xx/xx
-        Location: http://materials.duke.edu/AFLOW/aflow.3.2.10.tar.xz
+3.2.11 - 2021/xx/xx
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.11.tar.xz
         -- changed newlines to semi-colons in aurostd::execute() and aurostd::execute2string() and added file system IO options to aurostd::execute2string() (CO)
         -- extended CleanStringASCII_InPlace() to include ALL ASCII characters (CO)
         -- added NELM and NELM_STATIC options to VASP_FORCE_OPTIONS and aflow.rc (CO)
@@ -46,6 +46,17 @@
         -- fixing UTC offset in dates (CO)
         -- adding DEFAULT_VASP_FORCE_OPTION_BADER_STATIC which turns on bader for any STATIC calculation (CO)
         -- patched KBIN::VASP_Reread_POSCAR(), added aurostd::StringstreamClean() around (CO)
+        -- consolidating PARAMS->xvasp conversion in avasp (CO)
+3.2.10 - 2021/06/25
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.10.tar.xz
+        -- fixed bug in GetPrimitive() function, use more robust volume check (DX)
+        -- fixed tolerance bug in edata if tolerance scan fails (DX)
+        -- fixed bandgap code for metals with partially empty channels (CO)
+        -- bypassing soft bandgap code errors for lib2raw (CO)
+        -- fixed KBIN::ExtractAtomicSpecies(), removed unreliable system call (CO)
+        -- patched aurostd::VASP_PseudoPotential_CleanName_InPlace() for more reliable composition extraction (CO)
+        (AFLOW: aflowlib_libraries.cpp, bader.cpp, ivasp.cpp, Makefile, ovasp.cpp, pflow_funcs.cpp, plotter.cpp, xatom.cpp)
+        (AUROSTD: aurostd.h, main.cpp, xparser.cpp, xparser.h)
 3.2.9 - 2021/05/05
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.9.tar.xz
         -- Fixed bug with APL overwriting *.orig files. (AS)
