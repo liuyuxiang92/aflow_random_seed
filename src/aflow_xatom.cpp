@@ -3931,18 +3931,20 @@ istream& operator>>(istream& cinput, xstructure& a) {
   stringstream message;
 
   if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
-  if(LDEBUG) if(a.iomode==IOAFLOW_AUTO) cerr << soliloquy << " a.iomode = IOAFLOW_AUTO" << endl;
-  if(LDEBUG) if(a.iomode==IOVASP_AUTO) cerr << soliloquy << " a.iomode = IOVASP_AUTO" << endl;
-  if(LDEBUG) if(a.iomode==IOVASP_POSCAR) cerr << soliloquy << " a.iomode = IOVASP_POSCAR" << endl;
-  if(LDEBUG) if(a.iomode==IOVASP_ABCCAR) cerr << soliloquy << " a.iomode = IOVASP_ABCCAR" << endl;
-  if(LDEBUG) if(a.iomode==IOVASP_WYCKCAR) cerr << soliloquy << " a.iomode = IOVASP_WYCKCAR" << endl;
-  if(LDEBUG) if(a.iomode==IOQE_AUTO) cerr << soliloquy << " a.iomode = IOQE_AUTO" << endl;
-  if(LDEBUG) if(a.iomode==IOQE_GEOM) cerr << soliloquy << " a.iomode = IOQE_GEOM" << endl;
-  if(LDEBUG) if(a.iomode==IOAIMS_AUTO) cerr << soliloquy << " a.iomode = IOAIMS_AUTO" << endl;  //CO20171008
-  if(LDEBUG) if(a.iomode==IOAIMS_GEOM) cerr << soliloquy << " a.iomode = IOAIMS_GEOM" << endl;  //CO20171008
-  if(LDEBUG) if(a.iomode==IOABINIT_GEOM) cerr << soliloquy << " a.iomode = IOABINIT_GEOM" << endl;  //DX20200310
-  if(LDEBUG) if(a.iomode==IOELK_GEOM) cerr << soliloquy << " a.iomode = IOELK_GEOM" << endl;  //DX20200310
-  if(LDEBUG) if(a.iomode==IOCIF) cerr << soliloquy << " a.iomode = IOCIF" << endl;  //DX20180723
+  if(LDEBUG){
+    if(a.iomode==IOAFLOW_AUTO) cerr << soliloquy << " a.iomode = IOAFLOW_AUTO" << endl;
+    if(a.iomode==IOVASP_AUTO) cerr << soliloquy << " a.iomode = IOVASP_AUTO" << endl;
+    if(a.iomode==IOVASP_POSCAR) cerr << soliloquy << " a.iomode = IOVASP_POSCAR" << endl;
+    if(a.iomode==IOVASP_ABCCAR) cerr << soliloquy << " a.iomode = IOVASP_ABCCAR" << endl;
+    if(a.iomode==IOVASP_WYCKCAR) cerr << soliloquy << " a.iomode = IOVASP_WYCKCAR" << endl;
+    if(a.iomode==IOQE_AUTO) cerr << soliloquy << " a.iomode = IOQE_AUTO" << endl;
+    if(a.iomode==IOQE_GEOM) cerr << soliloquy << " a.iomode = IOQE_GEOM" << endl;
+    if(a.iomode==IOAIMS_AUTO) cerr << soliloquy << " a.iomode = IOAIMS_AUTO" << endl;  //CO20171008
+    if(a.iomode==IOAIMS_GEOM) cerr << soliloquy << " a.iomode = IOAIMS_GEOM" << endl;  //CO20171008
+    if(a.iomode==IOABINIT_GEOM) cerr << soliloquy << " a.iomode = IOABINIT_GEOM" << endl;  //DX20200310
+    if(a.iomode==IOELK_GEOM) cerr << soliloquy << " a.iomode = IOELK_GEOM" << endl;  //DX20200310
+    if(a.iomode==IOCIF) cerr << soliloquy << " a.iomode = IOCIF" << endl;  //DX20180723
+  }
 
   if(LDEBUG) cerr << soliloquy << " definitions" << endl;
   uint iline=0;

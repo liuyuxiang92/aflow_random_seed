@@ -2591,9 +2591,8 @@ namespace aurostd {
   string FileToString(const string& _FileName) {
     string FileName(CleanFileName(_FileName));
     ifstream FileStream;
-    stringstream strstreamout;
-    string strline;
-    strstreamout.str(std::string());
+    stringstream strstreamout; aurostd::StringstreamClean(strstreamout);
+    string strline="";
     //  cerr << FileName.c_str() << endl;  // DEBUG
     FileStream.open(FileName.c_str(),std::ios::in);
     if(FileStream.good()) // !=NULL)
@@ -3180,7 +3179,7 @@ namespace aurostd {
     system(cmdstream.str().c_str());
     // command="";
     strstream << aurostd::file2string(file);
-    cmdstream.clear();cmdstream.str(std::string());
+    aurostd::StringstreamClean(cmdstream);
 #ifndef _AFLOW_TEMP_PRESERVE_
     aurostd::RemoveFile(file);
 #endif
@@ -3443,7 +3442,7 @@ namespace aurostd {
   // *******************************************************************************************
   // *******************************************************************************************
   bool ExtractToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,string Keyword) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    StringstreamOUTPUT.clear();StringstreamOUTPUT.str(std::string());
+    aurostd::StringstreamClean(StringstreamOUTPUT);
     string strline,subS2;
     subS2=Keyword; // STRING TO SEARCH
     FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
@@ -3459,7 +3458,7 @@ namespace aurostd {
 
   // *******************************************************************************************
   bool ExtractToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop) {    // AFLOW_FUNCTION_IMPLEMENTATION
-    StringstreamOUTPUT.clear();StringstreamOUTPUT.str(std::string());
+    aurostd::StringstreamClean(StringstreamOUTPUT);
     string strline;
     FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
     bool status=FALSE;
@@ -3473,13 +3472,13 @@ namespace aurostd {
   }
 
   bool ExtractToStringstreamEXPLICIT(stringstream StringStreamIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop) { // AFLOW_FUNCTION_IMPLEMENTATION
-    StringstreamOUTPUT.clear();StringstreamOUTPUT.str(std::string());
+    aurostd::StringstreamClean(StringstreamOUTPUT);
     string StringIN=StringStreamIN.str();
     return ExtractToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start,Keyword_stop);
   }
 
   bool ExtractToStringstreamEXPLICIT(string StringIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop) {  // AFLOW_FUNCTION_IMPLEMENTATION
-    StringstreamOUTPUT.clear();StringstreamOUTPUT.str(std::string());
+    aurostd::StringstreamClean(StringstreamOUTPUT);
     bool status=FALSE;
     vector<string> tokens;
     aurostd::string2tokens(StringIN,tokens,"\n");
@@ -3492,7 +3491,7 @@ namespace aurostd {
   }
 
   bool ExtractToStringstreamEXPLICIT(string StringIN,stringstream& StringstreamOUTPUT,string Keyword) {  // AFLOW_FUNCTION_IMPLEMENTATION
-    StringstreamOUTPUT.clear();StringstreamOUTPUT.str(std::string());
+    aurostd::StringstreamClean(StringstreamOUTPUT);
     bool status=FALSE;
     vector<string> tokens;
     aurostd::string2tokens(StringIN,tokens,"\n");
@@ -3513,7 +3512,7 @@ namespace aurostd {
   bool ExtractLastToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop) { // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << "LDEBUG: ExtractLastToStringstreamEXPLICIT" << endl;
-    StringstreamOUTPUT.clear();StringstreamOUTPUT.str(std::string());
+    aurostd::StringstreamClean(StringstreamOUTPUT);
     vector<string> tokens;
     aurostd::stream2vectorstring(FileIN,tokens);
     int istart=-1,istop=-1;
@@ -3532,7 +3531,7 @@ namespace aurostd {
 
 
   bool ExtractLastToStringstreamEXPLICIT(stringstream StringStreamIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop) { // AFLOW_FUNCTION_IMPLEMENTATION
-    StringstreamOUTPUT.clear();StringstreamOUTPUT.str(std::string());
+    aurostd::StringstreamClean(StringstreamOUTPUT);
     string StringIN=StringStreamIN.str();
     return ExtractLastToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start,Keyword_stop);
   }
@@ -3540,7 +3539,7 @@ namespace aurostd {
   bool ExtractLastToStringstreamEXPLICIT(string StringIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop) {  // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << "LDEBUG: ExtractLastToStringstreamEXPLICIT" << endl;
-    StringstreamOUTPUT.clear();StringstreamOUTPUT.str(std::string());
+    aurostd::StringstreamClean(StringstreamOUTPUT);
     vector<string> tokens;
     aurostd::string2vectorstring(StringIN,tokens);
     int istart=-1,istop=-1;
@@ -3588,7 +3587,7 @@ namespace aurostd {
   }
 
   bool ExtractJustAfterToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,string Keyword_start) {    // AFLOW_FUNCTION_IMPLEMENTATION
-    StringstreamOUTPUT.clear();StringstreamOUTPUT.str(std::string());
+    aurostd::StringstreamClean(StringstreamOUTPUT);
     string strline;
     FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
     bool status=FALSE;
@@ -3601,13 +3600,13 @@ namespace aurostd {
   }
 
   bool ExtractJustAfterToStringstreamEXPLICIT(stringstream StringStreamIN,stringstream& StringstreamOUTPUT,string Keyword_start) { // AFLOW_FUNCTION_IMPLEMENTATION
-    StringstreamOUTPUT.clear();StringstreamOUTPUT.str(std::string());
+    aurostd::StringstreamClean(StringstreamOUTPUT);
     string StringIN=StringStreamIN.str();
     return ExtractJustAfterToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start);
   }
 
   bool ExtractJustAfterToStringstreamEXPLICIT(string StringIN,stringstream& StringstreamOUTPUT,string Keyword_start) {  // AFLOW_FUNCTION_IMPLEMENTATION
-    StringstreamOUTPUT.clear();StringstreamOUTPUT.str(std::string());
+    aurostd::StringstreamClean(StringstreamOUTPUT);
     bool status=FALSE;
     vector<string> tokens;
     aurostd::string2tokens(StringIN,tokens,"\n");
@@ -4006,71 +4005,81 @@ namespace aurostd {
   // Function file2string bz2file2string gzfile2string xzfile2string zipfile2string efile2string
   // ***************************************************************************
   // write file to string - Stefano Curtarolo
-  uint file2string(string _FileNameIN,string& StringIN) {
+  uint file2string(const string& _FileNameIN,string& StringIN) {  //CO20210624
     string FileNameIN=aurostd::CleanFileName(_FileNameIN);
     if(!FileExist(FileNameIN)) {
       // cerr << "ERROR - aurostd::file2string: file=" << FileNameIN << " not present !" << endl;
-      return 0;}   
+      return 0;
+    }
     ifstream FileIN;
     FileIN.open(FileNameIN.c_str(),std::ios::in);
     char c; while (FileIN.get(c)) StringIN+=c;
     FileIN.clear();FileIN.close();
     return StringIN.length();  // return 0 if something got messed up
   }
-  uint bz2file2string(string _FileNameIN,string& StringIN) {
+  uint bz2file2string(const string& _FileNameIN,string& StringIN) { //CO20210624
     string FileNameIN=aurostd::CleanFileName(_FileNameIN);
     // cerr << "bz2file2string; BEGIN" << endl;
     if(!FileExist(FileNameIN)) {
       // cerr << "ERROR - aurostd::bz2file2string: file=" << FileNameIN << " not present !" << endl;
-      return 0;}   
+      return 0;
+    }   
     if(!aurostd::IsCommandAvailable("bzcat")) {
       // cerr << "ERROR - aurostd::bz2file2string: command \"bzcat\" is necessary !" << endl;
-      return 0;}   
+      return 0;
+    }   
     StringIN=aurostd::execute2string("bzcat \""+FileNameIN+"\"");
     return StringIN.length();  // return 0 if something got messed up
   }
-  uint gzfile2string(string _FileNameIN,string& StringIN) {
+  uint gzfile2string(const string& _FileNameIN,string& StringIN) {  //CO20210624
     string FileNameIN=aurostd::CleanFileName(_FileNameIN);
     // cerr << "gzfile2string; BEGIN" << endl;
     if(!FileExist(FileNameIN)) {
       // cerr << "ERROR - aurostd::gzfile2string: file=" << FileNameIN << " not present !" << endl;
-      return 0;}   
+      return 0;
+    }
     if(!aurostd::IsCommandAvailable("zcat")) {
       // cerr << "ERROR - aurostd::gzfile2string: command \"zcat\" is necessary !" << endl;
-      return 0;}   
+      return 0;
+    }
     StringIN=aurostd::execute2string("zcat \""+FileNameIN+"\"");
     return StringIN.length();  // return 0 if something got messed up
   }
-  uint xzfile2string(string _FileNameIN,string& StringIN) {
+  uint xzfile2string(const string& _FileNameIN,string& StringIN) {  //CO20210624
     string FileNameIN=aurostd::CleanFileName(_FileNameIN);
     // cerr << "xzfile2string; BEGIN" << endl;
     if(!FileExist(FileNameIN)) {
       // cerr << "ERROR - aurostd::xzfile2string: file=" << FileNameIN << " not present !" << endl;
-      return 0;}   
+      return 0;
+    }
     if(!aurostd::IsCommandAvailable("xzcat")) {
       // cerr << "ERROR - aurostd::xzfile2string: command \"xzcat\" is necessary !" << endl;
-      return 0;}   
+      return 0;
+    }
     StringIN=aurostd::execute2string("xzcat \""+FileNameIN+"\"");
     return StringIN.length();  // return 0 if something got messed up
   }
   //CO START
-  uint zipfile2string(string _FileNameIN,string& StringIN) {
+  uint zipfile2string(const string& _FileNameIN,string& StringIN) { //CO20210624
     string FileNameIN=aurostd::CleanFileName(_FileNameIN);
     if(!FileExist(FileNameIN)) {
-      return 0;}
+      return 0;
+    }
     if(!aurostd::IsCommandAvailable("unzip")) {
-      return 0;}
+      return 0;
+    }
     StringIN=aurostd::execute2string("unzip -p \""+FileNameIN+"\"");
     return StringIN.length();  // return 0 if something got messed up
   }
   //CO END
-  uint efile2string(const string& FileNameIN,string& StringIN) {
+  uint efile2string(const string& FileNameIN,string& StringIN) {  //CO20210624
     //[CO20190808 - OBSOLETE, we clean inside FileExist()]string FileNameIN=aurostd::CleanFileName(_FileNameIN),FileNameOUT;  //CO
     string FileNameOUT=""; //CO20191110
     // cerr << "efile2string; BEGIN FileNameIN=[" << FileNameIN << "]" << endl;
     if(!FileExist(FileNameIN,FileNameOUT) && !EFileExist(FileNameIN,FileNameOUT)) {
       // cerr << "ERROR - aurostd::efile2string: file=" << FileNameIN << " not present !" << endl;
-      return 0;}   
+      return 0;
+    }   
     // cerr << aurostd::substring2bool(FileNameIN,".bz2") << endl;
     if(aurostd::substring2bool(FileNameOUT,".bz2")) {
       // cerr << "efile2string: found .bz2, using bz2file2string" << endl;
@@ -4092,23 +4101,23 @@ namespace aurostd {
   // Function file2vectorstring bz2file2vectorstring gzfile2vectorstring xzfile2vectorstring efile2vectorstring 
   // ***************************************************************************
   // write file to vector string - Stefano Curtarolo
-  uint file2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive,bool trim_edges) {
+  uint file2vectorstring(const string& FileNameIN,vector<string>& vline,bool consecutive,bool trim_edges) { //CO20210624
     return aurostd::string2vectorstring(file2string(aurostd::CleanFileName(FileNameIN)),vline,consecutive,trim_edges);
   }
 
-  uint bz2file2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive,bool trim_edges) {
+  uint bz2file2vectorstring(const string& FileNameIN,vector<string>& vline,bool consecutive,bool trim_edges) {  //CO20210624
     return aurostd::string2vectorstring(bz2file2string(aurostd::CleanFileName(FileNameIN)),vline,consecutive,trim_edges);
   }
 
-  uint gzfile2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive,bool trim_edges) {
+  uint gzfile2vectorstring(const string& FileNameIN,vector<string>& vline,bool consecutive,bool trim_edges) { //CO20210624
     return aurostd::string2vectorstring(gzfile2string(aurostd::CleanFileName(FileNameIN)),vline,consecutive,trim_edges);
   }
 
-  uint xzfile2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive,bool trim_edges) {
+  uint xzfile2vectorstring(const string& FileNameIN,vector<string>& vline,bool consecutive,bool trim_edges) { //CO20210624
     return aurostd::string2vectorstring(xzfile2string(aurostd::CleanFileName(FileNameIN)),vline,consecutive,trim_edges);
   }
 
-  uint efile2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive,bool trim_edges) {
+  uint efile2vectorstring(const string& FileNameIN,vector<string>& vline,bool consecutive,bool trim_edges) {  //CO20210624
     return aurostd::string2vectorstring(efile2string(aurostd::CleanFileName(FileNameIN)),vline,consecutive,trim_edges);
   }
 
@@ -4127,23 +4136,23 @@ namespace aurostd {
   // Function file2dequestring bz2file2dequestring gzfile2dequestring xzfile2dequestring efile2dequestring 
   // ***************************************************************************
   // write file to deque string - Stefano Curtarolo
-  uint file2dequestring(string FileNameIN,deque<string>& vline) {
+  uint file2dequestring(const string& FileNameIN,deque<string>& vline) {  //CO20210624
     return aurostd::string2dequestring(file2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint bz2file2dequestring(string FileNameIN,deque<string>& vline) {
+  uint bz2file2dequestring(const string& FileNameIN,deque<string>& vline) { //CO20210624
     return aurostd::string2dequestring(bz2file2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint gzfile2dequestring(string FileNameIN,deque<string>& vline) {
+  uint gzfile2dequestring(const string& FileNameIN,deque<string>& vline) {  //CO20210624
     return aurostd::string2dequestring(gzfile2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint xzfile2dequestring(string FileNameIN,deque<string>& vline) {
+  uint xzfile2dequestring(const string& FileNameIN,deque<string>& vline) {  //CO20210624
     return aurostd::string2dequestring(xzfile2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint efile2dequestring(string FileNameIN,deque<string>& vline) {
+  uint efile2dequestring(const string& FileNameIN,deque<string>& vline) { //CO20210624
     return aurostd::string2dequestring(efile2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
@@ -4163,23 +4172,23 @@ namespace aurostd {
   // Function file2vectorstring bz2file2vectorstring gzfile2vectorstring xzfile2vectorstring efile2vectorstring overloading for file2vector
   // ***************************************************************************
   // write file to deque string - Stefano Curtarolo
-  uint file2vectorstring(string FileNameIN,deque<string>& vline) {
+  uint file2vectorstring(const string& FileNameIN,deque<string>& vline) {  //CO20210624
     return aurostd::string2dequestring(file2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint bz2file2vectorstring(string FileNameIN,deque<string>& vline) {
+  uint bz2file2vectorstring(const string& FileNameIN,deque<string>& vline) {  //CO20210624
     return aurostd::string2dequestring(bz2file2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint gzfile2vectorstring(string FileNameIN,deque<string>& vline) {
+  uint gzfile2vectorstring(const string& FileNameIN,deque<string>& vline) { //CO20210624
     return aurostd::string2dequestring(gzfile2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint xzfile2vectorstring(string FileNameIN,deque<string>& vline) {
+  uint xzfile2vectorstring(const string& FileNameIN,deque<string>& vline) { //CO20210624
     return aurostd::string2dequestring(xzfile2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
-  uint efile2vectorstring(string FileNameIN,deque<string>& vline) {
+  uint efile2vectorstring(const string& FileNameIN,deque<string>& vline) {  //CO20210624
     return aurostd::string2dequestring(efile2string(aurostd::CleanFileName(FileNameIN)),vline);
   }
 
@@ -4198,79 +4207,60 @@ namespace aurostd {
   // Function file2stringstream bz2file2stringstream gzfile2stringstream xzfile2stringstream zipfile2stringstream efile2stringstream
   // ***************************************************************************
   // write file to stringstream - Stefano Curtarolo
-  bool file2stringstream(string _FileNameIN,stringstream& StringstreamIN) {
+  bool file2stringstream(const string& _FileNameIN,stringstream& StringstreamIN) {  //CO20210624
     string FileNameIN=aurostd::CleanFileName(_FileNameIN);
     if(!FileExist(FileNameIN)) {
       cerr << "ERROR - aurostd::file2stringstream: file=" << FileNameIN << " not present !" << endl;
       return FALSE;
     }
-    ifstream FileIN;
-    StringstreamIN.clear();StringstreamIN.str(std::string());
-    FileIN.open(FileNameIN.c_str(),std::ios::in);
-    char c; while (FileIN.get(c)) StringstreamIN.put(c);
-    FileIN.clear();FileIN.close();
+    aurostd::StringstreamClean(StringstreamIN);
+    StringstreamIN << file2string(FileNameIN);
     return TRUE;  // return FALSE if something got messed up
   }
-  bool bz2file2stringstream(string _FileNameIN,stringstream& StringstreamIN) {
+  bool bz2file2stringstream(const string& _FileNameIN,stringstream& StringstreamIN) { //CO20210624
     string FileNameIN=aurostd::CleanFileName(_FileNameIN);
     if(!FileExist(FileNameIN)) {
       cerr << "ERROR - aurostd::bz2file2stringstream: file=" << FileNameIN << " not present !" << endl;
       return FALSE;
     }
-    if(!aurostd::IsCommandAvailable("bzcat")) {
-      cerr << "ERROR - aurostd::bz2file2stringstream: command \"bzcat\" is necessary !" << endl;
-      return FALSE;
-    }
-    StringstreamIN.clear();StringstreamIN.str(std::string());
-    StringstreamIN << execute2string("bzcat \""+FileNameIN+"\"");
+    aurostd::StringstreamClean(StringstreamIN);
+    StringstreamIN << bz2file2string(FileNameIN);
     return TRUE;  // return FALSE if something got messed up
   }
-  bool gzfile2stringstream(string _FileNameIN,stringstream& StringstreamIN) {
+  bool gzfile2stringstream(const string& _FileNameIN,stringstream& StringstreamIN) {  //CO20210624
     string FileNameIN=aurostd::CleanFileName(_FileNameIN);
     if(!FileExist(FileNameIN)) {
       cerr << "ERROR - aurostd::gzfile2stringstream: file=" << FileNameIN << " not present !" << endl;
       return FALSE;
     }
-    if(!aurostd::IsCommandAvailable("zcat")) {
-      cerr << "ERROR - aurostd::gzfile2stringstream: command \"zcat\" is necessary !" << endl;
-      return FALSE;
-    }
-    StringstreamIN.clear();StringstreamIN.str(std::string());
-    StringstreamIN << execute2string("zcat \""+FileNameIN+"\"");
+    aurostd::StringstreamClean(StringstreamIN);
+    StringstreamIN << gzfile2string(FileNameIN);
     return TRUE;  // return FALSE if something got messed up
   }
-  bool xzfile2stringstream(string _FileNameIN,stringstream& StringstreamIN) {
+  bool xzfile2stringstream(const string& _FileNameIN,stringstream& StringstreamIN) {  //CO20210624
     string FileNameIN=aurostd::CleanFileName(_FileNameIN);
     if(!FileExist(FileNameIN)) {
       cerr << "ERROR - aurostd::xzfile2stringstream: file=" << FileNameIN << " not present !" << endl;
       return FALSE;
     }
-    if(!aurostd::IsCommandAvailable("xzcat")) {
-      cerr << "ERROR - aurostd::xzfile2stringstream: command \"xzcat\" is necessary !" << endl;
-      return FALSE;
-    }
-    StringstreamIN.clear();StringstreamIN.str(std::string());
-    StringstreamIN << execute2string("xzcat \""+FileNameIN+"\"");
+    aurostd::StringstreamClean(StringstreamIN);
+    StringstreamIN << xzfile2string(FileNameIN);
     return TRUE;  // return FALSE if something got messed up
   }
   //CO START
   //zipfile 2 a string
-  bool zipfile2stringstream(string _FileNameIN,stringstream& StringstreamIN) {
+  bool zipfile2stringstream(const string& _FileNameIN,stringstream& StringstreamIN) { //CO20210624
     string FileNameIN=CleanFileName(_FileNameIN);
     if(!FileExist(FileNameIN)) {
       cerr << "ERROR - aurostd::zipfile2stringstream: file=" << FileNameIN << " not present !" << endl;
       return FALSE;
     }
-    if(!aurostd::IsCommandAvailable("zcat")) {
-      cerr << "ERROR - aurostd::zipfile2stringstream: command \"unzip\" is necessary !" << endl;
-      return FALSE;
-    }
-    StringstreamIN.clear();StringstreamIN.str(std::string());
-    StringstreamIN << execute2string("unzip -p \""+FileNameIN+"\"");
+    aurostd::StringstreamClean(StringstreamIN);
+    StringstreamIN << zipfile2string(FileNameIN);
     return TRUE;  // return FALSE if something got messed up
   }
   //CO END
-  bool efile2stringstream(string _FileNameIN,stringstream& StringstreamIN) {
+  bool efile2stringstream(const string& _FileNameIN,stringstream& StringstreamIN) { //CO20210624
     string FileNameIN=aurostd::CleanFileName(_FileNameIN),FileNameOUT;  //CO
     if(!FileExist(FileNameIN,FileNameOUT) && !EFileExist(FileNameIN,FileNameOUT)) {
       cerr << "ERROR - aurostd::efile2stringstream: file=" << FileNameIN << " not present !" << endl;
@@ -4287,31 +4277,33 @@ namespace aurostd {
   // Function file2string
   // ***************************************************************************
   // write file to string - Stefano Curtarolo
-  string file2string(string FileNameIN) {
-    ifstream FileIN;
-    string StringIN;
-    FileIN.open(FileNameIN.c_str(),std::ios::in);
-    char c; while (FileIN.get(c)) StringIN+=c;
-    FileIN.clear();FileIN.close();
+  string file2string(const string& FileNameIN) {  //CO20210624
+    string StringIN="";
+    file2string(FileNameIN,StringIN);
     return StringIN;
   }
-  string bz2file2string(string FileNameIN) {
-    string StringIN;
+  string bz2file2string(const string& FileNameIN) { //CO20210624
+    string StringIN="";
     bz2file2string(FileNameIN,StringIN);
     return StringIN;
   }
-  string gzfile2string(string FileNameIN) {
-    string StringIN;
+  string gzfile2string(const string& FileNameIN) {  //CO20210624
+    string StringIN="";
     gzfile2string(FileNameIN,StringIN);
     return StringIN;
   }
-  string xzfile2string(string FileNameIN) {
-    string StringIN;
+  string xzfile2string(const string& FileNameIN) {  //CO20210624
+    string StringIN="";
     xzfile2string(FileNameIN,StringIN);
     return StringIN;
   }
-  string efile2string(string FileNameIN) {
-    string StringIN;
+  string zipfile2string(const string& FileNameIN) {  //CO20210624
+    string StringIN="";
+    zipfile2string(FileNameIN,StringIN);
+    return StringIN;
+  }
+  string efile2string(const string& FileNameIN) { //CO20210624
+    string StringIN="";
     efile2string(FileNameIN,StringIN);
     return StringIN;
   }
@@ -4437,7 +4429,7 @@ namespace aurostd {
     if(verbose) cout << soliloquy << " Loading url=" << url << endl;
     string stringIN="";  //CO20200404
     bool out=eurl2string(url,stringIN,verbose);
-    stringstreamIN.str(""); stringstreamIN << stringIN;
+    aurostd::StringstreamClean(stringstreamIN); stringstreamIN << stringIN;
     return out;
   }
 
@@ -4452,7 +4444,7 @@ namespace aurostd {
     if(verbose) cout << soliloquy << " Loading url=" << url << endl;
     string stringIN="";  //CO20200404
     bool out=url2string(url,stringIN,verbose);
-    stringstreamIN.str(""); stringstreamIN << stringIN;
+    aurostd::StringstreamClean(stringstreamIN); stringstreamIN << stringIN;
     return out;
   }
 
@@ -5164,12 +5156,11 @@ namespace aurostd {
     return strstring;
   }
 
-  void StringStreamSubst(stringstream &strstringsteram, const string &strfind, const string &strreplace) {
-    string strstring=strstringsteram.str();
+  void StringStreamSubst(stringstream &strstringstream, const string &strfind, const string &strreplace) {
+    string strstring=strstringstream.str();
     StringSubst(strstring,strfind,strreplace);
-    strstringsteram.clear();
-    strstringsteram.str(std::string());
-    strstringsteram << strstring;
+    aurostd::StringstreamClean(strstringstream);
+    strstringstream << strstring;
   }
 
   //  string StringSubst(string &strstring, const string &strfind0, const string &strfind1, const string &strfind2, const string &strfind3, const string &strreplace) {
@@ -5898,7 +5889,7 @@ namespace aurostd {
         for(uint i3=0;i3<=1;i3++)
           for(uint i4=0;i4<=1;i4++)
             for(uint i5=0;i5<=1;i5++) {
-              ss.clear();ss.str("");
+              aurostd::StringstreamClean(ss);
               ss << s.at(i1) << s.at(i2) << s.at(i3) << s.at(i4) << s.at(i5); 
               aurostd::StringSubst(out,"_{"+ss.str()+"}","<sub>"+ss.str()+"</sub>");
             }
@@ -6710,7 +6701,7 @@ namespace aurostd  {
 // ***************************************************************************
 namespace aurostd  {
   string vector2string(const vector<vector<double> >& vva) {
-    stringstream ss_vva; ss_vva.str(std::string());
+    stringstream ss_vva; aurostd::StringstreamClean(ss_vva);
     ss_vva << std::scientific;
     for (uint i=0; i<vva.size();i++) {
       for (uint j=0; j<vva[i].size();j++) {
@@ -7337,10 +7328,10 @@ namespace aurostd {
     vector<string> vcontent_json;
     // real
     sscontent_json << "\"real\":\"" << aurostd::utype2string(number.re,5,roff) << "\"" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
     // imaginary
     sscontent_json << "\"imag\":\"" << aurostd::utype2string(number.im,5,roff) << "\"" << eendl;
-    vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
+    vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
     sss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}" << eendl;
     return sss.str();    

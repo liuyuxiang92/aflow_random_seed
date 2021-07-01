@@ -633,46 +633,47 @@ namespace aurostd {
   bool stringstream2bz2file(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,const string& mode="");
   bool stringstream2xzfile(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,const string& mode="");
   // file2string
-  uint file2string(string FileNameIN,string& StringIN);
-  uint bz2file2string(string FileNameIN,string& StringIN);
-  uint gzfile2string(string FileNameIN,string& StringIN);
-  uint xzfile2string(string FileNameIN,string& StringIN);
-  uint zipfile2string(string _FileNameIN,string& StringIN); //CO
-  uint efile2string(const string& FileNameIN,string& StringIN);  //CO20191110
+  uint file2string(const string& FileNameIN,string& StringIN);  //CO20210624
+  uint bz2file2string(const string& FileNameIN,string& StringIN); //CO20210624
+  uint gzfile2string(const string& FileNameIN,string& StringIN);  //CO20210624
+  uint xzfile2string(const string& FileNameIN,string& StringIN);  //CO20210624
+  uint zipfile2string(const string& FileNameIN,string& StringIN); //CO  //CO20210624
+  uint efile2string(const string& FileNameIN,string& StringIN);  //CO20191110 //CO20210624
   // file2vectorstring  
-  uint file2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false); //CO20170613, defaults to usual string2tokens() behavior
-  uint bz2file2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false);  //CO20170613, defaults to usual string2tokens() behavior
-  uint gzfile2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false); //CO20170613, defaults to usual string2tokens() behavior
-  uint xzfile2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false); //CO20170613, defaults to usual string2tokens() behavior
-  uint efile2vectorstring(string FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false);  //CO20170613, defaults to usual string2tokens() behavior
+  uint file2vectorstring(const string& FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false); //CO20170613, defaults to usual string2tokens() behavior //CO20210624
+  uint bz2file2vectorstring(const string& FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false);  //CO20170613, defaults to usual string2tokens() behavior //CO20210624
+  uint gzfile2vectorstring(const string& FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false); //CO20170613, defaults to usual string2tokens() behavior //CO20210624
+  uint xzfile2vectorstring(const string& FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false); //CO20170613, defaults to usual string2tokens() behavior //CO20210624
+  uint efile2vectorstring(const string& FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false);  //CO20170613, defaults to usual string2tokens() behavior //CO20210624
   bool vectorstring2file(const vector<string>& vline,string FileNameOUT);
   // file2dequestring  
-  uint file2dequestring(string FileNameIN,deque<string>& vline);
-  uint bz2file2dequestring(string FileNameIN,deque<string>& vline);
-  uint gzfile2dequestring(string FileNameIN,deque<string>& vline);
-  uint xzfile2dequestring(string FileNameIN,deque<string>& vline);
-  uint efile2dequestring(string FileNameIN,deque<string>& vline);
+  uint file2dequestring(const string& FileNameIN,deque<string>& vline);  //CO20210624
+  uint bz2file2dequestring(const string& FileNameIN,deque<string>& vline); //CO20210624
+  uint gzfile2dequestring(const string& FileNameIN,deque<string>& vline);  //CO20210624
+  uint xzfile2dequestring(const string& FileNameIN,deque<string>& vline);  //CO20210624
+  uint efile2dequestring(const string& FileNameIN,deque<string>& vline); //CO20210624
   bool dequestring2file(const deque<string>& vline,string FileNameOUT);
   // file2vectorstring overloading with deque
-  uint file2vectorstring(string FileNameIN,deque<string>& vline);
-  uint bz2file2vectorstring(string FileNameIN,deque<string>& vline);
-  uint gzfile2vectorstring(string FileNameIN,deque<string>& vline);
-  uint xzfile2vectorstring(string FileNameIN,deque<string>& vline);
-  uint efile2vectorstring(string FileNameIN,deque<string>& vline);  
+  uint file2vectorstring(const string& FileNameIN,deque<string>& vline);  //CO20210624
+  uint bz2file2vectorstring(const string& FileNameIN,deque<string>& vline); //CO20210624
+  uint gzfile2vectorstring(const string& FileNameIN,deque<string>& vline);  //CO20210624
+  uint xzfile2vectorstring(const string& FileNameIN,deque<string>& vline);  //CO20210624
+  uint efile2vectorstring(const string& FileNameIN,deque<string>& vline);   //CO20210624
   bool vectorstring2file(const deque<string>& vline,string FileNameOUT);
   // file2stringstream
-  bool file2stringstream(string FileNameIN,stringstream& StringstreamIN);
-  bool bz2file2stringstream(string FileNameIN,stringstream& StringstreamIN);
-  bool gzfile2stringstream(string FileNameIN,stringstream& StringstreamIN);
-  bool xzfile2stringstream(string FileNameIN,stringstream& StringstreamIN);
-  bool zipfile2stringstream(string _FileNameIN,stringstream& StringstreamIN); //CO
-  bool efile2stringstream(string FileNameIN,stringstream& StringstreamIN);
+  bool file2stringstream(const string& FileNameIN,stringstream& StringstreamIN);  //CO20210624
+  bool bz2file2stringstream(const string& FileNameIN,stringstream& StringstreamIN); //CO20210624
+  bool gzfile2stringstream(const string& FileNameIN,stringstream& StringstreamIN);  //CO20210624
+  bool xzfile2stringstream(const string& FileNameIN,stringstream& StringstreamIN);  //CO20210624
+  bool zipfile2stringstream(const string& _FileNameIN,stringstream& StringstreamIN); //CO //CO20210624
+  bool efile2stringstream(const string& FileNameIN,stringstream& StringstreamIN); //CO20210624
   // return directly the string
-  string file2string(string FileNameIN);
-  string bz2file2string(string FileNameIN);
-  string gzfile2string(string FileNameIN);
-  string xzfile2string(string FileNameIN);
-  string efile2string(string FileNameIN);
+  string file2string(const string& FileNameIN); //CO20210624
+  string bz2file2string(const string& FileNameIN);  //CO20210624
+  string gzfile2string(const string& FileNameIN); //CO20210624
+  string xzfile2string(const string& FileNameIN); //CO20210624
+  string zipfile2string(const string& FileNameIN); //CO20210624
+  string efile2string(const string& FileNameIN);  //CO20210624
   // reading url to string/stringstream/tokens/vector/deque
   bool url2file(string url,string& fileIN,bool=FALSE)  __xprototype;   // bool = verbose
   bool eurl2string(const string& url,string& stringIN,bool verbose=FALSE);  //CO20200223

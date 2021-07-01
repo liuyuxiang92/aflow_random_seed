@@ -45,6 +45,7 @@
         -- patching SPIN_REMOVE_RELAX bug which was not turning off spin (CO)
         -- fixing UTC offset in dates (CO)
         -- adding DEFAULT_VASP_FORCE_OPTION_BADER_STATIC which turns on bader for any STATIC calculation (CO)
+        -- patched KBIN::VASP_Reread_POSCAR(), added aurostd::StringstreamClean() around (CO)
 3.2.9 - 2021/05/05
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.9.tar.xz
         -- Fixed bug with APL overwriting *.orig files. (AS)
