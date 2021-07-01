@@ -127,7 +127,7 @@ namespace aurostd {
     if(LDEBUG){cerr << soliloquy << " t_diff=" << t_diff << endl;}
     double offset=(double)t_diff/3600.0;
     offset_hours=(int)std::floor(offset);
-    offset_mins=(int)(std::round((offset-(double)offset_hours)*60.0));
+    offset_mins=(int)(round((offset-(double)offset_hours)*60.0));
   }
   long int get_date(void) {time_t t=time(0);struct tm *ptr_now=localtime(&t);return get_date(*ptr_now);}  //CO20200624
   long int get_date(const tm& tstruct) {return aurostd::get_year(tstruct)*10000+aurostd::get_month(tstruct)*100+aurostd::get_day(tstruct);}  //CO20200624

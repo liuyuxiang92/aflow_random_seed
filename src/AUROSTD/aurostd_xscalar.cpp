@@ -16,6 +16,10 @@
 #include "aurostd_xscalar.h"
 #endif
 
+#ifndef __XOPTIMIZE
+#define _XSCALAR_DEBUG_
+#endif
+
 // ----------------------------------------------------------------------------
 //namespace aurostd {
 //template<class utype> utype                        
@@ -216,9 +220,42 @@ namespace aurostd {
 
 // ----------------------------------------------------------------------------
 // round  floor ceil trunc
-// [OBSOLETE] namespace aurostd {  // namespace aurostd
-// [OBSOLETE]   // ROUND(X)
-// [OBSOLETE]  double round(double x) { return (double) std::round(double(x));}
+namespace aurostd {  // namespace aurostd
+  // ROUND(X)
+  double round(double x) { //CO20210701 //std::round() only works in C++11
+    //algo inspired from here: http://www.cplusplus.com/forum/articles/3638/
+    //https://stackoverflow.com/questions/12696764/round-is-not-a-member-of-std - it's a gcc bug
+    //1.2   ->   1
+    //-1.2  ->  -1
+    //0.1   ->   0
+    //-0.1  ->  -0  //this is ok, (int)round(-0.1)=0
+    //2.5   ->   3
+    //-2.5  ->  -3
+    //2.7   ->   3
+    //-2.7  ->  -3
+    //2.1   ->   2
+    //-2.1  ->  -2
+    //10.7  ->   11
+    //-10.7 ->  -11
+    //[CO20210624 - does not work for negative numbers]return std::floor( x + 0.5 );
+#ifdef _XSCALAR_DEBUG_
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+#endif
+    double fracpart=0.0,intpart=0.0;
+    fracpart=modf(x,&intpart);
+#ifdef _XSCALAR_DEBUG_
+    if(LDEBUG){
+      string soliloquy="aurostd::round():";
+      cerr << soliloquy << " x=" << x << endl;
+      cerr << soliloquy << " fracpart=" << fracpart << endl;
+      cerr << soliloquy << " intpart=" << intpart << endl;
+      cerr << soliloquy << " floor(x)=" << std::floor(x) << endl;
+      cerr << soliloquy << " ceil(x)=" << std::ceil(x) << endl;
+    }
+#endif
+    if(abs(fracpart)>=.5){return x>=0?std::ceil(x):std::floor(x);}  //not sure why fracpart would ever be negative, but it is for negative inputs
+    else{return x<0?std::ceil(x):std::floor(x);}
+  }
 // [OBSOLETE]  float round(float x) { return (float) std::roundf(float(x));}
 // [OBSOLETE]  long double round(long double x) { return (long double) std::roundl((long double) x);}
 // [OBSOLETE]  int round(int x) { return (int) std::round(double(x));}
@@ -241,7 +278,7 @@ namespace aurostd {
 // [OBSOLETE]  long double trunc(long double x) { return (long double) std::truncl((long double) x);}
 // [OBSOLETE]  int trunc(int x) { return (int) std::trunc(double(x));}
 // [OBSOLETE]  long trunc(long x) { return (long) std::trunc(double(x));}
-// [OBSOLETE] }
+}
 
 namespace aurostd {
   double ln(double x) { return (double) std::log(x);};
