@@ -969,10 +969,10 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   //AS20200909 END
   //AS20210701 BEGIN
   if (aurostd::args2flag(argv, cmds, "--plotgrdisp|--plotgruneisendispersion|--plotgrueneisendispersion")) {
-    vpflow.flag("PLOT_GRDISP", true);
-    vpflow.addattachedscheme("PLOT_GRDISP", "./", true);
+    vpflow.flag("PLOT_GRUENEISEN_DISPERSION", true);
+    vpflow.addattachedscheme("PLOT_GRUENEISEN_DISPERSION", "./", true);
   } else {
-    vpflow.args2addattachedscheme(argv,cmds,"PLOT_GRDISP","--plotgrdisp=","./");
+    vpflow.args2addattachedscheme(argv,cmds,"PLOT_GRUENEISEN_DISPERSION","--plotgrdisp=","./");
   }
   //AS20210701 END
 
@@ -1892,7 +1892,7 @@ namespace pflow {
       if(vpflow.flag("PLOT_THERMO_QHA")) {aurostd::xoption plotopts=plotter::getPlotOptions(vpflow,"PLOT_THERMO_QHA"); plotter::PLOT_THERMO_QHA(plotopts); _PROGRAMRUN=true;}
       //AS20200909 END
       //AS20210701 BEGIN
-      if(vpflow.flag("PLOT_GRDISP")) {aurostd::xoption plotopts=plotter::getPlotOptions(vpflow,"PLOT_GRDISP"); plotter::PLOT_GRDISP(plotopts); _PROGRAMRUN=true;}
+      if(vpflow.flag("PLOT_GRUENEISEN_DISPERSION")) {aurostd::xoption plotopts=plotter::getPlotOptions(vpflow,"PLOT_GRUENEISEN_DISPERSION"); plotter::PLOT_GRUENEISEN_DISPERSION(plotopts); _PROGRAMRUN=true;}
       //AS20210701 END
       if(vpflow.flag("PROTOS_ICSD")) {cout << aflowlib::PrototypesIcsdHelp(vpflow.getattachedscheme("PROTOS_ICSD"));cout << aflow::Banner("BANNER_BIG");return 1;}
       // if(POCCUPATION) {pflow::POCCUPATION(argv,cin); _PROGRAMRUN=true;}

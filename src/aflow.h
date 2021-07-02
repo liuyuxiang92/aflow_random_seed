@@ -3931,10 +3931,10 @@ namespace plotter {
   void PLOT_THERMO_QHA(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20200909
   void PLOT_THERMO_QHA(aurostd::xoption&, stringstream&,ostream& oss=cout); //AS20200909
   void PLOT_THERMO_QHA(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20200909
-  void PLOT_GRDISP(aurostd::xoption&,ostream& oss=cout);  //AS20210701
-  void PLOT_GRDISP(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20210701
-  void PLOT_GRDISP(aurostd::xoption&, stringstream&,ostream& oss=cout); //AS20210701
-  void PLOT_GRDISP(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20210701
+  void PLOT_GRUENEISEN_DISPERSION(aurostd::xoption&,ostream& oss=cout);  //AS20210701
+  void PLOT_GRUENEISEN_DISPERSION(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20210701
+  void PLOT_GRUENEISEN_DISPERSION(aurostd::xoption&, stringstream&,ostream& oss=cout); //AS20210701
+  void PLOT_GRUENEISEN_DISPERSION(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20210701
 
   // General plots -----------------------------------------------------------
   void plotSingleFromSet(xoption&, stringstream&, const vector<vector<double> >&, int,ostream& oss=cout); //CO20200404

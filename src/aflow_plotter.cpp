@@ -2715,23 +2715,23 @@ namespace plotter {
   //AS20200909 END
 
   //AS20210701 BEGIN
-  //PLOT_GRDISP///////////////////////////////////////////////////////////////
+  //PLOT_GRUENEISEN_DISPERSION///////////////////////////////////////////////////////////////
   /// Plots Grueneisen parameter dispersion curves.
-  /// Follows PLOT_GRDISP function.
-  void PLOT_GRDISP(xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return PLOT_GRDISP(plotoptions,FileMESSAGE,oss);}  //CO20200404
-  void PLOT_GRDISP(xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
+  /// Follows PLOT_GRUENEISEN_DISPERSION function.
+  void PLOT_GRUENEISEN_DISPERSION(xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return PLOT_GRUENEISEN_DISPERSION(plotoptions,FileMESSAGE,oss);}  //CO20200404
+  void PLOT_GRUENEISEN_DISPERSION(xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
     // Set k-points format to LaTeX
     plotoptions.push_attached("KPOINT_FORMAT", "LATEX");
     // Set output format to gnuplot
     plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
 
     stringstream out;
-    PLOT_GRDISP(plotoptions, out,FileMESSAGE,oss); //CO20200404
+    PLOT_GRUENEISEN_DISPERSION(plotoptions, out,FileMESSAGE,oss); //CO20200404
     savePlotGNUPLOT(plotoptions, out);
   }
 
-  void PLOT_GRDISP(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE;return PLOT_GRDISP(plotoptions,out,FileMESSAGE,oss);} //CO20200404
-  void PLOT_GRDISP(xoption& plotoptions, stringstream& out,ofstream& FileMESSAGE,ostream& oss) { //CO20200404
+  void PLOT_GRUENEISEN_DISPERSION(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE;return PLOT_GRUENEISEN_DISPERSION(plotoptions,out,FileMESSAGE,oss);} //CO20200404
+  void PLOT_GRUENEISEN_DISPERSION(xoption& plotoptions, stringstream& out,ofstream& FileMESSAGE,ostream& oss) { //CO20200404
     // Grueneisen parameters for acoustic modes at the Gamma point are ill-defined,
     // so for the plot to be pretty, one needs to substitute it with NaN
     static double nan = std::numeric_limits<double>::quiet_NaN();
