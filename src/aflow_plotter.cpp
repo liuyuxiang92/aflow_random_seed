@@ -2732,8 +2732,8 @@ namespace plotter {
 
   void PLOT_GRDISP(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE;return PLOT_GRDISP(plotoptions,out,FileMESSAGE,oss);} //CO20200404
   void PLOT_GRDISP(xoption& plotoptions, stringstream& out,ofstream& FileMESSAGE,ostream& oss) { //CO20200404
-    // Grueneisen parameter for acoustic modes at Gamma point is ill-defined,
-    // so for plot to be pretty one needs to substitute it with NaN
+    // Grueneisen parameters for acoustic modes at the Gamma point are ill-defined,
+    // so for the plot to be pretty, one needs to substitute it with NaN
     static double nan = std::numeric_limits<double>::quiet_NaN();
 
     plotoptions.push_attached("EXTENSION", "grdisp");
