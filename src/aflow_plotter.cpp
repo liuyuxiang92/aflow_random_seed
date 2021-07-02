@@ -2295,8 +2295,15 @@ namespace plotter {
     string unit = plotoptions.getattachedscheme("UNIT");
     if (unit.empty()) unit = "EV";
     string energyLabel;
-    if (aurostd::substring2bool(unit, "EV")) energyLabel = "energy";
-    else energyLabel = "frequency";
+    //AS20210701 extra check for Grueneisen parameter dispersion plotting
+    if (unit=="GRUENEISEN"){
+      energyLabel = "$\\gamma$";
+      unit = "";
+    }
+    else
+      if (aurostd::substring2bool(unit, "EV")) energyLabel = "energy";
+      else energyLabel = "frequency";
+
     unit = getFormattedUnit(unit);
 
     out << "# Band structure plot" << std::endl;
@@ -2350,7 +2357,12 @@ namespace plotter {
     out << " set tic scale 0" << std::endl;
     out << " set xrange [0:1]" << std::endl;
     out << " set yrange [" << Emin << ":" << Emax << "]" << std::endl;
-    out << " set ylabel '" << energyLabel << " (" << unit << ")'" << std::endl;
+    if (unit.empty()){//AS20210701 this might be a Grueneisen parameter dispersion plot, unitless
+      out << " set ylabel '" << energyLabel << std::endl;
+    }
+    else{
+      out << " set ylabel '" << energyLabel << " (" << unit << ")'" << std::endl;
+    }
 
     // Fermi level
     if (Efermi > Emin) {
@@ -2701,6 +2713,89 @@ namespace plotter {
     }
   }
   //AS20200909 END
+
+  //AS20210701 BEGIN
+  //PLOT_GRDISP///////////////////////////////////////////////////////////////
+  /// Plots Grueneisen parameter dispersion curves.
+  /// Follows PLOT_GRDISP function.
+  void PLOT_GRDISP(xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return PLOT_GRDISP(plotoptions,FileMESSAGE,oss);}  //CO20200404
+  void PLOT_GRDISP(xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
+    // Set k-points format to LaTeX
+    plotoptions.push_attached("KPOINT_FORMAT", "LATEX");
+    // Set output format to gnuplot
+    plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
+
+    stringstream out;
+    PLOT_GRDISP(plotoptions, out,FileMESSAGE,oss); //CO20200404
+    savePlotGNUPLOT(plotoptions, out);
+  }
+
+  void PLOT_GRDISP(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE;return PLOT_GRDISP(plotoptions,out,FileMESSAGE,oss);} //CO20200404
+  void PLOT_GRDISP(xoption& plotoptions, stringstream& out,ofstream& FileMESSAGE,ostream& oss) { //CO20200404
+    // Grueneisen parameter for acoustic modes at Gamma point is ill-defined,
+    // so for plot to be pretty one needs to substitute it with NaN
+    static double nan = std::numeric_limits<double>::quiet_NaN();
+
+    plotoptions.push_attached("EXTENSION", "grdisp");
+    plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
+    // Read files
+    string directory = plotoptions.getattachedscheme("DIRECTORY");
+    xEIGENVAL xeigen;
+    xeigen.GetPropertiesFile(directory+"/"+ DEFAULT_QHA_FILE_PREFIX
+        + DEFAULT_QHA_GP_PATH_FILE);
+    xKPOINTS xkpts;
+    xkpts.GetPropertiesFile(directory+"/"+ DEFAULT_QHA_FILE_PREFIX +
+        DEFAULT_QHA_KPOINTS_FILE);
+    stringstream poscar;
+    aurostd::efile2stringstream(directory+"/"+DEFAULT_APL_PHPOSCAR_FILE, poscar);  //CO20191110
+    xstructure xstr(poscar);
+
+    // substituting the values of Grueneisen parameters for acoustic modes at
+    // Gamma point with NaN
+    for (uint k=0; k<xeigen.number_kpoints; k++){
+      // if we are close enough to Gamma
+      if (aurostd::modulus(xeigen.vkpoint[k]) < AUROSTD_IDENTITY_TOL){
+        for (uint b=0; b<3; b++){ // acoustic modes should be the first three ones
+          for (uint s=0; s<=xeigen.spin; s++){
+            xeigen.venergy[k][b][s] = nan;
+          }
+        }
+      }
+    }
+
+    // now we need to recalculate energy_min and energy_max
+    xeigen.energy_max = -1e30;
+    xeigen.energy_min =  1e30;
+
+    double eigval = 0.0;
+    for (uint k=0; k<xeigen.number_kpoints; k++){
+      for (uint b=0; b<xeigen.number_bands; b++){
+        for (uint s=0; s<=xeigen.spin; s++){
+          eigval = xeigen.venergy[k][b][s];
+          if (eigval < xeigen.energy_min) xeigen.energy_min = eigval;
+          if (eigval > xeigen.energy_max) xeigen.energy_max = eigval;
+        }
+      }
+    }
+
+    // proceed with plot setup
+    plotoptions.push_attached("DEFAULT_TITLE", xeigen.title);
+    plotoptions.push_attached("LATTICE", getLatticeFromKpointsTitle(xkpts.title));
+    setFileName(plotoptions);
+    setTitle(plotoptions,FileMESSAGE,oss); //CO20200404
+
+    plotoptions.flag("BANDDOS", false);
+
+    plotoptions.push_attached("UNIT", "GRUENEISEN");
+
+    // Get Emin and Emax
+    plotoptions.flag("NOSHIFT", true);
+    setEMinMax(plotoptions, xeigen.energy_min, xeigen.energy_max);
+
+    generateHeader(out, plotoptions, false);
+    generateBandPlot(out, xeigen, xkpts, xstr, plotoptions);
+  }
+  //AS20210701 END
 
   //PLOT_TCOND////////////////////////////////////////////////////////////////
   // Plots AAPL thermal conductivity tensors

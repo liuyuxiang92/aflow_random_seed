@@ -967,6 +967,14 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"PLOT_THERMO_QHA","--plotthermoqha=","./");
   }
   //AS20200909 END
+  //AS20210701 BEGIN
+  if (aurostd::args2flag(argv, cmds, "--plotgrdisp")) {
+    vpflow.flag("PLOT_GRDISP", true);
+    vpflow.addattachedscheme("PLOT_GRDISP", "./", true);
+  } else {
+    vpflow.args2addattachedscheme(argv,cmds,"PLOT_GRDISP","--plotgrdisp=","./");
+  }
+  //AS20210701 END
 
   vpflow.flag("POCC",aurostd::args2flag(argv,cmds,"--pocc") && argv.at(1)=="--pocc");
   vpflow.args2addattachedscheme(argv,cmds,"POCC_DOS","--pocc_dos=","./");
@@ -1883,6 +1891,9 @@ namespace pflow {
       //AS20200909 BEGIN
       if(vpflow.flag("PLOT_THERMO_QHA")) {aurostd::xoption plotopts=plotter::getPlotOptions(vpflow,"PLOT_THERMO_QHA"); plotter::PLOT_THERMO_QHA(plotopts); _PROGRAMRUN=true;}
       //AS20200909 END
+      //AS20210701 BEGIN
+      if(vpflow.flag("PLOT_GRDISP")) {aurostd::xoption plotopts=plotter::getPlotOptions(vpflow,"PLOT_GRDISP"); plotter::PLOT_GRDISP(plotopts); _PROGRAMRUN=true;}
+      //AS20210701 END
       if(vpflow.flag("PROTOS_ICSD")) {cout << aflowlib::PrototypesIcsdHelp(vpflow.getattachedscheme("PROTOS_ICSD"));cout << aflow::Banner("BANNER_BIG");return 1;}
       // if(POCCUPATION) {pflow::POCCUPATION(argv,cin); _PROGRAMRUN=true;}
       if(vpflow.flag("POCC_DOS")) {pocc::POCC_DOS(cout,vpflow.getattachedscheme("POCC_DOS")); _PROGRAMRUN=true;} 
