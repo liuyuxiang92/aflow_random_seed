@@ -968,7 +968,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   }
   //AS20200909 END
   //AS20210701 BEGIN
-  if (aurostd::args2flag(argv, cmds, "--plotgrdisp")) {
+  if (aurostd::args2flag(argv, cmds, "--plotgrdisp|--plotgruneisendispersion|--plotgrueneisendispersion")) {
     vpflow.flag("PLOT_GRDISP", true);
     vpflow.addattachedscheme("PLOT_GRDISP", "./", true);
   } else {

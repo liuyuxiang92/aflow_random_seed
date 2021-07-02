@@ -2751,30 +2751,31 @@ namespace plotter {
     xstructure xstr(poscar);
 
     // substituting the values of Grueneisen parameters for acoustic modes at
-    // Gamma point with NaN
-    for (uint k=0; k<xeigen.number_kpoints; k++){
-      // if we are close enough to Gamma
-      if (aurostd::modulus(xeigen.vkpoint[k]) < AUROSTD_IDENTITY_TOL){
-        for (uint b=0; b<3; b++){ // acoustic modes should be the first three ones
-          for (uint s=0; s<=xeigen.spin; s++){
-            xeigen.venergy[k][b][s] = nan;
-          }
-        }
-      }
-    }
-
-    // now we need to recalculate energy_min and energy_max
+    // Gamma point with NaN.
+    // Here those values of Grueneisen parameters are either zero or a
+    // relatively big number (due to the numberical noise).
+    // For example, in Si the range of values is roughly between -1.5 and 1.5,
+    // but one can get the value at Gamma for one of the acoustic modes as high
+    // as 50.
+    // In Al the range is around [1.9:2.9] and zero values are causing problem
+    // too; beside that, zero values are unphysical.
+    // This means that we need to recalculate energy_min and energy_max for
+    // the plot to have the correct scale.
     xeigen.energy_max = -1e30;
     xeigen.energy_min =  1e30;
-
     double eigval = 0.0;
     for (uint k=0; k<xeigen.number_kpoints; k++){
       for (uint b=0; b<xeigen.number_bands; b++){
-        for (uint s=0; s<=xeigen.spin; s++){
-          eigval = xeigen.venergy[k][b][s];
-          if (eigval < xeigen.energy_min) xeigen.energy_min = eigval;
-          if (eigval > xeigen.energy_max) xeigen.energy_max = eigval;
+        if (b<=3){// acoustic modes should be the first three ones
+          // if we are close enough to Gamma, substitute with NaN
+          if (aurostd::modulus(xeigen.vkpoint[k]) < AUROSTD_IDENTITY_TOL){
+            xeigen.venergy[k][b][0] = nan;
+          }
         }
+
+        eigval = xeigen.venergy[k][b][0];
+        if (eigval < xeigen.energy_min) xeigen.energy_min = eigval;
+        if (eigval > xeigen.energy_max) xeigen.energy_max = eigval;
       }
     }
 
