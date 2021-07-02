@@ -983,7 +983,7 @@ namespace plotter {
 
     if(LDEBUG) { cerr << soliloquy << " EFERMI set" << endl;}
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xdos.energy_min, xdos.energy_max);
 
     // Plot
@@ -1143,7 +1143,7 @@ namespace plotter {
       plotoptions.push_attached("EFERMI", "0.0");
     }
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xeigen.energy_min, xeigen.energy_max);
 
     // Plot
@@ -1199,7 +1199,7 @@ namespace plotter {
       plotoptions.push_attached("EFERMI", "0.0");
     }
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xdos.energy_min, xdos.energy_max);
 
     // Plot
@@ -2300,9 +2300,12 @@ namespace plotter {
       energyLabel = "$\\gamma$";
       unit = "";
     }
-    else
-      if (aurostd::substring2bool(unit, "EV")) energyLabel = "energy";
-      else energyLabel = "frequency";
+    else if (aurostd::substring2bool(unit, "EV")){
+      energyLabel = "energy";
+    }
+    else{
+      energyLabel = "frequency";
+    }
 
     unit = getFormattedUnit(unit);
 
@@ -2450,7 +2453,7 @@ namespace plotter {
       convertEnergies(xdos, unit);
     }
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xdos.energy_min, xdos.energy_max);
 
     generateHeader(out, plotoptions, false);
@@ -2498,7 +2501,7 @@ namespace plotter {
       convertEnergies(xeigen, unit);
     }
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xeigen.energy_min, xeigen.energy_max);
 
     generateHeader(out, plotoptions, false);
@@ -2550,7 +2553,7 @@ namespace plotter {
       convertEnergies(xeigen, unit);
     }
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xdos.energy_min, xdos.energy_max);
 
     generateHeader(out, plotoptions, true);
@@ -2752,15 +2755,8 @@ namespace plotter {
 
     // substituting the values of Grueneisen parameters for acoustic modes at
     // Gamma point with NaN.
-    // Here those values of Grueneisen parameters are either zero or a
-    // relatively big number (due to the numberical noise).
-    // For example, in Si the range of values is roughly between -1.5 and 1.5,
-    // but one can get the value at Gamma for one of the acoustic modes as high
-    // as 50.
-    // In Al the range is around [1.9:2.9] and zero values are causing problem
-    // too; beside that, zero values are unphysical.
-    // This means that we need to recalculate energy_min and energy_max for
-    // the plot to have the correct scale.
+    // Grueneisen parameters at Gamma may be large due to numerical noise, so
+    // recalculate energy_min and energy_max
     xeigen.energy_max = -1e30;
     xeigen.energy_min =  1e30;
     double eigval = 0.0;
@@ -2789,7 +2785,7 @@ namespace plotter {
 
     plotoptions.push_attached("UNIT", "GRUENEISEN");
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     plotoptions.flag("NOSHIFT", true);
     setEMinMax(plotoptions, xeigen.energy_min, xeigen.energy_max);
 
