@@ -2249,7 +2249,7 @@ LATTICES = (the ones with "")
           aflow --plotbanddos=/common/DATA/ZnO,-8,6,1.5
           aflow --plotbanddos=./ --print=png --projection=atoms
 
-  aflow --plotdos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=atoms|lm|none|orbitals] [--title=] [--outfile=]
+  aflow --plotdos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=atoms|species|lm|none|orbitals] [--title=] [--outfile=]
         Generate DOS plot using GNUPLOT and pdfLaTeX
         The following file must reside in the directory:
          DOSCAR.static
@@ -2257,6 +2257,10 @@ LATTICES = (the ones with "")
         NOTE: If the DOSCAR contains f-orbitals and the calculation was performed
               with LORBIT = 10 and LSORBIT = .TRUE., either INCAR.static,
               vasprun.xml.static, or OUTCAR.static are required as well.
+        If it is a POCC run, the following files are required:
+         DOSCAR.pocc_TxxxxK
+        NOTE: If projection==species, the ARUN.POCC_xx directories are required,
+              along with the aflow.in and aflow.pocc.structures_unique.out file.
         Defaults.
          Directory: default = ./
          Emin: The minimum value of the DOS plot. Default value: -10
@@ -2266,7 +2270,7 @@ LATTICES = (the ones with "")
          --keep=gpl: keep the gnuplot script
          --noshift: do not shift the Fermi level to zero
          --print: specify the format of the output image (default: pdf)
-         --projection: Determines whether the DOS is projected along the atoms, l- or lm-resolved orbitals, or not at all (default: orbitals)
+         --projection: Determines whether the DOS is projected along the atoms, l- or lm-resolved orbitals, or not at all (default: orbitals). For POCC runs, the DOS can also be projected among the species.
          --title: the title of the plot in LaTeX format (default: title in DOSCAR file)
          --outfile: the name of the output image file.
         Examples:

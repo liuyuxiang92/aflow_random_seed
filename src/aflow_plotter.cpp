@@ -18,6 +18,7 @@
 // flexibility and customizability as possible.
 
 #include "aflow.h"
+#include "aflow_pocc.h"
 
 using std::deque;
 using std::string;
@@ -121,8 +122,13 @@ namespace plotter {
   //getPlotOptionsEStructure//////////////////////////////////////////////////
   // Sets the plot options that are specific to electronic structure plots.
   xoption getPlotOptionsEStructure(const aurostd::xoption& xopt, const string& key, bool datasets) {
-    xoption plotoptions = getPlotOptions(xopt, key, datasets);
+    bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
+    string soliloquy=XPID+"plotter::getPlotOptionsEStructure():";
+    
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
+    xoption plotoptions = getPlotOptions(xopt, key, datasets);
+    
     // Projection
     string scheme = xopt.getattachedscheme("PLOTTER::PROJECTION");
     if (scheme.empty()) {
@@ -130,6 +136,7 @@ namespace plotter {
     } else {
       plotoptions.push_attached("PROJECTION", aurostd::toupper(scheme));
     }
+    if(LDEBUG){cerr << soliloquy << " projection=" << plotoptions.getattachedscheme("PROJECTION") << endl;}
 
     // No border
     plotoptions.flag("NOBORDER", true);
@@ -933,9 +940,54 @@ namespace plotter {
     string directory = plotoptions.getattachedscheme("DIRECTORY");
     xDOSCAR xdos;
     if(LDEBUG) { cerr << soliloquy << " directory=" << directory << endl;}
-    xdos.GetPropertiesFile(aflowlib::vaspfile2stringstream(directory, "DOSCAR"));
-    PLOT_DOS(plotoptions, out, xdos,FileMESSAGE,oss);  //CO20200404
-    savePlotGNUPLOT(plotoptions, out);
+    //CO20210701 - adding support for POCC
+    //check if POCC directory
+    vector<string> vfiles,vpocc_doscars;
+    aurostd::DirectoryLS(directory,vfiles);
+    uint i=0;
+    for(i=0;i<vfiles.size();i++){
+      if(vfiles[i].find(POCC_DOSCAR_TAG)!=string::npos){vpocc_doscars.push_back(aurostd::CleanFileName(directory+"/"+vfiles[i]));}
+    }
+    if(vpocc_doscars.size()>0){
+      std::sort(vpocc_doscars.begin(),vpocc_doscars.end());
+      string pscheme=plotoptions.getattachedscheme("PROJECTION");
+      if(LDEBUG){cerr << soliloquy << " pscheme=" << pscheme << endl;}
+      if(pscheme.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No projection scheme provided",_INPUT_MISSING_);}
+      double temperature=0.0;
+      _aflags aflags;aflags.Directory=directory;
+      bool see_sub_output=false;//true;
+      ostream& oss_empty=cout;if(!see_sub_output){oss_empty.setstate(std::ios_base::badbit);}  //like NULL
+      ofstream devnull("/dev/null");  //NULL
+      int temperature_precision=0,zero_padding_temperature=0;
+      bool temperatures_int=true;
+      //get temperature string parameters, either we grab them from the aflow.in or we guess them from defaults in aflow.rc
+      if(aurostd::FileExist(aflags.Directory+"/"+_AFLOWIN_) && pocc::structuresGenerated(aflags.Directory)){
+        pocc::POccCalculator pcalc(aflags,devnull,oss_empty);
+        vector<double> v_temperatures;
+        pcalc.loadDataIntoCalculator();pcalc.setTemperatureStringParameters(v_temperatures); //needed for DOSCAR plots
+        pocc::getTemperatureStringParameters(v_temperatures,temperature_precision,temperatures_int,zero_padding_temperature);
+        if(pcalc.m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No ARUN.POCC_* runs found",_FILE_CORRUPT_);}
+        plotoptions.push_attached("ARUN_DIRECTORY",pcalc.m_ARUN_directories[0]);
+      }else{
+        pocc::getTemperatureStringParameters(temperature_precision,temperatures_int,zero_padding_temperature);
+        if(pscheme=="SPECIES"){ //we need ARUN_DIRECTORY
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Need ARUN.POCC_* runs for projection==\"species\"",_INPUT_MISSING_);
+        }
+      }
+      if(LDEBUG){cerr << soliloquy << " found POCC directory" << endl;}
+      for(i=0;i<vpocc_doscars.size();i++){
+        if(LDEBUG){cerr << soliloquy << " looking at POCC DOSCAR: " << vpocc_doscars[i] << endl;}
+        xdos.GetPropertiesFile(vpocc_doscars[i]);
+        temperature=pocc::poccDOSCAR2temperature(vpocc_doscars[i]);
+        plotoptions.push_attached("EXTENSION","dos_"+aurostd::tolower(pscheme)+"_T"+pocc::getTemperatureString(temperature,temperature_precision,temperatures_int,zero_padding_temperature)+"K");
+        PLOT_DOS(plotoptions, out, xdos,FileMESSAGE,oss);  //CO20200404
+        savePlotGNUPLOT(plotoptions, out);
+      }
+    }else{
+      xdos.GetPropertiesFile(aflowlib::vaspfile2stringstream(directory, "DOSCAR"));
+      PLOT_DOS(plotoptions, out, xdos,FileMESSAGE,oss);  //CO20200404
+      savePlotGNUPLOT(plotoptions, out);
+    }
   }
 
   void patchDefaultTitleAFLOWIN(xoption& plotoptions) { //CO20191110

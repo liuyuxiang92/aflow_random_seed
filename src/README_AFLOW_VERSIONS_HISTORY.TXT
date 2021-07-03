@@ -1,3 +1,6 @@
+3.2.11 - 2021/xx/xx
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.11.tar.xz
+        -- added command line plotting functionality for POCC runs using --plot_dos (CO)
 3.2.10 - 2021/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.10.tar.xz
         -- fixed bug in GetPrimitive() function, use more robust volume check (DX)
