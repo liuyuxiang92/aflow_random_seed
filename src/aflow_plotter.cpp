@@ -270,23 +270,50 @@ namespace plotter {
       string directory_tmp = aurostd::TmpDirectoryCreate("plotLATEX") + "/";
       chdir(directory_tmp.c_str());
       // Execute gnuplot and pdflatex
+      string command="",output="";
       aurostd::stringstream2file(gpfile, filename + ".plt");
-      aurostd::execute(XHOST.command("gnuplot") + " \"" + filename + ".plt\"");
+      command=XHOST.command("gnuplot") + " \"" + filename + ".plt\"";
+      if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+      aurostd::execute(command);
       if(LDEBUG) cerr << soliloquy << " directory_tmp = " << directory_tmp << endl;
       if(LDEBUG) cerr << soliloquy << aurostd::execute("ls -las "+directory_tmp) << endl;
       // ME20200609 - old pdfatex versions cannot process eps files
       if (pdflatex_version >= 2010) {
-        aurostd::execute(XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error \"" + filename_latex + ".tex\" 2>&1 > /dev/null");
+        command=XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error \"" + filename_latex + ".tex\" 2>&1 > /dev/null";
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        aurostd::execute(command);
       } else {
-        aurostd::execute(XHOST.command("latex") + " -interaction=nonstopmode -halt-on-error \"" + filename_latex + ".tex\" 2>&1 > /dev/null");
-        aurostd::execute(XHOST.command("dvips") + " " + filename_latex + ".dvi  > /dev/null 2>&1");
-        aurostd::execute(XHOST.command("ps2pdf") + " " + filename_latex + ".ps");
+        command=XHOST.command("latex") + " -interaction=nonstopmode -halt-on-error \"" + filename_latex + ".tex\" 2>&1 > /dev/null";
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        aurostd::execute(command);
+        command=XHOST.command("dvips") + " " + filename_latex + ".dvi  > /dev/null 2>&1";
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        aurostd::execute(command);
+        command=XHOST.command("ps2pdf") + " " + filename_latex + ".ps";
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        aurostd::execute(command);
       }
       // Convert to the desired format if not pdf
       if (format != "pdf") {
-        aurostd::execute(XHOST.command("convert") + " -quiet -density 300 -background white \"" + filename_latex + ".pdf\" convert_output." + format);   // to avoid C: ... Carbon:PBE = C: in windows
+        command=XHOST.command("convert") + " -quiet -density 300 -background white \"" + filename_latex + ".pdf\" convert_output." + format + " 1>/dev/null 2>&1";   // to avoid C: ... Carbon:PBE = C: in window //CO20210701 - io redirection
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        if(0){  //CO20210701 - does not work because of primitive execute2string functionality, will be fixed with upcoming version
+          output=aurostd::execute2string(command);
+          //start here for a patch:
+          //https://www.itechlounge.net/2020/09/web-imagickexception-attempt-to-perform-an-operation-not-allowed-by-the-security-policy-pdf/
+          if(output.find("not allowed by the security policy")!=string::npos){
+            string message="The ImageMagick policy file disables ghostscript formats. Please see here and update the policy file: https://bugs.archlinux.org/task/60580";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
+          }
+        }
+        if(!aurostd::FileExist("convert_output." + format)){
+          string message="The ImageMagick policy file disables ghostscript formats. Please see here and update the policy file: https://bugs.archlinux.org/task/60580";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
+        }
         if(LDEBUG) cerr << soliloquy << aurostd::execute("ls -las "+directory_tmp) << endl;
-        aurostd::execute("mv convert_output." + format + " \"" + filename_latex  + "." + format + "\"");
+        command="mv convert_output." + format + " \"" + filename_latex  + "." + format + "\"";
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        aurostd::execute(command);
         if(LDEBUG) cerr << soliloquy << aurostd::execute("ls -las "+directory_tmp) << endl;
       }
       chdir(current_dir.c_str());
@@ -299,9 +326,7 @@ namespace plotter {
       // Clean up
       aurostd::RemoveDirectory(directory_tmp);
       if (!aurostd::FileExist(directory_work + "/" + filename + "." + format)) {
-        string function = "plotter::savePlotGNUPLOT():";
-        string message = "Error while generating plot.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Error while generating plot.", _RUNTIME_ERROR_);
       }
     } else {
       string message = "The following binaries are missing: " + aurostd::joinWDelimiter(missing_binaries, " ") + ".";
