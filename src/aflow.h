@@ -3817,6 +3817,7 @@ namespace plotter {
   aurostd::xoption getPlotOptions(const aurostd::xoption&, const string&, bool=false);
   aurostd::xoption getPlotOptionsEStructure(const aurostd::xoption&, const string&, bool=false);
   aurostd::xoption getPlotOptionsPhonons(const aurostd::xoption&, const string&);
+  aurostd::xoption getPlotOptionsQHAthermo(const aurostd::xoption& xopt, const string& key);//AS20210705
 
   // Plot functions
   void generateHeader(stringstream&, const aurostd::xoption&, bool=false);

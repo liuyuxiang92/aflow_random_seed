@@ -174,6 +174,21 @@ namespace plotter {
     return plotoptions;
   }
 
+  //AS2020210705 BEGIN
+  //getPlotOptionsQHAthermo/////////////////////////////////////////////////////
+  // Sets the plot options that are specific to thermal properties obtained by the QHA
+  xoption getPlotOptionsQHAthermo(const aurostd::xoption& xopt, const string& key) {
+    xoption plotoptions = getPlotOptions(xopt, key);
+    string scheme = xopt.getattachedscheme("PLOTTER::EOSMODEL");
+    if (scheme.empty()) {
+      plotoptions.push_attached("EOSMODEL", "SJ");
+    } else {
+      plotoptions.push_attached("EOSMODEL", aurostd::toupper(scheme));
+    }
+    return plotoptions;
+  }
+  //AS2020210705 END
+
   // Plot functions ----------------------------------------------------------
 
   //generateHeader////////////////////////////////////////////////////////////
@@ -2675,6 +2690,8 @@ namespace plotter {
   void PLOT_THERMO_QHA(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE; PLOT_THERMO_QHA(plotoptions,out,FileMESSAGE,oss);} //CO20200404
   void PLOT_THERMO_QHA(xoption& plotoptions, stringstream& out,ofstream& FileMESSAGE,ostream& oss) 
   {
+    string function = "plotter::PLOT_THERMO_QHA():", msg = "";
+
     // Set labels
     static const int nprops = 7;
     string ylabels[nprops] = {"V", "F", "B", "\\beta", "c_V", "c_P", "\\gamma"};
@@ -2684,6 +2701,15 @@ namespace plotter {
     string yunits[nprops] = {"\\AA$^{3}$/atom", "eV/atom", "GPa", "$10^{-5}K^{-1}$",
       "$k_B$/atom", "$k_B$/atom", ""};
     string ymin[nprops] = {"", "", "", "", "0", "0", ""};
+
+    string eos_model = plotoptions.getattachedscheme("EOSMODEL");
+    if (eos_model != "SJ"  && eos_model != "BM2" && eos_model != "BM3" &&
+        eos_model != "BM4" && eos_model != "M"){
+      msg = "Wrong name of the EOS model was specified. ";
+      msg += "Only SJ, BM2, BM3, BM4 or M labels are allowed.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, msg, _INPUT_ILLEGAL_);
+    }
+    string keyword = "QHA_" + eos_model + "_THERMO";
 
     // Get data
     string directory = plotoptions.getattachedscheme("DIRECTORY");
@@ -2695,13 +2721,13 @@ namespace plotter {
     if (aurostd::EFileExist(thermo_file)) {
       string outformat = plotoptions.getattachedscheme("OUTPUT_FORMAT");
       plotoptions.push_attached("DATA_FILE", thermo_file);
-      plotoptions.push_attached("KEYWORD", "QHA_SJ_THERMO");
+      plotoptions.push_attached("KEYWORD", keyword);
       vector<vector<double> > data = readAflowDataFile(plotoptions);
       if (!user_file_name.empty()) plotoptions.push_attached("DEFAULT_TITLE", user_file_name);  //ME20200413
       for (int i = 0; i < nprops; i++) {
         plotoptions.pop_attached("YMIN");
         if (!ymin[i].empty()) plotoptions.push_attached("YMIN", ymin[i]);
-        plotoptions.push_attached("EXTENSION", extensions[i]);
+        plotoptions.push_attached("EXTENSION", extensions[i] + '_' + eos_model);
         setPlotLabels(plotoptions, "T", "K", ylabels[i], yunits[i]);
         plotSingleFromSet(plotoptions, out, data, i + 1,FileMESSAGE,oss);  //CO20200404
         if (outformat == "GNUPLOT") {
@@ -2710,9 +2736,8 @@ namespace plotter {
         out.str("");  //ME20200513 - reset stringstream
       }
     } else {
-      string function = "plotter::PLOT_THERMO_QHA():";
-      string message = "Could not find file " + thermo_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
+      msg = "Could not find file " + thermo_file + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, msg, _FILE_NOT_FOUND_);
     }
   }
   //AS20200909 END
@@ -2786,7 +2811,6 @@ namespace plotter {
     plotoptions.push_attached("UNIT", "GRUENEISEN");
 
     // Set Emin and Emax
-    plotoptions.flag("NOSHIFT", true);
     setEMinMax(plotoptions, xeigen.energy_min, xeigen.energy_max);
 
     generateHeader(out, plotoptions, false);
