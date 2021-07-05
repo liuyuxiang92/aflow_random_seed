@@ -971,7 +971,6 @@ namespace pocc {
   string getTemperatureString(double temperature,int precision,bool temperatures_int,int zero_padding_temperature) {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::getTemperatureString():";
-    
     stringstream t_ss;
     if(temperatures_int==false){t_ss.setf(std::ios::fixed,std::ios::floatfield);t_ss.precision(precision);}
     t_ss.width(zero_padding_temperature);t_ss.fill('0');
