@@ -167,10 +167,10 @@ namespace pocc {
 
     //get temperature from title
     //DOSCAR.pocc_T0000K
-    if(doscar_path.find(POCC_DOSCAR_TAG)==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"odd DOSCAR filename, format should be "+POCC_DOSCAR_TAG+"0000K",_FILE_CORRUPT_);}
+    if(doscar_path.find(POCC_DOSCAR_PREFIX)==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"odd DOSCAR filename, format should be "+POCC_DOSCAR_PREFIX+"0000K",_FILE_CORRUPT_);}
     vector<string> vtokens;
     aurostd::string2tokens(doscar_path,vtokens,"/");
-    string pocc_doscar_start=POCC_DOSCAR_TAG;
+    string pocc_doscar_start=POCC_DOSCAR_PREFIX;
     string pocc_doscar_end="K";
     string::size_type loc_start=vtokens.back().find(pocc_doscar_start);
     string::size_type loc_end=vtokens.back().find(pocc_doscar_end);
@@ -184,14 +184,14 @@ namespace pocc {
     //[CO+ME20200921 - just look at vtokens.back()]for(i=0;i<vtokens.size();i++){
     //[CO+ME20200921 - just look at vtokens.back()]  if(vtokens[i].find("pocc_T")!=string::npos && vtokens[i].find("K")!=string::npos){
     //[CO+ME20200921 - just look at vtokens.back()]    temperature_str=vtokens[i];
-    //[CO+ME20200921 - just look at vtokens.back()]    aurostd::StringSubst(temperature_str,POCC_DOSCAR_TAG,"");
+    //[CO+ME20200921 - just look at vtokens.back()]    aurostd::StringSubst(temperature_str,POCC_DOSCAR_PREFIX,"");
     //[CO+ME20200921 - just look at vtokens.back()]    aurostd::StringSubst(temperature_str,"K","");
     //[CO+ME20200921 - just look at vtokens.back()]    for(j=0;j<XHOST.vext.size();j++){aurostd::StringSubst(temperature_str,XHOST.vext[j],"");} //remove compression extension
     //[CO+ME20200921 - just look at vtokens.back()]    if(LDEBUG){cerr << soliloquy << " temperature_str=" << temperature_str << endl;}
     //[CO+ME20200921 - just look at vtokens.back()]    if(aurostd::isfloat(temperature_str)){break;}
     //[CO+ME20200921 - just look at vtokens.back()]  }
     //[CO+ME20200921 - just look at vtokens.back()]}
-    //[CO+ME20200921 - just look at vtokens.back()]if(doscar_path.find(POCC_DOSCAR_TAG)==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cannot get temperature_str",_FILE_CORRUPT_);}
+    //[CO+ME20200921 - just look at vtokens.back()]if(doscar_path.find(POCC_DOSCAR_PREFIX)==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cannot get temperature_str",_FILE_CORRUPT_);}
     double temperature=aurostd::string2utype<double>(temperature_str);
 
     return temperature;

@@ -95,7 +95,7 @@ static const string POCC_TITLE_TAG=":POCC_";
 static const string POCC_TITLE_TOL_TAG=":TOL_";
 static const string ARUN_TITLE_TAG=":ARUN.";
 static const string POCC_ARUN_TITLE_TAG=ARUN_TITLE_TAG+"POCC_";
-static const string POCC_DOSCAR_TAG="DOSCAR.pocc_T";
+static const string POCC_DOSCAR_PREFIX="DOSCAR.pocc_T";
 //CO20200731 END
 
 //XRD

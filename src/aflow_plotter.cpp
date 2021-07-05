@@ -971,7 +971,7 @@ namespace plotter {
     aurostd::DirectoryLS(directory,vfiles);
     uint i=0;
     for(i=0;i<vfiles.size();i++){
-      if(vfiles[i].find(POCC_DOSCAR_TAG)!=string::npos){vpocc_doscars.push_back(aurostd::CleanFileName(directory+"/"+vfiles[i]));}
+      if(vfiles[i].find(POCC_DOSCAR_PREFIX)!=string::npos){vpocc_doscars.push_back(aurostd::CleanFileName(directory+"/"+vfiles[i]));}
     }
     if(vpocc_doscars.size()>0){
       std::sort(vpocc_doscars.begin(),vpocc_doscars.end());
@@ -983,6 +983,11 @@ namespace plotter {
       bool see_sub_output=false;//true;
       ostream& oss_empty=cout;if(!see_sub_output){oss_empty.setstate(std::ios_base::badbit);}  //like NULL
       ofstream devnull("/dev/null");  //NULL
+      //T0K and T0000K cannot be known from a single file
+      //there is logic inside to determine whether we have floats, precision, and how to pad zeros. 
+      //it depends on the temperature range specified in the aflow.in (or command line). 
+      //however, if this cannot be found (because we only have the DOSCAR's), 
+      //then the logic says to understand the files locally as best as possible.
       int temperature_precision=0,zero_padding_temperature=0;
       bool temperatures_int=true;
       //get temperature string parameters, either we grab them from the aflow.in or we guess them from defaults in aflow.rc
@@ -995,6 +1000,9 @@ namespace plotter {
         plotoptions.push_attached("ARUN_DIRECTORY",pcalc.m_ARUN_directories[0]);
       }else{
         pocc::getTemperatureStringParameters(temperature_precision,temperatures_int,zero_padding_temperature);
+        //this is when we don't have the full POCC directory. 
+        //maybe someone is trying to plot in a directory only having aflow.in and DOSCAR's (but no ARUN's). 
+        //we need the ARUNs if we want to do projection==species, but not if projection==orbital
         if(pscheme=="SPECIES"){ //we need ARUN_DIRECTORY
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Need ARUN.POCC_* runs for projection==\"species\"",_INPUT_MISSING_);
         }
