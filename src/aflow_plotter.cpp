@@ -18,6 +18,7 @@
 // flexibility and customizability as possible.
 
 #include "aflow.h"
+#include "aflow_pocc.h"
 
 using std::deque;
 using std::string;
@@ -121,8 +122,13 @@ namespace plotter {
   //getPlotOptionsEStructure//////////////////////////////////////////////////
   // Sets the plot options that are specific to electronic structure plots.
   xoption getPlotOptionsEStructure(const aurostd::xoption& xopt, const string& key, bool datasets) {
-    xoption plotoptions = getPlotOptions(xopt, key, datasets);
+    bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
+    string soliloquy=XPID+"plotter::getPlotOptionsEStructure():";
+    
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
+    xoption plotoptions = getPlotOptions(xopt, key, datasets);
+    
     // Projection
     string scheme = xopt.getattachedscheme("PLOTTER::PROJECTION");
     if (scheme.empty()) {
@@ -130,6 +136,7 @@ namespace plotter {
     } else {
       plotoptions.push_attached("PROJECTION", aurostd::toupper(scheme));
     }
+    if(LDEBUG){cerr << soliloquy << " projection=" << plotoptions.getattachedscheme("PROJECTION") << endl;}
 
     // No border
     plotoptions.flag("NOBORDER", true);
@@ -278,23 +285,50 @@ namespace plotter {
       string directory_tmp = aurostd::TmpDirectoryCreate("plotLATEX") + "/";
       chdir(directory_tmp.c_str());
       // Execute gnuplot and pdflatex
+      string command="",output="";
       aurostd::stringstream2file(gpfile, filename + ".plt");
-      aurostd::execute(XHOST.command("gnuplot") + " \"" + filename + ".plt\"");
+      command=XHOST.command("gnuplot") + " \"" + filename + ".plt\"";
+      if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+      aurostd::execute(command);
       if(LDEBUG) cerr << soliloquy << " directory_tmp = " << directory_tmp << endl;
       if(LDEBUG) cerr << soliloquy << aurostd::execute("ls -las "+directory_tmp) << endl;
       // ME20200609 - old pdfatex versions cannot process eps files
       if (pdflatex_version >= 2010) {
-        aurostd::execute(XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error \"" + filename_latex + ".tex\" 2>&1 > /dev/null");
+        command=XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error \"" + filename_latex + ".tex\" 2>&1 > /dev/null";
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        aurostd::execute(command);
       } else {
-        aurostd::execute(XHOST.command("latex") + " -interaction=nonstopmode -halt-on-error \"" + filename_latex + ".tex\" 2>&1 > /dev/null");
-        aurostd::execute(XHOST.command("dvips") + " " + filename_latex + ".dvi  > /dev/null 2>&1");
-        aurostd::execute(XHOST.command("ps2pdf") + " " + filename_latex + ".ps");
+        command=XHOST.command("latex") + " -interaction=nonstopmode -halt-on-error \"" + filename_latex + ".tex\" 2>&1 > /dev/null";
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        aurostd::execute(command);
+        command=XHOST.command("dvips") + " " + filename_latex + ".dvi  > /dev/null 2>&1";
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        aurostd::execute(command);
+        command=XHOST.command("ps2pdf") + " " + filename_latex + ".ps";
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        aurostd::execute(command);
       }
       // Convert to the desired format if not pdf
       if (format != "pdf") {
-        aurostd::execute(XHOST.command("convert") + " -quiet -density 300 -background white \"" + filename_latex + ".pdf\" convert_output." + format);   // to avoid C: ... Carbon:PBE = C: in windows
+        command=XHOST.command("convert") + " -quiet -density 300 -background white \"" + filename_latex + ".pdf\" convert_output." + format + " 1>/dev/null 2>&1";   // to avoid C: ... Carbon:PBE = C: in window //CO20210701 - io redirection
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        if(0){  //CO20210701 - does not work because of primitive execute2string functionality, will be fixed with upcoming version
+          output=aurostd::execute2string(command);
+          //start here for a patch:
+          //https://www.itechlounge.net/2020/09/web-imagickexception-attempt-to-perform-an-operation-not-allowed-by-the-security-policy-pdf/
+          if(output.find("not allowed by the security policy")!=string::npos){
+            string message="The ImageMagick policy file disables ghostscript formats. Please see here and update the policy file: https://bugs.archlinux.org/task/60580";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
+          }
+        }
+        if(!aurostd::FileExist("convert_output." + format)){
+          string message="The ImageMagick policy file disables ghostscript formats. Please see here and update the policy file: https://bugs.archlinux.org/task/60580";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
+        }
         if(LDEBUG) cerr << soliloquy << aurostd::execute("ls -las "+directory_tmp) << endl;
-        aurostd::execute("mv convert_output." + format + " \"" + filename_latex  + "." + format + "\"");
+        command="mv convert_output." + format + " \"" + filename_latex  + "." + format + "\"";
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        aurostd::execute(command);
         if(LDEBUG) cerr << soliloquy << aurostd::execute("ls -las "+directory_tmp) << endl;
       }
       chdir(current_dir.c_str());
@@ -307,9 +341,7 @@ namespace plotter {
       // Clean up
       aurostd::RemoveDirectory(directory_tmp);
       if (!aurostd::FileExist(directory_work + "/" + filename + "." + format)) {
-        string function = "plotter::savePlotGNUPLOT():";
-        string message = "Error while generating plot.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Error while generating plot.", _RUNTIME_ERROR_);
       }
     } else {
       string message = "The following binaries are missing: " + aurostd::joinWDelimiter(missing_binaries, " ") + ".";
@@ -948,9 +980,62 @@ namespace plotter {
     string directory = plotoptions.getattachedscheme("DIRECTORY");
     xDOSCAR xdos;
     if(LDEBUG) { cerr << soliloquy << " directory=" << directory << endl;}
-    xdos.GetPropertiesFile(aflowlib::vaspfile2stringstream(directory, "DOSCAR"));
-    PLOT_DOS(plotoptions, out, xdos,FileMESSAGE,oss);  //CO20200404
-    savePlotGNUPLOT(plotoptions, out);
+    //CO20210701 - adding support for POCC
+    //check if POCC directory
+    vector<string> vfiles,vpocc_doscars;
+    aurostd::DirectoryLS(directory,vfiles);
+    uint i=0;
+    for(i=0;i<vfiles.size();i++){
+      if(vfiles[i].find(POCC_DOSCAR_PREFIX)!=string::npos){vpocc_doscars.push_back(aurostd::CleanFileName(directory+"/"+vfiles[i]));}
+    }
+    if(vpocc_doscars.size()>0){
+      std::sort(vpocc_doscars.begin(),vpocc_doscars.end());
+      string pscheme=plotoptions.getattachedscheme("PROJECTION");
+      if(LDEBUG){cerr << soliloquy << " pscheme=" << pscheme << endl;}
+      if(pscheme.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No projection scheme provided",_INPUT_MISSING_);}
+      double temperature=0.0;
+      _aflags aflags;aflags.Directory=directory;
+      bool see_sub_output=false;//true;
+      ostream& oss_empty=cout;if(!see_sub_output){oss_empty.setstate(std::ios_base::badbit);}  //like NULL
+      ofstream devnull("/dev/null");  //NULL
+      //T0K and T0000K cannot be known from a single file
+      //there is logic inside to determine whether we have floats, precision, and how to pad zeros. 
+      //it depends on the temperature range specified in the aflow.in (or command line). 
+      //however, if this cannot be found (because we only have the DOSCAR's), 
+      //then the logic says to understand the files locally as best as possible.
+      int temperature_precision=0,zero_padding_temperature=0;
+      bool temperatures_int=true;
+      //get temperature string parameters, either we grab them from the aflow.in or we guess them from defaults in aflow.rc
+      if(aurostd::FileExist(aflags.Directory+"/"+_AFLOWIN_) && pocc::structuresGenerated(aflags.Directory)){
+        pocc::POccCalculator pcalc(aflags,devnull,oss_empty);
+        vector<double> v_temperatures;
+        pcalc.loadDataIntoCalculator();pcalc.setTemperatureStringParameters(v_temperatures); //needed for DOSCAR plots
+        pocc::getTemperatureStringParameters(v_temperatures,temperature_precision,temperatures_int,zero_padding_temperature);
+        if(pcalc.m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No ARUN.POCC_* runs found",_FILE_CORRUPT_);}
+        plotoptions.push_attached("ARUN_DIRECTORY",pcalc.m_ARUN_directories[0]);
+      }else{
+        pocc::getTemperatureStringParameters(temperature_precision,temperatures_int,zero_padding_temperature);
+        //this is when we don't have the full POCC directory. 
+        //maybe someone is trying to plot in a directory only having aflow.in and DOSCAR's (but no ARUN's). 
+        //we need the ARUNs if we want to do projection==species, but not if projection==orbital
+        if(pscheme=="SPECIES"){ //we need ARUN_DIRECTORY
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Need ARUN.POCC_* runs for projection==\"species\"",_INPUT_MISSING_);
+        }
+      }
+      if(LDEBUG){cerr << soliloquy << " found POCC directory" << endl;}
+      for(i=0;i<vpocc_doscars.size();i++){
+        if(LDEBUG){cerr << soliloquy << " looking at POCC DOSCAR: " << vpocc_doscars[i] << endl;}
+        xdos.GetPropertiesFile(vpocc_doscars[i]);
+        temperature=pocc::poccDOSCAR2temperature(vpocc_doscars[i]);
+        plotoptions.push_attached("EXTENSION","dos_"+aurostd::tolower(pscheme)+"_T"+pocc::getTemperatureString(temperature,temperature_precision,temperatures_int,zero_padding_temperature)+"K");
+        PLOT_DOS(plotoptions, out, xdos,FileMESSAGE,oss);  //CO20200404
+        savePlotGNUPLOT(plotoptions, out);
+      }
+    }else{
+      xdos.GetPropertiesFile(aflowlib::vaspfile2stringstream(directory, "DOSCAR"));
+      PLOT_DOS(plotoptions, out, xdos,FileMESSAGE,oss);  //CO20200404
+      savePlotGNUPLOT(plotoptions, out);
+    }
   }
 
   void patchDefaultTitleAFLOWIN(xoption& plotoptions) { //CO20191110

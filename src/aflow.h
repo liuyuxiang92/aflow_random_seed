@@ -95,6 +95,7 @@ static const string POCC_TITLE_TAG=":POCC_";
 static const string POCC_TITLE_TOL_TAG=":TOL_";
 static const string ARUN_TITLE_TAG=":ARUN.";
 static const string POCC_ARUN_TITLE_TAG=ARUN_TITLE_TAG+"POCC_";
+static const string POCC_DOSCAR_PREFIX="DOSCAR.pocc_T";
 //CO20200731 END
 
 //XRD
@@ -1993,6 +1994,10 @@ class xStream {
     ~xStream();
     //NECESSARY PUBLIC CLASS METHODS - END
 
+    //initializers
+    void initialize(ostream& oss=cout);  //ME20200427
+    void initialize(ofstream& ofs,ostream& oss=cout);  //ME20200427
+    
     //getters
     ostream* getOSS() const; //CO20191110
     ofstream* getOFStream() const; //CO20191110
@@ -2000,8 +2005,6 @@ class xStream {
     //NECESSARY private CLASS METHODS - START
     void free();
     void copy(const xStream& b);
-    void initialize(ostream& oss=cout);  //ME20200427
-    void initialize(ofstream& ofs,ostream& oss=cout);  //ME20200427
     //NECESSARY END CLASS METHODS - END
     //logger variables
     ostream* p_oss;
