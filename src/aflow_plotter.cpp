@@ -2782,8 +2782,8 @@ namespace plotter {
     // Gamma point with NaN.
     // Grueneisen parameters at Gamma may be large due to numerical noise, so
     // recalculate energy_min and energy_max
-    xeigen.energy_max = -1e30;
-    xeigen.energy_min =  1e30;
+    xeigen.energy_max = -AUROSTD_MAX_DOUBLE;
+    xeigen.energy_min =  AUROSTD_MAX_DOUBLE;
     double eigval = 0.0;
     for (uint k=0; k<xeigen.number_kpoints; k++){
       for (uint b=0; b<xeigen.number_bands; b++){
