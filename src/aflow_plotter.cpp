@@ -174,6 +174,21 @@ namespace plotter {
     return plotoptions;
   }
 
+  //AS2020210705 BEGIN
+  //getPlotOptionsQHAthermo/////////////////////////////////////////////////////
+  // Sets the plot options that are specific to thermal properties obtained by the QHA
+  xoption getPlotOptionsQHAthermo(const aurostd::xoption& xopt, const string& key) {
+    xoption plotoptions = getPlotOptions(xopt, key);
+    string scheme = xopt.getattachedscheme("PLOTTER::EOSMODEL");
+    if (scheme.empty()) {
+      plotoptions.push_attached("EOSMODEL", "SJ");
+    } else {
+      plotoptions.push_attached("EOSMODEL", aurostd::toupper(scheme));
+    }
+    return plotoptions;
+  }
+  //AS2020210705 END
+
   // Plot functions ----------------------------------------------------------
 
   //generateHeader////////////////////////////////////////////////////////////
@@ -983,7 +998,7 @@ namespace plotter {
 
     if(LDEBUG) { cerr << soliloquy << " EFERMI set" << endl;}
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xdos.energy_min, xdos.energy_max);
 
     // Plot
@@ -1143,7 +1158,7 @@ namespace plotter {
       plotoptions.push_attached("EFERMI", "0.0");
     }
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xeigen.energy_min, xeigen.energy_max);
 
     // Plot
@@ -1199,7 +1214,7 @@ namespace plotter {
       plotoptions.push_attached("EFERMI", "0.0");
     }
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xdos.energy_min, xdos.energy_max);
 
     // Plot
@@ -2295,8 +2310,18 @@ namespace plotter {
     string unit = plotoptions.getattachedscheme("UNIT");
     if (unit.empty()) unit = "EV";
     string energyLabel;
-    if (aurostd::substring2bool(unit, "EV")) energyLabel = "energy";
-    else energyLabel = "frequency";
+    //AS20210701 extra check for Grueneisen parameter dispersion plotting
+    if (unit=="GRUENEISEN"){
+      energyLabel = "$\\gamma$";
+      unit = "";
+    }
+    else if (aurostd::substring2bool(unit, "EV")){
+      energyLabel = "energy";
+    }
+    else{
+      energyLabel = "frequency";
+    }
+
     unit = getFormattedUnit(unit);
 
     out << "# Band structure plot" << std::endl;
@@ -2350,7 +2375,12 @@ namespace plotter {
     out << " set tic scale 0" << std::endl;
     out << " set xrange [0:1]" << std::endl;
     out << " set yrange [" << Emin << ":" << Emax << "]" << std::endl;
-    out << " set ylabel '" << energyLabel << " (" << unit << ")'" << std::endl;
+    if (unit.empty()){//AS20210701 this might be a Grueneisen parameter dispersion plot, unitless
+      out << " set ylabel '" << energyLabel << std::endl;
+    }
+    else{
+      out << " set ylabel '" << energyLabel << " (" << unit << ")'" << std::endl;
+    }
 
     // Fermi level
     if (Efermi > Emin) {
@@ -2438,7 +2468,7 @@ namespace plotter {
       convertEnergies(xdos, unit);
     }
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xdos.energy_min, xdos.energy_max);
 
     generateHeader(out, plotoptions, false);
@@ -2486,7 +2516,7 @@ namespace plotter {
       convertEnergies(xeigen, unit);
     }
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xeigen.energy_min, xeigen.energy_max);
 
     generateHeader(out, plotoptions, false);
@@ -2538,7 +2568,7 @@ namespace plotter {
       convertEnergies(xeigen, unit);
     }
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xdos.energy_min, xdos.energy_max);
 
     generateHeader(out, plotoptions, true);
@@ -2660,6 +2690,8 @@ namespace plotter {
   void PLOT_THERMO_QHA(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE; PLOT_THERMO_QHA(plotoptions,out,FileMESSAGE,oss);} //CO20200404
   void PLOT_THERMO_QHA(xoption& plotoptions, stringstream& out,ofstream& FileMESSAGE,ostream& oss) 
   {
+    string function = "plotter::PLOT_THERMO_QHA():", msg = "";
+
     // Set labels
     static const int nprops = 7;
     string ylabels[nprops] = {"V", "F", "B", "\\beta", "c_V", "c_P", "\\gamma"};
@@ -2669,6 +2701,15 @@ namespace plotter {
     string yunits[nprops] = {"\\AA$^{3}$/atom", "eV/atom", "GPa", "$10^{-5}K^{-1}$",
       "$k_B$/atom", "$k_B$/atom", ""};
     string ymin[nprops] = {"", "", "", "", "0", "0", ""};
+
+    string eos_model = plotoptions.getattachedscheme("EOSMODEL");
+    if (eos_model != "SJ"  && eos_model != "BM2" && eos_model != "BM3" &&
+        eos_model != "BM4" && eos_model != "M"){
+      msg = "Wrong name of the EOS model was specified. ";
+      msg += "Only SJ, BM2, BM3, BM4 or M labels are allowed.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, msg, _INPUT_ILLEGAL_);
+    }
+    string keyword = "QHA_" + eos_model + "_THERMO";
 
     // Get data
     string directory = plotoptions.getattachedscheme("DIRECTORY");
@@ -2680,13 +2721,13 @@ namespace plotter {
     if (aurostd::EFileExist(thermo_file)) {
       string outformat = plotoptions.getattachedscheme("OUTPUT_FORMAT");
       plotoptions.push_attached("DATA_FILE", thermo_file);
-      plotoptions.push_attached("KEYWORD", "QHA_SJ_THERMO");
+      plotoptions.push_attached("KEYWORD", keyword);
       vector<vector<double> > data = readAflowDataFile(plotoptions);
       if (!user_file_name.empty()) plotoptions.push_attached("DEFAULT_TITLE", user_file_name);  //ME20200413
       for (int i = 0; i < nprops; i++) {
         plotoptions.pop_attached("YMIN");
         if (!ymin[i].empty()) plotoptions.push_attached("YMIN", ymin[i]);
-        plotoptions.push_attached("EXTENSION", extensions[i]);
+        plotoptions.push_attached("EXTENSION", extensions[i] + '_' + eos_model);
         setPlotLabels(plotoptions, "T", "K", ylabels[i], yunits[i]);
         plotSingleFromSet(plotoptions, out, data, i + 1,FileMESSAGE,oss);  //CO20200404
         if (outformat == "GNUPLOT") {
@@ -2695,12 +2736,87 @@ namespace plotter {
         out.str("");  //ME20200513 - reset stringstream
       }
     } else {
-      string function = "plotter::PLOT_THERMO_QHA():";
-      string message = "Could not find file " + thermo_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
+      msg = "Could not find file " + thermo_file + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, msg, _FILE_NOT_FOUND_);
     }
   }
   //AS20200909 END
+
+  //AS20210701 BEGIN
+  //PLOT_GRUENEISEN_DISPERSION///////////////////////////////////////////////////////////////
+  /// Plots Grueneisen parameter dispersion curves.
+  /// Follows PLOT_GRUENEISEN_DISPERSION function.
+  void PLOT_GRUENEISEN_DISPERSION(xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return PLOT_GRUENEISEN_DISPERSION(plotoptions,FileMESSAGE,oss);}  //CO20200404
+  void PLOT_GRUENEISEN_DISPERSION(xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
+    // Set k-points format to LaTeX
+    plotoptions.push_attached("KPOINT_FORMAT", "LATEX");
+    // Set output format to gnuplot
+    plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
+
+    stringstream out;
+    PLOT_GRUENEISEN_DISPERSION(plotoptions, out,FileMESSAGE,oss); //CO20200404
+    savePlotGNUPLOT(plotoptions, out);
+  }
+
+  void PLOT_GRUENEISEN_DISPERSION(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE;return PLOT_GRUENEISEN_DISPERSION(plotoptions,out,FileMESSAGE,oss);} //CO20200404
+  void PLOT_GRUENEISEN_DISPERSION(xoption& plotoptions, stringstream& out,ofstream& FileMESSAGE,ostream& oss) { //CO20200404
+    // Grueneisen parameters for acoustic modes at the Gamma point are ill-defined,
+    // so for the plot to be pretty, one needs to substitute it with NaN
+    static double nan = std::numeric_limits<double>::quiet_NaN();
+
+    plotoptions.push_attached("EXTENSION", "grdisp");
+    plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
+    // Read files
+    string directory = plotoptions.getattachedscheme("DIRECTORY");
+    xEIGENVAL xeigen;
+    xeigen.GetPropertiesFile(directory+"/"+ DEFAULT_QHA_FILE_PREFIX
+        + DEFAULT_QHA_GP_PATH_FILE);
+    xKPOINTS xkpts;
+    xkpts.GetPropertiesFile(directory+"/"+ DEFAULT_QHA_FILE_PREFIX +
+        DEFAULT_QHA_KPOINTS_FILE);
+    stringstream poscar;
+    aurostd::efile2stringstream(directory+"/"+DEFAULT_APL_PHPOSCAR_FILE, poscar);  //CO20191110
+    xstructure xstr(poscar);
+
+    // substituting the values of Grueneisen parameters for acoustic modes at
+    // Gamma point with NaN.
+    // Grueneisen parameters at Gamma may be large due to numerical noise, so
+    // recalculate energy_min and energy_max
+    xeigen.energy_max = -AUROSTD_MAX_DOUBLE;
+    xeigen.energy_min =  AUROSTD_MAX_DOUBLE;
+    double eigval = 0.0;
+    for (uint k=0; k<xeigen.number_kpoints; k++){
+      for (uint b=0; b<xeigen.number_bands; b++){
+        if (b<=3){// acoustic modes should be the first three ones
+          // if we are close enough to Gamma, substitute with NaN
+          if (aurostd::modulus(xeigen.vkpoint[k]) < AUROSTD_IDENTITY_TOL){
+            xeigen.venergy[k][b][0] = nan;
+          }
+        }
+
+        eigval = xeigen.venergy[k][b][0];
+        if (eigval < xeigen.energy_min) xeigen.energy_min = eigval;
+        if (eigval > xeigen.energy_max) xeigen.energy_max = eigval;
+      }
+    }
+
+    // proceed with plot setup
+    plotoptions.push_attached("DEFAULT_TITLE", xeigen.title);
+    plotoptions.push_attached("LATTICE", getLatticeFromKpointsTitle(xkpts.title));
+    setFileName(plotoptions);
+    setTitle(plotoptions,FileMESSAGE,oss); //CO20200404
+
+    plotoptions.flag("BANDDOS", false);
+
+    plotoptions.push_attached("UNIT", "GRUENEISEN");
+
+    // Set Emin and Emax
+    setEMinMax(plotoptions, xeigen.energy_min, xeigen.energy_max);
+
+    generateHeader(out, plotoptions, false);
+    generateBandPlot(out, xeigen, xkpts, xstr, plotoptions);
+  }
+  //AS20210701 END
 
   //PLOT_TCOND////////////////////////////////////////////////////////////////
   // Plots AAPL thermal conductivity tensors
