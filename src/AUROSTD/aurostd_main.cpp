@@ -948,6 +948,16 @@ namespace aurostd {
   }
 
   // ***************************************************************************
+  // Function PercentEncodeASCII //DX20210706
+  // ***************************************************************************
+  // Converts a single ASCII character into its percent-encoded form
+  string PercentEncodeASCII(const char c) {
+    stringstream char_percent_encoded;
+    char_percent_encoded << "%" << std::hex << (int)c;
+    return char_percent_encoded.str();
+  }
+
+  // ***************************************************************************
   // Function CleanStringASCII
   // ***************************************************************************
   // Clean a string from ASCII junk

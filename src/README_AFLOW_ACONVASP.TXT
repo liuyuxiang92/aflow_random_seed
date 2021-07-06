@@ -327,7 +327,7 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
         STDOUT option available.
 
 	  
-  aflow --aflowSG|--space_group|--sg|--aflowSG_number|--space_group_number|--sg_number|--aflowSG_label|--space_group_label|--sg_label[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--tolerance_spectrum=start,stop,nsteps] < file
+  aflow --aflowSG|--space_group|--sg|--aflowSG_number|--space_group_number|--sg_number|--aflowSG_label|--space_group_label|--sg_label[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--tolerance_spectrum=start:stop:nsteps] < file
         Calculates the space group of the crystal in the ITC convention.
         This routine employs an adaptive tolerance scheme; if any symmetry 
         rules are broken, the tolerance is changed and everything is recalculated.
@@ -356,7 +356,7 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Performs crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
           [--no_scan]                              : Suppresses tolerance scan.
-          [--tolerance_spectrum=start,stop,nsteps] : Performs symmetry analysis for a range of tolerance values
+          [--tolerance_spectrum=start:stop:nsteps] : Performs symmetry analysis for a range of tolerance values
         Check aflow --readme=symmetry
  
   aflow --alphabetic < POSCAR
@@ -2169,7 +2169,7 @@ LATTICES = (the ones with "")
         
         This is only tested for version 4.4.5.
 
-  aflow --pearson_symbol|--pearson|--Pearson_symbol|--Pearson [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--tolerance_spectrum=start,stop,nsteps] < file
+  aflow --pearson_symbol|--pearson|--Pearson_symbol|--Pearson [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--tolerance_spectrum=start:stop:nsteps] < file
         Returns the Pearson symbol of the structure.
         Tolerance:
            The tolerance is given in Angstroms.  There are two preset tolerances:
@@ -2189,7 +2189,7 @@ LATTICES = (the ones with "")
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Performs crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
           [--no_scan]                              : Suppresses tolerance scan.
-          [--tolerance_spectrum=start,stop,nsteps] : Performs symmetry analysis for a range of tolerance values
+          [--tolerance_spectrum=start:stop:nsteps] : Performs symmetry analysis for a range of tolerance values
         Check aflow --readme=symmetry
 
   aflow --planedens dens2d.in CHGCAR

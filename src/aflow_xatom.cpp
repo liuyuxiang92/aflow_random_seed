@@ -6400,8 +6400,21 @@ istream& operator>>(istream& cinput, xstructure& a) {
   if(LDEBUG) cerr << soliloquy << " WRAPPING [13]" << endl;
   // TOLERANCES ------------------------
   a.equiv_fpos_epsilon=_EQUIV_FPOS_EPS_; // standard but you can change
+  // SORT ATOMS (FALSE) -----------------------------
+  // AFLOW prefers alphabetic ordering; HOWEVER, sorting by default can cause
+  // issues for functions/processes outside of AFLOW (e.g., settings in INCAR).
+  // For now, it is safer to sort the atoms inside the particular AFLOW function
+  // where it is needed (e.g., symmetry and prototype functions).
+  // For readers/writers other than the VASP geometry file, we will always sort
+  // alphabetically. //DX+CO20210706
+  bool force_alphabetic_sorting=false;
+  if(force_alphabetic_sorting){
+    a.SpeciesPutAlphabetic();
+    std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames);
+  }
   // MAKE BASIS
   a.MakeBasis();
+  if(force_alphabetic_sorting){ a.MakeTypes(); } //DX+CO20210706
   // FLAGS -----------------------------
   a.Niggli_calculated=FALSE;
   a.Niggli_avoid=FALSE;

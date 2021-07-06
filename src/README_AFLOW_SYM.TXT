@@ -156,9 +156,9 @@ descriptors change as a function of tolerance (e.g., Figure 2 of the AFLOW-SYM a
 
 This can be done with the following --tolerance_spectrum option:
 
-  Ex: aflow --aflowSG --tolerance_spectrum=0.001,0.1,20
+  Ex: aflow --aflowSG --tolerance_spectrum=0.001:0.1:20
 
-where the following three fields are comma-separated:
+where the following three fields are colon-separated:
 
   field 1 : starting tolerance (must be > 0)
   field 2 : stopping tolerance (must be <= minimum interatomic distance)
@@ -282,7 +282,7 @@ AFLOW COMMANDS USAGE:
           [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
           [--screen_only]                          : Prints symmetry elements to string and does not write to a file.
 
-  aflow --aflowSG|--space_group|--sg|--aflowSG_number|--space_group_number|--sg_number|--aflowSG_label|--space_group_label|--sg_label[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--tolerance_spectrum=start,stop,nsteps] < file
+  aflow --aflowSG|--space_group|--sg|--aflowSG_number|--space_group_number|--sg_number|--aflowSG_label|--space_group_label|--sg_label[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--tolerance_spectrum=start:stop:nsteps] < file
         Calculates the space group of the crystal in the ITC convention.
         This routine consists of an adaptive tolerance; if any symmetry
         rules are broken, the tolerance is changed and everything is recalculated.
@@ -298,7 +298,7 @@ AFLOW COMMANDS USAGE:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Performs crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
           [--no_scan]                              : Suppresses tolerance scan.
-          [--tolerance_spectrum=start,stop,nsteps] : Performs symmetry analysis for a range of tolerance values
+          [--tolerance_spectrum=start:stop:nsteps] : Performs symmetry analysis for a range of tolerance values
 
   aflow --cif[=<tolerance_value>|=tight|=loose] [--no_scan] [--no_symmetry] [--setting=1|2|aflow] < file
         Converts a geometry file to a Crystallographic Information File (CIF).
@@ -409,14 +409,14 @@ AFLOW COMMANDS USAGE:
 
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
 
-  aflow --pearson_symbol|--pearson|--Pearson_symbol|--Pearson [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--tolerance_spectrum=start,stop,nsteps] < file
+  aflow --pearson_symbol|--pearson|--Pearson_symbol|--Pearson [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--tolerance_spectrum=start:stop:nsteps] < file
         Returns the Pearson symbol of the structure.
 
         Options:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Performs crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
           [--no_scan]                              : Suppresses tolerance scan.
-          [--tolerance_spectrum=start,stop,nsteps] : Performs symmetry analysis for a range of tolerance values
+          [--tolerance_spectrum=start:stop:nsteps] : Performs symmetry analysis for a range of tolerance values
 
   aflow --pointgroup | --pgroup[=<tolerance_value>|=tight|=loose] [--no_scan] [--print=text|json] [--screen_only] < file
         Calculates the point group symmetry of the lattice {R} and writes

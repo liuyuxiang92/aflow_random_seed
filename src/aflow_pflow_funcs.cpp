@@ -8269,7 +8269,7 @@ namespace pflow{
   vector<double> getSymmetryToleranceSpectrum(const string& tolerance_range_string){
 
     // Return the symmetry tolerance spectrum
-    // Expected input: "start,end,step"
+    // Expected input: "start:end:step"
 
     string function_name = XPID + "pflow::getSymmetryToleranceSpectrum():";
     stringstream message;
@@ -8277,7 +8277,7 @@ namespace pflow{
     vector<double> tolerance_spectrum;
 
     vector<string> tokens;
-    if(aurostd::string2tokens(tolerance_range_string,tokens,",") == 3){ //DX20210611 - switched from ":" to "," to be consistent with aflow delimiter convention
+    if(aurostd::string2tokens(tolerance_range_string,tokens,":") == 3){
       double start = aurostd::string2utype<double>(tokens[0]);
       double end = aurostd::string2utype<double>(tokens[1]);
       uint nsteps = aurostd::string2utype<uint>(tokens[2])-1;
@@ -8289,7 +8289,7 @@ namespace pflow{
       for(uint i=0;i<=nsteps;i++){ tolerance_spectrum.push_back(start+((double)i*interval)); }
     }
     else{
-      message << "Expected three inputs: first=range_start, second=range_end, third=nsteps.";
+      message << "Expected three inputs: first=range_start:second=range_end:third=nsteps.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
 
