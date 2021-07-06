@@ -517,7 +517,7 @@ void *_threaded_GetCages2(void *ptr) {
   return NULL;
 }
 
-//ME20210521 - added ofstream write flag
+//ME20210521 - added ofstream write flag (FFFflag) as function input
 bool GetCages(const xstructure& _str,_aflags& aflags,
     vector<acage>& cagesirreducible,vector<acage>& cagesreducible,
     vector<acage>& cages4,vector<acage>& cages3,vector<acage>& cages2,
