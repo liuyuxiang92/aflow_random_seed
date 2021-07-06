@@ -1,5 +1,6 @@
 3.2.11 - 2021/xx/xx
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.11.tar.xz
+        -- added command line plotting functionality for POCC runs using --plot_dos (CO)
         -- changed newlines to semi-colons in aurostd::execute() and aurostd::execute2string() and added file system IO options to aurostd::execute2string() (CO)
         -- extended CleanStringASCII_InPlace() to include ALL ASCII characters (CO)
         -- added NELM and NELM_STATIC options to VASP_FORCE_OPTIONS and aflow.rc (CO)

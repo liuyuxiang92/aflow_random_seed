@@ -95,6 +95,7 @@ static const string POCC_TITLE_TAG=":POCC_";
 static const string POCC_TITLE_TOL_TAG=":TOL_";
 static const string ARUN_TITLE_TAG=":ARUN.";
 static const string POCC_ARUN_TITLE_TAG=ARUN_TITLE_TAG+"POCC_";
+static const string POCC_DOSCAR_PREFIX="DOSCAR.pocc_T";
 //CO20200731 END
 
 //XRD
@@ -2024,6 +2025,10 @@ class xStream {
     ~xStream();
     //NECESSARY PUBLIC CLASS METHODS - END
 
+    //initializers
+    void initialize(ostream& oss=cout);  //ME20200427
+    void initialize(ofstream& ofs,ostream& oss=cout);  //ME20200427
+    
     //getters
     ostream* getOSS() const; //CO20191110
     ofstream* getOFStream() const; //CO20191110
@@ -2031,8 +2036,6 @@ class xStream {
     //NECESSARY private CLASS METHODS - START
     void free();
     void copy(const xStream& b);
-    void initialize(ostream& oss=cout);  //ME20200427
-    void initialize(ofstream& ofs,ostream& oss=cout);  //ME20200427
     //NECESSARY END CLASS METHODS - END
     //logger variables
     ostream* p_oss;
@@ -3897,6 +3900,7 @@ namespace plotter {
   aurostd::xoption getPlotOptions(const aurostd::xoption&, const string&, bool=false);
   aurostd::xoption getPlotOptionsEStructure(const aurostd::xoption&, const string&, bool=false);
   aurostd::xoption getPlotOptionsPhonons(const aurostd::xoption&, const string&);
+  aurostd::xoption getPlotOptionsQHAthermo(const aurostd::xoption& xopt, const string& key);//AS20210705
 
   // Plot functions
   void generateHeader(stringstream&, const aurostd::xoption&, bool=false);
@@ -4009,8 +4013,12 @@ namespace plotter {
   // QHA properties plotter -------------------------------------------------
   void PLOT_THERMO_QHA(aurostd::xoption&,ostream& oss=cout);  //AS20200909
   void PLOT_THERMO_QHA(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20200909
-  void PLOT_THERMO_QHA(aurostd::xoption&, stringstream&,ostream& oss=cout); //AS2020909
+  void PLOT_THERMO_QHA(aurostd::xoption&, stringstream&,ostream& oss=cout); //AS20200909
   void PLOT_THERMO_QHA(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20200909
+  void PLOT_GRUENEISEN_DISPERSION(aurostd::xoption&,ostream& oss=cout);  //AS20210701
+  void PLOT_GRUENEISEN_DISPERSION(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20210701
+  void PLOT_GRUENEISEN_DISPERSION(aurostd::xoption&, stringstream&,ostream& oss=cout); //AS20210701
+  void PLOT_GRUENEISEN_DISPERSION(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout); //AS20210701
 
   // General plots -----------------------------------------------------------
   void plotSingleFromSet(xoption&, stringstream&, const vector<vector<double> >&, int,ostream& oss=cout); //CO20200404

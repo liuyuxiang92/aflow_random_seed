@@ -966,7 +966,16 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   } else {
     vpflow.args2addattachedscheme(argv,cmds,"PLOT_THERMO_QHA","--plotthermoqha=","./");
   }
+  vpflow.args2addattachedscheme(argv, cmds, "PLOTTER::EOSMODEL", "--eosmodel=", "SJ");  //AS20210705
   //AS20200909 END
+  //AS20210701 BEGIN
+  if (aurostd::args2flag(argv, cmds, "--plotgrdisp|--plotgruneisendispersion|--plotgrueneisendispersion")) {
+    vpflow.flag("PLOT_GRUENEISEN_DISPERSION", true);
+    vpflow.addattachedscheme("PLOT_GRUENEISEN_DISPERSION", "./", true);
+  } else {
+    vpflow.args2addattachedscheme(argv,cmds,"PLOT_GRUENEISEN_DISPERSION","--plotgrdisp=","./");
+  }
+  //AS20210701 END
 
   vpflow.flag("POCC",aurostd::args2flag(argv,cmds,"--pocc") && argv.at(1)=="--pocc");
   vpflow.args2addattachedscheme(argv,cmds,"POCC_DOS","--pocc_dos=","./");
@@ -1881,8 +1890,11 @@ namespace pflow {
       if(vpflow.flag("PLOT_TCOND")) {aurostd::xoption plotopts=plotter::getPlotOptions(vpflow,"PLOT_TCOND"); plotter::PLOT_TCOND(plotopts); _PROGRAMRUN=true;}
       //ME20190614 END
       //AS20200909 BEGIN
-      if(vpflow.flag("PLOT_THERMO_QHA")) {aurostd::xoption plotopts=plotter::getPlotOptions(vpflow,"PLOT_THERMO_QHA"); plotter::PLOT_THERMO_QHA(plotopts); _PROGRAMRUN=true;}
+      if(vpflow.flag("PLOT_THERMO_QHA")) {aurostd::xoption plotopts=plotter::getPlotOptionsQHAthermo(vpflow,"PLOT_THERMO_QHA"); plotter::PLOT_THERMO_QHA(plotopts); _PROGRAMRUN=true;}
       //AS20200909 END
+      //AS20210701 BEGIN
+      if(vpflow.flag("PLOT_GRUENEISEN_DISPERSION")) {aurostd::xoption plotopts=plotter::getPlotOptionsPhonons(vpflow,"PLOT_GRUENEISEN_DISPERSION"); plotter::PLOT_GRUENEISEN_DISPERSION(plotopts); _PROGRAMRUN=true;}
+      //AS20210701 END
       if(vpflow.flag("PROTOS_ICSD")) {cout << aflowlib::PrototypesIcsdHelp(vpflow.getattachedscheme("PROTOS_ICSD"));cout << aflow::Banner("BANNER_BIG");return 1;}
       // if(POCCUPATION) {pflow::POCCUPATION(argv,cin); _PROGRAMRUN=true;}
       if(vpflow.flag("POCC_DOS")) {pocc::POCC_DOS(cout,vpflow.getattachedscheme("POCC_DOS")); _PROGRAMRUN=true;} 
@@ -2448,6 +2460,8 @@ namespace pflow {
     strstream << tab << x << " --plotphdispdos[=directory,[Emin,[Emax[,DOSSCALE]]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] [--outfile=]" << endl;
     strstream << tab << x << " --plotthermo[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--outfile=]" << endl;
     strstream << tab << x << " --plotcond|--plothermalconductivity[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--outfile=]" << endl;
+    strstream << tab << x << " --plotthermoqha[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--eosmodel=] [--outfile=]" << endl; //AS202210705
+    strstream << tab << x << " --plotgrdisp|--plotgrueneisendispersion|--plotgruneisendispersion[=directory,[Emin,[Emax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=]  [--outfile=]" << endl; //AS20210705
     strstream << tab << x << " --pomass[=directory]" << endl;
     strstream << tab << x << " --pomass_atom[=directory]" << endl;
     strstream << tab << x << " --pomass_cell[=directory]" << endl;
