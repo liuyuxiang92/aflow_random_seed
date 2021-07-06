@@ -3467,7 +3467,7 @@ LATTICES = (the ones with "")
           aflow --visualize_phonons --q=0,0,0 --branches=1,2,3 --format=V_SIM --amplitude=0.2
 
   aflow --volume v < POSCAR
-        Outputs POSCAR file giving having volume equal to v.
+        Outputs POSCAR file having volume equal to v.
   aflow --volume*= x < POSCAR
   aflow --volume+= x < POSCAR
         Outputs POSCAR with volume changes as *=, += actor (like in c,c++).
