@@ -1,5 +1,6 @@
-3.2.10 - 2021/XX/XX
-        Location: http://materials.duke.edu/AFLOW/aflow.3.2.10.tar.xz
+3.2.11 - 2021/XX/XX
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.11.tar.xz
+        -- added plotter options for QHA (AS)
         -- fixed bug in range for GetBasisTransformationInternalTranslations() (DX)
         -- fixed coordination matching when comparing environments (DX)
         -- fixed bug in JSON printing of equivalent atom decorations (DX)
@@ -19,6 +20,16 @@
         -- updated space group queries via AFLUX in the XtalFinder routines (DX)
         -- Made string search in database case insensitive (ME)
         -- Supressed file output for interstitials calculation in web mode (ME)
+3.2.10 - 2021/06/25
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.10.tar.xz
+        -- fixed bug in GetPrimitive() function, use more robust volume check (DX)
+        -- fixed tolerance bug in edata if tolerance scan fails (DX)
+        -- fixed bandgap code for metals with partially empty channels (CO)
+        -- bypassing soft bandgap code errors for lib2raw (CO)
+        -- fixed KBIN::ExtractAtomicSpecies(), removed unreliable system call (CO)
+        -- patched aurostd::VASP_PseudoPotential_CleanName_InPlace() for more reliable composition extraction (CO)
+        (AFLOW: aflowlib_libraries.cpp, bader.cpp, ivasp.cpp, Makefile, ovasp.cpp, pflow_funcs.cpp, plotter.cpp, xatom.cpp)
+        (AUROSTD: aurostd.h, main.cpp, xparser.cpp, xparser.h)
 3.2.9 - 2021/05/05
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.9.tar.xz
         -- Fixed bug with APL overwriting *.orig files. (AS)
