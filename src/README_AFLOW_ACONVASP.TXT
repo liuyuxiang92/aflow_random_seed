@@ -329,7 +329,7 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
 	  
   aflow --aflowSG|--space_group|--sg[_label|_number][=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--tolerance_spectrum=start,stop,nsteps] < file
         Calculates the space group of the crystal in the ITC convention.
-        This routine consists of an adaptive tolerance; if any symmetry 
+        This routine employs an adaptive tolerance scheme; if any symmetry 
         rules are broken, the tolerance is changed and everything is recalculated.
         Can be called inside aflow via:
               xstructure.SpaceGroup_ITC()        (default tolerance)
