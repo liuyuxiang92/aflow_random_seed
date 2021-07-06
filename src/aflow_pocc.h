@@ -98,7 +98,12 @@ namespace pocc {
   void poccOld2New(ofstream& FileMESSAGE,ostream& oss=cout);
 
   string addDefaultPOCCTOL2string(const string& input);
-  string getTemperatureString(double temperature,int precision=TEMPERATURE_PRECISION,bool temperatures_int=true,int zero_padding_temperature=TEMPERATURE_PRECISION+1);
+
+  void getTemperatureStringParameters(int& temperature_precision,bool& temperatures_int,int& zero_padding_temperature);
+  void getTemperatureStringParameters(const vector<double>& v_temperatures,int& temperature_precision,bool& temperatures_int,int& zero_padding_temperature);
+  string getTemperatureString(double temperature,int precision,bool temperatures_int,int zero_padding_temperature);
+
+  double poccDOSCAR2temperature(const string& doscar_path);
 } // namespace pocc
 
 namespace pocc {
@@ -522,6 +527,7 @@ namespace pocc {
       vector<string> m_ARUN_directories;
       double m_Hmix;
       double m_efa;
+      int m_temperature_precision;
       int m_zero_padding_temperature;
       bool m_temperatures_int;
       double m_energy_dft_ground;

@@ -20,6 +20,7 @@
         -- updated space group queries via AFLUX in the XtalFinder routines (DX)
         -- Made string search in database case insensitive (ME)
         -- Supressed file output for interstitials calculation in web mode (ME)
+        -- added command line plotting functionality for POCC runs using --plot_dos (CO)
 3.2.10 - 2021/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.10.tar.xz
         -- fixed bug in GetPrimitive() function, use more robust volume check (DX)
