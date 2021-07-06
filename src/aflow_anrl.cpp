@@ -393,6 +393,13 @@ namespace anrl {
     // load structure
     xstructure xstr(input,IOAFLOW_AUTO);
 
+    // ---------------------------------------------------------------------------
+    // ensure structure is alphabetic, otherwise the prototype convention breaks //DX20210706
+    xstr.SpeciesPutAlphabetic();
+    std::stable_sort(xstr.atoms.begin(),xstr.atoms.end(),sortAtomsNames);
+    xstr.MakeBasis();
+    xstr.MakeTypes();
+
     //DX20191217 START
     // ---------------------------------------------------------------------------
     // print format 

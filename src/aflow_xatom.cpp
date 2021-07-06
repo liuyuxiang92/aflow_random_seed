@@ -6401,10 +6401,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // TOLERANCES ------------------------
   a.equiv_fpos_epsilon=_EQUIV_FPOS_EPS_; // standard but you can change
   // MAKE BASIS
-  a.SpeciesPutAlphabetic(); //DX20210622 - this will ensure alphabetical, missing previously
-  std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames); //DX20210622 - this will ensure alphabetical, missing previously
   a.MakeBasis();
-  a.MakeTypes(); //DX20210622
   // FLAGS -----------------------------
   a.Niggli_calculated=FALSE;
   a.Niggli_avoid=FALSE;

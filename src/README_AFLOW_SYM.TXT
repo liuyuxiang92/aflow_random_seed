@@ -97,11 +97,13 @@ More file types will be added in later versions.
 ****************************************************************************************************
 SELF-CONSISTENT SYMMETRY:
 
-AFLOW-SYM includes self-consistency symmetry checks to identify a globally
-commensurate symmetry description.
+AFLOW-SYM includes self-consistency symmetry checks to ensure descriptions are commensurate
+(e.g., valid point group or space group, the cardinality of the factor group is homomorphic to
+the point group of the crystal, etc.).
 
-The following commands provide the most extensive self-consistency checks and are
-recommended for finding the symmetry of a material:
+There are some commands that validate the full symmetry profile (i.e., check descriptors
+across different analyses). The following commands provide the most extensive self-consistency
+checks and are recommended for classifying the symmetry of a material:
 
   aflow --aflow-sym : Validates symmetry operations between point groups, factor group,
                       space group, site symmetry, and equivalent/unique atoms
@@ -111,6 +113,10 @@ recommended for finding the symmetry of a material:
 The remaining commands are performed independently and are guaranteed to be self-consistent;
 however, they are not validated against the full symmetry profile.
 
+For example, calculating the space group (--aflowSG) and Pearson symbol (--pearson) separately
+does not guarantee the two results will be commensurate with one another.
+However, the space group and Pearson will be validated against one another when running the
+extended crystallographic data command (--edata).
 
 ****************************************************************************************************
 TOLERANCE:
@@ -276,10 +282,12 @@ AFLOW COMMANDS USAGE:
           [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
           [--screen_only]                          : Prints symmetry elements to string and does not write to a file.
 
-  aflow --aflowSG|--space_group|--sg[_label|_number][=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--tolerance_spectrum=start,stop,nsteps] < file
+  aflow --aflowSG|--space_group|--sg|--aflowSG_number|--space_group_number|--sg_number|--aflowSG_label|--space_group_label|--sg_label[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--tolerance_spectrum=start,stop,nsteps] < file
         Calculates the space group of the crystal in the ITC convention.
         This routine consists of an adaptive tolerance; if any symmetry
         rules are broken, the tolerance is changed and everything is recalculated.
+        The space group number and international symbol are printed by default.
+        The commands ending in "_number" and "_label" only return the space group number and label, respectively.
         Can be called inside aflow via:
               xstructure.SpaceGroup_ITC()        (default tolerance)
               xstructure.SpaceGroup_ITC(tol)     (user defined tolerance)
@@ -287,7 +295,6 @@ AFLOW COMMANDS USAGE:
 
         Options:
 
-          [_label|_number]                         : Prints the space group label or number, respectively (both are printed by default) (option is appended to command without spaces)
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Performs crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
           [--no_scan]                              : Suppresses tolerance scan.
@@ -303,7 +310,20 @@ AFLOW COMMANDS USAGE:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--no_scan]                              : Suppresses tolerance scan.
           [--no_symmetry]                          : Ignores symmetry analysis and returns the CIF with space group 1.
-          [--setting=1|2|aflow]                    : Specifies the space group setting
+          [--setting=1|2|aflow]                    : Specifies the space group setting. The `aflow' setting follows the choices of the AFLOW Prototype Encyclopedia.
+                                                     Different settings exist for the following space groups:
+                                                       - centrosymmetric space groups with two origin choices (24 space groups, e.g., sg=227):
+                                                           --setting=1     : origin centered on high site symmetry (not inversion site)
+                                                           --setting=2     : origin centered on inversion site
+                                                           --setting=aflow : origin centered on inversion site
+                                                       - rhombohedral space groups (e.g., space group 166):
+                                                           --setting=1     : rhombohedral setting
+                                                           --setting=2     : hexagonal setting
+                                                           --setting=aflow : rhombohedral setting
+                                                       - monoclinic space groups (e.g., space group 5):
+                                                           --setting=1     : unique axis-b
+                                                           --setting=2     : unique axis-c
+                                                           --setting=aflow : unique axis-b
 
   aflow --edata[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--print=text|json] [--setting=1|2|aflow] [--suppress_Wyckoff|--suppress_Wyckoff_printing] < file
         Calculates the extended crystallographic data information (lattice, crystal, reciprocal, and superlattice descriptors).
@@ -316,13 +336,26 @@ AFLOW COMMANDS USAGE:
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
           [--no_scan]                              : Suppresses tolerance scan.
           [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
-          [--setting=1|2|aflow]                    : Specifies the space group setting
+          [--setting=1|2|aflow]                    : Specifies the space group setting. The `aflow' setting follows the choices of the AFLOW Prototype Encyclopedia.
+                                                     Different settings exist for the following space groups:
+                                                       - centrosymmetric space groups with two origin choices (24 space groups, e.g., sg=227):
+                                                           --setting=1     : origin centered on high site symmetry (not inversion site)
+                                                           --setting=2     : origin centered on inversion site
+                                                           --setting=aflow : origin centered on inversion site
+                                                       - rhombohedral space groups (e.g., space group 166):
+                                                           --setting=1     : rhombohedral setting
+                                                           --setting=2     : hexagonal setting
+                                                           --setting=aflow : rhombohedral setting
+                                                       - monoclinic space groups (e.g., space group 5):
+                                                           --setting=1     : unique axis-b
+                                                           --setting=2     : unique axis-c
+                                                           --setting=aflow : unique axis-b
           [--suppress_Wyckoff]                     : Suppresses Wyckoff position output (i.e., space group info only)
 
   aflow --equivalent | --equiv | --iatoms[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--print=text|json] < file
         Calculate the point/factor/space groups to identify equivalent
         and inequivalent atoms. In the output, each structure atom has
-        number_label_of_atom[equivalent_to_label]* (* if inequivalent). (SC1107).
+        number_label_of_atom[equivalent_to_label]* (* if inequivalent). (SC201107).
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
         the code automatically changes tolerance and recalculates from the beginning.
 
@@ -492,7 +525,20 @@ AFLOW COMMANDS USAGE:
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
           [--no_scan]                              : Suppresses tolerance scan.
           [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
-          [--setting=1|2|aflow]                    : Specifies the space group setting
+          [--setting=1|2|aflow]                    : Specifies the space group setting. The `aflow' setting follows the choices of the AFLOW Prototype Encyclopedia.
+                                                     Different settings exist for the following space groups:
+                                                       - centrosymmetric space groups with two origin choices (24 space groups, e.g., sg=227):
+                                                           --setting=1     : origin centered on high site symmetry (not inversion site)
+                                                           --setting=2     : origin centered on inversion site
+                                                           --setting=aflow : origin centered on inversion site
+                                                       - rhombohedral space groups (e.g., space group 166):
+                                                           --setting=1     : rhombohedral setting
+                                                           --setting=2     : hexagonal setting
+                                                           --setting=aflow : rhombohedral setting
+                                                       - monoclinic space groups (e.g., space group 5):
+                                                           --setting=1     : unique axis-b
+                                                           --setting=2     : unique axis-c
+                                                           --setting=aflow : unique axis-b
           [--suppress_Wyckoff]                     : Suppresses Wyckoff position output (i.e., space group info only)
 
   aflow --sitepointgroup|--agroup[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--print=text|json] [--screen_only] < file
@@ -556,7 +602,20 @@ AFLOW COMMANDS USAGE:
           [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
           [--no_scan]                              : Suppresses tolerance scan.
-          [--setting=1|2|aflow]                    : Specifies the space group setting
+          [--setting=1|2|aflow]                    : Specifies the space group setting. The `aflow' setting follows the choices of the AFLOW Prototype Encyclopedia.
+                                                     Different settings exist for the following space groups:
+                                                       - centrosymmetric space groups with two origin choices (24 space groups, e.g., sg=227):
+                                                           --setting=1     : origin centered on high site symmetry (not inversion site)
+                                                           --setting=2     : origin centered on inversion site
+                                                           --setting=aflow : origin centered on inversion site
+                                                       - rhombohedral space groups (e.g., space group 166):
+                                                           --setting=1     : rhombohedral setting
+                                                           --setting=2     : hexagonal setting
+                                                           --setting=aflow : rhombohedral setting
+                                                       - monoclinic space groups (e.g., space group 5):
+                                                           --setting=1     : unique axis-b
+                                                           --setting=2     : unique axis-c
+                                                           --setting=aflow : unique axis-b
 
   aflow --Wyckoff|--Wyckoff_positions|--wyckoff|--wyckoff_positions[=<tolerance_value>|=tight|=loose] [--letters_only] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--multiplicities_only] [--no_scan] [--setting=1|2|aflow] [--site_symmetries_only] < file
         Prints the Wyckoff positions (multiplicity, letter, site symmetry and representative
@@ -570,7 +629,20 @@ AFLOW COMMANDS USAGE:
           [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
           [--multiplicities_only]                  : Prints the Wyckoff multiplicities only (colons separate elements, commas separate Wyckoff positions for a given element)
           [--no_scan]                              : Suppresses tolerance scan.
-          [--setting=1|2|aflow]                    : Specifies the space group setting
+          [--setting=1|2|aflow]                    : Specifies the space group setting. The `aflow' setting follows the choices of the AFLOW Prototype Encyclopedia.
+                                                     Different settings exist for the following space groups:
+                                                       - centrosymmetric space groups with two origin choices (24 space groups, e.g., sg=227):
+                                                           --setting=1     : origin centered on high site symmetry (not inversion site)
+                                                           --setting=2     : origin centered on inversion site
+                                                           --setting=aflow : origin centered on inversion site
+                                                       - rhombohedral space groups (e.g., space group 166):
+                                                           --setting=1     : rhombohedral setting
+                                                           --setting=2     : hexagonal setting
+                                                           --setting=aflow : rhombohedral setting
+                                                       - monoclinic space groups (e.g., space group 5):
+                                                           --setting=1     : unique axis-b
+                                                           --setting=2     : unique axis-c
+                                                           --setting=aflow : unique axis-b
           [--site_symmetries_only]                 : Prints the Wyckoff site symmetries only (colons separate elements, commas separate Wyckoff positions for a given element)
 
 
