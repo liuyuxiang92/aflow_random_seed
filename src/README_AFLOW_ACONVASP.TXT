@@ -332,7 +332,8 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
         This routine employs an adaptive tolerance scheme; if any symmetry 
         rules are broken, the tolerance is changed and everything is recalculated.
         The space group number and international symbol are printed by default.
-        The commands ending in "_number" and "_label" only return the space group number and label, respectively.
+        The commands "--aflowSG_number", "--space_group_number", and "--sg_number" only return the space group number.
+        The commands "--aflowSG_label", "--space_group_label", and "--sg_label" only return the space group label.
         Can be called inside aflow via:
               xstructure.SpaceGroup_ITC()        (default tolerance)
               xstructure.SpaceGroup_ITC(tol)     (user defined tolerance)
