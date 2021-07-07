@@ -389,7 +389,7 @@ void XtalFinderCalculator::getOptions(
 // ***************************************************************************
 string XtalFinderCalculator::getSpaceGroupMatchbookFromOptions(
     const aurostd::xoption& vpflow,
-    bool relaxation_step){
+    uint relaxation_step){ //DX20210615 - uint not bool
 
   string function_name = XPID + "XtalFinderCalculator::getSpaceGroupMatchbookFromOptions():";
   stringstream message;
@@ -5276,6 +5276,7 @@ namespace compare{
     //cerr << xstr1.Volume()/xstr1.atoms.size() << " vs " << xstr2.Volume()/xstr2.atoms.size() << endl;
     rescale_factor=(xstr1.Volume()/xstr1.atoms.size())/(xstr2.Volume()/xstr2.atoms.size()); //DX20201215 - store rescale factor
     xstr2.InflateVolume(rescale_factor); //already updates cartesian coordinates
+    xstr2.dist_nn_min*=std::pow(rescale_factor,(double) 1/3); //DX20210505 - need to update minimum distance with scaling factor
     // update Cartesian coordinates
     //DX20201210 [OBSOLETE - INFLATE VOLUME ACCOUNTS FOR THIS NOW] for(uint i=0; i<xstr2.atoms.size(); i++){
     //DX20201210 [OBSOLETE - INFLATE VOLUME ACCOUNTS FOR THIS NOW]  xstr2.atoms[i].cpos=F2C(xstr2.lattice,xstr2.atoms[i].fpos);
@@ -5975,7 +5976,8 @@ namespace compare{
         // ---------------------------------------------------------------------------
         // check frequency of distance
         // this is sensitive to tolerance of cutoff; use with caution
-        //DX - THIS IS TOO SENSITIVE - if(compare_frequency && env_1.coordinations_neighbor[i]!=env_2.neighbor_frequencies[j]){ continue; }
+        //DX - THIS IS TOO SENSITIVE - if(compare_frequency && env_1.coordinations_neighbor[i]!=env_2.coordinations_neighbor[j]){ continue; }
+        if(exact_match && env_1.coordinations_neighbor[i]!=env_2.coordinations_neighbor[j]){ continue; } //DX20210514 - if exact match, then this is needed
 
         // ---------------------------------------------------------------------------
         // exact match

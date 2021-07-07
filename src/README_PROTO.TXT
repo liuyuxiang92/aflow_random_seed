@@ -1585,6 +1585,7 @@ ANRL - nitrides - TERNARIES (R. Friedrich)
 
 ANRL Label                                       Pearson   SG symbol           Struk     Prototype           SG #      notes
 ----------------------------------------------------------------------------------------------------------------------------------------------------
+A3B3C_mC56_9_6a_6a_2a-001.{ABC}                  mC56      Cc                  -         N3Na3W1             #9        N3Na3W1, ICSD #75364
 ABC_oP12_62_c_c_c-001.{ABC}                      oP12      Pnma                -         CaLiN               #62       CaLiN, ICSD #107304
 A2B2C_tI10_139_e_e_a-001.{ABC}                   tI10      I4/mmm              -         Ca2N2Zn             #139      Ca2N2Zn, ICSD #69049
 A3BC2_hP6_191_f_a_d-001.{ABC}                    hP6       P6/mmm              -         Na3TaTi2            #191      Na3TaTi2, ICSD #186418

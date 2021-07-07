@@ -1975,7 +1975,7 @@ namespace AEL_functions {
         }
 
         // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-        if (!(XHOST.ARUN_POSTPROCESS || AEL_data.postprocess)) {
+        if (!(XHOST.POSTPROCESS || XHOST.ARUN_POSTPROCESS || AEL_data.postprocess)) { //CO20210701
           // Assign the values of the flags provided by the user in the aflow.in file to the class containing the input data for the VASP run
           // [OBSOLETE] aelerror = AEL_functions::aelvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), AEL_data, FileMESSAGE);
           // [OBSOLETE] if(aelerror != 0) {
@@ -2064,7 +2064,7 @@ namespace AEL_functions {
             }
 
             // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-            if (!(XHOST.ARUN_POSTPROCESS || AEL_data.postprocess)) {	  
+            if (!(XHOST.POSTPROCESS || XHOST.ARUN_POSTPROCESS || AEL_data.postprocess)) { //CO20210701
               // Assign the values of the flags provided by the user in the aflow.in file to the class containing the input data for the VASP run
               // [OBSOLETE] aelerror = AEL_functions::aelvaspflags(vaspRunsPressures.at(k).at(idVaspRun), _vaspFlags, _kbinFlags, runnamepressures.at(k).at(idVaspRun), AEL_data, FileMESSAGE);
               // [OBSOLETE] if(aelerror != 0) {

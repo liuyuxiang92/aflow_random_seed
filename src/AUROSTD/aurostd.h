@@ -394,6 +394,7 @@ namespace aurostd {
   bool isNullByte(char c); //DX20190131
   string removeNullBytes(string in); //DX20190131
   bool RemoveBinaryCharactersFromFile(const string& directory,const string& filename); //DX20190211 //CO20210315
+  string PercentEncodeASCII(const char c) __xprototype; //DX20210706
   string CleanStringASCII(const string& s) __xprototype;
   string CleanStringASCII_20190712(const string& s) __xprototype; //CO20190712
   string CleanStringASCII_20190101(const string& s) __xprototype; //CO20190712

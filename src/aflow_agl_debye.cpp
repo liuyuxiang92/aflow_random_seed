@@ -2436,7 +2436,7 @@ namespace AGL_functions {
         }
 
         // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-        if (!(XHOST.ARUN_POSTPROCESS || AGL_data.postprocess)) {
+        if (!(XHOST.POSTPROCESS || XHOST.ARUN_POSTPROCESS || AGL_data.postprocess)) { //CO20210701
           // Assign the values of the flags provided by the user in the _AFLOWIN_ file to the class containing the input data for the VASP run
           // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname, FileMESSAGE);
           // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
@@ -2628,7 +2628,7 @@ namespace AGL_functions {
             continue;
           }
           // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-          if (!(XHOST.ARUN_POSTPROCESS || AGL_data.postprocess)) {
+          if (!(XHOST.POSTPROCESS || XHOST.ARUN_POSTPROCESS || AGL_data.postprocess)) { //CO20210701
             // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname, FileMESSAGE);
             // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
             // [OBSOLETE] if(aglerror != 0) {
@@ -2769,7 +2769,7 @@ namespace AGL_functions {
             continue;
           } 	  	  
           // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-          if (!(XHOST.ARUN_POSTPROCESS || AGL_data.postprocess)) {	  
+          if (!(XHOST.POSTPROCESS || XHOST.ARUN_POSTPROCESS || AGL_data.postprocess)) { //CO20210701
             // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname, FileMESSAGE);
             // [OBSOLETE] aglerror = AGL_functions::aglvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), FileMESSAGE);
             // [OBSOLETE] if(aglerror != 0) {

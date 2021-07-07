@@ -312,8 +312,8 @@ namespace plotter {
       if (format != "pdf") {
         command=XHOST.command("convert") + " -quiet -density 300 -background white \"" + filename_latex + ".pdf\" convert_output." + format + " 1>/dev/null 2>&1";   // to avoid C: ... Carbon:PBE = C: in window //CO20210701 - io redirection
         if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        output=aurostd::execute2string(command);
         if(0){  //CO20210701 - does not work because of primitive execute2string functionality, will be fixed with upcoming version
-          output=aurostd::execute2string(command);
           //start here for a patch:
           //https://www.itechlounge.net/2020/09/web-imagickexception-attempt-to-perform-an-operation-not-allowed-by-the-security-policy-pdf/
           if(output.find("not allowed by the security policy")!=string::npos){

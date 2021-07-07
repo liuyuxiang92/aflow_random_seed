@@ -2821,7 +2821,7 @@ namespace anrl {
   string structure2anrl(xstructure& xstr, bool recalculate_symmetry=true);   // use default options //DX20191031 - added recalculate_symmetry
   string structure2anrl(xstructure& xstr, double tolerance);                 // specify symmetry tolerance //CO20190520 - removed pointers for bools and doubles, added const where possible
   string structure2anrl(xstructure& xstr, uint setting);                     // specify setting
-  string structure2anrl(xstructure& xstr, double tolerance, uint setting, bool recalculate_symmetry=true);  // main function //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190829 - added recalculate_symmetry //DX20191031 - removed reference
+  string structure2anrl(xstructure& xstr, double tolerance, uint setting, bool recalculate_symmetry=true, bool print_element_names=false, bool print_atomic_numbers=false);  // main function //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190829 - added recalculate_symmetry //DX20191031 - removed reference //DX20210622 - added printing options
   // ---------------------------------------------------------------------------
   // generic prototype generator (main function)
   xstructure PrototypeANRL_Generator(string& label, string& parameters, deque<string> &vatomX,deque<double> &vvolumeX, ostream& logstream=cout, bool silence_logger=true); //DX20200528 - command line = no logger
@@ -4687,7 +4687,7 @@ uint GetCages2(const xstructure& str,const double& roughness,vector<acage>& cage
     const bool& osswrite1,ostream& oss1, const bool& osswrite2,ostream& oss2);
 bool GetCages(const xstructure& _str,_aflags& aflags,
     vector<acage>& cagesirreducible,vector<acage>& cagesreducible,vector<acage>& cages4,
-    vector<acage>& cages3,vector<acage>& cages2,const double& _roughness,const bool& osswrite,ostream& oss);
+    vector<acage>& cages3,vector<acage>& cages2,double _roughness,bool FFFflag,bool osswrite,ostream& oss);
 // ----------------------------------------------------------------------------
 // aflow_pocc //CO20180502
 namespace KBIN {
