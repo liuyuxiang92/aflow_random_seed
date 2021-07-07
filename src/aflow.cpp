@@ -1130,28 +1130,28 @@ int main(int _argc,char **_argv) {
       // COUT DEFAULT
       oss.copyfmt(std::cout);                             
       oss.clear(std::cout.rdstate());                     
-      oss.basic_ios<char>::rdbuf(std::cout.rdbuf());      
+      oss.std::basic_ios<char>::rdbuf(std::cout.rdbuf());  //CO20210707 - patching for older TX machines
       oss << "COUT DEFAULT" << std::endl;
       if(1) { // somebody chose a file
         // FILE PRE
         std::ofstream ofs_pre("friscosity_pre.txt", std::ofstream::out);
         oss.copyfmt(ofs_pre);                             
         oss.clear(ofs_pre.rdstate());                     
-        oss.basic_ios<char>::rdbuf(ofs_pre.rdbuf());
+        oss.std::basic_ios<char>::rdbuf(ofs_pre.rdbuf());  //CO20210707 - patching for older TX machines
       }
       oss << "FRISCOSITY_PRE" << std::endl;
       if(1) { // put it back on COUT
         // COUT
         oss.copyfmt(std::cout);                             
         oss.clear(std::cout.rdstate());                     
-        oss.basic_ios<char>::rdbuf(std::cout.rdbuf());
+        oss.std::basic_ios<char>::rdbuf(std::cout.rdbuf());  //CO20210707 - patching for older TX machines
       }
       oss << "COUT" << std::endl;
       if(1) { // try CERR
         // CERR
         oss.copyfmt(std::cerr);                             
         oss.clear(std::cerr.rdstate());                     
-        oss.basic_ios<char>::rdbuf(std::cerr.rdbuf());
+        oss.std::basic_ios<char>::rdbuf(std::cerr.rdbuf());  //CO20210707 - patching for older TX machines
       }
       oss << "CERR" << std::endl;
       if(1) { // switch to file 
@@ -1159,7 +1159,7 @@ int main(int _argc,char **_argv) {
         std::ofstream ofs_post("friscosity_post.txt", std::ofstream::out);
         oss.copyfmt(ofs_post);                             
         oss.clear(ofs_post.rdstate());                     
-        oss.basic_ios<char>::rdbuf(ofs_post.rdbuf());
+        oss.std::basic_ios<char>::rdbuf(ofs_post.rdbuf());  //CO20210707 - patching for older TX machines
       }
       oss << "FRISCOSITY_POST" << std::endl;
 

@@ -104,7 +104,7 @@ class _Two_Species_Plotter:
         mode='markers',
         name='enthalpy',
         hoverinfo='text',
-        text=["""<a href="{}/">{}</a>""".format(urls[i], c_name[i]) for i in range(len(urls))],
+        text=["""<a href="{}">{}</a>""".format(urls[i], c_name[i]) for i in range(len(urls))],
         hoverlabel=dict(bgcolor='black'),
         marker=dict(
             color=['rgb({}, {}, {})'.format(c[0], c[1], c[2]) for c in colors],

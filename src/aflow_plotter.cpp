@@ -1761,7 +1761,7 @@ namespace plotter {
       json.addString("y_unit", "MEV");
     }
 
-    static const int num = 4;
+    static const uint num = 4;
     string tags[num] = {"kpoint_labels", "kpoint_labels_latex", "kpoint_labels_gnuplot", "kpoint_labels_html"};
     string formats[num] = { "", "LATEX", "GNUPLOT", "HTML"};
 
