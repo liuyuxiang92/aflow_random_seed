@@ -4681,7 +4681,7 @@ namespace aflowlib {
       }
       else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){
         //DX20210615 [OBSOLETE] space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + ",%27*";
-        space_group_summons = "%27,\"" + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "\",%27"; //DX20210615
+        space_group_summons = squote_encoded + ",\"" + GetSpaceGroupName(space_group_number) + space_encoded + hashtag_encoded + aurostd::utype2string<int>(space_group_number) + "\"," + squote_encoded; //DX20210615
       }
       else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){
         //DX20210615 [OBSOLETE] space_group_summons = "*%27," + GetSpaceGroupName(space_group_number) + "%20%23" + aurostd::utype2string<int>(space_group_number) + "%27";
