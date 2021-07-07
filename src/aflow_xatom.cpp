@@ -3017,7 +3017,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     if(a_iomode==IOVASP_AUTO)    oss << a.title <<endl; // << " (AUTO) " << endl;
     if(a_iomode==IOVASP_POSCAR)  oss << a.title <<endl; // << " (POSCAR) " << endl;
     if(a_iomode==IOVASP_ABCCAR)  oss << a.title <<endl; // << " (ABCCAR) " << endl;
-    if(a_iomode==IOVASP_WYCKCAR) oss << a.title <<endl; // << " (WYCKCAR) " << endl;
+    if(a_iomode==IOVASP_WYCKCAR) oss << a.title << "| SG: " << GetSpaceGroupName(a.space_group_ITC,a.directory) << " " << a.space_group_ITC << " PG: " << a.point_group_ITC << " BL: " << a.bravais_label_ITC << " | sym_eps: " << a.sym_eps << endl; //DX20210526 - extend title
     if(a.neg_scale==FALSE) {
       oss.precision(6);  //DM
       oss << a.scale; // << endl; //CO20170630
@@ -3055,7 +3055,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       }
     }
     // ----------------------------------------------------------------------
-    if(a_iomode==IOVASP_ABCCAR || a_iomode==IOVASP_WYCKCAR) {
+    if(a_iomode==IOVASP_ABCCAR){ //DX20210525 - separated a_iomode==IOVASP_WYCKCAR
       oss << " ";
       oss.precision(10);  //SC to cut/paste from matlab in format long
       if(abs(a.a)<10.0) oss << " ";
@@ -3077,7 +3077,34 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       if(abs(a.gamma)<10.0) oss << " ";
       if(!std::signbit(a.gamma)) oss << " ";
       oss << a.gamma << "";
-      if(a_iomode==IOVASP_WYCKCAR) oss << "  " << a.spacegroupnumber << "";
+      //DX20210621 [OBSOLETE] if(a_iomode==IOVASP_WYCKCAR) oss << "  " << a.spacegroupnumber << "";
+      oss << endl;
+      oss.precision(_precision_);  //SC to cut/paste from matlab in format long
+    }
+    else if(a_iomode==IOVASP_WYCKCAR){ //DX20210525 - note wyccar uses lattice parameters of the conventional cell
+      xvector<double> data = Getabc_angles(a.standard_lattice_ITC,DEGREES);
+      oss << " ";
+      oss.precision(10);  //SC to cut/paste from matlab in format long
+      if(abs(data(1))<10.0) oss << " ";
+      if(!std::signbit(data(1))) oss << " ";
+      oss << data(1) << "";
+      if(abs(data(2))<10.0) oss << " ";
+      if(!std::signbit(data(2))) oss << " ";
+      oss << data(2) << "";
+      if(abs(data(3))<10.0) oss << " ";
+      if(!std::signbit(data(3))) oss << " ";
+      oss << data(3) << "";
+      oss.precision(4);  //SC to cut/paste from matlab in format long
+      if(abs(data(4))<10.0) oss << " ";
+      if(!std::signbit(data(4))) oss << " ";
+      oss << data(4) << "";
+      if(abs(data(5))<10.0)  oss << " ";
+      if(!std::signbit(data(5)))  oss << " ";
+      oss << data(5) << "";
+      if(abs(a.gamma)<10.0) oss << " ";
+      if(!std::signbit(data(6))) oss << " ";
+      oss << data(6) << "";
+      oss << " " << a.space_group_ITC << " " << a.setting_ITC;
       oss << endl;
       oss.precision(_precision_);  //SC to cut/paste from matlab in format long
     }
@@ -3092,175 +3119,201 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       }
       oss << endl;
     }
+    //DX20210526 - add WYCCAR format - START
+    if(a_iomode==IOVASP_WYCKCAR) {
+      oss << aurostd::joinWDelimiter(SYM::countWyckoffTypes(a.wyckoff_sites_ITC), " ") << endl; // gets the number of Wyckoff positions per type
+      oss << "Direct(WYCCAR)" << endl; // wyccar is always in direct/fractional
+      uint nWyckoff_sites = a.wyckoff_sites_ITC.size();
+      double _coord = AUROSTD_MAX_DOUBLE;
+      for(uint i=0;i<nWyckoff_sites;i++){
+        _coord = AUROSTD_MAX_DOUBLE;
+        oss << " ";
+        for(uint j=1;j<=3;j++) {
+          _coord=aurostd::roundoff(a.wyckoff_sites_ITC[i].coord(j),pow(10.0,-(double)_precision_));
+          if(abs(_coord)<10.0) oss << " ";
+          if(!std::signbit(_coord)) oss << " ";
+          oss << _coord << " ";
+        }
+        oss << std::setprecision(_precision_) << std::left
+          << " " << a.wyckoff_sites_ITC[i].type
+          << " " << a.wyckoff_sites_ITC[i].multiplicity
+          << " " << a.wyckoff_sites_ITC[i].letter
+          << " " << a.wyckoff_sites_ITC[i].site_symmetry;
+        oss << endl;
+      }
+    }
+    //DX20210526 - add WYCCAR format - END
     // ----------------------------------------------------------------------
     //CO20170630 - fixing for POCC
     //[CO20180705 - we have const str&, so we can't modify atom arrangement, this MUST be done before structure is printed]a.MakeTypes();  //CO20180705 - repetita iuvant
     //[CO20180705 - we have const str&, so we can't modify atom arrangement, this MUST be done before structure is printed]std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsType);  //CO20180705 - this makes it necessary that atoms are properly typed
-    if(a.partial_occupation_flag==TRUE) {
-      //need to figure out the '+'
-      uint iatom=0;
-      vector<vector<uint> > vsame_pocc;
-      double last_pocc=0.0;
-      if(LDEBUG) {
-        for(uint i=0;i<a.atoms.size();i++){
-          cerr << soliloquy << " name=" << a.atoms[i].name << " type=" << a.atoms[i].type << " pocc=" << a.atoms[i].partial_occupation_value << endl;
+    if(a_iomode!=IOVASP_WYCKCAR) { //DX20210611 - do not do for Wyccar, atom count is not the same as number of Wyckoff positiosn
+      if(a.partial_occupation_flag==TRUE) {
+        //need to figure out the '+'
+        uint iatom=0;
+        vector<vector<uint> > vsame_pocc;
+        double last_pocc=0.0;
+        if(LDEBUG) {
+          for(uint i=0;i<a.atoms.size();i++){
+            cerr << soliloquy << " name=" << a.atoms[i].name << " type=" << a.atoms[i].type << " pocc=" << a.atoms[i].partial_occupation_value << endl;
+          }
         }
-      }
-      if(a.atoms.size()){
-        for(uint i=0;i<a.num_each_type.size();i++){
-          vsame_pocc.push_back(vector<uint>(0));  //for first atom
-          vsame_pocc.back().push_back(0); //first atom
-          last_pocc=a.atoms[iatom].partial_occupation_value;
-          for(uint j=0;j<(uint)a.num_each_type[i];j++){
-            if(aurostd::isequal(a.atoms[iatom].partial_occupation_value,last_pocc,_AFLOW_POCC_ZERO_TOL_)){vsame_pocc.back().back()+=1;} //same
-            else { //'+'
-              vsame_pocc.back().push_back(1);
-              last_pocc=a.atoms[iatom].partial_occupation_value;
+        if(a.atoms.size()){
+          for(uint i=0;i<a.num_each_type.size();i++){
+            vsame_pocc.push_back(vector<uint>(0));  //for first atom
+            vsame_pocc.back().push_back(0); //first atom
+            last_pocc=a.atoms[iatom].partial_occupation_value;
+            for(uint j=0;j<(uint)a.num_each_type[i];j++){
+              if(aurostd::isequal(a.atoms[iatom].partial_occupation_value,last_pocc,_AFLOW_POCC_ZERO_TOL_)){vsame_pocc.back().back()+=1;} //same
+              else { //'+'
+                vsame_pocc.back().push_back(1);
+                last_pocc=a.atoms[iatom].partial_occupation_value;
+              }
+              iatom++;
             }
-            iatom++;
           }
         }
-      }
-      if(LDEBUG) {
+        if(LDEBUG) {
+          for(uint i=0;i<vsame_pocc.size();i++){
+            for(uint j=0;j<vsame_pocc[i].size();j++){
+              cerr << soliloquy << " vsame_pocc[" << i << "][" << j << "]=" << vsame_pocc[i][j] << endl;
+            }
+          }
+        }
+        iatom=0;
         for(uint i=0;i<vsame_pocc.size();i++){
+          //if(vsame_pocc[i].size()==1){  //no '+'
+          //  oss << vsame_pocc[i][0] << "*";
+          //  //oss << std::defaultfloat;
+          //  oss.unsetf(ios_base::floatfield);
+          //  oss << a.atoms[iatom++].partial_occupation_value << std::fixed << " ";
+          //} else {  //need '+'
           for(uint j=0;j<vsame_pocc[i].size();j++){
-            cerr << soliloquy << " vsame_pocc[" << i << "][" << j << "]=" << vsame_pocc[i][j] << endl;
+            oss << vsame_pocc[i][j] << "*";
+            //oss << std::defaultfloat;
+            oss.unsetf(ios_base::floatfield);
+            oss << a.atoms[iatom].partial_occupation_value << std::fixed << (j!=vsame_pocc[i].size()-1?"+":" ");
+            iatom+=vsame_pocc[i][j];
           }
+          //}
+        }
+
+        //[OBSOLETE - CO20180705]for(uint i=0;i<a.num_each_type.size();i++){
+        //[OBSOLETE - CO20180705]  oss << a.num_each_type.at(i) << "*";
+        //[OBSOLETE - CO20180705]  //oss << std::defaultfloat;
+        //[OBSOLETE - CO20180705]  oss.unsetf(ios_base::floatfield);
+        //[OBSOLETE - CO20180705]  oss << a.atoms[i].partial_occupation_value << std::fixed << " ";
+        //[OBSOLETE - CO20180705]}
+      } else {for(uint i=0;i<a.num_each_type.size();i++){oss << a.num_each_type.at(i) << " ";}}
+      oss << endl;
+      if(a.isd) oss << "Selective Dynamics" << endl; // DONE YOYO BUG
+      // oss << a.coord_type << endl;
+
+      if(a.coord_flag==_COORDS_FRACTIONAL_) oss << "Direct(" << a.atoms.size() << ") ";
+      if(a.coord_flag==_COORDS_CARTESIAN_)  oss << "Cartesian(" << a.atoms.size() << ") ";
+      //  if(a.partial_occupation_flag==TRUE)  oss << "Pocc ";
+      if(a.order_parameter_structure==TRUE)  oss << "OrderParameter(" << a.order_parameter_atoms.size() << ") ";
+      if(1) { // write [A1B2C3D4]
+        //      oss << "[";for(uint i=0;i<a.num_each_type.size();i++) {oss << char('A'+i) << a.num_each_type.at(i);}oss << "] ";
+        //CO20170630, the original num_each_type doesn't work here, so we fix
+        if(a.partial_occupation_flag==TRUE) {
+          oss << "Partial ";
+          //oss.precision(_pocc_precision_);  //CO20170630
+          //oss << std::defaultfloat;
+          int comp_prec=(int)ceil(log10(1.0/a.partial_occupation_stoich_tol));  //ceil ensures we round up above 1 //CO20181226
+          oss.precision(comp_prec); //CO20181226
+          oss.unsetf(ios_base::floatfield);
+          oss << "[";for(uint i=0;i<a.comp_each_type.size();i++) {oss << char('A'+i) << a.comp_each_type.at(i);}oss << "] ";
+          oss << std::fixed;
+          oss.precision(_precision_);       //CO20170630 //CO20181226
+        } else {
+          oss << "["; for(uint i=0,k=0;i<a.num_each_type.size();k+=a.num_each_type.at(i),i++) { oss << char(a.atoms.at(k).type+65) << a.num_each_type.at(i);} oss << "] ";
         }
       }
-      iatom=0;
-      for(uint i=0;i<vsame_pocc.size();i++){
-        //if(vsame_pocc[i].size()==1){  //no '+'
-        //  oss << vsame_pocc[i][0] << "*";
-        //  //oss << std::defaultfloat;
-        //  oss.unsetf(ios_base::floatfield);
-        //  oss << a.atoms[iatom++].partial_occupation_value << std::fixed << " ";
-        //} else {  //need '+'
-        for(uint j=0;j<vsame_pocc[i].size();j++){
-          oss << vsame_pocc[i][j] << "*";
+      // done
+      oss << endl;
+    
+      double _coord;  //CO20190322 - remove annoying -0.0000000
+      for(uint iat=0;iat<a.atoms.size();iat++) {
+        oss << " ";
+        for(uint j=1;j<=3;j++) {
+          //	oss << " ";
+          if(a.coord_flag==_COORDS_FRACTIONAL_) {_coord=a.atoms.at(iat).fpos(j);} //CO20190322 - remove annoying -0.0000000
+          if(a.coord_flag==_COORDS_CARTESIAN_)  {_coord=a.atoms.at(iat).cpos(j);} //CO20190322 - remove annoying -0.0000000
+
+          _coord=aurostd::roundoff(_coord,pow(10.0,-(double)_precision_)); //CO20190322 - remove annoying -0.0000000
+          if(abs(_coord)<10.0) oss << " "; //CO20190322 - remove annoying -0.0000000
+          if(!std::signbit(_coord)) oss << " ";  //CO20190322 - remove annoying -0.0000000
+          oss << _coord << " "; //CO20190322 - remove annoying -0.0000000
+
+          //[CO20190322 OBSOLETE]if(a.coord_flag==_COORDS_FRACTIONAL_) {if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " "; oss << a.atoms.at(iat).fpos(j) << " ";}
+          //[CO20190322 OBSOLETE]if(a.coord_flag==_COORDS_CARTESIAN_)  {if(abs(a.atoms.at(iat).cpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).cpos(j))) oss << " "; oss << a.atoms.at(iat).cpos(j) << " ";}
+        }
+        //  cout << aurostd::modulus(a.atoms.at(iat).cpos) << " ";
+        if(a.isd==TRUE)
+          oss << " " << a.atoms.at(iat).sd[0] << " " << a.atoms.at(iat).sd[1] << " " << a.atoms.at(iat).sd[2];
+        if(a.atoms.at(iat).name_is_given==TRUE) {
+          oss << " " << a.atoms.at(iat).name << " ";
+          for(uint j=a.atoms.at(iat).name.length();j<5;j++) oss << " ";
+        }
+        if(a.partial_occupation_flag==TRUE) {
+          //oss.precision(_pocc_precision_);  //CO20170630
+          //if(a.atoms.at(iat).partial_occupation_flag==FALSE) oss << "-      ";
+          //	if(a.atoms.at(iat).partial_occupation_flag==TRUE) oss << a.atoms.at(iat).partial_occupation_value << "  ";// << " (" << iat << "/" << a.partial_occupation_flags.size() << ")";
           //oss << std::defaultfloat;
           oss.unsetf(ios_base::floatfield);
-          oss << a.atoms[iatom].partial_occupation_value << std::fixed << (j!=vsame_pocc[i].size()-1?"+":" ");
-          iatom+=vsame_pocc[i][j];
+          oss << "pocc=" << a.atoms.at(iat).partial_occupation_value << "  ";
+          oss << std::fixed;
+          //oss.precision(_precision_); //CO20170630
         }
-        //}
-      }
-
-      //[OBSOLETE - CO20180705]for(uint i=0;i<a.num_each_type.size();i++){
-      //[OBSOLETE - CO20180705]  oss << a.num_each_type.at(i) << "*";
-      //[OBSOLETE - CO20180705]  //oss << std::defaultfloat;
-      //[OBSOLETE - CO20180705]  oss.unsetf(ios_base::floatfield);
-      //[OBSOLETE - CO20180705]  oss << a.atoms[i].partial_occupation_value << std::fixed << " ";
-      //[OBSOLETE - CO20180705]}
-    } else {for(uint i=0;i<a.num_each_type.size();i++){oss << a.num_each_type.at(i) << " ";}}
-    oss << endl;
-    if(a.isd) oss << "Selective Dynamics" << endl; // DONE YOYO BUG
-    // oss << a.coord_type << endl;
-
-    if(a.coord_flag==_COORDS_FRACTIONAL_) oss << "Direct(" << a.atoms.size() << ") ";
-    if(a.coord_flag==_COORDS_CARTESIAN_)  oss << "Cartesian(" << a.atoms.size() << ") ";
-    //  if(a.partial_occupation_flag==TRUE)  oss << "Pocc ";
-    if(a.order_parameter_structure==TRUE)  oss << "OrderParameter(" << a.order_parameter_atoms.size() << ") ";
-    if(1) { // write [A1B2C3D4]
-      //      oss << "[";for(uint i=0;i<a.num_each_type.size();i++) {oss << char('A'+i) << a.num_each_type.at(i);}oss << "] ";
-      //CO20170630, the original num_each_type doesn't work here, so we fix
-      if(a.partial_occupation_flag==TRUE) {
-        oss << "Partial ";
-        //oss.precision(_pocc_precision_);  //CO20170630
-        //oss << std::defaultfloat;
-        int comp_prec=(int)ceil(log10(1.0/a.partial_occupation_stoich_tol));  //ceil ensures we round up above 1 //CO20181226
-        oss.precision(comp_prec); //CO20181226
-        oss.unsetf(ios_base::floatfield);
-        oss << "[";for(uint i=0;i<a.comp_each_type.size();i++) {oss << char('A'+i) << a.comp_each_type.at(i);}oss << "] ";
-        oss << std::fixed;
-        oss.precision(_precision_);       //CO20170630 //CO20181226
-      } else {
-        oss << "["; for(uint i=0,k=0;i<a.num_each_type.size();k+=a.num_each_type.at(i),i++) { oss << char(a.atoms.at(k).type+65) << a.num_each_type.at(i);} oss << "] ";
-      }
-    }
-    // done
-    oss << endl;
-
-    double _coord;  //CO20190322 - remove annoying -0.0000000
-    for(uint iat=0;iat<a.atoms.size();iat++) {
-      oss << " ";
-      for(uint j=1;j<=3;j++) {
-        //	oss << " ";
-        if(a.coord_flag==_COORDS_FRACTIONAL_) {_coord=a.atoms.at(iat).fpos(j);} //CO20190322 - remove annoying -0.0000000
-        if(a.coord_flag==_COORDS_CARTESIAN_)  {_coord=a.atoms.at(iat).cpos(j);} //CO20190322 - remove annoying -0.0000000
-
-        _coord=aurostd::roundoff(_coord,pow(10.0,-(double)_precision_)); //CO20190322 - remove annoying -0.0000000
-        if(abs(_coord)<10.0) oss << " "; //CO20190322 - remove annoying -0.0000000
-        if(!std::signbit(_coord)) oss << " ";  //CO20190322 - remove annoying -0.0000000
-        oss << _coord << " "; //CO20190322 - remove annoying -0.0000000
-
-        //[CO20190322 OBSOLETE]if(a.coord_flag==_COORDS_FRACTIONAL_) {if(abs(a.atoms.at(iat).fpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).fpos(j))) oss << " "; oss << a.atoms.at(iat).fpos(j) << " ";}
-        //[CO20190322 OBSOLETE]if(a.coord_flag==_COORDS_CARTESIAN_)  {if(abs(a.atoms.at(iat).cpos(j))<10.0) oss << " ";if(!std::signbit(a.atoms.at(iat).cpos(j))) oss << " "; oss << a.atoms.at(iat).cpos(j) << " ";}
-      }
-      //  cout << aurostd::modulus(a.atoms.at(iat).cpos) << " ";
-      if(a.isd==TRUE)
-        oss << " " << a.atoms.at(iat).sd[0] << " " << a.atoms.at(iat).sd[1] << " " << a.atoms.at(iat).sd[2];
-      if(a.atoms.at(iat).name_is_given==TRUE) {
-        oss << " " << a.atoms.at(iat).name << " ";
-        for(uint j=a.atoms.at(iat).name.length();j<5;j++) oss << " ";
-      }
-      if(a.partial_occupation_flag==TRUE) {
-        //oss.precision(_pocc_precision_);  //CO20170630
-        //if(a.atoms.at(iat).partial_occupation_flag==FALSE) oss << "-      ";
-        //	if(a.atoms.at(iat).partial_occupation_flag==TRUE) oss << a.atoms.at(iat).partial_occupation_value << "  ";// << " (" << iat << "/" << a.partial_occupation_flags.size() << ")";
-        //oss << std::defaultfloat;
-        oss.unsetf(ios_base::floatfield);
-        oss << "pocc=" << a.atoms.at(iat).partial_occupation_value << "  ";
-        oss << std::fixed;
-        //oss.precision(_precision_); //CO20170630
-      }
-      if(a.order_parameter_structure==TRUE) {
-        if(a.atoms.at(iat).order_parameter_atom==FALSE) oss << "- ";
-        if(a.atoms.at(iat).order_parameter_atom==TRUE) oss << a.atoms.at(iat).order_parameter_value << " ";// << " (" << iat << "/" << a.order_parameter_atoms.size() << ")";
-      }
-      if(a.write_inequivalent_flag==TRUE) {
-        oss << " ";
-        // ?	if(i<10) oss << "0";
-        oss << iat << "[";
-        if(a.atoms.at(iat).equivalent<10) oss << "0";
-        oss << a.atoms.at(iat).equivalent << "]";
-        if(a.atoms.at(iat).is_inequivalent) {
-          oss <<"*";
-          oss << "_(" << a.atoms.at(iat).num_equivalents << ") "; //<< "  index=" << a.atoms.at(iat).index_iatoms << "  ";
-          //  " v" << a.iatoms.size() << "   burp ";
-          // for(uint jat=0;jat<a.iatoms.size();jat++)  oss << a.iatoms.at(jat).size() << " ";
+        if(a.order_parameter_structure==TRUE) {
+          if(a.atoms.at(iat).order_parameter_atom==FALSE) oss << "- ";
+          if(a.atoms.at(iat).order_parameter_atom==TRUE) oss << a.atoms.at(iat).order_parameter_value << " ";// << " (" << iat << "/" << a.order_parameter_atoms.size() << ")";
         }
-      }
-      if(a.qm_forces_write) {
-        if(a.qm_calculated==TRUE)  oss << "F *(";
-        if(a.qm_calculated==FALSE) oss << "F  (";
-        for(uint j=1;j<=3;j++) {
-          if(abs(a.qm_forces.at(iat)(j))<10.0) oss << " ";
-          if(!std::signbit(a.qm_forces.at(iat)(j))) oss << " ";
-          oss << a.qm_forces.at(iat)(j) << " ";
+        if(a.write_inequivalent_flag==TRUE) {
+          oss << " ";
+          // ?	if(i<10) oss << "0";
+          oss << iat << "[";
+          if(a.atoms.at(iat).equivalent<10) oss << "0";
+          oss << a.atoms.at(iat).equivalent << "]";
+          if(a.atoms.at(iat).is_inequivalent) {
+            oss <<"*";
+            oss << "_(" << a.atoms.at(iat).num_equivalents << ") "; //<< "  index=" << a.atoms.at(iat).index_iatoms << "  ";
+            //  " v" << a.iatoms.size() << "   burp ";
+            // for(uint jat=0;jat<a.iatoms.size();jat++)  oss << a.iatoms.at(jat).size() << " ";
+          }
         }
-        oss << ")_   ";
-      }
-      if(a.qm_positions_write) {
-        if(a.qm_calculated==TRUE)  oss << "P *(";
-        if(a.qm_calculated==FALSE) oss << "P  (";
-        for(uint j=1;j<=3;j++) {
-          if(abs(a.qm_positions.at(iat)(j))<10.0) oss << " ";
-          if(!std::signbit(a.qm_positions.at(iat)(j))) oss << " ";
-          oss << a.qm_positions.at(iat)(j) << " ";
+        if(a.qm_forces_write) {
+          if(a.qm_calculated==TRUE)  oss << "F *(";
+          if(a.qm_calculated==FALSE) oss << "F  (";
+          for(uint j=1;j<=3;j++) {
+            if(abs(a.qm_forces.at(iat)(j))<10.0) oss << " ";
+            if(!std::signbit(a.qm_forces.at(iat)(j))) oss << " ";
+            oss << a.qm_forces.at(iat)(j) << " ";
+          }
+          oss << ")_   ";
         }
-        oss << ")_   ";
-      }
-      if(a.write_DEBUG_flag) {
-        oss << " s"<<a.atoms.at(iat).spin;
-        oss << " n"<<a.atoms.at(iat).number;
-        oss << " b"<<a.atoms.at(iat).basis;
-        oss << " N("<<a.atoms.at(iat).cleanname;
-        oss << " "<<a.atoms.at(iat).atomic_number<<" "<<" ["<<a.atoms.at(iat).type<<"] ";
-        oss << " ijk("<<a.atoms.at(iat).ijk(1)<<","<<a.atoms.at(iat).ijk(2)<<","<<a.atoms.at(iat).ijk(3)<<")";
-      }
-      oss << endl;oss.flush();
-    } // iat
+        if(a.qm_positions_write) {
+          if(a.qm_calculated==TRUE)  oss << "P *(";
+          if(a.qm_calculated==FALSE) oss << "P  (";
+          for(uint j=1;j<=3;j++) {
+            if(abs(a.qm_positions.at(iat)(j))<10.0) oss << " ";
+            if(!std::signbit(a.qm_positions.at(iat)(j))) oss << " ";
+            oss << a.qm_positions.at(iat)(j) << " ";
+          }
+          oss << ")_   ";
+        }
+        if(a.write_DEBUG_flag) {
+          oss << " s"<<a.atoms.at(iat).spin;
+          oss << " n"<<a.atoms.at(iat).number;
+          oss << " b"<<a.atoms.at(iat).basis;
+          oss << " N("<<a.atoms.at(iat).cleanname;
+          oss << " "<<a.atoms.at(iat).atomic_number<<" "<<" ["<<a.atoms.at(iat).type<<"] ";
+          oss << " ijk("<<a.atoms.at(iat).ijk(1)<<","<<a.atoms.at(iat).ijk(2)<<","<<a.atoms.at(iat).ijk(3)<<")";
+        }
+        oss << endl;oss.flush();
+      } // iat
+    } //DX20210610 - end Wyccar if-statement
     if(a.write_lattice_flag) {
       oss << "DIRECT LATTICE per raw" << endl;
       for(uint i=1;i<=3;i++) {
@@ -3387,7 +3440,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   // ----------------------------------------------------------------------
   //  CIF OUTPUT
   if(a.iomode==IOCIF) { // CIF
-    pflow::PrintCIF(oss, a, a.spacegroupnumber);
+    pflow::PrintCIF(oss, a, a.spacegroupnumber, a.setting_ITC); //DX20210630 - add setting (otherwise, this will mess up rhl systems by mixing the hex and rhl setting)
     return oss;
   }
 
@@ -4255,7 +4308,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }  //CO20180420 - check for missing lines
-    a.title=vinput.at(iline++);
+    //DX+ME20210525 [OBSOLETE - need to remove control code characters from input, important for web] a.title=vinput.at(iline++);
+    aurostd::RemoveControlCodeCharactersFromString(vinput[iline++],a.title); //DX+ME20210525 - need to remove control code characters from input, important for web
     // -------------- SCALE
     //    input >> a.scale;
     if(vinput.size()-1<iline) {
@@ -6346,8 +6400,21 @@ istream& operator>>(istream& cinput, xstructure& a) {
   if(LDEBUG) cerr << soliloquy << " WRAPPING [13]" << endl;
   // TOLERANCES ------------------------
   a.equiv_fpos_epsilon=_EQUIV_FPOS_EPS_; // standard but you can change
+  // SORT ATOMS (FALSE) -----------------------------
+  // AFLOW prefers alphabetic ordering; HOWEVER, sorting by default can cause
+  // issues for functions/processes outside of AFLOW (e.g., settings in INCAR).
+  // For now, it is safer to sort the atoms inside the particular AFLOW function
+  // where it is needed (e.g., symmetry and prototype functions).
+  // For readers/writers other than the VASP geometry file, we will always sort
+  // alphabetically. //DX+CO20210706
+  bool force_alphabetic_sorting=false;
+  if(force_alphabetic_sorting){
+    a.SpeciesPutAlphabetic();
+    std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames);
+  }
   // MAKE BASIS
   a.MakeBasis();
+  if(force_alphabetic_sorting){ a.MakeTypes(); } //DX+CO20210706
   // FLAGS -----------------------------
   a.Niggli_calculated=FALSE;
   a.Niggli_avoid=FALSE;
@@ -10377,6 +10444,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc, double sy
   // update tolerance info in *this
   (*this).sym_eps=tolerance;
   (*this).sym_eps_calculated=true;
+  double tolerance_orig=tolerance; //DX20210623
 
   // ---------------------------------------------------------------------------
   // loop over the real, reciprocal, and superlattice analysis until all
@@ -10399,7 +10467,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc, double sy
     // turn of scan
     if(count==count_max){
       no_scan=(*this).sym_eps_no_scan=true;
-      tolerance = sym_eps; // set to original eps
+      tolerance = tolerance_orig; // set to original tolerance //DX20210623 - originally sym_eps, but this could be AUROSTD_MAX_DOUBLE;
       cerr << function_name << " Unable to calculate consistent symmetry. Calculating at original tolerance (sym_eps=" << sym_eps << ") and ignoring consistency checks." << endl;
     }
 
@@ -17675,100 +17743,102 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
 
   vector<xvector<double> > translations;
 
-  double cell_volume_change = aurostd::abs(aurostd::det(basis_transformation));
+  //DX20210520 [OBSOLETE] double cell_volume_change = aurostd::abs(aurostd::det(basis_transformation));
 
-  if(LDEBUG){ cerr << function_name << " changed in cell volume from basis transformation: " << cell_volume_change << endl; }
+  //DX20210520 [OBSOLETE] if(LDEBUG){ cerr << function_name << " changed in cell volume from basis transformation: " << cell_volume_change << endl; }
 
   // ---------------------------------------------------------------------------
   // check if the basis transformation makes the cell larger and find
   // corresponding internal translations
-  if(cell_volume_change-1.0>_AUROSTD_XSCALAR_TOLERANCE_INTEGER_){
+  // DX20210520 - DO NOT EXCLUDE BASED ON DETERMINANT
+  // It is possible to stretch in one direction and compress in another and still
+  // get determinant=1 (e.g., POCC structures)
+  //DX20210520 [OBSOELTE] if(cell_volume_change-1.0>_AUROSTD_XSCALAR_TOLERANCE_INTEGER_){}
 
-    if(LDEBUG){ cerr << function_name << " cell size increases. Finding internal translations." << endl; }
+  if(LDEBUG){ cerr << function_name << " cell size increases. Finding internal translations." << endl; }
 
-    // ---------------------------------------------------------------------------
-    // get inverse matrix (Q)
-    xmatrix<double> inverse_transform = aurostd::inverse(basis_transformation);
+  // ---------------------------------------------------------------------------
+  // get inverse matrix (Q)
+  xmatrix<double> inverse_transform = aurostd::inverse(basis_transformation);
 
-    // ---------------------------------------------------------------------------
-    // to get translations take the "larger cell" in fractional coordinates
-    // and perform the inverse operation (Q) to see how small it gets,
-    // then these are the internal translations
-    xmatrix<double> lattice_frac = aurostd::eye<double>(3,3);
-    xmatrix<double> lattice_shrink = inverse_transform*lattice_frac;
+  // ---------------------------------------------------------------------------
+  // to get translations take the "larger cell" in fractional coordinates
+  // and perform the inverse operation (Q) to see how small it gets,
+  // then these are the internal translations
+  xmatrix<double> lattice_frac = aurostd::eye<double>(3,3);
+  xmatrix<double> lattice_shrink = inverse_transform*lattice_frac;
 
-    if(LDEBUG){ cerr << function_name << " shrunken lattice: " << lattice_shrink << endl; }
+  if(LDEBUG){ cerr << function_name << " shrunken lattice: " << lattice_shrink << endl; }
 
-    // ---------------------------------------------------------------------------
-    // Now that we have the shortest internal translations from lattice shrink
-    // (forms a basis), we need to find all the internal translations inside this
-    // cell via linear combinations of this basis.
-    // To determine how many combinations we need (i.e. how far to expand), we can
-    // use LatticeDimensionSphere(). Since lattice_shrink is in fractional
-    // coordinates, we need to find the necessary dimensions in each direction
-    // to fill the cell (i.e., the unit box). //DX20210111
-    xvector<int> dims=LatticeDimensionSphere(lattice_shrink,1.0);
-    if(LDEBUG){ cerr << function_name << " number of times to apply each internal translation: " << dims[1] << "," << dims[2] << "," << dims[3] << endl; }
+  // ---------------------------------------------------------------------------
+  // Now that we have the shortest internal translations from lattice shrink
+  // (forms a basis), we need to find all the internal translations inside this
+  // cell via linear combinations of this basis.
+  // To determine how many combinations we need (i.e. how far to expand), we can
+  // use LatticeDimensionSphere(). Since lattice_shrink is in fractional
+  // coordinates, we need to find the necessary dimensions in each direction
+  // to fill the cell (i.e., the unit box). //DX20210111
+  xvector<int> dims=LatticeDimensionSphere(lattice_shrink,1.0);
+  if(LDEBUG){ cerr << function_name << " number of times to apply each internal translation: " << dims[1] << "," << dims[2] << "," << dims[3] << endl; }
 
-    // ---------------------------------------------------------------------------
-    // create all linear combinations of translations, filter out duplicates later
-    xvector<double> a_vec=lattice_shrink(1);
-    xvector<double> b_vec=lattice_shrink(2);
-    xvector<double> c_vec=lattice_shrink(3);
-    xvector<double> a_vec_scaled, b_vec_scaled, c_vec_scaled;
-    for(int a=0;a<dims[1];a++){
-      a_vec_scaled = (double)a*a_vec;
-      translations.push_back(a_vec_scaled);
-      for(int b=0;b<dims[2];b++){
-        b_vec_scaled = (double)b*b_vec;
-        translations.push_back(b_vec_scaled);
-        translations.push_back(a_vec_scaled+b_vec_scaled);
-        for(int c=0;c<dims[3];c++){
-          c_vec_scaled = (double)c*c_vec;
-          translations.push_back(c_vec_scaled);
-          translations.push_back(a_vec_scaled+c_vec_scaled);
-          translations.push_back(b_vec_scaled+c_vec_scaled);
-          translations.push_back(a_vec_scaled+b_vec_scaled+c_vec_scaled);
-        }
+  // ---------------------------------------------------------------------------
+  // create all linear combinations of translations, filter out duplicates later
+  xvector<double> a_vec=lattice_shrink(1);
+  xvector<double> b_vec=lattice_shrink(2);
+  xvector<double> c_vec=lattice_shrink(3);
+  xvector<double> a_vec_scaled, b_vec_scaled, c_vec_scaled;
+  for(int a=0;a<=dims[1];a++){ //DX20210506 - need <=
+    a_vec_scaled = (double)a*a_vec;
+    translations.push_back(a_vec_scaled);
+    for(int b=0;b<=dims[2];b++){ //DX20210506 - need <=
+      b_vec_scaled = (double)b*b_vec;
+      translations.push_back(b_vec_scaled);
+      translations.push_back(a_vec_scaled+b_vec_scaled);
+      for(int c=0;c<=dims[3];c++){ //DX20210506 - need <=
+        c_vec_scaled = (double)c*c_vec;
+        translations.push_back(c_vec_scaled);
+        translations.push_back(a_vec_scaled+c_vec_scaled);
+        translations.push_back(b_vec_scaled+c_vec_scaled);
+        translations.push_back(a_vec_scaled+b_vec_scaled+c_vec_scaled);
       }
     }
-
-    if(LDEBUG){
-      cerr << function_name << " # translations:" << translations.size() << endl;
-      for(uint t=0;t<translations.size();t++){
-        cerr << function_name << " translations:" << translations[t] << endl;
-      }
-    }
-
-    // ---------------------------------------------------------------------------
-    // filter out unique translations 
-    vector<xvector<double> > unique_translations;
-    bool unique = true;
-    for(uint t=0;t<translations.size();t++){
-      xvector<double> translation_incell = BringInCell(translations[t]);
-      unique = true;
-      for(uint u=0;u<unique_translations.size() && unique ;u++){
-        unique = !(aurostd::isequal(translation_incell,unique_translations[u]));
-      }
-      if(unique){ unique_translations.push_back(translation_incell); }
-    }
-
-    if(LDEBUG){
-      cerr << function_name << " # unique_translations:" << unique_translations.size() << endl;
-      for(uint t=0;t<unique_translations.size();t++){
-        cerr << function_name << " unique_translations:" << unique_translations[t] << endl;
-      }
-    }
-    translations = unique_translations;
   }
+
+  if(LDEBUG){
+    cerr << function_name << " # translations:" << translations.size() << endl;
+    for(uint t=0;t<translations.size();t++){
+      cerr << function_name << " translations:" << translations[t] << endl;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // filter out unique translations 
+  vector<xvector<double> > unique_translations;
+  bool unique = true;
+  for(uint t=0;t<translations.size();t++){
+    xvector<double> translation_incell = BringInCell(translations[t]);
+    unique = true;
+    for(uint u=0;u<unique_translations.size() && unique ;u++){
+      unique = !(aurostd::isequal(translation_incell,unique_translations[u]));
+    }
+    if(unique){ unique_translations.push_back(translation_incell); }
+  }
+
+  if(LDEBUG){
+    cerr << function_name << " # unique_translations:" << unique_translations.size() << endl;
+    for(uint t=0;t<unique_translations.size();t++){
+      cerr << function_name << " unique_translations:" << unique_translations[t] << endl;
+    }
+  }
+  translations = unique_translations;
+
   // ---------------------------------------------------------------------------
   // if the cell size remains the same or shrinks, no internal translations
-  else{
-    // use null vector
-    if(LDEBUG){ cerr << function_name << " cell size remains the same or reduced. No internal translations." << endl; }
-    xvector<double> zero_xvector;
-    translations.push_back(zero_xvector);
-  }
+  //DX20210520 [OBSOELTE] else{}
+  //DX20210520 [OBSOELTE]  // use null vector
+  //DX20210520 [OBSOELTE]  if(LDEBUG){ cerr << function_name << " cell size remains the same or reduced. No internal translations." << endl; }
+  //DX20210520 [OBSOELTE]  xvector<double> zero_xvector;
+  //DX20210520 [OBSOELTE]  translations.push_back(zero_xvector);
   return translations;
 }
 

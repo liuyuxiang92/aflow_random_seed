@@ -8289,7 +8289,7 @@ namespace pflow{
       for(uint i=0;i<=nsteps;i++){ tolerance_spectrum.push_back(start+((double)i*interval)); }
     }
     else{
-      message << "Expected three inputs: first=range_start, second=range_end, third=nsteps.";
+      message << "Expected three inputs: first=range_start:second=range_end:third=nsteps.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
 

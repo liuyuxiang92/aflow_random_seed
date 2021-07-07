@@ -293,7 +293,7 @@ namespace SYM {
 namespace SYM { 
   double defaultTolerance(const xstructure& xstr){
     double min_dist = xstr.dist_nn_min; //CO20180409
-    if(min_dist == AUROSTD_NAN){min_dist=SYM::minimumDistance(xstr);} //CO20180409
+    if(min_dist == AUROSTD_NAN || min_dist == AUROSTD_MAX_DOUBLE){min_dist=SYM::minimumDistance(xstr);} //CO20180409 //DX20210615 - add AUROSTD_MAX_DOUBLE
     //if(xstr.dist_nn_min == AUROSTD_NAN){xstr.MinDist();}  //CO20180409
     //min_dist = xstr.dist_nn_min; //CO20180409
     double tolerance = min_dist/100.0;
@@ -8940,6 +8940,8 @@ bool KBIN_StepSymmetryPerform(xstructure& a,string AflowIn,ofstream &FileMESSAGE
   return KBIN_StepSymmetryPerform_20161205(a,AflowIn,FileMESSAGE,aflags,kflags,osswrite,oss);
 }
 bool KBIN_StepSymmetryPerform_20161205(xstructure& a,string AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,const bool& osswrite,ostream& oss) {
+  string function_name = XPID + "KBIN_StepSymmetryPerform():"; //DX20210703
+  stringstream message; //DX20210703
   ostringstream aus;
   bool Krun=TRUE;
   if(aurostd::substring2bool(AflowIn,"[AFLOW_SYMMETRY]CALC",TRUE)) {
@@ -8961,9 +8963,21 @@ bool KBIN_StepSymmetryPerform_20161205(xstructure& a,string AflowIn,ofstream &Fi
     kflags.KBIN_SYMMETRY_PGROUPK_PATTERSON_WRITE=TRUE; //DX20200129
     kflags.KBIN_SYMMETRY_IATOMS_WRITE=TRUE;
     kflags.KBIN_SYMMETRY_AGROUP_WRITE=TRUE;
+    // calculate the symmetry operations
+    message << "Calculating the full set of symmetry operations."; //DX20210703
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_); //DX20210703
     Krun=(Krun && pflow::PerformFullSymmetry(a,kflags.KBIN_SYMMETRY_EPS,kflags.KBIN_SYMMETRY_NO_SCAN,true,FileMESSAGE,aflags,kflags,osswrite,oss));
+    message << "Finished calculating the full set of symmetry operations."; //DX20210703
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_); //DX20210703
   }
-  if(a.bravais_lattice_type.empty()){a.GetRealLatticeType();} //CO+DX20210616 - needed for AEL/AGL
+  if(a.bravais_lattice_type.empty()){
+    // calculate the lattice type/variation
+    message << "Calculating the lattice information (type, variation, etc.). This may take some time, please be patient."; //DX20210703
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_); //DX20210703
+    a.GetRealLatticeType(); //CO+DX20210616 - needed for AEL/AGL
+    message << "Finished calculating the lattice information."; //DX20210703
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_); //DX20210703
+  }
   return Krun;
 }
 //DX+CO END
