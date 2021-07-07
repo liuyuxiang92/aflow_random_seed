@@ -117,7 +117,7 @@ bool SchemaTest(ofstream& FileMESSAGE,ostream& oss) {
 
 bool CeramGenTest(ostream& oss){ofstream FileMESSAGE;return CeramGenTest(FileMESSAGE,oss);}  //CO20190520
 bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
-  string soliloquy="CeramGenTest():";
+  string soliloquy=XPID+"CeramGenTest():";
   //bool LDEBUG=TRUE; // TRUE;
   stringstream message;
   _aflags aflags;aflags.Directory=".";
@@ -170,7 +170,7 @@ bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
 }
 bool EgapTest(ostream& oss){ofstream FileMESSAGE;return EgapTest(FileMESSAGE,oss);}  //CO20190520
 bool EgapTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
-  string soliloquy="EgapTest():";
+  string soliloquy=XPID+"EgapTest():";
   bool LDEBUG=TRUE; // TRUE;
   stringstream message;
   _aflags aflags;aflags.Directory=".";
@@ -463,7 +463,7 @@ bool coordinationTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
 
 bool PrototypeGeneratorTest(ostream& oss, bool check_symmetry, bool check_uniqueness){ofstream FileMESSAGE;return PrototypeGeneratorTest(FileMESSAGE,oss,check_symmetry,check_uniqueness);} //DX20200925
 bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmetry, bool check_uniqueness){  //DX20200925
-  string function_name="PrototypeGeneratorTest():";
+  string function_name=XPID+"PrototypeGeneratorTest():";
   bool LDEBUG=FALSE; // TRUE;
   stringstream message;
   _aflags aflags;aflags.Directory=aurostd::getPWD();
@@ -564,7 +564,7 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmet
 
 bool FoldAtomsInCellTest(ostream& oss){ofstream FileMESSAGE;return FoldAtomsInCellTest(FileMESSAGE,oss);} //DX20210129
 bool FoldAtomsInCellTest(ofstream& FileMESSAGE,ostream& oss){ //DX20210129
-  string function_name="FoldAtomsInCellTest():";
+  string function_name=XPID+"FoldAtomsInCellTest():";
   //bool LDEBUG=FALSE; // TRUE;
   stringstream message;
   _aflags aflags;aflags.Directory=aurostd::getPWD();

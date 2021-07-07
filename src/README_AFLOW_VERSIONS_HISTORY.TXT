@@ -1,3 +1,26 @@
+3.2.11 - 2021/XX/XX
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.11.tar.xz
+        -- added plotter options for QHA (AS)
+        -- fixed bug in range for GetBasisTransformationInternalTranslations() (DX)
+        -- fixed coordination matching when comparing environments (DX)
+        -- fixed bug in JSON printing of equivalent atom decorations (DX)
+        -- fixed INCAR-MAGMOM reader for crystal-spin analysis in symmetry and XtalFinder (DX)
+        -- fixed bug in internal translations with TransformStructures() to consider compression in one direction and expansion in another (DX)
+        -- fixed web printing in edata/sgdata; prevent mixing of txt and json outputs (DX)
+        -- remove control code characters from title line in geometry file (needed for web) (DX+ME)
+        -- added --Wyckoff functionality (--print=txt|json and --web) (DX)
+        -- added R. Friedrich prototype (DX+RF)
+        -- moved/improved Wyccar writier to geometry file printer function (DX)
+        -- updated README_AFLOW_SYM.TXT: added lattice data commands, tolerance spectrum, etc. (DX)
+        -- added new options to the Pearson symbol command: tolerance, magnetic moment, tolerance spectrum, etc. (DX)
+        -- updated README_AFLOW_COMPARE.TXT (DX)
+        -- added aliases to symmetry commands (e.g., --sg, --space_group_number, etc.) (DX)
+        -- fixed tolerance spectrum delimiter (colon to comma) (DX)
+        -- updated AFLUX call via AFLOW; uses new API route (DX)
+        -- updated space group queries via AFLUX in the XtalFinder routines (DX)
+        -- Made string search in database case insensitive (ME)
+        -- Supressed file output for interstitials calculation in web mode (ME)
+        -- added command line plotting functionality for POCC runs using --plot_dos (CO)
 3.2.10 - 2021/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.10.tar.xz
         -- fixed bug in GetPrimitive() function, use more robust volume check (DX)

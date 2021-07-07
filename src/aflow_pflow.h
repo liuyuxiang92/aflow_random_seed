@@ -368,6 +368,7 @@ namespace pflow {
   bool SHIRLEY(vector<string>,istream& input);
   bool SHIRLEY2(vector<string>,istream& input);
   string PEARSON_SYMBOL(istream& input);
+  string PEARSON_SYMBOL(istream& input,const aurostd::xoption& vpflow); //DX20210611 - added vpflow
   bool POCCUPATION(vector<string>,istream& input);
   void PDB(istream& input);
   void PDOS(vector<string>);
@@ -445,7 +446,7 @@ namespace pflow {
   void SUPERCELLSTRLIST(const string& options);
   xstructure xstrSWAP(vector<string>, istream& input);
   xstructure VOLUME(const string& options, istream& input);
-  string WYCCAR(aurostd::xoption& vpflow,istream& input); //DX20180807 - added wyccar to pflow
+  string WyckoffPositions(aurostd::xoption& vpflow,istream& input); //DX20180807 - added wyccar to pflow //DX20210525 - changed name and generalized function
   xstructure WYCKOFF(vector<string>,istream& input);
   void XRAY(const string& options,istream& input);
   void XRAY_PEAKS(const aurostd::xoption& vpflow,istream& input); //CO20190409
@@ -514,6 +515,7 @@ namespace pflow {
   void PrintGulp(const xstructure&,ostream& oss=cout);
   string PrintSGData(xstructure& xstr, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1, bool supress_Wyckoff=false); //DX20210211
   string PrintSGData(xstructure& xstr, aurostd::xoption& vpflow, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1, bool suppress_Wyckoff=false); //DX20210211
+  string PrintWyckoffData(xstructure& xstr, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1); //DX20210610
   //DX20210301 [OBSOLETE] bool PrintSGData(xstructure& str_sg,ostream& oss,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20170830 - SGDATA
   //DX20210301 [OBSOLETE] bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss,bool no_scan=false,int setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180226 - added & to tolerance
   //DX20210301 [OBSOLETE] bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss_final,aurostd::xoption& vpflow,bool no_scan=false,int sg_setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180822
