@@ -1279,9 +1279,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE] vpflow.flag("SG::AFLOW",aurostd::args2flag(argv,cmds,"--aflowSG") && argv.at(1)=="--aflowSG");
   // [OBSOLETE] vpflow.flag("SG::AFLOW_LABEL",aurostd::args2flag(argv,cmds,"--aflowSG_label") && argv.at(1)=="--aflowSG_label");
   // [OBSOLETE] vpflow.flag("SG::AFLOW_NUMBER",aurostd::args2flag(argv,cmds,"--aflowSG_number|--aflowSGn|--aflowSGN") && argv.at(1)=="--aflowSG_number");
-  vpflow.args2addattachedscheme(argv,cmds,"SG::AFLOW","--aflowSG=|--space_group=|--sg=",""); //DX20210611 - added aliases
-  vpflow.args2addattachedscheme(argv,cmds,"SG::AFLOW_LABEL","--aflowSG_label=|--space_group_label=|--sg_label=",""); //DX20210611 - added aliases
-  vpflow.args2addattachedscheme(argv,cmds,"SG::AFLOW_NUMBER","--aflowSG_number=|--space_group_number=|--sg_number=",""); //DX20210611 - added aliases
+  if(!vpflow.flag("LIST_PROTOTYPE_LABELS")){ //DX20210708 - protect against other commands
+    vpflow.args2addattachedscheme(argv,cmds,"SG::AFLOW","--aflowSG=|--space_group=|--sg=",""); //DX20210611 - added aliases
+    vpflow.args2addattachedscheme(argv,cmds,"SG::AFLOW_LABEL","--aflowSG_label=|--space_group_label=|--sg_label=",""); //DX20210611 - added aliases
+    vpflow.args2addattachedscheme(argv,cmds,"SG::AFLOW_NUMBER","--aflowSG_number=|--space_group_number=|--sg_number=",""); //DX20210611 - added aliases
+  }
   //DX20170926 - Create flags for SG functions - START
   if(vpflow.flag("SG::AFLOW") || vpflow.flag("SG::AFLOW_LABEL") || vpflow.flag("SG::AFLOW_NUMBER")){
     vpflow.flag("SG::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
