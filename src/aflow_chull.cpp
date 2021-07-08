@@ -1720,7 +1720,7 @@ namespace chull {
 
     // first index is used for the start_vector, therefore the angle is set to 0.0
     angle_list[1] = 0;
-    index_list[1] = 0;
+    index_list[1] = facet[0];
     for (uint i=1; i<num_points; i++){
       const xvector<double> next_vector = m_points[facet[i]].m_coords - center;
       const double dot = aurostd::scalar_product(start_vector, next_vector);
