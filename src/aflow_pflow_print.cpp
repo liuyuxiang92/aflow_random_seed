@@ -3609,10 +3609,15 @@ namespace pflow {
           }
         }
         ss_output << "WYCCAR" << endl;
-        int iomode_orig = str_sg.iomode; //DX20210621 - store original iomode
-        str_sg.iomode = IOVASP_WYCKCAR; //DX20210621
-        ss_output << str_sg; //DX20210621
-        str_sg.iomode = iomode_orig; //DX20210621 - revert to original iomode
+        // ---------------------------------------------------------------------------
+        // expanded form of WYCCAR (i.e., poscar, not just the wyccar) //DX20210708
+        xvector<double> data = Getabc_angles(str_sg.standard_lattice_ITC,DEGREES);
+        xstructure str_expanded = WyckoffPOSITIONS(str_sg.space_group_ITC, str_sg.setting_ITC, str_sg);
+        str_expanded.lattice=str_sg.standard_lattice_ITC;
+        str_expanded.ReScale(1.0);
+        str_expanded.neg_scale=FALSE;
+        str_expanded.iomode = IOVASP_POSCAR;
+        ss_output << str_expanded;
         //DX20210621 [OBSOLETE] convert vector<string> of WYCCAR to xstructure
         //DX20210621 [OBSOLETE] stringstream wss;
         //DX20210621 [OBSOLETE] for(uint i=0;i<str_sg.wyccar_ITC.size();i++){
