@@ -1477,7 +1477,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     //DX20180807 - added more wyccar flags (--usage, --no_scan, setting, --magmom) - START
     vpflow.flag("WYCKOFF_POSITIONS::USAGE",aurostd::args2flag(argv,cmds,"--usage|--USAGE"));
     vpflow.flag("WYCKOFF_POSITIONS::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
-    vpflow.flag("WYCKOFF_POSITIONS::PRINT_WYCCAR",aurostd::args2flag(argv,cmds,"--wyccar")); //DX20210525 - treat wyccar as a special way of printing
+    vpflow.args2addattachedscheme(argv,cmds,"WYCKOFF_POSITIONS::PRINT_WYCCAR","--wyccar=",""); //DX20210525 - treat wyccar as a special way of printing //DX20210708 - needs to be args2addattachedscheme to account for possible tolerance input
     vpflow.flag("WYCKOFF_POSITIONS::PRINT_LETTERS_ONLY",aurostd::args2flag(argv,cmds,"--letters_only"));
     vpflow.flag("WYCKOFF_POSITIONS::PRINT_SITE_SYMMETRIES_ONLY",aurostd::args2flag(argv,cmds,"--site_symmetries_only"));
     vpflow.flag("WYCKOFF_POSITIONS::PRINT_MULTIPLICITIES_ONLY",aurostd::args2flag(argv,cmds,"--multiplicities_only"));
