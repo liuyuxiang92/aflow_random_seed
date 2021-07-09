@@ -17,11 +17,11 @@
 
 // ***************************************************************************
 int MiscibilityCheck(string system_in) {  // (nomix,unknown,mix)
-string system=system_in;vector<string> vspecies;
- // XATOM_SplitAlloySpecies(KBIN::VASP_PseudoPotential_CleanName(system_in),vspecies);
-XATOM_AlphabetizationSpecies(system,vspecies);
-if(system.find("Cs")!=string::npos) return MISCIBILITY_SYSTEM_NOMIX; // Cs bug !
-if(vspecies.size()==1) return MISCIBILITY_SYSTEM_MISCIBLE; // pure element is miscible with itself
+  string system=system_in;vector<string> vspecies;
+  // XATOM_SplitAlloySpecies(KBIN::VASP_PseudoPotential_CleanName(system_in),vspecies);
+  XATOM_AlphabetizationSpecies(system,vspecies);
+  if(system.find("Cs")!=string::npos) return MISCIBILITY_SYSTEM_NOMIX; // Cs bug !
+  if(vspecies.size()==1) return MISCIBILITY_SYSTEM_MISCIBLE; // pure element is miscible with itself
   if(system=="AgAl") return MISCIBILITY_SYSTEM_MISCIBLE; // AgAl calcs=1050/200 elements=47,13 [2014-01-14]
   if(system=="AgAs") return MISCIBILITY_SYSTEM_NOMIX; // AgAs calcs=257/200 elements=47,33 [2014-01-14]
   if(system=="AgAu") return MISCIBILITY_SYSTEM_MISCIBLE; // AgAu calcs=294/200 elements=47,79 [2014-01-14]
@@ -1547,7 +1547,7 @@ if(vspecies.size()==1) return MISCIBILITY_SYSTEM_MISCIBLE; // pure element is mi
 // Extracted in date  [date=2014-01-14]
 // ***************************************************************************
 #endif 
- 
+
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2021           *
