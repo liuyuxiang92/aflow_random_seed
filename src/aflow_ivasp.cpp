@@ -42,7 +42,7 @@ namespace KBIN {
           cerr << "xstr.species_pp[" << i << "]=" << xvasp.str.species_pp[i] << endl;
         }
       }
-      convertPOSCARFormat(xvasp, kflags); //ME20190220
+      convertPOSCARFormat(xvasp, aflags, kflags); //ME20190220
     } //CT20180719
     if(Krun) Krun=(Krun && KBIN::VASP_Produce_KPOINTS(xvasp,AflowIn,FileMESSAGE,aflags,kflags,vflags));
     return Krun;
@@ -1753,28 +1753,58 @@ namespace KBIN {
   //ME20200114 - Throw a warning when the version could not be determined and
   // leave as is. Aborting is not desirable for instances where VASP does not
   // need to be run (e.g. post-processing).
-  void convertPOSCARFormat(_xvasp& xvasp, const _kflags& kflags) {
-    string vaspVersion = getVASPVersionNumber(kflags.KBIN_BIN); //CO20200610
-    if (vaspVersion.empty()) {
-      string function = "KBIN::convertPOSCARFormat()";
+  //CO20210713 - fixing for all the machines with aflags
+  void convertPOSCARFormat(_xvasp& xvasp, const _aflags& aflags, const _kflags& kflags) {
+    bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
+    string soliloquy=XPID+"KBIN::convertPOSCARFormat()";
+    string vasp_path_full=kflags.KBIN_BIN;
+    if(kflags.KBIN_MPI){  //CO20210713 - adding all the machine information
+      vasp_path_full=kflags.KBIN_MPI_BIN;
+      if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH")) {vasp_path_full=MPI_BINARY_DIR_DUKE_BETA_MPICH+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_OPENMPI")) {vasp_path_full=MPI_BINARY_DIR_DUKE_BETA_OPENMPI+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QRATS_MPICH")) {vasp_path_full=MPI_BINARY_DIR_DUKE_QRATS_MPICH+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QFLOW_OPENMPI")) {vasp_path_full=MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_X")) {vasp_path_full=MPI_BINARY_DIR_DUKE_X+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) {vasp_path_full=MPI_BINARY_DIR_MPCDF_EOS+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO")) {vasp_path_full=MPI_BINARY_DIR_MPCDF_DRACO+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA")) {vasp_path_full=MPI_BINARY_DIR_MPCDF_COBRA+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_HYDRA")) {vasp_path_full=MPI_BINARY_DIR_MPCDF_HYDRA+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) {vasp_path_full=MPI_BINARY_DIR_MACHINE001+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) {vasp_path_full=MPI_BINARY_DIR_MACHINE002+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE003")) {vasp_path_full=MPI_BINARY_DIR_MACHINE003+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) {vasp_path_full=MPI_BINARY_DIR_DUKE_MATERIALS+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_AFLOWLIB")) {vasp_path_full=MPI_BINARY_DIR_DUKE_AFLOWLIB+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_HABANA")) {vasp_path_full=MPI_BINARY_DIR_DUKE_HABANA+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::FULTON_MARYLOU")) {vasp_path_full=MPI_BINARY_DIR_FULTON_MARYLOU+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) {vasp_path_full=MPI_BINARY_DIR_CMU_EULER+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::OHAD")) {vasp_path_full=MPI_BINARY_DIR_MACHINE2+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::HOST1")) {vasp_path_full=MPI_BINARY_DIR_MACHINE1+kflags.KBIN_MPI_BIN;}
+    }
+    if(LDEBUG){cerr << soliloquy << " vasp_path_full=" << vasp_path_full << endl;}
+    double vaspVersion = getVASPVersionDouble(vasp_path_full); //CO20200610
+    if(LDEBUG){cerr << soliloquy << " vaspVersion=" << vaspVersion << endl;}
+    if (aurostd::isequal(vaspVersion,0.0)) {  //CO20210713
       stringstream message;
       message << "Could not determine VASP version " << kflags.KBIN_BIN << "." << " POSCAR may have the wrong format.";
-      pflow::logger(_AFLOW_FILE_NAME_, function, message, std::cout, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, std::cout, _LOGGER_WARNING_);
       return;
     }
-    int vaspv = vaspVersion[0] - '0';
-    if ((vaspv == 4) && !xvasp.str.is_vasp4_poscar_format) {
+    if ((vaspVersion<5.0) && !xvasp.str.is_vasp4_poscar_format) { //CO20210713
+      if(LDEBUG){cerr << soliloquy << " converting POSCAR to vasp4 format" << endl;}
       xvasp.str.is_vasp4_poscar_format = true;
       xvasp.str.is_vasp5_poscar_format = false;
       aurostd::StringstreamClean(xvasp.POSCAR);
       xvasp.POSCAR.clear();
       xvasp.POSCAR << xvasp.str;
-    } else if ((vaspv == 5) && !xvasp.str.is_vasp5_poscar_format) {
+      if(LDEBUG){cerr << soliloquy << " xvasp.POSCAR=" << endl << xvasp.POSCAR.str() << endl;}
+    } else if ((vaspVersion>=5.0) && !xvasp.str.is_vasp5_poscar_format) { //CO20210713
+      if(LDEBUG){cerr << soliloquy << " converting POSCAR to vasp5 format" << endl;}
       xvasp.str.is_vasp4_poscar_format = false;
       xvasp.str.is_vasp5_poscar_format = true;
       aurostd::StringstreamClean(xvasp.POSCAR);
       xvasp.POSCAR.clear();
       xvasp.POSCAR << xvasp.str;
+      if(LDEBUG){cerr << soliloquy << " xvasp.POSCAR=" << endl << xvasp.POSCAR.str() << endl;}
     }
   }
 

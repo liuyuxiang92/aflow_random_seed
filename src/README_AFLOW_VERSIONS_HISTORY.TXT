@@ -69,6 +69,7 @@
         -- patched KBIN::VASP_Reread_POSCAR(), added aurostd::StringstreamClean() around (CO)
         -- consolidating PARAMS->xvasp conversion in avasp (CO)
         -- adding aurostd::round() (CO)
+        -- patching convertPOSCARFormat() for different machine inputs (CO)
 3.2.10 - 2021/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.10.tar.xz
         -- fixed bug in GetPrimitive() function, use more robust volume check (DX)
