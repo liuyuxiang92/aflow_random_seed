@@ -903,11 +903,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   }
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_BANDSPINSPLIT","--plotband_spinsplit=|--plot_band_spin_split=|--plotbands_spinsplit=|--plot_bands_spin_split=","./");
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_BAND2","--plotband2=|--plot_band2=|--plotbands2=|--plot_bands2=","./");
-  if (aurostd::args2flag(argv, cmds, "--plotbanddos|--plotbandsdos|--plot_band_dos|--plot_bands_dos")) {
+  if (aurostd::args2flag(argv, cmds, "--plotbanddos|--plotbandsdos|--plot_band_dos|--plot_bands_dos|  --plotdosband|--plotdosbands|--plot_dos_band|--plot_dos_bands")) {  //CO20210712
     vpflow.flag("PLOT_BANDDOS", true);
     vpflow.addattachedscheme("PLOT_BANDDOS", "./", true);
   } else {
-    vpflow.args2addattachedscheme(argv,cmds,"PLOT_BANDDOS","--plotbanddos=|--plotbandsdos|--plot_band_dos=|--plot_bands_dos","./");  //ME20190614
+    vpflow.args2addattachedscheme(argv,cmds,"PLOT_BANDDOS","--plotbanddos=|--plotbandsdos=|--plot_band_dos=|--plot_bands_dos=|--plotdosband=|--plotdosbands=|--plot_dos_band=|--plot_dos_bands=","./");  //ME20190614  //CO20210712
   }
   if (aurostd::args2flag(argv, cmds, "--plotdos|--plot_dos")) {
     vpflow.flag("PLOT_DOS", true);
