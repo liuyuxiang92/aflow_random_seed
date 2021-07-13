@@ -221,7 +221,7 @@ class _Three_Species_Plotter:
                 'a': np.array(As),
                 'b': np.array(Bs),
                 'c': np.array(Cs),
-                'text': ["""<a href="{}/">{}</a>""".format(urls[i], c_name[i]) for i in range(len(urls))],
+                'text': ["""<a href="{}">{}</a>""".format(urls[i], c_name[i]) for i in range(len(urls))],
                 'hoverlabel': dict(bgcolor='black'),
                 'marker': dict(
                 size = 7,

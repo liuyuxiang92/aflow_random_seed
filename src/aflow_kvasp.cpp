@@ -1821,7 +1821,8 @@ namespace KBIN {
         if(Krun && kflags.KBIN_QSUB_MODE2) Krun=(Krun && KBIN::QSUB_Extract_Mode2(xvasp.xqsub,FileMESSAGE,aflags,kflags));
         if(Krun && kflags.KBIN_QSUB_MODE3) Krun=(Krun && KBIN::QSUB_Extract_Mode3(xvasp.xqsub,FileMESSAGE,aflags,kflags));
       }
-      if(Krun && vflags.KBIN_VASP_FORCE_OPTION_SKIP_NOMIX.isentry) {
+      //ME20210709 [OBSOLETE] if(Krun && vflags.KBIN_VASP_FORCE_OPTION_SKIP_NOMIX.isentry) { //ME20210709 - Throws an error with --genertate_aflowin_only because it does not populate the POTCARs, so the miscibility check fails.
+      if(Krun && !XHOST.GENERATE_AFLOWIN_ONLY && vflags.KBIN_VASP_FORCE_OPTION_SKIP_NOMIX.isentry) { //ME20210709 - For now, skip check if generate_aflowin_only. In the future, the elements (not the pseudopotentials) need to be grabbed from the aflow.in
         string potentials=xvasp.POTCAR_POTENTIALS.str();
         if(!aurostd::substring2bool(aurostd::CleanFileName(xvasp.Directory+"/"),"/1/") &&
             !aurostd::substring2bool(aurostd::CleanFileName(xvasp.Directory+"/"),"/2/") &&
