@@ -918,7 +918,7 @@ namespace aflowlib {
         else if(keyword=="bader_atomic_volumes") {bader_atomic_volumes=content;aurostd::string2tokens<double>(content,vbader_atomic_volumes,",");}
       }
     }
-    //ME20190129 - FIX vLDAU
+    //ME20190129 - FIX vLDAU //CO20210713 - there's only 1 type, but the number is repeated for the number of species
     if (vLDAU[0].size()) vLDAU[0].assign(vLDAU[1].size(), vLDAU[0][0]);
     // FIX LOOP
     loop="";
@@ -1236,15 +1236,11 @@ namespace aflowlib {
       if(species_pp_AUID.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "species_pp_AUID=" << species_pp_AUID << eendl;
       if(METAGGA.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "metagga=" << METAGGA << eendl;
       //ME20190124 - add more detailed LDAU information
-      if(ldau_TLUJ.size()) {
-        //ME20190124 BEGIN
-        sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_type=" << vLDAU[0][0] << eendl;
-        sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_l=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[1], 0), ",") << eendl;
-        sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_u=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[2], 9), ",") << eendl;
-        sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_j=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[3], 9), ",") << eendl;
-        //ME20190124 END
-        sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_TLUJ=" << ldau_TLUJ << eendl;
-      }
+      if(vLDAU.size()>0 && vLDAU[0].size()>0){sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_type=" << vLDAU[0][0] << eendl;} //ME20190124  //CO20210713
+      if(vLDAU.size()>1 && vLDAU[1].size()>0){sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_l=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[1], 0), ",") << eendl;}  //ME20190124  //CO20210713
+      if(vLDAU.size()>2 && vLDAU[2].size()>0){sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_u=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[2], 9), ",") << eendl;}  //ME20190124  //CO20210713
+      if(vLDAU.size()>3 && vLDAU[3].size()>0){sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_j=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[3], 9), ",") << eendl;}  //ME20190124  //CO20210713
+      if(ldau_TLUJ.size()) {sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_TLUJ=" << ldau_TLUJ << eendl;} //ME20190124  //CO20210713
       if(valence_cell_iupac!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "valence_cell_iupac=" << valence_cell_iupac << eendl;
       if(valence_cell_std!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "valence_cell_std=" << valence_cell_std << eendl;
       if(volume_cell!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "volume_cell=" << volume_cell << eendl;
@@ -1730,7 +1726,7 @@ namespace aflowlib {
 
       //////////////////////////////////////////////////////////////////////////
       //ME20190124 - Modified to include more detailed LDAU information
-      if(ldau_TLUJ.size()) {
+      if(vLDAU.size()>0 && vLDAU[0].size()) {  //ldau_TLUJ.size()
         ss_helper.str("");
         vs.clear();
         //only string is available, so we have to parse really fast
@@ -1751,20 +1747,19 @@ namespace aflowlib {
         //[OBSOLETE ME20190124 - use vLDAU] aurostd::string2tokens(ldau_TLUJ_tokens.at(1),L,",");
         //[OBSOLETE ME20190124 - use vLDAU] aurostd::string2tokens(ldau_TLUJ_tokens.at(2),U,",");
         //[OBSOLETE ME20190124 - use vLDAU] aurostd::string2tokens(ldau_TLUJ_tokens.at(3),J,",");
+        vs.push_back(aurostd::utype2string(T));
         if(L.size()&&U.size()&&J.size()){
           //no precision needed
-          vs.push_back(aurostd::utype2string(T));
           vs.push_back("["+aurostd::joinWDelimiter(L,",")+"]");
           vs.push_back("["+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(U,9),",")+"]");
           vs.push_back("["+aurostd::joinWDelimiter(aurostd::vecDouble2vecString(J,9),",")+"]");
-          ss_helper << aurostd::joinWDelimiter(vs,",");
-          vector<string> ldau_keys;  //ME20190124
-          aurostd::string2tokens("ldau_type,ldau_l,ldau_u,ldau_j", ldau_keys, ",");  //ME20190124
-          for (uint i = 0; i < ldau_keys.size(); i++) {  //ME20190124
-            sscontent_json << "\"" << ldau_keys[i] << "\":" << vs[i];  //ME20190124
-            vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);  //ME20190124
-          }
-          vs.clear();
+        }
+        if(T!=0){ss_helper << aurostd::joinWDelimiter(vs,",");} //CO20210713
+        vector<string> ldau_keys;  //ME20190124
+        aurostd::string2tokens("ldau_type,ldau_l,ldau_u,ldau_j", ldau_keys, ",");  //ME20190124
+        for (uint i = 0; i < ldau_keys.size() && i < vs.size(); i++) {  //ME20190124  //CO20210713
+          sscontent_json << "\"" << ldau_keys[i] << "\":" << vs[i];  //ME20190124
+          vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);  //ME20190124
         }
         //} ME20190124
         vs.clear();
