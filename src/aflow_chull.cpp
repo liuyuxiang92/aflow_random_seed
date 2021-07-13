@@ -1813,19 +1813,26 @@ namespace chull {
       new_facet.insert(start.first); new_facet.insert(start.second);
       raw_join_list.erase(start);
       std::vector<std::pair<uint, uint> > to_delete;
-      for (std::set< std::pair<uint, uint> >::const_iterator next_ptr = raw_join_list.begin(); next_ptr != raw_join_list.end(); ++next_ptr) {
-        std::pair<uint, uint> next = *next_ptr;
-        if (new_facet.count(next.first)) {
-          new_facet.insert(next.second);
-          to_delete.push_back(next);
+      uint found = 1;
+      while (found){
+        found = 0;
+        to_delete.clear();
+        for (std::set< std::pair<uint, uint> >::const_iterator next_ptr = raw_join_list.begin(); next_ptr != raw_join_list.end(); ++next_ptr) {
+          std::pair<uint, uint> next = *next_ptr;
+          if (new_facet.count(next.first)) {
+            found ++;
+            new_facet.insert(next.second);
+            to_delete.push_back(next);
+          }
+          else if (new_facet.count(next.second)) {
+            found ++;
+            new_facet.insert(next.first);
+            to_delete.push_back(next);
+          }
         }
-        else if (new_facet.count(next.second)) {
-          new_facet.insert(next.first);
-          to_delete.push_back(next);
+        for (std::vector<std::pair<uint, uint> >::const_iterator next = to_delete.begin(); next != to_delete.end(); ++next) {
+          raw_join_list.erase(*next);
         }
-      }
-      for (std::vector<std::pair<uint, uint> >::const_iterator next = to_delete.begin(); next != to_delete.end(); ++next) {
-        raw_join_list.erase(*next);
       }
       join_list.push_back(new_facet);
     }
