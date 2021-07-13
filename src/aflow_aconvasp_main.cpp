@@ -903,7 +903,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   }
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_BANDSPINSPLIT","--plotband_spinsplit=|--plot_band_spin_split=|--plotbands_spinsplit=|--plot_bands_spin_split=","./");
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_BAND2","--plotband2=|--plot_band2=|--plotbands2=|--plot_bands2=","./");
-  if (aurostd::args2flag(argv, cmds, "--plotbanddos|--plotbandsdos|--plot_band_dos|--plot_bands_dos|  --plotdosband|--plotdosbands|--plot_dos_band|--plot_dos_bands")) {  //CO20210712
+  if (aurostd::args2flag(argv, cmds, "--plotbanddos|--plotbandsdos|--plot_band_dos|--plot_bands_dos|--plotdosband|--plotdosbands|--plot_dos_band|--plot_dos_bands")) {  //CO20210712
     vpflow.flag("PLOT_BANDDOS", true);
     vpflow.addattachedscheme("PLOT_BANDDOS", "./", true);
   } else {
