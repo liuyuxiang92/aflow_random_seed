@@ -5620,7 +5620,7 @@ namespace aflowlib {
         opt.flag("PLOT_THERMO_QHA", true);
         opt.addattachedscheme("PLOT_THERMO_QHA", directory_RAW, true);
         opt.push_attached("PLOTTER::PRINT", "png");
-        aurostd::xoption plotopts=plotter::getPlotOptions(opt,"PLOT_THERMO_QHA");
+        aurostd::xoption plotopts=plotter::getPlotOptionsQHAthermo(opt,"PLOT_THERMO_QHA");  //CO+AS20210713
         plotter::PLOT_THERMO_QHA(plotopts);
       }
 
