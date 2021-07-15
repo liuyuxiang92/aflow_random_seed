@@ -8675,6 +8675,7 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       xvector<double> kpt(3);  //ME20190614
       for(uint iline=4;iline<vcontent.size();iline++) {
         aurostd::StringSubst(vcontent.at(iline),"!","@");
+        aurostd::StringSubst(vcontent.at(iline),"@","@ ");  //CO20210712 - for "!K" vs. "! K"
         if(aurostd::substring2bool(vcontent.at(iline),"@")) { // avoid removing ! as comment
           aurostd::string2tokens(vcontent.at(iline),tokens," ");
           if(tokens.size()>=5) {

@@ -910,11 +910,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   }
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_BANDSPINSPLIT","--plotband_spinsplit=|--plot_band_spin_split=|--plotbands_spinsplit=|--plot_bands_spin_split=","./");
   vpflow.args2addattachedscheme(argv,cmds,"PLOT_BAND2","--plotband2=|--plot_band2=|--plotbands2=|--plot_bands2=","./");
-  if (aurostd::args2flag(argv, cmds, "--plotbanddos|--plotbandsdos|--plot_band_dos|--plot_bands_dos")) {
+  if (aurostd::args2flag(argv, cmds, "--plotbanddos|--plotbandsdos|--plot_band_dos|--plot_bands_dos|--plotdosband|--plotdosbands|--plot_dos_band|--plot_dos_bands")) {  //CO20210712
     vpflow.flag("PLOT_BANDDOS", true);
     vpflow.addattachedscheme("PLOT_BANDDOS", "./", true);
   } else {
-    vpflow.args2addattachedscheme(argv,cmds,"PLOT_BANDDOS","--plotbanddos=|--plotbandsdos|--plot_band_dos=|--plot_bands_dos","./");  //ME20190614
+    vpflow.args2addattachedscheme(argv,cmds,"PLOT_BANDDOS","--plotbanddos=|--plotbandsdos=|--plot_band_dos=|--plot_bands_dos=|--plotdosband=|--plotdosbands=|--plot_dos_band=|--plot_dos_bands=","./");  //ME20190614  //CO20210712
   }
   if (aurostd::args2flag(argv, cmds, "--plotdos|--plot_dos")) {
     vpflow.flag("PLOT_DOS", true);
@@ -1286,9 +1286,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   // [OBSOLETE] vpflow.flag("SG::AFLOW",aurostd::args2flag(argv,cmds,"--aflowSG") && argv.at(1)=="--aflowSG");
   // [OBSOLETE] vpflow.flag("SG::AFLOW_LABEL",aurostd::args2flag(argv,cmds,"--aflowSG_label") && argv.at(1)=="--aflowSG_label");
   // [OBSOLETE] vpflow.flag("SG::AFLOW_NUMBER",aurostd::args2flag(argv,cmds,"--aflowSG_number|--aflowSGn|--aflowSGN") && argv.at(1)=="--aflowSG_number");
-  vpflow.args2addattachedscheme(argv,cmds,"SG::AFLOW","--aflowSG=|--space_group=|--sg=",""); //DX20210611 - added aliases
-  vpflow.args2addattachedscheme(argv,cmds,"SG::AFLOW_LABEL","--aflowSG_label=|--space_group_label=|--sg_label=",""); //DX20210611 - added aliases
-  vpflow.args2addattachedscheme(argv,cmds,"SG::AFLOW_NUMBER","--aflowSG_number=|--space_group_number=|--sg_number=",""); //DX20210611 - added aliases
+  if(!vpflow.flag("LIST_PROTOTYPE_LABELS")){ //DX20210708 - protect against other commands
+    vpflow.args2addattachedscheme(argv,cmds,"SG::AFLOW","--aflowSG=|--space_group=|--sg=",""); //DX20210611 - added aliases
+    vpflow.args2addattachedscheme(argv,cmds,"SG::AFLOW_LABEL","--aflowSG_label=|--space_group_label=|--sg_label=",""); //DX20210611 - added aliases
+    vpflow.args2addattachedscheme(argv,cmds,"SG::AFLOW_NUMBER","--aflowSG_number=|--space_group_number=|--sg_number=",""); //DX20210611 - added aliases
+  }
   //DX20170926 - Create flags for SG functions - START
   if(vpflow.flag("SG::AFLOW") || vpflow.flag("SG::AFLOW_LABEL") || vpflow.flag("SG::AFLOW_NUMBER")){
     vpflow.flag("SG::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
@@ -1482,7 +1484,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     //DX20180807 - added more wyccar flags (--usage, --no_scan, setting, --magmom) - START
     vpflow.flag("WYCKOFF_POSITIONS::USAGE",aurostd::args2flag(argv,cmds,"--usage|--USAGE"));
     vpflow.flag("WYCKOFF_POSITIONS::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan"));
-    vpflow.flag("WYCKOFF_POSITIONS::PRINT_WYCCAR",aurostd::args2flag(argv,cmds,"--wyccar")); //DX20210525 - treat wyccar as a special way of printing
+    vpflow.args2addattachedscheme(argv,cmds,"WYCKOFF_POSITIONS::PRINT_WYCCAR","--wyccar=",""); //DX20210525 - treat wyccar as a special way of printing //DX20210708 - needs to be args2addattachedscheme to account for possible tolerance input
     vpflow.flag("WYCKOFF_POSITIONS::PRINT_LETTERS_ONLY",aurostd::args2flag(argv,cmds,"--letters_only"));
     vpflow.flag("WYCKOFF_POSITIONS::PRINT_SITE_SYMMETRIES_ONLY",aurostd::args2flag(argv,cmds,"--site_symmetries_only"));
     vpflow.flag("WYCKOFF_POSITIONS::PRINT_MULTIPLICITIES_ONLY",aurostd::args2flag(argv,cmds,"--multiplicities_only"));

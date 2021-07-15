@@ -3170,7 +3170,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     if(a_iomode==IOVASP_POSCAR)  oss << a.title <<endl; // << " (POSCAR) " << endl;
     if(a_iomode==IOVASP_ABCCAR)  oss << a.title <<endl; // << " (ABCCAR) " << endl;
     if(a_iomode==IOVASP_WYCKCAR) oss << a.title << "| SG: " << GetSpaceGroupName(a.space_group_ITC,a.directory) << " " << a.space_group_ITC << " PG: " << a.point_group_ITC << " BL: " << a.bravais_label_ITC << " | sym_eps: " << a.sym_eps << endl; //DX20210526 - extend title
-    if(a.neg_scale==FALSE) {
+    if(a.neg_scale==FALSE || a_iomode==IOVASP_WYCKCAR) { //DX20210708 - wyccar should always use scale factor
       oss.precision(6);  //DM
       oss << a.scale; // << endl; //CO20170630
     } else {

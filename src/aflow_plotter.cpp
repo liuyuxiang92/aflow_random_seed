@@ -1774,7 +1774,7 @@ namespace plotter {
       for (uint i = 2; i < 2 * nsegments; i += 2) {
         labels_formated[i/2] = convertKPointLabel(xkpts.vpath[i - 1], formats[f]);
         if (xkpts.vpath[i-1] != xkpts.vpath[i]) {
-          labels_formated[i/2] += ("GNUPLOT" == formats[f] ? " |" : "|");
+          labels_formated[i/2] += ("GNUPLOT" == formats[f] ? " |" : "|"); //ME, should we add $|$ here too?
           labels_formated[i/2] += convertKPointLabel(xkpts.vpath[i], formats[f]);
         }
       }
@@ -2053,7 +2053,7 @@ namespace plotter {
     for (uint i = 2; i < 2 * nsegments; i += 2) {
       labels[i/2] = convertKPointLabel(xkpts.vpath[i - 1], format);
       if (xkpts.vpath[i-1] != xkpts.vpath[i]) {
-        labels[i/2] += "|" + convertKPointLabel(xkpts.vpath[i], format);
+        labels[i/2] += "$|$" + convertKPointLabel(xkpts.vpath[i], format);  //CO20210701 - | by itself can show up as hyphen, also consider $\\vert$
       }
     }
     labels.back() = convertKPointLabel(xkpts.vpath.back(), format);
