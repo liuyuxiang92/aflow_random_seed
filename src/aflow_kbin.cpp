@@ -588,6 +588,8 @@ namespace KBIN {
 
       // aurostd::random_shuffle(vDirectory);
       // std::random_shuffle(vDirectory.begin(),vDirectory.end());
+        
+      bool contcar_save=aurostd::args2flag(argv,"--contcar_save|--save_contcar");  //CO20210716
 
       for(uint idir=0;idir<vDirectory.size();idir++) {
         bool krun=TRUE;
@@ -597,23 +599,23 @@ namespace KBIN {
         // If necessary PERFORM CLEAN
         if(krun && aflags.AFLOW_PERFORM_CLEAN) {
           aflags.Directory=vDirectory.at(idir);
-          aurostd::StringSubst(aflags.Directory,"/"+_AFLOWLOCK_,"");
-          for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-            aurostd::StringSubst(aflags.Directory,"/OUTCAR.relax1"+XHOST.vext.at(iext),"");    // CLEAN UP A LITTLE
-            aurostd::StringSubst(aflags.Directory,"/OUTCAR.relax2"+XHOST.vext.at(iext),"");    // CLEAN UP A LITTLE
-            aurostd::StringSubst(aflags.Directory,"/OUTCAR.static"+XHOST.vext.at(iext),"");    // CLEAN UP A LITTLE
-            aurostd::StringSubst(aflags.Directory,"/OUTCAR.bands"+XHOST.vext.at(iext),"");     // CLEAN UP A LITTLE
-          }
-          for(uint iext=1;iext<XHOST.vext.size();iext++) {  // SKIP uncompressed
-            aurostd::StringSubst(aflags.Directory,"/EIGENVAL.relax1"+XHOST.vext.at(iext),"");  // CLEAN UP A LITTLE
-            aurostd::StringSubst(aflags.Directory,"/EIGENVAL.relax2"+XHOST.vext.at(iext),"");  // CLEAN UP A LITTLE
-            aurostd::StringSubst(aflags.Directory,"/EIGENVAL.static"+XHOST.vext.at(iext),"");  // CLEAN UP A LITTLE
-            aurostd::StringSubst(aflags.Directory,"/EIGENVAL.bands"+XHOST.vext.at(iext),"");   // CLEAN UP A LITTLE
-          }
-          aurostd::StringSubst(aflags.Directory,"/OUTCAR","");  // so it is easier to search
-          aurostd::StringSubst(aflags.Directory,"/"+_AFLOWIN_,"");  // so it is easier to search
+          //[CO20210716 - OBSOLETE]aurostd::StringSubst(aflags.Directory,"/"+_AFLOWLOCK_,"");
+          //[CO20210716 - OBSOLETE]for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
+          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/OUTCAR.relax1"+XHOST.vext.at(iext),"");    // CLEAN UP A LITTLE
+          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/OUTCAR.relax2"+XHOST.vext.at(iext),"");    // CLEAN UP A LITTLE
+          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/OUTCAR.static"+XHOST.vext.at(iext),"");    // CLEAN UP A LITTLE
+          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/OUTCAR.bands"+XHOST.vext.at(iext),"");     // CLEAN UP A LITTLE
+          //[CO20210716 - OBSOLETE]}
+          //[CO20210716 - OBSOLETE]for(uint iext=1;iext<XHOST.vext.size();iext++) {  // SKIP uncompressed
+          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/EIGENVAL.relax1"+XHOST.vext.at(iext),"");  // CLEAN UP A LITTLE
+          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/EIGENVAL.relax2"+XHOST.vext.at(iext),"");  // CLEAN UP A LITTLE
+          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/EIGENVAL.static"+XHOST.vext.at(iext),"");  // CLEAN UP A LITTLE
+          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/EIGENVAL.bands"+XHOST.vext.at(iext),"");   // CLEAN UP A LITTLE
+          //[CO20210716 - OBSOLETE]}
+          //[CO20210716 - OBSOLETE]aurostd::StringSubst(aflags.Directory,"/OUTCAR","");  // so it is easier to search
+          //[CO20210716 - OBSOLETE]aurostd::StringSubst(aflags.Directory,"/"+_AFLOWIN_,"");  // so it is easier to search
           //  cerr << aflags.Directory << endl;
-          KBIN::Clean(aflags);
+          KBIN::Clean(aflags,contcar_save);
           krun=FALSE;
         }
         // RUN
@@ -1424,6 +1426,7 @@ namespace KBIN {
     //    cerr << XPID << "KBIN::Clean: directory=" << aflags.Directory << endl;
 
     aurostd::StringSubst(directory,"/"+_AFLOWIN_,"");  // so it is easier to search
+    aurostd::StringSubst(directory,"/"+_AFLOWLOCK_,"");  // so it is easier to search
 
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
       aurostd::StringSubst(directory,"/OUTCAR.bands"+XHOST.vext.at(iext),"");  // so it is easier to search
@@ -1432,6 +1435,16 @@ namespace KBIN {
       aurostd::StringSubst(directory,"/OUTCAR.relax1"+XHOST.vext.at(iext),"");  // so it is easier to search
       aurostd::StringSubst(directory,"/OUTCAR.relax"+XHOST.vext.at(iext),"");  // so it is easier to search
     }   
+    aurostd::StringSubst(directory,"/OUTCAR","");      // so it is easier to search
+    
+    for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
+      aurostd::StringSubst(directory,"/EIGENVAL.bands"+XHOST.vext.at(iext),"");  // so it is easier to search
+      aurostd::StringSubst(directory,"/EIGENVAL.static"+XHOST.vext.at(iext),"");  // so it is easier to search    
+      aurostd::StringSubst(directory,"/EIGENVAL.relax2"+XHOST.vext.at(iext),"");  // so it is easier to search
+      aurostd::StringSubst(directory,"/EIGENVAL.relax1"+XHOST.vext.at(iext),"");  // so it is easier to search
+      aurostd::StringSubst(directory,"/EIGENVAL.relax"+XHOST.vext.at(iext),"");  // so it is easier to search
+    }   
+    aurostd::StringSubst(directory,"/EIGENVAL","");      // so it is easier to search
 
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
       aurostd::StringSubst(directory,"/agl_aflow.in"+XHOST.vext.at(iext),"");  // so it is easier to search
