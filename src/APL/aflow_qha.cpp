@@ -1445,14 +1445,16 @@ namespace apl
 
       Nelectrons = outcar.nelectrons;
 
-      static_eigvals.push_back(xEIGENVAL(directory+"/EIGENVAL.static"));
-      static_ibzkpts.push_back(xIBZKPT(directory+"/IBZKPT.static"));
+      if (includeElectronicContribution){
+        static_eigvals.push_back(xEIGENVAL(directory+"/EIGENVAL.static"));
+        static_ibzkpts.push_back(xIBZKPT(directory+"/IBZKPT.static"));
 
-      if (!static_eigvals.back().m_initialized){
-        msg = "Could not read the " + subdirectories_static[i]+"/EIGENVAL.static file.";
-        pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
-            *p_oss, _LOGGER_ERROR_);
-        data_read_success = false;
+        if (!static_eigvals.back().m_initialized){
+          msg = "Could not read the " + subdirectories_static[i]+"/EIGENVAL.static file.";
+          pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE,
+              *p_oss, _LOGGER_ERROR_);
+          data_read_success = false;
+        }
       }
     }
 
