@@ -25,6 +25,8 @@
 // Field width modifiers: used to format text during the output via std::setw function
 #define SW 5  // width of columns with blank space separator
 #define TW 15 // width of columns containing label/number
+#define SWTM 2  // width of columns with blank space separator for the THERMO_MESH block
+#define TWTM 18 // width of columns containing label/number for the THERMO_MESH block
 #define DCOEFF 1e-2 // this coefficient is used in numerical differentiation
 // (should not be too small). Usage dT = DCOEFF*T
 
@@ -2847,6 +2849,8 @@ namespace apl
   void QHA::writeThermalProperties(EOSmethod eos_method, QHAmethod qha_method,
       const string &directory)
   {
+    static int PRECISION = 10;
+
     string function = XPID + "QHA::writeThermalProperties():";
     string msg = "";
 
@@ -2908,29 +2912,32 @@ namespace apl
     file << blockname + "SYSTEM=" << system_title << std::endl;
     file << blockname + "START" << std::endl;
 
+    stringstream thermo_block, thermo_mesh_block;
+
     // write header
-    file << setw(5)  << "#T[K]"          << setw(SW) << ' ' <<
+    thermo_block << setw(5)  << "#T[K]"  << setw(SW) << ' ' <<
       setw(TW) << "V[A^3/atom]"          << setw(SW) << ' ' <<
       setw(TW) << "F(V)[eV/atom]"        << setw(SW) << ' ' <<
       setw(TW) << "B[GPa]"               << setw(SW) << ' ' <<
       setw(TW) << "beta[10^-5/K]"        << setw(SW) << ' ' <<
       setw(TW) << "Cv(V)[kB/atom]"       << setw(SW) << ' ' <<
       setw(TW) << "Cp(V)[kB/atom]"       << setw(SW) << ' ' <<
-      setw(TW) << "gamma(beta,B,Cv(V))"  << setw(SW) << ' ' <<
+      setw(TW) << "gamma"                << setw(SW) << ' ' <<
       setw(TW) << "Bprime";
     // the following properties are calculated only with a regular QHA calculation
     if (qha_method==QHA_CALC){
-      file  << setw(SW) << ' ' <<
-        setw(TW) << "gamma(V,mesh)"                          << setw(SW) << ' ' <<
-        setw(TW) << "beta(gamma(V,mesh),B,Cv(V))[10^-5/K]"   << setw(SW) << ' ' <<
-        setw(TW) << "Cv(V,mesh)[kB/atom]"                    << setw(SW) << ' ' <<
-        setw(TW) << "Cp(V,mesh)[kB/atom]"                    << setw(SW) << ' ' <<
-        setw(TW) << "gamma(V0,mesh)"                         << setw(SW) << ' ' <<
-        setw(TW) << "beta(gamma(V0,mesh),B,Cv(V0))[10^-5/K]" << setw(SW) << ' ' <<
-        setw(TW) << "Cv(V0,mesh)[kB/atom]"                   << setw(SW) << ' ' <<
-        setw(TW) << "Cp(V0,mesh)[kB/atom]";
+      thermo_mesh_block  << setw(5)  << "#T[K]"  << setw(SWTM) << ' ' <<
+        setw(TWTM) << "gamma"                    << setw(SWTM) << ' ' <<
+        setw(TWTM) << "beta[10^-5/K]"            << setw(SWTM) << ' ' <<
+        setw(TWTM) << "Cv[kB/atom]"              << setw(SWTM) << ' ' <<
+        setw(TWTM) << "Cp[kB/atom]"              << setw(SWTM) << ' ' <<
+        setw(TWTM) << "gamma(V0)"                << setw(SWTM) << ' ' <<
+        setw(TWTM) << "beta(V0)[10^-5/K]"        << setw(SWTM) << ' ' <<
+        setw(TWTM) << "Cv(V0)[kB/atom]"          << setw(SWTM) << ' ' <<
+        setw(TWTM) << "Cp(V0)[kB/atom]";
     }
-    file << std::endl;
+    thermo_block      << std::endl;
+    thermo_mesh_block << std::endl;
 
     xvector<double> F(N_EOSvolumes); // free energy
     xvector<double> xvolumes = aurostd::vector2xvector(EOSvolumes);
@@ -3036,7 +3043,9 @@ namespace apl
         }
 
         // write values to file
-        file << setw(5)  << T                   << setw(SW) << ' ' <<
+        thermo_block.unsetf(ios_base::floatfield);
+        thermo_block << setw(5)  << T     << setw(SW) << ' ' <<
+          std::fixed << std::setprecision(PRECISION) <<
           setw(TW) << Veq                 << setw(SW) << ' ' <<
           setw(TW) << Feq                 << setw(SW) << ' ' << //[eV/atom]
           setw(TW) << B                   << setw(SW) << ' ' <<
@@ -3047,17 +3056,20 @@ namespace apl
           setw(TW) << Bp;
         // the following properties are calculated only with a regular QHA calculation
         if (qha_method==QHA_CALC){
-          file << setw(SW) << ' ' <<
-            setw(TW) << GP_mesh_V              << setw(SW) << ' ' <<
-            setw(TW) << beta_mesh_V * 1e5      << setw(SW) << ' ' << //[10^-5/K]
-            setw(TW) << CV_mesh_V              << setw(SW) << ' ' << //[kB/atom]
-            setw(TW) << CP_mesh_V              << setw(SW) << ' ' << //[kB/atom]
-            setw(TW) << GP_mesh_V0K            << setw(SW) << ' ' <<
-            setw(TW) << beta_mesh_V0K * 1e5    << setw(SW) << ' ' << //[10^-5/K]
-            setw(TW) << CV_mesh_V0K            << setw(SW) << ' ' << //[kB/atom]
-            setw(TW) << CP_mesh_V0K            << setw(SW); //[kB/atom]
+          thermo_mesh_block.unsetf(ios_base::floatfield);
+          thermo_mesh_block << setw(5)  << T     << setw(SWTM) << ' ' <<
+            std::fixed << std::setprecision(PRECISION) <<
+            setw(TWTM) << GP_mesh_V              << setw(SWTM) << ' ' <<
+            setw(TWTM) << beta_mesh_V * 1e5      << setw(SWTM) << ' ' << //[10^-5/K]
+            setw(TWTM) << CV_mesh_V              << setw(SWTM) << ' ' << //[kB/atom]
+            setw(TWTM) << CP_mesh_V              << setw(SWTM) << ' ' << //[kB/atom]
+            setw(TWTM) << GP_mesh_V0K            << setw(SWTM) << ' ' <<
+            setw(TWTM) << beta_mesh_V0K * 1e5    << setw(SWTM) << ' ' << //[10^-5/K]
+            setw(TWTM) << CV_mesh_V0K            << setw(SWTM) << ' ' << //[kB/atom]
+            setw(TWTM) << CP_mesh_V0K            << setw(SWTM); //[kB/atom]
         }
-        file << std::endl;
+        thermo_block      << std::endl;
+        thermo_mesh_block << std::endl;
       }
     } catch (aurostd::xerror e){
       // QHA throws _VALUE_RANGE_ exception only when there is no minimum in
@@ -3073,8 +3085,24 @@ namespace apl
       }
     }
 
+    // output the data to the file
+    stringstream file;
+    file << AFLOWIN_SEPARATION_LINE << std::endl;
+    file << blockname + "SYSTEM=" << system_title << std::endl;
+    file << blockname + "START" << std::endl;
+    file << thermo_block.rdbuf();
     file << blockname + "STOP" << std::endl;
     file << AFLOWIN_SEPARATION_LINE << std::endl;
+
+    if (qha_method==QHA_CALC){
+      blockname += "_MESH";
+      file << AFLOWIN_SEPARATION_LINE << std::endl;
+      file << blockname + "SYSTEM=" << system_title << std::endl;
+      file << blockname + "START" << std::endl;
+      file << thermo_mesh_block.rdbuf();
+      file << blockname + "STOP" << std::endl;
+      file << AFLOWIN_SEPARATION_LINE << std::endl;
+    }
 
     if (aurostd::FileExist(filename)){
       if (!aurostd::stringstream2file(file, filename, "APPEND")){
