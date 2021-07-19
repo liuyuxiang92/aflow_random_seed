@@ -6844,7 +6844,7 @@ namespace KBIN {
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\"" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       //START - add fix to _AFLOWIN_ 
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
-        if(Krun){KBIN::VASP_CONTCAR_Save(xvasp,"breakpoint");}
+        if(Krun){KBIN::VASP_CONTCAR_Save(xvasp);}
       }
       //END - add fix to _AFLOWIN_ 
     }

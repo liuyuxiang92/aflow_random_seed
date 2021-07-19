@@ -1412,23 +1412,25 @@ namespace KBIN {
 // KBIN::Clean
 // *******************************************************************************************
 namespace KBIN {
-  void Clean(const _aflags& aflags) {          // AFLOW_FUNCTION_IMPLEMENTATION
+  void Clean(const _aflags& aflags,bool contcar_save) {          // AFLOW_FUNCTION_IMPLEMENTATION
     //    cerr << XPID << "KBIN::Clean: aflags.Directory=" << aflags.Directory << endl;
-    KBIN::Clean(aflags.Directory);
+    KBIN::Clean(aflags.Directory,contcar_save);
   }
 }
 
 namespace KBIN {
-  void Clean(const string _directory) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  void Clean(const string _directory,bool contcar_save) {        // AFLOW_FUNCTION_IMPLEMENTATION
     string directory=_directory;
     //    cerr << XPID << "KBIN::Clean: directory=" << aflags.Directory << endl;
 
     aurostd::StringSubst(directory,"/"+_AFLOWIN_,"");  // so it is easier to search
 
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-      aurostd::StringSubst(directory,"/"+XHOST.vext.at(iext),"");  // so it is easier to search
-      aurostd::StringSubst(directory,"/"+XHOST.vext.at(iext),"");  // so it is easier to search    
-      aurostd::StringSubst(directory,"/"+XHOST.vext.at(iext),"");  // so it is easier to search
+      aurostd::StringSubst(directory,"/OUTCAR.bands"+XHOST.vext.at(iext),"");  // so it is easier to search
+      aurostd::StringSubst(directory,"/OUTCAR.static"+XHOST.vext.at(iext),"");  // so it is easier to search    
+      aurostd::StringSubst(directory,"/OUTCAR.relax2"+XHOST.vext.at(iext),"");  // so it is easier to search
+      aurostd::StringSubst(directory,"/OUTCAR.relax1"+XHOST.vext.at(iext),"");  // so it is easier to search
+      aurostd::StringSubst(directory,"/OUTCAR.relax"+XHOST.vext.at(iext),"");  // so it is easier to search
     }   
 
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
@@ -1455,6 +1457,9 @@ namespace KBIN {
           aurostd::FileExist(string(directory+"/aflow.in")) ||      // normal aflow.in
           aurostd::FileExist(string(directory+"/agl_aflow.in")) ||  // normal agl_aflow.in
           aurostd::FileExist(string(directory+"/ael_aflow.in")) ) { // normal ael_aflow.in
+
+        //CO20210716 - save contcar
+        if(contcar_save){KBIN::VASP_CONTCAR_Save(directory);}
 
         // CLEAN directory
         //DX+CO START

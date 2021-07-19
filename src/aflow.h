@@ -2919,8 +2919,8 @@ namespace KBIN {
   void RUN_DirectoryScript(const _aflags& aflags,const string& script,const string& output);
   bool CompressDirectory(const _aflags& aflags,const _kflags& kflags);
   bool CompressDirectory(const _aflags& aflags);
-  void Clean(const _aflags& aflags);
-  void Clean(const string directory);
+  void Clean(const _aflags& aflags,bool contcar_save=false);
+  void Clean(const string directory,bool contcar_save=false);
   void XClean(string options);
   void GenerateAflowinFromVASPDirectory(_aflags& aflags);
   void StartStopCheck(const string &AflowIn,string str1,string str2,bool &flag,bool &flagS);
@@ -3057,7 +3057,8 @@ namespace KBIN {
   string VASP_Analyze(_xvasp &xvasp,bool qmwrite);
   //[CO20210315 - OBSOLETE]void VASP_CompressDirectory(_xvasp xvasp,_kflags &kflags);
   void VASP_Backup(_xvasp& xvasp,bool qmwrite,const string& relax); //CO20210315
-  void VASP_CONTCAR_Save(const _xvasp& xvasp,const string& relax);  //CO20210315
+  void VASP_CONTCAR_Save(const _xvasp& xvasp,const string& relax="breakpoint");  //CO20210315
+  void VASP_CONTCAR_Save(const string& directory,const string& relax="breakpoint");  //CO20210315
   void VASP_Recycle(const _xvasp& xvasp,const string& relax); //CO20210315
   void VASP_Recycle(const _xvasp& xvasp,int relax_number);  //CO20210315
   void VASP_RecycleExtraFile(const _xvasp& xvasp,const string& xfile,const string& relax);  //CO20210315

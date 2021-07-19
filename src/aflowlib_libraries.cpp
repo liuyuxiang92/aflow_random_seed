@@ -6886,9 +6886,10 @@ namespace aflowlib {
     //}
 
     if(FLAG_DO_CLEAN && vcleans.size()>0) {
+      bool contcar_save=aurostd::args2flag(argv,"--contcar_save|--save_contcar");
       for(uint i=0;i<vcleans.size();i++) {
         // cerr << "Cleaning=" << vcleans.at(i) << endl;
-        KBIN::Clean(vcleans.at(i));
+        KBIN::Clean(vcleans.at(i),contcar_save);
       }
     }
     return FALSE;

@@ -1585,7 +1585,8 @@ namespace pflow {
       if(!aflags.AFLOW_PERFORM_DIRECTORY) {
         cerr << "AFLOW: to use --clean, you must specify the directory" << endl; return 0;
       } else {
-        KBIN::Clean(aflags);
+        bool contcar_save=aurostd::args2flag(argv,cmds,"--contcar_save|--save_contcar");
+        KBIN::Clean(aflags,contcar_save);
       }
     }
 

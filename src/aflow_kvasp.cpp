@@ -4956,10 +4956,14 @@ namespace KBIN {
 
 namespace KBIN {
   void VASP_CONTCAR_Save(const _xvasp& xvasp,const string& ext) {        // AFLOW_FUNCTION_IMPLEMENTATION //CO20210315
+    return VASP_CONTCAR_Save(xvasp.Directory,ext);  //CO20210716
+  }
+  void VASP_CONTCAR_Save(const string& directory,const string& ext) {        // AFLOW_FUNCTION_IMPLEMENTATION //CO20210315
     string function="KBIN::VASP_CONTCAR_Save";
     string operation=function+"("+ext+")";
-    string contcar=xvasp.Directory+string("/CONTCAR");
-    if(aurostd::FileExist(contcar) && !aurostd::FileEmpty(contcar)) {
+    string aflowin=directory+"/"+_AFLOWIN_;
+    string contcar=directory+string("/CONTCAR");
+    if(aurostd::FileExist(aflowin) && aurostd::FileExist(contcar) && !aurostd::FileEmpty(contcar)) {
       xstructure xstr(contcar,IOAFLOW_AUTO);
       ostringstream aus;
       aus << AFLOWIN_SEPARATION_LINE << endl;
@@ -4970,8 +4974,8 @@ namespace KBIN {
       aus << xstr;
       aus << "[VASP_POSCAR_MODE_EXPLICIT]STOP" << endl;
       aus << AFLOWIN_SEPARATION_LINE << endl;
-      KBIN::AFLOWIN_ADD(xvasp.Directory+"/"+_AFLOWIN_,aus,"");
-      KBIN::AFLOWIN_REMOVE(xvasp.Directory+"/"+_AFLOWIN_,"[VASP_FORCE_OPTION]VOLUME",operation); //CO20210315
+      KBIN::AFLOWIN_ADD(aflowin,aus,"");
+      KBIN::AFLOWIN_REMOVE(aflowin,"[VASP_FORCE_OPTION]VOLUME",operation); //CO20210315
     }
   }
 } // namespace KBIN
