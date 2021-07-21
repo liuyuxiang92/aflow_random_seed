@@ -749,7 +749,7 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   check_name = "convex solid volume (double)";
   expected = 2.5;
 
-  calculated = aurostd::volumeConvex(points, facets);
+  calculated = aurostd::volume(points, facets, true);
   check_equal(calculated, expected, check_name, check_num, passed_checks, results);
 
   // ---------------------------------------------------------------------------
@@ -757,7 +757,7 @@ bool AurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   check_num++;
   check_name = "convex solid volume (int)";
 
-  calculated = aurostd::volumeConvex(ipoints, facets);
+  calculated = aurostd::volume(ipoints, facets, true);
   check_equal(calculated, expected, check_name, check_num, passed_checks, results);
 
 

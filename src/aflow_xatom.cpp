@@ -2000,7 +2000,7 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
     }
     facet_area.push_back(aurostd::areaPointsOnPlane(facet_coords));
   }
-  volume = aurostd::volumeConvex(points, facets);
+  volume = aurostd::volume(points, facets, true);
   area = aurostd::sum(facet_area);
   has_hull = true;
 }
