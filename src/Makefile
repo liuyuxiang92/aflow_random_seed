@@ -1639,8 +1639,7 @@ check_atomic_environment:
 check_aurostd:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	./aflow --Aurostd_test
-.PHONY: check_aflow_gcc_compatibility #HE20210616
-check_aflow_gcc_compatibility:
+
 ifeq ($(UNAME),Linux)
 	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' | wc -l | sed 's/^ *//') && \
 		if [ "$$NUMBER_NULLPTRS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_NULLPTRS nullptrs in the source code; this is not backwards compatible with older GCC version. Please swap with 'NULL' and recompile." && exit 1; fi
