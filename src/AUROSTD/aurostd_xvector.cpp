@@ -2100,7 +2100,7 @@ namespace aurostd { //HE20210511
   /// doi: 10.1109/ICIP.2001.958278.
   template<class utype> double
     areaPointsOnPlane(const vector<xvector<utype> >& points){ //HE20210511
-      string soliloquy=XPID+"aurostd::areaPointsOnPlane(): ";
+      string soliloquy=XPID+"aurostd::areaPointsOnPlane():";
       if (points.size() < 3){
         throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "there must be at least three points to calculate an area", _VALUE_ERROR_);
       }

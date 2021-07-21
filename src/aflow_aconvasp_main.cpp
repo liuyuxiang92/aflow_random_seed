@@ -7555,7 +7555,7 @@ namespace pflow { //HE20210331
     else throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "missing auid - could not load structure", _INPUT_ERROR_);
     if (vpflow.flag("ATOMIC_ENVIRONMENT::MODE")) ae_mode = vpflow.getattachedutype<uint>("ATOMIC_ENVIRONMENT::MODE");
     if (vpflow.flag("ATOMIC_ENVIRONMENT::OUTFOLDER")) aeOutBase = vpflow.getattachedscheme("ATOMIC_ENVIRONMENT::OUTFOLDER");
-    pflow::getAtomicEnvironment(auid, ae_mode, aeOutBase);
+    pflow::writeAtomicEnvironment(auid, ae_mode, aeOutBase);
   }
 }
 

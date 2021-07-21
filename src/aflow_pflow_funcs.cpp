@@ -8300,7 +8300,7 @@ namespace pflow{
 
 
 // ***************************************************************************
-// pflow::getAtomicEnvironment() //HE20210617
+// pflow::writeAtomicEnvironment() //HE20210617
 // ***************************************************************************
 
 namespace pflow {
@@ -8311,9 +8311,9 @@ namespace pflow {
   /// @param aeOutBase output folder
   ///
   /// Feature request: analyse a structure file directly
-  void getAtomicEnvironment(const string &auid, uint aeMode, string aeOutBase) {
+  void writeAtomicEnvironment(const string &auid, uint aeMode, string aeOutBase) {
     bool LDEBUG=(false || XHOST.DEBUG);
-    string soliloquy=XPID+"pflow::getAtomicEnvironment(): ";
+    string soliloquy=XPID+"pflow::writeAtomicEnvironment():";
     if(LDEBUG) cerr << soliloquy << "Start" << endl;
 
     string aurl = "";
@@ -8325,7 +8325,7 @@ namespace pflow {
     if (!auid.empty()) aurl = aurostd::execute2string(XHOST.command("aflow_data")+" vLIBS | grep -B1 \"" + auid + "\" | head -n 1");
     // Fallback if quick search failed
     if (!auid.empty() && aurl.empty()) {
-      cerr << soliloquy << "Quick search failed! Trying standard methode." << endl;
+      cerr << soliloquy << " Quick search failed! Trying standard methode." << endl;
       aflowlib::AflowlibLocator(auid, aurl, "AFLOWLIB_AUID2AURL");
     }
 
@@ -8338,8 +8338,8 @@ namespace pflow {
       entry.auid=auid;
       loadXstructures(entry);
       str = entry.vstr.back();
-      if(LDEBUG) cerr << soliloquy << "AUID: "<< auid << endl;
-      if(LDEBUG) cerr << soliloquy << "AURL: "<< aurl << endl;
+      if(LDEBUG) cerr << soliloquy << " AUID: "<< auid << endl;
+      if(LDEBUG) cerr << soliloquy << " AURL: "<< aurl << endl;
     }
 
     else {
@@ -8349,17 +8349,17 @@ namespace pflow {
     vector<AtomEnvironment> AE = getAtomEnvironments(str, aeMode);
 
     string file_name;
-    if(LDEBUG) cerr << soliloquy << "Saving " << AE.size() << " atomic environments" << endl;
+    if(LDEBUG) cerr << soliloquy << " Saving " << AE.size() << " atomic environments" << endl;
     for(uint i=0; i<AE.size(); i++) {
       file_name = aeOutAUID + "/" + aurostd::utype2string(i) + "_" + AE[i].element_center + ".json";
       AE[i].constructAtomEnvironmentHull();
       aurostd::string2file(AE[i].toJSON().toString(), file_name, "WRITE");
-      if(LDEBUG) cerr << soliloquy << file_name << endl;
+      if(LDEBUG) cerr << soliloquy << " " <<file_name << endl;
     }
   }
 
-  void getAtomicEnvironment(const string &auid, string &aeOutBase) {
-    getAtomicEnvironment(auid, 1, aeOutBase);
+  void writeAtomicEnvironment(const string &auid, string &aeOutBase) {
+    writeAtomicEnvironment(auid, 1, aeOutBase);
   }
 }
 

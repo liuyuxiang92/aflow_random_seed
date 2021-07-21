@@ -1958,10 +1958,10 @@ ostream& operator<<(ostream& oss, const AtomEnvironment& AtomEnvironment){
 
 /// @brief constructed a convex hull around the atomic environment
 void AtomEnvironment::constructAtomEnvironmentHull(void){
-  string soliloquy=XPID+"AtomEnvironment::constructAtomEnvironmentHull(): ";
+  string soliloquy=XPID+"AtomEnvironment::constructAtomEnvironmentHull():";
   bool LDEBUG=(false || XHOST.DEBUG);
   if (has_hull) {
-    if(LDEBUG) cerr << soliloquy << "AE hull is already set" << endl;
+    if(LDEBUG) cerr << soliloquy << " AE hull is already set" << endl;
     return;
   }
 
@@ -1970,7 +1970,7 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
     points.push_back(index2Point(t));
   }
 
-  if (LDEBUG) cerr << soliloquy << "create AE hull around " << num_neighbors << " atoms" << endl;
+  if (LDEBUG) cerr << soliloquy << " create AE hull around " << num_neighbors << " atoms" << endl;
   xoption hull_options;
   hull_options.flag("CHULL::FULL_HULL", true);
   hull_options.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS", true);
@@ -1980,7 +1980,7 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
   chull::ConvexHull AEhull;
   AEhull = chull::ConvexHull(hull_options, points);
 
-  if (LDEBUG) cerr << soliloquy << "resulting hull has " << AEhull.m_facets.size() << " raw facets" << endl;
+  if (LDEBUG) cerr << soliloquy << " resulting hull has " << AEhull.m_facets.size() << " raw facets" << endl;
 
   vector<vector<uint> > facet_collection;
   AEhull.getJoinedFacets(facet_collection);
@@ -1989,7 +1989,7 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
     for (std::vector<uint>::const_iterator v = f->begin(); v != f->end(); ++v) nf.push_back(*v);
     facets.push_back(nf);
   }
-  if(LDEBUG) cerr << soliloquy << "after joining " << facets.size() << " facets are remaining" << endl;
+  if(LDEBUG) cerr << soliloquy << " after joining " << facets.size() << " facets are remaining" << endl;
 
   for (std::vector<vector<uint> >::const_iterator f = facets.begin(); f != facets.end(); ++f) {
     if (f->size()<10) facet_order[f->size()-3]++;
@@ -2015,7 +2015,7 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
 /// @param index neighbor index
 /// @return neighbor coordinates
 xvector<double> AtomEnvironment::index2Point(uint index){
-    string soliloquy=XPID+"AtomEnvironment::index2Point(): ";
+    string soliloquy=XPID+"AtomEnvironment::index2Point():";
     for(uint i=0;i<coordinates_neighbor.size();i++){
         if (index < coordinations_neighbor[i]) return coordinates_neighbor[i][index];
         else index -= coordinations_neighbor[i];
@@ -2030,7 +2030,7 @@ xvector<double> AtomEnvironment::index2Point(uint index){
 /// @brief serialize AtomEnvironment class to json
 /// @return json string
 aurostd::JSONwriter AtomEnvironment::toJSON(bool full) const{
-  string soliloquy=XPID+"AtomEnvironment::toJSON(): ";
+  string soliloquy=XPID+"AtomEnvironment::toJSON():";
 
   aurostd::JSONwriter ae_json;
 

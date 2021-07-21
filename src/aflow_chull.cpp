@@ -1738,7 +1738,7 @@ namespace chull {
   /// @note the facets contain only vertices
   void ConvexHull::getJoinedFacets(vector<vector<uint> > &facet_collection, const double angle_threshold) {//HE20210510
     bool LDEBUG=(false || XHOST.DEBUG);
-    string soliloquy=XPID+"ConvexHull::getJoinedFacets(): ";
+    string soliloquy=XPID+"ConvexHull::getJoinedFacets():";
 
     if (m_dim != 3) throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "facet joining is just available in 3D", _VALUE_RANGE_);
     vector <vector<uint> > raw_facets;
@@ -1772,7 +1772,7 @@ namespace chull {
     }
     uint raw_facets_size = raw_facets.size();
     // Check for each facet, if their neighbors have an equivalent normal vector
-    if (LDEBUG) cerr << soliloquy << "coplanar | angle | facets | n1 | n2" << endl;
+    if (LDEBUG) cerr << soliloquy << " coplanar | angle | facets | n1 | n2" << endl;
     for (uint i1=0; i1<raw_facets_size; i1++){
       const vector<uint> base_facet = raw_facets[i1];
       for (uint i2=i1+1; i2<raw_facets_size; i2++){
@@ -1787,13 +1787,13 @@ namespace chull {
         if (check != 2) continue;
         double check_angle = aurostd::angle(normals[i1], normals[i2]);
         if (check_angle<angle_threshold){
-          if(LDEBUG) cerr << soliloquy << "YES | ";
+          if(LDEBUG) cerr << soliloquy << " YES | ";
           raw_join_list.insert(std::make_pair(i1, i2));
           remove_facet.insert(i1);
           remove_facet.insert(i2);
         }
         else {
-          if (LDEBUG) cerr << soliloquy << "NO  | ";
+          if (LDEBUG) cerr << soliloquy << " NO  | ";
         }
         if (LDEBUG) {
           cerr << check_angle << " | ";
