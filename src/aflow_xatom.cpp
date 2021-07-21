@@ -1897,7 +1897,8 @@ void AtomEnvironment::free(){
   area=0;
   volume=0;
   has_hull=false;
-  std::fill(facet_order, facet_order+8, 0);
+  facet_order.clear();
+  facet_order.resize(8, 0);
 }
 
 // ---------------------------------------------------------------------------
@@ -1926,7 +1927,7 @@ void AtomEnvironment::copy(const AtomEnvironment& b) {
   coordinations_neighbor=b.coordinations_neighbor;
   coordinates_neighbor=b.coordinates_neighbor;
   facets=b.facets;
-  std::copy(b.facet_order, b.facet_order+8, facet_order);
+  facet_order=b.facet_order;
   facet_area=b.facet_area;
   area=b.area;
   volume=b.volume;
@@ -1969,15 +1970,17 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
     points.push_back(index2Point(t));
   }
 
-  if(LDEBUG) cerr << soliloquy << "create AE hull around " << num_neighbors << " atoms" << endl;
+  if (LDEBUG) cerr << soliloquy << "create AE hull around " << num_neighbors << " atoms" << endl;
   xoption hull_options;
   hull_options.flag("CHULL::FULL_HULL", true);
-  hull_options.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS",true);
-  hull_options.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS",true);
+  hull_options.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS", true);
+  hull_options.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS", true);
+  hull_options.flag("CHULL::INCLUDE_OUTLIERS", true);
+  hull_options.flag("CHULL::SEE_NEGLECT", false);
   chull::ConvexHull AEhull;
   AEhull = chull::ConvexHull(hull_options, points);
 
-  if(LDEBUG) cerr << soliloquy << "resulting hull has " << AEhull.m_facets.size() << " raw facets" << endl;
+  if (LDEBUG) cerr << soliloquy << "resulting hull has " << AEhull.m_facets.size() << " raw facets" << endl;
 
   vector<vector<uint> > facet_collection;
   AEhull.getJoinedFacets(facet_collection);
@@ -2116,8 +2119,7 @@ aurostd::JSONwriter AtomEnvironment::toJSON(bool full) const{
         facets_collection.push_back(facet_entry);
       }
       ae_json.addVector("facets", facets_collection);
-      vector<uint> fo(facet_order, facet_order+8);
-      ae_json.addVector("facet_order", fo);
+      ae_json.addVector("facet_order", facet_order);
     }
   }
   return ae_json;
