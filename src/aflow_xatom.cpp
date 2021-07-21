@@ -1954,9 +1954,8 @@ ostream& operator<<(ostream& oss, const AtomEnvironment& AtomEnvironment){
 // ***************************************************************************
 // AtomEnvironment::constructAtomEnvironmentHull() - HE20210408
 // ***************************************************************************
-/**
- * @brief constructed a convex hull around the atomic environment
- */
+
+/// @brief constructed a convex hull around the atomic environment
 void AtomEnvironment::constructAtomEnvironmentHull(void){
   string soliloquy=XPID+"AtomEnvironment::constructAtomEnvironmentHull(): ";
   bool LDEBUG=(false || XHOST.DEBUG);
@@ -2008,11 +2007,10 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
 // ***************************************************************************
 // AtomEnvironment::index2Point() - HE20210408
 // ***************************************************************************
-/**
- * @brief lookup function to map flat neighbor index back into element sorted coordinates_neighbor list
- * @param index neighbor index
- * @return neighbor coordinates
- */
+
+/// @brief lookup function to map flat neighbor index back into element sorted coordinates_neighbor list
+/// @param index neighbor index
+/// @return neighbor coordinates
 xvector<double> AtomEnvironment::index2Point(uint index){
     string soliloquy=XPID+"AtomEnvironment::index2Point(): ";
     for(uint i=0;i<coordinates_neighbor.size();i++){
@@ -2025,10 +2023,9 @@ xvector<double> AtomEnvironment::index2Point(uint index){
 // ***************************************************************************
 // AtomEnvironment::toJSON() - HE20210408
 // ***************************************************************************
-/**
- * @brief serialize AtomEnvironment class to json
- * @return json string
- */
+
+/// @brief serialize AtomEnvironment class to json
+/// @return json string
 aurostd::JSONwriter AtomEnvironment::toJSON(bool full) const{
   string soliloquy=XPID+"AtomEnvironment::toJSON(): ";
 

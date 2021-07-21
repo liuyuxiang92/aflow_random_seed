@@ -8304,14 +8304,13 @@ namespace pflow{
 // ***************************************************************************
 
 namespace pflow {
-  /**
-   * @brief write collection of atomic environments into json files
-   * @param auid AFLOW ID
-   * @param aeMode enviroment definition (see ATOM_ENVIRONMENT_MODE_X in aflow.h)
-   * @param aeOutBase output folder
-   *
-   * Feature request: analyse a structure file directly
-   */
+
+  /// @brief write collection of atomic environments into json files
+  /// @param auid AFLOW ID
+  /// @param aeMode enviroment definition (see ATOM_ENVIRONMENT_MODE_X in aflow.h)
+  /// @param aeOutBase output folder
+  ///
+  /// Feature request: analyse a structure file directly
   void getAtomicEnvironment(const string &auid, uint aeMode, string aeOutBase) {
     bool LDEBUG=(false || XHOST.DEBUG);
     string soliloquy=XPID+"pflow::getAtomicEnvironment(): ";

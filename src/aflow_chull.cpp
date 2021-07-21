@@ -1702,11 +1702,10 @@ namespace chull {
     return convertUnits(sqrt(getDist2Hull() / getEntropyFormingAbility()),units);
   }
 
-  /**
-   * @brief sort the vertex indexes based on their angle around a central normal vector
-   * @param facet list of vertex indexes forming the facet
-   * @param facet_id id of one of the original facets (to use its already calculated normal vector)
-   */
+
+  /// @brief sort the vertex indexes based on their angle around a central normal vector
+  /// @param facet list of vertex indexes forming the facet
+  /// @param facet_id id of one of the original facets (to use its already calculated normal vector)
   void ConvexHull::sortFacetVertices(vector<uint> &facet, const uint &facet_id){//HE20210510
     xvector<double> center(3,1);
     const uint num_points = facet.size();
@@ -1733,12 +1732,10 @@ namespace chull {
     for (uint i=0; i<num_points; i++) facet[i] = index_list[i+1];
   }
 
-  /**
-   * @brief generates list of facets, if two neighboring facets are coplanar join them
-   * @param facet_collection output vector containing lists of vertex indexes
-   * @param angle_threshold max angle between two facts in radian to be still considered coplanar
-   * @note the facets contain only vertices
-   */
+  /// @brief generates list of facets, if two neighboring facets are coplanar join them
+  /// @param facet_collection output vector containing lists of vertex indexes
+  /// @param angle_threshold max angle between two facts in radian to be still considered coplanar
+  /// @note the facets contain only vertices
   void ConvexHull::getJoinedFacets(vector<vector<uint> > &facet_collection, const double angle_threshold) {//HE20210510
     bool LDEBUG=(false || XHOST.DEBUG);
     string soliloquy=XPID+"ConvexHull::getJoinedFacets(): ";

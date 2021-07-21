@@ -2079,27 +2079,25 @@ namespace aurostd {
 }
 
 namespace aurostd { //HE20210511
-  /**
-   * @brief area encapsulated by ordered points on a plane
-   * @param points collection of points
-   * @return area
-   *
-   * A series of triangles are formed by the first point P(0), P(k), and P(k+1) for k from 1 to points.size()-2.
-   * The sum of the triangle areas divided by two is the area of the overall polygon.
-   * Instead of calculating the norm for each triangle, the vector product can be summed, thereby reducing sqrt calls.
-   *
-   * area = 0.5 \left| \sum_{k=1}^{k=n-2} \overrightarrow{P_0P_k} \times \overrightarrow{P_0P_{k+1}} \right|
-   *
-   * The definition generates signed areas for each triangle. For a convex polygon, all areas are positive.
-   * For non-convex shapes, some areas will be negative in this definition and correct the overall area automatically.
-   *
-   * This function will return the wrong area if edges are crossed!
-   *
-   * More details:
-   * Cha Zhang and Tsuhan Chen "Efficient feature extraction for 2D/3D objects in mesh representation"
-   * Proceedings 2001 International Conference on Image Processing (Cat. No.01CH37205), 2001, pp. 935-938 vol.3
-   * doi: 10.1109/ICIP.2001.958278.
-   */
+  /// @brief area encapsulated by ordered points on a plane
+  /// @param points collection of points
+  /// @return area
+  ///
+  /// A series of triangles are formed by the first point P(0), P(k), and P(k+1) for k from 1 to points.size()-2.
+  /// The sum of the triangle areas divided by two is the area of the overall polygon.
+  /// Instead of calculating the norm for each triangle, the vector product can be summed, thereby reducing sqrt calls.
+  ///
+  /// area = 0.5 \left| \sum_{k=1}^{k=n-2} \overrightarrow{P_0P_k} \times \overrightarrow{P_0P_{k+1}} \right|
+  ///
+  /// The definition generates signed areas for each triangle. For a convex polygon, all areas are positive.
+  /// For non-convex shapes, some areas will be negative in this definition and correct the overall area automatically.
+  ///
+  /// This function will return the wrong area if edges are crossed!
+  ///
+  /// More details:
+  /// Cha Zhang and Tsuhan Chen "Efficient feature extraction for 2D/3D objects in mesh representation"
+  /// Proceedings 2001 International Conference on Image Processing (Cat. No.01CH37205), 2001, pp. 935-938 vol.3
+  /// doi: 10.1109/ICIP.2001.958278.
   template<class utype> double
     areaPointsOnPlane(const vector<xvector<utype> >& points){ //HE20210511
       string soliloquy=XPID+"aurostd::areaPointsOnPlane(): ";
@@ -2116,29 +2114,28 @@ namespace aurostd { //HE20210511
 }
 
 namespace aurostd { //HE20210511
-  /**
-   * @brief volume of a solid defined by points, facets their normals
-   * @param points collection of points
-   * @param facets collection of ordered point indices describing a facet
-   * @param normals collection of facet normals pointing all either outwards or inwards of the solid
-   * @return volume
-   *
-   * A series of pyramids are generated from the solid with the facets as bases and origin as their tips.
-   * Their volumes (1/3 * base area * height) is then summed up.
-   * The height of the pyramids is the scalar product of the normal vector and a point on the facet.
-   * Depending upon the normal direction, the height and, therefore, the volume can be negative.
-   * This ensures that overlapping volumes are handled properly.
-   *
-   * \frac{1}{3} \left| \sum_F (P0_F \cdot N_F) A_F \right|
-   * P0_F first point of a facet (could be any point on facet F)
-   * N_F facet normal vector
-   * A_F facet area
-   *
-   * More details:
-   * Cha Zhang and Tsuhan Chen "Efficient feature extraction for 2D/3D objects in mesh representation"
-   * Proceedings 2001 International Conference on Image Processing (Cat. No.01CH37205), 2001, pp. 935-938 vol.3
-   * doi: 10.1109/ICIP.2001.958278.
-   */
+
+  /// @brief volume of a solid defined by points, facets their normals
+  /// @param points collection of points
+  /// @param facets collection of ordered point indices describing a facet
+  /// @param normals collection of facet normals pointing all either outwards or inwards of the solid
+  /// @return volume
+  ///
+  /// A series of pyramids are generated from the solid with the facets as bases and origin as their tips.
+  /// Their volumes (1/3 * base area * height) is then summed up.
+  /// The height of the pyramids is the scalar product of the normal vector and a point on the facet.
+  /// Depending upon the normal direction, the height and, therefore, the volume can be negative.
+  /// This ensures that overlapping volumes are handled properly.
+  ///
+  /// \frac{1}{3} \left| \sum_F (P0_F \cdot N_F) A_F \right|
+  /// P0_F first point of a facet (could be any point on facet F)
+  /// N_F facet normal vector
+  /// A_F facet area
+  ///
+  /// More details:
+  /// Cha Zhang and Tsuhan Chen "Efficient feature extraction for 2D/3D objects in mesh representation"
+  /// Proceedings 2001 International Conference on Image Processing (Cat. No.01CH37205), 2001, pp. 935-938 vol.3
+  /// doi: 10.1109/ICIP.2001.958278.
   template<class utype>
   double
   volume(const vector <xvector<utype>> &points, const vector <vector<uint>> &facets,
@@ -2174,16 +2171,14 @@ namespace aurostd { //HE20210511
     return std::abs(result) / 3.0; // depending on the normal direction the volume could be negative
   }
 
-  /**
-   * @brief volume of a solid encapsulated by points on ordered facets
-   * @param points collection of points
-   * @param facets collection of consistently ordered point indices describing a facet
-   * @param convex switch to assume
-   * @return volume
-   *
-   * All facets need to be sorted consistently clockwise or anticlockwise in regards to the outside facing facet normal.
-   * For convex solid it is not necessary that all facets are ordered in the same manner.
-   */
+  /// @brief volume of a solid encapsulated by points on ordered facets
+  /// @param points collection of points
+  /// @param facets collection of consistently ordered point indices describing a facet
+  /// @param convex switch to assume
+  /// @return volume
+  ///
+  /// All facets need to be sorted consistently clockwise or anticlockwise in regards to the outside facing facet normal.
+  /// For convex solid it is not necessary that all facets are ordered in the same manner.
   template<class utype>
   double
   volume(const vector <xvector<utype>> &points, const vector <vector<uint>> &facets, const bool convex) { //HE20210511
