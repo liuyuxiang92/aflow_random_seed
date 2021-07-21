@@ -1737,6 +1737,7 @@ namespace chull {
    * @brief generates list of facets, if two neighboring facets are coplanar join them
    * @param facet_collection output vector containing lists of vertex indexes
    * @param angle_threshold max angle between two facts in radian to be still considered coplanar
+   * @note the facets contain only vertices
    */
   void ConvexHull::getJoinedFacets(vector<vector<uint> > &facet_collection, const double angle_threshold) {//HE20210510
     bool LDEBUG=(false || XHOST.DEBUG);
@@ -1749,6 +1750,8 @@ namespace chull {
     std::set<std::pair<uint, uint> > raw_join_list;
     vector<std::set<uint> > join_list;
     std::set<uint> remove_facet;
+    vector<vector<uint> > raw_facet_collection;
+    std::map<uint, uint> corner_check;
 
     // Collect information on each facet
     for (std::vector<ChullFacet>::const_iterator facet = h_facets.begin(); facet != h_facets.end(); ++facet){
@@ -1837,10 +1840,10 @@ namespace chull {
       join_list.push_back(new_facet);
     }
 
-    // Build the new facet collection
+    // Build the raw facet collection
     // Add unchanged facets (no sorting, as they should all be triangles)
     for (uint i=0; i<raw_facets_size; i++){
-      if (!remove_facet.count(i)) facet_collection.push_back(raw_facets[i]);
+      if (!remove_facet.count(i)) raw_facet_collection.push_back(raw_facets[i]);
     }
     // Add joined facets
     for (std::vector<std::set<uint> >::const_iterator to_join = join_list.begin(); to_join != join_list.end(); ++to_join) {
@@ -1865,6 +1868,21 @@ namespace chull {
         vec_vertices.push_back(*p_id);
       }
       sortFacetVertices(vec_vertices, *to_join->begin());
+      raw_facet_collection.push_back(vec_vertices);
+    }
+
+    // remove points that are on an edge and not a corner
+    for (uint i_facet = 0; i_facet < raw_facet_collection.size(); i_facet++) {
+      for (uint i_vert = 0; i_vert < raw_facet_collection[i_facet].size(); i_vert++) {
+        corner_check[raw_facet_collection[i_facet][i_vert]]++;
+      }
+    }
+
+    for (uint i_facet = 0; i_facet < raw_facet_collection.size(); i_facet++) {
+      vector<uint> vec_vertices;
+      for (uint i_vert = 0; i_vert < raw_facet_collection[i_facet].size(); i_vert++) {
+        if (corner_check[raw_facet_collection[i_facet][i_vert]]>2)  vec_vertices.push_back(raw_facet_collection[i_facet][i_vert]);
+      }
       facet_collection.push_back(vec_vertices);
     }
   }
