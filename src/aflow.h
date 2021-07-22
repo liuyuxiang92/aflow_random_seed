@@ -2640,8 +2640,8 @@ bool FoldAtomsInCellTest(ostream& oss=cout); //DX20210129
 bool FoldAtomsInCellTest(ofstream& FileMESSAGE,ostream& oss=cout); //DX20210129
 bool AtomicEnvironmentTest(ostream& oss=cout); //HE20210511
 bool AtomicEnvironmentTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210511
-bool AurostdTest(ostream& oss=cout); //HE20210512
-bool AurostdTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210512
+bool aurostdTest(ostream& oss=cout); //HE20210512
+bool aurostdTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210512
 // ----------------------------------------------------------------------------
 // Structure Prototypes
 // aflow_xproto.cpp

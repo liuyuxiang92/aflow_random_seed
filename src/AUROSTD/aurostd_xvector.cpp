@@ -2188,7 +2188,6 @@ namespace aurostd { //HE20210511
     vector <xvector<utype>> facet_direction;
     xvector<utype> center = aurostd::getCentroid(points);
     vector <xvector<utype>> normals;
-    xvector<utype> collinear_check;
     uint index_start = 0;
     for (uint f_id = 0; f_id < facets.size(); f_id++) {
       if (facets[f_id].size() < 3) {
@@ -2205,9 +2204,7 @@ namespace aurostd { //HE20210511
         facet_direction.clear();
         facet_direction.push_back(facet_points[index_start] - facet_points[index_start + 1]);
         facet_direction.push_back(facet_points[index_start + 1] - facet_points[index_start + 2]);
-        collinear_check = aurostd::vector_product(facet_direction[0], facet_direction[1]);
-        if (aurostd::iszero(collinear_check[1]) && aurostd::iszero(collinear_check[2]) &&
-            aurostd::iszero(collinear_check[3])) {
+        if (aurostd::isCollinear(facet_direction[0], facet_direction[1], (utype) _ZERO_TOL_)) {
           if (LDEBUG)
             cerr << soliloquy << "Points selected to calculate the normal vector for facet " << f_id
                  << " formed a line. (" << index_start << ", " << index_start + 1 << ", " << index_start + 2 << ")"
