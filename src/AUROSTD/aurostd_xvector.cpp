@@ -2199,8 +2199,9 @@ namespace aurostd { //HE20210511
       for (std::vector<uint>::const_iterator p_id = facets[f_id].begin();
            p_id != facets[f_id].end(); ++p_id)
         facet_points.push_back(points[*p_id]);
+      uint facet_size = facet_points.size();
       index_start = 0;
-      while (true) {
+      while (facet_size >= (index_start + 3)) {
         facet_direction.clear();
         facet_direction.push_back(facet_points[index_start] - facet_points[index_start + 1]);
         facet_direction.push_back(facet_points[index_start + 1] - facet_points[index_start + 2]);
@@ -2212,14 +2213,14 @@ namespace aurostd { //HE20210511
                  << " formed a line. (" << index_start << ", " << index_start + 1 << ", " << index_start + 2 << ")"
                  << endl;
           index_start++;
-          if (facet_points.size() >= (index_start + 3)) {
+          if (facet_size >= (index_start + 3)) {
             if (LDEBUG)
               cerr << soliloquy << "Trying next triplet (" << index_start << ", " << index_start + 1 << ", "
                    << index_start + 2 << ")" << endl;
             continue;
           } else {
             throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy,
-                                  "Could not calculate facet normal - point triplets form on a line", _VALUE_ERROR_);
+                                  "Could not calculate facet normal - point triplets form a line", _VALUE_ERROR_);
           }
         }
         xvector<utype> normal = aurostd::getGeneralNormal(facet_direction);
