@@ -186,9 +186,16 @@ min_cpp: CPP+= -std=c++98
 min_cpp: aflow aflow_data
 
 #HE20210318 - add debug build
+#For debugging build aflow with
+#  make debug
+#then start it using GNU Debugger
+#  gdb aflow
+#see also https://www.gnu.org/software/gdb/documentation/
 .PHONY: debug
 debug: CPP += -ggdb
 debug: aflow aflow_data
+
+
 .PHONY: mac
 mac:
 #	[CO20200508 - OBSOLETE]$(MAKE) CC=clang CPP=clang++ aflow_data
