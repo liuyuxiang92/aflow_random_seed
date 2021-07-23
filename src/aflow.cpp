@@ -695,7 +695,7 @@ bool display_result(const uint passed_checks, const uint check_num, const string
   aflags.Directory=aurostd::getPWD();
   if (passed_checks == check_num) {
     message << "SUCCESS " << task_description << " (passing " << check_num << " checks)" << endl;
-    pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
     message << "\t" << aurostd::joinWDelimiter(results, "\n\t");
     pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
   }

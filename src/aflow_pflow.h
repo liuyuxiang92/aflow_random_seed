@@ -1124,8 +1124,7 @@ namespace pflow {
 }
 
 namespace  pflow {
-  void writeAtomicEnvironment(const string &auid, uint aeMode=1, string aeOutBase="AE_out/");
-  void writeAtomicEnvironment(const string &auid, string &aeOutBase);
+  void outputAtomicEnvironment(const string &auid, uint aeMode=1, double radius=4.0);
 }
 
 #endif

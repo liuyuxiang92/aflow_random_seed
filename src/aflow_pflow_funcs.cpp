@@ -8308,58 +8308,44 @@ namespace pflow {
   /// @brief write collection of atomic environments into json files
   /// @param auid AFLOW ID
   /// @param aeMode enviroment definition (see ATOM_ENVIRONMENT_MODE_X in aflow.h)
-  /// @param aeOutBase output folder
+  /// @param radius change the search radius [FUTURE]
   ///
   /// Feature request: analyse a structure file directly
-  void writeAtomicEnvironment(const string &auid, uint aeMode, string aeOutBase) {
-    bool LDEBUG=(false || XHOST.DEBUG);
-    string soliloquy=XPID+"pflow::writeAtomicEnvironment():";
-    if(LDEBUG) cerr << soliloquy << "Start" << endl;
+  void outputAtomicEnvironment(const string &auid, uint aeMode, double radius) {
+    bool LDEBUG = (false || XHOST.DEBUG);
+    string soliloquy = XPID + "pflow::outputAtomicEnvironment():";
+    if (LDEBUG) cerr << soliloquy << "Start" << endl;
 
     string aurl = "";
     aflowlib::_aflowlib_entry entry;
     xstructure str;
-    string aeOutAUID = "";
+    std::map<string, string> meta_data;
 
     // Quickly match auid to aurl (speedup from 15s to 0.5s compared to single use of AflowlibLocator)
-    if (!auid.empty()) aurl = aurostd::execute2string(XHOST.command("aflow_data")+" vLIBS | grep -B1 \"" + auid + "\" | head -n 1");
+    if (!auid.empty())
+      aurl = aurostd::execute2string(XHOST.command("aflow_data") + " vLIBS | grep -B1 \"" + auid + "\" | head -n 1");
     // Fallback if quick search failed
     if (!auid.empty() && aurl.empty()) {
       cerr << soliloquy << " Quick search failed! Trying standard methode." << endl;
       aflowlib::AflowlibLocator(auid, aurl, "AFLOWLIB_AUID2AURL");
     }
 
-    if (!aeOutBase.empty()) aurostd::DirectoryMake(aeOutBase);
-
-    if (!aurl.empty()){
-
-      aeOutAUID = aeOutBase + auid.substr(6);
-      entry.aurl=aurl;
-      entry.auid=auid;
+    if (!aurl.empty()) {
+      entry.aurl = aurl;
+      entry.auid = auid;
       loadXstructures(entry);
+      meta_data["aurl"] = aurl;
+      meta_data["auid"] = auid;
       str = entry.vstr.back();
-      if(LDEBUG) cerr << soliloquy << " AUID: "<< auid << endl;
-      if(LDEBUG) cerr << soliloquy << " AURL: "<< aurl << endl;
-    }
-
-    else {
+      if (LDEBUG) cerr << soliloquy << " AUID: " << auid << endl;
+      if (LDEBUG) cerr << soliloquy << " AURL: " << aurl << endl;
+    } else {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "could not load a structure", _INPUT_ERROR_);
     }
-    aurostd::DirectoryMake(aeOutAUID);
-    vector<AtomEnvironment> AE = getAtomEnvironments(str, aeMode);
 
-    string file_name;
-    if(LDEBUG) cerr << soliloquy << " Saving " << AE.size() << " atomic environments" << endl;
-    for(uint i=0; i<AE.size(); i++) {
-      file_name = aeOutAUID + "/" + aurostd::utype2string(i) + "_" + AE[i].element_center + ".json";
-      AE[i].constructAtomEnvironmentHull();
-      aurostd::string2file(AE[i].toJSON().toString(), file_name, "WRITE");
-      if(LDEBUG) cerr << soliloquy << " " <<file_name << endl;
-    }
-  }
-
-  void writeAtomicEnvironment(const string &auid, string &aeOutBase) {
-    writeAtomicEnvironment(auid, 1, aeOutBase);
+    vector <AtomEnvironment> AE = getAtomEnvironments(str, aeMode);
+    for(uint i=0; i<AE.size(); i++) AE[i].constructAtomEnvironmentHull();
+    writeAtomEnvironments(AE, meta_data);
   }
 }
 

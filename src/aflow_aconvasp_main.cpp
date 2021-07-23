@@ -597,8 +597,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("ATOMIC_ENVIRONMENT::INIT",aurostd::args2flag(argv,cmds,"--ae|--atomic_environment")); //HE20210331 - Testing
   if(vpflow.flag("ATOMIC_ENVIRONMENT::INIT")){	//HE20210331
      vpflow.args2addattachedscheme(argv,cmds,"ATOMIC_ENVIRONMENT::AUID","--auid=","none");
-     vpflow.args2addattachedscheme(argv,cmds,"ATOMIC_ENVIRONMENT::OUTFOLDER","--out=|--outfolder=","AE_out/");
      vpflow.args2addattachedscheme(argv, cmds,"ATOMIC_ENVIRONMENT::MODE","--mode=","1");
+     vpflow.args2addattachedscheme(argv,cmds,"ATOMIC_ENVIRONMENT::RADIUS","--radius=","4");
+
   }	//HE20210331
 
   vpflow.flag("GENERATE_CERAMICS",aurostd::args2flag(argv,cmds,"--generate_ceramics|--gen_ceram"));  //CO20200731
@@ -7550,12 +7551,12 @@ namespace pflow { //HE20210331
     string soliloquy=XPID+"pflow::ATOMIC_ENVIRONMENT():";
     string auid = "";
     uint ae_mode = ATOM_ENVIRONMENT_MODE_1;
-    string aeOutBase = "AE_out/";
+    double radius = 4.0;
     if (vpflow.flag("ATOMIC_ENVIRONMENT::AUID")) auid = vpflow.getattachedscheme("ATOMIC_ENVIRONMENT::AUID");
     else throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "missing auid - could not load structure", _INPUT_ERROR_);
     if (vpflow.flag("ATOMIC_ENVIRONMENT::MODE")) ae_mode = vpflow.getattachedutype<uint>("ATOMIC_ENVIRONMENT::MODE");
-    if (vpflow.flag("ATOMIC_ENVIRONMENT::OUTFOLDER")) aeOutBase = vpflow.getattachedscheme("ATOMIC_ENVIRONMENT::OUTFOLDER");
-    pflow::writeAtomicEnvironment(auid, ae_mode, aeOutBase);
+    if (vpflow.flag("ATOMIC_ENVIRONMENT::RADIUS")) radius = vpflow.getattachedutype<double>("ATOMIC_ENVIRONMENT::RADIUS");
+    pflow::outputAtomicEnvironment(auid, ae_mode, radius);
   }
 }
 

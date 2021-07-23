@@ -2138,8 +2138,8 @@ namespace aurostd { //HE20210511
   /// doi: 10.1109/ICIP.2001.958278.
   template<class utype>
   double
-  volume(const vector <xvector<utype>> &points, const vector <vector<uint>> &facets,
-         const vector <xvector<utype>> &normals) { //HE20210511
+  volume(const vector <xvector<utype> > &points, const vector <vector<uint> > &facets,
+         const vector <xvector<utype> > &normals) { //HE20210511
     bool LDEBUG = (false || XHOST.DEBUG);
     string soliloquy = XPID + "aurostd::volume(): ";
 
@@ -2149,7 +2149,7 @@ namespace aurostd { //HE20210511
     }
     double result = 0.0;
 
-    vector <xvector<utype>> facet_points;
+    vector <xvector<utype> > facet_points;
     if (LDEBUG) cerr << soliloquy << "facet id | contribution | area | normal | scalar_prod" << endl;
     for (uint f_id = 0; f_id < facets.size(); f_id++) {
       if (facets[f_id].size() < 3) {
@@ -2181,13 +2181,13 @@ namespace aurostd { //HE20210511
   /// For convex solid it is not necessary that all facets are ordered in the same manner.
   template<class utype>
   double
-  volume(const vector <xvector<utype>> &points, const vector <vector<uint>> &facets, const bool convex) { //HE20210511
+  volume(const vector <xvector<utype> > &points, const vector <vector<uint> > &facets, const bool convex) { //HE20210511
     bool LDEBUG = (true || XHOST.DEBUG);
     string soliloquy = XPID + "aurostd::volume(): ";
-    vector <xvector<utype>> facet_points;
-    vector <xvector<utype>> facet_direction;
+    vector <xvector<utype> > facet_points;
+    vector <xvector<utype> > facet_direction;
     xvector<utype> center = aurostd::getCentroid(points);
-    vector <xvector<utype>> normals;
+    vector <xvector<utype> > normals;
     uint index_start = 0;
     for (uint f_id = 0; f_id < facets.size(); f_id++) {
       if (facets[f_id].size() < 3) {
@@ -2234,8 +2234,8 @@ namespace aurostd { //HE20210511
 
   // integer xvectors are converted into double vectors, to enable a correct volume calculation
   double
-  volume(const vector <xvector<int>> &points, const vector <vector<uint>> &facets, const bool convex) { //HE20210514
-    vector <xvector<double>> mapped_points;
+  volume(const vector <xvector<int> > &points, const vector <vector<uint> > &facets, const bool convex) { //HE20210514
+    vector <xvector<double> > mapped_points;
     uint num_points = points.size();
     for (uint p_id = 0; p_id < num_points; p_id++) {
       xvector<double> new_point(3, 1);

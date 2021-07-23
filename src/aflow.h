@@ -2606,7 +2606,9 @@ xvector<double> getCentroidOfStructurePBC(const deque<_atom>& atoms,xmatrix<doub
 // ----------------------------------------------------------------------------
 // functions related to AtomEnvironment - DX20191122
 vector<AtomEnvironment> getAtomEnvironments(const xstructure& xstr, uint mode=ATOM_ENVIRONMENT_MODE_1);
+void writeAtomEnvironments(const vector<AtomEnvironment> environments, const std::map<string, string> meta_data = std::map<string, string>()); //HE20210723 add separate write function
 vector<AtomEnvironment> getLFAAtomEnvironments(const xstructure& xstr, const string& lfa, const vector<string>& LFAs, uint mode=ATOM_ENVIRONMENT_MODE_1);
+
 void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,
     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates); //DX20191122
 void minimumCoordinationShellLatticeOnly(const xmatrix<double>& lattice,

@@ -2210,6 +2210,78 @@ vector<AtomEnvironment> getAtomEnvironments(const xstructure& xstr, uint mode){
 }
 
 // ***************************************************************************
+// writeAtomEnvironments() - HE20210723
+// ***************************************************************************
+
+void writeAtomEnvironments(vector<AtomEnvironment> AE, const std::map<string, string> meta_data){
+
+  bool LDEBUG = (false || XHOST.DEBUG);
+  string soliloquy = XPID + "pflow::writeAtomEnvironments():";
+
+  vector<aurostd::JSONwriter> ae_collection;
+  aurostd::JSONwriter ae_json;
+  string file_name = "atomic_environment.json";
+  string directory_name = "";
+  string file_path = "";
+  string file_extension = ".json";
+
+  // set filetype
+  filetype ftype = json_ft;
+  if(XHOST.vflag_control.flag("PRINT_MODE::JSON")) {
+    ftype = json_ft;
+    file_extension = ".json";
+  }
+  else if(XHOST.vflag_control.flag("PRINT_MODE::TXT")) {
+    ftype = txt_ft;
+    file_extension = ".txt";
+  }
+
+  // for now just JSON is supported
+  if(ftype != json_ft){
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "Just JSON is supported at the moment.", _INPUT_ERROR_);
+  }
+
+  // construct file path
+  if(XHOST.vflag_control.flag("FILE")) file_name = XHOST.vflag_control.getattachedscheme("FILE");
+  else {
+    if (meta_data.find("auid")!=meta_data.end()) {
+      string auid = meta_data.at("auid");
+      if (auid.find("aflow:") != std::string::npos) file_name = auid.substr(6);
+      else file_name = auid;
+    }
+  }
+
+  // ensure that filename has the appropriate extension
+  if (!(file_name.size() >= file_extension.size() && 0 == file_name.compare(file_name.size()-file_extension.size(), file_extension.size(), file_extension))){
+    file_name += file_extension;
+  };
+
+  if(XHOST.vflag_control.flag("DIRECTORY")){
+    directory_name = XHOST.vflag_control.getattachedscheme("DIRECTORY");
+    aurostd::DirectoryMake(directory_name);
+  }
+
+  if (!directory_name.empty()) file_path = directory_name + "/" + file_name;
+  else file_path = file_name;
+
+  if(LDEBUG) cerr << soliloquy << " Saving " << AE.size() << " atomic environments" << endl;
+
+  for(uint i=0; i<AE.size(); i++) ae_collection.push_back(AE[i].toJSON());
+
+  if (!meta_data.empty()) {
+    for (std::map<string, string>::const_iterator meta_entry=meta_data.begin(); meta_entry!=meta_data.end(); ++meta_entry){
+      ae_json.addString(meta_entry->first, meta_entry->second);
+    }
+  }
+
+  ae_json.addVector("atomic_environments", ae_collection);
+  aurostd::string2file(ae_json.toString(), file_path, "WRITE");
+  if(LDEBUG) cerr << soliloquy << " Written to " << file_path << endl;
+}
+
+
+
+// ***************************************************************************
 // getLFAAtomEnvironments() - DX20191122
 // ***************************************************************************
 vector<AtomEnvironment> getLFAAtomEnvironments(const xstructure& xstr, const string& lfa, const vector<string>& LFAs, uint mode){

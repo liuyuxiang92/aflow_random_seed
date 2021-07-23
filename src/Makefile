@@ -1200,7 +1200,6 @@ check_full:
 	$(MAKE) check_edata
 	$(MAKE) check_aflow_xtal_finder
 	$(MAKE) check_fold_atoms_in_cell_routine
-	$(MAKE) check_aflow_gcc_compatibility
 	$(MAKE) check_cce
 	$(MAKE) check_pocc
 	$(MAKE) check_prototype_generator
