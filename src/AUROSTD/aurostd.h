@@ -52,6 +52,7 @@
 #include <signal.h>  //ME20191125 - needed for AflowDB
 #include <vector>
 #include <list> //CO20170806 - need for POCC
+#include <utility> //HE2021069 - for pairs in chull (C++98 changes, already included in SYMBOLICCPLUSPLUS)
 #include <netdb.h>  //CO20180321 - frisco needs for AFLUX
 
 #define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)  //CO20200502 - moved from aflow.h

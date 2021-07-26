@@ -760,6 +760,7 @@ namespace chull {
       double getNPlus1EnthalpyGain(uint cpoint,ConvexHull& fake_hull,bool hull_set) const;
       vector<double> getNPlus1EnthalpyGain(const vector<uint>& vcpoints) const;
       vector<double> getNPlus1EnthalpyGain(const vector<uint>& vcpoint,ConvexHull& fake_hull,bool hull_set) const;
+      void getJoinedFacets(vector<vector<uint> > &facet_collection, const double angle_threshold = PI/180); //HE20210510 - 0.018 radians ~ 1 degree
 
       //writer
       bool write(filetype ftype=latex_ft) const;
@@ -831,6 +832,7 @@ namespace chull {
       vector<string> alloyToElements(const ChullPoint& point) const;
       vector<string> alloyToElements(uint i_nary,uint i_alloy) const;
       void checkStructurePoints();
+      void sortFacetVertices(vector<uint> &facet, const uint &facet_id); //HE20210510
 
       //other methods associated with calculating hull
       void addPointToFacet(ChullFacet& facet,uint i_point);

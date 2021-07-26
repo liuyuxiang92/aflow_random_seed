@@ -261,6 +261,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
 
   vector<vector<utype> > vvu;sort(vvu.begin(),vvu.end(),aurostd::compareVecElements<utype>);  //CO20190629
   vector<xvector<utype> > vxvu;sort(vxvu.begin(),vxvu.end(),aurostd::compareXVecElements<utype>);  //CO20190629
+  vector<vector<uint> > vvui; //HE20210511
   std::sort(vvu.begin(),vvu.end(),aurostd::compareVecElement<utype>()); //CO20190629
   std::sort(vxvu.begin(),vxvu.end(),aurostd::compareVecElement<utype>()); //CO20190629
 
@@ -268,6 +269,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   o+=isdifferent(v,v,x);v=-v;o+=max(v);v=abs(v);roundoff(v);roundoff(v,x);reduceByGCD(v,v,x);v+=normalizeSumToOne(v,x);clear(v);floor(v);ceil(v); //DX20191125 - changed input format for reduceByGCD()
   o+=getcos(v,v);v.clear();v.set(x);v.reset();v.resize(1,1);clear(v);reset(v);set(v,x);v=abs(v);v=vabs(v);v=sign(v);
   o+=angle(v,v,v);o+=getangle(v,v,v);isCollinear(v,v,x);v=getCentroid(vxv);v=getCentroid(vxv,vutype);o+=distance(v,v); //DX20200729 - added getCentroid() with weights
+  o+=areaPointsOnPlane(vxv); o+=volume(vxv, vvui, vxv); o+=volume(vxv, vvui); //HE20210721
   aurostd::xmatrix<utype> xmatpbc;dxv=getCentroidPBC(vxv,xmatpbc);dxv=getCentroidPBC(vxv,vutype,xmatpbc); //DX20200728 - added getCentroidPBC()
   getGeneralAngles(v,x);getGeneralAngle(v,0,x);
   vv=pointLineIntersection(v,v,v); //CO20190520

@@ -8297,6 +8297,61 @@ namespace pflow{
   }
 }
 
+
+
+// ***************************************************************************
+// pflow::writeAtomicEnvironment() //HE20210617
+// ***************************************************************************
+
+namespace pflow {
+
+  /// @brief write collection of atomic environments into json files
+  /// @param auid AFLOW ID
+  /// @param aeMode enviroment definition (see ATOM_ENVIRONMENT_MODE_X in aflow.h)
+  /// @param radius change the search radius [FUTURE]
+  ///
+  /// Feature request: analyse a structure file directly
+  void outputAtomicEnvironment(const string &auid, uint aeMode, double radius) {
+    bool LDEBUG = (false || XHOST.DEBUG);
+    string soliloquy = XPID + "pflow::outputAtomicEnvironment():";
+    if (LDEBUG) cerr << soliloquy << " Start" << endl;
+
+    // for FUTURE use
+    if (radius == 0){}
+     
+    string aurl = "";
+    aflowlib::_aflowlib_entry entry;
+    xstructure str;
+    std::map<string, string> meta_data;
+
+    // Quickly match auid to aurl (speedup from 15s to 0.5s compared to single use of AflowlibLocator)
+    if (!auid.empty())
+      aurl = aurostd::execute2string(XHOST.command("aflow_data") + " vLIBS | grep -B1 \"" + auid + "\" | head -n 1");
+    // Fallback if quick search failed
+    if (!auid.empty() && aurl.empty()) {
+      cerr << soliloquy << " Quick search failed! Trying standard methode." << endl;
+      aflowlib::AflowlibLocator(auid, aurl, "AFLOWLIB_AUID2AURL");
+    }
+
+    if (!aurl.empty()) {
+      entry.aurl = aurl;
+      entry.auid = auid;
+      loadXstructures(entry);
+      meta_data["aurl"] = aurl;
+      meta_data["auid"] = auid;
+      str = entry.vstr.back();
+      if (LDEBUG) cerr << soliloquy << " AUID: " << auid << endl;
+      if (LDEBUG) cerr << soliloquy << " AURL: " << aurl << endl;
+    } else {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "could not load a structure", _INPUT_ERROR_);
+    }
+
+    vector <AtomEnvironment> AE = getAtomEnvironments(str, aeMode);
+    for(uint i=0; i<AE.size(); i++) AE[i].constructAtomEnvironmentHull();
+    writeAtomEnvironments(AE, meta_data);
+  }
+}
+
 // ***************************************************************************
 // pflow::getSpaceGroupSetting() //DX20210420
 // ***************************************************************************
