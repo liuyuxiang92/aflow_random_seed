@@ -2078,6 +2078,175 @@ namespace aurostd {
     }
 }
 
+namespace aurostd { //HE20210511
+  /// @brief area encapsulated by ordered points on a plane
+  /// @param points collection of points
+  /// @return area
+  ///
+  /// A series of triangles are formed by the first point P(0), P(k), and P(k+1) for k from 1 to points.size()-2.
+  /// The sum of the triangle areas divided by two is the area of the overall polygon.
+  /// Instead of calculating the norm for each triangle, the vector product can be summed, thereby reducing sqrt calls.
+  ///
+  /// area = 0.5 \left| \sum_{k=1}^{k=n-2} \overrightarrow{P_0P_k} \times \overrightarrow{P_0P_{k+1}} \right|
+  ///
+  /// The definition generates signed areas for each triangle. For a convex polygon, all areas are positive.
+  /// For non-convex shapes, some areas will be negative in this definition and correct the overall area automatically.
+  ///
+  /// This function will return the wrong area if edges are crossed!
+  ///
+  /// More details:
+  /// Cha Zhang and Tsuhan Chen "Efficient feature extraction for 2D/3D objects in mesh representation"
+  /// Proceedings 2001 International Conference on Image Processing (Cat. No.01CH37205), 2001, pp. 935-938 vol.3
+  /// doi: 10.1109/ICIP.2001.958278.
+  template<class utype> double
+    areaPointsOnPlane(const vector<xvector<utype> >& points){ //HE20210511
+      string soliloquy=XPID+"aurostd::areaPointsOnPlane():";
+      if (points.size() < 3){
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "there must be at least three points to calculate an area", _VALUE_ERROR_);
+      }
+      utype result = 0.0;
+      uint upper_border = points.size()-2;
+      xvector<utype> sum_temp(points[0].lrows,points[0].urows);
+      for (uint k=1; k<=upper_border;k++) sum_temp += aurostd::vector_product(points[k]-points[0], points[k+1]-points[0]);
+      for (int i=sum_temp.lrows;i<=sum_temp.urows;i++) result += sum_temp[i]*sum_temp[i];
+      return 0.5 * std::sqrt((double) result);
+  }
+}
+
+namespace aurostd { //HE20210511
+
+  /// @brief volume of a solid defined by points, facets their normals
+  /// @param points collection of points
+  /// @param facets collection of ordered point indices describing a facet
+  /// @param normals collection of facet normals pointing all either outwards or inwards of the solid
+  /// @return volume
+  ///
+  /// A series of pyramids are generated from the solid with the facets as bases and origin as their tips.
+  /// Their volumes (1/3 * base area * height) is then summed up.
+  /// The height of the pyramids is the scalar product of the normal vector and a point on the facet.
+  /// Depending upon the normal direction, the height and, therefore, the volume can be negative.
+  /// This ensures that overlapping volumes are handled properly.
+  ///
+  /// \frac{1}{3} \left| \sum_F (P0_F \cdot N_F) A_F \right|
+  /// P0_F first point of a facet (could be any point on facet F)
+  /// N_F facet normal vector
+  /// A_F facet area
+  ///
+  /// More details:
+  /// Cha Zhang and Tsuhan Chen "Efficient feature extraction for 2D/3D objects in mesh representation"
+  /// Proceedings 2001 International Conference on Image Processing (Cat. No.01CH37205), 2001, pp. 935-938 vol.3
+  /// doi: 10.1109/ICIP.2001.958278.
+  template<class utype>
+  double
+  volume(const vector <xvector<utype> > &points, const vector <vector<uint> > &facets,
+         const vector <xvector<utype> > &normals) { //HE20210511
+    bool LDEBUG = (false || XHOST.DEBUG);
+    string soliloquy = XPID + "aurostd::volume():";
+
+    if (facets.size() != normals.size()) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, " there must be an equal number of facets and normal vectors",
+                            _VALUE_ERROR_);
+    }
+    double result = 0.0;
+
+    vector <xvector<utype> > facet_points;
+    if (LDEBUG) cerr << soliloquy << " facet id | contribution | area | normal | scalar_prod" << endl;
+    for (uint f_id = 0; f_id < facets.size(); f_id++) {
+      if (facets[f_id].size() < 3) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "there must be at least three vertices in each facets",
+                              _VALUE_ERROR_);
+      }
+      facet_points.clear();
+      for (std::vector<uint>::const_iterator p_id = facets[f_id].begin();
+           p_id != facets[f_id].end(); ++p_id)
+        facet_points.push_back(points[*p_id]);
+      double area = aurostd::areaPointsOnPlane(facet_points);
+      double scalar_prod = aurostd::scalar_product(normals[f_id], facet_points[0]);
+      if (LDEBUG)
+        cerr << soliloquy << " " << f_id << " | " << scalar_prod * area / 3.0 << " | " << area << " | " << normals[f_id]
+             << " | " << scalar_prod << endl;
+      result += scalar_prod * area;
+    }
+    if (LDEBUG) cerr << soliloquy << " Volume: " << std::abs(result) / 3.0 << endl;
+    return std::abs(result) / 3.0; // depending on the normal direction the volume could be negative
+  }
+
+  /// @brief volume of a solid encapsulated by points on ordered facets
+  /// @param points collection of points
+  /// @param facets collection of consistently ordered point indices describing a facet
+  /// @param convex switch to assume
+  /// @return volume
+  ///
+  /// All facets need to be sorted consistently clockwise or anticlockwise in regards to the outside facing facet normal.
+  /// For convex solid it is not necessary that all facets are ordered in the same manner.
+  template<class utype>
+  double
+  volume(const vector <xvector<utype> > &points, const vector <vector<uint> > &facets, const bool convex) { //HE20210511
+    bool LDEBUG = (true || XHOST.DEBUG);
+    string soliloquy = XPID + "aurostd::volume():";
+    vector <xvector<utype> > facet_points;
+    vector <xvector<utype> > facet_direction;
+    xvector<utype> center = aurostd::getCentroid(points);
+    vector <xvector<utype> > normals;
+    uint index_start = 0;
+    for (uint f_id = 0; f_id < facets.size(); f_id++) {
+      if (facets[f_id].size() < 3) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "there must be at least three vertices in each facets",
+                              _VALUE_ERROR_);
+      }
+      facet_points.clear();
+      for (std::vector<uint>::const_iterator p_id = facets[f_id].begin();
+           p_id != facets[f_id].end(); ++p_id)
+        facet_points.push_back(points[*p_id]);
+      uint facet_size = facet_points.size();
+      index_start = 0;
+      while (facet_size >= (index_start + 3)) {
+        facet_direction.clear();
+        facet_direction.push_back(facet_points[index_start] - facet_points[index_start + 1]);
+        facet_direction.push_back(facet_points[index_start + 1] - facet_points[index_start + 2]);
+        if (aurostd::isCollinear(facet_direction[0], facet_direction[1], (utype) _ZERO_TOL_)) {
+          if (LDEBUG)
+            cerr << soliloquy << " Points selected to calculate the normal vector for facet " << f_id
+                 << " formed a line. (" << index_start << ", " << index_start + 1 << ", " << index_start + 2 << ")"
+                 << endl;
+          index_start++;
+          if (facet_size >= (index_start + 3)) {
+            if (LDEBUG)
+              cerr << soliloquy << " Trying next triplet (" << index_start << ", " << index_start + 1 << ", "
+                   << index_start + 2 << ")" << endl;
+            continue;
+          } else {
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy,
+                                  "Could not calculate facet normal - point triplets form a line", _VALUE_ERROR_);
+          }
+        }
+        xvector<utype> normal = aurostd::getGeneralNormal(facet_direction);
+        if (convex) {
+          utype direction_check = aurostd::scalar_product(facet_points[0] - center, normal);
+          if (direction_check < 0) normal = -normal;
+        }
+        normals.push_back(normal);
+        break;
+      }
+    }
+    return volume(points, facets, normals);
+  }
+
+  // integer xvectors are converted into double vectors, to enable a correct volume calculation
+  double
+  volume(const vector <xvector<int> > &points, const vector <vector<uint> > &facets, const bool convex) { //HE20210514
+    vector <xvector<double> > mapped_points;
+    uint num_points = points.size();
+    for (uint p_id = 0; p_id < num_points; p_id++) {
+      xvector<double> new_point(3, 1);
+      for (int i = points[p_id].lrows; i <= points[p_id].urows; i++) new_point(i) = (double) points[p_id](i);
+      mapped_points.push_back(new_point);
+    }
+    return volume(mapped_points, facets, convex);
+  }
+}
+
+
 namespace aurostd {
   template<class utype> xvector<utype> //get centroid of data points //CO20180409
     getCentroid(const vector<xvector<utype> >& points) { //DX20200728 - added weights

@@ -179,6 +179,23 @@ static_no_pdf: aflow aflow_data
 static: static_no_pdf
 #	tar Jcfvp /www/AFLOW/CURRENT/aflow_$(VERSNUMBER)_amd64_debian_static.tar.xz aflow aflow_data	
 #ME190313 - Change compiler to clang because g++ fails to compile on some Macs
+
+#HE20210629 build with the oldest supported c++ standard
+.PHONY: min_cpp
+min_cpp: CPP+= -std=c++98
+min_cpp: aflow aflow_data
+
+#HE20210318 - add debug build
+#For debugging build aflow with
+#  make debug
+#then start it using GNU Debugger
+#  gdb aflow
+#see also https://www.gnu.org/software/gdb/documentation/
+.PHONY: debug
+debug: CPP += -ggdb
+debug: aflow aflow_data
+
+
 .PHONY: mac
 mac:
 #	[CO20200508 - OBSOLETE]$(MAKE) CC=clang CPP=clang++ aflow_data
@@ -1183,12 +1200,13 @@ check_full:
 	$(MAKE) check_edata
 	$(MAKE) check_aflow_xtal_finder
 	$(MAKE) check_fold_atoms_in_cell_routine
-	$(MAKE) check_aflow_gcc_compatibility
 	$(MAKE) check_cce
 	$(MAKE) check_pocc
 	$(MAKE) check_prototype_generator
 	$(MAKE) check_prototype_symmetry
 	$(MAKE) check_prototype_uniqueness
+	$(MAKE) check_atomic_environment
+	$(MAKE) check_aurostd
 .PHONY: check_proto
 check_proto:
 	@echo "Performing 'aflow --proto' test"
@@ -1619,8 +1637,15 @@ check_cce:
 	@echo "Running CCE test 20: LiCaN"
 	@wget --quiet http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/ORC/Ca1Li1N1_ICSD_107304/CONTCAR.relax.vasp; ANSWER=0.834,0.653,-2.298,-2.474,-1.133,-1.311,0.960,0.792,-8.794,-8.613,-8.814,-8.638,-8.787,-8.609,-8.840,-8.672,-8.518; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304 --cce_test --dft_formation_energies=-7.960,-11.112,-9.920,-7.880,0 --functionals=PBE,LDA,SCAN,PBE+U:ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 20 failed!, check CCE on CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304" && exit 1; else echo "CCE test 20 passed!"; rm -f CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304 ; fi
 #RF20200302 - STOP
-.PHONY: check_aflow_gcc_compatibility
-check_aflow_gcc_compatibility:
+.PHONY: check_atomic_environment #HE20210616
+check_atomic_environment:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --AtomicEnvironment_test
+.PHONY: check_aurostd
+check_aurostd:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --aurostd_test
+
 ifeq ($(UNAME),Linux)
 	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' | wc -l | sed 's/^ *//') && \
 		if [ "$$NUMBER_NULLPTRS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_NULLPTRS nullptrs in the source code; this is not backwards compatible with older GCC version. Please swap with 'NULL' and recompile." && exit 1; fi

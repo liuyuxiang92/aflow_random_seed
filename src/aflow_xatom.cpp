@@ -11,6 +11,7 @@
 #include "aflow_symmetry_spacegroup.h" //DX20180723
 #include "AUROSTD/aurostd_xscalar.h"
 #include "aflow_compare_structure.h" //CO20180409
+#include "aflow_chull.h" //HE20210408
 
 #define _calculate_symmetry_default_sgroup_radius_   2.0
 #define PLATON_MIN_VOLUME_PER_ATOM   6.0   // for symmetry calculation
@@ -1881,13 +1882,23 @@ AtomEnvironment::AtomEnvironment(){
 // ---------------------------------------------------------------------------
 // AtomEnvironment::free
 void AtomEnvironment::free(){
+  mode=0;
   element_center="";
   type_center=0;
+  num_types=0;
+  num_neighbors=0;
   elements_neighbor.clear();
   types_neighbor.clear();
   distances_neighbor.clear();
   coordinations_neighbor.clear();
   coordinates_neighbor.clear();
+  facets.clear();
+  facet_area.clear();
+  area=0;
+  volume=0;
+  has_hull=false;
+  facet_order.clear();
+  facet_order.resize(8, 0);
 }
 
 // ---------------------------------------------------------------------------
@@ -1905,13 +1916,22 @@ AtomEnvironment::AtomEnvironment(const AtomEnvironment& b){
 // ---------------------------------------------------------------------------
 // AtomEnvironment::copy
 void AtomEnvironment::copy(const AtomEnvironment& b) {
+  mode=b.mode;
   element_center=b.element_center;
   type_center=b.type_center;
+  num_neighbors=b.num_neighbors;
+  num_types=b.num_types;
   elements_neighbor=b.elements_neighbor;
   types_neighbor=b.types_neighbor;
   distances_neighbor=b.distances_neighbor;
   coordinations_neighbor=b.coordinations_neighbor;
   coordinates_neighbor=b.coordinates_neighbor;
+  facets=b.facets;
+  facet_order=b.facet_order;
+  facet_area=b.facet_area;
+  area=b.area;
+  volume=b.volume;
+  has_hull=b.has_hull;
 }
 
 // ---------------------------------------------------------------------------
@@ -1927,57 +1947,184 @@ const AtomEnvironment& AtomEnvironment::operator=(const AtomEnvironment& b){
 // AtomEnvironment::operator<< 
 ostream& operator<<(ostream& oss, const AtomEnvironment& AtomEnvironment){
 
-  // operator<< for the AtomEnvironment object (looks like a JSON)
-
-  //if(AtomEnvironment.iomode!=JSON_MODE){ //A safeguard until we construct more output schemes.
-  //  AtomEnvironment.iomode=JSON_MODE;
-  //}
-
-  string eendl="";
-  stringstream sscontent_json;
-  vector<string> vcontent_json, tmp;
-
-  // element_center 
-  sscontent_json << "\"element_center\":\"" << AtomEnvironment.element_center << "\"" << eendl;
-  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-  // type_center
-  sscontent_json << "\"type_center\":" << AtomEnvironment.type_center << eendl;
-  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-  // elements_neighbor
-  sscontent_json << "\"elements_neighbor\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(AtomEnvironment.elements_neighbor,"\""),",") << "]" << eendl;
-  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-  // distances_neighbor
-  sscontent_json << "\"distances_neighbor\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(AtomEnvironment.distances_neighbor,8,true,1e-6),",") << "]" << eendl;
-  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-  // coordinations_neighbor
-  sscontent_json << "\"coordinations_neighbor\":[" << aurostd::joinWDelimiter(AtomEnvironment.coordinations_neighbor,",") << "]" << eendl;
-  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-  // coordinates_neighbor
-  sscontent_json << "\"coordinates_neighbor\":[";
-  vector<string> coordinate_sets;
-  for(uint i=0;i<AtomEnvironment.coordinates_neighbor.size();i++){
-    vector<string> coordinates;
-    for(uint j=0;j<AtomEnvironment.coordinates_neighbor[i].size();j++){
-      stringstream ss_tmp; ss_tmp << "[" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(AtomEnvironment.coordinates_neighbor[i][j],8,true,1e-6),",") << "]";
-      coordinates.push_back(ss_tmp.str());
-      ss_tmp.clear();
-    }
-    coordinate_sets.push_back("["+aurostd::joinWDelimiter(coordinates,",")+"]");
-  }
-  sscontent_json << aurostd::joinWDelimiter(coordinate_sets,",") << "]" << eendl;
-  vcontent_json.push_back(sscontent_json.str()); sscontent_json.str("");
-
-  // Put into json AtomEnvironment object
-  oss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}";
-  vcontent_json.clear();
+  oss << AtomEnvironment.toJSON(false).toString();
 
   return oss;
 }
+
+// ***************************************************************************
+// AtomEnvironment::constructAtomEnvironmentHull() - HE20210408
+// ***************************************************************************
+
+/// @brief constructed a convex hull around the atomic environment
+void AtomEnvironment::constructAtomEnvironmentHull(void){
+  string soliloquy=XPID+"AtomEnvironment::constructAtomEnvironmentHull():";
+  bool LDEBUG=(false || XHOST.DEBUG);
+  if (has_hull) {
+    if(LDEBUG) cerr << soliloquy << " AE hull is already set" << endl;
+    return;
+  }
+
+  vector<xvector<double> > points;
+  for (uint t = 0; t < num_neighbors; t++) {
+    points.push_back(index2Point(t));
+  }
+
+  if (LDEBUG) cerr << soliloquy << " create AE hull around " << num_neighbors << " atoms" << endl;
+  xoption hull_options;
+  hull_options.flag("CHULL::FULL_HULL", true);
+  hull_options.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS", true);
+  hull_options.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS", true);
+  hull_options.flag("CHULL::INCLUDE_OUTLIERS", true);
+  hull_options.flag("CHULL::SEE_NEGLECT", false);
+  chull::ConvexHull AEhull;
+  AEhull = chull::ConvexHull(hull_options, points);
+
+  if (LDEBUG) cerr << soliloquy << " resulting hull has " << AEhull.m_facets.size() << " raw facets" << endl;
+
+  vector<vector<uint> > facet_collection;
+  AEhull.getJoinedFacets(facet_collection);
+  for (std::vector<vector<uint> >::const_iterator f = facet_collection.begin(); f != facet_collection.end(); ++f) {
+    vector<uint> nf;
+    for (std::vector<uint>::const_iterator v = f->begin(); v != f->end(); ++v) nf.push_back(*v);
+    facets.push_back(nf);
+  }
+  if(LDEBUG) cerr << soliloquy << " after joining " << facets.size() << " facets are remaining" << endl;
+
+  for (std::vector<vector<uint> >::const_iterator f = facets.begin(); f != facets.end(); ++f) {
+    if (f->size()<10) facet_order[f->size()-3]++;
+    else facet_order[7]++;
+  }
+  for (uint t = 0; t < facet_collection.size(); t++) {
+    vector<xvector<double> > facet_coords;
+    for (std::vector<uint>::const_iterator ind=facet_collection[t].begin(); ind != facet_collection[t].end(); ind++){
+      facet_coords.push_back(points[*ind]);
+    }
+    facet_area.push_back(aurostd::areaPointsOnPlane(facet_coords));
+  }
+  volume = aurostd::volume(points, facets, true);
+  area = aurostd::sum(facet_area);
+  has_hull = true;
+}
+
+// ***************************************************************************
+// AtomEnvironment::index2Point() - HE20210408
+// ***************************************************************************
+
+/// @brief lookup function to map flat neighbor index back into element sorted coordinates_neighbor list
+/// @param index neighbor index
+/// @return neighbor coordinates
+xvector<double> AtomEnvironment::index2Point(uint index){
+    string soliloquy=XPID+"AtomEnvironment::index2Point():";
+    for(uint i=0;i<coordinates_neighbor.size();i++){
+        if (index < coordinations_neighbor[i]) return coordinates_neighbor[i][index];
+        else index -= coordinations_neighbor[i];
+    }
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "index out of bounds", _INDEX_BOUNDS_);
+}
+
+// ***************************************************************************
+// AtomEnvironment::toJSON() - HE20210408
+// ***************************************************************************
+
+/// @brief serialize AtomEnvironment class to json
+/// @return json string
+aurostd::JSONwriter AtomEnvironment::toJSON(bool full) const{
+  string soliloquy=XPID+"AtomEnvironment::toJSON():";
+
+  aurostd::JSONwriter ae_json;
+
+  // this is the XtalFinder printing mode, we need to retain
+  // this printing mode since the work has been published
+  // this is flatter than the other printing method //DX20210624
+  if(mode == ATOM_ENVIRONMENT_MODE_1){
+    // element_center
+    ae_json.addString("element_center", element_center);
+    // type_center
+    ae_json.addNumber("type_center", type_center);
+    // elements_neighbor
+    ae_json.addVector("elements_neighbor", elements_neighbor);
+    // distances_neighbor
+    ae_json.addVector("distances_neighbor", distances_neighbor, 8, true);
+    // coordinations_neighbor
+    ae_json.addVector("coordinations_neighbor", coordinations_neighbor);
+
+    // coordinates_neighbor
+    vector<string> coordinates_all;
+    for(uint i=0;i<coordinates_neighbor.size();i++){
+      vector<string> coordinates_set;
+      for(uint j=0;j<coordinates_neighbor[i].size();j++){
+        aurostd::JSONwriter neighbor;
+        neighbor.mergeRawJSON("["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(coordinates_neighbor[i][j],8,true,1e-6),",")+"]");
+        coordinates_set.push_back(neighbor.toString(false));
+      }
+      aurostd::JSONwriter json_tmp;
+      json_tmp.mergeRawJSON("["+aurostd::joinWDelimiter(coordinates_set,",")+"]");
+      coordinates_all.push_back(json_tmp.toString(false));
+    }
+    ae_json.addVector("coordinates_neighbor",coordinates_all,false);
+  }
+
+  else{
+    ae_json.addNumber("ae_mode", mode);
+    ae_json.addString("center_element", element_center);
+    ae_json.addNumber("center_element_index", type_center);
+    ae_json.addNumber("element_count", num_types);
+
+    //    "elements_neighbor"
+    if (full) {
+      vector<aurostd::JSONwriter> distance_collection;
+      for (uint i = 0; i < elements_neighbor.size(); i++) {
+        aurostd::JSONwriter distance_element;
+        distance_element.addNumber("index", i);
+        distance_element.addString("name", elements_neighbor[i]);
+        distance_element.addNumber("min_distance", distances_neighbor[i]);
+        distance_element.addNumber("coordination", coordinations_neighbor[i]);
+        distance_collection.push_back(distance_element);
+      }
+      ae_json.addVector("neighbor_elements", distance_collection);
+    }
+    if (has_hull){
+      ae_json.addNumber("volume", volume);
+      ae_json.addNumber("area", area);
+    }
+    vector<aurostd::JSONwriter> neighbors;
+    uint index=0;
+    for (uint i = 0; i < coordinations_neighbor.size(); i++) {
+      for (uint k = 0; k < coordinations_neighbor[i]; k++) {
+        aurostd::JSONwriter neighbor;
+        if (full) {
+          neighbor.addNumber("index", index);
+          neighbor.addString("element", elements_neighbor[i]);
+          neighbor.addNumber("element_index", types_neighbor[i]);
+          neighbor.addVector("coordinate", coordinates_neighbor[i][k]);
+        }
+        else {
+          neighbor.addString("element", elements_neighbor[i]);
+          neighbor.addVector("coordinate", coordinates_neighbor[i][k]);
+        }
+        neighbors.push_back(neighbor);
+        index++;
+
+      }
+    }
+    ae_json.addVector("neighbors", neighbors);
+
+    if (has_hull && full) {
+      vector <aurostd::JSONwriter> facets_collection;
+      for (uint i = 0; i < facets.size(); i++) {
+        aurostd::JSONwriter facet_entry;
+        facet_entry.addNumber("area", facet_area[i]);
+        facet_entry.addVector("vertices", facets[i]);
+        facets_collection.push_back(facet_entry);
+      }
+      ae_json.addVector("facets", facets_collection);
+      ae_json.addVector("facet_order", facet_order);
+    }
+  }
+  return ae_json;
+}
+
 
 // ***************************************************************************
 // AtomEnvironment::getAtomEnvironment() - DX20191122 
@@ -1988,12 +2135,12 @@ ostream& operator<<(ostream& oss, const AtomEnvironment& AtomEnvironment){
 //     the neighbor elements, types, distance, coordination, and coordinates are stored in the object
 //     only one distance is sto
 // preliminary functionality, can/will be expanded in the future
-void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_index, uint mode){ 
+void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_index, uint ae_mode){
   vector<string> neighbor_elements;
-  getAtomEnvironment(xstr, center_index, neighbor_elements, mode); 
+  getAtomEnvironment(xstr, center_index, neighbor_elements, ae_mode);
 }
 
-void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_index, const vector<string>& neighbor_elements, uint mode){ 
+void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_index, const vector<string>& neighbor_elements, uint ae_mode){
 
   // ---------------------------------------------------------------------------
   // ATOM_ENVIRONMENT_MODE_1 : default minimum coordination shell
@@ -2002,12 +2149,15 @@ void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_ind
 
   // ---------------------------------------------------------------------------
   // get central atom info
+  mode=ae_mode;
   for(uint i=0;i<xstr.atoms.size();i++){
     if(i==center_index){
       element_center = xstr.atoms[i].name;
       type_center = xstr.atoms[i].type;
     }
   }
+
+  num_types = xstr.species.size();
 
   // ---------------------------------------------------------------------------
   // ATOM_ENVIRONMENT_MODE_1 : minimum coordination environment for each type 
@@ -2028,6 +2178,7 @@ void AtomEnvironment::getAtomEnvironment(const xstructure& xstr, uint center_ind
         distances_neighbor.push_back(min_dist);
         coordinations_neighbor.push_back(frequency);
         coordinates_neighbor.push_back(coordinates);
+        num_neighbors += frequency;
       }
     }
   }
@@ -2057,6 +2208,78 @@ vector<AtomEnvironment> getAtomEnvironments(const xstructure& xstr, uint mode){
   }
   return environments;
 }
+
+// ***************************************************************************
+// writeAtomEnvironments() - HE20210723
+// ***************************************************************************
+
+void writeAtomEnvironments(vector<AtomEnvironment> AE, const std::map<string, string> meta_data){
+
+  bool LDEBUG = (false || XHOST.DEBUG);
+  string soliloquy = XPID + "pflow::writeAtomEnvironments():";
+
+  vector<aurostd::JSONwriter> ae_collection;
+  aurostd::JSONwriter ae_json;
+  string file_name = "atomic_environment.json";
+  string directory_name = "";
+  string file_path = "";
+  string file_extension = ".json";
+
+  // set filetype
+  filetype ftype = json_ft;
+  if(XHOST.vflag_control.flag("PRINT_MODE::JSON")) {
+    ftype = json_ft;
+    file_extension = ".json";
+  }
+  else if(XHOST.vflag_control.flag("PRINT_MODE::TXT")) {
+    ftype = txt_ft;
+    file_extension = ".txt";
+  }
+
+  // for now just JSON is supported
+  if(ftype != json_ft){
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "Just JSON is supported at the moment.", _INPUT_ERROR_);
+  }
+
+  // construct file path
+  if(XHOST.vflag_control.flag("FILE")) file_name = XHOST.vflag_control.getattachedscheme("FILE");
+  else {
+    if (meta_data.find("auid")!=meta_data.end()) {
+      string auid = meta_data.at("auid");
+      if (auid.find("aflow:") != std::string::npos) file_name = auid.substr(6);
+      else file_name = auid;
+    }
+  }
+
+  // ensure that filename has the appropriate extension
+  if (!(file_name.size() >= file_extension.size() && 0 == file_name.compare(file_name.size()-file_extension.size(), file_extension.size(), file_extension))){
+    file_name += file_extension;
+  };
+
+  if(XHOST.vflag_control.flag("DIRECTORY")){
+    directory_name = XHOST.vflag_control.getattachedscheme("DIRECTORY");
+    aurostd::DirectoryMake(directory_name);
+  }
+
+  if (!directory_name.empty()) file_path = directory_name + "/" + file_name;
+  else file_path = file_name;
+
+  if(LDEBUG) cerr << soliloquy << " Saving " << AE.size() << " atomic environments" << endl;
+
+  for(uint i=0; i<AE.size(); i++) ae_collection.push_back(AE[i].toJSON());
+
+  if (!meta_data.empty()) {
+    for (std::map<string, string>::const_iterator meta_entry=meta_data.begin(); meta_entry!=meta_data.end(); ++meta_entry){
+      ae_json.addString(meta_entry->first, meta_entry->second);
+    }
+  }
+
+  ae_json.addVector("atomic_environments", ae_collection);
+  aurostd::string2file(ae_json.toString(), file_path, "WRITE");
+  if(LDEBUG) cerr << soliloquy << " Written to " << file_path << endl;
+}
+
+
 
 // ***************************************************************************
 // getLFAAtomEnvironments() - DX20191122
