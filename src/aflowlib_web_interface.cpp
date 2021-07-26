@@ -1238,10 +1238,10 @@ namespace aflowlib {
       //ME20190124 - add more detailed LDAU information
       if(ldau_TLUJ.size()) {
         //ME20190124 BEGIN
-        sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_type=" << vLDAU[0][0] << eendl;
-        sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_l=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[1], 0), ",") << eendl;
-        sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_u=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[2], 9), ",") << eendl;
-        sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_j=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[3], 9), ",") << eendl;
+        sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_type=" << vLDAU[0][0] << eendl;  //CO+DX20210726 - note precision 0, from wiki: "The first field indicates the type (T) of the DFT+U corrections: type=1, the rotationally invariant version introduced by Liechtenstein et al.29); type=2, the simplified rotationally invariant version introduced by Dudarev et al.30)."
+        sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_l=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[1], 0), ",") << eendl; //CO+DX20210726 - note precision 0, from wiki: "The second field indicates the l-quantum number ({L}, one number for each species separated by “,”) for which the on-site interaction is added (-1=neglected, 0=$s$, 1=$p$, 2=$d$, 3=$f$)."
+        sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_u=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[2], 9), ",") << eendl; //CO+DX20210726 - note precision 9, from wiki: "The third field lists the effective on-site Coulomb interaction parameters ({U}, one number for each species separated by “,”)."
+        sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_j=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vLDAU[3], 9), ",") << eendl; //CO+DX20210726 - note precision 9, from wiki: "The fourth field species the effective on-site exchange interaction parameters ({J}, one number for each species separated by “,”)."
         //ME20190124 END
         sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "ldau_TLUJ=" << ldau_TLUJ << eendl;
       }
