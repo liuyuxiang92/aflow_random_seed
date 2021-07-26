@@ -1466,9 +1466,10 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           if(!aurostd::substring2bool(vcontent.at(iline),"SYSTEM"))
             vline.push_back(vcontent.at(iline));
 
+  int LDAUT=0;
+  stringstream sdata_ldau;
   if(vline.size()!=0) {
     if(LDEBUG) cerr << soliloquy << " LDAU calculation in OUTCAR" << endl;
-    int LDAUT=0;
     vector<int> vLDAUL;vector<double> vLDAUU,vLDAUJ;
     for(uint j=0;j<vline.size();j++) {
       aurostd::string2tokens(vline.at(j),tokens,"=");
@@ -1512,22 +1513,21 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     }
 
     if(LDEBUG) { 
+      //
       cout << soliloquy << " LDA_type=" << LDAUT << endl;
+      //
       cout << soliloquy << " LDAU_L=";
       for(uint i=0;i<vLDAUL.size();i++) cout << vLDAUL.at(i) << ((i<vLDAUL.size()-1)?",":""); 
       cout << endl;
-    }
-    if(LDEBUG) {
+      //
       cout << soliloquy << " LDAU_U=";
       for(uint i=0;i<vLDAUU.size();i++) cout << vLDAUU.at(i) << ((i<vLDAUU.size()-1)?",":""); 
       cout << endl;
-    }
-    if(LDEBUG) {
+      //
       cout << soliloquy << " LDAU_J=";
       for(uint i=0;i<vLDAUJ.size();i++) cout << vLDAUJ.at(i) << ((i<vLDAUJ.size()-1)?",":"");
       cout << endl;
     }
-    stringstream sdata_ldau;
     sdata_ldau << aurostd::utype2string(LDAUT)+";";
     for(uint i=0;i<vLDAUL.size();i++) sdata_ldau << vLDAUL.at(i) << ((i<vLDAUL.size()-1)?",":"");
     sdata_ldau << ";";
@@ -1536,9 +1536,18 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     for(uint i=0;i<vLDAUJ.size();i++) sdata_ldau << vLDAUJ.at(i) << ((i<vLDAUJ.size()-1)?",":"");
     //sdata_ldau << ";";
     string_LDAU=sdata_ldau.str();
-    if(LDEBUG) cerr << soliloquy << " string_LDAU=" << string_LDAU << endl;
+  }else{
+    //CO20210713 - push back 0 for no +U
+    if(LDEBUG) cerr << soliloquy << " LDAU calculation NOT FOUND in OUTCAR" << endl;
+    for(uint j=0;j<species.size();j++) {
+      species_pp_vLDAU.at(j).push_back(LDAUT);
+    }
+    if(LDEBUG) { cout << soliloquy << " LDA_type=" << LDAUT << endl;}
+    //[CO+ME20210713 - keep legacy behavior, only print when non-zero]sdata_ldau << aurostd::utype2string(LDAUT);
+    //[CO+ME20210713 - keep legacy behavior, only print when non-zero]string_LDAU=sdata_ldau.str();
   }
-
+  
+  if(LDEBUG) cerr << soliloquy << " string_LDAU=" << string_LDAU << endl;
   if(LDEBUG) cerr << soliloquy << " species_pp_vLDAU.size()=" << species_pp_vLDAU.size() << endl;
 
   // ----------------------------------------------------------------------

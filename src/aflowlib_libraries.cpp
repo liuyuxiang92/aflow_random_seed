@@ -2538,7 +2538,7 @@ namespace aflowlib {
     // reference
     bool FORMATION_CALC=TRUE;    
     bool formation_calc_U=FALSE;
-    if(xstr.species_pp_vLDAU.at(0).size()>0) formation_calc_U=TRUE;
+    if(xstr.species_pp_vLDAU.size()>0 && xstr.species_pp_vLDAU[0].size()>0 && !aurostd::isequal(xstr.species_pp_vLDAU[0][0],0.0)) formation_calc_U=TRUE;  //CO20210712 - new style, vLDAU will be populated even if no +U, check type==0
     if(LDEBUG){cerr << soliloquy << " formation_calc_U=" << formation_calc_U << endl;}
 
     //CO20200624 START - CCE
@@ -2671,7 +2671,7 @@ namespace aflowlib {
     // reference
     bool FORMATION_CALC=TRUE;    
     bool isLDAUcalc=FALSE;
-    if(xstr.species_pp_vLDAU.at(0).size()>0) isLDAUcalc=TRUE;
+    if(xstr.species_pp_vLDAU.size()>0 && xstr.species_pp_vLDAU[0].size()>0 && !aurostd::isequal(xstr.species_pp_vLDAU[0][0],0.0)) isLDAUcalc=TRUE;  //CO20210712 - new style, vLDAU will be populated even if no +U, check type==0
     if(LDEBUG){cerr << soliloquy << " isLDAUcalc=" << isLDAUcalc << endl;}
 
     //CO20200624 START - CCE
@@ -3491,13 +3491,18 @@ namespace aflowlib {
           }
           data.vdft_type.clear();data.vdft_type.push_back(xOUT.pp_type);  //CO, this is technically a vector (RESTAPI paper)
           str_relax.species_pp_vLDAU.clear(); for(uint i=0;i<xOUT.species_pp_vLDAU.size();i++) str_relax.species_pp_vLDAU.push_back(xOUT.species_pp_vLDAU.at(i));  // for aflowlib_libraries.cpp
-          data.ldau_TLUJ=xOUT.string_LDAU;	  	  
+          data.ldau_TLUJ=xOUT.string_LDAU;
+          //[CO+ME20210713 - keep legacy behavior, only print when non-zero]if(data.ldau_TLUJ.empty()){data.ldau_TLUJ=aurostd::utype2string(0);} //CO20210713 - no +U
           data.METAGGA=xOUT.METAGGA;	  	  
 
           //ME20190124 BEGIN - Store LDAU information individually
           // Note that the vector here has the species in the columns, not the
           // rows because this is closer to the format in the out and json files.
           if(xOUT.species_pp_vLDAU.size()){data.vLDAU.resize(xOUT.species_pp_vLDAU[0].size());} //CO20200731
+          else{  //CO20210713 - set ldau_type=0
+            data.vLDAU.resize(4);
+            for(uint i=0;i<xOUT.species.size();i++){data.vLDAU[0].push_back(0);}
+          }
           for(uint i=0;i<xOUT.species_pp_vLDAU.size();i++){
             for(uint j=0;j<xOUT.species_pp_vLDAU[i].size();j++){  //CO20200731 - this WILL break if xOUT.species_pp_vLDAU[i].size()==0 //4
               data.vLDAU[j].push_back(xOUT.species_pp_vLDAU[i][j]);
@@ -5922,11 +5927,17 @@ namespace aflowlib {
     data.dft_type=aurostd::joinWDelimiter(data.vdft_type,",");
     if(AFLOWLIB_VERBOSE && !data.dft_type.empty()) cout << MESSAGE << " dft_type=" << data.dft_type << endl;
     data.ldau_TLUJ=xOUT.string_LDAU;	  	  
+    //[CO+ME20210713 - keep legacy behavior, only print when non-zero]if(data.ldau_TLUJ.empty()){data.ldau_TLUJ=aurostd::utype2string(0);} //CO20210713 - no +U
     if(AFLOWLIB_VERBOSE && !data.ldau_TLUJ.empty()) cout << MESSAGE << " ldau_TLUJ=" << data.ldau_TLUJ << endl;
     //ME20190124 BEGIN - Store LDAU information individually
     // Note that the vector here has the species in the columns, not the
     // rows because this is closer to the format in the out and json files.
-    data.vLDAU.resize(4);xstr_pocc.species_pp_vLDAU.clear();
+    xstr_pocc.species_pp_vLDAU.clear();
+    if(xOUT.species_pp_vLDAU.size()){data.vLDAU.resize(xOUT.species_pp_vLDAU[0].size());} //CO20200731
+    else{  //CO20210713 - set ldau_type=0
+      data.vLDAU.resize(4);
+      for(uint i=0;i<xOUT.species.size();i++){data.vLDAU[0].push_back(0);}
+    }
     if(LDEBUG){
       cerr << soliloquy << " xOUT.species_pp_vLDAU.size()=" << xOUT.species_pp_vLDAU.size() << endl;
       for(i=0;i<xOUT.species_pp_vLDAU.size();i++){

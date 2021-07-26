@@ -530,6 +530,7 @@ namespace aflowlib {
         uint k = 0;
         for (k = 0; k < nkeys; k++) {
           key = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
+          types_schema[k] = aurostd::RemoveSubString(types_schema[k], " COLLATE NOCASE");  // TEXT may contain directive to be case insensitive
           if (key.empty()) key = vschema_extra.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
           if (!aurostd::WithinList(columns, key, index)) break;
           if (types_db[index] != types_schema[k]) break;
@@ -969,7 +970,9 @@ namespace aflowlib {
 
       // Check for synonyms for changed parameter names
       if (value.empty()) {
-        if (cols[c] == "aflow_prototype_label_relax") {
+        if (cols[c] == "ldau_type") {
+          value = "0"; // if no LDAU type in json, assume it's 0 (no LDAU)
+        } else if (cols[c] == "aflow_prototype_label_relax") {
           value = aurostd::extractJsonValueAflow(entry, "anrl_label_relax"); //replace anrl_label_relax with aflow_prototype_label_relax - DO NOT TOUCH
         } else if (cols[c] == "aflow_prototype_label_orig") {
           value = aurostd::extractJsonValueAflow(entry, "anrl_label_orig"); //replace anrl_label_orig with aflow_prototype_label_orig - DO NOT TOUCH

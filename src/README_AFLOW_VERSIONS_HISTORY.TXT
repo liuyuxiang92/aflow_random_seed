@@ -21,6 +21,7 @@
         -- Made string search in database case insensitive (ME)
         -- Supressed file output for interstitials calculation in web mode (ME)
         -- added command line plotting functionality for POCC runs using --plot_dos (CO)
+        -- printing out ldau_type by default (0 if not calculated) (CO+ME)
         -- changed newlines to semi-colons in aurostd::execute() and aurostd::execute2string() and added file system IO options to aurostd::execute2string() (CO)
         -- extended CleanStringASCII_InPlace() to include ALL ASCII characters (CO)
         -- added NELM and NELM_STATIC options to VASP_FORCE_OPTIONS and aflow.rc (CO)
