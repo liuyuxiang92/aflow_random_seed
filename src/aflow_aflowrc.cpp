@@ -246,6 +246,8 @@
 #define         DEFAULT_VASP_PREC_ENMAX_HIGH                  XHOST.adefault.getattachedutype<double>("DEFAULT_VASP_PREC_ENMAX_HIGH")
 #define AFLOWRC_DEFAULT_VASP_PREC_ENMAX_ACCURATE              1.4
 #define         DEFAULT_VASP_PREC_ENMAX_ACCURATE              XHOST.adefault.getattachedutype<double>("DEFAULT_VASP_PREC_ENMAX_ACCURATE")
+#define AFLOWRC_DEFAULT_VASP_ENMAX_MINIMUM                    0.25
+#define         DEFAULT_VASP_ENMAX_MINIMUM                    XHOST.adefault.getattachedutype<double>("DEFAULT_VASP_ENMAX_MINIMUM")
 #define AFLOWRC_DEFAULT_VASP_SPIN_REMOVE_CUTOFF               0.05
 #define         DEFAULT_VASP_SPIN_REMOVE_CUTOFF               XHOST.adefault.getattachedutype<double>("DEFAULT_VASP_SPIN_REMOVE_CUTOFF")
 #define AFLOWRC_DEFAULT_VASP_PREC_POTIM                       0.5
@@ -254,56 +256,78 @@
 #define         DEFAULT_VASP_PREC_EDIFFG                      XHOST.adefault.getattachedutype<double>("DEFAULT_VASP_PREC_EDIFFG")
 
 // OPTIONS // DONE
-#define AFLOWRC_DEFAULT_VASP_EXTERNAL_INCAR                   string("./INCAR")
-#define         DEFAULT_VASP_EXTERNAL_INCAR                   XHOST.adefault.getattachedscheme("DEFAULT_VASP_EXTERNAL_INCAR")
-#define AFLOWRC_DEFAULT_VASP_EXTERNAL_POSCAR                  string("./POSCAR")
-#define         DEFAULT_VASP_EXTERNAL_POSCAR                  XHOST.adefault.getattachedscheme("DEFAULT_VASP_EXTERNAL_POSCAR")
-#define AFLOWRC_DEFAULT_VASP_EXTERNAL_POTCAR                  string("./POTCAR")
-#define         DEFAULT_VASP_EXTERNAL_POTCAR                  XHOST.adefault.getattachedscheme("DEFAULT_VASP_EXTERNAL_POTCAR")
-#define AFLOWRC_DEFAULT_VASP_EXTERNAL_KPOINTS                 string("./KPOINTS")
-#define         DEFAULT_VASP_EXTERNAL_KPOINTS                 XHOST.adefault.getattachedscheme("DEFAULT_VASP_EXTERNAL_KPOINTS")
-#define AFLOWRC_DEFAULT_AIMS_EXTERNAL_CONTROL                 string("./control.in")
-#define         DEFAULT_AIMS_EXTERNAL_CONTROL                 XHOST.adefault.getattachedscheme("DEFAULT_AIMS_EXTERNAL_CONTROL")
-#define AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM                    string("./geometry.in")
-#define         DEFAULT_AIMS_EXTERNAL_GEOM                    XHOST.adefault.getattachedscheme("DEFAULT_AIMS_EXTERNAL_GEOM")
-#define AFLOWRC_DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE             string("potpaw_PBE")
-#define         DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE             XHOST.adefault.getattachedscheme("DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE")
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME   string("ENERGY")
-#define         DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME   XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME")
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT         2 //CO20181226
-#define         DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT         XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT") //CO20181226
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME         string("ACCURATE")
-#define         DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME         XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME")
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME         string("NORMAL")
-#define         DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME         XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME")
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME      string("NONE")
-#define         DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME      XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME")
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME         string("0")  
-#define         DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME         XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME")
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME         string("DEFAULT")
-#define         DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME         XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME")
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME        string("DEFAULT")
-#define         DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME        XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME")
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SYM                 TRUE
-#define         DEFAULT_VASP_FORCE_OPTION_SYM                 XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SYM") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN                TRUE
-#define         DEFAULT_VASP_FORCE_OPTION_SPIN                XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SPIN") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1 FALSE
-#define         DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1 XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2 TRUE  //ME20190308 - remove spin after two relaxations if zero
-#define         DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2 XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_BADER               FALSE
-#define         DEFAULT_VASP_FORCE_OPTION_BADER               XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_BADER") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ELF                 FALSE
-#define         DEFAULT_VASP_FORCE_OPTION_ELF                 XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_ELF") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM         FALSE   // TRUE
-#define         DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM         XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_WAVECAR             FALSE
-#define         DEFAULT_VASP_FORCE_OPTION_WAVECAR             XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_WAVECAR") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_CHGCAR              TRUE
-#define         DEFAULT_VASP_FORCE_OPTION_CHGCAR              XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_CHGCAR") 
-#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_LSCOUPLING          FALSE
-#define         DEFAULT_VASP_FORCE_OPTION_LSCOUPLING          XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_LSCOUPLING") 
+#define AFLOWRC_DEFAULT_VASP_OUT                                      string("vasp.out")
+#define         DEFAULT_VASP_OUT                                      XHOST.adefault.getattachedscheme("DEFAULT_VASP_OUT")
+#define AFLOWRC_DEFAULT_VASP_EXTERNAL_INCAR                           string("./INCAR")
+#define         DEFAULT_VASP_EXTERNAL_INCAR                           XHOST.adefault.getattachedscheme("DEFAULT_VASP_EXTERNAL_INCAR")
+#define AFLOWRC_DEFAULT_VASP_EXTERNAL_POSCAR                          string("./POSCAR")
+#define         DEFAULT_VASP_EXTERNAL_POSCAR                          XHOST.adefault.getattachedscheme("DEFAULT_VASP_EXTERNAL_POSCAR")
+#define AFLOWRC_DEFAULT_VASP_EXTERNAL_POTCAR                          string("./POTCAR")
+#define         DEFAULT_VASP_EXTERNAL_POTCAR                          XHOST.adefault.getattachedscheme("DEFAULT_VASP_EXTERNAL_POTCAR")
+#define AFLOWRC_DEFAULT_VASP_EXTERNAL_KPOINTS                         string("./KPOINTS")
+#define         DEFAULT_VASP_EXTERNAL_KPOINTS                         XHOST.adefault.getattachedscheme("DEFAULT_VASP_EXTERNAL_KPOINTS")
+#define AFLOWRC_DEFAULT_AIMS_EXTERNAL_CONTROL                         string("./control.in")
+#define         DEFAULT_AIMS_EXTERNAL_CONTROL                         XHOST.adefault.getattachedscheme("DEFAULT_AIMS_EXTERNAL_CONTROL")
+#define AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM                            string("./geometry.in")
+#define         DEFAULT_AIMS_EXTERNAL_GEOM                            XHOST.adefault.getattachedscheme("DEFAULT_AIMS_EXTERNAL_GEOM")
+#define AFLOWRC_DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE                     string("potpaw_PBE")
+#define         DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE                     XHOST.adefault.getattachedscheme("DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE")
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME           string("ENERGY")
+#define         DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME           XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME")
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT                 2 //CO20181226
+#define         DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT                 XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT") //CO20181226
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME                 string("ACCURATE")
+#define         DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME                 XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME")
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME                 string("NORMAL")
+#define         DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME                 XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME")
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME              string("NONE")
+#define         DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME              XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME")
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME                 string("0")  
+#define         DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME                 XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME")
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME                 string("DEFAULT")
+#define         DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME                 XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME")
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME               1 //CO20200624
+#define         DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME               XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME") //CO20200624
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME        -5 //CO20200624
+#define         DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME        XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME") //CO20200624
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_BANDS_SCHEME         0 //CO20200624
+#define         DEFAULT_VASP_FORCE_OPTION_ISMEAR_BANDS_SCHEME         XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_ISMEAR_BANDS_SCHEME") //CO20200624
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA                       0.1 //CO20200624
+#define         DEFAULT_VASP_FORCE_OPTION_SIGMA                       XHOST.adefault.getattachedutype<double>("DEFAULT_VASP_FORCE_OPTION_SIGMA")  //CO20200624
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC                0.05 //CO20200624
+#define         DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC                XHOST.adefault.getattachedutype<double>("DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC")  //CO20200624
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA_BANDS                 0.05 //CO20200624
+#define         DEFAULT_VASP_FORCE_OPTION_SIGMA_BANDS                 XHOST.adefault.getattachedutype<double>("DEFAULT_VASP_FORCE_OPTION_SIGMA_BANDS")  //CO20200624
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM                        60  //CO20200624
+#define         DEFAULT_VASP_FORCE_OPTION_NELM                        XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_NELM") //CO20200624
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM_STATIC                 120 //CO20200624
+#define         DEFAULT_VASP_FORCE_OPTION_NELM_STATIC                 XHOST.adefault.getattachedutype<int>("DEFAULT_VASP_FORCE_OPTION_NELM_STATIC")  //CO20200624
+#define AFLOWRC_MAX_VASP_NELM                                         300  //CO20200624
+#define         MAX_VASP_NELM                                         XHOST.adefault.getattachedutype<int>("MAX_VASP_NELM") //CO20200624
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME                string("DEFAULT")
+#define         DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME                XHOST.adefault.getattachedscheme("DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME")
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SYM                         TRUE
+#define         DEFAULT_VASP_FORCE_OPTION_SYM                         XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SYM") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN                        TRUE
+#define         DEFAULT_VASP_FORCE_OPTION_SPIN                        XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SPIN") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1         FALSE
+#define         DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1         XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2         TRUE  //ME20190308 - remove spin after two relaxations if zero
+#define         DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2         XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_BADER                       FALSE
+#define         DEFAULT_VASP_FORCE_OPTION_BADER                       XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_BADER") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_BADER_STATIC                TRUE
+#define         DEFAULT_VASP_FORCE_OPTION_BADER_STATIC                XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_BADER_STATIC") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ELF                         FALSE
+#define         DEFAULT_VASP_FORCE_OPTION_ELF                         XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_ELF") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM                 FALSE   // TRUE
+#define         DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM                 XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_WAVECAR                     FALSE
+#define         DEFAULT_VASP_FORCE_OPTION_WAVECAR                     XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_WAVECAR") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_CHGCAR                      TRUE
+#define         DEFAULT_VASP_FORCE_OPTION_CHGCAR                      XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_CHGCAR") 
+#define AFLOWRC_DEFAULT_VASP_FORCE_OPTION_LSCOUPLING                  FALSE
+#define         DEFAULT_VASP_FORCE_OPTION_LSCOUPLING                  XHOST.adefault.getattachedutype<bool>("DEFAULT_VASP_FORCE_OPTION_LSCOUPLING") 
 
 // AFLOW_LIBRARY AFLOW_PROJECT // DONE
 #define AFLOWRC_DEFAULT_AFLOW_LIBRARY_DIRECTORIES             string("/common/AFLOW/LIBS/,/home/aflow/common/AFLOW/LIBS/,/fslhome/glh43/src/,/usr/local/bin/,/fslhome/fslcollab8/group/bin/,/home/auro/work/AFLOW3/,~/common/AFLOW/LIBS/,./,/nics/a/proj/aflow/common/AFLOW/LIBS/,/home/users/aflow/common/AFLOW/LIBS,/home/junkai/PROTO_DATABASE/,/projects/kyang-group/common/LIBS,/somewhere/")  // first is default, tokenized with ","
@@ -860,8 +884,20 @@
 #define         AFLOW_CORE_TEMPERATURE_REFRESH                XHOST.adefault.getattachedutype<double>("AFLOW_CORE_TEMPERATURE_REFRESH") 
 
 // VASP MACHINE SETTINGS
-#define AFLOWRC_VASP_CHECK_SLEEP                              30    // seconds
-#define         VASP_CHECK_SLEEP                              XHOST.adefault.getattachedutype<double>("VASP_CHECK_SLEEP") 
+#define AFLOWRC_SECONDS_SLEEP_VASP_COMPLETION                 15    // seconds
+#define         SECONDS_SLEEP_VASP_COMPLETION                 XHOST.adefault.getattachedutype<double>("SECONDS_SLEEP_VASP_COMPLETION") 
+#define AFLOWRC_SECONDS_SLEEP_VASP_MONITOR                    60    // seconds
+#define         SECONDS_SLEEP_VASP_MONITOR                    XHOST.adefault.getattachedutype<double>("SECONDS_SLEEP_VASP_MONITOR") 
+#define AFLOWRC_SECONDS_STALE_OUTCAR                          21600    // seconds
+#define         SECONDS_STALE_OUTCAR                          XHOST.adefault.getattachedutype<double>("SECONDS_STALE_OUTCAR") 
+#define AFLOWRC_BYTES_MAX_VASP_OUT                            20000000000    // bytes
+#define         BYTES_MAX_VASP_OUT                            XHOST.adefault.getattachedutype<unsigned long long int>("BYTES_MAX_VASP_OUT") 
+#define AFLOWRC_MEMORY_MAX_USAGE                              98    // percent
+#define         MEMORY_MAX_USAGE                              XHOST.adefault.getattachedutype<double>("MEMORY_MAX_USAGE") 
+#define AFLOWRC_FILE_VASP_MONITOR                             string("monitor_vasp")
+#define         FILE_VASP_MONITOR                             XHOST.adefault.getattachedscheme("FILE_VASP_MONITOR")
+#define AFLOWRC_INTEL_COMPILER_PATHS                          string("/opt/intel/bin/compilervars.sh,/opt/intel/bin/compilervars.csh,/app/intel/parallel_studio_xe_2020_update1/bin/compilervars.sh")
+#define         INTEL_COMPILER_PATHS                          XHOST.adefault.getattachedscheme("INTEL_COMPILER_PATHS")
 
 // MACHINE DEPENDENT MPI
 #define AFLOWRC_MPI_OPTIONS_DUKE_BETA_MPICH                   string("ulimit -s unlimited ") // DUKE_BETA_MPICH
@@ -1284,11 +1320,13 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_VASP_PREC_ENMAX_NORMAL",AFLOWRC_DEFAULT_VASP_PREC_ENMAX_NORMAL);
     aflowrc::load_default("DEFAULT_VASP_PREC_ENMAX_HIGH",AFLOWRC_DEFAULT_VASP_PREC_ENMAX_HIGH);
     aflowrc::load_default("DEFAULT_VASP_PREC_ENMAX_ACCURATE",AFLOWRC_DEFAULT_VASP_PREC_ENMAX_ACCURATE);
+    aflowrc::load_default("DEFAULT_VASP_ENMAX_MINIMUM",AFLOWRC_DEFAULT_VASP_ENMAX_MINIMUM);
     aflowrc::load_default("DEFAULT_VASP_SPIN_REMOVE_CUTOFF",AFLOWRC_DEFAULT_VASP_SPIN_REMOVE_CUTOFF);
     aflowrc::load_default("DEFAULT_VASP_PREC_POTIM",AFLOWRC_DEFAULT_VASP_PREC_POTIM);
     aflowrc::load_default("DEFAULT_VASP_PREC_EDIFFG",AFLOWRC_DEFAULT_VASP_PREC_EDIFFG);
 
     // OPTIONS
+    aflowrc::load_default("DEFAULT_VASP_OUT",AFLOWRC_DEFAULT_VASP_OUT);
     aflowrc::load_default("DEFAULT_VASP_EXTERNAL_INCAR",AFLOWRC_DEFAULT_VASP_EXTERNAL_INCAR);
     aflowrc::load_default("DEFAULT_VASP_EXTERNAL_POSCAR",AFLOWRC_DEFAULT_VASP_EXTERNAL_POSCAR);
     aflowrc::load_default("DEFAULT_VASP_EXTERNAL_POTCAR",AFLOWRC_DEFAULT_VASP_EXTERNAL_POTCAR);
@@ -1303,12 +1341,22 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME);
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME);
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME);
+    aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME);
+    aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME);
+    aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_ISMEAR_BANDS_SCHEME",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_BANDS_SCHEME);
+    aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_SIGMA",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA);
+    aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC);
+    aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_SIGMA_BANDS",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA_BANDS);
+    aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_NELM",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM); //CO20200624
+    aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_NELM_STATIC",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM_STATIC); //CO20200624
+    aflowrc::load_default("MAX_VASP_NELM",AFLOWRC_MAX_VASP_NELM); //CO20200624
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME);
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_SYM",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SYM);
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_SPIN",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN);
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1);
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2);
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_BADER",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_BADER);
+    aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_BADER_STATIC",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_BADER_STATIC);
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_ELF",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ELF);
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM);
     aflowrc::load_default("DEFAULT_VASP_FORCE_OPTION_WAVECAR",AFLOWRC_DEFAULT_VASP_FORCE_OPTION_WAVECAR);
@@ -1616,7 +1664,13 @@ namespace aflowrc {
     aflowrc::load_default("AFLOW_CORE_TEMPERATURE_REFRESH",AFLOWRC_AFLOW_CORE_TEMPERATURE_REFRESH);
 
     // VASP MACHINE SETTINGS
-    aflowrc::load_default("VASP_CHECK_SLEEP",AFLOWRC_VASP_CHECK_SLEEP); //CO20201111
+    aflowrc::load_default("SECONDS_SLEEP_VASP_COMPLETION",AFLOWRC_SECONDS_SLEEP_VASP_COMPLETION); //CO20201111
+    aflowrc::load_default("SECONDS_SLEEP_VASP_MONITOR",AFLOWRC_SECONDS_SLEEP_VASP_MONITOR); //CO20201111
+    aflowrc::load_default("SECONDS_STALE_OUTCAR",AFLOWRC_SECONDS_STALE_OUTCAR); //CO20201111
+    aflowrc::load_default("BYTES_MAX_VASP_OUT",AFLOWRC_BYTES_MAX_VASP_OUT); //CO20201111
+    aflowrc::load_default("MEMORY_MAX_USAGE",AFLOWRC_MEMORY_MAX_USAGE); //CO20201111
+    aflowrc::load_default("FILE_VASP_MONITOR",AFLOWRC_FILE_VASP_MONITOR); //CO20201111
+    aflowrc::load_default("INTEL_COMPILER_PATHS",AFLOWRC_INTEL_COMPILER_PATHS); //CO20201111
 
     // DEFAULT MACHINE DEPENDENT MPI
     aflowrc::load_default("MPI_OPTIONS_DUKE_BETA_MPICH",AFLOWRC_MPI_OPTIONS_DUKE_BETA_MPICH); 
@@ -1880,12 +1934,14 @@ namespace aflowrc {
     aflowrc << "DEFAULT_VASP_PREC_ENMAX_NORMAL=" << AFLOWRC_DEFAULT_VASP_PREC_ENMAX_NORMAL << endl;
     aflowrc << "DEFAULT_VASP_PREC_ENMAX_HIGH=" << AFLOWRC_DEFAULT_VASP_PREC_ENMAX_HIGH << endl;
     aflowrc << "DEFAULT_VASP_PREC_ENMAX_ACCURATE=" << AFLOWRC_DEFAULT_VASP_PREC_ENMAX_ACCURATE << endl;
+    aflowrc << "DEFAULT_VASP_ENMAX_MINIMUM=" << AFLOWRC_DEFAULT_VASP_ENMAX_MINIMUM << endl;
     aflowrc << "DEFAULT_VASP_SPIN_REMOVE_CUTOFF=" << AFLOWRC_DEFAULT_VASP_SPIN_REMOVE_CUTOFF << endl;
     aflowrc << "DEFAULT_VASP_PREC_POTIM=" << AFLOWRC_DEFAULT_VASP_PREC_POTIM << endl;
     aflowrc << "DEFAULT_VASP_PREC_EDIFFG=" << AFLOWRC_DEFAULT_VASP_PREC_EDIFFG << endl;
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS OPTIONS " << endl;
+    aflowrc << "DEFAULT_VASP_OUT=" << AFLOWRC_DEFAULT_VASP_OUT << endl;
     aflowrc << "DEFAULT_VASP_EXTERNAL_INCAR=" << AFLOWRC_DEFAULT_VASP_EXTERNAL_INCAR << endl;
     aflowrc << "DEFAULT_VASP_EXTERNAL_POSCAR=" << AFLOWRC_DEFAULT_VASP_EXTERNAL_POSCAR << endl;
     aflowrc << "DEFAULT_VASP_EXTERNAL_POTCAR=" << AFLOWRC_DEFAULT_VASP_EXTERNAL_POTCAR << endl;
@@ -1900,12 +1956,22 @@ namespace aflowrc {
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME << endl;
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME << endl;
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME << endl;
+    aflowrc << "DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME << endl;
+    aflowrc << "DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME << endl;
+    aflowrc << "DEFAULT_VASP_FORCE_OPTION_ISMEAR_BANDS_SCHEME=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ISMEAR_BANDS_SCHEME << endl;
+    aflowrc << "DEFAULT_VASP_FORCE_OPTION_SIGMA=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA << endl;
+    aflowrc << "DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC << endl;
+    aflowrc << "DEFAULT_VASP_FORCE_OPTION_SIGMA_BANDS=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SIGMA_BANDS << endl;
+    aflowrc << "DEFAULT_VASP_FORCE_OPTION_NELM=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM << endl; //CO20200624
+    aflowrc << "DEFAULT_VASP_FORCE_OPTION_NELM_STATIC=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM_STATIC << endl; //CO20200624
+    aflowrc << "MAX_VASP_NELM=" << AFLOWRC_MAX_VASP_NELM << endl; //CO20200624
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME << endl;
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_SYM=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SYM << endl;
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_SPIN=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN << endl;
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1 << endl;
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2 << endl;
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_BADER=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_BADER << endl;
+    aflowrc << "DEFAULT_VASP_FORCE_OPTION_BADER_STATIC=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_BADER_STATIC << endl;
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_ELF=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_ELF << endl;
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM << endl;
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_WAVECAR=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_WAVECAR << endl;
@@ -2209,7 +2275,13 @@ namespace aflowrc {
     aflowrc << "AFLOW_CORE_TEMPERATURE_HALT=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT << " // Celsius" << endl;
     aflowrc << "AFLOW_CORE_TEMPERATURE_REFRESH=" << AFLOWRC_AFLOW_CORE_TEMPERATURE_REFRESH << " // seconds"   << endl;
 
-    aflowrc << "VASP_CHECK_SLEEP=" << AFLOWRC_VASP_CHECK_SLEEP << " // seconds"   << endl;  //CO20201111
+    aflowrc << "SECONDS_SLEEP_VASP_COMPLETION=" << AFLOWRC_SECONDS_SLEEP_VASP_COMPLETION << " // seconds"   << endl;  //CO20201111
+    aflowrc << "SECONDS_SLEEP_VASP_MONITOR=" << AFLOWRC_SECONDS_SLEEP_VASP_MONITOR << " // seconds"   << endl;  //CO20201111
+    aflowrc << "SECONDS_STALE_OUTCAR=" << AFLOWRC_SECONDS_STALE_OUTCAR << " // seconds"   << endl;  //CO20201111
+    aflowrc << "BYTES_MAX_VASP_OUT=" << AFLOWRC_BYTES_MAX_VASP_OUT << " // bytes"   << endl;  //CO20201111
+    aflowrc << "MEMORY_MAX_USAGE=" << AFLOWRC_MEMORY_MAX_USAGE << " // bytes"   << endl;  //CO20201111
+    aflowrc << "FILE_VASP_MONITOR=" << AFLOWRC_FILE_VASP_MONITOR << " // monitor file postfix"   << endl;  //CO20201111
+    aflowrc << "INTEL_COMPILER_PATHS=" << AFLOWRC_INTEL_COMPILER_PATHS << " // comma-separated paths to search (for sourcing)"   << endl;  //CO20201111
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS MACHINE DEPENDENT MPI" << endl;
@@ -2456,11 +2528,13 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_PREC_ENMAX_NORMAL\")=" << DEFAULT_VASP_PREC_ENMAX_NORMAL << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_PREC_ENMAX_HIGH\")=" << DEFAULT_VASP_PREC_ENMAX_HIGH << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_PREC_ENMAX_ACCURATE\")=" << DEFAULT_VASP_PREC_ENMAX_ACCURATE << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_ENMAX_MINIMUM\")=" << DEFAULT_VASP_ENMAX_MINIMUM << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_SPIN_REMOVE_CUTOFF\")=" << DEFAULT_VASP_SPIN_REMOVE_CUTOFF << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_PREC_POTIM\")=" << DEFAULT_VASP_PREC_POTIM << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_PREC_EDIFFG\")=" << DEFAULT_VASP_PREC_EDIFFG << endl;
 
     if(LDEBUG) oss << "// DEFAULTS OPTIONS " << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_OUT\")=\"" << DEFAULT_VASP_OUT << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_EXTERNAL_INCAR\")=\"" << DEFAULT_VASP_EXTERNAL_INCAR << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_EXTERNAL_POSCAR\")=\"" << DEFAULT_VASP_EXTERNAL_POSCAR << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_EXTERNAL_POTCAR\")=\"" << DEFAULT_VASP_EXTERNAL_POTCAR << "\"" << endl;
@@ -2475,12 +2549,22 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME\")=\"" << DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME\")=\"" << DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME\")=\"" << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME\")=\"" << DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME\")=\"" << DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_VASP_FORCE_OPTION_ISMEAR_BANDS_SCHEME\")=\"" << DEFAULT_VASP_FORCE_OPTION_ISMEAR_BANDS_SCHEME << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_FORCE_OPTION_SIGMA\")=\"" << DEFAULT_VASP_FORCE_OPTION_SIGMA << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC\")=\"" << DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"DEFAULT_VASP_FORCE_OPTION_SIGMA_BANDS\")=\"" << DEFAULT_VASP_FORCE_OPTION_SIGMA_BANDS << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_VASP_FORCE_OPTION_NELM\")=" << DEFAULT_VASP_FORCE_OPTION_NELM << endl; //CO20200624
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"DEFAULT_VASP_FORCE_OPTION_NELM_STATIC\")=" << DEFAULT_VASP_FORCE_OPTION_NELM_STATIC << endl; //CO20200624
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<int>(\"MAX_VASP_NELM\")=" << MAX_VASP_NELM << endl; //CO20200624
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME\")=\"" << DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_VASP_FORCE_OPTION_SYM\")=" << DEFAULT_VASP_FORCE_OPTION_SYM << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_VASP_FORCE_OPTION_SPIN\")=" << DEFAULT_VASP_FORCE_OPTION_SPIN << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1\")=" << DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1 << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2\")=" << DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2 << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_VASP_FORCE_OPTION_BADER\")=" << DEFAULT_VASP_FORCE_OPTION_BADER << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_VASP_FORCE_OPTION_BADER_STATIC\")=" << DEFAULT_VASP_FORCE_OPTION_BADER_STATIC << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_VASP_FORCE_OPTION_ELF\")=" << DEFAULT_VASP_FORCE_OPTION_ELF << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM\")=" << DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<bool>(\"DEFAULT_VASP_FORCE_OPTION_WAVECAR\")=" << DEFAULT_VASP_FORCE_OPTION_WAVECAR << endl;
@@ -2769,7 +2853,13 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_HALT\")=" << AFLOW_CORE_TEMPERATURE_HALT << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"AFLOW_CORE_TEMPERATURE_REFRESH\")=" << AFLOW_CORE_TEMPERATURE_REFRESH << endl;
 
-    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"VASP_CHECK_SLEEP\")=" << VASP_CHECK_SLEEP << endl; //CO20201111
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"SECONDS_SLEEP_VASP_COMPLETION\")=" << SECONDS_SLEEP_VASP_COMPLETION << endl; //CO20201111
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"SECONDS_SLEEP_VASP_MONITOR\")=" << SECONDS_SLEEP_VASP_MONITOR << endl; //CO20201111
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"SECONDS_STALE_OUTCAR\")=" << SECONDS_STALE_OUTCAR << endl; //CO20201111
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<unsigned long long int>(\"BYTES_MAX_VASP_OUT\")=" << BYTES_MAX_VASP_OUT << endl; //CO20201111
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"MEMORY_MAX_USAGE\")=" << MEMORY_MAX_USAGE << endl; //CO20201111
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"FILE_VASP_MONITOR\")=" << FILE_VASP_MONITOR << endl; //CO20201111
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"INTEL_COMPILER_PATHS\")=" << INTEL_COMPILER_PATHS << endl; //CO20201111
 
     if(LDEBUG) oss << "// DEFAULT MACHINE DEPENDENT MPI" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_DUKE_BETA_MPICH\")=\"" << MPI_OPTIONS_DUKE_BETA_MPICH << "\"" << endl;

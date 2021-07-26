@@ -483,6 +483,11 @@ namespace aurostd {
 #endif
 }
 
+//--------------------------------------------------------------- round
+namespace aurostd {
+  double round(double x);
+}
+
 //--------------------------------------------------------------- isequal
 namespace aurostd {
   // with const utype&

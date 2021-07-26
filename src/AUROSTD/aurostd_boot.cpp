@@ -91,10 +91,17 @@ using aurostd::getElements; //CO20200624
 
 template<class utype> bool initialize_scalar(utype d) {
   string s="";
+  stringstream ss;
   utype u=0;
   u+=aurostd::string2utype<utype>(aurostd::utype2string<utype>(utype())+aurostd::utype2string<utype>(utype(),int())+aurostd::utype2string<utype>(utype(),int(),DEFAULT_STREAM)); //DX20201028 - added third variant containing format
-  u+=aurostd::substring2utype<utype>(s,s,1)+aurostd::substring2utype<utype>(s,s,s,1);
-  u+=aurostd::substring2utype<utype>(s,s)+aurostd::substring2utype<utype>(s,s,s);
+  u+=aurostd::substring2utype<utype>(s,s,1,1); //[CO20210315 - not used, not sure the purpose of strsub2]+aurostd::substring2utype<utype>(s,s,s,1);
+  u+=aurostd::substring2utype<utype>(s,s); //[CO20210315 - not used, not sure the purpose of strsub2]+aurostd::substring2utype<utype>(s,s,s);
+  u+=aurostd::substring2utype<utype>(ss,s,1,1); //CO20210315
+  u+=aurostd::substring2utype<utype>(ss,s); //CO20210315
+  u+=aurostd::kvpair2utype<utype>(s,s,s,1,1);  //CO20210315
+  u+=aurostd::kvpair2utype<utype>(s,s,s);  //CO20210315
+  u+=aurostd::kvpair2utype<utype>(ss,s,s,1,1); //CO20210315
+  u+=aurostd::kvpair2utype<utype>(ss,s,s); //CO20210315
   double o=0;
   o+=_isfloat(d)+_iscomplex(d);//abs(d);
   o+=max(d,d);o+=max(d,d,d);o+=max(d,d,d,d);o+=max(d,d,d,d,d);o+=min(d,d);o+=min(d,d,d);o+=min(d,d,d,d);o+=min(d,d,d,d,d);o+=_real(d);
@@ -626,7 +633,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 #endif
 #ifdef AUROSTD_INITIALIZE_UNSIGNED_LONG_INT
     o+=aurostd::string2utype<unsigned long int>(aurostd::utype2string<unsigned long int>((unsigned long int)(1))+aurostd::utype2string<unsigned long int>((unsigned long int)(1),int()));
-    // o+=initialize_scalar(((unsigned long int))(1));
+    o+=initialize_scalar((unsigned long int)(1));
     // o+=initialize_xscalar_xvector_xmatrix_xtensor(((unsigned long int))(1));
     // o+=initialize_xcomplex(((unsigned long int))(1));
     // xmatrix<(long int)> m(1,1);GaussJordan(m,m);
@@ -653,7 +660,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 #endif
 #ifdef AUROSTD_INITIALIZE_UNSIGNED_LONG_LONG_INT
     o+=aurostd::string2utype<unsigned long long int>(aurostd::utype2string<unsigned long long int>((unsigned long long int)(1))+aurostd::utype2string<unsigned long long int>((unsigned long long int)(1),int()));
-    // o+=initialize_scalar((unsigned long long int)(1));
+    o+=initialize_scalar((unsigned long long int)(1));
     // o+=initialize_xscalar_xvector_xmatrix_xtensor((unsigned long long int)(1));
     // o+=initialize_xcomplex((unsigned long long int)(1));
     // xmatrix<(long long int)> m(1,1);GaussJordan(m,m);

@@ -4207,18 +4207,20 @@ istream& operator>>(istream& cinput, xstructure& a) {
   stringstream message;
 
   if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
-  if(LDEBUG) if(a.iomode==IOAFLOW_AUTO) cerr << soliloquy << " a.iomode = IOAFLOW_AUTO" << endl;
-  if(LDEBUG) if(a.iomode==IOVASP_AUTO) cerr << soliloquy << " a.iomode = IOVASP_AUTO" << endl;
-  if(LDEBUG) if(a.iomode==IOVASP_POSCAR) cerr << soliloquy << " a.iomode = IOVASP_POSCAR" << endl;
-  if(LDEBUG) if(a.iomode==IOVASP_ABCCAR) cerr << soliloquy << " a.iomode = IOVASP_ABCCAR" << endl;
-  if(LDEBUG) if(a.iomode==IOVASP_WYCKCAR) cerr << soliloquy << " a.iomode = IOVASP_WYCKCAR" << endl;
-  if(LDEBUG) if(a.iomode==IOQE_AUTO) cerr << soliloquy << " a.iomode = IOQE_AUTO" << endl;
-  if(LDEBUG) if(a.iomode==IOQE_GEOM) cerr << soliloquy << " a.iomode = IOQE_GEOM" << endl;
-  if(LDEBUG) if(a.iomode==IOAIMS_AUTO) cerr << soliloquy << " a.iomode = IOAIMS_AUTO" << endl;  //CO20171008
-  if(LDEBUG) if(a.iomode==IOAIMS_GEOM) cerr << soliloquy << " a.iomode = IOAIMS_GEOM" << endl;  //CO20171008
-  if(LDEBUG) if(a.iomode==IOABINIT_GEOM) cerr << soliloquy << " a.iomode = IOABINIT_GEOM" << endl;  //DX20200310
-  if(LDEBUG) if(a.iomode==IOELK_GEOM) cerr << soliloquy << " a.iomode = IOELK_GEOM" << endl;  //DX20200310
-  if(LDEBUG) if(a.iomode==IOCIF) cerr << soliloquy << " a.iomode = IOCIF" << endl;  //DX20180723
+  if(LDEBUG){
+    if(a.iomode==IOAFLOW_AUTO) cerr << soliloquy << " a.iomode = IOAFLOW_AUTO" << endl;
+    if(a.iomode==IOVASP_AUTO) cerr << soliloquy << " a.iomode = IOVASP_AUTO" << endl;
+    if(a.iomode==IOVASP_POSCAR) cerr << soliloquy << " a.iomode = IOVASP_POSCAR" << endl;
+    if(a.iomode==IOVASP_ABCCAR) cerr << soliloquy << " a.iomode = IOVASP_ABCCAR" << endl;
+    if(a.iomode==IOVASP_WYCKCAR) cerr << soliloquy << " a.iomode = IOVASP_WYCKCAR" << endl;
+    if(a.iomode==IOQE_AUTO) cerr << soliloquy << " a.iomode = IOQE_AUTO" << endl;
+    if(a.iomode==IOQE_GEOM) cerr << soliloquy << " a.iomode = IOQE_GEOM" << endl;
+    if(a.iomode==IOAIMS_AUTO) cerr << soliloquy << " a.iomode = IOAIMS_AUTO" << endl;  //CO20171008
+    if(a.iomode==IOAIMS_GEOM) cerr << soliloquy << " a.iomode = IOAIMS_GEOM" << endl;  //CO20171008
+    if(a.iomode==IOABINIT_GEOM) cerr << soliloquy << " a.iomode = IOABINIT_GEOM" << endl;  //DX20200310
+    if(a.iomode==IOELK_GEOM) cerr << soliloquy << " a.iomode = IOELK_GEOM" << endl;  //DX20200310
+    if(a.iomode==IOCIF) cerr << soliloquy << " a.iomode = IOCIF" << endl;  //DX20180723
+  }
 
   if(LDEBUG) cerr << soliloquy << " definitions" << endl;
   uint iline=0;
@@ -5020,7 +5022,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
                   atom.order_parameter_value=0;
                   atom.order_parameter_atom=TRUE;
                 } else {
-                  atom.order_parameter_value=atoi(stmp_tokens.at(id).c_str());
+                  atom.order_parameter_value=aurostd::string2utype<int>(stmp_tokens.at(id).c_str());
                   atom.order_parameter_atom=TRUE;
                   a.order_parameter_sum+=atom.order_parameter_value;
                 }
@@ -9635,7 +9637,7 @@ string GetLaueLabel(string& point_group) {
 // ***************************************************************************
 string GetSpaceGroupLabel(int spacegroupnumber) {
   string spacegrouplabel;
-  spacegrouplabel="#"+aurostd::StringConvert(spacegroupnumber);
+  spacegrouplabel="#"+aurostd::utype2string(spacegroupnumber);
   return spacegrouplabel;
 }
 
@@ -9883,29 +9885,36 @@ string KPPRA_DELTA(xstructure& str,const double& DK) {
 // **************************************************************************
 // Function GetNBAND
 // **************************************************************************
-// returns extimated version of NBANDS starting from
+// returns estimated version of NBANDS starting from
 // electrons, ions, spin and ispin
-int GetNBANDS(int electrons,int nions,int spineach,bool ispin) {
-  string function_name = XPID + "GetNBANDS():";
-  double out;
+int GetNBANDS(int electrons,int nions,int spineach,bool ispin,int NPAR) {
+  string function_name=XPID+"GetNBANDS():";
+  double out=0.0;
   out=max(ceil((electrons+4.0)/1.75)+max(nions/1.75,6.0),ceil(0.80*electrons)); // from VASP
-  if(ispin) out=out+(nions*spineach+1)/2;
-  //  out=out*1.2;  // safety from vasp
-  out=out*1.3;      // safety more
-  out=out*1.1+5;    // Thu Jun 11 12:08:42 EDT 2009 // METAL PROJECT
-  out=out*1.075;    // Tue Oct 13 07:59:43 EDT 2009 // ICSD PROJECT
-  out=out+5;        // Sun Nov  1 10:41:20 EDT 2009 // ICSD PROJECT ORC
-  out=out*1.03;     // Tue Feb 26 15:15:36 EST 2013 // HELPS dielectric CALS
-  out=out*1.05;     // Mon Apr 23 13:40:02 EST 2018 // HELPS SCAN
+  if(ispin) out+=(nions*spineach+1)/2;
+  //  out*=1.2;  // safety from vasp
+  out*=1.3;      // safety more
+  out*=1.1+5;    // Thu Jun 11 12:08:42 EDT 2009 // METAL PROJECT
+  out*=1.075;    // Tue Oct 13 07:59:43 EDT 2009 // ICSD PROJECT
+  out+=5;        // Sun Nov  1 10:41:20 EDT 2009 // ICSD PROJECT ORC
+  out*=1.03;     // Tue Feb 26 15:15:36 EST 2013 // HELPS dielectric CALS
+  out*=1.05;     // Mon Apr 23 13:40:02 EST 2018 // HELPS SCAN
   // cerr << "GetNBANDS=" << out << endl;
   if (nions < 100) {
-    out=out*std::pow((double) nions,(double) 0.025);  // rescale so for big numbers of ions you get extra bands // Wed Jun 23 12:29:01 EDT 2010
+    out*=std::pow((double) nions,(double) 0.025);  // rescale so for big numbers of ions you get extra bands // Wed Jun 23 12:29:01 EDT 2010
   } else {
-    out= out * std::pow((double) nions,(double) 0.06);  //ME20191028 - prior scaling factor not sufficient for supercells
+    out*=std::pow((double) nions,(double) 0.06);  //ME20191028 - prior scaling factor not sufficient for supercells
   }
   //  cerr << "GetNBANDS=" << out << endl;
   // throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
-  return (int) ceil(out);
+  int nbands=(int)ceil(out);
+  //CO20210315 START - adjust for NPAR
+  if(NPAR>0){
+    int increment=1; //(increase?+1:-1);
+    while((nbands%NPAR)!=0){nbands+=increment;}
+  }
+  //CO20210315 END - adjust for NPAR
+  return nbands;
 }
 
 // **************************************************************************
@@ -15592,8 +15601,8 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
       //////////////////////////////////////////////////////////////////////////
     }
     if(!KRUN){
-      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry propagation FAILED" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
-      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry retrying with symmetry scan" << Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry propagation FAILED" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry retrying with symmetry scan" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       b.ClearSymmetry(); //CO20181226
       pflow::PerformFullSymmetry(b,FileMESSAGE,aflags,kflags,osswrite,oss);
       //FOOLPROOF!!!!!!!!!

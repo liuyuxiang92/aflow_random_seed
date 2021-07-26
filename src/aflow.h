@@ -139,6 +139,10 @@ static const string POCC_DOSCAR_PREFIX="DOSCAR.pocc_T";
 #define _AFLOW_XELEMENT_PROPERTIES_ALL_ "name,symbol,Z,period,group,series,block,mass,volume_molar,volume,area_molar_Miedema,valence_std,valence_iupac,valence_PT,valence_s,valence_p,valence_d,valence_f,density_PT,crystal,crystal_structure_PT,spacegroup,spacegroup_number,variance_parameter_mass,lattice_constants,lattice_angles,phase,radius_Saxena,radius_PT,radius_covalent_PT,radius_covalent,radius_VanDerWaals_PT,radii_Ghosh08,radii_Slatter,radii_Pyykko,conductivity_electrical,electronegativity_Pauling,hardness_chemical_Ghosh,electronegativity_Pearson,electronegativity_Ghosh,electronegativity_Allen,oxidation_states,oxidation_states_preferred,electron_affinity_PT,energies_ionization,work_function_Miedema,density_line_electron_WS_Miedema,energy_surface_0K_Miedema,chemical_scale_Pettifor,Mendeleev_number,temperature_boiling,temperature_melting,enthalpy_fusion,enthalpy_vaporization,enthalpy_atomization_WE,energy_cohesive,specific_heat_PT,critical_pressure,critical_temperature_PT,thermal_expansion,conductivity_thermal,hardness_mechanical_Brinell,hardness_mechanical_Mohs,hardness_mechanical_Vickers,hardness_chemical_Pearson,hardness_chemical_Putz,hardness_chemical_RB,modulus_shear,modulus_Young,modulus_bulk,Poisson_ratio_PT,modulus_bulk_x_volume_molar_Miedema,magnetic_type_PT,susceptibility_magnetic_mass,susceptibility_magnetic_volume,susceptibility_magnetic_molar,temperature_Curie,refractive_index,color_PT,HHIP,HHIR,xray_scatt" //CO20201111
 #define _ENERGIES_IONIZATION_MAX_AFLOWMACHL_ 5
 
+//MONITOR_VASP
+#define VERBOSE_MONITOR_VASP false
+#define AFLOW_MEMORY_TAG "AFLOW ERROR: AFLOW_MEMORY"
+
 // --------------------------------------------------------------------------
 // definitions for MULTHREADS
 //#define MAX_ALLOCATABLE_PTHREADS     1024
@@ -155,6 +159,8 @@ namespace AFLOW_PTHREADS {
 
 extern string _AFLOWIN_; 
 extern string _AFLOWLOCK_; 
+
+const string VASP_KEYWORD_EXECUTION=" Executing: ";
 
 // --------------------------------------------------------------------------
 // definitions for aflow
@@ -308,6 +314,9 @@ using aurostd::xcombos;
 //BANDGAP  //CO20191110
 #define _METALGAP_ -1.0*AUROSTD_NAN
 #define _METALEDGE_ -1.0
+
+//moved from avasp
+#define _AFLOWINPAD_ 60
 
 // --------------------------------------------------------------------------
 // this is a container of general global choices
@@ -850,7 +859,7 @@ class _vflags {
     xoption AFLOW_SYSTEM;                         //ME20181121
     int KBIN_VASP_RUN_NRELAX;
     xoption KBIN_VASP_RUN;                        // GENERATE, STATIC, KPOINTS, RELAX, RELAX_STATIC, RELAX_STATIC_BANDS, STATIC_BANDS, DIELECTRIC_STATIC, DIELECTRIC_DYNAMIC, DSCF
-    xoption KBIN_VASP_REPEAT;                     // REPEAT_BANDS REPEAT_STATIC_BANDS REPEAT_DELSOL
+    xoption KBIN_VASP_REPEAT;                     // REPEAT_STATIC REPEAT_STATIC_BANDS REPEAT_BANDS REPEAT_DELSOL
     xoption KBIN_VASP_FORCE_OPTION_NOTUNE;        // NOTUNE
     xoption KBIN_VASP_FORCE_OPTION_SYSTEM_AUTO;   // SYSTEM_AUTO
     xoption KBIN_VASP_FORCE_OPTION_RELAX_MODE;    // RELAX_MODE  forces/energy
@@ -872,10 +881,22 @@ class _vflags {
     xoption KBIN_VASP_FORCE_OPTION_PSTRESS_EQUAL; // isentry and content_double
     // EDIFFG
     xoption KBIN_VASP_FORCE_OPTION_EDIFFG_EQUAL; // isentry and content_double
+    // NELM
+    xoption KBIN_VASP_FORCE_OPTION_NELM_EQUAL;  // isentry and content_double //CO20200624
+    // NELM_STATIC
+    xoption KBIN_VASP_FORCE_OPTION_NELM_STATIC_EQUAL;  // isentry and content_double //CO20200624
     // ISMEAR
     xoption KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL;  // isentry and content_double //CO20181129
     // SIGMA
     xoption KBIN_VASP_FORCE_OPTION_SIGMA_EQUAL;  // isentry and content_double //CO20181129
+    // ISMEAR_STATIC
+    xoption KBIN_VASP_FORCE_OPTION_ISMEAR_STATIC_EQUAL;  // isentry and content_double //CO20181129
+    // SIGMA_STATIC
+    xoption KBIN_VASP_FORCE_OPTION_SIGMA_STATIC_EQUAL;  // isentry and content_double //CO20181129
+    // ISMEAR_BANDS
+    xoption KBIN_VASP_FORCE_OPTION_ISMEAR_BANDS_EQUAL;  // isentry and content_double //CO20181129
+    // SIGMA_BANDS
+    xoption KBIN_VASP_FORCE_OPTION_SIGMA_BANDS_EQUAL;  // isentry and content_double //CO20181129
     // RWIGS
     bool KBIN_VASP_FORCE_OPTION_RWIGS_STATIC;  
     xoption KBIN_VASP_FORCE_OPTION_SKIP_NOMIX;    // SKIP_NOMIX
@@ -1062,9 +1083,9 @@ namespace init {
   uint InitSchema(bool INIT_VERBOSE);
 } // namespace init
 
-uint AFLOW_getTEMP(vector<string> argv);
-uint AFLOW_monitor(vector<string> argv);
-double AFLOW_checkMEMORY(string="",double=102.0);
+uint AFLOW_getTEMP(const vector<string>& argv);
+uint AFLOW_monitor(const vector<string>& argv);
+double AFLOW_checkMEMORY(const string& progname="",double=102.0);
 bool CheckMaterialServer(const string& message);  //CO20200624
 bool CheckMaterialServer(void);
 string aflow_get_time_string(void);
@@ -1072,9 +1093,19 @@ string aflow_convert_time_ctime2aurostd(const string& time_LOCK); //CO20200624
 string aflow_get_time_string_short(void);
 // [OBSOLETE] string strPID(void);
 
-string Message(const string& list2print="");  //CO20200713
-string Message(const string& list2print,const string& filename);  //CO20200713
-string Message(const _aflags& aflags,const string& list2print="",const string& filename="");  //CO20200713
+class _xvasp; //forward declaration
+
+bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin);  //CO20210315
+bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin,int& ncpus);  //CO20210315
+void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed);  //CO20210315
+bool AFLOW_VASP_instance_running(); //CO20210315
+bool AFLOW_MONITOR_instance_running(const _aflags& aflags); //CO20210315
+bool VASP_instance_running(const string& vasp_bin); //CO20210315
+void AFLOW_monitor_VASP();  //CO20210315
+void AFLOW_monitor_VASP(const string& directory);  //CO20210315
+
+string Message(const string& filename,const string& list2print=_AFLOW_MESSAGE_DEFAULTS_);  //CO20200713
+string Message(const string& filename,const _aflags& aflags,const string& list2print=_AFLOW_MESSAGE_DEFAULTS_);  //CO20200713
 bool AFLOW_BlackList(const string& h);  //CO20200713
 namespace init {
   void MessageOption(const string& options, const string& routine,vector<string> vusage);  //CO20200624 - should go to cerr for web //DX20200724 - bool to void
@@ -2350,7 +2381,7 @@ string KPPRA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const int& 
 string KPPRA(xstructure& str,const int& _NK);
 string KPPRA_DELTA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const double& DK);
 string KPPRA_DELTA(xstructure& str,const double& DK);
-int GetNBANDS(int electrons,int nions,int spineach,bool ispin);
+int GetNBANDS(int electrons,int nions,int spineach,bool ispin=true,int NPAR=1);  //CO20210315 - spin==true is safer, added NPAR
 double GetZVAL(const stringstream& sss,vector<double>& vZVAL);
 double GetZVAL(const _xvasp& xvasp,vector<double>& vZVAL);
 double GetZVAL(const string& directory,vector<double>& vZVAL);
@@ -2905,8 +2936,8 @@ namespace KBIN {
   void RUN_DirectoryScript(const _aflags& aflags,const string& script,const string& output);
   bool CompressDirectory(const _aflags& aflags,const _kflags& kflags);
   bool CompressDirectory(const _aflags& aflags);
-  void Clean(const _aflags& aflags);
-  void Clean(const string directory);
+  void Clean(const _aflags& aflags,bool contcar_save=false);
+  void Clean(const string directory,bool contcar_save=false);
   void XClean(string options);
   void GenerateAflowinFromVASPDirectory(_aflags& aflags);
   void StartStopCheck(const string &AflowIn,string str1,string str2,bool &flag,bool &flagS);
@@ -3022,27 +3053,47 @@ namespace KBIN {
   bool VASP_Directory(ofstream& FileERROR,_aflags& aflags,_kflags& kflags);
   void VASP_BackupOriginal(_aflags aflags);
   // [OBSOLETE] G++6 not needed  void VASP_Wait(_xvasp& xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
+  void VASP_ProcessWarnings(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,aurostd::xoption& xmessage,aurostd::xoption& xwarning,ofstream &FileMESSAGE); //CO20210315
+  void VASP_ProcessWarnings(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,aurostd::xoption& xmessage,aurostd::xoption& xwarning,aurostd::xoption& xmonitor,ofstream &FileMESSAGE); //CO20210315
+  bool VASP_Error2Fix(const string& error,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
+  bool VASP_Error2Fix(const string& error,const string& mode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
+  bool VASP_Error2Fix(const string& error,int& submode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
+  bool VASP_Error2Fix(const string& error,const string& mode,int& submode,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
+  bool VASP_Error2Fix(const string& error,bool try_last_ditch_efforts,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
+  bool VASP_Error2Fix(const string& error,const string& mode,bool try_last_ditch_efforts,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
+  bool VASP_Error2Fix(const string& error,int& submode,bool try_last_ditch_efforts,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
+  bool VASP_Error2Fix(const string& error,const string& mode,int& submode,bool try_last_ditch_efforts,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);  //CO20210315
+  bool VASP_FixErrors(_xvasp &xvasp,aurostd::xoption& xmessage,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE); //CO20210315
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE);
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,string relaxB,bool qmwrite,ofstream &FileMESSAGE);
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,bool qmwrite,ofstream &FileMESSAGE);
   bool VASP_RunFinished(_xvasp &xvasp,_aflags &aflags,ofstream &FileMESSAGE,bool=FALSE);
   void WaitFinished(_xvasp &xvasp,_aflags &aflags,ofstream &FileMESSAGE,uint max_count=AUROSTD_MAX_UINT,bool=FALSE);  //CO20201220 - added max_count
-  void VASP_Error(_xvasp &xvasp,string="",string="",string="");
-  void VASP_Error(_xvasp &xvasp,ofstream &FileMESSAGE,string="",string="",string="");
+  void VASP_Error(const _xvasp &xvasp,const string& message1="",const string& message2="",const string& message3="");
+  void VASP_Error(const _xvasp &xvasp,ofstream &FileMESSAGE,const string& message1="",const string& message2="",const string& message3="");
   string VASP_Analyze(_xvasp &xvasp,bool qmwrite);
-  void VASP_CompressDirectory(_xvasp xvasp,_kflags &kflags);
-  void VASP_Backup(_xvasp& xvasp,bool qmwrite,string relax);
-  void VASP_CONTCAR_Save(_xvasp xvasp,string relax);
-  void VASP_Recycle(_xvasp xvasp,string relax);
-  void VASP_Recycle(_xvasp xvasp,int relax_number);
-  void VASP_RecycleExtraFile(_xvasp xvasp,string xfile,string relax);
-  void VASP_RecycleExtraFile(_xvasp xvasp,string xfile,int relax_number);
-  bool VASP_CheckUnconvergedOSZICAR(string dir);
+  //[CO20210315 - OBSOLETE]void VASP_CompressDirectory(_xvasp xvasp,_kflags &kflags);
+  void VASP_Backup(_xvasp& xvasp,bool qmwrite,const string& relax); //CO20210315
+  void VASP_CONTCAR_Save(const _xvasp& xvasp,const string& relax="breakpoint");  //CO20210315
+  void VASP_CONTCAR_Save(const string& directory,const string& relax="breakpoint");  //CO20210315
+  void VASP_Recycle(const _xvasp& xvasp,const string& relax); //CO20210315
+  void VASP_Recycle(const _xvasp& xvasp,int relax_number);  //CO20210315
+  void VASP_RecycleExtraFile(const _xvasp& xvasp,const string& xfile,const string& relax);  //CO20210315
+  void VASP_RecycleExtraFile(const _xvasp& xvasp,const string& xfile,int relax_number); //CO20210315
+  uint VASP_getNELM(const string& outcar); //CO20200624
+  uint VASP_getNSTEPS(const string& oszicar);  //CO20200624
+  bool VASP_OSZICARUnconverging(const string& dir,uint cutoff=3);
+  bool VASP_OSZICARUnconverged(const string& oszicar,const string& outcar);
   void GetStatDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   void GetDynaDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
-  string getVASPVersionString(const string&);  //ME20190219
-  string getVASPVersionNumber(const string&);  //CO20200610
-  double getVASPVersion(const string&);  //CO20200610
+  string OUTCAR2VASPVersion(const string& outcar);  //CO20210315
+  string OUTCAR2VASPVersionNumber(const string& outcar);  //CO20210315
+  double OUTCAR2VASPVersionDouble(const string& outcar);  //CO20210315
+  string VASPVersionString2Number(const string& vasp_version);  //CO20210315
+  double VASPVersionString2Double(const string& vasp_version);  //CO20210315
+  string getVASPVersion(const string& binfile);  //ME20190219
+  string getVASPVersionNumber(const string& binfile);  //CO20200610
+  double getVASPVersionDouble(const string& binfile);  //CO20200610
 }
 
 // ----------------------------------------------------------------------------
@@ -3058,15 +3109,19 @@ namespace KBIN {
   bool VASP_Write_INPUT(_xvasp& xvasp,_vflags &vflags,const string& ext_module="");//AS20210302
   bool VASP_Produce_INCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Modify_INCAR(_xvasp& xvasp,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
+  void VASP_CleanUp_INCAR(_xvasp& xvasp);
+  bool VASP_Reread_INCAR(_xvasp& xvasp); //CO20210315
   bool VASP_Reread_INCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
   bool VASP_Produce_POSCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Produce_POSCAR(_xvasp& xvasp);
   bool VASP_Modify_POSCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_vflags& vflags);
-  void convertPOSCARFormat(_xvasp&, const _kflags&);  //ME20190220
+  void convertPOSCARFormat(_xvasp&, const _aflags& aflags, const _kflags&);  //ME20190220 //CO20210713 - aflags
   bool VASP_Convert_Unit_Cell(_xvasp&, _vflags&, _aflags&, ofstream&, ostringstream&); //ME20181216
+  bool VASP_Reread_POSCAR(_xvasp& xvasp); //CO20210315
   bool VASP_Reread_POSCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
   bool VASP_Produce_KPOINTS(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Modify_KPOINTS(_xvasp& xvasp,ofstream& FileERROR,_aflags& aflags,_vflags& vflags);
+  bool VASP_Reread_KPOINTS(_xvasp& xvasp);  //CO20210315
   bool VASP_Reread_KPOINTS(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
   bool VASP_Find_DATA_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar,string &AUIDPotcar);
   bool VASP_Find_FILE_POTCAR(const string& species_pp,string &FilePotcar,string &DataPotcar,string &AUIDPotcar);
@@ -3089,50 +3144,73 @@ namespace KBIN {
   bool VASP_SplitAlloyPseudoPotentials(string alloy, string &species_ppA, string &species_ppB, string &species_ppC);
   bool VASP_SplitAlloyPseudoPotentials(vector<string> alloy, vector<string> &species_ppsA, vector<string> &species_ppsB);
   bool VASP_SplitAlloyPseudoPotentials(vector<string> alloy, vector<string> &species_ppsA, vector<string> &species_ppsB, vector<string> &species_ppsC);
-  void VASP_MPI_Autotune(_xvasp& xvasp,_aflags &aflags,bool VERBOSE);
+  void XVASP_Get_NPAR_NCORE(const _xvasp& xvasp,const _aflags& aflags,int& NPAR,int& NCORE);  //CO20210315
+  void XVASP_MPI_Autotune(_xvasp& xvasp,_aflags &aflags,bool VERBOSE);
   void XVASP_INCAR_System_Auto(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_Relax_ON(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_Relax_ON(_xvasp& xvasp,_vflags& vflags,int number); // for steps
   void XVASP_INCAR_Static_ON(_xvasp& xvasp,_vflags& vflags);
   void XVASP_INCAR_Relax_Static_ON(_xvasp& xvasp,_vflags& vflags);
-  void XVASP_INCAR_Relax_Static_Bands_ON(_xvasp& xvasp,_vflags& vflags);
+  void XVASP_INCAR_Bands_ON(_xvasp& xvasp,_vflags& vflags);
   void XVASP_INCAR_RWIGS_Static(_xvasp& xvasp,_vflags& vflags,ofstream &FileMESSAGE,bool OPERATION);
   void XVASP_INCAR_Precision(_xvasp& xvasp,_vflags& vflags);
   void XVASP_INCAR_Metagga(_xvasp& xvasp,_vflags& vflags);
   void XVASP_INCAR_Ivdw(_xvasp& xvasp,_vflags& vflags);
   void XVASP_INCAR_ABMIX(_xvasp& xvasp,_vflags& vflags);
-  int XVASP_INCAR_GetNBANDS(_xvasp& xvasp,bool ispin);
-  bool XVASP_INCAR_PREPARE_GENERIC(string command,_xvasp& xvasp,_vflags& vflags,string svalue,int ivalue,double dvalue,bool bvalue);
-  //  bool XVASP_INCAR_PREPARE_GENERIC(string command,_xvasp& xvasp,_kflags &kflags,_vflags& vflags,string svalue,int ivalue,double dvalue,bool bvalue);
-  // ALGO, ENMAX_MULTIPLY, IMIX, IALGO, TYPE, PAW_CORRECTIONS, NBANDS, PSTRESS, EDIFFG, POTIM, SPIN, LS_COUPLING, AUTO_MAGMOM, NWS, SYM, WAVECAR, CHGCAR
-  void XVASP_INCAR_ADJUST_ICHARG(_xvasp&, _vflags&, _aflags&, int, ofstream&);  //ME20191028
-  void XVASP_INCAR_SPIN_REMOVE_RELAX(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE);
-  void XVASP_KPOINTS_IBZKPT_UPDATE(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,ofstream &FileMESSAGE);
+  int XVASP_INCAR_GetNBANDS(const _xvasp& xvasp,const _aflags& aflags,bool ispin=true); //CO20210315 - spin==true is safer
+  string INCAR_IALGO2ALGO(int ialgo); //CO20210315
+  bool XVASP_INCAR_Read_MAGMOM(_xvasp& xvasp);  //CO20210315
+  bool XVASP_INCAR_PREPARE_GENERIC(const string& command,_xvasp& xvasp,const _vflags& vflags,const string& svalue,int ivalue,double dvalue,bool bvalue);
+  void XVASP_INCAR_ADJUST_ICHARG(_xvasp&, _vflags&, _aflags&, int,bool write_incar, ofstream&);  //ME20191028 //CO20210315 - write_incar
+  void XVASP_INCAR_SPIN_REMOVE_RELAX(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,bool write_incar,ofstream &FileMESSAGE);  //CO20210315 - write_incar
+  void XVASP_KPOINTS_IBZKPT_UPDATE(_xvasp& xvasp,_aflags &aflags,_vflags& vflags,int step,bool write_incar,ofstream &FileMESSAGE);  //CO20210315 - write_incar
   void XVASP_INCAR_LDAU_OFF(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_LDAU_ON(_xvasp& xvasp,_vflags& vflags,uint type);
   void XVASP_INCAR_LDAU_ADIABATIC(_xvasp& xvasp,int step);
   void XVASP_INCAR_LDAU_CUTOFF(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_KPOINTS_Dielectric_SET(_xvasp& xvasp,_kflags &kflags,_vflags& vflags,string mode_dielectric);
-  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,string ENTRY,string COMMENT,bool VERBOSE);
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& entry,const string& COMMENT,bool VERBOSE);  //CO20200624 - using aurostd::kvpairfound() now
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& entries,const string& COMMENT,bool VERBOSE);  //CO20200624 - using aurostd::kvpairfound() now
 
-  bool XVASP_KPOINTS_KPOINTS(_xvasp &xvasp,ofstream &FileMESSAGE,bool VERBOSE);
-  bool XVASP_KPOINTS_KPOINTS(_xvasp &xvasp);
+  bool AFLOWIN_REMOVE(const string& aflowin_file,const string& keyword,const string& comment); //CO20210314
+  bool AFLOWIN_REMOVE(const string& aflowin_file,const vector<string>& vkeywords,const string& comment); //CO20210314
+  bool AFLOWIN_REMOVE(const string& aflowin_file,const string& keyword,const string& keyword2avoid,const string& comment); //CO20210314
+  bool AFLOWIN_REMOVE(const string& aflowin_file,const vector<string>& vkeywords,const vector<string>& vkeywords2ignore,const string& comment); //CO20210314
+  void AFLOWIN_ADD(const string& aflowin_file,const stringstream& streamin,const string& comment);  //CO20210315
+  void AFLOWIN_ADD(const string& aflowin_file,const ostringstream& streamin,const string& comment); //CO20210315
+  void AFLOWIN_ADD(const string& aflowin_file,const string& line,const string& comment);  //CO20210315
+  void AFLOWIN_ADD(const string& aflowin_file,const vector<string>& vlines2add,const string& comment);  //CO20210315
+
+  void XVASP_KPOINTS_KPOINTS(_xvasp &xvasp,ofstream &FileMESSAGE,bool VERBOSE);
+  void XVASP_KPOINTS_KPOINTS(_xvasp &xvasp);
   // bool XVASP_KPOINTS_EVEN(_xvasp& xvasp); TO REMOVE
   // bool XVASP_KPOINTS_ODD(_xvasp& xvasp); TO REMOVE
-  bool XVASP_KPOINTS_OPERATION(_xvasp& xvasp,string operation);
+  bool XVASP_KPOINTS_IncludesGamma(const _xvasp& xvasp);  //CO20210315
+  bool XVASP_KPOINTS_OPERATION(_xvasp& xvasp,const string& operation);
   // bool XVASP_KPOINTS_Kshift_Gamma_EVEN(_xvasp& xvasp); TO REMOVE
   // bool XVASP_KPOINTS_Kshift_Gamma_ODD(_xvasp& xvasp); TO REMOVE
   // bool XVASP_KPOINTS_Kscheme(_xvasp& xvasp,string kscheme);
-  bool XVASP_KPOINTS_Fix_KPPRA(_xvasp &xvasp,int NK,ofstream &FileMESSAGE,bool VERBOSE);
-  bool XVASP_KPOINTS_Fix_KSHIFT(_xvasp &xvasp,_xvasp &rxvasp,bool KAUTOSHIFT,bool VERBOSE);
-  bool XVASP_KPOINTS_Fix_KPOINTS(_xvasp &xvasp,int NK,ofstream &FileMESSAGE,bool VERBOSE);
-  void XVASP_string2numbers(_xvasp& xvasp);
-  void XVASP_numbers2string(_xvasp& xvasp);
-  void XVASP_Afix_Clean(_xvasp& xvasp,string preserve_name);
-  void XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,bool verbose,_aflags &aflags,ofstream &FileMESSAGE);
-  void XVASP_Afix_NBANDS(_xvasp& xvasp,int& nbands,bool VERBOSE);
-  void XVASP_Afix_POTIM(_xvasp& xvasp,double& potim,bool VERBOSE);
-  double XVASP_Afix_GENERIC(string mode,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,double=0.0,int=0);
+  //[CO20210315 - OBSOLETE]bool XVASP_KPOINTS_Fix_KPPRA(_xvasp &xvasp,int NK,ofstream &FileMESSAGE,bool VERBOSE);
+  //[CO20210315 - OBSOLETE]bool XVASP_KPOINTS_Fix_KSHIFT(_xvasp &xvasp,_xvasp &rxvasp,bool KAUTOSHIFT,bool VERBOSE);
+  //[CO20210315 - OBSOLETE]bool XVASP_KPOINTS_Fix_KPOINTS(_xvasp &xvasp,int NK,ofstream &FileMESSAGE,bool VERBOSE);
+  bool XVASP_KPOINTS_isAutoMesh(const _xvasp& xvasp); //CO20210315
+  bool XVASP_KPOINTS_string2numbers(_xvasp& xvasp); //CO20210315 - cleaned up
+  bool XVASP_KPOINTS_numbers2string(_xvasp& xvasp); //CO20210315 - cleaned up
+  void XVASP_Afix_Clean(const _xvasp& xvasp,const string& preserve_name);
+  //[CO20210315 - OBSOLETE]bool XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,_aflags& aflags,bool VERBOSE,ofstream &FileMESSAGE);
+  //[CO20210315 - OBSOLETE]bool XVASP_Afix_ROTMAT(_xvasp& xvasp,int mode,_kflags kflags,_vflags vflags,_aflags& aflags,bool VERBOSE,ofstream &FileMESSAGE);
+  //the following functions are all associated with XVASP_Afix()
+  bool XVASP_Afix_NBANDS(_xvasp& xvasp,const _aflags& aflags,const _vflags& vflags,bool increase=true);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_NBANDS(_xvasp& xvasp,const _aflags& aflags,const _vflags& vflags,int& nbands,bool increase=true);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_POTIM(_xvasp& xvasp,const _vflags& vflags);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_POTIM(_xvasp& xvasp,const _vflags& vflags,double& potim);  //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_NELM(_xvasp& xvasp,const _vflags& vflags); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_NELM(_xvasp& xvasp,const _vflags& vflags,int& nelm); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_EFIELD_PEAD(_xvasp& xvasp,const _vflags& vflags); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_EFIELD_PEAD(_xvasp& xvasp,const _vflags& vflags,xvector<double>& E); //CO20200624 - this is not a general Afix, this can only be used inside Afix_GENERIC
+  bool XVASP_Afix_ApplyFix(const string& fix,aurostd::xoption& xfixed,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,_aflags &aflags,ofstream& FileMESSAGE); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
+  bool XVASP_Afix_IgnoreFix(const string& _fix,const _vflags& vflags);  //CO20210315
+  bool XVASP_Afix(const string& mode,int& submode,bool try_last_ditch_efforts,aurostd::xoption& xfixed,_xvasp& xvasp,_kflags& kflags,_vflags& vflags,_aflags &aflags,ofstream& FileMESSAGE); //CO20200624 - adding submode so we don't need to make a bunch of spin-off functions
 
   string ExtractSystemName(const string& directory);  //ME20200217
   string ExtractSystemNameFromAFLOWIN(const string& directory);  //ME20200217
@@ -3158,6 +3236,7 @@ struct _AVASP_PROTO{
   aurostd::xoption vparams;
 };
 
+void PARAMS2xvasp(_AVASP_PROTO *PARAMS,_xvasp& xvasp);  //CO20210624 - avoid duplicate code: AVASP_MakePrototype_AFLOWIN() and AVASP_MakePrototypeICSD_AFLOWIN()
 bool AVASP_MakePrototype_AFLOWIN(_AVASP_PROTO *PARAMS);
 bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS);
 bool AVASP_MakePrototype_AFLOWIN_20180101(_AVASP_PROTO *PARAMS);
@@ -3223,9 +3302,11 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     // CONTENT
     string content;vector<string> vcontent;string filename;       // the content, and lines of it
     string SYSTEM;
+    int NELM; //CO20200624
     int NIONS;
     double Efermi;
     bool isLSCOUPLING;
+    xvector<double> efield_pead;  //CO20210315
     int nelectrons; //AS20200528
     double natoms;                                                // for aflowlib_libraries.cpp
     double energy_cell,energy_atom;                               // for aflowlib_libraries.cpp
