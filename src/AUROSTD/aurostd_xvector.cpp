@@ -2141,16 +2141,16 @@ namespace aurostd { //HE20210511
   volume(const vector <xvector<utype> > &points, const vector <vector<uint> > &facets,
          const vector <xvector<utype> > &normals) { //HE20210511
     bool LDEBUG = (false || XHOST.DEBUG);
-    string soliloquy = XPID + "aurostd::volume(): ";
+    string soliloquy = XPID + "aurostd::volume():";
 
     if (facets.size() != normals.size()) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "there must be an equal number of facets and normal vectors",
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, " there must be an equal number of facets and normal vectors",
                             _VALUE_ERROR_);
     }
     double result = 0.0;
 
     vector <xvector<utype> > facet_points;
-    if (LDEBUG) cerr << soliloquy << "facet id | contribution | area | normal | scalar_prod" << endl;
+    if (LDEBUG) cerr << soliloquy << " facet id | contribution | area | normal | scalar_prod" << endl;
     for (uint f_id = 0; f_id < facets.size(); f_id++) {
       if (facets[f_id].size() < 3) {
         throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "there must be at least three vertices in each facets",
@@ -2163,11 +2163,11 @@ namespace aurostd { //HE20210511
       double area = aurostd::areaPointsOnPlane(facet_points);
       double scalar_prod = aurostd::scalar_product(normals[f_id], facet_points[0]);
       if (LDEBUG)
-        cerr << soliloquy << f_id << " | " << scalar_prod * area / 3.0 << " | " << area << " | " << normals[f_id]
+        cerr << soliloquy << " " << f_id << " | " << scalar_prod * area / 3.0 << " | " << area << " | " << normals[f_id]
              << " | " << scalar_prod << endl;
       result += scalar_prod * area;
     }
-    if (LDEBUG) cerr << soliloquy << "Volume: " << std::abs(result) / 3.0 << endl;
+    if (LDEBUG) cerr << soliloquy << " Volume: " << std::abs(result) / 3.0 << endl;
     return std::abs(result) / 3.0; // depending on the normal direction the volume could be negative
   }
 
@@ -2183,7 +2183,7 @@ namespace aurostd { //HE20210511
   double
   volume(const vector <xvector<utype> > &points, const vector <vector<uint> > &facets, const bool convex) { //HE20210511
     bool LDEBUG = (true || XHOST.DEBUG);
-    string soliloquy = XPID + "aurostd::volume(): ";
+    string soliloquy = XPID + "aurostd::volume():";
     vector <xvector<utype> > facet_points;
     vector <xvector<utype> > facet_direction;
     xvector<utype> center = aurostd::getCentroid(points);
@@ -2206,13 +2206,13 @@ namespace aurostd { //HE20210511
         facet_direction.push_back(facet_points[index_start + 1] - facet_points[index_start + 2]);
         if (aurostd::isCollinear(facet_direction[0], facet_direction[1], (utype) _ZERO_TOL_)) {
           if (LDEBUG)
-            cerr << soliloquy << "Points selected to calculate the normal vector for facet " << f_id
+            cerr << soliloquy << " Points selected to calculate the normal vector for facet " << f_id
                  << " formed a line. (" << index_start << ", " << index_start + 1 << ", " << index_start + 2 << ")"
                  << endl;
           index_start++;
           if (facet_size >= (index_start + 3)) {
             if (LDEBUG)
-              cerr << soliloquy << "Trying next triplet (" << index_start << ", " << index_start + 1 << ", "
+              cerr << soliloquy << " Trying next triplet (" << index_start << ", " << index_start + 1 << ", "
                    << index_start + 2 << ")" << endl;
             continue;
           } else {

@@ -8316,6 +8316,9 @@ namespace pflow {
     string soliloquy = XPID + "pflow::outputAtomicEnvironment():";
     if (LDEBUG) cerr << soliloquy << "Start" << endl;
 
+    // for FUTURE use
+    if (radius == 0){}
+     
     string aurl = "";
     aflowlib::_aflowlib_entry entry;
     xstructure str;
