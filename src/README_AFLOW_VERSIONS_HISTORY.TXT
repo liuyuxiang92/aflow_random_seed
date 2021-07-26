@@ -21,6 +21,7 @@
         -- Made string search in database case insensitive (ME)
         -- Supressed file output for interstitials calculation in web mode (ME)
         -- added command line plotting functionality for POCC runs using --plot_dos (CO)
+        -- printing out ldau_type by default (0 if not calculated) (CO+ME)
 3.2.10 - 2021/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.10.tar.xz
         -- fixed bug in GetPrimitive() function, use more robust volume check (DX)
