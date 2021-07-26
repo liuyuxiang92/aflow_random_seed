@@ -8314,7 +8314,7 @@ namespace pflow {
   void outputAtomicEnvironment(const string &auid, uint aeMode, double radius) {
     bool LDEBUG = (false || XHOST.DEBUG);
     string soliloquy = XPID + "pflow::outputAtomicEnvironment():";
-    if (LDEBUG) cerr << soliloquy << "Start" << endl;
+    if (LDEBUG) cerr << soliloquy << " Start" << endl;
 
     // for FUTURE use
     if (radius == 0){}
