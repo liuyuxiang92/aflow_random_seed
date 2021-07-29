@@ -3211,6 +3211,25 @@ A29B40CD12_cF656_227_ae2fg_e3g_b_g-001.{ABCD}                        cF656     F
 A21B_cI44_229_bdh_a-001.{AB}                                         cI44      Im-3m               B23           AgI                     #229      alpha-AgI (part 3) 
 A2B3C12D12_cI232_230_a_c_h_h-001.{ABCD}                              cI232     Ia-3d               J2_{3}        Al2Ca3H12O12            #230      Ca3Al2(OH)12 (part 3) 
 
+*****************************************************************************************************************************************************
+ANRL - metal carbo-nitrides - QUATERNARIES
+
+ANRL Label                                                           Pearson   SG symbol           Struk         Prototype               SG #      notes
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+A2BCD4_mP16_11_2e_e_e_4e-001.{ABCD}                                  mP16      P2_{1}/m            -             C2La1Li1N4              #11       ternary metal-carbo-nitride prototype; C2La1Li1N4, ICSD #420440
+AB2C2D_mC24_15_a_f_f_e-001.{ABCD}                                    mC24      C2/c                -             Ag1C2N2Na1              #15       ternary metal-carbo-nitride prototype; Ag1C2N2Na1, ICSD #65697
+A6BC6D2_hP15_147_g_a_g_d-001.{ABCD}                                  hP15      P-3                 -             C6Fe1N6Pb2              #147      ternary metal-carbo-nitride prototype; C6Fe1N6Pb2, ICSD #51493
+A6BC6D2_hP15_147_g_a_g_d-002.{ABCD}                                  hP15      P-3                 -             C6Fe1N6Sn2              #147      ternary metal-carbo-nitride prototype; C6Fe1N6Sn2, ICSD #51494
+A6B2C6D_hP15_147_g_d_g_a-001.{ABCD}                                  hP15      P-3                 -             C6Cd2N6Os1              #147      ternary metal-carbo-nitride prototype; C6Cd2N6Os1, ICSD #417821
+A6B2C6D_hP15_147_g_d_g_a-002.{ABCD}                                  hP15      P-3                 -             C6Cd2N6Ru1              #147      ternary metal-carbo-nitride prototype; C6Cd2N6Ru1, ICSD #417822
+A6B2C6D_hP15_147_g_d_g_a-003.{ABCD}                                  hP15      P-3                 -             C6Mn2N6Ru1              #147      ternary metal-carbo-nitride prototype; C6Mn2N6Ru1, ICSD #417823
+A6B2CD6_hP15_147_g_d_a_g-001.{ABCD}                                  hP15      P-3                 -             C6Cd2Fe1N6              #147      ternary metal-carbo-nitride prototype; C6Cd2Fe1N6, ICSD #417826
+A3B6CD6_hP16_162_g_k_a_k-001.{ABCD}                                  hP16      P-31m               -             Ag3C6Co1N6              #162      ternary metal-carbo-nitride prototype; Ag3C6Co1N6, ICSD #16959
+A3B6CD6_hP16_162_g_k_a_k-002.{ABCD}                                  hP16      P-31m               -             Ag3C6Fe1N6              #162      ternary metal-carbo-nitride prototype; Ag3C6Fe1N6, ICSD #173552
+A6B2CD6_cF60_216_f_bc_a_f-001.{ABCD}                                 cF60      F-43m               -             C6Cu2Fe1N6              #216      ternary metal-carbo-nitride prototype; C6Cu2Fe1N6, ICSD #28653
+A6BC6D_cF56_225_e_a_e_b-001.{ABCD}                                   cF56      Fm-3m               -             C6Cd1N6Pd1              #225      ternary metal-carbo-nitride prototype; C6Cd1N6Pd1, ICSD #6093
+A3BCD3_cF64_225_e_c_ab_e-001.{ABCD}                                  cF64      Fm-3m               -             C6Cs2Mn2N6              #225      ternary metal-carbo-nitride prototype; C6Cs2Mn2N6, ICSD #248046
+
 ****************************************************************************************************
 ****************************************************************************************************
 ****************************************************************************************************
