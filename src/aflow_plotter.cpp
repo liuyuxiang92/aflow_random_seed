@@ -517,7 +517,10 @@ namespace plotter {
               cerr << soliloquy << " elements=" << aurostd::joinWDelimiter(elements,",") << endl;
               cerr << soliloquy << " composition=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(composition,5),",") << endl;
             }
-            title = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft) + " (" + proto;  //_none_ //_latex_   //CO20190629
+            //DX+ME20210729 - the code below is wrapped in a try-catch block because there are unary prototypes in LIB2 (e.g., /common/LIB2/LIB/LaMn_pv/117)
+            // in these instances, we will return the default title
+            try { title = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft) + " (" + proto; } //_none_ //_latex_   //CO20190629 //DX+ME20210729
+            catch(aurostd::xerror& excpt){ return aurostd::fixStringLatex(default_title, false, false); } //DX+ME20210729
           } else {  // Title not in prototype format
             return aurostd::fixStringLatex(default_title, false, false);
           }
