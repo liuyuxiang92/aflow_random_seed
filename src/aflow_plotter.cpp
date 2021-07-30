@@ -2157,6 +2157,8 @@ namespace plotter {
   void generateDosPlotGNUPLOT(stringstream& out, const xDOSCAR& xdos, const deque<double>& energies,
       const deque<deque<deque<double> > >& dos, const vector<string>& labels,
       const xoption& plotoptions) {
+    bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
+    string soliloquy=XPID+"plotter::generateDosPlotGNUPLOT():";
     // Initialize variables
     double Efermi = aurostd::string2utype<double>(plotoptions.getattachedscheme("EFERMI"));
     double Emin = aurostd::string2utype<double>(plotoptions.getattachedscheme("XMIN"));
@@ -2166,8 +2168,15 @@ namespace plotter {
     uint ndos = dos.size();
 
     double dosmax = getDosLimits(plotoptions, xdos, dos, energies);
+    
+    if(LDEBUG){
+      cerr << soliloquy << " dosmax=" << dosmax << endl;
+      cerr << soliloquy << " xdos.spin=" << xdos.spin << endl;
+    }
+
+    if(aurostd::isequal(dosmax,0.0)){dosmax=1.0;} //CO+ME20210729 - issues with LIB0 pDOS plots, might need to rerun with NEDOS=5000, EMIN=-45, EMAX=30
     string maxdos = aurostd::utype2string<double>(dosmax);
-    string mindos;
+    string mindos="";
     if (xdos.spin == 0) mindos = "0";
     else mindos = "-" + maxdos;
 
@@ -2230,7 +2239,8 @@ namespace plotter {
     }
 
     out << " set " << (swap?"x":"y") << "tics " << (dosmax/(2 * (2 - xdos.spin))) << std::endl;
-    out << " set ytics" << (banddos?" format \"\"":"") << std::endl;
+    if(banddos){out << " set ytics format \"\"" << std::endl;}  //CO+ME20210729
+    //[CO+ME20210729 - breaks for LIB0 which has swap==false and banddos]out << " set ytics" << (banddos?" format \"\"":"") << std::endl;
     out << " set tic scale 0" << std::endl;
     out << " set " << (swap?"y":"x") << "range [" << Emin << ":" << Emax << "]" << std::endl;
     out << " set " << (swap?"x":"y") << "range [" << mindos << ":" << maxdos << "]" << std::endl;
@@ -2280,6 +2290,8 @@ namespace plotter {
           << ((i < ndos - 1)?",\\":"") << std::endl;
       }
     }
+
+    if(LDEBUG){cerr << soliloquy << " gnuplot file:" << endl << out.str() << endl;}
   }
 
   //getDosLimits//////////////////////////////////////////////////////////////
