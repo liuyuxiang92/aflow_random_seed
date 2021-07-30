@@ -18126,7 +18126,13 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   uint natoms_orig = (*this).atoms.size();
   uint natoms_transformed = 0;
   bool is_integer_multiple_transformation = true;
-  double tol=0.9*(*this).dist_nn_min; //DX20210316 - 0.1 is not robust, used fraction of min_dist
+  if((*this).dist_nn_min==AUROSTD_NAN || (*this).dist_nn_min==AUROSTD_MAX_DOUBLE){ (*this).dist_nn_min=SYM::minimumDistance((*this)); }
+
+  // if the cell is being reduced in a symmetry routine, it is best to set the same-atom tolerance to
+  // the minimum interatomic distance minus the sym_eps (e.g., dist_nn_min-sym_eps), since this is the "new resolution"
+  // of the atom postions; 90% of dist_nn_min is used so that the nearest-neighbor is not removed erroneously //DX20210716
+  double tol=0.9*(*this).dist_nn_min-(*this).sym_eps; //DX20210316 - 0.1 is not robust, used fraction of min_dist //DX20210716 - subtract sym_eps
+  if((*this).sym_eps==AUROSTD_NAN || (*this).sym_eps==AUROSTD_MAX_DOUBLE){ tol=0.9*(*this).dist_nn_min; } //DX20210716 - if no sym_eps, then 90% of dist_nn_min this should be sufficient
 
   // ---------------------------------------------------------------------------
   // transform the lattice 
