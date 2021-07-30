@@ -2003,15 +2003,15 @@ namespace aflowlib {
 
     if(!aurostd::FileExist(file_LIB) && !aurostd::FileExist(file_LIB_nocompress) && !aurostd::EFileExist(file_LIB_nocompress)) {
       if(!aurostd::FileExist(file_LIB)) {
-        error_message = MESSAGE + ": file not found " + file_LIB;
+        error_message = MESSAGE + " file not found " + file_LIB;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error_message, _FILE_NOT_FOUND_);
       }
       if(!aurostd::FileExist(file_LIB_nocompress)) {
-        error_message = MESSAGE + ": file not found " + file_LIB_nocompress;
+        error_message = MESSAGE + " file not found " + file_LIB_nocompress;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error_message, _FILE_NOT_FOUND_);
       }
       if(!aurostd::EFileExist(file_LIB_nocompress)) {
-        error_message = MESSAGE + ": file not found " + file_LIB_nocompress + ".EXT";
+        error_message = MESSAGE + " file not found " + file_LIB_nocompress + ".EXT";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error_message, _FILE_NOT_FOUND_);
       }
     }
@@ -2344,7 +2344,7 @@ namespace aflowlib {
 // 	file_LIB=directory_LIB+"/CONTCAR.relax"+aurostd::utype2string(i)+EXT;file_RAW=directory_RAW+"/CONTCAR.relax"+EXT;
 // 	if(aurostd::FileExist(file_LIB)) { aurostd::CopyFile(file_LIB,file_RAW);aurostd::execute(DEFAULT_KZIP_BIN+" -9fd \""+file_RAW+"\"");vfile.push_back("CONTCAR.relax"); }
 //       }
-//       if(aurostd::FileExist(file_RAW)) { cout << MESSAGE << ": ERROR - aflowlib::LIB2RAW_Loop_DATAs:[1] - file not prepared " << file_LIB << endl;}
+//       if(aurostd::FileExist(file_RAW)) { cout << MESSAGE << " ERROR - aflowlib::LIB2RAW_Loop_DATAs:[1] - file not prepared " << file_LIB << endl;}
 //     }
 
 //     if(!flag_DATA_BANDS_) {
@@ -2948,6 +2948,24 @@ namespace aflowlib {
     //[CO20200731 - moving to main LIB2RAW() loop]data.prototype=tokens.at(tokens.size()-1);
     //[CO20200731 - moving to main LIB2RAW() loop]aurostd::StringSubst(data.prototype,":LDAU2","");
     //[CO20200731 - moving to main LIB2RAW() loop]aurostd::StringSubst(data.prototype,"\n","");aurostd::StringSubst(data.prototype," ","");aurostd::StringSubst(data.prototype," ","");
+
+    //CO20210729 - LOCK might be missing, copy from VERSION variant if possible
+    if(!aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_)){
+      if(LDEBUG){cerr << soliloquy << " missing LOCK file, attempting to find old LOCK to copy over" << endl;}
+      vector<string> vfiles;
+      aurostd::DirectoryLS(directory_LIB,vfiles);
+      std::sort(vfiles.begin(),vfiles.end()); //get in order so later LOCK.VERSION comes last
+      string file_lock_len="";
+      for(uint i=0;i<vfiles.size();i++){
+        if(LDEBUG){cerr << soliloquy << " vfiles[i=" << i << "]=" << vfiles[i] << endl;}
+        file_lock_len=vfiles[i].substr(0,_AFLOWLOCK_.size());
+        if(LDEBUG){cerr << soliloquy << " file_lock_len=" << file_lock_len << endl;}
+        if(file_lock_len==_AFLOWLOCK_){
+          if(LDEBUG){cerr << soliloquy << " coping " << vfiles[i] << " to " << _AFLOWLOCK_ << endl;}
+          aurostd::CopyFile(directory_LIB+"/"+vfiles[i],directory_LIB+"/"+_AFLOWLOCK_);
+        }
+      }
+    }
 
     // FILES
     aflowlib::LIB2RAW_FileNeeded(directory_LIB,_AFLOWIN_,directory_RAW,_AFLOWIN_,vfile,MESSAGE);  // _AFLOWIN_
