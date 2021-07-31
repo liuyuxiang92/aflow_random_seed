@@ -618,6 +618,7 @@ namespace init {
     XHOST.vflag_control.flag("MONITOR",aurostd::args2flag(argv,cmds,"--monitor"));
     XHOST.vflag_control.flag("MONITOR_VASP",aurostd::args2flag(argv,cmds,"--monitor_vasp"));
     XHOST.vflag_control.flag("KILL_VASP_ALL",aurostd::args2flag(argv,cmds,"--kill_vasp_all|--killvaspall"));  //CO20210315 - issue non-specific killall vasp command
+    XHOST.vflag_control.flag("KILL_VASP_OOM",aurostd::args2flag(argv,cmds,"--kill_vasp_oom|--killvaspoom"));  //CO20210315 - kill vasp if approaching OOM
     XHOST.vflag_control.flag("GETTEMP",aurostd::args2flag(argv,cmds,"--getTEMP|--getTEMPS|--getTEMPs|--gettemp|--gettemps"));
     XHOST.vflag_control.flag("SWITCH_AFLOW",
         aurostd::args2flag(argv,cmds,"--run|--clean|--xclean|--multi|--generate") ||
@@ -2002,7 +2003,7 @@ void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed
 // ***************************************************************************
 bool AFLOW_VASP_instance_running(){ //CO20210315
   string soliloquy=XPID+"AFLOW_VASP_instance_running():";
-  //this needs to become more complicated as we add options other than --kill_all_vasp
+  //this needs to become more complicated as we add options other than --kill_vasp_all
   if(XHOST.vflag_control.flag("MONITOR_VASP") && XHOST.vflag_control.flag("KILL_VASP_ALL")==false){
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a targeted kill command for VASP not available yet: try --kill_vasp_all",_INPUT_ILLEGAL_);
   }
@@ -2014,7 +2015,7 @@ bool AFLOW_VASP_instance_running(){ //CO20210315
 // ***************************************************************************
 bool AFLOW_MONITOR_instance_running(const _aflags& aflags){ //CO20210315
   string soliloquy=XPID+"AFLOW_MONITOR_instance_running():";
-  //this needs to become more complicated as we add options other than --kill_all_vasp
+  //this needs to become more complicated as we add options other than --kill_vasp_all
   if(XHOST.vflag_control.flag("MONITOR_VASP") && XHOST.vflag_control.flag("KILL_VASP_ALL")==false){ //CO20210315 - this check doesn't really apply, we wouldn't call this function if we were running with --monitor_vasp, but it's a good reminder that this code needs to become smarter in the future with flags other than --kill_vasp_all
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a targeted kill command for VASP not available yet: try --kill_vasp_all",_INPUT_ILLEGAL_);
   }
@@ -2026,7 +2027,7 @@ bool AFLOW_MONITOR_instance_running(const _aflags& aflags){ //CO20210315
 // ***************************************************************************
 bool VASP_instance_running(const string& vasp_bin){ //CO20210315
   string soliloquy=XPID+"VASP_instance_running():";
-  //this needs to become more complicated as we add options other than --kill_all_vasp
+  //this needs to become more complicated as we add options other than --kill_vasp_all
   if(XHOST.vflag_control.flag("MONITOR_VASP") && XHOST.vflag_control.flag("KILL_VASP_ALL")==false){
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a targeted kill command for VASP not available yet: try --kill_vasp_all",_INPUT_ILLEGAL_);
   }

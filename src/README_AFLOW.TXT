@@ -62,6 +62,9 @@ aflow
    --kill_vasp_all                  A flag for the AFLOW --monitor_vasp daemon indicating that the kill command
                                     should target all instances of VASP running on the node.
 
+   --kill_vasp_oom                  A flag for the AFLOW --monitor_vasp daemon indicating that VASP should be terminated
+                                    if memory usage exceeds MEMORY_MAX_USAGE (see aflow.rc).
+
    --loop                           When finish, wait for more run
    --sort | -sort                   Sorts the aflow.in in the list
    --reverse | -rsort               Reverse the aflow.in in the list
@@ -1344,7 +1347,7 @@ IVDW=number_for_VASP_see_manual_for_IVDW
 
   ERROR:MEMORY
     The MEMORY error is triggered when an out-of-memory error is detected in the vasp.out (depends on the cluster).
-    Exceeding the MEMORY_MAX_USAGE (see README_AFLOW_AFLOWRC.TXT) will also trigger this error.
+    Exceeding the MEMORY_MAX_USAGE (see README_AFLOW_AFLOWRC.TXT) will also trigger this error (if --kill_vasp_oom flag is set for the monitoring daemon).
     AFLOW will divide NCPUS by two to allow more memory per process and
     allocate all possible resources to VASP by executing the following command before executing VASP again: ulimit -s unlimited.
     Should the error occur again, AFLOW will decrease NBANDS.
