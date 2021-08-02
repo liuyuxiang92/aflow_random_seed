@@ -2997,7 +2997,7 @@ namespace aflowlib {
       }
       if(LDEBUG){cerr << soliloquy << " vlocks(sorted)=" << aurostd::joinWDelimiter(vlocks,",") << endl;}
       if(vlocks.size()){  //always grab the 0th entry (oldest LOCK)
-        if(LDEBUG){cerr << soliloquy << " coping " << vlocks[0] << " to " << _AFLOWLOCK_ << endl;}
+        if(1||LDEBUG){cout << soliloquy << " coping " << vlocks[0] << " to " << _AFLOWLOCK_ << endl;}
         aurostd::CopyFile(directory_LIB+"/"+vlocks[0],directory_LIB+"/"+_AFLOWLOCK_);
       }
     }
