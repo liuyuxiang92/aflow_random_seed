@@ -2984,9 +2984,9 @@ namespace aflowlib {
           if(v1.find('.')!=string::npos && v2.find('.')==string::npos){flip=true;} //v1 is 3.1.1 style (NEW) and v2 is 30102 style (OLD)
           else if(v1.find('.')==string::npos && v2.find('.')==string::npos && aurostd::string2utype<uint>(v1)>aurostd::string2utype<uint>(v2)){flip=true;}  //v1 and v2 are 30102 style and (uint)v1>(uint)v2
           else if(v1.find('.')!=string::npos && v2.find('.')!=string::npos){
-            if(v1.size()>0 && v2.size()>0 && v1[0]>v2[0]){flip=true;}
-            else if(v1.size()>2 && v2.size()>2 && v1[2]>v2[2]){flip=true;}
-            else if(v1.size()>4 && v2.size()>4 && aurostd::string2utype<uint>(v1.substr(4))>aurostd::string2utype<uint>(v2.substr(4))){flip=true;}
+            if(v1.size()>0 && v2.size()>0 && v1[0]>v2[0]){flip=true;} //compare version major of 3.1.1 (NEW)
+            else if(v1.size()>2 && v2.size()>2 && v1[2]>v2[2]){flip=true;}  //compare version minor of 3.1.1 (NEW)
+            else if(v1.size()>4 && v2.size()>4 && aurostd::string2utype<uint>(v1.substr(4))>aurostd::string2utype<uint>(v2.substr(4))){flip=true;}  //compare version patch of 3.1.1 (NEW)
           }
           if(flip){
             vtemp=vlocks[i];
