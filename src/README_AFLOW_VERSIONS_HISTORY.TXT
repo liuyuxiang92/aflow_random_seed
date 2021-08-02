@@ -1,4 +1,4 @@
-3.2.11 - 2021/XX/XX
+3.2.11 - 2021/08/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.11.tar.xz
         -- added plotter options for QHA (AS)
         -- fixed bug in range for GetBasisTransformationInternalTranslations() (DX)

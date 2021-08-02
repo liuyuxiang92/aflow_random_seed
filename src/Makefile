@@ -23,7 +23,7 @@
 #
 # ***************************************************************************
 
-VERSNUMBER=3.2.10
+VERSNUMBER=3.2.11
 
 # MAKEFILE FOR AFLOW3
 # FOR FROZSL -lmkl_lapack95_ilp64 -lmkl_core -lmkl_intel_lp64 -lmkl_sequential
