@@ -18,6 +18,8 @@
         -- fixed tolerance spectrum delimiter (colon to comma) (DX)
         -- updated AFLUX call via AFLOW; uses new API route (DX)
         -- updated space group queries via AFLUX in the XtalFinder routines (DX)
+        -- fixed same-atom tolerance bug in new GetPrimitive() function (DX)
+        -- fixed unaries in LIB2 errors for plot titles (DX+ME)
         -- Made string search in database case insensitive (ME)
         -- Supressed file output for interstitials calculation in web mode (ME)
         -- added command line plotting functionality for POCC runs using --plot_dos (CO)
@@ -73,8 +75,12 @@
         -- patching convertPOSCARFormat() for different machine inputs (CO)
         -- adding --contcar_save to KBIN::Clean() (CO)
         -- fixing missing LOCK issue with --lib2raw (CO)
-        -- fixed same-atom tolerance bug in new GetPrimitive() function (DX)
-        -- fixed unaries in LIB2 errors for plot titles (DX+ME)
+        (AFLOW: aconvasp_main.cpp, aflow.cpp, aflow.h, aflowlib_database.cpp, aflowlib.h, aflowlib_libraries.cpp, aflowlib_libraries_scrubber.cpp, aflowlib_web_interface.cpp, aflowrc.cpp, avasp.cpp, cce.cpp, chull.cpp, chull.h, chull_jupyter_plotter.py, compare_structure.cpp, compare_structure_function.cpp, compare_structure.h, contrib_shidong_auxiliary.cpp, defects.cpp, iaims.cpp, ialien.cpp, ifrozsl.cpp, init.cpp, ivasp.cpp, kaims.cpp, kalien.cpp, kbin.cpp, kvasp.cpp, Makefile, matlab.cpp, nomix.cpp, ovasp.cpp, pflow_funcs.cpp, pflow.h, pflow_print.cpp, plotter.cpp, pocc.cpp, pocc.h, pocc_old.cpp, qsub.cpp, README_AFLOW_ACONVASP.TXT, README_AFLOW_AFLOWRC.TXT, README_AFLOW_CCE.TXT, README_AFLOW_COMPARE.TXT, README_AFLOW_SYM.TXT, README_AFLOW.TXT, README_PROTO.TXT, symmetry.cpp, symmetry_spacegroup.cpp, symmetry_spacegroup_functions.cpp, symmetry_spacegroup.h, xatom.cpp, xclasses.cpp)
+        (ANRL: aflow_anrl.cpp, list.cpp)
+        (AEL: ael_elasticity.cpp, ael_get_stress.cpp, pocc_ael_agl.cpp)
+        (AGL: agl_debye.cpp, agl_get_ev.cpp, pocc_ael_agl.cpp)
+        (APL: apl_kphonons.cpp)
+        (AUROSTD: aurostd.h, boot.cpp, main.cpp, xscalar.cpp, xscalar.h, xvector.cpp, xvector.h)
 3.2.10 - 2021/06/25
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.10.tar.xz
         -- fixed bug in GetPrimitive() function, use more robust volume check (DX)
