@@ -2952,18 +2952,53 @@ namespace aflowlib {
     //CO20210729 - LOCK might be missing, copy from VERSION variant if possible
     if(!aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_)){
       if(LDEBUG){cerr << soliloquy << " missing LOCK file, attempting to find old LOCK to copy over" << endl;}
-      vector<string> vfiles;
+      vector<string> vfiles,vlocks;
       aurostd::DirectoryLS(directory_LIB,vfiles);
-      std::sort(vfiles.begin(),vfiles.end()); //get in order so later LOCK.VERSION comes last
       string file_lock_len="";
-      for(uint i=0;i<vfiles.size();i++){
+      uint i=0,j=0;
+      uint lock_size=_AFLOWLOCK_.size();
+      for(i=0;i<vfiles.size();i++){
         if(LDEBUG){cerr << soliloquy << " vfiles[i=" << i << "]=" << vfiles[i] << endl;}
-        file_lock_len=vfiles[i].substr(0,_AFLOWLOCK_.size());
+        file_lock_len=vfiles[i].substr(0,lock_size);
         if(LDEBUG){cerr << soliloquy << " file_lock_len=" << file_lock_len << endl;}
-        if(file_lock_len==_AFLOWLOCK_){
-          if(LDEBUG){cerr << soliloquy << " coping " << vfiles[i] << " to " << _AFLOWLOCK_ << endl;}
-          aurostd::CopyFile(directory_LIB+"/"+vfiles[i],directory_LIB+"/"+_AFLOWLOCK_);
+        if(file_lock_len==_AFLOWLOCK_ &&
+           (vfiles[i].size()>lock_size && vfiles[i][lock_size]=='.') && //prevent LOCK.qha
+           (vfiles[i].size()>lock_size+1 && isdigit(vfiles[i][lock_size+1])==true)){  //prevent LOCK.qha
+          vlocks.push_back(vfiles[i]);
         }
+      }
+      if(LDEBUG){cerr << soliloquy << " vlocks(unsorted)=" << aurostd::joinWDelimiter(vlocks,",") << endl;}
+      std::sort(vlocks.begin(),vlocks.end()); //get in order so later LOCK.VERSION comes last
+      string v1="",v2="",vtemp="";
+      bool flip=false;
+      for(i=0;i<vlocks.size();i++){
+        for(j=i+1;j<vlocks.size();j++){
+          v1=vlocks[i].substr(lock_size+1); //ALWAYS GRAB HERE (and not above): as we switching order below, need to refresh what is v1/v2
+          v2=vlocks[j].substr(lock_size+1);
+          //isolate cases when the two entries need to flip
+          if(LDEBUG){
+            cerr << soliloquy << " vlocks[i=" << i << "]=" << vlocks[i] << " " << v1 << endl;
+            cerr << soliloquy << " vlocks[j=" << j << "]=" << vlocks[j] << " " << v2 << endl;
+          }
+          flip=false;
+          if(v1.find('.')!=string::npos && v2.find('.')==string::npos){flip=true;} //v1 is 3.1.1 style (NEW) and v2 is 30102 style (OLD)
+          else if(v1.find('.')==string::npos && v2.find('.')==string::npos && aurostd::string2utype<uint>(v1)>aurostd::string2utype<uint>(v2)){flip=true;}  //v1 and v2 are 30102 style and (uint)v1>(uint)v2
+          else if(v1.find('.')!=string::npos && v2.find('.')!=string::npos){
+            if(v1.size()>0 && v2.size()>0 && v1[0]>v2[0]){flip=true;}
+            else if(v1.size()>2 && v2.size()>2 && v1[2]>v2[2]){flip=true;}
+            else if(v1.size()>4 && v2.size()>4 && aurostd::string2utype<uint>(v1.substr(4))>aurostd::string2utype<uint>(v2.substr(4))){flip=true;}
+          }
+          if(flip){
+            vtemp=vlocks[i];
+            vlocks[i]=vlocks[j];
+            vlocks[j]=vtemp;
+          }
+        }
+      }
+      if(LDEBUG){cerr << soliloquy << " vlocks(sorted)=" << aurostd::joinWDelimiter(vlocks,",") << endl;}
+      if(vlocks.size()){  //always grab the 0th entry (oldest LOCK)
+        if(LDEBUG){cerr << soliloquy << " coping " << vlocks[0] << " to " << _AFLOWLOCK_ << endl;}
+        aurostd::CopyFile(directory_LIB+"/"+vlocks[0],directory_LIB+"/"+_AFLOWLOCK_);
       }
     }
 
