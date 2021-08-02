@@ -2973,7 +2973,8 @@ namespace aflowlib {
       bool flip=false;
       for(i=0;i<vlocks.size();i++){
         for(j=i+1;j<vlocks.size();j++){
-          v1=vlocks[i].substr(lock_size+1); //ALWAYS GRAB HERE (and not above): as we switching order below, need to refresh what is v1/v2
+          v1=vlocks[i].substr(lock_size+1); //ALWAYS GRAB HERE (and not above): as we are switching order below, need to refresh what is v1/v2
+
           v2=vlocks[j].substr(lock_size+1);
           //isolate cases when the two entries need to flip
           if(LDEBUG){
