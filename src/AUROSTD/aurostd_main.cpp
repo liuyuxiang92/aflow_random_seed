@@ -2051,7 +2051,7 @@ namespace aurostd {
   // ***************************************************************************
   // Stefano Curtarolo
   // fix file names from obvious things
-  string ProperFileName(string fileIN) {
+  string ProperFileName(const string& fileIN) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string fileOUT=fileIN;
     if(LDEBUG) cerr << "aurostd::ProperFileName: " << fileOUT << endl;
@@ -2067,13 +2067,12 @@ namespace aurostd {
   // Stefano Curtarolo
   // copy the file but does not check if the directory can be made or not...
   // CO20200624 - it cannot check because we might pass in *
-  bool CopyFile(string from,string to) { // "" compliant SC20190401
+  bool CopyFile(const string& from,const string& to) { // "" compliant SC20190401
     stringstream command;
     command << "cp -f \"" << CleanFileName(from) << "\" \"" << CleanFileName(to) << "\" " << endl;
     aurostd::execute(command);
     return TRUE;
   }
-
 
   // ***************************************************************************
   // Function aurostd::LinkFile
@@ -2081,7 +2080,7 @@ namespace aurostd {
   // Stefano Curtarolo
   // copy the file but does not check if the directory can be made or not...
   // CO20200624 - it cannot check because we might pass in *
-  bool LinkFile(string from,string to) { // "" compliant SC20190401
+  bool LinkFile(const string& from,const string& to) { // "" compliant SC20190401
     stringstream command;
     command << "ln -sf \"" << CleanFileName(from) << "\" \"" << CleanFileName(to) << "\" " << endl;
     aurostd::execute(command);

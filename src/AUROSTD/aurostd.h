@@ -453,9 +453,9 @@ namespace aurostd {
   string TmpFileCreate(const string& identifier="",const string& tmpdir="",bool hidden=false);  //CO20210315 - empty tmpdir means use XHOST.tmpfs
   string TmpDirectoryCreate(const string& identifier="",const string& tmpdir="",bool hidden=false);  //CO20210315 - empty tmpdir means use XHOST.tmpfs
   string CleanFileName(const string& fileIN);
-  string ProperFileName(string fileIN);
-  bool CopyFile(string file_from,string file_to);
-  bool LinkFile(string file_from,string file_to);
+  string ProperFileName(const string& fileIN);
+  bool CopyFile(const string& file_from,const string& file_to);
+  bool LinkFile(const string& file_from,const string& file_to);
   //CO START
   bool MatchCompressed(const string& CompressedFileName,const string& FileNameOUT);
   // [OBSOLETE]  bool DecompressFile(const string& CompressedFileName);
