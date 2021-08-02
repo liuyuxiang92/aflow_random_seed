@@ -1735,7 +1735,7 @@ namespace aurostd {
         return vpids;
       }
     }
-    
+
     if(aurostd::IsCommandAvailable("ps") && aurostd::IsCommandAvailable("grep")) {
       //FR recommends ps aux vs. ps -e
       //tested on linux and mac, PIDs are in second column, process is the last column
@@ -1775,7 +1775,7 @@ namespace aurostd {
   // ***************************************************************************
   //CO20210315
   bool ProcessRunning(const string& process,bool user_specific){return !aurostd::ProcessPIDs(process,user_specific).empty();} //CO20210315
-  
+
   // ***************************************************************************
   // Function ProcessKill
   // ***************************************************************************
@@ -1957,7 +1957,7 @@ namespace aurostd {
     vfiles=aurostd::vector2deque(_vfiles);
     return run;
   }
-  
+
   // ***************************************************************************
   // Function dirname
   // ***************************************************************************
@@ -1972,7 +1972,7 @@ namespace aurostd {
     string::size_type loc=file.find_last_of('/');
     return file.substr(0,loc);
   }
-  
+
   // ***************************************************************************
   // Function basename
   // ***************************************************************************
@@ -3246,13 +3246,13 @@ namespace aurostd {
 
     // bool INIT_VERBOSE=TRUE;
     // cerr << "COMMAND " <<  command << endl;
-    
+
     //CO20200624 START - some command cleanup
     string command=aurostd::CleanCommand4Execute(_command);
     //if(command.find("; ")!=string::npos){command="( "+command+" )";}  //put to subshell for IO redirection; https://www.gnu.org/software/bash/manual/html_node/Command-Grouping.html#Command-Grouping
     command="( "+command+" )";  //ALWAYS put to subshell for IO redirection; https://www.gnu.org/software/bash/manual/html_node/Command-Grouping.html#Command-Grouping
     //CO20200624 END - some command cleanup
-    
+
     stringstream strstream,cmdstream;
     string file=aurostd::TmpFileCreate("execute_report");
     if(fsio==stdouterr_fsio){cmdstream << command << " &> " << file;}  //CO20200624
@@ -3306,7 +3306,7 @@ namespace aurostd {
     return execute2string(command_str,fsio);  //CO20200624
   }
 #endif
-  
+
   string CleanCommand4Execute(const string& _command){ //CO20200624
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::CleanCommand4Execute():";
@@ -5347,7 +5347,7 @@ namespace aurostd {
     if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
     if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): [input=\"" << strstream << "\"], [substring=\"" << strsub1 << "\"]" << endl;
     if(_strstream.find(strsub1)==string::npos) return false;
-    
+
     vector<string> tokens;
     aurostd::string2tokens(_strstream,tokens,"\n");
     string strline="";
@@ -5479,7 +5479,7 @@ namespace aurostd {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "aurostd::substring_present_file_FAST():";
     string message = "";
-    
+
     if(!aurostd::FileExist(FileName)) {
       message = "file input not found =" + FileName;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
@@ -5488,13 +5488,13 @@ namespace aurostd {
       unsigned long long int fsize=aurostd::FileSize(FileName);
       if(fsize>=size_max){return false;}  //CO20210315 - in the future, consider throwing instead, and create a special function for vasp.out greps in kvasp
     }
-    
+
     bool use_regex=true;  //do we want to use regex?
     bool is_regex_used=false; //do we actually use regex?
 
     string strsub1=_strsub1;
     if(case_insensitive==true){strsub1=aurostd::tolower(strsub1);}
-    
+
     if(RemoveWS){
       if(use_regex){  //use regex
         aurostd::StringSubst(strsub1,"\t"," ");
@@ -5526,9 +5526,9 @@ namespace aurostd {
 
     aus << cat_command << " \"" << FileName << "\"";
     if(use_regex==false && RemoveWS==true){aus << " | sed \"s/ //g\" | sed \"s/\\t//g\"";}
-    
+
     //decide is_regex_used above here
-    
+
     //if using regex, protect against incoming ()
     //e.g., "Total CPU time used (sec)"
     if(is_regex_used){
@@ -5539,7 +5539,7 @@ namespace aurostd {
     string grep_command="grep";
     if(aurostd::IsCommandAvailable("fgrep") && is_regex_used==false){grep_command="fgrep";}  //fixed string search
     if(LDEBUG){cerr << soliloquy << " grep_command=\"" << grep_command << "\"" << endl;}
-    
+
     string grep_flags="-c"; //return count instead of strings matching
     if(case_insensitive==true){grep_flags="-ic";} //case-insensitive, should work with both grep and fgrep (tested by CO20210601)
     if(is_regex_used){grep_flags="-E "+grep_flags;} //regex flag
@@ -5587,7 +5587,7 @@ namespace aurostd {
     if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
     if(LDEBUG) cerr << XPID << "aurostd::substring2string(): [input=\"" << strstream << "\"], [substring=\"" << strsub1 << "\"]" << endl;
     if(_strstream.find(strsub1)==string::npos) return "";
-    
+
     vector<string> tokens;
     aurostd::string2tokens(_strstream,tokens,"\n");
     string strline="";
@@ -5605,11 +5605,11 @@ namespace aurostd {
     if(LDEBUG) cerr << XPID << "aurostd::substring2string(): END [substring=" << strsub1 << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
     return "";
   }
-  
+
   string substring2string(const stringstream& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
     return substring2string(strstream.str(),strsub1,RemoveWS,RemoveComments);
   }
-  
+
   //[CO20210315 - not used, not sure the purpose of strsub2]string substring2string(const string& strstream, const string& strsub1, const string& strsub2, bool RemoveWS) {
   //[CO20210315 - not used, not sure the purpose of strsub2]  bool LDEBUG=(FALSE || XHOST.DEBUG);
   //[CO20210315 - not used, not sure the purpose of strsub2]  if(LDEBUG) cerr << "DEBUG substring2string5: (BEGIN) " << strsub1 << " " << RemoveWS << endl;
@@ -5648,7 +5648,7 @@ namespace aurostd {
   //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, const string& strsub2, bool RemoveWS) {
   //[CO20210315 - not used, not sure the purpose of strsub2]  return string2utype<utype>(substring2string(strstream,strsub1,strsub2,RemoveWS));
   //[CO20210315 - not used, not sure the purpose of strsub2]}
-  
+
   bool kvpairfound(const string& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315
     //substring2bool and kvpairfound are similar but distinct
     //substring2bool will match any strsub1 and return true
@@ -5667,7 +5667,7 @@ namespace aurostd {
     if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
     if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): [input=\"" << strstream << "\"], [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;
     if(_strstream.find(keyword)==string::npos) return false;
-    
+
     vector<string> tokens;
     aurostd::string2tokens(_strstream,tokens,"\n");
     string strline="",_keyword="",value="";
@@ -5687,7 +5687,7 @@ namespace aurostd {
     if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=" << keyword << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
     return false;
   }
-  
+
   bool kvpairfound(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
     return kvpairfound(strstream.str(),keyword,delim,RemoveWS,RemoveComments);
   }
@@ -5711,7 +5711,7 @@ namespace aurostd {
     if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
     if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): [input=\"" << strstream << "\"], [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;
     if(_strstream.find(keyword)==string::npos) return "";
-    
+
     vector<string> tokens;
     aurostd::string2tokens(_strstream,tokens,"\n");
     string strline="",_keyword="",value="";
@@ -5732,7 +5732,7 @@ namespace aurostd {
     if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=" << keyword << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
     return "";
   }
-  
+
   string kvpair2value(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
     return kvpair2value(strstream.str(),keyword,delim,RemoveWS,RemoveComments);
   }
@@ -5756,7 +5756,7 @@ namespace aurostd {
     if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
     if(LDEBUG) cerr << XPID << "aurostd::substring2strings(): [input=\"" << strstream << "\"], [substring=\"" << strsub1 << "\"]" << endl;
     if(_strstream.find(strsub1)==string::npos) return 0;
-    
+
     vector<string> tokens;
     aurostd::string2tokens(_strstream,tokens,"\n");
     string strline="";

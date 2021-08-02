@@ -588,7 +588,7 @@ namespace KBIN {
 
       // aurostd::random_shuffle(vDirectory);
       // std::random_shuffle(vDirectory.begin(),vDirectory.end());
-        
+
       bool contcar_save=aurostd::args2flag(argv,"--contcar_save|--save_contcar");  //CO20210716
 
       for(uint idir=0;idir<vDirectory.size();idir++) {
@@ -1436,7 +1436,7 @@ namespace KBIN {
       aurostd::StringSubst(directory,"/OUTCAR.relax"+XHOST.vext.at(iext),"");  // so it is easier to search
     }   
     aurostd::StringSubst(directory,"/OUTCAR","");      // so it is easier to search
-    
+
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
       aurostd::StringSubst(directory,"/EIGENVAL.bands"+XHOST.vext.at(iext),"");  // so it is easier to search
       aurostd::StringSubst(directory,"/EIGENVAL.static"+XHOST.vext.at(iext),"");  // so it is easier to search    

@@ -596,9 +596,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
 
   vpflow.flag("ATOMIC_ENVIRONMENT::INIT",aurostd::args2flag(argv,cmds,"--ae|--atomic_environment")); //HE20210331 - Testing
   if(vpflow.flag("ATOMIC_ENVIRONMENT::INIT")){	//HE20210331
-     vpflow.args2addattachedscheme(argv,cmds,"ATOMIC_ENVIRONMENT::AUID","--auid=","none");
-     vpflow.args2addattachedscheme(argv, cmds,"ATOMIC_ENVIRONMENT::MODE","--mode=","1");
-     vpflow.args2addattachedscheme(argv,cmds,"ATOMIC_ENVIRONMENT::RADIUS","--radius=","4");
+    vpflow.args2addattachedscheme(argv,cmds,"ATOMIC_ENVIRONMENT::AUID","--auid=","none");
+    vpflow.args2addattachedscheme(argv, cmds,"ATOMIC_ENVIRONMENT::MODE","--mode=","1");
+    vpflow.args2addattachedscheme(argv,cmds,"ATOMIC_ENVIRONMENT::RADIUS","--radius=","4");
 
   }	//HE20210331
 
@@ -11123,7 +11123,7 @@ namespace pflow {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"pflow::PEARSON_SYMBOL():";  //CO20200624
     if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
-    
+
     // ---------------------------------------------------------------------------
     // usage
     if(vpflow.flag("PEARSON_SYMBOL::USAGE")){
@@ -11135,22 +11135,22 @@ namespace pflow {
       init::MessageOption("--usage","pflow::PEARSON_SYMBOL()",voptions);
       return "";
     }
-    
+
     stringstream sss;
 
     // ---------------------------------------------------------------------------
     // load structure
     xstructure a(input,IOAFLOW_AUTO);
     if(LDEBUG) cerr << soliloquy << " X1" << endl;
-    
+
     // ---------------------------------------------------------------------------
     // get tolerance
     double tolerance = pflow::getSymmetryTolerance(a,vpflow.getattachedscheme("PEARSON_SYMBOL::TOLERANCE"));
-    
+
     // ---------------------------------------------------------------------------
     // self-consistent tolerance scan
     if(vpflow.flag("PEARSON_SYMBOL::NO_SCAN")){ a.sym_eps_no_scan=true; } //DX20210406
-      
+
     // ---------------------------------------------------------------------------
     // tolerance spectrum
     bool tolerance_spectrum_analysis = false;
@@ -11163,17 +11163,17 @@ namespace pflow {
       sss << soliloquy << " ERROR: Cannot specify a single tolerance value and perform the tolerance spectrum at the same time. Please choose one or the other."; 
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,sss,_INPUT_ILLEGAL_);
     }
-    
+
     // ---------------------------------------------------------------------------
     // get magnetic moment information
     if(vpflow.flag("PEARSON_SYMBOL::MAGNETIC")){
       string magmom_info = vpflow.getattachedscheme("PEARSON_SYMBOL::MAGNETIC");
       ProcessAndAddSpinToXstructure(a, magmom_info);
     }
-    
+
     //DX20170824 [OBSOLETE] a.GetLatticeType();
     //DX20210611 [OBSOLETE] bool full_sym=false; //DX20170829 - Speed increase
-    
+
     if(!tolerance_spectrum_analysis){
       //DX20210611 [OBSOLETE] LATTICE::Standard_Lattice_Structure(a,str_sp,str_sc,full_sym); //DX20170829 - Speed increase
       a.GetRealLatticeType(tolerance); //DX20210611 - more concise method for calling
@@ -14405,7 +14405,7 @@ namespace pflow {
     bool letters_only = vpflow.flag("WYCKOFF_POSITIONS::PRINT_LETTERS_ONLY");
     bool site_symmetries_only = vpflow.flag("WYCKOFF_POSITIONS::PRINT_SITE_SYMMETRIES_ONLY");
     bool multiplicities_only = vpflow.flag("WYCKOFF_POSITIONS::PRINT_MULTIPLICITIES_ONLY");
-    
+
     //DX20190201 END
     xstructure str(input,IOAFLOW_AUTO); 
     str.ReScale(1.0);
@@ -14451,16 +14451,16 @@ namespace pflow {
       string sym_info = "sg=" + aurostd::utype2string<uint>(space_group_number) + ": " + multiplicities;
       return sym_info;
     }
-   
+
     bool standalone=true, already_calculated=true;
     // ---------------------------------------------------------------------------
     // file type //DX20210525 - string to filetype
     filetype ftype = txt_ft;
     if(XHOST.vflag_control.flag("PRINT_MODE::TXT")){ ftype = txt_ft; }
     else if(XHOST.vflag_control.flag("PRINT_MODE::JSON")){ ftype = json_ft; }
-    
+
     return PrintWyckoffData(str,ftype,standalone,already_calculated); //no need to pass in setting info, etc. already calculated
-   
+
   }
 }
 

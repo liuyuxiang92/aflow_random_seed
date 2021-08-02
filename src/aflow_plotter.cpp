@@ -124,11 +124,11 @@ namespace plotter {
   xoption getPlotOptionsEStructure(const aurostd::xoption& xopt, const string& key, bool datasets) {
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
     string soliloquy=XPID+"plotter::getPlotOptionsEStructure():";
-    
+
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
     xoption plotoptions = getPlotOptions(xopt, key, datasets);
-    
+
     // Projection
     string scheme = xopt.getattachedscheme("PLOTTER::PROJECTION");
     if (scheme.empty()) {
@@ -2171,7 +2171,7 @@ namespace plotter {
     uint ndos = dos.size();
 
     double dosmax = getDosLimits(plotoptions, xdos, dos, energies);
-    
+
     if(LDEBUG){
       cerr << soliloquy << " dosmax=" << dosmax << endl;
       cerr << soliloquy << " xdos.spin=" << xdos.spin << endl;

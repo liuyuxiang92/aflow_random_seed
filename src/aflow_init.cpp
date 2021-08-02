@@ -1135,7 +1135,7 @@ namespace init {
     if(LDEBUG) cerr.flush();
     if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << " [1]" << endl;
     if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << " [1]" << endl;
-    
+
     if((str2load=="vLIBS" || str2load=="XHOST_vLIBS")) { // && XHOST_vLIBS.size()!=3)
       if(XHOST_vLIBS.size()) for(uint i=0;i<XHOST_vLIBS.size();i++) XHOST_vLIBS.at(i).clear();
       XHOST_vLIBS.clear();
@@ -1387,13 +1387,13 @@ namespace init {
     if(str=="AFLOW_PSEUDOPOTENTIALS_LIST_TXT") { if(XHOST_AFLOW_PSEUDOPOTENTIALS_LIST_TXT.empty()) { return XHOST_AFLOW_PSEUDOPOTENTIALS_LIST_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_AFLOW_PSEUDOPOTENTIALS_LIST_TXT;}} // LOADED TXTS
     if(str=="f144468a7ccc2d3a72ba44000715efdb") {
       if(XHOST_f144468a7ccc2d3a72ba44000715efdb.empty()) {
-	//	cerr << "init::InitGlobalObject" << " [1a]" << endl;
-	XHOST_f144468a7ccc2d3a72ba44000715efdb=init::InitLoadString(str,LVERBOSE);
-	//	cerr << "init::InitGlobalObject" << " [1b]" << endl;
+        //	cerr << "init::InitGlobalObject" << " [1a]" << endl;
+        XHOST_f144468a7ccc2d3a72ba44000715efdb=init::InitLoadString(str,LVERBOSE);
+        //	cerr << "init::InitGlobalObject" << " [1b]" << endl;
         return XHOST_f144468a7ccc2d3a72ba44000715efdb;
       } else {
-	//	cerr << "init::InitGlobalObject" << " [2]" << endl;
-	return XHOST_f144468a7ccc2d3a72ba44000715efdb;
+        //	cerr << "init::InitGlobalObject" << " [2]" << endl;
+        return XHOST_f144468a7ccc2d3a72ba44000715efdb;
       }
     } // LOADED TXTS
     // [OBSOLETE] if(str=="d0f1b0e47f178ae627a388d3bf65d2d2") { if(XHOST_d0f1b0e47f178ae627a388d3bf65d2d2.empty()) { return XHOST_d0f1b0e47f178ae627a388d3bf65d2d2=init::InitLoadString(str,LVERBOSE);} else { return XHOST_d0f1b0e47f178ae627a388d3bf65d2d2;}} // LOADED TXTS
@@ -1793,7 +1793,7 @@ string aflow_convert_time_ctime2aurostd(const string& time_LOCK){ //CO20200624
   if(!strptime(time_LOCK.c_str(),"%a %b %d %H:%M:%S %Y",&tstruct)){return "";}
   tstruct.tm_isdst=-1;  //let computer figure it out
   std::mktime(&tstruct);  //get is_dst
-  
+
   if(LDEBUG){
     char buffer[30];
     strftime(buffer,30,"%F %T %Z",&tstruct);
@@ -1892,7 +1892,7 @@ bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin,int& ncpus){
   //reset
   vasp_bin="";
   ncpus=0;
-  
+
   if(LDEBUG){cerr << soliloquy << " looking for " << directory+"/"+_AFLOWLOCK_ << endl;}
   if(!aurostd::FileExist(directory+"/"+_AFLOWLOCK_)){return false;}
   if(LDEBUG){cerr << soliloquy << " FOUND " << directory+"/"+_AFLOWLOCK_ << endl;}
@@ -1971,14 +1971,14 @@ void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed
       scheme=line.substr(loc_start+str_xvasp_aopts_start.length(),loc_end-(loc_start+str_xvasp_aopts_start.length()));
       xvasp.aopts.flag(scheme,true);
     }
-    
+
     loc_start=line.find(str_vflags_ignore_afix_start);
     loc_end=line.find(str_flag_end);
     if(loc_start!=string::npos && loc_end!=string::npos){
       scheme=line.substr(loc_start+str_vflags_ignore_afix_start.length(),loc_end-(loc_start+str_vflags_ignore_afix_start.length()));
       vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(scheme,true);
     }
-    
+
     if(line.find("vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved=1")!=string::npos){vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved=true;}
 
     loc_start=line.find(str_xfixed_start);
@@ -2095,9 +2095,9 @@ void AFLOW_monitor_VASP(){  //CO20210601
       //if --FILE=LOCK, this will be useful
       if(aurostd::EFileExist(file_dir+"/"+DEFAULT_AFLOW_END_OUT)){break;}
       if(aurostd::EFileExist(file_dir+"/"+_STOPFLOW_)){aurostd::RemoveFile(file_dir+"/"+_STOPFLOW_);break;}
-      
+
       aurostd::Sleep(SECONDS_SLEEP_VASP_MONITOR);
-      
+
       //if --FILE=LOCK, this will be useful
       if(aurostd::EFileExist(file_dir+"/"+DEFAULT_AFLOW_END_OUT)){break;}
       if(aurostd::EFileExist(file_dir+"/"+_STOPFLOW_)){aurostd::RemoveFile(file_dir+"/"+_STOPFLOW_);break;}
@@ -2131,7 +2131,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   FileMESSAGE.open(FileNameLOCK.c_str(),std::ios::out);
   bool oss_silent=true;
   ostream& oss=cout;if(oss_silent){oss.setstate(std::ios_base::badbit);}  //like NULL - cannot print to cout with two instances of aflow running
-      
+
   message << aflow::Banner("BANNER_NORMAL");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
 
   //aflow.in
@@ -2145,7 +2145,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   //other flags
   _kflags kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,FileMESSAGE,aflags,oss);
   _vflags vflags=KBIN::VASP_Get_Vflags_from_AflowIN(AflowIn,FileMESSAGE,aflags,kflags,oss);
-  
+
   _xvasp xvasp;
   xvasp.Directory=aflags.Directory; //arun_directory;
   message << "START        - " << xvasp.Directory;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_); //include directory so noticeable space remains
@@ -2165,13 +2165,13 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   bool vasp_running=false;
   uint vlines_lock_size=0;
   vector<string> vlines_lock;
-  
+
   //there are issues getting the correct vasp binary since this is an entirely different aflow instance
   //we might run the other aflow instance with --mpi or --machine flags that affect which vasp binary we use
   //therefore, the most robust way to define the binary is to search the LOCK file
   //[CO20210315 - OBSOLETE]string& vasp_bin=kflags.KBIN_MPI_BIN;
   //[CO20210315 - OBSOLETE]if(!(kflags.KBIN_MPI==true||XHOST.MPI==true)){vasp_bin=kflags.KBIN_BIN;}
-  
+
   //CO20210315 - when we generalize this code to run for targeted instances of vasp, we also need to target the right instances of aflow
 
   string vasp_bin="";
@@ -2198,7 +2198,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
     if(!aurostd::FileExist(xvasp.Directory+"/"+_AFLOWLOCK_)){break;} //we needed it above to get the vasp_bin
     if(aurostd::EFileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_END_OUT)){break;}  //check before continue below
     if(aurostd::EFileExist(xvasp.Directory+"/"+_STOPFLOW_)){aurostd::RemoveFile(xvasp.Directory+"/"+_STOPFLOW_);break;} //check before continue below
-    
+
     vasp_running=VASP_instance_running(vasp_bin);
     if(VERBOSE){
       message << "nloop=" << (nloop++);pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
@@ -2211,7 +2211,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
       continue;
     }
     n_not_running=0;  //reset
-    
+
     //determine whether we need to clear xmonitor with new vasp instance (relax1->relax2)
     nexecuting=0;
     vlines_lock_size=aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines_lock);  //we already checked above that it exists
@@ -2314,7 +2314,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
 
     if(VERBOSE){message << "sleeping for " << sleep_seconds << " seconds";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
     aurostd::Sleep(sleep_seconds);
-    
+
     if(aurostd::EFileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_END_OUT)){break;}
     if(aurostd::EFileExist(xvasp.Directory+"/"+_STOPFLOW_)){aurostd::RemoveFile(xvasp.Directory+"/"+_STOPFLOW_);break;}
   }

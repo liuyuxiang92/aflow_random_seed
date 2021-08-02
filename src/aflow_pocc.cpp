@@ -949,7 +949,7 @@ namespace pocc {
     m_Hmix=pocc::getHmix(xv_energies,xv_dgs);
     m_efa=pocc::getEFA(xv_energies,xv_dgs);
   }
-  
+
   void getTemperatureStringParameters(int& temperature_precision,bool& temperatures_int,int& zero_padding_temperature){
     vector<double> v_temperatures=getVTemperatures(DEFAULT_POCC_TEMPERATURE_STRING);
     return getTemperatureStringParameters(v_temperatures,temperature_precision,temperatures_int,zero_padding_temperature);
@@ -1213,7 +1213,7 @@ namespace pocc {
     string soliloquy=XPID+"POccCalculator::plotAvgDOSCAR():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-    
+
     xDOSCAR xdos(doscar_path,*p_FileMESSAGE,true,*p_oss);
     double temperature=poccDOSCAR2temperature(doscar_path);
     return plotAvgDOSCAR(xdos,temperature,directory);
@@ -2589,7 +2589,7 @@ namespace pocc {
   void POccCalculator::loadFromAFlags(const aurostd::xoption& loader) { //grabs from m_aflags
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::loadFromAFlags():";
-    
+
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
     string AflowIn_file="",AflowIn="";

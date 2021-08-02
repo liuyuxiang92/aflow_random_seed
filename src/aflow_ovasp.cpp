@@ -1546,7 +1546,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     //[CO+ME20210713 - keep legacy behavior, only print when non-zero]sdata_ldau << aurostd::utype2string(LDAUT);
     //[CO+ME20210713 - keep legacy behavior, only print when non-zero]string_LDAU=sdata_ldau.str();
   }
-  
+
   if(LDEBUG) cerr << soliloquy << " string_LDAU=" << string_LDAU << endl;
   if(LDEBUG) cerr << soliloquy << " species_pp_vLDAU.size()=" << species_pp_vLDAU.size() << endl;
 

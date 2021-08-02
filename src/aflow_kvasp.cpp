@@ -1010,11 +1010,11 @@ namespace KBIN {
     // NELM //CO20200624
     // cerr << "NELM" << endl;  //CO20200624
     vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.options2entry(AflowIn,_STROPT_+"NELM=",FALSE,vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.xscheme); // scheme already loaded in aflow_xclasses.cpp is "60" - default  //CO20200624
-    
+
     // NELM_STATIC //CO20200624
     // cerr << "NELM_STATIC" << endl; //CO20200624
     vflags.KBIN_VASP_FORCE_OPTION_NELM_STATIC_EQUAL.options2entry(AflowIn,_STROPT_+"NELM_STATIC=",FALSE,vflags.KBIN_VASP_FORCE_OPTION_NELM_STATIC_EQUAL.xscheme); // scheme already loaded in aflow_xclasses.cpp is "120" - default  //CO20200624
-    
+
     // ISMEAR
     // cerr << "ISMEAR" << endl;
     vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL.options2entry(AflowIn,_STROPT_+"ISMEAR=",FALSE,vflags.KBIN_VASP_FORCE_OPTION_ISMEAR_EQUAL.xscheme); // scheme already loaded in aflow_xclasses.cpp is "1" - default  //CO20181128
@@ -1821,7 +1821,7 @@ namespace KBIN {
         if(Krun && kflags.KBIN_QSUB_MODE2) Krun=(Krun && KBIN::QSUB_Extract_Mode2(xvasp.xqsub,FileMESSAGE,aflags,kflags));
         if(Krun && kflags.KBIN_QSUB_MODE3) Krun=(Krun && KBIN::QSUB_Extract_Mode3(xvasp.xqsub,FileMESSAGE,aflags,kflags));
       }
-      //ME20210709 [OBSOLETE] if(Krun && vflags.KBIN_VASP_FORCE_OPTION_SKIP_NOMIX.isentry) { //ME20210709 - Throws an error with --genertate_aflowin_only because it does not populate the POTCARs, so the miscibility check fails.
+      //ME20210709 [OBSOLETE] if(Krun && vflags.KBIN_VASP_FORCE_OPTION_SKIP_NOMIX.isentry) //DX+ME20210709 - Throws an error with --genertate_aflowin_only because it does not populate the POTCARs, so the miscibility check fails.
       if(Krun && !XHOST.GENERATE_AFLOWIN_ONLY && vflags.KBIN_VASP_FORCE_OPTION_SKIP_NOMIX.isentry) { //ME20210709 - For now, skip check if generate_aflowin_only. In the future, the elements (not the pseudopotentials) need to be grabbed from the aflow.in
         string potentials=xvasp.POTCAR_POTENTIALS.str();
         if(!aurostd::substring2bool(aurostd::CleanFileName(xvasp.Directory+"/"),"/1/") &&
@@ -1949,7 +1949,7 @@ namespace KBIN {
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_APL" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             xvasp.NRELAX=-3;
-          //CO20170601 START
+            //CO20170601 START
           }else if(kflags.KBIN_PHONONS_CALCULATION_QHA) {  // RUN PHONONS QHA ------------------------
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_QHA" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1958,7 +1958,7 @@ namespace KBIN {
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AAPL" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             xvasp.NRELAX=-3;
-          //CO20170601 END
+            //CO20170601 END
           }else if(kflags.KBIN_PHONONS_CALCULATION_AGL) {  // RUN PHONONS AGL ------------------------
             aus << "00000  MESSAGE PERFORMING PHONONS_CALCULATION_AGL (Debye Model)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -3072,7 +3072,7 @@ namespace KBIN {
     //[CO20210315 - does not work for big files]string content_vasp_out=aurostd::file2string(xvasp.Directory+"/"+DEFAULT_VASP_OUT);  //no "comments" to remove in this output file
     //[CO20210315 - does not work for big files]content_vasp_out=aurostd::RemoveWhiteSpaces(content_vasp_out);  //remove whitespaces
     //[CO20210315 - does not work for big files]content_vasp_out=aurostd::toupper(content_vasp_out);  //put toupper to eliminate case-sensitivity 
-    
+
     //do memory check
     double memory_usage_percentage=0.0;
     bool approaching_oom=false;
@@ -3095,15 +3095,15 @@ namespace KBIN {
 
     //get INCAR
     VASP_Reread_INCAR(xvasp);  //preload incar
-    
+
     if(LDEBUG){aus << soliloquy << " [1]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-    
+
     //get whether relaxing or not
     bool relaxing=false;
     if(aurostd::kvpairfound(xvasp.INCAR,"IBRION","=")){
       if(aurostd::kvpairfound(xvasp.INCAR,"NSW","=") && aurostd::kvpair2utype<int>(xvasp.INCAR,"NSW","=")>0){relaxing=true;}
     }
-    
+
     //need to get ISYM and ISPIN (ISPIND too)
     //get ISYM
     int isym_current=2; //CO20200624 - VASP default for non-USPP runs, add check later for USPP //https://www.vasp.at/wiki/index.php/ISYM
@@ -3138,21 +3138,21 @@ namespace KBIN {
       vasp_still_running=VASP_instance_running(vasp_bin);
     }
     if(LDEBUG){aus << soliloquy << " vasp_still_running=" << vasp_still_running << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-    
+
     //vasp can spit out many warnings quickly, going from ~10MB to 1GB within 2 minutes
     //we will pass BYTES_MAX_VASP_OUT into substring_present_file_FAST as a stop condition
     //then OUTPUT_LARGE will be triggered at the bottom
     unsigned long long int grep_stop_condition=AUROSTD_MAX_ULLINT;
     if(vasp_monitor_running && vasp_still_running){grep_stop_condition=BYTES_MAX_VASP_OUT;} //no stop condition when vasp is not running, we must process the errors
-    
+
     //CO20210315 - might consider "renice 20 -p VASP_PIDs" to give greps below priority
-    
+
     bool renice=false;
     if(vasp_still_running && fsize_vaspout>=10000000){aurostd::ProcessRenice(vasp_bin,15);renice=true;} //renice vasp if vasp.out>=10Mb so grep can work faster
 
     uint i=0;
     vector<string> vtokens;
-    
+
     //determine which schemes require xmessage.flag("REACHED_ACCURACY")
     //CO+AS202010315 - considering DENTET for this list, patches seem to be working. See: LIB3/CTa_pvTi_sv/ABC2_tP8_123_h_h_abg-001.ABC
     aurostd::xoption xRequiresAccuracy;
@@ -3177,7 +3177,7 @@ namespace KBIN {
     bool reached_accuracy_relaxing=(relaxing==true  && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"reached required accuracy",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) );  //[CO20210601 - only check for static, not relax (might be frozen, and we can fix by appending CONTCAR)]vasp_still_running==false &&
     bool reached_accuracy_static  =(relaxing==false && vasp_still_running==false && vasp_oszicar_unconverged==false && xwarning.flag("OUTCAR_INCOMPLETE")==false); //CO20210315 - "reached accuracy" for static/bands calculation is a converged electronic scf, need to also check OUTCAR_INCOMPLETE, as a converged OSZICAR might actually be a run that ended because of an error
     xmessage.flag("REACHED_ACCURACY",(reached_accuracy_relaxing || reached_accuracy_static));
-    
+
     if(LDEBUG){
       aus << soliloquy << " relaxing=" << relaxing << endl;
       aus << soliloquy << " vasp_oszicar_unconverged=" << vasp_oszicar_unconverged << endl;
@@ -3237,7 +3237,7 @@ namespace KBIN {
     found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"inverse of rotation matrix was not found (increase SYMPREC)",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //VASP's internal symmetry routines END
-    
+
     //VASP issues with RMM-DIIS START
     scheme="EDDRMM"; //CO20210315 - look here https://www.vasp.at/wiki/index.php/IALGO#RMM-DIIS
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
@@ -3254,7 +3254,7 @@ namespace KBIN {
     found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"ZBRENT: can't locate minimum",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //VASP issues with RMM-DIIS END
-    
+
     //CSLOSHING and NELM START
     //CSLOSHING and NELM warnings are similar, CSLOSHING will apply a fix before VASP finishes running, while NELM only cares about the LAST iteration
     //do not check turn on CSLOSHING with NELM, caused collisions with EDDDAV. it bounces back and forth between ALGO=VERFAST and ALGO=NORMAL
@@ -3271,7 +3271,7 @@ namespace KBIN {
     xwarning.flag(scheme,found_warning);
     if(1){if(xwarning.flag("CSLOSHING")){xwarning.flag("NELM",true);}}
     //CSLOSHING and NELM END
-    
+
     //ALL OTHERS (in alphabetic order) START
     scheme="BRMIX";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
@@ -3436,7 +3436,7 @@ namespace KBIN {
     found_warning=(found_warning && aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,"LAPACK: Routine ZPOTRF failed",RemoveWS,case_insensitive,expect_near_end,grep_stop_condition));
     xwarning.flag(scheme,found_warning);
     //ALL OTHERS (in alphabetic order) END
-    
+
     //check at the end (only if other warnings are found and can be corrected)
     //this is actually a critical check, what appeared to be vasp stuck was actually aflow stuck reading (cat/sed/grep) a VERY long vasp.out full of warnings
     //a single check for errors could take hours
@@ -3450,7 +3450,7 @@ namespace KBIN {
     xwarning.flag(scheme,found_warning);
 
     if(LDEBUG){aus << soliloquy << " [2]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-    
+
     if(renice){aurostd::ProcessRenice(vasp_bin,0);} //renice vasp back to normal after grep
 
     //CO20210315 - this bit must be done before wdebug
@@ -3520,7 +3520,7 @@ namespace KBIN {
     //[CO20210315 - doesn't work]  xwarning.flag("ZPOTRF",FALSE);
     //[CO20210315 - doesn't work]  //we don't need an xmonitor here, this is only for prioritizing errors
     //[CO20210315 - doesn't work]}
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     //must do before RMM_DIIS and ROTMAT
     if(1||vasp_monitor_running){ //CO20210315 - might consider running this always, come back and test
@@ -3596,7 +3596,7 @@ namespace KBIN {
         xwarning.flag("IBZKPT",FALSE);
       }
     }
-    
+
     //do just before RMM_DIIS and ROTMAT
     //we generally treat CALC_FROZEN as a out-of-memory error UNLESS the calculation has reached its accuracy (finished) and the OUTCAR is incomplete (odd occurrence, noticed on qrats so far)
     //only convert CALC_FROZEN to MEMORY if it's the only warning (OUTCAR_INCOMPLETE is derivative)
@@ -3606,7 +3606,7 @@ namespace KBIN {
         aus << "MMMMM  MESSAGE treating xwarning.flag(\"CALC_FROZEN\") as xwarning.flag(\"MEMORY\")" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET); //; possible false positive
       }
     }
-    
+
     //the memory might ramp up too quickly, in which the OOM killer will kill vasp
     //if we are lucky, we'll get the "BAD TERMINATION..." warning in the vasp.out (works on qrats)
     if(xwarning.flag("MPICH0") && xmessage.flag("REACHED_ACCURACY")==false){
@@ -3660,7 +3660,7 @@ namespace KBIN {
     if(LDEBUG){aus << soliloquy << " [3]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
     //decide which warnings to ignore
-    
+
     if(xwarning.flag("MPICH11") && xwarning.flag("NBANDS")){ // fix MPICH11 first
       aus << "MMMMM  MESSAGE ignoring xwarning.flag(\"NBANDS\"): prioritizing xwarning.flag(\"MPICH11\")" << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       xwarning.flag("NBANDS",FALSE);
@@ -3696,7 +3696,7 @@ namespace KBIN {
     //[CO20210315 - OBSOLETE, we prioritize the order below]if(xwarning.flag("NKXYZ_IKPTD")){xwarning.flag("IBZKPT",FALSE);} // priority
     //[try NIRMAT first]if(xwarning.flag("NIRMAT") && xwarning.flag("SGRCON")) xwarning.flag("SGRCON",FALSE);
     //[no must fix the LATTICE]if(xwarning.flag("EDDRMM")) xwarning.flag("ZPOTRF",FALSE);
-    
+
     if(LDEBUG){aus << soliloquy << " [4]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
   }
 } // namespace KBIN
@@ -3781,7 +3781,7 @@ namespace KBIN {
     //however, there might be some options which conflict
     //add KBIN::XVASP_INCAR_REMOVE_ENTRY() as necessary
     //check also submode fixes
-   
+
     bool fixed_applied=false;
     bool try_last_ditch_efforts=true;
     uint i=0;
@@ -3804,7 +3804,7 @@ namespace KBIN {
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("SGRCON","SYMPREC",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       // ********* APPLY GENERIC SYMMETRY FIXES ******************
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("ROTMAT",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-      
+
       //fix MPI/NPAR problems next
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MPICH11",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("MPICH139",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
@@ -3830,16 +3830,16 @@ namespace KBIN {
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("REAL_OPTLAY_1","LREAL",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("REAL_OPT","LREAL",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("ZPOTRF",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-      
+
       //patch only if above warnings are not patched first
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("NELM",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-      
+
       //apply these last if no other fixes worked
       // ********* APPLY PREFERRED RMM-DIIS FIXES ******************  //all of these must come before RMM-DIIS
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("ZBRENT",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       // ********* APPLY GENERIC RMM-DIIS FIXES ******************
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("RMM_DIIS",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
-      
+
       //[CO20210315 - do not apply patches for frozen calc]//CO20210315 - do last, fixes assume out-of-memory error
       //[CO20210315 - do not apply patches for frozen calc]fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","MEMORY",try_last_ditch_efforts,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
     }
@@ -3859,7 +3859,7 @@ namespace KBIN {
       //[CO20210621 - not shown to work (alone)]fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","RECYCLE_CONTCAR",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
       fixed_applied=(fixed_applied || KBIN::VASP_Error2Fix("CALC_FROZEN","THREADS",false,xvasp,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE));
     }
-    
+
     //print out all xfixed BEFORE adding "ALL"
     std::sort(xfixed.vxscheme.begin(),xfixed.vxscheme.end()); //sort for printing
     //print ALL first
@@ -3882,7 +3882,7 @@ namespace KBIN {
     string function="KBIN::VASP_Run";
     string soliloquy=XPID+function+"():";
     ostringstream aus_exec,aus;
-    
+
     if(LDEBUG){aus << soliloquy << " BEGIN" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
     if(XHOST.AVOID_RUNNING_VASP){  //CO20200624
@@ -4451,7 +4451,7 @@ namespace KBIN {
       if(nrun<maxrun) {
 
         if(LDEBUG){aus << soliloquy << " [4]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-        
+
         VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,FileMESSAGE);
 
         xfixed.flag("ALL",FALSE);

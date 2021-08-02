@@ -2962,8 +2962,8 @@ namespace aflowlib {
         file_lock_len=vfiles[i].substr(0,lock_size);
         if(LDEBUG){cerr << soliloquy << " file_lock_len=" << file_lock_len << endl;}
         if(file_lock_len==_AFLOWLOCK_ &&
-           (vfiles[i].size()>lock_size && vfiles[i][lock_size]=='.') && //prevent LOCK.qha
-           (vfiles[i].size()>lock_size+1 && isdigit(vfiles[i][lock_size+1])==true)){  //prevent LOCK.qha
+            (vfiles[i].size()>lock_size && vfiles[i][lock_size]=='.') && //prevent LOCK.qha
+            (vfiles[i].size()>lock_size+1 && isdigit(vfiles[i][lock_size+1])==true)){  //prevent LOCK.qha
           vlocks.push_back(vfiles[i]);
         }
       }
@@ -6744,7 +6744,7 @@ namespace aflowlib {
       for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
         if(aurostd::FileExist(dir+"/OSZICAR"+vrelax[irelax]+XHOST.vext[iext]) && aurostd::FileExist(dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext])) {
           if(KBIN::VASP_OSZICARUnconverged(dir+"/OSZICAR"+vrelax[irelax]+XHOST.vext[iext],dir+"/OUTCAR"+vrelax[irelax]+XHOST.vext[iext]) &&
-             KBIN::VASP_getNSTEPS(dir+"/OSZICAR"+vrelax[irelax]+XHOST.vext[iext])<AFLOWRC_MAX_VASP_NELM){ //let's not penalize calculations that have exhausted NELM
+              KBIN::VASP_getNSTEPS(dir+"/OSZICAR"+vrelax[irelax]+XHOST.vext[iext])<AFLOWRC_MAX_VASP_NELM){ //let's not penalize calculations that have exhausted NELM
             ok=FALSE;obb << ". error(unconverged)=OSZICAR"+vrelax[irelax]+".EXT";continue;
           }
         }

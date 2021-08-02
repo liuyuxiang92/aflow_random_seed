@@ -563,7 +563,7 @@ void print(const deque<_atom>& atoms);
 namespace SYM {
   //Operations on class-atoms
   vector<int> count_types(deque<_atom>& vatom);
-  
+
   vector<int> countWyckoffTypes(const vector<wyckoffsite_ITC>& Wyckoff_positions); //DX20210526
 
   //EXPAND LATTICE/CRYSTAL FUNCTIONS

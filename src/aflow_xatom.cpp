@@ -2015,12 +2015,12 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
 /// @param index neighbor index
 /// @return neighbor coordinates
 xvector<double> AtomEnvironment::index2Point(uint index){
-    string soliloquy=XPID+"AtomEnvironment::index2Point():";
-    for(uint i=0;i<coordinates_neighbor.size();i++){
-        if (index < coordinations_neighbor[i]) return coordinates_neighbor[i][index];
-        else index -= coordinations_neighbor[i];
-    }
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "index out of bounds", _INDEX_BOUNDS_);
+  string soliloquy=XPID+"AtomEnvironment::index2Point():";
+  for(uint i=0;i<coordinates_neighbor.size();i++){
+    if (index < coordinations_neighbor[i]) return coordinates_neighbor[i][index];
+    else index -= coordinations_neighbor[i];
+  }
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "index out of bounds", _INDEX_BOUNDS_);
 }
 
 // ***************************************************************************
@@ -3455,7 +3455,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
       }
       // done
       oss << endl;
-    
+
       double _coord;  //CO20190322 - remove annoying -0.0000000
       for(uint iat=0;iat<a.atoms.size();iat++) {
         oss << " ";

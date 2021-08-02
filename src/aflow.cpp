@@ -639,7 +639,7 @@ bool FoldAtomsInCellTest(ofstream& FileMESSAGE,ostream& oss){ //DX20210129
 // HE20210616
 template <typename utype>
 void check(const bool &passed, const utype &calculated, const utype &expected, const string &check_function,
-           const string check_description, const uint check_num, uint &passed_checks, vector<string> &results){
+    const string check_description, const uint check_num, uint &passed_checks, vector<string> &results){
   stringstream result;
   if (passed) {
     passed_checks++;
@@ -652,10 +652,10 @@ void check(const bool &passed, const utype &calculated, const utype &expected, c
   else {
     if (check_function.empty()) {
       result << std::setw(3) << check_num << " | FAIL | " << check_description
-             << " (result: " << calculated << " | expected: " << expected << ")";
+        << " (result: " << calculated << " | expected: " << expected << ")";
     } else {
       result << std::setw(3) << check_num << " | FAIL | " << check_function << " | " << check_description
-             << " (result: " << calculated << " | expected: " << expected << ")";
+        << " (result: " << calculated << " | expected: " << expected << ")";
     }
   }
   results.push_back(result.str());
@@ -663,33 +663,33 @@ void check(const bool &passed, const utype &calculated, const utype &expected, c
 
 template <typename utype>
 void check_equal(const utype &calculated, const utype &expected, const string &check_function,
-                 const string check_description, const uint check_num, uint &passed_checks, vector<string> &results){
+    const string check_description, const uint check_num, uint &passed_checks, vector<string> &results){
   bool passed = false;
   if (aurostd::isequal(calculated, expected)) passed = true;
   check(passed, calculated, expected, check_function, check_description, check_num, passed_checks, results);
 }
 void check_equal(const string &calculated, const string &expected, const string &check_function, 
-                 const string check_description, const uint check_num, uint &passed_checks, vector<string> &results){
+    const string check_description, const uint check_num, uint &passed_checks, vector<string> &results){
   bool passed = false;
   if (calculated == expected) passed = true;
   check(passed, calculated, expected, check_function, check_description, check_num, passed_checks, results);
 }
 void check_equal(const bool &calculated, const bool &expected, const string &check_function,
-                 const string check_description, const uint check_num, uint &passed_checks, vector<string> &results){
+    const string check_description, const uint check_num, uint &passed_checks, vector<string> &results){
   bool passed = false;
   if (calculated == expected) passed = true;
   check(passed, calculated, expected, check_function, check_description, check_num, passed_checks, results);
 }
 
 void check_similar(const double &calculated, const double &expected, const string &check_function,
-                   const string check_description, const uint check_num, uint &passed_checks, vector<string> &results, const double &relative=1E-10){
+    const string check_description, const uint check_num, uint &passed_checks, vector<string> &results, const double &relative=1E-10){
   bool passed = false;
   if (std::abs(expected - calculated) <= expected * relative) passed = true;
   check(passed, calculated, expected, check_function, check_description, check_num, passed_checks, results);
 }
 
 bool display_result(const uint passed_checks, const uint check_num, const string & task_description, const vector<string> & results,
-                    const string & function_name, ofstream & FileMESSAGE, ostream & oss){
+    const string & function_name, ofstream & FileMESSAGE, ostream & oss){
   stringstream message;
   _aflags aflags;
   aflags.Directory=aurostd::getPWD();
@@ -1073,7 +1073,7 @@ bool AtomicEnvironmentTest(ofstream& FileMESSAGE, ostream& oss){ //HE20210511
 
   // present overall result
   return display_result(passed_checks, check_num, task_description, results, function_name, FileMESSAGE, oss);
-  }
+}
 
 int main(int _argc,char **_argv) {
   string soliloquy = XPID + "main():"; //CO20180419

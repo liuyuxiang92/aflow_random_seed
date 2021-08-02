@@ -3853,7 +3853,7 @@ namespace pflow {
     if(!already_calculated){
       str_sg.SpaceGroup_ITC(sym_eps, -1, setting, no_scan);
     }
-    
+
     xvector<double> data = Getabc_angles(str_sg.standard_lattice_ITC,DEGREES);
     stringstream ss_output;
     if(ftype == txt_ft || (XHOST.vflag_control.flag("WWW") && standalone)){
@@ -3870,14 +3870,14 @@ namespace pflow {
           << " " << setw(3) << str_sg.wyckoff_sites_ITC[i].multiplicity   // set(3): Wyckoff positions have a max of three digits
           << " " << setw(5) << str_sg.wyckoff_sites_ITC[i].letter         // set(5): space group #47 has Wyckoff letter "alpha" (i.e, five letters)
           << " " << setw(8) << str_sg.wyckoff_sites_ITC[i].site_symmetry; // set(8): Wyckoff site symmetry generally lists three/four directions, each with one to two characters (e.g., inversion)
-          double _coord = AUROSTD_MAX_DOUBLE;
-          for(uint j=1;j<=3;j++) {
-            _coord=aurostd::roundoff(str_sg.wyckoff_sites_ITC[i].coord(j),pow(10.0,-(double)14));
-            if(abs(_coord)<10.0) ss_output << " ";
-            if(!std::signbit(_coord)) ss_output << " ";
-            ss_output << _coord << " ";
-          }
-          ss_output << endl;
+        double _coord = AUROSTD_MAX_DOUBLE;
+        for(uint j=1;j<=3;j++) {
+          _coord=aurostd::roundoff(str_sg.wyckoff_sites_ITC[i].coord(j),pow(10.0,-(double)14));
+          if(abs(_coord)<10.0) ss_output << " ";
+          if(!std::signbit(_coord)) ss_output << " ";
+          ss_output << _coord << " ";
+        }
+        ss_output << endl;
       }
       // ME20210402 - Convert to array of strings for web
       if (XHOST.vflag_control.flag("WWW") && standalone) { //DX20210521 - add standalone
@@ -3891,14 +3891,14 @@ namespace pflow {
     if(ftype == json_ft || (XHOST.vflag_control.flag("WWW") && standalone)){
       aurostd::JSONwriter json;
       bool roff = true;
-      
+
       // space group number
       if(str_sg.space_group_ITC > 0 && str_sg.space_group_ITC < 231){
         json.addNumber("space_group_number", str_sg.space_group_ITC);
       } else if (PRINT_NULL_JSON){
         json.addNull("space_group_number");
       }
-      
+
       // ITC setting
       if(str_sg.setting_ITC == 1 || str_sg.setting_ITC == 2){
         json.addNumber("setting_ITC", str_sg.setting_ITC);

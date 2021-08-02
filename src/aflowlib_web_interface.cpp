@@ -4712,7 +4712,7 @@ namespace aflowlib {
     // if there is only one space group in the query, put summons in sg2();
     // otherwise this is done outside this function
     if(only_one_sg) { 
-      //DX20210615 [OBSOLETE] space_group_summons = "sg2(" + space_group_summons + ")"; }
+      //DX20210615 [OBSOLETE] space_group_summons = "sg2(" + space_group_summons + ")";
       if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){ space_group_summons = "spacegroup_orig(" + space_group_summons + ")"; } //DX20210615 - relaxation-step specific keyword
       else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){ space_group_summons = "sg2(" + space_group_summons + ")"; } //DX20210615 - relaxation-step specific keyword
       else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_){ space_group_summons = "spacegroup_relax(" + space_group_summons + ")"; } //DX20210615 - relaxation-step specific keyword

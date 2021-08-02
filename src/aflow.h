@@ -484,7 +484,7 @@ class _XHOST {
 //  vector<string> vLibrary_ICSD_ALL; // line by line
 
 // all the at(N) need to be sequetial !!!
-  
+
 #define XHOST_README_AFLOW_LICENSE_GPL3_TXT            XHOST.vGlobal_string.at(40)
 #define XHOST_README_AFLOW_TXT                         XHOST.vGlobal_string.at(41)
 #define XHOST_README_AFLOW_VERSIONS_HISTORY_TXT        XHOST.vGlobal_string.at(42)
@@ -2040,7 +2040,7 @@ class xStream {
     //initializers
     void initialize(ostream& oss=cout);  //ME20200427
     void initialize(ofstream& ofs,ostream& oss=cout);  //ME20200427
-    
+
     //getters
     ostream* getOSS() const; //CO20191110
     ofstream* getOFStream() const; //CO20191110

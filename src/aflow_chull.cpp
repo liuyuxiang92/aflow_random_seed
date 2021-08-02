@@ -1726,7 +1726,7 @@ namespace chull {
       const xvector<double> next_vector = m_points[facet[i]].m_coords - center;
       const double dot = aurostd::scalar_product(start_vector, next_vector);
       const double det = start_vector[1]*next_vector[2]*normal[3] + next_vector[1]*normal[2]*start_vector[3] + normal[1]*start_vector[2]*next_vector[3]
-                         - start_vector[3]*next_vector[2]*normal[1] - next_vector[3]*normal[2]*start_vector[1] - normal[3]*start_vector[2]*next_vector[1];
+        - start_vector[3]*next_vector[2]*normal[1] - next_vector[3]*normal[2]*start_vector[1] - normal[3]*start_vector[2]*next_vector[1];
       angle_list[i+1] = atan2(det, dot);
       index_list[i+1] = facet[i];
     }
@@ -1776,7 +1776,7 @@ namespace chull {
 
     // Ensure that point_neighbors is unique
     for (std::map<uint, vector<uint> >::iterator point_neighbors_entry = point_neighbors.begin();
-         point_neighbors_entry != point_neighbors.end(); ++point_neighbors_entry){
+        point_neighbors_entry != point_neighbors.end(); ++point_neighbors_entry){
       std::sort(point_neighbors_entry->second.begin(),point_neighbors_entry->second.end());
       point_neighbors_entry->second.erase( std::unique( point_neighbors_entry->second.begin(), point_neighbors_entry->second.end() ), point_neighbors_entry->second.end() );
     }

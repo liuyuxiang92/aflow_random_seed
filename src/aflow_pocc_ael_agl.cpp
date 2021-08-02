@@ -70,7 +70,7 @@ namespace pocc {
     //run postprocessing
     ael_run_postprocess=(ael_run_postprocess || XHOST.vflag_control.flag("AEL_RUN_POSTPROCESSING") ); //CO20201026
     ael_run_postprocess=(ael_run_postprocess || XHOST.POSTPROCESS ); //CO20201026
-    
+
     //write extra output (debugging mostly)
     ael_write_full_results=(ael_write_full_results || XHOST.vflag_control.flag("AEL_WRITE_FULL_RESULTS") ); //CO20201026
   }

@@ -256,28 +256,28 @@ namespace aurostd {  // namespace aurostd
     if(abs(fracpart)>=.5){return x>=0?std::ceil(x):std::floor(x);}  //not sure why fracpart would ever be negative, but it is for negative inputs
     else{return x<0?std::ceil(x):std::floor(x);}
   }
-// [OBSOLETE]  float round(float x) { return (float) std::roundf(float(x));}
-// [OBSOLETE]  long double round(long double x) { return (long double) std::roundl((long double) x);}
-// [OBSOLETE]  int round(int x) { return (int) std::round(double(x));}
-// [OBSOLETE]  long round(long x) { return (long) std::round(double(x));}
-// [OBSOLETE]  // FLOOR(X)
-// [OBSOLETE]  //  double floor(double x) { return (double) std::floor(double(x));}
-// [OBSOLETE]  float floor(float x) { return (float) std::floorf(float(x));}
-// [OBSOLETE]  long double floor(long double x) { return (long double) std::floorl((long double) x);}
-// [OBSOLETE]  int floor(int x) { return (int) std::floor(double(x));}
-// [OBSOLETE]  long floor(long x) { return (long) std::floor(double(x));}
-// [OBSOLETE]  // CEIL(X)
-// [OBSOLETE]  double ceil(double x) { return (double) std::ceil(double(x));}
-// [OBSOLETE]  float ceil(float x) { return (float) std::ceilf(float(x));}
-// [OBSOLETE]  long double ceil(long double x) { return (long double) std::ceill((long double) x);}
-// [OBSOLETE]  int ceil(int x) { return (int) std::ceil(double(x));}
-// [OBSOLETE]  long ceil(long x) { return (long) std::ceil(double(x));}
-// [OBSOLETE]  // TRUNC(X)
-// [OBSOLETE]  double trunc(double x) { return (double) std::trunc(double(x));}
-// [OBSOLETE]  float trunc(float x) { return (float) std::truncf(float(x));}
-// [OBSOLETE]  long double trunc(long double x) { return (long double) std::truncl((long double) x);}
-// [OBSOLETE]  int trunc(int x) { return (int) std::trunc(double(x));}
-// [OBSOLETE]  long trunc(long x) { return (long) std::trunc(double(x));}
+  // [OBSOLETE]  float round(float x) { return (float) std::roundf(float(x));}
+  // [OBSOLETE]  long double round(long double x) { return (long double) std::roundl((long double) x);}
+  // [OBSOLETE]  int round(int x) { return (int) std::round(double(x));}
+  // [OBSOLETE]  long round(long x) { return (long) std::round(double(x));}
+  // [OBSOLETE]  // FLOOR(X)
+  // [OBSOLETE]  //  double floor(double x) { return (double) std::floor(double(x));}
+  // [OBSOLETE]  float floor(float x) { return (float) std::floorf(float(x));}
+  // [OBSOLETE]  long double floor(long double x) { return (long double) std::floorl((long double) x);}
+  // [OBSOLETE]  int floor(int x) { return (int) std::floor(double(x));}
+  // [OBSOLETE]  long floor(long x) { return (long) std::floor(double(x));}
+  // [OBSOLETE]  // CEIL(X)
+  // [OBSOLETE]  double ceil(double x) { return (double) std::ceil(double(x));}
+  // [OBSOLETE]  float ceil(float x) { return (float) std::ceilf(float(x));}
+  // [OBSOLETE]  long double ceil(long double x) { return (long double) std::ceill((long double) x);}
+  // [OBSOLETE]  int ceil(int x) { return (int) std::ceil(double(x));}
+  // [OBSOLETE]  long ceil(long x) { return (long) std::ceil(double(x));}
+  // [OBSOLETE]  // TRUNC(X)
+  // [OBSOLETE]  double trunc(double x) { return (double) std::trunc(double(x));}
+  // [OBSOLETE]  float trunc(float x) { return (float) std::truncf(float(x));}
+  // [OBSOLETE]  long double trunc(long double x) { return (long double) std::truncl((long double) x);}
+  // [OBSOLETE]  int trunc(int x) { return (int) std::trunc(double(x));}
+  // [OBSOLETE]  long trunc(long x) { return (long) std::trunc(double(x));}
 }
 
 namespace aurostd {
