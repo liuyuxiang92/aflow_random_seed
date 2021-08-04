@@ -2628,7 +2628,6 @@ namespace KBIN {
                     // PROCEED
                     xvasp.NRELAXING++;
                     aus << 11111*xvasp.NRELAXING << "  RUN_DIELECTRIC_STATIC (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-                    kflags.KBIN_MPI_NCPUS_BUFFER=kflags.KBIN_MPI_NCPUS;
                     if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS") && kflags.KBIN_MPI_NCPUS==24) {
                       uint ncpus_before=kflags.KBIN_MPI_NCPUS;
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) kflags.KBIN_MPI_NCPUS=DUKE_MATERIALS_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5
@@ -2679,7 +2678,6 @@ namespace KBIN {
                     xvasp.aopts.flag("FLAG::WAVECAR_PRESERVED",TRUE); // WAVECAR.dielectric_static
                     bool qmwrite=TRUE;
                     KBIN::VASP_Backup(xvasp,qmwrite,string("dielectric_static"));
-                    //		kflags.KBIN_MPI_NCPUS=kflags.KBIN_MPI_NCPUS_BUFFER;
                   }
                   if(vflags.KBIN_VASP_RUN.flag("DIELECTRIC_DYNAMIC") && vflags.KBIN_VASP_RUN.flag("DIELECTRIC_STATIC")) {  // check for DIELECTRIC DYNAMIC
                     xvasp.NRELAXING++;

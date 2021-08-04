@@ -6609,7 +6609,24 @@ namespace KBIN {
         param_int=kflags.KBIN_MPI_NCPUS/2;
         if(param_int<1){Krun=false;}
       }
-      if(Krun){kflags.KBIN_MPI_NCPUS=param_int;}
+      if(Krun){
+        kflags.KBIN_MPI_NCPUS_ORIG=kflags.KBIN_MPI_NCPUS;
+        kflags.KBIN_MPI_NCPUS=param_int;
+      }
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\" kflags.KBIN_MPI_NCPUS(post)=" << kflags.KBIN_MPI_NCPUS << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    }
+    else if(fix=="NCPUS_RESTORE") {
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\" kflags.KBIN_MPI_NCPUS(pre)=" << kflags.KBIN_MPI_NCPUS << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      //do not check for KBIN_MPI, since --monitor_vasp is running separate binary
+      //we are coming from an MPI error, so we know this is running with NCPUS>1
+      if(Krun){
+        param_int=kflags.KBIN_MPI_NCPUS_ORIG;
+        if(param_int<1){Krun=false;}
+      }
+      if(Krun){
+        //[original is only set in "NCPUS"]kflags.KBIN_MPI_NCPUS_ORIG=kflags.KBIN_MPI_NCPUS;
+        kflags.KBIN_MPI_NCPUS=param_int;
+      }
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\" kflags.KBIN_MPI_NCPUS(post)=" << kflags.KBIN_MPI_NCPUS << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
     else if(fix=="NELM") {
@@ -7169,7 +7186,8 @@ namespace KBIN {
         Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
         bool Krun2=true;fix="NCPUS";
-        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
+        bool ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+        if(ignorefix2){Krun2=false;}
         Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
         bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
@@ -7177,7 +7195,9 @@ namespace KBIN {
         Krun3=(Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
         Krun=(Krun1||Krun2||Krun3);
-        //no need to remove these settings if it fails
+        if(!Krun){  //remove fixes before going to next submode
+          if(!ignorefix2){fix="NCPUS_RESTORE";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);xfixed.flag(fix,false);}
+        }
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==1){ //lower NBANDS, try before lowering k-points
@@ -7248,11 +7268,14 @@ namespace KBIN {
         Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
         bool Krun2=true;fix="NCPUS";
-        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
+        bool ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+        if(ignorefix2){Krun2=false;}
         Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
         Krun=(Krun1||Krun2);
-        //no need to remove these settings if it fails
+        if(!Krun){  //remove fixes before going to next submode
+          if(!ignorefix2){fix="NCPUS_RESTORE";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);xfixed.flag(fix,false);}
+        }
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       //this might be a memory issue, might not be
@@ -7474,7 +7497,8 @@ namespace KBIN {
       Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
       bool Krun2=true;fix="NCPUS";
-      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
+      bool ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+      if(ignorefix2){Krun2=false;}
       Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
       bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
@@ -7482,6 +7506,9 @@ namespace KBIN {
       Krun3=(Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
       Krun=(Krun1||Krun2||Krun3);
+      if(!Krun){  //remove fixes before going to next submode
+        if(!ignorefix2){fix="NCPUS_RESTORE";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);xfixed.flag(fix,false);}
+      }
     }
     else if(mode=="ZBRENT") { //other RMM-DIIS patches will follow
       //https://www.vasp.at/forum/viewtopic.php?t=1856

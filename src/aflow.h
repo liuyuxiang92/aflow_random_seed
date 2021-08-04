@@ -757,7 +757,7 @@ class _kflags {
     bool   KBIN_MPI;
     int    KBIN_MPI_NCPUS;
     string KBIN_MPI_NCPUS_STRING; //ME20181216
-    int    KBIN_MPI_NCPUS_BUFFER;
+    int    KBIN_MPI_NCPUS_ORIG; //CO20210804 - repurposing
     string KBIN_MPI_START;
     string KBIN_MPI_STOP;
     string KBIN_MPI_COMMAND;
