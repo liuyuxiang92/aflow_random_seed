@@ -8660,7 +8660,7 @@ namespace LATTICE {
     if(foundBZ==FALSE) {
       cerr << "WARNING: LATTICE::KPOINTS_Directions, lattice_type=" << lattice_type << " not found in aflow_lattice.cpp " << endl;
       cout << "WARNING: LATTICE::KPOINTS_Directions, lattice_type=" << lattice_type << " not found in aflow_lattice.cpp " << endl;
-      oss   << "WARNING: LATTICE::KPOINTS_Directions, lattice_type=" << lattice_type << " not found in aflow_lattice.cpp " << endl;
+      oss  << "WARNING: LATTICE::KPOINTS_Directions, lattice_type=" << lattice_type << " not found in aflow_lattice.cpp " << endl;
     }
     string output(oss.str());
     if(grid<0) aurostd::StringSubst(output,"NKPOINTS",aurostd::utype2string(nkpoint));

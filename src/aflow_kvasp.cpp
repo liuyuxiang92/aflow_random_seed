@@ -1376,30 +1376,39 @@ namespace KBIN {
     // [OBSOLETE] if(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG) vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_VALUE=aurostd::RemoveWhiteSpaces(aurostd::substring2string(AflowIn,"[VASP_KPOINTS_FILE]BANDS_LATTICE=",TRUE));
     // [OBSOLETE]  else {vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_VALUE=DEFAULT_BANDS_LATTICE;vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG=TRUE;} // DEFAULT FIX
 
-    vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.options2entry(AflowIn,"[VASP_KPOINTS_FILE]BANDS_LATTICE=",FALSE,vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.xscheme); // scheme already loaded in aflow_xclasses.cpp is ""
-    if(!vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.isentry &&
-        !vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.flag(DEFAULT_BANDS_LATTICE))
+    vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.options2entry(AflowIn,"[VASP_KPOINTS_FILE]BANDS_LATTICE=",FALSE,vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.xscheme); // scheme already loaded in aflow_xclasses.cpp is AUTO
+    if(!vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.isentry){
+      vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.clear();
       vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.push(DEFAULT_BANDS_LATTICE);
+    }
 
     if((vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS")) && !vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.isentry) {
       cerr << "WARNING: if you use vflags.KBIN_VASP_RUN.flag(\"RELAX_STATIC_BANDS\") or vflags.KBIN_VASP_RUN.flag(\"STATIC_BANDS\"), you must specify KBIN_VASP_KPOINTS_BANDS_LATTICE" << endl;
       cerr << "         Taking defauls vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string=" << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << endl;
     }
-    vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG    =    aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_FILE]BANDS_LATTICE=AUTO",TRUE) ||    aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_FILE]BANDS_LATTICE=auto",TRUE);
+    //[CO20210805 - OBSOLETE]vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG    =    aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_FILE]BANDS_LATTICE=AUTO",TRUE) ||    aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_FILE]BANDS_LATTICE=auto",TRUE);
     // [OBSOLETE]  if(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG) vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG=FALSE;
-    if(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string=="AUTO") vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG=TRUE;
-    if(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG) vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.clear();
+    //[CO20210805 - OBSOLETE]if(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string=="AUTO") vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG=TRUE;
+    //[CO20210805 - OBSOLETE]if(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG) vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.clear();
 
-    vflags.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG    =     aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_FILE]BANDS_GRID=",TRUE);
-    if(vflags.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG)
-      vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE=aurostd::substring2utype<int>(AflowIn,"[VASP_KPOINTS_FILE]BANDS_GRID=",TRUE);
-    else {vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE=16;vflags.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG=TRUE;
+    vflags.KBIN_VASP_KPOINTS_BANDS_GRID.options2entry(AflowIn,"[VASP_KPOINTS_FILE]BANDS_GRID=",FALSE,vflags.KBIN_VASP_KPOINTS_BANDS_GRID.xscheme); // scheme already loaded in aflow_xclasses.cpp is 20
+    //[CO20210805 - OBSOLETE]vflags.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG    =     aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_FILE]BANDS_GRID=",TRUE);
+    //[CO20210805 - OBSOLETE]if(vflags.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG)
+    //[CO20210805 - OBSOLETE]  vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE=aurostd::substring2utype<int>(AflowIn,"[VASP_KPOINTS_FILE]BANDS_GRID=",TRUE);
+    //[CO20210805 - OBSOLETE]else {vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE=16;vflags.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG=TRUE;
+    if(!vflags.KBIN_VASP_KPOINTS_BANDS_GRID.isentry){  //CO20210805
+      vflags.KBIN_VASP_KPOINTS_BANDS_GRID.clear();
+      vflags.KBIN_VASP_KPOINTS_BANDS_GRID.push(aurostd::utype2string(DEFAULT_BANDS_GRID));
+    }
       //    cerr << "WARNING: if you use VASP_RUN_RELAX_STATIC_BANDS or vflags.KBIN_VASP_RUN.flag(\"STATIC_BANDS\"), you must specify KBIN_VASP_KPOINTS_BANDS_GRID_FLAG" << endl;
       //   cerr << "         Taking defauls vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE=" << vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE << endl;
-    } // DEFAULT FIX
-    if((vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS")) && !vflags.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG) {
-      cerr << "WARNING: if you use VASP_RUN_RELAX_STATIC_BANDS or vflags.KBIN_VASP_RUN.flag(\"STATIC_BANDS\"), you must specify KBIN_VASP_KPOINTS_BANDS_GRID_FLAG" << endl;
-      cerr << "         Taking defauls vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE=" << vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE << endl;
+    if((vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || 
+          vflags.KBIN_VASP_RUN.flag("REPEAT_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("REPEAT_BANDS")) && 
+        !vflags.KBIN_VASP_KPOINTS_BANDS_GRID.isentry) {
+      message="";
+      message+="if you run RELAX_STATIC_BANDS, STATIC_BANDS, REPEAT_STATIC_BANDS, or REPEAT_BANDS, you must specify KBIN_VASP_KPOINTS_BANDS_GRID";
+      message+="taking default KBIN_VASP_KPOINTS_BANDS_GRID="+vflags.KBIN_VASP_KPOINTS_BANDS_GRID.content_string;
+      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_WARNING_);
     }
 
     // [OBSOLETE] vflags.KBIN_VASP_POSCAR_FILE_KEYWORD                 =    aurostd::substring2bool(AflowIn,"[VASP_POSCAR_FILE]"); 
@@ -2427,7 +2436,7 @@ namespace KBIN {
                     if(STATIC_DEBUG) {aus << "STATIC_DEBUG: vflags.KBIN_VASP_REPEAT.flag(\"REPEAT_BANDS\")=" << vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS") << endl;}
                     if(STATIC_DEBUG) {aus << "STATIC_DEBUG: vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.isentry=" << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.isentry << endl;}
                     if(STATIC_DEBUG) {aus << "STATIC_DEBUG: vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string=" << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << endl;}
-                    if(STATIC_DEBUG) {aus << "STATIC_DEBUG: vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG=" << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG << endl;}
+                    //[CO20210805 - OBSOLETE]if(STATIC_DEBUG) {aus << "STATIC_DEBUG: vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG=" << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG << endl;}
                     if(STATIC_DEBUG) {aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
                     string stringBZ="";
                     bool foundBZ=FALSE;
@@ -2435,9 +2444,8 @@ namespace KBIN {
                     if(STATIC_DEBUG) {aus << "STATIC_DEBUG: foundBZ=" << foundBZ << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
                     if(STATIC_DEBUG) {aus << "STATIC_DEBUG: " << xvasp.str << endl;}
                     if(STATIC_DEBUG) {aus << "STATIC_DEBUG: " << rlattice << endl;}
-                    if(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG==FALSE) {
-                      stringBZ=LATTICE::KPOINTS_Directions(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string,rlattice,vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE,xvasp.str.iomode,foundBZ); // rlattice = updated structure
-                    } else {
+                    //[CO20210805 - OBSOLETE]if(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG==FALSE)
+                    if(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string=="AUTO") { //CO20210805
                       foundBZ=FALSE;
                       //AS20200724 BEGIN
                       // when KBIN_VASP_KPOINTS_BANDS_LATTICE=AUTO we need to retrieve
@@ -2449,13 +2457,22 @@ namespace KBIN {
                       vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.push(xvasp.str.bravais_lattice_variation_type);
                       //AS20200724 END
                     }
-                    if(STATIC_DEBUG) {aus << "STATIC_DEBUG: " << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-                    if(STATIC_DEBUG) {aus << "STATIC_DEBUG: " << stringBZ << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-                    if(STATIC_DEBUG) {aus << "STATIC_DEBUG: foundBZ=" << foundBZ << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
-                    if(STATIC_DEBUG) {aus << "STATIC_DEBUG: " << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+                    if(0){  //CO20210805 - no need to run this code twice, run once after you standardize the structure
+                      stringBZ=LATTICE::KPOINTS_Directions(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string,rlattice,vflags.KBIN_VASP_KPOINTS_BANDS_GRID.content_int,xvasp.str.iomode,foundBZ); // rlattice = updated structure
+                      if(STATIC_DEBUG) {aus << "STATIC_DEBUG: " << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+                      if(STATIC_DEBUG) {aus << "STATIC_DEBUG: " << stringBZ << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+                      if(STATIC_DEBUG) {aus << "STATIC_DEBUG: foundBZ=" << foundBZ << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+                      if(STATIC_DEBUG) {aus << "STATIC_DEBUG: " << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+                    }
 
                     // always recalculate standardization
-                    if(vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE")==FALSE) {
+                    if(vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE")==TRUE) {
+                      // nothing
+                      aus << "00000  MESSAGE PRESERVING ORIGINAL STRUCTURE" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+                      aus << "00000  MESSAGE ORIGINAL: a,b,c,alpha,beta,gamma " << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
+                      aus << "00000  MESSAGE ORIGINAL: lattice: " << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << endl;
+                      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+                    }else{
                       aus << "00000  MESSAGE WARNING RECALCULATING STANDARD STRUCTURE" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
                       aus << "00000  MESSAGE BEFORE: a,b,c,alpha,beta,gamma " << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
                       aus << "00000  MESSAGE BEFORE: lattice: " << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << endl;
@@ -2469,25 +2486,15 @@ namespace KBIN {
                       aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR"));
                       xvasp.str.FixLattices();
                       rlattice=xvasp.str.lattice; // in rlattice I`ve always the final structure
-                      // [OBSOLETE] vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_VALUE=xvasp.str.bravais_lattice_variation_type;//WSETYAWAN mod
-                      // vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_VALUE=xvasp.str.bravais_conventional_lattice_type;
+                      //CO20210805 - both Standard_Conventional_UnitCellForm() and Standard_Primitive_UnitCellForm() 
+                      //return back updated bravais_lattice_variation_type, no need to recalculate with GetLatticeType()
                       vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.clear();vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.push(xvasp.str.bravais_lattice_variation_type); //WSETYAWAN mod
-
+                      
                       aus << "00000  MESSAGE AFTER: a,b,c,alpha,beta,gamma " << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
                       aus << "00000  MESSAGE AFTER: lattice: " << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << endl;
                       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-                      // 		  cerr << "vasp.str.bravais_lattice_variation_type=" << xvasp.str.bravais_lattice_variation_type << endl;
-                      // 		  cerr << "vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string=" << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << endl;
-                    } else {
-                      // nothing
-                      aus << "00000  MESSAGE PRESERVING ORIGINAL STRUCTURE" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-                      aus << "00000  MESSAGE ORIGINAL: a,b,c,alpha,beta,gamma " << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
-                      aus << "00000  MESSAGE ORIGINAL: lattice: " << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << endl;
-                      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-                      // 		  cerr << "vasp.str.bravais_lattice_variation_type=" << xvasp.str.bravais_lattice_variation_type << endl;
-                      // 		  cerr << "vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string=" << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << endl;
                     }
-                    stringBZ=LATTICE::KPOINTS_Directions(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string,rlattice,vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE,xvasp.str.iomode,foundBZ); // rlattice = updated structure
+                    stringBZ=LATTICE::KPOINTS_Directions(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string,rlattice,vflags.KBIN_VASP_KPOINTS_BANDS_GRID.content_int,xvasp.str.iomode,foundBZ); // rlattice = updated structure
                     if(STATIC_DEBUG) {aus << "STATIC_DEBUG: " << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
                     if(STATIC_DEBUG) {aus << "STATIC_DEBUG: " << stringBZ << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
                     if(STATIC_DEBUG) {aus << "STATIC_DEBUG: foundBZ=" << foundBZ << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
@@ -2547,7 +2554,6 @@ namespace KBIN {
                 // BANDS PART ----------------------------------------------------------------------------
                 if(vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_STATIC_BANDS") || vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")) {
                   // NOW DO THE BANDS PATCHING KPOINTS (if necessary...)
-                  bool foundBZ;
                   KBIN::VASP_Recycle(xvasp,"static");  // bring back the stuff
                   KBIN::VASP_RecycleExtraFile(xvasp,"CHGCAR","static");  // bring back the stuff
                   xvasp.aopts.flag("FLAG::POSCAR_PRESERVED",TRUE); //CO20210315 - correct placement // in case of errors it is not lost but recycled
@@ -2559,8 +2565,14 @@ namespace KBIN {
                   // poscar was already conventionalized in the static part
                   xvasp.KPOINTS.clear();xvasp.KPOINTS.str(std::string());
                   //	      xvasp.KPOINTS <<
-                  string stringBZ;
-                  stringBZ=LATTICE::KPOINTS_Directions(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string,rlattice,vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE,xvasp.str.iomode,foundBZ); // rlattice = updated structure
+                  string stringBZ="";
+                  bool foundBZ=false;
+                  stringBZ=LATTICE::KPOINTS_Directions(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string,rlattice,vflags.KBIN_VASP_KPOINTS_BANDS_GRID.content_int,xvasp.str.iomode,foundBZ); // rlattice = updated structure
+                  if(foundBZ==FALSE) {  //CO20210805
+                    aus << "Unrecoverable error, lattice not found:" << std::endl;
+                    aus << xvasp.str;
+                    throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, aus.str(), _RUNTIME_ERROR_);
+                  }
                   // removed stuff BELOW
                   xvasp.KPOINTS << stringBZ;
                   aurostd::stringstream2file(xvasp.KPOINTS,string(xvasp.Directory+"/KPOINTS"));
@@ -2587,7 +2599,7 @@ namespace KBIN {
                   }
                   // NOW DO THE BANDS RUN
                   xvasp.NRELAXING++;
-                  aus << 11111*xvasp.NRELAXING << "  BANDS (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << " - K=[" << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << "," << vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE << "]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+                  aus << 11111*xvasp.NRELAXING << "  BANDS (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << " - K=[" << vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string << "," << vflags.KBIN_VASP_KPOINTS_BANDS_GRID.content_int << "]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
                   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
                   //[CO20210315 - OBSOLETE]vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.push("ROTMAT");	// dont mess up KPOINTS in bands
                   //[CO20210315 - OBSOLETE]vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.push("IBZKPT");    // dont mess up KPOINTS in bands
