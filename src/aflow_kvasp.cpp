@@ -3072,21 +3072,23 @@ namespace KBIN {
     //[CO20210315 - does not work for big files]content_vasp_out=aurostd::toupper(content_vasp_out);  //put toupper to eliminate case-sensitivity 
 
     //do memory check
-    double memory_usage_percentage=0.0;
+    double usage_percentage_ram=0.0,usage_percentage_swap=0.0;
     bool approaching_oom=false;
-    if(aurostd::GetMemoryUsagePercentage(memory_usage_percentage)){approaching_oom=(memory_usage_percentage>=MEMORY_MAX_USAGE);}
+    if(aurostd::GetMemoryUsagePercentage(usage_percentage_ram,usage_percentage_swap)){approaching_oom=(usage_percentage_ram>=MEMORY_MAX_USAGE_RAM && usage_percentage_swap>=MEMORY_MAX_USAGE_SWAP);}
     if(approaching_oom){  //might be a quick memory spike, try again
       if(VERBOSE){
-        aus << "00000  MESSAGE memory used: " << aurostd::utype2string(memory_usage_percentage,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+        aus << "00000  MESSAGE ram memory used: " << aurostd::utype2string(usage_percentage_ram,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_RAM << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+        aus << "00000  MESSAGE swap memory used: " << aurostd::utype2string(usage_percentage_swap,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_SWAP << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aus << "00000  MESSAGE reading memory again after " << SECONDS_SLEEP_VASP_MONITOR << " second sleep" << endl;
         if(LDEBUG){cerr << aus.str();}
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       aurostd::Sleep(SECONDS_SLEEP_VASP_MONITOR);
-      if(aurostd::GetMemoryUsagePercentage(memory_usage_percentage)){approaching_oom=(memory_usage_percentage>=MEMORY_MAX_USAGE);}
+      if(aurostd::GetMemoryUsagePercentage(usage_percentage_ram,usage_percentage_swap)){approaching_oom=(usage_percentage_ram>=MEMORY_MAX_USAGE_RAM && usage_percentage_swap>=MEMORY_MAX_USAGE_SWAP);}
     }
     if(VERBOSE||approaching_oom){
-      aus << "00000  MESSAGE memory used: " << aurostd::utype2string(memory_usage_percentage,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      aus << "00000  MESSAGE ram memory used: " << aurostd::utype2string(usage_percentage_ram,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_RAM << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      aus << "00000  MESSAGE swap memory used: " << aurostd::utype2string(usage_percentage_swap,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_SWAP << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       if(LDEBUG){cerr << aus.str();}
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
@@ -3317,7 +3319,7 @@ namespace KBIN {
     //
     scheme="MEMORY";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,AFLOW_MEMORY_TAG,RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || (XHOST.vflag_control.flag("KILL_VASP_OOM") && approaching_oom)));
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,AFLOW_MEMORY_TAG,RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || ((1||XHOST.vflag_control.flag("KILL_VASP_OOM")) && approaching_oom)));
     xwarning.flag(scheme,found_warning);
     //
     //on qrats, we see this

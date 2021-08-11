@@ -2465,20 +2465,26 @@ namespace aurostd {
     return sizeout;
   }
 
-  bool GetMemoryUsagePercentage(double& memory_usage_percentage){ //CO20210601
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+  bool GetMemoryUsagePercentage(double& usage_percentage_ram,double& usage_percentage_swap){ //CO20210601
+    bool LDEBUG=(true || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::GetMemoryUsagePercentage():";
 
-    unsigned long long int memory_free=0,memory_total=0;
-    memory_usage_percentage=0.0;
-    bool memory_read=aurostd::GetMemory(memory_free,memory_total);
+    unsigned long long int free_ram=0,total_ram=0;
+    unsigned long long int free_swap=0,total_swap=0;
+    usage_percentage_ram=0.0;usage_percentage_swap=0.0;
+    bool memory_read=aurostd::GetMemory(free_ram,total_ram,free_swap,total_swap);
     if(memory_read){
-      memory_usage_percentage=100.0*(((double)(memory_total-memory_free))/((double)(memory_total)));
+      usage_percentage_ram=100.0*(((double)(total_ram-free_ram))/((double)(total_ram)));
+      usage_percentage_swap=100.0*(((double)(total_swap-free_swap))/((double)(total_swap)));
       if(LDEBUG){
-        cerr << soliloquy << " memory_free=" << memory_free << endl;
-        cerr << soliloquy << " memory_used=" << memory_total-memory_free << endl;
-        cerr << soliloquy << " memory_total=" << memory_total << endl;
-        cerr << soliloquy << " memory_usage_percentage=" << memory_usage_percentage << endl;
+        cerr << soliloquy << " free_ram=" << free_ram << endl;
+        cerr << soliloquy << " used_ram=" << total_ram-free_ram << endl;
+        cerr << soliloquy << " total_ram=" << total_ram << endl;
+        cerr << soliloquy << " usage_percentage_ram=" << usage_percentage_ram << endl;
+        cerr << soliloquy << " free_swap=" << free_swap << endl;
+        cerr << soliloquy << " used_swap=" << total_swap-free_swap << endl;
+        cerr << soliloquy << " total_swap=" << total_swap << endl;
+        cerr << soliloquy << " usage_percentage_swap=" << usage_percentage_swap << endl;
       }
     }
     else{
@@ -2487,7 +2493,7 @@ namespace aurostd {
     return memory_read;
   }
 
-  bool GetMemory(unsigned long long int& free,unsigned long long int& total){ //CO20210315 - only works for linux: needs `free` command
+  bool GetMemory(unsigned long long int& free_ram,unsigned long long int& total_ram,unsigned long long int& free_swap,unsigned long long int& total_swap){ //CO20210315 - only works for linux: needs `free` command
     //https://www.howtogeek.com/456943/how-to-use-the-free-command-on-linux/
     //will grab the total and the free
     //the free is the memory unused by anything
@@ -2507,15 +2513,25 @@ namespace aurostd {
     //              Swap:       2097148           0     2097148
     vector<string> vlines;
     aurostd::string2vectorstring(output,vlines);
-    if(vlines.size()<2){return false;}
-    if(vlines[1].find("Mem:")==string::npos){return false;}
+    if(vlines.size()<3){return false;}
     vector<string> vtokens;
+    //ram
+    if(vlines[1].find("Mem:")==string::npos){return false;}
     aurostd::string2tokens(vlines[1],vtokens," ");
     if(!aurostd::isfloat(vtokens[1])){return false;}
-    total=aurostd::string2utype<unsigned long long int>(vtokens[1]);
+    total_ram=aurostd::string2utype<unsigned long long int>(vtokens[1]);
     if(!aurostd::isfloat(vtokens[3])){return false;}
-    free=aurostd::string2utype<unsigned long long int>(vtokens[3]);
-    if(LDEBUG){cerr << soliloquy << " free=" << free << " total=" << total << endl;}
+    free_ram=aurostd::string2utype<unsigned long long int>(vtokens[3]);
+    if(LDEBUG){cerr << soliloquy << " free_ram=" << free_ram << " total_ram=" << total_ram << endl;}
+    //swap
+    if(vlines[2].find("Swap:")==string::npos){return false;}
+    aurostd::string2tokens(vlines[2],vtokens," ");
+    if(!aurostd::isfloat(vtokens[1])){return false;}
+    total_swap=aurostd::string2utype<unsigned long long int>(vtokens[1]);
+    if(!aurostd::isfloat(vtokens[3])){return false;}
+    free_swap=aurostd::string2utype<unsigned long long int>(vtokens[3]);
+    if(LDEBUG){cerr << soliloquy << " free_swap=" << free_swap << " total_swap=" << total_swap << endl;}
+    //
     return true;
   }
 
