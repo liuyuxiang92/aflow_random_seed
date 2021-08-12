@@ -170,9 +170,13 @@ namespace pocc {
     // properties, might differ for different POCC structures:
     // the temperature region for the averaged POCC "material" is at least the
     // lowest range among the structures
+    int min_id = 0;
     nrows = T_list[0].rows;
     for (uint i=1; i<Nstructures; i++){
-      nrows = std::min(nrows, T_list[i].rows);
+      if (T_list[i].rows < nrows){
+        nrows = T_list[i].rows;
+        min_id = i;
+      }
     }
 
     // check that calculations for POCC structures are consistent and the same
@@ -187,7 +191,7 @@ namespace pocc {
         }
       }
     }
-    T = T_list[0];
+    T = T_list[min_id];
 
     // sanity/corruption check: the number of fitting coefficients should
     // be the same for all POCC structures
