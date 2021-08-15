@@ -461,6 +461,7 @@ class _outreach {
     bool newflag;
     uint year;
     vector<string> vauthor;
+    vector<string> vcorrespondingauthor;
     string title;
     string journal,link,arxiv,supplementary; 
     string place,date;

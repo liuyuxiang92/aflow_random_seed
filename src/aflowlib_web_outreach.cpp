@@ -32,6 +32,7 @@ _outreach::_outreach() {
   wnumber=0;
   year=0;
   vauthor.clear();
+  vcorrespondingauthor.clear();
   title="";
   journal="";
   arxiv="";
@@ -74,6 +75,7 @@ void _outreach::copy(const _outreach& b) {
   wnumber=b.wnumber;
   year=b.year;
   vauthor.clear();for(uint i=0;i<b.vauthor.size();i++) vauthor.push_back(b.vauthor.at(i));
+  vcorrespondingauthor.clear();for(uint i=0;i<b.vcorrespondingauthor.size();i++) vcorrespondingauthor.push_back(b.vcorrespondingauthor.at(i));
   title=b.title;
   journal=b.journal;
   arxiv=b.arxiv;
@@ -159,7 +161,7 @@ uint bibtex2file(string bibtex,string _authors,string _title,string journal,stri
   // FIX THE AUTHORS
   string authors=_authors;
   vector<string> vfix;
-  aurostd::string2tokens("Buongiorno Nardelli,van Roekeghem,Aspuru-Guzik,Hattrick-Simpers,DeCost,de Coss,De Santo,De Gennaro,Al Rahal Al Orabi,de Jong,D'Amico,van der Zwaag,van de Walle,Di Stefano",vfix,",");
+  aurostd::string2tokens("Buongiorno Nardelli,van Roekeghem,Aspuru-Guzik,Hattrick-Simpers,DeCost,de Coss,De Santo,De Gennaro,Al Rahal Al Orabi,de Jong,D'Amico,van der Zwaag,van de Walle,Di Stefano,Ojeda Mota,Simmons Jr.,Mattos Jr.",vfix,",");
   for(uint i=0;i<vfix.size();i++) aurostd::StringSubst(authors,vfix.at(i),string("{"+vfix.at(i)+"}")); // FIX 
   aurostd::StringSubst(authors,".",".~"); 
   aurostd::StringSubst(authors,"~ "," "); 
@@ -1497,7 +1499,25 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
     }
   }
 
-  for(uint i=0;i<voutreach.size();i++) fixlabel(valabel,voutreach.at(i).vauthor);
+  for(uint i=0;i<voutreach.size();i++) {
+    fixlabel(valabel,voutreach.at(i).vauthor);
+    //   cout << voutreach.at(i).vauthor.size() << endl;
+    for(uint j=0;j<voutreach.at(i).vauthor.size();j++) { // fix corresponding  authors
+      aurostd::StringSubst(voutreach.at(i).vauthor.at(j),"*","");  //fix corresponding authors
+      if(0)   {
+	vector<string> tokens;
+	aurostd::string2tokens(voutreach.at(i).vauthor.at(j),tokens," ");
+	if(tokens.size()>2) {
+	  cout << tokens.size() << " [" << voutreach.at(i).vauthor.at(j) << "] ";
+	  for (k=0;k< tokens.size();k++)
+	    cout << tokens.at(k) << " ";
+	  cout << endl;
+	}
+      }
+    }
+  }
+  //  exit(0);
+  
   for(uint i=0;i<voutreach.size();i++) fixlabel(valabel,voutreach.at(i).vextra_html);
   for(uint i=0;i<voutreach.size();i++) fixlabel(valabel,voutreach.at(i).vextra_latex);
   for(uint i=0;i<voutreach.size();i++) fixlabel(vjlabel,voutreach.at(i).journal);
