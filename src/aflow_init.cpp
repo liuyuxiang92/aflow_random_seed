@@ -12,6 +12,7 @@
 
 string _AFLOWIN_; 
 string _AFLOWLOCK_; 
+string _STOPFLOW_;  //CO20210315
 
 // THREADS
 namespace AFLOW_PTHREADS {
@@ -596,8 +597,10 @@ namespace init {
     if(INIT_VERBOSE) oss << "--- LOADING @ _AFLOWIN_ and _AFLOWLOCK_ --- " << endl;
     _AFLOWIN_=aurostd::args2attachedstring(XHOST.argv,"--use_aflow.in=","aflow.in");
     _AFLOWLOCK_=aurostd::args2attachedstring(XHOST.argv,"--use_LOCK=","LOCK");
+    _STOPFLOW_=aurostd::args2attachedstring(XHOST.argv,"--use_stop_file=","STOPFLOW");  //CO20210315
     if(INIT_VERBOSE) oss << "_AFLOWIN_=" << _AFLOWIN_ << endl;
     if(INIT_VERBOSE) oss << "_AFLOWLOCK_=" << _AFLOWLOCK_ << endl;
+    if(INIT_VERBOSE) oss << "_STOPFLOW_=" << _STOPFLOW_ << endl;  //CO20210315
 
     // LOAD control stuff
     if(INIT_VERBOSE) oss << "--- LOADING @ control --- " << endl;
@@ -613,6 +616,9 @@ namespace init {
     XHOST.vflag_control.flag("MULTI=GZ2XZ",aurostd::args2flag(argv,cmds,"--multi=gz2xz"));
     XHOST.vflag_control.flag("MULTI=ZIP",aurostd::args2flag(argv,cmds,"--multi=zip"));
     XHOST.vflag_control.flag("MONITOR",aurostd::args2flag(argv,cmds,"--monitor"));
+    XHOST.vflag_control.flag("MONITOR_VASP",aurostd::args2flag(argv,cmds,"--monitor_vasp"));
+    XHOST.vflag_control.flag("KILL_VASP_ALL",aurostd::args2flag(argv,cmds,"--kill_vasp_all|--killvaspall"));  //CO20210315 - issue non-specific killall vasp command
+    XHOST.vflag_control.flag("KILL_VASP_OOM",aurostd::args2flag(argv,cmds,"--kill_vasp_oom|--killvaspoom"));  //CO20210315 - kill vasp if approaching OOM
     XHOST.vflag_control.flag("GETTEMP",aurostd::args2flag(argv,cmds,"--getTEMP|--getTEMPS|--getTEMPs|--gettemp|--gettemps"));
     XHOST.vflag_control.flag("SWITCH_AFLOW",
         aurostd::args2flag(argv,cmds,"--run|--clean|--xclean|--multi|--generate") ||
@@ -1129,7 +1135,7 @@ namespace init {
     if(LDEBUG) cerr.flush();
     if(LDEBUG) cerr << soliloquy << " XHOST_vLIBS.size()=" << XHOST_vLIBS.size() << " [1]" << endl;
     if(LDEBUG) cerr << soliloquy << " str2load=" << str2load << " [1]" << endl;
-    
+
     if((str2load=="vLIBS" || str2load=="XHOST_vLIBS")) { // && XHOST_vLIBS.size()!=3)
       if(XHOST_vLIBS.size()) for(uint i=0;i<XHOST_vLIBS.size();i++) XHOST_vLIBS.at(i).clear();
       XHOST_vLIBS.clear();
@@ -1381,13 +1387,13 @@ namespace init {
     if(str=="AFLOW_PSEUDOPOTENTIALS_LIST_TXT") { if(XHOST_AFLOW_PSEUDOPOTENTIALS_LIST_TXT.empty()) { return XHOST_AFLOW_PSEUDOPOTENTIALS_LIST_TXT=init::InitLoadString(str,LVERBOSE);} else { return XHOST_AFLOW_PSEUDOPOTENTIALS_LIST_TXT;}} // LOADED TXTS
     if(str=="f144468a7ccc2d3a72ba44000715efdb") {
       if(XHOST_f144468a7ccc2d3a72ba44000715efdb.empty()) {
-	//	cerr << "init::InitGlobalObject" << " [1a]" << endl;
-	XHOST_f144468a7ccc2d3a72ba44000715efdb=init::InitLoadString(str,LVERBOSE);
-	//	cerr << "init::InitGlobalObject" << " [1b]" << endl;
+        //	cerr << "init::InitGlobalObject" << " [1a]" << endl;
+        XHOST_f144468a7ccc2d3a72ba44000715efdb=init::InitLoadString(str,LVERBOSE);
+        //	cerr << "init::InitGlobalObject" << " [1b]" << endl;
         return XHOST_f144468a7ccc2d3a72ba44000715efdb;
       } else {
-	//	cerr << "init::InitGlobalObject" << " [2]" << endl;
-	return XHOST_f144468a7ccc2d3a72ba44000715efdb;
+        //	cerr << "init::InitGlobalObject" << " [2]" << endl;
+        return XHOST_f144468a7ccc2d3a72ba44000715efdb;
       }
     } // LOADED TXTS
     // [OBSOLETE] if(str=="d0f1b0e47f178ae627a388d3bf65d2d2") { if(XHOST_d0f1b0e47f178ae627a388d3bf65d2d2.empty()) { return XHOST_d0f1b0e47f178ae627a388d3bf65d2d2=init::InitLoadString(str,LVERBOSE);} else { return XHOST_d0f1b0e47f178ae627a388d3bf65d2d2;}} // LOADED TXTS
@@ -1620,7 +1626,7 @@ namespace init {
 // ***************************************************************************
 // AFLOW_getTEMP
 // ***************************************************************************
-uint AFLOW_getTEMP(vector<string> argv) {
+uint AFLOW_getTEMP(const vector<string>& argv) {
   bool LDEBUG=(TRUE || XHOST.DEBUG);
   bool RUNBAR=aurostd::args2flag(argv,"--runbar|--RUNBAR|--runBAR|--bar|--BAR");
   bool RUNSTAT=aurostd::args2flag(argv,"--runstat|--RUNSTAT|--runSTAT|--stat|--STAT");
@@ -1700,7 +1706,7 @@ uint AFLOW_getTEMP(vector<string> argv) {
 // ***************************************************************************
 // AFLOW_monitor
 // ***************************************************************************
-uint AFLOW_monitor(vector<string> argv) {
+uint AFLOW_monitor(const vector<string>& argv) {
   cout << "MMMMM  Aflow: starting AFLOW_monitor" << endl;
   cerr << "MMMMM  Aflow: starting AFLOW_monitor" << endl;
 
@@ -1783,12 +1789,21 @@ string aflow_convert_time_ctime2aurostd(const string& time_LOCK){ //CO20200624
   //https://en.cppreference.com/w/c/chrono/strftime
   //'Www Mmm dd hh:mm:ss yyyy' === '%a %b %d %H:%M:%S %Y'
   //https://stackoverflow.com/questions/19524720/using-strptime-converting-string-to-time-but-getting-garbage
-  struct tm tstruct;
+  tm tstruct;
   if(!strptime(time_LOCK.c_str(),"%a %b %d %H:%M:%S %Y",&tstruct)){return "";}
+  tstruct.tm_isdst=-1;  //let computer figure it out
+  std::mktime(&tstruct);  //get is_dst
+
+  if(LDEBUG){
+    char buffer[30];
+    strftime(buffer,30,"%F %T %Z",&tstruct);
+    cerr << soliloquy << " tstruct=" << buffer << endl;
+  }
 
   if(LDEBUG){cerr << soliloquy << " END" << endl;}
 
-  return aurostd::get_datetime(&tstruct);
+  bool include_utc_offset=true;
+  return aurostd::get_datetime(tstruct,include_utc_offset);
 }
 
 // ***************************************************************************
@@ -1839,7 +1854,7 @@ string aflow_get_time_string_short(void) {
 // ***************************************************************************
 // Messages
 // ***************************************************************************
-double AFLOW_checkMEMORY(string progname,double memory) {
+double AFLOW_checkMEMORY(const string& progname,double memory) {
   vector<string> vps,tokens;string command;
   double maxmem=0.0;
   if(progname.empty()) aurostd::string2vectorstring(aurostd::execute2string("ps aux | grep -v \" 0.0  0.0 \" | grep "+XHOST.user),vps);
@@ -1862,10 +1877,456 @@ double AFLOW_checkMEMORY(string progname,double memory) {
 }
 
 // ***************************************************************************
+// GetVASPBinaryFromLOCK
+// ***************************************************************************
+bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin){  //CO20210315
+  int ncpus=0;
+  return GetVASPBinaryFromLOCK(directory,vasp_bin,ncpus);
+}
+bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin,int& ncpus){  //CO20210315
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"GetVASPBinaryFromLOCK():";
+
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+  //reset
+  vasp_bin="";
+  ncpus=0;
+
+  if(LDEBUG){cerr << soliloquy << " looking for " << directory+"/"+_AFLOWLOCK_ << endl;}
+  if(!aurostd::FileExist(directory+"/"+_AFLOWLOCK_)){return false;}
+  if(LDEBUG){cerr << soliloquy << " FOUND " << directory+"/"+_AFLOWLOCK_ << endl;}
+
+  uint i=0,j=0,vlines_size=0,vtokens_size=0;
+  vector<string> vlines,vtokens;
+  vlines_size=aurostd::file2vectorstring(directory+"/"+_AFLOWLOCK_,vlines);
+  if(LDEBUG){cerr << soliloquy << " " << directory+"/"+_AFLOWLOCK_ << " contains " << vlines_size << " lines" << endl;}
+
+  for(i=vlines_size-1;i<vlines_size;i--){ //go backwards
+    if(vlines[i].find(VASP_KEYWORD_EXECUTION)==string::npos){continue;} //look for 'Executing:' line
+    if(LDEBUG){cerr << soliloquy << " found line containing execution command: \"" << vlines[i] << "\"" << endl;}
+    vtokens_size=aurostd::string2tokens(vlines[i],vtokens," ");
+    for(j=2;j<vtokens_size;j++){
+      if(vtokens[j]==DEFAULT_VASP_OUT||vtokens[j]==DEFAULT_VASP_OUT+";"){ //looking for sequence VASP_BIN >> VASP_OUT //if j goes below 0, then it goes to max uint //CO20210315 - adding semicolon as NO HOST mode used to print it
+        vasp_bin=vtokens[j-2];
+        ncpus=1;  //set default
+        if(j>2 && aurostd::isfloat(vtokens[j-3])){ncpus=aurostd::string2utype<int>(vtokens[j-3]);} //grab if available, it will be just before the bin
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+// ***************************************************************************
+// processFlagsFromLOCK
+// ***************************************************************************
+void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed){  //CO20210315
+  bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || XHOST.DEBUG);
+  string soliloquy=XPID+"processFlagsFromLOCK():";
+
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+  if(!aurostd::FileExist(xvasp.Directory+"/"+_AFLOWLOCK_)){return;}
+
+  uint i=0;
+
+  //clear out past options
+  //[needs to be targeted, keep FLAG::AFIX_DRYRUN]xvasp.aopts.clear();
+  vector<string> flags;
+  flags=xvasp.aopts.vxscheme;
+  for(i=0;i<flags.size();i++){ //capture all _PRESERVED flags (KPOINTS, POSCAR, etc.)
+    const string& flag=flags[i];
+    if(flag.find("FLAG::")!=string::npos && flag.find("_PRESERVED")!=string::npos){xvasp.aopts.flag(flag,false);}
+  }
+  vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.clear();
+  vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved=false;
+  xfixed.clear();
+
+  uint vlines_size=0;
+  vector<string> vlines,vtokens;
+  vlines_size=aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines);
+
+  string str_xvasp_aopts_start="xvasp.aopts.flag(\"";
+  string str_vflags_ignore_afix_start="vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"";
+  string str_xfixed_start="xfixed.flag(\"";
+  string str_flag_end="\")=1";
+  string scheme="";
+
+  string::size_type loc_start=0,loc_end=0;
+
+  uint nexecuting=0;
+  for(i=vlines_size-1;i<vlines_size;i--){ //go backwards
+    const string& line=vlines[i];
+    if(line.find(VASP_KEYWORD_EXECUTION)!=string::npos){nexecuting++;} //look for 'Executing:' line
+    if(LDEBUG){
+      cerr << soliloquy << " vlines[i=" << i << "]=" << line << endl;
+      cerr << soliloquy << " nexecuting=" << nexecuting << endl;
+    }
+    if(nexecuting>1){break;}
+
+    loc_start=line.find(str_xvasp_aopts_start);
+    loc_end=line.find(str_flag_end);
+    if(loc_start!=string::npos && loc_end!=string::npos){
+      scheme=line.substr(loc_start+str_xvasp_aopts_start.length(),loc_end-(loc_start+str_xvasp_aopts_start.length()));
+      xvasp.aopts.flag(scheme,true);
+    }
+
+    loc_start=line.find(str_vflags_ignore_afix_start);
+    loc_end=line.find(str_flag_end);
+    if(loc_start!=string::npos && loc_end!=string::npos){
+      scheme=line.substr(loc_start+str_vflags_ignore_afix_start.length(),loc_end-(loc_start+str_vflags_ignore_afix_start.length()));
+      vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(scheme,true);
+    }
+
+    if(line.find("vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved=1")!=string::npos){vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved=true;}
+
+    loc_start=line.find(str_xfixed_start);
+    loc_end=line.find(str_flag_end);
+    if(loc_start!=string::npos && loc_end!=string::npos){
+      scheme=line.substr(loc_start+str_xfixed_start.length(),loc_end-(loc_start+str_xfixed_start.length()));
+      xfixed.flag(scheme,true);
+    }
+
+  }
+
+  if(LDEBUG){
+    cerr << soliloquy << " printing xvasp.aopts" << endl;
+    for(uint i=0;i<xvasp.aopts.vxscheme.size();i++){cerr << soliloquy << " xvasp.aopts.flag(\"" << xvasp.aopts.vxscheme[i] << "\")=" << xvasp.aopts.flag(xvasp.aopts.vxscheme[i]) << endl;}
+    cerr << soliloquy << " printing xfixed" << endl;
+    for(uint i=0;i<xfixed.vxscheme.size();i++){cerr << soliloquy << " xfixed.flag(\"" << xfixed.vxscheme[i] << "\")=" << xfixed.flag(xfixed.vxscheme[i]) << endl;}
+  }
+}
+
+// ***************************************************************************
+// AFLOW_VASP_instance_running
+// ***************************************************************************
+bool AFLOW_VASP_instance_running(){ //CO20210315
+  string soliloquy=XPID+"AFLOW_VASP_instance_running():";
+  //this needs to become more complicated as we add options other than --kill_vasp_all
+  if(XHOST.vflag_control.flag("MONITOR_VASP") && XHOST.vflag_control.flag("KILL_VASP_ALL")==false){
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a targeted kill command for VASP not available yet: try --kill_vasp_all",_INPUT_ILLEGAL_);
+  }
+  return (aurostd::ProcessPIDs("aflow").size()>1);  //check that the instance of aflow running vasp is running
+}
+
+// ***************************************************************************
+// AFLOW_MONITOR_instance_running
+// ***************************************************************************
+bool AFLOW_MONITOR_instance_running(const _aflags& aflags){ //CO20210315
+  string soliloquy=XPID+"AFLOW_MONITOR_instance_running():";
+  //this needs to become more complicated as we add options other than --kill_vasp_all
+  if(XHOST.vflag_control.flag("MONITOR_VASP") && XHOST.vflag_control.flag("KILL_VASP_ALL")==false){ //CO20210315 - this check doesn't really apply, we wouldn't call this function if we were running with --monitor_vasp, but it's a good reminder that this code needs to become smarter in the future with flags other than --kill_vasp_all
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a targeted kill command for VASP not available yet: try --kill_vasp_all",_INPUT_ILLEGAL_);
+  }
+  return aurostd::FileExist(aflags.Directory+"/"+_AFLOWLOCK_+"."+FILE_VASP_MONITOR);
+}
+
+// ***************************************************************************
+// VASP_instance_running
+// ***************************************************************************
+bool VASP_instance_running(const string& vasp_bin){ //CO20210315
+  string soliloquy=XPID+"VASP_instance_running():";
+  //this needs to become more complicated as we add options other than --kill_vasp_all
+  if(XHOST.vflag_control.flag("MONITOR_VASP") && XHOST.vflag_control.flag("KILL_VASP_ALL")==false){
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a targeted kill command for VASP not available yet: try --kill_vasp_all",_INPUT_ILLEGAL_);
+  }
+  return aurostd::ProcessRunning(vasp_bin);
+}
+
+// ***************************************************************************
+// AFLOW_monitor_VASP
+// ***************************************************************************
+#define NCOUNTS_WAIT_MONITOR 10 //wait no more than 10*sleep_seconds (should be 10 minutes)
+void AFLOW_monitor_VASP(){  //CO20210601
+  //AFLOW_monitor_VASP() with no input arguments will look for FILE/DIRECTORY input from XHOST (--FILE or --D)
+  //then it will pass the path to AFLOW_monitor_VASP(const string& directory)
+  //this function will keep reading the --FILE input for new directories
+  bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || XHOST.DEBUG);
+  string soliloquy=XPID+"AFLOW_monitor_VASP():";
+
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+  string directory="";
+
+  if(XHOST.vflag_control.flag("FILE")){
+    if(LDEBUG){cerr << soliloquy << " found FILE input: " << XHOST.vflag_control.getattachedscheme("FILE") << endl;}
+    uint nfailures=0,nsuccesses=0;  //nfailures waits for file to be written, nsuccesses makes sure we didn't run out of directories
+    string file=XHOST.vflag_control.getattachedscheme("FILE");
+    string file_dir=aurostd::dirname(file);
+    vector<string> vlines,vtokens;
+    uint i=0,j=0,vlines_size=0,vtokens_size=0;
+    bool found=false;
+    string search_str="[dir=";
+    string directory_old="";
+    while(nfailures<NCOUNTS_WAIT_MONITOR && nsuccesses<NCOUNTS_WAIT_MONITOR){  //10 minutes, keeps us from wasting walltime
+      if(!aurostd::FileExist(file)){
+        if(LDEBUG){cerr << soliloquy << " FILE not yet found, waiting...: FILE=" << file << endl;}
+        nfailures++;  //increment, only wait 10 minutes for a file to be written
+        aurostd::Sleep(SECONDS_SLEEP_VASP_MONITOR);
+        continue;
+      }
+      if(LDEBUG){cerr << soliloquy << " FILE found: FILE=" << file << endl;}
+      nfailures=0;  //reset
+      vlines_size=aurostd::file2vectorstring(file,vlines);
+      found=false;
+      for(i=vlines_size-1;i<vlines_size&&!found;i--){ //go backwards
+        //looking for "... - [dir=.] - [user=aflow] ..."
+        if(vlines[i].find(search_str)==string::npos){continue;}
+        if(LDEBUG){cerr << soliloquy << " found line containing \"" << search_str << "\": " << vlines[i] << endl;}
+        vtokens_size=aurostd::string2tokens(vlines[i],vtokens," ");
+        for(j=0;j<vtokens_size&&!found;j++){
+          if(vtokens[j].find(search_str)==string::npos){continue;}
+          directory=vtokens[j];
+          aurostd::StringSubst(directory,search_str,"");aurostd::StringSubst(directory,"]","");
+          found=true;
+          if(LDEBUG){cerr << soliloquy << " dir=" << directory << endl;}
+          if(directory==directory_old){ //increment, only wait 10 minutes for a new directory to be found
+            if(LDEBUG){cerr << soliloquy << " already ran this directory, waiting...: dir=" << directory << endl;}
+            nsuccesses++;
+            continue;
+          }
+          if(LDEBUG){cerr << soliloquy << " found directory to run: dir=" << directory << endl;}
+          directory_old=directory;
+          nsuccesses=0;
+          AFLOW_monitor_VASP(directory);
+        }
+      }
+      //if --FILE=LOCK, this will be useful
+      if(aurostd::EFileExist(file_dir+"/"+DEFAULT_AFLOW_END_OUT)){break;}
+      if(aurostd::EFileExist(file_dir+"/"+_STOPFLOW_)){aurostd::RemoveFile(file_dir+"/"+_STOPFLOW_);break;}
+
+      aurostd::Sleep(SECONDS_SLEEP_VASP_MONITOR);
+
+      //if --FILE=LOCK, this will be useful
+      if(aurostd::EFileExist(file_dir+"/"+DEFAULT_AFLOW_END_OUT)){break;}
+      if(aurostd::EFileExist(file_dir+"/"+_STOPFLOW_)){aurostd::RemoveFile(file_dir+"/"+_STOPFLOW_);break;}
+    }
+  }
+  else if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){
+    if(LDEBUG){cerr << soliloquy << " found DIRECTORY input: " << XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN") << endl;}
+    directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");
+    return AFLOW_monitor_VASP(directory);
+  }
+  else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no directory input provided",_INPUT_ILLEGAL_);}
+  if(LDEBUG){cerr << soliloquy << " END" << endl;}
+}
+
+void AFLOW_monitor_VASP(const string& directory){ //CO20210601
+  //AFLOW_monitor_VASP() with no input arguments will look for FILE/DIRECTORY input from XHOST (--FILE or --D)
+  //then it will pass the path to AFLOW_monitor_VASP(const string& directory)
+  //this function will finish once the calculation in the particular directory finishes
+  string soliloquy=XPID+"AFLOW_monitor_VASP():";
+  stringstream message;
+
+  //aflags
+  _aflags aflags;
+  aflags.Directory=directory;
+  if(directory.empty()){return;} //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"directory input is empty",_INPUT_ILLEGAL_);
+  if(!aurostd::FileExist(aflags.Directory+"/"+_AFLOWIN_)){return;}
+
+  //output objects
+  ofstream FileMESSAGE,FileMESSAGE_devnull;
+  string FileNameLOCK=aflags.Directory+"/"+_AFLOWLOCK_+"."+FILE_VASP_MONITOR;
+  FileMESSAGE.open(FileNameLOCK.c_str(),std::ios::out);
+  bool oss_silent=true;
+  ostream& oss=cout;if(oss_silent){oss.setstate(std::ios_base::badbit);}  //like NULL - cannot print to cout with two instances of aflow running
+
+  message << aflow::Banner("BANNER_NORMAL");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
+
+  //aflow.in
+  string AflowIn_file="",AflowIn="";
+  try{KBIN::getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,FileMESSAGE,oss);}
+  catch(aurostd::xerror& err){
+    pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+    return;
+  }
+
+  //other flags
+  _kflags kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,FileMESSAGE,aflags,oss);
+  _vflags vflags=KBIN::VASP_Get_Vflags_from_AflowIN(AflowIn,FileMESSAGE,aflags,kflags,oss);
+
+  _xvasp xvasp;
+  xvasp.Directory=aflags.Directory; //arun_directory;
+  message << "START        - " << xvasp.Directory;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_); //include directory so noticeable space remains
+  AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
+  xvasp.aopts.flag("FLAG::AFIX_DRYRUN",true); //VERY IMPORTANT
+
+  //a note about xmonitor: it only controls the amount of output to the LOCK file, it does NOT affect performance
+
+  int nloop=1;
+  uint i=0;
+  uint nexecuting=0,nexecuting_old=0;
+  uint n_not_running=0;
+  uint sleep_seconds=SECONDS_SLEEP_VASP_MONITOR;
+  uint sleep_seconds_afterkill=sleep_seconds;
+  aurostd::xoption xmessage,xwarning,xmonitor,xfixed;
+  bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP);
+  bool vasp_running=false;
+  uint vlines_lock_size=0;
+  vector<string> vlines_lock;
+
+  //there are issues getting the correct vasp binary since this is an entirely different aflow instance
+  //we might run the other aflow instance with --mpi or --machine flags that affect which vasp binary we use
+  //therefore, the most robust way to define the binary is to search the LOCK file
+  //[CO20210315 - OBSOLETE]string& vasp_bin=kflags.KBIN_MPI_BIN;
+  //[CO20210315 - OBSOLETE]if(!(kflags.KBIN_MPI==true||XHOST.MPI==true)){vasp_bin=kflags.KBIN_BIN;}
+
+  //CO20210315 - when we generalize this code to run for targeted instances of vasp, we also need to target the right instances of aflow
+
+  string vasp_bin="";
+  int ncpus=0;
+  nloop=0;
+  string memory_string="";
+  double memory_usage_percentage=0;
+
+  while((AFLOW_VASP_instance_running() || (nloop++)<NCOUNTS_WAIT_MONITOR) && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
+    GetVASPBinaryFromLOCK(xvasp.Directory,vasp_bin,ncpus);
+    vasp_bin=aurostd::basename(vasp_bin); //remove directory stuff
+    if(vasp_bin.empty()){
+      if(VERBOSE){message << "sleeping for " << sleep_seconds_afterkill << " seconds, waiting for VASP binary to start running and " << _AFLOWLOCK_ << " to be written";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+      aurostd::Sleep(sleep_seconds_afterkill); //sleep at least a minute to let aflow start up
+      continue;
+    }
+  }
+  if(vasp_bin.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no vasp binary found in "+xvasp.Directory+"/"+_AFLOWLOCK_,_RUNTIME_ERROR_);}
+  message << "vasp_binary=\"" << vasp_bin << "\" (from " << _AFLOWLOCK_ << ")";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+  nloop=0;
+  n_not_running=0;
+  while(AFLOW_VASP_instance_running() || n_not_running<NCOUNTS_WAIT_MONITOR){  //wait no more than 10 minutes for vasp bin to start up (again)
+    if(!aurostd::FileExist(xvasp.Directory+"/"+_AFLOWLOCK_)){break;} //we needed it above to get the vasp_bin
+    if(aurostd::EFileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_END_OUT)){break;}  //check before continue below
+    if(aurostd::EFileExist(xvasp.Directory+"/"+_STOPFLOW_)){aurostd::RemoveFile(xvasp.Directory+"/"+_STOPFLOW_);break;} //check before continue below
+
+    vasp_running=VASP_instance_running(vasp_bin);
+    if(VERBOSE){
+      message << "nloop=" << (nloop++);pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      message << "program \"" << vasp_bin << "\" is " << (vasp_running?"":"NOT ") << "running";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    }
+    if(vasp_running==false){
+      n_not_running++;
+      if(VERBOSE){message << "sleeping for " << sleep_seconds_afterkill << " seconds, waiting for \"" << vasp_bin << "\" to start running";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+      aurostd::Sleep(sleep_seconds_afterkill); //sleep at least a minute to let aflow sleep since OUTCAR is incomplete
+      continue;
+    }
+    n_not_running=0;  //reset
+
+    //determine whether we need to clear xmonitor with new vasp instance (relax1->relax2)
+    nexecuting=0;
+    vlines_lock_size=aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines_lock);  //we already checked above that it exists
+    for(i=0;i<vlines_lock_size;i++){
+      if(vlines_lock[i].find(VASP_KEYWORD_EXECUTION)==string::npos){continue;}
+      nexecuting++;
+    }
+    if(nexecuting!=nexecuting_old){
+      message << "found new instance of \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      xmonitor.clear(); //new run, clear IGNORE_WARNINGS //we've transitioned from relax1->relax2, etc.
+      nexecuting_old=nexecuting;
+    }
+
+    //check vasp output file here
+    KBIN::VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,xmonitor,FileMESSAGE);
+
+    //check memory again, it's possible it floated above the threshold only for a second
+    memory_usage_percentage=0.0;
+    if(0){  //do not turn off MEMORY because it fails GetMemory(), it's possible MEMORY was triggered for other reasons (e.g., FROZEN_CALC)
+      if(xwarning.flag("MEMORY")){
+        bool ignore_memory=false;
+        if(aurostd::GetMemoryUsagePercentage(memory_usage_percentage)==false){
+          message << "ignoring xwarning.flag(\"MEMORY\"), could not retrieve memory status";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+          ignore_memory=true;
+        }else{
+          if(memory_usage_percentage<MEMORY_MAX_USAGE){
+            message << "ignoring xwarning.flag(\"MEMORY\"), memory usage dropped below threshold ("+aurostd::utype2string(memory_usage_percentage,2,FIXED_STREAM)+"% memory usage)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+            ignore_memory=true;
+          }
+        }
+        if(ignore_memory){xwarning.flag("MEMORY",false);}
+      }
+    }
+
+    bool kill_vasp=false;
+    if(xwarning.flag()){  //if any flag is on
+      kill_vasp=true;
+      //the --monitor_vasp instance will not have the right ncpus set, so grab it from the LOCK
+      GetVASPBinaryFromLOCK(xvasp.Directory,vasp_bin,ncpus);  //grab ncpus and set to kflags.KBIN_MPI_NCPUS
+      vasp_bin=aurostd::basename(vasp_bin); //remove directory stuff
+      if(ncpus>0){kflags.KBIN_MPI_NCPUS=ncpus;}
+      //HERE: plug in exceptions from xfixed, etc. to turn OFF kill_vasp
+      //read LOCK to see what has been issued already
+      processFlagsFromLOCK(xvasp,vflags,xfixed);
+      xfixed.flag("ALL",false); //otherwise new attempts cannot be tried
+      if(VERBOSE){message << "ls (pre)" << endl << aurostd::execute2string("ls -l") << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+      if(!KBIN::VASP_FixErrors(xvasp,xmessage,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE)){
+        if(xwarning.flag("CALC_FROZEN")==false && xwarning.flag("OUTPUT_LARGE")==false){  //kill vasp if the calc is frozen (no solution)
+          kill_vasp=false;
+          message << "kill_vasp=" << kill_vasp << ": all fixes exhausted" << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+        }
+      }
+      if(VERBOSE){message << "ls (post)" << endl << aurostd::execute2string("ls -l") << endl;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+    }
+
+    //it's possible KBIN::VASP_ProcessWarnings() takes a long time (big vasp.out)
+    //double check that there isn't a new instance of vasp running
+    nexecuting=0;
+    vlines_lock_size=aurostd::file2vectorstring(xvasp.Directory+"/"+_AFLOWLOCK_,vlines_lock);  //we already checked above that it exists
+    for(i=0;i<vlines_lock_size;i++){
+      if(vlines_lock[i].find(VASP_KEYWORD_EXECUTION)==string::npos){continue;}
+      nexecuting++;
+    }
+    if(nexecuting!=nexecuting_old){
+      message << "found new instance of \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      kill_vasp=false;
+      nexecuting_old=nexecuting;
+    }
+
+    if(kill_vasp){
+      if(XHOST.vflag_control.flag("KILL_VASP_ALL")){
+        vasp_running=VASP_instance_running(vasp_bin);
+        if(vasp_running){
+          //special case for MEMORY, the error will be triggered in the --monitor_vasp instance, and not in the --run one
+          //so write out "AFLOW ERROR: AFLOW_MEMORY" so it gets caught in the --run instance
+          if(xwarning.flag("MEMORY")){
+            memory_string=" "+string(AFLOW_MEMORY_TAG); //pre-pending space to match formatting
+            if(aurostd::GetMemoryUsagePercentage(memory_usage_percentage)){
+              memory_string+=" ("+aurostd::utype2string(memory_usage_percentage,2,FIXED_STREAM)+"% memory usage)";  //CO20210315 - use fixed stream here, since we'll have two sig figs before decimal, and two after (99.99%)
+            }
+            memory_string+="\n";
+            aurostd::string2file(memory_string,xvasp.Directory+"/"+DEFAULT_VASP_OUT,"APPEND");
+          }
+          //write BEFORE issuing the kill, the other instance of aflow will start to act as soon as the process is dead
+          message << "issuing kill command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+          aurostd::ProcessKill(vasp_bin);
+        }else{
+          message << "\""+vasp_bin+"\" has died before the kill command could be issued";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+        }
+        xmonitor.clear(); //new run, clear IGNORE_WARNINGS
+        message << "sleeping for " << sleep_seconds_afterkill << " seconds after kill command";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+        aurostd::Sleep(sleep_seconds_afterkill); //there are two aflow instances. the aflow-monitor should sleep at least a minute, as (in the worst case) aflow-vasp needs 15-30 seconds to sleep while it waits for an incomplete OUTCAR to finish writing. you don't want aflow-vasp to pick up AFTER aflow-monitor.
+      }else{  //to be developed
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a targeted kill command for VASP not available yet: try --kill_vasp_all",_INPUT_ILLEGAL_);
+      }
+    }
+
+    if(aurostd::EFileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_END_OUT)){break;}
+    if(aurostd::EFileExist(xvasp.Directory+"/"+_STOPFLOW_)){aurostd::RemoveFile(xvasp.Directory+"/"+_STOPFLOW_);break;}
+
+    if(VERBOSE){message << "sleeping for " << sleep_seconds << " seconds";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+    aurostd::Sleep(sleep_seconds);
+
+    if(aurostd::EFileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_END_OUT)){break;}
+    if(aurostd::EFileExist(xvasp.Directory+"/"+_STOPFLOW_)){aurostd::RemoveFile(xvasp.Directory+"/"+_STOPFLOW_);break;}
+  }
+  message << "END        - " << xvasp.Directory;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_); //include directory so noticeable space remains
+  FileMESSAGE.flush();FileMESSAGE.clear();FileMESSAGE.close();
+}
+
+// ***************************************************************************
 // Messages
 // ***************************************************************************
 pthread_mutex_t mutex_INIT_Message=PTHREAD_MUTEX_INITIALIZER;
-string Message(const string& list2print) {
+string Message(const string& filename,const string& list2print){
   pthread_mutex_lock(&mutex_INIT_Message);
   // pthread_mutex_unlock(&mutex_INIT_Message);
   stringstream strout;
@@ -1885,23 +2346,14 @@ string Message(const string& list2print) {
   //if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("vasp",XHOST.maxmem);  //CO20170628 - this is already run above, very slow
   // if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("aflow",XHOST.maxmem);
   // if(XHOST.maxmem>0.0 && XHOST.maxmem<100.0) AFLOW_checkMEMORY("clamd",XHOST.maxmem);
+  if(!filename.empty()) strout << " - ["  <<  filename << "]";  //CO20200713
   return strout.str();
 }
-
-//[CO20200713 - OBSOLETE]string Message(const string& str1,const string& list2print) {return string(" - "+str1+Message(list2print));}
-string Message(const string& list2print,const string& filename) { //CO20200713
-  stringstream strout;  //CO20200713
-  strout << Message(list2print);  //CO20200624 - do not check for empty - print ERROR_TEMPERATURE
-  if(!filename.empty()) strout << " - ["  <<  filename << "]";  //CO20200713
-  return strout.str();  //CO20200713
-}
-//string Message(const _aflags& aflags) {return string(" - "+aflags.Directory + "\n");}
-string Message(const _aflags& aflags) {return Message(aflags,_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_);}
-string Message(const _aflags& aflags,const string& list2print,const string& filename) { //CO20200713
+string Message(const string& filename,const _aflags& aflags,const string& list2print){ //CO20200713
   stringstream strout;  //CO20200713
   if(!list2print.empty()) strout << " - [dir=" << aflags.Directory << "]";  //CO20200713
   if(AFLOW_PTHREADS::FLAG) strout << " - [thread=" << aurostd::utype2string(aflags.AFLOW_PTHREADS_NUMBER) << "/" << aurostd::utype2string(AFLOW_PTHREADS::MAX_PTHREADS) << "]"; //CO20200713
-  strout << Message(list2print,filename); //CO20200713
+  strout << Message(filename,list2print); //CO20200713
   return strout.str();  //CO20200713
 }
 

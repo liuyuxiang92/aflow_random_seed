@@ -194,7 +194,7 @@ void CalculateNewStateAFLOW(string & SL_name) {
 
 double GetResultFromAFLOW() {
   // get the calculated formation_energy_per_atom from aflow
-  // the results are read from aflow.qmvasp.out.bz2
+  // the results are read from DEFAULT_AFLOW_QMVASP_OUT.bz2
   // commands used here depend on the output format of aflow
 
   // change everything back to the mode "655"

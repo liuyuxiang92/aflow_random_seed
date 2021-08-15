@@ -188,8 +188,8 @@ namespace aflowlib {
 
   void AflowDB::initializeExtraSchema() {
     vschema_extra.clear();
-    vschema_extra.push_attached("SCHEMA::NAME::ALLOY", "alloy");
-    vschema_extra.push_attached("SCHEMA::TYPE::ALLOY", "string");
+    vschema_extra.push_attached("SCHEMA::NAME:ALLOY", "alloy");
+    vschema_extra.push_attached("SCHEMA::TYPE:ALLOY", "string");
   }
 
 }  // namespace aflowlib
@@ -226,7 +226,7 @@ namespace aflowlib {
     // If there is a temporary database file, a rebuild process is either in
     // progress or failed.
     if (aurostd::FileExist(tmp_file)) {
-      long int tm_tmp = aurostd::FileModificationTime(tmp_file);
+      long int tm_tmp = aurostd::GetTimestampModified(tmp_file);
       time_t t = std::time(NULL); //DX20200319 - nullptr -> NULL
       long int tm_curr = (long int) t;
       int pid = -1;
@@ -530,6 +530,7 @@ namespace aflowlib {
         uint k = 0;
         for (k = 0; k < nkeys; k++) {
           key = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
+          types_schema[k] = aurostd::RemoveSubString(types_schema[k], " COLLATE NOCASE");  // TEXT may contain directive to be case insensitive
           if (key.empty()) key = vschema_extra.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
           if (!aurostd::WithinList(columns, key, index)) break;
           if (types_db[index] != types_schema[k]) break;
@@ -555,10 +556,10 @@ namespace aflowlib {
         }
       }
 
-      long int tm_db = aurostd::FileModificationTime(database_file);
+      long int tm_db = aurostd::GetTimestampModified(database_file);
       int i = 0;
       for (i = 0; i < _N_AUID_TABLES_; i++) {
-        if (aurostd::FileModificationTime(json_files[i]) > tm_db) break;
+        if (aurostd::GetTimestampModified(json_files[i]) > tm_db) break;
       }
       rebuild_db = (i != _N_AUID_TABLES_);
 
@@ -616,7 +617,7 @@ namespace aflowlib {
     if (npatch_input == 0) return 0;  // No files, so nothing to patch
 
     long int tm_db = 0;
-    if (check_timestamps) tm_db = aurostd::FileModificationTime(database_file);
+    if (check_timestamps) tm_db = aurostd::GetTimestampModified(database_file);
 
     // Check files that need to be patched
     for (uint i = 0; i < npatch_input; i++) {
@@ -635,7 +636,7 @@ namespace aflowlib {
         }
       }
 
-      if (!check_timestamps || (aurostd::FileModificationTime(filename) > tm_db)) {
+      if (!check_timestamps || (aurostd::GetTimestampModified(filename) > tm_db)) {
         patch_files.push_back(filename);
         message << "Adding file " << filename << " to patch list.";
       } else {
@@ -944,11 +945,11 @@ namespace aflowlib {
       type = XHOST.vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
       if (type.empty()) type = vschema_extra.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
       if (unique && (keys[k] == "AUID")) {
-        types[k] = "TEXT UNIQUE NOT NULL";
+        types[k] = "TEXT UNIQUE NOT NULL COLLATE NOCASE";  // Make string search not case sensitive
       } else if (type == "number") {
         types[k] = "REAL";
       } else {
-        types[k] = "TEXT";
+        types[k] = "TEXT COLLATE NOCASE";  // Make string search not case sensitive
       }
     }
     return types;
@@ -969,22 +970,24 @@ namespace aflowlib {
 
       // Check for synonyms for changed parameter names
       if (value.empty()) {
-        if (cols[c] == "aflow_prototype_label_relax") {
-          value = aurostd::extractJsonValueAflow(entry, "anrl_label_relax");
+        if (cols[c] == "ldau_type") {
+          value = "0"; // if no LDAU type in json, assume it's 0 (no LDAU)
+        } else if (cols[c] == "aflow_prototype_label_relax") {
+          value = aurostd::extractJsonValueAflow(entry, "anrl_label_relax"); //replace anrl_label_relax with aflow_prototype_label_relax - DO NOT TOUCH
         } else if (cols[c] == "aflow_prototype_label_orig") {
-          value = aurostd::extractJsonValueAflow(entry, "anrl_label_orig");
+          value = aurostd::extractJsonValueAflow(entry, "anrl_label_orig"); //replace anrl_label_orig with aflow_prototype_label_orig - DO NOT TOUCH
         } else if (cols[c] == "aflow_prototype_params_list_relax") {
-          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_list_relax");
-          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_list_relax");
+          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_list_relax"); //replace anrl_parameter_list_relax with aflow_prototype_params_list_relax - DO NOT TOUCH
+          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_list_relax"); //replace anrl_prototype_parameter_list_relax with aflow_prototype_params_list_relax - DO NOT TOUCH
         } else if (cols[c] == "aflow_prototype_params_list_orig") {
-          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_list_orig");
-          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_list_orig");
+          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_list_orig"); //replace anrl_parameter_list_orig with aflow_prototype_params_list_orig - DO NOT TOUCH
+          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_list_orig"); //replace anrl_prototype_parameter_list_orig with aflow_prototype_params_list_orig - DO NOT TOUCH
         } else if (cols[c] == "aflow_prototype_params_values_relax") {
-          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_values_relax");
-          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_values_relax");
+          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_values_relax"); //replace anrl_parameter_values_relax with aflow_prototype_params_values_relax - DO NOT TOUCH
+          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_values_relax"); //replace aflow_prototype_parameter_values_relax with aflow_prototype_params_values_relax - DO NOT TOUCH
         } else if (cols[c] == "aflow_prototype_params_values_orig") {
-          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_values_orig");
-          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_values_orig");
+          value = aurostd::extractJsonValueAflow(entry, "anrl_parameter_values_orig"); //replace anrl_parameter_values_orig with aflow_prototype_params_values_orig - DO NOT TOUCH
+          if (value.empty()) value = aurostd::extractJsonValueAflow(entry, "aflow_prototype_parameter_values_orig"); //replace aflow_prototype_parameter_values_orig with aflow_prototype_params_values_orig - DO NOT TOUCH
         }
       }
 

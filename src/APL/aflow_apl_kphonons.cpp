@@ -179,19 +179,19 @@ namespace KBIN {
     if (Krun) {
       int i;
       for (i = start_relax; Krun && i <= _NUM_RELAX_; i++) {
-        aus << 11111*i << " RELAXATION APL - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message(_AFLOW_MESSAGE_DEFAULTS_) << endl;
+        aus << 11111*i << " RELAXATION APL - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message(_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(fileMessage, aus, XHOST.QUIET);
         if (i < _NUM_RELAX_) {
           Krun = VASP_Run(xvasp, aflags, kflags, vflags, _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), true, fileMessage);
-          XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, fileMessage);
-          XVASP_KPOINTS_IBZKPT_UPDATE(xvasp, aflags, vflags, i, fileMessage);
+          XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, true, fileMessage); //CO20210315 - always write_incar
+          XVASP_KPOINTS_IBZKPT_UPDATE(xvasp, aflags, vflags, i, true, fileMessage); //CO20210315 - always write_kpoints
         } else { 
           Krun = VASP_Run(xvasp, aflags, kflags, vflags, _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), true, fileMessage);
-          XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, fileMessage);  //ME20200115 - or else SPIN_REMOVE_RELAX_2 does not work
+          XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, false, fileMessage);  //ME20200115 - or else SPIN_REMOVE_RELAX_2 does not work  //CO20210315 - write_incar only if (i<num_relax), no static afterward
         }
       }
       if (Krun && (i == _NUM_RELAX_)) {
-        aus << 11111*i << " RELAXATION APL END - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message(_AFLOW_MESSAGE_DEFAULTS_) << endl;
+        aus << 11111*i << " RELAXATION APL END - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message(_AFLOW_FILE_NAME_) << endl;
       }
     }
     if (!Krun) return false;
@@ -655,11 +655,15 @@ namespace KBIN {
         try {
           // Check the version of VASP binary
           message << "Checking VASP version for linear response calculations.";
-          string vaspVersion;
-          vaspVersion = getVASPVersionString( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );
-          if (!vaspVersion.empty()) {
-            message << "[" << vaspVersion[0] << "].";
-            if ((vaspVersion[0] - '0') < 5) { //cool way of getting ascii value:  https://stackoverflow.com/questions/36310181/char-subtraction-in-c
+          //[CO20210315 - new style]string vaspVersion;
+          //[CO20210315 - new style]vaspVersion = getVASPVersionNumber( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );
+          double vaspVersion=KBIN::getVASPVersionDouble( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );  //CO20210315
+          //[CO20210315 - new style]if (!vaspVersion.empty())
+          if (aurostd::isequal(vaspVersion,0.0)==false){  //CO20210315
+            //[CO20210315 - new style]message << "[" << vaspVersion[0] << "]."; //CO20210315
+            //[CO20210315 - new style]if ((vaspVersion[0] - '0') < 5) //cool way of getting ascii value:  https://stackoverflow.com/questions/36310181/char-subtraction-in-c
+            message << "[" << vaspVersion << "]."; //CO20210315
+            if (vaspVersion < 5) {  //CO20210315
               pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
               //ME20190107 - fix both serial and MPI binaries
               kflags.KBIN_SERIAL_BIN = DEFAULT_VASP5_BIN;

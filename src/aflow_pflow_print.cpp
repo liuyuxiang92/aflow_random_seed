@@ -3584,7 +3584,7 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // text output
     // ME20210402 - print both for web
-    if((ftype == txt_ft) || (XHOST.vflag_control.flag("WWW"))) {
+    if((ftype == txt_ft) || (XHOST.vflag_control.flag("WWW") && standalone)) { //DX20210521 - add standalone
       ss_output << "SPACE GROUP OF THE CRYSTAL" << endl;
       ss_output << " Space group number                           = " << str_sg.space_group_ITC << endl;
       ss_output << " Space group label (Hermann Mauguin)          = " << space_group_HM << endl;
@@ -3609,18 +3609,27 @@ namespace pflow {
           }
         }
         ss_output << "WYCCAR" << endl;
-        // convert vector<string> of WYCCAR to xstructure
-        stringstream wss;
-        for(uint i=0;i<str_sg.wyccar_ITC.size();i++){
-          wss << str_sg.wyccar_ITC[i] << endl;
-        }
-        if(str_sg.wyccar_ITC.size()!=0){ //DX20180526 - skip if fails
-          xstructure xstr_wyccar(wss,IOVASP_WYCKCAR);
-          ss_output << xstr_wyccar;
-        }
+        // ---------------------------------------------------------------------------
+        // expanded form of WYCCAR (i.e., poscar, not just the wyccar) //DX20210708
+        xvector<double> data = Getabc_angles(str_sg.standard_lattice_ITC,DEGREES);
+        xstructure str_expanded = WyckoffPOSITIONS(str_sg.space_group_ITC, str_sg.setting_ITC, str_sg);
+        str_expanded.lattice=str_sg.standard_lattice_ITC;
+        str_expanded.ReScale(1.0);
+        str_expanded.neg_scale=FALSE;
+        str_expanded.iomode = IOVASP_POSCAR;
+        ss_output << str_expanded;
+        //DX20210621 [OBSOLETE] convert vector<string> of WYCCAR to xstructure
+        //DX20210621 [OBSOLETE] stringstream wss;
+        //DX20210621 [OBSOLETE] for(uint i=0;i<str_sg.wyccar_ITC.size();i++){
+        //DX20210621 [OBSOLETE]   wss << str_sg.wyccar_ITC[i] << endl;
+        //DX20210621 [OBSOLETE] }
+        //DX20210621 [OBSOLETE] if(str_sg.wyccar_ITC.size()!=0){ //DX20180526 - skip if fails
+        //DX20210621 [OBSOLETE]   xstructure xstr_wyccar(wss,IOVASP_WYCKCAR);
+        //DX20210621 [OBSOLETE]   ss_output << xstr_wyccar;
+        //DX20210621 [OBSOLETE] }
       }
       // ME20210402 - Convert to array of strings for web
-      if (XHOST.vflag_control.flag("WWW")) {
+      if (XHOST.vflag_control.flag("WWW") && standalone) { //DX20210521 - add standalone
         vector<string> voutput;
         aurostd::stream2vectorstring(ss_output, voutput);
         ss_output.clear();
@@ -3631,7 +3640,7 @@ namespace pflow {
     // ---------------------------------------------------------------------------
     // json output
     // ME20210402 - print both for web
-    if((ftype == json_ft) || XHOST.vflag_control.flag("WWW")){
+    if((ftype == json_ft) || (XHOST.vflag_control.flag("WWW") && standalone)){ //DX20210521 - add standalone
 
       aurostd::JSONwriter json;
       bool roff = true;
@@ -3754,7 +3763,7 @@ namespace pflow {
         }
       }
       // ME20210402 - added web output
-      if (XHOST.vflag_control.flag("WWW")) ss_output << "\"json\":" << json.toString(standalone) << "}" << std::endl;
+      if (XHOST.vflag_control.flag("WWW") && standalone) ss_output << "\"json\":" << json.toString(standalone) << "}" << std::endl; //DX20210521 - add standalone
       else ss_output << json.toString(standalone);
       if(standalone) { ss_output << endl; }
     }
@@ -3814,6 +3823,131 @@ namespace pflow {
     vpflow.push_attached("SGDATA::WYCCAR",wyccar.str());
     //DX20180822 - put attributes into vpflow - END
     return ss_output.str();
+  }
+}
+
+// ***************************************************************************
+// pflow::PrintWyckoffData()
+// ***************************************************************************
+// This funtion prints out Wyckoff position data.
+// David Hicks (DX) 
+// DX20210611 - cleaned, use filetype, use JSON writer, and other minor mods
+// Note: xstructure is modified in this function (so do not use const)
+namespace pflow {
+  string PrintWyckoffData(xstructure& xstr,
+      filetype ftype,
+      bool standalone,
+      bool already_calculated,
+      double sym_eps,
+      bool no_scan,
+      int setting) {
+
+    string function_name = XPID + "pflow::PrintWyckoffData():";
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+
+    if(LDEBUG){ cerr << function_name << " BEGIN" << endl; }
+
+    // ---------------------------------------------------------------------------
+    // calculate the space group symmetry if not already calculated
+    xstructure str_sg(xstr);
+    if(!already_calculated){
+      str_sg.SpaceGroup_ITC(sym_eps, -1, setting, no_scan);
+    }
+
+    xvector<double> data = Getabc_angles(str_sg.standard_lattice_ITC,DEGREES);
+    stringstream ss_output;
+    if(ftype == txt_ft || (XHOST.vflag_control.flag("WWW") && standalone)){
+      ss_output << " Space group number                           = " << str_sg.space_group_ITC << endl; 
+      ss_output << " Setting                                      = " << str_sg.setting_ITC << endl;
+      ss_output << " ITC cell parameters - a b c alpha beta gamma = ";
+      ss_output.precision(10); ss_output << data(1) << " " << data(2) << " " << data(3) << " ";
+      ss_output.precision(3); ss_output << data(4) << " " << data(5) << " " << data(6) << endl;
+      ss_output << " Wyckoff positions" << endl;
+      uint nWyckoff_sites = str_sg.wyckoff_sites_ITC.size();
+      for(uint i=0;i<nWyckoff_sites;i++){
+        ss_output << std::setprecision(14) << std::left << std::fixed
+          << "   " << setw(5) << str_sg.wyckoff_sites_ITC[i].type         // set(5): species have max of two characters + pseudopoential (up to three characters)
+          << " " << setw(3) << str_sg.wyckoff_sites_ITC[i].multiplicity   // set(3): Wyckoff positions have a max of three digits
+          << " " << setw(5) << str_sg.wyckoff_sites_ITC[i].letter         // set(5): space group #47 has Wyckoff letter "alpha" (i.e, five letters)
+          << " " << setw(8) << str_sg.wyckoff_sites_ITC[i].site_symmetry; // set(8): Wyckoff site symmetry generally lists three/four directions, each with one to two characters (e.g., inversion)
+        double _coord = AUROSTD_MAX_DOUBLE;
+        for(uint j=1;j<=3;j++) {
+          _coord=aurostd::roundoff(str_sg.wyckoff_sites_ITC[i].coord(j),pow(10.0,-(double)14));
+          if(abs(_coord)<10.0) ss_output << " ";
+          if(!std::signbit(_coord)) ss_output << " ";
+          ss_output << _coord << " ";
+        }
+        ss_output << endl;
+      }
+      // ME20210402 - Convert to array of strings for web
+      if (XHOST.vflag_control.flag("WWW") && standalone) { //DX20210521 - add standalone
+        vector<string> voutput;
+        aurostd::stream2vectorstring(ss_output, voutput);
+        ss_output.clear();
+        ss_output.str("");
+        ss_output << "{\"txt\":[" << aurostd::joinWDelimiter(aurostd::wrapVecEntries(voutput, "\"", "\""), ",") << "],";
+      }
+    }
+    if(ftype == json_ft || (XHOST.vflag_control.flag("WWW") && standalone)){
+      aurostd::JSONwriter json;
+      bool roff = true;
+
+      // space group number
+      if(str_sg.space_group_ITC > 0 && str_sg.space_group_ITC < 231){
+        json.addNumber("space_group_number", str_sg.space_group_ITC);
+      } else if (PRINT_NULL_JSON){
+        json.addNull("space_group_number");
+      }
+
+      // ITC setting
+      if(str_sg.setting_ITC == 1 || str_sg.setting_ITC == 2){
+        json.addNumber("setting_ITC", str_sg.setting_ITC);
+      } else if (PRINT_NULL_JSON){
+        json.addNull("setting_ITC");
+      }
+      // Real lattice parameters
+      if(data.rows != 0){
+        json.addVector("lattice_parameters_ITC",data,_AFLOWLIB_DATA_GEOMETRY_PREC_,roff);
+      } else if (PRINT_NULL_JSON){
+        json.addNull("lattice_parameters_ITC");
+      }
+      // representative Wyckoff positions
+      if(str_sg.wyccar_ITC.size()){
+
+        aurostd::JSONwriter Wyckoff_json;
+        vector<aurostd::JSONwriter> vset_json;
+
+        xvector<double> position;
+        for(uint i=0;i<str_sg.wyccar_ITC.size();i++){
+          if(i>4 && i!=str_sg.wyccar_ITC.size()-1){ //Skip title, scale, lattice parameters, number of atoms, and coordinate type, and last newline
+            Wyckoff_json.clear();
+            position.clear();
+
+            vector<string> tokens;
+            aurostd::string2tokens(str_sg.wyccar_ITC[i],tokens," ");
+            if(tokens.size() == 7){
+              position(1) = aurostd::string2utype<double>(tokens[0]);
+              position(2) = aurostd::string2utype<double>(tokens[1]);
+              position(3) = aurostd::string2utype<double>(tokens[2]);
+              Wyckoff_json.addVector("position", position, _AFLOWLIB_DATA_GEOMETRY_PREC_, roff);
+              Wyckoff_json.addString("name", tokens[3]);
+              Wyckoff_json.addNumber("mulitiplicity", tokens[4]);
+              Wyckoff_json.addString("Wyckoff_letter", tokens[5]);
+              Wyckoff_json.addString("site_symmetry", tokens[6]);
+              vset_json.push_back(Wyckoff_json);
+            }
+          }
+        }
+
+        json.addVector("Wyckoff_positions", vset_json);
+      } else if (PRINT_NULL_JSON){
+        json.addNull("Wyckoff_positions");
+      }
+      if (XHOST.vflag_control.flag("WWW") && standalone) ss_output << "\"json\":" << json.toString(standalone) << "}"; //DX20210521 - add standalone
+      else ss_output << json.toString(standalone);
+      if(standalone) { ss_output << endl; }
+    }
+    return ss_output.str(); 
   }
 }
 

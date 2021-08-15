@@ -290,9 +290,9 @@ namespace KBIN {
         krun = VASP_Produce_and_Modify_INPUT(xvasp, AflowIn, FileMESSAGE, aflags, kflags, vflags);
         krun = (krun && VASP_Write_INPUT(xvasp, vflags));
         krun = VASP_Run(xvasp, aflags, kflags, vflags, "relax" + aurostd::utype2string<int>(i), true, FileMESSAGE);
-        XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, FileMESSAGE);
+        XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, (i<num_relax), FileMESSAGE);  //CO20210315 - write_incar only if (i<num_relax), no static afterwards
         if (i < num_relax) {
-          XVASP_KPOINTS_IBZKPT_UPDATE(xvasp, aflags, vflags, i, FileMESSAGE);
+          XVASP_KPOINTS_IBZKPT_UPDATE(xvasp, aflags, vflags, i, true, FileMESSAGE); //CO20210315 - always true because (i < num_relax)
         }
       }
     }
@@ -1975,7 +1975,7 @@ namespace AEL_functions {
         }
 
         // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-        if (!(XHOST.ARUN_POSTPROCESS || AEL_data.postprocess)) {
+        if (!(XHOST.POSTPROCESS || XHOST.ARUN_POSTPROCESS || AEL_data.postprocess)) { //CO20210701
           // Assign the values of the flags provided by the user in the aflow.in file to the class containing the input data for the VASP run
           // [OBSOLETE] aelerror = AEL_functions::aelvaspflags(vaspRuns.at(idVaspRun), _vaspFlags, _kbinFlags, runname.at(idVaspRun), AEL_data, FileMESSAGE);
           // [OBSOLETE] if(aelerror != 0) {
@@ -2064,7 +2064,7 @@ namespace AEL_functions {
             }
 
             // If files do not exist, and the postprocess flag is not set, continue on to prepare generation of _AFLOWIN_ ...
-            if (!(XHOST.ARUN_POSTPROCESS || AEL_data.postprocess)) {	  
+            if (!(XHOST.POSTPROCESS || XHOST.ARUN_POSTPROCESS || AEL_data.postprocess)) { //CO20210701
               // Assign the values of the flags provided by the user in the aflow.in file to the class containing the input data for the VASP run
               // [OBSOLETE] aelerror = AEL_functions::aelvaspflags(vaspRunsPressures.at(k).at(idVaspRun), _vaspFlags, _kbinFlags, runnamepressures.at(k).at(idVaspRun), AEL_data, FileMESSAGE);
               // [OBSOLETE] if(aelerror != 0) {

@@ -517,10 +517,11 @@ void *_threaded_GetCages2(void *ptr) {
   return NULL;
 }
 
+//ME20210521 - added ofstream write flag (FFFflag) as function input
 bool GetCages(const xstructure& _str,_aflags& aflags,
     vector<acage>& cagesirreducible,vector<acage>& cagesreducible,
     vector<acage>& cages4,vector<acage>& cages3,vector<acage>& cages2,
-    const double& _roughness,const bool& osswrite,ostream& oss) {
+    double _roughness,bool FFFflag, bool osswrite,ostream& oss) {
   string soliloquy=XPID+"GetCages():";
   // oss << "CAGES BEGIN" << endl;
   bool Krun=TRUE;
@@ -551,7 +552,6 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
 
   oss.setf(std::ios::fixed,std::ios::floatfield);
   oss.precision(_oss_precision_aflow_defects_);
-  bool FFFflag=TRUE;
   ofstream FFF;
   string FileNameCAGE;
   if(FFFflag) FileNameCAGE=DEFAULT_AFLOW_ICAGES_OUT;
@@ -570,7 +570,8 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
 
   string banner="-------------------------------------------------------------------------------------------";
   //  oss << "------------------------------------------------------------------------------------" << endl;
-  bool PFSWRITE=TRUE;ofstream FileDevNull("/dev/null");
+  bool PFSWRITE=FFFflag;  // ME20210521
+  ofstream FileDevNull("/dev/null");
   aflags.QUIET=TRUE;
   bool OSSWRITE=FALSE;// if(!OSSWRITE) PFSWRITE=FALSE;
   oss << banner << endl; // ---------------------------------
@@ -962,7 +963,7 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
   aflowin << AFLOWIN_SEPARATION_LINE << endl;
 
   //  cout << aflowin.str();
-  aurostd::stringstream2file(aflowin,_AFLOWIN_+".part");  
+  if(FFFflag) aurostd::stringstream2file(aflowin,_AFLOWIN_+".part");  // ME20210521
   oss << aflowin.str() << endl; // ---------------------------------
   FFF << aflowin.str() << endl; // ---------------------------------
 

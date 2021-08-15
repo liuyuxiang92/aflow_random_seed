@@ -52,6 +52,7 @@
 #include <signal.h>  //ME20191125 - needed for AflowDB
 #include <vector>
 #include <list> //CO20170806 - need for POCC
+#include <utility> //HE2021069 - for pairs in chull (C++98 changes, already included in SYMBOLICCPLUSPLUS)
 #include <netdb.h>  //CO20180321 - frisco needs for AFLUX
 
 #define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)  //CO20200502 - moved from aflow.h
@@ -281,19 +282,21 @@ template<class utype> std::ostream& operator<<(std::ostream&,const std::deque<ut
 // TIME stuff
 namespace aurostd {
   int get_day(void);
-  int get_day(tm* tstruct); //CO20200624
+  int get_day(const tm& tstruct); //CO20200624
   int get_month(void);
-  int get_month(tm* tsruct);  //CO20200624
+  int get_month(const tm& tstruct);  //CO20200624
   int get_year(void);
-  int get_year(tm* tstruct);  //CO20200624
+  int get_year(const tm& tsruct);  //CO20200624
+  void get_offset_utc(int& offset_hours,int& offset_mins); //CO20210601
+  void get_offset_utc(const tm& tstruct,int& offset_hours,int& offset_mins);  //CO20210601
   long int get_date(void);
-  long int get_date(tm* tstruct);  //CO20200624
+  long int get_date(const tm& tsruct);  //CO20200624
   int get_hour(void);
-  int get_hour(tm* tstruct);  //CO20200624
+  int get_hour(const tm& tsruct);  //CO20200624
   int get_min(void);
-  int get_min(tm* tstruct); //CO20200624
+  int get_min(const tm& tsruct); //CO20200624
   int get_sec(void);
-  int get_sec(tm* tstruct); //CO20200624
+  int get_sec(const tm& tsruct); //CO20200624
   long double get_seconds(void);
   long double get_seconds(long double reference_seconds);
   long double get_delta_seconds(long double& seconds_begin);
@@ -304,11 +307,11 @@ namespace aurostd {
   long double get_useconds(long double reference_useconds);
   long double get_delta_useconds(long double& useconds_begin);
   string get_time(void);
-  string get_time(tm* tstruct); //CO20200624
-  string get_datetime(void);
-  string get_datetime(tm* tstruct); //CO20200624
+  string get_time(const tm& tsruct); //CO20200624
+  string get_datetime(bool include_utc_offset=false);
+  string get_datetime(const tm& tsruct,bool include_utc_offset=false); //CO20200624
   string get_datetime_formatted(const string& date_delim="/",bool include_time=true,const string& date_time_sep=" ",const string& time_delim=":");  //CO20171215
-  string get_datetime_formatted(tm* tstruct,const string& date_delim="/",bool include_time=true,const string& date_time_sep=" ",const string& time_delim=":");  //CO20171215  //CO20200624
+  string get_datetime_formatted(const tm& tsruct,const string& date_delim="/",bool include_time=true,const string& date_time_sep=" ",const string& time_delim=":");  //CO20171215  //CO20200624
   bool beep(uint=2000,uint=100); // standard values
 }
 // ----------------------------------------------------------------------------
@@ -317,6 +320,14 @@ namespace aurostd {
   unsigned long long int getTID(void); //CO20200502 - threadID
 }
 // ----------------------------------------------------------------------------
+
+//FSIO: file system IO
+enum FSIO {  //CO20200624 - for execute2string
+  stdout_fsio,
+  stderr_fsio,
+  stdouterr_fsio
+};
+
 namespace aurostd {
   void sizes(void) __xprototype;
   // aflow_aurostd.cpp
@@ -380,10 +391,11 @@ namespace aurostd {
   //about cleaning up strings
   bool RemoveControlCodeCharactersFromString(const string& in, string& out); //DX20190516  //CO20190620
   bool RemoveControlCodeCharactersFromStringstream(std::stringstream& ss_in, std::stringstream& ss_out); //DX20190516
-  bool RemoveControlCodeCharactersFromFile(string directory, string filename, bool keep_orig_file=true); //DX20190516
+  bool RemoveControlCodeCharactersFromFile(const string& directory,const string& filename, bool keep_orig_file=true); //DX20190516
   bool isNullByte(char c); //DX20190131
   string removeNullBytes(string in); //DX20190131
-  bool RemoveBinaryCharactersFromFile(string directory, string filename); //DX20190211
+  bool RemoveBinaryCharactersFromFile(const string& directory,const string& filename); //DX20190211 //CO20210315
+  string PercentEncodeASCII(const char c) __xprototype; //DX20210706
   string CleanStringASCII(const string& s) __xprototype;
   string CleanStringASCII_20190712(const string& s) __xprototype; //CO20190712
   string CleanStringASCII_20190101(const string& s) __xprototype; //CO20190712
@@ -420,6 +432,10 @@ namespace aurostd {
   void RemoveSubStringFirstInPlace(string& str_orig, const string& str_rm) __xprototype;  //CO20190712
   string RemoveSubString(const string& str_orig, const string& str_rm) __xprototype;
   void RemoveSubStringInPlace(string& str_orig, const string& str_rm) __xprototype; //CO20190712
+  vector<string> ProcessPIDs(const string& process,bool user_specific=true); //CO20210315
+  bool ProcessRunning(const string& process,bool user_specific=true); //CO20210315
+  void ProcessKill(const string& process,bool user_specific=true,bool sigkill=true); //CO20210315
+  void ProcessRenice(const string& process,int nvalue,bool user_specific=true); //CO20210315
   // about directories and file existing or not
   bool DirectoryMake(string Directory);
   bool SSH_DirectoryMake(string user, string machine,string Directory);
@@ -427,16 +443,19 @@ namespace aurostd {
   bool SubDirectoryLS(const string& _Directory,vector<string>& vsubd);  //CO20200731
   bool DirectoryLS(const string& Directory,vector<string> &vfiles);
   bool DirectoryLS(const string& Directory,deque<string> &vfiles);
+  string dirname(const string& _file);  //CO20210315
+  string basename(const string& _file); //CO20210315
   bool DirectoryLocked(string directory,string="LOCK");
   bool DirectorySkipped(string directory);
   bool DirectoryWritable(string directory);
   bool DirectoryUnwritable(string directory);
-  string TmpFileCreate(const string& prefix="");
-  string TmpDirectoryCreate(const string& prefix="");
+  string TmpStrCreate(const string& _identifier="",const string& _tmpdir="",bool hidden=false,bool directory=false);  //CO20210624
+  string TmpFileCreate(const string& identifier="",const string& tmpdir="",bool hidden=false);  //CO20210315 - empty tmpdir means use XHOST.tmpfs
+  string TmpDirectoryCreate(const string& identifier="",const string& tmpdir="",bool hidden=false);  //CO20210315 - empty tmpdir means use XHOST.tmpfs
   string CleanFileName(const string& fileIN);
-  string ProperFileName(string fileIN);
-  bool CopyFile(string file_from,string file_to);
-  bool LinkFile(string file_from,string file_to);
+  string ProperFileName(const string& fileIN);
+  bool CopyFile(const string& file_from,const string& file_to);
+  bool LinkFile(const string& file_from,const string& file_to);
   //CO START
   bool MatchCompressed(const string& CompressedFileName,const string& FileNameOUT);
   // [OBSOLETE]  bool DecompressFile(const string& CompressedFileName);
@@ -445,6 +464,7 @@ namespace aurostd {
   bool IsCompressed(const string& FileNameIn,string& FileNameOut);
   bool IsCompressed(const string& FileNameIn);
   string GetCompressionExtension(const string& CompressedFileName);
+  string GetCatCommand(const string& CompressedFileName); //CO20210315
   //CO END
   bool UncompressFile(const string& FileName,const string& command);  bool UncompressFile(const string& FileName); // with guess  
   bool CompressFile(const string& FileName,const string& command=AUROSTD_ZIP_BIN); // with default
@@ -458,11 +478,14 @@ namespace aurostd {
   bool FileExist(const string& FileName);  bool FileExist(const string& FileName,string &FileNameOut);
   bool EFileExist(const string& FileName); bool EFileExist(const string& FileName,string &FileNameOut);
   unsigned long long int FileSize(const string& FileName);  //ME20191001
+  bool GetMemoryUsagePercentage(double& memory_usage_percentage);  //CO20210601
+  bool GetMemory(unsigned long long int& free,unsigned long long int& total); //CO20210315
   bool FileEmpty(const string& FileName);
   bool FileNotEmpty(const string& FileName);
   bool EFileEmpty(const string& FileName); //CO20190808
   bool EFileNotEmpty(const string& FileName); //CO20190808
-  long int FileModificationTime(const string&);  //ME20180712
+  long int GetTimestampModified(const string&);  //ME20180712
+  long int SecondsSinceFileModified(const string&);  //CO20210315
   unsigned int getFileCheckSum(const string&, const string&);  //ME20190219
   unsigned int getFletcher32(unsigned short*, size_t);  //ME20190219
   string FileToString(const string& FileName);
@@ -525,21 +548,22 @@ namespace aurostd {
   // about executing
   bool execute(ostringstream& command);
   bool execute(stringstream& command);
-  bool execute(string command);
-  bool execute(vector<string> vcommand);
-  bool execute(deque<string> dcommand);
+  bool execute(const string& command);
+  bool execute(const vector<string>& vcommand);
+  bool execute(const deque<string>& dcommand);
 #ifdef _stringcharstar_
   bool execute(char* command);
 #endif
   // Execute and report
-  string execute2string(ostringstream& command);
-  string execute2string(stringstream& command);
-  string execute2string(string command);
-  vector<string> execute2string(vector<string> vcommand);
-  deque<string> execute2string(deque<string> dcommand);
+  string execute2string(ostringstream& command,FSIO fsio=stdout_fsio);  //CO20200624 - added file system IO mode
+  string execute2string(stringstream& command,FSIO fsio=stdout_fsio);  //CO20200624 - added file system IO mode
+  string execute2string(const string& command,FSIO fsio=stdout_fsio);  //CO20200624 - added file system IO mode
+  vector<string> execute2string(const vector<string>& vcommand,FSIO fsio=stdout_fsio);  //CO20200624 - added file system IO mode
+  deque<string> execute2string(const deque<string>& dcommand,FSIO fsio=stdout_fsio);  //CO20200624 - added file system IO mode
 #ifdef _stringcharstar_
-  string execute2string(char* command);
+  string execute2string(char* command,FSIO fsio=stdout_fsio);  //CO20200624 - added file system IO mode
 #endif
+  string CleanCommand4Execute(const string& _command); //CO20200624
   template<class utype> utype execute2utype(ostringstream& command);
   template<class utype> utype execute2utype(stringstream& command);
   template<class utype> utype execute2utype(string command);
@@ -601,57 +625,58 @@ namespace aurostd {
   deque<string> stream2dequestring(stringstream& stringstreamIN);
   deque<string> string2dequestring(const string& stringIN);
   // about writing files
-  bool string2file(const string& StringOUTPUT,const string& FileNameOUTPUT,string="");
-  bool string2compressfile(const string& commamnd,const string& StringOUTPUT,const string& FileNameOUTPUT,string="");
-  bool string2gzfile(const string& StringOUTPUT,const string& FileNameOUTPUT,string="");
-  bool string2bz2file(const string& StringOUTPUT,const string& FileNameOUTPUT,string="");
-  bool string2xzfile(const string& StringOUTPUT,const string& FileNameOUTPUT,string="");
-  bool stringstream2file(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,string="");
-  bool stringstream2compressfile(const string& commamnd,const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,string="");
-  bool stringstream2gzfile(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,string="");
-  bool stringstream2bz2file(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,string="");
-  bool stringstream2xzfile(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,string="");
+  bool string2file(const string& StringOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool string2compressfile(const string& commamnd,const string& StringOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool string2gzfile(const string& StringOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool string2bz2file(const string& StringOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool string2xzfile(const string& StringOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool stringstream2file(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool stringstream2compressfile(const string& commamnd,const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool stringstream2gzfile(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool stringstream2bz2file(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,const string& mode="");
+  bool stringstream2xzfile(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,const string& mode="");
   // file2string
-  uint file2string(string FileNameIN,string& StringIN);
-  uint bz2file2string(string FileNameIN,string& StringIN);
-  uint gzfile2string(string FileNameIN,string& StringIN);
-  uint xzfile2string(string FileNameIN,string& StringIN);
-  uint zipfile2string(string _FileNameIN,string& StringIN); //CO
-  uint efile2string(const string& FileNameIN,string& StringIN);  //CO20191110
+  uint file2string(const string& FileNameIN,string& StringIN);  //CO20210624
+  uint bz2file2string(const string& FileNameIN,string& StringIN); //CO20210624
+  uint gzfile2string(const string& FileNameIN,string& StringIN);  //CO20210624
+  uint xzfile2string(const string& FileNameIN,string& StringIN);  //CO20210624
+  uint zipfile2string(const string& FileNameIN,string& StringIN); //CO  //CO20210624
+  uint efile2string(const string& FileNameIN,string& StringIN);  //CO20191110 //CO20210624
   // file2vectorstring  
-  uint file2vectorstring(string FileNameIN,vector<string>& vline);
-  uint bz2file2vectorstring(string FileNameIN,vector<string>& vline);
-  uint gzfile2vectorstring(string FileNameIN,vector<string>& vline);
-  uint xzfile2vectorstring(string FileNameIN,vector<string>& vline);
-  uint efile2vectorstring(string FileNameIN,vector<string>& vline);
+  uint file2vectorstring(const string& FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false); //CO20170613, defaults to usual string2tokens() behavior //CO20210624
+  uint bz2file2vectorstring(const string& FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false);  //CO20170613, defaults to usual string2tokens() behavior //CO20210624
+  uint gzfile2vectorstring(const string& FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false); //CO20170613, defaults to usual string2tokens() behavior //CO20210624
+  uint xzfile2vectorstring(const string& FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false); //CO20170613, defaults to usual string2tokens() behavior //CO20210624
+  uint efile2vectorstring(const string& FileNameIN,vector<string>& vline,bool consecutive=false,bool trim_edges=false);  //CO20170613, defaults to usual string2tokens() behavior //CO20210624
   bool vectorstring2file(const vector<string>& vline,string FileNameOUT);
   // file2dequestring  
-  uint file2dequestring(string FileNameIN,deque<string>& vline);
-  uint bz2file2dequestring(string FileNameIN,deque<string>& vline);
-  uint gzfile2dequestring(string FileNameIN,deque<string>& vline);
-  uint xzfile2dequestring(string FileNameIN,deque<string>& vline);
-  uint efile2dequestring(string FileNameIN,deque<string>& vline);
+  uint file2dequestring(const string& FileNameIN,deque<string>& vline);  //CO20210624
+  uint bz2file2dequestring(const string& FileNameIN,deque<string>& vline); //CO20210624
+  uint gzfile2dequestring(const string& FileNameIN,deque<string>& vline);  //CO20210624
+  uint xzfile2dequestring(const string& FileNameIN,deque<string>& vline);  //CO20210624
+  uint efile2dequestring(const string& FileNameIN,deque<string>& vline); //CO20210624
   bool dequestring2file(const deque<string>& vline,string FileNameOUT);
   // file2vectorstring overloading with deque
-  uint file2vectorstring(string FileNameIN,deque<string>& vline);
-  uint bz2file2vectorstring(string FileNameIN,deque<string>& vline);
-  uint gzfile2vectorstring(string FileNameIN,deque<string>& vline);
-  uint xzfile2vectorstring(string FileNameIN,deque<string>& vline);
-  uint efile2vectorstring(string FileNameIN,deque<string>& vline);  
+  uint file2vectorstring(const string& FileNameIN,deque<string>& vline);  //CO20210624
+  uint bz2file2vectorstring(const string& FileNameIN,deque<string>& vline); //CO20210624
+  uint gzfile2vectorstring(const string& FileNameIN,deque<string>& vline);  //CO20210624
+  uint xzfile2vectorstring(const string& FileNameIN,deque<string>& vline);  //CO20210624
+  uint efile2vectorstring(const string& FileNameIN,deque<string>& vline);   //CO20210624
   bool vectorstring2file(const deque<string>& vline,string FileNameOUT);
   // file2stringstream
-  bool file2stringstream(string FileNameIN,stringstream& StringstreamIN);
-  bool bz2file2stringstream(string FileNameIN,stringstream& StringstreamIN);
-  bool gzfile2stringstream(string FileNameIN,stringstream& StringstreamIN);
-  bool xzfile2stringstream(string FileNameIN,stringstream& StringstreamIN);
-  bool zipfile2stringstream(string _FileNameIN,stringstream& StringstreamIN); //CO
-  bool efile2stringstream(string FileNameIN,stringstream& StringstreamIN);
+  bool file2stringstream(const string& FileNameIN,stringstream& StringstreamIN);  //CO20210624
+  bool bz2file2stringstream(const string& FileNameIN,stringstream& StringstreamIN); //CO20210624
+  bool gzfile2stringstream(const string& FileNameIN,stringstream& StringstreamIN);  //CO20210624
+  bool xzfile2stringstream(const string& FileNameIN,stringstream& StringstreamIN);  //CO20210624
+  bool zipfile2stringstream(const string& _FileNameIN,stringstream& StringstreamIN); //CO //CO20210624
+  bool efile2stringstream(const string& FileNameIN,stringstream& StringstreamIN); //CO20210624
   // return directly the string
-  string file2string(string FileNameIN);
-  string bz2file2string(string FileNameIN);
-  string gzfile2string(string FileNameIN);
-  string xzfile2string(string FileNameIN);
-  string efile2string(string FileNameIN);
+  string file2string(const string& FileNameIN); //CO20210624
+  string bz2file2string(const string& FileNameIN);  //CO20210624
+  string gzfile2string(const string& FileNameIN); //CO20210624
+  string xzfile2string(const string& FileNameIN); //CO20210624
+  string zipfile2string(const string& FileNameIN); //CO20210624
+  string efile2string(const string& FileNameIN);  //CO20210624
   // reading url to string/stringstream/tokens/vector/deque
   bool url2file(string url,string& fileIN,bool=FALSE)  __xprototype;   // bool = verbose
   bool eurl2string(const string& url,string& stringIN,bool verbose=FALSE);  //CO20200223
@@ -702,26 +727,25 @@ namespace aurostd {
   template<class utype> uint string2tokensAdd(const string& str,std::vector<utype>& tokens,const string& delimiters = " ") __xprototype;
   template<class utype> uint string2tokensAdd(const string& str,std::deque<utype>& tokens,const string& delimiters = " ") __xprototype;
 
-  template<typename typeTo, typename typeFrom> typeTo StringStreamConvert(typeFrom from) __xprototype;
-  //  template<typename typeFrom> string StringStreamConvert(typeFrom from) __xprototype;
-  template<typename typeFrom> string StringConvert(typeFrom from) __xprototype;
-  template<typename typeTo, typename typeFrom> typeTo NumberStreamConvert(typeFrom from) __xprototype;
+  //[CO20210315 - OBSOLETE use stream2stream()]template<typename typeTo, typename typeFrom> typeTo StringStreamConvert(const typeFrom& from);  //CO20210315 - cleaned up
+  //[CO20210315 - OBSOLETE use stream2stream()]template<typename typeFrom> string StringConvert(const typeFrom& from);  //CO20210315 - cleaned up
+  //[CO20210315 - not defined]template<typename typeTo, typename typeFrom> typeTo NumberStreamConvert(const typeFrom& from);  //CO20210315 - cleaned up
 
   // [OBSOLETE]  double string2double(const string& from) __xprototype;
-  vector<double> vectorstring2vectordouble(vector<string> from) __xprototype;
+  vector<double> vectorstring2vectordouble(const vector<string>& from); //CO20210315 - cleaned up
   // [OBSOLETE]  long double string2longdouble(const string& from) __xprototype;
   // [OBSOLETE]  int string2int(const string& from) __xprototype;
   string string2string(const string& from) __xprototype;
-  template<typename utype> utype string2utype(const string& from) __xprototype;
-  vector<int> vectorstring2vectorint(vector<string> from) __xprototype;
+  template<typename utype> utype string2utype(const string& from);  //CO20210315 - cleaned up
+  vector<int> vectorstring2vectorint(const vector<string>& from); //CO20210315 - cleaned up
   // [OBSOLETE] uint string2uint(const string& from) __xprototype;
-  vector<uint> vectorstring2vectoruint(vector<string> from) __xprototype;
+  vector<uint> vectorstring2vectoruint(const vector<string>& from); //CO20210315 - cleaned up
   // [OBSOLETE] long int string2longint(const string& from) __xprototype;
   // [OBSOLETE] float string2float(const string& from) __xprototype;
 
-  vector<float> vectorstring2vectorfloat(vector<string> from) __xprototype;
-  string vectorstring2string(const vector<string>& vstrings) __xprototype;
-  string vectorstring2string(const deque<string>& vstrings) __xprototype;
+  vector<float> vectorstring2vectorfloat(const vector<string>& from);  //CO20210315 - cleaned up
+  string vectorstring2string(const vector<string>& vstrings);
+  string vectorstring2string(const deque<string>& vstrings);
 
   // [OBSOLETE] string double2string(double from) __xprototype;
   // [OBSOLETE] string double2string(double from,int precision) __xprototype;
@@ -765,9 +789,8 @@ namespace aurostd {
   int GetNLinesString(const string& strstream) __xprototype;
   int GetNLinesString(const stringstream& strstream) __xprototype;
   int GetNLinesFile(const string& file_name) __xprototype;
-  string GetLineString(const string& strstream, const int& line) __xprototype;
-  string GetLineString(const stringstream& strstream, const int& line) __xprototype;
-  stringstream GetLineStringstream(const stringstream& strstream, const int& line) __xprototype;
+  string GetLineString(const string& strstream,int line);
+  string GetLineString(const stringstream& strstream,int line);
   // substitute strings in strings and stringstreams
   bool StringsAlphabetic(const string& A,const string& B,bool allow_identical=true); //CO20180801
   bool StringsAlphabetic(const vector<string>& input,bool allow_identical=true);  //CO20180801
@@ -777,16 +800,12 @@ namespace aurostd {
   string StringSubst(string &strstring, const char &charfind, const char &charreplace);
   void StringStreamSubst(stringstream &strstring, const string &strfind, const string &strreplace);  //ME20190128 - fixed type declaration
   // about present substrings
-  bool substring2bool(const string& strstream, const string& strsub1, bool CLEAN);
-  bool substring2bool(const vector<string>& vstrstream, const string& strsub1, bool CLEAN);
-  bool substring2bool(const deque<string>& vstrstream, const string& strsub1, bool CLEAN);
-  bool substring2bool(const stringstream& strstream, const string& strsub1, bool CLEAN);
-  bool substring_present_file(const string& FileName, const string& strsub1, bool CLEAN);
-  bool substring_present_file_FAST(const string& FileName, const string& strsub1, bool CLEAN);
-  bool substring2bool(const string& strstream, const string& strsub1);
-  bool substring2bool(const vector<string>& vstrstream, const string& strsub1);
-  bool substring2bool(const deque<string>& vstrstream, const string& strsub1);
-  bool substring2bool(const stringstream& strstream, const string& strsub1);
+  bool substring2bool(const string& strstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
+  bool substring2bool(const vector<string>& vstrstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  bool substring2bool(const deque<string>& vstrstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
+  bool substring2bool(const stringstream& strstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
+  bool substring_present_file(const string& FileName,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  bool substring_present_file_FAST(const string& FileName,const string& strsub1,bool RemoveWS=false,bool case_insensitive=false,bool expect_near_end=false,unsigned long long int size_max=AUROSTD_MAX_ULLINT);  //CO20210315 - cleaned up
   bool WithinList(const vector<string>& list,const string& input,bool sorted=false);  //CO20181010
   bool WithinList(const vector<int>& list,int input,bool sorted=false); //CO20181010
   bool WithinList(const vector<uint>& list,uint input,bool sorted=false); //CO20181010
@@ -795,53 +814,26 @@ namespace aurostd {
   bool WithinList(const vector<uint>&, uint, int&,bool sorted=false);  //ME20190905
   bool EWithinList(const vector<string>& list,const string& input); //CO20200223
   bool EWithinList(const vector<string>& list, const string& input, string& output); //CO20200223
-  bool substring_present_file(const string& FileName, const string& strsub1) ;
-  bool substring_present_file_FAST(const string& FileName, const string& strsub1) ;
   // about present substrings and taking off the value
-  string substring2string(const string& strstream, const string& strsub1) __xprototype;
-  string substring2string(const string& strstream, const string& strsub1, bool CLEAN) __xprototype;
-  string substring2string(const string& strstream, const string& strsub1, const string& strsub2) __xprototype;
-  string substring2string(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
+  string substring2string(const string& strstream, const string& strsub1, bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
+  string substring2string(const stringstream& strstream, const string& strsub1, bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
+  //[CO20210315 - not used, not sure the purpose of strsub2]string substring2string(const string& strstream, const string& strsub1, const string& strsub2, bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  template<typename utype> utype substring2utype(const string& strstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  template<typename utype> utype substring2utype(const stringstream& strstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, const string& strsub2, bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
 
-  template<typename utype> utype substring2utype(const string& strstream, const string& strsub1) __xprototype;
-  template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, bool CLEAN) __xprototype;
-  template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, const string& strsub2) __xprototype;
-  template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-  // [OBSOLETE] int substring2integer(const string& strstream, const string& strsub1) __xprototype;
-  // [OBSOLETE] int substring2integer(const string& strstream, const string& strsub1, bool CLEAN) __xprototype;
-  // [OBSOLETE] int substring2integer(const string& strstream, const string& strsub1, const string& strsub2) __xprototype;
-  // [OBSOLETE] int substring2integer(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-  // [OBSOLETE] int substring2int(const string& strstream, const string& strsub1) __xprototype;
-  // [OBSOLETE] int substring2int(const string& strstream, const string& strsub1, bool CLEAN) __xprototype;
-  // [OBSOLETE] int substring2int(const string& strstream, const string& strsub1, const string& strsub2) __xprototype;
-  // [OBSOLETE] int substring2int(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-  // [OBSOLETE] double substring2double(const string& strstream, const string& strsub1) __xprototype;
-  // [OBSOLETE] double substring2double(const string& strstream, const string& strsub1, bool CLEAN) __xprototype;
-  // [OBSOLETE] double substring2double(const string& strstream, const string& strsub1, const string& strsub2) __xprototype;
-  // [OBSOLETE] double substring2double(const string& strstream, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-  // about present substrings and taking off the values in vectors
+  bool kvpairfound(const string& strstream,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315
+  bool kvpairfound(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315
+  string kvpair2value(const string& strstream,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315
+  string kvpair2value(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315
+  template<typename utype> utype kvpair2utype(const string& strstream,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  template<typename utype> utype kvpair2utype(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
 
-  uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1) __xprototype;
-  uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, bool CLEAN) __xprototype;
-  uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2) __xprototype;
-  uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-  template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1) __xprototype;
-  template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, bool CLEAN) __xprototype;
-  template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-  template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2) __xprototype;
-  // [OBSOLETE] uint substring2integers(const string& strstream, vector<int> &vintout, const string& strsub1) __xprototype;
-  // [OBSOLETE] uint substring2integers(const string& strstream, vector<int> &vintout, const string& strsub1, bool CLEAN) __xprototype;
-  // [OBSOLETE] uint substring2integers(const string& strstream, vector<int> &vintout, const string& strsub1, const string& strsub2) __xprototype;
-  // [OBSOLETE] uint substring2integers(const string& strstream, vector<int> &vintout, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-  // [OBSOLETE] uint substring2ints(const string& strstream, vector<int> &vintout, const string& strsub1) __xprototype;
-  // [OBSOLETE] uint substring2ints(const string& strstream, vector<int> &vintout, const string& strsub1, bool CLEAN) __xprototype;
-  // [OBSOLETE] uint substring2ints(const string& strstream, vector<int> &vintout, const string& strsub1, const string& strsub2) __xprototype;
-  // [OBSOLETE] uint substring2ints(const string& strstream, vector<int> &vintout, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-  // [OBSOLETE] uint substring2doubles(const string& strstream, vector<double> &vdoubleout, const string& strsub1) __xprototype;
-  // [OBSOLETE] uint substring2doubles(const string& strstream, vector<double> &vdoubleout, const string& strsub1, bool CLEAN) __xprototype;
-  // [OBSOLETE] uint substring2doubles(const string& strstream, vector<double> &vdoubleout, const string& strsub1, const string& strsub2) __xprototype;
-  // [OBSOLETE] uint substring2doubles(const string& strstream, vector<double> &vdoubleout, const string& strsub1, const string& strsub2, bool CLEAN) __xprototype;
-
+  uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  //[CO20210315 - not used, not sure the purpose of strsub2]uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
+  template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  template<typename utype> uint substring2utypes(const stringstream& strstream, vector<string> &vstringout, const string& strsub1, bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
 }
 
 // ***************************************************************************

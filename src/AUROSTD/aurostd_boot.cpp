@@ -91,10 +91,17 @@ using aurostd::getElements; //CO20200624
 
 template<class utype> bool initialize_scalar(utype d) {
   string s="";
+  stringstream ss;
   utype u=0;
   u+=aurostd::string2utype<utype>(aurostd::utype2string<utype>(utype())+aurostd::utype2string<utype>(utype(),int())+aurostd::utype2string<utype>(utype(),int(),DEFAULT_STREAM)); //DX20201028 - added third variant containing format
-  u+=aurostd::substring2utype<utype>(s,s,1)+aurostd::substring2utype<utype>(s,s,s,1);
-  u+=aurostd::substring2utype<utype>(s,s)+aurostd::substring2utype<utype>(s,s,s);
+  u+=aurostd::substring2utype<utype>(s,s,1,1); //[CO20210315 - not used, not sure the purpose of strsub2]+aurostd::substring2utype<utype>(s,s,s,1);
+  u+=aurostd::substring2utype<utype>(s,s); //[CO20210315 - not used, not sure the purpose of strsub2]+aurostd::substring2utype<utype>(s,s,s);
+  u+=aurostd::substring2utype<utype>(ss,s,1,1); //CO20210315
+  u+=aurostd::substring2utype<utype>(ss,s); //CO20210315
+  u+=aurostd::kvpair2utype<utype>(s,s,s,1,1);  //CO20210315
+  u+=aurostd::kvpair2utype<utype>(s,s,s);  //CO20210315
+  u+=aurostd::kvpair2utype<utype>(ss,s,s,1,1); //CO20210315
+  u+=aurostd::kvpair2utype<utype>(ss,s,s); //CO20210315
   double o=0;
   o+=_isfloat(d)+_iscomplex(d);//abs(d);
   o+=max(d,d);o+=max(d,d,d);o+=max(d,d,d,d);o+=max(d,d,d,d,d);o+=min(d,d);o+=min(d,d,d);o+=min(d,d,d,d);o+=min(d,d,d,d,d);o+=_real(d);
@@ -261,6 +268,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
 
   vector<vector<utype> > vvu;sort(vvu.begin(),vvu.end(),aurostd::compareVecElements<utype>);  //CO20190629
   vector<xvector<utype> > vxvu;sort(vxvu.begin(),vxvu.end(),aurostd::compareXVecElements<utype>);  //CO20190629
+  vector<vector<uint> > vvui; //HE20210511
   std::sort(vvu.begin(),vvu.end(),aurostd::compareVecElement<utype>()); //CO20190629
   std::sort(vxvu.begin(),vxvu.end(),aurostd::compareVecElement<utype>()); //CO20190629
 
@@ -268,6 +276,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   o+=isdifferent(v,v,x);v=-v;o+=max(v);v=abs(v);roundoff(v);roundoff(v,x);reduceByGCD(v,v,x);v+=normalizeSumToOne(v,x);clear(v);floor(v);ceil(v); //DX20191125 - changed input format for reduceByGCD()
   o+=getcos(v,v);v.clear();v.set(x);v.reset();v.resize(1,1);clear(v);reset(v);set(v,x);v=abs(v);v=vabs(v);v=sign(v);
   o+=angle(v,v,v);o+=getangle(v,v,v);isCollinear(v,v,x);v=getCentroid(vxv);v=getCentroid(vxv,vutype);o+=distance(v,v); //DX20200729 - added getCentroid() with weights
+  o+=areaPointsOnPlane(vxv); o+=volume(vxv, vvui, vxv); o+=volume(vxv, vvui); //HE20210721
   aurostd::xmatrix<utype> xmatpbc;dxv=getCentroidPBC(vxv,xmatpbc);dxv=getCentroidPBC(vxv,vutype,xmatpbc); //DX20200728 - added getCentroidPBC()
   getGeneralAngles(v,x);getGeneralAngle(v,0,x);
   vv=pointLineIntersection(v,v,v); //CO20190520
@@ -624,7 +633,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 #endif
 #ifdef AUROSTD_INITIALIZE_UNSIGNED_LONG_INT
     o+=aurostd::string2utype<unsigned long int>(aurostd::utype2string<unsigned long int>((unsigned long int)(1))+aurostd::utype2string<unsigned long int>((unsigned long int)(1),int()));
-    // o+=initialize_scalar(((unsigned long int))(1));
+    o+=initialize_scalar((unsigned long int)(1));
     // o+=initialize_xscalar_xvector_xmatrix_xtensor(((unsigned long int))(1));
     // o+=initialize_xcomplex(((unsigned long int))(1));
     // xmatrix<(long int)> m(1,1);GaussJordan(m,m);
@@ -651,7 +660,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 #endif
 #ifdef AUROSTD_INITIALIZE_UNSIGNED_LONG_LONG_INT
     o+=aurostd::string2utype<unsigned long long int>(aurostd::utype2string<unsigned long long int>((unsigned long long int)(1))+aurostd::utype2string<unsigned long long int>((unsigned long long int)(1),int()));
-    // o+=initialize_scalar((unsigned long long int)(1));
+    o+=initialize_scalar((unsigned long long int)(1));
     // o+=initialize_xscalar_xvector_xmatrix_xtensor((unsigned long long int)(1));
     // o+=initialize_xcomplex((unsigned long long int)(1));
     // xmatrix<(long long int)> m(1,1);GaussJordan(m,m);

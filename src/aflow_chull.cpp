@@ -1702,6 +1702,197 @@ namespace chull {
     return convertUnits(sqrt(getDist2Hull() / getEntropyFormingAbility()),units);
   }
 
+
+  /// \brief sort the vertex indexes based on their angle around a central normal vector
+  /// \param facet list of vertex indexes forming the facet
+  /// \param facet_id id of one of the original facets (to use its already calculated normal vector)
+  ///
+  /// Sorting the vertex indexes avoid crossing lines when drawing or calculating the area or volume later.
+  void ConvexHull::sortFacetVertices(vector<uint> &facet, const uint &facet_id){//HE20210510
+    xvector<double> center(3,1);
+    const uint num_points = facet.size();
+    xvector<uint> index_list(num_points,1);
+    xvector<double> angle_list(num_points,1);
+    for (std::vector<uint>::const_iterator p_id = facet.begin(); p_id != facet.end(); ++p_id) center += m_points[*p_id].m_coords;
+
+    center /= num_points;
+    const xvector<double> start_vector = m_points[facet[0]].m_coords - center;
+    const xvector<double> normal = m_facets[facet_id].m_normal;
+
+    // first index is used for the start_vector, therefore the angle is set to 0.0
+    angle_list[1] = 0;
+    index_list[1] = facet[0];
+    for (uint i=1; i<num_points; i++){
+      const xvector<double> next_vector = m_points[facet[i]].m_coords - center;
+      const double dot = aurostd::scalar_product(start_vector, next_vector);
+      const double det = start_vector[1]*next_vector[2]*normal[3] + next_vector[1]*normal[2]*start_vector[3] + normal[1]*start_vector[2]*next_vector[3]
+        - start_vector[3]*next_vector[2]*normal[1] - next_vector[3]*normal[2]*start_vector[1] - normal[3]*start_vector[2]*next_vector[1];
+      angle_list[i+1] = atan2(det, dot);
+      index_list[i+1] = facet[i];
+    }
+    aurostd::quicksort2(num_points, angle_list, index_list);
+    for (uint i=0; i<num_points; i++) facet[i] = index_list[i+1];
+  }
+
+  /// @brief generates list of facets, if two neighboring facets are coplanar join them
+  /// @param facet_collection output vector containing lists of vertex indexes
+  /// @param angle_threshold max angle between two facts in radian to be still considered coplanar
+  /// @note the facets contain only vertices
+  void ConvexHull::getJoinedFacets(vector<vector<uint> > &facet_collection, const double angle_threshold) {//HE20210510
+    bool LDEBUG=(false || XHOST.DEBUG);
+    string soliloquy=XPID+"ConvexHull::getJoinedFacets():";
+
+    if (m_dim != 3) throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "facet joining is just available in 3D", _VALUE_RANGE_);
+    vector <vector<uint> > raw_facets;
+    vector<xvector<double> > normals;
+    std::map<uint, vector<uint> >  point_neighbors;
+    std::list<std::pair<uint, uint> > raw_join_list;
+    vector<vector<uint> > join_list;
+    vector<uint> remove_facet;
+    vector<vector<uint> > raw_facet_collection;
+    std::map<uint, uint> corner_check;
+
+    // Collect information on each facet
+    for (std::vector<ChullFacet>::const_iterator facet = h_facets.begin(); facet != h_facets.end(); ++facet){
+
+      vector <uint> vertices;
+
+      // Represent facet based on the vertices indexes
+      for(std::vector<chull::FacetPoint>::const_iterator vert = facet->m_vertices.begin(); vert != facet->m_vertices.end(); ++vert){
+        vertices.push_back(vert->ch_index);
+      }
+      raw_facets.push_back(vertices);
+      normals.push_back(facet->m_normal);
+    }
+
+
+    // Build lookup for neighboring points
+    // (Base point is included to make a check easier)
+    for (std::vector<vector<uint> >::const_iterator facet = raw_facets.begin(); facet != raw_facets.end(); ++facet){
+      for (std::vector<uint>::const_iterator ind = facet->begin(); ind != facet->end(); ++ind){
+        std::copy(facet->begin(),facet->end(), std::inserter(point_neighbors[*ind],point_neighbors[*ind].end()));
+      }
+    }
+
+    // Ensure that point_neighbors is unique
+    for (std::map<uint, vector<uint> >::iterator point_neighbors_entry = point_neighbors.begin();
+        point_neighbors_entry != point_neighbors.end(); ++point_neighbors_entry){
+      std::sort(point_neighbors_entry->second.begin(),point_neighbors_entry->second.end());
+      point_neighbors_entry->second.erase( std::unique( point_neighbors_entry->second.begin(), point_neighbors_entry->second.end() ), point_neighbors_entry->second.end() );
+    }
+
+    uint raw_facets_size = raw_facets.size();
+    // Check for each facet, if their neighbors have an equivalent normal vector
+    if (LDEBUG) cerr << soliloquy << " coplanar | angle | facets | n1 | n2" << endl;
+    for (uint i1=0; i1<raw_facets_size; i1++){
+      const vector<uint> base_facet = raw_facets[i1];
+      for (uint i2=i1+1; i2<raw_facets_size; i2++){
+        uint check=0;
+        const vector<uint> compare_facet = raw_facets[i2];
+        for (uint k=0; k<3; k++) {
+          for (uint j=0; j<3; j++) {
+            if (base_facet[k]==compare_facet[j]) check++;
+          }
+        }
+        // neighbor share two vertices
+        if (check != 2) continue;
+        double check_angle = aurostd::angle(normals[i1], normals[i2]);
+        if (check_angle<angle_threshold){
+          if(LDEBUG) cerr << soliloquy << " YES | ";
+          raw_join_list.push_back(std::make_pair(i1, i2));
+          remove_facet.push_back(i1);
+          remove_facet.push_back(i2);
+        }
+        else {
+          if (LDEBUG) cerr << soliloquy << " NO  | ";
+        }
+        if (LDEBUG) {
+          cerr << check_angle << " | ";
+          cerr << i1 << ", " << i2 << " | ";
+          for (uint k=1; k<4; k++) cerr << normals[i1][k] << ", ";
+          cerr << "| ";
+          for (uint k=1; k<4; k++) cerr << normals[i2][k] << ", ";
+          cerr << endl;
+        }
+      }
+    }
+
+    // Combine the joined pairs into complete facets
+    while (raw_join_list.size()){
+      std::pair<uint, uint> start=*raw_join_list.begin();
+      vector<uint> new_facet;
+      new_facet.push_back(start.first); new_facet.push_back(start.second);
+      raw_join_list.erase(std::find(raw_join_list.begin(), raw_join_list.end(), start));
+      std::vector<std::pair<uint, uint> > to_delete;
+      uint found = 1;
+      while (found){
+        found = 0;
+        to_delete.clear();
+        for (std::list< std::pair<uint, uint> >::const_iterator next_ptr = raw_join_list.begin(); next_ptr != raw_join_list.end(); ++next_ptr) {
+          std::pair<uint, uint> next = *next_ptr;
+          if (std::find(new_facet.begin(), new_facet.end(), next.first) != new_facet.end()) {
+            found ++;
+            new_facet.push_back(next.second);
+            to_delete.push_back(next);
+          }
+          else if (std::find(new_facet.begin(), new_facet.end(), next.second) != new_facet.end())  {
+            found ++;
+            new_facet.push_back(next.first);
+            to_delete.push_back(next);
+          }
+        }
+        for (std::vector<std::pair<uint, uint> >::const_iterator next = to_delete.begin(); next != to_delete.end(); ++next) {
+          raw_join_list.erase(std::find(raw_join_list.begin(), raw_join_list.end(), *next));
+        }
+      }
+      join_list.push_back(new_facet);
+    }
+
+    // Build the raw facet collection
+    // Add unchanged facets (no sorting, as they should all be triangles)
+    for (uint i=0; i<raw_facets_size; i++){
+      if (std::find(remove_facet.begin(), remove_facet.end(), i) == remove_facet.end()) raw_facet_collection.push_back(raw_facets[i]);
+    }
+    // Add joined facets
+    for (std::vector<vector<uint> >::const_iterator to_join = join_list.begin(); to_join != join_list.end(); ++to_join) {
+      vector<uint> vertices;
+      for (vector<uint>::const_iterator f_id = to_join->begin(); f_id != to_join->end(); ++f_id) {
+        for (std::vector<uint>::const_iterator p_id = raw_facets[*f_id].begin(); p_id != raw_facets[*f_id].end(); ++p_id) {
+          if (std::find(vertices.begin(), vertices.end(), *p_id) == vertices.end()) vertices.push_back(*p_id); // ensure vertices vector is unique
+        }
+      }
+      // sort the vertices for std::set_difference(); point_neighbors are already sorted
+      std::sort(vertices.begin(), vertices.end());
+
+      // If a vertex has no outside neighbor it is removed
+      vector<uint> vertices_to_remove;
+      for (vector<uint>::const_iterator p_id = vertices.begin(); p_id != vertices.end(); ++p_id){
+        std::vector<uint> diff_result;
+        std::set_difference(point_neighbors[*p_id].begin(), point_neighbors[*p_id].end(), vertices.begin(), vertices.end(), std::inserter(diff_result, diff_result.end()));
+        if (!diff_result.size()) vertices_to_remove.push_back(*p_id);
+      }
+      for (std::vector<uint>::const_iterator p_id = vertices_to_remove.begin(); p_id != vertices_to_remove.end(); ++p_id) {
+        vertices.erase(std::find(vertices.begin(), vertices.end(), *p_id));
+      }
+      sortFacetVertices(vertices, *to_join->begin());
+      raw_facet_collection.push_back(vertices);
+    }
+
+    // remove points that are on an edge and not a corner
+    for (uint i_facet = 0; i_facet < raw_facet_collection.size(); i_facet++) {
+      for (uint i_vert = 0; i_vert < raw_facet_collection[i_facet].size(); i_vert++) {
+        corner_check[raw_facet_collection[i_facet][i_vert]]++;
+      }
+    }
+
+    for (uint i_facet = 0; i_facet < raw_facet_collection.size(); i_facet++) {
+      vector<uint> vec_vertices;
+      for (uint i_vert = 0; i_vert < raw_facet_collection[i_facet].size(); i_vert++) {
+        if (corner_check[raw_facet_collection[i_facet][i_vert]]>2)  vec_vertices.push_back(raw_facet_collection[i_facet][i_vert]);
+      }
+      facet_collection.push_back(vec_vertices);
+    }
+  }
   //since we don't check ALL attributes of entry, then we weed out MORE
   //entries existing in different catalogs will not be strictly identical
   //avoid this by comparing only the most pertinent information
@@ -3785,8 +3976,9 @@ namespace chull {
     //flag defaults
     m_formation_energy_hull=formation_energy_hull;    //energy vs. entropic_temperature hull
     if(m_formation_energy_hull){m_half_hull=m_lower_hull=true;} //default
-    m_half_hull=(m_half_hull || true);                //energy/entropic_temperature lower/upper hull  //override with flag from m_cflags
-    m_lower_hull=(m_formation_energy_hull || true);   //energy/entropic_temperature lower/upper hull  //override with flag from m_cflags
+    m_half_hull=(m_half_hull && m_cflags.flag("CHULL::FULL_HULL")==false); //energy/entropic_temperature lower/upper hull //override with flag from m_cflags  //HE20210510 - added CHULL::FULL_HULL
+    m_lower_hull=(m_formation_energy_hull && m_cflags.flag("CHULL::FULL_HULL")==false); //energy/entropic_temperature lower/upper hull //override with flag from m_cflags  //HE20210510 - added CHULL::FULL_HULL
+
     m_add_artificial_unaries=add_artificial_unaries;
 
     //detect for coord types mixture!

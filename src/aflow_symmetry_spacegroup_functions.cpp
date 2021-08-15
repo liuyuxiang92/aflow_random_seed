@@ -4909,6 +4909,26 @@ namespace SYM {
 } //namespace SYM
 
 // **********************************************************************************************************************
+// SYM::countWyckoffTypes()
+// **********************************************************************************************************************
+//counts the types of Wyckoff positions per species
+namespace SYM {
+  vector<int> countWyckoffTypes(const vector<wyckoffsite_ITC>& Wyckoff_positions){
+    vector<int> types, types_count;
+    uint nWyckoff_sites = Wyckoff_positions.size();
+    int index = 0;
+    for(uint i=0;i<nWyckoff_sites;i++){
+      if(!aurostd::WithinList(types,Wyckoff_positions[i].index,index)){
+        types.push_back(Wyckoff_positions[i].index);
+        types_count.push_back(1);
+      }
+      else{ types_count[index] +=1; }
+    }
+    return types_count;
+  }
+} //namespace SYM
+
+// **********************************************************************************************************************
 // mirror_operations
 // **********************************************************************************************************************
 //GET MIRROR OPERATIONS

@@ -312,7 +312,8 @@ namespace aflowlib {
       string Domain;
       bool establish();
     public:
-      APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226
+      //DX20210615 [OBSOLETE] APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226
+      APIget( string a_Summons="", string a_API_Path="/API/aflux/?", string a_Domain="aflow.org" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226 //DX20210615 - updated domain name
       void reset( string a_Summons="#", string a_API_Path="", string a_Domain="" );
       friend ostream& operator<<( ostream& output, APIget& a );
   };
@@ -460,6 +461,7 @@ class _outreach {
     bool newflag;
     uint year;
     vector<string> vauthor;
+    vector<string> vcorrespondingauthor;
     string title;
     string journal,link,arxiv,supplementary; 
     string place,date;

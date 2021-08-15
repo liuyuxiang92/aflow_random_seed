@@ -82,7 +82,7 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
          --spin_remove_relax_1 (default: DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1)
          --spin_remove_relax_2 (default: DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2)
          --kscheme=[M | G] (default: DEFAULT_KSCHEME in .aflow.rc) --kscheme_static=[M | G] (default: DEFAULT_KSCHEME_STATIC in .aflow.rc)
-	 --kppra=NNNN (default: DEFAULT_KPPRA in .aflow.rc) --kppra_static=NNNN (default: DEFAULT_KPPRA_STATIC in .aflow.rc) --bands_grid=NNNN (default: DEFAULT_BANDS_GRID in .aflow.rc)
+	       --kppra=NNNN (default: DEFAULT_KPPRA in .aflow.rc) --kppra_static=NNNN (default: DEFAULT_KPPRA_STATIC in .aflow.rc) --bands_grid=NNNN (default: DEFAULT_BANDS_GRID in .aflow.rc)
          --enmax_multiply=NNNN (default: DEFAULT_VASP_PREC_ENMAX_HIGH in .aflow.rc, DEFAULT_VASP_PREC_ENMAX_ACCURATE  in .aflow.rc)
          --pressure=0,1,2  (string of kB pressures separated by commas)
  	       --module=[APL | QHA | AAPL]
@@ -327,14 +327,17 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
         STDOUT option available.
 
 	  
-  aflow --aflowSG[_label,_number][=tolerance | =tight | =loose] [--no_scan] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] [--tolerance_spectrum=start:stop:step] < POSCAR
+  aflow --aflowSG|--space_group|--sg|--aflowSG_number|--space_group_number|--sg_number|--aflowSG_label|--space_group_label|--sg_label[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--tolerance_spectrum=start:stop:nsteps] < file
         Calculates the space group of the crystal in the ITC convention.
-        No assumptions are made on the input POSCAR-- may be supercell, primitive, etc.
-        Gives the Bravais lattice, crystal system, point group, space group number and wyckoff set.
-        The origin choice is always the first choice in ITC 5th edition. This is the highest symmetry
-        choice. (However, for Monoclinic systems, different unique axes and cell choices are examined to
-        ensure a spacegroup is identified.) This routine consists of an adaptive tolerance; if any symmetry 
+        This routine employs an adaptive tolerance scheme; if any symmetry 
         rules are broken, the tolerance is changed and everything is recalculated.
+        The space group number and international symbol are printed by default.
+        The commands "--aflowSG_number", "--space_group_number", and "--sg_number" only return the space group number.
+        The commands "--aflowSG_label", "--space_group_label", and "--sg_label" only return the space group label.
+        Can be called inside aflow via:
+              xstructure.SpaceGroup_ITC()        (default tolerance)
+              xstructure.SpaceGroup_ITC(tol)     (user defined tolerance)
+        This is the AFLOW counterpart to platonSG and findsymSG.
         Tolerance:
            The tolerance is given in Angstroms.  There are two preset tolerances:
              tight: minimum_interatomic_distance/100.0
@@ -342,22 +345,18 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
            The default tolerance is the "tight" tolerance value.
            A value can also be specified. (Note, it must be below the minimum 
            interatomic distance, otherwise an error will be thrown.)
-        Can be called inside aflow via:
-              xstructure.SpaceGroup_ITC()        (default tolerance)
-              xstructure.SpaceGroup_ITC(tol)     (user defined tolerance)
-        AFLOW counterpart to platonSG and findsymSG.
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location 
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found 
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects 
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
-          [--no_scan] : Will not perform tolerance scan.
-          [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
-          [--tolerance_spectrum=start:stop:step] : Perform symmetry analysis for a range of tolerance values
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Performs crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--tolerance_spectrum=start:stop:nsteps] : Performs symmetry analysis for a range of tolerance values
         Check aflow --readme=symmetry
  
   aflow --alphabetic < POSCAR
@@ -805,9 +804,11 @@ LATTICES = (the ones with "")
         on different versions (at least 4.4.1 and 4.4.5 (including PAW)  
         work).  For a large cell this can take a while (e.g., 80 atoms  
         might take ~20 minutes).  vasp4631 ok.
-  aflow --cif[=tolerance | =tight | =loose] [--setting=1| =2] [--no_symmetry] < POSCAR
-        Outputs to standard out a Crystallographic Information File
-        (cif) format file based on the POSCAR input file.  
+  
+  aflow --cif[=<tolerance_value>|=tight|=loose] [--no_scan] [--no_symmetry] [--setting=1|2|aflow] < file
+        Converts a geometry file to a Crystallographic Information File (CIF).
+        By default, a symmetry analysis is performed via AFLOW-SYM; however, this can be suppresed
+        with --no_symmetry, printing the positions explicitly (i.e., representing as space group 1).
         This can be used as input for Mercury, and is the preferred  
         format in Gerd's structure collection.
         Tolerance:
@@ -815,14 +816,31 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Space group setting:
           The space group setting can be specified with the optional flag [--setting=1| =2] (the default is setting 1).
           For rhombohedral systems, setting 1=rhl and 2=hex.
           For monoclinic systems, setting 1=unique axis-b and 2=unique axis-c.
         Options:
-          [--no_symmetry] : Will not perform symmetry analysis and return the CIF with space group 1.
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--no_symmetry]                          : Ignores symmetry analysis and returns the CIF with space group 1.
+          [--setting=1|2|aflow]                    : Specifies the space group setting. The `aflow' setting follows the choices of the AFLOW Prototype Encyclopedia.
+                                                     Different settings exist for the following space groups:
+                                                       - centrosymmetric space groups with two origin choices (24 space groups, e.g., sg=227):
+                                                           --setting=1     : origin centered on high site symmetry (not inversion site)
+                                                           --setting=2     : origin centered on inversion site
+                                                           --setting=aflow : origin centered on inversion site
+                                                       - rhombohedral space groups (e.g., space group 166):
+                                                           --setting=1     : rhombohedral setting
+                                                           --setting=2     : hexagonal setting
+                                                           --setting=aflow : rhombohedral setting
+                                                       - monoclinic space groups (e.g., space group 5):
+                                                           --setting=1     : unique axis-b
+                                                           --setting=2     : unique axis-c
+                                                           --setting=aflow : unique axis-b
+  
   aflow --clat=a,b,c,alpha,beta,gamma
         Outputs to standard out the cartesian lattice vectors obtained
         from the input a b c alpha beta gamma.
@@ -1118,7 +1136,7 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Options:
           [--no_scan] : Will not perform tolerance scan.
@@ -1163,7 +1181,7 @@ LATTICES = (the ones with "")
         The smallest mesh to satisfy this requirement is calculated.
         See also --kpoints.
 
-  aflow --edata[=tolerance| =tight| =loose] [--setting=1| =2] [--no_scan] [--print=txt | --print=json] < POSCAR
+  aflow --edata[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--print=text|json] [--setting=1|2|aflow] [--suppress_Wyckoff|--suppress_Wyckoff_printing] < file
         Outputs to standard the information given by --data in addition
         to lattice-, superlattice- and reciprocal-lattice types.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -1173,24 +1191,39 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Space group setting:
           The space group setting can be specified with the optional flag [--setting=1| =2] (the default is setting 1).
           For rhombohedral systems, setting 1=rhl and 2=hex.
           For monoclinic systems, setting 1=unique axis-b and 2=unique axis-c.
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
-          [--no_scan] : Will not perform tolerance scan.
-          [--print=txt | --print=json] : Specify output format.
-          [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
+          [--setting=1|2|aflow]                    : Specifies the space group setting. The `aflow' setting follows the choices of the AFLOW Prototype Encyclopedia.
+                                                     Different settings exist for the following space groups:
+                                                       - centrosymmetric space groups with two origin choices (24 space groups, e.g., sg=227):
+                                                           --setting=1     : origin centered on high site symmetry (not inversion site)
+                                                           --setting=2     : origin centered on inversion site
+                                                           --setting=aflow : origin centered on inversion site
+                                                       - rhombohedral space groups (e.g., space group 166):
+                                                           --setting=1     : rhombohedral setting
+                                                           --setting=2     : hexagonal setting
+                                                           --setting=aflow : rhombohedral setting
+                                                       - monoclinic space groups (e.g., space group 5):
+                                                           --setting=1     : unique axis-b
+                                                           --setting=2     : unique axis-c
+                                                           --setting=aflow : unique axis-b
+          [--suppress_Wyckoff]                     : Suppresses Wyckoff position output (i.e., space group info only)
         Check aflow --readme=symmetry
 
   aflow --edos ispin
@@ -1204,14 +1237,15 @@ LATTICES = (the ones with "")
         See --edos. Outputs total DOS and DOS of orbital s and d. The sDOS or dDOS is per species
         as given in POSCAR. Output format:
         Energy DOSup DOSdown s_up_spec1 s_down_spec1...s_up_specN s_down_specN d_up_spec1 d_down_spec1...d_up_specN d_down_specN
+  
   aflow --elk
         Transforms an input geometry file to the ELK format.
         The output follows the ELK conventions discussed in http://elk.sourceforge.net/elk.pdf.
-  aflow --equivalent | --equiv | --iatoms[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  
+  aflow --equivalent | --equiv | --iatoms[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--print=text|json] < file
         Calculate point/factor/space group and use them to label equivalent
         and inequivalent atoms. On the output, each structure atom has
-        number_label_of_atom[equivalent_to_label]* (* if inequivalent).
-        (SC1107).
+        number_label_of_atom[equivalent_to_label]* (* if inequivalent).(SC201107).
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
         the code automatically changes tolerance and recalculates from the beginning.
         Tolerance:
@@ -1219,20 +1253,20 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
-          [--no_scan] : Will not perform tolerance scan.
-          [--print=txt | --print=json] : Specify output format.
-          [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
         Check aflow --readme=symmetry
 
   aflow --eigcurv=bands_directory
@@ -1280,24 +1314,24 @@ LATTICES = (the ones with "")
 
   aflow --extract_kpoints | --xkpoints aflow.in
         Extract to stdout the kpoints embedded in the aflow.in file.
-        Useful for scripting (SC0209).
+        Useful for scripting (SC200902).
   aflow --extract_incar | --xincar aflow.in
         Extract to stdout the incar embedded in the aflow.in file.
-        Useful for scripting (SC0209).
+        Useful for scripting (SC200902).
   aflow --extract_poscar | --xposcar aflow.in
         Extract to stdout the poscar embedded in the aflow.in file.
-        Useful for scripting (SC0209).
+        Useful for scripting (SC200902).
   aflow --extract_potcar | --xpotcar aflow.in
         Extract to stdout the potcar embedded in the aflow.in file.
-        Useful for scripting (SC0209).
+        Useful for scripting (SC200902).
   aflow --extract_symmetry | --xsymmetry aflow.in
         Extract the symmetry (pgroup,fgroup,iatoms) from the poscar
         embedded in the aflow.in file. Must use this for aflow<2947
         to fix the fgroup bug.
-        Useful for scripting (SC0209).
+        Useful for scripting (SC200902).
         Check aflow --readme=symmetry
 
-  aflow --factorgroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --factorgroup|--fgroup[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--print=text|json] [--screen_only] < file
         Calculates factor group symmetry of the cell {R|t} and writes
         in the aflow.fgroup.out file. See documentation of aflow.
         The point group is required for the factor group, therefore
@@ -1309,21 +1343,21 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
-          [--no_scan] : Will not perform tolerance scan.
-          [--print=txt | --print=json] : Specify output format.
-          [--screen_only] : Prints symmetry elements to string and does not write to a file.
-          [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
+          [--screen_only]                          : Prints symmetry elements to string and does not write to a file.
         Check aflow --readme=symmetry
 
   aflow --findsym[=tolerance_relative: default 1.0e-3] < POSCAR
@@ -1342,7 +1376,7 @@ LATTICES = (the ones with "")
         Resample the PATH following the standard definition of the POSCAR and the standard path.
         If there are not nearby points, it will ask to redo the nbands step.
 
-  aflow --aflow-sym|--AFLOW-SYM|--AFLOWSYM|--aflowSYM|--aflowsym|--full_symmetry|--full_sym|--fullsym[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --aflow-sym|--AFLOW-SYM|--AFLOWSYM|--aflowSYM|--aflowsym|--full_symmetry|--full_sym|--fullsym[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--print=text|json] [--screen_only] < file
         Calculates the full symmetry of a crystal: point group lattice, point group crystal, factor group,
         space group, site point group, inequivalent/equivalent atoms, and the point group of the klattice.
         This routine calculates the full symmetry suite at a certain tolerance. If symmetry rules are broken,
@@ -1352,21 +1386,21 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum 
+           A value can also be specified. (Note, it must be below the minimum 
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
-          [--no_scan] : Will not perform tolerance scan.
-          [--print=txt | --print=json] : Specify output format.
-          [--screen_only] : Prints symmetry elements to string and does not write to a file.
-          [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
+          [--screen_only]                          : Prints symmetry elements to string and does not write to a file.
         Check aflow --readme=symmetry
 
 
@@ -1743,7 +1777,7 @@ LATTICES = (the ones with "")
         band calculation in vasp.
   aflow --inwignerseitz [--inws] < POSCAR
         Outputs to standard out a POSCAR file where all the atoms are
-        mapped to their images in the Wigner-Seitz cell.(SC 10Jan04)
+        mapped to their images in the Wigner-Seitz cell.(SC20100104)
   aflow --inflate_lattice=coefficient | --ilattice coefficient=coefficient < POSCAR
         Inflate/deflate POSCAR lattice of coefficient.
   aflow --inflate_volume=coefficient | --ivolume coefficient=coefficient < POSCAR
@@ -1817,7 +1851,30 @@ LATTICES = (the ones with "")
         It also helps in the primitive cell serach, as it has been
         included by default inside. (SC0902).
   
-  aflow --lattice_type | --lattice | --lattice_crystal[=tolerance| =tight| =loose] < POSCAR
+  aflow --lattice_data|--data_lattice|--real_lattice_data|--data_real_lattice[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--print=text|json] < file
+        Returns the lattice type data, includeing the lattice vectors, lattice parameters (Angstroms/Bohrs and degrees)
+        volume, c/a ratio, lattice type, lattice variation, lattice system, and Pearson symbol.
+        Tolerance:
+           The tolerance is given in Angstroms.  There are two preset tolerances:
+             tight: minimum_interatomic_distance/100.0
+             loose: minimum_interatomic_distance/10.0
+           The default tolerance is the "tight" tolerance value.
+           A value can also be specified. (Note, it must be below the minimum
+           interatomic distance, otherwise an error will be thrown.)
+        Magnetic analysis:
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
+        Options:
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
+  
+  aflow --lattice_type | --lattice | --lattice_crystal[=<tolerance_value>|=tight|=loose] < file
         Returns the lattice type and the conventional lattice type of the CRYSTAL following the tables
         of Setyawayn-Curtarolo [http://dx.doi.org/10.1016/j.commatsci.2010.05.010].
         Tolerance:
@@ -1827,8 +1884,11 @@ LATTICES = (the ones with "")
            The default tolerance is the "tight" tolerance value.
            A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
+        Options:
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
         Check aflow --readme=symmetry
-  aflow --lattice_lattice_type | --lattice_lattice[=tolerance| =tight| =loose] < POSCAR
+  
+  aflow --lattice_lattice_type | --lattice_lattice[=<tolerance_value>|=tight|=loose] < file
         Returns the lattice type and the conventional lattice type of the LATTICE following the tables
         of Setyawayn-Curtarolo [http://dx.doi.org/10.1016/j.commatsci.2010.05.010].
         Tolerance:
@@ -1838,7 +1898,10 @@ LATTICES = (the ones with "")
            The default tolerance is the "tight" tolerance value.
            A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
+        Options:
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
         Check aflow --readme=symmetry
+  
   aflow --latticehistogram < POSCAR
         Outputs the lattice calculated respect to tolerance of histogram of symmetry.
     
@@ -2106,8 +2169,27 @@ LATTICES = (the ones with "")
         
         This is only tested for version 4.4.5.
 
-  aflow --pearson_symbol | --pearson < POSCAR
+  aflow --pearson_symbol|--pearson|--Pearson_symbol|--Pearson [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--tolerance_spectrum=start:stop:nsteps] < file
         Returns the Pearson symbol of the structure.
+        Tolerance:
+           The tolerance is given in Angstroms.  There are two preset tolerances:
+             tight: minimum_interatomic_distance/100.0
+             loose: minimum_interatomic_distance/10.0
+           The default tolerance is the "tight" tolerance value.
+           A value can also be specified. (Note, it must be below the minimum
+           interatomic distance, otherwise an error will be thrown.)
+        Magnetic analysis:
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
+        Options:
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Performs crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--tolerance_spectrum=start:stop:nsteps] : Performs symmetry analysis for a range of tolerance values
         Check aflow --readme=symmetry
 
   aflow --planedens dens2d.in CHGCAR
@@ -2249,7 +2331,7 @@ LATTICES = (the ones with "")
           aflow --plotbanddos=/common/DATA/ZnO,-8,6,1.5
           aflow --plotbanddos=./ --print=png --projection=atoms
 
-  aflow --plotdos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=atoms|lm|none|orbitals] [--title=] [--outfile=]
+  aflow --plotdos[=directory[,DOS_Emin[,DOS_Emax[,DOSSCALE]]]] [--keep=gpl] [--noshift] [--print=pdf|eps|gif|jpg|png] [--projection=atoms|species|lm|none|orbitals] [--title=] [--outfile=]
         Generate DOS plot using GNUPLOT and pdfLaTeX
         The following file must reside in the directory:
          DOSCAR.static
@@ -2257,6 +2339,10 @@ LATTICES = (the ones with "")
         NOTE: If the DOSCAR contains f-orbitals and the calculation was performed
               with LORBIT = 10 and LSORBIT = .TRUE., either INCAR.static,
               vasprun.xml.static, or OUTCAR.static are required as well.
+        If it is a POCC run, the following files are required:
+         DOSCAR.pocc_TxxxxK
+        NOTE: If projection==species, the ARUN.POCC_xx directories are required,
+              along with the aflow.in and aflow.pocc.structures_unique.out file.
         Defaults.
          Directory: default = ./
          Emin: The minimum value of the DOS plot. Default value: -10
@@ -2266,7 +2352,7 @@ LATTICES = (the ones with "")
          --keep=gpl: keep the gnuplot script
          --noshift: do not shift the Fermi level to zero
          --print: specify the format of the output image (default: pdf)
-         --projection: Determines whether the DOS is projected along the atoms, l- or lm-resolved orbitals, or not at all (default: orbitals)
+         --projection: Determines whether the DOS is projected along the atoms, l- or lm-resolved orbitals, or not at all (default: orbitals). For POCC runs, the DOS can also be projected among the species.
          --title: the title of the plot in LaTeX format (default: title in DOSCAR file)
          --outfile: the name of the output image file.
         Examples:
@@ -2526,7 +2612,7 @@ LATTICES = (the ones with "")
         the output of aflow.  I am not sure that this will all  
         work the same way with PAW potentials.  
 
-  aflow --pointgroup | --pgroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] < POSCAR
+  aflow --pointgroup | --pgroup[=<tolerance_value>|=tight|=loose] [--no_scan] [--print=text|json] [--screen_only] < file
         Calculates the point group symmetry of the lattice {R} and writes
         it in the aflow.pgroup.out file. See documentation of aflow.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -2536,14 +2622,16 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Options:
-          [--no_scan] : Will not perform tolerance scan.
-          [--print=txt | --print=json] : Specify output format.
-          [--screen_only] : Prints symmetry elements to string and does not write to a file.
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
+          [--screen_only]                          : Prints symmetry elements to string and does not write to a file.
         Check aflow --readme=symmetry
-  aflow --pointgroup_crystal | --pgroup_crystal | --pgroup_xtal[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  
+  aflow --pointgroup_crystal|--pgroup_crystal|--pgroup_xtal[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--print=text|json] [--screen_only] < file
         Calculate the point group symmetry of the crystal {R+atoms} and
         writes it the aflow.pgroup_xtal.file.  
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -2553,23 +2641,24 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
-          [--no_scan] : Will not perform tolerance scan.
-          [--print=txt | --print=json] : Specify output format.
-          [--screen_only] : Prints symmetry elements to string and does not write to a file.
-          [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
+          [--screen_only]                          : Prints symmetry elements to string and does not write to a file.
         Check aflow --readme=symmetry
-  aflow --pointgroupkcrystal | --pointgroupk_xtal[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR] < POSCAR
+
+  aflow --pointgroupkcrystal|--pointgroupk_xtal[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--print=text|json] [--screen_only] < file
         Calculates the dual of the crystal point group symmetry operations and writes
         it in the aflow.pgroupk_xtal.out file. See documentation of aflow.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -2579,23 +2668,24 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
-          [--no_scan] : Will not perform tolerance scan.
-          [--print=txt | --print=json] : Specify output format.
-          [--screen_only] : Prints symmetry elements to string and does not write to a file.
-          [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
+          [--screen_only]                          : Prints symmetry elements to string and does not write to a file.
         Check aflow --readme=symmetry
-  aflow --pointgroupklattice | --pgroupk[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] < POSCAR
+  
+  aflow --pointgroupklattice|--pgroupk[=<tolerance_value>|=tight|=loose] [--no_scan] [--print=text|json] [--screen_only] < file
         Calculates the point group symmetry of the klattice {K} and writes
         it in the aflow.pgroupk.out file. See documentation of aflow.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -2605,14 +2695,16 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Options:
-          [--no_scan] : Will not perform tolerance scan.
-          [--print=txt | --print=json] : Specify output format.
-          [--screen_only] : Prints symmetry elements to string and does not write to a file.
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
+          [--screen_only]                          : Prints symmetry elements to string and does not write to a file.
         Check aflow --readme=symmetry
-  aflow --pointgroupk_Patterson | --pgroupk_Patterson[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR] < POSCAR
+
+  aflow --pointgroupk_Patterson|--pgroupk_Patterson[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR] [--no_scan] [--print=text|json] [--screen_only] < file
         Calculates the Patterson point group symmetry operations and writes
         it in the aflow.pgroupk_Patterson.out file. See documentation of aflow.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -2622,22 +2714,23 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
-          [--no_scan] : Will not perform tolerance scan.
-          [--print=txt | --print=json] : Specify output format.
-          [--screen_only] : Prints symmetry elements to string and does not write to a file.
-          [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
+          [--screen_only]                          : Prints symmetry elements to string and does not write to a file.
         Check aflow --readme=symmetry
+  
   aflow --pgl < POSCAR
         Calculate the point group symmetry of the lattice {R} and
         prints it to stdout.
@@ -2684,7 +2777,7 @@ LATTICES = (the ones with "")
 
   aflow --poscar2aflowin < POSCAR
         Makes an "almost standard" aflow.in starting from the poscar.
-        Useful for scripting (SC100630).
+        Useful for scripting (SC20100630).
 
   aflow --poscar2cce|--get_cce_correction|--get_cce_cor < STRUCT_FILE
         options:
@@ -2787,13 +2880,22 @@ LATTICES = (the ones with "")
       or README_AFLOW_ANRL.TXT.
       
       Options:
-        [--setting=1|2|anrl] : Specify the space group setting for the conventional cell/Wyckoff positions.  
-          The `anrl' setting follows the choices of the AFLOW Library of Crystallographic Prototypes: 
-              - axis-b for monoclinic space groups, 
-              - rhombohedral setting for rhombohedral space groups, and 
-              - origin centered on the inversion for centrosymmetric space groups 
-          (default: anrl).
-  
+          [--setting=1|2|aflow] : Specifies the space group setting. The `aflow' setting follows the choices of the AFLOW Prototype Encyclopedia (default: aflow).
+                                  Different settings exist for the following space groups:
+                                    - centrosymmetric space groups with two origin choices (24 space groups, e.g., sg=227):
+                                        --setting=1     : origin centered on high site symmetry (not inversion site)
+                                        --setting=2     : origin centered on inversion site
+                                        --setting=aflow : origin centered on inversion site
+                                    - rhombohedral space groups (e.g., space group 166):
+                                        --setting=1     : rhombohedral setting
+                                        --setting=2     : hexagonal setting
+                                        --setting=aflow : rhombohedral setting
+                                    - monoclinic space groups (e.g., space group 5):
+                                        --setting=1     : unique axis-b
+                                        --setting=2     : unique axis-c
+                                        --setting=aflow : unique axis-b
+          [--print_element_names]  : Print the element names from the input structure
+          [--print_atomic_numbers] : Print the atomic number for the elements in the input structure
 
   aflow --prototype_labels|--proto_labels [--library=htqc|anrl|all] [--arity=|--number_of_species=|--species_count=<number>] [--stoichiometry=|--stoich=<number>,<number>,...] [--space_group_number=|--space_group=|--sg=<number>] 
         Returns a list of the AFLOW prototype labels.
@@ -3048,6 +3150,21 @@ LATTICES = (the ones with "")
   aflow --rebuild_database [--patchfiles=file1,file2,...]
         Fetches new entries and rebuilds the AFLOW database file.
         --patchfiles can be used to patch the AFLOW database using jsonl files (see --patch_database).
+   
+   aflow --reciprocal_lattice_data|--reciprocallattice_data|--klattice_data|--data_reciprocal_lattice[=<tolerance_value>|=tight|=loose] [--no_scan] [--print=text|json] < file
+        Returns the reciprocal lattice type data, includeing the lattice vectors, lattice parameters (Angstroms/Bohrs and degrees)
+        volume, c/a ratio, lattice type, lattice variation, lattice system, and Pearson symbol.
+        Tolerance:
+           The tolerance is given in Angstroms.  There are two preset tolerances:
+             tight: minimum_interatomic_distance/100.0
+             loose: minimum_interatomic_distance/10.0
+           The default tolerance is the "tight" tolerance value.
+           A value can also be specified. (Note, it must be below the minimum
+           interatomic distance, otherwise an error will be thrown.)
+        Options:
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
 
   aflow --revsg [#] [n] [l] [m]
         Constructs a POSCAR of a specified space group and with specified wyckoff positions
@@ -3112,7 +3229,7 @@ LATTICES = (the ones with "")
         Charges must be entered after each atom position.
         E.g.,   Co 0 0 0 +2.  
 
-  aflow --sgdata | --space_group_data[=tolerance| =tight| =loose] [--setting=1| =2][--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  aflow --sgdata|--space_group_data[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--print=text|json] [--setting=1|2|aflow] [--suppress_Wyckoff|--suppress_Wyckoff_printing] < file
         Outputs the following space group information: space group number, space group labels 
         (Hermann Mauguin, Hall, Schoenflies), Laue class, crystal class, ITC setting, ITC origin shift, 
         general Wyckoff position, and the WYCCAR (similar to --edata).
@@ -3123,23 +3240,39 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Space group setting:
           The space group setting can be specified with the optional flag [--setting=1| =2] (the default is setting 1).
           For rhombohedral systems, setting 1=rhl and 2=hex.
           For monoclinic systems, setting 1=unique axis-b and 2=unique axis-c.
         Options:
-          [--no_scan] : Will not perform tolerance scan.
-          [--print=txt | --print=json] : Specify output format.
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
+          [--setting=1|2|aflow]                    : Specifies the space group setting. The `aflow' setting follows the choices of the AFLOW Prototype Encyclopedia.
+                                                     Different settings exist for the following space groups:
+                                                       - centrosymmetric space groups with two origin choices (24 space groups, e.g., sg=227):
+                                                           --setting=1     : origin centered on high site symmetry (not inversion site)
+                                                           --setting=2     : origin centered on inversion site
+                                                           --setting=aflow : origin centered on inversion site
+                                                       - rhombohedral space groups (e.g., space group 166):
+                                                           --setting=1     : rhombohedral setting
+                                                           --setting=2     : hexagonal setting
+                                                           --setting=aflow : rhombohedral setting
+                                                       - monoclinic space groups (e.g., space group 5):
+                                                           --setting=1     : unique axis-b
+                                                           --setting=2     : unique axis-c
+                                                           --setting=aflow : unique axis-b
+          [--suppress_Wyckoff]                     : Suppresses Wyckoff position output (i.e., space group info only)
         Check aflow --readme=symmetry
 
   aflow --shell=ns,r1,r2,name,dens < POSCAR
@@ -3170,7 +3303,8 @@ LATTICES = (the ones with "")
         S=(Sx,Sy,Sz).  The shifted is added to the positions.  The shift
         is assumed to be given in Cartesian coordinates unless you specify
         c or C for Cartesian or d or D for direct at the end.
-  aflow --sitepointgroup | --agroup[=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] < POSCAR
+  
+  aflow --sitepointgroup|--agroup[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--print=text|json] [--screen_only] < file
         Calculates the site point group symmetry for every atom in the
         unit cell and writes it in the aflow.agroup.out file.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -3180,29 +3314,30 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
-          [--no_scan] : Will not perform tolerance scan.
-          [--print=txt | --print=json] : Specify output format.
-          [--screen_only] : Prints symmetry elements to string and does not write to a file.
-          [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
+          [--screen_only]                          : Prints symmetry elements to string and does not write to a file.
         Check aflow --readme=symmetry
-  aflow --spacegroup [=tolerance| =tight| =loose] [--no_scan] [--print=txt | --print=json] [--screen_only] [--radius] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]< POSCAR
+  
+  aflow --spacegroup[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--print=text|json] [--radius=<radius>] [--screen_only] < file
         Calculates space group symmetry of the cell {R|t+T} with
         translations as big as |T| and writes it in the aflow.sgroup.out
         file. See documentation of aflow.
         Be careful because the size of the space group increases
         as the radius^3 times the size of the factor roup.
-        The point and factopr groups are required for the space group,
+        The point and factor groups are required for the space group,
         therefore the aflow.pgroup.out and aflow.fgroup.out files will
         be generated as well.
         This routine consists of symmetry consistency checks. If symmetry rules are broken,
@@ -3212,21 +3347,22 @@ LATTICES = (the ones with "")
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
-          [--no_scan] : Will not perform tolerance scan.
-          [--print=txt | --print=json] : Specify output format.
-          [--screen_only] : Prints symmetry elements to string and does not write to a file.
-          [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry 
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
+          [--radius=<radius>]                      : Specifies radius (Angstroms) to print symmetry operations out to a given distance from the origin
+          [--screen_only]                          : Prints symmetry elements to string and does not write to a file.
         Check aflow --readme=symmetry
 
   aflow --sqs=structure_type,atom_num,neighbour_num,sl_num_min,sl_num_max,A,B | --special-quasirandom-structure=...
@@ -3273,6 +3409,22 @@ LATTICES = (the ones with "")
 	  to output POSCAR in a standard conventional lattice) (WS & SC Nov09)
         REF: Setyawan Curtarolo, DOI: 10.1016/j.commatsci.2010.05.010
         Check aflow --readme=symmetry
+  
+  aflow --superlattice_data|--data_superlattice[=<tolerance_value>|=tight|=loose] [--no_scan] [--print=text|json] < file
+        Returns the superlattice type data, includeing the lattice vectors, lattice parameters (Angstroms/Bohrs and degrees)
+        volume, c/a ratio, lattice type, lattice variation, lattice system, and Pearson symbol.
+        Tolerance:
+           The tolerance is given in Angstroms.  There are two preset tolerances:
+             tight: minimum_interatomic_distance/100.0
+             loose: minimum_interatomic_distance/10.0
+           The default tolerance is the "tight" tolerance value.
+           A value can also be specified. (Note, it must be below the minimum
+           interatomic distance, otherwise an error will be thrown.)
+        Options:
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--print=text|json]                      : Outputs the results into human-readable text (default) or JSON, respectively.
+  
   aflow --statdiel OUTCAR*
         Extracts and diagonalizes the static dielectric constant tensor
         from the output of a DFPT run (see the aflow "DIELECTRIC_STATIC" tag).
@@ -3463,42 +3615,100 @@ LATTICES = (the ones with "")
           aflow --visualize_phonons --q=0,0,0 --branches=1,2,3 --format=V_SIM --amplitude=0.2
 
   aflow --volume v < POSCAR
-        Outputs POSCAR file giving having volume equal to v.
+        Outputs POSCAR file having volume equal to v.
   aflow --volume*= x < POSCAR
   aflow --volume+= x < POSCAR
         Outputs POSCAR with volume changes as *=, += actor (like in c,c++).
 
-  aflow --wyccar[=tolerance | =tight | =loose] [--no_scan] [--setting=1| =2] [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]] [--letters_only] [--multiplicities_only] [--site_symmetries_only] < POSCAR
+  aflow --wyccar[=<tolerance_value>|=tight|=loose] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--no_scan] [--setting=1|2|aflow] < file
         Prints the wyccar file (the poscar file with wyckoff positions) for the input POSCAR
-        The wyccar format presents the lattice in standard conventional form and the wyckoff 
-        positions with their associated labels and site symmetry. If variability in the 
-        Wyckoff positions exists, the algorithm finds the Wykoff positions with the "smallest" 
-        lettering scheme ("a" being the smallest). (R. Taylor/ D. Hicks)
+        The wyccar format presents the lattice in standard conventional form and the wyckoff
+        positions with their associated labels and site symmetry. If variability in the
+        Wyckoff positions exists, the algorithm finds the Wykoff positions with the "smallest"
+        lettering scheme ("a" being the smallest).
         Tolerance:
            The tolerance is given in Angstroms.  There are two preset tolerances:
              tight: minimum_interatomic_distance/100.0
              loose: minimum_interatomic_distance/10.0
            The default tolerance is the "tight" tolerance value.
-           A value can also be specified. (Note, it must not be below the minimum
+           A value can also be specified. (Note, it must be below the minimum
+           interatomic distance, otherwise an error will be thrown.)
+        Space group setting:
+          The space group setting can be specified with the optional flag [--setting=1|=2|=aflow] (the default is setting 1).
+          For rhombohedral systems, setting 1=rhl, 2=hex, and aflow=rhl.
+          For monoclinic systems, setting 1=unique axis-b, 2=unique axis-c, and aflow=unique axis-b.
+          For centrosymmetric systems, setting 1=origin on high-symmetry site, 2=origin on inversion site, aflow=origin on inversion site
+        Magnetic analysis:
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
+        Options:
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--setting=1|2|aflow]                    : Specifies the space group setting. The `aflow' setting follows the choices of the AFLOW Prototype Encyclopedia.
+                                                     Different settings exist for the following space groups:
+                                                       - centrosymmetric space groups with two origin choices (24 space groups, e.g., sg=227):
+                                                           --setting=1     : origin centered on high site symmetry (not inversion site)
+                                                           --setting=2     : origin centered on inversion site
+                                                           --setting=aflow : origin centered on inversion site
+                                                       - rhombohedral space groups (e.g., space group 166):
+                                                           --setting=1     : rhombohedral setting
+                                                           --setting=2     : hexagonal setting
+                                                           --setting=aflow : rhombohedral setting
+                                                       - monoclinic space groups (e.g., space group 5):
+                                                           --setting=1     : unique axis-b
+                                                           --setting=2     : unique axis-c
+                                                           --setting=aflow : unique axis-b
+        Check aflow --readme=symmetry
+  
+  aflow --Wyckoff|--Wyckoff_positions|--wyckoff|--wyckoff_positions[=<tolerance_value>|=tight|=loose] [--letters_only] [--magmom=[m1,m2,...|INCAR|OUTCAR]] [--multiplicities_only] [--no_scan] [--setting=1|2|aflow] [--site_symmetries_only] < file
+        Prints the Wyckoff positions (multiplicity, letter, site symmetry and representative
+        coordinate) based on the input geometry. If variability in the Wyckoff positions exists,
+        the algorithm finds the Wykoff positions with the "smallest" lettering scheme ("a" being the smallest).
+        Tolerance:
+           The tolerance is given in Angstroms.  There are two preset tolerances:
+             tight: minimum_interatomic_distance/100.0
+             loose: minimum_interatomic_distance/10.0
+           The default tolerance is the "tight" tolerance value.
+           A value can also be specified. (Note, it must be below the minimum
            interatomic distance, otherwise an error will be thrown.)
         Space group setting:
           The space group setting can be specified with the optional flag [--setting=1| =2] (the default is setting 1).
-          For rhombohedral systems, setting 1=rhl and 2=hex.
-          For monoclinic systems, setting 1=unique axis-b and 2=unique axis-c.
+          For rhombohedral systems, setting 1=rhl, 2=hex, and aflow=rhl.
+          For monoclinic systems, setting 1=unique axis-b, 2=unique axis-c, and aflow=unique axis-b.
+          For centrosymmetric systems, setting 1=origin on high-symmetry site, 2=origin on inversion site, aflow=origin on inversion site
         Magnetic analysis:
-          The magnetic tag specifies the magnetic moment on each of the atoms.  The
-          two input formats are a comma separated string of the magnetic moments -
-          in the same order as the input file, the location of the INCAR, or the location
-          of the OUTCAR, which is then read and the magnetic moment for each atom is found
-          (must be a static calculation, otherwise this information isn't specified).
-          Works for both collinear and non-collinear systems (AFLOW autodetects
-          collinear/non-collinear based on the input).
+          The magnetic tag specifies the magnetic moment on each of the atoms.
+          The three possible input types are:
+            1) a comma separated string of the magnetic moments (in the same order as the atoms in the geometry file)
+            2) a string specifying the path to the INCAR, or
+            3) a string specifying the path to the OUTCAR.
+          AFLOW autodetects collinear/non-collinear magnetic moments based on the input.
         Options:
-          [--no_scan] : Will not perform tolerance scan.
-          [--mag|--magnetic|--magmom=[m1,m2,...|INCAR|OUTCAR]]: Perform symmetry analysis of spin system, where spin degree of freedom breaks symmetry
-          [--letters_only]: Return the Wyckoff letters only
-          [--multiplicities_only]: Return the Wyckoff multiplicities only
-          [--site_symmetries_only]: Return the Wyckoff site symmetries only
+          [=<tolerance_value>|=tight|=loose]       : Specifies the symmetry tolerance: <tolerance_value>: user-input, "tight": min_interatomic_dist/100, "loose": min_interatomic_dist/10 (option is appended to command without spaces)
+          [--letters_only]                         : Prints the Wyckoff letters only (colons separate elements, commas separate Wyckoff positions for a given element)
+          [--magmom=[m1,m2,...|INCAR|OUTCAR]]      : Perform crystal spin symmetry analysis, where spin degree of freedom breaks symmetry
+          [--multiplicities_only]                  : Prints the Wyckoff multiplicities only (colons separate elements, commas separate Wyckoff positions for a given element)
+          [--no_scan]                              : Suppresses tolerance scan.
+          [--setting=1|2|aflow]                    : Specifies the space group setting. The `aflow' setting follows the choices of the AFLOW Prototype Encyclopedia.
+                                                     Different settings exist for the following space groups:
+                                                       - centrosymmetric space groups with two origin choices (24 space groups, e.g., sg=227):
+                                                           --setting=1     : origin centered on high site symmetry (not inversion site)
+                                                           --setting=2     : origin centered on inversion site
+                                                           --setting=aflow : origin centered on inversion site
+                                                       - rhombohedral space groups (e.g., space group 166):
+                                                           --setting=1     : rhombohedral setting
+                                                           --setting=2     : hexagonal setting
+                                                           --setting=aflow : rhombohedral setting
+                                                       - monoclinic space groups (e.g., space group 5):
+                                                           --setting=1     : unique axis-b
+                                                           --setting=2     : unique axis-c
+                                                           --setting=aflow : unique axis-b
+          [--site_symmetries_only]                 : Prints the Wyckoff site symmetries only (colons separate elements, commas separate Wyckoff positions for a given element)
         Check aflow --readme=symmetry
 
   aflow --xray=lambda < POSCAR
@@ -3558,7 +3768,7 @@ LATTICES = (the ones with "")
         of the atoms in the Wigner-Seitz cell. This parameter
         is usefull to fight against VASP trend of moving atoms
         in different (but traslationally equivalent) positions
-        of the unit cell. (SC 10Jan04).
+        of the unit cell. (SC20100104).
 
   aflow --zval[=directory]
         Outputs from the available POTCAR/OUTCAR the sum of ZVAL.
