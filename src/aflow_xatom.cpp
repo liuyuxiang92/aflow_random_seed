@@ -18343,7 +18343,7 @@ void xstructure::qm_recycle(void) {
   qm_clear();
 }
 
-void xstructure::qm_load(string Directory,string suffix,int iomode) {
+void xstructure::qm_load(const string& Directory,const string& suffix,int iomode) {
   double data_natoms=double(atoms.size());
   if(iomode!=IOVASP_POSCAR) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","Only IOVASP_POSCAR is supported.",_FILE_WRONG_FORMAT_);};
   if(iomode==IOVASP_POSCAR) {

@@ -1,6 +1,7 @@
 3.2.12 - 2021/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- added swap memory check to aurostd::GetMemory() and aurostd::GetMemoryUsagePercentage() (CO)
+        -- patched --qmvasp command (CO)
 3.2.11 - 2021/08/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.11.tar.xz
         -- added plotter options for QHA (AS)
