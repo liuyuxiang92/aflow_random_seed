@@ -1803,7 +1803,7 @@ class xstructure {
     // GEOMETRY ENERGETICS after the QM calculations              // --------------------------------------
     void qm_clear(void);                                          // QM create/clean all the vectors
     void qm_recycle(void);                                        // QM shift data from QM to GEOM
-    void qm_load(string directory,string suffix="",int=IOVASP_POSCAR);                    // QM results load from an ab-initio calculation
+    void qm_load(const string& directory,const string& suffix="",int=IOVASP_POSCAR);                    // QM results load from an ab-initio calculation
     bool qm_calculated;                                           // QM calculation
     double qm_scale;                                              // QM scale (always linear A)
     xmatrix<double> qm_lattice;                                   // QM LATTICE in REAL SPACE (meters)
