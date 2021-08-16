@@ -1583,6 +1583,7 @@ namespace pocc {
     if (m_kflags.KBIN_PHONONS_CALCULATION_QHA) { //AS20210402
       if(LDEBUG){cerr << "Running QHA postprocessing" << endl;}
       calculateQHAProperties();
+      calculateQHAPropertiesAVG(v_temperatures);
     }
 
     //END: TEMPERATURE DEPENDENT PROPERTIES

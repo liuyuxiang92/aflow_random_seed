@@ -757,6 +757,7 @@ namespace pocc {
 
       //AS20210204 QHA
       void calculateQHAProperties();
+      void calculateQHAPropertiesAVG(const vector<double>& v_temperatures);
   };
 } // namespace pocc
 

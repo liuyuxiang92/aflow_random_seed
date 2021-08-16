@@ -1184,6 +1184,7 @@ namespace apl
   bool QHA_Get_AflowInName(string &AflowInName, const string &directory_LIB);
   string EOSmethod2label(EOSmethod eos_method);//AS20210518
   string QHAmethod2label(QHAmethod qha_method);//AS20210518
+  bool hasImaginary(const string& filename, const string &QHA_method);//AS20210813
   //void linkAPLtoQHA();//AS20201216 OBSOLETE
 
   /// Calculates QHA-related properties

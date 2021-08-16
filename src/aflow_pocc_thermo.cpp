@@ -481,35 +481,35 @@ namespace pocc {
   /// reading the corresponding flag from filename.
   /// The flag is IMAG and is set to YES if it contains imaginary frequencies, i.e:
   /// [QHA_method]IMAG=NO
-  bool hasImaginary(const string& filename, const string &QHA_method)
-  {
-    string function = "hasImaginary():", msg = "";
-
-    vector<string> vlines;
-    bool has_imaginary = false;
-    if (!aurostd::efile2vectorstring(filename, vlines)){
-      msg = "File " + filename + " does not exist.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_NOT_FOUND_);
-    }
-
-    vector<string> tokens;
-    for (uint i=0; i<vlines.size(); i++){
-      if (vlines[i].find("["+QHA_method+"]") != std::string::npos){
-        if (vlines[i].find("IMAG") != std::string::npos){
-          aurostd::string2tokens(vlines[i],tokens,"=");
-          if (tokens.size() != 2){
-            msg = "Incorrect number of tokens: should be 2 instead of ";
-            msg += tokens.size();
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_CORRUPT_);
-          }
-
-          has_imaginary = tokens[1].find("YES") != std::string::npos;
-          break;
-        }
-      }
-    }
-    return has_imaginary;
-  }
+//  bool hasImaginary(const string& filename, const string &QHA_method)
+//  {
+//    string function = "hasImaginary():", msg = "";
+//
+//    vector<string> vlines;
+//    bool has_imaginary = false;
+//    if (!aurostd::efile2vectorstring(filename, vlines)){
+//      msg = "File " + filename + " does not exist.";
+//      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_NOT_FOUND_);
+//    }
+//
+//    vector<string> tokens;
+//    for (uint i=0; i<vlines.size(); i++){
+//      if (vlines[i].find("["+QHA_method+"]") != std::string::npos){
+//        if (vlines[i].find("IMAG") != std::string::npos){
+//          aurostd::string2tokens(vlines[i],tokens,"=");
+//          if (tokens.size() != 2){
+//            msg = "Incorrect number of tokens: should be 2 instead of ";
+//            msg += tokens.size();
+//            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_CORRUPT_);
+//          }
+//
+//          has_imaginary = tokens[1].find("YES") != std::string::npos;
+//          break;
+//        }
+//      }
+//    }
+//    return has_imaginary;
+//  }
 
   /// Calculates the logarithm of the partition function.
   double EnsembleThermo::logZ(const xvector<double> &E, const vector<int> &degeneracies, double T)
@@ -810,7 +810,7 @@ namespace pocc {
       filename = m_aflags.Directory + "/" + m_ARUN_directories[i] + "/";
       filename += DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_IMAG_FILE;
 
-      if (hasImaginary(filename, apl::QHAmethod2label(qha_method))){
+      if (apl::hasImaginary(filename, apl::QHAmethod2label(qha_method))){
         dirs2ignore.push_back(m_ARUN_directories[i]);
       }
     }
@@ -822,6 +822,7 @@ namespace pocc {
            aurostd::joinWDelimiter(dirs2ignore, ","), true);
 
       loadDataIntoCalculator();
+      setDFTEnergies();
     }
 
     // collect degeneracies
