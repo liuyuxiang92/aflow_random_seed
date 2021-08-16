@@ -2899,6 +2899,7 @@ namespace apl
     }
 
     string blockname_coeff  = blockname + "_COEFF]";
+    string blockname_mesh   = blockname + "_THERMO_MESH]";
     blockname += "_THERMO]";
 
     string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE;
@@ -2906,14 +2907,7 @@ namespace apl
     pflow::logger(QHA_ARUN_MODE, function, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
-    stringstream file, file_coeff;
-    file.precision(10);
-    file_coeff.precision(20);
-
-    file << AFLOWIN_SEPARATION_LINE << std::endl;
-    file << blockname + "SYSTEM=" << system_title << std::endl;
-    file << blockname + "START" << std::endl;
-
+    stringstream file_coeff;
     stringstream thermo_block, thermo_mesh_block;
 
     // write header
@@ -3097,12 +3091,11 @@ namespace apl
     file << AFLOWIN_SEPARATION_LINE << std::endl;
 
     if (qha_method==QHA_CALC){
-      blockname += "_MESH";
       file << AFLOWIN_SEPARATION_LINE << std::endl;
-      file << blockname + "SYSTEM=" << system_title << std::endl;
-      file << blockname + "START" << std::endl;
+      file << blockname_mesh + "SYSTEM=" << system_title << std::endl;
+      file << blockname_mesh + "START" << std::endl;
       file << thermo_mesh_block.rdbuf();
-      file << blockname + "STOP" << std::endl;
+      file << blockname_mesh + "STOP" << std::endl;
       file << AFLOWIN_SEPARATION_LINE << std::endl;
     }
 
