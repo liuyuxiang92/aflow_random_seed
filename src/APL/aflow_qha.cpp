@@ -2908,6 +2908,7 @@ namespace apl
         _LOGGER_MESSAGE_);
 
     stringstream file_coeff;
+    file_coeff.precision(20);// it's better to have as many significant digits as possible
     stringstream thermo_block, thermo_mesh_block;
 
     // write header
