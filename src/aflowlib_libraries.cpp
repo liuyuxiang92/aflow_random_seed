@@ -6792,6 +6792,8 @@ namespace aflowlib {
     bool LDEBUG=(TRUE || XHOST.DEBUG);
     string soliloquy=XPID+"aflowlib::XPLUG_CHECK_ONLY():";  //CO20200404
     int NUM_THREADS=XHOST.CPU_Cores; //ME20181226
+    bool FLAG_DO_CLEAN=XHOST.vflag_control.flag("XPLUG_DO_CLEAN");
+    if(LDEBUG) cerr << soliloquy << " FLAG_DO_CLEAN=" << FLAG_DO_CLEAN << endl;
     //ME20181109 - Handle NCPUS=MAX
     if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && !(XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX")))
       NUM_THREADS=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));
@@ -6866,6 +6868,16 @@ namespace aflowlib {
     if(LDEBUG) cerr << soliloquy << " vzips.size()=" << vzips.size() << endl;
     if(LDEBUG) cerr << soliloquy << " vcleans.size()=" << vcleans.size() << endl;
 
+    //do clean here so we can clean inside XPLUG_CHECK_ONLY()
+    //only issue is that we now clean before zipping, not ideal... better to zip first
+    if(FLAG_DO_CLEAN && vcleans.size()>0) {
+      bool contcar_save=aurostd::args2flag(argv,"--contcar_save|--save_contcar"); //CO20210716
+      for(uint i=0;i<vcleans.size();i++) {
+        // cerr << "Cleaning=" << vcleans.at(i) << endl;
+        KBIN::Clean(vcleans.at(i),contcar_save);
+      }
+    }
+
     return true;
   }
   bool XPLUG(const vector<string>& argv) {
@@ -6873,7 +6885,7 @@ namespace aflowlib {
     string soliloquy=XPID+"aflowlib::XPLUG():";  //CO20200404
     int NUM_ZIP=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_ZIP"));
     int NUM_SIZE=aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_SIZE"));
-    bool FLAG_DO_CLEAN=XHOST.vflag_control.flag("XPLUG_DO_CLEAN");
+    //[CO20210817 - moved to XPLUG_CHECK_ONLY()]bool FLAG_DO_CLEAN=XHOST.vflag_control.flag("XPLUG_DO_CLEAN");
     bool FLAG_DO_ADD=XHOST.vflag_control.flag("XPLUG_DO_ADD");
     string PREFIX=XHOST.vflag_control.getattachedscheme("XPLUG_PREFIX");
 
@@ -6882,7 +6894,7 @@ namespace aflowlib {
 
     if(LDEBUG) cerr << soliloquy << " NUM_ZIP=" << NUM_ZIP << endl;
     if(LDEBUG) cerr << soliloquy << " NUM_SIZE=" << NUM_SIZE << endl;
-    if(LDEBUG) cerr << soliloquy << " FLAG_DO_CLEAN=" << FLAG_DO_CLEAN << endl;
+    //[CO20210817 - moved to XPLUG_CHECK_ONLY()]if(LDEBUG) cerr << soliloquy << " FLAG_DO_CLEAN=" << FLAG_DO_CLEAN << endl;
     if(LDEBUG) cerr << soliloquy << " FLAG_DO_ADD=" << FLAG_DO_ADD << endl;
     if(LDEBUG) cerr << soliloquy << " PREFIX=" << PREFIX << endl;
 
@@ -6951,13 +6963,13 @@ namespace aflowlib {
     //aurostd::execute(command);
     //}
 
-    if(FLAG_DO_CLEAN && vcleans.size()>0) {
-      bool contcar_save=aurostd::args2flag(argv,"--contcar_save|--save_contcar"); //CO20210716
-      for(uint i=0;i<vcleans.size();i++) {
-        // cerr << "Cleaning=" << vcleans.at(i) << endl;
-        KBIN::Clean(vcleans.at(i),contcar_save);
-      }
-    }
+    //[CO20210817 - moved to XPLUG_CHECK_ONLY()]if(FLAG_DO_CLEAN && vcleans.size()>0) {
+    //[CO20210817 - moved to XPLUG_CHECK_ONLY()]  bool contcar_save=aurostd::args2flag(argv,"--contcar_save|--save_contcar"); //CO20210716
+    //[CO20210817 - moved to XPLUG_CHECK_ONLY()]  for(uint i=0;i<vcleans.size();i++) {
+    //[CO20210817 - moved to XPLUG_CHECK_ONLY()]    // cerr << "Cleaning=" << vcleans.at(i) << endl;
+    //[CO20210817 - moved to XPLUG_CHECK_ONLY()]    KBIN::Clean(vcleans.at(i),contcar_save);
+    //[CO20210817 - moved to XPLUG_CHECK_ONLY()]  }
+    //[CO20210817 - moved to XPLUG_CHECK_ONLY()]}
     return FALSE;
   }
 }
