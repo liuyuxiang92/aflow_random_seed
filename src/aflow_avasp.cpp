@@ -858,6 +858,11 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   xvasp.aopts.flag("AFLOWIN_FLAG::KMODE_STATIC", vflags.KBIN_VASP_KPOINTS_STATIC_KMODE.isentry);
   if (vflags.KBIN_VASP_KPOINTS_STATIC_KMODE.isentry) {xvasp.aopts.push_attached("AFLOWIN_FLAG::KMODE_STATIC", vflags.KBIN_VASP_KPOINTS_STATIC_KMODE.content_string);}
 
+  xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_LATTICE",vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.isentry); //CO20210805
+  if(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.isentry){xvasp.aopts.push_attached("AFLOWIN_FLAG::BANDS_LATTICE",vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string);}  //CO20210805
+  xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID",vflags.KBIN_VASP_KPOINTS_BANDS_GRID.isentry); //CO20210805
+  if(vflags.KBIN_VASP_KPOINTS_BANDS_GRID.isentry){xvasp.aopts.push_attached("AFLOWIN_FLAG::BANDS_GRID",vflags.KBIN_VASP_KPOINTS_BANDS_GRID.content_string);} //CO20210805
+
   //POTCAR
   xvasp.aopts.flag("FLAG::POTCAR_MODE_IMPLICIT", vflags.KBIN_VASP_POTCAR_MODE.flag("IMPLICIT"));
   xvasp.aopts.flag("FLAG::POTCAR_MODE_EXTERNAL", vflags.KBIN_VASP_POTCAR_MODE.flag("EXTERNAL"));
@@ -909,6 +914,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   if(LDEBUG) {cerr << soliloquy << " xvasp.AVASP_potential=" << xvasp.AVASP_potential << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.AVASP_prototype_from_library_=" << xvasp.AVASP_prototype_from_library_ << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.AVASP_prototype_mode=" << xvasp.AVASP_prototype_mode << endl;}
+  if(LDEBUG) {cerr << soliloquy << " xvasp.AVASP_path_BANDS=" << xvasp.AVASP_path_BANDS << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.AVASP_value_BANDS_GRID=" << xvasp.AVASP_value_BANDS_GRID << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.AVASP_value_KPPRA=" << xvasp.AVASP_value_KPPRA << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.AVASP_value_KPPRA_STATIC=" << xvasp.AVASP_value_KPPRA_STATIC << endl;}
@@ -922,6 +928,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::AIMS\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::AIMS") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::ALGORITHM\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::ALGORITHM") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL") << endl;}
+  if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::BANDS_LATTICE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_LATTICE") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::BANDS_GRID\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::CIF\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::CIF") << endl;} //DX20190123 - add CIF
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::CHGCAR_FILE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::CHGCAR_FILE") << endl;}  //ME20191028
@@ -1299,6 +1306,8 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::KPPRA\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KPPRA") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::KPPRA_STATIC\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::KPPRA_STATIC\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC") << endl;
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::BANDS_LATTICE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_LATTICE") << endl;
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::BANDS_LATTICE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_LATTICE") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::BANDS_GRID\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::BANDS_GRID\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID") << endl;
 
@@ -2858,9 +2867,21 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[12.11]" << endl;
 
   // KPOINTS
+  if(0){  //CO20210805 - should not be necessary
+    if(xvasp.AVASP_path_BANDS.empty()){xvasp.AVASP_path_BANDS=DEFAULT_BANDS_LATTICE;} //CO20210805 - set default if not present
+    if(xvasp.AVASP_value_BANDS_GRID==0){xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;} //CO20210805 - set default if not present
+  }
+
   //ME20181128 - Added remaining KPOINTS modes
   bool skip_implicit = (!xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT") &&
       (xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT") || xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP") || xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL")));  //CO20190401 START/STOP
+  if(LDEBUG){
+    cerr << soliloquy << " xvasp.aopts.flag(\"FLAG::KPOINTS_IMPLICIT\")=" << xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT") << endl;
+    cerr << soliloquy << " xvasp.aopts.flag(\"FLAG::KPOINTS_EXPLICIT\")=" << xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT") << endl;
+    cerr << soliloquy << " xvasp.aopts.flag(\"FLAG::KPOINTS_EXPLICIT_START_STOP\")=" << xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP") << endl;
+    cerr << soliloquy << " xvasp.aopts.flag(\"FLAG::KPOINTS_EXTERNAL\")=" << xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL") << endl;
+    cerr << soliloquy << " skip_implicit=" << skip_implicit << endl;
+  }
   if (!skip_implicit) {
     aflowin << "[VASP_KPOINTS_MODE_IMPLICIT] " << endl;
     //[ME20181216]aflowin << "[VASP_KPOINTS_FILE]KSCHEME=" << xvasp.AVASP_KSCHEME << " " << endl;
@@ -2870,7 +2891,14 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     if(xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME")) xvasp.AVASP_KSCHEME=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KSCHEME");    // KSCHEME
     if(xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC")) xvasp.AVASP_value_KPPRA_STATIC=aurostd::string2utype<int>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC")); // KPPRA_STATIC
     if(xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) xvasp.AVASP_STATIC_KSCHEME=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KSCHEME_STATIC");    // KSCHEME_STATIC
+    if(xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_LATTICE")) xvasp.AVASP_path_BANDS=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_LATTICE"); // BANDS_LATTICE
     if(xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID")) xvasp.AVASP_value_BANDS_GRID=aurostd::string2utype<uint>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID")); // BANDS_GRID
+    
+    if(LDEBUG){
+      cerr << soliloquy << " xvasp.AVASP_STATIC_KSCHEME=" << xvasp.AVASP_STATIC_KSCHEME << endl;
+      cerr << soliloquy << " xvasp.AVASP_path_BANDS=" << xvasp.AVASP_path_BANDS << endl;
+      cerr << soliloquy << " xvasp.AVASP_value_BANDS_GRID=" << xvasp.AVASP_value_BANDS_GRID << endl;
+    }
 
     if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[12.12]" << endl;
 
@@ -2902,7 +2930,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       write_all = true;
       if(!xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC")) xvasp.AVASP_value_KPPRA_STATIC=DEFAULT_KPPRA_STATIC; 
       if(!xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) xvasp.AVASP_STATIC_KSCHEME=DEFAULT_STATIC_KSCHEME;
-      if(!xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID")) xvasp.AVASP_path_BANDS=DEFAULT_BANDS_LATTICE;
+      if(!xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_LATTICE")) xvasp.AVASP_path_BANDS=DEFAULT_BANDS_LATTICE;
       if(!xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID")) xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;
       if(xvasp.str.species.size()==1) if(!xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC")) xvasp.AVASP_value_KPPRA_STATIC=DEFAULT_UNARY_KPPRA_STATIC;
       if(xvasp.str.species.size()==1) if(!xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID")) xvasp.AVASP_value_BANDS_GRID=DEFAULT_UNARY_BANDS_GRID;
@@ -4878,7 +4906,8 @@ bool AVASP_DefaultValuesBinary_AFLOWIN(_xvasp &xvasp) {
   xvasp.AVASP_EXTRA_INCAR.clear();
   xvasp.AVASP_volume_in=-1.0;
   xvasp.AVASP_flag_RUN_RELAX=TRUE;
-  xvasp.AVASP_path_BANDS="";         // DEFAULT VALUES
+  xvasp.AVASP_path_BANDS=DEFAULT_BANDS_LATTICE;         // DEFAULT VALUES //CO20210805
+  if(xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_LATTICE")) xvasp.AVASP_path_BANDS=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_LATTICE"); //CO202010805
   xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;  // DEFAULT VALUES
   if(xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID")) xvasp.AVASP_value_BANDS_GRID=aurostd::string2utype<uint>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID"));
   return TRUE;
@@ -6654,7 +6683,8 @@ bool AVASP_DefaultValuesICSD_AFLOWIN(_xvasp &xvasp) {
   xvasp.AVASP_EXTRA_INCAR.clear();
   xvasp.AVASP_volume_in=-1.0;
   xvasp.AVASP_flag_RUN_RELAX=TRUE;
-  xvasp.AVASP_path_BANDS="fcc";
+  xvasp.AVASP_path_BANDS=DEFAULT_BANDS_LATTICE; //CO20210805
+  if(xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_LATTICE")) xvasp.AVASP_path_BANDS=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_LATTICE"); // BANDS_LATTICE  //CO20210805
   xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;
   if(xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID")) xvasp.AVASP_value_BANDS_GRID=aurostd::string2utype<uint>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID")); // BANDS_GRID
   return TRUE;
