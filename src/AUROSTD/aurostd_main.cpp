@@ -2466,7 +2466,7 @@ namespace aurostd {
   }
 
   bool GetMemoryUsagePercentage(double& usage_percentage_ram,double& usage_percentage_swap){ //CO20210601
-    bool LDEBUG=(true || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::GetMemoryUsagePercentage():";
 
     unsigned long long int free_ram=0,total_ram=0;
