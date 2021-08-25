@@ -139,7 +139,14 @@ namespace apl {
 
         //lattice = LATTICE_Lattice_Variation_SpaceGroup(spacegroupNumber,_pc->getInputCellStructure());
         //lattice = LATTICE::SpaceGroup2LatticeVariation(spacegroupNumber,_pc->getInputCellStructure());
-        lattice = LATTICE::SpaceGroup2LatticeVariation(a.space_group_ITC, a);
+        //AS+DX20210602 BEGIN
+        // lattice = LATTICE::SpaceGroup2LatticeVariation(a.space_group_ITC, a);
+        // Sometimes SpaceGroup2LatticeVariation might not detect a correct
+        // lattice variation, that is consistent with the space group number:
+        // AS encountered a problem when MCLC is returned instead of MCLC1
+        a.GetExtendedCrystallographicData();
+        lattice = a.bravais_lattice_variation_type;
+        //AS+DX20210602 END
       } else {
         lattice = a.bravais_lattice_variation_type;
       }

@@ -225,8 +225,8 @@ namespace pocc {
     for (uint i=1; i<n; i++){
       if (pocc_qha_thermo_properties[i].size() < minsize)
         minsize = pocc_qha_thermo_properties[i].size();
-
-      if (minsize == 0) minsize = pocc_qha_thermo_properties[i].size();
+//
+//      if (minsize == 0) minsize = pocc_qha_thermo_properties[i].size();
     }
 
     for (uint i=0; i<n; i++){
