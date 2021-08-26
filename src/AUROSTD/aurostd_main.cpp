@@ -2508,24 +2508,34 @@ namespace aurostd {
     if(!aurostd::IsCommandAvailable("free")){return false;}
     string output=aurostd::execute2string("free");
     if(LDEBUG){cerr << soliloquy << " free output:" << endl << output << endl;}
+    //on most linux machines:
     //                            total        used        free      shared  buff/cache   available
     //              Mem:      395654628    41363940    30948848     4106252   323341840   349143640
     //              Swap:       2097148           0     2097148
+    //on qrats:
+    //                          total       used       free     shared    buffers     cached
+    //             Mem:     264523076  255134588    9388488         36    1745836  232705576
+    //             -/+ buffers/cache:   20683176  243839900
+    //             Swap:      4194300      71436    4122864
     vector<string> vlines;
     aurostd::string2vectorstring(output,vlines);
     if(vlines.size()<3){return false;}
     vector<string> vtokens;
+    uint iline=0;
     //ram
-    if(vlines[1].find("Mem:")==string::npos){return false;}
-    aurostd::string2tokens(vlines[1],vtokens," ");
+    iline=1;
+    if(vlines[iline].find("Mem:")==string::npos){return false;}
+    aurostd::string2tokens(vlines[iline],vtokens," ");
     if(!aurostd::isfloat(vtokens[1])){return false;}
     total_ram=aurostd::string2utype<unsigned long long int>(vtokens[1]);
     if(!aurostd::isfloat(vtokens[3])){return false;}
     free_ram=aurostd::string2utype<unsigned long long int>(vtokens[3]);
     if(LDEBUG){cerr << soliloquy << " free_ram=" << free_ram << " total_ram=" << total_ram << endl;}
     //swap
-    if(vlines[2].find("Swap:")==string::npos){return false;}
-    aurostd::string2tokens(vlines[2],vtokens," ");
+    iline=2;
+    if(vlines[iline].find("Swap:")==string::npos){iline++;}  //try next line
+    if(vlines[iline].find("Swap:")==string::npos){return false;}
+    aurostd::string2tokens(vlines[iline],vtokens," ");
     if(!aurostd::isfloat(vtokens[1])){return false;}
     total_swap=aurostd::string2utype<unsigned long long int>(vtokens[1]);
     if(!aurostd::isfloat(vtokens[3])){return false;}
