@@ -1516,7 +1516,6 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
       }
     }
   }
-  //  exit(0);
   
   for(uint i=0;i<voutreach.size();i++) fixlabel(valabel,voutreach.at(i).vextra_html);
   for(uint i=0;i<voutreach.size();i++) fixlabel(valabel,voutreach.at(i).vextra_latex);
