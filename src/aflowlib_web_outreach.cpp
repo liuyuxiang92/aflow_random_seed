@@ -176,7 +176,7 @@ uint bibtex2file(string bibtex,string _authors,string _title,string journal,stri
   for(uint i=0;i<vfix.size();i++) aurostd::StringSubst(title,vfix.at(i),string("{"+vfix.at(i)+"}")); // FIX 
   // NOW build
   bibcontent << "@article{" << bibtex << "," << endl;
-  if(authors.size()) bibcontent << " authors={" << authors << "}";  // AUTHORS
+  if(authors.size()) bibcontent << " author={" << authors << "}";  // AUTHORS
   if(title.size()) bibcontent << "," << endl << " title={" << aurostd::html2latex(title) << "}"; // TITLE
   if(journal.size()) bibcontent << "," << endl << " journal={" << journal << "}";   // JOURNAL
   if(volume.size()) bibcontent << "," << "volume={" << volume << "}";   // VOLUME
