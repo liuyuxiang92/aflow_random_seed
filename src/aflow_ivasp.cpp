@@ -6261,6 +6261,7 @@ namespace KBIN {
     else if(fix.find("NBANDS+")!=string::npos||fix.find("NBANDS-")!=string::npos){apply_once=false;}
     else if(fix=="NBANDS"){apply_once=false;}
     else if(fix=="POTIM"){apply_once=false;}
+    else if(fix=="RECYCLE_CONTCAR"){apply_once=false;}
     //add others here
     if(apply_once==true && xfixed.flag(fix)){
       if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": already applied" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
