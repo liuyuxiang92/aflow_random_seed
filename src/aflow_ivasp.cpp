@@ -7193,7 +7193,7 @@ namespace KBIN {
 
         bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun3=false;}
-        Krun3=(Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        Krun3=((Krun1||Krun2) && Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));  //only run if (Krun1||Krun2)
 
         Krun=(Krun1||Krun2||Krun3);
         if(!Krun){  //remove fixes before going to next submode
@@ -7212,7 +7212,7 @@ namespace KBIN {
 
         bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun3=false;}
-        Krun3=(Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        Krun3=((Krun1||Krun2) && Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));  //only run if (Krun1||Krun2)
 
         Krun=(Krun1||Krun2||Krun3);
         //no need to remove these settings if it fails
@@ -7229,7 +7229,7 @@ namespace KBIN {
 
         bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun3=false;}
-        Krun3=(Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        Krun3=((Krun1||Krun2) && Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));  //only run if (Krun1||Krun2)
 
         Krun=(Krun1||Krun2||Krun3);
         //no need to remove these settings if it fails
@@ -7504,7 +7504,7 @@ namespace KBIN {
 
       bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun3=false;}
-      Krun3=(Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+      Krun3=((Krun1||Krun2) && Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));  //only run if (Krun1||Krun2)
 
       Krun=(Krun1||Krun2||Krun3);
       if(!Krun){  //remove fixes before going to next submode

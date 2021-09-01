@@ -2477,6 +2477,7 @@ namespace aurostd {
       usage_percentage_ram=100.0*(((double)(total_ram-free_ram))/((double)(total_ram)));
       usage_percentage_swap=100.0*(((double)(total_swap-free_swap))/((double)(total_swap)));
       if(LDEBUG){
+        cerr << soliloquy << " [date=" << aflow_get_time_string() << "]" << endl; //helps debugging
         cerr << soliloquy << " free_ram=" << free_ram << endl;
         cerr << soliloquy << " used_ram=" << total_ram-free_ram << endl;
         cerr << soliloquy << " total_ram=" << total_ram << endl;
@@ -2485,6 +2486,7 @@ namespace aurostd {
         cerr << soliloquy << " used_swap=" << total_swap-free_swap << endl;
         cerr << soliloquy << " total_swap=" << total_swap << endl;
         cerr << soliloquy << " usage_percentage_swap=" << usage_percentage_swap << endl;
+        cerr << endl; //helps debugging
       }
     }
     else{

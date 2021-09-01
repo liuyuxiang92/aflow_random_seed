@@ -1783,7 +1783,7 @@ MEMORY_MAX_USAGE_RAM
 MEMORY_MAX_USAGE_SWAP
   description: The swap memory limit (in percent) before a MEMORY error is issued by --monitor_vasp.
   type: integer
-  default: 55
+  default: 45
 
 FILE_VASP_MONITOR
   description: File name for the aflow vasp monitor (--monitor_vasp). In the default case, the name would be LOCK.monitor_vasp.
