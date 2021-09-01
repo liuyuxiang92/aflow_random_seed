@@ -477,40 +477,6 @@ namespace pocc {
     }
   }
 
-  /// Checks if the given POCC structure contains imaginary frequencies by
-  /// reading the corresponding flag from filename.
-  /// The flag is IMAG and is set to YES if it contains imaginary frequencies, i.e:
-  /// [QHA_method]IMAG=NO
-//  bool hasImaginary(const string& filename, const string &QHA_method)
-//  {
-//    string function = "hasImaginary():", msg = "";
-//
-//    vector<string> vlines;
-//    bool has_imaginary = false;
-//    if (!aurostd::efile2vectorstring(filename, vlines)){
-//      msg = "File " + filename + " does not exist.";
-//      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_NOT_FOUND_);
-//    }
-//
-//    vector<string> tokens;
-//    for (uint i=0; i<vlines.size(); i++){
-//      if (vlines[i].find("["+QHA_method+"]") != std::string::npos){
-//        if (vlines[i].find("IMAG") != std::string::npos){
-//          aurostd::string2tokens(vlines[i],tokens,"=");
-//          if (tokens.size() != 2){
-//            msg = "Incorrect number of tokens: should be 2 instead of ";
-//            msg += tokens.size();
-//            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_CORRUPT_);
-//          }
-//
-//          has_imaginary = tokens[1].find("YES") != std::string::npos;
-//          break;
-//        }
-//      }
-//    }
-//    return has_imaginary;
-//  }
-
   /// Calculates the logarithm of the partition function.
   double EnsembleThermo::logZ(const xvector<double> &E, const vector<int> &degeneracies, double T)
   {
@@ -532,21 +498,8 @@ namespace pocc {
   /// differentiation.
   xvector<double> EnsembleThermo::calcThermalExpansionSG(const xvector<double> &volumes, double dT)
   {
-    // Convolution weights for the Savitzky-Golay 5pt cubic filter as reported in:
-    // "General least-squares smoothing and differentiation by the convolution (Savitzky-Golay) method"
-    // Peter A. Gorry Analytical Chemistry 1990 62 (6), 570-573
-    // https://doi.org/10.1021/ac00205a007
-    const static xmatrix<double> SGmat(5,5);
-    SGmat[1][1]=-125.0/84.0; SGmat[1][2]=-19.0/42.0; SGmat[1][3]= 1.0/12.0; SGmat[1][4]=  5.0/42.0; SGmat[1][5]= -29.0/84.0;
-    SGmat[2][1]= 136.0/84.0; SGmat[2][2]= -1.0/42.0; SGmat[2][3]=-8.0/12.0; SGmat[2][4]=-13.0/42.0; SGmat[2][5]=  88.0/84.0;
-    SGmat[3][1]=  48.0/84.0; SGmat[3][2]= 12.0/42.0; SGmat[3][3]= 0.0/12.0; SGmat[3][4]=-12.0/42.0; SGmat[3][5]= -48.0/84.0;
-    SGmat[4][1]= -88.0/84.0; SGmat[4][2]= 13.0/42.0; SGmat[4][3]= 8.0/12.0; SGmat[4][4]=  1.0/42.0; SGmat[4][5]=-136.0/84.0;
-    SGmat[5][1]=  29.0/84.0; SGmat[5][2]= -5.0/42.0; SGmat[5][3]=-1.0/12.0; SGmat[5][4]= 19.0/42.0; SGmat[5][5]= 125.0/84.0;
-    const static xvector<double> SGvec(5);
-    SGvec[1]= 1.0/12.0; SGvec[2]=-8.0/12.0; SGvec[3]= 0.0/12.0; SGvec[4]= 8.0/12.0; SGvec[5]=-1.0/12.0;
-    ////////////////////////////////////////////////////////////////////////////////
+    string function = "calcThermalExpansion():", msg = "";
 
-    string function = "calcThermalExpansionSG():", msg = "";
     int npoints = volumes.rows;
     if (npoints<5){
       msg = "Savitzky-Golay filter requires at least 5 points: only ";
@@ -556,31 +509,8 @@ namespace pocc {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INDEX_ILLEGAL_);
     }
 
-    xvector<double> endpoints(5), dummy(5);
-    xvector<double> beta(npoints);
-
-    // calculate derivatives for the first 2 points
-    for (int i=1; i<=5; i++) dummy[i] = volumes[i];
-    endpoints = dummy*SGmat;
-    for (int i=1; i<=2; i++) beta[i] = endpoints[i];
-
-    // calculate derivatives for the [3:end-3] points
-    int id = 0;
-    for (int i=3; i<=npoints-2; i++){
-      beta[i] = 0.0;
-      for (int j=1; j<=5; j++){
-        id = i - 3 + j;
-        beta[i] += SGvec[j]*volumes[id];
-      }
-    }
-
-    // calculate derivatives for the last 2 points
-    for (int i=1; i<=5; i++) dummy[i] = volumes[npoints-5+i];
-    endpoints = dummy*SGmat;
-    for (int i=4; i<=5; i++) beta[npoints-5+i] = endpoints[i];
-
-    // calculate the coefficient of thermal expansion
-    for (int i=1; i<=npoints; i++) beta[i] /= (volumes[i]*dT);
+    xvector<double> beta = aurostd::diffSG(volumes, dT);
+    for (int i=beta.lrows; i<=beta.urows; i++) beta[i] /= volumes[i];
 
     return beta;
   }

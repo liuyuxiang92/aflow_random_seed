@@ -12,7 +12,6 @@
 #ifndef _AFLOW_POCC_QHA_CPP_
 #define _AFLOW_POCC_QHA_CPP_
 
-#include <limits.h>
 #include "aflow.h"
 #include "aflow_pocc.h"
 
@@ -29,7 +28,6 @@ namespace pocc {
     string blockname = "[" + block_name + "]";
 
     output << AFLOWIN_SEPARATION_LINE << std::endl;
-    //file << blockname + "SYSTEM=" << system_title << std::endl;
     output << blockname + "START" << std::endl;
 
     // print header
@@ -62,64 +60,6 @@ namespace pocc {
     output << AFLOWIN_SEPARATION_LINE << std::endl;
   }
 
-  /// Calculates the thermal expansion coefficient as a logarithmic derivative
-  /// of equilibrium volume employing the Savitzky-Golay filter for the
-  /// differentiation.
-  xvector<double> calcThermalExpansionSGloc(const xvector<double> &volumes, double dT)
-  {
-    // Convolution weights for the Savitzky-Golay 5pt cubic filter as reported in:
-    // "General least-squares smoothing and differentiation by the convolution (Savitzky-Golay) method"
-    // Peter A. Gorry Analytical Chemistry 1990 62 (6), 570-573
-    // https://doi.org/10.1021/ac00205a007
-    const static xmatrix<double> SGmat(5,5);
-    SGmat[1][1]=-125.0/84.0; SGmat[1][2]=-19.0/42.0; SGmat[1][3]= 1.0/12.0; SGmat[1][4]=  5.0/42.0; SGmat[1][5]= -29.0/84.0;
-    SGmat[2][1]= 136.0/84.0; SGmat[2][2]= -1.0/42.0; SGmat[2][3]=-8.0/12.0; SGmat[2][4]=-13.0/42.0; SGmat[2][5]=  88.0/84.0;
-    SGmat[3][1]=  48.0/84.0; SGmat[3][2]= 12.0/42.0; SGmat[3][3]= 0.0/12.0; SGmat[3][4]=-12.0/42.0; SGmat[3][5]= -48.0/84.0;
-    SGmat[4][1]= -88.0/84.0; SGmat[4][2]= 13.0/42.0; SGmat[4][3]= 8.0/12.0; SGmat[4][4]=  1.0/42.0; SGmat[4][5]=-136.0/84.0;
-    SGmat[5][1]=  29.0/84.0; SGmat[5][2]= -5.0/42.0; SGmat[5][3]=-1.0/12.0; SGmat[5][4]= 19.0/42.0; SGmat[5][5]= 125.0/84.0;
-    const static xvector<double> SGvec(5);
-    SGvec[1]= 1.0/12.0; SGvec[2]=-8.0/12.0; SGvec[3]= 0.0/12.0; SGvec[4]= 8.0/12.0; SGvec[5]=-1.0/12.0;
-    ////////////////////////////////////////////////////////////////////////////////
-
-    string function = "calcThermalExpansionSG():", msg = "";
-    int npoints = volumes.rows;
-    if (npoints<5){
-      msg = "Savitzky-Golay filter requires at least 5 points: only ";
-      msg += aurostd::utype2string(npoints) + " were provided.";
-      msg += " Make sure that the minimum range among the set of POCC structures,";
-      msg += "defined by the [AFLOW_APL]TPT parameter for each, is reasonable.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INDEX_ILLEGAL_);
-    }
-
-    xvector<double> endpoints(5), dummy(5);
-    xvector<double> beta(npoints);
-
-    // calculate derivatives for the first 2 points
-    for (int i=1; i<=5; i++) dummy[i] = volumes[i];
-    endpoints = dummy*SGmat;
-    for (int i=1; i<=2; i++) beta[i] = endpoints[i];
-
-    // calculate derivatives for the [3:end-3] points
-    int id = 0;
-    for (int i=3; i<=npoints-2; i++){
-      beta[i] = 0.0;
-      for (int j=1; j<=5; j++){
-        id = i - 3 + j;
-        beta[i] += SGvec[j]*volumes[id];
-      }
-    }
-
-    // calculate derivatives for the last 2 points
-    for (int i=1; i<=5; i++) dummy[i] = volumes[npoints-5+i];
-    endpoints = dummy*SGmat;
-    for (int i=4; i<=5; i++) beta[npoints-5+i] = endpoints[i];
-
-    // calculate the coefficient of thermal expansion
-    for (int i=1; i<=npoints; i++) beta[i] /= (volumes[i]*dT);
-
-    return beta;
-  }
-
   /// Calcualates POCC-average of QHA-related properties.
   void POccCalculator::calculateQHAPropertiesAVG(const vector<double>& v_temperatures) {
     string function = XPID +  "POccCalculator::calculateQHAProperties():";
@@ -131,7 +71,6 @@ namespace pocc {
     pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
       *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
-////////////////////////////////////////////////////////////////////////////////
     apl::QHAmethod qha_method = apl::QHA_CALC;
     vector<string> dirs2ignore;
 
@@ -154,8 +93,8 @@ namespace pocc {
       loadDataIntoCalculator();
       setDFTEnergies();
     }
-////////////////////////////////////////////////////////////////////////////////
 
+    // read properties
     vector<vector<vector<double> > > pocc_qha_thermo_properties;
     vector<double> line;
     uint ncols = 0;
@@ -225,8 +164,6 @@ namespace pocc {
     for (uint i=1; i<n; i++){
       if (pocc_qha_thermo_properties[i].size() < minsize)
         minsize = pocc_qha_thermo_properties[i].size();
-//
-//      if (minsize == 0) minsize = pocc_qha_thermo_properties[i].size();
     }
 
     for (uint i=0; i<n; i++){
@@ -252,7 +189,7 @@ namespace pocc {
       }
     }
 
-    // collect degeneracies only for stable structures
+    // collect degeneracies
     vector<int> degeneracies;
     int n_total = 0;
     unsigned long long int isupercell=0;
@@ -348,11 +285,11 @@ namespace pocc {
     double dT = (pocc_qha_thermo_properties[0][minsize-1][0] -
                  pocc_qha_thermo_properties[0][0][0])/(minsize - 1);
 
-    xvector<double> vols(minsize);
+    xvector<double> logV(minsize);
     for (uint row=0; row<minsize; row++){
-      vols[row+1] = averaged_qha_data_T[row][1];
+      logV[row+1] = log(averaged_qha_data_T[row][1]);
     }
-    xvector<double> beta = calcThermalExpansionSGloc(vols, dT);
+    xvector<double> beta = aurostd::diffSG(logV, dT);
     file << AFLOWIN_SEPARATION_LINE << std::endl;
     file << "[POCC_QHA_SJ_BETA_E]START" << std::endl;
     file << setw(5)  << "#T[K]"         << setw(SW) << ' ' <<
@@ -368,9 +305,9 @@ namespace pocc {
     file << AFLOWIN_SEPARATION_LINE << std::endl;
 
     for (uint row=0; row<minsize; row++){
-      vols[row+1] = averaged_qha_data_F_T[row][1];
+      logV[row+1] = log(averaged_qha_data_F_T[row][1]);
     }
-    beta = calcThermalExpansionSGloc(vols, dT);
+    beta = aurostd::diffSG(logV, dT);
     file << AFLOWIN_SEPARATION_LINE << std::endl;
     file << "[POCC_QHA_SJ_BETA_F]START" << std::endl;
     file << setw(5)  << "#T[K]"         << setw(SW) << ' ' <<
