@@ -2936,8 +2936,10 @@ namespace KBIN {
   void RUN_DirectoryScript(const _aflags& aflags,const string& script,const string& output);
   bool CompressDirectory(const _aflags& aflags,const _kflags& kflags);
   bool CompressDirectory(const _aflags& aflags);
-  void Clean(const _aflags& aflags,bool contcar_save=false);
-  void Clean(const string directory,bool contcar_save=false);
+  void Clean(const _aflags& aflags);
+  void Clean(const string directory);
+  void Clean(const _aflags& aflags,const aurostd::xoption& opts_clean);  //CO20210901
+  void Clean(const string directory,const aurostd::xoption& opts_clean); //CO20210901
   void XClean(string options);
   void GenerateAflowinFromVASPDirectory(_aflags& aflags);
   void StartStopCheck(const string &AflowIn,string str1,string str2,bool &flag,bool &flagS);

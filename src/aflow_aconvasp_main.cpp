@@ -1593,8 +1593,10 @@ namespace pflow {
       if(!aflags.AFLOW_PERFORM_DIRECTORY) {
         cerr << "AFLOW: to use --clean, you must specify the directory" << endl; return 0;
       } else {
-        bool contcar_save=aurostd::args2flag(argv,cmds,"--contcar_save|--save_contcar");  //CO20210716
-        KBIN::Clean(aflags,contcar_save);
+        aurostd::xoption opts_clean;  //CO20210716
+        opts_clean.flag("SAVE_CONTCAR",aurostd::args2flag(argv,cmds,"--contcar_save|--save_contcar"));  //CO20210716 - saves contcar no matter what
+        opts_clean.flag("SAVE_CONTCAR_OUTCAR_COMPLETE",aurostd::args2flag(argv,cmds,"--contcar_save_outcar_complete|--save_contcar_outcar_complete"));  //CO20210716 - saves contcar only if outcar is complete
+        KBIN::Clean(aflags,opts_clean);
       }
     }
 

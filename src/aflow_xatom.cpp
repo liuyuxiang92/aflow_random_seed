@@ -9894,7 +9894,7 @@ int GetNBANDS(int electrons,int nions,int spineach,bool ispin,int NPAR) {
   if(ispin) out+=(nions*spineach+1)/2;
   //  out*=1.2;  // safety from vasp
   out*=1.3;      // safety more
-  out*=1.1+5;    // Thu Jun 11 12:08:42 EDT 2009 // METAL PROJECT
+  out=out*1.1+5;    // Thu Jun 11 12:08:42 EDT 2009 // METAL PROJECT
   out*=1.075;    // Tue Oct 13 07:59:43 EDT 2009 // ICSD PROJECT
   out+=5;        // Sun Nov  1 10:41:20 EDT 2009 // ICSD PROJECT ORC
   out*=1.03;     // Tue Feb 26 15:15:36 EST 2013 // HELPS dielectric CALS
