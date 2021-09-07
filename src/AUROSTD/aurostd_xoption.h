@@ -43,26 +43,26 @@ namespace aurostd {
       vector<string> vxsghost;   // tokenized "," content
       bool preserved;            // the output
       // LOAD BOOLS FUNCTIONS
-      void options2entry(string,string,int=aurostd_xoptionONOFF,string="");
-      void scheme2scheme(char,string);
-      void scheme2scheme(string,string);
-      bool isscheme(string) const; // check if available //CO20180101 //SC20191227
+      void options2entry(const string&,const string&,int=aurostd_xoptionONOFF,const string& xscheme_DEFAULT="");  //CO20210805 - const&
+      void scheme2scheme(char,const string&); //CO20210805 - const&
+      void scheme2scheme(const string&,const string&);  //CO20210805 - const&
+      bool isscheme(const string&) const; // check if available //CO20180101 //SC20191227 //CO20210805 - const&
       // [OBSOLETE] uint addscheme(string);      // add scheme then returns vscheme.size()
       // [OBSOLETE] uint purgescheme(string);    // remove scheme then returns vscheme.size()
-      uint opscheme(string,bool);  // add/remove scheme then returns vscheme.size()
-      uint push(string);           // add scheme then returns vscheme.size()
-      uint pop(string);            // remove scheme then returns vscheme.size()
+      uint opscheme(const string&,bool);  // add/remove scheme then returns vscheme.size()  //CO20210805 - const&
+      uint push(const string&);           // add scheme then returns vscheme.size() //CO20210805 - const&
+      uint pop(const string&);            // remove scheme then returns vscheme.size()  //CO20210805 - const&
       // for plain flags
-      bool flag(string,bool);      // if bool=TRUE/FALSE => add/remove "string" 
-      bool flag(string) const;     // interrogate=TRUE/FALSE, same as ischeme //CO20180101  //SC20191227
+      bool flag(const string&,bool);      // if bool=TRUE/FALSE => add/remove "string"  //CO20210805 - const&
+      bool flag(const string&) const;     // interrogate=TRUE/FALSE, same as ischeme //CO20180101  //SC20191227 //CO20210805 - const&
       bool flag(void) const;       // return if there is any scheme inside //CO20180101 //SC20191227
       // attached stuff..
-      bool isdefined(string) const;                                    //SC20200114
-      uint opattachedscheme(string,string,bool);                       // add/remove attached_scheme if flag=TRUE, then returns vghost.size()
-      uint addattachedscheme(string scheme,string attached,bool flag); // add attached_scheme if flag=TRUE, then returns vghost.size()
+      bool isdefined(const string&) const;                                    //SC20200114  //CO20210805 - const&
+      uint opattachedscheme(const string&,const string&,bool);                       // add/remove attached_scheme if flag=TRUE, then returns vghost.size() //CO20210805 - const&
+      uint addattachedscheme(const string& scheme,const string& attached,bool flag); // add attached_scheme if flag=TRUE, then returns vghost.size()  //CO20210805 - const&
       // [OBSOLETE] uint purgeattachedscheme(string check);            // remove attached_scheme, then returns vghost.size() - same as pop_attached
-      uint push_attached(string scheme,string attached);               // add attached_scheme, then returns vghost.size() - like addattachedscheme with flag=TRUE
-      uint pop_attached(string check);                                 // remove attached_scheme, then returns vghost.size()
+      uint push_attached(const string& scheme,const string& attached);               // add attached_scheme, then returns vghost.size() - like addattachedscheme with flag=TRUE //CO20210805 - const&
+      uint pop_attached(const string& check);                                 // remove attached_scheme, then returns vghost.size() //CO20210805 - const&
       string getattachedscheme(const string& scheme) const; //CO20180101
       template<class utype> utype getattachedutype(const string& scheme) const;  //CO20200731
       bool args2addattachedscheme(vector<string> &argv,const string scheme,const string& _s_search,string string_default); 

@@ -889,9 +889,11 @@ _vflags::_vflags() {
   // [OBSOLETE] KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG                           = FALSE;
   // [OBSOLETE] KBIN_VASP_KPOINTS_BANDS_LATTICE_VALUE                          = "";
 
-  KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG                      = FALSE;
-  KBIN_VASP_KPOINTS_BANDS_GRID_FLAG                              = FALSE;
-  KBIN_VASP_KPOINTS_BANDS_GRID_VALUE                             = 0;
+  //[CO20210805 - OBSOLETE]KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG                      = FALSE;
+  KBIN_VASP_KPOINTS_BANDS_GRID.clear();                         //CO20210805
+  KBIN_VASP_KPOINTS_BANDS_GRID.push(aurostd::utype2string(DEFAULT_BANDS_GRID));        //CO20210805
+  //[CO20210805 - OBSOLETE]KBIN_VASP_KPOINTS_BANDS_GRID_FLAG                              = FALSE;
+  //[CO20210805 - OBSOLETE]KBIN_VASP_KPOINTS_BANDS_GRID_VALUE                             = 0;
   KBIN_VASP_WRITE_KPOINTS                                        = FALSE;
   // KBIN_VASP_POSCAR_MODE
   KBIN_VASP_POSCAR_MODE.clear();                                 // all false
@@ -1071,9 +1073,10 @@ void _vflags::copy(const _vflags& b) {
   KBIN_VASP_KPOINTS_BANDS_LATTICE                                = b.KBIN_VASP_KPOINTS_BANDS_LATTICE;
   // [OBSOLETE] KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG                           = b.KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG;
   // [OBSOLETE] KBIN_VASP_KPOINTS_BANDS_LATTICE_VALUE                          = b.KBIN_VASP_KPOINTS_BANDS_LATTICE_VALUE;
-  KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG                      = b.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG;
-  KBIN_VASP_KPOINTS_BANDS_GRID_FLAG                              = b.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG;
-  KBIN_VASP_KPOINTS_BANDS_GRID_VALUE                             = b.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE;
+  //[CO20210805 - OBSOLETE]KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG                      = b.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG;
+  KBIN_VASP_KPOINTS_BANDS_GRID                                   = b.KBIN_VASP_KPOINTS_BANDS_GRID;  //CO20210805
+  //[CO20210805 - OBSOLETE]KBIN_VASP_KPOINTS_BANDS_GRID_FLAG                              = b.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG;
+  //[CO20210805 - OBSOLETE]KBIN_VASP_KPOINTS_BANDS_GRID_VALUE                             = b.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE;
   KBIN_VASP_WRITE_KPOINTS                                        = b.KBIN_VASP_WRITE_KPOINTS;
   // KBIN_VASP_POSCAR_MODE
   KBIN_VASP_POSCAR_MODE                                          = b.KBIN_VASP_POSCAR_MODE;
