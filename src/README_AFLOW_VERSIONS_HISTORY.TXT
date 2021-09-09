@@ -1,6 +1,7 @@
 3.2.12 - 2021/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- patching populateXVASP() bug for BANDS_LATTICE and BANDS_GRID (CO)
+        -- patching xoption::options2entry() clear() issues (CO)
         -- added swap memory check to aurostd::GetMemory() and aurostd::GetMemoryUsagePercentage() (CO)
         -- patched --qmvasp command (CO)
         -- adding --contcar_save_outcar_complete to KBIN::Clean() (CO)
