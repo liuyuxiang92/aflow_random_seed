@@ -6284,13 +6284,15 @@ namespace aurostd {
 // generic functionality to turn a double into a fraction
 // (continued fraction method)
 namespace aurostd{
-  void double2fraction(const double& input_double, int& numerator, int& denominator, double tol){
+  void double2fraction(const double& input_double, int& numerator, int& denominator, double tol_diff, double tol_remainder){  //CO+DX20210909
 
     // Method for converting a double into a fraction comprised of an integer
     // in the numerator and denominator
     // default tol=1e-2 (well-tested value)
     // See https://en.wikipedia.org/wiki/Continued_fraction for more details
     // DX20210908
+    // tol_diff compares input_double and numerator/denominator //CO+DX20210909
+    // tol_remainder is for the continued fraction algorithm (best not to change from 1e-2, or it runs forever  //CO+DX20210909
    
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "aurostd::continuedFractions():";
@@ -6298,9 +6300,13 @@ namespace aurostd{
 
     vector<int> fraction_sequence;
     double tmp_double = input_double, difference = 1e9;
-    int count = 0, count_max=100; // count_max is a while-loop safeguard
+    int count=0,count_max=max(100,(int)std::ceil(std::pow(10.0,log10(1.0/tol_remainder)))); // count_max is a while-loop safeguard //CO20210909 patched count_max to change with tol_remainder
     
-    if(LDEBUG){ cerr << function_name << " input_double=" << input_double << endl; }
+    if(LDEBUG){
+      cerr << function_name << " input_double=" << std::fixed << std::setprecision(15) << input_double << endl;
+      cerr << function_name << " tol_diff=" << std::fixed << std::setprecision(15) << tol_diff << endl;
+      cerr << function_name << " tol_remainder=" << std::fixed << std::setprecision(15) << tol_remainder << endl;
+    }
     
     // ---------------------------------------------------------------------------
     // determine the fraction sequence
@@ -6308,7 +6314,7 @@ namespace aurostd{
     // then find the remainder, take inverse (divide by 1), and make this the
     // "new" double. Continue the process until a tolerance threshold is met
     // (i.e., difference is below tolerances)
-    while(difference>tol&&count<100){
+    while(difference>tol_remainder&&count<count_max){
       int floor_int = std::floor(tmp_double);
       fraction_sequence.push_back(floor_int);
       difference = tmp_double - floor_int;
@@ -6333,8 +6339,13 @@ namespace aurostd{
     // ---------------------------------------------------------------------------
     // check result
     double fraction2double = (double)numerator/(double)denominator;
-    if(!aurostd::isequal(input_double,fraction2double,tol)){
-      message << "The fraction=" << numerator << "/" << denominator << " (=" << fraction2double << ") is not equal to the input_double=" << input_double << " (with tol=" << tol << ").";
+    if(LDEBUG){
+      cerr << function_name << " fraction2double=" << std::fixed << std::setprecision(15) << fraction2double << endl;
+      cerr << function_name << " input_double=" << std::fixed << std::setprecision(15) << input_double << endl;
+      cerr << function_name << " diff=" << std::fixed << std::setprecision(15) << abs(fraction2double-input_double) << endl;
+    }
+    if(!aurostd::isequal(input_double,fraction2double,tol_diff)){
+      message << "The fraction=" << numerator << "/" << denominator << " (=" << std::fixed << std::setprecision(15) << fraction2double << ") is not equal to the input_double=" << std::fixed << std::setprecision(15) << input_double << " (with tol_diff=" << std::fixed << std::setprecision(15) << tol_diff << ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message,_RUNTIME_ERROR_);
     }
   }

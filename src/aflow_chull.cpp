@@ -1932,9 +1932,9 @@ namespace chull {
     string soliloquy=XPID+"ChullPoint::setGenCoords():";
     if(entry.vcomposition.size()==0&&entry.vstoichiometry.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No vcomposition or vstoichiometry found for entry.auid="+entry.auid,_RUNTIME_ERROR_);}
     xvector<double> coord(velements.size());
-    bool found=false;
+    bool found=false; //not necessary, we already check in entryValid()
+    double c_sum=0.0;
     if(entry.vcomposition.size()>0){
-      double c_sum=0.0;
       for(uint i=0,fl_size_i=entry.vcomposition.size();i<fl_size_i;i++){c_sum+=entry.vcomposition[i];}  //derive stoich exactly!
       if(c_sum==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"c_sum==0 (entry.auid="+entry.auid+",entry.aurl="+entry.aurl+")",_RUNTIME_ERROR_);}
       for(uint i=0,fl_size_i=velements.size();i<fl_size_i-1;i++){
@@ -1948,15 +1948,41 @@ namespace chull {
         //[might be from lower hull]if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"element not found: "+velements[i],_RUNTIME_ERROR_);}
       }
     }else{  //pocc structures have no vcomposition, only vstoichiometry
+      //get exact fraction
+      int numerator=0.0,denominator=0.0;
+      double stoich=0.0;
+      vector<double> vstoich;
+      for(uint i=0,fl_size_i=entry.vstoichiometry.size();i<fl_size_i;i++){  //derive stoich exactly!
+        aurostd::double2fraction(entry.vstoichiometry[i],numerator,denominator,ZERO_TOL*10);  //ZERO_TOL=1e-8, make slightly looser than what's written to aflowlib.out
+        stoich=(double)numerator/(double)denominator;
+        c_sum+=stoich;
+        vstoich.push_back(stoich);
+      }
+      if(c_sum==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"c_sum==0 (entry.auid="+entry.auid+",entry.aurl="+entry.aurl+")",_RUNTIME_ERROR_);}
+      if(!aurostd::identical(c_sum,1.0,ZERO_TOL)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"c_sum!=1 (entry.auid="+entry.auid+",entry.aurl="+entry.aurl+")",_RUNTIME_ERROR_);}
       for(uint i=0,fl_size_i=velements.size();i<fl_size_i-1;i++){
         found=false;
         for(uint j=0,fl_size_j=entry.vspecies.size();j<fl_size_j && !found;j++){
           if(velements[i]==entry.vspecies[j]){
-            coord[i+coord.lrows]=entry.vstoichiometry[j];
+            coord[i+coord.lrows]=vstoich[j]/c_sum;
             found=true;
           }
         }
         //[might be from lower hull]if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"element not found: "+velements[i],_RUNTIME_ERROR_);}
+      }
+      if(0){  //entry.vstoichiometry has write round-offs, better to derive fraction exactly
+        for(uint i=0,fl_size_i=entry.vstoichiometry.size();i<fl_size_i;i++){c_sum+=entry.vstoichiometry[i];}  //derive stoich exactly!
+        if(c_sum==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"c_sum==0 (entry.auid="+entry.auid+",entry.aurl="+entry.aurl+")",_RUNTIME_ERROR_);}
+        for(uint i=0,fl_size_i=velements.size();i<fl_size_i-1;i++){
+          found=false;
+          for(uint j=0,fl_size_j=entry.vspecies.size();j<fl_size_j && !found;j++){
+            if(velements[i]==entry.vspecies[j]){
+              coord[i+coord.lrows]=entry.vstoichiometry[j]/c_sum;
+              found=true;
+            }
+          }
+          //[might be from lower hull]if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"element not found: "+velements[i],_RUNTIME_ERROR_);}
+        }
       }
     }
     if(formation_energy_coord){coord[coord.urows]=H_f_atom(entry);} //entry.enthalpy_formation_atom
@@ -1984,19 +2010,23 @@ namespace chull {
   void ChullPoint::setStoichCoords() {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     string soliloquy=XPID+"ChullPoint::setStoichCoords():";
-    if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
+    if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates: aurl="+m_entry.aurl);}
     double c_sum=0.0; //concentration sum
     xvector<double> stoich(m_coords.urows,m_coords.lrows);
     xvector<int> elements_present(m_coords.urows,m_coords.lrows);
     if(LDEBUG) {cerr << soliloquy << " m_coords=" << m_coords << endl;}
     for(int j=m_coords.lrows;j<=m_coords.urows-1;j++){
-      if(std::signbit(m_coords[j])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Negative stoich coordinate found");} //no negative numbers in stoich coordinates, only energy
+      if(std::signbit(m_coords[j])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Negative stoich coordinate found: aurl="+m_entry.aurl);} //no negative numbers in stoich coordinates, only energy
       stoich[j]=m_coords[j];
       if(nonZeroWithinTol(m_coords[j])){elements_present[j]=1;}
       c_sum+=m_coords[j];
     }
     stoich[stoich.urows]=(1.0-c_sum); //hidden dimension
-    if(std::signbit(stoich[stoich.urows])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Negative stoich coordinate found");}  //no negative numbers
+    if(std::signbit(stoich[stoich.urows])){
+      //necessary check now because POCC entries have no composition, only stoich, so write-out errors will be prevalent
+      if(zeroWithinTol(stoich[stoich.urows])){stoich[stoich.urows]=0.0;}  //only zero out for the last coord, as it's derived from the subtraction of the others
+      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Negative stoich coordinate found: aurl="+m_entry.aurl);}
+    }  //no negative numbers
     if(nonZeroWithinTol(stoich[stoich.urows])){elements_present[elements_present.urows]=1;}   //check if nary++
     s_coords=stoich;
     c_coords=s_coords;
