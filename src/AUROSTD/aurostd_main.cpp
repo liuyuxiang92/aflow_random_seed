@@ -6193,6 +6193,7 @@ namespace aurostd {
 // FUNCTION DOUBLE2FRACTION
 //DX20190824 (moved from aflow_symmetry_spacegroup_functions.cpp)
 // hard-coded variant until generic converter is integrated
+// DX20210908 - added generic converter
 
 // ******************************************************************************
 // dbl2frac Double to Fraction (Overloaded)
@@ -6274,6 +6275,101 @@ namespace aurostd {
     return out;
   }
 } //namespace SYM
+
+
+//DX20210908 - double2fraction functionality - STOP
+// ******************************************************************************
+// aurostd::double2fraction() //DX20210908
+// ******************************************************************************
+// generic functionality to turn a double into a fraction
+// (continued fraction method)
+namespace aurostd{
+  void double2fraction(const double& input_double, int& numerator, int& denominator, double tol){
+
+    // Method for converting a double into a fraction comprised of an integer
+    // in the numerator and denominator
+    // default tol=1e-2 (well-tested value)
+    // See https://en.wikipedia.org/wiki/Continued_fraction for more details
+    // DX20210908
+   
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "aurostd::continuedFractions():";
+    stringstream message;
+
+    vector<int> fraction_sequence;
+    double tmp_double = input_double, difference = 1e9;
+    int count = 0, count_max=100; // count_max is a while-loop safeguard
+    
+    if(LDEBUG){ cerr << function_name << " input_double=" << input_double << endl; }
+    
+    // ---------------------------------------------------------------------------
+    // determine the fraction sequence
+    // i.e., determine the integer part of the double (via std::floor)
+    // then find the remainder, take inverse (divide by 1), and make this the
+    // "new" double. Continue the process until a tolerance threshold is met
+    // (i.e., difference is below tolerances)
+    while(difference>tol&&count<100){
+      int floor_int = std::floor(tmp_double);
+      fraction_sequence.push_back(floor_int);
+      difference = tmp_double - floor_int;
+      tmp_double = 1.0/difference;
+      count++;
+    }
+    if(count==count_max){
+      message << "The number of elements in the fraction sequence exceeded " << count_max << ". Increase the threshold or there is an issue with the while-loop.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message,_RUNTIME_ERROR_);
+    }
+    if(LDEBUG){ cerr << function_name << " fraction_sequence=" << aurostd::joinWDelimiter(fraction_sequence, ",") << endl; }
+    
+    // ---------------------------------------------------------------------------
+    // determine the numerator and denominator
+    int n = fraction_sequence.size()-1;
+    numerator=1;
+    denominator=1;
+    numerator = getNumeratorContinuedFractions(numerator,n,fraction_sequence);
+    denominator = getDenominatorContinuedFractions(denominator,n,fraction_sequence);
+    if(LDEBUG){ cerr << function_name << " calculated fraction=" << numerator << "/" << denominator << endl; }
+
+    // ---------------------------------------------------------------------------
+    // check result
+    double fraction2double = (double)numerator/(double)denominator;
+    if(!aurostd::isequal(input_double,fraction2double,tol)){
+      message << "The fraction=" << numerator << "/" << denominator << " (=" << fraction2double << ") is not equal to the input_double=" << input_double << " (with tol=" << tol << ").";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message,_RUNTIME_ERROR_);
+    }
+  }
+}
+
+namespace aurostd{
+  int getNumeratorContinuedFractions(int& p, const int& n, vector<int>& fraction_sequence){
+    
+    // Get the numerator (p) for a continued fraction
+    // Note: slightly different than procedure for denominator
+    // See https://en.wikipedia.org/wiki/Continued_fraction for more details
+    // DX20210908
+
+    if(n>=2){ p = fraction_sequence[n]*getNumeratorContinuedFractions(p,n-1,fraction_sequence) + getNumeratorContinuedFractions(p,n-2,fraction_sequence); }
+    else if (n==1){ p = fraction_sequence[n]*getNumeratorContinuedFractions(p,n-1,fraction_sequence) + 1; }
+    else if(n==0){ p = fraction_sequence[n]*1 + 0; }
+    return p;  
+  }
+}
+
+namespace aurostd{
+  int getDenominatorContinuedFractions(int& q, const int& n, vector<int>& fraction_sequence){
+    
+    // Get the denominator (q) for a continued fraction
+    // Note: slightly different than procedure for numerator
+    // See https://en.wikipedia.org/wiki/Continued_fraction for more details
+    // DX20210908
+
+    if(n>=2){ q = fraction_sequence[n]*getDenominatorContinuedFractions(q,n-1,fraction_sequence) + getDenominatorContinuedFractions(q,n-2,fraction_sequence); }
+    else if (n==1){ q = fraction_sequence[n]*getDenominatorContinuedFractions(q,n-1,fraction_sequence) + 0; }
+    else if(n==0){ q = 1; }
+    return q;  
+  }
+}
+//DX20210908 - double2fraction functionality - STOP
 
 // ******************************************************************************
 // dbl2frac Double to Fraction //DX20200313
