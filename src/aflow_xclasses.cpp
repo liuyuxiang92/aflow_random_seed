@@ -718,8 +718,12 @@ void _kflags::clear() {
 // look into aflow.h for the definitions
 
 // constructors
-_vflags::_vflags() {
+_vflags::_vflags() {free();}
 
+// destructor
+_vflags::~_vflags() {free();}
+
+void _vflags::free() {
   // SYSTEM
   AFLOW_SYSTEM.clear(); //ME20181121
 
@@ -839,16 +843,16 @@ _vflags::_vflags() {
 
   KBIN_VASP_FORCE_OPTION_NSW_EQUAL                               = FALSE;
   KBIN_VASP_FORCE_OPTION_NSW_EQUAL_VALUE                         = 0;
-
-  KBIN_VASP_FORCE_OPTION_KPOINTS.clear();                        // KPOINTS
+  
   // AFIX
   KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.clear();                    // AFIX
   // CONVERT
   KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.clear(); 
-
   //  KBIN_VASP_FORCE_OPTION_VOLUME
   KBIN_VASP_FORCE_OPTION_VOLUME.clear();                         // RUN
   KBIN_VASP_FORCE_OPTION_VOLUME.push("");                   // RUN
+
+  KBIN_VASP_FORCE_OPTION_KPOINTS.clear();                        // KPOINTS
 
   // KBIN_VASP_INCAR_MODE
   KBIN_VASP_INCAR_MODE.clear();                                  // all false
@@ -899,9 +903,8 @@ _vflags::_vflags() {
   KBIN_VASP_POSCAR_MODE.clear();                                 // all false
   KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.clear();
   KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRUCTURE.clear();
-  // KBIN_VASP_POTCAR_MODE  
-  KBIN_VASP_POTCAR_MODE.clear();                                 // all false
   // KBIN_VASP_INCAR_FILE
+  KBIN_VASP_INCAR_VERBOSE                                        = TRUE; // VERBOSITY IS GOOD !!!
   KBIN_VASP_INCAR_FILE.clear();                                  // all false
   KBIN_VASP_INCAR_EXPLICIT.clear(); //ME20181226
   KBIN_VASP_INCAR_EXPLICIT_START_STOP.str(""); //ME20181226 //CO20190401 - clear ss with .str("")
@@ -909,7 +912,6 @@ _vflags::_vflags() {
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_SYSTEM_AUTO                 = FALSE;
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_FILE                        = FALSE;
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_COMMAND                     = FALSE;
-  KBIN_VASP_INCAR_VERBOSE                                        = TRUE; // VERBOSITY IS GOOD !!!
 
   // KBIN_VASP_KPOINTS_FILE
   KBIN_VASP_KPOINTS_FILE.clear();                                // all false
@@ -930,7 +932,8 @@ _vflags::_vflags() {
   KBIN_VASP_POSCAR_FILE_VOLUME.clear();                          // RUN
   KBIN_VASP_POSCAR_FILE_VOLUME.push("");                    // RUN
 
-
+  // KBIN_VASP_POTCAR_MODE  
+  KBIN_VASP_POTCAR_MODE.clear();                                 // all false
   // KBIN_VASP_POTCAR_FILE
   KBIN_VASP_POTCAR_FILE.clear();                                 // all false
   KBIN_VASP_POTCAR_EXPLICIT.clear(); //ME20181226
@@ -940,14 +943,6 @@ _vflags::_vflags() {
   // [OBSOLETE] KBIN_VASP_POTCAR_FILE_SUFFIX                     = FALSE;
   // [OBSOLETE] KBIN_VASP_POTCAR_FILE_FILE                       = FALSE;
   // [OBSOLETE] KBIN_VASP_POTCAR_FILE_COMMAND                    = FALSE;
-}
-
-// destructor
-_vflags::~_vflags() {
-  free();
-}
-
-void _vflags::free() {
 }
 
 void _vflags::copy(const _vflags& b) {
@@ -1116,7 +1111,6 @@ void _vflags::copy(const _vflags& b) {
   // KBIN_VASP_POSCAR_FILE_VOLUME
   KBIN_VASP_POSCAR_FILE_VOLUME                                   = b.KBIN_VASP_POSCAR_FILE_VOLUME;
 
-
   // KBIN_VASP_POTCAR_FILE
   KBIN_VASP_POTCAR_FILE                                          = b.KBIN_VASP_POTCAR_FILE;
   KBIN_VASP_POTCAR_EXPLICIT.clear(); KBIN_VASP_POTCAR_EXPLICIT << b.KBIN_VASP_POTCAR_EXPLICIT.str(); //ME20181226
@@ -1144,10 +1138,7 @@ const _vflags& _vflags::operator=(const _vflags& b) {  // operator=
   return *this;
 }
 
-void _vflags::clear() {
-  _vflags vflags_temp;
-  copy(vflags_temp);
-}
+void _vflags::clear() {free();}
 
 // **************************************************************************
 // **************************************************************************
