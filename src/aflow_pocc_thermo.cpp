@@ -721,7 +721,7 @@ namespace pocc {
     file << AFLOWIN_SEPARATION_LINE << std::endl;
 
     // save data into the file
-    string filename = POCC_FILE_PREFIX + "qha." + DEFAULT_QHA_THERMO_FILE;
+    string filename = POCC_FILE_PREFIX + DEFAULT_POCC_QHA_THERMO_FILE;
     if (aurostd::FileExist(filename)){
       if (!aurostd::stringstream2file(file, filename, "APPEND")){
         msg = "Error writing to " + filename + " file.";

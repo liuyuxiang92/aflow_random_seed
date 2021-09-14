@@ -676,6 +676,12 @@
 #define AFLOWRC_DEFAULT_QHA_KPOINTS_FILE                      string("kpoints.out")
 #define         DEFAULT_QHA_KPOINTS_FILE                      XHOST.adefault.getattachedscheme("DEFAULT_QHA_KPOINTS_FILE")
 //AS20201112 
+//AS20210914 BEGIN
+#define AFLOWRC_DEFAULT_POCC_QHA_THERMO_FILE                  string("qha.thermo.out")
+#define         DEFAULT_POCC_QHA_THERMO_FILE                  XHOST.adefault.getattachedscheme("DEFAULT_POCC_QHA_THERMO_FILE")
+#define AFLOWRC_DEFAULT_POCC_QHA_AVGTHERMO_FILE               string("qha.avgthermo.out")
+#define         DEFAULT_POCC_QHA_AVGTHERMO_FILE               XHOST.adefault.getattachedscheme("DEFAULT_POCC_QHA_AVGTHERMO_FILE")
+//AS20210914 END
 
 // DEFAULT AAPL
 //// DEFAULT AAPL VALUES
@@ -1549,6 +1555,10 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_QHA_PDIS_FILE", AFLOWRC_DEFAULT_QHA_PDIS_FILE);//AS20201022
     aflowrc::load_default("DEFAULT_QHA_PDOS_FILE", AFLOWRC_DEFAULT_QHA_PDOS_FILE);//AS20201201
     aflowrc::load_default("DEFAULT_QHA_KPOINTS_FILE", AFLOWRC_DEFAULT_QHA_KPOINTS_FILE);//AS20201112
+    //AS20210914 BEGIN
+    aflowrc::load_default("DEFAULT_POCC_QHA_THERMO_FILE", AFLOWRC_DEFAULT_POCC_QHA_THERMO_FILE);
+    aflowrc::load_default("DEFAULT_POCC_QHA_AVGTHERMO_FILE", AFLOWRC_DEFAULT_POCC_QHA_AVGTHERMO_FILE);
+    //AS20210914 END
 
     // DEFAULT AAPL
     //// DEFAULT AAPL VALUES
@@ -2168,6 +2178,10 @@ namespace aflowrc {
     aflowrc << "DEFAULT_QHA_PDIS_FILE=\"" << AFLOWRC_DEFAULT_QHA_PDIS_FILE << "\"" << endl;//AS20201022
     aflowrc << "DEFAULT_QHA_PDOS_FILE=\"" << AFLOWRC_DEFAULT_QHA_PDOS_FILE << "\"" << endl;//AS20201201
     aflowrc << "DEFAULT_QHA_KPOINTS_FILE=\"" << AFLOWRC_DEFAULT_QHA_KPOINTS_FILE << "\"" << endl;//AS20201112
+    //AS20210914 BEGIN
+    aflowrc << "DEFAULT_POCC_QHA_THERMO_FILE=\"" << AFLOWRC_DEFAULT_POCC_QHA_THERMO_FILE << "\"" << endl;
+    aflowrc << "DEFAULT_POCC_QHA_AVGTHERMO_FILE=\"" << AFLOWRC_DEFAULT_POCC_QHA_AVGTHERMO_FILE << "\"" << endl;
+    //AS20210914 END
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS AAPL" << endl;
@@ -2754,6 +2768,10 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_PDIS_FILE\")=\"" << DEFAULT_QHA_PDIS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_PDOS_FILE\")=\"" << DEFAULT_QHA_PDOS_FILE << "\"" << endl;//AS20201201
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QHA_KPOINTS_FILE\")=\"" << DEFAULT_QHA_KPOINTS_FILE << "\"" << endl;//AS20201112
+    //AS20210914 BEGIN
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_QHA_THERMO_FILE\")=\"" << DEFAULT_POCC_QHA_THERMO_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_QHA_AVGTHERMO_FILE\")=\"" << DEFAULT_POCC_QHA_AVGTHERMO_FILE << "\"" << endl;
+    //AS20210914 END
     if(LDEBUG) oss << "// DEFAULTS AAPL" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BTE\")=\"" << DEFAULT_AAPL_BTE << "\"" << endl;
     //[ME20181226]if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AAPL_BZMETHOD\")=\"" << DEFAULT_AAPL_BZMETHOD << "\"" << endl;

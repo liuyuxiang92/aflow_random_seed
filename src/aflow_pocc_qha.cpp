@@ -338,7 +338,7 @@ namespace pocc {
     file << "[POCC_QHA_SJ_BETA_F]STOP" << std::endl;
     file << AFLOWIN_SEPARATION_LINE << std::endl;
 
-    string output_file = "aflow.pocc.qha.avgthermo.out";
+    string output_file = POCC_FILE_PREFIX + DEFAULT_POCC_QHA_AVGTHERMO_FILE;
     msg = "Writing the averaged POCC+QHA data to " + output_file+" file.";
     pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
         *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
