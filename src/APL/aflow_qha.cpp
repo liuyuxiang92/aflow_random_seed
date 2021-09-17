@@ -418,7 +418,8 @@ namespace apl
 
       // if APL state file for V=1.0 exists, reuse it and do not create PHONON_1.000 directory
       if (aurostd::isequal(gprange[j], 1.0) &&
-          aurostd::EFileExist(DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_STATE_FILE)){
+          aurostd::EFileExist(currentDirectory + "/" +
+            DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_STATE_FILE)){
         subdirectories_apl_gp.push_back(".");
       }
       else{
@@ -444,7 +445,8 @@ namespace apl
 
         // if APL state file for V=1.0 exists, reuse it and do not create PHONON_1.000 directory
         if (aurostd::isequal(i, 1.0) &&
-            aurostd::EFileExist(DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_STATE_FILE)){
+            aurostd::EFileExist(currentDirectory + "/" +
+              DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_STATE_FILE)){
           subdirectories_apl_eos.push_back(".");
         }
         else{
@@ -494,7 +496,8 @@ namespace apl
 
         // if APL state file for V=1.0 exists, reuse it and do not create PHONON_1.000 directory
         if (aurostd::isequal(coef, 1.0) &&
-            aurostd::EFileExist(DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_STATE_FILE)){
+            aurostd::EFileExist(currentDirectory + "/" +
+              DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_STATE_FILE)){
           subdirectories_apl_qhanp.push_back(".");
         }
         else{
