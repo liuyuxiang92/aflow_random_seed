@@ -1929,6 +1929,7 @@ namespace chull {
   }
 
   void ChullPoint::setGenCoords(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,bool formation_energy_coord) {
+    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     string soliloquy=XPID+"ChullPoint::setGenCoords():";
     if(entry.vcomposition.size()==0&&entry.vstoichiometry.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No vcomposition or vstoichiometry found for entry.auid="+entry.auid,_RUNTIME_ERROR_);}
     xvector<double> coord(velements.size());
@@ -1949,11 +1950,12 @@ namespace chull {
       }
     }else{  //pocc structures have no vcomposition, only vstoichiometry
       //get exact fraction
-      int numerator=0.0,denominator=0.0;
+      int numerator=0,denominator=0;
       double stoich=0.0;
       vector<double> vstoich;
+      if(LDEBUG){cerr << soliloquy << " converting stoich[aurl=" << entry.aurl << "]=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(entry.vstoichiometry),",") << " to fractions" << endl;}
       for(uint i=0,fl_size_i=entry.vstoichiometry.size();i<fl_size_i;i++){  //derive stoich exactly!
-        aurostd::double2fraction(entry.vstoichiometry[i],numerator,denominator,ZERO_TOL*10);  //ZERO_TOL=1e-8, make slightly looser than what's written to aflowlib.out
+        aurostd::double2fraction(entry.vstoichiometry[i],numerator,denominator,DEFAULT_POCC_STOICH_TOL);  //ZERO_TOL*10 is preferred, but due to buy in GetStoich(), use DEFAULT_POCC_STOICH_TOL instead (for now) //ZERO_TOL=1e-8, make slightly looser than what's written to aflowlib.out
         stoich=(double)numerator/(double)denominator;
         c_sum+=stoich;
         vstoich.push_back(stoich);
@@ -2844,7 +2846,10 @@ namespace chull {
     }
     double hid_dim=1.0-sum(m_coords);
     if(LDEBUG) {cerr << soliloquy << " hid_dim=" << hid_dim << endl;}
-    if(std::signbit(hid_dim) || hid_dim>1.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coord("+aurostd::utype2string(m_coords.rows)+") is outside of [0,1] range of a generalized stoichiometry coordinate");}
+    if(std::signbit(hid_dim) || hid_dim>1.0) {
+      if(zeroWithinTol(hid_dim)){hid_dim=0.0;}  //only zero out for the last coord, as it's derived from the subtraction of the others
+      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coord("+aurostd::utype2string(m_coords.rows)+") is outside of [0,1] range of a generalized stoichiometry coordinate");}
+    }
 
     xvector<int> elements_present(m_coords.lrows,m_coords.urows+1);
     for(int i=m_coords.lrows;i<=m_coords.urows;i++){if(nonZeroWithinTol(m_coords[i])){elements_present[i]=1;}}
