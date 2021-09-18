@@ -7292,6 +7292,7 @@ namespace KBIN {
     else if(mode=="NBANDS") {
       fix="NBANDS++";
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+      if(Krun){xfixed.flag("NBANDS_EXHAUSTED",false);}  //if the NBANDS error comes up, the ONLY solution is to increase NBANDS //let it continue resetting "NBANDS_EXHAUSTED", no problem... //remember, there are other reasons for fix=="NBANDS++"
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="NELM") { //CSLOSHING solutions should be tried first
@@ -7567,6 +7568,7 @@ namespace KBIN {
     else if(mode=="MPICH11") {try_last_ditch_effort=false;} //changing POSCAR doesn't help
     else if(mode=="MPICH139") {try_last_ditch_effort=false;} //changing POSCAR doesn't help
     else if(mode=="MPICH174") {try_last_ditch_effort=false;} //changing POSCAR doesn't help
+    else if(mode=="NBANDS") {try_last_ditch_effort=false;} //changing POSCAR doesn't help
 
     if(Krun==false && try_last_ditch_effort){
       //last-ditch effort, increase volume
@@ -7584,6 +7586,7 @@ namespace KBIN {
     else if(mode=="MPICH139") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
     else if(mode=="MPICH174") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
     else if(mode=="NATOMS") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    else if(mode=="NBANDS") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
 
     if(Krun==false && try_last_ditch_effort){
       //last-ditch effort, increase KPOINTS
@@ -7601,6 +7604,7 @@ namespace KBIN {
     else if(mode=="MPICH139") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
     else if(mode=="MPICH174") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
     else if(mode=="NATOMS") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    else if(mode=="NBANDS") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
 
     if(Krun==false && try_last_ditch_effort){
       //last-ditch effort, increase KPOINTS
