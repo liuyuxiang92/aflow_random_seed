@@ -6,7 +6,8 @@
         -- patched --qmvasp command (CO)
         -- adding --contcar_save_outcar_complete to KBIN::Clean() (CO)
         -- NBANDS equation typo patch, returning old NBANDS behavior (CO)
-        -- fixing some "NBANDS" patches (CO)
+        -- fixing some error="NBANDS" patches (CO)
+        -- patching GetStoich() bug with pocc structures (round-off printing errors) (CO)
 3.2.11 - 2021/08/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.11.tar.xz
         -- added plotter options for QHA (AS)
