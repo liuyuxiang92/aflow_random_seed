@@ -5,7 +5,8 @@
         -- added swap memory check to aurostd::GetMemory() and aurostd::GetMemoryUsagePercentage() (CO)
         -- patched --qmvasp command (CO)
         -- adding --contcar_save_outcar_complete to KBIN::Clean() (CO)
-        -- nbands equation typo patch, returning old nbands behavior (CO)
+        -- NBANDS equation typo patch, returning old NBANDS behavior (CO)
+        -- fixing some "NBANDS" patches (CO)
 3.2.11 - 2021/08/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.11.tar.xz
         -- added plotter options for QHA (AS)
