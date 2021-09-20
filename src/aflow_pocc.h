@@ -825,8 +825,9 @@ namespace pocc {
     public:
       EnsembleThermo(ostream &oss=std::cout);
       EnsembleThermo(const EnsembleThermo &ens);
-      EnsembleThermo(vector<string> &directories, const string &filename,
-          const string &calc_type, apl::EOSmethod eos_method, bool isFVTprovided,
+      EnsembleThermo(const string & currentDir, vector<string> &directories,
+          const string &filename, const string &calc_type,
+          apl::EOSmethod eos_method, bool isFVTprovided,
           ofstream &FileMESSAGE, ostream &oss=std::cout);
       const EnsembleThermo& operator=(const EnsembleThermo &ens);
       ~EnsembleThermo();
@@ -836,6 +837,7 @@ namespace pocc {
       int Nvolumes;
       int nrows;
       double Ensemble_Vmin, Ensemble_Vmax;
+      string currentDirectory;
       xvector<double> T;
       xmatrix<double> FV;
       xvector<double> volumes;

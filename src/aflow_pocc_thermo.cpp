@@ -55,6 +55,7 @@ namespace pocc {
   /// Initializes all values to "zero" and attempts to clear all containers.
   void EnsembleThermo::free()
   {
+    currentDirectory = ".";
     qha.clear();
     eos_method = apl::EOS_SJ;
     Nstructures = 0;
@@ -79,6 +80,7 @@ namespace pocc {
   {
     if (this==&ens) return;
 
+    currentDirectory = ens.currentDirectory;
     qha = ens.qha;
     eos_method = ens.eos_method;
     Nstructures = ens.Nstructures;
@@ -99,7 +101,8 @@ namespace pocc {
     beta = ens.beta;
   }
 
-  EnsembleThermo::EnsembleThermo(vector<string> &directories, const string &fname,
+  EnsembleThermo::EnsembleThermo(const string &currentDir,
+      vector<string> &directories, const string &fname,
       const string &calc_type, apl::EOSmethod eos_method, bool isFVTprovided,
       ofstream &FileMESSAGE, ostream &oss)
   {
@@ -110,6 +113,7 @@ namespace pocc {
 
     xStream::initialize(FileMESSAGE, oss);
     this->eos_method = eos_method;
+    currentDirectory = currentDir;
 
     Ensemble_Vmin = DBL_MAX, Ensemble_Vmax = 0;
     double Vmin = 0, Vmax = 0;
@@ -118,7 +122,7 @@ namespace pocc {
     vector<xvector<double> > T_list;
 
     for (uint i=0; i<directories.size(); i++){
-      file = directories[i] + "/" + fname;
+      file = currentDirectory + "/" + directories[i] + "/" + fname;
 
       if (!aurostd::EFileExist(file)){
         msg = "File " + file + " does not exists:";
@@ -721,7 +725,8 @@ namespace pocc {
     file << AFLOWIN_SEPARATION_LINE << std::endl;
 
     // save data into the file
-    string filename = POCC_FILE_PREFIX + DEFAULT_POCC_QHA_THERMO_FILE;
+    string filename = currentDirectory + "/";
+    filename += POCC_FILE_PREFIX + DEFAULT_POCC_QHA_THERMO_FILE;
     if (aurostd::FileExist(filename)){
       if (!aurostd::stringstream2file(file, filename, "APPEND")){
         msg = "Error writing to " + filename + " file.";
@@ -780,7 +785,8 @@ namespace pocc {
     }
 
     // remove output file if already exists
-    filename = POCC_FILE_PREFIX + "qha." + DEFAULT_QHA_THERMO_FILE;
+    filename = m_aflags.Directory + "/";
+    filename += POCC_FILE_PREFIX + "qha." + DEFAULT_QHA_THERMO_FILE;
     if (aurostd::FileExist(filename)){
       aurostd::RemoveFile(filename);
     }
@@ -788,8 +794,8 @@ namespace pocc {
     // calculate thermodynamic properties using data provided by QHA reading
     // the fitting coefficients data (isFVTprovided = false)
     string fname = DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_COEFF_FILE;
-    EnsembleThermo ens(m_ARUN_directories, fname, apl::QHAmethod2label(qha_method),
-        apl::EOS_SJ, false, *p_FileMESSAGE);
+    EnsembleThermo ens(m_aflags.Directory, m_ARUN_directories, fname,
+        apl::QHAmethod2label(qha_method), apl::EOS_SJ, false, *p_FileMESSAGE);
     ens.degeneracies = degeneracies;
     ens.calculateThermodynamicProperties();
     ens.writeThermodynamicProperties();
