@@ -5685,9 +5685,9 @@ namespace aflowlib {
           else if (tokens[0] == "energy_free_vibrational_atom_apl_300K")
             data.energy_free_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
           else if (tokens[0] == "entropy_vibrational_cell_apl_300K")
-            data.entropy_vibrational_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
+            data.entropy_vibrational_cell_apl_300K = 1000.0 * KBOLTZEV * aurostd::string2utype<double>(tokens[1]);  // Convert to meV/K to be consistent with AGL
           else if (tokens[0] == "entropy_vibrational_atom_apl_300K")
-            data.entropy_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+            data.entropy_vibrational_atom_apl_300K = 1000.0 * KBOLTZEV * aurostd::string2utype<double>(tokens[1]);  // Convert to meV/K to be consistent with AGL
           else if (tokens[0] == "energy_internal_vibrational_cell_apl_300K")
             data.energy_internal_vibrational_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
           else if (tokens[0] == "energy_internal_vibrational_atom_apl_300K")
