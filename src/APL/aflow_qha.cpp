@@ -308,6 +308,15 @@ namespace apl
     initialize(in_structure, xinput, qha_options, apl_options, FileMESSAGE, oss);
   }
 
+  //xStream initializers
+  void QHA::initialize(ostream& oss) {
+    xStream::initialize(oss);
+  }
+
+  void QHA::initialize(ofstream& mf, ostream& oss) {
+    xStream::initialize(mf, oss);
+  }
+
   /// Initializes the QHA class with all the necessary data.
   ///
   void QHA::initialize(const xstructure &in_structure, _xinput &xinput,

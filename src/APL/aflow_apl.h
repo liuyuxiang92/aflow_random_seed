@@ -39,6 +39,7 @@ namespace apl {
   void subtractZeroStateForces(vector<_xinput>&, bool);
   void subtractZeroStateForces(vector<_xinput>&, _xinput&);  // ME20190114
 
+  bool APL_Get_AflowInName(string& AflowInName, const string& directory_LIB); //ME20210927
 }
 
 // ***************************************************************************
@@ -89,6 +90,8 @@ namespace apl {
       void initialize(const string&);  // ME20200212
       void initialize(const xstructure&, ofstream&, bool=true, ostream& oss=std::cout);
       void initialize(const xstructure&, bool=true);  // ME20191225
+      void initialize(ostream& oss);
+      void initialize(ofstream& mf, ostream& oss);
       void clearSupercell();
       //void LightCopy(const xstructure& a, xstructure& b);  // OBSOLETE ME20200220
       bool isConstructed();
@@ -147,7 +150,7 @@ namespace apl {
       //ME20190715 END
       //CO END
       // **** BEGIN JJPR *****
-      xvector<int> scell;
+      xvector<int> scell_dim;
       vector<int> _pc2scMap;
       vector<int> _sc2pcMap;
       // **** END  JJPR *****
@@ -194,6 +197,8 @@ namespace apl {
       void initialize(const vector<int>&, const xstructure& xs, bool=true, bool=true);
       void initialize(const xvector<int>&, const xstructure& xs, ofstream&, bool=true, bool=true, ostream& oss=std::cout);
       void initialize(const xvector<int>&, const xstructure& xs, bool=true, bool=true);
+      void initialize(ostream& oss);
+      void initialize(ofstream& mf, ostream& oss);
 
       void makeIrreducible();
       void calculateLittleGroups();  // ME20200109
@@ -395,6 +400,9 @@ namespace apl {
       void clear(Supercell&);
       void initialize(const aurostd::xoption&, ofstream&, ostream& oss=std::cout);
       void initialize(const aurostd::xoption&);
+      void initialize(const xvector<int>&, const xstructure& xs, bool=true, bool=true);
+      void initialize(ostream& oss);
+      void initialize(ofstream& mf, ostream& oss);
 
       bool runVASPCalculations(_xinput&, _aflags&, _kflags&, _xflags&, string&);
 
@@ -497,6 +505,8 @@ namespace apl {
       PhononCalculator& operator=(const PhononCalculator&);
       ~PhononCalculator();
       void clear();
+      void initialize(ostream& oss);
+      void initialize(ofstream& mf, ostream& oss);
 
       string _system;  // ME20190614 - for VASP-style output files
 
@@ -712,7 +722,7 @@ namespace apl {
       void calc(int, double, double, double);  //ME20200203
       void writePDOS(const string&);
       void writePDOS(string, string);  //[PN]
-      xDOSCAR createDOSCAR();  //ME20190614
+      xDOSCAR createDOSCAR() const;  //ME20190614
       void writePHDOSCAR(const string&);  //ME20190614
       // Interface IDOSCalculator
       const std::vector<double>& getBins() const;  //ME20200108 - added const
@@ -760,7 +770,10 @@ namespace apl {
       ThermalPropertiesCalculator& operator=(const ThermalPropertiesCalculator&);
       ~ThermalPropertiesCalculator();
       void clear();
+      void initialize(ostream& oss);
+      void initialize(ofstream& mf, ostream& oss);
 
+      uint natoms;
       vector<double> temperatures;
       vector<double> Cv;
       vector<double> Fvib;
@@ -769,6 +782,7 @@ namespace apl {
       double U0;
       string _directory;
 
+      void initialize(const xDOSCAR&, ofstream&, ostream& oss=std::cout);
       void initialize(const vector<double>&, const vector<double>&, ofstream&, const string& system="", ostream& oss=std::cout);
       void initialize(const vector<double>&, const vector<double>&, const string& system="");
       void calculateThermalProperties(double, double, double);
@@ -787,6 +801,8 @@ namespace apl {
       double getIsochoricSpecificHeat(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::kB);
 
       void writePropertiesToFile(string);
+      void addToAPLOut(stringstream&);
+      string getPropertiesFileString();
   };
 }  // namespace apl
 
@@ -895,6 +911,8 @@ namespace apl {
       void clear();
       void initialize(const Supercell&, int, int, double, ofstream&, ostream& oss=std::cout);
       void initialize(const Supercell&, int, int, double);
+      void initialize(ostream& oss);
+      void initialize(ofstream& mf, ostream& oss);
       void readClusterSetFromFile(const string&);
 
       vector<_cluster> clusters;
@@ -998,6 +1016,8 @@ namespace apl {
       void clear();
       void initialize(const Supercell&, int, const aurostd::xoption&, ofstream&, ostream& oss=std::cout);
       void initialize(const Supercell&, int, const aurostd::xoption&);
+      void initialize(ostream& oss);
+      void initialize(ofstream& mf, ostream& oss);
 
       void setOptions(double, int, double, double, bool);
       const string& getDirectory() const;
@@ -1191,6 +1211,8 @@ namespace apl
       QHA(const QHA& qha);
       QHA(const xstructure &struc, _xinput &xinput, xoption &qhaopts, xoption &aplopts,
           ofstream &FileMESSAGE, ostream &oss=std::cout);
+      void initialize(ostream& oss);
+      void initialize(ofstream& mf, ostream& oss);
       void initialize(const xstructure &struc, _xinput &xinput, xoption &qhaopts,
           xoption &aplopts, ofstream &FileMESSAGE, ostream &oss);
       ~QHA();

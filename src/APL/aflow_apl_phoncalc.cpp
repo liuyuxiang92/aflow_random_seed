@@ -103,6 +103,17 @@ namespace apl {
     free();
   }
 
+  //xStream initializers
+  void PhononCalculator::initialize(ostream& oss) {
+    _qm.initialize(oss);
+    _supercell.initialize(oss);
+  }
+
+  void PhononCalculator::initialize(ofstream& mf, ostream& oss) {
+    _qm.initialize(mf, oss);
+    _supercell.initialize(mf, oss);
+  }
+
 }  // namespace apl
 
 //////////////////////////////////////////////////////////////////////////////
@@ -839,7 +850,6 @@ namespace apl {
         }
       }
     }
-    //printXMatrix2(dynamicalMatrix);
 
     // Subtract the sum of all "forces" from the central atom, this is like an automatic sum rule...
     for (uint i = 0; i < pcAtomsSize; i++) {

@@ -623,7 +623,7 @@ namespace apl {
     // }
   }
 
-  xDOSCAR DOSCalculator::createDOSCAR() {
+  xDOSCAR DOSCalculator::createDOSCAR() const {
     if (!_pc_set) {
       string function = "DOSCalculator::createDOSCAR()";
       string message = "PhononCalculator pointer not set.";

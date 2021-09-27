@@ -139,6 +139,15 @@ namespace apl {
     _initialized = true;
   }
 
+  //xStream initializers
+  void ForceConstantCalculator::initialize(ostream& oss) {
+    xStream::initialize(oss);
+  }
+
+  void ForceConstantCalculator::initialize(ofstream& mf, ostream& oss) {
+    xStream::initialize(mf, oss);
+  }
+
 }  // namespace apl
 
 namespace apl {
@@ -891,7 +900,7 @@ namespace apl {
     if (xInputs[0].AFLOW_MODE_VASP) out << tag << "AFLOW_MODE=VASP" << std::endl;
     else if (xInputs[0].AFLOW_MODE_AIMS) out << tag << "AFLOW_MODE=AIMS" << std::endl;
     out << AFLOWIN_SEPARATION_LINE << std::endl;
-    out << tag << "SUPERCELL=" << _supercell->scell << std::endl;
+    out << tag << "SUPERCELL=" << _supercell->scell_dim << std::endl;
     out << tag << "INPUT_STRUCTURE=START" << std::endl;
     out << _supercell->getInputStructure();  // No endl necessary
     out << tag << "INPUT_STRUCTURE=STOP" << std::endl;
@@ -1367,15 +1376,16 @@ namespace apl {
           //[CO20190131 - moved up]xstructure& xstr = xInputs[idxRun].getXStr(); //ME20190109 - Declare to make code more legible
           xstr.title = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr.title); //CO20181226, ME20190109
           if(xstr.title.empty()){xstr.buildGenericTitle(true,false);} //CO20181226, ME20190109
-          xstr.title += " APL supercell=" + aurostd::joinWDelimiter(_supercell->scell, 'x'); //ME20190109
+          xstr.title += " APL supercell=";
+          if (_supercell->scell_dim.rows == 3) {
+            xstr.title += aurostd::joinWDelimiter(_supercell->scell_dim, "x"); //ME20190109
+          } else {
+            xmatrix<double> scmat = aurostd::xmatrixutype2double(aurostd::reshape(_supercell->scell_dim, 3, 3));
+            xstr.title += "[" + xmatDouble2String(scmat, 0) + "]";
+          }
           xstr.title += " atom=" + aurostd::utype2string<int>(idAtom); //ME20190109
-          std::stringstream distortion; //ME20190112 - need stringstream for nicer formatting
           xvector<double> dist_cart = DISTORTION_MAGNITUDE * _uniqueDistortions[i][j];  //ME20190112
-          distortion << " distortion=["
-            << std::fixed << std::setprecision(3) << dist_cart[1] << ","
-            << std::fixed << std::setprecision(3) << dist_cart[2] << ","
-            << std::fixed << std::setprecision(3) << dist_cart[3] << "]"; //ME20190112
-          xstr.title += distortion.str();
+          xstr.title += " distortion=[" + aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(dist_cart, 3), ',') + "]";
 
           // For VASP, use the standardized aflow.in creator
           if (_kbinFlags.AFLOW_MODE_VASP){
@@ -1418,7 +1428,13 @@ namespace apl {
       //ME20190108 - Set title
       xInputs[idxRun].getXStr().title=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xInputs[idxRun].getXStr().title); //CO20181226
       if(xInputs[idxRun].getXStr().title.empty()){xInputs[idxRun].getXStr().buildGenericTitle(true,false);} //CO20181226
-      xInputs[idxRun].getXStr().title += " APL supercell=" + aurostd::joinWDelimiter(_supercell->scell, 'x'); //ME20190112
+      xInputs[idxRun].getXStr().title += " APL supercell=" ;
+      if (_supercell->scell_dim.rows == 3) {
+        xInputs[idxRun].getXStr().title += aurostd::joinWDelimiter(_supercell->scell_dim, "x"); //ME20190109
+      } else {
+        xmatrix<double> scmat = aurostd::xmatrixutype2double(aurostd::reshape(_supercell->scell_dim, 3, 3));
+        xInputs[idxRun].getXStr().title += "[" + xmatDouble2String(scmat, 0) + "]";
+      }
       xInputs[idxRun].getXStr().title += " undistorted";
       xInputs[idxRun].xvasp.aopts.flag("APL_FLAG::IS_ZEROSTATE", true);  //ME20191029
       // For VASP, use the standardized aflow.in creator

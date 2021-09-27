@@ -1194,6 +1194,7 @@ namespace aflowlib {
     bool perform_STATIC=FALSE;
     bool perform_BANDS=FALSE,perform_BADER=FALSE,perform_THERMODYNAMICS=FALSE;
     bool perform_AGL=FALSE,perform_AEL=FALSE;
+    bool perform_APL=FALSE; //ME20210901
     bool perform_QHA=FALSE; //AS20200831
     bool perform_POCC=FALSE;  //CO20200624
     bool perform_PATCH=FALSE; // to inject updates while LIB2RAW  //CO20200624 - turning off in general, check below
@@ -1211,6 +1212,7 @@ namespace aflowlib {
       if(aurostd::FileExist(directory_LIB+"/AECCAR0.static"+XHOST.vext.at(iext)) && aurostd::FileExist(directory_LIB+"/AECCAR2.static"+XHOST.vext.at(iext))) perform_BADER=TRUE;
       if(aurostd::FileExist(directory_LIB+"/aflow.agl.out"+XHOST.vext.at(iext))) perform_AGL=TRUE;
       if(aurostd::FileExist(directory_LIB+"/aflow.ael.out"+XHOST.vext.at(iext))) perform_AEL=TRUE;
+      if(aurostd::FileExist(directory_LIB+"/"+DEFAULT_APL_OUT_FILE+XHOST.vext.at(iext))) perform_APL=TRUE; //ME20210901
       if(aurostd::FileExist(directory_LIB+"/"+DEFAULT_QHA_FILE_PREFIX+"out"+XHOST.vext.at(iext))) perform_QHA=TRUE;//AS20200831
       if(aurostd::FileExist(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE+XHOST.vext.at(iext))) perform_POCC=TRUE; //CO20200624
     }
@@ -1470,6 +1472,44 @@ namespace aflowlib {
         if(aurostd::FileExist(directory_RAW+"/AEL_energy_structures.json")) aurostd::LinkFile(directory_RAW+"/AEL_energy_structures.json",directory_WEB);    // LINK //CT20181212 //CO20200624 - adding FileExist() check
       }
     }
+    // BEGIN ME20210901
+    // do the APL loop
+    if (perform_APL) {
+      cout << soliloquy << " APL LOOP ---------------------------------------------------------------------------------" << endl;
+      aflowlib::LIB2RAW_Loop_APL(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (apl):");
+      if (flag_WEB) {
+        string file = "";
+
+        file = directory_RAW+"/"+DEFAULT_APL_PHDOSCAR_FILE;
+        if (aurostd::FileExist(file)) aurostd::LinkFile(file, directory_WEB);
+
+        file = directory_RAW+"/"+DEFAULT_APL_PHKPOINTS_FILE;
+        if (aurostd::FileExist(file)) aurostd::LinkFile(file, directory_WEB);
+
+        file = directory_RAW+"/"+DEFAULT_APL_PHEIGENVAL_FILE;
+        if (aurostd::FileExist(file)) aurostd::LinkFile(file, directory_WEB);
+
+        file = directory_RAW+"/"+DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE;
+        if (aurostd::FileExist(file)) aurostd::LinkFile(file, directory_WEB);
+
+        file = directory_RAW+"/"+DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_MSQRDISP_FILE;
+        if (aurostd::FileExist(file)) aurostd::LinkFile(file, directory_WEB);
+
+        file = directory_RAW+"/"+DEFAULT_APL_FILE_PREFIX + DEFAULT_AAPL_GVEL_FILE;
+        if (aurostd::FileExist(file)) aurostd::LinkFile(file, directory_WEB);
+
+        vector<string> files;
+        aurostd::DirectoryLS(directory_LIB, files);
+        for (uint i = 0; i < files.size(); i++) {
+          if ((files[i].find("phdispdos.png") != string::npos)
+           || (files[i].find("phdisp.png") != string::npos)
+           || (files[i].find("phdos.png") != string::npos)) {
+            aurostd::LinkFile(directory_RAW+"/"+files[i],directory_WEB);
+          }
+        }
+      }
+    }
+    // END ME20210901
     // BEGIN AS20200831
     // ---------------------------------------------------------------------------------------------------------------------------------
     // do the QHA
@@ -5611,6 +5651,125 @@ namespace aflowlib {
   }
 }
 
+// BEGIN ME20210901
+// ***************************************************************************
+// aflowlib::LIB2RAW_Loop_APL
+// ***************************************************************************
+namespace aflowlib {
+  bool LIB2RAW_Loop_APL(const string& directory_LIB,const string& directory_RAW,vector<string> &vfile,aflowlib::_aflowlib_entry& data,const string& MESSAGE) {
+    bool LDEBUG = (FALSE || XHOST.DEBUG);
+    string function = XPID + "aflowlib::LIB2RAW_Loop_APL():";
+    if(LDEBUG) std::cerr << function << " [1]" << std::endl;
+    if (AFLOWLIB_VERBOSE) std::cout << MESSAGE << " " << function << " - begin " << directory_LIB << std::endl;
+
+    data.vloop.push_back("apl");
+
+    vector<string> vlines, tokens;
+    string file="", lines="";
+
+    // Always need PHPOSCAR
+    file = DEFAULT_APL_PHPOSCAR_FILE;
+    aflowlib::LIB2RAW_FileNeeded(directory_LIB, file, directory_RAW, file, vlines, MESSAGE);
+
+    // aflow.apl.out
+    file = DEFAULT_APL_OUT_FILE;
+    aflowlib::LIB2RAW_FileNeeded(directory_LIB, file, directory_RAW, file, vlines, MESSAGE);
+    aurostd::ExtractToStringEXPLICIT(aurostd::efile2string(directory_RAW + "/" + file), lines, "[APL_THERMO_RESULTS]START", "[APL_THERMO_RESULTS]STOP");
+    aurostd::string2vectorstring(lines, vlines);
+    for (uint i = 0; i < vlines.size(); i++) {
+        aurostd::StringSubst(vlines[i], "=", " ");
+        aurostd::string2tokens(vlines[i], tokens, " ");
+        if (tokens.size() >= 2) {
+          if (tokens[0] == "energy_free_vibrational_cell_apl_300K")
+            data.energy_free_vibrational_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
+          else if (tokens[0] == "energy_free_vibrational_atom_apl_300K")
+            data.energy_free_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+          else if (tokens[0] == "entropy_vibrational_cell_apl_300K")
+            data.entropy_vibrational_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
+          else if (tokens[0] == "entropy_vibrational_atom_apl_300K")
+            data.entropy_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+          else if (tokens[0] == "energy_internal_vibrational_cell_apl_300K")
+            data.energy_internal_vibrational_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
+          else if (tokens[0] == "energy_internal_vibrational_atom_apl_300K")
+            data.energy_internal_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+          else if (tokens[0] == "energy_zero_point_cell_apl_300K")
+            data.energy_zero_point_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
+          else if (tokens[0] == "energy_zero_point_atom_apl_300K")
+            data.energy_zero_point_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+          else if (tokens[0] == "heat_capacity_Cv_cell_apl_300K")
+            data.heat_capacity_Cv_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
+          else if (tokens[0] == "heat_capacity_Cv_atom_apl_300K")
+            data.heat_capacity_Cv_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+        }
+    }
+
+    if (AFLOWLIB_VERBOSE) {
+      std::cout << MESSAGE << " energy_free_vibrational_cell_apl_300K = " << ((data.energy_free_vibrational_cell_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_free_vibrational_cell_apl_300K):"unavailable") << std::endl;
+      std::cout << MESSAGE << " energy_free_vibrational_atom_apl_300K = " << ((data.energy_free_vibrational_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_free_vibrational_atom_apl_300K):"unavailable") << std::endl;
+      std::cout << MESSAGE << " entropy_vibrational_cell_apl_300K = " << ((data.entropy_vibrational_cell_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.entropy_vibrational_cell_apl_300K):"unavailable") << std::endl;
+      std::cout << MESSAGE << " entropy_vibrational_atom_apl_300K = " << ((data.entropy_vibrational_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.entropy_vibrational_atom_apl_300K):"unavailable") << std::endl;
+      std::cout << MESSAGE << " energy_internal_vibrational_cell_apl_300K = " << ((data.energy_internal_vibrational_cell_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_internal_vibrational_cell_apl_300K):"unavailable") << std::endl;
+      std::cout << MESSAGE << " energy_internal_vibrational_atom_apl_300K = " << ((data.energy_internal_vibrational_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_internal_vibrational_atom_apl_300K):"unavailable") << std::endl;
+      std::cout << MESSAGE << " energy_zero_point_cell_apl_300K = " << ((data.energy_zero_point_cell_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_zero_point_cell_apl_300K):"unavailable") << std::endl;
+      std::cout << MESSAGE << " energy_zero_point_atom_apl_300K = " << ((data.energy_zero_point_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_zero_point_atom_apl_300K):"unavailable") << std::endl;
+      std::cout << MESSAGE << " heat_capacity_Cv_cell_apl_300K = " << ((data.heat_capacity_Cv_cell_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.heat_capacity_Cv_cell_apl_300K):"unavailable") << std::endl;
+      std::cout << MESSAGE << " heat_capacity_Cv_atom_apl_300K = " << ((data.heat_capacity_Cv_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.heat_capacity_Cv_atom_apl_300K):"unavailable") << std::endl;
+    }
+
+    // Mean square displacement file
+    file = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_MSQRDISP_FILE;
+    std::cout << file << std::endl;
+    if (aurostd::EFileExist(directory_LIB + "/" + file)) {
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB, file, directory_RAW, file, vfile, MESSAGE);
+    }
+
+    // Group velocities file
+    file = DEFAULT_APL_FILE_PREFIX + DEFAULT_AAPL_GVEL_FILE;
+    std::cout << file << std::endl;
+    if (aurostd::EFileExist(directory_LIB + "/" + file)) {
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB, file, directory_RAW, file, vfile, MESSAGE);
+    }
+
+    // Plot dispersions and/or DOS
+    bool plot_disp = (aurostd::EFileExist(directory_LIB + "/" + DEFAULT_APL_PHEIGENVAL_FILE) && aurostd::EFileExist(directory_LIB + "/" + DEFAULT_APL_PHKPOINTS_FILE));
+    bool plot_dos = aurostd::EFileExist(directory_LIB + "/" + DEFAULT_APL_PHDOSCAR_FILE);
+    if (plot_disp || plot_dos) {
+      if (AFLOWLIB_VERBOSE) std::cout << MESSAGE << " Plotting phonon dispersions and/or DOS." << std::endl;
+      if (plot_dos) {
+        aflowlib::LIB2RAW_FileNeeded(directory_LIB, DEFAULT_APL_PHDOSCAR_FILE, directory_RAW, DEFAULT_APL_PHDOSCAR_FILE, vfile, MESSAGE);
+      }
+      if (plot_disp) {
+        aflowlib::LIB2RAW_FileNeeded(directory_LIB, DEFAULT_APL_PHEIGENVAL_FILE, directory_RAW, DEFAULT_APL_PHEIGENVAL_FILE, vfile, MESSAGE);
+        aflowlib::LIB2RAW_FileNeeded(directory_LIB, DEFAULT_APL_PHKPOINTS_FILE, directory_RAW, DEFAULT_APL_PHKPOINTS_FILE, vfile, MESSAGE);
+      }
+      aurostd::xoption opts, plotoptions;
+      string plottype = "";
+      if (plot_disp && plot_dos) {
+        plottype = "PLOT_PHDISPDOS";
+      } else if (plot_disp) {
+        plottype = "PLOT_PHDISP";
+      } else {
+        plottype = "PLOT_PHDOS";
+      }
+      opts.push_attached(plottype, directory_RAW);
+      opts.push_attached("PLOTTER::PRINT", "png");
+      if (plot_dos) {
+        opts.push_attached("PLOTTER::PROJECTION", "atoms");
+      }
+      plotoptions = plotter::getPlotOptionsPhonons(opts, plottype);
+      if (plot_disp && plot_dos) {
+        plotter::PLOT_PHDISPDOS(plotoptions);
+      } else if (plot_disp) {
+        plotter::PLOT_PHDISP(plotoptions);
+      } else {
+        plotter::PLOT_DOS(plotoptions);
+      }
+    }
+
+    return true;
+  }
+}
+// END ME20210901
 // BEGIN AS20200831
 // ***************************************************************************
 // aflowlib::LIB2RAW_Loop_QHA  // SMOLYANYUK
@@ -7219,6 +7378,7 @@ namespace aflowlib {
     bool run_directory=false;
     bool agl_aflowin_found = false;
     bool ael_aflowin_found = false;        
+    bool apl_aflowin_found = false; //ME20210927
     bool qha_aflowin_found = false; //AS20200901
     string AflowInName = _AFLOWIN_;
     string FileLockName = _AFLOWLOCK_;
@@ -7314,6 +7474,37 @@ namespace aflowlib {
           vFileLockName.push_back(FileLockName); //AS20200904
         }
       }
+
+      // ME20210901 BEGIN
+      // Check for APL aflow.in
+      apl_aflowin_found = apl::APL_Get_AflowInName(AflowInName, directory_LIB);
+      if (apl_aflowin_found) {
+        // Abort if there is an APL aflow.in file, but no PHPOSCAR (i.e., directory
+        // was never run). Otherwise, lib2raw will run VASP.
+        if (!aurostd::EFileExist(directory_LIB+"/"+DEFAULT_APL_PHPOSCAR_FILE)) {
+          string message = "PHPOSCAR not found. Cannot run directory " + directory_LIB + " for post-processing.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
+        }
+        run_directory = true;
+        aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_APL_OUT_FILE);
+        aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_APL_PHDOSCAR_FILE);
+        aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_APL_PHKPOINTS_FILE);
+        aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_APL_PHEIGENVAL_FILE);
+        aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE);
+        aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_MSQRDISP_FILE);
+        aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_APL_FILE_PREFIX + DEFAULT_AAPL_GVEL_FILE);
+        aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_HARMIFC_FILE);
+        aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_POLAR_FILE);
+
+        FileLockName = "LOCK.apl";
+        if(aurostd::EFileExist(directory_LIB+"/"+FileLockName, stmp) && aurostd::IsCompressed(stmp)) {
+          aurostd::UncompressFile(stmp);
+        }
+        // save for later since we will need to loop among all possible submodules
+        vAflowInName.push_back(AflowInName);
+        vFileLockName.push_back(FileLockName);
+      }
+      // ME20210901 END
 
       // AS20200902 BEGIN
       // Check for QHA input file

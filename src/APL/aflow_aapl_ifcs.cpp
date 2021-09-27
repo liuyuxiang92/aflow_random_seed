@@ -190,6 +190,15 @@ namespace apl {
     initialized = true;
   }
 
+  //xStream initializers
+  void AnharmonicIFCs::initialize(ostream& oss) {
+    xStream::initialize(oss);
+  }
+
+  void AnharmonicIFCs::initialize(ofstream& mf, ostream& oss) {
+    xStream::initialize(mf, oss);
+  }
+
   //getOrder//////////////////////////////////////////////////////////////////
   int AnharmonicIFCs::getOrder() const {
     return order;

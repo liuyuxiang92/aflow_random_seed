@@ -14,6 +14,8 @@
 //temporary directory for storing QHA files
 #define _STROPT_ string("[VASP_FORCE_OPTION]") //ME20181226
 
+#define APL_AFLOWIN_DEFAULT string("aflow_apl.in")  // ME20210901
+
 static const string _ANHARMONIC_IFCS_FILE_[2] = {"anharmonicIFCs_3rd.xml", "anharmonicIFCs_4th.xml"};
 static const int _NUM_RELAX_ = 2; //ME20181226
 static const string _APL_RELAX_PREFIX_ = "relax_apl"; //ME20181226  //ME20190125
@@ -390,6 +392,7 @@ namespace KBIN {
       message << (kflags.KBIN_MODULE_OPTIONS.aplflags[i].isentry? "Setting" : "DEFAULT") << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme;
       pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
       aplopts.flag(key, kflags.KBIN_MODULE_OPTIONS.aplflags[i].option);
+      aplopts.flag(key + "_ENTRY", kflags.KBIN_MODULE_OPTIONS.aplflags[i].isentry); // ME20210505
       aplopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme);
     }
 
@@ -784,21 +787,22 @@ namespace KBIN {
     //AS20200709 BEGIN
     // convert an array of xoptions to a single xoption using defaults for missing
     // properties
-    aurostd::xoption qhaopts;
-    for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.qhaflags.size(); i++) {
-      const string& key = kflags.KBIN_MODULE_OPTIONS.qhaflags[i].keyword;
-      message << (kflags.KBIN_MODULE_OPTIONS.qhaflags[i].isentry? "Setting" : "DEFAULT")
-        << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme;
-      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
-      qhaopts.flag(key, kflags.KBIN_MODULE_OPTIONS.qhaflags[i].option);
-      qhaopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme);
-    }
+    //ME20210831 - Only validate and process if we have a QHA calculations
+    if (kflags.KBIN_PHONONS_CALCULATION_QHA) {
+      aurostd::xoption qhaopts;
+      for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.qhaflags.size(); i++) {
+        const string& key = kflags.KBIN_MODULE_OPTIONS.qhaflags[i].keyword;
+        message << (kflags.KBIN_MODULE_OPTIONS.qhaflags[i].isentry? "Setting" : "DEFAULT")
+          << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme;
+        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+        qhaopts.flag(key, kflags.KBIN_MODULE_OPTIONS.qhaflags[i].option);
+        qhaopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme);
+      }
 
-    apl::validateParametersQHA(qhaopts, aflags, FileMESSAGE, oss);
-    //AS20200709 END
+      apl::validateParametersQHA(qhaopts, aflags, FileMESSAGE, oss);
+      //AS20200709 END
 
-    //AS20200513 BEGIN
-    if (kflags.KBIN_PHONONS_CALCULATION_QHA){
+      //AS20200513 BEGIN
       apl::QHA qha(supercell.getInputStructureLight(), xinput,
           qhaopts, aplopts, FileMESSAGE, oss);
 
@@ -909,6 +913,8 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
+    stringstream apl_outfile; // ME20210927 - summary file
+
     // Get the format of frequency desired by user ///////////////////////
 
     if (LDEBUG) std::cerr << function << " DEBUG [5a]" << std::endl;
@@ -1010,6 +1016,7 @@ namespace KBIN {
         double USER_TP_TSTEP = aurostd::string2utype<double>(aplopts.getattachedscheme("TSTEP"));
         tpc.calculateThermalProperties(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
         tpc.writePropertiesToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE);
+        tpc.addToAPLOut(apl_outfile);
 
         if (aplopts.flag("DISPLACEMENTS")) {
           apl::AtomicDisplacements ad(phcalc);
@@ -1035,15 +1042,22 @@ namespace KBIN {
           }
           if (i > 0) {
             double idos_percent = 100.0 * idos[i - 1]/idos.back();
-            // Cannot use std::setprecision with apl:logger, so use this workaround.
-            stringstream percent;
-            percent << std::fixed << std::setprecision(1) << idos_percent;
             message << "There are imaginary frequencies in the phonon DOS, covering "
-              << percent.str() << "\% of the integrated DOS. These frequencies were "
-              << " omitted in the calculation of thermodynamic properties.";
+              << std::fixed << std::setprecision(1) << idos_percent << "\% of the integrated DOS. "
+              << "These frequencies were omitted in the calculation of thermodynamic properties.";
             pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
           }
         }
+      }
+    }
+
+    // ME20210927
+    if (!apl_outfile.str().empty()) {
+      string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_APL_OUT_FILE);
+      aurostd::stringstream2file(apl_outfile, filename);
+      if (!aurostd::FileExist(filename)) {
+        string message = "Cannot open output file " + filename + ".";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
       }
     }
 
@@ -1116,11 +1130,12 @@ namespace apl {
     string function = "apl::validateParametersSupercellAPL():";
     string message = "";
     string _ASTROPT_ = "[AFLOW_APL]";
-    if (aplopts.flag("SUPERCELL")) {
+    // ME2021050 - isentry more reliable than option
+    if (aplopts.flag("SUPERCELL_ENTRY")) {
       vector<int> tokens;
       string supercell_scheme = aplopts.getattachedscheme("SUPERCELL");
-      aurostd::string2tokens(supercell_scheme, tokens, " xX");
-      if (tokens.size() != 3) {
+      aurostd::string2tokens(supercell_scheme, tokens, " xX,;");
+      if (tokens.size() != 3 && tokens.size() != 9) {
         message = "Wrong setting in " + _ASTROPT_ + "SUPERCELL.";
         message += " See README_AFLOW_APL.TXT for the correct format.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
@@ -1130,8 +1145,8 @@ namespace apl {
       aplopts.flag("MINATOMS", false);
       aplopts.flag("MINATOMS_UNIFORM", false);
       aplopts.flag("MINSHELL", false);
-    } else if (aplopts.flag("MINATOMS") || aplopts.flag("MINATOMS_UNIFORM")) {
-      if (aplopts.flag("MINATOMS_UNIFORM")) {
+    } else if (aplopts.flag("MINATOMS_ENTRY") || aplopts.flag("MINATOMS_UNIFORM_ENTRY")) {
+      if (aplopts.flag("MINATOMS_UNIFORM_ENTRY")) {
         aplopts.push_attached("SUPERCELL::METHOD", "MINATOMS_UNIFORM");
         aplopts.push_attached("SUPERCELL::VALUE", aplopts.getattachedscheme("MINATOMS_UNIFORM"));
         aplopts.flag("MINATOMS", false);
@@ -1141,7 +1156,7 @@ namespace apl {
       }
       aplopts.flag("SUPERCELL", false);
       aplopts.flag("MINSHELL", false);
-    } else if (aplopts.flag("MINSHELL")) {
+    } else if (aplopts.flag("MINSHELL_ENTRY")) {
       aplopts.push_attached("SUPERCELL::METHOD", "SHELLS");
       aplopts.push_attached("SUPERCELL::VALUE", aplopts.getattachedscheme("MINSHELL"));
       aplopts.flag("SUPERCELL", false);
@@ -1805,6 +1820,46 @@ namespace apl {
   }
 
 }  // namespace apl
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                           GET aflow.in NAME                              //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+namespace apl {
+
+  // Checks for APL aflow.in files for lib2raw. Adapted from AS.
+  bool APL_Get_AflowInName(string& AflowInName, const string& directory_LIB)  {
+    bool aflowin_found = false;
+    vector<string> vaflowins;
+    string stmp="";
+    if (!AflowInName.empty()) vaflowins.push_back(AflowInName);
+    if (!_AFLOWIN_.empty()) vaflowins.push_back(_AFLOWIN_);
+    vaflowins.push_back(APL_AFLOWIN_DEFAULT);
+
+    string aflowin_name = "", aflowin = "", fullpath_aflowin_name = "";
+    for (uint i=0; i<vaflowins.size(); i++){
+      aflowin_name = vaflowins[i];
+      fullpath_aflowin_name = directory_LIB + '/' + aflowin_name;
+      if(aurostd::EFileExist(fullpath_aflowin_name,stmp)&&aurostd::IsCompressed(stmp)){aurostd::UncompressFile(stmp);}
+      if (aurostd::FileExist(fullpath_aflowin_name)){
+        aflowin = aurostd::file2string(fullpath_aflowin_name);
+        if (aflowin.empty()) continue;
+      }
+
+      aflowin = aurostd::RemoveComments(aflowin);
+      if (aurostd::substring2bool(aflowin,_ASTROPT_APL_ + "CALC",TRUE) ||
+          aurostd::substring2bool(aflowin,_ASTROPT_APL_OLD_ + "CALC",TRUE)){
+        AflowInName = aflowin_name;
+        aflowin_found = true;
+        break;
+      }
+    }
+
+    return aflowin_found;
+  }
+}
 
 // ***************************************************************************
 // *                                                                         *

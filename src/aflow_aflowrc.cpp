@@ -553,6 +553,8 @@
 #define         DEFAULT_APL_GVEL                              XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_DISPLACEMENTS")  // ME20200517
 
 //// DEFAULT APL FILES
+#define AFLOWRC_DEFAULT_APL_OUT_FILE                          string("aflow.apl.out")  // ME20210927
+#define         DEFAULT_APL_OUT_FILE                         XHOST.adefault.getattachedscheme("DEFAULT_APL_OUT_FILE")  // ME20210927
 #define AFLOWRC_DEFAULT_APL_FILE_PREFIX                       string("aflow.apl.")
 #define         DEFAULT_APL_FILE_PREFIX                       XHOST.adefault.getattachedscheme("DEFAULT_APL_FILE_PREFIX")
 #define AFLOWRC_DEFAULT_APL_PDIS_FILE                         string("phonon_dispersion.out")
@@ -1485,6 +1487,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APL_GVEL",AFLOWRC_DEFAULT_APL_GVEL);  //ME20200517
 
     //// DEFAULT APL FILES
+    aflowrc::load_default("DEFAULT_APL_OUT_FILE",AFLOWRC_DEFAULT_APL_OUT_FILE);
     aflowrc::load_default("DEFAULT_APL_FILE_PREFIX",AFLOWRC_DEFAULT_APL_FILE_PREFIX);
     aflowrc::load_default("DEFAULT_APL_PDIS_FILE",AFLOWRC_DEFAULT_APL_PDIS_FILE);
     aflowrc::load_default("DEFAULT_APL_PDOS_FILE",AFLOWRC_DEFAULT_APL_PDOS_FILE);
@@ -2103,6 +2106,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APL_DISPLACEMENTS=" << AFLOWRC_DEFAULT_APL_DISPLACEMENTS << endl;  //ME20200421
     aflowrc << "DEFAULT_APL_TPT=\"" << AFLOWRC_DEFAULT_APL_TPT << "\"" << endl;
     aflowrc << "DEFAULT_APL_GVEL=" << AFLOWRC_DEFAULT_APL_GVEL << endl;  //ME20200517
+    aflowrc << "DEFAULT_APL_OUT_FILE=\"" << AFLOWRC_DEFAULT_APL_OUT_FILE << "\"" << endl;  //ME20210927
     aflowrc << "DEFAULT_APL_FILE_PREFIX=\"" << AFLOWRC_DEFAULT_APL_FILE_PREFIX << "\"" << endl;
     aflowrc << "DEFAULT_APL_PDIS_FILE=\"" << AFLOWRC_DEFAULT_APL_PDIS_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_PDOS_FILE=\"" << AFLOWRC_DEFAULT_APL_PDOS_FILE << "\"" << endl;
@@ -2688,6 +2692,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DISPLACEMENTS\")=" << DEFAULT_APL_DISPLACEMENTS << endl;  //ME20200421
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_TPT\")=\"" << DEFAULT_APL_TPT << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_GVEL\")=" << DEFAULT_APL_GVEL << endl;  //ME20200517
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_OUT_FILE\")=\"" << DEFAULT_APL_OUT_FILE << "\"" << endl;  // ME20210927
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_FILE_PREFIX\")=\"" << DEFAULT_APL_FILE_PREFIX << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PDIS_FILE\")=\"" << DEFAULT_APL_PDIS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PDOS_FILE\")=\"" << DEFAULT_APL_PDOS_FILE << "\"" << endl;

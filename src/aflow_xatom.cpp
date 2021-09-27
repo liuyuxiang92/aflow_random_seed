@@ -15139,10 +15139,12 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
 
                 //mapping
                 sc2pcMap.push_back(a.iatoms[ia][iia]);
-                if(ignore_pcmap==false && pcmap==false){
-                  if(force_strict_pc2scMap==true){  //only if i==0 && j==0 && k==0 atom
-                    if(i==0 && j==0 && k==0){pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
-                  } else {pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
+                // ME20210506 - Strict mapping is done outside to account for non-diagonal supercells
+                if(!ignore_pcmap && !pcmap && !force_strict_pc2scMap){
+                  //if(force_strict_pc2scMap==true){  //only if i==0 && j==0 && k==0 atom
+                  //  if(i==0 && j==0 && k==0){pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
+                  //} else {pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
+                  pc2scMap.push_back(b.atoms.size()-1);pcmap=true;
                 }
                 //[CO20190116 - OBSOLETE]if(ignore_pcmap==false && i==0 && j==0 && k==0){
                 //[CO20190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
@@ -15164,11 +15166,13 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
             }
           }
         }
-        if(ignore_pcmap==false && pcmap==false){
-          if(force_strict_pc2scMap){
-            message << "pc2scMap not found for atom[i=" << a.iatoms[ia][iia] << "]";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INDEX_MISMATCH_);
-          }
+        // ME20210506 - Strict mapping is done outside to account for non-diagonal supercells
+        if(!ignore_pcmap && !pcmap && !force_strict_pc2scMap){
+          // ME20210506 - Strict mapping is done outside to account for non-diagonal supercells
+          //if(force_strict_pc2scMap){
+          //  message << "pc2scMap not found for atom[i=" << a.iatoms[ia][iia] << "]";
+          //  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INDEX_MISMATCH_);
+          //}
           ignore_pcmap=true;
           pc2scMap.clear();
         }
@@ -15229,10 +15233,12 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
 
               //mapping
               sc2pcMap.push_back(ia);
-              if(ignore_pcmap==false && pcmap==false){
-                if(force_strict_pc2scMap==true){  //only if i==0 && j==0 && k==0 atom
-                  if(i==0 && j==0 && k==0){pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
-                } else {pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
+              // ME20210506 - Strict mapping is done outside to account for non-diagonal supercells
+              if(!ignore_pcmap && !pcmap && !force_strict_pc2scMap){
+                //if(force_strict_pc2scMap==true){  //only if i==0 && j==0 && k==0 atom
+                //  if(i==0 && j==0 && k==0){pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
+                //} else {pc2scMap.push_back(b.atoms.size()-1);pcmap=true;}
+                pc2scMap.push_back(b.atoms.size()-1);pcmap=true;
               }
               //[CO20190116 - OBSOLETE]if(ignore_pcmap==false && i==0 && j==0 && k==0){
               //[CO20190116 - OBSOLETE]  pc2scMap.push_back(b.atoms.size()-1);
@@ -15254,17 +15260,45 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
           }
         }
       }
-      if(ignore_pcmap==false && pcmap==false){
-        if(force_strict_pc2scMap){
-          message << "pc2scMap not found for atom[i=" << ia << "]";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _INDEX_MISMATCH_);
-        }
+      // ME20210506 - Strict mapping is done outside to account for non-diagonal supercells
+      if(!ignore_pcmap && !pcmap && !force_strict_pc2scMap){
+        //if(force_strict_pc2scMap){
+        //  message << "pc2scMap not found for atom[i=" << ia << "]";
+        //  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _INDEX_MISMATCH_);
+        //}
         ignore_pcmap=true;
         pc2scMap.clear();
       }
     }
   }
   //CO END
+  // ME20210506 - The old method for force_strict_pc2scMap only works for diagonal
+  // supercells. This method is brute-force but should work for most non-diagonal
+  // cells.
+  if (!ignore_pcmap && force_strict_pc2scMap) {
+    pc2scMap.clear();
+    uint pcatoms = a.atoms.size();
+    pc2scMap.resize(pcatoms);
+    uint scatoms = b.atoms.size();
+    uint nshifts = cshifts.size();
+    uint s = 0, ipc = 0, isc = 0;
+    for (s = 0; s < nshifts; s++) {
+      for (ipc = 0; ipc < pcatoms; ipc++) {
+        for (isc = 0; isc < scatoms; isc++) {
+          if(aurostd::identical(a.atoms[ipc].cpos + cshifts[s],b.atoms[isc].cpos,_FLOAT_TOL_)) {
+            pc2scMap[ipc] = isc;
+            break;
+          }
+        }
+        if (isc == scatoms) break;
+      }
+      if (ipc == pcatoms) break;
+    }
+    if (s == nshifts) {
+      message << "pc2scMap not found";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _INDEX_MISMATCH_);
+    }
+  }
 
   b.GetStoich();  //CO20170724
   b.MakeBasis(); // need to update NUMBER and BASIS

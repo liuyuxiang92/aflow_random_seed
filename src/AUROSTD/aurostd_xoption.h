@@ -43,7 +43,7 @@ namespace aurostd {
       vector<string> vxsghost;   // tokenized "," content
       bool preserved;            // the output
       // LOAD BOOLS FUNCTIONS
-      void options2entry(const string&,const string&,int=aurostd_xoptionONOFF,const string& xscheme_DEFAULT="");  //CO20210805 - const&
+      void options2entry(const string&,string,int=aurostd_xoptionONOFF,string xscheme_DEFAULT="");  //CO20210805 - const&
       void scheme2scheme(char,const string&); //CO20210805 - const&
       void scheme2scheme(const string&,const string&);  //CO20210805 - const&
       bool isscheme(const string&) const; // check if available //CO20180101 //SC20191227 //CO20210805 - const&

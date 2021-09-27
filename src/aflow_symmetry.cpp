@@ -8978,6 +8978,7 @@ bool KBIN_StepSymmetryPerform_20161205(xstructure& a,string AflowIn,ofstream &Fi
     message << "Finished calculating the lattice information."; //DX20210703
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_); //DX20210703
   }
+  if(a.bravais_lattice_type.empty()){a.GetRealLatticeType();} //CO+DX20210616 - needed for AEL/AGL
   return Krun;
 }
 //DX+CO END
