@@ -2624,6 +2624,7 @@ namespace aflowlib {
     //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl;
 
     // line XXX2					   
+    uint i=0;
     if(FORMATION_CALC) { // no LDAU yet
       if(LDEBUG) cerr << soliloquy << " [FCALC=1]" << endl;
       vector<double> venthalpy_atom_ref;
@@ -2651,7 +2652,6 @@ namespace aflowlib {
       data.enthalpy_formation_atom=data.enthalpy_atom;
 
       double data_natoms=0.0; //needs to be double for pocc
-      uint i=0;
       for(i=0;i<xstr.comp_each_type.size();i++){data_natoms+=xstr.comp_each_type[i];}
       if(LDEBUG){cerr << soliloquy << " data_natoms=" << data_natoms << endl;}
 
@@ -2674,17 +2674,27 @@ namespace aflowlib {
           data.enthalpy_formation_cce_300K_atom=data.enthalpy_formation_cce_300K_cell/data_natoms;
           data.enthalpy_formation_cce_0K_atom=data.enthalpy_formation_cce_0K_cell/data_natoms;
         }
+        if(formation_calc_cce==false && formation_calc_U==true){  //CO20210828 - if CCE fails for +U calc, clear out data.enthalpy_formation_cell and _atom
+          if(AFLOWLIB_VERBOSE) cout << MESSAGE << " CCE failed for +U calculation, clearing out data.enthalpy_formation_cell and _atom" << endl;
+          data.enthalpy_formation_cell=AUROSTD_NAN;
+          data.enthalpy_formation_atom=AUROSTD_NAN;
+          FORMATION_CALC=false;
+        }
       }
-      if(LDEBUG){
-        cerr << soliloquy << " data.enthalpy_formation_cce_300K_cell=" << data.enthalpy_formation_cce_300K_cell << endl;
-        cerr << soliloquy << " data.enthalpy_formation_cce_0K_cell=" << data.enthalpy_formation_cce_0K_cell << endl;
-        cerr << soliloquy << " data.enthalpy_formation_cce_300K_atom=" << data.enthalpy_formation_cce_300K_atom << endl;
-        cerr << soliloquy << " data.enthalpy_formation_cce_0K_atom=" << data.enthalpy_formation_cce_0K_atom << endl;
-      }
-      //CO20200624 STOP - adding cce variants
+    }
+    if(LDEBUG){
+      cerr << soliloquy << " data.enthalpy_formation_cell=" << data.enthalpy_formation_cell << endl;
+      cerr << soliloquy << " data.enthalpy_formation_atom=" << data.enthalpy_formation_atom << endl;
+      cerr << soliloquy << " data.enthalpy_formation_cce_300K_cell=" << data.enthalpy_formation_cce_300K_cell << endl;
+      cerr << soliloquy << " data.enthalpy_formation_cce_0K_cell=" << data.enthalpy_formation_cce_0K_cell << endl;
+      cerr << soliloquy << " data.enthalpy_formation_cce_300K_atom=" << data.enthalpy_formation_cce_300K_atom << endl;
+      cerr << soliloquy << " data.enthalpy_formation_cce_0K_atom=" << data.enthalpy_formation_cce_0K_atom << endl;
+    }
+    //CO20200624 STOP - adding cce variants
 
-      if(LDEBUG) cerr << soliloquy << " [FCALC=3]" << endl;
+    if(LDEBUG) cerr << soliloquy << " [FCALC=3]" << endl;
 
+    if(FORMATION_CALC){
       data.entropic_temperature=0;
       if(data.vstoichiometry.size()>1) {
         for(i=0;i<(uint) data.vstoichiometry.size();i++)
@@ -2692,9 +2702,9 @@ namespace aflowlib {
             data.entropic_temperature+=data.vstoichiometry.at(i)*logl(data.vstoichiometry.at(i));
         data.entropic_temperature=data.enthalpy_formation_atom/(data.entropic_temperature*KBOLTZEV);
       }
-      // cerr << XPID << data.enthalpy_formation_cell << endl << data.enthalpy_formation_cell/data_natoms << endl << data.enthalpy_formation_atom << endl;
-      if(LDEBUG) cerr << soliloquy << " [FCALC=4]" << endl;
     }
+    // cerr << XPID << data.enthalpy_formation_cell << endl << data.enthalpy_formation_cell/data_natoms << endl << data.enthalpy_formation_atom << endl;
+    if(LDEBUG) cerr << soliloquy << " [FCALC=4]" << endl;
     return FORMATION_CALC;
   }
 } // namespace aflowlib

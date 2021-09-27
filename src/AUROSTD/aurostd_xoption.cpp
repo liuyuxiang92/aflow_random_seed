@@ -66,7 +66,8 @@ namespace aurostd {
   const xoption& xoption::operator=(const xoption& b) {  // operator=
     if(this!=&b) {
       free();
-      copy(b);}
+      copy(b);
+    }
     return *this;
   }
 
@@ -78,23 +79,40 @@ namespace aurostd {
 
   void xoption::clear() {
     //[CO20200624 - creating objects is SLOW]xoption aflow_option_temp;
-    //[CO20200624 - creating objects is SLOWcopy(aflow_option_temp);
+    //[CO20200624 - creating objects is SLOW]copy(aflow_option_temp);
     free();
   }
 
   // **************************************************************************
-  void xoption::options2entry(const string& options_FILE, string input_keyword,int _option_DEFAULT, string xscheme_DEFAULT) { //CO20210805 - const&
+  //void xoption::options2entry(const string& options_FILE,const string& input_keyword,int _option_DEFAULT,const string& xscheme_DEFAULT) //CO20210805 - const&
+  void xoption::options2entry(const string& options_FILE_IN,const string& input_keyword_IN,int option_DEFAULT_IN,const string& xscheme_DEFAULT_IN) {
     bool VERBOSE=(FALSE || VERBOSE_XOPTION); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG;
     string soliloquy=XPID+"aurostd::xoption::options2entry():";
-    clear();
+
+    //CO20210909 - BIG BUG HERE
+    //the following clear() will reset all of the internal xoption variables
+    //if we pass one of these variables into options2entry(), it is reset as well
+    //see for example, this construction:
+    //vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.options2entry(AflowIn,_STROPT_+"NELM=",FALSE,vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.xscheme);
+    //xscheme gets cleared before it's set
+    //in order to preserve this construction and prevent headaches, make copies of the inputs BEFORE the clear
+    string options_FILE=options_FILE_IN;
+    string input_keyword=input_keyword_IN;
+    int _option_DEFAULT=option_DEFAULT_IN;
+    string xscheme_DEFAULT=xscheme_DEFAULT_IN;
+
+    clear();  //CO20210909 - DANGEROUS! see note above
+
     bool option_DEFAULT=FALSE; 
     if(_option_DEFAULT==0) option_DEFAULT=FALSE; // it is a int.. it might be -1
     if(_option_DEFAULT==1) option_DEFAULT=TRUE; // it is a int.. it might be -1
     isentry=option_DEFAULT;option=option_DEFAULT;content_string=xscheme_DEFAULT;xscheme=xscheme_DEFAULT;preserved=FALSE;   // DEFAULT
-    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " BEGIN " << endl;
-    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " input_keyword=\"" << input_keyword << "\"" << endl;
-    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " option_DEFAULT=" << (option_DEFAULT?"TRUE":"FALSE") << endl;
-    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " xscheme_DEFAULT=\"" << xscheme_DEFAULT << "\"" << endl;
+    if(VERBOSE){
+      cerr << "DEBUG - " << soliloquy << " BEGIN " << endl;
+      cerr << "DEBUG - " << soliloquy << " input_keyword=\"" << input_keyword << "\"" << endl;
+      cerr << "DEBUG - " << soliloquy << " option_DEFAULT=" << (option_DEFAULT?"TRUE":"FALSE") << endl;
+      cerr << "DEBUG - " << soliloquy << " xscheme_DEFAULT=\"" << xscheme_DEFAULT << "\"" << endl;
+    }
     // start the scan
     //string keyword; //CO20180404 - now a member of the object
     vector<string> vkeyword;
