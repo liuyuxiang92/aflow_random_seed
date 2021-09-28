@@ -1735,7 +1735,6 @@ bool CheckMaterialServer(const string& message) { //CO20200624
   if(XHOST.hostname==XHOST.AFLOW_WEB_SERVER) return TRUE;
   if(XHOST.hostname=="habana") return TRUE;
   if(XHOST.hostname=="aflowlib") return TRUE;
-  if(XHOST.hostname=="nuke") return TRUE;
   string function = XPID + "init::CheckMaterialServer():";
   stringstream messagestream;
   messagestream << "Your machine is \"" << XHOST.hostname << "\". ";
