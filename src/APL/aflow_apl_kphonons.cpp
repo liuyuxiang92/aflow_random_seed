@@ -1008,7 +1008,7 @@ namespace KBIN {
 
       // Calculate thermal properties
       if (aplopts.flag("TP")) {
-        //if (!dosc.hasNegativeFrequencies()) //ME20200210 - Do not skip, just ignore contributions of imaginary frequencies and throw a warning
+        //if (!dosc.hasImaginaryFrequencies()) //ME20200210 - Do not skip, just ignore contributions of imaginary frequencies and throw a warning
         apl::ThermalPropertiesCalculator tpc(dosc, FileMESSAGE, aflags.Directory, oss);  //ME20190423
         //ME20200108 - new ThermalPropertiesCalculator format
         double USER_TP_TSTART = aurostd::string2utype<double>(aplopts.getattachedscheme("TSTART"));
@@ -1032,7 +1032,7 @@ namespace KBIN {
           phcalc.writeGroupVelocitiesToFile(gvelfile, gvel);
         }
 
-        if (dosc.hasNegativeFrequencies()) {  //ME20200210
+        if (dosc.hasImaginaryFrequencies()) {  //ME20200210
           //ME20200210 - changed warning
           const vector<double>& freqs = dosc.getBins();
           const vector<double>& idos = dosc.getIDOS();

@@ -18,6 +18,8 @@
 #ifndef _AFLOW_POCC_H_
 #define _AFLOW_POCC_H_
 
+#include "APL/aflow_apl.h"
+
 //precision defines tol and paddings
 //const int _AFLOW_POCC_PRECISION_ = 8;    //moved to aflow.h
 //tolerances
@@ -752,6 +754,13 @@ namespace pocc {
       void generateDebyeThermalProperties(vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom); //CT20200722
       void getDebyeThermalProperties(vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom);
       void getAverageDebyeThermalProperties(const vector<double>& v_temperatures, bool agl_write_full_results, vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom);
+
+      // ME20210927 - APL functions
+      void calculatePhononPropertiesAPL(const vector<double>& v_temperatures);
+      void initializePhononCalculators(vector<apl::PhononCalculator>& vphcalc);
+      vector<xDOSCAR> getPhononDoscars(vector<apl::PhononCalculator>& vphcalc, xoption& dosopts);
+      void calculatePhononDOSThread(int, int, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&);
+      xDOSCAR getAveragePhononDos(double T, const vector<xDOSCAR>& vxdos);
   };
 } // namespace pocc
 

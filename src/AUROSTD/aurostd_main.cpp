@@ -2034,7 +2034,13 @@ namespace aurostd {
   string CleanFileName(const string& fileIN) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(fileIN.empty()){return fileIN;}
-    string fileOUT=fileIN;
+    // ME20211001
+    // Remove any control characters while copying
+    // Useful when filenIN was read from another file
+    string fileOUT="";
+    for (uint i = 0; i < fileIN.size(); i++) {
+      if (fileIN[i] > 31) fileOUT += fileIN[i];
+    }
     if(LDEBUG) cerr << "aurostd::CleanFileName: " << fileOUT << endl;
     // [OBSOLETE] interferes with ~/.aflow.rc   if(aurostd::substring2bool(fileOUT,"~/")) aurostd::StringSubst(fileOUT,"~/","/home/"+XHOST.user+"/");
     //ME20200922 - Cleaning // must be in a while loop or it won't clean e.g. ///
@@ -2053,7 +2059,13 @@ namespace aurostd {
   // fix file names from obvious things
   string ProperFileName(const string& fileIN) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string fileOUT=fileIN;
+    // ME20211001
+    // Remove any control characters while copying
+    // Useful when filenIN was read from another file
+    string fileOUT="";
+    for (uint i = 0; i < fileIN.size(); i++) {
+      if (fileIN[i] > 31) fileOUT += fileIN[i];
+    }
     if(LDEBUG) cerr << "aurostd::ProperFileName: " << fileOUT << endl;
     aurostd::StringSubst(fileOUT,"//",".");
     aurostd::StringSubst(fileOUT,"/",".");

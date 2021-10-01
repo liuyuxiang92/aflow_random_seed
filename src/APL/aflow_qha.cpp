@@ -1237,7 +1237,7 @@ namespace apl
       // following line is left commented instead of being deleted.
       //      dosc.writePHDOSCAR(subdirectories[i]);//AS20200824
 
-      if (dosc.hasNegativeFrequencies()){
+      if (dosc.hasImaginaryFrequencies()){
         stringstream msg;
         msg << "Phonon dispersions of the APL calculation in the " << subdirectories[i];
         msg << " directory contain imaginary frequencies." << std::endl;

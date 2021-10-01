@@ -167,10 +167,17 @@ namespace pocc {
 
     //get temperature from title
     //DOSCAR.pocc_T0000K
-    if(doscar_path.find(POCC_DOSCAR_PREFIX)==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"odd DOSCAR filename, format should be "+POCC_DOSCAR_PREFIX+"0000K",_FILE_CORRUPT_);}
+    //ME20210927 - Added PHDOSCAR support
+    string pocc_doscar_start = "";
+    if(doscar_path.find(POCC_DOSCAR_PREFIX) != string::npos){
+      pocc_doscar_start = POCC_DOSCAR_PREFIX;
+    } else if (doscar_path.find(POCC_PHDOSCAR_PREFIX) != string::npos) {
+      pocc_doscar_start = POCC_PHDOSCAR_PREFIX;
+    } else {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"odd DOSCAR filename, format should be "+POCC_DOSCAR_PREFIX+"0000K",_FILE_CORRUPT_);
+    }
     vector<string> vtokens;
     aurostd::string2tokens(doscar_path,vtokens,"/");
-    string pocc_doscar_start=POCC_DOSCAR_PREFIX;
     string pocc_doscar_end="K";
     string::size_type loc_start=vtokens.back().find(pocc_doscar_start);
     string::size_type loc_end=vtokens.back().find(pocc_doscar_end);
@@ -218,6 +225,7 @@ namespace KBIN {
     _kflags kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,aflags);
     _vflags vflags=KBIN::VASP_Get_Vflags_from_AflowIN(AflowIn,aflags,kflags);
 
+    if(LDEBUG){cerr << soliloquy << " kflags.KBIN_PHONONS_CALCULATION_APL=" << kflags.KBIN_PHONONS_CALCULATION_APL << endl;}
     if(LDEBUG){cerr << soliloquy << " kflags.KBIN_PHONONS_CALCULATION_AEL=" << kflags.KBIN_PHONONS_CALCULATION_AEL << endl;}
     if(LDEBUG){cerr << soliloquy << " kflags.KBIN_PHONONS_CALCULATION_AGL=" << kflags.KBIN_PHONONS_CALCULATION_AGL << endl;}
 
@@ -1230,7 +1238,8 @@ namespace pocc {
     cmdline_opts.push_attached("PLOTTER::PRINT", "png");
     plot_opts = plotter::getPlotOptionsEStructure(cmdline_opts, "PLOT_DOS");
     plot_opts.push_attached("DIRECTORY",directory);
-    if(1){  //turn off for ME - POCC+APL
+    //ME20210927 - use carstring to distingish between types of DOSCARs
+    if(xdos.carstring == "CAR") {  //turn off for ME - POCC+APL
       plot_opts.push_attached("PROJECTION","ORBITALS");
       //plot_opts.push_attached("EXTENSION","dos_orbitals_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
       plot_opts.push_attached("EXTENSION","dos_orbitals_T"+(*this).getTemperatureString(temperature)+"K");
@@ -1255,14 +1264,15 @@ namespace pocc {
           plotter::PLOT_PDOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
         }
       }
-    }else{  //ME!
-      plot_opts.push_attached("ARUN_DIRECTORY",m_ARUN_directories[0]);
+    } else if (xdos.carstring == "PHON") {  //ME!
+      plot_opts = plotter::getPlotOptionsPhonons(cmdline_opts, "PLOT_PHDOS");
+      plot_opts.push_attached("DIRECTORY",m_aflags.Directory);
       plot_opts.push_attached("PROJECTION","ATOMS");
-      //plot_opts.push_attached("EXTENSION","dos_atoms_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
-      plot_opts.push_attached("EXTENSION","dos_atoms_T"+(*this).getTemperatureString(temperature)+"K");
+      plot_opts.push_attached("EXTENSION","phdos_T"+getTemperatureString(xdos.temperature)+"K");
       plot_opts.pop_attached("XMIN");plot_opts.pop_attached("XMAX");
-      plot_opts.push_attached("XMIN","0");plot_opts.push_attached("XMAX","0.05");
-      plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
+      plotter::PLOT_PHDOS(plot_opts, xdos);
+    } else {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "Unrecognized xDOSCAR format.", _RUNTIME_ERROR_);
     }
 
     if(LDEBUG){cerr << soliloquy << " END" << endl;}
@@ -1579,6 +1589,10 @@ namespace pocc {
     if (m_kflags.KBIN_PHONONS_CALCULATION_AGL) { //CT20200323
       if(LDEBUG){cerr << "Running AGL postprocessing" << endl;}
       calculateDebyeThermalProperties(v_temperatures);
+    }
+    if (m_kflags.KBIN_PHONONS_CALCULATION_APL) { //ME20210927
+      if(LDEBUG){cerr << "Running APL postprocessing" << endl;}
+      //calculatePhononPropertiesAPL(v_temperatures);
     }
 
     //END: TEMPERATURE DEPENDENT PROPERTIES

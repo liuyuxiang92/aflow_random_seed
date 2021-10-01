@@ -96,6 +96,7 @@ static const string POCC_TITLE_TOL_TAG=":TOL_";
 static const string ARUN_TITLE_TAG=":ARUN.";
 static const string POCC_ARUN_TITLE_TAG=ARUN_TITLE_TAG+"POCC_";
 static const string POCC_DOSCAR_PREFIX="DOSCAR.pocc_T";
+static const string POCC_PHDOSCAR_PREFIX="PHDOSCAR.pocc_T";  // ME20210927
 //CO20200731 END
 
 //XRD
@@ -810,6 +811,7 @@ class _kflags {
     bool   KBIN_POCC_CALCULATION;
     string KBIN_POCC_TEMPERATURE_STRING;  //CO20191114
     string KBIN_POCC_ARUNS2SKIP_STRING;   //CO20200627
+    bool   KBIN_POCC_EXCLUDE_UNSTABLE; //ME20210927
     // frozsl operation lists
     bool   KBIN_FROZSL;
     bool   KBIN_FROZSL_DOWNLOAD;
@@ -2936,6 +2938,7 @@ namespace KBIN {
   void AFLOW_RUN_Directory(const _aflags& aflags);
   void RUN_DirectoryScript(const _aflags& aflags,const string& script,const string& output);
   bool CompressDirectory(const _aflags& aflags,const _kflags& kflags);
+  bool CompressDirectory(const string& directory,const _kflags& kflags);  //ME20210927
   bool CompressDirectory(const _aflags& aflags);
   void Clean(const _aflags& aflags,bool contcar_save=false);
   void Clean(const string directory,bool contcar_save=false);
@@ -4006,6 +4009,9 @@ namespace plotter {
   void PLOT_PHDOS(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
   void PLOT_PHDOS(aurostd::xoption&, stringstream&,ostream& oss=cout);  //CO20200404
   void PLOT_PHDOS(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+  void PLOT_PHDOS(aurostd::xoption&, const xDOSCAR&, ostream& oss=cout); //ME20210927
+  void PLOT_PHDOS(aurostd::xoption&, const xDOSCAR&, ofstream& FileMESSAGE,ostream& oss=cout); //ME20210927
+  void PLOT_PHDOS(aurostd::xoption&, stringstream& out, xDOSCAR, ofstream& FileMESSAGE,ostream& oss=cout); //ME20210927
 
   void PLOT_PHDISP(aurostd::xoption&,ostream& oss=cout);  //CO20200404
   void PLOT_PHDISP(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404

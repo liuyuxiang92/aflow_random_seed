@@ -5,7 +5,7 @@
 // ***************************************************************************
 
 #include "aflow_apl.h"
-#include "aflow_compare_structure.h"
+#include "../aflow_compare_structure.h"
 
 #define _SYM_ZERO_TOL_LOOSE_ 0.05
 

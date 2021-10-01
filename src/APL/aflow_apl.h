@@ -717,9 +717,9 @@ namespace apl {
       ~DOSCalculator();
       void clear(PhononCalculator&);
       void initialize(const xoption&);//AS20201203 input parameters are passed via xoption
-      void calc(int);
-      void calc(int, double);
-      void calc(int, double, double, double);  //ME20200203
+      void calc(int, bool VERBOSE=false);
+      void calc(int, double, bool VERBOSE=false);
+      void calc(int, double, double, double, bool VERBOSE=false);  //ME20200203
       void writePDOS(const string&);
       void writePDOS(string, string);  //[PN]
       xDOSCAR createDOSCAR() const;  //ME20190614
@@ -729,7 +729,11 @@ namespace apl {
       const std::vector<double>& getDOS() const;   //ME20200108 - added const
       const std::vector<double>& getIDOS() const;  //ME20200210
       const std::vector<xvector<double> >& getFreqs() const;  //AS20200312
-      bool hasNegativeFrequencies() const;  //ME20200108 - added const
+      bool hasImaginaryFrequencies() const;  //ME20200108 - added const
+      double getMinFreq() const;  // ME20210927
+      double getMaxFreq() const;  // ME20210927
+      const xstructure& getInputStructure() const;  //ME20210927
+      uint getNumberOfBranches() const;  //ME20210927
       string _system;
     private:
       void free();
@@ -764,8 +768,8 @@ namespace apl {
     public:
       ThermalPropertiesCalculator(ostream& oss=std::cout);
       ThermalPropertiesCalculator(ofstream&, ostream& os=std::cout);
-      ThermalPropertiesCalculator(const DOSCalculator&, ofstream&, string directory="./", ostream& os=std::cout);
-      ThermalPropertiesCalculator(const xDOSCAR&, ofstream&, string directory="./", ostream& os=std::cout);
+      ThermalPropertiesCalculator(const DOSCalculator&, ofstream&, const string& directory="./", ostream& os=std::cout);
+      ThermalPropertiesCalculator(const xDOSCAR&, ofstream&, const string& directory="./", ostream& os=std::cout);
       ThermalPropertiesCalculator(const ThermalPropertiesCalculator&);
       ThermalPropertiesCalculator& operator=(const ThermalPropertiesCalculator&);
       ~ThermalPropertiesCalculator();

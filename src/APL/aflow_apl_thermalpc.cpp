@@ -45,15 +45,15 @@ namespace apl {
     free();
   }
 
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const DOSCalculator& dosc, ofstream& mf, string directory, ostream& oss) {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const DOSCalculator& dosc, ofstream& mf, const string& directory, ostream& oss) {
     free();
-    _directory = directory;
+    _directory = aurostd::CleanFileName(directory);
     initialize(dosc.createDOSCAR(), mf, oss);
   }
 
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const xDOSCAR& xdos, ofstream& mf, string directory, ostream& oss) {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const xDOSCAR& xdos, ofstream& mf, const string& directory, ostream& oss) {
     free();
-    _directory = directory;
+    _directory = aurostd::CleanFileName(directory);
     initialize(xdos, mf, oss);
   }
 
@@ -390,8 +390,12 @@ namespace apl {
     string message = "Writing thermal properties into file " + filename + ".";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_TPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
-    string outfile_str = getPropertiesFileString();
-    aurostd::string2file(outfile_str, filename);
+    stringstream outfile;
+    outfile << AFLOWIN_SEPARATION_LINE << std::endl;
+    if (!system.empty()) outfile << "[APL_THERMO]SYSTEM=" << system << std::endl;
+    outfile << getPropertiesFileString();
+    outfile << AFLOWIN_SEPARATION_LINE << std::endl;
+    aurostd::stringstream2file(outfile, filename);
     if (!aurostd::FileExist(filename)) {
       string function = "ThermalPropertiesCalculator::writePropertiesToFile():";
       message = "Cannot open output file " + filename + ".";
@@ -419,15 +423,16 @@ namespace apl {
       }
     }
     apl_outfile << "[APL_THERMO_RESULTS]STOP" << std::endl;
+    apl_outfile << AFLOWIN_SEPARATION_LINE << std::endl;
+    if (!system.empty()) apl_outfile << "[APL_THERMO]SYSTEM=" << system << std::endl;
     apl_outfile << getPropertiesFileString();
+    apl_outfile << AFLOWIN_SEPARATION_LINE << std::endl;
   }
 
   string ThermalPropertiesCalculator::getPropertiesFileString() {
     stringstream outfile;
 
     // Header
-    outfile << AFLOWIN_SEPARATION_LINE << std::endl;
-    if (!system.empty()) outfile << "[APL_THERMO]SYSTEM=" << system << std::endl;
     outfile << "[APL_THERMO]START" << std::endl;
     outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
     outfile << "#"
@@ -466,7 +471,6 @@ namespace apl {
 
     // Footer
     outfile << "[APL_THERMO]STOP" << std::endl;
-    outfile << AFLOWIN_SEPARATION_LINE << std::endl;
 
     return outfile.str();
   }

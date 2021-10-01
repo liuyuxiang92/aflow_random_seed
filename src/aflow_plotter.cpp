@@ -2555,7 +2555,25 @@ namespace plotter {
     string directory = plotoptions.getattachedscheme("DIRECTORY");
     xDOSCAR xdos;
     xdos.GetPropertiesFile(directory+"/"+DEFAULT_APL_PHDOSCAR_FILE); //CO20191110
+    PLOT_PHDOS(plotoptions, out, xdos, FileMESSAGE, oss);
+  }
 
+  // ME20210927
+  void PLOT_PHDOS(xoption& plotoptions, const xDOSCAR& xdos, ostream& oss) {ofstream FileMESSAGE; return PLOT_PHDOS(plotoptions,xdos,FileMESSAGE,oss);}
+  void PLOT_PHDOS(xoption& plotoptions, const xDOSCAR& xdos, ofstream& FileMESSAGE, ostream& oss) {
+    // Set k-points format to LaTeX
+    plotoptions.push_attached("KPOINT_FORMAT", "LATEX");
+    // Set output format to gnuplot
+    plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
+
+    stringstream out;
+    PLOT_PHDOS(plotoptions, out, xdos, FileMESSAGE, oss);
+    savePlotGNUPLOT(plotoptions, out);
+  }
+
+  // Create a copy of xDOSCAR here because the energy units may be changed, which
+  // should not propagate outside
+  void PLOT_PHDOS(xoption& plotoptions, stringstream& out, xDOSCAR xdos, ofstream& FileMESSAGE, ostream& oss) {
     plotoptions.push_attached("DEFAULT_TITLE", xdos.title);
     setFileName(plotoptions);
     setTitle(plotoptions,FileMESSAGE,oss); //CO20200404

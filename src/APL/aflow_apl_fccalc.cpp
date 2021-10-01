@@ -1636,7 +1636,7 @@ namespace apl {
       for (uint j = 0; j < _uniqueDistortions[i].size(); j++) {
         message << "Atom [" << aurostd::PaddedNumString(id, 3) << "] ("
           << std::setw(2) << _supercell->getSupercellStructure().atoms[id].cleanname
-          << ") will be distorted in direction ["
+          << ") will be displaced in direction ["
           << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](1) << ","
           << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](2) << ","
           << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](3) << "].";
@@ -1928,7 +1928,7 @@ namespace apl {
     bool LDEBUG=(FALSE || _DEBUG_APL_HARM_IFCS_ || XHOST.DEBUG);
     string soliloquy="apl::ForceConstantCalculator::projectToCartesianDirections():"; //CO20190218
     for (uint i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO20190218
-      if(LDEBUG) {cerr << soliloquy << " looking at distorted atom[idistortion=" << i << "]" << std::endl;} //CO20190218
+      if(LDEBUG) {cerr << soliloquy << " looking at displaced atom[idistortion=" << i << "]" << std::endl;} //CO20190218
       // Construct transformation matrix A
       xmatrix<double> A(3, 3), U(3, 3);
       for (uint j = 0; j < 3; j++) {
