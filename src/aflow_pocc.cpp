@@ -1179,8 +1179,8 @@ namespace pocc {
     unsigned long long int isupercell=0;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       isupercell=std::distance(l_supercell_sets.begin(),it);
-      if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/hep.plot_eps_0.01.dat",eps_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"hep.plot_eps_0.01.dat not found in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
-      message << "Processing hep.plot_eps_0.01.dat of " << m_ARUN_directories[isupercell];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/"+DEFAULT_AFLOW_PLASMONICS_OUT,eps_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,DEFAULT_AFLOW_PLASMONICS_OUT+" not found in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
+      message << "Processing "+DEFAULT_AFLOW_PLASMONICS_OUT+" of " << m_ARUN_directories[isupercell];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
       aurostd::efile2vectorstring(eps_file,vlines);
       vlines=aurostd::RemoveComments(vlines);
       _venergy.clear();_veels.clear();_vdielectric_real.clear();_vdielectric_imag.clear();
@@ -1285,8 +1285,8 @@ namespace pocc {
 
     bool found_all_eps_dat_files=true;
     for(unsigned long long int isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_eps_dat_files==true;isupercell++){
-      if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/hep.plot_eps_0.01.dat")){
-        if(LDEBUG){cerr << soliloquy << " hep.plot_eps_0.01.dat not found in "+m_ARUN_directories[isupercell] << endl;}
+      if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/"+DEFAULT_AFLOW_PLASMONICS_OUT)){
+        if(LDEBUG){cerr << soliloquy << " "+DEFAULT_AFLOW_PLASMONICS_OUT+" not found in "+m_ARUN_directories[isupercell] << endl;}
         found_all_eps_dat_files=false;
       }
     }

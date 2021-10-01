@@ -145,6 +145,8 @@
 #define         DEFAULT_AFLOW_FROZSL_EIGEN_OUT          XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_FROZSL_EIGEN_OUT")
 #define AFLOWRC_DEFAULT_AFLOW_END_OUT                   string("aflow.end.out")
 #define         DEFAULT_AFLOW_END_OUT                   XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_END_OUT")
+#define AFLOWRC_DEFAULT_AFLOW_PLASMONICS_OUT            string("aflow.plasmonics_eps_0.01.out")
+#define         DEFAULT_AFLOW_PLASMONICS_OUT            XHOST.adefault.getattachedscheme("DEFAULT_AFLOW_PLASMONICS_OUT")
 
 // GENERIC MPI   // DONE
 #define AFLOWRC_MPI_START_DEFAULT                       string("")
@@ -1264,6 +1266,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_AFLOW_FROZSL_MODES_OUT",AFLOWRC_DEFAULT_AFLOW_FROZSL_MODES_OUT);
     aflowrc::load_default("DEFAULT_AFLOW_FROZSL_EIGEN_OUT",AFLOWRC_DEFAULT_AFLOW_FROZSL_EIGEN_OUT);
     aflowrc::load_default("DEFAULT_AFLOW_END_OUT",AFLOWRC_DEFAULT_AFLOW_END_OUT);
+    aflowrc::load_default("DEFAULT_AFLOW_PLASMONICS_OUT",AFLOWRC_DEFAULT_AFLOW_PLASMONICS_OUT);
 
     // DEFAULT GENERIC MPI
     aflowrc::load_default("MPI_START_DEFAULT",AFLOWRC_MPI_START_DEFAULT); 
@@ -1873,6 +1876,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_AFLOW_FROZSL_MODES_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_FROZSL_MODES_OUT << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_FROZSL_EIGEN_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_FROZSL_EIGEN_OUT << "\"" << endl;
     aflowrc << "DEFAULT_AFLOW_END_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_END_OUT << "\"" << endl;
+    aflowrc << "DEFAULT_AFLOW_PLASMONICS_OUT=\"" << AFLOWRC_DEFAULT_AFLOW_PLASMONICS_OUT << "\"" << endl;
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULT GENERIC MPI " << endl;
@@ -2473,6 +2477,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_FROZSL_MODES_OUT\")=\"" << DEFAULT_AFLOW_FROZSL_MODES_OUT << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_FROZSL_EIGEN_OUT\")=\"" << DEFAULT_AFLOW_FROZSL_EIGEN_OUT << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_END_OUT\")=\"" << DEFAULT_AFLOW_END_OUT << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AFLOW_PLASMONICS_OUT\")=\"" << DEFAULT_AFLOW_PLASMONICS_OUT << "\"" << endl;
 
     if(LDEBUG) oss << "// DEFAULT GENERIC MPI" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_START_DEFAULT\")=\"" << MPI_START_DEFAULT << "\"" << endl;
