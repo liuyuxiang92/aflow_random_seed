@@ -2035,7 +2035,11 @@ namespace aurostd {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(fileIN.empty()){return fileIN;}
     // ME20211001
-    // Remove any control characters while copying
+    // Remove any control characters (below ASCII 32) while copying. This is useful
+    // when fileIN is read from a file, which can have all sorts of junk and causes
+    // FileExist to break. We cannot use RemoveControlCodeCharactersFromString()
+    // because it keeps tabs and linebreaks and cannot use CleanStringASCII because
+    // it keeps control characters.
     string fileOUT="";
     for (uint i = 0; i < fileIN.size(); i++) {
       if (fileIN[i] > 31) fileOUT += fileIN[i];
@@ -2059,7 +2063,11 @@ namespace aurostd {
   string ProperFileName(const string& fileIN) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // ME20211001
-    // Remove any control characters while copying
+    // Remove any control characters (below ASCII 32) while copying. This is useful
+    // when fileIN is read from a file, which can have all sorts of junk and causes
+    // FileExist to break. We cannot use RemoveControlCodeCharactersFromString()
+    // because it keeps tabs and linebreaks and cannot use CleanStringASCII because
+    // it keeps control characters.
     string fileOUT="";
     for (uint i = 0; i < fileIN.size(); i++) {
       if (fileIN[i] > 31) fileOUT += fileIN[i];
