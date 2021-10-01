@@ -758,7 +758,7 @@ namespace pocc {
       // ME20210927 - APL functions
       void calculatePhononPropertiesAPL(const vector<double>& v_temperatures);
       void initializePhononCalculators(vector<apl::PhononCalculator>& vphcalc);
-      vector<xDOSCAR> getPhononDoscars(vector<apl::PhononCalculator>& vphcalc, xoption& dosopts);
+      vector<xDOSCAR> getPhononDoscars(vector<apl::PhononCalculator>& vphcalc, xoption& dosopts, vector<int>& vexclude);
       void calculatePhononDOSThread(int, int, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&);
       xDOSCAR getAveragePhononDos(double T, const vector<xDOSCAR>& vxdos);
   };

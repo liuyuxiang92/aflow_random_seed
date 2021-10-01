@@ -49,6 +49,17 @@ namespace pocc {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
     }
 
+    vector<int> vexclude;
+    string aruns2skip_backup = "";
+    if (m_kflags.KBIN_POCC_EXCLUDE_UNSTABLE) {
+      // vflag_control (command line) has priority
+      if (XHOST.vflag_control.flag("ARUNS2SKIP")) {
+        aruns2skip_backup = XHOST.vflag_control.getattachedscheme("ARUNS2SKIP");
+      } else if (!m_kflags.KBIN_POCC_ARUNS2SKIP_STRING.empty()) {
+        aruns2skip_backup = m_kflags.KBIN_POCC_ARUNS2SKIP_STRING;
+      }
+    }
+
     // Parse aflow.in options
     const vector<aurostd::xoption>& vxopts = m_kflags.KBIN_MODULE_OPTIONS.aplflags;
     aurostd::xoption aplopts;
@@ -64,7 +75,17 @@ namespace pocc {
     initializePhononCalculators(vphcalc);
 
     // Get phonon DOS from each run
-    vector<xDOSCAR> vxdos = getPhononDoscars(vphcalc, aplopts);
+    vector<xDOSCAR> vxdos = getPhononDoscars(vphcalc, aplopts, vexclude);
+    if (vxdos.size() == 0) {
+      if (m_kflags.KBIN_POCC_EXCLUDE_UNSTABLE) {
+        message << "No structures left after excluding dynamically unstable representatives.";
+        pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        return;
+      } else {
+        message << "No phonon DOSCARs calculated.";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      }
+    }
     vphcalc.clear();
 
     // Compress new files in subdirectories
@@ -132,6 +153,19 @@ namespace pocc {
       tpc.addToAPLOut(ossmain);
       ossmain << "[POCC_APL_RESULTS]STOP_TEMPERATURE=" << tstring << "_K" << endl;
       tpc.writePropertiesToFile(m_aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE);
+    }
+
+    // Restore ARUNS2SKIP
+    if (vexclude.size() > 0) {
+      if (XHOST.vflag_control.flag("ARUNS2SKIP")) {
+        XHOST.vflag_control.push_attached("ARUNS2SKIP", aruns2skip_backup);
+      } else if (!m_kflags.KBIN_POCC_ARUNS2SKIP_STRING.empty()) {
+        m_kflags.KBIN_POCC_ARUNS2SKIP_STRING = aruns2skip_backup;
+      } else {
+        m_kflags.KBIN_POCC_ARUNS2SKIP_STRING = "";
+      }
+      loadDataIntoCalculator();
+      setDFTEnergies();
     }
   }
 
@@ -204,7 +238,7 @@ namespace pocc {
     }
   }
 
-  vector<xDOSCAR> POccCalculator::getPhononDoscars(vector<apl::PhononCalculator>& vphcalc, xoption& aplopts) {
+  vector<xDOSCAR> POccCalculator::getPhononDoscars(vector<apl::PhononCalculator>& vphcalc, xoption& aplopts, vector<int>& vexclude) {
     string function = "pocc::POccCalculator::getPhononDoscars()";
     string message = "Calculating phonon densities of states.";
     pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, m_aflags, *p_FileMESSAGE, *p_oss);
@@ -227,15 +261,30 @@ namespace pocc {
       if (!aplopts.flag("DOS_PROJECT")) vphcalc[isupercell].getQMesh().makeIrreducible();
 
       apl::DOSCalculator dosc(vphcalc[isupercell], aplopts);
-      //if (dosc.hasNegativeFrequencies()) {
-      //  (*it).m_include = false;
-      //} else {
-      //  if (dosc.getMinFreq() < minfreq) minfreq = dosc.getMinFreq();
-      //  if (dosc.getMaxFreq() > maxfreq) maxfreq = dosc.getMaxFreq();
-      //}
-      if (dosc.getMinFreq() < minfreq) minfreq = dosc.getMinFreq();
-      if (dosc.getMaxFreq() > maxfreq) maxfreq = dosc.getMaxFreq();
-      vphdos[isupercell] = dosc;
+      if (m_kflags.KBIN_POCC_EXCLUDE_UNSTABLE && dosc.hasImaginaryFrequencies()) {
+        vexclude.push_back(isupercell);
+      } else {
+        if (dosc.getMinFreq() < minfreq) minfreq = dosc.getMinFreq();
+        if (dosc.getMaxFreq() > maxfreq) maxfreq = dosc.getMaxFreq();
+        vphdos[isupercell] = dosc;
+      }
+    }
+
+    uint nexclude = vexclude.size();
+    if (nexclude > 0) {
+      string aruns2skip = "";
+      for (uint i = 0; i < nexclude; i++) {
+        aruns2skip += m_ARUN_directories[vexclude[i]];
+        if (i < nexclude - 1) aruns2skip += ",";
+      }
+      if (XHOST.vflag_control.flag("ARUNS2SKIP")) {
+        aruns2skip = XHOST.vflag_control.getattachedscheme("ARUNS2SKIP") + "," + aruns2skip;
+        XHOST.vflag_control.push_attached("ARUNS2SKIP", aruns2skip);
+      } else if (!m_kflags.KBIN_POCC_ARUNS2SKIP_STRING.empty()) {
+        m_kflags.KBIN_POCC_ARUNS2SKIP_STRING += "," + aruns2skip;
+      } else { // Nothing set in aflow.in or command line, so add to kflags
+        m_kflags.KBIN_POCC_ARUNS2SKIP_STRING = aruns2skip;
+      }
     }
     aplopts.push_attached("MINFREQ", aurostd::utype2string<double>(minfreq));
     aplopts.push_attached("MAXFREQ", aurostd::utype2string<double>(maxfreq));

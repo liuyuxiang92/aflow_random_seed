@@ -2063,16 +2063,11 @@ namespace aurostd {
   string ProperFileName(const string& fileIN) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // ME20211001
-<<<<<<< HEAD
-    // Remove any control characters while copying
-    // Useful when filenIN was read from another file
-=======
     // Remove any control characters (below ASCII 32) while copying. This is useful
     // when fileIN is read from a file, which can have all sorts of junk and causes
     // FileExist to break. We cannot use RemoveControlCodeCharactersFromString()
     // because it keeps tabs and linebreaks and cannot use CleanStringASCII because
     // it keeps control characters.
->>>>>>> 94d80850538c299a2b299d276d933cb0495b15fe
     string fileOUT="";
     for (uint i = 0; i < fileIN.size(); i++) {
       if (fileIN[i] > 31) fileOUT += fileIN[i];
