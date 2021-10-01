@@ -331,6 +331,11 @@ DEFAULT_AFLOW_END_OUT
   type: string
   default: "aflow.end.out"
 
+DEFAULT_AFLOW_PLASMONICS_OUT
+  description: File name for the plasmonics data output file.
+  type: string
+  default: "aflow.plasmonics_eps_0.01.out"
+
 ####################################################################################################
 DEFAULT GENERIC MPI
 
