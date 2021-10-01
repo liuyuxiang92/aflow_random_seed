@@ -1053,7 +1053,7 @@ namespace KBIN {
 
     // ME20210927
     if (!apl_outfile.str().empty()) {
-      string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_APL_OUT_FILE);
+      string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_OUT_FILE);
       aurostd::stringstream2file(apl_outfile, filename);
       if (!aurostd::FileExist(filename)) {
         string message = "Cannot open output file " + filename + ".";

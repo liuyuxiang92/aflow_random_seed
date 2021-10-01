@@ -155,6 +155,15 @@ namespace pocc {
       tpc.writePropertiesToFile(m_aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE);
     }
 
+    if (!ossmain.str().empty()) {
+      string filename = aurostd::CleanFileName(m_aflags.Directory + "/" + POCC_FILE_PREFIX + POCC_APL_OUT_FILE);
+      aurostd::stringstream2file(ossmain, filename);
+      if (!aurostd::FileExist(filename)) {
+        message << "Cannot open output file " << filename << ".";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+      }
+    }
+
     // Restore ARUNS2SKIP
     if (vexclude.size() > 0) {
       if (XHOST.vflag_control.flag("ARUNS2SKIP")) {
@@ -284,6 +293,13 @@ namespace pocc {
         m_kflags.KBIN_POCC_ARUNS2SKIP_STRING += "," + aruns2skip;
       } else { // Nothing set in aflow.in or command line, so add to kflags
         m_kflags.KBIN_POCC_ARUNS2SKIP_STRING = aruns2skip;
+      }
+      loadDataIntoCalculator();
+      setDFTEnergies();
+      // Erase data from DOS vphcalc and vphdos
+      for (uint i = nexclude - 1; i < nexclude; i--) {
+        vphcalc.erase(vphcalc.begin() + vexclude[i]);
+        vphdos.erase(vphdos.begin() + vexclude[i]);
       }
     }
     aplopts.push_attached("MINFREQ", aurostd::utype2string<double>(minfreq));

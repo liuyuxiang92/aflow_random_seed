@@ -1212,7 +1212,7 @@ namespace aflowlib {
       if(aurostd::FileExist(directory_LIB+"/AECCAR0.static"+XHOST.vext.at(iext)) && aurostd::FileExist(directory_LIB+"/AECCAR2.static"+XHOST.vext.at(iext))) perform_BADER=TRUE;
       if(aurostd::FileExist(directory_LIB+"/aflow.agl.out"+XHOST.vext.at(iext))) perform_AGL=TRUE;
       if(aurostd::FileExist(directory_LIB+"/aflow.ael.out"+XHOST.vext.at(iext))) perform_AEL=TRUE;
-      if(aurostd::FileExist(directory_LIB+"/"+DEFAULT_APL_OUT_FILE+XHOST.vext.at(iext))) perform_APL=TRUE; //ME20210901
+      if(aurostd::FileExist(directory_LIB+"/"+DEFAULT_APL_FILE_PREFIX+DEFAULT_APL_OUT_FILE+XHOST.vext.at(iext))) perform_APL=TRUE; //ME20210901
       if(aurostd::FileExist(directory_LIB+"/"+DEFAULT_QHA_FILE_PREFIX+"out"+XHOST.vext.at(iext))) perform_QHA=TRUE;//AS20200831
       if(aurostd::FileExist(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE+XHOST.vext.at(iext))) perform_POCC=TRUE; //CO20200624
     }
@@ -5682,7 +5682,7 @@ namespace aflowlib {
     aflowlib::LIB2RAW_FileNeeded(directory_LIB, file, directory_RAW, file, vlines, MESSAGE);
 
     // aflow.apl.out
-    file = DEFAULT_APL_OUT_FILE;
+    file = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_OUT_FILE;
     aflowlib::LIB2RAW_FileNeeded(directory_LIB, file, directory_RAW, file, vlines, MESSAGE);
     aurostd::ExtractToStringEXPLICIT(aurostd::efile2string(directory_RAW + "/" + file), lines, "[APL_THERMO_RESULTS]START", "[APL_THERMO_RESULTS]STOP");
     aurostd::string2vectorstring(lines, vlines);
@@ -7496,7 +7496,7 @@ namespace aflowlib {
           throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
         }
         run_directory = true;
-        aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_APL_OUT_FILE);
+        aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_OUT_FILE);
         aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_APL_PHDOSCAR_FILE);
         aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_APL_PHKPOINTS_FILE);
         aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_APL_PHEIGENVAL_FILE);

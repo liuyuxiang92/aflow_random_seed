@@ -476,6 +476,8 @@
 #define         POCC_FILE_PREFIX                                  XHOST.adefault.getattachedscheme("POCC_FILE_PREFIX")
 #define AFLOWRC_POCC_OUT_FILE                                     string("out")
 #define         POCC_OUT_FILE                                     XHOST.adefault.getattachedscheme("POCC_OUT_FILE")
+#define AFLOWRC_POCC_APL_OUT_FILE                                 string("apl.out")  //ME20210927
+#define         POCC_APL_OUT_FILE                                 XHOST.adefault.getattachedscheme("POCC_APL_OUT_FILE")  //ME20210927
 #define AFLOWRC_POCC_ALL_SUPERCELLS_FILE                          string("structures_all.out")
 #define         POCC_ALL_SUPERCELLS_FILE                          XHOST.adefault.getattachedscheme("POCC_ALL_SUPERCELLS_FILE")
 #define AFLOWRC_POCC_UNIQUE_SUPERCELLS_FILE                       string("structures_unique.out")
@@ -557,7 +559,7 @@
 #define         DEFAULT_APL_GVEL                              XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_DISPLACEMENTS")  // ME20200517
 
 //// DEFAULT APL FILES
-#define AFLOWRC_DEFAULT_APL_OUT_FILE                          string("aflow.apl.out")  // ME20210927
+#define AFLOWRC_DEFAULT_APL_OUT_FILE                          string("out")  // ME20210927
 #define         DEFAULT_APL_OUT_FILE                         XHOST.adefault.getattachedscheme("DEFAULT_APL_OUT_FILE")  // ME20210927
 #define AFLOWRC_DEFAULT_APL_FILE_PREFIX                       string("aflow.apl.")
 #define         DEFAULT_APL_FILE_PREFIX                       XHOST.adefault.getattachedscheme("DEFAULT_APL_FILE_PREFIX")
@@ -1449,12 +1451,13 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS",AFLOWRC_DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS);
     aflowrc::load_default("POCC_FILE_PREFIX",AFLOWRC_POCC_FILE_PREFIX);
     aflowrc::load_default("POCC_OUT_FILE",AFLOWRC_POCC_OUT_FILE);
+    aflowrc::load_default("POCC_APL_OUT_FILE",AFLOWRC_POCC_APL_OUT_FILE);  //ME20210927
     aflowrc::load_default("POCC_ALL_SUPERCELLS_FILE",AFLOWRC_POCC_ALL_SUPERCELLS_FILE);
     aflowrc::load_default("POCC_UNIQUE_SUPERCELLS_FILE",AFLOWRC_POCC_UNIQUE_SUPERCELLS_FILE);
     aflowrc::load_default("POCC_ALL_HNF_MATRICES_FILE",AFLOWRC_POCC_ALL_HNF_MATRICES_FILE);
     aflowrc::load_default("POCC_ALL_SITE_CONFIGURATIONS_FILE",AFLOWRC_POCC_ALL_SITE_CONFIGURATIONS_FILE);
     aflowrc::load_default("POCC_DOSCAR_FILE",AFLOWRC_POCC_DOSCAR_FILE);
-    aflowrc::load_default("POCC_PHDOSCAR_FILE",AFLOWRC_POCC_PHDOSCAR_FILE);  // ME20210927
+    aflowrc::load_default("POCC_PHDOSCAR_FILE",AFLOWRC_POCC_PHDOSCAR_FILE);  //ME20210927
     aflowrc::load_default("POCC_ANIONS_LIST",AFLOWRC_POCC_ANIONS_LIST);
 
     // DEFAULT APL
@@ -2074,12 +2077,13 @@ namespace aflowrc {
     aflowrc << "DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS=" << AFLOWRC_DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS << endl;
     aflowrc << "POCC_FILE_PREFIX=\"" << AFLOWRC_POCC_FILE_PREFIX << "\"" << endl;
     aflowrc << "POCC_OUT_FILE=\"" << AFLOWRC_POCC_OUT_FILE << "\"" << endl;
+    aflowrc << "POCC_APL_OUT_FILE=\"" << AFLOWRC_POCC_APL_OUT_FILE << "\"" << endl;  //ME20210927
     aflowrc << "POCC_ALL_SUPERCELLS_FILE=\"" << AFLOWRC_POCC_ALL_SUPERCELLS_FILE << "\"" << endl;
     aflowrc << "POCC_UNIQUE_SUPERCELLS_FILE=\"" << AFLOWRC_POCC_UNIQUE_SUPERCELLS_FILE << "\"" << endl;
     aflowrc << "POCC_ALL_HNF_MATRICES_FILE=\"" << AFLOWRC_POCC_ALL_HNF_MATRICES_FILE << "\"" << endl;
     aflowrc << "POCC_ALL_SITE_CONFIGURATIONS_FILE=\"" << AFLOWRC_POCC_ALL_SITE_CONFIGURATIONS_FILE << "\"" << endl;
     aflowrc << "POCC_DOSCAR_FILE=\"" << AFLOWRC_POCC_DOSCAR_FILE << "\"" << endl;
-    aflowrc << "POCC_PHDOSCAR_FILE=\"" << AFLOWRC_POCC_PHDOSCAR_FILE << "\"" << endl;  // ME20210927
+    aflowrc << "POCC_PHDOSCAR_FILE=\"" << AFLOWRC_POCC_PHDOSCAR_FILE << "\"" << endl;  //ME20210927
     aflowrc << "POCC_ANIONS_LIST=\"" << AFLOWRC_POCC_ANIONS_LIST << "\"" << endl;
 
     aflowrc << " " << endl;
@@ -2663,6 +2667,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS\")=" << DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_FILE_PREFIX\")=\"" << POCC_FILE_PREFIX << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_OUT_FILE\")=\"" << POCC_OUT_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_APL_OUT_FILE\")=\"" << POCC_APL_OUT_FILE << "\"" << endl;  //ME20210927
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_ALL_SUPERCELLS_FILE\")=\"" << POCC_ALL_SUPERCELLS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_UNIQUE_SUPERCELLS_FILE\")=\"" << POCC_UNIQUE_SUPERCELLS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_ALL_HNF_MATRICES_FILE\")=\"" << POCC_ALL_HNF_MATRICES_FILE << "\"" << endl;
