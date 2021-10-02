@@ -1455,7 +1455,7 @@ namespace pocc {
       //header
       pocc_out_ss << "#";
       pocc_out_ss << aurostd::PaddedPRE("energy (eV)",padding) << " ";
-      pocc_out_ss << aurostd::PaddedPRE("EELS (eV)",padding) << " ";
+      pocc_out_ss << aurostd::PaddedPRE("EELS",padding) << " ";
       pocc_out_ss << aurostd::PaddedPRE("Re(dielectric)",padding) << " ";
       pocc_out_ss << aurostd::PaddedPRE("Im(dielectric)",padding) << " ";
       pocc_out_ss << endl;
