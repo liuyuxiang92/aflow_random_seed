@@ -5679,11 +5679,11 @@ namespace aflowlib {
 
     // Always need PHPOSCAR
     file = DEFAULT_APL_PHPOSCAR_FILE;
-    aflowlib::LIB2RAW_FileNeeded(directory_LIB, file, directory_RAW, file, vlines, MESSAGE);
+    aflowlib::LIB2RAW_FileNeeded(directory_LIB, file, directory_RAW, file, vfile, MESSAGE);
 
     // aflow.apl.out
     file = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_OUT_FILE;
-    aflowlib::LIB2RAW_FileNeeded(directory_LIB, file, directory_RAW, file, vlines, MESSAGE);
+    aflowlib::LIB2RAW_FileNeeded(directory_LIB, file, directory_RAW, file, vfile, MESSAGE);
     aurostd::ExtractToStringEXPLICIT(aurostd::efile2string(directory_RAW + "/" + file), lines, "[APL_THERMO_RESULTS]START", "[APL_THERMO_RESULTS]STOP");
     aurostd::string2vectorstring(lines, vlines);
     for (uint i = 0; i < vlines.size(); i++) {
@@ -6047,6 +6047,59 @@ namespace aflowlib {
       //300K STOP
     }
 
+    //ME20210927 - APL
+    string aplout = POCC_FILE_PREFIX + POCC_APL_OUT_FILE;
+    if (aurostd::EFileExist(directory_LIB + "/" + aplout)) {
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB, aplout, directory_RAW, aplout, vfile, MESSAGE);
+      if (AFLOWLIB_VERBOSE) std::cout << MESSAGE << " loading " << directory_RAW << "/" << aplout << std::endl;
+      string lines = "";
+      aurostd::ExtractToStringEXPLICIT(aurostd::efile2string(directory_RAW + "/" + aplout), lines, "[POCC_APL_RESULTS]START_TEMPERATURE=0300_K","[POCC_APL_RESULTS]STOP_TEMPERATURE=0300_K");
+      if (!lines.empty()) {
+        string lines_300K = "";
+        vector<string> vlines;
+        aurostd::ExtractToStringEXPLICIT(lines, lines_300K, "[APL_THERMO_RESULTS]START", "[APL_THERMO_RESULTS]STOP");
+        aurostd::string2vectorstring(lines_300K, vlines);
+        for (uint i = 0; i < vlines.size(); i++) {
+            aurostd::StringSubst(vlines[i], "=", " ");
+            aurostd::string2tokens(vlines[i], tokens, " ");
+            if (tokens.size() >= 2) {
+              if (tokens[0] == "energy_free_vibrational_cell_apl_300K")
+                data.energy_free_vibrational_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
+              else if (tokens[0] == "energy_free_vibrational_atom_apl_300K")
+                data.energy_free_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+              else if (tokens[0] == "entropy_vibrational_cell_apl_300K")
+                data.entropy_vibrational_cell_apl_300K = 1000.0 * KBOLTZEV * aurostd::string2utype<double>(tokens[1]);  // Convert to meV/K to be consistent with AGL
+              else if (tokens[0] == "entropy_vibrational_atom_apl_300K")
+                data.entropy_vibrational_atom_apl_300K = 1000.0 * KBOLTZEV * aurostd::string2utype<double>(tokens[1]);  // Convert to meV/K to be consistent with AGL
+              else if (tokens[0] == "energy_internal_vibrational_cell_apl_300K")
+                data.energy_internal_vibrational_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
+              else if (tokens[0] == "energy_internal_vibrational_atom_apl_300K")
+                data.energy_internal_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+              else if (tokens[0] == "energy_zero_point_cell_apl_300K")
+                data.energy_zero_point_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
+              else if (tokens[0] == "energy_zero_point_atom_apl_300K")
+                data.energy_zero_point_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+              else if (tokens[0] == "heat_capacity_Cv_cell_apl_300K")
+                data.heat_capacity_Cv_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
+              else if (tokens[0] == "heat_capacity_Cv_atom_apl_300K")
+                data.heat_capacity_Cv_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+            }
+        }
+      }
+      if (AFLOWLIB_VERBOSE) {
+        std::cout << MESSAGE << " energy_free_vibrational_cell_apl_300K = " << ((data.energy_free_vibrational_cell_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_free_vibrational_cell_apl_300K):"unavailable") << std::endl;
+        std::cout << MESSAGE << " energy_free_vibrational_atom_apl_300K = " << ((data.energy_free_vibrational_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_free_vibrational_atom_apl_300K):"unavailable") << std::endl;
+        std::cout << MESSAGE << " entropy_vibrational_cell_apl_300K = " << ((data.entropy_vibrational_cell_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.entropy_vibrational_cell_apl_300K):"unavailable") << std::endl;
+        std::cout << MESSAGE << " entropy_vibrational_atom_apl_300K = " << ((data.entropy_vibrational_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.entropy_vibrational_atom_apl_300K):"unavailable") << std::endl;
+        std::cout << MESSAGE << " energy_internal_vibrational_cell_apl_300K = " << ((data.energy_internal_vibrational_cell_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_internal_vibrational_cell_apl_300K):"unavailable") << std::endl;
+        std::cout << MESSAGE << " energy_internal_vibrational_atom_apl_300K = " << ((data.energy_internal_vibrational_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_internal_vibrational_atom_apl_300K):"unavailable") << std::endl;
+        std::cout << MESSAGE << " energy_zero_point_cell_apl_300K = " << ((data.energy_zero_point_cell_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_zero_point_cell_apl_300K):"unavailable") << std::endl;
+        std::cout << MESSAGE << " energy_zero_point_atom_apl_300K = " << ((data.energy_zero_point_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_zero_point_atom_apl_300K):"unavailable") << std::endl;
+        std::cout << MESSAGE << " heat_capacity_Cv_cell_apl_300K = " << ((data.heat_capacity_Cv_cell_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.heat_capacity_Cv_cell_apl_300K):"unavailable") << std::endl;
+        std::cout << MESSAGE << " heat_capacity_Cv_atom_apl_300K = " << ((data.heat_capacity_Cv_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.heat_capacity_Cv_atom_apl_300K):"unavailable") << std::endl;
+      }
+    }
+
     string AflowIn_file="",AflowIn="";
     KBIN::getAflowInFromDirectory(directory_LIB,AflowIn_file,AflowIn);
     if(LDEBUG){cerr << soliloquy << " loaded aflow.in from dir=" << directory_LIB << endl;}
@@ -6092,7 +6145,8 @@ namespace aflowlib {
     aurostd::DirectoryLS(directory_RAW,vfiles);
     std::sort(vfiles.begin(),vfiles.end()); //get in order
     for(i=0;i<vfiles.size();i++){
-      if(vfiles[i].find(POCC_DOSCAR_FILE)!=string::npos){
+      if((vfiles[i].find(POCC_DOSCAR_FILE)!=string::npos)
+      || (vfiles[i].find(POCC_PHDOSCAR_FILE)!=string::npos)){  //ME20210927 - added PHDOSCAR
         //need to grab POSCAR from ARUN.POCC_01
         //inside plotter we change '/RAW/' to '/LIB/', everything in RAW must be self-contained
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " plotting " << vfiles[i] << endl;
