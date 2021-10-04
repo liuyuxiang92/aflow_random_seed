@@ -3191,6 +3191,15 @@ void xstructure::ClearSpecies() { //CO20180420 - helps with pocc, match with Add
   species_mass.clear();
 }
 
+//ME20211004 - from POCC
+void xstructure::CleanStructure() {
+  neg_scale = false;  //NO negative scale... doesn't really matter, scale is one variable
+  ReScale(1.0);
+  ShiftOriginToAtom(0);
+  BringInCell();
+  clean(); //DX20191220 - uppercase to lowercase clean
+}
+
 void xstructure::initialize(istream& _input,int _iomode) { //DX20210129 - initialize structure; avoid copying of xstructure
   free(); //DX20191220 - added free to initialize
   (*this).iomode=_iomode;

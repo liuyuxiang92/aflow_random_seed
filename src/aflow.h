@@ -1560,6 +1560,7 @@ class xstructure {
     void clear(void);                                             // clear everything //DX20191220 - uppercase to lowercase clear
     void clean(void);                                             // performs stringstream clean //DX20191220 - uppercase to lowercase clean
     void ClearSpecies(void);                                      // Clear all the symmetry
+    void CleanStructure();                                        // Fix up structure - ME20211004
     void ShiftOriginToAtom(const int& iat);                       // Shift the origin to atom(iat)
     void IdenticalAtoms(void);                                    // Make identical atoms
     void SwapCoordinates(const uint& i,const uint& j);            // Permute Coordinates i with j

@@ -629,6 +629,8 @@ namespace pocc {
 
       void writePARTCAR() const;
       void generateStructures(const _xvasp& xvasp);
+      bool inputFilesFoundAnywhereAPL();  //ME20211004
+      void createModuleAflowIns(const _xvasp& xvasp, const string& MODULE);  //ME20211004
       xstructure createXStructure(const POccSuperCell& psc,int n_hnf=0,unsigned long long int hnf_count=0,unsigned long long int types_config_permutations_count=0,bool clean_structure=false,bool primitivize=false);
       bool areEquivalentStructuresByUFF(std::list<POccSuperCellSet>::iterator it, const POccSuperCell& psc) const;
       void add2DerivativeStructuresList(const POccSuperCell& psc,std::list<POccSuperCellSet>::iterator i_start,std::list<POccSuperCellSet>::iterator i_end);

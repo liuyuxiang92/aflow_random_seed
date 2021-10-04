@@ -29,14 +29,13 @@ using std::string;
 using std::vector;
 using std::deque;
 
-static const string _POCC_APL_ERR_PREFIX_ = "pocc::";
 static const string _POCC_APL_MODULE_ = "POCC-APL";
 static const double _FREQ_WARNING_THRESHOLD_ = 1e-3;
 
 namespace pocc {
 
   void POccCalculator::calculatePhononPropertiesAPL(const vector<double>& v_temperatures) {
-    string function = _POCC_APL_ERR_PREFIX_ + "POccCalculator::calculatePhononProperties()";
+    string function = XPID + "POccCalculator::calculatePhononProperties()";
     stringstream message;
     // Make sure that everything is consistent
     uint nruns = m_ARUN_directories.size();
@@ -179,7 +178,7 @@ namespace pocc {
   }
 
   void POccCalculator::initializePhononCalculators(vector<apl::PhononCalculator>& vphcalc) {
-    string function = "pocc::POccCalculator::initializePhononCalculators()";
+    string function = XPID + "POccCalculator::initializePhononCalculators()";
     string message = "Initializing phonon calculators.";
     pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, m_aflags, *p_FileMESSAGE, *p_oss);
     unsigned long long int isupercell = 0;
@@ -248,7 +247,7 @@ namespace pocc {
   }
 
   vector<xDOSCAR> POccCalculator::getPhononDoscars(vector<apl::PhononCalculator>& vphcalc, xoption& aplopts, vector<int>& vexclude) {
-    string function = "pocc::POccCalculator::getPhononDoscars()";
+    string function = XPID + "POccCalculator::getPhononDoscars()";
     string message = "Calculating phonon densities of states.";
     pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, m_aflags, *p_FileMESSAGE, *p_oss);
 
@@ -334,7 +333,7 @@ namespace pocc {
 
   void POccCalculator::calculatePhononDOSThread(int startIndex, int endIndex,
       const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos) {
-    string function = "pocc::POccCalculator::getPhononDoscars()";
+    string function = XPID + "POccCalculator::getPhononDoscars()";
 
     // Normalize to number of branches in the parent structure
     double pocc_sum = aurostd::sum(xstr_pocc.comp_each_type);  // Will be needed for projections
@@ -420,7 +419,7 @@ namespace pocc {
   }
 
   xDOSCAR POccCalculator::getAveragePhononDos(double T, const vector<xDOSCAR>& vxdos) {
-    string function = "pocc::POccCalculator::getAveragePhononDos()";
+    string function = XPID + "POccCalculator::getAveragePhononDos()";
     stringstream message;
     xDOSCAR xdos;
 
@@ -484,6 +483,19 @@ namespace pocc {
       }
     }
     return xdos;
+  }
+
+  bool POccCalculator::inputFilesFoundAnywhereAPL() {
+    if (m_ARUN_directories.size()) loadDataIntoCalculator();
+    string directory = "";
+    for (uint i = 0; i < m_ARUN_directories.size(); i++) {
+      directory = m_aflags.Directory + "/" + m_ARUN_directories[i];
+      if (aurostd::EFileExist(directory + "/" + DEFAULT_APL_PHPOSCAR_FILE)
+        || aurostd::EFileExist(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_STATE_FILE)) {
+        return true;
+      }
+    }
+    return false;
   }
 
 }  // namespace pocc

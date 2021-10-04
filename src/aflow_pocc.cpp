@@ -225,9 +225,9 @@ namespace KBIN {
     _kflags kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,aflags);
     _vflags vflags=KBIN::VASP_Get_Vflags_from_AflowIN(AflowIn,aflags,kflags);
 
-    if(LDEBUG){cerr << soliloquy << " kflags.KBIN_PHONONS_CALCULATION_APL=" << kflags.KBIN_PHONONS_CALCULATION_APL << endl;}
     if(LDEBUG){cerr << soliloquy << " kflags.KBIN_PHONONS_CALCULATION_AEL=" << kflags.KBIN_PHONONS_CALCULATION_AEL << endl;}
     if(LDEBUG){cerr << soliloquy << " kflags.KBIN_PHONONS_CALCULATION_AGL=" << kflags.KBIN_PHONONS_CALCULATION_AGL << endl;}
+    if(LDEBUG){cerr << soliloquy << " kflags.KBIN_PHONONS_CALCULATION_APL=" << kflags.KBIN_PHONONS_CALCULATION_APL << endl;}
 
     return VASP_RunPOCC(xvasp,AflowIn,aflags,kflags,vflags,FileMESSAGE,oss);
   }
@@ -242,9 +242,26 @@ namespace KBIN {
       if(!pocc::structuresGenerated(aflags.Directory)){
         try{pcalc.generateStructures(xvasp);}
         catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);}
+        //ME2021104
+        if (kflags.KBIN_PHONONS_CALCULATION_AEL
+          || kflags.KBIN_PHONONS_CALCULATION_AGL
+          || kflags.KBIN_PHONONS_CALCULATION_APL) {
+          string message = "Cannot perform property calculations before running POCC calculations."
+            " Please see the README for more information.";
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_NOTICE_);
+        }
         return;
       }
 
+      //ME20211004
+      if (kflags.KBIN_PHONONS_CALCULATION_APL) {
+        // Simple check: if APL input files are not present anywhere,
+        // assume that we need to create aflow.in files
+        if (!pcalc.inputFilesFoundAnywhereAPL()) {
+          pcalc.createModuleAflowIns(xvasp, "APL");
+          return;
+        }
+      }
       //post-processing
       pcalc.CleanPostProcessing();
       //pocc::patchStructuresFile(aflags,FileMESSAGE,oss);  //patch if needed
@@ -1592,7 +1609,7 @@ namespace pocc {
     }
     if (m_kflags.KBIN_PHONONS_CALCULATION_APL) { //ME20210927
       if(LDEBUG){cerr << "Running APL postprocessing" << endl;}
-      //calculatePhononPropertiesAPL(v_temperatures);
+      calculatePhononPropertiesAPL(v_temperatures);
     }
 
     //END: TEMPERATURE DEPENDENT PROPERTIES
@@ -5132,17 +5149,56 @@ namespace pocc {
       aurostd::stringstream2file(unique_derivative_structures_ss,m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE);
     }
 
+  // ME20211004
+  void POccCalculator::createModuleAflowIns(const _xvasp& xvasp_in, const string& MODULE) {
+    string soliloquy = XPID + "POccCalculator::createModuleAflowIns():";
+    string message = "";
+
+    if (m_ARUN_directories.size()) loadDataIntoCalculator();
+
+    // We need relaxed structures to propagate into the modules.
+    // If not all directories have a qmvasp file, it is safe to
+    // assume that not all have relaxed structures.
+    if(!QMVASPsFound()) {
+      message = "Not all POCC calculations have finished."
+        " Please run POCC in all subdirectories before calculating properties.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
+    }
+
+    _xvasp xvasp;
+    for (uint i = 0; i < m_ARUN_directories.size(); i++) {
+      xvasp = xvasp_in;
+      try {
+        xvasp.str = KBIN::GetMostRelaxedStructure(m_ARUN_directories[i]);
+      } catch (aurostd::xerror& e) {
+        message = "Could not find valid structure file inside directory " + m_ARUN_directories[i] + ".";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
+      }
+      xvasp.str.CleanStructure();
+      xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE", MODULE);
+      xvasp.Directory = aurostd::CleanFileName(m_aflags.Directory + "/" + m_ARUN_directories[i]);
+      xvasp.AVASP_arun=true;
+      xvasp.AVASP_arun_mode = "POCC";
+      xvasp.AVASP_arun_runname = getARUNString(i);
+      xvasp.aopts.flag("FLAG::AVASP_SKIP_NOMIX", false);
+      AVASP_populateXVASP(m_aflags, m_kflags, m_vflags, xvasp);
+      stringstream aflowin;
+      AVASP_MakeSingleAFLOWIN(xvasp, aflowin, true);
+    }
+  }
+
   void POccCalculator::cleanPOccStructure() {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::cleanPOccStructure():";
     stringstream message;
+    xstr_pocc.CleanStructure();  // ME20211004 - Moved to xstructure
 
-    //fix up structure
-    xstr_pocc.neg_scale=false;  //NO negative scale... doesn't really matter, scale is one variable
-    xstr_pocc.ReScale(1.0);
-    xstr_pocc.ShiftOriginToAtom(0);
-    xstr_pocc.BringInCell();
-    xstr_pocc.clean(); //DX20191220 - uppercase to lowercase clean
+    //[OBSOLETE ME20211004]//fix up structure
+    //[OBSOLETE ME20211004]xstr_pocc.neg_scale=false;  //NO negative scale... doesn't really matter, scale is one variable
+    //[OBSOLETE ME20211004]xstr_pocc.ReScale(1.0);
+    //[OBSOLETE ME20211004]xstr_pocc.ShiftOriginToAtom(0);
+    //[OBSOLETE ME20211004]xstr_pocc.BringInCell();
+    //[OBSOLETE ME20211004]xstr_pocc.clean(); //DX20191220 - uppercase to lowercase clean
 
     if(LDEBUG) {
       cerr << soliloquy << " cleaned PARTCAR" << endl;

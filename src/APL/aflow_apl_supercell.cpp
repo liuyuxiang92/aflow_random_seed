@@ -209,9 +209,7 @@ namespace apl {
 
     // Copy
     _inStructure = xstr;
-    _inStructure.ReScale(1.0);
-    _inStructure.ShiftOriginToAtom(0);
-    _inStructure.BringInCell();  //clean up
+    _inStructure.CleanStructure();
 
     if(LDEBUG){
       cerr << soliloquy << " this is the structure to be analyzed (after sorting via iatoms)" << std::endl;
@@ -1068,9 +1066,7 @@ namespace apl {
     // the conventional to the primitive cell.
     pcStructure.LatticeReduction_avoid = false;
     pcStructure.Standard_Primitive_UnitCellForm();
-    pcStructure.ReScale(1.0);
-    pcStructure.ShiftOriginToAtom(0);
-    pcStructure.BringInCell();
+    pcStructure.CleanStructure();
     return pcStructure;
   }
 
