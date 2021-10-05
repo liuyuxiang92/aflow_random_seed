@@ -1092,6 +1092,54 @@ namespace KBIN {
 }
 
 // ***************************************************************************
+// KBIN::MoveRun2NewDirectory() //DX20210901
+// ***************************************************************************
+// Moves an aflow run (i.e., aflow.in) to a new directory and adds a LOCK
+// to the original directory to prevent aflow from re-running the system.
+// Some machines have scrubbers on certain filesystems/workspaces that remove
+// old/untouched files, i.e., removes/deletes aflow.ins that are waiting to be
+// run. To avoid this, we store the aflow.in in a filesystem/workspace "safe"
+// from the scrubber, and move the aflow.in to the "run" filesystem/workspace
+// once it has been selected from the aflow daemon.
+// This is needed for machine001, machine002, machine003
+namespace KBIN {
+  void MoveRun2NewDirectory(_aflags& aflags, const string& subdirectory_orig, const string& subdirectory_new){
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name=XPID+"KBIN::RUN_MoveRun2NewDirectory():";
+    ostringstream aus,message;
+
+    // ---------------------------------------------------------------------------
+    // create lock immediately // CO20210901
+    aus << "touch " << aflags.Directory << "LOCK";
+    message <<    "MMMMM  Executing: \"" << aus.str() << "\"" << Message(_AFLOW_FILE_NAME_,aflags,"user,host,time") << endl;aurostd::PrintMessageStream(message,XHOST.QUIET);message.clear();message.str(std::string());
+    aurostd::execute(aus);
+    aus.clear();aus.str(std::string());
+
+    // ---------------------------------------------------------------------------
+    //Changing the run directory from the "original" to a "new" directory
+    string directory_orig = aflags.Directory;
+    if(LDEBUG){
+      cerr << function_name << " original full directory " << directory_orig << endl;
+      cerr << function_name << " changing subdirectory " << subdirectory_orig << " to " << subdirectory_new << endl;
+    }
+    aurostd::StringSubst(aflags.Directory,subdirectory_orig,subdirectory_new);
+
+    // ---------------------------------------------------------------------------
+    // make new directory
+    aus << "mkdir -p " << aflags.Directory;
+    message <<    "MMMMM  Executing: \"" << aus.str() << "\"" << Message(_AFLOW_FILE_NAME_,aflags,"user,host,time") << endl;aurostd::PrintMessageStream(message,XHOST.QUIET);message.clear();message.str(std::string());aurostd::execute(aus);aus.clear();aus.str(std::string());
+
+    // ---------------------------------------------------------------------------
+    // copy aflow.in to new directory
+    aus << "cp " << directory_orig << "/aflow.in " << aflags.Directory;
+    message <<    "MMMMM  Executing: \"" << aus.str() << "\"" << Message(_AFLOW_FILE_NAME_,aflags,"user,host,time") << endl;aurostd::PrintMessageStream(message,XHOST.QUIET);message.clear();message.str(std::string());aurostd::execute(aus);aus.clear();aus.str(std::string());
+
+    if(LDEBUG){ cerr << function_name << " new full directory " << aflags.Directory << endl; }
+  }
+}
+
+// ***************************************************************************
 // KBIN::RUN_Directory
 // ***************************************************************************
 namespace KBIN {
@@ -1099,6 +1147,20 @@ namespace KBIN {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::RUN_Directory():";
     ostringstream aus;
+
+    // ---------------------------------------------------------------------------
+    // Move aflow run (i.e., aflow.in) to a new directory and add a LOCK
+    // to the original directory to prevent machine scrubbers from removing
+    // DX20210901
+    if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE001") ||
+        aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE002") ||
+        aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE003")){
+
+      string subdirectory_orig = aurostd::execute2string("echo $HOME");   // $HOME    : environment variable pointing to "home" filesystem (specific to machine001/002/003)
+      string subdirectory_new = aurostd::execute2string("echo $WORKDIR"); // $WORKDIR : environment variable pointing to "work" filesystem (specific to machine001/002/003)
+      KBIN::MoveRun2NewDirectory(aflags, subdirectory_orig, subdirectory_new);
+    }
+
     ifstream FileSUBDIR;string FileNameSUBDIR;
     FileNameSUBDIR=aflags.Directory;
     FileSUBDIR.open(FileNameSUBDIR.c_str(),std::ios::in);
