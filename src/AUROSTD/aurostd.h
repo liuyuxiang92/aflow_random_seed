@@ -854,11 +854,6 @@ namespace aurostd {
   string latex2html(const string& str) __xprototype;
   string latex2txt(const string& str) __xprototype;
   string fixStringLatex(const string& input, bool double_back_slash=false,bool symmetry_string=false);  //CO20190419
-  string dbl2frac(double a, bool sign_prefix=true); //DX20190724
-  double frac2dbl(const string& str); //DX20200313
-  void double2fraction(const double& input_double, int& numerator, int& denominator, double tol_diff=AUROSTD_IDENTITY_TOL, double tol_remainder=1e-2); //DX20210908
-  int getNumeratorContinuedFractions(int& p, const int& n, vector<int>& fraction_sequence); //DX20210908
-  int getDenominatorContinuedFractions(int& q, const int& n, vector<int>& fraction_sequence); //DX20210908
 }
 
 
