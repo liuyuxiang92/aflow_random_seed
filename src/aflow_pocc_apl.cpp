@@ -65,13 +65,11 @@ namespace pocc {
     for (uint i = 0; i < vxopts.size(); i++) {
       const string& key = vxopts[i].keyword;
       aplopts.push_attached(key, vxopts[i].xscheme);
-      // Special case: boolean keyword
-      if (key == "DOS_PROJECT") aplopts.flag(key, vxopts[i].option);
+      aplopts.flag(key, vxopts[i].option);
     }
     apl::validateParametersDosAPL(aplopts, m_aflags, *p_FileMESSAGE);
 
-    vector<apl::PhononCalculator> vphcalc;
-    initializePhononCalculators(vphcalc);
+    vector<apl::PhononCalculator> vphcalc = initializePhononCalculators();
 
     // Get phonon DOS from each run
     vector<xDOSCAR> vxdos = getPhononDoscars(vphcalc, aplopts, vexclude);
@@ -107,15 +105,14 @@ namespace pocc {
     }
 
     // Calculate vibrational properties
-    double T = 0;
-    xDOSCAR xdos_T;
     stringstream ossmain;
+
     apl::ThermalPropertiesCalculator tpc(*p_FileMESSAGE, *p_oss);
-    tpc._directory = m_aflags.Directory;
-    tpc.natoms = (uint) aurostd::sum(xstr_pocc.comp_each_type);  // Set to number of atoms in parent structure
     double tpt_start = aurostd::string2utype<double>(aplopts.getattachedscheme("TSTART"));
     double tpt_end = aurostd::string2utype<double>(aplopts.getattachedscheme("TEND"));
     double tpt_step = aurostd::string2utype<double>(aplopts.getattachedscheme("TSTEP"));
+    xDOSCAR xdos_T;
+    double T = 0;
     for (uint t = 0; t < v_temperatures.size(); t++) {
       T = v_temperatures[t];
       xdos_T = getAveragePhononDos(T, vxdos);
@@ -147,6 +144,9 @@ namespace pocc {
       }
 
       tpc.clear();
+      tpc._directory = m_aflags.Directory;
+      tpc.initialize(xdos_T, *p_FileMESSAGE, *p_oss);
+      tpc.natoms = (uint) aurostd::round(aurostd::sum(xstr_pocc.comp_each_type));  // Set to number of atoms in parent structure
       tpc.calculateThermalProperties(tpt_start, tpt_end, tpt_step);
       ossmain << "[POCC_APL_RESULTS]START_TEMPERATURE=" << tstring << "_K" << endl;
       tpc.addToAPLOut(ossmain);
@@ -177,10 +177,12 @@ namespace pocc {
     }
   }
 
-  void POccCalculator::initializePhononCalculators(vector<apl::PhononCalculator>& vphcalc) {
+  vector<apl::PhononCalculator> POccCalculator::initializePhononCalculators() {
     string function = XPID + "POccCalculator::initializePhononCalculators()";
     string message = "Initializing phonon calculators.";
     pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, m_aflags, *p_FileMESSAGE, *p_oss);
+
+    vector<apl::PhononCalculator> vphcalc;
     unsigned long long int isupercell = 0;
     int imax = 0;
     for (std::list<POccSuperCellSet>::iterator it = l_supercell_sets.begin(); it != l_supercell_sets.end(); ++it) {
@@ -242,8 +244,9 @@ namespace pocc {
 
       // Convert to primitive cell for projections
       phcalc.getSupercell().projectToPrimitive();
-      vphcalc[isupercell] = phcalc;
+      vphcalc.push_back(phcalc);
     }
+    return vphcalc;
   }
 
   vector<xDOSCAR> POccCalculator::getPhononDoscars(vector<apl::PhononCalculator>& vphcalc, xoption& aplopts, vector<int>& vexclude) {
@@ -317,7 +320,7 @@ namespace pocc {
       int startIndex = thread_dist[i][0];
       int endIndex = thread_dist[i][1];
       threads.push_back(new std::thread(&POccCalculator::calculatePhononDOSThread, this, startIndex, endIndex,
-        std::ref(aplopts), std::ref(vphdos), std::ref(vxdos)));
+            std::ref(aplopts), std::ref(vphdos), std::ref(vxdos)));
     }
 
     for (uint i = 0; i < threads.size(); i++) {
@@ -449,8 +452,8 @@ namespace pocc {
         // Check frequencies
         if (!mismatch) {
           if ((xdos.energy_max != vxdos[isupercell].energy_max)
-            || (xdos.energy_min != vxdos[isupercell].energy_min)
-            || (xdos.number_energies != vxdos[isupercell].venergy.size())) {
+              || (xdos.energy_min != vxdos[isupercell].energy_min)
+              || (xdos.number_energies != vxdos[isupercell].venergy.size())) {
             message << "Frequencies do not match for phonon DOS in " << m_ARUN_directories[isupercell] << ".";
             mismatch = true;
           }
@@ -486,12 +489,12 @@ namespace pocc {
   }
 
   bool POccCalculator::inputFilesFoundAnywhereAPL() {
-    if (m_ARUN_directories.size()) loadDataIntoCalculator();
+    if (m_ARUN_directories.size() == 0) loadDataIntoCalculator();
     string directory = "";
     for (uint i = 0; i < m_ARUN_directories.size(); i++) {
       directory = m_aflags.Directory + "/" + m_ARUN_directories[i];
       if (aurostd::EFileExist(directory + "/" + DEFAULT_APL_PHPOSCAR_FILE)
-        || aurostd::EFileExist(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_STATE_FILE)) {
+          || aurostd::EFileExist(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_STATE_FILE)) {
         return true;
       }
     }

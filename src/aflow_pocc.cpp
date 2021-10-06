@@ -246,7 +246,7 @@ namespace KBIN {
         if (kflags.KBIN_PHONONS_CALCULATION_AEL
           || kflags.KBIN_PHONONS_CALCULATION_AGL
           || kflags.KBIN_PHONONS_CALCULATION_APL) {
-          string message = "Cannot perform property calculations before running POCC calculations."
+          string message = "Cannot run AFLOW modules without fully completed POCC calculations."
             " Please see the README for more information.";
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_NOTICE_);
         }
@@ -262,6 +262,7 @@ namespace KBIN {
           return;
         }
       }
+
       //post-processing
       pcalc.CleanPostProcessing();
       //pocc::patchStructuresFile(aflags,FileMESSAGE,oss);  //patch if needed
@@ -1481,6 +1482,7 @@ namespace pocc {
     for(uint i=0;i<vfiles.size();i++){
       if(vfiles[i].find(POCC_FILE_PREFIX+POCC_OUT_FILE)!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //aflow.pocc.out
       if(vfiles[i].find(POCC_DOSCAR_FILE)!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //DOSCAR.pocc_T0000K.xz
+      if(vfiles[i].find(POCC_PHDOSCAR_FILE)!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //PHDOSCAR.pocc_T0000K.xz
       if(vfiles[i].find("dos_orbitals_")!=string::npos && vfiles[i].find(".png")!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //SYSTEM_dos_orbitals_T2400K.png.xz
       if(vfiles[i].find("dos_species_")!=string::npos && vfiles[i].find(".png")!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //SYSTEM_dos_species_T2400K.png.xz
       if(vfiles[i].find("dos_atoms_")!=string::npos && vfiles[i].find(".png")!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //SYSTEM_dos_atoms_T2400K.png.xz
@@ -1490,7 +1492,7 @@ namespace pocc {
 
   void POccCalculator::loadDataIntoCalculator(){
     string soliloquy=XPID+"POccCalculator::loadDataIntoCalculator():";
-    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialized");}
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialize");}
 
     POccStructuresFile psf(*p_FileMESSAGE,*p_oss);
     psf.initialize(POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,m_aflags);
@@ -5154,14 +5156,15 @@ namespace pocc {
     string soliloquy = XPID + "POccCalculator::createModuleAflowIns():";
     string message = "";
 
-    if (m_ARUN_directories.size()) loadDataIntoCalculator();
+    if (m_ARUN_directories.size() == 0) loadDataIntoCalculator();
 
     // We need relaxed structures to propagate into the modules.
     // If not all directories have a qmvasp file, it is safe to
     // assume that not all have relaxed structures.
     if(!QMVASPsFound()) {
       message = "Not all POCC calculations have finished."
-        " Please run POCC in all subdirectories before calculating properties.";
+        " Please run AFLOW in all subdirectories before running AFLOW modules."
+        " See the README for more information.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
     }
 
@@ -5176,7 +5179,6 @@ namespace pocc {
       }
       xvasp.str.CleanStructure();
       xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE", MODULE);
-      xvasp.Directory = aurostd::CleanFileName(m_aflags.Directory + "/" + m_ARUN_directories[i]);
       xvasp.AVASP_arun=true;
       xvasp.AVASP_arun_mode = "POCC";
       xvasp.AVASP_arun_runname = getARUNString(i);

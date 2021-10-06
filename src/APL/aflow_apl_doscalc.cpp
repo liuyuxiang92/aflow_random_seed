@@ -361,16 +361,18 @@ namespace apl {
     //ME20190423 START
     //ME20200321 - Added logger output
     //rawCalc(USER_DOS_NPOINTS);  OBSOLETE
-    if (VERBOSE) {
-      if (_bzmethod == "LT") {
+    if (_bzmethod == "LT") {
+      if (VERBOSE) {
         message = "Calculating phonon DOS using the linear tetrahedron method.";
         pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
-        calcDosLT();
-      } else if (_bzmethod == "RS") {
+      }
+      calcDosLT();
+    } else if (_bzmethod == "RS") {
+      if (VERBOSE) {
         message = "Calculating phonon DOS using the root sampling method.";
         pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
-        calcDosRS();
       }
+      calcDosRS();
     }
     //ME20190423 END
 
@@ -380,7 +382,7 @@ namespace apl {
 
     // Normalize to number of branches
     // ME20210927 - Only normalize when inside full frequency spectrum
-    if (aurostd::isequal(fmin - _minFreq, 0.0) && aurostd::isequal(fmax - _maxFreq, 0.0)) {
+    if ((fmin - _minFreq < _ZERO_TOL_) && (fmax - _maxFreq > _ZERO_TOL_)) {
       double sum = 0.0;
       for (int k = 0; k < USER_DOS_NPOINTS; k++)
         sum += _dos[k];
