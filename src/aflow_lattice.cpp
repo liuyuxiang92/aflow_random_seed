@@ -831,22 +831,25 @@ namespace LATTICE {
               tmp_lattice[3][3]=translation_vectors[k][3];
               // ---------------------------------------------------------------------------
               // check lattice vector length: c==b
+
+              // NS20211006 start 
               if(abs(translations_mod[k]-translations_mod[j])<eps){
                 // this determinant method is faster than aurostd::det(), and speed is crucial here
-                volume_tmp = abs(tmp_lattice[1][1]*tmp_lattice[2][2]*tmp_lattice[3][3]+tmp_lattice[1][2]*tmp_lattice[2][3]*tmp_lattice[3][1]+ // FAST
+                volume_tmp = tmp_lattice[1][1]*tmp_lattice[2][2]*tmp_lattice[3][3]+tmp_lattice[1][2]*tmp_lattice[2][3]*tmp_lattice[3][1]+ // FAST
                     tmp_lattice[1][3]*tmp_lattice[2][1]*tmp_lattice[3][2]-tmp_lattice[1][3]*tmp_lattice[2][2]*tmp_lattice[3][1]-              // FAST
-                    tmp_lattice[1][2]*tmp_lattice[2][1]*tmp_lattice[3][3]-tmp_lattice[1][1]*tmp_lattice[2][3]*tmp_lattice[3][2]);             // FAST
+                    tmp_lattice[1][2]*tmp_lattice[2][1]*tmp_lattice[3][3]-tmp_lattice[1][1]*tmp_lattice[2][3]*tmp_lattice[3][2];             // FAST
                 // ---------------------------------------------------------------------------
                 // check determinant
                 // use absolute value to quickly filter, but then check for positive determinant
                 // later for each lattice vector permutation
                 // do absolute value determinant here
-                if(abs(abs(volume_tmp)-volume_orig) < volume_eps){
+                volume_tmp_abs = abs(volume_tmp);
+                if(abs(volume_tmp_abs-volume_orig) < volume_eps && volume_tmp_abs > eps){ //NS20211006 add > eps condition to avoid singular behavior
                   tmp_lattice_orig = tmp_lattice; // save original lattice before swapping rows
                   // ---------------------------------------------------------------------------
                   // store positive determinant permutations
                   // if initial determinant is positive, do THREE row swaps to keep positive
-                  if(volume_tmp>volume_eps){
+                  if(volume_tmp>0){ // NS20211006 end
                     // 1,2,3
                     lattices_aaa.push_back(tmp_lattice);
                     // 2,3,1
