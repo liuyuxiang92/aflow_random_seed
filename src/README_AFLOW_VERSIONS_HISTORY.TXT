@@ -2,6 +2,7 @@
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- patching populateXVASP() bug for BANDS_LATTICE and BANDS_GRID (CO)
         -- patching xoption::options2entry() clear() issues (CO)
+        -- added function to move aflow run to another directory (DX)
 3.2.11 - 2021/08/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.11.tar.xz
         -- added plotter options for QHA (AS)
