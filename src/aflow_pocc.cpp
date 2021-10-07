@@ -342,6 +342,7 @@ namespace pocc {
 } // namespace pocc
 
 namespace pocc {
+  //ME20211006 - added site config and HNF matrix strings
   void parsePOccHashFromXStructureTitle(const string& title,string& pocc_hash){
     string hnf_index_str="",site_config_index_str="";
     return parsePOccHashFromXStructureTitle(title,pocc_hash,hnf_index_str,site_config_index_str);
@@ -351,7 +352,7 @@ namespace pocc {
     string soliloquy=XPID+"pocc::parsePOccHashFromXStructureTitle():";
     if(LDEBUG){cerr << soliloquy << " title=" << title << endl;}
     vector<string> vtokens,vtokens2;
-    string tmp_str;
+    string tmp_str = "";
     aurostd::string2tokens(title,vtokens," ");
     pocc_hash="",hnf_index_str="",site_config_index_str="";
     for(uint t=0;t<vtokens.size();t++){ //find pocc hash directly
@@ -372,28 +373,8 @@ namespace pocc {
       }
     }
     if(pocc_hash.empty()){  //otherwise build pocc hash from components in the title
-      vector<string> vtokens3;
-      for(uint t=0;t<vtokens.size();t++){
-        if(aurostd::substring2bool(vtokens[t],"HNF(n=")){ //HNF(n=2,#2/3)
-          aurostd::string2tokens(vtokens[t],vtokens2,",");
-          if(vtokens2.size()!=2){continue;}    //did not find pocc_hash, keep going
-          aurostd::string2tokens(vtokens2[1],vtokens3,"/");
-          if(vtokens3.size()!=2){continue;}    //did not find pocc_hash, keep going
-          aurostd::StringSubst(vtokens3[0],"#","");
-          if(!aurostd::isfloat(vtokens3[0])){continue;}   //did not find pocc_hash, keep going
-          hnf_index_str=aurostd::utype2string( aurostd::string2utype<int>(vtokens3[0])-1 );
-          continue;
-        }
-        if(aurostd::substring2bool(vtokens[t],"site_config(")){ //site_config(#1/2)
-          aurostd::string2tokens(vtokens[t],vtokens2,"/");
-          if(vtokens2.size()!=2){continue;}    //did not find pocc_hash, keep going
-          aurostd::StringSubst(vtokens2[0],"site_config(","");
-          aurostd::StringSubst(vtokens2[0],"#","");
-          if(!aurostd::isfloat(vtokens2[0])){continue;}   //did not find pocc_hash, keep going
-          site_config_index_str=aurostd::utype2string( aurostd::string2utype<int>(vtokens2[0])-1 );
-        }
-      }
-      pocc_hash="H"+hnf_index_str+"C"+site_config_index_str;
+      string hnf_matrix_str="",site_config_str="";
+      return parsePOccHashFromXStructureTitle(title,pocc_hash,hnf_index_str,hnf_matrix_str,site_config_index_str,site_config_str);
     }
     if(LDEBUG){
       cerr << soliloquy << " hnf_index_str=" << hnf_index_str << endl;
@@ -401,6 +382,64 @@ namespace pocc {
       cerr << soliloquy << " pocc_hash=" << pocc_hash << endl;
     }
   }
+
+  void parsePOccHashFromXStructureTitle(const string& title,string& pocc_hash,string& hnf_index_str,string& hnf_matrix_str,string& site_config_index_str,string& site_config_str){
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XPID+"pocc::parsePOccHashFromXStructureTitle():";
+    pocc_hash="",hnf_index_str="",hnf_matrix_str="",site_config_index_str="",site_config_str="";
+    vector<string> vtokens,vtokens2,vtokens3;
+    aurostd::string2tokens(title,vtokens," ");
+    if(LDEBUG){cerr << soliloquy << " title=" << title << endl;}
+    for(uint t=0;t<vtokens.size();t++){
+      if(aurostd::substring2bool(vtokens[t],"HNF(n=")){ //HNF(n=2,#2/3)
+        aurostd::string2tokens(vtokens[t],vtokens2,",");
+        if(vtokens2.size()!=2){continue;}    //did not find pocc_hash, keep going
+        aurostd::string2tokens(vtokens2[1],vtokens3,"/");
+        if(vtokens3.size()!=2){continue;}    //did not find pocc_hash, keep going
+        aurostd::StringSubst(vtokens3[0],"#","");
+        if(!aurostd::isfloat(vtokens3[0])){continue;}   //did not find pocc_hash, keep going
+        hnf_index_str=aurostd::utype2string( aurostd::string2utype<int>(vtokens3[0])-1 );
+        // ME20211006 - Get the full matrix
+        vector<string> vtokens4;
+        aurostd::string2tokens(vtokens3[1],vtokens4,"=");
+        hnf_matrix_str += vtokens4[1];
+        t++;
+        do {
+          hnf_matrix_str += " " + vtokens[t];
+          if (t == vtokens.size() - 1) break;
+        } while (vtokens[t++].find("]") == string::npos);
+        t--;
+        continue;
+      }
+      if(aurostd::substring2bool(vtokens[t],"site_config(")){ //site_config(#1/2)
+        aurostd::string2tokens(vtokens[t],vtokens2,"/");
+        if(vtokens2.size()!=2){continue;}    //did not find pocc_hash, keep going
+        aurostd::StringSubst(vtokens2[0],"site_config(","");
+        aurostd::StringSubst(vtokens2[0],"#","");
+        if(!aurostd::isfloat(vtokens2[0])){continue;}   //did not find pocc_hash, keep going
+        site_config_index_str=aurostd::utype2string( aurostd::string2utype<int>(vtokens2[0])-1 );
+        // ME20211006 - Get the full matrix
+        aurostd::string2tokens(vtokens2[1],vtokens3,"=");
+        site_config_str += vtokens3[1];
+        t++;
+        do {
+          site_config_str += " " + vtokens[t];
+          if (t == vtokens.size() - 1) break;
+        } while (vtokens[t++].find("]") == string::npos);
+        t--;
+        continue;
+      }
+    }
+    pocc_hash="H"+hnf_index_str+"C"+site_config_index_str;
+    if(LDEBUG){
+      cerr << soliloquy << " hnf_index_str=" << hnf_index_str << endl;
+      cerr << soliloquy << " hnf_matrix_str=" << hnf_matrix_str << endl;
+      cerr << soliloquy << " site_config_index_str=" << site_config_index_str << endl;
+      cerr << soliloquy << " site_config_str=" << site_config_str << endl;
+      cerr << soliloquy << " pocc_hash=" << pocc_hash << endl;
+    }
+  }
+
   unsigned long long int getDGFromXStructureTitle(const string& title){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"pocc::getDGFromXStructureTitle():";
@@ -1487,18 +1526,17 @@ namespace pocc {
       if(vfiles[i].find("dos_species_")!=string::npos && vfiles[i].find(".png")!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //SYSTEM_dos_species_T2400K.png.xz
       if(vfiles[i].find("dos_atoms_")!=string::npos && vfiles[i].find(".png")!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //SYSTEM_dos_atoms_T2400K.png.xz
     }
-
   }
 
-  void POccCalculator::loadDataIntoCalculator(){
+  void POccCalculator::loadDataIntoCalculator(bool load_all){
     string soliloquy=XPID+"POccCalculator::loadDataIntoCalculator():";
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialize");}
 
     POccStructuresFile psf(*p_FileMESSAGE,*p_oss);
-    psf.initialize(POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,m_aflags);
+    psf.initialize(POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,m_aflags,load_all);
     if(!psf.loadDataIntoCalculator((*this),false)){  //do not try DirectoryLS() yet
       //if we get here, then postprocessing file is TOO old, try rewriting after we read in ALL_STRUCTURES file
-      psf.initialize(POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE,m_aflags);
+      psf.initialize(POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE,m_aflags,load_all);
       if(!psf.loadDataIntoCalculator((*this),true)){  //try DirectoryLS() here
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot load data from structures files",_FILE_NOT_FOUND_);
       }
@@ -1582,7 +1620,7 @@ namespace pocc {
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialize");}
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
-    loadDataIntoCalculator();
+    if(m_ARUN_directories.size() == 0) loadDataIntoCalculator();
     if(!QMVASPsFound()){return;}
     setDFTEnergies();
     setEFA();
@@ -1707,13 +1745,19 @@ namespace pocc {
   POccSuperCell::~POccSuperCell() {free();}
   void POccSuperCell::free() {
     m_hnf_index=AUROSTD_MAX_ULLINT;
+    m_hnf_matrix.clear();  //ME20211006
     m_site_config_index=AUROSTD_MAX_ULLINT;
+    m_site_config.clear();  //ME20211006
+    m_structure.clear(); //ME20211006
     m_degeneracy=0; //VERY IMPORTANT, 0 m_degeneracy will kill division
     m_energy_uff=AUROSTD_MAX_DOUBLE;
   }
   void POccSuperCell::copy(const POccSuperCell& b){
     m_hnf_index=b.m_hnf_index;
+    m_hnf_matrix=b.m_hnf_matrix;  //ME20211006
     m_site_config_index=b.m_site_config_index;
+    m_site_config=b.m_site_config;  //ME20211006
+    m_structure=b.m_structure;  //ME20211006
     m_degeneracy=b.m_degeneracy;
     m_energy_uff=b.m_energy_uff;
   }
@@ -1756,7 +1800,10 @@ namespace pocc {
     return m_psc_set[0];
   }
   double POccSuperCellSet::getHNFIndex() const {return getSuperCell().m_hnf_index;} //fix me eventually to do robust matrix comparison
+  xmatrix<int> POccSuperCellSet::getHNFMatrix() const {return getSuperCell().m_hnf_matrix;} //ME20211006
   double POccSuperCellSet::getSiteConfigIndex() const {return getSuperCell().m_site_config_index;} //fix me eventually to do robust matrix comparison
+  vector<vector<int> > POccSuperCellSet::getSiteConfig() const {return getSuperCell().m_site_config;} //ME20211006
+  xstructure POccSuperCellSet::getStructure() const {return getSuperCell().m_structure;}  //ME20211007
   double POccSuperCellSet::getUFFEnergy() const {return getSuperCell().m_energy_uff;}
 } // namespace pocc
 
@@ -2675,7 +2722,7 @@ namespace pocc {
     string soliloquy=XPID+"POccCalculator::writePARTCAR():";
     stringstream message;
 
-    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialized");}
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialize");}
 
     message << "Writing out PARTCAR";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     stringstream partcar_ss;
@@ -4196,6 +4243,112 @@ namespace pocc {
 
 
     //return true;
+  }
+
+  vector<uint> POccCalculator::getMapToPARTCAR(unsigned long long int isupercell, const xstructure& xstr) {
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG); 
+    string soliloquy = XPID + "POccCalculator::getMapToPARTCAR():";
+    string message = "";
+    if(isupercell > l_supercell_sets.size() - 1) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid supercell index");
+    }
+
+    // Bounds check of isupercell is done inside getUniqueSuperCells
+    std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();
+    std::advance(it, isupercell);
+    xstructure xstr_derivative = (*it).getStructure();
+    if (xstr_derivative.atoms.size() == 0) {
+      xstr_derivative = getUniqueSuperCell(isupercell);
+    }
+
+    // Match structures
+    bool same_species = false;
+    bool scale_volume = true;
+    bool optimize_match = false;
+    double misfit = 0.0;
+    structure_mapping_info mapping_info = compare::initialize_misfit_struct();
+    if (!compare::aflowCompareStructure(xstr, xstr_derivative, same_species, scale_volume, optimize_match, misfit, mapping_info)) {
+      message = "Could not map structure to derivative structure.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
+    }
+
+    if (LDEBUG) {
+      std::cerr << soliloquy << "atom_map = " << aurostd::joinWDelimiter(mapping_info.atom_map, " ") << std::endl;
+    }
+
+    // Create map from the relaxed structrue to the derivative structure
+    // The number of atoms in the relaxed structure may be bigger larger
+    // than in the derivative structure (sconv vs. sprim). In that case,
+    // structure comparison only returns the maps to the supercell of the
+    // derivative structure with the same number of atoms.
+    // Luckily, structure comparison creates supercells in a predictable
+    // way (0 0 1 1 2 2 instead of,  e.g. 0 1 2 0 1 2) so we can use the
+    // ratio of atoms to map to the actual derivative structure.
+    uint ratio = xstr.atoms.size()/xstr_derivative.atoms.size();
+    if (ratio == 0) {
+      message = "Could not map structure to derivative structure. Derivative structure has more atoms";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
+    }
+    vector<uint> map_to_derivative;
+    for (uint i = 0; i < mapping_info.atom_map.size(); i++) {
+      map_to_derivative.push_back(mapping_info.atom_map[i]/ratio);
+    }
+
+    if (LDEBUG) std::cerr << "map_to_derivative = " << aurostd::joinWDelimiter(map_to_derivative, " ") << std::endl;
+
+    // To map from the derivative structure to PARTCAR, we need the site
+    // configuration of the structure. The problem is that the site configuration
+    // stores the type, so we need to create a type to PARTCAR map for each site
+    uint nsites = m_pocc_sites.size();
+    uint ntypes = xstr_pocc.species.size();
+    vector<vector<int> > type2occMap(nsites, vector<int>(ntypes, -1)); // -1 means no atoms of this type on that site
+    int type = 0, occ = 0;
+    for (uint site = 0; site < m_pocc_sites.size(); site++) {
+      for (uint t = 0; t < m_pocc_sites[site].v_types.size(); t++) {
+        type = (int) m_pocc_sites[site].v_types[t];
+        occ = (int) m_pocc_sites[site].v_occupants[t];
+        type2occMap[site][type] = occ;
+      }
+    }
+
+    vector<uint> derivative_partcar_map;
+
+    vector<vector<int> > config = (*it).getSiteConfig();
+    if (LDEBUG) {
+      std::cerr << "Site configuration:" << std::endl;
+      for (uint i = 0; i < config.size(); i++) {
+        std::cerr << aurostd::joinWDelimiter(config[i], " ") << std::endl;
+      }
+      std::cerr << "type2occMap:" << std::endl;
+      for (uint i = 0; i < type2occMap.size(); i++) {
+        std::cerr << aurostd::joinWDelimiter(type2occMap[i], " ") << std::endl;
+      }
+    }
+    for (uint site = 0; site < config.size(); site++) {
+      std::sort(config[site].begin(), config[site].end());  // Site configurations are not sorted, but structures always are
+      for (uint at = 0; at < config[site].size(); at++) {
+        type = config[site][at];
+        if (type < 0) continue;  // type can be zero when sites are not used
+        occ = type2occMap[site][type];
+        if (occ < 0) {
+          message = "Mismatch between derivative structure and PARTCAR.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
+        } else {
+          derivative_partcar_map.push_back((uint) occ);
+        }
+      }
+    }
+
+    if (LDEBUG) std::cerr << "derivative_partcar_map = " << aurostd::joinWDelimiter(derivative_partcar_map, " ") << std::endl;
+
+    // Finally, map to PARTCAR
+    vector<uint> map_to_partcar;
+    for (uint i = 0; i < map_to_derivative.size(); i++) {
+      map_to_partcar.push_back(derivative_partcar_map[map_to_derivative[i]]);
+    }
+    if (LDEBUG) std::cerr << "map_to_partcar = " << aurostd::joinWDelimiter(map_to_partcar, " ") << std::endl;
+
+    return map_to_partcar;
   }
 
 } // namespace pocc
@@ -7103,19 +7256,20 @@ namespace pocc {
     m_initialized=false;  //no point
     return m_initialized;
   }
-  bool POccStructuresFile::initialize(const string& fileIN,ostream& oss) {
+  //ME20211006 - added load_all
+  bool POccStructuresFile::initialize(const string& fileIN,ostream& oss,bool load_all) {
     xStream::initialize(oss);
-    return initialize(fileIN);
+    return initialize(fileIN,load_all);
   }
-  bool POccStructuresFile::initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccStructuresFile::initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool load_all) {
     xStream::initialize(FileMESSAGE,oss);
-    return initialize(fileIN);
+    return initialize(fileIN,load_all);
   }
-  bool POccStructuresFile::initialize(const string& fileIN) {
+  bool POccStructuresFile::initialize(const string& fileIN,bool load_all) {
     free();
     try{
       readFile(fileIN);
-      processFile();
+      processFile(load_all);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -7138,20 +7292,21 @@ namespace pocc {
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
     return m_initialized;
   }
-  bool POccStructuresFile::initialize(const string& fileIN,const _aflags& aflags,ostream& oss) {
+  bool POccStructuresFile::initialize(const string& fileIN,const _aflags& aflags,ostream& oss,bool load_all) {
     xStream::initialize(oss);
-    return initialize(fileIN,aflags);
+    return initialize(fileIN,aflags,load_all);
   }
-  bool POccStructuresFile::initialize(const string& fileIN,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) {
+  bool POccStructuresFile::initialize(const string& fileIN,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss,bool load_all) {
     xStream::initialize(FileMESSAGE,oss);
-    return initialize(fileIN,aflags);
+    return initialize(fileIN,aflags,load_all);
   }
-  bool POccStructuresFile::initialize(const string& fileIN,const _aflags& aflags) {
+  //ME20211006 - added load_all
+  bool POccStructuresFile::initialize(const string& fileIN,const _aflags& aflags, bool load_all) {
     free();
     try{
       setAFlags(aflags);
       readFile(fileIN);
-      processFile();
+      processFile(load_all);
       m_initialized=true;
     }
     catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);}
@@ -7178,7 +7333,7 @@ namespace pocc {
     if(LDEBUG){cerr << soliloquy << " m_vcontent.size()=" << m_vcontent.size() << endl;}
   }
 
-  void POccStructuresFile::processFile() {
+  void POccStructuresFile::processFile(bool load_all) {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccStructuresFile::processFile():";
 
@@ -7254,7 +7409,7 @@ namespace pocc {
     unsigned long long int iline=0;
     unsigned long long int ititle=0;
     bool reading_POSCAR=false;
-    string pocc_hash="",hnf_index_str="",site_config_index_str="";
+    string pocc_hash="",hnf_index_str="",hnf_matrix_str,site_config_index_str="",site_config_str="";  //ME20211006 - added site config and HNF matrix string
     for(iline=0;iline<m_vcontent.size();iline++){
       if(aurostd::substring2bool(m_vcontent[iline],structure_group_tag)){
         l_supercell_sets.push_back(POccSuperCellSet());
@@ -7270,10 +7425,38 @@ namespace pocc {
         if(ititle>=m_vcontent.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot grab title at iline="+aurostd::utype2string(ititle),_FILE_CORRUPT_);}
         m_vPOSCAR_lines.back().back().push_back( ititle );
         //process title
-        parsePOccHashFromXStructureTitle(m_vcontent[ititle],pocc_hash,hnf_index_str,site_config_index_str);
+        if (load_all) parsePOccHashFromXStructureTitle(m_vcontent[ititle],pocc_hash,hnf_index_str,hnf_matrix_str,site_config_index_str,site_config_str);  // ME20211006
+        else parsePOccHashFromXStructureTitle(m_vcontent[ititle],pocc_hash,hnf_index_str,site_config_index_str);
         l_supercell_sets.back().m_psc_set.back().m_hnf_index=aurostd::string2utype<unsigned long long int>(hnf_index_str);
         l_supercell_sets.back().m_psc_set.back().m_site_config_index=aurostd::string2utype<unsigned long long int>(site_config_index_str);
         l_supercell_sets.back().m_psc_set.back().m_degeneracy=getDGFromXStructureTitle(m_vcontent[ititle]);
+        //ME20211006
+        if (load_all) {
+          vector<string> vtokens1, vtokens2;
+          aurostd::StringSubst(hnf_matrix_str, "[", "");
+          aurostd::StringSubst(hnf_matrix_str, "]", "");
+          xmatrix<int> hnf(3,3);
+          aurostd::string2tokens(hnf_matrix_str, vtokens1, ";");
+          for (uint i = 0; i < vtokens1.size(); i++) {
+            aurostd::string2tokens(vtokens1[i], vtokens2, " ");
+            for (uint j = 0; j < vtokens2.size(); j++) {
+              hnf[i+1][j+1] = aurostd::string2utype<int>(vtokens2[j]);
+            }
+          }
+          l_supercell_sets.back().m_psc_set.back().m_hnf_matrix = hnf;
+          aurostd::StringSubst(site_config_str, "[", "");
+          aurostd::StringSubst(site_config_str, "]", "");
+          aurostd::string2tokens(site_config_str, vtokens1, ";");
+          l_supercell_sets.back().m_psc_set.back().m_site_config.clear();
+          vector<vector<int> > site_config(vtokens1.size());
+          for (uint i = 0; i < vtokens1.size(); i++) {
+            aurostd::string2tokens(vtokens1[i], vtokens2, " ");
+            for (uint j = 0; j < vtokens2.size(); j++) {
+              site_config[i].push_back(aurostd::string2utype<int>(vtokens2[j]));
+            }
+          }
+          l_supercell_sets.back().m_psc_set.back().m_site_config = site_config;
+        }
       }
       if(reading_POSCAR && aurostd::substring2bool(m_vcontent[iline],poscar_stop_tag)){
         reading_POSCAR=false;
@@ -7281,6 +7464,15 @@ namespace pocc {
           throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Found POSCAR stop tag before start tag",_FILE_CORRUPT_);
         }
         m_vPOSCAR_lines.back().back().push_back( found_POSCAR_STOP_tag ? iline : iline-1 );
+        //ME20211006
+        if (load_all) {
+          const vector<uint> startstop = m_vPOSCAR_lines.back().back();
+          stringstream poscar;
+          for (uint i = startstop[0]; i < startstop[1]; i++) {
+            poscar << m_vcontent[i] << std::endl;
+          }
+          l_supercell_sets.back().m_psc_set.back().m_structure = xstructure(poscar);
+        }
       }
       //do NOT read UFF_ENERGY yet, as it might be above the POSCAR, we need to go through m_vcontent again after populating l_supercell_sets sizes
     }

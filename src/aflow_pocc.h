@@ -55,6 +55,7 @@ namespace pocc {
 
   void parsePOccHashFromXStructureTitle(const string& title,string& pocc_hash);
   void parsePOccHashFromXStructureTitle(const string& title,string& pocc_hash,string& hnf_index_str,string& site_config_index_str);
+  void parsePOccHashFromXStructureTitle(const string& title,string& pocc_hash,string& hnf_index_str,string&hnf_matrix_str,string& site_config_index_str,string& site_config_str);  //ME20211006
   unsigned long long int getDGFromXStructureTitle(const string& title);
   void parsePropertyByTag(const string& line,const string& tag,double& prop);
   bool patchStructuresAllFile(const _aflags& aflags,string& structures_file,stringstream& structures_file_ss,ofstream& FileMESSAGE,ostream& oss);
@@ -186,8 +187,11 @@ namespace pocc {
       //NECESSARY PUBLIC CLASS METHODS - END
 
       unsigned long long int m_hnf_index;
+      xmatrix<int> m_hnf_matrix;  //ME20211006
       unsigned long long int m_site_config_index;
+      vector<vector<int> > m_site_config;  //ME20211006
       unsigned long long int m_degeneracy;
+      xstructure m_structure;  //ME20211006
       double m_energy_uff;
     private:
       //NECESSARY PRIVATE CLASS METHODS - START
@@ -205,8 +209,11 @@ namespace pocc {
     bool operator<(const POccSuperCellSet& other) const;
     unsigned long long int getDegeneracy() const;
     const POccSuperCell& getSuperCell() const;
-    double getHNFIndex() const;
+    double getHNFIndex() const; //ME20211006
+    xmatrix<int> getHNFMatrix() const;
     double getSiteConfigIndex() const;
+    vector<vector<int> > getSiteConfig() const; //ME20211006
+    xstructure getStructure() const; //ME20211006
     double getUFFEnergy() const;
 
     vector<POccSuperCell> m_psc_set;
@@ -627,10 +634,12 @@ namespace pocc {
       void setKFlags(const _kflags& Kflags);                                    //standard _kflags
       void setVFlags(const _vflags& Vflags);                                    //standard _vflags
 
-      void writePARTCAR() const;
-      void generateStructures(const _xvasp& xvasp);
+      // Modules
       bool inputFilesFoundAnywhereAPL();  //ME20211004
       void createModuleAflowIns(const _xvasp& xvasp, const string& MODULE);  //ME20211004
+
+      void writePARTCAR() const;
+      void generateStructures(const _xvasp& xvasp);
       xstructure createXStructure(const POccSuperCell& psc,int n_hnf=0,unsigned long long int hnf_count=0,unsigned long long int types_config_permutations_count=0,bool clean_structure=false,bool primitivize=false);
       bool areEquivalentStructuresByUFF(std::list<POccSuperCellSet>::iterator it, const POccSuperCell& psc) const;
       void add2DerivativeStructuresList(const POccSuperCell& psc,std::list<POccSuperCellSet>::iterator i_start,std::list<POccSuperCellSet>::iterator i_end);
@@ -645,6 +654,7 @@ namespace pocc {
       string getARUNString(unsigned long long int i);
       xstructure getUniqueSuperCell(unsigned long long int i);
       vector<xstructure> getUniqueDerivativeStructures();
+      vector<uint> getMapToPARTCAR(unsigned long long int i, const xstructure& xstr);  //ME20211006
       unsigned long long int getUniqueSuperCellsCount() const;
       //bool printUniqueDerviativeStructures();
       //void resetMaxSLRadius();
@@ -652,7 +662,7 @@ namespace pocc {
       void resetSiteConfigurations();
 
       void CleanPostProcessing();
-      void loadDataIntoCalculator();
+      void loadDataIntoCalculator(bool load_all=false);  //ME20211006 - added load_all
       void setTemperatureStringParameters();
       void setTemperatureStringParameters(vector<double>& v_temperatures);
       void postProcessing();
@@ -798,19 +808,19 @@ namespace pocc {
       bool initialize(ostream& oss);
       bool initialize(ofstream& FileMESSAGE,ostream& oss);
       bool initialize();
-      bool initialize(const string& fileIN,ostream& oss);
-      bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss);
-      bool initialize(const string& fileIN);
+      bool initialize(const string& fileIN,ostream& oss,bool load_all=false); //ME20211006 - added load_all
+      bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool load_all=false); //ME20211006 - added load_all
+      bool initialize(const string& fileIN,bool load_all=false); //ME20211006 - added load_all
       bool initialize(const _aflags& aflags,ostream& oss);
       bool initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss);
       bool initialize(const _aflags& aflags);
-      bool initialize(const string& fileIN,const _aflags& aflags,ostream& oss);
-      bool initialize(const string& fileIN,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss);
-      bool initialize(const string& fileIN,const _aflags& aflags);
+      bool initialize(const string& fileIN,const _aflags& aflags,ostream& oss,bool load_all=false); //ME20211006 - added load_all
+      bool initialize(const string& fileIN,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss,bool load_all=false); //ME20211006 - added load_all
+      bool initialize(const string& fileIN,const _aflags& aflags,bool load_all=false); //ME20211006 - added load_all
 
       void setAFlags(const _aflags& aflags);
       void readFile(const string& fileIN);
-      void processFile();
+      void processFile(bool load_all=false);  //ME20211006 - added load_all
       bool getARUNDirectories(vector<string>& ARUN_directories,bool tryDirectoryLS=true);
       bool loadDataIntoCalculator(POccCalculator& pcalc,bool tryDirectoryLS=true);
 

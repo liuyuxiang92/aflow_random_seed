@@ -49,6 +49,7 @@ namespace pocc {
     }
 
     vector<int> vexclude;
+    // Store arun2skip so we can restore later
     string aruns2skip_backup = "";
     if (m_kflags.KBIN_POCC_EXCLUDE_UNSTABLE) {
       // vflag_control (command line) has priority
@@ -105,7 +106,7 @@ namespace pocc {
     }
 
     // Calculate vibrational properties
-    stringstream ossmain;
+    stringstream aplout;
 
     apl::ThermalPropertiesCalculator tpc(*p_FileMESSAGE, *p_oss);
     double tpt_start = aurostd::string2utype<double>(aplopts.getattachedscheme("TSTART"));
@@ -148,15 +149,15 @@ namespace pocc {
       tpc.initialize(xdos_T, *p_FileMESSAGE, *p_oss);
       tpc.natoms = (uint) aurostd::round(aurostd::sum(xstr_pocc.comp_each_type));  // Set to number of atoms in parent structure
       tpc.calculateThermalProperties(tpt_start, tpt_end, tpt_step);
-      ossmain << "[POCC_APL_RESULTS]START_TEMPERATURE=" << tstring << "_K" << endl;
-      tpc.addToAPLOut(ossmain);
-      ossmain << "[POCC_APL_RESULTS]STOP_TEMPERATURE=" << tstring << "_K" << endl;
+      aplout << "[POCC_APL_RESULTS]START_TEMPERATURE=" << tstring << "_K" << endl;
+      tpc.addToAPLOut(aplout);
+      aplout << "[POCC_APL_RESULTS]STOP_TEMPERATURE=" << tstring << "_K" << endl;
       tpc.writePropertiesToFile(m_aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE);
     }
 
-    if (!ossmain.str().empty()) {
+    if (!aplout.str().empty()) {
       string filename = aurostd::CleanFileName(m_aflags.Directory + "/" + POCC_FILE_PREFIX + POCC_APL_OUT_FILE);
-      aurostd::stringstream2file(ossmain, filename);
+      aurostd::stringstream2file(aplout, filename);
       if (!aurostd::FileExist(filename)) {
         message << "Cannot open output file " << filename << ".";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
@@ -254,6 +255,9 @@ namespace pocc {
     string message = "Calculating phonon densities of states.";
     pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, m_aflags, *p_FileMESSAGE, *p_oss);
 
+    bool projected = !aplopts.flag("DOS_PROJECT");
+    if (projected) loadDataIntoCalculator(true);  // Reload to get structures for mapping
+
     // q-point mesh
     vector<int> qpt_mesh;
     aurostd::string2tokens(aplopts.getattachedscheme("DOSMESH"), qpt_mesh, " xX");
@@ -269,7 +273,7 @@ namespace pocc {
 
       string directory = aurostd::CleanFileName(m_aflags.Directory + "/" + m_ARUN_directories[isupercell]);
       vphcalc[isupercell].initialize_qmesh(qpt_mesh, true, true);
-      if (!aplopts.flag("DOS_PROJECT")) vphcalc[isupercell].getQMesh().makeIrreducible();
+      if (projected) vphcalc[isupercell].getQMesh().makeIrreducible();
 
       apl::DOSCalculator dosc(vphcalc[isupercell], aplopts);
       if (m_kflags.KBIN_POCC_EXCLUDE_UNSTABLE && dosc.hasImaginaryFrequencies()) {
@@ -296,7 +300,7 @@ namespace pocc {
       } else { // Nothing set in aflow.in or command line, so add to kflags
         m_kflags.KBIN_POCC_ARUNS2SKIP_STRING = aruns2skip;
       }
-      loadDataIntoCalculator();
+      loadDataIntoCalculator(projected);
       setDFTEnergies();
       // Erase data from DOS vphcalc and vphdos
       for (uint i = nexclude - 1; i < nexclude; i--) {
@@ -352,10 +356,7 @@ namespace pocc {
       vphdos[i].calc(dos_npoints, dos_smear, minfreq, maxfreq, false);
       xDOSCAR phdos = vphdos[i].createDOSCAR();
 
-      stringstream dosfile_raw;
-      dosfile_raw << phdos;
-      aurostd::stringstream2file(dosfile_raw, m_ARUN_directories[i] + "/PHDOSCAR.pocc.raw");
-
+      // Normalize
       double norm_factor = nbranches/((double) vphdos[i].getNumberOfBranches());
       for (uint e = 0; e < phdos.number_energies; e++) phdos.viDOS[0][e] *= norm_factor;
 
@@ -375,43 +376,19 @@ namespace pocc {
       phdos.number_atoms = natoms_pocc;
 
       // If there are projected DOS, add the DOS contributions that belong to
-      // each site in the parent structure. Since there have been relaxation
-      // calculations and since AFLOW uses a large initial volume, the lattice
-      // vectors are considerably different from the original POCC structure,
-      // i.e. FPOSMatch will not help. First order approximation: scale the
-      // volume of the initial POCC structure and find the site that is the
-      // is closest to the atom.
+      // each site in the parent structure.
       if (projected) {
-        xstructure xstr_scaled = xstr_pocc;
-        double V_new = GetVolume(xstr_phcalc);
-        V_new *= pocc_sum/((double) natoms_phcalc);
-        xstr_scaled.SetVolume(V_new);
+        vector<uint> map = getMapToPARTCAR(i, xstr_phcalc);
 
         deque<deque<deque<deque<double> > > > vDOS_pocc(natoms_pocc + 1, deque<deque<deque<double> > >(nproj, deque<deque<double> >(1, deque<double>(phdos.number_energies, 0.0))));
         vDOS_pocc[0] = phdos.vDOS[0];  // Totals stay the same
 
-        xvector<double> cpos(3);
+        uint at_mapped = 0;
         for (uint at = 0; at < natoms_phcalc; at++) {
-          cpos = xstr_scaled.f2c * BringInCell(xstr_scaled.c2f * xstr_phcalc.atoms[at].cpos);
-          int at_mapped = -1;
-          double min_dist = AUROSTD_MAX_DOUBLE, dist = AUROSTD_MAX_DOUBLE;
-          for (uint at_pocc = 0; at_pocc < natoms_pocc; at_pocc++) {
-            if (xstr_phcalc.atoms[at].cleanname == xstr_scaled.atoms[at_pocc].cleanname) {
-              dist = aurostd::modulus(SYM::minimizeDistanceCartesianMethod(xstr_scaled.atoms[at_pocc].cpos, cpos, xstr_scaled.lattice));
-              if (dist < min_dist) {
-                min_dist = dist;
-                at_mapped = (int) at_pocc;
-              }
-            }
-          }
-          if (at_mapped < 0) {
-            string message = "Could not map atom " + aurostd::utype2string<uint>(at) + " to parent structure.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
-          } else {
-            for (uint p = 0; p < nproj; p++) {
-              for (uint e = 0; e < phdos.number_energies; e++) {
-                vDOS_pocc[at_mapped + 1][p][0][e] += phdos.vDOS[at + 1][p][0][e];
-              }
+          at_mapped = map[at];
+          for (uint p = 0; p < nproj; p++) {
+            for (uint e = 0; e < phdos.number_energies; e++) {
+              vDOS_pocc[at_mapped + 1][p][0][e] += phdos.vDOS[at + 1][p][0][e];
             }
           }
         }
