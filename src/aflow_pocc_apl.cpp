@@ -255,8 +255,7 @@ namespace pocc {
     string message = "Calculating phonon densities of states.";
     pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, m_aflags, *p_FileMESSAGE, *p_oss);
 
-    bool projected = !aplopts.flag("DOS_PROJECT");
-    if (projected) loadDataIntoCalculator(true);  // Reload to get structures for mapping
+    bool projected = aplopts.flag("DOS_PROJECT");
 
     // q-point mesh
     vector<int> qpt_mesh;
@@ -273,7 +272,7 @@ namespace pocc {
 
       string directory = aurostd::CleanFileName(m_aflags.Directory + "/" + m_ARUN_directories[isupercell]);
       vphcalc[isupercell].initialize_qmesh(qpt_mesh, true, true);
-      if (projected) vphcalc[isupercell].getQMesh().makeIrreducible();
+      if (!projected) vphcalc[isupercell].getQMesh().makeIrreducible();
 
       apl::DOSCalculator dosc(vphcalc[isupercell], aplopts);
       if (m_kflags.KBIN_POCC_EXCLUDE_UNSTABLE && dosc.hasImaginaryFrequencies()) {
@@ -300,13 +299,15 @@ namespace pocc {
       } else { // Nothing set in aflow.in or command line, so add to kflags
         m_kflags.KBIN_POCC_ARUNS2SKIP_STRING = aruns2skip;
       }
-      loadDataIntoCalculator(projected);
-      setDFTEnergies();
       // Erase data from DOS vphcalc and vphdos
       for (uint i = nexclude - 1; i < nexclude; i--) {
         vphcalc.erase(vphcalc.begin() + vexclude[i]);
         vphdos.erase(vphdos.begin() + vexclude[i]);
       }
+    }
+    if (projected || (nexclude > 0)) {
+      loadDataIntoCalculator(projected);  // Reload to get structures for mapping if projected
+      setDFTEnergies();
     }
     aplopts.push_attached("MINFREQ", aurostd::utype2string<double>(minfreq));
     aplopts.push_attached("MAXFREQ", aurostd::utype2string<double>(maxfreq));

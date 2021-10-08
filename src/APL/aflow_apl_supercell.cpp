@@ -709,8 +709,11 @@ namespace apl {
     //std::cout << "sc2pcMap: " << aurostd::joinWDelimiter(_sc2pcMap, " ") << std::endl;
     //std::cout << "pc2scMap: " << aurostd::joinWDelimiter(_pc2scMap, " ") << std::endl;
     //structure_mapping_info mapping_info = compare::initialize_misfit_struct();
+    //bool same_species = true;
+    //bool scale_volume = true;
+    //bool optimize_match = false;
     //double misfit = 0.0;
-    //bool match = compare::aflowCompareStructure(pcell, _inStructure_original, false, true, false, misfit, mapping_info);
+    //bool match = compare::aflowCompareStructure(pcell, _inStructure_original, same_species, scale_volume, optimize_match, misfit, mapping_info);
     //std::cout << "match = " << match << std::endl;
     //std::cout << "Rotation:" << std::endl;
     //std::cout << mapping_info.rotation << std::endl;

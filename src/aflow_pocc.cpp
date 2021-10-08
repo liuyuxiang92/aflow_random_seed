@@ -1296,7 +1296,7 @@ namespace pocc {
     plot_opts = plotter::getPlotOptionsEStructure(cmdline_opts, "PLOT_DOS");
     plot_opts.push_attached("DIRECTORY",directory);
     //ME20210927 - use carstring to distingish between types of DOSCARs
-    if(xdos.carstring == "CAR") {  //turn off for ME - POCC+APL
+    if(xdos.carstring == "POCC") {  //turn off for ME - POCC+APL
       plot_opts.push_attached("PROJECTION","ORBITALS");
       //plot_opts.push_attached("EXTENSION","dos_orbitals_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
       plot_opts.push_attached("EXTENSION","dos_orbitals_T"+(*this).getTemperatureString(temperature)+"K");
@@ -1321,7 +1321,7 @@ namespace pocc {
           plotter::PLOT_PDOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
         }
       }
-    } else if (xdos.carstring == "PHON") {  //ME!
+    } else if (xdos.carstring == "PHON") {
       plot_opts = plotter::getPlotOptionsPhonons(cmdline_opts, "PLOT_PHDOS");
       plot_opts.push_attached("DIRECTORY",m_aflags.Directory);
       plot_opts.push_attached("PROJECTION","ATOMS");
@@ -1329,7 +1329,7 @@ namespace pocc {
       plot_opts.pop_attached("XMIN");plot_opts.pop_attached("XMAX");
       plotter::PLOT_PHDOS(plot_opts, xdos);
     } else {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "Unrecognized xDOSCAR format.", _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "Invalid xDOSCAR format for POCC.", _RUNTIME_ERROR_);
     }
 
     if(LDEBUG){cerr << soliloquy << " END" << endl;}
@@ -4260,9 +4260,15 @@ namespace pocc {
     if (xstr_derivative.atoms.size() == 0) {
       xstr_derivative = getUniqueSuperCell(isupercell);
     }
+    if (LDEBUG) {
+      std::cerr << soliloquy << " Input structure:" << std::endl;
+      std::cerr << xstr << std::endl;
+      std::cerr << soliloquy << " Derivative structure:" << std::endl;
+      std::cerr << xstr_derivative << std::endl;
+    }
 
     // Match structures
-    bool same_species = false;
+    bool same_species = true;
     bool scale_volume = true;
     bool optimize_match = false;
     double misfit = 0.0;
@@ -4272,9 +4278,7 @@ namespace pocc {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
     }
 
-    if (LDEBUG) {
-      std::cerr << soliloquy << "atom_map = " << aurostd::joinWDelimiter(mapping_info.atom_map, " ") << std::endl;
-    }
+    if (LDEBUG) std::cerr << soliloquy << "atom_map = " << aurostd::joinWDelimiter(mapping_info.atom_map, " ") << std::endl;
 
     // Create map from the relaxed structrue to the derivative structure
     // The number of atoms in the relaxed structure may be bigger larger
@@ -4315,11 +4319,11 @@ namespace pocc {
 
     vector<vector<int> > config = (*it).getSiteConfig();
     if (LDEBUG) {
-      std::cerr << "Site configuration:" << std::endl;
+      std::cerr << soliloquy << " Site configuration:" << std::endl;
       for (uint i = 0; i < config.size(); i++) {
         std::cerr << aurostd::joinWDelimiter(config[i], " ") << std::endl;
       }
-      std::cerr << "type2occMap:" << std::endl;
+      std::cerr << soliloquy << " type2occMap:" << std::endl;
       for (uint i = 0; i < type2occMap.size(); i++) {
         std::cerr << aurostd::joinWDelimiter(type2occMap[i], " ") << std::endl;
       }
@@ -4328,7 +4332,7 @@ namespace pocc {
       std::sort(config[site].begin(), config[site].end());  // Site configurations are not sorted, but structures always are
       for (uint at = 0; at < config[site].size(); at++) {
         type = config[site][at];
-        if (type < 0) continue;  // type can be zero when sites are not used
+        if (type < 0) continue;  // type can be -1 when sites are not used
         occ = type2occMap[site][type];
         if (occ < 0) {
           message = "Mismatch between derivative structure and PARTCAR.";
@@ -4339,14 +4343,14 @@ namespace pocc {
       }
     }
 
-    if (LDEBUG) std::cerr << "derivative_partcar_map = " << aurostd::joinWDelimiter(derivative_partcar_map, " ") << std::endl;
+    if (LDEBUG) std::cerr << soliloquy << " derivative_partcar_map = " << aurostd::joinWDelimiter(derivative_partcar_map, " ") << std::endl;
 
     // Finally, map to PARTCAR
     vector<uint> map_to_partcar;
     for (uint i = 0; i < map_to_derivative.size(); i++) {
       map_to_partcar.push_back(derivative_partcar_map[map_to_derivative[i]]);
     }
-    if (LDEBUG) std::cerr << "map_to_partcar = " << aurostd::joinWDelimiter(map_to_partcar, " ") << std::endl;
+    if (LDEBUG) std::cerr << soliloquy << " map_to_partcar = " << aurostd::joinWDelimiter(map_to_partcar, " ") << std::endl;
 
     return map_to_partcar;
   }
@@ -4356,6 +4360,7 @@ namespace pocc {
 namespace pocc {
   //--------------------------------------------------------------------------------
   // class POccSiteConfiguration (nested in POccCalculator)
+    }
   //--------------------------------------------------------------------------------
   POccSiteConfiguration::POccSiteConfiguration() {
     free();
@@ -7465,8 +7470,8 @@ namespace pocc {
         }
         m_vPOSCAR_lines.back().back().push_back( found_POSCAR_STOP_tag ? iline : iline-1 );
         //ME20211006
-        if (load_all) {
-          const vector<uint> startstop = m_vPOSCAR_lines.back().back();
+        if (load_all && m_vPOSCAR_lines.back().size() == 1) {
+          const vector<uint>& startstop = m_vPOSCAR_lines.back().back();
           stringstream poscar;
           for (uint i = startstop[0]; i < startstop[1]; i++) {
             poscar << m_vcontent[i] << std::endl;
