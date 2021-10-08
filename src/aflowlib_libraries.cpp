@@ -5943,6 +5943,9 @@ namespace aflowlib {
         if(vfiles[i].find("_dos_atoms_")!=string::npos && vfiles[i].find(".png")!=string::npos){
           aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  // _dos_atoms_
         }
+        if (vfiles[i].find("_phdos_")!=string::npos && vfiles[i].find(".png")!=string::npos){
+          aflowlib::LIB2RAW_FileNeeded(directory_LIB,vfiles[i],directory_RAW,vfiles[i],vfile,MESSAGE);  //ME20211008
+        }
       }
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE) << endl;
       aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE),aflow_pocc_out,"[AFLOW_POCC]START_TEMPERATURE=ALL","[AFLOW_POCC]STOP_TEMPERATURE=ALL");
@@ -7465,6 +7468,16 @@ namespace aflowlib {
       FileLockName = _AFLOWLOCK_;
       if(aurostd::EFileExist(directory_LIB+"/"+FileLockName,stmp)&&aurostd::IsCompressed(stmp)){aurostd::UncompressFile(stmp);} //CO20210204 - fix LOCK.xz
       vFileLockName.push_back(FileLockName); //AS20200915
+      //ME20211008 - Check for AFLOW modules
+      //APL
+      apl_aflowin_found = apl::APL_Get_AflowInName(AflowInName, directory_LIB);
+      aurostd::RemoveFile(directory_LIB+"/"+POCC_FILE_PREFIX + POCC_APL_OUT_FILE);
+      FileLockName = "LOCK.apl";
+      if(aurostd::EFileExist(directory_LIB+"/"+FileLockName, stmp) && aurostd::IsCompressed(stmp)) {
+        aurostd::UncompressFile(stmp);
+      }
+      vAflowInName.push_back(AflowInName);
+      vFileLockName.push_back(FileLockName);
     } else {
       // [OBSOLETE] else if(aurostd::FileExist(directory_LIB+"/agl_aflow.in"))
       AGL_functions::AGL_Get_AflowInName(AflowInName, directory_LIB, agl_aflowin_found); //CT20200713 Call function to find correct aflow.in file name  //CO20210204 - fix aflow.in.xz inside
