@@ -304,9 +304,7 @@ namespace pocc {
         vphcalc.erase(vphcalc.begin() + vexclude[i]);
         vphdos.erase(vphdos.begin() + vexclude[i]);
       }
-    }
-    if (projected || (nexclude > 0)) {
-      loadDataIntoCalculator(projected);  // Reload to get structures for mapping if projected
+      loadDataIntoCalculator();
       setDFTEnergies();
     }
     aplopts.push_attached("MINFREQ", aurostd::utype2string<double>(minfreq));

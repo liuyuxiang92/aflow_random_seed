@@ -55,7 +55,6 @@ namespace pocc {
 
   void parsePOccHashFromXStructureTitle(const string& title,string& pocc_hash);
   void parsePOccHashFromXStructureTitle(const string& title,string& pocc_hash,string& hnf_index_str,string& site_config_index_str);
-  void parsePOccHashFromXStructureTitle(const string& title,string& pocc_hash,string& hnf_index_str,string&hnf_matrix_str,string& site_config_index_str,string& site_config_str);  //ME20211006
   unsigned long long int getDGFromXStructureTitle(const string& title);
   void parsePropertyByTag(const string& line,const string& tag,double& prop);
   bool patchStructuresAllFile(const _aflags& aflags,string& structures_file,stringstream& structures_file_ss,ofstream& FileMESSAGE,ostream& oss);
@@ -187,11 +186,8 @@ namespace pocc {
       //NECESSARY PUBLIC CLASS METHODS - END
 
       unsigned long long int m_hnf_index;
-      xmatrix<int> m_hnf_matrix;  //ME20211006
       unsigned long long int m_site_config_index;
-      vector<vector<int> > m_site_config;  //ME20211006
       unsigned long long int m_degeneracy;
-      xstructure m_structure;  //ME20211006
       double m_energy_uff;
     private:
       //NECESSARY PRIVATE CLASS METHODS - START
@@ -662,7 +658,7 @@ namespace pocc {
       void resetSiteConfigurations();
 
       void CleanPostProcessing();
-      void loadDataIntoCalculator(bool load_all=false);  //ME20211006 - added load_all
+      void loadDataIntoCalculator();
       void setTemperatureStringParameters();
       void setTemperatureStringParameters(vector<double>& v_temperatures);
       void postProcessing();
@@ -808,19 +804,19 @@ namespace pocc {
       bool initialize(ostream& oss);
       bool initialize(ofstream& FileMESSAGE,ostream& oss);
       bool initialize();
-      bool initialize(const string& fileIN,ostream& oss,bool load_all=false); //ME20211006 - added load_all
-      bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool load_all=false); //ME20211006 - added load_all
-      bool initialize(const string& fileIN,bool load_all=false); //ME20211006 - added load_all
+      bool initialize(const string& fileIN,ostream& oss);
+      bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const string& fileIN);
       bool initialize(const _aflags& aflags,ostream& oss);
       bool initialize(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss);
       bool initialize(const _aflags& aflags);
-      bool initialize(const string& fileIN,const _aflags& aflags,ostream& oss,bool load_all=false); //ME20211006 - added load_all
-      bool initialize(const string& fileIN,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss,bool load_all=false); //ME20211006 - added load_all
-      bool initialize(const string& fileIN,const _aflags& aflags,bool load_all=false); //ME20211006 - added load_all
+      bool initialize(const string& fileIN,const _aflags& aflags,ostream& oss);
+      bool initialize(const string& fileIN,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss);
+      bool initialize(const string& fileIN,const _aflags& aflags);
 
       void setAFlags(const _aflags& aflags);
       void readFile(const string& fileIN);
-      void processFile(bool load_all=false);  //ME20211006 - added load_all
+      void processFile();
       bool getARUNDirectories(vector<string>& ARUN_directories,bool tryDirectoryLS=true);
       bool loadDataIntoCalculator(POccCalculator& pcalc,bool tryDirectoryLS=true);
 

@@ -2544,7 +2544,6 @@ namespace plotter {
 
     stringstream out;
     PLOT_PHDOS(plotoptions, out,FileMESSAGE,oss);  //CO20200404
-    savePlotGNUPLOT(plotoptions, out);
   }
 
   void PLOT_PHDOS(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE;return PLOT_PHDOS(plotoptions,out,FileMESSAGE,oss);}  //CO20200404
@@ -2553,9 +2552,30 @@ namespace plotter {
     plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
     // Read files
     string directory = plotoptions.getattachedscheme("DIRECTORY");
+    //ME20211008 - adding support for POCC
+    //Check if directory contains PHDOSCAR.pocc files
+    vector<string> vfiles, vpocc_doscars;
+    aurostd::DirectoryLS(directory, vfiles);
+    for (uint i = 0; i < vfiles.size(); i++) {
+      // File name must start with prefix
+      if (vfiles[i].find(POCC_PHDOSCAR_PREFIX) == 0) vpocc_doscars.push_back(vfiles[i]);
+    }
     xDOSCAR xdos;
-    xdos.GetPropertiesFile(directory+"/"+DEFAULT_APL_PHDOSCAR_FILE); //CO20191110
-    PLOT_PHDOS(plotoptions, out, xdos, FileMESSAGE, oss);
+    if (vpocc_doscars.size() > 0) {
+      string T = "";
+      plotoptions.flag("PLOT_ALL_ATOMS", true);  // PARTCAR has no iatoms
+      for (uint i = 0; i < vpocc_doscars.size(); i++) {
+        // Grab the temperature string. Format is always prefix + T + "K" + extension
+        T = vpocc_doscars[i].substr(POCC_PHDOSCAR_PREFIX.length());
+        T = T.substr(0, T.find("K"));
+        plotoptions.push_attached("EXTENSION", "phdos_T" + T + "K");
+        xdos.GetPropertiesFile(directory + "/" + vpocc_doscars[i]);
+        PLOT_PHDOS(plotoptions, out, xdos, FileMESSAGE, oss);
+      }
+    } else {
+      xdos.GetPropertiesFile(directory+"/"+DEFAULT_APL_PHDOSCAR_FILE); //CO20191110
+      PLOT_PHDOS(plotoptions, out, xdos, FileMESSAGE, oss);
+    }
   }
 
   // ME20210927
@@ -2568,7 +2588,6 @@ namespace plotter {
 
     stringstream out;
     PLOT_PHDOS(plotoptions, out, xdos, FileMESSAGE, oss);
-    savePlotGNUPLOT(plotoptions, out);
   }
 
   // Create a copy of xDOSCAR here because the energy units may be changed, which
@@ -2591,6 +2610,7 @@ namespace plotter {
 
     generateHeader(out, plotoptions, false);
     generateDosPlot(out, xdos, plotoptions,FileMESSAGE,oss);  //CO20200404
+    savePlotGNUPLOT(plotoptions, out);
   }
 
   //PLOT_PHDISP///////////////////////////////////////////////////////////////
@@ -2604,7 +2624,6 @@ namespace plotter {
 
     stringstream out;
     PLOT_PHDISP(plotoptions, out,FileMESSAGE,oss); //CO20200404
-    savePlotGNUPLOT(plotoptions, out);
   }
 
   void PLOT_PHDISP(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE;return PLOT_PHDISP(plotoptions,out,FileMESSAGE,oss);} //CO20200404
@@ -2639,6 +2658,7 @@ namespace plotter {
 
     generateHeader(out, plotoptions, false);
     generateBandPlot(out, xeigen, xkpts, xstr, plotoptions);
+    savePlotGNUPLOT(plotoptions, out);
   }
 
   //PLOT_PHDISPDOS////////////////////////////////////////////////////////////
@@ -2652,7 +2672,6 @@ namespace plotter {
 
     stringstream out;
     PLOT_PHDISPDOS(plotoptions, out,FileMESSAGE,oss);  //CO20200404
-    savePlotGNUPLOT(plotoptions, out);
   }
 
   void PLOT_PHDISPDOS(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE;return PLOT_PHDISPDOS(plotoptions,out,FileMESSAGE,oss);}  //CO20200404
@@ -2692,6 +2711,7 @@ namespace plotter {
     generateHeader(out, plotoptions, true);
     generateBandPlot(out, xeigen, xkpts, xstr, plotoptions);
     generateDosPlot(out, xdos, plotoptions,FileMESSAGE,oss);  //CO20200404
+    savePlotGNUPLOT(plotoptions, out);
   }
 
   //convertEnergies///////////////////////////////////////////////////////////
