@@ -8,6 +8,7 @@
         -- NBANDS equation typo patch, returning old NBANDS behavior (CO)
         -- fixing some error="NBANDS" patches (CO)
         -- patching GetStoich() bug with pocc structures (round-off printing errors) (CO)
+        -- added function to move aflow run to another directory (DX)
 3.2.11 - 2021/08/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.11.tar.xz
         -- added plotter options for QHA (AS)
