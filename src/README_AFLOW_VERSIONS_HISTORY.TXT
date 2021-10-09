@@ -4,6 +4,7 @@
         -- patching xoption::options2entry() clear() issues (CO)
         -- implemented QH-POCC and POCC+QHA (AS)
         -- improved formatting of aflow.qha.thermo.out file (AS)
+        -- added function to move aflow run to another directory (DX)
 3.2.11 - 2021/08/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.11.tar.xz
         -- added plotter options for QHA (AS)
