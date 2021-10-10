@@ -2492,8 +2492,8 @@ namespace aurostd {
     usage_percentage_ram=0.0;usage_percentage_swap=0.0;
     bool memory_read=aurostd::GetMemory(free_ram,total_ram,free_swap,total_swap);
     if(memory_read){
-      usage_percentage_ram=100.0*(((double)(total_ram-free_ram))/((double)(total_ram)));
-      usage_percentage_swap=100.0*(((double)(total_swap-free_swap))/((double)(total_swap)));
+      if(total_ram>0){usage_percentage_ram=100.0*(((double)(total_ram-free_ram))/((double)(total_ram)));}
+      if(total_swap>0){usage_percentage_swap=100.0*(((double)(total_swap-free_swap))/((double)(total_swap)));}  //some qrats nodes have no swap
       if(LDEBUG){
         cerr << soliloquy << " [date=" << aflow_get_time_string() << "]" << endl; //helps debugging
         cerr << soliloquy << " free_ram=" << free_ram << endl;
