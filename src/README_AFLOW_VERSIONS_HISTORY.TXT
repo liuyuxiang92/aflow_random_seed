@@ -4,6 +4,7 @@
         -- patching xoption::options2entry() clear() issues (CO)
         -- added plasmonics analysis in POCC (CO)
         -- added function to move aflow run to another directory (DX)
+        -- added machine settings for machine004 (DX)
 3.2.11 - 2021/08/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.11.tar.xz
         -- added plotter options for QHA (AS)
