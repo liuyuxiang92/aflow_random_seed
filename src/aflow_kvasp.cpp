@@ -196,6 +196,18 @@ namespace KBIN {
       kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
     }
     //DX20201005 - MACHINE003 - END
+    //DX20211011 - MACHINE004 - START
+    // machine004
+    if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE004") ||
+        aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE004") ||
+        aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE004"))   // check MACHINE004
+      aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE004")) {
+      aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,oss);
+      kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+    }
+    //DX20211011 - MACHINE004 - END
     // duke_materials	
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_MATERIALS") ||
         aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MATERIALS") ||    // check DUKE_MATERIALS
@@ -2663,6 +2675,7 @@ namespace KBIN {
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //DX20190509 - MACHINE001
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //DX20190509 - MACHINE002
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE003")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //DX20201005 - MACHINE003
+                      if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE004")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //DX20211011 - MACHINE004
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //DX20190107 - CMU EULER
                       aflags.AFLOW_GLOBAL_NCPUS=-kflags.KBIN_MPI_NCPUS;
                       aus << "00000  MESSAGE Running RUN_DIELECTRIC_STATIC fixing mpivasp5 with " << ncpus_before << "-AMD cores to " << kflags.KBIN_MPI_NCPUS << "-AMD cores" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
@@ -4300,6 +4313,20 @@ namespace KBIN {
               aurostd::execute(aus_exec);
             }
             //DX20201005 - MACHINE003 - END
+            //DX20211011 - MACHINE004 - START
+            // HOST MACHINE004_MPICH ------------------------------------------------------------------------
+            if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE004")) {
+              // verbosization
+              aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+              aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_MACHINE004 << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_MACHINE004 << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(_AFLOW_FILE_NAME_,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl;  //CO20170628 - SLOW WITH MEMORY
+              aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+              // run
+              aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
+              aus_exec << MPI_OPTIONS_MACHINE004 << endl;
+              aus_exec << MPI_COMMAND_MACHINE004 << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_MACHINE004 << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << endl;
+              aurostd::execute(aus_exec);
+            }
+            //DX20211011 - MACHINE004 - END
             // HOST DUKE_MATERIALS ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) {
               // verbosization
