@@ -105,6 +105,25 @@ namespace pocc {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
     }
 
+    uint nexclude = vexclude.size();
+    if (nexclude > 0) {
+      string aruns2skip = "";
+      for (uint i = 0; i < nexclude; i++) {
+        aruns2skip += m_ARUN_directories[vexclude[i]];
+        if (i < nexclude - 1) aruns2skip += ",";
+      }
+      if (XHOST.vflag_control.flag("ARUNS2SKIP")) {
+        aruns2skip = XHOST.vflag_control.getattachedscheme("ARUNS2SKIP") + "," + aruns2skip;
+        XHOST.vflag_control.push_attached("ARUNS2SKIP", aruns2skip);
+      } else if (!m_kflags.KBIN_POCC_ARUNS2SKIP_STRING.empty()) {
+        m_kflags.KBIN_POCC_ARUNS2SKIP_STRING += "," + aruns2skip;
+      } else { // Nothing set in aflow.in or command line, so add to kflags
+        m_kflags.KBIN_POCC_ARUNS2SKIP_STRING = aruns2skip;
+      }
+      loadDataIntoCalculator();
+      setDFTEnergies();
+    }
+
     // Calculate vibrational properties
     stringstream aplout;
 
@@ -165,7 +184,7 @@ namespace pocc {
     }
 
     // Restore ARUNS2SKIP
-    if (vexclude.size() > 0) {
+    if (nexclude > 0) {
       if (XHOST.vflag_control.flag("ARUNS2SKIP")) {
         XHOST.vflag_control.push_attached("ARUNS2SKIP", aruns2skip_backup);
       } else if (!m_kflags.KBIN_POCC_ARUNS2SKIP_STRING.empty()) {
@@ -263,7 +282,6 @@ namespace pocc {
 
     // Calculate phonon DOS
     uint nruns = vphcalc.size();
-    vector<xDOSCAR> vxdos(nruns);
     vector<apl::DOSCalculator> vphdos(nruns);
     double minfreq = 0.0, maxfreq = 0.0;
     unsigned long long int isupercell = 0;
@@ -286,24 +304,9 @@ namespace pocc {
       }
     }
 
-    uint nexclude = vexclude.size();
-    if (nexclude > 0) {
-      string aruns2skip = "";
-      for (uint i = 0; i < nexclude; i++) {
-        aruns2skip += m_ARUN_directories[vexclude[i]];
-        if (i < nexclude - 1) aruns2skip += ",";
-      }
-      if (XHOST.vflag_control.flag("ARUNS2SKIP")) {
-        aruns2skip = XHOST.vflag_control.getattachedscheme("ARUNS2SKIP") + "," + aruns2skip;
-        XHOST.vflag_control.push_attached("ARUNS2SKIP", aruns2skip);
-      } else if (!m_kflags.KBIN_POCC_ARUNS2SKIP_STRING.empty()) {
-        m_kflags.KBIN_POCC_ARUNS2SKIP_STRING += "," + aruns2skip;
-      } else { // Nothing set in aflow.in or command line, so add to kflags
-        m_kflags.KBIN_POCC_ARUNS2SKIP_STRING = aruns2skip;
-      }
-      loadDataIntoCalculator();
-      setDFTEnergies();
-    }
+    nruns = vcalc.size();
+    vector<xDOSCAR> vxdos(nruns);
+
     aplopts.push_attached("MINFREQ", aurostd::utype2string<double>(minfreq));
     aplopts.push_attached("MAXFREQ", aurostd::utype2string<double>(maxfreq));
 
@@ -358,7 +361,7 @@ namespace pocc {
       xDOSCAR phdos = vphdos[icalc].createDOSCAR();
 
       // Normalize
-      double norm_factor = nbranches/((double) vphdos[i].getNumberOfBranches());
+      double norm_factor = nbranches/((double) vphdos[icalc].getNumberOfBranches());
       for (uint e = 0; e < phdos.number_energies; e++) phdos.viDOS[0][e] *= norm_factor;
 
       const xstructure& xstr_phcalc = vphdos[icalc].getInputStructure();
@@ -395,7 +398,7 @@ namespace pocc {
         }
         phdos.vDOS = vDOS_pocc;
       }
-      vxdos[icalc] = phdos;
+      vxdos[i] = phdos;
     }
   }
 
