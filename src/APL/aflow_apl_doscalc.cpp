@@ -188,45 +188,25 @@ namespace apl {
     // Get the number of CPUS
     int ncpus = _pc->getNCPUs();
 
-    // Distribute the calculation
-    int startIndex, endIndex;
-    std::vector<std::thread*> threads;
-    vector<vector<int> > thread_dist = getThreadDistribution((int) _qpoints.size(), ncpus);
-    for (int icpu = 0; icpu < ncpus; icpu++) {
-      startIndex = thread_dist[icpu][0];
-      endIndex = thread_dist[icpu][1];
-      threads.push_back(new std::thread(&DOSCalculator::calculateInOneThread, this, startIndex, endIndex));
+    if (ncpus > 1) {
+      int startIndex, endIndex;
+      std::vector<std::thread*> threads;
+      vector<vector<int> > thread_dist = getThreadDistribution((int) _qpoints.size(), ncpus);
+      for (int icpu = 0; icpu < ncpus; icpu++) {
+        startIndex = thread_dist[icpu][0];
+        endIndex = thread_dist[icpu][1];
+        threads.push_back(new std::thread(&DOSCalculator::calculateInOneThread, this, startIndex, endIndex));
+      }
+      for (uint i = 0; i < threads.size(); i++) {
+        threads[i]->join();
+        delete threads[i];
+      }
+      threads.clear();
+    } else {
+      calculateInOneThread(0, (int) _qpoints.size());
     }
-
-    // OBSOLETE ME20180801
-    //   for (int icpu = 0; icpu < ncpus; icpu++) {
-    //   startIndex = icpu * qpointsPerCPU;
-    //   endIndex = startIndex + qpointsPerCPU;
-    //   if (((uint)endIndex > _qpoints.size()) ||
-    //   ((icpu == ncpus - 1) && ((uint)endIndex < _qpoints.size())))
-    //   endIndex = _qpoints.size();
-    //   threads.push_back(new std::thread(&DOSCalculator::calculateInOneThread, this, startIndex, endIndex));
-    //   }
-
-    // Wait to finish all threads here!
-    for (uint i = 0; i < threads.size(); i++) {
-      threads[i]->join();
-      delete threads[i];
-    }
-    threads.clear();
-
 #else
-
-    // Calculate frequencies
-    //ME20190624 - added eigenvectors for projected DOS
-    //ME20200206 - use calculateInOneThread so changes only need to be made in one place
-    //[[OBSOLETE]xmatrix<xcomplex<double> > xmtrx(_pc->getNumberOfBranches(), _pc->getNumberOfBranches());
-    //[[OBSOLETE]for (uint iqp = 0; iqp < _qpoints.size(); iqp++) {
-    //[[OBSOLETE]  _freqs.push_back(_pc->getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, xmtrx));
-    //[[OBSOLETE]  _eigen.push_back(xmtrx);
-    //[[OBSOLETE]}
     calculateInOneThread(0, (int) _qpoints.size());
-
 #endif
     //CO END
 

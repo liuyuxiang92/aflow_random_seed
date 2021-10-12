@@ -1272,16 +1272,19 @@ namespace apl {
     eigenvectors.resize(nQPs, xmatrix<xcomplex<double> >(nbranches, nbranches));
     vector<vector<xvector<double> > > gvel(nQPs);
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    vector<vector<int> > thread_dist = getThreadDistribution(nQPs, _ncpus);
-    vector<std::thread*> threads;
-    threads.clear();
-    for (int icpu = 0; icpu < _ncpus; icpu++) {
-      threads.push_back(new std::thread(&PhononCalculator::calculateGroupVelocitiesThread, this,
-            thread_dist[icpu][0], thread_dist[icpu][1], std::ref(freqs), std::ref(eigenvectors), std::ref(gvel)));
-    }
-    for (uint t = 0; t < threads.size(); t++) {
-      threads[t]->join();
-      delete threads[t];
+    if (_ncpus > 1) {
+      vector<vector<int> > thread_dist = getThreadDistribution(nQPs, _ncpus);
+      vector<std::thread*> threads;
+      for (int icpu = 0; icpu < _ncpus; icpu++) {
+        threads.push_back(new std::thread(&PhononCalculator::calculateGroupVelocitiesThread, this,
+              thread_dist[icpu][0], thread_dist[icpu][1], std::ref(freqs), std::ref(eigenvectors), std::ref(gvel)));
+      }
+      for (uint t = 0; t < threads.size(); t++) {
+        threads[t]->join();
+        delete threads[t];
+      }
+    } else {
+      calculateGroupVelocitiesThread(0, nQPs, freqs, eigenvectors, gvel);
     }
 #else
     calculateGroupVelocitiesThread(0, nQPs, freqs, eigenvectors, gvel);

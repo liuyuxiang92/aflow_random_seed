@@ -267,6 +267,7 @@ namespace pocc {
     vector<apl::DOSCalculator> vphdos(nruns);
     double minfreq = 0.0, maxfreq = 0.0;
     unsigned long long int isupercell = 0;
+    vector<uint> vcalc;
     for (std::list<POccSuperCellSet>::iterator it = l_supercell_sets.begin(); it != l_supercell_sets.end(); ++it) {
       isupercell = std::distance(l_supercell_sets.begin(), it);
 
@@ -281,6 +282,7 @@ namespace pocc {
         if (dosc.getMinFreq() < minfreq) minfreq = dosc.getMinFreq();
         if (dosc.getMaxFreq() > maxfreq) maxfreq = dosc.getMaxFreq();
         vphdos[isupercell] = dosc;
+        vcalc.push_back((uint) isupercell);
       }
     }
 
@@ -299,11 +301,6 @@ namespace pocc {
       } else { // Nothing set in aflow.in or command line, so add to kflags
         m_kflags.KBIN_POCC_ARUNS2SKIP_STRING = aruns2skip;
       }
-      // Erase data from DOS vphcalc and vphdos
-      for (uint i = nexclude - 1; i < nexclude; i--) {
-        vphcalc.erase(vphcalc.begin() + vexclude[i]);
-        vphdos.erase(vphdos.begin() + vexclude[i]);
-      }
       loadDataIntoCalculator();
       setDFTEnergies();
     }
@@ -318,26 +315,30 @@ namespace pocc {
     int ncpus = KBIN::get_NCPUS(m_kflags);
     vector<std::thread*> threads;
     if (ncpus > (int) nruns) ncpus = (int) nruns;
-    vector<vector<int> > thread_dist = getThreadDistribution((int) nruns, ncpus);
-    for (int i = 0; i < ncpus; i++) {
-      int startIndex = thread_dist[i][0];
-      int endIndex = thread_dist[i][1];
-      threads.push_back(new std::thread(&POccCalculator::calculatePhononDOSThread, this, startIndex, endIndex,
-            std::ref(aplopts), std::ref(vphdos), std::ref(vxdos)));
-    }
+    if (ncpus > 1) {
+      vector<vector<int> > thread_dist = getThreadDistribution((int) nruns, ncpus);
+      for (int i = 0; i < ncpus; i++) {
+        int startIndex = thread_dist[i][0];
+        int endIndex = thread_dist[i][1];
+        threads.push_back(new std::thread(&POccCalculator::calculatePhononDOSThread, this, startIndex, endIndex,
+              vcalc, std::ref(aplopts), std::ref(vphdos), std::ref(vxdos)));
+      }
 
-    for (uint i = 0; i < threads.size(); i++) {
-      threads[i]->join();
-      delete threads[i];
+      for (uint i = 0; i < threads.size(); i++) {
+        threads[i]->join();
+        delete threads[i];
+      }
+    } else {
+      calculatePhononDOSThread(0, (int) nruns, vcalc, aplopts, vphdos, vxdos);
     }
 #else
-    calculatePhononDOSThread(0, (int) nruns, aplopts, vphdos, vxdos);
+    calculatePhononDOSThread(0, (int) nruns, vcalc, aplopts, vphdos, vxdos);
 #endif
 
     return vxdos;
   }
 
-  void POccCalculator::calculatePhononDOSThread(int startIndex, int endIndex,
+  void POccCalculator::calculatePhononDOSThread(int startIndex, int endIndex, const vector<uint>& vcalc,
       const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos) {
     string function = XPID + "POccCalculator::getPhononDoscars()";
 
@@ -352,14 +353,15 @@ namespace pocc {
     double maxfreq = aurostd::string2utype<double>(aplopts.getattachedscheme("MAXFREQ"));
 
     for (int i = startIndex; i < endIndex; i++) {
-      vphdos[i].calc(dos_npoints, dos_smear, minfreq, maxfreq, false);
-      xDOSCAR phdos = vphdos[i].createDOSCAR();
+      uint icalc = vcalc[i];
+      vphdos[icalc].calc(dos_npoints, dos_smear, minfreq, maxfreq, false);
+      xDOSCAR phdos = vphdos[icalc].createDOSCAR();
 
       // Normalize
       double norm_factor = nbranches/((double) vphdos[i].getNumberOfBranches());
       for (uint e = 0; e < phdos.number_energies; e++) phdos.viDOS[0][e] *= norm_factor;
 
-      const xstructure& xstr_phcalc = vphdos[i].getInputStructure();
+      const xstructure& xstr_phcalc = vphdos[icalc].getInputStructure();
       uint natoms_phcalc = xstr_phcalc.atoms.size();
       uint nproj = phdos.vDOS[0].size();
       bool projected = (nproj > 1);
@@ -377,7 +379,7 @@ namespace pocc {
       // If there are projected DOS, add the DOS contributions that belong to
       // each site in the parent structure.
       if (projected) {
-        vector<uint> map = getMapToPARTCAR(i, xstr_phcalc);
+        vector<uint> map = getMapToPARTCAR((unsigned long long int) icalc, xstr_phcalc);
 
         deque<deque<deque<deque<double> > > > vDOS_pocc(natoms_pocc + 1, deque<deque<deque<double> > >(nproj, deque<deque<double> >(1, deque<double>(phdos.number_energies, 0.0))));
         vDOS_pocc[0] = phdos.vDOS[0];  // Totals stay the same
@@ -393,7 +395,7 @@ namespace pocc {
         }
         phdos.vDOS = vDOS_pocc;
       }
-      vxdos[i] = phdos;
+      vxdos[icalc] = phdos;
     }
   }
 

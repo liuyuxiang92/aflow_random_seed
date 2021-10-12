@@ -401,7 +401,7 @@ namespace KBIN {
       } else {
         if (exclude[0] == 'T') {
           kflags.KBIN_POCC_EXCLUDE_UNSTABLE = true;
-        } else if (exclude[1] == 'F') {
+        } else if (exclude[0] == 'F') {
           kflags.KBIN_POCC_EXCLUDE_UNSTABLE = false;
         } else {
           kflags.KBIN_POCC_EXCLUDE_UNSTABLE = DEFAULT_POCC_EXCLUDE_UNSTABLE;
