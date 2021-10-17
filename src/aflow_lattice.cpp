@@ -711,7 +711,7 @@ namespace LATTICE {
     // get volume of original structure and volume tolerance
     double volume_orig=det(lattice_original); // volume
     double amin=min(aurostd::modulus(lattice_original(1)),aurostd::modulus(lattice_original(2)),aurostd::modulus(lattice_original(3)));
-    double volume_eps = eps*amin*amin*amin;
+    double volume_eps = eps*amin*amin*amin; //DX20211016 - this volume_eps is used to see if volumes are similar
     double volume_tmp = AUROSTD_MAX_DOUBLE, volume_tmp_abs = AUROSTD_MAX_DOUBLE;
     //DX20210316 [OTHER POSSIBILITY] double tol_vol=0.1;
     //DX20210316 [OTHER POSSIBILITY] double volume_eps=tol_vol*volume_orig;
@@ -750,14 +750,14 @@ namespace LATTICE {
             // use absolute value to quickly filter, but then check for positive determinant
             // later for each lattice vector permutation
             volume_tmp_abs = abs(volume_tmp);
-            if(volume_tmp_abs > volume_eps){
+            if(volume_tmp_abs > eps){ //NS+DX20211016 - use eps to determine if not singular (not volume_eps)
               // do absolute value determinant here
               if(abs(volume_tmp_abs-volume_orig) < volume_eps){
                 tmp_lattice_orig = tmp_lattice; // save original lattice before swapping rows
                 // ---------------------------------------------------------------------------
                 // store positive determinant permutations
                 // if initial determinant is positive, do THREE row swaps to keep positive
-                if(volume_tmp>volume_eps){
+                if(volume_tmp>eps){ //NS+DX20211016 - use eps to determine if not singular (not volume_eps)
                   // 1,2,3
                   lattices.push_back(tmp_lattice);
                   // 2,3,1
@@ -842,46 +842,48 @@ namespace LATTICE {
                 // check determinant
                 // use absolute value to quickly filter, but then check for positive determinant
                 // later for each lattice vector permutation
-                // do absolute value determinant here
                 volume_tmp_abs = abs(volume_tmp);
-                if(abs(volume_tmp_abs-volume_orig) < volume_eps && volume_tmp_abs > eps){ //NS20211006 add > eps condition to avoid singular behavior
-                  tmp_lattice_orig = tmp_lattice; // save original lattice before swapping rows
-                  // ---------------------------------------------------------------------------
-                  // store positive determinant permutations
-                  // if initial determinant is positive, do THREE row swaps to keep positive
-                  if(volume_tmp>0){ // NS20211006 end
-                    // 1,2,3
-                    lattices_aaa.push_back(tmp_lattice);
-                    // 2,3,1
-                    tmp_lattice[2][1]=translation_vectors[i][1];tmp_lattice[2][2]=translation_vectors[i][2];tmp_lattice[2][3]=translation_vectors[i][3];
-                    tmp_lattice[3][1]=translation_vectors[j][1];tmp_lattice[3][2]=translation_vectors[j][2];tmp_lattice[3][3]=translation_vectors[j][3];
-                    tmp_lattice[1][1]=translation_vectors[k][1];tmp_lattice[1][2]=translation_vectors[k][2];tmp_lattice[1][3]=translation_vectors[k][3];
-                    lattices_aaa.push_back(tmp_lattice);
-                    // 3,1,2
-                    tmp_lattice[3][1]=translation_vectors[i][1];tmp_lattice[3][2]=translation_vectors[i][2];tmp_lattice[3][3]=translation_vectors[i][3];
-                    tmp_lattice[1][1]=translation_vectors[j][1];tmp_lattice[1][2]=translation_vectors[j][2];tmp_lattice[1][3]=translation_vectors[j][3];
-                    tmp_lattice[2][1]=translation_vectors[k][1];tmp_lattice[2][2]=translation_vectors[k][2];tmp_lattice[2][3]=translation_vectors[k][3];
-                    lattices_aaa.push_back(tmp_lattice);
+                if(volume_tmp_abs > eps){ //NS+DX20211016 - use eps to determine if not singular (not volume_eps)
+                  // do absolute value determinant here
+                  if(abs(abs(volume_tmp)-volume_orig) < volume_eps){
+                    tmp_lattice_orig = tmp_lattice; // save original lattice before swapping rows
+                    // ---------------------------------------------------------------------------
+                    // store positive determinant permutations
+                    // if initial determinant is positive, do THREE row swaps to keep positive
+                    if(volume_tmp>eps){ //NS+DX20211016 - use eps to determine if not singular (not volume_eps)
+                      // 1,2,3
+                      lattices_aaa.push_back(tmp_lattice);
+                      // 2,3,1
+                      tmp_lattice[2][1]=translation_vectors[i][1];tmp_lattice[2][2]=translation_vectors[i][2];tmp_lattice[2][3]=translation_vectors[i][3];
+                      tmp_lattice[3][1]=translation_vectors[j][1];tmp_lattice[3][2]=translation_vectors[j][2];tmp_lattice[3][3]=translation_vectors[j][3];
+                      tmp_lattice[1][1]=translation_vectors[k][1];tmp_lattice[1][2]=translation_vectors[k][2];tmp_lattice[1][3]=translation_vectors[k][3];
+                      lattices_aaa.push_back(tmp_lattice);
+                      // 3,1,2
+                      tmp_lattice[3][1]=translation_vectors[i][1];tmp_lattice[3][2]=translation_vectors[i][2];tmp_lattice[3][3]=translation_vectors[i][3];
+                      tmp_lattice[1][1]=translation_vectors[j][1];tmp_lattice[1][2]=translation_vectors[j][2];tmp_lattice[1][3]=translation_vectors[j][3];
+                      tmp_lattice[2][1]=translation_vectors[k][1];tmp_lattice[2][2]=translation_vectors[k][2];tmp_lattice[2][3]=translation_vectors[k][3];
+                      lattices_aaa.push_back(tmp_lattice);
+                    }
+                    // if initial determinant is negative, do TWO row swaps to turn positive
+                    else{
+                      // 2,1,3
+                      tmp_lattice[2][1]=translation_vectors[i][1];tmp_lattice[2][2]=translation_vectors[i][2];tmp_lattice[2][3]=translation_vectors[i][3];
+                      tmp_lattice[1][1]=translation_vectors[j][1];tmp_lattice[1][2]=translation_vectors[j][2];tmp_lattice[1][3]=translation_vectors[j][3];
+                      tmp_lattice[3][1]=translation_vectors[k][1];tmp_lattice[3][2]=translation_vectors[k][2];tmp_lattice[3][3]=translation_vectors[k][3];
+                      lattices_aaa.push_back(tmp_lattice);
+                      // 1,3,2
+                      tmp_lattice[1][1]=translation_vectors[i][1];tmp_lattice[1][2]=translation_vectors[i][2];tmp_lattice[1][3]=translation_vectors[i][3];
+                      tmp_lattice[3][1]=translation_vectors[j][1];tmp_lattice[3][2]=translation_vectors[j][2];tmp_lattice[3][3]=translation_vectors[j][3];
+                      tmp_lattice[2][1]=translation_vectors[k][1];tmp_lattice[2][2]=translation_vectors[k][2];tmp_lattice[2][3]=translation_vectors[k][3];
+                      lattices_aaa.push_back(tmp_lattice);
+                      // 3,2,1
+                      tmp_lattice[3][1]=translation_vectors[i][1];tmp_lattice[3][2]=translation_vectors[i][2];tmp_lattice[3][3]=translation_vectors[i][3];
+                      tmp_lattice[2][1]=translation_vectors[j][1];tmp_lattice[2][2]=translation_vectors[j][2];tmp_lattice[2][3]=translation_vectors[j][3];
+                      tmp_lattice[1][1]=translation_vectors[k][1];tmp_lattice[1][2]=translation_vectors[k][2];tmp_lattice[1][3]=translation_vectors[k][3];
+                      lattices_aaa.push_back(tmp_lattice);
+                    }
+                    tmp_lattice=tmp_lattice_orig; //revert to original lattice
                   }
-                  // if initial determinant is negative, do TWO row swaps to turn positive
-                  else{
-                    // 2,1,3
-                    tmp_lattice[2][1]=translation_vectors[i][1];tmp_lattice[2][2]=translation_vectors[i][2];tmp_lattice[2][3]=translation_vectors[i][3];
-                    tmp_lattice[1][1]=translation_vectors[j][1];tmp_lattice[1][2]=translation_vectors[j][2];tmp_lattice[1][3]=translation_vectors[j][3];
-                    tmp_lattice[3][1]=translation_vectors[k][1];tmp_lattice[3][2]=translation_vectors[k][2];tmp_lattice[3][3]=translation_vectors[k][3];
-                    lattices_aaa.push_back(tmp_lattice);
-                    // 1,3,2
-                    tmp_lattice[1][1]=translation_vectors[i][1];tmp_lattice[1][2]=translation_vectors[i][2];tmp_lattice[1][3]=translation_vectors[i][3];
-                    tmp_lattice[3][1]=translation_vectors[j][1];tmp_lattice[3][2]=translation_vectors[j][2];tmp_lattice[3][3]=translation_vectors[j][3];
-                    tmp_lattice[2][1]=translation_vectors[k][1];tmp_lattice[2][2]=translation_vectors[k][2];tmp_lattice[2][3]=translation_vectors[k][3];
-                    lattices_aaa.push_back(tmp_lattice);
-                    // 3,2,1
-                    tmp_lattice[3][1]=translation_vectors[i][1];tmp_lattice[3][2]=translation_vectors[i][2];tmp_lattice[3][3]=translation_vectors[i][3];
-                    tmp_lattice[2][1]=translation_vectors[j][1];tmp_lattice[2][2]=translation_vectors[j][2];tmp_lattice[2][3]=translation_vectors[j][3];
-                    tmp_lattice[1][1]=translation_vectors[k][1];tmp_lattice[1][2]=translation_vectors[k][2];tmp_lattice[1][3]=translation_vectors[k][3];
-                    lattices_aaa.push_back(tmp_lattice);
-                  }
-                  tmp_lattice=tmp_lattice_orig; //revert to original lattice
                 }
               }
             }
