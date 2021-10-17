@@ -7333,13 +7333,19 @@ namespace KBIN {
         }
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==2){ //desperate attempt, increase NELM
+      if(submode==2){ //desperate attempt, increase NELM  //CO20211017 - do BEFORE you increase KPOINTS (KPOINTS=GAMMA_ODD), as the longer run will be more expensive with more KPOINTS
         fix="NELM";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==3){ //desperate attempt 2, also increase EDIFF, sometimes the threshold is just a bit too high
+      if(submode==3){ //Gamma-odd (might increase ki) //CO20211017 - worked for Cr_pvHf_pvMo_pvNV_svZr_sv:PAW_PBE/AB_cF8_225_a_b.AB:POCC_P0-1xD_P1-0.2xA-0.2xB-0.2xC-0.2xE-0.2xF/ARUN.POCC_05_H0C4
+        fix="KPOINTS=GAMMA_ODD";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==4){ //desperate attempt 2, also increase EDIFF, sometimes the threshold is just a bit too high
         bool Krun1=true;fix="NELM";
         bool ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
         if(ignorefix1){Krun1=false;}
@@ -7354,7 +7360,7 @@ namespace KBIN {
         //no need to remove these settings if it fails
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode>=4){Krun=false;}
+      if(submode>=5){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="NKXYZ_IKPTD") {
