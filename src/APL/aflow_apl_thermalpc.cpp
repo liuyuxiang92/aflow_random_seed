@@ -414,8 +414,8 @@ namespace apl {
   void ThermalPropertiesCalculator::addToAPLOut(stringstream& apl_outfile) {
     apl_outfile << AFLOWIN_SEPARATION_LINE << std::endl;
     apl_outfile << "[APL_THERMO_RESULTS]START" << std::endl;
-    apl_outfile << "energy_zero_point_cell_apl_300K=" << std::setprecision(8) << U0 << " (meV/cell)" << std::endl;
-    if (natoms > 0) apl_outfile << "energy_zero_point_atom_apl_300K=" << std::setprecision(8) << (U0/natoms) << " (meV/atom)" << std::endl;
+    apl_outfile << "energy_zero_point_cell_apl=" << std::setprecision(8) << U0 << " (meV/cell)" << std::endl;
+    if (natoms > 0) apl_outfile << "energy_zero_point_atom_apl=" << std::setprecision(8) << (U0/natoms) << " (meV/atom)" << std::endl;
     for (uint t = 0; t < temperatures.size(); t++) {
       if (aurostd::isequal(temperatures[t], 300.0)) {
         apl_outfile << "energy_free_vibrational_cell_apl_300K=" << std::setprecision(8) << Fvib[t] << " (meV/cell)" << std::endl;

@@ -5708,9 +5708,9 @@ namespace aflowlib {
             data.energy_internal_vibrational_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
           else if (tokens[0] == "energy_internal_vibrational_atom_apl_300K")
             data.energy_internal_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
-          else if (tokens[0] == "energy_zero_point_cell_apl_300K")
+          else if (tokens[0] == "energy_zero_point_cell_apl")
             data.energy_zero_point_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
-          else if (tokens[0] == "energy_zero_point_atom_apl_300K")
+          else if (tokens[0] == "energy_zero_point_atom_apl")
             data.energy_zero_point_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
           else if (tokens[0] == "heat_capacity_Cv_cell_apl_300K")
             data.heat_capacity_Cv_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
@@ -6074,6 +6074,7 @@ namespace aflowlib {
     string aplout = POCC_FILE_PREFIX + POCC_APL_OUT_FILE;
     if (aurostd::EFileExist(directory_LIB + "/" + aplout)) {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB, aplout, directory_RAW, aplout, vfile, MESSAGE);
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB, DEFAULT_APL_PHPOSCAR_FILE, directory_RAW, DEFAULT_APL_PHPOSCAR_FILE, vfile, MESSAGE);
       if (AFLOWLIB_VERBOSE) std::cout << MESSAGE << " loading " << directory_RAW << "/" << aplout << std::endl;
       string lines = "";
       aurostd::ExtractToStringEXPLICIT(aurostd::efile2string(directory_RAW + "/" + aplout), lines, "[POCC_APL_RESULTS]START_TEMPERATURE=0300_K","[POCC_APL_RESULTS]STOP_TEMPERATURE=0300_K");

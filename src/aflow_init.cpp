@@ -3018,15 +3018,15 @@ namespace init {
 
     //ME20210927 BEGIN
     // schema is CAPITAL, content is not necessarily
-    XHOST.vschema.push_attached("SCHEMA::NAME:ENERGY_ZERO_POINT_ATOM_APL_300K","energy_zero_point_atom_apl_300K");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_ZERO_POINT_ATOM_APL_300K","eV/atom");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_ZERO_POINT_ATOM_APL_300K","number");
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENERGY_ZERO_POINT_ATOM_APL","energy_zero_point_atom_apl");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_ZERO_POINT_ATOM_APL","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_ZERO_POINT_ATOM_APL","number");
     //ME20210927 END
     //ME20210927 BEGIN
     // schema is CAPITAL, content is not necessarily
-    XHOST.vschema.push_attached("SCHEMA::NAME:ENERGY_ZERO_POINT_CELL_APL_300K","energy_zero_point_cell_apl_300K");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_ZERO_POINT_CELL_APL_300K","eV/cell");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_ZERO_POINT_CELL_APL_300K","number");
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENERGY_ZERO_POINT_CELL_APL","energy_zero_point_cell_apl");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_ZERO_POINT_CELL_APL","eV/cell");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_ZERO_POINT_CELL_APL","number");
     //ME20210927 END
 
     // schema is CAPITAL, content is not necessarily
