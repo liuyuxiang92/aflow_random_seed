@@ -1015,7 +1015,11 @@ namespace KBIN {
         double USER_TP_TEND = aurostd::string2utype<double>(aplopts.getattachedscheme("TEND"));
         double USER_TP_TSTEP = aurostd::string2utype<double>(aplopts.getattachedscheme("TSTEP"));
         tpc.calculateThermalProperties(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
-        tpc.writePropertiesToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE);
+        // ME20211019 - additional output formats
+        string tpfile = aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE;
+        tpc.writePropertiesToFile(tpfile, txt_ft);
+        tpfile = aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_JSON;
+        tpc.writePropertiesToFile(tpfile, json_ft);
         tpc.addToAPLOut(apl_outfile);
 
         if (aplopts.flag("DISPLACEMENTS")) {

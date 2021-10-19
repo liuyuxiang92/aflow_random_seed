@@ -1460,8 +1460,13 @@ namespace plotter {
   aurostd::JSONwriter DOS2JSON(xoption &xopt, const xDOSCAR &xdos, ofstream& FileMESSAGE,
       ostream &oss)
   {
-    string directory = ".";
-    xopt.push_attached("DIRECTORY", directory);
+    //ME20211015 - Only set directory when none is given
+    string directory = xopt.getattachedscheme("DIRECTORY");
+    if (directory.empty()) {
+      directory = ".";
+      xopt.push_attached("DIRECTORY", directory);
+    }
+
     if (directory.empty()) directory = aurostd::getPWD();
 
     xstructure xstr = getStructureWithNames(xopt,FileMESSAGE,xdos.carstring,oss);
@@ -1487,7 +1492,7 @@ namespace plotter {
       tdos_data.addString("y_unit", "");
     }
     else if (aurostd::substring2bool(xdos.carstring, "PHON")){
-      tdos_data.addString("x_unit", "MEV");
+      tdos_data.addString("x_unit", "EV");  //ME20211014 - units are always eV
       tdos_data.addString("y_unit", "");
     }
 
@@ -1691,7 +1696,7 @@ namespace plotter {
       pdos_data.addBool("spin_polarized", xdos.spin);
       pdos_data.addBool("energies_shifted", !xopt.flag("NOSHIFT"));
       pdos_data.addVector("energy", xopt.flag("NOSHIFT") ? xdos.venergy : xdos.venergyEf);
-      pdos_data.addString("x_unit", "MEV");
+      pdos_data.addString("x_unit", "EV");  //ME20211014 - units are always eV
       pdos_data.addString("y_unit", "");
 
       // create a mapping of species to the id of the first representative of
@@ -1761,7 +1766,7 @@ namespace plotter {
     }
     else if(aurostd::substring2bool(xeigen.carstring, "PHON")){
       json.addString("x_unit", "");
-      json.addString("y_unit", "MEV");
+      json.addString("y_unit", "EV");  //ME20211014 - units are always eV
     }
 
     static const uint num = 4;

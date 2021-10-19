@@ -804,9 +804,9 @@ namespace apl {
       double getIsochoricSpecificHeat(double, ThermalPropertiesUnits=apl::kB);
       double getIsochoricSpecificHeat(double, const vector<double>&, const vector<double>&, ThermalPropertiesUnits=apl::kB);
 
-      void writePropertiesToFile(string);
+      void writePropertiesToFile(string, filetype ft=txt_ft);
       void addToAPLOut(stringstream&);
-      string getPropertiesFileString();
+      string getPropertiesFileString(filetype ft=txt_ft);
   };
 }  // namespace apl
 

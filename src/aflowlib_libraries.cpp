@@ -1492,10 +1492,16 @@ namespace aflowlib {
         file = directory_RAW+"/"+DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE;
         if (aurostd::FileExist(file)) aurostd::LinkFile(file, directory_WEB);
 
+        file = directory_RAW+"/"+DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_JSON;
+        if (aurostd::FileExist(file)) aurostd::LinkFile(file, directory_WEB);
+
         file = directory_RAW+"/"+DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_MSQRDISP_FILE;
         if (aurostd::FileExist(file)) aurostd::LinkFile(file, directory_WEB);
 
         file = directory_RAW+"/"+DEFAULT_APL_FILE_PREFIX + DEFAULT_AAPL_GVEL_FILE;
+        if (aurostd::FileExist(file)) aurostd::LinkFile(file, directory_WEB);
+
+        file = directory_RAW+"/"+aflowlib_data.system_name+"_phdosdata.json";
         if (aurostd::FileExist(file)) aurostd::LinkFile(file, directory_WEB);
 
         vector<string> files;
@@ -5726,16 +5732,20 @@ namespace aflowlib {
       std::cout << MESSAGE << " heat_capacity_Cv_atom_apl_300K = " << ((data.heat_capacity_Cv_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.heat_capacity_Cv_atom_apl_300K):"unavailable") << std::endl;
     }
 
+    // Thermo json file
+    file = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_JSON;
+    if (aurostd::EFileExist(directory_LIB + "/" + file)) {
+      aflowlib::LIB2RAW_FileNeeded(directory_LIB, file, directory_RAW, file, vfile, MESSAGE);
+    }
+
     // Mean square displacement file
     file = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_MSQRDISP_FILE;
-    std::cout << file << std::endl;
     if (aurostd::EFileExist(directory_LIB + "/" + file)) {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB, file, directory_RAW, file, vfile, MESSAGE);
     }
 
     // Group velocities file
     file = DEFAULT_APL_FILE_PREFIX + DEFAULT_AAPL_GVEL_FILE;
-    std::cout << file << std::endl;
     if (aurostd::EFileExist(directory_LIB + "/" + file)) {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB, file, directory_RAW, file, vfile, MESSAGE);
     }
@@ -5769,6 +5779,17 @@ namespace aflowlib {
       plotoptions = plotter::getPlotOptionsPhonons(opts, plottype);
       if (plot_disp && plot_dos) {
         plotter::PLOT_PHDISPDOS(plotoptions);
+        // Convert to json for web
+        xKPOINTS xkpts(directory_LIB + "/" + DEFAULT_APL_PHKPOINTS_FILE);
+        xEIGENVAL xeigen(directory_LIB + "/" + DEFAULT_APL_PHEIGENVAL_FILE);
+        xDOSCAR xdos(directory_LIB + "/" + DEFAULT_APL_PHDOSCAR_FILE);
+        xoption jsonoptions;
+        jsonoptions.push_attached("DIRECTORY", directory_RAW);
+        jsonoptions.flag("NOSHIFT", true);
+        ofstream dummy;
+        string json = plotter::bandsDOS2JSON(xdos, xeigen, xkpts, jsonoptions, dummy).toString();
+        string filename = directory_RAW + "/" + data.system_name + "_phdosdata.json";
+        aurostd::string2file(json, filename);
       } else if (plot_disp) {
         plotter::PLOT_PHDISP(plotoptions);
       } else {
@@ -5868,7 +5889,6 @@ namespace aflowlib {
         xopt.push_attached("DIRECTORY",directory_RAW);
         xopt.flag("NOSHIFT", true);
         plotter::generateBandPlot(json, xeig, xkpts, xstr, xopt);
-
         aurostd::stringstream2file(json, directory_RAW + "/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_PDIS_FILE+".T300K.json");
       }
     } else {

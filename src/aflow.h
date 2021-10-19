@@ -3985,7 +3985,7 @@ namespace plotter {
       const vector<double> &distances, const vector<double> &segment_points,
       const xoption& plotoptions);//AS2021102
   aurostd::JSONwriter bandsDOS2JSON(const xDOSCAR &xdos, const xEIGENVAL &xeigen,
-      const xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss);//AS20201102
+      const xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss=std::cout);//AS20201102  //ME20211014 - added default for oss
 
   // DOS
   bool dosDataAvailable(const deque<deque<deque<deque<double> > > >& vdos, int pdos); // ME20200305

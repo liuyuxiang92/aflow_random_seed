@@ -1062,7 +1062,8 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   xstructure Supercell::calculatePrimitiveStructure() const { //CO20180409
-    xstructure pcStructure=_inStructure;
+    xstructure pcStructure;
+    LightCopy(_inStructure, pcStructure);  //ME20211019 - do not copy symmetry
     //ME20200324 - Setting LatticeReduction_avoid to true can results in
     // primitive cells with slightly different lattice parameters, especially
     // for monoclinic cells. This error can propagate and break mappings from
