@@ -231,8 +231,8 @@ namespace aflowlib {
     entropy_vibrational_atom_apl_300K = b.entropy_vibrational_atom_apl_300K;
     energy_internal_vibrational_cell_apl_300K = b.energy_internal_vibrational_cell_apl_300K;
     energy_internal_vibrational_atom_apl_300K = b.energy_internal_vibrational_atom_apl_300K;
-    energy_zero_point_cell_apl_300K = b.energy_zero_point_cell_apl_300K;
-    energy_zero_point_atom_apl_300K = b.energy_zero_point_atom_apl_300K;
+    energy_zero_point_cell_apl = b.energy_zero_point_cell_apl;
+    energy_zero_point_atom_apl = b.energy_zero_point_atom_apl;
     heat_capacity_Cv_cell_apl_300K = b.heat_capacity_Cv_cell_apl_300K;
     heat_capacity_Cv_atom_apl_300K = b.heat_capacity_Cv_atom_apl_300K;
     // QHA
@@ -514,8 +514,8 @@ namespace aflowlib {
     entropy_vibrational_atom_apl_300K = AUROSTD_NAN;
     energy_internal_vibrational_cell_apl_300K = AUROSTD_NAN;
     energy_internal_vibrational_atom_apl_300K = AUROSTD_NAN;
-    energy_zero_point_cell_apl_300K = AUROSTD_NAN;
-    energy_zero_point_atom_apl_300K = AUROSTD_NAN;
+    energy_zero_point_cell_apl = AUROSTD_NAN;
+    energy_zero_point_atom_apl = AUROSTD_NAN;
     heat_capacity_Cv_cell_apl_300K = AUROSTD_NAN;
     heat_capacity_Cv_atom_apl_300K = AUROSTD_NAN;
     // QHA
@@ -926,8 +926,8 @@ namespace aflowlib {
         else if (keyword=="entropy_vibrational_atom_apl_300K"){entropy_vibrational_atom_apl_300K=aurostd::string2utype<double>(content);}
         else if (keyword=="energy_internal_vibrational_cell_apl_300K"){energy_internal_vibrational_cell_apl_300K=aurostd::string2utype<double>(content);}
         else if (keyword=="energy_internal_vibrational_atom_apl_300K"){energy_internal_vibrational_atom_apl_300K=aurostd::string2utype<double>(content);}
-        else if (keyword=="energy_zero_point_cell_apl_300K"){energy_zero_point_cell_apl_300K=aurostd::string2utype<double>(content);}
-        else if (keyword=="energy_zero_point_atom_apl_300K"){energy_zero_point_atom_apl_300K=aurostd::string2utype<double>(content);}
+        else if (keyword=="energy_zero_point_cell_apl"){energy_zero_point_cell_apl=aurostd::string2utype<double>(content);}
+        else if (keyword=="energy_zero_point_atom_apl"){energy_zero_point_atom_apl=aurostd::string2utype<double>(content);}
         else if (keyword=="heat_capacity_Cv_cell_apl_300K"){heat_capacity_Cv_cell_apl_300K=aurostd::string2utype<double>(content);}
         else if (keyword=="heat_capacity_Cv_atom_apl_300K"){heat_capacity_Cv_atom_apl_300K=aurostd::string2utype<double>(content);}
         //ME20210927 END
@@ -1205,8 +1205,8 @@ namespace aflowlib {
       oss << "entropy_vibrational_atom_apl_300K=" << entropy_vibrational_atom_apl_300K << (html?"<br>":"") << endl;
       oss << "energy_internal_vibrational_cell_apl_300K=" << energy_internal_vibrational_cell_apl_300K << (html?"<br>":"") << endl;
       oss << "energy_internal_vibrational_atom_apl_300K=" << energy_internal_vibrational_atom_apl_300K << (html?"<br>":"") << endl;
-      oss << "energy_zero_point_cell_apl_300K=" << energy_zero_point_cell_apl_300K << (html?"<br>":"") << endl;
-      oss << "energy_zero_point_atom_apl_300K=" << energy_zero_point_atom_apl_300K << (html?"<br>":"") << endl;
+      oss << "energy_zero_point_cell_apl=" << energy_zero_point_cell_apl << (html?"<br>":"") << endl;
+      oss << "energy_zero_point_atom_apl=" << energy_zero_point_atom_apl << (html?"<br>":"") << endl;
       oss << "heat_capacity_Cv_cell_apl_300K=" << heat_capacity_Cv_cell_apl_300K << (html?"<br>":"") << endl;
       oss << "heat_capacity_Cv_atom_apl_300K=" << heat_capacity_Cv_atom_apl_300K << (html?"<br>":"") << endl;
       //ME20210927 END
@@ -1475,8 +1475,8 @@ namespace aflowlib {
       if (entropy_vibrational_atom_apl_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "entropy_vibrational_atom_apl_300K=" << entropy_vibrational_atom_apl_300K;
       if (energy_internal_vibrational_cell_apl_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "energy_internal_vibrational_cell_apl_300K=" << energy_internal_vibrational_cell_apl_300K;
       if (energy_internal_vibrational_atom_apl_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "energy_internal_vibrational_atom_apl_300K=" << energy_internal_vibrational_atom_apl_300K;
-      if (energy_zero_point_cell_apl_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "energy_zero_point_cell_apl_300K=" << energy_zero_point_cell_apl_300K;
-      if (energy_zero_point_atom_apl_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "energy_zero_point_atom_apl_300K=" << energy_zero_point_atom_apl_300K;
+      if (energy_zero_point_cell_apl!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "energy_zero_point_cell_apl=" << energy_zero_point_cell_apl;
+      if (energy_zero_point_atom_apl!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "energy_zero_point_atom_apl=" << energy_zero_point_atom_apl;
       if (heat_capacity_Cv_cell_apl_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "heat_capacity_Cv_cell_apl_300K=" << heat_capacity_Cv_cell_apl_300K;
       if (heat_capacity_Cv_atom_apl_300K!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "heat_capacity_Cv_atom_apl_300K=" << heat_capacity_Cv_atom_apl_300K;
       //ME20210927 END
@@ -3395,18 +3395,18 @@ namespace aflowlib {
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
       //////////////////////////////////////////////////////////////////////////
-      if (energy_zero_point_cell_apl_300K!=AUROSTD_NAN) {
-        sscontent_json << "\"energy_zero_point_cell_apl_300K\":" << energy_zero_point_cell_apl_300K;
+      if (energy_zero_point_cell_apl!=AUROSTD_NAN) {
+        sscontent_json << "\"energy_zero_point_cell_apl\":" << energy_zero_point_cell_apl;
       } else {
-        if (PRINT_NULL) sscontent_json << "\"energy_zero_point_cell_apl_300K\":null";
+        if (PRINT_NULL) sscontent_json << "\"energy_zero_point_cell_apl\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
       //////////////////////////////////////////////////////////////////////////
-      if (energy_zero_point_atom_apl_300K!=AUROSTD_NAN) {
-        sscontent_json << "\"energy_zero_point_atom_apl_300K\":" << energy_zero_point_atom_apl_300K;
+      if (energy_zero_point_atom_apl!=AUROSTD_NAN) {
+        sscontent_json << "\"energy_zero_point_atom_apl\":" << energy_zero_point_atom_apl;
       } else {
-        if (PRINT_NULL) sscontent_json << "\"energy_zero_point_atom_apl_300K\":null";
+        if (PRINT_NULL) sscontent_json << "\"energy_zero_point_atom_apl\":null";
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////

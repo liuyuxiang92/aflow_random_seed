@@ -5709,9 +5709,9 @@ namespace aflowlib {
           else if (tokens[0] == "energy_internal_vibrational_atom_apl_300K")
             data.energy_internal_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
           else if (tokens[0] == "energy_zero_point_cell_apl")
-            data.energy_zero_point_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
+            data.energy_zero_point_cell_apl = aurostd::string2utype<double>(tokens[1]);
           else if (tokens[0] == "energy_zero_point_atom_apl")
-            data.energy_zero_point_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+            data.energy_zero_point_atom_apl = aurostd::string2utype<double>(tokens[1]);
           else if (tokens[0] == "heat_capacity_Cv_cell_apl_300K")
             data.heat_capacity_Cv_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
           else if (tokens[0] == "heat_capacity_Cv_atom_apl_300K")
@@ -5726,8 +5726,8 @@ namespace aflowlib {
       std::cout << MESSAGE << " entropy_vibrational_atom_apl_300K = " << ((data.entropy_vibrational_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.entropy_vibrational_atom_apl_300K):"unavailable") << std::endl;
       std::cout << MESSAGE << " energy_internal_vibrational_cell_apl_300K = " << ((data.energy_internal_vibrational_cell_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_internal_vibrational_cell_apl_300K):"unavailable") << std::endl;
       std::cout << MESSAGE << " energy_internal_vibrational_atom_apl_300K = " << ((data.energy_internal_vibrational_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_internal_vibrational_atom_apl_300K):"unavailable") << std::endl;
-      std::cout << MESSAGE << " energy_zero_point_cell_apl_300K = " << ((data.energy_zero_point_cell_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_zero_point_cell_apl_300K):"unavailable") << std::endl;
-      std::cout << MESSAGE << " energy_zero_point_atom_apl_300K = " << ((data.energy_zero_point_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_zero_point_atom_apl_300K):"unavailable") << std::endl;
+      std::cout << MESSAGE << " energy_zero_point_cell_apl = " << ((data.energy_zero_point_cell_apl!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_zero_point_cell_apl):"unavailable") << std::endl;
+      std::cout << MESSAGE << " energy_zero_point_atom_apl = " << ((data.energy_zero_point_atom_apl!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_zero_point_atom_apl):"unavailable") << std::endl;
       std::cout << MESSAGE << " heat_capacity_Cv_cell_apl_300K = " << ((data.heat_capacity_Cv_cell_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.heat_capacity_Cv_cell_apl_300K):"unavailable") << std::endl;
       std::cout << MESSAGE << " heat_capacity_Cv_atom_apl_300K = " << ((data.heat_capacity_Cv_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.heat_capacity_Cv_atom_apl_300K):"unavailable") << std::endl;
     }
@@ -6105,10 +6105,10 @@ namespace aflowlib {
                 data.energy_internal_vibrational_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
               else if (tokens[0] == "energy_internal_vibrational_atom_apl_300K")
                 data.energy_internal_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
-              else if (tokens[0] == "energy_zero_point_cell_apl_300K")
-                data.energy_zero_point_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
-              else if (tokens[0] == "energy_zero_point_atom_apl_300K")
-                data.energy_zero_point_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+              else if (tokens[0] == "energy_zero_point_cell_apl")
+                data.energy_zero_point_cell_apl = aurostd::string2utype<double>(tokens[1]);
+              else if (tokens[0] == "energy_zero_point_atom_apl")
+                data.energy_zero_point_atom_apl = aurostd::string2utype<double>(tokens[1]);
               else if (tokens[0] == "heat_capacity_Cv_cell_apl_300K")
                 data.heat_capacity_Cv_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
               else if (tokens[0] == "heat_capacity_Cv_atom_apl_300K")
@@ -6123,8 +6123,8 @@ namespace aflowlib {
         std::cout << MESSAGE << " entropy_vibrational_atom_apl_300K = " << ((data.entropy_vibrational_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.entropy_vibrational_atom_apl_300K):"unavailable") << std::endl;
         std::cout << MESSAGE << " energy_internal_vibrational_cell_apl_300K = " << ((data.energy_internal_vibrational_cell_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_internal_vibrational_cell_apl_300K):"unavailable") << std::endl;
         std::cout << MESSAGE << " energy_internal_vibrational_atom_apl_300K = " << ((data.energy_internal_vibrational_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_internal_vibrational_atom_apl_300K):"unavailable") << std::endl;
-        std::cout << MESSAGE << " energy_zero_point_cell_apl_300K = " << ((data.energy_zero_point_cell_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_zero_point_cell_apl_300K):"unavailable") << std::endl;
-        std::cout << MESSAGE << " energy_zero_point_atom_apl_300K = " << ((data.energy_zero_point_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_zero_point_atom_apl_300K):"unavailable") << std::endl;
+        std::cout << MESSAGE << " energy_zero_point_cell_apl = " << ((data.energy_zero_point_cell_apl!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_zero_point_cell_apl):"unavailable") << std::endl;
+        std::cout << MESSAGE << " energy_zero_point_atom_apl = " << ((data.energy_zero_point_atom_apl!=AUROSTD_NAN)?aurostd::utype2string<double>(data.energy_zero_point_atom_apl):"unavailable") << std::endl;
         std::cout << MESSAGE << " heat_capacity_Cv_cell_apl_300K = " << ((data.heat_capacity_Cv_cell_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.heat_capacity_Cv_cell_apl_300K):"unavailable") << std::endl;
         std::cout << MESSAGE << " heat_capacity_Cv_atom_apl_300K = " << ((data.heat_capacity_Cv_atom_apl_300K!=AUROSTD_NAN)?aurostd::utype2string<double>(data.heat_capacity_Cv_atom_apl_300K):"unavailable") << std::endl;
       }

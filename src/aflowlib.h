@@ -236,8 +236,8 @@ namespace aflowlib {
       double entropy_vibrational_atom_apl_300K;
       double energy_internal_vibrational_cell_apl_300K;
       double energy_internal_vibrational_atom_apl_300K;
-      double energy_zero_point_cell_apl_300K;
-      double energy_zero_point_atom_apl_300K;
+      double energy_zero_point_cell_apl;
+      double energy_zero_point_atom_apl;
       double heat_capacity_Cv_cell_apl_300K;
       double heat_capacity_Cv_atom_apl_300K;
       // QHA  //AS20200831

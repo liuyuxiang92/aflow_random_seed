@@ -175,7 +175,7 @@ Using the APL module with POCC requires a completed POCC run.
 5.1) Copy the aflow.in file for POCC into a new aflow.in file, e.g. aflow_apl.in. Inside this file,
 uncomment the line "[AFLOW_APL]CALC"
 
-5.2) Run aflow with the new aflow.in file. All subdirectories should now contain aflow_apl.in files.
+5.2) Run aflow with the new aflow.in file. All subdirectories should now contain an aflow_apl.in file.
 
 5.3) Run APL inside the POCC subdirectories. For more information on APL, see the APL README. Running
 the APL postprocessing step is not necessary.
