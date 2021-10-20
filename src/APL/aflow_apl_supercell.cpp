@@ -5,7 +5,6 @@
 // ***************************************************************************
 
 #include "aflow_apl.h"
-#include "../aflow_compare_structure.h"
 
 #define _SYM_ZERO_TOL_LOOSE_ 0.05
 
@@ -703,37 +702,6 @@ namespace apl {
     xstructure pcell;
     if (_pcStructure.iatoms_calculated) SYM::CalculateInequivalentAtoms(_pcStructure);
     LightCopy(_pcStructure, pcell);  // No need for symmetry
-
-    //std::cout << "orig:" << std::endl << _inStructure_original << std::endl;
-    //std::cout << "pcell:" << std::endl << pcell << std::endl;
-    //std::cout << "sc2pcMap: " << aurostd::joinWDelimiter(_sc2pcMap, " ") << std::endl;
-    //std::cout << "pc2scMap: " << aurostd::joinWDelimiter(_pc2scMap, " ") << std::endl;
-    //structure_mapping_info mapping_info = compare::initialize_misfit_struct();
-    //bool same_species = true;
-    //bool scale_volume = true;
-    //bool optimize_match = false;
-    //double misfit = 0.0;
-    //bool match = compare::aflowCompareStructure(pcell, _inStructure_original, same_species, scale_volume, optimize_match, misfit, mapping_info);
-    //std::cout << "match = " << match << std::endl;
-    //std::cout << "Rotation:" << std::endl;
-    //std::cout << mapping_info.rotation << std::endl;
-    //std::cout << "Basis transformation:" << std::endl;
-    //std::cout << mapping_info.basis_transformation << std::endl;
-    //std::cout << "atom_map: " << aurostd::joinWDelimiter(mapping_info.atom_map, " ") << std::endl;
-    //std::cout << "basis_map: " << aurostd::joinWDelimiter(mapping_info.basis_map, " ") << std::endl;
-    //std::cout << "misfit = " << misfit << std::endl;
-    //match = compare::aflowCompareStructure(_inStructure_original, pcell, false, true, false, misfit, mapping_info);
-
-    //std::cout << std::endl;
-    //std::cout << "match = " << match << std::endl;
-    //std::cout << "Rotation:" << std::endl;
-    //std::cout << mapping_info.rotation << std::endl;
-    //std::cout << "Basis transformation:" << std::endl;
-    //std::cout << mapping_info.basis_transformation << std::endl;
-    //std::cout << "atom_map: " << aurostd::joinWDelimiter(mapping_info.atom_map, " ") << std::endl;
-    //std::cout << "basis_map: " << aurostd::joinWDelimiter(mapping_info.basis_map, " ") << std::endl;
-    //std::cout << "misfit = " << misfit << std::endl;
-    //exit(0);
 
     // The original structure may be a rotated primitive cell. Transform the
     // primitive cell so that they overlap or else the mapping will not work
