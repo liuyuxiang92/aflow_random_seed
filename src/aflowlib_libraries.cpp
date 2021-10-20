@@ -6073,8 +6073,14 @@ namespace aflowlib {
     //ME20210927 - APL
     string aplout = POCC_FILE_PREFIX + POCC_APL_OUT_FILE;
     if (aurostd::EFileExist(directory_LIB + "/" + aplout)) {
+      // Link PHPOSCAR for plotting
+      for(uint iext=0;iext<XHOST.vext.size();iext++) {
+        if (aurostd::FileExist(directory_LIB + "/" + DEFAULT_APL_PHPOSCAR_FILE + XHOST.vext[iext])) {
+          aurostd::LinkFile(directory_LIB+ "/" + DEFAULT_APL_PHPOSCAR_FILE + XHOST.vext[iext], directory_RAW);
+          break;
+        }
+      }
       aflowlib::LIB2RAW_FileNeeded(directory_LIB, aplout, directory_RAW, aplout, vfile, MESSAGE);
-      aflowlib::LIB2RAW_FileNeeded(directory_LIB, DEFAULT_APL_PHPOSCAR_FILE, directory_RAW, DEFAULT_APL_PHPOSCAR_FILE, vfile, MESSAGE);
       if (AFLOWLIB_VERBOSE) std::cout << MESSAGE << " loading " << directory_RAW << "/" << aplout << std::endl;
       string lines = "";
       aurostd::ExtractToStringEXPLICIT(aurostd::efile2string(directory_RAW + "/" + aplout), lines, "[POCC_APL_RESULTS]START_TEMPERATURE=0300_K","[POCC_APL_RESULTS]STOP_TEMPERATURE=0300_K");

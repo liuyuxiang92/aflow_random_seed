@@ -1249,15 +1249,13 @@ namespace pocc {
     string soliloquy=XPID+"POccCalculator::plotAvgDOSCAR():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
-
     aurostd::xoption cmdline_opts, plot_opts;
-    cmdline_opts.push_attached("PLOT_DOS", directory);
     cmdline_opts.push_attached("PLOTTER::PRINT", "png");
-    plot_opts = plotter::getPlotOptionsEStructure(cmdline_opts, "PLOT_DOS");
-    plot_opts.push_attached("DIRECTORY",directory);
     //ME20210927 - use carstring to distingish between types of DOSCARs
     if(xdos.carstring == "POCC") {  //turn off for ME - POCC+APL
+      if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+      cmdline_opts.push_attached("PLOT_DOS", directory);
+      plot_opts = plotter::getPlotOptionsEStructure(cmdline_opts, "PLOT_DOS");
       plot_opts.push_attached("PROJECTION","ORBITALS");
       //plot_opts.push_attached("EXTENSION","dos_orbitals_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
       plot_opts.push_attached("EXTENSION","dos_orbitals_T"+(*this).getTemperatureString(temperature)+"K");
@@ -1283,9 +1281,11 @@ namespace pocc {
         }
       }
     } else if (xdos.carstring == "PHON") {
+      cmdline_opts.push_attached("PLOT_PHDOS", directory);
       plot_opts = plotter::getPlotOptionsPhonons(cmdline_opts, "PLOT_PHDOS");
-      plot_opts.push_attached("PROJECTION","ATOMS");
-      plot_opts.push_attached("EXTENSION","phdos_T"+getTemperatureString(xdos.temperature)+"K");
+      plot_opts.push_attached("PROJECTION", "ATOMS");
+      plot_opts.push_attached("EXTENSION", "phdos_T"+getTemperatureString(xdos.temperature)+"K");
+      plot_opts.flag("PLOT_ALL_ATOMS", true);
       plot_opts.pop_attached("XMIN");plot_opts.pop_attached("XMAX");
       plotter::PLOT_PHDOS(plot_opts, xdos);
     } else {
