@@ -845,7 +845,7 @@ namespace LATTICE {
                 volume_tmp_abs = abs(volume_tmp);
                 if(volume_tmp_abs > eps){ //NS+DX20211016 - use eps to determine if not singular (not volume_eps)
                   // do absolute value determinant here
-                  if(abs(abs(volume_tmp)-volume_orig) < volume_eps){
+                  if(abs(volume_tmp_abs-volume_orig) < volume_eps){ //DX20211024
                     tmp_lattice_orig = tmp_lattice; // save original lattice before swapping rows
                     // ---------------------------------------------------------------------------
                     // store positive determinant permutations
