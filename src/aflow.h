@@ -2902,6 +2902,7 @@ namespace AFLOW_PTHREADS {
 }
 // interfaces
 namespace KBIN {
+  void MoveRun2NewDirectory(_aflags& aflags, const string& subdirectory_orig, const string& subdirectory_new); //DX20210901
   void RUN_Directory_PTHREADS(_aflags &aflags);
   void *_threaded_interface_RUN_Directory(void *ptr);
 } // namespace KBIN

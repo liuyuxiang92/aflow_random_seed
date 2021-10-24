@@ -2637,7 +2637,7 @@ namespace aflowlib {
       double enthalpy_atom_ref=data.enthalpy_atom; // if there is 1 then there is only one
       string aus_gs_structure="";
       double aus_gs_atom=0.0,aus_volume_atom=0.0,aus_spin_atom=0.0;
-      for(uint i=0;i<(uint) data.nspecies;i++) {
+      for(i=0;i<(uint) data.nspecies;i++) {
         //      string pseudopotential,string type,vector<double> LDAU
         enthalpy_atom_ref=data.enthalpy_atom; // if there is 1 then there is only one
         aus_gs_structure="";
