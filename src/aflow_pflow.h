@@ -393,6 +393,10 @@ namespace pflow {
   vector<string> GENERATE_CERAMICS(const aurostd::xoption& vpflow); //CO20200731
   string GENERATE_CERAMICS_PRINT(const aurostd::xoption& vpflow); //CO20200731
   bool PSEUDOPOTENTIALS_CHECK(const aurostd::xoption& vpflow,const string& file,ostream& oss=cout); //SC20200330
+  void PYTHON_MODULES(const string& modules, ostream& oss=std::cout);  //ME20211103
+  void PYTHON_MODULES(const string& modules, ofstream& FileMESSAGE, ostream& oss=std::cout);  //ME20211103
+  void PYTHON_MODULES(const vector<string>& vmodules, ostream& oss=std::cout);  //ME20211103
+  void PYTHON_MODULES(const vector<string>& vmodules, ofstream& FileMESSAGE, ostream& oss=std::cout);  //ME20211103
   bool QMVASP(aurostd::xoption& vpflow);  //vector<string> argv); //CO20180703
   xstructure POSCAR(istream& input);
   xmatrix<double> QE_ibrav2lattice(const int& ibrav, const xvector<double>& parameters, const bool& isabc); //DX20180123 - added more robust QE reader

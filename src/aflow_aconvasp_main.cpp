@@ -1197,6 +1197,14 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("PSEUDOPOTENTIALS_CHECK::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
   }
 
+  //ME20211103
+  if (aurostd::args2flag(argv, cmds, "--python_modules|--create_python_modules")) {
+    vpflow.flag("PYTHON_MODULES", true);
+    vpflow.addattachedscheme("PYTHON_MODULES", "", true);
+  } else {
+    vpflow.args2addattachedscheme(argv,cmds,"PYTHON_MODULES", "--python_modules=|--create_python_modules=", "");
+  }
+
   // MOVE ON
   vpflow.flag("QE",aurostd::args2flag(argv,cmds,"--qe") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO"));
   vpflow.flag("ABCCAR",aurostd::args2flag(argv,cmds,"--abccar") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20190123 - moved ABCCAR to here
@@ -1968,6 +1976,7 @@ namespace pflow {
       if(vpflow.flag("PRIM2")) {cout << pflow::PRIM(cin,2); _PROGRAMRUN=true;}
       if(vpflow.flag("PRIM3")) {cout << pflow::PRIM(cin,3); _PROGRAMRUN=true;}
       if(vpflow.flag("PSEUDOPOTENTIALS_CHECK")) {pflow::PSEUDOPOTENTIALS_CHECK(vpflow,vpflow.getattachedscheme("PSEUDOPOTENTIALS_CHECK"),cout); _PROGRAMRUN=true;} 
+      if(vpflow.flag("PYTHON_MODULES")) {pflow::PYTHON_MODULES(vpflow.getattachedscheme("PYTHON_MODULES")); _PROGRAMRUN=true;}  //ME20211103
 
       // Q
       if(vpflow.flag("QE")) {cout << input2QExstr(cin); _PROGRAMRUN=true;}
@@ -2516,6 +2525,7 @@ namespace pflow {
     strstream << tab << x << " --primr|--fastprimitivecell|--fprim < POSCAR" << endl;
     strstream << tab << x << " --prototype < POSCAR" << endl;
     strstream << tab << x << " --pseudopotentials_check=[POTCAR|OUTCAR][""|.bz2|.gz|.xz] | --pp_check= | --ppk=" << endl;
+    strstream << tab << x << " --python_modules[=module1,module2] | --create_python_modules=[module1,module2] [-D directory]" << endl;
     strstream << tab << x << " --qe < POSCAR" << endl;
     strstream << tab << x << " --qmvasp [--static] [-D directory]" << endl;
     strstream << tab << x << " --rasmol[=n1[,n2[,n3]]] < POSCAR" << endl;
@@ -13242,6 +13252,91 @@ namespace pflow {
     return TRUE;
   }
 } // namespace pflow
+
+
+// ***************************************************************************
+// pflow::PYTHON_MODULES //ME20211103
+// ***************************************************************************
+
+namespace pflow {
+  void PYTHON_MODULES(const string& modules, ostream& oss) {
+    ofstream FileMESSAGE;
+    PYTHON_MODULES(modules, FileMESSAGE, oss);
+  }
+
+  void PYTHON_MODULES(const string& modules, ofstream& FileMESSAGE, ostream& oss) {
+    vector<string> vmodules;
+    aurostd::string2tokens(modules, vmodules, ",");
+    PYTHON_MODULES(vmodules, FileMESSAGE, oss);
+  }
+
+  void PYTHON_MODULES(const vector<string>& vmodules_in, ostream& oss) {
+    ofstream FileMESSAGE;
+    PYTHON_MODULES(vmodules_in, FileMESSAGE, oss);
+  }
+
+  void PYTHON_MODULES(const vector<string>& vmodules_in, ofstream& FileMESSAGE, ostream& oss) {
+    string function = "pflow::PYTHON_MODULES():";
+    string directory = XHOST.vflag_control.getattachedscheme("DIRECTORY");
+    if (directory.empty()) directory = ".";
+
+    vector<string> vavailable, vmodules, vskip;
+    string available = "aflow_cce,aflow_chull,aflow_chull_plotter,aflow_sym,aflow_xtal_finder";
+    aurostd::string2tokens(available, vavailable, ",");
+
+    // Get available modules first
+    if (vmodules_in.size() > 0) {
+      for (uint i = 0; i < vmodules_in.size(); i++) {
+        if (aurostd::WithinList(vavailable, vmodules_in[i])
+          || (vmodules_in[i] == "aflow_xtalfinder")) {  //Need to account for inconsistency between aflow command and publication
+          vmodules.push_back(vmodules_in[i]);
+        } else {
+          vskip.push_back(vmodules_in[i]);  // For the warning message
+        }
+      }
+    } else {
+      vmodules = vavailable;
+    }
+
+    stringstream message;
+    if (vskip.size() > 0) {
+      message << "Could not find modules " << aurostd::joinWDelimiter(vskip, ", ") << "."
+        << " Available modules: " << aurostd::joinWDelimiter(vavailable, ", ") << ".";
+      pflow::logger(_AFLOW_FILE_NAME_, function, message, directory, FileMESSAGE, oss, _LOGGER_WARNING_);
+    }
+    if (vmodules.size() > 0) {
+      // Dependencies
+      if (aurostd::WithinList(vmodules, "aflow_chull_plotter") && !aurostd::WithinList(vmodules, "aflow_chull")) vmodules.push_back("aflow_chull");
+      for (uint i = 0; i < vmodules.size(); i++) {
+        const string& mod = vmodules[i];
+        string moddir = aurostd::CleanFileName(directory + "/" + mod);
+        if (!aurostd::FileExist(moddir)) aurostd::DirectoryMake(moddir);
+        // Only include cpps here to avoid multiple definition errors
+        if (mod == "aflow_cce") {
+#include "aflow_cce_python.cpp"
+          aurostd::string2file(AFLOW_CCE_PYTHON_PY, moddir + "/__init__.py");
+        } else if (mod == "aflow_chull") {
+#include "aflow_chull_python.cpp"
+          aurostd::string2file(AFLOW_CHULL_PYTHON_PY, moddir + "/__init__.py");
+        } else if (mod == "aflow_chull_plotter") {
+#include "aflow_chull_jupyter_plotter.cpp"
+          aurostd::string2file(AFLOW_CHULL_JUPYTER_PLOTTER_PY, moddir + "/__init__.py");
+        } else if (mod == "aflow_sym") {
+#include "aflow_sym_python.cpp"
+          aurostd::string2file(AFLOW_SYM_PYTHON_PY, moddir + "/__init__.py");
+        } else if ((mod == "aflow_xtal_finder") || (mod == "aflow_xtalfinder")) {
+#include "aflow_xtalfinder_python.cpp"
+          aurostd::string2file(AFLOW_XTALFINDER_PYTHON_PY, moddir + "/__init__.py");
+        }
+      }
+      message << "Successfully installed modules " << aurostd::joinWDelimiter(vmodules, ", ") << ".";
+      pflow::logger(_AFLOW_FILE_NAME_, function, message, directory, FileMESSAGE, oss, _LOGGER_NOTICE_);
+    } else {
+      message << "No modules left to write.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
+    }
+  }
+}
 
 // ***************************************************************************
 // pflow::STATDIEL // CAMILO
