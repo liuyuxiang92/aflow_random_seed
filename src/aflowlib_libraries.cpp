@@ -45,7 +45,6 @@ bool AFLOWLIB_VERBOSE=TRUE; // FALSE;
 #define USE_AFLOW_SG
 //#define USE_PLATON_SG
 
-#define AFLOW_MAX_ARGV 1024
 #define AFLOW_CORE_TEMPERATURE_LIB2RAW 46.0
 
 #define RELAX_MAX 10  //CO20200829
@@ -6599,6 +6598,8 @@ namespace aflowlib {
     int answer=0;
     stringstream obb;
 
+    //[CO20211104 - debug MULTI_ZIP()]return true;
+
     // clean
     if(LDEBUG) cerr << soliloquy << " [1]: analyzing = " << dir << endl;
 
@@ -6913,49 +6914,88 @@ namespace aflowlib {
     deque<string> vdirsOUT,vzips,vcleans;
     XPLUG_CHECK_ONLY(argv,vdirsOUT,vzips,vcleans); //CO20200501
 
-    uint vzips_size=vzips.size();
-
-    if(vzips_size>0) {
+    if(vzips.size()>0) {
       if(aurostd::substring2bool(XHOST.hostname,"m7int0") || aurostd::substring2bool(XHOST.hostname,"m6int0")) XHOST.hostname="marylou";
       XHOST.hostname=aurostd::RemoveSubString(XHOST.hostname,".egr.duke.edu");
       XHOST.hostname=aurostd::RemoveSubString(XHOST.hostname,".mems.duke.edu");
       XHOST.hostname=aurostd::RemoveSubString(XHOST.hostname,".pratt.duke.edu");
       XHOST.hostname=aurostd::RemoveSubString(XHOST.hostname,".duke.edu");
-      vector<string> vcommands;
-      stringstream command;
-      uint i=0;
-      uint iwhile=0;  //SAFETY, maximum number of while loop iteration is vzips_size (1 zip command per vzips entry)
-      //CO20200825 - modifying the loop to check command LENGTH vs. number of arguments
-      while(i<vzips_size && iwhile<vzips_size){  //new loop for zip command, limit not the number of inputs, but the size of the overall command
-        command << "aflow --multi=zip " << (FLAG_DO_ADD?"--add ":"") << "--np=" << NUM_ZIP;
-        command << " --prefix=update_" << (PREFIX!=""?string(PREFIX+"_"):string(""));
-        //[CO20200501 - OBSOLETE]command << aurostd::get_date() <<  "-" << aurostd::get_hour() << aurostd::get_min() << aurostd::get_sec();
-        command << aurostd::get_datetime_formatted("",true,"-",""); //CO20200501 - no delim for date and time, include time, "-" between date and time
-        command << "_" << (iwhile++)+1 << "_" << XHOST.hostname;
-        command << " --size=" << NUM_SIZE << " --DIRECTORY ";
-        while(i<vzips_size){
-          command << " " << vzips[i++];
-          if(command.str().size()>=AFLOW_MAX_ARGV || i>=vzips_size){
-            cerr << command.str() << endl;
-            vcommands.push_back(command.str());aurostd::StringstreamClean(command);
-            break;
-          }
-        }
-      }
-      cerr << soliloquy << " last command=\"" << command.str() << "\"" << endl; //sanity check that we didn't leave anything out
-      //[CO20200825 - OBSOLETE]for(uint i=0;i<vzips_size;i+=aflow_max_argv) {
-      //[CO20200825 - OBSOLETE]  command << "aflow --multi=zip " << (FLAG_DO_ADD?"--add ":"") << "--np=" << NUM_ZIP;
-      //[CO20200825 - OBSOLETE]  command << " --prefix=update_" << (PREFIX!=""?string(PREFIX+"_"):string(""));
-      //[CO20200825 - OBSOLETE]  //[CO20200501 - OBSOLETE]command << aurostd::get_date() <<  "-" << aurostd::get_hour() << aurostd::get_min() << aurostd::get_sec();
-      //[CO20200825 - OBSOLETE]  command << aurostd::get_datetime_formatted("",true,"-",""); //CO20200501 - no delim for date and time, include time, "-" between date and time
-      //[CO20200825 - OBSOLETE]  command << "_" << i/aflow_max_argv+1 << "_" << XHOST.hostname;
-      //[CO20200825 - OBSOLETE]  command << " --size=" << NUM_SIZE << " --DIRECTORY ";
-      //[CO20200825 - OBSOLETE]  for(uint j=i;j<i+aflow_max_argv && j<vzips_size;j++) command << " " << vzips.at(j);
-      //[CO20200825 - OBSOLETE]  command << " " << endl << endl;
-      //[CO20200825 - OBSOLETE]}
-      //[CO20200825 - OBSOLETE]cerr << command.str() << endl;
-      //[CO20200825 - OBSOLETE]aurostd::execute(command);
-      aurostd::execute(vcommands);
+      
+      vector<string> argv_mzip;
+      argv_mzip.push_back("aflow"); //not necessary, safe
+      argv_mzip.push_back("--multi=zip"); //not necessary, safe
+      if(FLAG_DO_ADD){argv_mzip.push_back("--add");}
+      argv_mzip.push_back("--np="+aurostd::utype2string(NUM_ZIP));  //not necessary, safe
+      //prefix
+      string prefix="update";
+      if(!PREFIX.empty()){prefix+="_"+PREFIX;}
+      prefix+="_"+aurostd::get_datetime_formatted("",true,"-",""); //CO20200501 - no delim for date and time, include time, "-" between date and time
+      prefix+="_"+XHOST.hostname;
+      argv_mzip.push_back("--prefix="+prefix);
+      //
+      argv_mzip.push_back("--size="+aurostd::utype2string(NUM_SIZE));
+      argv_mzip.push_back("--DIRECTORY"); //not necessary, safe
+      argv_mzip.insert(argv_mzip.end(),vzips.begin(),vzips.end());  //not necessary, safe
+      //--DIRECTORY vzips is NOT necessary, as it gets pulled from VDIR (set below)
+
+      //(re)set XHOST flags
+      bool   XHOST_vflag_control_XPLUG_NUM_THREADS_flag_ORIG   = XHOST.vflag_control.flag("XPLUG_NUM_THREADS");
+      string XHOST_vflag_control_XPLUG_NUM_THREADS_scheme_ORIG = XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS");
+      bool   XHOST_vflag_control_VDIR_flag_ORIG   = XHOST.vflag_control.flag("VDIR");
+      string XHOST_vflag_control_VDIR_scheme_ORIG = XHOST.vflag_control.getattachedscheme("VDIR");
+
+      XHOST.vflag_control.flag("VDIR",true);
+      XHOST.vflag_control.push_attached("VDIR",aurostd::joinWDelimiter(vzips,","));
+
+      //run command
+      AFLOW_PTHREADS::MULTI_zip(argv_mzip);
+
+      //(re)set XHOST flags
+      XHOST.vflag_control.flag("XPLUG_NUM_THREADS",XHOST_vflag_control_XPLUG_NUM_THREADS_flag_ORIG);
+      XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",XHOST_vflag_control_XPLUG_NUM_THREADS_scheme_ORIG);
+      XHOST.vflag_control.flag("VDIR",XHOST_vflag_control_VDIR_flag_ORIG);
+      XHOST.vflag_control.push_attached("VDIR",XHOST_vflag_control_VDIR_scheme_ORIG);
+
+      //[CO20211104 - OBSOLETE]vector<string> vcommands;
+      //[CO20211104 - OBSOLETE]stringstream command;
+      //[CO20211104 - OBSOLETE]uint i=0;
+      //[CO20211104 - OBSOLETE]uint iwhile=0;  //SAFETY, maximum number of while loop iteration is vzips_size (1 zip command per vzips entry)
+      //[CO20211104 - OBSOLETE]//CO20200825 - modifying the loop to check command LENGTH vs. number of arguments
+      //[CO20211104 - OBSOLETE]string var_n_total_zips="VARNTOTALZIPS";  //CO20211103 - placeholder until we get total count
+      //[CO20211104 - OBSOLETE]while(i<vzips_size && iwhile<vzips_size){  //new loop for zip command, limit not the number of inputs, but the size of the overall command
+      //[CO20211104 - OBSOLETE]  command << "/home/aflow/src/AFLOW-dev/AFLOW-src_testing/src/aflow --multi=zip " << (FLAG_DO_ADD?"--add ":"") << "--np=" << NUM_ZIP;
+      //[CO20211104 - OBSOLETE]  command << " --prefix=update_" << (PREFIX!=""?string(PREFIX+"_"):string(""));
+      //[CO20211104 - OBSOLETE]  command << aurostd::get_datetime_formatted("",true,"-",""); //CO20200501 - no delim for date and time, include time, "-" between date and time
+      //[CO20211104 - OBSOLETE]  command << "_" << (iwhile++)+1 << "_of_" << var_n_total_zips;
+      //[CO20211104 - OBSOLETE]  command << "_" << XHOST.hostname;
+      //[CO20211104 - OBSOLETE]  command << " --size=" << NUM_SIZE << " --DIRECTORY ";
+      //[CO20211104 - OBSOLETE]  while(i<vzips_size){
+      //[CO20211104 - OBSOLETE]    command << " " << vzips[i++];
+      //[CO20211104 - OBSOLETE]    if(command.str().size()>=AFLOW_MAX_ARGV || i>=vzips_size){
+      //[CO20211104 - OBSOLETE]      vcommands.push_back(command.str());aurostd::StringstreamClean(command);
+      //[CO20211104 - OBSOLETE]      break;
+      //[CO20211104 - OBSOLETE]    }
+      //[CO20211104 - OBSOLETE]  }
+      //[CO20211104 - OBSOLETE]}
+      //[CO20211104 - OBSOLETE]uint vcommands_size=vcommands.size();
+      //[CO20211104 - OBSOLETE]for(i=0;i<vcommands_size;i++){
+      //[CO20211104 - OBSOLETE]  aurostd::StringSubst(vcommands[i],var_n_total_zips,aurostd::utype2string(vcommands_size)); //CO20211103 - replace placeholder with actual count
+      //[CO20211104 - OBSOLETE]  cerr << vcommands[i] << endl;
+      //[CO20211104 - OBSOLETE]}
+      //[CO20211104 - OBSOLETE]cerr << soliloquy << " last command=\"" << command.str() << "\"" << endl; //sanity check that we didn't leave anything out
+      //[CO20211104 - OBSOLETE]//[CO20200825 - OBSOLETE]for(uint i=0;i<vzips_size;i+=aflow_max_argv) {
+      //[CO20211104 - OBSOLETE]//[CO20200825 - OBSOLETE]  command << "aflow --multi=zip " << (FLAG_DO_ADD?"--add ":"") << "--np=" << NUM_ZIP;
+      //[CO20211104 - OBSOLETE]//[CO20200825 - OBSOLETE]  command << " --prefix=update_" << (PREFIX!=""?string(PREFIX+"_"):string(""));
+      //[CO20211104 - OBSOLETE]//[CO20200825 - OBSOLETE]  //[CO20200501 - OBSOLETE]command << aurostd::get_date() <<  "-" << aurostd::get_hour() << aurostd::get_min() << aurostd::get_sec();
+      //[CO20211104 - OBSOLETE]//[CO20200825 - OBSOLETE]  command << aurostd::get_datetime_formatted("",true,"-",""); //CO20200501 - no delim for date and time, include time, "-" between date and time
+      //[CO20211104 - OBSOLETE]//[CO20200825 - OBSOLETE]  command << "_" << i/aflow_max_argv+1 << "_" << XHOST.hostname;
+      //[CO20211104 - OBSOLETE]//[CO20200825 - OBSOLETE]  command << " --size=" << NUM_SIZE << " --DIRECTORY ";
+      //[CO20211104 - OBSOLETE]//[CO20200825 - OBSOLETE]  for(uint j=i;j<i+aflow_max_argv && j<vzips_size;j++) command << " " << vzips.at(j);
+      //[CO20211104 - OBSOLETE]//[CO20200825 - OBSOLETE]  command << " " << endl << endl;
+      //[CO20211104 - OBSOLETE]//[CO20200825 - OBSOLETE]}
+      //[CO20211104 - OBSOLETE]//[CO20200825 - OBSOLETE]cerr << command.str() << endl;
+      //[CO20211104 - OBSOLETE]//[CO20200825 - OBSOLETE]aurostd::execute(command);
+      //[CO20211104 - OBSOLETE]aurostd::execute(vcommands);
     }
 
     //if(vzips_size>0) {
