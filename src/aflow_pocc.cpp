@@ -1175,56 +1175,61 @@ namespace pocc {
     m_venergy_plasm.clear();m_veels_plasm.clear();m_vdielectric_real_plasm.clear();m_vdielectric_imag_plasm.clear();
     vector<double> _venergy,_veels,_vdielectric_real,_vdielectric_imag;
     vector<string> vlines,vtokens;
-    uint iline=0,i=0;
+    uint iline=0,ieps=0,i=0;
     unsigned long long int isupercell=0;
-    for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
-      isupercell=std::distance(l_supercell_sets.begin(),it);
-      if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/"+DEFAULT_AFLOW_PLASMONICS_OUT,eps_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,DEFAULT_AFLOW_PLASMONICS_OUT+" not found in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
-      message << "Processing "+DEFAULT_AFLOW_PLASMONICS_OUT+" of " << m_ARUN_directories[isupercell];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
-      aurostd::efile2vectorstring(eps_file,vlines);
-      vlines=aurostd::RemoveComments(vlines);
-      _venergy.clear();_veels.clear();_vdielectric_real.clear();_vdielectric_imag.clear();
-      for(iline=0;iline<vlines.size();iline++){
-        if(LDEBUG){cerr << soliloquy << " vlines[iline=" << iline << "]=\"" << vlines[iline] << "\"" << endl;}
-        aurostd::string2tokens(vlines[iline],vtokens," ");
-        if(LDEBUG){cerr << soliloquy << " vtokens=" << aurostd::joinWDelimiter(vtokens,"|") << endl;}
-        //there should be 5 columns
-        if(vtokens.size()!=5){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vcols!=5 (="+aurostd::utype2string(vtokens.size())+") in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
-        //The file has 5 columns:
-        //column1 = energy (eV)
-        //column2 = do not consider this
-        //column3 = EELS spectrum
-        //column4 = real part of dielectric function
-        //column5 = imaginary part of dielectric function
-        _venergy.push_back(aurostd::string2utype<double>(vtokens[0]));
-        _veels.push_back(aurostd::string2utype<double>(vtokens[2]));
-        _vdielectric_real.push_back(aurostd::string2utype<double>(vtokens[3]));
-        _vdielectric_imag.push_back(aurostd::string2utype<double>(vtokens[4]));
-      }
-      //check _venergy to std m_venergy_plasm
-      if(isupercell==0){
-        m_venergy_plasm.clear();
-        for(i=0;i<_venergy.size();i++){
-          m_venergy_plasm.push_back(_venergy[i]);
-          m_veels_plasm.push_back(0.0);
-          m_vdielectric_real_plasm.push_back(0.0);
-          m_vdielectric_imag_plasm.push_back(0.0);
+    for(ieps=0;ieps<m_veps_plasm.size();ieps++){
+      m_venergy_plasm.push_back(vector<double>(0));
+      m_veels_plasm.push_back(vector<double>(0));
+      m_vdielectric_real_plasm.push_back(vector<double>(0));
+      m_vdielectric_imag_plasm.push_back(vector<double>(0));
+      for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
+        isupercell=std::distance(l_supercell_sets.begin(),it);
+        if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/"+DEFAULT_AFLOW_PLASMONICS_FILE+"_"+m_veps_plasm[ieps]+"."+POCC_OUT_FILE,eps_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,DEFAULT_AFLOW_PLASMONICS_FILE+" not found in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
+        message << "Processing "+DEFAULT_AFLOW_PLASMONICS_FILE+"_"+m_veps_plasm[ieps]+"."+POCC_OUT_FILE+" of " << m_ARUN_directories[isupercell];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+        aurostd::efile2vectorstring(eps_file,vlines);
+        vlines=aurostd::RemoveComments(vlines);
+        _venergy.clear();_veels.clear();_vdielectric_real.clear();_vdielectric_imag.clear();
+        for(iline=0;iline<vlines.size();iline++){
+          if(LDEBUG){cerr << soliloquy << " vlines[iline=" << iline << "]=\"" << vlines[iline] << "\"" << endl;}
+          aurostd::string2tokens(vlines[iline],vtokens," ");
+          if(LDEBUG){cerr << soliloquy << " vtokens=" << aurostd::joinWDelimiter(vtokens,"|") << endl;}
+          //there should be 5 columns
+          if(vtokens.size()!=5){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vcols!=5 (="+aurostd::utype2string(vtokens.size())+") in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
+          //The file has 5 columns:
+          //column1 = energy (eV)
+          //column2 = do not consider this
+          //column3 = EELS spectrum
+          //column4 = real part of dielectric function
+          //column5 = imaginary part of dielectric function
+          _venergy.push_back(aurostd::string2utype<double>(vtokens[0]));
+          _veels.push_back(aurostd::string2utype<double>(vtokens[2]));
+          _vdielectric_real.push_back(aurostd::string2utype<double>(vtokens[3]));
+          _vdielectric_imag.push_back(aurostd::string2utype<double>(vtokens[4]));
         }
-      }
-      else{
-        if(m_venergy_plasm.size()!=_venergy.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_venergy_plasm.size()!=_venergy.size() for isupercell="+aurostd::utype2string(isupercell)+" in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
-        for(i=0;i<m_venergy_plasm.size();i++){
-          if(!aurostd::isequal(m_venergy_plasm[i],_venergy[i])){
-            cerr << soliloquy << " venergy: " << m_venergy_plasm[i] << " != " << _venergy[i] << endl;
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_venergy_plasm[i="+aurostd::utype2string(i)+"]!=_venergy[i] for isupercell="+aurostd::utype2string(isupercell)+" in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);
+        //check _venergy to std m_venergy_plasm
+        if(isupercell==0){
+          for(i=0;i<_venergy.size();i++){
+            m_venergy_plasm.back().push_back(_venergy[i]);
+            m_veels_plasm.back().push_back(0.0);
+            m_vdielectric_real_plasm.back().push_back(0.0);
+            m_vdielectric_imag_plasm.back().push_back(0.0);
           }
         }
-      }
-      //do averaging
-      for(i=0;i<m_venergy_plasm.size();i++){
-        m_veels_plasm[i]+=( (*it).m_probability*_veels[i] );
-        m_vdielectric_real_plasm[i]+=( (*it).m_probability*_vdielectric_real[i] );
-        m_vdielectric_imag_plasm[i]+=( (*it).m_probability*_vdielectric_imag[i] );
+        else{
+          if(m_venergy_plasm.back().size()!=_venergy.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_venergy_plasm.back().size()!=_venergy.size() for isupercell="+aurostd::utype2string(isupercell)+" in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
+          for(i=0;i<m_venergy_plasm.back().size();i++){
+            if(!aurostd::isequal(m_venergy_plasm.back()[i],_venergy[i])){
+              cerr << soliloquy << " venergy: " << m_venergy_plasm.back()[i] << " != " << _venergy[i] << endl;
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_venergy_plasm.back()[i="+aurostd::utype2string(i)+"]!=_venergy[i] for isupercell="+aurostd::utype2string(isupercell)+" in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);
+            }
+          }
+        }
+        //do averaging
+        for(i=0;i<m_venergy_plasm.back().size();i++){
+          m_veels_plasm.back()[i]+=( (*it).m_probability*_veels[i] );
+          m_vdielectric_real_plasm.back()[i]+=( (*it).m_probability*_vdielectric_real[i] );
+          m_vdielectric_imag_plasm.back()[i]+=( (*it).m_probability*_vdielectric_imag[i] );
+        }
       }
     }
   }
@@ -1282,15 +1287,56 @@ namespace pocc {
     string soliloquy=XPID+"POccCalculator::calculateSTATICProperties():";
 
     if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+    
+    vector<string> vfiles;
 
     bool found_all_eps_dat_files=true;
+    uint i=0;
+    string tmp_str="";
+    m_veps_plasm.clear();
     for(unsigned long long int isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_eps_dat_files==true;isupercell++){
-      if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/"+DEFAULT_AFLOW_PLASMONICS_OUT)){
-        if(LDEBUG){cerr << soliloquy << " "+DEFAULT_AFLOW_PLASMONICS_OUT+" not found in "+m_ARUN_directories[isupercell] << endl;}
-        found_all_eps_dat_files=false;
+      aurostd::DirectoryLS(m_aflags.Directory+"/"+m_ARUN_directories[isupercell],vfiles);
+      if(isupercell==0){
+        for(i=0;i<vfiles.size();i++){
+          if(vfiles[i].find(DEFAULT_AFLOW_PLASMONICS_FILE)!=string::npos){
+            //get eps and store it
+            tmp_str=vfiles[i];
+            aurostd::StringSubst(tmp_str,DEFAULT_AFLOW_PLASMONICS_FILE+"_",""); //remove DEFAULT_AFLOW_PLASMONICS_FILE+'_'
+            aurostd::StringSubst(tmp_str,DEFAULT_AFLOW_PLASMONICS_FILE,""); //remove DEFAULT_AFLOW_PLASMONICS_FILE
+            tmp_str=tmp_str.substr(0,tmp_str.find("_")); //remove everything after '_'
+            tmp_str=tmp_str.substr(0,tmp_str.find("."+POCC_OUT_FILE)); //remove everything after '.out'
+            tmp_str=tmp_str.substr(0,tmp_str.find(POCC_OUT_FILE)); //remove everything after 'out'
+            if(LDEBUG){cerr << soliloquy << " eps=" << tmp_str << endl;}
+            if(aurostd::isfloat(tmp_str)){m_veps_plasm.push_back(tmp_str);}
+          }
+        }
+      }else{
+        for(i=0;i<m_veps_plasm.size();i++){
+          if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/"+DEFAULT_AFLOW_PLASMONICS_FILE+"_"+m_veps_plasm[i]+"."+POCC_OUT_FILE)){
+            if(LDEBUG){cerr << soliloquy << " "+DEFAULT_AFLOW_PLASMONICS_FILE+"_"+m_veps_plasm[i]+"."+POCC_OUT_FILE+" not found in "+m_ARUN_directories[isupercell] << endl;}
+            found_all_eps_dat_files=false;
+          }
+        }
       }
     }
     if(!found_all_eps_dat_files){return;}
+
+    //sort m_veps_plasm, do manually as string sorting is different than double sorting
+    uint j=0;
+    double eps1=0.0,eps2=0.0;
+    for(i=0;i<m_veps_plasm.size();i++){
+      for(j=i;j<m_veps_plasm.size();j++){
+        eps1=aurostd::string2utype<double>(m_veps_plasm[i]);
+        eps2=aurostd::string2utype<double>(m_veps_plasm[j]);
+        if(eps2<eps1){
+          tmp_str=m_veps_plasm[i];
+          m_veps_plasm[i]=m_veps_plasm[j];
+          m_veps_plasm[j]=tmp_str;
+        }
+      }
+    }
+
+    if(LDEBUG){cerr << soliloquy << " m_veps_plasm=" << aurostd::joinWDelimiter(m_veps_plasm,",") << endl;}
 
     setAvgPlasmonicData(temperature);
   }
@@ -1449,25 +1495,27 @@ namespace pocc {
     if(Egap_net!=AUROSTD_MAX_DOUBLE) pocc_out_ss << "Egap_net=" << aurostd::utype2string(Egap_net,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV)" << endl;
     //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
     //PLASMONICS
-    if(m_venergy_plasm.size()!=0){
-      uint i=0,padding=25;
-      pocc_out_ss << POCC_AFLOWIN_tag << "START_PLASMONICS" << endl;
-      //header
-      pocc_out_ss << "#";
-      pocc_out_ss << aurostd::PaddedPRE("energy (eV)",padding) << " ";
-      pocc_out_ss << aurostd::PaddedPRE("EELS",padding) << " ";
-      pocc_out_ss << aurostd::PaddedPRE("Re(dielectric)",padding) << " ";
-      pocc_out_ss << aurostd::PaddedPRE("Im(dielectric)",padding) << " ";
-      pocc_out_ss << endl;
-      for(i=0;i<m_venergy_plasm.size();i++){
-        pocc_out_ss << " "; //spacing
-        pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_venergy_plasm[i],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
-        pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_veels_plasm[i],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
-        pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_vdielectric_real_plasm[i],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
-        pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_vdielectric_imag_plasm[i],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
+    for(uint ieps=0;ieps<m_veps_plasm.size();ieps++){
+      if(m_venergy_plasm[ieps].size()!=0){
+        uint i=0,padding=25;
+        pocc_out_ss << POCC_AFLOWIN_tag << "START_PLASMONICS_EPS_" << m_veps_plasm[ieps] << endl;
+        //header
+        pocc_out_ss << "#";
+        pocc_out_ss << aurostd::PaddedPRE("energy (eV)",padding) << " ";
+        pocc_out_ss << aurostd::PaddedPRE("EELS",padding) << " ";
+        pocc_out_ss << aurostd::PaddedPRE("Re(dielectric)",padding) << " ";
+        pocc_out_ss << aurostd::PaddedPRE("Im(dielectric)",padding) << " ";
         pocc_out_ss << endl;
+        for(i=0;i<m_venergy_plasm[ieps].size();i++){
+          pocc_out_ss << " "; //spacing
+          pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_venergy_plasm[ieps][i],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
+          pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_veels_plasm[ieps][i],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
+          pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_vdielectric_real_plasm[ieps][i],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
+          pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_vdielectric_imag_plasm[ieps][i],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
+          pocc_out_ss << endl;
+        }
+        pocc_out_ss << POCC_AFLOWIN_tag << "STOP_PLASMONICS_EPS_" << m_veps_plasm[ieps] << endl;
       }
-      pocc_out_ss << POCC_AFLOWIN_tag << "STOP_PLASMONICS" << endl;
     }
     pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=" << (*this).getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
@@ -2094,6 +2142,7 @@ namespace pocc {
     m_Egap.clear();
     m_Egap_DOS_net=AUROSTD_MAX_DOUBLE;
     m_Egap_net=AUROSTD_MAX_DOUBLE;
+    m_veps_plasm.clear();
     m_venergy_plasm.clear();
     m_veels_plasm.clear();
     m_vdielectric_real_plasm.clear();
@@ -2139,6 +2188,7 @@ namespace pocc {
     m_Egap.clear();for(uint ispin=0;ispin<b.m_Egap.size();ispin++){m_Egap.push_back(b.m_Egap[ispin]);}
     m_Egap_DOS_net=b.m_Egap_DOS_net;
     m_Egap_net=b.m_Egap_net;
+    m_veps_plasm.clear();for(uint i=0;i<b.m_veps_plasm.size();i++){m_veps_plasm.push_back(b.m_veps_plasm[i]);}
     m_venergy_plasm.clear();for(uint i=0;i<b.m_venergy_plasm.size();i++){m_venergy_plasm.push_back(b.m_venergy_plasm[i]);}
     m_veels_plasm.clear();for(uint i=0;i<b.m_veels_plasm.size();i++){m_veels_plasm.push_back(b.m_veels_plasm[i]);}
     m_vdielectric_real_plasm.clear();for(uint i=0;i<b.m_vdielectric_real_plasm.size();i++){m_vdielectric_real_plasm.push_back(b.m_vdielectric_real_plasm[i]);}
