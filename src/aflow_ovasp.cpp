@@ -4212,7 +4212,7 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
          aurostd::substring2bool(vcontent[iline],"vectors") &&
          aurostd::substring2bool(vcontent[iline],"reciprocal")){reading_lattice=true;ilattice=0;continue;}
       if(reading_lattice && ilattice<3){
-        cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;
+        if(LDEBUG){cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;}
         vtokens=GetCorrectPositions(vcontent[iline],6); //aurostd::string2tokens(vcontent[iline],vtokens," ");
         if(vtokens.size()!=6){ilattice=0;reading_lattice=false;}  //also contains reciprocal lattice components //ilattice==0 is an indicator that lattice was not read (correctly)
         xstr.lattice[xstr.lattice.lrows+ilattice][xstr.lattice.lcols+0]=aurostd::string2utype<double>(vtokens[0]);
@@ -4226,7 +4226,7 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
           reading_lattice=false;
         }
       }
-      if(aurostd::substring2bool(vcontent[iline],"POSITION") && aurostd::substring2bool(vcontent[iline],"TOTAL-FORCE")){reading_atoms=true;iatom=0;continue;}
+      if(aurostd::substring2bool(vcontent[iline],"POSITION") && aurostd::substring2bool(vcontent[iline],"TOTAL-FORCE")){reading_atoms=true;iatom=0;vatoms.clear();continue;}
       if(reading_atoms && iatom<natoms){
         if(LDEBUG){cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;}
         if(aurostd::substring2bool(vcontent[iline],"---------")){continue;}
@@ -4274,7 +4274,7 @@ void xOUTCAR::WriteMTPCFG(const string& outcar_path,stringstream& output_ss){  /
   string tab=" ";
 
   for(uint istr=0;istr<vxstr_ionic.size();istr++){
-    const xstructure a=vxstr_ionic[istr];
+    const xstructure& a=vxstr_ionic[istr];
     output_ss << "BEGIN_CFG" << endl;
     output_ss << tab << "Size" << endl;
     output_ss << tab << tab << a.atoms.size() << endl;
