@@ -1200,6 +1200,8 @@ class _atom { // simple class.. nothing fancy
     double partial_occupation_value;                       // partial occupation
     bool   partial_occupation_flag;                        // partial occupation
     int shell;                                             // neighbor shell number
+    // for xOUTCAR
+    xvector<double> forces;                                // forces from OUTCAR  //CO20211106
     // printing
     bool   verbose;                                        // verbose in printing
     bool   print_RHT;                                      // a printer for coord and name (general position)   //RHT
@@ -3376,7 +3378,10 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     double calculation_memory;                                    // for aflowlib_libraries.cpp - calculation_memory
     uint calculation_cores;                                       // for aflowlib_libraries.cpp - calculation_cores
     xstructure xstr;                                              // for GetBandGap()
-    vector<string> GetCorrectPositions(string line,uint expected_count);                //CO20170725 - vasp issues with lattice spacing (negative sign) 
+    vector<xstructure> vxstr_ionic;                               // for all ionic steps  //CO20211106
+    vector<double> venergy_ionic;                                 // for all ionic steps  //CO20211106
+    vector<xvector<double> > vstresses_ionic;                     // for all ionic steps  //CO20211106
+    vector<string> GetCorrectPositions(const string& line,uint expected_count);                //CO20170725 - vasp issues with lattice spacing (negative sign) 
     bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);          // get everything QUIET
     bool GetProperties(const string& stringIN,bool=TRUE);                      // get everything QUIET
     bool GetPropertiesFile(const string& fileIN,bool=TRUE);                    // get everything QUIET
@@ -3436,6 +3441,9 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     double         Egap_fit_net;
     vector<string> Egap_type;
     string         Egap_type_net;
+    //CO20211106 - IONIC STEPS DATA
+    bool GetIonicStepsData();   //CO20211106
+    void WriteMTPCFG(const string& outcar_path,stringstream& output_ss);   //CO20211106
     //[CO20200404 - OBSOLETE]string ERROR;
     //int number_bands,number_kpoints; //CO20171006 - camilo garbage
     //int ISPIN; // turn this into spin = 0 if ISPIN = 1 //CO20171006 - camilo garbage

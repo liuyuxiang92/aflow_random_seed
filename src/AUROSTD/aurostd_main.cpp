@@ -5401,6 +5401,10 @@ namespace aurostd {
     int index=-1;
     return WithinList(list, input, index, sorted);
   }
+  bool WithinList(const deque<string>& list,const string& input,bool sorted) { //CO20181010
+    int index=-1;
+    return WithinList(aurostd::deque2vector(list), input, index, sorted);
+  }
   bool WithinList(const vector<int>& list,int input,bool sorted) {  //CO20181010
     //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
     //return false;  OBSOLETE ME20190905
