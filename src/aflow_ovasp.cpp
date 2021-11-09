@@ -4164,7 +4164,7 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
     if(reading_ionic==false){
       if(aurostd::substring2bool(vcontent[iline],"ENERGIE")){
         reading_ionic=true;
-        xstr.clear();energy=AUROSTD_MAX_DOUBLE;stresses.resize(3);  //clear everything, set stresses to 3 as an indicator that it's not set
+        xstr.clear();vatoms.clear();energy=AUROSTD_MAX_DOUBLE;stresses.resize(3);  //clear everything, set stresses to 3 as an indicator that it's not set
         continue;
       }
     }else{
@@ -4210,7 +4210,7 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
       if(aurostd::substring2bool(vcontent[iline],"direct") && 
          aurostd::substring2bool(vcontent[iline],"lattice") &&
          aurostd::substring2bool(vcontent[iline],"vectors") &&
-         aurostd::substring2bool(vcontent[iline],"reciprocal")){reading_lattice=true;ilattice=0;continue;}
+         aurostd::substring2bool(vcontent[iline],"reciprocal")){reading_lattice=true;ilattice=0;xstr.clear();continue;}
       if(reading_lattice && ilattice<3){
         if(LDEBUG){cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;}
         vtokens=GetCorrectPositions(vcontent[iline],6); //aurostd::string2tokens(vcontent[iline],vtokens," ");
