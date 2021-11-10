@@ -754,6 +754,13 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   eentropy_atom=eentropy_cell/natoms;
   if(LDEBUG) cerr << soliloquy << " eentropy_cell=" << eentropy_cell << endl;
   // LOAD ENERGY DATA  // without energy of electrons
+  // CO20211109 - notes about which energy to pick
+  // we report the energy without entropy (0K energy).
+  // the sigma->0 is an extrapolation calculation.
+  // the only way to know the energy at sigma=0 is to do the calculation at
+  // 0, but then the system would not converge.
+  // it does not matter much which energy to pick: raw energy values of VASP are arbitrary.
+  // focus on delta energy (just be consistent).
   if(LDEBUG) cerr << soliloquy << " LOAD ENERGY DATA" << endl;
   line="";
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW - FROM THE BACK 
