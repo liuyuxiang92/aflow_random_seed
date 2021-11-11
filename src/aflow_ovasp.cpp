@@ -4171,7 +4171,11 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
     if(reading_ionic==false){
       if(aurostd::substring2bool(vcontent[iline],"ENERGIE")){
         reading_ionic=true;
-        xstr.clear();vatoms.clear();energy=AUROSTD_MAX_DOUBLE;stresses.resize(3);  //clear everything, set stresses to 3 as an indicator that it's not set
+        //clear everything, set stresses to 3 as an indicator that it's not set
+        xstr.clear();vatoms.clear();
+        ilattice=0;iatom=0;
+        energy=AUROSTD_MAX_DOUBLE;
+        stresses.resize(3);
         continue;
       }
     }else{
