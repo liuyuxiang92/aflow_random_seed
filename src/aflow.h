@@ -5144,7 +5144,7 @@ extern std::vector<xelement::xelement> velement;        // store starting from O
 #define _Y_CORR_THRESHOLD_STD_ 0.0
 #define _SELF_CORR_THRESHOLD_STD_ 0.95
 
-namespace aflowMachL {
+namespace aflowMachL {  //CO20211111
   void insertElementalProperties(const vector<string>& vproperties,const xelement::xelement& xel,vector<string>& vitems);
   void insertElementalPropertiesCoordCE(const vector<string>& vproperties,const xelement::xelement& xel,double M_X_bonds,double natoms_per_fu,vector<string>& vitems);
   void insertCrystalProperties(const string& structure_path,const string& anion,const vector<string>& vheaders,vector<string>& vitems,const string& e_props=_AFLOW_XELEMENT_PROPERTIES_ALL_);
@@ -5164,6 +5164,9 @@ namespace aflowMachL {
   void reduceFeatures(vector<vector<string> >& table,const string& yheader,const vector<uint>& vicol2skip,double var_threshold=_VAR_THRESHOLD_STD_,double ycorr_threshold=_Y_CORR_THRESHOLD_STD_,double selfcorr_threshold=_SELF_CORR_THRESHOLD_STD_);
   string reduceEProperties(double var_threshold=_VAR_THRESHOLD_STD_,double selfcorr_threshold=_SELF_CORR_THRESHOLD_STD_);
   void writeCoordCECSV();
+} // namespace aflowMachL
+namespace aflowMachL {  //CO20211111
+  void PrintMTPCFGAlloy(const aurostd::xoption& vpflow);  //CO20211111
 } // namespace aflowMachL
 //CO20201111 - END
 // ----------------------------------------------------------------------------
