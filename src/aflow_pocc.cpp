@@ -1172,23 +1172,24 @@ namespace pocc {
     setPOccStructureProbabilities(temperature); //done in calculateRELAXProperties() - repetita iuvant
     
     string eps_file="";
-    m_venergy_plasm.clear();m_veels_plasm.clear();m_vdielectric_real_plasm.clear();m_vdielectric_imag_plasm.clear();
-    vector<double> _venergy,_veels,_vdielectric_real,_vdielectric_imag;
+    m_venergy_plasm.clear();m_veels_plasm.clear();m_vdielectric_plasm.clear();
+    vector<double> _venergy,_veels;
+    vector<xcomplex<double> >_vdielectric;
+    xcomplex<double> xcomp_tmp;
     vector<string> vlines,vtokens;
     uint iline=0,ieps=0,i=0;
     unsigned long long int isupercell=0;
     for(ieps=0;ieps<m_veps_plasm.size();ieps++){
       m_venergy_plasm.push_back(vector<double>(0));
       m_veels_plasm.push_back(vector<double>(0));
-      m_vdielectric_real_plasm.push_back(vector<double>(0));
-      m_vdielectric_imag_plasm.push_back(vector<double>(0));
+      m_vdielectric_plasm.push_back(vector<xcomplex<double> >(0));
       for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
         isupercell=std::distance(l_supercell_sets.begin(),it);
         if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/"+DEFAULT_AFLOW_PLASMONICS_FILE+"_"+m_veps_plasm[ieps]+"."+POCC_OUT_FILE,eps_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,DEFAULT_AFLOW_PLASMONICS_FILE+" not found in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
         message << "Processing "+DEFAULT_AFLOW_PLASMONICS_FILE+"_"+m_veps_plasm[ieps]+"."+POCC_OUT_FILE+" of " << m_ARUN_directories[isupercell];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
         aurostd::efile2vectorstring(eps_file,vlines);
         vlines=aurostd::RemoveComments(vlines);
-        _venergy.clear();_veels.clear();_vdielectric_real.clear();_vdielectric_imag.clear();
+        _venergy.clear();_veels.clear();_vdielectric.clear();
         for(iline=0;iline<vlines.size();iline++){
           if(LDEBUG){cerr << soliloquy << " vlines[iline=" << iline << "]=\"" << vlines[iline] << "\"" << endl;}
           aurostd::string2tokens(vlines[iline],vtokens," ");
@@ -1203,16 +1204,17 @@ namespace pocc {
           //column5 = imaginary part of dielectric function
           _venergy.push_back(aurostd::string2utype<double>(vtokens[0]));
           _veels.push_back(aurostd::string2utype<double>(vtokens[2]));
-          _vdielectric_real.push_back(aurostd::string2utype<double>(vtokens[3]));
-          _vdielectric_imag.push_back(aurostd::string2utype<double>(vtokens[4]));
+          xcomp_tmp.re=aurostd::string2utype<double>(vtokens[3]);
+          xcomp_tmp.im=aurostd::string2utype<double>(vtokens[4]);
+          _vdielectric.push_back(xcomp_tmp);
         }
         //check _venergy to std m_venergy_plasm
         if(isupercell==0){
           for(i=0;i<_venergy.size();i++){
             m_venergy_plasm.back().push_back(_venergy[i]);
             m_veels_plasm.back().push_back(0.0);
-            m_vdielectric_real_plasm.back().push_back(0.0);
-            m_vdielectric_imag_plasm.back().push_back(0.0);
+            xcomp_tmp.re=0.0;xcomp_tmp.im=0.0;
+            m_vdielectric_plasm.back().push_back(xcomp_tmp);
           }
         }
         else{
@@ -1227,8 +1229,8 @@ namespace pocc {
         //do averaging
         for(i=0;i<m_venergy_plasm.back().size();i++){
           m_veels_plasm.back()[i]+=( (*it).m_probability*_veels[i] );
-          m_vdielectric_real_plasm.back()[i]+=( (*it).m_probability*_vdielectric_real[i] );
-          m_vdielectric_imag_plasm.back()[i]+=( (*it).m_probability*_vdielectric_imag[i] );
+          m_vdielectric_plasm.back()[i].re+=( (*it).m_probability*_vdielectric[i].re );
+          m_vdielectric_plasm.back()[i].im+=( (*it).m_probability*_vdielectric[i].im );
         }
       }
     }
@@ -1510,8 +1512,8 @@ namespace pocc {
           pocc_out_ss << " "; //spacing
           pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_venergy_plasm[ieps][i],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
           pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_veels_plasm[ieps][i],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
-          pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_vdielectric_real_plasm[ieps][i],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
-          pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_vdielectric_imag_plasm[ieps][i],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
+          pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_vdielectric_plasm[ieps][i].re,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
+          pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_vdielectric_plasm[ieps][i].im,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
           pocc_out_ss << endl;
         }
         pocc_out_ss << POCC_AFLOWIN_tag << "STOP_PLASMONICS_EPS_" << m_veps_plasm[ieps] << endl;
@@ -2145,8 +2147,7 @@ namespace pocc {
     m_veps_plasm.clear();
     m_venergy_plasm.clear();
     m_veels_plasm.clear();
-    m_vdielectric_real_plasm.clear();
-    m_vdielectric_imag_plasm.clear();
+    m_vdielectric_plasm.clear();
     enumerator_mode.clear();
 
     m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
@@ -2191,8 +2192,7 @@ namespace pocc {
     m_veps_plasm.clear();for(uint i=0;i<b.m_veps_plasm.size();i++){m_veps_plasm.push_back(b.m_veps_plasm[i]);}
     m_venergy_plasm.clear();for(uint i=0;i<b.m_venergy_plasm.size();i++){m_venergy_plasm.push_back(b.m_venergy_plasm[i]);}
     m_veels_plasm.clear();for(uint i=0;i<b.m_veels_plasm.size();i++){m_veels_plasm.push_back(b.m_veels_plasm[i]);}
-    m_vdielectric_real_plasm.clear();for(uint i=0;i<b.m_vdielectric_real_plasm.size();i++){m_vdielectric_real_plasm.push_back(b.m_vdielectric_real_plasm[i]);}
-    m_vdielectric_imag_plasm.clear();for(uint i=0;i<b.m_vdielectric_imag_plasm.size();i++){m_vdielectric_imag_plasm.push_back(b.m_vdielectric_imag_plasm[i]);}
+    m_vdielectric_plasm.clear();for(uint i=0;i<b.m_vdielectric_plasm.size();i++){m_vdielectric_plasm.push_back(b.m_vdielectric_plasm[i]);}
     enumerator_mode=b.enumerator_mode;
   }
 
