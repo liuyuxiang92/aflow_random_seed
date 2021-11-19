@@ -195,6 +195,12 @@ namespace aurostd {
   bool iszero(double x,double tolerance=(double)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO20191201
   bool iszero(long double x,long double tolerance=(long double)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO20191201
 
+  string dbl2frac(double a, bool sign_prefix=true); //DX20190724
+  double frac2dbl(const string& str); //DX20200313
+  void double2fraction(const double& input_double, int& numerator, int& denominator, double tol_diff=AUROSTD_IDENTITY_TOL, double tol_remainder=1e-2); //DX20210908
+  int getNumeratorContinuedFractions(int& p, const int& n, vector<int>& fraction_sequence); //DX20210908
+  int getDenominatorContinuedFractions(int& q, const int& n, vector<int>& fraction_sequence); //DX20210908
+
   template<class utype> utype fact(utype) __xprototype;
   template<class utype> utype factorial(utype) __xprototype;
   template<class utype> utype angle(utype,utype,utype,utype,utype,utype) __xprototype;

@@ -2651,7 +2651,6 @@ namespace KBIN {
                     // PROCEED
                     xvasp.NRELAXING++;
                     aus << 11111*xvasp.NRELAXING << "  RUN_DIELECTRIC_STATIC (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-                    kflags.KBIN_MPI_NCPUS_BUFFER=kflags.KBIN_MPI_NCPUS;
                     if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS") && kflags.KBIN_MPI_NCPUS==24) {
                       uint ncpus_before=kflags.KBIN_MPI_NCPUS;
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) kflags.KBIN_MPI_NCPUS=DUKE_MATERIALS_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5
@@ -2703,7 +2702,6 @@ namespace KBIN {
                     xvasp.aopts.flag("FLAG::WAVECAR_PRESERVED",TRUE); // WAVECAR.dielectric_static
                     bool qmwrite=TRUE;
                     KBIN::VASP_Backup(xvasp,qmwrite,string("dielectric_static"));
-                    //		kflags.KBIN_MPI_NCPUS=kflags.KBIN_MPI_NCPUS_BUFFER;
                   }
                   if(vflags.KBIN_VASP_RUN.flag("DIELECTRIC_DYNAMIC") && vflags.KBIN_VASP_RUN.flag("DIELECTRIC_STATIC")) {  // check for DIELECTRIC DYNAMIC
                     xvasp.NRELAXING++;
@@ -3098,21 +3096,23 @@ namespace KBIN {
     //[CO20210315 - does not work for big files]content_vasp_out=aurostd::toupper(content_vasp_out);  //put toupper to eliminate case-sensitivity 
 
     //do memory check
-    double memory_usage_percentage=0.0;
+    double usage_percentage_ram=0.0,usage_percentage_swap=0.0;
     bool approaching_oom=false;
-    if(aurostd::GetMemoryUsagePercentage(memory_usage_percentage)){approaching_oom=(memory_usage_percentage>=MEMORY_MAX_USAGE);}
+    if(aurostd::GetMemoryUsagePercentage(usage_percentage_ram,usage_percentage_swap)){approaching_oom=(usage_percentage_ram>=MEMORY_MAX_USAGE_RAM && usage_percentage_swap>=MEMORY_MAX_USAGE_SWAP);}
     if(approaching_oom){  //might be a quick memory spike, try again
       if(VERBOSE){
-        aus << "00000  MESSAGE memory used: " << aurostd::utype2string(memory_usage_percentage,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+        aus << "00000  MESSAGE ram memory used: " << aurostd::utype2string(usage_percentage_ram,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_RAM << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+        aus << "00000  MESSAGE swap memory used: " << aurostd::utype2string(usage_percentage_swap,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_SWAP << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aus << "00000  MESSAGE reading memory again after " << SECONDS_SLEEP_VASP_MONITOR << " second sleep" << endl;
         if(LDEBUG){cerr << aus.str();}
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       aurostd::Sleep(SECONDS_SLEEP_VASP_MONITOR);
-      if(aurostd::GetMemoryUsagePercentage(memory_usage_percentage)){approaching_oom=(memory_usage_percentage>=MEMORY_MAX_USAGE);}
+      if(aurostd::GetMemoryUsagePercentage(usage_percentage_ram,usage_percentage_swap)){approaching_oom=(usage_percentage_ram>=MEMORY_MAX_USAGE_RAM && usage_percentage_swap>=MEMORY_MAX_USAGE_SWAP);}
     }
     if(VERBOSE||approaching_oom){
-      aus << "00000  MESSAGE memory used: " << aurostd::utype2string(memory_usage_percentage,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      aus << "00000  MESSAGE ram memory used: " << aurostd::utype2string(usage_percentage_ram,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_RAM << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      aus << "00000  MESSAGE swap memory used: " << aurostd::utype2string(usage_percentage_swap,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_SWAP << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       if(LDEBUG){cerr << aus.str();}
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
