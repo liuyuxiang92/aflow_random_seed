@@ -1219,7 +1219,7 @@ namespace pocc {
           if(m_venergy_plasm.back().size()!=_venergy.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_venergy_plasm.back().size()!=_venergy.size() for isupercell="+aurostd::utype2string(isupercell)+" in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
           for(i=0;i<m_venergy_plasm.back().size();i++){
             if(!aurostd::isequal(m_venergy_plasm.back()[i],_venergy[i])){
-              cerr << soliloquy << " venergy: " << m_venergy_plasm.back()[i] << " != " << _venergy[i] << endl;
+              if(LDEBUG){cerr << soliloquy << " venergy: " << m_venergy_plasm.back()[i] << " != " << _venergy[i] << endl;}
               throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_venergy_plasm.back()[i="+aurostd::utype2string(i)+"]!=_venergy[i] for isupercell="+aurostd::utype2string(isupercell)+" in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);
             }
           }
