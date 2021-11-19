@@ -3343,7 +3343,7 @@ namespace KBIN {
     //
     scheme="MEMORY";
     found_warning=ReachedAccuracy2bool(scheme,xRequiresAccuracy,xmessage,vasp_still_running);
-    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,AFLOW_MEMORY_TAG,RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || ((1||XHOST.vflag_control.flag("KILL_VASP_OOM")) && approaching_oom)));
+    found_warning=(found_warning && (aurostd::substring_present_file_FAST(xvasp.Directory+"/"+DEFAULT_VASP_OUT,AFLOW_MEMORY_TAG,RemoveWS,case_insensitive,expect_near_end,grep_stop_condition) || (XHOST.vflag_control.flag("KILL_VASP_OOM") && approaching_oom)));
     xwarning.flag(scheme,found_warning);
     //
     //on qrats, we see this
