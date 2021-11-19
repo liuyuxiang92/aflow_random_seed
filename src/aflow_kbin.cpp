@@ -595,7 +595,9 @@ namespace KBIN {
       // aurostd::random_shuffle(vDirectory);
       // std::random_shuffle(vDirectory.begin(),vDirectory.end());
 
-      bool contcar_save=aurostd::args2flag(argv,"--contcar_save|--save_contcar");  //CO20210716
+      aurostd::xoption opts_clean;  //CO20210716
+      opts_clean.flag("SAVE_CONTCAR",aurostd::args2flag(argv,"--contcar_save|--save_contcar"));  //CO20210716 - saves contcar no matter what
+      opts_clean.flag("SAVE_CONTCAR_OUTCAR_COMPLETE",aurostd::args2flag(argv,"--contcar_save_outcar_complete|--save_contcar_outcar_complete"));  //CO20210716 - saves contcar only if outcar is complete
 
       for(uint idir=0;idir<vDirectory.size();idir++) {
         bool krun=TRUE;
@@ -621,7 +623,7 @@ namespace KBIN {
           //[CO20210716 - OBSOLETE]aurostd::StringSubst(aflags.Directory,"/OUTCAR","");  // so it is easier to search
           //[CO20210716 - OBSOLETE]aurostd::StringSubst(aflags.Directory,"/"+_AFLOWIN_,"");  // so it is easier to search
           //  cerr << aflags.Directory << endl;
-          KBIN::Clean(aflags,contcar_save);
+          KBIN::Clean(aflags,opts_clean);
           krun=FALSE;
         }
         // RUN
@@ -1488,14 +1490,16 @@ namespace KBIN {
 // KBIN::Clean
 // *******************************************************************************************
 namespace KBIN {
-  void Clean(const _aflags& aflags,bool contcar_save) {          // AFLOW_FUNCTION_IMPLEMENTATION
+  void Clean(const _aflags& aflags){aurostd::xoption opts_clean;return KBIN::Clean(aflags,opts_clean);}          // AFLOW_FUNCTION_IMPLEMENTATION
+  void Clean(const _aflags& aflags,const aurostd::xoption& opts_clean) {          // AFLOW_FUNCTION_IMPLEMENTATION  //CO20210901
     //    cerr << XPID << "KBIN::Clean: aflags.Directory=" << aflags.Directory << endl;
-    KBIN::Clean(aflags.Directory,contcar_save);
+    return KBIN::Clean(aflags.Directory,opts_clean);
   }
 }
 
 namespace KBIN {
-  void Clean(const string _directory,bool contcar_save) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  void Clean(const string _directory) {aurostd::xoption opts_clean;return KBIN::Clean(_directory,opts_clean);}        // AFLOW_FUNCTION_IMPLEMENTATION
+  void Clean(const string _directory,const aurostd::xoption& opts_clean) {        // AFLOW_FUNCTION_IMPLEMENTATION  //CO20210901
     string directory=_directory;
     //    cerr << XPID << "KBIN::Clean: directory=" << aflags.Directory << endl;
 
@@ -1546,7 +1550,18 @@ namespace KBIN {
           aurostd::FileExist(string(directory+"/ael_aflow.in")) ) { // normal ael_aflow.in
 
         //CO20210716 - save contcar
-        if(contcar_save){KBIN::VASP_CONTCAR_Save(directory);}
+        bool save_contcar=opts_clean.flag("SAVE_CONTCAR");
+        bool save_contcar_outcar_complete=opts_clean.flag("SAVE_CONTCAR_OUTCAR_COMPLETE");
+        if(save_contcar||save_contcar_outcar_complete){
+          bool outcar_complete=false;
+          if(save_contcar_outcar_complete){
+            _xvasp xvasp;xvasp.Directory=directory;
+            _aflags aflags;ofstream FileMESSAGE;
+            bool verbose=false;
+            outcar_complete=KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,verbose);
+          }
+          if(save_contcar||outcar_complete){KBIN::VASP_CONTCAR_Save(directory);}
+        }
 
         // CLEAN directory
         //DX+CO START

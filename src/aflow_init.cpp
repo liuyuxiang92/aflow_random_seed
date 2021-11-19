@@ -2178,7 +2178,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   int ncpus=0;
   nloop=0;
   string memory_string="";
-  double memory_usage_percentage=0;
+  double usage_percentage_ram=0.0,usage_percentage_swap=0.0;
 
   while((AFLOW_VASP_instance_running() || (nloop++)<NCOUNTS_WAIT_MONITOR) && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
     GetVASPBinaryFromLOCK(xvasp.Directory,vasp_bin,ncpus);
@@ -2229,16 +2229,16 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
     KBIN::VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,xmonitor,FileMESSAGE);
 
     //check memory again, it's possible it floated above the threshold only for a second
-    memory_usage_percentage=0.0;
+    usage_percentage_ram=0.0;usage_percentage_swap=0.0;
     if(0){  //do not turn off MEMORY because it fails GetMemory(), it's possible MEMORY was triggered for other reasons (e.g., FROZEN_CALC)
       if(xwarning.flag("MEMORY")){
         bool ignore_memory=false;
-        if(aurostd::GetMemoryUsagePercentage(memory_usage_percentage)==false){
+        if(aurostd::GetMemoryUsagePercentage(usage_percentage_ram,usage_percentage_swap)==false){
           message << "ignoring xwarning.flag(\"MEMORY\"), could not retrieve memory status";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
           ignore_memory=true;
         }else{
-          if(memory_usage_percentage<MEMORY_MAX_USAGE){
-            message << "ignoring xwarning.flag(\"MEMORY\"), memory usage dropped below threshold ("+aurostd::utype2string(memory_usage_percentage,2,FIXED_STREAM)+"% memory usage)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+          if(usage_percentage_ram<MEMORY_MAX_USAGE_RAM && usage_percentage_swap<MEMORY_MAX_USAGE_SWAP){
+            message << "ignoring xwarning.flag(\"MEMORY\"), memory usage dropped below threshold ("+aurostd::utype2string(usage_percentage_ram,2,FIXED_STREAM)+"% ram usage,"+aurostd::utype2string(usage_percentage_swap,2,FIXED_STREAM)+"% swap usage)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
             ignore_memory=true;
           }
         }
@@ -2289,8 +2289,8 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
           //so write out "AFLOW ERROR: AFLOW_MEMORY" so it gets caught in the --run instance
           if(xwarning.flag("MEMORY")){
             memory_string=" "+string(AFLOW_MEMORY_TAG); //pre-pending space to match formatting
-            if(aurostd::GetMemoryUsagePercentage(memory_usage_percentage)){
-              memory_string+=" ("+aurostd::utype2string(memory_usage_percentage,2,FIXED_STREAM)+"% memory usage)";  //CO20210315 - use fixed stream here, since we'll have two sig figs before decimal, and two after (99.99%)
+            if(aurostd::GetMemoryUsagePercentage(usage_percentage_ram,usage_percentage_swap)){
+              memory_string+=" ("+aurostd::utype2string(usage_percentage_ram,2,FIXED_STREAM)+"% ram usage,"+aurostd::utype2string(usage_percentage_swap,2,FIXED_STREAM)+"% swap usage)";  //CO20210315 - use fixed stream here, since we'll have two sig figs before decimal, and two after (99.99%)
             }
             memory_string+="\n";
             aurostd::string2file(memory_string,xvasp.Directory+"/"+DEFAULT_VASP_OUT,"APPEND");

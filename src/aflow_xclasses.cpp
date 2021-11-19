@@ -502,7 +502,7 @@ _kflags::_kflags() {
   KBIN_MPI                                         = FALSE;
   KBIN_MPI_NCPUS                                   = 0;
   KBIN_MPI_NCPUS_STRING                            = ""; //ME20181216
-  KBIN_MPI_NCPUS_BUFFER                            = 0;
+  KBIN_MPI_NCPUS_ORIG                              = 0; //CO20210804
   KBIN_MPI_START                                   = "";
   KBIN_MPI_STOP                                    = "";
   KBIN_MPI_COMMAND                                 = "";
@@ -613,7 +613,7 @@ void _kflags::copy(const _kflags& b) {
   KBIN_MPI                                         = b.KBIN_MPI;
   KBIN_MPI_NCPUS                                   = b.KBIN_MPI_NCPUS;
   KBIN_MPI_NCPUS_STRING                            = b.KBIN_MPI_NCPUS_STRING;	//ME20181216
-  KBIN_MPI_NCPUS_BUFFER                            = b.KBIN_MPI_NCPUS_BUFFER;
+  KBIN_MPI_NCPUS_ORIG                              = b.KBIN_MPI_NCPUS_ORIG; //CO20210804
   KBIN_MPI_START                                   = b.KBIN_MPI_START;
   KBIN_MPI_STOP                                    = b.KBIN_MPI_STOP;
   KBIN_MPI_COMMAND                                 = b.KBIN_MPI_COMMAND;

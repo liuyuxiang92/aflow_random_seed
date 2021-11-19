@@ -6901,6 +6901,34 @@ bool xstructure::GetStoich(void) { //CO20171025
   for(uint i=0;i<comp_each_type.size();i++){
     stoich_each_type.push_back( comp_each_type[i]/total_comp );
   }
+  //CO20210916 - round-off printing errors can be a big challenge here
+  //with PARTCAR showing: pocc=1, pocc=0.333, pocc=0.333, pocc=0.333 (LIB4/LIB/CNb_svTa_pvTi_sv:PAW_PBE/AB_cF8_225_a_b.AB:POCC_P0-1xA_P1-0.333xB-0.333xC-0.333xD)
+  //we get this:
+  //stoichiometry=0.50025013,0.16658329,0.16658329,0.16658329
+  //instead of this:
+  //stoichiometry=0.5,0.166666667,0.166666667,0.166666667
+  //the problem is NOT the partial_occupation_values, but the sum and division for stoich
+  //try to fix with aurostd::double2fraction()
+  if(partial_occupation_flag){
+    try{
+      bool LDEBUG=(FALSE || XHOST.DEBUG); 
+      string soliloquy="xstructure::GetStoich():";
+      total_comp=0.0;
+      int numerator=0,denominator=0;
+      double stoich=0.0;
+      deque<double> vstoich;
+      for(uint i=0;i<comp_each_type.size();i++){
+        aurostd::double2fraction(comp_each_type[i],numerator,denominator,partial_occupation_stoich_tol);  //need the right tolerance here
+        stoich=(double)numerator/(double)denominator;
+        total_comp+=stoich;
+        vstoich.push_back(stoich);
+      }
+      for(uint i=0;i<comp_each_type.size();i++){vstoich[i]/=total_comp;}
+      stoich_each_type=vstoich;
+      if(LDEBUG){cerr << soliloquy << " stoich_each_type=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(stoich_each_type),",") << endl;}
+    }
+    catch(aurostd::xerror& re){;} //do nothing
+  }
   return TRUE;
 }
 
@@ -18386,7 +18414,7 @@ void xstructure::qm_recycle(void) {
   qm_clear();
 }
 
-void xstructure::qm_load(string Directory,string suffix,int iomode) {
+void xstructure::qm_load(const string& Directory,const string& suffix,int iomode) {
   double data_natoms=double(atoms.size());
   if(iomode!=IOVASP_POSCAR) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","Only IOVASP_POSCAR is supported.",_FILE_WRONG_FORMAT_);};
   if(iomode==IOVASP_POSCAR) {
