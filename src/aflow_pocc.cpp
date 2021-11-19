@@ -4211,7 +4211,7 @@ namespace pocc {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG); 
     string soliloquy = XPID + "POccCalculator::getMapToPARTCAR():";
     string message = "";
-    if(isupercell > l_supercell_sets.size() - 1) {
+    if (isupercell > l_supercell_sets.size() - 1) {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, "Invalid supercell index.");
     }
 
@@ -4266,7 +4266,15 @@ namespace pocc {
     bool optimize_match = false;
     double misfit = 0.0;
     structure_mapping_info mapping_info = compare::initialize_misfit_struct();
-    if (!compare::aflowCompareStructure(xstr_in, xstr_derivative, same_species, scale_volume, optimize_match, misfit, mapping_info)) {
+    bool matched = false;
+    uint natoms_in = xstr_in.atoms.size();
+    uint natoms_derivative = xstr_derivative.atoms.size();
+    if (natoms_in < natoms_derivative) {
+      matched = compare::aflowCompareStructure(xstr_derivative, xstr_in, same_species, scale_volume, optimize_match, misfit, mapping_info);
+    } else {
+      matched = compare::aflowCompareStructure(xstr_in, xstr_derivative, same_species, scale_volume, optimize_match, misfit, mapping_info);
+    }
+    if (!matched) {
       message = "Could not map structure to derivative structure.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
     }
@@ -4281,15 +4289,26 @@ namespace pocc {
     // Luckily, structure comparison creates supercells in a predictable
     // way (0 0 1 1 2 2 instead of,  e.g. 0 1 2 0 1 2) so we can use the
     // ratio of atoms to map to the actual derivative structure.
-    uint ratio = xstr_in.atoms.size()/xstr_derivative.atoms.size();
-    if (ratio == 0) {
-      message = "Could not map structure to derivative structure. Derivative structure has more atoms";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
+    uint atom_ratio = 0;
+    vector<uint> map_to_derivative(natoms_in);
+    if (natoms_in < natoms_derivative) {
+      // NOT TESTED!
+      // If the input structure has fewer atoms, then we need to do a
+      // one-to-many map. It should not matter which equivalent atoms
+      // in the derivative structure it maps to.
+      atom_ratio = natoms_derivative/natoms_in;
+      int index = -1;
+      for (uint i = 0; i < natoms_in; i++) {
+        aurostd::WithinList(mapping_info.atom_map, i * atom_ratio, index);
+        map_to_derivative[i] = index;
+      }
+    } else {
+      atom_ratio = natoms_in/natoms_derivative;
+      for (uint i = 0; i < mapping_info.atom_map.size(); i++) {
+        map_to_derivative[i] = mapping_info.atom_map[i]/atom_ratio;
+      }
     }
-    vector<uint> map_to_derivative;
-    for (uint i = 0; i < mapping_info.atom_map.size(); i++) {
-      map_to_derivative.push_back(mapping_info.atom_map[i]/ratio);
-    }
+
     if (LDEBUG) std::cerr << "map_to_derivative = " << aurostd::joinWDelimiter(map_to_derivative, " ") << std::endl;
 
     // To get the map from the derivative structure to the PARTCAR, get the
