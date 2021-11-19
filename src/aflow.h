@@ -87,6 +87,8 @@ enum vector_reduction_type {   //CO20190629
 //[CO20190629 - obsolete with enum vector_reduction_type]#define _none_          'n'  //none
 //ME20190628 END
 
+#define _AFLOW_MAX_ARGV_ 1024 //CO20211104 - moved from aflowlib_libraries.cpp
+
 //MESSAGE defaults - CO20200502
 #define _AFLOW_MESSAGE_DEFAULTS_ "user,host,pid,time" //tid //CO20200624 - only depends on XHOST (not aflags)
 
@@ -2902,6 +2904,7 @@ namespace AFLOW_PTHREADS {
 }
 // interfaces
 namespace KBIN {
+  void MoveRun2NewDirectory(_aflags& aflags, const string& subdirectory_orig, const string& subdirectory_new); //DX20210901
   void RUN_Directory_PTHREADS(_aflags &aflags);
   void *_threaded_interface_RUN_Directory(void *ptr);
 } // namespace KBIN
@@ -2916,7 +2919,7 @@ namespace aurostd { // Multithreaded add on to aurostd
 namespace AFLOW_PTHREADS {
   bool MULTI_sh(vector<string> argv);
   bool MULTI_compress(string cmd,vector<string> argv);
-  bool MULTI_zip(vector<string> argv);
+  bool MULTI_zip(const vector<string>& argv); //CO20211104
   bool MULTI_bz2xz(vector<string> argv);bool MULTI_xz2bz2(vector<string> argv);
   bool MULTI_gz2xz(vector<string> argv);
 }
