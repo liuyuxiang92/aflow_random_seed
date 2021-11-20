@@ -1463,11 +1463,9 @@ namespace plotter {
     //ME20211015 - Only set directory when none is given
     string directory = xopt.getattachedscheme("DIRECTORY");
     if (directory.empty()) {
-      directory = ".";
+      directory = aurostd::getPWD();
       xopt.push_attached("DIRECTORY", directory);
     }
-
-    if (directory.empty()) directory = aurostd::getPWD();
 
     xstructure xstr = getStructureWithNames(xopt,FileMESSAGE,xdos.carstring,oss);
 
