@@ -1,10 +1,18 @@
 3.2.12 - 2021/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
-        -- patching populateXVASP() bug for BANDS_LATTICE and BANDS_GRID (CO)
-        -- patching xoption::options2entry() clear() issues (CO)
-        -- added plasmonics analysis in POCC (CO)
+        -- Added python module install functionality. (ME)
         -- added function to move aflow run to another directory (DX)
         -- added machine settings for machine004 (DX)
+        -- patching populateXVASP() bug for BANDS_LATTICE and BANDS_GRID (CO)
+        -- patching xoption::options2entry() clear() issues (CO)
+        -- added swap memory check to aurostd::GetMemory() and aurostd::GetMemoryUsagePercentage() (CO)
+        -- patched --qmvasp command (CO)
+        -- adding --contcar_save_outcar_complete to KBIN::Clean() (CO)
+        -- NBANDS equation typo patch, returning old NBANDS behavior (CO)
+        -- fixing some error="NBANDS" patches (CO)
+        -- patching GetStoich() bug with pocc structures (round-off printing errors) (CO)
+        -- adding KPOINTS=GAMMA_ODD to NELM patches (CO)
+        -- added plasmonics analysis in POCC (CO)
 3.2.11 - 2021/08/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.11.tar.xz
         -- added plotter options for QHA (AS)

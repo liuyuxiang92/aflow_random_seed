@@ -759,7 +759,7 @@ class _kflags {
     bool   KBIN_MPI;
     int    KBIN_MPI_NCPUS;
     string KBIN_MPI_NCPUS_STRING; //ME20181216
-    int    KBIN_MPI_NCPUS_BUFFER;
+    int    KBIN_MPI_NCPUS_ORIG; //CO20210804 - repurposing
     string KBIN_MPI_START;
     string KBIN_MPI_STOP;
     string KBIN_MPI_COMMAND;
@@ -1806,7 +1806,7 @@ class xstructure {
     // GEOMETRY ENERGETICS after the QM calculations              // --------------------------------------
     void qm_clear(void);                                          // QM create/clean all the vectors
     void qm_recycle(void);                                        // QM shift data from QM to GEOM
-    void qm_load(string directory,string suffix="",int=IOVASP_POSCAR);                    // QM results load from an ab-initio calculation
+    void qm_load(const string& directory,const string& suffix="",int=IOVASP_POSCAR);                    // QM results load from an ab-initio calculation
     bool qm_calculated;                                           // QM calculation
     double qm_scale;                                              // QM scale (always linear A)
     xmatrix<double> qm_lattice;                                   // QM LATTICE in REAL SPACE (meters)
@@ -2940,8 +2940,10 @@ namespace KBIN {
   void RUN_DirectoryScript(const _aflags& aflags,const string& script,const string& output);
   bool CompressDirectory(const _aflags& aflags,const _kflags& kflags);
   bool CompressDirectory(const _aflags& aflags);
-  void Clean(const _aflags& aflags,bool contcar_save=false);
-  void Clean(const string directory,bool contcar_save=false);
+  void Clean(const _aflags& aflags);
+  void Clean(const string directory);
+  void Clean(const _aflags& aflags,const aurostd::xoption& opts_clean);  //CO20210901
+  void Clean(const string directory,const aurostd::xoption& opts_clean); //CO20210901
   void XClean(string options);
   void GenerateAflowinFromVASPDirectory(_aflags& aflags);
   void StartStopCheck(const string &AflowIn,string str1,string str2,bool &flag,bool &flagS);
