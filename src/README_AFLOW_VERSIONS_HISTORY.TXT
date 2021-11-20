@@ -1,5 +1,6 @@
 3.2.12 - 2021/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
+        -- Added python module install functionality. (ME)
         -- Added POCC+APL workflow (ME)
         -- Added LIB2RAW for APL (ME)
         -- patching populateXVASP() bug for BANDS_LATTICE and BANDS_GRID (CO)
