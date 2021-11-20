@@ -1,7 +1,15 @@
 3.2.12 - 2021/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
+        -- Added python module install functionality. (ME)
         -- patching populateXVASP() bug for BANDS_LATTICE and BANDS_GRID (CO)
         -- patching xoption::options2entry() clear() issues (CO)
+        -- added swap memory check to aurostd::GetMemory() and aurostd::GetMemoryUsagePercentage() (CO)
+        -- patched --qmvasp command (CO)
+        -- adding --contcar_save_outcar_complete to KBIN::Clean() (CO)
+        -- NBANDS equation typo patch, returning old NBANDS behavior (CO)
+        -- fixing some error="NBANDS" patches (CO)
+        -- patching GetStoich() bug with pocc structures (round-off printing errors) (CO)
+        -- adding KPOINTS=GAMMA_ODD to NELM patches (CO)
         -- added function to move aflow run to another directory (DX)
         -- added machine settings for machine004 (DX)
 3.2.11 - 2021/08/02
