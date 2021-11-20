@@ -2943,6 +2943,13 @@ LATTICES = (the ones with "")
         --proto_icsd=ICSD_number.{ABC}[:speciesA*[:speciesB*]..[:volumeA*[:volumeB*].. | :volume]]"
         --proto_icsd=label_ICSD_number"
 
+  aflow --python_modules[=module1,module2] | --create_python_modules[=module1,module2] [-D directory]
+        Installs AFLOW python modules in the chosen directory.
+        Available modules: aflow_cce, aflow_chull, aflow_chull_plotter, aflow_sym, aflow_xtal_finder
+        --python_modules: A comma-separated list with the desired modules. Leave blank to install all.
+        --create_python_modules: alias for --python_modules
+        -D: directory in which to install the python modules. Default: ./
+
   aflow --qe                                                                       
         Transforms the POSCAR (or whicever is the input file format) to a              
         QUANTUM ESPRESSO GEOM format.                                                  
