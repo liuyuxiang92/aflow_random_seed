@@ -6261,6 +6261,7 @@ namespace KBIN {
     else if(fix.find("NBANDS+")!=string::npos||fix.find("NBANDS-")!=string::npos){apply_once=false;}
     else if(fix=="NBANDS"){apply_once=false;}
     else if(fix=="POTIM"){apply_once=false;}
+    else if(fix=="RECYCLE_CONTCAR"){apply_once=false;}
     //add others here
     if(apply_once==true && xfixed.flag(fix)){
       if(VERBOSE){aus << "MMMMM  MESSAGE ignoring FIX=\"" << fix << "\"" << ": already applied" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
@@ -6609,7 +6610,24 @@ namespace KBIN {
         param_int=kflags.KBIN_MPI_NCPUS/2;
         if(param_int<1){Krun=false;}
       }
-      if(Krun){kflags.KBIN_MPI_NCPUS=param_int;}
+      if(Krun){
+        kflags.KBIN_MPI_NCPUS_ORIG=kflags.KBIN_MPI_NCPUS;
+        kflags.KBIN_MPI_NCPUS=param_int;
+      }
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\" kflags.KBIN_MPI_NCPUS(post)=" << kflags.KBIN_MPI_NCPUS << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    }
+    else if(fix=="NCPUS_RESTORE") {
+      if(Krun && VERBOSE){aus << "MMMMM  MESSAGE attempting FIX=\"" << fix << "\" kflags.KBIN_MPI_NCPUS(pre)=" << kflags.KBIN_MPI_NCPUS << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      //do not check for KBIN_MPI, since --monitor_vasp is running separate binary
+      //we are coming from an MPI error, so we know this is running with NCPUS>1
+      if(Krun){
+        param_int=kflags.KBIN_MPI_NCPUS_ORIG;
+        if(param_int<1){Krun=false;}
+      }
+      if(Krun){
+        //[original is only set in "NCPUS"]kflags.KBIN_MPI_NCPUS_ORIG=kflags.KBIN_MPI_NCPUS;
+        kflags.KBIN_MPI_NCPUS=param_int;
+      }
       if(Krun && VERBOSE){aus << "MMMMM  MESSAGE applied FIX=\"" << fix << "\" kflags.KBIN_MPI_NCPUS(post)=" << kflags.KBIN_MPI_NCPUS << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     }
     else if(fix=="NELM") {
@@ -7169,15 +7187,18 @@ namespace KBIN {
         Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
         bool Krun2=true;fix="NCPUS";
-        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
+        bool ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+        if(ignorefix2){Krun2=false;}
         Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
         bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun3=false;}
-        Krun3=(Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        Krun3=((Krun1||Krun2) && Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));  //only run if (Krun1||Krun2)
 
         Krun=(Krun1||Krun2||Krun3);
-        //no need to remove these settings if it fails
+        if(!Krun){  //remove fixes before going to next submode
+          if(!ignorefix2){fix="NCPUS_RESTORE";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);xfixed.flag(fix,false);}
+        }
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       if(submode==1){ //lower NBANDS, try before lowering k-points
@@ -7191,7 +7212,7 @@ namespace KBIN {
 
         bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun3=false;}
-        Krun3=(Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        Krun3=((Krun1||Krun2) && Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));  //only run if (Krun1||Krun2)
 
         Krun=(Krun1||Krun2||Krun3);
         //no need to remove these settings if it fails
@@ -7208,7 +7229,7 @@ namespace KBIN {
 
         bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun3=false;}
-        Krun3=(Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        Krun3=((Krun1||Krun2) && Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));  //only run if (Krun1||Krun2)
 
         Krun=(Krun1||Krun2||Krun3);
         //no need to remove these settings if it fails
@@ -7248,11 +7269,14 @@ namespace KBIN {
         Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
         bool Krun2=true;fix="NCPUS";
-        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
+        bool ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+        if(ignorefix2){Krun2=false;}
         Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
         Krun=(Krun1||Krun2);
-        //no need to remove these settings if it fails
+        if(!Krun){  //remove fixes before going to next submode
+          if(!ignorefix2){fix="NCPUS_RESTORE";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);xfixed.flag(fix,false);}
+        }
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
       //this might be a memory issue, might not be
@@ -7268,6 +7292,7 @@ namespace KBIN {
     else if(mode=="NBANDS") {
       fix="NBANDS++";
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+      if(Krun){xfixed.flag("NBANDS_EXHAUSTED",false);}  //if the NBANDS error comes up, the ONLY solution is to increase NBANDS //let it continue resetting "NBANDS_EXHAUSTED", no problem... //remember, there are other reasons for fix=="NBANDS++"
       Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
     }
     else if(mode=="NELM") { //CSLOSHING solutions should be tried first
@@ -7308,13 +7333,19 @@ namespace KBIN {
         }
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==2){ //desperate attempt, increase NELM
+      if(submode==2){ //desperate attempt, increase NELM  //CO20211017 - do BEFORE you increase KPOINTS (KPOINTS=GAMMA_ODD), as the longer run will be more expensive with more KPOINTS
         fix="NELM";
         if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
         Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode==3){ //desperate attempt 2, also increase EDIFF, sometimes the threshold is just a bit too high
+      if(submode==3){ //Gamma-odd (might increase ki) //CO20211017 - worked for Cr_pvHf_pvMo_pvNV_svZr_sv:PAW_PBE/AB_cF8_225_a_b.AB:POCC_P0-1xD_P1-0.2xA-0.2xB-0.2xC-0.2xE-0.2xF/ARUN.POCC_05_H0C4
+        fix="KPOINTS=GAMMA_ODD";
+        if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun=false;}
+        Krun=(Krun && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+        if(!Krun){Krun=true;submode++;} //reset and go to the next solution
+      }
+      if(submode==4){ //desperate attempt 2, also increase EDIFF, sometimes the threshold is just a bit too high
         bool Krun1=true;fix="NELM";
         bool ignorefix1=XVASP_Afix_IgnoreFix(fix,vflags);
         if(ignorefix1){Krun1=false;}
@@ -7329,7 +7360,7 @@ namespace KBIN {
         //no need to remove these settings if it fails
         if(!Krun){Krun=true;submode++;} //reset and go to the next solution
       }
-      if(submode>=4){Krun=false;}
+      if(submode>=5){Krun=false;}
       submode+=submode_increment;submode_increment=1;  //increment and reset
     }
     else if(mode=="NKXYZ_IKPTD") {
@@ -7474,14 +7505,18 @@ namespace KBIN {
       Krun1=(Krun1 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
       bool Krun2=true;fix="NCPUS";
-      if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun2=false;}
+      bool ignorefix2=XVASP_Afix_IgnoreFix(fix,vflags);
+      if(ignorefix2){Krun2=false;}
       Krun2=(Krun2 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
 
       bool Krun3=true;fix="RECYCLE_CONTCAR";  //recycle contcar if possible
       if(XVASP_Afix_IgnoreFix(fix,vflags)){Krun3=false;}
-      Krun3=(Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));
+      Krun3=((Krun1||Krun2) && Krun3 && XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE));  //only run if (Krun1||Krun2)
 
       Krun=(Krun1||Krun2||Krun3);
+      if(!Krun){  //remove fixes before going to next submode
+        if(!ignorefix2){fix="NCPUS_RESTORE";XVASP_Afix_ApplyFix(fix,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE);xfixed.flag(fix,false);}
+      }
     }
     else if(mode=="ZBRENT") { //other RMM-DIIS patches will follow
       //https://www.vasp.at/forum/viewtopic.php?t=1856
@@ -7539,6 +7574,7 @@ namespace KBIN {
     else if(mode=="MPICH11") {try_last_ditch_effort=false;} //changing POSCAR doesn't help
     else if(mode=="MPICH139") {try_last_ditch_effort=false;} //changing POSCAR doesn't help
     else if(mode=="MPICH174") {try_last_ditch_effort=false;} //changing POSCAR doesn't help
+    else if(mode=="NBANDS") {try_last_ditch_effort=false;} //changing POSCAR doesn't help
 
     if(Krun==false && try_last_ditch_effort){
       //last-ditch effort, increase volume
@@ -7556,6 +7592,7 @@ namespace KBIN {
     else if(mode=="MPICH139") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
     else if(mode=="MPICH174") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
     else if(mode=="NATOMS") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    else if(mode=="NBANDS") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
 
     if(Krun==false && try_last_ditch_effort){
       //last-ditch effort, increase KPOINTS
@@ -7573,6 +7610,7 @@ namespace KBIN {
     else if(mode=="MPICH139") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
     else if(mode=="MPICH174") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
     else if(mode=="NATOMS") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
+    else if(mode=="NBANDS") {try_last_ditch_effort=false;} //changing KPOINTS doesn't help
 
     if(Krun==false && try_last_ditch_effort){
       //last-ditch effort, increase KPOINTS

@@ -904,8 +904,10 @@
 #define         SECONDS_STALE_OUTCAR                          XHOST.adefault.getattachedutype<double>("SECONDS_STALE_OUTCAR") 
 #define AFLOWRC_BYTES_MAX_VASP_OUT                            20000000000    // bytes
 #define         BYTES_MAX_VASP_OUT                            XHOST.adefault.getattachedutype<unsigned long long int>("BYTES_MAX_VASP_OUT") 
-#define AFLOWRC_MEMORY_MAX_USAGE                              98    // percent
-#define         MEMORY_MAX_USAGE                              XHOST.adefault.getattachedutype<double>("MEMORY_MAX_USAGE") 
+#define AFLOWRC_MEMORY_MAX_USAGE_RAM                          98    // percent
+#define         MEMORY_MAX_USAGE_RAM                          XHOST.adefault.getattachedutype<double>("MEMORY_MAX_USAGE_RAM") 
+#define AFLOWRC_MEMORY_MAX_USAGE_SWAP                         45    // percent  //shouldn't go above 50, sometimes it ramps up quickly, so set to 45 to be safe
+#define         MEMORY_MAX_USAGE_SWAP                         XHOST.adefault.getattachedutype<double>("MEMORY_MAX_USAGE_SWAP") 
 #define AFLOWRC_FILE_VASP_MONITOR                             string("monitor_vasp")
 #define         FILE_VASP_MONITOR                             XHOST.adefault.getattachedscheme("FILE_VASP_MONITOR")
 #define AFLOWRC_INTEL_COMPILER_PATHS                          string("/opt/intel/bin/compilervars.sh,/opt/intel/bin/compilervars.csh,/app/intel/parallel_studio_xe_2020_update1/bin/compilervars.sh")
@@ -1695,7 +1697,8 @@ namespace aflowrc {
     aflowrc::load_default("SECONDS_SLEEP_VASP_MONITOR",AFLOWRC_SECONDS_SLEEP_VASP_MONITOR); //CO20201111
     aflowrc::load_default("SECONDS_STALE_OUTCAR",AFLOWRC_SECONDS_STALE_OUTCAR); //CO20201111
     aflowrc::load_default("BYTES_MAX_VASP_OUT",AFLOWRC_BYTES_MAX_VASP_OUT); //CO20201111
-    aflowrc::load_default("MEMORY_MAX_USAGE",AFLOWRC_MEMORY_MAX_USAGE); //CO20201111
+    aflowrc::load_default("MEMORY_MAX_USAGE_RAM",AFLOWRC_MEMORY_MAX_USAGE_RAM); //CO20201111
+    aflowrc::load_default("MEMORY_MAX_USAGE_SWAP",AFLOWRC_MEMORY_MAX_USAGE_SWAP); //CO20201111
     aflowrc::load_default("FILE_VASP_MONITOR",AFLOWRC_FILE_VASP_MONITOR); //CO20201111
     aflowrc::load_default("INTEL_COMPILER_PATHS",AFLOWRC_INTEL_COMPILER_PATHS); //CO20201111
 
@@ -2318,7 +2321,8 @@ namespace aflowrc {
     aflowrc << "SECONDS_SLEEP_VASP_MONITOR=" << AFLOWRC_SECONDS_SLEEP_VASP_MONITOR << " // seconds"   << endl;  //CO20201111
     aflowrc << "SECONDS_STALE_OUTCAR=" << AFLOWRC_SECONDS_STALE_OUTCAR << " // seconds"   << endl;  //CO20201111
     aflowrc << "BYTES_MAX_VASP_OUT=" << AFLOWRC_BYTES_MAX_VASP_OUT << " // bytes"   << endl;  //CO20201111
-    aflowrc << "MEMORY_MAX_USAGE=" << AFLOWRC_MEMORY_MAX_USAGE << " // bytes"   << endl;  //CO20201111
+    aflowrc << "MEMORY_MAX_USAGE_RAM=" << AFLOWRC_MEMORY_MAX_USAGE_RAM << " // bytes"   << endl;  //CO20201111
+    aflowrc << "MEMORY_MAX_USAGE_SWAP=" << AFLOWRC_MEMORY_MAX_USAGE_SWAP << " // bytes"   << endl;  //CO20201111
     aflowrc << "FILE_VASP_MONITOR=" << AFLOWRC_FILE_VASP_MONITOR << " // monitor file postfix"   << endl;  //CO20201111
     aflowrc << "INTEL_COMPILER_PATHS=" << AFLOWRC_INTEL_COMPILER_PATHS << " // comma-separated paths to search (for sourcing)"   << endl;  //CO20201111
 
@@ -2908,7 +2912,8 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"SECONDS_SLEEP_VASP_MONITOR\")=" << SECONDS_SLEEP_VASP_MONITOR << endl; //CO20201111
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"SECONDS_STALE_OUTCAR\")=" << SECONDS_STALE_OUTCAR << endl; //CO20201111
     if(LDEBUG) oss << "XHOST.adefault.getattachedutype<unsigned long long int>(\"BYTES_MAX_VASP_OUT\")=" << BYTES_MAX_VASP_OUT << endl; //CO20201111
-    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"MEMORY_MAX_USAGE\")=" << MEMORY_MAX_USAGE << endl; //CO20201111
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"MEMORY_MAX_USAGE_RAM\")=" << MEMORY_MAX_USAGE_RAM << endl; //CO20201111
+    if(LDEBUG) oss << "XHOST.adefault.getattachedutype<double>(\"MEMORY_MAX_USAGE_SWAP\")=" << MEMORY_MAX_USAGE_SWAP << endl; //CO20201111
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"FILE_VASP_MONITOR\")=" << FILE_VASP_MONITOR << endl; //CO20201111
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"INTEL_COMPILER_PATHS\")=" << INTEL_COMPILER_PATHS << endl; //CO20201111
 
