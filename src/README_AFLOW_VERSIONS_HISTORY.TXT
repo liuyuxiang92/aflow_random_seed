@@ -3,6 +3,11 @@
         -- Added python module install functionality. (ME)
         -- Added POCC+APL workflow (ME)
         -- Added LIB2RAW for APL (ME)
+        -- added function to move aflow run to another directory (DX)
+        -- added machine settings for machine004 (DX)
+        -- added function to move aflow run to another directory (DX)
+        -- added machine settings for machine004 (DX)
+        -- fixed gcc warning (version 4) in SYMBOLICCPLUSPLUS/ (DX)
         -- patching populateXVASP() bug for BANDS_LATTICE and BANDS_GRID (CO)
         -- patching xoption::options2entry() clear() issues (CO)
         -- added swap memory check to aurostd::GetMemory() and aurostd::GetMemoryUsagePercentage() (CO)
@@ -12,9 +17,7 @@
         -- fixing some error="NBANDS" patches (CO)
         -- patching GetStoich() bug with pocc structures (round-off printing errors) (CO)
         -- adding KPOINTS=GAMMA_ODD to NELM patches (CO)
-        -- added function to move aflow run to another directory (DX)
-        -- added machine settings for machine004 (DX)
-        -- fixed gcc warning (version 4) in SYMBOLICCPLUSPLUS/ (DX)
+        -- added plasmonics analysis in POCC (CO)
 3.2.11 - 2021/08/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.11.tar.xz
         -- added plotter options for QHA (AS)

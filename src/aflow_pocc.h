@@ -540,6 +540,12 @@ namespace pocc {
       xDOSCAR m_xdoscar;
       vector<double> m_Egap_DOS,m_Egap;
       double m_Egap_DOS_net,m_Egap_net;
+      vector<string> m_vfilenames_plasm;  //plasmonics
+      vector<string> m_veps_plasm; //plasmonics
+      vector<xPLASMONICS> m_vxplasm;  //plasmonics
+      //vector<vector<double> > m_venergy_plasm; //plasmonics
+      //vector<vector<double> > m_veels_plasm;   //plasmonics
+      //vector<vector<xcomplex<double> > > m_vdielectric_plasm;  //plasmonics  //contains both real and imaginary parts
 
       //initializers
       bool initialize(ostream& oss);
@@ -669,9 +675,11 @@ namespace pocc {
       void setEFA();
       void calculateRELAXProperties(double temperature=300);
       void calculateSTATICProperties(double temperature=300);
+      void calculatePlasmonicProperties(double temperature=300);
       void setPOccStructureProbabilities(double temperature=300); //room temperature
       string getTemperatureString(double temperature) const;
       void setAvgDOSCAR(double temperature=300);  //depends on probabilities
+      void setAvgPlasmonicData(double temperature=300);  //depends on probabilities
       void plotAvgDOSCAR(double temperature) const; //no default temperature, needs to be set inside setAvgDOSCAR()
       void plotAvgDOSCAR(const string& doscar_path,const string& directory=".") const;
       void plotAvgDOSCAR(const xDOSCAR& xdos,double temperature,const string& directory=".") const;

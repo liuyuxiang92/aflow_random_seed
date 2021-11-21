@@ -3291,6 +3291,7 @@ class xKPOINTS;
 class xCHGCAR;
 class xVASPOUT;
 class xQMVASP;  //CO20190803
+class xPLASMONICS;  //CO20190803
 namespace aflowlib { class _aflowlib_entry;}
 
 // -------------------------------------------------------------------------------------------------
@@ -3797,7 +3798,7 @@ class xCHGCAR : public xStream { //CO20200404 - xStream integration for logging
     void free();                 // free space
     void copy(const xCHGCAR& b); //
 };
-
+// -------------------------------------------------------------------------------------------------
 class xQMVASP : public xStream {  //CO20191110 //CO20200404 - xStream integration for logging
   public:
     xQMVASP(ostream& oss=cout);                           // default, just allocate  //CO20200404 - xStream integration for logging
@@ -3827,6 +3828,39 @@ class xQMVASP : public xStream {  //CO20191110 //CO20200404 - xStream integratio
   private:                       //
     void free();                 // free space
     void copy(const xQMVASP& b); //
+};
+// -------------------------------------------------------------------------------------------------
+class xPLASMONICS : public xStream {  //CO20191110 //CO20200404 - xStream integration for logging
+  public:
+    xPLASMONICS(ostream& oss=cout);                           // default, just allocate  //CO20200404 - xStream integration for logging
+    xPLASMONICS(ofstream& FileMESSAGE,ostream& oss=cout);     // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xPLASMONICS(const string& fileIN,bool=TRUE,ostream& oss=cout);                          // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    xPLASMONICS(const string& fileIN,ofstream& FileMESSAGE,bool=TRUE,ostream& oss=cout);    // constructor from filename QUIET //CO20200404 - xStream integration for logging
+    bool initialize(const string& fileIN,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool=TRUE);  //ME20200427  //CO20200508
+    bool initialize(const string& fileIN, bool=TRUE); //ME20200427
+
+    ~xPLASMONICS();                                                    // kill everything
+    xPLASMONICS(const xPLASMONICS& b);                                     // constructor copy
+    const xPLASMONICS& operator=(const xPLASMONICS &b);                    // copy
+    void clear(void);                                              // clear
+
+    bool m_initialized;  //CO20200404 - xStream integration for logging
+
+    // CONTENT
+    string content;vector<string> vcontent;string filename;        // the content, and lines of it
+    string eps; //plasmonics
+    vector<double> venergy; //plasmonics
+    vector<double> veels;   //plasmonics
+    vector<xcomplex<double> > vdielectric;  //plasmonics  //contains both real and imaginary parts
+    void getEPS();                                                             //CO20211120 - extract eps from filename
+    bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);          // get everything QUIET
+    bool GetProperties(const string& stringIN,bool=TRUE);                      // get everything QUIET
+    bool GetPropertiesFile(const string& fileIN,bool=TRUE);                    // get everything QUIET
+    bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
+  private:                       //
+    void free();                 // free space
+    void copy(const xPLASMONICS& b); //
 };
 
 // -------------------------------------------------------------------------------------------------

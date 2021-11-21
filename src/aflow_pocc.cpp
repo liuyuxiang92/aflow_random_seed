@@ -1184,6 +1184,63 @@ namespace pocc {
 
     if(LDEBUG){cerr << soliloquy << " END" << endl;}
   }
+  
+  void POccCalculator::setAvgPlasmonicData(double temperature){
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XPID+"POccCalculator::setAvgDOSCAR():";
+    stringstream message;
+
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+    if(m_ARUN_directories.size()!=l_supercell_sets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()!=l_supercell_sets.size()",_RUNTIME_ERROR_);}
+
+    setPOccStructureProbabilities(temperature); //done in calculateRELAXProperties() - repetita iuvant
+    
+    m_vxplasm.clear();
+    xPLASMONICS xplasm;
+    string PLASM_file="";
+    xcomplex<double> xcomp_tmp(0.0,0.0);
+    vector<string> vlines,vtokens;
+    uint ieps=0,i=0;
+    unsigned long long int isupercell=0;
+    for(ieps=0;ieps<m_veps_plasm.size();ieps++){
+      for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
+        isupercell=std::distance(l_supercell_sets.begin(),it);
+        if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/"+m_vfilenames_plasm[ieps],PLASM_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,m_vfilenames_plasm[ieps]+" not found in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
+        message << "Processing "+m_vfilenames_plasm[ieps]+" (eps=" << m_veps_plasm[ieps] << ") of " << m_ARUN_directories[isupercell];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+        xplasm.GetPropertiesFile(PLASM_file);
+        message << "xPLASM read (eps=" << xplasm.eps << ")";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+        if(isupercell==0){  //set all to 0
+          m_vxplasm[ieps].venergy.clear();
+          m_vxplasm[ieps].veels.clear();
+          m_vxplasm[ieps].vdielectric.clear();
+          for(i=0;i<xplasm.venergy.size();i++){
+            m_vxplasm[ieps].venergy.push_back(xplasm.venergy[i]);
+            m_vxplasm[ieps].veels.push_back(0.0);
+            xcomp_tmp.re=0.0;xcomp_tmp.im=0.0;
+            m_vxplasm[ieps].vdielectric.push_back(xcomp_tmp);
+          }
+        }else{ //check that all dimensions match
+          if(m_vxplasm[ieps].venergy.size()!=xplasm.venergy.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_vxplasm[ieps].venergy.size()!=xplasm.venergy.size() for isupercell="+aurostd::utype2string(isupercell)+" in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
+          if(m_vxplasm[ieps].veels.size()!=xplasm.veels.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_vxplasm[ieps].veels.size()!=xplasm.veels.size() for isupercell="+aurostd::utype2string(isupercell)+" in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
+          if(m_vxplasm[ieps].vdielectric.size()!=xplasm.vdielectric.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_vxplasm[ieps].vdielectric.size()!=xplasm.vdielectric.size() for isupercell="+aurostd::utype2string(isupercell)+" in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
+          for(i=0;i<m_vxplasm[ieps].venergy.size();i++){
+            if(!aurostd::isequal(m_vxplasm[ieps].venergy[i],xplasm.venergy[i])){
+              if(LDEBUG){cerr << soliloquy << " venergy: " << m_vxplasm[ieps].venergy[i] << " != " << xplasm.venergy[i] << endl;}
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_vxplasm[ieps].venergy[i="+aurostd::utype2string(i)+"]!=xplasm.venergy[i] for isupercell="+aurostd::utype2string(isupercell)+" in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);
+            }
+          }
+        }
+        //do averaging
+        for(i=0;i<m_vxplasm[ieps].venergy.size();i++){
+          m_vxplasm[ieps].veels[i]+=( (*it).m_probability*xplasm.veels[i] );
+          m_vxplasm[ieps].vdielectric[i].re+=( (*it).m_probability*xplasm.vdielectric[i].re );
+          m_vxplasm[ieps].vdielectric[i].im+=( (*it).m_probability*xplasm.vdielectric[i].im );
+        }
+      }
+    }
+  }
 
   void POccCalculator::calculateRELAXProperties(double temperature){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
@@ -1231,6 +1288,75 @@ namespace pocc {
 
     setAvgDOSCAR(temperature);
     if(0){plotAvgDOSCAR(temperature);}  //do not plot as part of LIB2LIB, leave for LIB2RAW
+  }
+  
+  void POccCalculator::calculatePlasmonicProperties(double temperature){
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XPID+"POccCalculator::calculateSTATICProperties():";
+
+    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+    
+    vector<string> vfiles;
+
+    bool found_all_eps_dat_files=true;
+    uint i=0;
+    string tmp_str="";
+    m_vfilenames_plasm.clear();
+    for(unsigned long long int isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_eps_dat_files==true;isupercell++){
+      aurostd::DirectoryLS(m_aflags.Directory+"/"+m_ARUN_directories[isupercell],vfiles);
+      if(isupercell==0){
+        for(i=0;i<vfiles.size();i++){
+          if(vfiles[i].find(DEFAULT_AFLOW_PLASMONICS_FILE)!=string::npos){m_vfilenames_plasm.push_back(vfiles[i]);}
+        }
+      }else{
+        for(i=0;i<m_vfilenames_plasm.size();i++){
+          if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/"+m_vfilenames_plasm[i])){
+            if(LDEBUG){cerr << soliloquy << " "+m_vfilenames_plasm[i]+" not found in "+m_ARUN_directories[isupercell] << endl;}
+            found_all_eps_dat_files=false;
+          }
+        }
+      }
+    }
+    if(!found_all_eps_dat_files){return;}
+
+    //check eps can be extracted
+    xPLASMONICS xplasm;
+    for(i=0;i<m_vfilenames_plasm.size();i++){
+      xplasm.filename=m_vfilenames_plasm[i];xplasm.getEPS();
+      if(!aurostd::isfloat(xplasm.eps)){
+        if(LDEBUG){cerr << soliloquy << " eps cannot be extracted from "+m_vfilenames_plasm[i] << endl;}
+        found_all_eps_dat_files=false;
+      }
+    }
+    if(!found_all_eps_dat_files){return;}
+
+    //sort m_veps_plasm, do manually as string sorting is different than double sorting
+    uint j=0;
+    double eps1=0.0,eps2=0.0;
+    for(i=0;i<m_vfilenames_plasm.size();i++){
+      for(j=i;j<m_vfilenames_plasm.size();j++){
+        xplasm.filename=m_vfilenames_plasm[i];xplasm.getEPS();
+        eps1=aurostd::string2utype<double>(xplasm.eps);
+        xplasm.filename=m_vfilenames_plasm[j];xplasm.getEPS();
+        eps2=aurostd::string2utype<double>(xplasm.eps);
+        if(eps2<eps1){
+          tmp_str=m_vfilenames_plasm[i];
+          m_vfilenames_plasm[i]=m_vfilenames_plasm[j];
+          m_vfilenames_plasm[j]=tmp_str;
+        }
+      }
+    }
+    if(LDEBUG){cerr << soliloquy << " m_vfilenames_plasm=" << aurostd::joinWDelimiter(m_vfilenames_plasm,",") << endl;}
+    
+    m_veps_plasm.clear();
+    m_vxplasm.clear();
+    for(i=0;i<m_vfilenames_plasm.size();i++){
+      xplasm.filename=m_vfilenames_plasm[i];xplasm.getEPS();
+      m_veps_plasm.push_back(xplasm.eps);
+      m_vxplasm.push_back(xPLASMONICS());
+    }
+    if(LDEBUG){cerr << soliloquy << " m_veps_plasm=" << aurostd::joinWDelimiter(m_veps_plasm,",") << endl;}
+    setAvgPlasmonicData(temperature);
   }
 
   void POccCalculator::plotAvgDOSCAR(double temperature) const {return plotAvgDOSCAR(m_xdoscar,temperature,m_aflags.Directory);}
@@ -1387,6 +1513,29 @@ namespace pocc {
     }
     if(Egap_net!=AUROSTD_MAX_DOUBLE) pocc_out_ss << "Egap_net=" << aurostd::utype2string(Egap_net,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV)" << endl;
     //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
+    //PLASMONICS
+    for(uint ieps=0;ieps<m_veps_plasm.size();ieps++){
+      if(m_vxplasm[ieps].venergy.size()!=0){
+        uint i=0,padding=25;
+        pocc_out_ss << POCC_AFLOWIN_tag << "START_PLASMONICS_EPS_" << m_veps_plasm[ieps] << endl;
+        //header
+        pocc_out_ss << "#";
+        pocc_out_ss << aurostd::PaddedPRE("energy (eV)",padding) << " ";
+        pocc_out_ss << aurostd::PaddedPRE("EELS",padding) << " ";
+        pocc_out_ss << aurostd::PaddedPRE("Re(dielectric)",padding) << " ";
+        pocc_out_ss << aurostd::PaddedPRE("Im(dielectric)",padding) << " ";
+        pocc_out_ss << endl;
+        for(i=0;i<m_vxplasm[ieps].venergy.size();i++){
+          pocc_out_ss << " "; //spacing
+          pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_vxplasm[ieps].venergy[i],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
+          pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_vxplasm[ieps].veels[i],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
+          pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_vxplasm[ieps].vdielectric[i].re,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
+          pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_vxplasm[ieps].vdielectric[i].im,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
+          pocc_out_ss << endl;
+        }
+        pocc_out_ss << POCC_AFLOWIN_tag << "STOP_PLASMONICS_EPS_" << m_veps_plasm[ieps] << endl;
+      }
+    }
     pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=" << (*this).getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
 
@@ -1602,6 +1751,7 @@ namespace pocc {
       for(uint itemp=0;itemp<v_temperatures.size();itemp++){
         calculateRELAXProperties(v_temperatures[itemp]);
         calculateSTATICProperties(v_temperatures[itemp]);
+        calculatePlasmonicProperties(v_temperatures[itemp]);
         writeResults(v_temperatures[itemp]);  //write temperature-dependent properties next
       }
     }
@@ -2021,6 +2171,9 @@ namespace pocc {
     m_Egap.clear();
     m_Egap_DOS_net=AUROSTD_MAX_DOUBLE;
     m_Egap_net=AUROSTD_MAX_DOUBLE;
+    m_vfilenames_plasm.clear();
+    m_veps_plasm.clear();
+    m_vxplasm.clear();
     enumerator_mode.clear();
 
     m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
@@ -2062,6 +2215,9 @@ namespace pocc {
     m_Egap.clear();for(uint ispin=0;ispin<b.m_Egap.size();ispin++){m_Egap.push_back(b.m_Egap[ispin]);}
     m_Egap_DOS_net=b.m_Egap_DOS_net;
     m_Egap_net=b.m_Egap_net;
+    m_vfilenames_plasm.clear();for(uint i=0;i<b.m_vfilenames_plasm.size();i++){m_vfilenames_plasm.push_back(b.m_vfilenames_plasm[i]);}
+    m_veps_plasm.clear();for(uint i=0;i<b.m_veps_plasm.size();i++){m_veps_plasm.push_back(b.m_veps_plasm[i]);}
+    m_vxplasm.clear();for(uint i=0;i<b.m_vxplasm.size();i++){m_vxplasm.push_back(b.m_vxplasm[i]);}
     enumerator_mode=b.enumerator_mode;
   }
 
