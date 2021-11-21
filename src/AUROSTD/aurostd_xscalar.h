@@ -86,6 +86,9 @@
 
 //AS20200427 - QHA-related conversion factors
 #define eV2GPa (E_ELECTRON*1e21)    // [eV/A^3] --> [GPa]
+#define GPa2eV (1.0/eV2GPa)         // [GPa] --> [eV/A^3]
+#define eV2kBar eV2GPa*10           // [eV/A^3] --> [kBar]
+#define kBar2eV (1.0/eV2kBar)       // [kBar] --> [eV/A^3]
 #define atm2Pa 101325
 
 //DX20210111 - GFA factors

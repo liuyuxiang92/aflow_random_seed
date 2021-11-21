@@ -4122,6 +4122,7 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
   bool reading_stresses=false;
   bool reading_lattice=false;
   bool reading_atoms=false;
+  bool convert_kBar2eV=false;
 
   //get species data first
   uint iline=0,i=0;
@@ -4173,6 +4174,7 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
     if(reading_ionic==false){
       if(aurostd::substring2bool(vcontent[iline],"ENERGIE")){
         reading_ionic=true;
+        reading_stresses=false;reading_lattice=false;reading_atoms=false;convert_kBar2eV=false;
         //clear everything, set stresses to 3 as an indicator that it's not set
         xstr.clear();vatoms.clear();
         ilattice=0;iatom=0;
@@ -4206,7 +4208,7 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
           }
         }
       }
-      if(aurostd::substring2bool(vcontent[iline],"FORCE") && aurostd::substring2bool(vcontent[iline],"-STRESS")){reading_stresses=true;continue;}
+      if(aurostd::substring2bool(vcontent[iline],"FORCE") && aurostd::substring2bool(vcontent[iline],"-STRESS")){reading_stresses=true;reading_lattice=false;reading_atoms=false;convert_kBar2eV=false;continue;}
       if(reading_stresses){
         if(aurostd::substring2bool(vcontent[iline],"Total")){
           aurostd::string2tokens(vcontent[iline],vtokens," ");
@@ -4215,7 +4217,20 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
             for(i=1;i<7;i++){stresses[stresses.lrows+i-1]=aurostd::string2utype<double>(vtokens[i]);}
             if(LDEBUG){
               cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;
-              cerr << soliloquy << " stresses(eV/AA)=" << stresses << endl; //X Y Z XY YZ ZX
+              cerr << soliloquy << " stresses(eV)=" << stresses << endl; //X Y Z XY YZ ZX //this is eV*volume of cell
+            }
+          }
+        }
+        //per ME's suggestion, let's grab 'in kB' instead of 'Total' (eV) which has more significant figures
+        if(aurostd::substring2bool(vcontent[iline],"in") && aurostd::substring2bool(vcontent[iline],"kB")){
+          aurostd::string2tokens(vcontent[iline],vtokens," ");
+          if(vtokens.size()==8){
+            //stresses.resize(6);
+            for(i=2;i<8;i++){stresses[stresses.lrows+i-1]=aurostd::string2utype<double>(vtokens[i]);}
+            convert_kBar2eV=true;
+            if(LDEBUG){
+              cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;
+              cerr << soliloquy << " stresses(kBar)=" << stresses << endl; //X Y Z XY YZ ZX
             }
           }
         }
@@ -4223,7 +4238,7 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
       if(aurostd::substring2bool(vcontent[iline],"direct") && 
          aurostd::substring2bool(vcontent[iline],"lattice") &&
          aurostd::substring2bool(vcontent[iline],"vectors") &&
-         aurostd::substring2bool(vcontent[iline],"reciprocal")){reading_lattice=true;ilattice=0;xstr.clear();continue;}
+         aurostd::substring2bool(vcontent[iline],"reciprocal")){reading_lattice=true;reading_stresses=false;reading_atoms=false;ilattice=0;xstr.clear();continue;}
       if(reading_lattice && ilattice<3){
         if(LDEBUG){cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;}
         vtokens=GetCorrectPositions(vcontent[iline],6); //aurostd::string2tokens(vcontent[iline],vtokens," ");
@@ -4236,10 +4251,14 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
           if(LDEBUG){cerr << soliloquy << " xstr.lattice=" << endl << xstr.lattice << endl;}
           xstr.scale=1.0;
           xstr.FixLattices();
+          if(convert_kBar2eV){
+            stresses*=(kBar2eV*xstr.GetVolume());
+            if(LDEBUG){cerr << soliloquy << " stresses(eV)=" << stresses << endl;} //X Y Z XY YZ ZX //this is eV*volume of cell
+          }
           reading_lattice=false;
         }
       }
-      if(aurostd::substring2bool(vcontent[iline],"POSITION") && aurostd::substring2bool(vcontent[iline],"TOTAL-FORCE")){reading_atoms=true;iatom=0;vatoms.clear();continue;}
+      if(aurostd::substring2bool(vcontent[iline],"POSITION") && aurostd::substring2bool(vcontent[iline],"TOTAL-FORCE")){reading_atoms=true;reading_stresses=false;reading_lattice=false;convert_kBar2eV=false;iatom=0;vatoms.clear();continue;}
       if(reading_atoms && iatom<natoms){
         if(LDEBUG){cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;}
         if(aurostd::substring2bool(vcontent[iline],"---------")){continue;}
