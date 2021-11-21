@@ -1201,7 +1201,7 @@ class _atom { // simple class.. nothing fancy
     bool   partial_occupation_flag;                        // partial occupation
     int shell;                                             // neighbor shell number
     // for xOUTCAR
-    xvector<double> forces;                                // forces from OUTCAR  //CO20211106
+    xvector<double> force;                                 // force components from OUTCAR  //CO20211106
     // printing
     bool   verbose;                                        // verbose in printing
     bool   print_RHT;                                      // a printer for coord and name (general position)   //RHT

@@ -86,7 +86,7 @@ _atom::_atom() {
   partial_occupation_value=1.0;
   partial_occupation_flag=FALSE;
   shell=0;
-  forces.clear(); //CO20211107
+  force.clear(); //CO20211107
   verbose=FALSE;
   print_RHT=false;  //CO20190405 //true; //CHANGE THIS BACK TO FALSE WHEN DONE DEBUGGING  (RHT)
   print_cartesian=FALSE;
@@ -133,7 +133,7 @@ void _atom::copy(const _atom& b) { // copy PRIVATE
   partial_occupation_value=b.partial_occupation_value;
   partial_occupation_flag=b.partial_occupation_flag;
   shell=b.shell;
-  forces=b.forces;  //CO20211107
+  force=b.force;  //CO20211107
   verbose=b.verbose;
   print_RHT=b.print_RHT;  // (RHT)
   print_cartesian=b.print_cartesian;
@@ -195,7 +195,7 @@ ostream& operator<<(ostream& oss,const _atom& atom) {
       oss << "partial_occupation_value=" << atom.partial_occupation_value << endl;
       oss << "partial_occupation_flag=" << atom.partial_occupation_flag << endl;
       oss << "nearest_neighbor_shell_num= " << atom.shell << endl;
-      oss << "forces= " << atom.forces << endl;
+      oss << "force= " << atom.force << endl;
     }
     if(atom.print_cartesian==TRUE) {
       if(atom.verbose) oss << "cartesian" << endl;

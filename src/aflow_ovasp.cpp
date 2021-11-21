@@ -1859,9 +1859,10 @@ bool xOUTCAR::GetXStructure() {
   double num = 0.0, natoms = 0.0;
   deque<_atom> atoms;
   xvector<double> cpos(3),fpos(3);
-  for(uint iline=vcontent.size()-1;iline<vcontent.size();iline--){  // NEW FROM THE BACK
+  uint vcontent_size=vcontent.size();
+  for(uint iline=vcontent_size-1;iline<vcontent_size;iline--){  // NEW FROM THE BACK
     //get lattice
-    if(!found_lattice && (iline<vcontent.size()-3) && aurostd::substring2bool(vcontent[iline],"direct")) {
+    if(!found_lattice && (iline<vcontent_size-3) && aurostd::substring2bool(vcontent[iline],"direct")) {
       aurostd::string2tokens(vcontent[iline],tokens);
       if((tokens.size()>5) && (tokens[0] == "direct") && (tokens[1] == "lattice") && (tokens[2] == "vectors") &&
           (tokens[3] == "reciprocal") && (tokens[4] == "lattice") && (tokens[5] == "vectors")){
@@ -1936,13 +1937,13 @@ bool xOUTCAR::GetXStructure() {
   xmatrix<double> f2c=trasp(lattice), c2f=inverse(f2c);
 
   //need types before positions
-  for(int iline=(int)vcontent.size()-1;iline>=0;iline--){  // NEW FROM THE BACK
+  for(int iline=(int)vcontent_size-1;iline>=0;iline--){  // NEW FROM THE BACK
     //get positions
     //from bottom up, cartesian coordinates found first
     //this is fortunate as they carry more precision (fractional needs multiplication)
     if(!found_positions && aurostd::substring2bool(vcontent[iline],"coordinates")){
       aurostd::string2tokens(vcontent[iline],tokens);
-      if(!found_positions && (iline<(int)vcontent.size()-natoms) && (tokens.size()>5) && (tokens[0] == "position") && (tokens[1] == "of") && (tokens[2] == "ions") &&
+      if(!found_positions && (iline<(int)vcontent_size-natoms) && (tokens.size()>5) && (tokens[0] == "position") && (tokens[1] == "of") && (tokens[2] == "ions") &&
           (tokens[3] == "in") && (tokens[4] == "cartesian") && (tokens[5] == "coordinates")){
         found_positions=true;
         if(LDEBUG) {cerr << soliloquy << " positions (cartesian) found!" << endl;}
@@ -1964,7 +1965,7 @@ bool xOUTCAR::GetXStructure() {
           }
         }
       }
-      if(!found_positions && (iline<(int)vcontent.size()-natoms) && (tokens.size()>5) && (tokens[0] == "position") && (tokens[1] == "of") && (tokens[2] == "ions") &&
+      if(!found_positions && (iline<(int)vcontent_size-natoms) && (tokens.size()>5) && (tokens[0] == "position") && (tokens[1] == "of") && (tokens[2] == "ions") &&
           (tokens[3] == "in") && (tokens[4] == "fractional") && (tokens[5] == "coordinates")){
         found_positions=true;
         if(LDEBUG) {cerr << soliloquy << " positions (fractional) found!" << endl;}
@@ -4128,7 +4129,8 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
   string tmp_str="";
   deque<string> species_pp;
   deque<int> num_each_type;
-  for(iline=0;iline<vcontent.size();iline++){
+  uint vcontent_size=vcontent.size();
+  for(iline=0;iline<vcontent_size;iline++){
     if(aurostd::substring2bool(vcontent[iline],"POTCAR:")){
       tmp_str=vcontent[iline].substr(vcontent[iline].find("POTCAR:")+6+1);  //len(POSCAR:)==6
       aurostd::string2tokens(tmp_str,vtokens," ");
@@ -4165,9 +4167,9 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
   uint ilattice=0,iatom=0,itype=0;
   xstructure xstr;
   double energy=AUROSTD_MAX_DOUBLE;
-  xvector<double> stresses(3);
+  xvector<double> stresses(6);stresses[stresses.lrows]=AUROSTD_MAX_DOUBLE;
   vector<_atom> vatoms; //must keep like this until we settle types...
-  for(iline=0;iline<vcontent.size();iline++){
+  for(iline=0;iline<vcontent_size;iline++){
     if(reading_ionic==false){
       if(aurostd::substring2bool(vcontent[iline],"ENERGIE")){
         reading_ionic=true;
@@ -4175,14 +4177,14 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
         xstr.clear();vatoms.clear();
         ilattice=0;iatom=0;
         energy=AUROSTD_MAX_DOUBLE;
-        stresses.resize(3);
+        stresses[stresses.lrows]=AUROSTD_MAX_DOUBLE; //stresses.resize(3);
         continue;
       }
     }else{
-      if(aurostd::substring2bool(vcontent[iline],"Iteration")||(iline==vcontent.size()-1)){
+      if(aurostd::substring2bool(vcontent[iline],"Iteration")||(iline==vcontent_size-1)){
         reading_ionic=false;
         reading_stresses=false;
-        if(xstr.atoms.size()==natoms && ilattice==3 && iatom==natoms && energy!=AUROSTD_MAX_DOUBLE && stresses.rows==6){  //add additional checks as needed
+        if(xstr.atoms.size()==natoms && ilattice==3 && iatom==natoms && energy!=AUROSTD_MAX_DOUBLE && stresses[stresses.lrows]!=AUROSTD_MAX_DOUBLE){  //add additional checks as needed //stresses.rows==6
           if(LDEBUG){cerr << soliloquy << " adding a new ionic step" << endl;}
           vxstr_ionic.push_back(xstr);
           venergy_ionic.push_back(energy);
@@ -4209,7 +4211,7 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
         if(aurostd::substring2bool(vcontent[iline],"Total")){
           aurostd::string2tokens(vcontent[iline],vtokens," ");
           if(vtokens.size()==7){
-            stresses.resize(6);
+            //stresses.resize(6);
             for(i=1;i<7;i++){stresses[stresses.lrows+i-1]=aurostd::string2utype<double>(vtokens[i]);}
             if(LDEBUG){
               cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;
@@ -4245,7 +4247,7 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
         if(vtokens.size()!=6){iatom=0;reading_atoms=false;}  //also contains force components //iatom==0 is an indicator that atoms were not read (correctly)
         vatoms.push_back(_atom());
         for(i=0;i<3;i++){vatoms.back().cpos[vatoms.back().cpos.lrows+i]=aurostd::string2utype<double>(vtokens[i]);}
-        for(i=0;i<3;i++){vatoms.back().forces[vatoms.back().forces.lrows+i]=aurostd::string2utype<double>(vtokens[i+3]);}
+        for(i=0;i<3;i++){vatoms.back().force[vatoms.back().force.lrows+i]=aurostd::string2utype<double>(vtokens[i+3]);}
         iatom++;
         if(iatom==natoms){
           iatom=0; //reset
@@ -4313,11 +4315,11 @@ void xOUTCAR::WriteMTPCFG(const string& outcar_path,stringstream& output_ss){  /
         output_ss << a.atoms[iatom].fpos[icoord] << (icoord<a.atoms[iatom].fpos.urows?" ":"");
       }
       output_ss << " ";
-      for(int icoord=a.atoms[iatom].forces.lrows;icoord<=a.atoms[iatom].forces.urows;icoord++){
-        if(abs(a.atoms[iatom].forces[icoord])<10) output_ss << "  ";
-        else if(abs(a.atoms[iatom].forces[icoord])<100) output_ss << " ";
-        if(!std::signbit(a.atoms[iatom].forces[icoord])) output_ss << " ";
-        output_ss << a.atoms[iatom].forces[icoord] << (icoord<a.atoms[iatom].forces.urows?" ":"");
+      for(int icoord=a.atoms[iatom].force.lrows;icoord<=a.atoms[iatom].force.urows;icoord++){
+        if(abs(a.atoms[iatom].force[icoord])<10) output_ss << "  ";
+        else if(abs(a.atoms[iatom].force[icoord])<100) output_ss << " ";
+        if(!std::signbit(a.atoms[iatom].force[icoord])) output_ss << " ";
+        output_ss << a.atoms[iatom].force[icoord] << (icoord<a.atoms[iatom].force.urows?" ":"");
       }
       output_ss << endl;
     }
