@@ -77,6 +77,7 @@ namespace symbolic{ //DX20200625
   {
     public: CloningSymbolicInterface();
             CloningSymbolicInterface(const CloningSymbolicInterface &);
+            void copy(const CloningSymbolicInterface &c); //DX20211120 - to fix warnings for gcc>10 and gcc=4, need explicit declaration
             CloningSymbolicInterface &operator=(const CloningSymbolicInterface &); //DX20210420 - to fix warnings for gcc>10, need explicit declaration
   };
 
