@@ -9558,7 +9558,6 @@ void xPLASMONICS::getEPS() {  //CO20211120
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy=XPID+"xPLASMONICS::getEPS():";
   if(LDEBUG){cerr << soliloquy << " filename=" << filename << endl;}
-  if(filename.empty()){return;}
   if(filename.find(DEFAULT_AFLOW_PLASMONICS_FILE)!=string::npos){
     //get eps and store it
     string _eps=filename;
