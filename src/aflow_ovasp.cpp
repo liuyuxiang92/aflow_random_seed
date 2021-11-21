@@ -9295,9 +9295,9 @@ void xPLASMONICS::getEPS() {  //CO20211120
     if(aurostd::substring2bool(_eps,"/")){_eps=_eps.substr(_eps.find_last_of("/")+1,string::npos);}
     aurostd::StringSubst(_eps,DEFAULT_AFLOW_PLASMONICS_FILE+"_",""); //remove DEFAULT_AFLOW_PLASMONICS_FILE+'_'
     aurostd::StringSubst(_eps,DEFAULT_AFLOW_PLASMONICS_FILE,""); //remove DEFAULT_AFLOW_PLASMONICS_FILE
-    _eps=_eps.substr(0,_eps.find("_")); //remove everything after '_'
-    _eps=_eps.substr(0,_eps.find("."+POCC_OUT_FILE)); //remove everything after '.out'
-    _eps=_eps.substr(0,_eps.find(POCC_OUT_FILE)); //remove everything after 'out'
+    _eps=_eps.substr(0,_eps.find("_")); //remove everything before '_'
+    _eps=_eps.substr(0,_eps.find("."+POCC_OUT_FILE)); //remove everything before '.out'
+    _eps=_eps.substr(0,_eps.find(POCC_OUT_FILE)); //remove everything before 'out'
     if(aurostd::isfloat(_eps)){eps=_eps;}
   }
   if(LDEBUG){cerr << soliloquy << " eps=" << eps << endl;}
