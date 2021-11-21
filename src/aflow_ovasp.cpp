@@ -9562,7 +9562,7 @@ void xPLASMONICS::getEPS() {  //CO20211120
   if(filename.find(DEFAULT_AFLOW_PLASMONICS_FILE)!=string::npos){
     //get eps and store it
     string _eps=filename;
-    if(aurostd::substring2bool(_eps,"/")){_eps=_eps.substr(_eps.find_last_of("/")+1,string::npos);}
+    _eps=aurostd::basename(_eps);
     aurostd::StringSubst(_eps,DEFAULT_AFLOW_PLASMONICS_FILE+"_",""); //remove DEFAULT_AFLOW_PLASMONICS_FILE+'_'
     aurostd::StringSubst(_eps,DEFAULT_AFLOW_PLASMONICS_FILE,""); //remove DEFAULT_AFLOW_PLASMONICS_FILE
     _eps=_eps.substr(0,_eps.find("_")); //remove everything before '_'
