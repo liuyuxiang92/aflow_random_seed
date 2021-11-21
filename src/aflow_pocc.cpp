@@ -1330,7 +1330,6 @@ namespace pocc {
       m_vxplasm.push_back(xPLASMONICS());
     }
     if(LDEBUG){cerr << soliloquy << " m_veps_plasm=" << aurostd::joinWDelimiter(m_veps_plasm,",") << endl;}
-    
     setAvgPlasmonicData(temperature);
   }
 
