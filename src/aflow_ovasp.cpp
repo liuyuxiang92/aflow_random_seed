@@ -4226,7 +4226,7 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
           aurostd::string2tokens(vcontent[iline],vtokens," ");
           if(vtokens.size()==8){
             //stresses.resize(6);
-            for(i=2;i<8;i++){stresses[stresses.lrows+i-1]=aurostd::string2utype<double>(vtokens[i]);}
+            for(i=2;i<8;i++){stresses[stresses.lrows+i-2]=aurostd::string2utype<double>(vtokens[i]);}
             convert_kBar2eV=true;
             if(LDEBUG){
               cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;
@@ -4252,8 +4252,15 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
           xstr.scale=1.0;
           xstr.FixLattices();
           if(convert_kBar2eV){
+            if(LDEBUG){
+              cerr << soliloquy << " xstr.GetVolume()=" << xstr.GetVolume() << endl;
+              cerr << soliloquy << " stresses(kBar)=" << stresses << endl; //X Y Z XY YZ ZX
+              cerr << soliloquy << " kBar2eV=" << kBar2eV << endl;
+            }
             stresses*=(kBar2eV*xstr.GetVolume());
-            if(LDEBUG){cerr << soliloquy << " stresses(eV)=" << stresses << endl;} //X Y Z XY YZ ZX //this is eV*volume of cell
+            if(LDEBUG){
+              cerr << soliloquy << " stresses(eV)=" << stresses << endl; //X Y Z XY YZ ZX //this is eV*volume of cell
+            }
           }
           reading_lattice=false;
         }
