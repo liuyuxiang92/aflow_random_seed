@@ -535,10 +535,12 @@ namespace pocc {
       xDOSCAR m_xdoscar;
       vector<double> m_Egap_DOS,m_Egap;
       double m_Egap_DOS_net,m_Egap_net;
+      vector<string> m_vfilenames_plasm;  //plasmonics
       vector<string> m_veps_plasm; //plasmonics
-      vector<vector<double> > m_venergy_plasm; //plasmonics
-      vector<vector<double> > m_veels_plasm;   //plasmonics
-      vector<vector<xcomplex<double> > > m_vdielectric_plasm;  //plasmonics  //contains both real and imaginary parts
+      vector<xPLASMONICS> m_vxplasm;  //plasmonics
+      //vector<vector<double> > m_venergy_plasm; //plasmonics
+      //vector<vector<double> > m_veels_plasm;   //plasmonics
+      //vector<vector<xcomplex<double> > > m_vdielectric_plasm;  //plasmonics  //contains both real and imaginary parts
 
       //initializers
       bool initialize(ostream& oss);

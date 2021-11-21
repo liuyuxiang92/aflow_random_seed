@@ -9138,14 +9138,14 @@ bool xQMVASP::GetPropertiesUrlFile(const string& url,const string& file,bool QUI
 }
 
 bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //CO20191110
-  bool LDBEUG=(FALSE || XHOST.DEBUG || !QUIET);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy=XPID+"xQMVASP::GetProperties():";
   stringstream message;
   bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
-  if(LDBEUG) cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -9158,10 +9158,10 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
   H_atom_static=AUROSTD_NAN;
   bool inside_relax=false,inside_static=false;
   // ----------------------------------------------------------------------
-  if(LDBEUG) cerr << soliloquy << " vcontent.size()=" << vcontent.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " vcontent.size()=" << vcontent.size() << endl;
   // ----------------------------------------------------------------------
   for(uint iline=0;iline<vcontent.size();iline++){
-    if(LDBEUG) cerr << soliloquy << " vcontent.at(" << iline << ")=" << vcontent.at(iline) << endl;
+    if(LDEBUG) cerr << soliloquy << " vcontent.at(" << iline << ")=" << vcontent.at(iline) << endl;
     if(aurostd::substring2bool(vcontent[iline],"STOP_relax")){inside_relax=false;}
     else if(aurostd::substring2bool(vcontent[iline],"START_relax")){inside_relax=true;}
     else if(aurostd::substring2bool(vcontent[iline],"STOP_static")){inside_static=false;}
@@ -9208,12 +9208,181 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
   // ----------------------------------------------------------------------   
   // ----------------------------------------------------------------------
   // DONE NOW RETURN  
-  if(LDBEUG) cerr << soliloquy << " END (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " END (" << time_delay(seconds) << ")" << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
   //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - " << soliloquy << " ERROR_flag set in xQMVASP" << endl;
   if(ERROR_flag){
     message << "ERROR_flag set in xQMVASP";
+    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
+    return FALSE;
+  }
+  return TRUE;
+}
+
+//-------------------------------------------------------------------------------------------------
+//CO20190803 STOP
+
+//CO20190803 START
+//---------------------------------------------------------------------------------
+// class xPLASMONICS
+//---------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// constructor
+xPLASMONICS::xPLASMONICS(ostream& oss) : xStream(oss) {free();} //CO20200404 - xStream integration for logging
+xPLASMONICS::xPLASMONICS(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss) {free();} //CO20200404 - xStream integration for logging
+xPLASMONICS::xPLASMONICS(const string& fileIN,bool QUIET,ostream& oss) : xStream(oss) {m_initialized=initialize(fileIN,QUIET);} //CO20200404 - xStream integration for logging
+xPLASMONICS::xPLASMONICS(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(FileMESSAGE,oss) {m_initialized = initialize(fileIN, QUIET);} //CO20200404 - xStream integration for logging
+
+bool xPLASMONICS::initialize(const string& fileIN,ostream& oss,bool QUIET) {xStream::initialize(oss);return initialize(fileIN,QUIET);} //CO20200508
+bool xPLASMONICS::initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool QUIET) {xStream::initialize(FileMESSAGE,oss);return initialize(fileIN,QUIET);} //CO20200508
+bool xPLASMONICS::initialize(const string& fileIN, bool QUIET) {
+  free();
+  filename = fileIN;
+  return GetPropertiesFile(fileIN, QUIET);
+}
+
+xPLASMONICS::xPLASMONICS(const xPLASMONICS& b) : xStream(*b.getOFStream(),*b.getOSS()) {free();copy(b);} // copy PUBLIC
+
+xPLASMONICS::~xPLASMONICS() {xStream::free();free();} //CO20191110 //CO20200404 - xStream integration for logging
+
+void xPLASMONICS::free() { //CO20191110
+  m_initialized=false; //CO20200404
+  //------------------------------------------------------------------------------
+  content="";                   // for aflowlib_libraries.cpp
+  vcontent.clear();             // for aflowlib_libraries.cpp
+  filename="";                  // for aflowlib_libraries.cpp
+  eps.clear();
+  venergy.clear();
+  veels.clear();
+  vdielectric.clear();
+}
+
+void xPLASMONICS::copy(const xPLASMONICS& b) { // copy PRIVATE //CO20191110
+  xStream::copy(b);  //CO20200404 - xStream integration for logging
+  free();
+  m_initialized=b.m_initialized; //CO20200404 - xStream integration for logging
+  content=b.content;
+  vcontent.clear();for(uint i=0;i<b.vcontent.size();i++){vcontent.push_back(b.vcontent[i]);}  // for aflowlib_libraries.cpp
+  filename=b.filename;
+  eps=b.eps;
+  venergy.clear();for(uint i=0;i<b.venergy.size();i++){venergy.push_back(b.venergy[i]);}
+  veels.clear();for(uint i=0;i<b.veels.size();i++){veels.push_back(b.veels[i]);}
+  vdielectric.clear();for(uint i=0;i<b.vdielectric.size();i++){vdielectric.push_back(b.vdielectric[i]);}
+}
+
+const xPLASMONICS& xPLASMONICS::operator=(const xPLASMONICS& b) {  // operator= PUBLIC //CO20191110
+  if(this!=&b) {free();copy(b);}
+  return *this;
+}
+
+void xPLASMONICS::clear() {  // clear PRIVATE  //CO20191110
+  xPLASMONICS _temp;
+  string filename_aus=filename;
+  copy(_temp);
+  filename=filename_aus;
+}
+
+void xPLASMONICS::getEPS() {  //CO20211120
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xPLASMONICS::getEPS():";
+  if(LDEBUG){cerr << soliloquy << " filename=" << filename << endl;}
+  if(filename.empty()){return;}
+  if(filename.find(DEFAULT_AFLOW_PLASMONICS_FILE)!=string::npos){
+    //get eps and store it
+    string _eps=filename;
+    if(aurostd::substring2bool(_eps,"/")){_eps=_eps.substr(_eps.find_last_of("/")+1,string::npos);}
+    aurostd::StringSubst(_eps,DEFAULT_AFLOW_PLASMONICS_FILE+"_",""); //remove DEFAULT_AFLOW_PLASMONICS_FILE+'_'
+    aurostd::StringSubst(_eps,DEFAULT_AFLOW_PLASMONICS_FILE,""); //remove DEFAULT_AFLOW_PLASMONICS_FILE
+    _eps=_eps.substr(0,_eps.find("_")); //remove everything after '_'
+    _eps=_eps.substr(0,_eps.find("."+POCC_OUT_FILE)); //remove everything after '.out'
+    _eps=_eps.substr(0,_eps.find(POCC_OUT_FILE)); //remove everything after 'out'
+    if(aurostd::isfloat(_eps)){eps=_eps;}
+  }
+  if(LDEBUG){cerr << soliloquy << " eps=" << eps << endl;}
+}
+
+bool xPLASMONICS::GetProperties(const string& stringIN,bool QUIET) { //CO20191110
+  stringstream sss; sss.str(stringIN);
+  if(filename=="") filename=DEFAULT_AFLOW_PLASMONICS_FILE+"_0.01."+POCC_OUT_FILE;
+  return xPLASMONICS::GetProperties(sss,QUIET);
+}
+
+bool xPLASMONICS::GetPropertiesFile(const string& fileIN,bool QUIET) { //CO20191110
+  stringstream sss;
+  //[CO20211121 - getEPS() needs the right filename]if(filename=="") 
+  filename=fileIN;
+  aurostd::efile2stringstream(fileIN,sss);
+  return xPLASMONICS::GetProperties(sss,QUIET);
+}
+
+bool xPLASMONICS::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {  //CO20191110
+  //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
+  string tmpfile=aurostd::TmpFileCreate("xPLASMONICS_GetProperties"); //CO20200502 - threadID
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
+  aurostd::RemoveFile(tmpfile);
+  return out;
+}
+
+bool xPLASMONICS::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //CO20191110
+  bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
+  string soliloquy=XPID+"xPLASMONICS::GetProperties():";
+  stringstream message;
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+
+  bool ERROR_flag=FALSE;
+  long double seconds=aurostd::get_seconds();
+  if(LDEBUG) cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
+  clear(); // so it does not mess up vector/deque
+  content=stringstreamIN.str();
+  vcontent.clear();
+  vector<string> vlines,tokens,tokens2;
+  aurostd::string2vectorstring(content,vcontent);
+  vlines=aurostd::RemoveComments(vcontent);
+  if(filename=="") filename="stringstream";
+  
+  // ----------------------------------------------------------------------
+  if(LDEBUG) cerr << soliloquy << " vcontent.size()=" << vcontent.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " vlines.size()=" << vlines.size() << endl;
+  // ----------------------------------------------------------------------
+
+  getEPS(); //extract eps from filename if possible
+  
+  // crunching to eat the info
+  vector<string> vtokens;
+  xcomplex<double> xcomp_tmp;
+  venergy.clear();veels.clear();vdielectric.clear();  //clear
+  for(uint iline=0;iline<vlines.size();iline++){
+    if(LDEBUG){cerr << soliloquy << " vlines[iline=" << iline << "]=\"" << vlines[iline] << "\"" << endl;}
+    aurostd::string2tokens(vlines[iline],vtokens," ");
+    if(LDEBUG){cerr << soliloquy << " vtokens=" << aurostd::joinWDelimiter(vtokens,"|") << endl;}
+    //there should be 5 columns
+    if(vtokens.size()!=5){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vcols!=5 (="+aurostd::utype2string(vtokens.size())+")",_FILE_NOT_FOUND_);}
+    //The file has 5 columns:
+    //column1 = energy (eV)
+    //column2 = do not consider this
+    //column3 = EELS spectrum
+    //column4 = real part of dielectric function
+    //column5 = imaginary part of dielectric function
+    venergy.push_back(aurostd::string2utype<double>(vtokens[0]));
+    veels.push_back(aurostd::string2utype<double>(vtokens[2]));
+    xcomp_tmp.re=aurostd::string2utype<double>(vtokens[3]);
+    xcomp_tmp.im=aurostd::string2utype<double>(vtokens[4]);
+    vdielectric.push_back(xcomp_tmp);
+  }
+  
+  // ----------------------------------------------------------------------   
+  // ----------------------------------------------------------------------
+  // DONE NOW RETURN  
+  if(LDEBUG) cerr << soliloquy << " END (" << time_delay(seconds) << ")" << endl;
+  // ----------------------------------------------------------------------
+  // DONE NOW RETURN
+  //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - " << soliloquy << " ERROR_flag set in xPLASMONICS" << endl;
+  if(ERROR_flag){
+    message << "ERROR_flag set in xPLASMONICS";
     if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
     else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
     return FALSE;
