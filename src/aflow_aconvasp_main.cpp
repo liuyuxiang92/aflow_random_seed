@@ -464,7 +464,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::WYCKOFF","--Wyckoff=|--wyckoff=","");
   }
   if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")) {
-    vpflow.flag("COMPARE_STRUCTURE::PRINT",aurostd::args2flag(argv,cmds,"--print|--print_mapping"));
+    vpflow.flag("COMPARE_STRUCTURE::PRINT",aurostd::args2flag(argv,cmds,"--print|--print_mapping|--print_mappings"));
     // structures appended to command
     if(aurostd::args2attachedflag(argv,"--compare_material=|--compare_materials=|--compare_structure=|--compare_structures=")){ //DX20170803
       vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::STRUCTURE_LIST","--compare_material=|--compare_materials=|--compare_structure=|--compare_structures=","");
@@ -773,6 +773,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("MISCIBILITY",aurostd::args2flag(argv,cmds,"--MIX|--mix|--MISCIBILITY|--miscibility|--MISCIBILE|--miscibile"));
   vpflow.flag("MOM",aurostd::args2flag(argv,cmds,"--mom"));
   vpflow.flag("MSI",aurostd::args2flag(argv,cmds,"--msi"));
+  
+  vpflow.flag("MTP::INIT",aurostd::args2flag(argv,cmds,"--mtp|--MTP"));  // initiate MTP writer
 
   vpflow.flag("MULTI=BZIP2",aurostd::args2flag(argv,cmds,"--multi=bzip2"));
   vpflow.flag("MULTI=BUNZIP2",aurostd::args2flag(argv,cmds,"--multi=bunzip2"));
@@ -1872,6 +1874,7 @@ namespace pflow {
       if(vpflow.flag("LTCELL")) {cout << pflow::LTCELL(vpflow.getattachedscheme("LTCELL"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("LTCELLFV")) {cout << pflow::LTCELL(vpflow.getattachedscheme("LTCELLFV"),cin); _PROGRAMRUN=true;}
       // M
+      if(vpflow.flag("MTP::INIT")) {aflowMachL::PrintMTPCFGAlloy(vpflow); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("MILLER")) {cout << pflow::MILLER(vpflow.getattachedscheme("MILLER"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("MULTI=BZIP2")) {AFLOW_PTHREADS::MULTI_compress("bzip2",argv);_PROGRAMRUN=true;}
       if(vpflow.flag("MULTI=BUNZIP2")) {AFLOW_PTHREADS::MULTI_compress("bunzip2",argv);_PROGRAMRUN=true;}

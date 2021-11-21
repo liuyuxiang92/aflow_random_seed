@@ -2193,6 +2193,55 @@ namespace aflowMachL {
 //CO20201111
 //////////////////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////////////////
+//CO20211111
+
+namespace aflowMachL {
+  void PrintMTPCFGAlloy(const aurostd::xoption& vpflow){
+    bool LDEBUG=(1||FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"aflowMachL::PrintMTPCFGAlloy():";
+
+    string alloy=vpflow.getattachedscheme("PFLOW::ALLOY");
+    vector<string> velements=aurostd::getElements(alloy,pp_string);
+    if(LDEBUG){
+      cerr << soliloquy << " alloy=\"" << alloy << "\"" << endl;
+      cerr << soliloquy << " elements=" << aurostd::joinWDelimiter(velements,",") << endl;
+      cerr << soliloquy << " nelements=" << velements.size() << endl;
+    }
+    
+    stringstream output_ss;
+    string ROOT="/common/LIB"+aurostd::utype2string(velements.size())+"/LIB";
+    vector<string> vsystems,vprotos,vfiles,_velements;
+    aurostd::DirectoryLS(ROOT,vsystems);
+
+    xOUTCAR xout;
+    uint isystem=0,iproto=0,ifile=0;
+    for(isystem=0;isystem<vsystems.size();isystem++){
+      _velements=aurostd::getElements(vsystems[isystem],pp_string);
+      if(velements==_velements){
+        if(LDEBUG){cerr << soliloquy << " found " << vsystems[isystem] << endl;}
+        aurostd::DirectoryLS(ROOT+"/"+vsystems[isystem],vprotos);
+        std::sort(vprotos.begin(),vprotos.end());
+        for(iproto=0;iproto<vprotos.size();iproto++){
+          aurostd::DirectoryLS(ROOT+"/"+vsystems[isystem]+"/"+vprotos[iproto],vfiles);
+          for(ifile=0;ifile<vfiles.size();ifile++){
+            if(aurostd::substring2bool(vfiles[ifile],"OUTCAR.relax")){
+              pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Found "+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile],_LOGGER_MESSAGE_);
+              xout.initialize(ROOT+"/"+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile]);
+              if(!xout.GetIonicStepsData()){continue;}
+              pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Processing "+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile],_LOGGER_MESSAGE_);
+              xout.WriteMTPCFG("LIB"+aurostd::utype2string(velements.size())+"/LIB/"+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile],output_ss);
+            }
+          }
+        }
+      }
+    }
+
+    aurostd::stringstream2file(output_ss,"aflow_MTP_"+alloy+".cfg");
+  }
+}
+//////////////////////////////////////////////////////////////////////////////////////
+
 #endif  // _AFLOW_TEST_CPP_
 
 // **************************************************************************

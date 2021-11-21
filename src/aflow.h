@@ -98,6 +98,7 @@ static const string POCC_TITLE_TOL_TAG=":TOL_";
 static const string ARUN_TITLE_TAG=":ARUN.";
 static const string POCC_ARUN_TITLE_TAG=ARUN_TITLE_TAG+"POCC_";
 static const string POCC_DOSCAR_PREFIX="DOSCAR.pocc_T";
+static const string POCC_PHDOSCAR_PREFIX="PHDOSCAR.pocc_T";  // ME20210927
 //CO20200731 END
 
 //XRD
@@ -812,6 +813,7 @@ class _kflags {
     bool   KBIN_POCC_CALCULATION;
     string KBIN_POCC_TEMPERATURE_STRING;  //CO20191114
     string KBIN_POCC_ARUNS2SKIP_STRING;   //CO20200627
+    bool   KBIN_POCC_EXCLUDE_UNSTABLE; //ME20210927
     // frozsl operation lists
     bool   KBIN_FROZSL;
     bool   KBIN_FROZSL_DOWNLOAD;
@@ -1200,6 +1202,8 @@ class _atom { // simple class.. nothing fancy
     double partial_occupation_value;                       // partial occupation
     bool   partial_occupation_flag;                        // partial occupation
     int shell;                                             // neighbor shell number
+    // for xOUTCAR
+    xvector<double> force;                                 // force components from OUTCAR  //CO20211106
     // printing
     bool   verbose;                                        // verbose in printing
     bool   print_RHT;                                      // a printer for coord and name (general position)   //RHT
@@ -1560,6 +1564,7 @@ class xstructure {
     void clear(void);                                             // clear everything //DX20191220 - uppercase to lowercase clear
     void clean(void);                                             // performs stringstream clean //DX20191220 - uppercase to lowercase clean
     void ClearSpecies(void);                                      // Clear all the symmetry
+    void CleanStructure();                                        // Fix up structure - ME20211004
     void ShiftOriginToAtom(const int& iat);                       // Shift the origin to atom(iat)
     void IdenticalAtoms(void);                                    // Make identical atoms
     void SwapCoordinates(const uint& i,const uint& j);            // Permute Coordinates i with j
@@ -2939,6 +2944,7 @@ namespace KBIN {
   void AFLOW_RUN_Directory(const _aflags& aflags);
   void RUN_DirectoryScript(const _aflags& aflags,const string& script,const string& output);
   bool CompressDirectory(const _aflags& aflags,const _kflags& kflags);
+  bool CompressDirectory(const string& directory,const _kflags& kflags);  //ME20210927
   bool CompressDirectory(const _aflags& aflags);
   void Clean(const _aflags& aflags);
   void Clean(const string directory);
@@ -3379,7 +3385,10 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     double calculation_memory;                                    // for aflowlib_libraries.cpp - calculation_memory
     uint calculation_cores;                                       // for aflowlib_libraries.cpp - calculation_cores
     xstructure xstr;                                              // for GetBandGap()
-    vector<string> GetCorrectPositions(string line,uint expected_count);                //CO20170725 - vasp issues with lattice spacing (negative sign) 
+    vector<xstructure> vxstr_ionic;                               // for all ionic steps  //CO20211106
+    vector<double> venergy_ionic;                                 // for all ionic steps  //CO20211106
+    vector<xvector<double> > vstresses_ionic;                     // for all ionic steps  //CO20211106
+    vector<string> GetCorrectPositions(const string& line,uint expected_count);                //CO20170725 - vasp issues with lattice spacing (negative sign) 
     bool GetProperties(const stringstream& stringstreamIN,bool=TRUE);          // get everything QUIET
     bool GetProperties(const string& stringIN,bool=TRUE);                      // get everything QUIET
     bool GetPropertiesFile(const string& fileIN,bool=TRUE);                    // get everything QUIET
@@ -3439,6 +3448,9 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     double         Egap_fit_net;
     vector<string> Egap_type;
     string         Egap_type_net;
+    //CO20211106 - IONIC STEPS DATA
+    bool GetIonicStepsData();   //CO20211106
+    void WriteMTPCFG(const string& outcar_path,stringstream& output_ss);   //CO20211106
     //[CO20200404 - OBSOLETE]string ERROR;
     //int number_bands,number_kpoints; //CO20171006 - camilo garbage
     //int ISPIN; // turn this into spin = 0 if ISPIN = 1 //CO20171006 - camilo garbage
@@ -4020,7 +4032,7 @@ namespace plotter {
       const vector<double> &distances, const vector<double> &segment_points,
       const xoption& plotoptions);//AS2021102
   aurostd::JSONwriter bandsDOS2JSON(const xDOSCAR &xdos, const xEIGENVAL &xeigen,
-      const xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss);//AS20201102
+      const xKPOINTS &xkpts, xoption &xopt, ofstream &FileMESSAGE, ostream &oss=std::cout);//AS20201102  //ME20211014 - added default for oss
 
   // DOS
   bool dosDataAvailable(const deque<deque<deque<deque<double> > > >& vdos, int pdos); // ME20200305
@@ -4045,6 +4057,9 @@ namespace plotter {
   void PLOT_PHDOS(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout); //CO20200404
   void PLOT_PHDOS(aurostd::xoption&, stringstream&,ostream& oss=cout);  //CO20200404
   void PLOT_PHDOS(aurostd::xoption&, stringstream&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+  void PLOT_PHDOS(aurostd::xoption&, const xDOSCAR&, ostream& oss=cout); //ME20210927
+  void PLOT_PHDOS(aurostd::xoption&, const xDOSCAR&, ofstream& FileMESSAGE,ostream& oss=cout); //ME20210927
+  void PLOT_PHDOS(aurostd::xoption&, stringstream& out, xDOSCAR, ofstream& FileMESSAGE,ostream& oss=cout); //ME20210927
 
   void PLOT_PHDISP(aurostd::xoption&,ostream& oss=cout);  //CO20200404
   void PLOT_PHDISP(aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
@@ -5172,7 +5187,7 @@ extern std::vector<xelement::xelement> velement;        // store starting from O
 #define _Y_CORR_THRESHOLD_STD_ 0.0
 #define _SELF_CORR_THRESHOLD_STD_ 0.95
 
-namespace aflowMachL {
+namespace aflowMachL {  //CO20211111
   void insertElementalProperties(const vector<string>& vproperties,const xelement::xelement& xel,vector<string>& vitems);
   void insertElementalPropertiesCoordCE(const vector<string>& vproperties,const xelement::xelement& xel,double M_X_bonds,double natoms_per_fu,vector<string>& vitems);
   void insertCrystalProperties(const string& structure_path,const string& anion,const vector<string>& vheaders,vector<string>& vitems,const string& e_props=_AFLOW_XELEMENT_PROPERTIES_ALL_);
@@ -5192,6 +5207,9 @@ namespace aflowMachL {
   void reduceFeatures(vector<vector<string> >& table,const string& yheader,const vector<uint>& vicol2skip,double var_threshold=_VAR_THRESHOLD_STD_,double ycorr_threshold=_Y_CORR_THRESHOLD_STD_,double selfcorr_threshold=_SELF_CORR_THRESHOLD_STD_);
   string reduceEProperties(double var_threshold=_VAR_THRESHOLD_STD_,double selfcorr_threshold=_SELF_CORR_THRESHOLD_STD_);
   void writeCoordCECSV();
+} // namespace aflowMachL
+namespace aflowMachL {  //CO20211111
+  void PrintMTPCFGAlloy(const aurostd::xoption& vpflow);  //CO20211111
 } // namespace aflowMachL
 //CO20201111 - END
 // ----------------------------------------------------------------------------

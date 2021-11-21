@@ -45,20 +45,16 @@ namespace apl {
     free();
   }
 
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const DOSCalculator& dosc, ofstream& mf, string directory, ostream& oss) : xStream(mf,oss) {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const DOSCalculator& dosc, ofstream& mf, const string& directory, ostream& oss) {
     free();
-    _directory = directory;
-    initialize(dosc.getBins(), dosc.getDOS(), dosc._system);
+    _directory = aurostd::CleanFileName(directory);
+    initialize(dosc.createDOSCAR(), mf, oss);
   }
 
-  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const xDOSCAR& xdos, ofstream& mf, string directory, ostream& oss) : xStream(mf,oss) {
+  ThermalPropertiesCalculator::ThermalPropertiesCalculator(const xDOSCAR& xdos, ofstream& mf, const string& directory, ostream& oss) {
     free();
-    _directory = directory;
-    vector<double> freq = aurostd::deque2vector(xdos.venergy);
-    // Convert to THz
-    for (uint i = 0; i < freq.size(); i++) freq[i] *= eV2Hz * Hz2THz;
-    vector<double> dos = aurostd::deque2vector(xdos.vDOS[0][0][0]);
-    initialize(freq, dos, xdos.title);
+    _directory = aurostd::CleanFileName(directory);
+    initialize(xdos, mf, oss);
   }
 
   // Copy constructors
@@ -85,6 +81,7 @@ namespace apl {
     _freqs_0K = that._freqs_0K;
     _dos_0K = that._dos_0K;
     _directory = that._directory;
+    natoms = that.natoms;
     system = that.system;
     temperatures = that.temperatures;
     Cv = that.Cv;
@@ -99,6 +96,7 @@ namespace apl {
     _freqs_0K.clear();
     _dos_0K.clear();
     _directory = "";
+    natoms = 0;
     system = "";
     temperatures.clear();
     Cv.clear();
@@ -124,6 +122,15 @@ namespace apl {
 
   //initialize////////////////////////////////////////////////////////////////
   // Initializes the thermal properties calculator with a 0 K solution.
+  void ThermalPropertiesCalculator::initialize(const xDOSCAR& xdos, ofstream& mf, ostream& oss) {
+    natoms = xdos.number_atoms;
+    vector<double> freq = aurostd::deque2vector(xdos.venergy);
+    // Convert to THz
+    for (uint i = 0; i < freq.size(); i++) freq[i] *= eV2Hz * Hz2THz;
+    vector<double> dos = aurostd::deque2vector(xdos.vDOS[0][0][0]);
+    initialize(freq, dos, mf, xdos.title, oss);
+  }
+
   void ThermalPropertiesCalculator::initialize(const vector<double>& freqs,
       const vector<double>& dos, ofstream& mf, const string& _system, ostream& oss) {
     xStream::initialize(mf, oss);
@@ -136,6 +143,15 @@ namespace apl {
     _dos_0K = dos;
     system = _system;
     U0 = getZeroPointEnergy();
+  }
+
+  //xStream initializers
+  void ThermalPropertiesCalculator::initialize(ostream& oss) {
+    xStream::initialize(oss);
+  }
+
+  void ThermalPropertiesCalculator::initialize(ofstream& mf, ostream& oss) {
+    xStream::initialize(mf, oss);
   }
 
   //calculateThermalProperties////////////////////////////////////////////////
@@ -369,46 +385,175 @@ namespace apl {
   //writePropertiesToFile/////////////////////////////////////////////////////
   // Outputs the thermal properties into a file that can be plotted using the
   // AFLOW plotter.
-  void ThermalPropertiesCalculator::writePropertiesToFile(string filename) {
+  void ThermalPropertiesCalculator::writePropertiesToFile(string filename, filetype ft) {
     filename = aurostd::CleanFileName(filename);
     string message = "Writing thermal properties into file " + filename + ".";
     pflow::logger(_AFLOW_FILE_NAME_, _APL_TPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
 
     stringstream outfile;
-
-    // Header
-    outfile << AFLOWIN_SEPARATION_LINE << std::endl;
-    if (!system.empty()) outfile << "[APL_THERMO]SYSTEM=" << system << std::endl;
-    outfile << "[APL_THERMO]START" << std::endl;
-    outfile << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
-    outfile << "#"
-      << std::setw(7) << "T(K)"
-      << std::setw(15) << "U0 (meV/cell)" << "   "
-      << std::setw(15) << "U (meV/cell)" << "   "
-      << std::setw(15) << "F (meV/cell)" << "   "
-      << std::setw(15) << "S (kB/cell)" << "   "
-      << std::setw(15) << "Cv (kB/cell)" << std::endl;
-
-    for (uint t = 0; t < temperatures.size(); t++) {
-      outfile << std::setw(8) << std::setprecision(2) << temperatures[t]
-        << std::setprecision(8)
-        << std::setw(15) << U0 << "   "
-        << std::setw(15) << U[t] << "   "
-        << std::setw(15) << Fvib[t] << "   "
-        << std::setw(15) << Svib[t] << "   "
-        << std::setw(15) << Cv[t] << std::endl;
+    if (ft == json_ft) {
+      aurostd::JSONwriter json;
+      if (!system.empty()) json.addString("system", system);
+      json.mergeRawJSON(getPropertiesFileString(ft));
+      outfile << json.toString();
+    } else {
+      outfile << AFLOWIN_SEPARATION_LINE << std::endl;
+      if (!system.empty()) outfile << "[APL_THERMO]SYSTEM=" << system << std::endl;
+      outfile << getPropertiesFileString(ft);
+      outfile << AFLOWIN_SEPARATION_LINE << std::endl;
     }
-
-    // Footer
-    outfile << "[APL_THERMO]STOP" << std::endl;
-    outfile << AFLOWIN_SEPARATION_LINE << std::endl;
-
     aurostd::stringstream2file(outfile, filename);
     if (!aurostd::FileExist(filename)) {
       string function = "ThermalPropertiesCalculator::writePropertiesToFile():";
       message = "Cannot open output file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
     }
+  }
+
+  // ME20210927
+  void ThermalPropertiesCalculator::addToAPLOut(stringstream& apl_outfile) {
+    apl_outfile << AFLOWIN_SEPARATION_LINE << std::endl;
+    apl_outfile << "[APL_THERMO_RESULTS]START" << std::endl;
+    apl_outfile << "energy_zero_point_cell_apl=" << std::setprecision(8) << U0 << " (meV/cell)" << std::endl;
+    if (natoms > 0) apl_outfile << "energy_zero_point_atom_apl=" << std::setprecision(8) << (U0/natoms) << " (meV/atom)" << std::endl;
+    for (uint t = 0; t < temperatures.size(); t++) {
+      if (aurostd::isequal(temperatures[t], 300.0)) {
+        apl_outfile << "energy_free_vibrational_cell_apl_300K=" << std::setprecision(8) << Fvib[t] << " (meV/cell)" << std::endl;
+        if (natoms > 0) apl_outfile << "energy_free_vibrational_atom_apl_300K=" << std::setprecision(8) << (Fvib[t]/(double) natoms) << " (meV/atom)" << std::endl;
+        apl_outfile << "entropy_vibrational_cell_apl_300K=" << std::setprecision(8) << Svib[t] << " (kB/cell)" << std::endl;
+        if (natoms > 0) apl_outfile << "entropy_vibrational_atom_apl_300K=" << std::setprecision(8) << (Svib[t]/(double) natoms) << " (kB/atom)" << std::endl;
+        apl_outfile << "energy_internal_vibrational_cell_apl_300K=" << std::setprecision(8) << U[t] << " (meV/cell)" << std::endl;
+        if (natoms > 0) apl_outfile << "energy_internal_vibrational_atom_apl_300K=" << std::setprecision(8) << (U[t]/(double) natoms) << " (meV/atom)" << std::endl;
+        apl_outfile << "heat_capacity_Cv_cell_apl_300K=" << std::setprecision(5) << Cv[t] << " (kB/cell)" << std::endl;
+        if (natoms > 0) apl_outfile << "heat_capacity_Cv_atom_apl_300K=" << std::setprecision(5) << (Cv[t]/(double) natoms) << " (kB/atom)" << std::endl;
+        break;
+      }
+    }
+    apl_outfile << "[APL_THERMO_RESULTS]STOP" << std::endl;
+    apl_outfile << AFLOWIN_SEPARATION_LINE << std::endl;
+    if (!system.empty()) apl_outfile << "[APL_THERMO]SYSTEM=" << system << std::endl;
+    apl_outfile << getPropertiesFileString();
+    apl_outfile << AFLOWIN_SEPARATION_LINE << std::endl;
+  }
+
+  string ThermalPropertiesCalculator::getPropertiesFileString(filetype ft) {
+    stringstream props;
+
+    if (ft == json_ft) {
+      aurostd::JSONwriter json,property;
+      json.addVector("T", temperatures);
+      property.clear();
+      property.addString("unit", "meV");
+      property.addString("unit_latex", "meV");
+      property.addString("unit_html", "meV");
+      property.addNumber("value", U0);
+      json.addJSON("U0_cell", property);
+      property.clear();
+      property.addString("unit", "meV");
+      property.addString("unit_latex", "meV");
+      property.addString("unit_html", "meV");
+      property.addVector("value", U);
+      json.addJSON("U_cell", property);
+      property.clear();
+      property.addString("unit", "meV");
+      property.addString("unit_latex", "meV");
+      property.addString("unit_html", "meV");
+      property.addVector("value", Fvib);
+      json.addJSON("Fvib_cell", property);
+      property.clear();
+      property.addString("unit", "kB");
+      property.addString("unit_latex", "$k_\\\\textnormal{B}$");
+      property.addString("unit_html", "<i>k</i><sub>B</sub>");
+      property.addVector("value", Svib);
+      json.addJSON("Svib_cell", property);
+      property.clear();
+      property.addString("unit", "kB");
+      property.addString("unit_latex", "$k_\\\\textnormal{B}$");
+      property.addString("unit_html", "<i>k</i><sub>B</sub>");
+      property.addVector("value", Cv);
+      json.addJSON("Cv_cell", property);
+      if (natoms > 0) {
+        property.clear();
+        property.addString("unit", "meV");
+        property.addString("unit_latex", "meV");
+        property.addString("unit_html", "meV");
+        property.addNumber("value", (U0/(double) natoms));
+        json.addJSON("U0_atom", property);
+        uint ntemps = temperatures.size();
+        vector<double> val_per_atom(ntemps);
+        property.clear();
+        property.addString("unit", "meV");
+        property.addString("unit_latex", "meV");
+        property.addString("unit_html", "meV");
+        for (uint i = 0; i < ntemps; i++) val_per_atom[i] = U[i]/((double) natoms);
+        property.addVector("value", val_per_atom);
+        property.addJSON("U_atom", property);
+        property.clear();
+        property.addString("unit", "meV");
+        property.addString("unit_latex", "meV");
+        property.addString("unit_html", "meV");
+        for (uint i = 0; i < ntemps; i++) val_per_atom[i] = Fvib[i]/((double) natoms);
+        property.addVector("value", val_per_atom);
+        property.addJSON("Fvib_atom", property);
+        property.clear();
+        property.addString("unit", "kB");
+        property.addString("unit_latex", "$k_\\\\textnormal{B}$");
+        property.addString("unit_html", "<i>k</i><sub>B</sub>");
+        for (uint i = 0; i < ntemps; i++) val_per_atom[i] = Svib[i]/((double) natoms);
+        property.addVector("value", val_per_atom);
+        property.addJSON("Svib_atom", property);
+        property.clear();
+        property.addString("unit", "kB");
+        property.addString("unit_latex", "$k_\\\\textnormal{B}$");
+        property.addString("unit_html", "<i>k</i><sub>B</sub>");
+        for (uint i = 0; i < ntemps; i++) val_per_atom[i] = Cv[i]/((double) natoms);
+        property.addVector("value", val_per_atom);
+        property.addJSON("Cv_atom", property);
+      }
+      props << json.toString(false);
+    } else {
+      // Header
+      props << "[APL_THERMO]START" << std::endl;
+      props << std::setiosflags(std::ios::fixed | std::ios::showpoint | std::ios::right);
+      props << "#"
+        << std::setw(7) << "T(K)"
+        << std::setw(15) << "U0 (meV/cell)" << "   "
+        << std::setw(15) << "U (meV/cell)" << "   "
+        << std::setw(15) << "F (meV/cell)" << "   "
+        << std::setw(15) << "S (kB/cell)" << "   "
+        << std::setw(15) << "Cv (kB/cell)";
+      if (natoms > 0) {
+        props << std::setw(15) << "U0 (meV/atom)" << "   "
+              << std::setw(15) << "U (meV/atom)" << "   "
+              << std::setw(15) << "F (meV/atom)" << "   "
+              << std::setw(15) << "S (kB/atom)" << "   "
+              << std::setw(15) << "Cv (kB/atom)";
+      }
+      props << std::endl;
+
+      for (uint t = 0; t < temperatures.size(); t++) {
+        props << std::setw(8) << std::setprecision(2) << temperatures[t]
+          << std::setprecision(8)
+          << std::setw(15) << U0 << "   "
+          << std::setw(15) << U[t] << "   "
+          << std::setw(15) << Fvib[t] << "   "
+          << std::setw(15) << Svib[t] << "   "
+          << std::setw(15) << Cv[t];
+        if (natoms > 0) {
+          props  << std::setw(15) << (U0/(double) natoms) << "   "
+                 << std::setw(15) << (U[t]/(double) natoms) << "   "
+                 << std::setw(15) << (Fvib[t]/(double) natoms) << "   "
+                 << std::setw(15) << (Svib[t]/(double) natoms) << "   "
+                 << std::setw(15) << (Cv[t]/(double) natoms);
+        }
+        props << std::endl;
+      }
+
+      // Footer
+      props << "[APL_THERMO]STOP" << std::endl;
+    }
+
+    return props.str();
   }
 
 }  // namespace apl

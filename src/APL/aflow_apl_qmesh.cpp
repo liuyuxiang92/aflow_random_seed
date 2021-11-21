@@ -171,6 +171,15 @@ namespace apl {
     _initialized = true;
   }
 
+  //xStream initializers
+  void QMesh::initialize(ostream& oss) {
+    xStream::initialize(oss);
+  }
+
+  void QMesh::initialize(ofstream& mf, ostream& oss) {
+    xStream::initialize(mf, oss);
+  }
+
   //setGrid///////////////////////////////////////////////////////////////////
   // Sets up the grid size
   void QMesh::setGrid(const xvector<int>& grid) {

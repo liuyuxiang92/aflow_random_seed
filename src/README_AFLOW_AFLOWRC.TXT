@@ -1124,6 +1124,11 @@ DEFAULT_POCC_TEMPERATURE_STRING
   type: string
   default: "0:1200:300"
 
+DEFAULT_POCC_EXCLUDE_UNSTABLE
+  description: Decided whether to exclude unstabale structures from the ensemble average
+  type: bool
+  default: 1
+
 DEFAULT_POCC_SITE_TOL
   description: Default site tolerance for HNF calculation.
   type: double
@@ -1189,10 +1194,20 @@ POCC_OUT_FILE
   type: string
   default: "out"
 
+POCC_APL_OUT_FILE
+  description: Name for the POCC-APL post-processing properties file.
+  type: string
+  default: "apl.out"
+
 POCC_DOSCAR_FILE
   description: Name for ensemble average DOSCAR.
   type: string
   default: "DOSCAR.pocc"
+
+POCC_PHDOSCAR_FILE
+  description: Name for ensemble average PHDOSCAR.
+  type: string
+  default: "PHDOSCAR.pocc"
 
 POCC_ANIONS_LIST
   description: List of elements that could be considered anions.
@@ -1330,6 +1345,11 @@ DEFAULT_APL_FILE_PREFIX
   type: string
   default: "aflow.apl."
 
+DEFAULT_APL_FILE_PREFIX
+  description: The APL summary file.
+  type: string
+  default: ".out"
+
 DEFAULT_APL_PDIS_FILE
   description: Output file for the phonon dispersion curve.
   type: string
@@ -1344,6 +1364,11 @@ DEFAULT_APL_THERMO_FILE
   description: Output file for the thermodynamic properties.
   type: string
   default: "thermodynamic_properties.out"
+
+DEFAULT_APL_THERMO_JSON
+  description: Output file for the thermodynamic properties in json format.
+  type: string
+  default: "thermodynamic_properties.json"
 
 DEFAULT_APL_HARMIFC_FILE
   description: Output file for the harmonic force constants. Also functions as the APL hibernation file.

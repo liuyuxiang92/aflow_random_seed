@@ -1397,7 +1397,12 @@ namespace KBIN {
 
 // *******************************************************************************************
 namespace KBIN {
+  //ME20210927 Added string variant
   bool CompressDirectory(const _aflags& aflags,const _kflags& kflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
+    return CompressDirectory(aflags.Directory, kflags);
+  }
+
+  bool CompressDirectory(const string& directory, const _kflags& kflags) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "KBIN::CompressDirectory():";
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -1408,10 +1413,10 @@ namespace KBIN {
     // [OBSOLETE] aus << "grep -v SKIP | ";
     // [OBSOLETE] aus << "grep -v " << KBIN_SUBDIRECTORIES << " | ";
     // [OBSOLETE]  aus << "grep -v aflow.in | grep -v " << _AFLOWIN_ << " ";;    //CO, never zip aflow.in or _aflow.in (agl_aflow.in) or newly defined aflow.in
-    if(LDEBUG){cerr << soliloquy << " directory=" << aflags.Directory << endl;}
+    if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
     vector<string> _vfiles,vfiles;
     string compressed_variant;
-    aurostd::DirectoryLS(aflags.Directory,_vfiles);
+    aurostd::DirectoryLS(directory,_vfiles);
     if(LDEBUG){cerr << soliloquy << "_vfiles=" << aurostd::joinWDelimiter(_vfiles,",") << endl;}
     string file_path;
     for(uint i=0;i<_vfiles.size();i++){
@@ -1426,7 +1431,7 @@ namespace KBIN {
           aurostd::substring2bool(_vfiles[i],".in")){continue;} //AS20201023 do not compress files like aflow_qha.in
       if(aurostd::substring2bool(_vfiles[i],DEFAULT_AFLOW_END_OUT) || aurostd::substring2bool(_vfiles[i],"aflow.end.out")){continue;}  //CO20170613, file is special because it gets written after compression
       if(aurostd::substring2bool(_vfiles[i],_AFLOWIN_)){continue;}
-      file_path=aflags.Directory + "/" + _vfiles[i];
+      file_path=directory + "/" + _vfiles[i];
       if(LDEBUG) {cerr << soliloquy << " file_path=" << file_path << endl;}
       if(aurostd::IsDirectory(file_path)){continue;}  //compress files only
       // [OBSOLETE]  if(aurostd::EFileExist(file_path,compressed_variant)){ //SC20200408
@@ -1447,7 +1452,7 @@ namespace KBIN {
     if(vfiles.size()){
       ostringstream aus;
       //aurostd::StringstreamClean(aus);
-      aus << "cd " << aflags.Directory << " && " << endl;
+      aus << "cd " << directory << " && " << endl;
       for(uint i=0;i<vfiles.size();i++){ //better than doing it all in one shot
         aus << kflags.KZIP_BIN << " -9f " << vfiles[i] << "; " << endl;  // semi-colon is important, keeps going if it stalls on one
       }

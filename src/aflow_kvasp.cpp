@@ -406,6 +406,20 @@ namespace KBIN {
         aus << "00000  MESSAGE POCC_ARUNS2SKIP_STRING=" << kflags.KBIN_POCC_ARUNS2SKIP_STRING << Message(_AFLOW_FILE_NAME_,aflags) << endl;  //CO20200624
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,oss);  //CO20200624
       }
+      //ME20210927 - EXCLUDE_UNSTABLE
+      string exclude = aurostd::toupper(aurostd::substring2string(AflowIn, "[AFLOW_POCC]EXCLUDE_UNSTABLE="));
+      if (exclude.empty()) {
+        kflags.KBIN_POCC_EXCLUDE_UNSTABLE = DEFAULT_POCC_EXCLUDE_UNSTABLE;
+      } else {
+        if (exclude[0] == 'T') {
+          kflags.KBIN_POCC_EXCLUDE_UNSTABLE = true;
+        } else if (exclude[0] == 'F') {
+          kflags.KBIN_POCC_EXCLUDE_UNSTABLE = false;
+        } else {
+          kflags.KBIN_POCC_EXCLUDE_UNSTABLE = DEFAULT_POCC_EXCLUDE_UNSTABLE;
+        }
+        aus << "00000  MESSAGE POCC_EXCLUDE_UNSTABLE=" << (kflags.KBIN_POCC_EXCLUDE_UNSTABLE?"TRUE":"FALSE") << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      }
     }
     // ---------------------------------------------------------
     // parameters for FROZSL

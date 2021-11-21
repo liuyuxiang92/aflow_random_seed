@@ -188,45 +188,25 @@ namespace apl {
     // Get the number of CPUS
     int ncpus = _pc->getNCPUs();
 
-    // Distribute the calculation
-    int startIndex, endIndex;
-    std::vector<std::thread*> threads;
-    vector<vector<int> > thread_dist = getThreadDistribution((int) _qpoints.size(), ncpus);
-    for (int icpu = 0; icpu < ncpus; icpu++) {
-      startIndex = thread_dist[icpu][0];
-      endIndex = thread_dist[icpu][1];
-      threads.push_back(new std::thread(&DOSCalculator::calculateInOneThread, this, startIndex, endIndex));
+    if (ncpus > 1) {
+      int startIndex, endIndex;
+      std::vector<std::thread*> threads;
+      vector<vector<int> > thread_dist = getThreadDistribution((int) _qpoints.size(), ncpus);
+      for (int icpu = 0; icpu < ncpus; icpu++) {
+        startIndex = thread_dist[icpu][0];
+        endIndex = thread_dist[icpu][1];
+        threads.push_back(new std::thread(&DOSCalculator::calculateInOneThread, this, startIndex, endIndex));
+      }
+      for (uint i = 0; i < threads.size(); i++) {
+        threads[i]->join();
+        delete threads[i];
+      }
+      threads.clear();
+    } else {
+      calculateInOneThread(0, (int) _qpoints.size());
     }
-
-    // OBSOLETE ME20180801
-    //   for (int icpu = 0; icpu < ncpus; icpu++) {
-    //   startIndex = icpu * qpointsPerCPU;
-    //   endIndex = startIndex + qpointsPerCPU;
-    //   if (((uint)endIndex > _qpoints.size()) ||
-    //   ((icpu == ncpus - 1) && ((uint)endIndex < _qpoints.size())))
-    //   endIndex = _qpoints.size();
-    //   threads.push_back(new std::thread(&DOSCalculator::calculateInOneThread, this, startIndex, endIndex));
-    //   }
-
-    // Wait to finish all threads here!
-    for (uint i = 0; i < threads.size(); i++) {
-      threads[i]->join();
-      delete threads[i];
-    }
-    threads.clear();
-
 #else
-
-    // Calculate frequencies
-    //ME20190624 - added eigenvectors for projected DOS
-    //ME20200206 - use calculateInOneThread so changes only need to be made in one place
-    //[[OBSOLETE]xmatrix<xcomplex<double> > xmtrx(_pc->getNumberOfBranches(), _pc->getNumberOfBranches());
-    //[[OBSOLETE]for (uint iqp = 0; iqp < _qpoints.size(); iqp++) {
-    //[[OBSOLETE]  _freqs.push_back(_pc->getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, xmtrx));
-    //[[OBSOLETE]  _eigen.push_back(xmtrx);
-    //[[OBSOLETE]}
     calculateInOneThread(0, (int) _qpoints.size());
-
 #endif
     //CO END
 
@@ -306,21 +286,22 @@ namespace apl {
   }
 
   //ME20200203 - DOS can now be calculated within any frequency range
+  //ME20210927 - Added VERBOSE option
   // ///////////////////////////////////////////////////////////////////////////
 
-  void DOSCalculator::calc(int USER_DOS_NPOINTS) {
-    calc(USER_DOS_NPOINTS, 0.0, _minFreq, _maxFreq);
+  void DOSCalculator::calc(int USER_DOS_NPOINTS, bool VERBOSE) {
+    calc(USER_DOS_NPOINTS, 0.0, _minFreq, _maxFreq, VERBOSE);
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
-  void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR) {
-    calc(USER_DOS_NPOINTS, USER_DOS_SMEAR, _minFreq, _maxFreq);
+  void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR, bool VERBOSE) {
+    calc(USER_DOS_NPOINTS, USER_DOS_SMEAR, _minFreq, _maxFreq, VERBOSE);
   }
 
   // ///////////////////////////////////////////////////////////////////////////
   void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR,
-      double fmin, double fmax) {
+      double fmin, double fmax, bool VERBOSE) {
     string function = "DOSCalculator::calc():";
     string message = "";
     if (!_pc_set) {
@@ -361,12 +342,16 @@ namespace apl {
     //ME20200321 - Added logger output
     //rawCalc(USER_DOS_NPOINTS);  OBSOLETE
     if (_bzmethod == "LT") {
-      message = "Calculating phonon DOS using the linear tetrahedron method.";
-      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+      if (VERBOSE) {
+        message = "Calculating phonon DOS using the linear tetrahedron method.";
+        pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+      }
       calcDosLT();
     } else if (_bzmethod == "RS") {
-      message = "Calculating phonon DOS using the root sampling method.";
-      pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+      if (VERBOSE) {
+        message = "Calculating phonon DOS using the root sampling method.";
+        pflow::logger(_AFLOW_FILE_NAME_, "APL", message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+      }
       calcDosRS();
     }
     //ME20190423 END
@@ -376,14 +361,17 @@ namespace apl {
       smearWithGaussian(_dos, _idos, _stepDOS, USER_DOS_SMEAR);  //ME20190614
 
     // Normalize to number of branches
-    double sum = 0.0;
-    for (int k = 0; k < USER_DOS_NPOINTS; k++)
-      sum += _dos[k];
-    sum /= _pc->getNumberOfBranches();
+    // ME20210927 - Only normalize when inside full frequency spectrum
+    if ((fmin - _minFreq < _ZERO_TOL_) && (fmax - _maxFreq > _ZERO_TOL_)) {
+      double sum = 0.0;
+      for (int k = 0; k < USER_DOS_NPOINTS; k++)
+        sum += _dos[k];
+      sum /= _pc->getNumberOfBranches();
 
-    for (int k = 0; k < USER_DOS_NPOINTS; k++) {
-      _dos[k] /= (sum * _stepDOS);
-      //_idos[k] /= (sum * _stepDOS);  //ME20190614  // OBSOLETE - ME20200228 - not necessary for iDOS
+      for (int k = 0; k < USER_DOS_NPOINTS; k++) {
+        _dos[k] /= (sum * _stepDOS);
+        //_idos[k] /= (sum * _stepDOS);  //ME20190614  // OBSOLETE - ME20200228 - not necessary for iDOS
+      }
     }
   }
 
@@ -623,7 +611,7 @@ namespace apl {
     // }
   }
 
-  xDOSCAR DOSCalculator::createDOSCAR() {
+  xDOSCAR DOSCalculator::createDOSCAR() const {
     if (!_pc_set) {
       string function = "DOSCalculator::createDOSCAR()";
       string message = "PhononCalculator pointer not set.";
@@ -709,8 +697,28 @@ namespace apl {
     return _freqs;
   }
 
-  bool DOSCalculator::hasNegativeFrequencies() const {
+  bool DOSCalculator::hasImaginaryFrequencies() const {
     return (_minFreq < MIN_FREQ_THRESHOLD ? true : false);
+  }
+
+  // ME20210927
+  double DOSCalculator::getMinFreq() const {
+    return _minFreq;
+  }
+
+  // ME20210927
+  double DOSCalculator::getMaxFreq() const {
+    return _maxFreq;
+  }
+
+  // ME20210927
+  const xstructure& DOSCalculator::getInputStructure() const {
+    return _pc->getInputCellStructure();
+  }
+
+  // ME20210927
+  uint DOSCalculator::getNumberOfBranches() const {
+    return _pc->getNumberOfBranches();
   }
 
   // ///////////////////////////////////////////////////////////////////////////

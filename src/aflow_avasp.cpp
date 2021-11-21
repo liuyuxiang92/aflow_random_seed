@@ -3281,7 +3281,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
         throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
       }
       if(pthread>=0)  pthread_mutex_lock(&mutex_AVASP);
-      cout << "AFLOW V(" << string(AFLOW_VERSION) << ") creating " << directory;
+      cout << "AFLOW V(" << string(AFLOW_VERSION) << ") creating " << directory << "/" + _AFLOWIN_;  //ME20211004 - added aflow.in file name
       if(xvasp.aopts.flag("FLAG::AVASP_LDAU1")) cout << " [LDAU1]";
       if(xvasp.aopts.flag("FLAG::AVASP_LDAU2")) cout << " [LDAU2]";
       if(fixed_lattice_vasp) cout << " [fixed_lattice_vasp=" << xvasp.AVASP_label << "]";

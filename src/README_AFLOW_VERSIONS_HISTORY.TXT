@@ -1,6 +1,8 @@
 3.2.12 - 2021/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)
+        -- Added POCC+APL workflow (ME)
+        -- Added LIB2RAW for APL (ME)
         -- added function to move aflow run to another directory (DX)
         -- added machine settings for machine004 (DX)
         -- added function to move aflow run to another directory (DX)
