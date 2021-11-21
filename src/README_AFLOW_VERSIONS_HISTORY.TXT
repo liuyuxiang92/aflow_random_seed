@@ -18,6 +18,10 @@
         -- patching GetStoich() bug with pocc structures (round-off printing errors) (CO)
         -- adding KPOINTS=GAMMA_ODD to NELM patches (CO)
         -- added plasmonics analysis in POCC (CO)
+        (AFLOW: aconvasp_main.cpp, aflow.cpp, aflow.h, aflowlib.h, aflowlib_libraries.cpp, aflowlib_web_interface.cpp, aflowlib_web_outreach.cpp, aflowrc.cpp, avasp.cpp, chull.cpp, compare_structure_function.cpp, init.cpp, ivasp.cpp, kbin.cpp, kvasp.cpp, lattice.cpp, Makefile.aflow, ovasp.cpp, pflow.h, plotter.cpp, pocc_apl.cpp, pocc.cpp, pocc.h, pthreads.cpp, README_AFLOW_ACONVASP.TXT, README_AFLOW_AFLOWRC.TXT, README_AFLOW_POCC.TXT, README_AFLOW.TXT, test.cpp, xatom.cpp, xclasses.cpp)
+        (APL: aapl_cluster.cpp, aapl_ifcs.cpp, aapl_tcond.cpp, apl_atomic_disp.cpp, apl_doscalc.cpp, apl_fccalc.cpp, apl.h, apl_kphonons.cpp, apl_pdisc.cpp, apl_phoncalc.cpp, apl_qmesh.cpp, apl_supercell.cpp, apl_thermalpc.cpp, qha.cpp)
+        (SYMBOLICCPLUSPLUS: symbolic.cpp, symbolic.h)
+        (AUROSTD: aurostd.h, boot.cpp, main.cpp, xmatrix.cpp, xmatrix.h, xoption.cpp, xoption.h, xscalar.cpp, xscalar.h)
 3.2.11 - 2021/08/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.11.tar.xz
         -- added plotter options for QHA (AS)
