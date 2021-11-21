@@ -285,7 +285,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   getGeneralNormal(vxv);
   v=aurostd::args2xvectorutype<utype>(vstring,c,v);v=aurostd::args2xvectorutype<utype>(vstring,c,i);
   aurostd::args2vectorutype<utype>(vstring,c);aurostd::args2dequeutype<utype>(dstring,c);
-  v.clear();clear(v);reshape(x);reshape(x,x);reshape(x,x,x);reshape(x,x,x,x);reshape(x,x,x,x,x);reshape(x,x,x,x,x,x);
+  v.clear();clear(v);reshape(xvi,2,1);reshape(x);reshape(x,x);reshape(x,x,x);reshape(x,x,x,x);reshape(x,x,x,x,x);reshape(x,x,x,x,x,x);
   //  sort2((unsigned long)1,v,v);sort2((unsigned long)1,xvd,xvi);sort2((unsigned long)1,xvi,xvd);
   o+=isequal(v,v)+isequal(v,v,(utype) 0)+isequal(v,v,x)+isdifferent(v,v)+isdifferent(v,v,x)+isinteger(v,x);swap(v,1,1);shiftlrows(v,1);
   getQuartiles(v,x,x,x);

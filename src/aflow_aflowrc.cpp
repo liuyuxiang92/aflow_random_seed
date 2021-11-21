@@ -456,6 +456,8 @@
 //DEFAULT POCC //CO20181226
 #define AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING                   string("0:2400:300")
 #define         DEFAULT_POCC_TEMPERATURE_STRING                   XHOST.adefault.getattachedscheme("DEFAULT_POCC_TEMPERATURE_STRING")
+#define AFLOWRC_DEFAULT_POCC_EXCLUDE_UNSTABLE                     true  //ME20210927
+#define         DEFAULT_POCC_EXCLUDE_UNSTABLE                     XHOST.adefault.getattachedutype<bool>("DEFAULT_POCC_EXCLUDE_UNSTABLE")  //ME20210927
 #define AFLOWRC_DEFAULT_POCC_SITE_TOL                             0.001
 #define         DEFAULT_POCC_SITE_TOL                             XHOST.adefault.getattachedutype<double>("DEFAULT_POCC_SITE_TOL")
 #define AFLOWRC_DEFAULT_POCC_STOICH_TOL                           0.001
@@ -474,6 +476,8 @@
 #define         POCC_FILE_PREFIX                                  XHOST.adefault.getattachedscheme("POCC_FILE_PREFIX")
 #define AFLOWRC_POCC_OUT_FILE                                     string("out")
 #define         POCC_OUT_FILE                                     XHOST.adefault.getattachedscheme("POCC_OUT_FILE")
+#define AFLOWRC_POCC_APL_OUT_FILE                                 string("apl.out")  //ME20210927
+#define         POCC_APL_OUT_FILE                                 XHOST.adefault.getattachedscheme("POCC_APL_OUT_FILE")  //ME20210927
 #define AFLOWRC_POCC_ALL_SUPERCELLS_FILE                          string("structures_all.out")
 #define         POCC_ALL_SUPERCELLS_FILE                          XHOST.adefault.getattachedscheme("POCC_ALL_SUPERCELLS_FILE")
 #define AFLOWRC_POCC_UNIQUE_SUPERCELLS_FILE                       string("structures_unique.out")
@@ -484,6 +488,8 @@
 #define         POCC_ALL_SITE_CONFIGURATIONS_FILE                 XHOST.adefault.getattachedscheme("POCC_ALL_SITE_CONFIGURATIONS_FILE")
 #define AFLOWRC_POCC_DOSCAR_FILE                                  string("DOSCAR.pocc")
 #define         POCC_DOSCAR_FILE                                  XHOST.adefault.getattachedscheme("POCC_DOSCAR_FILE")
+#define AFLOWRC_POCC_PHDOSCAR_FILE                                string("PHDOSCAR.pocc")  //ME20210927
+#define         POCC_PHDOSCAR_FILE                                XHOST.adefault.getattachedscheme("POCC_PHDOSCAR_FILE")  //ME20210927
 #define AFLOWRC_POCC_ANIONS_LIST                                  string("B,C,N,O")
 #define         POCC_ANIONS_LIST                                  XHOST.adefault.getattachedscheme("POCC_ANIONS_LIST")
 
@@ -555,12 +561,16 @@
 //// DEFAULT APL FILES
 #define AFLOWRC_DEFAULT_APL_FILE_PREFIX                       string("aflow.apl.")
 #define         DEFAULT_APL_FILE_PREFIX                       XHOST.adefault.getattachedscheme("DEFAULT_APL_FILE_PREFIX")
+#define AFLOWRC_DEFAULT_APL_OUT_FILE                          string("out")  // ME20210927
+#define         DEFAULT_APL_OUT_FILE                          XHOST.adefault.getattachedscheme("DEFAULT_APL_OUT_FILE")  // ME20210927
 #define AFLOWRC_DEFAULT_APL_PDIS_FILE                         string("phonon_dispersion.out")
 #define         DEFAULT_APL_PDIS_FILE                         XHOST.adefault.getattachedscheme("DEFAULT_APL_PDIS_FILE")
 #define AFLOWRC_DEFAULT_APL_PDOS_FILE                         string("phonon_dos.out")
 #define         DEFAULT_APL_PDOS_FILE                         XHOST.adefault.getattachedscheme("DEFAULT_APL_PDOS_FILE")
 #define AFLOWRC_DEFAULT_APL_THERMO_FILE                       string("thermodynamic_properties.out")
 #define         DEFAULT_APL_THERMO_FILE                       XHOST.adefault.getattachedscheme("DEFAULT_APL_THERMO_FILE")
+#define AFLOWRC_DEFAULT_APL_THERMO_JSON                       string("thermodynamic_properties.json")  //ME20211019
+#define         DEFAULT_APL_THERMO_JSON                       XHOST.adefault.getattachedscheme("DEFAULT_APL_THERMO_JSON")  //ME20211019
 #define AFLOWRC_DEFAULT_APL_DYNMAT_FILE                       string("DYNMAT.out")
 #define         DEFAULT_APL_DYNMAT_FILE                       XHOST.adefault.getattachedscheme("DEFAULT_APL_DYNMAT_FILE")
 #define AFLOWRC_DEFAULT_APL_HARMIFC_FILE                      string("harmonicIFCs.xml")
@@ -1444,6 +1454,7 @@ namespace aflowrc {
 
     // DEFAULT POCC
     aflowrc::load_default("DEFAULT_POCC_TEMPERATURE_STRING",AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING);
+    aflowrc::load_default("DEFAULT_POCC_EXCLUDE_UNSTABLE",AFLOWRC_DEFAULT_POCC_EXCLUDE_UNSTABLE);  //ME20210927
     aflowrc::load_default("DEFAULT_POCC_SITE_TOL",AFLOWRC_DEFAULT_POCC_SITE_TOL);
     aflowrc::load_default("DEFAULT_POCC_STOICH_TOL",AFLOWRC_DEFAULT_POCC_STOICH_TOL);
     aflowrc::load_default("DEFAULT_UFF_BONDING_DISTANCE",AFLOWRC_DEFAULT_UFF_BONDING_DISTANCE);
@@ -1453,11 +1464,13 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS",AFLOWRC_DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS);
     aflowrc::load_default("POCC_FILE_PREFIX",AFLOWRC_POCC_FILE_PREFIX);
     aflowrc::load_default("POCC_OUT_FILE",AFLOWRC_POCC_OUT_FILE);
+    aflowrc::load_default("POCC_APL_OUT_FILE",AFLOWRC_POCC_APL_OUT_FILE);  //ME20210927
     aflowrc::load_default("POCC_ALL_SUPERCELLS_FILE",AFLOWRC_POCC_ALL_SUPERCELLS_FILE);
     aflowrc::load_default("POCC_UNIQUE_SUPERCELLS_FILE",AFLOWRC_POCC_UNIQUE_SUPERCELLS_FILE);
     aflowrc::load_default("POCC_ALL_HNF_MATRICES_FILE",AFLOWRC_POCC_ALL_HNF_MATRICES_FILE);
     aflowrc::load_default("POCC_ALL_SITE_CONFIGURATIONS_FILE",AFLOWRC_POCC_ALL_SITE_CONFIGURATIONS_FILE);
     aflowrc::load_default("POCC_DOSCAR_FILE",AFLOWRC_POCC_DOSCAR_FILE);
+    aflowrc::load_default("POCC_PHDOSCAR_FILE",AFLOWRC_POCC_PHDOSCAR_FILE);  //ME20210927
     aflowrc::load_default("POCC_ANIONS_LIST",AFLOWRC_POCC_ANIONS_LIST);
 
     // DEFAULT APL
@@ -1497,9 +1510,11 @@ namespace aflowrc {
 
     //// DEFAULT APL FILES
     aflowrc::load_default("DEFAULT_APL_FILE_PREFIX",AFLOWRC_DEFAULT_APL_FILE_PREFIX);
+    aflowrc::load_default("DEFAULT_APL_OUT_FILE",AFLOWRC_DEFAULT_APL_OUT_FILE);  //ME20210927
     aflowrc::load_default("DEFAULT_APL_PDIS_FILE",AFLOWRC_DEFAULT_APL_PDIS_FILE);
     aflowrc::load_default("DEFAULT_APL_PDOS_FILE",AFLOWRC_DEFAULT_APL_PDOS_FILE);
     aflowrc::load_default("DEFAULT_APL_THERMO_FILE",AFLOWRC_DEFAULT_APL_THERMO_FILE);
+    aflowrc::load_default("DEFAULT_APL_THERMO_JSON",AFLOWRC_DEFAULT_APL_THERMO_JSON);  //ME20211019
     aflowrc::load_default("DEFAULT_APL_DYNMAT_FILE",AFLOWRC_DEFAULT_APL_DYNMAT_FILE);
     aflowrc::load_default("DEFAULT_APL_HARMIFC_FILE",AFLOWRC_DEFAULT_APL_HARMIFC_FILE);
     aflowrc::load_default("DEFAULT_APL_POLAR_FILE",AFLOWRC_DEFAULT_APL_POLAR_FILE);  //ME20200415
@@ -2073,6 +2088,7 @@ namespace aflowrc {
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS POCC" << endl;
     aflowrc << "DEFAULT_POCC_TEMPERATURE_STRING=\"" << AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING << "\"" << endl;
+    aflowrc << "DEFAULT_POCC_EXCLUDE_UNSTABLE=" << AFLOWRC_DEFAULT_POCC_EXCLUDE_UNSTABLE << endl;  //ME20210927
     aflowrc << "DEFAULT_POCC_SITE_TOL=" << AFLOWRC_DEFAULT_POCC_SITE_TOL << endl;
     aflowrc << "DEFAULT_POCC_STOICH_TOL=" << AFLOWRC_DEFAULT_POCC_STOICH_TOL << endl;
     aflowrc << "DEFAULT_UFF_BONDING_DISTANCE=" << AFLOWRC_DEFAULT_UFF_BONDING_DISTANCE << endl;
@@ -2082,11 +2098,13 @@ namespace aflowrc {
     aflowrc << "DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS=" << AFLOWRC_DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS << endl;
     aflowrc << "POCC_FILE_PREFIX=\"" << AFLOWRC_POCC_FILE_PREFIX << "\"" << endl;
     aflowrc << "POCC_OUT_FILE=\"" << AFLOWRC_POCC_OUT_FILE << "\"" << endl;
+    aflowrc << "POCC_APL_OUT_FILE=\"" << AFLOWRC_POCC_APL_OUT_FILE << "\"" << endl;  //ME20210927
     aflowrc << "POCC_ALL_SUPERCELLS_FILE=\"" << AFLOWRC_POCC_ALL_SUPERCELLS_FILE << "\"" << endl;
     aflowrc << "POCC_UNIQUE_SUPERCELLS_FILE=\"" << AFLOWRC_POCC_UNIQUE_SUPERCELLS_FILE << "\"" << endl;
     aflowrc << "POCC_ALL_HNF_MATRICES_FILE=\"" << AFLOWRC_POCC_ALL_HNF_MATRICES_FILE << "\"" << endl;
     aflowrc << "POCC_ALL_SITE_CONFIGURATIONS_FILE=\"" << AFLOWRC_POCC_ALL_SITE_CONFIGURATIONS_FILE << "\"" << endl;
     aflowrc << "POCC_DOSCAR_FILE=\"" << AFLOWRC_POCC_DOSCAR_FILE << "\"" << endl;
+    aflowrc << "POCC_PHDOSCAR_FILE=\"" << AFLOWRC_POCC_PHDOSCAR_FILE << "\"" << endl;  //ME20210927
     aflowrc << "POCC_ANIONS_LIST=\"" << AFLOWRC_POCC_ANIONS_LIST << "\"" << endl;
 
     aflowrc << " " << endl;
@@ -2122,9 +2140,11 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APL_TPT=\"" << AFLOWRC_DEFAULT_APL_TPT << "\"" << endl;
     aflowrc << "DEFAULT_APL_GVEL=" << AFLOWRC_DEFAULT_APL_GVEL << endl;  //ME20200517
     aflowrc << "DEFAULT_APL_FILE_PREFIX=\"" << AFLOWRC_DEFAULT_APL_FILE_PREFIX << "\"" << endl;
+    aflowrc << "DEFAULT_APL_OUT_FILE=\"" << AFLOWRC_DEFAULT_APL_OUT_FILE << "\"" << endl;  //ME20210927
     aflowrc << "DEFAULT_APL_PDIS_FILE=\"" << AFLOWRC_DEFAULT_APL_PDIS_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_PDOS_FILE=\"" << AFLOWRC_DEFAULT_APL_PDOS_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_THERMO_FILE=\"" << AFLOWRC_DEFAULT_APL_THERMO_FILE << "\"" << endl;
+    aflowrc << "DEFAULT_APL_THERMO_JSON=\"" << AFLOWRC_DEFAULT_APL_THERMO_JSON << "\"" << endl;  //ME20211019
     aflowrc << "DEFAULT_APL_DYNMAT_FILE=\"" << AFLOWRC_DEFAULT_APL_DYNMAT_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_HARMIFC_FILE=\"" << AFLOWRC_DEFAULT_APL_HARMIFC_FILE << "\"" << endl;
     aflowrc << "DEFAULT_APL_POLAR_FILE=\"" << AFLOWRC_DEFAULT_APL_POLAR_FILE << "\"" << endl;  //ME20200415
@@ -2666,6 +2686,7 @@ namespace aflowrc {
 
     if(LDEBUG) oss << "// DEFAULTS POCC" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_TEMPERATURE_STRING\")=\"" << DEFAULT_POCC_TEMPERATURE_STRING << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_EXCLUDE_UNSTABLE\")=" << DEFAULT_POCC_EXCLUDE_UNSTABLE << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_SITE_TOL\")=" << DEFAULT_POCC_SITE_TOL << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_STOICH_TOL\")=" << DEFAULT_POCC_STOICH_TOL << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_UFF_BONDING_DISTANCE\")=" << DEFAULT_UFF_BONDING_DISTANCE << endl;
@@ -2675,11 +2696,13 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS\")=" << DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_FILE_PREFIX\")=\"" << POCC_FILE_PREFIX << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_OUT_FILE\")=\"" << POCC_OUT_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_APL_OUT_FILE\")=\"" << POCC_APL_OUT_FILE << "\"" << endl;  //ME20210927
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_ALL_SUPERCELLS_FILE\")=\"" << POCC_ALL_SUPERCELLS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_UNIQUE_SUPERCELLS_FILE\")=\"" << POCC_UNIQUE_SUPERCELLS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_ALL_HNF_MATRICES_FILE\")=\"" << POCC_ALL_HNF_MATRICES_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_ALL_SITE_CONFIGURATIONS_FILE\")=\"" << POCC_ALL_SITE_CONFIGURATIONS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_DOSCAR_FILE\")=\"" << POCC_DOSCAR_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_PHDOSCAR_FILE\")=\"" << POCC_PHDOSCAR_FILE << "\"" << endl;  // ME20210927
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_ANIONS_LIST\")=\"" << POCC_ANIONS_LIST << "\"" << endl;
 
     if(LDEBUG) oss << "// DEFAULTS APL" << endl;
@@ -2714,9 +2737,11 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_TPT\")=\"" << DEFAULT_APL_TPT << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_GVEL\")=" << DEFAULT_APL_GVEL << endl;  //ME20200517
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_FILE_PREFIX\")=\"" << DEFAULT_APL_FILE_PREFIX << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_OUT_FILE\")=\"" << DEFAULT_APL_OUT_FILE << "\"" << endl;  // ME20210927
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PDIS_FILE\")=\"" << DEFAULT_APL_PDIS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_PDOS_FILE\")=\"" << DEFAULT_APL_PDOS_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_THERMO_FILE\")=\"" << DEFAULT_APL_THERMO_FILE << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_THERMO_JSON\")=\"" << DEFAULT_APL_THERMO_JSON << "\"" << endl;  //ME20211019
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_DYNMAT_FILE\")=\"" << DEFAULT_APL_DYNMAT_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_HARMIFC_FILE\")=\"" << DEFAULT_APL_HARMIFC_FILE << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APL_POLAR_FILE\")=\"" << DEFAULT_APL_POLAR_FILE << "\"" << endl;  //ME20200415
