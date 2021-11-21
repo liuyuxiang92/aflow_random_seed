@@ -9549,9 +9549,8 @@ const xPLASMONICS& xPLASMONICS::operator=(const xPLASMONICS& b) {  // operator= 
 }
 
 void xPLASMONICS::clear() {  // clear PRIVATE  //CO20191110
-  xPLASMONICS _temp;
   string filename_aus=filename;
-  copy(_temp);
+  free();
   filename=filename_aus;
 }
 
