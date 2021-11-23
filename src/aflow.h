@@ -1540,9 +1540,12 @@ class xstructure {
     xstructure(const string& url,const string& file,int=IOVASP_POSCAR); // constructor from URL
     ~xstructure();                                                // destructor
     // I/O, mutators                                              // --------------------------------------
+    void initialize(const string& structure_title="");            // initialize xstructure based on input (avoids copying xstructure); //CO20211122
     void initialize(istream& input,int=IOVASP_POSCAR);            // initialize xstructure based on input (avoids copying xstructure); //DX20210129
     void initialize(ifstream& input,int=IOVASP_POSCAR);           // initialize xstructure based on input (avoids copying xstructure); //DX20210129
     void initialize(const stringstream& input,int=IOVASP_POSCAR); // initialize xstructure based on input (avoids copying xstructure); //DX20210129
+    void initialize(const string& input,int);                     // initialize xstructure based on input (avoids copying xstructure); //CO20211122
+    void initialize(const string& url,const string& file,int=IOVASP_POSCAR);  // initialize xstructure based on input (avoids copying xstructure); //CO20211122
     bool GetStoich(void);                                         // get stoich_each_type - CO20170724
     bool sortAtomsEquivalent(void);                               // sort by equivalent atoms - CO20190116
     bool FixLattices(void);                                       // Reciprocal/f2c/c2f
