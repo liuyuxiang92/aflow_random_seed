@@ -55,7 +55,7 @@ namespace symbolic{ //DX20200625
   { CloningSymbolicInterface::operator=(c); } //DX20211120 - to fix warnings for gcc>10 gcc=4, need explicit declaration
 
   CloningSymbolicInterface &CloningSymbolicInterface::operator=(const CloningSymbolicInterface &c) //DX20210420 - to fix warnings for gcc>10, need explicit declaration
-  //DX20211120 - infinite recursion warning for gcc=4 - { *this=c; return *this; } //DX20210420 - to fix warnings for gcc>10, need explicit declaration
+    //DX20211120 - infinite recursion warning for gcc=4 - { *this=c; return *this; } //DX20210420 - to fix warnings for gcc>10, need explicit declaration
   { copy(c); return *this; } //DX20210420 - to fix warnings for gcc>10 and gcc=4, need explicit declaration
 
   ///////////////////////////////////////////////////

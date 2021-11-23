@@ -1507,8 +1507,8 @@ namespace aflowlib {
         aurostd::DirectoryLS(directory_LIB, files);
         for (uint i = 0; i < files.size(); i++) {
           if ((files[i].find("phdispdos.png") != string::npos)
-           || (files[i].find("phdisp.png") != string::npos)
-           || (files[i].find("phdos.png") != string::npos)) {
+              || (files[i].find("phdisp.png") != string::npos)
+              || (files[i].find("phdos.png") != string::npos)) {
             aurostd::LinkFile(directory_RAW+"/"+files[i],directory_WEB);
           }
         }
@@ -5692,30 +5692,30 @@ namespace aflowlib {
     aurostd::ExtractToStringEXPLICIT(aurostd::efile2string(directory_RAW + "/" + file), lines, "[APL_THERMO_RESULTS]START", "[APL_THERMO_RESULTS]STOP");
     aurostd::string2vectorstring(lines, vlines);
     for (uint i = 0; i < vlines.size(); i++) {
-        aurostd::StringSubst(vlines[i], "=", " ");
-        aurostd::string2tokens(vlines[i], tokens, " ");
-        if (tokens.size() >= 2) {
-          if (tokens[0] == "energy_free_vibrational_cell_apl_300K")
-            data.energy_free_vibrational_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
-          else if (tokens[0] == "energy_free_vibrational_atom_apl_300K")
-            data.energy_free_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
-          else if (tokens[0] == "entropy_vibrational_cell_apl_300K")
-            data.entropy_vibrational_cell_apl_300K = 1000.0 * KBOLTZEV * aurostd::string2utype<double>(tokens[1]);  // Convert to meV/K to be consistent with AGL
-          else if (tokens[0] == "entropy_vibrational_atom_apl_300K")
-            data.entropy_vibrational_atom_apl_300K = 1000.0 * KBOLTZEV * aurostd::string2utype<double>(tokens[1]);  // Convert to meV/K to be consistent with AGL
-          else if (tokens[0] == "energy_internal_vibrational_cell_apl_300K")
-            data.energy_internal_vibrational_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
-          else if (tokens[0] == "energy_internal_vibrational_atom_apl_300K")
-            data.energy_internal_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
-          else if (tokens[0] == "energy_zero_point_cell_apl")
-            data.energy_zero_point_cell_apl = aurostd::string2utype<double>(tokens[1]);
-          else if (tokens[0] == "energy_zero_point_atom_apl")
-            data.energy_zero_point_atom_apl = aurostd::string2utype<double>(tokens[1]);
-          else if (tokens[0] == "heat_capacity_Cv_cell_apl_300K")
-            data.heat_capacity_Cv_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
-          else if (tokens[0] == "heat_capacity_Cv_atom_apl_300K")
-            data.heat_capacity_Cv_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
-        }
+      aurostd::StringSubst(vlines[i], "=", " ");
+      aurostd::string2tokens(vlines[i], tokens, " ");
+      if (tokens.size() >= 2) {
+        if (tokens[0] == "energy_free_vibrational_cell_apl_300K")
+          data.energy_free_vibrational_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
+        else if (tokens[0] == "energy_free_vibrational_atom_apl_300K")
+          data.energy_free_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+        else if (tokens[0] == "entropy_vibrational_cell_apl_300K")
+          data.entropy_vibrational_cell_apl_300K = 1000.0 * KBOLTZEV * aurostd::string2utype<double>(tokens[1]);  // Convert to meV/K to be consistent with AGL
+        else if (tokens[0] == "entropy_vibrational_atom_apl_300K")
+          data.entropy_vibrational_atom_apl_300K = 1000.0 * KBOLTZEV * aurostd::string2utype<double>(tokens[1]);  // Convert to meV/K to be consistent with AGL
+        else if (tokens[0] == "energy_internal_vibrational_cell_apl_300K")
+          data.energy_internal_vibrational_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
+        else if (tokens[0] == "energy_internal_vibrational_atom_apl_300K")
+          data.energy_internal_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+        else if (tokens[0] == "energy_zero_point_cell_apl")
+          data.energy_zero_point_cell_apl = aurostd::string2utype<double>(tokens[1]);
+        else if (tokens[0] == "energy_zero_point_atom_apl")
+          data.energy_zero_point_atom_apl = aurostd::string2utype<double>(tokens[1]);
+        else if (tokens[0] == "heat_capacity_Cv_cell_apl_300K")
+          data.heat_capacity_Cv_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
+        else if (tokens[0] == "heat_capacity_Cv_atom_apl_300K")
+          data.heat_capacity_Cv_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+      }
     }
 
     if (AFLOWLIB_VERBOSE) {
@@ -6089,30 +6089,30 @@ namespace aflowlib {
         aurostd::ExtractToStringEXPLICIT(lines, lines_300K, "[APL_THERMO_RESULTS]START", "[APL_THERMO_RESULTS]STOP");
         aurostd::string2vectorstring(lines_300K, vlines);
         for (uint i = 0; i < vlines.size(); i++) {
-            aurostd::StringSubst(vlines[i], "=", " ");
-            aurostd::string2tokens(vlines[i], tokens, " ");
-            if (tokens.size() >= 2) {
-              if (tokens[0] == "energy_free_vibrational_cell_apl_300K")
-                data.energy_free_vibrational_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
-              else if (tokens[0] == "energy_free_vibrational_atom_apl_300K")
-                data.energy_free_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
-              else if (tokens[0] == "entropy_vibrational_cell_apl_300K")
-                data.entropy_vibrational_cell_apl_300K = 1000.0 * KBOLTZEV * aurostd::string2utype<double>(tokens[1]);  // Convert to meV/K to be consistent with AGL
-              else if (tokens[0] == "entropy_vibrational_atom_apl_300K")
-                data.entropy_vibrational_atom_apl_300K = 1000.0 * KBOLTZEV * aurostd::string2utype<double>(tokens[1]);  // Convert to meV/K to be consistent with AGL
-              else if (tokens[0] == "energy_internal_vibrational_cell_apl_300K")
-                data.energy_internal_vibrational_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
-              else if (tokens[0] == "energy_internal_vibrational_atom_apl_300K")
-                data.energy_internal_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
-              else if (tokens[0] == "energy_zero_point_cell_apl")
-                data.energy_zero_point_cell_apl = aurostd::string2utype<double>(tokens[1]);
-              else if (tokens[0] == "energy_zero_point_atom_apl")
-                data.energy_zero_point_atom_apl = aurostd::string2utype<double>(tokens[1]);
-              else if (tokens[0] == "heat_capacity_Cv_cell_apl_300K")
-                data.heat_capacity_Cv_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
-              else if (tokens[0] == "heat_capacity_Cv_atom_apl_300K")
-                data.heat_capacity_Cv_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
-            }
+          aurostd::StringSubst(vlines[i], "=", " ");
+          aurostd::string2tokens(vlines[i], tokens, " ");
+          if (tokens.size() >= 2) {
+            if (tokens[0] == "energy_free_vibrational_cell_apl_300K")
+              data.energy_free_vibrational_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
+            else if (tokens[0] == "energy_free_vibrational_atom_apl_300K")
+              data.energy_free_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+            else if (tokens[0] == "entropy_vibrational_cell_apl_300K")
+              data.entropy_vibrational_cell_apl_300K = 1000.0 * KBOLTZEV * aurostd::string2utype<double>(tokens[1]);  // Convert to meV/K to be consistent with AGL
+            else if (tokens[0] == "entropy_vibrational_atom_apl_300K")
+              data.entropy_vibrational_atom_apl_300K = 1000.0 * KBOLTZEV * aurostd::string2utype<double>(tokens[1]);  // Convert to meV/K to be consistent with AGL
+            else if (tokens[0] == "energy_internal_vibrational_cell_apl_300K")
+              data.energy_internal_vibrational_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
+            else if (tokens[0] == "energy_internal_vibrational_atom_apl_300K")
+              data.energy_internal_vibrational_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+            else if (tokens[0] == "energy_zero_point_cell_apl")
+              data.energy_zero_point_cell_apl = aurostd::string2utype<double>(tokens[1]);
+            else if (tokens[0] == "energy_zero_point_atom_apl")
+              data.energy_zero_point_atom_apl = aurostd::string2utype<double>(tokens[1]);
+            else if (tokens[0] == "heat_capacity_Cv_cell_apl_300K")
+              data.heat_capacity_Cv_cell_apl_300K = aurostd::string2utype<double>(tokens[1]);
+            else if (tokens[0] == "heat_capacity_Cv_atom_apl_300K")
+              data.heat_capacity_Cv_atom_apl_300K = aurostd::string2utype<double>(tokens[1]);
+          }
         }
       }
       if (AFLOWLIB_VERBOSE) {
@@ -6175,7 +6175,7 @@ namespace aflowlib {
     std::sort(vfiles.begin(),vfiles.end()); //get in order
     for(i=0;i<vfiles.size();i++){
       if((vfiles[i].find(POCC_DOSCAR_FILE)!=string::npos)
-      || (vfiles[i].find(POCC_PHDOSCAR_FILE)!=string::npos)){  //ME20210927 - added PHDOSCAR
+          || (vfiles[i].find(POCC_PHDOSCAR_FILE)!=string::npos)){  //ME20210927 - added PHDOSCAR
         //need to grab POSCAR from ARUN.POCC_01
         //inside plotter we change '/RAW/' to '/LIB/', everything in RAW must be self-contained
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " plotting " << vfiles[i] << endl;
@@ -7163,7 +7163,7 @@ namespace aflowlib {
       XHOST.hostname=aurostd::RemoveSubString(XHOST.hostname,".mems.duke.edu");
       XHOST.hostname=aurostd::RemoveSubString(XHOST.hostname,".pratt.duke.edu");
       XHOST.hostname=aurostd::RemoveSubString(XHOST.hostname,".duke.edu");
-      
+
       vector<string> argv_mzip;
       argv_mzip.push_back("aflow"); //not necessary, safe
       argv_mzip.push_back("--multi=zip"); //not necessary, safe

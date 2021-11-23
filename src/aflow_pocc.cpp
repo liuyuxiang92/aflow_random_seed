@@ -244,8 +244,8 @@ namespace KBIN {
         catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);}
         //ME2021104
         if (kflags.KBIN_PHONONS_CALCULATION_AEL
-          || kflags.KBIN_PHONONS_CALCULATION_AGL
-          || kflags.KBIN_PHONONS_CALCULATION_APL) {
+            || kflags.KBIN_PHONONS_CALCULATION_AGL
+            || kflags.KBIN_PHONONS_CALCULATION_APL) {
           string message = "Cannot run AFLOW modules without fully completed POCC calculations."
             " Please see the README for more information.";
           pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_NOTICE_);
@@ -1184,7 +1184,7 @@ namespace pocc {
 
     if(LDEBUG){cerr << soliloquy << " END" << endl;}
   }
-  
+
   void POccCalculator::setAvgPlasmonicData(double temperature){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::setAvgDOSCAR():";
@@ -1196,7 +1196,7 @@ namespace pocc {
     if(m_ARUN_directories.size()!=l_supercell_sets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()!=l_supercell_sets.size()",_RUNTIME_ERROR_);}
 
     setPOccStructureProbabilities(temperature); //done in calculateRELAXProperties() - repetita iuvant
-    
+
     m_vxplasm.clear();
     xPLASMONICS xplasm;
     string PLASM_file="";
@@ -1289,13 +1289,13 @@ namespace pocc {
     setAvgDOSCAR(temperature);
     if(0){plotAvgDOSCAR(temperature);}  //do not plot as part of LIB2LIB, leave for LIB2RAW
   }
-  
+
   void POccCalculator::calculatePlasmonicProperties(double temperature){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::calculateSTATICProperties():";
 
     if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
-    
+
     vector<string> vfiles;
 
     bool found_all_eps_dat_files=true;
@@ -1347,7 +1347,7 @@ namespace pocc {
       }
     }
     if(LDEBUG){cerr << soliloquy << " m_vfilenames_plasm=" << aurostd::joinWDelimiter(m_vfilenames_plasm,",") << endl;}
-    
+
     m_veps_plasm.clear();
     m_vxplasm.clear();
     for(i=0;i<m_vfilenames_plasm.size();i++){

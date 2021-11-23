@@ -2208,7 +2208,7 @@ namespace aflowMachL {
       cerr << soliloquy << " elements=" << aurostd::joinWDelimiter(velements,",") << endl;
       cerr << soliloquy << " nelements=" << velements.size() << endl;
     }
-    
+
     stringstream output_ss;
     string ROOT="/common/LIB"+aurostd::utype2string(velements.size())+"/LIB";
     vector<string> vsystems,vprotos,vfiles,_velements;

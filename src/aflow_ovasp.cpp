@@ -4142,8 +4142,8 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
       }
     }
     if(aurostd::substring2bool(vcontent[iline],"ions") && //THIS MUST COME AFTER species_pp IS FILLED
-       aurostd::substring2bool(vcontent[iline],"per") &&
-       aurostd::substring2bool(vcontent[iline],"type")){
+        aurostd::substring2bool(vcontent[iline],"per") &&
+        aurostd::substring2bool(vcontent[iline],"type")){
       aurostd::string2tokens(vcontent[iline],vtokens,"=");
       if(vtokens.size()>1){
         tmp_str=vtokens[1];
@@ -4164,7 +4164,7 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
     cerr << soliloquy << " num_each_type=" << aurostd::joinWDelimiter(num_each_type,",") << endl;
     cerr << soliloquy << " natoms=" << natoms << endl;
   }
-  
+
   uint ilattice=0,iatom=0,itype=0;
   xstructure xstr;
   double energy=AUROSTD_MAX_DOUBLE;
@@ -4195,8 +4195,8 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
         continue;
       }
       if(aurostd::substring2bool(vcontent[iline],"energy") && 
-        aurostd::substring2bool(vcontent[iline],"without") &&
-        aurostd::substring2bool(vcontent[iline],"entropy")){
+          aurostd::substring2bool(vcontent[iline],"without") &&
+          aurostd::substring2bool(vcontent[iline],"entropy")){
         aurostd::string2tokens(vcontent[iline],vtokens,"=");
         if(vtokens.size()>1){
           tmp_str=vtokens[1];
@@ -4236,9 +4236,9 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
         }
       }
       if(aurostd::substring2bool(vcontent[iline],"direct") && 
-         aurostd::substring2bool(vcontent[iline],"lattice") &&
-         aurostd::substring2bool(vcontent[iline],"vectors") &&
-         aurostd::substring2bool(vcontent[iline],"reciprocal")){reading_lattice=true;reading_stresses=false;reading_atoms=false;ilattice=0;xstr.clear();continue;}
+          aurostd::substring2bool(vcontent[iline],"lattice") &&
+          aurostd::substring2bool(vcontent[iline],"vectors") &&
+          aurostd::substring2bool(vcontent[iline],"reciprocal")){reading_lattice=true;reading_stresses=false;reading_atoms=false;ilattice=0;xstr.clear();continue;}
       if(reading_lattice && ilattice<3){
         if(LDEBUG){cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;}
         vtokens=GetCorrectPositions(vcontent[iline],6); //aurostd::string2tokens(vcontent[iline],vtokens," ");
@@ -4305,11 +4305,11 @@ void xOUTCAR::WriteMTPCFG(const string& outcar_path,stringstream& output_ss){  /
 
   if(vxstr_ionic.size()!=venergy_ionic.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vxstr_ionic.size()!=venergy_ionic",_FILE_CORRUPT_);}
   if(vxstr_ionic.size()!=vstresses_ionic.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vxstr_ionic.size()!=vstresses_ionic",_FILE_CORRUPT_);}
-  
+
   output_ss.setf(std::ios::fixed,std::ios::floatfield);
   uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
   output_ss.precision(_precision_);
-  
+
   string tab=" ";
 
   for(uint istr=0;istr<vxstr_ionic.size();istr++){
@@ -4354,9 +4354,9 @@ void xOUTCAR::WriteMTPCFG(const string& outcar_path,stringstream& output_ss){  /
     output_ss << tab << "PlusStress: xx yy zz xy yz xz" << endl; //order as vasp
     output_ss << tab << tab;
     for(int icoord=vstresses_ionic[istr].lrows;icoord<=vstresses_ionic[istr].urows;icoord++){
-        if(abs(vstresses_ionic[istr][icoord])<10) output_ss << "  ";
-        else if(abs(vstresses_ionic[istr][icoord])<100) output_ss << " ";
-        if(!std::signbit(vstresses_ionic[istr][icoord])) output_ss << " ";
+      if(abs(vstresses_ionic[istr][icoord])<10) output_ss << "  ";
+      else if(abs(vstresses_ionic[istr][icoord])<100) output_ss << " ";
+      if(!std::signbit(vstresses_ionic[istr][icoord])) output_ss << " ";
       output_ss << vstresses_ionic[istr][icoord] << (icoord<vstresses_ionic[istr].urows?" ":"");
     }
     output_ss << endl;
@@ -9612,14 +9612,14 @@ bool xPLASMONICS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   aurostd::string2vectorstring(content,vcontent);
   vlines=aurostd::RemoveComments(vcontent);
   if(filename=="") filename="stringstream";
-  
+
   // ----------------------------------------------------------------------
   if(LDEBUG) cerr << soliloquy << " vcontent.size()=" << vcontent.size() << endl;
   if(LDEBUG) cerr << soliloquy << " vlines.size()=" << vlines.size() << endl;
   // ----------------------------------------------------------------------
 
   getEPS(); //extract eps from filename if possible
-  
+
   // crunching to eat the info
   vector<string> vtokens;
   xcomplex<double> xcomp_tmp;
@@ -9642,7 +9642,7 @@ bool xPLASMONICS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     xcomp_tmp.im=aurostd::string2utype<double>(vtokens[4]);
     vdielectric.push_back(xcomp_tmp);
   }
-  
+
   // ----------------------------------------------------------------------   
   // ----------------------------------------------------------------------
   // DONE NOW RETURN  

@@ -524,10 +524,10 @@ namespace apl {
         << std::setw(15) << "Cv (kB/cell)";
       if (natoms > 0) {
         props << std::setw(15) << "U0 (meV/atom)" << "   "
-              << std::setw(15) << "U (meV/atom)" << "   "
-              << std::setw(15) << "F (meV/atom)" << "   "
-              << std::setw(15) << "S (kB/atom)" << "   "
-              << std::setw(15) << "Cv (kB/atom)";
+          << std::setw(15) << "U (meV/atom)" << "   "
+          << std::setw(15) << "F (meV/atom)" << "   "
+          << std::setw(15) << "S (kB/atom)" << "   "
+          << std::setw(15) << "Cv (kB/atom)";
       }
       props << std::endl;
 
@@ -541,10 +541,10 @@ namespace apl {
           << std::setw(15) << Cv[t];
         if (natoms > 0) {
           props  << std::setw(15) << (U0/(double) natoms) << "   "
-                 << std::setw(15) << (U[t]/(double) natoms) << "   "
-                 << std::setw(15) << (Fvib[t]/(double) natoms) << "   "
-                 << std::setw(15) << (Svib[t]/(double) natoms) << "   "
-                 << std::setw(15) << (Cv[t]/(double) natoms);
+            << std::setw(15) << (U[t]/(double) natoms) << "   "
+            << std::setw(15) << (Fvib[t]/(double) natoms) << "   "
+            << std::setw(15) << (Svib[t]/(double) natoms) << "   "
+            << std::setw(15) << (Cv[t]/(double) natoms);
         }
         props << std::endl;
       }

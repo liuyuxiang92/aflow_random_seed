@@ -1,10 +1,8 @@
-3.2.12 - 2021/XX/XX
+3.2.12 - 2021/11/23
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)
         -- Added POCC+APL workflow (ME)
         -- Added LIB2RAW for APL (ME)
-        -- added function to move aflow run to another directory (DX)
-        -- added machine settings for machine004 (DX)
         -- added function to move aflow run to another directory (DX)
         -- added machine settings for machine004 (DX)
         -- fixed gcc warning (version 4) in SYMBOLICCPLUSPLUS/ (DX)
@@ -17,7 +15,7 @@
         -- fixing some error="NBANDS" patches (CO)
         -- patching GetStoich() bug with pocc structures (round-off printing errors) (CO)
         -- adding KPOINTS=GAMMA_ODD to NELM patches (CO)
-        -- added plasmonics analysis in POCC (CO)
+        -- added dielectric analysis in POCC (CO)
         (AFLOW: aconvasp_main.cpp, aflow.cpp, aflow.h, aflowlib.h, aflowlib_libraries.cpp, aflowlib_web_interface.cpp, aflowlib_web_outreach.cpp, aflowrc.cpp, avasp.cpp, chull.cpp, compare_structure_function.cpp, init.cpp, ivasp.cpp, kbin.cpp, kvasp.cpp, lattice.cpp, Makefile.aflow, ovasp.cpp, pflow.h, plotter.cpp, pocc_apl.cpp, pocc.cpp, pocc.h, pthreads.cpp, README_AFLOW_ACONVASP.TXT, README_AFLOW_AFLOWRC.TXT, README_AFLOW_POCC.TXT, README_AFLOW.TXT, test.cpp, xatom.cpp, xclasses.cpp)
         (APL: aapl_cluster.cpp, aapl_ifcs.cpp, aapl_tcond.cpp, apl_atomic_disp.cpp, apl_doscalc.cpp, apl_fccalc.cpp, apl.h, apl_kphonons.cpp, apl_pdisc.cpp, apl_phoncalc.cpp, apl_qmesh.cpp, apl_supercell.cpp, apl_thermalpc.cpp, qha.cpp)
         (SYMBOLICCPLUSPLUS: symbolic.cpp, symbolic.h)

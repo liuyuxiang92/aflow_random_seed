@@ -2893,7 +2893,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     if(xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) xvasp.AVASP_STATIC_KSCHEME=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KSCHEME_STATIC");    // KSCHEME_STATIC
     if(xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_LATTICE")) xvasp.AVASP_path_BANDS=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_LATTICE"); // BANDS_LATTICE
     if(xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID")) xvasp.AVASP_value_BANDS_GRID=aurostd::string2utype<uint>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID")); // BANDS_GRID
-    
+
     if(LDEBUG){
       cerr << soliloquy << " xvasp.AVASP_STATIC_KSCHEME=" << xvasp.AVASP_STATIC_KSCHEME << endl;
       cerr << soliloquy << " xvasp.AVASP_path_BANDS=" << xvasp.AVASP_path_BANDS << endl;
