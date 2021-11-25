@@ -845,7 +845,7 @@ void _vflags::free() {
 
   KBIN_VASP_FORCE_OPTION_NSW_EQUAL                               = FALSE;
   KBIN_VASP_FORCE_OPTION_NSW_EQUAL_VALUE                         = 0;
-  
+
   // AFIX
   KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.clear();                    // AFIX
   // CONVERT

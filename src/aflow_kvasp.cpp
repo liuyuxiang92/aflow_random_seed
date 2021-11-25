@@ -1421,13 +1421,13 @@ namespace KBIN {
     //[CO20210805 - OBSOLETE]vflags.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG    =     aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_FILE]BANDS_GRID=",TRUE);
     //[CO20210805 - OBSOLETE]if(vflags.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG)
     //[CO20210805 - OBSOLETE]  vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE=aurostd::substring2utype<int>(AflowIn,"[VASP_KPOINTS_FILE]BANDS_GRID=",TRUE);
-    //[CO20210805 - OBSOLETE]else {vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE=16;vflags.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG=TRUE;
+    //[CO20210805 - OBSOLETE]else vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE=16;vflags.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG=TRUE;
     if(!vflags.KBIN_VASP_KPOINTS_BANDS_GRID.isentry){  //CO20210805
       vflags.KBIN_VASP_KPOINTS_BANDS_GRID.clear();
       vflags.KBIN_VASP_KPOINTS_BANDS_GRID.push(aurostd::utype2string(DEFAULT_BANDS_GRID));
     }
-      //    cerr << "WARNING: if you use VASP_RUN_RELAX_STATIC_BANDS or vflags.KBIN_VASP_RUN.flag(\"STATIC_BANDS\"), you must specify KBIN_VASP_KPOINTS_BANDS_GRID_FLAG" << endl;
-      //   cerr << "         Taking defauls vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE=" << vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE << endl;
+    //    cerr << "WARNING: if you use VASP_RUN_RELAX_STATIC_BANDS or vflags.KBIN_VASP_RUN.flag(\"STATIC_BANDS\"), you must specify KBIN_VASP_KPOINTS_BANDS_GRID_FLAG" << endl;
+    //   cerr << "         Taking defauls vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE=" << vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE << endl;
     if((vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || 
           vflags.KBIN_VASP_RUN.flag("REPEAT_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("REPEAT_BANDS")) && 
         !vflags.KBIN_VASP_KPOINTS_BANDS_GRID.isentry) {

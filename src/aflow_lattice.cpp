@@ -836,8 +836,8 @@ namespace LATTICE {
               if(abs(translations_mod[k]-translations_mod[j])<eps){
                 // this determinant method is faster than aurostd::det(), and speed is crucial here
                 volume_tmp = tmp_lattice[1][1]*tmp_lattice[2][2]*tmp_lattice[3][3]+tmp_lattice[1][2]*tmp_lattice[2][3]*tmp_lattice[3][1]+ // FAST
-                    tmp_lattice[1][3]*tmp_lattice[2][1]*tmp_lattice[3][2]-tmp_lattice[1][3]*tmp_lattice[2][2]*tmp_lattice[3][1]-              // FAST
-                    tmp_lattice[1][2]*tmp_lattice[2][1]*tmp_lattice[3][3]-tmp_lattice[1][1]*tmp_lattice[2][3]*tmp_lattice[3][2];             // FAST
+                  tmp_lattice[1][3]*tmp_lattice[2][1]*tmp_lattice[3][2]-tmp_lattice[1][3]*tmp_lattice[2][2]*tmp_lattice[3][1]-              // FAST
+                  tmp_lattice[1][2]*tmp_lattice[2][1]*tmp_lattice[3][3]-tmp_lattice[1][1]*tmp_lattice[2][3]*tmp_lattice[3][2];             // FAST
                 // ---------------------------------------------------------------------------
                 // check determinant
                 // use absolute value to quickly filter, but then check for positive determinant

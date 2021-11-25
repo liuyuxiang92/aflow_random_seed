@@ -773,7 +773,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("MISCIBILITY",aurostd::args2flag(argv,cmds,"--MIX|--mix|--MISCIBILITY|--miscibility|--MISCIBILE|--miscibile"));
   vpflow.flag("MOM",aurostd::args2flag(argv,cmds,"--mom"));
   vpflow.flag("MSI",aurostd::args2flag(argv,cmds,"--msi"));
-  
+
   vpflow.flag("MTP::INIT",aurostd::args2flag(argv,cmds,"--mtp|--MTP"));  // initiate MTP writer
 
   vpflow.flag("MULTI=BZIP2",aurostd::args2flag(argv,cmds,"--multi=bzip2"));
@@ -13293,7 +13293,7 @@ namespace pflow {
     if (vmodules_in.size() > 0) {
       for (uint i = 0; i < vmodules_in.size(); i++) {
         if (aurostd::WithinList(vavailable, vmodules_in[i])
-          || (vmodules_in[i] == "aflow_xtalfinder")) {  //Need to account for inconsistency between aflow command and publication
+            || (vmodules_in[i] == "aflow_xtalfinder")) {  //Need to account for inconsistency between aflow command and publication
           vmodules.push_back(vmodules_in[i]);
         } else {
           vskip.push_back(vmodules_in[i]);  // For the warning message
@@ -13431,7 +13431,7 @@ namespace pflow {
       }
       for(uint i=0;i<vCARs.size();i++) {aurostd::RemoveFile(directory+"/"+vCARs[i]);}
     }
-    
+
     //zip in style of vCAR
     for(uint i=0;i<vCARs.size();i++){
       for(uint j=0;j<vruns.size();j++){

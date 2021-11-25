@@ -898,7 +898,7 @@ namespace aurostd{
     // DX20210908
     // tol_diff compares input_double and numerator/denominator //CO+DX20210909
     // tol_remainder is for the continued fraction algorithm (best not to change from 1e-2, or it runs forever  //CO+DX20210909
-   
+
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "aurostd::continuedFractions():";
     stringstream message;
@@ -906,13 +906,13 @@ namespace aurostd{
     vector<int> fraction_sequence;
     double tmp_double = input_double, difference = 1e9;
     int count=0,count_max=max(100,(int)std::ceil(std::pow(10.0,log10(1.0/tol_remainder)))); // count_max is a while-loop safeguard //CO20210909 patched count_max to change with tol_remainder
-    
+
     if(LDEBUG){
       cerr << function_name << " input_double=" << std::fixed << std::setprecision(15) << input_double << endl;
       cerr << function_name << " tol_diff=" << std::fixed << std::setprecision(15) << tol_diff << endl;
       cerr << function_name << " tol_remainder=" << std::fixed << std::setprecision(15) << tol_remainder << endl;
     }
-    
+
     // ---------------------------------------------------------------------------
     // determine the fraction sequence
     // i.e., determine the integer part of the double (via std::floor)
@@ -931,7 +931,7 @@ namespace aurostd{
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message,_RUNTIME_ERROR_);
     }
     if(LDEBUG){ cerr << function_name << " fraction_sequence=" << aurostd::joinWDelimiter(fraction_sequence, ",") << endl; }
-    
+
     // ---------------------------------------------------------------------------
     // determine the numerator and denominator
     int n = fraction_sequence.size()-1;
@@ -958,7 +958,7 @@ namespace aurostd{
 
 namespace aurostd{
   int getNumeratorContinuedFractions(int& p, const int& n, vector<int>& fraction_sequence){
-    
+
     // Get the numerator (p) for a continued fraction
     // Note: slightly different than procedure for denominator
     // See https://en.wikipedia.org/wiki/Continued_fraction for more details
@@ -973,7 +973,7 @@ namespace aurostd{
 
 namespace aurostd{
   int getDenominatorContinuedFractions(int& q, const int& n, vector<int>& fraction_sequence){
-    
+
     // Get the denominator (q) for a continued fraction
     // Note: slightly different than procedure for numerator
     // See https://en.wikipedia.org/wiki/Continued_fraction for more details

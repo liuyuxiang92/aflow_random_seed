@@ -946,7 +946,7 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 
   calculated = aurostd::areaPointsOnPlane(ipoints);
   check_similar(calculated, expected, check_function, check_description, check_num, passed_checks, results);
-  
+
   // ---------------------------------------------------------------------------
   // Check | double2fraction conversion //DX20210908
   // ---------------------------------------------------------------------------
