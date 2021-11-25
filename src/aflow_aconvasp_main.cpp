@@ -7709,8 +7709,13 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   bool setPOCCTOL(xstructure& xstr,const string& pocc_tol_string){ //CO20181226
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::setPOCCTOL():";  //CO20200624
+    if(LDEBUG){
+      cerr << soliloquy << " BEGIN" << endl;
+      cerr << soliloquy << " pocc_tol_string=" << pocc_tol_string << endl;
+    }
     if(pocc_tol_string.empty()){return false;}
-    string soliloquy = XPID + "pflow::setPOCCTOL():";
     stringstream message;
     if(aurostd::substring2bool(pocc_tol_string,",")){
       message << "Cannot handle more than one pocc_tol specification";

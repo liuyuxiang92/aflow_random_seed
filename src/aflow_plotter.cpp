@@ -470,7 +470,7 @@ namespace plotter {
       } else { // Title not in ICSD format
         return aurostd::fixStringLatex(default_title, false, false);
       }
-    } else if (aurostd::substring2bool(default_title, POCC_TITLE_TAG)) {  // Check if in POCC format
+    } else if (aurostd::substring2bool(default_title, TAG_TITLE_POCC)) {  // Check if in POCC format
       if(LDEBUG){cerr << soliloquy << " found POCC" << endl;}
       title = formatDefaultTitlePOCC(plotoptions,FileMESSAGE,oss); //CO20200404
     } else if (aurostd::substring2bool(default_title, ".")) {  // Check if AFLOW prototype format
@@ -608,34 +608,36 @@ namespace plotter {
     //convert to: --proto=AB3C_cP5_221_a_c_b:Cs_sv:Eu:I:Pb_d --pocc_params=S0-1xA_S1-1xC_S2-0.5xB-0.5xD
     //arun stuff separate
 
-    if(!aurostd::substring2bool(default_title,POCC_TITLE_TAG)){  //use generic
-      message << "No POCC_TITLE_TAG found [" << POCC_TITLE_TAG << "], using generic SYSTEM name as title";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_); //CO20200404
+    if(!aurostd::substring2bool(default_title,TAG_TITLE_POCC)){  //use generic
+      message << "No TAG_TITLE_POCC found [" << TAG_TITLE_POCC << "], using generic SYSTEM name as title";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_); //CO20200404
       return aurostd::fixStringLatex(default_title, false, false);
     }
     //Get all the pieces of the default title
-    string::size_type t = default_title.find(POCC_TITLE_TAG);
-    string elements_prototype_str = default_title.substr(0, t);  //contains elements and prototype
-    string pocc_params_arun_str = default_title.substr(t + POCC_TITLE_TAG.length(), string::npos);  //pocc_params and ARUN(?)
+    string::size_type loc1 = default_title.find(TAG_TITLE_POCC);
+    string elements_prototype_str = default_title.substr(0, loc1);  //contains elements and prototype
+    string pocc_params_tol_arun_str = default_title.substr(loc1 + TAG_TITLE_POCC.length(), string::npos);  //pocc_params and ARUN(?)
     if(LDEBUG){
       cerr << soliloquy << " elements_prototype_str=" << elements_prototype_str << endl;
-      cerr << soliloquy << " pocc_params_arun_str=" << pocc_params_arun_str << endl;
+      cerr << soliloquy << " pocc_params_tol_arun_str=" << pocc_params_tol_arun_str << endl;
     }
     //parse elements_prototype_str by "."
     //PROBLEM: "." can exist in pp_string (not really important for standard PP, but it exists), as well
     //as proto: .ABC...
     //we will go in loop over "." parses until we get a structure!
-    t=elements_prototype_str.find('.');
+    loc1=elements_prototype_str.find('.');
     string pps="";
     string proto="";
     vector<string> velements;
+    string tmp_str="",tmp_str2="";
     string pocc_params="";
+    string pocc_tol="";
     string arun_pocc="";
     string arun_module="";
-    string::size_type c=0,m=0;
+    string::size_type loc2=0;
     xstructure xstr;
-    while(t!=string::npos && (t+1)<elements_prototype_str.length()){
-      pps=elements_prototype_str.substr(0,t);
-      proto=elements_prototype_str.substr(t+1,string::npos);
+    while(loc1!=string::npos && (loc1+1)<elements_prototype_str.length()){
+      pps=elements_prototype_str.substr(0,loc1);
+      proto=elements_prototype_str.substr(loc1+1,string::npos);
       if(LDEBUG){
         cerr << soliloquy << " pps=" << pps << endl;
         cerr << soliloquy << " proto=" << proto << endl;
@@ -644,37 +646,96 @@ namespace plotter {
       velements=aurostd::getElements(pps,pp_string,true,false,true);  //clean, no sort_elements, pseudopotential string, keep_pp
       if(LDEBUG) { cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(velements,",") << endl;}
 
-      pocc_params=pocc_params_arun_str;
-      c=pocc_params_arun_str.find(POCC_ARUN_TITLE_TAG);
-      if(c!=string::npos && (c+1)<pocc_params_arun_str.length()){
-        pocc_params=pocc_params_arun_str.substr(0,c);
-        arun_pocc=pocc_params_arun_str.substr(c+1,string::npos);
-        if(LDEBUG){cerr << soliloquy << " arun_pocc(with-module)=" << arun_pocc << endl;}
-        m=arun_pocc.find(":");
-        if(m!=string::npos && (m+1)<arun_pocc.length()){
-          string arun_pocc_new=arun_pocc.substr(0,m);
-          arun_module=arun_pocc.substr(m+1,string::npos);
-          arun_pocc=arun_pocc_new;
-        }
-      }
-      //CO20210315 - might find pocc_params='P0-1xA_P1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF:ARUN.AGL_9_SF_0.95' which is a bad system name, missing ARUN.POCC
-      m=pocc_params.find(ARUN_TITLE_TAG);
-      if(m!=string::npos){
-        arun_module=pocc_params.substr(m+1,string::npos);  //grab whatever follows the ARUN_TITLE_TAG
-        pocc_params=pocc_params.substr(0,m);  //parse it out of pocc_parms
+      tmp_str=pocc_params_tol_arun_str;
+      pocc_params=tmp_str;
+      loc2=tmp_str.find(TAG_TITLE_POCC_TOL);
+      if(loc2!=string::npos && (loc2+1)<tmp_str.length()){
+        pocc_params=tmp_str.substr(0,loc2);
+        tmp_str=tmp_str.substr(loc2+1,string::npos);
+        pocc_tol=tmp_str;
       }
       if(LDEBUG){
+        cerr << soliloquy << " [1]" << endl;
+        cerr << soliloquy << " proto=" << proto << endl;
         cerr << soliloquy << " pocc_params=" << pocc_params << endl;
+        cerr << soliloquy << " pocc_tol=" << pocc_tol << endl;
         cerr << soliloquy << " arun_pocc=" << arun_pocc << endl;
         cerr << soliloquy << " arun_module=" << arun_module << endl;
+        cerr << soliloquy << " tmp_str=" << tmp_str << endl;
+      }
+      loc2=tmp_str.find(TAG_TITLE_POCC_ARUN);
+      if(loc2!=string::npos && (loc2+1)<tmp_str.length()){
+        tmp_str2=tmp_str.substr(0,loc2);
+        if(tmp_str2.find(TAG_TITLE_POCC_TOL)!=string::npos){pocc_tol=tmp_str2;}
+        else{pocc_params=tmp_str2;}
+        tmp_str=tmp_str.substr(loc2+1,string::npos);
+        arun_pocc=tmp_str;
+      }
+      if(LDEBUG){
+        cerr << soliloquy << " [2]" << endl;
+        cerr << soliloquy << " proto=" << proto << endl;
+        cerr << soliloquy << " pocc_params=" << pocc_params << endl;
+        cerr << soliloquy << " pocc_tol=" << pocc_tol << endl;
+        cerr << soliloquy << " arun_pocc=" << arun_pocc << endl;
+        cerr << soliloquy << " arun_module=" << arun_module << endl;
+        cerr << soliloquy << " tmp_str=" << tmp_str << endl;
+      }
+      //CO20210315 - might find pocc_params='P0-1xA_P1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF:ARUN.AGL_9_SF_0.95' which is a bad system name, missing ARUN.POCC
+      loc2=tmp_str.find(TAG_TITLE_ARUN);
+      if(loc2!=string::npos && (loc2+1)<tmp_str.length()){
+        tmp_str2=tmp_str.substr(0,loc2);
+        if(tmp_str2.find(TAG_TITLE_POCC_ARUN)!=string::npos){arun_pocc=tmp_str2;}
+        else if(tmp_str2.find(TAG_TITLE_POCC_TOL)!=string::npos){pocc_tol=tmp_str2;}
+        else{pocc_params=tmp_str2;}
+        tmp_str=tmp_str.substr(loc2+1,string::npos);
+        arun_module=tmp_str;
+      }
+      if(LDEBUG){
+        cerr << soliloquy << " [3]" << endl;
+        cerr << soliloquy << " proto=" << proto << endl;
+        cerr << soliloquy << " pocc_params=" << pocc_params << endl;
+        cerr << soliloquy << " pocc_tol=" << pocc_tol << endl;
+        cerr << soliloquy << " arun_pocc=" << arun_pocc << endl;
+        cerr << soliloquy << " arun_module=" << arun_module << endl;
+        cerr << soliloquy << " tmp_str=" << tmp_str << endl;
+      }
+      loc2=tmp_str.find(":");
+      if(loc2!=string::npos && (loc2+1)<tmp_str.length()){
+        tmp_str2=tmp_str.substr(0,loc2);
+        if(tmp_str2.find(TAG_TITLE_POCC_ARUN)!=string::npos){arun_pocc=tmp_str2;} //more specific, look for first
+        else if(tmp_str2.find(TAG_TITLE_ARUN)!=string::npos){arun_module=tmp_str2;}
+        else if(tmp_str2.find(TAG_TITLE_POCC_TOL)!=string::npos){pocc_tol=tmp_str2;}
+        else{pocc_params=tmp_str.substr(0,loc2);}
+        tmp_str=arun_pocc.substr(loc2+1,string::npos);
+        //what's next??
+      }
+      if(LDEBUG){
+        cerr << soliloquy << " [4]" << endl;
+        cerr << soliloquy << " proto=" << proto << endl;
+        cerr << soliloquy << " pocc_params=" << pocc_params << endl;
+        cerr << soliloquy << " pocc_tol=" << pocc_tol << endl;
+        cerr << soliloquy << " arun_pocc=" << arun_pocc << endl;
+        cerr << soliloquy << " arun_module=" << arun_module << endl;
+        cerr << soliloquy << " tmp_str=" << tmp_str << endl;
       }
 
       aurostd::xoption proto_flags;
       proto_flags.push_attached("PROTO",proto + ":" + aurostd::joinWDelimiter(velements,":"));
       proto_flags.push_attached("POCC_PARAMS",pocc_params);
+      if(!pocc_tol.empty()){
+        tmp_str=pocc_tol;
+        if(tmp_str.find(TAG_TOL)!=string::npos){
+          aurostd::StringSubst(tmp_str,TAG_TITLE_POCC_TOL,"");  //remove 'TOL_'
+          aurostd::StringSubst(tmp_str,TAG_TOL+SEP_TAG2,"");  //remove 'TOL_'
+          aurostd::StringSubst(tmp_str,TAG_TOL,"");  //remove 'TOL_'
+          aurostd::StringSubst(tmp_str,SEP_TAG2,"");  //remove 'TOL_'
+        }
+        proto_flags.push_attached("POCC_TOL",tmp_str);
+      }
       if(LDEBUG){
         cerr << soliloquy << " proto_flags.getattachedscheme(\"PROTO\")=" << proto_flags.getattachedscheme("PROTO") << endl;
         cerr << soliloquy << " proto_flags.getattachedscheme(\"POCC_PARAMS\")=" << proto_flags.getattachedscheme("POCC_PARAMS") << endl;
+        cerr << soliloquy << " proto_flags.getattachedscheme(\"POCC_TOL\")=" << proto_flags.getattachedscheme("POCC_TOL") << endl;
       }
 
       try{
@@ -683,7 +744,7 @@ namespace plotter {
       }
       catch(aurostd::xerror& excpt){
         xstr.clear(); //DX20191220 - uppercase to lowercase clear
-        t=elements_prototype_str.find('.',t+1);
+        loc1=elements_prototype_str.find('.',loc1+1);
         continue;
       }
     }
@@ -1030,6 +1091,7 @@ namespace plotter {
         if(LDEBUG){cerr << soliloquy << " looking at POCC DOSCAR: " << vpocc_doscars[i] << endl;}
         xdos.GetPropertiesFile(vpocc_doscars[i]);
         temperature=pocc::poccDOSCAR2temperature(vpocc_doscars[i]);
+        plotoptions.push_attached("NORMALIZATION","ATOM");  //CO20211124
         plotoptions.push_attached("EXTENSION","dos_"+aurostd::tolower(pscheme)+"_T"+pocc::getTemperatureString(temperature,temperature_precision,temperatures_int,zero_padding_temperature)+"K");
         PLOT_DOS(plotoptions, out, xdos,FileMESSAGE,oss);  //CO20200404
         savePlotGNUPLOT(plotoptions, out);
@@ -2250,12 +2312,13 @@ namespace plotter {
     out << " set tic scale 0" << std::endl;
     out << " set " << (swap?"y":"x") << "range [" << Emin << ":" << Emax << "]" << std::endl;
     out << " set " << (swap?"x":"y") << "range [" << mindos << ":" << maxdos << "]" << std::endl;
+    string normalization=aurostd::tolower(plotoptions.getattachedscheme("NORMALIZATION"));
     if (banddos) {
       out << " unset ylabel" << std::endl;
-      out << " set title 'DOS (states/" << unit << ")' offset 0,-0.7" << std::endl;
+      out << " set title 'DOS (states/" << unit << (!normalization.empty()?"/"+normalization:"") << ")' offset 0,-0.7" << std::endl;
     } else {
       out << " set " << (swap?"y":"x") << "label '" << energyLabel << " (" << unit << ")' offset graph 0.00" << std::endl;
-      out << " set " << (swap?"x":"y") << "label 'DOS (states/" << unit << ")' offset graph 0.00" << std::endl;
+      out << " set " << (swap?"x":"y") << "label 'DOS (states/" << unit << (!normalization.empty()?"/"+normalization:"") << ")' offset graph 0.00" << std::endl;
     }
 
     // Fermi level

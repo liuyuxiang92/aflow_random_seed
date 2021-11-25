@@ -40,9 +40,6 @@ const double ENERGY_RADIUS = 10; //angstroms  //keep, so we can still compare wi
 const int A_START = 1, C_START = 1, F_START = 1;
 const int B_START = 0, D_START = 0, E_START = 0;
 
-//conversion for uff params
-const double KCAL_2_EV  = 4.336443203200000E-002; // 1(kcal/mol) = 4.33644E-2 eV
-
 bool PRIMITIVIZE=false;
 
 //testing
@@ -149,10 +146,10 @@ namespace pocc {
     string soliloquy=XPID+"pocc::addDefaultPOCCTOL2string():";
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     string output=input;
-    if(output.find(POCC_TITLE_TOL_TAG)==string::npos){
+    if(output.find(TAG_TITLE_POCC_TOL)==string::npos){
       int prec=3;
       prec=(int)ceil(log10(1.0/DEFAULT_POCC_SITE_TOL));
-      output+=POCC_TITLE_TOL_TAG+aurostd::utype2string(DEFAULT_POCC_SITE_TOL,prec);
+      output+=TAG_TITLE_POCC_TOL+aurostd::utype2string(DEFAULT_POCC_SITE_TOL,prec);
       prec=(int)ceil(log10(1.0/DEFAULT_POCC_STOICH_TOL));
       output+="_"+aurostd::utype2string(DEFAULT_POCC_STOICH_TOL,prec);
     }
@@ -1029,36 +1026,46 @@ namespace pocc {
     //depends not only the number of atoms (after relaxation), but also whether species/num_each_type are identical
     bool perform_pdos_avg=true;
     vector<string> vspecies,_vspecies;
-    deque<int> num_each_type,_num_each_type;
+    deque<int> num_each_type;
+    vector<uint> vnatoms;
     xstructure xstr;
     unsigned long long int isupercell=0;
     string POSCAR_file="";
     uint i=0;
-    for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end()&&perform_pdos_avg==true;++it){
+    for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       isupercell=std::distance(l_supercell_sets.begin(),it);
       if(aflowlib::GetSpeciesDirectory(m_aflags.Directory+"/"+m_ARUN_directories[isupercell],_vspecies)==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot extract vspecies from "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
       if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/POSCAR.static",POSCAR_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POSCAR.static not found in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
-      xstr.initialize(POSCAR_file);
+      xstr.clear();
+      xstr.initialize(POSCAR_file,IOVASP_POSCAR);
+      if(LDEBUG){
+        cerr << soliloquy << " xstr[isupercell=" << isupercell << "]=" << endl << xstr;
+        cerr << soliloquy << " xstr.atoms.size()=" << xstr.atoms.size() << endl;
+        cerr << soliloquy << " xstr.num_each_type=" << aurostd::joinWDelimiter(xstr.num_each_type,",") << endl;
+        cerr << soliloquy << " vspecies=" << aurostd::joinWDelimiter(_vspecies,",") << endl;
+      }
+      vnatoms.push_back(xstr.atoms.size());
       if(isupercell==0){
         vspecies.clear();for(i=0;i<_vspecies.size();i++){vspecies.push_back(_vspecies[i]);}
-        num_each_type.clear();for(i=0;i<_num_each_type.size();i++){num_each_type.push_back(_num_each_type[i]);}
+        num_each_type.clear();for(i=0;i<xstr.num_each_type.size();i++){num_each_type.push_back(xstr.num_each_type[i]);}
       }else{
         if(perform_pdos_avg && (vspecies!=_vspecies)){
           message << "Found a mismatch in vspecies in " << m_ARUN_directories[isupercell] << ", not performing pdos averaging";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
           perform_pdos_avg=false;
         }
-        if(perform_pdos_avg && (num_each_type!=_num_each_type)){
+        if(perform_pdos_avg && (num_each_type!=xstr.num_each_type)){
           message << "Found a mismatch in num_each_type in " << m_ARUN_directories[isupercell] << ", not performing pdos averaging";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
           perform_pdos_avg=false;
         }
       }
     }
+    if(LDEBUG){cerr << soliloquy << " vnatoms=" << aurostd::joinWDelimiter(vnatoms,",") << endl;}
 
     xDOSCAR xdoscar;
     string DOSCAR_file="";
     m_Egap_DOS_net=0.0;
     bool metal_found=false,insulator_found=false;
-    uint ispin=0,iatom=0,iorbital=0,vDOS_size_avg=0;
+    uint ispin=0,iatom=0,iorbital=0,vDOS_avg_size=0;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
       isupercell=std::distance(l_supercell_sets.begin(),it);
       if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/DOSCAR.static",DOSCAR_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"DOSCAR.static not found in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
@@ -1077,15 +1084,14 @@ namespace pocc {
         for(ispin=0;ispin<m_xdoscar.viDOS.size();ispin++){std::fill(m_xdoscar.viDOS[ispin].begin(),m_xdoscar.viDOS[ispin].end(),0.0);}
         
         if(m_xdoscar.vDOS.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.vDOS.size()==0",_INDEX_MISMATCH_);}
-        for(iatom=0;iatom<m_xdoscar.vDOS.size();iatom++){
-          for(iorbital=0;iorbital<m_xdoscar.vDOS[iatom].size();iorbital++){
-            for(ispin=0;ispin<m_xdoscar.vDOS[iatom][iorbital].size();ispin++){
-              std::fill(m_xdoscar.vDOS[iatom][iorbital][ispin].begin(),m_xdoscar.vDOS[iatom][iorbital][ispin].end(),0.0);
-            }
-          }
+        if(perform_pdos_avg){vDOS_avg_size=m_xdoscar.vDOS.size();}
+        else{
+          m_xdoscar.vDOS.resize(1); //resize to length 1 (total index)
+          m_xdoscar.number_atoms=0;
+          vDOS_avg_size=m_xdoscar.vDOS.size();  //only avg the totals, the extra pdos channel is a hack to print orbital sums
+          m_xdoscar.addAtomChannel(); //add single pdos for orbital sums
         }
-        if(perform_pdos_avg){vDOS_size_avg=m_xdoscar.vDOS.size();}
-        else{vDOS_size_avg=0;}  //this is the total index
+        m_xdoscar.resetVDOS();
         m_xdoscar.Efermi=0.0;
         m_Egap_DOS.assign(xdoscar.Egap.size(),0.0);
       }else{ //check that all dimensions match
@@ -1116,7 +1122,7 @@ namespace pocc {
         }else{
           if(xdoscar.vDOS.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"xdoscar.vDOS.size()==0",_INDEX_MISMATCH_);}
         }
-        for(iatom=0;iatom<vDOS_size_avg;iatom++){
+        for(iatom=0;iatom<vDOS_avg_size;iatom++){
           if(m_xdoscar.vDOS[iatom].size()!=xdoscar.vDOS[iatom].size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.vDOS[iatom].size()!=xdoscar.vDOS[iatom].size()",_INDEX_MISMATCH_);}
           for(iorbital=0;iorbital<m_xdoscar.vDOS[iatom].size();iorbital++){
             if(m_xdoscar.vDOS[iatom][iorbital].size()!=xdoscar.vDOS[iatom][iorbital].size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.vDOS[iatom][iorbital].size()!=xdoscar.vDOS[iatom][iorbital].size()",_INDEX_MISMATCH_);}
@@ -1134,22 +1140,34 @@ namespace pocc {
       for(ienergy=0;ienergy<m_xdoscar.venergyEf.size();ienergy++){m_xdoscar.venergyEf[ienergy]+=( (*it).m_probability*xdoscar.venergyEf[ienergy] );} //NOT the same across all ARUNS
       for(ispin=0;ispin<m_xdoscar.viDOS.size();ispin++){
         for(ienergy=0;ienergy<m_xdoscar.viDOS[ispin].size();ienergy++){
-          m_xdoscar.viDOS[ispin][ienergy]+=( (*it).m_probability*xdoscar.viDOS[ispin][ienergy] );
+          m_xdoscar.viDOS[ispin][ienergy]+=( (*it).m_probability * xdoscar.viDOS[ispin][ienergy] / vnatoms[isupercell] );
         }
       }
       //[sum of pdos != total: need to consider interstitials]if(0){
-      for(iatom=0;iatom<vDOS_size_avg;iatom++){  //iatom==0 is total, we can average this too
+      for(iatom=0;iatom<vDOS_avg_size;iatom++){  //iatom==0 is total, we can average this too
         for(iorbital=0;iorbital<m_xdoscar.vDOS[iatom].size();iorbital++){  //iorbital==0 is total, we can average this too
           for(ispin=0;ispin<m_xdoscar.vDOS[iatom][iorbital].size();ispin++){
             for(ienergy=0;ienergy<m_xdoscar.vDOS[iatom][iorbital][ispin].size();ienergy++){
-              m_xdoscar.vDOS[iatom][iorbital][ispin][ienergy]+=( (*it).m_probability*xdoscar.vDOS[iatom][iorbital][ispin][ienergy] );
+              m_xdoscar.vDOS[iatom][iorbital][ispin][ienergy]+=( (*it).m_probability * xdoscar.vDOS[iatom][iorbital][ispin][ienergy] / vnatoms[isupercell] );
+            }
+          }
+        }
+      }
+      if(!perform_pdos_avg){
+        for(iatom=1;iatom<xdoscar.vDOS.size();iatom++){  //iatom==1 starts first atom, sum from here onward
+          while(xdoscar.vDOS[iatom].size()>m_xdoscar.vDOS[iatom].size()){m_xdoscar.addOrbitalChannel();}
+          for(iorbital=0;iorbital<xdoscar.vDOS[iatom].size();iorbital++){  //iorbital==0 is total, we can average this too
+            for(ispin=0;ispin<xdoscar.vDOS[iatom][iorbital].size();ispin++){
+              for(ienergy=0;ienergy<xdoscar.vDOS[iatom][iorbital][ispin].size();ienergy++){
+                m_xdoscar.vDOS[1][iorbital][ispin][ienergy]+=( (*it).m_probability * xdoscar.vDOS[iatom][iorbital][ispin][ienergy] / vnatoms[isupercell] );
+              }
             }
           }
         }
       }
       //[sum of pdos != total: need to consider interstitials}else{
       //[sum of pdos != total: need to consider interstitials  double dos;
-      //[sum of pdos != total: need to consider interstitials  for(iatom=1;iatom<vDOS_size_avg;iatom++){  //iatom==0 is total, sum at the end
+      //[sum of pdos != total: need to consider interstitials  for(iatom=1;iatom<vDOS_avg_size;iatom++){  //iatom==0 is total, sum at the end
       //[sum of pdos != total: need to consider interstitials    for(iorbital=1;iorbital<m_xdoscar.vDOS[iatom].size();iorbital++){  //iorbital==0 is total, sum at the end
       //[sum of pdos != total: need to consider interstitials      for(ispin=0;ispin<m_xdoscar.vDOS[iatom][iorbital].size();ispin++){
       //[sum of pdos != total: need to consider interstitials        for(ienergy=0;ienergy<m_xdoscar.vDOS[iatom][iorbital][ispin].size();ienergy++){
@@ -1224,7 +1242,7 @@ namespace pocc {
 
   void POccCalculator::setAvgPlasmonicData(double temperature){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
-    string soliloquy=XPID+"POccCalculator::setAvgDOSCAR():";
+    string soliloquy=XPID+"POccCalculator::setAvgPlasmonicData():";
     stringstream message;
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -1410,6 +1428,7 @@ namespace pocc {
   void POccCalculator::plotAvgDOSCAR(const xDOSCAR& xdos,double temperature,const string& directory) const {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::plotAvgDOSCAR():";
+    stringstream message;
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
     aurostd::xoption cmdline_opts, plot_opts;
@@ -1419,17 +1438,25 @@ namespace pocc {
       if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
       cmdline_opts.push_attached("PLOT_DOS", directory);
       plot_opts = plotter::getPlotOptionsEStructure(cmdline_opts, "PLOT_DOS");
+      plot_opts.push_attached("NORMALIZATION","ATOM");  //CO20211124
       plot_opts.push_attached("PROJECTION","ORBITALS");
       //plot_opts.push_attached("EXTENSION","dos_orbitals_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
       plot_opts.push_attached("EXTENSION","dos_orbitals_T"+(*this).getTemperatureString(temperature)+"K");
       plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
 
+      //try species-projected
       plot_opts.push_attached("ARUN_DIRECTORY",m_ARUN_directories[0]);
       plot_opts.pop_attached("PROJECTION");
       plot_opts.push_attached("PROJECTION","SPECIES");
+      plot_opts.pop_attached("EXTENSION");
       //plot_opts.push_attached("EXTENSION","dos_species_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
       plot_opts.push_attached("EXTENSION","dos_species_T"+(*this).getTemperatureString(temperature)+"K");
-      plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
+      xstructure xstr=plotter::getStructureWithNames(plot_opts,*p_FileMESSAGE,xdos.carstring,*p_oss);
+      if(xdos.vDOS.size()==xstr.atoms.size()){plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);}
+      else{
+        message << "Skipping species-projected plots, there are varying num_each_type among POCC.ARUN's" << endl;
+        pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      }
 
       if(0){  //turn on for SG - plot orbitals for each species near fermi energy (dos_species_T0K_Cs_1)
         plot_opts.pop_attached("PROJECTION");
@@ -3443,7 +3470,7 @@ namespace pocc {
   //if(MODE==BOND_MODE){energy += 0.5 * uffb.Kij * uffb.delta * uffb.delta;}
   //else if(MODE==NONBOND_MODE){energy += uffb.Dij * (uffb.X12 - 2.0 * uffb.X6);}
   //}
-  //energy*=KCAL_2_EV;
+  //energy*=kcal2eV;
   //return energy;
   //}
 
@@ -7294,7 +7321,7 @@ namespace pocc {
       cerr << soliloquy << " uffb.delta=" << uffb.delta << endl;
       cerr << soliloquy << " uffb.ren=" << uffb.ren << endl;
       cerr << soliloquy << " uffb.R0=" << uffb.R0 << endl;
-      cerr << soliloquy << " energy=" << KCAL_2_EV * 0.5 * uffb.Kij * uffb.delta * uffb.delta << endl;
+      cerr << soliloquy << " energy=" << kcal2eV * 0.5 * uffb.Kij * uffb.delta * uffb.delta << endl;
 
       //lennard-jones potential
       cerr << soliloquy << " lennard-jones potential debug" << endl;
@@ -7307,12 +7334,12 @@ namespace pocc {
       cerr << soliloquy << " atomi.type=" << xstr.atoms[atom2].type << endl;
       cerr << soliloquy << " atomj.type=" << xstr.atoms[atom2].type << endl;
       cerr << soliloquy << " distij=" << distij << endl;
-      cerr << soliloquy << " energy=" << KCAL_2_EV * uffb.Dij * (uffb.X12 - 2.0 * uffb.X6) << endl;
+      cerr << soliloquy << " energy=" << kcal2eV * uffb.Dij * (uffb.X12 - 2.0 * uffb.X6) << endl;
 #endif
 
     }
     //if(MODE==BOND_MODE) cerr << "BONDING LENGTH C " << count << endl;
-    energy*=KCAL_2_EV;
+    energy*=kcal2eV;
     return energy;
   }
 

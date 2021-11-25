@@ -1913,12 +1913,12 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   //DX20190326 - moved up and added if-statement cases - END
 
   if(pocc){ //CO20181226
-    string pocc_params_add_on=POCC_TITLE_TAG+xvasp.AVASP_pocc_parameters;
+    string pocc_params_add_on=TAG_TITLE_POCC+xvasp.AVASP_pocc_parameters;
     system+=pocc_params_add_on;directory+=pocc_params_add_on;xvasp.AVASP_label+=pocc_params_add_on;
     if(!xvasp.AVASP_pocc_tol.empty()){
       string pocc_tol_str_tmp=xvasp.AVASP_pocc_tol;
       aurostd::StringSubst(pocc_tol_str_tmp,":","_"); //TOL_0.001_0.001 - first is site tol, second is stoich tol
-      string pocc_params_add_on=POCC_TITLE_TOL_TAG+pocc_tol_str_tmp; //CO20200624 - xvasp.AVASP_pocc_tol;
+      string pocc_params_add_on=TAG_TITLE_POCC_TOL+pocc_tol_str_tmp; //CO20200624 - xvasp.AVASP_pocc_tol;
       system+=pocc_params_add_on;directory+=pocc_params_add_on;xvasp.AVASP_label+=pocc_params_add_on;
     }
   }
