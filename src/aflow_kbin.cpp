@@ -1359,7 +1359,7 @@ namespace KBIN {
           aurostd::DirectoryLS(aflags.Directory,vfiles_dummyls);
           // ***************************************************************************
           // WRITE END
-          aurostd::string2file(string(Message(_AFLOW_FILE_NAME_,aflags)+"\n"),string(aflags.Directory+"/"+DEFAULT_AFLOW_END_OUT));
+          aurostd::string2file("AFLOW calculation complete"+string(Message(_AFLOW_FILE_NAME_,aflags)+"\n"),string(aflags.Directory+"/"+DEFAULT_AFLOW_END_OUT));
           // ***************************************************************************
           // MAKE READEABLE
           aurostd::ChmodFile("664",string(aflags.Directory+"/"+_AFLOWLOCK_));
