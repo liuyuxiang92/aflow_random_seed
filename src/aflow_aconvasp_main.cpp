@@ -8268,7 +8268,7 @@ namespace pflow {
       //   cout << str_sp.lattice << endl;
       cout << "</pre>" << endl;
       //ME+DX20210521 [OBSOLETE - remove height, let the CSS handle it] cout << "<img height=600 src=http://" << XHOST.AFLOW_MATERIALS_SERVER << "/SCIENCE/images/brillouin/" << lattice_type << ".PNG><br>" << endl;
-      cout << "<img src=http://" << XHOST.AFLOW_MATERIALS_SERVER << "/SCIENCE/images/brillouin/" << lattice_type << ".PNG><br>" << endl; //ME+DX20210521 - remove height, let the CSS handle it
+      cout << "<img src=https://" << XHOST.AFLOW_MATERIALS_SERVER << "/SCIENCE/images/brillouin/" << lattice_type << ".PNG><br>" << endl; //ME+DX20210521 - remove height, let the CSS handle it
       // OBSOLETE ME20210208 - There are no eps files on the server, so serving the image is enough
       //cout << "<br> [ ";
       //cout << "<a href=http://" << XHOST.AFLOW_MATERIALS_SERVER << "/SCIENCE/images/brillouin/" << lattice_type << ".PNG>png</a>";

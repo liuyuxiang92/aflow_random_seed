@@ -209,7 +209,7 @@ namespace init {
     XHOST.hostname=os.nodename;//aurostd::execute2string(string("hostname"));
     if(XHOST.hostname=="nietzsche") XHOST.hostname="nietzsche.mems.duke.edu";
     if(XHOST.hostname=="materials") XHOST.hostname="materials.duke.edu";
-    if(XHOST.hostname=="aflowlib") XHOST.hostname="aflowlib.mems.duke.edu";
+    if(XHOST.hostname=="aflowlib") XHOST.hostname="aflowlib.duke.edu";
     if(XHOST.hostname=="quser") XHOST.hostname="quser.materials.duke.edu";  //CO20200526
     if(INIT_VERBOSE) oss << aurostd::PaddedPOST("hostname = ",depth_short) << XHOST.hostname << endl;
     if(AFLOW_BlackList(XHOST.hostname)) {
@@ -227,7 +227,7 @@ namespace init {
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [7]" << endl;
     XHOST.AFLOW_MATERIALS_SERVER=AFLOW_MATERIALS_SERVER_DEFAULT;XHOST.AFLOW_WEB_SERVER=AFLOW_WEB_SERVER_DEFAULT; // DEFAULT
     if(aurostd::substring2bool(XHOST.hostname,"nietzsche")) {XHOST.AFLOW_MATERIALS_SERVER=AFLOW_MATERIALS_SERVER_DEFAULT;XHOST.AFLOW_WEB_SERVER=AFLOW_WEB_SERVER_DEFAULT;}
-    if(aurostd::substring2bool(XHOST.hostname,"aflowlib")) {XHOST.AFLOW_MATERIALS_SERVER="aflowlib.mems.duke.edu";XHOST.AFLOW_WEB_SERVER="aflowlib.mems.duke.edu";}
+    if(aurostd::substring2bool(XHOST.hostname,"aflowlib")) {XHOST.AFLOW_MATERIALS_SERVER="aflowlib.duke.edu";XHOST.AFLOW_WEB_SERVER="aflowlib.duke.edu";}
     if(INIT_VERBOSE) {
       oss << "--- SERVER ------------------ " << endl;
       oss << aurostd::PaddedPOST("XHOST.AFLOW_MATERIALS_SERVER = ",depth_short) << XHOST.AFLOW_MATERIALS_SERVER << endl;
@@ -582,7 +582,7 @@ namespace init {
     // some other technique to get MARYLOU
 
     // check for APENNSY_USE_SERVER/AFLOWLIB
-    if(XHOST.hostname=="nietzsche.mems.duke.edu" || XHOST.hostname=="materials.duke.edu" || XHOST.hostname=="aaaaflowlib.mems.duke.edu") {
+    if(XHOST.hostname=="nietzsche.mems.duke.edu" || XHOST.hostname=="materials.duke.edu" || XHOST.hostname=="aflowlib.duke.edu") {
       XHOST.APENNSY_USE_SERVER=TRUE;XHOST.APENNSY_USE_LIBRARY=FALSE;XHOST.APENNSY_SERVER_AFLOWLIB_ORG=FALSE;
     } else {
       XHOST.APENNSY_USE_SERVER=FALSE;XHOST.APENNSY_USE_LIBRARY=FALSE;XHOST.APENNSY_SERVER_AFLOWLIB_ORG=TRUE;
