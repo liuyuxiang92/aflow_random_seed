@@ -147,13 +147,18 @@ namespace pocc {
     
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
-    POccCalculator pcalc(vpflow);
-    pcalc.m_aflags.Directory=".";  //make current directory for now, we can change in the future
+    _aflags aflags;aflags.Directory=".";  //make current directory for now, we can change in the future
+
+    ofstream FileMESSAGE;
+    string FileNameLOCK=aflags.Directory+"/"+_AFLOWLOCK_;
+    FileMESSAGE.open(FileNameLOCK.c_str(),std::ios::out);
+    POccCalculator pcalc(vpflow,FileMESSAGE);
+    pcalc.m_aflags.Directory=aflags.Directory;
     pcalc.CleanPostProcessing();
     pcalc.convolution();
+    FileMESSAGE.flush();FileMESSAGE.clear();FileMESSAGE.close();
     stringstream command;
-    command << DEFAULT_KZIP_BIN+" -9fq -T0 aflow.pocc.out DOSCAR.pocc_T* PARTCAR";
-    //KBIN::CompressDirectory("."); //main directory for now
+    KBIN::CompressDirectory(aflags);
     aurostd::execute(command);
   }
 } // namespace pocc
