@@ -1484,6 +1484,11 @@ namespace KBIN {
     kflags.KZIP_BIN=DEFAULT_KZIP_BIN+" -9q";
     return KBIN::CompressDirectory(aflags,kflags);
   }
+  bool CompressDirectory(const string& directory) {        // AFLOW_FUNCTION_IMPLEMENTATION
+    _kflags kflags;
+    kflags.KZIP_BIN=DEFAULT_KZIP_BIN; //[CO20211130, moving -9q above as default]+" -9q";
+    return KBIN::CompressDirectory(directory,kflags);
+  }
 }
 
 // *******************************************************************************************

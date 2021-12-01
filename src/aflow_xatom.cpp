@@ -4674,6 +4674,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // If scale < 0 then it should be treated as the volume.
     a.neg_scale=FALSE;
     if(a.scale<0.0) {
+      //CO20211130 - the usual scaling factor is the lattice parameter
+      //for fcc, GetVol(a.lattice)=0.25
       double nvol=-1.0*(a.scale);
       double ovol=GetVol(a.lattice);
       a.scale=std::pow((double) (nvol/ovol),(double) 1.0/3.0);

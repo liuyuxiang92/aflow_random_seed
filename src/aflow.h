@@ -2954,6 +2954,7 @@ namespace KBIN {
   bool CompressDirectory(const _aflags& aflags,const _kflags& kflags);
   bool CompressDirectory(const string& directory,const _kflags& kflags);  //ME20210927
   bool CompressDirectory(const _aflags& aflags);
+  bool CompressDirectory(const string& directory);  //CO20211130
   void Clean(const _aflags& aflags);
   void Clean(const string directory);
   void Clean(const _aflags& aflags,const aurostd::xoption& opts_clean);  //CO20210901
