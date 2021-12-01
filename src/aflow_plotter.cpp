@@ -453,7 +453,7 @@ namespace plotter {
   // appropriately.
   string formatDefaultPlotTitle(const xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return formatDefaultPlotTitle(plotoptions,FileMESSAGE,oss);} //CO20200404
   string formatDefaultPlotTitle(const xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) { //CO20200404
-    bool LDEBUG=(1||FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG);
     string soliloquy=XPID+"plotter::formatDefaultPlotTitle():";
     string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
     if(LDEBUG) {cerr << soliloquy << " default_title=" << default_title << endl;}
