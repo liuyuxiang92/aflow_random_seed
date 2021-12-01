@@ -1855,6 +1855,7 @@ namespace pocc {
     if(LDEBUG){cerr << soliloquy << " m_vflags.AFLOW_SYSTEM.content_string=" << m_vflags.AFLOW_SYSTEM.content_string << endl;}
 
     setPOccStructure(xstr_pocc);
+    m_convolution=true;
     postProcessing();
   }
 
