@@ -152,7 +152,7 @@ namespace pocc {
     pcalc.CleanPostProcessing();
     pcalc.convolution();
     stringstream command;
-    command << DEFAULT_KZIP_BIN+" -9q -T0 aflow.pocc.out DOSCAR.pocc_T*";
+    command << DEFAULT_KZIP_BIN+" -9fq -T0 aflow.pocc.out DOSCAR.pocc_T* PARTCAR";
     //KBIN::CompressDirectory("."); //main directory for now
     aurostd::execute(command);
   }
@@ -1856,6 +1856,7 @@ namespace pocc {
 
     setPOccStructure(xstr_pocc);
     m_convolution=true;
+    writePARTCAR();
     postProcessing();
   }
 
