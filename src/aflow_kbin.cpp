@@ -1476,6 +1476,9 @@ namespace KBIN {
       //if not, try again one by one
       _vfiles.clear();
       for(i=0;i<vfiles.size();i++){ //better than doing it all in one shot
+        //it would be good to check if the file is corrupt, how to check is specific to the file
+        //do not check if the file is empty, WAVECAR/REPORT are empty
+        //-f will overwrite the original compressed file if an uncompressed variant exists
         if(aurostd::EFileExist(directory+"/"+vfiles[i])==true && aurostd::FileExist(directory+"/"+vfiles[i])==false){continue;}
         _vfiles.push_back(vfiles[i]);
       }
@@ -1495,6 +1498,9 @@ namespace KBIN {
       //if not, try again one by one
       _vfiles.clear();
       for(i=0;i<vfiles.size();i++){ //better than doing it all in one shot
+        //it would be good to check if the file is corrupt, how to check is specific to the file
+        //do not check if the file is empty, WAVECAR/REPORT are empty
+        //-f will overwrite the original compressed file if an uncompressed variant exists
         if(aurostd::EFileExist(directory+"/"+vfiles[i])==true && aurostd::FileExist(directory+"/"+vfiles[i])==false){continue;}
         _vfiles.push_back(vfiles[i]);
       }
