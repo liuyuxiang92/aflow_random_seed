@@ -1415,11 +1415,12 @@ namespace KBIN {
     // [OBSOLETE]  aus << "grep -v aflow.in | grep -v " << _AFLOWIN_ << " ";;    //CO, never zip aflow.in or _aflow.in (agl_aflow.in) or newly defined aflow.in
     if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
     vector<string> _vfiles,vfiles;
-    string compressed_variant;
+    string compressed_variant="";
     aurostd::DirectoryLS(directory,_vfiles);
     if(LDEBUG){cerr << soliloquy << "_vfiles=" << aurostd::joinWDelimiter(_vfiles,",") << endl;}
-    string file_path;
-    for(uint i=0;i<_vfiles.size();i++){
+    string file_path="";
+    uint i=0;
+    for(i=0;i<_vfiles.size();i++){
       if(aurostd::IsCompressed(_vfiles[i])){continue;}  //doesn't need full path, just substring2bool for zip variants, e.g., .EXT
       if(_vfiles[i].size() && _vfiles[i][0]=='.'){continue;}  //do not try to compress any hidden files, .nfs stuff is particularly problematic to compress
       if(aurostd::substring2bool(_vfiles[i],KBIN_SUBDIRECTORIES)){continue;}
@@ -1449,12 +1450,69 @@ namespace KBIN {
     // [OBSOLETE] cerr << vfiles.size() << endl;
     // [OBSOLETE] aurostd::StringstreamClean(aus);
     // [OBSOLETE] cerr << "CO " << aurostd::joinWDelimiter(vfiles," ") << endl;
-    if(vfiles.size()){
-      ostringstream aus;
-      //aurostd::StringstreamClean(aus);
-      aus << "cd " << directory << " && " << endl;
+    if(vfiles.size()){  //ATTEMPT 1 - xargs parallelization with -T4
+      //find . -name 'README*' -print0 | xargs -0 -P16 -I{} xz -T4 {}
+      //-T does not work with -9
+      //big compression (space) difference between -8 and -9, negligible between -6 and -8
+      //big speed up between -6 and -8, not too much between -8 and -9
+      uint ncpus_total=(uint)KBIN::get_NCPUS(kflags);
+      uint ncpus_xz=4;  //default
+      uint nprocessors=(uint) floor(((double)ncpus_total)/((double)ncpus_xz));  //floor is safe
+      stringstream aus;
+      for(i=0;i<vfiles.size();i++){aus << directory+"/"+vfiles[i] << '\0';} //emulates -print0
+      if(LDEBUG){cerr << soliloquy << " contents of tmpfile=\"" << aus.str() << "\"" << endl;}
+      string tmpfile=aurostd::TmpFileCreate("CompressDirectory");
+      aurostd::stringstream2file(aus,tmpfile);
+      aurostd::StringstreamClean(aus);
+      aus << "cat " << tmpfile << " | xargs -0 -P" << nprocessors << " -I{} " << kflags.KZIP_BIN << " -9fq";
+      if(aurostd::substring2bool(kflags.KZIP_BIN,"xz")){aus << " -T" << ncpus_xz;}
+      aus << " {}";
+      if(LDEBUG){cerr << soliloquy << " command=\"" << aus.str() << "\"" << endl;}
+      aurostd::execute(aus);
+#ifndef _AFLOW_TEMP_PRESERVE_
+      aurostd::RemoveFile(tmpfile);
+#endif
+      //CO20211130 - test if files were successfully compressed
+      //if not, try again one by one
+      _vfiles.clear();
+      for(i=0;i<vfiles.size();i++){ //better than doing it all in one shot
+        //it would be good to check if the file is corrupt, how to check is specific to the file
+        //do not check if the file is empty, WAVECAR/REPORT are empty
+        //-f will overwrite the original compressed file if an uncompressed variant exists
+        if(aurostd::EFileExist(directory+"/"+vfiles[i])==true && aurostd::FileExist(directory+"/"+vfiles[i])==false){continue;}
+        _vfiles.push_back(vfiles[i]);
+      }
+      vfiles.clear();
+      for(i=0;i<_vfiles.size();i++){vfiles.push_back(_vfiles[i]);}
+    }
+    if(vfiles.size()){  //ATTEMPT 2 - one-by-one with -T0
+      stringstream aus;
+      aurostd::StringstreamClean(aus);
+      //[CO+ME20211208 - add directory directly to path of file]aus << "cd " << directory << " && " << endl;
+      for(i=0;i<vfiles.size();i++){ //better than doing it all in one shot
+        aus << kflags.KZIP_BIN << " -9fq " << (aurostd::substring2bool(kflags.KZIP_BIN,"xz")?"-T0 ":"") << directory << "/" << vfiles[i] << "; " << endl;  // semi-colon is important, keeps going if it stalls on one //CO20211130 - added q
+      }
+      if(LDEBUG){cerr << soliloquy << " command=\"" << aus.str() << "\"" << endl;}
+      aurostd::execute(aus);
+      //CO20211130 - test if files were successfully compressed
+      //if not, try again one by one
+      _vfiles.clear();
+      for(i=0;i<vfiles.size();i++){ //better than doing it all in one shot
+        //it would be good to check if the file is corrupt, how to check is specific to the file
+        //do not check if the file is empty, WAVECAR/REPORT are empty
+        //-f will overwrite the original compressed file if an uncompressed variant exists
+        if(aurostd::EFileExist(directory+"/"+vfiles[i])==true && aurostd::FileExist(directory+"/"+vfiles[i])==false){continue;}
+        _vfiles.push_back(vfiles[i]);
+      }
+      vfiles.clear();
+      for(i=0;i<_vfiles.size();i++){vfiles.push_back(_vfiles[i]);}
+    }
+    if(vfiles.size()){  //ATTEMPT 3 - one-by-one
+      stringstream aus;
+      aurostd::StringstreamClean(aus);
+      //[CO+ME20211208 - add directory directly to path of file]aus << "cd " << directory << " && " << endl;
       for(uint i=0;i<vfiles.size();i++){ //better than doing it all in one shot
-        aus << kflags.KZIP_BIN << " -9f " << vfiles[i] << "; " << endl;  // semi-colon is important, keeps going if it stalls on one
+        aus << kflags.KZIP_BIN << " -9fq " << directory << "/" << vfiles[i] << "; " << endl;  // semi-colon is important, keeps going if it stalls on one //CO20211130 - added q
       }
       if(LDEBUG){cerr << soliloquy << " command=\"" << aus.str() << "\"" << endl;}
       // aus << kflags.KZIP_BIN << " " << aurostd::joinWDelimiter(vfiles," ") << endl; //AVOID, because if one fails, the whole command stops
@@ -1481,7 +1539,7 @@ namespace KBIN {
 namespace KBIN {
   bool CompressDirectory(const _aflags& aflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
     _kflags kflags;
-    kflags.KZIP_BIN=DEFAULT_KZIP_BIN+" -9q";
+    kflags.KZIP_BIN=DEFAULT_KZIP_BIN;   //[CO20211130, moving -9q above as default]+" -9q";
     return KBIN::CompressDirectory(aflags,kflags);
   }
 }
