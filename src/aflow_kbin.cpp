@@ -1485,9 +1485,9 @@ namespace KBIN {
     if(vfiles.size()){  //ATTEMPT 2 - one-by-one with -T0
       stringstream aus;
       aurostd::StringstreamClean(aus);
-      aus << "cd " << directory << " && " << endl;
+      //[CO+ME20211208 - add directory directly to path of file]aus << "cd " << directory << " && " << endl;
       for(i=0;i<vfiles.size();i++){ //better than doing it all in one shot
-        aus << kflags.KZIP_BIN << " -9fq " << (aurostd::substring2bool(kflags.KZIP_BIN,"xz")?"-T0 ":"") << vfiles[i] << "; " << endl;  // semi-colon is important, keeps going if it stalls on one //CO20211130 - added q
+        aus << kflags.KZIP_BIN << " -9fq " << (aurostd::substring2bool(kflags.KZIP_BIN,"xz")?"-T0 ":"") << directory << "/" << vfiles[i] << "; " << endl;  // semi-colon is important, keeps going if it stalls on one //CO20211130 - added q
       }
       if(LDEBUG){cerr << soliloquy << " command=\"" << aus.str() << "\"" << endl;}
       aurostd::execute(aus);
@@ -1504,9 +1504,9 @@ namespace KBIN {
     if(vfiles.size()){  //ATTEMPT 3 - one-by-one
       stringstream aus;
       aurostd::StringstreamClean(aus);
-      aus << "cd " << directory << " && " << endl;
+      //[CO+ME20211208 - add directory directly to path of file]aus << "cd " << directory << " && " << endl;
       for(uint i=0;i<vfiles.size();i++){ //better than doing it all in one shot
-        aus << kflags.KZIP_BIN << " -9fq " << vfiles[i] << "; " << endl;  // semi-colon is important, keeps going if it stalls on one //CO20211130 - added q
+        aus << kflags.KZIP_BIN << " -9fq " << directory << "/" << vfiles[i] << "; " << endl;  // semi-colon is important, keeps going if it stalls on one //CO20211130 - added q
       }
       if(LDEBUG){cerr << soliloquy << " command=\"" << aus.str() << "\"" << endl;}
       // aus << kflags.KZIP_BIN << " " << aurostd::joinWDelimiter(vfiles," ") << endl; //AVOID, because if one fails, the whole command stops
