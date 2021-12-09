@@ -478,8 +478,8 @@ namespace aurostd {
   bool FileExist(const string& FileName);  bool FileExist(const string& FileName,string &FileNameOut);
   bool EFileExist(const string& FileName); bool EFileExist(const string& FileName,string &FileNameOut);
   unsigned long long int FileSize(const string& FileName);  //ME20191001
-  bool GetMemoryUsagePercentage(double& memory_usage_percentage);  //CO20210601
-  bool GetMemory(unsigned long long int& free,unsigned long long int& total); //CO20210315
+  bool GetMemoryUsagePercentage(double& usage_percentage_ram,double& usage_percentage_swap);  //CO20210601
+  bool GetMemory(unsigned long long int& free_ram,unsigned long long int& total_ram,unsigned long long int& free_swap,unsigned long long int& total_swap); //CO20210315
   bool FileEmpty(const string& FileName);
   bool FileNotEmpty(const string& FileName);
   bool EFileEmpty(const string& FileName); //CO20190808
@@ -807,6 +807,7 @@ namespace aurostd {
   bool substring_present_file(const string& FileName,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
   bool substring_present_file_FAST(const string& FileName,const string& strsub1,bool RemoveWS=false,bool case_insensitive=false,bool expect_near_end=false,unsigned long long int size_max=AUROSTD_MAX_ULLINT);  //CO20210315 - cleaned up
   bool WithinList(const vector<string>& list,const string& input,bool sorted=false);  //CO20181010
+  bool WithinList(const deque<string>& list,const string& input,bool sorted=false);  //CO20181010
   bool WithinList(const vector<int>& list,int input,bool sorted=false); //CO20181010
   bool WithinList(const vector<uint>& list,uint input,bool sorted=false); //CO20181010
   bool WithinList(const vector<string>&, const string&, int&,bool sorted=false);  //ME20190905
@@ -854,8 +855,6 @@ namespace aurostd {
   string latex2html(const string& str) __xprototype;
   string latex2txt(const string& str) __xprototype;
   string fixStringLatex(const string& input, bool double_back_slash=false,bool symmetry_string=false);  //CO20190419
-  string dbl2frac(double a, bool sign_prefix=true); //DX20190724
-  double frac2dbl(const string& str); //DX20200313
 }
 
 

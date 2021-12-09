@@ -1288,6 +1288,25 @@ namespace aurostd {  // namespace aurostd
 // ****************************************************************************
 // ------------------------------------------------------ xmatrix construction
 namespace aurostd {
+  // ME2021050 - Reshape given matrix dimensions
+  template<class utype>
+    xmatrix<utype> reshape(const xvector<utype>& v1, int rows, int cols) {
+      if (rows * cols != v1.rows) {
+        string function = XPID + "aurostd::xmatrix<utype>::reshape(v1,rows,cols):";
+        stringstream message;
+        message << "vector (rows = " << v1.rows << ") cannot be reshaped into "
+          << rows << "x" << cols << "matrix.";
+        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+      }
+      xmatrix<utype> c(rows, cols);
+      for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+          c(i+1, j+1) = v1[v1.lrows + rows*i + j];
+        }
+      }
+      return c;
+    }
+
   // reshape by columns
   template<class utype>
     xmatrix<utype> reshape(const xvector<utype>& v1) {

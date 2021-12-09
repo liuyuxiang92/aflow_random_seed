@@ -308,6 +308,15 @@ namespace apl
     initialize(in_structure, xinput, qha_options, apl_options, FileMESSAGE, oss);
   }
 
+  //xStream initializers
+  void QHA::initialize(ostream& oss) {
+    xStream::initialize(oss);
+  }
+
+  void QHA::initialize(ofstream& mf, ostream& oss) {
+    xStream::initialize(mf, oss);
+  }
+
   /// Initializes the QHA class with all the necessary data.
   ///
   void QHA::initialize(const xstructure &in_structure, _xinput &xinput,
@@ -1228,7 +1237,7 @@ namespace apl
       // following line is left commented instead of being deleted.
       //      dosc.writePHDOSCAR(subdirectories[i]);//AS20200824
 
-      if (dosc.hasNegativeFrequencies()){
+      if (dosc.hasImaginaryFrequencies()){
         stringstream msg;
         msg << "Phonon dispersions of the APL calculation in the " << subdirectories[i];
         msg << " directory contain imaginary frequencies." << std::endl;

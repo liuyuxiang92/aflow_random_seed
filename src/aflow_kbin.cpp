@@ -26,6 +26,7 @@
 #define MACHINE001_DEFAULT_KILL_MEM_CUTOFF 1.50  //DX20190509 - MACHINE001
 #define MACHINE002_DEFAULT_KILL_MEM_CUTOFF 1.50  //DX20190509 - MACHINE002
 #define MACHINE003_DEFAULT_KILL_MEM_CUTOFF 1.50  //DX20201005 - MACHINE003
+#define MACHINE004_DEFAULT_KILL_MEM_CUTOFF 1.50  //DX20211011 - MACHINE004
 #define CMU_EULER_DEFAULT_KILL_MEM_CUTOFF 1.50   //DX20190107 - CMU EULER
 
 namespace aurostd {
@@ -416,6 +417,11 @@ namespace KBIN {
     aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE003",aurostd::args2flag(argv,"--machine=machine003"));
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE003")) XHOST.maxmem=MACHINE003_DEFAULT_KILL_MEM_CUTOFF;
     //DX20201005 - MACHINE003 - END
+    //DX20211011 - MACHINE004 - START
+    // "MACHINE::MACHINE004"
+    aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE004",aurostd::args2flag(argv,"--machine=machine004"));
+    if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE004")) XHOST.maxmem=MACHINE004_DEFAULT_KILL_MEM_CUTOFF;
+    //DX20211011 - MACHINE004 - END
     // DUKE_MATERIALS
     aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_MATERIALS",aurostd::args2flag(argv,"--machine=materials|--machine=duke_materials"));
     // DUKE_AFLOWLIB
@@ -589,7 +595,9 @@ namespace KBIN {
       // aurostd::random_shuffle(vDirectory);
       // std::random_shuffle(vDirectory.begin(),vDirectory.end());
 
-      bool contcar_save=aurostd::args2flag(argv,"--contcar_save|--save_contcar");  //CO20210716
+      aurostd::xoption opts_clean;  //CO20210716
+      opts_clean.flag("SAVE_CONTCAR",aurostd::args2flag(argv,"--contcar_save|--save_contcar"));  //CO20210716 - saves contcar no matter what
+      opts_clean.flag("SAVE_CONTCAR_OUTCAR_COMPLETE",aurostd::args2flag(argv,"--contcar_save_outcar_complete|--save_contcar_outcar_complete"));  //CO20210716 - saves contcar only if outcar is complete
 
       for(uint idir=0;idir<vDirectory.size();idir++) {
         bool krun=TRUE;
@@ -615,7 +623,7 @@ namespace KBIN {
           //[CO20210716 - OBSOLETE]aurostd::StringSubst(aflags.Directory,"/OUTCAR","");  // so it is easier to search
           //[CO20210716 - OBSOLETE]aurostd::StringSubst(aflags.Directory,"/"+_AFLOWIN_,"");  // so it is easier to search
           //  cerr << aflags.Directory << endl;
-          KBIN::Clean(aflags,contcar_save);
+          KBIN::Clean(aflags,opts_clean);
           krun=FALSE;
         }
         // RUN
@@ -961,6 +969,7 @@ namespace KBIN {
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;   // with MACHINE001; DX added 20190509
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;   // with MACHINE002; DX added 20190509
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE003")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;   // with MACHINE003; DX added 20201005
+        if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE004")) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;   // with MACHINE004; DX added 20211011
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER"))  kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;;  //DX20190107 - CMU EULER // with CMU_EULER force NCPUS //DX20181113
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::OHAD")) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;           // MACHINE2 has only NCPUS //CO20181113
         if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::HOST1")) kflags.KBIN_MPI_NCPUS=XHOST.CPU_Cores;          // MACHINE1 has only NCPUS //CO20181113
@@ -1092,6 +1101,54 @@ namespace KBIN {
 }
 
 // ***************************************************************************
+// KBIN::MoveRun2NewDirectory() //DX20210901
+// ***************************************************************************
+// Moves an aflow run (i.e., aflow.in) to a new directory and adds a LOCK
+// to the original directory to prevent aflow from re-running the system.
+// Some machines have scrubbers on certain filesystems/workspaces that remove
+// old/untouched files, i.e., removes/deletes aflow.ins that are waiting to be
+// run. To avoid this, we store the aflow.in in a filesystem/workspace "safe"
+// from the scrubber, and move the aflow.in to the "run" filesystem/workspace
+// once it has been selected from the aflow daemon.
+// This is needed for machine001, machine002, machine003
+namespace KBIN {
+  void MoveRun2NewDirectory(_aflags& aflags, const string& subdirectory_orig, const string& subdirectory_new){
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name=XPID+"KBIN::RUN_MoveRun2NewDirectory():";
+    ostringstream aus,message;
+
+    // ---------------------------------------------------------------------------
+    // create lock immediately // CO20210901
+    aus << "touch " << aflags.Directory << "LOCK";
+    message <<    "MMMMM  Executing: \"" << aus.str() << "\"" << Message(_AFLOW_FILE_NAME_,aflags,"user,host,time") << endl;aurostd::PrintMessageStream(message,XHOST.QUIET);message.clear();message.str(std::string());
+    aurostd::execute(aus);
+    aus.clear();aus.str(std::string());
+
+    // ---------------------------------------------------------------------------
+    //Changing the run directory from the "original" to a "new" directory
+    string directory_orig = aflags.Directory;
+    if(LDEBUG){
+      cerr << function_name << " original full directory " << directory_orig << endl;
+      cerr << function_name << " changing subdirectory " << subdirectory_orig << " to " << subdirectory_new << endl;
+    }
+    aurostd::StringSubst(aflags.Directory,subdirectory_orig,subdirectory_new);
+
+    // ---------------------------------------------------------------------------
+    // make new directory
+    aus << "mkdir -p " << aflags.Directory;
+    message <<    "MMMMM  Executing: \"" << aus.str() << "\"" << Message(_AFLOW_FILE_NAME_,aflags,"user,host,time") << endl;aurostd::PrintMessageStream(message,XHOST.QUIET);message.clear();message.str(std::string());aurostd::execute(aus);aus.clear();aus.str(std::string());
+
+    // ---------------------------------------------------------------------------
+    // copy aflow.in to new directory
+    aus << "cp " << directory_orig << "/aflow.in " << aflags.Directory;
+    message <<    "MMMMM  Executing: \"" << aus.str() << "\"" << Message(_AFLOW_FILE_NAME_,aflags,"user,host,time") << endl;aurostd::PrintMessageStream(message,XHOST.QUIET);message.clear();message.str(std::string());aurostd::execute(aus);aus.clear();aus.str(std::string());
+
+    if(LDEBUG){ cerr << function_name << " new full directory " << aflags.Directory << endl; }
+  }
+}
+
+// ***************************************************************************
 // KBIN::RUN_Directory
 // ***************************************************************************
 namespace KBIN {
@@ -1099,6 +1156,20 @@ namespace KBIN {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::RUN_Directory():";
     ostringstream aus;
+
+    // ---------------------------------------------------------------------------
+    // Move aflow run (i.e., aflow.in) to a new directory and add a LOCK
+    // to the original directory to prevent machine scrubbers from removing
+    // DX20210901
+    if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE001") ||
+        aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE002") ||
+        aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE003")){
+
+      string subdirectory_orig = aurostd::execute2string("echo $HOME");   // $HOME    : environment variable pointing to "home" filesystem (specific to machine001/002/003)
+      string subdirectory_new = aurostd::execute2string("echo $WORKDIR"); // $WORKDIR : environment variable pointing to "work" filesystem (specific to machine001/002/003)
+      KBIN::MoveRun2NewDirectory(aflags, subdirectory_orig, subdirectory_new);
+    }
+
     ifstream FileSUBDIR;string FileNameSUBDIR;
     FileNameSUBDIR=aflags.Directory;
     FileSUBDIR.open(FileNameSUBDIR.c_str(),std::ios::in);
@@ -1288,7 +1359,7 @@ namespace KBIN {
           aurostd::DirectoryLS(aflags.Directory,vfiles_dummyls);
           // ***************************************************************************
           // WRITE END
-          aurostd::string2file(string(Message(_AFLOW_FILE_NAME_,aflags)+"\n"),string(aflags.Directory+"/"+DEFAULT_AFLOW_END_OUT));
+          aurostd::string2file("AFLOW calculation complete"+string(Message(_AFLOW_FILE_NAME_,aflags)+"\n"),string(aflags.Directory+"/"+DEFAULT_AFLOW_END_OUT));
           // ***************************************************************************
           // MAKE READEABLE
           aurostd::ChmodFile("664",string(aflags.Directory+"/"+_AFLOWLOCK_));
@@ -1326,7 +1397,12 @@ namespace KBIN {
 
 // *******************************************************************************************
 namespace KBIN {
+  //ME20210927 Added string variant
   bool CompressDirectory(const _aflags& aflags,const _kflags& kflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
+    return CompressDirectory(aflags.Directory, kflags);
+  }
+
+  bool CompressDirectory(const string& directory, const _kflags& kflags) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "KBIN::CompressDirectory():";
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
@@ -1337,10 +1413,10 @@ namespace KBIN {
     // [OBSOLETE] aus << "grep -v SKIP | ";
     // [OBSOLETE] aus << "grep -v " << KBIN_SUBDIRECTORIES << " | ";
     // [OBSOLETE]  aus << "grep -v aflow.in | grep -v " << _AFLOWIN_ << " ";;    //CO, never zip aflow.in or _aflow.in (agl_aflow.in) or newly defined aflow.in
-    if(LDEBUG){cerr << soliloquy << " directory=" << aflags.Directory << endl;}
+    if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
     vector<string> _vfiles,vfiles;
     string compressed_variant;
-    aurostd::DirectoryLS(aflags.Directory,_vfiles);
+    aurostd::DirectoryLS(directory,_vfiles);
     if(LDEBUG){cerr << soliloquy << "_vfiles=" << aurostd::joinWDelimiter(_vfiles,",") << endl;}
     string file_path;
     for(uint i=0;i<_vfiles.size();i++){
@@ -1355,7 +1431,7 @@ namespace KBIN {
           aurostd::substring2bool(_vfiles[i],".in")){continue;} //AS20201023 do not compress files like aflow_qha.in
       if(aurostd::substring2bool(_vfiles[i],DEFAULT_AFLOW_END_OUT) || aurostd::substring2bool(_vfiles[i],"aflow.end.out")){continue;}  //CO20170613, file is special because it gets written after compression
       if(aurostd::substring2bool(_vfiles[i],_AFLOWIN_)){continue;}
-      file_path=aflags.Directory + "/" + _vfiles[i];
+      file_path=directory + "/" + _vfiles[i];
       if(LDEBUG) {cerr << soliloquy << " file_path=" << file_path << endl;}
       if(aurostd::IsDirectory(file_path)){continue;}  //compress files only
       // [OBSOLETE]  if(aurostd::EFileExist(file_path,compressed_variant)){ //SC20200408
@@ -1376,7 +1452,7 @@ namespace KBIN {
     if(vfiles.size()){
       ostringstream aus;
       //aurostd::StringstreamClean(aus);
-      aus << "cd " << aflags.Directory << " && " << endl;
+      aus << "cd " << directory << " && " << endl;
       for(uint i=0;i<vfiles.size();i++){ //better than doing it all in one shot
         aus << kflags.KZIP_BIN << " -9f " << vfiles[i] << "; " << endl;  // semi-colon is important, keeps going if it stalls on one
       }
@@ -1414,14 +1490,16 @@ namespace KBIN {
 // KBIN::Clean
 // *******************************************************************************************
 namespace KBIN {
-  void Clean(const _aflags& aflags,bool contcar_save) {          // AFLOW_FUNCTION_IMPLEMENTATION
+  void Clean(const _aflags& aflags){aurostd::xoption opts_clean;return KBIN::Clean(aflags,opts_clean);}          // AFLOW_FUNCTION_IMPLEMENTATION
+  void Clean(const _aflags& aflags,const aurostd::xoption& opts_clean) {          // AFLOW_FUNCTION_IMPLEMENTATION  //CO20210901
     //    cerr << XPID << "KBIN::Clean: aflags.Directory=" << aflags.Directory << endl;
-    KBIN::Clean(aflags.Directory,contcar_save);
+    return KBIN::Clean(aflags.Directory,opts_clean);
   }
 }
 
 namespace KBIN {
-  void Clean(const string _directory,bool contcar_save) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  void Clean(const string _directory) {aurostd::xoption opts_clean;return KBIN::Clean(_directory,opts_clean);}        // AFLOW_FUNCTION_IMPLEMENTATION
+  void Clean(const string _directory,const aurostd::xoption& opts_clean) {        // AFLOW_FUNCTION_IMPLEMENTATION  //CO20210901
     string directory=_directory;
     //    cerr << XPID << "KBIN::Clean: directory=" << aflags.Directory << endl;
 
@@ -1472,7 +1550,18 @@ namespace KBIN {
           aurostd::FileExist(string(directory+"/ael_aflow.in")) ) { // normal ael_aflow.in
 
         //CO20210716 - save contcar
-        if(contcar_save){KBIN::VASP_CONTCAR_Save(directory);}
+        bool save_contcar=opts_clean.flag("SAVE_CONTCAR");
+        bool save_contcar_outcar_complete=opts_clean.flag("SAVE_CONTCAR_OUTCAR_COMPLETE");
+        if(save_contcar||save_contcar_outcar_complete){
+          bool outcar_complete=false;
+          if(save_contcar_outcar_complete){
+            _xvasp xvasp;xvasp.Directory=directory;
+            _aflags aflags;ofstream FileMESSAGE;
+            bool verbose=false;
+            outcar_complete=KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,verbose);
+          }
+          if(save_contcar||outcar_complete){KBIN::VASP_CONTCAR_Save(directory);}
+        }
 
         // CLEAN directory
         //DX+CO START

@@ -502,7 +502,7 @@ _kflags::_kflags() {
   KBIN_MPI                                         = FALSE;
   KBIN_MPI_NCPUS                                   = 0;
   KBIN_MPI_NCPUS_STRING                            = ""; //ME20181216
-  KBIN_MPI_NCPUS_BUFFER                            = 0;
+  KBIN_MPI_NCPUS_ORIG                              = 0; //CO20210804
   KBIN_MPI_START                                   = "";
   KBIN_MPI_STOP                                    = "";
   KBIN_MPI_COMMAND                                 = "";
@@ -551,6 +551,7 @@ _kflags::_kflags() {
   KBIN_POCC_CALCULATION                            = FALSE;
   KBIN_POCC_TEMPERATURE_STRING                     = "";  //CO20191110
   KBIN_POCC_ARUNS2SKIP_STRING                      = "";  //CO20200624
+  KBIN_POCC_EXCLUDE_UNSTABLE                       = FALSE;  //ME20210927
   KBIN_FROZSL                                      = FALSE;
   KBIN_FROZSL_DOWNLOAD                             = FALSE;
   KBIN_FROZSL_FILE                                 = FALSE;
@@ -612,7 +613,7 @@ void _kflags::copy(const _kflags& b) {
   KBIN_MPI                                         = b.KBIN_MPI;
   KBIN_MPI_NCPUS                                   = b.KBIN_MPI_NCPUS;
   KBIN_MPI_NCPUS_STRING                            = b.KBIN_MPI_NCPUS_STRING;	//ME20181216
-  KBIN_MPI_NCPUS_BUFFER                            = b.KBIN_MPI_NCPUS_BUFFER;
+  KBIN_MPI_NCPUS_ORIG                              = b.KBIN_MPI_NCPUS_ORIG; //CO20210804
   KBIN_MPI_START                                   = b.KBIN_MPI_START;
   KBIN_MPI_STOP                                    = b.KBIN_MPI_STOP;
   KBIN_MPI_COMMAND                                 = b.KBIN_MPI_COMMAND;
@@ -661,6 +662,7 @@ void _kflags::copy(const _kflags& b) {
   KBIN_POCC_CALCULATION                            = b.KBIN_POCC_CALCULATION; //CO20191110
   KBIN_POCC_TEMPERATURE_STRING                     = b.KBIN_POCC_TEMPERATURE_STRING; //CO20191110
   KBIN_POCC_ARUNS2SKIP_STRING                      = b.KBIN_POCC_ARUNS2SKIP_STRING; //CO20200627
+  KBIN_POCC_EXCLUDE_UNSTABLE                       = b.KBIN_POCC_EXCLUDE_UNSTABLE;  //ME20210927
   KBIN_FROZSL                                      = b.KBIN_FROZSL;
   KBIN_FROZSL_DOWNLOAD                             = b.KBIN_FROZSL_DOWNLOAD;
   KBIN_FROZSL_FILE                                 = b.KBIN_FROZSL_FILE;
@@ -718,8 +720,12 @@ void _kflags::clear() {
 // look into aflow.h for the definitions
 
 // constructors
-_vflags::_vflags() {
+_vflags::_vflags() {free();}
 
+// destructor
+_vflags::~_vflags() {free();}
+
+void _vflags::free() {
   // SYSTEM
   AFLOW_SYSTEM.clear(); //ME20181121
 
@@ -840,15 +846,15 @@ _vflags::_vflags() {
   KBIN_VASP_FORCE_OPTION_NSW_EQUAL                               = FALSE;
   KBIN_VASP_FORCE_OPTION_NSW_EQUAL_VALUE                         = 0;
 
-  KBIN_VASP_FORCE_OPTION_KPOINTS.clear();                        // KPOINTS
   // AFIX
   KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.clear();                    // AFIX
   // CONVERT
   KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.clear(); 
-
   //  KBIN_VASP_FORCE_OPTION_VOLUME
   KBIN_VASP_FORCE_OPTION_VOLUME.clear();                         // RUN
   KBIN_VASP_FORCE_OPTION_VOLUME.push("");                   // RUN
+
+  KBIN_VASP_FORCE_OPTION_KPOINTS.clear();                        // KPOINTS
 
   // KBIN_VASP_INCAR_MODE
   KBIN_VASP_INCAR_MODE.clear();                                  // all false
@@ -889,17 +895,18 @@ _vflags::_vflags() {
   // [OBSOLETE] KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG                           = FALSE;
   // [OBSOLETE] KBIN_VASP_KPOINTS_BANDS_LATTICE_VALUE                          = "";
 
-  KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG                      = FALSE;
-  KBIN_VASP_KPOINTS_BANDS_GRID_FLAG                              = FALSE;
-  KBIN_VASP_KPOINTS_BANDS_GRID_VALUE                             = 0;
+  //[CO20210805 - OBSOLETE]KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG                      = FALSE;
+  KBIN_VASP_KPOINTS_BANDS_GRID.clear();                         //CO20210805
+  KBIN_VASP_KPOINTS_BANDS_GRID.push(aurostd::utype2string(DEFAULT_BANDS_GRID));        //CO20210805
+  //[CO20210805 - OBSOLETE]KBIN_VASP_KPOINTS_BANDS_GRID_FLAG                              = FALSE;
+  //[CO20210805 - OBSOLETE]KBIN_VASP_KPOINTS_BANDS_GRID_VALUE                             = 0;
   KBIN_VASP_WRITE_KPOINTS                                        = FALSE;
   // KBIN_VASP_POSCAR_MODE
   KBIN_VASP_POSCAR_MODE.clear();                                 // all false
   KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.clear();
   KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRUCTURE.clear();
-  // KBIN_VASP_POTCAR_MODE  
-  KBIN_VASP_POTCAR_MODE.clear();                                 // all false
   // KBIN_VASP_INCAR_FILE
+  KBIN_VASP_INCAR_VERBOSE                                        = TRUE; // VERBOSITY IS GOOD !!!
   KBIN_VASP_INCAR_FILE.clear();                                  // all false
   KBIN_VASP_INCAR_EXPLICIT.clear(); //ME20181226
   KBIN_VASP_INCAR_EXPLICIT_START_STOP.str(""); //ME20181226 //CO20190401 - clear ss with .str("")
@@ -907,7 +914,6 @@ _vflags::_vflags() {
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_SYSTEM_AUTO                 = FALSE;
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_FILE                        = FALSE;
   // [OBSOLETE] KBIN_VASP_INCAR_FILE_COMMAND                     = FALSE;
-  KBIN_VASP_INCAR_VERBOSE                                        = TRUE; // VERBOSITY IS GOOD !!!
 
   // KBIN_VASP_KPOINTS_FILE
   KBIN_VASP_KPOINTS_FILE.clear();                                // all false
@@ -928,7 +934,8 @@ _vflags::_vflags() {
   KBIN_VASP_POSCAR_FILE_VOLUME.clear();                          // RUN
   KBIN_VASP_POSCAR_FILE_VOLUME.push("");                    // RUN
 
-
+  // KBIN_VASP_POTCAR_MODE  
+  KBIN_VASP_POTCAR_MODE.clear();                                 // all false
   // KBIN_VASP_POTCAR_FILE
   KBIN_VASP_POTCAR_FILE.clear();                                 // all false
   KBIN_VASP_POTCAR_EXPLICIT.clear(); //ME20181226
@@ -938,14 +945,6 @@ _vflags::_vflags() {
   // [OBSOLETE] KBIN_VASP_POTCAR_FILE_SUFFIX                     = FALSE;
   // [OBSOLETE] KBIN_VASP_POTCAR_FILE_FILE                       = FALSE;
   // [OBSOLETE] KBIN_VASP_POTCAR_FILE_COMMAND                    = FALSE;
-}
-
-// destructor
-_vflags::~_vflags() {
-  free();
-}
-
-void _vflags::free() {
 }
 
 void _vflags::copy(const _vflags& b) {
@@ -1071,9 +1070,10 @@ void _vflags::copy(const _vflags& b) {
   KBIN_VASP_KPOINTS_BANDS_LATTICE                                = b.KBIN_VASP_KPOINTS_BANDS_LATTICE;
   // [OBSOLETE] KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG                           = b.KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG;
   // [OBSOLETE] KBIN_VASP_KPOINTS_BANDS_LATTICE_VALUE                          = b.KBIN_VASP_KPOINTS_BANDS_LATTICE_VALUE;
-  KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG                      = b.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG;
-  KBIN_VASP_KPOINTS_BANDS_GRID_FLAG                              = b.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG;
-  KBIN_VASP_KPOINTS_BANDS_GRID_VALUE                             = b.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE;
+  //[CO20210805 - OBSOLETE]KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG                      = b.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG;
+  KBIN_VASP_KPOINTS_BANDS_GRID                                   = b.KBIN_VASP_KPOINTS_BANDS_GRID;  //CO20210805
+  //[CO20210805 - OBSOLETE]KBIN_VASP_KPOINTS_BANDS_GRID_FLAG                              = b.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG;
+  //[CO20210805 - OBSOLETE]KBIN_VASP_KPOINTS_BANDS_GRID_VALUE                             = b.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE;
   KBIN_VASP_WRITE_KPOINTS                                        = b.KBIN_VASP_WRITE_KPOINTS;
   // KBIN_VASP_POSCAR_MODE
   KBIN_VASP_POSCAR_MODE                                          = b.KBIN_VASP_POSCAR_MODE;
@@ -1113,7 +1113,6 @@ void _vflags::copy(const _vflags& b) {
   // KBIN_VASP_POSCAR_FILE_VOLUME
   KBIN_VASP_POSCAR_FILE_VOLUME                                   = b.KBIN_VASP_POSCAR_FILE_VOLUME;
 
-
   // KBIN_VASP_POTCAR_FILE
   KBIN_VASP_POTCAR_FILE                                          = b.KBIN_VASP_POTCAR_FILE;
   KBIN_VASP_POTCAR_EXPLICIT.clear(); KBIN_VASP_POTCAR_EXPLICIT << b.KBIN_VASP_POTCAR_EXPLICIT.str(); //ME20181226
@@ -1141,10 +1140,7 @@ const _vflags& _vflags::operator=(const _vflags& b) {  // operator=
   return *this;
 }
 
-void _vflags::clear() {
-  _vflags vflags_temp;
-  copy(vflags_temp);
-}
+void _vflags::clear() {free();}
 
 // **************************************************************************
 // **************************************************************************

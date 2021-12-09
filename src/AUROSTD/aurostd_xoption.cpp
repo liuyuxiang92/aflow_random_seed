@@ -66,7 +66,8 @@ namespace aurostd {
   const xoption& xoption::operator=(const xoption& b) {  // operator=
     if(this!=&b) {
       free();
-      copy(b);}
+      copy(b);
+    }
     return *this;
   }
 
@@ -78,23 +79,40 @@ namespace aurostd {
 
   void xoption::clear() {
     //[CO20200624 - creating objects is SLOW]xoption aflow_option_temp;
-    //[CO20200624 - creating objects is SLOWcopy(aflow_option_temp);
+    //[CO20200624 - creating objects is SLOW]copy(aflow_option_temp);
     free();
   }
 
   // **************************************************************************
-  void xoption::options2entry(string options_FILE,string input_keyword,int _option_DEFAULT,string xscheme_DEFAULT) {
+  //void xoption::options2entry(const string& options_FILE,const string& input_keyword,int _option_DEFAULT,const string& xscheme_DEFAULT) //CO20210805 - const&
+  void xoption::options2entry(const string& options_FILE_IN,const string& input_keyword_IN,int option_DEFAULT_IN,const string& xscheme_DEFAULT_IN) {
     bool VERBOSE=(FALSE || VERBOSE_XOPTION); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG;
     string soliloquy=XPID+"aurostd::xoption::options2entry():";
-    clear();
+
+    //CO20210909 - BIG BUG HERE
+    //the following clear() will reset all of the internal xoption variables
+    //if we pass one of these variables into options2entry(), it is reset as well
+    //see for example, this construction:
+    //vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.options2entry(AflowIn,_STROPT_+"NELM=",FALSE,vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.xscheme);
+    //xscheme gets cleared before it's set
+    //in order to preserve this construction and prevent headaches, make copies of the inputs BEFORE the clear
+    string options_FILE=options_FILE_IN;
+    string input_keyword=input_keyword_IN;
+    int _option_DEFAULT=option_DEFAULT_IN;
+    string xscheme_DEFAULT=xscheme_DEFAULT_IN;
+
+    clear();  //CO20210909 - DANGEROUS! see note above
+
     bool option_DEFAULT=FALSE; 
     if(_option_DEFAULT==0) option_DEFAULT=FALSE; // it is a int.. it might be -1
     if(_option_DEFAULT==1) option_DEFAULT=TRUE; // it is a int.. it might be -1
     isentry=option_DEFAULT;option=option_DEFAULT;content_string=xscheme_DEFAULT;xscheme=xscheme_DEFAULT;preserved=FALSE;   // DEFAULT
-    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " BEGIN " << endl;
-    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " input_keyword=\"" << input_keyword << "\"" << endl;
-    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " option_DEFAULT=" << (option_DEFAULT?"TRUE":"FALSE") << endl;
-    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " xscheme_DEFAULT=\"" << xscheme_DEFAULT << "\"" << endl;
+    if(VERBOSE){
+      cerr << "DEBUG - " << soliloquy << " BEGIN " << endl;
+      cerr << "DEBUG - " << soliloquy << " input_keyword=\"" << input_keyword << "\"" << endl;
+      cerr << "DEBUG - " << soliloquy << " option_DEFAULT=" << (option_DEFAULT?"TRUE":"FALSE") << endl;
+      cerr << "DEBUG - " << soliloquy << " xscheme_DEFAULT=\"" << xscheme_DEFAULT << "\"" << endl;
+    }
     // start the scan
     //string keyword; //CO20180404 - now a member of the object
     vector<string> vkeyword;
@@ -256,7 +274,7 @@ namespace aurostd {
     // return isentry;
   }
 
-  void xoption::scheme2scheme(char c,string s) {
+  void xoption::scheme2scheme(char c,const string& s) { //CO20210805 - const&
     for(uint i=0;i<vxscheme.size();i++) {
       if(vxscheme.at(i).at(0)==c ||
           vxscheme.at(i).at(0)==aurostd::tolower(c) ||
@@ -266,7 +284,7 @@ namespace aurostd {
     }
   }
 
-  void xoption::scheme2scheme(string s1,string s2) {
+  void xoption::scheme2scheme(const string& s1,const string& s2) {  //CO20210805 - const&
     for(uint i=0;i<vxscheme.size();i++) {
       if(vxscheme.at(i)==s1 ||
           vxscheme.at(i)==aurostd::tolower(s1) ||
@@ -277,7 +295,7 @@ namespace aurostd {
     }
   }
 
-  bool xoption::isscheme(string check) const {                     //CO20180101
+  bool xoption::isscheme(const string& check) const {                     //CO20180101  //CO20210805 - const&
     // ISSCHEME and FLAG checks only vxscheme... does not manage the ghost, so for example    //SC20200114
     // CONVERT_UNIT_CELL (as flag) will not be confused with CONVERT_UNIT_CELL=STANDARD as method.   //SC20200114
     // Thanks to Marco Esters for getting this bug.   //SC20200114
@@ -325,10 +343,10 @@ namespace aurostd {
 
   // [OBSOLETE] uint xoption::addscheme(string _xscheme)   { return opscheme(_xscheme,TRUE); }
   // [OBSOLETE] uint xoption::purgescheme(string _xscheme) { return opscheme(_xscheme,FALSE); }
-  uint xoption::push(string _xscheme)        { return opscheme(_xscheme,TRUE); }
-  uint xoption::pop(string _xscheme)         { return opscheme(_xscheme,FALSE); }
+  uint xoption::push(const string& _xscheme)        { return opscheme(_xscheme,TRUE); } //CO20210805 - const&
+  uint xoption::pop(const string& _xscheme)         { return opscheme(_xscheme,FALSE); }  //CO20210805 - const&
 
-  uint xoption::opscheme(string _xscheme,bool operation) {
+  uint xoption::opscheme(const string& _xscheme,bool operation) { //CO20210805 - const&
     bool VERBOSE=(FALSE || VERBOSE_XOPTION); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG;
     if(operation==TRUE) {
       if(VERBOSE) cerr << "DEBUG - aurostd::xoption::opscheme: ADD=" << aurostd::toupper(_xscheme) << endl;
@@ -354,7 +372,7 @@ namespace aurostd {
     return vxscheme.size();
   }
 
-  bool xoption::flag(string _xscheme,bool operation) {
+  bool xoption::flag(const string& _xscheme,bool operation) { //CO20210805 - const&
     // [OBSOLETE]    if(operation) push(_xscheme);
     // [OBSOLETE]    if(!operation) pop(_xscheme);
     if(operation) opscheme(_xscheme,TRUE);  // push
@@ -362,7 +380,7 @@ namespace aurostd {
     return operation;
   }
 
-  bool xoption::flag(string xscheme) const { return isscheme(xscheme);  } // same as ischeme
+  bool xoption::flag(const string& xscheme) const { return isscheme(xscheme);  } // same as ischeme //CO20210805 - const&
 
   bool xoption::flag(void) const {  // same as ischeme
     if(vxscheme.size()>0) return TRUE;
@@ -372,7 +390,7 @@ namespace aurostd {
 
   // now for the attached ones.
 
-  bool xoption::isdefined(string check) const {                        //SC20200114
+  bool xoption::isdefined(const string& check) const {                        //SC20200114  //CO20210805 - const&
     // checks only scheme (vxscheme) it does not go through the attached schemes (vxghost).   //SC20200114
     string a,b;   //SC20200114
     // check schemes list going through vxscheme 1 by 1   //SC20200114
@@ -403,7 +421,7 @@ namespace aurostd {
     return aurostd::string2utype<utype>(getattachedscheme(xscheme));
   }
 
-  uint xoption::opattachedscheme(string _xscheme,string attached,bool operation) {
+  uint xoption::opattachedscheme(const string& _xscheme,const string& attached,bool operation) {  //CO20210805 - const&
     bool VERBOSE=(FALSE || VERBOSE_XOPTION); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG;
     if(operation==TRUE) {
       if(VERBOSE) cerr << "DEBUG - aurostd::xoption::opattachedscheme: ADD=" << aurostd::toupper(_xscheme) << endl;
@@ -430,7 +448,7 @@ namespace aurostd {
     return vxsghost.size();
   }  
 
-  uint xoption::addattachedscheme(string _xscheme,string attached,bool operation) {
+  uint xoption::addattachedscheme(const string& _xscheme,const string& attached,bool operation) { //CO20210805 - const&
     if(operation) return opattachedscheme(_xscheme,attached,TRUE);
     return vxsghost.size();
   }
@@ -439,11 +457,11 @@ namespace aurostd {
   // [OBSOLETE]   return opattachedscheme(_xscheme,"",FALSE);
   // [OBSOLETE] }
 
-  uint xoption::push_attached(string _xscheme,string attached) {
+  uint xoption::push_attached(const string& _xscheme,const string& attached) {  //CO20210805 - const&
     return opattachedscheme(_xscheme,attached,TRUE);
   }
 
-  uint xoption::pop_attached(string _xscheme) {
+  uint xoption::pop_attached(const string& _xscheme) {  //CO20210805 - const&
     return opattachedscheme(_xscheme,"",FALSE);
   }
 
