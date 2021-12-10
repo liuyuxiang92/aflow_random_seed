@@ -948,6 +948,7 @@ namespace plotter {
         temperature=pocc::poccDOSCAR2temperature(vpocc_doscars[i]);
         plotoptions.push_attached("NORMALIZATION","ATOM");  //CO20211124
         plotoptions.push_attached("EXTENSION","dos_"+aurostd::tolower(pscheme)+"_T"+pocc::getTemperatureString(temperature,temperature_precision,temperatures_int,zero_padding_temperature)+"K");
+        aurostd::StringstreamClean(out);  //CO20211210 - otherwise it writes out of other temperatures
         PLOT_DOS(plotoptions, out, xdos,FileMESSAGE,oss);  //CO20200404
         savePlotGNUPLOT(plotoptions, out);
       }
