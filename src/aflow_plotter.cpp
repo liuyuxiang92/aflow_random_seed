@@ -2127,7 +2127,7 @@ namespace plotter {
       }
       out << std::endl;
     }
-    out << "EOD" << std::endl;
+    out << "EOD" << std::endl << std::endl;
 
     // Margins
     out << "# Margins" << std::endl;
