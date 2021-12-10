@@ -2132,65 +2132,65 @@ namespace plotter {
     // Margins
     out << "# Margins" << std::endl;
     if (banddos) {
-      out << " set lmargin at screen 0.73" << std::endl;
-      out << " set rmargin at screen 0.98" << std::endl;
-      out << " set tmargin at screen 0.9" << std::endl;
-      out << " set bmargin at screen 0.12" << std::endl;
+      out << "set lmargin at screen 0.73" << std::endl;
+      out << "set rmargin at screen 0.98" << std::endl;
+      out << "set tmargin at screen 0.9" << std::endl;
+      out << "set bmargin at screen 0.12" << std::endl;
     } else {
-      out << " set tmargin at screen 0.9" << std::endl;
-      out << " set bmargin at screen 0.2" << std::endl;
+      out << "set tmargin at screen 0.9" << std::endl;
+      out << "set bmargin at screen 0.2" << std::endl;
     }
 
     // Key
     out << std::endl << "# Key" << std::endl;
     if (dos.size() == xdos.spin + 1) { // no need for key when only total DOS is plotted, NO-SPIN: xdos.spin==0, SPIN: xdos.spin==1  //CO20200404
-      out << " unset key" << std::endl;
+      out << "unset key" << std::endl;
     } else {
       if(plotoptions.flag("LEGEND_HORIZONTAL")){  //CO20200404 - ME LOOK HERE
         int maxcols=3;
         string maxcols_str=plotoptions.getattachedscheme("LEGEND_MAXCOLS");
         if(!maxcols_str.empty()){maxcols=aurostd::string2utype<int>(maxcols_str);}
-        out << " set key horizontal maxcols " << maxcols << std::endl;
+        out << "set key horizontal maxcols " << maxcols << std::endl;
       }
-      out << " set key samplen 2.5" << std::endl;  // Shorter lines to fit key into image
+      out << "set key samplen 2.5" << std::endl;  // Shorter lines to fit key into image
     }
 
     // Axes
     out << std::endl << "# Axes" << std::endl;
     if (banddos) {
-      out << " unset xtics" << std::endl;
-      out << " unset xrange" << std::endl;
+      out << "unset xtics" << std::endl;
+      out << "unset xrange" << std::endl;
     }
 
-    out << " set " << (swap?"x":"y") << "tics " << (dosmax/(2 * (2 - xdos.spin))) << std::endl;
-    if(banddos){out << " set ytics format \"\"" << std::endl;}  //CO+ME20210729
-    //[CO+ME20210729 - breaks for LIB0 which has swap==false and banddos]out << " set ytics" << (banddos?" format \"\"":"") << std::endl;
-    out << " set tic scale 0" << std::endl;
-    out << " set " << (swap?"y":"x") << "range [" << Emin << ":" << Emax << "]" << std::endl;
-    out << " set " << (swap?"x":"y") << "range [" << mindos << ":" << maxdos << "]" << std::endl;
+    out << "set " << (swap?"x":"y") << "tics " << (dosmax/(2 * (2 - xdos.spin))) << std::endl;
+    if(banddos){out << "set ytics format \"\"" << std::endl;}  //CO+ME20210729
+    //[CO+ME20210729 - breaks for LIB0 which has swap==false and banddos]out << "set ytics" << (banddos?" format \"\"":"") << std::endl;
+    out << "set tic scale 0" << std::endl;
+    out << "set " << (swap?"y":"x") << "range [" << Emin << ":" << Emax << "]" << std::endl;
+    out << "set " << (swap?"x":"y") << "range [" << mindos << ":" << maxdos << "]" << std::endl;
     string normalization=aurostd::tolower(plotoptions.getattachedscheme("NORMALIZATION"));
     if (banddos) {
-      out << " unset ylabel" << std::endl;
-      out << " set title 'DOS (states/" << unit << (!normalization.empty()?"/"+normalization:"") << ")' offset 0,-0.7" << std::endl;
+      out << "unset ylabel" << std::endl;
+      out << "set title 'DOS (states/" << unit << (!normalization.empty()?"/"+normalization:"") << ")' offset 0,-0.7" << std::endl;
     } else {
-      out << " set " << (swap?"y":"x") << "label '" << energyLabel << " (" << unit << ")' offset graph 0.00" << std::endl;
-      out << " set " << (swap?"x":"y") << "label 'DOS (states/" << unit << (!normalization.empty()?"/"+normalization:"") << ")' offset graph 0.00" << std::endl;
+      out << "set " << (swap?"y":"x") << "label '" << energyLabel << " (" << unit << ")' offset graph 0.00" << std::endl;
+      out << "set " << (swap?"x":"y") << "label 'DOS (states/" << unit << (!normalization.empty()?"/"+normalization:"") << ")' offset graph 0.00" << std::endl;
     }
 
     // Fermi level
     if (Efermi > Emin) {
       out << std::endl << "# Fermi level" << std::endl;
       if (swap) {
-        out << " set arrow from " << mindos << "," << Efermi << " to " << maxdos << "," << Efermi;
+        out << "set arrow from " << mindos << "," << Efermi << " to " << maxdos << "," << Efermi;
       } else {
-        out << " set arrow from " << Efermi << ", graph 0 to " << Efermi << ", graph 1";
+        out << "set arrow from " << Efermi << ", graph 0 to " << Efermi << ", graph 1";
       }
       out << " nohead lt 1 lc rgb '" << EFERMI_COLOR << "' lw 3" << std::endl;
     }
 
     // Plot data
     out << std::endl << "# Data" << std::endl;
-    out << " plot ";
+    out << "plot ";
     int xcol, ycol;
     if (swap) ycol = 1;
     else xcol = 1;
@@ -2371,49 +2371,49 @@ namespace plotter {
     // Margins
     out << "# Margins" << std::endl;
     if (banddos) {
-      out << " set lmargin at screen 0.08" << std::endl;
-      out << " set rmargin at screen 0.70" << std::endl;
-      out << " set tmargin at screen 0.9" << std::endl;
-      out << " set bmargin at screen 0.12" << std::endl;
+      out << "set lmargin at screen 0.08" << std::endl;
+      out << "set rmargin at screen 0.70" << std::endl;
+      out << "set tmargin at screen 0.9" << std::endl;
+      out << "set bmargin at screen 0.12" << std::endl;
     } else {
-      out << " set tmargin at screen 0.9" << std::endl;
-      out << " set bmargin at screen 0.15" << std::endl;
+      out << "set tmargin at screen 0.9" << std::endl;
+      out << "set bmargin at screen 0.15" << std::endl;
     }
 
     // Key
     out << std::endl << "# Key" << std::endl;
-    out << " unset key" << std::endl;
+    out << "unset key" << std::endl;
 
     // Axes
     out << std::endl << "# Axes" << std::endl;
-    out << " unset xtics" << std::endl;
-    out << " set xtics(";
+    out << "unset xtics" << std::endl;
+    out << "set xtics(";
     uint ntics = ticvals.size();
     for (uint i = 0; i < ntics; i++) {
       out << "'" << ticlabels[i] << "' " << ticvals[i];
       if (i < ntics - 1) out << ", ";
     }
     out << ")" << std::endl;
-    out << " set tic scale 0" << std::endl;
-    out << " set xrange [0:1]" << std::endl;
-    out << " set yrange [" << Emin << ":" << Emax << "]" << std::endl;
+    out << "set tic scale 0" << std::endl;
+    out << "set xrange [0:1]" << std::endl;
+    out << "set yrange [" << Emin << ":" << Emax << "]" << std::endl;
     if (unit.empty()){//AS20210701 this might be a Grueneisen parameter dispersion plot, unitless
-      out << " set ylabel '" << energyLabel << std::endl;
+      out << "set ylabel '" << energyLabel << std::endl;
     }
     else{
-      out << " set ylabel '" << energyLabel << " (" << unit << ")'" << std::endl;
+      out << "set ylabel '" << energyLabel << " (" << unit << ")'" << std::endl;
     }
 
     // Fermi level
     if (Efermi > Emin) {
       out << std::endl << "# Fermi level" << std::endl;
-      out << " set arrow from 0, " << Efermi << " to graph 1, first " << Efermi
+      out << "set arrow from 0, " << Efermi << " to graph 1, first " << Efermi
         << " nohead lt 1 lc rgb '" << EFERMI_COLOR << "' lw 3" << std::endl;
     }
 
     // Plot data
     out << std::endl << "# Data" << std::endl;
-    out << " plot ";
+    out << "plot ";
     // Majority spin
     for (uint b = 0; b < xeigen.number_bands; b++) {
       if (b > 0) out << "      ";
@@ -3116,33 +3116,33 @@ namespace plotter {
 
     // Margins
     out << "# Margins" << std::endl;
-    out << " set tmargin at screen 0.9" << std::endl;
-    out << " set bmargin at screen 0.22" << std::endl;
+    out << "set tmargin at screen 0.9" << std::endl;
+    out << "set bmargin at screen 0.22" << std::endl;
 
     // Axes
     out << "# Axes" << std::endl;
-    out << " set xrange [" << xmin << ":" << xmax << "]" << std::endl;
-    out << " set yrange [" << ymin << ":" << ymax << "]" << std::endl;
-    out << " set xlabel '$" << xlabel << "$" << xunit << "'" << std::endl;
-    out << " set ylabel '$" << ylabel << "$" << yunit << "'" << std::endl;
-    out << " set tics nomirror out" << std::endl;
+    out << "set xrange [" << xmin << ":" << xmax << "]" << std::endl;
+    out << "set yrange [" << ymin << ":" << ymax << "]" << std::endl;
+    out << "set xlabel '$" << xlabel << "$" << xunit << "'" << std::endl;
+    out << "set ylabel '$" << ylabel << "$" << yunit << "'" << std::endl;
+    out << "set tics nomirror out" << std::endl;
 
     // Key
     out << std::endl << "# Key" << std::endl;
     if (ndata == 1) {  // No need for legend if only one set of data to plot
-      out << " unset key" << std::endl;
+      out << "unset key" << std::endl;
     } else {
       if(plotoptions.flag("LEGEND_HORIZONTAL")){  //CO20200404 - ME LOOK HERE
         int maxcols=3;
         string maxcols_str=plotoptions.getattachedscheme("LEGEND_MAXCOLS");
         if(!maxcols_str.empty()){maxcols=aurostd::string2utype<int>(maxcols_str);}
-        out << " set key horizontal maxcols " << maxcols << std::endl;
+        out << "set key horizontal maxcols " << maxcols << std::endl;
       }
     }
 
     // Plot
     out << std::endl << "# Plot" << std::endl;
-    out << " plot ";
+    out << "plot ";
     for (uint i = 0; i < ndata; i++) {
       if (i > 0) out << "      ";
       out << "'$matrix_data' u 1:" << (i + 2) << " w " << plotstyle;
