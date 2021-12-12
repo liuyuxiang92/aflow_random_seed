@@ -2199,7 +2199,7 @@ namespace plotter {
     for (uint i = 0; i < ndos; i++) {
       if (swap) xcol = i + 2;
       else ycol = i + 2;
-      if (i > 0) out << "      ";
+      if (i > 0) out << "     ";
       out << "'$dos_data' u " << xcol << ":" << ycol << " w l lt -1 "
         << "lc rgb '" << ESTRUCTURE_COLORS[i % ESTRUCTURE_NCOLORS] << "' lw 2 title '" << labels[i] << "'"
         << (((xdos.spin == 1) || (i < ndos - 1))?",\\":"") << std::endl;
@@ -2416,7 +2416,7 @@ namespace plotter {
     out << "plot ";
     // Majority spin
     for (uint b = 0; b < xeigen.number_bands; b++) {
-      if (b > 0) out << "      ";
+      if (b > 0) out << "     ";
       out << "'$band_data' u 1:" << (b + 2)
         << " w l lt -1 lc rgb '" <<  ISPIN_COLORS[0] << "' lw 2"
         << (((xeigen.spin == 1) || (b < xeigen.number_bands - 1))?",\\":"") << std::endl;
@@ -3144,7 +3144,7 @@ namespace plotter {
     out << std::endl << "# Plot" << std::endl;
     out << "plot ";
     for (uint i = 0; i < ndata; i++) {
-      if (i > 0) out << "      ";
+      if (i > 0) out << "     ";
       out << "'$matrix_data' u 1:" << (i + 2) << " w " << plotstyle;
       if (lines) out << " lw 2";
       if (lines_set) out << " lt " << line_types[i];
