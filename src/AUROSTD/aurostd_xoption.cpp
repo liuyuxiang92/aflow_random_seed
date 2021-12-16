@@ -84,7 +84,7 @@ namespace aurostd {
   }
 
   // **************************************************************************
-  //void xoption::options2entry(const string& options_FILE,const string& input_keyword,int _option_DEFAULT,const string& xscheme_DEFAULT) { //CO20210805 - const&
+  //void xoption::options2entry(const string& options_FILE,const string& input_keyword,int _option_DEFAULT,const string& xscheme_DEFAULT) //CO20210805 - const&
   void xoption::options2entry(const string& options_FILE_IN,const string& input_keyword_IN,int option_DEFAULT_IN,const string& xscheme_DEFAULT_IN) {
     bool VERBOSE=(FALSE || VERBOSE_XOPTION); //DX20200907 - LDEBUG to VERBOSE; decouple from XHOST.DEBUG;
     string soliloquy=XPID+"aurostd::xoption::options2entry():";

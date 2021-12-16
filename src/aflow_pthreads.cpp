@@ -595,14 +595,14 @@ namespace AFLOW_PTHREADS {
         }
       }
     }
-      
+
     uint ishift=1;
     //CO20211104 - ishift not handled very well as it does not check XX_of_YY (as done below)
     //to handle this carefully would require checking the existence of all the zips, 
     //shifting duplicate names and all subsequent zips, as well as fixing YY for all zips
     //too much work... neglect for now until it's needed
     if(!flag_ADD) while(aurostd::FileExist(prefix+"_"+aurostd::utype2string(ishift)+".zip")) ishift++;
-    
+
     vector<string> vcommands,vtmpfiles;
     stringstream command;
     uint vdirs_size=vdirs.size();

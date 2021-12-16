@@ -807,6 +807,7 @@ namespace aurostd {
   bool substring_present_file(const string& FileName,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
   bool substring_present_file_FAST(const string& FileName,const string& strsub1,bool RemoveWS=false,bool case_insensitive=false,bool expect_near_end=false,unsigned long long int size_max=AUROSTD_MAX_ULLINT);  //CO20210315 - cleaned up
   bool WithinList(const vector<string>& list,const string& input,bool sorted=false);  //CO20181010
+  bool WithinList(const deque<string>& list,const string& input,bool sorted=false);  //CO20181010
   bool WithinList(const vector<int>& list,int input,bool sorted=false); //CO20181010
   bool WithinList(const vector<uint>& list,uint input,bool sorted=false); //CO20181010
   bool WithinList(const vector<string>&, const string&, int&,bool sorted=false);  //ME20190905

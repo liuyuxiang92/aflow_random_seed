@@ -103,6 +103,17 @@ namespace apl {
     free();
   }
 
+  //xStream initializers
+  void PhononCalculator::initialize(ostream& oss) {
+    _qm.initialize(oss);
+    _supercell.initialize(oss);
+  }
+
+  void PhononCalculator::initialize(ofstream& mf, ostream& oss) {
+    _qm.initialize(mf, oss);
+    _supercell.initialize(mf, oss);
+  }
+
 }  // namespace apl
 
 //////////////////////////////////////////////////////////////////////////////
@@ -839,7 +850,6 @@ namespace apl {
         }
       }
     }
-    //printXMatrix2(dynamicalMatrix);
 
     // Subtract the sum of all "forces" from the central atom, this is like an automatic sum rule...
     for (uint i = 0; i < pcAtomsSize; i++) {
@@ -1262,16 +1272,19 @@ namespace apl {
     eigenvectors.resize(nQPs, xmatrix<xcomplex<double> >(nbranches, nbranches));
     vector<vector<xvector<double> > > gvel(nQPs);
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    vector<vector<int> > thread_dist = getThreadDistribution(nQPs, _ncpus);
-    vector<std::thread*> threads;
-    threads.clear();
-    for (int icpu = 0; icpu < _ncpus; icpu++) {
-      threads.push_back(new std::thread(&PhononCalculator::calculateGroupVelocitiesThread, this,
-            thread_dist[icpu][0], thread_dist[icpu][1], std::ref(freqs), std::ref(eigenvectors), std::ref(gvel)));
-    }
-    for (uint t = 0; t < threads.size(); t++) {
-      threads[t]->join();
-      delete threads[t];
+    if (_ncpus > 1) {
+      vector<vector<int> > thread_dist = getThreadDistribution(nQPs, _ncpus);
+      vector<std::thread*> threads;
+      for (int icpu = 0; icpu < _ncpus; icpu++) {
+        threads.push_back(new std::thread(&PhononCalculator::calculateGroupVelocitiesThread, this,
+              thread_dist[icpu][0], thread_dist[icpu][1], std::ref(freqs), std::ref(eigenvectors), std::ref(gvel)));
+      }
+      for (uint t = 0; t < threads.size(); t++) {
+        threads[t]->join();
+        delete threads[t];
+      }
+    } else {
+      calculateGroupVelocitiesThread(0, nQPs, freqs, eigenvectors, gvel);
     }
 #else
     calculateGroupVelocitiesThread(0, nQPs, freqs, eigenvectors, gvel);

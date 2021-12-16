@@ -464,7 +464,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE_DATABASE_ENTRIES::WYCKOFF","--Wyckoff=|--wyckoff=","");
   }
   if(vpflow.flag("COMPARE_MATERIAL") || vpflow.flag("COMPARE_STRUCTURE")) {
-    vpflow.flag("COMPARE_STRUCTURE::PRINT",aurostd::args2flag(argv,cmds,"--print|--print_mapping"));
+    vpflow.flag("COMPARE_STRUCTURE::PRINT",aurostd::args2flag(argv,cmds,"--print|--print_mapping|--print_mappings"));
     // structures appended to command
     if(aurostd::args2attachedflag(argv,"--compare_material=|--compare_materials=|--compare_structure=|--compare_structures=")){ //DX20170803
       vpflow.args2addattachedscheme(argv,cmds,"COMPARE_STRUCTURE::STRUCTURE_LIST","--compare_material=|--compare_materials=|--compare_structure=|--compare_structures=","");
@@ -773,6 +773,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("MISCIBILITY",aurostd::args2flag(argv,cmds,"--MIX|--mix|--MISCIBILITY|--miscibility|--MISCIBILE|--miscibile"));
   vpflow.flag("MOM",aurostd::args2flag(argv,cmds,"--mom"));
   vpflow.flag("MSI",aurostd::args2flag(argv,cmds,"--msi"));
+
+  vpflow.flag("MTP::INIT",aurostd::args2flag(argv,cmds,"--mtp|--MTP"));  // initiate MTP writer
 
   vpflow.flag("MULTI=BZIP2",aurostd::args2flag(argv,cmds,"--multi=bzip2"));
   vpflow.flag("MULTI=BUNZIP2",aurostd::args2flag(argv,cmds,"--multi=bunzip2"));
@@ -1872,6 +1874,7 @@ namespace pflow {
       if(vpflow.flag("LTCELL")) {cout << pflow::LTCELL(vpflow.getattachedscheme("LTCELL"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("LTCELLFV")) {cout << pflow::LTCELL(vpflow.getattachedscheme("LTCELLFV"),cin); _PROGRAMRUN=true;}
       // M
+      if(vpflow.flag("MTP::INIT")) {aflowMachL::PrintMTPCFGAlloy(vpflow); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("MILLER")) {cout << pflow::MILLER(vpflow.getattachedscheme("MILLER"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("MULTI=BZIP2")) {AFLOW_PTHREADS::MULTI_compress("bzip2",argv);_PROGRAMRUN=true;}
       if(vpflow.flag("MULTI=BUNZIP2")) {AFLOW_PTHREADS::MULTI_compress("bunzip2",argv);_PROGRAMRUN=true;}
@@ -8260,7 +8263,7 @@ namespace pflow {
       //   cout << str_sp.lattice << endl;
       cout << "</pre>" << endl;
       //ME+DX20210521 [OBSOLETE - remove height, let the CSS handle it] cout << "<img height=600 src=http://" << XHOST.AFLOW_MATERIALS_SERVER << "/SCIENCE/images/brillouin/" << lattice_type << ".PNG><br>" << endl;
-      cout << "<img src=http://" << XHOST.AFLOW_MATERIALS_SERVER << "/SCIENCE/images/brillouin/" << lattice_type << ".PNG><br>" << endl; //ME+DX20210521 - remove height, let the CSS handle it
+      cout << "<img src=https://" << XHOST.AFLOW_MATERIALS_SERVER << "/SCIENCE/images/brillouin/" << lattice_type << ".PNG><br>" << endl; //ME+DX20210521 - remove height, let the CSS handle it
       // OBSOLETE ME20210208 - There are no eps files on the server, so serving the image is enough
       //cout << "<br> [ ";
       //cout << "<a href=http://" << XHOST.AFLOW_MATERIALS_SERVER << "/SCIENCE/images/brillouin/" << lattice_type << ".PNG>png</a>";
@@ -13290,7 +13293,7 @@ namespace pflow {
     if (vmodules_in.size() > 0) {
       for (uint i = 0; i < vmodules_in.size(); i++) {
         if (aurostd::WithinList(vavailable, vmodules_in[i])
-          || (vmodules_in[i] == "aflow_xtalfinder")) {  //Need to account for inconsistency between aflow command and publication
+            || (vmodules_in[i] == "aflow_xtalfinder")) {  //Need to account for inconsistency between aflow command and publication
           vmodules.push_back(vmodules_in[i]);
         } else {
           vskip.push_back(vmodules_in[i]);  // For the warning message
@@ -13428,7 +13431,7 @@ namespace pflow {
       }
       for(uint i=0;i<vCARs.size();i++) {aurostd::RemoveFile(directory+"/"+vCARs[i]);}
     }
-    
+
     //zip in style of vCAR
     for(uint i=0;i<vCARs.size();i++){
       for(uint j=0;j<vruns.size();j++){

@@ -526,7 +526,7 @@ bool xOUTCAR::GetPropertiesUrlFile(const string& url,const string& file,bool QUI
   return out;
 }
 
-vector<string> xOUTCAR::GetCorrectPositions(string line,uint expected_count) {
+vector<string> xOUTCAR::GetCorrectPositions(const string& line,uint expected_count) {
   //FIRST FIX : NEGATIVE SIGN
   //this function should fix the last line
   //   volume of cell :      369.80
@@ -542,10 +542,11 @@ vector<string> xOUTCAR::GetCorrectPositions(string line,uint expected_count) {
   //    2.156793936  3.735676679  0.000000000     0.231825578  0.133844560  0.000000000
   //    0.000000000  0.000000000109.286277550     0.000000000  0.000000000  0.009150280
   bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xOUTCAR::GetCorrectPositions():";
   vector<string> tokens;
   aurostd::string2tokens(line,tokens);
   if(tokens.size()==expected_count){return tokens;}
-  if(0||LDEBUG) cerr << XPID << "xOUTCAR::GetCorrectPositions: issuing fix for bad lattice vectors (negative sign) on this line: " << line << endl;
+  if(0||LDEBUG) cerr << soliloquy << " issuing fix for bad lattice vectors (negative sign) on this line: " << line << endl;
   //try fixing negative sign first
   vector<string> neg_tokens,_tokens;
   std::size_t pos;
@@ -562,7 +563,7 @@ vector<string> xOUTCAR::GetCorrectPositions(string line,uint expected_count) {
   }
   if(neg_tokens.size()==expected_count){return neg_tokens;}
   //negative sign fix not enough, now  we need to look at large number problems
-  if(0||LDEBUG) cerr << XPID << "xOUTCAR::GetCorrectPositions: issuing fix for bad lattice vectors (large numbers) on this line: " << line << endl;
+  if(0||LDEBUG) cerr << soliloquy << " issuing fix for bad lattice vectors (large numbers) on this line: " << line << endl;
   vector<string> dec_tokens;
   string good_num;
   _tokens.clear();
@@ -574,7 +575,7 @@ vector<string> xOUTCAR::GetCorrectPositions(string line,uint expected_count) {
   if(good_num.empty()){dec_tokens.clear();return dec_tokens;} //we have no hope
   //_tokens contains precision
   uint precision=_tokens[1].size();
-  if(0||LDEBUG) cerr << XPID << "xOUTCAR::GetCorrectPositions: precision of numbers on this line: " << precision << endl;
+  if(0||LDEBUG) cerr << soliloquy << " precision of numbers on this line: " << precision << endl;
   //let's build numbers with the right count of digits
   string num;
   bool fidelity=true;
@@ -613,7 +614,7 @@ vector<string> xOUTCAR::GetCorrectPositions(string line,uint expected_count) {
   }
   if(!fidelity || dec_tokens.size()!=expected_count){dec_tokens.clear();return dec_tokens;}
   if(0||LDEBUG){ 
-    cerr << XPID << "xOUTCAR::GetCorrectPositions: repaired vector: ";
+    cerr << soliloquy << " repaired vector: ";
     for(uint i=0;i<dec_tokens.size();i++){cerr << dec_tokens[i] << " ";}
     cerr << endl;
   }
@@ -753,6 +754,13 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   eentropy_atom=eentropy_cell/natoms;
   if(LDEBUG) cerr << soliloquy << " eentropy_cell=" << eentropy_cell << endl;
   // LOAD ENERGY DATA  // without energy of electrons
+  // CO20211109 - notes about which energy to pick
+  // we report the energy without entropy (0K energy).
+  // the sigma->0 is an extrapolation calculation.
+  // the only way to know the energy at sigma=0 is to do the calculation at
+  // 0, but then the system would not converge.
+  // it does not matter much which energy to pick: raw energy values of VASP are arbitrary.
+  // focus on delta energy (just be consistent).
   if(LDEBUG) cerr << soliloquy << " LOAD ENERGY DATA" << endl;
   line="";
   for(int iline=(int)vcontent.size()-1;iline>=0;iline--)  // NEW - FROM THE BACK 
@@ -1833,10 +1841,13 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 //-------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------
 bool xOUTCAR::GetXStructure() {
+  //CO20211107 - this is good for OUTCAR.static or .bands which only has one structure inside
+  //use GetIonicStepsData() otherwise
   bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xOUTCAR::GetXStructure():";
   xstr.clear(); //DX20191220 - uppercase to lowercase clear
 
-  if(LDEBUG) {cerr << XPID << "xOUTCAR::GetXStructure: Trying to build the xstructure from the OUTCAR" << endl;}
+  if(LDEBUG) {cerr << soliloquy << " Trying to build the xstructure from the OUTCAR" << endl;}
 
   //get lattice
   bool found_lattice,found_types,found_positions;
@@ -1848,18 +1859,19 @@ bool xOUTCAR::GetXStructure() {
   double num = 0.0, natoms = 0.0;
   deque<_atom> atoms;
   xvector<double> cpos(3),fpos(3);
-  for(int iline=(int)vcontent.size()-1;iline>=0;iline--){  // NEW FROM THE BACK
+  uint vcontent_size=vcontent.size();
+  for(uint iline=vcontent_size-1;iline<vcontent_size;iline--){  // NEW FROM THE BACK
     //get lattice
-    if(!found_lattice && (iline<(int)vcontent.size()-3) && aurostd::substring2bool(vcontent[iline],"direct")) {
+    if(!found_lattice && (iline<vcontent_size-3) && aurostd::substring2bool(vcontent[iline],"direct")) {
       aurostd::string2tokens(vcontent[iline],tokens);
       if((tokens.size()>5) && (tokens[0] == "direct") && (tokens[1] == "lattice") && (tokens[2] == "vectors") &&
           (tokens[3] == "reciprocal") && (tokens[4] == "lattice") && (tokens[5] == "vectors")){
-        if(LDEBUG) {cerr << XPID << "xOUTCAR::GetXStructure: lattice found!" << endl;}
+        if(LDEBUG) {cerr << soliloquy << " lattice found!" << endl;}
         found_lattice=true;
         //
         tokens=GetCorrectPositions(vcontent[iline+1],6);
         if(!tokens.size()){
-          if(LDEBUG) {cerr << XPID << "xOUTCAR::GetXStructure: line with lattice vector is ill-written, see: " << vcontent[iline+1] << endl;}
+          if(LDEBUG) {cerr << soliloquy << " line with lattice vector is ill-written, see: " << vcontent[iline+1] << endl;}
           return false;
         }
         lattice(1,1)=aurostd::string2utype<double>(tokens[0]);
@@ -1871,7 +1883,7 @@ bool xOUTCAR::GetXStructure() {
         //
         tokens=GetCorrectPositions(vcontent[iline+2],6);
         if(!tokens.size()){
-          if(LDEBUG) {cerr << XPID << "xOUTCAR::GetXStructure: line with lattice vector is ill-written, see: " << vcontent[iline+2] << endl;}
+          if(LDEBUG) {cerr << soliloquy << " line with lattice vector is ill-written, see: " << vcontent[iline+2] << endl;}
           return false;
         }
         lattice(2,1)=aurostd::string2utype<double>(tokens[0]);
@@ -1883,7 +1895,7 @@ bool xOUTCAR::GetXStructure() {
         //
         tokens=GetCorrectPositions(vcontent[iline+3],6);
         if(!tokens.size()){
-          if(LDEBUG) {cerr << XPID << "xOUTCAR::GetXStructure: line with lattice vector is ill-written, see: " << vcontent[iline+3] << endl;}
+          if(LDEBUG) {cerr << soliloquy << " line with lattice vector is ill-written, see: " << vcontent[iline+3] << endl;}
           return false;
         }
         lattice(3,1)=aurostd::string2utype<double>(tokens[0]);
@@ -1900,7 +1912,7 @@ bool xOUTCAR::GetXStructure() {
       if((tokens.size()>2) && (tokens[0]=="ions") && (tokens[1]=="per") && (tokens[2]=="type")){
         aurostd::string2tokens(vcontent[iline],tokens,"=");
         if(tokens.size()!=2){continue;}
-        if(LDEBUG) {cerr << XPID << "xOUTCAR::GetXStructure: types found!" << endl;}
+        if(LDEBUG) {cerr << soliloquy << " types found!" << endl;}
         found_types=true;
         token=tokens[1];
         aurostd::string2tokens(token,tokens);
@@ -1914,27 +1926,27 @@ bool xOUTCAR::GetXStructure() {
     }
   }
   if(!found_lattice){
-    if(LDEBUG) {cerr << XPID << "xOUTCAR::GetXStructure: lattice not found" << endl;}
+    if(LDEBUG) {cerr << soliloquy << " lattice not found" << endl;}
     return false;
   }
   if(!found_types){
-    if(LDEBUG) {cerr << XPID << "xOUTCAR::GetXStructure: types not found" << endl;}
+    if(LDEBUG) {cerr << soliloquy << " types not found" << endl;}
     return false;
   }
 
   xmatrix<double> f2c=trasp(lattice), c2f=inverse(f2c);
 
   //need types before positions
-  for(int iline=(int)vcontent.size()-1;iline>=0;iline--){  // NEW FROM THE BACK
+  for(int iline=(int)vcontent_size-1;iline>=0;iline--){  // NEW FROM THE BACK
     //get positions
     //from bottom up, cartesian coordinates found first
     //this is fortunate as they carry more precision (fractional needs multiplication)
     if(!found_positions && aurostd::substring2bool(vcontent[iline],"coordinates")){
       aurostd::string2tokens(vcontent[iline],tokens);
-      if(!found_positions && (iline<(int)vcontent.size()-natoms) && (tokens.size()>5) && (tokens[0] == "position") && (tokens[1] == "of") && (tokens[2] == "ions") &&
+      if(!found_positions && (iline<(int)vcontent_size-natoms) && (tokens.size()>5) && (tokens[0] == "position") && (tokens[1] == "of") && (tokens[2] == "ions") &&
           (tokens[3] == "in") && (tokens[4] == "cartesian") && (tokens[5] == "coordinates")){
         found_positions=true;
-        if(LDEBUG) {cerr << XPID << "xOUTCAR::GetXStructure: positions (cartesian) found!" << endl;}
+        if(LDEBUG) {cerr << soliloquy << " positions (cartesian) found!" << endl;}
         atoms.clear();
         for(uint itype=0;itype<num_each_type.size();itype++){
           for(uint iatom=0;iatom<(uint)num_each_type[itype];iatom++){
@@ -1942,7 +1954,7 @@ bool xOUTCAR::GetXStructure() {
             atoms.back().type=itype;
             tokens=GetCorrectPositions(vcontent[iline+atoms.size()],3);
             if(!tokens.size()){
-              if(LDEBUG) {cerr << XPID << "xOUTCAR::GetXStructure: line with atom positions is ill-written, see: " << vcontent[iline+atoms.size()] << endl;}
+              if(LDEBUG) {cerr << soliloquy << " line with atom positions is ill-written, see: " << vcontent[iline+atoms.size()] << endl;}
               return false;
             }
             cpos(1)=aurostd::string2utype<double>(tokens[0]);
@@ -1953,10 +1965,10 @@ bool xOUTCAR::GetXStructure() {
           }
         }
       }
-      if(!found_positions && (iline<(int)vcontent.size()-natoms) && (tokens.size()>5) && (tokens[0] == "position") && (tokens[1] == "of") && (tokens[2] == "ions") &&
+      if(!found_positions && (iline<(int)vcontent_size-natoms) && (tokens.size()>5) && (tokens[0] == "position") && (tokens[1] == "of") && (tokens[2] == "ions") &&
           (tokens[3] == "in") && (tokens[4] == "fractional") && (tokens[5] == "coordinates")){
         found_positions=true;
-        if(LDEBUG) {cerr << XPID << "xOUTCAR::GetXStructure: positions (fractional) found!" << endl;}
+        if(LDEBUG) {cerr << soliloquy << " positions (fractional) found!" << endl;}
         atoms.clear();
         for(uint itype=0;itype<num_each_type.size();itype++){
           for(uint iatom=0;iatom<(uint)num_each_type[itype];iatom++){
@@ -1964,7 +1976,7 @@ bool xOUTCAR::GetXStructure() {
             atoms.back().type=itype;
             tokens=GetCorrectPositions(vcontent[iline+atoms.size()],3);
             if(!tokens.size()){
-              if(LDEBUG) {cerr << XPID << "xOUTCAR::GetXStructure: line with atom positions is ill-written, see: " << vcontent[iline+atoms.size()] << endl;}
+              if(LDEBUG) {cerr << soliloquy << " line with atom positions is ill-written, see: " << vcontent[iline+atoms.size()] << endl;}
               return false;
             }
             fpos(1)=aurostd::string2utype<double>(tokens[0]);
@@ -1979,7 +1991,7 @@ bool xOUTCAR::GetXStructure() {
   }
 
   if(!found_positions){
-    if(LDEBUG) {cerr << XPID << "xOUTCAR::GetXStructure: atom positions not found" << endl;}
+    if(LDEBUG) {cerr << soliloquy << " atom positions not found" << endl;}
     return false;
   }
 
@@ -2018,20 +2030,20 @@ bool xOUTCAR::GetXStructure() {
   xstr.MakeBasis();
 
   if(LDEBUG) {
-    cerr << XPID << "xOUTCAR::GetXStructure: lattice" << endl;
+    cerr << soliloquy << " lattice" << endl;
     cerr << lattice << endl;
-    cerr << XPID << "xOUTCAR::GetXStructure: klattice" << endl;
+    cerr << soliloquy << " klattice" << endl;
     cerr << 2.0*pi*klattice << endl;
-    cerr << XPID << "xOUTCAR::GetXStructure: reciprocal of lattice (check)" << endl;
+    cerr << soliloquy << " reciprocal of lattice (check)" << endl;
     cerr << ReciprocalLattice(lattice) << endl;
-    cerr << XPID << "xOUTCAR::GetXStructure: natoms = " << natoms << endl;
+    cerr << soliloquy << " natoms = " << natoms << endl;
     for(uint i=0;i<num_each_type.size();i++){
-      cerr << XPID << "xOUTCAR::GetXStructure: num_each_type[" << i << "] = " << num_each_type[i] << endl;
+      cerr << soliloquy << " num_each_type[" << i << "] = " << num_each_type[i] << endl;
     }
     for(uint i=0;i<atoms.size();i++){
-      cerr << XPID << "xOUTCAR::GetXStructure: atom[" << i << "] type=" << atoms[i].type << " cpos=" << atoms[i].cpos << " fpos=" << atoms[i].fpos << endl;
+      cerr << soliloquy << " atom[" << i << "] type=" << atoms[i].type << " cpos=" << atoms[i].cpos << " fpos=" << atoms[i].fpos << endl;
     }
-    cerr << XPID << "xOUTCAR::GetXStructure: full xstructure" << endl;
+    cerr << soliloquy << " full xstructure" << endl;
     cerr << xstr << endl;
   }
 
@@ -4098,6 +4110,265 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
 //[CO20200404 - OBSOLETE]  //  if(ERROR_flag && !QUIET) return FALSE;
 //[CO20200404 - OBSOLETE]  return TRUE;
 //[CO20200404 - OBSOLETE]}
+
+bool xOUTCAR::GetIonicStepsData(){  //CO20211106
+  bool LDEBUG=(1||FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xOUTCAR::GetIonicStepsData():";
+  vxstr_ionic.clear();
+  venergy_ionic.clear();
+  vstresses_ionic.clear();
+
+  bool reading_ionic=false;
+  bool reading_stresses=false;
+  bool reading_lattice=false;
+  bool reading_atoms=false;
+  bool convert_kBar2eV=false;
+
+  //get species data first
+  uint iline=0,i=0;
+  vector<string> vtokens;
+  string tmp_str="";
+  deque<string> species_pp;
+  deque<int> num_each_type;
+  uint vcontent_size=vcontent.size();
+  for(iline=0;iline<vcontent_size;iline++){
+    if(aurostd::substring2bool(vcontent[iline],"POTCAR:")){
+      tmp_str=vcontent[iline].substr(vcontent[iline].find("POTCAR:")+6+1);  //len(POSCAR:)==6
+      aurostd::string2tokens(tmp_str,vtokens," ");
+      //vtokens[1] is the species_pp
+      if(!aurostd::WithinList(species_pp,vtokens[1])){species_pp.push_back(vtokens[1]);}
+      if(LDEBUG){
+        cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;
+      }
+    }
+    if(aurostd::substring2bool(vcontent[iline],"ions") && //THIS MUST COME AFTER species_pp IS FILLED
+        aurostd::substring2bool(vcontent[iline],"per") &&
+        aurostd::substring2bool(vcontent[iline],"type")){
+      aurostd::string2tokens(vcontent[iline],vtokens,"=");
+      if(vtokens.size()>1){
+        tmp_str=vtokens[1];
+        aurostd::string2tokens(tmp_str,vtokens," ");
+        if(vtokens.size()>0 && vtokens.size()==species_pp.size()){
+          num_each_type=aurostd::vector2deque(aurostd::vectorstring2vectorint(vtokens));
+          if(LDEBUG){
+            cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;
+          }
+          break;
+        }
+      }
+    }
+  }
+  uint natoms=aurostd::sum(num_each_type);
+  if(LDEBUG){
+    cerr << soliloquy << " species_pp=" << aurostd::joinWDelimiter(species_pp,",") << endl;
+    cerr << soliloquy << " num_each_type=" << aurostd::joinWDelimiter(num_each_type,",") << endl;
+    cerr << soliloquy << " natoms=" << natoms << endl;
+  }
+
+  uint ilattice=0,iatom=0,itype=0;
+  xstructure xstr;
+  double energy=AUROSTD_MAX_DOUBLE;
+  xvector<double> stresses(6);stresses[stresses.lrows]=AUROSTD_MAX_DOUBLE;
+  vector<_atom> vatoms; //must keep like this until we settle types...
+  for(iline=0;iline<vcontent_size;iline++){
+    if(reading_ionic==false){
+      if(aurostd::substring2bool(vcontent[iline],"ENERGIE")){
+        reading_ionic=true;
+        reading_stresses=false;reading_lattice=false;reading_atoms=false;convert_kBar2eV=false;
+        //clear everything, set stresses to 3 as an indicator that it's not set
+        xstr.clear();vatoms.clear();
+        ilattice=0;iatom=0;
+        energy=AUROSTD_MAX_DOUBLE;
+        stresses[stresses.lrows]=AUROSTD_MAX_DOUBLE; //stresses.resize(3);
+        continue;
+      }
+    }else{
+      if(aurostd::substring2bool(vcontent[iline],"Iteration")||(iline==vcontent_size-1)){
+        reading_ionic=false;
+        reading_stresses=false;
+        if(xstr.atoms.size()==natoms && ilattice==3 && iatom==natoms && energy!=AUROSTD_MAX_DOUBLE && stresses[stresses.lrows]!=AUROSTD_MAX_DOUBLE){  //add additional checks as needed //stresses.rows==6
+          if(LDEBUG){cerr << soliloquy << " adding a new ionic step" << endl;}
+          vxstr_ionic.push_back(xstr);
+          venergy_ionic.push_back(energy);
+          vstresses_ionic.push_back(stresses);
+        }
+        continue;
+      }
+      if(aurostd::substring2bool(vcontent[iline],"energy") && 
+          aurostd::substring2bool(vcontent[iline],"without") &&
+          aurostd::substring2bool(vcontent[iline],"entropy")){
+        aurostd::string2tokens(vcontent[iline],vtokens,"=");
+        if(vtokens.size()>1){
+          tmp_str=vtokens[1];
+          aurostd::string2tokens(tmp_str,vtokens,"e");
+          if(vtokens.size()>0){energy=aurostd::string2utype<double>(vtokens[0]);}
+          if(LDEBUG){
+            cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;
+            cerr << soliloquy << " energy=" << energy << endl;
+          }
+        }
+      }
+      if(aurostd::substring2bool(vcontent[iline],"FORCE") && aurostd::substring2bool(vcontent[iline],"-STRESS")){reading_stresses=true;reading_lattice=false;reading_atoms=false;convert_kBar2eV=false;continue;}
+      if(reading_stresses){
+        if(aurostd::substring2bool(vcontent[iline],"Total")){
+          aurostd::string2tokens(vcontent[iline],vtokens," ");
+          if(vtokens.size()==7){
+            //stresses.resize(6);
+            for(i=1;i<7;i++){stresses[stresses.lrows+i-1]=aurostd::string2utype<double>(vtokens[i]);}
+            if(LDEBUG){
+              cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;
+              cerr << soliloquy << " stresses(eV)=" << stresses << endl; //X Y Z XY YZ ZX //this is eV*volume of cell
+            }
+          }
+        }
+        //per ME's suggestion, let's grab 'in kB' instead of 'Total' (eV) which has more significant figures
+        if(aurostd::substring2bool(vcontent[iline],"in") && aurostd::substring2bool(vcontent[iline],"kB")){
+          aurostd::string2tokens(vcontent[iline],vtokens," ");
+          if(vtokens.size()==8){
+            //stresses.resize(6);
+            for(i=2;i<8;i++){stresses[stresses.lrows+i-2]=aurostd::string2utype<double>(vtokens[i]);}
+            convert_kBar2eV=true;
+            if(LDEBUG){
+              cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;
+              cerr << soliloquy << " stresses(kBar)=" << stresses << endl; //X Y Z XY YZ ZX
+            }
+          }
+        }
+      }
+      if(aurostd::substring2bool(vcontent[iline],"direct") && 
+          aurostd::substring2bool(vcontent[iline],"lattice") &&
+          aurostd::substring2bool(vcontent[iline],"vectors") &&
+          aurostd::substring2bool(vcontent[iline],"reciprocal")){reading_lattice=true;reading_stresses=false;reading_atoms=false;ilattice=0;xstr.clear();continue;}
+      if(reading_lattice && ilattice<3){
+        if(LDEBUG){cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;}
+        vtokens=GetCorrectPositions(vcontent[iline],6); //aurostd::string2tokens(vcontent[iline],vtokens," ");
+        if(vtokens.size()!=6){ilattice=0;reading_lattice=false;}  //also contains reciprocal lattice components //ilattice==0 is an indicator that lattice was not read (correctly)
+        xstr.lattice[xstr.lattice.lrows+ilattice][xstr.lattice.lcols+0]=aurostd::string2utype<double>(vtokens[0]);
+        xstr.lattice[xstr.lattice.lrows+ilattice][xstr.lattice.lcols+1]=aurostd::string2utype<double>(vtokens[1]);
+        xstr.lattice[xstr.lattice.lrows+ilattice][xstr.lattice.lcols+2]=aurostd::string2utype<double>(vtokens[2]);
+        ilattice++;
+        if(ilattice==3){
+          if(LDEBUG){cerr << soliloquy << " xstr.lattice=" << endl << xstr.lattice << endl;}
+          xstr.scale=1.0;
+          xstr.FixLattices();
+          if(convert_kBar2eV){
+            if(LDEBUG){
+              cerr << soliloquy << " xstr.GetVolume()=" << xstr.GetVolume() << endl;
+              cerr << soliloquy << " stresses(kBar)=" << stresses << endl; //X Y Z XY YZ ZX
+              cerr << soliloquy << " kBar2eV=" << kBar2eV << endl;
+            }
+            stresses*=(kBar2eV*xstr.GetVolume());
+            if(LDEBUG){
+              cerr << soliloquy << " stresses(eV)=" << stresses << endl; //X Y Z XY YZ ZX //this is eV*volume of cell
+            }
+          }
+          reading_lattice=false;
+        }
+      }
+      if(aurostd::substring2bool(vcontent[iline],"POSITION") && aurostd::substring2bool(vcontent[iline],"TOTAL-FORCE")){reading_atoms=true;reading_stresses=false;reading_lattice=false;convert_kBar2eV=false;iatom=0;vatoms.clear();continue;}
+      if(reading_atoms && iatom<natoms){
+        if(LDEBUG){cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;}
+        if(aurostd::substring2bool(vcontent[iline],"---------")){continue;}
+        vtokens=GetCorrectPositions(vcontent[iline],6); //aurostd::string2tokens(vcontent[iline],vtokens," ");
+        if(vtokens.size()!=6){iatom=0;reading_atoms=false;}  //also contains force components //iatom==0 is an indicator that atoms were not read (correctly)
+        vatoms.push_back(_atom());
+        for(i=0;i<3;i++){vatoms.back().cpos[vatoms.back().cpos.lrows+i]=aurostd::string2utype<double>(vtokens[i]);}
+        for(i=0;i<3;i++){vatoms.back().force[vatoms.back().force.lrows+i]=aurostd::string2utype<double>(vtokens[i+3]);}
+        iatom++;
+        if(iatom==natoms){
+          iatom=0; //reset
+          for(itype=0;itype<num_each_type.size();itype++){
+            for(i=0;i<(uint)num_each_type[itype];i++){
+              vatoms[iatom].type=itype;
+              vatoms[iatom].name=species_pp[itype];
+              vatoms[iatom].name_is_given=(!vatoms[iatom].name.empty());
+              vatoms[iatom].fpos=xstr.c2f*vatoms[iatom].cpos;
+              xstr.AddAtom(vatoms[iatom]);
+              xstr.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
+              iatom++;
+            }
+          }
+          xstr.title=SYSTEM;
+          xstr.MakeBasis();
+          if(LDEBUG){cerr << soliloquy << " xstr=" << endl << xstr << endl;}
+          reading_atoms=false;
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
+void xOUTCAR::WriteMTPCFG(const string& outcar_path,stringstream& output_ss){  //CO20211106
+  string soliloquy=XPID+"xOUTCAR::WriteMTPCFG():";
+
+  if(vxstr_ionic.size()!=venergy_ionic.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vxstr_ionic.size()!=venergy_ionic",_FILE_CORRUPT_);}
+  if(vxstr_ionic.size()!=vstresses_ionic.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vxstr_ionic.size()!=vstresses_ionic",_FILE_CORRUPT_);}
+
+  output_ss.setf(std::ios::fixed,std::ios::floatfield);
+  uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
+  output_ss.precision(_precision_);
+
+  string tab=" ";
+
+  for(uint istr=0;istr<vxstr_ionic.size();istr++){
+    const xstructure& a=vxstr_ionic[istr];
+    output_ss << "BEGIN_CFG" << endl;
+    output_ss << tab << "Size" << endl;
+    output_ss << tab << tab << a.atoms.size() << endl;
+    output_ss << tab << "Supercell" << endl;
+    for(uint i=1;i<=3;i++) {
+      for(uint j=1;j<=3;j++) {
+        output_ss << tab << tab << " ";
+        if(abs(a.lattice(i,j))<10.0) output_ss << " ";
+        if(!std::signbit(a.lattice(i,j))) output_ss << " ";
+        output_ss << a.lattice(i,j) << "";
+      }
+      output_ss << endl;
+    }
+    output_ss << tab << "AtomData: id type direct_x direct_y direct_z  fx fy fz" << endl;
+    for(uint iatom=0;iatom<a.atoms.size();iatom++){
+      output_ss << tab << tab;
+      if(iatom<10) output_ss << "  ";
+      else if(iatom<100) output_ss << " ";
+      output_ss << iatom << " ";
+      if(abs(a.atoms[iatom].type)<10) output_ss << "  ";
+      else if(abs(a.atoms[iatom].type)<100) output_ss << " ";
+      output_ss << a.atoms[iatom].type << " ";
+      for(int icoord=a.atoms[iatom].fpos.lrows;icoord<=a.atoms[iatom].fpos.urows;icoord++){
+        if(!std::signbit(a.atoms[iatom].fpos[icoord])) output_ss << " ";
+        output_ss << a.atoms[iatom].fpos[icoord] << (icoord<a.atoms[iatom].fpos.urows?" ":"");
+      }
+      output_ss << " ";
+      for(int icoord=a.atoms[iatom].force.lrows;icoord<=a.atoms[iatom].force.urows;icoord++){
+        if(abs(a.atoms[iatom].force[icoord])<10) output_ss << "  ";
+        else if(abs(a.atoms[iatom].force[icoord])<100) output_ss << " ";
+        if(!std::signbit(a.atoms[iatom].force[icoord])) output_ss << " ";
+        output_ss << a.atoms[iatom].force[icoord] << (icoord<a.atoms[iatom].force.urows?" ":"");
+      }
+      output_ss << endl;
+    }
+    output_ss << tab << "Energy" << endl;
+    output_ss << tab << tab << venergy_ionic[istr] << endl;
+    output_ss << tab << "PlusStress: xx yy zz xy yz xz" << endl; //order as vasp
+    output_ss << tab << tab;
+    for(int icoord=vstresses_ionic[istr].lrows;icoord<=vstresses_ionic[istr].urows;icoord++){
+      if(abs(vstresses_ionic[istr][icoord])<10) output_ss << "  ";
+      else if(abs(vstresses_ionic[istr][icoord])<100) output_ss << " ";
+      if(!std::signbit(vstresses_ionic[istr][icoord])) output_ss << " ";
+      output_ss << vstresses_ionic[istr][icoord] << (icoord<vstresses_ionic[istr].urows?" ":"");
+    }
+    output_ss << endl;
+    output_ss << tab << "Feature EFS_by vasp" << endl;
+    output_ss << tab << "Feature from aflow.org:" << outcar_path << ":ionic_step=" << istr+1 << endl;
+    output_ss << tab << "Feature elements ";
+    for(uint ispecies=0;ispecies<a.species.size();ispecies++){output_ss << KBIN::VASP_PseudoPotential_CleanName(a.species[ispecies]);}
+    output_ss << endl;
+    output_ss << "END_CFG" << endl;
+  }
+
+}
 
 // ***************************************************************************
 // ***************************************************************************
@@ -9138,14 +9409,14 @@ bool xQMVASP::GetPropertiesUrlFile(const string& url,const string& file,bool QUI
 }
 
 bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //CO20191110
-  bool LDBEUG=(FALSE || XHOST.DEBUG || !QUIET);
+  bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
   string soliloquy=XPID+"xQMVASP::GetProperties():";
   stringstream message;
   bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
 
   bool ERROR_flag=FALSE;
   long double seconds=aurostd::get_seconds();
-  if(LDBEUG) cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
   vcontent.clear();
@@ -9158,10 +9429,10 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
   H_atom_static=AUROSTD_NAN;
   bool inside_relax=false,inside_static=false;
   // ----------------------------------------------------------------------
-  if(LDBEUG) cerr << soliloquy << " vcontent.size()=" << vcontent.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " vcontent.size()=" << vcontent.size() << endl;
   // ----------------------------------------------------------------------
   for(uint iline=0;iline<vcontent.size();iline++){
-    if(LDBEUG) cerr << soliloquy << " vcontent.at(" << iline << ")=" << vcontent.at(iline) << endl;
+    if(LDEBUG) cerr << soliloquy << " vcontent.at(" << iline << ")=" << vcontent.at(iline) << endl;
     if(aurostd::substring2bool(vcontent[iline],"STOP_relax")){inside_relax=false;}
     else if(aurostd::substring2bool(vcontent[iline],"START_relax")){inside_relax=true;}
     else if(aurostd::substring2bool(vcontent[iline],"STOP_static")){inside_static=false;}
@@ -9208,12 +9479,179 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
   // ----------------------------------------------------------------------   
   // ----------------------------------------------------------------------
   // DONE NOW RETURN  
-  if(LDBEUG) cerr << soliloquy << " END (" << time_delay(seconds) << ")" << endl;
+  if(LDEBUG) cerr << soliloquy << " END (" << time_delay(seconds) << ")" << endl;
   // ----------------------------------------------------------------------
   // DONE NOW RETURN
   //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - " << soliloquy << " ERROR_flag set in xQMVASP" << endl;
   if(ERROR_flag){
     message << "ERROR_flag set in xQMVASP";
+    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
+    return FALSE;
+  }
+  return TRUE;
+}
+
+//-------------------------------------------------------------------------------------------------
+//CO20190803 STOP
+
+//CO20190803 START
+//---------------------------------------------------------------------------------
+// class xPLASMONICS
+//---------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+// constructor
+xPLASMONICS::xPLASMONICS(ostream& oss) : xStream(oss) {free();} //CO20200404 - xStream integration for logging
+xPLASMONICS::xPLASMONICS(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss) {free();} //CO20200404 - xStream integration for logging
+xPLASMONICS::xPLASMONICS(const string& fileIN,bool QUIET,ostream& oss) : xStream(oss) {m_initialized=initialize(fileIN,QUIET);} //CO20200404 - xStream integration for logging
+xPLASMONICS::xPLASMONICS(const string& fileIN,ofstream& FileMESSAGE,bool QUIET,ostream& oss) : xStream(FileMESSAGE,oss) {m_initialized = initialize(fileIN, QUIET);} //CO20200404 - xStream integration for logging
+
+bool xPLASMONICS::initialize(const string& fileIN,ostream& oss,bool QUIET) {xStream::initialize(oss);return initialize(fileIN,QUIET);} //CO20200508
+bool xPLASMONICS::initialize(const string& fileIN,ofstream& FileMESSAGE,ostream& oss,bool QUIET) {xStream::initialize(FileMESSAGE,oss);return initialize(fileIN,QUIET);} //CO20200508
+bool xPLASMONICS::initialize(const string& fileIN, bool QUIET) {
+  free();
+  filename = fileIN;
+  return GetPropertiesFile(fileIN, QUIET);
+}
+
+xPLASMONICS::xPLASMONICS(const xPLASMONICS& b) : xStream(*b.getOFStream(),*b.getOSS()) {free();copy(b);} // copy PUBLIC
+
+xPLASMONICS::~xPLASMONICS() {xStream::free();free();} //CO20191110 //CO20200404 - xStream integration for logging
+
+void xPLASMONICS::free() { //CO20191110
+  m_initialized=false; //CO20200404
+  //------------------------------------------------------------------------------
+  content="";                   // for aflowlib_libraries.cpp
+  vcontent.clear();             // for aflowlib_libraries.cpp
+  filename="";                  // for aflowlib_libraries.cpp
+  eps.clear();
+  venergy.clear();
+  veels.clear();
+  vdielectric.clear();
+}
+
+void xPLASMONICS::copy(const xPLASMONICS& b) { // copy PRIVATE //CO20191110
+  xStream::copy(b);  //CO20200404 - xStream integration for logging
+  free();
+  m_initialized=b.m_initialized; //CO20200404 - xStream integration for logging
+  content=b.content;
+  vcontent.clear();for(uint i=0;i<b.vcontent.size();i++){vcontent.push_back(b.vcontent[i]);}  // for aflowlib_libraries.cpp
+  filename=b.filename;
+  eps=b.eps;
+  venergy.clear();for(uint i=0;i<b.venergy.size();i++){venergy.push_back(b.venergy[i]);}
+  veels.clear();for(uint i=0;i<b.veels.size();i++){veels.push_back(b.veels[i]);}
+  vdielectric.clear();for(uint i=0;i<b.vdielectric.size();i++){vdielectric.push_back(b.vdielectric[i]);}
+}
+
+const xPLASMONICS& xPLASMONICS::operator=(const xPLASMONICS& b) {  // operator= PUBLIC //CO20191110
+  if(this!=&b) {free();copy(b);}
+  return *this;
+}
+
+void xPLASMONICS::clear() {  // clear PRIVATE  //CO20191110
+  string filename_aus=filename;
+  free();
+  filename=filename_aus;
+}
+
+void xPLASMONICS::getEPS() {  //CO20211120
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xPLASMONICS::getEPS():";
+  if(LDEBUG){cerr << soliloquy << " filename=" << filename << endl;}
+  if(filename.find(DEFAULT_AFLOW_PLASMONICS_FILE)!=string::npos){
+    //get eps and store it
+    string _eps=filename;
+    _eps=aurostd::basename(_eps);
+    aurostd::StringSubst(_eps,DEFAULT_AFLOW_PLASMONICS_FILE+"_",""); //remove DEFAULT_AFLOW_PLASMONICS_FILE+'_'
+    aurostd::StringSubst(_eps,DEFAULT_AFLOW_PLASMONICS_FILE,""); //remove DEFAULT_AFLOW_PLASMONICS_FILE
+    _eps=_eps.substr(0,_eps.find("_")); //remove everything before '_'
+    _eps=_eps.substr(0,_eps.find("."+POCC_OUT_FILE)); //remove everything before '.out'
+    _eps=_eps.substr(0,_eps.find(POCC_OUT_FILE)); //remove everything before 'out'
+    if(aurostd::isfloat(_eps)){eps=_eps;}
+  }
+  if(LDEBUG){cerr << soliloquy << " eps=" << eps << endl;}
+}
+
+bool xPLASMONICS::GetProperties(const string& stringIN,bool QUIET) { //CO20191110
+  stringstream sss; sss.str(stringIN);
+  if(filename=="") filename=DEFAULT_AFLOW_PLASMONICS_FILE+"_0.01."+POCC_OUT_FILE;
+  return xPLASMONICS::GetProperties(sss,QUIET);
+}
+
+bool xPLASMONICS::GetPropertiesFile(const string& fileIN,bool QUIET) { //CO20191110
+  stringstream sss;
+  //[CO20211121 - getEPS() needs the right filename]if(filename=="") 
+  filename=fileIN;
+  aurostd::efile2stringstream(fileIN,sss);
+  return xPLASMONICS::GetProperties(sss,QUIET);
+}
+
+bool xPLASMONICS::GetPropertiesUrlFile(const string& url,const string& file,bool QUIET) {  //CO20191110
+  //[CO20200502 - OBSOLETE]string tmpfile=XHOST.tmpfs+"/_aflow_"+XHOST.user+".pid"+XHOST.ostrPID.str()+".a"+string(AFLOW_VERSION)+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+"_"+file;
+  string tmpfile=aurostd::TmpFileCreate("xPLASMONICS_GetProperties"); //CO20200502 - threadID
+  aurostd::url2file(url+"/"+file,tmpfile,!QUIET);
+  bool out=GetPropertiesFile(tmpfile,QUIET);
+  filename="url="+url;  //CO20210315
+  aurostd::RemoveFile(tmpfile);
+  return out;
+}
+
+bool xPLASMONICS::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //CO20191110
+  bool LDEBUG=(FALSE || XHOST.DEBUG || !QUIET);
+  string soliloquy=XPID+"xPLASMONICS::GetProperties():";
+  stringstream message;
+  bool force_exit=XHOST.POSTPROCESS; //SC wants to exit here so we can fix the problem  // ME20200604 - do not exit with generate_aflowin_only
+
+  bool ERROR_flag=FALSE;
+  long double seconds=aurostd::get_seconds();
+  if(LDEBUG) cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;
+  clear(); // so it does not mess up vector/deque
+  content=stringstreamIN.str();
+  vcontent.clear();
+  vector<string> vlines,tokens,tokens2;
+  aurostd::string2vectorstring(content,vcontent);
+  vlines=aurostd::RemoveComments(vcontent);
+  if(filename=="") filename="stringstream";
+
+  // ----------------------------------------------------------------------
+  if(LDEBUG) cerr << soliloquy << " vcontent.size()=" << vcontent.size() << endl;
+  if(LDEBUG) cerr << soliloquy << " vlines.size()=" << vlines.size() << endl;
+  // ----------------------------------------------------------------------
+
+  getEPS(); //extract eps from filename if possible
+
+  // crunching to eat the info
+  vector<string> vtokens;
+  xcomplex<double> xcomp_tmp;
+  venergy.clear();veels.clear();vdielectric.clear();  //clear
+  for(uint iline=0;iline<vlines.size();iline++){
+    if(LDEBUG){cerr << soliloquy << " vlines[iline=" << iline << "]=\"" << vlines[iline] << "\"" << endl;}
+    aurostd::string2tokens(vlines[iline],vtokens," ");
+    if(LDEBUG){cerr << soliloquy << " vtokens=" << aurostd::joinWDelimiter(vtokens,"|") << endl;}
+    //there should be 5 columns
+    if(vtokens.size()!=5){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vcols!=5 (="+aurostd::utype2string(vtokens.size())+")",_FILE_NOT_FOUND_);}
+    //The file has 5 columns:
+    //column1 = energy (eV)
+    //column2 = do not consider this
+    //column3 = EELS spectrum
+    //column4 = real part of dielectric function
+    //column5 = imaginary part of dielectric function
+    venergy.push_back(aurostd::string2utype<double>(vtokens[0]));
+    veels.push_back(aurostd::string2utype<double>(vtokens[2]));
+    xcomp_tmp.re=aurostd::string2utype<double>(vtokens[3]);
+    xcomp_tmp.im=aurostd::string2utype<double>(vtokens[4]);
+    vdielectric.push_back(xcomp_tmp);
+  }
+
+  // ----------------------------------------------------------------------   
+  // ----------------------------------------------------------------------
+  // DONE NOW RETURN  
+  if(LDEBUG) cerr << soliloquy << " END (" << time_delay(seconds) << ")" << endl;
+  // ----------------------------------------------------------------------
+  // DONE NOW RETURN
+  //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - " << soliloquy << " ERROR_flag set in xPLASMONICS" << endl;
+  if(ERROR_flag){
+    message << "ERROR_flag set in xPLASMONICS";
     if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);}
     else{pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
     return FALSE;

@@ -109,7 +109,6 @@ namespace apl {
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
     int ncpus = _pc->getNCPUs();
     if (ncpus > nq) ncpus = nq;
-    if (ncpus < 1) ncpus = 1;
     if (ncpus > 1) {
       vector<vector<int> > thread_dist = getThreadDistribution(nq, ncpus);
       vector<std::thread*> threads;
