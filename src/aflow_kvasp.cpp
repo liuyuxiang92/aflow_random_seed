@@ -2227,7 +2227,11 @@ namespace KBIN {
                           }
                           if (l <= nlines) KBIN::VASP_RecycleExtraFile(xvasp, "CHGCAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
                         }
-                        if(vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option) KBIN::VASP_RecycleExtraFile(xvasp, "WAVECAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
+                        //CO+MM20211217
+                        //In general it's not a good idea to use the WAVECAR from relax1 to start relax2
+                        //a big change in the unit cell size/shape is going drastically change the plane waves that should be used
+                        //we can add another option to do this in the future
+                        //[CO+MM20211217]if(vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option) KBIN::VASP_RecycleExtraFile(xvasp, "WAVECAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
                         //ME20190301 END
                       }
                       if(xvasp.NRELAXING==xvasp.NRELAX) {
@@ -2306,7 +2310,11 @@ namespace KBIN {
                           }
                           if (l <= nlines) KBIN::VASP_RecycleExtraFile(xvasp, "CHGCAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
                         }
-                        if(vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option) KBIN::VASP_RecycleExtraFile(xvasp, "WAVECAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
+                        //CO+MM20211217
+                        //In general it's not a good idea to use the WAVECAR from relax1 to start relax2
+                        //a big change in the unit cell size/shape is going drastically change the plane waves that should be used
+                        //we can add another option to do this in the future
+                        //[CO+MM20211217]if(vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option) KBIN::VASP_RecycleExtraFile(xvasp, "WAVECAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
                         //ME20190301 END
                       }
                       if(xvasp.NRELAXING==xvasp.NRELAX) {
