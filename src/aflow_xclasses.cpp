@@ -502,7 +502,7 @@ _kflags::_kflags() {
   KBIN_MPI                                         = FALSE;
   KBIN_MPI_NCPUS                                   = 0;
   KBIN_MPI_NCPUS_STRING                            = ""; //ME20181216
-  KBIN_MPI_NCPUS_BUFFER                            = 0;
+  KBIN_MPI_NCPUS_ORIG                              = 0; //CO20210804
   KBIN_MPI_START                                   = "";
   KBIN_MPI_STOP                                    = "";
   KBIN_MPI_COMMAND                                 = "";
@@ -551,6 +551,7 @@ _kflags::_kflags() {
   KBIN_POCC_CALCULATION                            = FALSE;
   KBIN_POCC_TEMPERATURE_STRING                     = "";  //CO20191110
   KBIN_POCC_ARUNS2SKIP_STRING                      = "";  //CO20200624
+  KBIN_POCC_EXCLUDE_UNSTABLE                       = FALSE;  //ME20210927
   KBIN_FROZSL                                      = FALSE;
   KBIN_FROZSL_DOWNLOAD                             = FALSE;
   KBIN_FROZSL_FILE                                 = FALSE;
@@ -612,7 +613,7 @@ void _kflags::copy(const _kflags& b) {
   KBIN_MPI                                         = b.KBIN_MPI;
   KBIN_MPI_NCPUS                                   = b.KBIN_MPI_NCPUS;
   KBIN_MPI_NCPUS_STRING                            = b.KBIN_MPI_NCPUS_STRING;	//ME20181216
-  KBIN_MPI_NCPUS_BUFFER                            = b.KBIN_MPI_NCPUS_BUFFER;
+  KBIN_MPI_NCPUS_ORIG                              = b.KBIN_MPI_NCPUS_ORIG; //CO20210804
   KBIN_MPI_START                                   = b.KBIN_MPI_START;
   KBIN_MPI_STOP                                    = b.KBIN_MPI_STOP;
   KBIN_MPI_COMMAND                                 = b.KBIN_MPI_COMMAND;
@@ -661,6 +662,7 @@ void _kflags::copy(const _kflags& b) {
   KBIN_POCC_CALCULATION                            = b.KBIN_POCC_CALCULATION; //CO20191110
   KBIN_POCC_TEMPERATURE_STRING                     = b.KBIN_POCC_TEMPERATURE_STRING; //CO20191110
   KBIN_POCC_ARUNS2SKIP_STRING                      = b.KBIN_POCC_ARUNS2SKIP_STRING; //CO20200627
+  KBIN_POCC_EXCLUDE_UNSTABLE                       = b.KBIN_POCC_EXCLUDE_UNSTABLE;  //ME20210927
   KBIN_FROZSL                                      = b.KBIN_FROZSL;
   KBIN_FROZSL_DOWNLOAD                             = b.KBIN_FROZSL_DOWNLOAD;
   KBIN_FROZSL_FILE                                 = b.KBIN_FROZSL_FILE;
@@ -843,7 +845,7 @@ void _vflags::free() {
 
   KBIN_VASP_FORCE_OPTION_NSW_EQUAL                               = FALSE;
   KBIN_VASP_FORCE_OPTION_NSW_EQUAL_VALUE                         = 0;
-  
+
   // AFIX
   KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.clear();                    // AFIX
   // CONVERT

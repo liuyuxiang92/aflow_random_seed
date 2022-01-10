@@ -196,6 +196,18 @@ namespace KBIN {
       kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
     }
     //DX20201005 - MACHINE003 - END
+    //DX20211011 - MACHINE004 - START
+    // machine004
+    if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MACHINE004") ||
+        aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE004") ||
+        aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MACHINE004"))   // check MACHINE004
+      aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE004")) {
+      aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,oss);
+      kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+    }
+    //DX20211011 - MACHINE004 - END
     // duke_materials	
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_MATERIALS") ||
         aurostd::substring2bool(AflowIn,"[AFLOW_HOST]MATERIALS") ||    // check DUKE_MATERIALS
@@ -393,6 +405,20 @@ namespace KBIN {
       if(!kflags.KBIN_POCC_ARUNS2SKIP_STRING.empty()){  //CO20200624
         aus << "00000  MESSAGE POCC_ARUNS2SKIP_STRING=" << kflags.KBIN_POCC_ARUNS2SKIP_STRING << Message(_AFLOW_FILE_NAME_,aflags) << endl;  //CO20200624
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,oss);  //CO20200624
+      }
+      //ME20210927 - EXCLUDE_UNSTABLE
+      string exclude = aurostd::toupper(aurostd::substring2string(AflowIn, "[AFLOW_POCC]EXCLUDE_UNSTABLE="));
+      if (exclude.empty()) {
+        kflags.KBIN_POCC_EXCLUDE_UNSTABLE = DEFAULT_POCC_EXCLUDE_UNSTABLE;
+      } else {
+        if (exclude[0] == 'T') {
+          kflags.KBIN_POCC_EXCLUDE_UNSTABLE = true;
+        } else if (exclude[0] == 'F') {
+          kflags.KBIN_POCC_EXCLUDE_UNSTABLE = false;
+        } else {
+          kflags.KBIN_POCC_EXCLUDE_UNSTABLE = DEFAULT_POCC_EXCLUDE_UNSTABLE;
+        }
+        aus << "00000  MESSAGE POCC_EXCLUDE_UNSTABLE=" << (kflags.KBIN_POCC_EXCLUDE_UNSTABLE?"TRUE":"FALSE") << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       }
     }
     // ---------------------------------------------------------
@@ -1395,13 +1421,13 @@ namespace KBIN {
     //[CO20210805 - OBSOLETE]vflags.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG    =     aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_FILE]BANDS_GRID=",TRUE);
     //[CO20210805 - OBSOLETE]if(vflags.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG)
     //[CO20210805 - OBSOLETE]  vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE=aurostd::substring2utype<int>(AflowIn,"[VASP_KPOINTS_FILE]BANDS_GRID=",TRUE);
-    //[CO20210805 - OBSOLETE]else {vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE=16;vflags.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG=TRUE;
+    //[CO20210805 - OBSOLETE]else vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE=16;vflags.KBIN_VASP_KPOINTS_BANDS_GRID_FLAG=TRUE;
     if(!vflags.KBIN_VASP_KPOINTS_BANDS_GRID.isentry){  //CO20210805
       vflags.KBIN_VASP_KPOINTS_BANDS_GRID.clear();
       vflags.KBIN_VASP_KPOINTS_BANDS_GRID.push(aurostd::utype2string(DEFAULT_BANDS_GRID));
     }
-      //    cerr << "WARNING: if you use VASP_RUN_RELAX_STATIC_BANDS or vflags.KBIN_VASP_RUN.flag(\"STATIC_BANDS\"), you must specify KBIN_VASP_KPOINTS_BANDS_GRID_FLAG" << endl;
-      //   cerr << "         Taking defauls vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE=" << vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE << endl;
+    //    cerr << "WARNING: if you use VASP_RUN_RELAX_STATIC_BANDS or vflags.KBIN_VASP_RUN.flag(\"STATIC_BANDS\"), you must specify KBIN_VASP_KPOINTS_BANDS_GRID_FLAG" << endl;
+    //   cerr << "         Taking defauls vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE=" << vflags.KBIN_VASP_KPOINTS_BANDS_GRID_VALUE << endl;
     if((vflags.KBIN_VASP_RUN.flag("RELAX_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("STATIC_BANDS") || 
           vflags.KBIN_VASP_RUN.flag("REPEAT_STATIC_BANDS") || vflags.KBIN_VASP_RUN.flag("REPEAT_BANDS")) && 
         !vflags.KBIN_VASP_KPOINTS_BANDS_GRID.isentry) {
@@ -2639,7 +2665,6 @@ namespace KBIN {
                     // PROCEED
                     xvasp.NRELAXING++;
                     aus << 11111*xvasp.NRELAXING << "  RUN_DIELECTRIC_STATIC (" << STRING_TO_SHOW << ") - " <<  xvasp.Directory << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-                    kflags.KBIN_MPI_NCPUS_BUFFER=kflags.KBIN_MPI_NCPUS;
                     if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS") && kflags.KBIN_MPI_NCPUS==24) {
                       uint ncpus_before=kflags.KBIN_MPI_NCPUS;
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) kflags.KBIN_MPI_NCPUS=DUKE_MATERIALS_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5
@@ -2663,6 +2688,7 @@ namespace KBIN {
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //DX20190509 - MACHINE001
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //DX20190509 - MACHINE002
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE003")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //DX20201005 - MACHINE003
+                      if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE004")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //DX20211011 - MACHINE004
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //DX20190107 - CMU EULER
                       aflags.AFLOW_GLOBAL_NCPUS=-kflags.KBIN_MPI_NCPUS;
                       aus << "00000  MESSAGE Running RUN_DIELECTRIC_STATIC fixing mpivasp5 with " << ncpus_before << "-AMD cores to " << kflags.KBIN_MPI_NCPUS << "-AMD cores" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
@@ -2690,7 +2716,6 @@ namespace KBIN {
                     xvasp.aopts.flag("FLAG::WAVECAR_PRESERVED",TRUE); // WAVECAR.dielectric_static
                     bool qmwrite=TRUE;
                     KBIN::VASP_Backup(xvasp,qmwrite,string("dielectric_static"));
-                    //		kflags.KBIN_MPI_NCPUS=kflags.KBIN_MPI_NCPUS_BUFFER;
                   }
                   if(vflags.KBIN_VASP_RUN.flag("DIELECTRIC_DYNAMIC") && vflags.KBIN_VASP_RUN.flag("DIELECTRIC_STATIC")) {  // check for DIELECTRIC DYNAMIC
                     xvasp.NRELAXING++;
@@ -3085,21 +3110,23 @@ namespace KBIN {
     //[CO20210315 - does not work for big files]content_vasp_out=aurostd::toupper(content_vasp_out);  //put toupper to eliminate case-sensitivity 
 
     //do memory check
-    double memory_usage_percentage=0.0;
+    double usage_percentage_ram=0.0,usage_percentage_swap=0.0;
     bool approaching_oom=false;
-    if(aurostd::GetMemoryUsagePercentage(memory_usage_percentage)){approaching_oom=(memory_usage_percentage>=MEMORY_MAX_USAGE);}
+    if(aurostd::GetMemoryUsagePercentage(usage_percentage_ram,usage_percentage_swap)){approaching_oom=(usage_percentage_ram>=MEMORY_MAX_USAGE_RAM && usage_percentage_swap>=MEMORY_MAX_USAGE_SWAP);}
     if(approaching_oom){  //might be a quick memory spike, try again
       if(VERBOSE){
-        aus << "00000  MESSAGE memory used: " << aurostd::utype2string(memory_usage_percentage,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+        aus << "00000  MESSAGE ram memory used: " << aurostd::utype2string(usage_percentage_ram,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_RAM << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+        aus << "00000  MESSAGE swap memory used: " << aurostd::utype2string(usage_percentage_swap,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_SWAP << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aus << "00000  MESSAGE reading memory again after " << SECONDS_SLEEP_VASP_MONITOR << " second sleep" << endl;
         if(LDEBUG){cerr << aus.str();}
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       aurostd::Sleep(SECONDS_SLEEP_VASP_MONITOR);
-      if(aurostd::GetMemoryUsagePercentage(memory_usage_percentage)){approaching_oom=(memory_usage_percentage>=MEMORY_MAX_USAGE);}
+      if(aurostd::GetMemoryUsagePercentage(usage_percentage_ram,usage_percentage_swap)){approaching_oom=(usage_percentage_ram>=MEMORY_MAX_USAGE_RAM && usage_percentage_swap>=MEMORY_MAX_USAGE_SWAP);}
     }
     if(VERBOSE||approaching_oom){
-      aus << "00000  MESSAGE memory used: " << aurostd::utype2string(memory_usage_percentage,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      aus << "00000  MESSAGE ram memory used: " << aurostd::utype2string(usage_percentage_ram,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_RAM << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      aus << "00000  MESSAGE swap memory used: " << aurostd::utype2string(usage_percentage_swap,2,FIXED_STREAM) << "% (max=" << MEMORY_MAX_USAGE_SWAP << "%)" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       if(LDEBUG){cerr << aus.str();}
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
@@ -4300,6 +4327,20 @@ namespace KBIN {
               aurostd::execute(aus_exec);
             }
             //DX20201005 - MACHINE003 - END
+            //DX20211011 - MACHINE004 - START
+            // HOST MACHINE004_MPICH ------------------------------------------------------------------------
+            if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE004")) {
+              // verbosization
+              aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+              aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_MACHINE004 << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_MACHINE004 << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(_AFLOW_FILE_NAME_,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl;  //CO20170628 - SLOW WITH MEMORY
+              aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+              // run
+              aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
+              aus_exec << MPI_OPTIONS_MACHINE004 << endl;
+              aus_exec << MPI_COMMAND_MACHINE004 << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_MACHINE004 << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << endl;
+              aurostd::execute(aus_exec);
+            }
+            //DX20211011 - MACHINE004 - END
             // HOST DUKE_MATERIALS ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) {
               // verbosization

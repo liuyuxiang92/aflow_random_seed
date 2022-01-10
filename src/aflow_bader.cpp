@@ -2752,7 +2752,7 @@ namespace pflow {
     //string command="java -jar Jmol.jar -ionx";
     string command;
     //Look for JmolData.jar first
-    if((XHOST.hostname == "nietzsche.mems.duke.edu" || XHOST.hostname == "aflowlib.mems.duke.edu") && aurostd::FileExist("/usr/local/bin/JmolData.jar")) {
+    if((XHOST.hostname == "nietzsche.mems.duke.edu" || XHOST.hostname == "aflowlib.duke.edu") && aurostd::FileExist("/usr/local/bin/JmolData.jar")) {
       command = "java -jar /usr/local/bin/JmolData.jar";
       //command="/usr/local/bin/jmol";
     } else if(aurostd::IsCommandAvailable("JmolData.jar")) {

@@ -525,9 +525,13 @@ namespace aurostd {
 // AFLOW_PTHREADS::MULTI_zip
 // ***************************************************************************
 namespace AFLOW_PTHREADS {
-  bool MULTI_zip(vector<string> argv) {
-
-    string function_name = XPID + "AFLOW_PTHREADS::MULTI_zip():";
+  bool MULTI_zip(const vector<string>& argv) {  //CO20211104
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy = XPID + "AFLOW_PTHREADS::MULTI_zip():";
+    if(LDEBUG){
+      cerr << soliloquy << " BEGIN" << endl;
+      cerr << soliloquy << " input=\"" << aurostd::joinWDelimiter(argv," ") << "\"" << endl;
+    }
     stringstream message;
     ostringstream aus;
     _aflags aflags;
@@ -539,8 +543,8 @@ namespace AFLOW_PTHREADS {
     if(XHOST.vflag_control.flag("FILE")) {
       string file_name=XHOST.vflag_control.getattachedscheme("FILE");
       // if(file_name.empty() || file_name=="--f") file_name=argv.at(argv.size()-1);
-      if(!aurostd::FileExist(file_name)) {message << "FILE_NOT_FOUND = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_FILE_NOT_FOUND_);}
-      if( aurostd::FileEmpty(file_name)) {message << "FILE_EMPTY = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_FILE_CORRUPT_);}
+      if(!aurostd::FileExist(file_name)) {message << "FILE_NOT_FOUND = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_NOT_FOUND_);}
+      if( aurostd::FileEmpty(file_name)) {message << "FILE_EMPTY = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_CORRUPT_);}
       if(VERBOSE) {aus << "MMMMM  Loading File = " << file_name << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}
       aurostd::file2vectorstring(file_name,vdirs);
     }
@@ -570,23 +574,13 @@ namespace AFLOW_PTHREADS {
       }
       //    cerr << vdirs.at(i) << endl;
     }
-    //  cerr << vdirs.size() << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //  cerr << vdirs.size() << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
-    int size=aurostd::args2attachedutype<int>(argv,"--size=",(int) (100));if(size<=0) size=1;
+    uint size=aurostd::args2attachedutype<uint>(argv,"--size=",(int) (100));if(size<=0) size=1;
     string prefix=aurostd::args2attachedstring(argv,"--prefix=",(string) "m");
     bool flag_ADD=aurostd::args2flag(argv,"--add");
 
-    //  cerr << prefix << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
-
-    int numzipsCE=(int) ceil(((double) vdirs.size())/((double) size));
-    int numzipsFL=(int) floor(((double) vdirs.size())/((double) size));
-    int numzips=0;
-    if(aurostd::args2flag(argv,"--modonly")) {numzips=numzipsFL;} else {numzips=numzipsCE;}
-
-    uint ishift=1,i=0;
-    vector<string> vcommands;
-    string command;
-    if(!flag_ADD) while(aurostd::FileExist(prefix+"_"+aurostd::utype2string(i+ishift)+".zip")) ishift++;
+    //  cerr << prefix << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
     // delete POTCARs and AECCARs    
     vector<string> vremove;
@@ -602,19 +596,96 @@ namespace AFLOW_PTHREADS {
       }
     }
 
-    // cerr << numzips << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
-    // cerr << sysconf(_SC_ARG_MAX)  << endl;//throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
-    for(i=0;i<(uint) numzips;i++) {
-      command="zip -0rmv "+prefix+"_"+aurostd::utype2string(i+ishift)+"_of_"+aurostd::utype2string(numzips)+".zip"; //SC20200303
-      // command="zip -9rv "+prefix+"_"+aurostd::utype2string(i+ishift)+".zip";
-      for(uint j=0;j<(uint) size;j++) {
-        if(i*size+j < vdirs.size()) {
-          command+=" "+vdirs.at(i*size+j);
+    uint ishift=1;
+    //CO20211104 - ishift not handled very well as it does not check XX_of_YY (as done below)
+    //to handle this carefully would require checking the existence of all the zips, 
+    //shifting duplicate names and all subsequent zips, as well as fixing YY for all zips
+    //too much work... neglect for now until it's needed
+    if(!flag_ADD) while(aurostd::FileExist(prefix+"_"+aurostd::utype2string(ishift)+".zip")) ishift++;
+
+    vector<string> vcommands,vtmpfiles;
+    stringstream command;
+    uint vdirs_size=vdirs.size();
+    uint izip=0;  //SAFETY, maximum number of while loop iteration is vdirs_size (1 zip command per vdirs entry)
+    uint i=0,j=0;
+    stringstream zero_padding;
+    string zip_name="";
+
+    if(1){  //CO20211104 - creates a file of directories to zip and feeds that into the zip command, so the number of zip directories can now be arbitrarily large
+      uint numzipsCE=(uint) ceil(((double) vdirs_size)/((double) size));
+      uint numzipsFL=(uint) floor(((double) vdirs_size)/((double) size));
+      uint numzips=0;
+      if(aurostd::args2flag(argv,"--modonly")) {numzips=numzipsFL;} else {numzips=numzipsCE;}
+
+      vector<string> vdirs2tmp;
+      string tmpfile="";
+
+      for(izip=0;izip<numzips;izip++){
+        vdirs2tmp.clear();
+        for(j=0;j<size && izip*size+j<vdirs_size;j++){vdirs2tmp.push_back(vdirs[izip*size+j]);}
+        tmpfile=aurostd::TmpFileCreate("multi_zip");vtmpfiles.push_back(tmpfile);
+        if(LDEBUG){cerr << soliloquy << " tmpfile[izip=" << izip << "]=" << tmpfile << endl;}
+        aurostd::vectorstring2file(vdirs2tmp,tmpfile);
+        if(aurostd::FileEmpty(tmpfile)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Tmp file empty: "+tmpfile,_FILE_CORRUPT_);}
+        aurostd::StringstreamClean(zero_padding);
+        zero_padding << std::setfill('0') << std::setw(aurostd::getZeroPadding(numzips)) << izip+ishift;
+        zip_name=prefix+"_"+zero_padding.str()+"_of_"+aurostd::utype2string(numzips)+".zip"; //SC20200303 //CO20211103
+        command << "cat " << tmpfile << " | ";
+        command << "zip -0rmv ";  //-9rmv
+        command << zip_name;
+        command << " -@"; //https://unix.stackexchange.com/questions/508247/argument-list-too-long-when-zipping-large-list-of-certain-files-in-a-folder
+        command << " | grep " << _AFLOWIN_;
+        vcommands.push_back(command.str());aurostd::StringstreamClean(command);
+      }
+    }
+    if(0){  //CO20211104 - obsolete, this method relies on having a fixed zip command line length, no longer necessary with new zip file approach (above)
+      //CO20211104 - zip commands that were too long because of number of directories would break (not run)
+      //CO20200825 - modifying the loop to check command LENGTH vs. number of arguments
+      string var_n_total_zips="VARNTOTALZIPS";  //CO20211103 - placeholder until we get total count
+      while(i<vdirs_size && izip<vdirs_size){  //new loop for zip command, limit not the number of inputs, but the size of the overall command
+        zip_name=prefix+"_"+aurostd::utype2string((izip++)+ishift)+"_of_"+var_n_total_zips+".zip"; //SC20200303 //CO20211103
+        command << "zip -0rmv ";  //-9rmv
+        command << zip_name;
+        j=0;
+        while(i<vdirs_size && j<size){
+          command << " " << vdirs[i++];j++;
+          if(command.str().size()>=_AFLOW_MAX_ARGV_ || i>=vdirs_size || j>=size){
+            command << " | grep " << _AFLOWIN_;
+            vcommands.push_back(command.str());aurostd::StringstreamClean(command);
+            break;
+          }
         }
       }
-      command+=" | grep aflow.in";
-      vcommands.push_back(command);
+      uint vcommands_size=vcommands.size();
+      string zip_name_new="";
+      for(i=0;i<vcommands_size;i++){
+        zip_name=prefix+"_"+aurostd::utype2string(i+ishift)+"_of_"+var_n_total_zips+".zip";
+        aurostd::StringstreamClean(zero_padding);
+        zero_padding << std::setfill('0') << std::setw(aurostd::getZeroPadding(vcommands_size)) << i+ishift;
+        zip_name_new=prefix+"_"+zero_padding.str()+"_of_"+aurostd::utype2string(vcommands_size)+".zip"; //CO20211103 - replace placeholder with actual count
+        if(LDEBUG){cerr << soliloquy << " " << zip_name << " -> " << zip_name_new << endl;}
+        aurostd::StringSubst(vcommands[i],zip_name,zip_name_new);
+      }
     }
+    //verbose
+    for(i=0;i<vcommands.size();i++){cerr << soliloquy << " vcommands[i=" << i << "]=\"" << vcommands[i] << "\"" << endl;}
+    cerr << soliloquy << " last command=\"" << command.str() << "\"" << endl; //sanity check that we didn't leave anything out
+
+    //[CO20211104 - OBSOLETE]// cerr << numzips << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //[CO20211104 - OBSOLETE]// cerr << sysconf(_SC_ARG_MAX)  << endl;//throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //[CO20211104 - OBSOLETE]for(i=0;i<(uint) numzips;i++) {
+    //[CO20211104 - OBSOLETE]  command="zip -0rmv "+prefix; //SC20200303  //CO20211103
+    //[CO20211104 - OBSOLETE]  if(numzips>1){command+="_"+aurostd::utype2string(i+ishift)+"_of_"+aurostd::utype2string(numzips);} //SC20200303 //CO20211103
+    //[CO20211104 - OBSOLETE]  command+=".zip"; //SC20200303 //CO20211103
+    //[CO20211104 - OBSOLETE]  // command="zip -9rv "+prefix+"_"+aurostd::utype2string(i+ishift)+".zip";
+    //[CO20211104 - OBSOLETE]  for(uint j=0;j<(uint) size;j++) {
+    //[CO20211104 - OBSOLETE]    if(i*size+j < vdirs.size()) {
+    //[CO20211104 - OBSOLETE]      command+=" "+vdirs.at(i*size+j);
+    //[CO20211104 - OBSOLETE]    }
+    //[CO20211104 - OBSOLETE]  }
+    //[CO20211104 - OBSOLETE]  command+=" | grep aflow.in";
+    //[CO20211104 - OBSOLETE]  vcommands.push_back(command);
+    //[CO20211104 - OBSOLETE]}
 
     //CO20200825 - adding --np=XX functionality
     int np=1;
@@ -625,6 +696,8 @@ namespace AFLOW_PTHREADS {
 
     //  for(uint i=0;i<vcommands.size();i++) aurostd::execute(vcommands.at(i));
     aurostd::multithread_execute(vcommands,np,true); //CO20200731 - PTHREADS_DEFAULT doesn't always work
+
+    aurostd::RemoveFile(vtmpfiles); //CO20211104
 
     return TRUE;
   }

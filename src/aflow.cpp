@@ -947,6 +947,22 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   calculated = aurostd::areaPointsOnPlane(ipoints);
   check_similar(calculated, expected, check_function, check_description, check_num, passed_checks, results);
 
+  // ---------------------------------------------------------------------------
+  // Check | double2fraction conversion //DX20210908
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::double2fraction()";
+  check_description = "convert a double to a fraction.";
+
+  double test_double = 1.625;
+  int numerator=1, denominator=1;
+  string answer = "13/8";
+  aurostd::double2fraction(test_double,numerator,denominator);
+  stringstream result_ss; result_ss << numerator << "/" << denominator;
+
+  check_num++;
+  check_equal(result_ss.str(), answer, check_function, check_description, check_num, passed_checks, results);
+
   // present overall result
   return display_result(passed_checks, check_num, task_description, results, function_name, FileMESSAGE, oss);
 }

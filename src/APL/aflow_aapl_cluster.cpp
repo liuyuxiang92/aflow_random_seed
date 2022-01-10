@@ -147,7 +147,11 @@ namespace apl {
     nifcs = aurostd::powint(3, order);
     scell = supercell.getSupercellStructure();
     pcell = supercell.getInputStructure();
-    sc_dim = supercell.scell;
+    sc_dim = supercell.scell_dim;
+    if (sc_dim.rows != 3) {
+      message << "Cannot use non-diagonal supercells for AAPL.";
+      throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_ILLEGAL_);
+    }
     pc2scMap = supercell._pc2scMap;
     sc2pcMap = supercell._sc2pcMap;
     symmetry_map = getSymmetryMap();
@@ -169,6 +173,15 @@ namespace apl {
     ineq_clusters.clear();
     ineq_distortions.clear();
     linear_combinations.clear();
+  }
+
+  //xStream initializers
+  void ClusterSet::initialize(ostream& oss) {
+    xStream::initialize(oss);
+  }
+
+  void ClusterSet::initialize(ofstream& mf, ostream& oss) {
+    xStream::initialize(mf, oss);
   }
 
 }  // namespace apl

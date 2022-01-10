@@ -18,6 +18,8 @@
 #ifndef _AFLOW_POCC_H_
 #define _AFLOW_POCC_H_
 
+#include "APL/aflow_apl.h"
+
 //precision defines tol and paddings
 //const int _AFLOW_POCC_PRECISION_ = 8;    //moved to aflow.h
 //tolerances
@@ -203,8 +205,11 @@ namespace pocc {
     bool operator<(const POccSuperCellSet& other) const;
     unsigned long long int getDegeneracy() const;
     const POccSuperCell& getSuperCell() const;
-    double getHNFIndex() const;
+    double getHNFIndex() const; //ME20211006
+    xmatrix<int> getHNFMatrix() const;
     double getSiteConfigIndex() const;
+    vector<vector<int> > getSiteConfig() const; //ME20211006
+    xstructure getStructure() const; //ME20211006
     double getUFFEnergy() const;
 
     vector<POccSuperCell> m_psc_set;
@@ -535,6 +540,12 @@ namespace pocc {
       xDOSCAR m_xdoscar;
       vector<double> m_Egap_DOS,m_Egap;
       double m_Egap_DOS_net,m_Egap_net;
+      vector<string> m_vfilenames_plasm;  //plasmonics
+      vector<string> m_veps_plasm; //plasmonics
+      vector<xPLASMONICS> m_vxplasm;  //plasmonics
+      //vector<vector<double> > m_venergy_plasm; //plasmonics
+      //vector<vector<double> > m_veels_plasm;   //plasmonics
+      //vector<vector<xcomplex<double> > > m_vdielectric_plasm;  //plasmonics  //contains both real and imaginary parts
 
       //initializers
       bool initialize(ostream& oss);
@@ -625,6 +636,10 @@ namespace pocc {
       void setKFlags(const _kflags& Kflags);                                    //standard _kflags
       void setVFlags(const _vflags& Vflags);                                    //standard _vflags
 
+      // Modules
+      bool inputFilesFoundAnywhereAPL();  //ME20211004
+      void createModuleAflowIns(const _xvasp& xvasp, const string& MODULE);  //ME20211004
+
       void writePARTCAR() const;
       void generateStructures(const _xvasp& xvasp);
       xstructure createXStructure(const POccSuperCell& psc,int n_hnf=0,unsigned long long int hnf_count=0,unsigned long long int types_config_permutations_count=0,bool clean_structure=false,bool primitivize=false);
@@ -641,6 +656,7 @@ namespace pocc {
       string getARUNString(unsigned long long int i);
       xstructure getUniqueSuperCell(unsigned long long int i);
       vector<xstructure> getUniqueDerivativeStructures();
+      vector<uint> getMapToPARTCAR(unsigned long long int i, const xstructure& xstr);  //ME20211006
       unsigned long long int getUniqueSuperCellsCount() const;
       //bool printUniqueDerviativeStructures();
       //void resetMaxSLRadius();
@@ -659,9 +675,11 @@ namespace pocc {
       void setEFA();
       void calculateRELAXProperties(double temperature=300);
       void calculateSTATICProperties(double temperature=300);
+      void calculatePlasmonicProperties(double temperature=300);
       void setPOccStructureProbabilities(double temperature=300); //room temperature
       string getTemperatureString(double temperature) const;
       void setAvgDOSCAR(double temperature=300);  //depends on probabilities
+      void setAvgPlasmonicData(double temperature=300);  //depends on probabilities
       void plotAvgDOSCAR(double temperature) const; //no default temperature, needs to be set inside setAvgDOSCAR()
       void plotAvgDOSCAR(const string& doscar_path,const string& directory=".") const;
       void plotAvgDOSCAR(const xDOSCAR& xdos,double temperature,const string& directory=".") const;
@@ -752,6 +770,13 @@ namespace pocc {
       void generateDebyeThermalProperties(vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom); //CT20200722
       void getDebyeThermalProperties(vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom);
       void getAverageDebyeThermalProperties(const vector<double>& v_temperatures, bool agl_write_full_results, vector<double>& Debye_temperature, vector<double>& Debye_acoustic, vector<double>& Gruneisen, vector<double>& Cv300K, vector<double>& Cp300K, vector<double>& Fvib300K_atom, vector<double>& Fvib300K_cell, vector<double>& Svib300K_atom, vector<double>& Svib300K_cell, vector<double>& kappa300K, vector<vector<double> >& agl_temperatures, vector<vector<double> >& agl_gibbs_energies_atom, vector<vector<double> >& agl_vibrational_energies_atom);
+
+      // ME20210927 - APL functions
+      void calculatePhononPropertiesAPL(const vector<double>& v_temperatures);
+      vector<apl::PhononCalculator> initializePhononCalculators();
+      vector<xDOSCAR> getPhononDoscars(vector<apl::PhononCalculator>& vphcalc, xoption& dosopts, vector<int>& vexclude);
+      void calculatePhononDOSThread(int startIndex, int endIndex, const vector<uint>& vcalc, const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos);
+      xDOSCAR getAveragePhononDos(double T, const vector<xDOSCAR>& vxdos);
   };
 } // namespace pocc
 

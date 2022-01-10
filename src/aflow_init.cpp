@@ -209,7 +209,7 @@ namespace init {
     XHOST.hostname=os.nodename;//aurostd::execute2string(string("hostname"));
     if(XHOST.hostname=="nietzsche") XHOST.hostname="nietzsche.mems.duke.edu";
     if(XHOST.hostname=="materials") XHOST.hostname="materials.duke.edu";
-    if(XHOST.hostname=="aflowlib") XHOST.hostname="aflowlib.mems.duke.edu";
+    if(XHOST.hostname=="aflowlib") XHOST.hostname="aflowlib.duke.edu";
     if(XHOST.hostname=="quser") XHOST.hostname="quser.materials.duke.edu";  //CO20200526
     if(INIT_VERBOSE) oss << aurostd::PaddedPOST("hostname = ",depth_short) << XHOST.hostname << endl;
     if(AFLOW_BlackList(XHOST.hostname)) {
@@ -227,7 +227,7 @@ namespace init {
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [7]" << endl;
     XHOST.AFLOW_MATERIALS_SERVER=AFLOW_MATERIALS_SERVER_DEFAULT;XHOST.AFLOW_WEB_SERVER=AFLOW_WEB_SERVER_DEFAULT; // DEFAULT
     if(aurostd::substring2bool(XHOST.hostname,"nietzsche")) {XHOST.AFLOW_MATERIALS_SERVER=AFLOW_MATERIALS_SERVER_DEFAULT;XHOST.AFLOW_WEB_SERVER=AFLOW_WEB_SERVER_DEFAULT;}
-    if(aurostd::substring2bool(XHOST.hostname,"aflowlib")) {XHOST.AFLOW_MATERIALS_SERVER="aflowlib.mems.duke.edu";XHOST.AFLOW_WEB_SERVER="aflowlib.mems.duke.edu";}
+    if(aurostd::substring2bool(XHOST.hostname,"aflowlib")) {XHOST.AFLOW_MATERIALS_SERVER="aflowlib.duke.edu";XHOST.AFLOW_WEB_SERVER="aflowlib.duke.edu";}
     if(INIT_VERBOSE) {
       oss << "--- SERVER ------------------ " << endl;
       oss << aurostd::PaddedPOST("XHOST.AFLOW_MATERIALS_SERVER = ",depth_short) << XHOST.AFLOW_MATERIALS_SERVER << endl;
@@ -582,7 +582,7 @@ namespace init {
     // some other technique to get MARYLOU
 
     // check for APENNSY_USE_SERVER/AFLOWLIB
-    if(XHOST.hostname=="nietzsche.mems.duke.edu" || XHOST.hostname=="materials.duke.edu" || XHOST.hostname=="aaaaflowlib.mems.duke.edu") {
+    if(XHOST.hostname=="nietzsche.mems.duke.edu" || XHOST.hostname=="materials.duke.edu" || XHOST.hostname=="aflowlib.duke.edu") {
       XHOST.APENNSY_USE_SERVER=TRUE;XHOST.APENNSY_USE_LIBRARY=FALSE;XHOST.APENNSY_SERVER_AFLOWLIB_ORG=FALSE;
     } else {
       XHOST.APENNSY_USE_SERVER=FALSE;XHOST.APENNSY_USE_LIBRARY=FALSE;XHOST.APENNSY_SERVER_AFLOWLIB_ORG=TRUE;
@@ -2178,7 +2178,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   int ncpus=0;
   nloop=0;
   string memory_string="";
-  double memory_usage_percentage=0;
+  double usage_percentage_ram=0.0,usage_percentage_swap=0.0;
 
   while((AFLOW_VASP_instance_running() || (nloop++)<NCOUNTS_WAIT_MONITOR) && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
     GetVASPBinaryFromLOCK(xvasp.Directory,vasp_bin,ncpus);
@@ -2229,16 +2229,16 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
     KBIN::VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,xmonitor,FileMESSAGE);
 
     //check memory again, it's possible it floated above the threshold only for a second
-    memory_usage_percentage=0.0;
+    usage_percentage_ram=0.0;usage_percentage_swap=0.0;
     if(0){  //do not turn off MEMORY because it fails GetMemory(), it's possible MEMORY was triggered for other reasons (e.g., FROZEN_CALC)
       if(xwarning.flag("MEMORY")){
         bool ignore_memory=false;
-        if(aurostd::GetMemoryUsagePercentage(memory_usage_percentage)==false){
+        if(aurostd::GetMemoryUsagePercentage(usage_percentage_ram,usage_percentage_swap)==false){
           message << "ignoring xwarning.flag(\"MEMORY\"), could not retrieve memory status";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
           ignore_memory=true;
         }else{
-          if(memory_usage_percentage<MEMORY_MAX_USAGE){
-            message << "ignoring xwarning.flag(\"MEMORY\"), memory usage dropped below threshold ("+aurostd::utype2string(memory_usage_percentage,2,FIXED_STREAM)+"% memory usage)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+          if(usage_percentage_ram<MEMORY_MAX_USAGE_RAM && usage_percentage_swap<MEMORY_MAX_USAGE_SWAP){
+            message << "ignoring xwarning.flag(\"MEMORY\"), memory usage dropped below threshold ("+aurostd::utype2string(usage_percentage_ram,2,FIXED_STREAM)+"% ram usage,"+aurostd::utype2string(usage_percentage_swap,2,FIXED_STREAM)+"% swap usage)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
             ignore_memory=true;
           }
         }
@@ -2289,8 +2289,8 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
           //so write out "AFLOW ERROR: AFLOW_MEMORY" so it gets caught in the --run instance
           if(xwarning.flag("MEMORY")){
             memory_string=" "+string(AFLOW_MEMORY_TAG); //pre-pending space to match formatting
-            if(aurostd::GetMemoryUsagePercentage(memory_usage_percentage)){
-              memory_string+=" ("+aurostd::utype2string(memory_usage_percentage,2,FIXED_STREAM)+"% memory usage)";  //CO20210315 - use fixed stream here, since we'll have two sig figs before decimal, and two after (99.99%)
+            if(aurostd::GetMemoryUsagePercentage(usage_percentage_ram,usage_percentage_swap)){
+              memory_string+=" ("+aurostd::utype2string(usage_percentage_ram,2,FIXED_STREAM)+"% ram usage,"+aurostd::utype2string(usage_percentage_swap,2,FIXED_STREAM)+"% swap usage)";  //CO20210315 - use fixed stream here, since we'll have two sig figs before decimal, and two after (99.99%)
             }
             memory_string+="\n";
             aurostd::string2file(memory_string,xvasp.Directory+"/"+DEFAULT_VASP_OUT,"APPEND");
@@ -2990,6 +2990,45 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_FREE_CELL_QHA_300K","number");
     //AS20201207 END
 
+    //ME20210927 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENERGY_FREE_VIBRATIONAL_ATOM_APL_300K","energy_free_vibrational_atom_apl_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_FREE_VIBRATIONAL_ATOM_APL_300K","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_FREE_VIBRATIONAL_ATOM_APL_300K","number");
+    //ME20210927 END
+    //ME20210927 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENERGY_FREE_VIBRATIONAL_CELL_APL_300K","energy_free_vibrational_cell_apl_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_FREE_VIBRATIONAL_CELL_APL_300K","eV/cell");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_FREE_VIBRATIONAL_CELL_APL_300K","number");
+    //ME20210927 END
+
+    //ME20210927 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENERGY_INTERNAL_VIBRATIONAL_ATOM_APL_300K","energy_internal_vibrational_atom_apl_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_INTERNAL_VIBRATIONAL_ATOM_APL_300K","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_INTERNAL_VIBRATIONAL_ATOM_APL_300K","number");
+    //ME20210927 END
+    //ME20210927 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENERGY_INTERNAL_VIBRATIONAL_CELL_APL_300K","energy_internal_vibrational_cell_apl_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_INTERNAL_VIBRATIONAL_CELL_APL_300K","eV/cell");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_INTERNAL_VIBRATIONAL_CELL_APL_300K","number");
+    //ME20210927 END
+
+    //ME20210927 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENERGY_ZERO_POINT_ATOM_APL","energy_zero_point_atom_apl");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_ZERO_POINT_ATOM_APL","eV/atom");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_ZERO_POINT_ATOM_APL","number");
+    //ME20210927 END
+    //ME20210927 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENERGY_ZERO_POINT_CELL_APL","energy_zero_point_cell_apl");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENERGY_ZERO_POINT_CELL_APL","eV/cell");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENERGY_ZERO_POINT_CELL_APL","number");
+    //ME20210927 END
+
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:ENTHALPY_ATOM","enthalpy_atom");
     XHOST.vschema.push_attached("SCHEMA::UNIT:ENTHALPY_ATOM","eV/atom");
@@ -3045,6 +3084,19 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::TYPE:ENTROPY_FORMING_ABILITY","number");
     nschema++;
     //CO20200829 END
+
+    //ME20210927 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENTROPY_VIBRATIONAL_ATOM_APL_300K","entropy_vibrational_atom_apl_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTROPY_VIBRATIONAL_ATOM_APL_300K","meV/(K atom)");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENTROPY_VIBRATIONAL_ATOM_APL_300K","number");
+    //ME20210927 END
+    //ME20210927 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:ENTROPY_VIBRATIONAL_CELL_APL_300K","entropy_vibrational_cell_apl_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:ENTROPY_VIBRATIONAL_CELL_APL_300K","meV/(K cell)");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:ENTROPY_VIBRATIONAL_CELL_APL_300K","number");
+    //ME20210927 END
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:ENTROPIC_TEMPERATURE","entropic_temperature");
@@ -3121,6 +3173,17 @@ namespace init {
     XHOST.vschema.push_attached("SCHEMA::UNIT:HEAT_CAPACITY_CV_CELL_QHA_300K","kB/cell");
     XHOST.vschema.push_attached("SCHEMA::TYPE:HEAT_CAPACITY_CV_CELL_QHA_300K","number");
     //AS20201207 END
+
+    //ME20210927 BEGIN
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:HEAT_CAPACITY_CV_ATOM_APL_300K","heat_capacity_Cv_atom_apl_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:HEAT_CAPACITY_CV_ATOM_APL_300K","kB/cell");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:HEAT_CAPACITY_CV_ATOM_APL_300K","number");
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema.push_attached("SCHEMA::NAME:HEAT_CAPACITY_CV_CELL_APL_300K","heat_capacity_Cv_cell_apl_300K");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:HEAT_CAPACITY_CV_CELL_APL_300K","kB/cell");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:HEAT_CAPACITY_CV_CELL_APL_300K","number");
+    //ME20210927 END
 
     // schema is CAPITAL, content is not necessarily
     XHOST.vschema.push_attached("SCHEMA::NAME:KPOINTS","kpoints");

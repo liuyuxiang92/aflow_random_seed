@@ -2034,7 +2034,16 @@ namespace aurostd {
   string CleanFileName(const string& fileIN) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(fileIN.empty()){return fileIN;}
-    string fileOUT=fileIN;
+    // ME20211001
+    // Remove any control characters (below ASCII 32) while copying. This is useful
+    // when fileIN is read from a file, which can have all sorts of junk and causes
+    // FileExist to break. We cannot use RemoveControlCodeCharactersFromString()
+    // because it keeps tabs and linebreaks and cannot use CleanStringASCII because
+    // it keeps control characters.
+    string fileOUT="";
+    for (uint i = 0; i < fileIN.size(); i++) {
+      if (fileIN[i] > 31) fileOUT += fileIN[i];
+    }
     if(LDEBUG) cerr << "aurostd::CleanFileName: " << fileOUT << endl;
     // [OBSOLETE] interferes with ~/.aflow.rc   if(aurostd::substring2bool(fileOUT,"~/")) aurostd::StringSubst(fileOUT,"~/","/home/"+XHOST.user+"/");
     //ME20200922 - Cleaning // must be in a while loop or it won't clean e.g. ///
@@ -2053,7 +2062,16 @@ namespace aurostd {
   // fix file names from obvious things
   string ProperFileName(const string& fileIN) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string fileOUT=fileIN;
+    // ME20211001
+    // Remove any control characters (below ASCII 32) while copying. This is useful
+    // when fileIN is read from a file, which can have all sorts of junk and causes
+    // FileExist to break. We cannot use RemoveControlCodeCharactersFromString()
+    // because it keeps tabs and linebreaks and cannot use CleanStringASCII because
+    // it keeps control characters.
+    string fileOUT="";
+    for (uint i = 0; i < fileIN.size(); i++) {
+      if (fileIN[i] > 31) fileOUT += fileIN[i];
+    }
     if(LDEBUG) cerr << "aurostd::ProperFileName: " << fileOUT << endl;
     aurostd::StringSubst(fileOUT,"//",".");
     aurostd::StringSubst(fileOUT,"/",".");
@@ -2465,20 +2483,28 @@ namespace aurostd {
     return sizeout;
   }
 
-  bool GetMemoryUsagePercentage(double& memory_usage_percentage){ //CO20210601
+  bool GetMemoryUsagePercentage(double& usage_percentage_ram,double& usage_percentage_swap){ //CO20210601
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::GetMemoryUsagePercentage():";
 
-    unsigned long long int memory_free=0,memory_total=0;
-    memory_usage_percentage=0.0;
-    bool memory_read=aurostd::GetMemory(memory_free,memory_total);
+    unsigned long long int free_ram=0,total_ram=0;
+    unsigned long long int free_swap=0,total_swap=0;
+    usage_percentage_ram=0.0;usage_percentage_swap=0.0;
+    bool memory_read=aurostd::GetMemory(free_ram,total_ram,free_swap,total_swap);
     if(memory_read){
-      memory_usage_percentage=100.0*(((double)(memory_total-memory_free))/((double)(memory_total)));
+      if(total_ram>0){usage_percentage_ram=100.0*(((double)(total_ram-free_ram))/((double)(total_ram)));}
+      if(total_swap>0){usage_percentage_swap=100.0*(((double)(total_swap-free_swap))/((double)(total_swap)));}  //some qrats nodes have no swap
       if(LDEBUG){
-        cerr << soliloquy << " memory_free=" << memory_free << endl;
-        cerr << soliloquy << " memory_used=" << memory_total-memory_free << endl;
-        cerr << soliloquy << " memory_total=" << memory_total << endl;
-        cerr << soliloquy << " memory_usage_percentage=" << memory_usage_percentage << endl;
+        cerr << soliloquy << " [date=" << aflow_get_time_string() << "]" << endl; //helps debugging
+        cerr << soliloquy << " free_ram=" << free_ram << endl;
+        cerr << soliloquy << " used_ram=" << total_ram-free_ram << endl;
+        cerr << soliloquy << " total_ram=" << total_ram << endl;
+        cerr << soliloquy << " usage_percentage_ram=" << usage_percentage_ram << endl;
+        cerr << soliloquy << " free_swap=" << free_swap << endl;
+        cerr << soliloquy << " used_swap=" << total_swap-free_swap << endl;
+        cerr << soliloquy << " total_swap=" << total_swap << endl;
+        cerr << soliloquy << " usage_percentage_swap=" << usage_percentage_swap << endl;
+        cerr << endl; //helps debugging
       }
     }
     else{
@@ -2487,7 +2513,7 @@ namespace aurostd {
     return memory_read;
   }
 
-  bool GetMemory(unsigned long long int& free,unsigned long long int& total){ //CO20210315 - only works for linux: needs `free` command
+  bool GetMemory(unsigned long long int& free_ram,unsigned long long int& total_ram,unsigned long long int& free_swap,unsigned long long int& total_swap){ //CO20210315 - only works for linux: needs `free` command
     //https://www.howtogeek.com/456943/how-to-use-the-free-command-on-linux/
     //will grab the total and the free
     //the free is the memory unused by anything
@@ -2502,20 +2528,40 @@ namespace aurostd {
     if(!aurostd::IsCommandAvailable("free")){return false;}
     string output=aurostd::execute2string("free");
     if(LDEBUG){cerr << soliloquy << " free output:" << endl << output << endl;}
+    //on most linux machines:
     //                            total        used        free      shared  buff/cache   available
     //              Mem:      395654628    41363940    30948848     4106252   323341840   349143640
     //              Swap:       2097148           0     2097148
+    //on qrats:
+    //                          total       used       free     shared    buffers     cached
+    //             Mem:     264523076  255134588    9388488         36    1745836  232705576
+    //             -/+ buffers/cache:   20683176  243839900
+    //             Swap:      4194300      71436    4122864
     vector<string> vlines;
     aurostd::string2vectorstring(output,vlines);
-    if(vlines.size()<2){return false;}
-    if(vlines[1].find("Mem:")==string::npos){return false;}
+    if(vlines.size()<3){return false;}
     vector<string> vtokens;
-    aurostd::string2tokens(vlines[1],vtokens," ");
+    uint iline=0;
+    //ram
+    iline=1;
+    if(vlines[iline].find("Mem:")==string::npos){return false;}
+    aurostd::string2tokens(vlines[iline],vtokens," ");
     if(!aurostd::isfloat(vtokens[1])){return false;}
-    total=aurostd::string2utype<unsigned long long int>(vtokens[1]);
+    total_ram=aurostd::string2utype<unsigned long long int>(vtokens[1]);
     if(!aurostd::isfloat(vtokens[3])){return false;}
-    free=aurostd::string2utype<unsigned long long int>(vtokens[3]);
-    if(LDEBUG){cerr << soliloquy << " free=" << free << " total=" << total << endl;}
+    free_ram=aurostd::string2utype<unsigned long long int>(vtokens[3]);
+    if(LDEBUG){cerr << soliloquy << " free_ram=" << free_ram << " total_ram=" << total_ram << endl;}
+    //swap
+    iline=2;
+    if(vlines[iline].find("Swap:")==string::npos){iline++;}  //try next line
+    if(vlines[iline].find("Swap:")==string::npos){return false;}
+    aurostd::string2tokens(vlines[iline],vtokens," ");
+    if(!aurostd::isfloat(vtokens[1])){return false;}
+    total_swap=aurostd::string2utype<unsigned long long int>(vtokens[1]);
+    if(!aurostd::isfloat(vtokens[3])){return false;}
+    free_swap=aurostd::string2utype<unsigned long long int>(vtokens[3]);
+    if(LDEBUG){cerr << soliloquy << " free_swap=" << free_swap << " total_swap=" << total_swap << endl;}
+    //
     return true;
   }
 
@@ -5383,6 +5429,10 @@ namespace aurostd {
     int index=-1;
     return WithinList(list, input, index, sorted);
   }
+  bool WithinList(const deque<string>& list,const string& input,bool sorted) { //CO20181010
+    int index=-1;
+    return WithinList(aurostd::deque2vector(list), input, index, sorted);
+  }
   bool WithinList(const vector<int>& list,int input,bool sorted) {  //CO20181010
     //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
     //return false;  OBSOLETE ME20190905
@@ -6158,146 +6208,6 @@ namespace aurostd {
       output.append(1, input[i]);
     }
     return output;
-  }
-}
-
-// ***************************************************************************
-// FUNCTION DOUBLE2FRACTION
-//DX20190824 (moved from aflow_symmetry_spacegroup_functions.cpp)
-// hard-coded variant until generic converter is integrated
-
-// ******************************************************************************
-// dbl2frac Double to Fraction (Overloaded)
-// ******************************************************************************
-namespace aurostd {
-  string dbl2frac(double a, bool sign_prefix) {
-
-    string soliloquy = "aurostd::dbl2frac()";
-    stringstream message;
-
-    string out = ""; //DX20200427 - missing initialization
-    bool neg = false;
-    double tol = _ZERO_TOL_;
-    if(a < 0) {
-      neg = true;
-      a = aurostd::abs(a);
-    }
-    if(aurostd::abs(a) < tol) { //DX20200427 - if not else if
-      out = "0";
-    }
-    else if(aurostd::abs(a - .25) < tol) {
-      out = "1/4";
-    }
-    else if(aurostd::abs(a - .5) < tol) {
-      out = "1/2";
-    }
-    else if(aurostd::abs(a - .75) < tol) {
-      out = "3/4";
-    }
-    else if(aurostd::abs(a - (1.0 / 3.0)) < tol) {
-      out = "1/3";
-    }
-    else if(aurostd::abs(a - (2.0 / 3.0)) < tol) {
-      out = "2/3";
-    }
-    else if(aurostd::abs(a - (1.0 / 6.0)) < tol) {
-      out = "1/6";
-    }
-    else if(aurostd::abs(a - (5.0 / 6.0)) < tol) { //DX20180726 - added
-      out = "5/6"; //DX20180726 - added
-    } //DX20180726 - added
-    else if(aurostd::abs(a - (1.0 / 8.0)) < tol) {
-      out = "1/8";
-    }
-    else if(aurostd::abs(a - (3.0 / 8.0)) < tol) {
-      out = "3/8";
-    }
-    else if(aurostd::abs(a - (5.0 / 8.0)) < tol) {
-      out = "5/8";
-    }
-    else if(aurostd::abs(a - (7.0 / 8.0)) < tol) {
-      out = "7/8";
-    }
-    else if(aurostd::abs(a - (1.0 / 12.0)) < tol) { //DX20180726 - added
-      out = "1/12"; //DX20180726 - added
-    } //DX20180726 - added
-    else if(aurostd::abs(a - (5.0 / 12.0)) < tol) { //DX20180726 - added
-      out = "5/12"; //DX20180726 - added
-    } //DX20180726 - added
-    else if(aurostd::abs(a - (7.0 / 12.0)) < tol) { //DX20180726 - added
-      out = "7/12"; //DX20180726 - added
-    } //DX20180726 - added
-    else if(aurostd::abs(a - (11.0 / 12.0)) < tol) { //DX20180726 - added
-      out = "11/12"; //DX20180726 - added
-    } //DX20180726 - added
-    else {
-      //DX20200427 [should not throw if not found, just return decimal] message << "Could not find hard-coded fraction for the double " << a << ".";
-      //DX20200427 [should not throw if not found, just return decimal] throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
-      out = aurostd::utype2string<double>(a);
-    }
-    if(sign_prefix){
-      if(neg == true) {
-        out = "-" + out;
-      } 
-      else {
-        out = "+" + out;
-      }
-    }
-    return out;
-  }
-} //namespace SYM
-
-// ******************************************************************************
-// dbl2frac Double to Fraction //DX20200313
-// ******************************************************************************
-namespace aurostd {
-  double frac2dbl(const string& str) {
-
-    // converts fraction to double
-
-    // --------------------------------------------------------------------------
-    // parse tokens
-    vector<string> tokens;
-    uint field_count = aurostd::string2tokens(str,tokens,"/");
-
-    // --------------------------------------------------------------------------
-    // expects two fields
-    if(field_count == 1){ // not slash
-      if(aurostd::isfloat(str)){ //DX20200424
-        return aurostd::string2utype<double>(str);
-      }
-      else{ //DX20200424
-        string function_name = "aurostd::frac2dbl():";
-        stringstream message; message << "The input is not a numeric: str = " << str;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
-      }
-    }
-    else if(field_count != 2){
-      string function_name = "aurostd::frac2dbl():";
-      stringstream message; message << "Expect two fields, i.e., numerator and denominator: str = " << str;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
-    }
-
-    // --------------------------------------------------------------------------
-    // protect against non-numeric values //DX20200424
-    if(!aurostd::isfloat(tokens[0]) || !aurostd::isfloat(tokens[1])){
-      string function_name = "aurostd::frac2dbl():";
-      stringstream message; message << "The input is not a numeric: str = " << str;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
-    }
-
-    double numerator = aurostd::string2utype<double>(tokens[0]);
-    double denominator = aurostd::string2utype<double>(tokens[1]);
-
-    // --------------------------------------------------------------------------
-    // protect against division by zero
-    if(aurostd::isequal(denominator,_ZERO_TOL_)){
-      string function_name = "aurostd::frac2dbl():";
-      stringstream message; message << "Denominator is zero: " << denominator;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
-    }
-
-    return numerator/denominator;
   }
 }
 

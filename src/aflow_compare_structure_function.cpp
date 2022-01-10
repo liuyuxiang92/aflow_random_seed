@@ -1811,7 +1811,7 @@ void XtalFinderCalculator::loadStructuresFromStringstream(
   for(uint i=0;i<structure_lines.size();i++){
     if(LDEBUG) {cerr << "compare:: loading " << i << "/" << structure_lines.size() << endl;}
 
-    stringstream designation; designation << "file structure # " << i << "/" << start_string.size();
+    stringstream designation; designation << "file structure # " << i+1 << "/" << start_string.size();  //CO20211118 - otherwise last structure is 81/82
     xstructure xstr;
     compare::generateStructure("input geometry", structure_lines[i], relaxation_step, xstr, *p_oss);
 

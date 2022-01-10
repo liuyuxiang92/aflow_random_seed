@@ -1,7 +1,28 @@
-3.2.12 - 2021/XX/XX
+3.2.13 - 2021/XX/XX
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz
+        -- parallelized KBIN::CompressDirectory() (CO)
+3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
+        -- Added python module install functionality. (ME)
+        -- Added POCC+APL workflow (ME)
+        -- Added LIB2RAW for APL (ME)
+        -- added function to move aflow run to another directory (DX)
+        -- added machine settings for machine004 (DX)
+        -- fixed gcc warning (version 4) in SYMBOLICCPLUSPLUS/ (DX)
         -- patching populateXVASP() bug for BANDS_LATTICE and BANDS_GRID (CO)
         -- patching xoption::options2entry() clear() issues (CO)
+        -- added swap memory check to aurostd::GetMemory() and aurostd::GetMemoryUsagePercentage() (CO)
+        -- patched --qmvasp command (CO)
+        -- adding --contcar_save_outcar_complete to KBIN::Clean() (CO)
+        -- NBANDS equation typo patch, returning old NBANDS behavior (CO)
+        -- fixing some error="NBANDS" patches (CO)
+        -- patching GetStoich() bug with pocc structures (round-off printing errors) (CO)
+        -- adding KPOINTS=GAMMA_ODD to NELM patches (CO)
+        -- added dielectric analysis in POCC (CO)
+        (AFLOW: aconvasp_main.cpp, aflow.cpp, aflow.h, aflowlib.h, aflowlib_libraries.cpp, aflowlib_web_interface.cpp, aflowlib_web_outreach.cpp, aflowrc.cpp, avasp.cpp, chull.cpp, compare_structure_function.cpp, init.cpp, ivasp.cpp, kbin.cpp, kvasp.cpp, lattice.cpp, Makefile.aflow, ovasp.cpp, pflow.h, plotter.cpp, pocc_apl.cpp, pocc.cpp, pocc.h, pthreads.cpp, README_AFLOW_ACONVASP.TXT, README_AFLOW_AFLOWRC.TXT, README_AFLOW_POCC.TXT, README_AFLOW.TXT, test.cpp, xatom.cpp, xclasses.cpp)
+        (APL: aapl_cluster.cpp, aapl_ifcs.cpp, aapl_tcond.cpp, apl_atomic_disp.cpp, apl_doscalc.cpp, apl_fccalc.cpp, apl.h, apl_kphonons.cpp, apl_pdisc.cpp, apl_phoncalc.cpp, apl_qmesh.cpp, apl_supercell.cpp, apl_thermalpc.cpp, qha.cpp)
+        (SYMBOLICCPLUSPLUS: symbolic.cpp, symbolic.h)
+        (AUROSTD: aurostd.h, boot.cpp, main.cpp, xmatrix.cpp, xmatrix.h, xoption.cpp, xoption.h, xscalar.cpp, xscalar.h)
 3.2.11 - 2021/08/02
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.11.tar.xz
         -- added plotter options for QHA (AS)

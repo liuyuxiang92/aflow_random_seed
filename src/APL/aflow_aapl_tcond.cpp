@@ -445,7 +445,6 @@ namespace apl {
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
     int ncpus = _pc->getNCPUs();
     if (ncpus > nIQPs) ncpus = nIQPs;
-    vector<std::thread*> threads;
 #endif
     _qm->generateTetrahedra();
     // The conjugate is necessary because the three-phonon scattering processes
@@ -467,14 +466,18 @@ namespace apl {
     task_counter = 0;
     pflow::updateProgressBar(progress_bar_counter, nIQPs, *_pc->getOSS());
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    threads.clear();
-    for (int icpu = 0; icpu < ncpus; icpu++) {
-      threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesPhonon, this,
-            std::ref(phase_space), std::ref(phases)));
-    }
-    for (uint t = 0; t < threads.size(); t++) {
-      threads[t]->join();
-      delete threads[t];
+    if (ncpus > 1) {
+      vector<std::thread*> threads;
+      for (int icpu = 0; icpu < ncpus; icpu++) {
+        threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesPhonon, this,
+              std::ref(phase_space), std::ref(phases)));
+      }
+      for (uint t = 0; t < threads.size(); t++) {
+        threads[t]->join();
+        delete threads[t];
+      }
+    } else {
+      calculateTransitionProbabilitiesPhonon(phase_space, phases);
     }
 #else
     calculateTransitionProbabilitiesPhonon(phase_space, phases);
@@ -504,13 +507,17 @@ namespace apl {
 
         task_counter = 0;
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-        threads.clear();
-        for (int icpu = 0; icpu < ncpus; icpu++) {
-          threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesIsotope, this));
-        }
-        for (uint t = 0; t < threads.size(); t++) {
-          threads[t]->join();
-          delete threads[t];
+        if (ncpus > 1) {
+          vector<std::thread*> threads;
+          for (int icpu = 0; icpu < ncpus; icpu++) {
+            threads.push_back(new std::thread(&TCONDCalculator::calculateTransitionProbabilitiesIsotope, this));
+          }
+          for (uint t = 0; t < threads.size(); t++) {
+            threads[t]->join();
+            delete threads[t];
+          }
+        } else {
+          calculateTransitionProbabilitiesIsotope();
         }
 #else
         calculateTransitionProbabilitiesIsotope();
@@ -1141,16 +1148,18 @@ namespace apl {
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
     int ncpus = _pc->getNCPUs();
     if (ncpus > nIQPs) ncpus = nIQPs;
-    vector<std::thread*> threads;
-    vector<vector<int> > thread_dist = getThreadDistribution(nIQPs, ncpus);
-    threads.clear();
-    for (int icpu = 0; icpu < ncpus; icpu++) {
-      threads.push_back(new std::thread(&TCONDCalculator::calcAnharmRates, this,
-            std::ref(occ), std::ref(rates)));
-    }
-    for (int icpu = 0; icpu < ncpus; icpu++) {
-      threads[icpu]->join();
-      delete threads[icpu];
+    if (ncpus > 1) {
+      vector<std::thread*> threads;
+      for (int icpu = 0; icpu < ncpus; icpu++) {
+        threads.push_back(new std::thread(&TCONDCalculator::calcAnharmRates, this,
+              std::ref(occ), std::ref(rates)));
+      }
+      for (int icpu = 0; icpu < ncpus; icpu++) {
+        threads[icpu]->join();
+        delete threads[icpu];
+      }
+    } else {
+      calcAnharmRates(occ, rates);
     }
 #else
     calcAnharmRates(occ, rates);
@@ -1243,21 +1252,25 @@ namespace apl {
     // MPI variables
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
     int ncpus = _pc->getNCPUs();
-    vector<vector<int> > thread_dist;
+    if (ncpus > nIQPs) ncpus = nIQPs;
     vector<std::thread*> threads;
 #endif
 
     vector<vector<xvector<double> > > delta(nIQPs, vector<xvector<double> >(nBranches, xvector<double>(3)));
     task_counter = 0;
 #ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    threads.clear();
-    for (int icpu = 0; icpu < ncpus; icpu++) {
-      threads.push_back(new std::thread(&TCONDCalculator::calculateDelta, this,
-            std::ref(occ), std::ref(mfd), std::ref(delta)));
-    }
-    for (int icpu = 0; icpu < ncpus; icpu++) {
-      threads[icpu]->join();
-      delete threads[icpu];
+    if (ncpus > 1) {
+      threads.clear();
+      for (int icpu = 0; icpu < ncpus; icpu++) {
+        threads.push_back(new std::thread(&TCONDCalculator::calculateDelta, this,
+              std::ref(occ), std::ref(mfd), std::ref(delta)));
+      }
+      for (int icpu = 0; icpu < ncpus; icpu++) {
+        threads[icpu]->join();
+        delete threads[icpu];
+      }
+    } else {
+      calculateDelta(occ, mfd, delta);
     }
 #else
     calculateDelta(occ, mfd, delta);
