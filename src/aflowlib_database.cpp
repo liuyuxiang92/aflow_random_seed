@@ -967,6 +967,10 @@ namespace aflowlib {
 
       // Store for later
       if (cols[c] == "species") species = value;
+      else if (cols[c] == "aurl") {
+        aurostd::StringSubst(value, "_RAW/", "_WEB/");
+        aurostd::StringSubst(value, "_LIB/", "_WEB/");
+      }
 
       // Check for synonyms for changed parameter names
       if (value.empty()) {
