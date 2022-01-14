@@ -6281,7 +6281,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
           _atom atom_tmp;
           wyckoffsite_ITC wyckoff_tmp; //DX20191029
           for(uint t=0;t<tokens.size();t++){
-            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_type_symbol")){ atom_tmp.name = aurostd::RemoveCharacterFromTheFrontAndBack(tokens[t],'\''); atom_tmp.name_is_given=TRUE; } //DX20190718 - remove surrounding '' (common in Springer Materials cifs)
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_type_symbol")){
+              string name = aurostd::RemoveCharacterFromTheFrontAndBack(tokens[t],'\''); //DX20190718 - remove surrounding '' (common in Springer Materials cifs)
+              // ME20220113 - name could have oxidation states (found in newer ICSD CIFs)
+              if (name.length() > 2) name = name.substr(0, isdigit(name[1])?1:2);
+              atom_tmp.name = name;
+              atom_tmp.name_is_given = TRUE;
+            }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_x")){ atom_tmp.fpos[1] = aurostd::string2utype<double>(tokens[t]); }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_y")){ atom_tmp.fpos[2] = aurostd::string2utype<double>(tokens[t]); }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_z")){ atom_tmp.fpos[3] = aurostd::string2utype<double>(tokens[t]); }
