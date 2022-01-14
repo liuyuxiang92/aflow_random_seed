@@ -17,7 +17,7 @@ aflow.o: aflow.cpp APL/aflow_apl.h $(AFLOW_H_DEPS) SYMBOLICCPLUSPLUS/array.h SYM
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_aconvasp.o: aflow_aconvasp.cpp $(AFLOW_H_DEPS)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
-aflow_aconvasp_main.o: aflow_aconvasp_main.cpp APL/aflow_apl.h $(AFLOW_H_DEPS) aflow_bader.h aflow_cce.h aflow_chull.h aflow_contrib_shidong_cluster_expansion.h aflow_contrib_shidong_main.h aflow_gfa.h aflow_pocc.h aflow_pocc_old.h aflow_symmetry_spacegroup.h
+aflow_aconvasp_main.o: aflow_aconvasp_main.cpp APL/aflow_apl.h $(AFLOW_H_DEPS) aflow_bader.h aflow_cce.h aflow_cce_python.cpp aflow_chull.h aflow_chull_jupyter_plotter.cpp aflow_chull_python.cpp aflow_contrib_shidong_cluster_expansion.h aflow_contrib_shidong_main.h aflow_gfa.h aflow_pocc.h aflow_pocc_old.h aflow_sym_python.cpp aflow_symmetry_spacegroup.h aflow_xtalfinder_python.cpp
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_ael_elastic_fit.o: aflow_ael_elastic_fit.cpp $(AFLOW_H_DEPS) aflow_ael_elasticity.h aflow_agl_debye.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
