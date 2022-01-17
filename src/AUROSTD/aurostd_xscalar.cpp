@@ -16,6 +16,10 @@
 #include "aurostd_xscalar.h"
 #endif
 
+#ifndef __XOPTIMIZE
+#define _XSCALAR_DEBUG_
+#endif
+
 // ----------------------------------------------------------------------------
 //namespace aurostd {
 //template<class utype> utype                        
@@ -216,32 +220,65 @@ namespace aurostd {
 
 // ----------------------------------------------------------------------------
 // round  floor ceil trunc
-// [OBSOLETE] namespace aurostd {  // namespace aurostd
-// [OBSOLETE]   // ROUND(X)
-// [OBSOLETE]  double round(double x) { return (double) std::round(double(x));}
-// [OBSOLETE]  float round(float x) { return (float) std::roundf(float(x));}
-// [OBSOLETE]  long double round(long double x) { return (long double) std::roundl((long double) x);}
-// [OBSOLETE]  int round(int x) { return (int) std::round(double(x));}
-// [OBSOLETE]  long round(long x) { return (long) std::round(double(x));}
-// [OBSOLETE]  // FLOOR(X)
-// [OBSOLETE]  //  double floor(double x) { return (double) std::floor(double(x));}
-// [OBSOLETE]  float floor(float x) { return (float) std::floorf(float(x));}
-// [OBSOLETE]  long double floor(long double x) { return (long double) std::floorl((long double) x);}
-// [OBSOLETE]  int floor(int x) { return (int) std::floor(double(x));}
-// [OBSOLETE]  long floor(long x) { return (long) std::floor(double(x));}
-// [OBSOLETE]  // CEIL(X)
-// [OBSOLETE]  double ceil(double x) { return (double) std::ceil(double(x));}
-// [OBSOLETE]  float ceil(float x) { return (float) std::ceilf(float(x));}
-// [OBSOLETE]  long double ceil(long double x) { return (long double) std::ceill((long double) x);}
-// [OBSOLETE]  int ceil(int x) { return (int) std::ceil(double(x));}
-// [OBSOLETE]  long ceil(long x) { return (long) std::ceil(double(x));}
-// [OBSOLETE]  // TRUNC(X)
-// [OBSOLETE]  double trunc(double x) { return (double) std::trunc(double(x));}
-// [OBSOLETE]  float trunc(float x) { return (float) std::truncf(float(x));}
-// [OBSOLETE]  long double trunc(long double x) { return (long double) std::truncl((long double) x);}
-// [OBSOLETE]  int trunc(int x) { return (int) std::trunc(double(x));}
-// [OBSOLETE]  long trunc(long x) { return (long) std::trunc(double(x));}
-// [OBSOLETE] }
+namespace aurostd {  // namespace aurostd
+  // ROUND(X)
+  double round(double x) { //CO20210701 //std::round() only works in C++11
+    //algo inspired from here: http://www.cplusplus.com/forum/articles/3638/
+    //https://stackoverflow.com/questions/12696764/round-is-not-a-member-of-std - it's a gcc bug
+    //1.2   ->   1
+    //-1.2  ->  -1
+    //0.1   ->   0
+    //-0.1  ->  -0  //this is ok, (int)round(-0.1)=0
+    //2.5   ->   3
+    //-2.5  ->  -3
+    //2.7   ->   3
+    //-2.7  ->  -3
+    //2.1   ->   2
+    //-2.1  ->  -2
+    //10.7  ->   11
+    //-10.7 ->  -11
+    //[CO20210624 - does not work for negative numbers]return std::floor( x + 0.5 );
+#ifdef _XSCALAR_DEBUG_
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+#endif
+    double fracpart=0.0,intpart=0.0;
+    fracpart=modf(x,&intpart);
+#ifdef _XSCALAR_DEBUG_
+    if(LDEBUG){
+      string soliloquy="aurostd::round():";
+      cerr << soliloquy << " x=" << x << endl;
+      cerr << soliloquy << " fracpart=" << fracpart << endl;
+      cerr << soliloquy << " intpart=" << intpart << endl;
+      cerr << soliloquy << " floor(x)=" << std::floor(x) << endl;
+      cerr << soliloquy << " ceil(x)=" << std::ceil(x) << endl;
+    }
+#endif
+    if(abs(fracpart)>=.5){return x>=0?std::ceil(x):std::floor(x);}  //not sure why fracpart would ever be negative, but it is for negative inputs
+    else{return x<0?std::ceil(x):std::floor(x);}
+  }
+  // [OBSOLETE]  float round(float x) { return (float) std::roundf(float(x));}
+  // [OBSOLETE]  long double round(long double x) { return (long double) std::roundl((long double) x);}
+  // [OBSOLETE]  int round(int x) { return (int) std::round(double(x));}
+  // [OBSOLETE]  long round(long x) { return (long) std::round(double(x));}
+  // [OBSOLETE]  // FLOOR(X)
+  // [OBSOLETE]  //  double floor(double x) { return (double) std::floor(double(x));}
+  // [OBSOLETE]  float floor(float x) { return (float) std::floorf(float(x));}
+  // [OBSOLETE]  long double floor(long double x) { return (long double) std::floorl((long double) x);}
+  // [OBSOLETE]  int floor(int x) { return (int) std::floor(double(x));}
+  // [OBSOLETE]  long floor(long x) { return (long) std::floor(double(x));}
+  // [OBSOLETE]  // CEIL(X)
+  // [OBSOLETE]  double ceil(double x) { return (double) std::ceil(double(x));}
+  // [OBSOLETE]  float ceil(float x) { return (float) std::ceilf(float(x));}
+  // [OBSOLETE]  long double ceil(long double x) { return (long double) std::ceill((long double) x);}
+  // [OBSOLETE]  int ceil(int x) { return (int) std::ceil(double(x));}
+  // [OBSOLETE]  long ceil(long x) { return (long) std::ceil(double(x));}
+  // [OBSOLETE]  // TRUNC(X)
+  // [OBSOLETE]  double trunc(double x) { return (double) std::trunc(double(x));}
+  // [OBSOLETE]  float trunc(float x) { return (float) std::truncf(float(x));}
+  // [OBSOLETE]  long double trunc(long double x) { return (long double) std::truncl((long double) x);}
+  // [OBSOLETE]  int trunc(int x) { return (int) std::trunc(double(x));}
+  // [OBSOLETE]  long trunc(long x) { return (long) std::trunc(double(x));}
+}
 
 namespace aurostd {
   double ln(double x) { return (double) std::log(x);};
@@ -754,6 +791,253 @@ namespace aurostd {
   bool _iseven(unsigned long long int x) {
     if(mod(x,(unsigned long long int) 2)) return FALSE;
     else return TRUE;
+  }
+}
+
+// ***************************************************************************
+// FUNCTION DOUBLE2FRACTION
+//DX20190824 (moved from aflow_symmetry_spacegroup_functions.cpp)
+// hard-coded variant until generic converter is integrated
+// DX20210908 - added generic converter
+
+// ******************************************************************************
+// dbl2frac Double to Fraction (Overloaded)
+// ******************************************************************************
+namespace aurostd {
+  string dbl2frac(double a, bool sign_prefix) {
+
+    string soliloquy = "aurostd::dbl2frac()";
+    stringstream message;
+
+    string out = ""; //DX20200427 - missing initialization
+    bool neg = false;
+    double tol = _ZERO_TOL_;
+    if(a < 0) {
+      neg = true;
+      a = aurostd::abs(a);
+    }
+    if(aurostd::abs(a) < tol) { //DX20200427 - if not else if
+      out = "0";
+    }
+    else if(aurostd::abs(a - .25) < tol) {
+      out = "1/4";
+    }
+    else if(aurostd::abs(a - .5) < tol) {
+      out = "1/2";
+    }
+    else if(aurostd::abs(a - .75) < tol) {
+      out = "3/4";
+    }
+    else if(aurostd::abs(a - (1.0 / 3.0)) < tol) {
+      out = "1/3";
+    }
+    else if(aurostd::abs(a - (2.0 / 3.0)) < tol) {
+      out = "2/3";
+    }
+    else if(aurostd::abs(a - (1.0 / 6.0)) < tol) {
+      out = "1/6";
+    }
+    else if(aurostd::abs(a - (5.0 / 6.0)) < tol) { //DX20180726 - added
+      out = "5/6"; //DX20180726 - added
+    } //DX20180726 - added
+    else if(aurostd::abs(a - (1.0 / 8.0)) < tol) {
+      out = "1/8";
+    }
+    else if(aurostd::abs(a - (3.0 / 8.0)) < tol) {
+      out = "3/8";
+    }
+    else if(aurostd::abs(a - (5.0 / 8.0)) < tol) {
+      out = "5/8";
+    }
+    else if(aurostd::abs(a - (7.0 / 8.0)) < tol) {
+      out = "7/8";
+    }
+    else if(aurostd::abs(a - (1.0 / 12.0)) < tol) { //DX20180726 - added
+      out = "1/12"; //DX20180726 - added
+    } //DX20180726 - added
+    else if(aurostd::abs(a - (5.0 / 12.0)) < tol) { //DX20180726 - added
+      out = "5/12"; //DX20180726 - added
+    } //DX20180726 - added
+    else if(aurostd::abs(a - (7.0 / 12.0)) < tol) { //DX20180726 - added
+      out = "7/12"; //DX20180726 - added
+    } //DX20180726 - added
+    else if(aurostd::abs(a - (11.0 / 12.0)) < tol) { //DX20180726 - added
+      out = "11/12"; //DX20180726 - added
+    } //DX20180726 - added
+    else {
+      //DX20200427 [should not throw if not found, just return decimal] message << "Could not find hard-coded fraction for the double " << a << ".";
+      //DX20200427 [should not throw if not found, just return decimal] throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
+      out = aurostd::utype2string<double>(a);
+    }
+    if(sign_prefix){
+      if(neg == true) {
+        out = "-" + out;
+      } 
+      else {
+        out = "+" + out;
+      }
+    }
+    return out;
+  }
+} //namespace SYM
+
+
+//DX20210908 - double2fraction functionality - STOP
+// ******************************************************************************
+// aurostd::double2fraction() //DX20210908
+// ******************************************************************************
+// generic functionality to turn a double into a fraction
+// (continued fraction method)
+namespace aurostd{
+  void double2fraction(const double& input_double, int& numerator, int& denominator, double tol_diff, double tol_remainder){  //CO+DX20210909
+
+    // Method for converting a double into a fraction comprised of an integer
+    // in the numerator and denominator
+    // default tol=1e-2 (well-tested value)
+    // See https://en.wikipedia.org/wiki/Continued_fraction for more details
+    // DX20210908
+    // tol_diff compares input_double and numerator/denominator //CO+DX20210909
+    // tol_remainder is for the continued fraction algorithm (best not to change from 1e-2, or it runs forever  //CO+DX20210909
+
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "aurostd::continuedFractions():";
+    stringstream message;
+
+    vector<int> fraction_sequence;
+    double tmp_double = input_double, difference = 1e9;
+    int count=0,count_max=max(100,(int)std::ceil(std::pow(10.0,log10(1.0/tol_remainder)))); // count_max is a while-loop safeguard //CO20210909 patched count_max to change with tol_remainder
+
+    if(LDEBUG){
+      cerr << function_name << " input_double=" << std::fixed << std::setprecision(15) << input_double << endl;
+      cerr << function_name << " tol_diff=" << std::fixed << std::setprecision(15) << tol_diff << endl;
+      cerr << function_name << " tol_remainder=" << std::fixed << std::setprecision(15) << tol_remainder << endl;
+    }
+
+    // ---------------------------------------------------------------------------
+    // determine the fraction sequence
+    // i.e., determine the integer part of the double (via std::floor)
+    // then find the remainder, take inverse (divide by 1), and make this the
+    // "new" double. Continue the process until a tolerance threshold is met
+    // (i.e., difference is below tolerances)
+    while(difference>tol_remainder&&count<count_max){
+      int floor_int = std::floor(tmp_double);
+      fraction_sequence.push_back(floor_int);
+      difference = tmp_double - floor_int;
+      tmp_double = 1.0/difference;
+      count++;
+    }
+    if(count==count_max){
+      message << "The number of elements in the fraction sequence exceeded " << count_max << ". Increase the threshold or there is an issue with the while-loop.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message,_RUNTIME_ERROR_);
+    }
+    if(LDEBUG){ cerr << function_name << " fraction_sequence=" << aurostd::joinWDelimiter(fraction_sequence, ",") << endl; }
+
+    // ---------------------------------------------------------------------------
+    // determine the numerator and denominator
+    int n = fraction_sequence.size()-1;
+    numerator=1;
+    denominator=1;
+    numerator = getNumeratorContinuedFractions(numerator,n,fraction_sequence);
+    denominator = getDenominatorContinuedFractions(denominator,n,fraction_sequence);
+    if(LDEBUG){ cerr << function_name << " calculated fraction=" << numerator << "/" << denominator << endl; }
+
+    // ---------------------------------------------------------------------------
+    // check result
+    double fraction2double = (double)numerator/(double)denominator;
+    if(LDEBUG){
+      cerr << function_name << " fraction2double=" << std::fixed << std::setprecision(15) << fraction2double << endl;
+      cerr << function_name << " input_double=" << std::fixed << std::setprecision(15) << input_double << endl;
+      cerr << function_name << " diff=" << std::fixed << std::setprecision(15) << abs(fraction2double-input_double) << endl;
+    }
+    if(!aurostd::isequal(input_double,fraction2double,tol_diff)){
+      message << "The fraction=" << numerator << "/" << denominator << " (=" << std::fixed << std::setprecision(15) << fraction2double << ") is not equal to the input_double=" << std::fixed << std::setprecision(15) << input_double << " (with tol_diff=" << std::fixed << std::setprecision(15) << tol_diff << ").";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message,_RUNTIME_ERROR_);
+    }
+  }
+}
+
+namespace aurostd{
+  int getNumeratorContinuedFractions(int& p, const int& n, vector<int>& fraction_sequence){
+
+    // Get the numerator (p) for a continued fraction
+    // Note: slightly different than procedure for denominator
+    // See https://en.wikipedia.org/wiki/Continued_fraction for more details
+    // DX20210908
+
+    if(n>=2){ p = fraction_sequence[n]*getNumeratorContinuedFractions(p,n-1,fraction_sequence) + getNumeratorContinuedFractions(p,n-2,fraction_sequence); }
+    else if (n==1){ p = fraction_sequence[n]*getNumeratorContinuedFractions(p,n-1,fraction_sequence) + 1; }
+    else if(n==0){ p = fraction_sequence[n]*1 + 0; }
+    return p;  
+  }
+}
+
+namespace aurostd{
+  int getDenominatorContinuedFractions(int& q, const int& n, vector<int>& fraction_sequence){
+
+    // Get the denominator (q) for a continued fraction
+    // Note: slightly different than procedure for numerator
+    // See https://en.wikipedia.org/wiki/Continued_fraction for more details
+    // DX20210908
+
+    if(n>=2){ q = fraction_sequence[n]*getDenominatorContinuedFractions(q,n-1,fraction_sequence) + getDenominatorContinuedFractions(q,n-2,fraction_sequence); }
+    else if (n==1){ q = fraction_sequence[n]*getDenominatorContinuedFractions(q,n-1,fraction_sequence) + 0; }
+    else if(n==0){ q = 1; }
+    return q;  
+  }
+}
+//DX20210908 - double2fraction functionality - STOP
+
+// ******************************************************************************
+// dbl2frac Double to Fraction //DX20200313
+// ******************************************************************************
+namespace aurostd {
+  double frac2dbl(const string& str) {
+
+    // converts fraction to double
+
+    // --------------------------------------------------------------------------
+    // parse tokens
+    vector<string> tokens;
+    uint field_count = aurostd::string2tokens(str,tokens,"/");
+
+    // --------------------------------------------------------------------------
+    // expects two fields
+    if(field_count == 1){ // not slash
+      if(aurostd::isfloat(str)){ //DX20200424
+        return aurostd::string2utype<double>(str);
+      }
+      else{ //DX20200424
+        string function_name = "aurostd::frac2dbl():";
+        stringstream message; message << "The input is not a numeric: str = " << str;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
+      }
+    }
+    else if(field_count != 2){
+      string function_name = "aurostd::frac2dbl():";
+      stringstream message; message << "Expect two fields, i.e., numerator and denominator: str = " << str;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
+    }
+
+    // --------------------------------------------------------------------------
+    // protect against non-numeric values //DX20200424
+    if(!aurostd::isfloat(tokens[0]) || !aurostd::isfloat(tokens[1])){
+      string function_name = "aurostd::frac2dbl():";
+      stringstream message; message << "The input is not a numeric: str = " << str;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
+    }
+
+    double numerator = aurostd::string2utype<double>(tokens[0]);
+    double denominator = aurostd::string2utype<double>(tokens[1]);
+
+    // --------------------------------------------------------------------------
+    // protect against division by zero
+    if(aurostd::isequal(denominator,_ZERO_TOL_)){
+      string function_name = "aurostd::frac2dbl():";
+      stringstream message; message << "Denominator is zero: " << denominator;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
+    }
+
+    return numerator/denominator;
   }
 }
 

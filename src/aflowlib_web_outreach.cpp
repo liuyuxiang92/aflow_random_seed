@@ -32,6 +32,7 @@ _outreach::_outreach() {
   wnumber=0;
   year=0;
   vauthor.clear();
+  vcorrespondingauthor.clear();
   title="";
   journal="";
   arxiv="";
@@ -74,6 +75,7 @@ void _outreach::copy(const _outreach& b) {
   wnumber=b.wnumber;
   year=b.year;
   vauthor.clear();for(uint i=0;i<b.vauthor.size();i++) vauthor.push_back(b.vauthor.at(i));
+  vcorrespondingauthor.clear();for(uint i=0;i<b.vcorrespondingauthor.size();i++) vcorrespondingauthor.push_back(b.vcorrespondingauthor.at(i));
   title=b.title;
   journal=b.journal;
   arxiv=b.arxiv;
@@ -159,7 +161,7 @@ uint bibtex2file(string bibtex,string _authors,string _title,string journal,stri
   // FIX THE AUTHORS
   string authors=_authors;
   vector<string> vfix;
-  aurostd::string2tokens("Buongiorno Nardelli,van Roekeghem,Aspuru-Guzik,Hattrick-Simpers,DeCost,de Coss,De Santo,De Gennaro,Al Rahal Al Orabi,de Jong,D'Amico,van der Zwaag,van de Walle,Di Stefano",vfix,",");
+  aurostd::string2tokens("Buongiorno Nardelli,van Roekeghem,Aspuru-Guzik,Hattrick-Simpers,DeCost,de Coss,De Santo,De Gennaro,Al Rahal Al Orabi,de Jong,D'Amico,van der Zwaag,van de Walle,Di Stefano,Ojeda Mota,Simmons Jr.,Mattos Jr.",vfix,",");
   for(uint i=0;i<vfix.size();i++) aurostd::StringSubst(authors,vfix.at(i),string("{"+vfix.at(i)+"}")); // FIX 
   aurostd::StringSubst(authors,".",".~"); 
   aurostd::StringSubst(authors,"~ "," "); 
@@ -174,7 +176,7 @@ uint bibtex2file(string bibtex,string _authors,string _title,string journal,stri
   for(uint i=0;i<vfix.size();i++) aurostd::StringSubst(title,vfix.at(i),string("{"+vfix.at(i)+"}")); // FIX 
   // NOW build
   bibcontent << "@article{" << bibtex << "," << endl;
-  if(authors.size()) bibcontent << " authors={" << authors << "}";  // AUTHORS
+  if(authors.size()) bibcontent << " author={" << authors << "}";  // AUTHORS
   if(title.size()) bibcontent << "," << endl << " title={" << aurostd::html2latex(title) << "}"; // TITLE
   if(journal.size()) bibcontent << "," << endl << " journal={" << journal << "}";   // JOURNAL
   if(volume.size()) bibcontent << "," << "volume={" << volume << "}";   // VOLUME
@@ -205,21 +207,21 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
     if(XHOST.vflag_control.flag("PRINT_MODE::JSON")) {
       authors+="[";
       for(uint iauth=0;iauth<outreach.vauthor.size();iauth++) {
-	authors+="\""+outreach.vauthor.at(iauth)+"\"";
-	if(iauth!=outreach.vauthor.size()-1) authors+=",";
+        authors+="\""+outreach.vauthor.at(iauth)+"\"";
+        if(iauth!=outreach.vauthor.size()-1) authors+=",";
       }
       authors+="]";	
     } else { // TXT, HTML, LATEX
       for(uint iauth=0;iauth<outreach.vauthor.size();iauth++) {
-	authors+=outreach.vauthor.at(iauth);
-	if(outreach.vauthor.size()==2 && iauth==outreach.vauthor.size()-2) authors+=" and ";
-	if(outreach.vauthor.size()!=2 && iauth==outreach.vauthor.size()-2) authors+=", and ";
-	if(iauth!=outreach.vauthor.size()-2 && iauth!=outreach.vauthor.size()-1) authors+=", ";
+        authors+=outreach.vauthor.at(iauth);
+        if(outreach.vauthor.size()==2 && iauth==outreach.vauthor.size()-2) authors+=" and ";
+        if(outreach.vauthor.size()!=2 && iauth==outreach.vauthor.size()-2) authors+=", and ";
+        if(iauth!=outreach.vauthor.size()-2 && iauth!=outreach.vauthor.size()-1) authors+=", ";
       }
     }
     string wnumber=aurostd::utype2string(outreach.wnumber);
     if(wnumber.length()<2) wnumber="0"+wnumber;
-    
+
     //  generate journal HTML style
     string journal=""; 
     if(!outreach.bibtex_journal.size()) { // with journal
@@ -277,12 +279,12 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
       }
       if(XHOST.vflag_control.flag("PRINT_MODE::NUMBER")) {
         if(outreach.wnumber==0) {  // SHORTCUT for CHAPTER
-	  oss << "\"number\":" << outreach.wnumber << ",";
+          oss << "\"number\":" << outreach.wnumber << ",";
           oss << "\"chapter\":true,";
-	} else {
-	  oss << "\"number\":" << outreach.wnumber << ",";
- 	  oss << "\"article\":true,";
-         }
+        } else {
+          oss << "\"number\":" << outreach.wnumber << ",";
+          oss << "\"article\":true,";
+        }
       }
       // 3rd line AUTHORS
       aurostd::StringSubst(authors,"Csányi","Csanyi");
@@ -294,43 +296,43 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
       // EXTRA STUFF FOR PHP WEB
       // 7th line DOI
       if(XHOST.vflag_control.flag("PRINT_MODE::DOI") && outreach.doi.size())
-	oss << "\"doi\":\"" << outreach.doi << "\",";
+        oss << "\"doi\":\"" << outreach.doi << "\",";
       // 6th line PDF    
       if(XHOST.vflag_control.flag("PRINT_MODE::PDF") && outreach.pdf.size())
-	oss << "\"pdf\":\"" << WEB_PDF << outreach.pdf << "\",";
+        oss << "\"pdf\":\"" << WEB_PDF << outreach.pdf << "\",";
       // 6th line SUPPLEMENTARY
       if(XHOST.vflag_control.flag("PRINT_MODE::PDF") && outreach.supplementary.size())
- 	oss << "\"supplementary\":\"" << WEB_PDF << outreach.supplementary << "\",";
+        oss << "\"supplementary\":\"" << WEB_PDF << outreach.supplementary << "\",";
       // 6th line ARXIV
       if(outreach.arxiv.size())
-  	oss << "\"arxiv\":\"" << outreach.arxiv << "\",";
+        oss << "\"arxiv\":\"" << outreach.arxiv << "\",";
       // 6th line LINK
       if(outreach.link.size())
-  	oss << "\"link\":\"" << outreach.link << "\",";
+        oss << "\"link\":\"" << outreach.link << "\",";
       // 7th line BIBTEX
       if(XHOST.vflag_control.flag("PRINT_MODE::BIBTEX") && outreach.bibtex.size() && outreach.bibtex_journal.size() && outreach.doi.size() && outreach.title.size() && outreach.vauthor.size() ) { // needs to have bibtex pdf doi title and authors
-	bibtex2file(outreach.bibtex,authors,outreach.title,outreach.bibtex_journal,outreach.bibtex_volume,outreach.bibtex_issue,outreach.bibtex_pages,outreach.bibtex_year,outreach.abstract,outreach.doi,string(WEB_BIBTEX_FILE+outreach.bibtex+".txt"));
-	oss << "\"bibtex\":\"" << WEB_BIBTEX << outreach.bibtex << ".txt" << "\",";
+        bibtex2file(outreach.bibtex,authors,outreach.title,outreach.bibtex_journal,outreach.bibtex_volume,outreach.bibtex_issue,outreach.bibtex_pages,outreach.bibtex_year,outreach.abstract,outreach.doi,string(WEB_BIBTEX_FILE+outreach.bibtex+".txt"));
+        oss << "\"bibtex\":\"" << WEB_BIBTEX << outreach.bibtex << ".txt" << "\",";
       }
       // Xth line EXTRA
       if(outreach.vextra_html.size()) {
-	oss << "\"vextra_html\":\"" ;
-	for(uint ix=0;ix<outreach.vextra_html.size();ix++) {
+        oss << "\"vextra_html\":\"" ;
+        for(uint ix=0;ix<outreach.vextra_html.size();ix++) {
           string extrahtml = outreach.vextra_html.at(ix);
           aurostd::StringSubst(extrahtml, "\"", "\\\"");
-	  if(!aurostd::substring2bool(outreach.vextra_html.at(ix),WEB_PDF) && !aurostd::substring2bool(outreach.vextra_html.at(ix),WEB_DOI)) {
-	    oss << extrahtml << (compact?" ":"<br>");
-	  } else {
-	    if(aurostd::substring2bool(outreach.vextra_html.at(ix),WEB_DOI) && XHOST.vflag_control.flag("PRINT_MODE::DOI")) {
-	      oss << extrahtml << (compact?" ":"<br>");
-	    } else {
-	      if(aurostd::substring2bool(outreach.vextra_html.at(ix),WEB_PDF) && XHOST.vflag_control.flag("PRINT_MODE::PDF")) {
-		oss << extrahtml << (compact?" ":"<br>");
-	      }
-	    }
-	  }
-	}
-	oss << "\",";
+          if(!aurostd::substring2bool(outreach.vextra_html.at(ix),WEB_PDF) && !aurostd::substring2bool(outreach.vextra_html.at(ix),WEB_DOI)) {
+            oss << extrahtml << (compact?" ":"<br>");
+          } else {
+            if(aurostd::substring2bool(outreach.vextra_html.at(ix),WEB_DOI) && XHOST.vflag_control.flag("PRINT_MODE::DOI")) {
+              oss << extrahtml << (compact?" ":"<br>");
+            } else {
+              if(aurostd::substring2bool(outreach.vextra_html.at(ix),WEB_PDF) && XHOST.vflag_control.flag("PRINT_MODE::PDF")) {
+                oss << extrahtml << (compact?" ":"<br>");
+              }
+            }
+          }
+        }
+        oss << "\",";
       }
       // Print year
       oss << "\"year\":" << outreach.year;
@@ -377,8 +379,8 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
         oss << "[<a href="+outreach.link << "><b>link</b></a>] " << (compact?" ":newline.str());
       // 7th line BIBTEX
       if(XHOST.vflag_control.flag("PRINT_MODE::BIBTEX") && outreach.bibtex.size() && outreach.bibtex_journal.size() && outreach.doi.size() && outreach.title.size() && outreach.vauthor.size() ) { // needs to have bibtex pdf doi title and authors
-	bibtex2file(outreach.bibtex,authors,outreach.title,outreach.bibtex_journal,outreach.bibtex_volume,outreach.bibtex_issue,outreach.bibtex_pages,outreach.bibtex_year,outreach.abstract,outreach.doi,string(WEB_BIBTEX_FILE+outreach.bibtex+".txt"));
-	oss << "[<a href=" << WEB_BIBTEX << outreach.bibtex << ".txt" << "><b>bibtex</b></a>] " << (compact?" ":newline.str());
+        bibtex2file(outreach.bibtex,authors,outreach.title,outreach.bibtex_journal,outreach.bibtex_volume,outreach.bibtex_issue,outreach.bibtex_pages,outreach.bibtex_year,outreach.abstract,outreach.doi,string(WEB_BIBTEX_FILE+outreach.bibtex+".txt"));
+        oss << "[<a href=" << WEB_BIBTEX << outreach.bibtex << ".txt" << "><b>bibtex</b></a>] " << (compact?" ":newline.str());
       }
       // Xth line EXTRA
       for(uint ix=0;ix<outreach.vextra_html.size();ix++) {
@@ -396,8 +398,8 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
       }
       oss << "</li>";
     }
-   // ***************************************************************************
-     // LATEX
+    // ***************************************************************************
+    // LATEX
     if(XHOST.vflag_control.flag("PRINT_MODE::LATEX")) {
       // 3rd line AUTHORS
       authors=aurostd::html2latex(authors)+", ";
@@ -419,8 +421,8 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
         link=TRUE;
       } else {
         if(outreach.wnumber!=0 && outreach.wnumber!=27 && outreach.wnumber!=14 &&
-	   outreach.wnumber!=11 && outreach.wnumber!=8 && outreach.wnumber!=2 &&
-	   outreach.wnumber!=1) {
+            outreach.wnumber!=11 && outreach.wnumber!=8 && outreach.wnumber!=2 &&
+            outreach.wnumber!=1) {
           string doi=""; // ="{\\newline \\textsf{\\href{http://dx.doi.org/}{DOI: N/A}}}";
           oss << " " << doi;
           link=TRUE;
@@ -532,42 +534,42 @@ uint voutreach_global_max_year=0,voutreach_global_min_year=9999;
 // ARTICLES
 // ******************************************************************************************************************************************************
 // ******************************************************************************************************************************************************
- 
+
 uint voutreach_remove_duplicate(vector<_outreach>& voutreach) {
   bool LOCAL_VERBOSE=1;//FALSE;
   if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: voutreach.size()=" <<  voutreach.size() << endl;
   for(uint i=0;i<voutreach.size();i++)
     for(uint j=i+1;j<voutreach.size();j++)
       if(i!=j && voutreach.at(j).year==voutreach.at(i).year) { // same year
-	// if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same year: (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
+        // if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same year: (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
         if(voutreach.at(j).vauthor.size()==voutreach.at(i).vauthor.size()) { // same number of authors
-	  // if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same vauthor.size: (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
+          // if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same vauthor.size: (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
           if(voutreach.at(j).vauthor.at(0)==voutreach.at(i).vauthor.at(0)) { // same first author
-	    // if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same vauthor.at(0): (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
+            // if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same vauthor.at(0): (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
             if(voutreach.at(j).vauthor.at(voutreach.at(j).vauthor.size()-1)==voutreach.at(i).vauthor.at(voutreach.at(i).vauthor.size()-1)) { // same last author
-	      // if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same vauthor.at(N): (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
+              // if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same vauthor.at(N): (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
               vector<string> vwordi;aurostd::string2tokens(voutreach.at(i).title,vwordi," ");
               vector<string> vwordj;aurostd::string2tokens(voutreach.at(j).title,vwordj," ");
               if(vwordj.size()==vwordi.size()) { // same spaces
-		// if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same number of title words: (i,j)=(" << i << "," << j << ")  " << vwordj.size() << endl;
-		if(aurostd::abs(voutreach.at(i).title.length()-voutreach.at(j).title.length())<3) {
-		  if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found similar title length: (i,j)=(" << i << "," << j << ")  " << voutreach.at(i).title.length() << "," << voutreach.at(j).title.length() << endl;
-		  { // ACT
-		    if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same year: (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
-		    if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same vauthor.size: (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
-		    if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same vauthor.at(0): (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
-		    if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same vauthor.at(N): (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
-		    if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same number of title words: (i,j)=(" << i << "," << j << ")  " << vwordj.size() << endl;
-		    if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found similar title length: (i,j)=(" << i << "," << j << ")  " << voutreach.at(i).title.length() << "," << voutreach.at(j).title.length() << endl;
-		    if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: removing (i,j)=(" << i << "," << j << ")  title1=" << voutreach.at(j).title << " | " << voutreach.at(i).title << endl;
-		    if(i!=j) {voutreach.erase(voutreach.begin()+j);i=0;j=0;}
-		    if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: Article: found duplicate (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
-		  }
-		}
-	      }
-	    }
-	  }
-	}
+                // if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same number of title words: (i,j)=(" << i << "," << j << ")  " << vwordj.size() << endl;
+                if(aurostd::abs(voutreach.at(i).title.length()-voutreach.at(j).title.length())<3) {
+                  if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found similar title length: (i,j)=(" << i << "," << j << ")  " << voutreach.at(i).title.length() << "," << voutreach.at(j).title.length() << endl;
+                  { // ACT
+                    if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same year: (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
+                    if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same vauthor.size: (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
+                    if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same vauthor.at(0): (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
+                    if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same vauthor.at(N): (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
+                    if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found same number of title words: (i,j)=(" << i << "," << j << ")  " << vwordj.size() << endl;
+                    if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: found similar title length: (i,j)=(" << i << "," << j << ")  " << voutreach.at(i).title.length() << "," << voutreach.at(j).title.length() << endl;
+                    if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: removing (i,j)=(" << i << "," << j << ")  title1=" << voutreach.at(j).title << " | " << voutreach.at(i).title << endl;
+                    if(i!=j) {voutreach.erase(voutreach.begin()+j);i=0;j=0;}
+                    if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_remove_duplicate: Article: found duplicate (i,j)=(" << i << "," << j << ")  " << voutreach.size() << endl;
+                  }
+                }
+              }
+            }
+          }
+        }
       }
   return voutreach.size();
 }
@@ -728,7 +730,7 @@ void voutreach_print(uint _mode,ostream& oss,string what2print) {
     bool LOCAL_VERBOSE=1;//FALSE;
     if(!XHOST.QUIET_CERR) cerr << "LOADED " << voutreach.size() << " articles" << endl;
     bool HTRESOURCE_MODE_PHP_PREAMBLE=FALSE;
-    
+
     vector<string> voss;
 
     // if(LDEBUG && !XHOST.QUIET_CERR) cerr << voutreach.at(0);// << endl;
@@ -748,7 +750,7 @@ void voutreach_print(uint _mode,ostream& oss,string what2print) {
 
     if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_print [begin]" << endl;
     //   LDEBUG=TRUE;
-    
+
     if(LDEBUG) oss << "XHOST.vflag_control.flags" << endl;
     if(LDEBUG) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::JSON\")=" << XHOST.vflag_control.flag("PRINT_MODE::JSON") << endl;
     if(LDEBUG) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::HTML\")=" << XHOST.vflag_control.flag("PRINT_MODE::HTML") << endl;
@@ -763,14 +765,14 @@ void voutreach_print(uint _mode,ostream& oss,string what2print) {
     if(LDEBUG) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::NOTE\")=" << XHOST.vflag_control.flag("PRINT_MODE::NOTE") << endl;
     if(LDEBUG) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::NEW\")=" << XHOST.vflag_control.flag("PRINT_MODE::NEW") << endl;
     if(LDEBUG) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::DATE\")=" << XHOST.vflag_control.flag("PRINT_MODE::DATE") << endl;
-    
+
     // big hack in chinatown ! if Frisco gives me nothing...
     if(XHOST.vflag_control.flag("PHP::PUBS_ALLOY")) {
       if(XHOST.vflag_control.getattachedscheme("PHP::PUBS_ALLOY")=="--print=html") {
         mode=HTRESOURCE_MODE_PHP_ALLOY;
         XHOST.vflag_control.flag("PRINT_MODE::LATEX",FALSE);
         XHOST.vflag_control.flag("PRINT_MODE::TXT",FALSE);
-	XHOST.vflag_control.flag("PRINT_MODE::JSON",FALSE);
+        XHOST.vflag_control.flag("PRINT_MODE::JSON",FALSE);
         XHOST.vflag_control.flag("PRINT_MODE::HTML",TRUE); // DEFAULT
         valloy.push_back("AFLOW");
         valloy.push_back("AFLOWLIB");
@@ -827,7 +829,7 @@ void voutreach_print(uint _mode,ostream& oss,string what2print) {
       uint recent_articles=0;
       for(uint iauthor=0;iauthor<vauthor.size();iauthor++) {
         voutreach_local.clear();
-	if(!XHOST.vflag_control.flag("PRINT_MODE::JSON")) oss << endl; // just some  leeway but not in json SC20210616
+        if(!XHOST.vflag_control.flag("PRINT_MODE::JSON")) oss << endl; // just some  leeway but not in json SC20210616
         if(HTRESOURCE_MODE_PHP_PREAMBLE==TRUE && mode==HTRESOURCE_MODE_PHP_AUTHOR) {
           oss << "<?php" << endl;
           if(flag_simple==FALSE)
@@ -851,115 +853,115 @@ void voutreach_print(uint _mode,ostream& oss,string what2print) {
         for(uint i=0;i<voutreach.size();i++)
           if(aurostd::substring2bool(voutreach.at(i).vauthor,vauthor.at(iauthor)))
             voutreach_local.push_back(voutreach.at(i));  // push authors
-	
+
         if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_print: LOADED_LOCAL " << voutreach_local.size() << " articles" << endl;
-	voutreach_remove_duplicate(voutreach_local);
+        voutreach_remove_duplicate(voutreach_local);
         if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_print: LOADED_DUPLICATE " << voutreach_local.size() << " articles" << endl;
         voutreach_rsort_wnumber(voutreach_local); // sort TOP numbers first
         if(LOCAL_VERBOSE && !XHOST.QUIET_CERR) cerr << "voutreach_print: LOADED_SORTED " << voutreach_local.size() << " articles" << endl;
 
         if(mode==HTRESOURCE_MODE_PHP_AUTHOR && !XHOST.vflag_control.flag("PRINT_MODE::LATEX") && !XHOST.vflag_control.flag("PRINT_MODE::TXT") && !XHOST.vflag_control.flag("PRINT_MODE::JSON")) {oss << "<br><br>" << endl;}
-	if(XHOST.vflag_control.flag("PRINT_MODE::LATEX")) {oss << endl;}
-	
+        if(XHOST.vflag_control.flag("PRINT_MODE::LATEX")) {oss << endl;}
+
         // ************************************************************************************************************************
         // HTML/JSON MODE
         if(XHOST.vflag_control.flag("PRINT_MODE::HTML") || XHOST.vflag_control.flag("PRINT_MODE::JSON")) {
-	  //	if(mode==HTRESOURCE_MODE_PHP_AUTHOR && !XHOST.vflag_control.flag("PRINT_MODE::LATEX")&& !XHOST.vflag_control.flag("PRINT_MODE::TXT"))
-	  if(XHOST.vflag_control.flag("PRINT_MODE::HTML")) {
-	    voss.push_back("<li><span class=\"aflow\"> AFLOW V"+string(AFLOW_VERSION)+" </span></li>");
-	  }
-	  if(XHOST.vflag_control.flag("PRINT_MODE::JSON")) {
-	    voss.push_back("[");
-	  }
+          //	if(mode==HTRESOURCE_MODE_PHP_AUTHOR && !XHOST.vflag_control.flag("PRINT_MODE::LATEX")&& !XHOST.vflag_control.flag("PRINT_MODE::TXT"))
+          if(XHOST.vflag_control.flag("PRINT_MODE::HTML")) {
+            voss.push_back("<li><span class=\"aflow\"> AFLOW V"+string(AFLOW_VERSION)+" </span></li>");
+          }
+          if(XHOST.vflag_control.flag("PRINT_MODE::JSON")) {
+            voss.push_back("[");
+          }
           for(uint year=voutreach_global_max_year;year>=voutreach_global_min_year;year--) {
             bool flag_year=FALSE;
             for(uint i=0;i<voutreach_local.size()&&!flag_year;i++)
               if(year==voutreach_local.at(i).year)
                 flag_year=TRUE;
             if(flag_year && recent_articles<AUTHOR_RECENT_ARTICLES && year>=voutreach_global_max_year-AUTHOR_RECENT_YEARS && year<=voutreach_global_max_year) {
-             if(XHOST.vflag_control.flag("PRINT_MODE::YEAR")) {
-		if(XHOST.vflag_control.flag("PRINT_MODE::HTML")) {
-		  voss.push_back("<li><span class=\"pubYears\">"+aurostd::utype2string(year)+"</span></li>");
-		}
-	      }
-	      for(uint i=0;i<voutreach_local.size();i++) {
-		string wnumber=aurostd::utype2string(voutreach_local.at(i).wnumber);
-		if(wnumber.length()<3) wnumber="0"+wnumber;
-		if(wnumber.length()<2) wnumber="0"+wnumber;
-		if(voutreach_local.at(i).year==year && recent_articles<AUTHOR_RECENT_ARTICLES && year>=voutreach_global_max_year-AUTHOR_RECENT_YEARS && year<=voutreach_global_max_year) {
-		  voss.push_back(voutreach_local.at(i).print_string());
-		  recent_articles++;
-		} 
-	      }
-	    }
-	  }
-	  if(XHOST.vflag_control.flag("PRINT_MODE::HTML"))  { // this is only for HTML, json has all preables elsewhere
-	    if(HTRESOURCE_MODE_PHP_PREAMBLE==TRUE && mode==HTRESOURCE_MODE_PHP_AUTHOR) {
-	      voss.push_back("\n <?php");
-	      voss.push_back("}");
-	      voss.push_back("?>");
-	    }
-	    for(uint j=0;j<voss.size();j++) oss << voss.at(j) << endl;
+              if(XHOST.vflag_control.flag("PRINT_MODE::YEAR")) {
+                if(XHOST.vflag_control.flag("PRINT_MODE::HTML")) {
+                  voss.push_back("<li><span class=\"pubYears\">"+aurostd::utype2string(year)+"</span></li>");
+                }
+              }
+              for(uint i=0;i<voutreach_local.size();i++) {
+                string wnumber=aurostd::utype2string(voutreach_local.at(i).wnumber);
+                if(wnumber.length()<3) wnumber="0"+wnumber;
+                if(wnumber.length()<2) wnumber="0"+wnumber;
+                if(voutreach_local.at(i).year==year && recent_articles<AUTHOR_RECENT_ARTICLES && year>=voutreach_global_max_year-AUTHOR_RECENT_YEARS && year<=voutreach_global_max_year) {
+                  voss.push_back(voutreach_local.at(i).print_string());
+                  recent_articles++;
+                } 
+              }
+            }
           }
-   	  if(XHOST.vflag_control.flag("PRINT_MODE::JSON")) {
-	    voss.push_back("]");
-	    for(uint j=0;j<voss.size();j++) {
-	      oss << voss.at(j);
-	      if(j>0 && j<voss.size()-2) oss << ",";  
-	      //oss << endl;
-	    }
-	    oss << endl;
-	  }
-	  if(XHOST.vflag_control.flag("PRINT_MODE::EXTRA")) voutreach_print_publications_EXTRA(oss);
+          if(XHOST.vflag_control.flag("PRINT_MODE::HTML"))  { // this is only for HTML, json has all preables elsewhere
+            if(HTRESOURCE_MODE_PHP_PREAMBLE==TRUE && mode==HTRESOURCE_MODE_PHP_AUTHOR) {
+              voss.push_back("\n <?php");
+              voss.push_back("}");
+              voss.push_back("?>");
+            }
+            for(uint j=0;j<voss.size();j++) oss << voss.at(j) << endl;
+          }
+          if(XHOST.vflag_control.flag("PRINT_MODE::JSON")) {
+            voss.push_back("]");
+            for(uint j=0;j<voss.size();j++) {
+              oss << voss.at(j);
+              if(j>0 && j<voss.size()-2) oss << ",";  
+              //oss << endl;
+            }
+            oss << endl;
+          }
+          if(XHOST.vflag_control.flag("PRINT_MODE::EXTRA")) voutreach_print_publications_EXTRA(oss);
         } // HTML/JSON MODE
         // ************************************************************************************************************************
 
         // ************************************************************************************************************************
-	/* OLD MODE
+        /* OLD MODE
         // LATEX MODE
-	if(XHOST.vflag_control.flag("PRINT_MODE::LATEX")) {
-	if(!XHOST.vflag_control.flag("PRINT_MODE::YEAR")) oss << "\\begin{itemize}" << endl;
+        if(XHOST.vflag_control.flag("PRINT_MODE::LATEX")) {
+        if(!XHOST.vflag_control.flag("PRINT_MODE::YEAR")) oss << "\\begin{itemize}" << endl;
 
-	for(uint year=voutreach_global_max_year;year>=voutreach_global_min_year;year--) {
-	bool flag_year=FALSE;
-	for(uint i=0;i<voutreach_local.size()&&!flag_year;i++)
-	if(year==voutreach_local.at(i).year)
-	flag_year=TRUE;
-	if(flag_year && year<=voutreach_global_max_year) {
-	oss << endl;
-	if(XHOST.vflag_control.flag("PRINT_MODE::YEAR")) oss << "\\ \\\\  \\textbf{ \\color{blue}{[" << year << "]}}" << endl;
-	if(XHOST.vflag_control.flag("PRINT_MODE::YEAR")) oss << "\\begin{itemize}" << endl;
-	for(uint i=0;i<voutreach_local.size();i++) {
-	string wnumber=aurostd::utype2string(voutreach_local.at(i).wnumber);
-	if(wnumber.length()<3) wnumber="0"+wnumber;
-	if(wnumber.length()<2) wnumber="0"+wnumber;
-	if(voutreach_local.at(i).year==year && year>=voutreach_global_max_year-AUTHOR_RECENT_YEARS && year<=voutreach_global_max_year) {
-	// print 1 article
-	if(!XHOST.vflag_control.flag("PRINT_MODE::NUMBER")) {
-	oss << "" << "\\item[$\\bullet$]{}";// << "% ART" << wnumber << " - aflow " << string(AFLOW_VERSION);
-	} else {
-	if(voutreach_local.at(i).wnumber==0) {
-	oss << "" << "\\item[\\textbf{Chapter.\\,}]{}";// << "% ART" << wnumber << " - aflow " << string(AFLOW_VERSION);
-	} else {
-	oss << "" << "\\item[\\textbf{"+aurostd::utype2string(voutreach_local.at(i).wnumber)+".\\,}]{}";// << "% ART" << wnumber << " - aflow " << string(AFLOW_VERSION);
-	}
-	}
-	// oss << endl;
-	oss << voutreach_local.at(i);// << endl;
-	}
-	}
-	if(XHOST.vflag_control.flag("PRINT_MODE::YEAR")) oss << "\\end{itemize}" << endl;
-	}
-	}
-	oss << "" << endl;
-	if(!XHOST.vflag_control.flag("PRINT_MODE::YEAR")) oss << "\\end{itemize}" << endl;
-	//    oss << "\\end{list}" << endl;
-	oss << "" << endl;
-	oss << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
-	oss << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
+        for(uint year=voutreach_global_max_year;year>=voutreach_global_min_year;year--) {
+        bool flag_year=FALSE;
+        for(uint i=0;i<voutreach_local.size()&&!flag_year;i++)
+        if(year==voutreach_local.at(i).year)
+        flag_year=TRUE;
+        if(flag_year && year<=voutreach_global_max_year) {
+        oss << endl;
+        if(XHOST.vflag_control.flag("PRINT_MODE::YEAR")) oss << "\\ \\\\  \\textbf{ \\color{blue}{[" << year << "]}}" << endl;
+        if(XHOST.vflag_control.flag("PRINT_MODE::YEAR")) oss << "\\begin{itemize}" << endl;
+        for(uint i=0;i<voutreach_local.size();i++) {
+        string wnumber=aurostd::utype2string(voutreach_local.at(i).wnumber);
+        if(wnumber.length()<3) wnumber="0"+wnumber;
+        if(wnumber.length()<2) wnumber="0"+wnumber;
+        if(voutreach_local.at(i).year==year && year>=voutreach_global_max_year-AUTHOR_RECENT_YEARS && year<=voutreach_global_max_year) {
+        // print 1 article
+        if(!XHOST.vflag_control.flag("PRINT_MODE::NUMBER")) {
+        oss << "" << "\\item[$\\bullet$]{}";// << "% ART" << wnumber << " - aflow " << string(AFLOW_VERSION);
+        } else {
+        if(voutreach_local.at(i).wnumber==0) {
+        oss << "" << "\\item[\\textbf{Chapter.\\,}]{}";// << "% ART" << wnumber << " - aflow " << string(AFLOW_VERSION);
+        } else {
+        oss << "" << "\\item[\\textbf{"+aurostd::utype2string(voutreach_local.at(i).wnumber)+".\\,}]{}";// << "% ART" << wnumber << " - aflow " << string(AFLOW_VERSION);
+        }
+        }
+        // oss << endl;
+        oss << voutreach_local.at(i);// << endl;
+        }
+        }
+        if(XHOST.vflag_control.flag("PRINT_MODE::YEAR")) oss << "\\end{itemize}" << endl;
+        }
+        }
+        oss << "" << endl;
+        if(!XHOST.vflag_control.flag("PRINT_MODE::YEAR")) oss << "\\end{itemize}" << endl;
+        //    oss << "\\end{list}" << endl;
+        oss << "" << endl;
+        oss << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
+        oss << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
         } // LATEX MODE
-	*/
-       // ************************************************************************************************************************
+        */
+        // ************************************************************************************************************************
         // LATEX MODE
         if(XHOST.vflag_control.flag("PRINT_MODE::LATEX")) {
           if(!XHOST.vflag_control.flag("PRINT_MODE::YEAR")) voss.push_back("\\begin{itemize}");
@@ -998,45 +1000,45 @@ void voutreach_print(uint _mode,ostream& oss,string what2print) {
           voss.push_back("");
           voss.push_back("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
           voss.push_back("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-	  for(uint j=0;j<voss.size();j++) oss << voss.at(j) << endl;
+          for(uint j=0;j<voss.size();j++) oss << voss.at(j) << endl;
         } // LATEX MODE
         // ************************************************************************************************************************
 
         // ************************************************************************************************************************
-	// OLD MODE
-	/* TXT MODE
-        if(XHOST.vflag_control.flag("PRINT_MODE::TXT")) {
-          for(uint year=voutreach_global_max_year;year>=voutreach_global_min_year;year--) {
-            bool flag_year=FALSE;
-            for(uint i=0;i<voutreach_local.size()&&!flag_year;i++)
-              if(year==voutreach_local.at(i).year)
-                flag_year=TRUE;
-            if(flag_year && year<=voutreach_global_max_year) {
-              oss << endl;
-              if(XHOST.vflag_control.flag("PRINT_MODE::YEAR")) oss << "[" << year << "]" << endl;
-              for(uint i=0;i<voutreach_local.size();i++) {
-                string wnumber=aurostd::utype2string(voutreach_local.at(i).wnumber);
-                if(wnumber.length()<3) wnumber="0"+wnumber;
-                if(wnumber.length()<2) wnumber="0"+wnumber;
-                if(voutreach_local.at(i).year==year && year>=voutreach_global_max_year-AUTHOR_RECENT_YEARS && year<=voutreach_global_max_year) {
-                  // print 1 article
-                  if(XHOST.vflag_control.flag("PRINT_MODE::NUMBER")) {
-                    oss << "" << "["+aurostd::utype2string(voutreach_local.at(i).wnumber)+".] ";
-                  }
-                  oss << voutreach_local.at(i);
-                }
-              }
-            }
-          }
-          oss << "" << endl;
-          oss << "" << endl;
-          oss << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
-          oss << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
+        // OLD MODE
+        /* TXT MODE
+           if(XHOST.vflag_control.flag("PRINT_MODE::TXT")) {
+           for(uint year=voutreach_global_max_year;year>=voutreach_global_min_year;year--) {
+           bool flag_year=FALSE;
+           for(uint i=0;i<voutreach_local.size()&&!flag_year;i++)
+           if(year==voutreach_local.at(i).year)
+           flag_year=TRUE;
+           if(flag_year && year<=voutreach_global_max_year) {
+           oss << endl;
+           if(XHOST.vflag_control.flag("PRINT_MODE::YEAR")) oss << "[" << year << "]" << endl;
+           for(uint i=0;i<voutreach_local.size();i++) {
+           string wnumber=aurostd::utype2string(voutreach_local.at(i).wnumber);
+           if(wnumber.length()<3) wnumber="0"+wnumber;
+           if(wnumber.length()<2) wnumber="0"+wnumber;
+           if(voutreach_local.at(i).year==year && year>=voutreach_global_max_year-AUTHOR_RECENT_YEARS && year<=voutreach_global_max_year) {
+        // print 1 article
+        if(XHOST.vflag_control.flag("PRINT_MODE::NUMBER")) {
+        oss << "" << "["+aurostd::utype2string(voutreach_local.at(i).wnumber)+".] ";
+        }
+        oss << voutreach_local.at(i);
+        }
+        }
+        }
+        }
+        oss << "" << endl;
+        oss << "" << endl;
+        oss << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
+        oss << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" << endl;
         } // TXT MODE
-	*/ 
+        */ 
         // ************************************************************************************************************************
 
-       // ************************************************************************************************************************
+        // ************************************************************************************************************************
         // TXT MODE
         if(XHOST.vflag_control.flag("PRINT_MODE::TXT")) {
           for(uint year=voutreach_global_max_year;year>=voutreach_global_min_year;year--) {
@@ -1045,7 +1047,7 @@ void voutreach_print(uint _mode,ostream& oss,string what2print) {
               if(year==voutreach_local.at(i).year)
                 flag_year=TRUE;
             if(flag_year && year<=voutreach_global_max_year) {
-	      if(XHOST.vflag_control.flag("PRINT_MODE::YEAR")){  voss.push_back("");voss.push_back("["+aurostd::utype2string(year)+"]");}
+              if(XHOST.vflag_control.flag("PRINT_MODE::YEAR")){  voss.push_back("");voss.push_back("["+aurostd::utype2string(year)+"]");}
               for(uint i=0;i<voutreach_local.size();i++) {
                 string wnumber=aurostd::utype2string(voutreach_local.at(i).wnumber);
                 if(wnumber.length()<3) wnumber="0"+wnumber;
@@ -1054,19 +1056,19 @@ void voutreach_print(uint _mode,ostream& oss,string what2print) {
                   // print 1 article
                   if(XHOST.vflag_control.flag("PRINT_MODE::NUMBER")) {
                     voss.push_back("["+aurostd::utype2string(voutreach_local.at(i).wnumber)+".] "+voutreach_local.at(i).print_string());
-		  } else {
-		    voss.push_back(voutreach_local.at(i).print_string());
-		  }
-		}
-	      }
-	    }
+                  } else {
+                    voss.push_back(voutreach_local.at(i).print_string());
+                  }
+                }
+              }
+            }
           }
           voss.push_back("");
           voss.push_back("");
           voss.push_back("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
           voss.push_back("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
- 	  for(uint j=0;j<voss.size();j++) oss << voss.at(j) << endl;
-       } // TXT MODE
+          for(uint j=0;j<voss.size();j++) oss << voss.at(j) << endl;
+        } // TXT MODE
         // ************************************************************************************************************************
       } // iauthor
     }
@@ -1406,7 +1408,7 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
             if(object.at(0)==' ' || object.at(0)=='\"')
               object=object.substr(1,object.length());
             if(object.at(object.length()-1)==' ' || object.at(object.length()-1)==';' || 
-	       object.at(object.length()-1)=='"') object=object.substr(0,object.length()-1);
+                object.at(object.length()-1)=='"') object=object.substr(0,object.length()-1);
           }
           // if(!XHOST.QUIET_CERR) cerr << object << endl;
           if(ktokens.at(0)=="YEAR" || ktokens.at(0)=="year") ptmp.year=aurostd::string2utype<uint>(ktokens.at(1)); // check year
@@ -1422,7 +1424,7 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
             if(object=="POSTER" || object=="PRESENTATION_POSTER") ptmp.type="PRESENTATION_POSTER";
             if(object=="ARTICLE" || object=="article") ptmp.type="ARTICLE";
             if(object=="ALABEL" || object=="alabel") ptmp.type="ALABEL";
-	    if(object=="JLABEL" || object=="jlabel") ptmp.type="JLABEL";
+            if(object=="JLABEL" || object=="jlabel") ptmp.type="JLABEL";
             if(object=="PUBLICATION" || object=="publication") ptmp.type="ARTICLE";
             if(object=="EDUCATION" || object=="education") ptmp.type="EDUCATION";
             if(object=="RESEARCH" || object=="research") ptmp.type="RESEARCH";
@@ -1442,16 +1444,16 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
 
           if(ktokens.at(0)=="TITLE" || ktokens.at(0)=="title") ptmp.title=object; // check title
           if(ktokens.at(0)=="JOURNAL" || ktokens.at(0)=="journal") ptmp.journal=object; // check journal
-	  if(ktokens.at(0)=="LINK" || ktokens.at(0)=="link") ptmp.link=object; // check link
+          if(ktokens.at(0)=="LINK" || ktokens.at(0)=="link") ptmp.link=object; // check link
           if(ktokens.at(0)=="ARXIV" || ktokens.at(0)=="arxiv") ptmp.arxiv=object; // check arxiv
           if(ktokens.at(0)=="SUPPLEMENTARY" || ktokens.at(0)=="supplementary") ptmp.supplementary=object; // check supplementary
           if(ktokens.at(0)=="BIBTEX" || ktokens.at(0)=="bibtex") ptmp.bibtex=object; // check bibtex
           if(ktokens.at(0)=="BIBTEX_JOURNAL" || ktokens.at(0)=="bibtex_journal") ptmp.bibtex_journal=object; // check bibtex_journal
-	  if(ktokens.at(0)=="BIBTEX_VOLUME" || ktokens.at(0)=="bibtex_volume") ptmp.bibtex_volume=object; // check bibtex_volume
-	  if(ktokens.at(0)=="BIBTEX_ISSUE" || ktokens.at(0)=="bibtex_issue") ptmp.bibtex_issue=object; // check bibtex_issue
-	  if(ktokens.at(0)=="BIBTEX_PAGES" || ktokens.at(0)=="bibtex_pages") ptmp.bibtex_pages=object; // check bibtex_pages
+          if(ktokens.at(0)=="BIBTEX_VOLUME" || ktokens.at(0)=="bibtex_volume") ptmp.bibtex_volume=object; // check bibtex_volume
+          if(ktokens.at(0)=="BIBTEX_ISSUE" || ktokens.at(0)=="bibtex_issue") ptmp.bibtex_issue=object; // check bibtex_issue
+          if(ktokens.at(0)=="BIBTEX_PAGES" || ktokens.at(0)=="bibtex_pages") ptmp.bibtex_pages=object; // check bibtex_pages
           if(ktokens.at(0)=="BIBTEX_YEAR" || ktokens.at(0)=="bibtex_year") ptmp.bibtex_year=object; // check bibtex_year
-	  if(ktokens.at(0)=="PLACE" || ktokens.at(0)=="place") ptmp.place=object; // check place
+          if(ktokens.at(0)=="PLACE" || ktokens.at(0)=="place") ptmp.place=object; // check place
           if(ktokens.at(0)=="DATE" || ktokens.at(0)=="date") ptmp.date=object; // check date
           if(ktokens.at(0)=="HOST" || ktokens.at(0)=="host") ptmp.host=object; // check host
           if(ktokens.at(0)=="ABSTRACT" || ktokens.at(0)=="abstract") ptmp.abstract=object; // check abstract
@@ -1467,15 +1469,15 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
           if(ktokens.at(0)=="SPONSOR" || ktokens.at(0)=="sponsor") aurostd::string2tokensAdd(object,ptmp.vsponsor,",");
           if(ktokens.at(0)=="ALLOY" || ktokens.at(0)=="alloy") aurostd::string2tokensAdd(object,ptmp.valloy,",");
           if(ktokens.at(0)=="ALABEL" || ktokens.at(0)=="alabel") aurostd::string2tokensAdd(object,valabel,",");
-	  if(ktokens.at(0)=="JLABEL" || ktokens.at(0)=="jlabel") aurostd::string2tokensAdd(object,vjlabel,",");
+          if(ktokens.at(0)=="JLABEL" || ktokens.at(0)=="jlabel") aurostd::string2tokensAdd(object,vjlabel,",");
         }
       }
 
       if(ptmp.bibtex=="" && ptmp.bibtex_volume!="") { stringstream oss;oss << "curtarolo:art" << ptmp.wnumber;ptmp.bibtex=oss.str(); }
-      
+
       if(ptmp.type=="") {
         for(k=i;k<=j;k++) 
-	  if(!XHOST.QUIET_CERR) cerr << "entry=[" << vpres.at(k) << "]" << endl;
+          if(!XHOST.QUIET_CERR) cerr << "entry=[" << vpres.at(k) << "]" << endl;
       } else {
         if((aurostd::substring2bool(ptmp.type,"ARTICLE") || aurostd::substring2bool(ptmp.type,"PUBLICATION")) && (aurostd::substring2bool(what2print,"ARTICLE") || aurostd::substring2bool(what2print,"PUBLICATION")))
           voutreach.push_back(ptmp);
@@ -1497,7 +1499,24 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
     }
   }
 
-  for(uint i=0;i<voutreach.size();i++) fixlabel(valabel,voutreach.at(i).vauthor);
+  for(uint i=0;i<voutreach.size();i++) {
+    fixlabel(valabel,voutreach.at(i).vauthor);
+    //   cout << voutreach.at(i).vauthor.size() << endl;
+    for(uint j=0;j<voutreach.at(i).vauthor.size();j++) { // fix corresponding  authors
+      aurostd::StringSubst(voutreach.at(i).vauthor.at(j),"*","");  //fix corresponding authors
+      if(0)   {
+        vector<string> tokens;
+        aurostd::string2tokens(voutreach.at(i).vauthor.at(j),tokens," ");
+        if(tokens.size()>2) {
+          cout << tokens.size() << " [" << voutreach.at(i).vauthor.at(j) << "] ";
+          for (k=0;k< tokens.size();k++)
+            cout << tokens.at(k) << " ";
+          cout << endl;
+        }
+      }
+    }
+  }
+
   for(uint i=0;i<voutreach.size();i++) fixlabel(valabel,voutreach.at(i).vextra_html);
   for(uint i=0;i<voutreach.size();i++) fixlabel(valabel,voutreach.at(i).vextra_latex);
   for(uint i=0;i<voutreach.size();i++) fixlabel(vjlabel,voutreach.at(i).journal);
@@ -1566,9 +1585,9 @@ bool ProcessPhpLatexCv(void) {
   bool Arun=FALSE;
   vector<_outreach> voutreach;
   if(!XHOST.vflag_control.flag("PRINT_MODE::JSON") &&
-     !XHOST.vflag_control.flag("PRINT_MODE::HTML") && 
-     !XHOST.vflag_control.flag("PRINT_MODE::LATEX") && 
-     !XHOST.vflag_control.flag("PRINT_MODE::TXT")) {
+      !XHOST.vflag_control.flag("PRINT_MODE::HTML") && 
+      !XHOST.vflag_control.flag("PRINT_MODE::LATEX") && 
+      !XHOST.vflag_control.flag("PRINT_MODE::TXT")) {
     XHOST.vflag_control.flag("PRINT_MODE::HTML",TRUE);
   }
   if(XHOST.vflag_control.flag("PRINT_MODE::JSON")) {XHOST.vflag_control.flag("PRINT_MODE::LATEX",FALSE);XHOST.vflag_control.flag("PRINT_MODE::TXT",FALSE);XHOST.vflag_control.flag("PRINT_MODE::HTML",FALSE);}

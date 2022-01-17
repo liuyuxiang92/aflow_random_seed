@@ -57,7 +57,6 @@
 
 #define _ICSD_DIRBASE_ "ICSD"
 
-#define _aflowinpad_ 60
 #define _incarpad_ 48  //ME20181024
 
 string lattices[]={"","BCC","FCC","CUB","HEX","RHL","BCT","TET","ORC","ORCC","ORCF","ORCI","MCL","MCLC","TRI","XXX"};
@@ -859,6 +858,11 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   xvasp.aopts.flag("AFLOWIN_FLAG::KMODE_STATIC", vflags.KBIN_VASP_KPOINTS_STATIC_KMODE.isentry);
   if (vflags.KBIN_VASP_KPOINTS_STATIC_KMODE.isentry) {xvasp.aopts.push_attached("AFLOWIN_FLAG::KMODE_STATIC", vflags.KBIN_VASP_KPOINTS_STATIC_KMODE.content_string);}
 
+  xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_LATTICE",vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.isentry); //CO20210805
+  if(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.isentry){xvasp.aopts.push_attached("AFLOWIN_FLAG::BANDS_LATTICE",vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.content_string);}  //CO20210805
+  xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID",vflags.KBIN_VASP_KPOINTS_BANDS_GRID.isentry); //CO20210805
+  if(vflags.KBIN_VASP_KPOINTS_BANDS_GRID.isentry){xvasp.aopts.push_attached("AFLOWIN_FLAG::BANDS_GRID",vflags.KBIN_VASP_KPOINTS_BANDS_GRID.content_string);} //CO20210805
+
   //POTCAR
   xvasp.aopts.flag("FLAG::POTCAR_MODE_IMPLICIT", vflags.KBIN_VASP_POTCAR_MODE.flag("IMPLICIT"));
   xvasp.aopts.flag("FLAG::POTCAR_MODE_EXTERNAL", vflags.KBIN_VASP_POTCAR_MODE.flag("EXTERNAL"));
@@ -910,6 +914,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   if(LDEBUG) {cerr << soliloquy << " xvasp.AVASP_potential=" << xvasp.AVASP_potential << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.AVASP_prototype_from_library_=" << xvasp.AVASP_prototype_from_library_ << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.AVASP_prototype_mode=" << xvasp.AVASP_prototype_mode << endl;}
+  if(LDEBUG) {cerr << soliloquy << " xvasp.AVASP_path_BANDS=" << xvasp.AVASP_path_BANDS << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.AVASP_value_BANDS_GRID=" << xvasp.AVASP_value_BANDS_GRID << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.AVASP_value_KPPRA=" << xvasp.AVASP_value_KPPRA << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.AVASP_value_KPPRA_STATIC=" << xvasp.AVASP_value_KPPRA_STATIC << endl;}
@@ -923,6 +928,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::AIMS\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::AIMS") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::ALGORITHM\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::ALGORITHM") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::APL_SUPERCELL\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL") << endl;}
+  if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::BANDS_LATTICE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_LATTICE") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::BANDS_GRID\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::CIF\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::CIF") << endl;} //DX20190123 - add CIF
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::CHGCAR_FILE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::CHGCAR_FILE") << endl;}  //ME20191028
@@ -1126,13 +1132,13 @@ void AVASP_populateXVASP_ARUN(const _aflags& aflags,const _kflags& kflags,const 
       xvasp.aopts.flag("FLAG::EXTRA_INCAR", true);
       xvasp.AVASP_EXTRA_INCAR << "# Added by [AFLOW_APL] begin" << std::endl;
       if (xvasp.aopts.flag("APL_FLAG::AVASP_LR")) {
-        xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("IBRION=8",_incarpad_) << "# Linear Response method" << std::endl;
+        xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("IBRION=8",_incarpad_) << " # Linear Response method" << std::endl;
       } else {
         if (DEFAULT_APL_USE_LEPSILON) {
-          xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("IBRION=8",_incarpad_) << "# Linear Response method" << std::endl;
-          xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("LEPSILON=.TRUE.",_incarpad_) << "# Calculate Born effective charges and dielectric tensor" << std::endl;  //ME20190109
+          xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("IBRION=8",_incarpad_) << " # Linear Response method" << std::endl;
+          xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("LEPSILON=.TRUE.",_incarpad_) << " # Calculate Born effective charges and dielectric tensor" << std::endl;  //ME20190109
         } else {
-          xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("LCALCEPS=.TRUE.",_incarpad_) << "# Calculate Born effective charges and dielectric tensor" << std::endl;  //ME20190109
+          xvasp.AVASP_EXTRA_INCAR << aurostd::PaddedPOST("LCALCEPS=.TRUE.",_incarpad_) << " # Calculate Born effective charges and dielectric tensor" << std::endl;  //ME20190109
         }
       }
       xvasp.AVASP_EXTRA_INCAR << "# Added by [AFLOW_APL] end" << std::endl;
@@ -1300,6 +1306,8 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::KPPRA\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KPPRA") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::KPPRA_STATIC\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::KPPRA_STATIC\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC") << endl;
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::BANDS_LATTICE\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_LATTICE") << endl;
+  if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::BANDS_LATTICE\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_LATTICE") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::BANDS_GRID\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID") << endl;
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " xvasp.aopts.getattachedscheme(\"AFLOWIN_FLAG::BANDS_GRID\")=" << xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID") << endl;
 
@@ -1395,6 +1403,13 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   AVASP_fix_volumes_masses_XVASP(xvasp,skip_volume);  //ME20181103  //CO20181226
   deque<double> vmass(xvasp.str.species_mass); // BACKUP
   //  for(uint i=0;i<xvasp.str.species.size();i++) cerr << "xvasp.str.species_mass=" << xvasp.str.species_mass.at(i) << endl;
+
+  //CO202010624 - final modification for bader calc
+  //DEFAULT_VASP_FORCE_OPTION_BADER_STATIC depends on RUN type, it must be fixed above here
+  if(DEFAULT_VASP_FORCE_OPTION_BADER_STATIC && 
+      (xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS || xvasp.AVASP_flag_RUN_RELAX_STATIC || xvasp.AVASP_flag_RUN_STATIC || xvasp.AVASP_flag_RUN_STATIC_BANDS)){
+    xvasp.aopts.flag("FLAG::AVASP_BADER",TRUE);
+  }
 
   //CO20181226 - force CHGCAR if BADER
   if(xvasp.aopts.flag("FLAG::AVASP_BADER")) {xvasp.aopts.flag("FLAG::AVASP_CHGCAR",TRUE);}
@@ -1580,7 +1595,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
           string FilePotcar,DataPotcar,AUIDPotcar;
           if (!XHOST.GENERATE_AFLOWIN_ONLY) { //CO20190116
             if(!KBIN::VASP_Find_FILE_POTCAR(xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i),FilePotcar,DataPotcar,AUIDPotcar)) {
-              cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+              cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message(_AFLOW_FILE_NAME_) << endl;
               return FALSE; // dont die
             } else {
               if(LDEBUG) cerr << "DEBUG - " << soliloquy << "  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] = " << FilePotcar << endl;
@@ -2048,9 +2063,9 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   // SYMMETRY WRITE
   if(!xvasp.aopts.flag("FLAG::AVASP_SYMMETRY=OFF")) {
-    aflowin << aurostd::PaddedPOST("[AFLOW_SYMMETRY]CALC ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
-    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_WRITE ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
-    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("[AFLOW_SYMMETRY]CALC ",_AFLOWINPAD_) << " // README_AFLOW_SYM.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_WRITE ",_AFLOWINPAD_) << " // README_AFLOW_SYM.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 ",_AFLOWINPAD_) << " // README_AFLOW_SYM.TXT" << endl; //CO20180214
     //aflowin << "[AFLOW_SYMMETRY]CALC " << endl;
     //aflowin << "#[AFLOW_SYMMETRY]SGROUP_WRITE " << endl;
     //aflowin << "#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 " << endl;
@@ -2058,9 +2073,9 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   }
   // NEIGHBORS WRITE
   //DX20210122 [OBSOLETE] if(!xvasp.aopts.flag("FLAG::AVASP_NEIGHBORS=OFF")) {
-  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("#[AFLOW_NEIGHBOURS]CALC ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
-  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]RADIUS=7.7 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
-  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]DRADIUS=0.1 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
+  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("#[AFLOW_NEIGHBOURS]CALC ",_AFLOWINPAD_) << " // README_AFLOW.TXT" << endl; //CO20180214
+  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]RADIUS=7.7 ",_AFLOWINPAD_) << " // README_AFLOW.TXT" << endl; //CO20180214
+  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]DRADIUS=0.1 ",_AFLOWINPAD_) << " // README_AFLOW.TXT" << endl; //CO20180214
   //DX20210122 [OBSOLETE]   //aflowin << "#[AFLOW_NEIGHBOURS]CALC " << endl;
   //DX20210122 [OBSOLETE]   //aflowin << "[AFLOW_NEIGHBOURS]RADIUS=7.7 " << endl;
   //DX20210122 [OBSOLETE]   //aflowin << "[AFLOW_NEIGHBOURS]DRADIUS=0.1 " << endl;
@@ -2080,21 +2095,21 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
 
   // APL WRITING - ME20181027
   if(!xvasp.aopts.flag("FLAG::AVASP_APL=OFF")) { //CO20180214 - I interpret this flag to refer to WRITING APL options, not if they are on
-    aflowin << aurostd::PaddedPOST((MODULE=="APL"?string(""):string("#"))+"[AFLOW_APL]CALC ",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST((MODULE=="APL"?string(""):string("#"))+"[AFLOW_APL]CALC ",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl; //CO20180214
     //[ME20181216] - OLD SCHEME
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]ENGINE=DM",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DMAG=0.015",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]ENGINE=DM",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DMAG=0.015",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     //[ME20181216]//DX+CO START
-    //[ME20181216]aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string("#"):string(""))+"[AFLOW_APL]MINATOMS=100",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string("#"):string(""))+"[AFLOW_APL]MINATOMS=100",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     //[ME20181216]aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string(""):string("#"))+"[AFLOW_APL]SUPERCELL="+
-    //[ME20181216]    (xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"):"3x3x3"),_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;  //CO20180214
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DC=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DPM=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]ZEROSTATE=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]    (xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"):"3x3x3"),_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;  //CO20180214
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DC=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DPM=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]ZEROSTATE=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     //[ME20181216]//DX+CO END
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DOS=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]TP=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]TPT=0:2000:10",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DOS=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]TP=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]TPT=0:2000:10",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     //[ME20181216] - NEW SCHEME
     string _ASTROPT_, key, scheme, xvaspflag;
     _ASTROPT_ = "[AFLOW_APL]";
@@ -2107,14 +2122,14 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       key = xvaspflag;
       aurostd::StringSubst(key, "AFLOWIN_FLAG::APL_", string(""));
       if (!scheme.empty()) {
-        aflowin << aurostd::PaddedPOST(_ASTROPT_+key+"="+scheme,_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
+        aflowin << aurostd::PaddedPOST(_ASTROPT_+key+"="+scheme,_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
       }
     }
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
 
   if(!xvasp.aopts.flag("FLAG::AVASP_QHA=OFF")) {
-    aflowin << aurostd::PaddedPOST((MODULE=="QHA"?string(""):string("#"))+"[AFLOW_QHA]CALC ",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    aflowin << aurostd::PaddedPOST((MODULE=="QHA"?string(""):string("#"))+"[AFLOW_QHA]CALC ",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
     string _ASTROPT_ = "[AFLOW_QHA]", key="", scheme="", xvaspflag="";
 
     std::sort(xvasp.qhaopts.vxscheme.begin(), xvasp.qhaopts.vxscheme.end());
@@ -2125,23 +2140,23 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       key = xvaspflag;
       aurostd::StringSubst(key, "AFLOWIN_FLAG::QHA_", string(""));
       if (!scheme.empty()) {
-        aflowin << aurostd::PaddedPOST(_ASTROPT_+key+"="+scheme,_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+        aflowin << aurostd::PaddedPOST(_ASTROPT_+key+"="+scheme,_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
       }
     }
 
-    //[OBSOLETE AS20200302] aflowin << aurostd::PaddedPOST("[AFLOW_QHA]MODE=QHA3P",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE AS20200302] aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=y",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA=y",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_DISTORTION=0.03",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_DISTORTION=3",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_DISTORTION_RANGE=-3:6:1",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_PDIS_T=50,100,200",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_VOL_DISTORTION_PERCENTAGE=0.03",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]DISPLACEMENTS=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]PROJECTION_DIR=1:1:1",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=n",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_VOLRANGE_DIST=-2:4:0.5",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_KPOINTS_MODE=32768:10000:20:100000",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
+    //[OBSOLETE AS20200302] aflowin << aurostd::PaddedPOST("[AFLOW_QHA]MODE=QHA3P",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE AS20200302] aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=y",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA=y",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_DISTORTION=0.03",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_DISTORTION=3",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_DISTORTION_RANGE=-3:6:1",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_PDIS_T=50,100,200",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_VOL_DISTORTION_PERCENTAGE=0.03",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]DISPLACEMENTS=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]PROJECTION_DIR=1:1:1",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=n",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_VOLRANGE_DIST=-2:4:0.5",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_KPOINTS_MODE=32768:10000:20:100000",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
 
@@ -2151,19 +2166,19 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       MODULE = "AAPL";
       xvasp.aaplopts.pop_attached("AFLOWIN_FLAG::AAPL_FOURTH_ORDER");xvasp.aaplopts.push_attached("AFLOWIN_FLAG::AAPL_FOURTH_ORDER", "ON");
     }
-    aflowin << aurostd::PaddedPOST((MODULE=="AAPL"?string(""):string("#"))+"[AFLOW_AAPL]CALC ",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST((MODULE=="AAPL"?string(""):string("#"))+"[AFLOW_AAPL]CALC ",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     //[ME20181216] - OLD SCHEME
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]TDMAG=0.015",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUT_SHELL=4",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUT_RAD=4.5",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]SUMRULE=1E-5",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]BTE=FULL",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]THERMALGRID=21x21x21",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]ISOTOPE=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUMULATIVEK=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]BOUNDARY=n",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]NANO_SIZE=100",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]TCT=200:700:20",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]TDMAG=0.015",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUT_SHELL=4",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUT_RAD=4.5",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]SUMRULE=1E-5",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]BTE=FULL",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]THERMALGRID=21x21x21",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]ISOTOPE=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUMULATIVEK=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]BOUNDARY=n",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]NANO_SIZE=100",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]TCT=200:700:20",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     //[ME20181216] - NEW SCHEME
     string _ASTROPT_, key, scheme, xvaspflag;
     _ASTROPT_ = "[AFLOW_AAPL]";
@@ -2176,75 +2191,75 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       key = xvaspflag;
       aurostd::StringSubst(key, "AFLOWIN_FLAG::AAPL_", string(""));
       if (!scheme.empty()) {
-        aflowin << aurostd::PaddedPOST(_ASTROPT_+key+"="+scheme,_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
+        aflowin << aurostd::PaddedPOST(_ASTROPT_+key+"="+scheme,_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
       }
     }
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
 
   if(1 && !xvasp.aopts.flag("FLAG::AVASP_AGL=OFF")) {  //CO20181226 - cormac will fix
-    aflowin << aurostd::PaddedPOST((MODULE=="AGL"?string(""):string("#"))+"[AFLOW_AGL]CALC ",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]AEL_POISSON_RATIO=ON",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]DIRNAME_ARUN=ON",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]NTEMP=201",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]HUGONIOT_CALC=ON",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]NPRESSURE=101",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]SPRESSURE=1.0",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]NSTRUCTURES=28",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]STRAIN_STEP=0.01",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]WRITE_GIBBS_INPUT=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]WRITE_FULL_RESULTS=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]PLOT_RESULTS=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST((MODULE=="AGL"?string(""):string("#"))+"[AFLOW_AGL]CALC ",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]AEL_POISSON_RATIO=ON",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]DIRNAME_ARUN=ON",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]NTEMP=201",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]HUGONIOT_CALC=ON",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]NPRESSURE=101",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]SPRESSURE=1.0",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]NSTRUCTURES=28",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]STRAIN_STEP=0.01",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]WRITE_GIBBS_INPUT=OFF",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]WRITE_FULL_RESULTS=OFF",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]PLOT_RESULTS=OFF",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
     // [OBSOLETE] if(0){  //cormac will fix later
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]IEOS=0",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]IDEBYE=0",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]CHECK_EV_CONCAVITY=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]CHECK_EV_MIN=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]FIT_TYPE=0",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]AUTOSKIP_FAILED_ARUNS=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]SKIP_FAILED_ARUNS=",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]SKIP_ARUNS_MAX=7",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]RUN_ALL_PRESSURE_TEMPERATURE=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]HUGONIOT_EXTRAPOLATE=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]PRECACC_ALGONORM=OFF",_aflowinpad_) << "// README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]IEOS=0",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]IDEBYE=0",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]CHECK_EV_CONCAVITY=OFF",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]CHECK_EV_MIN=OFF",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]FIT_TYPE=0",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]AUTOSKIP_FAILED_ARUNS=OFF",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]SKIP_FAILED_ARUNS=",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]SKIP_ARUNS_MAX=7",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]RUN_ALL_PRESSURE_TEMPERATURE=OFF",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]HUGONIOT_EXTRAPOLATE=OFF",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AGL]PRECACC_ALGONORM=OFF",_AFLOWINPAD_) << " // README_AFLOW_AGL.TXT" << endl;
     // [OBSOLETE] }
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
 
   if(1 && !xvasp.aopts.flag("FLAG::AVASP_AEL=OFF")) { //CO20181226 - cormac will fix
-    aflowin << aurostd::PaddedPOST((MODULE=="AEL"?string(""):string("#"))+"[AFLOW_AEL]CALC ",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]STRAIN_SYMMETRY=ON",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]DIRNAME_ARUN=ON",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NNORMAL_STRAINS=4",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NSHEAR_STRAINS=4",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NORMAL_STRAIN_STEP=0.005",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SHEAR_STRAIN_STEP=0.005",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]CHECK_ELASTIC_SYMMETRY=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]WRITE_FULL_RESULTS=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]ORIGIN_STRAIN_CALC=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]RELAXED_STRUCT_FIT=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]ORIGIN_STRAIN_FIT=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST((MODULE=="AEL"?string(""):string("#"))+"[AFLOW_AEL]CALC ",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]STRAIN_SYMMETRY=ON",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]DIRNAME_ARUN=ON",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NNORMAL_STRAINS=4",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NSHEAR_STRAINS=4",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NORMAL_STRAIN_STEP=0.005",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SHEAR_STRAIN_STEP=0.005",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]CHECK_ELASTIC_SYMMETRY=OFF",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]WRITE_FULL_RESULTS=OFF",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]ORIGIN_STRAIN_CALC=OFF",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]RELAXED_STRUCT_FIT=OFF",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]ORIGIN_STRAIN_FIT=OFF",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
     // [OBSOLETE] if(0){  //cormac will fix later
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NEG_STRAINS=ON",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NIND_STRAINS=3",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SYM_TOL_FRAC=0.05",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]VASPRUNXML_STRESS=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]PRECACC_ALGONORM=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SYMMETRIZE=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]VASPSYM=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]AUTOSKIP_FAILED_ARUNS=OFF",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SKIP_FAILED_ARUNS=",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SKIP_ARUNS_MAX=1",_aflowinpad_) << "// README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NEG_STRAINS=ON",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]NIND_STRAINS=3",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SYM_TOL_FRAC=0.05",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]VASPRUNXML_STRESS=OFF",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]PRECACC_ALGONORM=OFF",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SYMMETRIZE=OFF",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]VASPSYM=OFF",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]AUTOSKIP_FAILED_ARUNS=OFF",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SKIP_FAILED_ARUNS=",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AEL]SKIP_ARUNS_MAX=1",_AFLOWINPAD_) << " // README_AFLOW_AEL.TXT" << endl;
     // [OBSOLETE] }
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
 
-  if(0) {
-    if(xvasp.str.species.size()==1 || xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC || xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD) {
-      xvasp.AVASP_flag_RUN_RELAX=FALSE;
-      xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS=TRUE;
-    }
-  }
+  //[CO20210624 - do NOT modify RUN settings here, too late (see bader)]if(0) {
+  //[CO20210624 - do NOT modify RUN settings here, too late (see bader)]  if(xvasp.str.species.size()==1 || xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC || xvasp.AVASP_prototype_mode==LIBRARY_MODE_HTQC_ICSD) {
+  //[CO20210624 - do NOT modify RUN settings here, too late (see bader)]    xvasp.AVASP_flag_RUN_RELAX=FALSE;
+  //[CO20210624 - do NOT modify RUN settings here, too late (see bader)]    xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS=TRUE;
+  //[CO20210624 - do NOT modify RUN settings here, too late (see bader)]  }
+  //[CO20210624 - do NOT modify RUN settings here, too late (see bader)]}
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[12.3]" << endl;
 
@@ -2252,13 +2267,13 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   string relax_count=aurostd::utype2string(DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT);
   if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_COUNT")){relax_count=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_COUNT");}
   if(LDEBUG) {cerr << soliloquy << " relax_count=" << relax_count << endl;}
-  if(xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS) aflowin << aurostd::PaddedPOST("[VASP_RUN]RELAX_STATIC_BANDS="+relax_count,_aflowinpad_); //CO20181226 - must be else if
-  else if(xvasp.AVASP_flag_RUN_RELAX_STATIC) aflowin << aurostd::PaddedPOST("[VASP_RUN]RELAX_STATIC="+relax_count,_aflowinpad_);  //CO20181226 - must be else if
-  else if(xvasp.AVASP_flag_RUN_RELAX) aflowin << aurostd::PaddedPOST("[VASP_RUN]RELAX="+relax_count,_aflowinpad_);  //CO20181226 - must be else if
-  else if(xvasp.AVASP_flag_RUN_STATIC) aflowin << aurostd::PaddedPOST("[VASP_RUN]STATIC",_aflowinpad_); //CO20181226 - must be else if
-  else if(xvasp.AVASP_flag_RUN_STATIC_BANDS) aflowin << aurostd::PaddedPOST("[VASP_RUN]STATIC_BANDS",_aflowinpad_); //CO20181226 - must be else if
-  else if(xvasp.AVASP_flag_GENERATE) aflowin << aurostd::PaddedPOST("[VASP_RUN]GENERATE",_aflowinpad_); //CO20181226 - must be else if
-  aflowin << "// GENERATE | STATIC | RELAX=N | RELAX_STATIC=N | STATIC_BANDS | RELAX_STATIC_BANDS=N | REPEAT_BANDS [,DS[,DD[,DSCF]]] " << endl;
+  if(xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS) aflowin << aurostd::PaddedPOST("[VASP_RUN]RELAX_STATIC_BANDS="+relax_count,_AFLOWINPAD_); //CO20181226 - must be else if
+  else if(xvasp.AVASP_flag_RUN_RELAX_STATIC) aflowin << aurostd::PaddedPOST("[VASP_RUN]RELAX_STATIC="+relax_count,_AFLOWINPAD_);  //CO20181226 - must be else if
+  else if(xvasp.AVASP_flag_RUN_RELAX) aflowin << aurostd::PaddedPOST("[VASP_RUN]RELAX="+relax_count,_AFLOWINPAD_);  //CO20181226 - must be else if
+  else if(xvasp.AVASP_flag_RUN_STATIC) aflowin << aurostd::PaddedPOST("[VASP_RUN]STATIC",_AFLOWINPAD_); //CO20181226 - must be else if
+  else if(xvasp.AVASP_flag_RUN_STATIC_BANDS) aflowin << aurostd::PaddedPOST("[VASP_RUN]STATIC_BANDS",_AFLOWINPAD_); //CO20181226 - must be else if
+  else if(xvasp.AVASP_flag_GENERATE) aflowin << aurostd::PaddedPOST("[VASP_RUN]GENERATE",_AFLOWINPAD_); //CO20181226 - must be else if
+  aflowin << " // GENERATE | STATIC | RELAX=N | RELAX_STATIC=N | STATIC_BANDS | RELAX_STATIC_BANDS=N | REPEAT_STATIC | REPEAT_STATIC_BANDS | REPEAT_BANDS [,DS[,DD[,DSCF]]] " << endl;
 
   if(xvasp.AVASP_flag_RUN_RELAX_STATIC ||
       xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS ||
@@ -2282,38 +2297,38 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
 
   // WAVECAR WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_WAVECAR")) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=ON",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_WAVECAR in .aflow.rc)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=ON",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_WAVECAR in .aflow.rc)" << endl;
   } else {
     //ME20191030 - should write explicitly; this avoids confusion and potential conflicts with aflow.rc values
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=OFF",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_WAVECAR in .aflow.rc)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=OFF",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_WAVECAR in .aflow.rc)" << endl;
   }
 
   // CHGCAR WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_CHGCAR")) {
     //ME20191030 - should write explicitly; this avoids confusion and potential conflicts with aflow.rc values
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=ON",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_CHGCAR in .aflow.rc)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=ON",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_CHGCAR in .aflow.rc)" << endl;
   } else {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=OFF",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_CHGCAR in .aflow.rc)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=OFF",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_CHGCAR in .aflow.rc)" << endl;
   }
 
   //ME20191028 - CHGCAR_FILE
   if (!xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::CHGCAR_FILE").empty()) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR_FILE="+xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::CHGCAR_FILE"),_aflowinpad_) << std::endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR_FILE="+xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::CHGCAR_FILE"),_AFLOWINPAD_) << std::endl;
   }
 
   // KPOINTS WRITING - Modified (ME20181023)
   if (xvasp.aopts.flag("AFLOWIN_FLAG::KPOINTS") && !(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KPOINTS").empty())) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]KPOINTS="+xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KPOINTS"),_aflowinpad_);
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]KPOINTS="+xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KPOINTS"),_AFLOWINPAD_);
   } else {
-    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]KPOINTS=keyword[,keyword]",_aflowinpad_);
+    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]KPOINTS=keyword[,keyword]",_AFLOWINPAD_);
   }
-  aflowin << "// EVEN | ODD | KSHIFT_GAMMA_EVEN | KSHIFT_GAMMA_ODD | KSCHEME_MONKHORST_PACK | KSCHEME_GAMMA | GAMMA | KEEPK | IBZKPT" << endl;
+  aflowin << " // EVEN | ODD | KSHIFT_GAMMA_EVEN | KSHIFT_GAMMA_ODD | KSCHEME_MONKHORST_PACK | KSCHEME_GAMMA | GAMMA | KEEPK | IBZKPT" << endl;
 
   // SYM WRITING - Modified (ME20181023) //CO20181226
   if(xvasp.aopts.flag("FLAG::AVASP_SYM")){
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SYM=ON",_aflowinpad_) << "// ON | OFF  (default: DEFAULT_VASP_FORCE_OPTION_SYM in .aflow.rc)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SYM=ON",_AFLOWINPAD_) << " // ON | OFF  (default: DEFAULT_VASP_FORCE_OPTION_SYM in .aflow.rc)" << endl;
   } else {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SYM=OFF",_aflowinpad_) << "// ON | OFF  (default: DEFAULT_VASP_FORCE_OPTION_SYM in .aflow.rc)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SYM=OFF",_AFLOWINPAD_) << " // ON | OFF  (default: DEFAULT_VASP_FORCE_OPTION_SYM in .aflow.rc)" << endl;
   }
 
   //CO20190126 - this scheme does not work well, it assumes AVASP_potential == DIR
@@ -2333,52 +2348,52 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   else if(xvasp.AVASP_potential==DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN) aus_PP="potpaw_PBE_KIN"; //CO20190204 - must come AFTER potpaw_PBE in else if() structure
 
   if(xvasp.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS") && !aus_PP.empty()) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]AUTO_PSEUDOPOTENTIALS="+aus_PP,_aflowinpad_) << "// pot_LDA | pot_GGA | potpaw_LDA | potpaw_GGA | potpaw_PBE | potpaw_LDA_KIN | potpaw_PBE_KIN  " << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]AUTO_PSEUDOPOTENTIALS="+aus_PP,_AFLOWINPAD_) << " // pot_LDA | pot_GGA | potpaw_LDA | potpaw_GGA | potpaw_PBE | potpaw_LDA_KIN | potpaw_PBE_KIN  " << endl;
   } else {
     if(aus_PP.empty()){aus_PP=DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE;}  //CO20190126 - some sort of default
     //   cerr << soliloquy << " AUTO_PSEUDOPOTENTIALS=FALSE" << endl;
-    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]AUTO_PSEUDOPOTENTIALS="+aus_PP,_aflowinpad_) << "// pot_LDA | pot_GGA | potpaw_LDA | potpaw_GGA | potpaw_PBE | potpaw_LDA_KIN | potpaw_PBE_KIN  " << endl;
+    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]AUTO_PSEUDOPOTENTIALS="+aus_PP,_AFLOWINPAD_) << " // pot_LDA | pot_GGA | potpaw_LDA | potpaw_GGA | potpaw_PBE | potpaw_LDA_KIN | potpaw_PBE_KIN  " << endl;
   }
 
   // NBANDS WRITING
   if(xvasp.aopts.flag("AFLOWIN_FLAG::NBANDS")) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]NBANDS",_aflowinpad_) << "// Estimate Bands (better than VASP)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]NBANDS",_AFLOWINPAD_) << " // Estimate Bands (better than VASP)" << endl;
   } else if (xvasp.aopts.flag("AFLOWIN_FLAG::NBANDS_EQUAL")) {  //ME20181128
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]NBANDS=" + xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::NBANDS_EQUAL"),_aflowinpad_) << "// Number of bands" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]NBANDS=" + xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::NBANDS_EQUAL"),_AFLOWINPAD_) << " // Number of bands" << endl;
   } else {
-    // aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]NBANDS",_aflowinpad_) << "// Estimate Bands (better than VASP)" << endl;
+    // aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]NBANDS",_AFLOWINPAD_) << " // Estimate Bands (better than VASP)" << endl;
   }
 
   // PSTRESS WRITING
   if(xvasp.aopts.flag("AFLOWIN_FLAG::PSTRESS")) {
     double PSTRESS=aurostd::string2utype<double>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::PSTRESS"));
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PSTRESS="+aurostd::utype2string(PSTRESS,_AVASP_DOUBLE2STRING_PRECISION_),_aflowinpad_) << "// Pressure in kBar (1kB=0.1GPa)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PSTRESS="+aurostd::utype2string(PSTRESS,_AVASP_DOUBLE2STRING_PRECISION_),_AFLOWINPAD_) << " // Pressure in kBar (1kB=0.1GPa)" << endl;
   } else {
-    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]PSTRESS=0.0",_aflowinpad_) << "// Pressure in kBar (1kB=0.1GPa)" << endl;
+    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]PSTRESS=0.0",_AFLOWINPAD_) << " // Pressure in kBar (1kB=0.1GPa)" << endl;
   }
 
   // EDIFFG WRITING
   if(xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG")) {
     double EDIFFG=aurostd::string2utype<double>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::EDIFFG"));
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]EDIFFG="+aurostd::utype2string(EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_),_aflowinpad_) << "// EDIFFG for relaxed forces" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]EDIFFG="+aurostd::utype2string(EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_),_AFLOWINPAD_) << " // EDIFFG for relaxed forces" << endl;
   } else {
-    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]EDIFFG="+aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_),_aflowinpad_) << "// EDIFFG for relaxed forces" << endl;
+    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]EDIFFG="+aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_),_AFLOWINPAD_) << " // EDIFFG for relaxed forces" << endl;
   }
 
   // ENMAX_MULTIPLY WRITING
   if(xvasp.aopts.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY")) {
     double ENMAX_MULTIPLY=aurostd::string2utype<double>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::ENMAX_MULTIPLY"));
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ENMAX_MULTIPLY="+aurostd::utype2string(ENMAX_MULTIPLY,_AVASP_DOUBLE2STRING_PRECISION_),_aflowinpad_) << "// extra multiplication" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ENMAX_MULTIPLY="+aurostd::utype2string(ENMAX_MULTIPLY,_AVASP_DOUBLE2STRING_PRECISION_),_AFLOWINPAD_) << " // extra multiplication" << endl;
   } else {
-    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]ENMAX_MULTIPLY="+aurostd::utype2string(DEFAULT_VASP_PREC_ENMAX_HIGH,4),_aflowinpad_) << "// Multiplication of the max(pseudopotential_cutoffs)" << endl;
+    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]ENMAX_MULTIPLY="+aurostd::utype2string(DEFAULT_VASP_PREC_ENMAX_HIGH,4),_AFLOWINPAD_) << " // Multiplication of the max(pseudopotential_cutoffs)" << endl;
   }
 
   // POTIM WRITING
   if(xvasp.aopts.flag("AFLOWIN_FLAG::POTIM")) {
     double POTIM=aurostd::string2utype<double>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::POTIM"));
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]POTIM="+aurostd::utype2string(POTIM,_AVASP_DOUBLE2STRING_PRECISION_),_aflowinpad_) << "// for ionic time-step" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]POTIM="+aurostd::utype2string(POTIM,_AVASP_DOUBLE2STRING_PRECISION_),_AFLOWINPAD_) << " // for ionic time-step" << endl;
   } else {
-    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]POTIM="+aurostd::utype2string(DEFAULT_VASP_PREC_POTIM,_AVASP_DOUBLE2STRING_PRECISION_),_aflowinpad_) << "// ionic time-step" << endl;
+    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]POTIM="+aurostd::utype2string(DEFAULT_VASP_PREC_POTIM,_AVASP_DOUBLE2STRING_PRECISION_),_AFLOWINPAD_) << " // ionic time-step" << endl;
   }
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[12.4]" << endl;
@@ -2386,10 +2401,10 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   // SPIN WRITING
   if(AFLOWIN_OLD) { // OLD
     if(xvasp.aopts.flag("FLAG::AVASP_SPIN")) {
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SPIN=ON",_aflowinpad_) << "// ON | OFF  (default NEGLECT)" << endl;
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SPIN=ON",_AFLOWINPAD_) << " // ON | OFF  (default NEGLECT)" << endl;
       aflowin << "[VASP_FORCE_OPTION]SPIN_REMOVE_RELAX_1 " << endl;
     } else {
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SPIN=OFF",_aflowinpad_) << "// ON | OFF  (default NEGLECT)" << endl;
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SPIN=OFF",_AFLOWINPAD_) << " // ON | OFF  (default NEGLECT)" << endl;
     }
   }
   if(AFLOWIN_NEW) { // NEW
@@ -2401,35 +2416,35 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     if(xvasp.aopts.flag("FLAG::AVASP_SPIN") && xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_2")) vstr.push_back("REMOVE_RELAX_2");
     if(vstr.size()>0) {
       for(uint i=0;i<vstr.size();i++) tstr+=vstr.at(i)+(i!=vstr.size()-1 ? "," : " ");
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SPIN="+tstr,_aflowinpad_) << "// (ON | OFF  (default: DEFAULT_VASP_FORCE_OPTION_SYM in .aflow.rc)), REMOVE_RELAX_1 | _2 (default: DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1 _2 in .aflow.rc)" << endl;
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SPIN="+tstr,_AFLOWINPAD_) << " // (ON | OFF  (default: DEFAULT_VASP_FORCE_OPTION_SYM in .aflow.rc)), REMOVE_RELAX_1 | _2 (default: DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1 _2 in .aflow.rc)" << endl;
     }
   }
 
   // BADER WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_BADER")) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=ON",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_BADER in .aflow.rc)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=ON",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_BADER in .aflow.rc)" << endl;
   } else {
-    // aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=OFF",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_BADER in .aflow.rc)" << endl;
+    // aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=OFF",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_BADER in .aflow.rc)" << endl;
   }
   // ELF WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_ELF")) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ELF=ON",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_ELF in .aflow.rc)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ELF=ON",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_ELF in .aflow.rc)" << endl;
   } else {
-    // aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ELF=OFF",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_ELF in .aflow.rc)" << endl;
+    // aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ELF=OFF",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_ELF in .aflow.rc)" << endl;
   }
 
   // LSCOUPLING WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_LSCOUPLING")) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LSCOUPLING=ON",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_LSCOUPLING in .aflow.rc)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LSCOUPLING=ON",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_LSCOUPLING in .aflow.rc)" << endl;
   } else {
-    // aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LSCOUPLING=OFF",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_LSCOUPLING in .aflow.rc)" << endl;
+    // aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LSCOUPLING=OFF",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_LSCOUPLING in .aflow.rc)" << endl;
   }
 
   // MAGMOM WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_AUTO_MAGMOM")) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]AUTO_MAGMOM=ON",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM in .aflow.rc)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]AUTO_MAGMOM=ON",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM in .aflow.rc)" << endl;
   } else {
-    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]AUTO_MAGMOM=ON",_aflowinpad_) << "// ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM in .aflow.rc)" << endl;
+    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]AUTO_MAGMOM=ON",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_AUTO_MAGMOM in .aflow.rc)" << endl;
   }
 
   // RELAX_TYPE + RELAX WRITING
@@ -2438,24 +2453,24 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   // the other sets other associated flags, like ediffg (see ivasp)
   if(!(xvasp.AVASP_flag_RUN_STATIC==TRUE || xvasp.AVASP_flag_RUN_STATIC_BANDS==TRUE)){
     if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")){  //CO20180214
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_"+xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"),_aflowinpad_);
-      aflowin << "// ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME | IONS_CELL_SHAPE " << endl;
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_"+xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"),_AFLOWINPAD_);
+      aflowin << " // ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME | IONS_CELL_SHAPE " << endl;
     } else {
       if(xvasp.aopts.flag("FLAG::VOLUME_PRESERVED")==FALSE){
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_ALL",_aflowinpad_);
-        aflowin << "// ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME | IONS_CELL_SHAPE " << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_ALL",_AFLOWINPAD_);
+        aflowin << " // ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME | IONS_CELL_SHAPE " << endl;
       } //CO20181226 - melding from below - I am interpreting this as: if not volume_preserved, then you probably want RELAX_ALL
     }
     // RELAX_MODE
     if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE")) {
       string RELAX_MODE=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE");
       //   if(RELAX_MODE.at(0)=='E' || RELAX_MODE.at(0)=='e')
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_MODE="+RELAX_MODE,_aflowinpad_) << "// (ENERGY | FORCES | ENERGY_FORCES | FORCES_ENERGY) (default: DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME in .aflow.rc) " << endl;
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_MODE="+RELAX_MODE,_AFLOWINPAD_) << " // (ENERGY | FORCES | ENERGY_FORCES | FORCES_ENERGY) (default: DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME in .aflow.rc) " << endl;
     } else {
       if(xvasp.aopts.flag("FLAG::AVASP_RELAX_FORCES")) {
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_MODE=FORCES",_aflowinpad_) << "// (ENERGY | FORCES | ENERGY_FORCES | FORCES_ENERGY) (default: DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME in .aflow.rc) " << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_MODE=FORCES",_AFLOWINPAD_) << " // (ENERGY | FORCES | ENERGY_FORCES | FORCES_ENERGY) (default: DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME in .aflow.rc) " << endl;
       } else {
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_MODE=ENERGY",_aflowinpad_) << "// (ENERGY | FORCES | ENERGY_FORCES | FORCES_ENERGY) (default: DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME in .aflow.rc) " << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_MODE=ENERGY",_AFLOWINPAD_) << " // (ENERGY | FORCES | ENERGY_FORCES | FORCES_ENERGY) (default: DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME in .aflow.rc) " << endl;
       }
     }
   }
@@ -2468,18 +2483,18 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(xvasp.aopts.flag("FLAG::PRECISION_SET") || xvasp.aopts.flag("AFLOWIN_FLAG::PRECISION")) {
     if(AFLOWIN_OLD) { // OLD
       if(PRECISION.at(0)=='L' || PRECISION.at(0)=='l')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=LOW",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=LOW",_AFLOWINPAD_) << " // (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
       if(PRECISION.at(0)=='M' || PRECISION.at(0)=='m')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=MEDIUM",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=MEDIUM",_AFLOWINPAD_) << " // (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
       if(PRECISION.at(0)=='N' || PRECISION.at(0)=='n')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=NORMAL",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=NORMAL",_AFLOWINPAD_) << " // (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
       if(PRECISION.at(0)=='H' || PRECISION.at(0)=='h')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=HIGH",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=HIGH",_AFLOWINPAD_) << " // (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
       if(PRECISION.at(0)=='A' || PRECISION.at(0)=='a')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=ACCURATE",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=ACCURATE",_AFLOWINPAD_) << " // (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
       //ME20181022
       if(PRECISION.at(0)=='P' || PRECISION.at(0)=='p')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=PHONONS",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=PHONONS",_AFLOWINPAD_) << " // (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
       aflowin << "#[VASP_FORCE_OPTION]PREC_preserved " << endl;
     }
     if(AFLOWIN_NEW) { // NEW
@@ -2502,10 +2517,10 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       if(vstr.size()>0) {
         for(uint i=0;i<vstr.size();i++)
           tstr+=vstr.at(i)+(i!=vstr.size()-1 ? "," : " ");
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC="+tstr,_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC="+tstr,_AFLOWINPAD_) << " // (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc)" << endl;
       }
       if(vstr.size()==0) {
-        aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]PREC="+DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME,_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]PREC="+DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME,_AFLOWINPAD_) << " // (LOW | MEDIUM | NORMAL | HIGH | ACCURATE | PHONONS), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc)" << endl;
       }
     }
   }
@@ -2518,15 +2533,15 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(xvasp.aopts.flag("FLAG::ALGO_SET") || xvasp.aopts.flag("AFLOWIN_FLAG::ALGORITHM")) {
     if(AFLOWIN_OLD) { // OLD
       if(ALGORITHM.at(0)=='N' || ALGORITHM.at(0)=='n')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=NORMAL",_aflowinpad_) << "// (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=NORMAL",_AFLOWINPAD_) << " // (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
       if(ALGORITHM.at(0)=='V' || ALGORITHM.at(0)=='v')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=VERYFAST",_aflowinpad_) << "// (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=VERYFAST",_AFLOWINPAD_) << " // (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
       if(ALGORITHM.at(0)=='F' || ALGORITHM.at(0)=='f')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=FAST",_aflowinpad_) << "// (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=FAST",_AFLOWINPAD_) << " // (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
       if(ALGORITHM.at(0)=='A' || ALGORITHM.at(0)=='a')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=ALL",_aflowinpad_) << "// (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=ALL",_AFLOWINPAD_) << " // (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
       if(ALGORITHM.at(0)=='D' || ALGORITHM.at(0)=='d')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=DAMPED",_aflowinpad_) << "// (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=DAMPED",_AFLOWINPAD_) << " // (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
       aflowin << "#[VASP_FORCE_OPTION]ALGO_PRESERVED " << endl;
     }
     if(AFLOWIN_NEW) { // NEW
@@ -2545,10 +2560,10 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       if(xvasp.aopts.flag("FLAG::ALGO_PRESERVED")) vstr.push_back("PRESERVED");
       if(vstr.size()>0) {
         for(uint i=0;i<vstr.size();i++) tstr+=vstr.at(i)+(i!=vstr.size()-1 ? "," : " ");
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO="+tstr,_aflowinpad_) << "// (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO="+tstr,_AFLOWINPAD_) << " // (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
       }
       if(vstr.size()==0) {
-        aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]ALGO="+DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME,_aflowinpad_) << "// (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]ALGO="+DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME,_AFLOWINPAD_) << " // (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
       }
     }
   }
@@ -2575,13 +2590,13 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     if(vstr.size()>0) {
       for(uint i=0;i<vstr.size();i++)
         tstr+=vstr.at(i)+(i!=vstr.size()-1 ? "," : " ");
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]METAGGA="+tstr,_aflowinpad_) << "// (TPSS | RTPSS | M06L | MBJL | SCAN | MS0 | MS1 | MS2 | NONE) (default: DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME in .aflow.rc)" << endl;
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]METAGGA="+tstr,_AFLOWINPAD_) << " // (TPSS | RTPSS | M06L | MBJL | SCAN | MS0 | MS1 | MS2 | NONE) (default: DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME in .aflow.rc)" << endl;
     }
     if(vstr.size()==0) {
-      aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]METAGGA=NONE",_aflowinpad_) << "// (TPSS | RTPSS | M06L | MBJL | SCAN | MS0 | MS1 | MS2 | NONE) (default: DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME in .aflow.rc)" << endl;
+      aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]METAGGA=NONE",_AFLOWINPAD_) << " // (TPSS | RTPSS | M06L | MBJL | SCAN | MS0 | MS1 | MS2 | NONE) (default: DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME in .aflow.rc)" << endl;
     }
   } else {
-    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]METAGGA=NONE",_aflowinpad_) << "// (TPSS | RTPSS | M06L | MBJL | SCAN | MS0 | MS1 | MS2 | NONE) (default: DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME in .aflow.rc)" << endl;
+    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]METAGGA=NONE",_AFLOWINPAD_) << " // (TPSS | RTPSS | M06L | MBJL | SCAN | MS0 | MS1 | MS2 | NONE) (default: DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME in .aflow.rc)" << endl;
   }
 
   // IVDW WRITING
@@ -2600,13 +2615,13 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     if(vstr.size()>0) {
       for(uint i=0;i<vstr.size();i++)
         tstr+=vstr.at(i)+(i!=vstr.size()-1 ? "," : " ");
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]IVDW="+tstr,_aflowinpad_) << "// (number_for_VASP_see_manual_for_IVDW | 0) (default: DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME in .aflow.rc)" << endl;
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]IVDW="+tstr,_AFLOWINPAD_) << " // (number_for_VASP_see_manual_for_IVDW | 0) (default: DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME in .aflow.rc)" << endl;
     }
     if(vstr.size()==0) {
-      aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]IVDW=0",_aflowinpad_) << "// (number_for_VASP_see_manual_for_IVDW | 0) (default: DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME in .aflow.rc)" << endl;
+      aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]IVDW=0",_AFLOWINPAD_) << " // (number_for_VASP_see_manual_for_IVDW | 0) (default: DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME in .aflow.rc)" << endl;
     }
   } else {
-    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]IVDW=0",_aflowinpad_) << "// (number_for_VASP_see_manual_for_IVDW | 0) (default: DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME in .aflow.rc)" << endl;
+    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]IVDW=0",_AFLOWINPAD_) << " // (number_for_VASP_see_manual_for_IVDW | 0) (default: DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME in .aflow.rc)" << endl;
   }
 
   // ABMIX WRITING
@@ -2623,10 +2638,10 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     if(vstr.size()>0) {
       for(uint i=0;i<vstr.size();i++)
         tstr+=vstr.at(i)+(i!=vstr.size()-1 ? "," : " ");
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ABMIX="+tstr,_aflowinpad_) << "// unspecified | [AUTO | US | PAW | (exp) #AMIX,#BMIX[,#AMIX_MAG,#BMIX_MAG]] (default=unspecified " << DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME<< ")" << endl;
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ABMIX="+tstr,_AFLOWINPAD_) << " // unspecified | [AUTO | US | PAW | (exp) #AMIX,#BMIX[,#AMIX_MAG,#BMIX_MAG]] (default=unspecified " << DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME<< ")" << endl;
     }
     if(vstr.size()==0) {
-      aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]ABMIX=AUTO",_aflowinpad_) << "// unspecified | [AUTO | US | PAW | (exp) #AMIX,#BMIX[,#AMIX_MAG,#BMIX_MAG]] (default=unspecified " << DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME<< ")" << endl;
+      aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]ABMIX=AUTO",_AFLOWINPAD_) << " // unspecified | [AUTO | US | PAW | (exp) #AMIX,#BMIX[,#AMIX_MAG,#BMIX_MAG]] (default=unspecified " << DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME<< ")" << endl;
     }
   }
 
@@ -2652,13 +2667,13 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(xvasp.aopts.flag("AFLOWIN_FLAG::TYPE")) 
     TYPE=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::TYPE");
   if(TYPE.at(0)!='M' && TYPE.at(0)!='I' && TYPE.at(0)!='S' && TYPE.at(0)!='m' && TYPE.at(0)!='i' && TYPE.at(0)!='s')
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]TYPE=DEFAULT",_aflowinpad_) << "// (METAL | INSULATOR | SEMICONDUCTOR | DEFAULT) (default " << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME<< ") " << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]TYPE=DEFAULT",_AFLOWINPAD_) << " // (METAL | INSULATOR | SEMICONDUCTOR | DEFAULT) (default " << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME<< ") " << endl;
   if(TYPE.at(0)=='M' || TYPE.at(0)=='m')
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]TYPE=METAL",_aflowinpad_) << "// (METAL | INSULATOR | SEMICONDUCTOR | DEFAULT) (default " << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME<< ") " << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]TYPE=METAL",_AFLOWINPAD_) << " // (METAL | INSULATOR | SEMICONDUCTOR | DEFAULT) (default " << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME<< ") " << endl;
   if(TYPE.at(0)=='I' || TYPE.at(0)=='i')
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]TYPE=INSULATOR",_aflowinpad_) << "// (METAL | INSULATOR | SEMICONDUCTOR | DEFAULT) (default " << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME<< ") " << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]TYPE=INSULATOR",_AFLOWINPAD_) << " // (METAL | INSULATOR | SEMICONDUCTOR | DEFAULT) (default " << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME<< ") " << endl;
   if(TYPE.at(0)=='S' || TYPE.at(0)=='s')
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]TYPE=SEMICONDUCTOR",_aflowinpad_) << "// (METAL | INSULATOR | SEMICONDUCTOR | DEFAULT) (default " << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME<< ") " << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]TYPE=SEMICONDUCTOR",_AFLOWINPAD_) << " // (METAL | INSULATOR | SEMICONDUCTOR | DEFAULT) (default " << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME<< ") " << endl;
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[12.5]" << endl;
 
@@ -2669,26 +2684,26 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       stringstream aus;
       aus << "[VASP_FORCE_OPTION]LDAU_SPECIES=";
       for(uint i=0;i<xvasp.str.species.size();i++) aus << KBIN::VASP_PseudoPotential_CleanName(xvasp.str.species.at(i)) << " ";
-      aflowin << aurostd::PaddedPOST(aus.str(),_aflowinpad_) << "// LDAU SPECIES separated by spaces" << endl;
+      aflowin << aurostd::PaddedPOST(aus.str(),_AFLOWINPAD_) << " // LDAU SPECIES separated by spaces" << endl;
     }
   }
   if(AFLOWIN_NEW) { // NEW STYLE
     if(xvasp.aopts.flag("FLAG::AVASP_LDAU_ADIABATIC")==FALSE && xvasp.aopts.flag("FLAG::AVASP_LDAU_CUTOFF")==FALSE) {
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU1") && !xvasp.aopts.flag("FLAG::AVASP_LDAU2")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU1=ON",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && !xvasp.aopts.flag("FLAG::AVASP_LDAU1")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=ON",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && xvasp.aopts.flag("FLAG::AVASP_LDAU1"))  aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=ON",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU1") && !xvasp.aopts.flag("FLAG::AVASP_LDAU2")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU1=ON",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && !xvasp.aopts.flag("FLAG::AVASP_LDAU1")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=ON",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && xvasp.aopts.flag("FLAG::AVASP_LDAU1"))  aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=ON",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
     }
     if(xvasp.aopts.flag("FLAG::AVASP_LDAU_ADIABATIC")==TRUE && xvasp.aopts.flag("FLAG::AVASP_LDAU_CUTOFF")==FALSE) {
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU1") && !xvasp.aopts.flag("FLAG::AVASP_LDAU2")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU1=ADIABATIC",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && !xvasp.aopts.flag("FLAG::AVASP_LDAU1")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=ADIABATIC",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && xvasp.aopts.flag("FLAG::AVASP_LDAU1"))  aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=ADIABATIC",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU1") && !xvasp.aopts.flag("FLAG::AVASP_LDAU2")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU1=ADIABATIC",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && !xvasp.aopts.flag("FLAG::AVASP_LDAU1")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=ADIABATIC",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && xvasp.aopts.flag("FLAG::AVASP_LDAU1"))  aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=ADIABATIC",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
     }
     if(xvasp.aopts.flag("FLAG::AVASP_LDAU_ADIABATIC")==FALSE && xvasp.aopts.flag("FLAG::AVASP_LDAU_CUTOFF")==TRUE) {
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU1") && !xvasp.aopts.flag("FLAG::AVASP_LDAU2")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU1=CUTOFF",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && !xvasp.aopts.flag("FLAG::AVASP_LDAU1")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=CUTOFF",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && xvasp.aopts.flag("FLAG::AVASP_LDAU1"))  aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=CUTOFF",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU1") && !xvasp.aopts.flag("FLAG::AVASP_LDAU2")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU1=CUTOFF",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && !xvasp.aopts.flag("FLAG::AVASP_LDAU1")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=CUTOFF",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && xvasp.aopts.flag("FLAG::AVASP_LDAU1"))  aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=CUTOFF",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
     }
-    if(xvasp.aopts.flag("FLAG::AVASP_LDAU1") || xvasp.aopts.flag("FLAG::AVASP_LDAU2")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU_PARAMETERS="+xvasp.AVASP_LDAU_PARAMETERS_STRING,_aflowinpad_) << "// species;Ls;Us;Js " << endl;
+    if(xvasp.aopts.flag("FLAG::AVASP_LDAU1") || xvasp.aopts.flag("FLAG::AVASP_LDAU2")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU_PARAMETERS="+xvasp.AVASP_LDAU_PARAMETERS_STRING,_AFLOWINPAD_) << " // species;Ls;Us;Js " << endl;
   }
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[12.6]" << endl;
@@ -2765,10 +2780,10 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       std::sort(vstr.begin(),vstr.end());vstr.erase( std::unique( vstr.begin(), vstr.end() ), vstr.end() ); //remove duplicates
       tstr=aurostd::joinWDelimiter(vstr,",")+" ";
       //for(uint i=0;i<vstr.size();i++) tstr+=vstr.at(i)+(i!=vstr.size()-1 ? "," : " ");
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CONVERT_UNIT_CELL="+tstr,_aflowinpad_) << "// (SPRIM, SCONV, NIGGLI, MINK, INCELL, COMPACT, WS, CART, FRAC, PRES) " << endl;
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CONVERT_UNIT_CELL="+tstr,_AFLOWINPAD_) << " // (SPRIM, SCONV, NIGGLI, MINK, INCELL, COMPACT, WS, CART, FRAC, PRES) " << endl;
     }
     if(vstr.size()==0) {
-      aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=SPRIM",_aflowinpad_) << "// (SPRIM, SCONV, NIGGLI, MINK, INCELL, COMPACT, WS, CART, FRAC, PRES)" << endl;
+      aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=SPRIM",_AFLOWINPAD_) << " // (SPRIM, SCONV, NIGGLI, MINK, INCELL, COMPACT, WS, CART, FRAC, PRES)" << endl;
     }
   }
 
@@ -2804,7 +2819,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(0) { // write the AFIX
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
     aflowin << "[AFLOW] # Do not uncomment the AFIX unless you know what  you are doing. " << endl;
-    aflowin <<  aurostd::PaddedPOST("[VASP_FORCE_OPTION]IGNORE_AFIX=NONE",_aflowinpad_) << "// ROTMAT, SGRCON, IBZKPT, SYMPREC, INVGRP, EDDRMM, LREAL, BRMIX, DAV, EDDDAV, EFIELD_PEAD, ZPOTRF, EXCCOR, NATOMS, NBANDS, MEMORY, PSMAXN, NPAR" << endl;
+    aflowin <<  aurostd::PaddedPOST("[VASP_FORCE_OPTION]IGNORE_AFIX=NONE",_AFLOWINPAD_) << " // ROTMAT, SGRCON, IBZKPT, SYMPREC, INVGRP, EDDRMM, LREAL, BRMIX, DAV, EDDDAV, EFIELD_PEAD, ZPOTRF, EXCCOR, NATOMS, NBANDS, MEMORY, PSMAXN, NPAR" << endl;
   }
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   // INCAR
@@ -2840,11 +2855,11 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       }
       //CO20181226 STOP
     }
-    aflowin << aurostd::PaddedPOST("#PSTRESS=000       # Pressure in kBar (1kB=0.1GPa) ",_aflowinpad_) << "# for hand modification" << endl;
-    aflowin << aurostd::PaddedPOST("#EDIFFG="+aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_)+"     # For relaxed forces ",_aflowinpad_) << "# for hand modification" << endl;
-    aflowin << aurostd::PaddedPOST("#POTIM="+aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_)+"      # default ",_aflowinpad_) << "# for hand modification" << endl;
-    aflowin << aurostd::PaddedPOST("#NBANDS=XX  ",_aflowinpad_) << "# for hand modification" << endl;
-    aflowin << aurostd::PaddedPOST("#IALGO=48   ",_aflowinpad_) << "# for hand modification" << endl;
+    aflowin << aurostd::PaddedPOST("#PSTRESS=000       # Pressure in kBar (1kB=0.1GPa) ",_AFLOWINPAD_) << " # for hand modification" << endl;
+    aflowin << aurostd::PaddedPOST("#EDIFFG="+aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_)+"     # For relaxed forces ",_AFLOWINPAD_) << " # for hand modification" << endl;
+    aflowin << aurostd::PaddedPOST("#POTIM="+aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_)+"      # default ",_AFLOWINPAD_) << " # for hand modification" << endl;
+    aflowin << aurostd::PaddedPOST("#NBANDS=XX  ",_AFLOWINPAD_) << " # for hand modification" << endl;
+    aflowin << aurostd::PaddedPOST("#IALGO=48   ",_AFLOWINPAD_) << " # for hand modification" << endl;
     aflowin << "[VASP_INCAR_MODE_EXPLICIT]STOP " << endl;
   }
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
@@ -2852,9 +2867,21 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[12.11]" << endl;
 
   // KPOINTS
+  if(0){  //CO20210805 - should not be necessary
+    if(xvasp.AVASP_path_BANDS.empty()){xvasp.AVASP_path_BANDS=DEFAULT_BANDS_LATTICE;} //CO20210805 - set default if not present
+    if(xvasp.AVASP_value_BANDS_GRID==0){xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;} //CO20210805 - set default if not present
+  }
+
   //ME20181128 - Added remaining KPOINTS modes
   bool skip_implicit = (!xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT") &&
       (xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT") || xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP") || xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL")));  //CO20190401 START/STOP
+  if(LDEBUG){
+    cerr << soliloquy << " xvasp.aopts.flag(\"FLAG::KPOINTS_IMPLICIT\")=" << xvasp.aopts.flag("FLAG::KPOINTS_IMPLICIT") << endl;
+    cerr << soliloquy << " xvasp.aopts.flag(\"FLAG::KPOINTS_EXPLICIT\")=" << xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT") << endl;
+    cerr << soliloquy << " xvasp.aopts.flag(\"FLAG::KPOINTS_EXPLICIT_START_STOP\")=" << xvasp.aopts.flag("FLAG::KPOINTS_EXPLICIT_START_STOP") << endl;
+    cerr << soliloquy << " xvasp.aopts.flag(\"FLAG::KPOINTS_EXTERNAL\")=" << xvasp.aopts.flag("FLAG::KPOINTS_EXTERNAL") << endl;
+    cerr << soliloquy << " skip_implicit=" << skip_implicit << endl;
+  }
   if (!skip_implicit) {
     aflowin << "[VASP_KPOINTS_MODE_IMPLICIT] " << endl;
     //[ME20181216]aflowin << "[VASP_KPOINTS_FILE]KSCHEME=" << xvasp.AVASP_KSCHEME << " " << endl;
@@ -2864,7 +2891,14 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     if(xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME")) xvasp.AVASP_KSCHEME=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KSCHEME");    // KSCHEME
     if(xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC")) xvasp.AVASP_value_KPPRA_STATIC=aurostd::string2utype<int>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC")); // KPPRA_STATIC
     if(xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) xvasp.AVASP_STATIC_KSCHEME=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::KSCHEME_STATIC");    // KSCHEME_STATIC
+    if(xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_LATTICE")) xvasp.AVASP_path_BANDS=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_LATTICE"); // BANDS_LATTICE
     if(xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID")) xvasp.AVASP_value_BANDS_GRID=aurostd::string2utype<uint>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID")); // BANDS_GRID
+
+    if(LDEBUG){
+      cerr << soliloquy << " xvasp.AVASP_STATIC_KSCHEME=" << xvasp.AVASP_STATIC_KSCHEME << endl;
+      cerr << soliloquy << " xvasp.AVASP_path_BANDS=" << xvasp.AVASP_path_BANDS << endl;
+      cerr << soliloquy << " xvasp.AVASP_value_BANDS_GRID=" << xvasp.AVASP_value_BANDS_GRID << endl;
+    }
 
     if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[12.12]" << endl;
 
@@ -2896,7 +2930,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       write_all = true;
       if(!xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC")) xvasp.AVASP_value_KPPRA_STATIC=DEFAULT_KPPRA_STATIC; 
       if(!xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) xvasp.AVASP_STATIC_KSCHEME=DEFAULT_STATIC_KSCHEME;
-      if(!xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID")) xvasp.AVASP_path_BANDS=DEFAULT_BANDS_LATTICE;
+      if(!xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_LATTICE")) xvasp.AVASP_path_BANDS=DEFAULT_BANDS_LATTICE;
       if(!xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID")) xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;
       if(xvasp.str.species.size()==1) if(!xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC")) xvasp.AVASP_value_KPPRA_STATIC=DEFAULT_UNARY_KPPRA_STATIC;
       if(xvasp.str.species.size()==1) if(!xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID")) xvasp.AVASP_value_BANDS_GRID=DEFAULT_UNARY_BANDS_GRID;
@@ -2988,7 +3022,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   // STRUCTURE VASP
   if(xvasp.aopts.flag("AFLOWIN_FLAG::VASP")) {
     if(pocc){
-      aflowin << aurostd::PaddedPOST("[AFLOW_POCC]CALC ",_aflowinpad_) << "// README_AFLOW_POCC.TXT" << endl; //CO20180214
+      aflowin << aurostd::PaddedPOST("[AFLOW_POCC]CALC ",_AFLOWINPAD_) << " // README_AFLOW_POCC.TXT" << endl; //CO20180214
       aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
     }
     if(pocc){aflowin << "[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE " << endl;}
@@ -3247,7 +3281,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
         throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
       }
       if(pthread>=0)  pthread_mutex_lock(&mutex_AVASP);
-      cout << "AFLOW V(" << string(AFLOW_VERSION) << ") creating " << directory;
+      cout << "AFLOW V(" << string(AFLOW_VERSION) << ") creating " << directory << "/" + _AFLOWIN_;  //ME20211004 - added aflow.in file name
       if(xvasp.aopts.flag("FLAG::AVASP_LDAU1")) cout << " [LDAU1]";
       if(xvasp.aopts.flag("FLAG::AVASP_LDAU2")) cout << " [LDAU2]";
       if(fixed_lattice_vasp) cout << " [fixed_lattice_vasp=" << xvasp.AVASP_label << "]";
@@ -3611,7 +3645,7 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
           if(LDEBUG) cerr << "DEBUG - " << soliloquy << " [5a.2]" << endl;
           string FilePotcar,DataPotcar,AUIDPotcar;
           if(!KBIN::VASP_Find_FILE_POTCAR(xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i),FilePotcar,DataPotcar,AUIDPotcar)) {
-            cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message(_AFLOW_MESSAGE_DEFAULTS_,_AFLOW_FILE_NAME_) << endl;
+            cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message(_AFLOW_FILE_NAME_) << endl;
             return FALSE; // dont die
           } else {
             if(LDEBUG) cerr << "DEBUG - " << soliloquy << "  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] = " << FilePotcar << endl;
@@ -3920,9 +3954,9 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   // SYMMETRY WRITE
   if(!xvasp.aopts.flag("FLAGS::AVASP_SYMMETRY=OFF")) {
-    aflowin << aurostd::PaddedPOST("[AFLOW_SYMMETRY]CALC ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
-    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_WRITE ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
-    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 ",_aflowinpad_) << "// README_AFLOW_SYM.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("[AFLOW_SYMMETRY]CALC ",_AFLOWINPAD_) << " // README_AFLOW_SYM.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_WRITE ",_AFLOWINPAD_) << " // README_AFLOW_SYM.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 ",_AFLOWINPAD_) << " // README_AFLOW_SYM.TXT" << endl; //CO20180214
     //aflowin << "[AFLOW_SYMMETRY]CALC " << endl;
     //aflowin << "#[AFLOW_SYMMETRY]SGROUP_WRITE " << endl;
     //aflowin << "#[AFLOW_SYMMETRY]SGROUP_RADIUS=7.77 " << endl;
@@ -3930,9 +3964,9 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
   }
   // NEIGHBORS WRITE
   //DX20210122 [OBSOLETE] if(!xvasp.aopts.flag("FLAGS::AVASP_NEIGHBORS=OFF")) {
-  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("#[AFLOW_NEIGHBOURS]CALC ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
-  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]RADIUS=7.7 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
-  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]DRADIUS=0.1 ",_aflowinpad_) << "// README_AFLOW.TXT" << endl; //CO20180214
+  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("#[AFLOW_NEIGHBOURS]CALC ",_AFLOWINPAD_) << " // README_AFLOW.TXT" << endl; //CO20180214
+  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]RADIUS=7.7 ",_AFLOWINPAD_) << " // README_AFLOW.TXT" << endl; //CO20180214
+  //DX20210122 [OBSOLETE]   aflowin << aurostd::PaddedPOST("[AFLOW_NEIGHBOURS]DRADIUS=0.1 ",_AFLOWINPAD_) << " // README_AFLOW.TXT" << endl; //CO20180214
   //DX20210122 [OBSOLETE]   //aflowin << "#[AFLOW_NEIGHBOURS]CALC " << endl;
   //DX20210122 [OBSOLETE]   //aflowin << "[AFLOW_NEIGHBOURS]RADIUS=7.7 " << endl;
   //DX20210122 [OBSOLETE]   //aflowin << "[AFLOW_NEIGHBOURS]DRADIUS=0.1 " << endl;
@@ -3941,52 +3975,52 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
   string MODULE = aurostd::toupper(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::MODULE"));
   // APL WRITING
   if(!xvasp.aopts.flag("FLAGS::AVASP_APL=OFF")) { //CO20180214 - I interpret this flag to refer to WRITING APL options, not if they are on
-    aflowin << aurostd::PaddedPOST((MODULE=="APL"?string(""):string("#"))+"[AFLOW_APL]CALC ",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl; //CO20180214
-    aflowin << aurostd::PaddedPOST("[AFLOW_APL]ENGINE=DM",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_APL]DMAG=0.015",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST((MODULE=="APL"?string(""):string("#"))+"[AFLOW_APL]CALC ",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl; //CO20180214
+    aflowin << aurostd::PaddedPOST("[AFLOW_APL]ENGINE=DM",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_APL]DMAG=0.015",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     //DX+CO START
-    aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string("#"):string(""))+"[AFLOW_APL]MINATOMS=100",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string("#"):string(""))+"[AFLOW_APL]MINATOMS=100",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string(""):string("#"))+"[AFLOW_APL]SUPERCELL="+
-        (xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"):"3x3x3"),_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;  //CO20180214
-    aflowin << aurostd::PaddedPOST("[AFLOW_APL]DC=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_APL]DPM=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_APL]ZEROSTATE=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
+        (xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"):"3x3x3"),_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;  //CO20180214
+    aflowin << aurostd::PaddedPOST("[AFLOW_APL]DC=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_APL]DPM=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_APL]ZEROSTATE=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     //DX+CO END
-    aflowin << aurostd::PaddedPOST("[AFLOW_APL]DOS=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_APL]TP=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_APL]TPT=0:2000:10",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_APL]DOS=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_APL]TP=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_APL]TPT=0:2000:10",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
   if(!xvasp.aopts.flag("FLAGS::AVASP_QHA=OFF")) {
-    aflowin << aurostd::PaddedPOST((MODULE=="QHA"?string(""):string("#"))+"[AFLOW_QHA]CALC ",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_QHA]MODE=QHA3P",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=y",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA=y",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_DISTORTION=0.03",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_DISTORTION=3",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_DISTORTION_RANGE=-3:6:1",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_PDIS_T=50,100,200",_aflowinpad_) << "// README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_VOL_DISTORTION_PERCENTAGE=0.03",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]DISPLACEMENTS=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]PROJECTION_DIR=1:1:1",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=n",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_VOLRANGE_DIST=-2:4:0.5",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_KPOINTS_MODE=32768:10000:20:100000",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST((MODULE=="QHA"?string(""):string("#"))+"[AFLOW_QHA]CALC ",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_QHA]MODE=QHA3P",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=y",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA=y",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_DISTORTION=0.03",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_DISTORTION=3",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_DISTORTION_RANGE=-3:6:1",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_PDIS_T=50,100,200",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_VOL_DISTORTION_PERCENTAGE=0.03",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]DISPLACEMENTS=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]PROJECTION_DIR=1:1:1",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=n",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_VOLRANGE_DIST=-2:4:0.5",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_KPOINTS_MODE=32768:10000:20:100000",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
   if(!xvasp.aopts.flag("FLAGS::AVASP_AAPL=OFF")) {
-    aflowin << aurostd::PaddedPOST((MODULE=="AAPL"?string(""):string("#"))+"[AFLOW_AAPL]CALC ",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]TDMAG=0.015",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUT_SHELL=4",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUT_RAD=4.5",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]SUMRULE=1E-5",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]BTE=FULL",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]THERMALGRID=21x21x21",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]ISOTOPE=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUMULATIVEK=y",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]BOUNDARY=n",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]NANO_SIZE=100",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]TCT=200:700:20",_aflowinpad_) << "// README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST((MODULE=="AAPL"?string(""):string("#"))+"[AFLOW_AAPL]CALC ",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]TDMAG=0.015",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUT_SHELL=4",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUT_RAD=4.5",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]SUMRULE=1E-5",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]BTE=FULL",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]THERMALGRID=21x21x21",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]ISOTOPE=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUMULATIVEK=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]BOUNDARY=n",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]NANO_SIZE=100",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]TCT=200:700:20",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
   if(0) {
@@ -3999,13 +4033,13 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[12.3]" << endl;
 
   // RELAX WRITING
-  if(xvasp.AVASP_flag_RUN_RELAX) aflowin << aurostd::PaddedPOST("[VASP_RUN]RELAX=2",_aflowinpad_);
-  if(xvasp.AVASP_flag_RUN_RELAX_STATIC) aflowin << aurostd::PaddedPOST("[VASP_RUN]RELAX_STATIC=2",_aflowinpad_);
-  if(xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS) aflowin << aurostd::PaddedPOST("[VASP_RUN]RELAX_STATIC_BANDS=2",_aflowinpad_);
-  if(xvasp.AVASP_flag_RUN_STATIC_BANDS) aflowin << aurostd::PaddedPOST("[VASP_RUN]STATIC_BANDS",_aflowinpad_);
-  if(xvasp.AVASP_flag_RUN_STATIC) aflowin << aurostd::PaddedPOST("[VASP_RUN]STATIC",_aflowinpad_);
-  if(xvasp.AVASP_flag_GENERATE) aflowin << aurostd::PaddedPOST("[VASP_RUN]GENERATE",_aflowinpad_);
-  aflowin << "// GENERATE | STATIC | RELAX=N | RELAX_STATIC=N | STATIC_BANDS | RELAX_STATIC_BANDS=N | REPEAT_BANDS [,DS[,DD[,DSCF]]] " << endl;
+  if(xvasp.AVASP_flag_RUN_RELAX) aflowin << aurostd::PaddedPOST("[VASP_RUN]RELAX=2",_AFLOWINPAD_);
+  if(xvasp.AVASP_flag_RUN_RELAX_STATIC) aflowin << aurostd::PaddedPOST("[VASP_RUN]RELAX_STATIC=2",_AFLOWINPAD_);
+  if(xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS) aflowin << aurostd::PaddedPOST("[VASP_RUN]RELAX_STATIC_BANDS=2",_AFLOWINPAD_);
+  if(xvasp.AVASP_flag_RUN_STATIC_BANDS) aflowin << aurostd::PaddedPOST("[VASP_RUN]STATIC_BANDS",_AFLOWINPAD_);
+  if(xvasp.AVASP_flag_RUN_STATIC) aflowin << aurostd::PaddedPOST("[VASP_RUN]STATIC",_AFLOWINPAD_);
+  if(xvasp.AVASP_flag_GENERATE) aflowin << aurostd::PaddedPOST("[VASP_RUN]GENERATE",_AFLOWINPAD_);
+  aflowin << " // GENERATE | STATIC | RELAX=N | RELAX_STATIC=N | STATIC_BANDS | RELAX_STATIC_BANDS=N | REPEAT_STATIC | REPEAT_STATIC_BANDS | REPEAT_BANDS [,DS[,DD[,DSCF]]] " << endl;
 
   if(xvasp.AVASP_flag_RUN_RELAX_STATIC ||
       xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS ||
@@ -4029,22 +4063,22 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
 
   // WAVECAR WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_WAVECAR")) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=ON",_aflowinpad_) << "// ON | OFF (default OFF)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=ON",_AFLOWINPAD_) << " // ON | OFF (default OFF)" << endl;
   } else {
-    //aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=OFF",_aflowinpad_) << "// ON | OFF (default OFF)" << endl;
+    //aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]WAVECAR=OFF",_AFLOWINPAD_) << " // ON | OFF (default OFF)" << endl;
   }
 
   // CHGCAR WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_CHGCAR")) {
-    //aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=ON",_aflowinpad_) << "// ON | OFF (default ON)" << endl;
+    //aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=ON",_AFLOWINPAD_) << " // ON | OFF (default ON)" << endl;
   } else {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=OFF",_aflowinpad_) << "// ON | OFF (default ON)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=OFF",_AFLOWINPAD_) << " // ON | OFF (default ON)" << endl;
   }
 
   // KPOINTS WRITING
-  aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]KPOINTS=keyword[,keyword]",_aflowinpad_) << "// EVEN | ODD | KSHIFT_GAMMA_EVEN | KSHIFT_GAMMA_ODD | KSCHEME_MONKHORST_PACK | KSCHEME_GAMMA | GAMMA | KEEPK | IBZKPT" << endl;
+  aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]KPOINTS=keyword[,keyword]",_AFLOWINPAD_) << " // EVEN | ODD | KSHIFT_GAMMA_EVEN | KSHIFT_GAMMA_ODD | KSCHEME_MONKHORST_PACK | KSCHEME_GAMMA | GAMMA | KEEPK | IBZKPT" << endl;
 
-  aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SYM=ON",_aflowinpad_) << "// ON | OFF  (default ON)" << endl;
+  aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SYM=ON",_AFLOWINPAD_) << " // ON | OFF  (default ON)" << endl;
 
   string aus_PP="";
   if(xvasp.AVASP_potential==DEFAULT_VASP_POTCAR_DIR_POT_LDA) aus_PP="pot_LDA";
@@ -4057,50 +4091,50 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(xvasp.AVASP_potential==DEFAULT_VASP_POTCAR_DIR_POTPAW_PBE_KIN) aus_PP="potpaw_PBE_KIN";
 
   if(xvasp.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS")) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]AUTO_PSEUDOPOTENTIALS="+aus_PP,_aflowinpad_) << "// pot_LDA | pot_GGA | potpaw_LDA | potpaw_GGA | potpaw_PBE | potpaw_LDA_KIN | potpaw_PBE_KIN  " << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]AUTO_PSEUDOPOTENTIALS="+aus_PP,_AFLOWINPAD_) << " // pot_LDA | pot_GGA | potpaw_LDA | potpaw_GGA | potpaw_PBE | potpaw_LDA_KIN | potpaw_PBE_KIN  " << endl;
 
   } else {
     //   cerr << soliloquy << " AUTO_PSEUDOPOTENTIALS=FALSE" << endl;
-    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]AUTO_PSEUDOPOTENTIALS="+aus_PP,_aflowinpad_) << "// pot_LDA | pot_GGA | potpaw_LDA | potpaw_GGA | potpaw_PBE | potpaw_LDA_KIN | potpaw_PBE_KIN  " << endl;
+    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]AUTO_PSEUDOPOTENTIALS="+aus_PP,_AFLOWINPAD_) << " // pot_LDA | pot_GGA | potpaw_LDA | potpaw_GGA | potpaw_PBE | potpaw_LDA_KIN | potpaw_PBE_KIN  " << endl;
   }
 
   // NBANDS WRITING
   if(xvasp.aopts.flag("AFLOWIN_FLAG::NBANDS")) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]NBANDS",_aflowinpad_) << "// Estimate Bands (better than VASP)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]NBANDS",_AFLOWINPAD_) << " // Estimate Bands (better than VASP)" << endl;
   } else {
-    //  aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]NBANDS",_aflowinpad_) << "// Estimate Bands (better than VASP)" << endl;
+    //  aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]NBANDS",_AFLOWINPAD_) << " // Estimate Bands (better than VASP)" << endl;
   }
 
   // PSTRESS WRITING
   if(xvasp.aopts.flag("AFLOWIN_FLAG::PSTRESS")) {
     double PSTRESS=aurostd::string2utype<double>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::PSTRESS"));
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PSTRESS="+aurostd::utype2string(PSTRESS,_AVASP_DOUBLE2STRING_PRECISION_),_aflowinpad_) << "// Pressure in kBar (1kB=0.1GPa)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PSTRESS="+aurostd::utype2string(PSTRESS,_AVASP_DOUBLE2STRING_PRECISION_),_AFLOWINPAD_) << " // Pressure in kBar (1kB=0.1GPa)" << endl;
   } else {
-    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]PSTRESS=0.0",_aflowinpad_) << "// Pressure in kBar (1kB=0.1GPa)" << endl;
+    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]PSTRESS=0.0",_AFLOWINPAD_) << " // Pressure in kBar (1kB=0.1GPa)" << endl;
   }
 
   // EDIFFG WRITING
   if(xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG")) {
     double EDIFFG=aurostd::string2utype<double>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::EDIFFG"));
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]EDIFFG="+aurostd::utype2string(EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_),_aflowinpad_) << "// EDIFFG for relaxed forces" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]EDIFFG="+aurostd::utype2string(EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_),_AFLOWINPAD_) << " // EDIFFG for relaxed forces" << endl;
   } else {
-    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]EDIFFG="+aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_),_aflowinpad_) << "// EDIFFG for relaxed forces" << endl;
+    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]EDIFFG="+aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_),_AFLOWINPAD_) << " // EDIFFG for relaxed forces" << endl;
   }
 
   // ENMAX_MULTIPLY WRITING
   if(xvasp.aopts.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY")) {
     double ENMAX_MULTIPLY=aurostd::string2utype<double>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::ENMAX_MULTIPLY"));
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ENMAX_MULTIPLY="+aurostd::utype2string(ENMAX_MULTIPLY,_AVASP_DOUBLE2STRING_PRECISION_),_aflowinpad_) << "// extra multiplication" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ENMAX_MULTIPLY="+aurostd::utype2string(ENMAX_MULTIPLY,_AVASP_DOUBLE2STRING_PRECISION_),_AFLOWINPAD_) << " // extra multiplication" << endl;
   } else {
-    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]ENMAX_MULTIPLY="+aurostd::utype2string(DEFAULT_VASP_PREC_ENMAX_HIGH,4),_aflowinpad_) << "// Multiplication of the max(pseudopotential_cutoffs)" << endl;
+    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]ENMAX_MULTIPLY="+aurostd::utype2string(DEFAULT_VASP_PREC_ENMAX_HIGH,4),_AFLOWINPAD_) << " // Multiplication of the max(pseudopotential_cutoffs)" << endl;
   }
 
   // POTIM WRITING
   if(xvasp.aopts.flag("AFLOWIN_FLAG::POTIM")) {
     double POTIM=aurostd::string2utype<double>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::POTIM"));
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]POTIM="+aurostd::utype2string(POTIM,_AVASP_DOUBLE2STRING_PRECISION_),_aflowinpad_) << "// for ionic time-step" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]POTIM="+aurostd::utype2string(POTIM,_AVASP_DOUBLE2STRING_PRECISION_),_AFLOWINPAD_) << " // for ionic time-step" << endl;
   } else {
-    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]POTIM="+aurostd::utype2string(DEFAULT_VASP_PREC_POTIM,_AVASP_DOUBLE2STRING_PRECISION_),_aflowinpad_) << "// ionic time-step" << endl;
+    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]POTIM="+aurostd::utype2string(DEFAULT_VASP_PREC_POTIM,_AVASP_DOUBLE2STRING_PRECISION_),_AFLOWINPAD_) << " // ionic time-step" << endl;
   }
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[12.4]" << endl;
@@ -4108,10 +4142,10 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
   // SPIN WRITING
   if(AFLOWIN_OLD) { // OLD
     if(xvasp.aopts.flag("FLAG::AVASP_SPIN")) {
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SPIN=ON",_aflowinpad_) << "// ON | OFF  (default NEGLECT)" << endl;
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SPIN=ON",_AFLOWINPAD_) << " // ON | OFF  (default NEGLECT)" << endl;
       aflowin << "[VASP_FORCE_OPTION]SPIN_REMOVE_RELAX_1 " << endl;
     } else {
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SPIN=OFF",_aflowinpad_) << "// ON | OFF  (default NEGLECT)" << endl;
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SPIN=OFF",_AFLOWINPAD_) << " // ON | OFF  (default NEGLECT)" << endl;
     }
   }
   if(AFLOWIN_NEW) { // NEW
@@ -4123,52 +4157,52 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
     if(xvasp.aopts.flag("FLAG::AVASP_SPIN") && xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_2")) vstr.push_back("REMOVE_RELAX_2");
     if(vstr.size()>0) {
       for(uint i=0;i<vstr.size();i++) tstr+=vstr.at(i)+(i!=vstr.size()-1 ? "," : " ");
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SPIN="+tstr,_aflowinpad_) << "// (ON | OFF  (default ON)), REMOVE_RELAX_1 | _2" << endl;
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]SPIN="+tstr,_AFLOWINPAD_) << " // (ON | OFF  (default ON)), REMOVE_RELAX_1 | _2" << endl;
     }
   }
 
   // BADER WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_BADER")) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=ON",_aflowinpad_) << "// ON | OFF (default OFF)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=ON",_AFLOWINPAD_) << " // ON | OFF (default OFF)" << endl;
   } else {
-    //    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=OFF",_aflowinpad_) << "// ON | OFF (default OFF)" << endl;
+    //    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=OFF",_AFLOWINPAD_) << " // ON | OFF (default OFF)" << endl;
   }
   // ELF WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_ELF")) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ELF=ON",_aflowinpad_) << "// ON | OFF (default OFF)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ELF=ON",_AFLOWINPAD_) << " // ON | OFF (default OFF)" << endl;
   } else {
-    //    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ELF=OFF",_aflowinpad_) << "// ON | OFF (default OFF)" << endl;
+    //    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ELF=OFF",_AFLOWINPAD_) << " // ON | OFF (default OFF)" << endl;
   }
 
   // LSCOUPLING WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_LSCOUPLING")) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LSCOUPLING=ON",_aflowinpad_) << "// ON | OFF (default OFF)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LSCOUPLING=ON",_AFLOWINPAD_) << " // ON | OFF (default OFF)" << endl;
   } else {
-    // aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LSCOUPLING=OFF",_aflowinpad_) << "// ON | OFF (default OFF)" << endl;
+    // aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LSCOUPLING=OFF",_AFLOWINPAD_) << " // ON | OFF (default OFF)" << endl;
   }
 
   // MAGMOM WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_AUTO_MAGMOM")) {
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]AUTO_MAGMOM=ON",_aflowinpad_) << "// ON | OFF (default OFF)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]AUTO_MAGMOM=ON",_AFLOWINPAD_) << " // ON | OFF (default OFF)" << endl;
   } else {
-    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]AUTO_MAGMOM=ON",_aflowinpad_) << "// ON | OFF (default OFF)" << endl;
+    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]AUTO_MAGMOM=ON",_AFLOWINPAD_) << " // ON | OFF (default OFF)" << endl;
   }
 
   // RELAX_TYPE
   if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE")){  //CO20180214
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_"+xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"),_aflowinpad_);
-    aflowin << "// ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME | IONS_CELL_SHAPE " << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_"+xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"),_AFLOWINPAD_);
+    aflowin << " // ALL | IONS | CELL_SHAPE | CELL_VOLUME | IONS_CELL_VOLUME | IONS_CELL_SHAPE " << endl;
   } else {
     // RELAX_MODE
     if(xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE")) {
       string RELAX_MODE=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE");
       //   if(RELAX_MODE.at(0)=='E' || RELAX_MODE.at(0)=='e')
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_MODE="+RELAX_MODE,_aflowinpad_) << "// (ENERGY | FORCES | ENERGY_FORCES | FORCES_ENERGY) (default: DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME in .aflow.rc) " << endl;
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_MODE="+RELAX_MODE,_AFLOWINPAD_) << " // (ENERGY | FORCES | ENERGY_FORCES | FORCES_ENERGY) (default: DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME in .aflow.rc) " << endl;
     } else {
       if(xvasp.aopts.flag("FLAG::AVASP_RELAX_FORCES")) {
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_MODE=FORCES",_aflowinpad_) << "// (ENERGY | FORCES | ENERGY_FORCES | FORCES_ENERGY) (default: DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME in .aflow.rc) " << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_MODE=FORCES",_AFLOWINPAD_) << " // (ENERGY | FORCES | ENERGY_FORCES | FORCES_ENERGY) (default: DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME in .aflow.rc) " << endl;
       } else {
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_MODE=ENERGY",_aflowinpad_) << "// (ENERGY | FORCES | ENERGY_FORCES | FORCES_ENERGY) (default: DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME in .aflow.rc) " << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]RELAX_MODE=ENERGY",_AFLOWINPAD_) << " // (ENERGY | FORCES | ENERGY_FORCES | FORCES_ENERGY) (default: DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME in .aflow.rc) " << endl;
       }
     }
   }
@@ -4181,15 +4215,15 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(xvasp.aopts.flag("FLAG::PRECISION_SET") || xvasp.aopts.flag("AFLOWIN_FLAG::PRECISION")) {
     if(AFLOWIN_OLD) { // OLD
       if(PRECISION.at(0)=='L' || PRECISION.at(0)=='l')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=LOW",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=LOW",_AFLOWINPAD_) << " // (LOW | MEDIUM | NORMAL | HIGH | ACCURATE), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
       if(PRECISION.at(0)=='M' || PRECISION.at(0)=='m')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=MEDIUM",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=MEDIUM",_AFLOWINPAD_) << " // (LOW | MEDIUM | NORMAL | HIGH | ACCURATE), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
       if(PRECISION.at(0)=='N' || PRECISION.at(0)=='n')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=NORMAL",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=NORMAL",_AFLOWINPAD_) << " // (LOW | MEDIUM | NORMAL | HIGH | ACCURATE), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
       if(PRECISION.at(0)=='H' || PRECISION.at(0)=='h')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=HIGH",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=HIGH",_AFLOWINPAD_) << " // (LOW | MEDIUM | NORMAL | HIGH | ACCURATE), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
       if(PRECISION.at(0)=='A' || PRECISION.at(0)=='a')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=ACCURATE",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC=ACCURATE",_AFLOWINPAD_) << " // (LOW | MEDIUM | NORMAL | HIGH | ACCURATE), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc" << endl;
       aflowin << "#[VASP_FORCE_OPTION]PREC_preserved " << endl;
     }
     if(AFLOWIN_NEW) { // NEW
@@ -4209,10 +4243,10 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
       if(vstr.size()>0) {
         for(uint i=0;i<vstr.size();i++)
           tstr+=vstr.at(i)+(i!=vstr.size()-1 ? "," : " ");
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC="+tstr,_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]PREC="+tstr,_AFLOWINPAD_) << " // (LOW | MEDIUM | NORMAL | HIGH | ACCURATE), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc)" << endl;
       }
       if(vstr.size()==0) {
-        aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]PREC=something",_aflowinpad_) << "// (LOW | MEDIUM | NORMAL | HIGH | ACCURATE), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]PREC=something",_AFLOWINPAD_) << " // (LOW | MEDIUM | NORMAL | HIGH | ACCURATE), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME in .aflow.rc)" << endl;
       }
     }
   }
@@ -4225,15 +4259,15 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(xvasp.aopts.flag("FLAG::ALGO_SET") || xvasp.aopts.flag("AFLOWIN_FLAG::ALGORITHM")) {
     if(AFLOWIN_OLD) { // OLD
       if(ALGORITHM.at(0)=='N' || ALGORITHM.at(0)=='n')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=NORMAL",_aflowinpad_) << "// (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=NORMAL",_AFLOWINPAD_) << " // (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
       if(ALGORITHM.at(0)=='V' || ALGORITHM.at(0)=='v')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=VERYFAST",_aflowinpad_) << "// (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=VERYFAST",_AFLOWINPAD_) << " // (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
       if(ALGORITHM.at(0)=='F' || ALGORITHM.at(0)=='f')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=FAST",_aflowinpad_) << "// (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=FAST",_AFLOWINPAD_) << " // (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
       if(ALGORITHM.at(0)=='A' || ALGORITHM.at(0)=='a')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=ALL",_aflowinpad_) << "// (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=ALL",_AFLOWINPAD_) << " // (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
       if(ALGORITHM.at(0)=='D' || ALGORITHM.at(0)=='d')
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=DAMPED",_aflowinpad_) << "// (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO=DAMPED",_AFLOWINPAD_) << " // (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
       aflowin << "#[VASP_FORCE_OPTION]ALGO_PRESERVED " << endl;
     }
     if(AFLOWIN_NEW) { // NEW
@@ -4252,10 +4286,10 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
       if(xvasp.aopts.flag("FLAG::ALGO_PRESERVED")) vstr.push_back("PRESERVED");
       if(vstr.size()>0) {
         for(uint i=0;i<vstr.size();i++) tstr+=vstr.at(i)+(i!=vstr.size()-1 ? "," : " ");
-        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO="+tstr,_aflowinpad_) << "// (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ALGO="+tstr,_AFLOWINPAD_) << " // (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
       }
       if(vstr.size()==0) {
-        aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]ALGO=something",_aflowinpad_) << "// (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
+        aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]ALGO=something",_AFLOWINPAD_) << " // (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED (default: DEFAULT_VASP_FORCE_OPTION_ALGO_SCHEME in .aflow.rc)" << endl;
       }
     }
   }
@@ -4282,13 +4316,13 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
     if(vstr.size()>0) {
       for(uint i=0;i<vstr.size();i++)
         tstr+=vstr.at(i)+(i!=vstr.size()-1 ? "," : " ");
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]METAGGA="+tstr,_aflowinpad_) << "// (TPSS | RTPSS | M06L | MBJL | SCAN | MS0 | MS1 | MS2 | NONE) (default: DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME in .aflow.rc)" << endl;
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]METAGGA="+tstr,_AFLOWINPAD_) << " // (TPSS | RTPSS | M06L | MBJL | SCAN | MS0 | MS1 | MS2 | NONE) (default: DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME in .aflow.rc)" << endl;
     }
     if(vstr.size()==0) {
-      aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]METAGGA=NONE",_aflowinpad_) << "// (TPSS | RTPSS | M06L | MBJL | SCAN | MS0 | MS1 | MS2 | NONE) (default: DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME in .aflow.rc)" << endl;
+      aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]METAGGA=NONE",_AFLOWINPAD_) << " // (TPSS | RTPSS | M06L | MBJL | SCAN | MS0 | MS1 | MS2 | NONE) (default: DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME in .aflow.rc)" << endl;
     }
   } else {
-    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]METAGGA=NONE",_aflowinpad_) << "// (TPSS | RTPSS | M06L | MBJL | SCAN | MS0 | MS1 | MS2 | NONE) (default: DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME in .aflow.rc)" << endl;
+    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]METAGGA=NONE",_AFLOWINPAD_) << " // (TPSS | RTPSS | M06L | MBJL | SCAN | MS0 | MS1 | MS2 | NONE) (default: DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME in .aflow.rc)" << endl;
   }
 
   // IVDW WRITING
@@ -4307,13 +4341,13 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
     if(vstr.size()>0) {
       for(uint i=0;i<vstr.size();i++)
         tstr+=vstr.at(i)+(i!=vstr.size()-1 ? "," : " ");
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]IVDW="+tstr,_aflowinpad_) << "// (number_for_VASP_see_manual_for_IVDW | 0) (default: DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME in .aflow.rc)" << endl;
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]IVDW="+tstr,_AFLOWINPAD_) << " // (number_for_VASP_see_manual_for_IVDW | 0) (default: DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME in .aflow.rc)" << endl;
     }
     if(vstr.size()==0) {
-      aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]IVDW=0",_aflowinpad_) << "// (number_for_VASP_see_manual_for_IVDW | 0) (default: DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME in .aflow.rc)" << endl;
+      aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]IVDW=0",_AFLOWINPAD_) << " // (number_for_VASP_see_manual_for_IVDW | 0) (default: DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME in .aflow.rc)" << endl;
     }
   } else {
-    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]IVDW=0",_aflowinpad_) << "// (number_for_VASP_see_manual_for_IVDW | 0) (default: DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME in .aflow.rc)" << endl;
+    aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]IVDW=0",_AFLOWINPAD_) << " // (number_for_VASP_see_manual_for_IVDW | 0) (default: DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME in .aflow.rc)" << endl;
   }
 
   // ABMIX WRITING
@@ -4330,10 +4364,10 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
     if(vstr.size()>0) {
       for(uint i=0;i<vstr.size();i++)
         tstr+=vstr.at(i)+(i!=vstr.size()-1 ? "," : " ");
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ABMIX="+tstr,_aflowinpad_) << "// unspecified | [AUTO | US | PAW | (exp) #AMIX,#BMIX[,#AMIX_MAG,#BMIX_MAG]] (default=unspecified " << DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME<< ")" << endl;
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]ABMIX="+tstr,_AFLOWINPAD_) << " // unspecified | [AUTO | US | PAW | (exp) #AMIX,#BMIX[,#AMIX_MAG,#BMIX_MAG]] (default=unspecified " << DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME<< ")" << endl;
     }
     if(vstr.size()==0) {
-      aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]#ABMIX=...",_aflowinpad_) << "// unspecified | [AUTO | US | PAW | (exp) #AMIX,#BMIX[,#AMIX_MAG,#BMIX_MAG]] (default=unspecified " << DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME<< ")" << endl;
+      aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]#ABMIX=...",_AFLOWINPAD_) << " // unspecified | [AUTO | US | PAW | (exp) #AMIX,#BMIX[,#AMIX_MAG,#BMIX_MAG]] (default=unspecified " << DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME<< ")" << endl;
     }
   }
 
@@ -4351,13 +4385,13 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(xvasp.aopts.flag("AFLOWIN_FLAG::TYPE")) 
     TYPE=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::TYPE");
   if(TYPE.at(0)!='M' && TYPE.at(0)!='I' && TYPE.at(0)!='S' && TYPE.at(0)!='m' && TYPE.at(0)!='i' && TYPE.at(0)!='s')
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]TYPE=DEFAULT",_aflowinpad_) << "// (METAL | INSULATOR | SEMICONDUCTOR | DEFAULT) (default " << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME<< ") " << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]TYPE=DEFAULT",_AFLOWINPAD_) << " // (METAL | INSULATOR | SEMICONDUCTOR | DEFAULT) (default " << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME<< ") " << endl;
   if(TYPE.at(0)=='M' || TYPE.at(0)=='m')
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]TYPE=METAL",_aflowinpad_) << "// (METAL | INSULATOR | SEMICONDUCTOR | DEFAULT) (default " << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME<< ") " << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]TYPE=METAL",_AFLOWINPAD_) << " // (METAL | INSULATOR | SEMICONDUCTOR | DEFAULT) (default " << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME<< ") " << endl;
   if(TYPE.at(0)=='I' || TYPE.at(0)=='i')
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]TYPE=INSULATOR",_aflowinpad_) << "// (METAL | INSULATOR | SEMICONDUCTOR | DEFAULT) (default " << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME<< ") " << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]TYPE=INSULATOR",_AFLOWINPAD_) << " // (METAL | INSULATOR | SEMICONDUCTOR | DEFAULT) (default " << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME<< ") " << endl;
   if(TYPE.at(0)=='S' || TYPE.at(0)=='s')
-    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]TYPE=SEMICONDUCTOR",_aflowinpad_) << "// (METAL | INSULATOR | SEMICONDUCTOR | DEFAULT) (default " << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME<< ") " << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]TYPE=SEMICONDUCTOR",_AFLOWINPAD_) << " // (METAL | INSULATOR | SEMICONDUCTOR | DEFAULT) (default " << DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME<< ") " << endl;
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[12.5]" << endl;
 
@@ -4368,26 +4402,26 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
       stringstream aus;
       aus << "[VASP_FORCE_OPTION]LDAU_SPECIES=";
       for(uint i=0;i<xvasp.str.species.size();i++) aus << KBIN::VASP_PseudoPotential_CleanName(xvasp.str.species.at(i)) << " ";
-      aflowin << aurostd::PaddedPOST(aus.str(),_aflowinpad_) << "// LDAU SPECIES separated by spaces" << endl;
+      aflowin << aurostd::PaddedPOST(aus.str(),_AFLOWINPAD_) << " // LDAU SPECIES separated by spaces" << endl;
     }
   }
   if(AFLOWIN_NEW) { // NEW STYLE
     if(xvasp.aopts.flag("FLAG::AVASP_LDAU_ADIABATIC")==FALSE && xvasp.aopts.flag("FLAG::AVASP_LDAU_CUTOFF")==FALSE) {
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU1") && !xvasp.aopts.flag("FLAG::AVASP_LDAU2")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU1=ON",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && !xvasp.aopts.flag("FLAG::AVASP_LDAU1")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=ON",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && xvasp.aopts.flag("FLAG::AVASP_LDAU1"))  aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=ON",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU1") && !xvasp.aopts.flag("FLAG::AVASP_LDAU2")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU1=ON",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && !xvasp.aopts.flag("FLAG::AVASP_LDAU1")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=ON",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && xvasp.aopts.flag("FLAG::AVASP_LDAU1"))  aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=ON",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
     }
     if(xvasp.aopts.flag("FLAG::AVASP_LDAU_ADIABATIC")==TRUE && xvasp.aopts.flag("FLAG::AVASP_LDAU_CUTOFF")==FALSE) {
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU1") && !xvasp.aopts.flag("FLAG::AVASP_LDAU2")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU1=ADIABATIC",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && !xvasp.aopts.flag("FLAG::AVASP_LDAU1")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=ADIABATIC",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && xvasp.aopts.flag("FLAG::AVASP_LDAU1"))  aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=ADIABATIC",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU1") && !xvasp.aopts.flag("FLAG::AVASP_LDAU2")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU1=ADIABATIC",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && !xvasp.aopts.flag("FLAG::AVASP_LDAU1")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=ADIABATIC",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && xvasp.aopts.flag("FLAG::AVASP_LDAU1"))  aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=ADIABATIC",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
     }
     if(xvasp.aopts.flag("FLAG::AVASP_LDAU_ADIABATIC")==FALSE && xvasp.aopts.flag("FLAG::AVASP_LDAU_CUTOFF")==TRUE) {
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU1") && !xvasp.aopts.flag("FLAG::AVASP_LDAU2")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU1=CUTOFF",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && !xvasp.aopts.flag("FLAG::AVASP_LDAU1")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=CUTOFF",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
-      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && xvasp.aopts.flag("FLAG::AVASP_LDAU1"))  aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=CUTOFF",_aflowinpad_) << "// ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU1") && !xvasp.aopts.flag("FLAG::AVASP_LDAU2")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU1=CUTOFF",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && !xvasp.aopts.flag("FLAG::AVASP_LDAU1")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=CUTOFF",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
+      if(xvasp.aopts.flag("FLAG::AVASP_LDAU2") && xvasp.aopts.flag("FLAG::AVASP_LDAU1"))  aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU2=CUTOFF",_AFLOWINPAD_) << " // ON | OFF | ADIABATIC | CUTOFF  " << endl;
     }
-    if(xvasp.aopts.flag("FLAG::AVASP_LDAU1") || xvasp.aopts.flag("FLAG::AVASP_LDAU2")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU_PARAMETERS="+xvasp.AVASP_LDAU_PARAMETERS_STRING,_aflowinpad_) << "// species;Ls;Us;Js " << endl;
+    if(xvasp.aopts.flag("FLAG::AVASP_LDAU1") || xvasp.aopts.flag("FLAG::AVASP_LDAU2")) aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]LDAU_PARAMETERS="+xvasp.AVASP_LDAU_PARAMETERS_STRING,_AFLOWINPAD_) << " // species;Ls;Us;Js " << endl;
   }
 
   if(LDEBUG) cerr << "DEBUG - " << soliloquy << " " << "[12.6]" << endl;
@@ -4462,10 +4496,10 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
     }
     if(vstr.size()>0) {
       for(uint i=0;i<vstr.size();i++) tstr+=vstr.at(i)+(i!=vstr.size()-1 ? "," : " ");
-      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CONVERT_UNIT_CELL="+tstr,_aflowinpad_) << "// (SPRIM, SCONV, NIGGLI, MINK, INCELL, COMPACT, WS, CART, FRAC, PRES) " << endl;
+      aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CONVERT_UNIT_CELL="+tstr,_AFLOWINPAD_) << " // (SPRIM, SCONV, NIGGLI, MINK, INCELL, COMPACT, WS, CART, FRAC, PRES) " << endl;
     }
     if(vstr.size()==0) {
-      aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=something",_aflowinpad_) << "// (SPRIM, SCONV, NIGGLI, MINK, INCELL, COMPACT, WS, CART, FRAC, PRES)" << endl;
+      aflowin << aurostd::PaddedPOST("#[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=something",_AFLOWINPAD_) << " // (SPRIM, SCONV, NIGGLI, MINK, INCELL, COMPACT, WS, CART, FRAC, PRES)" << endl;
     }
   }
 
@@ -4492,7 +4526,7 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(0) { // write the AFIX
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
     aflowin << "[AFLOW] # Do not uncomment the AFIX unless you know what  you are doing. " << endl;
-    aflowin <<  aurostd::PaddedPOST("[VASP_FORCE_OPTION]IGNORE_AFIX=NONE",_aflowinpad_) << "// ROTMAT, SGRCON, IBZKPT, SYMPREC, INVGRP, EDDRMM, LREAL, BRMIX, DAV, EDDDAV, EFIELD_PEAD, ZPOTRF, EXCCOR, NATOMS, NBANDS, MEMORY, PSMAXN, NPAR" << endl;
+    aflowin <<  aurostd::PaddedPOST("[VASP_FORCE_OPTION]IGNORE_AFIX=NONE",_AFLOWINPAD_) << " // ROTMAT, SGRCON, IBZKPT, SYMPREC, INVGRP, EDDRMM, LREAL, BRMIX, DAV, EDDDAV, EFIELD_PEAD, ZPOTRF, EXCCOR, NATOMS, NBANDS, MEMORY, PSMAXN, NPAR" << endl;
   }
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
@@ -4502,11 +4536,11 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
   if(xvasp.aopts.flag("FLAG::EXTRA_INCAR")==TRUE) {
     aflowin << xvasp.AVASP_EXTRA_INCAR.str(); // << endl;
   }
-  aflowin << aurostd::PaddedPOST("#PSTRESS=000     # Pressure in kBar (1kB=0.1GPa) ",_aflowinpad_) << "# for hand modification" << endl;
-  aflowin << aurostd::PaddedPOST("#EDIFFG="+aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_)+"     # For relaxed forces ",_aflowinpad_) << "# for hand modification" << endl;
-  aflowin << aurostd::PaddedPOST("#POTIM="+aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_)+"      # default ",_aflowinpad_) << "# for hand modification" << endl;
-  aflowin << aurostd::PaddedPOST("#NBANDS=XX  ",_aflowinpad_) << "# for hand modification" << endl;
-  aflowin << aurostd::PaddedPOST("#IALGO=48   ",_aflowinpad_) << "# for hand modification" << endl;
+  aflowin << aurostd::PaddedPOST("#PSTRESS=000     # Pressure in kBar (1kB=0.1GPa) ",_AFLOWINPAD_) << " # for hand modification" << endl;
+  aflowin << aurostd::PaddedPOST("#EDIFFG="+aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_)+"     # For relaxed forces ",_AFLOWINPAD_) << " # for hand modification" << endl;
+  aflowin << aurostd::PaddedPOST("#POTIM="+aurostd::utype2string(DEFAULT_VASP_PREC_EDIFFG,_AVASP_DOUBLE2STRING_PRECISION_)+"      # default ",_AFLOWINPAD_) << " # for hand modification" << endl;
+  aflowin << aurostd::PaddedPOST("#NBANDS=XX  ",_AFLOWINPAD_) << " # for hand modification" << endl;
+  aflowin << aurostd::PaddedPOST("#IALGO=48   ",_AFLOWINPAD_) << " # for hand modification" << endl;
   aflowin << "[VASP_INCAR_MODE_EXPLICIT]STOP " << endl;
   aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   aflowin << "[VASP_KPOINTS_MODE_IMPLICIT] " << endl;
@@ -4872,7 +4906,8 @@ bool AVASP_DefaultValuesBinary_AFLOWIN(_xvasp &xvasp) {
   xvasp.AVASP_EXTRA_INCAR.clear();
   xvasp.AVASP_volume_in=-1.0;
   xvasp.AVASP_flag_RUN_RELAX=TRUE;
-  xvasp.AVASP_path_BANDS="";         // DEFAULT VALUES
+  xvasp.AVASP_path_BANDS=DEFAULT_BANDS_LATTICE;         // DEFAULT VALUES //CO20210805
+  if(xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_LATTICE")) xvasp.AVASP_path_BANDS=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_LATTICE"); //CO202010805
   xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;  // DEFAULT VALUES
   if(xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID")) xvasp.AVASP_value_BANDS_GRID=aurostd::string2utype<uint>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID"));
   return TRUE;
@@ -4998,6 +5033,51 @@ bool AVASP_MakePrototype_AFLOWIN_LOOP(deque<_xvasp>& dxvasp,bool flag_WRITE) {
 }
 
 // ***************************************************************************
+void PARAMS2xvasp(_AVASP_PROTO *PARAMS,_xvasp& xvasp){  //CO20210624 - avoid duplicate code: AVASP_MakePrototype_AFLOWIN() and AVASP_MakePrototypeICSD_AFLOWIN()
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"PARAMS2xvasp():";
+
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::NOAUTOPP")) xvasp.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS",FALSE); //CO20190712
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_LDAU",TRUE);
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTONOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_NOLDAU",TRUE);
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VASP")) xvasp.aopts.flag("AFLOWIN_FLAG::VASP",TRUE);
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ABCCAR")) xvasp.aopts.flag("AFLOWIN_FLAG::ABCCAR",TRUE); //DX20190123 - add ABCCAR
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ABINIT")) xvasp.aopts.flag("AFLOWIN_FLAG::ABINIT",TRUE);
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AIMS")) xvasp.aopts.flag("AFLOWIN_FLAG::AIMS",TRUE);
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::CIF")) xvasp.aopts.flag("AFLOWIN_FLAG::CIF",TRUE); //DX20190123 - add CIF
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::QE")) xvasp.aopts.flag("AFLOWIN_FLAG::QE",TRUE);
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::HTQC_ICSD")) xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC_ICSD;
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::POTIM")) {xvasp.aopts.flag("AFLOWIN_FLAG::POTIM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::POTIM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::POTIM"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::BADER")) xvasp.aopts.flag("FLAG::AVASP_BADER",TRUE); //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_1")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_1",TRUE); //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_2")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_2",TRUE); //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PRECISION")) {xvasp.aopts.flag("AFLOWIN_FLAG::PRECISION",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::PRECISION",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PRECISION"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ALGORITHM")) {xvasp.aopts.flag("AFLOWIN_FLAG::ALGORITHM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ALGORITHM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ALGORITHM"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::METAGGA")) {xvasp.aopts.flag("AFLOWIN_FLAG::METAGGA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::METAGGA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::METAGGA"));}  
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::IVDW")) {xvasp.aopts.flag("AFLOWIN_FLAG::IVDW",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::IVDW",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::IVDW"));}  
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_MODE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_MODE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::TYPE"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::CONVERT_UNIT_CELL"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PRESERVED")) xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE); //CO20180214
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::EDIFFG")) {xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::EDIFFG",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::EDIFFG"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KSCHEME")) {xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KSCHEME"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KSCHEME_STATIC"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::BANDS_GRID")) {xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::BANDS_GRID",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY")) {xvasp.aopts.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ENMAX_MULTIPLY",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ENMAX_MULTIPLY"));}
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PARAMS")) xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS",TRUE); //DX20180123 - added ANRL parameters to PARAMS
+
+}
+
+// ***************************************************************************
 // struct _AVASP_PROTO {
 //   vector<string> ucell;
 //   string label;
@@ -5097,41 +5177,7 @@ bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
   if(!pocc_tol_raw.empty()){aurostd::string2tokens(pocc_tol_raw,pocc_tol_sets,",");}
   else {pocc_tol_sets.push_back("");} //so that it enters the for loop later just once
 
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::NOAUTOPP")) xvasp.aopts.flag("FLAG::AVASP_AUTO_PSEUDOPOTENTIALS",FALSE); //CO20190712
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_LDAU",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTONOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_NOLDAU",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VASP")) xvasp.aopts.flag("AFLOWIN_FLAG::VASP",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ABCCAR")) xvasp.aopts.flag("AFLOWIN_FLAG::ABCCAR",TRUE); //DX20190123 - add ABCCAR
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ABINIT")) xvasp.aopts.flag("AFLOWIN_FLAG::ABINIT",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AIMS")) xvasp.aopts.flag("AFLOWIN_FLAG::AIMS",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::CIF")) xvasp.aopts.flag("AFLOWIN_FLAG::CIF",TRUE); //DX20190123 - add CIF
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::QE")) xvasp.aopts.flag("AFLOWIN_FLAG::QE",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::HTQC_ICSD")) xvasp.AVASP_prototype_mode=LIBRARY_MODE_HTQC_ICSD;
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::POTIM")) {xvasp.aopts.flag("AFLOWIN_FLAG::POTIM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::POTIM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::POTIM"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::BADER")) xvasp.aopts.flag("FLAG::AVASP_BADER",TRUE); //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_1")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_1",TRUE); //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::SPIN_REMOVE_RELAX_2")) xvasp.aopts.flag("FLAG::AVASP_SPIN_REMOVE_RELAX_2",TRUE); //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PRECISION")) {xvasp.aopts.flag("AFLOWIN_FLAG::PRECISION",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::PRECISION",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PRECISION"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ALGORITHM")) {xvasp.aopts.flag("AFLOWIN_FLAG::ALGORITHM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ALGORITHM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ALGORITHM"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::METAGGA")) {xvasp.aopts.flag("AFLOWIN_FLAG::METAGGA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::METAGGA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::METAGGA"));}  
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::IVDW")) {xvasp.aopts.flag("AFLOWIN_FLAG::IVDW",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::IVDW",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::IVDW"));}  
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_MODE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_MODE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::TYPE"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::CONVERT_UNIT_CELL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PRESERVED")) xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE); //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::EDIFFG")) {xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::EDIFFG",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::EDIFFG"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KSCHEME")) {xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KSCHEME"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KSCHEME_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KSCHEME_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KSCHEME_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KSCHEME_STATIC"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::BANDS_GRID")) {xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::BANDS_GRID",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY")) {xvasp.aopts.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ENMAX_MULTIPLY",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ENMAX_MULTIPLY"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PARAMS")) xvasp.aopts.flag("AFLOWIN_FLAG::PARAMS",TRUE); //DX20180123 - added ANRL parameters to PARAMS
+  PARAMS2xvasp(PARAMS,xvasp); //CO20210624 - integrate more above/below inside this function as needed, be careful of order of operations
 
   string string_POTENTIAL=PARAMS->vparams.getattachedscheme("AFLOWIN_STRING::POTENTIAL");
   if(LDEBUG)  cerr << "DEBUG - " << soliloquy << " string_POTENTIAL=" << string_POTENTIAL << endl;
@@ -6637,7 +6683,8 @@ bool AVASP_DefaultValuesICSD_AFLOWIN(_xvasp &xvasp) {
   xvasp.AVASP_EXTRA_INCAR.clear();
   xvasp.AVASP_volume_in=-1.0;
   xvasp.AVASP_flag_RUN_RELAX=TRUE;
-  xvasp.AVASP_path_BANDS="fcc";
+  xvasp.AVASP_path_BANDS=DEFAULT_BANDS_LATTICE; //CO20210805
+  if(xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_LATTICE")) xvasp.AVASP_path_BANDS=xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_LATTICE"); // BANDS_LATTICE  //CO20210805
   xvasp.AVASP_value_BANDS_GRID=DEFAULT_BANDS_GRID;
   if(xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID")) xvasp.AVASP_value_BANDS_GRID=aurostd::string2utype<uint>(xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID")); // BANDS_GRID
   return TRUE;
@@ -6709,33 +6756,7 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
   KBIN::setModules(xvasp);  //CO20181226
   string parameters="";
 
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_LDAU",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTONOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_NOLDAU",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VASP")) xvasp.aopts.flag("AFLOWIN_FLAG::VASP",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ABCCAR")) xvasp.aopts.flag("AFLOWIN_FLAG::ABCCAR",TRUE); //DX20190123 - add ABCCAR
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ABINIT")) xvasp.aopts.flag("AFLOWIN_FLAG::ABINIT",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::AIMS")) xvasp.aopts.flag("AFLOWIN_FLAG::AIMS",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::CIF")) xvasp.aopts.flag("AFLOWIN_FLAG::CIF",TRUE); //DX20190123 - add CIF
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::QE")) xvasp.aopts.flag("AFLOWIN_FLAG::QE",TRUE);
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::MODULE")) {xvasp.aopts.flag("AFLOWIN_FLAG::MODULE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::MODULE"));}  //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::APL_SUPERCELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::APL_SUPERCELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"));}  //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::POTIM")) {xvasp.aopts.flag("AFLOWIN_FLAG::POTIM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::POTIM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::POTIM"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::PRECISION")) {xvasp.aopts.flag("AFLOWIN_FLAG::PRECISION",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::PRECISION",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::PRECISION"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ALGORITHM")) {xvasp.aopts.flag("AFLOWIN_FLAG::ALGORITHM",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ALGORITHM",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ALGORITHM"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::METAGGA")) {xvasp.aopts.flag("AFLOWIN_FLAG::METAGGA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::METAGGA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::METAGGA"));}  
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::IVDW")) {xvasp.aopts.flag("AFLOWIN_FLAG::IVDW",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::IVDW",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::IVDW"));}  
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_TYPE"));}  //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::RELAX_MODE")) {xvasp.aopts.flag("AFLOWIN_FLAG::RELAX_MODE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::RELAX_MODE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::RELAX_MODE"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::TYPE")) {xvasp.aopts.flag("AFLOWIN_FLAG::TYPE",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::TYPE",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::TYPE"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL")) {xvasp.aopts.flag("AFLOWIN_FLAG::CONVERT_UNIT_CELL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::CONVERT_UNIT_CELL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::CONVERT_UNIT_CELL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_PLUS_EQUAL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL")) {xvasp.aopts.flag("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::VOLUME_MULTIPLY_EQUAL"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::VOLUME_PRESERVED")) xvasp.aopts.flag("FLAG::VOLUME_PRESERVED",TRUE); //CO20180214
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::EDIFFG")) {xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::EDIFFG",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::EDIFFG"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::KPPRA_STATIC")) {xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::KPPRA_STATIC",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::KPPRA_STATIC"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::BANDS_GRID")) {xvasp.aopts.flag("AFLOWIN_FLAG::BANDS_GRID",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::BANDS_GRID",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::BANDS_GRID"));}
-  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY")) {xvasp.aopts.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY",TRUE);xvasp.aopts.push_attached("AFLOWIN_FLAG::ENMAX_MULTIPLY",PARAMS->vparams.getattachedscheme("AFLOWIN_FLAG::ENMAX_MULTIPLY"));}
+  PARAMS2xvasp(PARAMS,xvasp); //CO20210624 - integrate more above/below inside this function as needed, be careful of order of operations
 
   // recompile and ahave fun
   // cerr << soliloquy << " 0b" << endl;
@@ -6874,6 +6895,8 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
   xvasp.AVASP_flag_RUN_STATIC=FALSE; //CO20190219
   xvasp.AVASP_flag_RUN_STATIC_BANDS=FALSE;
 
+  xvasp.aopts.flag("FLAG::AVASP_BADER",TRUE); //CO20210624 - always turn Bader on
+
   xvasp.aopts.flag("FLAG::PRECISION_SET",TRUE);
   xvasp.AVASP_flag_PRECISION_scheme=DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME;
   xvasp.aopts.flag("FLAG::ALGO_SET",TRUE);
@@ -6886,7 +6909,7 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
   // extra INCAR
   xvasp.aopts.flag("FLAG::EXTRA_INCAR",TRUE);                               
   xvasp.AVASP_EXTRA_INCAR.clear();                                          
-  xvasp.AVASP_EXTRA_INCAR << "NELM = 120" << endl;                           //WSETYAWAN DEFAULT
+  xvasp.AVASP_EXTRA_INCAR << "NELM=120" << endl;                             //WSETYAWAN DEFAULT
   xvasp.AVASP_EXTRA_INCAR << "NELMIN=2"  << endl;                            //WSETYAWAN DEFAULT
   xvasp.AVASP_EXTRA_INCAR << "LPLANE=.TRUE." << endl;                        //WSETYAWAN DEFAULT
   if(xvasp.str.atoms.size()<=10)                     // cutoff for LREAL     //WSETYAWAN DEFAULT

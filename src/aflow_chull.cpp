@@ -1704,6 +1704,197 @@ namespace chull {
     return convertUnits(sqrt(getDist2Hull() / getEntropyFormingAbility()),units);
   }
 
+
+  /// \brief sort the vertex indexes based on their angle around a central normal vector
+  /// \param facet list of vertex indexes forming the facet
+  /// \param facet_id id of one of the original facets (to use its already calculated normal vector)
+  ///
+  /// Sorting the vertex indexes avoid crossing lines when drawing or calculating the area or volume later.
+  void ConvexHull::sortFacetVertices(vector<uint> &facet, const uint &facet_id){//HE20210510
+    xvector<double> center(3,1);
+    const uint num_points = facet.size();
+    xvector<uint> index_list(num_points,1);
+    xvector<double> angle_list(num_points,1);
+    for (std::vector<uint>::const_iterator p_id = facet.begin(); p_id != facet.end(); ++p_id) center += m_points[*p_id].m_coords;
+
+    center /= num_points;
+    const xvector<double> start_vector = m_points[facet[0]].m_coords - center;
+    const xvector<double> normal = m_facets[facet_id].m_normal;
+
+    // first index is used for the start_vector, therefore the angle is set to 0.0
+    angle_list[1] = 0;
+    index_list[1] = facet[0];
+    for (uint i=1; i<num_points; i++){
+      const xvector<double> next_vector = m_points[facet[i]].m_coords - center;
+      const double dot = aurostd::scalar_product(start_vector, next_vector);
+      const double det = start_vector[1]*next_vector[2]*normal[3] + next_vector[1]*normal[2]*start_vector[3] + normal[1]*start_vector[2]*next_vector[3]
+        - start_vector[3]*next_vector[2]*normal[1] - next_vector[3]*normal[2]*start_vector[1] - normal[3]*start_vector[2]*next_vector[1];
+      angle_list[i+1] = atan2(det, dot);
+      index_list[i+1] = facet[i];
+    }
+    aurostd::quicksort2(num_points, angle_list, index_list);
+    for (uint i=0; i<num_points; i++) facet[i] = index_list[i+1];
+  }
+
+  /// @brief generates list of facets, if two neighboring facets are coplanar join them
+  /// @param facet_collection output vector containing lists of vertex indexes
+  /// @param angle_threshold max angle between two facts in radian to be still considered coplanar
+  /// @note the facets contain only vertices
+  void ConvexHull::getJoinedFacets(vector<vector<uint> > &facet_collection, const double angle_threshold) {//HE20210510
+    bool LDEBUG=(false || XHOST.DEBUG);
+    string soliloquy=XPID+"ConvexHull::getJoinedFacets():";
+
+    if (m_dim != 3) throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "facet joining is just available in 3D", _VALUE_RANGE_);
+    vector <vector<uint> > raw_facets;
+    vector<xvector<double> > normals;
+    std::map<uint, vector<uint> >  point_neighbors;
+    std::list<std::pair<uint, uint> > raw_join_list;
+    vector<vector<uint> > join_list;
+    vector<uint> remove_facet;
+    vector<vector<uint> > raw_facet_collection;
+    std::map<uint, uint> corner_check;
+
+    // Collect information on each facet
+    for (std::vector<ChullFacet>::const_iterator facet = h_facets.begin(); facet != h_facets.end(); ++facet){
+
+      vector <uint> vertices;
+
+      // Represent facet based on the vertices indexes
+      for(std::vector<chull::FacetPoint>::const_iterator vert = facet->m_vertices.begin(); vert != facet->m_vertices.end(); ++vert){
+        vertices.push_back(vert->ch_index);
+      }
+      raw_facets.push_back(vertices);
+      normals.push_back(facet->m_normal);
+    }
+
+
+    // Build lookup for neighboring points
+    // (Base point is included to make a check easier)
+    for (std::vector<vector<uint> >::const_iterator facet = raw_facets.begin(); facet != raw_facets.end(); ++facet){
+      for (std::vector<uint>::const_iterator ind = facet->begin(); ind != facet->end(); ++ind){
+        std::copy(facet->begin(),facet->end(), std::inserter(point_neighbors[*ind],point_neighbors[*ind].end()));
+      }
+    }
+
+    // Ensure that point_neighbors is unique
+    for (std::map<uint, vector<uint> >::iterator point_neighbors_entry = point_neighbors.begin();
+        point_neighbors_entry != point_neighbors.end(); ++point_neighbors_entry){
+      std::sort(point_neighbors_entry->second.begin(),point_neighbors_entry->second.end());
+      point_neighbors_entry->second.erase( std::unique( point_neighbors_entry->second.begin(), point_neighbors_entry->second.end() ), point_neighbors_entry->second.end() );
+    }
+
+    uint raw_facets_size = raw_facets.size();
+    // Check for each facet, if their neighbors have an equivalent normal vector
+    if (LDEBUG) cerr << soliloquy << " coplanar | angle | facets | n1 | n2" << endl;
+    for (uint i1=0; i1<raw_facets_size; i1++){
+      const vector<uint> base_facet = raw_facets[i1];
+      for (uint i2=i1+1; i2<raw_facets_size; i2++){
+        uint check=0;
+        const vector<uint> compare_facet = raw_facets[i2];
+        for (uint k=0; k<3; k++) {
+          for (uint j=0; j<3; j++) {
+            if (base_facet[k]==compare_facet[j]) check++;
+          }
+        }
+        // neighbor share two vertices
+        if (check != 2) continue;
+        double check_angle = aurostd::angle(normals[i1], normals[i2]);
+        if (check_angle<angle_threshold){
+          if(LDEBUG) cerr << soliloquy << " YES | ";
+          raw_join_list.push_back(std::make_pair(i1, i2));
+          remove_facet.push_back(i1);
+          remove_facet.push_back(i2);
+        }
+        else {
+          if (LDEBUG) cerr << soliloquy << " NO  | ";
+        }
+        if (LDEBUG) {
+          cerr << check_angle << " | ";
+          cerr << i1 << ", " << i2 << " | ";
+          for (uint k=1; k<4; k++) cerr << normals[i1][k] << ", ";
+          cerr << "| ";
+          for (uint k=1; k<4; k++) cerr << normals[i2][k] << ", ";
+          cerr << endl;
+        }
+      }
+    }
+
+    // Combine the joined pairs into complete facets
+    while (raw_join_list.size()){
+      std::pair<uint, uint> start=*raw_join_list.begin();
+      vector<uint> new_facet;
+      new_facet.push_back(start.first); new_facet.push_back(start.second);
+      raw_join_list.erase(std::find(raw_join_list.begin(), raw_join_list.end(), start));
+      std::vector<std::pair<uint, uint> > to_delete;
+      uint found = 1;
+      while (found){
+        found = 0;
+        to_delete.clear();
+        for (std::list< std::pair<uint, uint> >::const_iterator next_ptr = raw_join_list.begin(); next_ptr != raw_join_list.end(); ++next_ptr) {
+          std::pair<uint, uint> next = *next_ptr;
+          if (std::find(new_facet.begin(), new_facet.end(), next.first) != new_facet.end()) {
+            found ++;
+            new_facet.push_back(next.second);
+            to_delete.push_back(next);
+          }
+          else if (std::find(new_facet.begin(), new_facet.end(), next.second) != new_facet.end())  {
+            found ++;
+            new_facet.push_back(next.first);
+            to_delete.push_back(next);
+          }
+        }
+        for (std::vector<std::pair<uint, uint> >::const_iterator next = to_delete.begin(); next != to_delete.end(); ++next) {
+          raw_join_list.erase(std::find(raw_join_list.begin(), raw_join_list.end(), *next));
+        }
+      }
+      join_list.push_back(new_facet);
+    }
+
+    // Build the raw facet collection
+    // Add unchanged facets (no sorting, as they should all be triangles)
+    for (uint i=0; i<raw_facets_size; i++){
+      if (std::find(remove_facet.begin(), remove_facet.end(), i) == remove_facet.end()) raw_facet_collection.push_back(raw_facets[i]);
+    }
+    // Add joined facets
+    for (std::vector<vector<uint> >::const_iterator to_join = join_list.begin(); to_join != join_list.end(); ++to_join) {
+      vector<uint> vertices;
+      for (vector<uint>::const_iterator f_id = to_join->begin(); f_id != to_join->end(); ++f_id) {
+        for (std::vector<uint>::const_iterator p_id = raw_facets[*f_id].begin(); p_id != raw_facets[*f_id].end(); ++p_id) {
+          if (std::find(vertices.begin(), vertices.end(), *p_id) == vertices.end()) vertices.push_back(*p_id); // ensure vertices vector is unique
+        }
+      }
+      // sort the vertices for std::set_difference(); point_neighbors are already sorted
+      std::sort(vertices.begin(), vertices.end());
+
+      // If a vertex has no outside neighbor it is removed
+      vector<uint> vertices_to_remove;
+      for (vector<uint>::const_iterator p_id = vertices.begin(); p_id != vertices.end(); ++p_id){
+        std::vector<uint> diff_result;
+        std::set_difference(point_neighbors[*p_id].begin(), point_neighbors[*p_id].end(), vertices.begin(), vertices.end(), std::inserter(diff_result, diff_result.end()));
+        if (!diff_result.size()) vertices_to_remove.push_back(*p_id);
+      }
+      for (std::vector<uint>::const_iterator p_id = vertices_to_remove.begin(); p_id != vertices_to_remove.end(); ++p_id) {
+        vertices.erase(std::find(vertices.begin(), vertices.end(), *p_id));
+      }
+      sortFacetVertices(vertices, *to_join->begin());
+      raw_facet_collection.push_back(vertices);
+    }
+
+    // remove points that are on an edge and not a corner
+    for (uint i_facet = 0; i_facet < raw_facet_collection.size(); i_facet++) {
+      for (uint i_vert = 0; i_vert < raw_facet_collection[i_facet].size(); i_vert++) {
+        corner_check[raw_facet_collection[i_facet][i_vert]]++;
+      }
+    }
+
+    for (uint i_facet = 0; i_facet < raw_facet_collection.size(); i_facet++) {
+      vector<uint> vec_vertices;
+      for (uint i_vert = 0; i_vert < raw_facet_collection[i_facet].size(); i_vert++) {
+        if (corner_check[raw_facet_collection[i_facet][i_vert]]>2)  vec_vertices.push_back(raw_facet_collection[i_facet][i_vert]);
+      }
+      facet_collection.push_back(vec_vertices);
+    }
+  }
   //since we don't check ALL attributes of entry, then we weed out MORE
   //entries existing in different catalogs will not be strictly identical
   //avoid this by comparing only the most pertinent information
@@ -1740,12 +1931,13 @@ namespace chull {
   }
 
   void ChullPoint::setGenCoords(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,bool formation_energy_coord) {
+    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     string soliloquy=XPID+"ChullPoint::setGenCoords():";
     if(entry.vcomposition.size()==0&&entry.vstoichiometry.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No vcomposition or vstoichiometry found for entry.auid="+entry.auid,_RUNTIME_ERROR_);}
     xvector<double> coord(velements.size());
-    bool found=false;
+    bool found=false; //not necessary, we already check in entryValid()
+    double c_sum=0.0;
     if(entry.vcomposition.size()>0){
-      double c_sum=0.0;
       for(uint i=0,fl_size_i=entry.vcomposition.size();i<fl_size_i;i++){c_sum+=entry.vcomposition[i];}  //derive stoich exactly!
       if(c_sum==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"c_sum==0 (entry.auid="+entry.auid+",entry.aurl="+entry.aurl+")",_RUNTIME_ERROR_);}
       for(uint i=0,fl_size_i=velements.size();i<fl_size_i-1;i++){
@@ -1759,15 +1951,42 @@ namespace chull {
         //[might be from lower hull]if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"element not found: "+velements[i],_RUNTIME_ERROR_);}
       }
     }else{  //pocc structures have no vcomposition, only vstoichiometry
+      //get exact fraction
+      int numerator=0,denominator=0;
+      double stoich=0.0;
+      vector<double> vstoich;
+      if(LDEBUG){cerr << soliloquy << " converting stoich[aurl=" << entry.aurl << "]=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(entry.vstoichiometry),",") << " to fractions" << endl;}
+      for(uint i=0,fl_size_i=entry.vstoichiometry.size();i<fl_size_i;i++){  //derive stoich exactly!
+        aurostd::double2fraction(entry.vstoichiometry[i],numerator,denominator,DEFAULT_POCC_STOICH_TOL);  //ZERO_TOL*10 is preferred, but due to buy in GetStoich(), use DEFAULT_POCC_STOICH_TOL instead (for now) //ZERO_TOL=1e-8, make slightly looser than what's written to aflowlib.out
+        stoich=(double)numerator/(double)denominator;
+        c_sum+=stoich;
+        vstoich.push_back(stoich);
+      }
+      if(c_sum==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"c_sum==0 (entry.auid="+entry.auid+",entry.aurl="+entry.aurl+")",_RUNTIME_ERROR_);}
+      if(!aurostd::identical(c_sum,1.0,ZERO_TOL)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"c_sum!=1 (entry.auid="+entry.auid+",entry.aurl="+entry.aurl+")",_RUNTIME_ERROR_);}
       for(uint i=0,fl_size_i=velements.size();i<fl_size_i-1;i++){
         found=false;
         for(uint j=0,fl_size_j=entry.vspecies.size();j<fl_size_j && !found;j++){
           if(velements[i]==entry.vspecies[j]){
-            coord[i+coord.lrows]=entry.vstoichiometry[j];
+            coord[i+coord.lrows]=vstoich[j]/c_sum;
             found=true;
           }
         }
         //[might be from lower hull]if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"element not found: "+velements[i],_RUNTIME_ERROR_);}
+      }
+      if(0){  //entry.vstoichiometry has write round-offs, better to derive fraction exactly
+        for(uint i=0,fl_size_i=entry.vstoichiometry.size();i<fl_size_i;i++){c_sum+=entry.vstoichiometry[i];}  //derive stoich exactly!
+        if(c_sum==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"c_sum==0 (entry.auid="+entry.auid+",entry.aurl="+entry.aurl+")",_RUNTIME_ERROR_);}
+        for(uint i=0,fl_size_i=velements.size();i<fl_size_i-1;i++){
+          found=false;
+          for(uint j=0,fl_size_j=entry.vspecies.size();j<fl_size_j && !found;j++){
+            if(velements[i]==entry.vspecies[j]){
+              coord[i+coord.lrows]=entry.vstoichiometry[j]/c_sum;
+              found=true;
+            }
+          }
+          //[might be from lower hull]if(!found){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"element not found: "+velements[i],_RUNTIME_ERROR_);}
+        }
       }
     }
     if(formation_energy_coord){coord[coord.urows]=H_f_atom(entry);} //entry.enthalpy_formation_atom
@@ -1795,19 +2014,23 @@ namespace chull {
   void ChullPoint::setStoichCoords() {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     string soliloquy=XPID+"ChullPoint::setStoichCoords():";
-    if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates");}
+    if(!m_has_stoich_coords){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Non-stoich coordinates: aurl="+m_entry.aurl);}
     double c_sum=0.0; //concentration sum
     xvector<double> stoich(m_coords.urows,m_coords.lrows);
     xvector<int> elements_present(m_coords.urows,m_coords.lrows);
     if(LDEBUG) {cerr << soliloquy << " m_coords=" << m_coords << endl;}
     for(int j=m_coords.lrows;j<=m_coords.urows-1;j++){
-      if(std::signbit(m_coords[j])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Negative stoich coordinate found");} //no negative numbers in stoich coordinates, only energy
+      if(std::signbit(m_coords[j])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Negative stoich coordinate found: aurl="+m_entry.aurl);} //no negative numbers in stoich coordinates, only energy
       stoich[j]=m_coords[j];
       if(nonZeroWithinTol(m_coords[j])){elements_present[j]=1;}
       c_sum+=m_coords[j];
     }
     stoich[stoich.urows]=(1.0-c_sum); //hidden dimension
-    if(std::signbit(stoich[stoich.urows])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Negative stoich coordinate found");}  //no negative numbers
+    if(std::signbit(stoich[stoich.urows])){
+      //necessary check now because POCC entries have no composition, only stoich, so write-out errors will be prevalent
+      if(zeroWithinTol(stoich[stoich.urows])){stoich[stoich.urows]=0.0;}  //only zero out for the last coord, as it's derived from the subtraction of the others
+      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Negative stoich coordinate found: aurl="+m_entry.aurl);}
+    }  //no negative numbers
     if(nonZeroWithinTol(stoich[stoich.urows])){elements_present[elements_present.urows]=1;}   //check if nary++
     s_coords=stoich;
     c_coords=s_coords;
@@ -2625,7 +2848,10 @@ namespace chull {
     }
     double hid_dim=1.0-sum(m_coords);
     if(LDEBUG) {cerr << soliloquy << " hid_dim=" << hid_dim << endl;}
-    if(std::signbit(hid_dim) || hid_dim>1.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coord("+aurostd::utype2string(m_coords.rows)+") is outside of [0,1] range of a generalized stoichiometry coordinate");}
+    if(std::signbit(hid_dim) || hid_dim>1.0) {
+      if(zeroWithinTol(hid_dim)){hid_dim=0.0;}  //only zero out for the last coord, as it's derived from the subtraction of the others
+      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Coord("+aurostd::utype2string(m_coords.rows)+") is outside of [0,1] range of a generalized stoichiometry coordinate");}
+    }
 
     xvector<int> elements_present(m_coords.lrows,m_coords.urows+1);
     for(int i=m_coords.lrows;i<=m_coords.urows;i++){if(nonZeroWithinTol(m_coords[i])){elements_present[i]=1;}}
@@ -3787,8 +4013,9 @@ namespace chull {
     //flag defaults
     m_formation_energy_hull=formation_energy_hull;    //energy vs. entropic_temperature hull
     if(m_formation_energy_hull){m_half_hull=m_lower_hull=true;} //default
-    m_half_hull=(m_half_hull || true);                //energy/entropic_temperature lower/upper hull  //override with flag from m_cflags
-    m_lower_hull=(m_formation_energy_hull || true);   //energy/entropic_temperature lower/upper hull  //override with flag from m_cflags
+    m_half_hull=(m_half_hull && m_cflags.flag("CHULL::FULL_HULL")==false); //energy/entropic_temperature lower/upper hull //override with flag from m_cflags  //HE20210510 - added CHULL::FULL_HULL
+    m_lower_hull=(m_formation_energy_hull && m_cflags.flag("CHULL::FULL_HULL")==false); //energy/entropic_temperature lower/upper hull //override with flag from m_cflags  //HE20210510 - added CHULL::FULL_HULL
+
     m_add_artificial_unaries=add_artificial_unaries;
 
     //detect for coord types mixture!

@@ -147,7 +147,7 @@ namespace apl {
         aurostd::string2tokens(vlines[iline], tokens, "=");
         vector<int> vdims;
         aurostd::string2tokens(tokens[1], vdims);
-        if (vdims.size() == 3) {
+        if (vdims.size() == 3 || vdims.size() == 9) {
           dims = aurostd::vector2xvector(vdims);
           break;
         }
@@ -208,9 +208,7 @@ namespace apl {
 
     // Copy
     _inStructure = xstr;
-    _inStructure.ReScale(1.0);
-    _inStructure.ShiftOriginToAtom(0);
-    _inStructure.BringInCell();  //clean up
+    _inStructure.CleanStructure();
 
     if(LDEBUG){
       cerr << soliloquy << " this is the structure to be analyzed (after sorting via iatoms)" << std::endl;
@@ -247,6 +245,14 @@ namespace apl {
     _initialized = true;
   }
 
+  //xStream initializers
+  void Supercell::initialize(ostream& oss) {
+    xStream::initialize(oss);
+  }
+
+  void Supercell::initialize(ofstream& mf, ostream& oss) {
+    xStream::initialize(mf, oss);
+  }
 
   // ///////////////////////////////////////////////////////////////////////////
 
@@ -344,7 +350,7 @@ namespace apl {
     }
     if (method == "SUPERCELL") {
       vector<int> tokens;
-      aurostd::string2tokens(value, tokens, " xX");
+      aurostd::string2tokens(value, tokens, " xX,;");
       dims = aurostd::vector2xvector(tokens);
     } else if (method == "MINATOMS") {
       int minatoms = aurostd::string2utype<int>(value);
@@ -401,12 +407,13 @@ namespace apl {
     build(dims);
   }
 
-  void Supercell::build(const xvector<int>& dims, bool VERBOSE) {
-    build(dims[1], dims[2], dims[3], VERBOSE);
+  void Supercell::build(int nx, int ny, int nz, bool VERBOSE) {
+    xvector<int> dims(3);
+    dims[1] = nx; dims[2] = ny; dims[3] = nz;
+    build(dims, VERBOSE);
   }
 
-  //[CO20190218 - OBSOLETE]#if !JAHNATEK_ORIGINAL
-  void Supercell::build(int nx, int ny, int nz, bool VERBOSE) {
+  void Supercell::build(const xvector<int>& dims, bool VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy="apl::Supercell::build():"; //CO20190218
     stringstream message;
@@ -414,41 +421,41 @@ namespace apl {
       message << "Not initialized.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
     }
-    //BEGIN JJPR
-    scell(1) = nx;
-    scell(2) = ny;
-    scell(3) = nz;
-    _derivative_structure = !(nx == ny && ny == nz);
+    scell_dim = dims;
+    _derivative_structure = ((dims.rows == 9) || !aurostd::identical(dims));
     bool get_full_sym = false; //GETFULLSYMBASIS;  //( GETFULLSYMBASIS || _derivative_structure ); //CO
-    //END JJPR
 
     // Print info
-    if (VERBOSE) {
-      message << "The supercell is going to build as " << nx << " x " << ny << " x " << nz
-        << " (" << (uint)(nx * ny * nz * _inStructure.atoms.size()) << " atoms).";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    if (dims.rows == 3) {
+      string dimstring = aurostd::joinWDelimiter(dims, "x");
+      _scStructure.info = "Supercell " + dimstring;
+      if (VERBOSE) {
+        message << "The supercell is going to build as " << dimstring;
+        message << " (" << (dims[1] * dims[2] * dims[3] * _inStructure.atoms.size()) << " atoms).";
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+      }
+    } else {
+      xmatrix<int> scmat = aurostd::reshape(dims, 3, 3);
+      string dimstring = aurostd::xmatDouble2String(aurostd::xmatrixutype2double(scmat), 0);
+      _scStructure.info = "Supercell " + dimstring;
+      if (VERBOSE) {
+        message << "The supercell is going to build as [" << dimstring << "]";
+        message << " (" << (aurostd::det(scmat) * _inStructure.atoms.size()) << " atoms).";
+        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+      }
     }
 
     if (VERBOSE && _derivative_structure) {
-      message << "Derivative structure detected, be patient as we calculate symmetry of the supercell.";
+      message << "Derivative structure detected, be patient as we calculate the symmetry of the supercell.";
       pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
     }
-    // Create lattice of the supercell
-    xmatrix<double> scale(3, 3);
-    scale.clear();
-    scale(1, 1) = nx;
-    scale(2, 2) = ny;
-    scale(3, 3) = nz;
 
     // Get supercell
-    //_scStructure = GetSuperCell(_inStructure, scale, _sc2pcMap, _pc2scMap, TRUE, _derivative_structure);  //now gets symmetries too! no need for full_basis (just a check)
-    _scStructure = GetSuperCell(_inStructure, scale, _sc2pcMap, _pc2scMap, TRUE, get_full_sym, false, true);  //now gets symmetries too! no need for full_basis (just a check) //CO20190409 - force_supercell_matrix==false as we might have a derivative structure, force_strict_pc2scMap==true because we want to map to true primitive cell, no equivalent atoms
+    //_scStructure = GetSuperCell(_inStructure, dims, _sc2pcMap, _pc2scMap, TRUE, _derivative_structure);  //now gets symmetries too! no need for full_basis (just a check)
+    _scStructure = GetSuperCell(_inStructure, dims, _sc2pcMap, _pc2scMap, TRUE, get_full_sym, false, true);  //now gets symmetries too! no need for full_basis (just a check) //CO20190409 - force_supercell_matrix==false as we might have a derivative structure, force_strict_pc2scMap==true because we want to map to true primitive cell, no equivalent atoms
 
     // Setup output flags
     _scStructure.write_inequivalent_flag = TRUE;
-
-    // Set the information about this construction
-    _scStructure.info = "Supercell " + aurostd::utype2string<int>(nx) + "x" + aurostd::utype2string<int>(ny) + "x" + aurostd::utype2string<int>(nz);
 
     // OK.
     if (VERBOSE) {
@@ -1023,16 +1030,15 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   xstructure Supercell::calculatePrimitiveStructure() const { //CO20180409
-    xstructure pcStructure=_inStructure;
+    xstructure pcStructure;
+    LightCopy(_inStructure, pcStructure);  //ME20211019 - do not copy symmetry
     //ME20200324 - Setting LatticeReduction_avoid to true can results in
     // primitive cells with slightly different lattice parameters, especially
     // for monoclinic cells. This error can propagate and break mappings from
     // the conventional to the primitive cell.
     pcStructure.LatticeReduction_avoid = false;
     pcStructure.Standard_Primitive_UnitCellForm();
-    pcStructure.ReScale(1.0);
-    pcStructure.ShiftOriginToAtom(0);
-    pcStructure.BringInCell();
+    pcStructure.CleanStructure();
     return pcStructure;
   }
 

@@ -229,6 +229,17 @@ namespace aflowlib {
       double ael_average_external_pressure; // (GPa) //CT20181212
       xmatrix<double> ael_stiffness_tensor;  //ME20191105
       xmatrix<double> ael_compliance_tensor;  //ME20191105
+      // APL //ME20210927
+      double energy_free_vibrational_cell_apl_300K;
+      double energy_free_vibrational_atom_apl_300K;
+      double entropy_vibrational_cell_apl_300K;
+      double entropy_vibrational_atom_apl_300K;
+      double energy_internal_vibrational_cell_apl_300K;
+      double energy_internal_vibrational_atom_apl_300K;
+      double energy_zero_point_cell_apl;
+      double energy_zero_point_atom_apl;
+      double heat_capacity_Cv_cell_apl_300K;
+      double heat_capacity_Cv_atom_apl_300K;
       // QHA  //AS20200831
       double gruneisen_qha; //AS20200831
       double gruneisen_qha_300K; //AS20200903
@@ -315,7 +326,8 @@ namespace aflowlib {
       string Domain;
       bool establish();
     public:
-      APIget( string a_Summons="", string a_API_Path=_AFLUX_API_PATH_, string a_Domain=AFLOWLIB_SERVER_DEFAULT ) : PORT(80),Summons(a_Summons),API_Path(a_API_Path),Domain(a_Domain) {}; //CO20181226
+      //DX20210615 [OBSOLETE] APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226
+      APIget( string a_Summons="", string a_API_Path=_AFLUX_API_PATH_, string a_Domain=AFLOWLIB_SERVER_DEFAULT ) : PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226 //DX20210615 - updated domain name
       void reset( string a_Summons="#", string a_API_Path="", string a_Domain="" );
       friend ostream& operator<<( ostream& output, APIget& a );
   };
@@ -442,6 +454,7 @@ namespace aflowlib {
   bool LIB2RAW_Loop_Bader(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
   bool LIB2RAW_Loop_AGL(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
   bool LIB2RAW_Loop_AEL(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry&,const string& MESSAGE);
+  bool LIB2RAW_Loop_APL(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);  // ME20210901
   bool LIB2RAW_Loop_QHA(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);  //AS20200831
   bool LIB2RAW_Loop_LOCK(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);
   bool LIB2RAW_Loop_POCC(const string& directory_LIB,const string& directory_RAW,vector<string> &vfiles,aflowlib::_aflowlib_entry& data,const string& MESSAGE);  //CO20200624
@@ -485,6 +498,7 @@ class _outreach {
     bool newflag;
     uint year;
     vector<string> vauthor;
+    vector<string> vcorrespondingauthor;
     string title;
     string journal,link,arxiv,supplementary; 
     string place,date;

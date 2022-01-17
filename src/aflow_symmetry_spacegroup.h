@@ -564,6 +564,8 @@ namespace SYM {
   //Operations on class-atoms
   vector<int> count_types(deque<_atom>& vatom);
 
+  vector<int> countWyckoffTypes(const vector<wyckoffsite_ITC>& Wyckoff_positions); //DX20210526
+
   //EXPAND LATTICE/CRYSTAL FUNCTIONS
   vector<xvector<double> > expand_lattice_positive_only(int& a, int& b, int& c, xmatrix<double>& L);
   vector<xvector<double> > expand_lattice(int& a, int& b, int& c, xmatrix<double>& L);

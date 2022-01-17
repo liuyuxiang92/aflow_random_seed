@@ -18,6 +18,7 @@
 // flexibility and customizability as possible.
 
 #include "aflow.h"
+#include "aflow_pocc.h"
 
 using std::deque;
 using std::string;
@@ -121,6 +122,11 @@ namespace plotter {
   //getPlotOptionsEStructure//////////////////////////////////////////////////
   // Sets the plot options that are specific to electronic structure plots.
   xoption getPlotOptionsEStructure(const aurostd::xoption& xopt, const string& key, bool datasets) {
+    bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
+    string soliloquy=XPID+"plotter::getPlotOptionsEStructure():";
+
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
     xoption plotoptions = getPlotOptions(xopt, key, datasets);
 
     // Projection
@@ -130,6 +136,7 @@ namespace plotter {
     } else {
       plotoptions.push_attached("PROJECTION", aurostd::toupper(scheme));
     }
+    if(LDEBUG){cerr << soliloquy << " projection=" << plotoptions.getattachedscheme("PROJECTION") << endl;}
 
     // No border
     plotoptions.flag("NOBORDER", true);
@@ -173,6 +180,21 @@ namespace plotter {
     }
     return plotoptions;
   }
+
+  //AS2020210705 BEGIN
+  //getPlotOptionsQHAthermo/////////////////////////////////////////////////////
+  // Sets the plot options that are specific to thermal properties obtained by the QHA
+  xoption getPlotOptionsQHAthermo(const aurostd::xoption& xopt, const string& key) {
+    xoption plotoptions = getPlotOptions(xopt, key);
+    string scheme = xopt.getattachedscheme("PLOTTER::EOSMODEL");
+    if (scheme.empty()) {
+      plotoptions.push_attached("EOSMODEL", "SJ");
+    } else {
+      plotoptions.push_attached("EOSMODEL", aurostd::toupper(scheme));
+    }
+    return plotoptions;
+  }
+  //AS2020210705 END
 
   // Plot functions ----------------------------------------------------------
 
@@ -263,23 +285,50 @@ namespace plotter {
       string directory_tmp = aurostd::TmpDirectoryCreate("plotLATEX") + "/";
       chdir(directory_tmp.c_str());
       // Execute gnuplot and pdflatex
+      string command="",output="";
       aurostd::stringstream2file(gpfile, filename + ".plt");
-      aurostd::execute(XHOST.command("gnuplot") + " \"" + filename + ".plt\"");
-      if(LDEBUG) cerr << soliloquy << "directory_tmp = " << directory_tmp << endl;
+      command=XHOST.command("gnuplot") + " \"" + filename + ".plt\"";
+      if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+      aurostd::execute(command);
+      if(LDEBUG) cerr << soliloquy << " directory_tmp = " << directory_tmp << endl;
       if(LDEBUG) cerr << soliloquy << aurostd::execute("ls -las "+directory_tmp) << endl;
       // ME20200609 - old pdfatex versions cannot process eps files
       if (pdflatex_version >= 2010) {
-        aurostd::execute(XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error \"" + filename_latex + ".tex\" 2>&1 > /dev/null");
+        command=XHOST.command("pdflatex") + " -interaction=nonstopmode -halt-on-error \"" + filename_latex + ".tex\" 2>&1 > /dev/null";
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        aurostd::execute(command);
       } else {
-        aurostd::execute(XHOST.command("latex") + " -interaction=nonstopmode -halt-on-error \"" + filename_latex + ".tex\" 2>&1 > /dev/null");
-        aurostd::execute(XHOST.command("dvips") + " " + filename_latex + ".dvi  > /dev/null 2>&1");
-        aurostd::execute(XHOST.command("ps2pdf") + " " + filename_latex + ".ps");
+        command=XHOST.command("latex") + " -interaction=nonstopmode -halt-on-error \"" + filename_latex + ".tex\" 2>&1 > /dev/null";
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        aurostd::execute(command);
+        command=XHOST.command("dvips") + " " + filename_latex + ".dvi  > /dev/null 2>&1";
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        aurostd::execute(command);
+        command=XHOST.command("ps2pdf") + " " + filename_latex + ".ps";
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        aurostd::execute(command);
       }
       // Convert to the desired format if not pdf
       if (format != "pdf") {
-        aurostd::execute(XHOST.command("convert") + " -quiet -density 300 -background white \"" + filename_latex + ".pdf\" convert_output." + format);   // to avoid C: ... Carbon:PBE = C: in windows
+        command=XHOST.command("convert") + " -quiet -density 300 -background white \"" + filename_latex + ".pdf\" convert_output." + format + " 1>/dev/null 2>&1";   // to avoid C: ... Carbon:PBE = C: in window //CO20210701 - io redirection
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        output=aurostd::execute2string(command);
+        if(0){  //CO20210701 - does not work because of primitive execute2string functionality, will be fixed with upcoming version
+          //start here for a patch:
+          //https://www.itechlounge.net/2020/09/web-imagickexception-attempt-to-perform-an-operation-not-allowed-by-the-security-policy-pdf/
+          if(output.find("not allowed by the security policy")!=string::npos){
+            string message="The ImageMagick policy file disables ghostscript formats. Please see here and update the policy file: https://bugs.archlinux.org/task/60580";
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
+          }
+        }
+        if(!aurostd::FileExist("convert_output." + format)){
+          string message="The ImageMagick policy file disables ghostscript formats. Please see here and update the policy file: https://bugs.archlinux.org/task/60580";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _RUNTIME_ERROR_);
+        }
         if(LDEBUG) cerr << soliloquy << aurostd::execute("ls -las "+directory_tmp) << endl;
-        aurostd::execute("mv convert_output." + format + " \"" + filename_latex  + "." + format + "\"");
+        command="mv convert_output." + format + " \"" + filename_latex  + "." + format + "\"";
+        if(LDEBUG){cerr << soliloquy << " executing command: \"" << command << "\"" << endl;}
+        aurostd::execute(command);
         if(LDEBUG) cerr << soliloquy << aurostd::execute("ls -las "+directory_tmp) << endl;
       }
       chdir(current_dir.c_str());
@@ -292,9 +341,7 @@ namespace plotter {
       // Clean up
       aurostd::RemoveDirectory(directory_tmp);
       if (!aurostd::FileExist(directory_work + "/" + filename + "." + format)) {
-        string function = "plotter::savePlotGNUPLOT():";
-        string message = "Error while generating plot.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Error while generating plot.", _RUNTIME_ERROR_);
       }
     } else {
       string message = "The following binaries are missing: " + aurostd::joinWDelimiter(missing_binaries, " ") + ".";
@@ -470,7 +517,10 @@ namespace plotter {
               cerr << soliloquy << " elements=" << aurostd::joinWDelimiter(elements,",") << endl;
               cerr << soliloquy << " composition=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(composition,5),",") << endl;
             }
-            title = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft) + " (" + proto;  //_none_ //_latex_   //CO20190629
+            //DX+ME20210729 - the code below is wrapped in a try-catch block because there are unary prototypes in LIB2 (e.g., /common/LIB2/LIB/LaMn_pv/117)
+            // in these instances, we will return the default title
+            try { title = pflow::prettyPrintCompound(elements, composition, no_vrt, true, latex_ft) + " (" + proto; } //_none_ //_latex_   //CO20190629 //DX+ME20210729 - for unaries in LIB2 errors
+            catch(aurostd::xerror& excpt){ return aurostd::fixStringLatex(default_title, false, false); } //DX+ME20210729 - for unaries in LIB2 errors
           } else {  // Title not in prototype format
             return aurostd::fixStringLatex(default_title, false, false);
           }
@@ -933,9 +983,62 @@ namespace plotter {
     string directory = plotoptions.getattachedscheme("DIRECTORY");
     xDOSCAR xdos;
     if(LDEBUG) { cerr << soliloquy << " directory=" << directory << endl;}
-    xdos.GetPropertiesFile(aflowlib::vaspfile2stringstream(directory, "DOSCAR"));
-    PLOT_DOS(plotoptions, out, xdos,FileMESSAGE,oss);  //CO20200404
-    savePlotGNUPLOT(plotoptions, out);
+    //CO20210701 - adding support for POCC
+    //check if POCC directory
+    vector<string> vfiles,vpocc_doscars;
+    aurostd::DirectoryLS(directory,vfiles);
+    uint i=0;
+    for(i=0;i<vfiles.size();i++){
+      if(vfiles[i].find(POCC_DOSCAR_PREFIX)!=string::npos){vpocc_doscars.push_back(aurostd::CleanFileName(directory+"/"+vfiles[i]));}
+    }
+    if(vpocc_doscars.size()>0){
+      std::sort(vpocc_doscars.begin(),vpocc_doscars.end());
+      string pscheme=plotoptions.getattachedscheme("PROJECTION");
+      if(LDEBUG){cerr << soliloquy << " pscheme=" << pscheme << endl;}
+      if(pscheme.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No projection scheme provided",_INPUT_MISSING_);}
+      double temperature=0.0;
+      _aflags aflags;aflags.Directory=directory;
+      bool see_sub_output=false;//true;
+      ostream& oss_empty=cout;if(!see_sub_output){oss_empty.setstate(std::ios_base::badbit);}  //like NULL
+      ofstream devnull("/dev/null");  //NULL
+      //T0K and T0000K cannot be known from a single file
+      //there is logic inside to determine whether we have floats, precision, and how to pad zeros. 
+      //it depends on the temperature range specified in the aflow.in (or command line). 
+      //however, if this cannot be found (because we only have the DOSCAR's), 
+      //then the logic says to understand the files locally as best as possible.
+      int temperature_precision=0,zero_padding_temperature=0;
+      bool temperatures_int=true;
+      //get temperature string parameters, either we grab them from the aflow.in or we guess them from defaults in aflow.rc
+      if(aurostd::FileExist(aflags.Directory+"/"+_AFLOWIN_) && pocc::structuresGenerated(aflags.Directory)){
+        pocc::POccCalculator pcalc(aflags,devnull,oss_empty);
+        vector<double> v_temperatures;
+        pcalc.loadDataIntoCalculator();pcalc.setTemperatureStringParameters(v_temperatures); //needed for DOSCAR plots
+        pocc::getTemperatureStringParameters(v_temperatures,temperature_precision,temperatures_int,zero_padding_temperature);
+        if(pcalc.m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No ARUN.POCC_* runs found",_FILE_CORRUPT_);}
+        plotoptions.push_attached("ARUN_DIRECTORY",pcalc.m_ARUN_directories[0]);
+      }else{
+        pocc::getTemperatureStringParameters(temperature_precision,temperatures_int,zero_padding_temperature);
+        //this is when we don't have the full POCC directory. 
+        //maybe someone is trying to plot in a directory only having aflow.in and DOSCAR's (but no ARUN's). 
+        //we need the ARUNs if we want to do projection==species, but not if projection==orbital
+        if(pscheme=="SPECIES"){ //we need ARUN_DIRECTORY
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Need ARUN.POCC_* runs for projection==\"species\"",_INPUT_MISSING_);
+        }
+      }
+      if(LDEBUG){cerr << soliloquy << " found POCC directory" << endl;}
+      for(i=0;i<vpocc_doscars.size();i++){
+        if(LDEBUG){cerr << soliloquy << " looking at POCC DOSCAR: " << vpocc_doscars[i] << endl;}
+        xdos.GetPropertiesFile(vpocc_doscars[i]);
+        temperature=pocc::poccDOSCAR2temperature(vpocc_doscars[i]);
+        plotoptions.push_attached("EXTENSION","dos_"+aurostd::tolower(pscheme)+"_T"+pocc::getTemperatureString(temperature,temperature_precision,temperatures_int,zero_padding_temperature)+"K");
+        PLOT_DOS(plotoptions, out, xdos,FileMESSAGE,oss);  //CO20200404
+        savePlotGNUPLOT(plotoptions, out);
+      }
+    }else{
+      xdos.GetPropertiesFile(aflowlib::vaspfile2stringstream(directory, "DOSCAR"));
+      PLOT_DOS(plotoptions, out, xdos,FileMESSAGE,oss);  //CO20200404
+      savePlotGNUPLOT(plotoptions, out);
+    }
   }
 
   void patchDefaultTitleAFLOWIN(xoption& plotoptions) { //CO20191110
@@ -983,7 +1086,7 @@ namespace plotter {
 
     if(LDEBUG) { cerr << soliloquy << " EFERMI set" << endl;}
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xdos.energy_min, xdos.energy_max);
 
     // Plot
@@ -1143,7 +1246,7 @@ namespace plotter {
       plotoptions.push_attached("EFERMI", "0.0");
     }
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xeigen.energy_min, xeigen.energy_max);
 
     // Plot
@@ -1199,7 +1302,7 @@ namespace plotter {
       plotoptions.push_attached("EFERMI", "0.0");
     }
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xdos.energy_min, xdos.energy_max);
 
     // Plot
@@ -1238,6 +1341,7 @@ namespace plotter {
       aflowlib::vaspfile2stringstream(directory + "", poscar_file, poscar);  //CO20200404
     }
 
+    if(LDEBUG){cerr << soliloquy << " poscar=" << endl << poscar.str() << endl;}
     xstructure xstr(poscar);
     if (xstr.is_vasp4_poscar_format) {  //PARTCAR has species and it is NOT vasp4 format  //CO20191110
       // No special case for phonons needed because PHPOSCAR is always in VASP5 format
@@ -1356,9 +1460,12 @@ namespace plotter {
   aurostd::JSONwriter DOS2JSON(xoption &xopt, const xDOSCAR &xdos, ofstream& FileMESSAGE,
       ostream &oss)
   {
-    string directory = ".";
-    xopt.push_attached("DIRECTORY", directory);
-    if (directory.empty()) directory = aurostd::getPWD();
+    //ME20211015 - Only set directory when none is given
+    string directory = xopt.getattachedscheme("DIRECTORY");
+    if (directory.empty()) {
+      directory = aurostd::getPWD();
+      xopt.push_attached("DIRECTORY", directory);
+    }
 
     xstructure xstr = getStructureWithNames(xopt,FileMESSAGE,xdos.carstring,oss);
 
@@ -1383,7 +1490,7 @@ namespace plotter {
       tdos_data.addString("y_unit", "");
     }
     else if (aurostd::substring2bool(xdos.carstring, "PHON")){
-      tdos_data.addString("x_unit", "MEV");
+      tdos_data.addString("x_unit", "EV");  //ME20211014 - units are always eV
       tdos_data.addString("y_unit", "");
     }
 
@@ -1587,7 +1694,7 @@ namespace plotter {
       pdos_data.addBool("spin_polarized", xdos.spin);
       pdos_data.addBool("energies_shifted", !xopt.flag("NOSHIFT"));
       pdos_data.addVector("energy", xopt.flag("NOSHIFT") ? xdos.venergy : xdos.venergyEf);
-      pdos_data.addString("x_unit", "MEV");
+      pdos_data.addString("x_unit", "EV");  //ME20211014 - units are always eV
       pdos_data.addString("y_unit", "");
 
       // create a mapping of species to the id of the first representative of
@@ -1657,10 +1764,10 @@ namespace plotter {
     }
     else if(aurostd::substring2bool(xeigen.carstring, "PHON")){
       json.addString("x_unit", "");
-      json.addString("y_unit", "MEV");
+      json.addString("y_unit", "EV");  //ME20211014 - units are always eV
     }
 
-    static const int num = 4;
+    static const uint num = 4;
     string tags[num] = {"kpoint_labels", "kpoint_labels_latex", "kpoint_labels_gnuplot", "kpoint_labels_html"};
     string formats[num] = { "", "LATEX", "GNUPLOT", "HTML"};
 
@@ -1673,7 +1780,7 @@ namespace plotter {
       for (uint i = 2; i < 2 * nsegments; i += 2) {
         labels_formated[i/2] = convertKPointLabel(xkpts.vpath[i - 1], formats[f]);
         if (xkpts.vpath[i-1] != xkpts.vpath[i]) {
-          labels_formated[i/2] += ("GNUPLOT" == formats[f] ? " |" : "|");
+          labels_formated[i/2] += ("GNUPLOT" == formats[f] ? " |" : "|"); //ME, should we add $|$ here too?
           labels_formated[i/2] += convertKPointLabel(xkpts.vpath[i], formats[f]);
         }
       }
@@ -1952,7 +2059,7 @@ namespace plotter {
     for (uint i = 2; i < 2 * nsegments; i += 2) {
       labels[i/2] = convertKPointLabel(xkpts.vpath[i - 1], format);
       if (xkpts.vpath[i-1] != xkpts.vpath[i]) {
-        labels[i/2] += "|" + convertKPointLabel(xkpts.vpath[i], format);
+        labels[i/2] += "$|$" + convertKPointLabel(xkpts.vpath[i], format);  //CO20210701 - | by itself can show up as hyphen, also consider $\\vert$
       }
     }
     labels.back() = convertKPointLabel(xkpts.vpath.back(), format);
@@ -2056,6 +2163,8 @@ namespace plotter {
   void generateDosPlotGNUPLOT(stringstream& out, const xDOSCAR& xdos, const deque<double>& energies,
       const deque<deque<deque<double> > >& dos, const vector<string>& labels,
       const xoption& plotoptions) {
+    bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
+    string soliloquy=XPID+"plotter::generateDosPlotGNUPLOT():";
     // Initialize variables
     double Efermi = aurostd::string2utype<double>(plotoptions.getattachedscheme("EFERMI"));
     double Emin = aurostd::string2utype<double>(plotoptions.getattachedscheme("XMIN"));
@@ -2065,8 +2174,15 @@ namespace plotter {
     uint ndos = dos.size();
 
     double dosmax = getDosLimits(plotoptions, xdos, dos, energies);
+
+    if(LDEBUG){
+      cerr << soliloquy << " dosmax=" << dosmax << endl;
+      cerr << soliloquy << " xdos.spin=" << xdos.spin << endl;
+    }
+
+    if(aurostd::isequal(dosmax,0.0)){dosmax=1.0;} //CO+ME20210729 - issues with LIB0 pDOS plots, might need to rerun with NEDOS=5000, EMIN=-45, EMAX=30
     string maxdos = aurostd::utype2string<double>(dosmax);
-    string mindos;
+    string mindos="";
     if (xdos.spin == 0) mindos = "0";
     else mindos = "-" + maxdos;
 
@@ -2129,7 +2245,8 @@ namespace plotter {
     }
 
     out << " set " << (swap?"x":"y") << "tics " << (dosmax/(2 * (2 - xdos.spin))) << std::endl;
-    out << " set ytics" << (banddos?" format \"\"":"") << std::endl;
+    if(banddos){out << " set ytics format \"\"" << std::endl;}  //CO+ME20210729
+    //[CO+ME20210729 - breaks for LIB0 which has swap==false and banddos]out << " set ytics" << (banddos?" format \"\"":"") << std::endl;
     out << " set tic scale 0" << std::endl;
     out << " set " << (swap?"y":"x") << "range [" << Emin << ":" << Emax << "]" << std::endl;
     out << " set " << (swap?"x":"y") << "range [" << mindos << ":" << maxdos << "]" << std::endl;
@@ -2179,6 +2296,8 @@ namespace plotter {
           << ((i < ndos - 1)?",\\":"") << std::endl;
       }
     }
+
+    if(LDEBUG){cerr << soliloquy << " gnuplot file:" << endl << out.str() << endl;}
   }
 
   //getDosLimits//////////////////////////////////////////////////////////////
@@ -2294,8 +2413,18 @@ namespace plotter {
     string unit = plotoptions.getattachedscheme("UNIT");
     if (unit.empty()) unit = "EV";
     string energyLabel;
-    if (aurostd::substring2bool(unit, "EV")) energyLabel = "energy";
-    else energyLabel = "frequency";
+    //AS20210701 extra check for Grueneisen parameter dispersion plotting
+    if (unit=="GRUENEISEN"){
+      energyLabel = "$\\gamma$";
+      unit = "";
+    }
+    else if (aurostd::substring2bool(unit, "EV")){
+      energyLabel = "energy";
+    }
+    else{
+      energyLabel = "frequency";
+    }
+
     unit = getFormattedUnit(unit);
 
     out << "# Band structure plot" << std::endl;
@@ -2349,7 +2478,12 @@ namespace plotter {
     out << " set tic scale 0" << std::endl;
     out << " set xrange [0:1]" << std::endl;
     out << " set yrange [" << Emin << ":" << Emax << "]" << std::endl;
-    out << " set ylabel '" << energyLabel << " (" << unit << ")'" << std::endl;
+    if (unit.empty()){//AS20210701 this might be a Grueneisen parameter dispersion plot, unitless
+      out << " set ylabel '" << energyLabel << std::endl;
+    }
+    else{
+      out << " set ylabel '" << energyLabel << " (" << unit << ")'" << std::endl;
+    }
 
     // Fermi level
     if (Efermi > Emin) {
@@ -2413,7 +2547,6 @@ namespace plotter {
 
     stringstream out;
     PLOT_PHDOS(plotoptions, out,FileMESSAGE,oss);  //CO20200404
-    savePlotGNUPLOT(plotoptions, out);
   }
 
   void PLOT_PHDOS(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE;return PLOT_PHDOS(plotoptions,out,FileMESSAGE,oss);}  //CO20200404
@@ -2422,9 +2555,47 @@ namespace plotter {
     plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
     // Read files
     string directory = plotoptions.getattachedscheme("DIRECTORY");
+    //ME20211008 - adding support for POCC
+    //Check if directory contains PHDOSCAR.pocc files
+    vector<string> vfiles, vpocc_doscars;
+    aurostd::DirectoryLS(directory, vfiles);
+    for (uint i = 0; i < vfiles.size(); i++) {
+      // File name must start with prefix
+      if (vfiles[i].find(POCC_PHDOSCAR_PREFIX) == 0) vpocc_doscars.push_back(vfiles[i]);
+    }
     xDOSCAR xdos;
-    xdos.GetPropertiesFile(directory+"/"+DEFAULT_APL_PHDOSCAR_FILE); //CO20191110
+    if (vpocc_doscars.size() > 0) {
+      string T = "";
+      plotoptions.flag("PLOT_ALL_ATOMS", true);  // PARTCAR has no iatoms
+      for (uint i = 0; i < vpocc_doscars.size(); i++) {
+        // Grab the temperature string. Format is always prefix + T + "K" + extension
+        T = vpocc_doscars[i].substr(POCC_PHDOSCAR_PREFIX.length());
+        T = T.substr(0, T.find("K"));
+        plotoptions.push_attached("EXTENSION", "phdos_T" + T + "K");
+        xdos.GetPropertiesFile(directory + "/" + vpocc_doscars[i]);
+        PLOT_PHDOS(plotoptions, out, xdos, FileMESSAGE, oss);
+      }
+    } else {
+      xdos.GetPropertiesFile(directory+"/"+DEFAULT_APL_PHDOSCAR_FILE); //CO20191110
+      PLOT_PHDOS(plotoptions, out, xdos, FileMESSAGE, oss);
+    }
+  }
 
+  // ME20210927
+  void PLOT_PHDOS(xoption& plotoptions, const xDOSCAR& xdos, ostream& oss) {ofstream FileMESSAGE; return PLOT_PHDOS(plotoptions,xdos,FileMESSAGE,oss);}
+  void PLOT_PHDOS(xoption& plotoptions, const xDOSCAR& xdos, ofstream& FileMESSAGE, ostream& oss) {
+    // Set k-points format to LaTeX
+    plotoptions.push_attached("KPOINT_FORMAT", "LATEX");
+    // Set output format to gnuplot
+    plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
+
+    stringstream out;
+    PLOT_PHDOS(plotoptions, out, xdos, FileMESSAGE, oss);
+  }
+
+  // Create a copy of xDOSCAR here because the energy units may be changed, which
+  // should not propagate outside
+  void PLOT_PHDOS(xoption& plotoptions, stringstream& out, xDOSCAR xdos, ofstream& FileMESSAGE, ostream& oss) {
     plotoptions.push_attached("DEFAULT_TITLE", xdos.title);
     setFileName(plotoptions);
     setTitle(plotoptions,FileMESSAGE,oss); //CO20200404
@@ -2437,11 +2608,12 @@ namespace plotter {
       convertEnergies(xdos, unit);
     }
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xdos.energy_min, xdos.energy_max);
 
     generateHeader(out, plotoptions, false);
     generateDosPlot(out, xdos, plotoptions,FileMESSAGE,oss);  //CO20200404
+    savePlotGNUPLOT(plotoptions, out);
   }
 
   //PLOT_PHDISP///////////////////////////////////////////////////////////////
@@ -2455,7 +2627,6 @@ namespace plotter {
 
     stringstream out;
     PLOT_PHDISP(plotoptions, out,FileMESSAGE,oss); //CO20200404
-    savePlotGNUPLOT(plotoptions, out);
   }
 
   void PLOT_PHDISP(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE;return PLOT_PHDISP(plotoptions,out,FileMESSAGE,oss);} //CO20200404
@@ -2485,11 +2656,12 @@ namespace plotter {
       convertEnergies(xeigen, unit);
     }
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xeigen.energy_min, xeigen.energy_max);
 
     generateHeader(out, plotoptions, false);
     generateBandPlot(out, xeigen, xkpts, xstr, plotoptions);
+    savePlotGNUPLOT(plotoptions, out);
   }
 
   //PLOT_PHDISPDOS////////////////////////////////////////////////////////////
@@ -2503,7 +2675,6 @@ namespace plotter {
 
     stringstream out;
     PLOT_PHDISPDOS(plotoptions, out,FileMESSAGE,oss);  //CO20200404
-    savePlotGNUPLOT(plotoptions, out);
   }
 
   void PLOT_PHDISPDOS(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE;return PLOT_PHDISPDOS(plotoptions,out,FileMESSAGE,oss);}  //CO20200404
@@ -2537,12 +2708,13 @@ namespace plotter {
       convertEnergies(xeigen, unit);
     }
 
-    // Get Emin and Emax
+    // Set Emin and Emax
     setEMinMax(plotoptions, xdos.energy_min, xdos.energy_max);
 
     generateHeader(out, plotoptions, true);
     generateBandPlot(out, xeigen, xkpts, xstr, plotoptions);
     generateDosPlot(out, xdos, plotoptions,FileMESSAGE,oss);  //CO20200404
+    savePlotGNUPLOT(plotoptions, out);
   }
 
   //convertEnergies///////////////////////////////////////////////////////////
@@ -2659,6 +2831,8 @@ namespace plotter {
   void PLOT_THERMO_QHA(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE; PLOT_THERMO_QHA(plotoptions,out,FileMESSAGE,oss);} //CO20200404
   void PLOT_THERMO_QHA(xoption& plotoptions, stringstream& out,ofstream& FileMESSAGE,ostream& oss) 
   {
+    string function = "plotter::PLOT_THERMO_QHA():", msg = "";
+
     // Set labels
     static const int nprops = 7;
     string ylabels[nprops] = {"V", "F", "B", "\\beta", "c_V", "c_P", "\\gamma"};
@@ -2668,6 +2842,15 @@ namespace plotter {
     string yunits[nprops] = {"\\AA$^{3}$/atom", "eV/atom", "GPa", "$10^{-5}K^{-1}$",
       "$k_B$/atom", "$k_B$/atom", ""};
     string ymin[nprops] = {"", "", "", "", "0", "0", ""};
+
+    string eos_model = plotoptions.getattachedscheme("EOSMODEL");
+    if (eos_model != "SJ"  && eos_model != "BM2" && eos_model != "BM3" &&
+        eos_model != "BM4" && eos_model != "M"){
+      msg = "Wrong name of the EOS model was specified. ";
+      msg += "Only SJ, BM2, BM3, BM4 or M labels are allowed.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, msg, _INPUT_ILLEGAL_);
+    }
+    string keyword = "QHA_" + eos_model + "_THERMO";
 
     // Get data
     string directory = plotoptions.getattachedscheme("DIRECTORY");
@@ -2679,13 +2862,13 @@ namespace plotter {
     if (aurostd::EFileExist(thermo_file)) {
       string outformat = plotoptions.getattachedscheme("OUTPUT_FORMAT");
       plotoptions.push_attached("DATA_FILE", thermo_file);
-      plotoptions.push_attached("KEYWORD", "QHA_SJ_THERMO");
+      plotoptions.push_attached("KEYWORD", keyword);
       vector<vector<double> > data = readAflowDataFile(plotoptions);
       if (!user_file_name.empty()) plotoptions.push_attached("DEFAULT_TITLE", user_file_name);  //ME20200413
       for (int i = 0; i < nprops; i++) {
         plotoptions.pop_attached("YMIN");
         if (!ymin[i].empty()) plotoptions.push_attached("YMIN", ymin[i]);
-        plotoptions.push_attached("EXTENSION", extensions[i]);
+        plotoptions.push_attached("EXTENSION", extensions[i] + '_' + eos_model);
         setPlotLabels(plotoptions, "T", "K", ylabels[i], yunits[i]);
         plotSingleFromSet(plotoptions, out, data, i + 1,FileMESSAGE,oss);  //CO20200404
         if (outformat == "GNUPLOT") {
@@ -2694,12 +2877,87 @@ namespace plotter {
         out.str("");  //ME20200513 - reset stringstream
       }
     } else {
-      string function = "plotter::PLOT_THERMO_QHA():";
-      string message = "Could not find file " + thermo_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
+      msg = "Could not find file " + thermo_file + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, msg, _FILE_NOT_FOUND_);
     }
   }
   //AS20200909 END
+
+  //AS20210701 BEGIN
+  //PLOT_GRUENEISEN_DISPERSION///////////////////////////////////////////////////////////////
+  /// Plots Grueneisen parameter dispersion curves.
+  /// Follows PLOT_GRUENEISEN_DISPERSION function.
+  void PLOT_GRUENEISEN_DISPERSION(xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return PLOT_GRUENEISEN_DISPERSION(plotoptions,FileMESSAGE,oss);}  //CO20200404
+  void PLOT_GRUENEISEN_DISPERSION(xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
+    // Set k-points format to LaTeX
+    plotoptions.push_attached("KPOINT_FORMAT", "LATEX");
+    // Set output format to gnuplot
+    plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
+
+    stringstream out;
+    PLOT_GRUENEISEN_DISPERSION(plotoptions, out,FileMESSAGE,oss); //CO20200404
+    savePlotGNUPLOT(plotoptions, out);
+  }
+
+  void PLOT_GRUENEISEN_DISPERSION(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE;return PLOT_GRUENEISEN_DISPERSION(plotoptions,out,FileMESSAGE,oss);} //CO20200404
+  void PLOT_GRUENEISEN_DISPERSION(xoption& plotoptions, stringstream& out,ofstream& FileMESSAGE,ostream& oss) { //CO20200404
+    // Grueneisen parameters for acoustic modes at the Gamma point are ill-defined,
+    // so for the plot to be pretty, one needs to substitute it with NaN
+    static double nan = std::numeric_limits<double>::quiet_NaN();
+
+    plotoptions.push_attached("EXTENSION", "grdisp");
+    plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
+    // Read files
+    string directory = plotoptions.getattachedscheme("DIRECTORY");
+    xEIGENVAL xeigen;
+    xeigen.GetPropertiesFile(directory+"/"+ DEFAULT_QHA_FILE_PREFIX
+        + DEFAULT_QHA_GP_PATH_FILE);
+    xKPOINTS xkpts;
+    xkpts.GetPropertiesFile(directory+"/"+ DEFAULT_QHA_FILE_PREFIX +
+        DEFAULT_QHA_KPOINTS_FILE);
+    stringstream poscar;
+    aurostd::efile2stringstream(directory+"/"+DEFAULT_APL_PHPOSCAR_FILE, poscar);  //CO20191110
+    xstructure xstr(poscar);
+
+    // substituting the values of Grueneisen parameters for acoustic modes at
+    // Gamma point with NaN.
+    // Grueneisen parameters at Gamma may be large due to numerical noise, so
+    // recalculate energy_min and energy_max
+    xeigen.energy_max = -AUROSTD_MAX_DOUBLE;
+    xeigen.energy_min =  AUROSTD_MAX_DOUBLE;
+    double eigval = 0.0;
+    for (uint k=0; k<xeigen.number_kpoints; k++){
+      for (uint b=0; b<xeigen.number_bands; b++){
+        if (b<=3){// acoustic modes should be the first three ones
+          // if we are close enough to Gamma, substitute with NaN
+          if (aurostd::modulus(xeigen.vkpoint[k]) < AUROSTD_IDENTITY_TOL){
+            xeigen.venergy[k][b][0] = nan;
+          }
+        }
+
+        eigval = xeigen.venergy[k][b][0];
+        if (eigval < xeigen.energy_min) xeigen.energy_min = eigval;
+        if (eigval > xeigen.energy_max) xeigen.energy_max = eigval;
+      }
+    }
+
+    // proceed with plot setup
+    plotoptions.push_attached("DEFAULT_TITLE", xeigen.title);
+    plotoptions.push_attached("LATTICE", getLatticeFromKpointsTitle(xkpts.title));
+    setFileName(plotoptions);
+    setTitle(plotoptions,FileMESSAGE,oss); //CO20200404
+
+    plotoptions.flag("BANDDOS", false);
+
+    plotoptions.push_attached("UNIT", "GRUENEISEN");
+
+    // Set Emin and Emax
+    setEMinMax(plotoptions, xeigen.energy_min, xeigen.energy_max);
+
+    generateHeader(out, plotoptions, false);
+    generateBandPlot(out, xeigen, xkpts, xstr, plotoptions);
+  }
+  //AS20210701 END
 
   //PLOT_TCOND////////////////////////////////////////////////////////////////
   // Plots AAPL thermal conductivity tensors

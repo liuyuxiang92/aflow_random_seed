@@ -14,6 +14,8 @@
 //temporary directory for storing QHA files
 #define _STROPT_ string("[VASP_FORCE_OPTION]") //ME20181226
 
+#define APL_AFLOWIN_DEFAULT string("aflow_apl.in")  // ME20210901
+
 static const string _ANHARMONIC_IFCS_FILE_[2] = {"anharmonicIFCs_3rd.xml", "anharmonicIFCs_4th.xml"};
 static const int _NUM_RELAX_ = 2; //ME20181226
 static const string _APL_RELAX_PREFIX_ = "relax_apl"; //ME20181226  //ME20190125
@@ -179,19 +181,19 @@ namespace KBIN {
     if (Krun) {
       int i;
       for (i = start_relax; Krun && i <= _NUM_RELAX_; i++) {
-        aus << 11111*i << " RELAXATION APL - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message(_AFLOW_MESSAGE_DEFAULTS_) << endl;
+        aus << 11111*i << " RELAXATION APL - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message(_AFLOW_FILE_NAME_) << endl;
         aurostd::PrintMessageStream(fileMessage, aus, XHOST.QUIET);
         if (i < _NUM_RELAX_) {
           Krun = VASP_Run(xvasp, aflags, kflags, vflags, _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), true, fileMessage);
-          XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, fileMessage);
-          XVASP_KPOINTS_IBZKPT_UPDATE(xvasp, aflags, vflags, i, fileMessage);
+          XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, true, fileMessage); //CO20210315 - always write_incar
+          XVASP_KPOINTS_IBZKPT_UPDATE(xvasp, aflags, vflags, i, true, fileMessage); //CO20210315 - always write_kpoints
         } else { 
           Krun = VASP_Run(xvasp, aflags, kflags, vflags, _APL_RELAX_PREFIX_ + aurostd::utype2string<int>(i), true, fileMessage);
-          XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, fileMessage);  //ME20200115 - or else SPIN_REMOVE_RELAX_2 does not work
+          XVASP_INCAR_SPIN_REMOVE_RELAX(xvasp, aflags, vflags, i, false, fileMessage);  //ME20200115 - or else SPIN_REMOVE_RELAX_2 does not work  //CO20210315 - write_incar only if (i<num_relax), no static afterward
         }
       }
       if (Krun && (i == _NUM_RELAX_)) {
-        aus << 11111*i << " RELAXATION APL END - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message(_AFLOW_MESSAGE_DEFAULTS_) << endl;
+        aus << 11111*i << " RELAXATION APL END - " << xvasp.Directory << " - K=[" << xvasp.str.kpoints_k1 << " " << xvasp.str.kpoints_k2 << " " << xvasp.str.kpoints_k3 << "]" << " - " << kflags.KBIN_BIN << " - " << Message(_AFLOW_FILE_NAME_) << endl;
       }
     }
     if (!Krun) return false;
@@ -390,6 +392,7 @@ namespace KBIN {
       message << (kflags.KBIN_MODULE_OPTIONS.aplflags[i].isentry? "Setting" : "DEFAULT") << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme;
       pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
       aplopts.flag(key, kflags.KBIN_MODULE_OPTIONS.aplflags[i].option);
+      aplopts.flag(key + "_ENTRY", kflags.KBIN_MODULE_OPTIONS.aplflags[i].isentry); // ME20210505
       aplopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme);
     }
 
@@ -655,11 +658,15 @@ namespace KBIN {
         try {
           // Check the version of VASP binary
           message << "Checking VASP version for linear response calculations.";
-          string vaspVersion;
-          vaspVersion = getVASPVersionString( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );
-          if (!vaspVersion.empty()) {
-            message << "[" << vaspVersion[0] << "].";
-            if ((vaspVersion[0] - '0') < 5) { //cool way of getting ascii value:  https://stackoverflow.com/questions/36310181/char-subtraction-in-c
+          //[CO20210315 - new style]string vaspVersion;
+          //[CO20210315 - new style]vaspVersion = getVASPVersionNumber( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );
+          double vaspVersion=KBIN::getVASPVersionDouble( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );  //CO20210315
+          //[CO20210315 - new style]if (!vaspVersion.empty())
+          if (aurostd::isequal(vaspVersion,0.0)==false){  //CO20210315
+            //[CO20210315 - new style]message << "[" << vaspVersion[0] << "]."; //CO20210315
+            //[CO20210315 - new style]if ((vaspVersion[0] - '0') < 5) //cool way of getting ascii value:  https://stackoverflow.com/questions/36310181/char-subtraction-in-c
+            message << "[" << vaspVersion << "]."; //CO20210315
+            if (vaspVersion < 5) {  //CO20210315
               pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
               //ME20190107 - fix both serial and MPI binaries
               kflags.KBIN_SERIAL_BIN = DEFAULT_VASP5_BIN;
@@ -780,21 +787,22 @@ namespace KBIN {
     //AS20200709 BEGIN
     // convert an array of xoptions to a single xoption using defaults for missing
     // properties
-    aurostd::xoption qhaopts;
-    for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.qhaflags.size(); i++) {
-      const string& key = kflags.KBIN_MODULE_OPTIONS.qhaflags[i].keyword;
-      message << (kflags.KBIN_MODULE_OPTIONS.qhaflags[i].isentry? "Setting" : "DEFAULT")
-        << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme;
-      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
-      qhaopts.flag(key, kflags.KBIN_MODULE_OPTIONS.qhaflags[i].option);
-      qhaopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme);
-    }
+    //ME20210831 - Only validate and process if we have a QHA calculations
+    if (kflags.KBIN_PHONONS_CALCULATION_QHA) {
+      aurostd::xoption qhaopts;
+      for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.qhaflags.size(); i++) {
+        const string& key = kflags.KBIN_MODULE_OPTIONS.qhaflags[i].keyword;
+        message << (kflags.KBIN_MODULE_OPTIONS.qhaflags[i].isentry? "Setting" : "DEFAULT")
+          << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme;
+        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+        qhaopts.flag(key, kflags.KBIN_MODULE_OPTIONS.qhaflags[i].option);
+        qhaopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme);
+      }
 
-    apl::validateParametersQHA(qhaopts, aflags, FileMESSAGE, oss);
-    //AS20200709 END
+      apl::validateParametersQHA(qhaopts, aflags, FileMESSAGE, oss);
+      //AS20200709 END
 
-    //AS20200513 BEGIN
-    if (kflags.KBIN_PHONONS_CALCULATION_QHA){
+      //AS20200513 BEGIN
       apl::QHA qha(supercell.getInputStructureLight(), xinput,
           qhaopts, aplopts, FileMESSAGE, oss);
 
@@ -905,6 +913,8 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
+    stringstream apl_outfile; // ME20210927 - summary file
+
     // Get the format of frequency desired by user ///////////////////////
 
     if (LDEBUG) std::cerr << function << " DEBUG [5a]" << std::endl;
@@ -998,14 +1008,19 @@ namespace KBIN {
 
       // Calculate thermal properties
       if (aplopts.flag("TP")) {
-        //if (!dosc.hasNegativeFrequencies()) //ME20200210 - Do not skip, just ignore contributions of imaginary frequencies and throw a warning
+        //if (!dosc.hasImaginaryFrequencies()) //ME20200210 - Do not skip, just ignore contributions of imaginary frequencies and throw a warning
         apl::ThermalPropertiesCalculator tpc(dosc, FileMESSAGE, aflags.Directory, oss);  //ME20190423
         //ME20200108 - new ThermalPropertiesCalculator format
         double USER_TP_TSTART = aurostd::string2utype<double>(aplopts.getattachedscheme("TSTART"));
         double USER_TP_TEND = aurostd::string2utype<double>(aplopts.getattachedscheme("TEND"));
         double USER_TP_TSTEP = aurostd::string2utype<double>(aplopts.getattachedscheme("TSTEP"));
         tpc.calculateThermalProperties(USER_TP_TSTART, USER_TP_TEND, USER_TP_TSTEP);
-        tpc.writePropertiesToFile(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE);
+        // ME20211019 - additional output formats
+        string tpfile = aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_FILE;
+        tpc.writePropertiesToFile(tpfile, txt_ft);
+        tpfile = aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_THERMO_JSON;
+        tpc.writePropertiesToFile(tpfile, json_ft);
+        tpc.addToAPLOut(apl_outfile);
 
         if (aplopts.flag("DISPLACEMENTS")) {
           apl::AtomicDisplacements ad(phcalc);
@@ -1021,7 +1036,7 @@ namespace KBIN {
           phcalc.writeGroupVelocitiesToFile(gvelfile, gvel);
         }
 
-        if (dosc.hasNegativeFrequencies()) {  //ME20200210
+        if (dosc.hasImaginaryFrequencies()) {  //ME20200210
           //ME20200210 - changed warning
           const vector<double>& freqs = dosc.getBins();
           const vector<double>& idos = dosc.getIDOS();
@@ -1031,15 +1046,22 @@ namespace KBIN {
           }
           if (i > 0) {
             double idos_percent = 100.0 * idos[i - 1]/idos.back();
-            // Cannot use std::setprecision with apl:logger, so use this workaround.
-            stringstream percent;
-            percent << std::fixed << std::setprecision(1) << idos_percent;
             message << "There are imaginary frequencies in the phonon DOS, covering "
-              << percent.str() << "\% of the integrated DOS. These frequencies were "
-              << " omitted in the calculation of thermodynamic properties.";
+              << std::fixed << std::setprecision(1) << idos_percent << "\% of the integrated DOS. "
+              << "These frequencies were omitted in the calculation of thermodynamic properties.";
             pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
           }
         }
+      }
+    }
+
+    // ME20210927
+    if (!apl_outfile.str().empty()) {
+      string filename = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_OUT_FILE);
+      aurostd::stringstream2file(apl_outfile, filename);
+      if (!aurostd::FileExist(filename)) {
+        string message = "Cannot open output file " + filename + ".";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
       }
     }
 
@@ -1112,11 +1134,12 @@ namespace apl {
     string function = "apl::validateParametersSupercellAPL():";
     string message = "";
     string _ASTROPT_ = "[AFLOW_APL]";
-    if (aplopts.flag("SUPERCELL")) {
+    // ME2021050 - isentry more reliable than option
+    if (aplopts.flag("SUPERCELL_ENTRY")) {
       vector<int> tokens;
       string supercell_scheme = aplopts.getattachedscheme("SUPERCELL");
-      aurostd::string2tokens(supercell_scheme, tokens, " xX");
-      if (tokens.size() != 3) {
+      aurostd::string2tokens(supercell_scheme, tokens, " xX,;");
+      if (tokens.size() != 3 && tokens.size() != 9) {
         message = "Wrong setting in " + _ASTROPT_ + "SUPERCELL.";
         message += " See README_AFLOW_APL.TXT for the correct format.";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
@@ -1126,8 +1149,8 @@ namespace apl {
       aplopts.flag("MINATOMS", false);
       aplopts.flag("MINATOMS_UNIFORM", false);
       aplopts.flag("MINSHELL", false);
-    } else if (aplopts.flag("MINATOMS") || aplopts.flag("MINATOMS_UNIFORM")) {
-      if (aplopts.flag("MINATOMS_UNIFORM")) {
+    } else if (aplopts.flag("MINATOMS_ENTRY") || aplopts.flag("MINATOMS_UNIFORM_ENTRY")) {
+      if (aplopts.flag("MINATOMS_UNIFORM_ENTRY")) {
         aplopts.push_attached("SUPERCELL::METHOD", "MINATOMS_UNIFORM");
         aplopts.push_attached("SUPERCELL::VALUE", aplopts.getattachedscheme("MINATOMS_UNIFORM"));
         aplopts.flag("MINATOMS", false);
@@ -1137,7 +1160,7 @@ namespace apl {
       }
       aplopts.flag("SUPERCELL", false);
       aplopts.flag("MINSHELL", false);
-    } else if (aplopts.flag("MINSHELL")) {
+    } else if (aplopts.flag("MINSHELL_ENTRY")) {
       aplopts.push_attached("SUPERCELL::METHOD", "SHELLS");
       aplopts.push_attached("SUPERCELL::VALUE", aplopts.getattachedscheme("MINSHELL"));
       aplopts.flag("SUPERCELL", false);
@@ -1801,6 +1824,46 @@ namespace apl {
   }
 
 }  // namespace apl
+
+//////////////////////////////////////////////////////////////////////////////
+//                                                                          //
+//                           GET aflow.in NAME                              //
+//                                                                          //
+//////////////////////////////////////////////////////////////////////////////
+
+namespace apl {
+
+  // Checks for APL aflow.in files for lib2raw. Adapted from AS.
+  bool APL_Get_AflowInName(string& AflowInName, const string& directory_LIB)  {
+    bool aflowin_found = false;
+    vector<string> vaflowins;
+    string stmp="";
+    if (!AflowInName.empty()) vaflowins.push_back(AflowInName);
+    if (!_AFLOWIN_.empty()) vaflowins.push_back(_AFLOWIN_);
+    vaflowins.push_back(APL_AFLOWIN_DEFAULT);
+
+    string aflowin_name = "", aflowin = "", fullpath_aflowin_name = "";
+    for (uint i=0; i<vaflowins.size(); i++){
+      aflowin_name = vaflowins[i];
+      fullpath_aflowin_name = directory_LIB + '/' + aflowin_name;
+      if(aurostd::EFileExist(fullpath_aflowin_name,stmp)&&aurostd::IsCompressed(stmp)){aurostd::UncompressFile(stmp);}
+      if (aurostd::FileExist(fullpath_aflowin_name)){
+        aflowin = aurostd::file2string(fullpath_aflowin_name);
+        if (aflowin.empty()) continue;
+      }
+
+      aflowin = aurostd::RemoveComments(aflowin);
+      if (aurostd::substring2bool(aflowin,_ASTROPT_APL_ + "CALC",TRUE) ||
+          aurostd::substring2bool(aflowin,_ASTROPT_APL_OLD_ + "CALC",TRUE)){
+        AflowInName = aflowin_name;
+        aflowin_found = true;
+        break;
+      }
+    }
+
+    return aflowin_found;
+  }
+}
 
 // ***************************************************************************
 // *                                                                         *

@@ -91,10 +91,17 @@ using aurostd::getElements; //CO20200624
 
 template<class utype> bool initialize_scalar(utype d) {
   string s="";
+  stringstream ss;
   utype u=0;
   u+=aurostd::string2utype<utype>(aurostd::utype2string<utype>(utype())+aurostd::utype2string<utype>(utype(),int())+aurostd::utype2string<utype>(utype(),int(),DEFAULT_STREAM)); //DX20201028 - added third variant containing format
-  u+=aurostd::substring2utype<utype>(s,s,1)+aurostd::substring2utype<utype>(s,s,s,1);
-  u+=aurostd::substring2utype<utype>(s,s)+aurostd::substring2utype<utype>(s,s,s);
+  u+=aurostd::substring2utype<utype>(s,s,1,1); //[CO20210315 - not used, not sure the purpose of strsub2]+aurostd::substring2utype<utype>(s,s,s,1);
+  u+=aurostd::substring2utype<utype>(s,s); //[CO20210315 - not used, not sure the purpose of strsub2]+aurostd::substring2utype<utype>(s,s,s);
+  u+=aurostd::substring2utype<utype>(ss,s,1,1); //CO20210315
+  u+=aurostd::substring2utype<utype>(ss,s); //CO20210315
+  u+=aurostd::kvpair2utype<utype>(s,s,s,1,1);  //CO20210315
+  u+=aurostd::kvpair2utype<utype>(s,s,s);  //CO20210315
+  u+=aurostd::kvpair2utype<utype>(ss,s,s,1,1); //CO20210315
+  u+=aurostd::kvpair2utype<utype>(ss,s,s); //CO20210315
   double o=0;
   o+=_isfloat(d)+_iscomplex(d);//abs(d);
   o+=max(d,d);o+=max(d,d,d);o+=max(d,d,d,d);o+=max(d,d,d,d,d);o+=min(d,d);o+=min(d,d,d);o+=min(d,d,d,d);o+=min(d,d,d,d,d);o+=_real(d);
@@ -262,6 +269,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
 
   vector<vector<utype> > vvu;sort(vvu.begin(),vvu.end(),aurostd::compareVecElements<utype>);  //CO20190629
   vector<xvector<utype> > vxvu;sort(vxvu.begin(),vxvu.end(),aurostd::compareXVecElements<utype>);  //CO20190629
+  vector<vector<uint> > vvui; //HE20210511
   std::sort(vvu.begin(),vvu.end(),aurostd::compareVecElement<utype>()); //CO20190629
   std::sort(vxvu.begin(),vxvu.end(),aurostd::compareVecElement<utype>()); //CO20190629
 
@@ -269,6 +277,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   o+=isdifferent(v,v,x);v=-v;o+=max(v);v=abs(v);roundoff(v);roundoff(v,x);reduceByGCD(v,v,x);v+=normalizeSumToOne(v,x);clear(v);floor(v);ceil(v); //DX20191125 - changed input format for reduceByGCD()
   o+=getcos(v,v);v.clear();v.set(x);v.reset();v.resize(1,1);clear(v);reset(v);set(v,x);v=abs(v);v=vabs(v);v=sign(v);
   o+=angle(v,v,v);o+=getangle(v,v,v);isCollinear(v,v,x);v=getCentroid(vxv);v=getCentroid(vxv,vutype);o+=distance(v,v); //DX20200729 - added getCentroid() with weights
+  o+=areaPointsOnPlane(vxv); o+=volume(vxv, vvui, vxv); o+=volume(vxv, vvui); //HE20210721
   aurostd::xmatrix<utype> xmatpbc;dxv=getCentroidPBC(vxv,xmatpbc);dxv=getCentroidPBC(vxv,vutype,xmatpbc); //DX20200728 - added getCentroidPBC()
   getGeneralAngles(v,x);getGeneralAngle(v,0,x);
   vv=pointLineIntersection(v,v,v); //CO20190520
@@ -277,7 +286,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   getGeneralNormal(vxv);
   v=aurostd::args2xvectorutype<utype>(vstring,c,v);v=aurostd::args2xvectorutype<utype>(vstring,c,i);
   aurostd::args2vectorutype<utype>(vstring,c);aurostd::args2dequeutype<utype>(dstring,c);
-  v.clear();clear(v);reshape(x);reshape(x,x);reshape(x,x,x);reshape(x,x,x,x);reshape(x,x,x,x,x);reshape(x,x,x,x,x,x);
+  v.clear();clear(v);reshape(xvi,2,1);reshape(x);reshape(x,x);reshape(x,x,x);reshape(x,x,x,x);reshape(x,x,x,x,x);reshape(x,x,x,x,x,x);
   //  sort2((unsigned long)1,v,v);sort2((unsigned long)1,xvd,xvi);sort2((unsigned long)1,xvi,xvd);
   o+=isequal(v,v)+isequal(v,v,(utype) 0)+isequal(v,v,x)+isdifferent(v,v)+isdifferent(v,v,x)+isinteger(v,x);swap(v,1,1);shiftlrows(v,1);
   getQuartiles(v,x,x,x);
@@ -323,7 +332,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   reshape(v);reshape(v,v);reshape(v,v,v);reshape(v,v,v,v);reshape(v,v,v,v,v);reshape(v,v,v,v,v,v);
   reshape_rows(v);reshape_rows(v,v);reshape_rows(v,v,v);reshape_rows(v,v,v,v);reshape_rows(v,v,v,v,v);reshape_rows(v,v,v,v,v,v);
   reshape_cols(v);reshape_cols(v,v);reshape_cols(v,v,v);reshape_cols(v,v,v,v);reshape_cols(v,v,v,v,v);reshape_cols(v,v,v,v,v,v);
-  utype tol; //DX20171025
+  utype tol=(utype)0; //DX20171025
   o+=isequal(m,m)+isequal(m,m,(utype) 0)+isequal(m,m,x)+isdifferent(m,m)+isdifferent(m,m,x)+isinteger(m,x)+isdiagonal(m)+isdiagonal(m,tol)+issymmetric(m)+isantisymmetric(m);
   o+=isidentity(m); //CO
   swap_cols(m,1,1);swap_columns(m,1,1);swap_rows(m,1,1);shiftlrows(m,1);shiftlcols(m,1);shiftlrowscols(m,1,1);  //CO20191201
@@ -625,7 +634,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 #endif
 #ifdef AUROSTD_INITIALIZE_UNSIGNED_LONG_INT
     o+=aurostd::string2utype<unsigned long int>(aurostd::utype2string<unsigned long int>((unsigned long int)(1))+aurostd::utype2string<unsigned long int>((unsigned long int)(1),int()));
-    // o+=initialize_scalar(((unsigned long int))(1));
+    o+=initialize_scalar((unsigned long int)(1));
     // o+=initialize_xscalar_xvector_xmatrix_xtensor(((unsigned long int))(1));
     // o+=initialize_xcomplex(((unsigned long int))(1));
     // xmatrix<(long int)> m(1,1);GaussJordan(m,m);
@@ -652,7 +661,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 #endif
 #ifdef AUROSTD_INITIALIZE_UNSIGNED_LONG_LONG_INT
     o+=aurostd::string2utype<unsigned long long int>(aurostd::utype2string<unsigned long long int>((unsigned long long int)(1))+aurostd::utype2string<unsigned long long int>((unsigned long long int)(1),int()));
-    // o+=initialize_scalar((unsigned long long int)(1));
+    o+=initialize_scalar((unsigned long long int)(1));
     // o+=initialize_xscalar_xvector_xmatrix_xtensor((unsigned long long int)(1));
     // o+=initialize_xcomplex((unsigned long long int)(1));
     // xmatrix<(long long int)> m(1,1);GaussJordan(m,m);

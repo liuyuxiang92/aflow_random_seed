@@ -331,6 +331,11 @@ DEFAULT_AFLOW_END_OUT
   type: string
   default: "aflow.end.out"
 
+DEFAULT_AFLOW_PLASMONICS_OUT
+  description: File name for the plasmonics data output file.
+  type: string
+  default: "aflow.plasmonics_eps_0.01.out"
+
 ####################################################################################################
 DEFAULT GENERIC MPI
 
@@ -576,6 +581,11 @@ DEFAULT_VASP_PREC_ENMAX_ACCURATE
   type: double
   default: 1.4
 
+DEFAULT_VASP_ENMAX_MINIMUM
+  description: Minimum multiplier for the max energy cutoff of the pseudopotentials (if PSMAXN error is encountered).
+  type: double
+  default: 0.25
+
 DEFAULT_VASP_SPIN_REMOVE_CUTOFF
   description: Magnetic moment threshold below which the spin-polarization setting will be turned off.
   type: double
@@ -593,6 +603,11 @@ DEFAULT_VASP_PREC_EDIFFG
 
 ####################################################################################################
 DEFAULTS OPTIONS
+
+DEFAULT_VASP_OUT
+  description: Filename for vasp output.
+  type: string
+  default: vasp.out
 
 DEFAULT_VASP_EXTERNAL_INCAR
   description: File to load in as default VASP INCAR.
@@ -670,6 +685,51 @@ DEFAULT_VASP_FORCE_OPTION_TYPE_SCHEME
   choices: DEFAULT, METAL, INSULATOR, SEMICONDUCTOR
   default: DEFAULT
 
+DEFAULT_VASP_FORCE_OPTION_ISMEAR_SCHEME
+  description: Default VASP ISMEAR scheme.
+  type: int
+  default: 1
+
+DEFAULT_VASP_FORCE_OPTION_ISMEAR_STATIC_SCHEME
+  description: Default VASP ISMEAR scheme for STATIC runs.
+  type: int
+  default: -5
+
+DEFAULT_VASP_FORCE_OPTION_ISMEAR_BANDS_SCHEME
+  description: Default VASP ISMEAR scheme for BANDS runs.
+  type: int
+  default: 0
+
+DEFAULT_VASP_FORCE_OPTION_SIGMA
+  description: Default VASP SIGMA value.
+  type: double
+  default: 0.1
+
+DEFAULT_VASP_FORCE_OPTION_SIGMA_STATIC
+  description: Default VASP SIGMA value for STATIC runs.
+  type: double
+  default: 0.05
+
+DEFAULT_VASP_FORCE_OPTION_SIGMA_BANDS
+  description: Default VASP SIGMA value for BANDS runs.
+  type: double
+  default: 0.05
+
+DEFAULT_VASP_NELM
+  description: Sets the maximum number of electronic self-consistency steps (NELM) for VASP runs.
+  type: int
+  default: 60
+
+DEFAULT_VASP_NELM_STATIC
+  description: Sets the maximum number of electronic self-consistency steps (NELM) for VASP STATIC runs.
+  type: int
+  default: 120
+
+MAX_VASP_NELM
+  description: Sets the maximum number of electronic self-consistency steps (NELM) for VASP should DEFAULT_VASP_FORCE_OPTION_NELM or DEFAULT_VASP_FORCE_OPTION_NELM_STATIC not be enough for convergence.
+  type: int
+  default: 300
+
 DEFAULT_VASP_FORCE_OPTION_ABMIX_SCHEME
   description: Default VASP Kerker mixing scheme settings. Defines AMIX/BMIX/AMIX_MAG/BMIX_MAG.
   type: string
@@ -698,9 +758,14 @@ DEFAULT_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2
   default: 0
 
 DEFAULT_VASP_FORCE_OPTION_BADER
-  description: Adapts INCAR for VASP to retrieve core charge (AECCARx) for Bader partial charge calculation.
+  description: Adapts INCAR for VASP to retrieve core charge (AECCARx) for Bader partial charge calculation. Turning this setting on will write these files out for any calculation type (RELAX, STATIC, STATIC_BANDS, etc.).
   type: bool
   default: 0
+
+DEFAULT_VASP_FORCE_OPTION_BADER_STATIC
+  description: Adapts INCAR for VASP to retrieve core charge (AECCARx) for Bader partial charge calculation. Turning this setting on will write these files out if the calculation type includes STATIC (RELAX_STATIC, RELAX_STATIC_BANDS, STATIC_BANDS, etc.).
+  type: bool
+  default: 1
 
 DEFAULT_VASP_FORCE_OPTION_ELF
   description: Adapts INCAR for VASP to calculate the electron localization function.
@@ -1059,6 +1124,11 @@ DEFAULT_POCC_TEMPERATURE_STRING
   type: string
   default: "0:1200:300"
 
+DEFAULT_POCC_EXCLUDE_UNSTABLE
+  description: Decided whether to exclude unstabale structures from the ensemble average
+  type: bool
+  default: 1
+
 DEFAULT_POCC_SITE_TOL
   description: Default site tolerance for HNF calculation.
   type: double
@@ -1124,10 +1194,20 @@ POCC_OUT_FILE
   type: string
   default: "out"
 
+POCC_APL_OUT_FILE
+  description: Name for the POCC-APL post-processing properties file.
+  type: string
+  default: "apl.out"
+
 POCC_DOSCAR_FILE
   description: Name for ensemble average DOSCAR.
   type: string
   default: "DOSCAR.pocc"
+
+POCC_PHDOSCAR_FILE
+  description: Name for ensemble average PHDOSCAR.
+  type: string
+  default: "PHDOSCAR.pocc"
 
 POCC_ANIONS_LIST
   description: List of elements that could be considered anions.
@@ -1265,6 +1345,11 @@ DEFAULT_APL_FILE_PREFIX
   type: string
   default: "aflow.apl."
 
+DEFAULT_APL_FILE_PREFIX
+  description: The APL summary file.
+  type: string
+  default: ".out"
+
 DEFAULT_APL_PDIS_FILE
   description: Output file for the phonon dispersion curve.
   type: string
@@ -1279,6 +1364,11 @@ DEFAULT_APL_THERMO_FILE
   description: Output file for the thermodynamic properties.
   type: string
   default: "thermodynamic_properties.out"
+
+DEFAULT_APL_THERMO_JSON
+  description: Output file for the thermodynamic properties in json format.
+  type: string
+  default: "thermodynamic_properties.json"
 
 DEFAULT_APL_HARMIFC_FILE
   description: Output file for the harmonic force constants. Also functions as the APL hibernation file.
@@ -1692,10 +1782,48 @@ AFLOW_CORE_TEMPERATURE_REFRESH
   type: integer
   default: 5
 
-VASP_CHECK_SLEEP
-  description: Time (seconds) to wait for VASP to finish writing output files. Useful on clusters with NFS delays.
+####################################################################################################
+DEFAULTS VASP MACHINE
+
+SECONDS_SLEEP_VASP_COMPLETION
+  description: Time (seconds) to wait for VASP to finish writing output files. Useful on clusters with NFS delays. Twice this number should be less than SECONDS_SLEEP_VASP_MONITOR to run with --monitor_vasp.
   type: integer
-  default: 30
+  default: 15
+
+SECONDS_SLEEP_VASP_MONITOR
+  description: Time (seconds) to wait between monitoring loops for --monitor_vasp.
+  type: integer
+  default: 60
+
+SECONDS_STALE_VASP_OUT
+  description: Time (seconds) at which the DEFAULT_VASP_OUT file is considered stale (since last modified).
+  type: integer
+  default: 21600 (6 hours)
+
+BYTES_MAX_VASP_OUT
+  description: Maximum size of the DEFAULT_VASP_OUT file. The larger the size, the longer the delays in applying patches. Keep as large as possible, it is better to let vasp finish gracefully.
+  type: integer
+  default: 20000000000 (20GB)
+
+MEMORY_MAX_USAGE_RAM
+  description: The ram memory limit (in percent) before a MEMORY error is issued by --monitor_vasp.
+  type: integer
+  default: 98
+
+MEMORY_MAX_USAGE_SWAP
+  description: The swap memory limit (in percent) before a MEMORY error is issued by --monitor_vasp.
+  type: integer
+  default: 45
+
+FILE_VASP_MONITOR
+  description: File name for the aflow vasp monitor (--monitor_vasp). In the default case, the name would be LOCK.monitor_vasp.
+  type: string
+  default: "monitor_vasp"
+
+INTEL_COMPILER_PATHS
+  description: Comma-separated paths to search for sourcing the Intel compiler environmental variables.
+  type: string
+  default: "/opt/intel/bin/compilervars.sh,/opt/intel/bin/compilervars.csh,/app/intel/parallel_studio_xe_2020_update1/bin/compilervars.sh"
 
 ####################################################################################################
 DEFAULTS MACHINE DEPENDENT MPI

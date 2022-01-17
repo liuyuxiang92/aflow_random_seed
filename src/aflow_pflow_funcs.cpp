@@ -944,7 +944,7 @@ namespace pflow {
       xvasp.AVASP_arun_runname=arun_dirname.str();
       AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
 
-      FileName=xvasp.Directory + "/" + string("aflow.qmvasp.out");
+      FileName=xvasp.Directory + "/" + DEFAULT_AFLOW_QMVASP_OUT;
       if(LDEBUG){cerr << soliloquy << " looking for: " << FileName << endl;}
       if(!aurostd::EFileExist(FileName)){all_vasp_done=false;break;}
       shear_fraction+=step_size;
@@ -1292,7 +1292,7 @@ namespace pflow {
     AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
 
     all_vasp_done=true;
-    FileName=xvasp.Directory + "/" + string("aflow.qmvasp.out");
+    FileName=xvasp.Directory + "/" + DEFAULT_AFLOW_QMVASP_OUT;
     if(LDEBUG){cerr << soliloquy << " looking for: " << FileName << endl;}
     if(!aurostd::EFileExist(FileName)){all_vasp_done=false;}
 
@@ -1492,7 +1492,7 @@ namespace pflow {
     AVASP_populateXVASP(aflags,kflags,vflags,xvasp);
 
     all_vasp_done=true;
-    FileName=xvasp.Directory + "/" + string("aflow.qmvasp.out");
+    FileName=xvasp.Directory + "/" + DEFAULT_AFLOW_QMVASP_OUT;
     if(LDEBUG){cerr << soliloquy << " looking for: " << FileName << endl;}
     if(!aurostd::EFileExist(FileName)){all_vasp_done=false;}
 
@@ -7293,10 +7293,15 @@ namespace pflow {
 
   string prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) {  // main function //char mode //CO20190629
     // 2-D, we usually want vred=gcd_vrt true for convex points, and no_vrt elsewhere
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "pflow::prettyPrintCompound():";
     stringstream message;
     uint precision=COEF_PRECISION;
     stringstream output;output.precision(precision);
+    if(LDEBUG){
+      cerr << soliloquy << " vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;
+      cerr << soliloquy << " vcomposition=" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(vcomposition),",") << endl;
+    }
     if(vspecies.size()!=(uint)vcomposition.rows) {
       message << "vspecies.size() != vcomposition.rows" << endl;
       message << "vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;
@@ -8332,11 +8337,66 @@ namespace pflow{
       for(uint i=0;i<=nsteps;i++){ tolerance_spectrum.push_back(start+((double)i*interval)); }
     }
     else{
-      message << "Expected three inputs: first=range_start, second=range_end, third=nsteps.";
+      message << "Expected three inputs: first=range_start:second=range_end:third=nsteps.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
     }
 
     return tolerance_spectrum;
+  }
+}
+
+
+
+// ***************************************************************************
+// pflow::writeAtomicEnvironment() //HE20210617
+// ***************************************************************************
+
+namespace pflow {
+
+  /// @brief write collection of atomic environments into json files
+  /// @param auid AFLOW ID
+  /// @param aeMode enviroment definition (see ATOM_ENVIRONMENT_MODE_X in aflow.h)
+  /// @param radius change the search radius [FUTURE]
+  ///
+  /// Feature request: analyse a structure file directly
+  void outputAtomicEnvironment(const string &auid, uint aeMode, double radius) {
+    bool LDEBUG = (false || XHOST.DEBUG);
+    string soliloquy = XPID + "pflow::outputAtomicEnvironment():";
+    if (LDEBUG) cerr << soliloquy << " Start" << endl;
+
+    // for FUTURE use
+    if (radius == 0){}
+
+    string aurl = "";
+    aflowlib::_aflowlib_entry entry;
+    xstructure str;
+    std::map<string, string> meta_data;
+
+    // Quickly match auid to aurl (speedup from 15s to 0.5s compared to single use of AflowlibLocator)
+    if (!auid.empty())
+      aurl = aurostd::execute2string(XHOST.command("aflow_data") + " vLIBS | grep -B1 \"" + auid + "\" | head -n 1");
+    // Fallback if quick search failed
+    if (!auid.empty() && aurl.empty()) {
+      cerr << soliloquy << " Quick search failed! Trying standard methode." << endl;
+      aflowlib::AflowlibLocator(auid, aurl, "AFLOWLIB_AUID2AURL");
+    }
+
+    if (!aurl.empty()) {
+      entry.aurl = aurl;
+      entry.auid = auid;
+      loadXstructures(entry);
+      meta_data["aurl"] = aurl;
+      meta_data["auid"] = auid;
+      str = entry.vstr.back();
+      if (LDEBUG) cerr << soliloquy << " AUID: " << auid << endl;
+      if (LDEBUG) cerr << soliloquy << " AURL: " << aurl << endl;
+    } else {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "could not load a structure", _INPUT_ERROR_);
+    }
+
+    vector <AtomEnvironment> AE = getAtomEnvironments(str, aeMode);
+    for(uint i=0; i<AE.size(); i++) AE[i].constructAtomEnvironmentHull();
+    writeAtomEnvironments(AE, meta_data);
   }
 }
 

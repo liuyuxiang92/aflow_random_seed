@@ -144,6 +144,7 @@ namespace pflow {
   bool GetNonCollinearMagneticInfo(uint num_atoms, const string& magmom_info, vector<xvector<double> >& vmag_noncoll); //DX20171205 - Magnetic symmetry non-collinear //DX20191107 - int to uint
   //DX20200225 [OBSOLETE - moved to XtalFinder header] vector<string> getMatchingPrototypes(xstructure& xstr, string& catalog); //DX20190314 
   void GLASS_FORMING_ABILITY(aurostd::xoption& vpflow); //DF20190329
+  void ATOMIC_ENVIRONMENT(const aurostd::xoption& vpflow); //HE20210331
   void GULP(istream& input);
   void HKL(const string& options,_aflags &aflags,istream& input);
   void HKLSearch(const string& options,_aflags &aflags,istream& input,const string& smode);
@@ -347,6 +348,7 @@ namespace pflow {
   bool SHIRLEY(vector<string>,istream& input);
   bool SHIRLEY2(vector<string>,istream& input);
   string PEARSON_SYMBOL(istream& input);
+  string PEARSON_SYMBOL(istream& input,const aurostd::xoption& vpflow); //DX20210611 - added vpflow
   bool POCCUPATION(vector<string>,istream& input);
   void PDB(istream& input);
   void PDOS(vector<string>);
@@ -371,7 +373,13 @@ namespace pflow {
   vector<string> GENERATE_CERAMICS(const aurostd::xoption& vpflow); //CO20200731
   string GENERATE_CERAMICS_PRINT(const aurostd::xoption& vpflow); //CO20200731
   bool PSEUDOPOTENTIALS_CHECK(const aurostd::xoption& vpflow,const string& file,ostream& oss=cout); //SC20200330
+  void PYTHON_MODULES(const string& modules, ostream& oss=std::cout);  //ME20211103
+  void PYTHON_MODULES(const string& modules, ofstream& FileMESSAGE, ostream& oss=std::cout);  //ME20211103
+  void PYTHON_MODULES(const vector<string>& vmodules, ostream& oss=std::cout);  //ME20211103
+  void PYTHON_MODULES(const vector<string>& vmodules, ofstream& FileMESSAGE, ostream& oss=std::cout);  //ME20211103
   bool QMVASP(aurostd::xoption& vpflow);  //vector<string> argv); //CO20180703
+  bool QMVASP_20210813(aurostd::xoption& vpflow);  //CO20180703
+  bool QMVASP_20210101(aurostd::xoption& vpflow);  //CO20180703
   xstructure POSCAR(istream& input);
   xmatrix<double> QE_ibrav2lattice(const int& ibrav, const xvector<double>& parameters, const bool& isabc); //DX20180123 - added more robust QE reader
 }
@@ -424,7 +432,7 @@ namespace pflow {
   void SUPERCELLSTRLIST(const string& options);
   xstructure xstrSWAP(vector<string>, istream& input);
   xstructure VOLUME(const string& options, istream& input);
-  string WYCCAR(aurostd::xoption& vpflow,istream& input); //DX20180807 - added wyccar to pflow
+  string WyckoffPositions(aurostd::xoption& vpflow,istream& input); //DX20180807 - added wyccar to pflow //DX20210525 - changed name and generalized function
   xstructure WYCKOFF(vector<string>,istream& input);
   void XRAY(const string& options,istream& input);
   void XRAY_PEAKS(const aurostd::xoption& vpflow,istream& input); //CO20190409
@@ -493,6 +501,7 @@ namespace pflow {
   void PrintGulp(const xstructure&,ostream& oss=cout);
   string PrintSGData(xstructure& xstr, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1, bool supress_Wyckoff=false); //DX20210211
   string PrintSGData(xstructure& xstr, aurostd::xoption& vpflow, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1, bool suppress_Wyckoff=false); //DX20210211
+  string PrintWyckoffData(xstructure& xstr, filetype ftype=txt_ft, bool standalone=true, bool already_calculated=false, double sym_eps=AUROSTD_MAX_DOUBLE, bool no_scan=false, int setting=1); //DX20210610
   //DX20210301 [OBSOLETE] bool PrintSGData(xstructure& str_sg,ostream& oss,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20170830 - SGDATA
   //DX20210301 [OBSOLETE] bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss,bool no_scan=false,int setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180226 - added & to tolerance
   //DX20210301 [OBSOLETE] bool PrintSGData(xstructure& str_sg,double& tolerance,ostream& oss_final,aurostd::xoption& vpflow,bool no_scan=false,int sg_setting=1,bool standalone=true,const string& format="txt",bool already_calculated=false); //DX20180822
@@ -1101,6 +1110,10 @@ namespace pflow {
   double getSymmetryTolerance(const xstructure& xstr, const string& tolerance_string);
   vector<double> getSymmetryToleranceSpectrum(const string& tolerance_range_string);
   uint getSpaceGroupSetting(const string& setting_string, uint mode_default=0); //DX20210420 - mode_default=0: unspecified, AFLOW will determine
+}
+
+namespace  pflow {
+  void outputAtomicEnvironment(const string &auid, uint aeMode=1, double radius=4.0);
 }
 
 #endif

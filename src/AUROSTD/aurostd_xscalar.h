@@ -71,21 +71,24 @@
 
 //ME20200107 - (A)APL conversion factors
 #define THz2Hz                        1E12
-#define Hz2THz                        1/THz2Hz
+#define Hz2THz                        (1.0/THz2Hz)
 #define au2Hz                         aurostd::sqrt(E_ELECTRON*1E20/AMU2KILOGRAM)  // eV/(A^2 amu) -> Hz
-#define au2rcm                        au2Hz/(100*C_VACUUM)                         // eV/(A^2 amu) -> cm^-1
-#define au2eV                         au2Hz*PLANCKSCONSTANTEV_h                    // eV/(A^2 amu) -> eV
-#define eV2Hz                         1/PLANCKSCONSTANTEV_h
-#define eV2rcm                        1/(PLANCKSCONSTANTEV_h*100*C_VACUUM)
-#define au2nmTHz                      E_ELECTRON*Hz2THz*Hz2THz*1E18/(0.1 * AMU2KILOGRAM)  // eV/(A amu) -> nm * THz^2
-#define PLANCKSCONSTANT_h_THz         PLANCKSCONSTANT_h*THz2Hz // J/THz
-#define PLANCKSCONSTANT_hbar_THz      PLANCKSCONSTANT_hbar*THz2Hz // J/THz
-#define PLANCKSCONSTANTAMU_hbar_THz   PLANCKSCONSTANTEV_hbar*THz2Hz*(10*au2nmTHz)  // amu A^2 THz
-#define BEfactor_hbar_THz             PLANCKSCONSTANTEV_hbar/(KBOLTZEV*Hz2THz)  // hbar/kB in K/THz
-#define BEfactor_h_THz                PLANCKSCONSTANTEV_h/(KBOLTZEV*Hz2THz)  // h/kB in K/THz
+#define au2rcm                        (au2Hz/(100*C_VACUUM))                         // eV/(A^2 amu) -> cm^-1
+#define au2eV                         (au2Hz*PLANCKSCONSTANTEV_h)                    // eV/(A^2 amu) -> eV
+#define eV2Hz                         (1.0/PLANCKSCONSTANTEV_h)
+#define eV2rcm                        (1.0/(PLANCKSCONSTANTEV_h*100*C_VACUUM))
+#define au2nmTHz                      ((E_ELECTRON*Hz2THz*Hz2THz*1E18)/(0.1 * AMU2KILOGRAM))  // eV/(A amu) -> nm * THz^2
+#define PLANCKSCONSTANT_h_THz         (PLANCKSCONSTANT_h*THz2Hz) // J/THz
+#define PLANCKSCONSTANT_hbar_THz      (PLANCKSCONSTANT_hbar*THz2Hz) // J/THz
+#define PLANCKSCONSTANTAMU_hbar_THz   (PLANCKSCONSTANTEV_hbar*THz2Hz*(10*au2nmTHz))  // amu A^2 THz
+#define BEfactor_hbar_THz             (PLANCKSCONSTANTEV_hbar/(KBOLTZEV*Hz2THz))  // hbar/kB in K/THz
+#define BEfactor_h_THz                (PLANCKSCONSTANTEV_h/(KBOLTZEV*Hz2THz))  // h/kB in K/THz
 
 //AS20200427 - QHA-related conversion factors
 #define eV2GPa (E_ELECTRON*1e21)    // [eV/A^3] --> [GPa]
+#define GPa2eV (1.0/eV2GPa)         // [GPa] --> [eV/A^3]
+#define eV2kBar (eV2GPa*10)         // [eV/A^3] --> [kBar]
+#define kBar2eV (1.0/eV2kBar)       // [kBar] --> [eV/A^3]
 #define atm2Pa 101325
 
 //DX20210111 - GFA factors
@@ -194,6 +197,12 @@ namespace aurostd {
   bool iszero(float x,float tolerance=(float)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO20191201
   bool iszero(double x,double tolerance=(double)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO20191201
   bool iszero(long double x,long double tolerance=(long double)_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //CO20191201
+
+  string dbl2frac(double a, bool sign_prefix=true); //DX20190724
+  double frac2dbl(const string& str); //DX20200313
+  void double2fraction(const double& input_double, int& numerator, int& denominator, double tol_diff=AUROSTD_IDENTITY_TOL, double tol_remainder=1e-2); //DX20210908
+  int getNumeratorContinuedFractions(int& p, const int& n, vector<int>& fraction_sequence); //DX20210908
+  int getDenominatorContinuedFractions(int& q, const int& n, vector<int>& fraction_sequence); //DX20210908
 
   template<class utype> utype fact(utype) __xprototype;
   template<class utype> utype factorial(utype) __xprototype;
@@ -481,6 +490,11 @@ namespace aurostd {
   //  double sqrt(xcomplex<double> x) __xprototype;
   long double sqrt(xcomplex<long double> x) __xprototype;
 #endif
+}
+
+//--------------------------------------------------------------- round
+namespace aurostd {
+  double round(double x);
 }
 
 //--------------------------------------------------------------- isequal

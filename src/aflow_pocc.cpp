@@ -80,7 +80,7 @@ namespace pocc {
     if(aflags.Directory.empty() || aflags.Directory=="./" || aflags.Directory=="."){aflags.Directory=aurostd::getPWD()+"/";} //".";  //CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
 
     //aflow.in
-    string AflowIn_file,AflowIn;
+    string AflowIn_file="",AflowIn="";
     try{KBIN::getAflowInFromAFlags(aflags,AflowIn_file,AflowIn,FileMESSAGE,oss);}
     catch(aurostd::xerror& err){
       pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
@@ -160,6 +160,51 @@ namespace pocc {
   }
 }
 
+namespace pocc {
+  double poccDOSCAR2temperature(const string& doscar_path){
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XPID+"pocc::poccDOSCAR2temperature():";
+
+    //get temperature from title
+    //DOSCAR.pocc_T0000K
+    //ME20210927 - Added PHDOSCAR support
+    string pocc_doscar_start = "";
+    if(doscar_path.find(POCC_DOSCAR_PREFIX) != string::npos){
+      pocc_doscar_start = POCC_DOSCAR_PREFIX;
+    } else if (doscar_path.find(POCC_PHDOSCAR_PREFIX) != string::npos) {
+      pocc_doscar_start = POCC_PHDOSCAR_PREFIX;
+    } else {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"odd DOSCAR filename, format should be "+POCC_DOSCAR_PREFIX+"0000K",_FILE_CORRUPT_);
+    }
+    vector<string> vtokens;
+    aurostd::string2tokens(doscar_path,vtokens,"/");
+    string pocc_doscar_end="K";
+    string::size_type loc_start=vtokens.back().find(pocc_doscar_start);
+    string::size_type loc_end=vtokens.back().find(pocc_doscar_end);
+    if(loc_start==string::npos||loc_end==string::npos){
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cannot get temperature_str",_FILE_CORRUPT_);
+    }
+    string temperature_str=vtokens.back().substr(loc_start+(pocc_doscar_start.size()),loc_end-(loc_start+(pocc_doscar_start.size())));
+    if(LDEBUG){cerr << soliloquy << " temperature_str=" << temperature_str << endl;}
+    if(!aurostd::isfloat(temperature_str)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"temperature_str is not a float",_FILE_CORRUPT_);}
+    //[CO+ME20200921 - just look at vtokens.back()]uint i=0,j=0;
+    //[CO+ME20200921 - just look at vtokens.back()]for(i=0;i<vtokens.size();i++){
+    //[CO+ME20200921 - just look at vtokens.back()]  if(vtokens[i].find("pocc_T")!=string::npos && vtokens[i].find("K")!=string::npos){
+    //[CO+ME20200921 - just look at vtokens.back()]    temperature_str=vtokens[i];
+    //[CO+ME20200921 - just look at vtokens.back()]    aurostd::StringSubst(temperature_str,POCC_DOSCAR_PREFIX,"");
+    //[CO+ME20200921 - just look at vtokens.back()]    aurostd::StringSubst(temperature_str,"K","");
+    //[CO+ME20200921 - just look at vtokens.back()]    for(j=0;j<XHOST.vext.size();j++){aurostd::StringSubst(temperature_str,XHOST.vext[j],"");} //remove compression extension
+    //[CO+ME20200921 - just look at vtokens.back()]    if(LDEBUG){cerr << soliloquy << " temperature_str=" << temperature_str << endl;}
+    //[CO+ME20200921 - just look at vtokens.back()]    if(aurostd::isfloat(temperature_str)){break;}
+    //[CO+ME20200921 - just look at vtokens.back()]  }
+    //[CO+ME20200921 - just look at vtokens.back()]}
+    //[CO+ME20200921 - just look at vtokens.back()]if(doscar_path.find(POCC_DOSCAR_PREFIX)==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cannot get temperature_str",_FILE_CORRUPT_);}
+    double temperature=aurostd::string2utype<double>(temperature_str);
+
+    return temperature;
+  }
+}
+
 namespace KBIN {
   void VASP_RunPOCC(const string& directory,ostream& oss) {ofstream FileMESSAGE;return VASP_RunPOCC(directory,FileMESSAGE,oss);}
   void VASP_RunPOCC(const string& directory,ofstream& FileMESSAGE,ostream& oss) {
@@ -182,6 +227,7 @@ namespace KBIN {
 
     if(LDEBUG){cerr << soliloquy << " kflags.KBIN_PHONONS_CALCULATION_AEL=" << kflags.KBIN_PHONONS_CALCULATION_AEL << endl;}
     if(LDEBUG){cerr << soliloquy << " kflags.KBIN_PHONONS_CALCULATION_AGL=" << kflags.KBIN_PHONONS_CALCULATION_AGL << endl;}
+    if(LDEBUG){cerr << soliloquy << " kflags.KBIN_PHONONS_CALCULATION_APL=" << kflags.KBIN_PHONONS_CALCULATION_APL << endl;}
 
     return VASP_RunPOCC(xvasp,AflowIn,aflags,kflags,vflags,FileMESSAGE,oss);
   }
@@ -196,7 +242,25 @@ namespace KBIN {
       if(!pocc::structuresGenerated(aflags.Directory)){
         try{pcalc.generateStructures(xvasp);}
         catch(aurostd::xerror& err){pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);}
+        //ME2021104
+        if (kflags.KBIN_PHONONS_CALCULATION_AEL
+            || kflags.KBIN_PHONONS_CALCULATION_AGL
+            || kflags.KBIN_PHONONS_CALCULATION_APL) {
+          string message = "Cannot run AFLOW modules without fully completed POCC calculations."
+            " Please see the README for more information.";
+          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_NOTICE_);
+        }
         return;
+      }
+
+      //ME20211004
+      if (kflags.KBIN_PHONONS_CALCULATION_APL) {
+        // Simple check: if APL input files are not present anywhere,
+        // assume that we need to create aflow.in files
+        if (!pcalc.inputFilesFoundAnywhereAPL()) {
+          pcalc.createModuleAflowIns(xvasp, "APL");
+          return;
+        }
       }
 
       //post-processing
@@ -912,13 +976,27 @@ namespace pocc {
     m_efa=pocc::getEFA(xv_energies,xv_dgs);
   }
 
+  void getTemperatureStringParameters(int& temperature_precision,bool& temperatures_int,int& zero_padding_temperature){
+    vector<double> v_temperatures=getVTemperatures(DEFAULT_POCC_TEMPERATURE_STRING);
+    return getTemperatureStringParameters(v_temperatures,temperature_precision,temperatures_int,zero_padding_temperature);
+  }
+  void getTemperatureStringParameters(const vector<double>& v_temperatures,int& temperature_precision,bool& temperatures_int,int& zero_padding_temperature){
+    temperature_precision=TEMPERATURE_PRECISION;
+    temperatures_int=true;
+    zero_padding_temperature=4;
+    if(!v_temperatures.empty()){
+      temperatures_int=true;
+      for(uint itemp=0;itemp<v_temperatures.size();itemp++){if(!aurostd::isinteger(v_temperatures[itemp])){temperatures_int=false;break;}}  //found a non-int temperature
+      zero_padding_temperature=aurostd::getZeroPadding(max(v_temperatures))+(temperatures_int ? 0 : TEMPERATURE_PRECISION+1); //+1 for decimal place
+    }
+  }
+
   string POccCalculator::getTemperatureString(double temperature) const {
-    return pocc::getTemperatureString(temperature,TEMPERATURE_PRECISION,m_temperatures_int,m_zero_padding_temperature);
+    return pocc::getTemperatureString(temperature,m_temperature_precision,m_temperatures_int,m_zero_padding_temperature);
   }
   string getTemperatureString(double temperature,int precision,bool temperatures_int,int zero_padding_temperature) {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::getTemperatureString():";
-
     stringstream t_ss;
     if(temperatures_int==false){t_ss.setf(std::ios::fixed,std::ios::floatfield);t_ss.precision(precision);}
     t_ss.width(zero_padding_temperature);t_ss.fill('0');
@@ -1098,13 +1176,70 @@ namespace pocc {
 
     //XDOSCAR.OUT
     //string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K";
-    string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+getTemperatureString(temperature)+"K";
+    string xdoscar_filename=POCC_DOSCAR_FILE+"_T"+(*this).getTemperatureString(temperature)+"K";
     message << "Writing out " << xdoscar_filename;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     stringstream pocc_xdoscar_ss;
     pocc_xdoscar_ss << m_xdoscar;
     aurostd::stringstream2file(pocc_xdoscar_ss,m_aflags.Directory+"/"+xdoscar_filename);
 
     if(LDEBUG){cerr << soliloquy << " END" << endl;}
+  }
+
+  void POccCalculator::setAvgPlasmonicData(double temperature){
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XPID+"POccCalculator::setAvgDOSCAR():";
+    stringstream message;
+
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+    if(m_ARUN_directories.size()!=l_supercell_sets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()!=l_supercell_sets.size()",_RUNTIME_ERROR_);}
+
+    setPOccStructureProbabilities(temperature); //done in calculateRELAXProperties() - repetita iuvant
+
+    m_vxplasm.clear();
+    xPLASMONICS xplasm;
+    string PLASM_file="";
+    xcomplex<double> xcomp_tmp(0.0,0.0);
+    vector<string> vlines,vtokens;
+    uint ieps=0,i=0;
+    unsigned long long int isupercell=0;
+    for(ieps=0;ieps<m_veps_plasm.size();ieps++){
+      for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end();++it){
+        isupercell=std::distance(l_supercell_sets.begin(),it);
+        if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/"+m_vfilenames_plasm[ieps],PLASM_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,m_vfilenames_plasm[ieps]+" not found in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
+        message << "Processing "+m_vfilenames_plasm[ieps]+" (eps=" << m_veps_plasm[ieps] << ") of " << m_ARUN_directories[isupercell];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+        xplasm.GetPropertiesFile(PLASM_file);
+        message << "xPLASM read (eps=" << xplasm.eps << ")";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+        if(isupercell==0){  //set all to 0
+          m_vxplasm[ieps].venergy.clear();
+          m_vxplasm[ieps].veels.clear();
+          m_vxplasm[ieps].vdielectric.clear();
+          for(i=0;i<xplasm.venergy.size();i++){
+            m_vxplasm[ieps].venergy.push_back(xplasm.venergy[i]);
+            m_vxplasm[ieps].veels.push_back(0.0);
+            xcomp_tmp.re=0.0;xcomp_tmp.im=0.0;
+            m_vxplasm[ieps].vdielectric.push_back(xcomp_tmp);
+          }
+        }else{ //check that all dimensions match
+          if(m_vxplasm[ieps].venergy.size()!=xplasm.venergy.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_vxplasm[ieps].venergy.size()!=xplasm.venergy.size() for isupercell="+aurostd::utype2string(isupercell)+" in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
+          if(m_vxplasm[ieps].veels.size()!=xplasm.veels.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_vxplasm[ieps].veels.size()!=xplasm.veels.size() for isupercell="+aurostd::utype2string(isupercell)+" in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
+          if(m_vxplasm[ieps].vdielectric.size()!=xplasm.vdielectric.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_vxplasm[ieps].vdielectric.size()!=xplasm.vdielectric.size() for isupercell="+aurostd::utype2string(isupercell)+" in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
+          for(i=0;i<m_vxplasm[ieps].venergy.size();i++){
+            if(!aurostd::isequal(m_vxplasm[ieps].venergy[i],xplasm.venergy[i])){
+              if(LDEBUG){cerr << soliloquy << " venergy: " << m_vxplasm[ieps].venergy[i] << " != " << xplasm.venergy[i] << endl;}
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_vxplasm[ieps].venergy[i="+aurostd::utype2string(i)+"]!=xplasm.venergy[i] for isupercell="+aurostd::utype2string(isupercell)+" in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);
+            }
+          }
+        }
+        //do averaging
+        for(i=0;i<m_vxplasm[ieps].venergy.size();i++){
+          m_vxplasm[ieps].veels[i]+=( (*it).m_probability*xplasm.veels[i] );
+          m_vxplasm[ieps].vdielectric[i].re+=( (*it).m_probability*xplasm.vdielectric[i].re );
+          m_vxplasm[ieps].vdielectric[i].im+=( (*it).m_probability*xplasm.vdielectric[i].im );
+        }
+      }
+    }
   }
 
   void POccCalculator::calculateRELAXProperties(double temperature){
@@ -1155,40 +1290,84 @@ namespace pocc {
     if(0){plotAvgDOSCAR(temperature);}  //do not plot as part of LIB2LIB, leave for LIB2RAW
   }
 
+  void POccCalculator::calculatePlasmonicProperties(double temperature){
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
+    string soliloquy=XPID+"POccCalculator::calculateSTATICProperties():";
+
+    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+
+    vector<string> vfiles;
+
+    bool found_all_eps_dat_files=true;
+    uint i=0;
+    string tmp_str="";
+    m_vfilenames_plasm.clear();
+    for(unsigned long long int isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_eps_dat_files==true;isupercell++){
+      aurostd::DirectoryLS(m_aflags.Directory+"/"+m_ARUN_directories[isupercell],vfiles);
+      if(isupercell==0){
+        for(i=0;i<vfiles.size();i++){
+          if(vfiles[i].find(DEFAULT_AFLOW_PLASMONICS_FILE)!=string::npos){m_vfilenames_plasm.push_back(vfiles[i]);}
+        }
+      }else{
+        for(i=0;i<m_vfilenames_plasm.size();i++){
+          if(!aurostd::EFileExist(m_aflags.Directory+"/"+m_ARUN_directories[isupercell]+"/"+m_vfilenames_plasm[i])){
+            if(LDEBUG){cerr << soliloquy << " "+m_vfilenames_plasm[i]+" not found in "+m_ARUN_directories[isupercell] << endl;}
+            found_all_eps_dat_files=false;
+          }
+        }
+      }
+    }
+    if(!found_all_eps_dat_files){return;}
+
+    //check eps can be extracted
+    xPLASMONICS xplasm;
+    for(i=0;i<m_vfilenames_plasm.size();i++){
+      xplasm.filename=m_vfilenames_plasm[i];xplasm.getEPS();
+      if(!aurostd::isfloat(xplasm.eps)){
+        if(LDEBUG){cerr << soliloquy << " eps cannot be extracted from "+m_vfilenames_plasm[i] << endl;}
+        found_all_eps_dat_files=false;
+      }
+    }
+    if(!found_all_eps_dat_files){return;}
+
+    //sort m_veps_plasm, do manually as string sorting is different than double sorting
+    uint j=0;
+    double eps1=0.0,eps2=0.0;
+    for(i=0;i<m_vfilenames_plasm.size();i++){
+      for(j=i;j<m_vfilenames_plasm.size();j++){
+        xplasm.filename=m_vfilenames_plasm[i];xplasm.getEPS();
+        eps1=aurostd::string2utype<double>(xplasm.eps);
+        xplasm.filename=m_vfilenames_plasm[j];xplasm.getEPS();
+        eps2=aurostd::string2utype<double>(xplasm.eps);
+        if(eps2<eps1){
+          tmp_str=m_vfilenames_plasm[i];
+          m_vfilenames_plasm[i]=m_vfilenames_plasm[j];
+          m_vfilenames_plasm[j]=tmp_str;
+        }
+      }
+    }
+    if(LDEBUG){cerr << soliloquy << " m_vfilenames_plasm=" << aurostd::joinWDelimiter(m_vfilenames_plasm,",") << endl;}
+
+    m_veps_plasm.clear();
+    m_vxplasm.clear();
+    for(i=0;i<m_vfilenames_plasm.size();i++){
+      xplasm.filename=m_vfilenames_plasm[i];xplasm.getEPS();
+      m_veps_plasm.push_back(xplasm.eps);
+      m_vxplasm.push_back(xPLASMONICS());
+    }
+    if(LDEBUG){cerr << soliloquy << " m_veps_plasm=" << aurostd::joinWDelimiter(m_veps_plasm,",") << endl;}
+    setAvgPlasmonicData(temperature);
+  }
+
   void POccCalculator::plotAvgDOSCAR(double temperature) const {return plotAvgDOSCAR(m_xdoscar,temperature,m_aflags.Directory);}
   void POccCalculator::plotAvgDOSCAR(const string& doscar_path,const string& directory) const {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::plotAvgDOSCAR():";
 
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
     xDOSCAR xdos(doscar_path,*p_FileMESSAGE,true,*p_oss);
-    //get temperature from title
-    //DOSCAR.pocc_T0000K
-    if(doscar_path.find("DOSCAR.pocc_T")==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"odd DOSCAR filename, format should be DOSCAR.pocc_T0000K",_FILE_CORRUPT_);}
-    vector<string> vtokens;
-    aurostd::string2tokens(doscar_path,vtokens,"/");
-    string pocc_doscar_start="DOSCAR.pocc_T";
-    string pocc_doscar_end="K";
-    string::size_type loc_start=vtokens.back().find(pocc_doscar_start);
-    string::size_type loc_end=vtokens.back().find(pocc_doscar_end);
-    if(loc_start==string::npos||loc_end==string::npos){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cannot get temperature_str",_FILE_CORRUPT_);
-    }
-    string temperature_str=vtokens.back().substr(loc_start+(pocc_doscar_start.size()),loc_end-(loc_start+(pocc_doscar_start.size())));
-    if(LDEBUG){cerr << soliloquy << " temperature_str=" << temperature_str << endl;}
-    if(!aurostd::isfloat(temperature_str)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"temperature_str is not a float",_FILE_CORRUPT_);}
-    //[CO+ME20200921 - just look at vtokens.back()]uint i=0,j=0;
-    //[CO+ME20200921 - just look at vtokens.back()]for(i=0;i<vtokens.size();i++){
-    //[CO+ME20200921 - just look at vtokens.back()]  if(vtokens[i].find("pocc_T")!=string::npos && vtokens[i].find("K")!=string::npos){
-    //[CO+ME20200921 - just look at vtokens.back()]    temperature_str=vtokens[i];
-    //[CO+ME20200921 - just look at vtokens.back()]    aurostd::StringSubst(temperature_str,"DOSCAR.pocc_T","");
-    //[CO+ME20200921 - just look at vtokens.back()]    aurostd::StringSubst(temperature_str,"K","");
-    //[CO+ME20200921 - just look at vtokens.back()]    for(j=0;j<XHOST.vext.size();j++){aurostd::StringSubst(temperature_str,XHOST.vext[j],"");} //remove compression extension
-    //[CO+ME20200921 - just look at vtokens.back()]    if(LDEBUG){cerr << soliloquy << " temperature_str=" << temperature_str << endl;}
-    //[CO+ME20200921 - just look at vtokens.back()]    if(aurostd::isfloat(temperature_str)){break;}
-    //[CO+ME20200921 - just look at vtokens.back()]  }
-    //[CO+ME20200921 - just look at vtokens.back()]}
-    //[CO+ME20200921 - just look at vtokens.back()]if(doscar_path.find("DOSCAR.pocc_T")==string::npos){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cannot get temperature_str",_FILE_CORRUPT_);}
-    double temperature=aurostd::string2utype<double>(temperature_str);
+    double temperature=poccDOSCAR2temperature(doscar_path);
     return plotAvgDOSCAR(xdos,temperature,directory);
   }
   void POccCalculator::plotAvgDOSCAR(const xDOSCAR& xdos,double temperature,const string& directory) const {
@@ -1196,24 +1375,23 @@ namespace pocc {
     string soliloquy=XPID+"POccCalculator::plotAvgDOSCAR():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"POccCalculator::plotAvgDOSCAR():","m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
-
     aurostd::xoption cmdline_opts, plot_opts;
-    cmdline_opts.push_attached("PLOT_DOS", directory);
     cmdline_opts.push_attached("PLOTTER::PRINT", "png");
-    plot_opts = plotter::getPlotOptionsEStructure(cmdline_opts, "PLOT_DOS");
-    plot_opts.push_attached("DIRECTORY",directory);
-    if(1){  //turn off for ME - POCC+APL
+    //ME20210927 - use carstring to distingish between types of DOSCARs
+    if(xdos.carstring == "POCC") {  //turn off for ME - POCC+APL
+      if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+      cmdline_opts.push_attached("PLOT_DOS", directory);
+      plot_opts = plotter::getPlotOptionsEStructure(cmdline_opts, "PLOT_DOS");
       plot_opts.push_attached("PROJECTION","ORBITALS");
       //plot_opts.push_attached("EXTENSION","dos_orbitals_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
-      plot_opts.push_attached("EXTENSION","dos_orbitals_T"+getTemperatureString(temperature)+"K");
+      plot_opts.push_attached("EXTENSION","dos_orbitals_T"+(*this).getTemperatureString(temperature)+"K");
       plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
 
       plot_opts.push_attached("ARUN_DIRECTORY",m_ARUN_directories[0]);
       plot_opts.pop_attached("PROJECTION");
       plot_opts.push_attached("PROJECTION","SPECIES");
       //plot_opts.push_attached("EXTENSION","dos_species_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
-      plot_opts.push_attached("EXTENSION","dos_species_T"+getTemperatureString(temperature)+"K");
+      plot_opts.push_attached("EXTENSION","dos_species_T"+(*this).getTemperatureString(temperature)+"K");
       plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
 
       if(0){  //turn on for SG - plot orbitals for each species near fermi energy (dos_species_T0K_Cs_1)
@@ -1228,14 +1406,16 @@ namespace pocc {
           plotter::PLOT_PDOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
         }
       }
-    }else{  //ME!
-      plot_opts.push_attached("ARUN_DIRECTORY",m_ARUN_directories[0]);
-      plot_opts.push_attached("PROJECTION","ATOMS");
-      //plot_opts.push_attached("EXTENSION","dos_atoms_T"+aurostd::utype2string(temperature,TEMPERATURE_PRECISION)+"K");
-      plot_opts.push_attached("EXTENSION","dos_atoms_T"+getTemperatureString(temperature)+"K");
+    } else if (xdos.carstring == "PHON") {
+      cmdline_opts.push_attached("PLOT_PHDOS", directory);
+      plot_opts = plotter::getPlotOptionsPhonons(cmdline_opts, "PLOT_PHDOS");
+      plot_opts.push_attached("PROJECTION", "ATOMS");
+      plot_opts.push_attached("EXTENSION", "phdos_T"+getTemperatureString(xdos.temperature)+"K");
+      plot_opts.flag("PLOT_ALL_ATOMS", true);
       plot_opts.pop_attached("XMIN");plot_opts.pop_attached("XMAX");
-      plot_opts.push_attached("XMIN","0");plot_opts.push_attached("XMAX","0.05");
-      plotter::PLOT_DOS(plot_opts,xdos,*p_FileMESSAGE,*p_oss);
+      plotter::PLOT_PHDOS(plot_opts, xdos);
+    } else {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "Invalid xDOSCAR format for POCC.", _RUNTIME_ERROR_);
     }
 
     if(LDEBUG){cerr << soliloquy << " END" << endl;}
@@ -1304,7 +1484,7 @@ namespace pocc {
     message << "Writing out " << POCC_FILE_PREFIX+POCC_OUT_FILE << " (T=" << temperature << "K properties)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200502 - no getTemperatureString(T) needed here
     stringstream pocc_out_ss;
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
-    pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=" << getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
+    pocc_out_ss << POCC_AFLOWIN_tag << "START_TEMPERATURE=" << (*this).getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
     //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
 
     //supercell probabilities
@@ -1333,7 +1513,30 @@ namespace pocc {
     }
     if(Egap_net!=AUROSTD_MAX_DOUBLE) pocc_out_ss << "Egap_net=" << aurostd::utype2string(Egap_net,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  (eV)" << endl;
     //[CO20200502 - removed unnecessary separation line]pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
-    pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=" << getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
+    //PLASMONICS
+    for(uint ieps=0;ieps<m_veps_plasm.size();ieps++){
+      if(m_vxplasm[ieps].venergy.size()!=0){
+        uint i=0,padding=25;
+        pocc_out_ss << POCC_AFLOWIN_tag << "START_PLASMONICS_EPS_" << m_veps_plasm[ieps] << endl;
+        //header
+        pocc_out_ss << "#";
+        pocc_out_ss << aurostd::PaddedPRE("energy (eV)",padding) << " ";
+        pocc_out_ss << aurostd::PaddedPRE("EELS",padding) << " ";
+        pocc_out_ss << aurostd::PaddedPRE("Re(dielectric)",padding) << " ";
+        pocc_out_ss << aurostd::PaddedPRE("Im(dielectric)",padding) << " ";
+        pocc_out_ss << endl;
+        for(i=0;i<m_vxplasm[ieps].venergy.size();i++){
+          pocc_out_ss << " "; //spacing
+          pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_vxplasm[ieps].venergy[i],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
+          pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_vxplasm[ieps].veels[i],pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
+          pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_vxplasm[ieps].vdielectric[i].re,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
+          pocc_out_ss << aurostd::PaddedPRE(aurostd::utype2string(m_vxplasm[ieps].vdielectric[i].im,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM),padding) << " ";
+          pocc_out_ss << endl;
+        }
+        pocc_out_ss << POCC_AFLOWIN_tag << "STOP_PLASMONICS_EPS_" << m_veps_plasm[ieps] << endl;
+      }
+    }
+    pocc_out_ss << POCC_AFLOWIN_tag << "STOP_TEMPERATURE=" << (*this).getTemperatureString(temperature) << "_K" << endl;  //"  (K)"
     pocc_out_ss << AFLOWIN_SEPARATION_LINE << endl;
 
     aurostd::stringstream2file(pocc_out_ss,m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE,"APPEND");
@@ -1425,24 +1628,30 @@ namespace pocc {
     aurostd::DirectoryLS(m_aflags.Directory,vfiles);
 
     for(uint i=0;i<vfiles.size();i++){
-      if(vfiles[i].find(POCC_FILE_PREFIX+POCC_OUT_FILE)!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //aflow.pocc.out
-      if(vfiles[i].find(POCC_DOSCAR_FILE)!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //DOSCAR.pocc_T0000K.xz
-      if(vfiles[i].find("dos_orbitals_")!=string::npos && vfiles[i].find(".png")!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //SYSTEM_dos_orbitals_T2400K.png.xz
-      if(vfiles[i].find("dos_species_")!=string::npos && vfiles[i].find(".png")!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //SYSTEM_dos_species_T2400K.png.xz
-      if(vfiles[i].find("dos_atoms_")!=string::npos && vfiles[i].find(".png")!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //SYSTEM_dos_atoms_T2400K.png.xz
+      //ME20211019 - Added APL options
+      if (m_kflags.KBIN_PHONONS_CALCULATION_APL) {
+        if(vfiles[i].find(POCC_PHDOSCAR_FILE)!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //PHDOSCAR.pocc_T0000K.xz
+        if(vfiles[i].find(DEFAULT_APL_PHPOSCAR_FILE)!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //PHDOSCAR.xz
+        if(vfiles[i].find(POCC_FILE_PREFIX+POCC_APL_OUT_FILE)!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //aflow.pocc.apl.out
+      } else {
+        if(vfiles[i].find(POCC_FILE_PREFIX+POCC_OUT_FILE)!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //aflow.pocc.out
+        if(vfiles[i].find(POCC_DOSCAR_FILE)!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //DOSCAR.pocc_T0000K.xz
+        if(vfiles[i].find("dos_orbitals_")!=string::npos && vfiles[i].find(".png")!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //SYSTEM_dos_orbitals_T2400K.png.xz
+        if(vfiles[i].find("dos_species_")!=string::npos && vfiles[i].find(".png")!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //SYSTEM_dos_species_T2400K.png.xz
+        if(vfiles[i].find("dos_atoms_")!=string::npos && vfiles[i].find(".png")!=string::npos){message << "Removing old postprocessing file: " << vfiles[i];pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);aurostd::RemoveFile(aurostd::CleanFileName(m_aflags.Directory+"/"+vfiles[i]));continue;}  //SYSTEM_dos_atoms_T2400K.png.xz
+      }
     }
-
   }
 
   void POccCalculator::loadDataIntoCalculator(){
     string soliloquy=XPID+"POccCalculator::loadDataIntoCalculator():";
-    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialized");}
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialize");}
 
-    POccStructuresFile psf;
-    psf.initialize(POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,m_aflags,*p_FileMESSAGE,*p_oss);
+    POccStructuresFile psf(*p_FileMESSAGE,*p_oss);
+    psf.initialize(POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE,m_aflags);
     if(!psf.loadDataIntoCalculator((*this),false)){  //do not try DirectoryLS() yet
       //if we get here, then postprocessing file is TOO old, try rewriting after we read in ALL_STRUCTURES file
-      psf.initialize(POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE,m_aflags,*p_FileMESSAGE,*p_oss);
+      psf.initialize(POCC_FILE_PREFIX+POCC_ALL_SUPERCELLS_FILE,m_aflags);
       if(!psf.loadDataIntoCalculator((*this),true)){  //try DirectoryLS() here
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Cannot load data from structures files",_FILE_NOT_FOUND_);
       }
@@ -1515,9 +1724,7 @@ namespace pocc {
     if(v_temperatures.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"v_temperatures.empty()",_INPUT_ILLEGAL_);}
 
     //get zero-padding, since temperature cannot be negative, just get max
-    m_temperatures_int=true;
-    for(uint itemp=0;itemp<v_temperatures.size();itemp++){if(!aurostd::isinteger(v_temperatures[itemp])){m_temperatures_int=false;break;}}  //found a non-int temperature
-    m_zero_padding_temperature=aurostd::getZeroPadding(max(v_temperatures))+(m_temperatures_int ? 0 : TEMPERATURE_PRECISION+1); //+1 for decimal place
+    getTemperatureStringParameters(v_temperatures,m_temperature_precision,m_temperatures_int,m_zero_padding_temperature);
   }
 
   void POccCalculator::postProcessing(){
@@ -1528,7 +1735,7 @@ namespace pocc {
     if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialize");}
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
-    loadDataIntoCalculator();
+    if(m_ARUN_directories.size() == 0) loadDataIntoCalculator();
     if(!QMVASPsFound()){return;}
     setDFTEnergies();
     setEFA();
@@ -1538,12 +1745,13 @@ namespace pocc {
 
     message << "Performing POCC post-processing for these temperatures: " << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(v_temperatures,5),",");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
-    if(1){  //turn off slow pocc-postprocessing
+    if(1 && !m_kflags.KBIN_PHONONS_CALCULATION_APL){  //turn off slow pocc-postprocessing  //ME20211019 - do not run regular POCC postprocessing for APL or LIB2LIB will run this twice
       aurostd::RemoveFile(m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE); //clear file
       writeResults(); //write temperature-independent properties first
       for(uint itemp=0;itemp<v_temperatures.size();itemp++){
         calculateRELAXProperties(v_temperatures[itemp]);
         calculateSTATICProperties(v_temperatures[itemp]);
+        calculatePlasmonicProperties(v_temperatures[itemp]);
         writeResults(v_temperatures[itemp]);  //write temperature-dependent properties next
       }
     }
@@ -1554,6 +1762,10 @@ namespace pocc {
     if (m_kflags.KBIN_PHONONS_CALCULATION_AGL) { //CT20200323
       if(LDEBUG){cerr << "Running AGL postprocessing" << endl;}
       calculateDebyeThermalProperties(v_temperatures);
+    }
+    if (m_kflags.KBIN_PHONONS_CALCULATION_APL) { //ME20210927
+      if(LDEBUG){cerr << "Running APL postprocessing" << endl;}
+      calculatePhononPropertiesAPL(v_temperatures);
     }
 
     //END: TEMPERATURE DEPENDENT PROPERTIES
@@ -1950,6 +2162,7 @@ namespace pocc {
     m_ARUN_directories.clear();
     m_Hmix=AUROSTD_MAX_DOUBLE;
     m_efa=AUROSTD_MAX_DOUBLE;
+    m_temperature_precision=TEMPERATURE_PRECISION;
     m_zero_padding_temperature=0;
     m_temperatures_int=false;
     m_energy_dft_ground=AUROSTD_MAX_DOUBLE;
@@ -1959,6 +2172,9 @@ namespace pocc {
     m_Egap.clear();
     m_Egap_DOS_net=AUROSTD_MAX_DOUBLE;
     m_Egap_net=AUROSTD_MAX_DOUBLE;
+    m_vfilenames_plasm.clear();
+    m_veps_plasm.clear();
+    m_vxplasm.clear();
     enumerator_mode.clear();
 
     m_energy_uff_tolerance=DEFAULT_UFF_ENERGY_TOLERANCE;
@@ -1989,6 +2205,7 @@ namespace pocc {
     l_supercell_sets.clear();for(std::list<POccSuperCellSet>::const_iterator it=b.l_supercell_sets.begin();it!=b.l_supercell_sets.end();++it){l_supercell_sets.push_back(*it);}
     m_Hmix=b.m_Hmix;
     m_efa=b.m_efa;
+    m_temperature_precision=b.m_temperature_precision;
     m_zero_padding_temperature=b.m_zero_padding_temperature;
     m_temperatures_int=b.m_temperatures_int;
     m_energy_dft_ground=b.m_energy_dft_ground;
@@ -1999,6 +2216,9 @@ namespace pocc {
     m_Egap.clear();for(uint ispin=0;ispin<b.m_Egap.size();ispin++){m_Egap.push_back(b.m_Egap[ispin]);}
     m_Egap_DOS_net=b.m_Egap_DOS_net;
     m_Egap_net=b.m_Egap_net;
+    m_vfilenames_plasm.clear();for(uint i=0;i<b.m_vfilenames_plasm.size();i++){m_vfilenames_plasm.push_back(b.m_vfilenames_plasm[i]);}
+    m_veps_plasm.clear();for(uint i=0;i<b.m_veps_plasm.size();i++){m_veps_plasm.push_back(b.m_veps_plasm[i]);}
+    m_vxplasm.clear();for(uint i=0;i<b.m_vxplasm.size();i++){m_vxplasm.push_back(b.m_vxplasm[i]);}
     enumerator_mode=b.enumerator_mode;
   }
 
@@ -2563,6 +2783,9 @@ namespace pocc {
   void POccCalculator::loadFromAFlags(const aurostd::xoption& loader) { //grabs from m_aflags
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::loadFromAFlags():";
+
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
     string AflowIn_file="",AflowIn="";
     KBIN::getAflowInFromAFlags(m_aflags,AflowIn_file,AflowIn,*p_FileMESSAGE,*p_oss);
     if(LDEBUG){cerr << soliloquy << " loaded aflow.in" << endl;}
@@ -2613,7 +2836,7 @@ namespace pocc {
     string soliloquy=XPID+"POccCalculator::writePARTCAR():";
     stringstream message;
 
-    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialized");}
+    if(!m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"POccCalculator failed to initialize");}
 
     message << "Writing out PARTCAR";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     stringstream partcar_ss;
@@ -4273,6 +4496,205 @@ namespace pocc {
     //return true;
   }
 
+  // ME20211008 - Map an input structure to the parent PARTCAR
+  // It builds this map by creating a map from the input structure
+  // to the unrelaxed derivative structure first. Then, it creates
+  // a map from the unrelaxed derivative structure to the PARTCAR.
+  // The maps are combined in the end.
+  vector<uint> POccCalculator::getMapToPARTCAR(unsigned long long int isupercell, const xstructure& xstr_in) {
+    bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG); 
+    string soliloquy = XPID + "POccCalculator::getMapToPARTCAR():";
+    string message = "";
+    if (isupercell > l_supercell_sets.size() - 1) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, "Invalid supercell index.");
+    }
+
+    std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();
+    std::advance(it, isupercell);
+    if (LDEBUG) {
+      std::cerr << soliloquy << " Input structure:" << std::endl;
+      std::cerr << xstr_in << std::endl;
+    }
+
+    // Get the derivatice structure from the unique structure file
+    vector<string> vlines;
+    string structures_file = aurostd::CleanFileName(m_aflags.Directory + "/" + POCC_FILE_PREFIX + POCC_UNIQUE_SUPERCELLS_FILE);
+    if (!aurostd::EFileExist(structures_file)) {
+      message = "Could not load derivative structure."
+        " Unique structures file " + structures_file + " not found.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
+    }
+    aurostd::efile2vectorstring(structures_file, vlines);
+    stringstream poscar;
+    bool found_POSCAR_START_tag = false, found_POSCAR_STOP_tag = false;
+    unsigned long long int structure_counter = 0;
+    for (uint i = 0; i < vlines.size(); i++) {
+      if (!found_POSCAR_START_tag) {
+        found_POSCAR_START_tag = aurostd::substring2bool(vlines[i], POSCAR_START_tag);
+        if (found_POSCAR_START_tag) continue;
+      }
+      found_POSCAR_STOP_tag = aurostd::substring2bool(vlines[i], POSCAR_STOP_tag);
+      if (found_POSCAR_STOP_tag) {
+        if (!found_POSCAR_START_tag) {
+          message = "Could not load derivative structure."
+            "Found POSCAR stop tag before start tag while reading " + structures_file + ".";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_CORRUPT_);
+        }
+        found_POSCAR_START_tag = false;
+        if (structure_counter == isupercell) break;
+        else structure_counter++;
+      }
+      if (found_POSCAR_START_tag && (structure_counter == isupercell)) {
+        poscar << vlines[i] << std::endl;
+      }
+    }
+    xstructure xstr_derivative(poscar);
+    if (LDEBUG) {
+      std::cerr << soliloquy << " Derivative structure:" << std::endl;
+      std::cerr << xstr_derivative << std::endl;
+    }
+
+    // Match structures
+    bool same_species = true;
+    bool scale_volume = true;
+    bool optimize_match = false;
+    double misfit = 0.0;
+    structure_mapping_info mapping_info = compare::initialize_misfit_struct();
+    bool matched = false;
+    uint natoms_in = xstr_in.atoms.size();
+    uint natoms_derivative = xstr_derivative.atoms.size();
+    if (natoms_in < natoms_derivative) {
+      matched = compare::aflowCompareStructure(xstr_derivative, xstr_in, same_species, scale_volume, optimize_match, misfit, mapping_info);
+    } else {
+      matched = compare::aflowCompareStructure(xstr_in, xstr_derivative, same_species, scale_volume, optimize_match, misfit, mapping_info);
+    }
+    if (!matched) {
+      message = "Could not map structure to derivative structure.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
+    }
+
+    if (LDEBUG) std::cerr << soliloquy << "atom_map = " << aurostd::joinWDelimiter(mapping_info.atom_map, " ") << std::endl;
+
+    // Create map from the relaxed structrue to the derivative structure
+    // The number of atoms in the relaxed structure may be bigger larger
+    // than in the derivative structure (sconv vs. sprim). In that case,
+    // structure comparison only returns the maps to the supercell of the
+    // derivative structure with the same number of atoms.
+    // Luckily, structure comparison creates supercells in a predictable
+    // way (0 0 1 1 2 2 instead of,  e.g. 0 1 2 0 1 2) so we can use the
+    // ratio of atoms to map to the actual derivative structure.
+    uint atom_ratio = 0;
+    vector<uint> map_to_derivative(natoms_in);
+    if (natoms_in < natoms_derivative) {
+      // NOT TESTED!
+      // If the input structure has fewer atoms, then we need to do a
+      // one-to-many map. It should not matter which equivalent atoms
+      // in the derivative structure it maps to.
+      atom_ratio = natoms_derivative/natoms_in;
+      int index = -1;
+      for (uint i = 0; i < natoms_in; i++) {
+        aurostd::WithinList(mapping_info.atom_map, i * atom_ratio, index);
+        map_to_derivative[i] = index;
+      }
+    } else {
+      atom_ratio = natoms_in/natoms_derivative;
+      for (uint i = 0; i < mapping_info.atom_map.size(); i++) {
+        map_to_derivative[i] = mapping_info.atom_map[i]/atom_ratio;
+      }
+    }
+
+    if (LDEBUG) std::cerr << "map_to_derivative = " << aurostd::joinWDelimiter(map_to_derivative, " ") << std::endl;
+
+    // To get the map from the derivative structure to the PARTCAR, get the
+    // full site configuration vector from the derivative structure title
+    vector<string> tokens, tokens2;
+    string config_str = "";
+    aurostd::string2tokens(xstr_derivative.title, tokens, " ");
+    for (uint i = 0; tokens.size(); i++) {
+      if (tokens[i].find("site_config(") != string::npos) {
+        aurostd::string2tokens(tokens[i], tokens2, "/");
+        if (tokens2.size() != 2) continue;  // not the right site_config string
+        aurostd::StringSubst(tokens2[0], "site_config(", "");
+        aurostd::StringSubst(tokens2[0], "#", "");
+        if (!aurostd::isfloat(tokens2[0])) continue;  // not the right site_config string
+        aurostd::string2tokens(tokens[i], tokens2, "=");
+        config_str += tokens2[1];
+        i++;
+        do {
+          config_str += " " + tokens[i];
+          if (i == tokens.size() - 1) break;
+        } while(tokens[i++].find("]") == string::npos);
+        break;
+      }
+    }
+    if (config_str.empty()) {
+      message = "Could not determine full site configuration.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
+    }
+    aurostd::string2tokens(config_str.substr(1, config_str.length() - 2), tokens, ";");
+    vector<vector<int> > config(tokens.size());
+    for (uint i = 0; i < tokens.size(); i++) {
+      aurostd::string2tokens(tokens[i], tokens2, " ");
+      for (uint j = 0; j < tokens2.size(); j++) {
+        config[i].push_back(aurostd::string2utype<int>(tokens2[j]));
+      }
+    }
+    if (LDEBUG) {
+      std::cerr << soliloquy << " Site configuration:" << std::endl;
+      for (uint i = 0; i < config.size(); i++) {
+        std::cerr << aurostd::joinWDelimiter(config[i], " ") << std::endl;
+      }
+    }
+
+    // Site configurations are stored by type, so we need to create a
+    // type to PARTCAR map for each site
+    uint nsites = m_pocc_sites.size();
+    uint ntypes = xstr_pocc.species.size();
+    vector<vector<int> > type2occMap(nsites, vector<int>(ntypes, -1)); // -1 means no atoms of this type on that site
+    int type = 0, occ = 0;
+    for (uint site = 0; site < m_pocc_sites.size(); site++) {
+      for (uint t = 0; t < m_pocc_sites[site].v_types.size(); t++) {
+        type = (int) m_pocc_sites[site].v_types[t];
+        occ = (int) m_pocc_sites[site].v_occupants[t];
+        type2occMap[site][type] = occ;
+      }
+    }
+    if (LDEBUG) {
+      std::cerr << soliloquy << " type2occMap:" << std::endl;
+      for (uint i = 0; i < type2occMap.size(); i++) {
+        std::cerr << aurostd::joinWDelimiter(type2occMap[i], " ") << std::endl;
+      }
+    }
+
+    // Create a flat map from the derivative structure to PARTCAR
+    vector<uint> derivative_partcar_map;
+    for (uint site = 0; site < config.size(); site++) {
+      std::sort(config[site].begin(), config[site].end());  // Site configurations are not sorted, but structures always are
+      for (uint at = 0; at < config[site].size(); at++) {
+        type = config[site][at];
+        if (type < 0) continue;  // type can be -1 when sites are not used
+        occ = type2occMap[site][type];
+        if (occ < 0) {
+          message = "Mismatch between derivative structure and PARTCAR.";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
+        } else {
+          derivative_partcar_map.push_back((uint) occ);
+        }
+      }
+    }
+
+    if (LDEBUG) std::cerr << soliloquy << " derivative_partcar_map = " << aurostd::joinWDelimiter(derivative_partcar_map, " ") << std::endl;
+
+    // Finally, combine the maps to map the input structure to PARTCAR
+    vector<uint> map_to_partcar;
+    for (uint i = 0; i < map_to_derivative.size(); i++) {
+      map_to_partcar.push_back(derivative_partcar_map[map_to_derivative[i]]);
+    }
+    if (LDEBUG) std::cerr << soliloquy << " map_to_partcar = " << aurostd::joinWDelimiter(map_to_partcar, " ") << std::endl;
+
+    return map_to_partcar;
+  }
+
 } // namespace pocc
 
 namespace pocc {
@@ -5226,17 +5648,56 @@ namespace pocc {
       aurostd::stringstream2file(unique_derivative_structures_ss,m_aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE);
     }
 
+  // ME20211004
+  void POccCalculator::createModuleAflowIns(const _xvasp& xvasp_in, const string& MODULE) {
+    string soliloquy = XPID + "POccCalculator::createModuleAflowIns():";
+    string message = "";
+
+    if (m_ARUN_directories.size() == 0) loadDataIntoCalculator();
+
+    // We need relaxed structures to propagate into the modules.
+    // If not all directories have a qmvasp file, it is safe to
+    // assume that not all have relaxed structures.
+    if(!QMVASPsFound()) {
+      message = "Not all POCC calculations have finished."
+        " Please run AFLOW in all subdirectories before running AFLOW modules."
+        " See the README for more information.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
+    }
+
+    _xvasp xvasp;
+    for (uint i = 0; i < m_ARUN_directories.size(); i++) {
+      xvasp = xvasp_in;
+      try {
+        xvasp.str = KBIN::GetMostRelaxedStructure(m_ARUN_directories[i]);
+      } catch (aurostd::xerror& e) {
+        message = "Could not find valid structure file inside directory " + m_ARUN_directories[i] + ".";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
+      }
+      xvasp.str.CleanStructure();
+      xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE", MODULE);
+      xvasp.AVASP_arun=true;
+      xvasp.AVASP_arun_mode = "POCC";
+      xvasp.AVASP_arun_runname = getARUNString(i);
+      xvasp.aopts.flag("FLAG::AVASP_SKIP_NOMIX", false);
+      AVASP_populateXVASP(m_aflags, m_kflags, m_vflags, xvasp);
+      stringstream aflowin;
+      AVASP_MakeSingleAFLOWIN(xvasp, aflowin, true);
+    }
+  }
+
   void POccCalculator::cleanPOccStructure() {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::cleanPOccStructure():";
     stringstream message;
+    xstr_pocc.CleanStructure();  // ME20211004 - Moved to xstructure
 
-    //fix up structure
-    xstr_pocc.neg_scale=false;  //NO negative scale... doesn't really matter, scale is one variable
-    xstr_pocc.ReScale(1.0);
-    xstr_pocc.ShiftOriginToAtom(0);
-    xstr_pocc.BringInCell();
-    xstr_pocc.clean(); //DX20191220 - uppercase to lowercase clean
+    //[OBSOLETE ME20211004]//fix up structure
+    //[OBSOLETE ME20211004]xstr_pocc.neg_scale=false;  //NO negative scale... doesn't really matter, scale is one variable
+    //[OBSOLETE ME20211004]xstr_pocc.ReScale(1.0);
+    //[OBSOLETE ME20211004]xstr_pocc.ShiftOriginToAtom(0);
+    //[OBSOLETE ME20211004]xstr_pocc.BringInCell();
+    //[OBSOLETE ME20211004]xstr_pocc.clean(); //DX20191220 - uppercase to lowercase clean
 
     if(LDEBUG) {
       cerr << soliloquy << " cleaned PARTCAR" << endl;
@@ -6087,7 +6548,7 @@ namespace pocc {
 
     //streams
     ostream* p_oss_sym=p_oss;
-    bool badbit_set=((*p_oss_sym).rdstate()==std::ios_base::badbit);
+    bool badbit_set=(*p_oss_sym).bad(); //((*p_oss_sym).rdstate()==std::ios_base::badbit);
     if(LDEBUG) {cerr << soliloquy << " badbit_set=" << badbit_set << endl;}
     ofstream* p_FileMESSAGE_sym=p_FileMESSAGE;
     ofstream devNull("/dev/null");  //must be outside if statement (scope)
@@ -7076,9 +7537,9 @@ namespace pocc {
   POccStructuresFile::POccStructuresFile(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize();}
   POccStructuresFile::POccStructuresFile(const string& fileIN,ostream& oss) : xStream(oss),m_initialized(false) {initialize(fileIN);}
   POccStructuresFile::POccStructuresFile(const string& fileIN,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(fileIN);}
-  POccStructuresFile::POccStructuresFile(const _aflags& aflags,ostream& oss): xStream(oss),m_initialized(false) {initialize(aflags,oss);}
+  POccStructuresFile::POccStructuresFile(const _aflags& aflags,ostream& oss): xStream(oss),m_initialized(false) {initialize(aflags);}
   POccStructuresFile::POccStructuresFile(const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(aflags);}
-  POccStructuresFile::POccStructuresFile(const string& fileIN,const _aflags& aflags,ostream& oss) : xStream(oss),m_initialized(false) {initialize(fileIN,aflags,oss);}
+  POccStructuresFile::POccStructuresFile(const string& fileIN,const _aflags& aflags,ostream& oss) : xStream(oss),m_initialized(false) {initialize(fileIN,aflags);}
   POccStructuresFile::POccStructuresFile(const string& fileIN,const _aflags& aflags,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(fileIN,aflags);}
   POccStructuresFile::POccStructuresFile(const POccStructuresFile& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
 
