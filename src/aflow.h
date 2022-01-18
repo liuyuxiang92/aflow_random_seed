@@ -1513,6 +1513,7 @@ class AtomEnvironment{
 #define IOCIF         11 //DX20180723
 #define IOELK_AUTO    12 //DX20200310
 #define IOELK_GEOM    13 //DX20200310
+#define IOATAT_STR    14 //SD20220114
 
 #define NOSG string("NNN #0")
 
