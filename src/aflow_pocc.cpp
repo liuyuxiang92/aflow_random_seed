@@ -147,6 +147,12 @@ namespace pocc {
     
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
+    //CO+ME20220118
+    //this code needs to be revisited
+    //checking for XHOST.DIRECTORY would make command line syntax "aflow ... -D DIR"
+    //can this take multiple inputs?
+    //would a --conv_dir=... flag be better?
+    //address for lib2raw
     _aflags aflags;aflags.Directory=".";  //make current directory for now, we can change in the future
 
     ofstream FileMESSAGE;

@@ -5232,7 +5232,7 @@ deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(deque<int> num_eac
 
   if(atoms_total+1!=IATOM){ //total column
     message << "Input xstructure and DOS mismatch: atoms_total+1!=vDOS.size()" << endl;
-    message &lt;&lt; "<span class="x x-first x-last">For POCC runs, check</span> that all ARUN.POCC's have the same num_each_type" &lt;&lt; endl;
+    message << "For POCC runs, check that all ARUN.POCC's have the same num_each_type" << endl;
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INDEX_MISMATCH_);
   }
 
