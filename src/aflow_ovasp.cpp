@@ -4907,7 +4907,7 @@ void xDOSCAR::addAtomChannel(){  //CO20211124
   string ERROR_out="";
   if(!checkDOS(ERROR_out)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,ERROR_out,_INDEX_BOUNDS_);} //no conversion needed
 
-  uint atoms_size=vDOS.size();if(atoms_size==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vDOS.size()==0",_INDEX_BOUNDS_);}; //no conversion needed
+  uint atoms_size=vDOS.size();if(atoms_size==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vDOS.size()==0",_INDEX_BOUNDS_);} //no conversion needed
   uint orbital_size=vDOS.front().size();
   uint spin_size=0;if(orbital_size>0){spin_size=vDOS.front().front().size();}
   uint energy_size=0;if(orbital_size>0 && spin_size>0){energy_size=vDOS.front().front().front().size();}
