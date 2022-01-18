@@ -85,6 +85,7 @@ using aurostd::utype2string;
 using aurostd::GaussJordan;
 using aurostd::gaussj;
 using aurostd::xoption;
+using aurostd::remainder;
 using aurostd::floor;
 using aurostd::ceil;
 using aurostd::getElements; //CO20200624
@@ -247,6 +248,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   // initialize xvector sort
   xvector<utype> vxu;xvector<int> ixv;xvector<double> dxv;
   aurostd::quicksort2((uint) 0,ixv,dxv);aurostd::quicksort2((uint) 0,dxv,ixv);
+  vxu=aurostd::remainder(vxu,(utype)1); //SD20220117
 
   // initialize scalars
   o+=nint(x)+factorial(x)+nCk(x,x)+fact(x)+isequal(x,x)+isequal(x,x,(utype) 0)+isequal(x,x,x)+isdifferent(x,x)+isdifferent(x,x,x);

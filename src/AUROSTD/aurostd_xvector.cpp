@@ -1121,6 +1121,16 @@ namespace aurostd {  // namespace aurostd
 }
 
 namespace aurostd {  // namespace aurostd
+  template<class utype>                                 // function remainder
+    xvector<utype> remainder(const xvector<utype> &a,utype d) {  // SD20220117
+      xvector<utype> c(a.urows,a.lrows);
+      for(int i=a.lrows;i<=a.urows;i++)
+        c[i]=a[i]-d*std::floor(a[i]/d);
+      return c;
+    }    
+}
+
+namespace aurostd {  // namespace aurostd
   template<class utype>                          // function floor
     xvector<double> floor(const xvector<utype> &a) {
       xvector<double> c(a.urows,a.lrows);

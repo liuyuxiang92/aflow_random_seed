@@ -4232,6 +4232,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(a.iomode==IOABINIT_GEOM) cerr << soliloquy << " a.iomode = IOABINIT_GEOM" << endl;  //DX20200310
     if(a.iomode==IOELK_GEOM) cerr << soliloquy << " a.iomode = IOELK_GEOM" << endl;  //DX20200310
     if(a.iomode==IOCIF) cerr << soliloquy << " a.iomode = IOCIF" << endl;  //DX20180723
+    if(a.iomode==IOATAT_STR) cerr << soliloquy << " a.iomode = IOATAT_STR" << endl;  //SD20220114
   }
 
   if(LDEBUG) cerr << soliloquy << " definitions" << endl;
@@ -4416,6 +4417,28 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // ELK input - END (DX20200310)
 
   // ----------------------------------------------------------------------
+  // ATAT input - START (SD20220117)
+  if(!IOMODE_found) {
+    if(LDEBUG) cerr << soliloquy << " ATAT DETECTOR" << endl; 
+    uint ATAT=0;
+    // count number of entries for coord system, lattice and atom positions
+    uint token_count=0;
+    for(uint i=0;i<vinput.size()-1;i++){
+      aurostd::string2tokens(vinput[i],tokens," ");
+      token_count += tokens.size();
+      if(i==5 && token_count==18){ATAT=1;}
+      if(i>5 && tokens.size()!=4){ATAT=0; break;}
+    }
+
+    if(ATAT==1){
+      a.iomode = IOATAT_STR;
+      if(LDEBUG) cerr << soliloquy << " ATAT DETECTOR = TRUE" << endl; 
+      IOMODE_found = TRUE; 
+    }
+  }
+  // ATAT input - END (SD20220117)
+
+  // ----------------------------------------------------------------------
   //for AIMS input - unfortunately, it's very generic so leave for last
   if(!IOMODE_found) {
     vector<string> tokens_line;
@@ -4527,6 +4550,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   if(LDEBUG) if(a.iomode==IOQE_GEOM) cerr << soliloquy << " a.iomode = IOQE_GEOM" << endl;
   if(LDEBUG) if(a.iomode==IOAIMS_AUTO) cerr << soliloquy << " a.iomode = IOAIMS_AUTO" << endl;  //CO20171008
   if(LDEBUG) if(a.iomode==IOAIMS_GEOM) cerr << soliloquy << " a.iomode = IOAIMS_GEOM" << endl;  //CO20171008
+  if(LDEBUG) if(a.iomode==IOATAT_STR) cerr << soliloquy << " a.iomode = IOATAT_STR" << endl;  //SD20220114
   // ----------------------------------------------------------------------
   // VASP INPUT
   if(a.iomode==IOVASP_AUTO || a.iomode==IOVASP_POSCAR || a.iomode==IOVASP_ABCCAR || a.iomode==IOVASP_WYCKCAR) { // VASP POSCAR
@@ -6338,7 +6362,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   } // CIF INPUT
 
   // ----------------------------------------------------------------------
-  // AINS INPUT
+  // AIMS INPUT
   if(a.iomode==IOAIMS_AUTO || a.iomode==IOAIMS_GEOM) { // AIMS GEOM
     //CO20171008
     //remember, we already did all the debugging above
@@ -6497,6 +6521,88 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
   } // AIMS INPUT
   // ----------------------------------------------------------------------
+
+  // ----------------------------------------------------------------------
+  // ATAT INPUT
+  if(a.iomode==IOATAT_STR) {
+    //SD20220114
+    if(LDEBUG) cerr << soliloquy << " ATAT IOATAT_STR" << endl;
+    a.neg_scale=FALSE;
+    a.scale=1.0;
+    xmatrix<double> coorsys(3,3);
+    xmatrix<double> lattice(3,3);
+
+    // read coordinate system
+    uint line=0;
+    uint vec_count=0;
+    for(;line<vinput.size();line++){
+      aurostd::string2tokens(vinput[line],tokens," ");
+      vec_count++;
+      if(vec_count==4){break;}
+      coorsys(vec_count,1)=aurostd::string2utype<double>(tokens[0]);
+      coorsys(vec_count,2)=aurostd::string2utype<double>(tokens[1]);
+      coorsys(vec_count,3)=aurostd::string2utype<double>(tokens[2]);
+    }
+    // read unitless lattice
+    vec_count=0;
+    for(;line<vinput.size();line++){
+      aurostd::string2tokens(vinput[line],tokens," ");
+      vec_count++;
+      if(vec_count==4){break;}
+      lattice(vec_count,1)=aurostd::string2utype<double>(tokens[0]);
+      lattice(vec_count,2)=aurostd::string2utype<double>(tokens[1]);
+      lattice(vec_count,3)=aurostd::string2utype<double>(tokens[2]);
+    }
+
+    a.lattice=coorsys*lattice;
+    cerr << soliloquy << " VOLUME " << aurostd::det(a.lattice) << endl;
+    //a.FixLattices();
+    if(LDEBUG) {
+      cerr << soliloquy << " ATAT lattice" << endl;
+      cerr << a.lattice << endl;
+      cerr << soliloquy << " ATAT f2c" << endl;
+      cerr << a.f2c << endl;
+      cerr << soliloquy << " ATAT c2f" << endl;
+      cerr << a.c2f << endl;
+    }
+
+    // read atoms
+    _atom atom;
+    xvector<double> avec(3);
+    for(;line<vinput.size()-1;line++){
+      atom.clear();
+      aurostd::string2tokens(vinput[line],tokens," ");
+      avec(1)=aurostd::string2utype<double>(tokens[0]);
+      avec(2)=aurostd::string2utype<double>(tokens[1]);
+      avec(3)=aurostd::string2utype<double>(tokens[2]);
+      atom.name=atom.cleanname=tokens[3];
+      atom.fpos=aurostd::remainder(aurostd::inverse(lattice)*avec,1.0);
+      atom.cpos=a.f2c*atom.fpos;
+      a.AddAtom(atom);
+      if(LDEBUG) {
+        cerr << soliloquy << " ATAT atom[" << atom.name <<"] found:" << endl;
+        cerr << "    fpos" << atom.fpos << endl;
+        cerr << "    cpos" << atom.cpos << endl;
+      }
+    }
+
+    // order and add additional attributes
+    a.SpeciesPutAlphabetic();
+    for(uint i=0;i<a.atoms.size();i++){
+      a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
+    }
+    a.MakeBasis();
+    a.MakeTypes();
+    a.partial_occupation_flag=FALSE;
+    a.is_vasp4_poscar_format=FALSE;
+    a.is_vasp5_poscar_format=FALSE;
+    a.buildGenericTitle();
+
+    
+
+  } // ATAT INPUT
+  // ----------------------------------------------------------------------
+
   // COMMON CODE (NEED TO BE PATCHED, THOUGH).
   // FIX NORMAL AND PARTIAL OCCUPAITON
   if(LDEBUG) cerr << soliloquy << " COMMON CODE [9]" << endl;
