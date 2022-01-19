@@ -99,6 +99,8 @@ namespace pocc {
   void poccOld2New(ostream& oss=cout);
   void poccOld2New(ofstream& FileMESSAGE,ostream& oss=cout);
 
+  void POCC_Convolution(const aurostd::xoption& vpflow);
+
   string addDefaultPOCCTOL2string(const string& input);
 
   void getTemperatureStringParameters(int& temperature_precision,bool& temperatures_int,int& zero_padding_temperature);
@@ -536,6 +538,7 @@ namespace pocc {
       aurostd::xoption enumerator_mode;       //how do we determine duplicates - UFF, SNF, ...
 
       //post-processing
+      bool m_convolution;
       vector<string> m_ARUN_directories;
       double m_Hmix;
       double m_efa;
@@ -643,6 +646,10 @@ namespace pocc {
       void setKFlags(const _kflags& Kflags);                                    //standard _kflags
       void setVFlags(const _vflags& Vflags);                                    //standard _vflags
 
+      //path getters
+      string getARUNDirectoryPath(uint isupercell) const;
+      string getOutputPath() const;
+
       // Modules
       bool inputFilesFoundAnywhereAPL();  //ME20211004
       void createModuleAflowIns(const _xvasp& xvasp, const string& MODULE);  //ME20211004
@@ -671,6 +678,7 @@ namespace pocc {
       void resetSiteConfigurations();
 
       void CleanPostProcessing();
+      void convolution();
       void loadDataIntoCalculator();
       void setTemperatureStringParameters();
       void setTemperatureStringParameters(vector<double>& v_temperatures);

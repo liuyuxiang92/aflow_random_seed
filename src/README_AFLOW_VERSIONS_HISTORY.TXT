@@ -1,6 +1,7 @@
-3.2.13 - 2021/XX/XX
+3.2.13 - 2022/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz
         -- parallelized KBIN::CompressDirectory() (CO)
+        -- generalizing DOS averaging for pocc systems with ARUNs having different numbers of atoms (CO)
         -- number->basis (CO)
         -- adding findClosedPackingPlane, to be finished (CO)
         -- testing new structure enumeration algorithm, to be finished (CO)
