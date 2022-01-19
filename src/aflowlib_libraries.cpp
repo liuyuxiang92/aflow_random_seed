@@ -758,7 +758,7 @@ namespace aflowlib {
   string LIB2RAW_CheckProjectFromDirectory(const string& directory) {
     string soliloquy=XPID+"aflowlib::LIB2RAW_CheckProjectFromDirectory():";
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << XPID << "aflowlib::LIB2RAW_CheckProjectFromDirectory" << endl;
+    if(LDEBUG) cerr << XPID << "aflowlib::LIB2RAW_CheckProjectFromDirectory" << endl;  
     CheckMaterialServer("aflowlib::LIB2RAW_CheckProjectFromDirectory"); // must be in AFLOW_MATERIALS_SERVER
     // find from PWD
     string PROJECT_LIBRARY="NOTHING",directory_pwd=aurostd::getPWD();aurostd::StringSubst(directory_pwd,"\n","");  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
@@ -1011,7 +1011,7 @@ namespace aflowlib {
     aurostd::StringSubst(directory,"ELPASOLITES","AURO");               // [HISTORIC]
     aurostd::StringSubst(directory,"LIBRARYX/RAW","LIBRARYX/LIB");      // [HISTORIC]
     aurostd::StringSubst(directory,"LIB2/RAW","LIB2/LIB");              // [HISTORIC]
-    aurostd::StringSubst(directory,"/RAW/","/LIB/");                    // to help
+    aurostd::StringSubst(directory,"/RAW/","/LIB/");                    // to help 
     //[CO+ME20200825 OBSOLETE]while(directory.size()>0 && directory.at(directory.size()-1)=='/'){directory=directory.substr(0,directory.size()-1);} //CO20200624 - MOVED FROM BELOW
     aurostd::RemoveTrailingCharacter_InPlace(directory,'/');
     if(directory=="." || directory.empty()) {directory=aurostd::getPWD();} //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
@@ -1076,7 +1076,7 @@ namespace aflowlib {
       CleanDirectoryLIB(directory);
       //[CO20200624 - do inside CleanDirectoryLIB()]string directory=aurostd::CleanFileName(options);
       //[CO20200624 - do inside CleanDirectoryLIB()]aurostd::StringSubst(directory,"./","");
-      //[CO20200624 - do inside CleanDirectoryLIB()]aurostd::StringSubst(directory,"/RAW/","/LIB/"); // to help
+      //[CO20200624 - do inside CleanDirectoryLIB()]aurostd::StringSubst(directory,"/RAW/","/LIB/"); // to help 
       //[CO20200624 - do inside CleanDirectoryLIB()]if(directory=="." || directory.empty()) { directory=aurostd::getPWD(); } //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
       flag_WEB=FALSE;
       flag_files_LIB=FALSE,flag_files_RAW=FALSE,flag_files_WEB=FALSE;
@@ -1203,7 +1203,7 @@ namespace aflowlib {
       if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_+XHOST.vext.at(iext))) perform_LOCK=TRUE;  //CO20200624
       if(aurostd::FileExist(directory_LIB+"/OUTCAR.relax1"+XHOST.vext.at(iext)) ||
           aurostd::FileExist(directory_LIB+"/OUTCAR.relax2"+XHOST.vext.at(iext)) ||
-          aurostd::FileExist(directory_LIB+"/OUTCAR.relax3"+XHOST.vext.at(iext)) || //CO20180827
+          aurostd::FileExist(directory_LIB+"/OUTCAR.relax3"+XHOST.vext.at(iext)) || //CO20180827 
           aurostd::FileExist(directory_LIB+"/OUTCAR.static"+XHOST.vext.at(iext)) || //CO20180827
           FALSE) perform_THERMODYNAMICS=TRUE; //CO20180827
       if(aurostd::FileExist(directory_LIB+"/OUTCAR.static"+XHOST.vext.at(iext))) perform_STATIC=TRUE;
@@ -1282,12 +1282,12 @@ namespace aflowlib {
     //[CO20200624 - OBSOLETE]if((perform_THERMODYNAMICS || perform_BANDS ||  perform_STATIC))
     _aflags aflags;
     cout << soliloquy << " dir=" << directory_LIB << " BEGIN_DATE = " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-    aurostd::ZIP2ZIP(directory_LIB,"bz2","xz",TRUE,XHOST.sPID);
+    aurostd::ZIP2ZIP(directory_LIB,"bz2","xz",TRUE,XHOST.sPID); 
     aurostd::ZIP2ZIP(directory_LIB,"gz","xz",TRUE,XHOST.sPID);
 
     if(LDEBUG) cerr << soliloquy << " [1]" << endl;
     //DX20190516 [OBSOLETE - overwrites file everytime, messes up timestamp] aurostd::RemoveBinaryCharactersFromFile(directory_LIB,_AFLOWIN_); //DX20190211 - Ensure no binary characters in aflow.in
-    //DX20190516 [ADD THIS LINE ONCE TESTED WITH REAL-WORLD CASE] if(aurostd::RemoveControlCodeCharactersFromFile(directory_LIB,_AFLOWIN_)) { //DX20190516 - Ensure no control characters in aflow.in; only modifies if control characters are detected
+    //DX20190516 [ADD THIS LINE ONCE TESTED WITH REAL-WORLD CASE] if(aurostd::RemoveControlCodeCharactersFromFile(directory_LIB,_AFLOWIN_)) { //DX20190516 - Ensure no control characters in aflow.in; only modifies if control characters are detected 
     //DX20190516 [ADD THIS LINE ONCE TESTED WITH REAL-WORLD CASE]   cout << soliloquy << " Control characters detected in aflow.in. The invalid characters have been removed, and the file has been overwritten (the original file has moved to aflow.in_old)." << endl; // signals file has been cleaned
     //DX20190516 [ADD THIS LINE ONCE TESTED WITH REAL-WORLD CASE] }
 
@@ -1372,7 +1372,7 @@ namespace aflowlib {
       }
       //  if(AFLOWLIB_VERBOSE)
       if(LDEBUG) cerr << soliloquy << " [AUID=0b] directory_LIB=" << directory_LIB << endl;
-      cout << soliloquy << " AURL  = " << aurostd::PaddedPOST(aflowlib_data.aurl,60) << endl;//"   " << directory_LIB << endl;
+      cout << soliloquy << " AURL  = " << aurostd::PaddedPOST(aflowlib_data.aurl,60) << endl;//"   " << directory_LIB << endl; 
       cout << soliloquy << " AUID  = " << aurostd::PaddedPOST(aflowlib_data.auid,60) << endl;//"   " << directory_LIB << endl;
       cout << soliloquy << " VAUID = " << aflowlib::auid2directory(aflowlib_data.auid) << endl;
 
@@ -1424,7 +1424,7 @@ namespace aflowlib {
     // do the STATIC
     if((perform_STATIC || perform_BANDS)) { //CO20200731 - MAGNETIC->STATIC //JX
       cout << soliloquy << " MAGNETIC LOOP ---------------------------------------------------------------------------------" << endl;
-      aflowlib::LIB2RAW_Loop_Magnetic(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (magnetic):");
+      aflowlib::LIB2RAW_Loop_Magnetic(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (magnetic):"); 
     }
     // ---------------------------------------------------------------------------------------------------------------------------------
     // do the BADER
@@ -1554,19 +1554,19 @@ namespace aflowlib {
     // do the POCC
     if(perform_POCC) {
       cout << soliloquy << " POCC LOOP ---------------------------------------------------------------------------------" << endl;
-      aflowlib::LIB2RAW_Loop_POCC(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (POCC):");
+      aflowlib::LIB2RAW_Loop_POCC(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (POCC):"); 
     }
     // ---------------------------------------------------------------------------------------------------------------------------------
     // do the LOCK
     if(perform_LOCK) {
       cout << soliloquy << " LOCK LOOP ---------------------------------------------------------------------------------" << endl;
-      aflowlib::LIB2RAW_Loop_LOCK(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (LOCK):");
+      aflowlib::LIB2RAW_Loop_LOCK(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (LOCK):"); 
     }
     // ---------------------------------------------------------------------------------------------------------------------------------
     // do the PATCH
     if(perform_PATCH) {
       cout << soliloquy << " PATCH LOOP --------------------------------------------------------------------------------" << endl;
-      aflowlib::LIB2RAW_Loop_PATCH(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (PATCH):");
+      aflowlib::LIB2RAW_Loop_PATCH(directory_LIB,directory_RAW,vfile,aflowlib_data,soliloquy+" (PATCH):"); 
     }
     // ---------------------------------------------------------------------------------------------------------------------------------
     // write DOS + BANDS JSON //CO20171025
@@ -1616,7 +1616,7 @@ namespace aflowlib {
     // [OBSOLETE] 	      if(vfile.at(ifile)=="KPOINTS.relax") { aurostd::RemoveFile(directory_RAW+"/"+vfile.at(ifile)); }
     // [OBSOLETE] 	      if(vfile.at(ifile)=="EIGENVAL.bands.old") { aurostd::RemoveFile(directory_RAW+"/"+vfile.at(ifile)); }
     // [OBSOLETE] 	      if(vfile.at(ifile)=="OUTCAR.relax") { aurostd::RemoveFile(directory_RAW+"/"+vfile.at(ifile)); }
-    // [OBSOLETE] 	    }
+    // [OBSOLETE] 	    } 
     // [OBSOLETE] 	} // vfile
     // [OBSOLETE]  } // iext
 
@@ -1651,7 +1651,7 @@ namespace aflowlib {
     deque<string> vfile2compress1; aurostd::string2tokens("aflow.pgroup,aflow.pgroup_xtal,aflow.pgroupk,aflow.pgroupk_xtal,aflow.pgroupk_Patterson,aflow.fgroup,aflow.iatoms,aflow.agroup",vfile2compress1,","); //DX20200520 - added Patterson
     for(uint ilink=0;ilink<vfile2compress1.size();ilink++) {
       for(uint iout=0;iout<vout.size();iout++) {
-        for(uint itype=0;itype<vtype.size();itype++) {
+        for(uint itype=0;itype<vtype.size();itype++) {   
           if(aurostd::FileExist(directory_RAW+"/"+vfile2compress1.at(ilink)+vtype.at(itype)+vout.at(iout))) {
             if(1||LDEBUG) { cout << soliloquy << " compressing file (" << ilink << "," << iout << "," << itype << "): " << string(directory_RAW+"/"+vfile2compress1.at(ilink)+vtype.at(itype)+vout.at(iout)) << endl; cout.flush(); }
             aurostd::CompressFile(directory_RAW+"/"+vfile2compress1.at(ilink)+vtype.at(itype)+vout.at(iout),DEFAULT_KZIP_BIN);
@@ -1666,16 +1666,16 @@ namespace aflowlib {
         deque<string> vfile2link0; aurostd::string2tokens("DOSCAR.static,OUTCAR.static,CHGCAR.static,AECCAR0.static,AECCAR2.static,EIGENVAL.bands,OSZICAR.bands",vfile2link0,",");
         for(uint ilink=0;ilink<vfile2link0.size();ilink++) {
           if(vfile.at(ifile)==vfile2link0.at(ilink)) {
-            // cout << soliloquy << " linking file RAW->LIB: " << vfile2link0.at(ilink) << endl;
-            if(aurostd::FileExist(directory_LIB+"/"+vfile.at(ifile)) || aurostd::EFileExist(directory_LIB+"/"+vfile.at(ifile))) { // need to be present in LIB also
+            // cout << soliloquy << " linking file RAW->LIB: " << vfile2link0.at(ilink) << endl;       
+            if(aurostd::FileExist(directory_LIB+"/"+vfile.at(ifile)) || aurostd::EFileExist(directory_LIB+"/"+vfile.at(ifile))) { // need to be present in LIB also  
               aurostd::RemoveFile(directory_RAW+"/"+vfile.at(ifile)); // remove RAW original
-              if(aurostd::FileExist(directory_LIB+"/"+vfile.at(ifile))) {
-                cout << soliloquy << " linking file RAW->LIB: " << string(directory_LIB+"/"+vfile.at(ifile)) << endl; cout.flush();
+              if(aurostd::FileExist(directory_LIB+"/"+vfile.at(ifile))) { 
+                cout << soliloquy << " linking file RAW->LIB: " << string(directory_LIB+"/"+vfile.at(ifile)) << endl; cout.flush();   
                 aurostd::LinkFile(directory_LIB+"/"+vfile.at(ifile),directory_RAW); // link LIB to RAW (save space)
               }
               for(uint iext=0;iext<XHOST.vext.size();iext++) {
                 if(aurostd::FileExist(directory_LIB+"/"+vfile.at(ifile)+XHOST.vext.at(iext))) {
-                  cout << soliloquy << " linking file RAW->LIB: " << string(directory_LIB+"/"+vfile.at(ifile)+XHOST.vext.at(iext)) << endl;  cout.flush();
+                  cout << soliloquy << " linking file RAW->LIB: " << string(directory_LIB+"/"+vfile.at(ifile)+XHOST.vext.at(iext)) << endl;  cout.flush();          
                   aurostd::LinkFile(directory_LIB+"/"+vfile.at(ifile)+XHOST.vext.at(iext),directory_RAW); // link LIB to RAW (save space)
                 }
               }
@@ -1716,21 +1716,21 @@ namespace aflowlib {
       //CO20200624 - these are PRE-LINKS: these files have NOT been written yet
       //if we check if they exist first, then the links will not be created
       //we want to do this NOW so that it can be captured by vfiles
-      //[CO20200624 - THIS IS A PRE-LINK!]if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT))
+      //[CO20200624 - THIS IS A PRE-LINK!]if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) 
       aurostd::LinkFile(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT,directory_WEB);    // LINK  //CO20200624 - adding FileExist() check
-      //[CO20200624 - THIS IS A PRE-LINK!]if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON))
+      //[CO20200624 - THIS IS A PRE-LINK!]if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON)) 
       aurostd::LinkFile(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON,directory_WEB);   // LINK //CO20200624 - adding FileExist() check
-      //[CO20200624 - THIS IS A PRE-LINK!]if(aurostd::FileExist(directory_RAW+"/"+aflowlib_data.auid+".out"))
+      //[CO20200624 - THIS IS A PRE-LINK!]if(aurostd::FileExist(directory_RAW+"/"+aflowlib_data.auid+".out")) 
       aurostd::LinkFile(directory_RAW+"/"+aflowlib_data.auid+".out",directory_WEB);     // LINK for AUID  //CO20200624 - adding FileExist() check
-      //[CO20200624 - THIS IS A PRE-LINK!]if(aurostd::FileExist(directory_RAW+"/"+aflowlib_data.auid+".json"))
+      //[CO20200624 - THIS IS A PRE-LINK!]if(aurostd::FileExist(directory_RAW+"/"+aflowlib_data.auid+".json")) 
       aurostd::LinkFile(directory_RAW+"/"+aflowlib_data.auid+".json",directory_WEB);     // LINK for AUID  //CO20200624 - adding FileExist() check
 
       deque<string> vfile2link1; aurostd::string2tokens("aflow.pgroup,aflow.pgroup_xtal,aflow.pgroupk,aflow.pgroupk_xtal,aflow.fgroup,aflow.iatoms,aflow.agroup,edata,data",vfile2link1,",");
       for(uint ilink=0;ilink<vfile2link1.size();ilink++) {
         for(uint iout=0;iout<vout.size();iout++) {
-          for(uint itype=0;itype<vtype.size();itype++) {
+          for(uint itype=0;itype<vtype.size();itype++) {   
             if(aurostd::FileExist(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout))) { // no compression
-              if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout)) << endl; cout.flush(); }
+              if(LDEBUG) { cout << soliloquy << " linking file WEB->RAW: " << string(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout)) << endl; cout.flush(); }              
               aurostd::LinkFile(directory_RAW+"/"+vfile2link1.at(ilink)+vtype.at(itype)+vout.at(iout),directory_WEB);
             }  // FileExist
             for(uint iext=0;iext<XHOST.vext.size();iext++) {
@@ -1839,16 +1839,16 @@ namespace aflowlib {
     }
 
     // write aflowlib.out
-    cout << soliloquy << " writing " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) << endl; cout.flush();
+    cout << soliloquy << " writing " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) << endl; cout.flush(); 
     cout << XPID << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << ": " << aflowlib_data.aflowlib2file(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT,"out");
-    cout << soliloquy << " linking file RAW->RAW: " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) << " -> " << string(directory_RAW+"/"+aflowlib_data.auid+".out") << endl; cout.flush();
+    cout << soliloquy << " linking file RAW->RAW: " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT) << " -> " << string(directory_RAW+"/"+aflowlib_data.auid+".out") << endl; cout.flush(); 
     if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) aurostd::LinkFile(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT,directory_RAW+"/"+aflowlib_data.auid+".out");         // LINK //CO20200624 - adding FileExist() check
     // cout << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << ": " << aflowlib_data.aflowlib2file(directory_WEB+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT);
 
     // write aflowlib.json
-    cout << soliloquy << " writing " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON) << endl; cout.flush();
+    cout << soliloquy << " writing " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON) << endl; cout.flush(); 
     cout << XPID << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << ": " << aflowlib_data.aflowlib2file(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON,"json");
-    cout << soliloquy << " linking file RAW->RAW: " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON) << " -> " << string(directory_RAW+"/"+aflowlib_data.auid+".json") << endl; cout.flush();
+    cout << soliloquy << " linking file RAW->RAW: " << string(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON) << " -> " << string(directory_RAW+"/"+aflowlib_data.auid+".json") << endl; cout.flush(); 
     if(aurostd::FileExist(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON)) aurostd::LinkFile(directory_RAW+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON,directory_RAW+"/"+aflowlib_data.auid+".json");         // LINK  //CO20200624 - adding FileExist() check
     // cout << DEFAULT_FILE_AFLOWLIB_ENTRY_JSON << ": " << aflowlib_data.aflowlib2file(directory_WEB+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON);
 
@@ -1875,7 +1875,7 @@ namespace aflowlib {
         string directory_AUID_LIB="",directory_AUID_RAW="",directory_AUID_WEB="";
         directory_AUID=init::AFLOW_Projects_Directories("AUID")+"/"+aflowlib::auid2directory(aflowlib_data.auid);
         aurostd::DirectoryMake(directory_AUID);
-        directory_AUID_LIB=directory_AUID+"/LIB";
+        directory_AUID_LIB=directory_AUID+"/LIB"; 
         directory_AUID_RAW=directory_AUID+"/RAW";
         directory_AUID_WEB=directory_AUID+"/WEB";
         aurostd::RemoveFile(directory_AUID_LIB); // to avoid auto-linking SC20181205
@@ -1907,7 +1907,7 @@ namespace aflowlib {
           if(tokens.size()>2) {
             if(tokens.at(tokens.size()-2)=="ICSD") {
               string directory_ICSD2LINK=init::AFLOW_Projects_Directories("AUID")+"/icsd:/"+tokens.at(tokens.size()-1);
-              aurostd::DirectoryMake(directory_ICSD2LINK);
+              aurostd::DirectoryMake(directory_ICSD2LINK);	      
               cout << soliloquy << " (ICSD2LINK) making ICSD2LINK: " << directory_ICSD2LINK << endl; cout.flush();
               // LIB
               aurostd::RemoveFile(directory_ICSD2LINK+"/LIB");  // to avoid auto-linking SC20190830
@@ -2073,7 +2073,7 @@ namespace aflowlib {
     }
     string file2add=fileRAW;
     for(uint iext=1;iext<XHOST.vext.size();iext++) {   // SKIP uncompressed
-      aurostd::StringSubst(file2add,XHOST.vext.at(iext),"");
+      aurostd::StringSubst(file2add,XHOST.vext.at(iext),""); 
     }
     vfile.push_back(file2add);
     return TRUE;
@@ -2581,7 +2581,7 @@ namespace aflowlib {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aflowlib::LIB2RAW_Calculate_FormationEnthalpy():";
     // reference
-    bool FORMATION_CALC=TRUE;
+    bool FORMATION_CALC=TRUE;    
     bool formation_calc_U=FALSE;
     if(xstr.species_pp_vLDAU.size()>0 && xstr.species_pp_vLDAU[0].size()>0 && !aurostd::isequal(xstr.species_pp_vLDAU[0][0],0.0)) formation_calc_U=TRUE;  //CO20210712 - new style, vLDAU will be populated even if no +U, check type==0
     if(LDEBUG){cerr << soliloquy << " formation_calc_U=" << formation_calc_U << endl;}
@@ -2617,7 +2617,7 @@ namespace aflowlib {
     // line XXX1
     if(FORMATION_CALC) {
       for(uint i=0;i<(uint) data.nspecies;i++) {
-        if(!xPOTCAR_EnthalpyReference_AUID(data.vspecies_pp_AUID.at(i),data.METAGGA)) {
+        if(!xPOTCAR_EnthalpyReference_AUID(data.vspecies_pp_AUID.at(i),data.METAGGA)) { 
           FORMATION_CALC=FALSE; // WORKS WITH SCANN TOO
           if(AFLOWLIB_VERBOSE) cout << MESSAGE << " REFERENCE NOT AVAILABLE species_pp=" << xstr.species_pp_version.at(i) << "  species_pp_AUID=" << data.vspecies_pp_AUID.at(i)
             << (data.METAGGA.empty()?string(""):string("  METAGGA=["+data.METAGGA+"]")) << "   Href=nothing" << endl;
@@ -2628,7 +2628,7 @@ namespace aflowlib {
     // OPERATE FORMATION
     //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl;
 
-    // line XXX2
+    // line XXX2					   
     uint i=0;
     if(FORMATION_CALC) { // no LDAU yet
       if(LDEBUG) cerr << soliloquy << " [FCALC=1]" << endl;
@@ -2724,7 +2724,7 @@ namespace aflowlib {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aflowlib::LIB2RAW_Calculate_FormationEnthalpy():";
     // reference
-    bool FORMATION_CALC=TRUE;
+    bool FORMATION_CALC=TRUE;    
     bool isLDAUcalc=FALSE;
     if(xstr.species_pp_vLDAU.size()>0 && xstr.species_pp_vLDAU[0].size()>0 && !aurostd::isequal(xstr.species_pp_vLDAU[0][0],0.0)) isLDAUcalc=TRUE;  //CO20210712 - new style, vLDAU will be populated even if no +U, check type==0
     if(LDEBUG){cerr << soliloquy << " isLDAUcalc=" << isLDAUcalc << endl;}
@@ -2766,7 +2766,7 @@ namespace aflowlib {
     // line XXX1
     if(FORMATION_CALC) {
       for(uint i=0;i<(uint) data.nspecies;i++) {
-        if(!xPOTCAR_EnthalpyReference_AUID(data.vspecies_pp_AUID.at(i),data.METAGGA)) {
+        if(!xPOTCAR_EnthalpyReference_AUID(data.vspecies_pp_AUID.at(i),data.METAGGA)) { 
           FORMATION_CALC=FALSE; // WORKS WITH SCANN TOO
           if(AFLOWLIB_VERBOSE) cout << MESSAGE << " REFERENCE NOT AVAILABLE species_pp=" << xstr.species_pp_version.at(i) << "  species_pp_AUID=" << data.vspecies_pp_AUID.at(i)
             << (data.METAGGA.empty()?string(""):string("  METAGGA=["+data.METAGGA+"]")) << "   Href=nothing" << endl;
@@ -2777,7 +2777,7 @@ namespace aflowlib {
     // OPERATE FORMATION
     //     cerr << "FORMATION_CALC=" << FORMATION_CALC << endl;
 
-    // line XXX2
+    // line XXX2					   
     if(FORMATION_CALC) { // no LDAU yet
       if(LDEBUG) cerr << soliloquy << " [FCALC=1]" << endl;
       vector<double> venthalpy_atom_ref;
@@ -3603,7 +3603,7 @@ namespace aflowlib {
           str_relax.species_pp_vLDAU.clear(); for(uint i=0;i<xOUT.species_pp_vLDAU.size();i++) str_relax.species_pp_vLDAU.push_back(xOUT.species_pp_vLDAU.at(i));  // for aflowlib_libraries.cpp
           data.ldau_TLUJ=xOUT.string_LDAU;
           //[CO+ME20210713 - keep legacy behavior, only print when non-zero]if(data.ldau_TLUJ.empty()){data.ldau_TLUJ=aurostd::utype2string(0);} //CO20210713 - no +U
-          data.METAGGA=xOUT.METAGGA;
+          data.METAGGA=xOUT.METAGGA;	  	  
 
           //ME20190124 BEGIN - Store LDAU information individually
           // Note that the vector here has the species in the columns, not the
@@ -4261,95 +4261,95 @@ namespace aflowlib {
         //DX20180823 - extract info from xoption - START
         if(vpflow_edata_orig.flag("EDATA::CALCULATED")) {
           if(data.Bravais_lattice_orig.empty()) { // Bravais_Lattice_orig
-            data.Bravais_lattice_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_LATTICE_TYPE");
+            data.Bravais_lattice_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_LATTICE_TYPE"); 
           }
           if(data.lattice_variation_orig.empty()) { // Bravais_Lattice_Variation_orig
-            data.lattice_variation_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_LATTICE_VARIATION_TYPE");
+            data.lattice_variation_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_LATTICE_VARIATION_TYPE"); 
           }
           if(data.lattice_system_orig.empty()) { // Lattice_System_orig
-            data.lattice_system_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_LATTICE_SYSTEM");
+            data.lattice_system_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_LATTICE_SYSTEM"); 
           }
           if(data.Pearson_symbol_orig.empty()) { // Pearson_orig
-            data.Pearson_symbol_orig=vpflow_edata_orig.getattachedscheme("EDATA::PEARSON_SYMBOL");
+            data.Pearson_symbol_orig=vpflow_edata_orig.getattachedscheme("EDATA::PEARSON_SYMBOL"); 
           }
           //DX20190124 - extract additional info from xoption - START
           if(data.crystal_system_orig.empty()) { // crystal_system_orig
-            data.crystal_system_orig=vpflow_edata_orig.getattachedscheme("EDATA::CRYSTAL_SYSTEM");
+            data.crystal_system_orig=vpflow_edata_orig.getattachedscheme("EDATA::CRYSTAL_SYSTEM"); 
           }
           if(data.crystal_family_orig.empty()) { // crystal_family_orig
-            data.crystal_family_orig=vpflow_edata_orig.getattachedscheme("EDATA::CRYSTAL_FAMILY");
+            data.crystal_family_orig=vpflow_edata_orig.getattachedscheme("EDATA::CRYSTAL_FAMILY"); 
           }
           if(data.point_group_Hermann_Mauguin_orig.empty()) { // point_group_Hermann_Mauguin_orig
-            data.point_group_Hermann_Mauguin_orig=vpflow_edata_orig.getattachedscheme("EDATA::POINT_GROUP_HERMANN_MAUGUIN");
+            data.point_group_Hermann_Mauguin_orig=vpflow_edata_orig.getattachedscheme("EDATA::POINT_GROUP_HERMANN_MAUGUIN"); 
           }
           if(data.crystal_class_orig.empty()) { // crystal_class_orig
-            data.crystal_class_orig=vpflow_edata_orig.getattachedscheme("EDATA::POINT_GROUP_CRYSTAL_CLASS");
+            data.crystal_class_orig=vpflow_edata_orig.getattachedscheme("EDATA::POINT_GROUP_CRYSTAL_CLASS"); 
           }
           if(data.point_group_Schoenflies_orig.empty()) { // point_group_Schoenflies_orig
-            data.point_group_Schoenflies_orig=vpflow_edata_orig.getattachedscheme("EDATA::POINT_GROUP_SCHOENFLIES");
+            data.point_group_Schoenflies_orig=vpflow_edata_orig.getattachedscheme("EDATA::POINT_GROUP_SCHOENFLIES"); 
           }
           if(data.point_group_orbifold_orig.empty()) { // point_group_orbifold_orig
-            data.point_group_orbifold_orig=vpflow_edata_orig.getattachedscheme("EDATA::POINT_GROUP_ORBIFOLD");
+            data.point_group_orbifold_orig=vpflow_edata_orig.getattachedscheme("EDATA::POINT_GROUP_ORBIFOLD"); 
           }
           if(data.point_group_type_orig.empty()) { // point_group_type_orig
-            data.point_group_type_orig=vpflow_edata_orig.getattachedscheme("EDATA::POINT_GROUP_TYPE");
+            data.point_group_type_orig=vpflow_edata_orig.getattachedscheme("EDATA::POINT_GROUP_TYPE"); 
           }
           if(data.point_group_order_orig==AUROSTD_NAN) { // point_group_order_orig
-            data.point_group_order_orig=vpflow_edata_orig.getattachedutype<uint>("EDATA::POINT_GROUP_ORDER");
+            data.point_group_order_orig=vpflow_edata_orig.getattachedutype<uint>("EDATA::POINT_GROUP_ORDER"); 
           }
           if(data.point_group_structure_orig.empty()) { // point_group_structure_orig
-            data.point_group_structure_orig=vpflow_edata_orig.getattachedscheme("EDATA::POINT_GROUP_STRUCTURE");
+            data.point_group_structure_orig=vpflow_edata_orig.getattachedscheme("EDATA::POINT_GROUP_STRUCTURE"); 
           }
           if(data.Bravais_lattice_lattice_type_orig.empty()) { // Bravais_lattice_lattice_type_orig
-            data.Bravais_lattice_lattice_type_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_TYPE");
+            data.Bravais_lattice_lattice_type_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_TYPE"); 
           }
           if(data.Bravais_lattice_lattice_variation_type_orig.empty()) { // Bravais_lattice_lattice_variation_type_orig
-            data.Bravais_lattice_lattice_variation_type_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE");
+            data.Bravais_lattice_lattice_variation_type_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE"); 
           }
           if(data.Bravais_lattice_lattice_system_orig.empty()) { // Bravais_lattice_lattice_system_orig
-            data.Bravais_lattice_lattice_system_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_SYSTEM");
+            data.Bravais_lattice_lattice_system_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_SYSTEM"); 
           }
-          if(data.Bravais_superlattice_lattice_type_orig.empty()) { // Bravais_superlattice_lattice_type_orig
-            data.Bravais_superlattice_lattice_type_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_TYPE");
+          if(data.Bravais_superlattice_lattice_type_orig.empty()) { // Bravais_superlattice_lattice_type_orig 
+            data.Bravais_superlattice_lattice_type_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_TYPE"); 
           }
           if(data.Bravais_superlattice_lattice_variation_type_orig.empty()) { // Bravais_superlattice_lattice_variation_type_orig
-            data.Bravais_superlattice_lattice_variation_type_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_VARIATION_TYPE");
+            data.Bravais_superlattice_lattice_variation_type_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_VARIATION_TYPE"); 
           }
           if(data.Bravais_superlattice_lattice_system_orig.empty()) { // Bravais_superlattice_lattice_system_orig
-            data.Bravais_superlattice_lattice_system_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_SYSTEM");
+            data.Bravais_superlattice_lattice_system_orig=vpflow_edata_orig.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_SYSTEM"); 
           }
           if(data.Pearson_symbol_superlattice_orig.empty()) { // Pearson_symbol_superlattice_orig
-            data.Pearson_symbol_superlattice_orig=vpflow_edata_orig.getattachedscheme("EDATA::PEARSON_SYMBOL_SUPERLATTICE");
+            data.Pearson_symbol_superlattice_orig=vpflow_edata_orig.getattachedscheme("EDATA::PEARSON_SYMBOL_SUPERLATTICE"); 
           }
           if(data.reciprocal_geometry_orig.empty()) { // reciprocal_geometry_orig
-            data.reciprocal_geometry_orig=vpflow_edata_orig.getattachedscheme("EDATA::RECIPROCAL_LATTICE_PARAMETERS");
-            vector<string> ktokens;
+            data.reciprocal_geometry_orig=vpflow_edata_orig.getattachedscheme("EDATA::RECIPROCAL_LATTICE_PARAMETERS"); 
+            vector<string> ktokens; 
             aurostd::string2tokens(data.reciprocal_geometry_orig,ktokens,",");
             for(uint t=0;t<ktokens.size();t++) { data.vreciprocal_geometry_orig.push_back(aurostd::string2utype<double>(ktokens[t])); }
           }
           if(data.reciprocal_volume_cell_orig==AUROSTD_NAN) { // reciprocal_volume_cell_orig
-            data.reciprocal_volume_cell_orig=vpflow_edata_orig.getattachedutype<double>("EDATA::RECIPROCAL_SPACE_VOLUME");
+            data.reciprocal_volume_cell_orig=vpflow_edata_orig.getattachedutype<double>("EDATA::RECIPROCAL_SPACE_VOLUME"); 
           }
           if(data.reciprocal_lattice_type_orig.empty()) { // reciprocal_lattice_type_orig
-            data.reciprocal_lattice_type_orig=vpflow_edata_orig.getattachedscheme("EDATA::RECIPROCAL_LATTICE_TYPE");
+            data.reciprocal_lattice_type_orig=vpflow_edata_orig.getattachedscheme("EDATA::RECIPROCAL_LATTICE_TYPE"); 
           }
           if(data.reciprocal_lattice_variation_type_orig.empty()) { // reciprocal_lattice_variation_type_orig
-            data.reciprocal_lattice_variation_type_orig=vpflow_edata_orig.getattachedscheme("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE");
+            data.reciprocal_lattice_variation_type_orig=vpflow_edata_orig.getattachedscheme("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE"); 
           }
           //DX20190131 - use self-consistent space group orig - START
           if(data.spacegroup_orig==AUROSTD_NAN) { //CO20201111
             data.spacegroup_orig=vpflow_edata_orig.getattachedutype<uint>("SGDATA::SPACE_GROUP_NUMBER");  //CO20201111
             if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPACEGROUP_ORIG = " << data.spacegroup_orig << endl;
-          }
+          } 
           //DX20190131 - use self-consistent space group orig - END
           if(data.Wyckoff_letters_orig.empty()) { // Wyckoff_letters_orig
-            data.Wyckoff_letters_orig=vpflow_edata_orig.getattachedscheme("SGDATA::WYCKOFF_LETTERS");
+            data.Wyckoff_letters_orig=vpflow_edata_orig.getattachedscheme("SGDATA::WYCKOFF_LETTERS"); 
           }
           if(data.Wyckoff_multiplicities_orig.empty()) { // Wyckoff_multiplicities_orig
-            data.Wyckoff_multiplicities_orig=vpflow_edata_orig.getattachedscheme("SGDATA::WYCKOFF_MULTIPLICITIES");
+            data.Wyckoff_multiplicities_orig=vpflow_edata_orig.getattachedscheme("SGDATA::WYCKOFF_MULTIPLICITIES"); 
           }
           if(data.Wyckoff_site_symmetries_orig.empty()) { // Wyckoff_site_symmetries_orig
-            data.Wyckoff_site_symmetries_orig=vpflow_edata_orig.getattachedscheme("SGDATA::WYCKOFF_SITE_SYMMETRIES");
+            data.Wyckoff_site_symmetries_orig=vpflow_edata_orig.getattachedscheme("SGDATA::WYCKOFF_SITE_SYMMETRIES"); 
           }
         }
         //DX20180823 - extract info from xoption - END
@@ -4409,8 +4409,8 @@ namespace aflowlib {
         TXT2+=str_relax.species_pp_version.at(0);
         if(data.aflow_prototype_label_orig!="") cout << data.aflow_prototype_label_orig << endl;
 
-        // cerr << data.nspecies << endl;
-        // cerr << "\"" << data.aflow_prototype_label_orig << "\"" << endl;
+        // cerr << data.nspecies << endl; 
+        // cerr << "\"" << data.aflow_prototype_label_orig << "\"" << endl; 
         // cerr << str_relax.species.at(0) << endl;
 
         // A1
@@ -4423,10 +4423,10 @@ namespace aflowlib {
         if(data.aflow_prototype_label_orig=="A_hP2_194_c" && (s=="Be" || s=="Cd" || s=="Co" || s=="Dy" || s=="Hf" || s=="Hg" || s=="Ho" || s=="Mg" || s=="Os" || s=="Re" || s=="Ru" || s=="Sc" || s=="Tc" || s=="Ti" || s=="Tl" || s=="Y" || s=="Zn" || s=="Zr" || s=="He")) { // A3
           cout << TXT1 << "A3" << TXT2 << endl;}
         // A4
-        if(data.aflow_prototype_label_orig=="A_cF8_227_a" && (s=="Ge" || s=="Si")) { // A4
+        if(data.aflow_prototype_label_orig=="A_cF8_227_a" && (s=="Ge" || s=="Si")) { // A4 
           cout << TXT1 << "A4" << TXT2 << endl;}
         // A5
-        if(data.aflow_prototype_label_orig=="A_tI4_141_a" && (s=="Sn")) { // A5
+        if(data.aflow_prototype_label_orig=="A_tI4_141_a" && (s=="Sn")) { // A5 
           cout << TXT1 << "A5" << TXT2 << endl;}
         // A6
         if(data.aflow_prototype_label_orig=="A_tI2_139_a" && (s=="In")) { // A6
@@ -4444,14 +4444,14 @@ namespace aflowlib {
         if(data.aflow_prototype_label_orig=="A_hR1_166_a" && (s=="Hg")) { // A10
           cout << TXT1 << "A10" << TXT2 << endl;}
         // A11
-        if(data.aflow_prototype_label_orig=="A_oC8_64_f" && (s=="Ga" || s=="Br")) { // A11
+        if(data.aflow_prototype_label_orig=="A_oC8_64_f" && (s=="Ga" || s=="Br")) { // A11 
           cout << TXT1 << "A11" << TXT2 << endl;}
         // A12
         if(data.aflow_prototype_label_orig=="A_cI58_217_ac2g" && (s=="Mn")) { // A12
-          cout << TXT1 << "A12" << TXT2 << endl;}
+          cout << TXT1 << "A12" << TXT2 << endl;} 
         // diatom (A_tP2_123_g) just RICO choice
         if(data.aflow_prototype_label_orig=="A_tP2_123_g" && (s=="O" || s=="N" || s=="F" || s=="H" || s=="Cl")) { // diatom //  cat /tmp/xscrubber_ppAUID.LIB1 | grep diatom | grep '/O'
-          cout << TXT1 << "diatom" << TXT2 << endl;}
+          cout << TXT1 << "diatom" << TXT2 << endl;} 
         // A14
         if(data.aflow_prototype_label_orig=="A_oC8_64_f" && (s=="I")) { // A14
           cout << TXT1 << "A14" << TXT2 << endl;}
@@ -4574,98 +4574,98 @@ namespace aflowlib {
         //DX20180823 - extract info from xoption - START
         if(vpflow_edata_relax.flag("EDATA::CALCULATED")) {
           if(data.Bravais_lattice_relax.empty()) { // Bravais_Lattice
-            data.Bravais_lattice_relax=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_LATTICE_TYPE");
+            data.Bravais_lattice_relax=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_LATTICE_TYPE"); 
           }
           if(data.lattice_variation_relax.empty()) { // Bravais_Lattice_Variation
-            data.lattice_variation_relax=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_LATTICE_VARIATION_TYPE");
+            data.lattice_variation_relax=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_LATTICE_VARIATION_TYPE"); 
           }
           if(data.lattice_system_relax.empty()) { // Lattice_System
-            data.lattice_system_relax=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_LATTICE_SYSTEM");
+            data.lattice_system_relax=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_LATTICE_SYSTEM"); 
           }
           if(data.Pearson_symbol_relax.empty()) { // Pearson
-            data.Pearson_symbol_relax=vpflow_edata_relax.getattachedscheme("EDATA::PEARSON_SYMBOL");
+            data.Pearson_symbol_relax=vpflow_edata_relax.getattachedscheme("EDATA::PEARSON_SYMBOL"); 
           }
           if(data.crystal_system.empty()) { // crystal_system
-            data.crystal_system=vpflow_edata_relax.getattachedscheme("EDATA::CRYSTAL_SYSTEM");
+            data.crystal_system=vpflow_edata_relax.getattachedscheme("EDATA::CRYSTAL_SYSTEM"); 
           }
           if(data.crystal_family.empty()) { // crystal_family
-            data.crystal_family=vpflow_edata_relax.getattachedscheme("EDATA::CRYSTAL_FAMILY");
+            data.crystal_family=vpflow_edata_relax.getattachedscheme("EDATA::CRYSTAL_FAMILY"); 
           }
           //DX20190115 - typo in Hermann-Mauguin and crystal class entries - START
           if(data.point_group_Hermann_Mauguin.empty()) { // point_group_Hermann_Mauguin
-            data.point_group_Hermann_Mauguin=vpflow_edata_relax.getattachedscheme("EDATA::POINT_GROUP_HERMANN_MAUGUIN");
+            data.point_group_Hermann_Mauguin=vpflow_edata_relax.getattachedscheme("EDATA::POINT_GROUP_HERMANN_MAUGUIN"); 
           }
           if(data.crystal_class.empty()) { // crystal_class
-            data.crystal_class=vpflow_edata_relax.getattachedscheme("EDATA::POINT_GROUP_CRYSTAL_CLASS");
+            data.crystal_class=vpflow_edata_relax.getattachedscheme("EDATA::POINT_GROUP_CRYSTAL_CLASS"); 
           }
           //DX20190115 - typo in Hermann-Mauguin and crystal class entries - END
           if(data.point_group_Schoenflies.empty()) { // point_group_Schoenflies
-            data.point_group_Schoenflies=vpflow_edata_relax.getattachedscheme("EDATA::POINT_GROUP_SCHOENFLIES");
+            data.point_group_Schoenflies=vpflow_edata_relax.getattachedscheme("EDATA::POINT_GROUP_SCHOENFLIES"); 
           }
           if(data.point_group_orbifold.empty()) { // point_group_orbifold
-            data.point_group_orbifold=vpflow_edata_relax.getattachedscheme("EDATA::POINT_GROUP_ORBIFOLD");
+            data.point_group_orbifold=vpflow_edata_relax.getattachedscheme("EDATA::POINT_GROUP_ORBIFOLD"); 
           }
-          if(data.point_group_type.empty()) { // point_group_type
-            data.point_group_type=vpflow_edata_relax.getattachedscheme("EDATA::POINT_GROUP_TYPE");
+          if(data.point_group_type.empty()) { // point_group_type 
+            data.point_group_type=vpflow_edata_relax.getattachedscheme("EDATA::POINT_GROUP_TYPE"); 
           }
-          if(data.point_group_order==AUROSTD_NAN) { // point_group_order
-            data.point_group_order=vpflow_edata_relax.getattachedutype<uint>("EDATA::POINT_GROUP_ORDER");
+          if(data.point_group_order==AUROSTD_NAN) { // point_group_order 
+            data.point_group_order=vpflow_edata_relax.getattachedutype<uint>("EDATA::POINT_GROUP_ORDER"); 
           }
-          if(data.point_group_structure.empty()) { // point_group_structure
-            data.point_group_structure=vpflow_edata_relax.getattachedscheme("EDATA::POINT_GROUP_STRUCTURE");
+          if(data.point_group_structure.empty()) { // point_group_structure 
+            data.point_group_structure=vpflow_edata_relax.getattachedscheme("EDATA::POINT_GROUP_STRUCTURE"); 
           }
-          if(data.Bravais_lattice_lattice_type.empty()) { // Bravais_lattice_lattice_type
-            data.Bravais_lattice_lattice_type=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_TYPE");
+          if(data.Bravais_lattice_lattice_type.empty()) { // Bravais_lattice_lattice_type 
+            data.Bravais_lattice_lattice_type=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_TYPE"); 
           }
           //DX20190115 - typo, missing "variation" - START
-          if(data.Bravais_lattice_lattice_variation_type.empty()) { // Bravais_lattice_lattice_variation_type
-            data.Bravais_lattice_lattice_variation_type=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE");
+          if(data.Bravais_lattice_lattice_variation_type.empty()) { // Bravais_lattice_lattice_variation_type 
+            data.Bravais_lattice_lattice_variation_type=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE"); 
           }
           //DX20190115 - typo, missing "variation" - END
-          if(data.Bravais_lattice_lattice_system.empty()) { // Bravais_lattice_lattice_system
-            data.Bravais_lattice_lattice_system=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_SYSTEM");
+          if(data.Bravais_lattice_lattice_system.empty()) { // Bravais_lattice_lattice_system 
+            data.Bravais_lattice_lattice_system=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_SYSTEM"); 
           }
-          if(data.Bravais_superlattice_lattice_type.empty()) { // Bravais_superlattice_lattice_type
-            data.Bravais_superlattice_lattice_type=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_TYPE");
+          if(data.Bravais_superlattice_lattice_type.empty()) { // Bravais_superlattice_lattice_type 
+            data.Bravais_superlattice_lattice_type=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_TYPE"); 
           }
-          if(data.Bravais_superlattice_lattice_variation_type.empty()) { // Bravais_superlattice_lattice_variation_type
-            data.Bravais_superlattice_lattice_variation_type=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_VARIATION_TYPE");
+          if(data.Bravais_superlattice_lattice_variation_type.empty()) { // Bravais_superlattice_lattice_variation_type 
+            data.Bravais_superlattice_lattice_variation_type=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_VARIATION_TYPE"); 
           }
-          if(data.Bravais_superlattice_lattice_system.empty()) { // Bravais_superlattice_lattice_system
-            data.Bravais_superlattice_lattice_system=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_SYSTEM");
+          if(data.Bravais_superlattice_lattice_system.empty()) { // Bravais_superlattice_lattice_system 
+            data.Bravais_superlattice_lattice_system=vpflow_edata_relax.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_SYSTEM"); 
           }
-          if(data.Pearson_symbol_superlattice.empty()) { // Pearson_symbol_superlattice
-            data.Pearson_symbol_superlattice=vpflow_edata_relax.getattachedscheme("EDATA::PEARSON_SYMBOL_SUPERLATTICE");
+          if(data.Pearson_symbol_superlattice.empty()) { // Pearson_symbol_superlattice 
+            data.Pearson_symbol_superlattice=vpflow_edata_relax.getattachedscheme("EDATA::PEARSON_SYMBOL_SUPERLATTICE"); 
           }
           if(data.reciprocal_geometry.empty()) { // reciprocal_geometry
-            data.reciprocal_geometry=vpflow_edata_relax.getattachedscheme("EDATA::RECIPROCAL_LATTICE_PARAMETERS");
-            vector<string> ktokens;
+            data.reciprocal_geometry=vpflow_edata_relax.getattachedscheme("EDATA::RECIPROCAL_LATTICE_PARAMETERS"); 
+            vector<string> ktokens; 
             aurostd::string2tokens(data.reciprocal_geometry,ktokens,",");
             for(uint t=0;t<ktokens.size();t++) { data.vreciprocal_geometry.push_back(aurostd::string2utype<double>(ktokens[t])); }
           }
           if(data.reciprocal_volume_cell==AUROSTD_NAN) { // reciprocal_volume_cell
-            data.reciprocal_volume_cell=vpflow_edata_relax.getattachedutype<double>("EDATA::RECIPROCAL_SPACE_VOLUME");
+            data.reciprocal_volume_cell=vpflow_edata_relax.getattachedutype<double>("EDATA::RECIPROCAL_SPACE_VOLUME"); 
           }
-          if(data.reciprocal_lattice_type.empty()) { // reciprocal_lattice_type
-            data.reciprocal_lattice_type=vpflow_edata_relax.getattachedscheme("EDATA::RECIPROCAL_LATTICE_TYPE");
+          if(data.reciprocal_lattice_type.empty()) { // reciprocal_lattice_type 
+            data.reciprocal_lattice_type=vpflow_edata_relax.getattachedscheme("EDATA::RECIPROCAL_LATTICE_TYPE"); 
           }
-          if(data.reciprocal_lattice_variation_type.empty()) { // reciprocal_lattice_variation_type
-            data.reciprocal_lattice_variation_type=vpflow_edata_relax.getattachedscheme("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE");
+          if(data.reciprocal_lattice_variation_type.empty()) { // reciprocal_lattice_variation_type 
+            data.reciprocal_lattice_variation_type=vpflow_edata_relax.getattachedscheme("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE"); 
           }
           //DX20190131 - use self-consistent space group relax - START
           if(data.spacegroup_relax==AUROSTD_NAN) {  //CO20201111
             data.spacegroup_relax=vpflow_edata_relax.getattachedutype<uint>("SGDATA::SPACE_GROUP_NUMBER");  //CO20201111
             if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPACEGROUP_RELAX = " << data.spacegroup_relax << endl;
-          }
+          } 
           //DX20190131 - use self-consistent space group orig - END
-          if(data.Wyckoff_letters.empty()) { // Wyckoff_letters
-            data.Wyckoff_letters=vpflow_edata_relax.getattachedscheme("SGDATA::WYCKOFF_LETTERS");
+          if(data.Wyckoff_letters.empty()) { // Wyckoff_letters 
+            data.Wyckoff_letters=vpflow_edata_relax.getattachedscheme("SGDATA::WYCKOFF_LETTERS"); 
           }
-          if(data.Wyckoff_multiplicities.empty()) { // Wyckoff_multiplicities
-            data.Wyckoff_multiplicities=vpflow_edata_relax.getattachedscheme("SGDATA::WYCKOFF_MULTIPLICITIES");
+          if(data.Wyckoff_multiplicities.empty()) { // Wyckoff_multiplicities 
+            data.Wyckoff_multiplicities=vpflow_edata_relax.getattachedscheme("SGDATA::WYCKOFF_MULTIPLICITIES"); 
           }
           if(data.Wyckoff_site_symmetries.empty()) { // Wyckoff_site_symmetries
-            data.Wyckoff_site_symmetries=vpflow_edata_relax.getattachedscheme("SGDATA::WYCKOFF_SITE_SYMMETRIES");
+            data.Wyckoff_site_symmetries=vpflow_edata_relax.getattachedscheme("SGDATA::WYCKOFF_SITE_SYMMETRIES"); 
           }
         }
         //DX20180823 - extract info from xoption - END
@@ -4686,7 +4686,7 @@ namespace aflowlib {
               aurostd::string2tokens(vline_edata.at(iline),tokens,"=");
               data.Pearson_symbol_relax=aurostd::RemoveWhiteSpaces(tokens.at(tokens.size()-1)); }
           }
-        }
+        } 
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Bravais Lattice Primitive = " << data.Bravais_lattice_relax << endl;
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Lattice Variation = " << data.lattice_variation_relax << endl;
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.RELAX] BRAVAIS LATTICE OF THE CRYSTAL (pgroup_xtal) - Real space: Lattice System = " << data.lattice_system_relax << endl;
@@ -4817,98 +4817,98 @@ namespace aflowlib {
         //DX20180823 - extract info from xoption - START
         if(vpflow_edata_bands.flag("EDATA::CALCULATED")) {
           if(data.Bravais_lattice_relax.empty()) { // Bravais_Lattice
-            data.Bravais_lattice_relax=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_LATTICE_TYPE");
+            data.Bravais_lattice_relax=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_LATTICE_TYPE"); 
           }
           if(data.lattice_variation_relax.empty()) { // Bravais_Lattice_Variation
-            data.lattice_variation_relax=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_LATTICE_VARIATION_TYPE");
+            data.lattice_variation_relax=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_LATTICE_VARIATION_TYPE"); 
           }
           if(data.lattice_system_relax.empty()) { // Lattice_System
-            data.lattice_system_relax=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_LATTICE_SYSTEM");
+            data.lattice_system_relax=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_LATTICE_SYSTEM"); 
           }
           if(data.Pearson_symbol_relax.empty()) { // Pearson
-            data.Pearson_symbol_relax=vpflow_edata_bands.getattachedscheme("EDATA::PEARSON_SYMBOL");
+            data.Pearson_symbol_relax=vpflow_edata_bands.getattachedscheme("EDATA::PEARSON_SYMBOL"); 
           }
           if(data.crystal_system.empty()) { // crystal_system
-            data.crystal_system=vpflow_edata_bands.getattachedscheme("EDATA::CRYSTAL_SYSTEM");
+            data.crystal_system=vpflow_edata_bands.getattachedscheme("EDATA::CRYSTAL_SYSTEM"); 
           }
           if(data.crystal_family.empty()) { // crystal_family
-            data.crystal_family=vpflow_edata_bands.getattachedscheme("EDATA::CRYSTAL_FAMILY");
+            data.crystal_family=vpflow_edata_bands.getattachedscheme("EDATA::CRYSTAL_FAMILY"); 
           }
           //DX20190115 - typo in Hermann-Mauguin and crystal class entries - START
           if(data.point_group_Hermann_Mauguin.empty()) { // point_group_Hermann_Mauguin
-            data.point_group_Hermann_Mauguin=vpflow_edata_bands.getattachedscheme("EDATA::POINT_GROUP_HERMANN_MAUGUIN");
+            data.point_group_Hermann_Mauguin=vpflow_edata_bands.getattachedscheme("EDATA::POINT_GROUP_HERMANN_MAUGUIN"); 
           }
           if(data.crystal_class.empty()) { // crystal_class
-            data.crystal_class=vpflow_edata_bands.getattachedscheme("EDATA::POINT_GROUP_CRYSTAL_CLASS");
+            data.crystal_class=vpflow_edata_bands.getattachedscheme("EDATA::POINT_GROUP_CRYSTAL_CLASS"); 
           }
           //DX20190115 - typo in Hermann-Mauguin and crystal class entries - END
           if(data.point_group_Schoenflies.empty()) { // point_group_Schoenflies
-            data.point_group_Schoenflies=vpflow_edata_bands.getattachedscheme("EDATA::POINT_GROUP_SCHOENFLIES");
+            data.point_group_Schoenflies=vpflow_edata_bands.getattachedscheme("EDATA::POINT_GROUP_SCHOENFLIES"); 
           }
           if(data.point_group_orbifold.empty()) { // point_group_orbifold
-            data.point_group_orbifold=vpflow_edata_bands.getattachedscheme("EDATA::POINT_GROUP_ORBIFOLD");
+            data.point_group_orbifold=vpflow_edata_bands.getattachedscheme("EDATA::POINT_GROUP_ORBIFOLD"); 
           }
-          if(data.point_group_type.empty()) { // point_group_type
-            data.point_group_type=vpflow_edata_bands.getattachedscheme("EDATA::POINT_GROUP_TYPE");
+          if(data.point_group_type.empty()) { // point_group_type 
+            data.point_group_type=vpflow_edata_bands.getattachedscheme("EDATA::POINT_GROUP_TYPE"); 
           }
-          if(data.point_group_order==AUROSTD_NAN) { // point_group_order
-            data.point_group_order=vpflow_edata_bands.getattachedutype<uint>("EDATA::POINT_GROUP_ORDER");
+          if(data.point_group_order==AUROSTD_NAN) { // point_group_order 
+            data.point_group_order=vpflow_edata_bands.getattachedutype<uint>("EDATA::POINT_GROUP_ORDER"); 
           }
-          if(data.point_group_structure.empty()) { // point_group_structure
-            data.point_group_structure=vpflow_edata_bands.getattachedscheme("EDATA::POINT_GROUP_STRUCTURE");
+          if(data.point_group_structure.empty()) { // point_group_structure 
+            data.point_group_structure=vpflow_edata_bands.getattachedscheme("EDATA::POINT_GROUP_STRUCTURE"); 
           }
-          if(data.Bravais_lattice_lattice_type.empty()) { // Bravais_lattice_lattice_type
-            data.Bravais_lattice_lattice_type=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_TYPE");
+          if(data.Bravais_lattice_lattice_type.empty()) { // Bravais_lattice_lattice_type 
+            data.Bravais_lattice_lattice_type=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_TYPE"); 
           }
           //DX20190115 - typo, missing "variation" - START
-          if(data.Bravais_lattice_lattice_variation_type.empty()) { // Bravais_lattice_lattice_variation_type
-            data.Bravais_lattice_lattice_variation_type=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE");
+          if(data.Bravais_lattice_lattice_variation_type.empty()) { // Bravais_lattice_lattice_variation_type 
+            data.Bravais_lattice_lattice_variation_type=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE"); 
           }
           //DX20190115 - typo, missing "variation" - END
-          if(data.Bravais_lattice_lattice_system.empty()) { // Bravais_lattice_lattice_system
-            data.Bravais_lattice_lattice_system=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_SYSTEM");
+          if(data.Bravais_lattice_lattice_system.empty()) { // Bravais_lattice_lattice_system 
+            data.Bravais_lattice_lattice_system=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_SYSTEM"); 
           }
-          if(data.Bravais_superlattice_lattice_type.empty()) { // Bravais_superlattice_lattice_type
-            data.Bravais_superlattice_lattice_type=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_TYPE");
+          if(data.Bravais_superlattice_lattice_type.empty()) { // Bravais_superlattice_lattice_type 
+            data.Bravais_superlattice_lattice_type=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_TYPE"); 
           }
-          if(data.Bravais_superlattice_lattice_variation_type.empty()) { // Bravais_superlattice_lattice_variation_type
-            data.Bravais_superlattice_lattice_variation_type=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_VARIATION_TYPE");
+          if(data.Bravais_superlattice_lattice_variation_type.empty()) { // Bravais_superlattice_lattice_variation_type 
+            data.Bravais_superlattice_lattice_variation_type=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_VARIATION_TYPE"); 
           }
-          if(data.Bravais_superlattice_lattice_system.empty()) { // Bravais_superlattice_lattice_system
-            data.Bravais_superlattice_lattice_system=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_SYSTEM");
+          if(data.Bravais_superlattice_lattice_system.empty()) { // Bravais_superlattice_lattice_system 
+            data.Bravais_superlattice_lattice_system=vpflow_edata_bands.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_SYSTEM"); 
           }
-          if(data.Pearson_symbol_superlattice.empty()) { // Pearson_symbol_superlattice
-            data.Pearson_symbol_superlattice=vpflow_edata_bands.getattachedscheme("EDATA::PEARSON_SYMBOL_SUPERLATTICE");
+          if(data.Pearson_symbol_superlattice.empty()) { // Pearson_symbol_superlattice 
+            data.Pearson_symbol_superlattice=vpflow_edata_bands.getattachedscheme("EDATA::PEARSON_SYMBOL_SUPERLATTICE"); 
           }
           if(data.reciprocal_geometry.empty()) { // reciprocal_geometry
-            data.reciprocal_geometry=vpflow_edata_bands.getattachedscheme("EDATA::RECIPROCAL_LATTICE_PARAMETERS");
+            data.reciprocal_geometry=vpflow_edata_bands.getattachedscheme("EDATA::RECIPROCAL_LATTICE_PARAMETERS"); 
             vector<string> ktokens;
             aurostd::string2tokens(data.reciprocal_geometry,ktokens,",");
             for(uint t=0;t<ktokens.size();t++) { data.vreciprocal_geometry.push_back(aurostd::string2utype<double>(ktokens[t])); }
           }
           if(data.reciprocal_volume_cell==AUROSTD_NAN) { // reciprocal_volume_cell
-            data.reciprocal_volume_cell=vpflow_edata_bands.getattachedutype<double>("EDATA::RECIPROCAL_SPACE_VOLUME");
+            data.reciprocal_volume_cell=vpflow_edata_bands.getattachedutype<double>("EDATA::RECIPROCAL_SPACE_VOLUME"); 
           }
-          if(data.reciprocal_lattice_type.empty()) { // reciprocal_lattice_type
-            data.reciprocal_lattice_type=vpflow_edata_bands.getattachedscheme("EDATA::RECIPROCAL_LATTICE_TYPE");
+          if(data.reciprocal_lattice_type.empty()) { // reciprocal_lattice_type 
+            data.reciprocal_lattice_type=vpflow_edata_bands.getattachedscheme("EDATA::RECIPROCAL_LATTICE_TYPE"); 
           }
-          if(data.reciprocal_lattice_variation_type.empty()) { // reciprocal_lattice_variation_type
-            data.reciprocal_lattice_variation_type=vpflow_edata_bands.getattachedscheme("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE");
+          if(data.reciprocal_lattice_variation_type.empty()) { // reciprocal_lattice_variation_type 
+            data.reciprocal_lattice_variation_type=vpflow_edata_bands.getattachedscheme("EDATA::RECIPROCAL_LATTICE_VARIATION_TYPE"); 
           }
           //DX20190131 - use self-consistent space group relax - START
           if(data.spacegroup_relax==AUROSTD_NAN) {  //CO20201111
             data.spacegroup_relax=vpflow_edata_bands.getattachedutype<uint>("SGDATA::SPACE_GROUP_NUMBER");  //CO20201111
             if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPACEGROUP_RELAX = " << data.spacegroup_relax << endl;
-          }
+          } 
           //DX20190131 - use self-consistent space group orig - END
-          if(data.Wyckoff_letters.empty()) { // Wyckoff_letters
-            data.Wyckoff_letters=vpflow_edata_bands.getattachedscheme("SGDATA::WYCKOFF_LETTERS");
+          if(data.Wyckoff_letters.empty()) { // Wyckoff_letters 
+            data.Wyckoff_letters=vpflow_edata_bands.getattachedscheme("SGDATA::WYCKOFF_LETTERS"); 
           }
-          if(data.Wyckoff_multiplicities.empty()) { // Wyckoff_multiplicities
-            data.Wyckoff_multiplicities=vpflow_edata_bands.getattachedscheme("SGDATA::WYCKOFF_MULTIPLICITIES");
+          if(data.Wyckoff_multiplicities.empty()) { // Wyckoff_multiplicities 
+            data.Wyckoff_multiplicities=vpflow_edata_bands.getattachedscheme("SGDATA::WYCKOFF_MULTIPLICITIES"); 
           }
           if(data.Wyckoff_site_symmetries.empty()) { // Wyckoff_site_symmetries
-            data.Wyckoff_site_symmetries=vpflow_edata_bands.getattachedscheme("SGDATA::WYCKOFF_SITE_SYMMETRIES");
+            data.Wyckoff_site_symmetries=vpflow_edata_bands.getattachedscheme("SGDATA::WYCKOFF_SITE_SYMMETRIES"); 
           }
         }
         //DX20180823 - extract info from xoption - END
@@ -4938,15 +4938,15 @@ namespace aflowlib {
         double anrl_symmetry_tolerance = str_sym.sym_eps;
         xstructure str_anrl = str;
         uint setting=SG_SETTING_ANRL;
-        anrl::structure2anrl(str_anrl, anrl_symmetry_tolerance, setting);
-        if(data.aflow_prototype_label_relax.empty()) { // anrl label
-          data.aflow_prototype_label_relax = str_anrl.prototype;
+        anrl::structure2anrl(str_anrl, anrl_symmetry_tolerance, setting); 
+        if(data.aflow_prototype_label_relax.empty()) { // anrl label 
+          data.aflow_prototype_label_relax = str_anrl.prototype; 
         }
         if(data.aflow_prototype_params_list_relax.empty()) { // anrl parameter list
-          data.aflow_prototype_params_list_relax = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,",");
+          data.aflow_prototype_params_list_relax = aurostd::joinWDelimiter(str_anrl.prototype_parameter_list,","); 
         }
         if(data.aflow_prototype_params_values_relax.empty()) { // anrl parameter values
-          data.aflow_prototype_params_values_relax = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),",");
+          data.aflow_prototype_params_values_relax = aurostd::joinWDelimiter(aurostd::vecDouble2vecString(str_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),","); 
         }
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] AFLOW Label = " << data.aflow_prototype_label_relax << endl;
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " [EDATA.BANDS] AFLOW parameter list = " << data.aflow_prototype_params_list_relax << endl;
@@ -5321,7 +5321,7 @@ namespace aflowlib {
 
     vector<double> vspecies_pp_ZVAL;
     for(uint i=0;i<data.vspecies_pp_ZVAL.size();i++) { vspecies_pp_ZVAL.push_back(data.vspecies_pp_ZVAL.at(i)); }//;aurostd::string2tokens(data.species_pp_ZVAL,vspecies_pp_ZVAL,",");
-    for(uint i=0;i<vspecies_pp_ZVAL.size();i++) { if(AFLOWLIB_VERBOSE) { cout << MESSAGE << " " << vspecies_pp_ZVAL.at(i) << endl; } }
+    for(uint i=0;i<vspecies_pp_ZVAL.size();i++) { if(AFLOWLIB_VERBOSE) { cout << MESSAGE << " " << vspecies_pp_ZVAL.at(i) << endl; } } 
 
     if(LDEBUG) cerr << soliloquy << " [4]" << endl;
 
@@ -5839,7 +5839,7 @@ namespace aflowlib {
         if(tokens.size()>=2) {
           if(tokens[0]=="gruneisen_qha") data.gruneisen_qha=aurostd::string2utype<double>(tokens[1]);
           if(tokens[0]=="gruneisen_qha_300K") data.gruneisen_qha_300K=aurostd::string2utype<double>(tokens[1]);
-          if(tokens[0]=="thermal_expansion_qha_300K")
+          if(tokens[0]=="thermal_expansion_qha_300K") 
             data.thermal_expansion_qha_300K=aurostd::string2utype<double>(tokens[1]);
           if(tokens[0]=="modulus_bulk_qha_300K")
             data.modulus_bulk_qha_300K=aurostd::string2utype<double>(tokens[1]);
@@ -5875,7 +5875,7 @@ namespace aflowlib {
 
       // convert T-dependent phonon dispersions to JSON file
       if (aurostd::EFileExist(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_PDIS_FILE+".T300K.out")
-          && aurostd::EFileExist(directory_RAW+"/"+DEFAULT_APL_PHPOSCAR_FILE)
+          && aurostd::EFileExist(directory_RAW+"/"+DEFAULT_APL_PHPOSCAR_FILE) 
           && aurostd::EFileExist(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_KPOINTS_FILE)){
         if (AFLOWLIB_VERBOSE) cout << MESSAGE << " converting T-dependent phonon dispersions to JSON format " << endl;
         stringstream json;
@@ -5930,8 +5930,8 @@ namespace aflowlib {
     //CMo_pvNb_svTa_pvV_svW_pv:PAW_PBE.AB_cF8_225_a_b.AB:POCC_P0-1xA_P1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF
     data.pocc_parameters=data.system_name;
     string::size_type loc;
-    loc=data.pocc_parameters.find(POCC_TITLE_TAG);
-    data.pocc_parameters=data.pocc_parameters.substr(loc+POCC_TITLE_TAG.size(),string::npos);
+    loc=data.pocc_parameters.find(TAG_TITLE_POCC);
+    data.pocc_parameters=data.pocc_parameters.substr(loc+TAG_TITLE_POCC.size(),string::npos);
     if(data.pocc_parameters.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No pocc_parameters found",_INPUT_ILLEGAL_);}
     data.pocc_parameters=pocc::addDefaultPOCCTOL2string(data.pocc_parameters);
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " pocc_parameters=" << data.pocc_parameters << endl;
@@ -6233,7 +6233,7 @@ namespace aflowlib {
     data.vdft_type.clear();data.vdft_type.push_back(xOUT.pp_type);  //CO, this is technically a vector (RESTAPI paper)
     data.dft_type=aurostd::joinWDelimiter(data.vdft_type,",");
     if(AFLOWLIB_VERBOSE && !data.dft_type.empty()) cout << MESSAGE << " dft_type=" << data.dft_type << endl;
-    data.ldau_TLUJ=xOUT.string_LDAU;
+    data.ldau_TLUJ=xOUT.string_LDAU;	  	  
     //[CO+ME20210713 - keep legacy behavior, only print when non-zero]if(data.ldau_TLUJ.empty()){data.ldau_TLUJ=aurostd::utype2string(0);} //CO20210713 - no +U
     if(AFLOWLIB_VERBOSE && !data.ldau_TLUJ.empty()) cout << MESSAGE << " ldau_TLUJ=" << data.ldau_TLUJ << endl;
     //ME20190124 BEGIN - Store LDAU information individually
@@ -6350,7 +6350,7 @@ namespace aflowlib {
       data.Bravais_lattice_lattice_type_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_TYPE"); // Bravais_lattice_lattice_type_orig
       data.Bravais_lattice_lattice_variation_type_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_VARIATION_TYPE"); // Bravais_lattice_lattice_variation_type_orig
       data.Bravais_lattice_lattice_system_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_LATTICE_LATTICE_SYSTEM"); // Bravais_lattice_lattice_system_orig
-      data.Bravais_superlattice_lattice_type_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_TYPE"); // Bravais_superlattice_lattice_type_orig
+      data.Bravais_superlattice_lattice_type_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_TYPE"); // Bravais_superlattice_lattice_type_orig 
       data.Bravais_superlattice_lattice_variation_type_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_VARIATION_TYPE"); // Bravais_superlattice_lattice_variation_type_orig
       data.Bravais_superlattice_lattice_system_orig=vpflow_edata.getattachedscheme("EDATA::BRAVAIS_SUPERLATTICE_SYSTEM"); // Bravais_superlattice_lattice_system_orig
       data.Pearson_symbol_superlattice_orig=vpflow_edata.getattachedscheme("EDATA::PEARSON_SYMBOL_SUPERLATTICE"); // Pearson_symbol_superlattice_orig
@@ -6367,7 +6367,7 @@ namespace aflowlib {
       //[CO20200731 - not applicable to POCC]if(data.spacegroup_orig.empty()) {
       //[CO20200731 - not applicable to POCC]  data.spacegroup_orig=vpflow_edata.getattachedscheme("SGDATA::SPACE_GROUP_NUMBER");
       //[CO20200731 - not applicable to POCC]  if(AFLOWLIB_VERBOSE) cout << MESSAGE << " SPACEGROUP_ORIG = " << data.spacegroup_orig << endl;
-      //[CO20200731 - not applicable to POCC]}
+      //[CO20200731 - not applicable to POCC]} 
       //DX20190131 - use self-consistent space group orig - END
       //[CO20200731 - not applicable to POCC]data.Wyckoff_letters_orig=vpflow_edata.getattachedscheme("SGDATA::WYCKOFF_LETTERS"); // Wyckoff_letters_orig
       //[CO20200731 - not applicable to POCC]data.Wyckoff_multiplicities_orig=vpflow_edata.getattachedscheme("SGDATA::WYCKOFF_MULTIPLICITIES"); // Wyckoff_multiplicities_orig
@@ -6594,7 +6594,7 @@ namespace aflowlib {
     aurostd::file2vectorstring(directory_RAW+"/"+_AFLOWLOCK_,vlock) ;
     _XHOST aus_XHOST;
     // ---------------------------------------------------------------
-    data.vaflowlib_date.clear(); //clear here,
+    data.vaflowlib_date.clear(); //clear here, 
     for(uint iline=0;iline<vlock.size();iline++){ //CO20200624 - adding lock date to vaflowlib_date  //grab both FIRST and LAST dates - data.vaflowlib_date.empty()
       if(aurostd::substring2bool(vlock[iline],"date=") && aurostd::substring2bool(vlock[iline],"[") && aurostd::substring2bool(vlock[iline],"]")) {
         loc=vlock[iline].find("date=");
@@ -6699,7 +6699,7 @@ namespace aflowlib {
         for(uint j=0;j<vremovej.size();j++) {
           if(aurostd::FileExist(vremovej.at(j))) {
             aurostd::RemoveFile(vremovej.at(j));
-            if(AFLOWLIB_VERBOSE)
+            if(AFLOWLIB_VERBOSE) 
               cout << MESSAGE << " removing file: " << aurostd::CleanFileName(vremovej.at(j)) << endl;
           }
         }
@@ -6762,7 +6762,7 @@ namespace aflowlib {
     } else {
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " FIXING " << directory_LIB << "/" << _AFLOWIN_ << endl;
       KBIN::VASP_Write_ppAUID_AFLOWIN(directory_LIB,data.vspecies_pp_AUID,data.vspecies);
-    }
+    } 
     // done   ---------------------------------------------------------------
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflowlib::LIB2RAW_Loop_PATCH - end " << directory_LIB << endl;
     return TRUE;
@@ -6871,7 +6871,7 @@ namespace aflowlib {
       if(LDEBUG) cerr << soliloquy << " [3]: not finding " << _AFLOWLOCK_ << " = " << dir << endl;
       return FALSE;
     }
-    if(!aurostd::EFileExist(dir+"/OUTCAR.relax1") &&
+    if(!aurostd::EFileExist(dir+"/OUTCAR.relax1") && 
         !aurostd::EFileExist(dir+"/OUTCAR.relax2") &&
         !aurostd::EFileExist(dir+"/OUTCAR.relax3") &&
         !aurostd::EFileExist(dir+"/OUTCAR.static") &&
@@ -6961,7 +6961,7 @@ namespace aflowlib {
                 if(answer!=0) { ok=FALSE;obb << ". Broken_file="+vbroken.at(ibroken)+".EXT"; }}
             }
           }
-        }
+        } 
       }
     }
     //CO20201220 START - look for stress tensor
@@ -7527,7 +7527,7 @@ namespace aflowlib {
 
     bool run_directory=false;
     bool agl_aflowin_found = false;
-    bool ael_aflowin_found = false;
+    bool ael_aflowin_found = false;        
     bool apl_aflowin_found = false; //ME20210927
     bool qha_aflowin_found = false; //AS20200901
     string AflowInName = _AFLOWIN_;
@@ -7630,7 +7630,7 @@ namespace aflowlib {
           // [OBSOLETE] }
 
           // AS20200904
-          // save for later since we will need to loop among all possible submodules,
+          // save for later since we will need to loop among all possible submodules, 
           // i.e. AGL, QHA,...
           vAflowInName.push_back(AflowInName); //AS20200904
           vFileLockName.push_back(FileLockName); //AS20200904
@@ -7686,7 +7686,7 @@ namespace aflowlib {
         //[CO20210204 - OBSOLETE, force it to be LOCK.qha]if(aurostd::FileExist(directory_LIB+"/LOCK.qha")) {FileLockName = "LOCK.qha";}
 
         // AS20200904
-        // save for later since we will need to loop among all possible submodules,
+        // save for later since we will need to loop among all possible submodules, 
         // i.e. AGL, QHA,...
         vAflowInName.push_back(AflowInName); //AS20200904
         vFileLockName.push_back(FileLockName); //AS20200904
@@ -7695,12 +7695,12 @@ namespace aflowlib {
     }
     //CT20200624 Calls functions to run AEL and AGL in postprocessing mode instead of executing an AFLOW run
     //CT20200624 This should help prevent VASP from running when performing postprocessing, since we go direct to AEL/AGL routines
-    //[CO20200624 - OBSOLETE]KBIN::VASP_RunPhonons_AGL_postprocess(directory_LIB, AflowInName, FileLockName); //CT20200624
+    //[CO20200624 - OBSOLETE]KBIN::VASP_RunPhonons_AGL_postprocess(directory_LIB, AflowInName, FileLockName); //CT20200624 
     //[CO20200624 - OBSOLETE]KBIN::VASP_RunPhonons_AEL_postprocess(directory_LIB, AflowInName, FileLockName); //CT20200624
     // [OBSOLETE] if (XHOST.QUIET) {      //CT20190903
     // [OBSOLETE]   aurostd::execute("aflow --use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK --force --run=0 --postprocess --quiet -D \""+directory_LIB+"\""); // do not mess up subdirectories
     // [OBSOLETE] } else {
-    // [OBSOLETE]   aurostd::execute("aflow --use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK --force --run=0 --postprocess -D \""+directory_LIB+"\"");
+    // [OBSOLETE]   aurostd::execute("aflow --use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK --force --run=0 --postprocess -D \""+directory_LIB+"\"");	
     // [OBSOLETE] }
 
     //KBIN::RUN_Directory() should be used instead of individual post-processing functions
@@ -7728,7 +7728,7 @@ namespace aflowlib {
       for (uint i=0; i<vAflowInName.size(); i++){
         //set env for RUN_Directory()
         //AS20200904 BEGIN
-        //_AFLOWIN_=AflowInName;
+        //_AFLOWIN_=AflowInName; 
         //_AFLOWLOCK_=FileLockName;
 
         _AFLOWIN_   = vAflowInName[i];
