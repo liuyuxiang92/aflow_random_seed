@@ -1,6 +1,8 @@
 3.2.13 - 2021/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz
         -- parallelized KBIN::CompressDirectory() (CO)
+        -- Fixed CIF parser for CIF files with oxidation states in species list (ME)
+        -- Added poscar2aflowin for non-POSCAR input files (ME)
 3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)
