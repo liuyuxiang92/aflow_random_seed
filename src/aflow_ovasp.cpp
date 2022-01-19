@@ -4866,13 +4866,14 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 void xDOSCAR::convertSpinOFF2ON() { //CO20191217
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy = XPID + "xDOSCAR::convertSpinOFF2ON():";
-  long double seconds=aurostd::get_seconds();
-  if(LDEBUG){cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;}
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
+  uint iatom=0,iorbital=0;
+  
   //check that it is truly SPIN-OFF
   if(viDOS.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"viDOS.size()!=1",_INPUT_ERROR_);}; //no conversion needed
-  for(uint iatom=0;iatom<vDOS.size();iatom++){
-    for(uint iorbital=0;iorbital<vDOS[iatom].size();iorbital++){
+  for(iatom=0;iatom<vDOS.size();iatom++){
+    for(iorbital=0;iorbital<vDOS[iatom].size();iorbital++){
       if(vDOS[iatom][iorbital].size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vDOS[iatom][iorbital].size()!=1",_INPUT_ERROR_);}; //no conversion needed
     }
   }
@@ -4885,8 +4886,8 @@ void xDOSCAR::convertSpinOFF2ON() { //CO20191217
 
   //copy everything over
   viDOS.push_back(viDOS.back());
-  for(uint iatom=0;iatom<vDOS.size();iatom++){
-    for(uint iorbital=0;iorbital<vDOS[iatom].size();iorbital++){
+  for(iatom=0;iatom<vDOS.size();iatom++){
+    for(iorbital=0;iorbital<vDOS[iatom].size();iorbital++){
       vDOS[iatom][iorbital].push_back(vDOS[iatom][iorbital].back());
     }
   }
@@ -4896,6 +4897,65 @@ void xDOSCAR::convertSpinOFF2ON() { //CO20191217
   Egap_fit.push_back(Egap_fit.back());
   Egap_type.push_back(Egap_type.back());
   spin=1;
+}
+
+void xDOSCAR::addAtomChannel(){  //CO20211124
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy = XPID + "xDOSCAR::addOrbitalChannel():";
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+  string ERROR_out="";
+  if(!checkDOS(ERROR_out)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,ERROR_out,_INDEX_BOUNDS_);} //no conversion needed
+
+  uint atoms_size=vDOS.size();if(atoms_size==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vDOS.size()==0",_INDEX_BOUNDS_);} //no conversion needed
+  uint orbital_size=vDOS.front().size();
+  uint spin_size=0;if(orbital_size>0){spin_size=vDOS.front().front().size();}
+  uint energy_size=0;if(orbital_size>0 && spin_size>0){energy_size=vDOS.front().front().front().size();}
+  vDOS.push_back(deque<deque<deque<double> > >(0));
+  uint iorbital=0,ispin=0;
+  if(orbital_size>0){vDOS.back().resize(orbital_size);}
+  if(spin_size>0){
+    for(iorbital=0;iorbital<orbital_size;iorbital++){
+      vDOS.back()[iorbital].resize(spin_size);
+      if(energy_size>0){
+        for(ispin=0;ispin<spin_size;ispin++){vDOS.back()[iorbital][ispin].resize(energy_size,0.0);}
+      }
+    }
+  }
+  number_atoms+=1;
+}
+
+void xDOSCAR::addOrbitalChannel(){  //CO20211124
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy = XPID + "xDOSCAR::addOrbitalChannel():";
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+  string ERROR_out="";
+  if(!checkDOS(ERROR_out)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,ERROR_out,_INDEX_BOUNDS_);} //no conversion needed
+
+  uint atoms_size=vDOS.size();if(atoms_size==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vDOS.size()==0",_INDEX_BOUNDS_);} //no conversion needed
+  uint orbital_size=vDOS.front().size();
+  uint spin_size=0;if(orbital_size>0){spin_size=vDOS.front().front().size();}
+  uint energy_size=0;if(orbital_size>0 && spin_size>0){energy_size=vDOS.front().front().front().size();}
+  uint iatom=0,ispin=0;
+  for(iatom=0;iatom<atoms_size;iatom++){
+    vDOS[iatom].push_back(deque<deque<double> >(0));
+    if(spin_size>0){vDOS[iatom].back().resize(spin_size);}
+    if(energy_size>0){
+      for(ispin=0;ispin<spin_size;ispin++){vDOS[iatom].back()[ispin].resize(energy_size,0.0);}
+    }
+  }
+}
+
+void xDOSCAR::resetVDOS(){  //CO20211124
+  uint iatom=0,iorbital=0,ispin=0;
+  for(iatom=0;iatom<vDOS.size();iatom++){
+    for(iorbital=0;iorbital<vDOS[iatom].size();iorbital++){
+      for(ispin=0;ispin<vDOS[iatom][iorbital].size();ispin++){
+        std::fill(vDOS[iatom][iorbital][ispin].begin(),vDOS[iatom][iorbital][ispin].end(),0.0);
+      }
+    }
+  }
 }
 
 bool xDOSCAR::checkDOS(string& ERROR_out) const { //CO20191110
@@ -5134,7 +5194,7 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
 deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(const xstructure& xstr) const {return GetVDOSSpecies(xstr.num_each_type);} //CO20191004
 deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(deque<int> num_each_type) const { //CO20191004
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XPID + "xDOSCAR::GetBandGap():";
+  string soliloquy = XPID + "xDOSCAR::GetVDOSSpecies():";
   stringstream message;
 
   if((content == "") || (vcontent.size() == 0)) {
@@ -5171,7 +5231,8 @@ deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(deque<int> num_eac
   }
 
   if(atoms_total+1!=IATOM){ //total column
-    message << "Input xstructure and DOS mismatch: atoms_total+1!=vDOS.size()";
+    message << "Input xstructure and DOS mismatch: atoms_total+1!=vDOS.size()" << endl;
+    message << "For POCC runs, check that all ARUN.POCC's have the same num_each_type" << endl;
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INDEX_MISMATCH_);
   }
 
