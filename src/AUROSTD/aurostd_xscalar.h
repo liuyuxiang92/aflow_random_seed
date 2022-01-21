@@ -68,6 +68,8 @@
 #define eVatom2kJmol            (E_ELECTRON*mol2atom/1.0e3)     // 1eV/atom=96.5kJ/mol    //CO20180329
 #define meVatom2kJmol           (eVatom2kJmol/1.0e3)            // 1meV/atom=0.0965kJ/mol //CO20180329
 #define hartree2eV              27.2113862459                   // 1hartree=27.211eV      //ME20200206
+#define kcal2eV                 4.336443203200000E-002          // 1(kcal/mol) = 4.33644E-2 eV
+#define eV2kcal                 (1.0/kcal2eV)
 
 //ME20200107 - (A)APL conversion factors
 #define THz2Hz                        1E12

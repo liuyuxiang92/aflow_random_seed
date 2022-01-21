@@ -723,6 +723,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("POSCAR2ENUM",(aurostd::args2flag(argv,cmds,"--poscar2multienum|--poscar2enum")));
   vpflow.flag("POSCAR2GULP",(aurostd::args2flag(argv,cmds,"--poscar2gulp")));
   vpflow.flag("POCC_INPUT",aurostd::args2flag(argv,cmds,"--pocc_input|--enum_input"));
+  vpflow.args2addattachedscheme(argv,cmds,"POCC::CONVOLUTION","--pocc_convolution=|--pocc_conv=|--poccconv=","");
 
   vpflow.args2addattachedscheme(argv,cmds,"JMOL","--jmol=","");
 
@@ -1975,6 +1976,7 @@ namespace pflow {
         pflow::POCC_INPUT();  //default to KY code, until new post-processing is complete
         _PROGRAMRUN=true;
       } //OLD - use [AFLOW_POCC]RUN for new code //CO20180409
+      if(vpflow.flag("POCC::CONVOLUTION")) {pocc::POCC_Convolution(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("POSCAR2WYCKOFF")) {pflow::POSCAR2WYCKOFF(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("PRIM")) {cout << pflow::PRIM(cin,0); _PROGRAMRUN=true;}
       if(vpflow.flag("PRIM1")) {cout << pflow::PRIM(cin,1); _PROGRAMRUN=true;}
@@ -7709,8 +7711,13 @@ namespace pflow {
 // ***************************************************************************
 namespace pflow {
   bool setPOCCTOL(xstructure& xstr,const string& pocc_tol_string){ //CO20181226
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::setPOCCTOL():";  //CO20200624
+    if(LDEBUG){
+      cerr << soliloquy << " BEGIN" << endl;
+      cerr << soliloquy << " pocc_tol_string=" << pocc_tol_string << endl;
+    }
     if(pocc_tol_string.empty()){return false;}
-    string soliloquy = XPID + "pflow::setPOCCTOL():";
     stringstream message;
     if(aurostd::substring2bool(pocc_tol_string,",")){
       message << "Cannot handle more than one pocc_tol specification";
@@ -11952,9 +11959,8 @@ namespace pflow {
 }
 
 // ***************************************************************************
-// pflow::convertXStr2POCC
+// pflow::checkAnionSublattice
 // ***************************************************************************
-// ./aflow --proto=T0009.ABC:Br:Cl:Cs_sv:I:Pb_d:Sm --pocc_params=S0-1xC_S1-0.5xE-0.5xF_S2-0.3333xA-0.3333xB-0.3333xD
 namespace pflow {
   bool checkAnionSublattice(const xstructure& xstr){  //CO20210201
     bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -12000,6 +12006,13 @@ namespace pflow {
     }
     return true;
   }
+} // namespace pflow
+
+namespace pflow {
+// ***************************************************************************
+// pflow::convertXStr2POCC
+// ***************************************************************************
+// ./aflow --proto=T0009.ABC:Br:Cl:Cs_sv:I:Pb_d:Sm --pocc_params=S0-1xC_S1-0.5xE-0.5xF_S2-0.3333xA-0.3333xB-0.3333xD
   bool convertXStr2POCC(xstructure& xstr,const string& pocc_params,const vector<string>& _vspecies,const vector<double>& vvolumes){ //CO20181226
     if(pocc_params.empty()){return false;}
     vector<string> vspecies;
@@ -12170,6 +12183,184 @@ namespace pflow {
         aurostd::StringSubst(xstr.title,tobereplaced,pp+"/"+proto);
       }
     }
+    return true;
+  }
+}
+
+// ***************************************************************************
+// pflow::POccInputs2Xstr
+// ***************************************************************************
+namespace pflow { //CO20211130
+  bool POccInputs2Xstr(const string& pocc_input,aurostd::xoption& pocc_settings,xstructure& xstr,ostream& oss){ofstream FileMESSAGE;return POccInputs2Xstr(pocc_input,pocc_settings,xstr,FileMESSAGE,oss);} //CO20211130
+  bool POccInputs2Xstr(const string& pocc_input,aurostd::xoption& pocc_settings,xstructure& xstr,ofstream& FileMESSAGE,ostream& oss){  //CO20211130
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"pflow::POccInputs2Xstr():";
+    stringstream message;
+    //example: Cs_svEuIPb_d:PAW_PBE.AB3C_cP5_221_a_c_b:POCC_S0-1xA_S1-1xC_S2-0.5xB-0.5xD
+    //ARUN example: Cs_afEuIPb_d:PAW_PBE.AB3C_cP5_221_a_c_b:POCC_S0-1xA_S1-1xC_S2-0.5xB-0.5xD:ARUN.POCC_1_H0C0
+    //convert to: --proto=AB3C_cP5_221_a_c_b:Cs_sv:Eu:I:Pb_d --pocc_params=S0-1xA_S1-1xC_S2-0.5xB-0.5xD
+    //arun stuff separate
+
+    if(!aurostd::substring2bool(pocc_input,TAG_TITLE_POCC)){  //use generic
+      message << "No TAG_TITLE_POCC found [" << TAG_TITLE_POCC << "], using generic SYSTEM name as title";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_); //CO20200404
+      return false;
+    }
+    //Get all the pieces of the default title
+    string::size_type loc1 = pocc_input.find(TAG_TITLE_POCC);
+    string elements_prototype_str = pocc_input.substr(0, loc1);  //contains elements and prototype
+    string pocc_params_tol_arun_str = pocc_input.substr(loc1 + TAG_TITLE_POCC.length(), string::npos);  //pocc_params and ARUN(?)
+    if(LDEBUG){
+      cerr << soliloquy << " elements_prototype_str=" << elements_prototype_str << endl;
+      cerr << soliloquy << " pocc_params_tol_arun_str=" << pocc_params_tol_arun_str << endl;
+    }
+    //parse elements_prototype_str by "."
+    //PROBLEM: "." can exist in pp_string (not really important for standard PP, but it exists), as well
+    //as proto: .ABC...
+    //we will go in loop over "." parses until we get a structure!
+    loc1=elements_prototype_str.find('.');
+    string pps="";
+    string proto="";
+    vector<string> velements;
+    string tmp_str="",tmp_str2="";
+    string pocc_params="";
+    string pocc_tol="";
+    string pocc_arun="";
+    string module_arun="";
+    string::size_type loc2=0;
+    while(loc1!=string::npos && (loc1+1)<elements_prototype_str.length()){
+      pps=elements_prototype_str.substr(0,loc1);
+      proto=elements_prototype_str.substr(loc1+1,string::npos);
+      if(LDEBUG){
+        cerr << soliloquy << " pps=" << pps << endl;
+        cerr << soliloquy << " proto=" << proto << endl;
+      }
+
+      velements=aurostd::getElements(pps,pp_string,true,false,true);  //clean, no sort_elements, pseudopotential string, keep_pp
+      if(LDEBUG) {cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(velements,",") << endl;}
+
+      tmp_str=pocc_params_tol_arun_str;
+      pocc_params=tmp_str;
+      loc2=tmp_str.find(TAG_TITLE_POCC_TOL);
+      if(loc2!=string::npos && (loc2+1)<tmp_str.length()){
+        pocc_params=tmp_str.substr(0,loc2);
+        tmp_str=tmp_str.substr(loc2+1,string::npos);
+        pocc_tol=tmp_str;
+      }
+      if(LDEBUG){
+        cerr << soliloquy << " [1]" << endl;
+        cerr << soliloquy << " proto=" << proto << endl;
+        cerr << soliloquy << " pocc_params=" << pocc_params << endl;
+        cerr << soliloquy << " pocc_tol=" << pocc_tol << endl;
+        cerr << soliloquy << " pocc_arun=" << pocc_arun << endl;
+        cerr << soliloquy << " module_arun=" << module_arun << endl;
+        cerr << soliloquy << " tmp_str=" << tmp_str << endl;
+      }
+      loc2=tmp_str.find(TAG_TITLE_POCC_ARUN);
+      if(loc2!=string::npos && (loc2+1)<tmp_str.length()){
+        tmp_str2=tmp_str.substr(0,loc2);
+        if(tmp_str2.find(TAG_TITLE_POCC_TOL)!=string::npos){pocc_tol=tmp_str2;}
+        else{pocc_params=tmp_str2;}
+        tmp_str=tmp_str.substr(loc2+1,string::npos);
+        pocc_arun=tmp_str;
+      }
+      if(LDEBUG){
+        cerr << soliloquy << " [2]" << endl;
+        cerr << soliloquy << " proto=" << proto << endl;
+        cerr << soliloquy << " pocc_params=" << pocc_params << endl;
+        cerr << soliloquy << " pocc_tol=" << pocc_tol << endl;
+        cerr << soliloquy << " pocc_arun=" << pocc_arun << endl;
+        cerr << soliloquy << " module_arun=" << module_arun << endl;
+        cerr << soliloquy << " tmp_str=" << tmp_str << endl;
+      }
+      //CO20210315 - might find pocc_params='P0-1xA_P1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF:ARUN.AGL_9_SF_0.95' which is a bad system name, missing ARUN.POCC
+      loc2=tmp_str.find(TAG_TITLE_ARUN);
+      if(loc2!=string::npos && (loc2+1)<tmp_str.length()){
+        tmp_str2=tmp_str.substr(0,loc2);
+        if(tmp_str2.find(TAG_TITLE_POCC_ARUN)!=string::npos){pocc_arun=tmp_str2;}
+        else if(tmp_str2.find(TAG_TITLE_POCC_TOL)!=string::npos){pocc_tol=tmp_str2;}
+        else{pocc_params=tmp_str2;}
+        tmp_str=tmp_str.substr(loc2+1,string::npos);
+        module_arun=tmp_str;
+      }
+      if(LDEBUG){
+        cerr << soliloquy << " [3]" << endl;
+        cerr << soliloquy << " proto=" << proto << endl;
+        cerr << soliloquy << " pocc_params=" << pocc_params << endl;
+        cerr << soliloquy << " pocc_tol=" << pocc_tol << endl;
+        cerr << soliloquy << " pocc_arun=" << pocc_arun << endl;
+        cerr << soliloquy << " module_arun=" << module_arun << endl;
+        cerr << soliloquy << " tmp_str=" << tmp_str << endl;
+      }
+      loc2=tmp_str.find(":");
+      if(loc2!=string::npos && (loc2+1)<tmp_str.length()){
+        tmp_str2=tmp_str.substr(0,loc2);
+        if(tmp_str2.find(TAG_TITLE_POCC_ARUN)!=string::npos){pocc_arun=tmp_str2;} //more specific, look for first
+        else if(tmp_str2.find(TAG_TITLE_ARUN)!=string::npos){module_arun=tmp_str2;}
+        else if(tmp_str2.find(TAG_TITLE_POCC_TOL)!=string::npos){pocc_tol=tmp_str2;}
+        else{pocc_params=tmp_str.substr(0,loc2);}
+        tmp_str=pocc_arun.substr(loc2+1,string::npos);
+        //what's next??
+      }
+      if(LDEBUG){
+        cerr << soliloquy << " [4]" << endl;
+        cerr << soliloquy << " proto=" << proto << endl;
+        cerr << soliloquy << " pocc_params=" << pocc_params << endl;
+        cerr << soliloquy << " pocc_tol=" << pocc_tol << endl;
+        cerr << soliloquy << " pocc_arun=" << pocc_arun << endl;
+        cerr << soliloquy << " module_arun=" << module_arun << endl;
+        cerr << soliloquy << " tmp_str=" << tmp_str << endl;
+      }
+
+      aurostd::xoption proto_flags;
+      proto_flags.push_attached("PROTO",proto + ":" + aurostd::joinWDelimiter(velements,":"));
+      proto_flags.push_attached("POCC_PARAMS",pocc_params);
+      if(!pocc_tol.empty()){
+        tmp_str=pocc_tol;
+        if(tmp_str.find(TAG_TOL)!=string::npos){
+          aurostd::StringSubst(tmp_str,TAG_TITLE_POCC_TOL,"");  //remove 'TOL_'
+          aurostd::StringSubst(tmp_str,TAG_TOL+SEP_TAG2,"");  //remove 'TOL_'
+          aurostd::StringSubst(tmp_str,TAG_TOL,"");  //remove 'TOL_'
+          aurostd::StringSubst(tmp_str,SEP_TAG2,"");  //remove 'TOL_'
+        }
+        proto_flags.push_attached("POCC_TOL",tmp_str);
+      }
+      if(LDEBUG){
+        cerr << soliloquy << " proto_flags.getattachedscheme(\"PROTO\")=" << proto_flags.getattachedscheme("PROTO") << endl;
+        cerr << soliloquy << " proto_flags.getattachedscheme(\"POCC_PARAMS\")=" << proto_flags.getattachedscheme("POCC_PARAMS") << endl;
+        cerr << soliloquy << " proto_flags.getattachedscheme(\"POCC_TOL\")=" << proto_flags.getattachedscheme("POCC_TOL") << endl;
+      }
+
+      try{
+        xstr=pflow::PROTO_LIBRARIES(proto_flags);
+        break;
+      }
+      catch(aurostd::xerror& excpt){
+        xstr.clear(); //DX20191220 - uppercase to lowercase clear
+        loc1=elements_prototype_str.find('.',loc1+1);
+        continue;
+      }
+    }
+
+    if(xstr.atoms.size()==0){  //use generic
+      message << "Cannot extract identifiable prototype from SYSTEM [" << pocc_input << "], using generic SYSTEM name as title";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);  //CO20200404
+      return false;
+    }
+
+    if(LDEBUG) {cerr << soliloquy << " xstr_found: " << endl;cerr << xstr << endl;}
+
+    if(xstr.species.size()!=xstr.comp_each_type.size()){ //use generic
+      message << "Cannot extract composition from prototype [" << proto << "], using generic SYSTEM name as title";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);  //CO20200404
+      return false;
+    }
+
+    pocc_settings.clear();
+    pocc_settings.push_attached("PPS",pps);
+    pocc_settings.push_attached("PROTO",proto);
+    pocc_settings.push_attached("POCC_PARAMS",pocc_params);
+    pocc_settings.push_attached("POCC_TOL",pocc_tol);
+    pocc_settings.push_attached("POCC_ARUN",pocc_arun);
+    pocc_settings.push_attached("MODULE_ARUN",module_arun);
+
     return true;
   }
 }
