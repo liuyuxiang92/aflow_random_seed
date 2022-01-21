@@ -6578,6 +6578,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       atom.name=atom.cleanname=tokens[3];
       atom.fpos=aurostd::remainder(aurostd::inverse(lattice)*avec,1.0);
       atom.cpos=a.f2c*atom.fpos;
+      atom.name_is_given=TRUE;
       a.AddAtom(atom);
       if(LDEBUG) {
         cerr << soliloquy << " ATAT atom[" << atom.name <<"] found:" << endl;
