@@ -54,7 +54,6 @@
 #include <list> //CO20170806 - need for POCC
 #include <utility> //HE2021069 - for pairs in chull (C++98 changes, already included in SYMBOLICCPLUSPLUS)
 #include <netdb.h>  //CO20180321 - frisco needs for AFLUX
-#include <iostream>
 #include <arpa/inet.h> //HE20220121 - for xhttp
 
 
