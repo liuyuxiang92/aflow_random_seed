@@ -672,7 +672,7 @@ void check_equal(const string &calculated, const string &expected, const string 
     const string check_description, const uint check_num, uint &passed_checks, vector<string> &results){
   bool passed = false;
   if (calculated == expected) passed = true;
-  check(passed, calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  check(passed, calculated.substr(0,250), expected, check_function, check_description, check_num, passed_checks, results); //HE20220124 Prevent a screen overflow if the received answer is too long
 }
 void check_equal(const bool &calculated, const bool &expected, const string &check_function,
     const string check_description, const uint check_num, uint &passed_checks, vector<string> &results){
@@ -962,6 +962,97 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 
   check_num++;
   check_equal(result_ss.str(), answer, check_function, check_description, check_num, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check http get function
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::httpGet()";
+
+  vector<std::string> urls;
+  urls.push_back("http://aflowlib.duke.edu/test/?echo=Compicated1773");
+  urls.push_back("http://aflowlib.duke.edu/test/?re=301");
+  urls.push_back("http://aflowlib.duke.edu/test/?re=302");
+  urls.push_back("http://aflowlib.duke.edu/test/?re=307");
+  urls.push_back("http://aflowlib.duke.edu/test/?re=308");
+
+  vector<std::string> http_results;
+  http_results.push_back("Compicated1773");
+  http_results.push_back("Redirected");
+  http_results.push_back("Redirected");
+  http_results.push_back("Redirected");
+  http_results.push_back("Redirected");
+
+  vector<std::string> http_description;
+  http_description.push_back("Echo test");
+  http_description.push_back("301 forward test");
+  http_description.push_back("302 forward test");
+  http_description.push_back("307 forward test");
+  http_description.push_back("308 forward test");
+
+  std::string response;
+  for (uint i_task=0; i_task<urls.size(); i_task++){
+    response.clear();
+    response = aurostd::httpGet(urls[i_task]);
+    check_num++;
+    check_equal(response, http_results[i_task], check_function, http_description[i_task], check_num, passed_checks, results);
+  }
+
+  // Test different call pattern
+  response.clear();
+  std::string http_single_description;
+  int status_code=-1;
+  std::map<std::string, std::string> http_header;
+
+  std::string http_host = "aflowlib.duke.edu";
+  std::string http_path = "/test/?echo=";
+  std::string url = "http://" + http_host + http_path;
+
+  http_single_description = "output=httpGet(url,status_code)";
+  response = aurostd::httpGet(url+http_single_description, status_code);
+  check_num++;
+  check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
+
+  http_single_description = "output=httpGet(url,status_code,header)";
+  response = aurostd::httpGet(url+http_single_description, status_code, http_header);
+  check_num++;
+  check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
+
+  http_single_description = "output=httpGet(host,path)";
+  response = aurostd::httpGet(http_host, http_path+http_single_description);
+  check_num++;
+  check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
+
+  http_single_description = "output=httpGet(host,path,status_code)";
+  response = aurostd::httpGet(http_host, http_path+http_single_description, status_code);
+  check_num++;
+  check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
+
+  http_single_description = "output=httpGet(host,path,status_code,header)";
+  response = aurostd::httpGet(http_host, http_path+http_single_description, status_code, http_header);
+  check_num++;
+  check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
+
+  http_single_description = "status_code=httpGet(url,output)";
+  status_code = aurostd::httpGet(url+http_single_description, response);
+  check_num++;
+  check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
+
+  http_single_description = "status_code=httpGet(url,output,header)";
+  status_code = aurostd::httpGet(url+http_single_description, response, http_header);
+  check_num++;
+  check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
+
+  http_single_description = "status_code=httpGet(host,path,output)";
+  status_code = aurostd::httpGet(http_host, http_path+http_single_description, response);
+  check_num++;
+  check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
+
+  http_single_description = "status_code=httpGet(host,path,output,header)";
+  status_code = aurostd::httpGet(http_host, http_path+http_single_description, response, http_header);
+  check_num++;
+  check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
+
 
   // present overall result
   return display_result(passed_checks, check_num, task_description, results, function_name, FileMESSAGE, oss);
