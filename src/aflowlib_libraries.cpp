@@ -5930,8 +5930,8 @@ namespace aflowlib {
     //CMo_pvNb_svTa_pvV_svW_pv:PAW_PBE.AB_cF8_225_a_b.AB:POCC_P0-1xA_P1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF
     data.pocc_parameters=data.system_name;
     string::size_type loc;
-    loc=data.pocc_parameters.find(POCC_TITLE_TAG);
-    data.pocc_parameters=data.pocc_parameters.substr(loc+POCC_TITLE_TAG.size(),string::npos);
+    loc=data.pocc_parameters.find(TAG_TITLE_POCC);
+    data.pocc_parameters=data.pocc_parameters.substr(loc+TAG_TITLE_POCC.size(),string::npos);
     if(data.pocc_parameters.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No pocc_parameters found",_INPUT_ILLEGAL_);}
     data.pocc_parameters=pocc::addDefaultPOCCTOL2string(data.pocc_parameters);
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " pocc_parameters=" << data.pocc_parameters << endl;
