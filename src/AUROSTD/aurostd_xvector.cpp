@@ -1122,28 +1122,10 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                 // function mod_floored
-    // Floored mod function
-    // std::fmod is the truncated mod function
-    // std::remainder is the rounded mod function
-    // See: https://en.wikipedia.org/wiki/Modulo_operation/
     xvector<utype> mod_floored(const xvector<utype> &a,utype d) {  // SD20220117
       xvector<utype> c(a.urows,a.lrows);
-      if(d==0 || d==INFINITY){
-        return a;
-      }
-      else if(d!=d){
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::mod_floored():","NAN value in divisor",_VALUE_ERROR_);
-      }
       for(int i=a.lrows;i<=a.urows;i++)
-        if (d==-INFINITY){
-          c[i]=-INFINITY;
-        }
-        else if(a[i]!=a[i]){
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::mod_floored():","NAN value in dividend (component="+aurostd::utype2string(i)+")",_VALUE_ERROR_);
-        }
-        else{
-          c[i]=a[i]-d*std::floor(a[i]/d);
-        }
+          c[i]=mod_floored(a[i],d);
       return c;
     }    
 }

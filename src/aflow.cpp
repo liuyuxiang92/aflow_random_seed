@@ -963,6 +963,23 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   check_num++;
   check_equal(result_ss.str(), answer, check_function, check_description, check_num, passed_checks, results);
 
+  // ---------------------------------------------------------------------------
+  // Check | mod_floored //SD20220124
+  // ---------------------------------------------------------------------------
+  check_num++;
+  check_function = "aurostd::mod_floored()";
+  check_description = "a mod b, quotient calculated using floor";
+  
+  xvector<double> divid(5,1), divis(5,1);
+  divid(1) = 0.1324; divid(2) = -0.4025; divid(3) = -0.2215; divid(4) = 0.0469; divid(5) = 0.4575;
+  divis(1) = 0.4649; divis(2) = -0.3424; divis(3) = 0.4706; divis(4) = 0.4572; divis(5) = -0.0146;
+  expected = 0.3586;
+  calculated = 0.0;
+  for(uint i=1;i<6;i++){ // sum so we only have to do one test
+    calculated += aurostd::mod_floored(divid(i),divis(i));
+  }
+  check_equal(calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  
   // present overall result
   return display_result(passed_checks, check_num, task_description, results, function_name, FileMESSAGE, oss);
 }
