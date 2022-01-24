@@ -1702,6 +1702,7 @@ class xstructure {
     void xstructure2cif(void);                                    // some wrap up IOs to convert format to CIF //DX20190123
     void xstructure2abccar(void);                                 // some wrap up IOs to convert format to ABCCAR //DX20190123
     void xstructure2elk(void);                                    // some wrap up IOs to convert format to ELK //DX20200313
+    void xstructure2atat(void);                                   // some wrap up IOs to convert format to ATAT //SD20220123
     //[CO20180420 - moved outside of xstructure]bool sortAtomsTypes(const _atom& a1,const _atom& a2);		// sort atoms by types
     //[CO20180420 - moved outside of xstructure]bool sortAtomsNames(const _atom& a1,const _atom& a2);		// sort atoms by names
     // OPERATORS                                                  // --------------------------------------
@@ -2635,6 +2636,7 @@ xstructure input2ABINITxstr(istream& input);
 xstructure input2QExstr(istream& input);
 xstructure input2VASPxstr(istream& input,bool vasp5=false);
 xstructure input2ELKxstr(istream& input); //DX20200313
+xstructure input2ATATxstr(istream& input); //SD20220123
 
 // ----------------------------------------------------------------------------
 // centroid functions for structures //DX20200728
