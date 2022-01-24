@@ -85,7 +85,6 @@ using aurostd::utype2string;
 using aurostd::GaussJordan;
 using aurostd::gaussj;
 using aurostd::xoption;
-using aurostd::remainder;
 using aurostd::floor;
 using aurostd::ceil;
 using aurostd::getElements; //CO20200624
