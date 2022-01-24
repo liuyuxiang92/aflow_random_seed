@@ -6267,7 +6267,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
       else {
         message << "Number of symmetry operations do not match between input operations and space group number (aflow="   //CO20190629
           << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl;  //CO20190629
-        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
+        if (LDEBUG) {
+          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629  //ME20210124 - Moved to LDEBUG outputting the CIF file makes error unreadable
+        }
         throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
       }
     }
@@ -6277,7 +6279,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
       message << " Building structure using symmetry operations in CIF file with space group P1.";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, std::cerr, _LOGGER_WARNING_);
       a.spacegroupnumber = 1;
-      //for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629 // ME20220124 - outputting the entire CIF makes the error unreadable
+      if (LDEBUG) {
+        for(uint i=0;i<vinput.size();i++) std::cerr << vinput[i] << endl;  //CO20190629 // ME20220124 - moved to LDEBUG because outputting the entire CIF makes the error message unreadable
+      }
       //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }
     // get lattice
