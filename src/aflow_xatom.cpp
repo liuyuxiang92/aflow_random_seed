@@ -6377,7 +6377,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
               else { atom_tmp.partial_occupation_flag = TRUE; a.partial_occupation_flag = TRUE; }
             }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_symmetry_multiplicity")){ wyckoff_tmp.multiplicity=aurostd::string2utype<double>(tokens[t]); }
-            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_Wyckoff_label")){ wyckoff_tmp.letter=tokens[t]; }
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_Wyckoff_label") || aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_Wyckoff_symbol")){ wyckoff_tmp.letter=tokens[t]; }  //ME20220125 - Added _atoms_site_Wyckoff_symbol check
           }
           wyckoff_tmp.type = atom_tmp.name; //DX20191029
           wyckoff_tmp.coord = atom_tmp.fpos; //DX20191029

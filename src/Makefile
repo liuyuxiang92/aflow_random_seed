@@ -1207,6 +1207,7 @@ check_full:
 	$(MAKE) check_prototype_uniqueness
 	$(MAKE) check_atomic_environment
 	$(MAKE) check_aurostd
+	$(MAKE) check_cif_parser
 .PHONY: check_proto
 check_proto:
 	@echo "Performing 'aflow --proto' test"
@@ -1645,6 +1646,10 @@ check_atomic_environment:
 check_aurostd:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	./aflow --aurostd_test
+.PHONY: check_cif_parser
+check_cif_parser:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --cif_parser_test
 
 ifeq ($(UNAME),Linux)
 	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' | wc -l | sed 's/^ *//') && \

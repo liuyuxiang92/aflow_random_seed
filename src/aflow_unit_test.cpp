@@ -6,6 +6,7 @@
 
 #include "aflow.h"
 #include "aflow_anrl.h"  //DX20201104
+#include "aflow_compare_structure.h"  //ME20220125
 
 
 // Collection of generic check functions, to streamline testing.
@@ -466,7 +467,7 @@ bool AtomicEnvironmentTest(ofstream& FileMESSAGE, ostream& oss){ //HE20210511
 
 bool SchemaTest(ostream& oss){ofstream FileMESSAGE;return SchemaTest(FileMESSAGE,oss);}
 bool SchemaTest(ofstream& FileMESSAGE,ostream& oss) {
-  string function = XPID+"SchemaTest()";
+  string function = XPID+"SchemaTest():";
   _aflags aflags; aflags.Directory = ".";
   stringstream message;
   bool all_passed = true, check_passed = true;
@@ -1038,6 +1039,290 @@ bool FoldAtomsInCellTest(ofstream& FileMESSAGE,ostream& oss){ //DX20210129
     pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
     return false;
   }
+
+  return true;
+}
+
+//ME20220125
+bool cifParserTest(ostream& oss){ofstream FileMESSAGE;return cifParserTest(FileMESSAGE,oss);}
+bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
+  string function = XPID + "cifParserTest():";
+  _aflags aflags; aflags.Directory = ".";
+  stringstream message;
+  bool all_passed = true, check_passed = true;
+  stringstream xstrss;
+  xstructure xstr_cif, xstr_poscar;
+  string str_cif = "", str_poscar = "";
+
+  bool same_species = true;
+  bool scale_volume = false;
+  bool optimize_match = false;
+  double misfit = 0.0;
+  bool match = false;
+
+  message << "Parsing CIF file and with recognized setting.";
+  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+  // CrO3 was a problematic structure in the past
+  str_cif =
+    "data_Cr4O12\n"
+    "_pd_phase_name Cr4O12\n"
+    "_cell_length_a 5.743\n"
+    "_cell_length_b 8.557\n"
+    "_cell_length_c 4.789\n"
+    "_cell_angle_alpha 90.\n"
+    "_cell_angle_beta 90.\n"
+    "_cell_angle_gamma 90.\n"
+    "_cell_volume 235.35\n"
+    "_cell_formula_units_Z 4\n"
+    "_space_group_name_H-M_alt 'A m a 2'\n"
+    "_space_group_IT_number 40\n"
+    "loop_\n"
+    "_space_group_symop_id\n"
+    "_space_group_symop_operation_xyz\n"
+    "1 'x+1/2,-y,z'\n"
+    "2 '-x+1/2,y,z'\n"
+    "3 '-x,-y,z'\n"
+    "4 'x,y,z'\n"
+    "5 'x+1/2,-y+1/2,z+1/2'\n"
+    "6 '-x+1/2,y+1/2,z+1/2'\n"
+    "7 '-x,-y+1/2,z+1/2'\n"
+    "8 'x,y+1/2,z+1/2'\n"
+    "loop_\n"
+    "_atom_type_symbol\n"
+    "_atom_type_oxidation_number\n"
+    "Cr6+ 6\n"
+    "O2- -2\n"
+    "loop_\n"
+    "_atom_site_label\n"
+    "_atom_site_type_symbol\n"
+    "_atom_site_symmetry_multiplicity\n"
+    "_atom_site_Wyckoff_symbol\n"
+    "_atom_site_fract_x\n"
+    "_atom_site_fract_y\n"
+    "_atom_site_fract_z\n"
+    "_atom_site_B_iso_or_equiv\n"
+    "_atom_site_occupancy\n"
+    "Cr1 Cr6+ 4 b 0.25 0.09676 0.5 . 1.\n"
+    "O1 O2- 4 a 0. 0. 0.3841 . 1.\n"
+    "O2 O2- 4 b 0.25 0.2677 0.3755 . 1.\n"
+    "O3 O2- 4 b 0.25 0.6078 0.3284 . 1.\n";
+
+  str_poscar =
+    "Cr4O12\n"
+    "1.000000\n"
+    "   5.74300000000000   0.00000000000000   0.00000000000000\n"
+    "   0.00000000000000   8.55700000000000   0.00000000000000\n"
+    "   0.00000000000000   0.00000000000000   4.78900000000000\n"
+    "4 12\n"
+    "Direct(16) [A4B12]\n"
+    "   0.25000000000000   0.09676000000000   0.50000000000000  Cr\n"
+    "   0.75000000000000   0.90324000000000   0.50000000000000  Cr\n"
+    "   0.25000000000000   0.59676000000000   0.00000000000000  Cr\n"
+    "   0.75000000000000   0.40324000000000   0.00000000000000  Cr\n"
+    "   0.00000000000000   0.00000000000000   0.38410000000000  O \n"
+    "   0.50000000000000   0.00000000000000   0.38410000000000  O \n"
+    "   0.00000000000000   0.50000000000000   0.88410000000000  O \n"
+    "   0.50000000000000   0.50000000000000   0.88410000000000  O \n"
+    "   0.25000000000000   0.26770000000000   0.37550000000000  O \n"
+    "   0.75000000000000   0.73230000000000   0.37550000000000  O \n"
+    "   0.25000000000000   0.76770000000000   0.87550000000000  O \n"
+    "   0.75000000000000   0.23230000000000   0.87550000000000  O \n"
+    "   0.25000000000000   0.60780000000000   0.32840000000000  O \n"
+    "   0.75000000000000   0.39220000000000   0.32840000000000  O \n"
+    "   0.25000000000000   0.10780000000000   0.82840000000000  O \n"
+    "   0.75000000000000   0.89220000000000   0.82840000000000  O \n";
+
+  aurostd::StringstreamClean(xstrss);
+  xstrss << str_cif;
+  xstr_cif = xstructure(xstrss);
+
+  aurostd::StringstreamClean(xstrss);
+  xstrss << str_poscar;
+  xstr_poscar = xstructure(xstrss);
+  match = compare::aflowCompareStructure(xstr_cif, xstr_poscar, same_species, scale_volume, optimize_match, misfit);
+  check_passed = (match && (misfit < _ZERO_TOL_));
+  all_passed = (all_passed && check_passed);
+  message << "Parsing CIF file with recognized settings " << (check_passed?"passed":"failed") << ".";
+  message << " Calculated misfit: " << misfit << ".";
+  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, (check_passed?_LOGGER_COMPLETE_:_LOGGER_ERROR_));
+
+  message << "Checking parsed Wyckoff positions.";
+  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+  vector<wyckoffsite_ITC> vwyckoff(4);
+  xvector<double> coords;
+  vwyckoff[0].type = "Cr"; vwyckoff[0].letter = "b"; vwyckoff[0].site_symmetry = "m.."; vwyckoff[0].multiplicity = 4; vwyckoff[0].coord[1] = 0.25; vwyckoff[0].coord[2] = 0.09676; vwyckoff[0].coord[3] = 0.5;
+  vwyckoff[1].type = "O"; vwyckoff[1].letter = "a"; vwyckoff[1].site_symmetry = "..2"; vwyckoff[1].multiplicity = 4; vwyckoff[1].coord[1] = 0.0; vwyckoff[1].coord[2] = 0.0; vwyckoff[1].coord[3] = 0.3841;
+  vwyckoff[2].type = "O"; vwyckoff[2].letter = "b"; vwyckoff[2].site_symmetry = "m.."; vwyckoff[2].multiplicity = 4; vwyckoff[2].coord[1] = 0.25; vwyckoff[2].coord[2] = 0.2677; vwyckoff[2].coord[3] = 0.3755;
+  vwyckoff[3].type = "O"; vwyckoff[3].letter = "b"; vwyckoff[3].site_symmetry = "m.."; vwyckoff[3].multiplicity = 4; vwyckoff[3].coord[1] = 0.25; vwyckoff[3].coord[2] = 0.6078; vwyckoff[3].coord[3] = 0.3284;
+  check_passed = (vwyckoff.size() == xstr_cif.wyckoff_sites_ITC.size());
+  for (uint i = 0; i < vwyckoff.size(); i++) {
+    check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].type == vwyckoff[i].type));
+    check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].letter == vwyckoff[i].letter));
+    check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].multiplicity == vwyckoff[i].multiplicity));
+    check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].coord == vwyckoff[i].coord));
+    if (!check_passed) {
+      std::cerr << "Failed site:" << std::endl;
+      std::cerr << "type = " << xstr_cif.wyckoff_sites_ITC[i].type << ", ";
+      std::cerr << "letter = " << xstr_cif.wyckoff_sites_ITC[i].letter << ", ";
+      std::cerr << "multiplicity = " << xstr_cif.wyckoff_sites_ITC[i].multiplicity << ", ";
+      std::cerr << "coord = " << xstr_cif.wyckoff_sites_ITC[i].coord << std::endl << std::endl;
+      std::cerr << "Should be:" << std::endl;
+      std::cerr << "type = " << vwyckoff[i].type << ", ";
+      std::cerr << "letter = " << vwyckoff[i].letter << ", ";
+      std::cerr << "multiplicity = " << vwyckoff[i].multiplicity << ", ";
+      std::cerr << "coord = " << vwyckoff[i].coord << std::endl;
+    }
+  }
+
+  all_passed = (all_passed && check_passed);
+  message << "Checking parsed Wyckoff positions " << (check_passed?"passed":"failed") << ".";
+  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, (check_passed?_LOGGER_COMPLETE_:_LOGGER_ERROR_));
+
+  // May need a better test case where the labels actually change
+  message << "Checking calculated Wyckoff positions.";
+  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+  xstr_cif.SpaceGroup_ITC();
+  vwyckoff[0].coord[1] = 0.25; vwyckoff[0].coord[2] = 0.59676; vwyckoff[0].coord[3] = 0.0000;
+  vwyckoff[1].coord[1] = 0.00; vwyckoff[1].coord[2] = 0.00000; vwyckoff[1].coord[3] = 0.3841;
+  vwyckoff[2].coord[1] = 0.25; vwyckoff[2].coord[2] = 0.76770; vwyckoff[2].coord[3] = 0.8755;
+  vwyckoff[3].coord[1] = 0.25; vwyckoff[3].coord[2] = 0.60780; vwyckoff[3].coord[3] = 0.3284;
+  check_passed = (vwyckoff.size() == xstr_cif.wyckoff_sites_ITC.size());
+  for (uint i = 0; i < vwyckoff.size() && check_passed; i++) {
+    check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].type == vwyckoff[i].type));
+    check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].letter == vwyckoff[i].letter));
+    check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].multiplicity == vwyckoff[i].multiplicity));
+    check_passed = (check_passed && aurostd::isequal(xstr_cif.wyckoff_sites_ITC[i].coord, vwyckoff[i].coord));
+    if (!check_passed) {
+      std::cerr << "Failed site:" << std::endl;
+      std::cerr << "type = " << xstr_cif.wyckoff_sites_ITC[i].type << ", ";
+      std::cerr << "letter = " << xstr_cif.wyckoff_sites_ITC[i].letter << ", ";
+      std::cerr << "multiplicity = " << xstr_cif.wyckoff_sites_ITC[i].multiplicity << ", ";
+      std::cerr << "coord = " << xstr_cif.wyckoff_sites_ITC[i].coord << std::endl << std::endl;
+      std::cerr << "Should be:" << std::endl;
+      std::cerr << "type = " << vwyckoff[i].type << ", ";
+      std::cerr << "letter = " << vwyckoff[i].letter << ", ";
+      std::cerr << "multiplicity = " << vwyckoff[i].multiplicity << ", ";
+      std::cerr << "coord = " << vwyckoff[i].coord << std::endl;
+    }
+  }
+  
+  all_passed = (all_passed && check_passed);
+  message << "Checking calculated Wyckoff positions " << (check_passed?"passed":"failed") << ".";
+  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, (check_passed?_LOGGER_COMPLETE_:_LOGGER_ERROR_));
+
+  // Test that the CIF parser works for structures with old settings
+  message << "Parsing CIF file with unrecognized setting.";
+  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+  aurostd::StringstreamClean(xstrss);
+  str_cif =
+    "data_Ge8Pt24\n"
+    "_pd_phase_name Ge8Pt24\n"
+    "_cell_length_a 7.93\n"
+    "_cell_length_b 7.767\n"
+    "_cell_length_c 7.767\n"
+    "_cell_angle_alpha 90.\n"
+    "_cell_angle_beta 90.06\n"
+    "_cell_angle_gamma 90.\n"
+    "_cell_volume 478.39\n"
+    "_cell_formula_units_Z 8\n"
+    "_space_group_name_H-M_alt 'F 1 2/m 1'\n"
+    "_space_group_IT_number 12\n"
+    "loop_\n"
+    "_space_group_symop_id\n"
+    "_space_group_symop_operation_xyz\n"
+    "1 '-x, -y, -z'\n"
+    "2 'x, -y, z'\n"
+    "3 '-x, y, -z'\n"
+    "4 'x, y, z'\n"
+    "5 '-x, -y+1/2, -z+1/2'\n"
+    "6 'x, -y+1/2, z+1/2'\n"
+    "7 '-x, y+1/2, -z+1/2'\n"
+    "8 'x, y+1/2, z+1/2'\n"
+    "9 '-x+1/2, -y, -z+1/2'\n"
+    "10 'x+1/2, -y, z+1/2'\n"
+    "11 '-x+1/2, y, -z+1/2'\n"
+    "12 'x+1/2, y, z+1/2'\n"
+    "13 '-x+1/2, -y+1/2, -z'\n"
+    "14 'x+1/2, -y+1/2, z'\n"
+    "15 '-x+1/2, y+1/2, -z'\n"
+    "16 'x+1/2, y+1/2, z'\n"
+    "loop_\n"
+    "_atom_type_symbol\n"
+    "_atom_type_oxidation_number\n"
+    "Pt0+ 0\n"
+    "Ge0+ 0\n"
+    "loop_\n"
+    "_atom_site_label\n"
+    "_atom_site_type_symbol\n"
+    "_atom_site_symmetry_multiplicity\n"
+    "_atom_site_Wyckoff_symbol\n"
+    "_atom_site_fract_x\n"
+    "_atom_site_fract_y\n"
+    "_atom_site_fract_z\n"
+    "_atom_site_B_iso_or_equiv\n"
+    "_atom_site_occupancy\n"
+    "Pt1 Pt0+ 8 g 0. 0.2 0. . 1.\n"
+    "Pt2 Pt0+ 8 h 0.25 0.25 0.25 . 1.\n"
+    "Pt3 Pt0+ 8 i 0. 0. 0.3 . 1.\n"
+    "Ge1 Ge0+ 8 i 0.25 0. 0. . 1.\n";
+
+  str_poscar =
+    "Ge8Pt24\n"
+    "1.0000000\n"
+    "7.93000000000000   0.00000000000000   0.00000000000000\n"
+    "0.00000000000000   7.76700000000000   0.00000000000000\n"
+    "-0.00813358189357   0.00000000000000   7.76699574126609\n"
+    "Ge Pt\n"
+    "8 24\n"
+    "Direct(32) [A8B24]\n"
+    "0.25000000000000   0.00000000000000   0.00000000000000  Ge\n"
+    "0.75000000000000   0.00000000000000   0.00000000000000  Ge\n"
+    "0.75000000000000   0.50000000000000   0.50000000000000  Ge\n"
+    "0.25000000000000   0.50000000000000   0.50000000000000  Ge\n"
+    "0.25000000000000   0.00000000000000   0.50000000000000  Ge\n"
+    "0.75000000000000   0.00000000000000   0.50000000000000  Ge\n"
+    "0.25000000000000   0.50000000000000   0.00000000000000  Ge\n"
+    "0.75000000000000   0.50000000000000   0.00000000000000  Ge\n"
+    "0.00000000000000   0.70000000000000   0.50000000000000  Pt\n"
+    "0.50000000000000   0.80000000000000   0.50000000000000  Pt\n"
+    "0.50000000000000   0.20000000000000   0.50000000000000  Pt\n"
+    "0.50000000000000   0.30000000000000   0.00000000000000  Pt\n"
+    "0.50000000000000   0.70000000000000   0.00000000000000  Pt\n"
+    "0.25000000000000   0.25000000000000   0.25000000000000  Pt\n"
+    "0.00000000000000   0.00000000000000   0.30000000000000  Pt\n"
+    "0.00000000000000   0.20000000000000   0.00000000000000  Pt\n"
+    "0.00000000000000   0.00000000000000   0.70000000000000  Pt\n"
+    "0.00000000000000   0.50000000000000   0.20000000000000  Pt\n"
+    "0.00000000000000   0.50000000000000   0.80000000000000  Pt\n"
+    "0.50000000000000   0.00000000000000   0.20000000000000  Pt\n"
+    "0.50000000000000   0.00000000000000   0.80000000000000  Pt\n"
+    "0.50000000000000   0.50000000000000   0.70000000000000  Pt\n"
+    "0.50000000000000   0.50000000000000   0.30000000000000  Pt\n"
+    "0.25000000000000   0.75000000000000   0.25000000000000  Pt\n"
+    "0.75000000000000   0.75000000000000   0.75000000000000  Pt\n"
+    "0.75000000000000   0.25000000000000   0.75000000000000  Pt\n"
+    "0.25000000000000   0.25000000000000   0.75000000000000  Pt\n"
+    "0.75000000000000   0.25000000000000   0.25000000000000  Pt\n"
+    "0.25000000000000   0.75000000000000   0.75000000000000  Pt\n"
+    "0.75000000000000   0.75000000000000   0.25000000000000  Pt\n"
+    "0.00000000000000   0.80000000000000   0.00000000000000  Pt\n"
+    "0.00000000000000   0.30000000000000   0.50000000000000  Pt\n";
+
+  bool quiet_tmp = XHOST.QUIET;
+  XHOST.QUIET = true;  // Suppress warnings
+  xstrss << str_cif;
+  xstr_cif = xstructure(xstrss);
+  XHOST.QUIET = quiet_tmp;
+
+  aurostd::StringstreamClean(xstrss);
+  xstrss << str_poscar;
+  xstr_poscar = xstructure(xstrss);
+  match = compare::aflowCompareStructure(xstr_cif, xstr_poscar, same_species, scale_volume, optimize_match, misfit);
+  check_passed = (match && (misfit < _ZERO_TOL_));
+  all_passed = (all_passed && check_passed);
+  message << "Parsing CIF file with unrecognized setting " << (check_passed?"passed":"failed") << ".";
+  message << " Calculated misfit: " << misfit << ".";
+  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, (check_passed?_LOGGER_COMPLETE_:_LOGGER_ERROR_));
 
   return true;
 }
