@@ -6164,7 +6164,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
       vector<string> general_wyckoff_position; // general Wyckoff position equations
       // get general Wyckoff multiplicity and position saved in aflow
       SYM::getGeneralWyckoffMultiplicityAndPosition(a.spacegroupnumber, setting_string, general_wyckoff_multiplicity, general_wyckoff_position);
-
       //      SYM::initsgs(setting_string);
       //      using SYM::gl_sgs;
       //      cerr << "find the spacegroupstring" << endl;
@@ -6263,14 +6262,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
           found_setting = true;
           break; //found setting
         }
-      }
-      else {
-        message << "Number of symmetry operations do not match between input operations and space group number (aflow="   //CO20190629
-          << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl;  //CO20190629
-        if (LDEBUG) {
-          for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629  //ME20210124 - Moved to LDEBUG outputting the CIF file makes error unreadable
-        }
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
       }
     }
     if(!found_setting){
