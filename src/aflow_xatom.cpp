@@ -6138,11 +6138,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
         found_symop_id=TRUE;
       }
       else if(found_symops){
-        if (vinput[i].find("loop_") != string::npos
-          || (found_symop_id && !isdigit(vinput[i][0]))) break;  // End of symops
+        if (vinput[i].find("loop_") != string::npos) break; // End of symops
         vector<string> tokens;
         aurostd::string2tokens(vinput[i],tokens," ");
         //DX20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - START
+        if (tokens.size() == 0) continue;
+        if (!isdigit(tokens[0][0])) break;  // End of symops
         if(found_symop_id){ tokens.erase(tokens.begin()); } //erase symop index, not needed //DX20190708 - enclose in if-statement
         string symop = aurostd::joinWDelimiter(tokens,"");
         symop = aurostd::RemoveCharacter(symop,'\''); // remove '
@@ -6163,7 +6164,6 @@ istream& operator>>(istream& cinput, xstructure& a) {
       vector<string> general_wyckoff_position; // general Wyckoff position equations
       // get general Wyckoff multiplicity and position saved in aflow
       SYM::getGeneralWyckoffMultiplicityAndPosition(a.spacegroupnumber, setting_string, general_wyckoff_multiplicity, general_wyckoff_position);
-      if (general_wyckoff_multiplicity != (int) spacegroup_symop_xyz.size()) continue;  //ME20210124
 
       //      SYM::initsgs(setting_string);
       //      using SYM::gl_sgs;
