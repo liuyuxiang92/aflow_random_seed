@@ -6143,8 +6143,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
         aurostd::string2tokens(vinput[i],tokens," ");
         //DX20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - START
         if (tokens.size() == 0) continue;
-        if (!isdigit(tokens[0][0])) break;  // End of symops
-        if(found_symop_id){ tokens.erase(tokens.begin()); } //erase symop index, not needed //DX20190708 - enclose in if-statement
+        if (found_symop_id && !isdigit(tokens[0][0])) break;  // End of symops
+        if (found_symop_id){ tokens.erase(tokens.begin()); } //erase symop index, not needed //DX20190708 - enclose in if-statement
         string symop = aurostd::joinWDelimiter(tokens,"");
         symop = aurostd::RemoveCharacter(symop,'\''); // remove '
         symop = aurostd::RemoveCharacter(symop,'\"'); // remove "
