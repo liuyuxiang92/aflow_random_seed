@@ -968,10 +968,10 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   check_num++;
   check_function = "aurostd::mod_floored()";
   check_description = "floored mod; numbers as int";
-  expected = -1;
+  expected_int = -1;
   
-  calculated = aurostd::mod_floored(5,-3);
-  check_equal(calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  calculated = aurostd::mod_floored(5, -3);
+  check_equal(calculated, expected_int, check_function, check_description, check_num, passed_checks, results);
 
   // ---------------------------------------------------------------------------
   // Check | mod_floored (double) //SD20220124
@@ -980,7 +980,7 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   check_description = "floored mod; numbers as double";
   expected = 1.4;
 
-  calculated = aurostd::mod_floored(-5.2,3.3);
+  calculated = aurostd::mod_floored(-5.2, 3.3);
   check_equal(calculated, expected, check_function, check_description, check_num, passed_checks, results);
 
   // ---------------------------------------------------------------------------
@@ -990,7 +990,7 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   check_description = "floored mod; divisor is 0";
   expected = 11.11;
 
-  calculated = aurostd::mod_floored(11.11,0.0);
+  calculated = aurostd::mod_floored(11.11, 0.0);
   check_equal(calculated, expected, check_function, check_description, check_num, passed_checks, results);
 
   // ---------------------------------------------------------------------------
@@ -1000,7 +1000,7 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   check_description = "floored mod; divisor is inf";
   expected = 11.11;
 
-  calculated = aurostd::mod_floored(11.11,(double) INFINITY);
+  calculated = aurostd::mod_floored(11.11, (double)INFINITY);
   check_equal(calculated, expected, check_function, check_description, check_num, passed_checks, results);
 
   // present overall result
