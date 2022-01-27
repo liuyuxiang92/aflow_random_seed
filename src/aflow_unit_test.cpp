@@ -444,60 +444,59 @@ bool AtomicEnvironmentTest(ofstream& FileMESSAGE, ostream& oss){ //HE20210511
 
 bool SchemaTest(ostream& oss){ofstream FileMESSAGE;return SchemaTest(FileMESSAGE,oss);}
 bool SchemaTest(ofstream& FileMESSAGE,ostream& oss) {
-  string function = XPID+"SchemaTest():";
-  _aflags aflags; aflags.Directory = ".";
-  stringstream message;
-  bool all_passed = true, check_passed = true;
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "SchemaTest():";
+  _aflags aflags; aflags.Directory = aurostd::getPWD();
 
-  message << "Performing schema test.";
-  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+  // Set up test environment
+  string task_description = "Testing aurostd";
+  vector<string> results;
+  uint passed_checks = 0;
+  string check_function = "";
+  string check_description = "";
 
-  message << "Checking for internal consistency of XHOST.vschema.";
-  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
-  vector<string> vschema_keys, vschema_types;
-  string schema_types = "UNIT,TYPE";
-  aurostd::string2tokens(schema_types, vschema_types, ",");
+  check_function = "XHOST.vschema";
+  check_description = "Internal consistency of vschema";
+  vector<string> vschema_keys;
+  vector<string> vschema_types = {"UNIT", "TYPE"};
   string key = "";
-  check_passed = true;
+  uint ninconsistent = 0;
   for (uint i = 0; i < XHOST.vschema.vxsghost.size(); i+= 2) {
     if(XHOST.vschema.vxsghost[i].find("::NAME:") != string::npos) {
       key=aurostd::RemoveSubString(XHOST.vschema.vxsghost[i], "SCHEMA::NAME:");
       vschema_keys.push_back(XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + key));
       for (uint j = 0; j < vschema_types.size(); j++) {
         if (!XHOST.vschema.isdefined("SCHEMA::" + vschema_types[j] + ":" + key)) {
-          check_passed = false;
-          message << "SCHEMA::" << vschema_types[j] << ":" << key << " not found.";
-          pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          ninconsistent++;
+          if (LDEBUG) {
+            std::cerr << "SCHEMA::" << vschema_types[j] << ":" << key << " not found." << std::endl;
+          }
         }
       }
     }
   }
-  message << "Schema internal consistency check " << (check_passed?"passed":"failed") << ".";
-  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, (check_passed?_LOGGER_COMPLETE_:_LOGGER_ERROR_));
-  all_passed = (all_passed && check_passed);
+  check_equal(ninconsistent, 0, check_function, check_description, passed_checks, results);
 
-  message << "Checking for consistency between _aflowlib_entry json and schema.";
-  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+  check_function = "_aflowlib_entry";
+  check_description = "Consistency between _aflowlib_entry json and schema";
   aflowlib::_aflowlib_entry aentry;
   string aflowlib_json = aentry.aflowlib2string("JSON", true);
   vector<string> json_keys = aurostd::extractJsonKeysAflow(aflowlib_json);
 
-  string keys_ignore = "data_language,error_status,natoms_orig,density_orig,volume_cell_orig,volume_atom_orig,spinD_magmom_orig";
-  vector<string> vkeys_ignore;
-  aurostd::string2tokens(keys_ignore, vkeys_ignore, ",");
-  check_passed = true;
+  vector<string> vkeys_ignore = {"data_language", "error_status", "natoms_orig",
+                                 "density_orig", "volume_cell_orig", "volume_atom_orig",
+                                 "spinD_magmom_orig"};
   for (uint i = 0; i < json_keys.size(); i++) {
     if (!aurostd::WithinList(vkeys_ignore, json_keys[i]) && !aurostd::WithinList(vschema_keys, json_keys[i])) {
-      check_passed = false;
-      message << json_keys[i] << " not found in schema.";
-      pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      ninconsistent++;
+      if (LDEBUG) {
+        std::cerr << json_keys[i] << " not found in schema." << std::endl;
+      }
     }
   }
-  message << "Consistency check between schema and aflowlib.json " << (check_passed?"passed":"failed") << ".";
-  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, (check_passed?_LOGGER_COMPLETE_:_LOGGER_ERROR_));
-  all_passed = (all_passed && check_passed);
+  check_equal(ninconsistent, 0, check_function, check_description, passed_checks, results);
 
-  return all_passed;
+  return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
 }
 
 bool CeramGenTest(ostream& oss){ofstream FileMESSAGE;return CeramGenTest(FileMESSAGE,oss);}  //CO20190520
@@ -1025,6 +1024,7 @@ bool cifParserTest(ostream& oss){ofstream FileMESSAGE;return cifParserTest(FileM
 bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string function_name = XPID + "cifParserTest():";
+
   // Set up test environment
   string task_description = "Testing aurostd";
   vector<string> results;
