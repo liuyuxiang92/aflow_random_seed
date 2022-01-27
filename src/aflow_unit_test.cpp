@@ -468,9 +468,7 @@ bool SchemaTest(ofstream& FileMESSAGE,ostream& oss) {
       for (uint j = 0; j < vschema_types.size(); j++) {
         if (!XHOST.vschema.isdefined("SCHEMA::" + vschema_types[j] + ":" + key)) {
           ninconsistent++;
-          if (LDEBUG) {
-            std::cerr << "SCHEMA::" << vschema_types[j] << ":" << key << " not found." << std::endl;
-          }
+          if (LDEBUG) std::cerr << "SCHEMA::" << vschema_types[j] << ":" << key << " not found." << std::endl;
         }
       }
     }
@@ -486,12 +484,10 @@ bool SchemaTest(ofstream& FileMESSAGE,ostream& oss) {
   vector<string> vkeys_ignore = {"data_language", "error_status", "natoms_orig",
                                  "density_orig", "volume_cell_orig", "volume_atom_orig",
                                  "spinD_magmom_orig"};
-  for (uint i = 0; i < json_keys.size(); i++) {
-    if (!aurostd::WithinList(vkeys_ignore, json_keys[i]) && !aurostd::WithinList(vschema_keys, json_keys[i])) {
+  for (const string& key : json_keys) {
+    if (!aurostd::WithinList(vkeys_ignore, key) && !aurostd::WithinList(vschema_keys, key)) {
       ninconsistent++;
-      if (LDEBUG) {
-        std::cerr << json_keys[i] << " not found in schema." << std::endl;
-      }
+      if (LDEBUG) std::cerr << key << " not found in schema." << std::endl;
     }
   }
   check_equal(ninconsistent, 0, check_function, check_description, passed_checks, results);
