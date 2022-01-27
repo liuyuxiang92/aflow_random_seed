@@ -1046,10 +1046,21 @@ bool FoldAtomsInCellTest(ofstream& FileMESSAGE,ostream& oss){ //DX20210129
 //ME20220125
 bool cifParserTest(ostream& oss){ofstream FileMESSAGE;return cifParserTest(FileMESSAGE,oss);}
 bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
-  string function = XPID + "cifParserTest():";
-  _aflags aflags; aflags.Directory = ".";
-  stringstream message;
-  bool all_passed = true, check_passed = true;
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string function_name = XPID + "cifParserTest():";
+  // Set up test environment
+  string task_description = "Testing aurostd";
+  vector<string> results;
+  uint passed_checks = 0;
+  string check_function = "";
+  string check_description = "";
+  string calculated = "";
+  string expected = "";
+  uint check_num = 0;
+
+  // Set up structure variables
+  _aflags aflags; aflags.Directory = aurostd::getPWD();
+  bool check_passed = true;
   stringstream xstrss;
   xstructure xstr_cif, xstr_poscar;
   string str_cif = "", str_poscar = "";
@@ -1060,8 +1071,6 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
   double misfit = 0.0;
   bool match = false;
 
-  message << "Parsing CIF file and with recognized setting.";
-  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
   // CrO3 was a problematic structure in the past
   str_cif =
     "data_Cr4O12\n"
@@ -1132,6 +1141,10 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
     "   0.25000000000000   0.10780000000000   0.82840000000000  O \n"
     "   0.75000000000000   0.89220000000000   0.82840000000000  O \n";
 
+  ++check_num;
+  check_function = "xstructure::operator<<";
+  check_description = "Parsing CIF file with recognized setting (CrO3)";
+
   aurostd::StringstreamClean(xstrss);
   xstrss << str_cif;
   xstr_cif = xstructure(xstrss);
@@ -1140,14 +1153,12 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
   xstrss << str_poscar;
   xstr_poscar = xstructure(xstrss);
   match = compare::aflowCompareStructure(xstr_cif, xstr_poscar, same_species, scale_volume, optimize_match, misfit);
-  check_passed = (match && (misfit < _ZERO_TOL_));
-  all_passed = (all_passed && check_passed);
-  message << "Parsing CIF file with recognized settings " << (check_passed?"passed":"failed") << ".";
-  message << " Calculated misfit: " << misfit << ".";
-  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, (check_passed?_LOGGER_COMPLETE_:_LOGGER_ERROR_));
+  expected = "Match";
+  calculated = string((match?"Match":"No Match")) +  " (misfit = " + aurostd::utype2string<double>(misfit) + ")";
+  check(match && (misfit < _ZERO_TOL_), calculated, expected, check_function, check_description, check_num, passed_checks, results);
 
-  message << "Checking parsed Wyckoff positions.";
-  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+  ++check_num;
+  check_description = "Checking parsed Wyckoff positions of CrO3";
   vector<wyckoffsite_ITC> vwyckoff(4);
   xvector<double> coords;
   vwyckoff[0].type = "Cr"; vwyckoff[0].letter = "b"; vwyckoff[0].site_symmetry = "m.."; vwyckoff[0].multiplicity = 4; vwyckoff[0].coord[1] = 0.25; vwyckoff[0].coord[2] = 0.09676; vwyckoff[0].coord[3] = 0.5;
@@ -1160,7 +1171,7 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
     check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].letter == vwyckoff[i].letter));
     check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].multiplicity == vwyckoff[i].multiplicity));
     check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].coord == vwyckoff[i].coord));
-    if (!check_passed) {
+    if (LDEBUG && !check_passed) {
       std::cerr << "Failed site:" << std::endl;
       std::cerr << "type = " << xstr_cif.wyckoff_sites_ITC[i].type << ", ";
       std::cerr << "letter = " << xstr_cif.wyckoff_sites_ITC[i].letter << ", ";
@@ -1174,13 +1185,13 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
     }
   }
 
-  all_passed = (all_passed && check_passed);
-  message << "Checking parsed Wyckoff positions " << (check_passed?"passed":"failed") << ".";
-  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, (check_passed?_LOGGER_COMPLETE_:_LOGGER_ERROR_));
+  expected = "Wyckoff positions match";
+  calculated = "Wyckoff positions " + string(check_passed?"matched":"did not match") + ".";
+  check(check_passed, calculated, expected, check_function, check_description, check_num, passed_checks, results);
 
   // May need a better test case where the labels actually change
-  message << "Checking calculated Wyckoff positions.";
-  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+  ++check_num;
+  check_description = "Checking calculated Wyckoff positions of CrO3";
   xstr_cif.SpaceGroup_ITC();
   vwyckoff[0].coord[1] = 0.25; vwyckoff[0].coord[2] = 0.59676; vwyckoff[0].coord[3] = 0.0000;
   vwyckoff[1].coord[1] = 0.00; vwyckoff[1].coord[2] = 0.00000; vwyckoff[1].coord[3] = 0.3841;
@@ -1192,7 +1203,7 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
     check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].letter == vwyckoff[i].letter));
     check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].multiplicity == vwyckoff[i].multiplicity));
     check_passed = (check_passed && aurostd::isequal(xstr_cif.wyckoff_sites_ITC[i].coord, vwyckoff[i].coord));
-    if (!check_passed) {
+    if (LDEBUG && !check_passed) {
       std::cerr << "Failed site:" << std::endl;
       std::cerr << "type = " << xstr_cif.wyckoff_sites_ITC[i].type << ", ";
       std::cerr << "letter = " << xstr_cif.wyckoff_sites_ITC[i].letter << ", ";
@@ -1206,13 +1217,13 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
     }
   }
   
-  all_passed = (all_passed && check_passed);
-  message << "Checking calculated Wyckoff positions " << (check_passed?"passed":"failed") << ".";
-  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, (check_passed?_LOGGER_COMPLETE_:_LOGGER_ERROR_));
+  expected = "Wyckoff positions match";
+  calculated = "Wyckoff positions " + string(check_passed?"matched":"did not match") + ".";
+  check(check_passed, calculated, expected, check_function, check_description, check_num, passed_checks, results);
 
   // Test that the CIF parser works for structures with old settings
-  message << "Parsing CIF file with unrecognized setting.";
-  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+  ++check_num;
+  check_description = "Parsing CIF file with unrecognized setting (GePt3)";
   aurostd::StringstreamClean(xstrss);
   str_cif =
     "data_Ge8Pt24\n"
@@ -1309,7 +1320,7 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
     "0.00000000000000   0.30000000000000   0.50000000000000  Pt\n";
 
   bool quiet_tmp = XHOST.QUIET;
-  XHOST.QUIET = true;  // Suppress warnings
+  XHOST.QUIET = !LDEBUG;  // Suppress warnings
   xstrss << str_cif;
   xstr_cif = xstructure(xstrss);
   XHOST.QUIET = quiet_tmp;
@@ -1318,11 +1329,9 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
   xstrss << str_poscar;
   xstr_poscar = xstructure(xstrss);
   match = compare::aflowCompareStructure(xstr_cif, xstr_poscar, same_species, scale_volume, optimize_match, misfit);
-  check_passed = (match && (misfit < _ZERO_TOL_));
-  all_passed = (all_passed && check_passed);
-  message << "Parsing CIF file with unrecognized setting " << (check_passed?"passed":"failed") << ".";
-  message << " Calculated misfit: " << misfit << ".";
-  pflow::logger(_AFLOW_FILE_NAME_, function, message, aflags, FileMESSAGE, oss, (check_passed?_LOGGER_COMPLETE_:_LOGGER_ERROR_));
+  expected = "Match";
+  calculated = string(match?"Match":"No Match") +  " (misfit = " + aurostd::utype2string<double>(misfit) + ")";
+  check(match && (misfit < _ZERO_TOL_), calculated, expected, check_function, check_description, check_num, passed_checks, results);
 
-  return true;
+  return display_result(passed_checks, check_num, task_description, results, function_name, FileMESSAGE, oss);
 }
