@@ -247,7 +247,6 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   // initialize xvector sort
   xvector<utype> vxu;xvector<int> ixv;xvector<double> dxv;
   aurostd::quicksort2((uint) 0,ixv,dxv);aurostd::quicksort2((uint) 0,dxv,ixv);
-  vxu=aurostd::mod_floored(vxu,(utype)1); //SD20220117 - not related to sorting
 
   // initialize scalars
   o+=nint(x)+factorial(x)+nCk(x,x)+fact(x)+isequal(x,x)+isequal(x,x,(utype) 0)+isequal(x,x,x)+isdifferent(x,x)+isdifferent(x,x,x);
@@ -297,6 +296,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   o+=aurostd::getMAD(v,x);v=aurostd::convolution(v,v,0);v=aurostd::convolution(v,v,vii,0);v=aurostd::moving_average(v,x); //CO20190520
   vector<int> peaks=getPeaks(v);peaks=getPeaks(v,w);
   aurostd::xmatrix<utype> mprod = aurostd::outer_product(v, w);  //ME20200327
+  vxu=aurostd::mod_floored(vxu,(utype)1); //SD20220117
 
   //CO20200404 START - aurostd->pflow
   utype ut=(utype)3;std::vector<utype> vec;std::complex<utype> utcomp;vector<std::complex<utype> > veccomp;
