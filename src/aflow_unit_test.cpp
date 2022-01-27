@@ -13,8 +13,9 @@
 // HE20210616
 template <typename utype>
 void check(const bool &passed, const utype &calculated, const utype &expected, const string &check_function,
-    const string check_description, const uint check_num, uint &passed_checks, vector<string> &results){
+    const string check_description, uint &passed_checks, vector<string> &results){
   stringstream result;
+  uint check_num = results.size() + 1;
   if (passed) {
     passed_checks++;
     if (check_function.empty()){
@@ -37,36 +38,37 @@ void check(const bool &passed, const utype &calculated, const utype &expected, c
 
 template <typename utype>
 void check_equal(const utype &calculated, const utype &expected, const string &check_function,
-    const string check_description, const uint check_num, uint &passed_checks, vector<string> &results){
+    const string check_description, uint &passed_checks, vector<string> &results){
   bool passed = false;
   if (aurostd::isequal(calculated, expected)) passed = true;
-  check(passed, calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  check(passed, calculated, expected, check_function, check_description, passed_checks, results);
 }
 void check_equal(const string &calculated, const string &expected, const string &check_function, 
-    const string check_description, const uint check_num, uint &passed_checks, vector<string> &results){
+    const string check_description, uint &passed_checks, vector<string> &results){
   bool passed = false;
   if (calculated == expected) passed = true;
-  check(passed, calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  check(passed, calculated, expected, check_function, check_description, passed_checks, results);
 }
 void check_equal(const bool &calculated, const bool &expected, const string &check_function,
-    const string check_description, const uint check_num, uint &passed_checks, vector<string> &results){
+    const string check_description, uint &passed_checks, vector<string> &results){
   bool passed = false;
   if (calculated == expected) passed = true;
-  check(passed, calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  check(passed, calculated, expected, check_function, check_description, passed_checks, results);
 }
 
 void check_similar(const double &calculated, const double &expected, const string &check_function,
-    const string check_description, const uint check_num, uint &passed_checks, vector<string> &results, const double &relative=1E-10){
+    const string check_description, uint &passed_checks, vector<string> &results, const double &relative=1E-10){
   bool passed = false;
   if (std::abs(expected - calculated) <= expected * relative) passed = true;
-  check(passed, calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  check(passed, calculated, expected, check_function, check_description, passed_checks, results);
 }
 
-bool display_result(const uint passed_checks, const uint check_num, const string & task_description, const vector<string> & results,
+bool display_result(const uint passed_checks, const string & task_description, const vector<string> & results,
     const string & function_name, ofstream & FileMESSAGE, ostream & oss){
   stringstream message;
   _aflags aflags;
   aflags.Directory=aurostd::getPWD();
+  uint check_num = results.size();
   if (passed_checks == check_num) {
     message << "SUCCESS " << task_description << " (passing " << check_num << " checks)" << endl;
     pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
@@ -99,7 +101,6 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   uint passed_checks = 0;
   string check_function = "";
   string check_description = "";
-  uint check_num = 0;
 
   double expected = 0.0;
   double calculated = 0.0;
@@ -150,22 +151,20 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 
   // ---------------------------------------------------------------------------
   // Check | convex solid volume (double)
-  check_num++;
   check_function = "aurostd::volume()";
   check_description = "convex solid, points as doubles";
   expected = 2.5;
 
   calculated = aurostd::volume(points, facets, true);
-  check_equal(calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  check_equal(calculated, expected, check_function, check_description, passed_checks, results);
 
   // ---------------------------------------------------------------------------
   // Check | convex solid volume (int)
-  check_num++;
   check_function = "aurostd::volume()";
   check_description = "convex solid, points as int";
 
   calculated = aurostd::volume(ipoints, facets, true);
-  check_equal(calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  check_equal(calculated, expected, check_function, check_description, passed_checks, results);
 
 
   // define non convex solid
@@ -202,17 +201,15 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 
   // ---------------------------------------------------------------------------
   // Check | non convex solid volume (double)
-  check_num++;
   check_function = "aurostd::volume()";
   check_description = "non convex solid, points as doubles";
   expected = 40.0;
 
   calculated = aurostd::volume(points, facets);
-  check_equal(calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  check_equal(calculated, expected, check_function, check_description, passed_checks, results);
 
   // ---------------------------------------------------------------------------
   // Check | error facet/normals mismatch
-  check_num++;
   check_function = "aurostd::volume()";
   check_description = "error: facet/normals mismatch";
   vector<xvector<double> > normals;
@@ -221,30 +218,28 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 
   try {
     calculated = aurostd::volume(points, facets, normals);
-    check(false, std::string("no error"), expected_error, check_function, check_description, check_num, passed_checks, results);
+    check(false, std::string("no error"), expected_error, check_function, check_description, passed_checks, results);
   }
   catch (aurostd::xerror e)
   {
-    if (e.error_code == expected_int) check(true, "", "", check_function, check_description, check_num, passed_checks, results);
-    else check(false, aurostd::utype2string(e.error_code), expected_error, check_function, check_description, check_num, passed_checks, results);
+    if (e.error_code == expected_int) check(true, "", "", check_function, check_description, passed_checks, results);
+    else check(false, aurostd::utype2string(e.error_code), expected_error, check_function, check_description, passed_checks, results);
   }
   catch (...) {
-    check(false, std::string("not an xerror"), expected_error, check_function, check_description, check_num, passed_checks, results);
+    check(false, std::string("not an xerror"), expected_error, check_function, check_description, passed_checks, results);
   }
 
   // ---------------------------------------------------------------------------
   // Check | non convex solid volume (int)
-  check_num++;
   check_function = "aurostd::volume()";
   check_description = "non convex solid, points as int";
   expected = 40.0;
 
   calculated = aurostd::volume(ipoints, facets);
-  check_equal(calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  check_equal(calculated, expected, check_function, check_description, passed_checks, results);
 
   // ---------------------------------------------------------------------------
   // Check | error facet size
-  check_num++;
   check_function = "aurostd::volume()";
   check_description = "error: wrong facet size";
   expected_error = "xerror code 30 (VALUE_ERROR)";
@@ -253,20 +248,19 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   facet.clear(); facet.resize(2); facet[0]=1; facet[1]=2; facets.push_back(facet);
   try {
     calculated = aurostd::volume(points, facets);
-    check(false, std::string("no error"), expected_error, check_function, check_description, check_num, passed_checks, results);
+    check(false, std::string("no error"), expected_error, check_function, check_description, passed_checks, results);
   }
   catch (aurostd::xerror e)
   {
-    if (e.error_code == expected_int) check(true, "", "", check_function, check_description, check_num, passed_checks, results);
-    else check(false, aurostd::utype2string(e.error_code), expected_error, check_function, check_description, check_num, passed_checks, results);
+    if (e.error_code == expected_int) check(true, "", "", check_function, check_description, passed_checks, results);
+    else check(false, aurostd::utype2string(e.error_code), expected_error, check_function, check_description, passed_checks, results);
   }
   catch (...) {
-    check(false, std::string("not an xerror"), expected_error, check_function, check_description, check_num, passed_checks, results);
+    check(false, std::string("not an xerror"), expected_error, check_function, check_description, passed_checks, results);
   }
 
   // ---------------------------------------------------------------------------
   // Check | non convex area (double)
-  check_num++;
   check_function = "aurostd::areaPointsOnPlane()";
   check_description = "non convex area; points as double";
   expected = 10.0;
@@ -279,17 +273,16 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   ipoints.push_back(p5i);
 
   calculated = aurostd::areaPointsOnPlane(points);
-  check_equal(calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  check_equal(calculated, expected, check_function, check_description, passed_checks, results);
 
   // ---------------------------------------------------------------------------
   // Check | non convex area (int)
-  check_num++;
   check_function = "aurostd::areaPointsOnPlane()";
   check_description = "non convex area; points as int";
   expected = 10.0;
 
   calculated = aurostd::areaPointsOnPlane(ipoints);
-  check_equal(calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  check_equal(calculated, expected, check_function, check_description, passed_checks, results);
 
 
   // define triangle in 3D to better test int handling
@@ -303,23 +296,21 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 
   // ---------------------------------------------------------------------------
   // Check | 3d triangle area (double)
-  check_num++;
   check_function = "aurostd::areaPointsOnPlane()";
   check_description = "3d triangle; points as double";
   expected = 3.5355339059;
 
   calculated = aurostd::areaPointsOnPlane(points);
-  check_similar(calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  check_similar(calculated, expected, check_function, check_description, passed_checks, results);
 
   // ---------------------------------------------------------------------------
   // Check | 3d triangle area (int)
-  check_num++;
   check_function = "aurostd::areaPointsOnPlane()";
   check_description = "3d triangle; points as int";
   expected = 3.5355339059;
 
   calculated = aurostd::areaPointsOnPlane(ipoints);
-  check_similar(calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  check_similar(calculated, expected, check_function, check_description, passed_checks, results);
 
   // ---------------------------------------------------------------------------
   // Check | double2fraction conversion //DX20210908
@@ -334,11 +325,10 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   aurostd::double2fraction(test_double,numerator,denominator);
   stringstream result_ss; result_ss << numerator << "/" << denominator;
 
-  check_num++;
-  check_equal(result_ss.str(), answer, check_function, check_description, check_num, passed_checks, results);
+  check_equal(result_ss.str(), answer, check_function, check_description, passed_checks, results);
 
   // present overall result
-  return display_result(passed_checks, check_num, task_description, results, function_name, FileMESSAGE, oss);
+  return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
 }
 
 bool AtomicEnvironmentTest(ostream& oss){ofstream FileMESSAGE;return AtomicEnvironmentTest(FileMESSAGE,oss);} //HE20210511
@@ -353,7 +343,6 @@ bool AtomicEnvironmentTest(ofstream& FileMESSAGE, ostream& oss){ //HE20210511
   uint passed_checks = 0;
   string check_function = "";
   string check_description = "";
-  uint check_num = 0;
 
   // ---------------------------------------------------------------------------
   // Test 1: create AE - mode 1
@@ -373,41 +362,36 @@ bool AtomicEnvironmentTest(ofstream& FileMESSAGE, ostream& oss){ //HE20210511
 
   // ---------------------------------------------------------------------------
   // Check | number of created AEs
-  check_num++;
   check_description = "number of created AEs";
-  check_equal(uint(AE.size()), uint(6), check_function, check_description, check_num, passed_checks, results);
+  check_equal(uint(AE.size()), uint(6), check_function, check_description, passed_checks, results);
 
   // ---------------------------------------------------------------------------
   // Check | point index mapping
-  check_num++;
   check_description = "point index mapping";
-  check_equal(AE[1].index2Point(10), AE[1].coordinates_neighbor[1][2], check_function, check_description, check_num, passed_checks, results);
+  check_equal(AE[1].index2Point(10), AE[1].coordinates_neighbor[1][2], check_function, check_description, passed_checks, results);
 
   // ---------------------------------------------------------------------------
   // Check | coordinate matching
-  check_num++;
   check_description = "coordinate matching";
   xvector<double> compare_point(3,1);
   compare_point(1) = -1.9551925593108925e0;
   compare_point(2) = -2.2642136090979212e0;
   compare_point(3) = 2.4896636484942385e0;
 
-  check_equal(AE[1].index2Point(2), compare_point, check_function, check_description, check_num, passed_checks, results);
+  check_equal(AE[1].index2Point(2), compare_point, check_function, check_description, passed_checks, results);
 
   // ---------------------------------------------------------------------------
   // Check | center element
-  check_num++;
   check_description = "center element";
-  check_equal(std::string(AE[2].element_center), std::string("Ca"), check_function, check_description, check_num, passed_checks, results);
+  check_equal(std::string(AE[2].element_center), std::string("Ca"), check_function, check_description, passed_checks, results);
 
   // ---------------------------------------------------------------------------
   // Check | center element id
-  check_num++;
   check_description = "center element id";
-  check_equal(AE[4].type_center, uint(1), check_function, check_description, check_num, passed_checks, results);
+  check_equal(AE[4].type_center, uint(1), check_function, check_description, passed_checks, results);
 
   // present overall result
-  bool isPassed = display_result(passed_checks, check_num, task_description, results, function_name, FileMESSAGE, oss);
+  bool isPassed = display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
   if (!isPassed) return isPassed;
   // ---------------------------------------------------------------------------
   // Test 2: create AE convex hull
@@ -419,7 +403,6 @@ bool AtomicEnvironmentTest(ofstream& FileMESSAGE, ostream& oss){ //HE20210511
   result.clear();
   task_description = "Creating convex hull with constructAtomEnvironmentHull() [aflow:d912e209c81aeb94]";
   passed_checks = 0;
-  check_num = 0;
   const uint test_AE = 4;
 
   // create hull
@@ -427,42 +410,36 @@ bool AtomicEnvironmentTest(ofstream& FileMESSAGE, ostream& oss){ //HE20210511
 
   // ---------------------------------------------------------------------------
   // Check | hull bit set
-  check_num++;
   check_description = "hull bit set";
-  check_equal(AE[test_AE].has_hull, true, check_function, check_description, check_num, passed_checks, results);
+  check_equal(AE[test_AE].has_hull, true, check_function, check_description, passed_checks, results);
 
   // ---------------------------------------------------------------------------
   // Check | hull volume
-  check_num++;
   check_description = "hull volume";
-  check_similar(AE[test_AE].volume, 31.4622167689, check_function, check_description, check_num, passed_checks, results);
+  check_similar(AE[test_AE].volume, 31.4622167689, check_function, check_description, passed_checks, results);
 
   // ---------------------------------------------------------------------------
   // Check | hull area
-  check_num++;
   check_description = "hull area";
-  check_similar(AE[test_AE].area, 60.4979100628, check_function, check_description, check_num, passed_checks, results);
+  check_similar(AE[test_AE].area, 60.4979100628, check_function, check_description, passed_checks, results);
 
   // ---------------------------------------------------------------------------
   // Check | triangle count
-  check_num++;
   check_description = "triangle count";
-  check_equal(AE[test_AE].facet_order[0], uint(6), check_function, check_description, check_num, passed_checks, results);
+  check_equal(AE[test_AE].facet_order[0], uint(6), check_function, check_description, passed_checks, results);
 
   // ---------------------------------------------------------------------------
   // Check | tetragon count
-  check_num++;
   check_description = "tetragon count";
-  check_equal(AE[test_AE].facet_order[1], uint(2), check_function, check_description, check_num, passed_checks, results);
+  check_equal(AE[test_AE].facet_order[1], uint(2), check_function, check_description, passed_checks, results);
 
   // ---------------------------------------------------------------------------
   // Check | pentagon count
-  check_num++;
   check_description = "pentagon count";
-  check_equal(AE[test_AE].facet_order[2], uint(0), check_function, check_description, check_num, passed_checks, results);
+  check_equal(AE[test_AE].facet_order[2], uint(0), check_function, check_description, passed_checks, results);
 
   // present overall result
-  return display_result(passed_checks, check_num, task_description, results, function_name, FileMESSAGE, oss);
+  return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
 }
 
 bool SchemaTest(ostream& oss){ofstream FileMESSAGE;return SchemaTest(FileMESSAGE,oss);}
@@ -1056,7 +1033,6 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
   string check_description = "";
   string calculated = "";
   string expected = "";
-  uint check_num = 0;
 
   // Set up structure variables
   _aflags aflags; aflags.Directory = aurostd::getPWD();
@@ -1141,7 +1117,6 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
     "   0.25000000000000   0.10780000000000   0.82840000000000  O \n"
     "   0.75000000000000   0.89220000000000   0.82840000000000  O \n";
 
-  ++check_num;
   check_function = "xstructure::operator<<";
   check_description = "Parsing CIF file with recognized setting (CrO3)";
 
@@ -1155,9 +1130,8 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
   match = compare::aflowCompareStructure(xstr_cif, xstr_poscar, same_species, scale_volume, optimize_match, misfit);
   expected = "Match";
   calculated = string((match?"Match":"No Match")) +  " (misfit = " + aurostd::utype2string<double>(misfit) + ")";
-  check(match && (misfit < _ZERO_TOL_), calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  check(match && (misfit < _ZERO_TOL_), calculated, expected, check_function, check_description, passed_checks, results);
 
-  ++check_num;
   check_description = "Checking parsed Wyckoff positions of CrO3";
   vector<wyckoffsite_ITC> vwyckoff(4);
   xvector<double> coords;
@@ -1187,10 +1161,9 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
 
   expected = "Wyckoff positions match";
   calculated = "Wyckoff positions " + string(check_passed?"matched":"did not match") + ".";
-  check(check_passed, calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  check(check_passed, calculated, expected, check_function, check_description, passed_checks, results);
 
   // May need a better test case where the labels actually change
-  ++check_num;
   check_description = "Checking calculated Wyckoff positions of CrO3";
   xstr_cif.SpaceGroup_ITC();
   vwyckoff[0].coord[1] = 0.25; vwyckoff[0].coord[2] = 0.59676; vwyckoff[0].coord[3] = 0.0000;
@@ -1219,10 +1192,9 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
   
   expected = "Wyckoff positions match";
   calculated = "Wyckoff positions " + string(check_passed?"matched":"did not match") + ".";
-  check(check_passed, calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  check(check_passed, calculated, expected, check_function, check_description, passed_checks, results);
 
   // Test that the CIF parser works for structures with old settings
-  ++check_num;
   check_description = "Parsing CIF file with unrecognized setting (GePt3)";
   aurostd::StringstreamClean(xstrss);
   str_cif =
@@ -1331,7 +1303,7 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
   match = compare::aflowCompareStructure(xstr_cif, xstr_poscar, same_species, scale_volume, optimize_match, misfit);
   expected = "Match";
   calculated = string(match?"Match":"No Match") +  " (misfit = " + aurostd::utype2string<double>(misfit) + ")";
-  check(match && (misfit < _ZERO_TOL_), calculated, expected, check_function, check_description, check_num, passed_checks, results);
+  check(match && (misfit < _ZERO_TOL_), calculated, expected, check_function, check_description, passed_checks, results);
 
-  return display_result(passed_checks, check_num, task_description, results, function_name, FileMESSAGE, oss);
+  return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
 }
