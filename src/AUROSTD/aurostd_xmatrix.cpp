@@ -1289,8 +1289,9 @@ namespace aurostd {  // namespace aurostd
 // ------------------------------------------------------ xmatrix construction
 namespace aurostd {
   // ME2021050 - Reshape given matrix dimensions
+  // SD20220127 - Added bool for row-major
   template<class utype>
-    xmatrix<utype> reshape(const xvector<utype>& v1, int rows, int cols) {
+    xmatrix<utype> reshape(const xvector<utype>& v1, int rows, int cols, bool row_major) {
       if (rows * cols != v1.rows) {
         string function = XPID + "aurostd::xmatrix<utype>::reshape(v1,rows,cols):";
         stringstream message;
@@ -1304,12 +1305,16 @@ namespace aurostd {
           c(i+1, j+1) = v1[v1.lrows + cols*i + j];
         }
       }
-      return c;
+      if (!row_major) {
+        return trasp(c);
+      }
+      else {
+        return c;
+      }
     }
   // SD20220126 - Reshape matrix into another matrix
-  // bool o = 1, 0 : row-major order (C order), column-major order (Fortran order)
   template<class utype>
-    xmatrix<utype> reshape(const xmatrix<utype>& c, int rows, int cols, bool o) {
+    xmatrix<utype> reshape(const xmatrix<utype>& c, int rows, int cols, bool row_major) {
       if (rows < 1 || cols < 1) {
         string soliloquy = XPID + "aurostd::xmatrix<utype>::reshape(c,rows,cols):";
         string message = "New dimensions cannot be less than one";
@@ -1322,16 +1327,15 @@ namespace aurostd {
         throw xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ERROR_);
       }
       xmatrix<utype> c_new = c;
-      if (!o) {c_new = trasp(c_new);}
       xvector<utype> v(rows * cols);
       uint count=1;
-      for (int i = c_new.lrows; i <= c_new.urows; i++) {
-        for (int j = c_new.lcols; j <= c_new.ucols; j++) {
+      for (int i = c.lrows; i <= c.urows; i++) {
+        for (int j = c.lcols; j <= c.ucols; j++) {
           v(count) = c_new[i][j];
           count++;
         }
       }
-      return aurostd::reshape(v, rows, cols);
+      return aurostd::reshape(v, rows, cols, row_major);
     }
 
   // reshape by columns
