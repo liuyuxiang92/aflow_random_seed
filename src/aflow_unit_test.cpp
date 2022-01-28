@@ -449,7 +449,7 @@ bool SchemaTest(ofstream& FileMESSAGE,ostream& oss) {
   _aflags aflags; aflags.Directory = aurostd::getPWD();
 
   // Set up test environment
-  string task_description = "Testing aurostd";
+  string task_description = "Testing schema";
   vector<string> results;
   uint passed_checks = 0;
   string check_function = "";
@@ -1185,7 +1185,7 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
       std::cerr << "coord = " << vwyckoff[i].coord << std::endl;
     }
   }
-  
+
   expected = "Wyckoff positions match";
   calculated = "Wyckoff positions " + string(check_passed?"matched":"did not match") + ".";
   check(check_passed, calculated, expected, check_function, check_description, passed_checks, results);
