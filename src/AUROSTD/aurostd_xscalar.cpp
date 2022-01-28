@@ -709,8 +709,7 @@ namespace aurostd {
 namespace aurostd {
   bool _ishex(const string& hexstr) {
     // Also process hexadecimal numbers with the '0x' prefix.
-    uint istart = ((hexstr.find("0x") == 0)?2:0);
-    for (const char& h : hexstr.substr(istart)) {
+    for (const char& h : ((hexstr.substr(0, 2) == "0x")?hexstr.substr(2):hexstr)) {
       // Return false if chars aren't '0-9', 'A-F', or 'a-f' - https://www.asciitable.com/
       if ((h < 48) || ((h > 57) && (h < 65)) || ((h > 70) && (h < 97)) || (h > 102)) return false;
     }
