@@ -5286,7 +5286,7 @@ namespace xprototype {
 
 namespace unittest {
 
-  typedef std::function<void()> unitTestFunction;
+  typedef std::function<void(uint&, vector<string>&)> unitTestFunction;
 
   struct xcheck {
     uint passed_checks;
@@ -5328,6 +5328,21 @@ namespace unittest {
       void multiplyByFive();
 
       bool taskSuccessful(const string& task);
+
+      template <typename utype>
+      void check(const bool passed, const utype &calculated, const utype &expected, const string &check_function,
+          const string check_description, uint &passed_checks, vector<string> &results);
+      template <typename utype>
+      void check_equal(const utype &calculated, const utype &expected, const string &check_function,
+          const string check_description, uint &passed_checks, vector<string> &results);
+      void check_equal(const string &calculated, const string &expected, const string &check_function,
+          const string check_description, uint &passed_checks, vector<string> &results);
+      void check_equal(const bool calculated, const bool expected, const string &check_function,
+          const string check_description, uint &passed_checks, vector<string> &results);
+      void check_similar(const double calculated, const double expected, const string &check_function,
+          const string &check_description, uint &passed_checks, vector<string> &results, const double relative=1E-10);
+
+      void SchemaTest(uint& passed_checks, vector<string>& results);
   };
 
 }

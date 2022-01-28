@@ -14,7 +14,6 @@ namespace unittest {
 
   UnitTest::UnitTest(ostream& oss) : xStream(oss) {
     initialize();
-    test_functions["multiply"].func();
   }
 
   UnitTest::UnitTest(ofstream& mf, ostream& oss) : xStream(mf, oss) {
@@ -154,6 +153,110 @@ namespace unittest {
     } else {
       return (test_functions[task].passed_checks == test_functions[task].results.size());
     }
+  }
+
+}
+
+namespace unittest {
+  // Collection of generic check functions, to streamline testing.
+  // HE20210616
+  template <typename utype>
+  void UnitTest::check(const bool passed, const utype &calculated, const utype &expected, const string &check_function,
+      const string check_description, uint &passed_checks, vector<string> &results){
+    stringstream result;
+    uint check_num = results.size() + 1;
+    if (passed) {
+      passed_checks++;
+      if (check_function.empty()){
+        result << std::setw(3) << check_num << " | pass | " << check_description;
+      } else {
+        result << std::setw(3) << check_num << " | pass | " << check_function << " | " << check_description;
+      }
+    }
+    else {
+      if (check_function.empty()) {
+        result << std::setw(3) << check_num << " | FAIL | " << check_description
+          << " (result: " << calculated << " | expected: " << expected << ")";
+      } else {
+        result << std::setw(3) << check_num << " | FAIL | " << check_function << " | " << check_description
+          << " (result: " << calculated << " | expected: " << expected << ")";
+      }
+    }
+    results.push_back(result.str());
+  }
+
+  template <typename utype>
+  void UnitTest::check_equal(const utype &calculated, const utype &expected, const string &check_function,
+      const string check_description, uint &passed_checks, vector<string> &results){
+    bool passed = (aurostd::isequal(calculated, expected));
+    check(passed, calculated, expected, check_function, check_description, passed_checks, results);
+  }
+  void UnitTest::check_equal(const string &calculated, const string &expected, const string &check_function,
+      const string check_description, uint &passed_checks, vector<string> &results){
+    bool passed = (calculated == expected);
+    check(passed, calculated, expected, check_function, check_description, passed_checks, results);
+  }
+  void UnitTest::check_equal(const bool calculated, const bool expected, const string &check_function,
+      const string check_description, uint &passed_checks, vector<string> &results){
+    bool passed = (calculated == expected);
+    check(passed, calculated, expected, check_function, check_description, passed_checks, results);
+  }
+
+  void UnitTest::check_similar(const double calculated, const double expected, const string &check_function,
+      const string &check_description, uint &passed_checks, vector<string> &results, const double relative){
+    bool passed = (std::abs(expected - calculated) <= expected * relative);
+    check(passed, calculated, expected, check_function, check_description, passed_checks, results);
+  }
+
+}
+
+namespace unittest {
+
+  void UnitTest::SchemaTest(uint& passed_checks, vector<string>& results) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "SchemaTest():";
+
+    // Set up test environment
+    string task_description = "Testing schema";
+    string check_function = "";
+    string check_description = "";
+
+    check_function = "XHOST.vschema";
+    check_description = "Internal consistency of vschema";
+    vector<string> vschema_keys;
+    vector<string> vschema_types = {"UNIT", "TYPE"};
+    string key = "";
+    uint ninconsistent = 0;
+    for (uint i = 0; i < XHOST.vschema.vxsghost.size(); i+= 2) {
+      if(XHOST.vschema.vxsghost[i].find("::NAME:") != string::npos) {
+        key=aurostd::RemoveSubString(XHOST.vschema.vxsghost[i], "SCHEMA::NAME:");
+        vschema_keys.push_back(XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + key));
+        for (uint j = 0; j < vschema_types.size(); j++) {
+          if (!XHOST.vschema.isdefined("SCHEMA::" + vschema_types[j] + ":" + key)) {
+            ninconsistent++;
+            if (LDEBUG) std::cerr << "SCHEMA::" << vschema_types[j] << ":" << key << " not found." << std::endl;
+          }
+        }
+      }
+    }
+    check_equal(ninconsistent, 0, check_function, check_description, passed_checks, results);
+
+    check_function = "_aflowlib_entry";
+    check_description = "Consistency between _aflowlib_entry json and schema";
+    aflowlib::_aflowlib_entry aentry;
+    string aflowlib_json = aentry.aflowlib2string("JSON", true);
+    vector<string> json_keys = aurostd::extractJsonKeysAflow(aflowlib_json);
+
+    vector<string> vkeys_ignore = {"data_language", "error_status", "natoms_orig",
+                                   "density_orig", "volume_cell_orig", "volume_atom_orig",
+                                   "spinD_magmom_orig"};
+    for (const string& key : json_keys) {
+      if (!aurostd::WithinList(vkeys_ignore, key) && !aurostd::WithinList(vschema_keys, key)) {
+        ninconsistent++;
+        if (LDEBUG) std::cerr << key << " not found in schema." << std::endl;
+      }
+    }
+    check_equal(ninconsistent, 0, check_function, check_description, passed_checks, results);
   }
 
 }
@@ -1334,7 +1437,7 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
       std::cerr << "coord = " << vwyckoff[i].coord << std::endl;
     }
   }
-  
+
   expected = "Wyckoff positions match";
   calculated = "Wyckoff positions " + string(check_passed?"matched":"did not match") + ".";
   check(check_passed, calculated, expected, check_function, check_description, passed_checks, results);
