@@ -253,9 +253,9 @@ namespace aflowlib {
         TokenExtractAFLOWLIB(vList.at(iaries).at(j),"composition=",tokens_composition);
 
         if(tokens_species.size()!=tokens_composition.size()) {
-          string function = XPID + "aflowlib::GREP_Species_ALL():";
+          string function_name = XPID + "aflowlib::GREP_Species_ALL():";
           string message = "tokens_species.size()!=tokens_composition.size()";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
         }
         // cerr << XPID << "GREP_Species_ALL: E=" << enthalpy << " ";
         for(uint k=0;k<nspecies;k++) // order by species, no entries
@@ -658,9 +658,9 @@ namespace aflowlib {
       if(found==TRUE) {
         if(LDEBUG || LVERBOSE) cerr << " ... size=" << (*pvLibrary).size() << " ..  ";// << endl;
       } else {
-        string function = XPID + "aflowlib::LOAD_Library_LIBRARY():";
+        string function_name = XPID + "aflowlib::LOAD_Library_LIBRARY():";
         string message = "AFLOW_LIBRARY not found!";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
         return FALSE;
       }
       if((*pvLibrary_tokens).size()==0) {
@@ -791,9 +791,9 @@ namespace aflowlib {
     }
 
     if(PROJECT_LIBRARY=="NOTHING") {
-      string function = XPID + "aflowlib::LIB2RAW_CheckProjectFromDirectory():";
+      string function_name = XPID + "aflowlib::LIB2RAW_CheckProjectFromDirectory():";
       string message = "Nothing found from pwd or directory [directory=" + directory + "]   [pwd=" + directory_pwd + "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
     }
     return XHOST.tmpfs;
   }
@@ -918,9 +918,9 @@ namespace aflowlib {
       }
       return TRUE;
     }
-    string function = XPID + "aflowlib::LIB2RAW_ALL():";
+    string function_name = XPID + "aflowlib::LIB2RAW_ALL():";
     string message = "Project Not Found";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
     return FALSE;
   }
 }
@@ -2029,12 +2029,12 @@ namespace aflowlib {
 namespace aflowlib {
   bool LIB2RAW_FileNeeded(string directory_LIB,string fileLIB,string directory_RAW,string fileRAW,vector<string> &vfile,const string& MESSAGE) {
     //  bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function = XPID + "aflowlib::LIB2RAW_FileNeeded():";
+    string function_name = XPID + "aflowlib::LIB2RAW_FileNeeded():";
     string error_message = "";
 
     if(XHOST.vext.size()!=XHOST.vzip.size()) {
       error_message = "XHOST.vext.size()!=XHOST.vzip.size()";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error_message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, error_message, _INDEX_MISMATCH_);
     }
 
     string file_LIB=directory_LIB+"/"+fileLIB;
@@ -2049,15 +2049,15 @@ namespace aflowlib {
     if(!aurostd::FileExist(file_LIB) && !aurostd::FileExist(file_LIB_nocompress) && !aurostd::EFileExist(file_LIB_nocompress)) {
       if(!aurostd::FileExist(file_LIB)) {
         error_message = MESSAGE + " file not found " + file_LIB;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error_message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, error_message, _FILE_NOT_FOUND_);
       }
       if(!aurostd::FileExist(file_LIB_nocompress)) {
         error_message = MESSAGE + " file not found " + file_LIB_nocompress;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error_message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, error_message, _FILE_NOT_FOUND_);
       }
       if(!aurostd::EFileExist(file_LIB_nocompress)) {
         error_message = MESSAGE + " file not found " + file_LIB_nocompress + ".EXT";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error_message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, error_message, _FILE_NOT_FOUND_);
       }
     }
     if(aurostd::FileExist(file_LIB)) aurostd::CopyFile(file_LIB,file_RAW);
@@ -2520,10 +2520,10 @@ namespace aflowlib {
   bool ExtractOUT_from_VASP_OUTCAR(string _file,const double& data_natoms,xOUTCAR& xOUT) {
     bool flag=xOUT.GetPropertiesFile(_file);
     if(aurostd::abs(data_natoms-(double) xOUT.natoms)>0.1) {
-      string function = XPID + "aflowlib::ExtractOUT_from_VASP_OUTCAR():";
+      string function_name = XPID + "aflowlib::ExtractOUT_from_VASP_OUTCAR():";
       stringstream message;
       message << "data_natoms(" << data_natoms << ")!= (int) xOUT.natoms(" << xOUT.natoms << ").";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
     }
     return flag;
   }
@@ -5519,7 +5519,7 @@ namespace aflowlib {
 namespace aflowlib {
   bool LIB2RAW_Loop_AEL(const string& directory_LIB,const string& directory_RAW,vector<string> &vfile,aflowlib::_aflowlib_entry& data,const string& MESSAGE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function = XPID + "aflowlib::LIB2RAW_loop_AEL()";  //ME20191119
+    string function_name = XPID + "aflowlib::LIB2RAW_loop_AEL()";  //ME20191119
     if(LDEBUG) cerr << "aflowlib::LIB2RAW_Loop_AEL [1]" << endl;
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " aflowlib::LIB2RAW_Loop_AEL - begin " << directory_LIB << endl;
     // [OBSOLETE]  aflowlib_out << _AFLOWLIB_ENTRY_SEPARATOR_ << "loop=ael";
@@ -5577,7 +5577,7 @@ namespace aflowlib {
             stringstream message;
             message << "Could not read stiffness tensor: wrong number of lines"
               << " (found " << vline.size() << ", need 6).";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _FILE_CORRUPT_);
           }
           for (int i = 0; i < 6; i++) {
             aurostd::string2tokens(vline[i], row);
@@ -5586,7 +5586,7 @@ namespace aflowlib {
               message << "Could not read stiffness tensor."
                 << " Wrong number of columns in line " << (i + 1)
                 << " (found " << row.size() << ", need 6).";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _FILE_CORRUPT_);
             }
             for (int j = 0; j < 6; j++) tensor[i + 1][j + 1] = row[j];
           }
@@ -5605,21 +5605,21 @@ namespace aflowlib {
         vline.pop_back();  // Remove empty line at the end
         try {
           if (vline.size() != 6) {
-            string function = "aflowlib::LIB2RAW_loop_AEL()";
+            string function_name = XPID + "aflowlib::LIB2RAW_loop_AEL()";
             stringstream message;
             message << "Could not read compliance tensor: wrong number of lines"
               << " (found " << vline.size() << ", need 6).";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _FILE_CORRUPT_);
           }
           for (int i = 0; i < 6; i++) {
             aurostd::string2tokens(vline[i], row);
             if (row.size() != 6) {
-              string function = "aflowlib::LIB2RAW_loop_AEL()";
+              string function_name = XPID + "aflowlib::LIB2RAW_loop_AEL()";
               stringstream message;
               message << "Could not read compliance tensor:"
                 << " wrong number of columns in line " << (i + 1)
                 << " (found " << row.size() << ", need 6).";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_CORRUPT_);
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _FILE_CORRUPT_);
             }
             for (int j = 0; j < 6; j++) tensor[i + 1][j + 1] = row[j];
           }
@@ -5673,9 +5673,9 @@ namespace aflowlib {
 namespace aflowlib {
   bool LIB2RAW_Loop_APL(const string& directory_LIB,const string& directory_RAW,vector<string> &vfile,aflowlib::_aflowlib_entry& data,const string& MESSAGE) {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function = XPID + "aflowlib::LIB2RAW_Loop_APL():";
-    if(LDEBUG) std::cerr << function << " [1]" << std::endl;
-    if (AFLOWLIB_VERBOSE) std::cout << MESSAGE << " " << function << " - begin " << directory_LIB << std::endl;
+    string function_name = XPID + "aflowlib::LIB2RAW_Loop_APL():";
+    if(LDEBUG) std::cerr << function_name << " [1]" << std::endl;
+    if (AFLOWLIB_VERBOSE) std::cout << MESSAGE << " " << function_name << " - begin " << directory_LIB << std::endl;
 
     data.vloop.push_back("apl");
 

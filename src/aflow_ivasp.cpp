@@ -6178,8 +6178,8 @@ namespace KBIN {
     //this is all done inside the main XVASP_Afix() function
     //BE CAREFUL not to overwrite xvasp.INCAR
     bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
-    string function="KBIN::XVASP_Afix_EFIELD_PEAD";
-    string soliloquy=XPID+function+"():";
+    string function_name="KBIN::XVASP_Afix_EFIELD_PEAD";
+    string soliloquy=XPID+function_name+"():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
@@ -6225,10 +6225,10 @@ namespace KBIN {
     }
     //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){return false;}  //remove whitespaces
 
-    KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"EFIELD_PEAD",function,vflags.KBIN_VASP_INCAR_VERBOSE);  //CO20200624
-    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing " << function << " [AFLOW] start" << endl;
-    xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << function << endl;
-    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing " << function << " [AFLOW] end" << endl;
+    KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"EFIELD_PEAD",function_name,vflags.KBIN_VASP_INCAR_VERBOSE);  //CO20200624
+    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing " << function_name << " [AFLOW] start" << endl;
+    xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << function_name << endl;
+    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing " << function_name << " [AFLOW] end" << endl;
 
     //[CO20210315 - avoid writing orig]xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE); //CO20200624
 
@@ -7899,9 +7899,9 @@ namespace KBIN {
   string ExtractSystemName(const string& directory) {
     string system_name = ExtractSystemNameFromAFLOWIN(directory);
     if (system_name.empty()) {
-      string function = "KBIN::ExtractSystemName()";
+      string function_name = "KBIN::ExtractSystemName()";
       string message = "Could not extract system.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_CORRUPT_);
     }
     aurostd::StringSubst(system_name,":.","."); //CO20200731 - patching bug in system name generation
     aurostd::StringSubst(system_name,"@ARUN.A",":ARUN.A");  //CO20200731 - patching for AEL/AGL ARUNs - @ in filenames are NOT good
@@ -7916,9 +7916,9 @@ namespace KBIN {
     string system_name = "";
     string aflowin_path = directory + "/" + _AFLOWIN_;
     if(!aurostd::FileExist(aflowin_path)) {
-      string function = "KBIN::ExtractSystemNameFromAFLOWIN():";
+      string function_name = "KBIN::ExtractSystemNameFromAFLOWIN():";
       string message = "Could not find file " + aflowin_path + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_NOT_FOUND_);
     }
     // ME20200525 - Need to take potential white space between [AFLOW],
     // SYSTEM, and = into account.

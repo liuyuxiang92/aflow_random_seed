@@ -1059,9 +1059,9 @@ namespace init {
   long _GetRAM(void) {
     struct sysinfo s;
     if(sysinfo(&s)!=0) {
-      string function = XPID + "init::_GetRAM():";
+      string function_name = XPID + "init::_GetRAM():";
       string message = "sysinfo error";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
     }
     return s.totalram;
   }
@@ -1074,9 +1074,9 @@ namespace init {
     uint64_t size;
     size_t len=sizeof(size);
     if(sysctl(mib,namelen,&size,&len,NULL,0)<0) {
-      string function = XPID + "init::GetRAM():";
+      string function_name = XPID + "init::GetRAM():";
       string message = "sysctl returned an error";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
     }
     return (long) size;
   }
@@ -1735,12 +1735,12 @@ bool CheckMaterialServer(const string& message) { //CO20200624
   if(XHOST.hostname==XHOST.AFLOW_WEB_SERVER) return TRUE;
   if(XHOST.hostname=="habana") return TRUE;
   if(XHOST.hostname=="aflowlib") return TRUE;
-  string function = XPID + "init::CheckMaterialServer():";
+  string function_name = XPID + "init::CheckMaterialServer():";
   stringstream messagestream;
   messagestream << "Your machine is \"" << XHOST.hostname << "\". ";
   if(message.length()>0) messagestream << "Command \"" << message << "\" can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\"." << endl;
   else messagestream << "The procedure can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\".";
-  throw aurostd::xerror(_AFLOW_FILE_NAME_, function, messagestream, _RUNTIME_ERROR_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, messagestream, _RUNTIME_ERROR_);
   return FALSE;
 }
 

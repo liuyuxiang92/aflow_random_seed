@@ -104,8 +104,8 @@ namespace aurostd{
   double polynomialFindExtremum(const xvector<double> &p, double xmin, double xmax,
       double tol){
     bool LDEBUG = (FALSE || DEBUG_XFIT || XHOST.DEBUG);
-    string function = XPID + "polynomialFindExtremum(): ";
-    if (LDEBUG) cerr << function << "begin" << std::endl;
+    string function_name = XPID + "polynomialFindExtremum(): ";
+    if (LDEBUG) cerr << function_name << "begin" << std::endl;
 
     double left_end = xmin; double right_end = xmax;
     double middle = 0.5*(left_end + right_end);
@@ -122,9 +122,9 @@ namespace aurostd{
     if (sign(f_at_left_end) == sign(f_at_right_end)) return -1;
 
     if (LDEBUG){
-      cerr << function << "left_end= "  << left_end  << "middle= ";
+      cerr << function_name << "left_end= "  << left_end  << "middle= ";
       cerr << middle  << "right_end= "  << right_end  << std::endl;
-      cerr << function << "f_left= " << f_at_left_end;
+      cerr << function_name << "f_left= " << f_at_left_end;
       cerr << "f_middle= " << f_at_middle << "f_right= ";
       cerr << f_at_right_end << std::endl;
     }
@@ -148,9 +148,9 @@ namespace aurostd{
       f_at_middle = dp[2];
 
       if (LDEBUG){
-        cerr << function << "left_end= "  << left_end  << "middle= ";
+        cerr << function_name << "left_end= "  << left_end  << "middle= ";
         cerr << middle  << "right_end= "  << right_end  << std::endl;
-        cerr << function << "f_left= " << f_at_left_end;
+        cerr << function_name << "f_left= " << f_at_left_end;
         cerr << "f_middle= " << f_at_middle << "f_right= ";
         cerr << f_at_right_end << std::endl;
       }
@@ -159,7 +159,7 @@ namespace aurostd{
     // double-check that the convergence criterion was reached
     if (std::abs(f_at_middle) > tol) return -1;
 
-    if (LDEBUG) cerr << function << "end" << std::endl;
+    if (LDEBUG) cerr << function_name << "end" << std::endl;
     return middle;
   }
 }
@@ -285,9 +285,9 @@ namespace aurostd{
   ///
   bool NonlinearFit::fitLevenbergMarquardt()
   {
-    string function = XPID + "NonlinearFit::fitLevenbergMarquardt(): ";
+    string function_name = XPID + "NonlinearFit::fitLevenbergMarquardt(): ";
     bool LDEBUG = (FALSE || DEBUG_XFIT || XHOST.DEBUG);
-    if (LDEBUG) cerr << function << "begin"  << std::endl;
+    if (LDEBUG) cerr << function_name << "begin"  << std::endl;
 
     static const double step_scaling_factor = 10.0;
 
@@ -304,16 +304,16 @@ namespace aurostd{
 
     // determine initial step
     double lambda = tau*maxDiagonalElement(A);
-    if (LDEBUG) cerr << function << "lambda = " << lambda << std::endl;
+    if (LDEBUG) cerr << function_name << "lambda = " << lambda << std::endl;
 
     while (iter<max_iter){
       iter++;
-      if (LDEBUG) cerr << function << "iteration: " << iter << std::endl;
+      if (LDEBUG) cerr << function_name << "iteration: " << iter << std::endl;
 
       // M = A + lambda*diag(A)
       M = A; for (int i=1; i<=Nparams; i++) M[i][i] += lambda*A[i][i];
 
-      if (LDEBUG) cerr << function << " M:" << std::endl << M << std::endl;
+      if (LDEBUG) cerr << function_name << " M:" << std::endl << M << std::endl;
 
       // transformation: xvector(N) => xmatrix(N,1) to use GaussJordan function
       for (int i=1; i<=Nparams; i++) G[i][1] = g[i];
@@ -341,10 +341,10 @@ namespace aurostd{
       else{
         lambda *= step_scaling_factor;
       }
-      if (LDEBUG) cerr << function << "pnew = " << p << std::endl;
+      if (LDEBUG) cerr << function_name << "pnew = " << p << std::endl;
     }
 
-    if (LDEBUG) cerr << function << "end"  << std::endl;
+    if (LDEBUG) cerr << function_name << "end"  << std::endl;
     return iter < max_iter;
   }
 }

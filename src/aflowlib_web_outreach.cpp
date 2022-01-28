@@ -716,7 +716,7 @@ bool AlloyAlphabeticLIBRARY(const string& s) {
 // ******************************************************************************************************************************************************
 
 void voutreach_print(uint _mode,ostream& oss,string what2print) {
-  string function = XPID + "voutreach_print()";
+  string function_name = XPID + "voutreach_print()";
   string message = "";
   aurostd::xoption vflag=XHOST.vflag_outreach;
   bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -790,7 +790,7 @@ void voutreach_print(uint _mode,ostream& oss,string what2print) {
         aurostd::string2tokens(XHOST.vflag_control.getattachedscheme("CV::AUTHOR"),vauthor,",");
         if(vauthor.size()==0) {
           message = "No authors specified.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message);
         }
       }
     }
@@ -803,7 +803,7 @@ void voutreach_print(uint _mode,ostream& oss,string what2print) {
         aurostd::string2tokens(XHOST.vflag_control.getattachedscheme("PHP::PUBS_ALLOY"),valloy,",");
         if(valloy.size()==0) {
           message = "valloy.size() == 0";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message);
         }
       }
     }
@@ -812,7 +812,7 @@ void voutreach_print(uint _mode,ostream& oss,string what2print) {
       aurostd::string2tokens(XHOST.vflag_control.getattachedscheme("PHP::PUBS_KEYWORD"),vkeyword,",");
       if(vkeyword.size()==0) {
         message = "No keywords specified.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message);
       }
       for(uint i=0;i<vkeyword.size();i++) if(!XHOST.QUIET_CERR) cerr << "vkeyword.at(" << i << ")=" <<  vkeyword.at(i) << endl;
     }
@@ -1556,9 +1556,9 @@ void HT_CHECK_GRANTS(ostream& oss) {//,const vector<string>& vitems,string msg1,
   vector<_outreach> voutreach;
   voutreach_load(voutreach,"PUBLICATIONS");
   if(!vflag.flag("GRANTS")) {
-    string function = XPID + "HT_CHECK_GRANTS():";
+    string function_name = XPID + "HT_CHECK_GRANTS():";
     string message = "No grants.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message);
   }
   if(!XHOST.QUIET_CERR) cerr << "LOADED " << voutreach.size() << " " << endl;
   string grant=vflag.getattachedscheme("GRANTS");

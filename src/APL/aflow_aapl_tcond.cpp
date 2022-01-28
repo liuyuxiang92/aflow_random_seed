@@ -158,11 +158,11 @@ namespace apl {
   }
 
   void TCONDCalculator::initialize(const aurostd::xoption& opts) {
-    string function = "apl::TCONDCalculator::initialize():";
+    string function_name = XPID + "apl::TCONDCalculator::initialize():";
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_INIT_);
     }
     // Set up phonon parameters
     nBranches = _pc->getNumberOfBranches();
@@ -170,7 +170,7 @@ namespace apl {
     aurostd::string2tokens(opts.getattachedscheme("THERMALGRID"), grid, " xX");
     if (grid.size() != 3) {
       message = "Wrong format for the q-point grid for thermal conductivity calculations.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
     }
     _pc->initialize_qmesh(grid, true, true);
     _qm->makeIrreducible();
@@ -184,11 +184,11 @@ namespace apl {
 
     if (tstart > tend) {
       message = "Tstart cannot be higher than Tend.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
     }
     if (tstep < _ZERO_TOL_) {
       message = "Tstep cannot be zero or negative.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
     }
     for (double t = tstart; t <= tend; t += tstep) temperatures.push_back(t);
 
@@ -217,9 +217,9 @@ namespace apl {
   // Grueneisen parameters, and the scattering phase space.
   void TCONDCalculator::calculateThermalConductivity() {
     if (!_initialized) {
-      string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalConductivity()";
+      string function_name = XPID + _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalConductivity()";
       string message = "Not initialized.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_INIT_);
     }
 
     // Transition probabilities
@@ -289,9 +289,9 @@ namespace apl {
   // Calculates the mode and average Grueneisen parameters.
   void TCONDCalculator::calculateGrueneisenParameters() {
     if (!_initialized) {
-      string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateGrueneisenParameters()";
+      string function_name = XPID + _AAPL_TCOND_ERR_PREFIX_ + "calculateGrueneisenParameters()";
       string message = "Not initialized.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_INIT_);
     }
     // Grueneisen parameters
     string message = "Calculating Grueneisen parameters.";
@@ -1076,10 +1076,10 @@ namespace apl {
         num_iter++;
       } while ((std::abs(norm) > TCOND_ITER_THRESHOLD) && (num_iter <= max_iter));
       if (num_iter > max_iter) {
-        string function = _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalConductivityTensor():";
+        string function_name = XPID + _AAPL_TCOND_ERR_PREFIX_ + "calculateThermalConductivityTensor():";
         message << "Thermal conductivity did not converge within " << max_iter << " iterations ";
         message << "at " << T << " K.";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
     }
     return tcond;
@@ -1388,10 +1388,10 @@ namespace apl {
     output << AFLOWIN_SEPARATION_LINE << std::endl;
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeTempIndepOutput():";
+      string function_name = XPID + _AAPL_TCOND_ERR_PREFIX_ + "writeTempIndepOutput():";
       stringstream message;
       message << "Could not write file " << filename << ".";
-      throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+      throw xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
     }
   }
 
@@ -1418,10 +1418,10 @@ namespace apl {
     output << AFLOWIN_SEPARATION_LINE << std::endl;
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeTempDepOutput():";
+      string function_name = XPID + _AAPL_TCOND_ERR_PREFIX_ + "writeTempDepOutput():";
       stringstream message;
       message << "Could not write file " << filename << ".";
-      throw xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+      throw xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
     }
   }
 
@@ -1566,9 +1566,9 @@ namespace apl {
 
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = _AAPL_TCOND_ERR_PREFIX_ + "writeThermalConductivity():";
+      string function_name = XPID + _AAPL_TCOND_ERR_PREFIX_ + "writeThermalConductivity():";
       string message = "Could not write thermal conductivities to file.";
-      throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+      throw xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
     }
   }
 

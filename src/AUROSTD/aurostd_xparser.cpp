@@ -791,9 +791,9 @@ namespace aurostd {
         value = aurostd::RemoveWhiteSpacesFromTheFront(json.substr(start, end - start));
         // If we have a nested object, "value" should only be '{' + white space by now.
         if (value[0] == '{') {
-          string function = XPID + "aurostd::extractJsonValueAflow():";
+          string function_name = XPID + "aurostd::extractJsonValueAflow():";
           string message = "JSON parser cannot read nested objects.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
         }
         end = value.find_last_of(",");
         value = value.substr(0, end);
@@ -803,9 +803,9 @@ namespace aurostd {
         value = aurostd::RemoveWhiteSpacesFromTheFront(json.substr(start, end - start));
         // If we have a nested object, it should start with '{'
         if (value[0] == '{') {
-          string function = XPID + "aurostd::extractJsonValueAflow():";
+          string function_name = XPID + "aurostd::extractJsonValueAflow():";
           string message = "JSON parser cannot read nested objects.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
         }
       }
     } else {

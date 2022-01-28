@@ -636,9 +636,9 @@ namespace aurostd {
   // namespace aurostd
   bool factorial(bool x) {
     if(_isfloat(x)) {
-      string function = XPID + "aurostd::factorial():";
+      string function_name = XPID + "aurostd::factorial():";
       string message = "factorial(bool) implemented only for bool !";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
     }
     return TRUE;
   }
@@ -726,9 +726,9 @@ namespace aurostd {
   template<class utype>
     bool _isodd(utype x) {
       if(_isfloat(x)) {
-        string function = XPID + "aurostd::factorial():";
+        string function_name = XPID + "aurostd::factorial():";
         string message = "_isodd implemented only for integers !";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
       }
       if(!mod(x,(utype) 2)) return FALSE;
       else return TRUE;
@@ -763,9 +763,9 @@ namespace aurostd {
   template<class utype>
     bool _iseven(utype x) {
       if(_isfloat(x)) {
-        string function = XPID + "aurostd::factorial():";
+        string function_name = XPID + "aurostd::factorial():";
         string message = "_iseven implemented only for integers !";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
       }
       if(mod(x,(utype) 2)) return FALSE;
       else return TRUE;

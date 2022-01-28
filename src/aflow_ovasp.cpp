@@ -7473,9 +7473,9 @@ bool IBZextrema(xEIGENVAL& xeigenval,
               curvature.clear() ; posvec.clear() ;
             }
             //ME20200724 - there used to be an exit here without comment or explanation
-            string function = "IBZextrema()";
+            string function_name = "IBZextrema()";
             string message = "branches.at(itr0).at(itr1)[1] > branches.at(itr0).at(itr1)[2])";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message);
           } else if(branches.at(itr0).at(itr1)[1] < branches.at(itr0).at(itr1)[2]) {
             for(int itr2=branches.at(itr0).at(itr1)[1]+2; itr2<=branches.at(itr0).at(itr1)[2]-2; itr2++) {
               ndxvec[1] = itr2-2 ;

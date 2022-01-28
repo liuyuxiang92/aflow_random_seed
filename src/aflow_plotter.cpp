@@ -1965,9 +1965,9 @@ namespace plotter {
     uint nsegments = xkpts.vpath.size()/2;
     // Make sure that the number of k-points is consistent with EIGENVAL
     if (xeigen.number_kpoints != nsegments * xkpts.path_grid) {
-      string function = "plotter::generateBandPlot():";
+      string function_name = "plotter::generateBandPlot():";
       string message = "Number of k-points in EIGENVAL and KPOINTS files do not match.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _RUNTIME_ERROR_);
     }
 
     // Labels
@@ -2729,9 +2729,9 @@ namespace plotter {
         out.str("");  //ME20200513 - reset stringstream
       }
     } else {
-      string function = "plotter::PLOT_THERMO():";
+      string function_name = "plotter::PLOT_THERMO():";
       string message = "Could not find file " + thermo_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _FILE_NOT_FOUND_);
     }
   }
 
@@ -2750,7 +2750,7 @@ namespace plotter {
   void PLOT_THERMO_QHA(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE; PLOT_THERMO_QHA(plotoptions,out,FileMESSAGE,oss);} //CO20200404
   void PLOT_THERMO_QHA(xoption& plotoptions, stringstream& out,ofstream& FileMESSAGE,ostream& oss) 
   {
-    string function = "plotter::PLOT_THERMO_QHA():", msg = "";
+    string function_name = "plotter::PLOT_THERMO_QHA():", msg = "";
 
     // Set labels
     static const int nprops = 7;
@@ -2767,7 +2767,7 @@ namespace plotter {
         eos_model != "BM4" && eos_model != "M"){
       msg = "Wrong name of the EOS model was specified. ";
       msg += "Only SJ, BM2, BM3, BM4 or M labels are allowed.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, msg, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, msg, _INPUT_ILLEGAL_);
     }
     string keyword = "QHA_" + eos_model + "_THERMO";
 
@@ -2797,7 +2797,7 @@ namespace plotter {
       }
     } else {
       msg = "Could not find file " + thermo_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, msg, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, msg, _FILE_NOT_FOUND_);
     }
   }
   //AS20200909 END
@@ -2904,9 +2904,9 @@ namespace plotter {
       setPlotLabels(plotoptions, "T", "K", "\\kappa", "W/m K");
       plotMatrix(plotoptions, out,FileMESSAGE,oss);  //CO20200404
     } else {
-      string function = "plotter::PLOT_TCOND()";
+      string function_name = "plotter::PLOT_TCOND()";
       string message = "Could not find file " + tcond_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _FILE_NOT_FOUND_);
     }
   }
 
@@ -3005,7 +3005,7 @@ namespace plotter {
   // Reads data from an AFLOW data file. Requires a START and STOP string to
   // be present so that it can skip headers and other data sets.
   vector<vector<double> > readAflowDataFile(xoption& plotoptions) {
-    string function = "plotter::readAflowDataFile():";
+    string function_name = "plotter::readAflowDataFile():";
     string message = "";
     vector<vector<double> > data;
     vector<double> row;
@@ -3039,13 +3039,13 @@ namespace plotter {
       if (vcontent[iline] == stopstring) break;
       if (iline == nlines) {
         message = "Wrong file format. No STOP tag found.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_WRONG_FORMAT_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _FILE_WRONG_FORMAT_);
       }
     }
     if (data.size() == 0) {
       message = "No data extracted from file " + path_to_file + ".";
       message += "File is either empty or has the wrong format.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_WRONG_FORMAT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _FILE_WRONG_FORMAT_);
     }
     return data;
   }

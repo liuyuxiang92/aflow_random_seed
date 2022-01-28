@@ -240,16 +240,16 @@ namespace aurostd {  // namespace aurostd
     utype* xmatrix<utype>::operator[] (int ir) const {
 #ifdef _XMATRIX_CHECK_BOUNDARIES_
       if(ir>urows)  {
-        string function = XPID + "aurostd::xmatrix::operator[]:";
+        string function_name = XPID + "aurostd::xmatrix::operator[]:";
         stringstream message;
         message << "_xmatrix<utype>_rows_high ir=" << ir << ", lrows=" << lrows << ", hrows=" << urows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
       }
       if(ir<lrows) {
-        string function = XPID + "aurostd::xmatrix::operator[]:";
+        string function_name = XPID + "aurostd::xmatrix::operator[]:";
         stringstream message;
         message << "_xmatrix<utype>_rows_low ir=" << ir << ", lrows=" << lrows << ", hrows=" << urows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
       }
 #endif
       return corpus[ir];
@@ -263,28 +263,28 @@ namespace aurostd {  // namespace aurostd
       //#ifndef XMATRIX_PERIODIC_BOUNDARY_CONDITIONS
 #ifdef _XMATRIX_CHECK_BOUNDARIES_
       if(i>urows) {
-        string function = XPID + "aurostd::xmatrix::operator():";
+        string function_name = XPID + "aurostd::xmatrix::operator():";
         stringstream message;
         message << "M -> i=" << i << " > urows=" << urows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
       }
       if(i<lrows) {
-        string function = XPID + "aurostd::xmatrix::operator():";
+        string function_name = XPID + "aurostd::xmatrix::operator():";
         stringstream message;
         message << "M -> i=" << i << " < lrows=" << lrows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
       }
       if(j>ucols) {
-        string function = XPID + "aurostd::xmatrix::operator():";
+        string function_name = XPID + "aurostd::xmatrix::operator():";
         stringstream message;
         message << "M -> j=" << j << " > ucols=" << ucols;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
       }
       if(j<lcols) {
-        string function = XPID + "aurostd::xmatrix::operator():";
+        string function_name = XPID + "aurostd::xmatrix::operator():";
         stringstream message;
         message << "M -> j=" << j << " < lcols=" << lcols;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
       }
 #endif // _XMATRIX_CHECK_BOUNDARIES_
       return corpus[i][j];
@@ -494,28 +494,28 @@ namespace aurostd {  // namespace aurostd
       if(bc==BOUNDARY_CONDITIONS_NONE) {
 #ifdef _XMATRIX_CHECK_BOUNDARIES_
         if(i>urows) {
-          string function = XPID + "aurostd::xmatrix::operator():";
+          string function_name = XPID + "aurostd::xmatrix::operator():";
           stringstream message;
           message << "M -> i=" << i << " > urows=" << urows;
-          throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+          throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
         }
         if(i<lrows) {
-          string function = XPID + "aurostd::xmatrix::operator():";
+          string function_name = XPID + "aurostd::xmatrix::operator():";
           stringstream message;
           message << "M -> i=" << i << " < lrows=" << lrows;
-          throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+          throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
         }
         if(j>ucols) {
-          string function = XPID + "aurostd::xmatrix::operator():";
+          string function_name = XPID + "aurostd::xmatrix::operator():";
           stringstream message;
           message << "M -> j=" << j << " > ucols=" << ucols;
-          throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+          throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
         }
         if(j<lcols) {
-          string function = XPID + "aurostd::xmatrix::operator():";
+          string function_name = XPID + "aurostd::xmatrix::operator():";
           stringstream message;
           message << "M -> j=" << j << " < lcols=" << lcols;
-          throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+          throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
         }
 #endif
         return corpus[i][j];
@@ -532,28 +532,28 @@ namespace aurostd {  // namespace aurostd
         if(jj<lcols) jj=ucols-mod(ucols-j,ucols-lcols+1);
 #ifdef _XMATRIX_CHECK_BOUNDARIES_
         if(ii>urows) {
-          string function = XPID + "aurostd::xmatrix::operator():";
+          string function_name = XPID + "aurostd::xmatrix::operator():";
           stringstream message;
           message << "V -> ii=" << ii << " > urows" << urows << " <<  BC=" << bc;
-          throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+          throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
         }
         if(ii<lrows) {
-          string function = XPID + "aurostd::xmatrix::operator():";
+          string function_name = XPID + "aurostd::xmatrix::operator():";
           stringstream message;
           message << "V -> ii=" << ii << " < lrows" << lrows << " <<  BC=" << bc;
-          throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+          throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
         }
         if(jj>ucols) {
-          string function = XPID + "aurostd::xmatrix::operator():";
+          string function_name = XPID + "aurostd::xmatrix::operator():";
           stringstream message;
           message << "V -> jj=" << jj << " > ucols" << ucols << " <<  BC=" << bc;
-          throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+          throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
         }
         if(jj<lcols) {
-          string function = XPID + "aurostd::xmatrix::operator():";
+          string function_name = XPID + "aurostd::xmatrix::operator():";
           stringstream message;
           message << "V -> jj=" << jj << " < lcols" << lcols << " <<  BC=" << bc;
-          throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+          throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
         }
 #endif
         return corpus[ii][jj];
@@ -579,9 +579,9 @@ namespace aurostd {  // namespace aurostd
       printf("r.lcols=%i, r.ucols=%i\n",r.lcols,r.ucols);
 #endif
       if(this->rows!=r.rows||this->cols!=r.cols) {
-        string function = XPID + "aurostd::xmatrix::operator+=:";
+        string function_name = XPID + "aurostd::xmatrix::operator+=:";
         string message = "(this->rows!=r.rows||this->cols!=r.cols)";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       for(int i=0;i<rows;i++)
         for(int j=0;j<cols;j++)
@@ -605,9 +605,9 @@ namespace aurostd {  // namespace aurostd
       printf("r.lcols=%i, r.ucols=%i\n",r.lcols,r.ucols);
 #endif
       if(this->rows!=r.rows||this->cols!=r.cols) {
-        string function = XPID + "aurostd::xmatrix::operator-=:";
+        string function_name = XPID + "aurostd::xmatrix::operator-=:";
         string message = "(this->rows!=r.rows||this->cols!=r.cols)";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       for(int i=0;i<rows;i++)
         for(int j=0;j<cols;j++)
@@ -747,9 +747,9 @@ namespace aurostd {  // namespace aurostd
       printf("M -> operator +: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
 #endif
       if(a.rows!=b.rows||a.cols!=b.cols) {
-        string function = XPID + "aurostd::xmatrix::operator+:";
+        string function_name = XPID + "aurostd::xmatrix::operator+:";
         string message = "(a.rows!=b.rows||a.cols!=b.cols)";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> c(a.rows,a.cols);
       int i,j;
@@ -773,9 +773,9 @@ namespace aurostd {  // namespace aurostd
       printf("M -> operator +: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
 #endif
       if(a.rows!=b.rows||a.cols!=b.cols) {
-        string function = XPID + "aurostd::xmatrix::operator+:";
+        string function_name = XPID + "aurostd::xmatrix::operator+:";
         string message = "(a.rows!=b.rows||a.cols!=b.cols)";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> c(a.rows,a.cols);
       int i,j;
@@ -799,9 +799,9 @@ namespace aurostd {  // namespace aurostd
 #endif
       if(a.cols!=b.rows) {
         //ME20190814 - eliminate exit
-        string function = XPID + "aurostd::xmatrix<utype>::operator*";
+        string function_name = XPID + "aurostd::xmatrix<utype>::operator*";
         string message = "a.cols != b.rows";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> c(a.rows,b.cols);
       int i=0,j=0,k=0,ii=0,jj=0,kk=0;
@@ -838,9 +838,9 @@ namespace aurostd {  // namespace aurostd
       printf("M -> operator *: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",b.lrows,b.urows,b.lcols,b.ucols);
 #endif
       if (a.cols!=b.rows) {
-        string function = XPID + "aurostd::xmatrix<utype>::operator*";
+        string function_name = XPID + "aurostd::xmatrix<utype>::operator*";
         string message = "a.cols != b.rows";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
 
       xmatrix<xcomplex<utype> > c(a.rows, b.cols);
@@ -873,11 +873,11 @@ namespace aurostd {  // namespace aurostd
       printf("M -> operator *: b.lrows=%i, b.urows=%i \n",b.lrows,b.urows);
 #endif
       if(a.cols!=b.rows) {
-        string function = XPID + "aurostd::xmatrix<utype>::operator*";
+        string function_name = XPID + "aurostd::xmatrix<utype>::operator*";
         stringstream message;
         message << "xmatrix * xvector: Matrix and vector have different dimensions.";
         message << " a.cols = " << a.cols << ", b.rows = " << b.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xvector<utype> c(a.lrows,a.urows);
       for(int i=a.lrows;i<=a.urows;i++)
@@ -896,11 +896,11 @@ namespace aurostd {  // namespace aurostd
       printf("M -> operator *: b.lrows=%i, b.urows=%i, b.lcols=%i, b.ucols=%i\n",a.lrows,a.urows,a.lcols,a.ucols);
 #endif
       if(a.rows!=b.rows) {
-        string function = XPID + "aurostd::xmatrix<utype>::operator*";
+        string function_name = XPID + "aurostd::xmatrix<utype>::operator*";
         stringstream message;
         message << "xvector * xmatrix: Vector and matrix have different dimensions.";
         message << " a.rows = " << a.rows << ", b.rows = " << b.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xvector<utype> c(b.lcols,b.ucols);
       for(int i=b.lcols;i<=b.ucols;i++)
@@ -916,11 +916,11 @@ namespace aurostd {
   template<class utype>
     xvector<xcomplex<utype> > operator*(const xmatrix<utype>& a, const xvector<xcomplex<utype> >& b) {
       if (a.cols != b.rows) {
-        string function = XPID + "aurostd::xmatrix::operator*";
+        string function_name = XPID + "aurostd::xmatrix::operator*";
         stringstream message;
         message << "xmatrix * xvector: Matrix and vector have different dimensions.";
         message << " a.cols = " << a.cols << ", b.rows = " << b.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xvector<xcomplex<utype> > c(a.lrows, a.urows);
       for (int i = a.lrows; i <= a.urows; i++) {
@@ -1132,9 +1132,9 @@ namespace aurostd {  // namespace aurostd
           }
         }
       } else {  // unknown mode
-        string function = XPID + "aurostd::identical():";
+        string function_name = XPID + "aurostd::identical():";
         string message = "Unknown mode " + utype2string<char>(_mode_) + ".";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
       }
       return true;
     }
@@ -1292,11 +1292,11 @@ namespace aurostd {
   template<class utype>
     xmatrix<utype> reshape(const xvector<utype>& v1, int rows, int cols) {
       if (rows * cols != v1.rows) {
-        string function = XPID + "aurostd::xmatrix<utype>::reshape(v1,rows,cols):";
+        string function_name = XPID + "aurostd::xmatrix<utype>::reshape(v1,rows,cols):";
         stringstream message;
         message << "vector (rows = " << v1.rows << ") cannot be reshaped into "
           << rows << "x" << cols << "matrix.";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> c(rows, cols);
       for (int i = 0; i < rows; i++) {
@@ -1319,10 +1319,10 @@ namespace aurostd {
   template<class utype>
     xmatrix<utype> reshape(const xvector<utype>& v1,const xvector<utype>& v2) {
       if(v1.rows!=v2.rows) {
-        string function = XPID + "aurostd::xmatrix<utype>::reshape(v1,v2):";
+        string function_name = XPID + "aurostd::xmatrix<utype>::reshape(v1,v2):";
         stringstream message;
         message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> c(v1.rows,2);
       for (int i=c.lrows;i<=c.urows;i++) {
@@ -1335,10 +1335,10 @@ namespace aurostd {
   template<class utype> xmatrix<utype>
     reshape(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3) {
       if(v1.rows!=v2.rows || v2.rows!=v3.rows) {
-        string function = XPID + "aurostd::xmatrix<utype>::reshape(v1,v2,v3):";
+        string function_name = XPID + "aurostd::xmatrix<utype>::reshape(v1,v2,v3):";
         stringstream message;
         message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows << " " << v3.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> c(v1.rows,3);
       for (int i=c.lrows;i<=c.urows;i++) {
@@ -1352,10 +1352,10 @@ namespace aurostd {
   template<class utype> xmatrix<utype>
     reshape(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3,const xvector<utype>& v4) {
       if(v1.rows!=v2.rows || v2.rows!=v3.rows || v3.rows!=v4.rows) {
-        string function = XPID + "aurostd::xmatrix<utype>::reshape(v1,v2,v3,v4):";
+        string function_name = XPID + "aurostd::xmatrix<utype>::reshape(v1,v2,v3,v4):";
         stringstream message;
         message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows << " " << v3.rows << " " << v4.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> c(v1.rows,4);
       for (int i=c.lrows;i<=c.urows;i++) {
@@ -1370,10 +1370,10 @@ namespace aurostd {
   template<class utype> xmatrix<utype>
     reshape(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3,const xvector<utype>& v4,const xvector<utype>& v5) {
       if(v1.rows!=v2.rows || v2.rows!=v3.rows || v3.rows!=v4.rows || v4.rows!=v5.rows) {
-        string function = XPID + "aurostd::xmatrix<utype>::reshape(v1,v2,v3,v4,v5):";
+        string function_name = XPID + "aurostd::xmatrix<utype>::reshape(v1,v2,v3,v4,v5):";
         stringstream message;
         message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows << " " << v3.rows << " " << v4.rows << " " << v5.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> c(v1.rows,5);
       for (int i=c.lrows;i<=c.urows;i++) {
@@ -1389,10 +1389,10 @@ namespace aurostd {
   template<class utype> xmatrix<utype>
     reshape(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3,const xvector<utype>& v4,const xvector<utype>& v5,const xvector<utype>& v6) {
       if(v1.rows!=v2.rows || v2.rows!=v3.rows || v3.rows!=v4.rows || v4.rows!=v5.rows || v5.rows!=v6.rows) {
-        string function = XPID + "aurostd::xmatrix<utype>::reshape(v1,v2,v3,v4,v5,v6):";
+        string function_name = XPID + "aurostd::xmatrix<utype>::reshape(v1,v2,v3,v4,v5,v6):";
         stringstream message;
         message << "vectors must have same the dimensions " << v1.rows << " " << v2.rows << " " << v3.rows << " " << v4.rows << " " << v5.rows << " " << v6.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> c(v1.rows,6);
       for (int i=c.lrows;i<=c.urows;i++) {
@@ -1444,10 +1444,10 @@ namespace aurostd {
   template<class utype>
     xmatrix<utype> reshape_rows(const xvector<utype>& v1,const xvector<utype>& v2) {
       if(v1.rows!=v2.rows) {
-        string function = XPID + "aurostd::xmatrix<utype>::reshape_rows(v1,v2):";
+        string function_name = XPID + "aurostd::xmatrix<utype>::reshape_rows(v1,v2):";
         stringstream message;
         message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> c(2,v1.rows);
       for (int i=c.lcols;i<=c.urows;i++) {
@@ -1460,10 +1460,10 @@ namespace aurostd {
   template<class utype> xmatrix<utype>
     reshape_rows(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3) {
       if(v1.rows!=v2.rows || v2.rows!=v3.rows) {
-        string function = XPID + "aurostd::xmatrix<utype>::reshape_rows(v1,v2,v3):";
+        string function_name = XPID + "aurostd::xmatrix<utype>::reshape_rows(v1,v2,v3):";
         stringstream message;
         message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows << " " << v3.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> c(3,v1.rows);
       for (int i=c.lcols;i<=c.urows;i++) {
@@ -1477,10 +1477,10 @@ namespace aurostd {
   template<class utype> xmatrix<utype>
     reshape_rows(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3,const xvector<utype>& v4) {
       if(v1.rows!=v2.rows || v2.rows!=v3.rows || v3.rows!=v4.rows) {
-        string function = XPID + "aurostd::xmatrix<utype>::reshape_rows(v1,v2,v3,v4):";
+        string function_name = XPID + "aurostd::xmatrix<utype>::reshape_rows(v1,v2,v3,v4):";
         stringstream message;
         message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows << " " << v3.rows << " " << v4.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> c(4,v1.rows);
       for (int i=c.lcols;i<=c.urows;i++) {
@@ -1495,10 +1495,10 @@ namespace aurostd {
   template<class utype> xmatrix<utype>
     reshape_rows(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3,const xvector<utype>& v4,const xvector<utype>& v5) {
       if(v1.rows!=v2.rows || v2.rows!=v3.rows || v3.rows!=v4.rows || v4.rows!=v5.rows ) {
-        string function = XPID + "aurostd::xmatrix<utype>::reshape_rows(v1,v2,v3,v4,v5):";
+        string function_name = XPID + "aurostd::xmatrix<utype>::reshape_rows(v1,v2,v3,v4,v5):";
         stringstream message;
         message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows << " " << v3.rows << " " << v4.rows << " " << v5.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> c(5,v1.rows);
       for (int i=c.lcols;i<=c.urows;i++) {
@@ -1514,10 +1514,10 @@ namespace aurostd {
   template<class utype> xmatrix<utype>
     reshape_rows(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3,const xvector<utype>& v4,const xvector<utype>& v5,const xvector<utype>& v6) {
       if(v1.rows!=v2.rows || v2.rows!=v3.rows || v3.rows!=v4.rows || v4.rows!=v5.rows ) {
-        string function = XPID + "aurostd::xmatrix<utype>::reshape_rows(v1,v2,v3,v4,v5),v6:";
+        string function_name = XPID + "aurostd::xmatrix<utype>::reshape_rows(v1,v2,v3,v4,v5),v6:";
         stringstream message;
         message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows << " " << v3.rows << " " << v4.rows << " " << v5.rows << " " << v6.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> c(6,v1.rows);
       for (int i=c.lcols;i<=c.urows;i++) {
@@ -2377,9 +2377,9 @@ namespace aurostd {  // namespace aurostd
       printf("a.lcols=%i, a.ucols=%i\n",a.lcols,a.ucols);
 #endif
       if(!a.issquare) {
-        string function = XPID + "aurostd::trace():";
+        string function_name = XPID + "aurostd::trace():";
         string message = "Trace is only defined for square matrices";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       utype out=0.0; //DX20170115 - double to utype (needed for xcomplex)
       for(int i=a.lrows;i<=a.urows;i++)
@@ -2424,9 +2424,9 @@ namespace aurostd {  // namespace aurostd
       printf("a.lcols=%i, a.ucols=%i\n",a.lcols,a.ucols);
 #endif
       if(!a.issquare) {
-        string function = XPID + "aurostd::identity():";
+        string function_name = XPID + "aurostd::identity():";
         string message = "Identity only defined for square matrces.";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       for(int i=a.lrows;i<=a.urows;i++)
         for(int j=a.lcols;j<=a.ucols;j++)
@@ -2918,9 +2918,9 @@ namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                               // exp xmatrix
     exp_old(const xmatrix<utype>& a) {
       if(!a.issquare) {
-        string function = XPID + "aurostd::exp_old():";
+        string function_name = XPID + "aurostd::exp_old():";
         string message = "exp only defined for square matrices.";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       xmatrix<utype> out(a.urows,a.ucols,a.lrows,a.lcols),an(a.urows,a.ucols,a.lrows,a.lcols);
       // UNUSED   bool convergence=FALSE;
@@ -2943,9 +2943,9 @@ namespace aurostd {  // namespace aurostd
       printf("a.lcols=%i, a.ucols=%i\n",a.lcols,a.ucols);
 #endif
       if(!a.issquare) {
-        string function = XPID + "aurostd::exp():";
+        string function_name = XPID + "aurostd::exp():";
         string message = "exp only defined for square matrices.";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       xmatrix<utype> out(a.urows,a.ucols,a.lrows,a.lcols),an(a.urows,a.ucols,a.lrows,a.lcols);
       bool convergence=FALSE;
@@ -2972,9 +2972,9 @@ namespace aurostd {  // namespace aurostd
       printf("a.lcols=%i, a.ucols=%i\n",a.lcols,a.ucols);
 #endif
       if(!a.issquare) {
-        string function = XPID + "aurostd::sin():";
+        string function_name = XPID + "aurostd::sin():";
         string message = "sin only defined for square matrices.";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       xmatrix<utype> out(a.urows,a.ucols,a.lrows,a.lcols), an(a.urows,a.ucols,a.lrows,a.lcols);
       bool convergence=FALSE;
@@ -3000,9 +3000,9 @@ namespace aurostd {  // namespace aurostd
       printf("a.lcols=%i, a.ucols=%i\n",a.lcols,a.ucols);
 #endif
       if(!a.issquare) {
-        string function = XPID + "aurostd::cos():";
+        string function_name = XPID + "aurostd::cos():";
         string message = "cos only defined for square matrices.";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       xmatrix<utype> out(a.urows,a.ucols,a.lrows,a.lcols),an(a.urows,a.ucols,a.lrows,a.lcols);
       bool convergence=FALSE;
@@ -3028,9 +3028,9 @@ namespace aurostd {  // namespace aurostd
       printf("a.lcols=%i, a.ucols=%i\n",a.lcols,a.ucols);
 #endif
       if(!a.issquare) {
-        string function = XPID + "aurostd::sinh():";
+        string function_name = XPID + "aurostd::sinh():";
         string message = "sinh only defined for square matrices.";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       xmatrix<utype> out(a.urows,a.ucols,a.lrows,a.lcols),an(a.urows,a.ucols,a.lrows,a.lcols);
       bool convergence=FALSE;
@@ -3057,9 +3057,9 @@ namespace aurostd {  // namespace aurostd
       printf("a.lcols=%i, a.ucols=%i\n",a.lcols,a.ucols);
 #endif
       if(!a.issquare) {
-        string function = XPID + "aurostd::cosh():";
+        string function_name = XPID + "aurostd::cosh():";
         string message = "cosh only defined for square matrices.";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       xmatrix<utype> out(a.urows,a.ucols,a.lrows,a.lcols),an(a.urows,a.ucols,a.lrows,a.lcols);
       bool convergence=FALSE;
@@ -3080,31 +3080,31 @@ namespace aurostd {  // namespace aurostd
   template<class utype>                                    // GaussJordan xmatrix
     void GaussJordan(xmatrix<utype>& A, xmatrix<utype>& B) {
       /// This function uses Gaussian Jordan elimination to solve A*x=b.  It returns the solution x and the inverse of A.
-      string function = XPID + "aurostd::GaussJordan():";
+      string function_name = XPID + "aurostd::GaussJordan():";
       string message = "";
       if(A.lrows!=1) {
         message = "[1] A.lrows!=1 <<  A.lrows=" + aurostd::utype2string<int>(A.lrows);
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_ERROR_);
       }
       if(A.lcols!=1) {
         message = "[2] A.lcols!=1 <<  A.lcols=" + aurostd::utype2string<int>(A.lcols);
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_ERROR_);
       }
       if(B.lrows!=1) {
         message = "[3] B.lrows!=1 <<  B.lrows=" + aurostd::utype2string<int>(B.lrows);
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_ERROR_);
       }
       if(B.lcols!=1) {
         message = "[4] B.lcols!=1 <<  B.lcols=" + aurostd::utype2string<int>(B.lcols);
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_ERROR_);
       }
       if(A.urows!=A.ucols) {
         message = "[5] A.urows!=A.ucols <<  A.urows=" + aurostd::utype2string<int>(A.urows) + " A.ucols=" + aurostd::utype2string<int>(A.ucols);
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       if(A.ucols!=B.urows) {
         message = "[6] A.ucols!=B.urows <<  A.ucols=" + aurostd::utype2string<int>(A.ucols) + " B.urows=" + aurostd::utype2string<int>(B.urows);
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       int n=A.urows;
       int m=B.ucols;
@@ -3130,7 +3130,7 @@ namespace aurostd {  // namespace aurostd
                 }
               } else if(ipiv[k]>1) {
                 message = "[7]: Singular Matrix-1";
-                throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+                throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
               }
             }
         ++(ipiv[icol]);
@@ -3142,7 +3142,7 @@ namespace aurostd {  // namespace aurostd
         indxc[i]=icol;
         if(A[icol][icol]==(double) 0.0) {
           message = "[8]: Singular Matrix-2";
-          throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+          throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
         }
         pivinv=1.0/A[icol][icol];
         A[icol][icol]=1.0;
@@ -3174,19 +3174,19 @@ namespace aurostd {   // least square stuff aurostd adaptation of nrecipes    //
     int i,icol=0,irow=0,j,k,l,ll; // default definitions to avoid compilation errors
     utype big,dum,pivinv,temp;
 
-    string function = XPID + "aurostd::gaussj():";
+    string function_name = XPID + "aurostd::gaussj():";
     string message = "";
     if(n>a.rows) {
       message = "n>a.rows";
-      throw xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_RANGE_);
+      throw xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_RANGE_);
     }
     if(n>b.rows) {
       message = "n>b.rows";
-      throw xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_RANGE_);
+      throw xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_RANGE_);
     }
     if(m>b.cols) {
       message = "m>b.cols";
-      throw xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_RANGE_);
+      throw xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_RANGE_);
     }
 
     xvector<int> indxc(1,n);
@@ -3206,7 +3206,7 @@ namespace aurostd {   // least square stuff aurostd adaptation of nrecipes    //
               }
             } else if(ipiv[k] > 1) {
               message = "Singular Matrix-1";
-              throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+              throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
             }
           }
       ++(ipiv[icol]);
@@ -3218,7 +3218,7 @@ namespace aurostd {   // least square stuff aurostd adaptation of nrecipes    //
       indxc[i]=icol;
       if(a[icol][icol] == 0.0) {
         message = "Singular Matrix-2";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       pivinv=1.0/a[icol][icol];
       a[icol][icol]=1.0;
@@ -3254,22 +3254,22 @@ namespace aurostd {   // least square stuff aurostd adaptation of nrecipes    //
       // The prgram returns value for a[1,ma], chisq,  and the covariance atrix covar[1,ma][1,ma]. (Parameters held fixed will return zero covariances.).
       // The user supplies a routine funcs(x,xvector<afunc>) that returns the ma basis funcions evaluated at x=X in the array afunc[1,ma]
 
-      string function = XPID + "aurostd::lfit():";
+      string function_name = XPID + "aurostd::lfit():";
       string message = "";
       int ndat=x.rows;
       if(y.rows!=x.rows) {
         message = "y.rows!=x.rows";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       if(sig.rows!=x.rows) {
         message = "sig.rows!=x.rows";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
 
       int ma=a.rows;
       if(ia.rows!=a.rows) {
         message = "ia.rows!=a.rows";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
 
       int i,j,k,l,m,mfit=0;
@@ -3281,7 +3281,7 @@ namespace aurostd {   // least square stuff aurostd adaptation of nrecipes    //
         if(ia[j]) mfit++;
       if(mfit == 0) {
         message = "no parameters to be fitted";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
       }
       for (j=1;j<=mfit;j++) {
         for (k=1;k<=mfit;k++) covar[j][k]=0.0;
@@ -3330,9 +3330,9 @@ namespace aurostd {   // least square stuff aurostd adaptation of nrecipes    //
 
     int ma=covar.rows;
     if(covar.cols!=covar.rows) {
-      string function = XPID + "aurostd::covsrt():";
+      string function_name = XPID + "aurostd::covsrt():";
       string message = "covar.cols!=covar.rows";
-      throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+      throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
     }
 
     for (i=mfit+1;i<=ma;i++) {
@@ -3571,9 +3571,9 @@ namespace aurostd {  // namespace aurostd
 
       //cerr << iobuf2 << endl;
       if(done==FALSE) {
-        string function = "operator<< xmatrix:";
+        string function_name = XPID + "operator<< xmatrix:";
         string message = "no data type available for user type";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
 
 #ifdef _XMATH_DEBUG_OUTPUT
@@ -3868,7 +3868,7 @@ namespace aurostd {
       // v[1..n][1..n] is a matrix whose columns contain, on output, the normalized eigenvectors of
       // a. The function returns the number of Jacobi rotations that were required.
 
-      string function = XPID + "aurostd::jacobi():";
+      string function_name = XPID + "aurostd::jacobi():";
       stringstream message;
       int j,iq,ip,i,n,nrot=0;
       utype tresh,theta,tau,t,sm,s,h,g,c;
@@ -3876,19 +3876,19 @@ namespace aurostd {
       n=a.rows;
       if(a.rows!=a.cols) {
         message << "'a' matrix not square  a.rows" << a.rows << " a.cols=" << a.cols;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       if(v.rows!=v.cols) {
         message << "'v' matrix not square  v.rows" << v.rows << " v.cols=" << v.cols;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       if(a.rows!=v.rows) {
         message << "'a' and 'v' matrices must have same size  a.rows" << a.rows << " v.rows=" << v.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       if(a.rows!=d.rows) {
         message << "'a' and 'd' objects must have same size  a.rows" << a.rows << " d.rows=" << d.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
 
       xvector<utype> b(1,n);
@@ -3971,9 +3971,9 @@ namespace aurostd {
     xvector<utype> jacobiHermitian(xmatrix<xcomplex<utype> >& A, xmatrix<xcomplex<utype> >& U, char _sort_) {
       // Matrices have to be square
       if (!A.issquare) {
-        string function = XPID + "aurostd::xmatrix::jacobiHermitian";
+        string function_name = XPID + "aurostd::xmatrix::jacobiHermitian";
         string message = "Input matrix is not square.";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
 
       // Reshape eigenvector matrix if needed
@@ -4079,9 +4079,9 @@ namespace aurostd {
       }
 
       if (nSweep > max_sweeps) {
-        string function = XPID + "aurostd::xmatrix::jacobiHermitian()";
+        string function_name = XPID + "aurostd::xmatrix::jacobiHermitian()";
         string message = "Number of sweeps exceeded maximum number of sweeps.";
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
 
       // Sort - leave as is if sort mode not found
@@ -4140,16 +4140,16 @@ namespace aurostd {
       utype p;
 
       n=v.rows;
-      string function = XPID + "aurostd::eigensrt()";
+      string function_name = XPID + "aurostd::eigensrt()";
       if(v.rows!=v.cols) {
         stringstream message;
         message << "'v' matrix not square  v.rows" << v.rows << " v.cols=" << v.cols;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       if(v.rows!=d.rows) {
         stringstream message;
         message << "'v' and 'd' objects must have same size  v.rows" << v.rows << " d.rows=" << d.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
 
       for (i=1;i<n;i++) {
@@ -4788,7 +4788,7 @@ namespace aurostd {
       // On output, a is replaced by the orthogonal matrix Q eﬀecting the
       // transformation. d[1..n] returns the diagonal elments of
       // the tridiagonal matrix, and e[1..n] the oﬀ-diagonal elements, with e[1]=0.
-      string function = XPID + "aurostd::tred2():";
+      string function_name = XPID + "aurostd::tred2():";
       stringstream message;
 
       int l,k,j,i,n;
@@ -4797,15 +4797,15 @@ namespace aurostd {
       n=a.rows;
       if(a.rows!=a.cols) {
         message << "'a' matrix not square  a.rows" << a.rows << " a.cols=" << a.cols;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       if(a.rows!=d.rows) {
         message << "'a' and 'd' objects must have same size  a.rows" << a.rows << " d.rows=" << d.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       if(a.rows!=e.rows) {
         message << "'a' and 'e' objects must have same size  a.rows" << a.rows << " e.rows=" << e.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
 
       for (i=n;i>=2;i--) {
@@ -4909,21 +4909,21 @@ namespace aurostd {
       int m,l,iter,i,k,n;
       utype s,r,p,g,f,dd,c,b;
 
-      string function = XPID + "aurostd::tqli():";
+      string function_name = XPID + "aurostd::tqli():";
       stringstream message;
 
       n=z.rows;
       if(z.rows!=z.cols) {
         message << "'z' matrix not square  z.rows" << z.rows << " z.cols=" << z.cols;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       if(z.rows!=d.rows) {
         message << "'z' and 'd' objects must have same size  z.rows" << z.rows << " d.rows=" << d.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       if(z.rows!=e.rows) {
         message << "'z' and 'e' objects must have same size  z.rows" << z.rows << " e.rows=" << e.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
 
       for (i=2;i<=n;i++) e[i-1]=e[i];
@@ -4938,7 +4938,7 @@ namespace aurostd {
           if(m != l) {
             if(iter++ == 30) {
               message << "Too many iterations in tqli.";
-              throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+              throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
             }
             g=(d[l+1]-d[l])/(2.0*e[l]);
             r=pythag(g,(utype) 1.0);
@@ -4991,10 +4991,10 @@ namespace aurostd {
 
       n=a.rows;
       if(a.rows!=a.cols) {
-        string function = XPID + "aurostd::balanc():";
+        string function_name = XPID + "aurostd::balanc():";
         stringstream message;
         message << "'a' matrix not square  a.rows" << a.rows << " a.cols=" << a.cols;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
 
       sqrdx=RADIX*RADIX;
@@ -5051,10 +5051,10 @@ namespace aurostd {
 
       n=a.rows;
       if(a.rows!=a.cols) {
-        string function = XPID + "aurostd::elmhes():";
+        string function_name = XPID + "aurostd::elmhes():";
         stringstream message;
         message << "'a' matrix not square  a.rows" << a.rows << " a.cols=" << a.cols;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
 
       for (m=2;m<n;m++) {
@@ -5102,11 +5102,11 @@ namespace aurostd {
       utype z,y,x,w,v,u,t,s,r=0,q=0,p=0,anorm;
 
       n=a.rows;
-      string function = XPID + "aurostd::hqr():";
+      string function_name = XPID + "aurostd::hqr():";
       if(a.rows!=a.cols) {
         stringstream message;
         message << "'a' matrix not square  a.rows" << a.rows << " a.cols=" << a.cols;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
 
       anorm=aurostd::abs(a[1][1]);
@@ -5148,7 +5148,7 @@ namespace aurostd {
             } else {
               if(its == 30) {
                 string message = "Too many iterations in hqr";
-                throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+                throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
               }
               if(its == 10 || its == 20) {
                 t += x;
@@ -5335,9 +5335,9 @@ namespace aurostd { // namespace aurostd
 
   void cematrix::LeastSquare(xvector<double>& y_vec, xvector<double>& y_sigma) { // function
     if(nrow !=y_vec.rows ) {
-      string function = "aurostd::cematrix::LeastSquare():";
+      string function_name = XPID + "aurostd::cematrix::LeastSquare():";
       string message = "No match of ranks of b and A. Input two matrices A (m x n) and b (m x 1)";
-      throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+      throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
     }
     //SVDcmp(A);
     SVDFit(y_vec, y_sigma);
@@ -5701,9 +5701,9 @@ namespace aurostd { // namespace aurostd
     for(i=1;i <=ncol;i++)
       DetW *=W[i];
     if(DetW < cematrix_EQUAL_DOUBLE) {
-      string function = XPID + "aurostd::cematrix::InverseMatrix():";
+      string function_name = XPID + "aurostd::cematrix::InverseMatrix():";
       string message = "Singular Matrix. No Inversion.";
-      throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
     }
     for(i=1;i <=ncol;i++) { //row of the inverse Matrix
       for(j=1;j <=nrow;j++) { // colume of the inverse Matrix
@@ -5762,9 +5762,9 @@ namespace aurostd { // namespace aurostd
     xvector<double> y_cal(1,nrow);
     A=M;
     if(A.rows !=y.rows ) {
-      string function = XPID + "aurostd::cematrix::SVDFit():";
+      string function_name = XPID + "aurostd::cematrix::SVDFit():";
       string message = "Ranks of x vector and y vector do not match!";
-      throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+      throw xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
     }
     xvector<double> b(1,nrow);
     for(i=1;i <=nrow;i++) { // Accumulate coeeficiens of the fitting matrix

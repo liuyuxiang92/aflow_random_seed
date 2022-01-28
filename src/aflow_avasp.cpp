@@ -255,9 +255,9 @@ void AVASP_Get_LDAU_Parameters(string _species,bool &LDAU,vector<string>& vLDAUs
 
   // ELSE
   if(species=="Np") {
-    string function = XPID + "AVASP_Get_LDAU_Parameters()";
+    string function_name = XPID + "AVASP_Get_LDAU_Parameters()";
     string message = "LDAU for " + species + " is not implemented yet.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
   }
 
   // LDAU=FALSE; // dont modify
@@ -311,7 +311,7 @@ void AVASP_Get_LDAU_Parameters(string _species,bool &LDAU,vector<string>& vLDAUs
 
 // ***************************************************************************
 string AVASP_Get_PseudoPotential_PAW_PBE_KIN(string species) {
-  string function = XPID + "AVASP_Get_PseudoPotential_PAW_PBE_KIN()";
+  string function_name = XPID + "AVASP_Get_PseudoPotential_PAW_PBE_KIN()";
   string error = "";
   bool ALLOW_ACTINIDIES=TRUE; //FALSE;
   if(ALLOW_ACTINIDIES==FALSE) {
@@ -319,11 +319,11 @@ string AVASP_Get_PseudoPotential_PAW_PBE_KIN(string species) {
         species=="Np" || species=="Pu" || species=="Am" || species=="Cm" || species=="Bk" || species=="Cf" ||
         species=="Es" || species=="Fm" || species=="Md" || species=="No" || species=="Lw") {
       error="not producing Actinides";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, error, _VALUE_ILLEGAL_);
     }
     if(species=="D" || species=="T") {
       error="not producing heavy hydrogen";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, error, _VALUE_ILLEGAL_);
     }
   }
 
@@ -430,7 +430,7 @@ string AVASP_Get_PseudoPotential_PAW_PBE_KIN(string species) {
 
   // If not found then UNKNOWN
   error="Potential not found: "+species;
-  throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error, _VALUE_ILLEGAL_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, error, _VALUE_ILLEGAL_);
 }
 
 // ***************************************************************************
@@ -443,7 +443,7 @@ string AVASP_Get_PseudoPotential_PAW_LDA_KIN(string species) {
 
 // ***************************************************************************
 string AVASP_Get_PseudoPotential_PAW_PBE(string species) {
-  string function = XPID + "AVASP_Get_PseudoPotential_PAW_PBE_PBE():";
+  string function_name = XPID + "AVASP_Get_PseudoPotential_PAW_PBE_PBE():";
   string error = "";
   bool ALLOW_ACTINIDIES=TRUE; //FALSE;
   if(ALLOW_ACTINIDIES==FALSE) {
@@ -451,11 +451,11 @@ string AVASP_Get_PseudoPotential_PAW_PBE(string species) {
         species=="Np" || species=="Pu" || species=="Am" || species=="Cm" || species=="Bk" || species=="Cf" ||
         species=="Es" || species=="Fm" || species=="Md" || species=="No" || species=="Lw") {
       error="not producing Actinides";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, error, _VALUE_ILLEGAL_);
     }
     if(species=="D" || species=="T") {
       error="not producing heavy hydrogen";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, error, _VALUE_ILLEGAL_);
     }
   }
 
@@ -561,11 +561,11 @@ string AVASP_Get_PseudoPotential_PAW_PBE(string species) {
 
   if(species=="Po") {
     error="No pseudopotential available for "+species;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, error, _VALUE_ILLEGAL_);
   }
   // If not found then UNKNOWN
   error="Potential not found: "+species;
-  throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error, _VALUE_ILLEGAL_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, error, _VALUE_ILLEGAL_);
 }
 
 // ***************************************************************************
@@ -6714,9 +6714,9 @@ bool AVASP_ADD_LDAU(_xvasp &xvasp) {
     }
     LDAU=(xvasp.aopts.flag("FLAG::AVASP_LDAU1") || xvasp.aopts.flag("FLAG::AVASP_LDAU2"));
     if(xvasp.aopts.flag("FLAG::AVASP_LDAU1")==TRUE && xvasp.aopts.flag("FLAG::AVASP_LDAU2")==TRUE) {
-      string function = XPID + "AVASP_ADD_LDAU():";
+      string function_name = XPID + "AVASP_ADD_LDAU():";
       string message = "AVASP_ADD_LDAU: you can not be here: xvasp.aopts.flag(\"FLAG::AVASP_LDAU1\")==TRUE && xvasp.aopts.flag(\"FLAG::AVASP_LDAU2\")==TRUE: need to get different LDAU parameterization";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
     }
     stringstream aus;
     aus.clear();aus.str(std::string());
