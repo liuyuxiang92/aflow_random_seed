@@ -8,39 +8,155 @@
 #include "aflow_anrl.h"  //DX20201104
 #include "aflow_compare_structure.h"  //ME20220125
 
-UnitTest::UnitTest(ostream& oss) : xStream(oss) {
-  free();
+namespace unittest {
+
+  void UnitTest::multiplyByFive() {std::cout << (120.0 * 5.0) << std::endl;}
+
+  UnitTest::UnitTest(ostream& oss) : xStream(oss) {
+    initialize();
+    test_functions["multiply"].func();
+  }
+
+  UnitTest::UnitTest(ofstream& mf, ostream& oss) : xStream(mf, oss) {
+    initialize();
+  }
+
+  UnitTest::UnitTest(const UnitTest& ut) : xStream(*ut.getOFStream(), *ut.getOSS()) {
+    free();
+    copy(ut);
+  }
+
+  const UnitTest& UnitTest::operator=(const UnitTest& ut) {
+    copy(ut);
+    return *this;
+  }
+
+  UnitTest::~UnitTest() {
+    free();
+  }
+
+  void UnitTest::clear() {
+    free();
+  }
+
+  void UnitTest::free() {
+    aflags.clear();
+    tasks.clear();
+    test_functions.clear();
+  }
+
+  void UnitTest::copy(const UnitTest& ut) {
+    if (this == &ut) return;
+    aflags = ut.aflags;
+    tasks = ut.tasks;
+    test_functions = ut.test_functions;
+  }
+
+  void UnitTest::initialize() {
+    free();
+    aflags.Directory = aurostd::getPWD();
+
+    initializeTestFunctions();
+    initializeTestGroups();
+  }
+
+  void UnitTest::initializeTestFunctions() {
+    // Initialize unit tests
+    test_functions["database::schema"] = initializeXcheck();
+    test_functions["database::schema"].func = std::bind(&unittest::UnitTest::multiplyByFive, this);
+  }
+
+  xcheck UnitTest::initializeXcheck() {
+    xcheck xt;
+    resetUnitTest(xt);
+    xt.func = nullptr;
+    return xt;
+  }
+
+  void UnitTest::resetUnitTest(const string& test_name) {
+    if (test_functions.count(test_name)) {
+      resetUnitTest(test_functions[test_name]);
+    }
+  }
+
+  void UnitTest::resetUnitTest(xcheck& test) {
+    test.passed_checks = 0;
+    test.results.clear();
+    test.test_finished = false;
+  }
+
+  void UnitTest::initializeTestGroups() {
+    test_groups.clear();
+    test2group.clear();
+
+    test_groups["database"] = {"schema"};
+    test_groups["xstructure"] = {"cif_parser"};
+    for (auto& group : test_groups) {
+      for (const string& member : group.second) {
+        test2group[member] = group.first;
+      }
+    }
+  }
+
+  bool UnitTest::runUnitTests(const vector<string>& unit_tests_in) {
+    string function_name = XPID + "runUnitTests():";
+    stringstream  message;
+    tasks.clear();
+    // Create task lists (groups or individual tests)
+    // Unit test list is the individual small tests over
+    // which to parallelize
+    vector<string> unit_tests;
+    for (const string& test : unit_tests_in) {
+      bool isgroup = test_groups.count(test);
+      if (!isgroup && test_functions.count(test)) {
+        message << "Skipping unrecognized test name " << test << ".";
+        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      } else if (isgroup && !aurostd::WithinList(tasks, test)) {
+        tasks.push_back(test);
+        for (const string& member : test_groups[test]) {
+          unit_tests.push_back(member);
+        }
+      } else if (!aurostd::WithinList(tasks, test2group[test])) {
+        unit_tests.push_back(test);
+        tasks.push_back(test);
+      }
+    }
+
+    // Print final summary
+    uint nsuccess = 0;
+    stringstream summary;
+    for (const string& task : tasks) {
+      bool success = taskSuccessful(task);
+      if (success) nsuccess++;
+      summary << "\t" << task << " | " << (success?"pass":"fail") << "\n";
+    }
+
+    uint ntasks = tasks.size();
+    if (nsuccess == ntasks) {
+      message << "Unit tests passed successfully (passsing " << ntasks << " tests).";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, summary, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+    } else {
+      message << "Some unit tests failed (" << (ntasks - nsuccess) << " of " << ntasks << " failed).";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, summary, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+    }
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, summary, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_);
+    return (nsuccess != ntasks);
+  }
+
+  bool UnitTest::taskSuccessful(const string& task) {
+    auto it = test_groups.find(task);
+    if (it != test_groups.end()) {
+      const vector<string> members = (*it).second;
+      for (const string& member : members ) {
+        if (test_functions[member].passed_checks != test_functions[member].results.size()) return false;
+      }
+      return true;
+    } else {
+      return (test_functions[task].passed_checks == test_functions[task].results.size());
+    }
+  }
+
 }
-
-UnitTest::UnitTest(ofstream& mf, ostream& oss) : xStream(mf, oss) {
-}
-
-UnitTest::UnitTest(const UnitTest& ut) : xStream(*ut.getOFStream(), *ut.getOSS()) {
-  free();
-  copy(ut);
-}
-
-const UnitTest& UnitTest::operator=(const UnitTest& ut) {
-  copy(ut);
-  return *this;
-}
-
-UnitTest::~UnitTest() {
-  free();
-}
-
-void UnitTest::clear() {
-  free();
-}
-
-void UnitTest::free() {
-
-}
-
-void UnitTest::copy(const UnitTest& ut) {
-  if (this == &ut) return;
-}
-
 
 // Collection of generic check functions, to streamline testing.
 // HE20210616

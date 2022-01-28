@@ -5284,22 +5284,53 @@ namespace xprototype {
 // ----------------------------------------------------------------------------
 // Unit Tests - ME20220127
 
-class UnitTest : public xStream {
-  public:
-    UnitTest(ostream& oss=std::cout);
-    UnitTest(ofstream& mf, ostream& oss=std::cout);
-    UnitTest(const UnitTest&);
-    const UnitTest& operator=(const UnitTest&);
-    ~UnitTest();
+namespace unittest {
 
-    void clear();
-    void initialize();
+  typedef std::function<void()> unitTestFunction;
 
-  private:
+  struct xcheck {
+    uint passed_checks;
+    unitTestFunction func;
+    vector<string> results;
+    bool test_finished;
+  };
 
-    void free();
-    void copy(const UnitTest& b);
-};
+  class UnitTest : public xStream {
+    public:
+      UnitTest(ostream& oss=std::cout);
+      UnitTest(ofstream& mf, ostream& oss=std::cout);
+      UnitTest(const UnitTest& ut);
+      const UnitTest& operator=(const UnitTest& ut);
+      ~UnitTest();
+
+      _aflags aflags;
+
+      void clear();
+
+      void resetUnitTest(const string& test_name);
+      bool runUnitTests(const vector<string>& unit_tests_in);
+
+    private:
+      std::unordered_map<string, xcheck> test_functions;
+      std::unordered_map<string, vector<string> > test_groups;
+      std::unordered_map<string, string> test2group;
+      vector<string> tasks;
+
+      void free();
+      void copy(const UnitTest& ut);
+
+      void initialize();
+      void initializeTestFunctions();
+      void initializeTestGroups();
+
+      void resetUnitTest(xcheck&);
+      xcheck initializeXcheck();
+      void multiplyByFive();
+
+      bool taskSuccessful(const string& task);
+  };
+
+}
 
 #endif
 // ***************************************************************************
