@@ -3928,19 +3928,15 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     oss.setf(std::ios::fixed,std::ios::floatfield);
-    // write the coordinate system
+    // set coordinate system to idenity
+    xmatrix<double> coorsys = aurostd::eye<double>(3, 3);
     for (uint i = 1; i <= 3; i++) {
       for (uint j = 1; j <= 3; j++) {
-        if (i == j) {
-          oss << aa.scale << " ";
-        }
-        else {
-          oss << 0.0 << " ";
-        }
+          oss << coorsys(i, j) << " ";
       }
       oss << endl;
     }
-    // write the unitless lattice
+    // write the lattice
     for (uint i = 1; i <= 3; i++) {
       for (uint j = 1; j <= 3; j++) {
         oss << aa.lattice(i, j) << " ";
@@ -6614,8 +6610,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
   //  See: https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/manual.pdf
   if(a.iomode==IOATAT_STR) {
     if (LDEBUG) cerr << soliloquy << " ATAT IOATAT_STR" << endl;
+    a.scale = 1.0;
     a.neg_scale = FALSE;
-    xmatrix<double> coorsys(3, 3);
+    xmatrix<double> coorsys(3, 3), ulat(3, 3);
 
     // read coordinate system
     uint line = 0;
@@ -6631,18 +6628,16 @@ istream& operator>>(istream& cinput, xstructure& a) {
     vec_count = 1;
     for (; line < vinput.size() && vec_count < 4; line++) {
       aurostd::string2tokens(vinput[line],tokens," ");
-      a.lattice(vec_count, 1)=aurostd::string2utype<double>(tokens[0]);
-      a.lattice(vec_count, 2)=aurostd::string2utype<double>(tokens[1]);
-      a.lattice(vec_count, 3)=aurostd::string2utype<double>(tokens[2]);
+      ulat(vec_count, 1)=aurostd::string2utype<double>(tokens[0]);
+      ulat(vec_count, 2)=aurostd::string2utype<double>(tokens[1]);
+      ulat(vec_count, 3)=aurostd::string2utype<double>(tokens[2]);
       vec_count++;
     }
-    a.scale=std::pow(std::pow(aurostd::det(a.lattice), -1.0) * aurostd::det(coorsys * a.lattice), 1.0 / 3.0); // assume C=a*I
+    a.lattice = coorsys * ulat;
 
     if (LDEBUG) {
       cerr << soliloquy << " ATAT lattice" << endl;
       cerr << a.lattice << endl;
-      cerr << soliloquy << " ATAT scale" << endl;
-      cerr << a.scale << endl;
       cerr << soliloquy << " ATAT f2c" << endl;
       cerr << a.f2c << endl;
       cerr << soliloquy << " ATAT c2f" << endl;
@@ -6659,8 +6654,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       avec(2) = aurostd::string2utype<double>(tokens[1]);
       avec(3) = aurostd::string2utype<double>(tokens[2]);
       atom.name = atom.cleanname=tokens[3];
-      //atom.fpos=aurostd::mod_floored(aurostd::inverse(a.lattice)*avec,1.0); // Remove after PR check
-      atom.fpos = BringInCell(aurostd::inverse(a.lattice) * avec);
+      atom.fpos = BringInCell(aurostd::inverse(a.lattice) * coorsys * avec);
       atom.cpos = a.f2c * atom.fpos;
       atom.name_is_given = TRUE;
       a.AddAtom(atom);
@@ -16571,7 +16565,7 @@ void xstructure::xstructure2elk(void) { //DX20200313
 // Function xstructure2atat
 // ***************************************************************************
 void xstructure::xstructure2atat(void) { //SD20220123
-  //ReScale(1.0);
+  ReScale(1.0);
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_;
   iomode=IOATAT_STR;
