@@ -3459,7 +3459,9 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     string         Egap_type_net;
     //CO20211106 - IONIC STEPS DATA
     bool GetIonicStepsData();   //CO20211106
-    void WriteMTPCFG(const string& outcar_path,stringstream& output_ss);   //CO20211106
+    void populateAFLOWLIBEntry(aflowlib::_aflowlib_entry& data,const string& outcar_path); //CO20220124
+    void WriteMTPCFG(stringstream& output_ss,const string& outcar_path);   //CO20211106
+    void WriteMTPCFG(stringstream& output_ss,const string& outcar_path,const vector<string>& velements);   //CO20211106
     //[CO20200404 - OBSOLETE]string ERROR;
     //int number_bands,number_kpoints; //CO20171006 - camilo garbage
     //int ISPIN; // turn this into spin = 0 if ISPIN = 1 //CO20171006 - camilo garbage
