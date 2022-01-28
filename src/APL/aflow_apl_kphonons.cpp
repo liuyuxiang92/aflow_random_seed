@@ -35,7 +35,7 @@ namespace KBIN {
       _vflags& vflags,
       ofstream& fileMessage,
       ostream& oss) {
-    string function = "KBIN::relaxStructureAPL_VASP():";
+    string function_name = XPID + "KBIN::relaxStructureAPL_VASP():";
     stringstream message;
 
     if (start_relax == _NUM_RELAX_) return true;  // Nothing to do here
@@ -130,7 +130,7 @@ namespace KBIN {
           << " do not agree. This is likely due to different symmetries in these structures. Use"
           << " an input structure that is closer to the fully relaxed one, remove all"
           << " CONTCAR." << _APL_RELAX_PREFIX_ << "* files, and run APL again.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
       // k-point grid comparison only relevant when KPPRA is used
       if (!vflags.KBIN_VASP_KPOINTS_PHONONS_GRID.content_string.empty()) {
@@ -145,7 +145,7 @@ namespace KBIN {
             << " do not agree. This is likely due to different symmetries in these structures. Use"
             << " an input structure that is closer to the fully relaxed one, remove all"
             << " CONTCAR." << _APL_RELAX_PREFIX_ << "* files, and run APL again.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
         }
       }
 
@@ -274,10 +274,10 @@ namespace KBIN {
     /////////////////////////////////////////////////////////////////////////////
 
     xinput.xvasp.AVASP_arun = true;
-    string function = "KBIN::RunPhonons_APL():";  //ME20191029
+    string function_name = XPID + "KBIN::RunPhonons_APL():";  //ME20191029
     stringstream message;
 
-    if (LDEBUG) std::cerr << function << " DEBUG [0]" << std::endl;
+    if (LDEBUG) std::cerr << function_name << " DEBUG [0]" << std::endl;
     // Test
     if (!(kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_AAPL)) return; //PN20180705
 
@@ -324,7 +324,7 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
-    if (LDEBUG) std::cerr << function << " DEBUG [1a]" << std::endl;
+    if (LDEBUG) std::cerr << function_name << " DEBUG [1a]" << std::endl;
 
     //ME20181019 - Overwrite defaults for CHGCAR, WAVECAR, etc. Only write
     // these files if the user explicitly sets these flags. Otherwise, APL will
@@ -365,7 +365,7 @@ namespace KBIN {
       aurostd::string2tokens(xflags.vflags.KBIN_VASP_KPOINTS_PHONONS_GRID.content_string, kpts, " xX");
       if (kpts.size() != 3) {
         message << "Incorrect format for KPOINTS_GRID";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
       }
     }
 
@@ -375,13 +375,13 @@ namespace KBIN {
       aurostd::string2tokens(xflags.vflags.KBIN_VASP_KPOINTS_PHONONS_SHIFT.content_string, kpts, " ,;");
       if (kpts.size() != 3) {
         message << "Incorrect format for KPOINTS_SHIFT";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
       }
     }
 
     // APL ----------------------------------------------------------------------
 
-    if (LDEBUG) std::cerr << function << " DEBUG [1b]" << std::endl;
+    if (LDEBUG) std::cerr << function_name << " DEBUG [1b]" << std::endl;
 
     /***************************** READ PARAMETERS *****************************/
 
@@ -559,7 +559,7 @@ namespace KBIN {
 
     // AAPL ----------------------------------------------------------------------
 
-    if (LDEBUG) std::cerr << function << " DEBUG [1c]" << std::endl;
+    if (LDEBUG) std::cerr << function_name << " DEBUG [1c]" << std::endl;
 
     //ME20181027 START
 
@@ -642,7 +642,7 @@ namespace KBIN {
     pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
     //ME20181027 STOP
 
-    if (LDEBUG) std::cerr << function << " DEBUG [1c]" << std::endl;
+    if (LDEBUG) std::cerr << function_name << " DEBUG [1c]" << std::endl;
 
     /////////////////////////////////////////////////////////////////////////////
     //                                                                         //
@@ -650,7 +650,7 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
-    if (LDEBUG) std::cerr << function << " DEBUG [2]" << std::endl;
+    if (LDEBUG) std::cerr << function_name << " DEBUG [2]" << std::endl;
 
     //fix vasp bin for LR or DM+POLAR
     if (aplopts.getattachedscheme("ENGINE") == "LR" || (aplopts.getattachedscheme("ENGINE") == string("DM") && aplopts.flag("POLAR"))) {
@@ -685,7 +685,7 @@ namespace KBIN {
           } else {
             message << "Failed.";
             pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Unexpected binary format.", _FILE_WRONG_FORMAT_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, "Unexpected binary format.", _FILE_WRONG_FORMAT_);
           }
         } catch (aurostd::xerror& excpt) {
           message << "Failed to identify the version of the VASP binary." << std::endl;
@@ -730,13 +730,13 @@ namespace KBIN {
       bool Krun=true;
       string function;
       if (xinput.AFLOW_MODE_VASP) {
-        function = "KBIN::relaxStructureAPL_VASP";
+        function_name = XPID + "KBIN::relaxStructureAPL_VASP";
         Krun = relaxStructureAPL_VASP(START_RELAX, AflowIn, aplopts, scell_dims,
             aplopts.flag("RELAX_COMMENSURATE"), xinput.xvasp, aflags, kflags, xflags.vflags, FileMESSAGE);
       }
       if (!Krun) {
         message << "Relaxation calculations did not run successfully.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
 
       // Reinitialize the supercell with the new structure
@@ -764,7 +764,7 @@ namespace KBIN {
       aurostd::stringstream2file(poscar, phposcar_file);
       if (!aurostd::FileExist(phposcar_file)) {
         message << "Cannot open output file " << phposcar_file << ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
       }
     }
     //ME20200102 END
@@ -852,7 +852,7 @@ namespace KBIN {
       }
     }
 
-    if (LDEBUG) std::cerr << function << " DEBUG [3b]" << std::endl;
+    if (LDEBUG) std::cerr << function_name << " DEBUG [3b]" << std::endl;
 
     stagebreak = (stagebreak || apl_stagebreak);
 
@@ -917,7 +917,7 @@ namespace KBIN {
 
     // Get the format of frequency desired by user ///////////////////////
 
-    if (LDEBUG) std::cerr << function << " DEBUG [5a]" << std::endl;
+    if (LDEBUG) std::cerr << function_name << " DEBUG [5a]" << std::endl;
 
     apl::IPCFreqFlags frequencyFormat = apl::NONE;
 
@@ -951,14 +951,14 @@ namespace KBIN {
       }
       // Check if there was specified unit keyword...
       if (((frequencyFormat & ~apl::OMEGA) & ~apl::ALLOW_NEGATIVE) == apl::NONE)
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, "Ambiguous frequency format.", _INPUT_AMBIGUOUS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, "Ambiguous frequency format.", _INPUT_AMBIGUOUS_);
     } else {
       frequencyFormat = apl::THZ | apl::ALLOW_NEGATIVE;
     }
 
     // PHONON DISPERSIONS ---------------------------------------------------------
 
-    if (LDEBUG) std::cerr << function << " DEBUG [5b]" << std::endl;
+    if (LDEBUG) std::cerr << function_name << " DEBUG [5b]" << std::endl;
 
     if (aplopts.flag("DC")) {
       apl::PhononDispersionCalculator pdisc(phcalc);
@@ -994,7 +994,7 @@ namespace KBIN {
 
     // PHONON DOS AND THERMODYNAMIC PROPERTIES ----------------------------------------
 
-    if (LDEBUG) std::cerr << function << " DEBUG [5c]" << std::endl;
+    if (LDEBUG) std::cerr << function_name << " DEBUG [5c]" << std::endl;
 
     if (aplopts.flag("DOS") || aplopts.flag("TP")) {
       // Calculate DOS
@@ -1061,7 +1061,7 @@ namespace KBIN {
       aurostd::stringstream2file(apl_outfile, filename);
       if (!aurostd::FileExist(filename)) {
         string message = "Cannot open output file " + filename + ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
       }
     }
 
@@ -1071,7 +1071,7 @@ namespace KBIN {
     //                                                                         //
     /////////////////////////////////////////////////////////////////////////////
 
-    if (LDEBUG) std::cerr << function << " DEBUG [6]" << std::endl;
+    if (LDEBUG) std::cerr << function_name << " DEBUG [6]" << std::endl;
 
     if (kflags.KBIN_PHONONS_CALCULATION_AAPL) {
       message << "Starting thermal conductivity calculations.";
@@ -1095,7 +1095,7 @@ namespace KBIN {
 namespace apl {
 
   void validateParametersAPL(aurostd::xoption& aplopts, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss) {
-    string function = "apl::validateParametersAPL():";
+    string function_name = XPID + "apl::validateParametersAPL():";
     string message;
     vector<string> tokens;
     string _ASTROPT_ = "[AFLOW_APL]";
@@ -1116,7 +1116,7 @@ namespace apl {
     if ((USER_ENGINE != "DM") && (USER_ENGINE != "LR")) {
       message = "Wrong setting in " + _ASTROPT_ + "ENGINE. Use either DM or LR. ";
       message += " See README_AFLOW_APL.TXT for more information.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
     }
     aplopts.push_attached("ENGINE", USER_ENGINE);  // To make sure it's all caps
 
@@ -1131,7 +1131,7 @@ namespace apl {
   }
 
   void validateParametersSupercellAPL(aurostd::xoption& aplopts) {
-    string function = "apl::validateParametersSupercellAPL():";
+    string function_name = XPID + "apl::validateParametersSupercellAPL():";
     string message = "";
     string _ASTROPT_ = "[AFLOW_APL]";
     // ME2021050 - isentry more reliable than option
@@ -1142,7 +1142,7 @@ namespace apl {
       if (tokens.size() != 3 && tokens.size() != 9) {
         message = "Wrong setting in " + _ASTROPT_ + "SUPERCELL.";
         message += " See README_AFLOW_APL.TXT for the correct format.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_NUMBER_);
       }
       aplopts.push_attached("SUPERCELL::METHOD", "SUPERCELL");
       aplopts.push_attached("SUPERCELL::VALUE", supercell_scheme);
@@ -1176,7 +1176,7 @@ namespace apl {
   }
 
   void validateParametersDispersionsAPL(aurostd::xoption& aplopts) {
-    string function = "apl::validateParametersDispersionsAPL():";
+    string function_name = XPID + "apl::validateParametersDispersionsAPL():";
     string message = "";
     vector<string> tokens;
     string scheme = "";
@@ -1203,18 +1203,18 @@ namespace apl {
         message = "Mismatch between the number of points and the number of labels for the phonon dispersions.";
         message += " Check the parameters DCINITCOORDS" + string(dc_initcoords_frac.empty()?"CART":"FRAC") + " and DCINITCOORDSLABELS.";
         message += " See README_AFLOW_APL.TXT for more information.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_NUMBER_);
       }
     } else if (scheme != "LATTICE") {
       message = "Wrong setting in " + _ASTROPT_ + "DCPATH. Use either LATTICE or MANUAL.";
       message += " See README_AFLOW_APL.TXT for more information.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
     }
     aplopts.push_attached("DCPATH", scheme);  // to make sure it's all caps
   }
 
   void validateParametersDosAPL(aurostd::xoption& aplopts, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss) {
-    string function = "apl::validateParametersDosAPL():";
+    string function_name = XPID + "apl::validateParametersDosAPL():";
     string message = "";
     vector<string> tokens;
     string _ASTROPT_ = "[AFLOW_APL]";
@@ -1224,7 +1224,7 @@ namespace apl {
     if ((dos_method != "LT") && (dos_method != "RS")) {
       message = "Wrong setting in " + _ASTROPT_ + "DOSMETHOD. Use either LT or RS.";
       message += " See README_AFLOW_APL.TXT for more information.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
     }
     aplopts.push_attached("DOSMETHOD", dos_method);  // To make sure the option is all caps
     double dos_smear = aurostd::string2utype<double>(aplopts.getattachedscheme("DOSSMEAR"));
@@ -1240,7 +1240,7 @@ namespace apl {
     if (tokens.size() != 3) {
       message = "Wrong setting in " + _ASTROPT_ + "DOSMESH.";
       message += " See README_AFLOW_APL.TXT for the correct format.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_NUMBER_);
     }
 
     // DOS projections
@@ -1251,7 +1251,7 @@ namespace apl {
         if (!dos_proj_cart.empty() && !dos_proj_frac.empty()) {
           message = "Ambiguous input in APL DOS projections.";
           message += " Choose between DOSPROJECTIONS_CART and DOSPROJECTIONS_FRAC.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_AMBIGUOUS_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_AMBIGUOUS_);
         } else {
           string projscheme;
           if (!dos_proj_cart.empty()) {
@@ -1272,7 +1272,7 @@ namespace apl {
               message = "Wrong setting in DOSPROJECTIONS_";
               message += string(dos_proj_cart.empty()?"FRAC":"CART") + ".";
               message += " See README_AFLOW_APL.TXT for the correct format.";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_NUMBER_);
             }
           }
         }
@@ -1285,18 +1285,18 @@ namespace apl {
       if (tokens.size() != 3) {
         message = "Wrong setting in " + _ASTROPT_ + "TPT.";
         message += " See README_AFLOW_APL.TXT for the correct format.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_NUMBER_);
       }
       double tstart = aurostd::string2utype<double>(tokens[0]);
       double tend = aurostd::string2utype<double>(tokens[1]);
       double tstep = aurostd::string2utype<double>(tokens[2]);
       if (tstart > tend) {
         message = "Start temperature is larger than end temperature.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
       }
       if (tstep < _FLOAT_TOL_) {
         message = "Temperature step cannot be zero or negative.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
       }
       aplopts.push_attached("TSTART", tokens[0]);
       aplopts.push_attached("TEND", tokens[1]);
@@ -1307,7 +1307,7 @@ namespace apl {
   // Checks that the AAPL parameters are valid and recasts them to be usable
   // by all AAPL classes.
   void validateParametersAAPL(xoption& aaplopts, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss) {
-    string function = "apl::validateParametersAAPL()";
+    string function_name = XPID + "apl::validateParametersAAPL()";
     string module = "AAPL";
     string scheme = "", message = "";
     vector<string> tokens;
@@ -1318,7 +1318,7 @@ namespace apl {
     if ((scheme != "RTA") && (scheme != "FULL")) {
       message = "Wrong setting in " + _ASTROPT_ + "BTE. Use either RTA or FULL.";
       message += " See README_AFLOW_APL.TXT for more information.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
     }
 
     // CUT_SHELL and CUT_RAD
@@ -1329,7 +1329,7 @@ namespace apl {
       if (tokens.size() < 1) {
         message = "Not enough entries in " + _ASTROPT_ + "CUT_RAD.";
         message += " See README_AFLOW_APL.TXT for more information.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_NUMBER_);
       } else if (tokens.size() > 2) {
         message = "Too many entries for " + _ASTROPT_ + "CUT_RAD. Excess entries will be ignored.";
         pflow::logger(_AFLOW_FILE_NAME_, module, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
@@ -1351,7 +1351,7 @@ namespace apl {
       if (tokens.size() < 1) {
         message = "Not enough entries in " + _ASTROPT_ + "CUT_SHELL.";
         message += " See README_AFLOW_APL.TXT for more information.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_NUMBER_);
       } else if (tokens.size() > 2) {
         message = "Too many entries for " + _ASTROPT_ + "CUT_SHELL. Excess entries will be ignored.";
         pflow::logger(_AFLOW_FILE_NAME_, module, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
@@ -1380,7 +1380,7 @@ namespace apl {
     if (tokens.size() != 3) {
       message = "Wrong setting in " + _ASTROPT_ + "THERMALGRID.";
       message += " See README_AFLOW_APL.TXT for the correct format.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_NUMBER_);
     }
 
     // TCT
@@ -1392,7 +1392,7 @@ namespace apl {
       double USER_TCT_TSTEP = aurostd::string2utype<double>(tokens[2]);
       if (USER_TCT_TSTEP < _ZERO_TOL_) {
         message = "Temperature step cannot be zero.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
       }
       if (USER_TCT_TSTART == 0) {
         message = "Thermal conductivity is infinite at 0 K and will be skipped.";
@@ -1401,7 +1401,7 @@ namespace apl {
       }
       if (USER_TCT_TSTART > USER_TCT_TEND) {
         message = "Start temperature cannot be larger than final temperature.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
       }
       aaplopts.push_attached("TSTART", aurostd::utype2string<double>(USER_TCT_TSTART));
       aaplopts.push_attached("TEND", aurostd::utype2string<double>(USER_TCT_TEND));
@@ -1409,7 +1409,7 @@ namespace apl {
     } else {
       message = "Wrong setting in " + _ASTROPT_ + "TCT.";
       message += " See README_AFLOW_APL.TXT for the correct format.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_NUMBER_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_NUMBER_);
     }
 
     // BOUNDARY and CUMULATIVEK
@@ -1425,12 +1425,12 @@ namespace apl {
   /// Checks that the QHA parameters are valid and recasts them to be usable.
   void validateParametersQHA(xoption& qhaopts, const _aflags& aflags, ofstream& FileMESSAGE, ostream& oss)
   {
-    string function = XPID + "apl::validateParametersQHA()";
+    string function_name = XPID + XPID + "apl::validateParametersQHA()";
     vector<string> tokens;
     vector<double> dtokens;
     string option = "";
 
-    pflow::logger(_AFLOW_FILE_NAME_, function, "Validating QHA parameters.", aflags,
+    pflow::logger(_AFLOW_FILE_NAME_, function_name, "Validating QHA parameters.", aflags,
         FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
     // EOS_DISTORTION_RANGE
@@ -1440,14 +1440,14 @@ namespace apl {
       string msg = "Wrong setting in  " + _ASTROPT_QHA_ + option + ".";
       msg += " The number of parameters is wrong.";
       msg += " Specify as " + option + "=" + AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, msg, _INPUT_NUMBER_);
     }
 
     if (dtokens[1] < dtokens[0]){
       string msg = "Wrong setting in " + _ASTROPT_QHA_ + option + ".";
       msg += " The end of the range of given volumes is smaller than the beginning.";
       msg += " Specify as " + option + "=" + AFLOWRC_DEFAULT_QHA_EOS_DISTORTION_RANGE;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, msg, _INPUT_NUMBER_);
     }
 
     // EOS_MODEL
@@ -1458,7 +1458,7 @@ namespace apl {
       string msg = "Wrong setting in " + _ASTROPT_QHA_ + option + ".";
       msg += " Either no model was given or the number of given models is too big.";
       msg += " Specify as "+option+"=SJ,BM2,BM3,BM4,M using each method once.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, msg, _INPUT_NUMBER_);
     }
 
     string token = "";
@@ -1477,7 +1477,7 @@ namespace apl {
     if (gp_distortion < _ZERO_TOL_){
       string msg = "Wrong setting in " + _ASTROPT_QHA_ + option + ".";
       msg += option + " should be a positive real number. ";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, msg, _INPUT_ILLEGAL_);
     }
 
     // MODE
@@ -1488,7 +1488,7 @@ namespace apl {
       string msg = "Wrong setting in " + _ASTROPT_QHA_ + option + ".";
       msg += " Either no method was given or the number of given methods is too big.";
       msg += " Specify as "+option+"=QHA,QHA3P,SCQHA,QHANP using each method once.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, msg, _INPUT_NUMBER_);
     }
 
     // note: QHA, QHA3P and SCQHA could run "simultaneously"
@@ -1508,14 +1508,14 @@ namespace apl {
       string msg = "Wrong setting in " + _ASTROPT_QHA_ + option + ".";
       msg += " List of temperatures is not given.";
       msg += " Specify as " + option + AFLOWRC_DEFAULT_QHA_PDIS_T;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_NUMBER_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, msg, _INPUT_NUMBER_);
     }
 
     for (uint i=0; i<itokens.size(); i++){
       if (itokens[i] < 0){
         string msg = "Wrong setting in " + _ASTROPT_QHA_ + option + ".";
         msg += " Negative temperature was given.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, msg, _INPUT_ILLEGAL_);
       }
     }
 
@@ -1526,7 +1526,7 @@ namespace apl {
       msg += " Taylor expansion order parameter should be a positive integer.";
       msg += " Specify as " + option + "=";
       msg += aurostd::utype2string<int>(AFLOWRC_DEFAULT_QHA_TAYLOR_EXPANSION_ORDER);
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, msg, _INPUT_ILLEGAL_);
     }
   }
   //AS20200709 END
@@ -1571,11 +1571,11 @@ namespace apl {
 
   //ME20181022 - Old method to create aflow.in files for AIMS
   void createAflowInPhononsAIMS(_aflags& _aflowFlags, _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn, _xinput& xinp, ofstream& FileMESSAGE) {
-    string function = "apl::createAflowInPhononsAIMS():";
+    string function_name = XPID + "apl::createAflowInPhononsAIMS():";
     string message = "";
     if (!xinp.AFLOW_MODE_AIMS) {
       message = "This function only works with AIMS.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
     }
     xinp.xaims.CONTROL.str(std::string());
     KBIN::AIMS_Produce_CONTROL(xinp.xaims,_AflowIn,FileMESSAGE,_aflowFlags,_kbinFlags,_xFlags.aimsflags);  //DEFAULT
@@ -1591,7 +1591,7 @@ namespace apl {
     string directory=xinp.getDirectory();
     if(directory.empty()){
       message = "No output directory found";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
     }
 
     if(!aurostd::FileExist(directory)){aurostd::DirectoryMake(directory);}  // Create directory if it is not created
@@ -1632,7 +1632,7 @@ namespace apl {
       aurostd::stringstream2file(xaims.GEOM, geom_filename);
       if(!aurostd::FileExist(geom_filename)){
         message = "Cannot create [" + AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM + "] file.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
       }
       aurostd::ChmodFile("a+rw", geom_filename);
     }
@@ -1642,7 +1642,7 @@ namespace apl {
     aurostd::stringstream2file(outfile, filename);
     if (!aurostd::FileExist(filename)){
       message = "Cannot create [" + _AFLOWIN_ + "] file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
     }
     aurostd::ChmodFile("a+rw", filename); // CHMOD a+rw _AFLOWIN_
     //CO END
@@ -1725,9 +1725,9 @@ namespace apl {
 
       // Was it all right?
       if (!xinps[idxRun].getXStr().qm_calculated) {
-        string function = "apl::outfileFoundEverywherePhonons():";
+        string function_name = XPID + "apl::outfileFoundEverywherePhonons():";
         string message = "The force file in " + directory + " is wrong.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_CORRUPT_);
       }
     }
     _logger << "No errors caught, all force files read successfully."; //CO20190116  //ME20190607
@@ -1736,7 +1736,7 @@ namespace apl {
   }
 
   bool readForcesFromDirectory(_xinput& xinp) {
-    string function = "apl::readForcesFromDirectory():";
+    string function_name = XPID + "apl::readForcesFromDirectory():";
     uint natoms = xinp.getXStr().atoms.size();
     xinp.getXStr().qm_forces.clear();
     // Load data....
@@ -1782,9 +1782,9 @@ namespace apl {
     uint natoms = xinps[ninps].getXStr().atoms.size();
     for (uint idxRun = 0; idxRun < ninps; idxRun++) {
       if (xinps[idxRun].getXStr().atoms.size() != natoms) {
-        string function = "apl::subtractZeroStateForces():";
+        string function_name = XPID + "apl::subtractZeroStateForces():";
         string message = "Structure and ZEROSTATE structure do not have the same number of atoms.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       for (uint k = 0; k < natoms; k++) {
         xinps[idxRun].getXStr().qm_forces[k](1) = xinps[idxRun].getXStr().qm_forces[k](1) - xinps[ninps].getXStr().qm_forces[k](1);
@@ -1799,7 +1799,7 @@ namespace apl {
   // This is used for AAPL and needs an extra input because the ZEROSTATE
   // calculation is not part of the xInputs vector
   void subtractZeroStateForces(vector<_xinput>& xinps, _xinput& zerostate) {
-    string function = "apl::subtractZeroStateForces():";
+    string function_name = XPID + "apl::subtractZeroStateForces():";
     string message = "";
     stringstream _logger;
     uint natoms = zerostate.getXStr().atoms.size();
@@ -1807,13 +1807,13 @@ namespace apl {
       readForcesFromDirectory(zerostate);
       if (!zerostate.getXStr().qm_calculated) {
         message = "The force file in " + zerostate.getDirectory() + " is wrong.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_CORRUPT_);
       }
     }
     for (uint idxRun = 0; idxRun < xinps.size(); idxRun++) {
       if (xinps[idxRun].getXStr().atoms.size() != natoms) {
         message = "Structure and ZEROSTATE structure do not have the same number of atoms.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       for (uint at = 0; at < natoms; at++) {
         xinps[idxRun].getXStr().qm_forces[at](1) = xinps[idxRun].getXStr().qm_forces[at](1) - zerostate.getXStr().qm_forces[at](1);

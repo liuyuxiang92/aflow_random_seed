@@ -965,9 +965,9 @@ double GetPearsonCoefficient(const string& symbol) {
     }
   }
   // If not found throw xerror
-  string function = XPID + "GetPearsonCoefficient():";
+  string function_name = XPID + "GetPearsonCoefficient():";
   string message = symbol + " is not a valid element name or symbol.";
-  throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _VALUE_ILLEGAL_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_ILLEGAL_);
 }
 
 double GetPearsonCoefficient(const int& iat) {
