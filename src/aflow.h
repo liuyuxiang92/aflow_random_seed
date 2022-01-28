@@ -5280,7 +5280,26 @@ namespace xprototype {
   };
 }
 
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Unit Tests - ME20220127
 
+class UnitTest : public xStream {
+  public:
+    UnitTest(ostream& oss=std::cout);
+    UnitTest(ofstream& mf, ostream& oss=std::cout);
+    UnitTest(const UnitTest&);
+    const UnitTest& operator=(const UnitTest&);
+    ~UnitTest();
+
+    void clear();
+    void initialize();
+
+  private:
+
+    void free();
+    void copy(const UnitTest& b);
+};
 
 #endif
 // ***************************************************************************

@@ -8,6 +8,39 @@
 #include "aflow_anrl.h"  //DX20201104
 #include "aflow_compare_structure.h"  //ME20220125
 
+UnitTest::UnitTest(ostream& oss) : xStream(oss) {
+  free();
+}
+
+UnitTest::UnitTest(ofstream& mf, ostream& oss) : xStream(mf, oss) {
+}
+
+UnitTest::UnitTest(const UnitTest& ut) : xStream(*ut.getOFStream(), *ut.getOSS()) {
+  free();
+  copy(ut);
+}
+
+const UnitTest& UnitTest::operator=(const UnitTest& ut) {
+  copy(ut);
+  return *this;
+}
+
+UnitTest::~UnitTest() {
+  free();
+}
+
+void UnitTest::clear() {
+  free();
+}
+
+void UnitTest::free() {
+
+}
+
+void UnitTest::copy(const UnitTest& ut) {
+  if (this == &ut) return;
+}
+
 
 // Collection of generic check functions, to streamline testing.
 // HE20210616
