@@ -147,11 +147,13 @@ namespace unittest {
     if (it != test_groups.end()) {
       const vector<string> members = (*it).second;
       for (const string& member : members ) {
-        if (test_functions[member].passed_checks != test_functions[member].results.size()) return false;
+        const xcheck& xchk = test_functions[member];
+        if (!xchk.test_finished || (test_functions[member].passed_checks != test_functions[member].results.size())) return false;
       }
       return true;
     } else {
-      return (test_functions[task].passed_checks == test_functions[task].results.size());
+      const xcheck& xchk = test_functions[task];
+      return (xchk.test_finished && (xchk.passed_checks == xchk.results.size()));
     }
   }
 

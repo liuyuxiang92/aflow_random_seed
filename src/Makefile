@@ -72,7 +72,7 @@ OPTS=
 #-O1
 #-O3
 # -march=opteron
-OPTS_MT=-O2 -std=gnu++0x
+OPTS_MT=-O2 -std=c++11
 TODAY=-DTODAY=\"$(TIME)\"
 VERS=-DAFLOW_VERSION=\"$(VERSNUMBER)\" $(TODAY)
 
