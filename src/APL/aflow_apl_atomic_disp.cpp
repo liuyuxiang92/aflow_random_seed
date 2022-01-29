@@ -9,14 +9,8 @@
 
 #include "aflow_apl.h"
 
-// Some parts are written within the C++0x support in GCC, especially std::thread,
-// which is implemented in gcc 4.4 and higher. For multithreads with std::thread see:
-// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
-#if GCC_VERSION>= 40400
-#define AFLOW_APL_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
 #include <thread>
-#else
-#warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
 static const string _APL_ADISP_MODULE_ = "APL";  // for the logger
@@ -106,7 +100,7 @@ namespace apl {
     uint nbranches = _pc->getNumberOfBranches();
     _eigenvectors.resize(nq, vector<vector<xvector<xcomplex<double> > > >(nbranches, vector<xvector<xcomplex<double> > >(natoms, xvector<xcomplex<double> >(3))));
     _frequencies.resize(nq, vector<double> (nbranches, 0.0));
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     int ncpus = _pc->getNCPUs();
     if (ncpus > nq) ncpus = nq;
     if (ncpus > 1) {

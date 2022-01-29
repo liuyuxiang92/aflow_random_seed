@@ -6,17 +6,9 @@
 
 #include "aflow_apl.h"
 
-//CO START
-// Some parts are written within the C++0x support in GCC, especially the std::thread,
-// which is implemented in gcc 4.4 and higher.... For multithreads with std::thread see:
-// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
-#if GCC_VERSION >= 40400  // added two zeros
-#define AFLOW_APL_MULTITHREADS_ENABLE 1
+#ifdef AFLOW_MULTITHREADS_ENABLE
 #include <thread>
-#else
-#warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
-//CO END
 
 static const double MIN_FREQ_THRESHOLD = -0.1;
 
@@ -183,7 +175,7 @@ namespace apl {
       _freqs.push_back(zero);
     _eigen.resize(_qpoints.size(), xmatrix<xcomplex<double> >(_pc->getNumberOfBranches(), _pc->getNumberOfBranches()));  // M20190624
 
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
 
     // Get the number of CPUS
     int ncpus = _pc->getNCPUs();

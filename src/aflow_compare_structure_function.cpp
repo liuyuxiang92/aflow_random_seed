@@ -14,15 +14,22 @@
 #include "aflow_symmetry_spacegroup.h"
 #include "aflow_xtalfinder_python.cpp" //DX20201228
 
-#undef AFLOW_COMPARE_MULTITHREADS_ENABLE
+//[OBSOLETE - ME20220128] #undef AFLOW_MULTITHREADS_ENABLE
 
-#if GCC_VERSION >= 40400   // added two zeros
-#define AFLOW_COMPARE_MULTITHREADS_ENABLE 1
+//[OBSOLETE - ME20220128] #if GCC_VERSION >= 40400   // added two zeros
+//[OBSOLETE - ME20220128] #define AFLOW_MULTITHREADS_ENABLE 1
+//[OBSOLETE - ME20220128] #include <thread>
+//[OBSOLETE - ME20220128] #include <mutex>
+//[OBSOLETE - ME20220128] static std::mutex _mutex_;
+//[OBSOLETE - ME20220128] #else
+//[OBSOLETE - ME20220128] #warning "The multithread parts of AFLOW-XtalFinder will be not included, since they need gcc 4.4 and higher (C++0x support)."
+//[OBSOLETE - ME20220128] #endif
+
+//ME20220128 - Use global compiler flags
+#ifdef AFLOW_MULTITHREADS_ENABLE
 #include <thread>
 #include <mutex>
 static std::mutex _mutex_;
-#else
-#warning "The multithread parts of AFLOW-XtalFinder will be not included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
 // for multi-threads on-the-fly scheme (explanation in AAPL/aflow_aapl_tcond.cpp, developed by M. Esters (ME))
@@ -2885,7 +2892,7 @@ void XtalFinderCalculator::performStructureConversions(
   int nstructures = calculate_primitive_vec.size();
 
   if(task_counter < nstructures){
-#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     std::unique_lock<std::mutex> lock(_mutex_);
 #endif
     i = task_counter++;
@@ -2909,7 +2916,7 @@ void XtalFinderCalculator::performStructureConversions(
     // Niggli
     if(calculate_Niggli_vec[i]){ structure_containers[i].structure.NiggliUnitCellForm(); }
 
-#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     std::unique_lock<std::mutex> lock(_mutex_);
 #endif
     i = task_counter++;
@@ -2968,7 +2975,7 @@ void XtalFinderCalculator::convertStructures(
   }
   task_counter = 0;
 
-#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
   // THREADED VERSION - START
   if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
 
@@ -3097,7 +3104,7 @@ void XtalFinderCalculator::calculateSymmetries(uint num_proc){
   message << "Calculating the symmetries of the structure(s).";
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
-#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
   // THREADED VERISON - START
   if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
 
@@ -3189,7 +3196,7 @@ void XtalFinderCalculator::calculateLFAEnvironments(uint num_proc){
   message << "Calculating the environments of the structure(s).";
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
-#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
   // THREADED VERISON - START
 
   if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
@@ -3240,7 +3247,7 @@ void XtalFinderCalculator::getNearestNeighbors(uint num_proc){
   message << "Calculating the nearest neighbors of all the structure(s).";
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
-#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
   // THREADED VERISON - START
 
   if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
@@ -4332,7 +4339,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
   vector<std::pair<uint,uint> > start_indices, end_indices;
   uint num_comparison_threads = 1;
 
-#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
 
   number_of_comparisons = 0;
   for(uint i=0;i<comparison_schemes.size();i++){ number_of_comparisons += comparison_schemes[i].numberOfComparisons(); }
@@ -4467,7 +4474,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
         pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
       }
       if(LDEBUG) { cerr << function_name << ": Number of comparisons is not zero... " << number_of_comparisons << endl; }
-#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
 
       // THREADED VERISON - START
       // split into threads
@@ -6666,7 +6673,7 @@ void XtalFinderCalculator::latticeSearch(
       vstrs_matched.push_back(str_misfit_tmp);
     }
 
-#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     // ---------------------------------------------------------------------------
     // split task into threads
     uint number_of_structures = vstrs_matched.size();
@@ -6707,7 +6714,7 @@ void XtalFinderCalculator::latticeSearch(
               xstr1_for_thread.push_back(xstr1);
             }
 
-#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
             // ---------------------------------------------------------------------------
             // threaded (DX20191107 thread pointer)
             vector<std::thread*> threads;
@@ -7653,7 +7660,7 @@ void XtalFinderCalculator::calculatePrototypeDesignations(
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
   task_counter = 0;
-#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
   if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
   // ---------------------------------------------------------------------------
   // split task into threads
@@ -7693,7 +7700,7 @@ void XtalFinderCalculator::getPrototypeDesignations(
   int nstructures = prototypes.size();
 
   if(task_counter < nstructures){
-#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     std::unique_lock<std::mutex> lock(_mutex_);
 #endif
     i = task_counter++;
@@ -7708,7 +7715,7 @@ void XtalFinderCalculator::getPrototypeDesignations(
     prototypes[i].aflow_label = prototypes[i].structure_representative->structure.prototype;
     prototypes[i].aflow_parameter_list = prototypes[i].structure_representative->structure.prototype_parameter_list;
     prototypes[i].aflow_parameter_values = prototypes[i].structure_representative->structure.prototype_parameter_values;
-#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     std::unique_lock<std::mutex> lock(_mutex_);
 #endif
     i = task_counter++;
@@ -7770,7 +7777,7 @@ void XtalFinderCalculator::calculateMatchingAFLOWPrototypes(
   XHOST.QUIET=true;
 
   task_counter = 0;
-#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
   // split task into threads
   uint number_of_structures = prototypes.size();
   uint number_of_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
@@ -7807,7 +7814,7 @@ void XtalFinderCalculator::getMatchingAFLOWPrototypes(
   int nstructures = prototypes.size();
 
   if(task_counter < nstructures){
-#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     std::unique_lock<std::mutex> lock(_mutex_);
 #endif
     i = task_counter++;
@@ -7825,7 +7832,7 @@ void XtalFinderCalculator::getMatchingAFLOWPrototypes(
       }
     }
 
-#ifdef AFLOW_COMPARE_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     std::unique_lock<std::mutex> lock(_mutex_);
 #endif
     i = task_counter++;

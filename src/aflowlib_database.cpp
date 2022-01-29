@@ -66,16 +66,10 @@
 #include "aflowlib.h"
 #include "SQLITE/aflow_sqlite.h"
 
-// Some parts are written within the C++0x support in GCC, especially std::thread,
-// which is implemented in gcc 4.4 and higher. For multithreads with std::thread see:
-// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
-#if GCC_VERSION >= 40400
-#define AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
 #include <thread>
 #include <mutex>
 std::mutex m;
-#else
-#warning "The multithread parts of AflowDB will not be included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
 #define _AFLOW_DB_DEBUG_ false
@@ -717,7 +711,7 @@ namespace aflowlib {
     vector<string> types = getDataTypes(columns, true);
 
     // Rebuild
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     int ncpus = init::GetCPUCores();
     int max_cpu = 16;
     if (ncpus < 1) ncpus = 1;
@@ -776,7 +770,7 @@ namespace aflowlib {
   void AflowDB::populateTable(const string& table, const vector<string>& columns, const vector<string>& types, const vector<vector<string> >& values) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
     string function_name = XPID + _AFLOW_DB_ERR_PREFIX_ + "populateTable():";
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     std::unique_lock<std::mutex> lk(m);
 #endif
     createTable(table, columns, types);
@@ -1184,7 +1178,7 @@ namespace aflowlib {
       vector<vector<vector<string> >  > maxmin(_N_AUID_TABLES_, vector<vector<string> >(ncols, vector<string>(2))), sets(_N_AUID_TABLES_, vector<vector<string> >(ncols));
       vector<vector<vector<int> > > counts(_N_AUID_TABLES_, vector<vector<int> >(ncols, vector<int>(2, 0)));
       vector<vector<int> > loop_counts(_N_AUID_TABLES_, vector<int>(nloops));
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
       int ncpus = init::GetCPUCores();
       if (ncpus < 1) ncpus = 1;
       // The maximum number of CPUs are empirically found values that appear

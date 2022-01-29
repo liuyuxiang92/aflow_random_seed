@@ -8,6 +8,12 @@
 #include "aflow_anrl.h"  //DX20201104
 #include "aflow_compare_structure.h"  //ME20220125
 
+#ifdef AFLOW_MULTITHREADS_ENABLE
+#include<mutex>
+#include<thread>
+static std::mutex m;
+#endif
+
 namespace unittest {
 
   void UnitTest::multiplyByFive() {std::cout << (120.0 * 5.0) << std::endl;}
@@ -96,6 +102,10 @@ namespace unittest {
       }
     }
   }
+
+}
+
+namespace unittest {
 
   bool UnitTest::runUnitTests(const vector<string>& unit_tests_in) {
     string function_name = XPID + "runUnitTests():";
