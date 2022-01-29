@@ -225,6 +225,15 @@ int main(int _argc,char **_argv) {
       }
       return 0; //CO20180419
     }
+    //ME20220128
+    if (!Arun && aurostd::args2attachedflag(argv,cmds,"--unit_test")) {
+      aurostd::xoption unittest_options;
+      unittest_options.args2addattachedscheme(argv, cmds, "UNIT_TESTS", "--unit_test=", "all");
+      vector<string> tests;
+      aurostd::string2tokens(unittest_options.getattachedscheme("UNIT_TESTS"), tests, ",");
+      unittest::UnitTest ut(std::cout);
+      return (ut.runUnitTests(tests)?0:1);
+    }
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_schema|--schema_test")) {return (SchemaTest()?0:1);}  //ME20210408
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_CeramGen|--CeramGen_test")) {return (CeramGenTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_Egap|--Egap_test")) {return (EgapTest()?0:1);}  //CO20190601

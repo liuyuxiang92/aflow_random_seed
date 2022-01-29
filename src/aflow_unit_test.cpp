@@ -90,7 +90,7 @@ namespace unittest {
 
     test_groups["database"] = {"schema"};
     test_groups["xstructure"] = {"cif_parser"};
-    for (auto& group : test_groups) {
+    for (const auto& group : test_groups) {
       for (const string& member : group.second) {
         test2group[member] = group.first;
       }
@@ -107,7 +107,16 @@ namespace unittest {
     vector<string> unit_tests;
     for (const string& test : unit_tests_in) {
       bool isgroup = test_groups.count(test);
-      if (!isgroup && test_functions.count(test)) {
+      if (test == "all") {
+        tasks.clear();
+        for (const auto& group : test_groups) {
+          tasks.push_back(group.first);
+          for (const string& member : group.second ) {
+            unit_tests.push_back(member);
+          }
+        }
+        break;
+      } else if (!isgroup && test_functions.count(test)) {
         message << "Skipping unrecognized test name " << test << ".";
         pflow::logger(_AFLOW_FILE_NAME_, function_name, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       } else if (isgroup && !aurostd::WithinList(tasks, test)) {
@@ -119,6 +128,11 @@ namespace unittest {
         unit_tests.push_back(test);
         tasks.push_back(test);
       }
+    }
+    if (tasks.size() == 0) {
+      message << "No unit tests to run.";
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
+      return true;
     }
 
     // Print final summary
@@ -133,10 +147,10 @@ namespace unittest {
     uint ntasks = tasks.size();
     if (nsuccess == ntasks) {
       message << "Unit tests passed successfully (passsing " << ntasks << " tests).";
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, summary, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     } else {
       message << "Some unit tests failed (" << (ntasks - nsuccess) << " of " << ntasks << " failed).";
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, summary, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     }
     pflow::logger(_AFLOW_FILE_NAME_, function_name, summary, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_);
     return (nsuccess != ntasks);
