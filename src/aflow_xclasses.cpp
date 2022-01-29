@@ -32,6 +32,7 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   QUIET=FALSE;
   QUIET_CERR=FALSE; // extra quiet SC20210617
   QUIET_COUT=FALSE; // extra quiet SC20210617
+  QUIET_THREADED=FALSE; //CO20220129 - quiet if inside a threaded process
   TEST=FALSE;
   DEBUG=FALSE;
   MPI=FALSE;
@@ -147,6 +148,7 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   QUIET=b.QUIET;
   QUIET_CERR=b.QUIET_CERR; // extra quiet SC20210617
   QUIET_COUT=b.QUIET_COUT; // extra quiet SC20210617
+  QUIET_THREADED=b.QUIET_THREADED; //CO20220129 - quiet if inside a threaded process
   TEST=b.TEST;
   DEBUG=b.DEBUG;
   MPI=b.MPI;

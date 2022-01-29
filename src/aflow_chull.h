@@ -71,6 +71,8 @@ namespace chull {
   class ChullPoint; //forward declaration
   class ConvexHull; //forward declaration
   bool convexHull(const aurostd::xoption& vpflow);
+  void convexHullThreaded(const aurostd::xoption& vpflow,const vector<string>& vinputs,uint& counter_vinputs,uint& counter_progress_bar,const _aflags& aflags,bool& Krun,ostream& oss=cout);
+  bool convexHullSingle(const aurostd::xoption& vpflow,const string& input,const _aflags& aflags,ostream& oss=cout,bool silent_flag_check=false);
   ////////////////////////////////////////////////////////////////////////////////
   // gets path to redirect output
   string getPath(bool add_backslash=true);
@@ -217,6 +219,7 @@ namespace chull {
 
       //for organization of points
       uint m_i_coord_group;
+      uint m_i_icsd;                    //index of equivalent icsd in m_points
 
       //stoich_coords only!
       xvector<double> s_coords;         //stoich_coords, m_coords[0:rows-1]+hidden_dimension
@@ -372,7 +375,7 @@ namespace chull {
       double m_offset;
       xvector<double> m_facet_centroid;
       xvector<double> m_hull_reference;
-      bool m_hypercollinear;
+      bool m_is_hypercollinear;
       bool m_is_vertical;
       bool m_is_artificial;
       bool m_in_lower_hemisphere;                //this determines how we sort wrt stoich (descending in lower_hemisphere)

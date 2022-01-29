@@ -2,6 +2,7 @@
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz
         -- parallelized KBIN::CompressDirectory() (CO)
         -- generalizing DOS averaging for pocc systems with ARUNs having different numbers of atoms (CO)
+        -- parallelized --chull --alloy (CO)
 3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)

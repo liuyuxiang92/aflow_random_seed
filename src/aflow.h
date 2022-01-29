@@ -341,7 +341,7 @@ class _XHOST {
     string sPID,sTID;           // aflow_init.cpp  [PID=12345678]  [TID=12345678]
     bool showPID,showTID;       // aflow_init.cpp  check if --showPID
     // machinery
-    bool QUIET,QUIET_CERR,QUIET_COUT,TEST,DEBUG,MPI;    // extra quiet SC20210617
+    bool QUIET,QUIET_CERR,QUIET_COUT,QUIET_THREADED,TEST,DEBUG,MPI;    // extra quiet SC20210617 //CO20220129 - quiet if inside a threaded process
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
     bool POSTPROCESS; //CO20200624 - generic postprocessing, including --lib2raw and --lib2lib
     bool ARUN_POSTPROCESS; //CT20181212 - this is for the --postprocess flag needed for AEL/AGL, can be extended to other modules too

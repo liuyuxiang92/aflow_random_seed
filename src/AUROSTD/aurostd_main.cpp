@@ -2933,7 +2933,12 @@ namespace aurostd {
     }
     if(message_parts.size()==0){return;}
 
-    bool verbose=(!XHOST.QUIET && !quiet && osswrite);
+    //CO20220129
+    //input quiet is always XHOST.QUIET, this is legacy: aflow.h (XHOST) was previously not made available in aurostd
+    //keep redundant for now, just in case in the future we change our mind about including aflow.h
+    bool verbose=(!XHOST.QUIET && !XHOST.QUIET_THREADED && !quiet && osswrite);
+    if((&oss==&cout) && XHOST.QUIET_COUT){verbose=false;}
+    if((&oss==&cerr) && XHOST.QUIET_CERR){verbose=false;}
     bool fancy_print=(!XHOST.vflag_control.flag("WWW")&&!XHOST.vflag_control.flag("NO_FANCY_PRINT"));  //CO20200404 - new web flag
 
     FILE* fstr=stdout;
@@ -3033,7 +3038,11 @@ namespace aurostd {
     }
     if(message_parts.size()==0){return;}
 
-    bool verbose=(!XHOST.QUIET && !quiet && osswrite);  //[CO2010315 - not always, removing for OUTCARs read during vasp runs]verbose=true; //ALWAYS!
+    //CO20220129
+    //input quiet is always XHOST.QUIET, this is legacy: aflow.h (XHOST) was previously not made available in aurostd
+    //keep redundant for now, just in case in the future we change our mind about including aflow.h
+    bool verbose=(!XHOST.QUIET && !XHOST.QUIET_THREADED && !quiet && osswrite);  //[CO2010315 - not always, removing for OUTCARs read during vasp runs]verbose=true; //ALWAYS!
+    if(XHOST.QUIET_CERR){verbose=false;}
     bool fancy_print=(!XHOST.vflag_control.flag("WWW")&&!XHOST.vflag_control.flag("NO_FANCY_PRINT"));  //CO20200404 - new web flag
 
     FILE* fstr=stderr;
@@ -3109,7 +3118,11 @@ namespace aurostd {
     }
     if(message_parts.size()==0){return;}
 
-    bool verbose=(!XHOST.QUIET && !quiet && osswrite);  //[CO2010315 - not always, removing for OUTCARs read during vasp runs]verbose=true; //ALWAYS!
+    //CO20220129
+    //input quiet is always XHOST.QUIET, this is legacy: aflow.h (XHOST) was previously not made available in aurostd
+    //keep redundant for now, just in case in the future we change our mind about including aflow.h
+    bool verbose=(!XHOST.QUIET && !XHOST.QUIET_THREADED && !quiet && osswrite);  //[CO2010315 - not always, removing for OUTCARs read during vasp runs]verbose=true; //ALWAYS!
+    if(XHOST.QUIET_CERR){verbose=false;}
     bool fancy_print=(!XHOST.vflag_control.flag("WWW")&&!XHOST.vflag_control.flag("NO_FANCY_PRINT"));  //CO20200404 - new web flag
 
     FILE* fstr=stderr;
