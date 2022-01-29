@@ -717,7 +717,7 @@ bool SchemaTest(ofstream& FileMESSAGE,ostream& oss) {
   _aflags aflags; aflags.Directory = aurostd::getPWD();
 
   // Set up test environment
-  string task_description = "Testing aurostd";
+  string task_description = "Testing schema";
   vector<string> results;
   uint passed_checks = 0;
   string check_function = "";
