@@ -11739,8 +11739,8 @@ namespace chull {
     else if(property=="offset"){value=aurostd::utype2string(facet.m_offset,precision,true,roundoff_tol,FIXED_STREAM);}
     else if(property=="centroid"){value="["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(facet.m_facet_centroid,precision,true,roundoff_tol,FIXED_STREAM),vector_delimiter)+"]";}
     else if(property=="is_hypercollinear"){value=(facet.m_is_hypercollinear?"true":"false");}
-    else if(property=="vertical"){value=(facet.m_is_vertical?"true":"false");}
-    else if(property=="artificial"){value=(facet.m_is_artificial?"true":"false");}
+    else if(property=="is_vertical"){value=(facet.m_is_vertical?"true":"false");}
+    else if(property=="is_artificial"){value=(facet.m_is_artificial?"true":"false");}
     else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown property");}
     if(value.empty()){value=null_value;}
     return value;
@@ -11970,8 +11970,8 @@ namespace chull {
     facet_properties_str+=",offset";
     facet_properties_str+=",centroid";
     facet_properties_str+=",is_hypercollinear";
-    facet_properties_str+=",vertical";
-    facet_properties_str+=",artificial";
+    facet_properties_str+=",is_vertical";
+    facet_properties_str+=",is_artificial";
 
     stringstream main_text_ss;main_text_ss.str("");
     vector<string> vout;        //json only
