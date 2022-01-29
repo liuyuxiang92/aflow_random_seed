@@ -20,16 +20,10 @@
 
 #include "aflow_apl.h"
 
-// Some parts are written within the C++0x support in GCC, especially std::thread,
-// which is implemented in gcc 4.4 and higher. For multithreads with std::thread see:
-// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
-#if GCC_VERSION >= 40400
-#define AFLOW_APL_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
 #include <thread>
 #include <mutex>
 static std::mutex m;
-#else
-#warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
 // Counters for threaded functions
@@ -442,7 +436,7 @@ namespace apl {
   void TCONDCalculator::calculateTransitionProbabilities() {
     string message = "Calculating transition probabilities.";
     pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     int ncpus = _pc->getNCPUs();
     if (ncpus > nIQPs) ncpus = nIQPs;
 #endif
@@ -465,7 +459,7 @@ namespace apl {
     progress_bar_counter = 0;
     task_counter = 0;
     pflow::updateProgressBar(progress_bar_counter, nIQPs, *_pc->getOSS());
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     if (ncpus > 1) {
       vector<std::thread*> threads;
       for (int icpu = 0; icpu < ncpus; icpu++) {
@@ -506,7 +500,7 @@ namespace apl {
         scattering_rates_isotope.resize(nIQPs, vector<double>(nBranches));
 
         task_counter = 0;
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
         if (ncpus > 1) {
           vector<std::thread*> threads;
           for (int icpu = 0; icpu < ncpus; icpu++) {
@@ -577,7 +571,7 @@ namespace apl {
     // Set up index for threaded execution
     int i = AUROSTD_MAX_INT;
     if (task_counter < nIQPs) {
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
       std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
 #endif
       i = task_counter++;
@@ -789,7 +783,7 @@ namespace apl {
           }
         }
       }
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
       std::unique_lock<std::mutex> lk(m);  // For thread-safe progress bar writing and assignment
 #endif
       i = task_counter++;
@@ -805,7 +799,7 @@ namespace apl {
     // Set up index for threaded execution
     int i = AUROSTD_MAX_INT;
     if (task_counter < nIQPs) {
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
       std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
 #endif
       i = task_counter++;
@@ -865,7 +859,7 @@ namespace apl {
           }
         }
       }
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
       std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
 #endif
       i = task_counter++;
@@ -1145,7 +1139,7 @@ namespace apl {
   vector<vector<double> > TCONDCalculator::calculateAnharmonicRates(const vector<vector<double> >& occ) {
     vector<vector<double> > rates(nIQPs, vector<double>(nBranches, 0.0));
     task_counter = 0;
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     int ncpus = _pc->getNCPUs();
     if (ncpus > nIQPs) ncpus = nIQPs;
     if (ncpus > 1) {
@@ -1171,7 +1165,7 @@ namespace apl {
     // Set up index for threaded execution
     int i = AUROSTD_MAX_INT;
     if (task_counter < nIQPs) {
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
       std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
 #endif
       i = task_counter++;
@@ -1188,7 +1182,7 @@ namespace apl {
         getProcess(processes[i][p], qpts, branches, sign);
         rates[i][branches[0]] += intr_trans_probs[i][p] * getOccupationTerm(occ, sign, qpts, branches);
       }
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
       std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
 #endif
       i = task_counter++;
@@ -1250,7 +1244,7 @@ namespace apl {
       const vector<vector<double> >& occ,
       vector<vector<xvector<double> > >& mfd) {
     // MPI variables
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     int ncpus = _pc->getNCPUs();
     if (ncpus > nIQPs) ncpus = nIQPs;
     vector<std::thread*> threads;
@@ -1258,7 +1252,7 @@ namespace apl {
 
     vector<vector<xvector<double> > > delta(nIQPs, vector<xvector<double> >(nBranches, xvector<double>(3)));
     task_counter = 0;
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     if (ncpus > 1) {
       threads.clear();
       for (int icpu = 0; icpu < ncpus; icpu++) {
@@ -1289,7 +1283,7 @@ namespace apl {
     // Set up index for threaded execution
     int i = AUROSTD_MAX_INT;
     if (task_counter < nIQPs) {
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
       std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
 #endif
       i = task_counter++;
@@ -1336,7 +1330,7 @@ namespace apl {
       for (int br = 0; br < nBranches; br++) {
         delta[i][br] = Uc * delta[i][br];
       }
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
       std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
 #endif
       i = task_counter++;

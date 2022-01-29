@@ -6,14 +6,8 @@
 
 #include "aflow_apl.h"
 
-// Some parts are written within the C++0x support in GCC, especially the std::thread,
-// which is implemented in gcc 4.4 and higher.... For multithreads with std::thread see:
-// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
-#if GCC_VERSION >= 40400  // added two zeros
-#define AFLOW_APL_MULTITHREADS_ENABLE 1
+#ifdef AFLOW_MULTITHREADS_ENABLE
 #include <thread>
-#else
-#warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
 #define _DEBUG_APL_PHONCALC_ false  //CO20190116
@@ -1271,7 +1265,7 @@ namespace apl {
     freqs.resize(nQPs);
     eigenvectors.resize(nQPs, xmatrix<xcomplex<double> >(nbranches, nbranches));
     vector<vector<xvector<double> > > gvel(nQPs);
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     if (_ncpus > 1) {
       vector<vector<int> > thread_dist = getThreadDistribution(nQPs, _ncpus);
       vector<std::thread*> threads;

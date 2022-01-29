@@ -15,14 +15,8 @@
 
 #define _DEBUG_POCC_APL_ false
 
-// Some parts are written within the C++0x support in GCC, especially the std::thread,
-// which is implemented in gcc 4.4 and higher.... For multithreads with std::thread see:
-// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
-#if GCC_VERSION >= 40400  // added two zeros
-#define AFLOW_APL_MULTITHREADS_ENABLE 1
+#ifdef AFLOW_MULTITHREADS_ENABLE
 #include <thread>
-#else
-#warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
 #endif
 
 using std::string;
@@ -314,7 +308,7 @@ namespace pocc {
     else message = "Calculating phonon DOS using the root sampling method.";
     pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, m_aflags, *p_FileMESSAGE, *p_oss);
 
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     int ncpus = KBIN::get_NCPUS(m_kflags);
     vector<std::thread*> threads;
     if (ncpus > (int) nruns) ncpus = (int) nruns;
