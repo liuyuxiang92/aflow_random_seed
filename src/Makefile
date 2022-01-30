@@ -58,7 +58,7 @@ W_AMBIG_OBJ=
 ifeq ($(OS), Windows_NT)
 W_AMBIG_OBJ=-Wa,-mbig-obj
 endif
-CCFLAGS=-Wall -W -fno-inline $(W_AMBIG_OBJ)
+CCFLAGS=-Wall -W -fno-inline $(W_AMBIG_OBJ) -DAFLOW_MULTITHREADS_ENABLE
 #ME20200514 - Allow inlining for threaded files (big performance penalty otherwise)
 CCFLAGS_MT=-Wall -W -DAFLOW_MULTITHREADS_ENABLE
 #[CO20191217 - put in OPTS_MT]CCFLAGS_MT=$(CCFLAGS) -O2

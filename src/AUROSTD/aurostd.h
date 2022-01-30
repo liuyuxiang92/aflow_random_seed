@@ -47,6 +47,10 @@
 #include <sys/types.h>
 #include <sys/utsname.h>
 #include <sys/wait.h>
+#ifdef AFLOW_MULTITHREADS_ENABLE
+#include <mutex>
+#include <thread>
+#endif
 #include <time.h>
 #include <typeinfo>
 #include <unistd.h>

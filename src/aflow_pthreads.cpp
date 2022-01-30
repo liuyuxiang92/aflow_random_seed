@@ -1088,10 +1088,14 @@ vector<vector<int> > getThreadDistribution(const int& nbins, const int& nthreads
   return thread_dist;
 }
 
-//ME20220130 - xThread class
+#ifdef AFLOW_MULTITHREADS_ENABLE
+
+//ME20220130 - xthread class
 namespace xthread {
 
   xThread::xThread() {
+    free();
+    setCPUs(1, 1);
   }
 
   xThread::xThread(const xThread& xt) {
@@ -1105,8 +1109,12 @@ namespace xthread {
 
   void xThread::copy(const xThread& xt) {
     if (this == &xt) return;
+    // std::mutex should not be copied as
+    // it should stay immutable
     ncpus_max = xt.ncpus_max;
     ncpus_max = xt.ncpus_min;
+    progress_bar = xt.progress_bar;
+    progress_bar_set = progress_bar_set;
   }
 
   xThread::~xThread() {
@@ -1116,13 +1124,77 @@ namespace xthread {
   void xThread::free() {
     ncpus_max = 0;
     ncpus_min = 0;
+    progress_bar_set = false;
   }
 
-  void xThread::clear() {
-    free();
+  void xThread::setCPUs(uint nmax, uint nmin) {
+    ncpus_max = nmax;
+    if (nmin == 0) ncpus_min = nmax;
   }
 
+  void xThread::setProgressBar(ostream& oss) {
+    progress_bar = &oss;
+    progress_bar_set = true;
+  }
+
+  void xThread::unsetProgressBar() {
+    progress_bar_set = false;
+  }
+
+  template <typename F, typename... A>
+  void xThread::run(uint nbins, F& func, A&... args) {
+    run(nbins, ncpus_max, func, args...);
+  }
+
+  template <typename F, typename... A>
+  void xThread::run(uint nbins, uint ncpus, F& func, A&... args) {
+    vector<std::thread*> threads;
+
+    if (ncpus > ncpus_max) ncpus = ncpus_max;
+
+    uint ncpus_max_available = (uint) KBIN::get_NCPUS();
+    uint ncpus_available = ncpus_max_available - XHOST.CPU_active;
+    while (ncpus_available < ncpus_min) {
+      ncpus_available = ncpus_max_available - XHOST.CPU_active;
+    }
+    ncpus = (ncpus_available > ncpus_max)?ncpus_max:ncpus_available;
+    XHOST.CPU_active += ncpus;
+
+    uint task_index = 0;
+    if (progress_bar_set) pflow::updateProgressBar(0, nbins, *progress_bar);
+    for (uint i = 0; i < ncpus; i++) {
+      threads.push_back(new std::thread(&xthread::xThread::run, this,
+                                        std::ref(func), std::ref(args)...)
+      );
+    }
+
+    for (std::thread* t : threads) {
+      t->join();
+      delete t;
+    }
+    XHOST.CPU_active -= ncpus;
+  }
+
+  template <typename F, typename...A>
+  void xThread::threadWorker(uint& task_index, uint nbins, F& func, A&... args) {
+    uint i = AUROSTD_MAX_UINT;
+    if (task_index < nbins) {
+      std::unique_lock<std::mutex> lk(mtx);
+      i = task_index++;
+    } else {
+      return;
+    }
+
+    while (i < nbins) {
+      func(i, args...);
+      std::unique_lock<std::mutex> lk(mtx);
+      i = task_index++;
+      if (progress_bar_set) pflow::updateProgressBar(task_index, nbins, *progress_bar);
+    }
+  }
 }
+
+#endif
 
 // **************************************************************************
 

@@ -2944,6 +2944,7 @@ namespace sflow {
 }
 vector<vector<int> > getThreadDistribution(const int&, const int&);  //ME20190218
 
+#ifdef AFLOW_MULTITHREADS_ENABLE
 //ME20220130
 namespace xthread {
   class xThread {
@@ -2955,14 +2956,30 @@ namespace xthread {
 
       void clear();
 
+      void setCPUs(uint nmax, uint nmin=0);
+      void setProgressBar(ostream& oss);
+      void unsetProgressBar();
+
+      template <typename F, typename...A>
+      void run(uint nbins, F& func, A&... args);
+      template <typename F, typename...A>
+      void run(uint nbins, uint ncpus, F& func, A&... args);
+
     private:
       void free();
       void copy(const xThread&);
 
       uint ncpus_max;
       uint ncpus_min;
+      std::mutex mtx;
+      ostream* progress_bar;
+      bool progress_bar_set;
+
+      template <typename F, typename...A>
+      void threadWorker(uint& task_counter, uint nbins, F& func, A&... args);
   };
 }
+#endif
 
 // ----------------------------------------------------------------------------
 // aflow_kbin.cpp
