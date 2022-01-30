@@ -25,7 +25,6 @@ namespace unittest {
   }
 
   UnitTest::UnitTest(const UnitTest& ut) : xStream(*ut.getOFStream(), *ut.getOSS()) {
-    free();
     copy(ut);
   }
 
@@ -35,6 +34,7 @@ namespace unittest {
   }
 
   UnitTest::~UnitTest() {
+    xStream::free();
     free();
   }
 
