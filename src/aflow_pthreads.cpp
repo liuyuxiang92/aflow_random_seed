@@ -1148,14 +1148,27 @@ namespace xthread {
 
   template <typename F, typename... A>
   void xThread::run(uint nbins, uint ncpus, F& func, A&... args) {
+    std::function<void()> dummy = []{};
+    run(nbins, ncpus, func, args..., dummy);
+  }
+
+  template <typename F, typename... A, typename PF, typename... PA>
+  void xThread::run(uint nbins, F& func, A&... args, PF& ppfunc, PA&... ppargs) {
+    run(nbins, ncpus_max, func, args..., ppfunc, ppargs...);
+  }
+
+  template <typename F, typename... A, typename PF, typename... PA>
+  void xThread::run(uint nbins, uint ncpus, F& func, A&... args, PF& ppfunc, PA&... ppargs) {
     vector<std::thread*> threads;
 
     if (ncpus > ncpus_max) ncpus = ncpus_max;
 
     uint ncpus_max_available = (uint) KBIN::get_NCPUS();
     uint ncpus_available = ncpus_max_available - XHOST.CPU_active;
+    uint sleep_second = 10;
     while (ncpus_available < ncpus_min) {
       ncpus_available = ncpus_max_available - XHOST.CPU_active;
+      aurostd::Sleep(sleep_second);
     }
     ncpus = (ncpus_available > ncpus_max)?ncpus_max:ncpus_available;
     XHOST.CPU_active += ncpus;
@@ -1164,7 +1177,8 @@ namespace xthread {
     if (progress_bar_set) pflow::updateProgressBar(0, nbins, *progress_bar);
     for (uint i = 0; i < ncpus; i++) {
       threads.push_back(new std::thread(&xthread::xThread::run, this,
-                                        std::ref(func), std::ref(args)...)
+                                        std::ref(func), std::ref(args)...,
+                                        std::ref(ppfunc), std::ref(ppargs)...)
       );
     }
 
@@ -1175,8 +1189,10 @@ namespace xthread {
     XHOST.CPU_active -= ncpus;
   }
 
-  template <typename F, typename...A>
-  void xThread::threadWorker(uint& task_index, uint nbins, F& func, A&... args) {
+  template <typename F, typename...A, typename PF, typename... PA>
+  void xThread::threadWorker(uint& task_index, uint nbins,
+                             F& func, A&... args,
+                             PF& ppfunc, PA&... ppargs) {
     uint i = AUROSTD_MAX_UINT;
     if (task_index < nbins) {
       std::unique_lock<std::mutex> lk(mtx);
@@ -1188,6 +1204,7 @@ namespace xthread {
     while (i < nbins) {
       func(i, args...);
       std::unique_lock<std::mutex> lk(mtx);
+      ppfunc(i, ppargs...);
       i = task_index++;
       if (progress_bar_set) pflow::updateProgressBar(task_index, nbins, *progress_bar);
     }

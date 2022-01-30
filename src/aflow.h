@@ -2962,6 +2962,10 @@ namespace xthread {
 
       template <typename F, typename...A>
       void run(uint nbins, F& func, A&... args);
+      template <typename F, typename...A, typename PF, typename... PA>
+      void run(uint nbins, F& func, A&... args, PF& ppfunc, PA&... ppargs);
+      template <typename F, typename...A, typename PF, typename... PA>
+      void run(uint nbins, uint ncpus, F& func, A&... args, PF& ppfunc, PA&... ppargs);
       template <typename F, typename...A>
       void run(uint nbins, uint ncpus, F& func, A&... args);
 
@@ -2975,8 +2979,8 @@ namespace xthread {
       ostream* progress_bar;
       bool progress_bar_set;
 
-      template <typename F, typename...A>
-      void threadWorker(uint& task_counter, uint nbins, F& func, A&... args);
+      template <typename F, typename...A, typename PF, typename... PA>
+      void threadWorker(uint& task_counter, uint nbins, F& func, A&... args, PF& ppfunc, PA&... ppargs);
   };
 }
 #endif
