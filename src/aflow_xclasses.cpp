@@ -57,6 +57,7 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   RAM_MB=0.0;
   RAM_GB=0.0;
   CPU_Cores=0;
+  CPU_active=0;  //ME20220130
   CPU_Model="";
   CPU_MHz="";
   vTemperatureCore.clear();
@@ -171,6 +172,7 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   RAM_MB=b.RAM_MB;
   RAM_GB=b.RAM_GB;
   CPU_Cores=b.CPU_Cores;
+  CPU_active=b.CPU_active;  //ME20220130
   CPU_Model=b.CPU_Model;
   CPU_MHz=b.CPU_MHz;
   vTemperatureCore.clear();for(uint i=0;i<b.vTemperatureCore.size();i++) vTemperatureCore.push_back(b.vTemperatureCore.at(i));

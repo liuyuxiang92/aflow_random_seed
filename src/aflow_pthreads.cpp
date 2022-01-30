@@ -1088,6 +1088,41 @@ vector<vector<int> > getThreadDistribution(const int& nbins, const int& nthreads
   return thread_dist;
 }
 
+//ME20220130 - xThread class
+namespace xthread {
+
+  xThread::xThread() {
+  }
+
+  xThread::xThread(const xThread& xt) {
+    copy(xt);
+  }
+
+  const xThread& xThread::operator=(const xThread& xt) {
+    copy(xt);
+    return *this;
+  }
+
+  void xThread::copy(const xThread& xt) {
+    if (this == &xt) return;
+    ncpus_max = xt.ncpus_max;
+    ncpus_max = xt.ncpus_min;
+  }
+
+  xThread::~xThread() {
+    free();
+  }
+
+  void xThread::free() {
+    ncpus_max = 0;
+    ncpus_min = 0;
+  }
+
+  void xThread::clear() {
+    free();
+  }
+
+}
 
 // **************************************************************************
 

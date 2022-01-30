@@ -357,6 +357,7 @@ class _XHOST {
     string AFLOW_MATERIALS_SERVER,AFLOW_WEB_SERVER;
     long double RAM,RAM_MB,RAM_GB;
     int CPU_Cores;
+    int CPU_active;  //ME20220130
     string CPU_Model;
     string CPU_MHz;
     vector<double> vTemperatureCore;
@@ -2942,6 +2943,26 @@ namespace sflow {
   void QDEL(string options,string cmd);
 }
 vector<vector<int> > getThreadDistribution(const int&, const int&);  //ME20190218
+
+//ME20220130
+namespace xthread {
+  class xThread {
+    public:
+      xThread();
+      xThread(const xThread& xt);
+      const xThread& operator=(const xThread& xt);
+      ~xThread();
+
+      void clear();
+
+    private:
+      void free();
+      void copy(const xThread&);
+
+      uint ncpus_max;
+      uint ncpus_min;
+  };
+}
 
 // ----------------------------------------------------------------------------
 // aflow_kbin.cpp
