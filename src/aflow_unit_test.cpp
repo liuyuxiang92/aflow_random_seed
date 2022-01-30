@@ -16,8 +16,6 @@ static std::mutex m;
 
 namespace unittest {
 
-  void UnitTest::multiplyByFive() {std::cout << (120.0 * 5.0) << std::endl;}
-
   UnitTest::UnitTest(ostream& oss) : xStream(oss) {
     initialize();
   }
@@ -67,8 +65,8 @@ namespace unittest {
 
   void UnitTest::initializeTestFunctions() {
     // Initialize unit tests
-    test_functions["database::schema"] = initializeXcheck();
-    test_functions["database::schema"].func = std::bind(&unittest::UnitTest::multiplyByFive, this);
+    test_functions["schema"] = initializeXcheck();
+    test_functions["schema"].func = std::bind(&unittest::UnitTest::SchemaTest, this, std::placeholders::_1, std::placeholders::_2);
   }
 
   xcheck UnitTest::initializeXcheck() {
