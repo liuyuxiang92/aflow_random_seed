@@ -1097,6 +1097,15 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   check_num++;
   check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
 
+  check_function = "aurostd::httpPercentEncoding()";
+  response = aurostd::httpPercentEncoding("Crazy!? _&@String");
+  check_num++;
+  check_equal(response, "Crazy%21%3F%20_%26%40String", check_function, "escape reserved chars", check_num, passed_checks, results);
+
+  response = aurostd::httpPercentEncoding("Crazy!? _&@String", "@&");
+  check_num++;
+  check_equal(response, "Crazy!? _%26%40String", check_function, "just escape @ and &", check_num, passed_checks, results);
+
 
   // present overall result
   return display_result(passed_checks, check_num, task_description, results, function_name, FileMESSAGE, oss);

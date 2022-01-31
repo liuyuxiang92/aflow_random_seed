@@ -25,6 +25,7 @@ namespace aurostd{
   std::string httpGet(const std::string &host, const std::string &query, int &status_code);
   std::string httpGet(const std::string &host, const std::string &query, int &status_code, std::map<std::string, std::string> &header);
 
+  std::string httpPercentEncoding(const std::string &raw_str, const std::string &characters="");
 }
 
 #endif //AFLOW_SRC_AUROSTD_XHTTP_H

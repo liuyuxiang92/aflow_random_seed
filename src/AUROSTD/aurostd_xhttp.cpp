@@ -242,6 +242,47 @@ namespace aurostd {
     }
   }
 
+
+  /// @brief convert characters into their percent representation
+  /// @param raw_str sting to escape
+  /// @param characters replace just the given characters (":/?#[]@!$&'()*+,;= " if empty)
+  /// @return escaped string
+  /// https://www.rfc-editor.org/rfc/rfc3986#section-2.1
+  string httpPercentEncoding(const string &raw_str, const string &characters){
+
+    bool LDEBUG = (false || XHOST.DEBUG || _DEBUG_XHTTP_);
+    string soliloquy = XPID + "aurostd::httpPercentEncoding():";
+
+    const char *reserved;
+    if (!characters.empty()){
+      reserved=characters.c_str();
+    }
+    else {
+      reserved= ":/?#[]@!$&'()*+,;= ";
+    }
+    size_t start=0;
+    size_t border=0;
+
+    char * str_position;
+    char str[raw_str.length()];
+    strcpy(str, raw_str.c_str());
+    str_position=std::strpbrk(str, reserved);
+
+    std::stringstream output;
+    if (LDEBUG) cerr << soliloquy << " Escaping '" << raw_str << endl;
+
+    while (str_position!=NULL){
+      border = str_position-str;
+      output << raw_str.substr(start, border-start) << "%" << std::uppercase << std::hex << std::setfill('0') << std::setw(2) << (uint) str[border];
+      if (LDEBUG) cerr << " Match '" << str[border] << "' (%" << std::uppercase << std::hex << std::setfill('0') << (uint) str[border] << std::dec << ") at " << border << endl;
+      start = border+1;
+      str_position=std::strpbrk(str_position+1,reserved);
+    }
+    output << raw_str.substr(start);
+    return output.str();
+
+  }
+
   /// @brief Get a raw http response
   /// @param hostname hostname to establish a connection to
   /// @param query query to run on the server (like "/API/aflux/?nspecies(4),paging(1,300)")
