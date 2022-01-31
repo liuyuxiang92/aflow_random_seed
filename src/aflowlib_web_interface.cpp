@@ -553,8 +553,9 @@ namespace aflowlib {
   } 
 
   void _aflowlib_entry::clear() {  // clear PRIVATE
-    _aflowlib_entry _temp;
-    copy(_temp);
+    //[CO20201220 - too slow]_aflowlib_entry _temp;
+    //[CO20201220 - too slow]copy(_temp);
+    free();
   }
 
   _aflowlib_entry::_aflowlib_entry(const string& file) { // constructur from file
@@ -982,8 +983,8 @@ namespace aflowlib {
     bond_aa=999999;bond_ab=999999;bond_bb=999999;
     vNsgroup.clear();vsgroup.clear();vstr.clear();  // apennsy
     // DONE
-    if(0) {
-      bool html=TRUE;
+    if(1) {							
+      bool html=FALSE; //TRUE;  //CO20201220
       oss << "Keywords" << endl;
       oss << "auid=" << auid << (html?"<br>":"") << endl;
       oss << "aurl=" << aurl << (html?"<br>":"") << endl;
@@ -1120,8 +1121,8 @@ namespace aflowlib {
       oss << "Bravais_superlattice_lattice_variation_type_orig=" << Bravais_superlattice_lattice_variation_type_orig << (html?"<br>":"") << endl;
       oss << "Bravais_superlattice_lattice_system_orig=" << Bravais_superlattice_lattice_system_orig << (html?"<br>":"") << endl;
       oss << "Pearson_symbol_superlattice_orig=" << Pearson_symbol_superlattice_orig << (html?"<br>":"") << endl;
-      oss << "reciprocal_geometry_orig==" << reciprocal_geometry_orig << "  vreciprocal_geometry_orig= ";for(uint j=0;j<vreciprocal_geometry_orig.size();j++) oss << vreciprocal_geometry_orig.at(j) << " "; oss << (html?"<br>":"") << endl;
-      oss << "reciprocal_volume_cell_orig==" << reciprocal_volume_cell_orig << (html?"<br>":"") << endl; 
+      oss << "reciprocal_geometry_orig=" << reciprocal_geometry_orig << "  vreciprocal_geometry_orig= ";for(uint j=0;j<vreciprocal_geometry_orig.size();j++) oss << vreciprocal_geometry_orig.at(j) << " "; oss << (html?"<br>":"") << endl;
+      oss << "reciprocal_volume_cell_orig=" << reciprocal_volume_cell_orig << (html?"<br>":"") << endl; 
       oss << "reciprocal_lattice_type_orig=" << reciprocal_lattice_type_orig << (html?"<br>":"") << endl;
       oss << "reciprocal_lattice_variation_type_orig=" << reciprocal_lattice_variation_type_orig << (html?"<br>":"") << endl;
       oss << "Wyckoff_letters_orig=" << Wyckoff_letters_orig << (html?"<br>":"") << endl;
@@ -1146,8 +1147,8 @@ namespace aflowlib {
       oss << "Bravais_superlattice_lattice_variation_type=" << Bravais_superlattice_lattice_variation_type << (html?"<br>":"") << endl;
       oss << "Bravais_superlattice_lattice_system=" << Bravais_superlattice_lattice_system << (html?"<br>":"") << endl;
       oss << "Pearson_symbol_superlattice=" << Pearson_symbol_superlattice << (html?"<br>":"") << endl;
-      oss << "reciprocal_geometry==" << reciprocal_geometry << "  vreciprocal_geometry= ";for(uint j=0;j<vreciprocal_geometry.size();j++) oss << vreciprocal_geometry.at(j) << " "; oss << (html?"<br>":"") << endl;
-      oss << "reciprocal_volume_cell==" << reciprocal_volume_cell << (html?"<br>":"") << endl; 
+      oss << "reciprocal_geometry=" << reciprocal_geometry << "  vreciprocal_geometry= ";for(uint j=0;j<vreciprocal_geometry.size();j++) oss << vreciprocal_geometry.at(j) << " "; oss << (html?"<br>":"") << endl;
+      oss << "reciprocal_volume_cell=" << reciprocal_volume_cell << (html?"<br>":"") << endl; 
       oss << "reciprocal_lattice_type=" << reciprocal_lattice_type << (html?"<br>":"") << endl;
       oss << "reciprocal_lattice_variation_type=" << reciprocal_lattice_variation_type << (html?"<br>":"") << endl;
       oss << "Wyckoff_letters=" << Wyckoff_letters << (html?"<br>":"") << endl;
@@ -1195,8 +1196,8 @@ namespace aflowlib {
       oss << "ael_applied_pressure=" << ael_applied_pressure << (html?"<br>":"") << endl; //CT20181212 
       oss << "ael_average_external_pressure=" << ael_average_external_pressure << (html?"<br>":"") << endl; //CT20181212 
       //ME20191105 BEGIN
-      oss << "ael_stiffness_tensor="; for (int i = ael_stiffness_tensor.lrows; i <= ael_stiffness_tensor.urows; i++) {for (int j = 1; j <= 6; j++) oss << ael_stiffness_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
-      oss << "ael_compliance_tensor="; for (int i = 1; i <= ael_compliance_tensor.lrows; i++) {for (int j = 1; j <= ael_compliance_tensor.urows; j++) oss << ael_compliance_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
+      oss << "ael_stiffness_tensor="; for (int i = ael_stiffness_tensor.lrows; i <= ael_stiffness_tensor.urows; i++) {for (int j = ael_stiffness_tensor.lcols; j <= ael_stiffness_tensor.ucols; j++) {oss << ael_stiffness_tensor[i][j] << " ";} oss << (html?"<br>":"") << endl;} //ME20191105  //CO20201220
+      oss << "ael_compliance_tensor="; for (int i = ael_compliance_tensor.lrows; i <= ael_compliance_tensor.urows; i++) {for (int j = ael_compliance_tensor.lcols; j <= ael_compliance_tensor.ucols; j++) {oss << ael_compliance_tensor[i][j] << " ";} oss << (html?"<br>":"") << endl;} //ME20191105  //CO20201220
       //ME20191105 END
       //ME20210927 BEGIN
       oss << "energy_free_vibrational_cell_apl_300K=" << energy_free_vibrational_cell_apl_300K << (html?"<br>":"") << endl;
@@ -4593,14 +4594,16 @@ namespace aflowlib {
 
 //AFLUX integration
 //FR+CO20180329
+#define _DEBUG_AFLUX_ true
 namespace aflowlib {
   bool APIget::establish(){
+    bool LDEBUG=(FALSE || _DEBUG_AFLUX_ || XHOST.DEBUG);
     struct hostent * host = gethostbyname( Domain.c_str() );
 
     //[CO20181226 - OBSOLETE]PORT=80;  //CO20180401
 
     if ( (host == NULL) || (host->h_addr == NULL) ) {
-      cerr << "Error retrieving DNS information." << endl;
+      pflow::logger(_AFLOW_FILE_NAME_,"aflowlib::APIget::establish():","Error retrieving DNS information.",std::cerr,_LOGGER_ERROR_);  //CO20200520
       return false;
     }
 
@@ -4612,26 +4615,28 @@ namespace aflowlib {
     sock = socket(AF_INET, SOCK_STREAM, 0);
 
     if (sock < 0) {
-      cerr << "Error creating socket." << endl;
+      pflow::logger(_AFLOW_FILE_NAME_,"aflowlib::APIget::establish():","Error creating socket.",std::cerr,_LOGGER_ERROR_);  //CO20200520
       return false;
     }
 
     if ( connect(sock, (struct sockaddr *)&client, sizeof(client)) < 0 ) {
       close(sock);
-      cerr << "Could not connect" << endl;
+      pflow::logger(_AFLOW_FILE_NAME_,"aflowlib::APIget::establish():","Could not connect",std::cerr,_LOGGER_ERROR_);  //CO20200520
       return false;
     }
 
+    //do NOT use endl: endl is locale dependent and HTTP standard specifically calls out \r\n
     stringstream ss;
-    ss << "GET " << API_Path << Summons << " HTTP/1.0\r\n" ;
-    //    cerr << "GET " << API_Path << Summons << " HTTP/1.0\r\n" ;
+    ss << "GET " << API_Path << Summons << " HTTP/1.0\r\n";
     ss << "HOST: " << Domain << "\r\n";
     ss << "Connection: close\r\n";
     ss << "\r\n";
     string request = ss.str();
 
+    if(LDEBUG){cerr << "aflowlib::APIget::establish():" << " request=" << endl;cerr << request << endl;}  //CO20200520
+
     if (send(sock, request.c_str(), request.length(), 0) != (int)request.length()) {
-      cerr << "Error sending request." << endl;
+      pflow::logger(_AFLOW_FILE_NAME_,"aflowlib::APIget::establish():","Error sending request.",std::cerr,_LOGGER_ERROR_);  //CO20200520
       return false;
     }
     return true;
@@ -4650,19 +4655,21 @@ namespace aflowlib {
     }
   }
   ostream& operator<<( ostream& output, APIget& a ) { 
-    char cur;
+    bool LDEBUG=(FALSE || _DEBUG_AFLUX_ || XHOST.DEBUG);
+    unsigned char cur;
     bool responsedata = false;
     bool waslinefeed = false;
     if( a.establish() ) {
       while ( ! responsedata ) { //discard headers
         read(a.sock, &cur, 1);
-        //cerr << cur << ":" << (int)cur << endl;
-        if( waslinefeed  && cur == '\r') responsedata = true;
+        if(LDEBUG){cerr << "aflowlib::APIget::operator<<()[headers]:" << " cur='" << cur << "'" << endl;}
+        if( waslinefeed && cur == '\r') responsedata = true;
         if( cur == '\n' ) waslinefeed = true;
         else waslinefeed = false;
       };
       read(a.sock, &cur, 1); //discard final \n in header \r\n\r\n
-      while ( read(a.sock, &cur, 1) > 0 ) output << cur; //cout << cur;
+      while ( read(a.sock, &cur, 1) > 0 ) output << cur;
+      if(LDEBUG){cerr << "aflowlib::APIget::operator<<()[data]:" << " cur='" << cur << "'" << endl;}
       close(a.sock);
     }
     return output;
@@ -4675,43 +4682,35 @@ namespace aflowlib {
   string AFLUXCall(const aurostd::xoption& vpflow){
 
     // Performs AFLUX call based on summons input from command line
-
-    string usage="aflow --aflux=<summons>";
-    string options="";
-
     if(vpflow.flag("AFLUX::USAGE")) {
+      string usage="aflow --aflux=<summons>";
+      string options="";
       //[CO20200624 - OBSOLETE]stringstream ss_usage;
       //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("AFLUX"),"aflowlib::AFLUXCall()",aurostd::liststring2string(usage,options));
       //[CO20200624 - OBSOLETE]return ss_usage.str();
-      init::ErrorOption(vpflow.getattachedscheme("AFLUX"),"aflowlib::AFLUXCall()",aurostd::liststring2string(usage,options));
+      init::MessageOption(vpflow.getattachedscheme("AFLUX"),"aflowlib::AFLUXCall()",aurostd::liststring2string(usage,options));
       return "";
     }
 
     string summons = "";
-    if(vpflow.flag("AFLUX")) {
-      summons=vpflow.getattachedscheme("AFLUX");
-      // check if string is enclosed in double or single quotes 
+    if(vpflow.flag("AFLUX::SUMMONS")) { //CO20200520 - AFLUX::SUMMONS
+      summons=vpflow.getattachedscheme("AFLUX::SUMMONS"); //CO20200520 - AFLUX::SUMMONS
+      // check if string is enclosed in double or single quotes
       // (since bash throws error for unprotected parentheses)
-      if((summons[0] == '\"' && summons[summons.size()-1] == '\"') || (summons[0] == '\'' && summons[summons.size()-1] == '\'')){
+      if(!summons.empty() && ((summons[0] == '\"' && summons[summons.size()-1] == '\"') || (summons[0] == '\'' && summons[summons.size()-1] == '\''))){
         summons.erase(summons.begin()); summons.erase(summons.begin()+summons.size()-1);
       }
     }
     return AFLUXCall(summons);
   }
-}
-
-namespace aflowlib {
   string AFLUXCall(const vector<string>& matchbook){
 
     // Performs AFLUX call based on vector of matchbook entries
     string summons = aurostd::joinWDelimiter(matchbook,",");
-
     return AFLUXCall(summons);
   }
-}
-
-namespace aflowlib {
   string AFLUXCall(const string& _summons){
+
     // Performs AFLUX call based on summons input
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "AFLUXCall():";
@@ -4723,14 +4722,34 @@ namespace aflowlib {
     aurostd::StringSubst(summons,"#","%23");  // percent encoding for "#"
 
     if(LDEBUG) {
-      cerr << function_name << ": Summons = " << summons << endl;
-      cerr << function_name << ": Peforming call ... please be patient ..." << endl;
+      cerr << function_name << " Summons=\"" << summons << "\"" << endl;
+      cerr << function_name << " Performing call ... please be patient ..." << endl;
     }
 
-    aflowlib::APIget API_socket(summons);
-    stringstream response; response << API_socket;
-    return response.str();
-
+    //CO20200520 - added attempts and sleep
+    string response_str="";
+    uint attempts=0;
+    if(0){
+      stringstream response_ss;
+      aflowlib::APIget API_socket(summons);
+      while(response_str.empty() && (++attempts)<10){
+        if(LDEBUG){cerr << function_name << " attempt=" << attempts << endl;}
+        response_ss << API_socket;response_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(response_ss.str());
+        if(attempts>1){aurostd::Sleep(2);}
+      }
+    }
+    bool response=false;
+    string url=AFLOWLIB_SERVER_DEFAULT+"/"+_AFLUX_API_PATH_+summons;
+    aurostd::StringSubst(url,"//","/");
+    if(LDEBUG){cerr << function_name << " url=" << url << endl;}
+    while((response==false || response_str.empty()) && (++attempts)<10){
+      if(LDEBUG){cerr << function_name << " attempt=" << attempts << endl;}
+      response=aurostd::url2string(url,response_str,true);
+      response_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(response_str);
+      if(response==false || response_str.empty()){aurostd::Sleep(2);}
+    }
+    
+    return response_str;
   }
 }
 
@@ -4747,7 +4766,8 @@ namespace aflowlib {
     vector<vector<std::pair<string,string> > > properties_response;
 
     vector<string> entries,fields,key_value;
-    aurostd::string2tokens(response,entries,"\n");
+    aurostd::string2vectorstring(response,entries); //CO20200520
+    //[CO20200520 - OBSOLETE]aurostd::string2tokens(response,entries,"\n");
 
     // for each entry in response
     for(uint e=0;e<entries.size();e++){
@@ -4774,6 +4794,154 @@ namespace aflowlib {
 }
 
 //DX+FR20190206 - AFLUX functionality via command line - END
+
+namespace aflowlib {  //CO20201220
+  // ***************************************************************************
+  // mergeEntries()
+  // ***************************************************************************
+  //simple helper function for loading multiple libraries together, will take
+  //combinations of nested vectors and convert them to other nested vectors
+  //naries is output, entries_new is input
+  //these assume vector<aflowlib::_aflowlib_entry> entries_new is all of the same
+  //type, e.g., binaries of MnPd (e.g., MnPd2, Mn2Pd, etc., similar structure to LIBS)
+  //also assumes ordered vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries
+  //outer most - unary, binary, etc.
+  //next outer - species match, Mn, Pd, MnPd, etc.
+  //inner most - entries
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(!mergeEntries(naries, entries_new[i], true)) { return false; }  //structured data
+    }
+    return true;
+  }
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,const vector<vector<aflowlib::_aflowlib_entry> >& entries_new,bool entries_new_same_type) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(naries.size() <= i + 1) {
+        naries.push_back(vector<vector<aflowlib::_aflowlib_entry> >(0));
+      }
+      if(!mergeEntries(naries[i], entries_new[i], entries_new_same_type, true)) {  //triple vector<> naries implies this structure
+        return false;
+      }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,const vector<aflowlib::_aflowlib_entry>& entries_new,bool entries_new_same_type) {
+    if(!entries_new.size()) { return true; }
+    int index_layer1=-1, index_layer2=-1;
+    if(entries_new_same_type) {
+      if(!mergeEntries(naries, entries_new[0], index_layer1, index_layer2)) { return false; }
+      for (uint i = 1; i < entries_new.size(); i++) { naries[index_layer1][index_layer2].push_back(entries_new[i]); }
+    } else {
+      for (uint i = 0; i < entries_new.size(); i++) {
+        if(!entries_new[i].vspecies.size()) { return false; }  //what the heck is this?
+        if(!mergeEntries(naries, entries_new[i], index_layer1, index_layer2)) { return false; }
+      }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,const aflowlib::_aflowlib_entry& entry_new) {
+    int index_layer1 = -1;
+    int index_layer2 = -1;
+    return mergeEntries(naries, entry_new, index_layer1, index_layer2);
+  }
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,const aflowlib::_aflowlib_entry& entry_new,int& index_layer1,int& index_layer2) {
+    if(!entry_new.vspecies.size()) { return false; }    //what the heck is this?
+    while (naries.size() < entry_new.vspecies.size()) {  //assumes entries_new all have the same vspecies.size()
+      naries.push_back(vector<vector<aflowlib::_aflowlib_entry> >(0));
+    }
+    index_layer1 = entry_new.vspecies.size() - 1;
+    return mergeEntries(naries[index_layer1], entry_new, index_layer2, true);  //triple vector<> naries implies this structure
+  }
+  //naries takes on two forms depending on sort_by_species
+  //if sort_by_species==true, then naries is truly a single nary (unary, binary, etc.) with
+  //the second layer consisting of different species
+  //otherwise, naries is the total entries (similar to naries above), where second layer
+  //is unaries, binary, etc. (no layer with different species)
+  //if sort_by_species and we are coming from LIBs (entries_new_same_type==true), then we don't need to check every entry, we already
+  //know they have the same type (binary of same species)
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new,bool sort_by_species) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(!mergeEntries(naries, entries_new[i], true, sort_by_species)) { return false; }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,const vector<vector<aflowlib::_aflowlib_entry> >& entries_new,bool entries_new_same_type,bool sort_by_species) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(!mergeEntries(naries, entries_new[i], entries_new_same_type, sort_by_species)) { return false; }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,const vector<aflowlib::_aflowlib_entry>& entries_new,bool entries_new_same_type,bool sort_by_species) {
+    if(!entries_new.size()) { return true; }
+    int index;
+    if(entries_new_same_type) {
+      if(!mergeEntries(naries, entries_new[0], index, sort_by_species)) { return false; }
+      for (uint i = 1; i < entries_new.size(); i++) { naries[index].push_back(entries_new[i]); }
+    } else {
+      for (uint i = 0; i < entries_new.size(); i++) {
+        if(!mergeEntries(naries, entries_new[i], index, sort_by_species)) { return false; }
+      }
+    }
+    return true;
+  }
+  //naries takes on two forms depending on sort_by_species
+  //if sort_by_species==true, then naries is truly a single nary (unary, binary, etc.) with
+  //the second layer consisting of different species
+  //otherwise, naries is the total entries (similar to naries above), where second layer
+  //is unaries, binary, etc. (no layer with different species)
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,const aflowlib::_aflowlib_entry& entry_new,bool sort_by_species) {
+    int index = -1;
+    return mergeEntries(naries, entry_new, index, sort_by_species);
+  }
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,const aflowlib::_aflowlib_entry& entry_new,int& index,bool sort_by_species) {
+    if(!entry_new.vspecies.size()) { return false; }
+    index = -1;
+    if(sort_by_species) {
+      //all of naries is unary, binary, etc., now just need to index species
+      for (uint i = 0; i < naries.size() && index == -1; i++) {
+        //test of stupidity
+        if(naries[i][0].vspecies.size() != entry_new.vspecies.size()) { return false; }
+        if(naries[i][0].vspecies == entry_new.vspecies) { index = i; }
+      }
+      if(index == -1) {
+        naries.push_back(vector<aflowlib::_aflowlib_entry>(0));
+        index = naries.size() - 1;
+      }
+    } else {
+      //just need to create space for unary, binary, etc.
+      while (naries.size() < entry_new.vspecies.size()) {
+        naries.push_back(vector<aflowlib::_aflowlib_entry>(0));
+      }
+      index = entry_new.vspecies.size() - 1;
+    }
+    naries[index].push_back(entry_new);
+    return true;
+  }
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      for (uint j = 0; j < entries_new[i].size(); j++) {
+        if(!mergeEntries(naries, entries_new[i][j])) { return false; }
+      }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,const vector<vector<aflowlib::_aflowlib_entry> >& entries_new) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(!mergeEntries(naries, entries_new[i])) { return false; }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,const vector<aflowlib::_aflowlib_entry>& entries_new) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(!mergeEntries(naries, entries_new[i])) { return false; }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,const aflowlib::_aflowlib_entry& entry_new) {
+    naries.push_back(entry_new);
+    return true;
+  }
+}  // namespace pflow
 
 //DX20200929 - START
 namespace aflowlib {

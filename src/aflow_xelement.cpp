@@ -718,6 +718,7 @@ namespace xelement {
 
   // ********************************************************************************************************************************************************
 
+
   xelement::xelement(const string& element,int oxidation_state) {free();populate(element,oxidation_state);}  //CO20200520
   xelement::xelement(uint ZZ,int oxidation_state) {free();populate(ZZ,oxidation_state);} //CO20200520
   xelement::xelement(const xelement& b){copy(b);} //CO20210201
@@ -1645,11 +1646,8 @@ namespace xelement {
 
 
   // ********************************************************************************************************************************************************
-  // populate by name or symbol
-  void xelement::populate(const string& element,int oxidation_state) {  //CO20200520
-    free();
-    // DEFAULT
-    verbose=FALSE;
+  // check if input is element
+  uint xelement::isElement(const string& element) const {  //CO20200520
     uint Z=0;
 
     // try with symbol
@@ -1662,8 +1660,17 @@ namespace xelement {
       for(uint i=1;i<=103&&Z==0;i++)  //CO20200520
         if(aurostd::toupper(element)==aurostd::toupper(xelement(i).name)) Z=i;
     }
-    if(Z!=0) {(*this)=xelement(Z,oxidation_state);loadDefaultUnits();return;}  //CO20200520
+    return Z;
+  }
 
+  // ********************************************************************************************************************************************************
+  // populate by name or symbol
+  void xelement::populate(const string& element,int oxidation_state) {  //CO20200520
+    free();
+    // DEFAULT
+    verbose=FALSE;
+    uint Z=isElement(element);
+    if(Z!=0) {(*this)=xelement(Z,oxidation_state);loadDefaultUnits();return;}  //CO20200520
     throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::xelement():","Element symbol/name does not exist: "+element,_VALUE_ILLEGAL_); //CO20200520
   }
 
@@ -11298,7 +11305,7 @@ namespace xelement {
     // [AFLOW]STOP=Lawrencium
     // ********************************************************************************************************************************************************
 
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::xelement():","Element number does not exist: "+aurostd::utype2string(ZZ),_INPUT_ILLEGAL_);  //CO20200520
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::xelement():","Element number does not exist: "+aurostd::utype2string(ZZ),_VALUE_ILLEGAL_);  //CO20200520
   }
 } // namespace xelement
 

@@ -1188,7 +1188,7 @@ class _atom { // simple class.. nothing fancy
     string cleanname;                                      // a chemical clean version of the name
     int info;                                              // container for misc. information  //RHT
     int    atomic_number;                                  // 0 by defauls
-    int    number;                                         // atom number reference for convasp, from zero to the sky
+    //[CO20200130 - number->basis]int    number;                                         // atom number reference for convasp, from zero to the sky
     string sd;                                             // ?
     xvector<int> ijk;                                      // xvector identifier of the lattice (but you must give str)
     bool   isincell;                                       // is in cell ? (i==j==k==0 ?)
@@ -2671,16 +2671,18 @@ void minimumCoordinationShell(const xstructure& xstr, uint center_index,
     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX20191122
 
 //makefile tests
+bool EntryLoaderTest(ostream& oss=cout);  //CO20200520
+bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200520
 bool SchemaTest(ostream& oss=std::cout);  //ME20210408
 bool SchemaTest(ofstream& FileMESSAGE,ostream& oss=std::cout);  //ME20210408
-bool CeramGenTest(ostream& oss=cout);
-bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss=cout);
-bool EgapTest(ostream& oss=cout);
-bool EgapTest(ofstream& FileMESSAGE,ostream& oss=cout);
-bool gcdTest(ostream& oss=cout);
-bool gcdTest(ofstream& FileMESSAGE,ostream& oss=cout);
-bool smithTest(ostream& oss=cout);
-bool smithTest(ofstream& FileMESSAGE,ostream& oss=cout);
+bool CeramGenTest(ostream& oss=cout); //CO20200520
+bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss=cout); //CO20200520
+bool EgapTest(ostream& oss=cout); //CO20200520
+bool EgapTest(ofstream& FileMESSAGE,ostream& oss=cout); //CO20200520
+bool gcdTest(ostream& oss=cout);  //CO20200520
+bool gcdTest(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200520
+bool smithTest(ostream& oss=cout);  //CO20200520
+bool smithTest(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200520
 bool coordinationTest(ostream& oss=cout);
 bool coordinationTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool PrototypeGeneratorTest(ostream& oss=cout, bool check_symmetry=false, bool check_uniqueness=false); //DX20200928
@@ -4948,6 +4950,7 @@ namespace xelement {
       ~xelement();                                                    // kill everything
       const xelement& operator=(const xelement &b);                   // copy
       void clear();
+      uint isElement(const string& element) const;  //CO20201220
       void loadDefaultUnits();  //CO20201111
       void populate(const string& element,int oxidation_state=AUROSTD_MAX_INT); //CO20200520
       void populate(uint ZZ,int oxidation_state=AUROSTD_MAX_INT); //CO20200520

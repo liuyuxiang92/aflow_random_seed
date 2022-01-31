@@ -312,6 +312,9 @@ namespace aflowlib {
 
 // ***************************************************************************
 // AFLUX STUFF
+//#define _AFLUX_API_PATH_ "/~frose/dev/aflux/src/?" //[CO20201220 - OBSOLETE]"/search/API/?"
+//#define _AFLUX_API_PATH_ "/~esters/API/aflux/v1.0/?" //[CO20201220 - OBSOLETE]"/search/API/?"
+#define _AFLUX_API_PATH_ "/API/aflux/v1.0/?" //[CO20201220 - OBSOLETE]"/search/API/?"
 namespace aflowlib {
   class APIget {
     private:
@@ -324,10 +327,32 @@ namespace aflowlib {
       bool establish();
     public:
       //DX20210615 [OBSOLETE] APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226
-      APIget( string a_Summons="", string a_API_Path="/API/aflux/?", string a_Domain="aflow.org" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226 //DX20210615 - updated domain name
+      APIget( string a_Summons="", string a_API_Path=_AFLUX_API_PATH_, string a_Domain=AFLOWLIB_SERVER_DEFAULT ) : PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226 //DX20210615 - updated domain name
       void reset( string a_Summons="#", string a_API_Path="", string a_Domain="" );
       friend ostream& operator<<( ostream& output, APIget& a );
   };
+}
+
+namespace aflowlib {  //CO20201220
+  ////////////////////////////////////////////////////////////////////////////////
+  //merge vector entries lists
+  //3-vec
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new);
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, const vector<vector<aflowlib::_aflowlib_entry> >& entries_new, bool entries_new_same_type = false);
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, const vector<aflowlib::_aflowlib_entry>& entries_new, bool entries_new_same_type = false);
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, const aflowlib::_aflowlib_entry& entries_new);
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, const aflowlib::_aflowlib_entry& entries_new, int& index_layer1, int& index_layer2);
+  //2-vec
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new, bool sort_by_species = true);
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, const vector<vector<aflowlib::_aflowlib_entry> >& entries_new, bool entries_new_same_type = false, bool sort_by_species = true);
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, const vector<aflowlib::_aflowlib_entry>& entries_new, bool entries_new_same_type = false, bool sort_by_species = true);
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, const aflowlib::_aflowlib_entry& entry_new, bool sort_by_species = true);
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, const aflowlib::_aflowlib_entry& entry_new, int& index, bool sort_by_species = true);
+  //1-vec
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new);
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, const vector<vector<aflowlib::_aflowlib_entry> >& entries_new);
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, const vector<aflowlib::_aflowlib_entry>& entries_new);
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, const aflowlib::_aflowlib_entry& entry_new);
 }
 
 // ***************************************************************************
@@ -336,10 +361,10 @@ namespace aflowlib {
   uint auid2present(string auid,string& aurl,int mode=1); // returns json.size() if found...
   bool AflowlibLocator(const string& in,string& out,const string& mode);
   string AflowlibLocator(string options,string mode);
-  string AFLUXCall(const aurostd::xoption& vpflow); //DX20190206 - add AFLUX functionality for command line 
-  string AFLUXCall(const vector<string>& matchbook); //DX20190206 - add AFLUX functionality
-  string AFLUXCall(const string& summons); //DX20190206 - add AFLUX functionality 
-  vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(const string& response); //DX20190206 - get properties from AFLUX response
+  string AFLUXCall(const aurostd::xoption& vpflow); //DX20190206 - add AFLUX functionality for command line   //CO20200520
+  string AFLUXCall(const vector<string>& matchbook); //DX20190206 - add AFLUX functionality //CO20200520
+  string AFLUXCall(const string& summons); //DX20190206 - add AFLUX functionality   //CO20200520
+  vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(const string& response); //DX20190206 - get properties from AFLUX response  //CO20200520
   string getSpaceGroupAFLUXSummons(const vector<uint>& space_groups, uint relaxation_step); //DX20200929
   string getSpaceGroupAFLUXSummons(uint space_group_number, uint relaxation_step, bool only_one_sg=true); //DX20200929
   // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss); //SC20200327
@@ -565,6 +590,11 @@ namespace aflowlib {
     vector<string> types;
     string catalog;
   };
+  
+  //CO20200520 START - moving from inside AflowDB
+  vector<string> getSchemaKeys();
+  vector<string> getDataNames();
+  //CO20200520 END - moving from inside AflowDB
 
   class AflowDB : public xStream {
     public:

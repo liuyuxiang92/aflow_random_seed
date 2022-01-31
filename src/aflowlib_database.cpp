@@ -509,7 +509,7 @@ namespace aflowlib {
       columns = getColumnNames(table);
 
       // Properties
-      vector<string> keys_schema = getSchemaKeys();
+      vector<string> keys_schema = (*this).getSchemaKeys();
       uint nkeys = keys_schema.size();
       if (nkeys > columns.size()) {
         rebuild_db = true;
@@ -707,7 +707,7 @@ namespace aflowlib {
     sql::SQLexecuteCommand(db, "PRAGMA synchronous = OFF");
 
     // Get columns and types from schema
-    vector<string> keys = getSchemaKeys();
+    vector<string> keys = (*this).getSchemaKeys();
     uint nkeys = keys.size();
     vector<string> columns(nkeys);
     for (uint k = 0; k < nkeys; k++) {
@@ -824,7 +824,7 @@ namespace aflowlib {
 
     uint chunk_size = 1000;
 
-    vector<string> schema_keys = getSchemaKeys();
+    vector<string> schema_keys = (*this).getSchemaKeys();
 
     // Patch
     vector<string> keys, vals, cols, types;
@@ -907,21 +907,26 @@ namespace aflowlib {
   }
 
   // Schema ------------------------------------------------------------------
-
   //getSchemaKeys/////////////////////////////////////////////////////////////
   // Returns the keys from the AFLOW schema.
-  vector<string> AflowDB::getSchemaKeys() {
+  vector<string> getSchemaKeys() {  //CO20200520
     vector<string> keys;
     string key = "";
     for (uint i = 0, n = XHOST.vschema.vxsghost.size(); i < n; i += 2) {
-      if(XHOST.vschema.vxsghost[i].find("::NAME:") != string::npos) {
+      if(XHOST.vschema.vxsghost[i].find("SCHEMA::NAME:")!=string::npos) { //CO20200520
         key=aurostd::RemoveSubString(XHOST.vschema.vxsghost[i], "SCHEMA::NAME:");
         // schema keys are upper case
         keys.push_back(aurostd::toupper(key));
       }
     }
+    return keys;
+  }
+
+  vector<string> AflowDB::getSchemaKeys() {
+    vector<string> keys=getSchemaKeys();
+    string key = "";
     for (uint i = 0, n = vschema_extra.vxsghost.size(); i < n; i += 2) {
-      if(vschema_extra.vxsghost[i].find("::NAME:") != string::npos) {
+      if(vschema_extra.vxsghost[i].find("SCHEMA::NAME:")!=string::npos) { //CO20200520
         key=aurostd::RemoveSubString(vschema_extra.vxsghost[i], "SCHEMA::NAME:");
         // schema keys are upper case
         keys.push_back(aurostd::toupper(key));
@@ -931,6 +936,22 @@ namespace aflowlib {
   }
 
   // Data --------------------------------------------------------------------
+
+
+  //getDataNames//////////////////////////////////////////////////////////////
+  // Gets the data names of the schema keys and converts them into SQLite
+  // types. Note that SQLite does not recognize arrays or Booleans, so they
+  // will be stored as text.
+  vector<string> getDataNames() { //CO20200520
+    vector<string> keys;
+    for (uint i = 0, n = XHOST.vschema.vxsghost.size(); i < n; i += 2) {
+      if(XHOST.vschema.vxsghost[i].find("SCHEMA::NAME:")!=string::npos) {
+        const string& key=XHOST.vschema.vxsghost[i+1];
+        keys.push_back(key);
+      }
+    }
+    return keys;
+  }
 
   //getDataTypes//////////////////////////////////////////////////////////////
   // Gets the data types of the schema keys and converts them into SQLite
@@ -1124,7 +1145,7 @@ namespace aflowlib {
   }
 
   DBStats AflowDB::initDBStats(const string& catalog, const vector<string>& loops) {
-    vector<string> keys = getSchemaKeys();
+    vector<string> keys = (*this).getSchemaKeys();
     vector<string> excluded_properties, cols;
     string exclude = "alloy";
     aurostd::string2tokens(exclude, excluded_properties, ",");

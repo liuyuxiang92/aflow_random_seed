@@ -26,6 +26,7 @@
 
 #include "aflow.h"
 #include "aflow_pflow.h"
+#include "aflowlib_entry_loader.h"
 #include "aflow_pocc.h"  //CO20200624
 #include "aflow_anrl.h"  //DX20201104
 
@@ -56,6 +57,49 @@
 //[OBSOLETE]string AFLOWLogicError::where(){return f_name;}
 //[OBSOLETE]//CO20180419 - global exception handling - STOP
 
+bool EntryLoaderTest(ostream& oss){ofstream FileMESSAGE;return EntryLoaderTest(FileMESSAGE,oss);}  //CO20200520
+bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss){  //CO20200520
+  string soliloquy="EntryLoaderTest():";
+  bool LDEBUG=TRUE; // TRUE;
+  stringstream message;
+  _aflags aflags;aflags.Directory=".";
+
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+  
+  message << "Performing EntryLoader test";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+  string sinput="",soutput="";
+  vector<aflowlib::_aflowlib_entry> entries;
+  aurostd::xoption elflags;
+  aflowlib::EntryLoader el;
+
+  if(0){
+    sinput="species(Mn,Pd)";
+    el.initialize(sinput,elflags,FileMESSAGE,oss);
+    el.retrieveOutput(soutput);
+    if(soutput.empty()){
+      message << "string output empty";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+      return false;
+    }
+    message << "string output = \""+soutput+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    el.retrieveOutput(entries);
+  }
+
+
+  //sinput="MnPdPt";
+  //el.initialize(sinput,elflags,FileMESSAGE,oss);
+  sinput="MnPdPt";  //CMoTaTiW  //CMoTaTiWZr
+  el.initialize(sinput,elflags,FileMESSAGE,oss);
+  //el.retrieveOutput(soutput);
+  //if(soutput.empty()){
+  //  message << "string output empty";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+  //  return false;
+  //}
+  //message << "string output = \""+soutput+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  el.retrieveOutput(entries);
+
+  return true;
+}
 
 bool SchemaTest(ostream& oss){ofstream FileMESSAGE;return SchemaTest(FileMESSAGE,oss);}
 bool SchemaTest(ofstream& FileMESSAGE,ostream& oss) {
@@ -1352,6 +1396,7 @@ int main(int _argc,char **_argv) {
       }
       return 0; //CO20180419
     }
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_EntryLoader|--EntryLoader_test")) {return (EntryLoaderTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_schema|--schema_test")) {return (SchemaTest()?0:1);}  //ME20210408
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_CeramGen|--CeramGen_test")) {return (CeramGenTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_Egap|--Egap_test")) {return (EgapTest()?0:1);}  //CO20190601

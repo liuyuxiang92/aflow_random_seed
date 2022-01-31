@@ -2051,6 +2051,8 @@ namespace aurostd {
     aurostd::StringSubst(fileOUT,"/./","/");
     aurostd::StringSubst(fileOUT,"*","\"*\"");
     aurostd::StringSubst(fileOUT,"?","\"?\"");
+    aurostd::StringSubst(fileOUT,"\r","");  //CO20220117 - no return carriage
+    aurostd::StringSubst(fileOUT,"\n","");  //CO20220117 - no newline
     if(LDEBUG) cerr << "aurostd::CleanFileName: " << fileOUT << endl;
     return fileOUT;
   }
@@ -4467,30 +4469,31 @@ namespace aurostd {
   // ***************************************************************************
   // wget URL to string - Stefano Curtarolo
   bool url2file(string url,string& fileIN,bool verbose) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || verbose || XHOST.DEBUG);
+    string soliloquy="aurostd::url2file():";
     if(!aurostd::IsCommandAvailable("wget")) {
-      cerr << "ERROR - aurostd::url2file(): command \"wget\" is necessary !" << endl;
+      cerr << "ERROR - " << soliloquy << " command \"wget\" is necessary !" << endl;
       return FALSE;
     }
     string _url=url;
     aurostd::StringSubst(_url,"http://","");
     aurostd::StringSubst(_url,"//","/");
-    if(LDEBUG) cerr << "aurostd::url2file(): Loading url=" << _url << endl;
-    if(verbose) cout << "aurostd::url2file(): Loading url=" << _url << endl;
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << _url << endl;
+    string command="";
 #ifndef _MACOSX_
-    aurostd::execute("wget --quiet --no-cache -O "+fileIN+" http://"+_url);
+    command="wget --quiet --no-cache -O "+fileIN+" 'http://"+_url+"'";
 #else
-    aurostd::execute("wget --quiet -O "+fileIN+" http://"+_url);
+    command="wget --quiet -O "+fileIN+" 'http://"+_url+"'";
 #endif    
-    if(aurostd::FileEmpty(fileIN)) {
-      aurostd::StringSubst(_url,":AFLOW","/AFLOW");
-#ifndef _MACOSX_
-      aurostd::execute("wget --quiet --no-cache -O "+fileIN+" http://"+_url);
-#else
-      aurostd::execute("wget --quiet -O "+fileIN+" http://"+_url); // _MACOSX_
-#endif    
+    if(LDEBUG){cerr << soliloquy << " command=\"" << command << "\"" << endl;}
+    aurostd::execute(command);
+    if(aurostd::FileEmpty(fileIN)){
+      if(command.find(":AFLOW")!=string::npos){
+        aurostd::StringSubst(command,":AFLOW","/AFLOW");
+        aurostd::execute(command);
+      }
       if(aurostd::FileEmpty(fileIN)) {
-        if(LDEBUG){cerr << "ERROR - aurostd::url2file(): URL not found http://" << _url << endl;} //CO20200731 - silence this, it's not an error
+        if(LDEBUG){cerr << "ERROR - " << soliloquy << " URL not found http://" << _url << endl;} //CO20200731 - silence this, it's not an error
         return FALSE;
       }
     }
@@ -4540,31 +4543,32 @@ namespace aurostd {
   // ***************************************************************************
   // wget URL to string - Stefano Curtarolo
   bool url2string(const string& url,string& stringIN,bool verbose) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    stringIN="";
+    bool LDEBUG=(FALSE || verbose || XHOST.DEBUG);
+    string soliloquy="aurostd::url2string():";
     if(!aurostd::IsCommandAvailable("wget")) {
-      cerr << "ERROR - aurostd::url2string(): command \"wget\" is necessary !" << endl;
+      cerr << "ERROR - " << soliloquy << " command \"wget\" is necessary !" << endl;
       return FALSE;
     }
     string _url=url;
     aurostd::StringSubst(_url,"http://","");
     aurostd::StringSubst(_url,"//","/");
-    if(LDEBUG) cerr << "aurostd::url2string(): Loading url=" << _url << endl;
-    if(verbose) cout << "aurostd::url2string(): Loading url=" << _url << endl;
+    if(LDEBUG) cerr << soliloquy << " Loading url=" << _url << endl;
+    string command="";
 #ifndef _MACOSX_
-    stringIN=aurostd::execute2string("wget --quiet --no-cache -O /dev/stdout http://"+_url);
+    command="wget --quiet --no-cache -O /dev/stdout 'http://"+_url+"'";
 #else
-    stringIN=aurostd::execute2string("wget --quiet -O /dev/stdout http://"+_url); // _MACOSX_
+    command="wget --quiet -O /dev/stdout 'http://"+_url+"'"; // _MACOSX_
 #endif    
-    if(stringIN=="") {
-      aurostd::StringSubst(_url,":AFLOW","/AFLOW");
-#ifndef _MACOSX_
-      stringIN=aurostd::execute2string("wget --quiet --no-cache -O /dev/stdout http://"+_url);
-#else
-      stringIN=aurostd::execute2string("wget --quiet -O /dev/stdout http://"+_url); // _MACOSX_
-#endif    
-      if(stringIN=="") {
-        if(LDEBUG){cerr << "ERROR - aurostd::url2string(): URL not found http://" << _url << endl;} //CO20200731 - silence this, it's not an error
+    if(LDEBUG){cerr << soliloquy << " command=\"" << command << "\"" << endl;}
+    stringIN="";
+    stringIN=aurostd::execute2string(command);
+    if(stringIN.empty()) {
+      if(command.find(":AFLOW")!=string::npos){
+        aurostd::StringSubst(command,":AFLOW","/AFLOW");
+        stringIN=aurostd::execute2string(command);
+      }
+      if(stringIN.empty()) {
+        if(LDEBUG){cerr << "ERROR - " << soliloquy << " URL not found http://" << _url << endl;} //CO20200731 - silence this, it's not an error
         return FALSE;
       }
     }
@@ -7469,10 +7473,10 @@ namespace aurostd {
   // individually wraps entries of vector with specified string
   // converts <a,b,c> to <'a','b','c'>
   // also works for deques
-  vector<string> wrapVecEntries(const vector<string>& vin,string wrap){
+  vector<string> wrapVecEntries(const vector<string>& vin,const string& wrap){
     return wrapVecEntries(vin,wrap,wrap);
   }
-  vector<string> wrapVecEntries(const vector<string>& vin,string wrap_start,string wrap_end){
+  vector<string> wrapVecEntries(const vector<string>& vin,const string& wrap_start,const string& wrap_end){
     vector<string> vout;
     for(uint i=0;i<vin.size();i++){
       if(vin[i].length()){
@@ -7481,10 +7485,10 @@ namespace aurostd {
     }
     return vout;
   }
-  deque<string> wrapVecEntries(const deque<string>& vin,string wrap){
+  deque<string> wrapVecEntries(const deque<string>& vin,const string& wrap){
     return wrapVecEntries(vin,wrap,wrap);
   }
-  deque<string> wrapVecEntries(const deque<string>& vin,string wrap_start,string wrap_end){
+  deque<string> wrapVecEntries(const deque<string>& vin,const string& wrap_start,const string& wrap_end){
     deque<string> vout;
     for(uint i=0;i<vin.size();i++){
       if(vin[i].length()){

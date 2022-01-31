@@ -1377,10 +1377,10 @@ namespace aurostd {
 }
 
 namespace aurostd {
-  vector<string> wrapVecEntries(const vector<string>& vin,string wrap);
-  vector<string> wrapVecEntries(const vector<string>& vin,string wrap_start,string wrap_end);
-  deque<string> wrapVecEntries(const deque<string>& vin,string wrap);                          //SC20200329 nice overload to deal with ME
-  deque<string> wrapVecEntries(const deque<string>& vin,string wrap_start,string wrap_end);    //SC20200329 nice overload to deal with ME
+  vector<string> wrapVecEntries(const vector<string>& vin,const string& wrap);
+  vector<string> wrapVecEntries(const vector<string>& vin,const string& wrap_start,const string& wrap_end);
+  deque<string> wrapVecEntries(const deque<string>& vin,const string& wrap);                          //SC20200329 nice overload to deal with ME
+  deque<string> wrapVecEntries(const deque<string>& vin,const string& wrap_start,const string& wrap_end);    //SC20200329 nice overload to deal with ME
 }
 
 //base64 stuff
