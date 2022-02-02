@@ -2949,14 +2949,14 @@ vector<vector<int> > getThreadDistribution(const int&, const int&);  //ME2019021
 namespace xthread {
   class xThread {
     public:
-      xThread(uint nmax=1, uint nmin=0);
+      xThread(int nmax=1, int nmin=0);
       xThread(const xThread& xt);
       const xThread& operator=(const xThread& xt);
       ~xThread();
 
       void clear();
 
-      void setCPUs(uint nmax, uint nmin=0);
+      void setCPUs(int nmax, int nmin=0);
       void setProgressBar(ostream& oss);
       void unsetProgressBar();
 
@@ -2967,8 +2967,8 @@ namespace xthread {
       void free();
       void copy(const xThread&);
 
-      uint ncpus_max;
-      uint ncpus_min;
+      int ncpus_max;
+      int ncpus_min;
       std::mutex mtx;
       ostream* progress_bar;
       bool progress_bar_set;

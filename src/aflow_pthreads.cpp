@@ -1093,7 +1093,7 @@ vector<vector<int> > getThreadDistribution(const int& nbins, const int& nthreads
 //ME20220130 - xthread class
 namespace xthread {
 
-  xThread::xThread(uint nmax, uint nmin) {
+  xThread::xThread(int nmax, int nmin) {
     free();
     setCPUs(nmax, nmin);
   }
@@ -1127,7 +1127,7 @@ namespace xthread {
     progress_bar_set = false;
   }
 
-  void xThread::setCPUs(uint nmax, uint nmin) {
+  void xThread::setCPUs(int nmax, int nmin) {
     if (nmax < nmin) std::swap(nmax, nmin);
     ncpus_max = nmax;
     if (nmin == 0) ncpus_min = nmax;
@@ -1166,18 +1166,18 @@ namespace xthread {
     vector<std::thread*> threads;
 
     uint sleep_second = 10;
-    uint ncpus_max_available = (uint) KBIN::get_NCPUS();
-    uint ncpus_available = ncpus_max_available - XHOST.CPU_active;
+    int ncpus_max_available = init::GetCPUCores();
+    int ncpus_available = ncpus_max_available - XHOST.CPU_active;
     while (ncpus_available < ncpus_min) {
       ncpus_available = ncpus_max_available - XHOST.CPU_active;
       aurostd::Sleep(sleep_second);
     }
-    uint ncpus = (ncpus_available > ncpus_max)?ncpus_max:ncpus_available;
+    int ncpus = (ncpus_available > ncpus_max)?ncpus_max:ncpus_available;
     XHOST.CPU_active += ncpus;
 
     uint task_index = 0;
     if (progress_bar_set) pflow::updateProgressBar(0, nbins, *progress_bar);
-    for (uint i = 0; i < ncpus; i++) {
+    for (int i = 0; i < ncpus; i++) {
       threads.push_back(new std::thread(&xThread::spawnWorker<F, A...>, this,
                                         std::ref(task_index), nbins,
                                         std::ref(func), std::ref(args)...)
