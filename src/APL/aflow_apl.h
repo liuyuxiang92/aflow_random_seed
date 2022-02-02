@@ -831,7 +831,7 @@ namespace apl {
       vector<double> _temperatures;
 
       void calculateEigenvectors();
-      void calculateEigenvectorsInThread(int, int);
+      void calculateEigenvectorsInThread(uint);
       void calculateMeanSquareDisplacementMatrices();
       void calculateModeDisplacements();
       double getOccupationNumber(double, double);
@@ -1159,7 +1159,7 @@ namespace apl {
       void getWeightsLT(double, const vector<double>&, vector<double>&);
       void calculateTransitionProbabilities();
       vector<vector<vector<xcomplex<double> > > > calculatePhases(bool=false);
-      void calculateTransitionProbabilitiesPhonon(vector<vector<vector<vector<double> > > >&,
+      void calculateTransitionProbabilitiesPhonon(uint, vector<vector<vector<vector<double> > > >&,
           const vector<vector<vector<xcomplex<double> > > >&);
       void calculateTransitionProbabilitiesIsotope();
       vector<vector<double> > calculateTransitionProbabilitiesBoundary();

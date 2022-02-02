@@ -67,12 +67,12 @@ INCLUDE = -I ./
 #INCLUDE = -I ./ -I /opt/intel/mkl100/include
 
 # -fno-inline -fno-implicit-inline-templates-frepo
-OPTS=
+OPTS=-std=c++11
 #-O2
 #-O1
 #-O3
 # -march=opteron
-OPTS_MT=-O2 -std=gnu++0x
+OPTS_MT=-O2 -std=c++11
 TODAY=-DTODAY=\"$(TIME)\"
 VERS=-DAFLOW_VERSION=\"$(VERSNUMBER)\" $(TODAY)
 

@@ -1093,9 +1093,9 @@ vector<vector<int> > getThreadDistribution(const int& nbins, const int& nthreads
 //ME20220130 - xthread class
 namespace xthread {
 
-  xThread::xThread() {
+  xThread::xThread(uint nmax, uint nmin) {
     free();
-    setCPUs(1, 1);
+    setCPUs(nmax, nmin);
   }
 
   xThread::xThread(const xThread& xt) {
@@ -1128,6 +1128,7 @@ namespace xthread {
   }
 
   void xThread::setCPUs(uint nmax, uint nmin) {
+    if (nmax < nmin) std::swap(nmax, nmin);
     ncpus_max = nmax;
     if (nmin == 0) ncpus_min = nmax;
   }
@@ -1142,57 +1143,8 @@ namespace xthread {
   }
 
   template <typename F, typename... A>
-  void xThread::run(uint nbins, F& func, A&... args) {
-    run(nbins, ncpus_max, func, args...);
-  }
-
-  template <typename F, typename... A>
-  void xThread::run(uint nbins, uint ncpus, F& func, A&... args) {
-    std::function<void()> dummy = []{};
-    run(nbins, ncpus, func, args..., dummy);
-  }
-
-  template <typename F, typename... A, typename PF, typename... PA>
-  void xThread::run(uint nbins, F& func, A&... args, PF& ppfunc, PA&... ppargs) {
-    run(nbins, ncpus_max, func, args..., ppfunc, ppargs...);
-  }
-
-  template <typename F, typename... A, typename PF, typename... PA>
-  void xThread::run(uint nbins, uint ncpus, F& func, A&... args, PF& ppfunc, PA&... ppargs) {
-    vector<std::thread*> threads;
-
-    if (ncpus > ncpus_max) ncpus = ncpus_max;
-
-    uint ncpus_max_available = (uint) KBIN::get_NCPUS();
-    uint ncpus_available = ncpus_max_available - XHOST.CPU_active;
-    uint sleep_second = 10;
-    while (ncpus_available < ncpus_min) {
-      ncpus_available = ncpus_max_available - XHOST.CPU_active;
-      aurostd::Sleep(sleep_second);
-    }
-    ncpus = (ncpus_available > ncpus_max)?ncpus_max:ncpus_available;
-    XHOST.CPU_active += ncpus;
-
-    uint task_index = 0;
-    if (progress_bar_set) pflow::updateProgressBar(0, nbins, *progress_bar);
-    for (uint i = 0; i < ncpus; i++) {
-      threads.push_back(new std::thread(&xthread::xThread::run, this,
-                                        std::ref(func), std::ref(args)...,
-                                        std::ref(ppfunc), std::ref(ppargs)...)
-      );
-    }
-
-    for (std::thread* t : threads) {
-      t->join();
-      delete t;
-    }
-    XHOST.CPU_active -= ncpus;
-  }
-
-  template <typename F, typename...A, typename PF, typename... PA>
-  void xThread::threadWorker(uint& task_index, uint nbins,
-                             F& func, A&... args,
-                             PF& ppfunc, PA&... ppargs) {
+  void xThread::spawnWorker(uint& task_index, uint nbins,
+                            F& func, A&... args) {
     uint i = AUROSTD_MAX_UINT;
     if (task_index < nbins) {
       std::unique_lock<std::mutex> lk(mtx);
@@ -1204,11 +1156,53 @@ namespace xthread {
     while (i < nbins) {
       func(i, args...);
       std::unique_lock<std::mutex> lk(mtx);
-      ppfunc(i, ppargs...);
       i = task_index++;
       if (progress_bar_set) pflow::updateProgressBar(task_index, nbins, *progress_bar);
     }
   }
+
+  template <typename F, typename... A>
+  void xThread::run(uint nbins, F& func, A&... args) {
+    vector<std::thread*> threads;
+
+    uint sleep_second = 10;
+    uint ncpus_max_available = (uint) KBIN::get_NCPUS();
+    uint ncpus_available = ncpus_max_available - XHOST.CPU_active;
+    while (ncpus_available < ncpus_min) {
+      ncpus_available = ncpus_max_available - XHOST.CPU_active;
+      aurostd::Sleep(sleep_second);
+    }
+    uint ncpus = (ncpus_available > ncpus_max)?ncpus_max:ncpus_available;
+    XHOST.CPU_active += ncpus;
+
+    uint task_index = 0;
+    if (progress_bar_set) pflow::updateProgressBar(0, nbins, *progress_bar);
+    for (uint i = 0; i < ncpus; i++) {
+      threads.push_back(new std::thread(&xThread::spawnWorker<F, A...>, this,
+                                        std::ref(task_index), nbins,
+                                        std::ref(func), std::ref(args)...)
+      );
+    }
+
+    for (std::thread* t : threads) {
+      t->join();
+      delete t;
+    }
+    XHOST.CPU_active -= ncpus;
+  }
+
+  void initializeXThread() {
+    xThread xt;
+
+    std::function<void(uint, vector<vector<vector<vector<double> > > >&, const vector<vector<vector<xcomplex<double> > > >&)> fn;
+    vector<vector<vector<vector<double> > > > v;
+    vector<vector<vector<xcomplex<double> > > > vx;
+    uint i = 0;
+    xt.run(i, fn, v, vx);
+    std::function<void(uint)> fn2;
+    xt.run(i, fn2);
+  }
+
 }
 
 #endif
