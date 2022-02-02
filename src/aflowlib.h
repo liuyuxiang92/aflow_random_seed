@@ -631,12 +631,15 @@ namespace aflowlib {
       string data_path;
       string database_file;
       string lock_file;
+#ifdef AFLOW_MULTITHREADS_ENABLE
+      std::mutex write_mutex;
+#endif
 
       void openTmpFile(int open_flags=SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_FULLMUTEX, bool copy_original=false);
       bool closeTmpFile(bool force_copy=false, bool keep=false, bool nocopy=false);
 
       void rebuildDB();
-      void buildTables(int, int, const vector<string>&, const vector<string>&);
+      void buildTable(uint, const vector<string>&, const vector<string>&);
       void populateTable(const string&, const vector<string>&, const vector<string>&, const vector<vector<string> >&);
 
       uint applyPatchFromJsonl(const vector<string>&);
@@ -649,9 +652,7 @@ namespace aflowlib {
 
       DBStats initDBStats(const string&, const vector<string>&);
       DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&);
-      void getColStats(int, int, const string&, const vector<string>&, const vector<string>&,
-          const vector<string>&, const vector<string>&, vector<vector<vector<int> > >&, vector<vector<int> >&,
-          vector<vector<vector<string> > >&, vector<vector<vector<string> > >&);
+      void getColStats(uint, const vector<string>&, vector<DBStats>&);
       vector<string> getUniqueFromJsonArrays(const vector<string>&);
       string stats2json(const DBStats&);
 

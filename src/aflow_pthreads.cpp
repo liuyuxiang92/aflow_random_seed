@@ -1163,8 +1163,6 @@ namespace xthread {
 
   template <typename F, typename... A>
   void xThread::run(uint nbins, F& func, A&... args) {
-    vector<std::thread*> threads;
-
     uint sleep_second = 10;
     int ncpus_max_available = init::GetCPUCores();
     int ncpus_available = ncpus_max_available - XHOST.CPU_active;
@@ -1177,6 +1175,8 @@ namespace xthread {
 
     uint task_index = 0;
     if (progress_bar_set) pflow::updateProgressBar(0, nbins, *progress_bar);
+
+    vector<std::thread*> threads;
     for (int i = 0; i < ncpus; i++) {
       threads.push_back(new std::thread(&xThread::spawnWorker<F, A...>, this,
                                         std::ref(task_index), nbins,
@@ -1193,14 +1193,27 @@ namespace xthread {
 
   void initializeXThread() {
     xThread xt;
+    uint i = 0;
+
+    vector<vector<vector<vector<double> > > > vvvvd;
+
+    vector<vector<vector<xcomplex<double> > > > vvvxc;
+
+    vector<string> vs;
+    vector<vector<string> > vvs;
+
+    vector<aflowlib::DBStats> vdbs;
 
     std::function<void(uint, vector<vector<vector<vector<double> > > >&, const vector<vector<vector<xcomplex<double> > > >&)> fn;
-    vector<vector<vector<vector<double> > > > v;
-    vector<vector<vector<xcomplex<double> > > > vx;
-    uint i = 0;
-    xt.run(i, fn, v, vx);
+    xt.run(i, fn, vvvvd, vvvxc);
     std::function<void(uint)> fn2;
     xt.run(i, fn2);
+
+    std::function<void(uint, const vector<string>&, const vector<string>&)> fndb1;
+    xt.run(i, fndb1, vs, vs);
+
+    std::function<void(uint, const vector<string>&, vector<aflowlib::DBStats>&)> fndb2;
+    xt.run<std::function<void(uint, const vector<string>&, vector<aflowlib::DBStats>&)>, const vector<string>, vector<aflowlib::DBStats> >(i, fndb2, vs, vdbs);
   }
 
 }

@@ -64,13 +64,6 @@
 #define _AFLOW_DB_PATCH_INCOMPLETE_  201  // At least one patch was incomplete
 
 #include "aflowlib.h"
-#include "SQLITE/aflow_sqlite.h"
-
-#ifdef AFLOW_MULTITHREADS_ENABLE
-#include <thread>
-#include <mutex>
-std::mutex m;
-#endif
 
 #define _AFLOW_DB_DEBUG_ false
 
@@ -716,49 +709,43 @@ namespace aflowlib {
     int max_cpu = 16;
     if (ncpus < 1) ncpus = 1;
     if (ncpus > max_cpu) ncpus = max_cpu;
-    vector<vector<int> > thread_dist = getThreadDistribution(_N_AUID_TABLES_, ncpus);
-    vector<std::thread*> threads;
-    for (int i = 0; i < ncpus; i++) {
-      threads.push_back(new std::thread(&AflowDB::buildTables, this,
-            thread_dist[i][0], thread_dist[i][1],
-            std::ref(columns), std::ref(types)));
-    }
-    for (int i = 0; i < ncpus; i++) {
-      threads[i]->join();
-      delete threads[i];
+    if (ncpus > 1) {
+      xthread::xThread xt(ncpus);
+      std::function<void(uint, const vector<string>&, const vector<string>&)> fn = std::bind(&AflowDB::buildTable, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+      xt.run((uint) _N_AUID_TABLES_, fn, columns, types);
+    } else {
+      for (uint i = 0; i < (uint) _N_AUID_TABLES_; i++) buildTable(i, columns, types);
     }
 #else
-    buildTables(0, _N_AUID_TABLES_, columns, types);
+    for (uint i = 0; i < (uint) _N_AUID_TABLES_; i++) buildTable(i, columns, types);
 #endif
     message << function_name << "Finished rebuild.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss);
   }
 
   //buildTables///////////////////////////////////////////////////////////////
-  // Reads the .jsonl files and processes the JSONs for the database writer.
-  void AflowDB::buildTables(int startIndex, int endIndex, const vector<string>& columns, const vector<string>& types) {
-    for (int i = startIndex; i < endIndex; i++) {
-      stringstream t;
-      t << std::setfill('0') << std::setw(2) << std::hex << i;
-      string table = "auid_" + t.str();
+  // Reads a .jsonl files and processes the JSONs for the database writer.
+  void AflowDB::buildTable(uint i, const vector<string>& columns, const vector<string>& types) {
+    stringstream t;
+    t << std::setfill('0') << std::setw(2) << std::hex << i;
+    string table = "auid_" + t.str();
 
-      string jsonfile = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".jsonl");
-      vector<string> data;
-      aurostd::efile2vectorstring(jsonfile, data);
-      vector<vector<string> > values;
-      uint ndata = data.size();
-      string aurl = "";
-      for (uint d = 0; d < ndata; d++) {
-        // Filter non-POCC ARUNs
-        aurl = aurostd::extractJsonValueAflow(data[d], "aurl");
-        if ((aurl.find("ARUN") != string::npos)
-            && (aurl.find("ARUN.POCC") == string::npos)) {
-          continue;
-        }
-        values.push_back(getDataValues(data[d], columns, types));
+    string jsonfile = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".jsonl");
+    vector<string> data;
+    aurostd::efile2vectorstring(jsonfile, data);
+    vector<vector<string> > values;
+    uint ndata = data.size();
+    string aurl = "";
+    for (uint d = 0; d < ndata; d++) {
+      // Filter non-POCC ARUNs
+      aurl = aurostd::extractJsonValueAflow(data[d], "aurl");
+      if ((aurl.find("ARUN") != string::npos)
+          && (aurl.find("ARUN.POCC") == string::npos)) {
+        continue;
       }
-      populateTable(table, columns, types, values);
+      values.push_back(getDataValues(data[d], columns, types));
     }
+    populateTable(table, columns, types, values);
   }
 
   //populateTable/////////////////////////////////////////////////////////////
@@ -771,7 +758,7 @@ namespace aflowlib {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
     string function_name = XPID + _AFLOW_DB_ERR_PREFIX_ + "populateTable():";
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    std::unique_lock<std::mutex> lk(m);
+    std::unique_lock<std::mutex> lk(write_mutex);
 #endif
     createTable(table, columns, types);
     int chunk_size = 1000, count = 0;
@@ -1165,6 +1152,9 @@ namespace aflowlib {
     uint nloops = loops.size();
 
     DBStats stats = initDBStats(catalog, loops);
+    // Create a vector with these stats to make getColStats have less inputs
+    vector<DBStats> colstats;
+    for (int t = 0; t < _N_AUID_TABLES_; t++) colstats.push_back(stats);
     uint ncols = stats.columns.size();
     const vector<string>& types = stats.types;
 
@@ -1175,9 +1165,6 @@ namespace aflowlib {
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss);
 
     if (stats.nentries > 0) {
-      vector<vector<vector<string> >  > maxmin(_N_AUID_TABLES_, vector<vector<string> >(ncols, vector<string>(2))), sets(_N_AUID_TABLES_, vector<vector<string> >(ncols));
-      vector<vector<vector<int> > > counts(_N_AUID_TABLES_, vector<vector<int> >(ncols, vector<int>(2, 0)));
-      vector<vector<int> > loop_counts(_N_AUID_TABLES_, vector<int>(nloops));
 #ifdef AFLOW_MULTITHREADS_ENABLE
       int ncpus = init::GetCPUCores();
       if (ncpus < 1) ncpus = 1;
@@ -1188,23 +1175,15 @@ namespace aflowlib {
       if (stats.nentries < 50000) cpu_max = 8;
       if (stats.nentries < 10000) cpu_max = 4;
       if (ncpus > cpu_max) ncpus = cpu_max;
-      vector<vector<int> > thread_dist = getThreadDistribution(_N_AUID_TABLES_, ncpus);
-      vector<std::thread*> threads;
-      for (int i = 0; i < ncpus; i++) {
-        threads.push_back(new std::thread(&AflowDB::getColStats, this,
-              thread_dist[i][0], thread_dist[i][1],
-              std::ref(catalog), std::ref(tables),
-              std::ref(stats.columns), std::ref(types), std::ref(loops),
-              std::ref(counts), std::ref(loop_counts),
-              std::ref(maxmin), std::ref(sets)));
-      }
-      for (int i = 0; i < ncpus; i++) {
-        threads[i]->join();
-        delete threads[i];
+      if (ncpus > 1) {
+        xthread::xThread xt(ncpus);
+        std::function<void(uint, const vector<string>&, vector<DBStats>&)> fn = std::bind(&AflowDB::getColStats, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        xt.run((uint) _N_AUID_TABLES_, fn, tables, colstats);
+      } else {
+        for (uint i = 0; i < _N_AUID_TABLES_; i++) getColStats(i, tables, colstats);
       }
 #else
-      getColStats(0, _N_AUID_TABLES_, catalog, tables, stats.columns, types,
-          loops, counts, loop_counts, maxmin, sets);
+      for (uint i = 0; i < _N_AUID_TABLES_; i++) getColStats(i, tables, colstats);
 #endif
 
       // Properties: count, max, min, set
@@ -1213,8 +1192,8 @@ namespace aflowlib {
       uint nset = 0, n = 0;
       for (uint c = 0; c < ncols; c++) {
         for (int t = 0; t < _N_AUID_TABLES_; t++) {
-          stats.count[c][0] += counts[t][c][0];
-          stats.count[c][1] += counts[t][c][1];
+          stats.count[c][0] += colstats[t].count[c][0];
+          stats.count[c][1] += colstats[t].count[c][1];
         }
         if (stats.count[c][0] + stats.count[c][1] > 0) {
           set.clear();
@@ -1222,23 +1201,25 @@ namespace aflowlib {
           nset = 0; n = 0;
           if (types[c] != "bool") {  // No max, min, or set for bool
             for (int t = 0; t < _N_AUID_TABLES_; t++) {
-              if (counts[t][c][0] > 0) {
+              const DBStats& cstats = colstats[t];
+              if (cstats.count[c][0] > 0) {
                 if (types[c] == "number") {
-                  if (max.empty()) max = maxmin[t][c][0];
-                  else if (aurostd::string2utype<double>(maxmin[t][c][0]) > aurostd::string2utype<double>(max)) max = maxmin[t][c][0];
+                  if (max.empty()) max = cstats.max[c];
+                  else if (aurostd::string2utype<double>(cstats.max[c]) > aurostd::string2utype<double>(max)) max = cstats.max[c];
 
-                  if (min.empty()) min = maxmin[t][c][1];
-                  else if (aurostd::string2utype<double>(maxmin[t][c][1]) < aurostd::string2utype<double>(min)) min = maxmin[t][c][1];
+                  if (min.empty()) min = cstats.min[c];
+                  else if (aurostd::string2utype<double>(cstats.min[c]) < aurostd::string2utype<double>(min)) min = cstats.min[c];
                 }
                 if (nset <= _DEFAULT_SET_LIMIT_) {
-                  n = sets[t][c].size();
+                  const vector<string>& colset = cstats.set[c];
+                  n = colset.size();
                   if (n > _DEFAULT_SET_LIMIT_) {
-                    set = sets[t][c];
+                    set = colset;
                     nset = n;
                   } else {
                     for (uint i = 0; i < n; i++) {
-                      if (!aurostd::WithinList(set, sets[t][c][i])) {
-                        set.push_back(sets[t][c][i]);
+                      if (!aurostd::WithinList(set, colset[i])) {
+                        set.push_back(colset[i]);
                         nset++;
                       }
                       if (nset > _DEFAULT_SET_LIMIT_) break;
@@ -1274,7 +1255,7 @@ namespace aflowlib {
 
       // Loop counts
       for (uint l = 0; l < nloops; l++) {
-        for (int t = 0; t < _N_AUID_TABLES_; t++) stats.loop_counts[l].second += loop_counts[t][l];
+        for (int t = 0; t < _N_AUID_TABLES_; t++) stats.loop_counts[l].second += colstats[t].loop_counts[l].second;
       }
     }
 
@@ -1283,10 +1264,7 @@ namespace aflowlib {
 
   //getColStats///////////////////////////////////////////////////////////////
   // Retrieves the statistics for each database property and the loops.
-  void AflowDB::getColStats(int startIndex, int endIndex, const string& catalog,
-      const vector<string>& tables, const vector<string>& cols, const vector<string>& types,
-      const vector<string>& loops, vector<vector<vector<int> > >& counts, vector<vector<int> >& loop_counts,
-      vector<vector<vector<string> > >& maxmin, vector<vector<vector<string> > >& sets) {
+  void AflowDB::getColStats(uint i, const vector<string>& tables, vector<DBStats>& colstats) {
     sqlite3* cursor;
     string function_name = XPID + _AFLOW_DB_ERR_PREFIX_ + "getColStats():";
     string message = "";
@@ -1296,32 +1274,33 @@ namespace aflowlib {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
     }
 
+    DBStats& cstats = colstats[i];
+    const vector<string>& cols = cstats.columns;
     uint ncols = cols.size();
     string where = "";
-    for (int i = startIndex; i < endIndex; i++) {
-      for (uint c = 0; c < ncols; c++) {
-        if (types[c] == "bool") {
-          where = "catalog='" + catalog + "' AND " + cols[c] + "=";
-          counts[i][c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'true'"));
-          counts[i][c][1] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'false'"));
-        } else {
-          where = "catalog='" + catalog + "' AND " + cols[c] + " NOT NULL";
-          counts[i][c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where));
-        }
-        // No need to determine max, min, or set for bool
-        if ((types[c] != "bool") && (counts[i][c][0] > 0)) {
-          // Max and  min only make sense for numbers
-          if (types[c] == "number") {
-            maxmin[i][c][0] = getProperty(cursor, "MAX", tables[i], cols[c], where);
-            maxmin[i][c][1] = getProperty(cursor, "MIN", tables[i], cols[c], where);
-          }
-          sets[i][c] = getSet(cursor, tables[i], cols[c], true, where, _DEFAULT_SET_LIMIT_ + 1);
-        }
+    for (uint c = 0; c < ncols; c++) {
+      if (cstats.types[c] == "bool") {
+        where = "catalog='" + cstats.catalog + "' AND " + cols[c] + "=";
+        cstats.count[c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'true'"));
+        cstats.count[c][1] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'false'"));
+      } else {
+        where = "catalog='" + cstats.catalog + "' AND " + cols[c] + " NOT NULL";
+        cstats.count[c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where));
       }
-      for (uint l = 0, nloops = loops.size(); l < nloops; l++) {
-        where = "catalog='" + catalog + "' AND loop LIKE '%\"" + loops[l] + "\"%'";
-        loop_counts[i][l] = aurostd::string2utype<int>(getProperty("COUNT", tables[i], "loop", where));
+      // No need to determine max, min, or set for bool
+      if ((cstats.types[c] != "bool") && (cstats.count[c][0] > 0)) {
+        // Max and  min only make sense for numbers
+        if (cstats.types[c] == "number") {
+          cstats.max[c] = getProperty(cursor, "MAX", tables[i], cols[c], where);
+          cstats.min[c] = getProperty(cursor, "MIN", tables[i], cols[c], where);
+        }
+        cstats.set[c] = getSet(cursor, tables[i], cols[c], true, where, _DEFAULT_SET_LIMIT_ + 1);
       }
+    }
+    vector<std::pair<string, int> >& loops = cstats.loop_counts;
+    for (std::pair<string, int>& loop : loops) {
+      where = "catalog='" + cstats.catalog + "' AND loop LIKE '%\"" + loop.first + "\"%'";
+      loop.second = aurostd::string2utype<int>(getProperty("COUNT", tables[i], "loop", where));
     }
 
     sql_code = sqlite3_close(cursor);
