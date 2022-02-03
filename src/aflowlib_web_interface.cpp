@@ -983,7 +983,7 @@ namespace aflowlib {
     bond_aa=999999;bond_ab=999999;bond_bb=999999;
     vNsgroup.clear();vsgroup.clear();vstr.clear();  // apennsy
     // DONE
-    if(1) {							
+    if(0) {
       bool html=FALSE; //TRUE;  //CO20201220
       oss << "Keywords" << endl;
       oss << "auid=" << auid << (html?"<br>":"") << endl;

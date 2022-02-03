@@ -20,20 +20,13 @@
 
 namespace aurostd {
 
-  struct URL {
-    std::string scheme;
-    std::string user;
-    std::string host;
-    unsigned short port;
-    std::string path;
-  };
-
-  URL httpConstructURL(const std::string &host, const std::string &path="/", const unsigned short &port=80){
+  URL httpConstructURL(const std::string &host, const std::string &path="/", const std::string &query="", const unsigned short &port=80){
     URL url;
     url.scheme = "http";
     url.port = port;
     url.host = host;
     url.path = path;
+    url.query = query;
     return url;
   }
 
@@ -44,10 +37,10 @@ namespace aurostd {
   ///
   /// While a `user` can be extracted by this parser `user:password` is not supported, and should not be added!
   /// https://datatracker.ietf.org/doc/html/rfc3986#section-3.2.1
-  URL httpParseURL(const std::string &url, const bool strict = false) {
+  URL httpParseURL(const std::string &url, const bool strict) {
 
     bool LDEBUG = (false || XHOST.DEBUG || _DEBUG_XHTTP_);
-    string soliloquy = XPID + "aurostd::httpParseResponse():";
+    std::string soliloquy = XPID + "aurostd::httpParseResponse():";
 
     if (LDEBUG) {
       if (strict) cerr << soliloquy << " Parse '" << url << "' strict" << endl;
@@ -91,8 +84,8 @@ namespace aurostd {
         result.host.erase(location);
       } else {
         if (result.scheme == "https") result.port = 443;
-        if (result.scheme == "ftp") result.port = 21;
-        if (result.scheme == "sftp") result.port = 22;
+        else if (result.scheme == "ftp") result.port = 21;
+        else if (result.scheme == "sftp") result.port = 22;
         else result.port = 80;
       }
 
@@ -103,13 +96,23 @@ namespace aurostd {
       result.port = 0;
     }
 
+    // split query from raw path
+    location = result.path.find('?');
+    if (location != std::string::npos) {
+      result.query = result.path.substr(location);
+      result.path = result.path.substr(0, location);
+    } else {
+      result.query = "";
+    }
+
     if (LDEBUG) {
-      cerr << soliloquy << " split up URL: '" << endl;
+      cerr << soliloquy << " split up URL: " << endl;
       cerr << "    " << "scheme: " << result.scheme << std::endl;
       cerr << "    " << "user: " << result.user << std::endl;
       cerr << "    " << "host: " << result.host << std::endl;
       cerr << "    " << "port: " << result.port << std::endl;
       cerr << "    " << "path: " << result.path << std::endl;
+      cerr << "    " << "query: " << result.query << std::endl;
     }
 
     return result;
@@ -245,23 +248,20 @@ namespace aurostd {
 
   /// @brief convert characters into their percent representation
   /// @param raw_str sting to escape
-  /// @param characters replace just the given characters (":/?#[]@!$&'()*+,;= " if empty)
+  /// @param characters replace just the given characters
   /// @return escaped string
-  /// https://www.rfc-editor.org/rfc/rfc3986#section-2.1
-  string httpPercentEncoding(const string &raw_str, const string &characters){
+  /// @note https://www.rfc-editor.org/rfc/rfc3986#section-2.1
+  /// @note characters to be escaped need to be a single byte long (for utf-8 strings use httpPercentEncodingFull)
+  string httpPercentEncodingSelected(const string &raw_str, const string &characters){
 
     bool LDEBUG = (false || XHOST.DEBUG || _DEBUG_XHTTP_);
     string soliloquy = XPID + "aurostd::httpPercentEncoding():";
 
-    const char *reserved;
-    if (!characters.empty()){
-      reserved=characters.c_str();
-    }
-    else {
-      reserved= ":/?#[]@!$&'()*+,;= ";
-    }
+    const char *reserved=characters.c_str();
+
     size_t start=0;
     size_t border=0;
+    short to_replace=0;
 
     char * str_position;
     char str[raw_str.length()];
@@ -269,12 +269,14 @@ namespace aurostd {
     str_position=std::strpbrk(str, reserved);
 
     std::stringstream output;
-    if (LDEBUG) cerr << soliloquy << " Escaping '" << raw_str << endl;
+    if (LDEBUG) cerr << soliloquy << " Escaping '" << raw_str << "'" << endl;
 
     while (str_position!=NULL){
       border = str_position-str;
-      output << raw_str.substr(start, border-start) << "%" << std::uppercase << std::hex << std::setfill('0') << std::setw(2) << (uint) str[border];
-      if (LDEBUG) cerr << " Match '" << str[border] << "' (%" << std::uppercase << std::hex << std::setfill('0') << (uint) str[border] << std::dec << ") at " << border << endl;
+      to_replace = str[border];
+      if (to_replace<0) to_replace+=256;
+      output << raw_str.substr(start, border-start) << "%" << std::uppercase << std::hex << std::setfill('0') << std::setw(2) << to_replace;
+      if (LDEBUG) cerr << " Match '" << str[border] << "' (%" << std::uppercase << std::hex << std::setfill('0') << to_replace << std::dec << ") at " << border << endl;
       start = border+1;
       str_position=std::strpbrk(str_position+1,reserved);
     }
@@ -282,6 +284,39 @@ namespace aurostd {
     return output.str();
 
   }
+
+
+  /// @brief Fully percent encode a string
+  /// @param work_str sting to escape
+  /// @return escaped string
+  /// @note https://www.rfc-editor.org/rfc/rfc3986#section-2.1
+  /// @note just leave unreserved characters (ALPHA / DIGIT / "-" / "." / "_" / "~")
+  string httpPercentEncodingFull(string work_str){
+
+    bool LDEBUG = (false || XHOST.DEBUG || _DEBUG_XHTTP_);
+    string soliloquy = XPID + "aurostd::httpPercentEncoding():";
+
+    const char *allowed = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                          "abcdefghijklmnopqrstuvwxyz"
+                          "0123456789"
+                          "-_.~";
+
+    size_t border=0;
+    short to_replace=0;
+    std::stringstream output;
+    if (LDEBUG) cerr << soliloquy << " Escaping '" << work_str << "'" << std::endl;
+
+    while (!work_str.empty()){
+      border = std::strspn(work_str.c_str(), allowed);
+      to_replace = work_str[border];
+      if (to_replace<0) to_replace+=256;
+      output << work_str.substr(0, border) << "%" << std::uppercase << std::hex << std::setfill('0') << std::setw(2) << to_replace;
+      if (LDEBUG) cerr << " Match '" << work_str[border] << "' (%" << std::uppercase << std::hex << std::setfill('0') << to_replace << std::dec << ")" << std::endl; // at " << border << endl;
+      work_str.erase(0,border+1);
+    }
+    return output.str();
+  }
+
 
   /// @brief Get a raw http response
   /// @param hostname hostname to establish a connection to
@@ -316,7 +351,8 @@ namespace aurostd {
     unsigned long loaded_bytes = 0;
 
     // build request and save its length
-    request_len = asprintf(&request, request_template, url.path.c_str(), url.host.c_str(), AFLOW_VERSION);
+    request_len = asprintf(&request, request_template, (url.path + url.query).c_str(), url.host.c_str(), AFLOW_VERSION);
+
 
     // get the TCP protocol entry
     protocol_entry = getprotobyname("tcp");
@@ -455,7 +491,7 @@ namespace aurostd {
   /// @param url_str content url
   /// @param output message body
   /// @return HTTP status code (-1 on failure)
-  int httpGet(const std::string &url_str, std::string &output) {
+  int httpGetStatus(const std::string &url_str, std::string &output) {
     URL url = httpParseURL(url_str);
     int status_code = -1;
     std::map <std::string, std::string> header;
@@ -468,7 +504,7 @@ namespace aurostd {
   /// @param output message body
   /// @param header response header
   /// @return HTTP status code (-1 on failure)
-  int httpGet(const std::string &url_str, std::string &output, std::map <std::string, std::string> &header) {
+  int httpGetStatus(const std::string &url_str, std::string &output, std::map <std::string, std::string> &header) {
     URL url = httpParseURL(url_str);
     int status_code = -1;
     httpGet(url, output, status_code, header);
@@ -480,8 +516,8 @@ namespace aurostd {
   /// @param query GET query
   /// @param output message body
   /// @return HTTP status code (-1 on failure)
-  int httpGet(const std::string &host, const std::string &query, std::string &output) {
-    URL url = httpConstructURL(host, query);
+  int httpGetStatus(const std::string &host, const std::string &path, const std::string &query, std::string &output) {
+    URL url = httpConstructURL(host, path, query);
     int status_code = -1;
     std::map <std::string, std::string> header;
     httpGet(url, output, status_code, header);
@@ -494,8 +530,8 @@ namespace aurostd {
   /// @param output message body
   /// @param header response header
   /// @return HTTP status code (-1 on failure)
-  int httpGet(const std::string &host, const std::string &query, std::string &output, std::map <std::string, std::string> &header) {
-    URL url = httpConstructURL(host, query);
+  int httpGetStatus(const std::string &host, const std::string &path, const std::string &query, std::string &output, std::map <std::string, std::string> &header) {
+    URL url = httpConstructURL(host, path, query);
     int status_code = -1;
     httpGet(url, output, status_code, header);
     return status_code;
@@ -546,8 +582,8 @@ namespace aurostd {
   /// @param host server name or IP to contact
   /// @param query GET query
   /// @return message body
-  std::string httpGet(const std::string &host, const std::string &query) {
-    URL url = httpConstructURL(host, query);
+  std::string httpGet(const std::string &host, const std::string &path, const std::string &query) {
+    URL url = httpConstructURL(host, path, query);
     std::string output;
     int status_code = -1;
     std::map <std::string, std::string> header;
@@ -561,8 +597,8 @@ namespace aurostd {
   /// @param query GET query
   /// @param status_code HTTP status code (-1 on failure)
   /// @return message body
-  std::string httpGet(const std::string &host, const std::string &query, int &status_code) {
-    URL url = httpConstructURL(host, query);
+  std::string httpGet(const std::string &host, const std::string &path, const std::string &query, int &status_code) {
+    URL url = httpConstructURL(host, path, query);
     std::string output;
     std::map <std::string, std::string> header;
 
@@ -577,8 +613,8 @@ namespace aurostd {
   /// @param status_code HTTP status code (-1 on failure)
   /// @param header response header
   /// @return message body
-  std::string httpGet(const std::string &host, const std::string &query, int &status_code, std::map <std::string, std::string> &header) {
-    URL url = httpConstructURL(host, query);
+  std::string httpGet(const std::string &host, const std::string &path, const std::string &query, int &status_code, std::map <std::string, std::string> &header) {
+    URL url = httpConstructURL(host, path, query);
     std::string output;
 
     status_code = -1;

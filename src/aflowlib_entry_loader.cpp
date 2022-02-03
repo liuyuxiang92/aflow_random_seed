@@ -10,8 +10,11 @@
 #ifndef _AFLOWLIB_ENTRY_LOADER_CPP_
 #define _AFLOWLIB_ENTRY_LOADER_CPP_
 
+#include <memory>
+
 #include "aflow.h"
 #include "aflowlib_entry_loader.h"
+
 
 #define _DEBUG_ENTRY_LOADER_ true
 
@@ -19,14 +22,29 @@
 const std::string AFLUX_DIRECTIVES=string("paging(0),format(aflow)");
 
 namespace aflowlib {
+  //--------------------------------------//
+  // Helper functions for the EntryLoader //
+  //--------------------------------------//
+
+
+  string getAFLUX(const string& query){
+    return "";
+  }
+
+  string getAFLUX(const vector<string>& matchbook){
+    // Performs AFLUX call based on vector of matchbook entries
+    string summons = aurostd::joinWDelimiter(matchbook,",");
+    return getAFLUX(summons);
+  }
+
+  //--------------------//
+  // Start Entry Loader //
+  //--------------------//
+
   EntryLoader::EntryLoader(ostream& oss) : xStream(oss),m_initialized(false) {free();;}
   EntryLoader::EntryLoader(ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {free();}
   EntryLoader::EntryLoader(const aurostd::xoption& flags,ostream& oss) : xStream(oss),m_initialized(false) {free();initialize(flags);}
   EntryLoader::EntryLoader(const aurostd::xoption& flags,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {free();initialize(flags);}
-  EntryLoader::EntryLoader(const string& sinput,ostream& oss) : xStream(oss),m_initialized(false) {free();initialize(sinput);}
-  EntryLoader::EntryLoader(const string& sinput,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {free();initialize(sinput);}
-  EntryLoader::EntryLoader(const string& sinput,const aurostd::xoption& flags,ostream& oss) : xStream(oss),m_initialized(false) {free();initialize(sinput,flags);}
-  EntryLoader::EntryLoader(const string& sinput,const aurostd::xoption& flags,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {free();initialize(sinput,flags);}
   EntryLoader::EntryLoader(const EntryLoader& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
 
   EntryLoader::~EntryLoader() {xStream::free();free();}
@@ -43,6 +61,8 @@ namespace aflowlib {
     m_elflags.clear();
     m_sinput.clear();
     m_aflags.clear();
+    m_entries_unique=true;
+    m_auid_list.clear();
     uint i=0,j=0;
     for(i=0;i<m_ventries.size();i++){for(j=0;j<m_ventries[i].size();j++){m_ventries[i][j].clear();}m_ventries[i].clear();}m_ventries.clear(); //clear
   }
@@ -53,6 +73,8 @@ namespace aflowlib {
     m_elflags=b.m_elflags;
     m_sinput=b.m_sinput;
     m_aflags=b.m_aflags;
+    m_auid_list=b.m_auid_list;
+    m_entries_unique=b.m_entries_unique;
     uint i=0,j=0,k=0;
     for(i=0;i<m_ventries.size();i++){for(j=0;j<m_ventries[i].size();j++){m_ventries[i][j].clear();}m_ventries[i].clear();}m_ventries.clear(); //clear
     for(i=0;i<b.m_ventries.size();i++){for(j=0;j<b.m_ventries[i].size();j++){for(k=0;k<b.m_ventries[i][j].size();k++){m_ventries[i][j][k]=b.m_ventries[i][j][k];}}} //copy
@@ -71,7 +93,7 @@ namespace aflowlib {
   bool EntryLoader::initialize() {
     free();
     loadAFlags();
-    m_initialized=false;  //no point
+    m_initialized=false;  //no entry
     return m_initialized;
   }
   
@@ -87,56 +109,213 @@ namespace aflowlib {
   
   bool EntryLoader::initialize(const aurostd::xoption& flags) {
     free();
-    loadAFlags();
-    loadInput(flags);
+//    loadAFlags();
+//    loadInput(flags);
     m_initialized=false;  //no point
     return m_initialized;
   }
-  
-  bool EntryLoader::initialize(const string& sinput,ostream& oss) {
-    xStream::initialize(oss);
-    return initialize(sinput);
-  }
 
-  bool EntryLoader::initialize(const string& sinput,ofstream& FileMESSAGE,ostream& oss) {
-    xStream::initialize(FileMESSAGE,oss);
-    return initialize(sinput);
-  }
-
-  bool EntryLoader::initialize(const string& sinput) {
-    free();
-    loadAFlags();
-    loadInput(sinput);
-    m_initialized=true;
-    return m_initialized;
-  }
-  
-  bool EntryLoader::initialize(const string& sinput,const aurostd::xoption& flags,ostream& oss) {
-    xStream::initialize(oss);
-    return initialize(sinput,flags);
-  }
-
-  bool EntryLoader::initialize(const string& sinput,const aurostd::xoption& flags,ofstream& FileMESSAGE,ostream& oss) {
-    xStream::initialize(FileMESSAGE,oss);
-    return initialize(sinput,flags);
-  }
-
-  bool EntryLoader::initialize(const string& sinput,const aurostd::xoption& flags) {
-    free();
-    loadAFlags();
-    loadInput(sinput,flags);
-    m_initialized=true;
-    return m_initialized;
-  }
 
   void EntryLoader::loadAFlags(){ //just a placeholder for necessary logger input
     if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){m_aflags.Directory=XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN");} //CO20190402
     if(m_aflags.Directory.empty() || m_aflags.Directory=="./" || m_aflags.Directory=="."){m_aflags.Directory=aurostd::getPWD()+"/";} //".";  //CO20180220 //[CO20191112 - OBSOLETE]aurostd::execute2string(XHOST.command("pwd"))
   }
 
-  void EntryLoader::loadInput(const string& sinput){m_sinput=sinput;}
-  void EntryLoader::loadInput(const aurostd::xoption& flags){m_elflags=flags;}
-  void EntryLoader::loadInput(const string& sinput,const aurostd::xoption& flags){loadInput(sinput);loadInput(flags);}
+//  void EntryLoader::loadInput(const string& sinput){m_sinput=sinput;}
+//  void EntryLoader::loadInput(const aurostd::xoption& flags){m_elflags=flags;}
+//  void EntryLoader::loadInput(const string& sinput,const aurostd::xoption& flags){loadInput(sinput);loadInput(flags);}
+
+  std::string EntryLoader::buildAFLUXQuery(const std::map<string, string> & matchbook){
+    std::string query = "";
+    for (std::map<string, string> part: {matchbook, m_aflux_directives}) {
+      for (std::pair <std::string, std::string> it: part) {
+        query += "," + it.first;
+        if (!it.second.empty()) query += "(" + it.second + ")";
+      }
+    }
+    query.erase(0,1);
+    cout << query << endl;
+    return "?" + aurostd::httpPercentEncodingFull(query);
+  }
+
+  void EntryLoader::selectSource(){
+    if(aurostd::FileExist(m_sqlite_file)){
+      m_current_source = Source::SQLITE;
+      if(m_sqlite_db_ptr == nullptr){
+        cout << "Init DB" << endl;
+        m_sqlite_db_ptr = std::make_shared<aflowlib::AflowDB>(m_sqlite_file);
+      }
+    } else if ("AFLUXtest"==aurostd::httpGet("http://aflowlib.duke.edu/test/?echo=AFLUXtest")){
+      m_current_source = Source::AFLUX;
+    } else if (false){
+      m_current_source = Source::FILESYSTEM;
+    } else if (false){
+      m_current_source = Source::RESTAPI;
+    } else {
+      m_current_source = Source::FAILED;
+    }
+    cout << (int) m_current_source << endl;
+  }
+
+  void EntryLoader::loadSqliteWhere(const std::string & where) {
+    stringstream message;
+    string soliloquy=XPID+"EntryLoader::loadSqliteWhere():";
+    vector<string> raw_lines = m_sqlite_db_ptr->getEntrySet(where, aflow_ft);
+    cout << "Raw result size " << raw_lines.size() << " for "<< where << endl;
+    aflowlib::_aflowlib_entry entry;
+    size_t start_size=m_lib_entries.size();
+    if(m_entries_unique) {
+      for (std::string line: raw_lines) {
+        entry.Load(line, *p_oss);
+        if (!entry.auid.empty() && (m_auid_list.find(entry.auid)==m_auid_list.end())) {
+          m_lib_entries.push_back(entry);
+          m_auid_list.emplace(entry.auid);
+        }
+      }
+    } else {
+      for (std::string line: raw_lines) {
+        entry.Load(line, *p_oss);
+        if (!entry.auid.empty()) {
+          m_lib_entries.push_back(entry);
+          m_auid_list.emplace(entry.auid);
+        }
+      }
+    }
+
+    message << "Loaded " << m_lib_entries.size()-start_size << " new entries (overall "<< m_lib_entries.size() << " | " << m_auid_list.size() << " unique)";
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_NOTICE_);
+
+
+  }
+  void EntryLoader::loadAFLUXMatchbook(const std::map<string, string> & matchbook){
+    loadAFLUXQuery(buildAFLUXQuery(matchbook));
+  }
+
+  void EntryLoader::loadAFLUXQuery(const std::string &query) {
+    string soliloquy=XPID+"EntryLoader::loadAFLUXQuery():";
+    std::string output = "";
+
+    stringstream message;
+    short status = aurostd::httpGetStatus(m_aflux_server, m_aflux_path, query, output);
+    //TODO throw ERROR if web fails or try different source
+//    cout << output << endl << endl;
+
+    vector<string> raw_lines;
+    aurostd::string2vectorstring(output,raw_lines);
+
+    aflowlib::_aflowlib_entry entry;
+    size_t start_size=m_lib_entries.size();
+    if(m_entries_unique) {
+      for (std::string line: raw_lines) {
+        entry.Load(line, *p_oss);
+        if (!entry.auid.empty() && (m_auid_list.find(entry.auid)==m_auid_list.end())) {
+          m_lib_entries.push_back(entry);
+          m_auid_list.emplace(entry.auid);
+        }
+      }
+    } else {
+      for (std::string line: raw_lines) {
+        entry.Load(line, *p_oss);
+        if (!entry.auid.empty()) {
+          m_lib_entries.push_back(entry);
+          m_auid_list.emplace(entry.auid);
+        }
+      }
+    }
+
+    message << "Loaded " << m_lib_entries.size()-start_size << " new entries (overall "<< m_lib_entries.size() << " | " << m_auid_list.size() << " unique)";
+    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_NOTICE_);
+  }
+
+  void EntryLoader::loadAUID(string AUID) {
+    if (m_current_source==Source::NONE) selectSource();
+    if (AUID.substr(0, 5) == "auid:") AUID="aflow:" + AUID.substr(5);
+    else if (AUID.substr(0, 6) != "aflow:") AUID="aflow:" + AUID;
+
+    if (m_current_source==Source::SQLITE) {
+      std::string where = "auid='\"" + AUID + "\"'";
+      loadSqliteWhere(where);
+    } else if (m_current_source==Source::AFLUX) {
+       std::map <std::string, std::string> matchbook{{"*", ""},{"auid", "'" + AUID + "'"}};
+       loadAFLUXMatchbook(matchbook);
+    }
+  }
+
+  void EntryLoader::loadAUID(const vector<string> &AUID) {
+    if (m_current_source==Source::NONE) selectSource();
+    std::map<std::string, std::string> matchbook;
+    std::string AUID_combined = "";
+    for (std::string AUID_single: AUID){
+      if (AUID_single.substr(0, 5) == "auid:") AUID_combined+=":'aflow:" + AUID_single.substr(5);
+      else if (AUID_single.substr(0, 6) != "aflow:") AUID_combined+=":'aflow:" + AUID_single;
+      else AUID_combined+=":'"+AUID_single;
+      AUID_combined += "'";
+    }
+    AUID_combined.erase(0,1);
+    loadAFLUXMatchbook({{"*", ""}, {"auid", AUID_combined}});
+  }
+
+  void EntryLoader::loadAlloy(const vector <std::string> & alloy, bool recursive) {
+    if (m_current_source == Source::NONE) selectSource();
+    vector <std::string> alloy_clean;
+
+    // check that all parts of alloy are actually elements
+    xelement::xelement xel;
+    for (std::string element: alloy) {
+      if (xel.isElement(element) == 0) {
+        cerr << element << " is not an element" << endl;
+      } else alloy_clean.emplace_back(element);
+    }
+
+    // build list of all needed sub-alloys
+    vector<vector<string>> alloy_sub_list;
+    if (recursive) {
+      aurostd::xcombos xc;
+      for (size_t i=1; i <= alloy_clean.size(); i++) {
+        xc.reset(alloy_clean.size(), i);
+        vector<int> choice;
+        while (xc.increment()) {
+          vector<string> alloy_tmp;
+          choice = xc.getCombo();
+          for (size_t idx=0; idx < choice.size(); ++idx) {
+            if (choice[idx]) alloy_tmp.push_back(alloy_clean[idx]);
+          }
+          alloy_sub_list.push_back(alloy_tmp);
+        }
+      }
+
+    } else {
+      alloy_sub_list.push_back(alloy_clean);
+    }
+
+    // build sorted alloy strings
+    std::vector<std::string> final_alloy_list;
+    for (vector<string> a : alloy_sub_list){
+      std::string alloy_tmp = "";
+      std::sort(a.begin(), a.end());
+      for (string e : a) alloy_tmp += e;
+      final_alloy_list.push_back(alloy_tmp);
+    }
+
+    // load the alloys
+    if (m_current_source==Source::SQLITE) {
+      std::string where = aurostd::joinWDelimiter(final_alloy_list, "' OR alloy='");
+      where = "alloy='" + where + "'";
+      loadSqliteWhere(where);
+    } else if (m_current_source==Source::AFLUX) {
+      std::string alloy_match = aurostd::joinWDelimiter(final_alloy_list, ":");
+      std::map <std::string, std::string> matchbook{{"*", ""},{"alloy", alloy_match}};
+      loadAFLUXMatchbook(matchbook);
+    }
+  }
+
+
+  void EntryLoader::loadAlloy(const std::string & alloy, bool recursive) {
+    vector <string> alloy_elements;
+    if (alloy.find(",") != string::npos) aurostd::string2tokens(alloy, alloy_elements, ",");
+    else alloy_elements = aurostd::getElements(alloy);
+    loadAlloy(alloy_elements, recursive);
+  }
 
   void EntryLoader::retrieveOutput(string& soutput){
     string soliloquy=XPID+"EntryLoader::retrieveOutput():";
@@ -146,11 +325,16 @@ namespace aflowlib {
     if(!m_elflags.flag("ENTRY_LOADER::IS_SUMMONS")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AFLUX summons input not found",_INPUT_ILLEGAL_);}
     soutput=aflowlib::AFLUXCall(m_elflags.getattachedscheme("AFLUX::SUMMONS"));
   }
+
+
+
   void EntryLoader::retrieveOutput(vector<aflowlib::_aflowlib_entry>& ventries){
     ventries.clear();
     processInput();
     loadEntries();
+    cout << "Testster" << endl;
     if(!aflowlib::mergeEntries(m_ventries,ventries)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"EntryLoader::retrieveOutput()[1]:","mergeEntries() failed",_RUNTIME_ERROR_);}
+    cout << m_ventries.size() << " | " << ventries.size() << endl;
   }
   void EntryLoader::retrieveOutput(vector<vector<aflowlib::_aflowlib_entry> >& ventries){
     uint i=0;
@@ -308,12 +492,12 @@ namespace aflowlib {
     string summons=m_elflags.getattachedscheme("AFLUX::SUMMONS");
     if(summons.empty()){return 0;}
     if(LDEBUG){cerr << soliloquy << " summons=\"" << summons << "\"" << endl;}
-    string soutput=aflowlib::AFLUXCall(m_elflags.getattachedscheme("AFLUX::SUMMONS"));
-    if(LDEBUG){
-      cerr << soliloquy << " response:" << endl;
-      cerr << soutput;
-      cerr << endl;
-    }
+    string soutput=aflowlib::getAFLUX(m_elflags.getattachedscheme("AFLUX::SUMMONS"));
+//    if(LDEBUG){
+//      cerr << soliloquy << " response:" << endl;
+//      cerr << soutput;
+//      cerr << endl;
+//    }
 
     vector<string> vlines;
     aurostd::string2vectorstring(soutput,vlines);
@@ -412,6 +596,9 @@ namespace aflowlib {
     }
     else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown input format",_INPUT_ILLEGAL_);}
   }
+
+
+
 }
 
 #endif  // _AFLOW_ENTRY_LOADER_CPP_

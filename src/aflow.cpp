@@ -30,6 +30,8 @@
 #include "aflow_pocc.h"  //CO20200624
 #include "aflow_anrl.h"  //DX20201104
 
+#include <chrono> // benchmarking HE
+
 //#define  __XOPTIMIZE
 //#include "aflow_array.h"
 
@@ -65,40 +67,61 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss){  //CO20200520
   _aflags aflags;aflags.Directory=".";
 
   if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-  
   message << "Performing EntryLoader test";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
-  string sinput="",soutput="";
-  vector<aflowlib::_aflowlib_entry> entries;
-  aurostd::xoption elflags;
+  auto start = std::chrono::high_resolution_clock::now();
   aflowlib::EntryLoader el;
-
-  if(0){
-    sinput="species(Mn,Pd)";
-    el.initialize(sinput,elflags,FileMESSAGE,oss);
-    el.retrieveOutput(soutput);
-    if(soutput.empty()){
-      message << "string output empty";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-      return false;
-    }
-    message << "string output = \""+soutput+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-    el.retrieveOutput(entries);
-  }
-
-
-  //sinput="MnPdPt";
-  //el.initialize(sinput,elflags,FileMESSAGE,oss);
-  sinput="MnPdPt";  //CMoTaTiW  //CMoTaTiWZr
-  el.initialize(sinput,elflags,FileMESSAGE,oss);
-  //el.retrieveOutput(soutput);
-  //if(soutput.empty()){
-  //  message << "string output empty";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-  //  return false;
-  //}
-  //message << "string output = \""+soutput+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  el.retrieveOutput(entries);
-
+//  el.m_aflux_display.emplace_back("Egap");
+//  el.m_aflux_display.emplace_back("spin_atom");
+//  el.m_entries_unique = false;
+  el.m_sqlite_file = "../testing/aflowlib.db";
+  el.m_current_source = aflowlib::EntryLoader::Source::AFLUX;
+//  el.loadAUID("aflow:d912e209c81aeb94");
+//  el.loadAUID("auid:d912e209c81aeb94");
+//  el.loadAUID("d912e209c81aeb94");
+  el.loadAlloy("NiMnPdPt");
+//  std::vector<string> AUID_list {"aflow:c6d8842d003b3cf8", "auid:5ddfc73e119d7d2a"};
+//  el.loadAUID(AUID_list);
+  auto stop = std::chrono::high_resolution_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+  cout << "Duration: "<< duration.count() << " milliseconds"<< endl;
   return true;
+
+
+//
+//  string sinput="",soutput="";
+//  vector<aflowlib::_aflowlib_entry> entries;
+//  aurostd::xoption elflags;
+//  aflowlib::EntryLoader el;
+//
+////  if(0){
+////    sinput="species(Mn,Pd)";
+////    el.initialize(sinput,elflags,FileMESSAGE,oss);
+////    el.retrieveOutput(soutput);
+////    if(soutput.empty()){
+////      message << "string output empty";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+////      return false;
+////    }
+////    message << "string output = \""+soutput+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+////    el.retrieveOutput(entries);
+////  }
+//
+//
+//  //sinput="MnPdPt";
+//  //el.initialize(sinput,elflags,FileMESSAGE,oss);
+//  sinput="MnPdPt";  //CMoTaTiW  //CMoTaTiWZr
+//  el.initialize(sinput,elflags,FileMESSAGE,oss);
+//  //el.retrieveOutput(soutput);
+//  //if(soutput.empty()){
+//  //  message << "string output empty";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+//  //  return false;
+//  //}
+//  //message << "string output = \""+soutput+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+//
+//  el.retrieveOutput(entries);
+//  cout << entries.size() << std::endl;
+//
+//  return true;
 }
 
 bool SchemaTest(ostream& oss){ofstream FileMESSAGE;return SchemaTest(FileMESSAGE,oss);}
@@ -1049,8 +1072,9 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   std::map<std::string, std::string> http_header;
 
   std::string http_host = "aflowlib.duke.edu";
-  std::string http_path = "/test/?echo=";
-  std::string url = "http://" + http_host + http_path;
+  std::string http_path = "/test/";
+  std::string http_query = "?echo=";
+  std::string url = "http://" + http_host + http_path + http_query;
 
   http_single_description = "output=httpGet(url,status_code)";
   response = aurostd::httpGet(url+http_single_description, status_code);
@@ -1062,49 +1086,51 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   check_num++;
   check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
 
-  http_single_description = "output=httpGet(host,path)";
-  response = aurostd::httpGet(http_host, http_path+http_single_description);
+  http_single_description = "output=httpGet(host,path,query)";
+  response = aurostd::httpGet(http_host, http_path, http_query+http_query+http_single_description);
   check_num++;
   check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
 
-  http_single_description = "output=httpGet(host,path,status_code)";
-  response = aurostd::httpGet(http_host, http_path+http_single_description, status_code);
+  http_single_description = "output=httpGet(host,path,query,status_code)";
+  response = aurostd::httpGet(http_host, http_path, http_query+http_single_description, status_code);
   check_num++;
   check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
 
-  http_single_description = "output=httpGet(host,path,status_code,header)";
-  response = aurostd::httpGet(http_host, http_path+http_single_description, status_code, http_header);
+  http_single_description = "output=httpGet(host,path,query,status_code,header)";
+  response = aurostd::httpGet(http_host, http_path, http_query+http_single_description, status_code, http_header);
   check_num++;
   check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
 
-  http_single_description = "status_code=httpGet(url,output)";
-  status_code = aurostd::httpGet(url+http_single_description, response);
+  check_function = "aurostd::httpGetStatus()";
+  http_single_description = "status_code=httpGetStatus(url,output)";
+  status_code = aurostd::httpGetStatus(url+http_single_description, response);
   check_num++;
   check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
 
-  http_single_description = "status_code=httpGet(url,output,header)";
-  status_code = aurostd::httpGet(url+http_single_description, response, http_header);
+  http_single_description = "status_code=httpGetStatus(url,output,header)";
+  status_code = aurostd::httpGetStatus(url+http_single_description, response, http_header);
   check_num++;
   check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
 
-  http_single_description = "status_code=httpGet(host,path,output)";
-  status_code = aurostd::httpGet(http_host, http_path+http_single_description, response);
+  http_single_description = "status_code=httpGetStatus(host,path,query,output)";
+  status_code = aurostd::httpGetStatus(http_host, http_path, http_query+http_single_description, response);
   check_num++;
   check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
 
-  http_single_description = "status_code=httpGet(host,path,output,header)";
-  status_code = aurostd::httpGet(http_host, http_path+http_single_description, response, http_header);
+  http_single_description = "status_code=httpGetStatus(host,path,query,output,header)";
+  status_code = aurostd::httpGetStatus(http_host, http_path, http_query+http_single_description, response, http_header);
   check_num++;
   check_equal(response, http_single_description, check_function, http_single_description, check_num, passed_checks, results);
 
-  check_function = "aurostd::httpPercentEncoding()";
-  response = aurostd::httpPercentEncoding("Crazy!? _&@String");
-  check_num++;
-  check_equal(response, "Crazy%21%3F%20_%26%40String", check_function, "escape reserved chars", check_num, passed_checks, results);
-
-  response = aurostd::httpPercentEncoding("Crazy!? _&@String", "@&");
+  check_function = "aurostd::httpPercentEncodingSelected()";
+  response = aurostd::httpPercentEncodingSelected("Crazy!? _&@String", "@&");
   check_num++;
   check_equal(response, "Crazy!? _%26%40String", check_function, "just escape @ and &", check_num, passed_checks, results);
+
+  check_function = "aurostd::httpPercentEncodingFull()";
+  response = aurostd::httpPercentEncodingFull("[(Crazy!? _&@String}/|\\äßæ");
+  check_num++;
+  check_equal(response, "%5B%28Crazy%21%3F%20_%26%40String%7D%2F%7C%5C%C3%A4%C3%9F%C3%A6", check_function, "escape all chars", check_num, passed_checks, results);
 
 
   // present overall result
