@@ -639,7 +639,7 @@ namespace aflowlib {
       bool closeTmpFile(bool force_copy=false, bool keep=false, bool nocopy=false);
 
       void rebuildDB();
-      void buildTable(uint, const vector<string>&, const vector<string>&);
+      void buildTable(int, const vector<string>&, const vector<string>&);
       void populateTable(const string&, const vector<string>&, const vector<string>&, const vector<vector<string> >&);
 
       uint applyPatchFromJsonl(const vector<string>&);
@@ -652,7 +652,7 @@ namespace aflowlib {
 
       DBStats initDBStats(const string&, const vector<string>&);
       DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&);
-      void getColStats(uint, const vector<string>&, vector<DBStats>&);
+      void getColStats(int, const vector<string>&, vector<DBStats>&);
       vector<string> getUniqueFromJsonArrays(const vector<string>&);
       string stats2json(const DBStats&);
 

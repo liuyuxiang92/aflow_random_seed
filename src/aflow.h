@@ -2961,7 +2961,7 @@ namespace xthread {
       void unsetProgressBar();
 
       template <typename F, typename... A>
-      void run(uint nbins, F& func, A&... args);
+      void run(int nbins, F& func, A&... args);
 
     private:
       void free();
@@ -2974,7 +2974,7 @@ namespace xthread {
       bool progress_bar_set;
 
       template <typename F, typename... A>
-      void spawnWorker(uint& task_counter, uint nbins, F& func, A&... args);
+      void spawnWorker(int& task_counter, int nbins, F& func, A&... args);
   };
 }
 #endif

@@ -90,28 +90,28 @@ namespace apl {
   void AtomicDisplacements::calculateEigenvectors() {
     _eigenvectors.clear();
     _frequencies.clear();
-    uint nq = _qpoints.size();
+    int nq = (int) _qpoints.size();
     if (nq == 0) return;
     uint natoms = _pc->getInputCellStructure().atoms.size();
     uint nbranches = _pc->getNumberOfBranches();
     _eigenvectors.resize(nq, vector<vector<xvector<xcomplex<double> > > >(nbranches, vector<xvector<xcomplex<double> > >(natoms, xvector<xcomplex<double> >(3))));
     _frequencies.resize(nq, vector<double> (nbranches, 0.0));
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    uint ncpus = (uint) _pc->getNCPUs();
+    int ncpus = _pc->getNCPUs();
     if (ncpus > nq) ncpus = nq;
     if (ncpus > 1) {
-      xthread::xThread xt(ncpus);
-      std::function<void(uint)> fn = std::bind(&AtomicDisplacements::calculateEigenvectorsInThread, this, std::placeholders::_1);
+      xthread::xThread xt(ncpus, 1);
+      std::function<void(int)> fn = std::bind(&AtomicDisplacements::calculateEigenvectorsInThread, this, std::placeholders::_1);
       xt.run(nq, fn);
     } else {
-      for (uint i = 0; i < nq; ++i) calculateEigenvectorsInThread(i);
+      for (int i = 0; i < nq; ++i) calculateEigenvectorsInThread(i);
     }
 #else
-    for (uint i = 0; i < nq; ++i) calculateEigenvectorsInThread(i);
+    for (int i = 0; i < nq; ++i) calculateEigenvectorsInThread(i);
 #endif
   }
 
-  void AtomicDisplacements::calculateEigenvectorsInThread(uint i) {
+  void AtomicDisplacements::calculateEigenvectorsInThread(int i) {
     uint nbranches = _pc->getNumberOfBranches();
     uint natoms = _pc->getInputCellStructure().atoms.size();
     xvector<double> freq(nbranches);

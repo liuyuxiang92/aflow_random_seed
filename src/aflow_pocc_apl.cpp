@@ -15,10 +15,6 @@
 
 #define _DEBUG_POCC_APL_ false
 
-#ifdef AFLOW_MULTITHREADS_ENABLE
-#include <thread>
-#endif
-
 using std::string;
 using std::vector;
 using std::deque;
@@ -275,7 +271,7 @@ namespace pocc {
     aurostd::string2tokens(aplopts.getattachedscheme("DOSMESH"), qpt_mesh, " xX");
 
     // Calculate phonon DOS
-    uint nruns = vphcalc.size();
+    int nruns = (int) vphcalc.size();
     vector<apl::DOSCalculator> vphdos(nruns);
     double minfreq = 0.0, maxfreq = 0.0;
     unsigned long long int isupercell = 0;
@@ -298,7 +294,7 @@ namespace pocc {
       }
     }
 
-    nruns = vcalc.size();
+    nruns = (int) vcalc.size();
     vector<xDOSCAR> vxdos(nruns);
 
     aplopts.push_attached("MINFREQ", aurostd::utype2string<double>(minfreq));
@@ -310,32 +306,24 @@ namespace pocc {
 
 #ifdef AFLOW_MULTITHREADS_ENABLE
     int ncpus = KBIN::get_NCPUS(m_kflags);
-    vector<std::thread*> threads;
     if (ncpus > (int) nruns) ncpus = (int) nruns;
     if (ncpus > 1) {
-      vector<vector<int> > thread_dist = getThreadDistribution((int) nruns, ncpus);
-      for (int i = 0; i < ncpus; i++) {
-        int startIndex = thread_dist[i][0];
-        int endIndex = thread_dist[i][1];
-        threads.push_back(new std::thread(&POccCalculator::calculatePhononDOSThread, this, startIndex, endIndex,
-              vcalc, std::ref(aplopts), std::ref(vphdos), std::ref(vxdos)));
-      }
-
-      for (uint i = 0; i < threads.size(); i++) {
-        threads[i]->join();
-        delete threads[i];
-      }
+      xthread::xThread xt(ncpus, 1);
+      std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&,
+          vector<xDOSCAR>&)> fn = std::bind(&POccCalculator::calculatePhononDOSThread, this,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5);
+      xt.run(nruns, fn, vcalc, aplopts, vphdos, vxdos);
     } else {
-      calculatePhononDOSThread(0, (int) nruns, vcalc, aplopts, vphdos, vxdos);
+      for (int i = 0; i < nruns; i++) calculatePhononDOSThread(i, vcalc, aplopts, vphdos, vxdos);
     }
 #else
-    calculatePhononDOSThread(0, (int) nruns, vcalc, aplopts, vphdos, vxdos);
+    for (int i = 0; i < nruns; i++) calculatePhononDOSThread(i, vcalc, aplopts, vphdos, vxdos);
 #endif
 
     return vxdos;
   }
 
-  void POccCalculator::calculatePhononDOSThread(int startIndex, int endIndex, const vector<uint>& vcalc,
+  void POccCalculator::calculatePhononDOSThread(int i, const vector<uint>& vcalc,
       const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos) {
     string function_name = XPID + "POccCalculator::getPhononDoscars()";
 
@@ -349,51 +337,49 @@ namespace pocc {
     double minfreq = aurostd::string2utype<double>(aplopts.getattachedscheme("MINFREQ"));
     double maxfreq = aurostd::string2utype<double>(aplopts.getattachedscheme("MAXFREQ"));
 
-    for (int i = startIndex; i < endIndex; i++) {
-      uint icalc = vcalc[i];
-      vphdos[icalc].calc(dos_npoints, dos_smear, minfreq, maxfreq, false);
-      xDOSCAR phdos = vphdos[icalc].createDOSCAR();
+    uint icalc = vcalc[i];
+    vphdos[icalc].calc(dos_npoints, dos_smear, minfreq, maxfreq, false);
+    xDOSCAR phdos = vphdos[icalc].createDOSCAR();
 
-      // Normalize
-      double norm_factor = nbranches/((double) vphdos[icalc].getNumberOfBranches());
-      for (uint e = 0; e < phdos.number_energies; e++) phdos.viDOS[0][e] *= norm_factor;
+    // Normalize
+    double norm_factor = nbranches/((double) vphdos[icalc].getNumberOfBranches());
+    for (uint e = 0; e < phdos.number_energies; e++) phdos.viDOS[0][e] *= norm_factor;
 
-      const xstructure& xstr_phcalc = vphdos[icalc].getInputStructure();
-      uint natoms_phcalc = xstr_phcalc.atoms.size();
-      uint nproj = phdos.vDOS[0].size();
-      bool projected = (nproj > 1);
-      for (uint at = 0; at < (projected?(natoms_phcalc + 1):1); at++) {  // +1 for totals
+    const xstructure& xstr_phcalc = vphdos[icalc].getInputStructure();
+    uint natoms_phcalc = xstr_phcalc.atoms.size();
+    uint nproj = phdos.vDOS[0].size();
+    bool projected = (nproj > 1);
+    for (uint at = 0; at < (projected?(natoms_phcalc + 1):1); at++) {  // +1 for totals
+      for (uint p = 0; p < nproj; p++) {
+        for (uint e = 0; e < phdos.number_energies; e++) {
+          phdos.vDOS[at][p][0][e] *= norm_factor;
+        }
+      }
+    }
+
+    uint natoms_pocc = xstr_pocc.atoms.size();
+    phdos.number_atoms = natoms_pocc;
+
+    // If there are projected DOS, add the DOS contributions that belong to
+    // each site in the parent structure.
+    if (projected) {
+      vector<uint> map = getMapToPARTCAR((unsigned long long int) icalc, xstr_phcalc);
+
+      deque<deque<deque<deque<double> > > > vDOS_pocc(natoms_pocc + 1, deque<deque<deque<double> > >(nproj, deque<deque<double> >(1, deque<double>(phdos.number_energies, 0.0))));
+      vDOS_pocc[0] = phdos.vDOS[0];  // Totals stay the same
+
+      uint at_mapped = 0;
+      for (uint at = 0; at < natoms_phcalc; at++) {
+        at_mapped = map[at];
         for (uint p = 0; p < nproj; p++) {
           for (uint e = 0; e < phdos.number_energies; e++) {
-            phdos.vDOS[at][p][0][e] *= norm_factor;
+            vDOS_pocc[at_mapped + 1][p][0][e] += phdos.vDOS[at + 1][p][0][e];
           }
         }
       }
-
-      uint natoms_pocc = xstr_pocc.atoms.size();
-      phdos.number_atoms = natoms_pocc;
-
-      // If there are projected DOS, add the DOS contributions that belong to
-      // each site in the parent structure.
-      if (projected) {
-        vector<uint> map = getMapToPARTCAR((unsigned long long int) icalc, xstr_phcalc);
-
-        deque<deque<deque<deque<double> > > > vDOS_pocc(natoms_pocc + 1, deque<deque<deque<double> > >(nproj, deque<deque<double> >(1, deque<double>(phdos.number_energies, 0.0))));
-        vDOS_pocc[0] = phdos.vDOS[0];  // Totals stay the same
-
-        uint at_mapped = 0;
-        for (uint at = 0; at < natoms_phcalc; at++) {
-          at_mapped = map[at];
-          for (uint p = 0; p < nproj; p++) {
-            for (uint e = 0; e < phdos.number_energies; e++) {
-              vDOS_pocc[at_mapped + 1][p][0][e] += phdos.vDOS[at + 1][p][0][e];
-            }
-          }
-        }
-        phdos.vDOS = vDOS_pocc;
-      }
-      vxdos[i] = phdos;
+      phdos.vDOS = vDOS_pocc;
     }
+    vxdos[i] = phdos;
   }
 
   xDOSCAR POccCalculator::getAveragePhononDos(double T, const vector<xDOSCAR>& vxdos) {

@@ -496,7 +496,7 @@ namespace apl {
       xmatrix<xcomplex<double> > getNonanalyticalTermGonze(const xvector<double>);
       xmatrix<xcomplex<double> > getEwaldSumDipoleDipoleContribution(const xvector<double>, bool = true);
 
-      void calculateGroupVelocitiesThread(int, int, vector<vector<double> >&, vector<xmatrix<xcomplex<double> > >&, vector<vector<xvector<double> > >&);
+      void calculateGroupVelocitiesThread(int, vector<vector<double> >&, vector<xmatrix<xcomplex<double> > >&, vector<vector<xvector<double> > >&);
 
     public:
       PhononCalculator(ostream& oss=std::cout);
@@ -647,7 +647,7 @@ namespace apl {
       double _temperature;  // ME20190614
       //[OBSOLETE PN20180705]vector<double> path;       //[PINKU]
       //[OBSOLETE PN20180705]vector<int> path_segment;  //[PINKU]
-      void calculateInOneThread(int, int);
+      void calculateInOneThread(int);
       bool isExactQPoint(const xvector<double>&, const xmatrix<double>&);
       string _system;
 
@@ -702,7 +702,7 @@ namespace apl {
       //CO START
       //private:
       void copy(const DOSCalculator&);
-      void calculateInOneThread(int, int);
+      void calculateInOneThread(int);
       //CO END
       void calculateFrequencies();
       void smearWithGaussian(vector<double>&, vector<double>&, double, double);  //ME20190614
@@ -831,7 +831,7 @@ namespace apl {
       vector<double> _temperatures;
 
       void calculateEigenvectors();
-      void calculateEigenvectorsInThread(uint);
+      void calculateEigenvectorsInThread(int);
       void calculateMeanSquareDisplacementMatrices();
       void calculateModeDisplacements();
       double getOccupationNumber(double, double);
@@ -1159,9 +1159,9 @@ namespace apl {
       void getWeightsLT(double, const vector<double>&, vector<double>&);
       void calculateTransitionProbabilities();
       vector<vector<vector<xcomplex<double> > > > calculatePhases(bool=false);
-      void calculateTransitionProbabilitiesPhonon(uint, vector<vector<vector<vector<double> > > >&,
+      void calculateTransitionProbabilitiesPhonon(int, vector<vector<vector<vector<double> > > >&,
           const vector<vector<vector<xcomplex<double> > > >&);
-      void calculateTransitionProbabilitiesIsotope();
+      void calculateTransitionProbabilitiesIsotope(int);
       vector<vector<double> > calculateTransitionProbabilitiesBoundary();
       void getProcess(const vector<int>&, vector<int>&, vector<int>&, int&);
       xmatrix<double> calculateThermalConductivityTensor(double, vector<vector<double> >&, vector<vector<double> >&);
@@ -1169,13 +1169,13 @@ namespace apl {
       vector<vector<double> > calculateAnharmonicRates(const vector<vector<double> >&);
       vector<vector<double> > calculateTotalRates(const vector<vector<double> >&, vector<vector<double> >&);
       double getOccupationTerm(const vector<vector<double> >&, int, const vector<int>&, const vector<int>&);
-      void calcAnharmRates(const vector<vector<double> >&, vector<vector<double> >&);
+      void calcAnharmRates(int, const vector<vector<double> >&, vector<vector<double> >&);
       vector<vector<xvector<double> > > getMeanFreeDispRTA(const vector<vector<double> >&);
       xmatrix<double> calcTCOND(double, const vector<vector<double> >&,
           const vector<vector<xvector<double> > >&);
       void getMeanFreeDispFull(const vector<vector<double> >&,
           const vector<vector<double> >&, vector<vector<xvector<double> > >&);
-      void calculateDelta(const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
+      void calculateDelta(int, const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
       void correctMFD(const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&);
 
       void writeTempIndepOutput(const string&, string, const string&, const vector<vector<double> >&);

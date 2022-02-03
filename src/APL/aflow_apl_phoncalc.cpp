@@ -6,10 +6,6 @@
 
 #include "aflow_apl.h"
 
-#ifdef AFLOW_MULTITHREADS_ENABLE
-#include <thread>
-#endif
-
 #define _DEBUG_APL_PHONCALC_ false  //CO20190116
 
 using std::string;
@@ -1252,7 +1248,7 @@ namespace apl {
       message = "Supercell not constructed yet.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_INIT_);
     }
-    uint nQPs = _qm.getnQPs();
+    int nQPs = (int) _qm.getnQPs();
     if (nQPs == 0) {
       message = "Mesh has no q-points.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_INIT_);
@@ -1267,32 +1263,26 @@ namespace apl {
     vector<vector<xvector<double> > > gvel(nQPs);
 #ifdef AFLOW_MULTITHREADS_ENABLE
     if (_ncpus > 1) {
-      vector<vector<int> > thread_dist = getThreadDistribution(nQPs, _ncpus);
-      vector<std::thread*> threads;
-      for (int icpu = 0; icpu < _ncpus; icpu++) {
-        threads.push_back(new std::thread(&PhononCalculator::calculateGroupVelocitiesThread, this,
-              thread_dist[icpu][0], thread_dist[icpu][1], std::ref(freqs), std::ref(eigenvectors), std::ref(gvel)));
-      }
-      for (uint t = 0; t < threads.size(); t++) {
-        threads[t]->join();
-        delete threads[t];
-      }
+      xthread::xThread xt(_ncpus, 1);
+      std::function<void(int, vector<vector<double> >&,
+          vector<xmatrix<xcomplex<double> > >&,
+          vector<vector<xvector<double> > >&)> fn = std::bind(&PhononCalculator::calculateGroupVelocitiesThread, this,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+      xt.run(nQPs, fn, freqs, eigenvectors, gvel);
     } else {
-      calculateGroupVelocitiesThread(0, nQPs, freqs, eigenvectors, gvel);
+      for (int i = 0; i < nQPs; i++) calculateGroupVelocitiesThread(i, freqs, eigenvectors, gvel);
     }
 #else
-    calculateGroupVelocitiesThread(0, nQPs, freqs, eigenvectors, gvel);
+    for (int i = 0; i < nQPs; i++) calculateGroupVelocitiesThread(i, freqs, eigenvectors, gvel);
 #endif
     return gvel;
   }
 
-  void PhononCalculator::calculateGroupVelocitiesThread(int startIndex, int endIndex,
+  void PhononCalculator::calculateGroupVelocitiesThread(int q,
       vector<vector<double> >& freqs, vector<xmatrix<xcomplex<double> > >& eigenvectors, vector<vector<xvector<double> > >& gvel) {
     xvector<double> f;
-    for (int q = startIndex; q < endIndex; q++) {
-      f = getFrequency(_qm.getQPoint(q).cpos, apl::THZ | apl::OMEGA, eigenvectors[q], gvel[q]);
-      freqs[q] = aurostd::xvector2vector(f);
-    }
+    f = getFrequency(_qm.getQPoint(q).cpos, apl::THZ | apl::OMEGA, eigenvectors[q], gvel[q]);
+    freqs[q] = aurostd::xvector2vector(f);
   }
 
   //writeGroupVelocitiesToFile////////////////////////////////////////////////

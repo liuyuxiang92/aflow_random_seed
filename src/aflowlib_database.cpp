@@ -710,14 +710,14 @@ namespace aflowlib {
     if (ncpus < 1) ncpus = 1;
     if (ncpus > max_cpu) ncpus = max_cpu;
     if (ncpus > 1) {
-      xthread::xThread xt(ncpus);
-      std::function<void(uint, const vector<string>&, const vector<string>&)> fn = std::bind(&AflowDB::buildTable, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-      xt.run((uint) _N_AUID_TABLES_, fn, columns, types);
+      xthread::xThread xt(ncpus, 1);
+      std::function<void(int, const vector<string>&, const vector<string>&)> fn = std::bind(&AflowDB::buildTable, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+      xt.run(_N_AUID_TABLES_, fn, columns, types);
     } else {
-      for (uint i = 0; i < (uint) _N_AUID_TABLES_; i++) buildTable(i, columns, types);
+      for (uint i = 0; i < _N_AUID_TABLES_; i++) buildTable(i, columns, types);
     }
 #else
-    for (uint i = 0; i < (uint) _N_AUID_TABLES_; i++) buildTable(i, columns, types);
+    for (uint i = 0; i < _N_AUID_TABLES_; i++) buildTable(i, columns, types);
 #endif
     message << function_name << "Finished rebuild.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss);
@@ -725,7 +725,7 @@ namespace aflowlib {
 
   //buildTables///////////////////////////////////////////////////////////////
   // Reads a .jsonl files and processes the JSONs for the database writer.
-  void AflowDB::buildTable(uint i, const vector<string>& columns, const vector<string>& types) {
+  void AflowDB::buildTable(int i, const vector<string>& columns, const vector<string>& types) {
     stringstream t;
     t << std::setfill('0') << std::setw(2) << std::hex << i;
     string table = "auid_" + t.str();
@@ -1176,14 +1176,14 @@ namespace aflowlib {
       if (stats.nentries < 10000) cpu_max = 4;
       if (ncpus > cpu_max) ncpus = cpu_max;
       if (ncpus > 1) {
-        xthread::xThread xt(ncpus);
-        std::function<void(uint, const vector<string>&, vector<DBStats>&)> fn = std::bind(&AflowDB::getColStats, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-        xt.run((uint) _N_AUID_TABLES_, fn, tables, colstats);
+        xthread::xThread xt(ncpus, 1);
+        std::function<void(int, const vector<string>&, vector<DBStats>&)> fn = std::bind(&AflowDB::getColStats, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        xt.run(_N_AUID_TABLES_, fn, tables, colstats);
       } else {
-        for (uint i = 0; i < _N_AUID_TABLES_; i++) getColStats(i, tables, colstats);
+        for (int i = 0; i < _N_AUID_TABLES_; i++) getColStats(i, tables, colstats);
       }
 #else
-      for (uint i = 0; i < _N_AUID_TABLES_; i++) getColStats(i, tables, colstats);
+      for (int i = 0; i < _N_AUID_TABLES_; i++) getColStats(i, tables, colstats);
 #endif
 
       // Properties: count, max, min, set
@@ -1264,7 +1264,7 @@ namespace aflowlib {
 
   //getColStats///////////////////////////////////////////////////////////////
   // Retrieves the statistics for each database property and the loops.
-  void AflowDB::getColStats(uint i, const vector<string>& tables, vector<DBStats>& colstats) {
+  void AflowDB::getColStats(int i, const vector<string>& tables, vector<DBStats>& colstats) {
     sqlite3* cursor;
     string function_name = XPID + _AFLOW_DB_ERR_PREFIX_ + "getColStats():";
     string message = "";
