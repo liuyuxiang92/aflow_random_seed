@@ -306,16 +306,12 @@ namespace pocc {
 
 #ifdef AFLOW_MULTITHREADS_ENABLE
     int ncpus = KBIN::get_NCPUS(m_kflags);
-    if (ncpus > (int) nruns) ncpus = (int) nruns;
-    if (ncpus > 1) {
-      xthread::xThread xt(ncpus, 1);
-      std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&,
-          vector<xDOSCAR>&)> fn = std::bind(&POccCalculator::calculatePhononDOSThread, this,
-          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5);
-      xt.run(nruns, fn, vcalc, aplopts, vphdos, vxdos);
-    } else {
-      for (int i = 0; i < nruns; i++) calculatePhononDOSThread(i, vcalc, aplopts, vphdos, vxdos);
-    }
+    if (ncpus > nruns) ncpus = nruns;
+    xthread::xThread xt(ncpus, 1);
+    std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&,
+        vector<xDOSCAR>&)> fn = std::bind(&POccCalculator::calculatePhononDOSThread, this,
+        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5);
+    xt.run(nruns, fn, vcalc, aplopts, vphdos, vxdos);
 #else
     for (int i = 0; i < nruns; i++) calculatePhononDOSThread(i, vcalc, aplopts, vphdos, vxdos);
 #endif

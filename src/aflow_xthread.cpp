@@ -96,18 +96,25 @@ namespace xthread {
     int task_index = 0;
     if (progress_bar_set) pflow::updateProgressBar(0, nbins, *progress_bar);
 
-    vector<std::thread*> threads;
-    for (int i = 0; i < ncpus; i++) {
-      threads.push_back(new std::thread(&xThread::spawnWorker<F, A...>, this,
-                                        std::ref(task_index), nbins,
-                                        std::ref(func), std::ref(args)...)
-      );
+    if (ncpus > 1) {
+      vector<std::thread*> threads;
+      for (int i = 0; i < ncpus; i++) {
+        threads.push_back(new std::thread(&xThread::spawnWorker<F, A...>, this,
+                                          std::ref(task_index), nbins,
+                                          std::ref(func), std::ref(args)...)
+        );
+      }
+      for (std::thread* t : threads) {
+        t->join();
+        delete t;
+      }
+    } else {
+      while (task_index < nbins) {
+        func(task_index, args...);
+        if (progress_bar_set) pflow::updateProgressBar(++task_index, nbins, *progress_bar);
+      }
     }
 
-    for (std::thread* t : threads) {
-      t->join();
-      delete t;
-    }
     XHOST.CPU_active -= ncpus;
   }
 

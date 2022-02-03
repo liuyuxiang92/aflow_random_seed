@@ -1262,16 +1262,12 @@ namespace apl {
     eigenvectors.resize(nQPs, xmatrix<xcomplex<double> >(nbranches, nbranches));
     vector<vector<xvector<double> > > gvel(nQPs);
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    if (_ncpus > 1) {
-      xthread::xThread xt(_ncpus, 1);
-      std::function<void(int, vector<vector<double> >&,
-          vector<xmatrix<xcomplex<double> > >&,
-          vector<vector<xvector<double> > >&)> fn = std::bind(&PhononCalculator::calculateGroupVelocitiesThread, this,
-          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
-      xt.run(nQPs, fn, freqs, eigenvectors, gvel);
-    } else {
-      for (int i = 0; i < nQPs; i++) calculateGroupVelocitiesThread(i, freqs, eigenvectors, gvel);
-    }
+    xthread::xThread xt(_ncpus, 1);
+    std::function<void(int, vector<vector<double> >&,
+        vector<xmatrix<xcomplex<double> > >&,
+        vector<vector<xvector<double> > >&)> fn = std::bind(&PhononCalculator::calculateGroupVelocitiesThread, this,
+        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+    xt.run(nQPs, fn, freqs, eigenvectors, gvel);
 #else
     for (int i = 0; i < nQPs; i++) calculateGroupVelocitiesThread(i, freqs, eigenvectors, gvel);
 #endif

@@ -439,14 +439,10 @@ namespace apl {
     phase_space.clear();
     phase_space.resize(nIQPs, vector<vector<vector<double> > >(nBranches, vector<vector<double> >(4, vector<double>(2, 0.0))));
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    if (ncpus > 1) {
-      std::function<void(int, vector<vector<vector<vector<double> > > >&,
-          const vector<vector<vector<xcomplex<double> > > >&)> fn = std::bind(&TCONDCalculator::calculateTransitionProbabilitiesPhonon, this,
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-      xt.run(nIQPs, fn, phase_space, phases);
-    } else {
-      for (int i = 0; i < nIQPs; i++) calculateTransitionProbabilitiesPhonon(i, phase_space, phases);
-    }
+    std::function<void(int, vector<vector<vector<vector<double> > > >&,
+        const vector<vector<vector<xcomplex<double> > > >&)> fn = std::bind(&TCONDCalculator::calculateTransitionProbabilitiesPhonon, this,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    xt.run(nIQPs, fn, phase_space, phases);
 #else
     for (int i = 0; i < nIQPs; i++) calculateTransitionProbabilitiesPhonon(i, phase_space, phases);
 #endif
@@ -1075,15 +1071,11 @@ namespace apl {
 #ifdef AFLOW_MULTITHREADS_ENABLE
     int ncpus = _pc->getNCPUs();
     if (ncpus > nIQPs) ncpus = nIQPs;
-    if (ncpus > 1) {
-      xthread::xThread xt(ncpus, 1);
-      std::function<void(int, const vector<vector<double> >&,
-          vector<vector<double> >&)> fn = std::bind(&TCONDCalculator::calcAnharmRates, this,
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-      xt.run(nIQPs, fn, occ, rates);
-    } else {
-      for (int i = 0; i < nIQPs; i++) calcAnharmRates(i, occ, rates);
-    }
+    xthread::xThread xt(ncpus, 1);
+    std::function<void(int, const vector<vector<double> >&,
+        vector<vector<double> >&)> fn = std::bind(&TCONDCalculator::calcAnharmRates, this,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    xt.run(nIQPs, fn, occ, rates);
 #else
     for (int i = 0; i < nIQPs; i++) calcAnharmRates(i, occ, rates);
 #endif
@@ -1159,16 +1151,12 @@ namespace apl {
 #ifdef AFLOW_MULTITHREADS_ENABLE
     int ncpus = _pc->getNCPUs();
     if (ncpus > nIQPs) ncpus = nIQPs;
-    if (ncpus > 1) {
-      xthread::xThread xt(ncpus, 1);
-      std::function<void(int, const vector<vector<double> >&,
-          const vector<vector<xvector<double> > >&,
-          vector<vector<xvector<double> > >&)> fn = std::bind(&TCONDCalculator::calculateDelta, this,
-            std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
-      xt.run(nIQPs, fn, occ, mfd, delta);
-    } else {
-      for (int i = 0; i < nIQPs; i++) calculateDelta(i, occ, mfd, delta);
-    }
+    xthread::xThread xt(ncpus, 1);
+    std::function<void(int, const vector<vector<double> >&,
+        const vector<vector<xvector<double> > >&,
+        vector<vector<xvector<double> > >&)> fn = std::bind(&TCONDCalculator::calculateDelta, this,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+    xt.run(nIQPs, fn, occ, mfd, delta);
 #else
     for (int i = 0; i < nIQPs; i++) calculateDelta(i, occ, mfd, delta);
 #endif

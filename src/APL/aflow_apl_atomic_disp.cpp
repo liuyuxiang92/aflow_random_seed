@@ -99,13 +99,9 @@ namespace apl {
 #ifdef AFLOW_MULTITHREADS_ENABLE
     int ncpus = _pc->getNCPUs();
     if (ncpus > nq) ncpus = nq;
-    if (ncpus > 1) {
-      xthread::xThread xt(ncpus, 1);
-      std::function<void(int)> fn = std::bind(&AtomicDisplacements::calculateEigenvectorsInThread, this, std::placeholders::_1);
-      xt.run(nq, fn);
-    } else {
-      for (int i = 0; i < nq; ++i) calculateEigenvectorsInThread(i);
-    }
+    xthread::xThread xt(ncpus, 1);
+    std::function<void(int)> fn = std::bind(&AtomicDisplacements::calculateEigenvectorsInThread, this, std::placeholders::_1);
+    xt.run(nq, fn);
 #else
     for (int i = 0; i < nq; ++i) calculateEigenvectorsInThread(i);
 #endif

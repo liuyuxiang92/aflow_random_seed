@@ -709,13 +709,9 @@ namespace aflowlib {
     int max_cpu = 16;
     if (ncpus < 1) ncpus = 1;
     if (ncpus > max_cpu) ncpus = max_cpu;
-    if (ncpus > 1) {
-      xthread::xThread xt(ncpus, 1);
-      std::function<void(int, const vector<string>&, const vector<string>&)> fn = std::bind(&AflowDB::buildTable, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-      xt.run(_N_AUID_TABLES_, fn, columns, types);
-    } else {
-      for (uint i = 0; i < _N_AUID_TABLES_; i++) buildTable(i, columns, types);
-    }
+    xthread::xThread xt(ncpus, 1);
+    std::function<void(int, const vector<string>&, const vector<string>&)> fn = std::bind(&AflowDB::buildTable, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    xt.run(_N_AUID_TABLES_, fn, columns, types);
 #else
     for (uint i = 0; i < _N_AUID_TABLES_; i++) buildTable(i, columns, types);
 #endif
@@ -1175,13 +1171,9 @@ namespace aflowlib {
       if (stats.nentries < 50000) cpu_max = 8;
       if (stats.nentries < 10000) cpu_max = 4;
       if (ncpus > cpu_max) ncpus = cpu_max;
-      if (ncpus > 1) {
-        xthread::xThread xt(ncpus, 1);
-        std::function<void(int, const vector<string>&, vector<DBStats>&)> fn = std::bind(&AflowDB::getColStats, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
-        xt.run(_N_AUID_TABLES_, fn, tables, colstats);
-      } else {
-        for (int i = 0; i < _N_AUID_TABLES_; i++) getColStats(i, tables, colstats);
-      }
+      xthread::xThread xt(ncpus, 1);
+      std::function<void(int, const vector<string>&, vector<DBStats>&)> fn = std::bind(&AflowDB::getColStats, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+      xt.run(_N_AUID_TABLES_, fn, tables, colstats);
 #else
       for (int i = 0; i < _N_AUID_TABLES_; i++) getColStats(i, tables, colstats);
 #endif

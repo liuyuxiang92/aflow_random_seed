@@ -231,13 +231,9 @@ namespace apl {
     int ncpus = _pc->getNCPUs();
 
     int nqps = (int) _qpoints.size();
-    if (ncpus > 1) {
-      xthread::xThread xt(ncpus, 1);
-      std::function<void(int)> fn = std::bind(&PhononDispersionCalculator::calculateInOneThread, this, std::placeholders::_1);
-      xt.run(nqps, fn);
-    } else {
-      for (int i = 0; i < nqps; i++) calculateInOneThread(i);
-    }
+    xthread::xThread xt(ncpus, 1);
+    std::function<void(int)> fn = std::bind(&PhononDispersionCalculator::calculateInOneThread, this, std::placeholders::_1);
+    xt.run(nqps, fn);
 #else
     for (int i = 0; i < nqps; i++) calculateInOneThread(i);
 #endif
