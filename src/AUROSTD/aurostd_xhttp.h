@@ -20,6 +20,7 @@ namespace aurostd{
     std::string query;
   };
 
+  int httpGetStatus(const std::string &url);
   int httpGetStatus(const std::string &url, std::string &output);
   int httpGetStatus(const std::string &url, std::string &output, std::map<std::string, std::string> &header);
 

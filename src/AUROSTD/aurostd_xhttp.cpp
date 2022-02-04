@@ -487,6 +487,19 @@ namespace aurostd {
 
   // Start of external callable functions
 
+
+  /// @brief Retrieve data from an url string
+  /// @param url_str content url
+  /// @return HTTP status code (-1 on failure)
+  int httpGetStatus(const std::string &url_str) {
+    URL url = httpParseURL(url_str);
+    std::string output;
+    int status_code = -1;
+    std::map <std::string, std::string> header;
+    httpGet(url, output, status_code, header);
+    return status_code;
+  }
+
   /// @brief Retrieve data from an url string
   /// @param url_str content url
   /// @param output message body

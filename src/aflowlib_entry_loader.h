@@ -11,6 +11,7 @@
 #define _AFLOWLIB_ENTRY_LOADER_H_
 
 #include <unordered_set>
+#include <unordered_map>
 
 namespace aflowlib {
   class EntryLoader : public xStream {
@@ -19,12 +20,6 @@ namespace aflowlib {
       //constructors - START
       EntryLoader(ostream& oss=cout);
       EntryLoader(ofstream& FileMESSAGE,ostream& oss=cout);
-      EntryLoader(const aurostd::xoption& flags,ostream& oss=cout);
-      EntryLoader(const aurostd::xoption& flags,ofstream& FileMESSAGE,ostream& oss=cout);
-      EntryLoader(const string& sinput,ostream& oss=cout);
-      EntryLoader(const string& sinput,ofstream& FileMESSAGE,ostream& oss=cout);
-      EntryLoader(const string& sinput,const aurostd::xoption& flags,ostream& oss=cout);
-      EntryLoader(const string& sinput,const aurostd::xoption& flags,ofstream& FileMESSAGE,ostream& oss=cout);
       EntryLoader(const EntryLoader& b);
       //constructors - STOP
       ~EntryLoader();
@@ -41,39 +36,37 @@ namespace aflowlib {
         NONE,
         FAILED
       };
-      vector<Source> m_source_order = {Source::SQLITE, Source::AFLUX,
-                                       Source::FILESYSTEM, Source::RESTAPI};
 
+      // Settings
       string m_sqlite_file = DEFAULT_AFLOW_DB_FILE;
       string m_aflux_server = "aflowlib.duke.edu";
       string m_aflux_path = "/API/aflux/v1.0/";
+      //TODO use server & path from aflux rc
       std::map<std::string, std::string> m_aflux_directives {
           {"format", "aflow"},
           {"paging", "0"}};
-
-      //Settings
       bool m_entries_unique = true;
       Source m_current_source = Source::NONE;
 
-      //attributes
-      bool m_initialized;
-      bool m_input_processed;
-      std::shared_ptr<aflowlib::AflowDB> m_sqlite_db_ptr;
-
-      aurostd::xoption m_elflags;
-      string m_sinput;
       _aflags m_aflags; //NOT an input, it's not required, just for directory manipulation
-      vector<vector<vector<aflowlib::_aflowlib_entry> > > m_ventries; //organize as 3-layer, always easier to go from 3-layer to 1-layer
-      vector<aflowlib::_aflowlib_entry> m_lib_entries;
+      //TODO understand usage
+
+
+      // Attributes
+      std::shared_ptr<aflowlib::AflowDB> m_sqlite_db_ptr;
       std::unordered_set<std::string> m_auid_list; // as sets are stored sorted enables faster find compared to a vector
 
+      // Data views
+      std::shared_ptr<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>> m_entries_flat;
+      std::shared_ptr<std::unordered_map<short, std::unordered_map<
+                      std::string, std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>>> m_entries_layered_map;
+
+
+
       //initializers
-      bool initialize(ostream& oss);
-      bool initialize(ofstream& FileMESSAGE,ostream& oss);
-      bool initialize();
-      bool initialize(const aurostd::xoption& flags,ostream& oss);
-      bool initialize(const aurostd::xoption& flags,ofstream& FileMESSAGE,ostream& oss);
-      bool initialize(const aurostd::xoption& flags);
+      void initialize(ostream& oss);
+      void initialize(ofstream& FileMESSAGE,ostream& oss);
+      void initialize();
 
       //generic loader
       void loadAUID(string AUID);
@@ -91,13 +84,20 @@ namespace aflowlib {
 
       void loadSqliteWhere(const std::string & where);
 
-      void loadAFlags();
+      void loadText(const std::vector<std::string> & raw_data_lines);
 
-      //getters
-      void retrieveOutput(string& soutput);
-      void retrieveOutput(vector<aflowlib::_aflowlib_entry>& ventries);
-      void retrieveOutput(vector<vector<aflowlib::_aflowlib_entry> >& ventries);
-      void retrieveOutput(vector<vector<vector<aflowlib::_aflowlib_entry> > >& ventries);
+      //getter for views
+      void getEntriesViewFlat(std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>> & result);
+      void getEntriesViewTwoLayer(std::vector<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>> & result);
+      void getEntriesViewThreeLayer(std::vector<std::vector<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> & result);
+      void getEntriesViewMap(std::unordered_map<short, std::unordered_map<std::string, std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> & result);
+
+      //getter that copy data into new format
+      void getEntriesFlat(std::vector<aflowlib::_aflowlib_entry> & result);
+      void getEntriesTwoLayer(std::vector<std::vector<aflowlib::_aflowlib_entry>> & result);
+      void getEntriesThreeLayer(std::vector<std::vector<std::vector<aflowlib::_aflowlib_entry>>> & result);
+
+
     private:
       //NECESSARY private CLASS METHODS - START
       void free();
@@ -107,11 +107,6 @@ namespace aflowlib {
       string buildAFLUXQuery(const std::map<string, string> & matchbook);
       void selectSource();
 
-      void processInput();
-      void sanitizeAFLUXSummons();  //uint n=1; return first page, n from AFLUX paper
-      uint AFLUXSummons2Entries();
-      void setAFLUXSummons4ElementsString();
-      void loadEntries();
   };
 } // namespace aflowlib
 
