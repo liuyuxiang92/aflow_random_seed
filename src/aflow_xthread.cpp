@@ -11,8 +11,16 @@
 #include "aflow.h"
 #include "APL/aflow_apl.h"
 
+// Global mutex that prevents two xThread instances from checking the number
+// of available CPUs at the same time.
+static std::mutex xthread_cpu_check;
+
 namespace xthread {
 
+  /// @brief Constructur for xThread
+  ///
+  /// @param nmax Maximum number of CPUs used by xThread (default: 0 for all available CPUs)
+  /// @param nmin Mininum number of CPUs required to spawn thread workers default: 0 for nmin = nmax)
   xThread::xThread(int nmax, int nmin) {
     free();
     setCPUs(nmax, nmin);
@@ -47,6 +55,10 @@ namespace xthread {
     progress_bar_set = false;
   }
 
+  /// @brief Sets the minimum and maximum number of CPUs used for threading
+  ///
+  /// @param nmax Maximum number of CPUs used by xThread (default: 0 for all available CPUs)
+  /// @param nmin Mininum number of CPUs required to spawn thread workers default: 0 for nmin = nmax)
   void xThread::setCPUs(int nmax, int nmin) {
     if (nmax < nmin) std::swap(nmax, nmin);
     if (nmax <= 0) nmax = init::GetCPUCores();
@@ -54,6 +66,9 @@ namespace xthread {
     if (nmin <= 0) ncpus_min = nmax;
   }
 
+  /// @brief Tells xThread that it has to update a progress bar when running
+  ///
+  /// @param oss The ostream for the progress bar
   void xThread::setProgressBar(ostream& oss) {
     progress_bar = &oss;
     progress_bar_set = true;
@@ -63,45 +78,72 @@ namespace xthread {
     progress_bar_set = false;
   }
 
+  /// @brief Worker called by the threads
+  ///
+  /// @param task_index The index of the next bin to run, shared across all threads
+  /// @param ntasks The number of task over which the function is parallelized
+  /// @param func The function to be called by the worker
+  /// @param args The arguments passed into func, if any
   template <typename F, typename... A>
-  void xThread::spawnWorker(int& task_index, int nbins,
+  void xThread::spawnWorker(int& task_index, int ntasks,
                             F& func, A&... args) {
+    // Initial distribution of the tasks over all threads
     int icurr = -1;
-    if (task_index < nbins) {
-      std::unique_lock<std::mutex> lk(mtx);
+    if (task_index < ntasks) {
+      mtx.lock();
       icurr = task_index++;
+      mtx.unlock();
     } else {
       return;
     }
 
-    while (icurr < nbins) {
-      func(icurr, args...);
-      std::unique_lock<std::mutex> lk(mtx);
+    while (icurr < ntasks) {
+      func(icurr, args...); // Call function
+      // Update the task index to the next available task
+      mtx.lock();
       icurr = task_index++;
-      if (progress_bar_set && (task_index <= nbins)) pflow::updateProgressBar(task_index, nbins, *progress_bar);
+      if (progress_bar_set && (task_index <= ntasks)) pflow::updateProgressBar(task_index, ntasks, *progress_bar);
+      mtx.unlock();
     }
   }
 
+  /// @brief Executes a function over at least ncpus_min and at most ncus_max threads
+  ///
+  /// @param ntasks The number of bins over which the function is parallelized
+  /// @param func The function to be called by the worker
+  /// @param args The arguments passed into func, if any
   template <typename F, typename... A>
-  void xThread::run(int nbins, F& func, A&... args) {
+  void xThread::run(int ntasks, F& func, A&... args) {
+    // First check if enough threads are available using XHOST.CPU_active,
+    // which every multi-threaded call should update.
+    // This prevents threaded functions that spawn other multi-threaded
+    // processes from allocating more threads than the machine can afford.
+    // This only works within a single AFLOW run
     uint sleep_second = 10;
     int ncpus_max_available = init::GetCPUCores();
     int ncpus_available = ncpus_max_available - XHOST.CPU_active;
+    int ncpus = 0;
     while (ncpus_available < ncpus_min) {
+      xthread_cpu_check.lock();
       ncpus_available = ncpus_max_available - XHOST.CPU_active;
+      if (ncpus_available >= ncpus_min) {
+        ncpus = (ncpus_available > ncpus_max)?ncpus_max:ncpus_available;
+        // "reserve" threads globally
+        XHOST.CPU_active += ncpus;
+      }
+      xthread_cpu_check.unlock();
       aurostd::Sleep(sleep_second);
     }
-    int ncpus = (ncpus_available > ncpus_max)?ncpus_max:ncpus_available;
-    XHOST.CPU_active += ncpus;
+
+    // Initialize progress bar
+    if (progress_bar_set) pflow::updateProgressBar(0, ntasks, *progress_bar);
 
     int task_index = 0;
-    if (progress_bar_set) pflow::updateProgressBar(0, nbins, *progress_bar);
-
     if (ncpus > 1) {
       vector<std::thread*> threads;
       for (int i = 0; i < ncpus; i++) {
         threads.push_back(new std::thread(&xThread::spawnWorker<F, A...>, this,
-                                          std::ref(task_index), nbins,
+                                          std::ref(task_index), ntasks,
                                           std::ref(func), std::ref(args)...)
         );
       }
@@ -110,13 +152,17 @@ namespace xthread {
         delete t;
       }
     } else {
-      while (task_index < nbins) {
+      // No need for thread overhead when ncpus == 1
+      while (task_index < ntasks) {
         func(task_index, args...);
-        if (progress_bar_set) pflow::updateProgressBar(++task_index, nbins, *progress_bar);
+        if (progress_bar_set) pflow::updateProgressBar(++task_index, ntasks, *progress_bar);
       }
     }
 
+    // "free" threads globally
+    xthread_cpu_check.lock();
     XHOST.CPU_active -= ncpus;
+    xthread_cpu_check.unlock();
   }
 
 }
