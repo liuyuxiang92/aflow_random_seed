@@ -2949,7 +2949,7 @@ vector<vector<int> > getThreadDistribution(const int&, const int&);  //ME2019021
 namespace xthread {
   class xThread {
     public:
-      xThread(int nmax=1, int nmin=0);
+      xThread(int nmax=0, int nmin=0);
       xThread(const xThread& xt);
       const xThread& operator=(const xThread& xt);
       ~xThread();

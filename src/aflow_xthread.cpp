@@ -49,8 +49,9 @@ namespace xthread {
 
   void xThread::setCPUs(int nmax, int nmin) {
     if (nmax < nmin) std::swap(nmax, nmin);
+    if (nmax <= 0) nmax = init::GetCPUCores();
     ncpus_max = nmax;
-    if (nmin == 0) ncpus_min = nmax;
+    if (nmin <= 0) ncpus_min = nmax;
   }
 
   void xThread::setProgressBar(ostream& oss) {
@@ -191,9 +192,8 @@ namespace xthread {
 
     //POCC
     //POccCalculator::calculatePhononDOSThread
-    std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&)> fn;
-    xt.run(i, fn, vuint, xopt, vdoscalc, vxdos);
-
+    std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&)> fnpoccapl;
+    xt.run(i, fnpoccapl, vuint, xopt, vdoscalc, vxdos);
   }
 
 }
