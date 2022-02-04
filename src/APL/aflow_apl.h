@@ -717,9 +717,9 @@ namespace apl {
       ~DOSCalculator();
       void clear(PhononCalculator&);
       void initialize(const xoption&);//AS20201203 input parameters are passed via xoption
-      void calc(int, bool VERBOSE=false);
-      void calc(int, double, bool VERBOSE=false);
-      void calc(int, double, double, double, bool VERBOSE=false);  //ME20200203
+      void calc(int, bool VERBOSE=true);
+      void calc(int, double, bool VERBOSE=true);
+      void calc(int, double, double, double, bool VERBOSE=true);  //ME20200203
       void writePDOS(const string&);
       void writePDOS(string, string);  //[PN]
       xDOSCAR createDOSCAR() const;  //ME20190614

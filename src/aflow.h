@@ -2974,7 +2974,7 @@ namespace xthread {
       bool progress_bar_set;
 
       template <typename F, typename... A>
-      void spawnWorker(int& task_counter, int ntasks, F& func, A&... args);
+      void spawnWorker(int& task_counter, int& progress_bar_counter, int ntasks, F& func, A&... args);
   };
 }
 #endif

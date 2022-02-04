@@ -61,9 +61,8 @@ namespace xthread {
   /// @param nmin Mininum number of CPUs required to spawn thread workers default: 0 for nmin = nmax)
   void xThread::setCPUs(int nmax, int nmin) {
     if (nmax < nmin) std::swap(nmax, nmin);
-    if (nmax <= 0) nmax = init::GetCPUCores();
-    ncpus_max = nmax;
-    if (nmin <= 0) ncpus_min = nmax;
+    ncpus_max = (nmax > 0)?nmax:(init::GetCPUCores());
+    ncpus_min = (nmin > 0)?nmin:nmax;
   }
 
   /// @brief Tells xThread that it has to update a progress bar when running
@@ -85,14 +84,13 @@ namespace xthread {
   /// @param func The function to be called by the worker
   /// @param args The arguments passed into func, if any
   template <typename F, typename... A>
-  void xThread::spawnWorker(int& task_index, int ntasks,
+  void xThread::spawnWorker(int& task_index, int& progress_bar_counter, int ntasks,
                             F& func, A&... args) {
     // Initial distribution of the tasks over all threads
     int icurr = -1;
     if (task_index < ntasks) {
-      mtx.lock();
+      std::lock_guard<std::mutex> lk(mtx);
       icurr = task_index++;
-      mtx.unlock();
     } else {
       return;
     }
@@ -100,10 +98,9 @@ namespace xthread {
     while (icurr < ntasks) {
       func(icurr, args...); // Call function
       // Update the task index to the next available task
-      mtx.lock();
+      std::lock_guard<std::mutex> lk(mtx);
       icurr = task_index++;
-      if (progress_bar_set && (task_index <= ntasks)) pflow::updateProgressBar(task_index, ntasks, *progress_bar);
-      mtx.unlock();
+      if (progress_bar_set && (progress_bar_counter <= ntasks)) pflow::updateProgressBar(++progress_bar_counter, ntasks, *progress_bar);
     }
   }
 
@@ -123,27 +120,29 @@ namespace xthread {
     int ncpus_max_available = init::GetCPUCores();
     int ncpus_available = ncpus_max_available - XHOST.CPU_active;
     int ncpus = 0;
-    while (ncpus_available < ncpus_min) {
+    do {
       xthread_cpu_check.lock();
       ncpus_available = ncpus_max_available - XHOST.CPU_active;
       if (ncpus_available >= ncpus_min) {
         ncpus = (ncpus_available > ncpus_max)?ncpus_max:ncpus_available;
         // "reserve" threads globally
         XHOST.CPU_active += ncpus;
+        xthread_cpu_check.unlock();
+      } else {
+        xthread_cpu_check.unlock();
+        aurostd::Sleep(sleep_second);
       }
-      xthread_cpu_check.unlock();
-      aurostd::Sleep(sleep_second);
-    }
+    } while (ncpus_available < ncpus_min);
 
     // Initialize progress bar
     if (progress_bar_set) pflow::updateProgressBar(0, ntasks, *progress_bar);
 
-    int task_index = 0;
+    int task_index = 0, progress_bar_counter = 0;
     if (ncpus > 1) {
       vector<std::thread*> threads;
       for (int i = 0; i < ncpus; i++) {
         threads.push_back(new std::thread(&xThread::spawnWorker<F, A...>, this,
-                                          std::ref(task_index), ntasks,
+                                          std::ref(task_index), std::ref(progress_bar_counter), ntasks,
                                           std::ref(func), std::ref(args)...)
         );
       }
@@ -155,14 +154,13 @@ namespace xthread {
       // No need for thread overhead when ncpus == 1
       while (task_index < ntasks) {
         func(task_index, args...);
-        if (progress_bar_set) pflow::updateProgressBar(++task_index, ntasks, *progress_bar);
+        if (progress_bar_set) pflow::updateProgressBar(++progress_bar_counter, ntasks, *progress_bar);
       }
     }
 
     // "free" threads globally
-    xthread_cpu_check.lock();
+    std::lock_guard<std::mutex> lk(mtx);
     XHOST.CPU_active -= ncpus;
-    xthread_cpu_check.unlock();
   }
 
 }

@@ -72,7 +72,7 @@ aflow_chull.o: aflow_chull.cpp $(AFLOW_H_DEPS) aflow_chull.h aflow_chull_jupyter
 aflow_compare_structure.o: aflow_compare_structure.cpp $(AFLOW_H_DEPS) aflow_symmetry_spacegroup.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_compare_structure_function.o: aflow_compare_structure_function.cpp $(AFLOW_H_DEPS) aflow_symmetry_spacegroup.h aflow_xtalfinder_python.cpp
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 aflow_contrib_cormac.o: aflow_contrib_cormac.cpp $(AFLOW_H_DEPS)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_contrib_shidong.o: aflow_contrib_shidong.cpp $(AFLOW_H_DEPS) aflow_contrib_shidong.h aflow_contrib_shidong_auxiliary.h aflow_contrib_shidong_cluster_expansion.h
@@ -112,7 +112,7 @@ aflow_kvasp.o: aflow_kvasp.cpp $(AFLOW_H_DEPS)
 aflow_lattice.o: aflow_lattice.cpp $(AFLOW_H_DEPS)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_makefile.o: aflow_makefile.cpp $(AFLOW_H_DEPS)
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 aflow_matlab.o: aflow_matlab.cpp $(AFLOW_H_DEPS)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_mix.o: aflow_mix.cpp $(AFLOW_H_DEPS)
@@ -138,7 +138,7 @@ aflow_pocc.o: aflow_pocc.cpp APL/aflow_apl.h $(AFLOW_H_DEPS) aflow_pocc.h
 aflow_pocc_ael_agl.o: aflow_pocc_ael_agl.cpp APL/aflow_apl.h $(AFLOW_H_DEPS) aflow_ael_elasticity.h aflow_agl_debye.h aflow_pocc.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_pocc_apl.o: aflow_pocc_apl.cpp APL/aflow_apl.h $(AFLOW_H_DEPS) aflow_pocc.h
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 aflow_pocc_old.o: aflow_pocc_old.cpp APL/aflow_apl.h $(AFLOW_H_DEPS) aflow_pocc.h aflow_pocc_old.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_pthreads.o: aflow_pthreads.cpp $(AFLOW_H_DEPS)
@@ -176,9 +176,9 @@ aflow_xprototype.o: aflow_xprototype.cpp $(AFLOW_H_DEPS)
 aflow_xpseudopotentials.o: aflow_xpseudopotentials.cpp $(AFLOW_H_DEPS) aflow_xpseudopotentials_data.cpp
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_xthread.o: aflow_xthread.cpp APL/aflow_apl.h $(AFLOW_H_DEPS)
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 aflowlib_database.o: aflowlib_database.cpp $(AFLOW_H_DEPS)
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 aflowlib_libraries.o: aflowlib_libraries.cpp APL/aflow_apl.h $(AFLOW_H_DEPS) aflow_ael_elasticity.h aflow_agl_debye.h aflow_bader.h aflow_cce.h aflow_gnuplot_funcs.cpp aflow_matlab_funcs.cpp aflow_pocc.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflowlib_libraries_scrubber.o: aflowlib_libraries_scrubber.cpp $(AFLOW_H_DEPS)
@@ -192,19 +192,19 @@ APL/aflow_aapl_cluster.o: APL/aflow_aapl_cluster.cpp APL/aflow_apl.h $(AFLOW_H_D
 APL/aflow_aapl_ifcs.o: APL/aflow_aapl_ifcs.cpp APL/aflow_apl.h $(AFLOW_H_DEPS)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 APL/aflow_aapl_tcond.o: APL/aflow_aapl_tcond.cpp APL/aflow_apl.h $(AFLOW_H_DEPS)
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 APL/aflow_apl_atomic_disp.o: APL/aflow_apl_atomic_disp.cpp APL/aflow_apl.h $(AFLOW_H_DEPS)
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 APL/aflow_apl_doscalc.o: APL/aflow_apl_doscalc.cpp APL/aflow_apl.h $(AFLOW_H_DEPS)
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 APL/aflow_apl_fccalc.o: APL/aflow_apl_fccalc.cpp APL/aflow_apl.h $(AFLOW_H_DEPS)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 APL/aflow_apl_kphonons.o: APL/aflow_apl_kphonons.cpp APL/aflow_apl.h $(AFLOW_H_DEPS)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 APL/aflow_apl_pdisc.o: APL/aflow_apl_pdisc.cpp APL/aflow_apl.h $(AFLOW_H_DEPS)
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 APL/aflow_apl_phoncalc.o: APL/aflow_apl_phoncalc.cpp APL/aflow_apl.h $(AFLOW_H_DEPS)
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 APL/aflow_apl_qmesh.o: APL/aflow_apl_qmesh.cpp APL/aflow_apl.h $(AFLOW_H_DEPS)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 APL/aflow_apl_supercell.o: APL/aflow_apl_supercell.cpp APL/aflow_apl.h $(AFLOW_H_DEPS)

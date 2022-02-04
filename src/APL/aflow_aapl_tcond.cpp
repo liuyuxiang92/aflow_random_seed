@@ -439,10 +439,12 @@ namespace apl {
     phase_space.clear();
     phase_space.resize(nIQPs, vector<vector<vector<double> > >(nBranches, vector<vector<double> >(4, vector<double>(2, 0.0))));
 #ifdef AFLOW_MULTITHREADS_ENABLE
+    xt.setProgressBar(*_pc->getOSS());
     std::function<void(int, vector<vector<vector<vector<double> > > >&,
         const vector<vector<vector<xcomplex<double> > > >&)> fn = std::bind(&TCONDCalculator::calculateTransitionProbabilitiesPhonon, this,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     xt.run(nIQPs, fn, phase_space, phases);
+    xt.unsetProgressBar();
 #else
     for (int i = 0; i < nIQPs; i++) calculateTransitionProbabilitiesPhonon(i, phase_space, phases);
 #endif
