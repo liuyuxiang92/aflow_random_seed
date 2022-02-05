@@ -226,11 +226,11 @@ namespace apl {
     for (uint i = 0; i < _qpoints.size(); i++)
       _freqs.push_back(zero);
 
+    int nqps = (int) _qpoints.size();
 #ifdef AFLOW_MULTITHREADS_ENABLE
     // Get the number of CPUS
     int ncpus = _pc->getNCPUs();
 
-    int nqps = (int) _qpoints.size();
     xthread::xThread xt(ncpus, 1);
     std::function<void(int)> fn = std::bind(&PhononDispersionCalculator::calculateInOneThread, this, std::placeholders::_1);
     xt.run(nqps, fn);

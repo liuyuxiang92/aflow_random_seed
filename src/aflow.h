@@ -2961,7 +2961,15 @@ namespace xthread {
       void unsetProgressBar();
 
       template <typename F, typename... A>
+      void run(uint ntasks, F& func, A&... args);
+      template <typename F, typename... A>
       void run(int ntasks, F& func, A&... args);
+      template <typename F, typename... A>
+      void run(unsigned long long int ntasks, F& func, A&... args);
+      template <typename IT, typename F, typename... A>
+      void run(IT& it, F& func, A&... args);
+      template <typename I, typename F, typename... A>
+      void run(I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
 
     private:
       void free();
@@ -2971,10 +2979,16 @@ namespace xthread {
       int ncpus_min;
       std::mutex mtx;
       ostream* progress_bar;
+      unsigned long long int progress_bar_counter;
       bool progress_bar_set;
 
-      template <typename F, typename... A>
-      void spawnWorker(int& task_counter, int& progress_bar_counter, int ntasks, F& func, A&... args);
+      void initializeProgressBar(unsigned long long int ntasks);
+
+      template <typename I, typename F, typename... A>
+      void spawnWorker(I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
+
+      template <typename I>
+      I advance(I& it, I& end, unsigned long long int ntasks, bool update_progress_bar=false);
   };
 }
 #endif

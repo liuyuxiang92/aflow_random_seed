@@ -167,12 +167,12 @@ namespace apl {
       _freqs.push_back(zero);
     _eigen.resize(_qpoints.size(), xmatrix<xcomplex<double> >(_pc->getNumberOfBranches(), _pc->getNumberOfBranches()));  // M20190624
 
+    int nqps = (int) _qpoints.size();
 #ifdef AFLOW_MULTITHREADS_ENABLE
 
     // Get the number of CPUS
     int ncpus = _pc->getNCPUs();
 
-    int nqps = (int) _qpoints.size();
     xthread::xThread xt(ncpus, 1);
     std::function<void(int)> fn = std::bind(&DOSCalculator::calculateInOneThread, this, std::placeholders::_1);
     xt.run(nqps, fn);

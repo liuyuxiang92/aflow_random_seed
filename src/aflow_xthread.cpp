@@ -42,6 +42,7 @@ namespace xthread {
     ncpus_max = xt.ncpus_max;
     ncpus_max = xt.ncpus_min;
     progress_bar = xt.progress_bar;
+    progress_bar_counter = xt.progress_bar_counter;
     progress_bar_set = progress_bar_set;
   }
 
@@ -52,7 +53,9 @@ namespace xthread {
   void xThread::free() {
     ncpus_max = 0;
     ncpus_min = 0;
+    progress_bar = nullptr;
     progress_bar_set = false;
+    progress_bar_counter = 0;
   }
 
   /// @brief Sets the minimum and maximum number of CPUs used for threading
@@ -71,46 +74,105 @@ namespace xthread {
   void xThread::setProgressBar(ostream& oss) {
     progress_bar = &oss;
     progress_bar_set = true;
+    progress_bar_counter = 0;
   }
 
   void xThread::unsetProgressBar() {
     progress_bar_set = false;
   }
 
+  void xThread::initializeProgressBar(unsigned long long int ntasks) {
+    progress_bar_counter = 0;
+    pflow::updateProgressBar(0, ntasks, *progress_bar);
+  }
+
   /// @brief Worker called by the threads
   ///
-  /// @param task_index The index of the next bin to run, shared across all threads
-  /// @param ntasks The number of task over which the function is parallelized
+  /// @param it The iterator or task index
+  /// @param end The end() iterator or the last task index
+  /// @param ntasks Number of tasks (for the progress bar)
   /// @param func The function to be called by the worker
   /// @param args The arguments passed into func, if any
-  template <typename F, typename... A>
-  void xThread::spawnWorker(int& task_index, int& progress_bar_counter, int ntasks,
+  template <typename I, typename F, typename... A>
+  void xThread::spawnWorker(I& it, I& end,
+                            unsigned long long int ntasks,
                             F& func, A&... args) {
-    // Initial distribution of the tasks over all threads
-    int icurr = -1;
-    if (task_index < ntasks) {
-      std::lock_guard<std::mutex> lk(mtx);
-      icurr = task_index++;
-    } else {
-      return;
-    }
+    I icurr = advance(it, end, ntasks);
 
-    while (icurr < ntasks) {
+    while (icurr != end) {
       func(icurr, args...); // Call function
-      // Update the task index to the next available task
-      std::lock_guard<std::mutex> lk(mtx);
-      icurr = task_index++;
-      if (progress_bar_set && (progress_bar_counter <= ntasks)) pflow::updateProgressBar(++progress_bar_counter, ntasks, *progress_bar);
+      icurr = advance(it, end, ntasks, progress_bar_set);
     }
   }
 
-  /// @brief Executes a function over at least ncpus_min and at most ncus_max threads
+  /// @brief Advances to the next task
+  ///
+  /// @param it The iterator or task index
+  /// @param end The end() iterator or the last task index
+  /// @param ntasks Number of tasks (for the progress bar)
+  /// @param update_progress_bar Update progress bar if true (default: false)
+  ///
+  /// @return The next task index or iterator position
+  template <typename I>
+  I xThread::advance(I& it, I& end,
+                     unsigned long long int ntasks,
+                     bool update_progress_bar) {
+    std::lock_guard<std::mutex> lk(mtx);
+    if (update_progress_bar && (progress_bar_counter <= ntasks)) {
+      pflow::updateProgressBar(++progress_bar_counter, ntasks, *progress_bar);
+    }
+    return (it == end)?end:(it++);
+  }
+
+  /// @brief Overload for running threads using indices to keep track of tasks
   ///
   /// @param ntasks The number of bins over which the function is parallelized
   /// @param func The function to be called by the worker
   /// @param args The arguments passed into func, if any
   template <typename F, typename... A>
   void xThread::run(int ntasks, F& func, A&... args) {
+    if (ntasks <= 0) return;
+    int task_index = 0;
+    run<int, F, A...>(task_index, ntasks, (unsigned long long int) ntasks, func, args...);
+  }
+
+  template <typename F, typename... A>
+  void xThread::run(uint ntasks, F& func, A&... args) {
+    if (ntasks == 0) return;
+    uint task_index = 0;
+    run<uint, F, A...>(task_index, ntasks, (unsigned long long int) ntasks, func, args...);
+  }
+
+  template <typename F, typename... A>
+  void xThread::run(unsigned long long int ntasks, F& func, A&... args) {
+    if (ntasks == 0) return;
+    unsigned long long int task_index = 0;
+    run<unsigned long long int, F, A...>(task_index, ntasks, ntasks, func, args...);
+  }
+
+  /// @brief Overload for running threads using iterables
+  ///
+  /// @param it the iterable over which to parallelize
+  /// @param func The function to be called by the worker
+  /// @param args The arguments passed into func, if any
+  template <typename IT, typename F, typename... A>
+  void xThread::run(IT& it, F& func, A&... args) {
+    unsigned long long int ntasks = (unsigned long long int) std::distance(it.begin(), it.end());
+    typename IT::iterator start = it.begin();
+    typename IT::iterator end = it.end();
+    run(start, end, ntasks, func, args...);
+  }
+
+  /// @brief Executes a function over at least ncpus_min and at most ncus_max threads
+  ///
+  /// @param it The iterator or task index
+  /// @param end The end() iterator or the last task index
+  /// @param ntasks Number of tasks (for the progress bar)
+  /// @param func The function to be called by the worker
+  /// @param args The arguments passed into func, if any
+  template <typename I, typename F, typename... A>
+  void xThread::run(I& it, I& end, unsigned long long int ntasks, F& func, A&... args) {
+    if (ntasks == 0) return;
     // First check if enough threads are available using XHOST.CPU_active,
     // which every multi-threaded call should update.
     // This prevents threaded functions that spawn other multi-threaded
@@ -135,14 +197,13 @@ namespace xthread {
     } while (ncpus_available < ncpus_min);
 
     // Initialize progress bar
-    if (progress_bar_set) pflow::updateProgressBar(0, ntasks, *progress_bar);
+    if (progress_bar_set) initializeProgressBar(ntasks);
 
-    int task_index = 0, progress_bar_counter = 0;
     if (ncpus > 1) {
       vector<std::thread*> threads;
       for (int i = 0; i < ncpus; i++) {
-        threads.push_back(new std::thread(&xThread::spawnWorker<F, A...>, this,
-                                          std::ref(task_index), std::ref(progress_bar_counter), ntasks,
+        threads.push_back(new std::thread(&xThread::spawnWorker<I, F, A...>, this,
+                                          std::ref(it), std::ref(end), ntasks,
                                           std::ref(func), std::ref(args)...)
         );
       }
@@ -152,14 +213,14 @@ namespace xthread {
       }
     } else {
       // No need for thread overhead when ncpus == 1
-      while (task_index < ntasks) {
-        func(task_index, args...);
+      for (; it != end; ++it) {
+        func(it, args...);
         if (progress_bar_set) pflow::updateProgressBar(++progress_bar_counter, ntasks, *progress_bar);
       }
     }
 
     // "free" threads globally
-    std::lock_guard<std::mutex> lk(mtx);
+    std::lock_guard<std::mutex> lk(xthread_cpu_check);
     XHOST.CPU_active -= ncpus;
   }
 
@@ -167,79 +228,103 @@ namespace xthread {
 
 namespace xthread {
 
-  void initializeXThread() {
-    xThread xt;
-    int i = 0;
+  //apl::AtomicDisplacements::calculateEigenvectorsInThread
+  //apl::DOSCalculator::calculateInOneThread
+  //apl::PhononDispersionCalculator::calculateInOneThread
+  //apl::TCONDCalculator::calculateTransitionProbabilitiesIsotope
+  template void xThread::run<
+    std::function<void(int)>
+  >(int, std::function<void(int) >&
+  );
 
-    // Pure vector types
-    vector<uint> vuint;
+  //apl::PhononCalculator::calculateGroupVelocitiesThread
+  template void xThread::run<
+    std::function<void(int, vector<vector<double> >&, vector<xmatrix<xcomplex<double> > >&, vector<vector<xvector<double> > >&)>,
+    vector<vector<double> >,
+    vector<xmatrix<xcomplex<double> > >,
+    vector<vector<xvector<double> > >
+  >(int, std::function<void(int, vector<vector<double> >&, vector<xmatrix<xcomplex<double> > >&, vector<vector<xvector<double> > >&)>&,
+    vector<vector<double> >&,
+    vector<xmatrix<xcomplex<double> > >&,
+    vector<vector<xvector<double> > >&
+  );
 
-    vector<vector<double> > vvdbl;
-    const vector<vector<double> > cvvdbl = vvdbl;
-    vector<vector<vector<vector<double> > > > vvvvdbl;
-    const vector<vector<vector<vector<double> > > > cvvvvdbl = vvvvdbl;
+  //apl::TCONDCalculator::calculateTransitionProbabilitiesPhonon
+  template void xThread::run<
+    std::function<void(int, vector<vector<vector<vector<double> > > >&, const vector<vector<vector<xcomplex<double> > > >&)>,
+    vector<vector<vector<vector<double> > > >,
+    vector<vector<vector<xcomplex<double> > > >
+  >(int, std::function<void(int, vector<vector<vector<vector<double> > > >&, const vector<vector<vector<xcomplex<double> > > >&)>&,
+    vector<vector<vector<vector<double> > > >&,
+    vector<vector<vector<xcomplex<double> > > >&
+  );
 
-    vector<string> vs;
-    const vector<string> cvs;
-    vector<vector<string> > vvs;
+  //POccCalculator::calculatePhononDOSThread
+  template void xThread::run<
+    std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&)>,
+    vector<uint>,
+    aurostd::xoption,
+    vector<apl::DOSCalculator>,
+    vector<xDOSCAR>
+  >(int, std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&)>&,
+    vector<uint>&,
+    aurostd::xoption&,
+    vector<apl::DOSCalculator>&,
+    vector<xDOSCAR>&
+  );
 
-    vector<vector<vector<xcomplex<double> > > > vvvxcdbl;
+  //apl::TCONDCalculator::calculateAnharmonicRates
+  template void xThread::run<std::function<void(int, const vector<vector<double> >&, vector<vector<double> >&)>,
+    const vector<vector<double> >,
+    vector<vector<double> >
+  >(int, std::function<void(int, const vector<vector<double> >&, vector<vector<double> >&)>&,
+    const vector<vector<double> >&,
+    vector<vector<double> >&
+  );
+
+  //apl::TCONDCalculator::calculateDelta
+  template void xThread::run<
+    std::function<void(int, const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&)>,
+    const vector<vector<double> >,
+    vector<vector<xvector<double> > >,
+    vector<vector<xvector<double> > >
+  >(int, std::function<void(int, const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&)>&,
+    const vector<vector<double> >&,
+    vector<vector<xvector<double> > >&,
+    vector<vector<xvector<double> > >&
+  );
 
 
-    // xvector types
-    vector<vector<xvector<double> > > vvxvdbl;
-    const vector<vector<xvector<double> > > cvvxvdbl = vvxvdbl;
+  //aflowlib::AflowDB::createTable
+  template void xThread::run<
+    std::function<void(int, const vector<string>&, const vector<string>&)>,
+    vector<string>,
+    vector<string>
+  >(int, std::function<void(int, const vector<string>&, const vector<string>&)>&,
+    vector<string>&,
+    vector<string>&
+  );
 
-    // xmatrix types
-    vector<xmatrix<xcomplex<double> > > vxmxcdbl;
+  //aflowlib::AflowDB::getColStats
+  template void xThread::run<
+    std::function<void(int, const vector<string>&, vector<aflowlib::DBStats>&)>,
+    const vector<string>,
+    vector<aflowlib::DBStats>
+  >(int, std::function<void(int, const vector<string>&, vector<aflowlib::DBStats>&)>&,
+    const vector<string>&,
+    vector<aflowlib::DBStats>&
+  );
 
-    // special types
-    vector<aflowlib::DBStats> vdbs;
-    aurostd::xoption xopt;
-    vector<apl::DOSCalculator> vdoscalc;
-    vector<xDOSCAR> vxdos;
+  template void xThread::run<
+    void(int, vector<int>&),
+    vector<int>
+  >(int, void(&) (int, vector<int>&), vector<int>&);
 
-
-    //Instantiate function with no args
-    //apl::AtomicDisplacements::calculateEigenvectorsInThread
-    //apl::DOSCalculator::calculateInOneThread
-    //apl::PhononDispersionCalculator::calculateInOneThread
-    //apl::TCONDCalculator::calculateTransitionProbabilitiesIsotope
-    std::function<void(int)> fnnoargs;
-    xt.run(i, fnnoargs);
-
-    //AAPL
-    //apl::TCONDCalculator::calculateTransitionProbabilitiesPhonon
-    std::function<void(int, vector<vector<vector<vector<double> > > >&, const vector<vector<vector<xcomplex<double> > > >&)> fn_vvvvdbl_vvvxcdbl;
-    xt.run(i, fn_vvvvdbl_vvvxcdbl, vvvvdbl, vvvxcdbl);
-    //apl::TCONDCalculator::calculateAnharmonicRates
-    using ft_vvdbl_vvdbl = std::function<void(int, const vector<vector<double> >&, vector<vector<double> >&)>;
-    ft_vvdbl_vvdbl fn_vvdbl_vvdbl;
-    xt.run(i, fn_vvdbl_vvdbl, cvvdbl, vvdbl);
-
-    //apl::TCONDCalculator::calculateDelta
-    std::function<void(int, const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&)> fn_vvdbl_vvxvdbl_vvxvdbl;
-    xt.run(i, fn_vvdbl_vvxvdbl_vvxvdbl, cvvdbl, vvxvdbl, vvxvdbl);
-
-    //APL
-    //apl::PhononCalculator::calculateGroupVelocitiesThread
-    std::function<void(int, vector<vector<double> >&, vector<xmatrix<xcomplex<double> > >&, vector<vector<xvector<double> > >&)> fn_vvdbl_vxmxcdbl_vvxvdbl;
-    xt.run(i, fn_vvdbl_vxmxcdbl_vvxvdbl, vvdbl, vxmxcdbl, vvxvdbl);
-
-    //AflowDB
-    //aflowlib::AflowDB::createTable
-    std::function<void(int, const vector<string>&, const vector<string>&)> fn_vs_vs;
-    xt.run(i, fn_vs_vs, vs, vs);
-    //aflowlib::AflowDB::getColStats
-    std::function<void(int, const vector<string>&, vector<aflowlib::DBStats>&)> fn_vs_vdbs;
-    xt.run(i, fn_vs_vdbs, cvs, vdbs);
-
-    //POCC
-    //POccCalculator::calculatePhononDOSThread
-    std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&)> fnpoccapl;
-    xt.run(i, fnpoccapl, vuint, xopt, vdoscalc, vxdos);
-  }
-
+  template void xThread::run<
+    std::vector<int>,
+    void(std::vector<int>::iterator&, int),
+    int
+  >(std::vector<int>&, void (&) (std::vector<int>::iterator&, int), int&);
 }
 
 #endif
