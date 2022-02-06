@@ -262,6 +262,9 @@ namespace xthread {
   /// @param it the iterable over which to parallelize
   /// @param func The function to be called by the worker
   /// @param args The arguments passed into func, if any
+  ///
+  /// ntasks will be converted to unsigned long long int because
+  /// the progress bar counter in pflow is of that type.
   template <typename IT, typename F, typename... A>
   void xThread::run(IT& it, F& func, A&... args) {
     int dist = (int) std::distance(it.begin(), it.end());
@@ -288,13 +291,20 @@ namespace xthread {
     // This only works within a single AFLOW run
     uint sleep_second = 10;
     int ncpus_max_available = init::GetCPUCores();
-    int ncpus_available = ncpus_max_available - XHOST.CPU_active;
-    int ncpus = 0;
+    int nmax = ncpus_max;
+    int nmin = ncpus_min;
+    // Adjust max. and min. number of CPUs to the number of tasks
+    if ((ntasks <= (unsigned long long int) AUROSTD_MAX_INT)) {
+      int n = (unsigned long long int) ntasks;
+      if (n < nmin) nmin = n;
+      if (n < nmax) nmax = n;
+    }
+    int ncpus = 0, ncpus_available = 0;
     do {
       xthread_cpu_check.lock();
       ncpus_available = ncpus_max_available - XHOST.CPU_active;
-      if (ncpus_available >= ncpus_min) {
-        ncpus = (ncpus_available > ncpus_max)?ncpus_max:ncpus_available;
+      if (ncpus_available >= nmin) {
+        ncpus = (ncpus_available > nmax)?nmax:ncpus_available;
         // "reserve" threads globally
         XHOST.CPU_active += ncpus;
         xthread_cpu_check.unlock();
@@ -302,7 +312,7 @@ namespace xthread {
         xthread_cpu_check.unlock();
         aurostd::Sleep(sleep_second);
       }
-    } while (ncpus_available < ncpus_min);
+    } while (ncpus_available < nmin);
 
     // Initialize progress bar
     if (progress_bar_set) initializeProgressBar(ntasks);
