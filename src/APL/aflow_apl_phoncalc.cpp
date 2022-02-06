@@ -11,6 +11,7 @@
 using std::string;
 using std::vector;
 using aurostd::xvector;
+using namespace std::placeholders;
 
 static const string _APL_PHCALC_ERR_PREFIX_ = "apl::PhononCalculator::";
 
@@ -1265,8 +1266,7 @@ namespace apl {
     xthread::xThread xt(_ncpus, 1);
     std::function<void(int, vector<vector<double> >&,
         vector<xmatrix<xcomplex<double> > >&,
-        vector<vector<xvector<double> > >&)> fn = std::bind(&PhononCalculator::calculateGroupVelocitiesThread, this,
-        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+        vector<vector<xvector<double> > >&)> fn = std::bind(&PhononCalculator::calculateGroupVelocitiesThread, this, _1, _2, _3, _4);
     xt.run(nQPs, fn, freqs, eigenvectors, gvel);
 #else
     for (int i = 0; i < nQPs; i++) calculateGroupVelocitiesThread(i, freqs, eigenvectors, gvel);

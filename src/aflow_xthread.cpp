@@ -8,23 +8,35 @@
 // Contains thread manager class xThread, which executes functions in parallel
 // and handles all index/iterator management and progress bar updates.
 //
+// It supports two modes: on-the-fly task distribution (default) or with
+// pre-distributed task lists. The latter is useful for many small tasks or
+// if the tasks involve expensive pre-computation steps.
+//
 // ----------
 //
 // Usage notes:
 //
 // Requirements for the functions that can be run:
-// The function must have either an index (integer type) or an iterable to
-// parallelize over as its first parameter. Additionally, function inputs
-// cannot be prvalues.
+// For on-the-fly redistribution, the function must have either an index
+// (integer type) or an iterable to parallelize over as its first parameter.
+//
+// For predistributed execution, the function must have two integer types
+// (start and end points) as first paramters. The pre-distributed scheme
+// cannot be used with iterators and currently does not support progress bars.
+//
+// Additionally, function inputs cannot be prvalues.
 //
 // ----------
 //
 // Running functions with xThread:
 //
-// A function can be run in parallel using the run() function.
+// A function can be run in parallel with the on-the-fly scheme using the
+// run() function.
 //
 // For functions with an index: run(max_index, function, args...)
 // For functions over an iterable: run(iterable, function, args...)
+//
+// For the pre-distributed scheme: runPredistributed(max_index, function, args...)
 //
 // Every function handled by this class needs to be instantiated here to avoid
 // linker errors. There is a section on how to do this at the end of this file.
@@ -86,6 +98,7 @@
 // the type of the function inputs exactly as written in the function defintion.
 // std::bind takes an address to the function, a pointer to the class instance
 // and one std::placeholders::_N for each argument of the function.
+// Using namespace std::placeholders can make std::bind more legible.
 //
 // ----------
 //
@@ -163,15 +176,7 @@ namespace xthread {
     progress_bar_counter = 0;
   }
 
-  /// @brief Sets the minimum and maximum number of CPUs used for threading
-  ///
-  /// @param nmax Maximum number of CPUs used by xThread (default: 0 for all available CPUs)
-  /// @param nmin Mininum number of CPUs required to spawn thread workers default: 0 for nmin = nmax)
-  void xThread::setCPUs(int nmax, int nmin) {
-    if (nmax < nmin) std::swap(nmax, nmin);
-    ncpus_max = (nmax > 0)?nmax:(init::GetCPUCores());
-    ncpus_min = (nmin > 0)?nmin:nmax;
-  }
+  // Progress bar -------------------------------------------------------------
 
   /// @brief Tells xThread that it has to update a progress bar when running
   ///
@@ -193,47 +198,69 @@ namespace xthread {
     pflow::updateProgressBar(0, ntasks, *progress_bar);
   }
 
-  /// @brief Worker called by the threads
-  ///
-  /// @param it The iterator or task index
-  /// @param end The end() iterator or the last task index
-  /// @param ntasks Number of tasks (for the progress bar)
-  /// @param func The function to be called by the worker
-  /// @param args The arguments passed into func, if any
-  template <typename I, typename F, typename... A>
-  void xThread::spawnWorker(I& it, I& end,
-                            unsigned long long int ntasks,
-                            F& func, A&... args) {
-    I icurr = advance(it, end, ntasks);
+  // CPU functions ------------------------------------------------------------
 
-    while (icurr != end) {
-      func(icurr, args...); // Call function
-      icurr = advance(it, end, ntasks, progress_bar_set);
-    }
+  /// @brief Sets the minimum and maximum number of CPUs used for threading
+  ///
+  /// @param nmax Maximum number of CPUs used by xThread (default: 0 for all available CPUs)
+  /// @param nmin Mininum number of CPUs required to spawn thread workers default: 0 for nmin = nmax)
+  void xThread::setCPUs(int nmax, int nmin) {
+    if (nmax < nmin) std::swap(nmax, nmin);
+    ncpus_max = (nmax > 0)?nmax:(init::GetCPUCores());
+    ncpus_min = (nmin > 0)?nmin:nmax;
   }
 
-  /// @brief Advances to the next task
+  /// @brief Checks if enough threads are available and "reserves" them
+  /// using XHOST.CPU_active
   ///
-  /// @param it The iterator or task index
-  /// @param end The end() iterator or the last task index
-  /// @param ntasks Number of tasks (for the progress bar)
-  /// @param update_progress_bar Update progress bar if true (default: false)
+  /// @param ntasks Number of tasks
   ///
-  /// @return The next task index or iterator position
-  template <typename I>
-  I xThread::advance(I& it, I& end,
-                     unsigned long long int ntasks,
-                     bool update_progress_bar) {
-    std::lock_guard<std::mutex> lk(mtx);
-    if (update_progress_bar && (progress_bar_counter <= ntasks)) {
-      pflow::updateProgressBar(++progress_bar_counter, ntasks, *progress_bar);
+  /// @return Number of threads to use for the function
+  ///
+  /// This prevents threaded functions that spawn other multi-threaded
+  /// processes from allocating more threads than the machine can afford.
+  /// This only works within a single AFLOW run
+  int xThread::reserveThreads(unsigned long long int ntasks) {
+    uint sleep_second = 10;
+    int ncpus_max_available = init::GetCPUCores();
+    int nmax = ncpus_max;
+    int nmin = ncpus_min;
+    // Adjust max. and min. number of CPUs to the number of tasks
+    if ((ntasks <= (unsigned long long int) AUROSTD_MAX_INT)) {
+      int n = (unsigned long long int) ntasks;
+      if (n < nmin) nmin = n;
+      if (n < nmax) nmax = n;
     }
-    return (it == end)?end:(it++);
+    int ncpus = 0, ncpus_available = 0;
+    do {
+      xthread_cpu_check.lock();
+      ncpus_available = ncpus_max_available - XHOST.CPU_active;
+      if (ncpus_available >= nmin) {
+        ncpus = (ncpus_available > nmax)?nmax:ncpus_available;
+        // "reserve" threads globally
+        XHOST.CPU_active += ncpus;
+        xthread_cpu_check.unlock();
+      } else {
+        xthread_cpu_check.unlock();
+        aurostd::Sleep(sleep_second);
+      }
+    } while (ncpus_available < nmin);
+    return ncpus;
   }
+
+  /// @brief "Frees" threads in XHOST.CPU_active
+  ///
+  /// @param ncpus Number of threads to free
+  void xThread::freeThreads(int ncpus) {
+    std::lock_guard<std::mutex> lk(xthread_cpu_check);
+    XHOST.CPU_active -= ncpus;
+  }
+
+  // On-the-fly scheme --------------------------------------------------------
 
   /// @brief Overload for running threads using indices to keep track of tasks
   ///
-  /// @param ntasks The number of bins over which the function is parallelized
+  /// @param ntasks The number of tasks over which the function is parallelized
   /// @param func The function to be called by the worker
   /// @param args The arguments passed into func, if any
   template <typename F, typename... A>
@@ -279,42 +306,13 @@ namespace xthread {
   ///
   /// @param it The iterator or task index
   /// @param end The end() iterator or the last task index
-  /// @param ntasks Number of tasks (for the progress bar)
+  /// @param ntasks Number of tasks
   /// @param func The function to be called by the worker
   /// @param args The arguments passed into func, if any
   template <typename I, typename F, typename... A>
   void xThread::run(I& it, I& end, unsigned long long int ntasks, F& func, A&... args) {
-    // First check if enough threads are available using XHOST.CPU_active,
-    // which every multi-threaded call should update.
-    // This prevents threaded functions that spawn other multi-threaded
-    // processes from allocating more threads than the machine can afford.
-    // This only works within a single AFLOW run
-    uint sleep_second = 10;
-    int ncpus_max_available = init::GetCPUCores();
-    int nmax = ncpus_max;
-    int nmin = ncpus_min;
-    // Adjust max. and min. number of CPUs to the number of tasks
-    if ((ntasks <= (unsigned long long int) AUROSTD_MAX_INT)) {
-      int n = (unsigned long long int) ntasks;
-      if (n < nmin) nmin = n;
-      if (n < nmax) nmax = n;
-    }
-    int ncpus = 0, ncpus_available = 0;
-    do {
-      xthread_cpu_check.lock();
-      ncpus_available = ncpus_max_available - XHOST.CPU_active;
-      if (ncpus_available >= nmin) {
-        ncpus = (ncpus_available > nmax)?nmax:ncpus_available;
-        // "reserve" threads globally
-        XHOST.CPU_active += ncpus;
-        xthread_cpu_check.unlock();
-      } else {
-        xthread_cpu_check.unlock();
-        aurostd::Sleep(sleep_second);
-      }
-    } while (ncpus_available < nmin);
-
-    // Initialize progress bar
+    if (ntasks == 0) return;
+    int ncpus = reserveThreads(ntasks);
     if (progress_bar_set) initializeProgressBar(ntasks);
 
     if (ncpus > 1) {
@@ -337,9 +335,108 @@ namespace xthread {
       }
     }
 
-    // "free" threads globally
-    std::lock_guard<std::mutex> lk(xthread_cpu_check);
-    XHOST.CPU_active -= ncpus;
+    freeThreads(ncpus);
+  }
+
+  /// @brief Worker called by the threads
+  ///
+  /// @param it The iterator or task index
+  /// @param end The end() iterator or the last task index
+  /// @param ntasks Number of tasks (for the progress bar)
+  /// @param func The function to be called by the worker
+  /// @param args The arguments passed into func, if any
+  template <typename I, typename F, typename... A>
+  void xThread::spawnWorker(I& it, I& end,
+                            unsigned long long int ntasks,
+                            F& func, A&... args) {
+    I icurr = advance(it, end, ntasks);
+
+    while (icurr != end) {
+      func(icurr, args...); // Call function
+      icurr = advance(it, end, ntasks, progress_bar_set);
+    }
+  }
+
+  /// @brief Advances to the next task
+  ///
+  /// @param it The iterator or task index
+  /// @param end The end() iterator or the last task index
+  /// @param ntasks Number of tasks (for the progress bar)
+  /// @param update_progress_bar Update progress bar if true (default: false)
+  ///
+  /// @return The next task index or iterator position
+  template <typename I>
+  I xThread::advance(I& it, I& end,
+                     unsigned long long int ntasks,
+                     bool update_progress_bar) {
+    std::lock_guard<std::mutex> lk(mtx);
+    if (update_progress_bar && (progress_bar_counter <= ntasks)) {
+      pflow::updateProgressBar(++progress_bar_counter, ntasks, *progress_bar);
+    }
+    return (it == end)?end:(it++);
+  }
+
+  // Pre-distributed scheme ---------------------------------------------------
+
+  /// @brief Overload for running threads using indices to keep track of tasks
+  ///
+  /// @param ntasks The number of tasks over which the function is parallelized
+  /// @param func The function to be called by the worker
+  /// @param args The arguments passed into func, if any
+  ///
+  /// The overloads are not necessary, but they allow for the same instantiation
+  /// scheme as the on-the-fly methods.
+  template <typename F, typename... A>
+  void xThread::runPredistributed(int ntasks, F& func, A&... args) {
+    if (ntasks <= 0) return;
+    runPredistributed<int, F, A...>(ntasks, func, args...);
+  }
+
+  template <typename F, typename... A>
+  void xThread::runPredistributed(uint ntasks, F& func, A&... args) {
+    if (ntasks == 0) return;
+    runPredistributed<uint, F, A...>(ntasks, func, args...);
+  }
+
+  template <typename F, typename... A>
+  void xThread::runPredistributed(unsigned long long int ntasks, F& func, A&... args) {
+    if (ntasks == 0) return;
+    runPredistributed<unsigned long long int, F, A...>(ntasks, func, args...);
+  }
+
+  template <typename I, typename F, typename... A>
+  void xThread::runPredistributed(I ntasks, F& func, A&... args) {
+    if (ntasks <= 0) return;
+    int ncpus = reserveThreads(ntasks);
+
+    if (ncpus > 1) {
+      vector<std::thread*> threads;
+      I n = (I) ncpus; // convert ncpus to same type
+      I tasks_per_thread = ntasks/n;
+      I remainder = ntasks % n;
+      I startIndex = 0, endIndex = 0;
+      for (I t = 0; t < ncpus; t++) {
+        if (t < remainder) {
+          startIndex = (tasks_per_thread + 1) * t;
+          endIndex = startIndex + tasks_per_thread + 1;
+        } else {
+          startIndex = tasks_per_thread * t + remainder;
+          endIndex = startIndex + tasks_per_thread;
+        }
+        //if (progress_bar_set) {
+        //  threads.push_back(new std::thread(std::ref(func), startIndex, endIndex, std::ref(progress_bar_counter), (unsigned long long int) ntasks, std::ref(args)...));
+        //} else {
+          threads.push_back(new std::thread(std::ref(func), startIndex, endIndex, std::ref(args)...));
+        //}
+      }
+      for (std::thread* t : threads) {
+        t->join();
+        delete t;
+      }
+    } else {
+      // No need for thread overhead when ncpus == 1
+      func(0, ntasks, args...);
+    }
   }
 
 }
@@ -350,6 +447,8 @@ namespace xthread {
 // The way the instantiation needs to be done depends on whether an index or
 // an iterator is used, on whether the function is static or a std::function,
 // and on the origin of the arguments passed into run().
+//
+// On-the-fly and pre-distributed schemes are instantiated the same way though.
 //
 // ----------
 //
@@ -465,6 +564,8 @@ namespace xthread {
 
 namespace xthread {
 
+  // run ----------------------------------------------------------------------
+
   //apl::AtomicDisplacements::calculateEigenvectorsInThread
   //apl::DOSCalculator::calculateInOneThread
   //apl::PhononDispersionCalculator::calculateInOneThread
@@ -543,18 +644,16 @@ namespace xthread {
     vector<string>&
   );
 
+  // runPredistributed --------------------------------------------------------
+
   //aflowlib::AflowDB::getColStats
-  template void xThread::run<
-    std::function<void(int, const vector<string>&, const string&, const vector<string>&, vector<aflowlib::DBStats>&)>,
+  template void xThread::runPredistributed<
+    std::function<void(int, int, const vector<string>&, deque<aflowlib::DBStats>&)>,
     const vector<string>,
-    const string,
-    const vector<string>,
-    vector<aflowlib::DBStats>
-  >(int, std::function<void(int, const vector<string>&, const string&, const vector<string>&, vector<aflowlib::DBStats>&)>&,
+    deque<aflowlib::DBStats>
+  >(int, std::function<void(int, int, const vector<string>&, deque<aflowlib::DBStats>&)>&,
     const vector<string>&,
-    const string&,
-    const vector<string>&,
-    vector<aflowlib::DBStats>&
+    deque<aflowlib::DBStats>&
   );
 }
 

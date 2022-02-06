@@ -2969,6 +2969,13 @@ namespace xthread {
       template <typename IT, typename F, typename... A>
       void run(IT& it, F& func, A&... args);
 
+      template <typename F, typename... A>
+      void runPredistributed(int ntasks, F& func, A&... args);
+      template <typename F, typename... A>
+      void runPredistributed(uint ntasks, F& func, A&... args);
+      template <typename F, typename... A>
+      void runPredistributed(unsigned long long int ntasks, F& func, A&... args);
+
     private:
       void free();
       void copy(const xThread&);
@@ -2982,14 +2989,18 @@ namespace xthread {
 
       void initializeProgressBar(unsigned long long int ntasks);
 
+      int reserveThreads(unsigned long long int ntasks);
+      void freeThreads(int ncpus);
+
       template <typename I, typename F, typename... A>
       void run(I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
-
       template <typename I, typename F, typename... A>
       void spawnWorker(I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
-
       template <typename I>
       I advance(I& it, I& end, unsigned long long int ntasks, bool update_progress_bar=false);
+
+      template <typename I, typename F, typename... A>
+      void runPredistributed(I ntasks, F& func, A&... args);
   };
 }
 #endif

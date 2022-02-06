@@ -69,6 +69,7 @@
 
 using std::string;
 using std::vector;
+using namespace std::placeholders;
 
 static const string _AFLOW_DB_ERR_PREFIX_ = "AflowDB::";
 static const uint _DEFAULT_SET_LIMIT_ = 16; //DX20200317 - int -> uint
@@ -710,7 +711,7 @@ namespace aflowlib {
     if (ncpus < 1) ncpus = 1;
     if (ncpus > max_cpus) ncpus = max_cpus;
     xthread::xThread xt(ncpus, 1);
-    std::function<void(int, const vector<string>&, const vector<string>&)> fn = std::bind(&AflowDB::buildTable, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    std::function<void(int, const vector<string>&, const vector<string>&)> fn = std::bind(&AflowDB::buildTable, this, _1, _2, _3);
     xt.run(_N_AUID_TABLES_, fn, columns, types);
 #else
     for (uint i = 0; i < _N_AUID_TABLES_; i++) buildTable(i, columns, types);
@@ -1148,6 +1149,8 @@ namespace aflowlib {
     uint nloops = loops.size();
 
     DBStats stats = initDBStats(catalog, loops);
+    deque<DBStats> colstats;
+    for (int i = 0; i < _N_AUID_TABLES_; i++) colstats.push_back(stats);
     uint ncols = stats.columns.size();
     const vector<string>& types = stats.types;
 
@@ -1157,7 +1160,6 @@ namespace aflowlib {
     message << "Starting analysis for catalog " << catalog << " (" << stats.nentries << " entries).";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss);
 
-    vector<DBStats> colstats(_N_AUID_TABLES_);
     if (stats.nentries > 0) {
 #ifdef AFLOW_MULTITHREADS_ENABLE
       int ncpus = init::GetCPUCores();
@@ -1170,12 +1172,10 @@ namespace aflowlib {
       if (stats.nentries < 10000)  max_cpus = 4;
       if (ncpus > max_cpus) ncpus = max_cpus;
       xthread::xThread xt(ncpus, 1);
-      std::function<void(int, const vector<string>&, const string&, const vector<string>&, vector<DBStats>&)>
-        fn = std::bind(&AflowDB::getColStats, this, std::placeholders::_1, std::placeholders::_2,
-            std::placeholders::_3, std::placeholders::_4, std::placeholders::_5);
-      xt.run(_N_AUID_TABLES_, fn, tables, catalog, loops, colstats);
+      std::function<void(int, int, const vector<string>&, deque<DBStats>&)> fn = std::bind(&AflowDB::getColStats, this, _1, _2, _3, _4);
+      xt.runPredistributed(_N_AUID_TABLES_, fn, tables, colstats);
 #else
-      for (int i = 0; i < _N_AUID_TABLES_; i++) getColStats(i, tables, catalog, loops, colstats);
+      getColStats(0, _N_AUID_TABLES_, tables, catalog, loops);
 #endif
 
       // Properties: count, max, min, set
@@ -1256,8 +1256,7 @@ namespace aflowlib {
 
   //getColStats///////////////////////////////////////////////////////////////
   // Retrieves the statistics for each database property and the loops.
-  void AflowDB::getColStats(int i, const vector<string>& tables, const string& catalog,
-      const vector<string>& loops, vector<DBStats>& colstats) {
+  void AflowDB::getColStats(int startIndex, int endIndex, const vector<string>& tables, deque<DBStats>& colstats) {
     sqlite3* cursor;
     string function_name = XPID + _AFLOW_DB_ERR_PREFIX_ + "getColStats():";
     string message = "";
@@ -1267,33 +1266,35 @@ namespace aflowlib {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
     }
 
-    DBStats cstats = initDBStats(catalog, loops);
-    const vector<string>& cols = cstats.columns;
-    uint ncols = cols.size();
-    string where = "";
-    for (uint c = 0; c < ncols; c++) {
-      if (cstats.types[c] == "bool") {
-        where = "catalog='" + catalog + "' AND " + cols[c] + "=";
-        cstats.count[c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'true'"));
-        cstats.count[c][1] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'false'"));
-      } else {
-        where = "catalog='" + catalog + "' AND " + cols[c] + " NOT NULL";
-        cstats.count[c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where));
-      }
-      // No need to determine max, min, or set for bool
-      if ((cstats.types[c] != "bool") && (cstats.count[c][0] > 0)) {
-        // Max and  min only make sense for numbers
-        if (cstats.types[c] == "number") {
-          cstats.max[c] = getProperty(cursor, "MAX", tables[i], cols[c], where);
-          cstats.min[c] = getProperty(cursor, "MIN", tables[i], cols[c], where);
+    for (int i = startIndex; i < endIndex; i++) {
+      DBStats& cstats = colstats[i];
+      const vector<string>& cols = cstats.columns;
+      uint ncols = cols.size();
+      string where = "";
+      for (uint c = 0; c < ncols; c++) {
+        if (cstats.types[c] == "bool") {
+          where = "catalog='" + cstats.catalog + "' AND " + cols[c] + "=";
+          cstats.count[c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'true'"));
+          cstats.count[c][1] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'false'"));
+        } else {
+          where = "catalog='" + cstats.catalog + "' AND " + cols[c] + " NOT NULL";
+          cstats.count[c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where));
         }
-        cstats.set[c] = getSet(cursor, tables[i], cols[c], true, where, _DEFAULT_SET_LIMIT_ + 1);
+        // No need to determine max, min, or set for bool
+        if ((cstats.types[c] != "bool") && (cstats.count[c][0] > 0)) {
+          // Max and  min only make sense for numbers
+          if (cstats.types[c] == "number") {
+            cstats.max[c] = getProperty(cursor, "MAX", tables[i], cols[c], where);
+            cstats.min[c] = getProperty(cursor, "MIN", tables[i], cols[c], where);
+          }
+          cstats.set[c] = getSet(cursor, tables[i], cols[c], true, where, _DEFAULT_SET_LIMIT_ + 1);
+        }
       }
-    }
-    vector<std::pair<string, int> >& loops_counts = cstats.loop_counts;
-    for (std::pair<string, int>& loop : loops_counts) {
-      where = "catalog='" + catalog + "' AND loop LIKE '%\"" + loop.first + "\"%'";
-      loop.second = aurostd::string2utype<int>(getProperty("COUNT", tables[i], "loop", where));
+      vector<std::pair<string, int> >& loops = cstats.loop_counts;
+      for (std::pair<string, int>& loop : loops) {
+        where = "catalog='" + cstats.catalog + "' AND loop LIKE '%\"" + loop.first + "\"%'";
+        loop.second = aurostd::string2utype<int>(getProperty("COUNT", tables[i], "loop", where));
+      }
     }
 
     sql_code = sqlite3_close(cursor);
@@ -1301,9 +1302,6 @@ namespace aflowlib {
       message = "Could not close cursor on database file " + database_file + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
     }
-
-    std::lock_guard<std::mutex> lk(write_mutex);
-    colstats[i] = cstats;
   }
 
   //getUniqueFromJsonArrays///////////////////////////////////////////////////

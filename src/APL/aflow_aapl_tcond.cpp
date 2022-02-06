@@ -26,6 +26,7 @@ using aurostd::xmatrix;
 using aurostd::xvector;
 using aurostd::xerror;
 using std::vector;
+using namespace std::placeholders;
 
 /************************** CONSTRUCTOR/DESTRUCTOR **************************/
 
@@ -439,8 +440,7 @@ namespace apl {
 #ifdef AFLOW_MULTITHREADS_ENABLE
     xt.setProgressBar(*_pc->getOSS());
     std::function<void(int, vector<vector<vector<vector<double> > > >&,
-        const vector<vector<vector<xcomplex<double> > > >&)> fn = std::bind(&TCONDCalculator::calculateTransitionProbabilitiesPhonon, this,
-          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        const vector<vector<vector<xcomplex<double> > > >&)> fn = std::bind(&TCONDCalculator::calculateTransitionProbabilitiesPhonon, this, _1, _2, _3);
     xt.run(nIQPs, fn, phase_space, phases);
     xt.unsetProgressBar();
 #else
@@ -470,7 +470,7 @@ namespace apl {
         scattering_rates_isotope.resize(nIQPs, vector<double>(nBranches));
 
 #ifdef AFLOW_MULTITHREADS_ENABLE
-        std::function<void(int)> fn = std::bind(&TCONDCalculator::calculateTransitionProbabilitiesIsotope, this, std::placeholders::_1);
+        std::function<void(int)> fn = std::bind(&TCONDCalculator::calculateTransitionProbabilitiesIsotope, this, _1);
         xt.run(nIQPs, fn);
 #else
         for (int i = 0; i < nIQPs; i++) calculateTransitionProbabilitiesIsotope(i);
@@ -1067,8 +1067,7 @@ namespace apl {
 #ifdef AFLOW_MULTITHREADS_ENABLE
     xthread::xThread xt(_pc->getNCPUs(), 1);
     std::function<void(int, const vector<vector<double> >&,
-        vector<vector<double> >&)> fn = std::bind(&TCONDCalculator::calcAnharmRates, this,
-          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        vector<vector<double> >&)> fn = std::bind(&TCONDCalculator::calcAnharmRates, this, _1, _2, _3);
     xt.run(nIQPs, fn, occ, rates);
 #else
     for (int i = 0; i < nIQPs; i++) calcAnharmRates(i, occ, rates);
@@ -1146,8 +1145,7 @@ namespace apl {
     xthread::xThread xt(_pc->getNCPUs(), 1);
     std::function<void(int, const vector<vector<double> >&,
         const vector<vector<xvector<double> > >&,
-        vector<vector<xvector<double> > >&)> fn = std::bind(&TCONDCalculator::calculateDelta, this,
-          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+        vector<vector<xvector<double> > >&)> fn = std::bind(&TCONDCalculator::calculateDelta, this, _1, _2, _3, _4);
     xt.run(nIQPs, fn, occ, mfd, delta);
 #else
     for (int i = 0; i < nIQPs; i++) calculateDelta(i, occ, mfd, delta);
