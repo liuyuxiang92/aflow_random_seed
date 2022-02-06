@@ -169,11 +169,7 @@ namespace apl {
 
     int nqps = (int) _qpoints.size();
 #ifdef AFLOW_MULTITHREADS_ENABLE
-
-    // Get the number of CPUS
-    int ncpus = _pc->getNCPUs();
-
-    xthread::xThread xt(ncpus, 1);
+    xthread::xThread xt(_pc->getNCPUs(), 1);
     std::function<void(int)> fn = std::bind(&DOSCalculator::calculateInOneThread, this, std::placeholders::_1);
     xt.run(nqps, fn);
 #else

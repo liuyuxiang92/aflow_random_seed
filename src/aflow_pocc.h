@@ -783,7 +783,11 @@ namespace pocc {
       void calculatePhononPropertiesAPL(const vector<double>& v_temperatures);
       vector<apl::PhononCalculator> initializePhononCalculators();
       vector<xDOSCAR> getPhononDoscars(vector<apl::PhononCalculator>& vphcalc, xoption& dosopts, vector<int>& vexclude);
+#ifdef AFLOW_MULTITHREADS_ENABLE
+      void calculatePhononDOSThread(int i, const vector<uint>& vcalc, const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos, std::mutex& m);
+#else
       void calculatePhononDOSThread(int i, const vector<uint>& vcalc, const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos);
+#endif
       xDOSCAR getAveragePhononDos(double T, const vector<xDOSCAR>& vxdos);
   };
 } // namespace pocc

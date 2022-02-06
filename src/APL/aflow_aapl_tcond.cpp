@@ -418,9 +418,7 @@ namespace apl {
     string message = "Calculating transition probabilities.";
     pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    int ncpus = _pc->getNCPUs();
-    if (ncpus > nIQPs) ncpus = nIQPs;
-    xthread::xThread xt(ncpus, 1);
+    xthread::xThread xt(_pc->getNCPUs(), 1);
 #endif
     _qm->generateTetrahedra();
     // The conjugate is necessary because the three-phonon scattering processes
@@ -472,12 +470,8 @@ namespace apl {
         scattering_rates_isotope.resize(nIQPs, vector<double>(nBranches));
 
 #ifdef AFLOW_MULTITHREADS_ENABLE
-        if (ncpus > 1) {
-          std::function<void(int)> fn = std::bind(&TCONDCalculator::calculateTransitionProbabilitiesIsotope, this, std::placeholders::_1);
-          xt.run(nIQPs, fn);
-        } else {
-          for (int i = 0; i < nIQPs; i++) calculateTransitionProbabilitiesIsotope(i);
-        }
+        std::function<void(int)> fn = std::bind(&TCONDCalculator::calculateTransitionProbabilitiesIsotope, this, std::placeholders::_1);
+        xt.run(nIQPs, fn);
 #else
         for (int i = 0; i < nIQPs; i++) calculateTransitionProbabilitiesIsotope(i);
 #endif
@@ -1071,9 +1065,7 @@ namespace apl {
   vector<vector<double> > TCONDCalculator::calculateAnharmonicRates(const vector<vector<double> >& occ) {
     vector<vector<double> > rates(nIQPs, vector<double>(nBranches, 0.0));
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    int ncpus = _pc->getNCPUs();
-    if (ncpus > nIQPs) ncpus = nIQPs;
-    xthread::xThread xt(ncpus, 1);
+    xthread::xThread xt(_pc->getNCPUs(), 1);
     std::function<void(int, const vector<vector<double> >&,
         vector<vector<double> >&)> fn = std::bind(&TCONDCalculator::calcAnharmRates, this,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
@@ -1151,9 +1143,7 @@ namespace apl {
 
     vector<vector<xvector<double> > > delta(nIQPs, vector<xvector<double> >(nBranches, xvector<double>(3)));
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    int ncpus = _pc->getNCPUs();
-    if (ncpus > nIQPs) ncpus = nIQPs;
-    xthread::xThread xt(ncpus, 1);
+    xthread::xThread xt(_pc->getNCPUs(), 1);
     std::function<void(int, const vector<vector<double> >&,
         const vector<vector<xvector<double> > >&,
         vector<vector<xvector<double> > >&)> fn = std::bind(&TCONDCalculator::calculateDelta, this,

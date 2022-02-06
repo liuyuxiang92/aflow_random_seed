@@ -305,13 +305,13 @@ namespace pocc {
     pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, m_aflags, *p_FileMESSAGE, *p_oss);
 
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    int ncpus = KBIN::get_NCPUS(m_kflags);
-    if (ncpus > nruns) ncpus = nruns;
-    xthread::xThread xt(ncpus, 1);
+    std::mutex m;
+    xthread::xThread xt(KBIN::get_NCPUS(m_kflags), 1);
     std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&,
-        vector<xDOSCAR>&)> fn = std::bind(&POccCalculator::calculatePhononDOSThread, this,
-        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4, std::placeholders::_5);
-    xt.run(nruns, fn, vcalc, aplopts, vphdos, vxdos);
+        vector<xDOSCAR>&, std::mutex&)> fn = std::bind(&POccCalculator::calculatePhononDOSThread, this,
+        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+        std::placeholders::_4, std::placeholders::_5, std::placeholders::_6);
+    xt.run(nruns, fn, vcalc, aplopts, vphdos, vxdos, m);
 #else
     for (int i = 0; i < nruns; i++) calculatePhononDOSThread(i, vcalc, aplopts, vphdos, vxdos);
 #endif
@@ -319,8 +319,14 @@ namespace pocc {
     return vxdos;
   }
 
+#ifdef AFLOW_MULTITHREADS_ENABLE
   void POccCalculator::calculatePhononDOSThread(int i, const vector<uint>& vcalc,
-      const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos) {
+      const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos, std::mutex& m)
+#else
+  void POccCalculator::calculatePhononDOSThread(int i, const vector<uint>& vcalc,
+      const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos)
+#endif
+      {
     string function_name = XPID + "POccCalculator::getPhononDoscars()";
 
     // Normalize to number of branches in the parent structure
@@ -375,6 +381,9 @@ namespace pocc {
       }
       phdos.vDOS = vDOS_pocc;
     }
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    std::lock_guard<std::mutex> lk(m);
+#endif
     vxdos[i] = phdos;
   }
 

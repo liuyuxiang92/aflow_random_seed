@@ -374,7 +374,7 @@ namespace xthread {
 // template void xThread::run<
 //   void(int, const vector<int>&, const vector<double>&, vector<int>&, vector<double>&),
 //   const vector<int>,
-//   const vector<double>,
+//   vector<double>,
 //   vector<int>,
 //   vector<double>
 // >(uint, void(&) (int, const vector<int>&, const vector<double>&, vector<int>&, vector<double>&),
@@ -386,17 +386,19 @@ namespace xthread {
 //
 // The first parameter inside <> is function type with the argument types in
 // parentheses. The remaining parameters are the argument types but without &.
+// The usage of const is different (see explanation later).
 //
 // The first parameter inside () is the index type, then the function type with
 // the argument types. This time, the function type has an additional (&). The
-// parentheses are mandatory.
+// parentheses are mandatory. The remaining parameters are the argument types,
+// but with & this time.
 //
-// The remaining parameters do not follow the function definition since both
-// vector<double> are put in as &, even though one is const &. On the other
-// hand, the first vector<int> is const &, but the second is just &. The
-// important part is how it passed into xt.run(), not how it is passed into f1.
-// vdbl1 is created inside f2 as vector<double> and is thus passed into run()
-// as vector<double>&. vint1 on the other hand is passed into f2 as
+// The remaining parameters do not follow the function definition since the
+// first vector<double> does not get const, even though one is const & in the
+// function definition. On the other hand, the first vector<int> is const &.
+// The important part is how it passed into xt.run(), not how it is passed into
+// f1. vdbl1 is created inside f2 as vector<double> and is thus passed into
+// run() as vector<double>&. vint1 on the other hand is passed into f2 as
 // const vector<int>& and will thus be passed into run() as const vector<int>&.
 //
 // So, if an argument is created in the same function that calls run(), do not
@@ -410,7 +412,7 @@ namespace xthread {
 // template void xThread::run<
 //   uint, std::function<void(int, const vector<int>&, const vector<double>&, vector<int>&, vector<double>&)>,
 //   const vector<int>,
-//   const vector<double>,
+//   vector<double>,
 //   vector<int>,
 //   vector<double>
 // >(uint, std::function<(int, const vector<int>&, const vector<double>&, vector<int>&, vector<double>&)>&,
@@ -496,16 +498,18 @@ namespace xthread {
 
   //POccCalculator::calculatePhononDOSThread
   template void xThread::run<
-    std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&)>,
+    std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&, std::mutex&)>,
     vector<uint>,
     aurostd::xoption,
     vector<apl::DOSCalculator>,
-    vector<xDOSCAR>
-  >(int, std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&)>&,
+    vector<xDOSCAR>,
+    std::mutex
+  >(int, std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&, std::mutex&)>&,
     vector<uint>&,
     aurostd::xoption&,
     vector<apl::DOSCalculator>&,
-    vector<xDOSCAR>&
+    vector<xDOSCAR>&,
+    std::mutex&
   );
 
   //apl::TCONDCalculator::calculateAnharmonicRates
@@ -541,10 +545,14 @@ namespace xthread {
 
   //aflowlib::AflowDB::getColStats
   template void xThread::run<
-    std::function<void(int, const vector<string>&, vector<aflowlib::DBStats>&)>,
+    std::function<void(int, const vector<string>&, const string&, const vector<string>&, vector<aflowlib::DBStats>&)>,
+    const vector<string>,
+    const string,
     const vector<string>,
     vector<aflowlib::DBStats>
-  >(int, std::function<void(int, const vector<string>&, vector<aflowlib::DBStats>&)>&,
+  >(int, std::function<void(int, const vector<string>&, const string&, const vector<string>&, vector<aflowlib::DBStats>&)>&,
+    const vector<string>&,
+    const string&,
     const vector<string>&,
     vector<aflowlib::DBStats>&
   );

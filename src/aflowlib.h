@@ -652,7 +652,7 @@ namespace aflowlib {
 
       DBStats initDBStats(const string&, const vector<string>&);
       DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&);
-      void getColStats(int, const vector<string>&, vector<DBStats>&);
+      void getColStats(int, const vector<string>&, const string&, const vector<string>&, vector<DBStats>&);
       vector<string> getUniqueFromJsonArrays(const vector<string>&);
       string stats2json(const DBStats&);
 
