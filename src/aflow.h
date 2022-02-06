@@ -2968,8 +2968,6 @@ namespace xthread {
       void run(unsigned long long int ntasks, F& func, A&... args);
       template <typename IT, typename F, typename... A>
       void run(IT& it, F& func, A&... args);
-      template <typename I, typename F, typename... A>
-      void run(I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
 
     private:
       void free();
@@ -2983,6 +2981,9 @@ namespace xthread {
       bool progress_bar_set;
 
       void initializeProgressBar(unsigned long long int ntasks);
+
+      template <typename I, typename F, typename... A>
+      void run(I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
 
       template <typename I, typename F, typename... A>
       void spawnWorker(I& it, I& end, unsigned long long int ntasks, F& func, A&... args);

@@ -3,8 +3,111 @@
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2022           *
 // *                                                                         *
 // ***************************************************************************
-// Marco Esters
-// Contains thread manager class xThread
+// Written by Marco Esters
+//
+// Contains thread manager class xThread, which executes functions in parallel
+// and handles all index/iterator management and progress bar updates.
+//
+// ----------
+//
+// Usage notes:
+//
+// Requirements for the functions that can be run:
+// The function must have either an index (integer type) or an iterable to
+// parallelize over as its first parameter. Additionally, function inputs
+// cannot be prvalues.
+//
+// ----------
+//
+// Running functions with xThread:
+//
+// A function can be run in parallel using the run() function.
+//
+// For functions with an index: run(max_index, function, args...)
+// For functions over an iterable: run(iterable, function, args...)
+//
+// Every function handled by this class needs to be instantiated here. There
+// is a section dedicated at the end of this file with notes on how to do this.
+//
+// Static functions are called differently than non-static member functions.
+//
+// Example functions:
+// void f1(uint i, const vector<int>& vint, vector<double>& vdbl)
+//   Parallelize over vdbl
+// void f2(vector<int>::iterator& i, const xmatrix<double>& mdbl)
+//   Parallelize over vector<int> v that i will iterate over
+// void f3(int i)
+//   With ntasks number of tasks.
+//
+// If functions are static functions:
+// Static member functions can directly be plugged into run()
+//
+// f1:
+//   uint ntasks = vdbl.size();
+//   xThread xt;
+//   xt.run(ntasks, f1, vint, vdbl);
+//
+// f2:
+//   xThread xt;
+//   xt.run(v, mdbl);
+//
+// f3:
+//   xThread xt;
+//   xt.run(ntasks, f3);
+//
+// Non-static member functions with xThread:
+//
+// Member functions of a class cannot be directly plugges into run because they
+// have to be bound to an instance of the class. For example, let all functions
+// belong to class C instantiated as cls. Let f1 and f2 be called inside another
+// class function of C and let f3 be called outside.
+//
+// f1:
+//   uint ntasks = vdbl.size();
+//   xThread xt;
+//   std::function<void(uint, const vector<int>&, const vector<double>&)> fn1 =
+//     std::bind(&C::f1, this,
+//       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+//   xt.run(ntasks, fn1, vint, vdbl);
+//
+// f2:
+//   xThread xt;
+//   std::function<void(vector<int>::iterator&, const xmatrix<double>&)> fn2 =
+//     std::bind(&C::f2, this, std::placeholders::_1, std::placeholders::_2);
+//   xt.run(v, fn2, mdbl);
+//
+// f3:
+//   xThread xt;
+//   std::function<void(int)> fn3 = std::bind(&C::f3, cls*, std::placeholders::_1);
+//   xt.run(ntasks, fn3);
+//
+// The template parameter in std::function takes the function return type and
+// the type of the function inputs exactly as written in the function defintion.
+// std::bind takes an address to the function, a pointer to the class instance
+// and one std::placeholders::_N for each argument of the function.
+//
+// ----------
+//
+// Setting the number of CPUs:
+// The default constructor uses as many threads as possible, but the number of
+// CPUs can be passed into the constructor or changes via setCPUs(). A minimum
+// number of threads can be set as well. In that case, xThread will wait until
+// that minimum number of threads is available.
+//
+// ----------
+//
+// Progress bars:
+// To use a progress bar, pass an ostream into the setProgressBar() function
+// before calling run(). unsetProgressBar() removes the progress bar.
+//
+// ----------
+//
+// Thread safety:
+// xThread guarantees only that no two instances of the called function writes
+// to the same index or iterator using mutexes. It cannot guarantee that the
+// passed function itself is thread-safe. Functions that perform actions that
+// are not thread-safe should pass their own mutex as a parameter.
+//
 
 #ifdef AFLOW_MULTITHREADS_ENABLE
 
@@ -78,7 +181,9 @@ namespace xthread {
   }
 
   void xThread::unsetProgressBar() {
+    progress_bar = nullptr;
     progress_bar_set = false;
+    progress_bar_counter = 0;
   }
 
   void xThread::initializeProgressBar(unsigned long long int ntasks) {
@@ -157,7 +262,9 @@ namespace xthread {
   /// @param args The arguments passed into func, if any
   template <typename IT, typename F, typename... A>
   void xThread::run(IT& it, F& func, A&... args) {
-    unsigned long long int ntasks = (unsigned long long int) std::distance(it.begin(), it.end());
+    int dist = (int) std::distance(it.begin(), it.end());
+    if (dist <= 0) return; // Cannot iterate backwards (yet)
+    unsigned long long int ntasks = (unsigned long long int) dist;
     typename IT::iterator start = it.begin();
     typename IT::iterator end = it.end();
     run(start, end, ntasks, func, args...);
@@ -172,7 +279,6 @@ namespace xthread {
   /// @param args The arguments passed into func, if any
   template <typename I, typename F, typename... A>
   void xThread::run(I& it, I& end, unsigned long long int ntasks, F& func, A&... args) {
-    if (ntasks == 0) return;
     // First check if enough threads are available using XHOST.CPU_active,
     // which every multi-threaded call should update.
     // This prevents threaded functions that spawn other multi-threaded
@@ -328,3 +434,9 @@ namespace xthread {
 }
 
 #endif
+
+// ***************************************************************************
+// *                                                                         *
+// *           Aflow STEFANO CURTAROLO - Duke University 2003-2022           *
+// *                                                                         *
+// ***************************************************************************
