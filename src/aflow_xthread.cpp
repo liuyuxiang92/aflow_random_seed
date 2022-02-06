@@ -26,10 +26,11 @@
 // For functions with an index: run(max_index, function, args...)
 // For functions over an iterable: run(iterable, function, args...)
 //
-// Every function handled by this class needs to be instantiated here. There
-// is a section dedicated at the end of this file with notes on how to do this.
+// Every function handled by this class needs to be instantiated here to avoid
+// linker errors. There is a section on how to do this at the end of this file.
 //
 // Static functions are called differently than non-static member functions.
+// The following examples show the difference.
 //
 // Example functions:
 // void f1(uint i, const vector<int>& vint, vector<double>& vdbl)
@@ -57,7 +58,7 @@
 //
 // Non-static member functions with xThread:
 //
-// Member functions of a class cannot be directly plugges into run because they
+// Member functions of a class cannot be directly plugged into run because they
 // have to be bound to an instance of the class. For example, let all functions
 // belong to class C instantiated as cls. Let f1 and f2 be called inside another
 // class function of C and let f3 be called outside.
@@ -108,6 +109,7 @@
 // passed function itself is thread-safe. Functions that perform actions that
 // are not thread-safe should pass their own mutex as a parameter.
 //
+// ----------
 
 #ifdef AFLOW_MULTITHREADS_ENABLE
 
@@ -332,6 +334,123 @@ namespace xthread {
 
 }
 
+// Template Instantiation
+//
+// Functions run with xThread need to be instantiated to avoid linker errors.
+// The way the instantiation needs to be done depends on whether an index or
+// an iterator is used, on whether the function is static or a std::function,
+// and on the origin of the arguments passed into run().
+//
+// ----------
+//
+// Instantiating functions using an index:
+//
+// It is best to learn by example. Take the following function f1:
+//
+// void f1(int, const vector<int>&, const vector<double>&, vector<int>&, vector<double>&);
+//
+// Let if be called inside function f2:
+//
+// bool f2(const vector<int>& vint1, vector<double>& vdbl2) {
+//   vector<int> vint2;
+//   vector<double> vdbl1;
+//   uint ntasks = vdbl.size();
+//   xthread::xThread xt;
+//   xt.run(ntasks, f1, vint1, vdbl1, vint2, vdbl2);
+// }
+//
+// The instantiation is:
+//
+// template void xThread::run<
+//   void(int, const vector<int>&, const vector<double>&, vector<int>&, vector<double>&),
+//   const vector<int>,
+//   const vector<double>,
+//   vector<int>,
+//   vector<double>
+// >(uint, void(&) (int, const vector<int>&, const vector<double>&, vector<int>&, vector<double>&),
+//   const vector<int>&,
+//   vector<double>&,
+//   vector<int>&,
+//   vector<double>&
+// );
+//
+// The first parameter inside <> is function type with the argument types in
+// parentheses. The remaining parameters are the argument types but without &.
+//
+// The first parameter inside () is the index type, then the function type with
+// the argument types. This time, the function type has an additional (&). The
+// parentheses are mandatory.
+//
+// The remaining parameters do not follow the function definition since both
+// vector<double> are put in as &, even though one is const &. On the other
+// hand, the first vector<int> is const &, but the second is just &. The
+// important part is how it passed into xt.run(), not how it is passed into f1.
+// vdbl1 is created inside f2 as vector<double> and is thus passed into run()
+// as vector<double>&. vint1 on the other hand is passed into f2 as
+// const vector<int>& and will thus be passed into run() as const vector<int>&.
+//
+// So, if an argument is created in the same function that calls run(), do not
+// use const inside (). If it is passed down by another function as const &,
+// use const &.
+//
+//
+// If f2 was converted to a std::function, e.g. via std::bind for non-static
+// member function, the instantiation is:
+//
+// template void xThread::run<
+//   uint, std::function<void(int, const vector<int>&, const vector<double>&, vector<int>&, vector<double>&)>,
+//   const vector<int>,
+//   const vector<double>,
+//   vector<int>,
+//   vector<double>
+// >(uint, std::function<(int, const vector<int>&, const vector<double>&, vector<int>&, vector<double>&)>&,
+//   const vector<int>&,
+//   vector<double>&,
+//   vector<int>&,
+//   vector<double>&
+// );
+//
+// Note: "template void" will always be "template void" since it is the type of
+// xThread::run(). It does not depend on the types of f1 and f2.
+//
+// ----------
+//
+// Instantiating functions using an iterator:
+//
+// Take the function f1:
+//
+// void f1(vector<int>::iterator& it, const vector<double>&);
+//
+// Let it be called as:
+//
+//   vector<int> v1;
+//   vector<double> v2;
+//   xthread::xThread xt;
+//   xt.run(v1, v2);
+//
+// The instantiation is then:
+//
+//   template void xThread::run<
+//     vector<int>,
+//     void(vector<int>::iterator&, const vector<double>&),
+//     vector<double>
+//   >(
+//     vector<int>&,
+//     void (&) (vector<int>::iterator&, const vector<double>&),
+//     vector<double>&
+//   );
+//
+// Note that the iterable has to appear as the first template parameter.
+// The rules and caveats for member functions and const references are the same
+// as for functions using an index.
+//
+// ----------
+//
+// All instantiations should be added below with a comment on which function is
+// instantiated. One instantiation can cover multiple functions.
+//
+// ----------
+
 namespace xthread {
 
   //apl::AtomicDisplacements::calculateEigenvectorsInThread
@@ -340,7 +459,7 @@ namespace xthread {
   //apl::TCONDCalculator::calculateTransitionProbabilitiesIsotope
   template void xThread::run<
     std::function<void(int)>
-  >(int, std::function<void(int) >&
+  >(int, std::function<void(int)>&
   );
 
   //apl::PhononCalculator::calculateGroupVelocitiesThread
@@ -400,7 +519,6 @@ namespace xthread {
     vector<vector<xvector<double> > >&
   );
 
-
   //aflowlib::AflowDB::createTable
   template void xThread::run<
     std::function<void(int, const vector<string>&, const vector<string>&)>,
@@ -420,17 +538,6 @@ namespace xthread {
     const vector<string>&,
     vector<aflowlib::DBStats>&
   );
-
-  template void xThread::run<
-    void(int, vector<int>&),
-    vector<int>
-  >(int, void(&) (int, vector<int>&), vector<int>&);
-
-  template void xThread::run<
-    std::vector<int>,
-    void(std::vector<int>::iterator&, int),
-    int
-  >(std::vector<int>&, void (&) (std::vector<int>::iterator&, int), int&);
 }
 
 #endif
