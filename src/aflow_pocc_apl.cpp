@@ -384,7 +384,7 @@ namespace pocc {
 #ifdef AFLOW_MULTITHREADS_ENABLE
     std::lock_guard<std::mutex> lk(m);
 #endif
-    vxdos[i] = phdos;
+    vxdos[i] = std::move(phdos);
   }
 
   xDOSCAR POccCalculator::getAveragePhononDos(double T, const vector<xDOSCAR>& vxdos) {

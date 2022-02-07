@@ -433,6 +433,8 @@ namespace xthread {
       // No need for thread overhead when ncpus == 1
       func(0, ntasks, args...);
     }
+
+    freeThreads(ncpus);
   }
 
 }
@@ -645,30 +647,16 @@ namespace xthread {
   //aflowlib::AflowDB::getColStats
   template void xThread::runPredistributed<
     std::function<void(
-      int, int, const string&,
-      const vector<string>&, const vector<string>&,
-      const vector<string>&, const vector<string>&,
-      vector<vector<vector<int> > >&, vector<vector<int> >&,
-      vector<vector<vector<string> > >&, vector<vector<vector<string> > >&
+      int, int, const vector<string>&, vector<aflowlib::DBStats>&
     )>,
-    const string,
-    const vector<string>, vector<string>,
-    const vector<string>, const vector<string>,
-    vector<vector<vector<int> > >, vector<vector<int> >,
-    vector<vector<vector<string> > >, vector<vector<vector<string> > >
+    const vector<string>,
+    vector<aflowlib::DBStats>
   >(int,
     std::function<void(
-      int, int, const string&,
-      const vector<string>&, const vector<string>&,
-      const vector<string>&, const vector<string>&,
-      vector<vector<vector<int> > >&, vector<vector<int> >&,
-      vector<vector<vector<string> > >&, vector<vector<vector<string> > >&
+      int, int, const vector<string>&, vector<aflowlib::DBStats>&
     )>&,
-    const string&,
-    const vector<string>&, vector<string>&,
-    const vector<string>&, const vector<string>&,
-    vector<vector<vector<int> > >&, vector<vector<int> >&,
-    vector<vector<vector<string> > >&, vector<vector<vector<string> > >&
+    const vector<string>&,
+    vector<aflowlib::DBStats>&
   );
 }
 

@@ -54,6 +54,7 @@
 #include <time.h>
 #include <typeinfo>
 #include <unistd.h>
+#include <unordered_map> //ME20220207
 #include <signal.h>  //ME20191125 - needed for AflowDB
 #include <vector>
 #include <list> //CO20170806 - need for POCC
