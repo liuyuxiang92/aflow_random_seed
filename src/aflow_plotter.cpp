@@ -1785,8 +1785,8 @@ namespace plotter {
   //generateDosPlot///////////////////////////////////////////////////////////
   // Generates the data for a DOS plot. 
   // ME20200305 - added DOS data checking
-  void generateDosPlot(stringstream& out, const xDOSCAR& xdos, const xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return generateDosPlot(out,xdos,plotoptions,FileMESSAGE,oss);} //CO20200404
-  void generateDosPlot(stringstream& out, const xDOSCAR& xdos, const xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
+  void generateDosPlot(stringstream& out,const xDOSCAR& xdos,xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return generateDosPlot(out,xdos,plotoptions,FileMESSAGE,oss);} //CO20200404
+  void generateDosPlot(stringstream& out,const xDOSCAR& xdos,xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
     string soliloquy=XPID+"plotter::generateDosPlot():";
     deque<deque<deque<double> > > dos;
@@ -1944,6 +1944,10 @@ namespace plotter {
     } else {
       string message = "Unknown projection scheme " + projection + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _INPUT_ILLEGAL_);
+    }
+    if(plotoptions.flag("LEGEND_HORIZONTAL")==false && labels.size()>4){  //CO20211227, avoid overlap between legend and DOS
+      plotoptions.flag("LEGEND_HORIZONTAL",true);
+      plotoptions.push_attached("LEGEND_MAXCOLS","5");
     }
     string outformat = plotoptions.getattachedscheme("OUTPUT_FORMAT");
     if (outformat == "GNUPLOT") {
