@@ -1024,6 +1024,55 @@ namespace aflowlib {
     }
     //CO202010213 START - patching so --lib2raw can run from anywhere
   }
+} // namespace aflowlib
+
+namespace aflowlib {
+  void setAURL(aflowlib::_aflowlib_entry& aflowlib_data,const string& directory_LIB,bool LOCAL){  //CO20220124
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"aflowlib::setAURL():";
+
+    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+    
+    if(LOCAL) {
+      aflowlib_data.aurl=aflowlib_data.auid=directory_LIB; //dummy
+    } else {
+      // build aflowlib_data.aurl
+      aflowlib_data.aurl=AFLOWLIB_SERVER_DEFAULT+":"+directory_LIB;
+
+      if(true){
+        //aurostd::StringSubst(aflowlib_data.aurl,"/mnt/MAIN/STAGING/qrats_finished_runs/LIB6/carbide","common"); //CO20200731 DEBUGGING ONLY
+        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/common","common"); //CO20200731 DEBUGGING ONLY
+        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/scratch/common","common"); //CO20200731 DEBUGGING ONLY
+        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/SCRATCH/common","common"); //CO20200731 DEBUGGING ONLY
+        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/work/common","common"); //CO20200731 DEBUGGING ONLY
+        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/WORK/common","common"); //CO20200731 DEBUGGING ONLY
+        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/archive/common","common"); //CO20200731 DEBUGGING ONLY
+        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/ARCHIVE/common","common"); //CO20200731 DEBUGGING ONLY
+        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/home/"+XHOST.user+"/common","common"); //CO20200731 - dev
+      }
+
+      if(LDEBUG){cerr << soliloquy << " aurl(PRE )=" << aflowlib_data.aurl << endl;}
+
+      if(aurostd::substring2bool(aflowlib_data.aurl,"LIBRARYX")) { aurostd::StringSubst(aflowlib_data.aurl,"common/GNDSTATE/LIBRARYX/LIB","AFLOWDATA/LIB2_RAW");aflowlib_data.catalog="LIBRARYX"; } // [HISTORIC]
+      if(aurostd::substring2bool(aflowlib_data.aurl,"ICSD")) { aurostd::StringSubst(aflowlib_data.aurl,"common/ICSD/LIB","AFLOWDATA/ICSD_WEB");aflowlib_data.catalog="ICSD"; }
+      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB0")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB0/LIB","AFLOWDATA/LIB0_RAW");aflowlib_data.catalog="LIB0"; }
+      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB1")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB1/LIB","AFLOWDATA/LIB1_RAW");aflowlib_data.catalog="LIB1"; }
+      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB2")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB2/LIB","AFLOWDATA/LIB2_RAW");aflowlib_data.catalog="LIB2"; }
+      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB3")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB3/LIB","AFLOWDATA/LIB3_RAW");aflowlib_data.catalog="LIB3"; }
+      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB4")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB4/LIB","AFLOWDATA/LIB4_RAW");aflowlib_data.catalog="LIB4"; }
+      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB5")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB5/LIB","AFLOWDATA/LIB5_RAW");aflowlib_data.catalog="LIB5"; }
+      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB6")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB6/LIB","AFLOWDATA/LIB6_RAW");aflowlib_data.catalog="LIB6"; }
+      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB7")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB7/LIB","AFLOWDATA/LIB7_RAW");aflowlib_data.catalog="LIB7"; }
+      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB8")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB8/LIB","AFLOWDATA/LIB8_RAW");aflowlib_data.catalog="LIB8"; }
+      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB9")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB9/LIB","AFLOWDATA/LIB9_RAW");aflowlib_data.catalog="LIB9"; }
+      if(aurostd::substring2bool(aflowlib_data.aurl,"AURO")) { aurostd::StringSubst(aflowlib_data.aurl,"common/AURO/LIB","AFLOWDATA/AURO_RAW");aflowlib_data.catalog="AURO"; }
+      aurostd::StringSubst(aflowlib_data.aurl,":/AFLOWDATA",":AFLOWDATA");
+
+      // cout << soliloquy << " AURL = " << aurostd::PaddedPOST(aflowlib_data.aurl,60) << endl;//"   " << directory_LIB << endl;  //CO20181226
+      
+      if(LDEBUG){cerr << soliloquy << " aurl(POST)=" << aflowlib_data.aurl << endl;}
+    }
+  }
 }
 
 // ***************************************************************************
@@ -1321,45 +1370,10 @@ namespace aflowlib {
 
     if(LDEBUG) cerr << soliloquy << " [3]" << endl;
 
-    if(LOCAL) {
-      aflowlib_data.aurl=aflowlib_data.auid=directory_LIB; //dummy
-    } else {
-      // build aflowlib_data.aurl
-      aflowlib_data.aurl="aflowlib.duke.edu:"+directory_LIB;
+    aflowlib::setAURL(aflowlib_data,directory_LIB,LOCAL); // build aflowlib_data.aurl
 
-      if(true){
-        //aurostd::StringSubst(aflowlib_data.aurl,"/mnt/MAIN/STAGING/qrats_finished_runs/LIB6/carbide","common"); //CO20200731 DEBUGGING ONLY
-        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/common","common"); //CO20200731 DEBUGGING ONLY
-        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/scratch/common","common"); //CO20200731 DEBUGGING ONLY
-        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/SCRATCH/common","common"); //CO20200731 DEBUGGING ONLY
-        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/work/common","common"); //CO20200731 DEBUGGING ONLY
-        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/WORK/common","common"); //CO20200731 DEBUGGING ONLY
-        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/archive/common","common"); //CO20200731 DEBUGGING ONLY
-        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/ARCHIVE/common","common"); //CO20200731 DEBUGGING ONLY
-        aurostd::StringSubst(aflowlib_data.aurl,XHOST.home+"/home/"+XHOST.user+"/common","common"); //CO20200731 - dev
-      }
-
-      if(LDEBUG){cerr << soliloquy << " aurl(PRE )=" << aflowlib_data.aurl << endl;}
-
-      if(aurostd::substring2bool(aflowlib_data.aurl,"LIBRARYX")) { aurostd::StringSubst(aflowlib_data.aurl,"common/GNDSTATE/LIBRARYX/LIB","AFLOWDATA/LIB2_RAW");aflowlib_data.catalog="LIBRARYX"; } // [HISTORIC]
-      if(aurostd::substring2bool(aflowlib_data.aurl,"ICSD")) { aurostd::StringSubst(aflowlib_data.aurl,"common/ICSD/LIB","AFLOWDATA/ICSD_WEB");aflowlib_data.catalog="ICSD"; }
-      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB0")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB0/LIB","AFLOWDATA/LIB0_RAW");aflowlib_data.catalog="LIB0"; }
-      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB1")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB1/LIB","AFLOWDATA/LIB1_RAW");aflowlib_data.catalog="LIB1"; }
-      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB2")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB2/LIB","AFLOWDATA/LIB2_RAW");aflowlib_data.catalog="LIB2"; }
-      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB3")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB3/LIB","AFLOWDATA/LIB3_RAW");aflowlib_data.catalog="LIB3"; }
-      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB4")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB4/LIB","AFLOWDATA/LIB4_RAW");aflowlib_data.catalog="LIB4"; }
-      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB5")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB5/LIB","AFLOWDATA/LIB5_RAW");aflowlib_data.catalog="LIB5"; }
-      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB6")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB6/LIB","AFLOWDATA/LIB6_RAW");aflowlib_data.catalog="LIB6"; }
-      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB7")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB7/LIB","AFLOWDATA/LIB7_RAW");aflowlib_data.catalog="LIB7"; }
-      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB8")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB8/LIB","AFLOWDATA/LIB8_RAW");aflowlib_data.catalog="LIB8"; }
-      if(aurostd::substring2bool(aflowlib_data.aurl,"LIB9")) { aurostd::StringSubst(aflowlib_data.aurl,"common/LIB9/LIB","AFLOWDATA/LIB9_RAW");aflowlib_data.catalog="LIB9"; }
-      if(aurostd::substring2bool(aflowlib_data.aurl,"AURO")) { aurostd::StringSubst(aflowlib_data.aurl,"common/AURO/LIB","AFLOWDATA/AURO_RAW");aflowlib_data.catalog="AURO"; }
-      aurostd::StringSubst(aflowlib_data.aurl,":/AFLOWDATA",":AFLOWDATA");
-
-      // cout << soliloquy << " AURL = " << aurostd::PaddedPOST(aflowlib_data.aurl,60) << endl;//"   " << directory_LIB << endl;  //CO20181226
-
-      if(LDEBUG){cerr << soliloquy << " aurl(POST)=" << aflowlib_data.aurl << endl;}
-
+    if(LOCAL==false){
+      
       // build aflowlib_data.auid
 
       if(LDEBUG) cerr << soliloquy << " [AUID=0] directory_LIB=" << directory_LIB << endl;
