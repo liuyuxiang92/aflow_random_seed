@@ -707,7 +707,7 @@ namespace AFLOW_PTHREADS {
 
     for(i=0;i<vzip_names.size();i++){ //CO20220207 - rename zip to include _MD5SUM.zip
       if(!aurostd::FileExist(vzip_names[i])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"zip file does not exist: "+vzip_names[i],_FILE_CORRUPT_);}
-      md5sum=file2md5sum(vzip_names[i]);
+      md5sum=aurostd::file2md5sum(vzip_names[i]);
       zip_name_new=vzip_names[i];
       aurostd::StringSubst(zip_name_new,".zip","_"+md5sum+".zip");
       aurostd::file2file(vzip_names[i],zip_name_new);
