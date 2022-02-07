@@ -4050,8 +4050,8 @@ namespace plotter {
 
   // DOS
   bool dosDataAvailable(const deque<deque<deque<deque<double> > > >& vdos, int pdos); // ME20200305
-  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ostream& oss=cout);  //CO20200404
-  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+  void generateDosPlot(stringstream&,const xDOSCAR&,aurostd::xoption&,ostream& oss=cout);  //CO20200404
+  void generateDosPlot(stringstream&,const xDOSCAR&,aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
 
   // Bands
   void generateBandPlot(stringstream&, const xEIGENVAL&, const xKPOINTS&, const xstructure&, const aurostd::xoption&);
