@@ -423,11 +423,7 @@ namespace xthread {
           startIndex = tasks_per_thread * t + remainder;
           endIndex = startIndex + tasks_per_thread;
         }
-        //if (progress_bar_set) {
-        //  threads.push_back(new std::thread(std::ref(func), startIndex, endIndex, std::ref(progress_bar_counter), (unsigned long long int) ntasks, std::ref(args)...));
-        //} else {
-          threads.push_back(new std::thread(std::ref(func), startIndex, endIndex, std::ref(args)...));
-        //}
+        threads.push_back(new std::thread(std::ref(func), startIndex, endIndex, std::ref(args)...));
       }
       for (std::thread* t : threads) {
         t->join();
@@ -648,12 +644,31 @@ namespace xthread {
 
   //aflowlib::AflowDB::getColStats
   template void xThread::runPredistributed<
-    std::function<void(int, int, const vector<string>&, deque<aflowlib::DBStats>&)>,
-    const vector<string>,
-    deque<aflowlib::DBStats>
-  >(int, std::function<void(int, int, const vector<string>&, deque<aflowlib::DBStats>&)>&,
-    const vector<string>&,
-    deque<aflowlib::DBStats>&
+    std::function<void(
+      int, int, const string&,
+      const vector<string>&, const vector<string>&,
+      const vector<string>&, const vector<string>&,
+      vector<vector<vector<int> > >&, vector<vector<int> >&,
+      vector<vector<vector<string> > >&, vector<vector<vector<string> > >&
+    )>,
+    const string,
+    const vector<string>, vector<string>,
+    const vector<string>, const vector<string>,
+    vector<vector<vector<int> > >, vector<vector<int> >,
+    vector<vector<vector<string> > >, vector<vector<vector<string> > >
+  >(int,
+    std::function<void(
+      int, int, const string&,
+      const vector<string>&, const vector<string>&,
+      const vector<string>&, const vector<string>&,
+      vector<vector<vector<int> > >&, vector<vector<int> >&,
+      vector<vector<vector<string> > >&, vector<vector<vector<string> > >&
+    )>&,
+    const string&,
+    const vector<string>&, vector<string>&,
+    const vector<string>&, const vector<string>&,
+    vector<vector<vector<int> > >&, vector<vector<int> >&,
+    vector<vector<vector<string> > >&, vector<vector<vector<string> > >&
   );
 }
 

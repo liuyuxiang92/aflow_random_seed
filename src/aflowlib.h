@@ -652,8 +652,9 @@ namespace aflowlib {
 
       DBStats initDBStats(const string&, const vector<string>&);
       DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&);
-      void getColStats(int, int, const vector<string>&, deque<DBStats>&);
-      void getColStatsThread(int, const vector<string>&, deque<DBStats>&, sqlite3*);
+      void getColStats(int, int, const string&, const vector<string>&, const vector<string>&,
+          const vector<string>&, const vector<string>&, vector<vector<vector<int> > >&, vector<vector<int> >&,
+          vector<vector<vector<string> > >&, vector<vector<vector<string> > >&);
       vector<string> getUniqueFromJsonArrays(const vector<string>&);
       string stats2json(const DBStats&);
 
