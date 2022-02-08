@@ -2230,7 +2230,7 @@ namespace aflowMachL {
               xout.initialize(ROOT+"/"+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile]);
               if(!xout.GetIonicStepsData()){continue;}
               pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Processing "+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile],_LOGGER_MESSAGE_);
-              xout.WriteMTPCFG("LIB"+aurostd::utype2string(velements.size())+"/LIB/"+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile],output_ss);
+              xout.WriteMTPCFG(output_ss,"LIB"+aurostd::utype2string(velements.size())+"/LIB/"+vsystems[isystem]+"/"+vprotos[iproto]+"/"+vfiles[ifile],velements);
             }
           }
         }
