@@ -233,13 +233,15 @@ namespace xthread {
     }
     int ncpus = 0, ncpus_available = 0;
     do {
-      xthread_cpu_check.lock();
       ncpus_available = ncpus_max_available - XHOST.CPU_active;
       if (ncpus_available >= nmin) {
+        xthread_cpu_check.lock();
         ncpus = std::min(ncpus_available, nmax);
         // "reserve" threads globally
         XHOST.CPU_active += ncpus;
         xthread_cpu_check.unlock();
+      } else if ((ncpus_available == 0) && (nmin == 1)) {
+        return 1;  // Run single-threaded on the main thread
       } else {
         xthread_cpu_check.unlock();
         aurostd::Sleep(sleep_second);
@@ -591,9 +593,9 @@ namespace xthread {
 
   //lambda function inside aurostd::multithread_execute
   template void xThread::run<
-    vector<string>,
-    std::function<void(vector<string>::iterator&)>
-  >(vector<string>&, std::function<void(vector<string>::iterator&)>&);
+    deque<string>,
+    std::function<void(deque<string>::iterator&)>
+  >(deque<string>&, std::function<void(deque<string>::iterator&)>&);
 
   //apl::PhononCalculator::calculateGroupVelocitiesThread
   template void xThread::run<

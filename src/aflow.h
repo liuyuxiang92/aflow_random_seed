@@ -2944,7 +2944,6 @@ namespace sflow {
   void QDEL(string options);
   void QDEL(string options,string cmd);
 }
-vector<vector<int> > getThreadDistribution(const int&, const int&);  //ME20190218
 
 #ifdef AFLOW_MULTITHREADS_ENABLE
 //ME20220130

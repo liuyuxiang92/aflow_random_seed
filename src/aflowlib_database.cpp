@@ -748,14 +748,18 @@ namespace aflowlib {
     stringstream t;
     t << std::setfill('0') << std::setw(2) << std::hex << i;
     string table = "auid_" + t.str();
+    string auid_prefix = "\"aflow:" + t.str();
 
     string jsonfile = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".jsonl");
     vector<string> data;
     aurostd::efile2vectorstring(jsonfile, data);
     vector<vector<string> > values;
     uint ndata = data.size();
-    string aurl = "";
+    string aurl = "", auid = "";
     for (uint d = 0; d < ndata; d++) {
+      // Filter auids that are in the wrong file
+      auid = aurostd::extractJsonValueAflow(data[d], "auid");
+      if (auid.rfind(auid_prefix, 0) != 0) continue;
       // Filter non-POCC ARUNs
       aurl = aurostd::extractJsonValueAflow(data[d], "aurl");
       if ((aurl.find("ARUN") != string::npos)
