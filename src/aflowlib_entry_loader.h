@@ -39,14 +39,20 @@ namespace aflowlib {
 
       // Settings
       string m_sqlite_file = DEFAULT_AFLOW_DB_FILE;
+      string m_sqlite_alloy_file = "../testing/aflowlib_lookup.db";
       string m_aflux_server = "aflowlib.duke.edu";
       string m_aflux_path = "/API/aflux/v1.0/";
       //TODO use server & path from aflux rc
       std::map<std::string, std::string> m_aflux_directives {
           {"format", "aflow"},
           {"paging", "0"}};
+      string m_restapi_server = "aflowlib.duke.edu";
+      string m_restapi_path = "/AFLOWDATA/";
+      string m_restapi_directives = "?format=text";
+      string m_filesystem_outfile = DEFAULT_FILE_AFLOWLIB_ENTRY_OUT;
+      string m_filesystem_path = "/common/";
       bool m_entries_unique = true;
-      Source m_current_source = Source::NONE;
+
 
       _aflags m_aflags; //NOT an input, it's not required, just for directory manipulation
       //TODO understand usage
@@ -54,6 +60,7 @@ namespace aflowlib {
 
       // Attributes
       std::shared_ptr<aflowlib::AflowDB> m_sqlite_db_ptr;
+      std::shared_ptr<aflowlib::AflowDB> m_sqlite_alloy_db_ptr;
       std::unordered_set<std::string> m_auid_list; // as sets are stored sorted enables faster find compared to a vector
 
       // Data views
@@ -72,6 +79,8 @@ namespace aflowlib {
       void loadAUID(string AUID);
       void loadAUID(const vector<std::string> &AUID);
 
+      //TODO add icsd:?
+
       void loadAURL(const string& AURL);
       void loadAURL(const vector<std::string> &AURL);
       
@@ -82,9 +91,16 @@ namespace aflowlib {
       void loadAFLUXQuery(const std::string & query);
       void loadAFLUXMatchbook(const std::map<string, string> & matchbook);
 
+      void loadRestAPIQueries(const std::vector<std::string> & queries);
+
+      void loadFiles(const std::vector<std::string> & files);
+
       void loadSqliteWhere(const std::string & where);
 
       void loadText(const std::vector<std::string> & raw_data_lines);
+
+      //setter
+      bool setSource(EntryLoader::Source new_source);
 
       //getter for views
       void getEntriesViewFlat(std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>> & result);
@@ -104,8 +120,12 @@ namespace aflowlib {
       void copy(const EntryLoader& b);
       //NECESSARY END CLASS METHODS - END
 
-      string buildAFLUXQuery(const std::map<string, string> & matchbook);
+      Source m_current_source = Source::NONE;
+
+      std::string buildAFLUXQuery(const std::map<string, string> & matchbook);
+      bool cleanAUID(string & AUID);
       void selectSource();
+      void getAlloyAUIDList(const std::vector<string> & alloy, std::vector<string> & auid_list);
 
   };
 } // namespace aflowlib

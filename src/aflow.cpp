@@ -69,40 +69,73 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss){  //CO20200520
   if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
   message << "Performing EntryLoader test";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
-  auto start = std::chrono::high_resolution_clock::now();
+
+  message << "####### Test SQLITE";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
   std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>> entries;
-  std::vector<aflowlib::_aflowlib_entry> entries_copy;
   {
+    auto start = std::chrono::high_resolution_clock::now();
     aflowlib::EntryLoader el;
-//  el.m_aflux_display.emplace_back("Egap");
-//  el.m_aflux_display.emplace_back("spin_atom");
-//  el.m_entries_unique = false;
     el.m_sqlite_file = "../testing/aflowlib.db";
-//    el.m_current_source = aflowlib::EntryLoader::Source::AFLUX;
-//  el.loadAUID("aflow:d912e209c81aeb94");
-//  el.loadAUID("auid:d912e209c81aeb94");
-//  el.loadAUID("d912e209c81aeb94");
-    el.loadAlloy("NiMnPd");
-//  std::vector<string> AUID_list {"aflow:c6d8842d003b3cf8", "auid:5ddfc73e119d7d2a"};
-//  el.loadAUID(AUID_list);
+
+    el.setSource(aflowlib::EntryLoader::Source::SQLITE);
+    el.loadAlloy("NiMnW", false);
+
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     cout << "Duration: " << duration.count() << " milliseconds" << endl;
     el.getEntriesViewFlat(entries);
-    el.getEntriesFlat(entries_copy);
+    cout << "Speed: " << entries.size()/(duration.count()/1000.0) << " entries/s" << endl;
   }
 
-  cout << "After loading got " << entries.size() << " entries" << endl;
-  cout << "First 5 entries:" << endl;
-  size_t iter_count=0;
-  for (std::shared_ptr<aflowlib::_aflowlib_entry> entry: entries){
-    cout << "  AUID: " << entry->auid << endl;
-    cout << "  PP: " << entry->species_pp << endl;
-    cout << "  species: " << entry->species << endl << endl ;
-    iter_count +=1;
-    if (iter_count>4) break;
+  message << "####### Test AFLUX";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+  {
+    auto start = std::chrono::high_resolution_clock::now();
+    aflowlib::EntryLoader el;
+
+    el.setSource(aflowlib::EntryLoader::Source::AFLUX);
+    el.loadAlloy("NiMnW", false);
+
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    cout << "Duration: " << duration.count() << " milliseconds" << endl;
+    el.getEntriesViewFlat(entries);
+    cout << "Speed: " << entries.size()/(duration.count()/1000.0) << " entries/s" << endl;
   }
-  cout << "After copy got " << entries_copy.size() << " entries" << endl;
+
+  message << "####### Test FILESYSTEM";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+
+  {
+    auto start = std::chrono::high_resolution_clock::now();
+    aflowlib::EntryLoader el;
+    el.m_sqlite_alloy_file = "../testing/aflowlib_lookup.db";
+
+    el.setSource(aflowlib::EntryLoader::Source::FILESYSTEM);
+    el.loadAlloy("NiMnW", false);
+
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    cout << "Duration: " << duration.count() << " milliseconds" << endl;
+    el.getEntriesViewFlat(entries);
+    cout << "Speed: " << entries.size()/(duration.count()/1000.0) << " entries/s" << endl;
+  }
+
+  message << "####### Test RESTAPI";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  {
+    auto start = std::chrono::high_resolution_clock::now();
+    aflowlib::EntryLoader el;
+    el.m_sqlite_alloy_file = "../testing/aflowlib_lookup.db";
+
+    el.setSource(aflowlib::EntryLoader::Source::RESTAPI);
+    el.loadAlloy("NiMnW", false);
+
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    cout << "Duration: " << duration.count() << " milliseconds" << endl;
+    el.getEntriesViewFlat(entries);
+    cout << "Speed: " << entries.size()/(duration.count()/1000.0) << " entries/s" << endl;
+  }
 
   return true;
 
