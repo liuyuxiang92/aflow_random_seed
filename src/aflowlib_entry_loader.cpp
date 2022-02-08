@@ -260,9 +260,13 @@ namespace aflowlib {
     cout << "Loading " << files.size() << " entries:" << endl;
     size_t start_size=m_entries_flat->size();
     for (string file_path : files){
-//      cout << "file path: " << file_path << endl;
-      aurostd::efile2string(file_path, file_content);
-      loadText({file_content});
+//      aurostd::efile2string(file_path, file_content);
+// TODO aurostd::efile2string is very slow (10 entries/s)
+// this variant is ca 700 E/s
+      std::ifstream open_file(file_path);
+      std::stringstream buffer;
+      buffer << open_file.rdbuf();
+      loadText({buffer.str()});
     }
     message << "Loaded " << m_entries_flat->size()-start_size << " new entries (overall "<< m_entries_flat->size() << " | " << m_auid_list.size() << " unique)";
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_NOTICE_);
@@ -337,6 +341,7 @@ namespace aflowlib {
         std::string AUID_combined = aurostd::joinWDelimiter(clean_AUID, "':'");
         AUID_combined = "'"+ AUID_combined + "'";
         loadAFLUXMatchbook({{"*", ""}, {"auid", AUID_combined}});
+        break;
       }
 
       case Source::SQLITE:{
