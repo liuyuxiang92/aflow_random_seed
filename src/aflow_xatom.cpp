@@ -2783,9 +2783,10 @@ void xstructure::free() { //DX20191220 - moved all initializations from constuct
 }
 
 // Constructors
-xstructure::xstructure(const string& structure_title) {
-  free(); //DX20191220 - moved contents below into free()
-  title=structure_title;
+xstructure::xstructure(const string& structure_title) { //CO20211122
+  (*this).initialize(structure_title);  //CO20211122
+  //CO20211122 [OBSOLETE - done in initialize]free(); //DX20191220 - moved contents below into free()
+  //CO20211122 [OBSOLETE - done in initialize]title=structure_title;
 }
 
 // ifstream/istream
@@ -2811,22 +2812,24 @@ xstructure::xstructure(const stringstream& __input,int _iomode) { //DX20210129 -
   //DX20210129 [OBSOLETE - done in initialize] _input >> (*this);
 }
 
-xstructure::xstructure(const string& _input,int _iomode) {
-  free(); //DX20191220 - added free to initialize
-  stringstream strstream;
-  aurostd::efile2stringstream(_input,strstream); //CO20171025
-  (*this).iomode=_iomode;
-  (*this).directory = _input; //DX20180526 - location of xstructure
-  strstream >> (*this);
+xstructure::xstructure(const string& _input,int _iomode) {  //CO20211122
+  (*this).initialize(_input, _iomode);  //CO20211122
+  //CO20211122 [OBSOLETE - done in initialize]free(); //DX20191220 - added free to initialize
+  //CO20211122 [OBSOLETE - done in initialize]stringstream strstream;
+  //CO20211122 [OBSOLETE - done in initialize]aurostd::efile2stringstream(_input,strstream); //CO20171025
+  //CO20211122 [OBSOLETE - done in initialize](*this).iomode=_iomode;
+  //CO20211122 [OBSOLETE - done in initialize](*this).directory = _input; //DX20180526 - location of xstructure
+  //CO20211122 [OBSOLETE - done in initialize]strstream >> (*this);
 }
 
-xstructure::xstructure(const string& url,const string& file,int _iomode) {
-  free(); //DX20191220 - added free to initialize
-  stringstream strstream;
-  aurostd::url2stringstream(url+"/"+file,strstream);
-  (*this).iomode=_iomode;
-  (*this).directory = url+"/"+file; //DX20180526 - location of xstructure
-  strstream >> (*this);
+xstructure::xstructure(const string& url,const string& file,int _iomode) {  //CO20211122
+  (*this).initialize(url, file, _iomode);  //CO20211122
+  //CO20211122 [OBSOLETE - done in initialize]free(); //DX20191220 - added free to initialize
+  //CO20211122 [OBSOLETE - done in initialize]stringstream strstream;
+  //CO20211122 [OBSOLETE - done in initialize]aurostd::url2stringstream(url+"/"+file,strstream);
+  //CO20211122 [OBSOLETE - done in initialize](*this).iomode=_iomode;
+  //CO20211122 [OBSOLETE - done in initialize](*this).directory = url+"/"+file; //DX20180526 - location of xstructure
+  //CO20211122 [OBSOLETE - done in initialize]strstream >> (*this);
 }
 
 void xstructure::copy(const xstructure& bstr) {
@@ -3203,6 +3206,11 @@ void xstructure::CleanStructure() {
   clean(); //DX20191220 - uppercase to lowercase clean
 }
 
+void xstructure::initialize(const string& structure_title) { //CO20211122 - initialize structure; avoid copying of xstructure
+  free(); //DX20191220 - moved contents below into free()
+  title=structure_title;
+}
+
 void xstructure::initialize(istream& _input,int _iomode) { //DX20210129 - initialize structure; avoid copying of xstructure
   free(); //DX20191220 - added free to initialize
   (*this).iomode=_iomode;
@@ -3220,6 +3228,24 @@ void xstructure::initialize(const stringstream& __input,int _iomode) { //DX20210
   (*this).iomode=_iomode;
   stringstream _input(__input.str());
   _input >> (*this);
+}
+
+void xstructure::initialize(const string& _input,int _iomode) { //CO20211122 - initialize structure; avoid copying of xstructure
+  free(); //DX20191220 - added free to initialize
+  stringstream strstream;
+  aurostd::efile2stringstream(_input,strstream); //CO20171025
+  (*this).iomode=_iomode;
+  (*this).directory = _input; //DX20180526 - location of xstructure
+  strstream >> (*this);
+}
+
+void xstructure::initialize(const string& url,const string& file,int _iomode) { //CO20211122 - initialize structure; avoid copying of xstructure
+  free(); //DX20191220 - added free to initialize
+  stringstream strstream;
+  aurostd::url2stringstream(url+"/"+file,strstream);
+  (*this).iomode=_iomode;
+  (*this).directory = url+"/"+file; //DX20180526 - location of xstructure
+  strstream >> (*this);
 }
 
 // **************************************************************************
@@ -4672,6 +4698,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // If scale < 0 then it should be treated as the volume.
     a.neg_scale=FALSE;
     if(a.scale<0.0) {
+      //CO20211130 - the usual scaling factor is the lattice parameter
+      //for fcc, GetVol(a.lattice)=0.25
       double nvol=-1.0*(a.scale);
       double ovol=GetVol(a.lattice);
       a.scale=std::pow((double) (nvol/ovol),(double) 1.0/3.0);
