@@ -2949,14 +2949,14 @@ vector<vector<int> > getThreadDistribution(const int&, const int&);  //ME2019021
 namespace xthread {
   class xThread {
     public:
-      xThread(int nmax=0, int nmin=0);
+      xThread(int nmax=0, int nmin=1);
       xThread(const xThread& xt);
       const xThread& operator=(const xThread& xt);
       ~xThread();
 
       void clear();
 
-      void setCPUs(int nmax, int nmin=0);
+      void setCPUs(int nmax, int nmin=1);
       void setProgressBar(ostream& oss);
       void unsetProgressBar();
 

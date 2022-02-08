@@ -1263,7 +1263,7 @@ namespace apl {
     eigenvectors.resize(nQPs, xmatrix<xcomplex<double> >(nbranches, nbranches));
     vector<vector<xvector<double> > > gvel(nQPs);
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    xthread::xThread xt(_ncpus, 1);
+    xthread::xThread xt(_ncpus);
     std::function<void(int, vector<vector<double> >&,
         vector<xmatrix<xcomplex<double> > >&,
         vector<vector<xvector<double> > >&)> fn = std::bind(&PhononCalculator::calculateGroupVelocitiesThread, this, _1, _2, _3, _4);

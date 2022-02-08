@@ -25,15 +25,12 @@
 //[OBSOLETE - ME20220128] #warning "The multithread parts of AFLOW-XtalFinder will be not included, since they need gcc 4.4 and higher (C++0x support)."
 //[OBSOLETE - ME20220128] #endif
 
-//ME20220128 - Use global compiler flags
-#ifdef AFLOW_MULTITHREADS_ENABLE
-#include <thread>
-#include <mutex>
-static std::mutex _mutex_;
-#endif
+//[OBSOLETE - ME20220128] // for multi-threads on-the-fly scheme (explanation in AAPL/aflow_aapl_tcond.cpp, developed by M. Esters (ME))
+//[OBSOLETE - ME20220128] static int task_counter = 0;
 
-// for multi-threads on-the-fly scheme (explanation in AAPL/aflow_aapl_tcond.cpp, developed by M. Esters (ME))
-static int task_counter = 0;
+//ME20220207 - Changed all functions to use xThread
+
+using namespace std::placeholders;  //ME20220207
 
 // ***************************************************************************
 // XtalFinderCalculator::compareStructures() - MAIN COMPARISON FUNCTION
@@ -2879,48 +2876,27 @@ bool XtalFinderCalculator::splitComparisonIntoThreads(
 // XtalFinderCalculator::performStructureConversions() //DX20210113
 // ***************************************************************************
 void XtalFinderCalculator::performStructureConversions(
+    uint i,
     const vector<bool>& calculate_primitive_vec,
     const vector<bool>& calculate_Minkowski_vec,
     const vector<bool>& calculate_Niggli_vec){
 
   // Perform primitivizations, Minkowski reductions, or Niggli reductions
   // on the structures indicated by the corresponding vector of booleans
-  // NOTE: This on-the-fly threaded scheme follows the procedure
-  // discussed in AAPL/aflow_aapl_tcond.cpp, developed by M. Esters (ME).
 
-  int i = AUROSTD_MAX_INT;
-  int nstructures = calculate_primitive_vec.size();
-
-  if(task_counter < nstructures){
-#ifdef AFLOW_MULTITHREADS_ENABLE
-    std::unique_lock<std::mutex> lock(_mutex_);
-#endif
-    i = task_counter++;
+  // ---------------------------------------------------------------------------
+  // primitivize
+  if(calculate_primitive_vec[i]){
+    structure_containers[i].structure.GetPrimitive();
+    structure_containers[i].natoms = structure_containers[i].structure.atoms.size(); //DX20210316 - updated number of atoms
   }
-  else {
-    return;
-  }
+  // ---------------------------------------------------------------------------
+  // Minkowski
+  if(calculate_Minkowski_vec[i]){ structure_containers[i].structure.MinkowskiBasisReduction(); }
+  // ---------------------------------------------------------------------------
+  // Niggli
+  if(calculate_Niggli_vec[i]){ structure_containers[i].structure.NiggliUnitCellForm(); }
 
-  //while (task_counter < nstructures){
-  while (i < nstructures){
-    // ---------------------------------------------------------------------------
-    // primitivize
-    if(calculate_primitive_vec[i]){
-      structure_containers[i].structure.GetPrimitive();
-      structure_containers[i].natoms = structure_containers[i].structure.atoms.size(); //DX20210316 - updated number of atoms
-    }
-    // ---------------------------------------------------------------------------
-    // Minkowski
-    if(calculate_Minkowski_vec[i]){ structure_containers[i].structure.MinkowskiBasisReduction(); }
-    // ---------------------------------------------------------------------------
-    // Niggli
-    if(calculate_Niggli_vec[i]){ structure_containers[i].structure.NiggliUnitCellForm(); }
-
-#ifdef AFLOW_MULTITHREADS_ENABLE
-    std::unique_lock<std::mutex> lock(_mutex_);
-#endif
-    i = task_counter++;
-  }
 }
 
 // ***************************************************************************
@@ -2973,26 +2949,15 @@ void XtalFinderCalculator::convertStructures(
       calculate_Niggli_vec[i] = !structure_containers[i].structure.Niggli_calculated;
     }
   }
-  task_counter = 0;
 
 #ifdef AFLOW_MULTITHREADS_ENABLE
   // THREADED VERSION - START
   if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
 
-  // Run threads
-  vector<std::thread*> threads;
-  for(uint n=0; n<num_proc; n++){
-    threads.push_back(new std::thread(&XtalFinderCalculator::performStructureConversions,
-          this,
-          std::ref(calculate_primitive_vec),
-          std::ref(calculate_Minkowski_vec),
-          std::ref(calculate_Niggli_vec)));
-  }
-  // Join threads
-  for(uint t=0;t<num_proc;t++){
-    threads[t]->join();
-    delete threads[t];
-  }
+  xthread::xThread xt(num_proc);
+  std::function<void(uint, const vector<bool>&, const vector<bool>&, const vector<bool>&)> fn =
+    std::bind(&XtalFinderCalculator::performStructureConversions, this, _1, _2, _3, _4);
+  xt.run(number_of_structures, fn, calculate_primitive_vec, calculate_Minkowski_vec, calculate_Niggli_vec);
 
   // THREADED VERSION - END
 #else
@@ -3001,11 +2966,13 @@ void XtalFinderCalculator::convertStructures(
 
   // ---------------------------------------------------------------------------
   // perform the relevant structure conversions
-  performStructureConversions(
-      calculate_primitive_vec,
-      calculate_Minkowski_vec,
-      calculate_Niggli_vec);
-
+  for (uint i = 0; i < number_of_structures; i++) {
+    performStructureConversions(
+        i,
+        calculate_primitive_vec,
+        calculate_Minkowski_vec,
+        calculate_Niggli_vec);
+  }
 #endif
   message << "All structures converted.";
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
@@ -3110,23 +3077,10 @@ void XtalFinderCalculator::calculateSymmetries(uint num_proc){
 
   // Distribute threads via indices
   uint number_of_structures = structure_containers.size();
-  uint num_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
-  vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, num_threads); //DX20191107
-
-  // Run threads (DX20191108 thread pointer)
-  vector<std::thread*> threads;
-  for(uint n=0; n<num_threads; n++){
-    threads.push_back(new std::thread(&XtalFinderCalculator::calculateSpaceGroups,
-          this,
-          thread_distribution[n][0],
-          thread_distribution[n][1],
-          SG_SETTING_ANRL)); //DX20191107 [switching to getThreadDistribution]
-  }
-  // Join threads
-  for(uint t=0;t<num_threads;t++){
-    threads[t]->join();
-    delete threads[t];
-  }
+  xthread::xThread xt(num_proc);
+  std::function<void(uint, uint, uint)> fn = std::bind(&XtalFinderCalculator::calculateSpaceGroups, this, _1, _2, _3);
+  uint setting = SG_SETTING_ANRL;
+  xt.runPredistributed(number_of_structures, fn, setting);
   // THREADED VERISON - END
 
 #else
@@ -3203,22 +3157,9 @@ void XtalFinderCalculator::calculateLFAEnvironments(uint num_proc){
 
   // Distribute threads via indices
   uint number_of_structures = structure_containers.size();
-  uint num_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
-  vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, num_threads); //DX20191107
-
-  // Run threads
-  vector<std::thread*> threads;
-  for(uint n=0; n<num_threads; n++){
-    threads.push_back(new std::thread(&XtalFinderCalculator::computeLFAEnvironments,
-          this,
-          thread_distribution[n][0],
-          thread_distribution[n][1]));
-  }
-  // Join threads
-  for(uint t=0;t<num_threads;t++){
-    threads[t]->join();
-    delete threads[t];
-  }
+  xthread::xThread xt(num_proc);
+  std::function<void(uint, uint)> fn = std::bind(&XtalFinderCalculator::computeLFAEnvironments, this, _1, _2);
+  xt.runPredistributed(number_of_structures, fn);
   // THREADED VERISON - END
 
 #else
@@ -3253,22 +3194,9 @@ void XtalFinderCalculator::getNearestNeighbors(uint num_proc){
   if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
   // Distribute threads via indices
   uint number_of_structures = structure_containers.size();
-  uint num_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
-  vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, num_threads); //DX20191107
-
-  // Run threads
-  vector<std::thread*> threads;
-  for(uint n=0; n<num_threads; n++){
-    threads.push_back(new std::thread(&XtalFinderCalculator::calculateNearestNeighbors,
-          this,
-          thread_distribution[n][0],
-          thread_distribution[n][1]));
-  }
-  // Join threads
-  for(uint t=0;t<num_threads;t++){
-    threads[t]->join();
-    delete threads[t];
-  }
+  xthread::xThread xt(num_proc);
+  std::function<void(uint, uint)> fn = std::bind(&XtalFinderCalculator::calculateNearestNeighbors, this, _1, _2);
+  xt.runPredistributed(number_of_structures, fn);
   // THREADED VERISON - END
 
 #else
@@ -4160,9 +4088,10 @@ void XtalFinderCalculator::representativePrototypeForICSDRunsNEW(
 // XtalFinderCalculator::runComparisonThreads()
 // ***************************************************************************
 void XtalFinderCalculator::runComparisonThreads(
+    uint index,
     vector<StructurePrototype>& comparison_schemes,
-    const std::pair<uint,uint>& start_indices,
-    const std::pair<uint,uint>& end_indices,
+    const vector<std::pair<uint,uint> >& vstart_indices,
+    const vector<std::pair<uint,uint> >& vend_indices,
     bool same_species,
     bool scale_volume,
     bool optimize_match){
@@ -4176,6 +4105,8 @@ void XtalFinderCalculator::runComparisonThreads(
   string function_name = XPID + "XtalFinderCalculator::runComparisonThreads():";
   stringstream message;
 
+  const std::pair<uint,uint>& start_indices = vstart_indices[index];
+  const std::pair<uint,uint>& end_indices = vend_indices[index];
   uint i_min=start_indices.first; uint i_max=end_indices.first;
   uint j_min=0; uint j_max=0;
 
@@ -4339,46 +4270,28 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
   vector<std::pair<uint,uint> > start_indices, end_indices;
   uint num_comparison_threads = 1;
 
+  bool scale_volume = comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME");
+  bool optimize_match = comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH");
 #ifdef AFLOW_MULTITHREADS_ENABLE
 
+  // ---------------------------------------------------------------------------
+  // THREADED VERSION - START
   number_of_comparisons = 0;
   for(uint i=0;i<comparison_schemes.size();i++){ number_of_comparisons += comparison_schemes[i].numberOfComparisons(); }
   num_comparison_threads = aurostd::min(num_proc,number_of_comparisons);
   splitComparisonIntoThreads(comparison_schemes, num_comparison_threads, start_indices, end_indices);
-  vector<std::thread*> threads;
 
-  // ---------------------------------------------------------------------------
-  // THREADED VERSION - START
-  if(num_comparison_threads>1){
-    if(LDEBUG) { cerr << function_name << " Threaded version." << endl; }
-    for(uint n=0; n<num_comparison_threads; n++){
-      threads.push_back(new std::thread(&XtalFinderCalculator::runComparisonThreads,
-            this,
-            std::ref(comparison_schemes),
-            std::ref(start_indices[n]),
-            std::ref(end_indices[n]),
-            same_species,
-            comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME"),
-            comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH")));
-    }
-
-    // ---------------------------------------------------------------------------
-    // join threads
-    for(uint t=0;t<threads.size();t++){
-      threads[t]->join();
-      delete threads[t];
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // NON-THREADED VERISON
-  else if (num_comparison_threads==1){
-    if(LDEBUG) { cerr << function_name << " Non-threaded version." << endl; }
-    runComparisons(comparison_schemes,
-        same_species,
-        comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME"),
-        comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"));
-  }
+  xthread::xThread xt(num_comparison_threads);
+  std::function<void(uint, vector<StructurePrototype>&,
+  const vector<std::pair<uint, uint> >&, const vector<std::pair<uint, uint> >&,
+  bool, bool, bool)> fn = std::bind(&XtalFinderCalculator::runComparisonThreads, this, _1, _2, _3, _4, _5, _6, _7);
+  xt.run(num_comparison_threads, fn,
+         comparison_schemes,
+         start_indices,
+         end_indices,
+         same_species,
+         scale_volume,
+         optimize_match);
 
 #else
 
@@ -4387,8 +4300,8 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
   if(LDEBUG) { cerr << function_name << " Non-threaded version." << endl; }
   runComparisons(comparison_schemes,
       same_species,
-      comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME"),
-      comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"));
+      scale_volume,
+      optimize_match);
 
 #endif
 
@@ -4480,36 +4393,25 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
       // split into threads
       start_indices.clear(); end_indices.clear();
       splitComparisonIntoThreads(comparison_schemes, num_comparison_threads, start_indices, end_indices);
-      threads.clear();
-
-      // run threads
-      for(uint n=0; n<num_comparison_threads; n++){
-        threads.push_back(new std::thread(&XtalFinderCalculator::runComparisonThreads,
-              this,
-              std::ref(comparison_schemes),
-              std::ref(start_indices[n]),
-              std::ref(end_indices[n]),
-              same_species,
-              comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME"),
-              comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH")));
-      }
-      // join threads
-      for(uint t=0;t<threads.size();t++){
-        threads[t]->join();
-        delete threads[t];
-      }
+      xt.run(num_comparison_threads, fn,
+             comparison_schemes,
+             start_indices,
+             end_indices,
+             same_species,
+             scale_volume,
+             optimize_match);
       // THREADED VERISON - END
 #else
       //SINGLE THREAD - START
       start_indices.clear(); end_indices.clear();
       uint single_thread=1;
       splitComparisonIntoThreads(comparison_schemes, single_thread, start_indices, end_indices);
-      runComparisonThreads(comparison_schemes,
-          start_indices[0],
-          end_indices[0],
+      runComparisonThreads(0, comparison_schemes,
+          start_indices,
+          end_indices,
           same_species,
-          comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME"),
-          comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH"));
+          scale_volume,
+          optimize_match);
       //SINGLE THREAD - END
 #endif
     }
@@ -6677,8 +6579,11 @@ void XtalFinderCalculator::latticeSearch(
     // ---------------------------------------------------------------------------
     // split task into threads
     uint number_of_structures = vstrs_matched.size();
-    uint number_of_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than lattices
-    vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, number_of_threads); //DX20191107
+    xthread::xThread xt(num_proc);
+    std::function<bool(const uint, const uint, const xstructure&,
+      const vector<double>&, const xstructure&, const string&,
+      vector<xmatrix<double> >&, vector<structure_mapping_info>&, bool, bool)> search_atom_mappings
+      = std::bind(&XtalFinderCalculator::searchAtomMappings, this, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10);
 #endif
 
     // ---------------------------------------------------------------------------
@@ -6708,51 +6613,43 @@ void XtalFinderCalculator::latticeSearch(
             xstr1.BringInCell(1e-10);
 
             // ---------------------------------------------------------------------------
+            // ME20200207 - No need for vector if it's all the same and xstr1 ist const
             // create vector of variables for each thread
-            vector<xstructure> xstr1_for_thread;
-            for(uint n=0; n<num_proc; n++){
-              xstr1_for_thread.push_back(xstr1);
-            }
+            //vector<xstructure> xstr1_for_thread;
+            //for(uint n=0; n<num_proc; n++){
+            //  xstr1_for_thread.push_back(xstr1);
+            //}
 
 #ifdef AFLOW_MULTITHREADS_ENABLE
             // ---------------------------------------------------------------------------
             // threaded (DX20191107 thread pointer)
-            vector<std::thread*> threads;
             if(LDEBUG){cerr << function_name << " Searching for possible matching structures [THREADED VERSION]" << endl;}
-            for(uint n=0; n<number_of_threads; n++){
-              threads.push_back(new std::thread(&XtalFinderCalculator::searchAtomMappings,
-                    this,
-                    std::ref(xstr1_for_thread[n]),
-                    std::ref(all_nn1),
-                    std::ref(xstr2), //DX20201208
-                    std::ref(lfa_str2),
-                    std::ref(lattices), //DX20201208
-                    std::ref(vstrs_matched),
-                    thread_distribution[n][0],
-                    thread_distribution[n][1],
-                    same_species,
-                    optimize_match));
-            }
-            for(uint t=0;t<threads.size();t++){
-              threads[t]->join();
-              delete threads[t];
-            }
+            xt.runPredistributed(number_of_structures, search_atom_mappings,
+                                 xstr1,
+                                 all_nn1,
+                                 xstr2,
+                                 lfa_str2,
+                                 lattices,
+                                 vstrs_matched,
+                                 same_species,
+                                 optimize_match
+            );
 #else
             // ---------------------------------------------------------------------------
             // non-threaded
-            uint n=0;
+            //uint n=0;
             uint start_index=0;
             uint end_index=vstrs_matched.size();  //DX20191107 switching end point convention
             if(LDEBUG){cerr << function_name << " Searching for possible matching structures [NON-THREADED VERSION]" << endl;}
             searchAtomMappings(
-                xstr1_for_thread[n],
+                start_index,
+                end_index,
+                xstr1_for_thread,
                 all_nn1,
                 xstr2, //DX20201208
                 lfa_str2,
                 lattices,
                 vstrs_matched,
-                start_index,
-                end_index,
                 same_species,
                 optimize_match);
 #endif
@@ -6892,13 +6789,13 @@ namespace compare {
 // XtalFinderCalculator::searchAtomMappings()
 // ***************************************************************************
 bool XtalFinderCalculator::searchAtomMappings(
+    uint start_index, uint end_index,
     const xstructure& xstr1,
     const vector<double>& all_nn1,
     const xstructure& xstr2,
     const string& lfa,
     vector<xmatrix<double> >& lattices,
     vector<structure_mapping_info>& vstrs_matched,
-    const uint start_index, const uint end_index,
     bool same_species,
     bool optimize_match){
 
@@ -7659,30 +7556,19 @@ void XtalFinderCalculator::calculatePrototypeDesignations(
   message << "Determining the AFLOW standard designation.";
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
-  task_counter = 0;
 #ifdef AFLOW_MULTITHREADS_ENABLE
   if(LDEBUG) {cerr << function_name << " Number of threads=" << num_proc << endl;}
   // ---------------------------------------------------------------------------
-  // split task into threads
-  uint number_of_structures = prototypes.size();
-  uint number_of_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
-  //PRE-DISTRIBUTED vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, number_of_threads); //DX20191107
-
-  // ---------------------------------------------------------------------------
   // [THREADED] determine AFLOW standard designation
-  vector<std::thread*> threads;
-  for(uint n=0; n<number_of_threads; n++){
-    threads.push_back(new std::thread(&XtalFinderCalculator::getPrototypeDesignations,this,std::ref(prototypes)));
-    //PRE-DISTRIBUTED threads.push_back(new std::thread(&XtalFinderCalculator::getPrototypeDesignations,this,std::ref(prototypes),thread_distribution[n][0], thread_distribution[n][1])); //DX20191107
-  }
-  for(uint t=0;t<threads.size();t++){
-    threads[t]->join();
-    delete threads[t];
-  }
+  xthread::xThread xt(num_proc);
+  std::function<void(vector<StructurePrototype>::iterator&)> fn =
+    std::bind(&XtalFinderCalculator::getPrototypeDesignations, this, _1);
+  xt.run(prototypes, fn);
+  // ---------------------------------------------------------------------------
 #else
   // NON-THREADED
   if(LDEBUG) {cerr << function_name << " Non-threaded version. Number of threads=" << num_proc << endl;}
-  getPrototypeDesignations(prototypes);
+  for (auto it = prototypes.begin(); it != prototypes.end(); ++it) getPrototypeDesignations(it);
 #endif
 
 }
@@ -7690,36 +7576,45 @@ void XtalFinderCalculator::calculatePrototypeDesignations(
 // ***************************************************************************
 // XtalFinderCalculator::getPrototypeDesignations()
 // ***************************************************************************
+// OBSOLETE ME20220207 - Replace with iterator for xThread
+//void XtalFinderCalculator::getPrototypeDesignations(
+//    vector<StructurePrototype>::iterator& prototypes){
+//
+//  // NOTE: This on-the-fly threaded scheme follows the procedure
+//  // discussed in AAPL/aflow_aapl_tcond.cpp, developed by M. Esters (ME).
+//
+//  int i = AUROSTD_MAX_INT;
+//  int nstructures = prototypes.size();
+//
+//  if(task_counter < nstructures){
+//#ifdef AFLOW_MULTITHREADS_ENABLE
+//    std::unique_lock<std::mutex> lock(_mutex_);
+//#endif
+//    i = task_counter++;
+//  }
+//  else {
+//    return;
+//  }
+//
+//  while (i < nstructures){
+//    anrl::structure2anrl(prototypes[i].structure_representative->structure,false); //DX20190829 - false for do not recalulate symmetry, save time
+//
+//    prototypes[i].aflow_label = prototypes[i].structure_representative->structure.prototype;
+//    prototypes[i].aflow_parameter_list = prototypes[i].structure_representative->structure.prototype_parameter_list;
+//    prototypes[i].aflow_parameter_values = prototypes[i].structure_representative->structure.prototype_parameter_values;
+//#ifdef AFLOW_MULTITHREADS_ENABLE
+//    std::unique_lock<std::mutex> lock(_mutex_);
+//#endif
+//    i = task_counter++;
+//  }
+//}
+
 void XtalFinderCalculator::getPrototypeDesignations(
-    vector<StructurePrototype>& prototypes){
-
-  // NOTE: This on-the-fly threaded scheme follows the procedure
-  // discussed in AAPL/aflow_aapl_tcond.cpp, developed by M. Esters (ME).
-
-  int i = AUROSTD_MAX_INT;
-  int nstructures = prototypes.size();
-
-  if(task_counter < nstructures){
-#ifdef AFLOW_MULTITHREADS_ENABLE
-    std::unique_lock<std::mutex> lock(_mutex_);
-#endif
-    i = task_counter++;
-  }
-  else {
-    return;
-  }
-
-  while (i < nstructures){
-    anrl::structure2anrl(prototypes[i].structure_representative->structure,false); //DX20190829 - false for do not recalulate symmetry, save time
-
-    prototypes[i].aflow_label = prototypes[i].structure_representative->structure.prototype;
-    prototypes[i].aflow_parameter_list = prototypes[i].structure_representative->structure.prototype_parameter_list;
-    prototypes[i].aflow_parameter_values = prototypes[i].structure_representative->structure.prototype_parameter_values;
-#ifdef AFLOW_MULTITHREADS_ENABLE
-    std::unique_lock<std::mutex> lock(_mutex_);
-#endif
-    i = task_counter++;
-  }
+    vector<StructurePrototype>::iterator& proto){
+  anrl::structure2anrl((*proto).structure_representative->structure,false); //DX20190829 - false for do not recalulate symmetry, save time
+  (*proto).aflow_label = (*proto).structure_representative->structure.prototype;
+  (*proto).aflow_parameter_list = (*proto).structure_representative->structure.prototype_parameter_list;
+  (*proto).aflow_parameter_values = (*proto).structure_representative->structure.prototype_parameter_values;
 }
 
 // ***************************************************************************
@@ -7776,26 +7671,16 @@ void XtalFinderCalculator::calculateMatchingAFLOWPrototypes(
   bool quiet_orig = XHOST.QUIET;
   XHOST.QUIET=true;
 
-  task_counter = 0;
+  uint number_of_structures = prototypes.size();
 #ifdef AFLOW_MULTITHREADS_ENABLE
   // split task into threads
-  uint number_of_structures = prototypes.size();
-  uint number_of_threads = aurostd::min(num_proc,number_of_structures); // cannot have more threads than structures
-  //PRE-DISTRIBUTED vector<vector<int> > thread_distribution = getThreadDistribution(number_of_structures, number_of_threads); //DX20191107
-
-  // [THREADED] determine AFLOW standard designation
-  vector<std::thread*> threads;
-  for(uint n=0; n<number_of_threads; n++){
-    threads.push_back(new std::thread(&XtalFinderCalculator::getMatchingAFLOWPrototypes,this,std::ref(prototypes),std::ref(vpflow_protos)));
-    //PRE-DISTRIBUTED threads.push_back(new std::thread(&XtalFinderCalculator::getPrototypeDesignations,this,std::ref(prototypes),thread_distribution[n][0], thread_distribution[n][1])); //DX20191107
-  }
-  for(uint t=0;t<threads.size();t++){
-    threads[t]->join();
-    delete threads[t];
-  }
+  xthread::xThread xt(num_proc);
+  std::function<void(uint, vector<StructurePrototype>&, const aurostd::xoption&)> fn =
+  std::bind(&XtalFinderCalculator::getMatchingAFLOWPrototypes, this, _1, _2, _3);
+  xt.run(number_of_structures, fn, prototypes, vpflow_protos);
 #else
   // NON-THREADED
-  getMatchingAFLOWPrototypes(prototypes,vpflow_protos);
+  for (uint i = 0; i < number_of_structures; i++) getMatchingAFLOWPrototypes(i,prototypes,vpflow_protos);
 #endif
   XHOST.QUIET=quiet_orig;
 }
@@ -7804,38 +7689,16 @@ void XtalFinderCalculator::calculateMatchingAFLOWPrototypes(
 // XtalFinderCalculator::getMatchingAFLOWPrototypes()
 // ***************************************************************************
 void XtalFinderCalculator::getMatchingAFLOWPrototypes(
+    uint i,
     vector<StructurePrototype>& prototypes,
-    aurostd::xoption vpflow_protos){
+    const aurostd::xoption& vpflow_protos){
 
-  // NOTE: This on-the-fly threaded scheme follows the procedure
-  // discussed in AAPL/aflow_aapl_tcond.cpp, developed by M. Esters (ME).
-
-  int i = AUROSTD_MAX_INT;
-  int nstructures = prototypes.size();
-
-  if(task_counter < nstructures){
-#ifdef AFLOW_MULTITHREADS_ENABLE
-    std::unique_lock<std::mutex> lock(_mutex_);
-#endif
-    i = task_counter++;
-  }
-  else {
-    return;
-  }
-
-  while (i < nstructures){
-    XtalFinderCalculator xtal_finder_protos(misfit_match,misfit_family,*p_FileMESSAGE,num_proc,*p_oss);
-    vector<StructurePrototype> matching_protos = xtal_finder_protos.compare2prototypes(prototypes[i].structure_representative->structure, vpflow_protos);
-    if(matching_protos.size()>0){
-      for(uint j=0;j<matching_protos[0].structures_duplicate.size();j++){
-        prototypes[i].matching_aflow_prototypes.push_back(matching_protos[0].structures_duplicate[j]->name);
-      }
+  XtalFinderCalculator xtal_finder_protos(misfit_match,misfit_family,*p_FileMESSAGE,num_proc,*p_oss);
+  vector<StructurePrototype> matching_protos = xtal_finder_protos.compare2prototypes(prototypes[i].structure_representative->structure, vpflow_protos);
+  if(matching_protos.size()>0){
+    for(uint j=0;j<matching_protos[0].structures_duplicate.size();j++){
+      prototypes[i].matching_aflow_prototypes.push_back(matching_protos[0].structures_duplicate[j]->name);
     }
-
-#ifdef AFLOW_MULTITHREADS_ENABLE
-    std::unique_lock<std::mutex> lock(_mutex_);
-#endif
-    i = task_counter++;
   }
 }
 

@@ -419,7 +419,7 @@ namespace apl {
     string message = "Calculating transition probabilities.";
     pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    xthread::xThread xt(_pc->getNCPUs(), 1);
+    xthread::xThread xt(_pc->getNCPUs());
 #endif
     _qm->generateTetrahedra();
     // The conjugate is necessary because the three-phonon scattering processes
@@ -1065,7 +1065,7 @@ namespace apl {
   vector<vector<double> > TCONDCalculator::calculateAnharmonicRates(const vector<vector<double> >& occ) {
     vector<vector<double> > rates(nIQPs, vector<double>(nBranches, 0.0));
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    xthread::xThread xt(_pc->getNCPUs(), 1);
+    xthread::xThread xt(_pc->getNCPUs());
     std::function<void(int, const vector<vector<double> >&,
         vector<vector<double> >&)> fn = std::bind(&TCONDCalculator::calcAnharmRates, this, _1, _2, _3);
     xt.run(nIQPs, fn, occ, rates);
@@ -1142,7 +1142,7 @@ namespace apl {
 
     vector<vector<xvector<double> > > delta(nIQPs, vector<xvector<double> >(nBranches, xvector<double>(3)));
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    xthread::xThread xt(_pc->getNCPUs(), 1);
+    xthread::xThread xt(_pc->getNCPUs());
     std::function<void(int, const vector<vector<double> >&,
         const vector<vector<xvector<double> > >&,
         vector<vector<xvector<double> > >&)> fn = std::bind(&TCONDCalculator::calculateDelta, this, _1, _2, _3, _4);

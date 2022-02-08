@@ -97,7 +97,7 @@ namespace apl {
     _eigenvectors.resize(nq, vector<vector<xvector<xcomplex<double> > > >(nbranches, vector<xvector<xcomplex<double> > >(natoms, xvector<xcomplex<double> >(3))));
     _frequencies.resize(nq, vector<double> (nbranches, 0.0));
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    xthread::xThread xt(_pc->getNCPUs(), 1);
+    xthread::xThread xt(_pc->getNCPUs());
     std::function<void(int)> fn = std::bind(&AtomicDisplacements::calculateEigenvectorsInThread, this, std::placeholders::_1);
     xt.run(nq, fn);
 #else

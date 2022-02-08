@@ -138,23 +138,23 @@ namespace xthread {
   /// @brief Constructur for xThread
   ///
   /// @param nmax Maximum number of CPUs used by xThread (default: 0 for all available CPUs)
-  /// @param nmin Mininum number of CPUs required to spawn thread workers default: 0 for nmin = nmax)
+  /// @param nmin Mininum number of CPUs required to spawn thread workers default: 1)
   xThread::xThread(int nmax, int nmin) {
     free();
     setCPUs(nmax, nmin);
   }
 
-  xThread::xThread(const xThread& xt) {
-    copy(xt);
+  xThread::xThread(const xThread& that) {
+    copy(that);
   }
 
-  const xThread& xThread::operator=(const xThread& xt) {
+  const xThread& xThread::operator=(const xThread& that) {
     copy(xt);
     return *this;
   }
 
-  void xThread::copy(const xThread& xt) {
-    if (this == &xt) return;
+  void xThread::copy(const xThread& that) {
+    if (this == &that) return;
     // std::mutex should not be copied because
     // it needs to stay immutable
     ncpus_max = xt.ncpus_max;
@@ -203,10 +203,10 @@ namespace xthread {
   /// @brief Sets the minimum and maximum number of CPUs used for threading
   ///
   /// @param nmax Maximum number of CPUs used by xThread (default: 0 for all available CPUs)
-  /// @param nmin Mininum number of CPUs required to spawn thread workers default: 0 for nmin = nmax)
+  /// @param nmin Mininum number of CPUs required to spawn thread workers default: 1)
   void xThread::setCPUs(int nmax, int nmin) {
     if (nmax < nmin) std::swap(nmax, nmin);
-    ncpus_max = (nmax > 0)?nmax:(init::GetCPUCores());
+    ncpus_max = (nmax > 0)?nmax:(KBIN::get_NCPUS());
     ncpus_min = (nmin > 0)?nmin:nmax;
   }
 
@@ -222,7 +222,7 @@ namespace xthread {
   /// This only works within a single AFLOW run
   int xThread::reserveThreads(unsigned long long int ntasks) {
     uint sleep_second = 10;
-    int ncpus_max_available = init::GetCPUCores();
+    int ncpus_max_available = KBIN::get_NCPUS();
     int nmax = ncpus_max;
     int nmin = ncpus_min;
     // Adjust max. and min. number of CPUs to the number of tasks
@@ -236,7 +236,7 @@ namespace xthread {
       xthread_cpu_check.lock();
       ncpus_available = ncpus_max_available - XHOST.CPU_active;
       if (ncpus_available >= nmin) {
-        ncpus = (ncpus_available > nmax)?nmax:ncpus_available;
+        ncpus = std::min(ncpus_available, nmax);
         // "reserve" threads globally
         XHOST.CPU_active += ncpus;
         xthread_cpu_check.unlock();
@@ -415,7 +415,7 @@ namespace xthread {
       I tasks_per_thread = ntasks/n;
       I remainder = ntasks % n;
       I startIndex = 0, endIndex = 0;
-      for (I t = 0; t < ncpus; t++) {
+      for (I t = 0; t < n; t++) {
         if (t < remainder) {
           startIndex = (tasks_per_thread + 1) * t;
           endIndex = startIndex + tasks_per_thread + 1;
@@ -559,6 +559,22 @@ namespace xthread {
 // instantiated. One instantiation can cover multiple functions.
 //
 // ----------
+//
+// Common mistakes
+//
+// When encountering linker errors, check if:
+//
+// - the index variable is exactly the same type (no implicit conversions)
+// - all arguments inside () have an & (except for the index variable)
+// - no parameter inside <> has an &
+// - this includes the function inside () - double-check
+// - the parameters inside the function are identical to the function definition
+// - only use const when passed in by parent function or when defined as const
+// - const inside () and <> are used the same way
+// - the iterable is added before functions inside <>
+// - on the other hand, the index variable type is not to be added inside <>
+//
+// ----------
 
 namespace xthread {
 
@@ -572,6 +588,12 @@ namespace xthread {
     std::function<void(int)>
   >(int, std::function<void(int)>&
   );
+
+  //lambda function inside aurostd::multithread_execute
+  template void xThread::run<
+    vector<string>,
+    std::function<void(vector<string>::iterator&)>
+  >(vector<string>&, std::function<void(vector<string>::iterator&)>&);
 
   //apl::PhononCalculator::calculateGroupVelocitiesThread
   template void xThread::run<
@@ -632,6 +654,61 @@ namespace xthread {
     vector<vector<xvector<double> > >&
   );
 
+  //XtalFinderCalculator::performStructureConversions
+  template void xThread::run<
+    std::function<void(uint, const vector<bool>&, const vector<bool>&, const vector<bool>&)>,
+    vector<bool>,
+    vector<bool>,
+    vector<bool>
+  >(uint, std::function<void(uint, const vector<bool>&, const vector<bool>&, const vector<bool>&)>&,
+    vector<bool>&,
+    vector<bool>&,
+    vector<bool>&
+  );
+
+  //XtalFinderCalculator::runComparisonThreads
+  template void xThread::run<
+    std::function<void(uint,
+      vector<StructurePrototype>&,
+      const vector<std::pair<uint, uint> >&,
+      const vector<std::pair<uint, uint> >&,
+      bool, bool, bool)>,
+    vector<StructurePrototype>,
+    vector<std::pair<uint, uint> >,
+    vector<std::pair<uint, uint> >,
+    bool, bool, bool
+  >(
+    uint,
+    std::function<void(uint,
+      vector<StructurePrototype>&,
+      const vector<std::pair<uint, uint> >&,
+      const vector<std::pair<uint, uint> >&,
+      bool, bool, bool)>&,
+    vector<StructurePrototype>&,
+    vector<std::pair<uint, uint> >&,
+    vector<std::pair<uint, uint> >&,
+    bool&, bool&, bool&
+  );
+
+  //XtalFinderCalculator::getPrototypeDesignations
+  template void xThread::run<
+    vector<StructurePrototype>,
+    std::function<void(vector<StructurePrototype>::iterator&)>
+  >(
+    vector<StructurePrototype>&,
+    std::function<void(vector<StructurePrototype>::iterator&)>&
+  );
+
+  //XtalFinderCalculator::getMatchingAFLOWPrototypes
+  template void xThread::run<
+    std::function<void(uint, vector<StructurePrototype>&, const aurostd::xoption&)>,
+    vector<StructurePrototype>,
+    aurostd::xoption
+  >(uint, std::function<void(uint, vector<StructurePrototype>&, const aurostd::xoption&)>&,
+    vector<StructurePrototype>&,
+    aurostd::xoption&
+  );
+
   //aflowlib::AflowDB::createTable
   template void xThread::run<
     std::function<void(int, const vector<string>&, const vector<string>&)>,
@@ -643,6 +720,49 @@ namespace xthread {
   );
 
   // runPredistributed --------------------------------------------------------
+
+  //XTalFinderCalculator::calculateSpaceGroups
+  template void xThread::runPredistributed<
+    std::function<void(uint, uint, uint)>,
+    uint
+  >(
+    uint, std::function<void(uint, uint, uint)>&, uint&
+  );
+
+  //XtalFinderCalculator::computeLFAEnvironments
+  //XtalFinderCalculator::calculateNearestNeighbors
+  template void xThread::runPredistributed<
+    std::function<void(uint, uint)>
+  >(
+    uint, std::function<void(uint, uint)>&
+  );
+
+  //XtalFinderCalculator::searchAtomMappings
+  template void xThread::runPredistributed<
+    std::function<bool(
+      uint, uint, const xstructure&,
+      const vector<double>&, const xstructure&, const string&,
+      vector<xmatrix<double> >&, vector<structure_mapping_info>&, bool, bool
+    )>,
+    xstructure,
+    vector<double>,
+    xstructure,
+    string,
+    vector<xmatrix<double> >,
+    vector<structure_mapping_info>,
+    bool, bool
+  >(
+    uint, std::function<bool(uint, uint, const xstructure&,
+      const vector<double>&, const xstructure&, const string&,
+      vector<xmatrix<double> >&, vector<structure_mapping_info>&, bool, bool)>&,
+    xstructure&,
+    vector<double>&,
+    xstructure&,
+    string&,
+    vector<xmatrix<double> >&,
+    vector<structure_mapping_info>&,
+    bool&, bool&
+  );
 
   //aflowlib::AflowDB::getColStats
   template void xThread::runPredistributed<
@@ -658,6 +778,7 @@ namespace xthread {
     const vector<string>&,
     vector<aflowlib::DBStats>&
   );
+
 }
 
 #endif

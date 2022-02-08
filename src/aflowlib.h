@@ -569,7 +569,8 @@ namespace aflowlib {
   class AflowDB : public xStream {
     public:
       AflowDB(const string&, ostream& oss=std::cout);
-      AflowDB(const string&, const string&, const string&, ostream& oss=std::cout);
+      AflowDB(const string&, const string&, const string&,
+        const aurostd::xoption& schema_in=XHOST.vschema, ostream& oss=std::cout);
       AflowDB(const AflowDB&);
       AflowDB& operator=(const AflowDB&);
       ~AflowDB();

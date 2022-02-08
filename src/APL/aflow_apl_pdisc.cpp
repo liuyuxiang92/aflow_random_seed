@@ -228,7 +228,7 @@ namespace apl {
 
     int nqps = (int) _qpoints.size();
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    xthread::xThread xt(_pc->getNCPUs(), 1);
+    xthread::xThread xt(_pc->getNCPUs());
     std::function<void(int)> fn = std::bind(&PhononDispersionCalculator::calculateInOneThread, this, std::placeholders::_1);
     xt.run(nqps, fn);
 #else
