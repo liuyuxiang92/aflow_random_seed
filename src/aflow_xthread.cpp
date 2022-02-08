@@ -149,7 +149,7 @@ namespace xthread {
   }
 
   const xThread& xThread::operator=(const xThread& that) {
-    copy(xt);
+    copy(that);
     return *this;
   }
 
@@ -157,11 +157,11 @@ namespace xthread {
     if (this == &that) return;
     // std::mutex should not be copied because
     // it needs to stay immutable
-    ncpus_max = xt.ncpus_max;
-    ncpus_max = xt.ncpus_min;
-    progress_bar = xt.progress_bar;
-    progress_bar_counter = xt.progress_bar_counter;
-    progress_bar_set = progress_bar_set;
+    ncpus_max = that.ncpus_max;
+    ncpus_max = that.ncpus_min;
+    progress_bar = that.progress_bar;
+    progress_bar_counter = that.progress_bar_counter;
+    progress_bar_set = that.progress_bar_set;
   }
 
   xThread::~xThread() {

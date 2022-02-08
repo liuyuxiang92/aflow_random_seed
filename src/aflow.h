@@ -413,6 +413,7 @@ class _XHOST {
     aurostd::xoption vflag_outreach;  // argv/argc options following the xoption structure
     aurostd::xoption vflag_control;  // argv/argc options following the xoption structure
     aurostd::xoption vschema;        // keywords, names, units etc etc
+    aurostd::xoption vschema_secret;  //ME20220208
     // USUAL COMMANDS
     vector<string> vcat; //     cat, bzcat, xzcat, gzcat
     vector<string> vext; //      "",  .bz2,   .xz,   .gz
@@ -1092,6 +1093,7 @@ namespace init {
   uint GetTEMP(void);
   double WaitTEMP(double TRESHOLD=AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT,ostream& oss=cout,bool LVERBOSE=FALSE,vector<string> vmessage=vector<string>(0));
   uint InitSchema(bool INIT_VERBOSE);
+  uint InitSchemaSecret(bool INIT_VERBOSE);  //ME20220208
 } // namespace init
 
 uint AFLOW_getTEMP(const vector<string>& argv);

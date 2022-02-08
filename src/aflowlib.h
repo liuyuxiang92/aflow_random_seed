@@ -569,8 +569,9 @@ namespace aflowlib {
   class AflowDB : public xStream {
     public:
       AflowDB(const string&, ostream& oss=std::cout);
-      AflowDB(const string&, const string&, const string&,
-        const aurostd::xoption& schema_in=XHOST.vschema, ostream& oss=std::cout);
+      AflowDB(const string&, const aurostd::xoption&, ostream& oss=std::cout);
+      AflowDB(const string&, const string&, const string&, const aurostd::xoption&, ostream& oss=std::cout);
+      AflowDB(const string&, const string&, const string&, const aurostd::xoption&, const aurostd::xoption&, ostream& oss=std::cout);
       AflowDB(const AflowDB&);
       AflowDB& operator=(const AflowDB&);
       ~AflowDB();
@@ -621,14 +622,16 @@ namespace aflowlib {
 
     private:
       void free();
-      void open(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
+      void open(int=SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
       void close();
       void copy(const AflowDB&);
-      void initializeExtraSchema();
+      void initialize(const string& db_file, const string& dt_path, const string& lck_file,
+                      int open_flags, const aurostd::xoption& schema_in, const aurostd::xoption& schema_secret_in);
 
       sqlite3* db;
       bool is_tmp;
-      aurostd::xoption vschema_extra;
+      aurostd::xoption vschema_secret;
+      aurostd::xoption vschema;
       string data_path;
       string database_file;
       string lock_file;

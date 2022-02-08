@@ -104,6 +104,7 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   vflag_outreach.clear();
   vflag_control.clear();
   vschema.clear();
+  vschema_secret.clear(); //ME20220208
   XHOST_LIBRARY_LIB0=LIBRARY_NOTHING;
   XHOST_LIBRARY_LIB1=LIBRARY_NOTHING;
   XHOST_LIBRARY_LIB2=LIBRARY_NOTHING;
@@ -219,6 +220,7 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   vflag_outreach=b.vflag_outreach;
   vflag_control=b.vflag_control;
   vschema=b.vschema;
+  vschema_secret = b.vschema_secret;  //ME20220208
   // extensions
   vcat.clear();for(uint i=0;i<b.vcat.size();i++) vcat.push_back(b.vcat.at(i));
   vext.clear();for(uint i=0;i<b.vext.size();i++) vext.push_back(b.vext.at(i));
@@ -269,6 +271,7 @@ void _XHOST::free() { // free PRIVATE
   vflag_outreach.clear();
   vflag_control.clear();
   vschema.clear();
+  vschema_secret.clear();  //ME20220208
   // extensions
   vcat.clear();vcat.push_back("cat");vcat.push_back("bzcat"); vcat.push_back("xzcat");vcat.push_back("gzcat");
   vext.clear();vext.push_back("");   vext.push_back(".bz2");  vext.push_back(".xz");  vext.push_back(".gz");

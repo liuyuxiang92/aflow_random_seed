@@ -82,27 +82,54 @@ namespace aflowlib {
   // Open the database for read access
   AflowDB::AflowDB(const string& db_file, ostream& oss) : xStream(oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
-    free();
-    database_file = db_file;
     if (LDEBUG) std::cerr << "AflowDB: reading database" << std::endl;
-    open(SQLITE_OPEN_READONLY);
-    initializeExtraSchema();
+    free();
+    aurostd::xoption dummy;
+    initialize(db_file, "", "", SQLITE_OPEN_READONLY, dummy, dummy);
+  }
+
+  AflowDB::AflowDB(const string& db_file, const aurostd::xoption& vschema_secret_in, ostream& oss) : xStream(oss) {
+    bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
+    if (LDEBUG) std::cerr << "AflowDB: reading database" << std::endl;
+    free();
+    aurostd::xoption dummy;
+    initialize(db_file, "", "", SQLITE_OPEN_READONLY, dummy, vschema_secret_in);
   }
 
   // Open the database for write access
-  AflowDB::AflowDB(const string& db_file, const string& dt_path, const string& lck_file, ostream& oss) : xStream (oss) {
+  AflowDB::AflowDB(const string& db_file, const string& dt_path, const string& lck_file,
+      const aurostd::xoption& vschema_in, ostream& oss) : xStream (oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
     free();
-    data_path = dt_path;
-    database_file = db_file;
-    lock_file = lck_file;
     if (LDEBUG) {
       std::cerr << "AflowDB: Database file: " << database_file << std::endl;
       std::cerr << "AflowDB: Data path: " << data_path << std::endl;
       std::cerr << "AflowDB: Lock file: " << lock_file << std::endl;
     }
-    open();
-    initializeExtraSchema();
+    aurostd::xoption dummy;
+    initialize(db_file, dt_path, lck_file, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, vschema_in, dummy);
+  }
+
+  AflowDB::AflowDB(const string& db_file, const string& dt_path, const string& lck_file,
+      const aurostd::xoption& vschema_in, const aurostd::xoption& vschema_secret_in, ostream& oss) : xStream (oss) {
+    bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
+    free();
+    if (LDEBUG) {
+      std::cerr << "AflowDB: Database file: " << database_file << std::endl;
+      std::cerr << "AflowDB: Data path: " << data_path << std::endl;
+      std::cerr << "AflowDB: Lock file: " << lock_file << std::endl;
+    }
+    initialize(db_file, dt_path, lck_file, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, vschema_in, vschema_secret_in);
+  }
+
+  void AflowDB::initialize(const string& db_file, const string& dt_path, const string& lck_file,
+    int open_flags, const aurostd::xoption& schema_in, const aurostd::xoption& vschema_secret_in) {
+    data_path = dt_path;
+    database_file = db_file;
+    lock_file = lck_file;
+    vschema = schema_in;
+    vschema_secret = vschema_secret_in;
+    open(open_flags);
   }
 
   // Copy constructors
@@ -121,7 +148,7 @@ namespace aflowlib {
     data_path = that.data_path;
     database_file = that.database_file;
     lock_file = that.lock_file;
-    vschema_extra = that.vschema_extra;
+    vschema_secret = that.vschema_secret;
     // Two databases should never operate on a temporary
     // file or have write access at the same time.
     is_tmp = false;
@@ -138,7 +165,8 @@ namespace aflowlib {
     data_path = "";
     database_file = "";
     lock_file = "";
-    vschema_extra.clear();
+    vschema.clear();
+    vschema_secret.clear();
     is_tmp = false;
   }
 
@@ -172,12 +200,6 @@ namespace aflowlib {
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
     }
-  }
-
-  void AflowDB::initializeExtraSchema() {
-    vschema_extra.clear();
-    vschema_extra.push_attached("SCHEMA::NAME:ALLOY", "alloy");
-    vschema_extra.push_attached("SCHEMA::TYPE:ALLOY", "string");
   }
 
 }  // namespace aflowlib
@@ -517,9 +539,9 @@ namespace aflowlib {
         string key = "";
         uint k = 0;
         for (k = 0; k < nkeys; k++) {
-          key = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
+          key = vschema.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
           types_schema[k] = aurostd::RemoveSubString(types_schema[k], " COLLATE NOCASE");  // TEXT may contain directive to be case insensitive
-          if (key.empty()) key = vschema_extra.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
+          if (key.empty()) key = vschema_secret.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
           if (!aurostd::WithinList(columns, key, index)) break;
           if (types_db[index] != types_schema[k]) break;
         }
@@ -699,8 +721,8 @@ namespace aflowlib {
     uint nkeys = keys.size();
     vector<string> columns(nkeys);
     for (uint k = 0; k < nkeys; k++) {
-      columns[k] = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys[k]);
-      if (columns[k].empty()) columns[k] = vschema_extra.getattachedscheme("SCHEMA::NAME:" + keys[k]);
+      columns[k] = vschema.getattachedscheme("SCHEMA::NAME:" + keys[k]);
+      if (columns[k].empty()) columns[k] = vschema_secret.getattachedscheme("SCHEMA::NAME:" + keys[k]);
     }
     vector<string> types = getDataTypes(columns, true);
 
@@ -710,7 +732,7 @@ namespace aflowlib {
     int max_cpus = 16;
     if (ncpus < 1) ncpus = 1;
     if (ncpus > max_cpus) ncpus = max_cpus;
-    xthread::xThread xt(ncpus, 1);
+    xthread::xThread xt(ncpus);
     std::function<void(int, const vector<string>&, const vector<string>&)> fn = std::bind(&AflowDB::buildTable, this, _1, _2, _3);
     xt.run(_N_AUID_TABLES_, fn, columns, types);
 #else
@@ -891,16 +913,16 @@ namespace aflowlib {
   vector<string> AflowDB::getSchemaKeys() {
     vector<string> keys;
     string key = "";
-    for (uint i = 0, n = XHOST.vschema.vxsghost.size(); i < n; i += 2) {
-      if(XHOST.vschema.vxsghost[i].find("::NAME:") != string::npos) {
-        key=aurostd::RemoveSubString(XHOST.vschema.vxsghost[i], "SCHEMA::NAME:");
+    for (uint i = 0, n = vschema.vxsghost.size(); i < n; i += 2) {
+      if(vschema.vxsghost[i].find("::NAME:") != string::npos) {
+        key=aurostd::RemoveSubString(vschema.vxsghost[i], "SCHEMA::NAME:");
         // schema keys are upper case
         keys.push_back(aurostd::toupper(key));
       }
     }
-    for (uint i = 0, n = vschema_extra.vxsghost.size(); i < n; i += 2) {
-      if(vschema_extra.vxsghost[i].find("::NAME:") != string::npos) {
-        key=aurostd::RemoveSubString(vschema_extra.vxsghost[i], "SCHEMA::NAME:");
+    for (uint i = 0, n = vschema_secret.vxsghost.size(); i < n; i += 2) {
+      if(vschema_secret.vxsghost[i].find("::NAME:") != string::npos) {
+        key=aurostd::RemoveSubString(vschema_secret.vxsghost[i], "SCHEMA::NAME:");
         // schema keys are upper case
         keys.push_back(aurostd::toupper(key));
       }
@@ -920,8 +942,8 @@ namespace aflowlib {
     string type = "";
     for (uint k = 0; k < nkeys; k++) {
       // AUID has to be unique
-      type = XHOST.vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
-      if (type.empty()) type = vschema_extra.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
+      type = vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
+      if (type.empty()) type = vschema_secret.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
       if (unique && (keys[k] == "AUID")) {
         types[k] = "TEXT UNIQUE NOT NULL COLLATE NOCASE";  // Make string search not case sensitive
       } else if (type == "number") {
@@ -1108,8 +1130,8 @@ namespace aflowlib {
     aurostd::string2tokens(exclude, excluded_properties, ",");
     string key = "";
     for (uint i = 0, nkeys = keys.size(); i < nkeys; i++) {
-      key = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys[i]);
-      if (key.empty()) key = vschema_extra.getattachedscheme("SCHEMA::NAME:" + keys[i]);
+      key = vschema.getattachedscheme("SCHEMA::NAME:" + keys[i]);
+      if (key.empty()) key = vschema_secret.getattachedscheme("SCHEMA::NAME:" + keys[i]);
       if (!key.empty() && !aurostd::WithinList(excluded_properties, key)) cols.push_back(key);
     }
     uint ncols = cols.size();
@@ -1130,7 +1152,7 @@ namespace aflowlib {
     // Get types for post-processing
     vector<string> types(ncols);
     for (uint i = 0; i < ncols; i++) {
-      types[i] = XHOST.vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(cols[i]));
+      types[i] = vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(cols[i]));
     }
     stats.types = types;
 
@@ -1163,7 +1185,7 @@ namespace aflowlib {
       if (stats.nentries < 50000)  max_cpus = 8;
       if (stats.nentries < 10000)  max_cpus = 4;
       if (ncpus > max_cpus) ncpus = max_cpus;
-      xthread::xThread xt(ncpus, 1);
+      xthread::xThread xt(ncpus);
       std::function<void(int, int, const vector<string>&, vector<DBStats>&)> fn = std::bind(&AflowDB::getColStats, this, _1, _2, _3, _4);
       xt.runPredistributed(_N_AUID_TABLES_, fn, tables, colstats);
 #else
