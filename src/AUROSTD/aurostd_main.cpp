@@ -2106,26 +2106,27 @@ namespace aurostd {
   }
 
   // ***************************************************************************
-  // Function aurostd::LinkLockFile
+  // Function aurostd::LinkFileAtomic
   // ***************************************************************************
   // Simon Divilov
-  // Create a hard or symbolic link of the lock file using C++ functions
-  // to avoid a race condition
-  bool LinkLockFile(const string& directory,const string& lockfile,const string& linkfile,bool hard) {
+  // Create a hard or symbolic link of a file using C++ functions
+  bool LinkFileAtomic(const string& from,const string& to,bool hard) {
     int fail;
+    string from_clean=CleanFileName(from),to_clean=CleanFileName(to);
+    if(from_clean.empty() || to_clean.empty()) {return FALSE;}
     if(hard) {
-      fail = link((directory+"/"+lockfile).c_str(),(directory+"/"+linkfile).c_str());
+      fail = link(from_clean.c_str(),to_clean.c_str());
     }
     else {
-      fail = symlink((directory+"/"+lockfile).c_str(),(directory+"/"+linkfile).c_str());
+      fail = symlink(from_clean.c_str(),to_clean.c_str());
     }
     if(fail) {
       if(errno==EEXIST) {
         return FALSE;
       }
       else {
-        string function = XPID+"aurostd::LinkLockFile()";
-        string message = "Error linking "+CleanFileName(directory+"/"+lockfile)+" -> "+CleanFileName(directory+"/"+linkfile)+" | errno="+aurostd::utype2string<int>(errno);
+        string function = XPID+"aurostd::LinkFileAtomic()";
+        string message = "Error linking "+from_clean+" -> "+to_clean+" | errno="+aurostd::utype2string<int>(errno);
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function,message,_FILE_ERROR_);
       }
     }
@@ -2135,18 +2136,11 @@ namespace aurostd {
   }
 
   // ***************************************************************************
-  // Function aurostd::UnlinkLockFile
+  // Function aurostd::UnlinkFile
   // ***************************************************************************
   // Simon Divilov
-  // Unlink lock file using C++ functions
-  bool UnlinkLockFile(const string& directory,const string& linkfile) {
-    if(unlink((directory+"/"+linkfile).c_str())) {
-      return FALSE;
-    }
-    else {
-      return TRUE;
-    }
-  }
+  // Unlink file using C++ functions
+  bool UnlinkFile(const string& link) {return (unlink(CleanFileName(link).c_str())==0);}
 
   //CO START
   //***************************************************************************//
