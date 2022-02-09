@@ -2105,6 +2105,49 @@ namespace aurostd {
     return TRUE;
   }
 
+  // ***************************************************************************
+  // Function aurostd::LinkLockFile
+  // ***************************************************************************
+  // Simon Divilov
+  // Create a hard or symbolic link of the lock file using C++ functions
+  // to avoid a race condition
+  bool LinkLockFile(const string& directory,const string& lockfile,const string& linkfile,bool hard) {
+    int fail;
+    if(hard) {
+      fail = link((directory+"/"+lockfile).c_str(),(directory+"/"+linkfile).c_str());
+    }
+    else {
+      fail = symlink((directory+"/"+lockfile).c_str(),(directory+"/"+linkfile).c_str());
+    }
+    if(fail) {
+      if(errno==EEXIST) {
+        return FALSE;
+      }
+      else {
+        string function = XPID+"aurostd::LinkLockFile()";
+        string message = "Error linking "+CleanFileName(directory+"/"+lockfile)+" -> "+CleanFileName(directory+"/"+linkfile)+" | errno="+aurostd::utype2string<int>(errno);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,message,_FILE_ERROR_);
+      }
+    }
+    else {
+      return TRUE;
+    }
+  }
+
+  // ***************************************************************************
+  // Function aurostd::UnlinkLockFile
+  // ***************************************************************************
+  // Simon Divilov
+  // Unlink lock file using C++ functions
+  bool UnlinkLockFile(const string& directory,const string& linkfile) {
+    if(unlink((directory+"/"+linkfile).c_str())) {
+      return FALSE;
+    }
+    else {
+      return TRUE;
+    }
+  }
+
   //CO START
   //***************************************************************************//
   // aurostd::MatchCompressed

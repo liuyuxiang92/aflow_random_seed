@@ -456,6 +456,8 @@ namespace aurostd {
   string ProperFileName(const string& fileIN);
   bool CopyFile(const string& file_from,const string& file_to);
   bool LinkFile(const string& file_from,const string& file_to);
+  bool LinkLockFile(const string& directory,const string& lockfile,const string& linkfile,bool hard=true); //SD20220208
+  bool UnlinkLockFile(const string& directory,const string& linkfile); //SD20220208
   //CO START
   bool MatchCompressed(const string& CompressedFileName,const string& FileNameOUT);
   // [OBSOLETE]  bool DecompressFile(const string& CompressedFileName);
