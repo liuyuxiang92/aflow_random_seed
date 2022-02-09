@@ -13406,93 +13406,93 @@ xstructure GetPrimitive(const xstructure& a) {
   return GetPrimitive(a,tolerance);
 }
 
-pthread_mutex_t mutex_XATOM=PTHREAD_MUTEX_INITIALIZER;
-#define _PTHREAD_FLUSH_TIME_ 1
-
-typedef struct {
-  int      ITHREAD;
-  int      THREADS_MAX;
-  xstructure *pstr;
-  int      ispecie_min;
-  vector<xvector<double> > *ptvector;
-  xmatrix<double> *polattice;
-  int      itbusy;
-  int      step;
-} _threaded_GETTVECTORS_params;
-
-void *_threaded_GetTvectors(void *ptr) {
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  _threaded_GETTVECTORS_params* pparams;
-  xmatrix<double> plattice(3,3);
-  xvector<double> fdisp(3),cdisp(3);
-  pparams = (_threaded_GETTVECTORS_params*) ptr;
-  (pparams->itbusy)=TRUE;
-  // pthread_mutex_lock(&mutex_XATOM);
-  AFLOW_PTHREADS::RUNNING++;
-  // cerr << "AFLOW_PTHREADS::RUNNING=" << AFLOW_PTHREADS::RUNNING << endl;
-  // pthread_mutex_unlock(&mutex_XATOM);
-  // CODE BEGIN
-  //  cerr << "debug " << (pparams->ITHREAD) << "/" << (pparams->THREADS_MAX) << endl;
-
-  double sstr_volume=(*pparams->pstr).Volume();
-
-  // CODE STEP1 BEGIN
-  if(pparams->step==1) {
-    if(LDEBUG) pthread_mutex_lock(&mutex_XATOM);   // LOCK
-    if(LDEBUG) cerr << "*_threaded_GetTvectors STEP1: " << AFLOW_PTHREADS::RUNNING << " " << pparams->ITHREAD << endl;
-    if(LDEBUG) pthread_mutex_unlock(&mutex_XATOM); // UNLOCK
-    for(uint iat1=0+(pparams->ITHREAD);iat1<(*pparams->pstr).atoms.size();iat1+=(pparams->THREADS_MAX)) { // does modulus thread max
-      if((*pparams->pstr).atoms.at(iat1).type==(pparams->ispecie_min))
-        for(uint iat2=0;iat2<(*pparams->pstr).atoms.size();iat2++)
-          if((*pparams->pstr).atoms.at(iat2).type==(pparams->ispecie_min)) {
-            fdisp=(*pparams->pstr).atoms.at(iat2).fpos-(*pparams->pstr).atoms.at(iat1).fpos;
-            cdisp=(*pparams->pstr).atoms.at(iat2).cpos-(*pparams->pstr).atoms.at(iat1).cpos;
-            if(aurostd::modulus(fdisp)>0.01 && aurostd::modulus(cdisp)>0.01)
-              if(IsTranslationFVector((*pparams->pstr),fdisp)) {
-                pthread_mutex_lock(&mutex_XATOM);
-                (*pparams->ptvector).push_back(cdisp);
-                pthread_mutex_unlock(&mutex_XATOM);
-              }
-          }
-    }
-  } // CODE STEP1 END
-  // CODE STEP2 BEGIN
-  if(pparams->step==2) {
-    if(LDEBUG) pthread_mutex_lock(&mutex_XATOM);   // LOCK
-    if(LDEBUG) cerr << "*_threaded_GetTvectors STEP2: " << AFLOW_PTHREADS::RUNNING << " " << pparams->ITHREAD << endl;
-    if(LDEBUG) pthread_mutex_unlock(&mutex_XATOM); // UNLOCK
-    for(uint iu=0+(pparams->ITHREAD);iu<(*pparams->ptvector).size();iu+=(pparams->THREADS_MAX)) { // does modulus thread max
-      for(uint i=1;i<=3;i++) plattice[1][i]=(*pparams->ptvector).at(iu)[i];
-      for(uint iv=0;iv<(*pparams->ptvector).size()&& iv!=iu;iv++) {
-        for(uint i=1;i<=3;i++) plattice[2][i]=(*pparams->ptvector).at(iv)[i];
-        for(uint iw=0;iw<(*pparams->ptvector).size()&& iw!=iv && iw!=iu;iw++) {
-          for(uint i=1;i<=3;i++) plattice[3][i]=(*pparams->ptvector).at(iw)[i];
-          if(det(plattice)>0.999 && det(plattice)<sstr_volume) {   // no coplanar and contain at least 1 atom and smaller than the original cell
-            if(aurostd::isinteger(sstr_volume/det(plattice))) {    // integer ratio of volumes
-              if(det(plattice)<det((*pparams->polattice))) {                    // better than before
-                if(LDEBUG) cout << XPID << "DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
-                if(isdifferent(plattice,(*pparams->polattice),0.0001)) {
-                  plattice=MinkowskiBasisReduction(plattice);      // Minkowski first
-                  plattice=NiggliUnitCellForm(plattice);           // Niggli Second
-                  if(isdifferent(plattice,(*pparams->polattice),0.0001)) {
-                    pthread_mutex_lock(&mutex_XATOM);   // LOCK
-                    (*pparams->polattice)=plattice;
-                    pthread_mutex_unlock(&mutex_XATOM); // UNLOCK
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  } // CODE STEP2 END
-
-  (pparams->itbusy)=FALSE;
-  AFLOW_PTHREADS::RUNNING--;
-  aurostd::Sleep(_PTHREAD_FLUSH_TIME_);
-  return NULL;
-}
+//ME20220208 [OBSOLETE - not used] pthread_mutex_t mutex_XATOM=PTHREAD_MUTEX_INITIALIZER;
+//ME20220208 [OBSOLETE - not used] #define _PTHREAD_FLUSH_TIME_ 1
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used] typedef struct {
+//ME20220208 [OBSOLETE - not used]   int      ITHREAD;
+//ME20220208 [OBSOLETE - not used]   int      THREADS_MAX;
+//ME20220208 [OBSOLETE - not used]   xstructure *pstr;
+//ME20220208 [OBSOLETE - not used]   int      ispecie_min;
+//ME20220208 [OBSOLETE - not used]   vector<xvector<double> > *ptvector;
+//ME20220208 [OBSOLETE - not used]   xmatrix<double> *polattice;
+//ME20220208 [OBSOLETE - not used]   int      itbusy;
+//ME20220208 [OBSOLETE - not used]   int      step;
+//ME20220208 [OBSOLETE - not used] } _threaded_GETTVECTORS_params;
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used] void *_threaded_GetTvectors(void *ptr) {
+//ME20220208 [OBSOLETE - not used]   bool LDEBUG=(FALSE || XHOST.DEBUG);
+//ME20220208 [OBSOLETE - not used]   _threaded_GETTVECTORS_params* pparams;
+//ME20220208 [OBSOLETE - not used]   xmatrix<double> plattice(3,3);
+//ME20220208 [OBSOLETE - not used]   xvector<double> fdisp(3),cdisp(3);
+//ME20220208 [OBSOLETE - not used]   pparams = (_threaded_GETTVECTORS_params*) ptr;
+//ME20220208 [OBSOLETE - not used]   (pparams->itbusy)=TRUE;
+//ME20220208 [OBSOLETE - not used]   // pthread_mutex_lock(&mutex_XATOM);
+//ME20220208 [OBSOLETE - not used]   AFLOW_PTHREADS::RUNNING++;
+//ME20220208 [OBSOLETE - not used]   // cerr << "AFLOW_PTHREADS::RUNNING=" << AFLOW_PTHREADS::RUNNING << endl;
+//ME20220208 [OBSOLETE - not used]   // pthread_mutex_unlock(&mutex_XATOM);
+//ME20220208 [OBSOLETE - not used]   // CODE BEGIN
+//ME20220208 [OBSOLETE - not used]   //  cerr << "debug " << (pparams->ITHREAD) << "/" << (pparams->THREADS_MAX) << endl;
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   double sstr_volume=(*pparams->pstr).Volume();
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   // CODE STEP1 BEGIN
+//ME20220208 [OBSOLETE - not used]   if(pparams->step==1) {
+//ME20220208 [OBSOLETE - not used]     if(LDEBUG) pthread_mutex_lock(&mutex_XATOM);   // LOCK
+//ME20220208 [OBSOLETE - not used]     if(LDEBUG) cerr << "*_threaded_GetTvectors STEP1: " << AFLOW_PTHREADS::RUNNING << " " << pparams->ITHREAD << endl;
+//ME20220208 [OBSOLETE - not used]     if(LDEBUG) pthread_mutex_unlock(&mutex_XATOM); // UNLOCK
+//ME20220208 [OBSOLETE - not used]     for(uint iat1=0+(pparams->ITHREAD);iat1<(*pparams->pstr).atoms.size();iat1+=(pparams->THREADS_MAX)) { // does modulus thread max
+//ME20220208 [OBSOLETE - not used]       if((*pparams->pstr).atoms.at(iat1).type==(pparams->ispecie_min))
+//ME20220208 [OBSOLETE - not used]         for(uint iat2=0;iat2<(*pparams->pstr).atoms.size();iat2++)
+//ME20220208 [OBSOLETE - not used]           if((*pparams->pstr).atoms.at(iat2).type==(pparams->ispecie_min)) {
+//ME20220208 [OBSOLETE - not used]             fdisp=(*pparams->pstr).atoms.at(iat2).fpos-(*pparams->pstr).atoms.at(iat1).fpos;
+//ME20220208 [OBSOLETE - not used]             cdisp=(*pparams->pstr).atoms.at(iat2).cpos-(*pparams->pstr).atoms.at(iat1).cpos;
+//ME20220208 [OBSOLETE - not used]             if(aurostd::modulus(fdisp)>0.01 && aurostd::modulus(cdisp)>0.01)
+//ME20220208 [OBSOLETE - not used]               if(IsTranslationFVector((*pparams->pstr),fdisp)) {
+//ME20220208 [OBSOLETE - not used]                 pthread_mutex_lock(&mutex_XATOM);
+//ME20220208 [OBSOLETE - not used]                 (*pparams->ptvector).push_back(cdisp);
+//ME20220208 [OBSOLETE - not used]                 pthread_mutex_unlock(&mutex_XATOM);
+//ME20220208 [OBSOLETE - not used]               }
+//ME20220208 [OBSOLETE - not used]           }
+//ME20220208 [OBSOLETE - not used]     }
+//ME20220208 [OBSOLETE - not used]   } // CODE STEP1 END
+//ME20220208 [OBSOLETE - not used]   // CODE STEP2 BEGIN
+//ME20220208 [OBSOLETE - not used]   if(pparams->step==2) {
+//ME20220208 [OBSOLETE - not used]     if(LDEBUG) pthread_mutex_lock(&mutex_XATOM);   // LOCK
+//ME20220208 [OBSOLETE - not used]     if(LDEBUG) cerr << "*_threaded_GetTvectors STEP2: " << AFLOW_PTHREADS::RUNNING << " " << pparams->ITHREAD << endl;
+//ME20220208 [OBSOLETE - not used]     if(LDEBUG) pthread_mutex_unlock(&mutex_XATOM); // UNLOCK
+//ME20220208 [OBSOLETE - not used]     for(uint iu=0+(pparams->ITHREAD);iu<(*pparams->ptvector).size();iu+=(pparams->THREADS_MAX)) { // does modulus thread max
+//ME20220208 [OBSOLETE - not used]       for(uint i=1;i<=3;i++) plattice[1][i]=(*pparams->ptvector).at(iu)[i];
+//ME20220208 [OBSOLETE - not used]       for(uint iv=0;iv<(*pparams->ptvector).size()&& iv!=iu;iv++) {
+//ME20220208 [OBSOLETE - not used]         for(uint i=1;i<=3;i++) plattice[2][i]=(*pparams->ptvector).at(iv)[i];
+//ME20220208 [OBSOLETE - not used]         for(uint iw=0;iw<(*pparams->ptvector).size()&& iw!=iv && iw!=iu;iw++) {
+//ME20220208 [OBSOLETE - not used]           for(uint i=1;i<=3;i++) plattice[3][i]=(*pparams->ptvector).at(iw)[i];
+//ME20220208 [OBSOLETE - not used]           if(det(plattice)>0.999 && det(plattice)<sstr_volume) {   // no coplanar and contain at least 1 atom and smaller than the original cell
+//ME20220208 [OBSOLETE - not used]             if(aurostd::isinteger(sstr_volume/det(plattice))) {    // integer ratio of volumes
+//ME20220208 [OBSOLETE - not used]               if(det(plattice)<det((*pparams->polattice))) {                    // better than before
+//ME20220208 [OBSOLETE - not used]                 if(LDEBUG) cout << XPID << "DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
+//ME20220208 [OBSOLETE - not used]                 if(isdifferent(plattice,(*pparams->polattice),0.0001)) {
+//ME20220208 [OBSOLETE - not used]                   plattice=MinkowskiBasisReduction(plattice);      // Minkowski first
+//ME20220208 [OBSOLETE - not used]                   plattice=NiggliUnitCellForm(plattice);           // Niggli Second
+//ME20220208 [OBSOLETE - not used]                   if(isdifferent(plattice,(*pparams->polattice),0.0001)) {
+//ME20220208 [OBSOLETE - not used]                     pthread_mutex_lock(&mutex_XATOM);   // LOCK
+//ME20220208 [OBSOLETE - not used]                     (*pparams->polattice)=plattice;
+//ME20220208 [OBSOLETE - not used]                     pthread_mutex_unlock(&mutex_XATOM); // UNLOCK
+//ME20220208 [OBSOLETE - not used]                   }
+//ME20220208 [OBSOLETE - not used]                 }
+//ME20220208 [OBSOLETE - not used]               }
+//ME20220208 [OBSOLETE - not used]             }
+//ME20220208 [OBSOLETE - not used]           }
+//ME20220208 [OBSOLETE - not used]         }
+//ME20220208 [OBSOLETE - not used]       }
+//ME20220208 [OBSOLETE - not used]     }
+//ME20220208 [OBSOLETE - not used]   } // CODE STEP2 END
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   (pparams->itbusy)=FALSE;
+//ME20220208 [OBSOLETE - not used]   AFLOW_PTHREADS::RUNNING--;
+//ME20220208 [OBSOLETE - not used]   aurostd::Sleep(_PTHREAD_FLUSH_TIME_);
+//ME20220208 [OBSOLETE - not used]   return NULL;
+//ME20220208 [OBSOLETE - not used] }
 
 // **************************************************************************
 // GetPrimitive() //DX20210406
@@ -13700,226 +13700,226 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
   (*this) = prim;
 }
 
-xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // APRIL 2009 JUNE 2012 added tolerance
-  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy="GetPrimitiveMULTITHREAD():"; //CO20200201
-  if(LDEBUG) cerr << soliloquy << " BEGIN " << endl; //CO20200201
-  if(LDEBUG){cerr << soliloquy << " _a=" << endl;cerr << _a << endl;} //CO20200201
-  cout.setf(std::ios::fixed,std::ios::floatfield);
-  cout.precision(10);
-  xstructure a(_a);
-  xstructure sstr=a;
-  if(LDEBUG){cerr << soliloquy << " sstr=" << endl;cerr << sstr << endl;} //CO20200201
-  if(LDEBUG){cerr << soliloquy << " sstr.atoms.size()=" << sstr.atoms.size() << endl;}  //CO20200201
-  sstr.SetVolume(sstr.atoms.size());
-  if(LDEBUG){cerr << soliloquy << " sstr(post Vol)=" << endl;cerr << sstr << endl;} //CO20200201
-  sstr=ReScale(sstr,1.0);
-  if(LDEBUG){cerr << soliloquy << " sstr(pre BringInCell)=" << endl;cerr << sstr << endl;} //CO20200201
-  sstr=BringInCell(sstr);
-  if(LDEBUG){cerr << soliloquy << " sstr(post BringInCell)=" << endl;cerr << sstr << endl;} //CO20200201
-  //  sstr.CalculateSymmetry();
-  if(tolerance<=0.0) a.equiv_fpos_epsilon=_EQUIV_FPOS_EPS_; else a.equiv_fpos_epsilon=tolerance;
-  double sstr_volume=sstr.Volume();
-
-  if(LDEBUG) cerr << soliloquy << " [1] " << endl; //CO20200201
-
-  _aflags aflags;
-  // identify the minimum set of atoms
-  // bool PGROUPWRITE=FALSE,PGROUPKWRITE=FALSE,FGROUPWRITE=FALSE,IATOMSWRITE=FALSE;
-  // bool OSSWRITE=TRUE; // to FileMESSAGE, does not matter as it is /dev/null
-  // ofstream FileMESSAGE("/dev/stderr");
-  // SYM::CalculatePointGroup(FileMESSAGE,sstr,aflags,PGROUPWRITE,OSSWRITE,cout);
-  // SYM::CalculatePointGroupKLattice(FileMESSAGE,sstr,aflags,PGROUPKWRITE,OSSWRITE,cout);
-  // SYM::CalculateFactorGroup(FileMESSAGE,sstr,aflags,FGROUPWRITE,OSSWRITE,cout);
-  // SYM::CalculateInequivalentAtoms(FileMESSAGE,sstr,aflags,IATOMSWRITE,OSSWRITE,cout);
-
-  xmatrix<double> plattice(3,3),olattice(3,3);
-  xvector<double> fdisp(3),cdisp(3);
-  std::vector<xvector<double> > candidate_lattice_vector;
-
-  if(LDEBUG) cerr << soliloquy << " [2] " << endl; //CO20200201
-
-  int specie_min=sstr.num_each_type.at(0),ispecie_min=0,specie_min_threshold=_PRIM_MULTITHREAD_MIN_ATOMS_THRESHOLD_; // seems a good threshold
-  for(uint ispecie=0;ispecie<sstr.num_each_type.size();ispecie++)
-    if(sstr.num_each_type.at(ispecie)<specie_min) {
-      specie_min=sstr.num_each_type.at(ispecie);
-      ispecie_min=ispecie;
-    }
-  // cerr << "DEBUG specie_min=" << specie_min << endl;
-
-  // generate list of vectors
-  candidate_lattice_vector.clear();
-  candidate_lattice_vector.push_back(sstr.lattice(1));  // lattice is made of good vectors
-  candidate_lattice_vector.push_back(sstr.lattice(2));  // lattice is made of good vectors
-  candidate_lattice_vector.push_back(sstr.lattice(3));  // lattice is made of good vectors
-  // no threads
-
-  if(LDEBUG) cerr << soliloquy << " [3] " << endl; //CO20200201
-
-  if(!AFLOW_PTHREADS::FLAG || specie_min<=specie_min_threshold) {
-    //   cerr << "NO PTHREADS" << endl;
-    for(uint iat1=0;iat1<sstr.atoms.size();iat1++) { //      if(sstr.atoms.at(iat1).type==ispecie_min)
-      for(uint iat2=0;iat2<sstr.atoms.size();iat2++) { //           if(sstr.atoms.at(iat2).type==ispecie_min)
-        if(iat1!=iat2) {
-          fdisp=sstr.atoms.at(iat2).fpos-sstr.atoms.at(iat1).fpos;
-          cdisp=sstr.atoms.at(iat2).cpos-sstr.atoms.at(iat1).cpos;
-          if(aurostd::modulus(fdisp)>0.01 && aurostd::modulus(cdisp)>0.01)
-            if(IsTranslationFVector(sstr,fdisp)) 
-              candidate_lattice_vector.push_back(cdisp);
-        }
-      }
-    }
-  } else { // multithread
-    cerr << "START THREADS [1] (GetPrimitiveMULTITHREAD=" << AFLOW_PTHREADS::MAX_PTHREADS << ") [" << specie_min << "]" << endl;
-    AFLOW_PTHREADS::Clean_Threads();                                              // multithread clean
-    _threaded_GETTVECTORS_params params[MAX_ALLOCATABLE_PTHREADS];                     // multithread
-    // _threaded_GETTVECTORS_params params[AFLOW_PTHREADS::MAX_PTHREADS];               // multithread
-    // vector<_threaded_GETTVECTORS_params> params(AFLOW_PTHREADS::MAX_PTHREADS);          // multithread
-    // prepare
-    for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++) {              // multithread
-      // construction of params[i]                                         // multithread
-      params[ithread].ITHREAD=ithread;                                     // multithread
-      params[ithread].THREADS_MAX=AFLOW_PTHREADS::MAX_PTHREADS;                      // multithread
-      params[ithread].pstr=&sstr;                                          // multithread
-      params[ithread].ispecie_min=ispecie_min;                             // multithread
-      params[ithread].ptvector=&candidate_lattice_vector;                  // multithread
-      params[ithread].polattice=&olattice;                                 // multithread
-      params[ithread].itbusy=ithread;                                      // multithread
-      params[ithread].step=1;  // 1=gettvectors                            // multithread
-    }                                                                      // multithread
-    // run
-    for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++) {
-      AFLOW_PTHREADS::viret[ithread]=pthread_create(&(AFLOW_PTHREADS::vpthread[ithread]),NULL,_threaded_GetTvectors,(void*)&params[ithread]);
-      //  aurostd::Sleep(10);
-    }
-    // collect
-    for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++)
-      pthread_join((AFLOW_PTHREADS::vpthread[ithread]),NULL);
-  }
-  if(LDEBUG) cout << "DEBUG: candidate_lattice_vector.size()=" << candidate_lattice_vector.size() << endl;
-
-  // now split
-  int cnt=0;
-  olattice=sstr.lattice;                      // the lattice is always a good lattice
-  if(!AFLOW_PTHREADS::FLAG || specie_min<=specie_min_threshold) {
-    // now generate triplets
-    for(uint iu=0;iu<candidate_lattice_vector.size();iu++) {
-      for(uint i=1;i<=3;i++) plattice[1][i]=candidate_lattice_vector.at(iu)[i];
-      for(uint iv=0;iv<candidate_lattice_vector.size()&& iv!=iu;iv++) {
-        for(uint i=1;i<=3;i++) plattice[2][i]=candidate_lattice_vector.at(iv)[i];
-        for(uint iw=0;iw<candidate_lattice_vector.size()&& iw!=iv && iw!=iu;iw++) {
-          for(uint i=1;i<=3;i++) plattice[3][i]=candidate_lattice_vector.at(iw)[i];
-          if(det(plattice)>0.999 && det(plattice)<sstr_volume) {   // no coplanar and contain at least 1 atom and smaller than the original cell
-            if(aurostd::isinteger(sstr_volume/det(plattice),0.0001)) {    // integer ratio of volumes
-              //  cerr << sstr_volume/det(plattice) << " " << aurostd::isinteger(sstr_volume/det(plattice),0.001) << endl;
-              if(det(plattice)<det(olattice)) {                    // better than before
-                if(LDEBUG) cout << XPID << "DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
-                if(isdifferent(plattice,olattice,0.001)) {
-                  plattice=MinkowskiBasisReduction(plattice);      // Minkowski first
-                  plattice=NiggliUnitCellForm(plattice);           // Niggli Second
-                  if(isdifferent(plattice,olattice,0.001)) {
-                    olattice=plattice;
-                    cnt++;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  } else { // multithread
-    //    if(LDEBUG)
-    cerr << "START THREADS [2] (GetPrimitiveMULTITHREAD=" << AFLOW_PTHREADS::MAX_PTHREADS << ") [" << specie_min << "]" << endl;
-    AFLOW_PTHREADS::Clean_Threads();                                              // multithread clean
-    _threaded_GETTVECTORS_params params[MAX_ALLOCATABLE_PTHREADS];                     // multithread
-    // _threaded_GETTVECTORS_params params[AFLOW_PTHREADS::MAX_PTHREADS];               // multithread
-    // vector<_threaded_GETTVECTORS_params> params(AFLOW_PTHREADS::MAX_PTHREADS);          // multithread
-    // prepare
-    for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++) {              // multithread
-      // construction of params[i]                                         // multithread
-      params[ithread].ITHREAD=ithread;                                     // multithread
-      params[ithread].THREADS_MAX=AFLOW_PTHREADS::MAX_PTHREADS;                      // multithread
-      params[ithread].pstr=&sstr;                                          // multithread
-      params[ithread].ispecie_min=ispecie_min;                             // multithread
-      params[ithread].ptvector=&candidate_lattice_vector;                  // multithread
-      params[ithread].polattice=&olattice;                                 // multithread
-      params[ithread].itbusy=ithread;                                      // multithread
-      params[ithread].step=2;  // 1=gettvectors                            // multithread
-    }                                                                      // multithread
-    // run
-    for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++) {
-      AFLOW_PTHREADS::viret[ithread]=pthread_create(&(AFLOW_PTHREADS::vpthread[ithread]),NULL,_threaded_GetTvectors,(void*)&params[ithread]);
-      //  aurostd::Sleep(10);
-    }
-    // collect
-    for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++)
-      pthread_join((AFLOW_PTHREADS::vpthread[ithread]),NULL);
-    if(LDEBUG) cerr << soliloquy << " END THREADS " << endl; //CO20200201
-  }
-
-  plattice=olattice;
-
-  // done
-
-  if(LDEBUG){cerr << soliloquy << " sstr=" << endl;cerr << sstr << endl;} //CO20200201
-  xstructure b=sstr;
-  b.lattice=plattice;//b.lattice=roundoff(b.lattice,_EPS_FPOS_EQUAL_);
-  b.FixLattices();
-  b.write_lattice_flag=FALSE;
-  b.write_klattice_flag=FALSE;
-  b.write_DEBUG_flag=FALSE;
-  // plug them all
-  for(uint iat=0;iat<sstr.atoms.size();iat++) {
-    b.atoms.at(iat).fpos=BringInCell(C2F(b.lattice,b.atoms.at(iat).cpos));
-    b.atoms.at(iat).cpos=F2C(b.lattice,b.atoms.at(iat).fpos);
-  }
-  // now remove them
-  b=BringInCell(b);b.RemoveFractionalCopies(tolerance);
-  b=BringInCell(b);b.RemoveCartesianCopies(0.01);
-  // rescale back to original scale.
-  b.SetVolume(Volume(a)*b.atoms.size()/a.atoms.size());
-  b=ReScale(b,a.scale);
-  //  // fix it up with the new Minkowsky and Niggli reductions // CANT DO AUTOMATICALLY
-  //  b=LatticeReduction(b);
-  // Put everything in new primitive cell.
-  b=BringInCell(b);
-
-
-  // check !
-
-  // no fractional ratio of atoms
-  double fraction_atoms=(double) a.atoms.size()/b.atoms.size();
-  if(!aurostd::isinteger(fraction_atoms,0.01)) return _a;
-
-  // nearest too close
-  if(NearestNeighbor(b)<5.0*tolerance)  return _a;
-  if(NearestNeighbor(b)<0.1)  return _a;
-
-  // no messed up volume
-  double fraction=Volume(a)/Volume(b);
-  if(abs(b.atoms.size()*fraction-a.atoms.size())>0.1) {
-    stringstream message;
-    message << "ERROR   xstructure xstructure::GetPrimitive(void)" << endl;
-    message << "        supercell has the wrong number of atoms" << endl;
-    message << "        volume original    = " << Volume(a) << endl;
-    message << "        volume prim        = " << Volume(b) << endl;
-    message << "        a.scale            = " << a.scale << endl;
-    message << "        b.scale            = " << b.scale << endl;
-    message << "        a.atoms.size()     = " << a.atoms.size() << endl;
-    message << "        b.atoms.size()     = " << b.atoms.size() << endl;
-    message << "        fraction           = " << fraction << endl;
-    message << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
-    message << b << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::GetPrimitive(void)",message,_RUNTIME_ERROR_);
-  }
-  // everything ok
-  if(LDEBUG) cerr << soliloquy << " END [ok]=" << fraction_atoms << endl;  //CO20200201
-  b.ClearSymmetry();  //CO20181226 - new structure, symmetry not calculated
-  b.primitive_calculated = TRUE; //DX20201007
-  return b;
-
-}
+//ME20220208 [OBSOLETE - not used] xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // APRIL 2009 JUNE 2012 added tolerance
+//ME20220208 [OBSOLETE - not used]   bool LDEBUG=(FALSE || XHOST.DEBUG);
+//ME20220208 [OBSOLETE - not used]   string soliloquy="GetPrimitiveMULTITHREAD():"; //CO20200201
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG) cerr << soliloquy << " BEGIN " << endl; //CO20200201
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << soliloquy << " _a=" << endl;cerr << _a << endl;} //CO20200201
+//ME20220208 [OBSOLETE - not used]   cout.setf(std::ios::fixed,std::ios::floatfield);
+//ME20220208 [OBSOLETE - not used]   cout.precision(10);
+//ME20220208 [OBSOLETE - not used]   xstructure a(_a);
+//ME20220208 [OBSOLETE - not used]   xstructure sstr=a;
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << soliloquy << " sstr=" << endl;cerr << sstr << endl;} //CO20200201
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << soliloquy << " sstr.atoms.size()=" << sstr.atoms.size() << endl;}  //CO20200201
+//ME20220208 [OBSOLETE - not used]   sstr.SetVolume(sstr.atoms.size());
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << soliloquy << " sstr(post Vol)=" << endl;cerr << sstr << endl;} //CO20200201
+//ME20220208 [OBSOLETE - not used]   sstr=ReScale(sstr,1.0);
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << soliloquy << " sstr(pre BringInCell)=" << endl;cerr << sstr << endl;} //CO20200201
+//ME20220208 [OBSOLETE - not used]   sstr=BringInCell(sstr);
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << soliloquy << " sstr(post BringInCell)=" << endl;cerr << sstr << endl;} //CO20200201
+//ME20220208 [OBSOLETE - not used]   //  sstr.CalculateSymmetry();
+//ME20220208 [OBSOLETE - not used]   if(tolerance<=0.0) a.equiv_fpos_epsilon=_EQUIV_FPOS_EPS_; else a.equiv_fpos_epsilon=tolerance;
+//ME20220208 [OBSOLETE - not used]   double sstr_volume=sstr.Volume();
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG) cerr << soliloquy << " [1] " << endl; //CO20200201
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   _aflags aflags;
+//ME20220208 [OBSOLETE - not used]   // identify the minimum set of atoms
+//ME20220208 [OBSOLETE - not used]   // bool PGROUPWRITE=FALSE,PGROUPKWRITE=FALSE,FGROUPWRITE=FALSE,IATOMSWRITE=FALSE;
+//ME20220208 [OBSOLETE - not used]   // bool OSSWRITE=TRUE; // to FileMESSAGE, does not matter as it is /dev/null
+//ME20220208 [OBSOLETE - not used]   // ofstream FileMESSAGE("/dev/stderr");
+//ME20220208 [OBSOLETE - not used]   // SYM::CalculatePointGroup(FileMESSAGE,sstr,aflags,PGROUPWRITE,OSSWRITE,cout);
+//ME20220208 [OBSOLETE - not used]   // SYM::CalculatePointGroupKLattice(FileMESSAGE,sstr,aflags,PGROUPKWRITE,OSSWRITE,cout);
+//ME20220208 [OBSOLETE - not used]   // SYM::CalculateFactorGroup(FileMESSAGE,sstr,aflags,FGROUPWRITE,OSSWRITE,cout);
+//ME20220208 [OBSOLETE - not used]   // SYM::CalculateInequivalentAtoms(FileMESSAGE,sstr,aflags,IATOMSWRITE,OSSWRITE,cout);
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   xmatrix<double> plattice(3,3),olattice(3,3);
+//ME20220208 [OBSOLETE - not used]   xvector<double> fdisp(3),cdisp(3);
+//ME20220208 [OBSOLETE - not used]   std::vector<xvector<double> > candidate_lattice_vector;
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG) cerr << soliloquy << " [2] " << endl; //CO20200201
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   int specie_min=sstr.num_each_type.at(0),ispecie_min=0,specie_min_threshold=_PRIM_MULTITHREAD_MIN_ATOMS_THRESHOLD_; // seems a good threshold
+//ME20220208 [OBSOLETE - not used]   for(uint ispecie=0;ispecie<sstr.num_each_type.size();ispecie++)
+//ME20220208 [OBSOLETE - not used]     if(sstr.num_each_type.at(ispecie)<specie_min) {
+//ME20220208 [OBSOLETE - not used]       specie_min=sstr.num_each_type.at(ispecie);
+//ME20220208 [OBSOLETE - not used]       ispecie_min=ispecie;
+//ME20220208 [OBSOLETE - not used]     }
+//ME20220208 [OBSOLETE - not used]   // cerr << "DEBUG specie_min=" << specie_min << endl;
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   // generate list of vectors
+//ME20220208 [OBSOLETE - not used]   candidate_lattice_vector.clear();
+//ME20220208 [OBSOLETE - not used]   candidate_lattice_vector.push_back(sstr.lattice(1));  // lattice is made of good vectors
+//ME20220208 [OBSOLETE - not used]   candidate_lattice_vector.push_back(sstr.lattice(2));  // lattice is made of good vectors
+//ME20220208 [OBSOLETE - not used]   candidate_lattice_vector.push_back(sstr.lattice(3));  // lattice is made of good vectors
+//ME20220208 [OBSOLETE - not used]   // no threads
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG) cerr << soliloquy << " [3] " << endl; //CO20200201
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   if(!AFLOW_PTHREADS::FLAG || specie_min<=specie_min_threshold) {
+//ME20220208 [OBSOLETE - not used]     //   cerr << "NO PTHREADS" << endl;
+//ME20220208 [OBSOLETE - not used]     for(uint iat1=0;iat1<sstr.atoms.size();iat1++) { //      if(sstr.atoms.at(iat1).type==ispecie_min)
+//ME20220208 [OBSOLETE - not used]       for(uint iat2=0;iat2<sstr.atoms.size();iat2++) { //           if(sstr.atoms.at(iat2).type==ispecie_min)
+//ME20220208 [OBSOLETE - not used]         if(iat1!=iat2) {
+//ME20220208 [OBSOLETE - not used]           fdisp=sstr.atoms.at(iat2).fpos-sstr.atoms.at(iat1).fpos;
+//ME20220208 [OBSOLETE - not used]           cdisp=sstr.atoms.at(iat2).cpos-sstr.atoms.at(iat1).cpos;
+//ME20220208 [OBSOLETE - not used]           if(aurostd::modulus(fdisp)>0.01 && aurostd::modulus(cdisp)>0.01)
+//ME20220208 [OBSOLETE - not used]             if(IsTranslationFVector(sstr,fdisp))
+//ME20220208 [OBSOLETE - not used]               candidate_lattice_vector.push_back(cdisp);
+//ME20220208 [OBSOLETE - not used]         }
+//ME20220208 [OBSOLETE - not used]       }
+//ME20220208 [OBSOLETE - not used]     }
+//ME20220208 [OBSOLETE - not used]   } else { // multithread
+//ME20220208 [OBSOLETE - not used]     cerr << "START THREADS [1] (GetPrimitiveMULTITHREAD=" << AFLOW_PTHREADS::MAX_PTHREADS << ") [" << specie_min << "]" << endl;
+//ME20220208 [OBSOLETE - not used]     AFLOW_PTHREADS::Clean_Threads();                                              // multithread clean
+//ME20220208 [OBSOLETE - not used]     _threaded_GETTVECTORS_params params[MAX_ALLOCATABLE_PTHREADS];                     // multithread
+//ME20220208 [OBSOLETE - not used]     // _threaded_GETTVECTORS_params params[AFLOW_PTHREADS::MAX_PTHREADS];               // multithread
+//ME20220208 [OBSOLETE - not used]     // vector<_threaded_GETTVECTORS_params> params(AFLOW_PTHREADS::MAX_PTHREADS);          // multithread
+//ME20220208 [OBSOLETE - not used]     // prepare
+//ME20220208 [OBSOLETE - not used]     for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++) {              // multithread
+//ME20220208 [OBSOLETE - not used]       // construction of params[i]                                         // multithread
+//ME20220208 [OBSOLETE - not used]       params[ithread].ITHREAD=ithread;                                     // multithread
+//ME20220208 [OBSOLETE - not used]       params[ithread].THREADS_MAX=AFLOW_PTHREADS::MAX_PTHREADS;                      // multithread
+//ME20220208 [OBSOLETE - not used]       params[ithread].pstr=&sstr;                                          // multithread
+//ME20220208 [OBSOLETE - not used]       params[ithread].ispecie_min=ispecie_min;                             // multithread
+//ME20220208 [OBSOLETE - not used]       params[ithread].ptvector=&candidate_lattice_vector;                  // multithread
+//ME20220208 [OBSOLETE - not used]       params[ithread].polattice=&olattice;                                 // multithread
+//ME20220208 [OBSOLETE - not used]       params[ithread].itbusy=ithread;                                      // multithread
+//ME20220208 [OBSOLETE - not used]       params[ithread].step=1;  // 1=gettvectors                            // multithread
+//ME20220208 [OBSOLETE - not used]     }                                                                      // multithread
+//ME20220208 [OBSOLETE - not used]     // run
+//ME20220208 [OBSOLETE - not used]     for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++) {
+//ME20220208 [OBSOLETE - not used]       AFLOW_PTHREADS::viret[ithread]=pthread_create(&(AFLOW_PTHREADS::vpthread[ithread]),NULL,_threaded_GetTvectors,(void*)&params[ithread]);
+//ME20220208 [OBSOLETE - not used]       //  aurostd::Sleep(10);
+//ME20220208 [OBSOLETE - not used]     }
+//ME20220208 [OBSOLETE - not used]     // collect
+//ME20220208 [OBSOLETE - not used]     for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++)
+//ME20220208 [OBSOLETE - not used]       pthread_join((AFLOW_PTHREADS::vpthread[ithread]),NULL);
+//ME20220208 [OBSOLETE - not used]   }
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG) cout << "DEBUG: candidate_lattice_vector.size()=" << candidate_lattice_vector.size() << endl;
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   // now split
+//ME20220208 [OBSOLETE - not used]   int cnt=0;
+//ME20220208 [OBSOLETE - not used]   olattice=sstr.lattice;                      // the lattice is always a good lattice
+//ME20220208 [OBSOLETE - not used]   if(!AFLOW_PTHREADS::FLAG || specie_min<=specie_min_threshold) {
+//ME20220208 [OBSOLETE - not used]     // now generate triplets
+//ME20220208 [OBSOLETE - not used]     for(uint iu=0;iu<candidate_lattice_vector.size();iu++) {
+//ME20220208 [OBSOLETE - not used]       for(uint i=1;i<=3;i++) plattice[1][i]=candidate_lattice_vector.at(iu)[i];
+//ME20220208 [OBSOLETE - not used]       for(uint iv=0;iv<candidate_lattice_vector.size()&& iv!=iu;iv++) {
+//ME20220208 [OBSOLETE - not used]         for(uint i=1;i<=3;i++) plattice[2][i]=candidate_lattice_vector.at(iv)[i];
+//ME20220208 [OBSOLETE - not used]         for(uint iw=0;iw<candidate_lattice_vector.size()&& iw!=iv && iw!=iu;iw++) {
+//ME20220208 [OBSOLETE - not used]           for(uint i=1;i<=3;i++) plattice[3][i]=candidate_lattice_vector.at(iw)[i];
+//ME20220208 [OBSOLETE - not used]           if(det(plattice)>0.999 && det(plattice)<sstr_volume) {   // no coplanar and contain at least 1 atom and smaller than the original cell
+//ME20220208 [OBSOLETE - not used]             if(aurostd::isinteger(sstr_volume/det(plattice),0.0001)) {    // integer ratio of volumes
+//ME20220208 [OBSOLETE - not used]               //  cerr << sstr_volume/det(plattice) << " " << aurostd::isinteger(sstr_volume/det(plattice),0.001) << endl;
+//ME20220208 [OBSOLETE - not used]               if(det(plattice)<det(olattice)) {                    // better than before
+//ME20220208 [OBSOLETE - not used]                 if(LDEBUG) cout << XPID << "DEBUG"<<iu<<","<<iv<<","<<iw<<" "<< sstr_volume<<" "<<det(plattice)<<" "<<sstr_volume/det(plattice)<<endl;
+//ME20220208 [OBSOLETE - not used]                 if(isdifferent(plattice,olattice,0.001)) {
+//ME20220208 [OBSOLETE - not used]                   plattice=MinkowskiBasisReduction(plattice);      // Minkowski first
+//ME20220208 [OBSOLETE - not used]                   plattice=NiggliUnitCellForm(plattice);           // Niggli Second
+//ME20220208 [OBSOLETE - not used]                   if(isdifferent(plattice,olattice,0.001)) {
+//ME20220208 [OBSOLETE - not used]                     olattice=plattice;
+//ME20220208 [OBSOLETE - not used]                     cnt++;
+//ME20220208 [OBSOLETE - not used]                   }
+//ME20220208 [OBSOLETE - not used]                 }
+//ME20220208 [OBSOLETE - not used]               }
+//ME20220208 [OBSOLETE - not used]             }
+//ME20220208 [OBSOLETE - not used]           }
+//ME20220208 [OBSOLETE - not used]         }
+//ME20220208 [OBSOLETE - not used]       }
+//ME20220208 [OBSOLETE - not used]     }
+//ME20220208 [OBSOLETE - not used]   } else { // multithread
+//ME20220208 [OBSOLETE - not used]     //    if(LDEBUG)
+//ME20220208 [OBSOLETE - not used]     cerr << "START THREADS [2] (GetPrimitiveMULTITHREAD=" << AFLOW_PTHREADS::MAX_PTHREADS << ") [" << specie_min << "]" << endl;
+//ME20220208 [OBSOLETE - not used]     AFLOW_PTHREADS::Clean_Threads();                                              // multithread clean
+//ME20220208 [OBSOLETE - not used]     _threaded_GETTVECTORS_params params[MAX_ALLOCATABLE_PTHREADS];                     // multithread
+//ME20220208 [OBSOLETE - not used]     // _threaded_GETTVECTORS_params params[AFLOW_PTHREADS::MAX_PTHREADS];               // multithread
+//ME20220208 [OBSOLETE - not used]     // vector<_threaded_GETTVECTORS_params> params(AFLOW_PTHREADS::MAX_PTHREADS);          // multithread
+//ME20220208 [OBSOLETE - not used]     // prepare
+//ME20220208 [OBSOLETE - not used]     for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++) {              // multithread
+//ME20220208 [OBSOLETE - not used]       // construction of params[i]                                         // multithread
+//ME20220208 [OBSOLETE - not used]       params[ithread].ITHREAD=ithread;                                     // multithread
+//ME20220208 [OBSOLETE - not used]       params[ithread].THREADS_MAX=AFLOW_PTHREADS::MAX_PTHREADS;                      // multithread
+//ME20220208 [OBSOLETE - not used]       params[ithread].pstr=&sstr;                                          // multithread
+//ME20220208 [OBSOLETE - not used]       params[ithread].ispecie_min=ispecie_min;                             // multithread
+//ME20220208 [OBSOLETE - not used]       params[ithread].ptvector=&candidate_lattice_vector;                  // multithread
+//ME20220208 [OBSOLETE - not used]       params[ithread].polattice=&olattice;                                 // multithread
+//ME20220208 [OBSOLETE - not used]       params[ithread].itbusy=ithread;                                      // multithread
+//ME20220208 [OBSOLETE - not used]       params[ithread].step=2;  // 1=gettvectors                            // multithread
+//ME20220208 [OBSOLETE - not used]     }                                                                      // multithread
+//ME20220208 [OBSOLETE - not used]     // run
+//ME20220208 [OBSOLETE - not used]     for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++) {
+//ME20220208 [OBSOLETE - not used]       AFLOW_PTHREADS::viret[ithread]=pthread_create(&(AFLOW_PTHREADS::vpthread[ithread]),NULL,_threaded_GetTvectors,(void*)&params[ithread]);
+//ME20220208 [OBSOLETE - not used]       //  aurostd::Sleep(10);
+//ME20220208 [OBSOLETE - not used]     }
+//ME20220208 [OBSOLETE - not used]     // collect
+//ME20220208 [OBSOLETE - not used]     for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++)
+//ME20220208 [OBSOLETE - not used]       pthread_join((AFLOW_PTHREADS::vpthread[ithread]),NULL);
+//ME20220208 [OBSOLETE - not used]     if(LDEBUG) cerr << soliloquy << " END THREADS " << endl; //CO20200201
+//ME20220208 [OBSOLETE - not used]   }
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   plattice=olattice;
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   // done
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << soliloquy << " sstr=" << endl;cerr << sstr << endl;} //CO20200201
+//ME20220208 [OBSOLETE - not used]   xstructure b=sstr;
+//ME20220208 [OBSOLETE - not used]   b.lattice=plattice;//b.lattice=roundoff(b.lattice,_EPS_FPOS_EQUAL_);
+//ME20220208 [OBSOLETE - not used]   b.FixLattices();
+//ME20220208 [OBSOLETE - not used]   b.write_lattice_flag=FALSE;
+//ME20220208 [OBSOLETE - not used]   b.write_klattice_flag=FALSE;
+//ME20220208 [OBSOLETE - not used]   b.write_DEBUG_flag=FALSE;
+//ME20220208 [OBSOLETE - not used]   // plug them all
+//ME20220208 [OBSOLETE - not used]   for(uint iat=0;iat<sstr.atoms.size();iat++) {
+//ME20220208 [OBSOLETE - not used]     b.atoms.at(iat).fpos=BringInCell(C2F(b.lattice,b.atoms.at(iat).cpos));
+//ME20220208 [OBSOLETE - not used]     b.atoms.at(iat).cpos=F2C(b.lattice,b.atoms.at(iat).fpos);
+//ME20220208 [OBSOLETE - not used]   }
+//ME20220208 [OBSOLETE - not used]   // now remove them
+//ME20220208 [OBSOLETE - not used]   b=BringInCell(b);b.RemoveFractionalCopies(tolerance);
+//ME20220208 [OBSOLETE - not used]   b=BringInCell(b);b.RemoveCartesianCopies(0.01);
+//ME20220208 [OBSOLETE - not used]   // rescale back to original scale.
+//ME20220208 [OBSOLETE - not used]   b.SetVolume(Volume(a)*b.atoms.size()/a.atoms.size());
+//ME20220208 [OBSOLETE - not used]   b=ReScale(b,a.scale);
+//ME20220208 [OBSOLETE - not used]   //  // fix it up with the new Minkowsky and Niggli reductions // CANT DO AUTOMATICALLY
+//ME20220208 [OBSOLETE - not used]   //  b=LatticeReduction(b);
+//ME20220208 [OBSOLETE - not used]   // Put everything in new primitive cell.
+//ME20220208 [OBSOLETE - not used]   b=BringInCell(b);
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   // check !
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   // no fractional ratio of atoms
+//ME20220208 [OBSOLETE - not used]   double fraction_atoms=(double) a.atoms.size()/b.atoms.size();
+//ME20220208 [OBSOLETE - not used]   if(!aurostd::isinteger(fraction_atoms,0.01)) return _a;
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   // nearest too close
+//ME20220208 [OBSOLETE - not used]   if(NearestNeighbor(b)<5.0*tolerance)  return _a;
+//ME20220208 [OBSOLETE - not used]   if(NearestNeighbor(b)<0.1)  return _a;
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used]   // no messed up volume
+//ME20220208 [OBSOLETE - not used]   double fraction=Volume(a)/Volume(b);
+//ME20220208 [OBSOLETE - not used]   if(abs(b.atoms.size()*fraction-a.atoms.size())>0.1) {
+//ME20220208 [OBSOLETE - not used]     stringstream message;
+//ME20220208 [OBSOLETE - not used]     message << "ERROR   xstructure xstructure::GetPrimitive(void)" << endl;
+//ME20220208 [OBSOLETE - not used]     message << "        supercell has the wrong number of atoms" << endl;
+//ME20220208 [OBSOLETE - not used]     message << "        volume original    = " << Volume(a) << endl;
+//ME20220208 [OBSOLETE - not used]     message << "        volume prim        = " << Volume(b) << endl;
+//ME20220208 [OBSOLETE - not used]     message << "        a.scale            = " << a.scale << endl;
+//ME20220208 [OBSOLETE - not used]     message << "        b.scale            = " << b.scale << endl;
+//ME20220208 [OBSOLETE - not used]     message << "        a.atoms.size()     = " << a.atoms.size() << endl;
+//ME20220208 [OBSOLETE - not used]     message << "        b.atoms.size()     = " << b.atoms.size() << endl;
+//ME20220208 [OBSOLETE - not used]     message << "        fraction           = " << fraction << endl;
+//ME20220208 [OBSOLETE - not used]     message << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
+//ME20220208 [OBSOLETE - not used]     message << b << endl;
+//ME20220208 [OBSOLETE - not used]     throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::GetPrimitive(void)",message,_RUNTIME_ERROR_);
+//ME20220208 [OBSOLETE - not used]   }
+//ME20220208 [OBSOLETE - not used]   // everything ok
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG) cerr << soliloquy << " END [ok]=" << fraction_atoms << endl;  //CO20200201
+//ME20220208 [OBSOLETE - not used]   b.ClearSymmetry();  //CO20181226 - new structure, symmetry not calculated
+//ME20220208 [OBSOLETE - not used]   b.primitive_calculated = TRUE; //DX20201007
+//ME20220208 [OBSOLETE - not used]   return b;
+//ME20220208 [OBSOLETE - not used]
+//ME20220208 [OBSOLETE - not used] }
 
 
 xstructure GetPrimitiveSINGLE(const xstructure& _a,double tolerance) {  // APRIL 2009JUNE 2012 added tolerance

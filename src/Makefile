@@ -213,7 +213,7 @@ production:
 
 ###################################################################################################
 #CO201706147
-$(SQLITE_OBJ): $(SQLITE_C) Makefile
+$(SQLITE_OBJ): $(SQLITE_C) $(MFS)
 	$(CC) $(SQLITE_OPTS) -c $< -o $@ $(FLAGS_STATIC_POST)
 #	$(CC) -DSQLITE_ENABLE_JSON1 -DSQLITE_OMIT_LOAD_EXTENSION -o $@ -c $< $(LIBS)	#-DSQLITE_OMIT_LOAD_EXTENSION doesn't really work amalgamation
 #	$(CC) -DSQLITE_ENABLE_JSON1 -o $@ -c $< $(LIBS)
@@ -224,9 +224,9 @@ $(SQLITE_OBJ): $(SQLITE_C) Makefile
 #[CO20200508 - do not include AFLOW*.h or AUROSTD*.cpp/AUROSTD*.h].cpp.o: .cpp .h $(MFS) $(AFLOW_HPPS) $(AUROSTD_HPPS) $(AUROSTD_CPPS)
 #[CO20200508 - addressing: warning: ignoring prerequisites on suffix rule definition].cpp.o: .cpp .h Makefile
 #[ME20220205 - added Makefile.aflow as dependency]
-%.o: %.cpp %.h Makefile Makefile.aflow
+%.o: %.cpp %.h $(MFS)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
-%.o: %.cpp Makefile Makefile.aflow
+%.o: %.cpp $(MFS)
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 #	touch $@
 ###################################################################################################

@@ -68,6 +68,7 @@
 //   xThread xt;
 //   xt.run(ntasks, f3);
 //
+//
 // Non-static member functions with xThread:
 //
 // Member functions of a class cannot be directly plugged into run because they
@@ -100,6 +101,12 @@
 // and one std::placeholders::_N for each argument of the function.
 // Using namespace std::placeholders can make std::bind more legible.
 //
+//
+// Lambda functions with xThread:
+//
+// Lambda functions should be assigned to a std::function. However, they do not
+// need to be bound like non-static member functions.
+//
 // ----------
 //
 // Setting the number of CPUs:
@@ -108,26 +115,32 @@
 // number of threads can be set as well. In that case, xThread will wait until
 // that minimum number of threads is available.
 //
+// WARNING: If the minimum is set to a value that is unattainable, the function
+// will never run. It is best to leave the minimum number of CPUs to 1, which
+// will always start as it doesn't spawn a new thread.
+//
 // ----------
 //
 // Progress bars:
 // To use a progress bar, pass an ostream into the setProgressBar() function
 // before calling run(). unsetProgressBar() removes the progress bar.
 //
+// Do not set the progress bar if the xThread is called in another threaded
+// run to avoid garbled output.
+//
 // ----------
 //
 // Thread safety:
-// xThread guarantees only that no two instances of the called function writes
+// xThread guarantees only that no two instances of the called function write
 // to the same index or iterator using mutexes. It cannot guarantee that the
 // passed function itself is thread-safe. Functions that perform actions that
-// are not thread-safe should pass their own mutex as a parameter.
+// are not thread-safe should pass their own mutex as an input parameter.
 //
 // ----------
 
 #ifdef AFLOW_MULTITHREADS_ENABLE
 
 #include "aflow.h"
-#include "APL/aflow_apl.h"
 
 // Global mutex that prevents two xThread instances from checking the number
 // of available CPUs at the same time.
@@ -557,11 +570,6 @@ namespace xthread {
 //
 // ----------
 //
-// All instantiations should be added below with a comment on which function is
-// instantiated. One instantiation can cover multiple functions.
-//
-// ----------
-//
 // Common mistakes
 //
 // When encountering linker errors, check if:
@@ -577,6 +585,12 @@ namespace xthread {
 // - on the other hand, the index variable type is not to be added inside <>
 //
 // ----------
+//
+// All instantiations should be added below with a comment on which function is
+// instantiated. One instantiation can cover multiple functions.
+//
+
+#include "APL/aflow_apl.h"
 
 namespace xthread {
 
@@ -719,6 +733,22 @@ namespace xthread {
   >(int, std::function<void(int, const vector<string>&, const vector<string>&)>&,
     vector<string>&,
     vector<string>&
+  );
+
+  //aflowlib::XPLUG_Directories_ok
+  template void xThread::run<
+    void(uint, uint, const deque<string>&, deque<string>&, deque<bool>&, std::mutex&),
+    uint,
+    deque<string>,
+    deque<string>,
+    deque<bool>,
+    std::mutex
+  >(uint, void (&) (uint, uint, const deque<string>&, deque<string>&, deque<bool>&, std::mutex&),
+    uint&,
+    deque<string>&,
+    deque<string>&,
+    deque<bool>&,
+    std::mutex&
   );
 
   // runPredistributed --------------------------------------------------------
