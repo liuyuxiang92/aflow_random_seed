@@ -505,9 +505,10 @@ namespace pocc {
 
     double shift = max(khi);
     double sum = 0.0;
+    int gtotal = aurostd::sum(degeneracies);
 
     for (int i=khi.lrows; i<=khi.urows; i++){
-      sum += degeneracies[i-khi.lrows] * exp(khi[i]-shift);
+      sum += degeneracies[i-khi.lrows] * exp(khi[i]-shift)/((double) gtotal);
     }
 
     return shift + std::log(sum);
