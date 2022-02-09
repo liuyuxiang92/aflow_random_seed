@@ -3928,8 +3928,8 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     oss.setf(std::ios::fixed,std::ios::floatfield);
-    // set coordinate system to idenity
-    xmatrix<double> coorsys = aurostd::eye<double>(3, 3);
+    xmatrix<double> coorsys = aurostd::eye<double>(3, 3); // set coordinate system to idenity
+    // write the coordinate system
     for (uint i = 1; i <= 3; i++) {
       for (uint j = 1; j <= 3; j++) {
           oss << coorsys(i, j) << " ";
@@ -3956,7 +3956,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
           oss << coord(j) << " ";
       }
       if (aa.atoms.at(iat).name_is_given == TRUE) {
-        oss << " " << aa.atoms.at(iat).name;
+        oss << " " << aa.atoms.at(iat).cleanname;
       }
       oss << endl;
     }
