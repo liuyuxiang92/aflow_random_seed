@@ -211,7 +211,7 @@ namespace KBIN {
       if(!aurostd::FileEmpty(aflowindir)) { // must not be empty
         if(aurostd::substring2bool(aflowindir,_AFLOWIN_)) {  // there must be an _AFLOWIN_
           aurostd::StringSubst(aflowindir,_AFLOWIN_,"");
-          if(!aurostd::LinkFileAtomic(aflowindir+"/"+_AFLOWIN_,aflowindir+"/LOCK."+_AFLOWIN_) && !aurostd::FileExist(aflowindir+_AFLOWLOCK_)) { // it should be UNLOCKED if temporary hard link can be made OR LOCK file does not exist // SD20220207
+          if(!aurostd::LinkFileAtomic(aflowindir+"/"+_AFLOWIN_,aflowindir+"/LOCK."+_AFLOWIN_,false) && !aurostd::FileExist(aflowindir+_AFLOWLOCK_)) { // it should be UNLOCKED if temporary hard link can be made OR LOCK file does not exist // SD20220207
             //  if(osswrite) {oss << "MMMMM  Loading Valid File Entry = " << aflowindir << MessageTime(aflags);aurostd::PrintMessageStream(oss,XHOST.QUIET);};
             return TRUE;	
           } else { // must be unlocked
@@ -640,7 +640,7 @@ namespace KBIN {
             aurostd::PrintMessageStream(aus,XHOST.QUIET);
           } else {                                                                                // ******* Directory EXISTS
             if(LDEBUG) cerr << soliloquy << " STEP1c" << endl;
-            if(!aurostd::LinkFileAtomic(aflags.Directory+"/"+_AFLOWIN_,aflags.Directory+"/LOCK."+_AFLOWIN_) && aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_)) {                                               // ******* Directory is locked
+            if(!aurostd::LinkFileAtomic(aflags.Directory+"/"+_AFLOWIN_,aflags.Directory+"/LOCK."+_AFLOWIN_,false) && aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_)) {                                               // ******* Directory is locked
               aus << "LLLLL  DIRECTORY_LOCKED ...bzzzz... !MULTI = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
               aurostd::PrintMessageStream(aus,XHOST.QUIET);
             } else {
@@ -808,7 +808,7 @@ namespace KBIN {
         FOUND=FALSE;
         for(uint i=0;i<vaflowin.size()&& !FOUND;i++) {
           aflags.Directory="NULL";
-          if(!aurostd::LinkFileAtomic(vaflowin.at(i)+"/"+_AFLOWIN_,vaflowin.at(i)+"/LOCK."+_AFLOWIN_) && aurostd::DirectoryLocked(vaflowin.at(i),_AFLOWLOCK_)) {
+          if(!aurostd::LinkFileAtomic(vaflowin.at(i)+"/"+_AFLOWIN_,vaflowin.at(i)+"/LOCK."+_AFLOWIN_,false) && aurostd::DirectoryLocked(vaflowin.at(i),_AFLOWLOCK_)) {
             if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  LOCKED ...bzzz... MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
             if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
             FOUND=FALSE;
@@ -858,7 +858,7 @@ namespace KBIN {
         // again another check for LOCK, because NFS (network file system might be slow in concurrent seaches
         //     if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_) && FOUND) {cerr << "AFLOW EXCEPTION on concurrent LOCK: " << aflags.Directory << endl; FOUND=FALSE;}
         // LinkFileAtomic will fail with error if aflags.Directory="NULL" // SD20220209
-        if(aflags.Directory!="NULL" && !aurostd::LinkFileAtomic(aflags.Directory+"/"+_AFLOWIN_,aflags.Directory+"/LOCK."+_AFLOWIN_) && aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_) && FOUND) {
+        if(aflags.Directory!="NULL" && !aurostd::LinkFileAtomic(aflags.Directory+"/"+_AFLOWIN_,aflags.Directory+"/LOCK."+_AFLOWIN_,false) && aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_) && FOUND) {
         //if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_) && FOUND) {
           aus << "AFLOW EXCEPTION on concurrent LOCK: " << aflags.Directory << endl;
           aurostd::PrintMessageStream(aus,XHOST.QUIET);
@@ -1193,10 +1193,10 @@ namespace KBIN {
     } else {                                                                                                    // ******* Directory EXISTS
       // ***************************************************************************
       // Check LOCK again
-      if((!aurostd::LinkFileAtomic(aflags.Directory+"/"+_AFLOWIN_,aflags.Directory+"/LOCK."+_AFLOWIN_) && aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_)) || DirectorySkipped(aflags.Directory) || DirectoryAlreadyInDatabase(aflags.Directory,aflags.AFLOW_FORCE_RUN) || DirectoryUnwritable(aflags.Directory)) {
+      if((!aurostd::LinkFileAtomic(aflags.Directory+"/"+_AFLOWIN_,aflags.Directory+"/LOCK."+_AFLOWIN_,false) && aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_)) || DirectorySkipped(aflags.Directory) || DirectoryAlreadyInDatabase(aflags.Directory,aflags.AFLOW_FORCE_RUN) || DirectoryUnwritable(aflags.Directory)) {
         // ******* Directory is locked/skipped/unwritable
         // LOCK/SKIP/UNWRITABLE exist, then RUN already RUN
-        if(!aurostd::LinkFileAtomic(aflags.Directory+"/"+_AFLOWIN_,aflags.Directory+"/LOCK."+_AFLOWIN_) && aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_)) {
+        if(!aurostd::LinkFileAtomic(aflags.Directory+"/"+_AFLOWIN_,aflags.Directory+"/LOCK."+_AFLOWIN_,false) && aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_)) {
           aus << "LLLLL  LOCKED ... bzzz ... KBIN::RUN_Directory "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           aus << "LLLLL  LOCKED ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           aurostd::PrintMessageStream(aus,XHOST.QUIET);

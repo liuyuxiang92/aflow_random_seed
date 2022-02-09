@@ -2109,16 +2109,16 @@ namespace aurostd {
   // Function aurostd::LinkFileAtomic
   // ***************************************************************************
   // Simon Divilov
-  // Create a hard or symbolic link of a file using C++ functions
-  bool LinkFileAtomic(const string& from,const string& to,bool hard) {
+  // Create a symbolic or hard link of a file using C++ functions
+  bool LinkFileAtomic(const string& from,const string& to,bool soft) {
     int fail;
     string from_clean=CleanFileName(from),to_clean=CleanFileName(to);
     if(from_clean.empty() || to_clean.empty()) {return FALSE;}
-    if(hard) {
-      fail = link(from_clean.c_str(),to_clean.c_str());
+    if(soft) {
+      fail = symlink(from_clean.c_str(),to_clean.c_str());
     }
     else {
-      fail = symlink(from_clean.c_str(),to_clean.c_str());
+      fail = link(from_clean.c_str(),to_clean.c_str());
     }
     if(fail) {
       if(errno==EEXIST) {
