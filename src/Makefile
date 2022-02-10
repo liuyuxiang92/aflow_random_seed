@@ -1225,7 +1225,7 @@ check_proto:
 .PHONY: check_schema
 check_schema:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --schema_test
+	./aflow --unit_test=schema
 .PHONY: check_Egap
 check_Egap:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
@@ -1245,7 +1245,7 @@ check_smith:
 .PHONY: check_coordination
 check_coordination:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --coordination_test
+	./aflow --unit_test=coordination
 .PHONY: check_slab
 check_slab:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
@@ -1579,7 +1579,7 @@ check_aflow_xtal_finder:
 .PHONY: check_fold_atoms_in_cell_routine
 check_fold_atoms_in_cell_routine:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --FoldAtomsInCell_test
+	./aflow --unit_test=fold_atoms
 .PHONY: check_prototype_generator
 check_prototype_generator:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
@@ -1641,15 +1641,15 @@ check_cce:
 .PHONY: check_atomic_environment #HE20210616
 check_atomic_environment:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --AtomicEnvironment_test
+	./aflow --unit_test=atomic_environment
 .PHONY: check_aurostd
 check_aurostd:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --aurostd_test
+	./aflow --unit_test=aurostd
 .PHONY: check_cif_parser
 check_cif_parser:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --cif_parser_test
+	./aflow --unit_test=cif_parser
 
 #[ME20220205 - Obsolete with C++11]
 #ifeq ($(UNAME),Linux)

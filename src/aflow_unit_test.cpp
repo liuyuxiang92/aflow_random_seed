@@ -64,15 +64,15 @@ namespace unittest {
 
     // aurostd
     xchk = initializeXCheck();
-    xchk.func = std::bind(&UnitTest::xvectorTest, this, _1, _2, _3);
-    xchk.function_name = XPID + "xvectorTest():";
-    xchk.task_description = "Testing xvector";
-    test_functions["schema"] = xchk;
-
-    xchk = initializeXCheck();
     xchk.func = std::bind(&UnitTest::xscalarTest, this, _1, _2, _3);
     xchk.function_name = XPID + "xscalarTest():";
     xchk.task_description = "Testing xscalar";
+    test_functions["schema"] = xchk;
+
+    xchk = initializeXCheck();
+    xchk.func = std::bind(&UnitTest::xvectorTest, this, _1, _2, _3);
+    xchk.function_name = XPID + "xvectorTest():";
+    xchk.task_description = "Testing xvector";
     test_functions["schema"] = xchk;
 
     // database
@@ -88,6 +88,12 @@ namespace unittest {
     xchk.function_name = XPID + "AtomicEnvironmentTest():";
     xchk.task_description = "Creating atomic environments";
     test_functions["atomic_environment"] = xchk;
+
+    xchk = initializeXCheck();
+    xchk.func = std::bind(&UnitTest::atomicEnvironmentTest, this, _1, _2, _3);
+    xchk.function_name = XPID + "coordinationTest():";
+    xchk.task_description = "Testing coordination numbers";
+    test_functions["coordination"] = xchk;
 
     xchk = initializeXCheck();
     xchk.func = std::bind(&UnitTest::cifParserTest, this, _1, _2, _3);
@@ -128,9 +134,9 @@ namespace unittest {
     test_groups.clear();
     test2group.clear();
 
-    test_groups["aurostd"] = {"xvector", "xscalar"};
+    test_groups["aurostd"] = {"xscalar", "xvector"};
     test_groups["database"] = {"schema"};
-    test_groups["xstructure"] = {"atomic_environment", "cif_parser", "fold_atoms"};
+    test_groups["xstructure"] = {"atomic_environment", "coordination", "cif_parser", "fold_atoms"};
 
     for (const auto& group : test_groups) {
       for (const string& member : group.second) {
@@ -352,6 +358,28 @@ namespace unittest {
 // aurostd
 namespace unittest {
 
+  void UnitTest::xscalarTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
+    if (errors.size()) {}  // Suppress compiler warnings
+    // setup test environment
+    string check_function = "";
+    string check_description = "";
+
+    // ---------------------------------------------------------------------------
+    // Check | double2fraction conversion //DX20210908
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::double2fraction()";
+    check_description = "convert a double to a fraction.";
+
+    double test_double = 1.625;
+    int numerator=1, denominator=1;
+    string answer = "13/8";
+    aurostd::double2fraction(test_double,numerator,denominator);
+    stringstream result_ss; result_ss << numerator << "/" << denominator;
+
+    checkEqual(result_ss.str(), answer, check_function, check_description, passed_checks, results);
+  }
+
   void UnitTest::xvectorTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
     if (errors.size()) {}  // Suppress compiler warnings
     // setup test environment
@@ -568,28 +596,6 @@ namespace unittest {
 
     calculated_dbl = aurostd::areaPointsOnPlane(ipoints);
     checkSimilar(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
-  }
-
-  void UnitTest::xscalarTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
-    if (errors.size()) {}  // Suppress compiler warnings
-    // setup test environment
-    string check_function = "";
-    string check_description = "";
-
-    // ---------------------------------------------------------------------------
-    // Check | double2fraction conversion //DX20210908
-    // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
-    check_function = "aurostd::double2fraction()";
-    check_description = "convert a double to a fraction.";
-
-    double test_double = 1.625;
-    int numerator=1, denominator=1;
-    string answer = "13/8";
-    aurostd::double2fraction(test_double,numerator,denominator);
-    stringstream result_ss; result_ss << numerator << "/" << denominator;
-
-    checkEqual(result_ss.str(), answer, check_function, check_description, passed_checks, results);
   }
 
 }
@@ -1029,6 +1035,66 @@ namespace unittest {
     checkEqual(expected_str, calculated_str, check_function, check_description, passed_checks, results);
   }
 
+  //CO20190520
+  void UnitTest::coordinationTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
+    if (errors.size()) {} // Suppress compiler warnings
+    // Set up test environment
+    string check_function = "", check_description = "";
+    uint expected_uint = 0, calculated_uint = 0;
+
+    xstructure str("aflowlib.duke.edu:AFLOWDATA/ICSD_WEB/FCC/Cl1Na1_ICSD_240599","CONTCAR.relax.vasp",IOAFLOW_AUTO);
+    deque<deque<uint> > coordinations;
+    str.GetCoordinations(coordinations);
+
+    check_function = "coordinations.size()";
+    check_description = "Number of iatoms";
+    calculated_uint = coordinations.size();
+    expected_uint = 2;
+    checkEqual(calculated_uint, expected_uint, check_function, check_description, passed_checks, results);
+
+    check_function = "coordinations[0].size()";
+    check_description = "Number of coordination environments atom 1";
+    calculated_uint = coordinations[0].size();
+    expected_uint = 2;
+    checkEqual(calculated_uint, expected_uint, check_function, check_description, passed_checks, results);
+
+    check_function = "coordinations[1].size()";
+    check_description = "Number of coordination environments atom 2";
+    calculated_uint = coordinations[1].size();
+    expected_uint = 2;
+    checkEqual(calculated_uint, expected_uint, check_function, check_description, passed_checks, results);
+
+    //first iatom
+    //first shell
+    check_function = "coordinations[0][0]";
+    check_description = "First shell atom 1";
+    calculated_uint = coordinations[0][0];
+    expected_uint = 6;
+    checkEqual(calculated_uint, expected_uint, check_function, check_description, passed_checks, results);
+
+    //second shell
+    check_function = "coordinations[0][1]";
+    check_description = "Second shell atom 1";
+    calculated_uint = coordinations[0][1];
+    expected_uint = 12;
+    checkEqual(calculated_uint, expected_uint, check_function, check_description, passed_checks, results);
+
+    //second iatom
+    //first shell
+    check_function = "coordinations[1][0]";
+    check_description = "First shell atom 2";
+    calculated_uint = coordinations[1][0];
+    expected_uint = 6;
+    checkEqual(calculated_uint, expected_uint, check_function, check_description, passed_checks, results);
+
+    //second shell
+    check_function = "coordinations[1][1]";
+    check_description = "Second shell atom 2";
+    calculated_uint = coordinations[1][1];
+    expected_uint = 12;
+    checkEqual(calculated_uint, expected_uint, check_function, check_description, passed_checks, results);
+  }
+
   //DX20210129
   void UnitTest::foldAtomsInCellTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
     // setup test environment
@@ -1394,55 +1460,6 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   }
 
   message << "smith test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
-  return TRUE; //CO20180419
-}
-
-bool coordinationTest(ostream& oss){ofstream FileMESSAGE;return coordinationTest(FileMESSAGE,oss);}  //CO20190520
-bool coordinationTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
-  string soliloquy=XPID+"coordinationTest():";
-  bool LDEBUG=TRUE; // TRUE;
-  stringstream message;
-  _aflags aflags;aflags.Directory=".";
-
-  xstructure str("aflowlib.duke.edu:AFLOWDATA/ICSD_WEB/FCC/Cl1Na1_ICSD_240599","CONTCAR.relax.vasp",IOAFLOW_AUTO);
-  deque<deque<uint> > coordinations;
-  str.GetCoordinations(coordinations);
-  if(coordinations.size()<2){
-    if(LDEBUG){cerr << soliloquy << " coordinations not found" << endl;}
-    return FALSE;
-  }
-  if(coordinations[0].size()<2){
-    if(LDEBUG){cerr << soliloquy << " coordinations[0] not found" << endl;}
-    return FALSE;
-  }
-  if(coordinations[1].size()<2){
-    if(LDEBUG){cerr << soliloquy << " coordinations[1] not found" << endl;}
-    return FALSE;
-  }
-  //first iatom
-  //first shell
-  if(coordinations[0][0]!=6){
-    if(LDEBUG){cerr << soliloquy << " coordinations[0][0]!=6 (==" << coordinations[0][0] << ")" << endl;}
-    return FALSE;
-  }
-  //second shell
-  if(coordinations[0][1]!=12){
-    if(LDEBUG){cerr << soliloquy << " coordinations[0][1]!=12 (==" << coordinations[0][1] << ")" << endl;}
-    return FALSE;
-  }
-  //second iatom
-  //first shell
-  if(coordinations[1][0]!=6){
-    if(LDEBUG){cerr << soliloquy << " coordinations[1][0]!=6 (==" << coordinations[1][0] << ")" << endl;}
-    return FALSE;
-  }
-  //second shell
-  if(coordinations[1][1]!=12){
-    if(LDEBUG){cerr << soliloquy << " coordinations[1][1]!=12 (==" << coordinations[1][1] << ")" << endl;}
-    return FALSE;
-  }
-
-  message << "coordination test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
   return TRUE; //CO20180419
 }
 

@@ -2682,8 +2682,6 @@ bool gcdTest(ostream& oss=cout);
 bool gcdTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool smithTest(ostream& oss=cout);
 bool smithTest(ofstream& FileMESSAGE,ostream& oss=cout);
-bool coordinationTest(ostream& oss=cout);
-bool coordinationTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool PrototypeGeneratorTest(ostream& oss=cout, bool check_symmetry=false, bool check_uniqueness=false); //DX20200928
 bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss=cout, bool check_symmetry=false, bool check_uniqueness=false); //DX20200928
 // ----------------------------------------------------------------------------
@@ -5419,6 +5417,7 @@ namespace unittest {
       // xstructure
       void atomicEnvironmentTest(uint&, vector<string>&, vector<string>&);
       void cifParserTest(uint&, vector<string>&, vector<string>&);
+      void coordinationTest(uint&, vector<string>&, vector<string>&);
       void foldAtomsInCellTest(uint&, vector<string>&, vector<string>&);
   };
 
