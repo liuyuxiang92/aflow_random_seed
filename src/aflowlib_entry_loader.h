@@ -12,6 +12,7 @@
 
 #include <unordered_set>
 #include <unordered_map>
+#include <regex>
 
 namespace aflowlib {
   class EntryLoader : public xStream {
@@ -32,6 +33,7 @@ namespace aflowlib {
         SQLITE,
         AFLUX,
         FILESYSTEM,
+        FILESYSTEM_RAW,
         RESTAPI,
         NONE,
         FAILED
@@ -51,7 +53,9 @@ namespace aflowlib {
       string m_restapi_directives = "?format=text";
       string m_filesystem_outfile = DEFAULT_FILE_AFLOWLIB_ENTRY_OUT;
       string m_filesystem_path = "/common/";
-      bool m_entries_unique = true;
+      string m_filesystem_collection = "RAW/";
+
+    bool m_entries_unique = true;
 
 
       _aflags m_aflags; //NOT an input, it's not required, just for directory manipulation
@@ -122,10 +126,18 @@ namespace aflowlib {
 
       Source m_current_source = Source::NONE;
 
+      // helper for FILESYSTEM_RAW
+      std::regex m_re_elements{"(A[cglmrstu]|B[aehikr]?|C[adeflmnorsu]?|D[bsy]|E[rsu]|F[elmr]?|G[ade]|H[efgos]?|I[nr]?|Kr?|L[airuv]|M[dgnot]|N[abdeiop]?|Os?|P[abdmortu]?|R[abefghnu]|S[bcegimnr]?|T[abcehilm]|U(u[opst])?|V|W|Xe|Yb?|Z[nr])"};
+      std::regex m_re_ppclean{"(_GW|_AE|_200eV)"};
+
+      std::vector<string> icsd_symmetries = {"BCC","BCT","CUB","FCC","HEX","MCL","MCLC",
+                                             "ORC","ORCC","ORCF","ORCI","RHL","TET","TRI"};
+
       std::string buildAFLUXQuery(const std::map<string, string> & matchbook);
       bool cleanAUID(string & AUID);
       void selectSource();
       void getAlloyAUIDList(const std::vector<string> & alloy, std::vector<string> & auid_list);
+      void loadAlloySearchFSR(const std::vector<string> & alloy_list, uint lib_max, bool recursive);
 
   };
 } // namespace aflowlib

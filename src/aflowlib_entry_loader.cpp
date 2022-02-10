@@ -15,7 +15,8 @@
 
 #include "aflow.h"
 #include "aflowlib_entry_loader.h"
-
+#include <fts.h>
+#include <sys/stat.h>
 
 #define _DEBUG_ENTRY_LOADER_ true
 
@@ -113,7 +114,6 @@ namespace aflowlib {
     m_current_source = Source::FAILED;
 
     switch (new_source) {
-
       case Source::SQLITE: {
         if (aurostd::FileExist(m_sqlite_file)) {
           if (m_sqlite_db_ptr == nullptr) {
@@ -125,6 +125,7 @@ namespace aflowlib {
         }
         break;
       }
+
       case Source::AFLUX: {
         if ("AFLUXtest" == aurostd::httpGet("http://aflowlib.duke.edu/test/?echo=AFLUXtest")) {
           m_current_source = Source::AFLUX;
@@ -132,6 +133,7 @@ namespace aflowlib {
         }
         break;
       }
+
       case Source::FILESYSTEM: {
         //TODO if m_sqlite_alloy_file is missing AURL and AUID load should still work
         if (aurostd::IsDirectory(m_filesystem_path + "AUID/") && aurostd::FileExist(m_sqlite_alloy_file)) { //
@@ -141,9 +143,20 @@ namespace aflowlib {
           }
           m_current_source = Source::FILESYSTEM;
           return true;
+        } else {
+          return setSource(Source::FILESYSTEM_RAW);
         }
         break;
       }
+
+      case Source::FILESYSTEM_RAW: {
+        if (aurostd::IsDirectory(m_filesystem_path + "AUID/")) { //
+          m_current_source = Source::FILESYSTEM_RAW;
+          return true;
+        }
+        break;
+      }
+
       case Source::RESTAPI: {
         if (aurostd::FileExist(m_sqlite_alloy_file) &&
             200 == aurostd::httpGetStatus("http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/")) {
@@ -156,14 +169,17 @@ namespace aflowlib {
         }
         break;
       }
+
       case Source::NONE: {
         m_current_source = Source::NONE;
         return true;
       }
+
       case Source::FAILED: {
         m_current_source = Source::FAILED;
         return true;
       }
+
     }
     return false;
   }
@@ -334,7 +350,6 @@ namespace aflowlib {
       if (cleanAUID(AUID_single)) clean_AUID.push_back(AUID_single);
     }
 
-
     switch (m_current_source) {
 
       case Source::AFLUX:{
@@ -363,12 +378,12 @@ namespace aflowlib {
         break;
       }
 
-      case Source::FILESYSTEM:{
+      case Source::FILESYSTEM: case Source::FILESYSTEM_RAW:{
         std::vector<std::string> files;
         for (std::string AUID_single: clean_AUID) {
           string file_path = m_filesystem_path + "AUID/aflow:";
           for (uint part = 0; part < 8; part++) file_path += AUID_single.substr(6 + part * 2, 2) + "/";
-          file_path += "WEB/" + m_filesystem_outfile;
+          file_path += m_filesystem_collection + m_filesystem_outfile;
           files.push_back(file_path);
         }
         loadFiles(files);
@@ -451,6 +466,12 @@ namespace aflowlib {
         loadAUID(auid_list);
         break;
       }
+
+      case Source::FILESYSTEM_RAW: {
+        loadAlloySearchFSR(final_alloy_list, alloy_clean.size(), recursive);
+        break;
+      }
+
       default:
         break;
     }
@@ -465,6 +486,115 @@ namespace aflowlib {
     loadAlloy(alloy_elements, recursive);
   }
 
+
+  void EntryLoader::loadAlloySearchFSR(const std::vector <string> & alloy_list, uint lib_max, bool recursive) {
+    // TODO put alloy finding in private sub function
+    std::vector<std::string> found_entries;
+
+    std::vector<std::string> search_path_list;
+    search_path_list.emplace_back(m_filesystem_path+"ICSD/"+m_filesystem_collection);
+    if (recursive) {
+      for (uint lib_idx = 1; lib_idx <= lib_max; lib_idx++) {
+        search_path_list.emplace_back(m_filesystem_path + "LIB" + std::to_string(lib_idx) + "/" + m_filesystem_collection);
+      }
+    } else {
+      search_path_list.emplace_back(m_filesystem_path + "LIB" + std::to_string(lib_max) + "/" + m_filesystem_collection);
+    }
+
+    char * paths[search_path_list.size()+1];
+    for (size_t list_idx=0; list_idx<search_path_list.size(); list_idx++){
+      paths[list_idx] = (char*) search_path_list[list_idx].c_str();
+    }
+    paths[search_path_list.size()+1] = nullptr;
+
+    size_t scanned = 0;
+    size_t found = 0;
+    size_t check_idx = m_filesystem_path.size();
+    struct stat file_stats{};
+
+    // initialize a file tree scan
+    // https://man7.org/linux/man-pages/man3/fts.3.html
+    // FTS_PHYSICAL - don't follow symlinks
+    // FTS_NOCHDIR - don't change the workdir of the program
+    // FTS_XDEV - don't descending into folders that are on a different device
+    FTS *tree = fts_open(paths, FTS_PHYSICAL | FTS_NOCHDIR  | FTS_XDEV, nullptr);
+    cout << "Loaded Tree" << endl;
+    FTSENT *node;
+    if(tree == nullptr)
+    {
+      //TODO error handling
+      cout << "Could not create search tree";
+      return;
+    }
+
+    // Iterate over all entries found in the folders listed in paths
+    while((node = fts_read(tree))){
+      scanned += 1;
+//      cout << node->fts_level << " | " << node->fts_path  << endl;
+      if ((node->fts_info & FTS_D)){
+        if (node->fts_path[check_idx]=='I') {
+          if (node->fts_level == 2) {
+            std::string name = node->fts_name;
+            name.erase(std::min(name.find("_ICSD_"), name.size()));
+            std::vector <std::string> element_match(std::sregex_token_iterator(name.begin(), name.end(), m_re_elements),
+                                                    std::sregex_token_iterator());
+            std::sort(element_match.begin(), element_match.end());
+            string alloy = aurostd::joinWDelimiter(element_match, "");
+//            cout << node->fts_level << " | " << node->fts_path << " | " << alloy << endl;
+            if (find(alloy_list.begin(), alloy_list.end(), alloy) == alloy_list.end()) {
+              fts_set(tree, node, FTS_SKIP);
+              continue;
+            } else {
+              string base_path = node->fts_path;
+              string full_path = base_path + "/aflowlib.out";
+              if (stat(full_path.c_str(), &file_stats) == 0) {
+                found += 1;
+                found_entries.emplace_back(full_path);
+                if (base_path.find("POCC") == std::string::npos) fts_set(tree, node, FTS_SKIP);
+              }
+            }
+          }
+        } else if (node->fts_path[check_idx]=='L'){
+          if (node->fts_level == 1) {
+            std::string name = node->fts_name;
+            name.erase(std::min(name.find(':'), name.size()));
+            std::regex_replace (name,m_re_ppclean,"");
+            std::vector <std::string> element_match(std::sregex_token_iterator(name.begin(), name.end(), m_re_elements),
+                                                    std::sregex_token_iterator());
+            std::sort(element_match.begin(), element_match.end());
+            string alloy = aurostd::joinWDelimiter(element_match, "");
+            if (find(alloy_list.begin(), alloy_list.end(), alloy) == alloy_list.end()) {
+              fts_set(tree, node, FTS_SKIP);
+              continue;
+            } else {
+              string base_path = node->fts_path;
+              string full_path = base_path + "/aflowlib.out";
+              if (stat(full_path.c_str(), &file_stats) == 0) {
+                found += 1;
+                found_entries.emplace_back(full_path);
+                if (base_path.find("POCC") == std::string::npos) fts_set(tree, node, FTS_SKIP);
+              }
+            }
+          }
+          else if (node->fts_level > 1){
+            string base_path = node->fts_path;
+            string full_path = base_path + "/aflowlib.out";
+            if (stat(full_path.c_str(), &file_stats) == 0) {
+              found += 1;
+              found_entries.emplace_back(full_path);
+              if (base_path.find("POCC") == std::string::npos) fts_set(tree, node, FTS_SKIP);
+            }
+          }
+        }
+      }
+      if (scanned%100==0) {
+        std::cout << scanned << " | " << found << " | " << node->fts_path << std::endl;
+      }
+    }
+    std::cout << "Scanned: " << scanned << " | Found: " << found  << std::endl;
+    loadFiles(found_entries);
+    //TODO if mini sqlite is available check for missing structures
+  }
 
   // View getter functions
   void EntryLoader::getEntriesViewFlat(std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>> & result) {
