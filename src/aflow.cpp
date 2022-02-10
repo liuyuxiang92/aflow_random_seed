@@ -234,7 +234,6 @@ int main(int _argc,char **_argv) {
       unittest::UnitTest ut(std::cout);
       return (ut.runTestSuites(tests)?0:1);
     }
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_schema|--schema_test")) {return (SchemaTest()?0:1);}  //ME20210408
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_CeramGen|--CeramGen_test")) {return (CeramGenTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_Egap|--Egap_test")) {return (EgapTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO20190601
@@ -243,10 +242,6 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_PrototypeGenerator|--PrototypeGenerator_test")) {return (PrototypeGeneratorTest()?0:1);}  //DX20200928
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_PrototypeSymmetry|--PrototypeSymmetry_test")) {return (PrototypeGeneratorTest(cout,true)?0:1);}  //DX20201105
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_PrototypeUniqueness|--PrototypeUniqueness_test")) {return (PrototypeGeneratorTest(cout,false,true)?0:1);}  //DX20210429
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_AtomicEnvironment|--AtomicEnvironment_test")) {return (AtomicEnvironmentTest(cout)?0:1);}  //HE20210511
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_aurostd|--aurostd_test")) {return (aurostdTest(cout)?0:1);} //HE20210512
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_cif_parser|--cif_parser_test")) {return (cifParserTest(cout)?0:1);}
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
       if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}

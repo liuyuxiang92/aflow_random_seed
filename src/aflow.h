@@ -2674,8 +2674,6 @@ void minimumCoordinationShell(const xstructure& xstr, uint center_index,
     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX20191122
 
 //makefile tests
-bool SchemaTest(ostream& oss=std::cout);  //ME20210408
-bool SchemaTest(ofstream& FileMESSAGE,ostream& oss=std::cout);  //ME20210408
 bool CeramGenTest(ostream& oss=cout);
 bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool EgapTest(ostream& oss=cout);
@@ -2688,14 +2686,6 @@ bool coordinationTest(ostream& oss=cout);
 bool coordinationTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool PrototypeGeneratorTest(ostream& oss=cout, bool check_symmetry=false, bool check_uniqueness=false); //DX20200928
 bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss=cout, bool check_symmetry=false, bool check_uniqueness=false); //DX20200928
-bool FoldAtomsInCellTest(ostream& oss=cout); //DX20210129
-bool FoldAtomsInCellTest(ofstream& FileMESSAGE,ostream& oss=cout); //DX20210129
-bool AtomicEnvironmentTest(ostream& oss=cout); //HE20210511
-bool AtomicEnvironmentTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210511
-bool aurostdTest(ostream& oss=cout); //HE20210512
-bool aurostdTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210512
-bool cifParserTest(ostream& oss=cout); //ME20220125
-bool cifParserTest(ofstream& FileMESSAGE, ostream& oss=cout); //ME202201025
 // ----------------------------------------------------------------------------
 // Structure Prototypes
 // aflow_xproto.cpp
@@ -5353,9 +5343,10 @@ namespace xprototype {
 
 namespace unittest {
 
-  typedef std::function<void(uint&, vector<string>&)> unitTestFunction;
+  typedef std::function<void(uint&, vector<string>&, vector<string>&)> unitTestFunction;
 
   struct xcheck {
+    vector<string> errors;
     unitTestFunction func;
     string function_name;
     string task_description;
@@ -5402,23 +5393,33 @@ namespace unittest {
       void runUnitTest(vector<string>::iterator& it, const vector<string>& tasks);
       bool taskSuccessful(const string& task);
 
-      void display_result(const xcheck& xchk);
+      void displayResult(const xcheck& xchk);
       template <typename utype>
       void check(const bool passed, const utype &calculated, const utype &expected, const string &check_function,
-          const string check_description, uint &passed_checks, vector<string> &results);
+          const string checkDescription, uint &passed_checks, vector<string> &results);
       template <typename utype>
-      void check_equal(const utype &calculated, const utype &expected, const string &check_function,
+      void checkEqual(const utype &calculated, const utype &expected, const string &check_function,
           const string check_description, uint &passed_checks, vector<string> &results);
-      void check_equal(const string &calculated, const string &expected, const string &check_function,
+      void checkEqual(const string &calculated, const string &expected, const string &check_function,
           const string check_description, uint &passed_checks, vector<string> &results);
-      void check_equal(const bool calculated, const bool expected, const string &check_function,
+      void checkEqual(const bool calculated, const bool expected, const string &check_function,
           const string check_description, uint &passed_checks, vector<string> &results);
-      void check_similar(const double calculated, const double expected, const string &check_function,
+      void checkSimilar(const double calculated, const double expected, const string &check_function,
           const string &check_description, uint &passed_checks, vector<string> &results, const double relative=1E-10);
 
-      void SchemaTest(uint& passed_checks, vector<string>& results);
+      // Test functions ---------------------------------
 
-      void cifParserTest(uint& passed_checks, vector<string>& results);
+      // aurostd
+      void xvectorTest(uint&, vector<string>&, vector<string>&);
+      void xscalarTest(uint&, vector<string>&, vector<string>&);
+
+      // database
+      void schemaTest(uint&, vector<string>&, vector<string>&);
+
+      // xstructure
+      void atomicEnvironmentTest(uint&, vector<string>&, vector<string>&);
+      void cifParserTest(uint&, vector<string>&, vector<string>&);
+      void foldAtomsInCellTest(uint&, vector<string>&, vector<string>&);
   };
 
 }
