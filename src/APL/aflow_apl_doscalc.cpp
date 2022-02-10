@@ -6,10 +6,6 @@
 
 #include "aflow_apl.h"
 
-#ifdef AFLOW_MULTITHREADS_ENABLE
-#include <thread>
-#endif
-
 static const double MIN_FREQ_THRESHOLD = -0.1;
 
 namespace apl {
@@ -149,12 +145,8 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   //CO START
-  void DOSCalculator::calculateInOneThread(int startIndex, int endIndex) {
-    //cout << "Thread: from " << startIndex << " to " <<  endIndex << std::endl;
-    for (int iqp = startIndex; iqp < endIndex; iqp++) {
-      _freqs[iqp] = _pc->getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, _eigen[iqp]);  //ME20190624
-      //std::this_thread::yield();
-    }
+  void DOSCalculator::calculateInOneThread(int iqp) {
+    _freqs[iqp] = _pc->getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, _eigen[iqp]);  //ME20190624
   }
   //CO END
 
@@ -175,30 +167,13 @@ namespace apl {
       _freqs.push_back(zero);
     _eigen.resize(_qpoints.size(), xmatrix<xcomplex<double> >(_pc->getNumberOfBranches(), _pc->getNumberOfBranches()));  // M20190624
 
+    int nqps = (int) _qpoints.size();
 #ifdef AFLOW_MULTITHREADS_ENABLE
-
-    // Get the number of CPUS
-    int ncpus = _pc->getNCPUs();
-
-    if (ncpus > 1) {
-      int startIndex, endIndex;
-      std::vector<std::thread*> threads;
-      vector<vector<int> > thread_dist = getThreadDistribution((int) _qpoints.size(), ncpus);
-      for (int icpu = 0; icpu < ncpus; icpu++) {
-        startIndex = thread_dist[icpu][0];
-        endIndex = thread_dist[icpu][1];
-        threads.push_back(new std::thread(&DOSCalculator::calculateInOneThread, this, startIndex, endIndex));
-      }
-      for (uint i = 0; i < threads.size(); i++) {
-        threads[i]->join();
-        delete threads[i];
-      }
-      threads.clear();
-    } else {
-      calculateInOneThread(0, (int) _qpoints.size());
-    }
+    xthread::xThread xt(_pc->getNCPUs());
+    std::function<void(int)> fn = std::bind(&DOSCalculator::calculateInOneThread, this, std::placeholders::_1);
+    xt.run(nqps, fn);
 #else
-    calculateInOneThread(0, (int) _qpoints.size());
+    for (int i = 0; i < nqps; i++) calculateInOneThread(i);
 #endif
     //CO END
 

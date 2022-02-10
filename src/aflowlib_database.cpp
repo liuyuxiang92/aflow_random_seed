@@ -64,18 +64,12 @@
 #define _AFLOW_DB_PATCH_INCOMPLETE_  201  // At least one patch was incomplete
 
 #include "aflowlib.h"
-#include "SQLITE/aflow_sqlite.h"
-
-#ifdef AFLOW_MULTITHREADS_ENABLE
-#include <thread>
-#include <mutex>
-std::mutex m;
-#endif
 
 #define _AFLOW_DB_DEBUG_ false
 
 using std::string;
 using std::vector;
+using namespace std::placeholders;
 
 static const string _AFLOW_DB_ERR_PREFIX_ = "AflowDB::";
 static const uint _DEFAULT_SET_LIMIT_ = 16; //DX20200317 - int -> uint
@@ -88,27 +82,54 @@ namespace aflowlib {
   // Open the database for read access
   AflowDB::AflowDB(const string& db_file, ostream& oss) : xStream(oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
-    free();
-    database_file = db_file;
     if (LDEBUG) std::cerr << "AflowDB: reading database" << std::endl;
-    open(SQLITE_OPEN_READONLY);
-    initializeExtraSchema();
+    free();
+    aurostd::xoption dummy;
+    initialize(db_file, "", "", SQLITE_OPEN_READONLY, dummy, dummy);
+  }
+
+  AflowDB::AflowDB(const string& db_file, const aurostd::xoption& vschema_secret_in, ostream& oss) : xStream(oss) {
+    bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
+    if (LDEBUG) std::cerr << "AflowDB: reading database" << std::endl;
+    free();
+    aurostd::xoption dummy;
+    initialize(db_file, "", "", SQLITE_OPEN_READONLY, dummy, vschema_secret_in);
   }
 
   // Open the database for write access
-  AflowDB::AflowDB(const string& db_file, const string& dt_path, const string& lck_file, ostream& oss) : xStream (oss) {
+  AflowDB::AflowDB(const string& db_file, const string& dt_path, const string& lck_file,
+      const aurostd::xoption& vschema_in, ostream& oss) : xStream (oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
     free();
-    data_path = dt_path;
-    database_file = db_file;
-    lock_file = lck_file;
     if (LDEBUG) {
       std::cerr << "AflowDB: Database file: " << database_file << std::endl;
       std::cerr << "AflowDB: Data path: " << data_path << std::endl;
       std::cerr << "AflowDB: Lock file: " << lock_file << std::endl;
     }
-    open();
-    initializeExtraSchema();
+    aurostd::xoption dummy;
+    initialize(db_file, dt_path, lck_file, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, vschema_in, dummy);
+  }
+
+  AflowDB::AflowDB(const string& db_file, const string& dt_path, const string& lck_file,
+      const aurostd::xoption& vschema_in, const aurostd::xoption& vschema_secret_in, ostream& oss) : xStream (oss) {
+    bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
+    free();
+    if (LDEBUG) {
+      std::cerr << "AflowDB: Database file: " << database_file << std::endl;
+      std::cerr << "AflowDB: Data path: " << data_path << std::endl;
+      std::cerr << "AflowDB: Lock file: " << lock_file << std::endl;
+    }
+    initialize(db_file, dt_path, lck_file, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, vschema_in, vschema_secret_in);
+  }
+
+  void AflowDB::initialize(const string& db_file, const string& dt_path, const string& lck_file,
+    int open_flags, const aurostd::xoption& schema_in, const aurostd::xoption& vschema_secret_in) {
+    data_path = dt_path;
+    database_file = db_file;
+    lock_file = lck_file;
+    vschema = schema_in;
+    vschema_secret = vschema_secret_in;
+    open(open_flags);
   }
 
   // Copy constructors
@@ -127,7 +148,7 @@ namespace aflowlib {
     data_path = that.data_path;
     database_file = that.database_file;
     lock_file = that.lock_file;
-    vschema_extra = that.vschema_extra;
+    vschema_secret = that.vschema_secret;
     // Two databases should never operate on a temporary
     // file or have write access at the same time.
     is_tmp = false;
@@ -144,7 +165,8 @@ namespace aflowlib {
     data_path = "";
     database_file = "";
     lock_file = "";
-    vschema_extra.clear();
+    vschema.clear();
+    vschema_secret.clear();
     is_tmp = false;
   }
 
@@ -178,12 +200,6 @@ namespace aflowlib {
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
     }
-  }
-
-  void AflowDB::initializeExtraSchema() {
-    vschema_extra.clear();
-    vschema_extra.push_attached("SCHEMA::NAME:ALLOY", "alloy");
-    vschema_extra.push_attached("SCHEMA::TYPE:ALLOY", "string");
   }
 
 }  // namespace aflowlib
@@ -523,9 +539,9 @@ namespace aflowlib {
         string key = "";
         uint k = 0;
         for (k = 0; k < nkeys; k++) {
-          key = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
+          key = vschema.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
           types_schema[k] = aurostd::RemoveSubString(types_schema[k], " COLLATE NOCASE");  // TEXT may contain directive to be case insensitive
-          if (key.empty()) key = vschema_extra.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
+          if (key.empty()) key = vschema_secret.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
           if (!aurostd::WithinList(columns, key, index)) break;
           if (types_db[index] != types_schema[k]) break;
         }
@@ -705,60 +721,54 @@ namespace aflowlib {
     uint nkeys = keys.size();
     vector<string> columns(nkeys);
     for (uint k = 0; k < nkeys; k++) {
-      columns[k] = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys[k]);
-      if (columns[k].empty()) columns[k] = vschema_extra.getattachedscheme("SCHEMA::NAME:" + keys[k]);
+      columns[k] = vschema.getattachedscheme("SCHEMA::NAME:" + keys[k]);
+      if (columns[k].empty()) columns[k] = vschema_secret.getattachedscheme("SCHEMA::NAME:" + keys[k]);
     }
     vector<string> types = getDataTypes(columns, true);
 
     // Rebuild
 #ifdef AFLOW_MULTITHREADS_ENABLE
     int ncpus = init::GetCPUCores();
-    int max_cpu = 16;
+    int max_cpus = 16;
     if (ncpus < 1) ncpus = 1;
-    if (ncpus > max_cpu) ncpus = max_cpu;
-    vector<vector<int> > thread_dist = getThreadDistribution(_N_AUID_TABLES_, ncpus);
-    vector<std::thread*> threads;
-    for (int i = 0; i < ncpus; i++) {
-      threads.push_back(new std::thread(&AflowDB::buildTables, this,
-            thread_dist[i][0], thread_dist[i][1],
-            std::ref(columns), std::ref(types)));
-    }
-    for (int i = 0; i < ncpus; i++) {
-      threads[i]->join();
-      delete threads[i];
-    }
+    if (ncpus > max_cpus) ncpus = max_cpus;
+    xthread::xThread xt(ncpus);
+    std::function<void(int, const vector<string>&, const vector<string>&)> fn = std::bind(&AflowDB::buildTable, this, _1, _2, _3);
+    xt.run(_N_AUID_TABLES_, fn, columns, types);
 #else
-    buildTables(0, _N_AUID_TABLES_, columns, types);
+    for (uint i = 0; i < _N_AUID_TABLES_; i++) buildTable(i, columns, types);
 #endif
     message << function_name << "Finished rebuild.";
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss);
   }
 
   //buildTables///////////////////////////////////////////////////////////////
-  // Reads the .jsonl files and processes the JSONs for the database writer.
-  void AflowDB::buildTables(int startIndex, int endIndex, const vector<string>& columns, const vector<string>& types) {
-    for (int i = startIndex; i < endIndex; i++) {
-      stringstream t;
-      t << std::setfill('0') << std::setw(2) << std::hex << i;
-      string table = "auid_" + t.str();
+  // Reads a .jsonl files and processes the JSONs for the database writer.
+  void AflowDB::buildTable(int i, const vector<string>& columns, const vector<string>& types) {
+    stringstream t;
+    t << std::setfill('0') << std::setw(2) << std::hex << i;
+    string table = "auid_" + t.str();
+    string auid_prefix = "\"aflow:" + t.str();
 
-      string jsonfile = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".jsonl");
-      vector<string> data;
-      aurostd::efile2vectorstring(jsonfile, data);
-      vector<vector<string> > values;
-      uint ndata = data.size();
-      string aurl = "";
-      for (uint d = 0; d < ndata; d++) {
-        // Filter non-POCC ARUNs
-        aurl = aurostd::extractJsonValueAflow(data[d], "aurl");
-        if ((aurl.find("ARUN") != string::npos)
-            && (aurl.find("ARUN.POCC") == string::npos)) {
-          continue;
-        }
-        values.push_back(getDataValues(data[d], columns, types));
+    string jsonfile = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".jsonl");
+    vector<string> data;
+    aurostd::efile2vectorstring(jsonfile, data);
+    vector<vector<string> > values;
+    uint ndata = data.size();
+    string aurl = "", auid = "";
+    for (uint d = 0; d < ndata; d++) {
+      // Filter auids that are in the wrong file
+      auid = aurostd::extractJsonValueAflow(data[d], "auid");
+      if (auid.rfind(auid_prefix, 0) != 0) continue;
+      // Filter non-POCC ARUNs
+      aurl = aurostd::extractJsonValueAflow(data[d], "aurl");
+      if ((aurl.find("ARUN") != string::npos)
+          && (aurl.find("ARUN.POCC") == string::npos)) {
+        continue;
       }
-      populateTable(table, columns, types, values);
+      values.push_back(getDataValues(data[d], columns, types));
     }
+    populateTable(table, columns, types, values);
   }
 
   //populateTable/////////////////////////////////////////////////////////////
@@ -771,7 +781,7 @@ namespace aflowlib {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
     string function_name = XPID + _AFLOW_DB_ERR_PREFIX_ + "populateTable():";
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    std::unique_lock<std::mutex> lk(m);
+    std::unique_lock<std::mutex> lk(write_mutex);
 #endif
     createTable(table, columns, types);
     int chunk_size = 1000, count = 0;
@@ -907,16 +917,16 @@ namespace aflowlib {
   vector<string> AflowDB::getSchemaKeys() {
     vector<string> keys;
     string key = "";
-    for (uint i = 0, n = XHOST.vschema.vxsghost.size(); i < n; i += 2) {
-      if(XHOST.vschema.vxsghost[i].find("::NAME:") != string::npos) {
-        key=aurostd::RemoveSubString(XHOST.vschema.vxsghost[i], "SCHEMA::NAME:");
+    for (uint i = 0, n = vschema.vxsghost.size(); i < n; i += 2) {
+      if(vschema.vxsghost[i].find("::NAME:") != string::npos) {
+        key=aurostd::RemoveSubString(vschema.vxsghost[i], "SCHEMA::NAME:");
         // schema keys are upper case
         keys.push_back(aurostd::toupper(key));
       }
     }
-    for (uint i = 0, n = vschema_extra.vxsghost.size(); i < n; i += 2) {
-      if(vschema_extra.vxsghost[i].find("::NAME:") != string::npos) {
-        key=aurostd::RemoveSubString(vschema_extra.vxsghost[i], "SCHEMA::NAME:");
+    for (uint i = 0, n = vschema_secret.vxsghost.size(); i < n; i += 2) {
+      if(vschema_secret.vxsghost[i].find("::NAME:") != string::npos) {
+        key=aurostd::RemoveSubString(vschema_secret.vxsghost[i], "SCHEMA::NAME:");
         // schema keys are upper case
         keys.push_back(aurostd::toupper(key));
       }
@@ -936,8 +946,8 @@ namespace aflowlib {
     string type = "";
     for (uint k = 0; k < nkeys; k++) {
       // AUID has to be unique
-      type = XHOST.vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
-      if (type.empty()) type = vschema_extra.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
+      type = vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
+      if (type.empty()) type = vschema_secret.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
       if (unique && (keys[k] == "AUID")) {
         types[k] = "TEXT UNIQUE NOT NULL COLLATE NOCASE";  // Make string search not case sensitive
       } else if (type == "number") {
@@ -1072,10 +1082,10 @@ namespace aflowlib {
       }
 
       // Loops
-      for (uint i = 0; i < total_stats.loop_counts.size(); i++){
-        total_stats.loop_counts[i].second += catalog_stats.loop_counts[i].second;
+      for (auto& loop : total_stats.loop_counts) {
+        const string& key = loop.first;
+        loop.second += catalog_stats.loop_counts[key];
       }
-
 
       // Species
       for (uint s = 0; s < catalog_stats.species.size(); s++) {
@@ -1124,12 +1134,11 @@ namespace aflowlib {
     aurostd::string2tokens(exclude, excluded_properties, ",");
     string key = "";
     for (uint i = 0, nkeys = keys.size(); i < nkeys; i++) {
-      key = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys[i]);
-      if (key.empty()) key = vschema_extra.getattachedscheme("SCHEMA::NAME:" + keys[i]);
+      key = vschema.getattachedscheme("SCHEMA::NAME:" + keys[i]);
+      if (key.empty()) key = vschema_secret.getattachedscheme("SCHEMA::NAME:" + keys[i]);
       if (!key.empty() && !aurostd::WithinList(excluded_properties, key)) cols.push_back(key);
     }
     uint ncols = cols.size();
-    uint nloops = loops.size();
 
     DBStats stats;
     stats.catalog = catalog;
@@ -1140,16 +1149,14 @@ namespace aflowlib {
     stats.nentries = 0;
     stats.nsystems = 0;
     stats.set.resize(ncols);
-    stats.loop_counts.resize(nloops);
-    for (uint l = 0; l < nloops; l++) {
-      stats.loop_counts[l].first = loops[l];
-      stats.loop_counts[l].second = 0;
+    for (const string& loop : loops) {
+      stats.loop_counts[loop] = 0;
     }
 
     // Get types for post-processing
     vector<string> types(ncols);
     for (uint i = 0; i < ncols; i++) {
-      types[i] = XHOST.vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(cols[i]));
+      types[i] = vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(cols[i]));
     }
     stats.types = types;
 
@@ -1162,11 +1169,8 @@ namespace aflowlib {
     string function_name = XPID + _AFLOW_DB_ERR_PREFIX_ + "getCatalogStats():";
     stringstream message;
 
-    uint nloops = loops.size();
-
     DBStats stats = initDBStats(catalog, loops);
-    uint ncols = stats.columns.size();
-    const vector<string>& types = stats.types;
+    vector<DBStats> colstats(_N_AUID_TABLES_, stats);
 
     string where = "catalog='" + catalog + "'";
     vector<string> entries = getPropertyMultiTables("COUNT", tables, "*", where);
@@ -1175,46 +1179,33 @@ namespace aflowlib {
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss);
 
     if (stats.nentries > 0) {
-      vector<vector<vector<string> >  > maxmin(_N_AUID_TABLES_, vector<vector<string> >(ncols, vector<string>(2))), sets(_N_AUID_TABLES_, vector<vector<string> >(ncols));
-      vector<vector<vector<int> > > counts(_N_AUID_TABLES_, vector<vector<int> >(ncols, vector<int>(2, 0)));
-      vector<vector<int> > loop_counts(_N_AUID_TABLES_, vector<int>(nloops));
 #ifdef AFLOW_MULTITHREADS_ENABLE
       int ncpus = init::GetCPUCores();
       if (ncpus < 1) ncpus = 1;
       // The maximum number of CPUs are empirically found values that appear
       // to result in the shortest run times. Further testing may be necessary.
-      int cpu_max = 32;
-      if (stats.nentries < 100000) cpu_max = 16;
-      if (stats.nentries < 50000) cpu_max = 8;
-      if (stats.nentries < 10000) cpu_max = 4;
-      if (ncpus > cpu_max) ncpus = cpu_max;
-      vector<vector<int> > thread_dist = getThreadDistribution(_N_AUID_TABLES_, ncpus);
-      vector<std::thread*> threads;
-      for (int i = 0; i < ncpus; i++) {
-        threads.push_back(new std::thread(&AflowDB::getColStats, this,
-              thread_dist[i][0], thread_dist[i][1],
-              std::ref(catalog), std::ref(tables),
-              std::ref(stats.columns), std::ref(types), std::ref(loops),
-              std::ref(counts), std::ref(loop_counts),
-              std::ref(maxmin), std::ref(sets)));
-      }
-      for (int i = 0; i < ncpus; i++) {
-        threads[i]->join();
-        delete threads[i];
-      }
+      int max_cpus = 32;
+      if (stats.nentries < 100000) max_cpus = 16;
+      if (stats.nentries < 50000)  max_cpus = 8;
+      if (stats.nentries < 10000)  max_cpus = 4;
+      if (ncpus > max_cpus) ncpus = max_cpus;
+      xthread::xThread xt(ncpus);
+      std::function<void(int, int, const vector<string>&, vector<DBStats>&)> fn = std::bind(&AflowDB::getColStats, this, _1, _2, _3, _4);
+      xt.runPredistributed(_N_AUID_TABLES_, fn, tables, colstats);
 #else
-      getColStats(0, _N_AUID_TABLES_, catalog, tables, stats.columns, types,
-          loops, counts, loop_counts, maxmin, sets);
+      getColStats(0, _N_AUID_TABLES_, tables, colstats);
 #endif
 
       // Properties: count, max, min, set
       vector<string> set;
       string max = "", min = "";
       uint nset = 0, n = 0;
+      uint ncols = stats.columns.size();
+      const vector<string>& types = stats.types;
       for (uint c = 0; c < ncols; c++) {
         for (int t = 0; t < _N_AUID_TABLES_; t++) {
-          stats.count[c][0] += counts[t][c][0];
-          stats.count[c][1] += counts[t][c][1];
+          stats.count[c][0] += colstats[t].count[c][0];
+          stats.count[c][1] += colstats[t].count[c][1];
         }
         if (stats.count[c][0] + stats.count[c][1] > 0) {
           set.clear();
@@ -1222,23 +1213,24 @@ namespace aflowlib {
           nset = 0; n = 0;
           if (types[c] != "bool") {  // No max, min, or set for bool
             for (int t = 0; t < _N_AUID_TABLES_; t++) {
-              if (counts[t][c][0] > 0) {
+              const DBStats& cstats = colstats[t];
+              if (cstats.count[c][0] > 0) {
                 if (types[c] == "number") {
-                  if (max.empty()) max = maxmin[t][c][0];
-                  else if (aurostd::string2utype<double>(maxmin[t][c][0]) > aurostd::string2utype<double>(max)) max = maxmin[t][c][0];
+                  if (max.empty()) max = cstats.max[c];
+                  else if (aurostd::string2utype<double>(cstats.max[c]) > aurostd::string2utype<double>(max)) max = cstats.max[c];
 
-                  if (min.empty()) min = maxmin[t][c][1];
-                  else if (aurostd::string2utype<double>(maxmin[t][c][1]) < aurostd::string2utype<double>(min)) min = maxmin[t][c][1];
+                  if (min.empty()) min = cstats.min[c];
+                  else if (aurostd::string2utype<double>(cstats.min[c]) < aurostd::string2utype<double>(min)) min = cstats.min[c];
                 }
                 if (nset <= _DEFAULT_SET_LIMIT_) {
-                  n = sets[t][c].size();
+                  n = cstats.set[c].size();
                   if (n > _DEFAULT_SET_LIMIT_) {
-                    set = sets[t][c];
+                    set = cstats.set[c];
                     nset = n;
                   } else {
-                    for (uint i = 0; i < n; i++) {
-                      if (!aurostd::WithinList(set, sets[t][c][i])) {
-                        set.push_back(sets[t][c][i]);
+                    for (const string& s : cstats.set[c]) {
+                      if (!aurostd::WithinList(set, s)) {
+                        set.push_back(s);
                         nset++;
                       }
                       if (nset > _DEFAULT_SET_LIMIT_) break;
@@ -1273,8 +1265,9 @@ namespace aflowlib {
       stats.species = getUniqueFromJsonArrays(species);
 
       // Loop counts
-      for (uint l = 0; l < nloops; l++) {
-        for (int t = 0; t < _N_AUID_TABLES_; t++) stats.loop_counts[l].second += loop_counts[t][l];
+      for (auto& loop : stats.loop_counts) {
+        const string& key = loop.first;
+        for (int t = 0; t < _N_AUID_TABLES_; t++) loop.second += colstats[t].loop_counts[key];
       }
     }
 
@@ -1283,10 +1276,7 @@ namespace aflowlib {
 
   //getColStats///////////////////////////////////////////////////////////////
   // Retrieves the statistics for each database property and the loops.
-  void AflowDB::getColStats(int startIndex, int endIndex, const string& catalog,
-      const vector<string>& tables, const vector<string>& cols, const vector<string>& types,
-      const vector<string>& loops, vector<vector<vector<int> > >& counts, vector<vector<int> >& loop_counts,
-      vector<vector<vector<string> > >& maxmin, vector<vector<vector<string> > >& sets) {
+  void AflowDB::getColStats(int startIndex, int endIndex, const vector<string>& tables, vector<DBStats>& colstats) {
     sqlite3* cursor;
     string function_name = XPID + _AFLOW_DB_ERR_PREFIX_ + "getColStats():";
     string message = "";
@@ -1296,32 +1286,43 @@ namespace aflowlib {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
     }
 
-    uint ncols = cols.size();
     string where = "";
     for (int i = startIndex; i < endIndex; i++) {
+      // Writing directly to the colstats vector may not be thread-safe,
+      // so create copy first and merge later.
+      DBStats cstats = colstats[i];
+      const string& catalog = cstats.catalog;
+      const vector<string>& cols = cstats.columns;
+      const vector<string>& types = cstats.types;
+      uint ncols = cols.size();
       for (uint c = 0; c < ncols; c++) {
         if (types[c] == "bool") {
           where = "catalog='" + catalog + "' AND " + cols[c] + "=";
-          counts[i][c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'true'"));
-          counts[i][c][1] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'false'"));
+          cstats.count[c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'true'"));
+          cstats.count[c][1] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'false'"));
         } else {
           where = "catalog='" + catalog + "' AND " + cols[c] + " NOT NULL";
-          counts[i][c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where));
+          cstats.count[c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where));
         }
         // No need to determine max, min, or set for bool
-        if ((types[c] != "bool") && (counts[i][c][0] > 0)) {
+        if ((types[c] != "bool") && (cstats.count[c][0] > 0)) {
           // Max and  min only make sense for numbers
           if (types[c] == "number") {
-            maxmin[i][c][0] = getProperty(cursor, "MAX", tables[i], cols[c], where);
-            maxmin[i][c][1] = getProperty(cursor, "MIN", tables[i], cols[c], where);
+            cstats.max[c] = getProperty(cursor, "MAX", tables[i], cols[c], where);
+            cstats.min[c] = getProperty(cursor, "MIN", tables[i], cols[c], where);
           }
-          sets[i][c] = getSet(cursor, tables[i], cols[c], true, where, _DEFAULT_SET_LIMIT_ + 1);
+          cstats.set[c] = getSet(cursor, tables[i], cols[c], true, where, _DEFAULT_SET_LIMIT_ + 1);
         }
       }
-      for (uint l = 0, nloops = loops.size(); l < nloops; l++) {
-        where = "catalog='" + catalog + "' AND loop LIKE '%\"" + loops[l] + "\"%'";
-        loop_counts[i][l] = aurostd::string2utype<int>(getProperty("COUNT", tables[i], "loop", where));
+      for (auto& loop : cstats.loop_counts) {
+        const string & key = loop.first;
+        where = "catalog='" + catalog + "' AND loop LIKE '%\"" + key + "\"%'";
+        loop.second = aurostd::string2utype<int>(getProperty("COUNT", tables[i], "loop", where));
       }
+#ifdef AFLOW_MULTITHREADS_ENABLE
+      std::lock_guard<std::mutex> lk(write_mutex);
+#endif
+      colstats[i] = std::move(cstats);
     }
 
     sql_code = sqlite3_close(cursor);
@@ -1369,8 +1370,8 @@ namespace aflowlib {
     json << "{";
     json << "\"count\":" << db_stats.nentries << ",";
     json << "\"systems\":" <<  db_stats.nsystems << ",";
-    for (uint l = 0; l < db_stats.loop_counts.size(); l++) {
-      json << "\"" << db_stats.loop_counts[l].first << "\":" << db_stats.loop_counts[l].second << ",";
+    for (const auto& loop: db_stats.loop_counts) {
+      json << "\"" << loop.first << "\":" << loop.second << ",";
     }
     json << "\"columns\":{";
     uint ncols = db_stats.columns.size();

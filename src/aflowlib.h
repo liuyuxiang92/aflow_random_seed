@@ -415,6 +415,7 @@ namespace aflowlib {
   bool LIB2RAW_FileNeeded(string directory_LIB,string fileLIB,string directory_RAW,string fileRAW,vector<string> &vfiles,const string& MESSAGE);
   // [OBSOLETE] bool LIB2RAW(vector<string> argv,bool overwrite);
   void CleanDirectoryLIB(string& directory);  //CO20200624
+  void setAURL(aflowlib::_aflowlib_entry& aflowlib_data,const string& directory_LIB,bool LOCAL=false);
   bool LIB2RAW(const string& options,bool overwrite,bool LOCAL=false);
   bool XPLUG_CHECK_ONLY(const vector<string>& argv); //CO20200501
   bool XPLUG_CHECK_ONLY(const vector<string>& argv,deque<string>& vdirsOUT,deque<string>& vzips,deque<string>& vcleans); //CO20200501
@@ -555,7 +556,7 @@ namespace aflowlib {
   struct DBStats {
     vector<string> columns;
     vector<vector<int> > count;  // 2D to accommodate bool
-    vector<std::pair<string, int> > loop_counts;
+    std::unordered_map<string, uint> loop_counts;
     vector<string> max;
     vector<string> min;
     int nentries;
@@ -569,7 +570,9 @@ namespace aflowlib {
   class AflowDB : public xStream {
     public:
       AflowDB(const string&, ostream& oss=std::cout);
-      AflowDB(const string&, const string&, const string&, ostream& oss=std::cout);
+      AflowDB(const string&, const aurostd::xoption&, ostream& oss=std::cout);
+      AflowDB(const string&, const string&, const string&, const aurostd::xoption&, ostream& oss=std::cout);
+      AflowDB(const string&, const string&, const string&, const aurostd::xoption&, const aurostd::xoption&, ostream& oss=std::cout);
       AflowDB(const AflowDB&);
       AflowDB& operator=(const AflowDB&);
       ~AflowDB();
@@ -620,23 +623,28 @@ namespace aflowlib {
 
     private:
       void free();
-      void open(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
+      void open(int=SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
       void close();
       void copy(const AflowDB&);
-      void initializeExtraSchema();
+      void initialize(const string& db_file, const string& dt_path, const string& lck_file,
+                      int open_flags, const aurostd::xoption& schema_in, const aurostd::xoption& schema_secret_in);
 
       sqlite3* db;
       bool is_tmp;
-      aurostd::xoption vschema_extra;
+      aurostd::xoption vschema_secret;
+      aurostd::xoption vschema;
       string data_path;
       string database_file;
       string lock_file;
+#ifdef AFLOW_MULTITHREADS_ENABLE
+      std::mutex write_mutex;
+#endif
 
       void openTmpFile(int open_flags=SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_FULLMUTEX, bool copy_original=false);
       bool closeTmpFile(bool force_copy=false, bool keep=false, bool nocopy=false);
 
       void rebuildDB();
-      void buildTables(int, int, const vector<string>&, const vector<string>&);
+      void buildTable(int, const vector<string>&, const vector<string>&);
       void populateTable(const string&, const vector<string>&, const vector<string>&, const vector<vector<string> >&);
 
       uint applyPatchFromJsonl(const vector<string>&);
@@ -649,9 +657,7 @@ namespace aflowlib {
 
       DBStats initDBStats(const string&, const vector<string>&);
       DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&);
-      void getColStats(int, int, const string&, const vector<string>&, const vector<string>&,
-          const vector<string>&, const vector<string>&, vector<vector<vector<int> > >&, vector<vector<int> >&,
-          vector<vector<vector<string> > >&, vector<vector<vector<string> > >&);
+      void getColStats(int, int, const vector<string>&, vector<DBStats>&);
       vector<string> getUniqueFromJsonArrays(const vector<string>&);
       string stats2json(const DBStats&);
 

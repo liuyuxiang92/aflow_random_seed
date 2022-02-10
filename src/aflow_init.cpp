@@ -1037,6 +1037,7 @@ namespace init {
 
     // NOW LOAD schema
     if (init::InitSchema(INIT_VERBOSE) == 0) return 0;
+    init::InitSchemaSecret(INIT_VERBOSE);
 
     // DONE
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [END]" << endl;
@@ -3899,6 +3900,31 @@ namespace init {
     //SchemaFixName("Wyckoff_site_symmetries","","strings");
     //SchemaFixName("Wyckoff_site_symmetries_orig","","strings");
   }
+}
+
+namespace init {
+
+  //ME20220208 - Initialize secret schema, which contain keywords that
+  //are inside the SQLite database, but are not served to the public.
+  uint InitSchemaSecret(bool INIT_VERBOSE) {
+    // DECLARATIONS
+    bool LDEBUG=(FALSE || XHOST.DEBUG || INIT_VERBOSE);
+    if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchemaSecret: [BEGIN]" << endl;
+
+    uint nschema = 0;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema_secret.push_attached("SCHEMA::NAME:ALLOY", "alloy");
+    XHOST.vschema_secret.push_attached("SCHEMA::UNIT:ALLOY", "");
+    XHOST.vschema_secret.push_attached("SCHEMA::TYPE:ALLOY", "string");
+    nschema++;
+
+    if(LDEBUG) cerr << "nschema=" << nschema << endl;
+    if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchemaSecret: [END]" << endl;
+
+    return nschema;
+  }
+
 }
 
 // **************************************************************************

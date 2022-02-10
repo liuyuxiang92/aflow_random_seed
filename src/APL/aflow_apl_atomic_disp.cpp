@@ -9,10 +9,6 @@
 
 #include "aflow_apl.h"
 
-#ifdef AFLOW_MULTITHREADS_ENABLE
-#include <thread>
-#endif
-
 static const string _APL_ADISP_MODULE_ = "APL";  // for the logger
 static const xcomplex<double> iONE(0.0, 1.0);
 
@@ -101,39 +97,25 @@ namespace apl {
     _eigenvectors.resize(nq, vector<vector<xvector<xcomplex<double> > > >(nbranches, vector<xvector<xcomplex<double> > >(natoms, xvector<xcomplex<double> >(3))));
     _frequencies.resize(nq, vector<double> (nbranches, 0.0));
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    int ncpus = _pc->getNCPUs();
-    if (ncpus > nq) ncpus = nq;
-    if (ncpus > 1) {
-      vector<vector<int> > thread_dist = getThreadDistribution(nq, ncpus);
-      vector<std::thread*> threads;
-      for (int i = 0; i < ncpus; i++) {
-        threads.push_back(new std::thread(&AtomicDisplacements::calculateEigenvectorsInThread, this, thread_dist[i][0], thread_dist[i][1]));
-      }
-      for (int i = 0; i < ncpus; i++) {
-        threads[i]->join();
-        delete threads[i];
-      }
-    } else {
-      calculateEigenvectorsInThread(0, nq);
-    }
+    xthread::xThread xt(_pc->getNCPUs());
+    std::function<void(int)> fn = std::bind(&AtomicDisplacements::calculateEigenvectorsInThread, this, std::placeholders::_1);
+    xt.run(nq, fn);
 #else
-    calculateEigenvectorsInThread(0, nq);
+    for (int i = 0; i < nq; ++i) calculateEigenvectorsInThread(i);
 #endif
   }
 
-  void AtomicDisplacements::calculateEigenvectorsInThread(int startIndex, int endIndex) {
+  void AtomicDisplacements::calculateEigenvectorsInThread(int i) {
     uint nbranches = _pc->getNumberOfBranches();
     uint natoms = _pc->getInputCellStructure().atoms.size();
     xvector<double> freq(nbranches);
     xmatrix<xcomplex<double> > eig(nbranches, nbranches, 1, 1);
-    for (int i = startIndex; i < endIndex; i++) {
-      freq = _pc->getFrequency(_qpoints[i].cpos, apl::THZ, eig);
-      for (uint br = 0; br < nbranches; br++) {
-        _frequencies[i][br] = freq[br + 1];
-        for (uint at = 0; at < natoms; at++) {
-          for (int j = 1; j < 4; j++) {
-            _eigenvectors[i][br][at][j] = eig[3 * at + j][br + 1];
-          }
+    freq = _pc->getFrequency(_qpoints[i].cpos, apl::THZ, eig);
+    for (uint br = 0; br < nbranches; br++) {
+      _frequencies[i][br] = freq[br + 1];
+      for (uint at = 0; at < natoms; at++) {
+        for (int j = 1; j < 4; j++) {
+          _eigenvectors[i][br][at][j] = eig[3 * at + j][br + 1];
         }
       }
     }

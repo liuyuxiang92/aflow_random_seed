@@ -88,6 +88,7 @@ namespace makefile {
         getDependencies(dfile,files_already_explored,dfiles); //do not propagate mt_required from sub-dependencies
       }
       if(line.find("#define")==0 && line.find("AFLOW_")!=string::npos && line.find("_MULTITHREADS_ENABLE")!=string::npos){mt_required=true;}
+      if(line.find("AFLOW_MULTITHREADS_ENABLE")!=string::npos){mt_required=true;}  //ME20220204
     }
     std::sort(dfiles.begin(),dfiles.end());dfiles.erase( std::unique( dfiles.begin(), dfiles.end() ), dfiles.end() );  //get unique set of dependent files
     if(LDEBUG){cerr << soliloquy << " dfiles=" << aurostd::joinWDelimiter(dfiles,",") << endl;}

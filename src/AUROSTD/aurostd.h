@@ -20,7 +20,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <fstream>
-#include <functional>  //ME20220127 - for unit tests
+#include <functional>  //ME20220127 - for unit tests and multithreading
 #include <grp.h>
 #include <iomanip>
 #include <iostream>
@@ -47,9 +47,14 @@
 #include <sys/types.h>
 #include <sys/utsname.h>
 #include <sys/wait.h>
+#ifdef AFLOW_MULTITHREADS_ENABLE
+#include <mutex>
+#include <thread>
+#endif
 #include <time.h>
 #include <typeinfo>
 #include <unistd.h>
+#include <unordered_map> //ME20220207
 #include <signal.h>  //ME20191125 - needed for AflowDB
 #include <vector>
 #include <list> //CO20170806 - need for POCC

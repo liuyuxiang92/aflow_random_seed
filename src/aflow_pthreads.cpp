@@ -1050,44 +1050,6 @@ namespace sflow {
   }
 } // namespace sflow
 
-//////////////////////////////////////////////////////////////////////////////
-
-// getThreadDistribution - ME20180801
-// Calculates the start and end indices for each thread for multi-thread
-// calculations. Note that the end index is not included in each thread.
-vector<vector<int> > getThreadDistribution(const int& nbins, const int& nthreads) {
-  bool LDEBUG = (false || XHOST.DEBUG);
-  vector<vector<int> > thread_dist(nthreads, vector<int>(2));
-  int binsperthread = nbins/nthreads;
-  int remainder = nbins % nthreads;
-  int startIndex, endIndex;
-  for (int t = 0; t < nthreads; t++) {
-    if (t < remainder) {
-      startIndex = (binsperthread + 1) * t;
-      endIndex = startIndex + binsperthread + 1;
-    } else {
-      startIndex = binsperthread * t + remainder;
-      endIndex = startIndex + binsperthread;
-    }
-    thread_dist[t][0] = startIndex;
-    thread_dist[t][1] = endIndex;
-  }
-  if (LDEBUG) {
-    std::cerr << "Thread distribution: " << std::endl;
-    std::cerr << std::setiosflags(std::ios::fixed | std::ios::right) << setw(10) << " Thread";
-    std::cerr << std::setiosflags(std::ios::fixed | std::ios::right) << setw(15) << " start Index";
-    std::cerr << std::setiosflags(std::ios::fixed | std::ios::right) << setw(15) << " end Index";
-    std::cerr << std::endl;
-    for (int t = 0; t < nthreads; t++) {
-      std::cerr << std::setiosflags(std::ios::fixed | std::ios::right) << setw(10) << t;
-      std::cerr << std::setiosflags(std::ios::fixed | std::ios::right) << setw(15) << thread_dist[t][0];
-      std::cerr << std::setiosflags(std::ios::fixed | std::ios::right) << setw(15) << thread_dist[t][1];
-      std::cerr << std::endl;
-    }
-  }
-  return thread_dist;
-}
-
 
 // **************************************************************************
 

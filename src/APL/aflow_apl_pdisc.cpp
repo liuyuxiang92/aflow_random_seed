@@ -7,10 +7,6 @@
 
 #include "aflow_apl.h"
 
-#ifdef AFLOW_MULTITHREADS_ENABLE
-#include <thread>
-#endif
-
 using namespace std;
 
 //////////////////////////////////////////////////////////////////////////////
@@ -188,20 +184,16 @@ namespace apl {
 
   //////////////////////////////////////////////////////////////////////////////
 
-  void PhononDispersionCalculator::calculateInOneThread(int startIndex, int endIndex) {
-    //cout << "Thread: from " << startIndex << " to " <<  endIndex << std::endl;
-    for (int iqp = startIndex; iqp < endIndex; iqp++) {
-      //ME20200206 - get direction for q-points near Gamma for non-analytical correction
-      // or the discontinuity due to LO-TO splitting is not accurately captured.
-      if (_pc->isPolarMaterial() && (aurostd::modulus(_qpoints[iqp]) < 0.005)) {
-        int npts = _pb.getDensity() + 1;
-        int i = iqp/npts;
-        xvector<double> qpoint_nac = _qpoints[i * npts] - _qpoints[(i + 1) * npts - 1];
-        _freqs[iqp] = _pc->getFrequency(_qpoints[iqp], qpoint_nac, _frequencyFormat);
-      } else {
-        _freqs[iqp] = _pc->getFrequency(_qpoints[iqp], _frequencyFormat);
-      }
-      //std::this_thread::yield();
+  void PhononDispersionCalculator::calculateInOneThread(int iqp) {
+    //ME20200206 - get direction for q-points near Gamma for non-analytical correction
+    // or the discontinuity due to LO-TO splitting is not accurately captured.
+    if (_pc->isPolarMaterial() && (aurostd::modulus(_qpoints[iqp]) < 0.005)) {
+      int npts = _pb.getDensity() + 1;
+      int i = iqp/npts;
+      xvector<double> qpoint_nac = _qpoints[i * npts] - _qpoints[(i + 1) * npts - 1];
+      _freqs[iqp] = _pc->getFrequency(_qpoints[iqp], qpoint_nac, _frequencyFormat);
+    } else {
+      _freqs[iqp] = _pc->getFrequency(_qpoints[iqp], _frequencyFormat);
     }
   }
 
@@ -234,30 +226,13 @@ namespace apl {
     for (uint i = 0; i < _qpoints.size(); i++)
       _freqs.push_back(zero);
 
+    int nqps = (int) _qpoints.size();
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    // Get the number of CPUS
-    int ncpus = _pc->getNCPUs();
-
-    if (ncpus > 1) {
-      int startIndex, endIndex;
-      std::vector<std::thread*> threads;
-      vector<vector<int> > thread_dist = getThreadDistribution((int) _qpoints.size(), ncpus);
-      for (int icpu = 0; icpu < ncpus; icpu++) {
-        startIndex = thread_dist[icpu][0];
-        endIndex = thread_dist[icpu][1];
-        threads.push_back(new std::thread(&PhononDispersionCalculator::calculateInOneThread, this, startIndex, endIndex));
-      }
-
-      for (uint i = 0; i < threads.size(); i++) {
-        threads[i]->join();
-        delete threads[i];
-      }
-      threads.clear();
-    } else {
-      calculateInOneThread(0, (int) _qpoints.size());
-    }
+    xthread::xThread xt(_pc->getNCPUs());
+    std::function<void(int)> fn = std::bind(&PhononDispersionCalculator::calculateInOneThread, this, std::placeholders::_1);
+    xt.run(nqps, fn);
 #else
-    calculateInOneThread(0, (int) _qpoints.size());
+    for (int i = 0; i < nqps; i++) calculateInOneThread(i);
 #endif
   }
 

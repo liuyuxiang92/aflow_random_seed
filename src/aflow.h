@@ -357,6 +357,7 @@ class _XHOST {
     string AFLOW_MATERIALS_SERVER,AFLOW_WEB_SERVER;
     long double RAM,RAM_MB,RAM_GB;
     int CPU_Cores;
+    int CPU_active;  //ME20220130
     string CPU_Model;
     string CPU_MHz;
     vector<double> vTemperatureCore;
@@ -412,6 +413,7 @@ class _XHOST {
     aurostd::xoption vflag_outreach;  // argv/argc options following the xoption structure
     aurostd::xoption vflag_control;  // argv/argc options following the xoption structure
     aurostd::xoption vschema;        // keywords, names, units etc etc
+    aurostd::xoption vschema_secret;  //ME20220208
     // USUAL COMMANDS
     vector<string> vcat; //     cat, bzcat, xzcat, gzcat
     vector<string> vext; //      "",  .bz2,   .xz,   .gz
@@ -1091,6 +1093,7 @@ namespace init {
   uint GetTEMP(void);
   double WaitTEMP(double TRESHOLD=AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT,ostream& oss=cout,bool LVERBOSE=FALSE,vector<string> vmessage=vector<string>(0));
   uint InitSchema(bool INIT_VERBOSE);
+  uint InitSchemaSecret(bool INIT_VERBOSE);  //ME20220208
 } // namespace init
 
 uint AFLOW_getTEMP(const vector<string>& argv);
@@ -2943,7 +2946,67 @@ namespace sflow {
   void QDEL(string options);
   void QDEL(string options,string cmd);
 }
-vector<vector<int> > getThreadDistribution(const int&, const int&);  //ME20190218
+
+#ifdef AFLOW_MULTITHREADS_ENABLE
+//ME20220130
+namespace xthread {
+  class xThread {
+    public:
+      xThread(int nmax=0, int nmin=1);
+      xThread(const xThread& xt);
+      const xThread& operator=(const xThread& xt);
+      ~xThread();
+
+      void clear();
+
+      void setCPUs(int nmax, int nmin=1);
+      void setProgressBar(ostream& oss);
+      void unsetProgressBar();
+
+      template <typename F, typename... A>
+      void run(uint ntasks, F& func, A&... args);
+      template <typename F, typename... A>
+      void run(int ntasks, F& func, A&... args);
+      template <typename F, typename... A>
+      void run(unsigned long long int ntasks, F& func, A&... args);
+      template <typename IT, typename F, typename... A>
+      void run(IT& it, F& func, A&... args);
+
+      template <typename F, typename... A>
+      void runPredistributed(int ntasks, F& func, A&... args);
+      template <typename F, typename... A>
+      void runPredistributed(uint ntasks, F& func, A&... args);
+      template <typename F, typename... A>
+      void runPredistributed(unsigned long long int ntasks, F& func, A&... args);
+
+    private:
+      void free();
+      void copy(const xThread&);
+
+      int ncpus_max;
+      int ncpus_min;
+      std::mutex mtx;
+      ostream* progress_bar;
+      unsigned long long int progress_bar_counter;
+      bool progress_bar_set;
+
+      void initializeProgressBar(unsigned long long int ntasks);
+
+      int reserveThreads(unsigned long long int ntasks);
+      void freeThreads(int ncpus);
+
+      template <typename I, typename F, typename... A>
+      void run(I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
+      template <typename I, typename F, typename... A>
+      void spawnWorker(I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
+      template <typename I>
+      I advance(I& it, I& end, unsigned long long int ntasks, bool update_progress_bar=false);
+
+      template <typename I, typename F, typename... A>
+      void runPredistributed(I ntasks, F& func, A&... args);
+  };
+}
+#endif
 
 // ----------------------------------------------------------------------------
 // aflow_kbin.cpp
@@ -3461,7 +3524,9 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     string         Egap_type_net;
     //CO20211106 - IONIC STEPS DATA
     bool GetIonicStepsData();   //CO20211106
-    void WriteMTPCFG(const string& outcar_path,stringstream& output_ss);   //CO20211106
+    void populateAFLOWLIBEntry(aflowlib::_aflowlib_entry& data,const string& outcar_path); //CO20220124
+    void WriteMTPCFG(stringstream& output_ss,const string& outcar_path);   //CO20211106
+    void WriteMTPCFG(stringstream& output_ss,const string& outcar_path,const vector<string>& velements);   //CO20211106
     //[CO20200404 - OBSOLETE]string ERROR;
     //int number_bands,number_kpoints; //CO20171006 - camilo garbage
     //int ISPIN; // turn this into spin = 0 if ISPIN = 1 //CO20171006 - camilo garbage
@@ -4050,8 +4115,8 @@ namespace plotter {
 
   // DOS
   bool dosDataAvailable(const deque<deque<deque<deque<double> > > >& vdos, int pdos); // ME20200305
-  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ostream& oss=cout);  //CO20200404
-  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+  void generateDosPlot(stringstream&,const xDOSCAR&,aurostd::xoption&,ostream& oss=cout);  //CO20200404
+  void generateDosPlot(stringstream&,const xDOSCAR&,aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
 
   // Bands
   void generateBandPlot(stringstream&, const xEIGENVAL&, const xKPOINTS&, const xstructure&, const aurostd::xoption&);
