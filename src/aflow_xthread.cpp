@@ -751,6 +751,17 @@ namespace xthread {
     std::mutex&
   );
 
+  //UnitTest::runUnitTest
+  template void xThread::run<
+    vector<string>,
+    std::function<void(vector<string>::iterator&, const vector<string>&)>,
+    vector<string>
+  >(
+    vector<string>&,
+    std::function<void(vector<string>::iterator&, const vector<string>&)>&,
+    vector<string>&
+  );
+
   // runPredistributed --------------------------------------------------------
 
   //XTalFinderCalculator::calculateSpaceGroups

@@ -2985,7 +2985,9 @@ namespace xthread {
 
       int ncpus_max;
       int ncpus_min;
+#ifdef AFLOW_MULTITHREADS_ENABLE
       std::mutex mtx;
+#endif
       ostream* progress_bar;
       unsigned long long int progress_bar_counter;
       bool progress_bar_set;
@@ -5354,10 +5356,12 @@ namespace unittest {
   typedef std::function<void(uint&, vector<string>&)> unitTestFunction;
 
   struct xcheck {
-    uint passed_checks;
     unitTestFunction func;
+    string function_name;
+    string task_description;
+    uint passed_checks;
     vector<string> results;
-    bool test_finished;
+    bool finished;
   };
 
   class UnitTest : public xStream {
@@ -5373,13 +5377,16 @@ namespace unittest {
       void clear();
 
       void resetUnitTest(const string& test_name);
-      bool runUnitTests(const vector<string>& unit_tests_in);
+      bool runTestSuites(const string& unit_test);
+      bool runTestSuites(const vector<string>& unit_tests_in);
 
     private:
       std::unordered_map<string, xcheck> test_functions;
       std::unordered_map<string, vector<string> > test_groups;
       std::unordered_map<string, string> test2group;
-      vector<string> tasks;
+#ifdef AFLOW_MULTITHREADS_ENABLE
+      std::mutex mtx;
+#endif
 
       void free();
       void copy(const UnitTest& ut);
@@ -5389,11 +5396,13 @@ namespace unittest {
       void initializeTestGroups();
 
       void resetUnitTest(xcheck&);
-      xcheck initializeXcheck();
+      xcheck initializeXCheck();
       void multiplyByFive();
 
+      void runUnitTest(vector<string>::iterator& it, const vector<string>& tasks);
       bool taskSuccessful(const string& task);
 
+      void display_result(const xcheck& xchk);
       template <typename utype>
       void check(const bool passed, const utype &calculated, const utype &expected, const string &check_function,
           const string check_description, uint &passed_checks, vector<string> &results);
@@ -5408,6 +5417,8 @@ namespace unittest {
           const string &check_description, uint &passed_checks, vector<string> &results, const double relative=1E-10);
 
       void SchemaTest(uint& passed_checks, vector<string>& results);
+
+      void cifParserTest(uint& passed_checks, vector<string>& results);
   };
 
 }

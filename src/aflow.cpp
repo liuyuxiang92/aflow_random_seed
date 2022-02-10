@@ -232,7 +232,7 @@ int main(int _argc,char **_argv) {
       vector<string> tests;
       aurostd::string2tokens(unittest_options.getattachedscheme("UNIT_TESTS"), tests, ",");
       unittest::UnitTest ut(std::cout);
-      return (ut.runUnitTests(tests)?0:1);
+      return (ut.runTestSuites(tests)?0:1);
     }
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_schema|--schema_test")) {return (SchemaTest()?0:1);}  //ME20210408
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_CeramGen|--CeramGen_test")) {return (CeramGenTest()?0:1);}  //CO20190601
