@@ -77,17 +77,20 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss){  //CO20200520
   aflowlib::EntryLoader el;
   el.m_sqlite_file = "../testing/aflowlib.db";
 
-  el.setSource(aflowlib::EntryLoader::Source::FILESYSTEM_RAW);
-  el.loadAlloy("NiCaCu", true);
+  el.setSource(aflowlib::EntryLoader::Source::FILESYSTEM);
+//  el.loadAlloy("NiCaCu", true);
+//  el.loadAUID((vector<string>) {"aflow:d912e209c81aeb94", "aflow:d9b3431b55cf5bc8"});
+  el.loadAURL((vector<string>) {"aflowlib.duke.edu:AFLOWDATA/LIB2_WEB/Ca_svNi_pv/539",
+               "aflowlib.duke.edu:AFLOWDATA/LIB2_RAW/Ca_svCu_pv/138"});
 
   auto stop = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
   cout << "Duration: " << duration.count() << " milliseconds" << endl;
   el.getEntriesViewFlat(entries);
   cout << "Speed: " << entries.size()/(duration.count()/1000.0) << " entries/s" << endl;
-  for (auto entry: entries){
-    cout << entry->auid << endl;
-  }
+//  for (auto entry: entries){
+//    cout << entry->auid << endl;
+//  }
 
 //  for (string testme: tasks){
 //    message << "####### Test SQLITE";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);

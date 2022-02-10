@@ -35,6 +35,7 @@ namespace aflowlib {
         FILESYSTEM,
         FILESYSTEM_RAW,
         RESTAPI,
+        RESTAPI_RAW,
         NONE,
         FAILED
       };
@@ -51,6 +52,8 @@ namespace aflowlib {
       string m_restapi_server = "aflowlib.duke.edu";
       string m_restapi_path = "/AFLOWDATA/";
       string m_restapi_directives = "?format=text";
+      string m_restapi_listing = "?aflowlib_entries";
+      string m_restapi_collection = "_WEB/";
       string m_filesystem_outfile = DEFAULT_FILE_AFLOWLIB_ENTRY_OUT;
       string m_filesystem_path = "/common/";
       string m_filesystem_collection = "RAW/";
@@ -85,7 +88,7 @@ namespace aflowlib {
 
       //TODO add icsd:?
 
-      void loadAURL(const string& AURL);
+      void loadAURL(string AURL);
       void loadAURL(const vector<std::string> &AURL);
       
       void loadAlloy(const string & alloy, bool recursive=true);
@@ -95,7 +98,7 @@ namespace aflowlib {
       void loadAFLUXQuery(const std::string & query);
       void loadAFLUXMatchbook(const std::map<string, string> & matchbook);
 
-      void loadRestAPIQueries(const std::vector<std::string> & queries);
+      void loadRestAPIQueries(const std::vector<std::string> & queries, bool full_url=false);
 
       void loadFiles(const std::vector<std::string> & files);
 
@@ -118,6 +121,7 @@ namespace aflowlib {
       void getEntriesThreeLayer(std::vector<std::vector<std::vector<aflowlib::_aflowlib_entry>>> & result);
 
 
+
     private:
       //NECESSARY private CLASS METHODS - START
       void free();
@@ -129,15 +133,20 @@ namespace aflowlib {
       // helper for FILESYSTEM_RAW
       std::regex m_re_elements{"(A[cglmrstu]|B[aehikr]?|C[adeflmnorsu]?|D[bsy]|E[rsu]|F[elmr]?|G[ade]|H[efgos]?|I[nr]?|Kr?|L[airuv]|M[dgnot]|N[abdeiop]?|Os?|P[abdmortu]?|R[abefghnu]|S[bcegimnr]?|T[abcehilm]|U(u[opst])?|V|W|Xe|Yb?|Z[nr])"};
       std::regex m_re_ppclean{"(_GW|_AE|_200eV)"};
+      std::regex m_re_aurl2file{"(LIB\\d{1,})_(?:(?:RAW)|(?:LIB)|(?:WEB))\\/"};
 
-      std::vector<string> icsd_symmetries = {"BCC","BCT","CUB","FCC","HEX","MCL","MCLC",
-                                             "ORC","ORCC","ORCF","ORCI","RHL","TET","TRI"};
+      std::vector<string> m_icsd_symmetries = {"BCC/","BCT/","CUB/","FCC/","HEX/","MCL/","MCLC/",
+                                               "ORC/","ORCC/","ORCF/","ORCI/","RHL/","TET/","TRI/"};
 
       std::string buildAFLUXQuery(const std::map<string, string> & matchbook);
       bool cleanAUID(string & AUID);
+      bool cleanAURL(string & AURL);
       void selectSource();
       void getAlloyAUIDList(const std::vector<string> & alloy, std::vector<string> & auid_list);
-      void loadAlloySearchFSR(const std::vector<string> & alloy_list, uint lib_max, bool recursive);
+      void loadAlloySearchFSR(const std::vector<string> & alloy_list, uint lib_max, bool recursive); // FILESYSTEM_RAW
+      void loadAlloySearchRR(const std::vector<string> & alloy_list, uint lib_max, bool recursive); // RESTAPI_RAW
+      void listRestAPI(string url, vector<string> & result);
+      std::string extractAlloy(std::string name, char lib_type);
 
   };
 } // namespace aflowlib

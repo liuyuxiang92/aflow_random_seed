@@ -108,6 +108,43 @@ namespace aflowlib {
     }
   }
 
+  bool EntryLoader::cleanAURL(string & AURL) {
+    if (AURL.substr(0, 28)== "aflowlib.duke.edu:AFLOWDATA/") return true;
+    if (AURL.substr(0, 9) == "AFLOWDATA") {
+      AURL = "aflowlib.duke.edu:" + AURL;
+      return true;
+    }
+
+    AURL = "aflowlib.duke.edu:AFLOWDATA/" + AURL;
+    return true;
+
+    //TODO how to check if AURL could be valid
+  }
+
+  void EntryLoader::listRestAPI(string url, vector<string> & result) {
+    result.clear();
+    url+= m_restapi_listing;
+    string output;
+    short status = aurostd::httpGetStatus(url, output);
+    if (status==200) aurostd::string2tokens(output, result, ",");
+    else cout << status << " | " << url << endl;
+  }
+
+  string EntryLoader::extractAlloy(std::string name, char lib_type) {
+    if (lib_type == 'I') { //ICSD
+      name.erase(std::min(name.find("_ICSD_"), name.size()));
+    } else if (lib_type == 'L') { //LIBX
+      name.erase(std::min(name.find(':'), name.size()));
+      name = std::regex_replace (name, m_re_ppclean,"");
+    } else {
+      return "";
+    }
+    std::vector <std::string> element_match(std::sregex_token_iterator(name.begin(), name.end(), m_re_elements),
+                                            std::sregex_token_iterator());
+    std::sort(element_match.begin(), element_match.end());
+    return aurostd::joinWDelimiter(element_match, "");
+  }
+
   bool EntryLoader::setSource(EntryLoader::Source new_source) {
     // TODO error messages
     if (new_source == m_current_source) return true;
@@ -151,6 +188,12 @@ namespace aflowlib {
 
       case Source::FILESYSTEM_RAW: {
         if (aurostd::IsDirectory(m_filesystem_path + "AUID/")) { //
+          if (aurostd::FileExist(m_sqlite_alloy_file)) { // use the alloy DB to optemize the RAW results
+            if (m_sqlite_alloy_db_ptr == nullptr) {
+              cout << "Init alloy DB" << endl;
+              m_sqlite_alloy_db_ptr = std::make_shared<aflowlib::AflowDB>(m_sqlite_alloy_file);
+            }
+          }
           m_current_source = Source::FILESYSTEM_RAW;
           return true;
         }
@@ -158,13 +201,28 @@ namespace aflowlib {
       }
 
       case Source::RESTAPI: {
-        if (aurostd::FileExist(m_sqlite_alloy_file) &&
-            200 == aurostd::httpGetStatus("http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/")) {
+        if (200 == aurostd::httpGetStatus("http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/")) {
+          if (aurostd::FileExist(m_sqlite_alloy_file)) {
+            if (m_sqlite_alloy_db_ptr == nullptr) {
+              cout << "Init alloy DB" << endl;
+              m_sqlite_alloy_db_ptr = std::make_shared<aflowlib::AflowDB>(m_sqlite_alloy_file);
+            }
+            m_current_source = Source::RESTAPI;
+            return true;
+          } else {
+            return setSource(Source::RESTAPI_RAW);
+          }
+        }
+        break;
+      }
+
+      case Source::RESTAPI_RAW: {
+        if (200 == aurostd::httpGetStatus("http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/")) {
           if (m_sqlite_alloy_db_ptr == nullptr) {
             cout << "Init alloy DB" << endl;
             m_sqlite_alloy_db_ptr = std::make_shared<aflowlib::AflowDB>(m_sqlite_alloy_file);
           }
-          m_current_source = Source::RESTAPI;
+          m_current_source = Source::RESTAPI_RAW;
           return true;
         }
         break;
@@ -247,7 +305,7 @@ namespace aflowlib {
   }
 
 
-  void EntryLoader::loadRestAPIQueries(const std::vector <std::string> &queries) {
+  void EntryLoader::loadRestAPIQueries(const std::vector <std::string> &queries, bool full_url) {
     string soliloquy=XPID+"EntryLoader::loadRestAPIQueries():";
     stringstream message;
     std::string output = "";
@@ -257,7 +315,8 @@ namespace aflowlib {
     size_t start_size=m_entries_flat->size();
     for (string query: queries){
       n+=1;
-      url = m_restapi_server+m_restapi_path + query + m_restapi_directives;
+      if (full_url)url = query;
+      else url = m_restapi_server+m_restapi_path + query + m_restapi_directives;
       cout << " Load #" << n << " from " << url << "\n";
       short status = aurostd::httpGetStatus(url, output);
       //TODO throw ERROR if web fails or try different source
@@ -295,7 +354,7 @@ namespace aflowlib {
   void EntryLoader::loadAFLUXQuery(const std::string &query) {
     string soliloquy=XPID+"EntryLoader::loadAFLUXQuery():";
     stringstream message;
-
+    cout << query << endl;
     std::string output = "";
     short status = aurostd::httpGetStatus(m_aflux_server, m_aflux_path, query, output);
     //TODO throw ERROR if web fails or try different source
@@ -307,6 +366,90 @@ namespace aflowlib {
 
     message << "Loaded " << m_entries_flat->size()-start_size << " new entries (overall "<< m_entries_flat->size() << " | " << m_auid_list.size() << " unique)";
     pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_NOTICE_);
+  }
+
+  void EntryLoader::loadAURL(string AURL) {
+    selectSource();
+
+    if (!cleanAURL(AURL)) return; //TODO error message
+
+    switch (m_current_source) {
+
+      case Source::SQLITE: {
+        std::string where = "aurl='\"" + AURL + "\"'";
+        loadSqliteWhere(where);
+        break;
+      }
+
+      case Source::AFLUX: {
+        std::map <std::string, std::string> matchbook{{"*", ""},{"aurl", "'" + AURL + "'"}};
+        loadAFLUXMatchbook(matchbook);
+        break;
+      }
+
+      case Source::RESTAPI: case Source::RESTAPI_RAW: {
+        loadAURL({AURL});
+        break;
+      }
+
+      case Source::FILESYSTEM: case Source::FILESYSTEM_RAW: {
+        loadAURL({AURL});
+        break;
+      }
+
+      default:
+        break;
+    }
+  }
+
+  void EntryLoader::loadAURL(const vector <std::string> &AURL) {
+    selectSource();
+    vector<std::string> clean_AURL;
+    for (std::string AURL_single: AURL) {
+      if (cleanAURL(AURL_single)) clean_AURL.push_back(AURL_single);
+    }
+    switch (m_current_source) {
+
+      case Source::AFLUX:{
+        std::string AURL_combined = aurostd::joinWDelimiter(clean_AURL, "':'");
+        AURL_combined = "'"+ AURL_combined + "'";
+        loadAFLUXMatchbook({{"*", ""}, {"aurl", AURL_combined}});
+        break;
+      }
+
+      case Source::SQLITE:{
+        std::string where = aurostd::joinWDelimiter(clean_AURL, "\"','\"");
+        where = "aurl IN ('\"" + where + "\"')";
+        loadSqliteWhere(where);
+        break;
+      }
+
+      case Source::RESTAPI: case Source::RESTAPI_RAW:{
+        std::vector<std::string> queries;
+        for (std::string AURL_single: clean_AURL) {
+          string rest_query = AURL_single.erase(0,28);
+          queries.push_back(rest_query);
+        }
+        loadRestAPIQueries(queries);
+        break;
+      }
+
+      case Source::FILESYSTEM: case Source::FILESYSTEM_RAW:{
+        std::vector<std::string> files;
+        for (std::string AURL_single: clean_AURL) {
+          string file_path = m_filesystem_path + AURL_single.erase(0,28) + "/" + m_filesystem_outfile;
+          file_path = std::regex_replace (file_path, m_re_aurl2file,"$1/"+m_filesystem_collection);
+          files.push_back(file_path);
+          cout << file_path << endl;
+        }
+        loadFiles(files);
+        break;
+
+      }
+
+      default:
+        break;
+    }
   }
 
   void EntryLoader::loadAUID(string AUID) {
@@ -328,12 +471,12 @@ namespace aflowlib {
         break;
         }
 
-      case Source::RESTAPI:{
+        case Source::RESTAPI: case Source::RESTAPI_RAW: {
         loadAUID({AUID});
         break;
       }
 
-      case Source::FILESYSTEM:{
+      case Source::FILESYSTEM: case Source::FILESYSTEM_RAW: {
         loadAUID({AUID});
         break;
       }
@@ -366,7 +509,7 @@ namespace aflowlib {
         break;
       }
 
-      case Source::RESTAPI:{
+      case Source::RESTAPI: case Source::RESTAPI_RAW:{
         std::vector<std::string> queries;
         for (std::string AUID_single: clean_AUID) {
           string rest_query = "AUID/aflow:";
@@ -460,6 +603,11 @@ namespace aflowlib {
         break;
       }
 
+      case Source::RESTAPI_RAW: {
+        loadAlloySearchRR(final_alloy_list, alloy_clean.size(), recursive);
+        break;
+      }
+
       case Source::FILESYSTEM: {
         std::vector<string> auid_list;
         getAlloyAUIDList(final_alloy_list, auid_list);
@@ -486,9 +634,78 @@ namespace aflowlib {
     loadAlloy(alloy_elements, recursive);
   }
 
+  void EntryLoader::loadAlloySearchRR(const std::vector <string> & alloy_list, uint lib_max, bool recursive) {
+    std::vector<std::string> rest_api_queries;
+    std::vector<std::string> icsd_search_path_list;
+    std::vector<std::string> libx_search_path_list;
+    std::vector<std::string> libx_crawl_list;
+    for (const string & sym : m_icsd_symmetries) {
+      icsd_search_path_list.emplace_back(m_restapi_server + m_restapi_path + "ICSD" + m_restapi_collection + sym);
+    }
+    if (recursive) {
+      for (uint lib_idx = 1; lib_idx <= lib_max; lib_idx++) {
+        libx_search_path_list.emplace_back(m_restapi_server + m_restapi_path + "LIB" + std::to_string(lib_idx) + m_restapi_collection);
+      }
+    } else {
+      libx_search_path_list.emplace_back(m_restapi_server + m_restapi_path + "LIB" + std::to_string(lib_max) + m_restapi_collection);
+    }
+    vector<string> listing;
+
+    for (const string & url : icsd_search_path_list){
+      listRestAPI(url, listing);
+      cout << url << endl;
+      for (const string & name: listing ){
+        if (find(alloy_list.begin(), alloy_list.end(), extractAlloy(name, 'I')) != alloy_list.end()){
+          rest_api_queries.emplace_back(url + name + "/" + m_restapi_directives);
+        }
+      }
+    }
+
+    for (const string & url : libx_search_path_list){
+      listRestAPI(url, listing);
+      cout << url << endl;
+      for (const string & name: listing ){
+        if (find(alloy_list.begin(), alloy_list.end(), extractAlloy(name, 'L')) != alloy_list.end()){
+          cout << " " << name << " | " << extractAlloy(name, 'L') << endl;
+          libx_crawl_list.emplace_back(url + name + "/" );
+        }
+      }
+    }
+
+    uint scanned=0;
+    while(!libx_crawl_list.empty()){
+      scanned += 1;
+      string url = libx_crawl_list.back();
+      libx_crawl_list.pop_back();
+      if (scanned%100 == 0) cout << scanned << " | " << libx_crawl_list.size() << " | " << url << endl;
+      listRestAPI(url, listing);
+      if (listing.empty()) {
+        rest_api_queries.emplace_back(url + m_restapi_directives);
+        cout << " " << url << endl;
+      } else {
+        for (const string & name: listing ) {
+          libx_crawl_list.emplace_back(url + name + "/");
+        }
+      }
+    }
+
+
+    loadRestAPIQueries(rest_api_queries, true);
+    if (m_sqlite_alloy_db_ptr != nullptr) {
+      vector <string> known_AUID_list;
+      getAlloyAUIDList(alloy_list, known_AUID_list);
+      vector <string> missing_AUID;
+      for (const string &AUID: known_AUID_list) {
+        if (m_auid_list.find(AUID) == m_auid_list.end()) missing_AUID.emplace_back(AUID);
+      }
+      std::cout << "Missed: " << missing_AUID.size() << std::endl;
+      loadAUID(missing_AUID);
+    }
+
+  }
+
 
   void EntryLoader::loadAlloySearchFSR(const std::vector <string> & alloy_list, uint lib_max, bool recursive) {
-    // TODO put alloy finding in private sub function
     std::vector<std::string> found_entries;
 
     std::vector<std::string> search_path_list;
@@ -534,14 +751,7 @@ namespace aflowlib {
       if ((node->fts_info & FTS_D)){
         if (node->fts_path[check_idx]=='I') {
           if (node->fts_level == 2) {
-            std::string name = node->fts_name;
-            name.erase(std::min(name.find("_ICSD_"), name.size()));
-            std::vector <std::string> element_match(std::sregex_token_iterator(name.begin(), name.end(), m_re_elements),
-                                                    std::sregex_token_iterator());
-            std::sort(element_match.begin(), element_match.end());
-            string alloy = aurostd::joinWDelimiter(element_match, "");
-//            cout << node->fts_level << " | " << node->fts_path << " | " << alloy << endl;
-            if (find(alloy_list.begin(), alloy_list.end(), alloy) == alloy_list.end()) {
+            if (find(alloy_list.begin(), alloy_list.end(), extractAlloy(node->fts_name, 'I')) == alloy_list.end()) {
               fts_set(tree, node, FTS_SKIP);
               continue;
             } else {
@@ -556,14 +766,7 @@ namespace aflowlib {
           }
         } else if (node->fts_path[check_idx]=='L'){
           if (node->fts_level == 1) {
-            std::string name = node->fts_name;
-            name.erase(std::min(name.find(':'), name.size()));
-            std::regex_replace (name,m_re_ppclean,"");
-            std::vector <std::string> element_match(std::sregex_token_iterator(name.begin(), name.end(), m_re_elements),
-                                                    std::sregex_token_iterator());
-            std::sort(element_match.begin(), element_match.end());
-            string alloy = aurostd::joinWDelimiter(element_match, "");
-            if (find(alloy_list.begin(), alloy_list.end(), alloy) == alloy_list.end()) {
+            if (find(alloy_list.begin(), alloy_list.end(), extractAlloy(node->fts_name, 'L')) == alloy_list.end()) {
               fts_set(tree, node, FTS_SKIP);
               continue;
             } else {
@@ -587,13 +790,22 @@ namespace aflowlib {
           }
         }
       }
-      if (scanned%100==0) {
+      if (scanned%1000==0) {
         std::cout << scanned << " | " << found << " | " << node->fts_path << std::endl;
       }
     }
-    std::cout << "Scanned: " << scanned << " | Found: " << found  << std::endl;
+    std::cout << "Scanned: " << scanned << " | Found: " << found << std::endl;
     loadFiles(found_entries);
-    //TODO if mini sqlite is available check for missing structures
+    if (m_sqlite_alloy_db_ptr != nullptr) {
+      vector <string> known_AUID_list;
+      getAlloyAUIDList(alloy_list, known_AUID_list);
+      vector <string> missing_AUID;
+      for (const string &AUID: known_AUID_list) {
+        if (m_auid_list.find(AUID) == m_auid_list.end()) missing_AUID.emplace_back(AUID);
+      }
+      std::cout << "Missed: " << missing_AUID.size() << std::endl;
+      loadAUID(missing_AUID);
+    }
   }
 
   // View getter functions
