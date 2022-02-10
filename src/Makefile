@@ -153,7 +153,7 @@ COUNTER_FILE=.aflow_counter
 all: aflow aflow_data 
 	$(MAKE) check
 include Makefile.aflow
-aflow: $(SQLITE_OBJ) $(AFLOW_DEPS) $(MFS) 
+aflow: $(SQLITE_OBJ) $(AFLOW_DEPS) Makefile
 #	$(MAKE) -C ../AFLOW2_FREE/EXTRA/APL2AGR/ && cd ../../
 #	cp -f aflow_apl*.o aflow_aapl*.o aflow_qha*.o ./APL/
 #	cp -f aflow_anrl*.o ./ANRL/
@@ -213,7 +213,7 @@ production:
 
 ###################################################################################################
 #CO201706147
-$(SQLITE_OBJ): $(SQLITE_C) $(MFS)
+$(SQLITE_OBJ): $(SQLITE_C) Makefile
 	$(CC) $(SQLITE_OPTS) -c $< -o $@ $(FLAGS_STATIC_POST)
 #	$(CC) -DSQLITE_ENABLE_JSON1 -DSQLITE_OMIT_LOAD_EXTENSION -o $@ -c $< $(LIBS)	#-DSQLITE_OMIT_LOAD_EXTENSION doesn't really work amalgamation
 #	$(CC) -DSQLITE_ENABLE_JSON1 -o $@ -c $< $(LIBS)
@@ -223,10 +223,9 @@ $(SQLITE_OBJ): $(SQLITE_C) $(MFS)
 #CO20200508 - catch all rule
 #[CO20200508 - do not include AFLOW*.h or AUROSTD*.cpp/AUROSTD*.h].cpp.o: .cpp .h $(MFS) $(AFLOW_HPPS) $(AUROSTD_HPPS) $(AUROSTD_CPPS)
 #[CO20200508 - addressing: warning: ignoring prerequisites on suffix rule definition].cpp.o: .cpp .h Makefile
-#[ME20220205 - added Makefile.aflow as dependency]
-%.o: %.cpp %.h $(MFS)
+%.o: %.cpp %.h Makefile
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
-%.o: %.cpp $(MFS)
+%.o: %.cpp Makefile
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 #	touch $@
 ###################################################################################################
