@@ -6654,7 +6654,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       avec(2) = aurostd::string2utype<double>(tokens[1]);
       avec(3) = aurostd::string2utype<double>(tokens[2]);
       atom.name = atom.cleanname=tokens[3];
-      atom.fpos = BringInCell(aurostd::inverse(a.lattice) * coorsys * avec);
+      atom.fpos = BringInCell(aurostd::inverse(trasp(a.lattice)) * coorsys * avec);
       atom.cpos = a.f2c * atom.fpos;
       atom.name_is_given = TRUE;
       a.AddAtom(atom);
