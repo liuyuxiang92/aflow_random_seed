@@ -372,7 +372,8 @@ namespace makefile {
     trimPath(file);
     if(LDEBUG){cerr << soliloquy << " building dependency for " << file << endl;}
     vfiles.push_back(file);
-    vvdependencies.push_back(vector<string>(0));files_already_explored.clear();
+    vvdependencies.push_back(vector<string>(1, Makefile_aflow));  // ME20220210 - Add Makefile.aflow as dependency or files with changed flags/dependencies won't compile
+    files_already_explored.clear();
     mt_required=false;
     getDependencies(vfiles.back(),files_already_explored,vvdependencies.back(),mt_required); //[didn't compile for some reason]vmt_required.back());
     vvdependencies.back().insert(vvdependencies.back().begin(),file);  //put file at the BEGINNING for $<
@@ -411,7 +412,8 @@ namespace makefile {
     trimPath(file);
     if(LDEBUG){cerr << soliloquy << " building dependency for " << file << endl;}
     vfiles.push_back(file);
-    vvdependencies.push_back(vector<string>(0));files_already_explored.clear();
+    vvdependencies.push_back(vector<string>(1, Makefile_aflow));  // ME20220210 - Add Makefile.aflow as dependency or files with changed flags/dependencies won't compile
+    files_already_explored.clear();
     mt_required=false;
     getDependencies(vfiles.back(),files_already_explored,vvdependencies.back(),mt_required); //[didn't compile for some reason]vmt_required.back());
     vvdependencies.back().insert(vvdependencies.back().begin(),file);  //put file at the BEGINNING for $<
@@ -512,7 +514,8 @@ namespace makefile {
             //END skipping
             if(LDEBUG){cerr << soliloquy << " building dependency for " << file << endl;}
             vfiles.push_back(file);
-            vvdependencies.push_back(vector<string>(0));files_already_explored.clear();
+            vvdependencies.push_back(vector<string>(1, Makefile_aflow));  // ME20220210 - Add Makefile.aflow as dependency or files with changed flags/dependencies won't compile
+            files_already_explored.clear();
             //[didn't compile for some reason]vmt_required.push_back(false);
             mt_required=false;
             getDependencies(vfiles.back(),files_already_explored,vvdependencies.back(),mt_required); //[didn't compile for some reason]vmt_required.back());

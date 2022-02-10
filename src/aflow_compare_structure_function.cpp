@@ -4268,11 +4268,11 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
 
   uint number_of_comparisons = 0;
   vector<std::pair<uint,uint> > start_indices, end_indices;
-  uint num_comparison_threads = 1;
 
   bool scale_volume = comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME");
   bool optimize_match = comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH");
 #ifdef AFLOW_MULTITHREADS_ENABLE
+  uint num_comparison_threads = 1;
 
   // ---------------------------------------------------------------------------
   // THREADED VERSION - START
@@ -4379,7 +4379,6 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
     number_of_comparisons=0;
     for(uint i=0;i<comparison_schemes.size();i++){ number_of_comparisons += comparison_schemes[i].numberOfComparisons(); }
     if(LDEBUG){ cerr << function_name << " number_of_comparisons: " << number_of_comparisons << endl; }
-    num_comparison_threads = aurostd::min(num_proc,number_of_comparisons);
 
     if(number_of_comparisons>0){
       if(!quiet){
@@ -4388,6 +4387,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
       }
       if(LDEBUG) { cerr << function_name << ": Number of comparisons is not zero... " << number_of_comparisons << endl; }
 #ifdef AFLOW_MULTITHREADS_ENABLE
+      num_comparison_threads = aurostd::min(num_proc,number_of_comparisons);
 
       // THREADED VERISON - START
       // split into threads
@@ -6566,7 +6566,7 @@ void XtalFinderCalculator::latticeSearch(
     }
 
     // ---------------------------------------------------------------------------
-    // create structure misfit objet for each lattice and add lattice deviation
+    // create structure misfit object for each lattice and add lattice deviation
     vector<structure_mapping_info> vstrs_matched;
     for(uint i=0;i<lattices.size();i++){
       structure_mapping_info str_misfit_tmp = compare::initialize_misfit_struct();
@@ -6584,6 +6584,8 @@ void XtalFinderCalculator::latticeSearch(
       const vector<double>&, const xstructure&, const string&,
       vector<xmatrix<double> >&, vector<structure_mapping_info>&, bool, bool)> search_atom_mappings
       = std::bind(&XtalFinderCalculator::searchAtomMappings, this, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10);
+#else
+    if (num_proc) {} // Suppress compiler warnings
 #endif
 
     // ---------------------------------------------------------------------------
