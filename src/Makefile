@@ -153,7 +153,7 @@ COUNTER_FILE=.aflow_counter
 all: aflow aflow_data 
 	$(MAKE) check
 include Makefile.aflow
-aflow: $(SQLITE_OBJ) $(AFLOW_DEPS) Makefile
+aflow: $(SQLITE_OBJ) $(AFLOW_DEPS) $(MFS)
 #	$(MAKE) -C ../AFLOW2_FREE/EXTRA/APL2AGR/ && cd ../../
 #	cp -f aflow_apl*.o aflow_aapl*.o aflow_qha*.o ./APL/
 #	cp -f aflow_anrl*.o ./ANRL/
