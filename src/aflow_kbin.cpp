@@ -211,7 +211,7 @@ namespace KBIN {
       if(!aurostd::FileEmpty(aflowindir)) { // must not be empty
         if(aurostd::substring2bool(aflowindir,_AFLOWIN_)) {  // there must be an _AFLOWIN_
           aurostd::StringSubst(aflowindir,_AFLOWIN_,"");
-          if(!aurostd::LinkFileAtomic(aflowindir+"/"+_AFLOWIN_,aflowindir+"/LOCK."+_AFLOWIN_,false) && !aurostd::FileExist(aflowindir+_AFLOWLOCK_)) { // it should be UNLOCKED if temporary hard link can be made OR LOCK file does not exist // SD20220207
+          if(!aurostd::LinkFileAtomic(aflowindir+"/"+_AFLOWIN_,aflowindir+"/LOCK."+_AFLOWIN_,false) && !aurostd::DirectoryLocked(aflowindir,_AFLOWLOCK_)) { // it should be UNLOCKED if temporary hard link can be made AND LOCK file does not exist // SD20220207
             //  if(osswrite) {oss << "MMMMM  Loading Valid File Entry = " << aflowindir << MessageTime(aflags);aurostd::PrintMessageStream(oss,XHOST.QUIET);};
             return TRUE;	
           } else { // must be unlocked
