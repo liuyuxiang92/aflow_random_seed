@@ -2111,22 +2111,22 @@ namespace aurostd {
   // Simon Divilov
   // Create a symbolic or hard link of a file using C++ functions
   bool LinkFileAtomic(const string& from,const string& to,bool soft) {
-    int fail;
+    int fail=0;
     string from_clean=CleanFileName(from),to_clean=CleanFileName(to);
     if(from_clean.empty() || to_clean.empty()) {return FALSE;}
     if(soft) {
-      fail = symlink(from_clean.c_str(),to_clean.c_str());
+      fail=symlink(from_clean.c_str(),to_clean.c_str());
     }
     else {
-      fail = link(from_clean.c_str(),to_clean.c_str());
+      fail=link(from_clean.c_str(),to_clean.c_str());
     }
     if(fail) {
       if(errno==EEXIST) {
         return FALSE;
       }
       else {
-        string function = XPID+"aurostd::LinkFileAtomic()";
-        string message = "Error linking "+from_clean+" -> "+to_clean+" | errno="+aurostd::utype2string<int>(errno);
+        string function=XPID+"aurostd::LinkFileAtomic()";
+        string message="Error linking "+from_clean+" -> "+to_clean+" | errno="+aurostd::utype2string<int>(errno);
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function,message,_FILE_ERROR_);
       }
     }
