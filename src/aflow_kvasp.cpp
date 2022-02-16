@@ -5422,7 +5422,7 @@ namespace KBIN {
   // when aflow.in files are moved between machines and the VASP binary files
   // have different names. This is not desirable when VASP does not need to be
   // run (e.g. for post-processing).
-  string getVASPVersion(const string& binfile) {  //CO20210315
+  string getVASPVersion(const string& binfile,const string& mpi_command) {  //CO20210315
     // /home/bin/vasp_std -> vasp.4.6.35
     // /home/bin/vasp_std -> vasp.5.4.4.18Apr17-6-g9f103f2a35
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
@@ -5445,7 +5445,11 @@ namespace KBIN {
       aurostd::string2file("","./POTCAR");
       if(LDEBUG){cerr << soliloquy << " ls[1]=" << endl << aurostd::execute2string("ls") << endl;}
       //execute2string does not work well here...
-      aurostd::execute(binfile + " > /dev/null 2>&1");  //ME20200610 - no output from vasp
+      string command="";
+      if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
+      command+=binfile+" > /dev/null 2>&1";
+      if(LDEBUG){cerr << soliloquy << " running command: \"" << command << "\"" << endl;}
+      aurostd::execute(command);  //ME20200610 - no output from vasp
       if(LDEBUG){cerr << soliloquy << " ls[2]=" << endl << aurostd::execute2string("ls") << endl;}
       if(!aurostd::FileExist("OUTCAR")){
         //first re-try, source intel
@@ -5453,7 +5457,10 @@ namespace KBIN {
         aurostd::string2tokens(INTEL_COMPILER_PATHS,vintel_paths,",");
         for(uint i=0;i<vintel_paths.size();i++){
           if(aurostd::FileExist("/bin/bash") && aurostd::FileExist(vintel_paths[i])){
-            string command="/bin/bash -c \"source "+vintel_paths[i]+" intel64; "+ binfile + " > /dev/null 2>&1\"";  //ME20200610 - no output from vasp  //CO20210315 - source only works in bash
+            command="";
+            command+="/bin/bash -c \"source "+vintel_paths[i]+" intel64; ";
+            if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
+            command+=binfile+" > /dev/null 2>&1\"";  //ME20200610 - no output from vasp  //CO20210315 - source only works in bash
             if(LDEBUG){cerr << soliloquy << " running command: \"" << command << "\"" << endl;}
             aurostd::execute(command);
             if(LDEBUG){cerr << soliloquy << " ls[3]=" << endl << aurostd::execute2string("ls") << endl;}
@@ -5514,15 +5521,15 @@ namespace KBIN {
 
     return "";
   }
-  string getVASPVersionNumber(const string& binfile) {  //CO20200610
+  string getVASPVersionNumber(const string& binfile,const string& mpi_command) {  //CO20200610
     // /home/bin/vasp_std -> 4.6.35
     // /home/bin/vasp_std -> 5.4.4
-    return VASPVersionString2Number(getVASPVersion(binfile));
+    return VASPVersionString2Number(getVASPVersion(binfile,mpi_command));
   }
-  double getVASPVersionDouble(const string& binfile) {  //CO20200610
+  double getVASPVersionDouble(const string& binfile,const string& mpi_command) {  //CO20200610
     // /home/bin/vasp_std -> 4.635
     // /home/bin/vasp_std -> 5.44
-    return VASPVersionString2Double(getVASPVersionNumber(binfile));
+    return VASPVersionString2Double(getVASPVersionNumber(binfile,mpi_command));
   }
 }  // namespace KBIN
 

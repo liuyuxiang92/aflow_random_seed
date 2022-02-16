@@ -3112,9 +3112,9 @@ namespace KBIN {
   double OUTCAR2VASPVersionDouble(const string& outcar);  //CO20210315
   string VASPVersionString2Number(const string& vasp_version);  //CO20210315
   double VASPVersionString2Double(const string& vasp_version);  //CO20210315
-  string getVASPVersion(const string& binfile);  //ME20190219
-  string getVASPVersionNumber(const string& binfile);  //CO20200610
-  double getVASPVersionDouble(const string& binfile);  //CO20200610
+  string getVASPVersion(const string& binfile,const string& mpi_command="");  //ME20190219
+  string getVASPVersionNumber(const string& binfile,const string& mpi_command="");  //CO20200610
+  double getVASPVersionDouble(const string& binfile,const string& mpi_command="");  //CO20200610
 }
 
 // ----------------------------------------------------------------------------
