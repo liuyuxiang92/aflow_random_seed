@@ -5427,7 +5427,10 @@ namespace KBIN {
     // /home/bin/vasp_std -> vasp.5.4.4.18Apr17-6-g9f103f2a35
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::getVASPVersionString():";
-    if(LDEBUG){cerr << soliloquy << " binfile=" << binfile << endl;}
+    if(LDEBUG){
+      cerr << soliloquy << " binfile=" << binfile << endl;
+      cerr << soliloquy << " mpi_command=" << mpi_command << endl;
+    }
     if (!XHOST.is_command(binfile)) return "";
     // Get the full path to the binary
     string fullPathBinaryName = XHOST.command(binfile);
@@ -5469,6 +5472,7 @@ namespace KBIN {
         }
       }
       string vasp_version_outcar=KBIN::OUTCAR2VASPVersion("OUTCAR");
+      if(LDEBUG){cerr << soliloquy << " vasp_version_outcar=" << vasp_version_outcar << endl;}
       chdir(pwddir.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(tmpdir);
