@@ -21,7 +21,7 @@
 #include <sys/stat.h>
 
 
-#define _DEBUG_ENTRY_LOADER_ true
+#define _DEBUG_ENTRY_LOADER_ false
 
 
 namespace aflowlib {
@@ -54,11 +54,11 @@ namespace aflowlib {
   /// create shared pointer used to store the data views and read default values from flags
   /// @TODO use flags to set defaults
   void EntryLoader::init() {
-    m_entries_flat = std::make_shared < std::vector < std::shared_ptr < aflowlib::_aflowlib_entry>>>();
-    m_entries_layered_map = std::make_shared < std::unordered_map < short, std::unordered_map <
-                                                                           std::string, std::vector < std::shared_ptr <
-                                                                                        aflowlib::_aflowlib_entry
-                                                                                            >>>>>();
+    m_out_debug = (m_out_debug || XHOST.DEBUG || _DEBUG_ENTRY_LOADER_);
+    m_entries_flat = std::make_shared<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>();
+    m_entries_layered_map = std::make_shared<std::map<short,
+                                             std::map<std::string,
+                                             std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>>>();
   }
 
   /// @brief reset a EntryLoader object
@@ -66,6 +66,8 @@ namespace aflowlib {
 
   /// @brief create a copy (privat)
   void EntryLoader::copy(const EntryLoader &b) {  //copy PRIVATE
+    m_out_debug = b.m_out_debug;
+    m_out_silent = b. m_out_silent;
     m_xstructure_relaxed = b.m_xstructure_relaxed;
     m_xstructure_original = b.m_xstructure_original;
     m_xstructure_original_file_name = b.m_xstructure_original_file_name;
@@ -89,13 +91,14 @@ namespace aflowlib {
     m_current_source = b.m_current_source;
     m_filesystem_available = b.m_filesystem_available;
     m_auid_list = b.m_auid_list;
+    std::stringstream().swap(m_logger_message);
 
     m_sqlite_db_ptr = b.m_sqlite_db_ptr;
     m_sqlite_alloy_db_ptr = b.m_sqlite_db_ptr;
 
     m_entries_flat = std::make_shared < std::vector < std::shared_ptr < aflowlib::_aflowlib_entry>>>(*b.m_entries_flat);
-    m_entries_layered_map = std::make_shared < std::unordered_map < short,
-        std::unordered_map < std::string,
+    m_entries_layered_map = std::make_shared < std::map < short,
+        std::map < std::string,
         std::vector < std::shared_ptr < aflowlib::_aflowlib_entry >>>>>(*b.m_entries_layered_map);
   }
 
@@ -108,7 +111,13 @@ namespace aflowlib {
   void EntryLoader::loadAUID(std::string AUID) {
     selectSource();
 
-    if (!cleanAUID(AUID)) return; //TODO error message
+    m_logger_message << "Try loading: " << AUID;
+    outInfo(__func__);
+    if (!cleanAUID(AUID)) {
+      m_logger_message << "AUID cleaning failed";
+      outError(__func__, __LINE__);
+      return;
+    }
 
     switch (m_current_source) {
 
@@ -147,8 +156,17 @@ namespace aflowlib {
   void EntryLoader::loadAUID(const std::vector <std::string> &AUID) {
     selectSource();
     std::vector <std::string> clean_AUID;
+
+    m_logger_message << "Try loading " << AUID.size() <<" AUIDs";
+    outInfo(__func__);
+
     for (std::string AUID_single: AUID) {
       if (cleanAUID(AUID_single)) clean_AUID.push_back(AUID_single);
+    }
+
+    if (clean_AUID.size()!=AUID.size()) {
+      m_logger_message << "cleaning of " << AUID.size() - clean_AUID.size()  << " AUIDs failed";
+      outError(__func__, __LINE__);
     }
 
     switch (m_current_source) {
@@ -212,6 +230,14 @@ namespace aflowlib {
 
     if (!cleanAURL(AURL)) return; //TODO error message
 
+    m_logger_message << "Try loading " << AURL;
+    outInfo(__func__);
+    if (!cleanAURL(AURL)) {
+      m_logger_message << "AURL cleaning failed";
+      outError(__func__, __LINE__);
+      return;
+    }
+
     switch (m_current_source) {
 
       case Source::SQLITE: {
@@ -250,10 +276,20 @@ namespace aflowlib {
   /// @param AURL list of AURLs
   void EntryLoader::loadAURL(const std::vector <std::string> &AURL) {
     selectSource();
+
+    m_logger_message << "Try loading " << AURL.size() <<" AURLs";
+    outInfo(__func__);
+
     std::vector <std::string> clean_AURL;
     for (std::string AURL_single: AURL) {
       if (cleanAURL(AURL_single)) clean_AURL.push_back(AURL_single);
     }
+
+    if (clean_AURL.size()!=AURL.size()) {
+      m_logger_message << "cleaning of " << AURL.size() - clean_AURL.size()  << " AURLs failed";
+      outError(__func__, __LINE__);
+    }
+
     switch (m_current_source) {
 
       case Source::AFLUX: {
@@ -267,6 +303,7 @@ namespace aflowlib {
 
       case Source::SQLITE: {
         std::string where = aurostd::joinWDelimiter(clean_AURL, "\"','\"");
+        where = std::regex_replace(where, m_re_aurl2file, "$1_" + m_sqlite_collection + "/");
         where = "aurl IN ('\"" + where + "\"')";
         loadSqliteWhere(where);
         break;
@@ -290,11 +327,9 @@ namespace aflowlib {
           std::string file_path = m_filesystem_path + AURL_single.substr(28) + "/" + m_filesystem_outfile;
           file_path = std::regex_replace(file_path, m_re_aurl2file, "$1/" + m_filesystem_collection + "/");
           files.push_back(file_path);
-          cout << file_path << endl;
         }
         loadFiles(files);
         break;
-
       }
 
       default:
@@ -328,7 +363,8 @@ namespace aflowlib {
     xelement::xelement xel;
     for (std::string element: alloy) {
       if (xel.isElement(element) == 0) {
-        cerr << element << " is not an element" << endl;
+        m_logger_message << element << " is not an element";
+        outError(__func__,__LINE__);
       } else alloy_clean.emplace_back(element);
     }
 
@@ -360,6 +396,11 @@ namespace aflowlib {
       for (std::string e: a) alloy_tmp += e;
       final_alloy_list.push_back(alloy_tmp);
     }
+    m_logger_message << "Try loading " << final_alloy_list.size() << " systems: ";
+    for (const std::string & alloy : final_alloy_list){
+      m_logger_message << "\"" << alloy << "\" ";
+    }
+    outInfo(__func__);
 
     // load the alloys
     switch (m_current_source) {
@@ -412,30 +453,26 @@ namespace aflowlib {
   /// @param where part of the SQLITE query after a `WHERE` keyword
   /// @note use setSource() to change the current source to Source::SQLITE to ensure that the database is connected
   void EntryLoader::loadSqliteWhere(const std::string &where) {
-    std::stringstream message;
-    std::string soliloquy = XPID + "EntryLoader::loadSqliteWhere():";
     std::vector <std::string> raw_lines = getRawSqliteWhere(where);
-    cout << "Raw result size " << raw_lines.size() << " for " << where << endl;
+    m_logger_message << raw_lines.size() << " entries found in DB for " << where;
+    outDebug(__func__);
 
     size_t start_size = m_entries_flat->size();
     loadText(raw_lines);
 
-    message << "Loaded " << m_entries_flat->size() - start_size << " new entries (overall " << m_entries_flat->size()
-            << " | " << m_auid_list.size() << " unique)";
-    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
+    m_logger_message << "Loaded " << m_entries_flat->size() - start_size << " new entries";
+    outInfo(__func__);
+
   }
 
   /// @brief load entries from a costum AFLUX query
   /// @param query AFLUX query
   /// @note #m_aflux_server and #m_aflux_path will be added
   void EntryLoader::loadAFLUXQuery(const std::string &query) {
-    std::string soliloquy = XPID + "EntryLoader::loadAFLUXQuery():";
-    std::stringstream message;
     size_t start_size = m_entries_flat->size();
     loadText(getRawAFLUXQuery(query));
-    message << "Loaded " << m_entries_flat->size() - start_size << " new entries (overall " << m_entries_flat->size()
-            << " | " << m_auid_list.size() << " unique)";
-    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
+    m_logger_message << "Loaded " << m_entries_flat->size() - start_size << " new entries";
+    outInfo(__func__);
   }
 
   /// @brief load entries from an AFLUX matchbook
@@ -450,40 +487,38 @@ namespace aflowlib {
   /// @param queries vector of queries
   /// @param full_url if `true` don't add #m_restapi_server, #m_restapi_path, and #m_restapi_directives
   void EntryLoader::loadRestAPIQueries(const std::vector <std::string> &queries, bool full_url) {
-    std::string soliloquy = XPID + "EntryLoader::loadRestAPIQueries():";
-    std::stringstream message;
-    cout << "Loading " << queries.size() << " entries:" << endl;
     size_t start_size = m_entries_flat->size();
+    size_t done_downloads = 0;
     for (std::string query: queries) {
       loadText({getRawRestAPIQuery(query, full_url)});
+      done_downloads++;
+      if (done_downloads%100 == 0){
+        m_logger_message << "Loaded " << done_downloads << " of " << queries.size();
+        outInfo(__func__);
+      }
     }
-    cout << endl;
-    message << "Loaded " << m_entries_flat->size() - start_size << " new entries (overall " << m_entries_flat->size()
-            << " | " << m_auid_list.size() << " unique)";
-    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
+    m_logger_message << "Loaded " << m_entries_flat->size() - start_size << " new entries";
+    outInfo(__func__);
   }
 
   /// @brief load entries from a list of file paths
   /// @param files list of file paths
   /// @note doesn't add #m_filesystem_path or #m_filesystem_collection
   void EntryLoader::loadFiles(const std::vector <std::string> &files) {
-    std::string soliloquy = XPID + "EntryLoader::loadFiles():";
-    std::stringstream message;
     std::string file_content;
-    cout << "Loading " << files.size() << " entries:" << endl;
     size_t start_size = m_entries_flat->size();
     for (std::string file_path: files) {
-//      aurostd::efile2string(file_path, file_content);
-// TODO aurostd::efile2string is very slow (10 entries/s)
-// this variant is ca 700 E/s
+       // aurostd::efile2string(file_path, file_content);
+       // TODO test aurostd::efile2string more
+       // it was very slow (10 entries/s)
+       // this variant is ca 700 E/s
       std::ifstream open_file(file_path);
       std::stringstream buffer;
       buffer << open_file.rdbuf();
       loadText({buffer.str()});
     }
-    message << "Loaded " << m_entries_flat->size() - start_size << " new entries (overall " << m_entries_flat->size()
-            << " | " << m_auid_list.size() << " unique)";
-    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
+    m_logger_message << "Loaded " << m_entries_flat->size() - start_size << " new entries";
+    outInfo(__func__);
   }
 
   /// @brief load entries from a list of strings
@@ -505,10 +540,10 @@ namespace aflowlib {
 
   /// @brief change the currently used source and prepares them
   /// @param new_source source to change to
+  /// @param silent silent all logging when called from selectSource() (default false)
   /// @note if the public alloy SQLITE DB is not found Source::FILESYSTEM and Source::RESTAPI
   ///       are mapped to Source::FILESYSTEM_RAW and Source::RESTAPI_RAW respectively
   bool EntryLoader::setSource(EntryLoader::Source new_source) {
-    // TODO error messages
     if (new_source == m_current_source) return true;
     m_current_source = Source::FAILED;
     m_filesystem_available = aurostd::IsDirectory(m_filesystem_path + "AUID/");
@@ -517,75 +552,96 @@ namespace aflowlib {
       case Source::SQLITE: {
         if (aurostd::FileExist(m_sqlite_file)) {
           if (m_sqlite_db_ptr == nullptr) {
-            cout << "Init full DB" << endl;
             m_sqlite_db_ptr = std::make_shared<aflowlib::AflowDB>(m_sqlite_file);
           }
           m_current_source = Source::SQLITE;
           return true;
+        } else {
+          m_logger_message << "Internal AFLUX SQLITE DB not found at " << m_sqlite_file;
+          outError(__func__,__LINE__);
         }
         break;
       }
 
       case Source::AFLUX: {
-        if ("AFLUXtest" == aurostd::httpGet("http://aflowlib.duke.edu/test/?echo=AFLUXtest")) {
+        if ("AFLUXtest" == aurostd::httpGet(m_aflux_server+"/test/?echo=AFLUXtest")) {
           m_current_source = Source::AFLUX;
           return true;
+        } else {
+          m_logger_message << "AFLUX API could not be reached at " << m_aflux_server;
+          outError(__func__,__LINE__);
         }
         break;
       }
 
       case Source::FILESYSTEM: {
-        //TODO if m_sqlite_alloy_file is missing AURL and AUID load should still work
-        if (m_filesystem_available && aurostd::FileExist(m_sqlite_alloy_file)) { //
-          if (m_sqlite_alloy_db_ptr == nullptr) {
-            cout << "Init alloy DB" << endl;
-            m_sqlite_alloy_db_ptr = std::make_shared<aflowlib::AflowDB>(m_sqlite_alloy_file);
+        if (m_filesystem_available) {
+          if (aurostd::FileExist(m_sqlite_alloy_file)) { //
+            if (m_sqlite_alloy_db_ptr == nullptr) {
+              m_sqlite_alloy_db_ptr = std::make_shared<aflowlib::AflowDB>(m_sqlite_alloy_file);
+            }
+            m_current_source = Source::FILESYSTEM;
+            return true;
+          } else {
+            m_logger_message << "Could not find public alloy SQLITE DB at " << m_sqlite_alloy_file << "; switching to Source::FILESYSTEM_RAW";
+            outInfo(__func__);
+            return setSource(Source::FILESYSTEM_RAW);
           }
-          m_current_source = Source::FILESYSTEM;
-          return true;
         } else {
-          return setSource(Source::FILESYSTEM_RAW);
+          m_logger_message << "Could not find AFLOW entries in the filesystem at " << m_filesystem_path;
+          outError(__func__,__LINE__);
         }
       }
 
       case Source::FILESYSTEM_RAW: {
         if (m_filesystem_available) { //
-          if (aurostd::FileExist(m_sqlite_alloy_file)) { // use the alloy DB to optemize the RAW results
+          if (aurostd::FileExist(m_sqlite_alloy_file)) { // use the alloy DB to optimize the RAW results
             if (m_sqlite_alloy_db_ptr == nullptr) {
-              cout << "Init alloy DB" << endl;
               m_sqlite_alloy_db_ptr = std::make_shared<aflowlib::AflowDB>(m_sqlite_alloy_file);
             }
           }
           m_current_source = Source::FILESYSTEM_RAW;
           return true;
+        } else {
+          m_logger_message << "Could not find AFLOW entries in the filesystem at " << m_filesystem_path;
+          outError(__func__,__LINE__);
         }
         break;
       }
 
       case Source::RESTAPI: {
-        if (200 == aurostd::httpGetStatus("http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/")) {
+        if (200 == aurostd::httpGetStatus(m_restapi_server+m_restapi_path+"ICSD_WEB/")) {
           if (aurostd::FileExist(m_sqlite_alloy_file)) {
             if (m_sqlite_alloy_db_ptr == nullptr) {
-              cout << "Init alloy DB" << endl;
               m_sqlite_alloy_db_ptr = std::make_shared<aflowlib::AflowDB>(m_sqlite_alloy_file);
             }
             m_current_source = Source::RESTAPI;
             return true;
           } else {
+            m_logger_message << "Could not find public alloy SQLITE DB at " << m_sqlite_alloy_file << "; switching to Source::RESTAPI_RAW";
+            outInfo(__func__);
             return setSource(Source::RESTAPI_RAW);
           }
+        } else {
+          m_logger_message << "AFLOW REST API could not be reached at " << m_aflux_server+m_restapi_path;
+          outError(__func__,__LINE__);
         }
         break;
       }
 
       case Source::RESTAPI_RAW: {
-        if (200 == aurostd::httpGetStatus("http://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/")) {
-          if (m_sqlite_alloy_db_ptr == nullptr) {
-            cout << "Init alloy DB" << endl;
-            m_sqlite_alloy_db_ptr = std::make_shared<aflowlib::AflowDB>(m_sqlite_alloy_file);
+        if (200 == aurostd::httpGetStatus(m_restapi_server+m_restapi_path+"ICSD_WEB/")) {
+          if (aurostd::FileExist(m_sqlite_alloy_file)) {
+            if (m_sqlite_alloy_db_ptr == nullptr) {
+              m_sqlite_alloy_db_ptr = std::make_shared<aflowlib::AflowDB>(m_sqlite_alloy_file);
+            }
           }
           m_current_source = Source::RESTAPI_RAW;
           return true;
+        }
+        else {
+          m_logger_message << "AFLOW REST API could not be reached at " << m_aflux_server+m_restapi_path;
+          outError(__func__,__LINE__);
         }
         break;
       }
@@ -626,9 +682,13 @@ namespace aflowlib {
   std::vector <std::string> EntryLoader::getRawAFLUXQuery(const std::string &query) {
     std::string output = "";
     std::vector <std::string> raw_lines;
-    short status = aurostd::httpGetStatus(m_aflux_server, m_aflux_path, query, output);
-    //TODO throw ERROR if web fails or try different source
-    aurostd::string2vectorstring(output, raw_lines);
+    if (200 == aurostd::httpGetStatus(m_aflux_server, m_aflux_path, query, output)){
+      aurostd::string2vectorstring(output, raw_lines);
+    } else {
+      m_logger_message << "Failed to get AFLUX query ";
+      m_logger_message << "(" << m_aflux_server << " | " << m_aflux_path << " | " << query << ")";
+      outError(__func__, __LINE__);
+    }
     return raw_lines;
   }
 
@@ -641,10 +701,13 @@ namespace aflowlib {
     std::string url;
     if (full_url) url = query;
     else url = m_restapi_server + m_restapi_path + query + m_restapi_directives;
-    cout << "RESTAPI load url: " << url << endl;
-    short status = aurostd::httpGetStatus(url, output);
-    //TODO throw ERROR if web fails or try different source
-    return output;
+    if (200 == aurostd::httpGetStatus(url, output)){
+      return output;
+    } else {
+      m_logger_message << "Failed to get REST API query " << "(" << url << ")";
+      outError(__func__, __LINE__);
+      return "";
+    }
   }
 
   /// @brief add an xstructure to an AFLOW lib entry
@@ -655,15 +718,16 @@ namespace aflowlib {
   /// @note adds the structure to entry.vstr
   void EntryLoader::addXstructure(aflowlib::_aflowlib_entry &entry, bool orig) {
     if (orig) {
-      // get aflow in
-      // http://aflowlib.duke.edu/AFLOWDATA/LIB4_WEB/AgAlCu_pvNi_pv:PAW_PBE/ABCD_cF16_216_c_d_b_a.CABD/aflow.in
-
+      if (entry.catalog == "ICSD") return; // no original structures available for ICSD entries
       xstructure new_structure;
       if (loadXstructureAflowIn(entry, new_structure)) { // load from aflow.in
         entry.vstr.push_back(new_structure);
       } else { // if no valid entry in aflow.in try to load files from m_xstructure_original_file_name list
         if (loadXstructureFile(entry, new_structure, true)) {
           entry.vstr.push_back(new_structure);
+        } else {
+          m_logger_message << "Failed to add original structure to " << entry.auid << " (" << entry.aurl << ")";
+          outError(__func__, __LINE__);
         }
       }
     } else {
@@ -673,6 +737,10 @@ namespace aflowlib {
       } else { // if positions are not present in aflowlib entry try to load files from m_xstructure_final_file_name list
         if (loadXstructureFile(entry, new_structure, false)) {
           entry.vstr.push_back(new_structure);
+        }
+        else {
+          m_logger_message << "Failed to add relaxed structure to " << entry.auid << " (" << entry.aurl << ")";
+          outError(__func__, __LINE__);
         }
       }
     }
@@ -689,6 +757,9 @@ namespace aflowlib {
     std::string base_folder = m_filesystem_path + entry.aurl.substr(28) + "/";
     base_folder = std::regex_replace(base_folder, m_re_aurl2file, "$1/" + m_filesystem_collection + "/");
     std::string poscar;
+    if (entry.catalog =="LIB0" && !m_filesystem_available && entry.aurl.substr(entry.aurl.size() - 2)=="/0"){
+      return false; // no entries in RESTAPI for WEB0 /0
+    }
 
     std::vector <std::string> possible_files;
     if (orig) possible_files = m_xstructure_original_file_name;
@@ -782,7 +853,7 @@ namespace aflowlib {
         atom.coord(2) = 0.0;
         atom.coord(3) = 0.0; // inside the zero cell
         atom.spin = 0.0;
-        atom.noncoll_spin.clear(); //DX20171205 - non-collinear spin
+        atom.noncoll_spin.clear();
         atom.type = type_idx;
         atom.order_parameter_value = 0;
         atom.order_parameter_atom = false;
@@ -816,7 +887,9 @@ namespace aflowlib {
       buffer << open_file.rdbuf();
       aflowin_content = buffer.str();
     } else { // load form REST API
+      m_out_super_silent = true;
       aflowin_content = getRawRestAPIQuery(base_url + "aflow.in", true);
+      m_out_super_silent = false;
     }
     std::string poscar = aflowin2poscar(aflowin_content);
     if (!poscar.empty()) { // load from aflow.in
@@ -838,7 +911,7 @@ namespace aflowlib {
   /// @brief save the shared pointers to the AFLOW lib entries into a two layer vector
   /// @param result save-to vector
   /// @note the underlying entries will not be copied and are likely not in a continuous chunk of memory
-  /// @note the entries are grouped by number of entries (largest to smallest)
+  /// @note the entries are grouped by number of entries (smallest to largest)
   void EntryLoader::getEntriesViewTwoLayer(vector<vector<std::shared_ptr < aflowlib::_aflowlib_entry>> > &result) {
     for (auto layer1: *m_entries_layered_map) {
       std::vector <std::shared_ptr<aflowlib::_aflowlib_entry>> collected_entries;
@@ -852,7 +925,7 @@ namespace aflowlib {
   /// @brief save the shared pointers to the AFLOW lib entries into a three layer vector
   /// @param result save-to vector
   /// @note the underlying entries will not be copied and are likely not in a continuous chunk of memory
-  /// @note the entries are grouped first by number of entries (largest to smallest) and then by alloy
+  /// @note the entries are grouped first by number of entries (smallest to largest) and then by alloy
   void EntryLoader::getEntriesViewThreeLayer(std::vector<std::vector<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> &result) {
     for (auto layer1: *m_entries_layered_map) {
       std::vector < std::vector < std::shared_ptr < aflowlib::_aflowlib_entry>>> collected_entries_l1;
@@ -871,7 +944,7 @@ namespace aflowlib {
   /// @note the entries are grouped first by number of entries and then by alloy
   /// @note creating a copy of the smart pointer #m_entries_layered_map is a bit more efficient way to use
   ///       the loaded entries after the EntryLoader class goes out of scope
-  void EntryLoader::getEntriesViewMap(std::unordered_map < short, std::unordered_map < std::string,
+  void EntryLoader::getEntriesViewMap(std::map < short, std::map < std::string,
                                       std::vector < std::shared_ptr < aflowlib::_aflowlib_entry >> >> &result) {
     result = *m_entries_layered_map;
   }
@@ -888,7 +961,7 @@ namespace aflowlib {
   /// @brief copy the AFLOW lib entries into a two layer vector
   /// @param result save-to vector
   /// @note the underlying entries are copied into a continuous chunk of memory
-  /// @note the entries are grouped by number of entries (largest to smallest)
+  /// @note the entries are grouped by number of entries (smallest to largest)
   void EntryLoader::getEntriesTwoLayer(std::vector <std::vector<aflowlib::_aflowlib_entry>> &result) {
     for (auto layer1: *m_entries_layered_map) {
       std::vector <aflowlib::_aflowlib_entry> collected_entries;
@@ -903,7 +976,7 @@ namespace aflowlib {
   /// @brief copy the AFLOW lib entries into a three layer vector
   /// @param result save-to vector
   /// @note the underlying entries are copied into a continuous chunk of memory
-  /// @note the entries are grouped first by number of entries (largest to smallest) and then by alloy
+  /// @note the entries are grouped first by number of entries (smallest to largest) and then by alloy
   void EntryLoader::getEntriesThreeLayer(std::vector<std::vector<vector<aflowlib::_aflowlib_entry>>> & result) {
     for (auto layer1: *m_entries_layered_map) {
       std::vector <std::vector<aflowlib::_aflowlib_entry>> collected_entries_l1;
@@ -919,12 +992,41 @@ namespace aflowlib {
   // private functions
   /// @brief find the best available source
   void EntryLoader::selectSource() {
+
     if (m_current_source == Source::NONE || m_current_source == Source::FAILED) {
-      if (EntryLoader::setSource(Source::SQLITE)) return;
-      if (EntryLoader::setSource(Source::AFLUX)) return;
-      if (EntryLoader::setSource(Source::FILESYSTEM)) return;
-      if (EntryLoader::setSource(Source::RESTAPI)) return;
+      m_out_super_silent = true;
+      if (EntryLoader::setSource(Source::SQLITE)) {
+        m_out_super_silent = false;
+        m_logger_message << "Automatically selected Source::SQLITE";
+        outInfo(__func__);
+        return;
+      }
+      if (EntryLoader::setSource(Source::AFLUX)) {
+        m_out_super_silent = false;
+        m_logger_message << "Automatically selected Source::AFLUX";
+        outInfo(__func__);
+        return;
+      }
+      if (EntryLoader::setSource(Source::FILESYSTEM)) {
+        m_out_super_silent = false;
+        m_logger_message << "Automatically selected";
+        if (m_current_source==Source::FILESYSTEM) m_logger_message << " Source::FILESYSTEM";
+        else if (m_current_source==Source::FILESYSTEM_RAW) m_logger_message << " Source::FILESYSTEM_RAW";
+        outInfo(__func__);
+        return;
+      }
+      if (EntryLoader::setSource(Source::RESTAPI)) {
+        m_out_super_silent = false;
+        m_logger_message << "Automatically selected";
+        if (m_current_source==Source::RESTAPI) m_logger_message << " Source::RESTAPI";
+        else if (m_current_source==Source::RESTAPI_RAW) m_logger_message << " Source::RESTAPI_RAW";
+        outInfo(__func__);
+        return;
+      }
       EntryLoader::setSource(Source::FAILED);
+      m_out_super_silent = false;
+      m_logger_message << "Failed to find a working source!";
+      outHardError(__func__, __LINE__, _GENERIC_ERROR_);
     }
   }
 
@@ -932,25 +1034,28 @@ namespace aflowlib {
   /// @param url entry url
   /// @param result save-to vector
   /// @param directories list directories if `true` (default)
-  void EntryLoader::listRestAPI(std::string url, std::vector <std::string> &result, bool directories) {
+  void EntryLoader::listRestAPI(std::string url, std::vector<std::string> &result, bool directories) {
     result.clear();
     if (directories) url += m_restapi_listing_dirs;
     else url += m_restapi_listing_files;
-    cout << url << endl;
     std::string output;
-    short status = aurostd::httpGetStatus(url, output);
-    if (status == 200) aurostd::string2tokens(output, result, ",");
-    else cout << status << " | " << url << endl;
+    if (200 == aurostd::httpGetStatus(url, output)) {
+      if (output[output.size()-1]=='\n') output.erase(output.size()-1);
+      aurostd::string2tokens(output, result, ",");
+    } else {
+      m_logger_message << "Could not list content for " << url;
+      outInfo(__func__);
+    };
     //TODO Error
   }
 
   /// @brief generate a list of AUID for a given list of alloys by querying the public alloy SQLITE DB
   /// @param alloy_list list of cleaned and sorted alloys
   /// @param auid_list resulting AUIDs
-  void EntryLoader::getAlloyAUIDList(const std::vector <std::string> & alloy_list,
-                                     std::vector <std::string> &auid_list) {
+  void EntryLoader::getAlloyAUIDList(const std::vector<std::string> & alloy_list, std::vector<std::string> &auid_list) {
     if (m_sqlite_alloy_db_ptr == nullptr) {
-      cout << "Small DB not loaded" << endl; //TODO error handling
+      m_logger_message << "Public alloy SQLITE DB is not ready";
+      outHardError(__func__, __LINE__, _RUNTIME_ERROR_);
       return;
     }
     auid_list.clear();
@@ -997,29 +1102,31 @@ namespace aflowlib {
     // https://man7.org/linux/man-pages/man3/fts.3.html
     // FTS_PHYSICAL - don't follow symlinks
     // FTS_NOCHDIR - don't change the workdir of the program
-    // FTS_XDEV - don't descending into folders that are on a different device
+    // FTS_XDEV - don't descend into folders that are on a different device
     FTS *tree = fts_open(paths, FTS_PHYSICAL | FTS_NOCHDIR | FTS_XDEV, nullptr);
-    cout << "Loaded Tree" << endl;
     FTSENT *node;
     if (tree == nullptr) {
-      //TODO error handling
-      cout << "Could not create search tree";
+      m_logger_message << "Failed to initialized the file tree used to search for alloys!";
+      outHardError(__func__,__LINE__,_FILE_ERROR_);
       return;
     }
 
     // Iterate over all entries found in the folders listed in paths
     while ((node = fts_read(tree))) {
       scanned += 1;
-//      cout << node->fts_level << " | " << node->fts_path  << endl;
+      if ((scanned-1) % 10000 == 0) {
+        m_logger_message << (scanned-1) << " objects scanned; " << found << " entries found; next scan: " << node->fts_path;
+        outDebug(__func__);
+      }
       if ((node->fts_info & FTS_D)) {
-        if (node->fts_path[check_idx] == 'I') {
+        if (node->fts_path[check_idx] == 'I') { // ICSD
           if (node->fts_level == 2) {
             if (find(alloy_list.begin(), alloy_list.end(), extractAlloy(node->fts_name, 'I')) == alloy_list.end()) {
               fts_set(tree, node, FTS_SKIP);
               continue;
             } else {
               std::string base_path = node->fts_path;
-              std::string full_path = base_path + "/aflowlib.out";
+              std::string full_path = base_path + "/" + m_filesystem_outfile;
               if (stat(full_path.c_str(), &file_stats) == 0) {
                 found += 1;
                 found_entries.emplace_back(full_path);
@@ -1027,14 +1134,14 @@ namespace aflowlib {
               }
             }
           }
-        } else if (node->fts_path[check_idx] == 'L') {
+        } else if (node->fts_path[check_idx] == 'L') { // LIBX
           if (node->fts_level == 1) {
             if (find(alloy_list.begin(), alloy_list.end(), extractAlloy(node->fts_name, 'L')) == alloy_list.end()) {
               fts_set(tree, node, FTS_SKIP);
               continue;
             } else {
               std::string base_path = node->fts_path;
-              std::string full_path = base_path + "/aflowlib.out";
+              std::string full_path = base_path + "/" + m_filesystem_outfile;
               if (stat(full_path.c_str(), &file_stats) == 0) {
                 found += 1;
                 found_entries.emplace_back(full_path);
@@ -1043,7 +1150,7 @@ namespace aflowlib {
             }
           } else if (node->fts_level > 1) {
             std::string base_path = node->fts_path;
-            std::string full_path = base_path + "/aflowlib.out";
+            std::string full_path = base_path + "/" + m_filesystem_outfile;
             if (stat(full_path.c_str(), &file_stats) == 0) {
               found += 1;
               found_entries.emplace_back(full_path);
@@ -1052,11 +1159,9 @@ namespace aflowlib {
           }
         }
       }
-      if (scanned % 1000 == 0) {
-        std::cout << scanned << " | " << found << " | " << node->fts_path << std::endl;
-      }
     }
-    std::cout << "Scanned: " << scanned << " | Found: " << found << std::endl;
+    m_logger_message << "Finishing search in the filesystem after scanning " << scanned << " objects";
+    outInfo(__func__);
     loadFiles(found_entries);
     if (m_sqlite_alloy_db_ptr != nullptr) {
       std::vector <std::string> known_AUID_list;
@@ -1065,7 +1170,8 @@ namespace aflowlib {
       for (const std::string &AUID: known_AUID_list) {
         if (m_auid_list.find(AUID) == m_auid_list.end()) missing_AUID.emplace_back(AUID);
       }
-      std::cout << "Missed: " << missing_AUID.size() << std::endl;
+      m_logger_message << "Found " << missing_AUID.size() << " entries in the public alloy SQLITE DB that where not found in the filesystem search.";
+      outDebug(__func__);
       loadAUID(missing_AUID);
     }
   }
@@ -1083,10 +1189,10 @@ namespace aflowlib {
     }
     if (alloy_list.size()>1) {
       for (uint lib_idx = 1; lib_idx <= lib_max; lib_idx++) {
-        libx_search_path_list.emplace_back(m_restapi_server + m_restapi_path + "LIB" + "_" + std::to_string(lib_idx) + m_restapi_collection + "/" );
+        libx_search_path_list.emplace_back(m_restapi_server + m_restapi_path + "LIB" + std::to_string(lib_idx) + "_" + m_restapi_collection + "/" );
       }
     } else if (alloy_list.size()==1){
-      libx_search_path_list.emplace_back(m_restapi_server + m_restapi_path + "LIB" + "_" + std::to_string(lib_max) + m_restapi_collection + "/" );
+      libx_search_path_list.emplace_back(m_restapi_server + m_restapi_path + "LIB" + std::to_string(lib_max) + "_" + m_restapi_collection + "/" );
     } else {
       return;
     }
@@ -1094,7 +1200,6 @@ namespace aflowlib {
 
     for (const std::string & url : icsd_search_path_list){
       listRestAPI(url, listing);
-      cout << url << endl;
       for (const std::string & name: listing ){
         if (find(alloy_list.begin(), alloy_list.end(), extractAlloy(name, 'I')) != alloy_list.end()){
           rest_api_queries.emplace_back(url + name + "/" + m_restapi_directives);
@@ -1102,27 +1207,35 @@ namespace aflowlib {
       }
     }
 
+    m_logger_message << "Found " << rest_api_queries.size() << " ICSD entries in REST API search";
+    outDebug(__func__);
+
     for (const std::string & url : libx_search_path_list){
       listRestAPI(url, listing);
-      cout << url << endl;
-      for (const std::string & name: listing ){
+      for (const std::string & name: listing){
         if (find(alloy_list.begin(), alloy_list.end(), extractAlloy(name, 'L')) != alloy_list.end()){
-          cout << " " << name << " | " << extractAlloy(name, 'L') << endl;
           libx_crawl_list.emplace_back(url + name + "/" );
         }
       }
     }
 
+    m_logger_message << "Found " << libx_crawl_list.size() << " LIBX base folders in the REST API search";
+    outDebug(__func__);
+
     uint scanned=0;
+    uint found=0;
     while(!libx_crawl_list.empty()){
       scanned += 1;
       std::string url = libx_crawl_list.back();
       libx_crawl_list.pop_back();
-      if (scanned%100 == 0) cout << scanned << " | " << libx_crawl_list.size() << " | " << url << endl;
+      if ((scanned-1)%100 == 0) {
+        m_logger_message << (scanned-1) << " folders scanned; " << found << " entries found; next scan: " << url;
+        outDebug(__func__);
+      }
       listRestAPI(url, listing);
       if (listing.empty()) {
         rest_api_queries.emplace_back(url + m_restapi_directives);
-        cout << " " << url << endl;
+        found += 1;
       } else {
         for (const std::string & name: listing ) {
           libx_crawl_list.emplace_back(url + name + "/");
@@ -1139,7 +1252,8 @@ namespace aflowlib {
       for (const std::string &AUID: known_AUID_list) {
         if (m_auid_list.find(AUID) == m_auid_list.end()) missing_AUID.emplace_back(AUID);
       }
-      std::cout << "Missed: " << missing_AUID.size() << std::endl;
+      m_logger_message << "Found " << missing_AUID.size() << " entries in the public alloy SQLITE DB that where not found in the REST API search.";
+      outDebug(__func__);
       loadAUID(missing_AUID);
     }
 
@@ -1154,10 +1268,7 @@ namespace aflowlib {
     if (AUID.substr(0, 5) == "auid:") AUID="aflow:" + AUID.substr(5);
     else if (AUID.substr(0, 6) != "aflow:") AUID="aflow:" + AUID;
     if (aurostd::_ishex(AUID.substr(6)) && AUID.size()==22) return true;
-    else {
-      cout << AUID << " has the wrong size" << endl; //TODO error logger
-      return false;
-    }
+    else return false;
   }
 
   /// @brief map different AURL styles to a default
@@ -1190,7 +1301,6 @@ namespace aflowlib {
       }
     }
     query.erase(0,1);
-    cout << query << endl;
     return "?" + aurostd::httpPercentEncodingFull(query);
   }
 
@@ -1239,6 +1349,43 @@ namespace aflowlib {
     }
     return poscar;
   }
+
+  // TODO why _AFLOW_FILE_NAME_ and not __FILE__?
+  // https://www.cprogramming.com/reference/preprocessor/__FILE__.html
+  // also the use of __func__ and __LINE__ would be useful
+
+
+  void EntryLoader::outInfo(const std::string & function_name) {
+    if ((!m_out_silent || m_out_debug) && !m_out_super_silent){
+      std::string soliloquy = XPID + "EntryLoader::" + function_name + "():";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, m_logger_message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
+    }
+    std::stringstream().swap(m_logger_message);
+  }
+
+  void EntryLoader::outDebug(const std::string & function_name) {
+    if (m_out_debug && !m_out_super_silent){
+      std::string soliloquy = XPID + "EntryLoader::" + function_name + "():";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, m_logger_message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    }
+    std::stringstream().swap(m_logger_message);
+  }
+
+  void EntryLoader::outError(const std::string &function_name, int line_number) {
+    if (!m_out_super_silent) {
+      std::string soliloquy = XPID + "EntryLoader::" + function_name + "():";
+      pflow::logger((std::string) _AFLOW_FILE_NAME_ + ":" + std::to_string(line_number),
+                    soliloquy, m_logger_message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+    }
+    std::stringstream().swap(m_logger_message);
+  }
+
+  void EntryLoader::outHardError(const std::string &function_name, int line_number, int error_type) {
+    std::string soliloquy = XPID + "EntryLoader::" + function_name + "():";
+    throw aurostd::xerror((std::string) _AFLOW_FILE_NAME_ + ":" + std::to_string(line_number), soliloquy, m_logger_message, error_type);
+    std::stringstream().swap(m_logger_message);
+  }
+
 
 }
 

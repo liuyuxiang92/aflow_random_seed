@@ -14,7 +14,7 @@
 #define _AFLOWLIB_ENTRY_LOADER_H_
 
 #include <unordered_set>
-#include <unordered_map>
+#include <map>
 #include <regex>
 
 namespace aflowlib {
@@ -46,6 +46,9 @@ namespace aflowlib {
       // Settings
       // TODO use aflux rc and flags
       _aflags m_aflags;
+
+      bool m_out_silent = false; ///< silents all output
+      bool m_out_debug = false;  ///< verbose output (overwrites #m_out_silent)
 
       bool m_xstructure_relaxed= false;  ///< add the relaxed structure into the lib entry
       bool m_xstructure_original= false; ///< add the original structure into the lib entry
@@ -89,8 +92,7 @@ namespace aflowlib {
       /// @brief tiered collection of loaded lib entries (number of elements -> alloy -> entries)
       /// @note creating a copy af this smart pointer is the most efficient way to use
       ///       the loaded entries after the EntryLoader class goes out of scope
-      std::shared_ptr<std::unordered_map<short, std::unordered_map<
-                      std::string, std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>>> m_entries_layered_map;
+      std::shared_ptr<std::map<short, std::map<std::string, std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>>> m_entries_layered_map;
 
       // REGEX expressions for quick finding/replacements in strings
       /// REGEX to find all chemical elements in a string
@@ -141,7 +143,7 @@ namespace aflowlib {
       void getEntriesViewFlat(std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>> & result);
       void getEntriesViewTwoLayer(vector<vector<std::shared_ptr<aflowlib::_aflowlib_entry>>> & result);
       void getEntriesViewThreeLayer(std::vector<std::vector<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> & result);
-      void getEntriesViewMap(std::unordered_map<short,std::unordered_map<std::string,std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> & result);
+      void getEntriesViewMap(std::map<short,std::map<std::string,std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> & result);
 
       // getter that copy data into new format
       void getEntriesFlat(std::vector<aflowlib::_aflowlib_entry> & result);
@@ -159,6 +161,8 @@ namespace aflowlib {
       /// @note should just be set by setSource()
       Source m_current_source = Source::NONE;
       bool m_filesystem_available = false; ///< helper to avoid repeatedly testing if the filesystem is available
+      std::stringstream m_logger_message;  ///< reusable stringstream for logging
+      bool m_out_super_silent = false;     ///< mute all output - used for private checks
 
       /// available ICSD symmetries to speed up the REST API searches
       const std::vector<std::string> m_icsd_symmetries = {"BCC/","BCT/","CUB/","FCC/","HEX/","MCL/","MCLC/",
@@ -174,6 +178,12 @@ namespace aflowlib {
       std::string buildAFLUXQuery(const std::map<std::string, std::string> & matchbook);
       std::string extractAlloy(std::string name, char lib_type);
       std::string aflowin2poscar(std::string raw_in);
+
+      // Logging helper
+      void outInfo(const std::string & function_name);
+      void outDebug(const std::string & function_name);
+      void outError(const std::string & function_name, int line_number);
+      void outHardError(const std::string & function_name, int line_number, int error_type);
 
   };
 } // namespace aflowlib

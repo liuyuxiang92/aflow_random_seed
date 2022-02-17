@@ -70,22 +70,28 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss){  //CO20200520
   if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
   message << "Performing EntryLoader test";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
-
   vector<string> tasks = {"NiMnW", "NiCaCu", "NiMnPdPt" , "NiMnPdPtCu"};
 
   auto start = std::chrono::high_resolution_clock::now();
   std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>> entries;
   aflowlib::EntryLoader el;
-  el.m_sqlite_file = "../testing/aflowlib.db";
-//  el.m_xstructure_original = true;
-  el.m_xstructure_relaxed = true;
-  el.setSource(aflowlib::EntryLoader::Source::SQLITE);
+//  el.m_sqlite_file = "../testing/aflowlib.db";
+  el.m_xstructure_original = false;
+  el.m_xstructure_relaxed = false;
+//  el.m_restapi_path = "/DEBUG/";
+//  el.m_aflux_server = "example.com";
+//  el.m_sqlite_alloy_file = "hidden.db";
+//  el.setSource(aflowlib::EntryLoader::Source::RESTAPI_RAW);
 //  el.m_filesystem_available = true;
-  el.loadAlloy("NiCaCu", false);
-//  el.loadAUID((vector<string>) {"aflow:d912e209c81aeb94", "aflow:d9b3431b55cf5bc8"});
-  el.loadAURL("aflowlib.duke.edu:AFLOWDATA/LIB2_RAW/Ca_svCu_pv/138");
-  el.loadAURL("LIB2_LIB/Ca_svCu_pv/138");
-  el.loadAURL("AFLOWDATA/LIB2_WEB/Ca_svCu_pv/138");
+  el.m_out_silent=true;
+//  el.m_out_debug=true;
+  el.loadAlloy("NiCaCu", true);
+//  el.loadAUID((vector<string>) {"aflow:d912e209c81aeb94", "aflow:d9b3431b55cf5bc8", "a2e209c81aeb94"});
+//  el.loadAUID("a2e209c81aeb94");
+//  el.loadAURL((vector<string>) {"aflowlib.duke.edu:AFLOWDATA/LIB2_RAW/Ca_svCu_pv/138", "aflowlib.duke.edu:AFLOWDATA/LIB2_RAW/Ca_svCu_pv/22"});
+//  el.loadAURL("aflowlib.duke.edu:AFLOWDATA/LIB2_RAW/Ca_svCu_pv/138");
+//  el.loadAURL("LIB2_LIB/Ca_svCu_pv/138");
+//  el.loadAURL("AFLOWDATA/LIB2_WEB/Ca_svCu_pv/138");
 
 //  auto e = copy(el.m_entries_flat);
   auto stop = std::chrono::high_resolution_clock::now();
@@ -96,20 +102,20 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss){  //CO20200520
   std::vector<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>> tl;
   el.getEntriesViewTwoLayer(tl);
 
-  cout << entries[50]->vstr.size() << endl;
-  cout << entries[50]->vstr.back() << endl;
-
-  cout << el.m_entries_flat->size() << endl;
-
-  sleep(1);
-  aflowlib::EntryLoader number_two(el);
-  el.clear();
-  cout << el.m_entries_flat->size() << endl;
-  cout << number_two.m_entries_flat->size() << endl;
-  cout << number_two.m_entries_flat->operator[](50)->vstr.size() << endl;
-  cout << number_two.m_entries_flat->operator[](50)->vstr.back() << endl;
-
-  cout << "Test Done" << endl;
+//  cout << entries[50]->vstr.size() << endl;
+//  cout << entries[50]->vstr.back() << endl;
+//
+//  cout << el.m_entries_flat->size() << endl;
+//
+//  sleep(1);
+//  aflowlib::EntryLoader number_two(el);
+//  el.clear();
+//  cout << el.m_entries_flat->size() << endl;
+//  cout << number_two.m_entries_flat->size() << endl;
+//  cout << number_two.m_entries_flat->operator[](50)->vstr.size() << endl;
+//  cout << number_two.m_entries_flat->operator[](50)->vstr.back() << endl;
+//
+//  cout << "Test Done" << endl;
 
 
 //  for (auto entry: entries){
