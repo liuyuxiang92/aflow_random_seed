@@ -31,6 +31,7 @@
 #include "aflow_anrl.h"  //DX20201104
 
 #include <chrono> // benchmarking HE
+#include <unistd.h> //TODO remove testing
 
 //#define  __XOPTIMIZE
 //#include "aflow_array.h"
@@ -76,18 +77,41 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss){  //CO20200520
   std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>> entries;
   aflowlib::EntryLoader el;
   el.m_sqlite_file = "../testing/aflowlib.db";
-
-  el.setSource(aflowlib::EntryLoader::Source::FILESYSTEM);
-//  el.loadAlloy("NiCaCu", true);
+//  el.m_xstructure_original = true;
+//  el.m_xstructure_relaxed = true;
+  el.setSource(aflowlib::EntryLoader::Source::SQLITE);
+//  el.m_filesystem_available = true;
+  el.loadAlloy("NiCaCu", true);
 //  el.loadAUID((vector<string>) {"aflow:d912e209c81aeb94", "aflow:d9b3431b55cf5bc8"});
-  el.loadAURL((vector<string>) {"aflowlib.duke.edu:AFLOWDATA/LIB2_WEB/Ca_svNi_pv/539",
-               "aflowlib.duke.edu:AFLOWDATA/LIB2_RAW/Ca_svCu_pv/138"});
+  el.loadAURL("aflowlib.duke.edu:AFLOWDATA/LIB2_RAW/Ca_svCu_pv/138");
+  el.loadAURL("LIB2_LIB/Ca_svCu_pv/138");
+  el.loadAURL("AFLOWDATA/LIB2_WEB/Ca_svCu_pv/138");
 
+//  auto e = copy(el.m_entries_flat);
   auto stop = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
   cout << "Duration: " << duration.count() << " milliseconds" << endl;
   el.getEntriesViewFlat(entries);
   cout << "Speed: " << entries.size()/(duration.count()/1000.0) << " entries/s" << endl;
+  std::vector<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>> tl;
+  el.getEntriesViewTwoLayer(tl);
+
+  cout << entries[50]->vstr.size() << endl;
+  cout << entries[50]->vstr.back() << endl;
+
+  cout << el.m_entries_flat->size() << endl;
+
+  sleep(1);
+  aflowlib::EntryLoader number_two(el);
+  el.clear();
+  cout << el.m_entries_flat->size() << endl;
+  cout << number_two.m_entries_flat->size() << endl;
+  cout << number_two.m_entries_flat->operator[](50)->vstr.size() << endl;
+  cout << number_two.m_entries_flat->operator[](50)->vstr.back() << endl;
+
+  cout << "Test Done" << endl;
+
+
 //  for (auto entry: entries){
 //    cout << entry->auid << endl;
 //  }
@@ -1233,16 +1257,15 @@ bool AtomicEnvironmentTest(ofstream& FileMESSAGE, ostream& oss){ //HE20210511
   // Test 1: create AE - mode 1
   // ---------------------------------------------------------------------------
 
-  // load test system
-  string auid = "aflow:d912e209c81aeb94";
-  string aurl = "aflowlib.duke.edu:AFLOWDATA/LIB2_RAW/Ca_svCu_pv/138";
-  aflowlib::_aflowlib_entry entry;
-  xstructure str;
 
-  entry.aurl=aurl;
-  entry.auid=auid;
-  pflow::loadXstructures(entry);
-  str = entry.vstr.back();
+  // load test system
+  xstructure str;
+  {
+    aflowlib::EntryLoader el;
+    el.loadAUID("aflow:d912e209c81aeb94"); // aflowlib.duke.edu:AFLOWDATA/LIB2_RAW/Ca_svCu_pv/138
+    str = el.m_entries_flat->operator[](0)->vstr.back();
+  }
+
   vector<AtomEnvironment> AE = getAtomEnvironments(str, 1);
 
   // ---------------------------------------------------------------------------
@@ -1262,9 +1285,9 @@ bool AtomicEnvironmentTest(ofstream& FileMESSAGE, ostream& oss){ //HE20210511
   check_num++;
   check_description = "coordinate matching";
   xvector<double> compare_point(3,1);
-  compare_point(1) = -1.9551925593108925e0;
-  compare_point(2) = -2.2642136090979212e0;
-  compare_point(3) = 2.4896636484942385e0;
+  compare_point(1) = -2.95227319118354;
+  compare_point(2) = 1.02047725834487;
+  compare_point(3) = 2.42721573754061;
 
   check_equal(AE[1].index2Point(2), compare_point, check_function, check_description, check_num, passed_checks, results);
 
@@ -1309,14 +1332,14 @@ bool AtomicEnvironmentTest(ofstream& FileMESSAGE, ostream& oss){ //HE20210511
   // Check | hull volume
   check_num++;
   check_description = "hull volume";
-  check_similar(AE[test_AE].volume, 31.4622167689, check_function, check_description, check_num, passed_checks, results);
-
+  check_similar(AE[test_AE].volume, 33.0352927028572, check_function, check_description, check_num, passed_checks, results);
+  cout << std::setprecision(15) << AE[test_AE].volume << endl;
   // ---------------------------------------------------------------------------
   // Check | hull area
   check_num++;
   check_description = "hull area";
-  check_similar(AE[test_AE].area, 60.4979100628, check_function, check_description, check_num, passed_checks, results);
-
+  check_similar(AE[test_AE].area, 62.4980204713889, check_function, check_description, check_num, passed_checks, results);
+  cout << std::setprecision(15) << AE[test_AE].area << endl;
   // ---------------------------------------------------------------------------
   // Check | triangle count
   check_num++;
