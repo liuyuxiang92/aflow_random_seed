@@ -858,7 +858,7 @@ namespace pocc {
       apl::EOSmethod eos_method;
       uint Nstructures;
       int Nvolumes;
-      int nrows;
+      int n_temps;
       double Ensemble_Vmin, Ensemble_Vmax;
       string currentDirectory;
       xvector<double> T;

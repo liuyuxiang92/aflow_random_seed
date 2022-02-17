@@ -60,7 +60,7 @@ namespace pocc {
     eos_method = apl::EOS_SJ;
     Nstructures = 0;
     Nvolumes = 0;
-    nrows = 0;
+    n_temps = 0;
     T.clear();
     FV.clear();
     volumes.clear();
@@ -85,7 +85,7 @@ namespace pocc {
     eos_method = ens.eos_method;
     Nstructures = ens.Nstructures;
     Nvolumes = ens.Nvolumes;
-    nrows = ens.nrows;
+    n_temps = ens.n_temps;
     T = ens.T;
     FV = ens.FV;
     volumes = ens.volumes;
@@ -191,10 +191,10 @@ namespace pocc {
     // the temperature region for the averaged POCC "material" is at least the
     // lowest range among the structures
     int min_id = 0;
-    nrows = T_list[0].rows;
+    n_temps = T_list[0].rows;
     for (uint i=1; i<Nstructures; i++){
-      if (T_list[i].rows < nrows){
-        nrows = T_list[i].rows;
+      if (T_list[i].rows < n_temps){
+        n_temps = T_list[i].rows;
         min_id = i;
       }
     }
@@ -202,7 +202,7 @@ namespace pocc {
     // check that calculations for POCC structures are consistent and the same
     // set of temperatures was used for QHA calculation for each of them
     for (uint i=0; i<Nstructures-1; i++){
-      for (int row=1; row<=nrows; row++){
+      for (int row=1; row<=n_temps; row++){
         if (!aurostd::isequal(T_list[i][row], T_list[i+1][row])){
           msg="Inconsistent list of temperatures among different ";
           msg+="POCC::QHA calculations.";
@@ -410,9 +410,9 @@ namespace pocc {
 
     // determine number of columns in the file and do some consistency check
     uint ncols = 0;
-    uint nrows = v_data.size();
+    uint n_temps = v_data.size();
     vector<double> tokens;
-    if (nrows){
+    if (n_temps){
       aurostd::string2tokens(v_data[0], tokens);
       ncols = tokens.size();
       if (ncols <= 1){
@@ -427,10 +427,10 @@ namespace pocc {
     }
 
     // extract coefficients and list of temperatures
-    coeffs = xmatrix<double>(nrows, ncols-1);
-    T = xvector<double>(nrows);
+    coeffs = xmatrix<double>(n_temps, ncols-1);
+    T = xvector<double>(n_temps);
 
-    for (uint i=0; i<nrows; i++){
+    for (uint i=0; i<n_temps; i++){
       aurostd::string2tokens(v_data[i], tokens);
       if (tokens.size() != ncols){
         msg = "Data block " + blockname + " does not have the same amount of";
@@ -443,7 +443,7 @@ namespace pocc {
     }
 
     if (LDEBUG){
-      cerr << function << "nrows="  << nrows << " ncols=" << ncols << std::endl;
+      cerr << function << "n_temps="  << n_temps << " ncols=" << ncols << std::endl;
       cerr << function << "coeffs=" << coeffs << std::endl;
     }
 
@@ -615,13 +615,13 @@ namespace pocc {
 
     xvector<double> F(Nvolumes), E(Nstructures);
 
-    Feq = xvector<double>(nrows);
-    Veq = xvector<double>(nrows);
-    B   = xvector<double>(nrows);
-    Bprime=xvector<double>(nrows);
+    Feq = xvector<double>(n_temps);
+    Veq = xvector<double>(n_temps);
+    B   = xvector<double>(n_temps);
+    Bprime=xvector<double>(n_temps);
 
     try{
-      for (int i=1; i<=nrows; i++){
+      for (int i=1; i<=n_temps; i++){
         if (aurostd::isequal(T[i], 0.0)) T[i] = _ZERO_TOL_;
 
         for (int v=volumes.lrows; v<=volumes.urows; v++){
@@ -662,7 +662,7 @@ namespace pocc {
 
     // calculation of the thermal expansion and heat capacity involves derivatives:
     // dT is a temperature step for the derivative
-    double dT = (max(T)-min(T))/(nrows-1);
+    double dT = (max(T)-min(T))/(n_temps-1);
     if (LDEBUG) cerr << function << " dT = " << dT << std::endl;
 
     // calculate the thermal expansion coefficients
@@ -670,16 +670,16 @@ namespace pocc {
 
     // calculate the heat capacity
     Cp = calcIsobaricSpecificHeatSG(Feq, dT);
-    for (int i=1; i<=nrows; i++) Cp[i] *= -T[i]/KBOLTZEV;
+    for (int i=1; i<=n_temps; i++) Cp[i] *= -T[i]/KBOLTZEV;
 
-    Cv = xvector<double>(nrows);
-    for (int i=1; i<=nrows; i++){
+    Cv = xvector<double>(n_temps);
+    for (int i=1; i<=n_temps; i++){
       Cv[i] = Cp[i] - Veq[i]*T[i]*B[i]*pow(beta[i],2)/eV2GPa/KBOLTZEV;
     }
 
     // calculate the average Grueneisen parameters
-    gamma = xvector<double>(nrows);
-    for (int i=1; i<=nrows; i++){
+    gamma = xvector<double>(n_temps);
+    for (int i=1; i<=n_temps; i++){
       gamma[i] = (beta[i]/Cv[i])*B[i]*Veq[i]/eV2GPa/KBOLTZEV;
     }
   }
@@ -710,7 +710,7 @@ namespace pocc {
       setw(TW) << "Bprime"
       << std::endl;
 
-    for (int i=1; i<=nrows; i++){
+    for (int i=1; i<=n_temps; i++){
       file << setw(5) << T[i]         << setw(SW) << ' ' <<
         setw(TW) << Veq[i]            << setw(SW) << ' ' <<
         setw(TW) << Feq[i]            << setw(SW) << ' ' <<
