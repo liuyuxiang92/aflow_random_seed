@@ -853,8 +853,7 @@ namespace aflowlib {
   /// @param result save-to vector
   /// @note the underlying entries will not be copied and are likely not in a continuous chunk of memory
   /// @note the entries are grouped first by number of entries (largest to smallest) and then by alloy
-  void EntryLoader::getEntriesViewThreeLayer(
-      std::vector < std::vector < std::vector < std::shared_ptr < aflowlib::_aflowlib_entry >> >> &result) {
+  void EntryLoader::getEntriesViewThreeLayer(std::vector<std::vector<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> &result) {
     for (auto layer1: *m_entries_layered_map) {
       std::vector < std::vector < std::shared_ptr < aflowlib::_aflowlib_entry>>> collected_entries_l1;
       for (auto layer2: layer1.second) {
@@ -905,7 +904,7 @@ namespace aflowlib {
   /// @param result save-to vector
   /// @note the underlying entries are copied into a continuous chunk of memory
   /// @note the entries are grouped first by number of entries (largest to smallest) and then by alloy
-  void EntryLoader::getEntriesViewThreeLayer(vector<vector<vector<aflolib::_aflowlib_entry>>> & result) {
+  void EntryLoader::getEntriesThreeLayer(std::vector<std::vector<vector<aflowlib::_aflowlib_entry>>> & result) {
     for (auto layer1: *m_entries_layered_map) {
       std::vector <std::vector<aflowlib::_aflowlib_entry>> collected_entries_l1;
       for (auto layer2: layer1.second) {
@@ -955,7 +954,7 @@ namespace aflowlib {
       return;
     }
     auid_list.clear();
-    std::string where = aurostd::joinWDelimiter(final_alloy_list, "','");
+    std::string where = aurostd::joinWDelimiter(alloy_list, "','");
     where = "alloy IN ('" + where + "')";
     std::vector <std::string> raw_lines = m_sqlite_alloy_db_ptr->getEntrySet(where, aflow_ft);
     for (std::string line: raw_lines) {
