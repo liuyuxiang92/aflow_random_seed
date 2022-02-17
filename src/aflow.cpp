@@ -78,10 +78,10 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss){  //CO20200520
   aflowlib::EntryLoader el;
   el.m_sqlite_file = "../testing/aflowlib.db";
 //  el.m_xstructure_original = true;
-//  el.m_xstructure_relaxed = true;
+  el.m_xstructure_relaxed = true;
   el.setSource(aflowlib::EntryLoader::Source::SQLITE);
 //  el.m_filesystem_available = true;
-  el.loadAlloy("NiCaCu", true);
+  el.loadAlloy("NiCaCu", false);
 //  el.loadAUID((vector<string>) {"aflow:d912e209c81aeb94", "aflow:d9b3431b55cf5bc8"});
   el.loadAURL("aflowlib.duke.edu:AFLOWDATA/LIB2_RAW/Ca_svCu_pv/138");
   el.loadAURL("LIB2_LIB/Ca_svCu_pv/138");

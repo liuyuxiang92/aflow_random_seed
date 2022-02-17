@@ -146,7 +146,7 @@ namespace aflowlib {
       // getter that copy data into new format
       void getEntriesFlat(std::vector<aflowlib::_aflowlib_entry> & result);
       void getEntriesTwoLayer(std::vector<std::vector<aflowlib::_aflowlib_entry>> & result);
-      void getEntriesThreeLayer(vector<vector<vector<aflowlib::_aflowlib_entry>>> & result);
+      void getEntriesThreeLayer(std::vector<std::vector<vector<aflowlib::_aflowlib_entry>>> & result);
 
       
     private:
