@@ -270,7 +270,11 @@ namespace aurostd {
     xdouble(const xvector<utype>&) __xprototype;
 
   template<class utype> xvector<utype>
+<<<<<<< HEAD
     remainder(const xvector<utype>&,utype d) __xprototype;  //SD20220117
+=======
+    mod_floored(const xvector<utype>&,utype d) __xprototype;  //SD20220117
+>>>>>>> xatom_atat
 
   template<class utype> xvector<double>
     floor(const xvector<utype>&) __xprototype;

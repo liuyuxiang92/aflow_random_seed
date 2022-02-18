@@ -1289,8 +1289,9 @@ namespace aurostd {  // namespace aurostd
 // ------------------------------------------------------ xmatrix construction
 namespace aurostd {
   // ME2021050 - Reshape given matrix dimensions
+  // SD20220127 - Added bool for row-major
   template<class utype>
-    xmatrix<utype> reshape(const xvector<utype>& v1, int rows, int cols) {
+    xmatrix<utype> reshape(const xvector<utype>& v1, int rows, int cols, bool row_major) {
       if (rows * cols != v1.rows) {
         string function = XPID + "aurostd::xmatrix<utype>::reshape(v1,rows,cols):";
         stringstream message;
@@ -1301,10 +1302,40 @@ namespace aurostd {
       xmatrix<utype> c(rows, cols);
       for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
-          c(i+1, j+1) = v1[v1.lrows + rows*i + j];
+          c(i+1, j+1) = v1[v1.lrows + cols*i + j];
         }
       }
-      return c;
+      if (!row_major) {
+        return trasp(c);
+      }
+      else {
+        return c;
+      }
+    }
+  // SD20220126 - Reshape matrix into another matrix
+  template<class utype>
+    xmatrix<utype> reshape(const xmatrix<utype>& c, int rows, int cols, bool row_major) {
+      if (rows < 1 || cols < 1) {
+        string soliloquy = XPID + "aurostd::xmatrix<utype>::reshape(c,rows,cols):";
+        string message = "New dimensions cannot be less than one";
+        throw xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ILLEGAL_);
+      }
+      else if (c.rows * c.cols != rows * cols) {
+        string soliloquy = XPID + "aurostd::xmatrix<utype>::reshape(c,rows,cols):";
+        stringstream message;
+        message << "New shape (" << rows << "," << cols << ") not compatible with old shape (" << c.rows << "," << c.cols << ")";
+        throw xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ERROR_);
+      }
+      xmatrix<utype> c_new = c;
+      xvector<utype> v(rows * cols);
+      uint count=1;
+      for (int i = c.lrows; i <= c.urows; i++) {
+        for (int j = c.lcols; j <= c.ucols; j++) {
+          v(count) = c_new[i][j];
+          count++;
+        }
+      }
+      return aurostd::reshape(v, rows, cols, row_major);
     }
 
   // reshape by columns

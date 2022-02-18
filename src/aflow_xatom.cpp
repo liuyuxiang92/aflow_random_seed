@@ -3919,8 +3919,51 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     return oss;
   } 
 
-
   // ----------------------------------------------------------------------
+  //  ATAT OUTPUT // SD20220123
+  //  Alloy-Theoretic Automated Toolkit
+  //  See: https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/manual.pdf
+  if(a_iomode == IOATAT_STR) { // ATAT
+    xstructure aa(a);
+    uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
+    oss.precision(_precision_);
+    oss.setf(std::ios::fixed,std::ios::floatfield);
+    xmatrix<double> coorsys = aurostd::eye<double>(3, 3); // set coordinate system to idenity
+    // write the coordinate system
+    for (uint i = 1; i <= 3; i++) {
+      for (uint j = 1; j <= 3; j++) {
+          oss << coorsys(i, j) << " ";
+      }
+      oss << endl;
+    }
+    // write the lattice
+    for (uint i = 1; i <= 3; i++) {
+      for (uint j = 1; j <= 3; j++) {
+        oss << aa.lattice(i, j) << " ";
+      }
+      oss << endl;
+    }
+    // write the atoms
+    xvector<double> coord(3);
+    for (uint iat = 0; iat < aa.atoms.size(); iat++) {
+      if (aa.coord_flag == _COORDS_FRACTIONAL_) {
+        coord = aa.atoms.at(iat).fpos * aa.lattice;
+      }
+      else if (aa.coord_flag == _COORDS_CARTESIAN_) {
+        coord = aa.atoms.at(iat).cpos * aa.lattice / aa.scale;
+      }
+      for (uint j = 1; j <= 3; j++) {
+          oss << coord(j) << " ";
+      }
+      if (aa.atoms.at(iat).name_is_given == TRUE) {
+        oss << " " << aa.atoms.at(iat).cleanname;
+      }
+      oss << endl;
+    }
+    return oss;
+  }
+  // ----------------------------------------------------------------------
+
   oss << "NOT CODED YET" << endl;
   return oss;
 }
@@ -4445,20 +4488,31 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // ----------------------------------------------------------------------
   // ATAT input - START (SD20220117)
   if(!IOMODE_found) {
-    if(LDEBUG) cerr << soliloquy << " ATAT DETECTOR" << endl; 
-    uint ATAT=0;
-    // count number of entries for coord system, lattice and atom positions
-    uint token_count=0;
-    for(uint i=0;i<vinput.size()-1;i++){
-      aurostd::string2tokens(vinput[i],tokens," ");
-      token_count += tokens.size();
-      if(i==5 && token_count==18){ATAT=1;}
-      if(i>5 && tokens.size()!=4){ATAT=0; break;}
+    if (LDEBUG) cerr << soliloquy << " ATAT DETECTOR" << endl; 
+    uint ATAT = 1;
+    // count number of entries for coord system and lattice, check for correct type
+    uint line = 0;
+    for (; line < vinput.size() - 1 && line < 6 && ATAT; line++) {
+      aurostd::string2tokens(vinput[line], tokens, " ");
+      ATAT = (tokens.size() == 3 && aurostd::isfloat(tokens[0]) && aurostd::isfloat(tokens[1]) && aurostd::isfloat(tokens[2]));
+    }
+    // count number of entries for atom positions, check for correct type
+    for (; line < vinput.size() - 1 && ATAT; line++) {
+      aurostd::string2tokens(vinput[line],tokens," ");
+      ATAT = (tokens.size() == 4 && aurostd::isfloat(tokens[0]) && aurostd::isfloat(tokens[1]) && aurostd::isfloat(tokens[2]));
+      if (ATAT) {
+        try {
+          xelement::symbol2Z(tokens[3]);
+        }
+        catch (aurostd::xerror& excpt) {
+          ATAT = 0;
+        }
+      }
     }
 
-    if(ATAT==1){
+    if (ATAT == 1) {
       a.iomode = IOATAT_STR;
-      if(LDEBUG) cerr << soliloquy << " ATAT DETECTOR = TRUE" << endl; 
+      if (LDEBUG) cerr << soliloquy << " ATAT DETECTOR = TRUE" << endl; 
       IOMODE_found = TRUE; 
     }
   }
@@ -6551,41 +6605,37 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // ----------------------------------------------------------------------
 
   // ----------------------------------------------------------------------
-  // ATAT INPUT
+  // ATAT INPUT //SD20220114
+  //  Alloy-Theoretic Automated Toolkit
+  //  See: https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/manual.pdf
   if(a.iomode==IOATAT_STR) {
-    //SD20220114
-    if(LDEBUG) cerr << soliloquy << " ATAT IOATAT_STR" << endl;
-    a.neg_scale=FALSE;
-    a.scale=1.0;
-    xmatrix<double> coorsys(3,3);
-    xmatrix<double> lattice(3,3);
+    if (LDEBUG) cerr << soliloquy << " ATAT IOATAT_STR" << endl;
+    a.scale = 1.0;
+    a.neg_scale = FALSE;
+    xmatrix<double> coorsys(3, 3), ulat(3, 3);
 
     // read coordinate system
-    uint line=0;
-    uint vec_count=0;
-    for(;line<vinput.size();line++){
+    uint line = 0;
+    uint vec_count = 1;
+    for (; line < vinput.size() && vec_count < 4; line++) {
       aurostd::string2tokens(vinput[line],tokens," ");
+      coorsys(vec_count, 1) = aurostd::string2utype<double>(tokens[0]);
+      coorsys(vec_count, 2) = aurostd::string2utype<double>(tokens[1]);
+      coorsys(vec_count, 3) = aurostd::string2utype<double>(tokens[2]);
       vec_count++;
-      if(vec_count==4){break;}
-      coorsys(vec_count,1)=aurostd::string2utype<double>(tokens[0]);
-      coorsys(vec_count,2)=aurostd::string2utype<double>(tokens[1]);
-      coorsys(vec_count,3)=aurostd::string2utype<double>(tokens[2]);
     }
     // read unitless lattice
-    vec_count=0;
-    for(;line<vinput.size();line++){
+    vec_count = 1;
+    for (; line < vinput.size() && vec_count < 4; line++) {
       aurostd::string2tokens(vinput[line],tokens," ");
+      ulat(vec_count, 1)=aurostd::string2utype<double>(tokens[0]);
+      ulat(vec_count, 2)=aurostd::string2utype<double>(tokens[1]);
+      ulat(vec_count, 3)=aurostd::string2utype<double>(tokens[2]);
       vec_count++;
-      if(vec_count==4){break;}
-      lattice(vec_count,1)=aurostd::string2utype<double>(tokens[0]);
-      lattice(vec_count,2)=aurostd::string2utype<double>(tokens[1]);
-      lattice(vec_count,3)=aurostd::string2utype<double>(tokens[2]);
     }
+    a.lattice = coorsys * ulat;
 
-    a.lattice=coorsys*lattice;
-    cerr << soliloquy << " VOLUME " << aurostd::det(a.lattice) << endl;
-    //a.FixLattices();
-    if(LDEBUG) {
+    if (LDEBUG) {
       cerr << soliloquy << " ATAT lattice" << endl;
       cerr << a.lattice << endl;
       cerr << soliloquy << " ATAT f2c" << endl;
@@ -6597,17 +6647,18 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // read atoms
     _atom atom;
     xvector<double> avec(3);
-    for(;line<vinput.size()-1;line++){
+    for (; line < vinput.size() - 1; line++) {
       atom.clear();
       aurostd::string2tokens(vinput[line],tokens," ");
-      avec(1)=aurostd::string2utype<double>(tokens[0]);
-      avec(2)=aurostd::string2utype<double>(tokens[1]);
-      avec(3)=aurostd::string2utype<double>(tokens[2]);
-      atom.name=atom.cleanname=tokens[3];
-      atom.fpos=aurostd::remainder(aurostd::inverse(lattice)*avec,1.0);
-      atom.cpos=a.f2c*atom.fpos;
+      avec(1) = aurostd::string2utype<double>(tokens[0]);
+      avec(2) = aurostd::string2utype<double>(tokens[1]);
+      avec(3) = aurostd::string2utype<double>(tokens[2]);
+      atom.name = atom.cleanname=tokens[3];
+      atom.fpos = BringInCell(aurostd::inverse(trasp(a.lattice)) * coorsys * avec);
+      atom.cpos = a.f2c * atom.fpos;
+      atom.name_is_given = TRUE;
       a.AddAtom(atom);
-      if(LDEBUG) {
+      if (LDEBUG) {
         cerr << soliloquy << " ATAT atom[" << atom.name <<"] found:" << endl;
         cerr << "    fpos" << atom.fpos << endl;
         cerr << "    cpos" << atom.cpos << endl;
@@ -6616,17 +6667,15 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
     // order and add additional attributes
     a.SpeciesPutAlphabetic();
-    for(uint i=0;i<a.atoms.size();i++){
+    for (uint i=0; i < a.atoms.size(); i++) {
       a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
     }
     a.MakeBasis();
     a.MakeTypes();
-    a.partial_occupation_flag=FALSE;
-    a.is_vasp4_poscar_format=FALSE;
-    a.is_vasp5_poscar_format=FALSE;
+    a.partial_occupation_flag = FALSE;
+    a.is_vasp4_poscar_format = FALSE;
+    a.is_vasp5_poscar_format = FALSE;
     a.buildGenericTitle();
-
-    
 
   } // ATAT INPUT
   // ----------------------------------------------------------------------
@@ -16513,6 +16562,17 @@ void xstructure::xstructure2elk(void) { //DX20200313
 }
 
 // ***************************************************************************
+// Function xstructure2atat
+// ***************************************************************************
+void xstructure::xstructure2atat(void) { //SD20220123
+  ReScale(1.0);
+  neg_scale=FALSE;
+  coord_flag=_COORDS_FRACTIONAL_;
+  iomode=IOATAT_STR;
+  return;
+}
+
+// ***************************************************************************
 // Function platon2print
 // ***************************************************************************
 string xstructure::platon2print(bool P_EQUAL,bool P_EXACT,double P_ang,double P_d1,double P_d2,double P_d3) {
@@ -17583,6 +17643,12 @@ xstructure input2VASPxstr(istream& input,bool vasp5) {  //CO20210119 - added vas
 xstructure input2ELKxstr(istream& input) { //DX20200313
   xstructure a(input,IOAFLOW_AUTO);
   a.xstructure2elk();
+  return a;
+}
+
+xstructure input2ATATxstr(istream& input) { //SD20220123
+  xstructure a(input,IOAFLOW_AUTO);
+  a.xstructure2atat();
   return a;
 }
 

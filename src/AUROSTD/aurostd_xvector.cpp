@@ -1121,11 +1121,19 @@ namespace aurostd {  // namespace aurostd
 }
 
 namespace aurostd {  // namespace aurostd
+<<<<<<< HEAD
   template<class utype>                                 // function remainder
     xvector<utype> remainder(const xvector<utype> &a,utype d) {  // SD20220117
       xvector<utype> c(a.urows,a.lrows);
       for(int i=a.lrows;i<=a.urows;i++)
         c[i]=a[i]-d*std::floor(a[i]/d);
+=======
+  template<class utype>                                 // function mod_floored
+    xvector<utype> mod_floored(const xvector<utype> &a,utype d) {  // SD20220117
+      xvector<utype> c(a.urows,a.lrows);
+      for(int i=a.lrows;i<=a.urows;i++)
+          c[i]=mod_floored(a[i],d);
+>>>>>>> xatom_atat
       return c;
     }    
 }
