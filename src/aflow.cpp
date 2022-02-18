@@ -28,6 +28,7 @@
 #include "aflow_pflow.h"
 #include "aflow_pocc.h"  //CO20200624
 #include "aflow_anrl.h"  //DX20201104
+#include "aflow_apdc.h"  //SD20220202
 
 //#define  __XOPTIMIZE
 //#include "aflow_array.h"
@@ -1131,6 +1132,28 @@ bool AtomicEnvironmentTest(ofstream& FileMESSAGE, ostream& oss){ //HE20210511
   return display_result(passed_checks, check_num, task_description, results, function_name, FileMESSAGE, oss);
 }
 
+bool APDCTest(ostream& oss){ofstream FileMESSAGE;return APDCTest(FileMESSAGE,oss);} //SD20220202
+bool APDCTest(ofstream& FileMESSAGE, ostream& oss) { //SD20220202
+  _apdc_data apdc_data;
+  // logger
+  string function_name = XPID + "APDCTest():";
+  stringstream message;
+  _aflags aflags;
+  message << "Testing APDC";
+  // initalize data
+  apdc_data.rundirpath = "/home/sd453/tmp/APDC_test";
+  apdc_data.plattice = "FCC";
+  apdc_data.elements = vector<string>(2);
+  apdc_data.elements[0] = "Pt";
+  apdc_data.elements[1] = "Au";
+  // run functions
+  apdc::GetPhaseDiagram(apdc_data);
+
+  // return
+  pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  return TRUE;
+}
+
 int main(int _argc,char **_argv) {
   string soliloquy = XPID + "main():"; //CO20180419
   ostream& oss=cout;  //CO20180419
@@ -1313,6 +1336,7 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_AtomicEnvironment|--AtomicEnvironment_test")) {return (AtomicEnvironmentTest(cout)?0:1);}  //HE20210511
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_aurostd|--aurostd_test")) {return (aurostdTest(cout)?0:1);} //HE20210512
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_APDC|--APDC_test")) {return (APDCTest(cout)?0:1);}  //SD20220202
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
       if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}
