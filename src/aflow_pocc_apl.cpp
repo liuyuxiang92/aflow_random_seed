@@ -294,7 +294,7 @@ namespace pocc {
       }
     }
 
-    nruns = (int) vcalc.size();
+    nruns = vcalc.size();
     vector<xDOSCAR> vxdos(nruns);
 
     aplopts.push_attached("MINFREQ", aurostd::utype2string<double>(minfreq));
@@ -313,17 +313,17 @@ namespace pocc {
         std::placeholders::_4, std::placeholders::_5, std::placeholders::_6);
     xt.run(nruns, fn, vcalc, aplopts, vphdos, vxdos, m);
 #else
-    for (int i = 0; i < nruns; i++) calculatePhononDOSThread(i, vcalc, aplopts, vphdos, vxdos);
+    for (uint i = 0; i < nruns; i++) calculatePhononDOSThread(i, vcalc, aplopts, vphdos, vxdos);
 #endif
 
     return vxdos;
   }
 
 #ifdef AFLOW_MULTITHREADS_ENABLE
-  void POccCalculator::calculatePhononDOSThread(int i, const vector<uint>& vcalc,
+  void POccCalculator::calculatePhononDOSThread(uint i, const vector<uint>& vcalc,
       const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos, std::mutex& m)
 #else
-  void POccCalculator::calculatePhononDOSThread(int i, const vector<uint>& vcalc,
+  void POccCalculator::calculatePhononDOSThread(uint i, const vector<uint>& vcalc,
       const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos)
 #endif
       {

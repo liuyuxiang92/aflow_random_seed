@@ -471,12 +471,12 @@ namespace xthread {
 //
 // void f1(int, const vector<int>&, const vector<double>&, vector<int>&, vector<double>&);
 //
-// Let if be called inside function f2:
+// Let it be called inside function f2:
 //
 // bool f2(const vector<int>& vint1, vector<double>& vdbl2) {
 //   vector<int> vint2;
 //   vector<double> vdbl1;
-//   uint ntasks = vdbl.size();
+//   uint ntasks = vdbl2.size();
 //   xthread::xThread xt;
 //   xt.run(ntasks, f1, vint1, vdbl1, vint2, vdbl2);
 // }
