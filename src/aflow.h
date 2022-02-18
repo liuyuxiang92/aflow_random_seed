@@ -2694,8 +2694,6 @@ bool AtomicEnvironmentTest(ostream& oss=cout); //HE20210511
 bool AtomicEnvironmentTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210511
 bool aurostdTest(ostream& oss=cout); //HE20210512
 bool aurostdTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210512
-bool APDCTest(ostream& oss=cout); //SD20220202
-bool APDCTest(ofstream& FileMESSAGE,ostream& oss=cout); //SD20220202
 // ----------------------------------------------------------------------------
 // Structure Prototypes
 // aflow_xproto.cpp
