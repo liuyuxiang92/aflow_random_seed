@@ -221,7 +221,8 @@ namespace aurostd {
   string TmpStrCreate(const string& _identifier,const string& _tmpdir,bool hidden,bool directory){
     string identifier=_identifier;if(identifier.empty()){identifier="tmp";} //CO20210624
     string tmpdir=_tmpdir;if(tmpdir.empty()){tmpdir=XHOST.tmpfs;} //CO20210315
-    string str=tmpdir+"/"+(hidden?".":"")+"_aflow_"+identifier+"."+XHOST.user+".pid"+XHOST.ostrPID.str()+".tid"+XHOST.ostrTID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+(directory?"_":".")+"tmp"; //CO20200502 - threadID
+    string user=XHOST.user;if(user.empty()){user="UNKNOWN";}; //SD20220218
+    string str=tmpdir+"/"+(hidden?".":"")+"_aflow_"+identifier+"."+user+".pid"+XHOST.ostrPID.str()+".tid"+XHOST.ostrTID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+(directory?"_":".")+"tmp"; //CO20200502 - threadID
     str=aurostd::CleanFileName(str);
     return str;
   }
