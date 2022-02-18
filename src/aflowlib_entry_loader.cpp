@@ -1358,7 +1358,7 @@ namespace aflowlib {
   void EntryLoader::outInfo(const std::string & function_name) {
     if ((!m_out_silent || m_out_debug) && !m_out_super_silent){
       std::string soliloquy = XPID + "EntryLoader::" + function_name + "():";
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, m_logger_message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, m_logger_message, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
     }
     std::stringstream().swap(m_logger_message);
   }
@@ -1366,7 +1366,7 @@ namespace aflowlib {
   void EntryLoader::outDebug(const std::string & function_name) {
     if (m_out_debug && !m_out_super_silent){
       std::string soliloquy = XPID + "EntryLoader::" + function_name + "():";
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, m_logger_message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, m_logger_message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     }
     std::stringstream().swap(m_logger_message);
   }
@@ -1375,7 +1375,7 @@ namespace aflowlib {
     if (!m_out_super_silent) {
       std::string soliloquy = XPID + "EntryLoader::" + function_name + "():";
       pflow::logger((std::string) _AFLOW_FILE_NAME_ + ":" + std::to_string(line_number),
-                    soliloquy, m_logger_message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+                    soliloquy, m_logger_message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     }
     std::stringstream().swap(m_logger_message);
   }

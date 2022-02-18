@@ -22,6 +22,23 @@
 #define AFLOWRC_DEFAULT_KZIP_EXT                        string(".xz") 
 #define         DEFAULT_KZIP_EXT                        XHOST.adefault.getattachedscheme("DEFAULT_KZIP_EXT")
 
+
+//HE20220218 START
+// DEFAULTS ENTRY LOADER
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE      string("~/.aflow/aflowlib_alloy.db")
+#define         DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE      XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE")
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_SERVER       string("aflowlib.duke.edu")
+#define         DEFAULT_ENTRY_LOADER_AFLUX_SERVER       XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_AFLUX_SERVER")
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_PATH         string("/API/aflux/v1.0/")
+#define         DEFAULT_ENTRY_LOADER_AFLUX_PATH         XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_AFLUX_PATH")
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_SERVER     string("aflowlib.duke.edu")
+#define         DEFAULT_ENTRY_LOADER_RESTAPI_SERVER     XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_RESTAPI_SERVER")
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_PATH       string("/AFLOWDATA/")
+#define         DEFAULT_ENTRY_LOADER_RESTAPI_PATH       XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_RESTAPI_PATH")
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_FS_PATH            string("/common/")
+#define         DEFAULT_ENTRY_LOADER_FS_PATH            XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_FS_PATH")
+//HE20220218 STOP
+
 //ME20191001 START
 // DEFAULTS AFLOW DATABASE
 #define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/var/cache/aflow_data/AFLOWDB/aflowlib.db")
@@ -1226,6 +1243,15 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_KZIP_BIN",AFLOWRC_DEFAULT_KZIP_BIN);
     aflowrc::load_default("DEFAULT_KZIP_EXT",AFLOWRC_DEFAULT_KZIP_EXT);
 
+    //HE20220218 START
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE", AFLOWRC_DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE);
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_AFLUX_SERVER", AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_SERVER);
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_AFLUX_PATH", AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_PATH);
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_RESTAPI_SERVER", AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_SERVER);
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_RESTAPI_PATH", AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_PATH);
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_FS_PATH", AFLOWRC_DEFAULT_ENTRY_LOADER_FS_PATH);
+    //HE20220218 STOP
+
     //ME20191001 START
     // AFLOW database files
     aflowrc::load_default("DEFAULT_AFLOW_DB_FILE", AFLOWRC_DEFAULT_AFLOW_DB_FILE);
@@ -1847,6 +1873,18 @@ namespace aflowrc {
     aflowrc << "DEFAULT_KZIP_EXT=\"" << AFLOWRC_DEFAULT_KZIP_EXT << "\"" << endl;
 
     aflowrc << " " << endl;
+
+    //HE20220218 START
+    aflowrc << "// DEFAULTS ENTRY LOADER" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE << "\"" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_AFLUX_SERVER=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_SERVER << "\"" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_AFLUX_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_PATH << "\"" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_RESTAPI_SERVER=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_SERVER << "\"" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_RESTAPI_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_PATH << "\"" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_FS_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_FS_PATH << "\"" << endl;
+    aflowrc << " " << endl;
+    //HE20220218 STOP
+
     //ME20191001 START
     aflowrc << "// DEFAULT AFLOW DATABASE" << endl;
     aflowrc << "DEFAULT_AFLOW_DB_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_FILE << "\"" << endl;
@@ -2458,6 +2496,16 @@ namespace aflowrc {
     if(LDEBUG) oss << "aflowrc::print_aflowrc: BEGIN" << endl;
     if(LDEBUG) oss << "aflowrc::print_aflowrc: XHOST.home=" << XHOST.home << endl;
     if(LDEBUG) oss << "aflowrc::print_aflowrc: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+
+    //HE20220218 START
+    if(LDEBUG) oss << "// DEFAULTS ENTRY LOADER" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_AFLUX_SERVER=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_SERVER << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_AFLUX_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_PATH << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_RESTAPI_SERVER=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_SERVER << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_RESTAPI_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_PATH << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_FS_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_FS_PATH << "\"" << endl;
+    //HE20220218 STOP
 
     //ME20191001 START
     if(LDEBUG) oss << "// DEFAULT AFLOW DATABASE" << endl;

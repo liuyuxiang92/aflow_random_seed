@@ -75,6 +75,7 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss){  //CO20200520
   auto start = std::chrono::high_resolution_clock::now();
   std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>> entries;
   aflowlib::EntryLoader el;
+
 //  el.m_sqlite_file = "../testing/aflowlib.db";
   el.m_xstructure_original = false;
   el.m_xstructure_relaxed = false;
@@ -83,7 +84,7 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss){  //CO20200520
 //  el.m_sqlite_alloy_file = "hidden.db";
 //  el.setSource(aflowlib::EntryLoader::Source::RESTAPI_RAW);
 //  el.m_filesystem_available = true;
-  el.m_out_silent=true;
+//  el.m_out_silent=true;
 //  el.m_out_debug=true;
   el.loadAlloy("NiCaCu", true);
 //  el.loadAUID((vector<string>) {"aflow:d912e209c81aeb94", "aflow:d9b3431b55cf5bc8", "a2e209c81aeb94"});

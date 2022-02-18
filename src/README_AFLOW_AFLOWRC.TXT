@@ -48,6 +48,39 @@ DEFAULT_KZIP_EXT
   default: ".xz"
 
 ####################################################################################################
+DEFAULTS FOR THE ENTRY LOADER
+
+DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE
+  description: location of the public alloy SQLITE DB file
+  type: string
+  default: "~/.aflow/aflowlib_alloy.db"
+
+DEFAULT_ENTRY_LOADER_AFLUX_SERVER
+  description: server that provides the AFLUX API
+  type: string
+  default: "aflowlib.duke.edu"
+
+DEFAULT_ENTRY_LOADER_AFLUX_PATH
+  description: base path including AFLUX API version
+  type: string
+  default: "/API/aflux/v1.0/"
+
+DEFAULT_ENTRY_LOADER_RESTAPI_SERVER
+  description: server that provides the AFLOW RESTAPI
+  type: string
+  default: "aflowlib.duke.edu"
+
+DEFAULT_ENTRY_LOADER_RESTAPI_PATH
+  description: AFLOW RESTAPI base path
+  type: string
+  default: "/AFLOWDATA/"
+
+DEFAULT_ENTRY_LOADER_FS_PATH
+  description: base path to the internal filesystem
+  type: string
+  default: "/common/"
+
+####################################################################################################
 DEFAULTS FOR THE AFLOW DATABASE
 
 DEFAULT_AFLOW_DB_FILE
