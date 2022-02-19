@@ -37,8 +37,8 @@ namespace apdc {
   void GetPhaseDiagram(_apdc_data& apdc_data);
   void GetBinodal(_apdc_data& apdc_data);
   void GetSpinodal(_apdc_data& apdc_data);
+  void GenerateFilesForATAT(const string& rundirpath, const string& plattice, const vector<string>& elements, const vector<xstructure>& vstr);
   vector<xstructure> GetXstructuresForATAT(const string& plattice, const vector<string>& elements);
-  void GenerateFilesForATAT(const string& rundirpath, const string& plattice, const vector<xstructure>& vstr);
 }
 
 
