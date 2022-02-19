@@ -27,6 +27,9 @@ _apdc_data::_apdc_data() {
   elements.clear();
 
   // Calculated data
+  alloyname = "";
+  vstr.clear();
+  
 }
 
 // Destructor
@@ -42,6 +45,8 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
     rundirpath = b.rundirpath;
     plattice = b.plattice;
     elements = b.elements;
+    alloyname = b.alloyname;
+    vstr = b.vstr;
   }
   return *this;
 }
@@ -51,10 +56,34 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
 // ***************************************************************************
 namespace apdc {
   void GetPhaseDiagram(_apdc_data& apdc_data) {
-    cerr << "TESTING" << endl;
+    GetBinodal(apdc_data);
   }
 }
 
+// ***************************************************************************
+// apdc::GetBinodal
+// ***************************************************************************
+namespace apdc {
+  void GetBinodal(_apdc_data& apdc_data) {
+    GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.plattice, apdc_data.elements);
+  }
+}
+
+// ***************************************************************************
+// apdc::GetSpinodal
+// ***************************************************************************
+namespace apdc {
+  void GetSpinodal(_apdc_data& apdc_data) {
+  }
+}
+
+// ***************************************************************************
+// apdc::GenerateFilesForATAT
+// ***************************************************************************
+namespace apdc {
+  void GenerateFilesForATAT(const string& rundirpath, const string& plattice, const vector<string>& elements) {
+  }
+}
 
 
 

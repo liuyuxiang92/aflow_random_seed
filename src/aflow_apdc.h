@@ -23,6 +23,8 @@ class _apdc_data {
     vector<string> elements;
 
     // Calculated data
+    string alloyname;
+    vector<xstructure> vstr;
   
 
   private:
@@ -32,6 +34,17 @@ class _apdc_data {
 // Namespace for functions used by APDC
 namespace apdc {
   void GetPhaseDiagram(_apdc_data& apdc_data);
+  void GetBinodal(_apdc_data& apdc_data);
+  void GetSpinodal(_apdc_data& apdc_data);
+  void GenerateFilesForATAT(const string& rundirpath, const string& plattice, const vector<string>& elements);
 }
+
+
+
+
+
+
+
+
 
 #endif
