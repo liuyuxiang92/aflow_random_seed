@@ -135,7 +135,15 @@ namespace apdc {
     }
     oss << endl;
     aurostd::string2file(oss.str(), rundirpath + "/lat.in");
+    aurostd::StringstreamClean(oss);
     // Generate str.out and energy
+    for (uint i = 0; i < vstr.size(); i++) {
+      aurostd::DirectoryMake(rundirpath + "/" + aurostd::utype2string<uint>(i));
+      oss << vstr[i] << endl;
+      aurostd::string2file(oss.str(), rundirpath + "/" + aurostd::utype2string<uint>(i) + "/str.out");
+      aurostd::string2file(aurostd::utype2string<double>(vstr[i].qm_E_cell) + "\n", rundirpath + "/" + aurostd::utype2string<uint>(i) + "/energy");
+      aurostd::StringstreamClean(oss);
+    }
   }
 }
 
@@ -173,6 +181,7 @@ namespace apdc {
     }
     for (uint i = istart; i <= iend; i++) {
         entry.Load(aflowlib + "/" + aurostd::utype2string<uint>(i), oss);
+        cerr << entry.spacegroup_orig << " " << entry.spacegroup_relax << " " << entry.enthalpy_cell << endl;
         entry.aurl = aflowurl + "/" + aurostd::utype2string<uint>(i);
         if (pflow::loadXstructures(entry, oss, false)) { //initial = unrelaxed; final = relaxed
           entry.vstr[0].iomode = IOATAT_STR;
