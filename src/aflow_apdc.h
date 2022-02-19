@@ -18,12 +18,13 @@ class _apdc_data {
     const _apdc_data& operator=(const _apdc_data &b);
     
     // Input data
-    string rundirpath;
+    string rootdirpath;
     string plattice;
     vector<string> elements;
 
     // Calculated data
     string alloyname;
+    string rundirpath;
     vector<xstructure> vstr;
   
 
@@ -36,7 +37,8 @@ namespace apdc {
   void GetPhaseDiagram(_apdc_data& apdc_data);
   void GetBinodal(_apdc_data& apdc_data);
   void GetSpinodal(_apdc_data& apdc_data);
-  void GenerateFilesForATAT(const string& rundirpath, const string& plattice, const vector<string>& elements);
+  vector<xstructure> GetXstructuresForATAT(const string& plattice, const vector<string>& elements);
+  void GenerateFilesForATAT(const string& rundirpath, const string& plattice, const vector<xstructure>& vstr);
 }
 
 
