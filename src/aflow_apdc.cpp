@@ -61,7 +61,7 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
 namespace apdc {
   void GetPhaseDiagram(_apdc_data& apdc_data) {
     // Clean-up input data and check for errors
-    apdc_data.rundirpath = aurostd::CleanFileName(apdc_data.rundirpath);
+    apdc_data.rootdirpath = aurostd::CleanFileName(apdc_data.rundirpath);
     apdc_data.plattice = aurostd::tolower(apdc_data.plattice);
     aurostd::sort_remove_duplicates(apdc_data.elements);
     if (apdc_data.plattice != "fcc" && apdc_data.plattice != "bcc" && apdc_data.plattice != "hcp") {
@@ -69,6 +69,9 @@ namespace apdc {
     }
     if (apdc_data.elements.size() < 2) {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetPhaseDiagram():", "Alloy must be at least binary", _VALUE_ERROR_);
+    }
+    if (!aurostd::DirectoryMake(apdc_data.rootdirpath)) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetPhaseDiagram():", "Cannot create directory", _INPUT_ILLEGAL_);
     }
     // Binodal
     for (uint i = 0; i < apdc_data.elements.size(); i++) {apdc_data.alloyname += apdc_data.elements[i];}
@@ -84,6 +87,7 @@ namespace apdc {
   void GetBinodal(_apdc_data& apdc_data) {
     apdc_data.vstr = GetXstructuresForATAT(apdc_data.plattice, apdc_data.elements);
     GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.plattice, apdc_data.elements, apdc_data.vstr);
+    RunATAT(apdc_data.rundirpath);
   }
 }
 
@@ -97,15 +101,25 @@ namespace apdc {
 }
 
 // ***************************************************************************
+// apdc::RunATAT
+// ***************************************************************************
+namespace apdc {
+  void RunATAT(const string& rundirpath) {
+    cerr << rundirpath << endl;
+  }
+}
+
+// ***************************************************************************
 // apdc::GenerateFilesForATAT
 // ***************************************************************************
 namespace apdc {
   void GenerateFilesForATAT(const string& rundirpath, const string& plattice, const vector<string>& elements, const vector<xstructure>& vstr) {
     stringstream oss;
     xmatrix<double> lattice(3,3);
-    if (!aurostd::DirectoryMake(rundirpath)) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GenerateFilesForATAT():", "Cannot create directory", _INPUT_ILLEGAL_); 
-    }
+    xvector<double> angles = 90.0 * aurostd::ones_xv<double>(3);
+    xvector<double> coorsys = aurostd::ones_xv<double>(3);
+    oss.precision(_DOUBLE_WRITE_PRECISION_MAX_);
+    oss.setf(std::ios::fixed,std::ios::floatfield);
     // Generate lat.in file
     if (plattice == "fcc") {
       lattice(1, 1) = 0.0; lattice(2, 1) = 0.5; lattice(3, 1) = 0.5;
@@ -118,17 +132,25 @@ namespace apdc {
       lattice(1, 3) = 0.5; lattice(2, 3) = 0.5; lattice(3, 3) = -0.5;
     }
     else if (plattice == "hcp") {
-      lattice(1, 1) = 0.5; lattice(2, 1) = -std::sqrt(3.0) / 2.0; lattice(3, 1) = 0.0;
-      lattice(1, 2) = 0.5; lattice(2, 2) = std::sqrt(3.0) / 2.0; lattice(3, 2) = 0.0;
-      lattice(1, 3) = 0.0; lattice(2, 3) = 0.0; lattice(3, 3) = std::sqrt(8.0 / 3.0);
+      lattice = aurostd::eye<double>(3, 3);
+      coorsys(3) = std::sqrt(8.0 / 3.0);
+      angles(3) = 120.0;
     }
-    lattice *= _AFLOW_APDC_ALAT;
-    oss << aurostd::eye<double>(3, 3) << endl << lattice << endl << 0.0 * aurostd::ones_xv<double>(3) << " ";
+    for (uint i = 1; i <= 3; i++) {oss << _AFLOW_APDC_ALAT * coorsys(i) << " ";}
+    for (uint i = 1; i <= 3; i++) {oss << angles(i) << " ";}
+    oss << endl;
+    for (uint i = 1; i <= 3; i++) {
+      for (uint j = 1; j <= 3; j++) {
+        oss << lattice(i, j) << " ";
+      }
+      oss << endl;
+    }
+    oss << 0.0 << " " << 0.0 << " " << 0.0 << " ";
     for (uint i = 0; i < elements.size(); i++) {
       oss << elements[i] << ",";
     }
     if (plattice == "hcp") {
-      oss << endl << 0.5 * aurostd::ones_xv<double>(3) << " ";
+      oss << endl << 2.0 / 3.0 << " " << 1.0 / 3.0 << " " << 0.5 << " ";
       for (uint i = 0; i < elements.size(); i++) {
         oss << elements[i] << ",";
       }
@@ -136,7 +158,7 @@ namespace apdc {
     oss << endl;
     aurostd::string2file(oss.str(), rundirpath + "/lat.in");
     aurostd::StringstreamClean(oss);
-    // Generate str.out and energy
+    // Generate str.out and energy files
     for (uint i = 0; i < vstr.size(); i++) {
       aurostd::DirectoryMake(rundirpath + "/" + aurostd::utype2string<uint>(i));
       oss << vstr[i] << endl;
@@ -153,14 +175,15 @@ namespace apdc {
 namespace apdc {
   vector<xstructure> GetXstructuresForATAT(const string& plattice, const vector<string>& elements) {
     vector<xstructure> vstr;
+    string aflowlib, aflowurl;
+    string alloyname = "";
     aflowlib::_aflowlib_entry entry;
     uint istart, iend;
     stringstream oss;
     int nary = elements.size();
-    string alloyname = "";
     for (uint i = 0; i < elements.size(); i++) {alloyname += AVASP_Get_PseudoPotential_PAW_PBE(elements[i]);}
-    string aflowlib = "/common/LIB" + aurostd::utype2string<int>(nary) + "/RAW/" + alloyname;
-    string aflowurl = "aflowlib.duke.edu:AFLOWDATA/LIB" + aurostd::utype2string<int>(nary) + "_RAW/" + alloyname;
+    aflowlib = "/common/LIB" + aurostd::utype2string<int>(nary) + "/RAW/" + alloyname;
+    aflowurl = "aflowlib.duke.edu:AFLOWDATA/LIB" + aurostd::utype2string<int>(nary) + "_RAW/" + alloyname;
     if (plattice == "fcc") {
       if (nary == 2) {
         istart = 1;
@@ -180,8 +203,8 @@ namespace apdc {
       }
     }
     for (uint i = istart; i <= iend; i++) {
-        entry.Load(aflowlib + "/" + aurostd::utype2string<uint>(i), oss);
-        cerr << entry.spacegroup_orig << " " << entry.spacegroup_relax << " " << entry.enthalpy_cell << endl;
+        //entry.Load(aflowlib + "/" + aurostd::utype2string<uint>(i) + "/aflowlib.out", *p_oss);
+        //cerr << entry.spacegroup_orig << " " << entry.spacegroup_relax << " " << entry.enthalpy_cell << endl;
         entry.aurl = aflowurl + "/" + aurostd::utype2string<uint>(i);
         if (pflow::loadXstructures(entry, oss, false)) { //initial = unrelaxed; final = relaxed
           entry.vstr[0].iomode = IOATAT_STR;
