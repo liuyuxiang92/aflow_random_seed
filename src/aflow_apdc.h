@@ -26,6 +26,7 @@ class _apdc_data {
     string alloyname;
     string rundirpath;
     vector<xstructure> vstr;
+    vector<uint> multiplicity;
   
 
   private:
@@ -39,6 +40,7 @@ namespace apdc {
   void GetSpinodal(_apdc_data& apdc_data);
   void RunATAT(const string& rundirpath);
   void GenerateFilesForATAT(const string& rundirpath, const string& plattice, const vector<string>& elements, const vector<xstructure>& vstr);
+  vector<uint> GetMultiplicity(const vector<xstructure>& vstr);
   vector<xstructure> GetXstructuresForATAT(const string& plattice, const vector<string>& elements);
 }
 

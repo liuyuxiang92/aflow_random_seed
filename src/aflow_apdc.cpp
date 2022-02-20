@@ -32,6 +32,7 @@ _apdc_data::_apdc_data() {
   alloyname = "";
   rundirpath = "";
   vstr.clear();
+  multiplicity.clear();
   
 }
 
@@ -61,7 +62,7 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
 namespace apdc {
   void GetPhaseDiagram(_apdc_data& apdc_data) {
     // Clean-up input data and check for errors
-    apdc_data.rootdirpath = aurostd::CleanFileName(apdc_data.rundirpath);
+    apdc_data.rootdirpath = aurostd::CleanFileName(apdc_data.rootdirpath);
     apdc_data.plattice = aurostd::tolower(apdc_data.plattice);
     aurostd::sort_remove_duplicates(apdc_data.elements);
     if (apdc_data.plattice != "fcc" && apdc_data.plattice != "bcc" && apdc_data.plattice != "hcp") {
@@ -86,6 +87,7 @@ namespace apdc {
 namespace apdc {
   void GetBinodal(_apdc_data& apdc_data) {
     apdc_data.vstr = GetXstructuresForATAT(apdc_data.plattice, apdc_data.elements);
+    apdc_data.multiplicity = GetMultiplicity(apdc_data.vstr);
     GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.plattice, apdc_data.elements, apdc_data.vstr);
     RunATAT(apdc_data.rundirpath);
   }
@@ -166,6 +168,26 @@ namespace apdc {
       aurostd::string2file(aurostd::utype2string<double>(vstr[i].qm_E_cell) + "\n", rundirpath + "/" + aurostd::utype2string<uint>(i) + "/energy");
       aurostd::StringstreamClean(oss);
     }
+  }
+}
+
+// ***************************************************************************
+// apdc::GetMultiplicity
+// ***************************************************************************
+namespace apdc {
+  vector<uint> GetMultiplicity(const vector<xstructure>& vstr) {
+    vector<uint> multiplicity;
+    uint natom, fact_prod;
+    for (uint i = 0; i < vstr.size(); i++) {
+      natom = 0;
+      fact_prod = 1;
+      for (uint j = 0; j < vstr[i].num_each_type.size(); j++) {
+        natom += vstr[i].num_each_type[j];
+        fact_prod *= aurostd::factorial(vstr[i].num_each_type[j]);
+      }
+      multiplicity.push_back(aurostd::factorial(natom) / fact_prod);
+    }
+    return multiplicity;
   }
 }
 
