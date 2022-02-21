@@ -33,6 +33,7 @@ _apdc_data::_apdc_data() {
   rundirpath = "";
   vstr.clear();
   multiplicity.clear();
+  composition.clear();
   
 }
 
@@ -65,14 +66,14 @@ namespace apdc {
     apdc_data.rootdirpath = aurostd::CleanFileName(apdc_data.rootdirpath);
     apdc_data.plattice = aurostd::tolower(apdc_data.plattice);
     aurostd::sort_remove_duplicates(apdc_data.elements);
+    if (!aurostd::DirectoryMake(apdc_data.rootdirpath)) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetPhaseDiagram():", "Cannot create directory", _INPUT_ILLEGAL_);
+    }
     if (apdc_data.plattice != "fcc" && apdc_data.plattice != "bcc" && apdc_data.plattice != "hcp") {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetPhaseDiagram():", "Invalid parent lattice", _INPUT_ILLEGAL_);
     }
     if (apdc_data.elements.size() < 2) {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetPhaseDiagram():", "Alloy must be at least binary", _VALUE_ERROR_);
-    }
-    if (!aurostd::DirectoryMake(apdc_data.rootdirpath)) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetPhaseDiagram():", "Cannot create directory", _INPUT_ILLEGAL_);
     }
     // Binodal
     for (uint i = 0; i < apdc_data.elements.size(); i++) {apdc_data.alloyname += apdc_data.elements[i];}
@@ -88,6 +89,8 @@ namespace apdc {
   void GetBinodal(_apdc_data& apdc_data) {
     apdc_data.vstr = GetXstructuresForATAT(apdc_data.plattice, apdc_data.elements);
     apdc_data.multiplicity = GetMultiplicity(apdc_data.vstr);
+    apdc_data.composition = GetComposition(apdc_data.elements, apdc_data.vstr);
+    for (uint i = 0; i < apdc_data.composition.size(); i++){cerr << apdc_data.composition[i] << endl;}
     GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.plattice, apdc_data.elements, apdc_data.vstr);
     RunATAT(apdc_data.rundirpath);
   }
@@ -192,6 +195,34 @@ namespace apdc {
 }
 
 // ***************************************************************************
+// apdc::GetComposition
+// ***************************************************************************
+namespace apdc {
+  vector<xvector<double> > GetComposition(const vector<string>& elements, const vector<xstructure>& vstr) {
+    vector<xvector<double> > composition;
+    uint nary = elements.size();
+    int ie = -1;
+    xvector<double> stoich;
+    vector<string> str_elements;
+    xstructure tmp = vstr[0];
+    for (uint i = 0; i < vstr.size(); i++) {
+      if (nary != vstr[i].stoich_each_type.size()) {
+        str_elements = vstr[i].GetElements(true, true);
+        stoich = 0.0 * aurostd::ones_xv<double>(nary);
+        for (uint j = 0; j < nary; j++) {
+          if (aurostd::WithinList(str_elements, elements[j], ie)) {stoich(j + 1) = vstr[i].stoich_each_type[ie];}
+        }
+      }
+      else {
+        stoich = aurostd::vector2xvector(aurostd::deque2vector(vstr[i].stoich_each_type));
+      }
+      composition.push_back(stoich);
+    }
+    return composition;
+  }
+}
+
+// ***************************************************************************
 // apdc::GetXstructuresForATAT
 // ***************************************************************************
 namespace apdc {
@@ -206,29 +237,26 @@ namespace apdc {
     for (uint i = 0; i < elements.size(); i++) {alloyname += AVASP_Get_PseudoPotential_PAW_PBE(elements[i]);}
     aflowlib = "/common/LIB" + aurostd::utype2string<int>(nary) + "/RAW/" + alloyname;
     aflowurl = "aflowlib.duke.edu:AFLOWDATA/LIB" + aurostd::utype2string<int>(nary) + "_RAW/" + alloyname;
-    if (plattice == "fcc") {
-      if (nary == 2) {
+    if (nary == 2) {
+      if (plattice == "fcc") {
         istart = 1;
         iend = 29;
       }
-    }
-    else if (plattice == "bcc") {
-      if (nary == 2) {
+      else if (plattice == "bcc") {
         istart = 58;
         iend = 86;
       }
-    }
-    else if (plattice == "hcp") {
-      if (nary == 2) {
+      else if (plattice == "hcp") {
         istart = 115;
         iend = 177;
       }
     }
+    else if (nary == 3) {
+    }
     for (uint i = istart; i <= iend; i++) {
-        //entry.Load(aflowlib + "/" + aurostd::utype2string<uint>(i) + "/aflowlib.out", *p_oss);
-        //cerr << entry.spacegroup_orig << " " << entry.spacegroup_relax << " " << entry.enthalpy_cell << endl;
+        entry.Load(aurostd::file2string(aflowlib + "/" + aurostd::utype2string<uint>(i) + "/aflowlib.out"), oss);
         entry.aurl = aflowurl + "/" + aurostd::utype2string<uint>(i);
-        if (pflow::loadXstructures(entry, oss, false)) { //initial = unrelaxed; final = relaxed
+        if (pflow::loadXstructures(entry, oss, false)) { // initial = unrelaxed; final = relaxed
           entry.vstr[0].iomode = IOATAT_STR;
           entry.vstr[0].qm_E_cell = entry.enthalpy_cell; // ATAT needs energy per cell
           if (entry.spacegroup_orig == entry.spacegroup_relax) {vstr.push_back(entry.vstr[0]);}

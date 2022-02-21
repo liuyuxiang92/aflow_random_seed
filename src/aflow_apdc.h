@@ -27,6 +27,7 @@ class _apdc_data {
     string rundirpath;
     vector<xstructure> vstr;
     vector<uint> multiplicity;
+    vector<xvector<double> > composition;
   
 
   private:
@@ -41,6 +42,7 @@ namespace apdc {
   void RunATAT(const string& rundirpath);
   void GenerateFilesForATAT(const string& rundirpath, const string& plattice, const vector<string>& elements, const vector<xstructure>& vstr);
   vector<uint> GetMultiplicity(const vector<xstructure>& vstr);
+  vector<xvector<double> > GetComposition(const vector<string>& elements, const vector<xstructure>& vstr);
   vector<xstructure> GetXstructuresForATAT(const string& plattice, const vector<string>& elements);
 }
 
