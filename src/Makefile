@@ -195,6 +195,11 @@ min_cpp: aflow aflow_data
 debug: CPP += -ggdb
 debug: aflow aflow_data
 
+#HE20220221 - add coverage build
+#
+.PHONY: coverage
+coverage: CPP += --coverage
+coverage: aflow aflow_data
 
 .PHONY: mac
 mac:

@@ -136,13 +136,13 @@ namespace aflowlib {
 
       case Source::RESTAPI:
       case Source::RESTAPI_RAW: {
-        loadAUID({AUID});
+        loadAUID(std::vector<std::string>({AUID}));
         break;
       }
 
       case Source::FILESYSTEM:
       case Source::FILESYSTEM_RAW: {
-        loadAUID({AUID});
+        loadAUID(std::vector<std::string>({AUID}));
         break;
       }
 
@@ -257,13 +257,13 @@ namespace aflowlib {
 
       case Source::RESTAPI:
       case Source::RESTAPI_RAW: {
-        loadAURL({AURL});
+        loadAURL(std::vector<std::string>({AURL}));
         break;
       }
 
       case Source::FILESYSTEM:
       case Source::FILESYSTEM_RAW: {
-        loadAURL({AURL});
+        loadAURL(std::vector<std::string>({AURL}));
         break;
       }
 
@@ -313,7 +313,7 @@ namespace aflowlib {
       case Source::RESTAPI_RAW: {
         std::vector <std::string> queries;
         for (std::string AURL_single: clean_AURL) {
-          std::string rest_query = AURL_single.erase(0, 28);
+          std::string rest_query = std::regex_replace(AURL_single.substr(28), m_re_aurl2file, "$1_" + m_sqlite_collection + "/") + "/";
           queries.push_back(rest_query);
         }
         loadRestAPIQueries(queries);
@@ -505,17 +505,12 @@ namespace aflowlib {
   /// @param files list of file paths
   /// @note doesn't add #m_filesystem_path or #m_filesystem_collection
   void EntryLoader::loadFiles(const std::vector <std::string> &files) {
-    std::string file_content;
     size_t start_size = m_entries_flat->size();
     for (std::string file_path: files) {
-       // aurostd::efile2string(file_path, file_content);
-       // TODO test aurostd::efile2string more
-       // it was very slow (10 entries/s)
-       // this variant is ca 700 E/s
-      std::ifstream open_file(file_path);
-      std::stringstream buffer;
-      buffer << open_file.rdbuf();
-      loadText({buffer.str()});
+       std::string file_content;
+       if (aurostd::file2string(file_path, file_content) > 0) {
+         loadText({file_content});
+       }
     }
     m_logger_message << "Loaded " << m_entries_flat->size() - start_size << " new entries";
     outInfo(__func__);
@@ -536,6 +531,11 @@ namespace aflowlib {
         if (m_xstructure_relaxed) addXstructure(*entry);
       }
     }
+  }
+
+  /// @brief returns the active data source
+  EntryLoader::Source EntryLoader::getSource() const{
+    return m_current_source;
   }
 
   /// @brief change the currently used source and prepares them
@@ -663,7 +663,7 @@ namespace aflowlib {
   /// @brief query the internal AFLUX SQLITE DB
   /// @param where part of the SQLITE query after a `WHERE` keyword
   /// @return list of result query strings
-  std::vector <std::string> EntryLoader::getRawSqliteWhere(const std::string &where) {
+  std::vector <std::string> EntryLoader::getRawSqliteWhere(const std::string &where) const{
     if (m_sqlite_db_ptr != nullptr) return m_sqlite_db_ptr->getEntrySet(where, aflow_ft);
     else return {"",};
   }
@@ -671,7 +671,7 @@ namespace aflowlib {
   /// @brief query AFLUX using a matchbook
   /// @param matchbook map with keyword and modifier
   /// @return list of query result strings
-  std::vector <std::string> EntryLoader::getRawAFLUXMatchbook(const std::map <std::string, std::string> &matchbook) {
+  std::vector <std::string> EntryLoader::getRawAFLUXMatchbook(const std::map <std::string, std::string> &matchbook){
     return getRawAFLUXQuery(buildAFLUXQuery(matchbook));
   }
 
@@ -679,7 +679,7 @@ namespace aflowlib {
   /// @param matchbook map with keyword and modifier
   /// @return list of query result strings
   /// @note #m_aflux_server and #m_aflux_path will be added
-  std::vector <std::string> EntryLoader::getRawAFLUXQuery(const std::string &query) {
+  std::vector <std::string> EntryLoader::getRawAFLUXQuery(const std::string &query){
     std::string output = "";
     std::vector <std::string> raw_lines;
     if (200 == aurostd::httpGetStatus(m_aflux_server, m_aflux_path, query, output)){
@@ -904,7 +904,7 @@ namespace aflowlib {
   /// @note the underlying entries will not be copied and are likely not in a continuous chunk of memory
   /// @note creating a copy the smart pointer #m_entries_flat is a bit more efficient way to use
   ///       the loaded entries after the EntryLoader class goes out of scope
-  void EntryLoader::getEntriesViewFlat(std::vector <std::shared_ptr<aflowlib::_aflowlib_entry>> &result) {
+  void EntryLoader::getEntriesViewFlat(std::vector <std::shared_ptr<aflowlib::_aflowlib_entry>> &result) const {
     result = *m_entries_flat;
   }
 
@@ -912,7 +912,7 @@ namespace aflowlib {
   /// @param result save-to vector
   /// @note the underlying entries will not be copied and are likely not in a continuous chunk of memory
   /// @note the entries are grouped by number of entries (smallest to largest)
-  void EntryLoader::getEntriesViewTwoLayer(vector<vector<std::shared_ptr < aflowlib::_aflowlib_entry>> > &result) {
+  void EntryLoader::getEntriesViewTwoLayer(vector<vector<std::shared_ptr < aflowlib::_aflowlib_entry>> > &result) const{
     for (auto layer1: *m_entries_layered_map) {
       std::vector <std::shared_ptr<aflowlib::_aflowlib_entry>> collected_entries;
       for (auto layer2: layer1.second) {
@@ -926,7 +926,7 @@ namespace aflowlib {
   /// @param result save-to vector
   /// @note the underlying entries will not be copied and are likely not in a continuous chunk of memory
   /// @note the entries are grouped first by number of entries (smallest to largest) and then by alloy
-  void EntryLoader::getEntriesViewThreeLayer(std::vector<std::vector<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> &result) {
+  void EntryLoader::getEntriesViewThreeLayer(std::vector<std::vector<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> &result) const{
     for (auto layer1: *m_entries_layered_map) {
       std::vector < std::vector < std::shared_ptr < aflowlib::_aflowlib_entry>>> collected_entries_l1;
       for (auto layer2: layer1.second) {
@@ -945,14 +945,14 @@ namespace aflowlib {
   /// @note creating a copy of the smart pointer #m_entries_layered_map is a bit more efficient way to use
   ///       the loaded entries after the EntryLoader class goes out of scope
   void EntryLoader::getEntriesViewMap(std::map < short, std::map < std::string,
-                                      std::vector < std::shared_ptr < aflowlib::_aflowlib_entry >> >> &result) {
+                                      std::vector < std::shared_ptr < aflowlib::_aflowlib_entry >> >> &result) const {
     result = *m_entries_layered_map;
   }
 
   /// @brief copy the AFLOW lib entries into a vector
   /// @param result save-to vector
   /// @note the underlying entries are copied into a continuous chunk of memory
-  void EntryLoader::getEntriesFlat(std::vector <aflowlib::_aflowlib_entry> &result) {
+  void EntryLoader::getEntriesFlat(std::vector <aflowlib::_aflowlib_entry> &result) const {
     for (auto entry: *m_entries_flat) {
       result.push_back(*entry);
     }
@@ -962,7 +962,7 @@ namespace aflowlib {
   /// @param result save-to vector
   /// @note the underlying entries are copied into a continuous chunk of memory
   /// @note the entries are grouped by number of entries (smallest to largest)
-  void EntryLoader::getEntriesTwoLayer(std::vector <std::vector<aflowlib::_aflowlib_entry>> &result) {
+  void EntryLoader::getEntriesTwoLayer(std::vector <std::vector<aflowlib::_aflowlib_entry>> &result) const {
     for (auto layer1: *m_entries_layered_map) {
       std::vector <aflowlib::_aflowlib_entry> collected_entries;
       for (auto layer2: layer1.second) {
@@ -977,7 +977,7 @@ namespace aflowlib {
   /// @param result save-to vector
   /// @note the underlying entries are copied into a continuous chunk of memory
   /// @note the entries are grouped first by number of entries (smallest to largest) and then by alloy
-  void EntryLoader::getEntriesThreeLayer(std::vector<std::vector<vector<aflowlib::_aflowlib_entry>>> & result) {
+  void EntryLoader::getEntriesThreeLayer(std::vector<std::vector<vector<aflowlib::_aflowlib_entry>>> & result) const {
     for (auto layer1: *m_entries_layered_map) {
       std::vector <std::vector<aflowlib::_aflowlib_entry>> collected_entries_l1;
       for (auto layer2: layer1.second) {
@@ -1277,11 +1277,13 @@ namespace aflowlib {
   /// @note AURL is not validated
   /// @note the AURL is cleaned in place
   bool EntryLoader::cleanAURL(std::string & AURL) {
+    if (AURL.substr(0, 5) == "aurl:")  AURL = AURL.substr(5);
     if (AURL.substr(0, 28)== "aflowlib.duke.edu:AFLOWDATA/") return true;
     if (AURL.substr(0, 9) == "AFLOWDATA") {
       AURL = "aflowlib.duke.edu:" + AURL;
       return true;
     }
+
     AURL = "aflowlib.duke.edu:AFLOWDATA/" + AURL;
     return true;
     //TODO how to check if AURL could be valid
@@ -1292,7 +1294,7 @@ namespace aflowlib {
   /// @returns AFLUX query
   /// @note does not include #m_aflux_server or #m_aflux_path
   /// @note the string is percent encoded
-  std::string EntryLoader::buildAFLUXQuery(const std::map<std::string, std::string> & matchbook){
+  std::string EntryLoader::buildAFLUXQuery(const std::map<std::string, std::string> & matchbook) const {
     std::string query = "";
     for (std::map<std::string, std::string> part: {matchbook, m_aflux_directives}) {
       for (std::pair <std::string, std::string> it: part) {
@@ -1309,7 +1311,7 @@ namespace aflowlib {
   /// @param lib_type indicate the LIB type | `I` for `ICSD` or `L` for 'LIBx'
   /// @return alloy string
   /// @note the alloy sting is sorted
-  std::string EntryLoader::extractAlloy(std::string name, char lib_type) {
+  std::string EntryLoader::extractAlloy(std::string name, char lib_type) const {
     if (lib_type == 'I') { //ICSD
       name.erase(std::min(name.find("_ICSD_"), name.size()));
     } else if (lib_type == 'L') { //LIBX
@@ -1328,7 +1330,7 @@ namespace aflowlib {
   /// \param raw_in content of `aflow.in`
   /// \return poscar content
   /// @note can only read `VASP_POSCAR_MODE_EXPLICIT` variants
-  std::string EntryLoader::aflowin2poscar(std::string raw_in){
+  std::string EntryLoader::aflowin2poscar(std::string raw_in) const {
     size_t explicit_start = raw_in.find("[VASP_POSCAR_MODE_EXPLICIT]");
     std::string poscar;
     if (explicit_start != std::string::npos) {

@@ -640,6 +640,7 @@ namespace aurostd {
   bool stringstream2xzfile(const stringstream& StringstreamOUTPUT,const string& FileNameOUTPUT,const string& mode="");
   // file2string
   uint file2string(const string& FileNameIN,string& StringIN);  //CO20210624
+  uint file2string_20220221(const string& FileNameIN,string& StringIN);  //HE20220221
   uint bz2file2string(const string& FileNameIN,string& StringIN); //CO20210624
   uint gzfile2string(const string& FileNameIN,string& StringIN);  //CO20210624
   uint xzfile2string(const string& FileNameIN,string& StringIN);  //CO20210624

@@ -61,7 +61,7 @@ namespace aflowlib {
       
       std::string m_aflux_server = DEFAULT_ENTRY_LOADER_AFLUX_SERVER;       ///< server that provides the AFLUX API
       std::string m_aflux_path = DEFAULT_ENTRY_LOADER_AFLUX_PATH;           ///< base path including AFLUX API version
-      std::string m_aflux_collection = "WEB";                               ///< collection to use for queries
+      std::string m_aflux_collection = "RAW";                               ///< collection to use for queries
       /// default AFLUX API directives to set format and disable paging
       std::map<std::string, std::string> m_aflux_directives {{"format", "aflow"}, {"paging", "0"}};
 
@@ -121,11 +121,12 @@ namespace aflowlib {
       void loadFiles(const std::vector<std::string> & files);
       void loadText(const std::vector<std::string> & raw_data_lines);
 
-      // Setter
+      // Source setter and getter
       bool setSource(EntryLoader::Source new_source);
+      EntryLoader::Source getSource() const;
 
       // Getter for raw data
-      std::vector<std::string> getRawSqliteWhere(const std::string & where);
+      std::vector<std::string> getRawSqliteWhere(const std::string & where) const;
       std::vector<std::string> getRawAFLUXMatchbook(const std::map<std::string, std::string> & matchbook);
       std::vector<std::string> getRawAFLUXQuery(const std::string & query);
       std::string getRawRestAPIQuery(const std::string &query, bool full_url=false);
@@ -137,15 +138,15 @@ namespace aflowlib {
       bool loadXstructureAflowIn(const aflowlib::_aflowlib_entry & entry, xstructure & new_structure);
 
       // getter for views
-      void getEntriesViewFlat(std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>> & result);
-      void getEntriesViewTwoLayer(vector<vector<std::shared_ptr<aflowlib::_aflowlib_entry>>> & result);
-      void getEntriesViewThreeLayer(std::vector<std::vector<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> & result);
-      void getEntriesViewMap(std::map<short,std::map<std::string,std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> & result);
+      void getEntriesViewFlat(std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>> & result) const;
+      void getEntriesViewTwoLayer(vector<vector<std::shared_ptr<aflowlib::_aflowlib_entry>>> & result) const;
+      void getEntriesViewThreeLayer(std::vector<std::vector<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> & result) const;
+      void getEntriesViewMap(std::map<short,std::map<std::string,std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> & result) const;
 
       // getter that copy data into new format
-      void getEntriesFlat(std::vector<aflowlib::_aflowlib_entry> & result);
-      void getEntriesTwoLayer(std::vector<std::vector<aflowlib::_aflowlib_entry>> & result);
-      void getEntriesThreeLayer(std::vector<std::vector<vector<aflowlib::_aflowlib_entry>>> & result);
+      void getEntriesFlat(std::vector<aflowlib::_aflowlib_entry> & result) const;
+      void getEntriesTwoLayer(std::vector<std::vector<aflowlib::_aflowlib_entry>> & result) const;
+      void getEntriesThreeLayer(std::vector<std::vector<vector<aflowlib::_aflowlib_entry>>> & result) const;
 
       
     private:
@@ -172,9 +173,9 @@ namespace aflowlib {
       void loadAlloySearchRR(const std::vector<std::string> & alloy_list, uint lib_max); // RESTAPI_RAW
       bool cleanAUID(std::string & AUID);
       bool cleanAURL(std::string & AURL);
-      std::string buildAFLUXQuery(const std::map<std::string, std::string> & matchbook);
-      std::string extractAlloy(std::string name, char lib_type);
-      std::string aflowin2poscar(std::string raw_in);
+      std::string buildAFLUXQuery(const std::map<std::string, std::string> & matchbook) const;
+      std::string extractAlloy(std::string name, char lib_type) const;
+      std::string aflowin2poscar(std::string raw_in) const;
 
       // Logging helper
       void outInfo(const std::string & function_name);
