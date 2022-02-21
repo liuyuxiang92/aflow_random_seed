@@ -28,10 +28,12 @@ _apdc_data::_apdc_data() {
   plattice = "";
   elements.clear();
 
-  // Calculated data
+  // Derived data
   alloyname = "";
   rundirpath = "";
   vstr.clear();
+
+  // Xstrucutre data
   multiplicity.clear();
   composition.clear();
   
@@ -90,7 +92,7 @@ namespace apdc {
     apdc_data.vstr = GetXstructuresForATAT(apdc_data.plattice, apdc_data.elements);
     apdc_data.multiplicity = GetMultiplicity(apdc_data.vstr);
     apdc_data.composition = GetComposition(apdc_data.elements, apdc_data.vstr);
-    for (uint i = 0; i < apdc_data.composition.size(); i++){cerr << apdc_data.composition[i] << endl;}
+    //for (uint i = 0; i < apdc_data.composition.size(); i++){cerr << apdc_data.composition[i] << endl;}
     GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.plattice, apdc_data.elements, apdc_data.vstr);
     RunATAT(apdc_data.rundirpath);
   }

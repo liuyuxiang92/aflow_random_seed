@@ -22,10 +22,12 @@ class _apdc_data {
     string plattice;
     vector<string> elements;
 
-    // Calculated data
+    // Derived data
     string alloyname;
     string rundirpath;
     vector<xstructure> vstr;
+
+    // Xstructure data
     vector<uint> multiplicity;
     vector<xvector<double> > composition;
   
