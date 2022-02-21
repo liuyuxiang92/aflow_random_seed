@@ -1353,13 +1353,9 @@ vector<string> getLeastFrequentAtomSpecies(const xstructure& xstr, bool clean) {
 // **************************************************************************
 // Function xstructure::GetElements() //DX20200728
 // **************************************************************************
-vector<string> xstructure::GetElements(bool clean_name, bool fake_names){
+vector<string> xstructure::GetElements(bool clean_name, bool fake_names) const{ // Made function const //SD20220221
 
   // Returns the elements in the xstructure
-  // default: returns xstr.species
-  // If no species are given, it also checks atom.name and has the option to
-  // assign fake elements if none are given
-  // Note: GetElementsFromAtomNames() updates the xstructure
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string function_name = XPID + "xstructure::GetElements():";
@@ -1382,11 +1378,10 @@ vector<string> xstructure::GetElements(bool clean_name, bool fake_names){
     return GetElementsFromAtomNames(clean_name);
   }
   // ---------------------------------------------------------------------------
-  // 3) if all are empty, decorate with fake elements (optional)
+  // 3) if all are empty, return fake elements (optional) // Does not change xstructure //SD20220221 
   else if (atoms[0].name.empty() && fake_names){
-    if(LDEBUG) {cerr << function_name << " WARNING: Atoms are not labeled, assigning fake names." << endl;}
-    DecorateWithFakeElements();
-    return aurostd::deque2vector(species);
+    if(LDEBUG) {cerr << function_name << " WARNING: Atoms are not labeled" << endl;}
+    return pflow::getFakeElements(num_each_type.size());
   }
 
   throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, "There are no element names in the structure.",_RUNTIME_ERROR_);
@@ -1395,7 +1390,7 @@ vector<string> xstructure::GetElements(bool clean_name, bool fake_names){
 // **************************************************************************
 // Function xstructure::GetElements() //DX20200728
 // **************************************************************************
-vector<string> xstructure::GetElementsFromAtomNames(bool clean_name){
+vector<string> xstructure::GetElementsFromAtomNames(bool clean_name) const{ // Made function const //SD20220221
 
   // Extracts the species from the atom names
 

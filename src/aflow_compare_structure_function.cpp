@@ -445,6 +445,7 @@ namespace compare {
     // ---------------------------------------------------------------------------
     // set element/stoichiometry attributes
     str_rep.stoichiometry = str_rep.structure.GetReducedComposition(!same_species);
+    str_rep.structure.DecorateWithFakeElements(); // GetElements does not change xstructure //SD20220221
     str_rep.elements = str_rep.structure.GetElements(true,true); // true: clean names and assign fake names
     str_rep.compound = pflow::prettyPrintCompound(str_rep.elements,str_rep.stoichiometry,no_vrt,false,txt_ft); //remove ones is true  //DX20190311 //DX20190313 - use xstr //eventually redundant
     // update xstructure species
