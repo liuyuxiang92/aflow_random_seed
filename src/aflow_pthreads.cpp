@@ -703,11 +703,12 @@ namespace AFLOW_PTHREADS {
 
     aurostd::RemoveFile(vtmpfiles); //CO20211104
 
+    if(!aurostd::IsCommandAvailable("md5sum")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"md5sum not available",_RUNTIME_ERROR_);}
     string md5sum="";
-
     for(i=0;i<vzip_names.size();i++){ //CO20220207 - rename zip to include _MD5SUM.zip
       if(!aurostd::FileExist(vzip_names[i])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"zip file does not exist: "+vzip_names[i],_FILE_CORRUPT_);}
       md5sum=aurostd::file2md5sum(vzip_names[i]);
+      if(md5sum.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"md5sum returned empty-string for file: \""+vzip_names[i]+"\"",_RUNTIME_ERROR_);}
       zip_name_new=vzip_names[i];
       aurostd::StringSubst(zip_name_new,".zip","_"+md5sum+".zip");
       aurostd::file2file(vzip_names[i],zip_name_new);
