@@ -1185,9 +1185,9 @@ namespace aflowlib {
       // The maximum number of CPUs are empirically found values that appear
       // to result in the shortest run times. Further testing may be necessary.
       int max_cpus = 32;
-      if (stats.nentries < 100000) max_cpus = 16;
-      if (stats.nentries < 50000)  max_cpus = 8;
-      if (stats.nentries < 10000)  max_cpus = 4;
+      if (stats.nentries < 10000) max_cpus = 4;
+      else if (stats.nentries < 50000)  max_cpus = 8;
+      else if (stats.nentries < 100000) max_cpus = 16;
       if (ncpus > max_cpus) ncpus = max_cpus;
       xthread::xThread xt(ncpus);
       std::function<void(int, int, const vector<string>&, vector<DBStats>&)> fn = std::bind(&AflowDB::getColStats, this, _1, _2, _3, _4);
