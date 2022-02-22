@@ -221,7 +221,8 @@ namespace aurostd {
   string TmpStrCreate(const string& _identifier,const string& _tmpdir,bool hidden,bool directory){
     string identifier=_identifier;if(identifier.empty()){identifier="tmp";} //CO20210624
     string tmpdir=_tmpdir;if(tmpdir.empty()){tmpdir=XHOST.tmpfs;} //CO20210315
-    string str=tmpdir+"/"+(hidden?".":"")+"_aflow_"+identifier+"."+XHOST.user+".pid"+XHOST.ostrPID.str()+".tid"+XHOST.ostrTID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+(directory?"_":".")+"tmp"; //CO20200502 - threadID
+    string user=XHOST.user.empty()?"UNKNOWN":XHOST.user; //SD20220218
+    string str=tmpdir+"/"+(hidden?".":"")+"_aflow_"+identifier+"."+user+".pid"+XHOST.ostrPID.str()+".tid"+XHOST.ostrTID.str()+".a"+AFLOW_VERSION+".rnd"+aurostd::utype2string(uint((double) std::floor((double)100000*aurostd::ran0())))+".u"+aurostd::utype2string(uint((double) aurostd::get_useconds()))+(directory?"_":".")+"tmp"; //CO20200502 - threadID
     str=aurostd::CleanFileName(str);
     return str;
   }
@@ -1692,6 +1693,10 @@ namespace aurostd {
   // ***************************************************************************
   //CO20210315
   vector<string> ProcessPIDs(const string& process,bool user_specific){ //CO20210315
+    string output_syscall="";
+    return ProcessPIDs(process,output_syscall,user_specific);
+  }
+  vector<string> ProcessPIDs(const string& process,string& output_syscall,bool user_specific){ //CO20210315
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::ProcessPIDs():";
     if(LDEBUG){cerr << soliloquy << " looking for process=" << process << endl;}
@@ -1708,7 +1713,7 @@ namespace aurostd {
         if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
         command+=" -f "+process+" 2> /dev/null";  //the -f is important, will match mpivasp46s in /usr/bin/mpivasp46s
         if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
-        string output=aurostd::execute2string(command);
+        string output=output_syscall=aurostd::execute2string(command);
         if(LDEBUG){cerr << soliloquy << " pgrep output:" << endl << "\"" << output << "\"" << endl;}
         if(0){  //before -f and -l
           aurostd::StringSubst(output,"\n"," ");
@@ -1745,7 +1750,7 @@ namespace aurostd {
       else{command+=" aux";}
       command+=" 2>/dev/null | "+command_grep+" 2> /dev/null";
       if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
-      string output=aurostd::execute2string(command);
+      string output=output_syscall=aurostd::execute2string(command);
       if(LDEBUG){cerr << soliloquy << " ps/grep output:" << endl << output << endl;}
       aurostd::string2vectorstring(output,vlines);
       for(i=0;i<vlines.size();i++){

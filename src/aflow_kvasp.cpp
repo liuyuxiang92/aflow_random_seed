@@ -1831,6 +1831,12 @@ namespace KBIN {
         if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")) vflags.KBIN_VASP_INCAR_VERBOSE=FALSE; // TURN OFF VERBOSITY
         if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_DELSOL")) vflags.KBIN_VASP_INCAR_VERBOSE=FALSE; // TURN OFF VERBOSITY
       }
+      
+      if(Krun && vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option) {  //CO20211217 - prevents VASP_Backup() from deleting and recycles for next run (VASP_RecycleExtraFile())
+        xvasp.aopts.flag("FLAG::WAVECAR_PRESERVED",vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option); //passing flag to xvasp
+        aus << "00000  MESSAGE Saving WAVECAR files" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+        aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+      }
 
       //CO, come back here at some point
       //think about taking pocc structure and reducing first if possible (and requested)
@@ -2221,7 +2227,11 @@ namespace KBIN {
                           }
                           if (l <= nlines) KBIN::VASP_RecycleExtraFile(xvasp, "CHGCAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
                         }
-                        //[WAVECAR NOT SUPPORTED]if(vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option) KBIN::VASP_RecycleExtraFile(xvasp, "WAVECAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
+                        //CO+MM20211217
+                        //In general it's not a good idea to use the WAVECAR from relax1 to start relax2
+                        //a big change in the unit cell size/shape is going drastically change the plane waves that should be used
+                        //we can add another option to do this in the future
+                        //[CO+MM20211217]if(vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option) KBIN::VASP_RecycleExtraFile(xvasp, "WAVECAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
                         //ME20190301 END
                       }
                       if(xvasp.NRELAXING==xvasp.NRELAX) {
@@ -2300,7 +2310,11 @@ namespace KBIN {
                           }
                           if (l <= nlines) KBIN::VASP_RecycleExtraFile(xvasp, "CHGCAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
                         }
-                        //[WAVECAR NOT SUPPORTED]if(vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option) KBIN::VASP_RecycleExtraFile(xvasp, "WAVECAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
+                        //CO+MM20211217
+                        //In general it's not a good idea to use the WAVECAR from relax1 to start relax2
+                        //a big change in the unit cell size/shape is going drastically change the plane waves that should be used
+                        //we can add another option to do this in the future
+                        //[CO+MM20211217]if(vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option) KBIN::VASP_RecycleExtraFile(xvasp, "WAVECAR", "relax"+aurostd::utype2string<int>(xvasp.NRELAXING));
                         //ME20190301 END
                       }
                       if(xvasp.NRELAXING==xvasp.NRELAX) {
@@ -5408,12 +5422,15 @@ namespace KBIN {
   // when aflow.in files are moved between machines and the VASP binary files
   // have different names. This is not desirable when VASP does not need to be
   // run (e.g. for post-processing).
-  string getVASPVersion(const string& binfile) {  //CO20210315
+  string getVASPVersion(const string& binfile,const string& mpi_command) {  //CO20210315
     // /home/bin/vasp_std -> vasp.4.6.35
     // /home/bin/vasp_std -> vasp.5.4.4.18Apr17-6-g9f103f2a35
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::getVASPVersionString():";
-    if(LDEBUG){cerr << soliloquy << " binfile=" << binfile << endl;}
+    if(LDEBUG){
+      cerr << soliloquy << " binfile=" << binfile << endl;
+      cerr << soliloquy << " mpi_command=" << mpi_command << endl;
+    }
     if (!XHOST.is_command(binfile)) return "";
     // Get the full path to the binary
     string fullPathBinaryName = XHOST.command(binfile);
@@ -5431,7 +5448,11 @@ namespace KBIN {
       aurostd::string2file("","./POTCAR");
       if(LDEBUG){cerr << soliloquy << " ls[1]=" << endl << aurostd::execute2string("ls") << endl;}
       //execute2string does not work well here...
-      aurostd::execute(binfile + " > /dev/null 2>&1");  //ME20200610 - no output from vasp
+      string command="";
+      if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
+      command+=binfile+" > /dev/null 2>&1";
+      if(LDEBUG){cerr << soliloquy << " running command: \"" << command << "\"" << endl;}
+      aurostd::execute(command);  //ME20200610 - no output from vasp
       if(LDEBUG){cerr << soliloquy << " ls[2]=" << endl << aurostd::execute2string("ls") << endl;}
       if(!aurostd::FileExist("OUTCAR")){
         //first re-try, source intel
@@ -5439,7 +5460,10 @@ namespace KBIN {
         aurostd::string2tokens(INTEL_COMPILER_PATHS,vintel_paths,",");
         for(uint i=0;i<vintel_paths.size();i++){
           if(aurostd::FileExist("/bin/bash") && aurostd::FileExist(vintel_paths[i])){
-            string command="/bin/bash -c \"source "+vintel_paths[i]+" intel64; "+ binfile + " > /dev/null 2>&1\"";  //ME20200610 - no output from vasp  //CO20210315 - source only works in bash
+            command="";
+            command+="/bin/bash -c \"source "+vintel_paths[i]+" intel64; ";
+            if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
+            command+=binfile+" > /dev/null 2>&1\"";  //ME20200610 - no output from vasp  //CO20210315 - source only works in bash
             if(LDEBUG){cerr << soliloquy << " running command: \"" << command << "\"" << endl;}
             aurostd::execute(command);
             if(LDEBUG){cerr << soliloquy << " ls[3]=" << endl << aurostd::execute2string("ls") << endl;}
@@ -5448,6 +5472,7 @@ namespace KBIN {
         }
       }
       string vasp_version_outcar=KBIN::OUTCAR2VASPVersion("OUTCAR");
+      if(LDEBUG){cerr << soliloquy << " vasp_version_outcar=" << vasp_version_outcar << endl;}
       chdir(pwddir.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(tmpdir);
@@ -5500,15 +5525,15 @@ namespace KBIN {
 
     return "";
   }
-  string getVASPVersionNumber(const string& binfile) {  //CO20200610
+  string getVASPVersionNumber(const string& binfile,const string& mpi_command) {  //CO20200610
     // /home/bin/vasp_std -> 4.6.35
     // /home/bin/vasp_std -> 5.4.4
-    return VASPVersionString2Number(getVASPVersion(binfile));
+    return VASPVersionString2Number(getVASPVersion(binfile,mpi_command));
   }
-  double getVASPVersionDouble(const string& binfile) {  //CO20200610
+  double getVASPVersionDouble(const string& binfile,const string& mpi_command) {  //CO20200610
     // /home/bin/vasp_std -> 4.635
     // /home/bin/vasp_std -> 5.44
-    return VASPVersionString2Double(getVASPVersionNumber(binfile));
+    return VASPVersionString2Double(getVASPVersionNumber(binfile,mpi_command));
   }
 }  // namespace KBIN
 
