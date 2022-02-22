@@ -436,6 +436,7 @@ namespace aurostd {
   string RemoveSubString(const string& str_orig, const string& str_rm) __xprototype;
   void RemoveSubStringInPlace(string& str_orig, const string& str_rm) __xprototype; //CO20190712
   vector<string> ProcessPIDs(const string& process,bool user_specific=true); //CO20210315
+  vector<string> ProcessPIDs(const string& process,string& output_syscall,bool user_specific=true); //CO20210315
   bool ProcessRunning(const string& process,bool user_specific=true); //CO20210315
   void ProcessKill(const string& process,bool user_specific=true,bool sigkill=true); //CO20210315
   void ProcessRenice(const string& process,int nvalue,bool user_specific=true); //CO20210315

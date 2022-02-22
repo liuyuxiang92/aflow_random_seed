@@ -1692,6 +1692,10 @@ namespace aurostd {
   // ***************************************************************************
   //CO20210315
   vector<string> ProcessPIDs(const string& process,bool user_specific){ //CO20210315
+    string output_syscall="";
+    return ProcessPIDs(process,output_syscall,user_specific);
+  }
+  vector<string> ProcessPIDs(const string& process,string& output_syscall,bool user_specific){ //CO20210315
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::ProcessPIDs():";
     if(LDEBUG){cerr << soliloquy << " looking for process=" << process << endl;}
@@ -1708,7 +1712,7 @@ namespace aurostd {
         if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
         command+=" -f "+process+" 2> /dev/null";  //the -f is important, will match mpivasp46s in /usr/bin/mpivasp46s
         if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
-        string output=aurostd::execute2string(command);
+        string output=output_syscall=aurostd::execute2string(command);
         if(LDEBUG){cerr << soliloquy << " pgrep output:" << endl << "\"" << output << "\"" << endl;}
         if(0){  //before -f and -l
           aurostd::StringSubst(output,"\n"," ");
@@ -1745,7 +1749,7 @@ namespace aurostd {
       else{command+=" aux";}
       command+=" 2>/dev/null | "+command_grep+" 2> /dev/null";
       if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
-      string output=aurostd::execute2string(command);
+      string output=output_syscall=aurostd::execute2string(command);
       if(LDEBUG){cerr << soliloquy << " ps/grep output:" << endl << output << endl;}
       aurostd::string2vectorstring(output,vlines);
       for(i=0;i<vlines.size();i++){
@@ -2051,8 +2055,6 @@ namespace aurostd {
     aurostd::StringSubst(fileOUT,"/./","/");
     aurostd::StringSubst(fileOUT,"*","\"*\"");
     aurostd::StringSubst(fileOUT,"?","\"?\"");
-    aurostd::StringSubst(fileOUT,"\r","");  //CO20220117 - no return carriage
-    aurostd::StringSubst(fileOUT,"\n","");  //CO20220117 - no newline
     if(LDEBUG) cerr << "aurostd::CleanFileName: " << fileOUT << endl;
     return fileOUT;
   }
@@ -4161,24 +4163,7 @@ namespace aurostd {
   // Function file2string bz2file2string gzfile2string xzfile2string zipfile2string efile2string
   // ***************************************************************************
   // write file to string - Stefano Curtarolo
-  uint file2string(const string& _FileNameIN,string& StringIN){
-    return file2string_20220221(_FileNameIN, StringIN);
-  }
-
-
-  uint file2string_20220221(const string& _FileNameIN,string& StringIN){ //HE20220221
-    // avoids the extra FileExist check (buffer.str() will always be empty if the file can't be open)
-    // avoids reading the file char by char
-    // speedup compared to file2string_20220101 10% (3000 files/ 5 warm runs)
-    string FileNameIN=aurostd::CleanFileName(_FileNameIN);
-    std::ifstream open_file(FileNameIN);
-    std::stringstream buffer;
-    buffer << open_file.rdbuf();
-    StringIN = buffer.str();
-    return StringIN.length();
-  }
-
-  uint file2string_20220101(const string& _FileNameIN,string& StringIN) {  //CO20210624
+  uint file2string(const string& _FileNameIN,string& StringIN) {  //CO20210624
     string FileNameIN=aurostd::CleanFileName(_FileNameIN);
     if(!FileExist(FileNameIN)) {
       // cerr << "ERROR - aurostd::file2string: file=" << FileNameIN << " not present !" << endl;
@@ -4486,31 +4471,30 @@ namespace aurostd {
   // ***************************************************************************
   // wget URL to string - Stefano Curtarolo
   bool url2file(string url,string& fileIN,bool verbose) {
-    bool LDEBUG=(FALSE || verbose || XHOST.DEBUG);
-    string soliloquy="aurostd::url2file():";
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(!aurostd::IsCommandAvailable("wget")) {
-      cerr << "ERROR - " << soliloquy << " command \"wget\" is necessary !" << endl;
+      cerr << "ERROR - aurostd::url2file(): command \"wget\" is necessary !" << endl;
       return FALSE;
     }
     string _url=url;
     aurostd::StringSubst(_url,"http://","");
     aurostd::StringSubst(_url,"//","/");
-    if(LDEBUG) cerr << soliloquy << " Loading url=" << _url << endl;
-    string command="";
+    if(LDEBUG) cerr << "aurostd::url2file(): Loading url=" << _url << endl;
+    if(verbose) cout << "aurostd::url2file(): Loading url=" << _url << endl;
 #ifndef _MACOSX_
-    command="wget --quiet --no-cache -O "+fileIN+" 'http://"+_url+"'";
+    aurostd::execute("wget --quiet --no-cache -O "+fileIN+" http://"+_url);
 #else
-    command="wget --quiet -O "+fileIN+" 'http://"+_url+"'";
+    aurostd::execute("wget --quiet -O "+fileIN+" http://"+_url);
 #endif    
-    if(LDEBUG){cerr << soliloquy << " command=\"" << command << "\"" << endl;}
-    aurostd::execute(command);
-    if(aurostd::FileEmpty(fileIN)){
-      if(command.find(":AFLOW")!=string::npos){
-        aurostd::StringSubst(command,":AFLOW","/AFLOW");
-        aurostd::execute(command);
-      }
+    if(aurostd::FileEmpty(fileIN)) {
+      aurostd::StringSubst(_url,":AFLOW","/AFLOW");
+#ifndef _MACOSX_
+      aurostd::execute("wget --quiet --no-cache -O "+fileIN+" http://"+_url);
+#else
+      aurostd::execute("wget --quiet -O "+fileIN+" http://"+_url); // _MACOSX_
+#endif    
       if(aurostd::FileEmpty(fileIN)) {
-        if(LDEBUG){cerr << "ERROR - " << soliloquy << " URL not found http://" << _url << endl;} //CO20200731 - silence this, it's not an error
+        if(LDEBUG){cerr << "ERROR - aurostd::url2file(): URL not found http://" << _url << endl;} //CO20200731 - silence this, it's not an error
         return FALSE;
       }
     }
