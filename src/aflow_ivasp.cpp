@@ -1757,31 +1757,35 @@ namespace KBIN {
   void convertPOSCARFormat(_xvasp& xvasp, const _aflags& aflags, const _kflags& kflags) {
     bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::convertPOSCARFormat()";
+    string mpi_command="";
     string vasp_path_full=kflags.KBIN_BIN;
     if(kflags.KBIN_MPI){  //CO20210713 - adding all the machine information
       vasp_path_full=kflags.KBIN_MPI_BIN;
-      if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH")) {vasp_path_full=MPI_BINARY_DIR_DUKE_BETA_MPICH+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_OPENMPI")) {vasp_path_full=MPI_BINARY_DIR_DUKE_BETA_OPENMPI+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QRATS_MPICH")) {vasp_path_full=MPI_BINARY_DIR_DUKE_QRATS_MPICH+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QFLOW_OPENMPI")) {vasp_path_full=MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_X")) {vasp_path_full=MPI_BINARY_DIR_DUKE_X+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) {vasp_path_full=MPI_BINARY_DIR_MPCDF_EOS+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO")) {vasp_path_full=MPI_BINARY_DIR_MPCDF_DRACO+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA")) {vasp_path_full=MPI_BINARY_DIR_MPCDF_COBRA+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_HYDRA")) {vasp_path_full=MPI_BINARY_DIR_MPCDF_HYDRA+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) {vasp_path_full=MPI_BINARY_DIR_MACHINE001+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) {vasp_path_full=MPI_BINARY_DIR_MACHINE002+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE003")) {vasp_path_full=MPI_BINARY_DIR_MACHINE003+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) {vasp_path_full=MPI_BINARY_DIR_DUKE_MATERIALS+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_AFLOWLIB")) {vasp_path_full=MPI_BINARY_DIR_DUKE_AFLOWLIB+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_HABANA")) {vasp_path_full=MPI_BINARY_DIR_DUKE_HABANA+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::FULTON_MARYLOU")) {vasp_path_full=MPI_BINARY_DIR_FULTON_MARYLOU+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) {vasp_path_full=MPI_BINARY_DIR_CMU_EULER+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::OHAD")) {vasp_path_full=MPI_BINARY_DIR_MACHINE2+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::HOST1")) {vasp_path_full=MPI_BINARY_DIR_MACHINE1+kflags.KBIN_MPI_BIN;}
+      if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH")) {mpi_command=MPI_COMMAND_DUKE_BETA_MPICH;vasp_path_full=MPI_BINARY_DIR_DUKE_BETA_MPICH+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_OPENMPI")) {mpi_command=MPI_COMMAND_DUKE_BETA_OPENMPI;vasp_path_full=MPI_BINARY_DIR_DUKE_BETA_OPENMPI+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QRATS_MPICH")) {mpi_command=MPI_COMMAND_DUKE_QRATS_MPICH;vasp_path_full=MPI_BINARY_DIR_DUKE_QRATS_MPICH+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QFLOW_OPENMPI")) {mpi_command=MPI_COMMAND_DUKE_QFLOW_OPENMPI;vasp_path_full=MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_X")) {mpi_command=MPI_COMMAND_DUKE_X;vasp_path_full=MPI_BINARY_DIR_DUKE_X+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) {mpi_command=MPI_COMMAND_MPCDF_EOS;vasp_path_full=MPI_BINARY_DIR_MPCDF_EOS+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO")) {mpi_command=MPI_COMMAND_MPCDF_DRACO;vasp_path_full=MPI_BINARY_DIR_MPCDF_DRACO+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA")) {mpi_command=MPI_COMMAND_MPCDF_COBRA;vasp_path_full=MPI_BINARY_DIR_MPCDF_COBRA+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_HYDRA")) {mpi_command=MPI_COMMAND_MPCDF_HYDRA;vasp_path_full=MPI_BINARY_DIR_MPCDF_HYDRA+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) {mpi_command=MPI_COMMAND_MACHINE001;vasp_path_full=MPI_BINARY_DIR_MACHINE001+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) {mpi_command=MPI_COMMAND_MACHINE002;vasp_path_full=MPI_BINARY_DIR_MACHINE002+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE003")) {mpi_command=MPI_COMMAND_MACHINE003;vasp_path_full=MPI_BINARY_DIR_MACHINE003+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) {mpi_command=MPI_COMMAND_DUKE_MATERIALS;vasp_path_full=MPI_BINARY_DIR_DUKE_MATERIALS+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_AFLOWLIB")) {mpi_command=MPI_COMMAND_DUKE_AFLOWLIB;vasp_path_full=MPI_BINARY_DIR_DUKE_AFLOWLIB+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_HABANA")) {mpi_command=MPI_COMMAND_DUKE_HABANA;vasp_path_full=MPI_BINARY_DIR_DUKE_HABANA+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::FULTON_MARYLOU")) {mpi_command=MPI_COMMAND_FULTON_MARYLOU;vasp_path_full=MPI_BINARY_DIR_FULTON_MARYLOU+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) {mpi_command=MPI_COMMAND_CMU_EULER;vasp_path_full=MPI_BINARY_DIR_CMU_EULER+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::OHAD")) {mpi_command=MPI_COMMAND_MACHINE2;vasp_path_full=MPI_BINARY_DIR_MACHINE2+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::HOST1")) {mpi_command=MPI_COMMAND_MACHINE1;vasp_path_full=MPI_BINARY_DIR_MACHINE1+kflags.KBIN_MPI_BIN;}
     }
-    if(LDEBUG){cerr << soliloquy << " vasp_path_full=" << vasp_path_full << endl;}
-    double vaspVersion = getVASPVersionDouble(vasp_path_full); //CO20200610
+    if(LDEBUG){
+      cerr << soliloquy << " mpi_command=\"" << mpi_command << "\"" << endl;
+      cerr << soliloquy << " vasp_path_full=\"" << vasp_path_full << "\"" << endl;
+    }
+    double vaspVersion = getVASPVersionDouble(vasp_path_full,mpi_command); //CO20200610
     if(LDEBUG){cerr << soliloquy << " vaspVersion=" << vaspVersion << endl;}
     if (aurostd::isequal(vaspVersion,0.0)) {  //CO20210713
       stringstream message;

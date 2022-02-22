@@ -739,7 +739,7 @@ namespace aurostd {
       if(t1[i].size()!=t2[i].size()) return FALSE;
       for(uint j=0;j<t1[i].size();j++) {
         if(t1[i][j].size()!=t2[i][j].size()) return FALSE;
-        for(uint k=0;k<t1[i][i].size();k++)
+        for(uint k=0;k<t1[i][i].size();k++) 	
           if(aurostd::abs(t1[i][j][k]-t2[i][j][k])>epsilon) return FALSE;
       }
     }
@@ -808,7 +808,7 @@ namespace aurostd {
     //old way also needs PATH_LENGTH_MAX, not good for current LONG pocc directories
     //[old way - need to convert char array -> string]const int PATH_LENGTH_MAX=1024;
     //[old way - need to convert char array -> string]char work_dir[PATH_LENGTH_MAX];
-    //[old way - need to convert char array -> string]getcwd(work_dir, PATH_LENGTH_MAX);
+    //[old way - need to convert char array -> string]getcwd(work_dir, PATH_LENGTH_MAX); 
 
     return aurostd::execute2string("pwd"); //XHOST.command("pwd") ?
   }
@@ -880,7 +880,7 @@ namespace aurostd {
     for(int i=0;i<depth-(int) aus.str().length();i++) { strout+=ch; }
     strout+=aus.str();
     return strout;
-  }
+  } 
   template<class utype> string PaddedPRE(utype input,int depth,string ch) {
     stringstream sss;
     sss << input;
@@ -914,12 +914,12 @@ namespace aurostd {
     int post=depth-pre-(int) input.length();
     // if(DEBUG) cerr << "aurostd::PaddedCENTER: input.length()=" << input.length() << endl;
     // if(DEBUG) cerr << "aurostd::PaddedCENTER: pre=" << pre << endl;
-    // if(DEBUG) cerr << "aurostd::PaddedCENTER: post=" << post << endl;
-    // if(DEBUG) cerr << "aurostd::PaddedCENTER: depth=" << depth << endl;
-    // if(DEBUG) cerr << "aurostd::PaddedCENTER: pre+post+input.length()=" << pre+post+input.length() << endl;
-    for(int i=1;i<pre;i++) { aus << ch; }
+    // if(DEBUG) cerr << "aurostd::PaddedCENTER: post=" << post << endl;   
+    // if(DEBUG) cerr << "aurostd::PaddedCENTER: depth=" << depth << endl;   
+    // if(DEBUG) cerr << "aurostd::PaddedCENTER: pre+post+input.length()=" << pre+post+input.length() << endl;   
+    for(int i=1;i<pre;i++) { aus << ch; }  
     aus << input;
-    for(int i=1;i<post;i++) { aus << ch; }
+    for(int i=1;i<post;i++) { aus << ch; }  
     return aus.str();
   }
   template<class utype> string PaddedCENTER(utype input,int depth,string ch) {
@@ -973,7 +973,7 @@ namespace aurostd {
               << "%]";
             position+=9;
           }
-        }
+        }  
         oss << " ";position++;
       }
     }
@@ -1120,7 +1120,7 @@ namespace aurostd {
   bool RemoveControlCodeCharactersFromString(const string& in, string& out){  //CO20190620
 
     // removes control code and backspace characters (e.g., NUL, DEL, etc.)
-    // only keep printable characters (i.e., digits, letters, punctuation, and spaces)
+    // only keep printable characters (i.e., digits, letters, punctuation, and spaces) 
     // and white space characters (i.e., space, newline, tabs, and carrage returns)
     // a boolean indicates if the stringstream contained a control code character
     // string input version
@@ -1138,7 +1138,7 @@ namespace aurostd {
   bool RemoveControlCodeCharactersFromStringstream(std::stringstream& ss_in, std::stringstream& ss_out){
 
     // removes control code and backspace characters (e.g., NUL, DEL, etc.)
-    // only keep printable characters (i.e., digits, letters, punctuation, and spaces)
+    // only keep printable characters (i.e., digits, letters, punctuation, and spaces) 
     // and white space characters (i.e., space, newline, tabs)
     // a boolean indicates if the stringstream contained a control code character
     // stringstream input version
@@ -1507,15 +1507,15 @@ namespace aurostd {
   //[OBSOLETE]      loc=vstrout[i].find(COMMENT_NEGLECT_3);  //CO20180409
   //[OBSOLETE]      vstrout[i]=vstrout[i].substr(0,loc);  //no NEED TO ask if()..., it will be set to npos anyway
   //[OBSOLETE]
-  //[OBSOLETE]if(vstrout[i].find(COMMENT_NEGLECT_1)!=string::npos)
-  //[OBSOLETE]  vstrout[i]=vstrout[i].substr(0,vstrout[i].find(COMMENT_NEGLECT_1));
+  //[OBSOLETE]if(vstrout[i].find(COMMENT_NEGLECT_1)!=string::npos) 
+  //[OBSOLETE]  vstrout[i]=vstrout[i].substr(0,vstrout[i].find(COMMENT_NEGLECT_1));  
   //[OBSOLETE]if(vstrout[i].find(COMMENT_NEGLECT_2)!=string::npos && vstrout[i].find(":"+COMMENT_NEGLECT_2)==string::npos)  // look for // but dont touch ://
   //[OBSOLETE]  vstrout[i]=vstrout[i].substr(0,vstrout[i].find(COMMENT_NEGLECT_2));
   //[OBSOLETE]if(vstrout[i].find(COMMENT_NEGLECT_3)!=string::npos)
   //[OBSOLETE]  vstrout[i]=vstrout[i].substr(0,vstrout[i].find(COMMENT_NEGLECT_3));
   //[OBSOLETE]  if(!vstrout[i].empty()) cout << vstrout[i] << endl;
   //[OBSOLETE]      if(!vstrout[i].empty()) strout+=vstrout[i]+"\n";
-  //[OBSOLETE]    }
+  //[OBSOLETE]    }  
   //[OBSOLETE]    return strout;
   //[OBSOLETE]  }
 
@@ -1692,6 +1692,10 @@ namespace aurostd {
   // ***************************************************************************
   //CO20210315
   vector<string> ProcessPIDs(const string& process,bool user_specific){ //CO20210315
+    string output_syscall="";
+    return ProcessPIDs(process,output_syscall,user_specific);
+  }
+  vector<string> ProcessPIDs(const string& process,string& output_syscall,bool user_specific){ //CO20210315
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::ProcessPIDs():";
     if(LDEBUG){cerr << soliloquy << " looking for process=" << process << endl;}
@@ -1708,7 +1712,7 @@ namespace aurostd {
         if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
         command+=" -f "+process+" 2> /dev/null";  //the -f is important, will match mpivasp46s in /usr/bin/mpivasp46s
         if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
-        string output=aurostd::execute2string(command);
+        string output=output_syscall=aurostd::execute2string(command);
         if(LDEBUG){cerr << soliloquy << " pgrep output:" << endl << "\"" << output << "\"" << endl;}
         if(0){  //before -f and -l
           aurostd::StringSubst(output,"\n"," ");
@@ -1745,7 +1749,7 @@ namespace aurostd {
       else{command+=" aux";}
       command+=" 2>/dev/null | "+command_grep+" 2> /dev/null";
       if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
-      string output=aurostd::execute2string(command);
+      string output=output_syscall=aurostd::execute2string(command);
       if(LDEBUG){cerr << soliloquy << " ps/grep output:" << endl << output << endl;}
       aurostd::string2vectorstring(output,vlines);
       for(i=0;i<vlines.size();i++){
@@ -2236,19 +2240,19 @@ namespace aurostd {
     if(command=="bunzip2" || command=="bzip2" || command=="bz2"  || command==".bz2") {
       if(!aurostd::IsCommandAvailable("bzip2")) {
         cerr << "ERROR - aurostd::UncompressFile: command \"bzip2\" is necessary !" << endl;
-        return FALSE; }
+        return FALSE; }   
       if(file.find(".bz2")!=string::npos) aurostd::execute("bzip2 -dqf \""+file+"\"");
     }
     if(command=="xunzip" || command=="xz" || command==".xz") {
       if(!aurostd::IsCommandAvailable("xz")) {
         cerr << "ERROR - aurostd::UncompressFile: command \"xz\" is necessary !" << endl;
-        return FALSE; }
+        return FALSE; }   
       if(file.find(".xz")!=string::npos) aurostd::execute("xz -dqf \""+file+"\"");
     }
     if(command=="gunzip" || command=="gzip" || command=="gz"  || command==".gz") {
       if(!aurostd::IsCommandAvailable("gzip")) {
         cerr << "ERROR - aurostd::UncompressFile: command \"gzip\" is necessary !" << endl;
-        return FALSE; }
+        return FALSE; }   
       if(file.find(".gz")!=string::npos) aurostd::execute("gzip -dqf \""+file+"\"");
     }
     if(command=="unzip" || command=="zip" || command==".zip") {
@@ -2276,7 +2280,7 @@ namespace aurostd {
       if(!aurostd::IsCommandAvailable("bzip2")) {
         cerr << "ERROR - aurostd::CompressFile: command \"bzip2\" is necessary !" << endl;
         return FALSE;
-      }
+      }   
       // [OBSOLETE]     if(FileExist(file+".bz2")) {aurostd::execute("rm -f \""+file+".bz2\"");}
       if(file.find(".bz2")==string::npos) aurostd::execute("bzip2 -9qf \""+file+"\"");
       return TRUE;
@@ -2285,7 +2289,7 @@ namespace aurostd {
       if(!aurostd::IsCommandAvailable("xz")) {
         cerr << "ERROR - aurostd::CompressFile: command \"xz\" is necessary !" << endl;
         return FALSE;
-      }
+      }   
       // [OBSOLETE]     if(FileExist(file+".xz")) {aurostd::execute("rm -f \""+file+".xz\"");}
       //    cerr << "aurostd::CompressFile XZ  FileName=[" << FileName << "]  command=[" << command << "]" << endl;
       if(file.find(".xz")==string::npos) aurostd::execute("xz -9qf -q \""+file+"\""); // twice -q to avoid any verbosity
@@ -2295,7 +2299,7 @@ namespace aurostd {
       if(!aurostd::IsCommandAvailable("gzip")) {
         cerr << "ERROR - aurostd::CompressFile: command \"gzip\" is necessary !" << endl;
         return FALSE;
-      }
+      }   
       // [OBSOLETE]     if(FileExist(file+".gz")) {aurostd::execute("rm -f \""+file+".gz\"");}
       if(file.find(".gz")==string::npos) aurostd::execute("gzip -9qf \""+file+"\"");
       return TRUE;
@@ -2321,14 +2325,14 @@ namespace aurostd {
     string to_cmd="xz",to_ext="xz";
     string dir=aurostd::CleanFileName(_dir);
 
-    if((from=="bz" || from=="bz2" || from=="bzip2") && (to=="xz")) { from_cmd="bzip2",from_ext="bz2";to_cmd="xz",to_ext="xz"; }
-    if((from=="xz") && (to=="bz" || to=="bz2" || to=="bzip2")) { from_cmd="xz",from_ext="xz";to_cmd="bzip2",to_ext="bz2"; }
-    if((from=="bz" || from=="bz2" || from=="bzip2") && (to=="gz" || to=="gzip")) { from_cmd="bzip2",from_ext="bz2";to_cmd="gzip",to_ext="gz"; }
-    if((from=="gz" || from=="gzip") && (to=="bz" || to=="bz2" || to=="bzip2")) { from_cmd="gzip",from_ext="gz";to_cmd="bzip2",to_ext="bz2"; }
-    if((from=="gz" || from=="gzip") && (to=="xz")) { from_cmd="gzip",from_ext="gz";to_cmd="xz",to_ext="xz"; }
-    if((from=="xz") && (to=="gz" || to=="gzip")) { from_cmd="xz",from_ext="xz";to_cmd="gzip",to_ext="gz"; }
-    if((from=="tbz") && (to=="xz")) { from_cmd="bzip",from_ext="tbz";to_cmd="xz",to_ext="xz"; }
-    if((from=="tgz") && (to=="xz")) { from_cmd="gzip",from_ext="tgz";to_cmd="xz",to_ext="xz"; }
+    if((from=="bz" || from=="bz2" || from=="bzip2") && (to=="xz")) { from_cmd="bzip2",from_ext="bz2";to_cmd="xz",to_ext="xz"; } 
+    if((from=="xz") && (to=="bz" || to=="bz2" || to=="bzip2")) { from_cmd="xz",from_ext="xz";to_cmd="bzip2",to_ext="bz2"; } 
+    if((from=="bz" || from=="bz2" || from=="bzip2") && (to=="gz" || to=="gzip")) { from_cmd="bzip2",from_ext="bz2";to_cmd="gzip",to_ext="gz"; } 
+    if((from=="gz" || from=="gzip") && (to=="bz" || to=="bz2" || to=="bzip2")) { from_cmd="gzip",from_ext="gz";to_cmd="bzip2",to_ext="bz2"; }  
+    if((from=="gz" || from=="gzip") && (to=="xz")) { from_cmd="gzip",from_ext="gz";to_cmd="xz",to_ext="xz"; } 
+    if((from=="xz") && (to=="gz" || to=="gzip")) { from_cmd="xz",from_ext="xz";to_cmd="gzip",to_ext="gz"; } 
+    if((from=="tbz") && (to=="xz")) { from_cmd="bzip",from_ext="tbz";to_cmd="xz",to_ext="xz"; } 
+    if((from=="tgz") && (to=="xz")) { from_cmd="gzip",from_ext="tgz";to_cmd="xz",to_ext="xz"; } 
 
     if(VERBOSE) { cout << message << "aurostd::ZIP2ZIP: BEGIN - dir=" << dir << endl; }
     vector<string> vfile;
@@ -2465,7 +2469,7 @@ namespace aurostd {
       if(!FileStream.good()){return 0;}
       unsigned long long int sizeout = 0;
       //[CO20210315 - no need to store BIG file in memory]string FileString="";
-      char c;
+      char c; 
       while (FileStream.get(c)){
         //[CO20210315 - no need to store BIG file in memory]FileString+=c;
         sizeout+=1; //[CO20210315 - no need to store BIG file in memory]=FileString.length();
@@ -2578,7 +2582,7 @@ namespace aurostd {
       int i=0;
       ifstream FileStream;
       FileStream.open(FileName.c_str(),std::ios::in);
-      char c;
+      char c; 
       while (FileStream.get(c)&&i<256) {i++;};
       // count no more that 16... it is not worth to count more
       FileStream.close();
@@ -2652,7 +2656,7 @@ namespace aurostd {
   unsigned int getFileCheckSum(const string& filename, const string& algo) {
     ifstream infile(filename.c_str(), std::ios::in | std::ios::binary);
     if (!infile.is_open()) {
-      string function_name = XPID + "aurostd::getFileCheckSum()";
+      string function_name = "aurostd::getFileCheckSum()";
       string message = "Cannot open file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _FILE_ERROR_);
     }
@@ -3804,7 +3808,7 @@ namespace aurostd {
     }
     // ifstreamIN.clear(); // ifstreamIN.seekg(0); // ******* INPUT FILE goes at the beginning
     return vstringout.size();  // return FALSE if something got messed up
-  }
+  } 
   uint stream2vectorstring(std::stringstream& stringstreamIN,vector<string> &vstringout) {
     // stringstreamIN.clear();stringstreamIN.seekg(0); // ******* INPUT FILE goes at the beginning
     vstringout.clear();
@@ -4084,7 +4088,7 @@ namespace aurostd {
   }
 
   // ***************************************************************************
-  // Function ostream2string  istream2string
+  // Function ostream2string  istream2string   
   // ***************************************************************************
   // convert ostream/istream to string - Stefano Curtarolo
   std::string ostream2string(std::ostream& oss) {
@@ -4177,11 +4181,11 @@ namespace aurostd {
     if(!FileExist(FileNameIN)) {
       // cerr << "ERROR - aurostd::bz2file2string: file=" << FileNameIN << " not present !" << endl;
       return 0;
-    }
+    }   
     if(!aurostd::IsCommandAvailable("bzcat")) {
       // cerr << "ERROR - aurostd::bz2file2string: command \"bzcat\" is necessary !" << endl;
       return 0;
-    }
+    }   
     StringIN=aurostd::execute2string("bzcat \""+FileNameIN+"\"");
     return StringIN.length();  // return 0 if something got messed up
   }
@@ -4233,7 +4237,7 @@ namespace aurostd {
     if(!FileExist(FileNameIN,FileNameOUT) && !EFileExist(FileNameIN,FileNameOUT)) {
       // cerr << "ERROR - aurostd::efile2string: file=" << FileNameIN << " not present !" << endl;
       return 0;
-    }
+    }   
     // cerr << aurostd::substring2bool(FileNameIN,".bz2") << endl;
     if(aurostd::substring2bool(FileNameOUT,".bz2")) {
       // cerr << "efile2string: found .bz2, using bz2file2string" << endl;
@@ -4252,7 +4256,7 @@ namespace aurostd {
   }
 
   // ***************************************************************************
-  // Function file2vectorstring bz2file2vectorstring gzfile2vectorstring xzfile2vectorstring efile2vectorstring
+  // Function file2vectorstring bz2file2vectorstring gzfile2vectorstring xzfile2vectorstring efile2vectorstring 
   // ***************************************************************************
   // write file to vector string - Stefano Curtarolo
   uint file2vectorstring(const string& FileNameIN,vector<string>& vline,bool consecutive,bool trim_edges) { //CO20210624
@@ -4287,7 +4291,7 @@ namespace aurostd {
   }
 
   // ***************************************************************************
-  // Function file2dequestring bz2file2dequestring gzfile2dequestring xzfile2dequestring efile2dequestring
+  // Function file2dequestring bz2file2dequestring gzfile2dequestring xzfile2dequestring efile2dequestring 
   // ***************************************************************************
   // write file to deque string - Stefano Curtarolo
   uint file2dequestring(const string& FileNameIN,deque<string>& vline) {  //CO20210624
@@ -4481,14 +4485,14 @@ namespace aurostd {
     aurostd::execute("wget --quiet --no-cache -O "+fileIN+" http://"+_url);
 #else
     aurostd::execute("wget --quiet -O "+fileIN+" http://"+_url);
-#endif
+#endif    
     if(aurostd::FileEmpty(fileIN)) {
       aurostd::StringSubst(_url,":AFLOW","/AFLOW");
 #ifndef _MACOSX_
       aurostd::execute("wget --quiet --no-cache -O "+fileIN+" http://"+_url);
 #else
       aurostd::execute("wget --quiet -O "+fileIN+" http://"+_url); // _MACOSX_
-#endif
+#endif    
       if(aurostd::FileEmpty(fileIN)) {
         if(LDEBUG){cerr << "ERROR - aurostd::url2file(): URL not found http://" << _url << endl;} //CO20200731 - silence this, it's not an error
         return FALSE;
@@ -4555,14 +4559,14 @@ namespace aurostd {
     stringIN=aurostd::execute2string("wget --quiet --no-cache -O /dev/stdout http://"+_url);
 #else
     stringIN=aurostd::execute2string("wget --quiet -O /dev/stdout http://"+_url); // _MACOSX_
-#endif
+#endif    
     if(stringIN=="") {
       aurostd::StringSubst(_url,":AFLOW","/AFLOW");
 #ifndef _MACOSX_
       stringIN=aurostd::execute2string("wget --quiet --no-cache -O /dev/stdout http://"+_url);
 #else
       stringIN=aurostd::execute2string("wget --quiet -O /dev/stdout http://"+_url); // _MACOSX_
-#endif
+#endif    
       if(stringIN=="") {
         if(LDEBUG){cerr << "ERROR - aurostd::url2string(): URL not found http://" << _url << endl;} //CO20200731 - silence this, it's not an error
         return FALSE;
@@ -4671,8 +4675,8 @@ namespace aurostd {
     if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
     if(!aurostd::IsCommandAvailable("wget")) {
       cerr << "ERROR - " << soliloquy << ": command \"wget\" is necessary !" << endl;
-      return 0;}
-    tokens.clear();
+      return 0;}	
+    tokens.clear(); 
     string content = "";
     aurostd::eurl2string(url,content);
     if(LDEBUG) { //CO20180627
@@ -4687,7 +4691,7 @@ namespace aurostd {
     vector<string> stokens;
     aurostd::string2tokens(content,stokens,delimiters);
     for(uint i=0;i<stokens.size();i++)
-      if(!stokens[i].empty())
+      if(!stokens[i].empty()) 
         tokens.push_back(aurostd::string2utype<utype>(stokens[i]));
     if(LDEBUG) cerr << soliloquy << " [5] tokens.size()=" << tokens.size() << endl;
     return tokens.size();
@@ -4703,8 +4707,8 @@ namespace aurostd {
     if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
     if(!aurostd::IsCommandAvailable("wget")) {
       cerr << "ERROR - " << soliloquy << ": command \"wget\" is necessary !" << endl;
-      return 0;}
-    tokens.clear();
+      return 0;}	
+    tokens.clear(); 
     string content = "";
     aurostd::url2string(url,content);
     if(LDEBUG) { //CO20180627
@@ -4719,7 +4723,7 @@ namespace aurostd {
     vector<string> stokens;
     aurostd::string2tokens(content,stokens,delimiters);
     for(uint i=0;i<stokens.size();i++)
-      if(stokens[i]!="")
+      if(stokens[i]!="") 
         tokens.push_back(aurostd::string2utype<utype>(stokens[i]));
     if(LDEBUG) cerr << soliloquy << " [5] tokens.size()=" << tokens.size() << endl;
     return tokens.size();
@@ -5188,7 +5192,7 @@ namespace aurostd {
           vint.push_back(j);
       } else {
         vint.push_back(aurostd::string2utype<int>(tokens_commas[i]));
-      }
+      }	
     }
   }
 
@@ -5209,7 +5213,7 @@ namespace aurostd {
           vuint.push_back(j);
       } else {
         vuint.push_back(aurostd::string2utype<uint>(tokens_commas[i]));
-      }
+      }	
     }
   }
 
@@ -5230,7 +5234,7 @@ namespace aurostd {
           vfloat.push_back(j);
       } else {
         vfloat.push_back(aurostd::string2utype<float>(tokens_commas[i]));
-      }
+      }	
     }
   }
 
@@ -5251,7 +5255,7 @@ namespace aurostd {
           vdouble.push_back(j);
       } else {
         vdouble.push_back(aurostd::string2utype<double>(tokens_commas[i]));
-      }
+      }	
     }
   }
 
@@ -6021,7 +6025,7 @@ namespace aurostd {
     aurostd::StringSubst(out,"\\delta","&delta;");aurostd::StringSubst(out,"\\Delta","&Delta;");
     aurostd::StringSubst(out,"\\omega","&omega;");aurostd::StringSubst(out,"\\Omega","&Omega;");
     aurostd::StringSubst(out,"\\sigma","&sigma;");aurostd::StringSubst(out,"\\Sigma","&Sigma;");
-    aurostd::StringSubst(out,"_{a}","<sub>a</sub>");aurostd::StringSubst(out,"_a","<sub>a</sub>");
+    aurostd::StringSubst(out,"_{a}","<sub>a</sub>");aurostd::StringSubst(out,"_a","<sub>a</sub>"); 
     aurostd::StringSubst(out,"_{b}","<sub>b</sub>");aurostd::StringSubst(out,"_b","<sub>b</sub>");
     aurostd::StringSubst(out,"_{c}","<sub>d</sub>");aurostd::StringSubst(out,"_c","<sub>d</sub>");
     aurostd::StringSubst(out,"_{d}","<sub>d</sub>");aurostd::StringSubst(out,"_d","<sub>d</sub>");
@@ -6031,7 +6035,7 @@ namespace aurostd {
     aurostd::StringSubst(out,"_{AB}","<sub>AB</sub>");
     aurostd::StringSubst(out,"_{AB2}","<sub>AB2</sub>");
     aurostd::StringSubst(out,"_{A2B2}","<sub>A2B2</sub>");
-    aurostd::StringSubst(out,"_{AB3}","<sub>AB3</sub>");
+    aurostd::StringSubst(out,"_{AB3}","<sub>AB3</sub>"); 
     for(uint i=0;i<100;i++) aurostd::StringSubst(out,"_{"+aurostd::utype2string(i)+"}","<sub>"+aurostd::utype2string(i)+"</sub>");
     for(uint i=0;i<10;i++) aurostd::StringSubst(out,"_"+aurostd::utype2string(i)+"","<sub>"+aurostd::utype2string(i)+"</sub>"); // patch
     for(uint i1=0;i1<=3;i1++)
@@ -6048,7 +6052,7 @@ namespace aurostd {
           for(uint i4=0;i4<=1;i4++)
             for(uint i5=0;i5<=1;i5++) {
               aurostd::StringstreamClean(ss);
-              ss << s.at(i1) << s.at(i2) << s.at(i3) << s.at(i4) << s.at(i5);
+              ss << s.at(i1) << s.at(i2) << s.at(i3) << s.at(i4) << s.at(i5); 
               aurostd::StringSubst(out,"_{"+ss.str()+"}","<sub>"+ss.str()+"</sub>");
             }
     //    return out;
@@ -6175,7 +6179,7 @@ namespace aurostd {
               // if we find one, but it has single backslash, leave alone
               // doesn't matter what it is, if it has single backslash it's good
               // if we find one, give single backslash
-              if(i && input[i - 1] == '\\') {break;}
+              if(i && input[i - 1] == '\\') {break;}  
               output.append(1, '\\');
               break;
             }
@@ -6603,7 +6607,7 @@ namespace aurostd  {
 namespace aurostd  {
   vector<vector<double> > Sum3DVectorAndReduce2D(const vector<vector<vector<double> > >& vvva) {
     //The first column will not change! (For example, PDOS into TOTALPDOS)
-    vector<vector<double> > vvtmp, vv_sum;
+    vector<vector<double> > vvtmp, vv_sum; 
     vv_sum=vvva.at(0);
     for (uint i=1; i<vvva.size();i++) {
       vvtmp=vvva[i];
@@ -7352,11 +7356,11 @@ namespace aurostd {
     vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
     sss << "{" << aurostd::joinWDelimiter(vcontent_json,",")  << "}" << eendl;
-    return sss.str();
+    return sss.str();    
   }
 }
 
-//Need to initalize
+//Need to initalize 
 namespace aurostd {
   string xcomplex2json(xcomplex<double>& number){ return _xcomplex2json(number); }
 }
