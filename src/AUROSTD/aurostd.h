@@ -49,13 +49,15 @@
 #include <time.h>
 #include <typeinfo>
 #include <unistd.h>
-#include <signal.h>  //ME20191125 - needed for AflowDB
+#include <signal.h>      //ME20191125 - needed for AflowDB
 #include <vector>
-#include <list> //CO20170806 - need for POCC
-#include <utility> //HE2021069 - for pairs in chull (C++98 changes, already included in SYMBOLICCPLUSPLUS)
-#include <netdb.h>  //CO20180321 - frisco needs for AFLUX
-#include <arpa/inet.h> //HE20220121 - for xhttp
-
+#include <list>          //CO20170806 - need for POCC
+#include <utility>       //HE2021069 - for pairs in chull (C++98 changes, already included in SYMBOLICCPLUSPLUS)
+#include <netdb.h>       //CO20180321 - frisco needs for AFLUX + for EntryLoader
+#include <arpa/inet.h>   //HE20220121 - for xhttp
+#include <fts.h>         //HE20220222 - for EntryLoader (effective filesystem tree walk)
+#include <unordered_set> //HE20220222 - for EntryLoader (faster comparisons)
+#include <regex>         //HE20220222 - for EntryLoader (faster match of complex patterns like alloy matching)
 
 #define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)  //CO20200502 - moved from aflow.h
 

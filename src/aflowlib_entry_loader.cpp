@@ -17,9 +17,6 @@
 
 #include "aflow.h"
 #include "aflowlib_entry_loader.h"
-#include <fts.h>
-#include <sys/stat.h>
-
 
 #define _DEBUG_ENTRY_LOADER_ false
 
@@ -28,6 +25,19 @@ namespace aflowlib {
 
   /// @class EntryLoader
   /// @brief unified interface to gather AFLOW lib entries from different sources
+  ///
+  /// Basic usage
+  /// @code
+  /// std::vector <std::shared_ptr<aflowlib::_aflowlib_entry>> results;
+  /// { // ensures that all resources are released as soon as possible
+  ///   aflowlib::EntryLoader el;
+  ///   el.m_out_debug = true; // change the behavior of the EntryLoader class
+  ///   el.loadAlloy("NiCa"); // the load functions can be called multiple times
+  ///   el.loadAUID(aflow:7dd846bc04c764e8); // no duplicates will be stored
+  ///   el.getEntriesViewFlat(results);
+  /// }
+  /// for (auto & entry : results) std::cout << entry->auid << std::endl;
+  /// @endcode
 
   // class constructor
   EntryLoader::EntryLoader(std::ostream &oss) : xStream(oss) { init(); }

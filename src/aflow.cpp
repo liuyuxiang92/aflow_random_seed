@@ -30,8 +30,7 @@
 #include "aflow_pocc.h"  //CO20200624
 #include "aflow_anrl.h"  //DX20201104
 
-#include <chrono> // benchmarking HE
-#include <unistd.h> //TODO remove testing
+#include <chrono> // benchmarking HE20220222
 
 //#define  __XOPTIMIZE
 //#include "aflow_array.h"

@@ -13,9 +13,6 @@
 #ifndef _AFLOWLIB_ENTRY_LOADER_H_
 #define _AFLOWLIB_ENTRY_LOADER_H_
 
-#include <unordered_set>
-#include <map>
-#include <regex>
 
 namespace aflowlib {
   class EntryLoader : public xStream {

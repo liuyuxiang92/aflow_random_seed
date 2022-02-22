@@ -4163,7 +4163,24 @@ namespace aurostd {
   // Function file2string bz2file2string gzfile2string xzfile2string zipfile2string efile2string
   // ***************************************************************************
   // write file to string - Stefano Curtarolo
-  uint file2string(const string& _FileNameIN,string& StringIN) {  //CO20210624
+  uint file2string(const string& _FileNameIN,string& StringIN){
+    return file2string_20220221(_FileNameIN, StringIN);
+  }
+
+
+  uint file2string_20220221(const string& _FileNameIN,string& StringIN){ //HE20220221
+    // avoids the extra FileExist check (buffer.str() will always be empty if the file can't be open)
+    // avoids reading the file char by char
+    // speedup compared to file2string_20220101 10% (3000 files/ 5 warm runs)
+    string FileNameIN=aurostd::CleanFileName(_FileNameIN);
+    std::ifstream open_file(FileNameIN);
+    std::stringstream buffer;
+    buffer << open_file.rdbuf();
+    StringIN = buffer.str();
+    return StringIN.length();
+  }
+
+  uint file2string_20220101(const string& _FileNameIN,string& StringIN) {  //CO20210624
     string FileNameIN=aurostd::CleanFileName(_FileNameIN);
     if(!FileExist(FileNameIN)) {
       // cerr << "ERROR - aurostd::file2string: file=" << FileNameIN << " not present !" << endl;
