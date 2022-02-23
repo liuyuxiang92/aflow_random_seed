@@ -58,7 +58,7 @@ namespace aurostd {
   // builds the xerror object.
   void xerror::buildException(const std::string& filename, const std::string& fname, const std::string& msg, const int& code) {
     file_name = filename;
-    function_name = fnc;
+    function_name = fname;
     error_message = msg;
     error_code = code;
     error_type = error_code/10;
