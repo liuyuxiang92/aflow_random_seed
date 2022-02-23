@@ -253,7 +253,7 @@ namespace KBIN {
     try {
       RunPhonons_APL_20181216(xinput,AflowIn,aflags,kflags,xflags,FileMESSAGE);
     } catch (aurostd::xerror e) {
-      pflow::logger(e.whereFileName(), e.whereFunction(), e.error_message, aflags.Directory, FileMESSAGE, oss, _LOGGER_ERROR_);
+      pflow::logger(e.whereFileName(), e.whereFunction(), e.buildMessageString(), aflags.Directory, FileMESSAGE, oss, _LOGGER_ERROR_);
     }
   }
   void RunPhonons_APL_20181216(_xinput& xinput,
@@ -687,7 +687,7 @@ namespace KBIN {
           }
         } catch (aurostd::xerror& excpt) {
           message << "Failed to identify the version of the VASP binary." << std::endl;
-          message << excpt.error_message << std::endl;
+          message << excpt.buildMessageString() << std::endl;
           pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
         }
       }
@@ -828,7 +828,7 @@ namespace KBIN {
         pflow::logger(_AFLOW_FILE_NAME_, "APL", "Awakening...", aflags, FileMESSAGE, oss);
         phcalc.awake();
       } catch (aurostd::xerror& e) {
-        message << e.error_message << " Skipping awakening...";
+        message << e.buildMessageString() << " Skipping awakening...";
         pflow::logger(_AFLOW_FILE_NAME_, "APL", message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
         awakeHarmIFCs = false;
       }
@@ -867,10 +867,10 @@ namespace KBIN {
             pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
             phcalc.readAnharmonicIFCs(ifcs_hib_file);
           } catch (aurostd::xerror& excpt) {
-            message<< excpt.error_message + " Skipping awakening of ";
+            message<< excpt.buildMessageString() + " Skipping awakening of ";
             if (o == 3) message << "3rd";
             else message << aurostd::utype2string<int>(o) + "th";
-            message << excpt.error_message + " order anharmonic IFCs.";
+            message << excpt.buildMessageString() + " order anharmonic IFCs.";
             pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
             awakeAnharmIFCs = false;
           }

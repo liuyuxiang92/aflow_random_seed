@@ -1191,7 +1191,7 @@ namespace apl
         try{
           phcalc.awake();
         } catch (aurostd::xerror& e){
-          pflow::logger(QHA_ARUN_MODE, __func__, e.error_message, currentDirectory,
+          pflow::logger(QHA_ARUN_MODE, __func__, e.buildMessageString(), currentDirectory,
               *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
           msg = "Reading data from the hibernation file failed.";
           pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
@@ -3001,8 +3001,8 @@ namespace apl
       // the energy-volume relation: at this point the calculation of 
       // thermodynamic properties should be stopped and a warning should be
       // printed, and all calculated data should be saved to the file
-      if (e.error_code == _VALUE_RANGE_){
-        pflow::logger(e.whereFileName(), e.whereFunction(), e.error_message,
+      if (e.whatCode() == _VALUE_RANGE_){
+        pflow::logger(e.whereFileName(), e.whereFunction(), e.buildMessageString(),
             currentDirectory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
       else{

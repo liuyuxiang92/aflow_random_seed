@@ -176,8 +176,7 @@ namespace apl {
         clst.readClusterSetFromFile(clust_hib_file);
       } catch (aurostd::xerror& excpt) {
         awakeClusterSet = false;
-        string message = excpt.error_message;
-        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, message, directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, excpt.buildMessageString(), directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
     }
     if (!awakeClusterSet) {

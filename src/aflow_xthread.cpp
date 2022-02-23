@@ -334,7 +334,7 @@ namespace xthread {
       vector<std::thread*> threads;
       for (int i = 0; i < ncpus; i++) {
         threads.push_back(new std::thread(&xThread::spawnWorker<I, F, A...>, this,
-                                          std::ref(it), std::ref(end), ntasks,
+                                          i, std::ref(it), std::ref(end), ntasks,
                                           std::ref(func), std::ref(args)...)
         );
       }
@@ -361,13 +361,18 @@ namespace xthread {
   /// @param func The function to be called by the worker
   /// @param args The arguments passed into func, if any
   template <typename I, typename F, typename... A>
-  void xThread::spawnWorker(I& it, I& end,
+  void xThread::spawnWorker(int ithread, I& it, I& end,
                             unsigned long long int ntasks,
                             F& func, A&... args) {
     I icurr = advance(it, end, ntasks);
 
     while (icurr != end) {
-      func(icurr, args...); // Call function
+      try {
+        func(icurr, args...); // Call function
+      } catch (aurostd::xerror& e) {
+        string message = "Error in thread " + aurostd::utype2string<int>(ithread) + e.what();
+        throw aurostd::xerror(e.whereFileName(), e.whereFunction(), message, e.whatCode());
+      }
       icurr = advance(it, end, ntasks, progress_bar_set);
     }
   }
@@ -438,7 +443,9 @@ namespace xthread {
           startIndex = tasks_per_thread * t + remainder;
           endIndex = startIndex + tasks_per_thread;
         }
-        threads.push_back(new std::thread(std::ref(func), startIndex, endIndex, std::ref(args)...));
+        threads.push_back(new std::thread(&xThread::spawnWorkerPredistributed<I, F, A...>, this,
+                                          (int) t, startIndex, endIndex,
+                                          std::ref(func), std::ref(args)...));
       }
       for (std::thread* t : threads) {
         t->join();
@@ -450,6 +457,16 @@ namespace xthread {
     }
 
     freeThreads(ncpus);
+  }
+
+  template <typename I, typename F, typename... A>
+  void xThread::spawnWorkerPredistributed(int ithread, I startIndex, I endIndex, F& func, A&... args) {
+    try {
+      func(startIndex, endIndex, args...);
+    } catch (aurostd::xerror& e) {
+      string message = "Error in thread " + aurostd::utype2string<int>(ithread) + e.what();
+      throw aurostd::xerror(e.whereFileName(), e.whereFunction(), message, e.whatCode());
+    }
   }
 
 }

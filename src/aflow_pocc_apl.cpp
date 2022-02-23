@@ -223,7 +223,7 @@ namespace pocc {
           pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
           phcalc.awake();
         } catch (aurostd::xerror& e) {
-          message = e.error_message + " Recalculating force constants.";
+          message = e.buildMessageString() + " Recalculating force constants.";
           pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
           awakeHarmIFCs = false;
         }

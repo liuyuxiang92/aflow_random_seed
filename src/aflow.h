@@ -2996,12 +2996,14 @@ namespace xthread {
       template <typename I, typename F, typename... A>
       void run(I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
       template <typename I, typename F, typename... A>
-      void spawnWorker(I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
+      void spawnWorker(int ithread, I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
       template <typename I>
       I advance(I& it, I& end, unsigned long long int ntasks, bool update_progress_bar=false);
 
       template <typename I, typename F, typename... A>
       void runPredistributed(I ntasks, F& func, A&... args);
+      template <typename I, typename F, typename... A>
+      void spawnWorkerPredistributed(int ithread, I startIndex, I endIndex, F& func, A&... args);
   };
 }
 #endif

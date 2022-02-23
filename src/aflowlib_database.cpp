@@ -866,7 +866,7 @@ namespace aflowlib {
         updateEntry(auid, cols, vals);
         npatches++;
       } catch (aurostd::xerror& e) {
-        message << "Failed to patch using line " << l << " (SQL error): " << e.error_message << ".";
+        message << "Failed to patch using line " << l << " (SQL error): " << e.buildMessageString() << ".";
         pflow::logger(_AFLOW_FILE_NAME_, __func__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
         continue;
       }
