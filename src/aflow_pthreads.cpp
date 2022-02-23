@@ -875,7 +875,6 @@ namespace aurostd {
   bool multithread_execute(deque<string> cmds, int _NUM_THREADS, bool VERBOSE) {
     bool LDEBUG = FALSE;
     if (VERBOSE) {}
-    string function_name = XPID + "aurostd::multithread_execute():";
     if (LDEBUG) std::cerr << "Commands to run:\n" << aurostd::joinWDelimiter(cmds, "\n") << std::endl;
 
     std::function<void(deque<string>::iterator&)> fn = [&](deque<string>::iterator& it) {aurostd::execute(*it);};
