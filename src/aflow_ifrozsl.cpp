@@ -75,9 +75,8 @@ namespace KBIN {
     for(uint i=0;i<vtitel.size();i++) {
       aurostd::string2tokens(vtitel.at(i),tokens," ");
       if(tokens.size()!=4 && tokens.size()!=5) {
-        string function_name = XPID + "KBIN::VASP_RunPhonons_FROZSL():";
         string message = "POTCAR KBIN_VASP_RunPhonons_FROZSL " + aurostd::joinWDelimiter(vtitel, ", ");
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
       }
       species_pp.push_back(tokens.at(3));
       species.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(3)));
@@ -267,7 +266,6 @@ namespace FROZSL {
 
 namespace FROZSL {
   bool WGET_OUTPUT(ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags) {
-    string function_name = XPID + "FROZSL::WGET_OUTPUT():";
     string message = "";
     ostringstream aus;
     aus << "00000  MESSAGE FROZSL running WGET OUTPUT files " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
@@ -280,7 +278,7 @@ namespace FROZSL {
 
     if(XHOST.vext.size()!=XHOST.vcat.size()) {
       message = "XHOST.vext.size()!=XHOST.vcat.size().";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
     }
 
     // CHECK FOR INSIDE STUFF
@@ -313,7 +311,7 @@ namespace FROZSL {
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         } else {
           message = "file not found " + vfiles[i];
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_NOT_FOUND_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_NOT_FOUND_);
         }
       }
       // ENERGIES

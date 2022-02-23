@@ -25,7 +25,6 @@ using std::vector;
 using aurostd::xcombos;
 using aurostd::xerror;
 
-static const string _AAPL_IFCS_ERR_PREFIX_ = "apl::AnharmonicIFCs::";
 static const string _AAPL_IFCS_MODULE_ = "AAPL";  // for the logger
 
 static const string _CLUSTER_SET_FILE_[2] = {"clusterSet_3rd.xml", "clusterSet_4th.xml"};
@@ -146,7 +145,6 @@ namespace apl {
   }
 
   void AnharmonicIFCs::initialize(const Supercell& scell, int _order, const aurostd::xoption& opts) {
-    string function_name = XPID + "apl::AnharmonicIFCs::initialize()";
     string message = "";
     // Initialize IFC parameters
     order = _order;
@@ -161,13 +159,13 @@ namespace apl {
     aurostd::string2tokens(opts.getattachedscheme("CUT_RAD"), tokens, ",");
     if (tokens.size() < (uint) order - 2) {
       message = "Not enough parameters for CUT_RAD";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
     }
     double cut_rad = aurostd::string2utype<double>(tokens[order - 3]);
     aurostd::string2tokens(opts.getattachedscheme("CUT_SHELL"), tokens, ",");
     if (tokens.size() < (uint) order - 2) {
       message = "Not enough parameters for CUT_SHELL";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
     }
     int cut_shell = aurostd::string2utype<int>(tokens[order - 3]);
     clst.initialize(scell, _order, cut_shell, cut_rad);
@@ -211,15 +209,14 @@ namespace apl {
 namespace apl {
 
   bool AnharmonicIFCs::runVASPCalculations(_xinput& xinput, _aflags& aflags, _kflags& kflags, _xflags& xflags) {
-    string function_name = XPID + _AAPL_IFCS_ERR_PREFIX_ + "runVASPCalculations():";
     string message = "";
     if (order > 4) {
       message = "Not implemented for order > 4.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _VALUE_ILLEGAL_);
     }
     if (!initialized) {
       message = "Not initialized.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_INIT_);
     }
 
     bool stagebreak = false;
@@ -392,9 +389,8 @@ namespace apl {
         }
       }
       if (d == ndir) {
-        string function_name = XPID + "apl::AnharmonicIFCs::calculateForceConstants()";
         string message = "Could not find ZEROSTATE directory.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_NOT_FOUND_);
       } else {
         _xinput zerostate(xInputs[0]);
         xstructure& xstr = zerostate.getXStr();
@@ -552,10 +548,9 @@ namespace apl {
       }
     }
     // If the for-loop runs until the end, the atom was not found
-    string function_name = XPID + _AAPL_IFCS_ERR_PREFIX_ + "getTransformedAtom():";
     stringstream message;
     message << "Could not transform atom " << at;
-    throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
   }
   //END Forces
 
@@ -721,10 +716,9 @@ namespace apl {
     } while ((num_iter <= max_iter) && (max_err > sumrule_threshold));
     pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "End SCF for anharmonic force constants.", directory, *p_FileMESSAGE, *p_oss);
     if (num_iter > max_iter) {
-      string function_name = XPID + _AAPL_IFCS_ERR_PREFIX_ + "symmetrizeIFCs";
       stringstream message;
       message << "Anharmonic force constants did not converge within " << max_iter << " iterations.";
-      throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+      throw xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
     } else {
       return ifcs;
     }
@@ -997,9 +991,8 @@ namespace apl {
     output << "</anharmonicifcs>" << std::endl;
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
-      string function_name = XPID + _AAPL_IFCS_ERR_PREFIX_ + "writeIFCsToFile";
       string message = "Could not write tensor to file.";
-      throw xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
+      throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_ERROR_);
     }
   }
 

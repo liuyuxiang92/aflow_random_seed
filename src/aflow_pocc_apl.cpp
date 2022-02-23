@@ -25,17 +25,16 @@ static const double _FREQ_WARNING_THRESHOLD_ = 1e-3;
 namespace pocc {
 
   void POccCalculator::calculatePhononPropertiesAPL(const vector<double>& v_temperatures) {
-    string function_name = XPID + "POccCalculator::calculatePhononProperties()";
     stringstream message;
     // Make sure that everything is consistent
     uint nruns = m_ARUN_directories.size();
     if (nruns == 0) {
       message << "Number of ARUN directories is zero.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
     }
     if (l_supercell_sets.size() != nruns) {
       message << "Number of directories and number of supercells are different.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
     }
 
     vector<int> vexclude;
@@ -71,7 +70,7 @@ namespace pocc {
         return;
       } else {
         message << "No phonon DOSCARs calculated.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
       }
     }
     vphcalc.clear();
@@ -92,7 +91,7 @@ namespace pocc {
     aurostd::stringstream2file(phposcar, phposcar_file);
     if (!aurostd::FileExist(phposcar_file)) {
       message << "Could not write file " << phposcar_file << ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_ERROR_);
     }
 
     uint nexclude = vexclude.size();
@@ -150,7 +149,7 @@ namespace pocc {
       aurostd::stringstream2file(phdoscar, filename);
       if (!aurostd::FileExist(filename)) {
         message << "Could not write file " << filename << ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_ERROR_);
       }
 
       tpc.clear();
@@ -169,7 +168,7 @@ namespace pocc {
       aurostd::stringstream2file(aplout, filename);
       if (!aurostd::FileExist(filename)) {
         message << "Cannot open output file " << filename << ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_ERROR_);
       }
     }
 
@@ -188,7 +187,6 @@ namespace pocc {
   }
 
   vector<apl::PhononCalculator> POccCalculator::initializePhononCalculators() {
-    string function_name = XPID + "POccCalculator::initializePhononCalculators()";
     string message = "Initializing phonon calculators.";
     pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, m_aflags, *p_FileMESSAGE, *p_oss);
 
@@ -205,7 +203,7 @@ namespace pocc {
       string statefile = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_STATE_FILE);
       if (!aurostd::EFileExist(statefile)) {
         message = "Cannot find state file in directory " + directory + ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_NOT_FOUND_);
       }
 
       // Initialize phonon calculator
@@ -248,7 +246,7 @@ namespace pocc {
           phcalc.setHarmonicForceConstants(fccalc);
         } else {
           message = "Could not calculate harmonic force constants for directory " + directory + ".";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
         }
       }
 
@@ -260,7 +258,6 @@ namespace pocc {
   }
 
   vector<xDOSCAR> POccCalculator::getPhononDoscars(vector<apl::PhononCalculator>& vphcalc, xoption& aplopts, vector<int>& vexclude) {
-    string function_name = XPID + "POccCalculator::getPhononDoscars()";
     string message = "Calculating phonon densities of states.";
     pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, m_aflags, *p_FileMESSAGE, *p_oss);
 
@@ -327,7 +324,6 @@ namespace pocc {
       const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos)
 #endif
       {
-    string function_name = XPID + "POccCalculator::getPhononDoscars()";
 
     // Normalize to number of branches in the parent structure
     double pocc_sum = aurostd::sum(xstr_pocc.comp_each_type);  // Will be needed for projections
@@ -388,7 +384,6 @@ namespace pocc {
   }
 
   xDOSCAR POccCalculator::getAveragePhononDos(double T, const vector<xDOSCAR>& vxdos) {
-    string function_name = XPID + "POccCalculator::getAveragePhononDos()";
     stringstream message;
     xDOSCAR xdos;
 
@@ -438,7 +433,7 @@ namespace pocc {
             }
           }
         }
-        if (mismatch) throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+        if (mismatch) throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
       }
       uint nat = xdos.vDOS.size();
       uint nproj = xdos.vDOS[0].size();

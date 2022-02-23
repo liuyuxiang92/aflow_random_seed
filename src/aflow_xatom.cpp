@@ -965,9 +965,8 @@ double GetPearsonCoefficient(const string& symbol) {
     }
   }
   // If not found throw xerror
-  string function_name = XPID + "GetPearsonCoefficient():";
   string message = symbol + " is not a valid element name or symbol.";
-  throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _VALUE_ILLEGAL_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _VALUE_ILLEGAL_);
 }
 
 double GetPearsonCoefficient(const int& iat) {
@@ -1245,7 +1244,6 @@ vector<uint> getAtomIndicesByType(const xstructure& xstr, int type) {
 
   // Get the atom indices of a given type from an xstructure
 
-  string function_name = XPID + "getAtomIndicesByType():";
   stringstream message;
 
   uint natoms = xstr.atoms.size();
@@ -1257,7 +1255,7 @@ vector<uint> getAtomIndicesByType(const xstructure& xstr, int type) {
 
   if(indices_atoms_subset.size() == 0){
     message << "No atoms found with type = " << type << ". Check structure.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_RUNTIME_ERROR_);
   }
 
   return indices_atoms_subset;
@@ -1270,7 +1268,6 @@ vector<uint> getAtomIndicesByName(const xstructure& xstr, const string& name) {
 
   // Get the atom indices of a given name/species from an xstructure
 
-  string function_name = XPID + "getAtomIndicesByName():";
   stringstream message;
 
   uint natoms = xstr.atoms.size();
@@ -1283,7 +1280,7 @@ vector<uint> getAtomIndicesByName(const xstructure& xstr, const string& name) {
 
   if(indices_atoms_subset.size() == 0){
     message << "No atoms found with name = " << name << " (note, using name_clean=" << name_clean << "). Check structure.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_RUNTIME_ERROR_);
   }
 
   return indices_atoms_subset;
@@ -1362,7 +1359,6 @@ vector<string> xstructure::GetElements(bool clean_name, bool fake_names){
   // Note: GetElementsFromAtomNames() updates the xstructure
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string function_name = XPID + "xstructure::GetElements():";
 
   // ---------------------------------------------------------------------------
   // 1) try xstructure.species
@@ -1384,12 +1380,12 @@ vector<string> xstructure::GetElements(bool clean_name, bool fake_names){
   // ---------------------------------------------------------------------------
   // 3) if all are empty, decorate with fake elements (optional)
   else if (atoms[0].name.empty() && fake_names){
-    if(LDEBUG) {cerr << function_name << " WARNING: Atoms are not labeled, assigning fake names." << endl;}
+    if(LDEBUG) {cerr << __func__ << " WARNING: Atoms are not labeled, assigning fake names." << endl;}
     DecorateWithFakeElements();
     return aurostd::deque2vector(species);
   }
 
-  throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, "There are no element names in the structure.",_RUNTIME_ERROR_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, "There are no element names in the structure.",_RUNTIME_ERROR_);
 }
 
 // **************************************************************************
@@ -1399,7 +1395,6 @@ vector<string> xstructure::GetElementsFromAtomNames(bool clean_name){
 
   // Extracts the species from the atom names
 
-  string function_name = XPID + "xstructure::GetSpeciesFromAtomName():";
 
   vector<string> species;
   if(atoms.size()==0){ return species; }
@@ -1415,7 +1410,7 @@ vector<string> xstructure::GetElementsFromAtomNames(bool clean_name){
         stringstream message;
         message << "The number of each type and atom names do not agree." << endl;
         message << (*this) << endl;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_VALUE_ERROR_);
       }
       iat++;
     }
@@ -1430,7 +1425,6 @@ vector<string> xstructure::GetElementsFromAtomNames(bool clean_name){
 // **************************************************************************
 vector<uint> xstructure::GetReducedComposition(bool numerical_sort){
 
-  string function_name = XPID + "xstructure::GetReducedComposition():";
 
   vector<uint> composition;
   for(uint i=0;i<num_each_type.size();i++){composition.push_back((uint)num_each_type[i]);}
@@ -7097,14 +7091,13 @@ xstructure GetStructure(const int& iomode,const string& Directory) {
 // **************************************************************************
 // change coordinates type
 void xstructure::SetCoordinates(int mode)  {
-  string function_name = XPID + "xstructure::SetCoordinates():";
   switch(mode) {
     case _UPDATE_LATTICE_VECTORS_TO_ABCANGLES_ : {
-                                                   throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"[1] mode="+aurostd::utype2string(mode),_INPUT_ERROR_);
+                                                   throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,"[1] mode="+aurostd::utype2string(mode),_INPUT_ERROR_);
                                                    break;
                                                  }
     case _UPDATE_LATTICE_ABCANGLES_TO_VECTORS_ : {
-                                                   throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"[2] mode="+aurostd::utype2string(mode),_INPUT_ERROR_);
+                                                   throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,"[2] mode="+aurostd::utype2string(mode),_INPUT_ERROR_);
                                                    break;
                                                  }
     case _COORDS_CARTESIAN_ : {
@@ -7118,7 +7111,7 @@ void xstructure::SetCoordinates(int mode)  {
                                  break;
                                }
     default: {
-               cerr << function_name << " NOTHING TO DO  mode=" << mode << endl;
+               cerr << __func__ << " NOTHING TO DO  mode=" << mode << endl;
              }
   }
 }
@@ -7144,13 +7137,12 @@ void xstructure::MakeTypes(void) {
   // need to update TYPES based on num_each_type
   // type is usually used as an index for species
   // if we take a subset of atoms from another structure (POCC), need to reset first iatom to 0
-  string function_name = XPID + "xstructure::MakeTypes():";
   stringstream message;
   uint sum_atoms=0;
   for(uint itype=0;itype<num_each_type.size();itype++){sum_atoms+=num_each_type[itype];}
   if(sum_atoms!=atoms.size()){
     message << "num_each_type does not match atom count (sum_atoms=" << sum_atoms << " vs. atoms.size()=" << atoms.size() << ").";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_VALUE_ERROR_);
   }
 
   uint iat=0;
@@ -7554,12 +7546,11 @@ void xstructure::AddCorners(void) {
 // **************************************************************************
 // // Shift the origin to atom(iat)
 void xstructure::ShiftOriginToAtom(const int& iat) {
-  string function_name = XPID + "xstructure::ShiftOriginToAtom():";
   stringstream message;
   //DX+CO START
   if(iat<0 || iat>=(int)atoms.size()) {
     message << "iat=" << iat << " out of boundaries (0," << atoms.size()-1 << ").";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_INPUT_ILLEGAL_);
   }
   xvector<double> frigin(3);
   origin=atoms[iat].cpos;
@@ -9717,9 +9708,8 @@ string GetSpaceGroupLabel(int spacegroupnumber) {
 xmatrix<double> MetricTensor(const xstructure& a) {return MetricTensor(a.lattice,a.scale);}
 
 xmatrix<double> MetricTensor(const xmatrix<double>& lattice,double scale) {
-  string function_name = XPID + "MetricTensor():";
   if(lattice.rows!=lattice.cols){
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Dimension mismatch, should be square lattice matrix.",_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,"Dimension mismatch, should be square lattice matrix.",_VALUE_ILLEGAL_);
   }
   xmatrix<double> metric_tensor(lattice.rows,lattice.cols);
   for(int i=lattice.lrows;i<=lattice.urows;i++){ //CO20190520
@@ -9974,7 +9964,7 @@ int GetNBANDS(int electrons,int nions,int spineach,bool ispin,int NPAR) {
     out*=std::pow((double) nions,(double) 0.06);  //ME20191028 - prior scaling factor not sufficient for supercells
   }
   //  cerr << "GetNBANDS=" << out << endl;
-  // throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
+  // throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,"Throw for debugging purposes.",_GENERIC_ERROR_);
   int nbands=(int)ceil(out);
   //CO20210315 START - adjust for NPAR
   if(NPAR>0){
@@ -10059,12 +10049,11 @@ double GetCellAtomZVAL(const string& directory,vector<double>& vZVAL,vector<doub
 // ***************************************************************************
 // Given the ZVAL of each species, it returns total ZVAL of cell
 double xstructure::GetZVAL(const vector<double>& vZVAL) {
-  string function_name = XPID + "xstructure::GetZVAL():";
   stringstream message;
   if(num_each_type.size()!=vZVAL.size()) {
     message << "num_each_type.size()=" << num_each_type.size() << endl;
     message << "vZVAL.size()=" << vZVAL.size() << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_INPUT_ILLEGAL_);
   }
   double CellZVAL=0.0;
   for(uint i=0;i<vZVAL.size();i++)  
@@ -10147,12 +10136,11 @@ double GetCellAtomPOMASS(const string& directory,vector<double>& vPOMASS,vector<
 // ***************************************************************************
 // Given the POMASS of each species, it returns total POMASS of cell
 double xstructure::GetPOMASS(const vector<double>& vPOMASS) {
-  string function_name = XPID + "xstructure::GetPOMASS():";
   stringstream message;
   if(num_each_type.size()!=vPOMASS.size()) {
     message << "num_each_type.size()=" << num_each_type.size() << endl;
     message << "vPOMASS.size()=" << vPOMASS.size() << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_INPUT_ILLEGAL_);
   }
   double CellPOMASS=0.0;
   for(uint i=0;i<vPOMASS.size();i++)  
@@ -10304,7 +10292,6 @@ xvector<double> Sortabc_angles(const xmatrix<double>& lat,int mode) {        // 
 // Dane Morgan, adjusted by SC
 
 xmatrix<double> GetClat(const xvector<double>& abc_angles) {   // AFLOW_FUNCTION_IMPLEMENTATION
-  string function_name = XPID + "GetClat():";
   stringstream message;
   xmatrix<double> clattice(3,3);
   double a=abc_angles[1];
@@ -10313,7 +10300,7 @@ xmatrix<double> GetClat(const xvector<double>& abc_angles) {   // AFLOW_FUNCTION
   double bc= abc_angles[4]*deg2rad; // angle from b to c (remove a)
   double ca= abc_angles[5]*deg2rad; // angle from c to a (remove b)
   double ab= abc_angles[6]*deg2rad; // angle from a to b (remove c)
-  //  if(abs(bc)>6.3||abs(ca)>6.3||abs(ab)>6.3) { cerr << _AUROSTD_XLIBS_ERROR_ << "GetClat: angles must be in RADIANT " << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);}
+  //  if(abs(bc)>6.3||abs(ca)>6.3||abs(ab)>6.3) { cerr << _AUROSTD_XLIBS_ERROR_ << "GetClat: angles must be in RADIANT " << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,"Throw for debugging purposes.",_GENERIC_ERROR_);}
   clattice(1,1)=a;
   clattice(2,1)=b*cos(ab);
   clattice(2,2)=b*sin(ab);
@@ -10323,7 +10310,7 @@ xmatrix<double> GetClat(const xvector<double>& abc_angles) {   // AFLOW_FUNCTION
     message <<"gamma = " << ab << endl;
     message <<"STOPPING "<< endl;
     message << _AUROSTD_XLIBS_ERROR_ << "ERROR: STOPPING " << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_INPUT_ILLEGAL_);
   }
   clattice(3,2)=c*(cos(bc)-cos(ab)*cos(ca))/sin(ab);
   clattice(3,3)=sqrt(abs(c*c-clattice(3,2)*clattice(3,2)-clattice(3,1)*clattice(3,1)));
@@ -10331,13 +10318,12 @@ xmatrix<double> GetClat(const xvector<double>& abc_angles) {   // AFLOW_FUNCTION
 }
 
 xmatrix<double> GetClat(const double &a,const double &b,const double &c,const double &alpha,const double &beta,const double &gamma) {
-  string function_name = XPID + "GetClat():";
   stringstream message;
   xmatrix<double> clattice(3,3);
   double bc= alpha*deg2rad; // angle from b to c (remove a)
   double ca= beta*deg2rad; // angle from c to a (remove b)
   double ab= gamma*deg2rad; // angle from a to b (remove c)
-  //  if(abs(bc)>6.3||abs(ca)>6.3||abs(ab)>6.3) { cerr << _AUROSTD_XLIBS_ERROR_ << "GetClat: angles must be in RADIANT " << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);}
+  //  if(abs(bc)>6.3||abs(ca)>6.3||abs(ab)>6.3) { cerr << _AUROSTD_XLIBS_ERROR_ << "GetClat: angles must be in RADIANT " << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,"Throw for debugging purposes.",_GENERIC_ERROR_);}
   clattice(1,1)=a;
   clattice(2,1)=b*cos(ab);
   clattice(2,2)=b*sin(ab);
@@ -10347,7 +10333,7 @@ xmatrix<double> GetClat(const double &a,const double &b,const double &c,const do
     message <<"gamma = " << ab << endl;
     message <<"STOPPING "<< endl;
     message << _AUROSTD_XLIBS_ERROR_ << "ERROR: STOPPING " << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_INPUT_ILLEGAL_);
   }
   clattice(3,2)=c*(cos(bc)-cos(ab)*cos(ca))/sin(ab);
   clattice(3,3)=sqrt(abs(c*c-clattice(3,2)*clattice(3,2)-clattice(3,1)*clattice(3,1)));
@@ -10363,7 +10349,6 @@ xmatrix<double> GetClat(const double &a,const double &b,const double &c,const do
 // structures are all set to 1.
 
 xstructure GetIntpolStr(xstructure strA, xstructure strB, const double& f,const string& path_flag) {
-  string function_name = XPID + "GetIntpolStr():";
   strA=ReScale(strA,1.0);
   strB=ReScale(strB,1.0);
   // Get new lattice params.
@@ -10377,7 +10362,7 @@ xstructure GetIntpolStr(xstructure strA, xstructure strB, const double& f,const 
   }
   // Get new cart. coords.
   if(strA.atoms.size()!=strB.atoms.size()) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,_AUROSTD_XLIBS_ERROR_+" number of atoms must be the same in both structures!!",_INPUT_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,_AUROSTD_XLIBS_ERROR_+" number of atoms must be the same in both structures!!",_INPUT_ILLEGAL_);
   }
   int size=strA.atoms.size();
   vector<xvector<double> > cposi(size,3);
@@ -10724,7 +10709,6 @@ void xstructure::GetLatticeType(double sym_eps, bool no_scan) {
 void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc, double sym_eps, bool no_scan) {
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string function_name = XPID + "xstructure::GetLatticeType():";
 
   // ---------------------------------------------------------------------------
   // set symmetry tolerance based on the following sequence
@@ -10734,7 +10718,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc, double sy
     if((*this).sym_eps_calculated){ tolerance = (*this).sym_eps; }
     else{ tolerance=SYM::defaultTolerance((*this)); }
   }
-  if(LDEBUG){ cerr << function_name << " [1] Set symmetry tolerance (starting sym_eps=" << tolerance << ")" << endl; }
+  if(LDEBUG){ cerr << __func__ << " [1] Set symmetry tolerance (starting sym_eps=" << tolerance << ")" << endl; }
 
   // keep track of self-consistent tolerance
   bool same_eps = false;
@@ -10760,7 +10744,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc, double sy
     tolerance = (*this).sym_eps;
     no_scan = (*this).sym_eps_no_scan;
 
-    if(LDEBUG){ cerr << function_name << " [2] Top of self-consistent lattice-type loop (calculating real, reciprocal, and superlattice types) (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+    if(LDEBUG){ cerr << __func__ << " [2] Top of self-consistent lattice-type loop (calculating real, reciprocal, and superlattice types) (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
 
     // ---------------------------------------------------------------------------
     // check if consistency checks failed (maxed while loop iteration)
@@ -10768,24 +10752,24 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc, double sy
     if(count==count_max){
       no_scan=(*this).sym_eps_no_scan=true;
       tolerance = tolerance_orig; // set to original tolerance //DX20210623 - originally sym_eps, but this could be AUROSTD_MAX_DOUBLE;
-      cerr << function_name << " Unable to calculate consistent symmetry. Calculating at original tolerance (sym_eps=" << sym_eps << ") and ignoring consistency checks." << endl;
+      cerr << __func__ << " Unable to calculate consistent symmetry. Calculating at original tolerance (sym_eps=" << sym_eps << ") and ignoring consistency checks." << endl;
     }
 
     // ---------------------------------------------------------------------------
     // REAL - pass in str_sp and str_sc to keep primitive and conventional info
-    if(LDEBUG){ cerr << function_name << " [3] Calculate real lattice type (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+    if(LDEBUG){ cerr << __func__ << " [3] Calculate real lattice type (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
     (*this).GetRealLatticeType(str_sp, str_sc, tolerance);
     tolerance = (*this).sym_eps; // update the tolerance
 
     // ---------------------------------------------------------------------------
     // RECIPROCAL
-    if(LDEBUG){ cerr << function_name << " [4] Calculate reciprocal lattice type (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+    if(LDEBUG){ cerr << __func__ << " [4] Calculate reciprocal lattice type (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
     (*this).GetReciprocalLatticeType(tolerance);
     if(!no_scan && (*this).sym_eps != tolerance){ continue; } // if tolerance changed, recalc
 
     // ---------------------------------------------------------------------------
     // SUPERLATTICE
-    if(LDEBUG){ cerr << function_name << " [5] Calculate superlattice type (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+    if(LDEBUG){ cerr << __func__ << " [5] Calculate superlattice type (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
     (*this).GetSuperlatticeType(tolerance);
     if(!no_scan && (*this).sym_eps != tolerance){ continue; } // if tolerance changed, recalc
 
@@ -10793,7 +10777,7 @@ void xstructure::GetLatticeType(xstructure& str_sp,xstructure& str_sc, double sy
     same_eps = true;
   }
 
-  if(LDEBUG){ cerr << function_name << " [6] Lattice types calculation finished! (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+  if(LDEBUG){ cerr << __func__ << " [6] Lattice types calculation finished! (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
 
 }
 
@@ -10968,7 +10952,6 @@ void xstructure::GetExtendedCrystallographicData(xstructure& str_sp,
     int setting) {
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string function_name = XPID + "xstructure::GetExtendedCrystallographicData():";
 
   // ---------------------------------------------------------------------------
   // set symmetry tolerance based on the following sequence
@@ -10978,7 +10961,7 @@ void xstructure::GetExtendedCrystallographicData(xstructure& str_sp,
     if((*this).sym_eps_calculated){ tolerance = (*this).sym_eps; }
     else{ tolerance=SYM::defaultTolerance((*this)); }
   }
-  if(LDEBUG){ cerr << function_name << " [1] Set symmetry tolerance (starting sym_eps=" << tolerance << ")" << endl; }
+  if(LDEBUG){ cerr << __func__ << " [1] Set symmetry tolerance (starting sym_eps=" << tolerance << ")" << endl; }
 
   // keep track of self-consistent tolerance
   bool force_perform = true;
@@ -11005,7 +10988,7 @@ void xstructure::GetExtendedCrystallographicData(xstructure& str_sp,
     tolerance = (*this).sym_eps;
     no_scan = (*this).sym_eps_no_scan;
 
-    if(LDEBUG){ cerr << function_name << " [2] Top of self-consistent extended crystallographic data loop (calculating lattice type and space group data) (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+    if(LDEBUG){ cerr << __func__ << " [2] Top of self-consistent extended crystallographic data loop (calculating lattice type and space group data) (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
 
     // ---------------------------------------------------------------------------
     // check if consistency checks failed (maxed while loop iteration)
@@ -11013,18 +10996,18 @@ void xstructure::GetExtendedCrystallographicData(xstructure& str_sp,
     if(count==count_max){
       no_scan=(*this).sym_eps_no_scan=true;
       tolerance = tolerance_orig; // set to original tolerance //DX20210623 - originally sym_eps, but this could be AUROSTD_MAX_DOUBLE;
-      cerr << function_name << " Unable to calculate consistent symmetry. Calculating at original tolerance (sym_eps=" << sym_eps << ") and ignoring consistency checks." << endl;
+      cerr << __func__ << " Unable to calculate consistent symmetry. Calculating at original tolerance (sym_eps=" << sym_eps << ") and ignoring consistency checks." << endl;
     }
 
     // ---------------------------------------------------------------------------
     // REAL, RECIPROCAL, and SUPERLATTICE data
-    if(LDEBUG){ cerr << function_name << " [3] Calculate real, reciprocal, and superlattice information (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+    if(LDEBUG){ cerr << __func__ << " [3] Calculate real, reciprocal, and superlattice information (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
     (*this).GetLatticeType(str_sp, str_sc, (*this).sym_eps);
     tolerance = (*this).sym_eps; // update the tolerance
 
     // ---------------------------------------------------------------------------
     // space group data
-    if(LDEBUG){ cerr << function_name << " [4] Calculate the space group symmetry information (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
+    if(LDEBUG){ cerr << __func__ << " [4] Calculate the space group symmetry information (sym_eps=" << tolerance << ", sym_eps_change_count=" << (*this).sym_eps_change_count << ")" << endl; }
     (*this).SpaceGroup_ITC(tolerance, -1, setting, no_scan);
     if(!no_scan && (*this).sym_eps != tolerance){ continue; } // if tolerance changed, recalc
 
@@ -11037,12 +11020,12 @@ void xstructure::GetExtendedCrystallographicData(xstructure& str_sp,
       string lattice_and_centering_from_sg = SYM::spacegroup2latticeAndCentering((*this).space_group_ITC); //DX20210412 - check centering
       if(!(lattice_and_centering == lattice_and_centering_from_sg && SYM::ComparePointGroupAndSpaceGroupString((*this),multiplicity_of_primitive,derivative_structure))){
         if(LDEBUG) {
-          cerr << function_name << " WARNING: Space group symbol and point group symbol do not match. (sg=" << GetSpaceGroupName((*this).space_group_ITC,(*this).directory) << ", centering_sg=" << lattice_and_centering_from_sg << " | pg=" << (*this).point_group_Hermann_Mauguin << ", centering=" << lattice_and_centering << ") [dir=" << (*this).directory << "]" << endl;
+          cerr << __func__ << " WARNING: Space group symbol and point group symbol do not match. (sg=" << GetSpaceGroupName((*this).space_group_ITC,(*this).directory) << ", centering_sg=" << lattice_and_centering_from_sg << " | pg=" << (*this).point_group_Hermann_Mauguin << ", centering=" << lattice_and_centering << ") [dir=" << (*this).directory << "]" << endl;
         }
         if(!SYM::change_tolerance((*this),(*this).sym_eps,(*this).dist_nn_min,(*this).sym_eps_no_scan)){
           if(force_perform){
             if(LDEBUG) {
-              cerr << function_name << " WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << (*this).directory << endl;
+              cerr << __func__ << " WARNING: Scan failed. Reverting back to original tolerance and recalculating as is (with aforementioned inconsistencies)." << (*this).directory << endl;
             }
             no_scan = (*this).sym_eps_no_scan = true; //DX20210331
             (*this).sym_eps = tolerance_orig; // set to original tolerance //DX20210623 - originally sym_eps, but this could be AUROSTD_MAX_DOUBLE;
@@ -11056,7 +11039,7 @@ void xstructure::GetExtendedCrystallographicData(xstructure& str_sp,
     same_eps = true;
   }
 
-  if(LDEBUG){ cerr << function_name << " [5] Extended crystallographic data calculation finished! (sym_eps=" << tolerance << ", sym_eps_change_count=" << count << ")" << endl; }
+  if(LDEBUG){ cerr << __func__ << " [5] Extended crystallographic data calculation finished! (sym_eps=" << tolerance << ", sym_eps_change_count=" << count << ")" << endl; }
 
 }
 
@@ -11073,7 +11056,6 @@ void xstructure::GetRealLatticeType(double sym_eps) {
 void xstructure::GetRealLatticeType(xstructure& str_sp,xstructure& str_sc, double sym_eps) {
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string function_name = XPID + "xstructure::GetRealLatticeType():";
 
   // ---------------------------------------------------------------------------
   // set symmetry tolerance based on the following sequence
@@ -11083,7 +11065,7 @@ void xstructure::GetRealLatticeType(xstructure& str_sp,xstructure& str_sc, doubl
     if((*this).sym_eps_calculated){ tolerance = (*this).sym_eps; }
     else{ tolerance=SYM::defaultTolerance((*this)); }
   }
-  if(LDEBUG){ cerr << function_name << " [1] Set symmetry tolerance (starting sym_eps=" << tolerance << ")" << endl; }
+  if(LDEBUG){ cerr << __func__ << " [1] Set symmetry tolerance (starting sym_eps=" << tolerance << ")" << endl; }
 
   // need to create a copy
   xstructure str_in=*this;
@@ -11095,11 +11077,11 @@ void xstructure::GetRealLatticeType(xstructure& str_sp,xstructure& str_sc, doubl
   str_in.sym_eps_no_scan=str_sp.sym_eps_no_scan=str_sc.sym_eps_no_scan=(*this).sym_eps_no_scan; //DX20210430
 
   // calculate
-  if(LDEBUG){ cerr << function_name << " [2]" << endl; }
+  if(LDEBUG){ cerr << __func__ << " [2]" << endl; }
   LATTICE::Bravais_Lattice_StructureDefault(str_in,str_sp,str_sc); // STD tolerance  // ONLY BRAVAIS_CRYSTAL
 
   // set properties
-  if(LDEBUG){ cerr << function_name << " [3]" << endl; }
+  if(LDEBUG){ cerr << __func__ << " [3]" << endl; }
   if(str_sp.pgroup_calculated==FALSE) str_sp.CalculateSymmetryPointGroup(FALSE);// cerr << "POINT GROUP" << endl;
   if(str_sp.fgroup_calculated==FALSE) str_sp.CalculateSymmetryFactorGroup(FALSE); //cerr << "FACTOR GROUP" << endl;
   if(str_sp.pgroup_xtal_calculated==FALSE) str_sp.CalculateSymmetryPointGroupCrystal(FALSE); //cerr << "POINT GROUP XTAL" << endl;
@@ -11125,7 +11107,7 @@ void xstructure::GetRealLatticeType(xstructure& str_sp,xstructure& str_sc, doubl
   this->point_group_type=str_sp.point_group_type;
   this->point_group_order=str_sp.point_group_order;
   this->point_group_structure=str_sp.point_group_structure;
-  if(LDEBUG){ cerr << function_name << " [4] DONE" << endl; }
+  if(LDEBUG){ cerr << __func__ << " [4] DONE" << endl; }
 
   // update sym_eps
   this->sym_eps=str_in.sym_eps=str_sc.sym_eps=str_sp.sym_eps; //DX
@@ -11148,7 +11130,6 @@ void xstructure::GetReciprocalLatticeType(double sym_eps) {
 void xstructure::GetReciprocalLatticeType(xstructure& str_sp,xstructure& str_sc, double sym_eps) {
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string function_name = XPID + "xstructure::GetReciprocalLatticeType():";
 
   // ---------------------------------------------------------------------------
   // set symmetry tolerance based on the following sequence
@@ -11158,7 +11139,7 @@ void xstructure::GetReciprocalLatticeType(xstructure& str_sp,xstructure& str_sc,
     if((*this).sym_eps_calculated){ tolerance = (*this).sym_eps; }
     else{ tolerance=SYM::defaultTolerance((*this)); }
   }
-  if(LDEBUG){ cerr << function_name << " [1] Set symmetry tolerance (starting sym_eps=" << tolerance << ")" << endl; }
+  if(LDEBUG){ cerr << __func__ << " [1] Set symmetry tolerance (starting sym_eps=" << tolerance << ")" << endl; }
 
   // ---------------------------------------------------------------------------
   // RECIPROCAL - use klattice an one atom (at the origin)
@@ -11172,7 +11153,7 @@ void xstructure::GetReciprocalLatticeType(xstructure& str_sp,xstructure& str_sc,
   str_in.sym_eps_change_count=str_sp.sym_eps_change_count=str_sc.sym_eps_change_count=(*this).sym_eps_change_count;
   str_in.sym_eps_no_scan=str_sp.sym_eps_no_scan=str_sc.sym_eps_no_scan=(*this).sym_eps_no_scan; //DX20210430 - added no_scan
 
-  if(LDEBUG){ cerr << function_name << " [1]" << endl; }
+  if(LDEBUG){ cerr << __func__ << " [1]" << endl; }
   //DX20170814 START - Use real pgroup to calculate pgroupk and then set pgroupk from str_sp to the pgroup and pgroup_xtal of str_reciprocal_in
   //DX20170814 The pgroup and pgroup_xtal are the same for the str_reciprocal structure because there is only one atom at the origin
   //DX20170814 (i.e. lattice and crystal symmetry are the same for the reciprocal space crystal)
@@ -11188,7 +11169,7 @@ void xstructure::GetReciprocalLatticeType(xstructure& str_sp,xstructure& str_sc,
 
   this->reciprocal_lattice_type=str_sp.bravais_lattice_type;
   this->reciprocal_lattice_variation_type=str_sp.bravais_lattice_variation_type;
-  if(LDEBUG){ cerr << function_name << " [2]" << endl; }
+  if(LDEBUG){ cerr << __func__ << " [2]" << endl; }
 
   // update sym_eps
   this->sym_eps=str_in.sym_eps=str_sc.sym_eps=str_sp.sym_eps; //DX
@@ -11210,7 +11191,6 @@ void xstructure::GetSuperlatticeType(double sym_eps) {
 void xstructure::GetSuperlatticeType(xstructure& str_sp,xstructure& str_sc, double sym_eps) {
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string function_name = XPID + "xstructure::GetSuperlatticeType():";
 
   // ---------------------------------------------------------------------------
   // set symmetry tolerance based on the following sequence
@@ -11220,33 +11200,33 @@ void xstructure::GetSuperlatticeType(xstructure& str_sp,xstructure& str_sc, doub
     if((*this).sym_eps_calculated){ tolerance = (*this).sym_eps; }
     else{ tolerance=SYM::defaultTolerance((*this)); }
   }
-  if(LDEBUG){ cerr << function_name << " [1] Set symmetry tolerance (starting sym_eps=" << tolerance << ")" << endl; }
+  if(LDEBUG){ cerr << __func__ << " [1] Set symmetry tolerance (starting sym_eps=" << tolerance << ")" << endl; }
 
   // ---------------------------------------------------------------------------
   // SUPERLATTICE - decorate with single atom type
   xstructure str_in=*this;
   str_in.ClearSymmetry();  // need to clear symmetry; otherwise, nothing is calculated
   if(LDEBUG){
-    cerr << function_name << " [1]" << endl;
+    cerr << __func__ << " [1]" << endl;
     cerr << str_in << endl;
   }
   // decorate with single atom type
   str_in.IdenticalAtoms();  // make superlattice
   if(LDEBUG){
-    cerr << function_name << " [2]" << endl;
+    cerr << __func__ << " [2]" << endl;
     cerr << str_in << endl;
   }
   // primitivize
   str_in.GetPrimitive(); //DX20210430 - remove obsolete eps=0.005
   if(LDEBUG){
-    cerr << function_name << " [3]" << endl;
+    cerr << __func__ << " [3]" << endl;
     cerr << str_in << endl;
   }
   // Minkowski
   str_in.Minkowski_calculated=FALSE;
   str_in.MinkowskiBasisReduction();
   if(LDEBUG){
-    cerr << function_name << " [4]" << endl;
+    cerr << __func__ << " [4]" << endl;
     cerr << str_in << endl;
   }
 
@@ -11265,7 +11245,7 @@ void xstructure::GetSuperlatticeType(xstructure& str_sp,xstructure& str_sc, doub
   this->bravais_superlattice_system=str_sp.bravais_lattice_system;
   this->pearson_symbol_superlattice=str_sp.pearson_symbol;
 
-  if(LDEBUG){ cerr << function_name << " [6] DONE" << endl; }
+  if(LDEBUG){ cerr << __func__ << " [6] DONE" << endl; }
 
   // update sym_eps
   this->sym_eps=str_in.sym_eps=str_sc.sym_eps=str_sp.sym_eps; //DX
@@ -11474,7 +11454,6 @@ void xstructure::SpeciesSwap(const uint& specieA,const uint& specieB) {
 // ***************************************************************************
 // Tell if two species are alphabetic!  Stefano Curtarolo Nov 2008
 bool xstructure::SpeciesGetAlphabetic(void) {
-  string function_name = XPID + "xstructure::SpeciesGetAlphabetic():";
   stringstream message;
   if(num_each_type.size()!=species.size()) {
     message << "num_each_type.size()!=species.size()   ("<<num_each_type.size()<<","<<species.size()<<")" << endl;
@@ -11483,7 +11462,7 @@ bool xstructure::SpeciesGetAlphabetic(void) {
     message << "species_pp.size()="<<species_pp.size()<< ": "; for(uint i=0;i<species_pp.size();i++) message << species_pp.at(i) << " "; message << endl;
     message << "species_volume.size()="<<species_volume.size()<< ": "; for(uint i=0;i<species_volume.size();i++) message << species_volume.at(i) << " "; message << endl;
     message << "species_mass.size()="<<species_mass.size()<< ": "; for(uint i=0;i<species_mass.size();i++) message << species_mass.at(i) << " "; message << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_RANGE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_VALUE_RANGE_);
   }
   // some useful checks
   if(species.size()==0) return TRUE; // empty structures are always alphabetic
@@ -11504,11 +11483,10 @@ bool xstructure::SpeciesGetAlphabetic(void) {
 // ***************************************************************************
 // Tell if two species are alphabetic!  Stefano Curtarolo Nov 2008
 bool xstructure::SpeciesPutAlphabetic(void) {
-  string function_name = XPID + "xstructure::SpeciesPutAlphabetic():";
   stringstream message;
   if(num_each_type.size()!=species.size()) {
     message << "num_each_type.size()!=species.size()   ("<<num_each_type.size()<<","<<species.size()<<")";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_RANGE_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_VALUE_RANGE_);
   }
   // some useful checks
   if(species.size()==0) return TRUE; // empty structures are always alphabetic
@@ -12613,16 +12591,14 @@ xstructure GetPrimitiveVASP(const xstructure& a,double tol) {
 // double (change in place)
 void BringInCellInPlace(double& component, double tolerance, double upper_bound, double lower_bound) {
   if (component == INFINITY || component != component || component == -INFINITY) {
-    string function_name = XPID + "BringInCellInPlace()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component << ").";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_); //DX20190905 - replaced cerr with throw
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_VALUE_ERROR_); //DX20190905 - replaced cerr with throw
   }
   if (std::signbit(tolerance)) { //DX20191115 
-    string function_name = XPID + "BringInCellInPlace()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Sign of tolerance is negative (tolerance=" << tolerance << ").";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_INPUT_ERROR_);
   }
   while (component - upper_bound >= -tolerance){ component -= 1.0; } //note: non-symmetric, favors values closer to lower bound
   while (component - lower_bound < -tolerance){ component += 1.0; }
@@ -12662,16 +12638,14 @@ void BringInCellInPlace(xstructure& xstr, double tolerance, double upper_bound, 
 double BringInCell(double component_in, double tolerance, double upper_bound, double lower_bound) {
   double component_out = component_in;
   if (component_out == INFINITY || component_out != component_out || component_out == -INFINITY) {
-    string function_name = XPID + "BringInCell()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component_out << ").";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ERROR_); //DX20190905 - replaced cerr with throw
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_VALUE_ERROR_); //DX20190905 - replaced cerr with throw
   }
   if (std::signbit(tolerance)) { //DX20191115 
-    string function_name = XPID + "BringInCell()";
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Sign of tolerance is negative (tolerance=" << tolerance << ").";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_INPUT_ERROR_);
   }
   while (component_out - upper_bound >= -tolerance) { component_out -= 1.0; } //note: non-symmetric, favors values closer to lower bound
   while (component_out - lower_bound < -tolerance) { component_out += 1.0; }
@@ -13145,10 +13119,9 @@ bool isTranslationVector(const xstructure& xstr, const xvector<double>& vec, dou
   // (tolerance example: need at least tol=0.1 for As1_ICSD_158474 == As1_ICSD_162840 via XtalFinder)
 
   if(tolerance<_ZERO_TOL_) {
-    string function_name = XPID + "isTranslationVector():";
     stringstream message;
     message << "Zero tolerance: " << tolerance;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_VALUE_ILLEGAL_);
   }
 
   xvector<double> cvec, fvec;
@@ -13182,11 +13155,10 @@ bool isTranslationVector(const xstructure& xstr, const xvector<double>& vec, dou
 }
 
 bool IsTranslationFVectorFAST(const xstructure& a, const xvector<double>& ftvec) {
-  string function_name = XPID + "IsTranslationFVectorFAST():";
   stringstream message;
   if(a.equiv_fpos_epsilon<1.0e-12) {
     message << "Zero tolerance: " << a.equiv_fpos_epsilon;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_VALUE_ILLEGAL_);
   }
   double tolerance=a.equiv_fpos_epsilon;
   if(aurostd::modulus(ftvec)<=tolerance) return TRUE;
@@ -13220,11 +13192,10 @@ bool IsTranslationFVectorFAST(const xstructure& a, const xvector<double>& ftvec)
 }
 
 bool IsTranslationFVectorORIGINAL(const xstructure& a, const xvector<double>& ftvec) {
-  string function_name = XPID + "IsTranslationFVectorORIGINAL():";
   stringstream message;
   if(a.equiv_fpos_epsilon<1.0e-12) {
     message << "Zero tolerance: " << a.equiv_fpos_epsilon;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_VALUE_ILLEGAL_);
   }
   double tolerance=a.equiv_fpos_epsilon;
   if(aurostd::modulus(ftvec)<=tolerance) return TRUE;
@@ -13254,11 +13225,10 @@ bool IsTranslationFVectorORIGINAL(const xstructure& a, const xvector<double>& ft
 }
 
 bool IsTranslationFVectorFAST_2011(const xstructure& a, const xvector<double>& ftvec) {
-  string function_name = XPID + "IsTranslationFVectorFAST():";
   stringstream message;
   if(a.equiv_fpos_epsilon<1.0e-12) {
     message << "Zero tolerance: " << a.equiv_fpos_epsilon;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_VALUE_ILLEGAL_);
   }
   double tolerance=a.equiv_fpos_epsilon;
   if(aurostd::modulus(ftvec)<=tolerance) return TRUE;
@@ -13289,11 +13259,10 @@ bool IsTranslationFVectorFAST_2011(const xstructure& a, const xvector<double>& f
 }
 
 bool IsTranslationFVectorORIGINAL_2011(const xstructure& a, const xvector<double>& ftvec) {
-  string function_name = XPID + "IsTranslationFVectorORIGINAL():";
   stringstream message;
   if(a.equiv_fpos_epsilon<1.0e-12) {
     message << "Zero tolerance: " << a.equiv_fpos_epsilon;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_VALUE_ILLEGAL_);
   }
   double tolerance=a.equiv_fpos_epsilon;
   if(aurostd::modulus(ftvec)<=tolerance) return TRUE;
@@ -13325,11 +13294,10 @@ bool IsTranslationFVectorORIGINAL_2011(const xstructure& a, const xvector<double
 
 
 bool IsTranslationCVector(const xstructure& a, const xvector<double>& ctvec) {
-  string function_name = XPID + "IsTranslationCVector():";
   stringstream message;
   if(a.equiv_fpos_epsilon<1.0e-12) {
     message << "Zero tolerance: " << a.equiv_fpos_epsilon;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_VALUE_ILLEGAL_);
   }
   /* Input translation vector is expectd to be in cartesian coordinates. */
   return IsTranslationFVector(a,C2F(a.lattice,ctvec));
@@ -13516,9 +13484,8 @@ xstructure GetPrimitive_20210322(const xstructure& a,double eps) {  //DX20210406
 void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string function_name = XPID + "GetPrimitive():";
 
-  if(LDEBUG){ cerr << function_name << " BEGIN " << endl; }
+  if(LDEBUG){ cerr << __func__ << " BEGIN " << endl; }
 
   uint natoms_orig = (*this).atoms.size();
   // ---------------------------------------------------------------------------
@@ -13538,7 +13505,7 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
     if((*this).sym_eps!=AUROSTD_NAN){ tolerance = (*this).sym_eps; }
     else{ tolerance = SYM::defaultTolerance((*this)); }
   }
-  if(LDEBUG){ cerr << function_name << " [1] Tolerance = " << tolerance << endl; }
+  if(LDEBUG){ cerr << __func__ << " [1] Tolerance = " << tolerance << endl; }
 
   double volume_orig=(*this).Volume();
 
@@ -13550,7 +13517,7 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
   vector<uint> vindices_atoms_min = getAtomIndicesByType((*this),atom_type_min);
   uint natoms_min = vindices_atoms_min.size();
 
-  if(LDEBUG){ cerr << function_name << " [2] Subset of atoms to find lattice vectors: " << natoms_min << endl; }
+  if(LDEBUG){ cerr << __func__ << " [2] Subset of atoms to find lattice vectors: " << natoms_min << endl; }
 
   // generate list of vectors
   vector<xvector<double> > candidate_lattice_vector;
@@ -13575,11 +13542,11 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
   }
 
   double nlattice_vectors = candidate_lattice_vector.size();
-  if(LDEBUG){ cerr << function_name << " [3] number of lattice vectors=" << nlattice_vectors << endl; }
+  if(LDEBUG){ cerr << __func__ << " [3] number of lattice vectors=" << nlattice_vectors << endl; }
 
   if(LDEBUG){
     for(uint i=0;i<nlattice_vectors;i++){
-      cerr << function_name << i << ": mod=" << aurostd::modulus(candidate_lattice_vector[i]) << " vec=" << candidate_lattice_vector[i] << endl;
+      cerr << __func__ << i << ": mod=" << aurostd::modulus(candidate_lattice_vector[i]) << " vec=" << candidate_lattice_vector[i] << endl;
     }
   }
 
@@ -13640,7 +13607,7 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
   }
   plattice=olattice;
 
-  if(LDEBUG){ cerr << function_name << " reduced lattice=" << plattice << endl; }
+  if(LDEBUG){ cerr << __func__ << " reduced lattice=" << plattice << endl; }
 
   // ---------------------------------------------------------------------------
   // if the lattice remains the same, do not change or update the atoms
@@ -13674,12 +13641,12 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
   if(!aurostd::isinteger(reduction_factor,0.1)){
     stringstream message;
     message << "The original volume is not an integer multiple of the new volume: " << reduction_factor;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_RUNTIME_ERROR_);
   }
   uint reduction_factor_integer = (uint)round(reduction_factor);
   if(abs(natoms_orig-(double)reduction_factor_integer*prim.atoms.size())>0.1) {
     stringstream message;
-    message << "ERROR   " << function_name << endl;
+    message << "ERROR   " << __func__ << endl;
     message << "        supercell has the wrong number of atoms" << endl;
     message << "        volume original    = " << (*this).Volume() << endl;
     message << "        volume prim        = " << prim.Volume() << endl;
@@ -13691,10 +13658,10 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
     message << "        reduction_factor   = " << reduction_factor << endl; //DX20210623
     message << "        supercell atoms    = " << reduction_factor*prim.atoms.size() << endl; //DX20210623
     message << prim << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_RUNTIME_ERROR_);
   }
   // everything ok
-  if(LDEBUG){ cerr << function_name << " END [ok]=" << fraction << endl; }
+  if(LDEBUG){ cerr << __func__ << " END [ok]=" << fraction << endl; }
 
   // set primitive representation
   (*this) = prim;
@@ -14037,11 +14004,10 @@ xstructure GetPrimitiveSINGLE(const xstructure& _a,double tolerance) {  // APRIL
 
 
 xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
-  string function_name = XPID + "GetPrimitive1():";
   stringstream message;
   if(a.equiv_fpos_epsilon<1.0e-12) {
     message << "Zero tolerance: " << a.equiv_fpos_epsilon;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_VALUE_ILLEGAL_);
   }
   double tolerance=a.equiv_fpos_epsilon;
 
@@ -14172,7 +14138,7 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
     message << "        fraction           = " << fraction << endl;
     message << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
     message << b << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_RUNTIME_ERROR_);
   }
   // everything ok
   b.primitive_calculated = TRUE; //DX20201007
@@ -14183,11 +14149,10 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
 
 // second try
 xstructure GetPrimitive2(const xstructure& a) {
-  string function_name = XPID + "GetPrimitive2():";
   stringstream message;
   if(a.equiv_fpos_epsilon<1.0e-12) {
     message << "Zero tolerance: " << a.equiv_fpos_epsilon;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_VALUE_ILLEGAL_);
   }
   double tolerance=a.equiv_fpos_epsilon;
 
@@ -14209,7 +14174,7 @@ xstructure GetPrimitive2(const xstructure& a) {
   //  cerr << sstr.scale << endl;
   sstr=BringInCell(sstr);
   // cerr << sstr.scale << endl;
-  // throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
+  // throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,"Throw for debugging purposes.",_GENERIC_ERROR_);
   string title=sstr.title;
   int i;
   for(uint iat=0;iat<sstr.num_each_type.size();iat++) {
@@ -14363,11 +14328,10 @@ xstructure GetPrimitive2(const xstructure& a) {
 
 // third try
 xstructure GetPrimitive3(const xstructure& a) {
-  string function_name = XPID + "GetPrimitive3():";
   stringstream message;
   if(a.equiv_fpos_epsilon<1.0e-12) {
     message << "Zero tolerance: " << a.equiv_fpos_epsilon;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_VALUE_ILLEGAL_);
   }
   double tolerance=a.equiv_fpos_epsilon;
 
@@ -14503,7 +14467,7 @@ xstructure GetPrimitive3(const xstructure& a) {
     message << "        fraction           = " << fraction << endl;
     message << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
     message << b << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_RUNTIME_ERROR_);
   }
   // everything ok
   b.primitive_calculated = TRUE; //DX20201007
@@ -16503,7 +16467,6 @@ void xstructure::DecorateWithElements(void) {
   // Apply an element to each atom type.
   // Elements are first alphabetized to follow the AFLOW convention
 
-  string function_name = XPID + "xstructure::DecorateWithElements():";
 
   // elements need to be alphabetic for AFLOW
   deque<string> elements;
@@ -16540,7 +16503,6 @@ void xstructure::DecorateWithFakeElements(){
   // In the case of compounds with more
   // than 26 species it is necessary to add more characters to this string
 
-  string function_name = XPID + "xstructure::DecorateWithFakeElements():";
 
   // get fake elements
   vector<string> fake_elements = pflow::getFakeElements(num_each_type.size());
@@ -18072,14 +18034,13 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
   // function finds all the lattice points in the new cell
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string function_name = XPID + "GetBasisTransformationInternalTranslations():";
   stringstream message;
 
   vector<xvector<double> > translations;
 
   //DX20210520 [OBSOLETE] double cell_volume_change = aurostd::abs(aurostd::det(basis_transformation));
 
-  //DX20210520 [OBSOLETE] if(LDEBUG){ cerr << function_name << " changed in cell volume from basis transformation: " << cell_volume_change << endl; }
+  //DX20210520 [OBSOLETE] if(LDEBUG){ cerr << __func__ << " changed in cell volume from basis transformation: " << cell_volume_change << endl; }
 
   // ---------------------------------------------------------------------------
   // check if the basis transformation makes the cell larger and find
@@ -18089,7 +18050,7 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
   // get determinant=1 (e.g., POCC structures)
   //DX20210520 [OBSOELTE] if(cell_volume_change-1.0>_AUROSTD_XSCALAR_TOLERANCE_INTEGER_){}
 
-  if(LDEBUG){ cerr << function_name << " cell size increases. Finding internal translations." << endl; }
+  if(LDEBUG){ cerr << __func__ << " cell size increases. Finding internal translations." << endl; }
 
   // ---------------------------------------------------------------------------
   // get inverse matrix (Q)
@@ -18102,7 +18063,7 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
   xmatrix<double> lattice_frac = aurostd::eye<double>(3,3);
   xmatrix<double> lattice_shrink = inverse_transform*lattice_frac;
 
-  if(LDEBUG){ cerr << function_name << " shrunken lattice: " << lattice_shrink << endl; }
+  if(LDEBUG){ cerr << __func__ << " shrunken lattice: " << lattice_shrink << endl; }
 
   // ---------------------------------------------------------------------------
   // Now that we have the shortest internal translations from lattice shrink
@@ -18113,7 +18074,7 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
   // coordinates, we need to find the necessary dimensions in each direction
   // to fill the cell (i.e., the unit box). //DX20210111
   xvector<int> dims=LatticeDimensionSphere(lattice_shrink,1.0);
-  if(LDEBUG){ cerr << function_name << " number of times to apply each internal translation: " << dims[1] << "," << dims[2] << "," << dims[3] << endl; }
+  if(LDEBUG){ cerr << __func__ << " number of times to apply each internal translation: " << dims[1] << "," << dims[2] << "," << dims[3] << endl; }
 
   // ---------------------------------------------------------------------------
   // create all linear combinations of translations, filter out duplicates later
@@ -18139,9 +18100,9 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
   }
 
   if(LDEBUG){
-    cerr << function_name << " # translations:" << translations.size() << endl;
+    cerr << __func__ << " # translations:" << translations.size() << endl;
     for(uint t=0;t<translations.size();t++){
-      cerr << function_name << " translations:" << translations[t] << endl;
+      cerr << __func__ << " translations:" << translations[t] << endl;
     }
   }
 
@@ -18159,9 +18120,9 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
   }
 
   if(LDEBUG){
-    cerr << function_name << " # unique_translations:" << unique_translations.size() << endl;
+    cerr << __func__ << " # unique_translations:" << unique_translations.size() << endl;
     for(uint t=0;t<unique_translations.size();t++){
-      cerr << function_name << " unique_translations:" << unique_translations[t] << endl;
+      cerr << __func__ << " unique_translations:" << unique_translations[t] << endl;
     }
   }
   translations = unique_translations;
@@ -18170,7 +18131,7 @@ vector<xvector<double> > GetBasisTransformationInternalTranslations(const xmatri
   // if the cell size remains the same or shrinks, no internal translations
   //DX20210520 [OBSOELTE] else{}
   //DX20210520 [OBSOELTE]  // use null vector
-  //DX20210520 [OBSOELTE]  if(LDEBUG){ cerr << function_name << " cell size remains the same or reduced. No internal translations." << endl; }
+  //DX20210520 [OBSOELTE]  if(LDEBUG){ cerr << __func__ << " cell size remains the same or reduced. No internal translations." << endl; }
   //DX20210520 [OBSOELTE]  xvector<double> zero_xvector;
   //DX20210520 [OBSOELTE]  translations.push_back(zero_xvector);
   return translations;
@@ -18217,11 +18178,10 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   if(aurostd::isidentity(transformation_matrix)){ return; }
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string function_name = XPID + "xstructure::ChangeBasis():";
   stringstream message;
 
   if(LDEBUG){
-    cerr << function_name << " structure BEFORE basis transformation:" << endl;
+    cerr << __func__ << " structure BEFORE basis transformation:" << endl;
     cerr << (*this) << endl;
   }
 
@@ -18275,7 +18235,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   // use _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_ to be consistent with AUROSTD's
   // isinteger tolerance
   if(basis_transformation_det_change < -_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_){
-    if(LDEBUG){ cerr << function_name << " removing duplicate atoms (cell has been reduced)." << endl; }
+    if(LDEBUG){ cerr << __func__ << " removing duplicate atoms (cell has been reduced)." << endl; }
 
     bool skew = false;
     deque<_atom> new_basis = ::foldAtomsInCell(atom_basis, lattice_orig, (*this).lattice, skew, tol, false); //false: don't check atom mappings (slow) //DX20210118 - add global namespace
@@ -18288,7 +18248,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   // ---------------------------------------------------------------------------
   // enlarge the cell: update the atom count information
   else if(basis_transformation_det_change > _AUROSTD_XSCALAR_TOLERANCE_INTEGER_){
-    if(LDEBUG){ cerr << function_name << " cell size has increased." << endl; }
+    if(LDEBUG){ cerr << __func__ << " cell size has increased." << endl; }
     // check atom count
     natoms_transformed = atom_basis.size();
     is_integer_multiple_transformation = ((*this).num_each_type.size() == 1 || natoms_transformed%natoms_orig==0); //DX20210316 - integer multiple does not apply to unaries
@@ -18301,14 +18261,14 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
       << " original: " << natoms_orig
       << " transformed: " << natoms_transformed
       << "; check the transformation matrix or same-atom tolerance.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_RUNTIME_ERROR_);
   }
 
   // ---------------------------------------------------------------------------
   // if the number of atoms changed (i.e., change in determinant is zero),
   // update the atom counts/order/types/etc.
   if(!aurostd::isequal(aurostd::abs(basis_transformation_det_change), _ZERO_TOL_, _AUROSTD_XSCALAR_TOLERANCE_INTEGER_)){
-    if(LDEBUG){ cerr << function_name << " updating atom count information." << endl; }
+    if(LDEBUG){ cerr << __func__ << " updating atom count information." << endl; }
     std::stable_sort(atom_basis.begin(),atom_basis.end(),sortAtomsNames); //DX20210129
     (*this).ReplaceAtoms(atom_basis, false); //false: check_atom_overlap
   }
@@ -18316,12 +18276,12 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
   // if the transformation preserves the volume, one-to-one mappings
   // no need to update species/types/etc. (i.e., ReplaceAtoms() is not needed)
   else{
-    if(LDEBUG){ cerr << function_name << " cell size remains the same (updating atom positions)." << endl; }
+    if(LDEBUG){ cerr << __func__ << " cell size remains the same (updating atom positions)." << endl; }
     (*this).atoms = atom_basis;
   }
 
   if(LDEBUG){
-    cerr << function_name << " structure AFTER basis transformation:" << endl;
+    cerr << __func__ << " structure AFTER basis transformation:" << endl;
     cerr << (*this) << endl;
   }
 }
@@ -18366,22 +18326,21 @@ void xstructure::TransformStructure(
     bool is_shift_frac) {
 
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string function_name = XPID + "xstructure::TransformStructure():";
 
   if(LDEBUG){
-    cerr << function_name << " basis transformation: " << transformation_matrix << endl;
-    cerr << function_name << " rotation (R): " << rotation << endl;
+    cerr << __func__ << " basis transformation: " << transformation_matrix << endl;
+    cerr << __func__ << " rotation (R): " << rotation << endl;
   }
 
   // ---------------------------------------------------------------------------
   // changed basis
   (*this).ChangeBasis(transformation_matrix);
-  if(LDEBUG){ cerr << function_name << " structure after CHANGING BASIS: " << (*this) << endl; }
+  if(LDEBUG){ cerr << __func__ << " structure after CHANGING BASIS: " << (*this) << endl; }
 
   // ---------------------------------------------------------------------------
   // rotate
   (*this).Rotate(rotation);
-  if(LDEBUG){ cerr << function_name << " structure after ROTATING: " << (*this) << endl; }
+  if(LDEBUG){ cerr << __func__ << " structure after ROTATING: " << (*this) << endl; }
 
   // ---------------------------------------------------------------------------
   // rotate
@@ -18389,7 +18348,7 @@ void xstructure::TransformStructure(
   (*this).ShiftPos(origin_shift,is_shift_frac);
   (*this).coord_flag=coordinate_flag; // set back to original coordinate-type
   (*this).BringInCell(); //DX20210116
-  if(LDEBUG){ cerr << function_name << " structure after shifting origin: " << (*this) << endl; }
+  if(LDEBUG){ cerr << __func__ << " structure after shifting origin: " << (*this) << endl; }
 }
 
 // **************************************************************************

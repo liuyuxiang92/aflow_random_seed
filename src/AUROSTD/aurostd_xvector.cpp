@@ -168,22 +168,20 @@ namespace aurostd {  // namespace aurostd
     utype& xvector<utype>::operator[](int i) const {
 #ifndef _XVECTOR_CHECK_BOUNDARIES_
       if(i>urows) {
-        string function_name = XPID + "aurostd::xvector::operator[]:";
         stringstream message;
         message << "xvector[1]=" << corpus[1] << endl;
         message << "xvector[2]=" << corpus[2] << endl;
         message << "xvector[3]=" << corpus[3] << endl;
         message << "xvector[] -> i=" << i << " > urows=" << urows << " lrows=" << lrows << " float=" << isfloat;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_BOUNDS_);
       }
       if(i<lrows) {
-        string function_name = XPID + "aurostd::xvector::operator[]:";
         stringstream message;
         message << "xvector[1]=" << corpus[1] << endl;
         message << "xvector[2]=" << corpus[2] << endl;
         message << "xvector[3]=" << corpus[3] << endl;
         message << "xvector[] -> i=" << i << " < lrows=" << lrows << " urows=" << urows << " float=" << isfloat;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_BOUNDS_);
       }
 #endif
       return corpus[i];
@@ -197,16 +195,14 @@ namespace aurostd {  // namespace aurostd
       //#ifndef BOUNDARY_CONDITIONS_PERIODIC
 #ifndef _XVECTOR_CHECK_BOUNDARIES_
       if(i>urows) {
-        string function_name = XPID + "aurostd::xvector::operator():";
         stringstream message;
         message << "xvector() -> i=" << i << " > urows=" << urows << " lrows=" << lrows << " float=" << isfloat;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_BOUNDS_);
       }
       if(i<lrows) {
-        string function_name = XPID + "aurostd::xvector::operator():";
         stringstream message;
         message << "xvector() -> i=" << i << " < lrows=" << lrows << " urows=" << urows << " float=" << isfloat;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_BOUNDS_);
       }
 #endif  // __XVECTOR_IGNORE_BOUNDARIES
       return corpus[i];
@@ -235,16 +231,14 @@ namespace aurostd {  // namespace aurostd
       if(bc==BOUNDARY_CONDITIONS_NONE) {
 #ifndef _XVECTOR_CHECK_BOUNDARIES_
         if(i>urows) {
-          string function_name = XPID + "aurostd::xvector::operator():";
           stringstream message;
           message << "i > xvector<utype>.urows, BC=" << bc;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_BOUNDS_);
         }
         if(i<lrows) {
-          string function_name = XPID + "aurostd::xvector::operator():";
           stringstream message;
           message << "i < xvector<utype>.lrows, BC=" << bc;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_BOUNDS_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_BOUNDS_);
         }
 #endif
         return corpus[i];
@@ -277,10 +271,9 @@ namespace aurostd {  // namespace aurostd
       printf("r.lrows=%i, r.urows=%i\n",r.lrows,r.urows);
 #endif
       if(this->rows!=r.rows) {
-        string function_name = XPID + "aurostd::xvector::operator+=:";
         stringstream message;
         message << "failure in operator+=: (this->rows!=r.rows)=FALSE";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
       }
       for(int i=0;i<rows;i++)
         corpus[i+lrows]+=r[i+r.lrows];
@@ -312,10 +305,9 @@ namespace aurostd {  // namespace aurostd
       printf("r.lrows=%i, r.urows=%i\n",r.lrows,r.urows);
 #endif
       if(this->rows!=r.rows) {
-        string function_name = XPID + "aurostd::xvector::operator-=:";
         stringstream message;
         message << "failure in operator-=: (this->rows!=r.rows)=FALSE";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
       }
       for(int i=0;i<rows;i++)
         corpus[i+lrows]-=r[i+r.lrows];
@@ -396,10 +388,9 @@ namespace aurostd {  // namespace aurostd
   template<class utype> utype                         // operator xvector * xvector
     operator*(const xvector<utype>& a,const xvector<utype>& b) {
       if(a.rows!=b.rows) {
-        string function_name = XPID + "aurostd::xvector::operator*:";
         stringstream message;
         message << "failure in operator* (a.rows != b.rows)";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
       }
       utype out=(utype) 0.0;
       for(int i=a.lrows,ii=b.lrows;i<=a.urows;i++,ii++)
@@ -413,10 +404,9 @@ namespace aurostd {  // namespace aurostd
   template<class utype> utype                   // scalar_product xvector * xvector
     scalar_product(const xvector<utype>& a,const xvector<utype>& b) {
       if(a.rows!=b.rows) {
-        string function_name = XPID + "aurostd::xvector::scalar_product():";
         stringstream message;
         message << "failure in operator* (a.rows != b.rows)";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
       }
       utype out=(utype) 0.0;
       for(int i=a.lrows,ii=b.lrows;i<=a.urows;i++,ii++)
@@ -431,16 +421,14 @@ namespace aurostd {  // namespace aurostd
     operator %(const xvector<utype>& a,const xvector<utype>& b) {
       xvector<utype> c(3);
       if(a.rows!=3) {
-        string function_name = XPID + "aurostd::xvector::operator%:";
         stringstream message;
         message << "xvector product (a%b) a.rows=" << a.rows << " !=3";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
       }
       if(b.rows!=3) {
-        string function_name = XPID + "aurostd::xvector::operator%:";
         stringstream message;
         message << "xvector product (a%b) b.rows=" << b.rows << " !=3";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
       }
       c(1)=a(2)*b(3)-a(3)*b(2);
       c(2)=a(3)*b(1)-a(1)*b(3);
@@ -455,16 +443,14 @@ namespace aurostd {  // namespace aurostd
     vector_product(const xvector<utype>& a,const xvector<utype>& b) {
       xvector<utype> c(3);
       if(a.rows!=3) {
-        string function_name = XPID + "aurostd::xvector::vector_product():";
         stringstream message;
         message << "xvector product (a%b) a.rows=" << a.rows << " !=3";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
       }
       if(b.rows!=3) {
-        string function_name = XPID + "aurostd::xvector::vector_product():";
         stringstream message;
         message << "xvector product (a%b) b.rows=" << b.rows << " !=3";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
       }
 
       c(1)=a(2)*b(3)-a(3)*b(2);
@@ -751,10 +737,9 @@ namespace aurostd {  // namespace aurostd
   template<class utype> xvector<char>                    // is xvector > xvector ?
     operator>(const xvector<utype>& a,const xvector<utype>& b) {
       if(a.rows!=b.rows) {
-        string function_name = XPID + "aurostd::xvector::operator>:";
         stringstream message;
         message << "failure in operator> (xvector > xvector)";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
       }
       xvector<char> c(a.lrows,a.urows);
       for(int i=a.lrows,ii=b.lrows;i<=a.urows;i++,ii++) {
@@ -769,10 +754,9 @@ namespace aurostd {  // namespace aurostd
   template<class utype> xvector<char>                    // is xvector < xvector ?
     operator<(const xvector<utype>& a,const xvector<utype>& b) {
       if(a.rows!=b.rows)  {
-        string function_name = XPID + "aurostd::xvector::operator<:";
         stringstream message;
         message << "failure in operator> (xvector < xvector)";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
       }
       xvector<char> c(a.lrows,a.urows);
       for(int i=a.lrows,ii=b.lrows;i<=a.urows;i++,ii++) {
@@ -787,10 +771,9 @@ namespace aurostd {  // namespace aurostd
   template<class utype> bool                             // is xvector == xvector ?
     identical(const xvector<utype>& a,const xvector<utype>& b,const utype& _tol_) {
       if(a.rows!=b.rows)  {
-        string function_name = XPID + "aurostd::xvector::identical():";
         stringstream message;
         message << "failure in function identical (xvector == xvector)[1]";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
       }
       bool output=TRUE;
       if(a.isfloat || a.iscomplex) {
@@ -1977,10 +1960,9 @@ namespace aurostd {  // namespace aurostd
   template<class utype> double   // cos of angle between two vectors
     cos(const xvector<utype>& v1,const xvector<utype>& v2) {
       if(v1.rows!=v2.rows) {
-        string function_name = XPID + "aurostd::xvector::cos():";
         stringstream message;
         message << "cos(xvector,xvector) v1.rows,v2.rows=" << v1.rows << "," << v2.rows;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
       }
       double out=0.0,n_v1=0.0,n_v2=0.0;
       int size=v1.rows,i;
@@ -1996,16 +1978,14 @@ namespace aurostd {  // namespace aurostd
       n_v2=modulus(_v2);
       // cerr << n_v1 << " " << n_v2 << endl;
       if(n_v1==0.0) {
-        string function_name = XPID + "aurostd::xvector::cos():";
         stringstream message;
         message << "cos(xvector,xvector)=modulus(v1)=0";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
       } 
       if(n_v2==0.0) {
-        string function_name = XPID + "aurostd::xvector::cos():";
         stringstream message;
         message << "cos(xvector,xvector)=modulus(v2)=0";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
       }
       // assert(n_v1>0 && n_v2>0);
       out/=(n_v1*n_v2);
@@ -2634,9 +2614,8 @@ namespace aurostd {  // namespace aurostd
           arr[j+as]=a;
           jstack += 2;
           if(jstack>_XQSORT_NSTACK) {
-            string function_name = XPID + "aurostd::xvector::quicksort():";
             string message = " _XQSORT_NSTACK too small in sort.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
           }
           if(ir-i+1 >= j-l) {
             istack[jstack]=ir;
@@ -2722,9 +2701,8 @@ namespace aurostd {  // namespace aurostd
           brr[l]=brr[j];brr[j]=b;
           jstack +=2;
           if(jstack>_XSORT_NSTACK) {
-            string function_name = XPID + "aurostd::xvector::quicksort2():";
             string message = " _XQSORT_NSTACK too small in sort2.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
           }
           if(ir-i+1>=j-l) {
             istack[jstack]=ir;
@@ -2813,9 +2791,8 @@ namespace aurostd {  // namespace aurostd
           crr[l]=crr[j];crr[j]=c;
           jstack +=2;
           if(jstack>_XSORT_NSTACK) {
-            string function_name = XPID + "aurostd::xvector::quicksort3():";
             string message = " _XQSORT_NSTACK too small in sort3.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
           }
           if(ir-i+1>=j-l) {
             istack[jstack]=ir;
@@ -2915,9 +2892,8 @@ namespace aurostd {  // namespace aurostd
           drr[l]=drr[j];drr[j]=d;
           jstack +=2;
           if(jstack>_XSORT_NSTACK) {
-            string function_name = XPID + "aurostd::xvector::quicksort4():";
             string message = " _XQSORT_NSTACK too small in sort4.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
           }
           if(ir-i+1>=j-l) {
             istack[jstack]=ir;
