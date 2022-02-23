@@ -268,7 +268,7 @@ namespace pocc {
     aurostd::string2tokens(aplopts.getattachedscheme("DOSMESH"), qpt_mesh, " xX");
 
     // Calculate phonon DOS
-    int nruns = (int) vphcalc.size();
+    uint nruns = vphcalc.size();
     vector<apl::DOSCalculator> vphdos(nruns);
     double minfreq = 0.0, maxfreq = 0.0;
     unsigned long long int isupercell = 0;
@@ -304,7 +304,7 @@ namespace pocc {
 #ifdef AFLOW_MULTITHREADS_ENABLE
     std::mutex m;
     xthread::xThread xt(KBIN::get_NCPUS(m_kflags), 1);
-    std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&,
+    std::function<void(uint, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&,
         vector<xDOSCAR>&, std::mutex&)> fn = std::bind(&POccCalculator::calculatePhononDOSThread, this,
         std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
         std::placeholders::_4, std::placeholders::_5, std::placeholders::_6);

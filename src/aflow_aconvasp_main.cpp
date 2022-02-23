@@ -13472,7 +13472,6 @@ namespace pflow {
   }
 
   void PYTHON_MODULES(const vector<string>& vmodules_in, ofstream& FileMESSAGE, ostream& oss) {
-    string function_name = "pflow::PYTHON_MODULES():";
     string directory = XHOST.vflag_control.getattachedscheme("DIRECTORY");
     if (directory.empty()) directory = ".";
 
@@ -13498,7 +13497,7 @@ namespace pflow {
     if (vskip.size() > 0) {
       message << "Could not find modules " << aurostd::joinWDelimiter(vskip, ", ") << "."
         << " Available modules: " << aurostd::joinWDelimiter(vavailable, ", ") << ".";
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, directory, FileMESSAGE, oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, __func__, message, directory, FileMESSAGE, oss, _LOGGER_WARNING_);
     }
     if (vmodules.size() > 0) {
       // Dependencies
@@ -13526,10 +13525,10 @@ namespace pflow {
         }
       }
       message << "Successfully installed modules " << aurostd::joinWDelimiter(vmodules, ", ") << ".";
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, directory, FileMESSAGE, oss, _LOGGER_NOTICE_);
+      pflow::logger(_AFLOW_FILE_NAME_, __func__, message, directory, FileMESSAGE, oss, _LOGGER_NOTICE_);
     } else {
       message << "No modules left to write.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INPUT_ERROR_);
     }
   }
 }

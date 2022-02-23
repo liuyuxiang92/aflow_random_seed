@@ -866,7 +866,6 @@ namespace AFLOW_PTHREADS {
 
 namespace AFLOW_PTHREADS {
   bool MULTI_sh(vector<string> argv) {
-    string function_name=XPID+"AFLOW_PTHREADS::MULTI_sh()";
     stringstream message;
     ostringstream aus;
     _aflags aflags;
@@ -875,8 +874,8 @@ namespace AFLOW_PTHREADS {
     if(file_name.empty() || file_name=="--f") file_name=argv.at(argv.size()-1);
     bool VERBOSE=FALSE;
 
-    if(!aurostd::FileExist(file_name)) {message << "FILE_NOT_FOUND = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_FILE_NOT_FOUND_);}
-    if( aurostd::FileEmpty(file_name)) {message << "FILE_EMPTY = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_FILE_CORRUPT_);}
+    if(!aurostd::FileExist(file_name)) {message << "FILE_NOT_FOUND = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_FILE_NOT_FOUND_);}
+    if( aurostd::FileEmpty(file_name)) {message << "FILE_EMPTY = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_FILE_CORRUPT_);}
     aus << "MMMMM Loading File = " << file_name << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
     vector<string> vcmds;
     vcmds.clear();

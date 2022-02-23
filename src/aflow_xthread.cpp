@@ -677,11 +677,11 @@ namespace xthread {
 
   //apl::TCONDCalculator::calculateDelta
   template void xThread::run<
-    std::function<void(int, const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&)>,
+    std::function<void(uint, const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&)>,
     const vector<vector<double> >,
     vector<vector<xvector<double> > >,
     vector<vector<xvector<double> > >
-  >(int, std::function<void(int, const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&)>&,
+  >(int, std::function<void(uint, const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&)>&,
     const vector<vector<double> >&,
     vector<vector<xvector<double> > >&,
     vector<vector<xvector<double> > >&
