@@ -513,7 +513,7 @@ namespace aflowlib {
       columns = getColumnNames(table);
 
       // Properties
-      vector<string> keys_schema = getSchemaKeys();
+      vector<string> keys_schema = getAllSchemaKeys();
       uint nkeys = keys_schema.size();
       if (nkeys > columns.size()) {
         rebuild_db = true;
@@ -709,7 +709,7 @@ namespace aflowlib {
     sql::SQLexecuteCommand(db, "PRAGMA synchronous = OFF");
 
     // Get columns and types from schema
-    vector<string> keys = getSchemaKeys();
+    vector<string> keys = getAllSchemaKeys();
     uint nkeys = keys.size();
     vector<string> columns(nkeys);
     for (uint k = 0; k < nkeys; k++) {
@@ -818,7 +818,7 @@ namespace aflowlib {
 
     uint chunk_size = 1000;
 
-    vector<string> schema_keys = getSchemaKeys();
+    vector<string> schema_keys = getAllSchemaKeys();
 
     // Patch
     vector<string> keys, vals, cols, types;
@@ -900,27 +900,12 @@ namespace aflowlib {
     updateRow(table, cols, vals, where);
   }
 
-  // Schema ------------------------------------------------------------------
-
-  //getSchemaKeys/////////////////////////////////////////////////////////////
-  // Returns the keys from the AFLOW schema.
-  vector<string> AflowDB::getSchemaKeys() {
-    vector<string> keys;
-    string key = "";
-    for (uint i = 0, n = vschema.vxsghost.size(); i < n; i += 2) {
-      if(vschema.vxsghost[i].find("::NAME:") != string::npos) {
-        key=aurostd::RemoveSubString(vschema.vxsghost[i], "SCHEMA::NAME:");
-        // schema keys are upper case
-        keys.push_back(aurostd::toupper(key));
-      }
-    }
-    for (uint i = 0, n = vschema_secret.vxsghost.size(); i < n; i += 2) {
-      if(vschema_secret.vxsghost[i].find("::NAME:") != string::npos) {
-        key=aurostd::RemoveSubString(vschema_secret.vxsghost[i], "SCHEMA::NAME:");
-        // schema keys are upper case
-        keys.push_back(aurostd::toupper(key));
-      }
-    }
+  //getAllSchemaKeys//////////////////////////////////////////////////////////
+  // Returns the keys from the schema and the secret schema
+  vector<string> AflowDB::getAllSchemaKeys() {
+    vector<string> keys = init::getSchemaKeys(vschema);
+    vector<string> keys_secret = init::getSchemaKeys(vschema_secret);
+    for (const string& key : keys_secret) keys.push_back(key);
     return keys;
   }
 
@@ -1117,7 +1102,7 @@ namespace aflowlib {
   }
 
   DBStats AflowDB::initDBStats(const string& catalog, const vector<string>& loops) {
-    vector<string> keys = getSchemaKeys();
+    vector<string> keys = getAllSchemaKeys();
     vector<string> excluded_properties, cols;
     string exclude = "alloy";
     aurostd::string2tokens(exclude, excluded_properties, ",");

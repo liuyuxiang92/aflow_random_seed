@@ -651,7 +651,7 @@ namespace aflowlib {
       bool auidInDatabase(const string&);
       void updateEntry(const string&, const vector<string>&, const vector<string>&);
 
-      vector<string> getSchemaKeys();
+      vector<string> getAllSchemaKeys();
       vector<string> getDataTypes(const vector<string>&, bool);
       vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
 

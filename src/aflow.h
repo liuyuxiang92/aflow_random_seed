@@ -1094,6 +1094,10 @@ namespace init {
   double WaitTEMP(double TRESHOLD=AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT,ostream& oss=cout,bool LVERBOSE=FALSE,vector<string> vmessage=vector<string>(0));
   uint InitSchema(bool INIT_VERBOSE);
   uint InitSchemaSecret(bool INIT_VERBOSE);  //ME20220208
+  vector<string> getSchemaKeys(const aurostd::xoption& vschema);  //ME20220223
+  vector<string> getSchemaNames(const aurostd::xoption& vschema);  //CO20200520
+  vector<string> getSchemaTypes(const aurostd::xoption& vschema);  //ME20220223
+  vector<string> getSchemaTypes(const aurostd::xoption& vschema, const vector<string>& keys);  //ME20220223
 } // namespace init
 
 uint AFLOW_getTEMP(const vector<string>& argv);

@@ -3932,6 +3932,56 @@ namespace init {
 
 }
 
+namespace init {
+
+  //getSchemaKeys/////////////////////////////////////////////////////////////
+  // Returns the keys from the AFLOW schema.
+  // Adapted from AflowDB
+  vector<string> getSchemaKeys(const aurostd::xoption& vschema) {
+    vector<string> keys;
+    string key = "";
+    for (uint i = 0, n = vschema.vxsghost.size(); i < n; i += 2) {
+      if(vschema.vxsghost[i].find("SCHEMA::NAME:") != string::npos) {
+        key = aurostd::RemoveSubString(vschema.vxsghost[i], "SCHEMA::NAME:");
+        // schema keys are upper case
+        keys.push_back(aurostd::toupper(key));
+      }
+    }
+    return keys;
+  }
+
+  //getSchemaNames/////////////////////////////////////////////////////////////
+  // CO20200520
+  // Returns the names of the AFLOW schema keys
+  vector<string> getSchemaNames(const aurostd::xoption& vschema) {
+    vector<string> keys;
+    for (uint i = 0, n = vschema.vxsghost.size(); i < n; i += 2) {
+      if(vschema.vxsghost[i].find("SCHEMA::NAME:") != string::npos) {
+        keys.push_back(aurostd::RemoveSubString(vschema.vxsghost[i + 1], "SCHEMA::NAME:"));
+      }
+    }
+    return keys;
+  }
+
+  //getSchemaTypes/////////////////////////////////////////////////////////////
+  // Gets the data types of the schema keys.
+  // Adapted from AflowDB
+  vector<string> getSchemaTypes(const aurostd::xoption& vschema) {
+    return getSchemaTypes(vschema, getSchemaKeys(vschema));
+  }
+
+  vector<string> getSchemaTypes(const aurostd::xoption& vschema, const vector<string>& keys) {
+    uint nkeys = keys.size();
+    vector<string> types(nkeys);
+    string type = "";
+    for (uint k = 0; k < nkeys; k++) {
+      types.push_back(vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k])));
+    }
+    return types;
+  }
+}
+
+
 // **************************************************************************
 
 #endif
