@@ -3941,7 +3941,7 @@ namespace init {
     vector<string> keys;
     string key = "";
     for (uint i = 0, n = vschema.vxsghost.size(); i < n; i += 2) {
-      if(vschema.vxsghost[i].find("SCHEMA::NAME:") != string::npos) {
+      if(vschema.vxsghost[i].find("SCHEMA::NAME:") != string::npos) {  //CO20200520
         key = aurostd::RemoveSubString(vschema.vxsghost[i], "SCHEMA::NAME:");
         // schema keys are upper case
         keys.push_back(aurostd::toupper(key));
