@@ -1660,8 +1660,9 @@ class xstructure {
     void DecorateWithElements(void);                              // Decorate with elements (alphabetic order) - useful for platon
     void DecorateWithFakeElements(void);                          // Decorate with fake elements - useful for prototypes //DX20200727
     vector<string> GetElements(bool clean_name=false,
-        bool fake_names=false);                                   //DX20200724
-    vector<string> GetElementsFromAtomNames(bool clean_name=true);//DX20200724
+        bool fake_names=false) const;                             //DX20200724 //SD20220222 - made function const
+    vector<string> GetElementsFromAtomNames(
+        bool clean_name=true) const;                              //DX20200724 //SD20220222 - made function const
     vector<uint> GetReducedComposition(bool numerical_sort=false);//DX20200724
     string platon2sg(bool P_EQUAL=DEFAULT_PLATON_P_EQUAL,
         bool P_EXACT=DEFAULT_PLATON_P_EXACT,
