@@ -1,14 +1,8 @@
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2022           *
-// *           Aflow HAGEN ECKERT - Duke University 2021-2022                *
-// *           Aflow COREY OSES - Duke University 2013-2022                  *
 // *                                                                         *
 // ***************************************************************************
-// Hagen Eckert
-// hagen.eckert@duke.edu
-// Corey Oses
-// corey.oses@duke.edu
 
 #ifndef _AFLOWLIB_ENTRY_LOADER_H_
 #define _AFLOWLIB_ENTRY_LOADER_H_
@@ -188,7 +182,5 @@ namespace aflowlib {
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2022           *
-// *           Aflow HAGEN ECKERT - Duke University 2021-2022                *
-// *           Aflow COREY OSES - Duke University 2013-2022                  *
 // *                                                                         *
 // ***************************************************************************

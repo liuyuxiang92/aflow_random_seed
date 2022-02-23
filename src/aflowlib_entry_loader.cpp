@@ -1,19 +1,15 @@
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2022           *
-// *           Aflow HAGEN ECKERT - Duke University 2021-2022                *
-// *           Aflow COREY OSES - Duke University 2013-2022                  *
 // *                                                                         *
 // ***************************************************************************
-// Hagen Eckert
-// hagen.eckert@duke.edu
-// Corey Oses
-// corey.oses@duke.edu
+// Developed in fruitful collaboration by Corey Oses and Hagen Eckert.
+// corey.oses@duke.edu | hagen.eckert@duke.edu
+
 
 #ifndef _AFLOWLIB_ENTRY_LOADER_CPP_
 #define _AFLOWLIB_ENTRY_LOADER_CPP_
 
-#include <memory>
 
 #include "aflow.h"
 #include "aflowlib_entry_loader.h"
@@ -370,9 +366,8 @@ namespace aflowlib {
     std::vector <std::string> alloy_clean;
 
     // check that all parts of alloy are actually elements
-    xelement::xelement xel;
     for (std::string element: alloy) {
-      if (xel.isElement(element) == 0) {
+      if (xelement::xelement::isElement(element) == 0) {
         m_logger_message << element << " is not an element";
         outError(__func__,__LINE__);
       } else alloy_clean.emplace_back(element);
@@ -1406,7 +1401,5 @@ namespace aflowlib {
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2022           *
-// *           Aflow HAGEN ECKERT - Duke University 2021-2022                *
-// *           Aflow COREY OSES - Duke University 2013-2022                  *
 // *                                                                         *
 // ***************************************************************************

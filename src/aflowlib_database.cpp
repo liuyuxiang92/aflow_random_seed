@@ -909,7 +909,7 @@ namespace aflowlib {
   // Schema ------------------------------------------------------------------
   //getSchemaKeys/////////////////////////////////////////////////////////////
   // Returns the keys from the AFLOW schema.
-  vector<string> getSchemaKeys() {  //CO20200520
+  vector<string> getSchemaKeysBase() {  //CO20200520
     vector<string> keys;
     string key = "";
     for (uint i = 0, n = XHOST.vschema.vxsghost.size(); i < n; i += 2) {
@@ -923,7 +923,7 @@ namespace aflowlib {
   }
 
   vector<string> AflowDB::getSchemaKeys() {
-    vector<string> keys=getSchemaKeys();
+    vector<string> keys=getSchemaKeysBase();
     string key = "";
     for (uint i = 0, n = vschema_extra.vxsghost.size(); i < n; i += 2) {
       if(vschema_extra.vxsghost[i].find("SCHEMA::NAME:")!=string::npos) { //CO20200520

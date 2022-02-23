@@ -1302,6 +1302,8 @@ bool AtomicEnvironmentTest(ofstream& FileMESSAGE, ostream& oss){ //HE20210511
   xstructure str;
   {
     aflowlib::EntryLoader el;
+    el.m_xstructure_relaxed = true;
+    el.m_out_silent = true;
     el.loadAUID("aflow:d912e209c81aeb94"); // aflowlib.duke.edu:AFLOWDATA/LIB2_RAW/Ca_svCu_pv/138
     str = el.m_entries_flat->operator[](0)->vstr.back();
   }
