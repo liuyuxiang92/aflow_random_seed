@@ -1647,7 +1647,7 @@ namespace xelement {
 
   // ********************************************************************************************************************************************************
   // check if input is element
-  uint xelement::isElement(const string& element) const {  //CO20200520
+  uint xelement::isElement(const string& element) {  //CO20200520
     uint Z=0;
 
     // try with symbol
