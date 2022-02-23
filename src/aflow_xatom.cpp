@@ -3941,17 +3941,9 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     // write the atoms
     xvector<double> coord(3);
     for (uint iat = 0; iat < aa.atoms.size(); iat++) {
-      if (aa.coord_flag == _COORDS_FRACTIONAL_) {
-        coord = aa.atoms.at(iat).fpos * aa.lattice;
-      }
-      else if (aa.coord_flag == _COORDS_CARTESIAN_) {
-        coord = aa.atoms.at(iat).cpos * aa.lattice / aa.scale;
-      }
-      for (uint j = 1; j <= 3; j++) {
-          oss << coord(j) << " ";
-      }
-      if (aa.atoms.at(iat).name_is_given == TRUE) {
-        oss << " " << aa.atoms.at(iat).cleanname;
+      oss << aa.atoms[iat].cpos(1) << " " << aa.atoms[iat].cpos(2) << " " << aa.atoms[iat].cpos(3);
+      if (aa.atoms[iat].name_is_given == TRUE) {
+        oss << " " << aa.atoms[iat].cleanname;
       }
       oss << endl;
     }
@@ -4495,16 +4487,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
     for (; line < vinput.size() - 1 && ATAT; line++) {
       aurostd::string2tokens(vinput[line],tokens," ");
       ATAT = (tokens.size() == 4 && aurostd::isfloat(tokens[0]) && aurostd::isfloat(tokens[1]) && aurostd::isfloat(tokens[2]));
-      if (ATAT) {
-        try {
-          xelement::symbol2Z(tokens[3]);
-        }
-        catch (aurostd::xerror& excpt) {
-          ATAT = 0;
-        }
-      }
+      if (ATAT && !xelement::xelement::isElement(tokens[3])) {ATAT = 0;}
     }
-
     if (ATAT == 1) {
       a.iomode = IOATAT_STR;
       if (LDEBUG) cerr << soliloquy << " ATAT DETECTOR = TRUE" << endl; 
