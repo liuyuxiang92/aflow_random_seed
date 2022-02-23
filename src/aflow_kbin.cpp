@@ -554,7 +554,7 @@ namespace KBIN {
     // ------------------------------------------------------------------------------------------------------------------------------------
     // nothing specified : CHECK IF DAEMON
     if(XHOST.AFLOW_RUNDIRflag) { // check if daemaon aflowd
-      string progname=argv[0];
+      string progname=argv.at(0);
       if(aurostd::substring2bool(progname,"aflowd")) {
         XHOST.AFLOW_MULTIflag=TRUE;
         XHOST.AFLOW_RUNXflag=FALSE;
@@ -1180,7 +1180,7 @@ namespace KBIN {
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
-    if(aflags.Directory[0]!='/' && aflags.Directory[0]!='.' && aflags.Directory[0]!=' ') aflags.Directory="./"+aflags.Directory;
+    if(aflags.Directory.at(0)!='/' && aflags.Directory.at(0)!='.' && aflags.Directory.at(0)!=' ') aflags.Directory="./"+aflags.Directory;
 
     if(!FileSUBDIR) {                                                                                           // ******* Directory is non existent
       aus << "EEEEE  DIRECTORY_NOT_FOUND = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
@@ -1664,7 +1664,7 @@ namespace KBIN {
           FileCHECK.open(FileNameCHECK.c_str(),std::ios::in);                         // _AFLOWIN_.EXT
           FileCHECK.clear();FileCHECK.close();                                        // _AFLOWIN_.EXT
           if(FileCHECK) {                                                             // _AFLOWIN_.EXT
-            aurostd::execute(XHOST.vzip[iext]+" -dqf "+_AFLOWIN_+XHOST.vext[iext]); // _AFLOWIN_.EXT
+            aurostd::execute(XHOST.vzip.at(iext)+" -dqf "+_AFLOWIN_+XHOST.vext[iext]); // _AFLOWIN_.EXT
           }
         } // _AFLOWIN_.EXT
       }
