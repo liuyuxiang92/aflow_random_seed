@@ -2111,7 +2111,7 @@ namespace aurostd {
   // Simon Divilov
   // Create a symbolic or hard link of a file using C++ functions
   bool LinkFileAtomic(const string& from,const string& to,bool soft) {
-    int fail;
+    int fail=0;
     string from_clean=CleanFileName(from),to_clean=CleanFileName(to);
     if(from_clean.empty() || to_clean.empty()) {return FALSE;}
     if(soft) {

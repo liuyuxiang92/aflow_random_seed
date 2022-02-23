@@ -1291,6 +1291,9 @@ namespace aurostd {
   // ME2021050 - Reshape given matrix dimensions
   // SD20220127 - Added bool for row-major
   template<class utype>
+    // SD20220222 - row_major=true, store array where the left-most index is iterated first (C order),
+    // row_major=false, store array where the right-most index is iterated first (Fortran order)
+    // See: https://en.wikipedia.org/wiki/Row-_and_column-major_order
     xmatrix<utype> reshape(const xvector<utype>& v1, int rows, int cols, bool row_major) {
       if (rows * cols != v1.rows) {
         string function = XPID + "aurostd::xmatrix<utype>::reshape(v1,rows,cols):";
