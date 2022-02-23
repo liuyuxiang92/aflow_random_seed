@@ -206,21 +206,21 @@ namespace KBIN {
   bool Legitimate_aflowin(string _aflowindir,const bool& osswrite,ostringstream& oss) {
     string aflowindir=_aflowindir;
     aurostd::StringSubst(aflowindir,"//","/");
-    if(!aurostd::FileExist(aflowindir)){ // file must exist
+    if(!aurostd::FileExist(aflowindir)){ // file does not exist
       if(osswrite) {oss << "MMMMM  Not loading unexisting file = " << aflowindir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
       return FALSE;
     }
-    if(aurostd::FileEmpty(aflowindir)){ // must not be empty
+    if(aurostd::FileEmpty(aflowindir)){ // file is empty
       if(osswrite) {oss << "MMMMM  Not loading empty file = " << aflowindir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
       return FALSE;
     }
-    if(!aurostd::substring2bool(aflowindir,_AFLOWIN_)){ // there must be an _AFLOWIN_
+    if(!aurostd::substring2bool(aflowindir,_AFLOWIN_)){ // _AFLOWIN_ does not exist
       if(osswrite) {oss << "MMMMM  Not loading file without " << _AFLOWIN_ << " = " << aflowindir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
       return FALSE;
     }
     aurostd::StringSubst(aflowindir,_AFLOWIN_,"");
     if(!aurostd::LinkFileAtomic(aflowindir+"/"+_AFLOWIN_,aflowindir+"/LOCK."+_AFLOWIN_,false) ||
-       aurostd::DirectoryLocked(aflowindir,_AFLOWLOCK_)){ // it should be UNLOCKED if temporary hard link can be made OR LOCK file does not exist //SD20220207
+       aurostd::DirectoryLocked(aflowindir,_AFLOWLOCK_)){ // directory is locked if temporary hard link cannot be made OR LOCK file exists //SD20220207
       if(osswrite) {oss << "MMMMM  Directory locked = " << aflowindir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
       return FALSE;
     }
