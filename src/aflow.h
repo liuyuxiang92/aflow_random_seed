@@ -4953,6 +4953,7 @@ namespace xelement {
       ~xelement();                                                    // kill everything
       const xelement& operator=(const xelement &b);                   // copy
       void clear();
+      uint isElement(const string& element) const;  //CO20201220
       void loadDefaultUnits();  //CO20201111
       void populate(const string& element,int oxidation_state=AUROSTD_MAX_INT); //CO20200520
       void populate(uint ZZ,int oxidation_state=AUROSTD_MAX_INT); //CO20200520

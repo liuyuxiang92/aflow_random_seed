@@ -4492,14 +4492,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     for (; line < vinput.size() - 1 && ATAT; line++) {
       aurostd::string2tokens(vinput[line],tokens," ");
       ATAT = (tokens.size() == 4 && aurostd::isfloat(tokens[0]) && aurostd::isfloat(tokens[1]) && aurostd::isfloat(tokens[2]));
-      if (ATAT) {
-        try {
-          xelement::symbol2Z(tokens[3]);
-        }
-        catch (aurostd::xerror& excpt) {
-          ATAT = 0;
-        }
-      }
+      if (ATAT && !xelement::isElement(tokens[3])) {ATAT = 0;}
     }
 
     if (ATAT == 1) {
@@ -6645,9 +6638,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
       avec(1) = aurostd::string2utype<double>(tokens[0]);
       avec(2) = aurostd::string2utype<double>(tokens[1]);
       avec(3) = aurostd::string2utype<double>(tokens[2]);
-      atom.name = atom.cleanname=tokens[3];
+      //atom.name = atom.cleanname=tokens[3];
       atom.fpos = BringInCell(aurostd::inverse(trasp(a.lattice)) * coorsys * avec);
-      atom.cpos = a.f2c * atom.fpos;
+      atom.cpos = a.c2f * atom.fpos;
       atom.name_is_given = TRUE;
       a.AddAtom(atom);
       if (LDEBUG) {
