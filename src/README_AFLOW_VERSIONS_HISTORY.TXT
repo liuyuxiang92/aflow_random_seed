@@ -7,6 +7,7 @@
         -- testing new structure enumeration algorithm, to be finished (CO)
         -- removing whitespaces and hyphens from chull input injected from web (CO)
         -- patching IsDirectory() and IsFile(), used to trip over directory/file permissions (CO)
+        -- added md5sum to --xplug (CO)
 3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)
