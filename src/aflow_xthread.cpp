@@ -652,13 +652,13 @@ namespace xthread {
 
   //POccCalculator::calculatePhononDOSThread
   template void xThread::run<
-    std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&, std::mutex&)>,
+    std::function<void(uint, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&, std::mutex&)>,
     vector<uint>,
     aurostd::xoption,
     vector<apl::DOSCalculator>,
     vector<xDOSCAR>,
     std::mutex
-  >(int, std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&, std::mutex&)>&,
+  >(uint, std::function<void(uint, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&, std::mutex&)>&,
     vector<uint>&,
     aurostd::xoption&,
     vector<apl::DOSCalculator>&,
@@ -677,11 +677,11 @@ namespace xthread {
 
   //apl::TCONDCalculator::calculateDelta
   template void xThread::run<
-    std::function<void(uint, const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&)>,
+    std::function<void(int, const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&)>,
     const vector<vector<double> >,
     vector<vector<xvector<double> > >,
     vector<vector<xvector<double> > >
-  >(int, std::function<void(uint, const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&)>&,
+  >(int, std::function<void(int, const vector<vector<double> >&, const vector<vector<xvector<double> > >&, vector<vector<xvector<double> > >&)>&,
     const vector<vector<double> >&,
     vector<vector<xvector<double> > >&,
     vector<vector<xvector<double> > >&
