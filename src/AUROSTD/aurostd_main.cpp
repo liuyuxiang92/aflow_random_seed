@@ -1993,6 +1993,7 @@ namespace aurostd {
   // ***************************************************************************
   bool DirectoryLocked(string directory,string LOCK) {
     if(FileExist(directory+"/"+LOCK)) return TRUE;
+    if(FileExist(directory+"/"+LOCK+_LOCK_LINK_SUFFIX_)) return TRUE;
     if(FileExist(directory+"/"+LOCK+".xz")) return TRUE;
     if(FileExist(directory+"/"+LOCK+".gz")) return TRUE;
     if(FileExist(directory+"/"+LOCK+".bz2")) return TRUE;

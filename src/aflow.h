@@ -167,6 +167,7 @@ namespace AFLOW_PTHREADS {
 
 extern string _AFLOWIN_; 
 extern string _AFLOWLOCK_; 
+extern const string _LOCK_LINK_SUFFIX_; //SD20220224
 
 const string VASP_KEYWORD_EXECUTION=" Executing: ";
 
