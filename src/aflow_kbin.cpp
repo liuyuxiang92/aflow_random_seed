@@ -495,7 +495,7 @@ namespace KBIN {
         aus << "EEEEE  FILE_EMPTY = " << file_name  << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);return 1;  //CO20200624 - previously exit
       }
       aus << "MMMMM  Loading File = " << file_name << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
-      string aflowindir;
+      string aflowindir="";
       vector<string> vlines;
       vlines.clear();
       aurostd::file2vectorstring(file_name,vlines);
@@ -521,7 +521,7 @@ namespace KBIN {
         if(!Legitimate_aflowin(vlines[i],FALSE,aus)) {continue;} // TRUE puts too much verbosity
         aflowindir = vlines[i];
         aurostd::StringSubst(aflowindir,_AFLOWIN_,"");
-        if(aurostd::LinkFileAtomic(aflowindir+"/"+_AFLOWIN_,aflowindir+"/LOCK."+_AFLOWIN_,false)) {vruns.push_back(vlines[i]);} //SD20220223 - link LOCK file
+        if(aurostd::LinkFileAtomic(aflowindir+"/"+_AFLOWIN_,aflowindir+"/"+_AFLOWLOCK_+".init",false)) {vruns.push_back(vlines[i]);} //SD20220223 - link LOCK file
       }
 
       aus << "MMMMM  " <<  aurostd::PaddedPOST("Legitimate VRUNS = "+aurostd::utype2string(vruns.size()),40) << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
@@ -772,14 +772,14 @@ namespace KBIN {
         // FILE SPECIFIED
         if(aflags.AFLOW_PERFORM_FILE) {
           aus << "MMMMM  AFLOW: aflags.AFLOW_PERFORM_FILE==TRUE" << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
-          string aflowindir;
+          string aflowindir="";
           vaflowin.clear();
           for(uint i=0;(i<vruns.size() && vaflowin.size()<maxcheck);i++) {
             if(!Legitimate_aflowin(vruns[i],FALSE,aus)) {continue;} // TRUE puts too much verbosity
             aflowindir = vruns[i];
             aurostd::StringSubst(aflowindir,_AFLOWIN_,"");
             //SD20220223 - linked LOCK file should already exist from previous for loop, so if we cannot make a link then directory is valid
-            if(!aurostd::LinkFileAtomic(aflowindir+"/"+_AFLOWIN_,aflowindir+"/LOCK."+_AFLOWIN_,false)) {vaflowin.push_back(vruns[i]);} 
+            if(!aurostd::LinkFileAtomic(aflowindir+"/"+_AFLOWIN_,aflowindir+"/"+_AFLOWLOCK_+".init",false)) {vaflowin.push_back(vruns[i]);} 
             // vaflowin.push_back(vruns[i]); // just load them up... they were checked before //OLD MUST RECHECH THEM as things change on the fly
           }
         }
@@ -868,7 +868,6 @@ namespace KBIN {
         //  ---------------------------------------------------------------------------- START RUNNING
         if(FOUND) {
           // again another check for LOCK, because NFS (network file system might be slow in concurrent seaches
-	      aurostd::UnlinkFile(aflags.Directory+"/LOCK."+_AFLOWIN_); // Remove LOCK link // SD20220207
           EMPTY=FALSE;
           //  ---------------------------------------------------------------------------- KIN_RUN_AFLOWIN
           if(aflags.KBIN_RUN_AFLOWIN) {
@@ -1123,7 +1122,7 @@ namespace KBIN {
 
     // ---------------------------------------------------------------------------
     // create lock immediately // CO20210901
-    aus << "touch " << aflags.Directory << "LOCK";
+    aus << "touch " << aflags.Directory << "/" << _AFLOWLOCK_; // SD20220223 - use _AFLOWLOCK_
     message <<    "MMMMM  Executing: \"" << aus.str() << "\"" << Message(_AFLOW_FILE_NAME_,aflags,"user,host,time") << endl;aurostd::PrintMessageStream(message,XHOST.QUIET);message.clear();message.str(std::string());
     aurostd::execute(aus);
     aus.clear();aus.str(std::string());
@@ -1264,7 +1263,7 @@ namespace KBIN {
           // ***************************************************************************
           // FLUSH & REOPEN to avoid double writing
           FileLOCK.flush();FileLOCK.close();FileLOCK.open(FileNameLOCK.c_str(),std::ios::app);
-          aurostd::UnlinkFile(aflags.Directory+"/LOCK."+_AFLOWIN_); // Remove LOCK link // SD20220207
+          aurostd::UnlinkFile(aflags.Directory+"/"+_AFLOWLOCK_+".init"); // Remove LOCK link // SD20220207
           // ***************************************************************************
           // NOW Digest AFLOWIN
           FileAFLOWIN.clear();FileAFLOWIN.seekg(0);
