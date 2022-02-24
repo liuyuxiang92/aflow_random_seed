@@ -248,7 +248,7 @@ namespace KBIN {
 // KBIN::Legitimate_aflowin
 // ***************************************************************************
 namespace KBIN {
-  bool Legitimate_aflowin(const string _aflowindir,const bool& osswrite,ostringstream& oss) {
+  bool Legitimate_aflowin(const string& _aflowindir,const bool& osswrite,ostringstream& oss) {
     string aflowindir=_aflowindir;
     aurostd::StringSubst(aflowindir,"//","/");
     if(!aurostd::FileExist(aflowindir)){ // file does not exist
@@ -280,7 +280,7 @@ namespace KBIN {
 // KBIN::Legitimate_aflowdir
 // ***************************************************************************
 namespace KBIN {
-  bool Legitimate_aflowdir(const string aflowdir,const _aflags& aflags,const bool& osswrite,ostringstream& oss) {
+  bool Legitimate_aflowdir(const string& aflowdir,const _aflags& aflags,const bool& osswrite,ostringstream& oss) {
     if(!aurostd::FileExist(aflowdir)){ // directory does not exist
       if(osswrite) {oss << "MMMMM  Directory does not exist = " << aflowdir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
       return FALSE;
@@ -306,7 +306,7 @@ namespace KBIN {
 }
 
 namespace KBIN {
-  bool Legitimate_aflowdir(const string aflowdir,const _aflags& aflags) { ostringstream aus; return KBIN::Legitimate_aflowdir(aflowdir,aflags,FALSE,aus);};
+  bool Legitimate_aflowdir(const string& aflowdir,const _aflags& aflags) { ostringstream aus; return KBIN::Legitimate_aflowdir(aflowdir,aflags,FALSE,aus);};
 }
 
 namespace KBIN {
@@ -333,6 +333,7 @@ namespace KBIN {
   int KBIN_Main(vector<string> argv) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "KBIN::KBIN_Main():";
+    if (argv.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Missing arguments",_INPUT_MISSING_);} //SD2022024 - check argv!=0
     string GENERIC;
     //  string Directory;
     int i;
@@ -631,7 +632,7 @@ namespace KBIN {
     // ------------------------------------------------------------------------------------------------------------------------------------
     // nothing specified : CHECK IF DAEMON
     if(XHOST.AFLOW_RUNDIRflag) { // check if daemaon aflowd
-      string progname=argv.at(0);
+      string progname=argv[0];
       if(aurostd::substring2bool(progname,"aflowd")) {
         XHOST.AFLOW_MULTIflag=TRUE;
         XHOST.AFLOW_RUNXflag=FALSE;
@@ -1262,7 +1263,7 @@ namespace KBIN {
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
-    if(aflags.Directory.at(0)!='/' && aflags.Directory.at(0)!='.' && aflags.Directory.at(0)!=' ') aflags.Directory="./"+aflags.Directory;
+    if(aflags.Directory.empty() || (aflags.Directory[0]!='/' && aflags.Directory[0]!='.' && aflags.Directory[0]!=' ')){aflags.Directory="./"+aflags.Directory;}
 
     //[SD20220224 - OBSOLETE]if(!FileSUBDIR) {                                                                                           // ******* Directory is non existent
     //[SD20220224 - OBSOLETE]  aus << "EEEEE  DIRECTORY_NOT_FOUND = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
@@ -1754,7 +1755,7 @@ namespace KBIN {
           FileCHECK.open(FileNameCHECK.c_str(),std::ios::in);                         // _AFLOWIN_.EXT
           FileCHECK.clear();FileCHECK.close();                                        // _AFLOWIN_.EXT
           if(FileCHECK) {                                                             // _AFLOWIN_.EXT
-            aurostd::execute(XHOST.vzip.at(iext)+" -dqf "+_AFLOWIN_+XHOST.vext[iext]); // _AFLOWIN_.EXT
+            aurostd::execute(XHOST.vzip[iext]+" -dqf "+_AFLOWIN_+XHOST.vext[iext]); // _AFLOWIN_.EXT
           }
         } // _AFLOWIN_.EXT
       }

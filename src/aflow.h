@@ -2970,10 +2970,10 @@ namespace KBIN {
   void StartStopCheck(const string &AflowIn,string str1,bool &flag,bool &flagS);
   bool Legitimate_krun(const _aflags& aflags,const bool& osswrite,ostringstream& oss); //SD20220224
   bool Legitimate_krun(const _aflags& aflags); //SD20220224
-  bool Legitimate_aflowin(const string aflowindir,const bool& osswrite,ostringstream& oss); //SD20220224 - made aflowindir const
-  bool Legitimate_aflowin(const string aflowindir); //SD20220224 - made aflowindir const
-  bool Legitimate_aflowdir(const string aflowindir,const _aflags& aflags,const bool& osswrite,ostringstream& oss); //SD20220224
-  bool Legitimate_aflowdir(const string aflowindir,const _aflags& aflags); //SD20220224
+  bool Legitimate_aflowin(const string& aflowindir,const bool& osswrite,ostringstream& oss); //SD20220224 - made aflowindir const
+  bool Legitimate_aflowin(const string& aflowindir); //SD20220224 - made aflowindir const
+  bool Legitimate_aflowdir(const string& aflowindir,const _aflags& aflags,const bool& osswrite,ostringstream& oss); //SD20220224
+  bool Legitimate_aflowdir(const string& aflowindir,const _aflags& aflags); //SD20220224
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss=cout); //CO20191110
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss=cout); //CO20191110
   void getAflowInFromDirectory(const string& directory,string& AflowIn_file,string& AflowIn,ostream& oss=cout); //CO20191110
