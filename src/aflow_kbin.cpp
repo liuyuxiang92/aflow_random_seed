@@ -203,7 +203,7 @@ using aurostd::DirectoryUnwritable;
 // KBIN::Legitimate_krun
 // ***************************************************************************
 namespace KBIN {
-  bool Legitimate_krun(const _aflags& aflags,const bool& osswrite,ostringstream& oss) {
+  bool Legitimate_krun(const _aflags& aflags,const bool osswrite,ostringstream& oss) {
     string aflowindir=aflags.Directory,filename;
     aurostd::StringSubst(aflowindir,"//","/");
     if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP){
@@ -248,7 +248,7 @@ namespace KBIN {
 // KBIN::Legitimate_aflowin
 // ***************************************************************************
 namespace KBIN {
-  bool Legitimate_aflowin(const string& _aflowindir,const bool& osswrite,ostringstream& oss) {
+  bool Legitimate_aflowin(const string& _aflowindir,const bool osswrite,ostringstream& oss) {
     string aflowindir=_aflowindir;
     aurostd::StringSubst(aflowindir,"//","/");
     if(!aurostd::FileExist(aflowindir)){ // file does not exist
@@ -280,7 +280,7 @@ namespace KBIN {
 // KBIN::Legitimate_aflowdir
 // ***************************************************************************
 namespace KBIN {
-  bool Legitimate_aflowdir(const string& aflowdir,const _aflags& aflags,const bool& osswrite,ostringstream& oss) {
+  bool Legitimate_aflowdir(const string& aflowdir,const _aflags& aflags,const bool osswrite,ostringstream& oss) {
     if(!aurostd::FileExist(aflowdir)){ // directory does not exist
       if(osswrite) {oss << "MMMMM  Directory does not exist = " << aflowdir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
       return FALSE;
@@ -333,7 +333,7 @@ namespace KBIN {
   int KBIN_Main(vector<string> argv) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "KBIN::KBIN_Main():";
-    if (argv.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Missing arguments",_INPUT_MISSING_);} //SD2022024 - check argv!=0
+    if (argv.empty()){return 0;} //SD2022024 - check argv!=0
     string GENERIC;
     //  string Directory;
     int i;
