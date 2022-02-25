@@ -370,7 +370,7 @@ namespace xthread {
       try {
         func(icurr, args...); // Call function
       } catch (aurostd::xerror& e) {
-        string message = "Error in thread " + aurostd::utype2string<int>(ithread) + e.what();
+        string message = "Error in thread " + aurostd::utype2string<int>(ithread) + ": " + e.what();
         throw aurostd::xerror(e.whereFileName(), e.whereFunction(), message, e.whatCode());
       }
       icurr = advance(it, end, ntasks, progress_bar_set);
@@ -464,7 +464,7 @@ namespace xthread {
     try {
       func(startIndex, endIndex, args...);
     } catch (aurostd::xerror& e) {
-      string message = "Error in thread " + aurostd::utype2string<int>(ithread) + e.what();
+      string message = "Error in thread " + aurostd::utype2string<int>(ithread) + ": " + e.what();
       throw aurostd::xerror(e.whereFileName(), e.whereFunction(), message, e.whatCode());
     }
   }
