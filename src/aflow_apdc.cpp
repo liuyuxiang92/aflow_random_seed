@@ -69,7 +69,7 @@ namespace apdc {
     apdc_data.plattice = aurostd::tolower(apdc_data.plattice);
     aurostd::sort_remove_duplicates(apdc_data.elements);
     if (!aurostd::DirectoryMake(apdc_data.rootdirpath)) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetPhaseDiagram():", "Cannot create directory", _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetPhaseDiagram():", "Cannot create directory", _FILE_ERROR_);
     }
     if (apdc_data.plattice != "fcc" && apdc_data.plattice != "bcc" && apdc_data.plattice != "hcp") {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetPhaseDiagram():", "Invalid parent lattice", _INPUT_ILLEGAL_);
