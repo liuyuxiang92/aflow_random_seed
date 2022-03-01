@@ -3670,7 +3670,7 @@ namespace aurostd {
     FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
     bool status=FALSE;
     while(getline(FileIN,strline)) {
-      if(aurostd::substring2bool(strline,Keyword_stop))  {status=FALSE;break;}
+      if(aurostd::substring2bool(strline,Keyword_stop))  break;
       if(status) StringstreamOUTPUT << strline << endl;
       if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
     }
@@ -3690,7 +3690,7 @@ namespace aurostd {
     vector<string> tokens;
     aurostd::string2tokens(StringIN,tokens,"\n");
     for(uint i=0;i<tokens.size();i++) {
-      if(aurostd::substring2bool(tokens[i],Keyword_stop))  {status=FALSE;break;}
+      if(aurostd::substring2bool(tokens[i],Keyword_stop))  break;
       if(status) StringstreamOUTPUT << tokens[i] << endl;
       if(aurostd::substring2bool(tokens[i],Keyword_start)) status=TRUE;
     }

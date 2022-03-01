@@ -3327,7 +3327,8 @@ namespace aflowlib {
     if(LDEBUG) cerr << soliloquy << " [7]" << endl;
 
     if(str_orig.num_each_type.size()==0 && aurostd::FileExist(directory_RAW+"/POSCAR.orig")) {
-      xstructure _str_orig(directory_RAW+"/POSCAR.orig",IOVASP_AUTO);
+      //xstructure _str_orig(directory_RAW+"/POSCAR.orig",IOVASP_AUTO);
+      xstructure _str_orig=KBIN::ExtractPOSCARFromAFLOWIN(directory_RAW,IOVASP_AUTO); //SD20220228 - correct original xstructure
       str_orig=_str_orig;
       str_orig.SetSpecies(deq_species); //DX20190620 - add species to xstructure
       str_orig.ReScale(1.0);
@@ -3895,7 +3896,8 @@ namespace aflowlib {
       bool no_scan = false;
 
       // pre
-      xstructure str_orig(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO);
+      //xstructure str_orig(directory_RAW+"/POSCAR.orig",IOAFLOW_AUTO);
+      xstructure str_orig=KBIN::ExtractPOSCARFromAFLOWIN(directory_RAW,IOVASP_AUTO); //SD20220228 - correct original xstructure
       double pre_default_tolerance=SYM::defaultTolerance(str_orig);
       // mid
       xstructure str_mid(directory_RAW+"/CONTCAR.relax1",IOAFLOW_AUTO);

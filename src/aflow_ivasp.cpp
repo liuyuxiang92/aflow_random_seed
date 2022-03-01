@@ -8075,7 +8075,7 @@ namespace KBIN {
 namespace KBIN {
   // SD20220228 - Extract either the first (default) or last POSCAR from
   // the AFLOWIN
-  xstructure ExtractPOSCARFromAFLOWIN(const string& directory, bool first) {
+  xstructure ExtractPOSCARFromAFLOWIN(const string& directory, int iomode, bool first) {
     string function_name = "KBIN::ExtractPOSCARFromAFLOWIN():";
     stringstream poscar;
     string aflowin;
@@ -8098,7 +8098,7 @@ namespace KBIN {
       string message = "Invalid " + _AFLOWIN_;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_WRONG_FORMAT_);
     }
-    return xstructure(poscar, IOVASP_AUTO);
+    return xstructure(poscar, iomode);
   }
 } // namespace KBIN
 
