@@ -3726,7 +3726,7 @@ namespace aurostd {
   }
   // *******************************************************************************************
 
-  // SD20220301 - Extract the nth entry to stringstream, negative values go backwards
+  // SD20220301 - Extract the nth entry to stringstream, negative values go backwards, n==0 returns all entries
   bool ExtractNthToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,string Keyword,int index) {
     aurostd::StringstreamClean(StringstreamOUTPUT);
     string strline,subS2;
