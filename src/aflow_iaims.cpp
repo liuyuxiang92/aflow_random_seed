@@ -431,7 +431,8 @@ namespace KBIN {
           if(aurostd::substring2bool(AflowIn,"[AIMS_GEOM_MODE_EXPLICIT]START") &&
               aurostd::substring2bool(AflowIn,"[AIMS_GEOM_MODE_EXPLICIT]STOP"))
             // [OBSOLETE]	  aurostd::ExtractLastToStringstreamEXPLICIT(FileAFLOWIN,xaims.GEOM,"[AIMS_GEOM_MODE_EXPLICIT]START","[AIMS_GEOM_MODE_EXPLICIT]STOP");
-            aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,xaims.GEOM,"[AIMS_GEOM_MODE_EXPLICIT]START","[AIMS_GEOM_MODE_EXPLICIT]STOP");
+            //[SD20220301 - OBSOLETE]aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,xaims.GEOM,"[AIMS_GEOM_MODE_EXPLICIT]START","[AIMS_GEOM_MODE_EXPLICIT]STOP");
+            aurostd::ExtractNthToStringstreamEXPLICIT(AflowIn,xaims.GEOM,"[AIMS_GEOM_MODE_EXPLICIT]START","[AIMS_GEOM_MODE_EXPLICIT]STOP",-1);
           xaims.str=xstructure(xaims.GEOM,IOAIMS_AUTO);   // load structure
         }
         // get ONE of MANY

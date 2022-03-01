@@ -332,7 +332,8 @@ namespace pocc {
   xstructure extractPARTCAR(const string& AflowIn){
     string soliloquy=XPID+"pocc::extractPARTCAR():";
     stringstream ss_pocc_structure;
-    aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,ss_pocc_structure, "[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE", "[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE");
+    //[SD20220301 - OBSOLETE]aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,ss_pocc_structure, "[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE", "[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE");
+    aurostd::ExtractNthToStringstreamEXPLICIT(AflowIn,ss_pocc_structure, "[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE", "[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE",-1);
     if(ss_pocc_structure.str().empty()){
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No PARTCAR found (looking for [POCC_MODE_EXPLICIT]START.POCC_STRUCTURE / [POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE)");
     }

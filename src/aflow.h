@@ -3227,7 +3227,7 @@ namespace KBIN {
   string ExtractSystemName(const string& directory);  //ME20200217
   string ExtractSystemNameFromAFLOWIN(const string& directory);  //ME20200217
   string ExtractSystemNameFromVASP(const string& directory);  //ME20200217
-  xstructure ExtractPOSCARFromAFLOWIN(const string& directory, int iomode, bool first=true); //SD20220228
+  xstructure ExtractPOSCARFromAFLOWIN(const string& directory,int iomode,int index); //SD20220228
   double ExtractEfermiOUTCAR(string directory);
   xstructure GetMostRelaxedStructure(string directory); //CO20180627
   vector<string> ExtractAtomicSpecies(const string& directory,ostream& oss=cout);

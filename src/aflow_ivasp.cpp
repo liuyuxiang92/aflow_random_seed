@@ -1402,7 +1402,8 @@ namespace KBIN {
           if(aurostd::substring2bool(AflowIn,"[VASP_POSCAR_MODE_EXPLICIT]START") &&
               aurostd::substring2bool(AflowIn,"[VASP_POSCAR_MODE_EXPLICIT]STOP"))
             // [OBSOLETE]	  aurostd::ExtractLastToStringstreamEXPLICIT(FileAFLOWIN,xvasp.POSCAR,"[VASP_POSCAR_MODE_EXPLICIT]START","[VASP_POSCAR_MODE_EXPLICIT]STOP");
-            aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,xvasp.POSCAR,"[VASP_POSCAR_MODE_EXPLICIT]START","[VASP_POSCAR_MODE_EXPLICIT]STOP");
+            //[SD20220301 - OBSOLETE]aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,xvasp.POSCAR,"[VASP_POSCAR_MODE_EXPLICIT]START","[VASP_POSCAR_MODE_EXPLICIT]STOP");
+            aurostd::ExtractNthToStringstreamEXPLICIT(AflowIn,xvasp.POSCAR,"[VASP_POSCAR_MODE_EXPLICIT]START","[VASP_POSCAR_MODE_EXPLICIT]STOP",-1);
           xvasp.str=xstructure(xvasp.POSCAR,IOVASP_AUTO);   // load structure
         }
         // get ONE of MANY
@@ -8073,28 +8074,24 @@ namespace KBIN {
 // KBIN::ExtractPOSCARFromAFLOWIN
 // ***************************************************************************
 namespace KBIN {
-  // SD20220228 - Extract either the first (default) or last POSCAR from
-  // the AFLOWIN
-  xstructure ExtractPOSCARFromAFLOWIN(const string& directory, int iomode, bool first) {
+  // SD20220228 - Extract the nth POSCAR from the AFLOWIN, negative values go backwards
+  xstructure ExtractPOSCARFromAFLOWIN(const string& directory, int iomode, int index) {
     string function_name = "KBIN::ExtractPOSCARFromAFLOWIN():";
     stringstream poscar;
     string aflowin;
     string poscar_start = _VASP_POSCAR_MODE_EXPLICIT_START_;
     string poscar_stop = _VASP_POSCAR_MODE_EXPLICIT_STOP_;
-    bool success = 0;
+    aurostd::StringSubst(poscar_start, ".", ""); // remove ending period
+    aurostd::StringSubst(poscar_stop, ".", ""); // remove ending period
+    if(index==0) {
+      string message = "Index cannot be 0";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+    }
     if(!aurostd::file2string(directory + "/" + _AFLOWIN_, aflowin)) { 
       string message = "Could not find " + _AFLOWIN_ + " in " + directory;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_NOT_FOUND_);
     }
-    aurostd::StringSubst(poscar_start, ".", ""); // remove ending period
-    aurostd::StringSubst(poscar_stop, ".", ""); // remove ending period
-    if(first) {
-      success = aurostd::ExtractFirstToStringstreamEXPLICIT(aflowin, poscar, poscar_start, poscar_stop);
-    }
-    else {
-      success = aurostd::ExtractLastToStringstreamEXPLICIT(aflowin, poscar, poscar_start, poscar_stop);
-    }
-    if(!success) {
+    if(!aurostd::ExtractNthToStringstreamEXPLICIT(aflowin, poscar, poscar_start, poscar_stop, index)) {
       string message = "Invalid " + _AFLOWIN_;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_WRONG_FORMAT_);
     }
