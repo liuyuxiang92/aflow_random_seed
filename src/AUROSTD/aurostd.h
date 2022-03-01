@@ -589,6 +589,11 @@ namespace aurostd {
   bool ExtractToStringstreamEXPLICIT(stringstream StringStreamIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop);
   bool ExtractToStringstreamEXPLICIT(string StringIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop);
   bool ExtractToStringstreamEXPLICIT(string StringIN,stringstream& StringstreamOUTPUT,string Keyword);
+  // take the first //SD20220228
+  bool ExtractFirstToStringstreamEXPLICIT(ifstream &FileIN,stringstream& StringstreamOUTPUT,string Keyword);
+  bool ExtractFirstToStringstreamEXPLICIT(ifstream &FileIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop);
+  bool ExtractFirstToStringstreamEXPLICIT(stringstream StringStreamIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop);
+  bool ExtractFirstToStringstreamEXPLICIT(string StringIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop);
   // take the last
   bool ExtractLastToStringstreamEXPLICIT(ifstream &FileIN,stringstream& StringstreamOUTPUT,string Keyword);
   bool ExtractLastToStringstreamEXPLICIT(ifstream &FileIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop);

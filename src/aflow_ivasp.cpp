@@ -8069,6 +8069,39 @@ namespace KBIN {
   }
 } // namespace KBIN
 
+// ***************************************************************************
+// KBIN::ExtractPOSCARFromAFLOWIN
+// ***************************************************************************
+namespace KBIN {
+  // SD20220228 - Extract either the first (default) or last POSCAR from
+  // the AFLOWIN
+  xstructure ExtractPOSCARFromAFLOWIN(const string& directory, bool first) {
+    string function_name = "KBIN::ExtractPOSCARFromAFLOWIN():";
+    stringstream poscar;
+    string aflowin;
+    string poscar_start = _VASP_POSCAR_MODE_EXPLICIT_START_;
+    string poscar_stop = _VASP_POSCAR_MODE_EXPLICIT_STOP_;
+    bool success = 0;
+    if(!aurostd::file2string(directory + "/" + _AFLOWIN_, aflowin)) { 
+      string message = "Could not find " + _AFLOWIN_ + " in " + directory;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_NOT_FOUND_);
+    }
+    aurostd::StringSubst(poscar_start, ".", ""); // remove ending period
+    aurostd::StringSubst(poscar_stop, ".", ""); // remove ending period
+    if(first) {
+      success = aurostd::ExtractFirstToStringstreamEXPLICIT(aflowin, poscar, poscar_start, poscar_stop);
+    }
+    else {
+      success = aurostd::ExtractLastToStringstreamEXPLICIT(aflowin, poscar, poscar_start, poscar_stop);
+    }
+    if(!success) {
+      string message = "Invalid " + _AFLOWIN_;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_WRONG_FORMAT_);
+    }
+    return xstructure(poscar, IOVASP_AUTO);
+  }
+} // namespace KBIN
+
 #endif
 
 // ***************************************************************************

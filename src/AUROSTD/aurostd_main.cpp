@@ -3658,6 +3658,47 @@ namespace aurostd {
 
   // *******************************************************************************************
   // *******************************************************************************************
+  // SD20220228 - Only extract the first match
+  bool ExtractFirstToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,string Keyword) {   // AFLOW_FUNCTION_IMPLEMENTATION
+    return ExtractToStringstreamEXPLICIT(FileIN,StringstreamOUTPUT,Keyword);
+  }
+
+  // *******************************************************************************************
+  bool ExtractFirstToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop) {    // AFLOW_FUNCTION_IMPLEMENTATION
+    aurostd::StringstreamClean(StringstreamOUTPUT);
+    string strline;
+    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+    bool status=FALSE;
+    while(getline(FileIN,strline)) {
+      if(aurostd::substring2bool(strline,Keyword_stop))  {status=FALSE;break;}
+      if(status) StringstreamOUTPUT << strline << endl;
+      if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
+    }
+    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+    return status;  // return FALSE if something got messed up
+  }
+
+  bool ExtractFirstToStringstreamEXPLICIT(stringstream StringStreamIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop) { // AFLOW_FUNCTION_IMPLEMENTATION
+    aurostd::StringstreamClean(StringstreamOUTPUT);
+    string StringIN=StringStreamIN.str();
+    return ExtractFirstToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start,Keyword_stop);
+  }
+
+  bool ExtractFirstToStringstreamEXPLICIT(string StringIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop) {  // AFLOW_FUNCTION_IMPLEMENTATION
+    aurostd::StringstreamClean(StringstreamOUTPUT);
+    bool status=FALSE;
+    vector<string> tokens;
+    aurostd::string2tokens(StringIN,tokens,"\n");
+    for(uint i=0;i<tokens.size();i++) {
+      if(aurostd::substring2bool(tokens[i],Keyword_stop))  {status=FALSE;break;}
+      if(status) StringstreamOUTPUT << tokens[i] << endl;
+      if(aurostd::substring2bool(tokens[i],Keyword_start)) status=TRUE;
+    }
+    return status;  // return FALSE if something got messed up
+  }
+
+  // *******************************************************************************************
+  // *******************************************************************************************
   bool ExtractLastToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,string Keyword) {   // AFLOW_FUNCTION_IMPLEMENTATION
     return ExtractToStringstreamEXPLICIT(FileIN,StringstreamOUTPUT,Keyword);
   }

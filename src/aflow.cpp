@@ -1426,6 +1426,10 @@ int main(int _argc,char **_argv) {
     }
 
     if(!Arun && (aurostd::args2flag(argv,cmds,"--scrub") || aurostd::args2attachedflag(argv,"--scrub="))) {
+      //SD999
+        cerr << KBIN::ExtractPOSCARFromAFLOWIN("/home/sd453/tmp/testing/binary/fcc/AuPt",false) << endl;
+        return 0;
+      //SD999
       //  XHOST.DEBUG=TRUE;
       aflowlib::LIB2SCRUB(aurostd::args2attachedstring(argv,"--scrub=","ALL"),TRUE);
       return 0; //CO20180419
