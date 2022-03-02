@@ -3125,7 +3125,7 @@ namespace KBIN {
   bool VASP_Reread_INCAR(_xvasp& xvasp); //CO20210315
   bool VASP_Reread_INCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
   bool VASP_Produce_POSCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
-  bool VASP_Produce_POSCAR(_xvasp& xvasp);
+  bool VASP_Produce_POSCAR(_xvasp& xvasp,const string& Directory); //SD20220302 - produce POSCAR.orig from AFLOWIN
   bool VASP_Modify_POSCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_vflags& vflags);
   void convertPOSCARFormat(_xvasp&, const _aflags& aflags, const _kflags&);  //ME20190220 //CO20210713 - aflags
   bool VASP_Convert_Unit_Cell(_xvasp&, _vflags&, _aflags&, ofstream&, ostringstream&); //ME20181216
@@ -3227,7 +3227,10 @@ namespace KBIN {
   string ExtractSystemName(const string& directory);  //ME20200217
   string ExtractSystemNameFromAFLOWIN(const string& directory);  //ME20200217
   string ExtractSystemNameFromVASP(const string& directory);  //ME20200217
-  xstructure ExtractPOSCARFromAFLOWIN(const string& directory,int iomode,int index); //SD20220228
+  xstructure ExtractPOSCARFromDirectory(const string& directory,int iomode,int index); //SD20220228
+  stringstream ExtractPOSCARFromDirectory(const string& directory,int index); //SD20220228
+  xstructure ExtractPOSCARFromAFLOWIN(const string& AflowIn,int iomode,int index); //SD20220228
+  stringstream ExtractPOSCARFromAFLOWIN(const string& AflowIn,int index); //SD20220228
   double ExtractEfermiOUTCAR(string directory);
   xstructure GetMostRelaxedStructure(string directory); //CO20180627
   vector<string> ExtractAtomicSpecies(const string& directory,ostream& oss=cout);
