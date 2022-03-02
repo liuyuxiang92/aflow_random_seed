@@ -3719,10 +3719,10 @@ namespace aurostd {
     if(size==0) {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "Vector has zero size", _VALUE_ERROR_);
     }
-    if(std::abs(index)>size) {
+    if(std::abs(index)+(1+aurostd::sign(index))/2>size) {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "Index outside of vector bounds", _INDEX_BOUNDS_);
     }
-    return (uint)((index-1)%size+size)%size;
+    return (uint)(index%size+size)%size;
   }
   // *******************************************************************************************
 
@@ -3744,7 +3744,7 @@ namespace aurostd {
         for(uint i=0;i<tokens.size();i++) StringstreamOUTPUT << tokens[i] << endl;
       }
       else {
-        uint i=aurostd::ConvertNegativeIndex(index,tokens.size());
+        uint i=aurostd::ConvertNegativeIndex(index<0?index:index-1,tokens.size());
         StringstreamOUTPUT << tokens[i] << endl;
       }
       return TRUE;
@@ -3762,27 +3762,50 @@ namespace aurostd {
     vector<uint> vstart, vstop;
     aurostd::stream2vectorstring(FileIN,tokens);
     uint istart=0,istop=0;
-    for(uint i=0; i<tokens.size();i++) {
-      if(aurostd::substring2bool(tokens[i],Keyword_stop)) {
-        istop=i-1;
-        vstop.push_back(istop);
+    int iter=0;
+    if(index>0) {
+      for(uint i=0;i<tokens.size();i++) {
+        if(aurostd::substring2bool(tokens[i],Keyword_stop)) {
+          istop=i-1;
+          if(index==iter) {vstop.push_back(istop);break;}
+        }
+        if(aurostd::substring2bool(tokens[i],Keyword_start)) {
+          iter++;
+          istart=i+1;
+          if(index==iter) {vstart.push_back(istart);}
+        }
       }
-      if(aurostd::substring2bool(tokens[i],Keyword_start)) {
-        istart=i+1;
-        vstart.push_back(istart);
+    }
+    else if(index<0) {
+      for(int i=tokens.size()-1;i>=0;i--) {
+        if(aurostd::substring2bool(tokens[i],Keyword_stop)) {
+          iter--;
+          istop=i-1;
+          if(index==iter) {vstop.push_back(istop);}
+        }    
+        if(aurostd::substring2bool(tokens[i],Keyword_start)) {
+          istart=i+1;
+          if(index==iter) {vstart.push_back(istart);break;}
+        }    
+      }    
+    }   
+    else {
+      for(uint i=0;i<tokens.size();i++) {
+        if(aurostd::substring2bool(tokens[i],Keyword_stop)) {
+          istop=i-1;
+          vstop.push_back(istop);
+        }
+        if(aurostd::substring2bool(tokens[i],Keyword_start)) {
+          istart=i+1;
+          vstart.push_back(istart);
+        }
       }
     }
     if(vstop.size()>0) {
       if(vstop.size()!=vstart.size()) vstart.pop_back(); // remove unfinished start
-      if(index==0) {
         for(uint i=0;i<vstart.size();i++) {
           for(uint j=vstart[i];j<=vstop[i];j++) StringstreamOUTPUT << tokens[j] << endl;
         }
-      }
-      else {
-        uint i=aurostd::ConvertNegativeIndex(index,vstart.size());
-        for(uint j=vstart[i];j<=vstop[i];j++) StringstreamOUTPUT << tokens[j] << endl;
-      }
       if(LDEBUG) cerr << "LDEBUG: " << StringstreamOUTPUT.str() << endl;
       return TRUE;
     }
@@ -3803,27 +3826,50 @@ namespace aurostd {
     vector<uint> vstart, vstop;
     aurostd::string2vectorstring(StringIN,tokens);
     uint istart=0,istop=0;
-    for(uint i=0; i<tokens.size();i++) {
-      if(aurostd::substring2bool(tokens[i],Keyword_stop)) {
-        istop=i-1;
-        vstop.push_back(istop);
+    int iter=0;
+    if(index>0) {
+      for(uint i=0;i<tokens.size();i++) {
+        if(aurostd::substring2bool(tokens[i],Keyword_stop)) {
+          istop=i-1;
+          if(index==iter) {vstop.push_back(istop);break;}
+        }
+        if(aurostd::substring2bool(tokens[i],Keyword_start)) {
+          iter++;
+          istart=i+1;
+          if(index==iter) {vstart.push_back(istart);}
+        }
       }
-      if(aurostd::substring2bool(tokens[i],Keyword_start)) {
-        istart=i+1;
-        vstart.push_back(istart);
+    }
+    else if(index<0) {
+      for(int i=tokens.size()-1;i>=0;i--) {
+        if(aurostd::substring2bool(tokens[i],Keyword_stop)) {
+          iter--;
+          istop=i-1;
+          if(index==iter) {vstop.push_back(istop);}
+        }    
+        if(aurostd::substring2bool(tokens[i],Keyword_start)) {
+          istart=i+1;
+          if(index==iter) {vstart.push_back(istart);break;}
+        }    
+      }    
+    }   
+    else {
+      for(uint i=0;i<tokens.size();i++) {
+        if(aurostd::substring2bool(tokens[i],Keyword_stop)) {
+          istop=i-1;
+          vstop.push_back(istop);
+        }
+        if(aurostd::substring2bool(tokens[i],Keyword_start)) {
+          istart=i+1;
+          vstart.push_back(istart);
+        }
       }
     }
     if(vstop.size()>0) {
       if(vstop.size()!=vstart.size()) vstart.pop_back(); // remove unfinished start
-      if(index==0) {
         for(uint i=0;i<vstart.size();i++) {
           for(uint j=vstart[i];j<=vstop[i];j++) StringstreamOUTPUT << tokens[j] << endl;
         }
-      }
-      else {
-        uint i=aurostd::ConvertNegativeIndex(index,vstart.size());
-        for(uint j=vstart[i];j<=vstop[i];j++) StringstreamOUTPUT << tokens[j] << endl;
-      }
       if(LDEBUG) cerr << "LDEBUG: " << StringstreamOUTPUT.str() << endl;
       return TRUE;
     }
