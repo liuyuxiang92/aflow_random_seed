@@ -259,7 +259,7 @@ namespace apdc {
         entry.Load(aurostd::file2string(aflowlib + "/" + aurostd::utype2string<uint>(i) + "/aflowlib.out"), oss);
         entry.aurl = aflowurl + "/" + aurostd::utype2string<uint>(i);
         if (pflow::loadXstructures(entry, oss, false)) { // initial = unrelaxed; final = relaxed
-          //entry.vstr[0].ReScale(1.0);
+          entry.vstr[0].ReScale(1.0);
           entry.vstr[0].iomode = IOATAT_STR;
           entry.vstr[0].qm_E_cell = entry.enthalpy_cell; // ATAT needs energy per cell
           if (entry.spacegroup_orig == entry.spacegroup_relax) {vstr.push_back(entry.vstr[0]);}
