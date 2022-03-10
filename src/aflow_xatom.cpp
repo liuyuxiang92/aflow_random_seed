@@ -3923,15 +3923,15 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
     oss.precision(_precision_);
     oss.setf(std::ios::fixed,std::ios::floatfield);
-    xmatrix<double> coorsys = aurostd::eye<double>(3, 3); // set coordinate system to idenity
-    // write the coordinate system
+    xmatrix<double> axes = aurostd::eye<double>(3, 3); // set axes to idenity
+    // write the axes
     for (uint i = 1; i <= 3; i++) {
       for (uint j = 1; j <= 3; j++) {
-          oss << coorsys(i, j) << " ";
+          oss << axes(i, j) << " ";
       }
       oss << endl;
     }
-    // write the lattice
+    // write the fractional cell vectors (== lattice)
     for (uint i = 1; i <= 3; i++) {
       for (uint j = 1; j <= 3; j++) {
         oss << aa.lattice(i, j) << " ";
@@ -4477,7 +4477,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   if(!IOMODE_found) {
     if (LDEBUG) cerr << soliloquy << " ATAT DETECTOR" << endl; 
     uint ATAT = 1;
-    // count number of entries for coord system and lattice, check for correct type
+    // count number of entries for axes and fractional cell vectors, check for correct type
     uint line = 0;
     for (; line < vinput.size() - 1 && line < 6 && ATAT; line++) {
       aurostd::string2tokens(vinput[line], tokens, " ");
@@ -6591,29 +6591,29 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if (LDEBUG) cerr << soliloquy << " ATAT IOATAT_STR" << endl;
     a.scale = 1.0;
     a.neg_scale = FALSE;
-    xmatrix<double> coorsys(3, 3), ulat(3, 3);
+    xmatrix<double> axes(3, 3), frac_cell(3, 3);
 
-    // read coordinate system
+    // read the axes
     uint line = 0;
     uint vec_count = 1;
     for (; line < vinput.size() && vec_count < 4; line++) {
       aurostd::string2tokens(vinput[line],tokens," ");
-      coorsys(vec_count, 1) = aurostd::string2utype<double>(tokens[0]);
-      coorsys(vec_count, 2) = aurostd::string2utype<double>(tokens[1]);
-      coorsys(vec_count, 3) = aurostd::string2utype<double>(tokens[2]);
+      axes(vec_count, 1) = aurostd::string2utype<double>(tokens[0]);
+      axes(vec_count, 2) = aurostd::string2utype<double>(tokens[1]);
+      axes(vec_count, 3) = aurostd::string2utype<double>(tokens[2]);
       vec_count++;
     }
-    // read unitless lattice
+    // read the fractional cell vectors
     vec_count = 1;
     for (; line < vinput.size() && vec_count < 4; line++) {
       aurostd::string2tokens(vinput[line],tokens," ");
-      ulat(vec_count, 1)=aurostd::string2utype<double>(tokens[0]);
-      ulat(vec_count, 2)=aurostd::string2utype<double>(tokens[1]);
-      ulat(vec_count, 3)=aurostd::string2utype<double>(tokens[2]);
+      frac_cell(vec_count, 1)=aurostd::string2utype<double>(tokens[0]);
+      frac_cell(vec_count, 2)=aurostd::string2utype<double>(tokens[1]);
+      frac_cell(vec_count, 3)=aurostd::string2utype<double>(tokens[2]);
       vec_count++;
     }
-    a.lattice = coorsys * ulat;
-
+    a.lattice = axes * frac_cell;
+    a.FixLattices();
     if (LDEBUG) {
       cerr << soliloquy << " ATAT lattice" << endl;
       cerr << a.lattice << endl;
@@ -6632,9 +6632,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
       avec(1) = aurostd::string2utype<double>(tokens[0]);
       avec(2) = aurostd::string2utype<double>(tokens[1]);
       avec(3) = aurostd::string2utype<double>(tokens[2]);
-      atom.name = atom.cleanname=tokens[3];
-      atom.fpos = BringInCell(aurostd::inverse(trasp(a.lattice)) * coorsys * avec);
-      atom.cpos = a.f2c * atom.fpos;
+      atom.name = atom.cleanname = tokens[3];
+      atom.cpos = axes * avec;
+      atom.fpos = a.c2f * atom.cpos;
       atom.name_is_given = TRUE;
       a.AddAtom(atom);
       if (LDEBUG) {
