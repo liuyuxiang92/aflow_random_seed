@@ -1141,7 +1141,7 @@ bool APDCTest(ofstream& FileMESSAGE, ostream& oss) { //SD20220202
   _aflags aflags;
   message << "Testing APDC";
   // initalize data
-  apdc_data.rootdirpath = "/home/sd453/tmp/testing/";
+  apdc_data.rootdirpath = "/home/sd453/tmp/testing2/";
   apdc_data.plattice = "FCC";
   apdc_data.elements = vector<string>(2);
   apdc_data.elements[0] = "Pt";

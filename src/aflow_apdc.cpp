@@ -89,7 +89,7 @@ namespace apdc {
 // ***************************************************************************
 namespace apdc {
   void GetBinodal(_apdc_data& apdc_data) {
-    apdc_data.vstr = GetXstructuresForATAT(apdc_data.plattice, apdc_data.elements);
+    apdc_data.vstr = GetAFLOWXstructuresForATAT(apdc_data.plattice, apdc_data.elements);
     apdc_data.multiplicity = GetMultiplicity(apdc_data.vstr);
     apdc_data.composition = GetComposition(apdc_data.elements, apdc_data.vstr);
     //for (uint i = 0; i < apdc_data.composition.size(); i++){cerr << apdc_data.composition[i] << endl;}
@@ -225,20 +225,22 @@ namespace apdc {
 }
 
 // ***************************************************************************
-// apdc::GetXstructuresForATAT
+// apdc::GetAFLOWXstructuresForATAT
 // ***************************************************************************
 namespace apdc {
-  vector<xstructure> GetXstructuresForATAT(const string& plattice, const vector<string>& elements) {
-    vector<xstructure> vstr;
+  vector<xstructure> GetAFLOWXstructuresForATAT(const string& plattice, const vector<string>& elements, bool use_xstr_atat) {
+    vector<xstructure> vstr, vstr_atat;
     string aflowlib, aflowurl;
     string alloyname = "";
     aflowlib::_aflowlib_entry entry;
-    uint istart, iend;
+    uint istart, iend, nary = elements.size();
     stringstream oss;
-    int nary = elements.size();
-    for (uint i = 0; i < elements.size(); i++) {alloyname += AVASP_Get_PseudoPotential_PAW_PBE(elements[i]);}
-    aflowlib = "/common/LIB" + aurostd::utype2string<int>(nary) + "/RAW/" + alloyname;
-    aflowurl = "aflowlib.duke.edu:AFLOWDATA/LIB" + aurostd::utype2string<int>(nary) + "_RAW/" + alloyname;
+    for (uint i = 0; i < nary; i++) {alloyname += AVASP_Get_PseudoPotential_PAW_PBE(elements[i]);}
+    aflowlib = "/common/LIB" + aurostd::utype2string<uint>(nary) + "/RAW/" + alloyname;
+    aflowurl = "aflowlib.duke.edu:AFLOWDATA/LIB" + aurostd::utype2string<uint>(nary) + "_RAW/" + alloyname;
+    if (use_xstr_atat) {
+      vstr_atat = GetATATXstructuresForAFLOW(plattice, elements);} // read the ATAT geometries
+      vector<uint> dict = DictAFLOW2ATAT(plattice, nary); // dictionary ATAT to AFLOW
     if (nary == 2) {
       if (plattice == "fcc") {
         istart = 1;
@@ -258,11 +260,18 @@ namespace apdc {
     for (uint i = istart; i <= iend; i++) {
         entry.Load(aurostd::file2string(aflowlib + "/" + aurostd::utype2string<uint>(i) + "/aflowlib.out"), oss);
         entry.aurl = aflowurl + "/" + aurostd::utype2string<uint>(i);
-        if (pflow::loadXstructures(entry, oss, false)) { // initial = unrelaxed; final = relaxed
+        if (!use_xstr_atat && pflow::loadXstructures(entry, oss, false)) { // initial = unrelaxed; final = relaxed
+          entry.vstr[0].FixLattices();
           entry.vstr[0].ReScale(1.0);
+          entry.vstr[0].BringInCell();
           entry.vstr[0].iomode = IOATAT_STR;
           entry.vstr[0].qm_E_cell = entry.enthalpy_cell; // ATAT needs energy per cell
           if (entry.spacegroup_orig == entry.spacegroup_relax) {vstr.push_back(entry.vstr[0]);}
+        }
+        else {
+          vstr_atat[dict[i]].iomode = IOATAT_STR;
+          vstr_atat[dict[i]].qm_E_cell = entry.enthalpy_cell; // ATAT needs energy per cell
+          if (entry.spacegroup_orig == entry.spacegroup_relax) {vstr.push_back(vstr_atat[dict[i]]);}
         }
         entry.clear();
     }
@@ -270,8 +279,107 @@ namespace apdc {
   }
 }
 
+// ***************************************************************************
+// apdc::GetATATXstructuresForAFLOW
+// ***************************************************************************
+namespace apdc {
+  vector<xstructure> GetATATXstructuresForAFLOW(const string& plattice, const vector<string>& elements) {
+    vector<xstructure> vstr;
+    xstructure str;
+    _atom atom;
+    uint nary = elements.size();
+    xmatrix<double> lat = aurostd::eye<double>(3, 3);
+    xvector<double> coord = aurostd::ones_xv<double>(3);
+    if (nary == 2) {
+      if (plattice == "fcc") {
+        // #1
+        lat(1,1) =  0.50; lat(1,2) =  0.00; lat(1,3) =  0.50;
+        lat(2,1) =  0.50; lat(2,2) =  0.50; lat(2,3) =  0.00;
+        lat(3,1) =  0.00; lat(3,2) =  0.50; lat(3,3) =  0.50;
+        str.lattice = _AFLOW_APDC_ALAT * lat; str.ReScale(1.0);
+        coord(1) = 0.00; coord(2) = 0.00; coord(3) = 0.00;
+        atom.name = atom.cleanname = elements[0]; atom.name_is_given = TRUE; atom.fpos = coord; atom.cpos = str.f2c * atom.fpos;
+        str.AddAtom(atom); atom.clear();
+        str.SpeciesPutAlphabetic(); str.MakeBasis(); str.MakeTypes(); str.buildGenericTitle(); vstr.push_back(str); str.clear();
+        // #2
+        lat(1,1) =  0.50; lat(1,2) =  0.00; lat(1,3) =  0.50;
+        lat(2,1) =  0.50; lat(2,2) =  0.50; lat(2,3) =  0.00;
+        lat(3,1) =  0.00; lat(3,2) =  0.50; lat(3,3) =  0.50;
+        str.lattice = _AFLOW_APDC_ALAT * lat; str.ReScale(1.0);
+        coord(1) = 0.00; coord(2) = 0.00; coord(3) = 0.00;
+        atom.name = atom.cleanname = elements[1]; atom.name_is_given = TRUE; atom.fpos = coord; atom.cpos = str.f2c * atom.fpos;
+        str.AddAtom(atom); atom.clear();
+        str.SpeciesPutAlphabetic(); str.MakeBasis(); str.MakeTypes(); str.buildGenericTitle(); vstr.push_back(str); str.clear();
+        // #3
+        lat(1,1) = -0.50; lat(1,2) =  0.50; lat(1,3) =  1.00;
+        lat(2,1) = -0.50; lat(2,2) =  1.00; lat(2,3) =  0.50;
+        lat(3,1) = -1.00; lat(3,2) =  0.50; lat(3,3) =  0.50;
+        str.lattice = _AFLOW_APDC_ALAT * lat; str.ReScale(1.0);
+        coord(1) = 0.50; coord(2) = 0.50; coord(3) = 0.50;
+        atom.name = atom.cleanname = elements[0]; atom.name_is_given = TRUE; atom.fpos = coord; atom.cpos = str.f2c * atom.fpos;
+        str.AddAtom(atom); atom.clear();
+        coord(1) = 0.00; coord(2) = 0.00; coord(3) = 0.00;
+        atom.name = atom.cleanname = elements[1]; atom.name_is_given = TRUE; atom.fpos = coord; atom.cpos = str.f2c * atom.fpos;
+        str.AddAtom(atom); atom.clear();
+        str.SpeciesPutAlphabetic(); str.MakeBasis(); str.MakeTypes(); str.buildGenericTitle(); vstr.push_back(str); str.clear();
+        // #4
+        lat(1,1) =  0.00; lat(1,2) = -0.50; lat(1,3) = -0.50;
+        lat(2,1) =  0.00; lat(2,2) = -0.50; lat(2,3) =  0.50;
+        lat(3,1) =  1.00; lat(3,2) =  0.00; lat(3,3) =  0.00;
+        str.lattice = _AFLOW_APDC_ALAT * lat; str.ReScale(1.0);
+        coord(1) = 0.00; coord(2) = 0.00; coord(3) = 0.00;
+        atom.name = atom.cleanname = elements[0]; atom.name_is_given = TRUE; atom.fpos = coord; atom.cpos = str.f2c * atom.fpos;
+        str.AddAtom(atom); atom.clear();
+        coord(1) = 0.50; coord(2) = 0.50; coord(3) = 0.50;
+        atom.name = atom.cleanname = elements[1]; atom.name_is_given = TRUE; atom.fpos = coord; atom.cpos = str.f2c * atom.fpos;
+        str.AddAtom(atom); atom.clear();
+        str.SpeciesPutAlphabetic(); str.MakeBasis(); str.MakeTypes(); str.buildGenericTitle(); vstr.push_back(str); str.clear();
+        // #5
+        lat(1,1) = -0.50; lat(1,2) =  0.00; lat(1,3) = -0.50;
+        lat(2,1) =  0.00; lat(2,2) = -0.50; lat(2,3) =  0.50;
+        lat(3,1) = -1.00; lat(3,2) =  1.00; lat(3,3) =  1.00;
+        str.lattice = _AFLOW_APDC_ALAT * lat; str.ReScale(1.0);
+        coord(1) = 2.0/3.0; coord(2) = 1.0/3.0; coord(3) = 2.0/3.0;
+        atom.name = atom.cleanname = elements[0]; atom.name_is_given = TRUE; atom.fpos = coord; atom.cpos = str.f2c * atom.fpos;
+        str.AddAtom(atom); atom.clear();
+        coord(1) = 1.0/3.0; coord(2) = 2.0/3.0; coord(3) = 1.0/3.0;
+        atom.name = atom.cleanname = elements[0]; atom.name_is_given = TRUE; atom.fpos = coord; atom.cpos = str.f2c * atom.fpos;
+        str.AddAtom(atom); atom.clear();
+        coord(1) = 0.00; coord(2) = 0.00; coord(3) = 0.00;
+        atom.name = atom.cleanname = elements[1]; atom.name_is_given = TRUE; atom.fpos = coord; atom.cpos = str.f2c * atom.fpos;
+        str.AddAtom(atom); atom.clear();
+        str.SpeciesPutAlphabetic(); str.MakeBasis(); str.MakeTypes(); str.buildGenericTitle(); vstr.push_back(str); str.clear();
+      }
+      else if (plattice == "bcc") {
+      }
+      else if (plattice == "hcp") {
+      }
+    }
+    return vstr;
+  }
+}
 
-
+// ***************************************************************************
+// apdc::DictAFLOW2ATAT
+// ***************************************************************************
+namespace apdc {
+  vector<uint> DictAFLOW2ATAT(const string& plattice, const uint nary) {
+    vector<uint> dict;
+    if (nary == 2) {
+      if (plattice == "fcc") {
+        //dict = {1, 0, 3, 2, 9, 8};
+        dict = {0, 1, 2, 3, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+      }
+      else if (plattice == "bcc") {
+      }
+      else if (plattice == "hcp") {
+      }
+    }
+    else if (nary == 3) {
+    }
+    return dict;
+  }
+}
 
 
 
