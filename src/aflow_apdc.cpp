@@ -89,7 +89,7 @@ namespace apdc {
 // ***************************************************************************
 namespace apdc {
   void GetBinodal(_apdc_data& apdc_data) {
-    apdc_data.vstr = GetAFLOWXstructuresForATAT(apdc_data.plattice, apdc_data.elements);
+    apdc_data.vstr = GetAFLOWXstructuresForATAT(apdc_data.plattice, apdc_data.elements, false);
     apdc_data.multiplicity = GetMultiplicity(apdc_data.vstr);
     apdc_data.composition = GetComposition(apdc_data.elements, apdc_data.vstr);
     //for (uint i = 0; i < apdc_data.composition.size(); i++){cerr << apdc_data.composition[i] << endl;}
