@@ -45,7 +45,7 @@ namespace apdc {
   void GenerateFilesForATAT(const string& rundirpath, const string& plattice, const vector<string>& elements, const vector<xstructure>& _vstr, bool use_atat_xstr=true);
   vector<uint> GetMultiplicity(const vector<xstructure>& vstr);
   vector<xvector<double> > GetComposition(const vector<string>& elements, const vector<xstructure>& vstr);
-  vector<xstructure> GetAFLOWXstructuresForATAT(const string& plattice, const vector<string>& elements);
+  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements);
   vector<xstructure> GetATATXstructures(const string& rundirpath, uint max_num_atoms=4);
 }
 

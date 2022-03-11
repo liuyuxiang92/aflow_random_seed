@@ -89,7 +89,7 @@ namespace apdc {
 // ***************************************************************************
 namespace apdc {
   void GetBinodal(_apdc_data& apdc_data) {
-    apdc_data.vstr = GetAFLOWXstructuresForATAT(apdc_data.plattice, apdc_data.elements);
+    apdc_data.vstr = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements);
     apdc_data.multiplicity = GetMultiplicity(apdc_data.vstr);
     apdc_data.composition = GetComposition(apdc_data.elements, apdc_data.vstr);
     //for (uint i = 0; i < apdc_data.composition.size(); i++){cerr << apdc_data.composition[i] << endl;}
@@ -232,10 +232,10 @@ namespace apdc {
 }
 
 // ***************************************************************************
-// apdc::GetAFLOWXstructuresForATAT
+// apdc::GetAFLOWXstructures
 // ***************************************************************************
 namespace apdc {
-  vector<xstructure> GetAFLOWXstructuresForATAT(const string& plattice, const vector<string>& elements) {
+  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements) {
     vector<xstructure> vstr, vstr_atat;
     string aflowlib, aflowurl;
     string alloyname = "";
@@ -284,10 +284,27 @@ namespace apdc {
 namespace apdc {
   vector<xstructure> GetATATXstructures(const string& rundirpath, uint max_num_atoms) {
     vector<xstructure> vstr;
-    string sstr = aurostd::execute2string("genstr -n " + aurostd::utype2string<uint>(max_num_atoms) + " -l " + rundirpath + "/lat.in",stdouterr_fsio);
+    xstructure str;
+    stringstream oss;
+    vector<string> vinput, tokens;
+    string sstr = aurostd::execute2string("genstr -n " + aurostd::utype2string<uint>(max_num_atoms) + " -l " + rundirpath + "/lat.in", stdouterr_fsio);
     if (aurostd::substring2bool(sstr, "command not found")) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetATATXstructures():", "Missing program genstr", _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetATATXstructures():", "Missing genstr program", _RUNTIME_ERROR_);
     }
+    aurostd::string2vectorstring(sstr, vinput);
+    for (uint line = 0; line < vinput.size(); line++) {
+      if (aurostd::substring2bool(vinput[line], "end")) {
+        str = xstructure(oss);
+        str.iomode = IOVASP_POSCAR;
+        str.SpeciesPutAlphabetic();
+        vstr.push_back(str);
+        aurostd::StringstreamClean(oss);
+      }
+      else {
+        oss << vinput[line] << endl;
+      }
+    }
+    for (uint i = 0; i < vstr.size(); i++){cerr << vstr[i] << endl;}
     cerr << "DONE!" << endl;
     return vstr;
   }

@@ -6624,6 +6624,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
 
     // read atoms
+    deque<_atom> atoms;
     _atom atom;
     xvector<double> avec(3);
     for (; line < vinput.size() - 1; line++) {
@@ -6636,19 +6637,31 @@ istream& operator>>(istream& cinput, xstructure& a) {
       atom.cpos = trasp(axes) * avec;
       atom.fpos = a.c2f * atom.cpos;
       atom.name_is_given = TRUE;
-      a.AddAtom(atom);
+      atoms.push_back(atom);
       if (LDEBUG) {
         cerr << soliloquy << " ATAT atom[" << atom.name <<"] found:" << endl;
         cerr << "    fpos" << atom.fpos << endl;
         cerr << "    cpos" << atom.cpos << endl;
       }
     }
+    std::stable_sort(atoms.begin(),atoms.end(),sortAtomsNames);
 
-    // order and add additional attributes
-    a.SpeciesPutAlphabetic();
-    for (uint i=0; i < a.atoms.size(); i++) {
+    // assign types
+    uint itype = 0;
+    atoms[0].type = itype;
+    for (uint i = 1;i < atoms.size(); i++) {
+      if (atoms[i].name != atoms[i - 1].name) {itype++;}
+      atoms[i].type = itype;
+    }
+
+    // add atoms
+    for (uint i=0; i < atoms.size(); i++) {
+      a.AddAtom(atoms[i]);
       a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
     }
+    a.SpeciesPutAlphabetic();
+
+    // add additional attributes
     a.MakeBasis();
     a.MakeTypes();
     a.partial_occupation_flag = FALSE;
