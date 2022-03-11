@@ -1402,9 +1402,11 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   //  for(uint i=0;i<xvasp.str.species.size();i++) cerr << "xvasp.str.species_mass=" << xvasp.str.species_mass.at(i) << endl;
 
   //CO202010624 - final modification for bader calc
+  //ME20220311 - do not override APL/QHA/AAPL settings or aflow will create GBs of unwanted data
   //DEFAULT_VASP_FORCE_OPTION_BADER_STATIC depends on RUN type, it must be fixed above here
   if(DEFAULT_VASP_FORCE_OPTION_BADER_STATIC && 
-      (xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS || xvasp.AVASP_flag_RUN_RELAX_STATIC || xvasp.AVASP_flag_RUN_STATIC || xvasp.AVASP_flag_RUN_STATIC_BANDS)){
+      (xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS || xvasp.AVASP_flag_RUN_RELAX_STATIC || xvasp.AVASP_flag_RUN_STATIC || xvasp.AVASP_flag_RUN_STATIC_BANDS)
+    && ((xvasp.AVASP_arun_mode != "APL") && (xvasp.AVASP_arun_mode != "AAPL") && (xvasp.AVASP_arun_mode != "QHA"))){
     xvasp.aopts.flag("FLAG::AVASP_BADER",TRUE);
   }
 
@@ -2418,10 +2420,13 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   }
 
   // BADER WRITING
+  // CO+ME20220311 - Always write Bader settings. While this may increase the size of the aflow.in, some
+  // settings are necessary to ensure portability of the aflow.in file. In this case, relying on the
+  // default can result in GBs of potentially unwanted data when moving aflow.in files between systems
   if(xvasp.aopts.flag("FLAG::AVASP_BADER")) {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=ON",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_BADER in .aflow.rc)" << endl;
   } else {
-    // aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=OFF",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_BADER in .aflow.rc)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=OFF",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_BADER in .aflow.rc)" << endl;
   }
   // ELF WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_ELF")) {
@@ -4066,8 +4071,11 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
   }
 
   // CHGCAR WRITING
+  // CO+ME20220311 - Always write CHGCAR settings. While this may increase the size of the aflow.in, some
+  // settings are necessary to ensure portability of the aflow.in file. In this case, relying on the
+  // default can result in GBs of potentially unwanted data when moving aflow.in files between systems
   if(xvasp.aopts.flag("FLAG::AVASP_CHGCAR")) {
-    //aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=ON",_AFLOWINPAD_) << " // ON | OFF (default ON)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=ON",_AFLOWINPAD_) << " // ON | OFF (default ON)" << endl;
   } else {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=OFF",_AFLOWINPAD_) << " // ON | OFF (default ON)" << endl;
   }
@@ -4159,10 +4167,13 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
   }
 
   // BADER WRITING
+  // CO+ME20220311 - Always write Bader settings. While this may increase the size of the aflow.in, some
+  // settings are necessary to ensure portability of the aflow.in file. In this case, relying on the
+  // default can result in GBs of potentially unwanted data when moving aflow.in files between systems
   if(xvasp.aopts.flag("FLAG::AVASP_BADER")) {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=ON",_AFLOWINPAD_) << " // ON | OFF (default OFF)" << endl;
   } else {
-    //    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=OFF",_AFLOWINPAD_) << " // ON | OFF (default OFF)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=OFF",_AFLOWINPAD_) << " // ON | OFF (default OFF)" << endl;
   }
   // ELF WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_ELF")) {
