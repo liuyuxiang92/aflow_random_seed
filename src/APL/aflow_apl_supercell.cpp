@@ -696,7 +696,7 @@ namespace apl {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     vector<int> pc2sc, sc2pc;
     xstructure pcell;
-    if (_pcStructure.iatoms_calculated) SYM::CalculateInequivalentAtoms(_pcStructure);
+    if (!_pcStructure.iatoms_calculated) SYM::CalculateInequivalentAtoms(_pcStructure);
     LightCopy(_pcStructure, pcell);  // No need for symmetry
 
     // The original structure may be a rotated primitive cell. Transform the
