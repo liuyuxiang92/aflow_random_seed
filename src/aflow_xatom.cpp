@@ -12,7 +12,7 @@
 #include "AUROSTD/aurostd_xscalar.h"
 #include "aflow_compare_structure.h" //CO20180409
 #include "aflow_chull.h" //HE20210408
-#include "aflow_symbolic.h"  //ME20210124
+#include "aflow_symbolic.h"  //ME20220124
 
 #define _calculate_symmetry_default_sgroup_radius_   2.0
 #define PLATON_MIN_VOLUME_PER_ATOM   6.0   // for symmetry calculation
@@ -6125,7 +6125,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy,message,_VALUE_ERROR_);
     }
     //DX20191029 - check if space group number is found - END
-    //ME20210124 - Read symmetry operations without consistency checks first
+    //ME20220124 - Read symmetry operations without consistency checks first
     bool found_setting = false;
     vector<string> spacegroup_symop_xyz;
     bool found_symops=FALSE;
@@ -6164,6 +6164,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       vector<string> general_wyckoff_position; // general Wyckoff position equations
       // get general Wyckoff multiplicity and position saved in aflow
       SYM::getGeneralWyckoffMultiplicityAndPosition(a.spacegroupnumber, setting_string, general_wyckoff_multiplicity, general_wyckoff_position);
+      // ME20220124 - moved up
       //      SYM::initsgs(setting_string);
       //      using SYM::gl_sgs;
       //      cerr << "find the spacegroupstring" << endl;
@@ -6265,7 +6266,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       }
     }
     if(!found_setting){
-      // ME20210124 - Changed to warning
+      // ME20220124 - Changed to warning
       message << "Symmetry operations do not match between input operations and space group number/option.";  //CO20190629
       message << " Building structure using symmetry operations in CIF file with space group P1.";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, std::cerr, _LOGGER_WARNING_);
@@ -6302,7 +6303,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.FixLattices();
     a.partial_occupation_flag = FALSE;
 
-    // ME20210124 - Convert xyz to symbolic representation
+    // ME20220124 - Convert xyz to symbolic representation
     vector<symbolic::Symbolic> spacegroup_symop_symbolic;
     if (!found_setting) {
       uint nsym = spacegroup_symop_xyz.size();
@@ -6351,7 +6352,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         if(tokens.size()==atom_site_fields.size()){
           _atom atom_tmp;
           wyckoffsite_ITC wyckoff_tmp; //DX20191029
-          //ME20210124 - prepare for P1 if setting not found
+          //ME20220124 - prepare for P1 if setting not found
           if (!found_setting) {
             wyckoff_tmp.letter = "a";
             wyckoff_tmp.multiplicity = 1;
@@ -6387,7 +6388,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           a.wyckoff_sites_ITC.push_back(wyckoff_tmp);
           atom_tmp.cpos=a.f2c*atom_tmp.fpos;
           a.AddAtom(atom_tmp);
-          //ME20210124 - Use symmetry operations when setting unknown
+          //ME20220124 - Use symmetry operations when setting unknown
           if (!found_setting) {
             uint natoms = a.atoms.size();  // For Wyckoff positions
             _atom at;
@@ -6440,7 +6441,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.is_vasp5_poscar_format=FALSE; //DX20190308 - needed or SPECIES section breaks
 
     // add title, CIFs do not generally have a canonical "title" line, so make one
-    a.BringInCell();  //ME20210124
+    a.BringInCell();  //ME20220124
     a.buildGenericTitle(); //DX20210211
   } // CIF INPUT
 
