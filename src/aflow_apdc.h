@@ -42,20 +42,11 @@ namespace apdc {
   void GetBinodal(_apdc_data& apdc_data);
   void GetSpinodal(_apdc_data& apdc_data);
   void RunATAT(const string& rundirpath);
-  void GenerateFilesForATAT(const string& rundirpath, const string& plattice, const vector<string>& elements, const vector<xstructure>& vstr);
+  void GenerateFilesForATAT(const string& rundirpath, const string& plattice, const vector<string>& elements, const vector<xstructure>& _vstr, bool use_atat_xstr=true);
   vector<uint> GetMultiplicity(const vector<xstructure>& vstr);
   vector<xvector<double> > GetComposition(const vector<string>& elements, const vector<xstructure>& vstr);
-  vector<xstructure> GetAFLOWXstructuresForATAT(const string& plattice, const vector<string>& elements, bool use_xstr_atat=true);
-  vector<xstructure> GetATATXstructuresForAFLOW(const string& plattice, const vector<string>& elements);
-  vector<uint> DictAFLOW2ATAT(const string& plattice, const uint nary);
+  vector<xstructure> GetAFLOWXstructuresForATAT(const string& plattice, const vector<string>& elements);
+  vector<xstructure> GetATATXstructures(const string& rundirpath, uint max_num_atoms=4);
 }
-
-
-
-
-
-
-
-
 
 #endif
