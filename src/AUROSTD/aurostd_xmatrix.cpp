@@ -1276,7 +1276,7 @@ namespace aurostd {
       xmatrix<utype> c(rows, cols);
       for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
-          c(i+1, j+1) = v1[v1.lrows + rows*i + j];
+          c(i+1, j+1) = v1[v1.lrows + cols*i + j];
         }
       }
       return c;

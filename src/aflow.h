@@ -2698,6 +2698,8 @@ bool AtomicEnvironmentTest(ostream& oss=cout); //HE20210511
 bool AtomicEnvironmentTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210511
 bool aurostdTest(ostream& oss=cout); //HE20210512
 bool aurostdTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210512
+bool cifParserTest(ostream& oss=cout); //ME20220125
+bool cifParserTest(ofstream& FileMESSAGE, ostream& oss=cout); //ME202201025
 // ----------------------------------------------------------------------------
 // Structure Prototypes
 // aflow_xproto.cpp

@@ -524,7 +524,6 @@ namespace apl {
       int i,
       vector<vector<vector<vector<double> > > >& phase_space,
       const vector<vector<vector<xcomplex<double> > > >& phases) {
-
     // Prepare and precompute
     const Supercell& scell = _pc->getSupercell();
     const vector<vector<int> >& clusters = _pc->getClusters(3);
@@ -734,7 +733,6 @@ namespace apl {
   // Calculates the intrinsic transition probabilities/scattering rates of
   // the isotope scattering processes.
   void TCONDCalculator::calculateTransitionProbabilitiesIsotope(int i) {
-
     // Prepare
     const xstructure& pcell = _pc->getInputCellStructure();
     uint natoms = pcell.atoms.size();
@@ -1156,7 +1154,6 @@ namespace apl {
   void TCONDCalculator::calculateDelta(int i, const vector<vector<double> >& occ,
       const vector<vector<xvector<double> > >& mfd,
       vector<vector<xvector<double> > >& delta) {
-
     xvector<double> correction(3);
     vector<int> qpts(3), branches(3);
     int sign = -1;
