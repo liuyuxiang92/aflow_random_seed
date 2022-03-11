@@ -6633,7 +6633,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       avec(2) = aurostd::string2utype<double>(tokens[1]);
       avec(3) = aurostd::string2utype<double>(tokens[2]);
       atom.name = atom.cleanname = tokens[3];
-      atom.cpos = axes * avec;
+      atom.cpos = trasp(axes) * avec;
       atom.fpos = a.c2f * atom.cpos;
       atom.name_is_given = TRUE;
       a.AddAtom(atom);
