@@ -123,6 +123,7 @@ namespace apdc {
   void GenerateFilesForATAT(const string& rundirpath, const string& plattice, const vector<string>& elements, const vector<xstructure>& _vstr, bool use_atat_xstr) {
     stringstream oss;
     vector<xstructure> vstr;
+    vector<uint> dict;
     xmatrix<double> lattice(3,3);
     xvector<double> angles = 90.0 * aurostd::ones_xv<double>(3);
     xvector<double> coorsys = aurostd::ones_xv<double>(3);
@@ -168,16 +169,18 @@ namespace apdc {
     aurostd::StringstreamClean(oss);
     if (!use_atat_xstr) {
       vstr = _vstr;
+      for (uint i = 0; i < vstr.size(); i++) {dict.push_back(i);}
     }
     else {
-      GetATATXstructures(rundirpath);
+      vstr = GetATATXstructures(rundirpath);
+      dict = GetDictionaryForXstructures(vstr, _vstr); // AFLOW to ATAT
     }
     // Generate str.out and energy files
     for (uint i = 0; i < vstr.size(); i++) {
       aurostd::DirectoryMake(rundirpath + "/" + aurostd::utype2string<uint>(i));
       oss << vstr[i];
       aurostd::string2file(oss.str(), rundirpath + "/" + aurostd::utype2string<uint>(i) + "/str.out");
-      aurostd::string2file(aurostd::utype2string<double>(vstr[i].qm_E_cell) + "\n", rundirpath + "/" + aurostd::utype2string<uint>(i) + "/energy");
+      aurostd::string2file(aurostd::utype2string<double>(_vstr[dict[i]].qm_E_cell) + "\n", rundirpath + "/" + aurostd::utype2string<uint>(i) + "/energy");
       aurostd::StringstreamClean(oss);
     }
   }
@@ -284,7 +287,6 @@ namespace apdc {
 namespace apdc {
   vector<xstructure> GetATATXstructures(const string& rundirpath, uint max_num_atoms) {
     vector<xstructure> vstr;
-    xstructure str;
     stringstream oss;
     vector<string> vinput, tokens;
     string sstr = aurostd::execute2string("genstr -n " + aurostd::utype2string<uint>(max_num_atoms) + " -l " + rundirpath + "/lat.in", stdouterr_fsio);
@@ -294,23 +296,41 @@ namespace apdc {
     aurostd::string2vectorstring(sstr, vinput);
     for (uint line = 0; line < vinput.size(); line++) {
       if (aurostd::substring2bool(vinput[line], "end")) {
-        str = xstructure(oss);
-        str.iomode = IOVASP_POSCAR;
-        str.SpeciesPutAlphabetic();
-        vstr.push_back(str);
+        vstr.push_back(xstructure(oss));
         aurostd::StringstreamClean(oss);
       }
       else {
         oss << vinput[line] << endl;
       }
     }
-    for (uint i = 0; i < vstr.size(); i++){cerr << vstr[i] << endl;}
-    cerr << "DONE!" << endl;
     return vstr;
   }
 }
 
+// ***************************************************************************
+// apdc::GetDictionaryForXstructures
+// ***************************************************************************
+namespace apdc {
+  vector<uint> GetDictionaryForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, uint num_proc) {
+    vector<uint> dict;
+    bool match;
+    for (uint i = 0; i < vstr1.size(); i++) {
+      match = false;
+      for (uint j = 0; j < vstr2.size() && !match; j++) {
+        if (compare::structuresMatch(vstr1[i], vstr2[j], true, num_proc)) {dict.push_back(j); match = true;}
+      }
+      if (!match) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetDictionaryForXstructures():", "No structure match for i=" + aurostd::utype2string<uint>(i), _INPUT_ILLEGAL_);
+      }
+    }
+    return dict;
+  }
 
+  vector<uint> GetDictionaryForXstructures(const string plattice, const int nary) {
+    vector<uint> dict;
+    return dict;
+  }
+}
 
 
 

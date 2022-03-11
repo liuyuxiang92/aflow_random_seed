@@ -47,6 +47,8 @@ namespace apdc {
   vector<xvector<double> > GetComposition(const vector<string>& elements, const vector<xstructure>& vstr);
   vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements);
   vector<xstructure> GetATATXstructures(const string& rundirpath, uint max_num_atoms=4);
+  vector<uint> GetDictionaryForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, uint num_proc=8);
+  vector<uint> GetDictionaryForXstructures(const string& plattice, const int& nary);
 }
 
 #endif
