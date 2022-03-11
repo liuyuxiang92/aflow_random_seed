@@ -93,10 +93,15 @@ enum vector_reduction_type {   //CO20190629
 #define _AFLOW_MESSAGE_DEFAULTS_ "user,host,pid,time" //tid //CO20200624 - only depends on XHOST (not aflags)
 
 //CO20200731 START
-static const string POCC_TITLE_TAG=":POCC_";
-static const string POCC_TITLE_TOL_TAG=":TOL_";
-static const string ARUN_TITLE_TAG=":ARUN.";
-static const string POCC_ARUN_TITLE_TAG=ARUN_TITLE_TAG+"POCC_";
+static const string SEP_TAG1=":";
+static const string SEP_TAG2="_";
+static const string TAG_POCC="POCC";
+static const string TAG_TOL="TOL";
+static const string TAG_ARUN="ARUN";
+static const string TAG_TITLE_POCC=SEP_TAG1+TAG_POCC+SEP_TAG2;
+static const string TAG_TITLE_POCC_TOL=SEP_TAG1+TAG_TOL+SEP_TAG2;
+static const string TAG_TITLE_ARUN=SEP_TAG1+TAG_ARUN+".";
+static const string TAG_TITLE_POCC_ARUN=TAG_TITLE_ARUN+TAG_POCC+SEP_TAG2;
 static const string POCC_DOSCAR_PREFIX="DOSCAR.pocc_T";
 static const string POCC_PHDOSCAR_PREFIX="PHDOSCAR.pocc_T";  // ME20210927
 //CO20200731 END
@@ -1540,9 +1545,12 @@ class xstructure {
     xstructure(const string& url,const string& file,int=IOVASP_POSCAR); // constructor from URL
     ~xstructure();                                                // destructor
     // I/O, mutators                                              // --------------------------------------
+    void initialize(const string& structure_title="");            // initialize xstructure based on input (avoids copying xstructure); //CO20211122
     void initialize(istream& input,int=IOVASP_POSCAR);            // initialize xstructure based on input (avoids copying xstructure); //DX20210129
     void initialize(ifstream& input,int=IOVASP_POSCAR);           // initialize xstructure based on input (avoids copying xstructure); //DX20210129
     void initialize(const stringstream& input,int=IOVASP_POSCAR); // initialize xstructure based on input (avoids copying xstructure); //DX20210129
+    void initialize(const string& input,int);                     // initialize xstructure based on input (avoids copying xstructure); //CO20211122
+    void initialize(const string& url,const string& file,int=IOVASP_POSCAR);  // initialize xstructure based on input (avoids copying xstructure); //CO20211122
     bool GetStoich(void);                                         // get stoich_each_type - CO20170724
     bool sortAtomsEquivalent(void);                               // sort by equivalent atoms - CO20190116
     bool FixLattices(void);                                       // Reciprocal/f2c/c2f
@@ -2683,6 +2691,8 @@ bool AtomicEnvironmentTest(ostream& oss=cout); //HE20210511
 bool AtomicEnvironmentTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210511
 bool aurostdTest(ostream& oss=cout); //HE20210512
 bool aurostdTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210512
+bool cifParserTest(ostream& oss=cout); //ME20220125
+bool cifParserTest(ofstream& FileMESSAGE, ostream& oss=cout); //ME202201025
 // ----------------------------------------------------------------------------
 // Structure Prototypes
 // aflow_xproto.cpp
@@ -2946,6 +2956,7 @@ namespace KBIN {
   bool CompressDirectory(const _aflags& aflags,const _kflags& kflags);
   bool CompressDirectory(const string& directory,const _kflags& kflags);  //ME20210927
   bool CompressDirectory(const _aflags& aflags);
+  bool CompressDirectory(const string& directory);  //CO20211130
   void Clean(const _aflags& aflags);
   void Clean(const string directory);
   void Clean(const _aflags& aflags,const aurostd::xoption& opts_clean);  //CO20210901
@@ -3103,9 +3114,9 @@ namespace KBIN {
   double OUTCAR2VASPVersionDouble(const string& outcar);  //CO20210315
   string VASPVersionString2Number(const string& vasp_version);  //CO20210315
   double VASPVersionString2Double(const string& vasp_version);  //CO20210315
-  string getVASPVersion(const string& binfile);  //ME20190219
-  string getVASPVersionNumber(const string& binfile);  //CO20200610
-  double getVASPVersionDouble(const string& binfile);  //CO20200610
+  string getVASPVersion(const string& binfile,const string& mpi_command="");  //ME20190219
+  string getVASPVersionNumber(const string& binfile,const string& mpi_command="");  //CO20200610
+  double getVASPVersionDouble(const string& binfile,const string& mpi_command="");  //CO20200610
 }
 
 // ----------------------------------------------------------------------------
@@ -3450,7 +3461,9 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     string         Egap_type_net;
     //CO20211106 - IONIC STEPS DATA
     bool GetIonicStepsData();   //CO20211106
-    void WriteMTPCFG(const string& outcar_path,stringstream& output_ss);   //CO20211106
+    void populateAFLOWLIBEntry(aflowlib::_aflowlib_entry& data,const string& outcar_path); //CO20220124
+    void WriteMTPCFG(stringstream& output_ss,const string& outcar_path);   //CO20211106
+    void WriteMTPCFG(stringstream& output_ss,const string& outcar_path,const vector<string>& velements);   //CO20211106
     //[CO20200404 - OBSOLETE]string ERROR;
     //int number_bands,number_kpoints; //CO20171006 - camilo garbage
     //int ISPIN; // turn this into spin = 0 if ISPIN = 1 //CO20171006 - camilo garbage
@@ -3530,6 +3543,9 @@ class xDOSCAR : public xStream { //CO20200404 - xStream integration for logging
     bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
     bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
     void convertSpinOFF2ON(); //CO20191217 - copies everything from spin channel 1 to spin channel 2
+    void addAtomChannel();  //CO20211124 - creates another atom channel, mimicking size of orbital, spin, and energy
+    void addOrbitalChannel(); //CO20211124 - creates another orbital channel, mimicking sizes of spin and energy
+    void resetVDOS(); //CO20211124 - set all vDOS to 0
     bool checkDOS(string& ERROR_out) const;  //CO20191010
     bool GetBandGap(double EFERMI=AUROSTD_NAN,double efermi_tol=AUROSTD_NAN,double energy_tol=1e-3,double occ_tol=1e-4); //CO20191110
     deque<deque<deque<deque<double> > > > GetVDOSSpecies(const xstructure& xstr) const; //vDOS.at(species).at(spin).at(energy_number)  //CO20191110
@@ -4036,8 +4052,8 @@ namespace plotter {
 
   // DOS
   bool dosDataAvailable(const deque<deque<deque<deque<double> > > >& vdos, int pdos); // ME20200305
-  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ostream& oss=cout);  //CO20200404
-  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+  void generateDosPlot(stringstream&,const xDOSCAR&,aurostd::xoption&,ostream& oss=cout);  //CO20200404
+  void generateDosPlot(stringstream&,const xDOSCAR&,aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
 
   // Bands
   void generateBandPlot(stringstream&, const xEIGENVAL&, const xKPOINTS&, const xstructure&, const aurostd::xoption&);

@@ -97,9 +97,9 @@ namespace aurostd {
       msgstr << "Supplied error message: ";
     }
     msgstr << what();  // detailed error message
-    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){  //CO20200624
-      msgstr << " [dir=" << XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN") << "]";
-    }
+    //[CO20211125 - OBSOLETE]if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){  //CO20200624
+    //[CO20211125 - OBSOLETE]  msgstr << " [dir=" << XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN") << "]";
+    //[CO20211125 - OBSOLETE]}
     return msgstr.str();
   }
 
