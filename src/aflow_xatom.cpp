@@ -7276,7 +7276,7 @@ void xstructure::AddAtom(const deque<_atom>& atoms_in, bool check_present) { //D
       if(FOUND_POSITION){ continue; }
       // now check if any atoms in the xstructure are duplicates with the input atoms
       else if(natoms_xstr != 0){
-        //if(!SYM::MapAtom(atoms, atoms_unique[iat], true, (*this).lattice, false, tol)) // ME20220120
+        // ME20220120 - changed atoms_unique to atom_in since we are looping over atoms_in
         if(!SYM::MapAtom(atoms, atoms_in[iat], true, (*this).lattice, false, tol)){
           atoms_unique.push_back(atoms_in[iat]);
         }
