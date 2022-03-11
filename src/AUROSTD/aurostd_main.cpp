@@ -3301,7 +3301,7 @@ namespace aurostd {
 
     stringstream strstream,cmdstream;
     string file=aurostd::TmpFileCreate("execute_report");
-    if(fsio==stdouterr_fsio){cmdstream << command << " &> " << file;}  //CO20200624
+    if(fsio==stdouterr_fsio){cmdstream << "bash -c \"" << command << " &> " << file << "\"";}  //CO20200624 //SD20220311 - force bash, &> does not work in sh
     else if(fsio==stderr_fsio){cmdstream << command << " 2> " << file;} //CO20200624
     else{cmdstream << command << " > " << file;} //CO20200624
     if(LDEBUG){cerr << soliloquy << " cmdstream=\"" << cmdstream.str() << "\"" << endl;}
