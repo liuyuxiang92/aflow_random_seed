@@ -458,7 +458,9 @@ bool SchemaTest(ofstream& FileMESSAGE,ostream& oss) {
   check_function = "XHOST.vschema";
   check_description = "Internal consistency of vschema";
   vector<string> vschema_keys;
-  vector<string> vschema_types = {"UNIT", "TYPE"};
+  string schema_types = "UNIT,TYPE";
+  vector<string> vschema_types;
+  aurostd::string2tokens(schema_types, vschema_types, ",");
   string key = "";
   uint ninconsistent = 0;
   for (uint i = 0; i < XHOST.vschema.vxsghost.size(); i+= 2) {
@@ -481,10 +483,11 @@ bool SchemaTest(ofstream& FileMESSAGE,ostream& oss) {
   string aflowlib_json = aentry.aflowlib2string("JSON", true);
   vector<string> json_keys = aurostd::extractJsonKeysAflow(aflowlib_json);
 
-  vector<string> vkeys_ignore = {"data_language", "error_status", "natoms_orig",
-                                 "density_orig", "volume_cell_orig", "volume_atom_orig",
-                                 "spinD_magmom_orig"};
-  for (const string& key : json_keys) {
+  string keys_ignore = "data_language,error_status,natoms_orig,density_orig,volume_cell_orig,volume_atom_orig,spinD_magmom_orig";
+  vector<string> vkeys_ignore;
+  aurostd::string2tokens(keys_ignore, vkeys_ignore, ",");
+  for (uint i = 0; i < json_keys.size(); i++) {
+    const string& key = json_keys[i];
     if (!aurostd::WithinList(vkeys_ignore, key) && !aurostd::WithinList(vschema_keys, key)) {
       ninconsistent++;
       if (LDEBUG) std::cerr << key << " not found in schema." << std::endl;
@@ -1022,7 +1025,7 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
   string function_name = XPID + "cifParserTest():";
 
   // Set up test environment
-  string task_description = "Testing aurostd";
+  string task_description = "Testing CIF parser";
   vector<string> results;
   uint passed_checks = 0;
   string check_function = "";

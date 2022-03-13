@@ -6357,7 +6357,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
             wyckoff_tmp.letter = "a";
             wyckoff_tmp.multiplicity = 1;
             wyckoff_tmp.site_symmetry = "1";
-            vector<string> eq = {"x", "y", "z"};
+            string eq_str = "x,y,z";
+            vector<string> eq;
+            aurostd::string2tokens(eq_str, eq, ",");
             wyckoff_tmp.equations.push_back(eq);
           }
           for(uint t=0;t<tokens.size();t++){
@@ -6394,7 +6396,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
             _atom at;
             deque<_atom> atoms_symop;
             symbolic::Symbolic x("x"), y("y"), z("z"), result;
-            for (const symbolic::Symbolic& eq : spacegroup_symop_symbolic) {
+            for (uint i = 0; i < spacegroup_symop_symbolic.size(); i++) {
+              const symbolic::Symbolic& eq = spacegroup_symop_symbolic[i];
               const xvector<double>& fpos = atom_tmp.fpos;
               result = eq[x == fpos[1], y == fpos[2], z == fpos[3]];
               at = atom_tmp;
