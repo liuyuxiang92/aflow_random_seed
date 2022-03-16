@@ -7,6 +7,7 @@
 #include "aflow.h"
 #include "aflow_anrl.h"  //DX20201104
 #include "aflow_compare_structure.h"  //ME20220125
+#include "aflow_apdc.h"  //SD20220202
 
 
 // Collection of generic check functions, to streamline testing.
@@ -1305,4 +1306,27 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
   check(match && (misfit < _ZERO_TOL_), calculated, expected, check_function, check_description, passed_checks, results);
 
   return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
+}
+
+//SD20220202
+bool APDCTest(ostream& oss){ofstream FileMESSAGE;return APDCTest(FileMESSAGE,oss);}
+bool APDCTest(ofstream& FileMESSAGE, ostream& oss) {
+  _apdc_data apdc_data;
+  // logger
+  string function_name = XPID + "APDCTest():";
+  stringstream message;
+  _aflags aflags;
+  message << "Testing APDC";
+  // initalize data
+  apdc_data.rootdirpath = "/home/sd453/tmp/testing2/";
+  apdc_data.plattice = "FCC";
+  apdc_data.elements = vector<string>(2);
+  apdc_data.elements[0] = "Pt";
+  apdc_data.elements[1] = "Au";
+  // run functions
+  apdc::GetPhaseDiagram(apdc_data);
+
+  // return
+  pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  return TRUE;
 }
