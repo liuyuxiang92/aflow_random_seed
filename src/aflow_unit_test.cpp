@@ -1318,11 +1318,12 @@ bool APDCTest(ofstream& FileMESSAGE, ostream& oss) {
   _aflags aflags;
   message << "Testing APDC";
   // initalize data
-  apdc_data.rootdirpath = "/home/sd453/tmp/testing2/";
+  apdc_data.rootdirpath = "/home/sd453/tmp/APDC_test/";
   apdc_data.plattice = "FCC";
   apdc_data.elements = vector<string>(2);
   apdc_data.elements[0] = "Pt";
   apdc_data.elements[1] = "Au";
+  apdc_data.max_num_atoms = 8;
   // run functions
   apdc::GetPhaseDiagram(apdc_data);
 

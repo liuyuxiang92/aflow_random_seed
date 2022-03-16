@@ -13,6 +13,8 @@
 #include "aflow_apdc.h"
 
 #define _AFLOW_APDC_ALAT 4.0
+#define _AFLOW_APDC_MAX_NUM_ATOMS 4
+#define _AFLOW_APDC_MIN_SLEEP 2
 
 // ###############################################################################
 //            AFLOW Automatic Phase Diagram Constructor (APDC) (2022-)
@@ -24,14 +26,19 @@
 // Constructor
 _apdc_data::_apdc_data() {
   // Input data
+  workdirpath = "";
   rootdirpath = "";
   plattice = "";
   elements.clear();
+  max_num_atoms = 0;
 
   // Derived data
   alloyname = "";
   rundirpath = "";
-  vstr.clear();
+  vstr_aflow.clear();
+  lat_atat = "";
+  vstr_atat.clear();
+  mapstr.clear();
 
   // Xstrucutre data
   multiplicity.clear();
@@ -49,12 +56,21 @@ void _apdc_data::free() {
 // Copy constructor
 const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
   if (this != &b) {
+    // Input data
     rootdirpath = b.rootdirpath;
     plattice = b.plattice;
     elements = b.elements;
+    max_num_atoms = b.max_num_atoms;
+    // Derived data
     alloyname = b.alloyname;
     rundirpath = b.rundirpath;
-    vstr = b.vstr;
+    vstr_aflow = b.vstr_aflow;
+    lat_atat = b.lat_atat;
+    vstr_atat = b.vstr_atat;
+    mapstr = b.mapstr;
+    // Xstructure data
+    multiplicity = b.multiplicity;
+    composition = b.composition;
   }
   return *this;
 }
@@ -65,6 +81,7 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
 namespace apdc {
   void GetPhaseDiagram(_apdc_data& apdc_data) {
     // Clean-up input data and check for errors
+    apdc_data.workdirpath = aurostd::getPWD();
     apdc_data.rootdirpath = aurostd::CleanFileName(apdc_data.rootdirpath);
     apdc_data.plattice = aurostd::tolower(apdc_data.plattice);
     aurostd::sort_remove_duplicates(apdc_data.elements);
@@ -90,13 +107,15 @@ namespace apdc {
 // ***************************************************************************
 namespace apdc {
   void GetBinodal(_apdc_data& apdc_data) {
-    apdc_data.vstr = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements);
-    apdc_data.multiplicity = GetMultiplicity(apdc_data.vstr);
-    apdc_data.composition = GetComposition(apdc_data.elements, apdc_data.vstr);
-    //for (uint i = 0; i < apdc_data.composition.size(); i++){cerr << apdc_data.composition[i] << endl;}
-    GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.plattice, apdc_data.elements, apdc_data.vstr);
-    //GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.plattice, apdc_data.elements, apdc_data.vstr,false);
-    RunATAT(apdc_data.rundirpath);
+    apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements);
+    apdc_data.lat_atat = CreateLatForATAT(apdc_data.plattice, apdc_data.elements);
+    apdc_data.vstr_atat = GetATATXstructures(apdc_data.lat_atat, apdc_data.max_num_atoms);
+    // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
+    apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, _AFLOW_APDC_MAX_NUM_ATOMS), apdc_data.vstr_aflow);
+    GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.lat_atat, apdc_data.vstr_aflow, apdc_data.vstr_atat, apdc_data.mapstr);
+    RunATAT(apdc_data.workdirpath, apdc_data.rundirpath);
+    //apdc_data.multiplicity = GetMultiplicity(apdc_data.vstr_atat);
+    //apdc_data.composition = GetComposition(apdc_data.elements, apdc_data.vstr_atat);
   }
 }
 
@@ -113,8 +132,31 @@ namespace apdc {
 // apdc::RunATAT
 // ***************************************************************************
 namespace apdc {
-  void RunATAT(const string& rundirpath) {
-    cerr << rundirpath << endl;
+  void RunATAT(const string& workdirpath, const string& rundirpath) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    uint iter = 0;
+    if (aurostd::substring2bool(aurostd::execute2string("mmaps", stdouterr_fsio), "command not found")) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "RunATAT():", "Missing mmaps program", _RUNTIME_ERROR_);
+    }
+    aurostd::execute("touch " + rundirpath + "/stop"); // pre-kill mmaps gracefully
+    chdir(rundirpath.c_str());
+    string tmpfile = aurostd::TmpStrCreate();
+    aurostd::execute("mmaps -d > " + tmpfile + " 2>&1 &");
+    if (aurostd::substring2bool(aurostd::file2string(tmpfile), "Maps is already running")) {
+      aurostd::RemoveFile(rundirpath + "/maps_is_running");
+      aurostd::execute("mmaps -d > " + tmpfile + " 2>&1 &");
+    }
+    while (!aurostd::FileExist(rundirpath + "/predstr.out")) {
+      iter++;
+      if (LDEBUG) {cerr << "Sleeping, iter=" << iter << endl;}
+      if (iter > 30) { // wait 30 times the minimum sleep (60 seconds)
+        aurostd::RemoveFile(tmpfile);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "RunATAT():", "mmaps is taking too long to predict structures", _RUNTIME_ERROR_);
+      }
+      aurostd::Sleep(_AFLOW_APDC_MIN_SLEEP);
+    }
+    aurostd::RemoveFile(tmpfile);
+    chdir(workdirpath.c_str());
   }
 }
 
@@ -122,69 +164,21 @@ namespace apdc {
 // apdc::GenerateFilesForATAT
 // ***************************************************************************
 namespace apdc {
-  void GenerateFilesForATAT(const string& rundirpath, const string& plattice, const vector<string>& elements, const vector<xstructure>& _vstr, bool use_atat_xstr) {
+  void GenerateFilesForATAT(const string& rundirpath, const string& lat_atat, const vector<xstructure>& vstr_aflow, const vector<xstructure>& vstr_atat, const vector<int>& mapstr) {
     stringstream oss;
     vector<xstructure> vstr;
-    vector<uint> dict;
-    xmatrix<double> lattice(3,3);
-    xvector<double> angles = 90.0 * aurostd::ones_xv<double>(3);
-    xvector<double> coorsys = aurostd::ones_xv<double>(3);
-    oss.precision(_DOUBLE_WRITE_PRECISION_MAX_);
-    oss.setf(std::ios::fixed,std::ios::floatfield);
     // Generate lat.in file
-    if (plattice == "fcc") {
-      lattice(1, 1) = 0.0; lattice(2, 1) = 0.5; lattice(3, 1) = 0.5;
-      lattice(1, 2) = 0.5; lattice(2, 2) = 0.0; lattice(3, 2) = 0.5;
-      lattice(1, 3) = 0.5; lattice(2, 3) = 0.5; lattice(3, 3) = 0.0;
-    }
-    else if (plattice == "bcc") {
-      lattice(1, 1) = -0.5; lattice(2, 1) = 0.5; lattice(3, 1) = 0.5;
-      lattice(1, 2) = 0.5; lattice(2, 2) = -0.5; lattice(3, 2) = 0.5;
-      lattice(1, 3) = 0.5; lattice(2, 3) = 0.5; lattice(3, 3) = -0.5;
-    }
-    else if (plattice == "hcp") {
-      lattice = aurostd::eye<double>(3, 3);
-      coorsys(3) = std::sqrt(8.0 / 3.0);
-      angles(3) = 120.0;
-    }
-    for (uint i = 1; i <= 3; i++) {oss << _AFLOW_APDC_ALAT * coorsys(i) << " ";}
-    for (uint i = 1; i <= 3; i++) {oss << angles(i) << " ";}
-    oss << endl;
-    for (uint i = 1; i <= 3; i++) {
-      for (uint j = 1; j <= 3; j++) {
-        oss << lattice(i, j) << " ";
-      }
-      oss << endl;
-    }
-    oss << 0.0 << " " << 0.0 << " " << 0.0 << " ";
-    for (uint i = 0; i < elements.size(); i++) {
-      oss << elements[i] << ",";
-    }
-    if (plattice == "hcp") {
-      oss << endl << 2.0 / 3.0 << " " << 1.0 / 3.0 << " " << 0.5 << " ";
-      for (uint i = 0; i < elements.size(); i++) {
-        oss << elements[i] << ",";
-      }
-    }
-    oss << endl;
-    aurostd::string2file(oss.str(), rundirpath + "/lat.in");
-    aurostd::StringstreamClean(oss);
-    if (!use_atat_xstr) {
-      vstr = _vstr;
-      for (uint i = 0; i < vstr.size(); i++) {dict.push_back(i);}
-    }
-    else {
-      vstr = GetATATXstructures(rundirpath);
-      dict = GetDictionaryForXstructures(_vstr, vstr); // AFLOW to ATAT
-    }
+    aurostd::string2file(lat_atat, rundirpath + "/lat.in");
     // Generate str.out and energy files
-    for (uint i = 0; i < vstr.size(); i++) {
+    uint msize = mapstr.size();
+    for (uint i = 0; i < vstr_atat.size(); i++) {
       aurostd::DirectoryMake(rundirpath + "/" + aurostd::utype2string<uint>(i));
-      vstr[dict[i]].iomode = IOATAT_STR;
-      oss << vstr[dict[i]];
+      oss << vstr_atat[i];
       aurostd::string2file(oss.str(), rundirpath + "/" + aurostd::utype2string<uint>(i) + "/str.out");
-      aurostd::string2file(aurostd::utype2string<double>(_vstr[i].qm_E_cell) + "\n", rundirpath + "/" + aurostd::utype2string<uint>(i) + "/energy");
       aurostd::StringstreamClean(oss);
+      if (i < msize && mapstr[i] != -1) {
+        aurostd::string2file(aurostd::utype2string<double>(vstr_aflow[mapstr[i]].qm_E_cell) + "\n", rundirpath + "/" + aurostd::utype2string<uint>(i) + "/energy");
+      }
     }
   }
 }
@@ -241,7 +235,7 @@ namespace apdc {
 // apdc::GetAFLOWXstructures
 // ***************************************************************************
 namespace apdc {
-  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, uint num_proc) {
+  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, bool keep_all, uint num_proc) {
     vector<xstructure> vstr;
     string aflowlib, aflowurl;
     string alloyname = "";
@@ -272,12 +266,7 @@ namespace apdc {
         entry.aurl = aflowurl + "/" + aurostd::utype2string<uint>(i);
         if (pflow::loadXstructures(entry, oss, false)) { // initial = unrelaxed; final = relaxed
           entry.vstr[0].qm_E_cell = entry.enthalpy_cell; // ATAT needs energy per cell
-          if (entry.spacegroup_orig == entry.spacegroup_relax) {
-            vstr.push_back(entry.vstr[0]);
-          }
-          else if (compare::structuresMatch(entry.vstr[0], entry.vstr[entry.vstr.size() - 1], true, num_proc)) { // double check with structuresMatch
-            vstr.push_back(entry.vstr[0]);
-          }
+          if (keep_all || compare::structuresMatch(entry.vstr[0], entry.vstr[entry.vstr.size() - 1], true, num_proc)) {vstr.push_back(entry.vstr[0]);}
         }
         entry.clear();
     }
@@ -286,14 +275,67 @@ namespace apdc {
 }
 
 // ***************************************************************************
+// apdc::CreateLatForATAT
+// ***************************************************************************
+namespace apdc {
+  string CreateLatForATAT(const string& plattice, const vector<string>& elements) {
+    stringstream oss;
+    xmatrix<double> lattice(3,3);
+    xvector<double> angles = 90.0 * aurostd::ones_xv<double>(3);
+    xvector<double> coorsys = aurostd::ones_xv<double>(3);
+    oss.precision(_DOUBLE_WRITE_PRECISION_MAX_);
+    oss.setf(std::ios::fixed,std::ios::floatfield);
+    if (plattice == "fcc") {
+      lattice(1, 1) = 0.0; lattice(2, 1) = 0.5; lattice(3, 1) = 0.5;
+      lattice(1, 2) = 0.5; lattice(2, 2) = 0.0; lattice(3, 2) = 0.5;
+      lattice(1, 3) = 0.5; lattice(2, 3) = 0.5; lattice(3, 3) = 0.0;
+    }
+    else if (plattice == "bcc") {
+      lattice(1, 1) = -0.5; lattice(2, 1) = 0.5; lattice(3, 1) = 0.5;
+      lattice(1, 2) = 0.5; lattice(2, 2) = -0.5; lattice(3, 2) = 0.5;
+      lattice(1, 3) = 0.5; lattice(2, 3) = 0.5; lattice(3, 3) = -0.5;
+    }
+    else if (plattice == "hcp") {
+      lattice = aurostd::eye<double>(3, 3);
+      coorsys(3) = std::sqrt(8.0 / 3.0);
+      angles(3) = 120.0;
+    }
+    for (uint i = 1; i <= 3; i++) {oss << _AFLOW_APDC_ALAT * coorsys(i) << " ";}
+    for (uint i = 1; i <= 3; i++) {oss << angles(i) << " ";}
+    oss << endl;
+    for (uint i = 1; i <= 3; i++) {
+      for (uint j = 1; j <= 3; j++) {
+        oss << lattice(i, j) << " ";
+      }
+      oss << endl;
+    }
+    oss << 0.0 << " " << 0.0 << " " << 0.0 << " ";
+    for (uint i = 0; i < elements.size(); i++) {
+      oss << elements[i] << ",";
+    }
+    if (plattice == "hcp") {
+      oss << endl << 2.0 / 3.0 << " " << 1.0 / 3.0 << " " << 0.5 << " ";
+      for (uint i = 0; i < elements.size(); i++) {
+        oss << elements[i] << ",";
+      }
+    }
+    oss << endl;
+    return oss.str();
+  }
+}
+
+// ***************************************************************************
 // apdc::GetATATXstructures
 // ***************************************************************************
 namespace apdc {
-  vector<xstructure> GetATATXstructures(const string& rundirpath, uint max_num_atoms) {
+  vector<xstructure> GetATATXstructures(const string& lat, const uint max_num_atoms) {
     vector<xstructure> vstr;
     stringstream oss;
     vector<string> vinput, tokens;
-    string sstr = aurostd::execute2string("genstr -n " + aurostd::utype2string<uint>(max_num_atoms) + " -l " + rundirpath + "/lat.in", stdouterr_fsio);
+    string tmpfile = aurostd::TmpStrCreate();
+    aurostd::string2file(lat, tmpfile);
+    string sstr = aurostd::execute2string("genstr -n " + aurostd::utype2string<uint>(max_num_atoms) + " -l " + tmpfile, stdouterr_fsio);
+    aurostd::RemoveFile(tmpfile);
     if (aurostd::substring2bool(sstr, "Unable to open lattice file") || sstr == "") {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetATATXstructures():", "Missing lat.in file", _FILE_NOT_FOUND_);
     }
@@ -303,7 +345,7 @@ namespace apdc {
     aurostd::string2vectorstring(sstr, vinput);
     for (uint line = 0; line < vinput.size(); line++) {
       if (aurostd::substring2bool(vinput[line], "end")) {
-        vstr.push_back(xstructure(oss));
+        vstr.push_back(xstructure(oss, IOATAT_STR));
         aurostd::StringstreamClean(oss);
       }
       else {
@@ -315,27 +357,25 @@ namespace apdc {
 }
 
 // ***************************************************************************
-// apdc::GetDictionaryForXstructures
+// apdc::GetMapForXstructures
 // ***************************************************************************
 namespace apdc {
-  vector<uint> GetDictionaryForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, uint num_proc) {
+  vector<int> GetMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, uint num_proc) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    vector<uint> dict;
+    vector<int> mapstr;
     bool match;
     for (uint i = 0; i < vstr1.size(); i++) {
       match = false;
       for (uint j = 0; j < vstr2.size() && !match; j++) {
-        if (compare::structuresMatch(vstr1[i], vstr2[j], true, num_proc)) { // ATAT first, then AFLOW, due to atom labelings
+        if (compare::structuresMatch(vstr1[i], vstr2[j], true, num_proc)) {
           if (LDEBUG) {cerr << "str1 i=" << i << " matched str2 j=" << j << endl << "str1=" << vstr1[i] << endl << "str2=" << vstr2[j] << endl;}
-          dict.push_back(j); 
+          mapstr.push_back(j); 
           match = true;
         }
       }
-      if (!match) {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetDictionaryForXstructures():", "No structure match for i=" + aurostd::utype2string<uint>(i), _INPUT_ILLEGAL_);
-      }
+      if (!match) {mapstr.push_back(-1);}
     }
-    return dict;
+    return mapstr;
   }
 }
 
