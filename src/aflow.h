@@ -424,6 +424,8 @@ class _XHOST {
     // AFLOWSYM
     bool SKEW_TEST; //DX20171019
     double SKEW_TOL; //DX20171019
+    // xstructure
+    bool READ_SPIN_FROM_ATOMLABEL; //SD20220316
     // WEB MODE
     //[CO20200404 - overload with --www]bool WEB_MODE;  //CO20190401
   private:                                                //
@@ -2697,6 +2699,8 @@ bool aurostdTest(ostream& oss=cout); //HE20210512
 bool aurostdTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210512
 bool APDCTest(ostream& oss=cout); //SD20220202
 bool APDCTest(ofstream& FileMESSAGE,ostream& oss=cout); //SD20220202
+bool cifParserTest(ostream& oss=cout); //ME20220125
+bool cifParserTest(ofstream& FileMESSAGE, ostream& oss=cout); //ME202201025
 // ----------------------------------------------------------------------------
 // Structure Prototypes
 // aflow_xproto.cpp
@@ -3118,9 +3122,9 @@ namespace KBIN {
   double OUTCAR2VASPVersionDouble(const string& outcar);  //CO20210315
   string VASPVersionString2Number(const string& vasp_version);  //CO20210315
   double VASPVersionString2Double(const string& vasp_version);  //CO20210315
-  string getVASPVersion(const string& binfile);  //ME20190219
-  string getVASPVersionNumber(const string& binfile);  //CO20200610
-  double getVASPVersionDouble(const string& binfile);  //CO20200610
+  string getVASPVersion(const string& binfile,const string& mpi_command="");  //ME20190219
+  string getVASPVersionNumber(const string& binfile,const string& mpi_command="");  //CO20200610
+  double getVASPVersionDouble(const string& binfile,const string& mpi_command="");  //CO20200610
 }
 
 // ----------------------------------------------------------------------------
@@ -3465,7 +3469,9 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     string         Egap_type_net;
     //CO20211106 - IONIC STEPS DATA
     bool GetIonicStepsData();   //CO20211106
-    void WriteMTPCFG(const string& outcar_path,stringstream& output_ss);   //CO20211106
+    void populateAFLOWLIBEntry(aflowlib::_aflowlib_entry& data,const string& outcar_path); //CO20220124
+    void WriteMTPCFG(stringstream& output_ss,const string& outcar_path);   //CO20211106
+    void WriteMTPCFG(stringstream& output_ss,const string& outcar_path,const vector<string>& velements);   //CO20211106
     //[CO20200404 - OBSOLETE]string ERROR;
     //int number_bands,number_kpoints; //CO20171006 - camilo garbage
     //int ISPIN; // turn this into spin = 0 if ISPIN = 1 //CO20171006 - camilo garbage
@@ -4054,8 +4060,8 @@ namespace plotter {
 
   // DOS
   bool dosDataAvailable(const deque<deque<deque<deque<double> > > >& vdos, int pdos); // ME20200305
-  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ostream& oss=cout);  //CO20200404
-  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+  void generateDosPlot(stringstream&,const xDOSCAR&,aurostd::xoption&,ostream& oss=cout);  //CO20200404
+  void generateDosPlot(stringstream&,const xDOSCAR&,aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
 
   // Bands
   void generateBandPlot(stringstream&, const xEIGENVAL&, const xKPOINTS&, const xstructure&, const aurostd::xoption&);

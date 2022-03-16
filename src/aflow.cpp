@@ -57,7 +57,6 @@
 //[OBSOLETE]string AFLOWLogicError::where(){return f_name;}
 //[OBSOLETE]//CO20180419 - global exception handling - STOP
 
-
 bool SchemaTest(ostream& oss){ofstream FileMESSAGE;return SchemaTest(FileMESSAGE,oss);}
 bool SchemaTest(ofstream& FileMESSAGE,ostream& oss) {
   string function = XPID+"SchemaTest()";
@@ -1337,6 +1336,7 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_AtomicEnvironment|--AtomicEnvironment_test")) {return (AtomicEnvironmentTest(cout)?0:1);}  //HE20210511
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_aurostd|--aurostd_test")) {return (aurostdTest(cout)?0:1);} //HE20210512
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_APDC|--APDC_test")) {return (APDCTest(cout)?0:1);}  //SD20220202
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_cif_parser|--cif_parser_test")) {return (cifParserTest(cout)?0:1);}
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
       if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}

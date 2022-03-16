@@ -1692,6 +1692,10 @@ namespace aurostd {
   // ***************************************************************************
   //CO20210315
   vector<string> ProcessPIDs(const string& process,bool user_specific){ //CO20210315
+    string output_syscall="";
+    return ProcessPIDs(process,output_syscall,user_specific);
+  }
+  vector<string> ProcessPIDs(const string& process,string& output_syscall,bool user_specific){ //CO20210315
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::ProcessPIDs():";
     if(LDEBUG){cerr << soliloquy << " looking for process=" << process << endl;}
@@ -1708,7 +1712,7 @@ namespace aurostd {
         if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
         command+=" -f "+process+" 2> /dev/null";  //the -f is important, will match mpivasp46s in /usr/bin/mpivasp46s
         if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
-        string output=aurostd::execute2string(command);
+        string output=output_syscall=aurostd::execute2string(command);
         if(LDEBUG){cerr << soliloquy << " pgrep output:" << endl << "\"" << output << "\"" << endl;}
         if(0){  //before -f and -l
           aurostd::StringSubst(output,"\n"," ");
@@ -1745,7 +1749,7 @@ namespace aurostd {
       else{command+=" aux";}
       command+=" 2>/dev/null | "+command_grep+" 2> /dev/null";
       if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
-      string output=aurostd::execute2string(command);
+      string output=output_syscall=aurostd::execute2string(command);
       if(LDEBUG){cerr << soliloquy << " ps/grep output:" << endl << output << endl;}
       aurostd::string2vectorstring(output,vlines);
       for(i=0;i<vlines.size();i++){
@@ -3301,7 +3305,7 @@ namespace aurostd {
 
     stringstream strstream,cmdstream;
     string file=aurostd::TmpFileCreate("execute_report");
-    if(fsio==stdouterr_fsio){cmdstream << "bash -c \"" << command << " &> " << file << "\"";}  //CO20200624 //SD20220311 - force bash, &> does not work in sh
+    if(fsio==stdouterr_fsio){cmdstream << "bash -c \"" << command << " &> " << file << "\"";}  //CO20200624 //SD20220311 - force bash, &> does not work in sh; be careful with quotes within quotes, althought it seems to work
     else if(fsio==stderr_fsio){cmdstream << command << " 2> " << file;} //CO20200624
     else{cmdstream << command << " > " << file;} //CO20200624
     if(LDEBUG){cerr << soliloquy << " cmdstream=\"" << cmdstream.str() << "\"" << endl;}
