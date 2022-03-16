@@ -10,6 +10,9 @@
 #ifndef _AFLOW_APDC_H_
 #define _AFLOW_APDC_H_
 
+#define _MAX_NUM_ATOMS 4
+#define _NUM_PROC 8
+
 // Class _apdc data
 class _apdc_data {
   public:
@@ -45,10 +48,9 @@ namespace apdc {
   void GenerateFilesForATAT(const string& rundirpath, const string& plattice, const vector<string>& elements, const vector<xstructure>& _vstr, bool use_atat_xstr=true);
   vector<uint> GetMultiplicity(const vector<xstructure>& vstr);
   vector<xvector<double> > GetComposition(const vector<string>& elements, const vector<xstructure>& vstr);
-  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements);
-  vector<xstructure> GetATATXstructures(const string& rundirpath, uint max_num_atoms=4);
-  vector<uint> GetDictionaryForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, uint num_proc=8);
-  vector<uint> GetDictionaryForXstructures(const string& plattice, const int& nary);
+  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, uint num_proc=_NUM_PROC);
+  vector<xstructure> GetATATXstructures(const string& rundirpath, uint max_num_atoms=_MAX_NUM_ATOMS);
+  vector<uint> GetDictionaryForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, uint num_proc=_NUM_PROC);
 }
 
 #endif
