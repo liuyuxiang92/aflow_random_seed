@@ -271,6 +271,7 @@ void _atom::CleanSpin(void) {
   spin_is_given=FALSE; //DX20170921 - magnetic sym
   noncoll_spin.clear();            //DX20171205 - magnetic sym (non-collinear)
   noncoll_spin_is_given=FALSE; //DX20171205 - magnetic sym (non-collinear)
+  if(!XHOST.READ_SPIN_FROM_ATOMLABEL) {return;} //SD20220316
   if(name.find("+")!=string::npos) {spin=atof(name.substr(name.find("+")).c_str()); spin_is_given=TRUE;} //DX20170921 - magnetic sym
   if(name.find("-")!=string::npos) {spin=atof(name.substr(name.find("-")).c_str()); spin_is_given=TRUE;} //DX20170921 - magnetic sym
 }
