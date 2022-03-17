@@ -6597,7 +6597,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     uint line = 0;
     uint vec_count = 1;
     for (; line < vinput.size() && vec_count < 4; line++) {
-      aurostd::string2tokens(vinput[line],tokens," ");
+      aurostd::string2tokens(vinput[line], tokens, " ");
       axes(vec_count, 1) = aurostd::string2utype<double>(tokens[0]);
       axes(vec_count, 2) = aurostd::string2utype<double>(tokens[1]);
       axes(vec_count, 3) = aurostd::string2utype<double>(tokens[2]);
@@ -6606,10 +6606,10 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // read the fractional cell vectors
     vec_count = 1;
     for (; line < vinput.size() && vec_count < 4; line++) {
-      aurostd::string2tokens(vinput[line],tokens," ");
-      frac_cell(vec_count, 1)=aurostd::string2utype<double>(tokens[0]);
-      frac_cell(vec_count, 2)=aurostd::string2utype<double>(tokens[1]);
-      frac_cell(vec_count, 3)=aurostd::string2utype<double>(tokens[2]);
+      aurostd::string2tokens(vinput[line], tokens, " ");
+      frac_cell(vec_count, 1) = aurostd::string2utype<double>(tokens[0]);
+      frac_cell(vec_count, 2) = aurostd::string2utype<double>(tokens[1]);
+      frac_cell(vec_count, 3) = aurostd::string2utype<double>(tokens[2]);
       vec_count++;
     }
     a.lattice = axes * frac_cell;
@@ -6629,7 +6629,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     xvector<double> avec(3);
     for (; line < vinput.size() - 1; line++) {
       atom.clear();
-      aurostd::string2tokens(vinput[line],tokens," ");
+      aurostd::string2tokens(vinput[line], tokens, " ");
       avec(1) = aurostd::string2utype<double>(tokens[0]);
       avec(2) = aurostd::string2utype<double>(tokens[1]);
       avec(3) = aurostd::string2utype<double>(tokens[2]);
