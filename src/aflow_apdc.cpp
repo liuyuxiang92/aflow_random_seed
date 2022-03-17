@@ -139,14 +139,11 @@ namespace apdc {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "RunATAT():", "Missing mmaps program", _RUNTIME_ERROR_);
     }
     aurostd::execute("touch " + rundirpath + "/stop"); // pre-kill mmaps gracefully
+    aurostd::RemoveFile(rundirpath + "/maps_is_running");
+    aurostd::RemoveFile(rundirpath + "/predstr.out");
     chdir(rundirpath.c_str());
     string tmpfile = aurostd::TmpStrCreate();
     aurostd::execute("mmaps -d > " + tmpfile + " 2>&1 &");
-    string tmpstring = aurostd::file2string(tmpfile);
-    if (tmpstring == "" || aurostd::substring2bool(tmpstring, "Maps is already running")) {
-      aurostd::RemoveFile(rundirpath + "/maps_is_running");
-      aurostd::execute("mmaps -d > " + tmpfile + " 2>&1 &");
-    }
     while (!aurostd::FileExist(rundirpath + "/predstr.out")) {
       iter++;
       if (LDEBUG) {cerr << "Sleeping, iter=" << iter << endl;}
