@@ -34,9 +34,11 @@ class _apdc_data {
     vector<xstructure> vstr_atat;
     vector<int> mapstr;
 
-    // Xstructure data
-    vector<uint> multiplicity;
-    vector<xvector<double> > composition;
+    // Structure data
+    xvector<int> multiplicity;
+    xmatrix<double> composition;
+    xvector<double> excess_energies_atom;
+    
   
 
   private:
@@ -50,8 +52,9 @@ namespace apdc {
   void GetSpinodal(_apdc_data& apdc_data);
   void RunATAT(const string& workdirpath, const string& rundirpath);
   void GenerateFilesForATAT(const string& rundirpath, const string& lat_atat, const vector<xstructure>& vstr_aflow, const vector<xstructure>& vstr_atat, const vector<int>& mapstr);
-  vector<uint> GetMultiplicity(const vector<xstructure>& vstr);
-  vector<xvector<double> > GetComposition(const vector<string>& elements, const vector<xstructure>& vstr);
+  xvector<int> GetMultiplicity(const vector<xstructure>& vstr);
+  xmatrix<double> GetComposition(const vector<string>& elements, const vector<xstructure>& vstr);
+  xvector<double> GetEnergies(const string& rundirpath, const uint nstr, const uint nary);
   vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, bool keep_all=true, uint num_proc=_NUM_PROC);
   string CreateLatForATAT(const string& plattice, const vector<string>& elements);
   vector<xstructure> GetATATXstructures(const string& rundirpath, const uint max_num_atoms);

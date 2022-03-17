@@ -40,9 +40,10 @@ _apdc_data::_apdc_data() {
   vstr_atat.clear();
   mapstr.clear();
 
-  // Xstrucutre data
+  // Structure data
   multiplicity.clear();
   composition.clear();
+  excess_energies_atom.clear();
   
 }
 
@@ -68,9 +69,10 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
     lat_atat = b.lat_atat;
     vstr_atat = b.vstr_atat;
     mapstr = b.mapstr;
-    // Xstructure data
+    // Structure data
     multiplicity = b.multiplicity;
     composition = b.composition;
+    excess_energies_atom = b.excess_energies_atom;
   }
   return *this;
 }
@@ -114,8 +116,9 @@ namespace apdc {
     apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, _AFLOW_APDC_MAX_NUM_ATOMS), apdc_data.vstr_aflow);
     GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.lat_atat, apdc_data.vstr_aflow, apdc_data.vstr_atat, apdc_data.mapstr);
     RunATAT(apdc_data.workdirpath, apdc_data.rundirpath);
-    //apdc_data.multiplicity = GetMultiplicity(apdc_data.vstr_atat);
-    //apdc_data.composition = GetComposition(apdc_data.elements, apdc_data.vstr_atat);
+    apdc_data.multiplicity = GetMultiplicity(apdc_data.vstr_atat);
+    apdc_data.composition = GetComposition(apdc_data.elements, apdc_data.vstr_atat);
+    apdc_data.excess_energies_atom = GetEnergies(apdc_data.rundirpath, apdc_data.vstr_atat.size(), apdc_data.elements.size());
   }
 }
 
@@ -125,6 +128,75 @@ namespace apdc {
 namespace apdc {
   void GetSpinodal(_apdc_data& apdc_data) {
     cerr << apdc_data.rundirpath << endl;
+  }
+}
+
+// ***************************************************************************
+// apdc::GetMultiplicity
+// ***************************************************************************
+namespace apdc {
+  xvector<int> GetMultiplicity(const vector<xstructure>& vstr) {
+    uint nstr = vstr.size();
+    xvector<int> multiplicity(nstr);
+    uint natom, fact_prod;
+    for (uint i = 0; i < nstr; i++) {
+      natom = 0;
+      fact_prod = 1;
+      for (uint j = 0; j < vstr[i].num_each_type.size(); j++) {
+        natom += vstr[i].num_each_type[j];
+        fact_prod *= aurostd::factorial(vstr[i].num_each_type[j]);
+      }
+      multiplicity(i + 1) = aurostd::factorial(natom) / fact_prod;
+    }
+    return multiplicity;
+  }
+}
+
+// ***************************************************************************
+// apdc::GetComposition
+// ***************************************************************************
+namespace apdc {
+  xmatrix<double> GetComposition(const vector<string>& elements, const vector<xstructure>& vstr) {
+    uint nstr = vstr.size(), nary = elements.size();
+    xmatrix<double> composition(nstr, nary);
+    int ie = -1;
+    xvector<double> stoich;
+    vector<string> str_elements;
+    for (uint i = 0; i < vstr.size(); i++) {
+      if (nary != vstr[i].stoich_each_type.size()) {
+        str_elements = vstr[i].GetElements(true, true);
+        stoich = 0.0 * aurostd::ones_xv<double>(nary);
+        for (uint j = 0; j < nary; j++) {
+          if (aurostd::WithinList(str_elements, elements[j], ie)) {stoich(j + 1) = vstr[i].stoich_each_type[ie];}
+        }
+      }
+      else {
+        stoich = aurostd::vector2xvector(aurostd::deque2vector(vstr[i].stoich_each_type));
+      }
+      for (uint j = 0; j < nary; j++) {composition(i + 1, j + 1) = stoich(j + 1);}
+    }
+    return composition;
+  }
+}
+
+// ***************************************************************************
+// apdc::GetEnergies
+// ***************************************************************************
+namespace apdc {
+  xvector<double> GetEnergies(const string& rundirpath, const uint nstr, const uint nary) {
+    xvector<double> energies(nstr);
+    vector<string> vinput, tokens;
+    aurostd::file2vectorstring(rundirpath + "/fit.out", vinput);
+    for (uint line = 0; line < vinput.size(); line++) {
+      aurostd::string2tokens(vinput[line], tokens, " ");
+      energies(aurostd::string2utype<uint>(tokens[tokens.size() - 1]) + 1) = aurostd::string2utype<double>(tokens[nary]);
+    }
+    aurostd::file2vectorstring(rundirpath + "/predstr.out", vinput);
+    for (uint line = 0; line < vinput.size(); line++) {
+      aurostd::string2tokens(vinput[line], tokens, " ");
+      energies(aurostd::string2utype<uint>(tokens[tokens.size() - 2]) + 1) = aurostd::string2utype<double>(tokens[nary]);
+    }
+    return energies;
   }
 }
 
@@ -140,18 +212,19 @@ namespace apdc {
     }
     aurostd::execute("touch " + rundirpath + "/stop"); // pre-kill mmaps gracefully
     aurostd::RemoveFile(rundirpath + "/maps_is_running");
-    aurostd::RemoveFile(rundirpath + "/predstr.out");
+    aurostd::RemoveFile(rundirpath + "/maps.log");
     chdir(rundirpath.c_str());
-    string tmpfile = aurostd::TmpStrCreate();
+    string tmpfile = aurostd::TmpStrCreate(), logstring = "";
     aurostd::execute("mmaps -d > " + tmpfile + " 2>&1 &");
-    while (!aurostd::FileExist(rundirpath + "/predstr.out")) {
+    while (!aurostd::substring2bool(logstring, "true and predicted ground states agree") && !aurostd::substring2bool(logstring, "No other ground states")) {
       iter++;
       if (LDEBUG) {cerr << "Sleeping, iter=" << iter << endl;}
       if (iter > 30) { // wait 30 times the minimum sleep (60 seconds)
         aurostd::RemoveFile(tmpfile);
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "RunATAT():", "mmaps is taking too long to predict structures", _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "RunATAT():", "mmaps is taking too long to predict structures, dir=" + rundirpath, _RUNTIME_ERROR_);
       }
       aurostd::Sleep(_AFLOW_APDC_MIN_SLEEP);
+      aurostd::file2string(rundirpath + "/maps.log", logstring);
     }
     aurostd::RemoveFile(tmpfile);
     chdir(workdirpath.c_str());
@@ -178,53 +251,6 @@ namespace apdc {
         aurostd::string2file(aurostd::utype2string<double>(vstr_aflow[mapstr[i]].qm_E_cell) + "\n", rundirpath + "/" + aurostd::utype2string<uint>(i) + "/energy");
       }
     }
-  }
-}
-
-// ***************************************************************************
-// apdc::GetMultiplicity
-// ***************************************************************************
-namespace apdc {
-  vector<uint> GetMultiplicity(const vector<xstructure>& vstr) {
-    vector<uint> multiplicity;
-    uint natom, fact_prod;
-    for (uint i = 0; i < vstr.size(); i++) {
-      natom = 0;
-      fact_prod = 1;
-      for (uint j = 0; j < vstr[i].num_each_type.size(); j++) {
-        natom += vstr[i].num_each_type[j];
-        fact_prod *= aurostd::factorial(vstr[i].num_each_type[j]);
-      }
-      multiplicity.push_back(aurostd::factorial(natom) / fact_prod);
-    }
-    return multiplicity;
-  }
-}
-
-// ***************************************************************************
-// apdc::GetComposition
-// ***************************************************************************
-namespace apdc {
-  vector<xvector<double> > GetComposition(const vector<string>& elements, const vector<xstructure>& vstr) {
-    vector<xvector<double> > composition;
-    uint nary = elements.size();
-    int ie = -1;
-    xvector<double> stoich;
-    vector<string> str_elements;
-    for (uint i = 0; i < vstr.size(); i++) {
-      if (nary != vstr[i].stoich_each_type.size()) {
-        str_elements = vstr[i].GetElements(true, true);
-        stoich = 0.0 * aurostd::ones_xv<double>(nary);
-        for (uint j = 0; j < nary; j++) {
-          if (aurostd::WithinList(str_elements, elements[j], ie)) {stoich(j + 1) = vstr[i].stoich_each_type[ie];}
-        }
-      }
-      else {
-        stoich = aurostd::vector2xvector(aurostd::deque2vector(vstr[i].stoich_each_type));
-      }
-      composition.push_back(stoich);
-    }
-    return composition;
   }
 }
 
