@@ -142,7 +142,8 @@ namespace apdc {
     chdir(rundirpath.c_str());
     string tmpfile = aurostd::TmpStrCreate();
     aurostd::execute("mmaps -d > " + tmpfile + " 2>&1 &");
-    if (aurostd::substring2bool(aurostd::file2string(tmpfile), "Maps is already running")) {
+    string tmpstring = aurostd::file2string(tmpfile);
+    if (tmpstring == "" || aurostd::substring2bool(tmpstring, "Maps is already running")) {
       aurostd::RemoveFile(rundirpath + "/maps_is_running");
       aurostd::execute("mmaps -d > " + tmpfile + " 2>&1 &");
     }
@@ -213,7 +214,6 @@ namespace apdc {
     int ie = -1;
     xvector<double> stoich;
     vector<string> str_elements;
-    xstructure tmp = vstr[0];
     for (uint i = 0; i < vstr.size(); i++) {
       if (nary != vstr[i].stoich_each_type.size()) {
         str_elements = vstr[i].GetElements(true, true);
@@ -237,33 +237,49 @@ namespace apdc {
 namespace apdc {
   vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, bool keep_all, uint num_proc) {
     vector<xstructure> vstr;
+    vector<string> vstrlabel;
     string aflowlib, aflowurl;
     string alloyname = "";
     aflowlib::_aflowlib_entry entry;
-    uint istart, iend, nary = elements.size();
+    uint nary = elements.size();
     stringstream oss;
     for (uint i = 0; i < nary; i++) {alloyname += AVASP_Get_PseudoPotential_PAW_PBE(elements[i]);}
     aflowlib = "/common/LIB" + aurostd::utype2string<uint>(nary) + "/RAW/" + alloyname;
     aflowurl = "aflowlib.duke.edu:AFLOWDATA/LIB" + aurostd::utype2string<uint>(nary) + "_RAW/" + alloyname;
-    if (nary == 2) {
-      if (plattice == "fcc") {
-        istart = 1;
-        iend = 29;
+    if (plattice == "fcc") {
+      if (nary >= 2) {
+        for (uint i = 1; i < 30; i++) {vstrlabel.push_back(aurostd::utype2string<uint>(i));}
       }
-      else if (plattice == "bcc") {
-        istart = 58;
-        iend = 86;
-      }
-      else if (plattice == "hcp") {
-        istart = 115;
-        iend = 177;
+      if (nary >= 3) {
+        vstrlabel.push_back("TFCC001.ABC");vstrlabel.push_back("TFCC002.ABC");vstrlabel.push_back("TFCC003.ABC");
+        for (uint i = 4; i < 17; i++) {
+          vstrlabel.push_back("TFCC00" + aurostd::utype2string<uint>(i) + ".ABC");
+          vstrlabel.push_back("TFCC00" + aurostd::utype2string<uint>(i) + ".BCA");
+          vstrlabel.push_back("TFCC00" + aurostd::utype2string<uint>(i) + ".CAB");
+        }
       }
     }
-    else if (nary == 3) {
+    else if (plattice == "bcc") {
+      if (nary >= 2) {
+        for (uint i = 58; i < 87; i++) {vstrlabel.push_back(aurostd::utype2string<uint>(i));}
+      }
+      if (nary >= 3) {
+        vstrlabel.push_back("TBCC001.ABC");vstrlabel.push_back("TBCC002.ABC");vstrlabel.push_back("TBCC003.ABC");
+        for (uint i = 4; i < 17; i++) {
+          vstrlabel.push_back("TBCC00" + aurostd::utype2string<uint>(i) + ".ABC");
+          vstrlabel.push_back("TBCC00" + aurostd::utype2string<uint>(i) + ".BCA");
+          vstrlabel.push_back("TBCC00" + aurostd::utype2string<uint>(i) + ".CAB");
+        }
+      }
     }
-    for (uint i = istart; i <= iend; i++) {
-        entry.Load(aurostd::file2string(aflowlib + "/" + aurostd::utype2string<uint>(i) + "/aflowlib.out"), oss);
-        entry.aurl = aflowurl + "/" + aurostd::utype2string<uint>(i);
+    else if (plattice == "hcp") {
+      if (nary >= 2) {
+        for (uint i = 115; i < 178; i++) {vstrlabel.push_back(aurostd::utype2string<uint>(i));}
+      }
+    }
+    for (uint i = 0; i < vstrlabel.size(); i++) {
+        entry.Load(aurostd::file2string(aflowlib + "/" + vstrlabel[i] + "/aflowlib.out"), oss);
+        entry.aurl = aflowurl + "/" + vstrlabel[i];
         if (pflow::loadXstructures(entry, oss, false)) { // initial = unrelaxed; final = relaxed
           entry.vstr[0].qm_E_cell = entry.enthalpy_cell; // ATAT needs energy per cell
           if (keep_all || compare::structuresMatch(entry.vstr[0], entry.vstr[entry.vstr.size() - 1], true, num_proc)) {vstr.push_back(entry.vstr[0]);}
@@ -336,8 +352,8 @@ namespace apdc {
     aurostd::string2file(lat, tmpfile);
     string sstr = aurostd::execute2string("genstr -n " + aurostd::utype2string<uint>(max_num_atoms) + " -l " + tmpfile, stdouterr_fsio);
     aurostd::RemoveFile(tmpfile);
-    if (aurostd::substring2bool(sstr, "Unable to open lattice file") || sstr == "") {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetATATXstructures():", "Missing lat.in file", _FILE_NOT_FOUND_);
+    if (sstr == "" || aurostd::substring2bool(sstr, "Unable to open lattice file")) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetATATXstructures():", "Invalid lat.in file", _FILE_CORRUPT_);
     }
     else if (aurostd::substring2bool(sstr, "command not found")) {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetATATXstructures():", "Missing genstr program", _RUNTIME_ERROR_);
