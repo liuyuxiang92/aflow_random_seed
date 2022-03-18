@@ -328,6 +328,41 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 
   check_equal(result_ss.str(), answer, check_function, check_description, passed_checks, results);
 
+  // ---------------------------------------------------------------------------
+  // Check | companion matrix //SD20220318
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::companion_matrix()";
+  check_description = "calculate the companion matrix of a polynomial";
+
+  xvector<double> pc1(4);
+  xmatrix<double> sol1(3, 3);
+  xmatrix<double> res1;
+  pc1(1) = 6.0; pc1(2) = -5.0; pc1(3) = -2.0; pc1(4) = 3.0;
+  sol1(1, 1) = 0.0; sol1(1, 2) = 1.0; sol1(1, 3) = 0.0;
+  sol1(2, 1) = 0.0; sol1(2, 2) = 0.0; sol1(2, 3) = 1.0;
+  sol1(3, 1) = -6.0 / 3.0; sol1(3, 2) = 5.0 / 3.0; sol1(3, 3) = 2.0 / 3.0;
+  res1 = aurostd::companion_matrix(pc1);
+
+  check_equal(res1, sol1, check_function, check_description, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | polynomialFindRoots //SD20220318
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::polynomialFindRoots()";
+
+  xvector<double> pc2(4), solr(3), soli(3), resr, resi;
+  pc2(1) = 6.0; pc2(2) = -5.0; pc2(3) = -2.0; pc2(4) = 3.0;
+  solr(1) = 1.05576592536838; solr(2) = 1.05576592536838; solr(3) = -1.44486518407010;
+  soli(1) = -0.519201791550296; soli(2) = 0.519201791550296; soli(3) = 0.0;
+  aurostd::polynomialFindRoots(pc2, resr, resi);
+
+  check_description = "calculate the roots of a polynomial (real part)";
+  check_equal(resr, solr, check_function, check_description, passed_checks, results);
+  check_description = "calculate the roots of a polynomial (imag part)";
+  check_equal(resi, soli, check_function, check_description, passed_checks, results);
+
   // present overall result
   return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
 }

@@ -16,6 +16,8 @@ namespace aurostd{
   xmatrix<double> Vandermonde_matrix(const xvector<double> &x, int n);
   double polynomialFindExtremum(const xvector<double> &p, double xmin, double xmax,
       double tol=_mm_epsilon);
+  xmatrix<double> companion_matrix(const xvector<double> &p); //SD20220318
+  void polynomialFindRoots(const xvector<double> &p, xvector<double> &rr, xvector<double> &ri); // SD20220318
 }
 
 //********************************************************************************

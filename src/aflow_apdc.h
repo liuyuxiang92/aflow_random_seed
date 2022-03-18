@@ -35,9 +35,13 @@ class _apdc_data {
     vector<int> mapstr;
 
     // Structure data
-    xvector<int> multiplicity;
-    xmatrix<double> composition;
-    xvector<double> excess_energies_atom;
+    xmatrix<int> multiplicity;
+    xmatrix<double> conc;
+    xvector<double> excess_energies_atom; // eV/atom
+    xvector<double> prob_rand;
+
+    // Thermo data
+    xvector<double> prob;
     
   
 
@@ -52,9 +56,11 @@ namespace apdc {
   void GetSpinodal(_apdc_data& apdc_data);
   void RunATAT(const string& workdirpath, const string& rundirpath);
   void GenerateFilesForATAT(const string& rundirpath, const string& lat_atat, const vector<xstructure>& vstr_aflow, const vector<xstructure>& vstr_atat, const vector<int>& mapstr);
-  xvector<int> GetMultiplicity(const vector<xstructure>& vstr);
-  xmatrix<double> GetComposition(const vector<string>& elements, const vector<xstructure>& vstr);
-  xvector<double> GetEnergies(const string& rundirpath, const uint nstr, const uint nary);
+  xmatrix<int> CalcMultiplicity(const vector<xstructure>& vstr);
+  xvector<double> CalcProbabilitiesRandom(const xmatrix<double>& conc, const xmatrix<int>& multiplicity);
+  xmatrix<double> GetConcentration(const vector<string>& elements, const vector<xstructure>& vstr);
+  xmatrix<double> GetConcentration(const string& rundirpath, const int nstr, const int nelem);
+  xvector<double> GetEnergies(const string& rundirpath, const int nstr, const int nelem);
   vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, bool keep_all=true, uint num_proc=_NUM_PROC);
   string CreateLatForATAT(const string& plattice, const vector<string>& elements);
   vector<xstructure> GetATATXstructures(const string& rundirpath, const uint max_num_atoms);

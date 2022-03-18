@@ -162,6 +162,36 @@ namespace aurostd{
     if (LDEBUG) cerr << function << "end" << std::endl;
     return middle;
   }
+  /// Simon Divilov
+  /// Calculate the (tranpose) n-by-n companion matrix of a polynomial, where n is the polynomial degree
+  /// transposed companion matrix:
+  ///  0   1   0  ..  0
+  ///  0   0   1  ..  0
+  /// ...
+  ///  0   0   0  ..  1
+  /// -p0 -p1 -p2 .. -p(n-1)
+  xmatrix<double> companion_matrix(const xvector<double> &p)
+  {
+    int n = p.urows - 1;
+    xmatrix<double> CM(n, n);
+    for (int i = 1; i < n; i++) {
+      for (int j = 1; j <= n; j++) {
+        if (i == j - 1) {CM(i, j) = 1.0; continue;}
+        CM(i, j) = 0.0;
+      } 
+    }
+    for (int j = 1; j <= n; j++) {CM(n, j) = -p(j) / p(p.urows);}
+    return CM;
+  }
+
+  /// Simon Divilov
+  /// Calculates the roots of a polynomial as the eigenvalues of the companion matrix
+  /// The real and imaginary parts of the roots are returned in rr and ri, respectively
+  /// DOI: 10.1090/S0025-5718-1995-1262279-2
+  void polynomialFindRoots(const xvector<double> &p, xvector<double> &rr, xvector<double> &ri)
+  {
+    aurostd::eigen(companion_matrix(p), rr, ri);
+  }
 }
 
 //********************************************************************************
