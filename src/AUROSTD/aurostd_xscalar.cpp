@@ -743,15 +743,14 @@ namespace aurostd {
 // Quick check if the string is a hexadecimal string
 namespace aurostd {
   bool _ishex(const string& hexstr) {
-    uint istart = 0;
-    uint str_len = hexstr.size();
     // Also process hexadecimal numbers with the '0x' prefix.
-    if ((str_len > 2) && (hexstr[0] == '0') && hexstr[1] == 'x') istart = 2;
-    for (uint i = istart; i < str_len; i++) {
-      // Return false if chars aren't '0-9' or 'a-f' - https://www.asciitable.com/
-      if ((hexstr[i] < 48) || ((hexstr[i] > 57) && (hexstr[i] < 97)) || (hexstr[i] > 102)) return false;
+    uint istart = ((hexstr.substr(0, 2) == "0x")?2:0);
+    for (uint i = istart; i < hexstr.length(); i++) {
+      const char& h = hexstr[i];
+      // Return false if chars aren't '0-9', 'A-F', or 'a-f' - https://www.asciitable.com/
+      if ((h < 48) || ((h > 57) && (h < 65)) || ((h > 70) && (h < 97)) || (h > 102)) return false;
     }
-    return true;
+    return (hexstr.length() != istart);
   }
 }
 

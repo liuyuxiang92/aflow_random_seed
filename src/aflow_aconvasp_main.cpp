@@ -2951,6 +2951,7 @@ namespace pflow {
     AVASP_DefaultValuesBinary_AFLOWIN(xvasp);
     xvasp.AVASP_prototype_mode=LIBRARY_MODE_PROTOTYPE;
     xvasp.AVASP_flag_PRECISION_scheme="H";
+    str.iomode = IOVASP_POSCAR;  //ME20220113 - set to POSCAR or else the input format will be used
     xvasp.str=str;
     if(xvasp.str.atoms.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"pflow::POSCAR2AFLOWIN():","POSCAR has no atoms",_INPUT_ILLEGAL_);} //CO20200102
     if(xvasp.str.atoms[0].name_is_given==false){throw aurostd::xerror(_AFLOW_FILE_NAME_,"pflow::POSCAR2AFLOWIN():","POSCAR is missing species information",_INPUT_ILLEGAL_);} //CO20200102

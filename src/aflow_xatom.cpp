@@ -12,6 +12,7 @@
 #include "AUROSTD/aurostd_xscalar.h"
 #include "aflow_compare_structure.h" //CO20180409
 #include "aflow_chull.h" //HE20210408
+#include "aflow_symbolic.h"  //ME20220124
 
 #define _calculate_symmetry_default_sgroup_radius_   2.0
 #define PLATON_MIN_VOLUME_PER_ATOM   6.0   // for symmetry calculation
@@ -6181,15 +6182,46 @@ istream& operator>>(istream& cinput, xstructure& a) {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy,message,_VALUE_ERROR_);
     }
     //DX20191029 - check if space group number is found - END
+    //ME20220124 - Read symmetry operations without consistency checks first
     bool found_setting = false;
-    // loop over possible settings in aflow
+    vector<string> spacegroup_symop_xyz;
+    bool found_symops=FALSE;
+    bool found_symop_id=FALSE; //DX20190708
+    for(uint i=0;i<vinput.size();i++) {
+      if(aurostd::substring2bool(vinput[i],"_space_group_symop_operation_xyz") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_as_xyz")){
+        found_symops=TRUE;
+      }
+      else if(aurostd::substring2bool(vinput[i],"_space_group_symop_id") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_site_id")){ //DX20190708
+        found_symop_id=TRUE;
+      }
+      else if(found_symops){
+        if (vinput[i].find("loop_") != string::npos) break; // End of symops
+        vector<string> tokens;
+        aurostd::string2tokens(vinput[i],tokens," ");
+        //DX20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - START
+        if (tokens.size() == 0) continue;
+        if (found_symop_id && !isdigit(tokens[0][0])) break;  // End of symops
+        if (found_symop_id){ tokens.erase(tokens.begin()); } //erase symop index, not needed //DX20190708 - enclose in if-statement
+        string symop = aurostd::joinWDelimiter(tokens,"");
+        symop = aurostd::RemoveCharacter(symop,'\''); // remove '
+        symop = aurostd::RemoveCharacter(symop,'\"'); // remove "
+        symop = aurostd::RemoveWhiteSpaces(symop); // remove spaces
+        try {
+          symop = SYM::reorderWyckoffPosition(symop); //DX20190708 - standardize order of equation (variable first, then number)
+        } catch (aurostd::xerror& e) {
+          break;  // End of symops
+        }
+        spacegroup_symop_xyz.push_back(symop);
+        //DX20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - END
+      }
+    }
     for(uint setting_number=1;setting_number<=2;setting_number++){
       string setting_string = aurostd::utype2string<uint>(setting_number);
       int general_wyckoff_multiplicity=0; // general Wyckoff position multiplicity
       vector<string> general_wyckoff_position; // general Wyckoff position equations
       // get general Wyckoff multiplicity and position saved in aflow
       SYM::getGeneralWyckoffMultiplicityAndPosition(a.spacegroupnumber, setting_string, general_wyckoff_multiplicity, general_wyckoff_position);
-
+      // ME20220124 - moved up
       //      SYM::initsgs(setting_string);
       //      using SYM::gl_sgs;
       //      cerr << "find the spacegroupstring" << endl;
@@ -6227,35 +6259,35 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //      cerr << "general_wyckoff_position.size(): " << general_wyckoff_position.size() << endl;
       //      cerr << "spacegroup_symop_xyz.size(): " << spacegroup_symop_xyz.size() << endl;
       // check equations in cif
-      vector<string> spacegroup_symop_xyz;  
-      int multiplicity_count=0;
-      bool found_symops=FALSE;
-      bool found_symop_id=FALSE; //DX20190708
-      for(uint i=0;i<vinput.size();i++) {
-        if(aurostd::substring2bool(vinput[i],"_space_group_symop_operation_xyz") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_as_xyz")){
-          found_symops=TRUE;
-        }
-        else if(aurostd::substring2bool(vinput[i],"_space_group_symop_id") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_site_id")){ //DX20190708
-          found_symop_id=TRUE;
-        }
-        else if(found_symops && multiplicity_count<general_wyckoff_multiplicity){
-          multiplicity_count+=1;
-          vector<string> tokens; 
-          aurostd::string2tokens(vinput[i],tokens," ");
-          //DX20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - START
-          if(found_symop_id){ tokens.erase(tokens.begin()); } //erase symop index, not needed //DX20190708 - enclose in if-statement
-          string symop = aurostd::joinWDelimiter(tokens,"");
-          symop = aurostd::RemoveCharacter(symop,'\''); // remove ' 
-          symop = aurostd::RemoveCharacter(symop,'\"'); // remove "
-          symop = aurostd::RemoveWhiteSpaces(symop); // remove spaces
-          symop = SYM::reorderWyckoffPosition(symop); //DX20190708 - standardize order of equation (variable first, then number)
-          spacegroup_symop_xyz.push_back(symop);
-          //if(tokens.size()==2){
-          //  spacegroup_symop_xyz.push_back(tokens[1]);
-          //}
-          //DX20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - END
-        }
-      }
+      //vector<string> spacegroup_symop_xyz;
+      //int multiplicity_count=0;
+      //bool found_symops=FALSE;
+      //bool found_symop_id=FALSE; //DX20190708
+      //for(uint i=0;i<vinput.size();i++) {
+      //  if(aurostd::substring2bool(vinput[i],"_space_group_symop_operation_xyz") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_as_xyz")){
+      //    found_symops=TRUE;
+      //  }
+      //  else if(aurostd::substring2bool(vinput[i],"_space_group_symop_id") || aurostd::substring2bool(vinput[i],"_symmetry_equiv_pos_site_id")){ //DX20190708
+      //    found_symop_id=TRUE;
+      //  }
+      //  else if(found_symops && multiplicity_count<general_wyckoff_multiplicity){
+      //    multiplicity_count+=1;
+      //    vector<string> tokens;
+      //    aurostd::string2tokens(vinput[i],tokens," ");
+      //    //DX20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - START
+      //    if(found_symop_id){ tokens.erase(tokens.begin()); } //erase symop index, not needed //DX20190708 - enclose in if-statement
+      //    string symop = aurostd::joinWDelimiter(tokens,"");
+      //    symop = aurostd::RemoveCharacter(symop,'\''); // remove '
+      //    symop = aurostd::RemoveCharacter(symop,'\"'); // remove "
+      //    symop = aurostd::RemoveWhiteSpaces(symop); // remove spaces
+      //    symop = SYM::reorderWyckoffPosition(symop); //DX20190708 - standardize order of equation (variable first, then number)
+      //    spacegroup_symop_xyz.push_back(symop);
+      //    //if(tokens.size()==2){
+      //    //  spacegroup_symop_xyz.push_back(tokens[1]);
+      //    //}
+      //    //DX20181210 - account for many formats (i.e., x,y,z or 'x, y, z') - END
+      //  }
+      //}
       // compare cif and aflow's general position
       uint match_count=0;
       if(general_wyckoff_position.size()==spacegroup_symop_xyz.size()){
@@ -6289,17 +6321,17 @@ istream& operator>>(istream& cinput, xstructure& a) {
           break; //found setting
         }
       }
-      else {
-        message << "Number of symmetry operations do not match between input operations and space group number (aflow="   //CO20190629
-          << general_wyckoff_position.size() << " vs cif=" << spacegroup_symop_xyz.size() << ")." << endl;  //CO20190629
-        for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
-      }
     }
     if(!found_setting){
-      message << "Symmetry operations do not match between input operations and space group number/option." << endl;  //CO20190629
-      for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+      // ME20220124 - Changed to warning
+      message << "Symmetry operations do not match between input operations and space group number/option.";  //CO20190629
+      message << " Building structure using symmetry operations in CIF file with space group P1.";
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, std::cerr, _LOGGER_WARNING_);
+      a.spacegroupnumber = 1;
+      if (LDEBUG) {
+        for(uint i=0;i<vinput.size();i++) std::cerr << vinput[i] << endl;  //CO20190629 // ME20220124 - moved to LDEBUG because outputting the entire CIF makes the error message unreadable
+      }
+      //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
     }
     // get lattice
     for(uint i=0;i<vinput.size();i++) {
@@ -6327,6 +6359,18 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.lattice = GetClat(a.a, a.b, a.c, a.alpha, a.beta, a.gamma);
     a.FixLattices();
     a.partial_occupation_flag = FALSE;
+
+    // ME20220124 - Convert xyz to symbolic representation
+    vector<symbolic::Symbolic> spacegroup_symop_symbolic;
+    if (!found_setting) {
+      uint nsym = spacegroup_symop_xyz.size();
+      vector<vector<string> > vsymops(nsym);
+      for (uint i = 0; i < nsym; ++i) {
+        aurostd::string2tokens(spacegroup_symop_xyz[i], vsymops[i], ",");
+      }
+      spacegroup_symop_symbolic = anrl::equations2SymbolicEquations(vsymops);
+    }
+
     // get atoms
     vector<string> atom_site_fields;
     bool found_atom_site_labels=FALSE;
@@ -6365,8 +6409,24 @@ istream& operator>>(istream& cinput, xstructure& a) {
         if(tokens.size()==atom_site_fields.size()){
           _atom atom_tmp;
           wyckoffsite_ITC wyckoff_tmp; //DX20191029
+          //ME20220124 - prepare for P1 if setting not found
+          if (!found_setting) {
+            wyckoff_tmp.letter = "a";
+            wyckoff_tmp.multiplicity = 1;
+            wyckoff_tmp.site_symmetry = "1";
+            string eq_str = "x,y,z";
+            vector<string> eq;
+            aurostd::string2tokens(eq_str, eq, ",");
+            wyckoff_tmp.equations.push_back(eq);
+          }
           for(uint t=0;t<tokens.size();t++){
-            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_type_symbol")){ atom_tmp.name = aurostd::RemoveCharacterFromTheFrontAndBack(tokens[t],'\''); atom_tmp.name_is_given=TRUE; } //DX20190718 - remove surrounding '' (common in Springer Materials cifs)
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_type_symbol")){
+              string name = aurostd::RemoveCharacterFromTheFrontAndBack(tokens[t],'\''); //DX20190718 - remove surrounding '' (common in Springer Materials cifs)
+              // ME20220113 - name could have oxidation states (found in newer ICSD CIFs)
+              if (name.length() > 2) name = name.substr(0, isdigit(name[1])?1:2);
+              atom_tmp.name = name;
+              atom_tmp.name_is_given = TRUE;
+            }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_x")){ atom_tmp.fpos[1] = aurostd::string2utype<double>(tokens[t]); }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_y")){ atom_tmp.fpos[2] = aurostd::string2utype<double>(tokens[t]); }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_fract_z")){ atom_tmp.fpos[3] = aurostd::string2utype<double>(tokens[t]); }
@@ -6377,16 +6437,38 @@ istream& operator>>(istream& cinput, xstructure& a) {
               else { atom_tmp.partial_occupation_flag = TRUE; a.partial_occupation_flag = TRUE; }
             }
             if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_symmetry_multiplicity")){ wyckoff_tmp.multiplicity=aurostd::string2utype<double>(tokens[t]); }
-            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_Wyckoff_label")){ wyckoff_tmp.letter=tokens[t]; }
+            if(aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_Wyckoff_label") || aurostd::substring2bool(atom_site_fields.at(t),"_atom_site_Wyckoff_symbol")){ wyckoff_tmp.letter=tokens[t]; }  //ME20220125 - Added _atoms_site_Wyckoff_symbol check
           }
           wyckoff_tmp.type = atom_tmp.name; //DX20191029
           wyckoff_tmp.coord = atom_tmp.fpos; //DX20191029
-          if(wyckoff_tmp.multiplicity!=0 && wyckoff_tmp.letter!=""){
+          if(found_setting && wyckoff_tmp.multiplicity!=0 && wyckoff_tmp.letter!=""){
             SYM::getWyckoffInformation(a.spacegroupnumber, a.spacegroupoption, wyckoff_tmp.letter, wyckoff_tmp.multiplicity, wyckoff_tmp.site_symmetry, wyckoff_tmp.equations);
           }
           a.wyckoff_sites_ITC.push_back(wyckoff_tmp);
           atom_tmp.cpos=a.f2c*atom_tmp.fpos;
           a.AddAtom(atom_tmp);
+          //ME20220124 - Use symmetry operations when setting unknown
+          if (!found_setting) {
+            uint natoms = a.atoms.size();  // For Wyckoff positions
+            _atom at;
+            deque<_atom> atoms_symop;
+            symbolic::Symbolic x("x"), y("y"), z("z"), result;
+            for (uint i = 0; i < spacegroup_symop_symbolic.size(); i++) {
+              const symbolic::Symbolic& eq = spacegroup_symop_symbolic[i];
+              const xvector<double>& fpos = atom_tmp.fpos;
+              result = eq[x == fpos[1], y == fpos[2], z == fpos[3]];
+              at = atom_tmp;
+              at.fpos[1] = (double) result(0);
+              at.fpos[2] = (double) result(1);
+              at.fpos[3] = (double) result(2);
+              at.cpos = a.f2c * at.fpos;
+              atoms_symop.push_back(at);
+            }
+            a.AddAtom(atoms_symop);
+            // Add Wyckoff positions
+            uint natoms_added = a.atoms.size() - natoms;
+            for (uint i = 0; i < natoms_added; ++i) a.wyckoff_sites_ITC.push_back(wyckoff_tmp);
+          }
           already_storing_atoms=TRUE; //DX20190718 - to handle format of Springer Materials cifs (adds extra fields at the end; do not read them)
         } else {
           message << "Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl;  //CO20190629
@@ -6419,6 +6501,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.is_vasp5_poscar_format=FALSE; //DX20190308 - needed or SPECIES section breaks
 
     // add title, CIFs do not generally have a canonical "title" line, so make one
+    a.BringInCell();  //ME20220124
     a.buildGenericTitle(); //DX20210211
   } // CIF INPUT
 
@@ -7332,8 +7415,8 @@ void xstructure::AddAtom(const deque<_atom>& atoms_in, bool check_present) { //D
 
     // first check if the input atoms are unique
     // it is more efficient to use a double for-loop (upper-triangular)
-    // as opposed to MapAtom(deque<_atom>, _atom); otherwise you check atoms
-    // end up checking twice //DX20210202
+    // as opposed to MapAtom(deque<_atom>, _atom); otherwise you end up
+    // checking atoms twice //DX20210202
     bool FOUND_POSITION=FALSE;
     for(uint iat=0;iat<atoms_in.size();iat++){
       FOUND_POSITION=FALSE;
@@ -7343,7 +7426,8 @@ void xstructure::AddAtom(const deque<_atom>& atoms_in, bool check_present) { //D
       if(FOUND_POSITION){ continue; }
       // now check if any atoms in the xstructure are duplicates with the input atoms
       else if(natoms_xstr != 0){
-        if(!SYM::MapAtom(atoms, atoms_unique[iat], true, (*this).lattice, false, tol)){
+        // ME20220120 - changed atoms_unique to atom_in since we are looping over atoms_in
+        if(!SYM::MapAtom(atoms, atoms_in[iat], true, (*this).lattice, false, tol)){
           atoms_unique.push_back(atoms_in[iat]);
         }
       }
@@ -7503,7 +7587,7 @@ void xstructure::AddAtom(const _atom& atom, bool check_present) {
 // **************************************************************************
 // xstructure::RemoveAtom
 // **************************************************************************
-// This removes an atom to the structure.
+// This removes an atom from the structure.
 //CO20170721 - added some safety checks to make sure we weren't deleting an entry
 // of a vector/deque that didn't exist (see if size() > itype)
 // this is really important because if we build an xstructure on the fly and only occupy
