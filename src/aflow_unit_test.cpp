@@ -327,6 +327,46 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 
   check_equal(result_ss.str(), answer, check_function, check_description, passed_checks, results);
 
+  // ---------------------------------------------------------------------------
+  // Check | mod_floored (int) //SD20220124
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::mod_floored()";
+  check_description = "floored mod; numbers as int";
+  expected_int = -1; 
+  
+  calculated = aurostd::mod_floored(5, -3);
+  check_equal(calculated, expected_int, check_function, check_description, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | mod_floored (double) //SD20220124
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::mod_floored()";
+  check_description = "floored mod; numbers as double";
+  expected = 1.4;
+
+  calculated = aurostd::mod_floored(-5.2, 3.3);
+  check_equal(calculated, expected, check_function, check_description, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | mod_floored (divisor 0) //SD20220124
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::mod_floored()";
+  check_description = "floored mod; divisor is 0"; 
+  expected = 11.11;
+
+  calculated = aurostd::mod_floored(11.11, 0.0);
+  check_equal(calculated, expected, check_function, check_description, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | mod_floored (divisor inf) //SD20220124
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::mod_floored()";
+  check_description = "floored mod; divisor is inf";
+  expected = 11.11;
+
+  calculated = aurostd::mod_floored(11.11, (double)INFINITY);
+  check_equal(calculated, expected, check_function, check_description, passed_checks, results);
+
   // present overall result
   return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
 }
