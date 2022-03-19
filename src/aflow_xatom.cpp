@@ -6636,7 +6636,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       atom.name = atom.cleanname = tokens[3];
       atom.cpos = trasp(axes) * avec;
       atom.fpos = a.c2f * atom.cpos;
-      atom.name_is_given = TRUE;
+      atom.name_is_given = (!atom.name.empty());
       atoms.push_back(atom);
       if (LDEBUG) {
         cerr << soliloquy << " ATAT atom[" << atom.name <<"] found:" << endl;
