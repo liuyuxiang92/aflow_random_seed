@@ -206,6 +206,9 @@ namespace KBIN {
   bool Legitimate_krun(const _aflags& aflags,const bool osswrite,ostringstream& oss) {
     string aflowindir=aflags.Directory,filename;
     aurostd::StringSubst(aflowindir,"//","/");
+    if(!Legitimate_aflowdir(aflowindir,aflags,osswrite,oss)){ // aflowdir not legitimate
+      return FALSE;
+    }
     if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP){
       filename=aflowindir+"/INCAR";
     }
@@ -213,9 +216,6 @@ namespace KBIN {
       filename=aflowindir+"/"+_AFLOWIN_;
     }
     else { //SD20220319 - catch-all
-      return FALSE;
-    }
-    if(!Legitimate_aflowdir(aflowindir,aflags,osswrite,oss)){ // aflowdir not legitimate
       return FALSE;
     }
     if(!aurostd::FileExist(filename)){ // file does not exist
@@ -1209,7 +1209,7 @@ namespace KBIN {
 
     // ---------------------------------------------------------------------------
     // copy aflow.in to new directory
-    aus << "cp " << directory_orig << "/aflow.in " << aflags.Directory;
+    aus << "cp " << directory_orig << "/"+_AFLOWIN_+" " << aflags.Directory;
     message <<    "MMMMM  Executing: \"" << aus.str() << "\"" << Message(_AFLOW_FILE_NAME_,aflags,"user,host,time") << endl;aurostd::PrintMessageStream(message,XHOST.QUIET);message.clear();message.str(std::string());aurostd::execute(aus);aus.clear();aus.str(std::string());
 
     if(LDEBUG){ cerr << function_name << " new full directory " << aflags.Directory << endl; }
