@@ -1283,8 +1283,7 @@ namespace KBIN {
     //[SD20220224 - OBSOLETE]      aus << "LLLLL  UNWRITABLE ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
     //[SD20220224 - OBSOLETE]      aurostd::PrintMessageStream(aus,XHOST.QUIET);
     //[SD20220224 - OBSOLETE]    }
-    if(!Legitimate_aflowdir(aflags.Directory,aflags)){return;}
-    if(!aurostd::LinkFileAtomic(aflags.Directory+"/"+_AFLOWIN_,aflags.Directory+"/"+_AFLOWLOCK_+_LOCK_LINK_SUFFIX_,false)){return;} // create LOCK link //SD20220224
+    if(!Legitimate_aflowdir(aflags.Directory,aflags) || !aurostd::LinkFileAtomic(aflags.Directory+"/"+_AFLOWIN_,aflags.Directory+"/"+_AFLOWLOCK_+_LOCK_LINK_SUFFIX_,false)){return;} // create LOCK link //SD20220224
     // SD20220224 - Dumb LOCK is now made with LinkFileAtomic, also we do not need to check if _AFLOWIN_ exists
     // because LinkFileAtomic will throw an error if that is the case
     //[SD20220224 - OBSOLETE]// make a dumb lock as soon as possible -------------------------------------
