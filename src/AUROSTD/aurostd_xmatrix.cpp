@@ -1301,15 +1301,25 @@ namespace aurostd {
       xmatrix<utype> c(rows, cols);
       for (int i = c.lrows; i <= c.urows; i++) {
         for (int j = c.lcols; j <= c.ucols; j++) {
-          c(i, j) = v1[v1.lrows + c.ucols*i + j];
+          c(i, j) = v1(v1.lrows + c.ucols*(i-1) + j-1);
         }
       }
       return c;
     }
+
+  // reshape by columns
+  template<class utype>
+    xmatrix<utype> reshape(const xvector<utype>& v1) {
+      xmatrix<utype> c(v1.rows,1);
+      for (int i=c.lrows;i<=c.urows;i++)
+        c(i,1)=v1(v1.lrows+(i-c.lrows+1));
+      return c;
+    }
+
   // SD20220126 - Reshape matrix into another matrix
   template<class utype>
     xmatrix<utype> reshape(const xmatrix<utype>& c, int rows, int cols) {
-      if (rows < 1 || cols < 1) {
+      if (rows < 1 || cols < 1) { 
         string soliloquy = XPID + "aurostd::xmatrix<utype>::reshape(c,rows,cols):";
         string message = "New dimensions cannot be less than one";
         throw xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ILLEGAL_);
@@ -1320,25 +1330,13 @@ namespace aurostd {
         message << "New shape (" << rows << "," << cols << ") not compatible with old shape (" << c.rows << "," << c.cols << ")";
         throw xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ERROR_);
       }
-      xmatrix<utype> c_new = c;
-      xvector<utype> v(rows * cols);
-      uint count=1;
+      xvector<utype> v1(rows * cols);
       for (int i = c.lrows; i <= c.urows; i++) {
         for (int j = c.lcols; j <= c.ucols; j++) {
-          v(count) = c_new[i][j];
-          count++;
+          v1(v1.lrows + c.ucols*(i-1) + j-1) = c(i, j);
         }
       }
-      return aurostd::reshape(v, rows, cols);
-    }
-
-  // reshape by columns
-  template<class utype>
-    xmatrix<utype> reshape(const xvector<utype>& v1) {
-      xmatrix<utype> c(v1.rows,1);
-      for (int i=c.lrows;i<=c.urows;i++)
-        c(i,1)=v1(v1.lrows+(i-c.lrows+1));
-      return c;
+      return reshape(v1, rows, cols);
     }
 
   template<class utype>
