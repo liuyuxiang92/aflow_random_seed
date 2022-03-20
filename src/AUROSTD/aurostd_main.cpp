@@ -2130,7 +2130,7 @@ namespace aurostd {
         return FALSE;
       }
       else {
-        string function = XPID+"aurostd::LinkFileAtomic()";
+        string function = XPID+"aurostd::LinkFileAtomic():";
         string message = "Error linking "+from_clean+" -> "+to_clean+" | errno="+aurostd::utype2string<int>(errno);
         throw aurostd::xerror(_AFLOW_FILE_NAME_,function,message,_FILE_ERROR_);
       }

@@ -774,6 +774,8 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   A1[1][1]=3;A1[1][2]=2;A1[1][3]=1;
   A1[2][1]=5;A1[2][2]=3;A1[2][3]=1;
   A1[3][1]=6;A1[3][2]=8;A1[3][3]=9;
+    cerr<<aurostd::reshape(A1,9,1)<<endl;
+    cerr<<aurostd::reshape(A1,1,9)<<endl;
 
   aurostd::getSmithNormalForm(A1,U1,V1,S1);
 

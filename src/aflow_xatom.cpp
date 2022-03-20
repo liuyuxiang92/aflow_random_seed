@@ -3935,17 +3935,23 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     // write the fractional cell vectors (== lattice)
     for (uint i = 1; i <= 3; i++) {
       for (uint j = 1; j <= 3; j++) {
-        oss << aa.lattice(i, j) << " ";
+        oss << " ";
+        if (abs(aa.lattice(i, j)) < 10.0) {oss << " ";}
+        if (!std::signbit(aa.lattice(i, j))) {oss << " ";}
+        oss << aa.lattice(i, j) << "";
       }
       oss << endl;
     }
     // write the atoms
     xvector<double> coord(3);
     for (uint iat = 0; iat < aa.atoms.size(); iat++) {
-      oss << aa.atoms[iat].cpos(1) << " " << aa.atoms[iat].cpos(2) << " " << aa.atoms[iat].cpos(3);
-      if (aa.atoms[iat].name_is_given == TRUE) {
-        oss << " " << aa.atoms[iat].cleanname;
+      oss << " ";
+      for (uint i=1; i <= 3; i++) {
+        if (abs(aa.atoms[iat].cpos(i)) < 10.0) {oss << " ";}
+        if (!std::signbit(aa.atoms[iat].cpos(i))) {oss << " ";}
+        oss << aa.atoms[iat].cpos(i) << " ";
       }
+      if (aa.atoms[iat].name_is_given == TRUE) {oss << aa.atoms[iat].cleanname;}
       oss << endl;
     }
     return oss;

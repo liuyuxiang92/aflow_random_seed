@@ -1299,9 +1299,9 @@ namespace aurostd {
         throw xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> c(rows, cols);
-      for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-          c(i+1, j+1) = v1[v1.lrows + cols*i + j];
+      for (int i = c.lrows; i <= c.urows; i++) {
+        for (int j = c.lcols; j <= c.ucols; j++) {
+          c(i, j) = v1[v1.lrows + c.ucols*i + j];
         }
       }
       return c;
