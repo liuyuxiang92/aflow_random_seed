@@ -367,6 +367,18 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   calculated = aurostd::mod_floored(11.11, (double)INFINITY);
   check_equal(calculated, expected, check_function, check_description, passed_checks, results);
 
+  // ---------------------------------------------------------------------------
+  // Check | reshape //SD20220319
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::reshape()";
+  check_description = "reshape a rectangular matrix";
+  xmatrix<int> xmat(3,4);
+  xmat(1,1) = 1; xmat(1,2) = 2; xmat(1,3) = 3; xmat(1,4) = 4;
+  xmat(2,1) = 5; xmat(2,2) = 6; xmat(2,3) = 7; xmat(2,4) = 8;
+  xmat(3,1) = 9; xmat(3,2) = 10; xmat(3,3) = 11; xmat(3,4) = 12;
+
+  check_equal(aurostd::reshape(aurostd::reshape(xmat,4,3),3,4), xmat, check_function, check_description, passed_checks, results);
+
   // present overall result
   return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
 }
