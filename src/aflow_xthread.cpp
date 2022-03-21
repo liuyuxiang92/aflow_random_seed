@@ -27,7 +27,8 @@
 // (start and end points) as first paramters. The pre-distributed scheme
 // cannot be used with iterators and currently does not support progress bars.
 //
-// Additionally, function inputs cannot be prvalues.
+// Additionally, function inputs cannot be prvalues (see here for a distinction
+// between value types: https://accu.org/journals/overload/27/150/knatten_2641/).
 //
 // ----------
 //
