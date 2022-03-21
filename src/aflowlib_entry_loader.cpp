@@ -528,10 +528,10 @@ namespace aflowlib {
     for (std::string line: raw_data_lines) {
       std::shared_ptr <aflowlib::_aflowlib_entry> entry = std::make_shared<aflowlib::_aflowlib_entry>();
       entry->Load(line, *p_oss);
-      if (!entry->auid.empty() && (m_auid_list.find(entry->auid) == m_auid_list.end())) {
+      if (!entry->auid.empty() && (std::find(m_auid_list.begin(),m_auid_list.end(), entry->auid) == m_auid_list.end())) {
         m_entries_flat->push_back(entry);
         (*m_entries_layered_map)[entry->nspecies][entry->species_pp].push_back(entry);
-        m_auid_list.emplace(entry->auid);
+        m_auid_list.emplace_back(entry->auid);
         if (m_xstructure_original) addXstructure(*entry, true);
         if (m_xstructure_relaxed) addXstructure(*entry);
       }
@@ -1172,7 +1172,7 @@ namespace aflowlib {
       getAlloyAUIDList(alloy_list, known_AUID_list);
       std::vector <std::string> missing_AUID;
       for (const std::string &AUID: known_AUID_list) {
-        if (m_auid_list.find(AUID) == m_auid_list.end()) missing_AUID.emplace_back(AUID);
+        if (std::find(m_auid_list.begin(), m_auid_list.end(), AUID) == m_auid_list.end()) missing_AUID.emplace_back(AUID);
       }
       m_logger_message << "Found " << missing_AUID.size() << " entries in the public alloy SQLITE DB that where not found in the filesystem search.";
       outDebug(__func__);
@@ -1254,7 +1254,7 @@ namespace aflowlib {
       getAlloyAUIDList(alloy_list, known_AUID_list);
       std::vector <std::string> missing_AUID;
       for (const std::string &AUID: known_AUID_list) {
-        if (m_auid_list.find(AUID) == m_auid_list.end()) missing_AUID.emplace_back(AUID);
+        if (std::find(m_auid_list.begin(), m_auid_list.end(), AUID)== m_auid_list.end()) missing_AUID.emplace_back(AUID);
       }
       m_logger_message << "Found " << missing_AUID.size() << " entries in the public alloy SQLITE DB that where not found in the REST API search.";
       outDebug(__func__);

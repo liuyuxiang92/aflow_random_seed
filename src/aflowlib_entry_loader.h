@@ -71,7 +71,7 @@ namespace aflowlib {
       std::shared_ptr<aflowlib::AflowDB> m_sqlite_alloy_db_ptr;             ///< pointer to an instance of the public alloy SQLITE DB
       /// @brief set that contains all loaded AUIDs
       /// @note `std::set` is stored sorted and is therefore faster at finding entries compared to `std::vector`
-      std::unordered_set<std::string> m_auid_list;
+      std::vector<std::string> m_auid_list;
 
       // Data views
       /// @brief flat collection of loaded lib entries
