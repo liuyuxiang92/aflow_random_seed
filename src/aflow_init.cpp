@@ -1038,7 +1038,7 @@ namespace init {
 
     // NOW LOAD schema
     if (init::InitSchema(INIT_VERBOSE) == 0) return 0;
-    init::InitSchemaSecret(INIT_VERBOSE);
+    init::InitSchemaInternal(INIT_VERBOSE);
 
     // DONE
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [END]" << endl;
@@ -3909,23 +3909,23 @@ namespace init {
 
 namespace init {
 
-  //ME20220208 - Initialize secret schema, which contain keywords that
+  //ME20220208 - Initialize internal schema, which contain keywords that
   //are inside the SQLite database, but are not served to the public.
-  uint InitSchemaSecret(bool INIT_VERBOSE) {
+  uint InitSchemaInternal(bool INIT_VERBOSE) {
     // DECLARATIONS
     bool LDEBUG=(FALSE || XHOST.DEBUG || INIT_VERBOSE);
-    if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchemaSecret: [BEGIN]" << endl;
+    if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchemaInternal: [BEGIN]" << endl;
 
     uint nschema = 0;
 
     // schema is CAPITAL, content is not necessarily
-    XHOST.vschema_secret.push_attached("SCHEMA::NAME:ALLOY", "alloy");
-    XHOST.vschema_secret.push_attached("SCHEMA::UNIT:ALLOY", "");
-    XHOST.vschema_secret.push_attached("SCHEMA::TYPE:ALLOY", "string");
+    XHOST.vschema_internal.push_attached("SCHEMA::NAME:ALLOY", "alloy");
+    XHOST.vschema_internal.push_attached("SCHEMA::UNIT:ALLOY", "");
+    XHOST.vschema_internal.push_attached("SCHEMA::TYPE:ALLOY", "string");
     nschema++;
 
     if(LDEBUG) cerr << "nschema=" << nschema << endl;
-    if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchemaSecret: [END]" << endl;
+    if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchemaInternal: [END]" << endl;
 
     return nschema;
   }

@@ -627,11 +627,11 @@ namespace aflowlib {
       void close();
       void copy(const AflowDB&);
       void initialize(const string& db_file, const string& dt_path, const string& lck_file,
-                      int open_flags, const aurostd::xoption& schema_in, const aurostd::xoption& schema_secret_in);
+                      int open_flags, const aurostd::xoption& schema_in, const aurostd::xoption& schema_internal_in);
 
       sqlite3* db;
       bool is_tmp;
-      aurostd::xoption vschema_secret;
+      aurostd::xoption vschema_internal;
       aurostd::xoption vschema;
       string data_path;
       string database_file;
