@@ -702,6 +702,41 @@ namespace aurostd {
 }
 
 // ***************************************************************************
+// Function mod_floored
+// ***************************************************************************
+namespace aurostd {
+  // SD20220124
+  // std::fmod is the truncated mod function
+  // std::remainder is the rounded mod function
+  // e.g.
+  // std::fmod(-4.0,+1.1)=            -0.7; std::fmod(-4.0,-1.1)=            -0.7
+  // std::remainder(-4.0,+1.1)=       +0.4; std::remainder(-4.0,-1.1)=       +0.4
+  // aurostd::mod_floored(-4.0,+1.1)= +0.4; aurostd::mod_floored(-4.0,-1.1)= -0.7
+  // See: https://en.wikipedia.org/wiki/Modulo_operation
+  template<class utype> utype mod_floored(utype x, utype y) {
+    if (y == (utype)0.0 || y == (utype)INFINITY) {
+      return x;
+    }
+    else if (y == (utype)-INFINITY) {
+      return (utype)-INFINITY;
+    }
+    else if (std::isnan(y)) {
+      string soliloquy = XPID + "aurostd::mod_floored():";
+      string message = "NAN value in divisor";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ILLEGAL_);
+    }
+    else if (std::isnan(x)) {
+      string soliloquy = XPID + "aurostd::mod_floored():";
+      string message = "NAN value in dividend";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ILLEGAL_);
+    }
+    else {
+      return x - y * std::floor((double)x/y);
+    }
+  }
+}
+
+// ***************************************************************************
 // Function ishex
 // ***************************************************************************
 // ME20200707

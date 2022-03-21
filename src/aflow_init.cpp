@@ -12,6 +12,7 @@
 
 string _AFLOWIN_; 
 string _AFLOWLOCK_; 
+const string _LOCK_LINK_SUFFIX_=".init"; //SD20220224
 string _STOPFLOW_;  //CO20210315
 
 // THREADS
