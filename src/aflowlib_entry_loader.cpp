@@ -58,7 +58,7 @@ namespace aflowlib {
 
   /// @brief initialize the class (privat)
   /// create shared pointer used to store the data views and read default values from flags
-  /// @TODO use flags to set defaults
+  /// @TODO use flags to overwrite defaults
   void EntryLoader::init() {
     m_out_debug = (m_out_debug || XHOST.DEBUG || _DEBUG_ENTRY_LOADER_);
     m_entries_flat = std::make_shared<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>();
@@ -234,7 +234,7 @@ namespace aflowlib {
   void EntryLoader::loadAURL(std::string AURL) {
     selectSource();
 
-    if (!cleanAURL(AURL)) return; //TODO error message
+    if (!cleanAURL(AURL)) return;
 
     m_logger_message << "Try loading " << AURL;
     outInfo(__func__);
@@ -916,7 +916,7 @@ namespace aflowlib {
   /// @brief save the shared pointers to the AFLOW lib entries into a two layer vector
   /// @param result save-to vector
   /// @note the underlying entries will not be copied and are likely not in a continuous chunk of memory
-  /// @note the entries are grouped by number of entries (smallest to largest)
+  /// @note the entries are grouped by number of elements (smallest to largest)
   void EntryLoader::getEntriesViewTwoLayer(vector<vector<std::shared_ptr < aflowlib::_aflowlib_entry>> > &result) const{
     for (auto layer1: *m_entries_layered_map) {
       std::vector <std::shared_ptr<aflowlib::_aflowlib_entry>> collected_entries;
@@ -930,7 +930,7 @@ namespace aflowlib {
   /// @brief save the shared pointers to the AFLOW lib entries into a three layer vector
   /// @param result save-to vector
   /// @note the underlying entries will not be copied and are likely not in a continuous chunk of memory
-  /// @note the entries are grouped first by number of entries (smallest to largest) and then by alloy
+  /// @note the entries are grouped first by number of elements (smallest to largest) and then by alloy
   void EntryLoader::getEntriesViewThreeLayer(std::vector<std::vector<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> &result) const{
     for (auto layer1: *m_entries_layered_map) {
       std::vector < std::vector < std::shared_ptr < aflowlib::_aflowlib_entry>>> collected_entries_l1;
@@ -946,7 +946,7 @@ namespace aflowlib {
   /// @brief save the shared pointers to the AFLOW lib entries into a three layer map
   /// @param result save-to map
   /// @note the underlying entries will not be copied and are likely not in a continuous chunk of memory
-  /// @note the entries are grouped first by number of entries and then by alloy
+  /// @note the entries are grouped first by number of elements and then by alloy
   /// @note creating a copy of the smart pointer #m_entries_layered_map is a bit more efficient way to use
   ///       the loaded entries after the EntryLoader class goes out of scope
   void EntryLoader::getEntriesViewMap(std::map < short, std::map < std::string,
@@ -966,7 +966,7 @@ namespace aflowlib {
   /// @brief copy the AFLOW lib entries into a two layer vector
   /// @param result save-to vector
   /// @note the underlying entries are copied into a continuous chunk of memory
-  /// @note the entries are grouped by number of entries (smallest to largest)
+  /// @note the entries are grouped by number of elements (smallest to largest)
   void EntryLoader::getEntriesTwoLayer(std::vector <std::vector<aflowlib::_aflowlib_entry>> &result) const {
     for (auto layer1: *m_entries_layered_map) {
       std::vector <aflowlib::_aflowlib_entry> collected_entries;
@@ -981,7 +981,7 @@ namespace aflowlib {
   /// @brief copy the AFLOW lib entries into a three layer vector
   /// @param result save-to vector
   /// @note the underlying entries are copied into a continuous chunk of memory
-  /// @note the entries are grouped first by number of entries (smallest to largest) and then by alloy
+  /// @note the entries are grouped first by number of elements (smallest to largest) and then by alloy
   void EntryLoader::getEntriesThreeLayer(std::vector<std::vector<vector<aflowlib::_aflowlib_entry>>> & result) const {
     for (auto layer1: *m_entries_layered_map) {
       std::vector <std::vector<aflowlib::_aflowlib_entry>> collected_entries_l1;
@@ -1051,7 +1051,6 @@ namespace aflowlib {
       m_logger_message << "Could not list content for " << url;
       outInfo(__func__);
     };
-    //TODO Error
   }
 
   /// @brief generate a list of AUID for a given list of alloys by querying the public alloy SQLITE DB
@@ -1072,7 +1071,7 @@ namespace aflowlib {
     }
   }
 
-  /// @brief load AFLOW lib entries for a given alloy directly from the filesystem
+  /// @brief load AFLOW lib entries for a given alloy directly from the filesystem (source FILESYSTEM_RAW)
   /// @param alloy_list list of cleaned and sorted alloys
   /// @param lib_max number of elements in the largest alloy
   /// @note if the public alloy SQLITE DB is available the results are expanded with missed entries
@@ -1181,7 +1180,7 @@ namespace aflowlib {
     }
   }
 
-  /// @brief load AFLOW lib entries for a given alloy set directly from the AFLOW REST API
+  /// @brief load AFLOW lib entries for a given alloy set directly from the AFLOW REST API (source RESTAPI_RAW)
   /// @param alloy_list list of cleaned and sorted alloys
   /// @param lib_max number of elements in the largest alloy
   void EntryLoader::loadAlloySearchRR(const std::vector <std::string> & alloy_list, uint lib_max) {
@@ -1360,7 +1359,6 @@ namespace aflowlib {
   // TODO why _AFLOW_FILE_NAME_ and not __FILE__?
   // https://www.cprogramming.com/reference/preprocessor/__FILE__.html
   // also the use of __func__ and __LINE__ would be useful
-
 
   void EntryLoader::outInfo(const std::string & function_name) {
     if ((!m_out_silent || m_out_debug) && !m_out_super_silent){

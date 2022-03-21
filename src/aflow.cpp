@@ -1297,7 +1297,6 @@ bool AtomicEnvironmentTest(ofstream& FileMESSAGE, ostream& oss){ //HE20210511
   // Test 1: create AE - mode 1
   // ---------------------------------------------------------------------------
 
-
   // load test system
   xstructure str;
   {

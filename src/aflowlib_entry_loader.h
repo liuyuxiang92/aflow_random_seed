@@ -7,7 +7,6 @@
 #ifndef _AFLOWLIB_ENTRY_LOADER_H_
 #define _AFLOWLIB_ENTRY_LOADER_H_
 
-
 namespace aflowlib {
   class EntryLoader : public xStream {
     public:
@@ -86,7 +85,7 @@ namespace aflowlib {
       /// REGEX to find all chemical elements in a string
       const std::regex m_re_elements{"(A[cglmrstu]|B[aehikr]?|C[adeflmnorsu]?|D[bsy]|E[rsu]|F[elmr]?|G[ade]|H[efgos]?|I[nr]?|Kr?|L[airuv]|M[dgnot]|N[abdeiop]?|Os?|P[abdmortu]?|R[abefghnu]|S[bcegimnr]?|T[abcehilm]|U(u[opst])?|V|W|Xe|Yb?|Z[nr])"};
       /// REGEX to replace all pseudo potentials that contain uppercase letters from a string (could be miss taken for a chemical element)
-      const std::regex m_re_ppclean{"("+ aurostd::StringSubst(CAPITAtringSubst(CAPITAL_LETL_LETTERS_PP_LIST, ",", "|") + ")"};
+      const std::regex m_re_ppclean{"("+ aurostd::StringSubst(CAPITAL_LETTERS_PP_LIST, ",", "|") + ")"};
       /// @brief REGEX to help change a AURL into a file path
       /// @note the content of the group `((?:(?:LIB\d{1,})|(?:ICSD)))` can be used in the replacement  with `$1`;
       ///       the second group `(?:(?:RAW)|(?:LIB)|(?:WEB))` is there to select the full substring to be replaced
