@@ -78,7 +78,7 @@ namespace aflowlib {
       /// @brief flat collection of loaded lib entries
       std::shared_ptr<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>> m_entries_flat;
       /// @brief tiered collection of loaded lib entries (number of elements -> alloy -> entries)
-      /// @note creating a copy af this smart pointer is the most efficient way to use
+      /// @note creating a copy of this smart pointer is the most efficient way to use
       ///       the loaded entries after the EntryLoader class goes out of scope
       std::shared_ptr<std::map<short, std::map<std::string, std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>>> m_entries_layered_map;
 
