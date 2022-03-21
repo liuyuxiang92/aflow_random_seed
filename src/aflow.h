@@ -426,6 +426,8 @@ class _XHOST {
     // AFLOWSYM
     bool SKEW_TEST; //DX20171019
     double SKEW_TOL; //DX20171019
+    // xstructure
+    bool READ_SPIN_FROM_ATOMLABEL; //SD20220316
     // WEB MODE
     //[CO20200404 - overload with --www]bool WEB_MODE;  //CO20190401
   private:                                                //

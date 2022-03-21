@@ -78,6 +78,7 @@ namespace init {
     XHOST.DEBUG=aurostd::args2flag(argv,cmds,"--debug");
     XHOST.TEST=aurostd::args2flag(argv,cmds,"--test|-test");
     XHOST.SKEW_TEST=aurostd::args2flag(argv,cmds,"--skew_test"); //DX20171025
+    XHOST.READ_SPIN_FROM_ATOMLABEL=aurostd::args2flag(argv,cmds,"--read_spin_from_atomlabel"); //SD20220316
     //[CO20200404 - overload with --www]XHOST.WEB_MODE=aurostd::args2flag(argv,cmds,"--web_mode"); //CO20190402
     XHOST.MPI=aurostd::args2flag(argv,"--MPI|--mpi");
 
