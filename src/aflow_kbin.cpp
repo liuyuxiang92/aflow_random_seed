@@ -267,7 +267,7 @@ namespace KBIN {
 // ***************************************************************************
 namespace KBIN {
   bool Legitimate_aflowdir(const string& aflowdir,const _aflags& aflags,const bool osswrite,ostringstream& oss) {
-    if(!aurostd::FileExist(aflowdir)){ // directory does not exist
+    if(!aurostd::IsDirectory(aflowdir)){ // directory does not exist
       if(osswrite) {oss << "MMMMM  Directory does not exist = " << aflowdir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
       return FALSE;
     }
