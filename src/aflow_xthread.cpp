@@ -12,6 +12,9 @@
 // pre-distributed task lists. The latter is useful for many small tasks or
 // if the tasks involve expensive pre-computation steps.
 //
+// This class uses variadic templates. For more information, see here:
+// https://kubasejdak.com/variadic-templates
+//
 // ----------
 //
 // Usage notes:
@@ -50,7 +53,6 @@
 // void f2(vector<int>::iterator& i, const xmatrix<double>& mdbl)
 //   Parallelize over vector<int> v that i will iterate over
 // void f3(int i)
-//   With ntasks number of tasks.
 //
 // If functions are static functions:
 // Static member functions can directly be plugged into run()
@@ -68,13 +70,17 @@
 //   xThread xt;
 //   xt.run(ntasks, f3);
 //
+//   With ntasks number of tasks.
 //
 // Non-static member functions with xThread:
 //
 // Member functions of a class cannot be directly plugged into run because they
-// have to be bound to an instance of the class. For example, let all functions
-// belong to class C instantiated as cls. Let f1 and f2 be called inside another
-// class function of C and let f3 be called outside.
+// have to be bound to an instance of the class (this is also the reason why
+// "this" had to be added when calling a member function in std::thread). This
+// is done using std::bind.
+// For example, let all functions belong to class C instantiated as cls. Let f1
+// and f2 be called inside another class function of C and let f3 be called
+// outside.
 //
 // f1:
 //   uint ntasks = vdbl.size();
@@ -92,13 +98,15 @@
 //
 // f3:
 //   xThread xt;
-//   std::function<void(int)> fn3 = std::bind(&C::f3, cls*, std::placeholders::_1);
+//   std::function<void(int)> fn3 = std::bind(&C::f3, &cls, std::placeholders::_1);
 //   xt.run(ntasks, fn3);
 //
 // The template parameter in std::function takes the function return type and
 // the type of the function inputs exactly as written in the function defintion.
 // std::bind takes an address to the function, a pointer to the class instance
 // and one std::placeholders::_N for each argument of the function.
+// For more information and an example, see:
+// https://en.cppreference.com/w/cpp/utility/functional/placeholders
 // Using namespace std::placeholders can make std::bind more legible.
 //
 //
