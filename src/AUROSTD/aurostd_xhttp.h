@@ -15,7 +15,7 @@ namespace aurostd{
     std::string scheme;
     std::string user;
     std::string host;
-    unsigned short port;
+    unsigned int port;
     std::string path;
     std::string query;
   };

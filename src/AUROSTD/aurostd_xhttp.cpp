@@ -12,15 +12,11 @@
 
 #include "aurostd_xhttp.h"
 
-#ifndef _AUROSTD_XERROR_H_
-#include "aurostd_xerror.h"
-#endif
-
 #define _DEBUG_XHTTP_ false
 
 namespace aurostd {
 
-  URL httpConstructURL(const std::string &host, const std::string &path="/", const std::string &query="", const unsigned short &port=80){
+  URL httpConstructURL(const std::string &host, const std::string &path="/", const std::string &query="", const unsigned int &port=80){
     URL url;
     url.scheme = "http";
     url.port = port;
@@ -261,7 +257,7 @@ namespace aurostd {
 
     size_t start=0;
     size_t border=0;
-    short to_replace=0;
+    int to_replace=0;
 
     char * str_position;
     char str[raw_str.length()];
@@ -302,7 +298,7 @@ namespace aurostd {
                           "-_.~";
 
     size_t border=0;
-    short to_replace=0;
+    int to_replace=0;
     std::stringstream output;
     if (LDEBUG) cerr << soliloquy << " Escaping '" << work_str << "'" << std::endl;
 
@@ -384,12 +380,15 @@ namespace aurostd {
 
     socket_entry.sin_addr.s_addr = ip_address;
     socket_entry.sin_family = AF_INET;
-    socket_entry.sin_port = htons(url.port);
+    if (url.port > 65535) {
+      cerr << soliloquy << " Failed to connect to " << url.host << " as port is out of range (" << url.port << ">65535)" << endl;
+      return false;
+    }
+    socket_entry.sin_port = htons((short) url.port);
 
     // start connection
     if (connect(socket_file_descriptor, (struct sockaddr *) &socket_entry, sizeof(socket_entry)) == -1) {
-      cerr << soliloquy << " Failed to connect to " << url.host << " (" << ip_address_str << ":" << url.port << ")"
-           << endl;
+      cerr << soliloquy << " Failed to connect to " << url.host << " (" << ip_address_str << ":" << url.port << ")" << endl;
       return false;
     }
     if (LDEBUG)
