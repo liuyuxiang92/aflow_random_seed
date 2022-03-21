@@ -161,9 +161,16 @@ namespace xthread {
   ///
   /// @param nmax Maximum number of CPUs used by xThread (default: 0 for all available CPUs)
   /// @param nmin Mininum number of CPUs required to spawn thread workers default: 1)
+  /// @param oss  stream for the progress bar output
   xThread::xThread(int nmax, int nmin) {
     free();
     setCPUs(nmax, nmin);
+  }
+
+  xThread::xThread(ostream& oss, int nmax, int nmin) {
+    free();
+    setCPUs(nmax, nmin);
+    setProgressBar(oss);
   }
 
   xThread::xThread(const xThread& that) {

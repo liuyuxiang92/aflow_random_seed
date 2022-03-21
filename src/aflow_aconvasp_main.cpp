@@ -2016,7 +2016,7 @@ namespace pflow {
         return return_code;
       }
       if (vpflow.flag("ANALYZEDB")) {
-        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, XHOST.vschema_secret);
+        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, XHOST.vschema_internal);
         db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
         _PROGRAMRUN = true;
       }

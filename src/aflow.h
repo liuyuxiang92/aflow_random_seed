@@ -2959,6 +2959,7 @@ namespace xthread {
   class xThread {
     public:
       xThread(int nmax=0, int nmin=1);
+      xThread(ostream& oss, int nmax=0, int nmin=1);
       xThread(const xThread& xt);
       const xThread& operator=(const xThread& xt);
       ~xThread();
