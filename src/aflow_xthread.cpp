@@ -839,13 +839,13 @@ namespace xthread {
   //aflowlib::AflowDB::getColStats
   template void xThread::runPredistributed<
     std::function<void(
-      int, int, const vector<string>&, vector<aflowlib::DBStats>&
+      uint, int, const vector<string>&, vector<aflowlib::DBStats>&
     )>,
     const vector<string>,
     vector<aflowlib::DBStats>
-  >(int,
+  >(uint,
     std::function<void(
-      int, int, const vector<string>&, vector<aflowlib::DBStats>&
+      uint, int, const vector<string>&, vector<aflowlib::DBStats>&
     )>&,
     const vector<string>&,
     vector<aflowlib::DBStats>&

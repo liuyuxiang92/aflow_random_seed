@@ -1123,14 +1123,14 @@ namespace aflowlib {
     stats.nentries = 0;
     stats.nsystems = 0;
     stats.set.resize(ncols);
-    for (const string& loop : loops) {
-      stats.loop_counts[loop] = 0;
+    for (uint i = 0; i < loops.size(); i++) {
+      stats.loop_counts[loops[i]] = 0;
     }
 
     // Get types for post-processing
     vector<string> types(ncols);
-    for (uint i = 0; i < ncols; i++) {
-      types[i] = vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(cols[i]));
+    for (uint c = 0; c < ncols; c++) {
+      types[c] = vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(cols[c]));
     }
     stats.types = types;
 
@@ -1143,11 +1143,11 @@ namespace aflowlib {
     stringstream message;
 
     DBStats stats = initDBStats(catalog, loops);
-    vector<DBStats> colstats(_N_AUID_TABLES_, stats);
+    vector<DBStats> colstats(tables.size(), stats);
 
     string where = "catalog='" + catalog + "'";
     vector<string> entries = getPropertyMultiTables("COUNT", tables, "*", where);
-    for (int t = 0; t < _N_AUID_TABLES_; t++) stats.nentries += aurostd::string2utype<int>(entries[t]);
+    for (uint t = 0; t < tables.size(); t++) stats.nentries += aurostd::string2utype<int>(entries[t]);
     message << "Starting analysis for catalog " << catalog << " (" << stats.nentries << " entries).";
     pflow::logger(_AFLOW_FILE_NAME_, __func__, message, *p_FileMESSAGE, *p_oss);
 
@@ -1163,10 +1163,10 @@ namespace aflowlib {
       else if (stats.nentries < 100000) max_cpus = 16;
       if (ncpus > max_cpus) ncpus = max_cpus;
       xthread::xThread xt(ncpus);
-      std::function<void(int, int, const vector<string>&, vector<DBStats>&)> fn = std::bind(&AflowDB::getColStats, this, _1, _2, _3, _4);
-      xt.runPredistributed(_N_AUID_TABLES_, fn, tables, colstats);
+      std::function<void(uint, int, const vector<string>&, vector<DBStats>&)> fn = std::bind(&AflowDB::getColStats, this, _1, _2, _3, _4);
+      xt.runPredistributed(tables.size(), fn, tables, colstats);
 #else
-      getColStats(0, _N_AUID_TABLES_, tables, colstats);
+      getColStats(0, tables.size(), tables, colstats);
 #endif
 
       // Properties: count, max, min, set
@@ -1176,7 +1176,7 @@ namespace aflowlib {
       uint ncols = stats.columns.size();
       const vector<string>& types = stats.types;
       for (uint c = 0; c < ncols; c++) {
-        for (int t = 0; t < _N_AUID_TABLES_; t++) {
+        for (uint t = 0; t < tables.size(); t++) {
           stats.count[c][0] += colstats[t].count[c][0];
           stats.count[c][1] += colstats[t].count[c][1];
         }
@@ -1185,7 +1185,7 @@ namespace aflowlib {
           max = ""; min = "";
           nset = 0; n = 0;
           if (types[c] != "bool") {  // No max, min, or set for bool
-            for (int t = 0; t < _N_AUID_TABLES_; t++) {
+            for (uint t = 0; t < tables.size(); t++) {
               const DBStats& cstats = colstats[t];
               if (cstats.count[c][0] > 0) {
                 if (types[c] == "number") {
@@ -1238,9 +1238,9 @@ namespace aflowlib {
       stats.species = getUniqueFromJsonArrays(species);
 
       // Loop counts
-      for (auto& loop : stats.loop_counts) {
-        const string& key = loop.first;
-        for (int t = 0; t < _N_AUID_TABLES_; t++) loop.second += colstats[t].loop_counts[key];
+      for (std::map<string, uint>::iterator it = stats.loop_counts.begin(); it != stats.loop_counts.end(); ++it) {
+         const string& key = (*it).first;
+         for (uint t = 0; t < tables.size(); t++) (*it).second += colstats[t].loop_counts[key];
       }
     }
 
@@ -1286,10 +1286,10 @@ namespace aflowlib {
           cstats.set[c] = getSet(cursor, tables[i], cols[c], true, where, _DEFAULT_SET_LIMIT_ + 1);
         }
       }
-      for (auto& loop : cstats.loop_counts) {
-        const string & key = loop.first;
+      for (std::map<string, uint>::iterator it = cstats.loop_counts.begin(); it != cstats.loop_counts.end(); ++it) {
+        const string& key = (*it).first;
         where = "catalog='" + catalog + "' AND loop LIKE '%\"" + key + "\"%'";
-        loop.second = aurostd::string2utype<int>(getProperty("COUNT", tables[i], "loop", where));
+        (*it).second = aurostd::string2utype<int>(getProperty("COUNT", tables[i], "loop", where));
       }
 #ifdef AFLOW_MULTITHREADS_ENABLE
       std::lock_guard<std::mutex> lk(write_mutex);

@@ -556,7 +556,7 @@ namespace aflowlib {
   struct DBStats {
     vector<string> columns;
     vector<vector<int> > count;  // 2D to accommodate bool
-    std::unordered_map<string, uint> loop_counts;
+    std::map<string, uint> loop_counts;
     vector<string> max;
     vector<string> min;
     int nentries;
