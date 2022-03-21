@@ -86,7 +86,7 @@ namespace aflowlib {
       /// REGEX to find all chemical elements in a string
       const std::regex m_re_elements{"(A[cglmrstu]|B[aehikr]?|C[adeflmnorsu]?|D[bsy]|E[rsu]|F[elmr]?|G[ade]|H[efgos]?|I[nr]?|Kr?|L[airuv]|M[dgnot]|N[abdeiop]?|Os?|P[abdmortu]?|R[abefghnu]|S[bcegimnr]?|T[abcehilm]|U(u[opst])?|V|W|Xe|Yb?|Z[nr])"};
       /// REGEX to replace all pseudo potentials that contain uppercase letters from a string (could be miss taken for a chemical element)
-      const std::regex m_re_ppclean{"(_GW|_AE|_200eV)"};
+      const std::regex m_re_ppclean{"("+ aurostd::StringSubst(CAPITAtringSubst(CAPITAL_LETL_LETTERS_PP_LIST, ",", "|") + ")"};
       /// @brief REGEX to help change a AURL into a file path
       /// @note the content of the group `((?:(?:LIB\d{1,})|(?:ICSD)))` can be used in the replacement  with `$1`;
       ///       the second group `(?:(?:RAW)|(?:LIB)|(?:WEB))` is there to select the full substring to be replaced
@@ -128,13 +128,13 @@ namespace aflowlib {
       bool loadXstructureLibEntry(const aflowlib::_aflowlib_entry & entry, xstructure & new_structure);
       bool loadXstructureAflowIn(const aflowlib::_aflowlib_entry & entry, xstructure & new_structure);
 
-      // getter for views
+      // getter for views on the loaded aflowlib entries (using zero copy shared_ptr)
       void getEntriesViewFlat(std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>> & result) const;
       void getEntriesViewTwoLayer(vector<vector<std::shared_ptr<aflowlib::_aflowlib_entry>>> & result) const;
       void getEntriesViewThreeLayer(std::vector<std::vector<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> & result) const;
       void getEntriesViewMap(std::map<short,std::map<std::string,std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> & result) const;
 
-      // getter that copy data into new format
+      // getter that copies the loaded aflowlib entries into new structure
       void getEntriesFlat(std::vector<aflowlib::_aflowlib_entry> & result) const;
       void getEntriesTwoLayer(std::vector<std::vector<aflowlib::_aflowlib_entry>> & result) const;
       void getEntriesThreeLayer(std::vector<std::vector<vector<aflowlib::_aflowlib_entry>>> & result) const;

@@ -803,8 +803,10 @@ namespace aurostd {
   bool StringsAlphabetic(const vector<string>& input,bool allow_identical=true);  //CO20180801
   bool StringsAlphabetic(const deque<string>& input,bool allow_identical=true);  //CO20180801
   string StringSubst(string &strstring, const string &strfind, const string &strreplace);
+  string StringSubst(const string &strstring, const string &strfind, const string &strreplace); //HE20220321
   //  string StringSubst(string &strstring, const string &strfind0, const string &strfind1, const string &strfind2, const string &strfind3, const string &strreplace);
   string StringSubst(string &strstring, const char &charfind, const char &charreplace);
+  string StringSubst(const string &strstring, const char &charfind, const char &charreplace);
   void StringStreamSubst(stringstream &strstring, const string &strfind, const string &strreplace);  //ME20190128 - fixed type declaration
   // about present substrings
   bool substring2bool(const string& strstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up

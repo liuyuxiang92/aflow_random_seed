@@ -5321,6 +5321,12 @@ namespace aurostd {
     return strstring;
   }
 
+  //HE20220321 overload for const strings
+  string StringSubst(const string &strstring, const string &strfind, const string &strreplace) {
+    std::string work_copy = strstring;
+    return StringSubst(work_copy, strfind, strreplace);
+  }
+
   string StringSubst(string &strstring, const char &charfind, const char &charreplace) {
     string stroutput;
     for (uint i=0;i<strstring.size();i++)
@@ -5330,6 +5336,12 @@ namespace aurostd {
         stroutput+=strstring[i];
     strstring=stroutput;
     return strstring;
+  }
+
+  //HE20220321 overload for const strings
+  string StringSubst(const string &strstring, const char &charfind, const char &charreplace) {
+    std::string work_copy = strstring;
+    return StringSubst(work_copy, charfind, charreplace);
   }
 
   void StringStreamSubst(stringstream &strstringstream, const string &strfind, const string &strreplace) {
