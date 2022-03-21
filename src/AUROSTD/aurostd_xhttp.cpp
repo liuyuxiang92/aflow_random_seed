@@ -181,7 +181,7 @@ namespace aurostd {
     response.erase(0, border + offset + offset);
 
     // check if Transfer-Encoding is chunked
-    isChunked = header_raw.find("chunked") != std::string::npos;
+    isChunked = ( header_raw.find("chunked") != std::string::npos );
 
     // extract first line that contains the status
     border = header_raw.find(delimiter);
