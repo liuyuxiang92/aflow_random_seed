@@ -413,7 +413,7 @@ class _XHOST {
     aurostd::xoption vflag_outreach;  // argv/argc options following the xoption structure
     aurostd::xoption vflag_control;  // argv/argc options following the xoption structure
     aurostd::xoption vschema;        // keywords, names, units etc etc
-    aurostd::xoption vschema_secret;  //ME20220208
+    aurostd::xoption vschema_internal;  //ME20220208
     // USUAL COMMANDS
     vector<string> vcat; //     cat, bzcat, xzcat, gzcat
     vector<string> vext; //      "",  .bz2,   .xz,   .gz
