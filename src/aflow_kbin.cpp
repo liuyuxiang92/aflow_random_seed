@@ -235,7 +235,7 @@ namespace KBIN {
 // ***************************************************************************
 namespace KBIN {
   bool Legitimate_aflowin(const string& _aflowindir,const bool osswrite,ostringstream& oss) {
-    string aflowindir=_aflowindir;
+    string aflowindir=_aflowindir; //SD20220321 - aflowindir = aflowdir/_AFLOWIN_
     aurostd::StringSubst(aflowindir,"//","/");
     if(!aurostd::FileExist(aflowindir)){ // file does not exist
       if(osswrite) {oss << "MMMMM  File does not exist = " << aflowindir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
