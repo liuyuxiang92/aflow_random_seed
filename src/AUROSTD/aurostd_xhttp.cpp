@@ -44,7 +44,7 @@ namespace aurostd {
     }
 
     URL result;
-    std::string delimiter;
+    std::string delimiter = "";
     size_t start = 0;
     size_t location = 0;
 
@@ -76,7 +76,7 @@ namespace aurostd {
       // locate port (default to 80 or 443)
       location = result.host.find(':');
       if (location != std::string::npos) {
-        result.port = std::stoi(result.host.substr(location + 1));
+        result.port = aurostd::string2utype(result.host.substr(location + 1));
         result.host.erase(location);
       } else {
         if (result.scheme == "https") result.port = 443;
@@ -159,12 +159,11 @@ namespace aurostd {
 
     string soliloquy = XPID + "aurostd::httpParseResponse():";
 
-    std::string header_raw;
+    std::string header_raw = "";
     int status_code = -1;
-    std::string status_line;
+    std::string status_line = "";
     std::string const delimiter = "\r\n";
-    bool isChunked;
-    std::string chunk_length_octet;
+    std::string chunk_length_octet = "";
     size_t chuck_length = 0;
     size_t border = 0;
     size_t split = 0;
@@ -177,7 +176,7 @@ namespace aurostd {
     response.erase(0, border + offset + offset);
 
     // check if Transfer-Encoding is chunked
-    isChunked = ( header_raw.find("chunked") != std::string::npos );
+    bool isChunked = ( header_raw.find("chunked") != std::string::npos );
 
     // extract first line that contains the status
     border = header_raw.find(delimiter);
@@ -187,11 +186,11 @@ namespace aurostd {
     // save status code
     split = status_line.find(' ') + 1;
     border = status_line.find(' ', split + 1);
-    status_code = std::stoi(status_line.substr(split, border - split));
+    status_code = aurostd::string2utype(status_line.substr(split, border - split));
 
     // extract the header data
-    std::string key;
-    std::string item;
+    std::string key = "";
+    std::string item = "";
     while (!header_raw.empty()) {
       split = header_raw.find(':');
       border = header_raw.find(delimiter);
@@ -441,7 +440,7 @@ namespace aurostd {
     output.clear();
     header.clear();
     int redirect_codes[] = {301, 302, 307, 308};
-    std::string response;
+    std::string response = "";
     const int max_number_of_tries = 3;
     int number_of_tries = 0;
     bool success = false;
@@ -492,7 +491,7 @@ namespace aurostd {
   /// @return HTTP status code (-1 on failure)
   int httpGetStatus(const std::string &url_str) {
     URL url = httpParseURL(url_str);
-    std::string output;
+    std::string output = "";
     int status_code = -1;
     std::map <std::string, std::string> header;
     httpGet(url, output, status_code, header);
@@ -554,7 +553,7 @@ namespace aurostd {
   /// @return message body
   std::string httpGet(const std::string &url_str) {
     URL url = httpParseURL(url_str);
-    std::string output;
+    std::string output = "";
     int status_code = -1;
     std::map <std::string, std::string> header;
 
@@ -568,7 +567,7 @@ namespace aurostd {
   /// @return message body
   std::string httpGet(const std::string &url_str, int &status_code) {
     URL url = httpParseURL(url_str);
-    std::string output;
+    std::string output = "";
     std::map <std::string, std::string> header;
 
     status_code = -1;
@@ -584,7 +583,7 @@ namespace aurostd {
   std::string httpGet(const std::string &url_str, int &status_code, std::map <std::string, std::string> &header) {
     URL url = httpParseURL(url_str);
 
-    std::string output;
+    std::string output="";
     status_code = -1;
     httpGet(url, output, status_code, header);
     return output;
@@ -596,7 +595,7 @@ namespace aurostd {
   /// @return message body
   std::string httpGet(const std::string &host, const std::string &path, const std::string &query) {
     URL url = httpConstructURL(host, path, query);
-    std::string output;
+    std::string output="";
     int status_code = -1;
     std::map <std::string, std::string> header;
 
@@ -611,7 +610,7 @@ namespace aurostd {
   /// @return message body
   std::string httpGet(const std::string &host, const std::string &path, const std::string &query, int &status_code) {
     URL url = httpConstructURL(host, path, query);
-    std::string output;
+    std::string output="";
     std::map <std::string, std::string> header;
 
     status_code = -1;
@@ -627,7 +626,7 @@ namespace aurostd {
   /// @return message body
   std::string httpGet(const std::string &host, const std::string &path, const std::string &query, int &status_code, std::map <std::string, std::string> &header) {
     URL url = httpConstructURL(host, path, query);
-    std::string output;
+    std::string output="";
 
     status_code = -1;
     httpGet(url, output, status_code, header);
