@@ -71,15 +71,18 @@
 //   xThread xt;
 //   xt.run(ntasks, f3);
 //
-//   With ntasks number of tasks.
+//   With ntasks = number of tasks.
 //
 // Non-static member functions with xThread:
 //
 // Member functions of a class cannot be directly plugged into run because they
 // have to be bound to an instance of the class (this is also the reason why
 // "this" had to be added when calling a member function in std::thread). This
-// is done using std::bind.
-// For example, let all functions belong to class C instantiated as cls. Let f1
+// can be done using std::bind. For more information and an example, see:
+// https://en.cppreference.com/w/cpp/utility/functional/placeholders
+//
+// The following examples show how std::bind works with the functions f1 - f3.
+// Let all functions belong to class C instantiated as cls. Let f1
 // and f2 be called inside another class function of C and let f3 be called
 // outside.
 //
@@ -104,11 +107,15 @@
 //
 // The template parameter in std::function takes the function return type and
 // the type of the function inputs exactly as written in the function defintion.
-// std::bind takes an address to the function, a pointer to the class instance
-// and one std::placeholders::_N for each argument of the function.
-// For more information and an example, see:
-// https://en.cppreference.com/w/cpp/utility/functional/placeholders
-// Using namespace std::placeholders can make std::bind more legible.
+// std::bind takes an address to the function and a pointer to the class
+// instance (always "this" when called inside the class). If the function has
+// arguments, one std::placeholders::_N for each argument of the function needs
+// to be added. This tells std::bind how many arguments to expect, which is why
+// f1 needs three and f3 only one placeholder. Unfortunately, the number of
+// arguments cannot simply be indicated using an integer because std::function
+// needs to expand all the templates.
+// Using namespace std::placeholders can make std::bind more legible because it
+// allows writing _1 instead of std::placeholders::_1.
 //
 //
 // Lambda functions with xThread:
