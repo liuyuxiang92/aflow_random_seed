@@ -1365,7 +1365,7 @@ namespace aflowlib {
       std::string soliloquy = XPID + "EntryLoader::" + function_name + "():";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, m_logger_message, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
     }
-    std::stringstream().swap(m_logger_message);
+    aurostd::StringstreamClean(m_logger_message);
   }
 
   void EntryLoader::outDebug(const std::string & function_name) {
@@ -1373,7 +1373,7 @@ namespace aflowlib {
       std::string soliloquy = XPID + "EntryLoader::" + function_name + "():";
       pflow::logger(_AFLOW_FILE_NAME_, soliloquy, m_logger_message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     }
-    std::stringstream().swap(m_logger_message);
+    aurostd::StringstreamClean(m_logger_message);
   }
 
   void EntryLoader::outError(const std::string &function_name, int line_number) {
@@ -1382,13 +1382,13 @@ namespace aflowlib {
       pflow::logger((std::string) _AFLOW_FILE_NAME_ + ":" + std::to_string(line_number),
                     soliloquy, m_logger_message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     }
-    std::stringstream().swap(m_logger_message);
+    aurostd::StringstreamClean(m_logger_message);
   }
 
   void EntryLoader::outHardError(const std::string &function_name, int line_number, int error_type) {
     std::string soliloquy = XPID + "EntryLoader::" + function_name + "():";
     throw aurostd::xerror((std::string) _AFLOW_FILE_NAME_ + ":" + std::to_string(line_number), soliloquy, m_logger_message, error_type);
-    std::stringstream().swap(m_logger_message);
+    aurostd::StringstreamClean(m_logger_message);
   }
 
 

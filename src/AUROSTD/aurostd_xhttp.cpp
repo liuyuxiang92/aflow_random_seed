@@ -76,7 +76,7 @@ namespace aurostd {
       // locate port (default to 80 or 443)
       location = result.host.find(':');
       if (location != std::string::npos) {
-        result.port = aurostd::string2utype(result.host.substr(location + 1));
+        result.port = aurostd::string2utype<uint>(result.host.substr(location + 1));
         result.host.erase(location);
       } else {
         if (result.scheme == "https") result.port = 443;
@@ -186,7 +186,7 @@ namespace aurostd {
     // save status code
     split = status_line.find(' ') + 1;
     border = status_line.find(' ', split + 1);
-    status_code = aurostd::string2utype(status_line.substr(split, border - split));
+    status_code = aurostd::string2utype<uint>(status_line.substr(split, border - split));
 
     // extract the header data
     std::string key = "";
@@ -470,7 +470,7 @@ namespace aurostd {
         }
       } else if (number_of_tries < max_number_of_tries) {
         cerr << soliloquy << " Retry failed GET in 5s (" << number_of_tries << " of " << max_number_of_tries << ")" << endl;
-        aurostd::sleep(5);
+        aurostd::Sleep(5);
         continue;
       } else {
         cerr << soliloquy << " GET request failed after " << number_of_tries << " tries." << endl;
