@@ -753,7 +753,7 @@ bool display_result(const uint passed_checks, const uint check_num, const string
 
 bool EntryLoaderTest(ostream& oss){ofstream FileMESSAGE;return EntryLoaderTest(FileMESSAGE,oss);}  //CO20200520
 bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
-  string function_name = XPID + __func__;
+  string function_name = XPID + __func__ + ":";
 
   // setup test environment
   string task_description = "Testing EntryLoader";
