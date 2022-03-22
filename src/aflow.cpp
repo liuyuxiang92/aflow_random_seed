@@ -764,7 +764,7 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
   string check_function = "";
   uint check_num = 0;
 
-  std::string test_alloy = "CaCuNi";
+  std::string test_alloy = "MnPdPt";
   bool recursive = false;
   aflowlib::EntryLoader el;
   aflowlib::_aflowlib_entry test_entry;
