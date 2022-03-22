@@ -1214,6 +1214,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("ABINIT",aurostd::args2flag(argv,cmds,"--abinit") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO"));
   vpflow.flag("AIMS",aurostd::args2flag(argv,cmds,"--aims") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO"));
   vpflow.flag("ELK",aurostd::args2flag(argv,cmds,"--elk") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20200313
+  vpflow.flag("ATAT",aurostd::args2flag(argv,cmds,"--atat") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //SD20220123
 
   //DX20190123 - CIF to work with PROTO - START 
   vpflow.flag("CIF",aurostd::args2flag(argv,cmds,"--cif") && (vpflow.flag("PROTO_AFLOW") || vpflow.flag("PROTO"))); //DX20190123 - to differentiate between proto and istream 
@@ -1723,6 +1724,7 @@ namespace pflow {
       if(vpflow.flag("AFLOWLIB_AURL2LOOP")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AURL2LOOP"),"AFLOWLIB_AURL2LOOP"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWSYM_PYTHON")){ SYM::writePythonScript(cout); _PROGRAMRUN=true;} //DX20210202
       if(vpflow.flag("AFLUX")) {cout << aflowlib::AFLUXCall(vpflow) << endl; _PROGRAMRUN=true;}  //DX20190206 - add AFLUX command line functionality
+      if(vpflow.flag("ATAT")) {cout << input2ATATxstr(cin); _PROGRAMRUN=true;} //SD20220123
       // B
       if(vpflow.flag("BANDGAP_WAHYU")) {AConvaspBandgap(argv); _PROGRAMRUN=true;}
       if(vpflow.flag("BANDGAP"))       {pflow::BANDGAP(vpflow, cout); _PROGRAMRUN=true;} // CAMILO  //CO20171006
