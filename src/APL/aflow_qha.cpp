@@ -1503,9 +1503,9 @@ namespace apl
           pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory,
               *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
           cerr << __AFLOW_FUNC__ << " original frequencies:" << std::endl;
-          cerr << __AFLOW_FUNC__ << xomega << std::endl;
+          cerr << __AFLOW_FUNC__ << " " << xomega << std::endl;
           cerr << __AFLOW_FUNC__ << " fit to frequencies:" << std::endl;
-          cerr << __AFLOW_FUNC__ << gp_fit_matrix * tmp << std::endl;
+          cerr << __AFLOW_FUNC__ << " " << gp_fit_matrix * tmp << std::endl;
           break;
         }
       }
