@@ -812,7 +812,7 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
   // Check | load alloys
 
   for (auto source: test_sources) {
-    std::stringstream().swap(check_description);
+    aurostd::StringstreamClean(check_description);
     check_num++;
     check_function = "EntryLoader::loadAlloy()";
     if (source.first == "RESTAPI" || source.first == "RESTAPI_RAW") recursive = false;
@@ -845,7 +845,7 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
   // Check | load AUID + Xstructure
 
   for (auto source: short_test_sources) {
-    std::stringstream().swap(check_description);
+    aurostd::StringstreamClean(check_description);
     check_num++;
     check_function = "EntryLoader::loadAUID()";
     check_description << source.first << " + xstructure";
@@ -875,7 +875,7 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
 
   // ---------------------------------------------------------------------------
   // Check | load xstructure from file
-  std::stringstream().swap(check_description);
+  aurostd::StringstreamClean(check_description);
   check_num++;
   check_function = "EntryLoader::loadXstructureFile()";
   el.loadXstructureFile(test_entry, test_structure);
@@ -887,7 +887,7 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
   // Check | load AURL
 
   for (auto source: short_test_sources) {
-    std::stringstream().swap(check_description);
+    aurostd::StringstreamClean(check_description);
     check_num++;
     check_function = "EntryLoader::loadAURL()";
     check_description << source.first;

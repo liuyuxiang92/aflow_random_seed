@@ -97,7 +97,7 @@ namespace aflowlib {
     m_current_source = b.m_current_source;
     m_filesystem_available = b.m_filesystem_available;
     m_auid_list = b.m_auid_list;
-    std::stringstream().swap(m_logger_message);
+    aurostd::StringstreamClean(m_logger_message);
 
     m_sqlite_db_ptr = b.m_sqlite_db_ptr;
     m_sqlite_alloy_db_ptr = b.m_sqlite_db_ptr;
