@@ -361,9 +361,9 @@ namespace xthread {
                                           std::ref(func), std::ref(args)...)
         );
       }
-      for (std::thread* t : threads) {
-        t->join();
-        delete t;
+      for (uint t = 0; t < threads.size(); t++) {
+        threads[t]->join();
+        delete threads[t];
       }
     } else {
       // No need for thread overhead when ncpus == 1
@@ -470,9 +470,9 @@ namespace xthread {
                                           (int) t, startIndex, endIndex,
                                           std::ref(func), std::ref(args)...));
       }
-      for (std::thread* t : threads) {
-        t->join();
-        delete t;
+      for (uint t = 0; t < threads.size(); t++) {
+        threads[t]->join();
+        delete threads[t];
       }
     } else {
       // No need for thread overhead when ncpus == 1
