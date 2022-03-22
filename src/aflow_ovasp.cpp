@@ -7537,7 +7537,7 @@ bool IBZextrema(xEIGENVAL& xeigenval,
             }
             //ME20200724 - there used to be an exit here without comment or explanation
             string message = "branches.at(itr0).at(itr1)[1] > branches.at(itr0).at(itr1)[2])";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message);
           } else if(branches.at(itr0).at(itr1)[1] < branches.at(itr0).at(itr1)[2]) {
             for(int itr2=branches.at(itr0).at(itr1)[1]+2; itr2<=branches.at(itr0).at(itr1)[2]-2; itr2++) {
               ndxvec[1] = itr2-2 ;

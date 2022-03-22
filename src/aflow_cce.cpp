@@ -618,7 +618,7 @@ namespace cce {
         message << " The oxidation numbers that you provided do not add up to zero!" << endl;
         message << " Sum over all oxidation numbers is: " << cce_vars.oxidation_sum << endl;
         message << " Please correct and rerun." << endl;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _INPUT_ILLEGAL_);	
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INPUT_ILLEGAL_);	
       }
     } else {
       message << " It seems you forgot to provide the oxidation numbers after \"--oxidation_numbers=\". Please add them or omit the option.";

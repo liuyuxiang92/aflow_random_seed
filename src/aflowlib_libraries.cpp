@@ -254,7 +254,7 @@ namespace aflowlib {
 
         if(tokens_species.size()!=tokens_composition.size()) {
           string message = "tokens_species.size()!=tokens_composition.size()";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
         }
         // cerr << XPID << "GREP_Species_ALL: E=" << enthalpy << " ";
         for(uint k=0;k<nspecies;k++) // order by species, no entries
@@ -658,7 +658,7 @@ namespace aflowlib {
         if(LDEBUG || LVERBOSE) cerr << " ... size=" << (*pvLibrary).size() << " ..  ";// << endl;
       } else {
         string message = "AFLOW_LIBRARY not found!";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         return FALSE;
       }
       if((*pvLibrary_tokens).size()==0) {
@@ -790,7 +790,7 @@ namespace aflowlib {
 
     if(PROJECT_LIBRARY=="NOTHING") {
       string message = "Nothing found from pwd or directory [directory=" + directory + "]   [pwd=" + directory_pwd + "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     return XHOST.tmpfs;
   }
@@ -916,7 +916,7 @@ namespace aflowlib {
       return TRUE;
     }
     string message = "Project Not Found";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     return FALSE;
   }
 }
@@ -2043,7 +2043,7 @@ namespace aflowlib {
 
     if(XHOST.vext.size()!=XHOST.vzip.size()) {
       error_message = "XHOST.vext.size()!=XHOST.vzip.size()";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, error_message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error_message, _INDEX_MISMATCH_);
     }
 
     string file_LIB=directory_LIB+"/"+fileLIB;
@@ -2058,15 +2058,15 @@ namespace aflowlib {
     if(!aurostd::FileExist(file_LIB) && !aurostd::FileExist(file_LIB_nocompress) && !aurostd::EFileExist(file_LIB_nocompress)) {
       if(!aurostd::FileExist(file_LIB)) {
         error_message = MESSAGE + " file not found " + file_LIB;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, error_message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error_message, _FILE_NOT_FOUND_);
       }
       if(!aurostd::FileExist(file_LIB_nocompress)) {
         error_message = MESSAGE + " file not found " + file_LIB_nocompress;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, error_message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error_message, _FILE_NOT_FOUND_);
       }
       if(!aurostd::EFileExist(file_LIB_nocompress)) {
         error_message = MESSAGE + " file not found " + file_LIB_nocompress + ".EXT";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, error_message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error_message, _FILE_NOT_FOUND_);
       }
     }
     if(aurostd::FileExist(file_LIB)) aurostd::CopyFile(file_LIB,file_RAW);
@@ -2531,7 +2531,7 @@ namespace aflowlib {
     if(aurostd::abs(data_natoms-(double) xOUT.natoms)>0.1) {
       stringstream message;
       message << "data_natoms(" << data_natoms << ")!= (int) xOUT.natoms(" << xOUT.natoms << ").";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
     return flag;
   }
@@ -5584,7 +5584,7 @@ namespace aflowlib {
             stringstream message;
             message << "Could not read stiffness tensor: wrong number of lines"
               << " (found " << vline.size() << ", need 6).";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _FILE_CORRUPT_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
           }
           for (int i = 0; i < 6; i++) {
             aurostd::string2tokens(vline[i], row);
@@ -5593,7 +5593,7 @@ namespace aflowlib {
               message << "Could not read stiffness tensor."
                 << " Wrong number of columns in line " << (i + 1)
                 << " (found " << row.size() << ", need 6).";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _FILE_CORRUPT_);
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
             }
             for (int j = 0; j < 6; j++) tensor[i + 1][j + 1] = row[j];
           }
@@ -5615,7 +5615,7 @@ namespace aflowlib {
             stringstream message;
             message << "Could not read compliance tensor: wrong number of lines"
               << " (found " << vline.size() << ", need 6).";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _FILE_CORRUPT_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
           }
           for (int i = 0; i < 6; i++) {
             aurostd::string2tokens(vline[i], row);
@@ -5624,7 +5624,7 @@ namespace aflowlib {
               message << "Could not read compliance tensor:"
                 << " wrong number of columns in line " << (i + 1)
                 << " (found " << row.size() << ", need 6).";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _FILE_CORRUPT_);
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
             }
             for (int j = 0; j < 6; j++) tensor[i + 1][j + 1] = row[j];
           }
@@ -5678,8 +5678,8 @@ namespace aflowlib {
 namespace aflowlib {
   bool LIB2RAW_Loop_APL(const string& directory_LIB,const string& directory_RAW,vector<string> &vfile,aflowlib::_aflowlib_entry& data,const string& MESSAGE) {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    if(LDEBUG) std::cerr << __func__ << " [1]" << std::endl;
-    if (AFLOWLIB_VERBOSE) std::cout << MESSAGE << " " << __func__ << " - begin " << directory_LIB << std::endl;
+    if(LDEBUG) std::cerr << __AFLOW_FUNC__ << " [1]" << std::endl;
+    if (AFLOWLIB_VERBOSE) std::cout << MESSAGE << " " << __AFLOW_FUNC__ << " - begin " << directory_LIB << std::endl;
 
     data.vloop.push_back("apl");
 

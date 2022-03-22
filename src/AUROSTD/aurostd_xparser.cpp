@@ -792,7 +792,7 @@ namespace aurostd {
         // If we have a nested object, "value" should only be '{' + white space by now.
         if (value[0] == '{') {
           string message = "JSON parser cannot read nested objects.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _VALUE_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
         }
         end = value.find_last_of(",");
         value = value.substr(0, end);
@@ -803,7 +803,7 @@ namespace aurostd {
         // If we have a nested object, it should start with '{'
         if (value[0] == '{') {
           string message = "JSON parser cannot read nested objects.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _VALUE_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
         }
       }
     } else {

@@ -136,7 +136,7 @@ namespace apl {
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     // Set up phonon parameters
     nBranches = _pc->getNumberOfBranches();
@@ -144,7 +144,7 @@ namespace apl {
     aurostd::string2tokens(opts.getattachedscheme("THERMALGRID"), grid, " xX");
     if (grid.size() != 3) {
       message = "Wrong format for the q-point grid for thermal conductivity calculations.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
     }
     _pc->initialize_qmesh(grid, true, true);
     _qm->makeIrreducible();
@@ -158,11 +158,11 @@ namespace apl {
 
     if (tstart > tend) {
       message = "Tstart cannot be higher than Tend.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     if (tstep < _ZERO_TOL_) {
       message = "Tstep cannot be zero or negative.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     for (double t = tstart; t <= tend; t += tstep) temperatures.push_back(t);
 
@@ -192,7 +192,7 @@ namespace apl {
   void TCONDCalculator::calculateThermalConductivity() {
     if (!_initialized) {
       string message = "Not initialized.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
 
     // Transition probabilities
@@ -263,7 +263,7 @@ namespace apl {
   void TCONDCalculator::calculateGrueneisenParameters() {
     if (!_initialized) {
       string message = "Not initialized.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     // Grueneisen parameters
     string message = "Calculating Grueneisen parameters.";
@@ -992,7 +992,7 @@ namespace apl {
       if (num_iter > max_iter) {
         message << "Thermal conductivity did not converge within " << max_iter << " iterations ";
         message << "at " << T << " K.";
-        throw xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
     }
     return tcond;
@@ -1241,7 +1241,7 @@ namespace apl {
     if (!aurostd::FileExist(filename)) {
       stringstream message;
       message << "Could not write file " << filename << ".";
-      throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_ERROR_);
+      throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 
@@ -1270,7 +1270,7 @@ namespace apl {
     if (!aurostd::FileExist(filename)) {
       stringstream message;
       message << "Could not write file " << filename << ".";
-      throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_ERROR_);
+      throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 
@@ -1416,7 +1416,7 @@ namespace apl {
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
       string message = "Could not write thermal conductivities to file.";
-      throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_ERROR_);
+      throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 

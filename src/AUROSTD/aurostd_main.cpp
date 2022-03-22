@@ -1199,7 +1199,7 @@ namespace aurostd {
       else{ return false; } //signals file is unchanged
     } else {
       string message = "File does not exist: " + directory + "/" + filename;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
     return false;
   }
@@ -1237,7 +1237,7 @@ namespace aurostd {
     deque<string> vzip; aurostd::string2tokens("bzip2,xz,gzip",vzip,",");vzip.push_front(""); // cheat for void string
     if(vext.size()!=vcmd.size()) {
       string message = "vext.size()!=vcmd.size()";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
 
     for(uint iext=0;iext<vext.size();iext++){ // check filename.EXT
@@ -2655,7 +2655,7 @@ namespace aurostd {
     ifstream infile(filename.c_str(), std::ios::in | std::ios::binary);
     if (!infile.is_open()) {
       string message = "Cannot open file " + filename + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_ERROR_);
     }
 
     // Get file length
@@ -2745,7 +2745,7 @@ namespace aurostd {
     if(!file_to_check) {
 
       string message = "In routine " + routine + ". Cannot open file " + FileName + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 
@@ -2794,7 +2794,7 @@ namespace aurostd {
     aurostd::StringSubst(position,"\n","");
     if(position.length()>0) return TRUE;
     string message = "\"" + command + "\" is not available";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     return FALSE;
   }
 
@@ -6579,7 +6579,7 @@ namespace aurostd  {
     if(vvva.size()!=vFi.size()) {
 
       string message = "Vector sizes are not equal.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
     vector<vector<double> > vvb, vv_tmp, vv_tmp_shrinked;
     vector<vector<vector<double> > > vvvc;
@@ -6618,7 +6618,7 @@ namespace aurostd  {
   vector<vector<double> > Sum2DVectorExceptFirstColumn(const vector<vector<double> >& vva, const vector<vector<double> >& vvb) {
     if((vva.size()!=vvb.size()) && (vva.at(0).size() != vvb.at(0).size())) {
       string message = "Vector sizes are not equal.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
 
     vector<vector<double> > vv_sum; vv_sum.resize(vva.size());

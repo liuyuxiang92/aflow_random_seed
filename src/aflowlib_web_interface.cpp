@@ -561,7 +561,7 @@ namespace aflowlib {
     stringstream oss;
     if(!aurostd::FileExist(file)) { //SC20190813
       string message = DEFAULT_FILE_AFLOWLIB_ENTRY_OUT + " not found =" + file;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
     string entry;
     aurostd::efile2string(file,entry);
@@ -869,7 +869,7 @@ namespace aflowlib {
             stringstream message;
             message << "Could not read ael_stiffness_tensor: wrong number of rows"
               << " (found " << rows.size() << ", need 6).";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _FILE_CORRUPT_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
           } else {
             for (int i = 0; i < 6; i++) {
               aurostd::string2tokens(rows[i], r, ",");
@@ -878,7 +878,7 @@ namespace aflowlib {
                 message << "Could not read ael_stiffness_tensor: wrong number of columns"
                   << " in row " << (i + 1)
                   << " (found " << rows.size() << ", need 6).";
-                throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _FILE_CORRUPT_);
+                throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
               } else {
                 for (int j = 0; j < 6; j++) {
                   tensor[i + 1][j + 1] = r[j];
@@ -896,7 +896,7 @@ namespace aflowlib {
             stringstream message;
             message << "Could not read ael_compliance_tensor: wrong number of rows"
               << " (found " << rows.size() << ", need 6).";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _FILE_CORRUPT_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
           } else {
             for (int i = 0; i < 6; i++) {
               aurostd::string2tokens(rows[i], r, ",");
@@ -905,7 +905,7 @@ namespace aflowlib {
                 message << "Could not read ael_compliance_tensor: wrong number of columns"
                   << " in row " << (i + 1)
                   << " (found " << rows.size() << ", need 6).";
-                throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _FILE_CORRUPT_);
+                throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
               } else {
                 for (int j = 0; j < 6; j++) {
                   tensor[i + 1][j + 1] = r[j];
@@ -4460,7 +4460,7 @@ namespace aflowlib {
     bool VERBOSE_LOCAL=(FALSE || XHOST.DEBUG);
     if(vaflowlib_entry.size()==0) {
       string message = DEFAULT_FILE_AFLOWLIB_ENTRY_OUT + " file not found";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
     vsgroup.clear();vNsgroup.clear();
 
@@ -4469,7 +4469,7 @@ namespace aflowlib {
     if(XGNDSTATE_HOLES==0)  // SAFE NO HOLES IN THE XMATRIX
       if(vaflowlib_entry.size()==0) {
         message = DEFAULT_FILE_AFLOWLIB_ENTRY_OUT + " file not found";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
       }
     if(XGNDSTATE_HOLES==1)  // ALLOW HOLES WITH FAKE VALUES
       if(vaflowlib_entry.size()==0) {
@@ -4485,7 +4485,7 @@ namespace aflowlib {
         aurostd::string2tokens(vaflowlib_entry.at(i),tokens,",");
         if(tokens.size()==0) {
           message = "geometry not enough tokens";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _VALUE_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
         }
         if(tokens.size()==3) { // ok
           vsgroup.clear();
@@ -4529,7 +4529,7 @@ namespace aflowlib { // move to web interface
 
     if(mode!="AFLOWLIB_AUID2AURL" && mode!="AFLOWLIB_AURL2AUID" && mode!="AFLOWLIB_AUID2LOOP" && mode!="AFLOWLIB_AURL2LOOP") {
       message = "wrong mode=" + mode;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     if(XHOST_vAUID.size()==0) { init::InitGlobalObject("vLIBS"); }
     if(XHOST_vAURL.size()==0) { init::InitGlobalObject("vLIBS"); }
@@ -4539,7 +4539,7 @@ namespace aflowlib { // move to web interface
       message += "    XHOST_vAUID.size()=" + aurostd::utype2string<uint>(XHOST_vAUID.size()) + '\n';
       message += "    XHOST_vAURL.size()=" + aurostd::utype2string<uint>(XHOST_vAURL.size()) + '\n';
       message += "    XHOST_vLOOP.size()=" + aurostd::utype2string<uint>(XHOST_vLOOP.size());
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
     out="";
     for(uint i=0;i<XHOST_vAUID.size()&&out.empty();i++) {
@@ -4560,7 +4560,7 @@ namespace aflowlib {
     if(LDEBUG) cerr << XPID << "aflowlib::AflowlibLocator: BEGIN" << endl;
     if(mode!="AFLOWLIB_AUID2AURL" && mode!="AFLOWLIB_AURL2AUID" && mode!="AFLOWLIB_AUID2LOOP" && mode!="AFLOWLIB_AURL2LOOP") {
       string message = "wrong mode=" + mode;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
@@ -4717,8 +4717,8 @@ namespace aflowlib {
     aurostd::StringSubst(summons,"#","%23");  // percent encoding for "#"
 
     if(LDEBUG) {
-      cerr << __func__ << ": Summons = " << summons << endl;
-      cerr << __func__ << ": Peforming call ... please be patient ..." << endl;
+      cerr << __AFLOW_FUNC__ << " Summons = " << summons << endl;
+      cerr << __AFLOW_FUNC__ << " Peforming call ... please be patient ..." << endl;
     }
 
     aflowlib::APIget API_socket(summons);
@@ -4753,7 +4753,7 @@ namespace aflowlib {
         aurostd::string2tokens(fields[i],key_value,"=");
         if(key_value.size()!=2 && !aurostd::substring2bool(fields[i],"example") && !aurostd::substring2bool(fields[i],"description")){ 
           string message = "Cannot find key-value pair splitting on \"=\" for the following field: \"" + fields[i] + "\".";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         }
         std::pair<string,string> property; 
         property.first = aurostd::RemoveWhiteSpaces(key_value[0]);  // key 

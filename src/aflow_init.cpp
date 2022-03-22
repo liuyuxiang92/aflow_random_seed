@@ -1063,7 +1063,7 @@ namespace init {
     struct sysinfo s;
     if(sysinfo(&s)!=0) {
       string message = "sysinfo error";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     return s.totalram;
   }
@@ -1077,7 +1077,7 @@ namespace init {
     size_t len=sizeof(size);
     if(sysctl(mib,namelen,&size,&len,NULL,0)<0) {
       string message = "sysctl returned an error";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     return (long) size;
   }
@@ -1740,7 +1740,7 @@ bool CheckMaterialServer(const string& message) { //CO20200624
   messagestream << "Your machine is \"" << XHOST.hostname << "\". ";
   if(message.length()>0) messagestream << "Command \"" << message << "\" can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\"." << endl;
   else messagestream << "The procedure can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\".";
-  throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, messagestream, _RUNTIME_ERROR_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _RUNTIME_ERROR_);
   return FALSE;
 }
 

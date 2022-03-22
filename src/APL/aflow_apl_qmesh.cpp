@@ -226,7 +226,7 @@ namespace apl {
     if ((include_inversions && !xs.pgroupk_Patterson_calculated) ||
         (!include_inversions && !xs.pgroupk_xtal_calculated)) {
       string message = "Calculation of the crystallographic point group of the reciprocal cell unsuccessful.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     if (include_inversions) _recCell.pgroup=xs.pgroupk_Patterson;
@@ -536,7 +536,7 @@ namespace apl {
       return _littleGroups[iq];
     } else {
       string message = "Little groups are only calculated for irreducible q-points.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _VALUE_RANGE_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_RANGE_);
     }
   }
 
@@ -581,7 +581,7 @@ namespace apl {
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
       string message = "Could not write q-points to file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 
@@ -622,7 +622,7 @@ namespace apl {
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
       string message = "Could not write irreducible q-points to file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 

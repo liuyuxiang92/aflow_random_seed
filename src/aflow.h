@@ -566,6 +566,19 @@ class _XHOST {
 // max is 128
 extern _XHOST XHOST; // this will be global
 
+// ME+HE20220321
+// Based on https://stackoverflow.com/questions/1666802/is-there-a-class-macro-in-c
+// Get full formatted name of function
+inline std::string aflowFunc(const std::string& pretty_func, const std::string& func) {
+  size_t end = pretty_func.find(func);
+  // Everything between the function name and the last space character
+  // are namespace and class name, if present
+  size_t begin = pretty_func.rfind(" ", end) + 1;
+  return XPID + pretty_func.substr(begin, end - begin) + func + "():";
+}
+
+#define __AFLOW_FUNC__ aflowFunc(__PRETTY_FUNCTION__, __func__)
+
 //DX20180131 - add symmetry definitions - START
 // symmetry 
 #define SG_SETTING_1    1

@@ -4584,7 +4584,7 @@ namespace KBIN {
     bool Krun=TRUE;
     if(relaxA!=relaxB) {
       string message = "relaxA (" + relaxA + ") != relaxB (" + relaxB + ")";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     if(KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE)){Krun=(Krun&&true);}
     else{
@@ -4839,7 +4839,7 @@ namespace KBIN {
 
     if(!FileSUBDIR) {                                                                                           // ******* Directory is non existent
       aus << "Directory not found";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, aus.str(), _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, aus.str(), _FILE_NOT_FOUND_);
     } else {                                                                                                    // ******* Directory EXISTS
       // Check LOCK again
       // ifstream FileLOCK0;string FileNameLOCK0=aflags.Directory+"/"+_AFLOWLOCK_;    FileLOCK0.open(FileNameLOCK0.c_str(),std::ios::in);FileLOCK0.close();
@@ -4862,12 +4862,12 @@ namespace KBIN {
       if(aurostd::FileExist(aflags.Directory+"/"+_AFLOWLOCK_) || aurostd::EFileExist(aflags.Directory+"/"+_AFLOWLOCK_))	{ // ******* Directory is locked
         // LOCK exist, then RUN already RUN
         aus << "Directory LOCKED";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, aus.str(), _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, aus.str(), _RUNTIME_ERROR_);
       }
       if(aurostd::FileExist(aflags.Directory+"/SKIP") || aurostd::EFileExist(aflags.Directory+"/SKIP")) {	// ******* Directory is skipped
         // SKIP exist, then RUN already RUN
         aus << "Directory SKIPPED";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, aus.str(), _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, aus.str(), _RUNTIME_ERROR_);
       }
 
       // ******* Directory is un locked/skipped
@@ -5215,7 +5215,7 @@ namespace KBIN {
 
     if(!aurostd::FileExist(outcar)) {
       message = "check filename || file missing";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     } else {
       outcarpath = "/" + outcar ;
       outcarpath = work_dir + outcarpath ;
@@ -5241,7 +5241,7 @@ namespace KBIN {
     aurostd::string2tokens(outcarlines.at(outcarlines.size()-1),endline," ");
     if(vasptoken.at(0) != "vasp" || endline.at(0) != "Voluntary") { // first and last line check
       message =  "OUTCAR file is probably corrupt";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     }
     uint sec_count = 0 ;
     for (uint ii=outcarlines.size()-12 ; ii<outcarlines.size() ; ii++) { // presence timing information check
@@ -5254,7 +5254,7 @@ namespace KBIN {
     }
     if(sec_count != 4) { // first and last line check
       message =  "OUTCAR file is probably corrupt";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     }
     // OUTCAR is now in memory, now parse the info
     vector<string> words_line ;
@@ -5284,7 +5284,7 @@ namespace KBIN {
     }
     if(!check_digit) {
       message = outcar + " lacks MACROSCOPIC statement";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     } // DONE PARSING //
     bool matcheck = false ;
     for (uint ii = 1 ; ii <= 3 ; ii++) { // clean up spuriously small values: e.g. "-0.000001"
@@ -5298,7 +5298,7 @@ namespace KBIN {
         if(testdiff >= eps) { // eps is a bit arbitrary right now ..
           // serious issues with VASP calculation here: 
           message = "asymmetric dielectric tensor";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         } else { // only if small
           statdiel(ii,jj) = statdiel(jj,ii) ;
         }

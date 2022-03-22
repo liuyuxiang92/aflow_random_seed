@@ -76,7 +76,7 @@ namespace KBIN {
       aurostd::string2tokens(vtitel.at(i),tokens," ");
       if(tokens.size()!=4 && tokens.size()!=5) {
         string message = "POTCAR KBIN_VASP_RunPhonons_FROZSL " + aurostd::joinWDelimiter(vtitel, ", ");
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
       species_pp.push_back(tokens.at(3));
       species.push_back(KBIN::VASP_PseudoPotential_CleanName(tokens.at(3)));
@@ -278,7 +278,7 @@ namespace FROZSL {
 
     if(XHOST.vext.size()!=XHOST.vcat.size()) {
       message = "XHOST.vext.size()!=XHOST.vcat.size().";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
 
     // CHECK FOR INSIDE STUFF
@@ -311,7 +311,7 @@ namespace FROZSL {
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         } else {
           message = "file not found " + vfiles[i];
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_NOT_FOUND_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
         }
       }
       // ENERGIES

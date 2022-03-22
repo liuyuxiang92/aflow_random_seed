@@ -6229,10 +6229,10 @@ namespace KBIN {
     }
     //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){return false;}  //remove whitespaces
 
-    KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"EFIELD_PEAD",__func__,vflags.KBIN_VASP_INCAR_VERBOSE);  //CO20200624
-    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing " << __func__ << " [AFLOW] start" << endl;
-    xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << __func__ << endl;
-    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing " << __func__ << " [AFLOW] end" << endl;
+    KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"EFIELD_PEAD",__AFLOW_FUNC__,vflags.KBIN_VASP_INCAR_VERBOSE);  //CO20200624
+    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing " << __AFLOW_FUNC__ << " [AFLOW] start" << endl;
+    xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << __AFLOW_FUNC__ << endl;
+    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing " << __AFLOW_FUNC__ << " [AFLOW] end" << endl;
 
     //[CO20210315 - avoid writing orig]xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE); //CO20200624
 
@@ -7904,7 +7904,7 @@ namespace KBIN {
     string system_name = ExtractSystemNameFromAFLOWIN(directory);
     if (system_name.empty()) {
       string message = "Could not extract system.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     }
     aurostd::StringSubst(system_name,":.","."); //CO20200731 - patching bug in system name generation
     aurostd::StringSubst(system_name,"@ARUN.A",":ARUN.A");  //CO20200731 - patching for AEL/AGL ARUNs - @ in filenames are NOT good
@@ -7920,7 +7920,7 @@ namespace KBIN {
     string aflowin_path = directory + "/" + _AFLOWIN_;
     if(!aurostd::FileExist(aflowin_path)) {
       string message = "Could not find file " + aflowin_path + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
     // ME20200525 - Need to take potential white space between [AFLOW],
     // SYSTEM, and = into account.

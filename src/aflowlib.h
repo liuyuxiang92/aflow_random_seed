@@ -571,6 +571,7 @@ namespace aflowlib {
     public:
       AflowDB(const string&, ostream& oss=std::cout);
       AflowDB(const string&, const aurostd::xoption&, ostream& oss=std::cout);
+      AflowDB(const string&, const aurostd::xoption&, const aurostd::xoption&, ostream& oss=std::cout);
       AflowDB(const string&, const string&, const string&, const aurostd::xoption&, ostream& oss=std::cout);
       AflowDB(const string&, const string&, const string&, const aurostd::xoption&, const aurostd::xoption&, ostream& oss=std::cout);
       AflowDB(const AflowDB&);

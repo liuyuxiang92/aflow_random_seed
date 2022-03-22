@@ -104,7 +104,7 @@ namespace aurostd{
   double polynomialFindExtremum(const xvector<double> &p, double xmin, double xmax,
       double tol){
     bool LDEBUG = (FALSE || DEBUG_XFIT || XHOST.DEBUG);
-    if (LDEBUG) cerr << __func__ << "begin" << std::endl;
+    if (LDEBUG) cerr << __AFLOW_FUNC__ << " begin" << std::endl;
 
     double left_end = xmin; double right_end = xmax;
     double middle = 0.5*(left_end + right_end);
@@ -121,9 +121,9 @@ namespace aurostd{
     if (sign(f_at_left_end) == sign(f_at_right_end)) return -1;
 
     if (LDEBUG){
-      cerr << __func__ << "left_end= "  << left_end  << "middle= ";
+      cerr << __AFLOW_FUNC__ << " left_end= "  << left_end  << "middle= ";
       cerr << middle  << "right_end= "  << right_end  << std::endl;
-      cerr << __func__ << "f_left= " << f_at_left_end;
+      cerr << __AFLOW_FUNC__ << " f_left= " << f_at_left_end;
       cerr << "f_middle= " << f_at_middle << "f_right= ";
       cerr << f_at_right_end << std::endl;
     }
@@ -147,9 +147,9 @@ namespace aurostd{
       f_at_middle = dp[2];
 
       if (LDEBUG){
-        cerr << __func__ << "left_end= "  << left_end  << "middle= ";
+        cerr << __AFLOW_FUNC__ << " left_end= "  << left_end  << "middle= ";
         cerr << middle  << "right_end= "  << right_end  << std::endl;
-        cerr << __func__ << "f_left= " << f_at_left_end;
+        cerr << __AFLOW_FUNC__ << " f_left= " << f_at_left_end;
         cerr << "f_middle= " << f_at_middle << "f_right= ";
         cerr << f_at_right_end << std::endl;
       }
@@ -158,7 +158,7 @@ namespace aurostd{
     // double-check that the convergence criterion was reached
     if (std::abs(f_at_middle) > tol) return -1;
 
-    if (LDEBUG) cerr << __func__ << "end" << std::endl;
+    if (LDEBUG) cerr << __AFLOW_FUNC__ << " end" << std::endl;
     return middle;
   }
 }
@@ -285,7 +285,7 @@ namespace aurostd{
   bool NonlinearFit::fitLevenbergMarquardt()
   {
     bool LDEBUG = (FALSE || DEBUG_XFIT || XHOST.DEBUG);
-    if (LDEBUG) cerr << __func__ << "begin"  << std::endl;
+    if (LDEBUG) cerr << __AFLOW_FUNC__ << " begin"  << std::endl;
 
     static const double step_scaling_factor = 10.0;
 
@@ -302,16 +302,16 @@ namespace aurostd{
 
     // determine initial step
     double lambda = tau*maxDiagonalElement(A);
-    if (LDEBUG) cerr << __func__ << "lambda = " << lambda << std::endl;
+    if (LDEBUG) cerr << __AFLOW_FUNC__ << " lambda = " << lambda << std::endl;
 
     while (iter<max_iter){
       iter++;
-      if (LDEBUG) cerr << __func__ << "iteration: " << iter << std::endl;
+      if (LDEBUG) cerr << __AFLOW_FUNC__ << " iteration: " << iter << std::endl;
 
       // M = A + lambda*diag(A)
       M = A; for (int i=1; i<=Nparams; i++) M[i][i] += lambda*A[i][i];
 
-      if (LDEBUG) cerr << __func__ << " M:" << std::endl << M << std::endl;
+      if (LDEBUG) cerr << __AFLOW_FUNC__ << " M:" << std::endl << M << std::endl;
 
       // transformation: xvector(N) => xmatrix(N,1) to use GaussJordan function
       for (int i=1; i<=Nparams; i++) G[i][1] = g[i];
@@ -339,10 +339,10 @@ namespace aurostd{
       else{
         lambda *= step_scaling_factor;
       }
-      if (LDEBUG) cerr << __func__ << "pnew = " << p << std::endl;
+      if (LDEBUG) cerr << __AFLOW_FUNC__ << " pnew = " << p << std::endl;
     }
 
-    if (LDEBUG) cerr << __func__ << "end"  << std::endl;
+    if (LDEBUG) cerr << __AFLOW_FUNC__ << " end"  << std::endl;
     return iter < max_iter;
   }
 }

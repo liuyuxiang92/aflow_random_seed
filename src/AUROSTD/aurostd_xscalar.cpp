@@ -637,7 +637,7 @@ namespace aurostd {
   bool factorial(bool x) {
     if(_isfloat(x)) {
       string message = "factorial(bool) implemented only for bool !";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     return TRUE;
   }
@@ -727,7 +727,7 @@ namespace aurostd {
     bool _isodd(utype x) {
       if(_isfloat(x)) {
         string message = "_isodd implemented only for integers !";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
       }
       if(!mod(x,(utype) 2)) return FALSE;
       else return TRUE;
@@ -763,7 +763,7 @@ namespace aurostd {
     bool _iseven(utype x) {
       if(_isfloat(x)) {
         string message = "_iseven implemented only for integers !";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
       }
       if(mod(x,(utype) 2)) return FALSE;
       else return TRUE;
@@ -903,9 +903,9 @@ namespace aurostd{
     int count=0,count_max=max(100,(int)std::ceil(std::pow(10.0,log10(1.0/tol_remainder)))); // count_max is a while-loop safeguard //CO20210909 patched count_max to change with tol_remainder
 
     if(LDEBUG){
-      cerr << __func__ << " input_double=" << std::fixed << std::setprecision(15) << input_double << endl;
-      cerr << __func__ << " tol_diff=" << std::fixed << std::setprecision(15) << tol_diff << endl;
-      cerr << __func__ << " tol_remainder=" << std::fixed << std::setprecision(15) << tol_remainder << endl;
+      cerr << __AFLOW_FUNC__ << " input_double=" << std::fixed << std::setprecision(15) << input_double << endl;
+      cerr << __AFLOW_FUNC__ << " tol_diff=" << std::fixed << std::setprecision(15) << tol_diff << endl;
+      cerr << __AFLOW_FUNC__ << " tol_remainder=" << std::fixed << std::setprecision(15) << tol_remainder << endl;
     }
 
     // ---------------------------------------------------------------------------
@@ -923,9 +923,9 @@ namespace aurostd{
     }
     if(count==count_max){
       message << "The number of elements in the fraction sequence exceeded " << count_max << ". Increase the threshold or there is an issue with the while-loop.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message,_RUNTIME_ERROR_);
     }
-    if(LDEBUG){ cerr << __func__ << " fraction_sequence=" << aurostd::joinWDelimiter(fraction_sequence, ",") << endl; }
+    if(LDEBUG){ cerr << __AFLOW_FUNC__ << " fraction_sequence=" << aurostd::joinWDelimiter(fraction_sequence, ",") << endl; }
 
     // ---------------------------------------------------------------------------
     // determine the numerator and denominator
@@ -934,19 +934,19 @@ namespace aurostd{
     denominator=1;
     numerator = getNumeratorContinuedFractions(numerator,n,fraction_sequence);
     denominator = getDenominatorContinuedFractions(denominator,n,fraction_sequence);
-    if(LDEBUG){ cerr << __func__ << " calculated fraction=" << numerator << "/" << denominator << endl; }
+    if(LDEBUG){ cerr << __AFLOW_FUNC__ << " calculated fraction=" << numerator << "/" << denominator << endl; }
 
     // ---------------------------------------------------------------------------
     // check result
     double fraction2double = (double)numerator/(double)denominator;
     if(LDEBUG){
-      cerr << __func__ << " fraction2double=" << std::fixed << std::setprecision(15) << fraction2double << endl;
-      cerr << __func__ << " input_double=" << std::fixed << std::setprecision(15) << input_double << endl;
-      cerr << __func__ << " diff=" << std::fixed << std::setprecision(15) << abs(fraction2double-input_double) << endl;
+      cerr << __AFLOW_FUNC__ << " fraction2double=" << std::fixed << std::setprecision(15) << fraction2double << endl;
+      cerr << __AFLOW_FUNC__ << " input_double=" << std::fixed << std::setprecision(15) << input_double << endl;
+      cerr << __AFLOW_FUNC__ << " diff=" << std::fixed << std::setprecision(15) << abs(fraction2double-input_double) << endl;
     }
     if(!aurostd::isequal(input_double,fraction2double,tol_diff)){
       message << "The fraction=" << numerator << "/" << denominator << " (=" << std::fixed << std::setprecision(15) << fraction2double << ") is not equal to the input_double=" << std::fixed << std::setprecision(15) << input_double << " (with tol_diff=" << std::fixed << std::setprecision(15) << tol_diff << ").";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message,_RUNTIME_ERROR_);
     }
   }
 }
@@ -1003,19 +1003,19 @@ namespace aurostd {
       }
       else{ //DX20200424
         stringstream message; message << "The input is not a numeric: str = " << str;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
     }
     else if(field_count != 2){
       stringstream message; message << "Expect two fields, i.e., numerator and denominator: str = " << str;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     // --------------------------------------------------------------------------
     // protect against non-numeric values //DX20200424
     if(!aurostd::isfloat(tokens[0]) || !aurostd::isfloat(tokens[1])){
       stringstream message; message << "The input is not a numeric: str = " << str;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     double numerator = aurostd::string2utype<double>(tokens[0]);
@@ -1025,7 +1025,7 @@ namespace aurostd {
     // protect against division by zero
     if(aurostd::isequal(denominator,_ZERO_TOL_)){
       stringstream message; message << "Denominator is zero: " << denominator;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     return numerator/denominator;

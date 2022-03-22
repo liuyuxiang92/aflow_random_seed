@@ -1970,7 +1970,7 @@ namespace plotter {
     // Make sure that the number of k-points is consistent with EIGENVAL
     if (xeigen.number_kpoints != nsegments * xkpts.path_grid) {
       string message = "Number of k-points in EIGENVAL and KPOINTS files do not match.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     // Labels
@@ -2733,7 +2733,7 @@ namespace plotter {
       }
     } else {
       string message = "Could not find file " + thermo_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
   }
 
@@ -2769,7 +2769,7 @@ namespace plotter {
         eos_model != "BM4" && eos_model != "M"){
       msg = "Wrong name of the EOS model was specified. ";
       msg += "Only SJ, BM2, BM3, BM4 or M labels are allowed.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, msg, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, msg, _INPUT_ILLEGAL_);
     }
     string keyword = "QHA_" + eos_model + "_THERMO";
 
@@ -2799,7 +2799,7 @@ namespace plotter {
       }
     } else {
       msg = "Could not find file " + thermo_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, msg, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, msg, _FILE_NOT_FOUND_);
     }
   }
   //AS20200909 END
@@ -2907,7 +2907,7 @@ namespace plotter {
       plotMatrix(plotoptions, out,FileMESSAGE,oss);  //CO20200404
     } else {
       string message = "Could not find file " + tcond_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
   }
 
@@ -3039,13 +3039,13 @@ namespace plotter {
       if (vcontent[iline] == stopstring) break;
       if (iline == nlines) {
         message = "Wrong file format. No STOP tag found.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _FILE_WRONG_FORMAT_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
       }
     }
     if (data.size() == 0) {
       message = "No data extracted from file " + path_to_file + ".";
       message += "File is either empty or has the wrong format.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__, message, _FILE_WRONG_FORMAT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
     }
     return data;
   }

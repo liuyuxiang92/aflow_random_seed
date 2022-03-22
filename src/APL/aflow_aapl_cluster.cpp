@@ -140,7 +140,7 @@ namespace apl {
       order = _order;
     } else {
       message << "Cluster order must be larger than 1 (is " << _order << ").";
-      throw xerror(_AFLOW_FILE_NAME_, __func__, message, _VALUE_RANGE_);
+      throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_RANGE_);
     }
     nifcs = aurostd::powint(3, order);
     scell = supercell.getSupercellStructure();
@@ -148,7 +148,7 @@ namespace apl {
     sc_dim = supercell.scell_dim;
     if (sc_dim.rows != 3) {
       message << "Cannot use non-diagonal supercells for AAPL.";
-      throw xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_ILLEGAL_);
+      throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_ILLEGAL_);
     }
     pc2scMap = supercell._pc2scMap;
     sc2pcMap = supercell._sc2pcMap;
@@ -213,14 +213,14 @@ namespace apl {
       scell.CalculateSymmetryPointGroupCrystal(false);
       if (!scell.pgroup_xtal_calculated) {
         message = "Could not calculate the point group of the supercell.";
-        throw xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
     }
     if (!pcell.pgroup_xtal_calculated) {
       pcell.CalculateSymmetryPointGroupCrystal(false);
       if (!pcell.pgroup_xtal_calculated) {
         message = "Could not calculate the point group of the primitive cell.";
-        throw xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
     }
 
@@ -230,7 +230,7 @@ namespace apl {
         pcell.CalculateSymmetryFactorGroup(false);
         if (!pcell.fgroup_calculated) {
           message = "Could not calculate the factor group of the primitive cell.";
-          throw xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+          throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         }
       }
       bool mapped = false;
@@ -263,7 +263,7 @@ namespace apl {
             message = "At least one atom of the supercell could not be mapped.";
             if (LDEBUG) {
             }
-            throw xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+            throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
           }
         }
       }
@@ -275,7 +275,7 @@ namespace apl {
         std::cerr << "ClusterSet::getSymmetryMap: Point group mismatch. Primitive cell: ";
         std::cerr << pcell.point_group_Hermann_Mauguin << "; supercell: " << scell.point_group_Hermann_Mauguin << std::endl;
       }
-      throw xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+      throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
   }
 
@@ -1335,7 +1335,7 @@ namespace apl {
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
       message = "Could not write ClusterSet to file.";
-      throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_ERROR_);
+      throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 
@@ -1595,13 +1595,13 @@ namespace apl {
 
     if (!aurostd::EFileExist(filename) && !aurostd::FileExist(filename)) {
       message << "Could not open file " << filename << ". File not found.";
-      throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_NOT_FOUND_);
+      throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
     vector<string> vlines;
     aurostd::efile2vectorstring(filename, vlines);
     if (vlines.size() == 0) {
       message << "Cannot open file " << filename << ". File empty or corrupt.";
-      throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+      throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     }
 
     // Start reading
@@ -1611,7 +1611,7 @@ namespace apl {
     // Check that this is a valid xml file
     if (line.find("xml") == string::npos) {
       message << "File is not a valid xml file.";
-      throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_WRONG_FORMAT_);
+      throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
     }
 
     //Check if xml file can be used to read the ClusterSet object
@@ -1622,7 +1622,7 @@ namespace apl {
       if (order == 4) readHigherOrderDistortions(line_count, vlines);
     } else {
       message << "The settings in the hibernate file and the aflow.in file are incompatible.";
-      throw xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+      throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     // Necessary for AAPL calculations; since these calculations are
@@ -1651,7 +1651,7 @@ namespace apl {
     while (true) {
       if (line_count == vsize) {
         message << "Checksum not found in hibernate file.";
-        throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+        throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
       }
       line = vlines[line_count++];
       if (line.find("checksum") != string::npos) {
@@ -1871,7 +1871,7 @@ namespace apl {
     while (true) {
       if (line_count == vsize) {
         message = "inequivalent_clusters tag not found";
-        throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+        throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
       }
       line = vlines[line_count++];
       if (line.find("inequivalent_clusters") != string::npos) {
@@ -1883,14 +1883,14 @@ namespace apl {
     while (line.find("/inequivalent_clusters") == string::npos) {
       if (line_count == vsize) {
         message = "inequivalent_clusters tag incomplete";
-        throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+        throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
       }
       line = vlines[line_count++];
       if (line.find("ineq_cluster") != string::npos) {
         while (line.find("/ineq_cluster") == string::npos) {
           if (line_count == vsize) {
             message = "ineq_cluster tag incomplete";
-            throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+            throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
           }
           line = vlines[line_count++];
           if (line.find("varray name=\"clusters\"") != string::npos) {
@@ -1920,7 +1920,7 @@ namespace apl {
     while (line.find("/clusters") == string::npos) {
       if (line_count == vsize) {
         message = "clusters tag incomplete";
-        throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+        throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
       } 
       line = vlines[line_count++];
       if (line.find("<cluster>") != string::npos) {
@@ -1928,7 +1928,7 @@ namespace apl {
         while(line.find("</cluster>") == string::npos) {
           if (line_count == vsize) {
             message = "cluster tag incomplete";
-            throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+            throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
           }
           line = vlines[line_count++];
           if (line.find("atoms") != string::npos) {
@@ -1970,7 +1970,7 @@ namespace apl {
     while (line.find("/linear_combinations") == string::npos) {
       if (line_count == vsize) {
         message = "linear_combinations tag incomplete";
-        throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+        throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
       }
       line = vlines[line_count++];
       if (line.find("independent") != string::npos) {
@@ -1991,7 +1991,7 @@ namespace apl {
         while(true) {
           if (line_count == vsize) {
             message = "indices varray incomplete";
-            throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+            throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
           }
           line = vlines[line_count++];
           if (line.find("/varray") != string::npos) {
@@ -2011,7 +2011,7 @@ namespace apl {
         while(true) {
           if (line_count == vsize) {
             message = "coefficients varray incomplete";
-            throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+            throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
           }
           line = vlines[line_count++];
           if (line.find("/varray") != string::npos) {
@@ -2031,7 +2031,7 @@ namespace apl {
         while(true) {
           if (line_count == vsize) {
             message = "indep2depMap varray incomplete";
-            throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+            throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
           }
           line = vlines[line_count++];
           if (line.find("/varray") != string::npos) {
@@ -2063,7 +2063,7 @@ namespace apl {
     while (line.find("/inequivalent_distortions") == string::npos) {
       if (line_count == vsize) {
         message = "inequivalent_distortions tag incomplete";
-        throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+        throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
       }
       line = vlines[line_count++];
       if (line.find("ineq_dist") != string::npos) {
@@ -2083,7 +2083,7 @@ namespace apl {
     while (line.find("/ineq_dist") == string::npos) {
       if (line_count == vsize) {
         message = "ineq_dist tag incomplete";
-        throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+        throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
       }
       line = vlines[line_count++];
       if (line.find("atoms") != string::npos) {
@@ -2104,7 +2104,7 @@ namespace apl {
         while (line.find("/distortions") == string::npos) {
           if (line_count == vsize) {
             message = "ineq_dist tag incomplete";
-            throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+            throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
           }
           line = vlines[line_count++];
           if (line.find("varray") != string::npos) {
@@ -2112,7 +2112,7 @@ namespace apl {
             while (true) {
               if (line_count == vsize) {
                 message = "incomplete distortions varray";
-                throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+                throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
               }
               line = vlines[line_count++];
               if (line.find("/varray") != string::npos) {
@@ -2135,14 +2135,14 @@ namespace apl {
         while (line.find("/rotations") == string::npos) {
           if (line_count == vsize) {
             message = "rotations tag incomplete";
-            throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+            throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
           }
           line = vlines[line_count++];
           if (line.find("varray") != string::npos) {
             while (true) {
               if (line_count == vsize) {
                 message = "incomplete rotations varray";
-                throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+                throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
               }
               line = vlines[line_count++];
               if (line.find("/varray") != string::npos) {
@@ -2164,7 +2164,7 @@ namespace apl {
         while (line.find("/transformation_maps") == string::npos) {
           if (line_count == vsize) {
             message = "transformation_maps tag incomplete";
-            throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+            throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
           }
           line = vlines[line_count++];
           if (line.find("varray") != string::npos) {
@@ -2172,7 +2172,7 @@ namespace apl {
             while (true) {
               if (line_count == vsize) {
                 message = "incomplete distortions varray";
-                throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+                throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
               }
               line = vlines[line_count++];
               if (line.find("/varray") != string::npos) {
@@ -2204,7 +2204,7 @@ namespace apl {
     while (line.find("/higher_order_distortions") == string::npos) {
       if (line_count == vsize) {
         message = "higher_order_distortions tag incomplete";
-        throw xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_CORRUPT_);
+        throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
       }
       line = vlines[line_count++];
       if (line.find("ineq_dist") != string::npos) {

@@ -173,7 +173,7 @@ namespace aurostd {  // namespace aurostd
         message << "xvector[2]=" << corpus[2] << endl;
         message << "xvector[3]=" << corpus[3] << endl;
         message << "xvector[] -> i=" << i << " > urows=" << urows << " lrows=" << lrows << " float=" << isfloat;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
       }
       if(i<lrows) {
         stringstream message;
@@ -181,7 +181,7 @@ namespace aurostd {  // namespace aurostd
         message << "xvector[2]=" << corpus[2] << endl;
         message << "xvector[3]=" << corpus[3] << endl;
         message << "xvector[] -> i=" << i << " < lrows=" << lrows << " urows=" << urows << " float=" << isfloat;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
       }
 #endif
       return corpus[i];
@@ -197,12 +197,12 @@ namespace aurostd {  // namespace aurostd
       if(i>urows) {
         stringstream message;
         message << "xvector() -> i=" << i << " > urows=" << urows << " lrows=" << lrows << " float=" << isfloat;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
       }
       if(i<lrows) {
         stringstream message;
         message << "xvector() -> i=" << i << " < lrows=" << lrows << " urows=" << urows << " float=" << isfloat;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
       }
 #endif  // __XVECTOR_IGNORE_BOUNDARIES
       return corpus[i];
@@ -233,12 +233,12 @@ namespace aurostd {  // namespace aurostd
         if(i>urows) {
           stringstream message;
           message << "i > xvector<utype>.urows, BC=" << bc;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_BOUNDS_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
         }
         if(i<lrows) {
           stringstream message;
           message << "i < xvector<utype>.lrows, BC=" << bc;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_BOUNDS_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
         }
 #endif
         return corpus[i];
@@ -273,7 +273,7 @@ namespace aurostd {  // namespace aurostd
       if(this->rows!=r.rows) {
         stringstream message;
         message << "failure in operator+=: (this->rows!=r.rows)=FALSE";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       for(int i=0;i<rows;i++)
         corpus[i+lrows]+=r[i+r.lrows];
@@ -307,7 +307,7 @@ namespace aurostd {  // namespace aurostd
       if(this->rows!=r.rows) {
         stringstream message;
         message << "failure in operator-=: (this->rows!=r.rows)=FALSE";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       for(int i=0;i<rows;i++)
         corpus[i+lrows]-=r[i+r.lrows];
@@ -390,7 +390,7 @@ namespace aurostd {  // namespace aurostd
       if(a.rows!=b.rows) {
         stringstream message;
         message << "failure in operator* (a.rows != b.rows)";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       utype out=(utype) 0.0;
       for(int i=a.lrows,ii=b.lrows;i<=a.urows;i++,ii++)
@@ -406,7 +406,7 @@ namespace aurostd {  // namespace aurostd
       if(a.rows!=b.rows) {
         stringstream message;
         message << "failure in operator* (a.rows != b.rows)";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       utype out=(utype) 0.0;
       for(int i=a.lrows,ii=b.lrows;i<=a.urows;i++,ii++)
@@ -423,12 +423,12 @@ namespace aurostd {  // namespace aurostd
       if(a.rows!=3) {
         stringstream message;
         message << "xvector product (a%b) a.rows=" << a.rows << " !=3";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       if(b.rows!=3) {
         stringstream message;
         message << "xvector product (a%b) b.rows=" << b.rows << " !=3";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       c(1)=a(2)*b(3)-a(3)*b(2);
       c(2)=a(3)*b(1)-a(1)*b(3);
@@ -445,12 +445,12 @@ namespace aurostd {  // namespace aurostd
       if(a.rows!=3) {
         stringstream message;
         message << "xvector product (a%b) a.rows=" << a.rows << " !=3";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       if(b.rows!=3) {
         stringstream message;
         message << "xvector product (a%b) b.rows=" << b.rows << " !=3";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
 
       c(1)=a(2)*b(3)-a(3)*b(2);
@@ -739,7 +739,7 @@ namespace aurostd {  // namespace aurostd
       if(a.rows!=b.rows) {
         stringstream message;
         message << "failure in operator> (xvector > xvector)";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       xvector<char> c(a.lrows,a.urows);
       for(int i=a.lrows,ii=b.lrows;i<=a.urows;i++,ii++) {
@@ -756,7 +756,7 @@ namespace aurostd {  // namespace aurostd
       if(a.rows!=b.rows)  {
         stringstream message;
         message << "failure in operator> (xvector < xvector)";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       xvector<char> c(a.lrows,a.urows);
       for(int i=a.lrows,ii=b.lrows;i<=a.urows;i++,ii++) {
@@ -773,7 +773,7 @@ namespace aurostd {  // namespace aurostd
       if(a.rows!=b.rows)  {
         stringstream message;
         message << "failure in function identical (xvector == xvector)[1]";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       bool output=TRUE;
       if(a.isfloat || a.iscomplex) {
@@ -1962,7 +1962,7 @@ namespace aurostd {  // namespace aurostd
       if(v1.rows!=v2.rows) {
         stringstream message;
         message << "cos(xvector,xvector) v1.rows,v2.rows=" << v1.rows << "," << v2.rows;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       double out=0.0,n_v1=0.0,n_v2=0.0;
       int size=v1.rows,i;
@@ -1980,12 +1980,12 @@ namespace aurostd {  // namespace aurostd
       if(n_v1==0.0) {
         stringstream message;
         message << "cos(xvector,xvector)=modulus(v1)=0";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       } 
       if(n_v2==0.0) {
         stringstream message;
         message << "cos(xvector,xvector)=modulus(v2)=0";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
       // assert(n_v1>0 && n_v2>0);
       out/=(n_v1*n_v2);
@@ -2615,7 +2615,7 @@ namespace aurostd {  // namespace aurostd
           jstack += 2;
           if(jstack>_XQSORT_NSTACK) {
             string message = " _XQSORT_NSTACK too small in sort.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
           }
           if(ir-i+1 >= j-l) {
             istack[jstack]=ir;
@@ -2702,7 +2702,7 @@ namespace aurostd {  // namespace aurostd
           jstack +=2;
           if(jstack>_XSORT_NSTACK) {
             string message = " _XQSORT_NSTACK too small in sort2.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
           }
           if(ir-i+1>=j-l) {
             istack[jstack]=ir;
@@ -2792,7 +2792,7 @@ namespace aurostd {  // namespace aurostd
           jstack +=2;
           if(jstack>_XSORT_NSTACK) {
             string message = " _XQSORT_NSTACK too small in sort3.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
           }
           if(ir-i+1>=j-l) {
             istack[jstack]=ir;
@@ -2893,7 +2893,7 @@ namespace aurostd {  // namespace aurostd
           jstack +=2;
           if(jstack>_XSORT_NSTACK) {
             string message = " _XQSORT_NSTACK too small in sort4.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
           }
           if(ir-i+1>=j-l) {
             istack[jstack]=ir;

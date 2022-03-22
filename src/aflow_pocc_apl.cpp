@@ -30,11 +30,11 @@ namespace pocc {
     uint nruns = m_ARUN_directories.size();
     if (nruns == 0) {
       message << "Number of ARUN directories is zero.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     if (l_supercell_sets.size() != nruns) {
       message << "Number of directories and number of supercells are different.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     vector<int> vexclude;
@@ -70,7 +70,7 @@ namespace pocc {
         return;
       } else {
         message << "No phonon DOSCARs calculated.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
     }
     vphcalc.clear();
@@ -91,7 +91,7 @@ namespace pocc {
     aurostd::stringstream2file(phposcar, phposcar_file);
     if (!aurostd::FileExist(phposcar_file)) {
       message << "Could not write file " << phposcar_file << ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
 
     uint nexclude = vexclude.size();
@@ -149,7 +149,7 @@ namespace pocc {
       aurostd::stringstream2file(phdoscar, filename);
       if (!aurostd::FileExist(filename)) {
         message << "Could not write file " << filename << ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
       }
 
       tpc.clear();
@@ -168,7 +168,7 @@ namespace pocc {
       aurostd::stringstream2file(aplout, filename);
       if (!aurostd::FileExist(filename)) {
         message << "Cannot open output file " << filename << ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
       }
     }
 
@@ -203,7 +203,7 @@ namespace pocc {
       string statefile = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_STATE_FILE);
       if (!aurostd::EFileExist(statefile)) {
         message = "Cannot find state file in directory " + directory + ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
       }
 
       // Initialize phonon calculator
@@ -246,7 +246,7 @@ namespace pocc {
           phcalc.setHarmonicForceConstants(fccalc);
         } else {
           message = "Could not calculate harmonic force constants for directory " + directory + ".";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         }
       }
 
@@ -433,7 +433,7 @@ namespace pocc {
             }
           }
         }
-        if (mismatch) throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INDEX_MISMATCH_);
+        if (mismatch) throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       uint nat = xdos.vDOS.size();
       uint nproj = xdos.vDOS[0].size();

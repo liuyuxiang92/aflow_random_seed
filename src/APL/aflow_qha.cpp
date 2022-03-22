@@ -329,7 +329,7 @@ namespace apl
     xStream::initialize(FileMESSAGE, oss);
 
     string msg  = "Initializing QHA.";
-    pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
+    pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     free();
@@ -410,7 +410,7 @@ namespace apl
     message << "If there are unstable phonon modes, they will ";
     message << (ignore_imaginary ? "" : "NOT ") << "be ignored.";
 
-    pflow::logger(QHA_ARUN_MODE, __func__, message, currentDirectory, *p_FileMESSAGE,
+    pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, message, currentDirectory, *p_FileMESSAGE,
         *p_oss, _LOGGER_MESSAGE_);
 
     // determine the names for the directories for the calculation of the Grueneisen parameter
@@ -482,7 +482,7 @@ namespace apl
         msg << aurostd::utype2string<int>(N_EOSvolumes);
         msg << " APL calculations." << std::endl;
         msg << "QHA EOS calculation will be skipped!";
-        pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+        pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
             *p_oss, _LOGGER_ERROR_);
       }
     }
@@ -571,12 +571,12 @@ namespace apl
     bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
 
     string msg = "Performing a QHA calculation.";
-    pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
+    pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     if (!isInitialized){
       msg = "QHA was not initialized properly and the QHA calculation will be aborted.";
-      pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+      pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_ERROR_);
       return;
     }
@@ -591,7 +591,7 @@ namespace apl
       // calculations.
       if ((isQHA && isEOS) || isQHA3P || isSCQHA || isQHANP){
         msg = "Checking if all required files from static DFT calculations exist.";
-        pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+        pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
             *p_oss, _LOGGER_MESSAGE_);
         vector<vector<bool> > file_is_present(subdirectories_static.size(),
             vector<bool>(4));
@@ -810,7 +810,7 @@ namespace apl
             +_AFLOWIN_)) continue;
 
       msg = "Generate aflow.in file in " + subdirectories_static[i] + " directory.";
-      pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+      pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_MESSAGE_);
 
       xinput.xvasp.str = origStructure;
@@ -857,7 +857,7 @@ namespace apl
 
     if (!isInitialized){
       msg = "QHA was not initialized properly and the QHA calculation will be aborted.";
-      pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+      pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_ERROR_);
       return 0;
     }
@@ -938,7 +938,7 @@ namespace apl
     // successfully. For example, a finite difference calculation of Grueneisen
     // parameters does not depend on any data from any static DFT calculation.
     if (!msg.empty()){
-      pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+      pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_ERROR_);
     }
   }
@@ -982,7 +982,7 @@ namespace apl
         continue;
 
       msg = "Generating aflow.in file in " + subdirectories[i] + " directory.";
-      pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+      pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_MESSAGE_);
 
       xinput.xvasp.str = origStructure;
@@ -1029,7 +1029,7 @@ namespace apl
 
     if (!isInitialized){
       msg = "QHA was not initialized properly.";
-      pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+      pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_ERROR_);
       return 0;
     }
@@ -1101,7 +1101,7 @@ namespace apl
     // successfully. For example, a finite difference calculation of Grueneisen
     // parameters does not depend on any data from any static DFT calculation.
     if (!msg.empty()){
-      pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+      pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_ERROR_);
     }
   }
@@ -1127,7 +1127,7 @@ namespace apl
         break;
     }
     msg+=" APL calculations exist.";
-    pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+    pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
         *p_oss, _LOGGER_MESSAGE_);
 
     vector<string> &subdirectories = (QHA_FD==qhatype) ? subdirectories_apl_gp :
@@ -1157,12 +1157,12 @@ namespace apl
       QHAtype type)
   {
     string msg = "Reading phonon DOS and dispersion relations.";
-    pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
+    pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     if (!isInitialized){
       msg = "QHA was not initialized properly and the QHA calculation will be aborted.";
-      pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+      pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_ERROR_);
       return false;
     }
@@ -1186,20 +1186,20 @@ namespace apl
         DEFAULT_APL_HARMIFC_FILE;
       if (aurostd::EFileExist(hibernation_file)){
         msg = "Reading hibernation file...";
-        pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+        pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
             *p_oss, _LOGGER_MESSAGE_);
         try{
           phcalc.awake();
         } catch (aurostd::xerror& e){
-          pflow::logger(QHA_ARUN_MODE, __func__, e.buildMessageString(), currentDirectory,
+          pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, e.buildMessageString(), currentDirectory,
               *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
           msg = "Reading data from the hibernation file failed.";
-          pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+          pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
               *p_oss, _LOGGER_ERROR_);
           return false;
         }
         msg = "Hibernation file was read successfully.";
-        pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+        pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
             *p_oss, _LOGGER_MESSAGE_);
       }
 
@@ -1238,7 +1238,7 @@ namespace apl
         if (ignore_imaginary){
           msg << "The imaginary parts of the phonon dispersions and phonon DOS will be ignored.";
           msg << " Check if the results are still meaningful!" << std::endl;
-          pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+          pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
               *p_oss, _LOGGER_WARNING_);
         }
         else{
@@ -1248,7 +1248,7 @@ namespace apl
           msg << "the problematic calculations or ignore this error by setting "; 
           msg << "IGNORE_IMAGINARY=ON." << std::endl;
 
-          pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+          pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
               *p_oss, _LOGGER_ERROR_);
           apl_data_read_successfully = false;
         }
@@ -1267,7 +1267,7 @@ namespace apl
       else{
         msg = "Could not map the AFLOW standard primitive cell to the supercell. ";
         msg += "Phonon dispersions will be calculated using the original structure instead.";
-        pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+        pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
             *p_oss, _LOGGER_WARNING_);
       }
       Nbranches = phcalc.getNumberOfBranches();
@@ -1298,7 +1298,7 @@ namespace apl
         filename += DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_KPOINTS_FILE;
         if (!aurostd::stringstream2file(qpath_stream, filename)){
           msg = "Error writing to " + filename + "file.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,msg,_FILE_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_ERROR_);
         }
       }
       else{
@@ -1378,12 +1378,12 @@ namespace apl
   bool QHA::readStaticCalculationsData()
   {
     string msg = "";
-    pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
+    pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     if (!isInitialized){
       msg = "QHA was not initialized properly and the QHA calculation will be aborted.";
-      pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+      pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_ERROR_);
       return false;
     }
@@ -1395,14 +1395,14 @@ namespace apl
     for (uint i=0; i<subdirectories_static.size(); i++){
       msg = "Reading data from the static DFT calculation in the ";
       msg += subdirectories_static[i] + " directory.";
-      pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+      pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_MESSAGE_);
 
       directory = currentDirectory + '/' + subdirectories_static[i];
       outcarfile = directory+'/'+"OUTCAR.static";
       if (!outcar.GetPropertiesFile(outcarfile)){
         msg = "Could not read the " + outcarfile + " file";
-        pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+        pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
             *p_oss, _LOGGER_ERROR_);
         data_read_success = false;
       }
@@ -1417,7 +1417,7 @@ namespace apl
 
       if (!static_eigvals.back().m_initialized){
         msg = "Could not read the " + subdirectories_static[i]+"/EIGENVAL.static file.";
-        pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+        pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
             *p_oss, _LOGGER_ERROR_);
         data_read_success = false;
       }
@@ -1500,12 +1500,12 @@ namespace apl
           msg+="determine mode-decomposed Grueneisen parameter) is larger than ";
           msg+="10\% for V="+aurostd::utype2string<double>(EOSvolumes[Vid]);
 
-          pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory,
+          pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory,
               *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-          cerr << __func__ << " original frequencies:" << std::endl;
-          cerr << __func__ << xomega << std::endl;
-          cerr << __func__ << " fit to frequencies:" << std::endl;
-          cerr << __func__ << gp_fit_matrix * tmp << std::endl;
+          cerr << __AFLOW_FUNC__ << " original frequencies:" << std::endl;
+          cerr << __AFLOW_FUNC__ << xomega << std::endl;
+          cerr << __AFLOW_FUNC__ << " fit to frequencies:" << std::endl;
+          cerr << __AFLOW_FUNC__ << gp_fit_matrix * tmp << std::endl;
           break;
         }
       }
@@ -1765,7 +1765,7 @@ namespace apl
     if (!isMinimumWithinBounds(E)){
       msg = "Calculation is stopped since there is no free energy minimum";
       msg += " within a given volume range.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,msg,_VALUE_RANGE_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_VALUE_RANGE_);
     }
 
     xvector<double> V = aurostd::vector2xvector(EOSvolumes);
@@ -2170,7 +2170,7 @@ namespace apl
     static const double dE = max(0.01, KBOLTZEV*T);
 
     bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
-    if (LDEBUG) cerr << __func__ << "begin" << std::endl;
+    if (LDEBUG) cerr << __AFLOW_FUNC__ << " begin" << std::endl;
 
     // Fermi energy is used as a starting guess for the value of chemical potential
     double guess = Efermi_V[Vid];
@@ -2206,10 +2206,10 @@ namespace apl
     f_at_middle = calcIDOS(middle, T, static_eigvals[Vid]) - Nelectrons;
 
     if (LDEBUG){
-      cerr << __func__ << "Bracketing interval was determined." << std::endl;
-      cerr << __func__ << "left_end= "  << left_end  << "middle= ";
+      cerr << __AFLOW_FUNC__ << " Bracketing interval was determined." << std::endl;
+      cerr << __AFLOW_FUNC__ << " left_end= "  << left_end  << "middle= ";
       cerr << middle  << "right_end= "  << right_end  << std::endl;
-      cerr << __func__ << "f_left= " << f_at_left_end;
+      cerr << __AFLOW_FUNC__ << " f_left= " << f_at_left_end;
       cerr << "f_middle= " << f_at_middle << "f_right= ";
       cerr << f_at_right_end << std::endl;
     }
@@ -2237,15 +2237,15 @@ namespace apl
       f_at_middle = calcIDOS(middle, T, static_eigvals[Vid]) - Nelectrons;
 
       if (LDEBUG){
-        cerr << __func__ << "left_end= "  << left_end  << "middle= ";
+        cerr << __AFLOW_FUNC__ << " left_end= "  << left_end  << "middle= ";
         cerr << middle  << "right_end= "  << right_end  << std::endl;
-        cerr << __func__ << "f_left= " << f_at_left_end;
+        cerr << __AFLOW_FUNC__ << " f_left= " << f_at_left_end;
         cerr << "f_middle= " << f_at_middle << "f_right= ";
         cerr << f_at_right_end << std::endl;
       }
     }
 
-    if (LDEBUG) cerr << __func__ << "end" << std::endl;
+    if (LDEBUG) cerr << __AFLOW_FUNC__ << " end" << std::endl;
     return middle;
   }
 
@@ -2564,7 +2564,7 @@ namespace apl
     if (iter == max_scqha_iteration){
       string msg="Maximum number of iterations in self consistent loop is reached";
       msg += " at T="+aurostd::utype2string<double>(T)+"K.";
-      pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+      pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
           *p_oss, _LOGGER_MESSAGE_);
     }
 
@@ -2599,7 +2599,7 @@ namespace apl
     else
       msg += "with temperature steps computed using the V *= (1 + beta*dT) approximation.";
 
-    pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
+    pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     // get the equilibrium volume from the fit to the EOS model fitted to the set of 
@@ -2789,7 +2789,7 @@ namespace apl
 
     if (!aurostd::stringstream2file(file, filename, "APPEND")){
       msg = "Error writing to " + filename + "file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,msg,_FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_ERROR_);
     }
   }
 
@@ -2853,7 +2853,7 @@ namespace apl
 
     string filename = directory+'/'+DEFAULT_QHA_FILE_PREFIX+DEFAULT_QHA_THERMO_FILE;
     msg = "Writing T-dependent properties to "+filename;
-    pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
+    pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     stringstream file;
@@ -2916,7 +2916,7 @@ namespace apl
         if (!isMinimumWithinBounds(F)){
           msg = "Calculation is stopped at T=" + aurostd::utype2string<double>(T) + " [K]";
           msg+= " since there is no free energy minimum within a given volume range.";
-          pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+          pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
               *p_oss, _LOGGER_WARNING_);
           break;
         }
@@ -3016,13 +3016,13 @@ namespace apl
     if (aurostd::FileExist(filename)){
       if (!aurostd::stringstream2file(file, filename, "APPEND")){
         msg = "Error writing to " + filename + " file.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,msg,_FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_ERROR_);
       }
     }
     else{
       if (!aurostd::stringstream2file(file, filename)){
         msg = "Error writing to " + filename + " file.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,msg,_FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_ERROR_);
       }
     }
   }
@@ -3032,7 +3032,7 @@ namespace apl
   void QHA::writeFVT(const string &directory)
   {
     string msg = "Writing F(V,T) relations to file.";
-    pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
+    pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     stringstream file;
@@ -3069,7 +3069,7 @@ namespace apl
 
     if (!aurostd::stringstream2file(file, filename)){
       msg = "Error writing to " + filename + "file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,msg,_FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_ERROR_);
     }
   }
 
@@ -3079,7 +3079,7 @@ namespace apl
   {
     string msg = "Calculating Grueneisen parameters along the path in";
     msg += " that was used to for the phonon dispersion.";
-    pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
+    pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
     // we will save bands-projected Grueneisen parameter in xEIGENVAL
     xEIGENVAL GPpath(gp_ph_dispersions.front());
@@ -3115,7 +3115,7 @@ namespace apl
     aurostd::stringstream2file(eigenval, filename);
     if (!aurostd::FileExist(filename)){
       msg = "Cannot open "+filename+" file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,msg,_FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_ERROR_);
     }
   }
 
@@ -3127,7 +3127,7 @@ namespace apl
   void QHA::writeAverageGPfiniteDifferences(const string &directory)
   {
     string msg = "Writing T-dependence of the average Grueneisen parameter.";
-    pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
+    pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     stringstream file;
@@ -3159,7 +3159,7 @@ namespace apl
 
     if (!aurostd::stringstream2file(file, filename)){
       msg = "Error writing to " + filename + "file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,msg,_FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_ERROR_);
     }
   }
 
@@ -3168,7 +3168,7 @@ namespace apl
   void QHA::writeGPmeshFD(const string &directory)
   {
     string msg = "Writing Grueneisen parameters calculated on the mesh of q-points.";
-    pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
+    pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
 
     stringstream file;
@@ -3214,7 +3214,7 @@ namespace apl
     file << xeigen;
     if (!aurostd::stringstream2file(file, filename)){
       msg = "Error writing to " + filename + "file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,msg,_FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_ERROR_);
     }
   }
 
@@ -3242,7 +3242,7 @@ namespace apl
 
     if (!aurostd::stringstream2file(file, filename)){
       msg = "Error writing to " + filename + "file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,msg,_FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_ERROR_);
     }
   }
 
@@ -3273,14 +3273,14 @@ namespace apl
           break;
         case (QHANP_CALC):
           msg = "T-dependent phonon dispersion calculation is not supported for QHANP method";
-          pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+          pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
           return;
           break;
       }
 
       msg = "Writing phonon dispersions corresponding to a ";
       msg += "temperature of " + aurostd::utype2string<double>(T) + " K.";
-      pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
+      pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
           _LOGGER_MESSAGE_);
 
       // we will save T-dependent phonon bands in xEIGENVAL
@@ -3358,7 +3358,7 @@ namespace apl
       filename += ".T"+aurostd::PaddedNumString(T, ndigits)+"K.out";
       if (!aurostd::stringstream2file(eig_stream, filename)){
         msg = "An error occurred when attempted to write "+filename+" file.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,msg,_FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_ERROR_);
       }
     }
   }
@@ -3366,7 +3366,7 @@ namespace apl
   void QHA::writeQHAresults(const string &directory)
   {
     string msg = "Writing properties calculated by QHA into aflow.qha.out file.";
-    pflow::logger(QHA_ARUN_MODE, __func__, msg, currentDirectory, *p_FileMESSAGE,
+    pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
         *p_oss, _LOGGER_MESSAGE_);
 
     xvector<double> xvolumes = aurostd::vector2xvector(EOSvolumes);
@@ -3424,7 +3424,7 @@ namespace apl
     string filename = directory + '/' + DEFAULT_QHA_FILE_PREFIX + "out";
     if (!aurostd::stringstream2file(aflow_qha_out, filename)){
       msg = "Error writing to " + filename + " file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,msg,_FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_ERROR_);
     }
   }
 }

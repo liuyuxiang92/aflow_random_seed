@@ -91,7 +91,7 @@ namespace apl {
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     //AS20200312 BEGIN: now initialization parameters are passed using xoption
     _bzmethod = aplopts.getattachedscheme("DOSMETHOD");
@@ -128,13 +128,13 @@ namespace apl {
 
     if (!_pc->getSupercell().isConstructed()) {
       message = "The supercell structure has not been initialized yet.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
 
     QMesh& _qm = _pc->getQMesh();
     if (!_qm.initialized()) {
       message = "q-point mesh is not initialized.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     if (_projections.size() == 0) _qm.makeIrreducible();
 
@@ -271,12 +271,12 @@ namespace apl {
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     // Check parameters
     if (aurostd::isequal(fmax, fmin, _FLOAT_TOL_)) {
       message = "Frequency range of phonon DOS is nearly zero.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     } else if (fmin > fmax) {
       double tmp = fmax;
       fmax = fmin;
@@ -498,7 +498,7 @@ namespace apl {
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     // Write PHDOS file
     //CO START
@@ -532,7 +532,7 @@ namespace apl {
     aurostd::stringstream2file(outfile, filename); //ME20181226
     if (!aurostd::FileExist(filename)) { //ME20181226
       message = "Cannot open output file " + filename + "."; //ME20181226
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
       //    throw apl::APLRuntimeError("DOSCalculator::writePDOS(); Cannot open output PDOS file.");
     }
     //outfile.clear();
@@ -545,7 +545,7 @@ namespace apl {
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHDOSCAR_FILE);
     message = "Writing phonon density of states into file " + filename + ".";
@@ -556,7 +556,7 @@ namespace apl {
     aurostd::stringstream2file(doscar, filename);
     if (!aurostd::FileExist(filename)) {
       message = "Cannot open output file " + filename + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
     // OBSOLETE ME20191219 - PHPOSCAR is already written in KBIN::RunPhonons_APL
     // if (xdos.partial) {  // Write PHPOSCAR if there are projected DOS
@@ -568,7 +568,7 @@ namespace apl {
     //   aurostd::stringstream2file(poscar, filename);
     //   if (!aurostd::FileExist(filename)) {
     //     string message = "Cannot open output file " + filename + ".";
-    //     throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_ERROR_);
+    //     throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     //   }
     // }
   }
@@ -576,7 +576,7 @@ namespace apl {
   xDOSCAR DOSCalculator::createDOSCAR() const {
     if (!_pc_set) {
       string message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     xDOSCAR xdos;
     xdos.spin = 0;
@@ -689,7 +689,7 @@ namespace apl {
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     //CO START
     // Write PHDOS file
@@ -719,7 +719,7 @@ namespace apl {
     aurostd::stringstream2file(outfile, file);
     if (!aurostd::FileExist(file)) {
       message = "Cannot open output file " + filename + "."; //ME20181226
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
     //CO END
   }

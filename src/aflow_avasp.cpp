@@ -256,7 +256,7 @@ void AVASP_Get_LDAU_Parameters(string _species,bool &LDAU,vector<string>& vLDAUs
   // ELSE
   if(species=="Np") {
     string message = "LDAU for " + species + " is not implemented yet.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
   }
 
   // LDAU=FALSE; // dont modify
@@ -317,11 +317,11 @@ string AVASP_Get_PseudoPotential_PAW_PBE_KIN(string species) {
         species=="Np" || species=="Pu" || species=="Am" || species=="Cm" || species=="Bk" || species=="Cf" ||
         species=="Es" || species=="Fm" || species=="Md" || species=="No" || species=="Lw") {
       error="not producing Actinides";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, error, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
     }
     if(species=="D" || species=="T") {
       error="not producing heavy hydrogen";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, error, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
     }
   }
 
@@ -428,7 +428,7 @@ string AVASP_Get_PseudoPotential_PAW_PBE_KIN(string species) {
 
   // If not found then UNKNOWN
   error="Potential not found: "+species;
-  throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, error, _VALUE_ILLEGAL_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
 }
 
 // ***************************************************************************
@@ -448,11 +448,11 @@ string AVASP_Get_PseudoPotential_PAW_PBE(string species) {
         species=="Np" || species=="Pu" || species=="Am" || species=="Cm" || species=="Bk" || species=="Cf" ||
         species=="Es" || species=="Fm" || species=="Md" || species=="No" || species=="Lw") {
       error="not producing Actinides";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, error, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
     }
     if(species=="D" || species=="T") {
       error="not producing heavy hydrogen";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, error, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
     }
   }
 
@@ -558,11 +558,11 @@ string AVASP_Get_PseudoPotential_PAW_PBE(string species) {
 
   if(species=="Po") {
     error="No pseudopotential available for "+species;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, error, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
   }
   // If not found then UNKNOWN
   error="Potential not found: "+species;
-  throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, error, _VALUE_ILLEGAL_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
 }
 
 // ***************************************************************************
@@ -6723,7 +6723,7 @@ bool AVASP_ADD_LDAU(_xvasp &xvasp) {
     LDAU=(xvasp.aopts.flag("FLAG::AVASP_LDAU1") || xvasp.aopts.flag("FLAG::AVASP_LDAU2"));
     if(xvasp.aopts.flag("FLAG::AVASP_LDAU1")==TRUE && xvasp.aopts.flag("FLAG::AVASP_LDAU2")==TRUE) {
       string message = "AVASP_ADD_LDAU: you can not be here: xvasp.aopts.flag(\"FLAG::AVASP_LDAU1\")==TRUE && xvasp.aopts.flag(\"FLAG::AVASP_LDAU2\")==TRUE: need to get different LDAU parameterization";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     stringstream aus;
     aus.clear();aus.str(std::string());

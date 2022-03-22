@@ -19,7 +19,7 @@ namespace LATTICE {
     string message = "";
     if(lat.empty()){
       message = "input lattice string is empty";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     if(lat=="CUB" || lat=="cP") return TRUE;
     if(lat=="BCC" || lat=="cI") return TRUE;
@@ -37,7 +37,7 @@ namespace LATTICE {
     if(lat=="TRI" || lat=="aP") return TRUE;
 
     message = "BZ for " + lat + " is not ready";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _VALUE_ILLEGAL_); // you do not want to produce or run stuff that is not ready so you do not clog the computers
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_); // you do not want to produce or run stuff that is not ready so you do not clog the computers
     return FALSE;
   }
 }
@@ -61,7 +61,7 @@ namespace LATTICE {
     if(lattice_type=="FCC"){ return "cF"; }
     if(lattice_type=="BCC"){ return "cI"; }
 
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,lattice_type+" is not a possible lattice type.",_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,lattice_type+" is not a possible lattice type.",_VALUE_ILLEGAL_);
 
     return "";
   }
@@ -79,7 +79,7 @@ namespace LATTICE {
     else if(lattice_centering == 'F'){ return 4; }
     else{
       stringstream message; message << lattice_centering << " is not a possible lattice centering.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__func__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     }
 
     return 1;
@@ -181,7 +181,7 @@ namespace LATTICE {
       LATTICE::SpaceGroup2Lattice(sg,lattice_type,lattice_system);
       if(lattice_type=="error") {
         string message = "Could not find the lattice type for space group=" + aurostd::utype2string(sg) + ". Check the space group input or the LATTICE::Lattice2SpaceGroup() function.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
       if(lattice_type==lattice) vsgn.push_back(sg);
     }
@@ -369,7 +369,7 @@ namespace LATTICE {
       message += "a = " + aurostd::utype2string<double>(a);
       message += ", b = " + aurostd::utype2string<double>(b);
       message += ", c = " + aurostd::utype2string<double>(c);
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     // 4. ORC
     if((sg>=16 && sg <=19) || (sg>=25 && sg<=34) || (sg>=47 && sg<=62)) return "ORC";
@@ -380,7 +380,7 @@ namespace LATTICE {
       message += "a = " + aurostd::utype2string<double>(a);
       message += ", b = " + aurostd::utype2string<double>(b);
       message += ", c = " + aurostd::utype2string<double>(c);
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     // 6. ORCF
     if(sg==22 || sg==42 || sg==43 ||sg==69 || sg==70) {
@@ -393,7 +393,7 @@ namespace LATTICE {
       message += "a = " + aurostd::utype2string<double>(a);
       message += ", b = " + aurostd::utype2string<double>(b);
       message += ", c = " + aurostd::utype2string<double>(c);
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     // 7. ORCI
     if(sg==23 || sg==24 || (sg>=44 && sg<=46) || (sg>=71 && sg<=74)) return "ORCI";
@@ -409,7 +409,7 @@ namespace LATTICE {
       message += "a = " + aurostd::utype2string<double>(a);
       message += ", b = " + aurostd::utype2string<double>(b);
       message += ", c = " + aurostd::utype2string<double>(c);
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     // 10. Trigonal, can be rhombohedral or hexagonal
     if(sg>=143 && sg<=167) {
@@ -713,7 +713,7 @@ namespace LATTICE {
     xmatrix<double> tmp_lattice(3,3), tmp_lattice_orig(3,3); // store temporary lattices
 
     uint n_translations = translation_vectors.size();
-    if(LDEBUG) { cerr << __func__ << " Number of lattice vectors: " << n_translations << endl; }
+    if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Number of lattice vectors: " << n_translations << endl; }
 
     // ---------------------------------------------------------------------------
     // all crystal systems use this loop except for cubic systems
@@ -2286,7 +2286,7 @@ namespace LATTICE {
           message << "==========================================" << endl;
           message << "str_sp.transform_coordinates_original2new: " << str_sp.transform_coordinates_original2new << endl;
           message << "str_sp.rotate_lattice_original2new: " << str_sp.rotate_lattice_original2new;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         }
       }
       else {

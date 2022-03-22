@@ -271,7 +271,7 @@ namespace aurostd {  // namespace aurostd
   bool get_itemized_vector_string_from_input(const vector<string> &argv,const string& s0,vector<string>& tokens,const string& delimiter) {// =":")
     if(aurostd::substring2bool(s0,"|")) {
       string message = "not ported to \"|\"";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __func__, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
     }
     uint icount=0;
     string s0neq=s0,s0equ;aurostd::StringSubst(s0neq,"=","");s0equ=s0neq+"=";
