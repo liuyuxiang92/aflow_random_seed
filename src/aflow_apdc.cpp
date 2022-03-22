@@ -43,7 +43,7 @@ _apdc_data::_apdc_data() {
   // Structure data
   multiplicity.clear();
   conc.clear();
-  excess_energies_atom.clear();
+  excess_energies.clear();
   prob_rand.clear();
 
   // Thermo data
@@ -76,7 +76,7 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
     // Structure data
     multiplicity = b.multiplicity;
     conc = b.conc;
-    excess_energies_atom = b.excess_energies_atom;
+    excess_energies = b.excess_energies;
     prob_rand = b.prob_rand;
     // Thermo data
     prob = b.prob;
@@ -117,16 +117,17 @@ namespace apdc {
 namespace apdc {
   void GetBinodal(_apdc_data& apdc_data) {
     apdc_data.lat_atat = CreateLatForATAT(apdc_data.plattice, apdc_data.elements);
-    apdc_data.vstr_atat = GetATATXstructures(apdc_data.lat_atat, apdc_data.max_num_atoms);
+    apdc_data.vstr_atat = GetATATXstructures(apdc_data.lat_atat, (uint)apdc_data.max_num_atoms);
  //   apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements);
  //   // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
  //   apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, _AFLOW_APDC_MAX_NUM_ATOMS), apdc_data.vstr_aflow);
  //   GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.lat_atat, apdc_data.vstr_aflow, apdc_data.vstr_atat, apdc_data.mapstr);
  //   RunATAT(apdc_data.workdirpath, apdc_data.rundirpath);
     apdc_data.conc = GetConcentration(apdc_data.rundirpath, apdc_data.vstr_atat.size(), apdc_data.elements.size());
-    apdc_data.excess_energies_atom = GetEnergies(apdc_data.rundirpath, apdc_data.vstr_atat.size(), apdc_data.elements.size());
-    apdc_data.multiplicity = CalcMultiplicity(apdc_data.vstr_atat);
-    apdc_data.prob_rand = CalcProbabilitiesRandom(apdc_data.conc, apdc_data.multiplicity);
+    vector<xvector<int> > multiplicity = GetMultiplicity(apdc_data.vstr_atat);
+    apdc_data.multiplicity = multiplicity[1];
+    apdc_data.excess_energies = GetExcessEnergy(apdc_data.rundirpath, apdc_data.conc, multiplicity[0]);
+    apdc_data.prob_rand = GetProbabilityRandom(apdc_data.conc, apdc_data.multiplicity, apdc_data.max_num_atoms);
     
   }
 }
@@ -141,31 +142,32 @@ namespace apdc {
 }
 
 // ***************************************************************************
-// apdc::CalcProbabilitiesRandom
+// apdc::GetProbabilityRandom
 // ***************************************************************************
 // P(X) = g*(Xa^Na)*(Xb*Nb)*(Xc*Nc)*...
 namespace apdc {
-  xvector<double> CalcProbabilitiesRandom(const xmatrix<double>& conc, const xmatrix<int>& multiplicity) {
+  xvector<double> GetProbabilityRandom(const xmatrix<double>& conc, const xvector<int>& multiplicity, const int max_num_atoms) {
     int nstr = conc.rows, nelem = conc.cols;
     xvector<double> prob_rand(nstr);
     for (int i = 1; i <= nstr; i++) {
-      prob_rand(i) = multiplicity(i, 2);
-      for (int j = 1; j <= nelem; j++) {prob_rand(i) *= std::pow(conc(i, j), multiplicity(i, 1) * conc(i, j));}
+      prob_rand(i) = multiplicity(i);
+      for (int j = 1; j <= nelem; j++) {prob_rand(i) *= std::pow(conc(i, j), max_num_atoms);}
     }
     return prob_rand / aurostd::sum(prob_rand);
   }
 }
 
 // ***************************************************************************
-// apdc::CalcMultiplicity
+// apdc::GetMultiplicity
 // ***************************************************************************
 // N = Na+Nb+Nc+...
 // g = N!/(Na!*Nb!*Nc!*...)
 // return [N,g]
 namespace apdc {
-  xmatrix<int> CalcMultiplicity(const vector<xstructure>& vstr) {
+  vector<xvector<int> > GetMultiplicity(const vector<xstructure>& vstr) {
     int nstr = vstr.size();
-    xmatrix<int> multiplicity(nstr, 2);
+    vector<xvector<int> > multiplicity;
+    xvector<int> g(nstr), n(nstr);
     uint natom, fact_prod;
     for (int i = 1; i <= nstr; i++) {
       natom = 0;
@@ -174,9 +176,10 @@ namespace apdc {
         natom += vstr[i - 1].num_each_type[j];
         fact_prod *= aurostd::factorial(vstr[i - 1].num_each_type[j]);
       }
-      multiplicity(i, 1) = natom;
-      multiplicity(i, 2) = aurostd::factorial(natom) / fact_prod;
+      n(i) = natom;
+      g(i) = aurostd::factorial(natom) / fact_prod;
     }
+    multiplicity.push_back(n); multiplicity.push_back(g);
     return multiplicity;
   }
 }
@@ -229,23 +232,34 @@ namespace apdc {
 }
 
 // ***************************************************************************
-// apdc::GetEnergies
+// apdc::GetExcessEnergy
 // ***************************************************************************
 namespace apdc {
-  xvector<double> GetEnergies(const string& rundirpath, const int nstr, const int nelem) {
-    xvector<double> energies(nstr);
+  xvector<double> GetExcessEnergy(const string& rundirpath, const xmatrix<double>& conc, const xvector<int>& natom) {
+    int nstr = conc.rows, nelem = conc.cols;
     vector<string> vinput, tokens;
+    aurostd::file2vectorstring(rundirpath + "/ref_energy.out", vinput);
+    xvector<double> nrg_ref = aurostd::vector2xvector(aurostd::vectorstring2vectordouble(vinput));
+    xvector<double> nrg(nstr);
     aurostd::file2vectorstring(rundirpath + "/fit.out", vinput);
     for (uint line = 0; line < vinput.size(); line++) {
       aurostd::string2tokens(vinput[line], tokens, " ");
-      energies(aurostd::string2utype<int>(tokens[tokens.size() - 1]) + 1) = aurostd::string2utype<double>(tokens[nelem]);
+      nrg(aurostd::string2utype<int>(tokens[tokens.size() - 1]) + 1) = aurostd::string2utype<double>(tokens[nelem]);
     }
     aurostd::file2vectorstring(rundirpath + "/predstr.out", vinput);
     for (uint line = 0; line < vinput.size(); line++) {
       aurostd::string2tokens(vinput[line], tokens, " ");
-      energies(aurostd::string2utype<int>(tokens[tokens.size() - 2]) + 1) = aurostd::string2utype<double>(tokens[nelem]);
+      nrg(aurostd::string2utype<int>(tokens[tokens.size() - 2]) + 1) = aurostd::string2utype<double>(tokens[nelem]);
     }
-    return energies;
+    // Convert D_j = E_j/n_j - \sum(X_k*E0_k) ==> D_j = E_j - \sum(X_k*E0_k)
+    double nrg_macro;
+    for (int i = 1; i <= nstr; i++) {
+      nrg_macro = aurostd::sum(conc.getmat(i, i, 1, nelem, 1, 1) * nrg_ref);
+      nrg(i) += nrg_macro;
+      nrg(i) *= natom(i);
+      nrg(i) -= nrg_macro;
+    }
+    return nrg;
   }
 }
 
