@@ -1995,6 +1995,7 @@ namespace aurostd {
   // ***************************************************************************
   bool DirectoryLocked(string directory,string LOCK) {
     if(FileExist(directory+"/"+LOCK)) return TRUE;
+    if(FileExist(directory+"/"+LOCK+_LOCK_LINK_SUFFIX_)) return TRUE;
     if(FileExist(directory+"/"+LOCK+".xz")) return TRUE;
     if(FileExist(directory+"/"+LOCK+".gz")) return TRUE;
     if(FileExist(directory+"/"+LOCK+".bz2")) return TRUE;
@@ -2106,6 +2107,42 @@ namespace aurostd {
     aurostd::execute(command);
     return TRUE;
   }
+
+  // ***************************************************************************
+  // Function aurostd::LinkFileAtomic
+  // ***************************************************************************
+  // Simon Divilov
+  // Create a symbolic or hard link of a file using C++ functions
+  bool LinkFileAtomic(const string& from,const string& to,bool soft) {
+    int fail=0;
+    string from_clean=CleanFileName(from),to_clean=CleanFileName(to);
+    if(from_clean.empty() || to_clean.empty()) {return FALSE;}
+    if(soft) {
+      fail = symlink(from_clean.c_str(),to_clean.c_str());
+    }
+    else {
+      fail = link(from_clean.c_str(),to_clean.c_str());
+    }
+    if(fail) {
+      if(errno==EEXIST) {
+        return FALSE;
+      }
+      else {
+        string message = "Error linking "+from_clean+" -> "+to_clean+" | errno="+aurostd::utype2string<int>(errno);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_ERROR_);
+      }
+    }
+    else {
+      return TRUE;
+    }
+  }
+
+  // ***************************************************************************
+  // Function aurostd::UnlinkFile
+  // ***************************************************************************
+  // Simon Divilov
+  // Unlink file using C++ functions
+  bool UnlinkFile(const string& link) {return (unlink(CleanFileName(link).c_str())==0);}
 
   //CO START
   //***************************************************************************//
@@ -2743,7 +2780,6 @@ namespace aurostd {
       ifstream& file_to_check) {
     string FileName(CleanFileName(_FileName));
     if(!file_to_check) {
-
       string message = "In routine " + routine + ". Cannot open file " + FileName + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_ERROR_);
     }
@@ -6577,7 +6613,6 @@ namespace aurostd  {
   vector<vector<double> > NormalizeAndSum3DVector(const vector<vector<vector<double> > >& vvva, const vector<double>& vFi) {
     //normalize DOS and sum
     if(vvva.size()!=vFi.size()) {
-
       string message = "Vector sizes are not equal.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }

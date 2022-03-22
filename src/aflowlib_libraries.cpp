@@ -5599,7 +5599,7 @@ namespace aflowlib {
           }
           data.ael_stiffness_tensor = tensor;
         } catch (aurostd::xerror& e) {
-          std::cout << MESSAGE << " ERROR - " << e.what() << std::endl;
+          std::cout << MESSAGE << " ERROR - " << e.buildMessageString() << std::endl;
         }
       } else {
         std::cout << MESSAGE << " WARNING - No stiffness tensor found in aflow.ael.out." << std::endl;
@@ -5630,7 +5630,7 @@ namespace aflowlib {
           }
           data.ael_compliance_tensor = tensor;
         } catch (aurostd::xerror& e) {
-          std::cout << MESSAGE << " ERROR - " << e.what() << std::endl;
+          std::cout << MESSAGE << " ERROR - " << e.buildMessageString() << std::endl;
         }
       } else {
         std::cout << MESSAGE << " WARNING - No compliance tensor found in aflow.ael.out." << std::endl;
@@ -7041,23 +7041,6 @@ namespace aflowlib {
   }
 }
 
-#ifdef AFLOW_MULTITHREADS_ENABLE
-
-namespace aflowlib {
-  void XPLUG_Directories_ok(uint i, uint ntasks, const deque<string>& vdirsIN, deque<string>& vdirsOUT, deque<bool>& vok, std::mutex& m) {
-    string dir = "";
-    stringstream oss;
-    bool ok = XPLUG_Directory_ok(vdirsIN[i], dir, i, ntasks, i, oss);
-    std::lock_guard<std::mutex> lk(m);
-    vdirsOUT[i] = dir;
-    vok[i] = ok;
-    std::cerr << oss.str();
-    std::cerr.flush();
-  }
-}
-
-#endif
-
 namespace aflowlib {
   bool XPLUG_CHECK_ONLY(const vector<string>& argv) {  //CO20200501
     deque<string> vdirsOUT,vzips,vcleans;
@@ -7097,12 +7080,6 @@ namespace aflowlib {
     for(uint i=0;i<vdirsIN.size();i++) { vok.push_back(TRUE);vrun.push_back(i); }
     //  if(LDEBUG) cerr << soliloquy << " [2]" << endl;
 
-#ifdef AFLOW_MULTITHREADS_ENABLE
-    xthread::xThread xt(NUM_THREADS);
-    uint ntasks = vdirsIN.size();
-    std::mutex m;
-    xt.run(ntasks, XPLUG_Directories_ok, ntasks, vdirsIN, vdirsOUT, vok, m);
-#else
     if((int) vdirsIN.size()<=NUM_THREADS) NUM_THREADS=(uint) vdirsIN.size();        // SAFETY
     //  if(LDEBUG) cerr << soliloquy << " [3]" << endl;
 
@@ -7139,7 +7116,6 @@ namespace aflowlib {
       for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++) pthread_join(AFLOW_PTHREADS::vpthread[ithread],NULL); // flush threads
       //  if(LDEBUG) cerr << soliloquy << " [10]" << endl;
     }
-#endif
 
     // has OK. now do the counting
     for(uint i=0;i<vdirsIN.size();i++) {

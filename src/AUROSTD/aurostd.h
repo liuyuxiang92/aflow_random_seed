@@ -241,7 +241,7 @@ typedef unsigned uint;
 
 //extern bool QUIET,DEBUG;
 //extern class _XHOST XHOST;
-#include "../aflow.h"     //needed for XHOST
+#include "../aflow.h"     //needed for XHOST //SD20220224 - also for _LOCK_LINK_SUFFIX_
 //#include "../SQLITE/sqlite3.h"  // OBSOLETE ME20191228 - not used
 
 //CO20200624 START - adding from Jahnatek
@@ -462,6 +462,8 @@ namespace aurostd {
   string ProperFileName(const string& fileIN);
   bool CopyFile(const string& file_from,const string& file_to);
   bool LinkFile(const string& file_from,const string& file_to);
+  bool LinkFileAtomic(const string& file_from,const string& file_to,bool soft=true); //SD20220208
+  bool UnlinkFile(const string& file_link); //SD20220208
   //CO START
   bool MatchCompressed(const string& CompressedFileName,const string& FileNameOUT);
   // [OBSOLETE]  bool DecompressFile(const string& CompressedFileName);
