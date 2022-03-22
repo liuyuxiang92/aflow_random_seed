@@ -250,7 +250,7 @@ namespace aurostd {
   string httpPercentEncodingSelected(const string &raw_str, const string &characters){
 
     bool LDEBUG = (false || XHOST.DEBUG || _DEBUG_XHTTP_);
-    string soliloquy = XPID + "aurostd::httpPercentEncoding():";
+    string soliloquy = XPID + "aurostd::httpPercentEncodingSelected():";
 
     const char *reserved=characters.c_str();
 
@@ -470,7 +470,7 @@ namespace aurostd {
         }
       } else if (number_of_tries < max_number_of_tries) {
         cerr << soliloquy << " Retry failed GET in 5s (" << number_of_tries << " of " << max_number_of_tries << ")" << endl;
-        usleep(5000);
+        aurostd::sleep(5);
         continue;
       } else {
         cerr << soliloquy << " GET request failed after " << number_of_tries << " tries." << endl;
