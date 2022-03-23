@@ -2702,8 +2702,6 @@ bool CeramGenTest(ostream& oss=cout);
 bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool EgapTest(ostream& oss=cout);
 bool EgapTest(ofstream& FileMESSAGE,ostream& oss=cout);
-bool gcdTest(ostream& oss=cout);
-bool gcdTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool smithTest(ostream& oss=cout);
 bool smithTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool PrototypeGeneratorTest(ostream& oss=cout, bool check_symmetry=false, bool check_uniqueness=false); //DX20200928
@@ -5425,17 +5423,24 @@ namespace unittest {
 
       void displayResult(const xcheck& xchk);
       template <typename utype>
-      void check(const bool passed, const utype &calculated, const utype &expected, const string &check_function,
-          const string checkDescription, uint &passed_checks, vector<string> &results);
+      void check(const bool passed, const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
+          const string& checkDescription, uint& passed_checks, vector<string>& results);
       template <typename utype>
-      void checkEqual(const utype &calculated, const utype &expected, const string &check_function,
-          const string check_description, uint &passed_checks, vector<string> &results);
-      void checkEqual(const string &calculated, const string &expected, const string &check_function,
-          const string check_description, uint &passed_checks, vector<string> &results);
-      void checkEqual(const bool calculated, const bool expected, const string &check_function,
-          const string check_description, uint &passed_checks, vector<string> &results);
-      void checkSimilar(const double calculated, const double expected, const string &check_function,
-          const string &check_description, uint &passed_checks, vector<string> &results, const double relative=1E-10);
+      void check(const bool passed, const utype& calculated, const utype& expected, const string& check_function,
+          const string& checkDescription, uint& passed_checks, vector<string>& results);
+
+      template <typename utype>
+      void checkEqual(const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
+          const string& check_description, uint& passed_checks, vector<string>& results);
+      template <typename utype>
+      void checkEqual(const utype& calculated, const utype& expected, const string& check_function,
+          const string& check_description, uint& passed_checks, vector<string>& results);
+      void checkEqual(const string& calculated, const string& expected, const string& check_function,
+          const string& check_description, uint& passed_checks, vector<string>& results);
+      void checkEqual(const bool calculated, const bool expected, const string& check_function,
+          const string& check_description, uint& passed_checks, vector<string>& results);
+      void checkSimilar(const double calculated, const double expected, const string& check_function,
+          const string& check_description, uint& passed_checks, vector<string>& results, const double relative=1E-10);
 
       // Test functions ---------------------------------
 

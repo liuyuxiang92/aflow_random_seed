@@ -304,8 +304,14 @@ namespace unittest {
   }
 
   template <typename utype>
-  void UnitTest::check(const bool passed, const utype &calculated, const utype &expected, const string &check_function,
-      const string check_description, uint &passed_checks, vector<string> &results){
+  void UnitTest::check(const bool passed, const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
+    const string& check_description, uint& passed_checks, vector<string>& results) {
+    check(passed, aurostd::joinWDelimiter(calculated, ","), aurostd::joinWDelimiter(expected, ","), check_function, check_description, passed_checks, results);
+  }
+
+  template <typename utype>
+  void UnitTest::check(const bool passed, const utype& calculated, const utype& expected, const string& check_function,
+      const string& check_description, uint& passed_checks, vector<string>& results){
     stringstream result;
     uint check_num = results.size() + 1;
     if (passed) {
@@ -329,24 +335,33 @@ namespace unittest {
   }
 
   template <typename utype>
-  void UnitTest::checkEqual(const utype &calculated, const utype &expected, const string &check_function,
-      const string check_description, uint &passed_checks, vector<string> &results){
+  void UnitTest::checkEqual(const vector<utype>& calculated, const vector<utype>& expected, const string& check_function, const string& check_description, uint& passed_checks, vector<string>& results) {
+    bool passed = (calculated.size() == expected.size());
+    for (uint i = 0; i < calculated.size() && passed; i++) {
+      passed = (calculated[i] == expected[i]);
+    }
+    check(passed, calculated, expected, check_function, check_description, passed_checks, results);
+  }
+
+  template <typename utype>
+  void UnitTest::checkEqual(const utype& calculated, const utype& expected, const string& check_function,
+      const string& check_description, uint& passed_checks, vector<string>& results) {
     bool passed = (aurostd::isequal(calculated, expected));
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
   }
-  void UnitTest::checkEqual(const string &calculated, const string &expected, const string &check_function,
-      const string check_description, uint &passed_checks, vector<string> &results){
+  void UnitTest::checkEqual(const string& calculated, const string& expected, const string& check_function,
+      const string& check_description, uint & passed_checks, vector<string>& results) {
     bool passed = (calculated == expected);
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
   }
-  void UnitTest::checkEqual(const bool calculated, const bool expected, const string &check_function,
-      const string check_description, uint &passed_checks, vector<string> &results){
+  void UnitTest::checkEqual(const bool calculated, const bool expected, const string& check_function,
+      const string& check_description, uint& passed_checks, vector<string>& results) {
     bool passed = (calculated == expected);
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
   }
 
-  void UnitTest::checkSimilar(const double calculated, const double expected, const string &check_function,
-      const string &check_description, uint &passed_checks, vector<string> &results, const double relative){
+  void UnitTest::checkSimilar(const double calculated, const double expected, const string& check_function,
+      const string& check_description, uint& passed_checks, vector<string>& results, const double relative) {
     bool passed = (std::abs(expected - calculated) <= expected * relative);
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
   }
@@ -366,6 +381,9 @@ namespace unittest {
 
     int calculated_int = 0;
     int expected_int = 0;
+
+    vector<int> calculated_vint;
+    vector<int> expected_vint;
 
     // ---------------------------------------------------------------------------
     // Check | double2fraction conversion //DX20210908
@@ -421,6 +439,40 @@ namespace unittest {
   
     calculated_dbl = aurostd::mod_floored(11.11, (double)INFINITY);
     checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | gcd //CO20190520
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::GCD()";
+    int a=0,b=0,x1=0,y1=0,gcd=0;
+
+    check_description = "gcd(25,15)";
+    a=25;b=15;
+    expected_vint = {5, -1, 2};
+    aurostd::GCD(a,b,gcd,x1,y1);
+    calculated_vint = {gcd, x1, y1};
+    checkEqual(calculated_vint, expected_vint, check_function, check_description, passed_checks, results);
+
+    check_description = "gcd(25,0)";
+    a=25;b=0;
+    expected_vint = {25, 1, 0};
+    aurostd::GCD(a,b,gcd,x1,y1);
+    calculated_vint = {gcd, x1, y1};
+    checkEqual(calculated_vint, expected_vint, check_function, check_description, passed_checks, results);
+
+    check_description = "gcd(0,15)";
+    a=0;b=15;
+    expected_vint = {15, 0, 1};
+    aurostd::GCD(a,b,gcd,x1,y1);
+    calculated_vint = {gcd, x1, y1};
+    checkEqual(calculated_vint, expected_vint, check_function, check_description, passed_checks, results);
+
+    check_description = "gcd(-5100,30450)";
+    a=-5100;b=30450;
+    expected_vint = {150, -6, -1};
+    aurostd::GCD(a,b,gcd,x1,y1);
+    calculated_vint = {gcd, x1, y1};
+    checkEqual(calculated_vint, expected_vint, check_function, check_description, passed_checks, results);
   }
 
   void UnitTest::xvectorTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
@@ -1370,69 +1422,6 @@ bool EgapTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
 
   message << "Egap test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
   return true;
-}
-
-bool gcdTest(ostream& oss){ofstream FileMESSAGE;return gcdTest(FileMESSAGE,oss);}  //CO20190520
-bool gcdTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
-  string soliloquy = XPID + "gcdTest():";
-  bool LDEBUG=TRUE; // TRUE;
-  stringstream message;
-  _aflags aflags;aflags.Directory=".";
-
-  message << "Performing gcd test";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-
-  int a=0,b=0,x1=0,y1=0,gcd=0;
-
-  a=25;b=15;
-  aurostd::GCD(a,b,gcd,x1,y1);
-  if(!(gcd==5 && x1==-1 && y1==2)){
-    if(LDEBUG){
-      cerr << soliloquy << " gcd(25,15) failed" << endl;
-      cerr << soliloquy << " gcd=" << gcd << endl;
-      cerr << soliloquy << " x=" << x1 << endl;
-      cerr << soliloquy << " y=" << y1 << endl;
-    }
-    return FALSE;
-  }
-
-  a=25;b=0;
-  aurostd::GCD(a,b,gcd,x1,y1);
-  if(!(gcd==25 && x1==1 && y1==0)){
-    if(LDEBUG){
-      cerr << soliloquy << " gcd(25,0) failed" << endl;
-      cerr << soliloquy << " gcd=" << gcd << endl;
-      cerr << soliloquy << " x=" << x1 << endl;
-      cerr << soliloquy << " y=" << y1 << endl;
-    }
-    return FALSE;
-  }
-
-  a=0;b=15;
-  aurostd::GCD(a,b,gcd,x1,y1);
-  if(!(gcd==15 && x1==0 && y1==1)){
-    if(LDEBUG){
-      cerr << soliloquy << " gcd(0,15) failed" << endl;
-      cerr << soliloquy << " gcd=" << gcd << endl;
-      cerr << soliloquy << " x=" << x1 << endl;
-      cerr << soliloquy << " y=" << y1 << endl;
-    }
-    return FALSE;
-  }
-
-  a=-5100;b=30450;
-  aurostd::GCD(a,b,gcd,x1,y1);
-  if(!(gcd==150 && x1==-6 && y1==-1)){
-    if(LDEBUG){
-      cerr << soliloquy << " gcd(-5100,30450) failed" << endl;
-      cerr << soliloquy << " gcd=" << gcd << endl;
-      cerr << soliloquy << " x=" << x1 << endl;
-      cerr << soliloquy << " y=" << y1 << endl;
-    }
-    return FALSE;
-  }
-
-  message << "gcd test successful";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
-  return TRUE; //CO20180419
 }
 
 bool smithTest(ostream& oss){ofstream FileMESSAGE;return smithTest(FileMESSAGE,oss);}  //CO20190520
