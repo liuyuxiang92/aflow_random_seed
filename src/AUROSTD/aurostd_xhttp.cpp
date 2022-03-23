@@ -12,9 +12,23 @@
 
 #include "aurostd_xhttp.h"
 
-#define _DEBUG_XHTTP_ false
+#define _DEBUG_XHTTP_ true
 
 namespace aurostd {
+  /// If IPv6 is needed in the future it would be best to use
+  /// inet_ntop from <arpa/inet.h>
+  std::string httpGetIP4String(unsigned int ip)
+  {
+    char ip_str[20];
+    unsigned char bytes[4];
+    // move the 4 bytes into the lowest byte and isolate it with &0xFF
+    bytes[0] = ip & 0xFF; // technical (ip >> 0), but its already the lowest byte
+    bytes[1] = (ip >> 8) & 0xFF;
+    bytes[2] = (ip >> 16) & 0xFF;
+    bytes[3] = (ip >> 24) & 0xFF;
+    std::sprintf(ip_str, "%d.%d.%d.%d", bytes[0], bytes[1], bytes[2], bytes[3]);
+    return (std::string) ip_str;
+  }
 
   URL httpConstructURL(const std::string &host, const std::string &path="/", const std::string &query="", const unsigned int &port=80){
     URL url;
@@ -338,7 +352,7 @@ namespace aurostd {
 
     in_addr_t ip_address;
     struct sockaddr_in socket_entry{};
-    char ip_address_str[20];
+    std::string ip_address_str; // prepared for detailed debugging - see below
     char *request;
     int request_len;
     int socket_file_descriptor;
@@ -370,12 +384,8 @@ namespace aurostd {
       return false;
     }
 
-    ip_address = inet_addr(inet_ntoa(*(struct in_addr *) *(host_entry->h_addr_list)));
-    if (ip_address == (in_addr_t) - 1) {
-      cerr << soliloquy << " Failed to generate IP address for '" << url.host << "'!" << endl;
-      return false;
-    }
-    inet_ntop(AF_INET, &ip_address, ip_address_str, sizeof(ip_address_str));
+    ip_address = (*(struct in_addr *) *(host_entry->h_addr_list)).s_addr;
+    ip_address_str = httpGetIP4String(ip_address);
 
     socket_entry.sin_addr.s_addr = ip_address;
     socket_entry.sin_family = AF_INET;
