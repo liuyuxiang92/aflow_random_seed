@@ -13,8 +13,8 @@
 #include "aflow_apdc.h"
 
 #define _AFLOW_APDC_ALAT 4.0
-#define _AFLOW_APDC_MAX_NUM_ATOMS 4
-#define _AFLOW_APDC_MIN_SLEEP 2
+// Strings for I/O
+#define _APDC_STR_OPT_ string("[AFLOW_APDC]")
 
 // ###############################################################################
 //            AFLOW Automatic Phase Diagram Constructor (APDC) (2022-)
@@ -26,12 +26,17 @@
 // Constructor
 _apdc_data::_apdc_data() {
   // Input data
+  num_threads = 0;
   workdirpath = "";
   rootdirpath = "";
   plattice = "";
   elements.clear();
+  aflow_max_num_atoms = 0;
   max_num_atoms = 0;
-
+  conc_macro_npts.clear();
+  conc_macro.clear();
+  temp_npts = 0;
+  temp.clear();
   // Derived data
   alloyname = "";
   rundirpath = "";
@@ -39,16 +44,13 @@ _apdc_data::_apdc_data() {
   lat_atat = "";
   vstr_atat.clear();
   mapstr.clear();
-
   // Structure data
   multiplicity.clear();
   conc.clear();
   excess_energies.clear();
-  prob_rand.clear();
-
   // Thermo data
+  prob_rand.clear();
   prob.clear();
-  
 }
 
 // Destructor
@@ -62,10 +64,16 @@ void _apdc_data::free() {
 const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
   if (this != &b) {
     // Input data
+    num_threads = b.num_threads;
+    workdirpath = b.workdirpath;
     rootdirpath = b.rootdirpath;
     plattice = b.plattice;
     elements = b.elements;
     max_num_atoms = b.max_num_atoms;
+    conc_macro_npts = b.conc_macro_npts;
+    conc_macro = b.conc_macro;
+    temp_npts = b.temp_npts;
+    temp = b.temp;
     // Derived data
     alloyname = b.alloyname;
     rundirpath = b.rundirpath;
@@ -77,8 +85,8 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
     multiplicity = b.multiplicity;
     conc = b.conc;
     excess_energies = b.excess_energies;
-    prob_rand = b.prob_rand;
     // Thermo data
+    prob_rand = b.prob_rand;
     prob = b.prob;
   }
   return *this;
@@ -90,24 +98,59 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
 namespace apdc {
   void GetPhaseDiagram(_apdc_data& apdc_data) {
     // Clean-up input data and check for errors
+    if (XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && !(XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX"))) {
+      apdc_data.num_threads = aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));
+    }
+    if (apdc_data.num_threads < 1) {apdc_data.num_threads = 1;}
     apdc_data.workdirpath = aurostd::getPWD();
     apdc_data.rootdirpath = aurostd::CleanFileName(apdc_data.rootdirpath);
     apdc_data.plattice = aurostd::tolower(apdc_data.plattice);
     aurostd::sort_remove_duplicates(apdc_data.elements);
-    if (!aurostd::DirectoryMake(apdc_data.rootdirpath)) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetPhaseDiagram():", "Cannot create directory", _FILE_ERROR_);
-    }
-    if (apdc_data.plattice != "fcc" && apdc_data.plattice != "bcc" && apdc_data.plattice != "hcp") {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetPhaseDiagram():", "Invalid parent lattice", _INPUT_ILLEGAL_);
-    }
-    if (apdc_data.elements.size() < 2) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetPhaseDiagram():", "Alloy must be at least binary", _VALUE_ERROR_);
-    }
+    ErrorChecks(apdc_data);
     // Binodal
-    for (uint i = 0; i < apdc_data.elements.size(); i++) {apdc_data.alloyname += apdc_data.elements[i];}
     apdc_data.rundirpath += apdc_data.rootdirpath + "/" + pflow::arity_string(apdc_data.elements.size(), false, false) + "/" + apdc_data.plattice + "/" + apdc_data.alloyname;
     aurostd::DirectoryMake(apdc_data.rundirpath);
     GetBinodal(apdc_data);
+  }
+
+ void GetPhaseDiagram(const string& aflowin, bool elements_only) {
+    _apdc_data apdc_data;
+    if (elements_only) { // command line call
+      aurostd::string2tokens(aflowin, apdc_data.elements, ",");
+      apdc_data.rootdirpath = aurostd::getPWD();
+      apdc_data.plattice = DEFAULT_APDC_PLATTICE;
+      apdc_data.aflow_max_num_atoms = DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS;
+      apdc_data.max_num_atoms = DEFAULT_APDC_MAX_NUM_ATOMS;
+    }
+    else {
+      cerr<<aflowin<<endl;
+    }
+    GetPhaseDiagram(apdc_data);
+ }
+
+ void GetPhaseDiagram(istream& infile) {string aflowin; std::getline(infile, aflowin); GetPhaseDiagram(aflowin, false);}
+}
+
+// ***************************************************************************
+// apdc::ErrorChecks
+// ***************************************************************************
+namespace apdc {
+  void ErrorChecks(_apdc_data& apdc_data) {
+    if (!aurostd::DirectoryMake(apdc_data.rootdirpath)) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "ErrorChecks():", "Cannot create directory", _FILE_ERROR_);
+    }
+    if (apdc_data.plattice != "fcc" && apdc_data.plattice != "bcc" && apdc_data.plattice != "hcp") {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "ErrorChecks():", "Invalid parent lattice", _INPUT_ILLEGAL_);
+    }
+    if (apdc_data.elements.size() < 2) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "ErrorChecks():", "Alloy must be at least binary", _VALUE_ERROR_);
+    }
+    for (uint i = 0; i < apdc_data.elements.size(); i++) {
+      if (!xelement::xelement::isElement(apdc_data.elements[i])) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "ErrorChecks():", "Element \"" + apdc_data.elements[i] + "\" is invalid", _INPUT_ILLEGAL_);
+      }
+      apdc_data.alloyname += apdc_data.elements[i];
+    }
   }
 }
 
@@ -118,11 +161,11 @@ namespace apdc {
   void GetBinodal(_apdc_data& apdc_data) {
     apdc_data.lat_atat = CreateLatForATAT(apdc_data.plattice, apdc_data.elements);
     apdc_data.vstr_atat = GetATATXstructures(apdc_data.lat_atat, (uint)apdc_data.max_num_atoms);
- //   apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements);
+    apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads);
  //   // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
- //   apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, _AFLOW_APDC_MAX_NUM_ATOMS), apdc_data.vstr_aflow);
- //   GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.lat_atat, apdc_data.vstr_aflow, apdc_data.vstr_atat, apdc_data.mapstr);
- //   RunATAT(apdc_data.workdirpath, apdc_data.rundirpath);
+    apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, apdc_data.aflow_max_num_atoms), apdc_data.vstr_aflow, apdc_data.num_threads);
+    GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.lat_atat, apdc_data.vstr_aflow, apdc_data.vstr_atat, apdc_data.mapstr);
+    RunATAT(apdc_data.workdirpath, apdc_data.rundirpath);
     apdc_data.conc = GetConcentration(apdc_data.rundirpath, apdc_data.vstr_atat.size(), apdc_data.elements.size());
     vector<xvector<int> > multiplicity = GetMultiplicity(apdc_data.vstr_atat);
     apdc_data.multiplicity = multiplicity[1];
@@ -286,7 +329,7 @@ namespace apdc {
         aurostd::RemoveFile(tmpfile);
         throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "RunATAT():", "mmaps is taking too long to predict structures, dir=" + rundirpath, _RUNTIME_ERROR_);
       }
-      aurostd::Sleep(_AFLOW_APDC_MIN_SLEEP);
+      aurostd::Sleep(_APDC_MIN_SLEEP_);
       aurostd::file2string(rundirpath + "/maps.log", logstring);
     }
     aurostd::RemoveFile(tmpfile);
@@ -321,7 +364,7 @@ namespace apdc {
 // apdc::GetAFLOWXstructures
 // ***************************************************************************
 namespace apdc {
-  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, bool keep_all, uint num_proc) {
+  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_proc, bool keep_all) {
     vector<xstructure> vstr;
     vector<string> vstrlabel;
     string aflowlib, aflowurl;
@@ -462,7 +505,7 @@ namespace apdc {
 // apdc::GetMapForXstructures
 // ***************************************************************************
 namespace apdc {
-  vector<int> GetMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, uint num_proc) {
+  vector<int> GetMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_proc) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     vector<int> mapstr;
     bool match;

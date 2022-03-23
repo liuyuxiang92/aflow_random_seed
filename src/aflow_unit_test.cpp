@@ -1342,27 +1342,3 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
 
   return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
 }
-
-//SD20220202
-bool APDCTest(ostream& oss){ofstream FileMESSAGE;return APDCTest(FileMESSAGE,oss);}
-bool APDCTest(ofstream& FileMESSAGE, ostream& oss) {
-  _apdc_data apdc_data;
-  // logger
-  string function_name = XPID + "APDCTest():";
-  stringstream message;
-  _aflags aflags;
-  message << "Testing APDC";
-  // initalize data
-  apdc_data.rootdirpath = "/home/sd453/tmp/APDC_test/";
-  apdc_data.plattice = "FCC";
-  apdc_data.elements = vector<string>(2);
-  apdc_data.elements[0] = "Pt";
-  apdc_data.elements[1] = "Au";
-  apdc_data.max_num_atoms = 8;
-  // run functions
-  apdc::GetPhaseDiagram(apdc_data);
-
-  // return
-  pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  return TRUE;
-}

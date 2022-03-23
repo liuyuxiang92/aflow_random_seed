@@ -237,7 +237,6 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_AtomicEnvironment|--AtomicEnvironment_test")) {return (AtomicEnvironmentTest(cout)?0:1);}  //HE20210511
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_aurostd|--aurostd_test")) {return (aurostdTest(cout)?0:1);} //HE20210512
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_APDC|--APDC_test")) {return (APDCTest(cout)?0:1);}  //SD20220202
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_cif_parser|--cif_parser_test")) {return (cifParserTest(cout)?0:1);}
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 

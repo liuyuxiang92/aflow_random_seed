@@ -29,6 +29,7 @@
 #include "aflow_gfa.h" //DF20190329
 #include "aflow_cce.h" //RF20200203
 #include "APL/aflow_apl.h"  //ME20200330
+#include "aflow_apdc.h" //SD20220323
 
 extern double NearestNeighbor(const xstructure& a);
 
@@ -98,6 +99,10 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   }
   //DX20190206 - add AFLUX functionality to command line - END
   vpflow.flag("ANALYZEDB", aurostd::args2flag(argv,cmds,"--analyze_database"));  //ME20191001
+
+  //SD20220323 - APDC command line functionality - START
+  vpflow.args2addattachedscheme(argv,cmds,"APDC::CALC_PHASE_DIAGRAM","--calc_phase_diagram=|--calc_phasediagram=","");
+  //SD20220323 - APDC command line functionality - END
 
   // Commands for serializing bands and DOS data to JSON
   vpflow.args2addattachedscheme(argv,cmds,"DOSDATA2JSON","--dosdata2json=","./"); //EG
@@ -1724,6 +1729,8 @@ namespace pflow {
       if(vpflow.flag("AFLOWLIB_AURL2LOOP")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AURL2LOOP"),"AFLOWLIB_AURL2LOOP"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWSYM_PYTHON")){ SYM::writePythonScript(cout); _PROGRAMRUN=true;} //DX20210202
       if(vpflow.flag("AFLUX")) {cout << aflowlib::AFLUXCall(vpflow) << endl; _PROGRAMRUN=true;}  //DX20190206 - add AFLUX command line functionality
+      if(vpflow.flag("APDC::CALC_PHASE_DIAGRAM")) {apdc::GetPhaseDiagram(vpflow.getattachedscheme("APDC::CALC_PHASE_DIAGRAM"), true); _PROGRAMRUN=true;} //SD20220323
+      if(vpflow.flag("APDC::CALC_PHASE_DIAGRAM_TODO")) {apdc::GetPhaseDiagram(std::cin); _PROGRAMRUN=true;} //SD20220323 - CHANGE LATER
       if(vpflow.flag("ATAT")) {cout << input2ATATxstr(cin); _PROGRAMRUN=true;} //SD20220123
       // B
       if(vpflow.flag("BANDGAP_WAHYU")) {AConvaspBandgap(argv); _PROGRAMRUN=true;}

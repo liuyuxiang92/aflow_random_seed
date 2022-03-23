@@ -10,7 +10,8 @@
 #ifndef _AFLOW_APDC_H_
 #define _AFLOW_APDC_H_
 
-#define _AFLOW_APDC_NUM_PROC 8
+#define _APDC_NUM_PROC_ 8
+#define _APDC_MIN_SLEEP_ 2
 
 // Class _apdc data
 class _apdc_data {
@@ -20,11 +21,17 @@ class _apdc_data {
     const _apdc_data& operator=(const _apdc_data &b);
     
     // Input data
+    int num_threads;
     string workdirpath;
     string rootdirpath;
     string plattice;
     vector<string> elements;
+    int aflow_max_num_atoms;
     int max_num_atoms;
+    vector<int> conc_macro_npts;
+    xmatrix<double> conc_macro; // unitless
+    int temp_npts;
+    vector<double> temp;
 
     // Derived data
     string alloyname;
@@ -36,15 +43,13 @@ class _apdc_data {
 
     // Structure data
     xvector<int> multiplicity;
-    xmatrix<double> conc;
+    xmatrix<double> conc; // unitless
     xvector<double> excess_energies; // eV
-    xvector<double> prob_rand;
 
     // Thermo data
+    xvector<double> prob_rand;
     xvector<double> prob;
     
-  
-
   private:
   void free();
 };
@@ -52,6 +57,9 @@ class _apdc_data {
 // Namespace for functions used by APDC
 namespace apdc {
   void GetPhaseDiagram(_apdc_data& apdc_data);
+  void GetPhaseDiagram(const string& aflowin, bool elements_only);
+  void GetPhaseDiagram(istream& infile);
+  void ErrorChecks(_apdc_data& apdc_data);
   void GetBinodal(_apdc_data& apdc_data);
   void GetSpinodal(_apdc_data& apdc_data);
   void RunATAT(const string& workdirpath, const string& rundirpath);
@@ -61,10 +69,10 @@ namespace apdc {
   xmatrix<double> GetConcentration(const vector<string>& elements, const vector<xstructure>& vstr);
   xmatrix<double> GetConcentration(const string& rundirpath, const int nstr, const int nelem);
   xvector<double> GetExcessEnergy(const string& rundirpath, const xmatrix<double>& conc, const xvector<int>& natom);
-  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, bool keep_all=true, uint num_proc=_AFLOW_APDC_NUM_PROC);
+  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_threads, bool keep_all=true);
   string CreateLatForATAT(const string& plattice, const vector<string>& elements);
   vector<xstructure> GetATATXstructures(const string& rundirpath, const uint max_num_atoms);
-  vector<int> GetMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, uint num_proc=_AFLOW_APDC_NUM_PROC);
+  vector<int> GetMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads);
 }
 
 #endif
