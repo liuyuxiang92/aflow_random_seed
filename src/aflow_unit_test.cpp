@@ -155,7 +155,6 @@ namespace unittest {
   }
 
   bool UnitTest::runTestSuites(const vector<string>& unit_tests_in) {
-    string function_name = XPID + "runUnitTests():";
     stringstream  message;
     // Create task lists (groups or individual tests)
     // unit_test is the individual small tests over
@@ -174,7 +173,7 @@ namespace unittest {
         break;
       } else if (!isgroup && (test_functions.find(test) != test_functions.end())) {
         message << "Skipping unrecognized test name " << test << ".";
-        pflow::logger(_AFLOW_FILE_NAME_, function_name, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       } else if (isgroup && !aurostd::WithinList(tasks, test)) {
         tasks.push_back(test);
         for (const string& member : test_groups[test]) {
@@ -188,7 +187,7 @@ namespace unittest {
     uint ntasks = tasks.size();
     if (ntasks == 0) {
       message << "No unit tests to run.";
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
       return true;
     }
 
@@ -213,17 +212,16 @@ namespace unittest {
 
     if (nsuccess == ntasks) {
       message << "Unit tests passed successfully (passsing " << ntasks << " tests).";
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
     } else {
       message << "Some unit tests failed (" << (ntasks - nsuccess) << " of " << ntasks << " failed).";
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     }
-    pflow::logger(_AFLOW_FILE_NAME_, function_name, summary, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, summary, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_);
     return (nsuccess == ntasks);
   }
 
   void UnitTest::runUnitTest(vector<string>::iterator& it, const vector<string>& tasks) {
-    string function_name = XPID + "UnitTest::runUnitTest():";
     const string& test_name = (*it);
     xcheck& test = test_functions[test_name];
     resetUnitTest(test);
@@ -255,10 +253,10 @@ namespace unittest {
         stringstream message;
         if (nsuccess == ntests_group) {
           message << "Unit tests of group " << group << " passed successfully (passsing " << ntests_group << " tests).";
-          pflow::logger(_AFLOW_FILE_NAME_, function_name, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
         } else {
           message << "Some unit tests of group " << group << " failed (" << (ntests_group - nsuccess) << " of " << ntests_group << " failed).";
-          pflow::logger(_AFLOW_FILE_NAME_, function_name, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
         }
         for (const string& test_name_group : vtests_group) {
           displayResult(test_functions[test_name_group]);
@@ -668,7 +666,6 @@ namespace unittest {
 
   void UnitTest::schemaTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = XPID + "SchemaTest():";
     if (errors.size()) {}  // Suppress compiler warnings
 
     // Set up test environment
@@ -688,7 +685,7 @@ namespace unittest {
         for (uint j = 0; j < vschema_types.size(); j++) {
           if (!XHOST.vschema.isdefined("SCHEMA::" + vschema_types[j] + ":" + key)) {
             ninconsistent++;
-            if (LDEBUG) std::cerr << function_name << " SCHEMA::" << vschema_types[j] << ":" << key << " not found." << std::endl;
+            if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " SCHEMA::" << vschema_types[j] << ":" << key << " not found." << std::endl;
           }
         }
       }
@@ -707,7 +704,7 @@ namespace unittest {
     for (const string& key : json_keys) {
       if (!aurostd::WithinList(vkeys_ignore, key) && !aurostd::WithinList(vschema_keys, key)) {
         ninconsistent++;
-        if (LDEBUG) std::cerr << function_name << " " << key << " not found in schema." << std::endl;
+        if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " " << key << " not found in schema." << std::endl;
       }
     }
     checkEqual(ninconsistent, 0, check_function, check_description, passed_checks, results);
@@ -818,10 +815,9 @@ namespace unittest {
 
   void UnitTest::cifParserTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = XPID + "cifParserTest():";
     if (errors.size()) {}  // Suppress compiler warnings
 
-    if (LDEBUG) std::cerr << "Running " << function_name << std::endl;
+    if (LDEBUG) std::cerr << "Running " << __AFLOW_FUNC__ << std::endl;
 
     // Set up test environment
     string check_function = "", check_description = "", expected_str = "", calculated_str = "";
@@ -1528,13 +1524,12 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
 
 bool PrototypeGeneratorTest(ostream& oss, bool check_symmetry, bool check_uniqueness){ofstream FileMESSAGE;return PrototypeGeneratorTest(FileMESSAGE,oss,check_symmetry,check_uniqueness);} //DX20200925
 bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmetry, bool check_uniqueness){  //DX20200925
-  string function_name=XPID+"PrototypeGeneratorTest():";
   bool LDEBUG=FALSE; // TRUE;
   stringstream message;
   _aflags aflags;aflags.Directory=aurostd::getPWD();
 
   message << "Testing generation of all AFLOW prototypes" << (check_symmetry?" AND checking symmetry of all generated AFLOW prototypes":check_uniqueness?" AND checking all AFLOW prototypes are unique":"");
-  pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
   vector<string> prototype_labels, compositions;
   vector<uint> space_group_numbers;
@@ -1548,7 +1543,7 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmet
       library);
 
   message << "Number of prototype labels = " << num_protos << " (each may have multiple parameter sets)";
-  pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
   string catalog="anrl";
   for(uint i=0;i<num_protos;i++){
@@ -1563,7 +1558,7 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmet
       }
       catch(aurostd::xerror& excpt){
         message << "Could not generate prototype=" << prototype_labels[i] << " given parameters=" << parameter_sets[j] << "; check inputs or the symbolic generator.";
-        pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+        pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
         return false;
       }
 
@@ -1585,7 +1580,7 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmet
           message << "The correct label and parameters for this structure are:" << endl;
           message << updated_label_and_params << endl;
           message << "Please feed this label and set of parameters into the prototype generator.";
-          pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
           return false;
         }
       }
@@ -1609,20 +1604,20 @@ bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmet
           message << aurostd::joinWDelimiter(protos_matching,",") << ". ";
           message << "If the prototype was newly added, ONLY include it in the encyclopedia for a valid reason (e.g., historical, special designation, etc.)";
           message << " and document this in anrl::isSpecialCaseEquivalentPrototypes().";
-          pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
           return false;
         }
         // if it doesn't match with ITSELF
         if(protos_matching.size()==0){
           message << "ERROR: " << prototype_labels[i] << " given parameters=" << parameter_sets[j] << " does NOT match to any prototypes ";
           message << "(either this system requires a special symmetry tolerance or there is a bug with XtalFinder)." << endl;
-          pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
         }
       }
     }
   }
   message << "Successfully generated all prototypes!";
-  pflow::logger(_AFLOW_FILE_NAME_,function_name,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+  pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
 
   return true;
 }
