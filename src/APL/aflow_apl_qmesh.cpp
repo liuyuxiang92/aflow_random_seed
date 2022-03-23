@@ -15,7 +15,6 @@ using aurostd::xvector;
 using std::vector;
 using std::string;
 
-static const string _APL_QMESH_ERR_PREFIX_ = "apl::QMesh::";
 static const string _APL_QMESH_MODULE_ = "QMESH";  // for the logger
 
 //////////////////////////////////////////////////////////////////////////////
@@ -226,9 +225,8 @@ namespace apl {
 
     if ((include_inversions && !xs.pgroupk_Patterson_calculated) ||
         (!include_inversions && !xs.pgroupk_xtal_calculated)) {
-      string function_name = XPID + _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell()";
       string message = "Calculation of the crystallographic point group of the reciprocal cell unsuccessful.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     if (include_inversions) _recCell.pgroup=xs.pgroupk_Patterson;
@@ -537,9 +535,8 @@ namespace apl {
     if (iq < _nIQPs) {
       return _littleGroups[iq];
     } else {
-      string function_name = XPID + _APL_QMESH_ERR_PREFIX_ + "getLittleGroup()";
       string message = "Little groups are only calculated for irreducible q-points.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_RANGE_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_RANGE_);
     }
   }
 
@@ -583,9 +580,8 @@ namespace apl {
     // Write to file
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
-      string function_name = XPID + _APL_QMESH_ERR_PREFIX_ + "writeQpoints";
       string message = "Could not write q-points to file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 
@@ -625,9 +621,8 @@ namespace apl {
     // Write to file
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
-      string function_name = XPID + _APL_QMESH_ERR_PREFIX_ + "writeIrredQpoints";
       string message = "Could not write irreducible q-points to file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 

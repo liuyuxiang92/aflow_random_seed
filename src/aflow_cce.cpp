@@ -614,12 +614,11 @@ namespace cce {
       cce_vars.oxidation_sum = get_oxidation_states_sum(cce_vars); // double because for superoxides O ox. number is -0.5
       if (std::abs(cce_vars.oxidation_sum) > DEFAULT_CCE_OX_TOL) {
         oss << print_output_oxidation_numbers(structure, cce_vars);
-        string function_name = "cce::get_oxidation_states()";
         message << " BAD NEWS: The formation enthalpy of this system is not correctable!" << endl;
         message << " The oxidation numbers that you provided do not add up to zero!" << endl;
         message << " Sum over all oxidation numbers is: " << cce_vars.oxidation_sum << endl;
         message << " Please correct and rerun." << endl;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name, message, _INPUT_ILLEGAL_);	
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INPUT_ILLEGAL_);	
       }
     } else {
       message << " It seems you forgot to provide the oxidation numbers after \"--oxidation_numbers=\". Please add them or omit the option.";

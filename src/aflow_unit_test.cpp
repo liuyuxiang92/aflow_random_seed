@@ -352,7 +352,6 @@ namespace unittest {
     bool passed = (std::abs(expected - calculated) <= expected * relative);
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
   }
-
 }
 
 // aurostd
@@ -363,6 +362,12 @@ namespace unittest {
     // setup test environment
     string check_function = "";
     string check_description = "";
+
+    double calculated_dbl = 0.0;
+    double expected_dbl = 0.0;
+
+    int calculated_int = 0;
+    int expected_int = 0;
 
     // ---------------------------------------------------------------------------
     // Check | double2fraction conversion //DX20210908
@@ -378,6 +383,46 @@ namespace unittest {
     stringstream result_ss; result_ss << numerator << "/" << denominator;
 
     checkEqual(result_ss.str(), answer, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | mod_floored (int) //SD20220124
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::mod_floored()";
+    check_description = "floored mod; numbers as int";
+    expected_int = -1; 
+    
+    calculated_int = aurostd::mod_floored(5, -3);
+    checkEqual(calculated_int, expected_int, check_function, check_description, passed_checks, results);
+  
+    // ---------------------------------------------------------------------------
+    // Check | mod_floored (double) //SD20220124
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::mod_floored()";
+    check_description = "floored mod; numbers as double";
+    expected_dbl = 1.4;
+  
+    calculated_dbl = aurostd::mod_floored(-5.2, 3.3);
+    checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
+  
+    // ---------------------------------------------------------------------------
+    // Check | mod_floored (divisor 0) //SD20220124
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::mod_floored()";
+    check_description = "floored mod; divisor is 0"; 
+    expected_dbl = 11.11;
+  
+    calculated_dbl = aurostd::mod_floored(11.11, 0.0);
+    checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
+  
+    // ---------------------------------------------------------------------------
+    // Check | mod_floored (divisor inf) //SD20220124
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::mod_floored()";
+    check_description = "floored mod; divisor is inf";
+    expected_dbl = 11.11;
+  
+    calculated_dbl = aurostd::mod_floored(11.11, (double)INFINITY);
+    checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
   }
 
   void UnitTest::xvectorTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
@@ -507,8 +552,8 @@ namespace unittest {
     }
     catch (aurostd::xerror e)
     {
-      if (e.error_code == expected_int) check(true, "", "", check_function, check_description, passed_checks, results);
-      else check(false, aurostd::utype2string(e.error_code), expected_str, check_function, check_description, passed_checks, results);
+      if (e.whatCode() == expected_int) check(true, "", "", check_function, check_description, passed_checks, results);
+      else check(false, aurostd::utype2string(e.whatCode()), expected_str, check_function, check_description, passed_checks, results);
     }
     catch (...) {
       check(false, std::string("not an xerror"), expected_str, check_function, check_description, passed_checks, results);
@@ -537,8 +582,8 @@ namespace unittest {
     }
     catch (aurostd::xerror e)
     {
-      if (e.error_code == expected_int) check(true, "", "", check_function, check_description, passed_checks, results);
-      else check(false, aurostd::utype2string(e.error_code), expected_str, check_function, check_description, passed_checks, results);
+      if (e.whatCode() == expected_int) check(true, "", "", check_function, check_description, passed_checks, results);
+      else check(false, aurostd::utype2string(e.whatCode()), expected_str, check_function, check_description, passed_checks, results);
     }
     catch (...) {
       check(false, std::string("not an xerror"), expected_str, check_function, check_description, passed_checks, results);
@@ -596,6 +641,24 @@ namespace unittest {
 
     calculated_dbl = aurostd::areaPointsOnPlane(ipoints);
     checkSimilar(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
+  }
+
+  void UnitTest::xmatrixTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
+    if (errors.size()) {}  // Suppress compiler warnings
+    // setup test environment
+    string check_function = "";
+    string check_description = "";
+
+    // ---------------------------------------------------------------------------
+    // Check | reshape //SD20220319
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::reshape()";
+    check_description = "reshape a rectangular matrix";
+    xmatrix<int> xmat(3,4);
+    xmat(1,1) = 1; xmat(1,2) = 2; xmat(1,3) = 3; xmat(1,4) = 4;
+    xmat(2,1) = 5; xmat(2,2) = 6; xmat(2,3) = 7; xmat(2,4) = 8;
+    xmat(3,1) = 9; xmat(3,2) = 10; xmat(3,3) = 11; xmat(3,4) = 12;
+    checkEqual(aurostd::reshape(aurostd::reshape(xmat,4,3),3,4), xmat, check_function, check_description, passed_checks, results);
   }
 
 }

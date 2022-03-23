@@ -12,6 +12,9 @@
 // pre-distributed task lists. The latter is useful for many small tasks or
 // if the tasks involve expensive pre-computation steps.
 //
+// This class uses variadic templates. For more information, see here:
+// https://kubasejdak.com/variadic-templates
+//
 // ----------
 //
 // Usage notes:
@@ -24,7 +27,8 @@
 // (start and end points) as first paramters. The pre-distributed scheme
 // cannot be used with iterators and currently does not support progress bars.
 //
-// Additionally, function inputs cannot be prvalues.
+// Additionally, function inputs cannot be prvalues (see here for a distinction
+// between value types: https://accu.org/journals/overload/27/150/knatten_2641/).
 //
 // ----------
 //
@@ -50,7 +54,6 @@
 // void f2(vector<int>::iterator& i, const xmatrix<double>& mdbl)
 //   Parallelize over vector<int> v that i will iterate over
 // void f3(int i)
-//   With ntasks number of tasks.
 //
 // If functions are static functions:
 // Static member functions can directly be plugged into run()
@@ -68,13 +71,20 @@
 //   xThread xt;
 //   xt.run(ntasks, f3);
 //
+//   With ntasks = number of tasks.
 //
 // Non-static member functions with xThread:
 //
 // Member functions of a class cannot be directly plugged into run because they
-// have to be bound to an instance of the class. For example, let all functions
-// belong to class C instantiated as cls. Let f1 and f2 be called inside another
-// class function of C and let f3 be called outside.
+// have to be bound to an instance of the class (this is also the reason why
+// "this" had to be added when calling a member function in std::thread). This
+// can be done using std::bind. For more information and an example, see:
+// https://en.cppreference.com/w/cpp/utility/functional/placeholders
+//
+// The following examples show how std::bind works with the functions f1 - f3.
+// Let all functions belong to class C instantiated as cls. Let f1
+// and f2 be called inside another class function of C and let f3 be called
+// outside.
 //
 // f1:
 //   uint ntasks = vdbl.size();
@@ -92,14 +102,20 @@
 //
 // f3:
 //   xThread xt;
-//   std::function<void(int)> fn3 = std::bind(&C::f3, cls*, std::placeholders::_1);
+//   std::function<void(int)> fn3 = std::bind(&C::f3, &cls, std::placeholders::_1);
 //   xt.run(ntasks, fn3);
 //
 // The template parameter in std::function takes the function return type and
 // the type of the function inputs exactly as written in the function defintion.
-// std::bind takes an address to the function, a pointer to the class instance
-// and one std::placeholders::_N for each argument of the function.
-// Using namespace std::placeholders can make std::bind more legible.
+// std::bind takes an address to the function and a pointer to the class
+// instance (always "this" when called inside the class). If the function has
+// arguments, one std::placeholders::_N for each argument of the function needs
+// to be added. This tells std::bind how many arguments to expect, which is why
+// f1 needs three and f3 only one placeholder. Unfortunately, the number of
+// arguments cannot simply be indicated using an integer because std::function
+// needs to expand all the templates.
+// Using namespace std::placeholders can make std::bind more legible because it
+// allows writing _1 instead of std::placeholders::_1.
 //
 //
 // Lambda functions with xThread:
@@ -152,9 +168,16 @@ namespace xthread {
   ///
   /// @param nmax Maximum number of CPUs used by xThread (default: 0 for all available CPUs)
   /// @param nmin Mininum number of CPUs required to spawn thread workers default: 1)
+  /// @param oss  stream for the progress bar output
   xThread::xThread(int nmax, int nmin) {
     free();
     setCPUs(nmax, nmin);
+  }
+
+  xThread::xThread(ostream& oss, int nmax, int nmin) {
+    free();
+    setCPUs(nmax, nmin);
+    setProgressBar(oss);
   }
 
   xThread::xThread(const xThread& that) {
@@ -334,13 +357,13 @@ namespace xthread {
       vector<std::thread*> threads;
       for (int i = 0; i < ncpus; i++) {
         threads.push_back(new std::thread(&xThread::spawnWorker<I, F, A...>, this,
-                                          std::ref(it), std::ref(end), ntasks,
+                                          i, std::ref(it), std::ref(end), ntasks,
                                           std::ref(func), std::ref(args)...)
         );
       }
-      for (std::thread* t : threads) {
-        t->join();
-        delete t;
+      for (uint t = 0; t < threads.size(); t++) {
+        threads[t]->join();
+        delete threads[t];
       }
     } else {
       // No need for thread overhead when ncpus == 1
@@ -361,13 +384,18 @@ namespace xthread {
   /// @param func The function to be called by the worker
   /// @param args The arguments passed into func, if any
   template <typename I, typename F, typename... A>
-  void xThread::spawnWorker(I& it, I& end,
+  void xThread::spawnWorker(int ithread, I& it, I& end,
                             unsigned long long int ntasks,
                             F& func, A&... args) {
     I icurr = advance(it, end, ntasks);
 
     while (icurr != end) {
-      func(icurr, args...); // Call function
+      try {
+        func(icurr, args...); // Call function
+      } catch (aurostd::xerror& e) {
+        string message = "Error in thread " + aurostd::utype2string<int>(ithread) + ": " + e.what();
+        throw aurostd::xerror(e.whereFileName(), e.whereFunction(), message, e.whatCode());
+      }
       icurr = advance(it, end, ntasks, progress_bar_set);
     }
   }
@@ -438,11 +466,13 @@ namespace xthread {
           startIndex = tasks_per_thread * t + remainder;
           endIndex = startIndex + tasks_per_thread;
         }
-        threads.push_back(new std::thread(std::ref(func), startIndex, endIndex, std::ref(args)...));
+        threads.push_back(new std::thread(&xThread::spawnWorkerPredistributed<I, F, A...>, this,
+                                          (int) t, startIndex, endIndex,
+                                          std::ref(func), std::ref(args)...));
       }
-      for (std::thread* t : threads) {
-        t->join();
-        delete t;
+      for (uint t = 0; t < threads.size(); t++) {
+        threads[t]->join();
+        delete threads[t];
       }
     } else {
       // No need for thread overhead when ncpus == 1
@@ -450,6 +480,16 @@ namespace xthread {
     }
 
     freeThreads(ncpus);
+  }
+
+  template <typename I, typename F, typename... A>
+  void xThread::spawnWorkerPredistributed(int ithread, I startIndex, I endIndex, F& func, A&... args) {
+    try {
+      func(startIndex, endIndex, args...);
+    } catch (aurostd::xerror& e) {
+      string message = "Error in thread " + aurostd::utype2string<int>(ithread) + ": " + e.what();
+      throw aurostd::xerror(e.whereFileName(), e.whereFunction(), message, e.whatCode());
+    }
   }
 
 }
@@ -471,12 +511,12 @@ namespace xthread {
 //
 // void f1(int, const vector<int>&, const vector<double>&, vector<int>&, vector<double>&);
 //
-// Let if be called inside function f2:
+// Let it be called inside function f2:
 //
 // bool f2(const vector<int>& vint1, vector<double>& vdbl2) {
 //   vector<int> vint2;
 //   vector<double> vdbl1;
-//   uint ntasks = vdbl.size();
+//   uint ntasks = vdbl2.size();
 //   xthread::xThread xt;
 //   xt.run(ntasks, f1, vint1, vdbl1, vint2, vdbl2);
 // }
@@ -635,13 +675,13 @@ namespace xthread {
 
   //POccCalculator::calculatePhononDOSThread
   template void xThread::run<
-    std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&, std::mutex&)>,
+    std::function<void(uint, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&, std::mutex&)>,
     vector<uint>,
     aurostd::xoption,
     vector<apl::DOSCalculator>,
     vector<xDOSCAR>,
     std::mutex
-  >(int, std::function<void(int, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&, std::mutex&)>&,
+  >(uint, std::function<void(uint, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&, vector<xDOSCAR>&, std::mutex&)>&,
     vector<uint>&,
     aurostd::xoption&,
     vector<apl::DOSCalculator>&,
@@ -810,13 +850,13 @@ namespace xthread {
   //aflowlib::AflowDB::getColStats
   template void xThread::runPredistributed<
     std::function<void(
-      int, int, const vector<string>&, vector<aflowlib::DBStats>&
+      uint, int, const vector<string>&, vector<aflowlib::DBStats>&
     )>,
     const vector<string>,
     vector<aflowlib::DBStats>
-  >(int,
+  >(uint,
     std::function<void(
-      int, int, const vector<string>&, vector<aflowlib::DBStats>&
+      uint, int, const vector<string>&, vector<aflowlib::DBStats>&
     )>&,
     const vector<string>&,
     vector<aflowlib::DBStats>&

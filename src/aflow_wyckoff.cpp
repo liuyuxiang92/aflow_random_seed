@@ -60,6 +60,10 @@ xstructure WyckoffPOSITIONS(uint spacegroup, xstructure strin) {
 
 xstructure WyckoffPOSITIONS(uint spacegroup_in, uint option_in, xstructure strin) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
+  if (spacegroup_in < 1 || spacegroup_in > 230) {
+    string message = "Invalid space group " + aurostd::utype2string<uint>(spacegroup_in);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message,_VALUE_RANGE_);
+  }
 
   if(LDEBUG) cerr << "WyckoffPOSITIONS [0]" << endl;
 

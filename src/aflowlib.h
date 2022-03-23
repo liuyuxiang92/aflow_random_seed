@@ -556,7 +556,7 @@ namespace aflowlib {
   struct DBStats {
     vector<string> columns;
     vector<vector<int> > count;  // 2D to accommodate bool
-    std::unordered_map<string, uint> loop_counts;
+    std::map<string, uint> loop_counts;
     vector<string> max;
     vector<string> min;
     int nentries;
@@ -571,6 +571,7 @@ namespace aflowlib {
     public:
       AflowDB(const string&, ostream& oss=std::cout);
       AflowDB(const string&, const aurostd::xoption&, ostream& oss=std::cout);
+      AflowDB(const string&, const aurostd::xoption&, const aurostd::xoption&, ostream& oss=std::cout);
       AflowDB(const string&, const string&, const string&, const aurostd::xoption&, ostream& oss=std::cout);
       AflowDB(const string&, const string&, const string&, const aurostd::xoption&, const aurostd::xoption&, ostream& oss=std::cout);
       AflowDB(const AflowDB&);
@@ -627,11 +628,11 @@ namespace aflowlib {
       void close();
       void copy(const AflowDB&);
       void initialize(const string& db_file, const string& dt_path, const string& lck_file,
-                      int open_flags, const aurostd::xoption& schema_in, const aurostd::xoption& schema_secret_in);
+                      int open_flags, const aurostd::xoption& schema_in, const aurostd::xoption& schema_internal_in);
 
       sqlite3* db;
       bool is_tmp;
-      aurostd::xoption vschema_secret;
+      aurostd::xoption vschema_internal;
       aurostd::xoption vschema;
       string data_path;
       string database_file;
@@ -651,7 +652,7 @@ namespace aflowlib {
       bool auidInDatabase(const string&);
       void updateEntry(const string&, const vector<string>&, const vector<string>&);
 
-      vector<string> getSchemaKeys();
+      vector<string> getAllSchemaKeys();
       vector<string> getDataTypes(const vector<string>&, bool);
       vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
 

@@ -12,7 +12,9 @@
 #include "aflow_pflow.h"
 
 // #define  AFLOW_PTHREADS_MULTISH_PREEMPTIVE_
+#ifndef AFLOW_MULTITHREADS_ENABLE
 #define  AFLOW_PTHREADS_MULTISH_TIMESHARING_
+#endif
 //#define  AFLOW_PTHREADS::MULTISH_TIMESHARING_SEQUENTIAL_
 //#define  AFLOW_PTHREADS::MULTISH_TIMESHARING_CONCURRENT_
 
@@ -487,6 +489,8 @@ namespace aurostd {
   }
 } // namespace aurostd
 
+#endif //  AFLOW_PTHREADS_MULTISH_TIMESHARING_
+
 namespace aurostd {
   bool multithread_execute(vector<string> vcmds,int _NUM_THREADS,bool VERBOSE) {
     int NUM_THREADS=_NUM_THREADS;                                          // SAFETY
@@ -497,8 +501,6 @@ namespace aurostd {
     return aurostd::multithread_execute(dcmds,NUM_THREADS,VERBOSE);
   }
 } // namespace aurostd
-
-#endif //  AFLOW_PTHREADS_MULTISH_TIMESHARING_
 
 // ***************************************************************************
 // MultiThread Execute vectors/deque of Strings
@@ -609,7 +611,8 @@ namespace AFLOW_PTHREADS {
     uint izip=0;  //SAFETY, maximum number of while loop iteration is vdirs_size (1 zip command per vdirs entry)
     uint i=0,j=0;
     stringstream zero_padding;
-    string zip_name="";
+    string zip_name="",zip_name_new="";
+    vector<string> vzip_names;  //CO20220207
 
     if(1){  //CO20211104 - creates a file of directories to zip and feeds that into the zip command, so the number of zip directories can now be arbitrarily large
       uint numzipsCE=(uint) ceil(((double) vdirs_size)/((double) size));
@@ -619,6 +622,7 @@ namespace AFLOW_PTHREADS {
 
       vector<string> vdirs2tmp;
       string tmpfile="";
+      vzip_names.clear();
 
       for(izip=0;izip<numzips;izip++){
         vdirs2tmp.clear();
@@ -630,6 +634,7 @@ namespace AFLOW_PTHREADS {
         aurostd::StringstreamClean(zero_padding);
         zero_padding << std::setfill('0') << std::setw(aurostd::getZeroPadding(numzips)) << izip+ishift;
         zip_name=prefix+"_"+zero_padding.str()+"_of_"+aurostd::utype2string(numzips)+".zip"; //SC20200303 //CO20211103
+        vzip_names.push_back(zip_name); //CO20220207
         command << "cat " << tmpfile << " | ";
         command << "zip -0rmv ";  //-9rmv
         command << zip_name;
@@ -657,7 +662,7 @@ namespace AFLOW_PTHREADS {
         }
       }
       uint vcommands_size=vcommands.size();
-      string zip_name_new="";
+      vzip_names.clear();
       for(i=0;i<vcommands_size;i++){
         zip_name=prefix+"_"+aurostd::utype2string(i+ishift)+"_of_"+var_n_total_zips+".zip";
         aurostd::StringstreamClean(zero_padding);
@@ -665,6 +670,7 @@ namespace AFLOW_PTHREADS {
         zip_name_new=prefix+"_"+zero_padding.str()+"_of_"+aurostd::utype2string(vcommands_size)+".zip"; //CO20211103 - replace placeholder with actual count
         if(LDEBUG){cerr << soliloquy << " " << zip_name << " -> " << zip_name_new << endl;}
         aurostd::StringSubst(vcommands[i],zip_name,zip_name_new);
+        vzip_names.push_back(zip_name_new); //CO20220207
       }
     }
     //verbose
@@ -699,6 +705,17 @@ namespace AFLOW_PTHREADS {
 
     aurostd::RemoveFile(vtmpfiles); //CO20211104
 
+    if(!aurostd::IsCommandAvailable("md5sum")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"md5sum not available",_RUNTIME_ERROR_);}
+    string md5sum="";
+    for(i=0;i<vzip_names.size();i++){ //CO20220207 - rename zip to include _MD5SUM.zip
+      if(!aurostd::FileExist(vzip_names[i])){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"zip file does not exist: "+vzip_names[i],_FILE_CORRUPT_);}
+      md5sum=aurostd::file2md5sum(vzip_names[i]);
+      if(md5sum.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"md5sum returned empty-string for file: \""+vzip_names[i]+"\"",_RUNTIME_ERROR_);}
+      zip_name_new=vzip_names[i];
+      aurostd::StringSubst(zip_name_new,".zip","_"+md5sum+".zip");
+      aurostd::file2file(vzip_names[i],zip_name_new);
+    }
+
     return TRUE;
   }
 } // namespace AFLOW_PTHREADS
@@ -722,8 +739,13 @@ namespace AFLOW_PTHREADS {
       if(cmd=="gunzip") { if(aurostd::substring2bool(vfile.at(i),".gz")) { vcmds.push_back("gzip -dvf "+vfile.at(i)); } }
       if(cmd=="xunz" || cmd=="xunzip") { if(aurostd::substring2bool(vfile.at(i),".xz")) { vcmds.push_back("xz -dvf "+vfile.at(i)); } }
     }
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    if (argv.size()) {}  // avoid compiler warnings
+    aurostd::multithread_execute(vcmds, KBIN::get_NCPUS(), VERBOSE);
+#else
     AFLOW_PTHREADS::Check_Threads_WrapperNP(argv,vcmds.size(),VERBOSE); // check treads from NP
     aurostd::multithread_execute(vcmds,AFLOW_PTHREADS::MAX_PTHREADS,VERBOSE);
+#endif
     cout << endl;
     return TRUE;
   }
@@ -750,10 +772,17 @@ namespace AFLOW_PTHREADS {
       } 
     }
     cerr << XPID << "AFLOW_PTHREADS::MULTI_bz2xz: AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
+#ifndef AFLOW_MULTITHREADS_ENABLE
     AFLOW_PTHREADS::Check_Threads_WrapperNP(argv,vcmds.size(),VERBOSE); // check treads from NP
+#endif
 
     cerr << XPID << "AFLOW_PTHREADS::MULTI_bz2xz: PERFORMING" << endl;
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    if (argv.size()) {}  // avoid compiler warnings
+    aurostd::multithread_execute(vcmds, KBIN::get_NCPUS(), VERBOSE);
+#else
     aurostd::multithread_execute(vcmds,AFLOW_PTHREADS::MAX_PTHREADS,VERBOSE);
+#endif
     cout << endl;
     // done
     cerr << XPID << "AFLOW_PTHREADS::MULTI_bz2xz: END" << endl;
@@ -782,10 +811,17 @@ namespace AFLOW_PTHREADS {
       } 
     }
     cerr << XPID << "AFLOW_PTHREADS::MULTI_xz2bz2: AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
+#ifndef AFLOW_MULTITHREADS_ENABLE
     AFLOW_PTHREADS::Check_Threads_WrapperNP(argv,vcmds.size(),VERBOSE); // check treads from NP
+#endif
 
     cerr << XPID << "AFLOW_PTHREADS::MULTI_xz2bz2: PERFORMING" << endl;
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    if (argv.size()) {}  // avoid compiler warnings
+    aurostd::multithread_execute(vcmds, KBIN::get_NCPUS(), VERBOSE);
+#else
     aurostd::multithread_execute(vcmds,AFLOW_PTHREADS::MAX_PTHREADS,VERBOSE);
+#endif
     cout << endl;
     // done
     cerr << XPID << "AFLOW_PTHREADS::MULTI_xz2bz2: END" << endl;
@@ -811,15 +847,58 @@ namespace AFLOW_PTHREADS {
         vcmds.push_back("gzip -dvf "+vfile.at(i)+".gz && xz -9vf "+vfile.at(i));
       } 
     }
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    if (argv.size()) {}  // avoid compiler warnings
+    aurostd::multithread_execute(vcmds, KBIN::get_NCPUS(), VERBOSE);
+#else
     AFLOW_PTHREADS::Check_Threads_WrapperNP(argv,vcmds.size(),VERBOSE); // check treads from NP
     // for(uint i=0;i<vcmds.size();i++) cout << vcmds.at(i) << endl;
     aurostd::multithread_execute(vcmds,AFLOW_PTHREADS::MAX_PTHREADS,VERBOSE);
+#endif
     cout << endl;
     // done
     return TRUE;
   }
 } // namespace AFLOW_PTHREADS
 
+
+#ifdef AFLOW_MULTITHREADS_ENABLE
+
+namespace AFLOW_PTHREADS {
+  bool MULTI_sh(vector<string> argv) {
+    stringstream message;
+    ostringstream aus;
+    _aflags aflags;
+    // [OBSOLETE]    string file_name=aurostd::args2string(argv,"--FILE|--F|--f","xxxx");
+    string file_name=XHOST.vflag_control.getattachedscheme("FILE");
+    if(file_name.empty() || file_name=="--f") file_name=argv.at(argv.size()-1);
+    bool VERBOSE=FALSE;
+
+    if(!aurostd::FileExist(file_name)) {message << "FILE_NOT_FOUND = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);}
+    if( aurostd::FileEmpty(file_name)) {message << "FILE_EMPTY = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_CORRUPT_);}
+    aus << "MMMMM Loading File = " << file_name << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
+    vector<string> vcmds;
+    vcmds.clear();
+    aurostd::file2vectorstring(file_name,vcmds);
+    aus << "MMMMM Loaded Lines = " << vcmds.size() << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
+    return aurostd::multithread_execute(vcmds, KBIN::get_NCPUS(), VERBOSE);
+  }
+}
+
+namespace aurostd {
+  bool multithread_execute(deque<string> cmds, int _NUM_THREADS, bool VERBOSE) {
+    bool LDEBUG = FALSE;
+    if (VERBOSE) {}
+    if (LDEBUG) std::cerr << "Commands to run:\n" << aurostd::joinWDelimiter(cmds, "\n") << std::endl;
+
+    std::function<void(deque<string>::iterator&)> fn = [&](deque<string>::iterator& it) {aurostd::execute(*it);};
+    xthread::xThread xt(_NUM_THREADS);
+    xt.run(cmds, fn);
+    return true;
+  }
+}
+
+#endif
 
 // **************************************************************************
 // NOT MULTITHREAD BUT GOOD ENOUGH....

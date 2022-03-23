@@ -54,7 +54,6 @@
 #include <time.h>
 #include <typeinfo>
 #include <unistd.h>
-#include <unordered_map> //ME20220207
 #include <signal.h>  //ME20191125 - needed for AflowDB
 #include <vector>
 #include <list> //CO20170806 - need for POCC
@@ -243,7 +242,7 @@ typedef unsigned uint;
 
 //extern bool QUIET,DEBUG;
 //extern class _XHOST XHOST;
-#include "../aflow.h"     //needed for XHOST
+#include "../aflow.h"     //needed for XHOST //SD20220224 - also for _LOCK_LINK_SUFFIX_
 //#include "../SQLITE/sqlite3.h"  // OBSOLETE ME20191228 - not used
 
 //CO20200624 START - adding from Jahnatek
@@ -440,6 +439,7 @@ namespace aurostd {
   string RemoveSubString(const string& str_orig, const string& str_rm) __xprototype;
   void RemoveSubStringInPlace(string& str_orig, const string& str_rm) __xprototype; //CO20190712
   vector<string> ProcessPIDs(const string& process,bool user_specific=true); //CO20210315
+  vector<string> ProcessPIDs(const string& process,string& output_syscall,bool user_specific=true); //CO20210315
   bool ProcessRunning(const string& process,bool user_specific=true); //CO20210315
   void ProcessKill(const string& process,bool user_specific=true,bool sigkill=true); //CO20210315
   void ProcessRenice(const string& process,int nvalue,bool user_specific=true); //CO20210315
@@ -463,6 +463,8 @@ namespace aurostd {
   string ProperFileName(const string& fileIN);
   bool CopyFile(const string& file_from,const string& file_to);
   bool LinkFile(const string& file_from,const string& file_to);
+  bool LinkFileAtomic(const string& file_from,const string& file_to,bool soft=true); //SD20220208
+  bool UnlinkFile(const string& file_link); //SD20220208
   //CO START
   bool MatchCompressed(const string& CompressedFileName,const string& FileNameOUT);
   // [OBSOLETE]  bool DecompressFile(const string& CompressedFileName);

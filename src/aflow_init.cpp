@@ -12,6 +12,7 @@
 
 string _AFLOWIN_; 
 string _AFLOWLOCK_; 
+const string _LOCK_LINK_SUFFIX_=".init"; //SD20220224
 string _STOPFLOW_;  //CO20210315
 
 // THREADS
@@ -78,6 +79,7 @@ namespace init {
     XHOST.DEBUG=aurostd::args2flag(argv,cmds,"--debug");
     XHOST.TEST=aurostd::args2flag(argv,cmds,"--test|-test");
     XHOST.SKEW_TEST=aurostd::args2flag(argv,cmds,"--skew_test"); //DX20171025
+    XHOST.READ_SPIN_FROM_ATOMLABEL=aurostd::args2flag(argv,cmds,"--read_spin_from_atomlabel"); //SD20220316
     //[CO20200404 - overload with --www]XHOST.WEB_MODE=aurostd::args2flag(argv,cmds,"--web_mode"); //CO20190402
     XHOST.MPI=aurostd::args2flag(argv,"--MPI|--mpi");
 
@@ -85,6 +87,7 @@ namespace init {
     XHOST.tmpfs=aurostd::CleanFileName(XHOST.tmpfs+"/");
 
     XHOST.user=aurostd::execute2string("whoami");  //AS SOON AS POSSIBLE
+    if(XHOST.user.empty()){XHOST.user="UNKNOWN_USER";} //SD20220222 - avoid double . when defining tmpdir in TmpStrCreate
     XHOST.home=aurostd::execute2string("cd && pwd");  //AS SOON AS POSSIBLE
     if(XHOST.home.empty()){XHOST.home=getenv("HOME");}  //CO20200624 - attempt 2
     XHOST.GENERATE_AFLOWIN_ONLY=aurostd::args2flag(argv,cmds,"--generate_aflowin_only");  //CT20180719
@@ -1037,7 +1040,7 @@ namespace init {
 
     // NOW LOAD schema
     if (init::InitSchema(INIT_VERBOSE) == 0) return 0;
-    init::InitSchemaSecret(INIT_VERBOSE);
+    init::InitSchemaInternal(INIT_VERBOSE);
 
     // DONE
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [END]" << endl;
@@ -1060,9 +1063,8 @@ namespace init {
   long _GetRAM(void) {
     struct sysinfo s;
     if(sysinfo(&s)!=0) {
-      string function_name = XPID + "init::_GetRAM():";
       string message = "sysinfo error";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     return s.totalram;
   }
@@ -1075,9 +1077,8 @@ namespace init {
     uint64_t size;
     size_t len=sizeof(size);
     if(sysctl(mib,namelen,&size,&len,NULL,0)<0) {
-      string function_name = XPID + "init::GetRAM():";
       string message = "sysctl returned an error";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     return (long) size;
   }
@@ -1736,12 +1737,11 @@ bool CheckMaterialServer(const string& message) { //CO20200624
   if(XHOST.hostname==XHOST.AFLOW_WEB_SERVER) return TRUE;
   if(XHOST.hostname=="habana") return TRUE;
   if(XHOST.hostname=="aflowlib") return TRUE;
-  string function_name = XPID + "init::CheckMaterialServer():";
   stringstream messagestream;
   messagestream << "Your machine is \"" << XHOST.hostname << "\". ";
   if(message.length()>0) messagestream << "Command \"" << message << "\" can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\"." << endl;
   else messagestream << "The procedure can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\".";
-  throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, messagestream, _RUNTIME_ERROR_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _RUNTIME_ERROR_);
   return FALSE;
 }
 
@@ -2298,6 +2298,13 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
           }
           //write BEFORE issuing the kill, the other instance of aflow will start to act as soon as the process is dead
           message << "issuing kill command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+          if(1){  //super debug
+            string output_syscall="";
+            vector<string> vpids=aurostd::ProcessPIDs(vasp_bin,output_syscall);
+            message << "output_syscall=";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+            message << output_syscall;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
+            message << "PIDs2kill="+aurostd::joinWDelimiter(vpids,",");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+          }
           aurostd::ProcessKill(vasp_bin);
         }else{
           message << "\""+vasp_bin+"\" has died before the kill command could be issued";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
@@ -3904,28 +3911,78 @@ namespace init {
 
 namespace init {
 
-  //ME20220208 - Initialize secret schema, which contain keywords that
+  //ME20220208 - Initialize internal schema, which contain keywords that
   //are inside the SQLite database, but are not served to the public.
-  uint InitSchemaSecret(bool INIT_VERBOSE) {
+  uint InitSchemaInternal(bool INIT_VERBOSE) {
     // DECLARATIONS
     bool LDEBUG=(FALSE || XHOST.DEBUG || INIT_VERBOSE);
-    if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchemaSecret: [BEGIN]" << endl;
+    if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchemaInternal: [BEGIN]" << endl;
 
     uint nschema = 0;
 
     // schema is CAPITAL, content is not necessarily
-    XHOST.vschema_secret.push_attached("SCHEMA::NAME:ALLOY", "alloy");
-    XHOST.vschema_secret.push_attached("SCHEMA::UNIT:ALLOY", "");
-    XHOST.vschema_secret.push_attached("SCHEMA::TYPE:ALLOY", "string");
+    XHOST.vschema_internal.push_attached("SCHEMA::NAME:ALLOY", "alloy");
+    XHOST.vschema_internal.push_attached("SCHEMA::UNIT:ALLOY", "");
+    XHOST.vschema_internal.push_attached("SCHEMA::TYPE:ALLOY", "string");
     nschema++;
 
     if(LDEBUG) cerr << "nschema=" << nschema << endl;
-    if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchemaSecret: [END]" << endl;
+    if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchemaInternal: [END]" << endl;
 
     return nschema;
   }
 
 }
+
+namespace init {
+
+  //getSchemaKeys/////////////////////////////////////////////////////////////
+  // Returns the keys from the AFLOW schema.
+  // Adapted from AflowDB
+  vector<string> getSchemaKeys(const aurostd::xoption& vschema) {
+    vector<string> keys;
+    string key = "";
+    for (uint i = 0, n = vschema.vxsghost.size(); i < n; i += 2) {
+      if(vschema.vxsghost[i].find("SCHEMA::NAME:") != string::npos) {  //CO20200520
+        key = aurostd::RemoveSubString(vschema.vxsghost[i], "SCHEMA::NAME:");
+        // schema keys are upper case
+        keys.push_back(aurostd::toupper(key));
+      }
+    }
+    return keys;
+  }
+
+  //getSchemaNames/////////////////////////////////////////////////////////////
+  // CO20200520
+  // Returns the names of the AFLOW schema keys
+  vector<string> getSchemaNames(const aurostd::xoption& vschema) {
+    vector<string> keys;
+    for (uint i = 0, n = vschema.vxsghost.size(); i < n; i += 2) {
+      if(vschema.vxsghost[i].find("SCHEMA::NAME:") != string::npos) {
+        keys.push_back(aurostd::RemoveSubString(vschema.vxsghost[i + 1], "SCHEMA::NAME:"));
+      }
+    }
+    return keys;
+  }
+
+  //getSchemaTypes/////////////////////////////////////////////////////////////
+  // Gets the data types of the schema keys.
+  // Adapted from AflowDB
+  vector<string> getSchemaTypes(const aurostd::xoption& vschema) {
+    return getSchemaTypes(vschema, getSchemaKeys(vschema));
+  }
+
+  vector<string> getSchemaTypes(const aurostd::xoption& vschema, const vector<string>& keys) {
+    uint nkeys = keys.size();
+    vector<string> types(nkeys);
+    string type = "";
+    for (uint k = 0; k < nkeys; k++) {
+      types.push_back(vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k])));
+    }
+    return types;
+  }
+}
+
 
 // **************************************************************************
 

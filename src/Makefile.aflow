@@ -142,7 +142,7 @@ aflow_pocc_apl.o: aflow_pocc_apl.cpp APL/aflow_apl.h $(AFLOW_H_DEPS) Makefile.af
 aflow_pocc_old.o: aflow_pocc_old.cpp APL/aflow_apl.h $(AFLOW_H_DEPS) Makefile.aflow aflow_pocc.h aflow_pocc_old.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_pthreads.o: aflow_pthreads.cpp $(AFLOW_H_DEPS) Makefile.aflow
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 aflow_qsub.o: aflow_qsub.cpp $(AFLOW_H_DEPS) Makefile.aflow
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_spacegroup.o: aflow_spacegroup.cpp $(AFLOW_H_DEPS) Makefile.aflow
@@ -182,7 +182,7 @@ aflow_xthread.o: aflow_xthread.cpp APL/aflow_apl.h $(AFLOW_H_DEPS) Makefile.aflo
 aflowlib_database.o: aflowlib_database.cpp $(AFLOW_H_DEPS) Makefile.aflow
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 aflowlib_libraries.o: aflowlib_libraries.cpp APL/aflow_apl.h $(AFLOW_H_DEPS) Makefile.aflow aflow_ael_elasticity.h aflow_agl_debye.h aflow_bader.h aflow_cce.h aflow_gnuplot_funcs.cpp aflow_matlab_funcs.cpp aflow_pocc.h
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 aflowlib_libraries_scrubber.o: aflowlib_libraries_scrubber.cpp $(AFLOW_H_DEPS) Makefile.aflow
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflowlib_web_interface.o: aflowlib_web_interface.cpp APL/aflow_apl.h $(AFLOW_H_DEPS) Makefile.aflow aflow_pocc.h aflow_symmetry_spacegroup.h aflowlib_webapp_bands.cpp aflowlib_webapp_entry.cpp

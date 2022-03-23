@@ -4583,9 +4583,8 @@ namespace KBIN {
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,string relaxA,string relaxB,bool qmwrite,ofstream &FileMESSAGE) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool Krun=TRUE;
     if(relaxA!=relaxB) {
-      string function_name = XPID + "KBIN::VASP_run():";
       string message = "relaxA (" + relaxA + ") != relaxB (" + relaxB + ")";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     if(KBIN::VASP_Run(xvasp,aflags,kflags,vflags,FileMESSAGE)){Krun=(Krun&&true);}
     else{
@@ -4830,7 +4829,6 @@ namespace KBIN {
 
 namespace KBIN {
   void GenerateAflowinFromVASPDirectory(_aflags &aflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    string function_name = XPID + "KBIN::GenerateAflowinFromVASPDirectory():";
     ifstream FileSUBDIR;string FileNameSUBDIR;
     FileNameSUBDIR=aflags.Directory;
     FileSUBDIR.open(FileNameSUBDIR.c_str(),std::ios::in);
@@ -4841,7 +4839,7 @@ namespace KBIN {
 
     if(!FileSUBDIR) {                                                                                           // ******* Directory is non existent
       aus << "Directory not found";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, aus.str(), _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, aus.str(), _FILE_NOT_FOUND_);
     } else {                                                                                                    // ******* Directory EXISTS
       // Check LOCK again
       // ifstream FileLOCK0;string FileNameLOCK0=aflags.Directory+"/"+_AFLOWLOCK_;    FileLOCK0.open(FileNameLOCK0.c_str(),std::ios::in);FileLOCK0.close();
@@ -4864,12 +4862,12 @@ namespace KBIN {
       if(aurostd::FileExist(aflags.Directory+"/"+_AFLOWLOCK_) || aurostd::EFileExist(aflags.Directory+"/"+_AFLOWLOCK_))	{ // ******* Directory is locked
         // LOCK exist, then RUN already RUN
         aus << "Directory LOCKED";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, aus.str(), _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, aus.str(), _RUNTIME_ERROR_);
       }
       if(aurostd::FileExist(aflags.Directory+"/SKIP") || aurostd::EFileExist(aflags.Directory+"/SKIP")) {	// ******* Directory is skipped
         // SKIP exist, then RUN already RUN
         aus << "Directory SKIPPED";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, aus.str(), _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, aus.str(), _RUNTIME_ERROR_);
       }
 
       // ******* Directory is un locked/skipped
@@ -5206,7 +5204,6 @@ namespace KBIN {
   void GetStatDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi) { // loop GetStatDiel
     //[CO20191112 - OBSOLETE]int PATH_LENGTH_MAX = 1024 ;
     //[CO20191112 - OBSOLETE]char work_dir[PATH_LENGTH_MAX] ;
-    string function_name = XPID + "KBIN::GetStatDiel()";
     string message = "";
     string outcarfile, outcarpath ;
     string outcarpath_tmp = aurostd::TmpFileCreate("OUTCARc1.tmp") ;
@@ -5218,7 +5215,7 @@ namespace KBIN {
 
     if(!aurostd::FileExist(outcar)) {
       message = "check filename || file missing";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     } else {
       outcarpath = "/" + outcar ;
       outcarpath = work_dir + outcarpath ;
@@ -5244,7 +5241,7 @@ namespace KBIN {
     aurostd::string2tokens(outcarlines.at(outcarlines.size()-1),endline," ");
     if(vasptoken.at(0) != "vasp" || endline.at(0) != "Voluntary") { // first and last line check
       message =  "OUTCAR file is probably corrupt";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     }
     uint sec_count = 0 ;
     for (uint ii=outcarlines.size()-12 ; ii<outcarlines.size() ; ii++) { // presence timing information check
@@ -5257,7 +5254,7 @@ namespace KBIN {
     }
     if(sec_count != 4) { // first and last line check
       message =  "OUTCAR file is probably corrupt";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     }
     // OUTCAR is now in memory, now parse the info
     vector<string> words_line ;
@@ -5287,7 +5284,7 @@ namespace KBIN {
     }
     if(!check_digit) {
       message = outcar + " lacks MACROSCOPIC statement";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     } // DONE PARSING //
     bool matcheck = false ;
     for (uint ii = 1 ; ii <= 3 ; ii++) { // clean up spuriously small values: e.g. "-0.000001"
@@ -5301,7 +5298,7 @@ namespace KBIN {
         if(testdiff >= eps) { // eps is a bit arbitrary right now ..
           // serious issues with VASP calculation here: 
           message = "asymmetric dielectric tensor";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         } else { // only if small
           statdiel(ii,jj) = statdiel(jj,ii) ;
         }
@@ -5422,12 +5419,15 @@ namespace KBIN {
   // when aflow.in files are moved between machines and the VASP binary files
   // have different names. This is not desirable when VASP does not need to be
   // run (e.g. for post-processing).
-  string getVASPVersion(const string& binfile) {  //CO20210315
+  string getVASPVersion(const string& binfile,const string& mpi_command) {  //CO20210315
     // /home/bin/vasp_std -> vasp.4.6.35
     // /home/bin/vasp_std -> vasp.5.4.4.18Apr17-6-g9f103f2a35
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::getVASPVersionString():";
-    if(LDEBUG){cerr << soliloquy << " binfile=" << binfile << endl;}
+    if(LDEBUG){
+      cerr << soliloquy << " binfile=" << binfile << endl;
+      cerr << soliloquy << " mpi_command=" << mpi_command << endl;
+    }
     if (!XHOST.is_command(binfile)) return "";
     // Get the full path to the binary
     string fullPathBinaryName = XHOST.command(binfile);
@@ -5445,7 +5445,11 @@ namespace KBIN {
       aurostd::string2file("","./POTCAR");
       if(LDEBUG){cerr << soliloquy << " ls[1]=" << endl << aurostd::execute2string("ls") << endl;}
       //execute2string does not work well here...
-      aurostd::execute(binfile + " > /dev/null 2>&1");  //ME20200610 - no output from vasp
+      string command="";
+      if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
+      command+=binfile+" > /dev/null 2>&1";
+      if(LDEBUG){cerr << soliloquy << " running command: \"" << command << "\"" << endl;}
+      aurostd::execute(command);  //ME20200610 - no output from vasp
       if(LDEBUG){cerr << soliloquy << " ls[2]=" << endl << aurostd::execute2string("ls") << endl;}
       if(!aurostd::FileExist("OUTCAR")){
         //first re-try, source intel
@@ -5453,7 +5457,10 @@ namespace KBIN {
         aurostd::string2tokens(INTEL_COMPILER_PATHS,vintel_paths,",");
         for(uint i=0;i<vintel_paths.size();i++){
           if(aurostd::FileExist("/bin/bash") && aurostd::FileExist(vintel_paths[i])){
-            string command="/bin/bash -c \"source "+vintel_paths[i]+" intel64; "+ binfile + " > /dev/null 2>&1\"";  //ME20200610 - no output from vasp  //CO20210315 - source only works in bash
+            command="";
+            command+="/bin/bash -c \"source "+vintel_paths[i]+" intel64; ";
+            if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
+            command+=binfile+" > /dev/null 2>&1\"";  //ME20200610 - no output from vasp  //CO20210315 - source only works in bash
             if(LDEBUG){cerr << soliloquy << " running command: \"" << command << "\"" << endl;}
             aurostd::execute(command);
             if(LDEBUG){cerr << soliloquy << " ls[3]=" << endl << aurostd::execute2string("ls") << endl;}
@@ -5462,6 +5469,7 @@ namespace KBIN {
         }
       }
       string vasp_version_outcar=KBIN::OUTCAR2VASPVersion("OUTCAR");
+      if(LDEBUG){cerr << soliloquy << " vasp_version_outcar=" << vasp_version_outcar << endl;}
       chdir(pwddir.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(tmpdir);
@@ -5514,15 +5522,15 @@ namespace KBIN {
 
     return "";
   }
-  string getVASPVersionNumber(const string& binfile) {  //CO20200610
+  string getVASPVersionNumber(const string& binfile,const string& mpi_command) {  //CO20200610
     // /home/bin/vasp_std -> 4.6.35
     // /home/bin/vasp_std -> 5.4.4
-    return VASPVersionString2Number(getVASPVersion(binfile));
+    return VASPVersionString2Number(getVASPVersion(binfile,mpi_command));
   }
-  double getVASPVersionDouble(const string& binfile) {  //CO20200610
+  double getVASPVersionDouble(const string& binfile,const string& mpi_command) {  //CO20200610
     // /home/bin/vasp_std -> 4.635
     // /home/bin/vasp_std -> 5.44
-    return VASPVersionString2Double(getVASPVersionNumber(binfile));
+    return VASPVersionString2Double(getVASPVersionNumber(binfile,mpi_command));
   }
 }  // namespace KBIN
 

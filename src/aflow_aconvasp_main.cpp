@@ -1214,6 +1214,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("ABINIT",aurostd::args2flag(argv,cmds,"--abinit") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO"));
   vpflow.flag("AIMS",aurostd::args2flag(argv,cmds,"--aims") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO"));
   vpflow.flag("ELK",aurostd::args2flag(argv,cmds,"--elk") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20200313
+  vpflow.flag("ATAT",aurostd::args2flag(argv,cmds,"--atat") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //SD20220123
 
   //DX20190123 - CIF to work with PROTO - START 
   vpflow.flag("CIF",aurostd::args2flag(argv,cmds,"--cif") && (vpflow.flag("PROTO_AFLOW") || vpflow.flag("PROTO"))); //DX20190123 - to differentiate between proto and istream 
@@ -1723,6 +1724,7 @@ namespace pflow {
       if(vpflow.flag("AFLOWLIB_AURL2LOOP")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AURL2LOOP"),"AFLOWLIB_AURL2LOOP"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWSYM_PYTHON")){ SYM::writePythonScript(cout); _PROGRAMRUN=true;} //DX20210202
       if(vpflow.flag("AFLUX")) {cout << aflowlib::AFLUXCall(vpflow) << endl; _PROGRAMRUN=true;}  //DX20190206 - add AFLUX command line functionality
+      if(vpflow.flag("ATAT")) {cout << input2ATATxstr(cin); _PROGRAMRUN=true;} //SD20220123
       // B
       if(vpflow.flag("BANDGAP_WAHYU")) {AConvaspBandgap(argv); _PROGRAMRUN=true;}
       if(vpflow.flag("BANDGAP"))       {pflow::BANDGAP(vpflow, cout); _PROGRAMRUN=true;} // CAMILO  //CO20171006
@@ -2000,7 +2002,7 @@ namespace pflow {
       //ME20200829 - Added patch functionality
       if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB") || vpflow.flag("PATCHDB")) {
         int return_code = 199;  // Placeholder: return code in the 100s do not run the analysis
-        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, DEFAULT_AFLOW_DB_DATA_PATH, DEFAULT_AFLOW_DB_LOCK_FILE, XHOST.vschema, XHOST.vschema_secret);
+        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, DEFAULT_AFLOW_DB_DATA_PATH, DEFAULT_AFLOW_DB_LOCK_FILE, XHOST.vschema, XHOST.vschema_internal);
         string patchfiles = vpflow.getattachedscheme("DBPATCHFILES");
         // Hierarchy: rebuild > update > patch
         if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB")) {
@@ -2016,7 +2018,7 @@ namespace pflow {
         return return_code;
       }
       if (vpflow.flag("ANALYZEDB")) {
-        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, XHOST.vschema_secret);
+        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, XHOST.vschema, XHOST.vschema_internal);
         db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
         _PROGRAMRUN = true;
       }
@@ -13473,7 +13475,6 @@ namespace pflow {
   }
 
   void PYTHON_MODULES(const vector<string>& vmodules_in, ofstream& FileMESSAGE, ostream& oss) {
-    string function_name = "pflow::PYTHON_MODULES():";
     string directory = XHOST.vflag_control.getattachedscheme("DIRECTORY");
     if (directory.empty()) directory = ".";
 
@@ -13499,7 +13500,7 @@ namespace pflow {
     if (vskip.size() > 0) {
       message << "Could not find modules " << aurostd::joinWDelimiter(vskip, ", ") << "."
         << " Available modules: " << aurostd::joinWDelimiter(vavailable, ", ") << ".";
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, directory, FileMESSAGE, oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, directory, FileMESSAGE, oss, _LOGGER_WARNING_);
     }
     if (vmodules.size() > 0) {
       // Dependencies
@@ -13527,10 +13528,10 @@ namespace pflow {
         }
       }
       message << "Successfully installed modules " << aurostd::joinWDelimiter(vmodules, ", ") << ".";
-      pflow::logger(_AFLOW_FILE_NAME_, function_name, message, directory, FileMESSAGE, oss, _LOGGER_NOTICE_);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, directory, FileMESSAGE, oss, _LOGGER_NOTICE_);
     } else {
       message << "No modules left to write.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
     }
   }
 }
