@@ -12,7 +12,7 @@
 
 #include "aurostd_xhttp.h"
 
-#define _DEBUG_XHTTP_ true
+#define _DEBUG_XHTTP_ false
 
 namespace aurostd {
   /// If IPv6 is needed in the future it would be best to use
