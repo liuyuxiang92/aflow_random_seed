@@ -7,6 +7,8 @@
 #include "aflow.h"
 #include "aflow_anrl.h"  //DX20201104
 #include "aflow_compare_structure.h"  //ME20220125
+#include "aflowlib_entry_loader.h"
+#include <chrono> // benchmarking HE20220222
 
 
 // Collection of generic check functions, to streamline testing.
@@ -1356,5 +1358,173 @@ bool cifParserTest(ofstream& FileMESSAGE, ostream& oss) {
   calculated = string(match?"Match":"No Match") +  " (misfit = " + aurostd::utype2string<double>(misfit) + ")";
   check(match && (misfit < _ZERO_TOL_), calculated, expected, check_function, check_description, passed_checks, results);
 
+  return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
+}
+
+//HE20220324
+bool EntryLoaderTest(ostream& oss){ofstream FileMESSAGE;return EntryLoaderTest(FileMESSAGE,oss);}  //CO20200520
+bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
+  string function_name = XPID + __func__ + ":";
+
+  // setup test environment
+  string task_description = "Testing EntryLoader";
+  vector<string> results;
+  stringstream result;
+  stringstream check_description;
+  uint passed_checks = 0;
+  string check_function = "";
+  uint check_num = 0;
+
+  std::string test_alloy = "MnPdPt";
+  bool recursive = false;
+  aflowlib::EntryLoader el;
+  aflowlib::_aflowlib_entry test_entry;
+  xstructure test_structure;
+
+
+  size_t expected = 0;
+  std::vector<std::string> test_AUIDs = {
+      "aflow:2de63b1ebe0a1a83",
+      "4d8cf7edb50d1901",
+      "auid:6d47aa3f4f1286d0",
+      "aflow:7dd846bc04c764e8",
+      "9d84facf8161aa60",
+      "broken"
+  };
+  std::string test_AUID = "aflow:0d16c1946df2435c";
+
+  std::vector<std::string> test_AURLs = {
+      "aflowlib.duke.edu:AFLOWDATA/LIB2_WEB/Ca_svCu_pv/84",
+      "AFLOWDATA/LIB2_WEB/Ca_svCu_pv/546",
+      "aurl:AFLOWDATA/LIB2_WEB/Ca_svCu_pv/724.BA",
+      "LIB2_WEB/Ca_svCu_pv/253",
+      "aflowlib.duke.edu:AFLOWDATA/LIB2_WEB/Ca_svCu_pv/230"
+  };
+  std::string test_AURL ="aflowlib.duke.edu:AFLOWDATA/LIB2_WEB/Ca_svCu_pv/539";
+
+  std::map<std::string, aflowlib::EntryLoader::Source> test_sources = {
+      {"AUTO SELECT", aflowlib::EntryLoader::Source::NONE},
+      {"SQLITE", aflowlib::EntryLoader::Source::SQLITE},
+      {"AFLUX", aflowlib::EntryLoader::Source::AFLUX},
+      {"FILESYSTEM", aflowlib::EntryLoader::Source::FILESYSTEM},
+      {"RESTAPI", aflowlib::EntryLoader::Source::RESTAPI},
+      {"FILESYSTEM_RAW", aflowlib::EntryLoader::Source::FILESYSTEM_RAW},
+      {"RESTAPI_RAW", aflowlib::EntryLoader::Source::RESTAPI_RAW}
+  };
+
+  std::map<std::string, aflowlib::EntryLoader::Source> short_test_sources = {
+      {"SQLITE", aflowlib::EntryLoader::Source::SQLITE},
+      {"AFLUX", aflowlib::EntryLoader::Source::AFLUX},
+      {"FILESYSTEM", aflowlib::EntryLoader::Source::FILESYSTEM},
+      {"RESTAPI", aflowlib::EntryLoader::Source::RESTAPI},
+  };
+
+  // ---------------------------------------------------------------------------
+  // Check | load alloys
+
+  for (auto source: test_sources) {
+    aurostd::StringstreamClean(check_description);
+    check_num++;
+    check_function = "EntryLoader::loadAlloy()";
+    if (source.first == "RESTAPI" || source.first == "RESTAPI_RAW") recursive = false;
+    else recursive = true;
+    check_description << source.first << " - " << test_alloy;
+    if (recursive) {
+      check_description << " - recursive";
+      expected = 2500;
+    } else expected = 90;
+    el.clear();
+    el.m_out_silent = true;
+    {
+      auto start = std::chrono::high_resolution_clock::now();
+      if (el.setSource(source.second)) {
+        el.loadAlloy(test_alloy, recursive);
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::high_resolution_clock::now() - start);
+        check_description << " | speed " << el.m_entries_flat->size() / (duration.count() / 1000.0) << " entries/s; "
+                          << el.m_entries_flat->size() << " entries";
+        check((expected < el.m_entries_flat->size()), el.m_entries_flat->size(), expected, check_function,
+              check_description.str(), passed_checks, results);
+      } else {
+        check_description << " | failed to load " << source.first;
+        check(false, 0, 0, check_function, check_description.str(), passed_checks, results);
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Check | load AUID + Xstructure
+
+  for (auto source: short_test_sources) {
+    aurostd::StringstreamClean(check_description);
+    check_num++;
+    check_function = "EntryLoader::loadAUID()";
+    check_description << source.first << " + xstructure";
+    expected = 6;
+    el.clear();
+    el.m_out_silent = true;
+    el.m_xstructure_original = true;
+    el.m_xstructure_relaxed = true;
+    if (source.first == "RESTAPI" || source.first == "RESTAPI_RAW") el.m_filesystem_path="/fake/"; // force xstructure test to use REST API
+    auto start = std::chrono::high_resolution_clock::now();
+    if (el.setSource(source.second)) {
+      el.loadAUID(test_AUID);
+      if (source.first == "AFLUX") test_entry = *el.m_entries_flat->back();
+      el.loadAUID(test_AUIDs);
+
+      auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::high_resolution_clock::now() - start);
+      check_description << " | speed " << el.m_entries_flat->size() / (duration.count() / 1000.0) << " entries/s; "
+                        << el.m_entries_flat->size() << " entries";
+      check_equal(el.m_entries_flat->size(), expected, check_function,
+                  check_description.str(), passed_checks, results);
+    } else {
+      check_description << " | failed to load " << source.first;
+      check(false, 0, 0, check_function, check_description.str(), passed_checks, results);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Check | load xstructure from file
+  aurostd::StringstreamClean(check_description);
+  check_num++;
+  check_function = "EntryLoader::loadXstructureFile()";
+  el.loadXstructureFile(test_entry, test_structure);
+  check_description << "load xstructure extern";
+  check_equal(test_structure.atoms.size(), (size_t) 6, check_function, check_description.str(), passed_checks, results);
+
+
+  // ---------------------------------------------------------------------------
+  // Check | load AURL
+
+  for (auto source: short_test_sources) {
+    aurostd::StringstreamClean(check_description);
+    check_num++;
+    check_function = "EntryLoader::loadAURL()";
+    check_description << source.first;
+    expected = 6;
+    el.clear();
+    el.m_out_silent = true;
+    {
+      auto start = std::chrono::high_resolution_clock::now();
+      if (el.setSource(source.second)) {
+        el.loadAURL(test_AURLs);
+        el.loadAURL(test_AURL);
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::high_resolution_clock::now() - start);
+        check_description << " | speed " << el.m_entries_flat->size() / (duration.count() / 1000.0) << " entries/s; "
+                          << el.m_entries_flat->size() << " entries";
+        check_equal(el.m_entries_flat->size(), expected, check_function,
+                    check_description.str(), passed_checks, results);
+      } else {
+        check_description << " | failed to load " << source.first;
+        check(false, 0, 0, check_function, check_description.str(), passed_checks, results);
+      }
+    }
+  }
+
+
+
+  // present overall result
   return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
 }
