@@ -41,12 +41,16 @@ namespace unittest {
   void UnitTest::free() {
     aflags.clear();
     test_functions.clear();
+    test_groups.clear();
+    test2group.clear();
   }
 
   void UnitTest::copy(const UnitTest& ut) {
     if (this == &ut) return;
     aflags = ut.aflags;
     test_functions = ut.test_functions;
+    test_groups = ut.test_groups;
+    test2group = ut.test2group;
   }
 
   void UnitTest::initialize() {
@@ -150,9 +154,10 @@ namespace unittest {
     test_groups["database"] = {"schema"};
     test_groups["structure"] = {"atomic_environment", "coordination", "xstructure_parser", "fold_atoms"};
 
-    for (const auto& group : test_groups) {
-      for (const string& member : group.second) {
-        test2group[member] = group.first;
+    for (std::map<string, vector<string> >::iterator it = test_groups.begin(); it != test_groups.end(); ++it) {
+      const vector<string>& members = (*it).second;
+      for (uint i = 0; i < members.size(); i++) {
+        test2group[members[i]] = (*it).first;
       }
     }
   }
@@ -172,14 +177,15 @@ namespace unittest {
     // unit_test is the individual small tests over
     // which to parallelize
     vector<string> unit_tests, tasks;
-    for (const string& test : unit_tests_in) {
+    for (uint t = 0; t < unit_tests_in.size(); t++) {
+      const string& test = unit_tests_in[t];
       bool isgroup = (test_groups.find(test) != test_groups.end());
       if (test == "all") {
         tasks.clear();
-        for (const auto& group : test_groups) {
-          tasks.push_back(group.first);
-          for (const string& member : group.second ) {
-            unit_tests.push_back(member);
+        for (std::map<string, vector<string> >::iterator it = test_groups.begin(); it != test_groups.end(); ++it) {
+          tasks.push_back((*it).first);
+          for (uint m = 0; m < (*it).second.size(); m++) {
+            unit_tests.push_back((*it).second[m]);
           }
         }
         break;
@@ -188,8 +194,9 @@ namespace unittest {
         pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       } else if (isgroup && !aurostd::WithinList(tasks, test)) {
         tasks.push_back(test);
-        for (const string& member : test_groups[test]) {
-          unit_tests.push_back(member);
+        const vector<string>& members = test_groups[test];
+        for (uint m = 0; m < members.size(); m++) {
+          unit_tests.push_back(members[m]);
         }
       } else if (!aurostd::WithinList(tasks, test2group[test])) {
         unit_tests.push_back(test);
@@ -216,10 +223,10 @@ namespace unittest {
     // Print final summary
     uint nsuccess = 0;
     stringstream summary;
-    for (const string& task : tasks) {
-      bool success = taskSuccessful(task);
+    for (uint t = 0; t < tasks.size(); t++) {
+      bool success = taskSuccessful(tasks[t]);
       if (success) nsuccess++;
-      summary << "\t" << task << " | " << (success?"pass":"fail") << "\n";
+      summary << "\t" << tasks[t] << " | " << (success?"pass":"fail") << "\n";
     }
 
     if (nsuccess == ntasks) {
@@ -259,8 +266,8 @@ namespace unittest {
       if (i == ntests_group) {
         // All finished - print output
         uint nsuccess = 0;
-        for (const string& test_name_group : vtests_group) {
-          if (taskSuccessful(test_name_group)) nsuccess++;
+        for (uint t = 0; t < vtests_group.size(); t++) {
+          if (taskSuccessful(vtests_group[t])) nsuccess++;
         }
         stringstream message;
         if (nsuccess == ntests_group) {
@@ -270,18 +277,19 @@ namespace unittest {
           message << "Some unit tests of group " << group << " failed (" << (ntests_group - nsuccess) << " of " << ntests_group << " failed).";
           pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
         }
-        for (const string& test_name_group : vtests_group) {
-          displayResult(test_functions[test_name_group]);
+        for (uint t = 0; t < vtests_group.size(); t++) {
+          displayResult(test_functions[vtests_group[t]]);
         }
       }
     }
   }
 
   bool UnitTest::taskSuccessful(const string& task) {
-    auto it = test_groups.find(task);
+    std::map<string, vector<string> >::iterator it = test_groups.find(task);
     if (it != test_groups.end()) {
       const vector<string> members = (*it).second;
-      for (const string& member : members ) {
+      for (uint m = 0; m < members.size(); m++) {
+        const string& member = members[m];
         const xcheck& xchk = test_functions[member];
         if (!xchk.finished || (test_functions[member].passed_checks != test_functions[member].results.size())) return false;
       }
@@ -786,7 +794,8 @@ namespace unittest {
     vector<string> vkeys_ignore = {"data_language", "error_status", "natoms_orig",
                                    "density_orig", "volume_cell_orig", "volume_atom_orig",
                                    "spinD_magmom_orig"};
-    for (const string& key : json_keys) {
+    for (uint k = 0; k < json_keys.size(); k++) {
+      const string& key = json_keys[k];
       if (!aurostd::WithinList(vkeys_ignore, key) && !aurostd::WithinList(vschema_keys, key)) {
         ninconsistent++;
         if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " " << key << " not found in schema." << std::endl;
