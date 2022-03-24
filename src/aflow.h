@@ -5459,11 +5459,12 @@ namespace unittest {
       void xstructureParserTest(uint&, vector<string>&, vector<string>&);
       void xstructureTest(uint&, vector<string>&, vector<string>&);
 
-      // ovasp
-      void xoutcarTest(uint&, vector<string>&, vector<string>&);
-
       // structure generation
       void ceramgenTest(uint&, vector<string>&, vector<string>&);
+      void prototypeGeneratorTest(uint&, vector<string>&, vector<string>&);
+
+      // ovasp
+      void xoutcarTest(uint&, vector<string>&, vector<string>&);
   };
 
 }

@@ -111,17 +111,23 @@ namespace unittest {
     xchk.task_description = "xstructure functions";
     test_functions["xstructure"] = xchk;
 
+    // structure generation
+    xchk = initializeXCheck();
+    xchk.func = std::bind(&UnitTest::ceramgenTest, this, _1, _2, _3);
+    xchk.function_name= "ceramgenTest():";
+    xchk.task_description = "pflow::GENERATE_CERAMICS()";
+
+    xchk = initializeXCheck();
+    xchk.func = std::bind(&UnitTest::prototypeGeneratorTest, this, _1, _2, _3);
+    xchk.function_name= "prototypeGeneratorTest():";
+    xchk.task_description = "Generate all prototypes and test symmetry";
+
+    // ovasp
     // ovasp
     xchk = initializeXCheck();
     xchk.func = std::bind(&UnitTest::xoutcarTest, this, _1, _2, _3);
     xchk.function_name= "xoutcarTest():";
     xchk.task_description = "xOUTCAR class";
-
-    // structure generation
-    xchk = initializeXCheck();
-    xchk.func = std::bind(&UnitTest::ceramgenTest, this, _1, _2, _3);
-    xchk.function_name= "xoutcarTest():";
-    xchk.task_description = "pflow::GENERATE_CERAMICS()";
   }
 
   xcheck UnitTest::initializeXCheck() {
@@ -1530,6 +1536,134 @@ namespace unittest {
     checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
   }
 
+  //DX20200925
+  //ME20220324 - refactored to run in parallel
+  void _testPrototype(uint i, const vector<string>& prototype_labels, vector<uint>& nprotos, vector<string>& errors
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    , std::mutex& m
+#endif
+  ) {
+    double tolerance_sym = 0.0;
+    string label_input = "";
+    bool generated = false, sym = false, unique = false;
+    xstructure xstr;
+    ofstream ofs("/dev/null");
+
+    vector<string> parameter_sets = anrl::getANRLParameters(prototype_labels[i], "all");
+    for (uint j = 0; j < parameter_sets.size(); j++) {
+      string error = "";
+      try {
+        xstr = aflowlib::PrototypeLibraries(ofs,prototype_labels[i],parameter_sets[j],1);
+        generated = true;
+      } catch(aurostd::xerror& excpt) {
+        error = "Could not generate prototype=" + prototype_labels[i] + ", params=" + parameter_sets[j];
+      }
+
+      if (error.empty()) {
+        stringstream label_input_ss;
+        label_input_ss << prototype_labels[i] << "-" << std::setw(3) << std::setfill('0') << j+1;
+        label_input = label_input_ss.str();
+        tolerance_sym = anrl::specialCaseSymmetryTolerances(label_input);
+        if(tolerance_sym != AUROSTD_MAX_DOUBLE) {
+          xstr.sym_eps = tolerance_sym;
+          xstr.sym_eps_calculated = true;
+        }
+      }
+
+      if (error.empty()) {
+        string updated_label_and_params = "";
+        if(!anrl::structureAndLabelConsistent(xstr, prototype_labels[i], updated_label_and_params, tolerance_sym)){ //DX20201105 - added symmetry tolerance
+          error = "The structure has a higher symmetry than indicated by the label (orig: proto="
+              + prototype_labels[i] + ", params=" + parameter_sets[j] + ")."
+              + " The correct label and parameters for this structure are:\n" + updated_label_and_params; 
+        } else {
+          sym = true;
+        }
+      }
+      if (error.empty()) {
+        aurostd::xoption vpflow;
+        // check if the prototype matches to more than one prototype
+        // (i.e., a prototype should match with itself, but no others)
+        string catalog = "anrl";
+        vector<string> protos_matching = compare::getMatchingPrototypes(xstr, vpflow, catalog);
+        // if it matches to more than one
+        if(protos_matching.size() > 1 && !anrl::isSpecialCaseEquivalentPrototypes(protos_matching)) {
+          error = prototype_labels[i] + ", params=" + parameter_sets[j]
+              + " matches multiple prototypes (and not a documented special case): "
+              + aurostd::joinWDelimiter(protos_matching,",") + "."
+              + " If the prototype was newly added, ONLY include it in the encyclopedia"
+              + " for a valid reason (e.g., historical, special designation, etc.)"
+              + " and document this in anrl::isSpecialCaseEquivalentPrototypes().";
+        // if it doesn't match with ITSELF
+        } else if (protos_matching.size() == 0) {
+          error = prototype_labels[i] + ", params=" + parameter_sets[j]
+              + " does not match to any prototypes"
+              + " (requires special symmetry tolerance or there is a bug with XtalFinder).";
+        } else {
+          unique = true;
+        }
+      }
+#ifdef AFLOW_MULTITHREADS_ENABLE
+      std::lock_guard<std::mutex> lk(m);
+#endif
+      if (generated) nprotos[0]++;
+      if (sym) nprotos[1]++;
+      if (unique) nprotos[2]++;
+      if (!error.empty()) errors.push_back(error);
+    }
+  }
+
+  void UnitTest::prototypeGeneratorTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
+    bool LDEBUG = (FALSE || XHOST.DEBUG);
+
+    // Set up test environment
+    string check_function = "", check_description = "";
+
+    vector<string> prototype_labels, compositions;
+    vector<uint> space_group_numbers;
+    vector<vector<vector<string> > > grouped_Wyckoff_letters;
+    string library = "anrl";
+
+    uint num_protos = aflowlib::GetAllPrototypeLabels(prototype_labels,
+        compositions,
+        space_group_numbers,
+        grouped_Wyckoff_letters,
+        library);
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << "Number of prototype labels = " << num_protos << " (each may have multiple parameter sets)";
+
+    // Test
+    // 1: if the prototype can be generated,
+    // 2: if symmetry and label are consistent
+    // 3: if it is a unique prototye
+    // Keep results in vector to simplify function input
+    vector<uint> nprotos(3, 0);
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    xthread::xThread xt(KBIN::get_NCPUS()); // Okay to be greedy - xThread will manage number of threads
+    std::mutex m;
+    xt.run(num_protos, _testPrototype, prototype_labels, nprotos, errors, m);
+#else
+    for (uint i = 0; i < num_protos; i++) _testPrototype(i, prototype_labels, nprotos, errors);
+#endif
+
+    // Get number of all protoypes + parameter sets
+    uint expected_uint = 0;
+    for (uint i = 0; num_protos; i++) {
+      expected_uint += anrl::getANRLParameters(prototype_labels[i], "all").size();
+    }
+
+    check_function = "aflowlib::PrototypeLibraries()";
+    check_description = "generate prototypes";
+    checkEqual(nprotos[0], expected_uint, check_function, check_description, passed_checks, results);
+
+    check_function = "anrl::structureAndLabelConsistent()";
+    check_description = "symmetry consistent with prototype label";
+    checkEqual(nprotos[1], expected_uint, check_function, check_description, passed_checks, results);
+
+    check_function = "compare::getMatchingPrototypes()";
+    check_description = "protoypes are unique";
+    checkEqual(nprotos[2], expected_uint, check_function, check_description, passed_checks, results);
+  }
+
 }
 
 // ovasp
@@ -1698,106 +1832,6 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
 
   message << "smith test successful";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
   return TRUE; //CO20180419
-}
-
-bool PrototypeGeneratorTest(ostream& oss, bool check_symmetry, bool check_uniqueness){ofstream FileMESSAGE;return PrototypeGeneratorTest(FileMESSAGE,oss,check_symmetry,check_uniqueness);} //DX20200925
-bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss,bool check_symmetry, bool check_uniqueness){  //DX20200925
-  bool LDEBUG=FALSE; // TRUE;
-  stringstream message;
-  _aflags aflags;aflags.Directory=aurostd::getPWD();
-
-  message << "Testing generation of all AFLOW prototypes" << (check_symmetry?" AND checking symmetry of all generated AFLOW prototypes":check_uniqueness?" AND checking all AFLOW prototypes are unique":"");
-  pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-
-  vector<string> prototype_labels, compositions;
-  vector<uint> space_group_numbers;
-  vector<vector<vector<string> > > grouped_Wyckoff_letters;
-  string library = "anrl";
-
-  uint num_protos = aflowlib::GetAllPrototypeLabels(prototype_labels,
-      compositions,
-      space_group_numbers,
-      grouped_Wyckoff_letters,
-      library);
-
-  message << "Number of prototype labels = " << num_protos << " (each may have multiple parameter sets)";
-  pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-
-  string catalog="anrl";
-  for(uint i=0;i<num_protos;i++){
-    // get parameters
-    vector<string> parameter_sets = anrl::getANRLParameters(prototype_labels[i],"all");
-    if(LDEBUG){ cerr << "Number of parameters for label=" << prototype_labels[i] << ": " << parameter_sets.size() << endl; }
-
-    for(uint j=0;j<parameter_sets.size();j++){
-      xstructure xstr;
-      try{
-        xstr = aflowlib::PrototypeLibraries(oss,prototype_labels[i],parameter_sets[j],1);
-      }
-      catch(aurostd::xerror& excpt){
-        message << "Could not generate prototype=" << prototype_labels[i] << " given parameters=" << parameter_sets[j] << "; check inputs or the symbolic generator.";
-        pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-        return false;
-      }
-
-      // check symmetry
-      if(check_symmetry){
-        if(LDEBUG){ cerr << "Check that the generated structure is consistent with the label=" << prototype_labels[i] << ": " << parameter_sets.size() << endl; }
-
-        // symmetry tolerances
-        // some prototype require special tolerance values
-        stringstream label_input_ss; label_input_ss << prototype_labels[i] << "-" << std::setw(3) << std::setfill('0') << j+1;
-        string label_input = label_input_ss.str();
-        double tolerance_sym = anrl::specialCaseSymmetryTolerances(label_input);
-
-        string updated_label_and_params = "";
-        if(!anrl::structureAndLabelConsistent(xstr, prototype_labels[i], updated_label_and_params, tolerance_sym)){ //DX20201105 - added symmetry tolerance
-          // if changes symmetry, give the appropriate label
-          message << "The structure has a higher symmetry than indicated by the label ";
-          message << "(orig: proto=" << prototype_labels[i] << " and " << parameter_sets[j] << "). ";
-          message << "The correct label and parameters for this structure are:" << endl;
-          message << updated_label_and_params << endl;
-          message << "Please feed this label and set of parameters into the prototype generator.";
-          pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-          return false;
-        }
-      }
-      // check uniqueness
-      if(check_uniqueness){
-        aurostd::xoption vpflow;
-        stringstream label_input_ss; label_input_ss << prototype_labels[i] << "-" << std::setw(3) << std::setfill('0') << j+1;
-        string label_input = label_input_ss.str();
-        // use special symmetry tolerance if necessary (otherwise, we won't check the prototypes with the correct symmetry)
-        double sym_eps = anrl::specialCaseSymmetryTolerances(label_input);
-        if(sym_eps!=AUROSTD_MAX_DOUBLE){;
-          xstr.sym_eps = sym_eps;
-          xstr.sym_eps_calculated = true;
-        }
-        // check if the prototype matches to more than one prototype
-        // (i.e., a prototype should match with itself, but no others)
-        vector<string> protos_matching = compare::getMatchingPrototypes(xstr, vpflow, catalog);
-        // if it matches to more than one
-        if(protos_matching.size()>1 && !anrl::isSpecialCaseEquivalentPrototypes(protos_matching)){
-          message << "ERROR: " << prototype_labels[i] << " given parameters=" << parameter_sets[j] << " matches to more than one prototype (and not a documented special case): ";
-          message << aurostd::joinWDelimiter(protos_matching,",") << ". ";
-          message << "If the prototype was newly added, ONLY include it in the encyclopedia for a valid reason (e.g., historical, special designation, etc.)";
-          message << " and document this in anrl::isSpecialCaseEquivalentPrototypes().";
-          pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-          return false;
-        }
-        // if it doesn't match with ITSELF
-        if(protos_matching.size()==0){
-          message << "ERROR: " << prototype_labels[i] << " given parameters=" << parameter_sets[j] << " does NOT match to any prototypes ";
-          message << "(either this system requires a special symmetry tolerance or there is a bug with XtalFinder)." << endl;
-          pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-        }
-      }
-    }
-  }
-  message << "Successfully generated all prototypes!";
-  pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
-
-  return true;
 }
 
 // ***************************************************************************

@@ -590,7 +590,7 @@ namespace xthread {
 //   vector<int> v1;
 //   vector<double> v2;
 //   xthread::xThread xt;
-//   xt.run(v1, v2);
+//   xt.run(v1, f1, v2);
 //
 // The instantiation is then:
 //
@@ -800,6 +800,21 @@ namespace xthread {
     vector<string>&,
     std::function<void(vector<string>::iterator&, const vector<string>&)>&,
     vector<string>&
+  );
+
+  //_testPrototype
+  template void xThread::run<
+      void(uint, const vector<string>&, vector<uint>&, vector<string>&, std::mutex&),
+      vector<string>,
+      vector<uint>,
+      vector<string>,
+      std::mutex
+    >(uint,
+      void(&) (uint, const vector<string>&, vector<uint>&, vector<string>&, std::mutex&),
+      vector<string>&,
+      vector<uint>&,
+      vector<string>&,
+      std::mutex&
   );
 
   // runPredistributed --------------------------------------------------------
