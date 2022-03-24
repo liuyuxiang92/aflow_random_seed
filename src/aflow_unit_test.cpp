@@ -100,28 +100,16 @@ namespace unittest {
     test_functions["atomic_environment"] = xchk;
 
     xchk = initializeXCheck();
-    xchk.func = std::bind(&UnitTest::coordinationTest, this, _1, _2, _3);
-    xchk.function_name = "coordinationTest():";
-    xchk.task_description = "Coordination numbers";
-    test_functions["coordination"] = xchk;
-
-    xchk = initializeXCheck();
     xchk.func = std::bind(&UnitTest::xstructureParserTest, this, _1, _2, _3);
     xchk.function_name = "xstructureParserTest():";
     xchk.task_description = "xstructure parsers";
     test_functions["xstructure_parser"] = xchk;
 
     xchk = initializeXCheck();
-    xchk.func = std::bind(&UnitTest::foldAtomsInCellTest, this, _1, _2, _3);
-    xchk.function_name= "foldAtomsInCellTest():";
-    xchk.task_description = "Folding atoms into cell";
-    test_functions["fold_atoms"] = xchk;
-
-    xchk = initializeXCheck();
-    xchk.func = std::bind(&UnitTest::foldAtomsInCellTest, this, _1, _2, _3);
-    xchk.function_name= "slabTest():";
-    xchk.task_description = "Creating slabs of structures";
-    test_functions["slab"] = xchk;
+    xchk.func = std::bind(&UnitTest::xstructureTest, this, _1, _2, _3);
+    xchk.function_name= "xstructureTest():";
+    xchk.task_description = "xstructure functions";
+    test_functions["xstructure"] = xchk;
   }
 
   xcheck UnitTest::initializeXCheck() {
@@ -152,7 +140,7 @@ namespace unittest {
 
     test_groups["aurostd"] = {"xscalar", "xvector", "xmatrix"};
     test_groups["database"] = {"schema"};
-    test_groups["structure"] = {"atomic_environment", "coordination", "xstructure_parser", "fold_atoms"};
+    test_groups["structure"] = {"atomic_environment", "xstructure", "xstructure_parser"};
 
     for (std::map<string, vector<string> >::iterator it = test_groups.begin(); it != test_groups.end(); ++it) {
       const vector<string>& members = (*it).second;
@@ -418,7 +406,6 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     // Check | double2fraction conversion //DX20210908
     // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
     check_function = "aurostd::double2fraction()";
     check_description = "convert a double to a fraction.";
 
@@ -558,6 +545,7 @@ namespace unittest {
 
     // ---------------------------------------------------------------------------
     // Check | convex solid volume (double)
+    // ---------------------------------------------------------------------------
     check_function = "aurostd::volume()";
     check_description = "convex solid, points as doubles";
     expected_dbl = 2.5;
@@ -567,6 +555,7 @@ namespace unittest {
 
     // ---------------------------------------------------------------------------
     // Check | convex solid volume (int)
+    // ---------------------------------------------------------------------------
     check_function = "aurostd::volume()";
     check_description = "convex solid, points as int";
 
@@ -608,6 +597,7 @@ namespace unittest {
 
     // ---------------------------------------------------------------------------
     // Check | non convex solid volume (double)
+    // ---------------------------------------------------------------------------
     check_function = "aurostd::volume()";
     check_description = "non convex solid, points as doubles";
     expected_dbl = 40.0;
@@ -617,6 +607,7 @@ namespace unittest {
 
     // ---------------------------------------------------------------------------
     // Check | error facet/normals mismatch
+    // ---------------------------------------------------------------------------
     check_function = "aurostd::volume()";
     check_description = "error: facet/normals mismatch";
     vector<xvector<double> > normals;
@@ -638,6 +629,7 @@ namespace unittest {
 
     // ---------------------------------------------------------------------------
     // Check | non convex solid volume (int)
+    // ---------------------------------------------------------------------------
     check_function = "aurostd::volume()";
     check_description = "non convex solid, points as int";
     expected_dbl = 40.0;
@@ -647,6 +639,7 @@ namespace unittest {
 
     // ---------------------------------------------------------------------------
     // Check | error facet size
+    // ---------------------------------------------------------------------------
     check_function = "aurostd::volume()";
     check_description = "error: wrong facet size";
     expected_str = "xerror code 30 (VALUE_ERROR)";
@@ -668,6 +661,7 @@ namespace unittest {
 
     // ---------------------------------------------------------------------------
     // Check | non convex area (double)
+    // ---------------------------------------------------------------------------
     check_function = "aurostd::areaPointsOnPlane()";
     check_description = "non convex area; points as double";
     expected_dbl = 10.0;
@@ -684,6 +678,7 @@ namespace unittest {
 
     // ---------------------------------------------------------------------------
     // Check | non convex area (int)
+    // ---------------------------------------------------------------------------
     check_function = "aurostd::areaPointsOnPlane()";
     check_description = "non convex area; points as int";
     expected_dbl = 10.0;
@@ -703,6 +698,7 @@ namespace unittest {
 
     // ---------------------------------------------------------------------------
     // Check | 3d triangle area (double)
+    // ---------------------------------------------------------------------------
     check_function = "aurostd::areaPointsOnPlane()";
     check_description = "3d triangle; points as double";
     expected_dbl = 3.5355339059;
@@ -712,6 +708,7 @@ namespace unittest {
 
     // ---------------------------------------------------------------------------
     // Check | 3d triangle area (int)
+    // ---------------------------------------------------------------------------
     check_function = "aurostd::areaPointsOnPlane()";
     check_description = "3d triangle; points as int";
     expected_dbl = 3.5355339059;
@@ -765,6 +762,9 @@ namespace unittest {
     string check_function = "";
     string check_description = "";
 
+    // ---------------------------------------------------------------------------
+    // Check | internal consistency
+    // ---------------------------------------------------------------------------
     check_function = "XHOST.vschema";
     check_description = "Internal consistency of vschema";
     vector<string> vschema_keys;
@@ -785,6 +785,9 @@ namespace unittest {
     }
     checkEqual(ninconsistent, 0, check_function, check_description, passed_checks, results);
 
+    // ---------------------------------------------------------------------------
+    // Check | consistency between _aflowlib_entry and schema
+    // ---------------------------------------------------------------------------
     check_function = "_aflowlib_entry";
     check_description = "Consistency between _aflowlib_entry json and schema";
     aflowlib::_aflowlib_entry aentry;
@@ -806,7 +809,7 @@ namespace unittest {
 
 }
 
-// xstructure tests
+// structure tests
 namespace unittest {
 
   //HE20210511
@@ -929,7 +932,14 @@ namespace unittest {
     double misfit = 0.0;
     bool match = false;
 
-    // CIF parser
+    // ---------------------------------------------------------------------------
+    // Check | CIF parser
+    // ---------------------------------------------------------------------------
+
+    // ---------------------------------------------------------------------------
+    // Test 1: parse structure with known settings
+    // ---------------------------------------------------------------------------
+
     // CrO3 was a problematic structure in the past
     str_cif =
       "data_Cr4O12\n"
@@ -1010,11 +1020,16 @@ namespace unittest {
     aurostd::StringstreamClean(xstrss);
     xstrss << str_poscar;
     xstr_poscar = xstructure(xstrss);
+
+    // ---------------------------------------------------------------------------
+    // test: parse structure
     match = compare::aflowCompareStructure(xstr_cif, xstr_poscar, same_species, scale_volume, optimize_match, misfit);
     expected_str = "Match";
     calculated_str = string(match?"":"No ") + "Match";
     checkEqual(expected_str, calculated_str, check_function, check_description, passed_checks, results);
 
+    // ---------------------------------------------------------------------------
+    // test: compare Wyckoff positions
     check_description = "Checking parsed Wyckoff positions of CrO3";
     vector<wyckoffsite_ITC> vwyckoff(4);
     xvector<double> coords;
@@ -1077,7 +1092,9 @@ namespace unittest {
     calculated_str = "Wyckoff positions " + string(check_passed?"match":"do not match");
     checkEqual(expected_str, calculated_str, check_function, check_description, passed_checks, results);
 
-    // Test that the CIF parser works for structures with old settings
+    // ---------------------------------------------------------------------------
+    // Test 2: parse structure with unrecognized (old) settings
+    // ---------------------------------------------------------------------------
     check_description = "Parsing CIF file with unrecognized setting (GePt3)";
     aurostd::StringstreamClean(xstrss);
     str_cif =
@@ -1180,6 +1197,8 @@ namespace unittest {
     xstr_cif = xstructure(xstrss);
     XHOST.QUIET = quiet_tmp;
 
+    // ---------------------------------------------------------------------------
+    // test: parse structure
     aurostd::StringstreamClean(xstrss);
     xstrss << str_poscar;
     xstr_poscar = xstructure(xstrss);
@@ -1189,30 +1208,33 @@ namespace unittest {
     checkEqual(expected_str, calculated_str, check_function, check_description, passed_checks, results);
   }
 
-  //CO20190520
-  void UnitTest::coordinationTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
+  void UnitTest::xstructureTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
     if (errors.size()) {} // Suppress compiler warnings
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     // Set up test environment
     string check_function = "", check_description = "";
+    string expected_str = "", calculated_str = "";
     uint expected_uint = 0, calculated_uint = 0;
+    bool match = false;
 
-    xstructure str("aflowlib.duke.edu:AFLOWDATA/ICSD_WEB/FCC/Cl1Na1_ICSD_240599","CONTCAR.relax.vasp",IOAFLOW_AUTO);
+    // ---------------------------------------------------------------------------
+    // Check | getCoordinations() //CO20190520
+    // ---------------------------------------------------------------------------
+    xstructure xstr("aflowlib.duke.edu:AFLOWDATA/ICSD_WEB/FCC/Cl1Na1_ICSD_240599","CONTCAR.relax.vasp",IOAFLOW_AUTO);
     deque<deque<uint> > coordinations;
-    str.GetCoordinations(coordinations);
+    xstr.GetCoordinations(coordinations);
 
-    check_function = "coordinations.size()";
+    check_function = "xstructure::getCoordinations()";
     check_description = "Number of iatoms";
     calculated_uint = coordinations.size();
     expected_uint = 2;
     checkEqual(calculated_uint, expected_uint, check_function, check_description, passed_checks, results);
 
-    check_function = "coordinations[0].size()";
     check_description = "Number of coordination environments atom 1";
     calculated_uint = coordinations[0].size();
     expected_uint = 2;
     checkEqual(calculated_uint, expected_uint, check_function, check_description, passed_checks, results);
 
-    check_function = "coordinations[1].size()";
     check_description = "Number of coordination environments atom 2";
     calculated_uint = coordinations[1].size();
     expected_uint = 2;
@@ -1220,14 +1242,12 @@ namespace unittest {
 
     //first iatom
     //first shell
-    check_function = "coordinations[0][0]";
     check_description = "First shell atom 1";
     calculated_uint = coordinations[0][0];
     expected_uint = 6;
     checkEqual(calculated_uint, expected_uint, check_function, check_description, passed_checks, results);
 
     //second shell
-    check_function = "coordinations[0][1]";
     check_description = "Second shell atom 1";
     calculated_uint = coordinations[0][1];
     expected_uint = 12;
@@ -1235,51 +1255,20 @@ namespace unittest {
 
     //second iatom
     //first shell
-    check_function = "coordinations[1][0]";
     check_description = "First shell atom 2";
     calculated_uint = coordinations[1][0];
     expected_uint = 6;
     checkEqual(calculated_uint, expected_uint, check_function, check_description, passed_checks, results);
 
     //second shell
-    check_function = "coordinations[1][1]";
     check_description = "Second shell atom 2";
     calculated_uint = coordinations[1][1];
     expected_uint = 12;
     checkEqual(calculated_uint, expected_uint, check_function, check_description, passed_checks, results);
-  }
-
-  //DX20210129
-  void UnitTest::foldAtomsInCellTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
-    // setup test environment
-    string check_function = "", check_description = "", expected_str = "", calculated_str = "";
-    stringstream message;
 
     // ---------------------------------------------------------------------------
-    // generate rocksalt structure
-    check_function = "anrl::getANRLParameters()";
-    check_description = "prototype parameters for AB_cF8_225_a_b";
-    string prototype_label = "AB_cF8_225_a_b"; 
-    vector<string> parameter_sets = anrl::getANRLParameters(prototype_label,"all");
-    checkEqual(parameter_sets.size(), 1, check_function, check_description, passed_checks, results);
-
-    check_function = "aflowlib::PrototypeLibraries()";
-    check_description = "structure from prototype label and params";
-    xstructure xstr;
-    bool generated = false;
-    try{
-      xstr = aflowlib::PrototypeLibraries(*p_oss,prototype_label,parameter_sets[0],1);
-      generated = true;
-    }
-    catch(aurostd::xerror& excpt){
-      message << "Could not generate prototype=" << prototype_label << " given parameters=" << parameter_sets[0] << "; check inputs or the symbolic generator.";
-      errors.push_back(message.str());
-      generated = false;
-    }
-    expected_str = "Prototype generated";
-    calculated_str = "Prototype " + string(generated?"":"not ") + "generated";
-
-    checkEqual(expected_str, calculated_str, check_function, check_description, passed_checks, results);
+    // Check | foldAtomdInCell //DX20210129
+    // ---------------------------------------------------------------------------
 
     // set fold atoms in cell variables
     bool skew = false;
@@ -1299,7 +1288,7 @@ namespace unittest {
     xstr_supercell.foldAtomsInCell(lattice_new, skew, tol, check_min_dists);
 
     bool same_species = true;
-    bool match = compare::structuresMatch(xstr,xstr_supercell,same_species);
+    match = compare::structuresMatch(xstr,xstr_supercell,same_species);
     expected_str = "Match";
     calculated_str = "Match", string(match?"":"No ") + "Match";
     checkEqual(expected_str, calculated_str, check_function, check_description, passed_checks, results);
@@ -1316,18 +1305,14 @@ namespace unittest {
     expected_str = "Match";
     calculated_str = "Match", string(match?"":"No ") + "Match";
     checkEqual(expected_str, calculated_str, check_function, check_description, passed_checks, results);
-  }
 
-  //See W. Sun and G. Ceder, Surface Science 617 (2013) 53-59
-  void UnitTest::slabTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {  //CO20190520
-    if (errors.size()) {} // Suppress compiler warnings
-    bool LDEBUG = (FALSE || XHOST.DEBUG);
-
-    // Set up test environment
-    string check_function = "", check_description = "", xstr_str = "";
+    // ---------------------------------------------------------------------------
+    // Check | slab test //CO20190520
+    // ---------------------------------------------------------------------------
+    //See W. Sun and G. Ceder, Surface Science 617 (2013) 53-59
+    string xstr_str = "";
     stringstream xstrss;
     double min_dist = 0.0, min_dist_orig = 0.0;
-
     xvector<int> hkl(3);
     hkl[1] = 1; hkl[2] = 0; hkl[3] = 4;
 
@@ -1427,6 +1412,8 @@ namespace unittest {
     try {
       xstr_slab_correct = xstructure(xstrss); //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
     } catch (aurostd::xerror& excpt) {} //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
+    // ---------------------------------------------------------------------------
+    // test 1: compare min distance of bulk and correct slab
     min_dist = xstr_slab_correct.MinDist();
     if(LDEBUG){
       std::cerr << __AFLOW_FUNC__ << " xstr_slab_correct=\n" << xstr_slab_correct << std::endl;
@@ -1437,9 +1424,12 @@ namespace unittest {
     check_description = "Compare minimum distance bulk vs. correct slab";
     checkEqual(min_dist, min_dist_orig, check_function, check_description, passed_checks, results);
 
+    // ---------------------------------------------------------------------------
+    // test 2: compare min distance of generated slab and correct slab
     xmatrix<double> lattice_slab_origbasis;
     xstructure xstr_slab_test = slab::CreateSlab_SurfaceLattice(xstr_in,hkl,1,0,5.0); //the v3len_max_strict is very important here, as the test from Sun et al. takes a shortcut here
     min_dist = xstr_slab_test.MinDist();
+    check_function = "xstructure::CreateSlab_SurfaceLattice(hkl = 104)";
     check_description = "Compare minimum distance slab vs. correct slab";
     if(LDEBUG){
       std::cerr << __AFLOW_FUNC__ << " xstr_slab_test=\n" << xstr_slab_test << std::endl;
@@ -1448,10 +1438,12 @@ namespace unittest {
     }
     checkEqual(min_dist, min_dist_orig, check_function, check_description, passed_checks, results);
 
-    check_function = "xstructure::CreateSlab_SurfaceLattice()";
+    // ---------------------------------------------------------------------------
+    // test 3: compare structures of generated slab and correct slab
     check_description = "Compare minimum distance bulk vs. correct slab";
-    bool match = compare::structuresMatch(xstr_slab_correct,xstr_slab_test,true,false,false);
+    match = compare::structuresMatch(xstr_slab_correct,xstr_slab_test,true,false,false);
     checkEqual("Match", string(match?"":"No ") + "Match", check_function, check_description, passed_checks, results);
+
   }
 
 }
