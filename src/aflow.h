@@ -5454,7 +5454,7 @@ namespace unittest {
 
       // xstructure
       void atomicEnvironmentTest(uint&, vector<string>&, vector<string>&);
-      void cifParserTest(uint&, vector<string>&, vector<string>&);
+      void xstructureParserTest(uint&, vector<string>&, vector<string>&);
       void coordinationTest(uint&, vector<string>&, vector<string>&);
       void foldAtomsInCellTest(uint&, vector<string>&, vector<string>&);
   };

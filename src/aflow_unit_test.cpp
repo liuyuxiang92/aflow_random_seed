@@ -67,13 +67,19 @@ namespace unittest {
     xchk.func = std::bind(&UnitTest::xscalarTest, this, _1, _2, _3);
     xchk.function_name = XPID + "xscalarTest():";
     xchk.task_description = "Testing xscalar";
-    test_functions["schema"] = xchk;
+    test_functions["xscalar"] = xchk;
 
     xchk = initializeXCheck();
     xchk.func = std::bind(&UnitTest::xvectorTest, this, _1, _2, _3);
     xchk.function_name = XPID + "xvectorTest():";
     xchk.task_description = "Testing xvector";
-    test_functions["schema"] = xchk;
+    test_functions["xvector"] = xchk;
+
+    xchk = initializeXCheck();
+    xchk.func = std::bind(&UnitTest::xmatrixTest, this, _1, _2, _3);
+    xchk.function_name = XPID + "xmatrixTest():";
+    xchk.task_description = "Testing xmatrix";
+    test_functions["xmatrix"] = xchk;
 
     // database
     xchk = initializeXCheck();
@@ -90,16 +96,16 @@ namespace unittest {
     test_functions["atomic_environment"] = xchk;
 
     xchk = initializeXCheck();
-    xchk.func = std::bind(&UnitTest::atomicEnvironmentTest, this, _1, _2, _3);
+    xchk.func = std::bind(&UnitTest::coordinationTest, this, _1, _2, _3);
     xchk.function_name = XPID + "coordinationTest():";
     xchk.task_description = "Testing coordination numbers";
     test_functions["coordination"] = xchk;
 
     xchk = initializeXCheck();
-    xchk.func = std::bind(&UnitTest::cifParserTest, this, _1, _2, _3);
-    xchk.function_name = XPID + "cifParserTest():";
-    xchk.task_description = "Testing CIF file parser";
-    test_functions["cif_parser"] = xchk;
+    xchk.func = std::bind(&UnitTest::xstructureParserTest, this, _1, _2, _3);
+    xchk.function_name = XPID + "xstructureParserTest():";
+    xchk.task_description = "Testing structure parsers";
+    test_functions["xstructure_parser"] = xchk;
 
     xchk = initializeXCheck();
     xchk.func = std::bind(&UnitTest::foldAtomsInCellTest, this, _1, _2, _3);
@@ -134,9 +140,9 @@ namespace unittest {
     test_groups.clear();
     test2group.clear();
 
-    test_groups["aurostd"] = {"xscalar", "xvector"};
+    test_groups["aurostd"] = {"xscalar", "xvector", "xmatrix"};
     test_groups["database"] = {"schema"};
-    test_groups["xstructure"] = {"atomic_environment", "coordination", "cif_parser", "fold_atoms"};
+    test_groups["structure"] = {"atomic_environment", "coordination", "xstructure_parser", "fold_atoms"};
 
     for (const auto& group : test_groups) {
       for (const string& member : group.second) {
@@ -865,7 +871,7 @@ namespace unittest {
     checkEqual(AE[test_AE].facet_order[2], uint(0), check_function, check_description, passed_checks, results);
   }
 
-  void UnitTest::cifParserTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
+  void UnitTest::xstructureParserTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if (errors.size()) {}  // Suppress compiler warnings
 
