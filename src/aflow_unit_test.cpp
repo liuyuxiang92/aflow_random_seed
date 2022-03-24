@@ -320,6 +320,20 @@ namespace unittest {
     const string& check_description, uint& passed_checks, vector<string>& results) {
     check(passed, aurostd::joinWDelimiter(calculated, ","), aurostd::joinWDelimiter(expected, ","), check_function, check_description, passed_checks, results);
   }
+  void UnitTest::check(const bool passed, const vector<double>& calculated, const vector<double>& expected, const string& check_function,
+    const string& check_description, uint& passed_checks, vector<string>& results) {
+    check(passed, aurostd::joinWDelimiter(aurostd::vecDouble2vecString(calculated), ","), aurostd::joinWDelimiter(aurostd::vecDouble2vecString(expected), ","), check_function, check_description, passed_checks, results);
+  }
+
+  template <typename utype>
+  void UnitTest::check(const bool passed, const xmatrix<utype>& calculated, const xmatrix<utype>& expected, const string& check_function,
+    const string& check_description, uint& passed_checks, vector<string>& results) {
+    check(passed, aurostd::xmat2String(calculated), aurostd::xmat2String(expected), check_function, check_description, passed_checks, results);
+  }
+  void UnitTest::check(const bool passed, const xmatrix<double>& calculated, const xmatrix<double>& expected, const string& check_function,
+    const string& check_description, uint& passed_checks, vector<string>& results) {
+    check(passed, aurostd::xmatDouble2String(calculated), aurostd::xmatDouble2String(expected), check_function, check_description, passed_checks, results);
+  }
 
   template <typename utype>
   void UnitTest::check(const bool passed, const utype& calculated, const utype& expected, const string& check_function,
@@ -349,7 +363,18 @@ namespace unittest {
   template <typename utype>
   void UnitTest::checkEqual(const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
       const string& check_description, uint& passed_checks, vector<string>& results) {
-    bool passed = aurostd::isequal(calculated, expected);
+    bool passed = (calculated.size() == expected.size());
+    for (uint i = 0; i < calculated.size() && passed; i++) {
+      passed = aurostd::isequal(calculated[i], expected[i]);
+    }
+    check(passed, calculated, expected, check_function, check_description, passed_checks, results);
+  }
+  void UnitTest::checkEqual(const vector<string>& calculated, const vector<string>& expected, const string& check_function,
+      const string& check_description, uint& passed_checks, vector<string>& results) {
+    bool passed = (calculated.size() == expected.size());
+    for (uint i = 0; i < calculated.size() && passed; i++) {
+      passed = (calculated[i] == expected[i]);
+    }
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
   }
 

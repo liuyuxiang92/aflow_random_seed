@@ -1253,6 +1253,21 @@ namespace aurostd {
   string joinWDelimiter(const xvector<int>& ientries, const stringstream& delimiter,
       const stringstream& m_delimiter,
       const stringstream& l_delimiter);
+  // ME20220324 - added missing uint variant for xvector
+  string joinWDelimiter(const xvector<uint>& ientries, const char& _delimiter);
+  string joinWDelimiter(const xvector<uint>& ientries, const char& _delimiter,
+      const char& _l_delimiter);
+  string joinWDelimiter(const xvector<uint>& ientries, const char& _delimiter,
+      const char& _m_delimiter, const char& _l_delimiter);
+  string joinWDelimiter(const xvector<uint>& ientries, const string& _delimiter);
+  string joinWDelimiter(const xvector<uint>& ientries, const string& _delimiter,
+      const string& _l_delimiter);
+  string joinWDelimiter(const xvector<uint>& ientries, const string& _delimiter,
+      const string& _m_delimiter, const string& _l_delimiter);
+  string joinWDelimiter(const xvector<uint>& ientries, const stringstream& delimiter);
+  string joinWDelimiter(const xvector<uint>& ientries, const stringstream& delimiter,
+      const stringstream& m_delimiter,
+      const stringstream& l_delimiter);
   string joinWDelimiter(const vector<int>& ientries, const char& _delimiter);
   string joinWDelimiter(const vector<int>& ientries, const char& _delimiter,
       const char& _l_delimiter);
@@ -1364,6 +1379,9 @@ namespace aurostd {
 namespace aurostd {
   // [OBSOLETE] string xmatDouble2String(const xmatrix<double>& xmat_in, bool roff=false);
   string xmatDouble2String(const xmatrix<double>& xmat_in, int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
+  // ME20220324
+  template <typename utype>
+  string xmat2String(const xmatrix<utype>& mat_in);
 }
 
 //CO20171215 - more json functionality

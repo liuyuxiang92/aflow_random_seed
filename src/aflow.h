@@ -5420,8 +5420,16 @@ namespace unittest {
       bool taskSuccessful(const string& task);
 
       void displayResult(const xcheck& xchk);
+
       template <typename utype>
       void check(const bool passed, const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
+          const string& checkDescription, uint& passed_checks, vector<string>& results);
+      void check(const bool passed, const vector<double>& calculated, const vector<double>& expected, const string& check_function,
+          const string& checkDescription, uint& passed_checks, vector<string>& results);
+      template <typename utype>
+      void check(const bool passed, const xmatrix<utype>& calculated, const xmatrix<utype>& expected, const string& check_function,
+          const string& checkDescription, uint& passed_checks, vector<string>& results);
+      void check(const bool passed, const xmatrix<double>& calculated, const xmatrix<double>& expected, const string& check_function,
           const string& checkDescription, uint& passed_checks, vector<string>& results);
       template <typename utype>
       void check(const bool passed, const utype& calculated, const utype& expected, const string& check_function,
@@ -5429,6 +5437,8 @@ namespace unittest {
 
       template <typename utype>
       void checkEqual(const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
+          const string& check_description, uint& passed_checks, vector<string>& results);
+      void checkEqual(const vector<string>& calculated, const vector<string>& expected, const string& check_function,
           const string& check_description, uint& passed_checks, vector<string>& results);
       template <typename utype>
       void checkEqual(const utype& calculated, const utype& expected, const string& check_function,
