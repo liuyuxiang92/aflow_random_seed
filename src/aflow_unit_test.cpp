@@ -110,6 +110,18 @@ namespace unittest {
     xchk.function_name= "xstructureTest():";
     xchk.task_description = "xstructure functions";
     test_functions["xstructure"] = xchk;
+
+    // ovasp
+    xchk = initializeXCheck();
+    xchk.func = std::bind(&UnitTest::xoutcarTest, this, _1, _2, _3);
+    xchk.function_name= "xoutcarTest():";
+    xchk.task_description = "xOUTCAR class";
+
+    // structure generation
+    xchk = initializeXCheck();
+    xchk.func = std::bind(&UnitTest::ceramgenTest, this, _1, _2, _3);
+    xchk.function_name= "xoutcarTest():";
+    xchk.task_description = "pflow::GENERATE_CERAMICS()";
   }
 
   xcheck UnitTest::initializeXCheck() {
@@ -141,6 +153,7 @@ namespace unittest {
     test_groups["aurostd"] = {"xscalar", "xvector", "xmatrix"};
     test_groups["database"] = {"schema"};
     test_groups["structure"] = {"atomic_environment", "xstructure", "xstructure_parser"};
+    test_groups["ovasp"] = {"outcar"};
 
     for (std::map<string, vector<string> >::iterator it = test_groups.begin(); it != test_groups.end(); ++it) {
       const vector<string>& members = (*it).second;
@@ -218,7 +231,7 @@ namespace unittest {
     }
 
     if (nsuccess == ntasks) {
-      message << "Unit tests passed successfully (passsing " << ntasks << " tests).";
+      message << "Unit tests passed successfully (passing " << ntasks << " tests).";
       pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
     } else {
       message << "Some unit tests failed (" << (ntasks - nsuccess) << " of " << ntasks << " failed).";
@@ -279,12 +292,12 @@ namespace unittest {
       for (uint m = 0; m < members.size(); m++) {
         const string& member = members[m];
         const xcheck& xchk = test_functions[member];
-        if (!xchk.finished || (test_functions[member].passed_checks != test_functions[member].results.size())) return false;
+        if (!xchk.finished || (xchk.errors.size() > 0) || (xchk.passed_checks != xchk.results.size())) return false;
       }
       return true;
     } else {
       const xcheck& xchk = test_functions[task];
-      return (xchk.finished && (xchk.passed_checks == xchk.results.size()));
+      return (xchk.finished && (xchk.errors.size() == 0) && (xchk.passed_checks == xchk.results.size()));
     }
   }
 
@@ -297,10 +310,17 @@ namespace unittest {
     stringstream message;
     uint check_num = xchk.results.size();
     if (xchk.passed_checks == check_num) {
-      message << "SUCCESS " << xchk.task_description << " (passing " << check_num << " checks)" << endl;
-      pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
+      if (xchk.errors.size() > 0) {
+        // All attempted checks passed, but there were errors.
+        // This happens when a prerequisite for a test fails (e.g. file loading).
+        message << "FAIL " << xchk.task_description << " due to runtime errors" << std::endl;
+        pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
+      } else {
+        message << "SUCCESS " << xchk.task_description << " (passing " << check_num << " checks)" << std::endl;
+        pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
+      }
     } else {
-      message << "FAIL " << xchk.task_description << " (" << (check_num - xchk.passed_checks) << " of " << check_num << " checks failed)" << endl;
+      message << "FAIL " << xchk.task_description << " (" << (check_num - xchk.passed_checks) << " of " << check_num << " checks failed)" << std::endl;
       pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
     }
     message << "\t" << aurostd::joinWDelimiter(xchk.results, "\n\t");
@@ -422,38 +442,38 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     check_function = "aurostd::mod_floored()";
     check_description = "floored mod; numbers as int";
-    expected_int = -1; 
-    
+    expected_int = -1;
+
     calculated_int = aurostd::mod_floored(5, -3);
     checkEqual(calculated_int, expected_int, check_function, check_description, passed_checks, results);
-  
+
     // ---------------------------------------------------------------------------
     // Check | mod_floored (double) //SD20220124
     // ---------------------------------------------------------------------------
     check_function = "aurostd::mod_floored()";
     check_description = "floored mod; numbers as double";
     expected_dbl = 1.4;
-  
+
     calculated_dbl = aurostd::mod_floored(-5.2, 3.3);
     checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
-  
+
     // ---------------------------------------------------------------------------
     // Check | mod_floored (divisor 0) //SD20220124
     // ---------------------------------------------------------------------------
     check_function = "aurostd::mod_floored()";
-    check_description = "floored mod; divisor is 0"; 
+    check_description = "floored mod; divisor is 0";
     expected_dbl = 11.11;
-  
+
     calculated_dbl = aurostd::mod_floored(11.11, 0.0);
     checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
-  
+
     // ---------------------------------------------------------------------------
     // Check | mod_floored (divisor inf) //SD20220124
     // ---------------------------------------------------------------------------
     check_function = "aurostd::mod_floored()";
     check_description = "floored mod; divisor is inf";
     expected_dbl = 11.11;
-  
+
     calculated_dbl = aurostd::mod_floored(11.11, (double)INFINITY);
     checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
 
@@ -917,7 +937,8 @@ namespace unittest {
     if (LDEBUG) std::cerr << "Running " << __AFLOW_FUNC__ << std::endl;
 
     // Set up test environment
-    string check_function = "", check_description = "", expected_str = "", calculated_str = "";
+    string check_function = "", check_description = "";
+    bool calculated_bool = false, expected_bool = false;
 
     // Set up structure variables
     _aflags aflags; aflags.Directory = aurostd::getPWD();
@@ -930,7 +951,6 @@ namespace unittest {
     bool scale_volume = false;
     bool optimize_match = false;
     double misfit = 0.0;
-    bool match = false;
 
     // ---------------------------------------------------------------------------
     // Check | CIF parser
@@ -1023,14 +1043,13 @@ namespace unittest {
 
     // ---------------------------------------------------------------------------
     // test: parse structure
-    match = compare::aflowCompareStructure(xstr_cif, xstr_poscar, same_species, scale_volume, optimize_match, misfit);
-    expected_str = "Match";
-    calculated_str = string(match?"":"No ") + "Match";
-    checkEqual(expected_str, calculated_str, check_function, check_description, passed_checks, results);
+    expected_bool = true;
+    calculated_bool = compare::aflowCompareStructure(xstr_cif, xstr_poscar, same_species, scale_volume, optimize_match, misfit);
+    checkEqual(expected_bool, calculated_bool, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
     // test: compare Wyckoff positions
-    check_description = "Checking parsed Wyckoff positions of CrO3";
+    check_description = "Compare parsed Wyckoff positions of CrO3";
     vector<wyckoffsite_ITC> vwyckoff(4);
     xvector<double> coords;
     vwyckoff[0].type = "Cr"; vwyckoff[0].letter = "b"; vwyckoff[0].site_symmetry = "m.."; vwyckoff[0].multiplicity = 4; vwyckoff[0].coord[1] = 0.25; vwyckoff[0].coord[2] = 0.09676; vwyckoff[0].coord[3] = 0.5;
@@ -1057,12 +1076,12 @@ namespace unittest {
       }
     }
 
-    expected_str = "Wyckoff positions match";
-    calculated_str = "Wyckoff positions " + string(check_passed?"match":"do not match");
-    checkEqual(expected_str, calculated_str, check_function, check_description, passed_checks, results);
+    expected_bool = true;
+    calculated_bool = check_passed;
+    checkEqual(expected_bool, calculated_bool, check_function, check_description, passed_checks, results);
 
     // May need a better test case where the labels actually change
-    check_description = "Checking calculated Wyckoff positions of CrO3";
+    check_description = "Compare calculated Wyckoff positions of CrO3";
     xstr_cif.SpaceGroup_ITC();
     vwyckoff[0].coord[1] = 0.25; vwyckoff[0].coord[2] = 0.59676; vwyckoff[0].coord[3] = 0.0000;
     vwyckoff[1].coord[1] = 0.00; vwyckoff[1].coord[2] = 0.00000; vwyckoff[1].coord[3] = 0.3841;
@@ -1088,9 +1107,9 @@ namespace unittest {
       }
     }
 
-    expected_str = "Wyckoff positions match";
-    calculated_str = "Wyckoff positions " + string(check_passed?"match":"do not match");
-    checkEqual(expected_str, calculated_str, check_function, check_description, passed_checks, results);
+    expected_bool = true;
+    calculated_bool = check_passed;
+    checkEqual(expected_bool, calculated_bool, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
     // Test 2: parse structure with unrecognized (old) settings
@@ -1202,10 +1221,9 @@ namespace unittest {
     aurostd::StringstreamClean(xstrss);
     xstrss << str_poscar;
     xstr_poscar = xstructure(xstrss);
-    match = compare::aflowCompareStructure(xstr_cif, xstr_poscar, same_species, scale_volume, optimize_match, misfit);
-    expected_str = "Match";
-    calculated_str = string(match?"":"No ") + "Match";
-    checkEqual(expected_str, calculated_str, check_function, check_description, passed_checks, results);
+    expected_bool = true;
+    calculated_bool = compare::aflowCompareStructure(xstr_cif, xstr_poscar, same_species, scale_volume, optimize_match, misfit);
+    checkEqual(expected_bool, calculated_bool, check_function, check_description, passed_checks, results);
   }
 
   void UnitTest::xstructureTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
@@ -1213,9 +1231,8 @@ namespace unittest {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // Set up test environment
     string check_function = "", check_description = "";
-    string expected_str = "", calculated_str = "";
+    bool expected_bool = false, calculated_bool = false;
     uint expected_uint = 0, calculated_uint = 0;
-    bool match = false;
 
     // ---------------------------------------------------------------------------
     // Check | getCoordinations() //CO20190520
@@ -1288,10 +1305,9 @@ namespace unittest {
     xstr_supercell.foldAtomsInCell(lattice_new, skew, tol, check_min_dists);
 
     bool same_species = true;
-    match = compare::structuresMatch(xstr,xstr_supercell,same_species);
-    expected_str = "Match";
-    calculated_str = "Match", string(match?"":"No ") + "Match";
-    checkEqual(expected_str, calculated_str, check_function, check_description, passed_checks, results);
+    expected_bool = true;
+    calculated_bool = compare::structuresMatch(xstr,xstr_supercell,same_species);
+    checkEqual(expected_bool, calculated_bool, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
     // test 2: reduce cell
@@ -1301,10 +1317,9 @@ namespace unittest {
     xstructure xstr_reduced = xstr_supercell;
     xstr_reduced.foldAtomsInCell(xstr.lattice, skew, tol, check_min_dists);
 
-    match = compare::structuresMatch(xstr,xstr_reduced,same_species);
-    expected_str = "Match";
-    calculated_str = "Match", string(match?"":"No ") + "Match";
-    checkEqual(expected_str, calculated_str, check_function, check_description, passed_checks, results);
+    expected_bool = true;
+    calculated_bool = compare::structuresMatch(xstr,xstr_reduced,same_species);
+    checkEqual(expected_bool, calculated_bool, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
     // Check | slab test //CO20190520
@@ -1440,157 +1455,178 @@ namespace unittest {
 
     // ---------------------------------------------------------------------------
     // test 3: compare structures of generated slab and correct slab
-    check_description = "Compare minimum distance bulk vs. correct slab";
-    match = compare::structuresMatch(xstr_slab_correct,xstr_slab_test,true,false,false);
-    checkEqual("Match", string(match?"":"No ") + "Match", check_function, check_description, passed_checks, results);
+    check_description = "Match structures of generated slab and correct slab";
+    expected_bool = true;
+    calculated_bool = compare::structuresMatch(xstr_slab_correct,xstr_slab_test,true,false,false);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
 
   }
 
 }
 
-bool CeramGenTest(ostream& oss){ofstream FileMESSAGE;return CeramGenTest(FileMESSAGE,oss);}  //CO20190520
-bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
-  //bool LDEBUG=TRUE; // TRUE;
-  stringstream message;
-  _aflags aflags;aflags.Directory=".";
+// structure generation
+namespace unittest {
 
-  message << "Performing ceramics generation test";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  //CO20190520
+  void UnitTest::ceramgenTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
+    if (errors.size()) {} // Suppress compiler warnings
 
-  //./aflow --generate_ceramics --nm=N,C --m=Co,Mo,Fe,Ru,Ni,Rh,Pt,Cu,Cr,V --N=5
-  vector<string> vnonmetals,vmetals;
-  aurostd::string2tokens("N,C",vnonmetals,",");aurostd::string2tokens("Co,Mo,Fe,Ru,Ni,Rh,Pt,Cu,Cr,V",vmetals,",");
+    // setup test environment
+    string check_function = "", check_description = "";
+    bool calculated_bool = false, expected_bool = false;
+    uint calculated_uint = 0, expected_uint = 0;
 
-  vector<string> commands=pflow::GENERATE_CERAMICS(vnonmetals,vmetals,5);
-  if(commands.size()!=6){
-    message << "commands.size()!=6";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-    return false;
-  }
-  //C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N
-  //C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V
-  //C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V
-  //C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V
-  //C:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V
-  //C:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V
+    //./aflow --generate_ceramics --nm=N,C --m=Co,Mo,Fe,Ru,Ni,Rh,Pt,Cu,Cr,V --N=5
+    vector<string> vnonmetals,vmetals;
+    aurostd::string2tokens("N,C",vnonmetals,",");
+    aurostd::string2tokens("Co,Mo,Fe,Ru,Ni,Rh,Pt,Cu,Cr,V",vmetals,",");
 
-  if(!aurostd::WithinList(commands,"C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N")){
-    message << "C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N not found";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-    return false;
-  }
-  if(!aurostd::WithinList(commands,"C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V")){
-    message << "C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V not found";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-    return false;
-  }
-  if(!aurostd::WithinList(commands,"C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V")){
-    message << "C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V not found";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-    return false;
-  }
-  if(!aurostd::WithinList(commands,"C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V")){
-    message << "C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V not found";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-    return false;
-  }
-  if(!aurostd::WithinList(commands,"C:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V")){
-    message << "C:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V not found";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-    return false;
-  }
-  if(!aurostd::WithinList(commands,"C:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V")){
-    message << "C:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V not found";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-    return false;
+    check_function = "pflow::GENERATE_CERAMICS()";
+    vector<string> commands=pflow::GENERATE_CERAMICS(vnonmetals,vmetals,5);
+
+    check_description = "number of commands";
+    calculated_uint = commands.size();
+    expected_uint = 6;
+    checkEqual(calculated_uint, expected_uint, check_function, check_description, passed_checks, results);
+
+    //C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N
+    //C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V
+    //C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V
+    //C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V
+    //C:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V
+    //C:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V
+
+    string search = "";
+
+    search = "C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N";
+    check_description = "find " + search;
+    expected_bool = true;
+    calculated_bool = aurostd::WithinList(commands, search);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+
+    search = "C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V";
+    check_description = "find " + search;
+    calculated_bool = aurostd::WithinList(commands, search);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+
+    search = "C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V";
+    check_description = "find " + search;
+    calculated_bool = aurostd::WithinList(commands, search);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+
+    search = "C:Co,Cr,Cu,Fe,Mo:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V";
+    check_description = "find " + search;
+    calculated_bool = aurostd::WithinList(commands, search);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+
+    search = "C:Co,Cr,Cu,Fe,Mo:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V";
+    check_description = "find " + search;
+    calculated_bool = aurostd::WithinList(commands, search);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+
+    search = "C:N:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V:Ni,Pt,Rh,Ru,V";
+    check_description = "find " + search;
+    calculated_bool = aurostd::WithinList(commands, search);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
   }
 
-  message << "Ceramics generation test successful";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
-  return true;
 }
-bool EgapTest(ostream& oss){ofstream FileMESSAGE;return EgapTest(FileMESSAGE,oss);}  //CO20190520
-bool EgapTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
-  bool LDEBUG=TRUE; // TRUE;
-  stringstream message;
-  _aflags aflags;aflags.Directory=".";
 
-  message << "Performing Egap test";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+// ovasp
+namespace unittest {
+  void UnitTest::xoutcarTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
+    bool LDEBUG = (FALSE || XHOST.DEBUG);
 
-  string system="",path="",query="",file="",efile="",ext="",tfile="",Egap_type="";
-  vector<string> files;
-  xOUTCAR xout(FileMESSAGE,oss);
-  double EFERMI=AUROSTD_MAX_DOUBLE,Egap=0.0;
+    // setup test environment
+    string check_function = "", check_description = "";
+    string calculated_str = "", expected_str = "";
+    bool calculated_bool = false, expected_bool = false;
+    double calculated_dbl = 0.0, expected_dbl = 0.0;
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////
-  //FCC/Si1_ICSD_150530
-  system="ICSD_WEB/FCC/Si1_ICSD_150530";
+    string system="",path="",query="",file="",efile="",ext="",tfile="",Egap_type="";
+    vector<string> files;
+    xOUTCAR xout;
 
-  path=AFLOWLIB_SERVER_DEFAULT+"/AFLOWDATA/"+system;
-  query=path+"/?files";
-  message << "Fetching: " << query;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  aurostd::url2tokens(query,files,",");
-  if(files.size()==0){
-    message << "Could not fetch query: " << query;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-    return false;
-  }
-  //OUTCAR.static
-  file="OUTCAR.static";
-  if(!aurostd::EWithinList(files,file,efile)){
-    message << "No " << file << " found within " << query;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-    return false;
-  }
-  ext=aurostd::GetCompressionExtension(efile);
-  tfile=aurostd::TmpFileCreate("Egap_file1")+ext;
-  query=path+"/"+efile;
-  message << "Fetching: " << query;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  if(!(aurostd::url2file(query,tfile,LDEBUG) && aurostd::FileExist(tfile))){
-    message << "Could not fetch query: " << query;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-    return false;
-  }
-  message << "Loaded file to: " << tfile;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  if(!xout.GetPropertiesFile(tfile,!LDEBUG)){
-    message << "xOUTCAR::GetProperties() failed";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-    return false;
-  }
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    //FCC/Si1_ICSD_150530
+    system="ICSD_WEB/FCC/Si1_ICSD_150530";
+
+    // Fetch and parse required files first - abort test if unsuccessful
+    path=AFLOWLIB_SERVER_DEFAULT+"/AFLOWDATA/"+system;
+    query=path+"/?files";
+    aurostd::url2tokens(query,files,",");
+    if(files.size()==0){
+      errors.push_back("Could not fetch query: " + query);
+      return;
+    }
+
+    //OUTCAR.static
+    file="OUTCAR.static";
+    if(!aurostd::EWithinList(files,file,efile)){
+      errors.push_back("No " + file + " found within " + query);
+      return;
+    }
+
+    ext=aurostd::GetCompressionExtension(efile);
+    tfile=aurostd::TmpFileCreate("Egap_file1")+ext;
+    query=path+"/"+efile;
+    if(!(aurostd::url2file(query,tfile,LDEBUG) && aurostd::FileExist(tfile))){
+      errors.push_back("Could not fetch query: " + query);
+      return;
+    }
+
+    check_function = "xOUTCAR::GetProperties()";
+    check_description = "load OUTCAR.static";
+    if (!xout.GetPropertiesFile(tfile,!LDEBUG)) {
+      errors.push_back("Could not parse " + file);
+      return;
+    }
 #ifndef _AFLOW_TEMP_PRESERVE_
-  aurostd::RemoveFile(tfile);
+    aurostd::RemoveFile(tfile);
 #endif
-  EFERMI=xout.Efermi;
-  //OUTCAR.bands
-  file="OUTCAR.bands";
-  if(!aurostd::EWithinList(files,file,efile)){
-    query=path+"/?files"; //reload query for error message
-    message << "No " << file << " found within " << query;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-    return false;
-  }
-  ext=aurostd::GetCompressionExtension(efile);
-  tfile=aurostd::TmpFileCreate("Egap_file1")+ext;
-  query=path+"/"+efile;
-  message << "Fetching: " << query;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  if(!(aurostd::url2file(query,tfile,LDEBUG) && aurostd::FileExist(tfile))){
-    message << "Could not fetch query: " << query;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-    return false;
-  }
-  message << "Loaded file to: " << tfile;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  if(!xout.GetPropertiesFile(tfile,!LDEBUG)){
-    message << "xOUTCAR::GetProperties() failed";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-    return false;
-  }
-#ifndef _AFLOW_TEMP_PRESERVE_
-  aurostd::RemoveFile(tfile);
-#endif
-  //GetBandGap
-  message << "Running bandgap code";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  if(!xout.GetBandGap(EFERMI)){
-    message << "xOUTCAR::GetBandGap() failed";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-    return false;
-  }
-  Egap=+6.1000e-01;
-  if(!aurostd::isequal(Egap,xout.Egap[0])){
-    message << "xOUTCAR::GetBandGap() did not find Egap==" << Egap << ", found instead xOUTCAR.Egap[0]==" << xout.Egap[0];pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-    return false;
-  }
-  Egap_type="insulator-indirect";
-  if(xout.Egap_type[0]!="insulator-indirect"){
-    message << "xOUTCAR::GetBandGap() did not find type==" << Egap_type << ", found instead xOUTCAR.Egap_type[0]==" << xout.Egap_type[0];pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_ERROR_);
-    return false;
-  }
-  /////////////////////////////////////////////////////////////////////////////////////////////////
+    double EFERMI=xout.Efermi;
 
-  message << "Egap test successful";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
-  return true;
+    //OUTCAR.bands
+    file="OUTCAR.bands";
+    if(!aurostd::EWithinList(files,file,efile)){
+      query=path+"/?files"; //reload query for error message
+      errors.push_back("No " + file + " found within " + query);
+      return;
+    }
+    ext=aurostd::GetCompressionExtension(efile);
+    tfile=aurostd::TmpFileCreate("Egap_file1")+ext;
+    query=path+"/"+efile;
+    if(!(aurostd::url2file(query,tfile,LDEBUG) && aurostd::FileExist(tfile))){
+      errors.push_back("Could not fetch query: " + query);
+      return;
+    }
+    if(!xout.GetPropertiesFile(tfile,!LDEBUG)){
+      errors.push_back("Could not parse " + file);
+      return;
+    }
+#ifndef _AFLOW_TEMP_PRESERVE_
+    aurostd::RemoveFile(tfile);
+#endif
+
+    //GetBandGap
+    check_function = "xOUTCAR::GetBandGap()";
+
+    check_description = "Calculate Egap successfully";
+    expected_bool = true;
+    bool parsed = calculated_bool = xout.GetBandGap(EFERMI);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+
+    check_description = "Egap value";
+    expected_dbl = 6.1000e-01;
+    calculated_dbl = (parsed?xout.Egap[0]:AUROSTD_MAX_DOUBLE);
+    checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
+
+    check_description = "Egap type";
+    expected_str = "insulator-indirect";
+    calculated_str = (parsed?xout.Egap_type[0]:"N/A");
+    checkEqual(calculated_str, expected_str, check_function, check_description, passed_checks, results);
+  }
+
 }
 
 bool smithTest(ostream& oss){ofstream FileMESSAGE;return smithTest(FileMESSAGE,oss);}  //CO20190520
@@ -1614,9 +1650,9 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   }
 
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[1][1]==24 && U1[1][2]==-13 && U1[1][3]==-1 && 
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[2][1]==13 && U1[2][2]==-7  && U1[2][3]==-1 && 
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[3][1]==2  && U1[3][2]==-1  && U1[3][3]==0  && 
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[1][1]==24 && U1[1][2]==-13 && U1[1][3]==-1 &&
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[2][1]==13 && U1[2][2]==-7  && U1[2][3]==-1 &&
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[3][1]==2  && U1[3][2]==-1  && U1[3][3]==0  &&
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
@@ -1624,9 +1660,9 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[1][1]==0  && V1[1][2]==1  && V1[1][3]==3  && 
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[2][1]==-1 && V1[2][2]==-1 && V1[2][3]==-1 && 
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[3][1]==1  && V1[3][2]==0  && V1[3][3]==-1 && 
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[1][1]==0  && V1[1][2]==1  && V1[1][3]==3  &&
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[2][1]==-1 && V1[2][2]==-1 && V1[2][3]==-1 &&
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[3][1]==1  && V1[3][2]==0  && V1[3][3]==-1 &&
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
@@ -1634,8 +1670,8 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[1][1]==1 && S1[1][2]==0 && S1[1][3]==0 && 
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[2][1]==0 && S1[2][2]==1 && S1[2][3]==0 && 
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[1][1]==1 && S1[1][2]==0 && S1[1][3]==0 &&
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[2][1]==0 && S1[2][2]==1 && S1[2][3]==0 &&
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[3][1]==0 && S1[3][2]==0 && S1[3][3]==1 &&
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )

@@ -2698,10 +2698,6 @@ void minimumCoordinationShell(const xstructure& xstr, uint center_index,
     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX20191122
 
 //makefile tests
-bool CeramGenTest(ostream& oss=cout);
-bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss=cout);
-bool EgapTest(ostream& oss=cout);
-bool EgapTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool smithTest(ostream& oss=cout);
 bool smithTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool PrototypeGeneratorTest(ostream& oss=cout, bool check_symmetry=false, bool check_uniqueness=false); //DX20200928
@@ -5462,6 +5458,12 @@ namespace unittest {
       void atomicEnvironmentTest(uint&, vector<string>&, vector<string>&);
       void xstructureParserTest(uint&, vector<string>&, vector<string>&);
       void xstructureTest(uint&, vector<string>&, vector<string>&);
+
+      // ovasp
+      void xoutcarTest(uint&, vector<string>&, vector<string>&);
+
+      // structure generation
+      void ceramgenTest(uint&, vector<string>&, vector<string>&);
   };
 
 }
