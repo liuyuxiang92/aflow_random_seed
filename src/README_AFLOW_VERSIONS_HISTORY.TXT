@@ -1,6 +1,9 @@
 3.2.13 - 2022/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz
         -- parallelized KBIN::CompressDirectory() (CO)
+        -- Fixed CIF parser for CIF files with oxidation states in species list (ME)
+        -- Added fallback solutions for reading CIF files with unregonized settings (ME)
+        -- Added poscar2aflowin for non-POSCAR input files (ME)
         -- generalizing DOS averaging for pocc systems with ARUNs having different numbers of atoms (CO)
         -- number->basis (CO)
         -- adding findClosedPackingPlane, to be finished (CO)

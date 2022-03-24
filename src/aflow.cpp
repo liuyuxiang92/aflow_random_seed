@@ -28,7 +28,6 @@
 #include "aflow_pflow.h"
 #include "aflowlib_entry_loader.h"
 #include "aflow_pocc.h"  //CO20200624
-#include "aflow_anrl.h"  //DX20201104
 
 #include <chrono> // benchmarking HE20220222
 
@@ -403,9 +402,9 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   }
 
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[1][1]==24 && U1[1][2]==-13 && U1[1][3]==-1 && 
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[2][1]==13 && U1[2][2]==-7  && U1[2][3]==-1 && 
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[3][1]==2  && U1[3][2]==-1  && U1[3][3]==0  && 
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[1][1]==24 && U1[1][2]==-13 && U1[1][3]==-1 &&
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[2][1]==13 && U1[2][2]==-7  && U1[2][3]==-1 &&
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[3][1]==2  && U1[3][2]==-1  && U1[3][3]==0  &&
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
@@ -413,9 +412,9 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[1][1]==0  && V1[1][2]==1  && V1[1][3]==3  && 
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[2][1]==-1 && V1[2][2]==-1 && V1[2][3]==-1 && 
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[3][1]==1  && V1[3][2]==0  && V1[3][3]==-1 && 
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[1][1]==0  && V1[1][2]==1  && V1[1][3]==3  &&
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[2][1]==-1 && V1[2][2]==-1 && V1[2][3]==-1 &&
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[3][1]==1  && V1[3][2]==0  && V1[3][3]==-1 &&
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
@@ -423,8 +422,8 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[1][1]==1 && S1[1][2]==0 && S1[1][3]==0 && 
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[2][1]==0 && S1[2][2]==1 && S1[2][3]==0 && 
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[1][1]==1 && S1[1][2]==0 && S1[1][3]==0 &&
+  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[2][1]==0 && S1[2][2]==1 && S1[2][3]==0 &&
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[3][1]==0 && S1[3][2]==0 && S1[3][3]==1 &&
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
@@ -612,7 +611,7 @@ bool FoldAtomsInCellTest(ofstream& FileMESSAGE,ostream& oss){ //DX20210129
 
   // ---------------------------------------------------------------------------
   // generate rocksalt structure
-  string prototype_label = "AB_cF8_225_a_b"; 
+  string prototype_label = "AB_cF8_225_a_b";
   vector<string> parameter_sets = anrl::getANRLParameters(prototype_label,"all");
 
   if(parameter_sets.size() != 1){
@@ -709,7 +708,7 @@ void check_equal(const utype &calculated, const utype &expected, const string &c
   if (aurostd::isequal(calculated, expected)) passed = true;
   check(passed, calculated, expected, check_function, check_description, check_num, passed_checks, results);
 }
-void check_equal(const string &calculated, const string &expected, const string &check_function, 
+void check_equal(const string &calculated, const string &expected, const string &check_function,
     const string check_description, const uint check_num, uint &passed_checks, vector<string> &results){
   bool passed = false;
   if (calculated == expected) passed = true;
@@ -1586,6 +1585,7 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_AtomicEnvironment|--AtomicEnvironment_test")) {return (AtomicEnvironmentTest(cout)?0:1);}  //HE20210511
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_aurostd|--aurostd_test")) {return (aurostdTest(cout)?0:1);} //HE20210512
+    if(!Arun && aurostd::args2flag(argv,cmds,"--test_cif_parser|--cif_parser_test")) {return (cifParserTest(cout)?0:1);}
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
       if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}
