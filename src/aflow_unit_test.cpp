@@ -717,16 +717,31 @@ namespace unittest {
     // setup test environment
     string check_function = "", check_description = "";
 
+    xmatrix<int> calculated_xmatint, expected_xmatint;
+
     // ---------------------------------------------------------------------------
     // Check | reshape //SD20220319
     // ---------------------------------------------------------------------------
     check_function = "aurostd::reshape()";
     check_description = "reshape a rectangular matrix";
-    xmatrix<int> xmat(3,4);
-    xmat(1,1) = 1; xmat(1,2) = 2; xmat(1,3) = 3; xmat(1,4) = 4;
-    xmat(2,1) = 5; xmat(2,2) = 6; xmat(2,3) = 7; xmat(2,4) = 8;
-    xmat(3,1) = 9; xmat(3,2) = 10; xmat(3,3) = 11; xmat(3,4) = 12;
-    checkEqual(aurostd::reshape(aurostd::reshape(xmat,4,3),3,4), xmat, check_function, check_description, passed_checks, results);
+    expected_xmatint = xmatrix<int>(3,4);
+    expected_xmatint(1,1) = 1; expected_xmatint(1,2) =  2; expected_xmatint(1,3) =  3; expected_xmatint(1,4) = 4;
+    expected_xmatint(2,1) = 5; expected_xmatint(2,2) =  6; expected_xmatint(2,3) =  7; expected_xmatint(2,4) = 8;
+    expected_xmatint(3,1) = 9; expected_xmatint(3,2) = 10; expected_xmatint(3,3) = 11; expected_xmatint(3,4) = 12;
+    calculated_xmatint = aurostd::reshape(aurostd::reshape(expected_xmatint,4,3),3,4);
+    checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | ehermite //CO20190520
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::getEHermite()";
+    check_description = "calculate elementary Hermite transformation";
+    expected_xmatint = xmatrix<int>(2, 2);
+    calculated_xmatint[1][1] =   5; calculated_xmatint[1][2] = -2;
+    calculated_xmatint[2][1] = -12; calculated_xmatint[2][2] =  5;
+    calculated_xmatint = xmatrix<int>(2, 2);
+    aurostd::getEHermite(5, 12, calculated_xmatint);
+    checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
   }
 
 }
@@ -1582,21 +1597,6 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   bool LDEBUG=TRUE; // TRUE;
   stringstream message;
   _aflags aflags;aflags.Directory=".";
-
-  //test ehermite
-  xmatrix<int> ehermite(2,2);
-  aurostd::getEHermite(5,12,ehermite);
-  if(!(
-        ehermite[1][1]==5 &&
-        ehermite[1][2]==-2 &&
-        ehermite[2][1]==-12 &&
-        ehermite[2][2]==5 &&
-        TRUE
-      )
-    ){
-    if(LDEBUG){cerr << __AFLOW_FUNC__ << " getEHermite(5,12) failed" << endl;}
-    return FALSE;
-  }
 
   xmatrix<int> A1(3,3),U1,V1,S1;
   A1[1][1]=3;A1[1][2]=2;A1[1][3]=1;
