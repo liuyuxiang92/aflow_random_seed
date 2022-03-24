@@ -287,6 +287,9 @@ namespace aurostd {
   template<class utype> xvector<float>
     xfloat(const xvector<utype>&) __xprototype;
 
+  template<class utype> xvector<utype>
+    pow(const xvector<utype>&,utype d) __xprototype;  //SD20220324
+
   template<class utype> xvector<long int>
     xlongint(const xvector<utype>&) __xprototype;
 

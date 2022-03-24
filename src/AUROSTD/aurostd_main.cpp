@@ -6544,6 +6544,34 @@ template<class utype> utype combinations(utype n,utype k) { // http://en.wikiped
 
 template<class utype> utype Cnk(utype n,utype k) { return combinations(n,k);}  // http://en.wikipedia.org/wiki/Combination
 
+// ***************************************************************************
+// GRID GENERATION
+// ----------------------------------------------------------------------------
+// SD20220324
+// linspace
+// Generates n linearly spaced points, the spacing between the points is (stop-start)/(n-1)
+// If n==1, return v(1)=stop
+// If n is a double, then round n
+namespace aurostd {
+  xvector<double> linspace(const double start, const double stop, const int n) {
+    if (n < 1) {
+      string function = XPID + "aurostd::linspace():";
+      string message = "Number of points must be greater than 0";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    }
+    xvector<double> v(n);
+    double dx = stop - start;
+    if (n == 1) {
+      v(v.lrows) = stop;
+      return v;
+    }
+    for (int i = v.lrows; i <= v.urows; i++) {
+      v(i) = start + (i - 1) * dx / (n - 1);
+    }
+    return v;
+  }
+  xvector<double> linspace(const double start, const double stop, const double n) {int m = (int)aurostd::round(n); return linspace(start, stop, m);}
+}
 
 // ***************************************************************************
 // aurostd::ShiftFirstColumn(const vector<vector<double> >& a, const double& value)

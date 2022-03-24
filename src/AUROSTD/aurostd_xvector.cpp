@@ -1173,6 +1173,16 @@ namespace aurostd {  // namespace aurostd
 }
 
 namespace aurostd {  // namespace aurostd
+  template<class utype>                                 // function pow
+    xvector<utype> pow(const xvector<utype> &a,utype d) {  // SD20220324
+      xvector<utype> c(a.urows,a.lrows);
+      for(int i=a.lrows;i<=a.urows;i++)
+          c[i]=pow(a[i],d);
+      return c;
+    }
+}
+
+namespace aurostd {  // namespace aurostd
   template<class utype>                                 // conversion to float
     xvector<float> xfloat(const xvector<utype> &a) {
       xvector<float> c(a.urows,a.lrows);

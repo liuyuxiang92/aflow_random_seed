@@ -840,16 +840,18 @@
 //// DEFAULT APDC
 #define AFLOWRC_DEFAULT_APDC_MIN_SLEEP_SECONDS                2 // seconds
 #define         DEFAULT_APDC_MIN_SLEEP_SECONDS                XHOST.adefault.getattachedutype<int>("DEFAULT_APDC_MIN_SLEEP_SECONDS")
-#define AFLOWRC_DEFAULT_APDC_PLATTICE                         string("fcc")
-#define         DEFAULT_APDC_PLATTICE                         XHOST.adefault.getattachedscheme("DEFAULT_APDC_PLATTICE")
 #define AFLOWRC_DEFAULT_APDC_MAX_NUM_ATOMS                    8
 #define         DEFAULT_APDC_MAX_NUM_ATOMS                    XHOST.adefault.getattachedutype<int>("DEFAULT_APDC_MAX_NUM_ATOMS")
 #define AFLOWRC_DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS              4
 #define         DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS              XHOST.adefault.getattachedutype<int>("DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS")
 #define AFLOWRC_DEFAULT_APDC_CONC_NPTS                        20
-#define         DEFAULT_APDC_CONC_NPTS                        XHOST.adefault.getattachedutype<int>("DEFAULT_APDC_CONC_NPTS")
+#define         DEFAULT_APDC_CONC_NPTS                        XHOST.adefault.getattachedutype<double>("DEFAULT_APDC_CONC_NPTS")
 #define AFLOWRC_DEFAULT_APDC_TEMP_NPTS                        100
-#define         DEFAULT_APDC_TEMP_NPTS                        XHOST.adefault.getattachedutype<int>("DEFAULT_APDC_TEMP_NPTS")
+#define         DEFAULT_APDC_TEMP_NPTS                        XHOST.adefault.getattachedutype<double>("DEFAULT_APDC_TEMP_NPTS")
+#define AFLOWRC_DEFAULT_APDC_TEMP_MIN                         300 // K
+#define         DEFAULT_APDC_TEMP_MIN                         XHOST.adefault.getattachedutype<double>("DEFAULT_APDC_TEMP_MIN")
+#define AFLOWRC_DEFAULT_APDC_TEMP_MAX                         2000 // K
+#define         DEFAULT_APDC_TEMP_MAX                         XHOST.adefault.getattachedutype<double>("DEFAULT_APDC_TEMP_MAX")
 
 //RF20200413 START
 // DEFAULT CCE
@@ -1674,11 +1676,12 @@ namespace aflowrc {
 
     // DEFAULT APDC
     aflowrc::load_default("DEFAULT_APDC_MIN_SLEEP_SECONDS",AFLOWRC_DEFAULT_APDC_MIN_SLEEP_SECONDS);
-    aflowrc::load_default("DEFAULT_APDC_PLATTICE",AFLOWRC_DEFAULT_APDC_PLATTICE);
     aflowrc::load_default("DEFAULT_APDC_MAX_NUM_ATOMS",AFLOWRC_DEFAULT_APDC_MAX_NUM_ATOMS);
     aflowrc::load_default("DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS",AFLOWRC_DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS);
     aflowrc::load_default("DEFAULT_APDC_CONC_NPTS",AFLOWRC_DEFAULT_APDC_CONC_NPTS);
     aflowrc::load_default("DEFAULT_APDC_TEMP_NPTS",AFLOWRC_DEFAULT_APDC_TEMP_NPTS);
+    aflowrc::load_default("DEFAULT_APDC_TEMP_MIN",AFLOWRC_DEFAULT_APDC_TEMP_MIN);
+    aflowrc::load_default("DEFAULT_APDC_TEMP_MAX",AFLOWRC_DEFAULT_APDC_TEMP_MAX);
 
     //RF20200413 START
     // DEFAULT CCE
@@ -2305,11 +2308,12 @@ namespace aflowrc {
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS APDC " << endl;
     aflowrc << "DEFAULT_APDC_MIN_SLEEP_SECONDS" << AFLOWRC_DEFAULT_APDC_MIN_SLEEP_SECONDS << endl;
-    aflowrc << "DEFAULT_APDC_PLATTICE" << AFLOWRC_DEFAULT_APDC_PLATTICE << endl;
     aflowrc << "DEFAULT_APDC_MAX_NUM_ATOMS" << AFLOWRC_DEFAULT_APDC_MAX_NUM_ATOMS << endl;
     aflowrc << "DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS" << AFLOWRC_DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS << endl;
     aflowrc << "DEFAULT_APDC_CONC_NPTS" << AFLOWRC_DEFAULT_APDC_CONC_NPTS << endl;
     aflowrc << "DEFAULT_APDC_TEMP_NPTS" << AFLOWRC_DEFAULT_APDC_TEMP_NPTS << endl;
+    aflowrc << "DEFAULT_APDC_TEMP_MIN" << AFLOWRC_DEFAULT_APDC_TEMP_MIN << endl;
+    aflowrc << "DEFAULT_APDC_TEMP_MAX" << AFLOWRC_DEFAULT_APDC_TEMP_MAX << endl;
     //SD20220323 - APDC END
 
     //RF20200413 START
@@ -2908,11 +2912,12 @@ namespace aflowrc {
     //SD20220323 - APDC START
     if(LDEBUG) oss << "// DEFAULTS APDC " << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_MIN_SLEEP_SECONDS\")=" << AFLOWRC_DEFAULT_APDC_MIN_SLEEP_SECONDS << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_PLATTICE\")=" << AFLOWRC_DEFAULT_APDC_PLATTICE << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_MAX_NUM_ATOMS\")=" << AFLOWRC_DEFAULT_APDC_MAX_NUM_ATOMS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS\")=" << AFLOWRC_DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_CONC_NPTS\")=" << AFLOWRC_DEFAULT_APDC_CONC_NPTS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_TEMP_NPTS\")=" << AFLOWRC_DEFAULT_APDC_TEMP_NPTS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_TEMP_MIN\")=" << AFLOWRC_DEFAULT_APDC_TEMP_MIN << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_TEMP_MAX\")=" << AFLOWRC_DEFAULT_APDC_TEMP_MAX << endl;
     //SD20220323 - APDC END
 
     //RF20200413 START

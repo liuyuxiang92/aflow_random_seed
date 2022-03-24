@@ -733,6 +733,26 @@ namespace aurostd {
 }
 
 // ***************************************************************************
+// Function mod_floored
+// ***************************************************************************
+namespace aurostd {
+  // SD20220324
+  template<class utype> utype pow(utype x, utype y) {
+    if (std::isnan(x)) {
+      string soliloquy = XPID + "aurostd::pow():";
+      string message = "NAN value in base";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ILLEGAL_);
+    }
+    if (std::isnan(y)) {
+      string soliloquy = XPID + "aurostd::pow():";
+      string message = "NAN value in exponent";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ILLEGAL_);
+    }
+    return std::pow((double)x,(double)y);
+  }
+}
+
+// ***************************************************************************
 // Function ishex
 // ***************************************************************************
 // ME20200707

@@ -333,7 +333,7 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   // ---------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
   check_function = "aurostd::companion_matrix()";
-  check_description = "calculate the companion matrix of a polynomial";
+  check_description = "calculate the companion matrix of a univariate polynomial";
 
   xvector<double> pc1(4);
   xmatrix<double> sol1(3, 3);
@@ -358,10 +358,21 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   soli(1) = -0.519201791550296; soli(2) = 0.519201791550296; soli(3) = 0.0;
   aurostd::polynomialFindRoots(pc2, resr, resi);
 
-  check_description = "calculate the roots of a polynomial (real part)";
+  check_description = "calculate the roots of a univariate polynomial (real part)";
   check_equal(resr, solr, check_function, check_description, passed_checks, results);
-  check_description = "calculate the roots of a polynomial (imag part)";
+  check_description = "calculate the roots of a univariate polynomial (imag part)";
   check_equal(resi, soli, check_function, check_description, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | linspace //SD20220324
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::linspace()";
+  check_description = "generate n linearly spaced points";
+  xvector<double> ls(5);
+  ls(1) = 1.0; ls(2) = 1.375; ls(3) = 1.75; ls(4) = 2.125; ls(5) = 2.5;
+
+  check_equal(ls, aurostd::linspace(1.0,2.5,5), check_function, check_description, passed_checks, results);
 
   // present overall result
   return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);

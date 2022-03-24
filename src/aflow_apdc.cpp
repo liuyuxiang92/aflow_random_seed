@@ -12,10 +12,6 @@
 #include "aflow.h"
 #include "aflow_apdc.h"
 
-#define _AFLOW_APDC_ALAT 4.0
-// Strings for I/O
-#define _APDC_STR_OPT_ string("[AFLOW_APDC]")
-
 // ###############################################################################
 //            AFLOW Automatic Phase Diagram Constructor (APDC) (2022-)
 // ###############################################################################
@@ -27,15 +23,18 @@
 _apdc_data::_apdc_data() {
   // Input data
   num_threads = 0;
+  min_sleep = 0;
   workdirpath = "";
   rootdirpath = "";
   plattice = "";
   elements.clear();
   aflow_max_num_atoms = 0;
   max_num_atoms = 0;
-  conc_macro_npts.clear();
+  conc_npts = 0;
+  conc_range.clear();
   conc_macro.clear();
   temp_npts = 0;
+  temp_range.clear();
   temp.clear();
   // Derived data
   alloyname = "";
@@ -44,13 +43,13 @@ _apdc_data::_apdc_data() {
   lat_atat = "";
   vstr_atat.clear();
   mapstr.clear();
-  // Structure data
+  // Cluster data
   multiplicity.clear();
-  conc.clear();
-  excess_energies.clear();
+  conc_cluster.clear();
+  excess_energy_cluster.clear();
   // Thermo data
-  prob_rand.clear();
-  prob.clear();
+  prob_ideal_cluster.clear();
+  prob_cluster.clear();
 }
 
 // Destructor
@@ -65,14 +64,17 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
   if (this != &b) {
     // Input data
     num_threads = b.num_threads;
+    min_sleep = b.min_sleep;
     workdirpath = b.workdirpath;
     rootdirpath = b.rootdirpath;
     plattice = b.plattice;
     elements = b.elements;
     max_num_atoms = b.max_num_atoms;
-    conc_macro_npts = b.conc_macro_npts;
+    conc_npts = b.conc_npts;
+    conc_range = b.conc_range;
     conc_macro = b.conc_macro;
     temp_npts = b.temp_npts;
+    temp_range = b.temp_range;
     temp = b.temp;
     // Derived data
     alloyname = b.alloyname;
@@ -81,13 +83,13 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
     lat_atat = b.lat_atat;
     vstr_atat = b.vstr_atat;
     mapstr = b.mapstr;
-    // Structure data
+    // Cluster data
     multiplicity = b.multiplicity;
-    conc = b.conc;
-    excess_energies = b.excess_energies;
+    conc_cluster = b.conc_cluster;
+    excess_energy_cluster = b.excess_energy_cluster;
     // Thermo data
-    prob_rand = b.prob_rand;
-    prob = b.prob;
+    prob_ideal_cluster = b.prob_ideal_cluster;
+    prob_cluster = b.prob_cluster;
   }
   return *this;
 }
@@ -102,6 +104,7 @@ namespace apdc {
       apdc_data.num_threads = aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));
     }
     if (apdc_data.num_threads < 1) {apdc_data.num_threads = 1;}
+    if (apdc_data.min_sleep < 1) {apdc_data.min_sleep = 1;}
     apdc_data.workdirpath = aurostd::getPWD();
     apdc_data.rootdirpath = aurostd::CleanFileName(apdc_data.rootdirpath);
     apdc_data.plattice = aurostd::tolower(apdc_data.plattice);
@@ -113,14 +116,34 @@ namespace apdc {
     GetBinodal(apdc_data);
   }
 
- void GetPhaseDiagram(const string& aflowin, bool elements_only) {
+ void GetPhaseDiagram(const string& aflowin, bool command_line_call) {
     _apdc_data apdc_data;
-    if (elements_only) { // command line call
-      aurostd::string2tokens(aflowin, apdc_data.elements, ",");
-      apdc_data.rootdirpath = aurostd::getPWD();
-      apdc_data.plattice = DEFAULT_APDC_PLATTICE;
+    string function_name = XPID + "GetPhaseDiagram():";
+    if (command_line_call) {
+      // FORMAT: <plattice>:<element1>,<element2>,...<element(K)>:<conc1_i>,<conc1_f>,<conc2_i><conc2_f>,..<conc(K),i><conc(K)_f>
+      vector<string> tokens;
+      aurostd::string2tokens(aflowin, tokens, ":");
+      if (tokens.empty()) {
+        string message = "Missing input";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
+      }
+      if (tokens.size() != 3) {
+        string message = "Invalid input";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
+      }
+      apdc_data.min_sleep = DEFAULT_APDC_MIN_SLEEP_SECONDS;
       apdc_data.aflow_max_num_atoms = DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS;
       apdc_data.max_num_atoms = DEFAULT_APDC_MAX_NUM_ATOMS;
+      apdc_data.rootdirpath = aurostd::getPWD();
+      apdc_data.plattice = tokens[0];
+      aurostd::string2tokens(tokens[1], apdc_data.elements, ",");
+      apdc_data.conc_npts = DEFAULT_APDC_CONC_NPTS;
+      vector<double> vc;
+      aurostd::string2tokens(tokens[2], vc, ",");
+      apdc_data.conc_range = aurostd::vector2xvector(vc);
+      apdc_data.temp_npts = DEFAULT_APDC_TEMP_NPTS;
+      vector<double> vt = {DEFAULT_APDC_TEMP_MIN, DEFAULT_APDC_TEMP_MAX};
+      apdc_data.temp_range = aurostd::vector2xvector(vt);
     }
     else {
       cerr<<aflowin<<endl;
@@ -136,20 +159,41 @@ namespace apdc {
 // ***************************************************************************
 namespace apdc {
   void ErrorChecks(_apdc_data& apdc_data) {
+    string function_name = XPID + "ErrorChecks():";
     if (!aurostd::DirectoryMake(apdc_data.rootdirpath)) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "ErrorChecks():", "Cannot create directory", _FILE_ERROR_);
+      string message = "Cannot create directory";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
     }
     if (apdc_data.plattice != "fcc" && apdc_data.plattice != "bcc" && apdc_data.plattice != "hcp") {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "ErrorChecks():", "Invalid parent lattice", _INPUT_ILLEGAL_);
+      string message = "Invalid parent lattice";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
     }
     if (apdc_data.elements.size() < 2) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "ErrorChecks():", "Alloy must be at least binary", _VALUE_ERROR_);
+      string message = "Alloy must be at least binary";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
     }
     for (uint i = 0; i < apdc_data.elements.size(); i++) {
       if (!xelement::xelement::isElement(apdc_data.elements[i])) {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "ErrorChecks():", "Element \"" + apdc_data.elements[i] + "\" is invalid", _INPUT_ILLEGAL_);
+        string message = "Element \"" + apdc_data.elements[i] + "\" is invalid";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
       }
       apdc_data.alloyname += apdc_data.elements[i];
+    }
+    if (apdc_data.conc_range.rows != 2 * (int)apdc_data.elements.size()) {
+      string message = "Concentration range must have format [X1_start, X1_end, X2_start, X2_end,...X(K)_start, X(K)_end]";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
+    }
+    if (!aurostd::isequal(aurostd::sum(apdc_data.conc_range), 2.0)) {
+      string message = "Total concentration must sum to 1";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+    }
+    if (apdc_data.temp_range.rows != 2) {
+      string message = "Temperature range must have format [T_start T_end]";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
+    }
+    if (apdc_data.temp_range(1) < 0 || apdc_data.temp_range(2) < 0) {
+      string message = "Temperature cannot be below 0K";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
     }
   }
 }
@@ -161,17 +205,21 @@ namespace apdc {
   void GetBinodal(_apdc_data& apdc_data) {
     apdc_data.lat_atat = CreateLatForATAT(apdc_data.plattice, apdc_data.elements);
     apdc_data.vstr_atat = GetATATXstructures(apdc_data.lat_atat, (uint)apdc_data.max_num_atoms);
-    apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads);
- //   // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
-    apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, apdc_data.aflow_max_num_atoms), apdc_data.vstr_aflow, apdc_data.num_threads);
-    GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.lat_atat, apdc_data.vstr_aflow, apdc_data.vstr_atat, apdc_data.mapstr);
-    RunATAT(apdc_data.workdirpath, apdc_data.rundirpath);
-    apdc_data.conc = GetConcentration(apdc_data.rundirpath, apdc_data.vstr_atat.size(), apdc_data.elements.size());
+  //  apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads);
+  //  // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
+  //  apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, apdc_data.aflow_max_num_atoms), apdc_data.vstr_aflow, apdc_data.num_threads);
+  //  GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.lat_atat, apdc_data.vstr_aflow, apdc_data.vstr_atat, apdc_data.mapstr);
+  //  RunATAT(apdc_data.workdirpath, apdc_data.rundirpath, apdc_data.min_sleep);
+    apdc_data.conc_cluster = GetConcentrationCluster(apdc_data.rundirpath, apdc_data.vstr_atat.size(), apdc_data.elements.size());
     vector<xvector<int> > multiplicity = GetMultiplicity(apdc_data.vstr_atat);
     apdc_data.multiplicity = multiplicity[1];
-    apdc_data.excess_energies = GetExcessEnergy(apdc_data.rundirpath, apdc_data.conc, multiplicity[0]);
-    apdc_data.prob_rand = GetProbabilityRandom(apdc_data.conc, apdc_data.multiplicity, apdc_data.max_num_atoms);
-    
+    apdc_data.excess_energy_cluster = GetExcessEnergyCluster(apdc_data.rundirpath, apdc_data.conc_cluster, multiplicity[0]);
+    apdc_data.conc_macro = GetConcentrationMacro(apdc_data.conc_range, apdc_data.conc_npts, apdc_data.elements.size());
+    apdc_data.temp = GetTemperature(apdc_data.temp_range, apdc_data.temp_npts);
+    apdc_data.prob_ideal_cluster = GetProbabilityIdealCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.multiplicity, apdc_data.max_num_atoms);
+    CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_ideal_cluster);
+    return;
+    apdc_data.prob_cluster = GetProbabilityCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.excess_energy_cluster, apdc_data.prob_ideal_cluster, apdc_data.temp, apdc_data.max_num_atoms);
   }
 }
 
@@ -185,26 +233,115 @@ namespace apdc {
 }
 
 // ***************************************************************************
-// apdc::GetProbabilityRandom
+// apdc::GetProbabilityCluster
 // ***************************************************************************
-// P(X) = g*(Xa^Na)*(Xb*Nb)*(Xc*Nc)*...
 namespace apdc {
-  xvector<double> GetProbabilityRandom(const xmatrix<double>& conc, const xvector<int>& multiplicity, const int max_num_atoms) {
-    int nstr = conc.rows, nelem = conc.cols;
-    xvector<double> prob_rand(nstr);
-    for (int i = 1; i <= nstr; i++) {
-      prob_rand(i) = multiplicity(i);
-      for (int j = 1; j <= nelem; j++) {prob_rand(i) *= std::pow(conc(i, j), max_num_atoms);}
+  xtensor<double> GetProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    LDEBUG=TRUE;
+    int nx = prob_ideal_cluster.rows, ncl = prob_ideal_cluster.cols, nt = temp.rows, neqs = conc_cluster.cols - 1;
+    xtensor<double> prob_cluster({nx, ncl, nt});
+    xvector<double> beta = aurostd::pow(CONSTANT_BOLTZMANN * temp, -1.0);
+    xvector<double> rr, ri;
+    if (neqs == 1) {
+      for (int i = 1; i <= nx; i++) {
+        for (int j = 1; j <= nt; j++) {
+          xvector<double> coeff = 0.0 * aurostd::ones_xv<double>(max_num_atoms + 1);
+          for (int k = 1; k <= ncl; k++) {
+            coeff((int)(max_num_atoms * conc_cluster(k, 1)) + 1) += prob_ideal_cluster(i, k) * std::exp(-beta(j) * excess_energy_cluster(k)) * (conc_cluster(k, 1) - conc_macro(i, 1));
+          }
+          if (LDEBUG) {cerr << "p=" << coeff << endl;}
+          aurostd::polynomialFindRoots(coeff, rr, ri);
+          if (LDEBUG) {
+            cerr << "i=" << i << " j=" << j << " | Real roots=" << rr << endl;
+            cerr << "i=" << i << " j=" << j << " | Imag roots=" << ri << endl;
+          }
+        }
+      }
     }
-    return prob_rand / aurostd::sum(prob_rand);
+    else { // homotopy continuation
+    }
+    return prob_cluster;
+  }
+}
+
+// ***************************************************************************
+// apdc::GetProbabilityIdealCluster
+// ***************************************************************************
+// P_j(X) = g_j*(X1^N1_j)*(X2^N2_j)*...(X(K)^N(K)_j)
+namespace apdc {
+  xmatrix<double> GetProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& multiplicity, const int max_num_atoms) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    int ncl = conc_cluster.rows, nx = conc_macro.rows, nelem = conc_macro.cols;
+    xmatrix<double> prob_ideal_cluster(nx, ncl);
+    for (int i = 1; i <= nx; i++) {
+      for (int j = 1; j <= ncl; j++) {
+        prob_ideal_cluster(i, j) = multiplicity(j);
+        for (int k = 1; k <= nelem; k++) {prob_ideal_cluster(i, j) *= std::pow(conc_macro(i, k), conc_cluster(j, k) * max_num_atoms);}
+      }
+      prob_ideal_cluster.setmat(prob_ideal_cluster.getmat(i, i, 1, ncl) / aurostd::sum(prob_ideal_cluster.getmat(i, i, 1, ncl)), i, 1); // normalize sum to 1
+      if (LDEBUG) {cerr << "i=" << i << " | SUM[P_j]=" << aurostd::sum(prob_ideal_cluster.getmat(i, i, 1, ncl)) << endl;}
+    }
+    return prob_ideal_cluster;
+  }
+}
+
+// ***************************************************************************
+// apdc::CheckProbability
+// ***************************************************************************
+namespace apdc {
+  bool CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob) {
+    int nx = prob.rows;
+    for (int i = 1; i <= nx; i++) {
+      if (!aurostd::isequal(aurostd::sum(prob(i)), 1.0)) {return false;}
+      cerr<<prob(i)*conc_cluster<<endl;
+      cerr<<conc_macro(i)<<endl;
+      cerr<<"++++"<<endl;
+    }
+    return true;
+  }
+}
+
+// ***************************************************************************
+// apdc::GetConcentrationMacro
+// ***************************************************************************
+namespace apdc {
+  xmatrix<double> GetConcentrationMacro(const xvector<double>& conc_range, const int conc_npts, const int nelem) {
+    string function_name = XPID + "GetConcentrationMacro():";
+    xmatrix<double> conc_macro(conc_npts, nelem);
+    double start, stop;
+    for (int i = 1; i <= nelem; i++) {
+      if (conc_range(2 * i - 1) < 0 || conc_range(2 * i - 1) > 1 ||
+          conc_range(2 * i) < 0 || conc_range(2 * i) > 1) {
+        string message = "Concentration range must be defined on [0,1]";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+      }
+      start = conc_range(2 * i - 1); stop = conc_range(2 * i);
+      // Redefine concentration profile to be (0,1) rather than [0,1] to avoid NaNs
+      if (aurostd::isequal(start, 0.0)) {start += CONC_DELTA;}
+      if (aurostd::isequal(start, 1.0)) {start -= CONC_DELTA;}
+      if (aurostd::isequal(stop, 0.0)) {stop += CONC_DELTA;}
+      if (aurostd::isequal(stop, 1.0)) {stop -= CONC_DELTA;}
+      conc_macro.setcol(aurostd::linspace(start, stop, conc_npts), i);
+    }
+    return conc_macro;
+  }
+}
+
+// ***************************************************************************
+// apdc::GetTemperature
+// ***************************************************************************
+namespace apdc {
+  xvector<double> GetTemperature(const xvector<double>& temp_range, const int temp_npts) {
+    return aurostd::linspace(temp_range(1), temp_range(2), temp_npts);
   }
 }
 
 // ***************************************************************************
 // apdc::GetMultiplicity
 // ***************************************************************************
-// N = Na+Nb+Nc+...
-// g = N!/(Na!*Nb!*Nc!*...)
+// N_j = N1_j+N2_j+...N(K)_j
+// g_j = N_j!/(N1_j!*N2_j!*...N(K)_j)
 // return [N,g]
 namespace apdc {
   vector<xvector<int> > GetMultiplicity(const vector<xstructure>& vstr) {
@@ -228,12 +365,12 @@ namespace apdc {
 }
 
 // ***************************************************************************
-// apdc::GetConcentration
+// apdc::GetConcentrationCluster
 // ***************************************************************************
 namespace apdc {
   xmatrix<double> GetConcentration(const vector<string>& elements, const vector<xstructure>& vstr) {
     uint nstr = vstr.size(), nelem = elements.size();
-    xmatrix<double> conc(nstr, nelem);
+    xmatrix<double> conc_cluster(nstr, nelem);
     int ie = -1;
     xvector<double> stoich;
     vector<string> str_elements;
@@ -248,38 +385,38 @@ namespace apdc {
       else {
         stoich = aurostd::vector2xvector(aurostd::deque2vector(vstr[i].stoich_each_type));
       }
-      for (uint j = 0; j < nelem; j++) {conc(i + 1, j + 1) = stoich(j + 1);}
+      for (uint j = 0; j < nelem; j++) {conc_cluster(i + 1, j + 1) = stoich(j + 1);}
     }
-    return conc;
+    return conc_cluster;
   }
 
-  xmatrix<double> GetConcentration(const string& rundirpath, const int nstr, const int nelem) {
-    xmatrix<double> conc(nstr, nelem);
+  xmatrix<double> GetConcentrationCluster(const string& rundirpath, const int nstr, const int nelem) {
+    xmatrix<double> conc_cluster(nstr, nelem);
     vector<string> vinput, tokens;
     aurostd::file2vectorstring(rundirpath + "/fit.out", vinput);
     for (uint line = 0; line < vinput.size(); line++) {
       aurostd::string2tokens(vinput[line], tokens, " ");
       for (int i = 1; i <= nelem; i++) {
-        conc(aurostd::string2utype<int>(tokens[tokens.size() - 1]) + 1, i) = aurostd::string2utype<double>(tokens[i - 1]);
+        conc_cluster(aurostd::string2utype<int>(tokens[tokens.size() - 1]) + 1, i) = aurostd::string2utype<double>(tokens[i - 1]);
       }
     }
     aurostd::file2vectorstring(rundirpath + "/predstr.out", vinput);
     for (uint line = 0; line < vinput.size(); line++) {
       aurostd::string2tokens(vinput[line], tokens, " ");
       for (int i = 1; i <= nelem; i++) {
-        conc(aurostd::string2utype<int>(tokens[tokens.size() - 2]) + 1, i) = aurostd::string2utype<double>(tokens[i - 1]);
+        conc_cluster(aurostd::string2utype<int>(tokens[tokens.size() - 2]) + 1, i) = aurostd::string2utype<double>(tokens[i - 1]);
       }
     }
-    return conc;
+    return conc_cluster;
   }
 }
 
 // ***************************************************************************
-// apdc::GetExcessEnergy
+// apdc::GetExcessEnergyCluster
 // ***************************************************************************
 namespace apdc {
-  xvector<double> GetExcessEnergy(const string& rundirpath, const xmatrix<double>& conc, const xvector<int>& natom) {
-    int nstr = conc.rows, nelem = conc.cols;
+  xvector<double> GetExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const xvector<int>& natom) {
+    int nstr = conc_cluster.rows, nelem = conc_cluster.cols;
     vector<string> vinput, tokens;
     aurostd::file2vectorstring(rundirpath + "/ref_energy.out", vinput);
     xvector<double> nrg_ref = aurostd::vector2xvector(aurostd::vectorstring2vectordouble(vinput));
@@ -287,20 +424,12 @@ namespace apdc {
     aurostd::file2vectorstring(rundirpath + "/fit.out", vinput);
     for (uint line = 0; line < vinput.size(); line++) {
       aurostd::string2tokens(vinput[line], tokens, " ");
-      nrg(aurostd::string2utype<int>(tokens[tokens.size() - 1]) + 1) = aurostd::string2utype<double>(tokens[nelem]);
+      nrg(aurostd::string2utype<int>(tokens[tokens.size() - 1]) + 1) = aurostd::string2utype<double>(tokens[nelem]) * natom(aurostd::string2utype<int>(tokens[tokens.size() - 1]) + 1);
     }
     aurostd::file2vectorstring(rundirpath + "/predstr.out", vinput);
     for (uint line = 0; line < vinput.size(); line++) {
       aurostd::string2tokens(vinput[line], tokens, " ");
-      nrg(aurostd::string2utype<int>(tokens[tokens.size() - 2]) + 1) = aurostd::string2utype<double>(tokens[nelem]);
-    }
-    // Convert D_j = E_j/n_j - \sum(X_k*E0_k) ==> D_j = E_j - \sum(X_k*E0_k)
-    double nrg_macro;
-    for (int i = 1; i <= nstr; i++) {
-      nrg_macro = aurostd::sum(conc.getmat(i, i, 1, nelem, 1, 1) * nrg_ref);
-      nrg(i) += nrg_macro;
-      nrg(i) *= natom(i);
-      nrg(i) -= nrg_macro;
+      nrg(aurostd::string2utype<int>(tokens[tokens.size() - 2]) + 1) = aurostd::string2utype<double>(tokens[nelem]) * natom(aurostd::string2utype<int>(tokens[tokens.size() - 2]) + 1);
     }
     return nrg;
   }
@@ -310,11 +439,13 @@ namespace apdc {
 // apdc::RunATAT
 // ***************************************************************************
 namespace apdc {
-  void RunATAT(const string& workdirpath, const string& rundirpath) {
+  void RunATAT(const string& workdirpath, const string& rundirpath, const uint min_sleep) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "RunATAT():";
     uint iter = 0;
     if (aurostd::substring2bool(aurostd::execute2string("mmaps", stdouterr_fsio), "command not found")) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "RunATAT():", "Missing mmaps program", _RUNTIME_ERROR_);
+      string message = "Missing mmaps program";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
     }
     aurostd::execute("touch " + rundirpath + "/stop"); // pre-kill mmaps gracefully
     aurostd::RemoveFile(rundirpath + "/maps_is_running");
@@ -326,10 +457,11 @@ namespace apdc {
       iter++;
       if (LDEBUG) {cerr << "Sleeping, iter=" << iter << endl;}
       if (iter > 30) { // wait 30 times the minimum sleep (60 seconds)
+        string message = "mmaps is taking too long to predict structures, dir=" + rundirpath;
         aurostd::RemoveFile(tmpfile);
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "RunATAT():", "mmaps is taking too long to predict structures, dir=" + rundirpath, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
-      aurostd::Sleep(_APDC_MIN_SLEEP_);
+      aurostd::Sleep(min_sleep);
       aurostd::file2string(rundirpath + "/maps.log", logstring);
     }
     aurostd::RemoveFile(tmpfile);
@@ -445,7 +577,7 @@ namespace apdc {
       coorsys(3) = std::sqrt(8.0 / 3.0);
       angles(3) = 120.0;
     }
-    for (uint i = 1; i <= 3; i++) {oss << _AFLOW_APDC_ALAT * coorsys(i) << " ";}
+    for (uint i = 1; i <= 3; i++) {oss << DEFAULT_ATAT_ALAT * coorsys(i) << " ";}
     for (uint i = 1; i <= 3; i++) {oss << angles(i) << " ";}
     oss << endl;
     for (uint i = 1; i <= 3; i++) {
@@ -474,6 +606,7 @@ namespace apdc {
 // ***************************************************************************
 namespace apdc {
   vector<xstructure> GetATATXstructures(const string& lat, const uint max_num_atoms) {
+    string function_name = XPID + "GetATATXstructures():";
     vector<xstructure> vstr;
     stringstream oss;
     vector<string> vinput, tokens;
@@ -482,10 +615,12 @@ namespace apdc {
     string sstr = aurostd::execute2string("genstr -n " + aurostd::utype2string<uint>(max_num_atoms) + " -l " + tmpfile, stdouterr_fsio);
     aurostd::RemoveFile(tmpfile);
     if (sstr.size() == 0 || aurostd::substring2bool(sstr, "Unable to open lattice file")) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetATATXstructures():", "Invalid lat.in file", _FILE_CORRUPT_);
+      string message = "Invalid lat.in file";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_CORRUPT_);
     }
     else if (aurostd::substring2bool(sstr, "command not found")) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, XPID + "GetATATXstructures():", "Missing genstr program", _RUNTIME_ERROR_);
+      string message = "Missing genstr program";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
     }
     aurostd::string2vectorstring(sstr, vinput);
     for (uint line = 0; line < vinput.size(); line++) {
