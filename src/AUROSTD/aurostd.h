@@ -745,7 +745,7 @@ namespace aurostd {
   // [OBSOLETE]  long double string2longdouble(const string& from) __xprototype;
   // [OBSOLETE]  int string2int(const string& from) __xprototype;
   string string2string(const string& from) __xprototype;
-  template<typename utype> utype string2utype(const string& from);  //CO20210315 - cleaned up
+  template<typename utype> utype string2utype(const string& from, const uint base=10);  //CO20210315 - cleaned up //HE20220324 add base option
   vector<int> vectorstring2vectorint(const vector<string>& from); //CO20210315 - cleaned up
   // [OBSOLETE] uint string2uint(const string& from) __xprototype;
   vector<uint> vectorstring2vectoruint(const vector<string>& from); //CO20210315 - cleaned up

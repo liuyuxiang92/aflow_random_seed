@@ -381,6 +381,39 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 
   check_equal(aurostd::reshape(aurostd::reshape(xmat,4,3),3,4), xmat, check_function, check_description, passed_checks, results);
 
+
+  // ---------------------------------------------------------------------------
+  // Check | string2utype //HE20220324
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::string2utype()";
+  check_description = "int - bases 16, 10, 8, 5";
+  bool multi_check = true;
+  multi_check = (multi_check && (aurostd::string2utype<int>("-420") == -420));
+  multi_check = (multi_check && (aurostd::string2utype<int>("-420", 16)) == -1056);
+  multi_check = (multi_check && (aurostd::string2utype<int>("-0x420", 16)) == -1056);
+  multi_check = (multi_check && (aurostd::string2utype<int>("-0X420", 16)) == -1056);
+  multi_check = (multi_check && (aurostd::string2utype<int>("-420", 16)) == -1056);
+  multi_check = (multi_check && (aurostd::string2utype<int>("-420", 8)) == -272);
+  multi_check = (multi_check && (aurostd::string2utype<int>("-0420", 8)) == -272);
+  multi_check = (multi_check && (aurostd::string2utype<int>("-420", 5)) == -110);
+  check_equal(multi_check, true, check_function, check_description, passed_checks, results);
+
+  check_description = "float - bases 16, 10, 8, 5";
+  multi_check = true;
+  multi_check = (multi_check && (aurostd::string2utype<float>("-4.20") == -4.20f));
+  multi_check = (multi_check && (aurostd::string2utype<float>("-420", 16)) == -1056.0f);
+  multi_check = (multi_check && (aurostd::string2utype<float>("-420", 8)) == -272.0f);
+  multi_check = (multi_check && (aurostd::string2utype<float>("-420", 5)) == -110.0f);
+  check_equal(multi_check, true, check_function, check_description, passed_checks, results);
+
+  check_description = "double - bases 16, 10, 8, 5";
+  multi_check = true;
+  multi_check = (multi_check && (aurostd::string2utype<double>("-4.20") == -4.20));
+  multi_check = (multi_check && (aurostd::string2utype<double>("-420", 16)) == -1056.0);
+  multi_check = (multi_check && (aurostd::string2utype<double>("-420", 8)) == -272.0);
+  multi_check = (multi_check && (aurostd::string2utype<double>("-420", 5)) == -110.0);
+  check_equal(multi_check, true, check_function, check_description, passed_checks, results);
+
   // present overall result
   return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
 }

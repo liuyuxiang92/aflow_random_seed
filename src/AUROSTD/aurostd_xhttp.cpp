@@ -232,6 +232,7 @@ namespace aurostd {
         response.erase(0, border + offset);
         if (chunk_length_octet != "0") {
           chuck_length = std::stoi(chunk_length_octet, 0, 16);
+          chuck_length = aurostd::string2utype<uint>(chunk_length_octet, 16);
           full_request_length += chuck_length;
           // sanity check one - every chunk should end with \r\n
           if (response.substr(chuck_length, offset) != delimiter) {
