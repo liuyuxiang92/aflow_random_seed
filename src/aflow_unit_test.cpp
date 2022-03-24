@@ -369,12 +369,6 @@ namespace unittest {
     bool passed = (calculated == expected);
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
   }
-
-  void UnitTest::checkSimilar(const double calculated, const double expected, const string& check_function,
-      const string& check_description, uint& passed_checks, vector<string>& results, const double relative_tol) {
-    bool passed = (std::abs(expected - calculated) <= expected * relative_tol);
-    check(passed, calculated, expected, check_function, check_description, passed_checks, results);
-  }
 }
 
 // aurostd
@@ -681,7 +675,7 @@ namespace unittest {
     expected_dbl = 3.5355339059;
 
     calculated_dbl = aurostd::areaPointsOnPlane(points);
-    checkSimilar(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
+    checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
     // Check | 3d triangle area (int)
@@ -690,7 +684,7 @@ namespace unittest {
     expected_dbl = 3.5355339059;
 
     calculated_dbl = aurostd::areaPointsOnPlane(ipoints);
-    checkSimilar(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
+    checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
   }
 
   void UnitTest::xmatrixTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
@@ -841,12 +835,12 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     // Check | hull volume
     check_description = "hull volume";
-    checkSimilar(AE[test_AE].volume, 31.4622167689, check_function, check_description, passed_checks, results);
+    checkEqual(AE[test_AE].volume, 31.4622167689, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
     // Check | hull area
     check_description = "hull area";
-    checkSimilar(AE[test_AE].area, 60.4979100628, check_function, check_description, passed_checks, results);
+    checkEqual(AE[test_AE].area, 60.4979100628, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
     // Check | triangle count

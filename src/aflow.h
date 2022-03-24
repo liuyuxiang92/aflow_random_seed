@@ -5437,8 +5437,6 @@ namespace unittest {
           const string& check_description, uint& passed_checks, vector<string>& results);
       void checkEqual(const bool calculated, const bool expected, const string& check_function,
           const string& check_description, uint& passed_checks, vector<string>& results);
-      void checkSimilar(const double calculated, const double expected, const string& check_function,
-          const string& check_description, uint& passed_checks, vector<string>& results, const double relative_tol=1E-10);
 
       // Test functions ---------------------------------
 
