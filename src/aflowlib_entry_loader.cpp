@@ -32,7 +32,7 @@ namespace aflowlib {
   ///   el.loadAUID(aflow:7dd846bc04c764e8); // no duplicates will be stored
   ///   el.getEntriesViewFlat(results);
   /// }
-  /// for (auto & entry : results) std::cout << entry->auid << std::endl;
+  /// for (std::shared_ptr<aflowlib::_aflowlib_entry>> & entry : results) std::cout << entry->auid << std::endl;
   /// @endcode
 
   // class constructor
@@ -60,15 +60,43 @@ namespace aflowlib {
   /// create shared pointer used to store the data views and read default values from flags
   /// @TODO use flags to overwrite defaults
   void EntryLoader::init() {
-    m_out_debug = (m_out_debug || XHOST.DEBUG || _DEBUG_ENTRY_LOADER_);
+    m_out_silent = false;
+    m_out_debug = (XHOST.DEBUG || _DEBUG_ENTRY_LOADER_);
+    m_xstructure_relaxed = false;
+    m_xstructure_original = false;
+    m_xstructure_original_file_name = {"POSCAR.orig", "POSCAR.relax1"} ;
+    m_xstructure_final_file_name = {"CONTCAR.relax2", "CONTCAR.relax", "POSCAR.static", "POSCAR.bands", "CONTCAR.static", "CONTCAR.bands"};
+
+    m_sqlite_file = DEFAULT_AFLOW_DB_FILE;
+    m_sqlite_alloy_file = DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE;
+    m_sqlite_collection = "WEB";
+
+    m_aflux_server = DEFAULT_ENTRY_LOADER_AFLUX_SERVER;
+    m_aflux_path = DEFAULT_ENTRY_LOADER_AFLUX_PATH;
+    m_aflux_collection = "RAW";
+    m_aflux_directives = {{"format", "aflow"}, {"paging", "0"}};
+
+    m_restapi_server = DEFAULT_ENTRY_LOADER_RESTAPI_SERVER;
+    m_restapi_path = DEFAULT_ENTRY_LOADER_RESTAPI_PATH;
+    m_restapi_directives = DEFAULT_FILE_AFLOWLIB_ENTRY_OUT;
+    m_restapi_listing_dirs = "?aflowlib_entries";
+    m_restapi_listing_files = "?files";
+    m_restapi_collection = "WEB";
+    m_filesystem_outfile = DEFAULT_FILE_AFLOWLIB_ENTRY_OUT;
+    m_filesystem_path = DEFAULT_ENTRY_LOADER_FS_PATH;
+    m_filesystem_collection = "RAW";
+
     m_entries_flat = std::make_shared<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>();
     m_entries_layered_map = std::make_shared<std::map<short,
                                              std::map<std::string,
                                              std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>>>();
   }
 
+  /// @brief clean a EntryLoader object
+  void EntryLoader::clear() { free(); }
+
   /// @brief reset a EntryLoader object
-  void EntryLoader::clear() { *this = {}; }  // calling the constructor
+  void EntryLoader::free() { *this = {}; } // calling the default constructor to ensure a clean instance of EntryLoader
 
   /// @brief create a copy (privat)
   void EntryLoader::copy(const EntryLoader &b) {  //copy PRIVATE

@@ -34,41 +34,41 @@ namespace aflowlib {
       };
 
       // Settings
-      bool m_out_silent = false; ///< silents all output
-      bool m_out_debug = false;  ///< verbose output (overwrites #m_out_silent)
+      bool m_out_silent; ///< silents all output
+      bool m_out_debug;  ///< verbose output (overwrites #m_out_silent)
 
-      bool m_xstructure_relaxed= false;  ///< add the relaxed structure into the lib entry
-      bool m_xstructure_original= false; ///< add the original structure into the lib entry
+      bool m_xstructure_relaxed;  ///< add the relaxed structure into the lib entry
+      bool m_xstructure_original; ///< add the original structure into the lib entry
 
       /// alternative sources for the original structure if aflow.in failed (in order of priority)
-      std::vector<std::string> m_xstructure_original_file_name = {"POSCAR.orig", "POSCAR.relax1"};
+      std::vector<std::string> m_xstructure_original_file_name;
       /// sources for the relaxed structure (in order of priority)
-      std::vector<std::string> m_xstructure_final_file_name = {"CONTCAR.relax2", "CONTCAR.relax", "POSCAR.static", "POSCAR.bands", "CONTCAR.static", "CONTCAR.bands"};
+      std::vector<std::string> m_xstructure_final_file_name;
       
-      std::string m_sqlite_file = DEFAULT_AFLOW_DB_FILE;                    ///< location of the internal AFLUX SQLITE DB file
-      std::string m_sqlite_alloy_file = DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE; ///< location of the public alloy SQLITE DB file
-      std::string m_sqlite_collection = "WEB";                              ///< collection to use for queries
+      std::string m_sqlite_file;          ///< location of the internal AFLUX SQLITE DB file
+      std::string m_sqlite_alloy_file;    ///< location of the public alloy SQLITE DB file
+      std::string m_sqlite_collection;    ///< collection to use for queries
       
-      std::string m_aflux_server = DEFAULT_ENTRY_LOADER_AFLUX_SERVER;       ///< server that provides the AFLUX API
-      std::string m_aflux_path = DEFAULT_ENTRY_LOADER_AFLUX_PATH;           ///< base path including AFLUX API version
-      std::string m_aflux_collection = "RAW";                               ///< collection to use for queries
+      std::string m_aflux_server;         ///< server that provides the AFLUX API
+      std::string m_aflux_path;           ///< base path including AFLUX API version
+      std::string m_aflux_collection;     ///< collection to use for queries
       /// default AFLUX API directives to set format and disable paging
-      std::map<std::string, std::string> m_aflux_directives {{"format", "aflow"}, {"paging", "0"}};
+      std::map<std::string, std::string> m_aflux_directives;
 
-      std::string m_restapi_server = DEFAULT_ENTRY_LOADER_RESTAPI_SERVER;   ///< server that provides the AFLOW RESTAPI
-      std::string m_restapi_path = DEFAULT_ENTRY_LOADER_RESTAPI_PATH;       ///< AFLOW RESTAPI base path
-      std::string m_restapi_directives = DEFAULT_FILE_AFLOWLIB_ENTRY_OUT;   ///< directive to receive an entry (typically "?format=text" or "aflowlib.out")
-      std::string m_restapi_listing_dirs = "?aflowlib_entries";             ///< directive to list sub entries
-      std::string m_restapi_listing_files = "?files";                       ///< directive to list files available for an entry
-      std::string m_restapi_collection = "WEB";                             ///< collection to use for queries
+      std::string m_restapi_server;        ///< server that provides the AFLOW RESTAPI
+      std::string m_restapi_path;          ///< AFLOW RESTAPI base path
+      std::string m_restapi_directives;    ///< directive to receive an entry (typically "?format=text" or "aflowlib.out")
+      std::string m_restapi_listing_dirs;  ///< directive to list sub entries
+      std::string m_restapi_listing_files; ///< directive to list files available for an entry
+      std::string m_restapi_collection;    ///< collection to use for queries
 
-      std::string m_filesystem_outfile = DEFAULT_FILE_AFLOWLIB_ENTRY_OUT;   ///< file name of the AFLOW lib entry
-      std::string m_filesystem_path = DEFAULT_ENTRY_LOADER_FS_PATH;         ///< base path to the internal filesystem
-      std::string m_filesystem_collection = "RAW";                          ///< collection to use for queries
+      std::string m_filesystem_outfile;    ///< file name of the AFLOW lib entry
+      std::string m_filesystem_path;       ///< base path to the internal filesystem
+      std::string m_filesystem_collection; ///< collection to use for queries
 
       // Attributes
-      std::shared_ptr<aflowlib::AflowDB> m_sqlite_db_ptr;                   ///< pointer to an instance of the internal AFLUX SQLITE DB
-      std::shared_ptr<aflowlib::AflowDB> m_sqlite_alloy_db_ptr;             ///< pointer to an instance of the public alloy SQLITE DB
+      std::shared_ptr<aflowlib::AflowDB> m_sqlite_db_ptr;       ///< pointer to an instance of the internal AFLUX SQLITE DB
+      std::shared_ptr<aflowlib::AflowDB> m_sqlite_alloy_db_ptr; ///< pointer to an instance of the public alloy SQLITE DB
       /// @brief set that contains all loaded AUIDs
       /// @note `std::set` is stored sorted and is therefore faster at finding entries compared to `std::vector`
       std::vector<std::string> m_auid_list;
@@ -142,7 +142,9 @@ namespace aflowlib {
     private:
       //NECESSARY private CLASS METHODS - START
       void init();
+      void free();
       void copy(const EntryLoader& b);
+
       //NECESSARY END CLASS METHODS - END
 
       /// @brief Determines which source is used to load data
