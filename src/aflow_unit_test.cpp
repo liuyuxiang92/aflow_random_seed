@@ -8,7 +8,6 @@
 #include "aflow_anrl.h"  //DX20201104
 #include "aflow_compare_structure.h"  //ME20220125
 #include "aflowlib_entry_loader.h"
-#include <chrono> // benchmarking HE20220222
 
 
 // Collection of generic check functions, to streamline testing.
@@ -1472,12 +1471,11 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
     el.clear();
     el.m_out_silent = true;
     {
-      auto start = std::chrono::high_resolution_clock::now();
+      long double start = aurostd::get_seconds();
       if (el.setSource(source.second)) {
         el.loadAlloy(test_alloy, recursive);
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::high_resolution_clock::now() - start);
-        check_description << " | speed " << el.m_entries_flat->size() / (duration.count() / 1000.0) << " entries/s; "
+        long double duration = aurostd::get_delta_seconds(start);
+        check_description << " | speed " << el.m_entries_flat->size() / duration << " entries/s; "
                           << el.m_entries_flat->size() << " entries";
         check((expected < el.m_entries_flat->size()), el.m_entries_flat->size(), expected, check_function,
               check_description.str(), passed_checks, results);
@@ -1502,15 +1500,14 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
     el.m_xstructure_original = true;
     el.m_xstructure_relaxed = true;
     if (source.first == "RESTAPI" || source.first == "RESTAPI_RAW") el.m_filesystem_path="/fake/"; // force xstructure test to use REST API
-    auto start = std::chrono::high_resolution_clock::now();
+    long double start = aurostd::get_seconds();
     if (el.setSource(source.second)) {
       el.loadAUID(test_AUID);
       if (source.first == "AFLUX") test_entry = *el.m_entries_flat->back();
       el.loadAUID(test_AUIDs);
 
-      auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
-          std::chrono::high_resolution_clock::now() - start);
-      check_description << " | speed " << el.m_entries_flat->size() / (duration.count() / 1000.0) << " entries/s; "
+      long double duration = aurostd::get_delta_seconds(start);
+      check_description << " | speed " << el.m_entries_flat->size() / duration  << " entries/s; "
                         << el.m_entries_flat->size() << " entries";
       check_equal(el.m_entries_flat->size(), expected, check_function,
                   check_description.str(), passed_checks, results);
@@ -1542,13 +1539,12 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
     el.clear();
     el.m_out_silent = true;
     {
-      auto start = std::chrono::high_resolution_clock::now();
+      long double start = aurostd::get_seconds();
       if (el.setSource(source.second)) {
         el.loadAURL(test_AURLs);
         el.loadAURL(test_AURL);
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::high_resolution_clock::now() - start);
-        check_description << " | speed " << el.m_entries_flat->size() / (duration.count() / 1000.0) << " entries/s; "
+        long double duration = aurostd::get_delta_seconds(start);
+        check_description << " | speed " << el.m_entries_flat->size() / duration << " entries/s; "
                           << el.m_entries_flat->size() << " entries";
         check_equal(el.m_entries_flat->size(), expected, check_function,
                     check_description.str(), passed_checks, results);
