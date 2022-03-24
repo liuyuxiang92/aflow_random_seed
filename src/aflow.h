@@ -4805,8 +4805,6 @@ namespace slab { //CO20190601
   xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
   xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout);  //CO20190321
 
-  bool slabTest(ostream& oss=cout);  //CO20190520
-  bool slabTest(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20190520
 } // namespace slab
 
 // ----------------------------------------------------------------------------
@@ -5440,7 +5438,7 @@ namespace unittest {
       void checkEqual(const bool calculated, const bool expected, const string& check_function,
           const string& check_description, uint& passed_checks, vector<string>& results);
       void checkSimilar(const double calculated, const double expected, const string& check_function,
-          const string& check_description, uint& passed_checks, vector<string>& results, const double relative=1E-10);
+          const string& check_description, uint& passed_checks, vector<string>& results, const double relative_tol=1E-10);
 
       // Test functions ---------------------------------
 
@@ -5457,6 +5455,7 @@ namespace unittest {
       void xstructureParserTest(uint&, vector<string>&, vector<string>&);
       void coordinationTest(uint&, vector<string>&, vector<string>&);
       void foldAtomsInCellTest(uint&, vector<string>&, vector<string>&);
+      void slabTest(uint&, vector<string>&, vector<string>&);
   };
 
 }
