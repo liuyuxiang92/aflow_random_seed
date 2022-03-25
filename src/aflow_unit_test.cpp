@@ -196,7 +196,7 @@ namespace unittest {
           }
         }
         break;
-      } else if (!isgroup && (test_functions.find(test) != test_functions.end())) {
+      } else if (!isgroup && (test_functions.find(test) == test_functions.end())) {
         message << "Skipping unrecognized test name " << test << ".";
         pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       } else if (isgroup && !aurostd::WithinList(tasks, test)) {
@@ -233,7 +233,7 @@ namespace unittest {
     for (uint t = 0; t < tasks.size(); t++) {
       bool success = taskSuccessful(tasks[t]);
       if (success) nsuccess++;
-      summary << "\t" << tasks[t] << " | " << (success?"pass":"fail") << "\n";
+      summary << "  " << tasks[t] << " | " << (success?"pass":"fail") << "\n";
     }
 
     if (nsuccess == ntasks) {
@@ -329,7 +329,7 @@ namespace unittest {
       message << "FAIL " << xchk.task_description << " (" << (check_num - xchk.passed_checks) << " of " << check_num << " checks failed)" << std::endl;
       pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
     }
-    message << "\t" << aurostd::joinWDelimiter(xchk.results, "\n\t");
+    message << "  " << aurostd::joinWDelimiter(xchk.results, "\n  ");
     pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     if (xchk.errors.size() > 0) {
       message << "\nAdditional error messages:\n" << aurostd::joinWDelimiter(xchk.errors, "\n");
@@ -359,18 +359,17 @@ namespace unittest {
 
   template <typename utype>
   void UnitTest::check(const bool passed, const utype& calculated, const utype& expected, const string& check_function,
-      const string& check_description, uint& passed_checks, vector<string>& results){
+      const string& check_description, uint& passed_checks, vector<string>& results) {
     stringstream result;
     uint check_num = results.size() + 1;
     if (passed) {
       passed_checks++;
-      if (check_function.empty()){
+      if (check_function.empty()) {
         result << std::setw(3) << check_num << " | pass | " << check_description;
       } else {
         result << std::setw(3) << check_num << " | pass | " << check_function << " | " << check_description;
       }
-    }
-    else {
+    } else {
       if (check_function.empty()) {
         result << std::setw(3) << check_num << " | FAIL | " << check_description
           << " (result: " << calculated << " | expected: " << expected << ")";
@@ -898,7 +897,6 @@ namespace unittest {
     // ---------------------------------------------------------------------------
 
     // setup test environment
-    results.clear();
     const uint test_AE = 4;
 
     // create hull
@@ -1253,15 +1251,15 @@ namespace unittest {
     expected_uint = 2;
     checkEqual(calculated_uint, expected_uint, check_function, check_description, passed_checks, results);
 
-    check_description = "Number of coordination environments atom 1";
-    calculated_uint = coordinations[0].size();
-    expected_uint = 2;
-    checkEqual(calculated_uint, expected_uint, check_function, check_description, passed_checks, results);
+    check_description = "Number of coordination environments atom 1 > 2";
+    expected_bool = true;
+    calculated_bool = (coordinations[0].size() > 2);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
 
-    check_description = "Number of coordination environments atom 2";
-    calculated_uint = coordinations[1].size();
-    expected_uint = 2;
-    checkEqual(calculated_uint, expected_uint, check_function, check_description, passed_checks, results);
+    check_description = "Number of coordination environments atom 2 > 2";
+    expected_bool = true;
+    calculated_bool = (coordinations[1].size() > 2);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
 
     //first iatom
     //first shell
@@ -1346,7 +1344,7 @@ namespace unittest {
       "  0.000000   0.000000  13.492372\n"
       "12 18\n"
       "Direct\n"
-      "	  0.33333333333332   0.66666666666665   0.31943934568918  Fe\n"
+      "   0.33333333333332   0.66666666666665   0.31943934568918  Fe\n"
       "  -0.00000000000002  -0.00000000000001   0.65277267902252  Fe\n"
       "   0.66666666666665   0.33333333333332   0.98610601235585  Fe\n"
       "   0.66666666666668   0.33333333333335   0.18056065431082  Fe\n"
@@ -1376,16 +1374,16 @@ namespace unittest {
       "   0.66666666666667   0.01846437673106   0.08333333333333  O \n"
       "   0.33333333333333   0.35179771006440   0.41666666666667  O \n"
       "   0.00000000000000   0.68513104339773   0.75000000000000  O \n";
-    xstructure xstr_in;
     aurostd::StringstreamClean(xstrss);
     xstrss << xstr_str;
+    xstructure xstr_in;
     try {
-      xstr_in = xstructure(xstrss);           //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
+      xstrss >> xstr_in;          //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
     } catch (aurostd::xerror& excpt) {} //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
     min_dist = min_dist_orig = xstr_in.MinDist();
     if(LDEBUG){
-      cerr << __AFLOW_FUNC__ << " xstr_in=" << endl;cerr << xstr_in << endl;
-      cerr << __AFLOW_FUNC__ << " xstr_in.MinDist()=" << min_dist << endl;
+      std::cerr << __AFLOW_FUNC__ << " xstr_in=\n" << xstr_in << std::endl;
+      std::cerr << __AFLOW_FUNC__ << " xstr_in.MinDist()=" << min_dist << std::endl;
     }
 
     //create xstr_slab (correct answer)
@@ -1395,8 +1393,8 @@ namespace unittest {
     " -4.73623366665202   0.00000000000000   0.00000000000000\n"
     " -9.47247466669728  21.24210623923067   0.00000000000000\n"
     " -2.36811866667432   3.16803536641816   2.60528076661565\n"
-    "12 18"
-    "Direct"
+    "12 18\n"
+    "Direct\n"
     "   0.66666667      0.31943935     0.38890928   Fe\n"
     "  -0.00000000      0.65277268     0.38890928   Fe\n"
     "   0.33333333      0.98610601     0.38890928   Fe\n"
@@ -1431,12 +1429,12 @@ namespace unittest {
     aurostd::StringstreamClean(xstrss);
     xstrss << xstr_str;
     try {
-      xstr_slab_correct = xstructure(xstrss); //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
+      xstrss >> xstr_slab_correct; //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
     } catch (aurostd::xerror& excpt) {} //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
     // ---------------------------------------------------------------------------
     // test 1: compare min distance of bulk and correct slab
     min_dist = xstr_slab_correct.MinDist();
-    if(LDEBUG){
+    if(LDEBUG) {
       std::cerr << __AFLOW_FUNC__ << " xstr_slab_correct=\n" << xstr_slab_correct << std::endl;
       min_dist=xstr_slab_correct.MinDist();
       std::cerr << __AFLOW_FUNC__ << " xstr_slab_correct.MinDist()=" << min_dist << std::endl;
