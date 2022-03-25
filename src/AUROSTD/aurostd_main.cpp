@@ -1997,6 +1997,7 @@ namespace aurostd {
   // ***************************************************************************
   bool DirectoryLocked(string directory,string LOCK) {
     if(FileExist(directory+"/"+LOCK)) return TRUE;
+    if(FileExist(directory+"/"+LOCK+_LOCK_LINK_SUFFIX_)) return TRUE;
     if(FileExist(directory+"/"+LOCK+".xz")) return TRUE;
     if(FileExist(directory+"/"+LOCK+".gz")) return TRUE;
     if(FileExist(directory+"/"+LOCK+".bz2")) return TRUE;
@@ -2108,6 +2109,43 @@ namespace aurostd {
     aurostd::execute(command);
     return TRUE;
   }
+
+  // ***************************************************************************
+  // Function aurostd::LinkFileAtomic
+  // ***************************************************************************
+  // Simon Divilov
+  // Create a symbolic or hard link of a file using C++ functions
+  bool LinkFileAtomic(const string& from,const string& to,bool soft) {
+    int fail=0;
+    string from_clean=CleanFileName(from),to_clean=CleanFileName(to);
+    if(from_clean.empty() || to_clean.empty()) {return FALSE;}
+    if(soft) {
+      fail = symlink(from_clean.c_str(),to_clean.c_str());
+    }
+    else {
+      fail = link(from_clean.c_str(),to_clean.c_str());
+    }
+    if(fail) {
+      if(errno==EEXIST) {
+        return FALSE;
+      }
+      else {
+        string function = XPID+"aurostd::LinkFileAtomic():";
+        string message = "Error linking "+from_clean+" -> "+to_clean+" | errno="+aurostd::utype2string<int>(errno);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,message,_FILE_ERROR_);
+      }
+    }
+    else {
+      return TRUE;
+    }
+  }
+
+  // ***************************************************************************
+  // Function aurostd::UnlinkFile
+  // ***************************************************************************
+  // Simon Divilov
+  // Unlink file using C++ functions
+  bool UnlinkFile(const string& link) {return (unlink(CleanFileName(link).c_str())==0);}
 
   //CO START
   //***************************************************************************//
@@ -3305,7 +3343,7 @@ namespace aurostd {
 
     stringstream strstream,cmdstream;
     string file=aurostd::TmpFileCreate("execute_report");
-    if(fsio==stdouterr_fsio){cmdstream << command << " &> " << file;}  //CO20200624
+    if(fsio==stdouterr_fsio){cmdstream << "bash -c \"" << command << " &> " << file << "\"";}  //CO20200624 //SD20220311 - force bash, &> does not work in sh; be careful with quotes within quotes, althought it seems to work
     else if(fsio==stderr_fsio){cmdstream << command << " 2> " << file;} //CO20200624
     else{cmdstream << command << " > " << file;} //CO20200624
     if(LDEBUG){cerr << soliloquy << " cmdstream=\"" << cmdstream.str() << "\"" << endl;}

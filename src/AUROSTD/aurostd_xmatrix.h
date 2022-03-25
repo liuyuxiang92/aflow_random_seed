@@ -249,6 +249,9 @@ namespace aurostd {
     reshape(const xvector<utype>&, int, int) __xprototype;  // ME20210505
 
   template<class utype> xmatrix<utype>
+    reshape(const xmatrix<utype>&, int, int) __xprototype;  // SD20220126
+
+  template<class utype> xmatrix<utype>
     reshape(const xvector<utype>&) __xprototype;
 
   template<class utype> xmatrix<utype>

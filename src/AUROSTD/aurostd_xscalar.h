@@ -151,6 +151,7 @@ namespace aurostd {
   template<class utype> utype sqrt(utype) __xprototype;
   template<class utype> utype sign(utype) __xprototype;
   template<class utype> utype mod(utype,utype) __xprototype;
+  template<class utype> utype mod_floored(utype,utype) __xprototype;
   template<class utype> utype nint(utype) __xprototype;
   template<class utype> void _GCD(int a,int b, int& gcd, int& x, int& y); //CO20180409  //CO20191112 - extended GCD, get Bezout coefficients
   template<class utype> void _GCD(int a,int b, int& gcd); //CO20180409
