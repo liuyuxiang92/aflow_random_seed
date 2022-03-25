@@ -44,7 +44,8 @@ _apdc_data::_apdc_data() {
   vstr_atat.clear();
   mapstr.clear();
   // Cluster data
-  multiplicity.clear();
+  mult_cluster.clear();
+  natom_cluster.clear();
   conc_cluster.clear();
   excess_energy_cluster.clear();
   // Thermo data
@@ -84,7 +85,8 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
     vstr_atat = b.vstr_atat;
     mapstr = b.mapstr;
     // Cluster data
-    multiplicity = b.multiplicity;
+    mult_cluster = b.mult_cluster;
+    natom_cluster = b.natom_cluster;
     conc_cluster = b.conc_cluster;
     excess_energy_cluster = b.excess_energy_cluster;
     // Thermo data
@@ -205,18 +207,22 @@ namespace apdc {
   void GetBinodal(_apdc_data& apdc_data) {
     apdc_data.lat_atat = CreateLatForATAT(apdc_data.plattice, apdc_data.elements);
     apdc_data.vstr_atat = GetATATXstructures(apdc_data.lat_atat, (uint)apdc_data.max_num_atoms);
-  //  apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads);
-  //  // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
-  //  apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, apdc_data.aflow_max_num_atoms), apdc_data.vstr_aflow, apdc_data.num_threads);
-  //  GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.lat_atat, apdc_data.vstr_aflow, apdc_data.vstr_atat, apdc_data.mapstr);
-  //  RunATAT(apdc_data.workdirpath, apdc_data.rundirpath, apdc_data.min_sleep);
+    apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads, false);
+    //apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads);
+    // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
+    apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, apdc_data.aflow_max_num_atoms), apdc_data.vstr_aflow, apdc_data.num_threads);
+    GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.lat_atat, apdc_data.vstr_aflow, apdc_data.vstr_atat, apdc_data.mapstr);
+    RunATAT(apdc_data.workdirpath, apdc_data.rundirpath, apdc_data.min_sleep);
+    vector<xvector<int> > mult_cluster = GetMultiplicityCluster(apdc_data.vstr_atat);
+    apdc_data.natom_cluster = mult_cluster[0];
+    apdc_data.mult_cluster = mult_cluster[1];
     apdc_data.conc_cluster = GetConcentrationCluster(apdc_data.rundirpath, apdc_data.vstr_atat.size(), apdc_data.elements.size());
-    vector<xvector<int> > multiplicity = GetMultiplicity(apdc_data.vstr_atat);
-    apdc_data.multiplicity = multiplicity[1];
-    apdc_data.excess_energy_cluster = GetExcessEnergyCluster(apdc_data.rundirpath, apdc_data.conc_cluster, multiplicity[0]);
+    apdc_data.excess_energy_cluster = GetExcessEnergyCluster(apdc_data.rundirpath, apdc_data.conc_cluster, apdc_data.natom_cluster);
     apdc_data.conc_macro = GetConcentrationMacro(apdc_data.conc_range, apdc_data.conc_npts, apdc_data.elements.size());
+    SetCongruentClusters(apdc_data);
     apdc_data.temp = GetTemperature(apdc_data.temp_range, apdc_data.temp_npts);
-    apdc_data.prob_ideal_cluster = GetProbabilityIdealCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.multiplicity, apdc_data.max_num_atoms);
+    return;
+    apdc_data.prob_ideal_cluster = GetProbabilityIdealCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.mult_cluster, apdc_data.max_num_atoms);
     CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_ideal_cluster);
     return;
     apdc_data.prob_cluster = GetProbabilityCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.excess_energy_cluster, apdc_data.prob_ideal_cluster, apdc_data.temp, apdc_data.max_num_atoms);
@@ -242,17 +248,18 @@ namespace apdc {
     int nx = prob_ideal_cluster.rows, ncl = prob_ideal_cluster.cols, nt = temp.rows, neqs = conc_cluster.cols - 1;
     xtensor<double> prob_cluster({nx, ncl, nt});
     xvector<double> beta = aurostd::pow(CONSTANT_BOLTZMANN * temp, -1.0);
+    xmatrix<int> natom_cluster = aurostd::xmatrixdouble2utype<int>((double)max_num_atoms * conc_cluster);
     xvector<double> rr, ri;
     if (neqs == 1) {
       for (int i = 1; i <= nx; i++) {
         for (int j = 1; j <= nt; j++) {
           xvector<double> coeff = 0.0 * aurostd::ones_xv<double>(max_num_atoms + 1);
           for (int k = 1; k <= ncl; k++) {
-            coeff((int)(max_num_atoms * conc_cluster(k, 1)) + 1) += prob_ideal_cluster(i, k) * std::exp(-beta(j) * excess_energy_cluster(k)) * (conc_cluster(k, 1) - conc_macro(i, 1));
+            coeff(natom_cluster(k, 1) + 1) += prob_ideal_cluster(i, k) * std::exp(-beta(j) * excess_energy_cluster(k)) * (conc_cluster(k, 1) - conc_macro(i, 1));
           }
-          if (LDEBUG) {cerr << "p=" << coeff << endl;}
           aurostd::polynomialFindRoots(coeff, rr, ri);
           if (LDEBUG) {
+            cerr << "p=" << coeff << endl;
             cerr << "i=" << i << " j=" << j << " | Real roots=" << rr << endl;
             cerr << "i=" << i << " j=" << j << " | Imag roots=" << ri << endl;
           }
@@ -270,13 +277,13 @@ namespace apdc {
 // ***************************************************************************
 // P_j(X) = g_j*(X1^N1_j)*(X2^N2_j)*...(X(K)^N(K)_j)
 namespace apdc {
-  xmatrix<double> GetProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& multiplicity, const int max_num_atoms) {
+  xmatrix<double> GetProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& mult_cluster, const int max_num_atoms) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     int ncl = conc_cluster.rows, nx = conc_macro.rows, nelem = conc_macro.cols;
     xmatrix<double> prob_ideal_cluster(nx, ncl);
     for (int i = 1; i <= nx; i++) {
       for (int j = 1; j <= ncl; j++) {
-        prob_ideal_cluster(i, j) = multiplicity(j);
+        prob_ideal_cluster(i, j) = mult_cluster(j);
         for (int k = 1; k <= nelem; k++) {prob_ideal_cluster(i, j) *= std::pow(conc_macro(i, k), conc_cluster(j, k) * max_num_atoms);}
       }
       prob_ideal_cluster.setmat(prob_ideal_cluster.getmat(i, i, 1, ncl) / aurostd::sum(prob_ideal_cluster.getmat(i, i, 1, ncl)), i, 1); // normalize sum to 1
@@ -318,6 +325,7 @@ namespace apdc {
       }
       start = conc_range(2 * i - 1); stop = conc_range(2 * i);
       // Redefine concentration profile to be (0,1) rather than [0,1] to avoid NaNs
+        //// FIX LATER
       if (aurostd::isequal(start, 0.0)) {start += CONC_DELTA;}
       if (aurostd::isequal(start, 1.0)) {start -= CONC_DELTA;}
       if (aurostd::isequal(stop, 0.0)) {stop += CONC_DELTA;}
@@ -338,15 +346,41 @@ namespace apdc {
 }
 
 // ***************************************************************************
-// apdc::GetMultiplicity
+// apdc::SetCongruentClusters
+// ***************************************************************************
+namespace apdc {
+  void SetCongruentClusters(_apdc_data& apdc_data) {
+    vector<int> indx_cluster;
+    for (int i = 1; i <= apdc_data.natom_cluster.rows; i++) {
+      if (!(apdc_data.max_num_atoms % apdc_data.natom_cluster(i))) {indx_cluster.push_back(i);}
+    }
+    int ncl = indx_cluster.size(), nelem = apdc_data.elements.size();
+    xvector<int> v1(ncl), v2(ncl);
+    xvector<double> v3(ncl);
+    xmatrix<double> m1(ncl, nelem);
+    for (int i = 0; i < ncl; i++) {
+      m1.setmat(apdc_data.conc_cluster.getmat(indx_cluster[i], indx_cluster[i], 1, nelem), i + 1, 1);
+      v1(i + 1) = apdc_data.mult_cluster(indx_cluster[i]);
+      v2(i + 1) = apdc_data.natom_cluster(indx_cluster[i]);
+      v3(i + 1) = apdc_data.excess_energy_cluster(indx_cluster[i]);
+    }
+    apdc_data.conc_cluster = m1;
+    apdc_data.mult_cluster = v1;
+    apdc_data.natom_cluster = v2;
+    apdc_data.excess_energy_cluster = v3;
+  }
+}
+
+// ***************************************************************************
+// apdc::GetMultiplicityCluster
 // ***************************************************************************
 // N_j = N1_j+N2_j+...N(K)_j
 // g_j = N_j!/(N1_j!*N2_j!*...N(K)_j)
 // return [N,g]
 namespace apdc {
-  vector<xvector<int> > GetMultiplicity(const vector<xstructure>& vstr) {
+  vector<xvector<int> > GetMultiplicityCluster(const vector<xstructure>& vstr) {
     int nstr = vstr.size();
-    vector<xvector<int> > multiplicity;
+    vector<xvector<int> > mult_cluster;
     xvector<int> g(nstr), n(nstr);
     uint natom, fact_prod;
     for (int i = 1; i <= nstr; i++) {
@@ -359,8 +393,8 @@ namespace apdc {
       n(i) = natom;
       g(i) = aurostd::factorial(natom) / fact_prod;
     }
-    multiplicity.push_back(n); multiplicity.push_back(g);
-    return multiplicity;
+    mult_cluster.push_back(n); mult_cluster.push_back(g);
+    return mult_cluster;
   }
 }
 
@@ -496,7 +530,7 @@ namespace apdc {
 // apdc::GetAFLOWXstructures
 // ***************************************************************************
 namespace apdc {
-  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_proc, bool keep_all) {
+  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_proc, bool use_sg) {
     vector<xstructure> vstr;
     vector<string> vstrlabel;
     string aflowlib, aflowurl;
@@ -543,10 +577,16 @@ namespace apdc {
         entry.aurl = aflowurl + "/" + vstrlabel[i];
         if (pflow::loadXstructures(entry, oss, false)) { // initial = unrelaxed; final = relaxed
           entry.vstr[0].qm_E_cell = entry.enthalpy_cell; // ATAT needs energy per cell
-          if (keep_all || compare::structuresMatch(entry.vstr[0], entry.vstr[entry.vstr.size() - 1], true, num_proc)) {vstr.push_back(entry.vstr[0]);}
+          if (use_sg && (entry.spacegroup_orig == entry.spacegroup_relax)) {
+            vstr.push_back(entry.vstr[0]);
+          }
+          else if (compare::structuresMatch(entry.vstr[0], entry.vstr[entry.vstr.size() - 1], true, num_proc)) {
+            vstr.push_back(entry.vstr[0]);
+          }
         }
         entry.clear();
     }
+    cerr<<vstr.size()<<endl;
     return vstr;
   }
 }
