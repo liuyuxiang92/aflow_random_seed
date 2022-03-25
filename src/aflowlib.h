@@ -415,6 +415,7 @@ namespace aflowlib {
   bool LIB2RAW_FileNeeded(string directory_LIB,string fileLIB,string directory_RAW,string fileRAW,vector<string> &vfiles,const string& MESSAGE);
   // [OBSOLETE] bool LIB2RAW(vector<string> argv,bool overwrite);
   void CleanDirectoryLIB(string& directory);  //CO20200624
+  void setAURL(aflowlib::_aflowlib_entry& aflowlib_data,const string& directory_LIB,bool LOCAL=false);
   bool LIB2RAW(const string& options,bool overwrite,bool LOCAL=false);
   bool XPLUG_CHECK_ONLY(const vector<string>& argv); //CO20200501
   bool XPLUG_CHECK_ONLY(const vector<string>& argv,deque<string>& vdirsOUT,deque<string>& vzips,deque<string>& vcleans); //CO20200501

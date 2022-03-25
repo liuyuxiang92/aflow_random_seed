@@ -577,7 +577,7 @@ namespace apl {
     // Set up index for threaded execution
     int i = AUROSTD_MAX_INT;
     if (task_counter < nIQPs) {
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_APL_MULTITHREADS_ENABLE
       std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
 #endif
       i = task_counter++;
@@ -789,7 +789,7 @@ namespace apl {
           }
         }
       }
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_APL_MULTITHREADS_ENABLE
       std::unique_lock<std::mutex> lk(m);  // For thread-safe progress bar writing and assignment
 #endif
       i = task_counter++;
@@ -805,7 +805,7 @@ namespace apl {
     // Set up index for threaded execution
     int i = AUROSTD_MAX_INT;
     if (task_counter < nIQPs) {
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_APL_MULTITHREADS_ENABLE
       std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
 #endif
       i = task_counter++;
@@ -865,7 +865,7 @@ namespace apl {
           }
         }
       }
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_APL_MULTITHREADS_ENABLE
       std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
 #endif
       i = task_counter++;
@@ -1171,7 +1171,7 @@ namespace apl {
     // Set up index for threaded execution
     int i = AUROSTD_MAX_INT;
     if (task_counter < nIQPs) {
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_APL_MULTITHREADS_ENABLE
       std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
 #endif
       i = task_counter++;
@@ -1188,7 +1188,7 @@ namespace apl {
         getProcess(processes[i][p], qpts, branches, sign);
         rates[i][branches[0]] += intr_trans_probs[i][p] * getOccupationTerm(occ, sign, qpts, branches);
       }
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_APL_MULTITHREADS_ENABLE
       std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
 #endif
       i = task_counter++;
@@ -1289,7 +1289,7 @@ namespace apl {
     // Set up index for threaded execution
     int i = AUROSTD_MAX_INT;
     if (task_counter < nIQPs) {
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_APL_MULTITHREADS_ENABLE
       std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
 #endif
       i = task_counter++;
@@ -1336,7 +1336,7 @@ namespace apl {
       for (int br = 0; br < nBranches; br++) {
         delta[i][br] = Uc * delta[i][br];
       }
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_APL_MULTITHREADS_ENABLE
       std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
 #endif
       i = task_counter++;
