@@ -16,7 +16,7 @@
 
 namespace aurostd {
   /// If IPv6 is needed in the future it would be best to use
-  /// inet_ntop from <arpa/inet.h>
+  /// inet_ntop from arpa/inet.h
   std::string httpGetIP4String(unsigned int ip)
   {
     char ip_str[20];
@@ -466,7 +466,7 @@ namespace aurostd {
         if (LDEBUG) cerr << soliloquy << " Received status code " << status_code << endl;
         if (LDEBUG && status_code!=-1) {
           cerr << soliloquy << " Header content: " << endl;
-          for (auto it = header.begin(); it != header.end(); it++)
+          for (std::map<std::string, std::string>::iterator it = header.begin(); it != header.end(); it++)
             cerr << "    " << it->first << ": " << it->second << std::endl;
         }
         if (std::find(std::begin(redirect_codes), std::end(redirect_codes), status_code) != std::end(redirect_codes)) {

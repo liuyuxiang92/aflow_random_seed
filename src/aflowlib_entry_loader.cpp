@@ -187,15 +187,16 @@ namespace aflowlib {
 
   /// @brief load multiple entries from a vector of AUIDs
   /// @param AUID list of AURLs
-  void EntryLoader::loadAUID(const std::vector <std::string> &AUID) {
+  void EntryLoader::loadAUID(const std::vector<std::string> &AUID) {
     selectSource();
     std::vector <std::string> clean_AUID;
 
     m_logger_message << "Try loading " << AUID.size() <<" AUIDs";
     outInfo(__func__);
 
-    for (std::string AUID_single: AUID) {
-      if (cleanAUID(AUID_single)) clean_AUID.push_back(AUID_single);
+    for (std::vector<std::string>::const_iterator AUID_single = AUID.begin(); AUID_single != AUID.end(); AUID_single++) {
+      std::string temp = *AUID_single;
+      if (cleanAUID(temp)) clean_AUID.push_back(temp);
     }
 
     if (clean_AUID.size()!=AUID.size()) {
@@ -223,9 +224,9 @@ namespace aflowlib {
       case Source::RESTAPI:
       case Source::RESTAPI_RAW: {
         std::vector <std::string> queries;
-        for (std::string AUID_single: clean_AUID) {
+        for (std::vector<std::string>::const_iterator AUID_single = clean_AUID.begin(); AUID_single != clean_AUID.end(); AUID_single++) {
           std::string rest_query = "AUID/aflow:";
-          for (uint part = 0; part < 8; part++) rest_query += AUID_single.substr(6 + part * 2, 2) + "/";
+          for (uint part = 0; part < 8; part++) rest_query += AUID_single->substr(6 + part * 2, 2) + "/";
           rest_query += "WEB/";
           queries.push_back(rest_query);
         }
@@ -236,9 +237,9 @@ namespace aflowlib {
       case Source::FILESYSTEM:
       case Source::FILESYSTEM_RAW: {
         std::vector <std::string> files;
-        for (std::string AUID_single: clean_AUID) {
+        for (std::vector<std::string>::const_iterator AUID_single = clean_AUID.begin(); AUID_single != clean_AUID.end(); AUID_single++) {
           std::string file_path = m_filesystem_path + "AUID/aflow:";
-          for (uint part = 0; part < 8; part++) file_path += AUID_single.substr(6 + part * 2, 2) + "/";
+          for (uint part = 0; part < 8; part++) file_path += AUID_single->substr(6 + part * 2, 2) + "/";
           file_path += m_filesystem_collection + "/" + m_filesystem_outfile;
           files.push_back(file_path);
         }
@@ -315,8 +316,9 @@ namespace aflowlib {
     outInfo(__func__);
 
     std::vector <std::string> clean_AURL;
-    for (std::string AURL_single: AURL) {
-      if (cleanAURL(AURL_single)) clean_AURL.push_back(AURL_single);
+    for (std::vector<std::string>::const_iterator AURL_single = AURL.begin(); AURL_single != AURL.end(); AURL_single++) {
+      std::string temp = *AURL_single;
+      if (cleanAURL(temp)) clean_AURL.push_back(temp);
     }
 
     if (clean_AURL.size()!=AURL.size()) {
@@ -346,8 +348,8 @@ namespace aflowlib {
       case Source::RESTAPI:
       case Source::RESTAPI_RAW: {
         std::vector <std::string> queries;
-        for (std::string AURL_single: clean_AURL) {
-          std::string rest_query = std::regex_replace(AURL_single.substr(28), m_re_aurl2file, "$1_" + m_sqlite_collection + "/") + "/";
+        for (std::vector<std::string>::const_iterator AURL_single = clean_AURL.begin(); AURL_single != clean_AURL.end(); AURL_single++) {
+          std::string rest_query = std::regex_replace(AURL_single->substr(28), m_re_aurl2file, "$1_" + m_sqlite_collection + "/") + "/";
           queries.push_back(rest_query);
         }
         loadRestAPIQueries(queries);
@@ -357,8 +359,8 @@ namespace aflowlib {
       case Source::FILESYSTEM:
       case Source::FILESYSTEM_RAW: {
         std::vector <std::string> files;
-        for (std::string AURL_single: clean_AURL) {
-          std::string file_path = m_filesystem_path + AURL_single.substr(28) + "/" + m_filesystem_outfile;
+        for (std::vector<std::string>::const_iterator AURL_single = clean_AURL.begin(); AURL_single != clean_AURL.end(); AURL_single++) {
+          std::string file_path = m_filesystem_path + AURL_single->substr(28) + "/" + m_filesystem_outfile;
           file_path = std::regex_replace(file_path, m_re_aurl2file, "$1/" + m_filesystem_collection + "/");
           files.push_back(file_path);
         }
@@ -394,15 +396,15 @@ namespace aflowlib {
     std::vector <std::string> alloy_clean;
 
     // check that all parts of alloy are actually elements
-    for (std::string element: alloy) {
-      if (xelement::xelement::isElement(element) == 0) {
-        m_logger_message << element << " is not an element";
+    for (std::vector<std::string>::const_iterator element = alloy.begin(); element != alloy.end(); element++) {
+      if (xelement::xelement::isElement(*element) == 0) {
+        m_logger_message << *element << " is not an element";
         outError(__func__,__LINE__);
-      } else alloy_clean.emplace_back(element);
+      } else alloy_clean.emplace_back(*element);
     }
 
     // build list of all needed sub-alloys
-    std::vector <std::vector<std::string>> alloy_sub_list;
+    std::vector<std::vector<std::string>> alloy_sub_list;
     if (recursive) {
       aurostd::xcombos xc;
       for (size_t i = 1; i <= alloy_clean.size(); i++) {
@@ -423,15 +425,15 @@ namespace aflowlib {
 
     // build sorted alloy strings
     std::vector <std::string> final_alloy_list;
-    for (std::vector <std::string> &a: alloy_sub_list) {
+    for (std::vector<std::vector<std::string>>::iterator a = alloy_sub_list.begin(); a != alloy_sub_list.end(); a++) {
       std::string alloy_tmp = "";
-      std::sort(a.begin(), a.end());
-      for (std::string e: a) alloy_tmp += e;
+      std::sort(a->begin(), a->end());
+      for (std::vector<std::string>::iterator e = a->begin(); e != a->end(); e++) alloy_tmp += *e;
       final_alloy_list.push_back(alloy_tmp);
     }
     m_logger_message << "Try loading " << final_alloy_list.size() << " systems: ";
-    for (const std::string & alloy : final_alloy_list){
-      m_logger_message << "\"" << alloy << "\" ";
+    for (std::vector<std::string>::const_iterator alloy = final_alloy_list.begin(); alloy != final_alloy_list.end(); alloy++) {
+      m_logger_message << "\"" << *alloy << "\" ";
     }
     outInfo(__func__);
 
@@ -522,8 +524,8 @@ namespace aflowlib {
   void EntryLoader::loadRestAPIQueries(const std::vector <std::string> &queries, bool full_url) {
     size_t start_size = m_entries_flat->size();
     size_t done_downloads = 0;
-    for (std::string query: queries) {
-      loadText({getRawRestAPIQuery(query, full_url)});
+    for (std::vector<std::string>::const_iterator query = queries.begin(); query != queries.end(); query++) {
+      loadText({getRawRestAPIQuery(*query, full_url)});
       done_downloads++;
       if (done_downloads%100 == 0){
         m_logger_message << "Loaded " << done_downloads << " of " << queries.size();
@@ -539,9 +541,9 @@ namespace aflowlib {
   /// @note doesn't add #m_filesystem_path or #m_filesystem_collection
   void EntryLoader::loadFiles(const std::vector <std::string> &files) {
     size_t start_size = m_entries_flat->size();
-    for (std::string file_path: files) {
+    for (std::vector<std::string>::const_iterator file_path = files.begin(); file_path != files.end(); file_path++) {
        std::string file_content;
-       if (aurostd::file2string(file_path, file_content) > 0) {
+       if (aurostd::file2string(*file_path, file_content) > 0) {
          loadText({file_content});
        }
     }
@@ -553,9 +555,9 @@ namespace aflowlib {
   /// @param raw_data_lines list of data strings
   /// @note each entry in raw_data_lines should correspond to one AFLOW lib entry
   void EntryLoader::loadText(const std::vector <std::string> &raw_data_lines) {
-    for (std::string line: raw_data_lines) {
+    for (std::vector<std::string>::const_iterator line = raw_data_lines.begin(); line != raw_data_lines.end(); line++) {
       std::shared_ptr <aflowlib::_aflowlib_entry> entry = std::make_shared<aflowlib::_aflowlib_entry>();
-      entry->Load(line, *p_oss);
+      entry->Load(*line, *p_oss);
       if (!entry->auid.empty() && (std::find(m_auid_list.begin(),m_auid_list.end(), entry->auid) == m_auid_list.end())) {
         m_entries_flat->push_back(entry);
         (*m_entries_layered_map)[entry->nspecies][entry->species_pp].push_back(entry);
@@ -806,8 +808,8 @@ namespace aflowlib {
     }
 
     std::string selected_file;
-    for (const std::string &file_name: possible_files) {
-      if (aurostd::EWithinList(available_files, file_name, selected_file)) {
+    for (std::vector<std::string>::const_iterator file_name = possible_files.begin(); file_name != possible_files.end(); file_name++) {
+      if (aurostd::EWithinList(available_files, *file_name, selected_file)) {
         if (m_filesystem_available) aurostd::efile2string(base_folder + selected_file, poscar);
         else poscar = getRawRestAPIQuery(base_url + selected_file, true);
         if (!poscar.empty()) { // load from aflow.in
@@ -857,9 +859,9 @@ namespace aflowlib {
     std::vector<double> positions_fractional_raw;
     std::vector <std::string> positions_fractional_raw_str;
     aurostd::string2tokens(entry.positions_fractional, positions_fractional_raw_str, ";");
-    for (std::string pf_str: positions_fractional_raw_str) {
+    for (std::vector<std::string>::const_iterator pf_str = positions_fractional_raw_str.begin(); pf_str != positions_fractional_raw_str.end(); pf_str++) {
       positions_fractional_raw.clear();
-      aurostd::string2tokens(pf_str, positions_fractional_raw, ",");
+      aurostd::string2tokens(*pf_str, positions_fractional_raw, ",");
       positions_fractional.emplace_back(positions_fractional_raw);
     }
 
@@ -946,10 +948,10 @@ namespace aflowlib {
   /// @note the underlying entries will not be copied and are likely not in a continuous chunk of memory
   /// @note the entries are grouped by number of elements (smallest to largest)
   void EntryLoader::getEntriesViewTwoLayer(vector<vector<std::shared_ptr < aflowlib::_aflowlib_entry>> > &result) const{
-    for (auto layer1: *m_entries_layered_map) {
-      std::vector <std::shared_ptr<aflowlib::_aflowlib_entry>> collected_entries;
-      for (auto layer2: layer1.second) {
-        for (auto entry: layer2.second) collected_entries.push_back(entry);
+  for (std::map<short, std::map<std::string, std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>>::iterator layer1 = m_entries_layered_map->begin(); layer1 != m_entries_layered_map->end(); layer1++) {
+  std::vector <std::shared_ptr<aflowlib::_aflowlib_entry>> collected_entries;
+    for (std::map<std::string, std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>::iterator layer2 = layer1->second.begin(); layer2 != layer1->second.end(); layer2++) {
+      for (std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>::iterator entry = layer2->second.begin(); entry != layer2->second.end(); entry++) collected_entries.push_back(*entry);
       }
       result.push_back(collected_entries);
     }
@@ -960,11 +962,11 @@ namespace aflowlib {
   /// @note the underlying entries will not be copied and are likely not in a continuous chunk of memory
   /// @note the entries are grouped first by number of elements (smallest to largest) and then by alloy
   void EntryLoader::getEntriesViewThreeLayer(std::vector<std::vector<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> &result) const{
-    for (auto layer1: *m_entries_layered_map) {
+    for (std::map<short, std::map<std::string, std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>>::iterator layer1 = m_entries_layered_map->begin(); layer1 != m_entries_layered_map->end(); layer1++) {
       std::vector < std::vector < std::shared_ptr < aflowlib::_aflowlib_entry>>> collected_entries_l1;
-      for (auto layer2: layer1.second) {
+      for (std::map<std::string, std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>::iterator layer2 = layer1->second.begin(); layer2 != layer1->second.end(); layer2++) {
         std::vector <std::shared_ptr<aflowlib::_aflowlib_entry>> collected_entries_l2;
-        for (auto entry: layer2.second) collected_entries_l2.push_back(entry);
+        for (std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>::iterator entry = layer2->second.begin(); entry != layer2->second.end(); entry++) collected_entries_l2.push_back(*entry);
         collected_entries_l1.push_back(collected_entries_l2);
       }
       result.push_back(collected_entries_l1);
@@ -986,8 +988,8 @@ namespace aflowlib {
   /// @param result save-to vector
   /// @note the underlying entries are copied into a continuous chunk of memory
   void EntryLoader::getEntriesFlat(std::vector <aflowlib::_aflowlib_entry> &result) const {
-    for (auto entry: *m_entries_flat) {
-      result.push_back(*entry);
+    for (std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>::iterator entry = m_entries_flat->begin(); entry != m_entries_flat->end(); entry++){
+      result.emplace_back(*(*entry));
     }
   }
 
@@ -996,10 +998,10 @@ namespace aflowlib {
   /// @note the underlying entries are copied into a continuous chunk of memory
   /// @note the entries are grouped by number of elements (smallest to largest)
   void EntryLoader::getEntriesTwoLayer(std::vector <std::vector<aflowlib::_aflowlib_entry>> &result) const {
-    for (auto layer1: *m_entries_layered_map) {
+    for (std::map<short, std::map<std::string, std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>>::iterator layer1 = m_entries_layered_map->begin(); layer1 != m_entries_layered_map->end(); layer1++) {
       std::vector <aflowlib::_aflowlib_entry> collected_entries;
-      for (auto layer2: layer1.second) {
-        for (auto entry: layer2.second) collected_entries.push_back(*entry);
+      for (std::map<std::string, std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>::iterator layer2 = layer1->second.begin(); layer2 != layer1->second.end(); layer2++) {
+        for (std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>::iterator entry = layer2->second.begin(); entry != layer2->second.end(); entry++) collected_entries.push_back(*(*entry));
       }
       result.push_back(collected_entries);
     }
@@ -1011,11 +1013,11 @@ namespace aflowlib {
   /// @note the underlying entries are copied into a continuous chunk of memory
   /// @note the entries are grouped first by number of elements (smallest to largest) and then by alloy
   void EntryLoader::getEntriesThreeLayer(std::vector<std::vector<vector<aflowlib::_aflowlib_entry>>> & result) const {
-    for (auto layer1: *m_entries_layered_map) {
+    for (std::map<short, std::map<std::string, std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>>::iterator layer1 = m_entries_layered_map->begin(); layer1 != m_entries_layered_map->end(); layer1++) {
       std::vector <std::vector<aflowlib::_aflowlib_entry>> collected_entries_l1;
-      for (auto layer2: layer1.second) {
+      for (std::map<std::string, std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>::iterator layer2 = layer1->second.begin(); layer2 != layer1->second.end(); layer2++) {
         std::vector <aflowlib::_aflowlib_entry> collected_entries_l2;
-        for (auto entry: layer2.second) collected_entries_l2.push_back(*entry);
+        for (std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>::iterator entry = layer2->second.begin(); entry != layer2->second.end(); entry++) collected_entries_l2.push_back(*(*entry));
         collected_entries_l1.push_back(collected_entries_l2);
       }
       result.push_back(collected_entries_l1);
@@ -1094,8 +1096,8 @@ namespace aflowlib {
     std::string where = aurostd::joinWDelimiter(alloy_list, "','");
     where = "alloy IN ('" + where + "')";
     std::vector <std::string> raw_lines = m_sqlite_alloy_db_ptr->getEntrySet(where, aflow_ft);
-    for (std::string line: raw_lines) {
-      auid_list.push_back(line.substr(5, 22));
+    for (std::vector<std::string>::const_iterator line = raw_lines.begin(); line != raw_lines.end(); line++) {
+      auid_list.push_back(line->substr(5, 22));
     }
   }
 
@@ -1199,8 +1201,8 @@ namespace aflowlib {
       std::vector <std::string> known_AUID_list;
       getAlloyAUIDList(alloy_list, known_AUID_list);
       std::vector <std::string> missing_AUID;
-      for (const std::string &AUID: known_AUID_list) {
-        if (std::find(m_auid_list.begin(), m_auid_list.end(), AUID) == m_auid_list.end()) missing_AUID.emplace_back(AUID);
+      for (std::vector<std::string>::const_iterator AUID = known_AUID_list.begin(); AUID != known_AUID_list.end(); AUID++) {
+        if (std::find(m_auid_list.begin(), m_auid_list.end(), *AUID) == m_auid_list.end()) missing_AUID.emplace_back(*AUID);
       }
       m_logger_message << "Found " << missing_AUID.size() << " entries in the public alloy SQLITE DB that where not found in the filesystem search.";
       outDebug(__func__);
@@ -1216,8 +1218,8 @@ namespace aflowlib {
     std::vector<std::string> icsd_search_path_list;
     std::vector<std::string> libx_search_path_list;
     std::vector<std::string> libx_crawl_list;
-    for (const std::string & sym : m_icsd_symmetries) {
-      icsd_search_path_list.emplace_back(m_restapi_server + m_restapi_path + "ICSD" + "_" + m_restapi_collection + "/" + sym);
+    for (std::vector<std::string>::const_iterator sym = m_icsd_symmetries.begin(); sym != m_icsd_symmetries.end(); sym++) {
+      icsd_search_path_list.emplace_back(m_restapi_server + m_restapi_path + "ICSD" + "_" + m_restapi_collection + "/" + *sym);
     }
     if (alloy_list.size()>1) {
       for (uint lib_idx = 1; lib_idx <= lib_max; lib_idx++) {
@@ -1229,24 +1231,22 @@ namespace aflowlib {
       return;
     }
     std::vector<std::string> listing;
-
-    for (const std::string & url : icsd_search_path_list){
-      listRestAPI(url, listing);
-      for (const std::string & name: listing ){
-        if (find(alloy_list.begin(), alloy_list.end(), extractAlloy(name, 'I')) != alloy_list.end()){
-          rest_api_queries.emplace_back(url + name + "/" + m_restapi_directives);
+    for (std::vector<std::string>::const_iterator url = icsd_search_path_list.begin(); url != icsd_search_path_list.end(); url++) {
+      listRestAPI(*url, listing);
+      for (std::vector<std::string>::const_iterator name = listing.begin(); name != listing.end(); name++) {
+        if (find(alloy_list.begin(), alloy_list.end(), extractAlloy(*name, 'I')) != alloy_list.end()){
+          rest_api_queries.emplace_back(*url + *name + "/" + m_restapi_directives);
         }
       }
     }
 
     m_logger_message << "Found " << rest_api_queries.size() << " ICSD entries in REST API search";
     outDebug(__func__);
-
-    for (const std::string & url : libx_search_path_list){
-      listRestAPI(url, listing);
-      for (const std::string & name: listing){
-        if (find(alloy_list.begin(), alloy_list.end(), extractAlloy(name, 'L')) != alloy_list.end()){
-          libx_crawl_list.emplace_back(url + name + "/" );
+    for (std::vector<std::string>::const_iterator url = libx_search_path_list.begin(); url != libx_search_path_list.end(); url++) {
+      listRestAPI(*url, listing);
+      for (std::vector<std::string>::const_iterator name = listing.begin(); name != listing.end(); name++) {
+        if (find(alloy_list.begin(), alloy_list.end(), extractAlloy(*name, 'L')) != alloy_list.end()){
+          libx_crawl_list.emplace_back(*url + *name + "/" );
         }
       }
     }
@@ -1269,8 +1269,8 @@ namespace aflowlib {
         rest_api_queries.emplace_back(url + m_restapi_directives);
         found += 1;
       } else {
-        for (const std::string & name: listing ) {
-          libx_crawl_list.emplace_back(url + name + "/");
+        for (std::vector<std::string>::const_iterator name = listing.begin(); name != listing.end(); name++) {
+          libx_crawl_list.emplace_back(url + *name + "/");
         }
       }
     }
@@ -1281,8 +1281,8 @@ namespace aflowlib {
       std::vector <std::string> known_AUID_list;
       getAlloyAUIDList(alloy_list, known_AUID_list);
       std::vector <std::string> missing_AUID;
-      for (const std::string &AUID: known_AUID_list) {
-        if (std::find(m_auid_list.begin(), m_auid_list.end(), AUID)== m_auid_list.end()) missing_AUID.emplace_back(AUID);
+      for (std::vector<std::string>::const_iterator AUID = known_AUID_list.begin(); AUID != known_AUID_list.end(); AUID++) {
+        if (std::find(m_auid_list.begin(), m_auid_list.end(), *AUID)== m_auid_list.end()) missing_AUID.emplace_back(*AUID);
       }
       m_logger_message << "Found " << missing_AUID.size() << " entries in the public alloy SQLITE DB that where not found in the REST API search.";
       outDebug(__func__);
@@ -1328,10 +1328,11 @@ namespace aflowlib {
   /// @note the string is percent encoded
   std::string EntryLoader::buildAFLUXQuery(const std::map<std::string, std::string> & matchbook) const {
     std::string query = "";
-    for (std::map<std::string, std::string> part: {matchbook, m_aflux_directives}) {
-      for (std::pair <std::string, std::string> it: part) {
-        query += "," + it.first;
-        if (!it.second.empty()) query += "(" + it.second + ")";
+    std::vector<std::map<std::string, std::string>> joined_directives = {matchbook, m_aflux_directives};
+    for (std::vector<std::map<std::string, std::string>>::const_iterator part = joined_directives.begin(); part != joined_directives.end(); part++) {
+      for (std::map<std::string, std::string>::const_iterator it = part->begin(); it != part->end(); it++) {
+        query += "," + it->first;
+        if (!it->second.empty()) query += "(" + it->second + ")";
       }
     }
     query.erase(0,1);
@@ -1375,8 +1376,8 @@ namespace aflowlib {
       } else {
         std::vector <std::string> raw_lines;
         aurostd::string2vectorstring(raw_in, raw_lines);
-        for (std::string &line: raw_lines) {
-          if (line.substr(0, 18) == "[VASP_POSCAR_FILE]") poscar += line.substr(16) + "\n";
+        for (std::vector<std::string>::const_iterator line = raw_lines.begin(); line != raw_lines.end(); line++) {
+          if (line->substr(0, 18) == "[VASP_POSCAR_FILE]") poscar += line->substr(16) + "\n";
           else break;
         }
       }
