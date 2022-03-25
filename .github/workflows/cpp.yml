@@ -3,10 +3,12 @@ name: AFLOW-src C++ build
 #env var: https://dev.to/mihinduranasinghe/working-with-environment-variables-github-actions-part-2-46po
 
 on:
-  push:
-    branches: [ master, staging ]
+  #[CO20220325 - now only PR]  push:
+  #[CO20220325 - now only PR]    branches: [ master, staging ]
+  #[CO20220325 - now only PR]  pull_request:
+  #[CO20220325 - now only PR]    branches: [ master, staging ]
   pull_request:
-    branches: [ master, staging ]
+    branches: staging
 
 jobs:
   build_ubuntu_1804:
@@ -16,7 +18,7 @@ jobs:
     - name: make
       run: make -C src
     - name: make check_full
-      if: github.event_name == 'push'
+      #[CO20220325 - now only PR]if: github.event_name == 'push'
       run: make -C src check_full
 #  build_ubuntu_1604:
 #    runs-on: ubuntu-16.04
@@ -33,18 +35,18 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: make
-      if: github.event_name == 'push'
+      #[CO20220325 - now only PR]if: github.event_name == 'push'
       run: make -C src
     - name: make check_full
-      if: github.event_name == 'push'
+      #[CO20220325 - now only PR]if: github.event_name == 'push'
       run: make -C src check_full
   build_mac_1015:
     runs-on: macos-10.15
     steps:
     - uses: actions/checkout@v2
     - name: make
-      if: github.event_name == 'push'
+      #[CO20220325 - now only PR]if: github.event_name == 'push'
       run: make -C src
     - name: make check_full
-      if: github.event_name == 'push'
+      #[CO20220325 - now only PR]if: github.event_name == 'push'
       run: make -C src check_full
