@@ -185,7 +185,7 @@ namespace aurostd{
         CM(i, j) = 0.0;
       } 
     }
-    for (int j = 1; j <= n; j++) {CM(n, j) = -p(j) / p(p.urows);}
+    for (int j = 1; j <= n; j++) {CM(n, j) = -p(j) / p(n + 1);}
     return CM;
   }
 
