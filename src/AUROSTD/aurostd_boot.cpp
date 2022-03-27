@@ -296,6 +296,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   o+=aurostd::getMAD(v,x);v=aurostd::convolution(v,v,0);v=aurostd::convolution(v,v,vii,0);v=aurostd::moving_average(v,x); //CO20190520
   vector<int> peaks=getPeaks(v);peaks=getPeaks(v,w);
   aurostd::xmatrix<utype> mprod = aurostd::outer_product(v, w);  //ME20200327
+  vxu=aurostd::mod_floored(vxu,(utype)1); //SD20220117
 
   //CO20200404 START - aurostd->pflow
   utype ut=(utype)3;std::vector<utype> vec;std::complex<utype> utcomp;vector<std::complex<utype> > veccomp;
@@ -328,6 +329,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   vector<string> vs;vxu=vector2xvector<utype>(vs,1); //CO20201111
   vector<vector<utype> > mvv=xmatrix2vectorvector(m);vectorvector2xmatrix(mvv);
   if(det(m)==0 || sum(m)==0) return FALSE;
+  reshape(m3,9,1);
   reshape(v);reshape(v,v);reshape(v,v,v);reshape(v,v,v,v);reshape(v,v,v,v,v);reshape(v,v,v,v,v,v);
   reshape_rows(v);reshape_rows(v,v);reshape_rows(v,v,v);reshape_rows(v,v,v,v);reshape_rows(v,v,v,v,v);reshape_rows(v,v,v,v,v,v);
   reshape_cols(v);reshape_cols(v,v);reshape_cols(v,v,v);reshape_cols(v,v,v,v);reshape_cols(v,v,v,v,v);reshape_cols(v,v,v,v,v,v);

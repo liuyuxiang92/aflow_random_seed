@@ -167,6 +167,7 @@ namespace AFLOW_PTHREADS {
 
 extern string _AFLOWIN_; 
 extern string _AFLOWLOCK_; 
+extern const string _LOCK_LINK_SUFFIX_; //SD20220224
 
 const string VASP_KEYWORD_EXECUTION=" Executing: ";
 
@@ -424,6 +425,8 @@ class _XHOST {
     // AFLOWSYM
     bool SKEW_TEST; //DX20171019
     double SKEW_TOL; //DX20171019
+    // xstructure
+    bool READ_SPIN_FROM_ATOMLABEL; //SD20220316
     // WEB MODE
     //[CO20200404 - overload with --www]bool WEB_MODE;  //CO20190401
   private:                                                //
@@ -1518,6 +1521,7 @@ class AtomEnvironment{
 #define IOCIF         11 //DX20180723
 #define IOELK_AUTO    12 //DX20200310
 #define IOELK_GEOM    13 //DX20200310
+#define IOATAT_STR    14 //SD20220114
 
 #define NOSG string("NNN #0")
 
@@ -1659,8 +1663,9 @@ class xstructure {
     void DecorateWithElements(void);                              // Decorate with elements (alphabetic order) - useful for platon
     void DecorateWithFakeElements(void);                          // Decorate with fake elements - useful for prototypes //DX20200727
     vector<string> GetElements(bool clean_name=false,
-        bool fake_names=false);                                   //DX20200724
-    vector<string> GetElementsFromAtomNames(bool clean_name=true);//DX20200724
+        bool fake_names=false) const;                             //DX20200724 //SD20220222 - made function const
+    vector<string> GetElementsFromAtomNames(
+        bool clean_name=true) const;                              //DX20200724 //SD20220222 - made function const
     vector<uint> GetReducedComposition(bool numerical_sort=false);//DX20200724
     string platon2sg(bool P_EQUAL=DEFAULT_PLATON_P_EQUAL,
         bool P_EXACT=DEFAULT_PLATON_P_EXACT,
@@ -1709,6 +1714,7 @@ class xstructure {
     void xstructure2cif(void);                                    // some wrap up IOs to convert format to CIF //DX20190123
     void xstructure2abccar(void);                                 // some wrap up IOs to convert format to ABCCAR //DX20190123
     void xstructure2elk(void);                                    // some wrap up IOs to convert format to ELK //DX20200313
+    void xstructure2atat(void);                                   // some wrap up IOs to convert format to ATAT //SD20220123
     //[CO20180420 - moved outside of xstructure]bool sortAtomsTypes(const _atom& a1,const _atom& a2);		// sort atoms by types
     //[CO20180420 - moved outside of xstructure]bool sortAtomsNames(const _atom& a1,const _atom& a2);		// sort atoms by names
     // OPERATORS                                                  // --------------------------------------
@@ -2642,6 +2648,7 @@ xstructure input2ABINITxstr(istream& input);
 xstructure input2QExstr(istream& input);
 xstructure input2VASPxstr(istream& input,bool vasp5=false);
 xstructure input2ELKxstr(istream& input); //DX20200313
+xstructure input2ATATxstr(istream& input); //SD20220123
 
 // ----------------------------------------------------------------------------
 // centroid functions for structures //DX20200728
@@ -2916,7 +2923,7 @@ namespace AFLOW_PTHREADS {
 }
 // interfaces
 namespace KBIN {
-  void MoveRun2NewDirectory(_aflags& aflags, const string& subdirectory_orig, const string& subdirectory_new); //DX20210901
+  bool MoveRun2NewDirectory(_aflags& aflags, const string& subdirectory_orig, const string& subdirectory_new); //DX20210901 //SD20220319 - return bool
   void RUN_Directory_PTHREADS(_aflags &aflags);
   void *_threaded_interface_RUN_Directory(void *ptr);
 } // namespace KBIN
@@ -2965,8 +2972,12 @@ namespace KBIN {
   void GenerateAflowinFromVASPDirectory(_aflags& aflags);
   void StartStopCheck(const string &AflowIn,string str1,string str2,bool &flag,bool &flagS);
   void StartStopCheck(const string &AflowIn,string str1,bool &flag,bool &flagS);
-  bool Legitimate_aflowin(string aflowindir,const bool& osswrite,ostringstream& oss);
-  bool Legitimate_aflowin(string aflowindir);
+  bool Legitimate_krun(const _aflags& aflags,const bool osswrite,ostringstream& oss); //SD20220224
+  bool Legitimate_krun(const _aflags& aflags); //SD20220224
+  bool Legitimate_aflowin(const string& aflowindir,const bool osswrite,ostringstream& oss); //SD20220224 - made aflowindir const, removed reference from bool
+  bool Legitimate_aflowin(const string& aflowindir); //SD20220224 - made aflowindir const
+  bool Legitimate_aflowdir(const string& aflowindir,const _aflags& aflags,const bool osswrite,ostringstream& oss); //SD20220224
+  bool Legitimate_aflowdir(const string& aflowindir,const _aflags& aflags); //SD20220224
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss=cout); //CO20191110
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss=cout); //CO20191110
   void getAflowInFromDirectory(const string& directory,string& AflowIn_file,string& AflowIn,ostream& oss=cout); //CO20191110
@@ -4952,6 +4963,7 @@ namespace xelement {
       ~xelement();                                                    // kill everything
       const xelement& operator=(const xelement &b);                   // copy
       void clear();
+      static uint isElement(const string& element);  //CO20201220 //SD20220223 - made static
       void loadDefaultUnits();  //CO20201111
       void populate(const string& element,int oxidation_state=AUROSTD_MAX_INT); //CO20200520
       void populate(uint ZZ,int oxidation_state=AUROSTD_MAX_INT); //CO20200520

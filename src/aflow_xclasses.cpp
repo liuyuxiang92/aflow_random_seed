@@ -127,6 +127,8 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   // AFLOWSYM
   SKEW_TEST=FALSE; //DX20171019
   SKEW_TOL=AUROSTD_NAN; //DX20171019
+  // xstructure
+  READ_SPIN_FROM_ATOMLABEL=FALSE; //SD20220316 - spin and pp label can conflict with one another
   // WEB
   //[CO20200404 - overload with --www]WEB_MODE=FALSE; //CO20190402
 };
@@ -229,6 +231,8 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   // AFLOWSYM
   SKEW_TEST=b.SKEW_TEST; //DX20171019
   SKEW_TOL=b.SKEW_TOL; //DX20171019
+  // xstructure
+  READ_SPIN_FROM_ATOMLABEL=b.READ_SPIN_FROM_ATOMLABEL; //SD20220316
   // WEB
   //[CO20200404 - overload with --www]WEB_MODE=b.WEB_MODE;  //CO20190402
 }
