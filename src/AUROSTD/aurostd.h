@@ -807,13 +807,19 @@ namespace aurostd {
   bool substring2bool(const stringstream& strstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
   bool substring_present_file(const string& FileName,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
   bool substring_present_file_FAST(const string& FileName,const string& strsub1,bool RemoveWS=false,bool case_insensitive=false,bool expect_near_end=false,unsigned long long int size_max=AUROSTD_MAX_ULLINT);  //CO20210315 - cleaned up
+  bool WithinList(const vector<double>& list,const double& input,bool sorted=false);  //SD20220325
   bool WithinList(const vector<string>& list,const string& input,bool sorted=false);  //CO20181010
   bool WithinList(const deque<string>& list,const string& input,bool sorted=false);  //CO20181010
   bool WithinList(const vector<int>& list,int input,bool sorted=false); //CO20181010
   bool WithinList(const vector<uint>& list,uint input,bool sorted=false); //CO20181010
+  bool WithinList(const vector<double>&, const double&, int&,bool sorted=false);  //SD20220325
   bool WithinList(const vector<string>&, const string&, int&,bool sorted=false);  //ME20190905
   bool WithinList(const vector<int>&, int, int&,bool sorted=false);  //ME20190905
   bool WithinList(const vector<uint>&, uint, int&,bool sorted=false);  //ME20190905
+  bool WithinList(const vector<double>&, const double&, vector<int>&,bool sorted=false);  //SD20220325
+  bool WithinList(const vector<string>&, const string&, vector<int>&,bool sorted=false);  //SD20220325
+  bool WithinList(const vector<int>&, int, vector<int>&,bool sorted=false);  //SD20220325
+  bool WithinList(const vector<uint>&, uint, vector<int>&,bool sorted=false);  //SD20220325
   bool EWithinList(const vector<string>& list,const string& input); //CO20200223
   bool EWithinList(const vector<string>& list, const string& input, string& output); //CO20200223
   // about present substrings and taking off the value

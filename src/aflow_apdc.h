@@ -12,7 +12,7 @@
 
 #define DEFAULT_ATAT_ALAT 4.0 // Ang
 #define CONSTANT_BOLTZMANN 8.6173324e-5 // eV/K
-#define CONC_DELTA 0.01
+#define CONC_SHIFT 0.01 // concentration shift away from 0
 #define _APDC_STR_OPT_ string("[AFLOW_APDC]")
 
 // Class _apdc data
@@ -74,7 +74,7 @@ namespace apdc {
   xmatrix<double> GetConcentrationMacro(const xvector<double>& conc_range, const int conc_npts, const int nelem);
   xvector<double> GetTemperature(const xvector<double>& temp_range, const int temp_npts);
   void SetCongruentClusters(_apdc_data& apdc_data);
-  vector<xvector<int> > GetMultiplicityCluster(const vector<xstructure>& vstr);
+  vector<xvector<int>> GetMultiplicityCluster(const vector<xstructure>& vstr);
   xmatrix<double> GetConcentrationCluster(const vector<string>& elements, const vector<xstructure>& vstr);
   xmatrix<double> GetConcentrationCluster(const string& rundirpath, const int nstr, const int nelem);
   xvector<double> GetExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const xvector<int>& natom);

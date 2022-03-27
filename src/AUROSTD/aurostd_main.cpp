@@ -5427,6 +5427,10 @@ namespace aurostd {
     return aurostd::substring2bool(strstream.str(),strsub1,RemoveWS,RemoveComments);
   }
 
+  bool WithinList(const vector<double>& list,const double& input,bool sorted) { //SD20220325
+    int index=-1;
+    return WithinList(list, input, index, sorted);
+  }
   bool WithinList(const vector<string>& list,const string& input,bool sorted) { //CO20181010
     //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
     //return false;  OBSOLETE ME20190905
@@ -5450,6 +5454,31 @@ namespace aurostd {
     return WithinList(list, input, index, sorted);
   }
 
+  //SD20220325 - added double version
+  bool WithinList(const vector<double>& list, const double& input, int& index, bool sorted) {
+    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(sorted && list[i]>input){break;} 
+      if(aurostd::isequal(list[i],input)) {
+        index = i;
+        return true;
+      }
+    }
+    index = -1;
+    return false;
+  }
+
+  //SD20220325 - returns all matches as a vector<int>
+  bool WithinList(const vector<double>& list, const double& input, vector<int>& index, bool sorted) {
+    index.clear();
+    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(sorted && list[i]>input){break;}
+      if(aurostd::isequal(list[i],input)) {
+        index.push_back(i);
+      }
+    }
+    return index.empty()?false:true;
+  }
+
   //ME20190813 - added versions that also determine the index of the item in the list
   bool WithinList(const vector<string>& list, const string& input, int& index, bool sorted) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
@@ -5463,6 +5492,19 @@ namespace aurostd {
     return false;
   }
 
+  //SD20220325 - returns all matches as a vector<int>
+  bool WithinList(const vector<string>& list, const string& input, vector<int>& index, bool sorted) {
+    index.clear();
+    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(sorted && list[i]>input){break;}
+      if(list[i]==input) {
+        index.push_back(i);
+      }
+    }
+    return index.empty()?false:true;
+  }
+  bool WithinList(const deque<string>& list, const string& input, vector<int>& index, bool sorted) {return WithinList(aurostd::deque2vector(list), input, index, sorted);}
+
   bool WithinList(const vector<int>& list, int input, int& index, bool sorted) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
       if(sorted && list[i]>input){break;} //CO20201111
@@ -5475,6 +5517,18 @@ namespace aurostd {
     return false;
   }
 
+  //SD20220325 - returns all matches as a vector<int>
+  bool WithinList(const vector<int>& list, int input, vector<int>& index, bool sorted) {
+    index.clear();
+    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(sorted && list[i]>input){break;}
+      if(list[i]==input) {
+        index.push_back(i);
+      }
+    }
+    return index.empty()?false:true;
+  }
+
   bool WithinList(const vector<uint>& list, uint input, int& index, bool sorted) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
       if(sorted && list[i]>input){break;} //CO20201111
@@ -5485,6 +5539,18 @@ namespace aurostd {
     }
     index = -1;
     return false;
+  }
+
+  //SD20220325 - returns all matches as a vector<int>
+  bool WithinList(const vector<uint>& list, uint input, vector<int>& index, bool sorted) {
+    index.clear();
+    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+      if(sorted && list[i]>input){break;}
+      if(list[i]==input) {
+        index.push_back(i);
+      }
+    }
+    return index.empty()?false:true;
   }
 
   bool EWithinList(const vector<string>& list,const string& input) { //CO20200223

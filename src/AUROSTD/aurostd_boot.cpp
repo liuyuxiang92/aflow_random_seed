@@ -235,6 +235,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   aurostd::reduceByGCD(dutype,dutype); //DX201911225
   aurostd::reduceByGCD(duint,duint); //DX201911225
   o+=aurostd::identical(dutype); //DX20210502
+  aurostd::WithinList(vdouble,d,i); //SD20220325
 
   // initialize vector/deque 
   aurostd::string2tokens(s,vstring,"");aurostd::string2tokens(s,dstring,"");
@@ -265,7 +266,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   trasp(v);
   aurostd::identical(v); //DX20210503
   //  sin(v);sinh(v);cos(v);cosh(v);exp(v);
-  aurostd::linspace(1,2,3); //SD20220324
+  aurostd::linspace(d,d,i); //SD20220324
 
   vector<vector<utype> > vvu;sort(vvu.begin(),vvu.end(),aurostd::compareVecElements<utype>);  //CO20190629
   vector<xvector<utype> > vxvu;sort(vxvu.begin(),vxvu.end(),aurostd::compareXVecElements<utype>);  //CO20190629

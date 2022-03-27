@@ -13,7 +13,7 @@
 #include "aflow_apdc.h"
 
 // ###############################################################################
-//            AFLOW Automatic Phase Diagram Constructor (APDC) (2022-)
+//            AFLOW Alloy Phase Diagram Constructor (APDC) (2022-)
 // ###############################################################################
 
 // **************************************************************************
@@ -162,37 +162,69 @@ namespace apdc {
 namespace apdc {
   void ErrorChecks(_apdc_data& apdc_data) {
     string function_name = XPID + "ErrorChecks():";
+    // Check if directory is writable
     if (!aurostd::DirectoryMake(apdc_data.rootdirpath)) {
       string message = "Cannot create directory";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
     }
+    // Check if parent lattice is valid
     if (apdc_data.plattice != "fcc" && apdc_data.plattice != "bcc" && apdc_data.plattice != "hcp") {
       string message = "Invalid parent lattice";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
     }
+    // Check if alloy is at least binary
     if (apdc_data.elements.size() < 2) {
       string message = "Alloy must be at least binary";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
     }
+    // Check if elements are valid, construct alloy name
     for (uint i = 0; i < apdc_data.elements.size(); i++) {
       if (!xelement::xelement::isElement(apdc_data.elements[i])) {
         string message = "Element \"" + apdc_data.elements[i] + "\" is invalid";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
       }
       apdc_data.alloyname += apdc_data.elements[i];
     }
+    // Check if concentration range format is valid
     if (apdc_data.conc_range.rows != 2 * (int)apdc_data.elements.size()) {
       string message = "Concentration range must have format [X1_start, X1_end, X2_start, X2_end,...X(K)_start, X(K)_end]";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
     }
-    if (!aurostd::isequal(aurostd::sum(apdc_data.conc_range), 2.0)) {
+    // Check if concentration is within [0,1] and sums to 1
+    double totconc_init = 0.0, totconc_final = 0.0;
+    vector<double> vconc_init, vconc_final;
+    vector<int> vzeros_init, vzeros_final;
+    for (int i = 1; i <= (int)apdc_data.elements.size() && totconc_init <= 1.0 && totconc_final <= 1.0; i++) {
+      if (apdc_data.conc_range(2 * i - 1) < 0 || apdc_data.conc_range(2 * i - 1) > 1 ||
+          apdc_data.conc_range(2 * i) < 0 || apdc_data.conc_range(2 * i) > 1) {
+        string message = "Concentration range must be defined on [0,1]";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+      }
+      totconc_init += apdc_data.conc_range(2 * i - 1); totconc_final += apdc_data.conc_range(2 * i);
+      vconc_init.push_back(apdc_data.conc_range(2 * i - 1)); vconc_final.push_back(apdc_data.conc_range(2 * i));
+    }
+    if (!aurostd::isequal(totconc_init, 1.0) || !aurostd::isequal(totconc_final, 1.0)) {
       string message = "Total concentration must sum to 1";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
     }
+    // Redefine concentration range from [0,1] to (0,1)
+    aurostd::WithinList(vconc_init, 0.0, vzeros_init); aurostd::WithinList(vconc_final, 0.0, vzeros_final);
+    double cdelta_init = CONC_SHIFT * (double)vzeros_init.size() / ((double)vconc_init.size() - (double)vzeros_init.size());
+    double cdelta_final = CONC_SHIFT * (double)vzeros_final.size() / ((double)vconc_final.size() - (double)vzeros_final.size());
+    for (int i = 1; i <= apdc_data.conc_range.rows; i++) {
+      if (aurostd::isequal(apdc_data.conc_range(i), 0.0)) {
+        apdc_data.conc_range(i) += CONC_SHIFT;
+      }
+      else {
+        apdc_data.conc_range(i) -= (i % 2) ? cdelta_init : cdelta_final;
+      }
+    }
+    // Check if temperature range format is valid
     if (apdc_data.temp_range.rows != 2) {
       string message = "Temperature range must have format [T_start T_end]";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
     }
+    // Check if temperature values are valid
     if (apdc_data.temp_range(1) < 0 || apdc_data.temp_range(2) < 0) {
       string message = "Temperature cannot be below 0K";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
@@ -203,6 +235,7 @@ namespace apdc {
 // ***************************************************************************
 // apdc::GetBinodal
 // ***************************************************************************
+// Binodal construction based on method developed in Y. Lederer et al., Acta Materialia, 159 (2018)
 namespace apdc {
   void GetBinodal(_apdc_data& apdc_data) {
     apdc_data.lat_atat = CreateLatForATAT(apdc_data.plattice, apdc_data.elements);
@@ -213,7 +246,7 @@ namespace apdc {
     apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, apdc_data.aflow_max_num_atoms), apdc_data.vstr_aflow, apdc_data.num_threads);
     GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.lat_atat, apdc_data.vstr_aflow, apdc_data.vstr_atat, apdc_data.mapstr);
     RunATAT(apdc_data.workdirpath, apdc_data.rundirpath, apdc_data.min_sleep);
-    vector<xvector<int> > mult_cluster = GetMultiplicityCluster(apdc_data.vstr_atat);
+    vector<xvector<int>> mult_cluster = GetMultiplicityCluster(apdc_data.vstr_atat);
     apdc_data.natom_cluster = mult_cluster[0];
     apdc_data.mult_cluster = mult_cluster[1];
     apdc_data.conc_cluster = GetConcentrationCluster(apdc_data.rundirpath, apdc_data.vstr_atat.size(), apdc_data.elements.size());
@@ -221,7 +254,6 @@ namespace apdc {
     apdc_data.conc_macro = GetConcentrationMacro(apdc_data.conc_range, apdc_data.conc_npts, apdc_data.elements.size());
     SetCongruentClusters(apdc_data);
     apdc_data.temp = GetTemperature(apdc_data.temp_range, apdc_data.temp_npts);
-    return;
     apdc_data.prob_ideal_cluster = GetProbabilityIdealCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.mult_cluster, apdc_data.max_num_atoms);
     CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_ideal_cluster);
     return;
@@ -316,21 +348,8 @@ namespace apdc {
   xmatrix<double> GetConcentrationMacro(const xvector<double>& conc_range, const int conc_npts, const int nelem) {
     string function_name = XPID + "GetConcentrationMacro():";
     xmatrix<double> conc_macro(conc_npts, nelem);
-    double start, stop;
     for (int i = 1; i <= nelem; i++) {
-      if (conc_range(2 * i - 1) < 0 || conc_range(2 * i - 1) > 1 ||
-          conc_range(2 * i) < 0 || conc_range(2 * i) > 1) {
-        string message = "Concentration range must be defined on [0,1]";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
-      }
-      start = conc_range(2 * i - 1); stop = conc_range(2 * i);
-      // Redefine concentration profile to be (0,1) rather than [0,1] to avoid NaNs
-        //// FIX LATER
-      if (aurostd::isequal(start, 0.0)) {start += CONC_DELTA;}
-      if (aurostd::isequal(start, 1.0)) {start -= CONC_DELTA;}
-      if (aurostd::isequal(stop, 0.0)) {stop += CONC_DELTA;}
-      if (aurostd::isequal(stop, 1.0)) {stop -= CONC_DELTA;}
-      conc_macro.setcol(aurostd::linspace(start, stop, conc_npts), i);
+      conc_macro.setcol(aurostd::linspace(conc_range(2 * i - 1), conc_range(2 * i), conc_npts), i);
     }
     return conc_macro;
   }
@@ -586,7 +605,6 @@ namespace apdc {
         }
         entry.clear();
     }
-    cerr<<vstr.size()<<endl;
     return vstr;
   }
 }

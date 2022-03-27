@@ -33,13 +33,13 @@ VERSNUMBER=3.2.12
 UNAME=$(shell uname)
 
 # for aflow
-CPP=g++
+CPP=g++ -std=c++11
 #-O2 -frepo
 # for sqllite
 CC=gcc
 ARCH=
 ifeq ($(UNAME),Darwin)
-CPP=clang++
+CPP=clang++ -std=c++11
 CC=clang
 ARCH=-D_MACOSX_
 endif
