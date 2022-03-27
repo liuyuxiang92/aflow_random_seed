@@ -74,7 +74,7 @@ namespace init {
     aflowrc::read(oss,INIT_VERBOSE || XHOST.DEBUG);
     XHOST.vflag_control.flag("AFLOWRC::READ",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=read|--aflowrc_read"));
     if(XHOST.vflag_control.flag("AFLOWRC::READ")) {aflowrc::print_aflowrc(oss,TRUE);return false;}
-    //
+    // SD20220223 - try alternatives
     if(XHOST.home.empty()){XHOST.home=aurostd::execute2string("cd && pwd");}
     if(XHOST.home.empty()){XHOST.home="~";}
     if(XHOST.user.empty()){XHOST.user=aurostd::execute2string("whoami");}
