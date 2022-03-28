@@ -2318,7 +2318,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
           }
           //write BEFORE issuing the kill, the other instance of aflow will start to act as soon as the process is dead
           message << "issuing kill command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-          if(1){  //super debug
+          if(0){  //super debug
             string output_syscall="";
             vector<string> vpids=aurostd::ProcessPIDs(vasp_bin,output_syscall);
             message << "output_syscall=";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
