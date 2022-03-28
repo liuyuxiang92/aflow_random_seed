@@ -105,8 +105,6 @@ namespace apdc {
     if (XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && !(XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX"))) {
       apdc_data.num_threads = aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));
     }
-    if (apdc_data.num_threads < 1) {apdc_data.num_threads = 1;}
-    if (apdc_data.min_sleep < 1) {apdc_data.min_sleep = 1;}
     apdc_data.workdirpath = aurostd::getPWD();
     apdc_data.rootdirpath = aurostd::CleanFileName(apdc_data.rootdirpath);
     apdc_data.plattice = aurostd::tolower(apdc_data.plattice);
@@ -162,6 +160,10 @@ namespace apdc {
 namespace apdc {
   void ErrorChecks(_apdc_data& apdc_data) {
     string function_name = XPID + "ErrorChecks():";
+    // Check if number of threads is valid
+    if (apdc_data.num_threads < 1) {apdc_data.num_threads = 1;}
+    // Check if min sleep is at least 1 sec
+    if (apdc_data.min_sleep < 1) {apdc_data.min_sleep = 1;}
     // Check if directory is writable
     if (!aurostd::DirectoryMake(apdc_data.rootdirpath)) {
       string message = "Cannot create directory";
