@@ -714,6 +714,7 @@ namespace aflow {
     strstream << tab << " --machine=beta|beta_openmpi|qrats|qflow|x|conrad|eos|materials|habana|aflowlib|ranger|kraken" << endl;
     strstream << tab << "           marylou|parsons|jellium|ohad|host1" << endl;
     strstream << tab << "           raptor --np=N|diamond --np=N" << endl;
+    strstream << tab << " --machine_name=XXXX " << endl;
     strstream << "******* END RUNNING MODE ***************************************************************************" << endl;
     strstream << endl;
     // --readme=htresources
