@@ -70,37 +70,12 @@ namespace init {
     // XHOST.vflag_control.flag("AFLOWRC::OVERWRITE",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=overwrite|--aflowrc_overwrite"));
     XHOST.home=getenv("HOME");  //AS SOON AS POSSIBLE
     XHOST.user=getenv("USER");  //AS SOON AS POSSIBLE
-    if(XHOST.home.empty()){XHOST.home=getenv("HOME");}  //CO20200624 - attempt 2
     if(!aflowrc::is_available(oss,INIT_VERBOSE || XHOST.DEBUG)) aflowrc::write_default(oss,INIT_VERBOSE || XHOST.DEBUG);
     aflowrc::read(oss,INIT_VERBOSE || XHOST.DEBUG);
     XHOST.vflag_control.flag("AFLOWRC::READ",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=read|--aflowrc_read"));
     if(XHOST.vflag_control.flag("AFLOWRC::READ")) {aflowrc::print_aflowrc(oss,TRUE);return false;}
-    // SD20220223 - try alternatives
-    if(XHOST.home.empty()){XHOST.home=aurostd::execute2string("cd && pwd");}
-    if(XHOST.home.empty()){XHOST.home="~";}
-    if(XHOST.user.empty()){XHOST.user=aurostd::execute2string("whoami");}
-    if(XHOST.user.empty()){XHOST.user="UNKNOWN_USER";}
-
-    int depth_short=20,depth_long=45;
-    string position;
+    // SD20220223 - check to make sure the temporary directory is writable, do this before execute2string commands, since they write to /tmp
     vector<string> tokens;
-    if(INIT_VERBOSE) oss << "*********************************************************************************" << endl;
-    if(INIT_VERBOSE) oss << "* AFLOW V=" << string(AFLOW_VERSION) << " - machine information " << endl;
-    if(INIT_VERBOSE) oss << "*********************************************************************************" << endl;
-    XHOST.argv.clear();for(uint i=0;i<argv.size();i++)  XHOST.argv.push_back(argv.at(i));
-
-    // IMMEDIATELY
-    XHOST.QUIET=aurostd::args2flag(argv,cmds,"--quiet|-q");
-    XHOST.QUIET_CERR=aurostd::args2flag(argv,cmds,"--quiet=cerr"); // extra quiet SC20210617
-    XHOST.QUIET_COUT=aurostd::args2flag(argv,cmds,"--quiet=cout"); // extra quiet SC20210617
-    XHOST.DEBUG=aurostd::args2flag(argv,cmds,"--debug");
-    XHOST.TEST=aurostd::args2flag(argv,cmds,"--test|-test");
-    XHOST.SKEW_TEST=aurostd::args2flag(argv,cmds,"--skew_test"); //DX20171025
-    XHOST.READ_SPIN_FROM_ATOMLABEL=aurostd::args2flag(argv,cmds,"--read_spin_from_atomlabel"); //SD20220316
-    //[CO20200404 - overload with --www]XHOST.WEB_MODE=aurostd::args2flag(argv,cmds,"--web_mode"); //CO20190402
-    XHOST.MPI=aurostd::args2flag(argv,"--MPI|--mpi");
-
-    // SD20220223 - check to make sure the temporary directory is writable
     string tmpfs_str=DEFAULT_TMPFS_DIRECTORIES;
     if(tmpfs_str.empty()){tmpfs_str=AFLOWRC_DEFAULT_TMPFS_DIRECTORIES;}
     string tmpfs_str_input=aurostd::args2attachedstring(XHOST.argv,"--use_tmpfs=","");
@@ -117,6 +92,29 @@ namespace init {
     XHOST.tmpfs=aurostd::CleanFileName(XHOST.tmpfs+"/");
     //[SD20220223 - OBSOLETE]XHOST.tmpfs=aurostd::args2attachedstring(argv,"--use_tmpfs","/tmp");
     tokens.clear();
+    // SD20220223 - try alternatives
+    if(XHOST.home.empty()){XHOST.home=aurostd::execute2string("cd && pwd");}
+    if(XHOST.home.empty()){XHOST.home="~";}
+    if(XHOST.user.empty()){XHOST.user=aurostd::execute2string("whoami");}
+    if(XHOST.user.empty()){XHOST.user="UNKNOWN_USER";}
+
+    int depth_short=20,depth_long=45;
+    string position;
+    if(INIT_VERBOSE) oss << "*********************************************************************************" << endl;
+    if(INIT_VERBOSE) oss << "* AFLOW V=" << string(AFLOW_VERSION) << " - machine information " << endl;
+    if(INIT_VERBOSE) oss << "*********************************************************************************" << endl;
+    XHOST.argv.clear();for(uint i=0;i<argv.size();i++)  XHOST.argv.push_back(argv.at(i));
+
+    // IMMEDIATELY
+    XHOST.QUIET=aurostd::args2flag(argv,cmds,"--quiet|-q");
+    XHOST.QUIET_CERR=aurostd::args2flag(argv,cmds,"--quiet=cerr"); // extra quiet SC20210617
+    XHOST.QUIET_COUT=aurostd::args2flag(argv,cmds,"--quiet=cout"); // extra quiet SC20210617
+    XHOST.DEBUG=aurostd::args2flag(argv,cmds,"--debug");
+    XHOST.TEST=aurostd::args2flag(argv,cmds,"--test|-test");
+    XHOST.SKEW_TEST=aurostd::args2flag(argv,cmds,"--skew_test"); //DX20171025
+    XHOST.READ_SPIN_FROM_ATOMLABEL=aurostd::args2flag(argv,cmds,"--read_spin_from_atomlabel"); //SD20220316
+    //[CO20200404 - overload with --www]XHOST.WEB_MODE=aurostd::args2flag(argv,cmds,"--web_mode"); //CO20190402
+    XHOST.MPI=aurostd::args2flag(argv,"--MPI|--mpi");
 
     XHOST.GENERATE_AFLOWIN_ONLY=aurostd::args2flag(argv,cmds,"--generate_aflowin_only");  //CT20180719
     XHOST.POSTPROCESS=aurostd::args2attachedflag(argv,cmds,"--lib2raw=|--lib2lib=");  //CO20200624

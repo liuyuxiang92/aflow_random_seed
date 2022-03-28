@@ -1799,7 +1799,7 @@ namespace aurostd {
         command+=" "+process+" 2>/dev/null";
         if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
         aurostd::execute(command);
-        aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process,user_specific);
+        aurostd::Sleep(sleep_seconds);process_killed=!aurostd::ProcessRunning(process,user_specific);
       }
     }
     if(!process_killed){
@@ -1810,7 +1810,7 @@ namespace aurostd {
         command+=" "+process+" 2>/dev/null";
         if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
         aurostd::execute(command);
-        aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process,user_specific);
+        aurostd::Sleep(sleep_seconds);process_killed=!aurostd::ProcessRunning(process,user_specific);
       }
     }
     if(!process_killed){
@@ -1824,7 +1824,7 @@ namespace aurostd {
           command+=" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
           if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
           aurostd::execute(command);
-          aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process,user_specific);
+          aurostd::Sleep(sleep_seconds);process_killed=!aurostd::ProcessRunning(process,user_specific);
         }
       }
     }
