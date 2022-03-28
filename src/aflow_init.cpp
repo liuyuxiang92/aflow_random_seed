@@ -77,7 +77,6 @@ namespace init {
     // SD20220223 - check to make sure the temporary directory is writable, do this before execute2string commands, since they write to /tmp
     vector<string> tokens;
     string tmpfs_str=DEFAULT_TMPFS_DIRECTORIES;
-    if(tmpfs_str.empty()){tmpfs_str=DEFAULT_TMPFS_DIRECTORIES;}
     string tmpfs_str_input=aurostd::args2attachedstring(XHOST.argv,"--use_tmpfs=","");
     if(!tmpfs_str_input.empty()){tmpfs_str=tmpfs_str_input;}
     aurostd::string2tokens(tmpfs_str,tokens,",");
