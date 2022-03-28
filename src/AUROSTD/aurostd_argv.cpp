@@ -41,7 +41,8 @@ namespace aurostd {  // namespace aurostd
       if(argi.size()>=2) if(argi.at(0)=='-' && argi.at(1)=='D') argi=string("-")+argi;  // for -D
 
       if(argi=="--machine") argi+=string("=");                  // forcing "=" after machine !
-      if(argi=="--aflowlib") argi+=string("=");                  // forcing "=" after machine !
+      if(argi=="--machine_name") argi+=string("=");             // forcing "=" after machine_name ! //HE20220309
+      if(argi=="--aflowlib") argi+=string("=");                 // forcing "=" after aflowlib !
       if(argi=="--np") argi+=string("=");                       // forcing "=" after np !
       if(argi.at(argi.size()-1)=='=' && i<_argc-1) {argi+=string(_argv[i+1]);i++;}  // fixing space after "= "
       out_argv.push_back(argi);

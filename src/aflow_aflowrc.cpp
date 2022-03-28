@@ -21,6 +21,8 @@
 #define         DEFAULT_KZIP_BIN                        XHOST.adefault.getattachedscheme("DEFAULT_KZIP_BIN")
 #define AFLOWRC_DEFAULT_KZIP_EXT                        string(".xz") 
 #define         DEFAULT_KZIP_EXT                        XHOST.adefault.getattachedscheme("DEFAULT_KZIP_EXT")
+#define AFLOWRC_DEFAULT_TMPFS_DIRECTORIES               string("/tmp/,/run/shm/,/dev/shm/")
+#define         DEFAULT_TMPFS_DIRECTORIES               XHOST.adefault.getattachedscheme("DEFAULT_TMPFS_DIRECTORIES")
 
 
 //HE20220218 START
@@ -1242,6 +1244,7 @@ namespace aflowrc {
     // DEFAULT DEFINITIONS
     aflowrc::load_default("DEFAULT_KZIP_BIN",AFLOWRC_DEFAULT_KZIP_BIN);
     aflowrc::load_default("DEFAULT_KZIP_EXT",AFLOWRC_DEFAULT_KZIP_EXT);
+    aflowrc::load_default("DEFAULT_TMPFS_DIRECTORIES",AFLOWRC_DEFAULT_TMPFS_DIRECTORIES);
 
     //HE20220218 START
     aflowrc::load_default("DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE", AFLOWRC_DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE);
@@ -1871,6 +1874,7 @@ namespace aflowrc {
     aflowrc << "// DEFAULT DEFINITIONS" << endl;
     aflowrc << "DEFAULT_KZIP_BIN=\"" << AFLOWRC_DEFAULT_KZIP_BIN << "\"" << endl;
     aflowrc << "DEFAULT_KZIP_EXT=\"" << AFLOWRC_DEFAULT_KZIP_EXT << "\"" << endl;
+    aflowrc << "DEFAULT_TMPFS_DIRECTORIES=\"" << AFLOWRC_DEFAULT_TMPFS_DIRECTORIES << "\"" << endl;
 
     aflowrc << " " << endl;
 
@@ -2518,6 +2522,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "// DEFAULT DEFINITIONS" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_KZIP_BIN\")=\"" << DEFAULT_KZIP_BIN << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_KZIP_EXT\")=\"" << DEFAULT_KZIP_EXT << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_TMPFS_DIRECTORIES\")=\"" << DEFAULT_TMPFS_DIRECTORIES << "\"" << endl;
 
     if(LDEBUG) oss << "// FILENAMES FOR AFLOW.ORG ANALYSIS" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_FILE_AFLOWLIB_ENTRY_OUT\")=\"" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << "\"" << endl;

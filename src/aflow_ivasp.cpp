@@ -2951,9 +2951,9 @@ namespace KBIN {
     if(NPAR==0) {NPAR=4;NCORE=1;}
 
     //DX COME BACK: should these be set by machine? looks like they are being overridden below
-    if(xvasp.NCPUS==32)  {NPAR=4;NCORE=32;} // test for DX conrad and gordon
-    if(xvasp.NCPUS==48)  {NPAR=4;NCORE=48;} // test for DX gaffney, koehr, and mustang
-    if(xvasp.NCPUS==44)  {NPAR=4;NCORE=44;} // test for DX onyx
+    if(xvasp.NCPUS==32)  {NPAR=4;NCORE=32;} // test for DX
+    if(xvasp.NCPUS==48)  {NPAR=4;NCORE=48;} // test for DX
+    if(xvasp.NCPUS==44)  {NPAR=4;NCORE=44;} // test for DX
 
     // marylou fulton super computer center
     if(xvasp.NCPUS==4)  { // best 4 times

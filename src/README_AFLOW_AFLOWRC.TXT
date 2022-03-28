@@ -47,6 +47,11 @@ DEFAULT_KZIP_EXT
   type: string
   default: ".xz"
 
+DEFAULT_TMPFS_DIRECTORIES
+  description: Path(s) to search for the temporary directory 
+  type: string
+  default: "/tmp/,/run/shm/,/dev/shm/"
+
 ####################################################################################################
 DEFAULTS FOR THE ENTRY LOADER
 
