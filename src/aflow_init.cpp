@@ -64,9 +64,42 @@ namespace init {
     string soliloquy=XPID+"init::InitMachine():";
     string message = "";
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [BEGIN]" << endl;
+
+    // AFLOWRC LOAD DEFAULTS FROM AFLOWRC.
+    // XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
+    // XHOST.vflag_control.flag("AFLOWRC::OVERWRITE",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=overwrite|--aflowrc_overwrite"));
+    XHOST.home=getenv("HOME");  //AS SOON AS POSSIBLE
+    XHOST.user=getenv("USER");  //AS SOON AS POSSIBLE
+    if(!aflowrc::is_available(oss,INIT_VERBOSE || XHOST.DEBUG)) aflowrc::write_default(oss,INIT_VERBOSE || XHOST.DEBUG);
+    aflowrc::read(oss,INIT_VERBOSE || XHOST.DEBUG);
+    XHOST.vflag_control.flag("AFLOWRC::READ",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=read|--aflowrc_read"));
+    if(XHOST.vflag_control.flag("AFLOWRC::READ")) {aflowrc::print_aflowrc(oss,TRUE);return false;}
+    // SD20220223 - read AFLOWRC to determine the temporary directory, which is needed for execute2string
+    // SD20220223 - check to make sure the temporary directory is writable
+    vector<string> tokens;
+    string tmpfs_str=DEFAULT_TMPFS_DIRECTORIES;
+    string tmpfs_str_input=aurostd::args2attachedstring(XHOST.argv,"--use_tmpfs=","");
+    if(!tmpfs_str_input.empty()){tmpfs_str=tmpfs_str_input;}
+    aurostd::string2tokens(tmpfs_str,tokens,",");
+    if(LDEBUG){cerr << soliloquy << " tokens[tmpfs_str]=\"" << aurostd::joinWDelimiter(tokens,",") << "\"" << endl;}
+    for(uint i=0;i<tokens.size() && XHOST.tmpfs.empty();i++){
+      if(aurostd::DirectoryWritable(tokens[i])){XHOST.tmpfs=tokens[i];}
+    }
+    if(XHOST.tmpfs.empty()) {
+      message="tmp directories are not writable";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message);
+    }
+    XHOST.tmpfs=aurostd::CleanFileName(XHOST.tmpfs+"/");
+    //[SD20220223 - OBSOLETE]XHOST.tmpfs=aurostd::args2attachedstring(argv,"--use_tmpfs","/tmp");
+    tokens.clear();
+    // SD20220223 - try alternatives
+    if(XHOST.home.empty()){XHOST.home=aurostd::execute2string("cd && pwd");}
+    if(XHOST.home.empty()){XHOST.home="~";}
+    if(XHOST.user.empty()){XHOST.user=aurostd::execute2string("whoami");}
+    if(XHOST.user.empty()){XHOST.user="UNKNOWN_USER";}
+
     int depth_short=20,depth_long=45;
     string position;
-    vector<string> tokens;
     if(INIT_VERBOSE) oss << "*********************************************************************************" << endl;
     if(INIT_VERBOSE) oss << "* AFLOW V=" << string(AFLOW_VERSION) << " - machine information " << endl;
     if(INIT_VERBOSE) oss << "*********************************************************************************" << endl;
@@ -83,24 +116,9 @@ namespace init {
     //[CO20200404 - overload with --www]XHOST.WEB_MODE=aurostd::args2flag(argv,cmds,"--web_mode"); //CO20190402
     XHOST.MPI=aurostd::args2flag(argv,"--MPI|--mpi");
 
-    XHOST.tmpfs=aurostd::args2attachedstring(XHOST.argv,"--use_tmpfs=","/tmp");
-    XHOST.tmpfs=aurostd::CleanFileName(XHOST.tmpfs+"/");
-
-    XHOST.user=aurostd::execute2string("whoami");  //AS SOON AS POSSIBLE
-    if(XHOST.user.empty()){XHOST.user="UNKNOWN_USER";} //SD20220222 - avoid double . when defining tmpdir in TmpStrCreate
-    XHOST.home=aurostd::execute2string("cd && pwd");  //AS SOON AS POSSIBLE
-    if(XHOST.home.empty()){XHOST.home=getenv("HOME");}  //CO20200624 - attempt 2
     XHOST.GENERATE_AFLOWIN_ONLY=aurostd::args2flag(argv,cmds,"--generate_aflowin_only");  //CT20180719
     XHOST.POSTPROCESS=aurostd::args2attachedflag(argv,cmds,"--lib2raw=|--lib2lib=");  //CO20200624
     XHOST.ARUN_POSTPROCESS=aurostd::args2flag(argv,cmds,"--postprocess");  //CT20181212
-
-    // AFLOWRC LOAD DEFAULTS FROM AFLOWRC.
-    //  XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
-    //  XHOST.vflag_control.flag("AFLOWRC::OVERWRITE",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=overwrite|--aflowrc_overwrite"));
-    if(!aflowrc::is_available(oss,INIT_VERBOSE || XHOST.DEBUG)) aflowrc::write_default(oss,INIT_VERBOSE || XHOST.DEBUG);
-    aflowrc::read(oss,INIT_VERBOSE || XHOST.DEBUG);
-    XHOST.vflag_control.flag("AFLOWRC::READ",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=read|--aflowrc_read"));
-    if(XHOST.vflag_control.flag("AFLOWRC::READ")) {aflowrc::print_aflowrc(oss,TRUE);return false;}
 
     // IMMEDIATELY GET PIDS
     XHOST.PID=getpid();    // PID number

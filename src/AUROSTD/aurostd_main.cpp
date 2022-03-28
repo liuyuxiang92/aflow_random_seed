@@ -1797,7 +1797,7 @@ namespace aurostd {
         command+=" "+process+" 2>/dev/null";
         if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
         aurostd::execute(command);
-        aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process,user_specific);
+        aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,user_specific));
       }
     }
     if(!process_killed){
@@ -1808,7 +1808,7 @@ namespace aurostd {
         command+=" "+process+" 2>/dev/null";
         if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
         aurostd::execute(command);
-        aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process,user_specific);
+        aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,user_specific));
       }
     }
     if(!process_killed){
@@ -1822,7 +1822,7 @@ namespace aurostd {
           command+=" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
           if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
           aurostd::execute(command);
-          aurostd::Sleep(sleep_seconds);process_killed=aurostd::ProcessRunning(process,user_specific);
+          aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,user_specific));
         }
       }
     }
@@ -2018,11 +2018,10 @@ namespace aurostd {
   // ***************************************************************************
   bool DirectoryWritable(string _Directory) {  // "" compliant SC20190401
     string Directory(CleanFileName(_Directory));
-    string filename=string(Directory+"/aflow.writable."+aurostd::utype2string(uint((double) std::floor(100000*aurostd::ran0())))+".test");
-    string2file("DirectoryWritable",filename);
-    if(!FileExist(filename)) return FALSE;
-    string command=string("rm -f \""+filename+"\"");
-    execute(command);
+    string filename=aurostd::TmpFileCreate("DirectoryWritable",Directory,true); // SD20220223 - uses TmpFileCreate
+    bool writable=aurostd::string2file("DirectoryWritable",filename);
+    if(!writable || !FileExist(filename)) return FALSE;
+    aurostd::RemoveFile(filename);
     return TRUE;
   }
   bool DirectoryUnwritable(string Directory) {
