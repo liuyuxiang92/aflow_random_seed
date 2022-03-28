@@ -208,8 +208,8 @@ namespace KBIN{
     // *********************************************************************************************************************
     // OPERATIONS related to PARTICULAR MACHINES ***************************************************************************
 
-    if(LDEBUG) cerr << "[DEBUG] aflags.AFLOW_MACHINE_GLOBAL=" << aflags.AFLOW_MACHINE_GLOBAL << endl;
-    if(LDEBUG) cerr << "[DEBUG] aflags.AFLOW_MACHINE_LOCAL=" << aflags.AFLOW_MACHINE_LOCAL << endl;
+    if(LDEBUG) cerr << "[DEBUG] aflags.AFLOW_MACHINE_GLOBAL=" << aflags.AFLOW_MACHINE_GLOBAL.getattachedscheme("NAME") << endl; //HE20220309 use machine name
+    if(LDEBUG) cerr << "[DEBUG] aflags.AFLOW_MACHINE_LOCAL=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << endl; //HE20220309 use machine name
 
     // ***************************************************************************
     // Get the KBIN_BIN name

@@ -6,6 +6,7 @@
         -- Added poscar2aflowin for non-POSCAR input files (ME)
         -- generalizing DOS averaging for pocc systems with ARUNs having different numbers of atoms (CO)
         -- added md5sum to --xplug (CO)
+        -- allow naming of generic hosts using --machine_name in combination with --machine (HE)
         -- fixed logical statements in aflow_kvasp.cpp to be linear (SD)
         -- fixed the LOCK file to be created atomically (SD)
         -- added xmatrix reshape, mod_floored functions (SD)
