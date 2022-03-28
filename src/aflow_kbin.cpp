@@ -498,6 +498,15 @@ namespace KBIN {
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::CMU_EULER")) XHOST.maxmem=CMU_EULER_DEFAULT_KILL_MEM_CUTOFF;
     //DX20190107 - CMU EULER - END
 
+    //HE20220309 - Machine Name - START
+    // allow the use of generic machine templates while using descriptive names
+    stringstream machine_name;
+    string argv_machine_name = aurostd::args2attachedstring(argv, "--machine_name=", "");
+    if (!argv_machine_name.empty()) machine_name << argv_machine_name << "(" << aflags.AFLOW_MACHINE_GLOBAL << ")";
+    else machine_name << aflags.AFLOW_MACHINE_GLOBAL;
+    aflags.AFLOW_MACHINE_GLOBAL.addattachedscheme("NAME", machine_name.str() ,true);
+    //HE20220309 - Machine Name - END
+
 
     // turn off multi pthreads on specific machines
     if(aflags.AFLOW_MACHINE_GLOBAL.flag()) {
