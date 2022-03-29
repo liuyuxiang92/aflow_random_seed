@@ -162,6 +162,11 @@ namespace apdc {
     if (apdc_data.num_threads < 1) {apdc_data.num_threads = 1;}
     // Check if min sleep is at least 1 sec
     if (apdc_data.min_sleep < 1) {apdc_data.min_sleep = 1;}
+    // Check if max number of atoms in cluster is valid
+    if (apdc_data.aflow_max_num_atoms < 1 || apdc_data.max_num_atoms < 1) {
+      string message = "Maximum number of atoms per cluster must be at least 1";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+    }
     // Check if directory is writable
     if (!aurostd::DirectoryMake(apdc_data.rootdirpath)) {
       string message = "Cannot create directory";
@@ -259,6 +264,7 @@ namespace apdc {
     apdc_data.excess_energy_cluster = GetExcessEnergyCluster(apdc_data.rundirpath, apdc_data.conc_cluster, apdc_data.num_atom_cluster);
     apdc_data.conc_macro = GetConcentrationMacro(apdc_data.conc_range, apdc_data.conc_npts, apdc_data.elements.size());
     SetCongruentClusters(apdc_data);
+        cerr<<apdc_data.conc_cluster<<endl;return;
     apdc_data.temp = GetTemperature(apdc_data.temp_range, apdc_data.temp_npts);
     apdc_data.prob_ideal_cluster = GetProbabilityIdealCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.max_num_atoms);
     CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_ideal_cluster);
