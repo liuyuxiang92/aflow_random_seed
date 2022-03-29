@@ -47,8 +47,7 @@ class _apdc_data {
     vector<int> mapstr;
 
     // Cluster data
-    xvector<int> mult_cluster; // DIM: J
-    xvector<int> natom_cluster; // DIM: J
+    xvector<int> num_atom_cluster; // DIM: J
     xmatrix<double> conc_cluster; // UNIT: unitless | DIM: J, K
     xvector<double> excess_energy_cluster; // UNIT: eV | DIM: J
 
@@ -69,12 +68,12 @@ namespace apdc {
   void GetBinodal(_apdc_data& apdc_data);
   void GetSpinodal(_apdc_data& apdc_data);
   xtensor<double> GetProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms);
-  xmatrix<double> GetProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& mult_cluster, const int max_num_atoms);
+  xmatrix<double> GetProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const int max_num_atoms);
   bool CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob);
   xmatrix<double> GetConcentrationMacro(const xvector<double>& conc_range, const int conc_npts, const int nelem);
   xvector<double> GetTemperature(const xvector<double>& temp_range, const int temp_npts);
   void SetCongruentClusters(_apdc_data& apdc_data);
-  vector<xvector<int>> GetMultiplicityCluster(const vector<xstructure>& vstr);
+  xvector<int> GetNumAtomCluster(const vector<xstructure>& vstr);
   xmatrix<double> GetConcentrationCluster(const vector<string>& elements, const vector<xstructure>& vstr);
   xmatrix<double> GetConcentrationCluster(const string& rundirpath, const int nstr, const int nelem);
   xvector<double> GetExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const xvector<int>& natom);

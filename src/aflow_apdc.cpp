@@ -44,8 +44,7 @@ _apdc_data::_apdc_data() {
   vstr_atat.clear();
   mapstr.clear();
   // Cluster data
-  mult_cluster.clear();
-  natom_cluster.clear();
+  num_atom_cluster.clear();
   conc_cluster.clear();
   excess_energy_cluster.clear();
   // Thermo data
@@ -85,8 +84,7 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
     vstr_atat = b.vstr_atat;
     mapstr = b.mapstr;
     // Cluster data
-    mult_cluster = b.mult_cluster;
-    natom_cluster = b.natom_cluster;
+    num_atom_cluster = b.num_atom_cluster;
     conc_cluster = b.conc_cluster;
     excess_energy_cluster = b.excess_energy_cluster;
     // Thermo data
@@ -192,6 +190,10 @@ namespace apdc {
       string message = "Concentration range must have format [X1_start, X1_end, X2_start, X2_end,...X(K)_start, X(K)_end]";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
     }
+    if (apdc_data.conc_npts < 2) {
+      string message = "Number of points for the concentration range must be at least 2";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+    }
     // Check if concentration is within [0,1] and sums to 1
     double totconc_init = 0.0, totconc_final = 0.0;
     vector<double> vconc_init, vconc_final;
@@ -226,6 +228,10 @@ namespace apdc {
       string message = "Temperature range must have format [T_start T_end]";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
     }
+    if (apdc_data.temp_npts < 2) {
+      string message = "Number of points for the temperature range must be at least 2";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+    }
     // Check if temperature values are valid
     if (apdc_data.temp_range(1) < 0 || apdc_data.temp_range(2) < 0) {
       string message = "Temperature cannot be below 0K";
@@ -248,15 +254,13 @@ namespace apdc {
     apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, apdc_data.aflow_max_num_atoms), apdc_data.vstr_aflow, apdc_data.num_threads);
     GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.lat_atat, apdc_data.vstr_aflow, apdc_data.vstr_atat, apdc_data.mapstr);
     RunATAT(apdc_data.workdirpath, apdc_data.rundirpath, apdc_data.min_sleep);
-    vector<xvector<int>> mult_cluster = GetMultiplicityCluster(apdc_data.vstr_atat);
-    apdc_data.natom_cluster = mult_cluster[0];
-    apdc_data.mult_cluster = mult_cluster[1];
+    apdc_data.num_atom_cluster = GetNumAtomCluster(apdc_data.vstr_atat);
     apdc_data.conc_cluster = GetConcentrationCluster(apdc_data.rundirpath, apdc_data.vstr_atat.size(), apdc_data.elements.size());
-    apdc_data.excess_energy_cluster = GetExcessEnergyCluster(apdc_data.rundirpath, apdc_data.conc_cluster, apdc_data.natom_cluster);
+    apdc_data.excess_energy_cluster = GetExcessEnergyCluster(apdc_data.rundirpath, apdc_data.conc_cluster, apdc_data.num_atom_cluster);
     apdc_data.conc_macro = GetConcentrationMacro(apdc_data.conc_range, apdc_data.conc_npts, apdc_data.elements.size());
     SetCongruentClusters(apdc_data);
     apdc_data.temp = GetTemperature(apdc_data.temp_range, apdc_data.temp_npts);
-    apdc_data.prob_ideal_cluster = GetProbabilityIdealCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.mult_cluster, apdc_data.max_num_atoms);
+    apdc_data.prob_ideal_cluster = GetProbabilityIdealCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.max_num_atoms);
     CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_ideal_cluster);
     return;
     apdc_data.prob_cluster = GetProbabilityCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.excess_energy_cluster, apdc_data.prob_ideal_cluster, apdc_data.temp, apdc_data.max_num_atoms);
@@ -311,14 +315,17 @@ namespace apdc {
 // ***************************************************************************
 // P_j(X) = g_j*(X1^N1_j)*(X2^N2_j)*...(X(K)^N(K)_j)
 namespace apdc {
-  xmatrix<double> GetProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& mult_cluster, const int max_num_atoms) {
+  xmatrix<double> GetProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const int max_num_atoms) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    LDEBUG=TRUE;
     int ncl = conc_cluster.rows, nx = conc_macro.rows, nelem = conc_macro.cols;
     xmatrix<double> prob_ideal_cluster(nx, ncl);
     for (int i = 1; i <= nx; i++) {
       for (int j = 1; j <= ncl; j++) {
-        prob_ideal_cluster(i, j) = mult_cluster(j);
-        for (int k = 1; k <= nelem; k++) {prob_ideal_cluster(i, j) *= std::pow(conc_macro(i, k), conc_cluster(j, k) * max_num_atoms);}
+        prob_ideal_cluster(i, j) = aurostd::factorial(max_num_atoms);
+        for (int k = 1; k <= nelem; k++) {
+          prob_ideal_cluster(i, j) *= std::pow(conc_macro(i, k), conc_cluster(j, k) * max_num_atoms) / aurostd::factorial(conc_cluster(j, k) * max_num_atoms);
+        }
       }
       prob_ideal_cluster.setmat(prob_ideal_cluster.getmat(i, i, 1, ncl) / aurostd::sum(prob_ideal_cluster.getmat(i, i, 1, ncl)), i, 1); // normalize sum to 1
       if (LDEBUG) {cerr << "i=" << i << " | SUM[P_j]=" << aurostd::sum(prob_ideal_cluster.getmat(i, i, 1, ncl)) << endl;}
@@ -372,50 +379,37 @@ namespace apdc {
 namespace apdc {
   void SetCongruentClusters(_apdc_data& apdc_data) {
     vector<int> indx_cluster;
-    for (int i = 1; i <= apdc_data.natom_cluster.rows; i++) {
-      if (!(apdc_data.max_num_atoms % apdc_data.natom_cluster(i))) {indx_cluster.push_back(i);}
+    for (int i = 1; i <= apdc_data.num_atom_cluster.rows; i++) {
+      if (!(apdc_data.max_num_atoms % apdc_data.num_atom_cluster(i))) {indx_cluster.push_back(i);}
     }
     int ncl = indx_cluster.size(), nelem = apdc_data.elements.size();
-    xvector<int> v1(ncl), v2(ncl);
-    xvector<double> v3(ncl);
+    xvector<int> v1(ncl);
+    xvector<double> v2(ncl);
     xmatrix<double> m1(ncl, nelem);
     for (int i = 0; i < ncl; i++) {
       m1.setmat(apdc_data.conc_cluster.getmat(indx_cluster[i], indx_cluster[i], 1, nelem), i + 1, 1);
-      v1(i + 1) = apdc_data.mult_cluster(indx_cluster[i]);
-      v2(i + 1) = apdc_data.natom_cluster(indx_cluster[i]);
-      v3(i + 1) = apdc_data.excess_energy_cluster(indx_cluster[i]);
+      v1(i + 1) = apdc_data.num_atom_cluster(indx_cluster[i]);
+      v2(i + 1) = apdc_data.excess_energy_cluster(indx_cluster[i]);
     }
     apdc_data.conc_cluster = m1;
-    apdc_data.mult_cluster = v1;
-    apdc_data.natom_cluster = v2;
-    apdc_data.excess_energy_cluster = v3;
+    apdc_data.num_atom_cluster = v1;
+    apdc_data.excess_energy_cluster = v2;
   }
 }
 
 // ***************************************************************************
-// apdc::GetMultiplicityCluster
+// apdc::GetNumAtomCluster
 // ***************************************************************************
-// N_j = N1_j+N2_j+...N(K)_j
-// g_j = N_j!/(N1_j!*N2_j!*...N(K)_j)
-// return [N,g]
 namespace apdc {
-  vector<xvector<int> > GetMultiplicityCluster(const vector<xstructure>& vstr) {
-    int nstr = vstr.size();
-    vector<xvector<int> > mult_cluster;
-    xvector<int> g(nstr), n(nstr);
-    uint natom, fact_prod;
+  xvector<int> GetNumAtomCluster(const vector<xstructure>& vstr) {
+    int nstr = vstr.size(), natom;
+    xvector<int> num_atom_cluster(nstr);
     for (int i = 1; i <= nstr; i++) {
       natom = 0;
-      fact_prod = 1;
-      for (uint j = 0; j < vstr[i - 1].num_each_type.size(); j++) {
-        natom += vstr[i - 1].num_each_type[j];
-        fact_prod *= aurostd::factorial(vstr[i - 1].num_each_type[j]);
-      }
-      n(i) = natom;
-      g(i) = aurostd::factorial(natom) / fact_prod;
+      for (uint j = 0; j < vstr[i - 1].num_each_type.size(); j++) {natom += vstr[i - 1].num_each_type[j];}
+      num_atom_cluster(i) = natom;
     }
-    mult_cluster.push_back(n); mult_cluster.push_back(g);
-    return mult_cluster;
+    return num_atom_cluster;
   }
 }
 
@@ -470,7 +464,7 @@ namespace apdc {
 // apdc::GetExcessEnergyCluster
 // ***************************************************************************
 namespace apdc {
-  xvector<double> GetExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const xvector<int>& natom) {
+  xvector<double> GetExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const xvector<int>& num_atom_cluster) {
     int nstr = conc_cluster.rows, nelem = conc_cluster.cols;
     vector<string> vinput, tokens;
     aurostd::file2vectorstring(rundirpath + "/ref_energy.out", vinput);
@@ -479,12 +473,12 @@ namespace apdc {
     aurostd::file2vectorstring(rundirpath + "/fit.out", vinput);
     for (uint line = 0; line < vinput.size(); line++) {
       aurostd::string2tokens(vinput[line], tokens, " ");
-      nrg(aurostd::string2utype<int>(tokens[tokens.size() - 1]) + 1) = aurostd::string2utype<double>(tokens[nelem]) * natom(aurostd::string2utype<int>(tokens[tokens.size() - 1]) + 1);
+      nrg(aurostd::string2utype<int>(tokens[tokens.size() - 1]) + 1) = aurostd::string2utype<double>(tokens[nelem]) * num_atom_cluster(aurostd::string2utype<int>(tokens[tokens.size() - 1]) + 1);
     }
     aurostd::file2vectorstring(rundirpath + "/predstr.out", vinput);
     for (uint line = 0; line < vinput.size(); line++) {
       aurostd::string2tokens(vinput[line], tokens, " ");
-      nrg(aurostd::string2utype<int>(tokens[tokens.size() - 2]) + 1) = aurostd::string2utype<double>(tokens[nelem]) * natom(aurostd::string2utype<int>(tokens[tokens.size() - 2]) + 1);
+      nrg(aurostd::string2utype<int>(tokens[tokens.size() - 2]) + 1) = aurostd::string2utype<double>(tokens[nelem]) * num_atom_cluster(aurostd::string2utype<int>(tokens[tokens.size() - 2]) + 1);
     }
     return nrg;
   }
