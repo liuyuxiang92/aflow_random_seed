@@ -337,10 +337,10 @@ class _XHOST {
     // _XHOST(const _XHOST& b);                          // constructor copy
     const _XHOST& operator=(const _XHOST &b);         // copy
     // BOOT
-    int PPID,PID,TID;                // aflow_init.cpp  PID/TID number  //CO20200508 //SD20220329 PPID number
-    ostringstream ostrPPID,ostrPID,ostrTID; // aflow_init.cpp  PID/TID in ostringstream... //CO20200508 
-    string sPPID,sPID,sTID;           // aflow_init.cpp  [PID=12345678]  [TID=12345678]
-    bool showPPID,showPID,showTID;       // aflow_init.cpp  check if --showPID
+    int PGID,PID,TID;                // aflow_init.cpp  PID/TID number  //CO20200508 //SD20220329 PGID number
+    ostringstream ostrPGID,ostrPID,ostrTID; // aflow_init.cpp  PID/TID in ostringstream... //CO20200508 
+    string sPGID,sPID,sTID;           // aflow_init.cpp  [PID=12345678]  [TID=12345678]
+    bool showPGID,showPID,showTID;       // aflow_init.cpp  check if --showPID
     // machinery
     bool QUIET,QUIET_CERR,QUIET_COUT,TEST,DEBUG,MPI;    // extra quiet SC20210617
     bool GENERATE_AFLOWIN_ONLY; //CT20180719

@@ -121,14 +121,14 @@ namespace init {
     XHOST.ARUN_POSTPROCESS=aurostd::args2flag(argv,cmds,"--postprocess");  //CT20181212
 
     // IMMEDIATELY GET PIDS
-    // get PPID
-    XHOST.PPID=getppid();    // PPID number
-    XHOST.ostrPPID.clear(); // PPID as stringstream
-    XHOST.ostrPPID.str(std::string()); // PPID as stringstream
-    XHOST.ostrPPID<<XHOST.PPID;  // PPID as stringstream
-    XHOST.sPPID="";
-    XHOST.showPPID=aurostd::args2flag(argv,cmds,"--showPPID");
-    if(XHOST.showPID) XHOST.sPID="[PPID="+aurostd::PaddedPRE(XHOST.ostrPPID.str(),7)+"] "; // PPID as a comment
+    // get PGID
+    XHOST.PGID=getpgrp();    // PGID number
+    XHOST.ostrPGID.clear(); // PGID as stringstream
+    XHOST.ostrPGID.str(std::string()); // PGID as stringstream
+    XHOST.ostrPGID<<XHOST.PGID;  // PGID as stringstream
+    XHOST.sPGID="";
+    XHOST.showPGID=aurostd::args2flag(argv,cmds,"--showPGID");
+    if(XHOST.showPID) XHOST.sPID="[PGID="+aurostd::PaddedPRE(XHOST.ostrPGID.str(),7)+"] "; // PGID as a comment
 
     // get PID
     XHOST.PID=getpid();    // PID number
@@ -2032,10 +2032,10 @@ void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed
 // AFLOW_VASP_instance_running
 // ***************************************************************************
 bool AFLOW_VASP_instance_running(){ //CO20210315
-  //SD20220329 - only check instances of aflow with the same PPID as the monitor
+  //SD20220329 - only check instances of aflow with the same PGID as the monitor
   string soliloquy=XPID+"AFLOW_VASP_instance_running():";
-  string ppid = aurostd::utype2string(XHOST.PPID),output_syscall="";
-  return (aurostd::ProcessPIDs("aflow",ppid,output_syscall).size()>1);  //check that the instance of aflow running vasp is running
+  string pgid = aurostd::utype2string(XHOST.PGID),output_syscall="";
+  return (aurostd::ProcessPIDs("aflow",pgid,output_syscall).size()>1);  //check that the instance of aflow running vasp is running
 }
 
 // ***************************************************************************
@@ -2050,10 +2050,10 @@ bool AFLOW_MONITOR_instance_running(const _aflags& aflags){ //CO20210315
 // VASP_instance_running
 // ***************************************************************************
 bool VASP_instance_running(const string& vasp_bin){ //CO20210315
-  //SD20220329 - only check instances of vasp with the same PPID as the monitor
+  //SD20220329 - only check instances of vasp with the same PGID as the monitor
   string soliloquy=XPID+"VASP_instance_running():";
-  string ppid = aurostd::utype2string(XHOST.PPID);
-  return aurostd::ProcessRunning(vasp_bin,ppid);
+  string pgid = aurostd::utype2string(XHOST.PGID);
+  return aurostd::ProcessRunning(vasp_bin,pgid);
 }
 
 // ***************************************************************************
@@ -2304,7 +2304,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
     }
 
     if(kill_vasp){
-      string ppid=aurostd::utype2string(XHOST.PPID);
+      string pgid=aurostd::utype2string(XHOST.PGID);
       vasp_running=VASP_instance_running(vasp_bin);
       if(vasp_running){
         //special case for MEMORY, the error will be triggered in the --monitor_vasp instance, and not in the --run one
@@ -2321,12 +2321,12 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
         message << "issuing kill command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         if(0){  //super debug
           string output_syscall="";
-          vector<string> vpids=aurostd::ProcessPIDs(vasp_bin,ppid,output_syscall);
+          vector<string> vpids=aurostd::ProcessPIDs(vasp_bin,pgid,output_syscall);
           message << "output_syscall=";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
           message << output_syscall;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
           message << "PIDs2kill="+aurostd::joinWDelimiter(vpids,",");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         }
-        aurostd::ProcessKill(vasp_bin,ppid);
+        aurostd::ProcessKill(vasp_bin,pgid);
       }else{
         message << "\""+vasp_bin+"\" has died before the kill command could be issued";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       }
