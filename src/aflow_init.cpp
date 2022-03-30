@@ -2304,7 +2304,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
     }
 
     if(kill_vasp){
-      string ppid = aurostd::utype2string(XHOST.PPID);
+      string ppid=aurostd::utype2string(XHOST.PPID);
       vasp_running=VASP_instance_running(vasp_bin);
       if(vasp_running){
         //special case for MEMORY, the error will be triggered in the --monitor_vasp instance, and not in the --run one
