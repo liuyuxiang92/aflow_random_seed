@@ -337,7 +337,7 @@ namespace aurostd {
   /// @todo write response into a file
   ///
   /// This function is primitive and is aimed to communicate with AFLOW's API servers.
-  bool httpGetResponse(xURL url, std::string &response) {
+  bool httpGetResponse(const xURL & url, std::string &response) {
 
     bool LDEBUG = (false || XHOST.DEBUG || _DEBUG_XHTTP_);
     string soliloquy = XPID + "aurostd::httpGetResponse():";
