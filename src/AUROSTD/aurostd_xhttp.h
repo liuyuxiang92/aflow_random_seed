@@ -11,7 +11,7 @@
 #define AFLOW_SRC_AUROSTD_XHTTP_H
 
 namespace aurostd{
-  struct URL {
+  struct xURL {
     std::string scheme;
     std::string user;
     std::string host;
@@ -38,7 +38,7 @@ namespace aurostd{
   std::string httpPercentEncodingSelected(const std::string &raw_str, const std::string &characters);
   std::string httpPercentEncodingFull(std::string work_str);
 
-  URL httpParseURL(const std::string &url, const bool strict = false);
+  xURL httpParseURL(const std::string &url, const bool strict = false);
 }
 
 #endif //AFLOW_SRC_AUROSTD_XHTTP_H

@@ -30,8 +30,8 @@ namespace aurostd {
     return (std::string) ip_str;
   }
 
-  URL httpConstructURL(const std::string &host, const std::string &path="/", const std::string &query="", const unsigned int &port=80){
-    URL url;
+  xURL httpConstructURL(const std::string &host, const std::string &path="/", const std::string &query="", const unsigned int &port=80){
+    xURL url;
     url.scheme = "http";
     url.port = port;
     url.host = host;
@@ -42,12 +42,12 @@ namespace aurostd {
 
   /// @brief split a URL string into its parts
   /// @param url url string
-  /// @param strict if set, a full URL needs a schema (http://, https://), else it is interpreted as path
-  /// @return URL struct
+  /// @param strict if set, a full URL needs a scheme (http://, https://), else it is interpreted as path
+  /// @return xURL struct
   ///
   /// While a `user` can be extracted by this parser, `user:password` is not supported and should not be added!
   /// https://datatracker.ietf.org/doc/html/rfc3986#section-3.2.1
-  URL httpParseURL(const std::string &url, const bool strict) {
+  xURL httpParseURL(const std::string &url, const bool strict) {
 
     bool LDEBUG = (false || XHOST.DEBUG || _DEBUG_XHTTP_);
     std::string soliloquy = XPID + "aurostd::httpParseResponse():";
@@ -57,12 +57,12 @@ namespace aurostd {
       else cerr << soliloquy << " Parse '" << url << "' lenient" << endl;
     }
 
-    URL result;
+    xURL result;
     std::string delimiter = "";
     size_t start = 0;
     size_t location = 0;
 
-    // locate schema
+    // locate scheme
     delimiter = "://";
     location = url.find(delimiter);
     if (location != std::string::npos) {
@@ -128,14 +128,14 @@ namespace aurostd {
     return result;
   }
 
-  /// @brief build a new URL struct from a redirect location
+  /// @brief build a new xURL struct from a redirect location
   /// @param base_url url that initiated the redirection
   /// @param new_location new location - url or path (absolute or relative)
-  /// @return constructed URL struct
+  /// @return constructed xURL struct
   ///
   /// @note https://en.wikipedia.org/wiki/HTTP_location
-  URL httpParseRedirect(const URL &base_url, const std::string &new_location) {
-    URL new_url = httpParseURL(new_location, true);
+  xURL httpParseRedirect(const xURL &base_url, const std::string &new_location) {
+    xURL new_url = httpParseURL(new_location, true);
 
     // redirect contains just a path
     // add information from the base_url
@@ -178,42 +178,41 @@ namespace aurostd {
     std::string status_line = "";
     std::string const delimiter = "\r\n";
     std::string chunk_length_octet = "";
-    size_t chuck_length = 0;
-    size_t border = 0;
+    size_t pos_newline_border = 0;
     size_t split = 0;
     size_t full_request_length = 0;
     size_t offset = delimiter.length();
 
     // separate headers from message body
-    border = response.find(delimiter + delimiter);
-    header_raw = response.substr(0, border);
-    response.erase(0, border + offset + offset);
+    pos_newline_border = response.find(delimiter + delimiter);
+    header_raw = response.substr(0, pos_newline_border);
+    response.erase(0, pos_newline_border + offset + offset);
 
     // check if Transfer-Encoding is chunked
     bool isChunked = ( header_raw.find("chunked") != std::string::npos );
 
     // extract first line that contains the status
-    border = header_raw.find(delimiter);
-    status_line = header_raw.substr(0, border);
-    header_raw.erase(0, border + offset);
+    pos_newline_border = header_raw.find(delimiter);
+    status_line = header_raw.substr(0, pos_newline_border);
+    header_raw.erase(0, pos_newline_border + offset);
 
     // save status code
     split = status_line.find(' ') + 1;
-    border = status_line.find(' ', split + 1);
-    status_code = aurostd::string2utype<uint>(status_line.substr(split, border - split));
+    pos_newline_border = status_line.find(' ', split + 1);
+    status_code = aurostd::string2utype<uint>(status_line.substr(split, pos_newline_border - split));
 
     // extract the header data
     std::string key = "";
     std::string item = "";
     while (!header_raw.empty()) {
       split = header_raw.find(':');
-      border = header_raw.find(delimiter);
-      if (border != std::string::npos) {
+      pos_newline_border = header_raw.find(delimiter);
+      if (pos_newline_border != std::string::npos) {
         header_raw.substr(0, split);
         // Header field name are case-insensitive
         key = aurostd::tolower(header_raw.substr(0, split));
-        item = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(header_raw.substr(split + 1, border - split - 1));
-        header_raw.erase(0, border + offset);
+        item = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(header_raw.substr(split + 1, pos_newline_border - split - 1));
+        header_raw.erase(0, pos_newline_border + offset);
 
         // Headers that appear multiple times are equal to a list separated by comma
         if (header.find(key) == header.end()) {
@@ -226,10 +225,11 @@ namespace aurostd {
 
     // in HTTP1.1 data is mostly sent in chunks
     if (isChunked) {
+      size_t chuck_length = 0;
       while (!response.empty() and chunk_length_octet != "0") {
-        border = response.find(delimiter);
-        chunk_length_octet = response.substr(0, border);
-        response.erase(0, border + offset);
+        pos_newline_border = response.find(delimiter);
+        chunk_length_octet = response.substr(0, pos_newline_border);
+        response.erase(0, pos_newline_border + offset);
         if (chunk_length_octet != "0") {
           chuck_length = aurostd::string2utype<uint>(chunk_length_octet, 16);
           full_request_length += chuck_length;
@@ -269,7 +269,7 @@ namespace aurostd {
     const char *reserved=characters.c_str();
 
     size_t start=0;
-    size_t border=0;
+    size_t pos=0;
     int to_replace=0;
 
     char * str_position;
@@ -281,12 +281,12 @@ namespace aurostd {
     if (LDEBUG) cerr << soliloquy << " Escaping '" << raw_str << "'" << endl;
 
     while (str_position!=NULL){
-      border = str_position-str;
-      to_replace = str[border];
+      pos = str_position-str;
+      to_replace = str[pos];
       if (to_replace<0) to_replace+=256;
-      output << raw_str.substr(start, border-start) << "%" << std::uppercase << std::hex << std::setfill('0') << std::setw(2) << to_replace;
-      if (LDEBUG) cerr << " Match '" << str[border] << "' (%" << std::uppercase << std::hex << std::setfill('0') << to_replace << std::dec << ") at " << border << endl;
-      start = border+1;
+      output << raw_str.substr(start, pos-start) << "%" << std::uppercase << std::hex << std::setfill('0') << std::setw(2) << to_replace;
+      if (LDEBUG) cerr << " Match '" << str[pos] << "' (%" << std::uppercase << std::hex << std::setfill('0') << to_replace << std::dec << ") at " << pos << endl;
+      start = pos+1;
       str_position=std::strpbrk(str_position+1,reserved);
     }
     output << raw_str.substr(start);
@@ -310,18 +310,18 @@ namespace aurostd {
                           "0123456789"
                           "-_.~";
 
-    size_t border=0;
+    size_t pos=0;
     int to_replace=0;
     std::stringstream output;
     if (LDEBUG) cerr << soliloquy << " Escaping '" << work_str << "'" << std::endl;
 
     while (!work_str.empty()){
-      border = std::strspn(work_str.c_str(), allowed);
-      to_replace = work_str[border];
+      pos = std::strspn(work_str.c_str(), allowed);
+      to_replace = work_str[pos];
       if (to_replace<0) to_replace+=256;
-      output << work_str.substr(0, border) << "%" << std::uppercase << std::hex << std::setfill('0') << std::setw(2) << to_replace;
-      if (LDEBUG) cerr << " Match '" << work_str[border] << "' (%" << std::uppercase << std::hex << std::setfill('0') << to_replace << std::dec << ")" << std::endl;
-      work_str.erase(0,border+1);
+      output << work_str.substr(0, pos) << "%" << std::uppercase << std::hex << std::setfill('0') << std::setw(2) << to_replace;
+      if (LDEBUG) cerr << " Match '" << work_str[pos] << "' (%" << std::uppercase << std::hex << std::setfill('0') << to_replace << std::dec << ")" << std::endl;
+      work_str.erase(0,pos+1);
     }
     return output.str();
   }
@@ -337,7 +337,7 @@ namespace aurostd {
   /// @todo write response into a file
   ///
   /// This function is primitive and is aimed to communicate with AFLOW's API servers.
-  bool httpGetResponse(URL url, std::string &response) {
+  bool httpGetResponse(xURL url, std::string &response) {
 
     bool LDEBUG = (false || XHOST.DEBUG || _DEBUG_XHTTP_);
     string soliloquy = XPID + "aurostd::httpGetResponse():";
@@ -437,7 +437,7 @@ namespace aurostd {
     return true;
   }
 
-  void httpGet(URL url,
+  void httpGet(xURL url,
                std::string &output, int &status_code, std::map <std::string, std::string> &header) {
 
     bool LDEBUG = (false || XHOST.DEBUG || _DEBUG_XHTTP_);
@@ -498,7 +498,7 @@ namespace aurostd {
   /// @param url_str content url
   /// @return HTTP status code (-1 on failure)
   int httpGetStatus(const std::string &url_str) {
-    URL url = httpParseURL(url_str);
+    xURL url = httpParseURL(url_str);
     std::string output = "";
     int status_code = -1;
     std::map <std::string, std::string> header;
@@ -511,7 +511,7 @@ namespace aurostd {
   /// @param output message body
   /// @return HTTP status code (-1 on failure)
   int httpGetStatus(const std::string &url_str, std::string &output) {
-    URL url = httpParseURL(url_str);
+    xURL url = httpParseURL(url_str);
     int status_code = -1;
     std::map <std::string, std::string> header;
     httpGet(url, output, status_code, header);
@@ -524,7 +524,7 @@ namespace aurostd {
   /// @param header response header
   /// @return HTTP status code (-1 on failure)
   int httpGetStatus(const std::string &url_str, std::string &output, std::map <std::string, std::string> &header) {
-    URL url = httpParseURL(url_str);
+    xURL url = httpParseURL(url_str);
     int status_code = -1;
     httpGet(url, output, status_code, header);
     return status_code;
@@ -536,7 +536,7 @@ namespace aurostd {
   /// @param output message body
   /// @return HTTP status code (-1 on failure)
   int httpGetStatus(const std::string &host, const std::string &path, const std::string &query, std::string &output) {
-    URL url = httpConstructURL(host, path, query);
+    xURL url = httpConstructURL(host, path, query);
     int status_code = -1;
     std::map <std::string, std::string> header;
     httpGet(url, output, status_code, header);
@@ -550,7 +550,7 @@ namespace aurostd {
   /// @param header response header
   /// @return HTTP status code (-1 on failure)
   int httpGetStatus(const std::string &host, const std::string &path, const std::string &query, std::string &output, std::map <std::string, std::string> &header) {
-    URL url = httpConstructURL(host, path, query);
+    xURL url = httpConstructURL(host, path, query);
     int status_code = -1;
     httpGet(url, output, status_code, header);
     return status_code;
@@ -560,7 +560,7 @@ namespace aurostd {
   /// @param url_str content url
   /// @return message body
   std::string httpGet(const std::string &url_str) {
-    URL url = httpParseURL(url_str);
+    xURL url = httpParseURL(url_str);
     std::string output = "";
     int status_code = -1;
     std::map <std::string, std::string> header;
@@ -574,7 +574,7 @@ namespace aurostd {
   /// @param status_code HTTP status code (-1 on failure)
   /// @return message body
   std::string httpGet(const std::string &url_str, int &status_code) {
-    URL url = httpParseURL(url_str);
+    xURL url = httpParseURL(url_str);
     std::string output = "";
     std::map <std::string, std::string> header;
 
@@ -589,7 +589,7 @@ namespace aurostd {
   /// @param header response header
   /// @return message body
   std::string httpGet(const std::string &url_str, int &status_code, std::map <std::string, std::string> &header) {
-    URL url = httpParseURL(url_str);
+    xURL url = httpParseURL(url_str);
 
     std::string output="";
     status_code = -1;
@@ -602,7 +602,7 @@ namespace aurostd {
   /// @param query GET query
   /// @return message body
   std::string httpGet(const std::string &host, const std::string &path, const std::string &query) {
-    URL url = httpConstructURL(host, path, query);
+    xURL url = httpConstructURL(host, path, query);
     std::string output="";
     int status_code = -1;
     std::map <std::string, std::string> header;
@@ -617,7 +617,7 @@ namespace aurostd {
   /// @param status_code HTTP status code (-1 on failure)
   /// @return message body
   std::string httpGet(const std::string &host, const std::string &path, const std::string &query, int &status_code) {
-    URL url = httpConstructURL(host, path, query);
+    xURL url = httpConstructURL(host, path, query);
     std::string output="";
     std::map <std::string, std::string> header;
 
@@ -633,7 +633,7 @@ namespace aurostd {
   /// @param header response header
   /// @return message body
   std::string httpGet(const std::string &host, const std::string &path, const std::string &query, int &status_code, std::map <std::string, std::string> &header) {
-    URL url = httpConstructURL(host, path, query);
+    xURL url = httpConstructURL(host, path, query);
     std::string output="";
 
     status_code = -1;
