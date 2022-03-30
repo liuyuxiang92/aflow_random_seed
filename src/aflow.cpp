@@ -26,9 +26,7 @@
 
 #include "aflow.h"
 #include "aflow_pflow.h"
-
 #include "aflow_pocc.h"  //CO20200624
-
 
 //#define  __XOPTIMIZE
 //#include "aflow_array.h"
@@ -56,7 +54,6 @@
 //[OBSOLETE]AFLOWLogicError::AFLOWLogicError(const std::string& function,std::stringstream& message) : std::logic_error(message.str()),f_name(function) {message.str("");}    //errors in logic, unintended (and insurmountable) use of functionality
 //[OBSOLETE]string AFLOWLogicError::where(){return f_name;}
 //[OBSOLETE]//CO20180419 - global exception handling - STOP
-
 
 int main(int _argc,char **_argv) {
   string soliloquy = XPID + "main():"; //CO20180419
