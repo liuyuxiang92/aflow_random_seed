@@ -437,6 +437,12 @@ namespace aurostd {
     return true;
   }
 
+  /// @brief get the content of a URL
+  /// @param url copied so that a redirect can change it
+  /// @param output
+  /// @param status_code
+  /// @param header
+  /// @note this function is the 'privat' implementation of httpGet()
   void httpGet(xURL url,
                std::string &output, int &status_code, std::map <std::string, std::string> &header) {
 
