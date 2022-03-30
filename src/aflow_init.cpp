@@ -2320,7 +2320,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
         message << "issuing kill command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         if(0){  //super debug
           string output_syscall="";
-          vector<string> vpids=aurostd::ProcessPIDs(vasp_bin,XHOST.PPID,output_syscall);
+          vector<string> vpids=aurostd::ProcessPIDs(vasp_bin,aurostd::utype2string(XHOST.PPID),output_syscall);
           message << "output_syscall=";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
           message << output_syscall;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
           message << "PIDs2kill="+aurostd::joinWDelimiter(vpids,",");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
