@@ -16,6 +16,7 @@
         -- fixed logic bug in ProcessKill (SD)
         -- added temporary directory list to aflowrc (SD)
         -- fixed order of variable initializations in aflow_init.cpp (SD)
+        -- removed "kill_vasp_all" and implemented a targeted kill vasp command (SD)
 3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)

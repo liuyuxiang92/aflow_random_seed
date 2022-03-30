@@ -1774,11 +1774,65 @@ namespace aurostd {
     return vpids;
   }
 
+  //SD20220329 - overload to allow for only getting the PIDs with a specific PPID
+  vector<string> ProcessPIDs(const string& process,const string& ppid,string& output_syscall,bool user_specific){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"aurostd::ProcessPIDs():";
+    string ps_opts=" uid,ppid,pid,etime,pcpu,pmem,args"; // user-defined options, since just "u" or "j" might not be good enough
+    if(LDEBUG){cerr << soliloquy << " looking for process=" << process << endl;}
+    string command="ps";
+    vector<string> vlines,vtokens,vpids;
+    uint i=0,j=0;
+    if(aurostd::IsCommandAvailable("ps") && aurostd::IsCommandAvailable("grep")) {
+      aurostd::string2tokens(ps_opts,vtokens,",");
+      uint nopts = vtokens.size();
+      string command_grep="grep "+process;
+      if(user_specific){command+=" xo";}
+      else{command+=" axo";}
+      command+=ps_opts;
+      if(!aurostd::execute2string(command+" > /dev/null",stderr_fsio).empty()) {
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown options in \"ps\"",_INPUT_ILLEGAL_);
+      }
+      command+=" 2>/dev/null | "+command_grep+" 2> /dev/null";
+      if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
+      string output=output_syscall=aurostd::execute2string(command);
+      if(LDEBUG){cerr << soliloquy << " ps/grep output:" << endl << output << endl;}
+      aurostd::string2vectorstring(output,vlines);
+      for(i=0;i<vlines.size();i++){
+        aurostd::string2tokens(vlines[i],vtokens," ");
+        if(vtokens.size()<nopts){continue;} // set by ps_opts
+        const string& pid=vtokens[2]; // set by ps_opts
+        if (vtokens[1]==ppid) { // set by ps_opts
+          string proc=vtokens[nopts-1]; // set by ps_opts
+          for(j=nopts;j<vtokens.size();j++){proc+=" "+vtokens[j];} // set by ps_opts
+          if(LDEBUG){cerr << soliloquy << " proc[i=" << i << "]=\"" << proc << "\"" << endl;}
+          if(proc.find(process)==string::npos){continue;}
+          if(proc.find(command)!=string::npos){continue;}
+          if(proc==command_grep){continue;}
+          vpids.push_back(pid);
+        }
+      }
+      if(LDEBUG){
+        cerr << soliloquy << " vpids=" << aurostd::joinWDelimiter(vpids,",") << endl;
+        cerr << soliloquy << " vpids.empty()=" << vpids.empty() << endl;
+      }
+      return vpids;
+    }
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"\"pgrep\"-type command not found",_INPUT_ILLEGAL_);
+    return vpids;
+  }
+
   // ***************************************************************************
   // Function ProcessRunning
   // ***************************************************************************
   //CO20210315
   bool ProcessRunning(const string& process,bool user_specific){return !aurostd::ProcessPIDs(process,user_specific).empty();} //CO20210315
+
+  //SD20220329 - overload to allow for only getting the PIDs with a specific PPID
+  bool ProcessRunning(const string& process,const string& ppid,bool user_specific){
+    string output_syscall="";
+    return !aurostd::ProcessPIDs(process,ppid,output_syscall,user_specific).empty();
+  }
 
   // ***************************************************************************
   // Function ProcessKill
@@ -1831,7 +1885,33 @@ namespace aurostd {
     //can add checks here if the process wasn't killed completely
 
     if(!process_killed){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::ProcessRunning():","process could not be kill",_RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::ProcessKill():","process could not be kill",_RUNTIME_ERROR_);
+    }
+  }
+
+  //SD20220329 - overload to allow for only killing the PIDs with a specific PPID
+  void ProcessKill(const string& process,const string& ppid,bool user_specific,bool sigkill){
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy=XPID+"aurostd::ProcessKill():";
+    string command="kill",output_syscall="";
+    bool process_killed=(!aurostd::ProcessRunning(process,ppid,user_specific));
+    uint sleep_seconds=5; //2 seconds is too few
+    if(!process_killed){
+      if(aurostd::IsCommandAvailable("kill")) {
+        vector<string> vpids=aurostd::ProcessPIDs(process,ppid,output_syscall,user_specific);
+        if(vpids.empty()){process_killed=true;}
+        else{
+          if(sigkill){command+=" -9";}
+          command+=" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
+          if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
+          aurostd::execute(command);
+          aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,ppid,user_specific));
+        }
+      }
+    }
+    //can add checks here if the process wasn't killed completely
+    if(!process_killed){
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::ProcessKill():","process could not be kill",_RUNTIME_ERROR_);
     }
   }
 

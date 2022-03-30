@@ -121,6 +121,16 @@ namespace init {
     XHOST.ARUN_POSTPROCESS=aurostd::args2flag(argv,cmds,"--postprocess");  //CT20181212
 
     // IMMEDIATELY GET PIDS
+    // get PPID
+    XHOST.PPID=getppid();    // PPID number
+    XHOST.ostrPPID.clear(); // PPID as stringstream
+    XHOST.ostrPPID.str(std::string()); // PPID as stringstream
+    XHOST.ostrPPID<<XHOST.PPID;  // PPID as stringstream
+    XHOST.sPPID="";
+    XHOST.showPPID=aurostd::args2flag(argv,cmds,"--showPPID");
+    if(XHOST.showPID) XHOST.sPID="[PPID="+aurostd::PaddedPRE(XHOST.ostrPPID.str(),7)+"] "; // PPID as a comment
+
+    // get PID
     XHOST.PID=getpid();    // PID number
     XHOST.ostrPID.clear(); // PID as stringstream
     XHOST.ostrPID.str(std::string()); // PID as stringstream
@@ -638,7 +648,6 @@ namespace init {
     XHOST.vflag_control.flag("MULTI=ZIP",aurostd::args2flag(argv,cmds,"--multi=zip"));
     XHOST.vflag_control.flag("MONITOR",aurostd::args2flag(argv,cmds,"--monitor"));
     XHOST.vflag_control.flag("MONITOR_VASP",aurostd::args2flag(argv,cmds,"--monitor_vasp"));
-    XHOST.vflag_control.flag("KILL_VASP_ALL",aurostd::args2flag(argv,cmds,"--kill_vasp_all|--killvaspall"));  //CO20210315 - issue non-specific killall vasp command
     XHOST.vflag_control.flag("KILL_VASP_OOM",aurostd::args2flag(argv,cmds,"--kill_vasp_oom|--killvaspoom"));  //CO20210315 - kill vasp if approaching OOM
     XHOST.vflag_control.flag("GETTEMP",aurostd::args2flag(argv,cmds,"--getTEMP|--getTEMPS|--getTEMPs|--gettemp|--gettemps"));
     XHOST.vflag_control.flag("SWITCH_AFLOW",
@@ -2023,12 +2032,10 @@ void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed
 // AFLOW_VASP_instance_running
 // ***************************************************************************
 bool AFLOW_VASP_instance_running(){ //CO20210315
+  //SD20220329 - only check instances of aflow with the same PPID as the monitor
   string soliloquy=XPID+"AFLOW_VASP_instance_running():";
-  //this needs to become more complicated as we add options other than --kill_vasp_all
-  if(XHOST.vflag_control.flag("MONITOR_VASP") && XHOST.vflag_control.flag("KILL_VASP_ALL")==false){
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a targeted kill command for VASP not available yet: try --kill_vasp_all",_INPUT_ILLEGAL_);
-  }
-  return (aurostd::ProcessPIDs("aflow").size()>1);  //check that the instance of aflow running vasp is running
+  string ppid = aurostd::utype2string(XHOST.PPID),output_syscall="";
+  return (aurostd::ProcessPIDs("aflow",ppid,output_syscall).size()>1);  //check that the instance of aflow running vasp is running
 }
 
 // ***************************************************************************
@@ -2036,10 +2043,6 @@ bool AFLOW_VASP_instance_running(){ //CO20210315
 // ***************************************************************************
 bool AFLOW_MONITOR_instance_running(const _aflags& aflags){ //CO20210315
   string soliloquy=XPID+"AFLOW_MONITOR_instance_running():";
-  //this needs to become more complicated as we add options other than --kill_vasp_all
-  if(XHOST.vflag_control.flag("MONITOR_VASP") && XHOST.vflag_control.flag("KILL_VASP_ALL")==false){ //CO20210315 - this check doesn't really apply, we wouldn't call this function if we were running with --monitor_vasp, but it's a good reminder that this code needs to become smarter in the future with flags other than --kill_vasp_all
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a targeted kill command for VASP not available yet: try --kill_vasp_all",_INPUT_ILLEGAL_);
-  }
   return aurostd::FileExist(aflags.Directory+"/"+_AFLOWLOCK_+"."+FILE_VASP_MONITOR);
 }
 
@@ -2047,12 +2050,10 @@ bool AFLOW_MONITOR_instance_running(const _aflags& aflags){ //CO20210315
 // VASP_instance_running
 // ***************************************************************************
 bool VASP_instance_running(const string& vasp_bin){ //CO20210315
+  //SD20220329 - only check instances of vasp with the same PPID as the monitor
   string soliloquy=XPID+"VASP_instance_running():";
-  //this needs to become more complicated as we add options other than --kill_vasp_all
-  if(XHOST.vflag_control.flag("MONITOR_VASP") && XHOST.vflag_control.flag("KILL_VASP_ALL")==false){
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a targeted kill command for VASP not available yet: try --kill_vasp_all",_INPUT_ILLEGAL_);
-  }
-  return aurostd::ProcessRunning(vasp_bin);
+  string ppid = aurostd::utype2string(XHOST.PPID);
+  return aurostd::ProcessRunning(vasp_bin,ppid);
 }
 
 // ***************************************************************************
@@ -2303,38 +2304,34 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
     }
 
     if(kill_vasp){
-      if(XHOST.vflag_control.flag("KILL_VASP_ALL")){
-        vasp_running=VASP_instance_running(vasp_bin);
-        if(vasp_running){
-          //special case for MEMORY, the error will be triggered in the --monitor_vasp instance, and not in the --run one
-          //so write out "AFLOW ERROR: AFLOW_MEMORY" so it gets caught in the --run instance
-          if(xwarning.flag("MEMORY")){
-            memory_string=" "+string(AFLOW_MEMORY_TAG); //pre-pending space to match formatting
-            if(aurostd::GetMemoryUsagePercentage(usage_percentage_ram,usage_percentage_swap)){
-              memory_string+=" ("+aurostd::utype2string(usage_percentage_ram,2,FIXED_STREAM)+"% ram usage,"+aurostd::utype2string(usage_percentage_swap,2,FIXED_STREAM)+"% swap usage)";  //CO20210315 - use fixed stream here, since we'll have two sig figs before decimal, and two after (99.99%)
-            }
-            memory_string+="\n";
-            aurostd::string2file(memory_string,xvasp.Directory+"/"+DEFAULT_VASP_OUT,"APPEND");
+      vasp_running=VASP_instance_running(vasp_bin);
+      if(vasp_running){
+        //special case for MEMORY, the error will be triggered in the --monitor_vasp instance, and not in the --run one
+        //so write out "AFLOW ERROR: AFLOW_MEMORY" so it gets caught in the --run instance
+        if(xwarning.flag("MEMORY")){
+          memory_string=" "+string(AFLOW_MEMORY_TAG); //pre-pending space to match formatting
+          if(aurostd::GetMemoryUsagePercentage(usage_percentage_ram,usage_percentage_swap)){
+            memory_string+=" ("+aurostd::utype2string(usage_percentage_ram,2,FIXED_STREAM)+"% ram usage,"+aurostd::utype2string(usage_percentage_swap,2,FIXED_STREAM)+"% swap usage)";  //CO20210315 - use fixed stream here, since we'll have two sig figs before decimal, and two after (99.99%)
           }
-          //write BEFORE issuing the kill, the other instance of aflow will start to act as soon as the process is dead
-          message << "issuing kill command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-          if(0){  //super debug
-            string output_syscall="";
-            vector<string> vpids=aurostd::ProcessPIDs(vasp_bin,output_syscall);
-            message << "output_syscall=";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-            message << output_syscall;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
-            message << "PIDs2kill="+aurostd::joinWDelimiter(vpids,",");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-          }
-          aurostd::ProcessKill(vasp_bin);
-        }else{
-          message << "\""+vasp_bin+"\" has died before the kill command could be issued";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+          memory_string+="\n";
+          aurostd::string2file(memory_string,xvasp.Directory+"/"+DEFAULT_VASP_OUT,"APPEND");
         }
-        xmonitor.clear(); //new run, clear IGNORE_WARNINGS
-        message << "sleeping for " << sleep_seconds_afterkill << " seconds after kill command";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-        aurostd::Sleep(sleep_seconds_afterkill); //there are two aflow instances. the aflow-monitor should sleep at least a minute, as (in the worst case) aflow-vasp needs 15-30 seconds to sleep while it waits for an incomplete OUTCAR to finish writing. you don't want aflow-vasp to pick up AFTER aflow-monitor.
-      }else{  //to be developed
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a targeted kill command for VASP not available yet: try --kill_vasp_all",_INPUT_ILLEGAL_);
+        //write BEFORE issuing the kill, the other instance of aflow will start to act as soon as the process is dead
+        message << "issuing kill command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+        if(0){  //super debug
+          string output_syscall="";
+          vector<string> vpids=aurostd::ProcessPIDs(vasp_bin,output_syscall);
+          message << "output_syscall=";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+          message << output_syscall;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
+          message << "PIDs2kill="+aurostd::joinWDelimiter(vpids,",");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+        }
+        aurostd::ProcessKill(vasp_bin);
+      }else{
+        message << "\""+vasp_bin+"\" has died before the kill command could be issued";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       }
+      xmonitor.clear(); //new run, clear IGNORE_WARNINGS
+      message << "sleeping for " << sleep_seconds_afterkill << " seconds after kill command";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      aurostd::Sleep(sleep_seconds_afterkill); //there are two aflow instances. the aflow-monitor should sleep at least a minute, as (in the worst case) aflow-vasp needs 15-30 seconds to sleep while it waits for an incomplete OUTCAR to finish writing. you don't want aflow-vasp to pick up AFTER aflow-monitor.
     }
 
     if(aurostd::EFileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_END_OUT)){break;}
