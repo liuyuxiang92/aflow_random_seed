@@ -226,7 +226,7 @@ namespace aurostd {
     // in HTTP1.1 data is mostly sent in chunks
     if (isChunked) {
       size_t chuck_length = 0;
-      while (!response.empty() and chunk_length_octet != "0") {
+      while (!response.empty() && chunk_length_octet != "0") {
         pos_newline_border = response.find(delimiter);
         chunk_length_octet = response.substr(0, pos_newline_border);
         response.erase(0, pos_newline_border + offset);
@@ -459,7 +459,7 @@ namespace aurostd {
     int number_of_tries = 0;
     bool success = false;
 
-    while (status_code != 200 and number_of_tries < max_number_of_tries) {
+    while (status_code != 200 && number_of_tries < max_number_of_tries) {
       // read server response
       success = httpGetResponse(url, response);
       number_of_tries += 1;
