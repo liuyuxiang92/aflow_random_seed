@@ -31,7 +31,7 @@
 #define         DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE      XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE")
 #define AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_SERVER       string("aflowlib.duke.edu")
 #define         DEFAULT_ENTRY_LOADER_AFLUX_SERVER       XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_AFLUX_SERVER")
-#define AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_PATH         string("/API/aflux/v1.0/")
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_PATH         string("/API/aflux/")
 #define         DEFAULT_ENTRY_LOADER_AFLUX_PATH         XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_AFLUX_PATH")
 #define AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_SERVER     string("aflowlib.duke.edu")
 #define         DEFAULT_ENTRY_LOADER_RESTAPI_SERVER     XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_RESTAPI_SERVER")

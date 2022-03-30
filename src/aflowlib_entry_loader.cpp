@@ -90,6 +90,7 @@ namespace aflowlib {
     m_entries_layered_map = std::make_shared<std::map<short,
                                              std::map<std::string,
                                              std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>>>();
+    selectSource();
   }
 
   /// @brief clean a EntryLoader object
