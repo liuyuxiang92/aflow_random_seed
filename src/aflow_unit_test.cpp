@@ -1408,7 +1408,6 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
   stringstream check_description;
   uint passed_checks = 0;
   string check_function = "";
-  uint check_num = 0;
 
   std::string test_alloy = "MnPdPt";
   bool recursive = false;
@@ -1417,7 +1416,7 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
   xstructure test_structure;
 
 
-  size_t expected = 0;
+  size_t expected_size_t = 0;
   std::vector<std::string> test_AUIDs = {
       "aflow:2de63b1ebe0a1a83",
       "4d8cf7edb50d1901",
@@ -1458,15 +1457,14 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
   // Check | load alloys
   for (std::map<std::string, aflowlib::EntryLoader::Source>::iterator source = test_sources.begin(); source != test_sources.end(); source++) {
     aurostd::StringstreamClean(check_description);
-    check_num++;
     check_function = "EntryLoader::loadAlloy()";
     if (source->first == "RESTAPI" || source->first == "RESTAPI_RAW") recursive = false;
     else recursive = true;
     check_description << source->first << " - " << test_alloy;
     if (recursive) {
       check_description << " - recursive";
-      expected = 2500;
-    } else expected = 90;
+      expected_size_t = 2500;
+    } else expected_size_t = 90;
     el.clear();
     el.m_out_silent = true;
     {
@@ -1476,7 +1474,7 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
         long double duration = aurostd::get_delta_seconds(start);
         check_description << " | speed " << el.m_entries_flat->size() / duration << " entries/s; "
                           << el.m_entries_flat->size() << " entries";
-        check((expected < el.m_entries_flat->size()), el.m_entries_flat->size(), expected, check_function,
+        check((expected_size_t < el.m_entries_flat->size()), el.m_entries_flat->size(), expected_size_t, check_function,
               check_description.str(), passed_checks, results);
       } else {
         check_description << " | failed to load " << source->first;
@@ -1490,10 +1488,9 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
 
   for (std::map<std::string, aflowlib::EntryLoader::Source>::iterator source = short_test_sources.begin(); source != short_test_sources.end(); source++) {
     aurostd::StringstreamClean(check_description);
-    check_num++;
     check_function = "EntryLoader::loadAUID()";
     check_description << source->first << " + xstructure";
-    expected = 6;
+    expected_size_t = 6;
     el.clear();
     el.m_out_silent = true;
     el.m_xstructure_original = true;
@@ -1508,7 +1505,7 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
       long double duration = aurostd::get_delta_seconds(start);
       check_description << " | speed " << el.m_entries_flat->size() / duration  << " entries/s; "
                         << el.m_entries_flat->size() << " entries";
-      check_equal(el.m_entries_flat->size(), expected, check_function,
+      check_equal(el.m_entries_flat->size(), expected_size_t, check_function,
                   check_description.str(), passed_checks, results);
     } else {
       check_description << " | failed to load " << source->first;
@@ -1519,7 +1516,6 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
   // ---------------------------------------------------------------------------
   // Check | load xstructure from file
   aurostd::StringstreamClean(check_description);
-  check_num++;
   check_function = "EntryLoader::loadXstructureFile()";
   el.loadXstructureFile(test_entry, test_structure);
   check_description << "load xstructure extern";
@@ -1531,10 +1527,9 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
 
   for (std::map<std::string, aflowlib::EntryLoader::Source>::iterator source = short_test_sources.begin(); source != short_test_sources.end(); source++) {
     aurostd::StringstreamClean(check_description);
-    check_num++;
     check_function = "EntryLoader::loadAURL()";
     check_description << source->first;
-    expected = 6;
+    expected_size_t = 6;
     el.clear();
     el.m_out_silent = true;
     {
@@ -1545,7 +1540,7 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
         long double duration = aurostd::get_delta_seconds(start);
         check_description << " | speed " << el.m_entries_flat->size() / duration << " entries/s; "
                           << el.m_entries_flat->size() << " entries";
-        check_equal(el.m_entries_flat->size(), expected, check_function,
+        check_equal(el.m_entries_flat->size(), expected_size_t, check_function,
                     check_description.str(), passed_checks, results);
       } else {
         check_description << " | failed to load " << source->first;
