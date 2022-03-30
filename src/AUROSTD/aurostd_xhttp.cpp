@@ -172,7 +172,7 @@ namespace aurostd {
                         std::string &output, std::map <std::string, std::string> &header) {
 
     string soliloquy = XPID + "aurostd::httpParseResponse():";
-
+    bool LDEBUG = (false || XHOST.DEBUG || _DEBUG_XHTTP_);
     std::string header_raw = "";
     int status_code = -1;
     std::string status_line = "";
@@ -231,12 +231,11 @@ namespace aurostd {
         chunk_length_octet = response.substr(0, border);
         response.erase(0, border + offset);
         if (chunk_length_octet != "0") {
-          chuck_length = std::stoi(chunk_length_octet, 0, 16);
           chuck_length = aurostd::string2utype<uint>(chunk_length_octet, 16);
           full_request_length += chuck_length;
           // sanity check one - every chunk should end with \r\n
           if (response.substr(chuck_length, offset) != delimiter) {
-            cerr << soliloquy << " Chunk did not end in `\\r\\n`." << endl;
+            if (LDEBUG) cerr << soliloquy << " Chunk did not end in `\\r\\n`." << endl;
             return -1;
           }
           output += response.substr(0, chuck_length);
@@ -245,7 +244,7 @@ namespace aurostd {
       }
       // sanity check two - the constructed string should have the length reported by the server
       if (full_request_length != output.length()) {
-        cerr << soliloquy << " Final string size is different from the chunk size sum." << endl;
+        if (LDEBUG) cerr << soliloquy << " Final string size is different from the chunk size sum." << endl;
         return -1;
       }
       return status_code;
@@ -367,21 +366,21 @@ namespace aurostd {
     // get the TCP protocol entry
     protocol_entry = getprotobyname("tcp");
     if (protocol_entry == nullptr) {
-      cerr << soliloquy << " Failed to get TCP protocol entry!" << endl;
+      if (LDEBUG) cerr << soliloquy << " Failed to get TCP protocol entry!" << endl;
       return false;
     }
 
     // open the socket
     socket_file_descriptor = socket(AF_INET, SOCK_STREAM, protocol_entry->p_proto);
     if (socket_file_descriptor == -1) {
-      cerr << soliloquy << " Failed to open socket!" << endl;
+      if (LDEBUG) cerr << soliloquy << " Failed to open socket!" << endl;
       return false;
     }
 
     // find the IP of the host
     host_entry = gethostbyname(url.host.c_str());
     if (host_entry == nullptr) {
-      cerr << soliloquy << " Failed to find information on '" << url.host << "'!" << endl;
+      if (LDEBUG) cerr << soliloquy << " Failed to find information on '" << url.host << "'!" << endl;
       return false;
     }
 
@@ -391,14 +390,14 @@ namespace aurostd {
     socket_entry.sin_addr.s_addr = ip_address;
     socket_entry.sin_family = AF_INET;
     if (url.port > 65535) {
-      cerr << soliloquy << " Failed to connect to " << url.host << " as port is out of range (" << url.port << ">65535)" << endl;
+      if (LDEBUG) cerr << soliloquy << " Failed to connect to " << url.host << " as port is out of range (" << url.port << ">65535)" << endl;
       return false;
     }
     socket_entry.sin_port = htons((short) url.port);
 
     // start connection
     if (connect(socket_file_descriptor, (struct sockaddr *) &socket_entry, sizeof(socket_entry)) == -1) {
-      cerr << soliloquy << " Failed to connect to " << url.host << " (" << ip_address_str << ":" << url.port << ")" << endl;
+      if (LDEBUG) cerr << soliloquy << " Failed to connect to " << url.host << " (" << ip_address_str << ":" << url.port << ")" << endl;
       return false;
     }
     if (LDEBUG)
@@ -409,8 +408,7 @@ namespace aurostd {
     while (nbytes_total < request_len) {
       nbytes_last = write(socket_file_descriptor, request + nbytes_total, request_len - nbytes_total);
       if (nbytes_last == -1) {
-        cerr << soliloquy << " Failed to send the request to " << url.host << "( " << ip_address_str << ":" << url.port
-             << ")" << endl;
+        if (LDEBUG) cerr << soliloquy << " Failed to send the request to " << url.host << "( " << ip_address_str << ":" << url.port << ")" << endl;
         return false;
       }
       nbytes_total += nbytes_last;
@@ -429,8 +427,7 @@ namespace aurostd {
     if (LDEBUG) cerr << soliloquy << " Finished reading response (" << loaded_bytes << " bytes)" << endl;
 
     if (nbytes_total == -1) {
-      cerr << soliloquy << " Failed to read response from " << url.host << "( " << ip_address_str << ":" << url.port
-           << ")" << endl;
+      if (LDEBUG) cerr << soliloquy << " Failed to read response from " << url.host << "( " << ip_address_str << ":" << url.port << ")" << endl;
       response.clear();
       return false;
     }
@@ -475,16 +472,16 @@ namespace aurostd {
             if (LDEBUG) cerr << soliloquy << " Redirected to '" << header["location"] << "'" << endl;
           }
           else {
-            cerr << soliloquy << " GET request failed due to a redirect without location." << endl;
+            if (LDEBUG) cerr << soliloquy << " GET request failed due to a redirect without location." << endl;
             return;
           }
         }
       } else if (number_of_tries < max_number_of_tries) {
-        cerr << soliloquy << " Retry failed GET in 5s (" << number_of_tries << " of " << max_number_of_tries << ")" << endl;
+        if (LDEBUG) cerr << soliloquy << " Retry failed GET in 5s (" << number_of_tries << " of " << max_number_of_tries << ")" << endl;
         aurostd::Sleep(5);
         continue;
       } else {
-        cerr << soliloquy << " GET request failed after " << number_of_tries << " tries." << endl;
+        if (LDEBUG) cerr << soliloquy << " GET request failed after " << number_of_tries << " tries." << endl;
         return;
       }
     }

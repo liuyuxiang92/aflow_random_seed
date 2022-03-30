@@ -25,6 +25,7 @@
         -- new EntryLoader with automatic source selection (HE)
         -- improved speed of aurostd::file2string (HE)
         -- added const strings variant of aurostd::StringSubst (HE)
+        -- added non decimal bases to aurostd::string2utype (HE)
 3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)
