@@ -116,12 +116,12 @@ namespace aurostd {
     }
 
     if (LDEBUG) {
-      cerr << soliloquy << " split up URL: " << endl;
-      cerr << "    " << "scheme: " << result.scheme << std::endl;
-      cerr << "    " << "user: " << result.user << std::endl;
-      cerr << "    " << "host: " << result.host << std::endl;
-      cerr << "    " << "port: " << result.port << std::endl;
-      cerr << "    " << "path: " << result.path << std::endl;
+      cerr << soliloquy << " split up URL: " << "\n";
+      cerr << "    " << "scheme: " << result.scheme << "\n";
+      cerr << "    " << "user: " << result.user << "\n";
+      cerr << "    " << "host: " << result.host << "\n";
+      cerr << "    " << "port: " << result.port << "\n";
+      cerr << "    " << "path: " << result.path << "\n";
       cerr << "    " << "query: " << result.query << std::endl;
     }
 
@@ -320,7 +320,7 @@ namespace aurostd {
       to_replace = work_str[border];
       if (to_replace<0) to_replace+=256;
       output << work_str.substr(0, border) << "%" << std::uppercase << std::hex << std::setfill('0') << std::setw(2) << to_replace;
-      if (LDEBUG) cerr << " Match '" << work_str[border] << "' (%" << std::uppercase << std::hex << std::setfill('0') << to_replace << std::dec << ")" << std::endl; // at " << border << endl;
+      if (LDEBUG) cerr << " Match '" << work_str[border] << "' (%" << std::uppercase << std::hex << std::setfill('0') << to_replace << std::dec << ")" << std::endl;
       work_str.erase(0,border+1);
     }
     return output.str();
