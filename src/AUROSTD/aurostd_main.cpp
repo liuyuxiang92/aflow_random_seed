@@ -1778,47 +1778,46 @@ namespace aurostd {
   vector<string> ProcessPIDs(const string& process,const string& pgid,string& output_syscall,bool user_specific){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::ProcessPIDs():";
-    string ps_opts=" uid,pgid,pid,etime,pcpu,pmem,args"; // user-defined options, since just "u" or "j" might not be good enough
     if(LDEBUG){cerr << soliloquy << " looking for process=" << process << endl;}
+    if(!aurostd::IsCommandAvailable("ps") || !aurostd::IsCommandAvailable("grep")) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"\"pgrep\"-type command not found",_INPUT_ILLEGAL_);
+    }
+    string ps_opts=" uid,pgid,pid,etime,pcpu,pmem,args"; // user-defined options, since just "u" or "j" might not be good enough
     string command="ps";
     vector<string> vlines,vtokens,vpids;
     uint i=0,j=0;
-    if(aurostd::IsCommandAvailable("ps") && aurostd::IsCommandAvailable("grep")) {
-      aurostd::string2tokens(ps_opts,vtokens,",");
-      uint nopts = vtokens.size();
-      string command_grep="grep "+process;
-      if(user_specific){command+=" xo";}
-      else{command+=" axo";}
-      command+=ps_opts;
-      if(!aurostd::execute2string(command+" > /dev/null",stderr_fsio).empty()) {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown options in \"ps\"",_INPUT_ILLEGAL_);
-      }
-      command+=" 2>/dev/null | "+command_grep+" 2> /dev/null";
-      if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
-      string output=output_syscall=aurostd::execute2string(command);
-      if(LDEBUG){cerr << soliloquy << " ps/grep output:" << endl << output << endl;}
-      aurostd::string2vectorstring(output,vlines);
-      for(i=0;i<vlines.size();i++){
-        aurostd::string2tokens(vlines[i],vtokens," ");
-        if(vtokens.size()<nopts){continue;} // set by ps_opts
-        const string& pid=vtokens[2]; // set by ps_opts
-        if (vtokens[1]==pgid) { // set by ps_opts
-          string proc=vtokens[nopts-1]; // set by ps_opts
-          for(j=nopts;j<vtokens.size();j++){proc+=" "+vtokens[j];} // set by ps_opts
-          if(LDEBUG){cerr << soliloquy << " proc[i=" << i << "]=\"" << proc << "\"" << endl;}
-          if(proc.find(process)==string::npos){continue;}
-          if(proc.find(command)!=string::npos){continue;}
-          if(proc==command_grep){continue;}
-          vpids.push_back(pid);
-        }
-      }
-      if(LDEBUG){
-        cerr << soliloquy << " vpids=" << aurostd::joinWDelimiter(vpids,",") << endl;
-        cerr << soliloquy << " vpids.empty()=" << vpids.empty() << endl;
-      }
-      return vpids;
+    aurostd::string2tokens(ps_opts,vtokens,",");
+    uint nopts = vtokens.size();
+    string command_grep="grep "+process;
+    if(user_specific){command+=" xo";}
+    else{command+=" axo";}
+    command+=ps_opts;
+    if(!aurostd::execute2string(command+" > /dev/null",stderr_fsio).empty()) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown options in \"ps\"",_INPUT_ILLEGAL_);
     }
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"\"pgrep\"-type command not found",_INPUT_ILLEGAL_);
+    command+=" 2>/dev/null | "+command_grep+" 2> /dev/null";
+    if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
+    string output=output_syscall=aurostd::execute2string(command);
+    if(LDEBUG){cerr << soliloquy << " ps/grep output:" << endl << output << endl;}
+    aurostd::string2vectorstring(output,vlines);
+    for(i=0;i<vlines.size();i++){
+      aurostd::string2tokens(vlines[i],vtokens," ");
+      if(vtokens.size()<nopts){continue;} // set by ps_opts
+      const string& pid=vtokens[2]; // set by ps_opts
+      if (vtokens[1]==pgid) { // set by ps_opts
+        string proc=vtokens[nopts-1]; // set by ps_opts
+        for(j=nopts;j<vtokens.size();j++){proc+=" "+vtokens[j];} // set by ps_opts
+        if(LDEBUG){cerr << soliloquy << " proc[i=" << i << "]=\"" << proc << "\"" << endl;}
+        if(proc.find(process)==string::npos){continue;}
+        if(proc.find(command)!=string::npos){continue;}
+        if(proc==command_grep){continue;}
+        vpids.push_back(pid);
+      }
+    }
+    if(LDEBUG){
+      cerr << soliloquy << " vpids=" << aurostd::joinWDelimiter(vpids,",") << endl;
+      cerr << soliloquy << " vpids.empty()=" << vpids.empty() << endl;
+    }
     return vpids;
   }
 
@@ -1893,21 +1892,23 @@ namespace aurostd {
   void ProcessKill(const string& process,const string& pgid,bool user_specific,bool sigkill){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::ProcessKill():";
+    if(!aurostd::IsCommandAvailable("kill")) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"\"kill\" command not found",_INPUT_ILLEGAL_);
+    }
     string command="kill",output_syscall="";
     bool process_killed=(!aurostd::ProcessRunning(process,pgid,user_specific));
     uint sleep_seconds=5; //2 seconds is too few
     if(!process_killed){
-      if(aurostd::IsCommandAvailable("kill")) {
-        vector<string> vpids=aurostd::ProcessPIDs(process,pgid,output_syscall,user_specific);
-        if(vpids.empty()){process_killed=true;}
-        else{
-          if(sigkill){command+=" -9";}
-          command+=" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
-          if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
-          aurostd::execute(command);
-          aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,pgid,user_specific));
-        }
+      vector<string> vpids=aurostd::ProcessPIDs(process,pgid,output_syscall,user_specific);
+      if(vpids.empty()){process_killed=true;}
+      else{
+        if(sigkill){command+=" -9";}
+        command+=" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
+        if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
+        aurostd::execute(command);
+        aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,pgid,user_specific));
       }
+      
     }
     //can add checks here if the process wasn't killed completely
     if(!process_killed){

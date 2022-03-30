@@ -5461,9 +5461,16 @@ namespace KBIN {
         for(uint i=0;i<vintel_paths.size();i++){
           if(aurostd::FileExist("/bin/bash") && aurostd::FileExist(vintel_paths[i])){
             command="";
-            command+="/bin/bash -c \"source "+vintel_paths[i]+" intel64; ";
-            if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
-            command+=binfile+" > /dev/null 2>&1\"";  //ME20200610 - no output from vasp  //CO20210315 - source only works in bash
+            if(aurostd::substring2bool(vintel_paths[i],".csh")){
+              command+="/bin/tcsh -c \"source "+vintel_paths[i]+" intel64; (";
+              if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
+              command+=binfile+" > /dev/null) >& /dev/null\""; //SD20220330 - source works in (t)csh
+            }
+            else{
+              command+="/bin/bash -c \"source "+vintel_paths[i]+" intel64; ";
+              if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
+              command+=binfile+" > /dev/null 2>&1\"";  //ME20200610 - no output from vasp  //CO20210315 - source only works in bash
+            }
             if(LDEBUG){cerr << soliloquy << " running command: \"" << command << "\"" << endl;}
             aurostd::execute(command);
             if(LDEBUG){cerr << soliloquy << " ls[3]=" << endl << aurostd::execute2string("ls") << endl;}

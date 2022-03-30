@@ -123,17 +123,15 @@ namespace init {
     // IMMEDIATELY GET PIDS
     // get PGID
     XHOST.PGID=getpgrp();    // PGID number
-    XHOST.ostrPGID.clear(); // PGID as stringstream
-    XHOST.ostrPGID.str(std::string()); // PGID as stringstream
+    aurostd::StringstreamClean(XHOST.ostrPGID);
     XHOST.ostrPGID<<XHOST.PGID;  // PGID as stringstream
     XHOST.sPGID="";
     XHOST.showPGID=aurostd::args2flag(argv,cmds,"--showPGID");
-    if(XHOST.showPID) XHOST.sPID="[PGID="+aurostd::PaddedPRE(XHOST.ostrPGID.str(),7)+"] "; // PGID as a comment
+    if(XHOST.showPID) XHOST.sPGID="[PGID="+aurostd::PaddedPRE(XHOST.ostrPGID.str(),7)+"] "; // PGID as a comment
 
     // get PID
     XHOST.PID=getpid();    // PID number
-    XHOST.ostrPID.clear(); // PID as stringstream
-    XHOST.ostrPID.str(std::string()); // PID as stringstream
+    aurostd::StringstreamClean(XHOST.ostrPID);
     XHOST.ostrPID<<XHOST.PID;  // PID as stringstream
     XHOST.sPID="";
     XHOST.showPID=aurostd::args2flag(argv,cmds,"--showPID");
@@ -142,8 +140,7 @@ namespace init {
 
     // get TID
     XHOST.TID=getpid();    // TID number
-    XHOST.ostrTID.clear(); // TID as stringstream
-    XHOST.ostrTID.str(std::string()); // TID as stringstream
+    aurostd::StringstreamClean(XHOST.ostrTID);
     XHOST.ostrTID<<XHOST.TID;  // TID as stringstream
     XHOST.sTID="";
     XHOST.showTID=aurostd::args2flag(argv,cmds,"--showTID");
@@ -2032,11 +2029,16 @@ void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed
 // AFLOW_VASP_instance_running
 // ***************************************************************************
 bool AFLOW_VASP_instance_running(){ //CO20210315
+  string soliloquy=XPID+"AFLOW_VASP_instance_running():";
+  return (aurostd::ProcessPIDs("aflow").size()>1);  //check that the instance of aflow running vasp is running
+}
+bool AFLOW_VASP_instance_running(const string& pgid){
   //SD20220329 - only check instances of aflow with the same PGID as the monitor
   string soliloquy=XPID+"AFLOW_VASP_instance_running():";
-  string pgid = aurostd::utype2string(XHOST.PGID),output_syscall="";
+  string output_syscall="";
   return (aurostd::ProcessPIDs("aflow",pgid,output_syscall).size()>1);  //check that the instance of aflow running vasp is running
 }
+
 
 // ***************************************************************************
 // AFLOW_MONITOR_instance_running
@@ -2050,9 +2052,12 @@ bool AFLOW_MONITOR_instance_running(const _aflags& aflags){ //CO20210315
 // VASP_instance_running
 // ***************************************************************************
 bool VASP_instance_running(const string& vasp_bin){ //CO20210315
+  string soliloquy=XPID+"VASP_instance_running():";
+  return aurostd::ProcessRunning(vasp_bin);
+}
+bool VASP_instance_running(const string& vasp_bin,const string& pgid){
   //SD20220329 - only check instances of vasp with the same PGID as the monitor
   string soliloquy=XPID+"VASP_instance_running():";
-  string pgid = aurostd::utype2string(XHOST.PGID);
   return aurostd::ProcessRunning(vasp_bin,pgid);
 }
 
@@ -2182,6 +2187,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   uint n_not_running=0;
   uint sleep_seconds=SECONDS_SLEEP_VASP_MONITOR;
   uint sleep_seconds_afterkill=sleep_seconds;
+  string pgid=aurostd::utype2string(XHOST.PGID);
   aurostd::xoption xmessage,xwarning,xmonitor,xfixed;
   bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP);
   bool vasp_running=false;
@@ -2202,7 +2208,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   string memory_string="";
   double usage_percentage_ram=0.0,usage_percentage_swap=0.0;
 
-  while((AFLOW_VASP_instance_running() || (nloop++)<NCOUNTS_WAIT_MONITOR) && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
+  while((AFLOW_VASP_instance_running(pgid) || (nloop++)<NCOUNTS_WAIT_MONITOR) && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
     GetVASPBinaryFromLOCK(xvasp.Directory,vasp_bin,ncpus);
     vasp_bin=aurostd::basename(vasp_bin); //remove directory stuff
     if(vasp_bin.empty()){
@@ -2216,12 +2222,12 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
 
   nloop=0;
   n_not_running=0;
-  while(AFLOW_VASP_instance_running() || n_not_running<NCOUNTS_WAIT_MONITOR){  //wait no more than 10 minutes for vasp bin to start up (again)
+  while(AFLOW_VASP_instance_running(pgid) || n_not_running<NCOUNTS_WAIT_MONITOR){  //wait no more than 10 minutes for vasp bin to start up (again)
     if(!aurostd::FileExist(xvasp.Directory+"/"+_AFLOWLOCK_)){break;} //we needed it above to get the vasp_bin
     if(aurostd::EFileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_END_OUT)){break;}  //check before continue below
     if(aurostd::EFileExist(xvasp.Directory+"/"+_STOPFLOW_)){aurostd::RemoveFile(xvasp.Directory+"/"+_STOPFLOW_);break;} //check before continue below
 
-    vasp_running=VASP_instance_running(vasp_bin);
+    vasp_running=VASP_instance_running(vasp_bin,pgid);
     if(VERBOSE){
       message << "nloop=" << (nloop++);pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       message << "program \"" << vasp_bin << "\" is " << (vasp_running?"":"NOT ") << "running";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
@@ -2304,8 +2310,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
     }
 
     if(kill_vasp){
-      string pgid=aurostd::utype2string(XHOST.PGID);
-      vasp_running=VASP_instance_running(vasp_bin);
+      vasp_running=VASP_instance_running(vasp_bin,pgid);
       if(vasp_running){
         //special case for MEMORY, the error will be triggered in the --monitor_vasp instance, and not in the --run one
         //so write out "AFLOW ERROR: AFLOW_MEMORY" so it gets caught in the --run instance
