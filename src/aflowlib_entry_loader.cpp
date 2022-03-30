@@ -29,7 +29,7 @@ namespace aflowlib {
   ///   aflowlib::EntryLoader el;
   ///   el.m_out_debug = true; // change the behavior of the EntryLoader class
   ///   el.loadAlloy("NiCa"); // the load functions can be called multiple times
-  ///   el.loadAUID(aflow:7dd846bc04c764e8); // no duplicates will be stored
+  ///   el.loadAUID("aflow:7dd846bc04c764e8"); // no duplicates will be stored
   ///   el.getEntriesViewFlat(results);
   /// }
   /// for (std::shared_ptr<aflowlib::_aflowlib_entry>> & entry : results) std::cout << entry->auid << std::endl;
@@ -226,7 +226,7 @@ namespace aflowlib {
         std::vector <std::string> queries;
         for (std::vector<std::string>::const_iterator AUID_single = clean_AUID.begin(); AUID_single != clean_AUID.end(); AUID_single++) {
           std::string rest_query = "AUID/aflow:";
-          for (uint part = 0; part < 8; part++) rest_query += AUID_single->substr(6 + part * 2, 2) + "/";
+          for (uint part = 6; part <= 20; part+= 2) rest_query += AUID_single->substr(part, 2) + "/";
           rest_query += "WEB/";
           queries.push_back(rest_query);
         }
@@ -239,7 +239,7 @@ namespace aflowlib {
         std::vector <std::string> files;
         for (std::vector<std::string>::const_iterator AUID_single = clean_AUID.begin(); AUID_single != clean_AUID.end(); AUID_single++) {
           std::string file_path = m_filesystem_path + "AUID/aflow:";
-          for (uint part = 0; part < 8; part++) file_path += AUID_single->substr(6 + part * 2, 2) + "/";
+          for (uint part = 6; part <= 20; part+= 2) file_path += AUID_single->substr(part, 2) + "/";
           file_path += m_filesystem_collection + "/" + m_filesystem_outfile;
           files.push_back(file_path);
         }
@@ -252,7 +252,7 @@ namespace aflowlib {
     }
   }
 
-  /// @brief load a single entry from a AURL
+  /// @brief load a single entry from an AURL
   /// @param AURL AFLOW unique URL
   /// @note following AURLs would be equivalent:
   /// @note `aflowlib.duke.edu:AFLOWDATA/LIB2_RAW/Ca_svCu_pv/138`
@@ -1140,7 +1140,7 @@ namespace aflowlib {
     FTS *tree = fts_open(paths, FTS_PHYSICAL | FTS_NOCHDIR | FTS_XDEV, nullptr);
     FTSENT *node;
     if (tree == nullptr) {
-      m_logger_message << "Failed to initialized the file tree used to search for alloys!";
+      m_logger_message << "Failed to initialize the file tree used to search for alloys!";
       outHardError(__func__,__LINE__,_FILE_ERROR_);
       return;
     }
@@ -1294,7 +1294,6 @@ namespace aflowlib {
   /// @brief map different AUID styles to a default
   /// @param AUID AUID to clean
   /// @return `false` if AUID is not valid
-  /// @note AUID is not probably validated
   /// @note the AUID is cleaned in place
   bool EntryLoader::cleanAUID(std::string & AUID) {
     if (AUID.substr(0, 5) == "auid:") AUID="aflow:" + AUID.substr(5);
@@ -1384,10 +1383,6 @@ namespace aflowlib {
     }
     return poscar;
   }
-
-  // TODO why _AFLOW_FILE_NAME_ and not __FILE__?
-  // https://www.cprogramming.com/reference/preprocessor/__FILE__.html
-  // also the use of __func__ and __LINE__ would be useful
 
   void EntryLoader::outInfo(const std::string & function_name) {
     if ((!m_out_silent || m_out_debug) && !m_out_super_silent){
