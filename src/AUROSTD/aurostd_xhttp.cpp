@@ -21,8 +21,8 @@ namespace aurostd {
   {
     char ip_str[20];
     unsigned char bytes[4];
-    // move the 4 bytes into the lowest byte and isolate it with &0xFF
-    bytes[0] = ip & 0xFF; // technical (ip >> 0), but its already the lowest byte
+    // move the 4 bytes into the lowest byte and mask it with &0xFF
+    bytes[0] = ip & 0xFF; // technically (ip >> 0), but it's already the lowest byte
     bytes[1] = (ip >> 8) & 0xFF;
     bytes[2] = (ip >> 16) & 0xFF;
     bytes[3] = (ip >> 24) & 0xFF;
@@ -40,12 +40,12 @@ namespace aurostd {
     return url;
   }
 
-  /// @brief split an URL string into its parts
+  /// @brief split a URL string into its parts
   /// @param url url string
   /// @param strict if set, a full URL needs a schema (http://, https://), else it is interpreted as path
   /// @return URL struct
   ///
-  /// While a `user` can be extracted by this parser `user:password` is not supported, and should not be added!
+  /// While a `user` can be extracted by this parser, `user:password` is not supported and should not be added!
   /// https://datatracker.ietf.org/doc/html/rfc3986#section-3.2.1
   URL httpParseURL(const std::string &url, const bool strict) {
 
@@ -116,7 +116,7 @@ namespace aurostd {
     }
 
     if (LDEBUG) {
-      cerr << soliloquy << " split up URL: " << "\n";
+      cerr << soliloquy << " split up URL:" << "\n";
       cerr << "    " << "scheme: " << result.scheme << "\n";
       cerr << "    " << "user: " << result.user << "\n";
       cerr << "    " << "host: " << result.host << "\n";
@@ -145,7 +145,7 @@ namespace aurostd {
       new_url.host = base_url.host;
       new_url.user = base_url.user;
       // if relative path add new content behind the last '/'
-      if (new_url.path.at(0) != '/') {
+      if (new_url.path[0] != '/') {
         int base_split = base_url.path.find_last_of('/');
         new_url.path = base_url.path.substr(0, base_split) + "/" + new_url.path;
       }
@@ -215,7 +215,7 @@ namespace aurostd {
         item = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(header_raw.substr(split + 1, border - split - 1));
         header_raw.erase(0, border + offset);
 
-        // Headers that appear multiple times are equal to a list separated by a comma
+        // Headers that appear multiple times are equal to a list separated by comma
         if (header.find(key) == header.end()) {
           header.emplace(key, item);
         } else {
@@ -224,7 +224,7 @@ namespace aurostd {
       } else { header_raw.clear(); }
     }
 
-    // in HTTP1.1 data is mostly send in chunks
+    // in HTTP1.1 data is mostly sent in chunks
     if (isChunked) {
       while (!response.empty() and chunk_length_octet != "0") {
         border = response.find(delimiter);
