@@ -2187,7 +2187,6 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   uint n_not_running=0;
   uint sleep_seconds=SECONDS_SLEEP_VASP_MONITOR;
   uint sleep_seconds_afterkill=sleep_seconds;
-  string pgid=XPGID;
   aurostd::xoption xmessage,xwarning,xmonitor,xfixed;
   bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP);
   bool vasp_running=false;
@@ -2208,7 +2207,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   string memory_string="";
   double usage_percentage_ram=0.0,usage_percentage_swap=0.0;
 
-  while((AFLOW_VASP_instance_running(pgid) || (nloop++)<NCOUNTS_WAIT_MONITOR) && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
+  while((AFLOW_VASP_instance_running(XPGID) || (nloop++)<NCOUNTS_WAIT_MONITOR) && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
     GetVASPBinaryFromLOCK(xvasp.Directory,vasp_bin,ncpus);
     vasp_bin=aurostd::basename(vasp_bin); //remove directory stuff
     if(vasp_bin.empty()){
@@ -2222,12 +2221,12 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
 
   nloop=0;
   n_not_running=0;
-  while(AFLOW_VASP_instance_running(pgid) || n_not_running<NCOUNTS_WAIT_MONITOR){  //wait no more than 10 minutes for vasp bin to start up (again)
+  while(AFLOW_VASP_instance_running(XPGID) || n_not_running<NCOUNTS_WAIT_MONITOR){  //wait no more than 10 minutes for vasp bin to start up (again)
     if(!aurostd::FileExist(xvasp.Directory+"/"+_AFLOWLOCK_)){break;} //we needed it above to get the vasp_bin
     if(aurostd::EFileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_END_OUT)){break;}  //check before continue below
     if(aurostd::EFileExist(xvasp.Directory+"/"+_STOPFLOW_)){aurostd::RemoveFile(xvasp.Directory+"/"+_STOPFLOW_);break;} //check before continue below
 
-    vasp_running=VASP_instance_running(vasp_bin,pgid);
+    vasp_running=VASP_instance_running(vasp_bin,XPGID);
     if(VERBOSE){
       message << "nloop=" << (nloop++);pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       message << "program \"" << vasp_bin << "\" is " << (vasp_running?"":"NOT ") << "running";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
@@ -2310,7 +2309,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
     }
 
     if(kill_vasp){
-      vasp_running=VASP_instance_running(vasp_bin,pgid);
+      vasp_running=VASP_instance_running(vasp_bin,XPGID);
       if(vasp_running){
         //special case for MEMORY, the error will be triggered in the --monitor_vasp instance, and not in the --run one
         //so write out "AFLOW ERROR: AFLOW_MEMORY" so it gets caught in the --run instance
@@ -2326,12 +2325,12 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
         message << "issuing kill command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         if(0){  //super debug
           string output_syscall="";
-          vector<string> vpids=aurostd::ProcessPIDs(vasp_bin,pgid,output_syscall);
+          vector<string> vpids=aurostd::ProcessPIDs(vasp_bin,XPGID,output_syscall);
           message << "output_syscall=";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
           message << output_syscall;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
           message << "PIDs2kill="+aurostd::joinWDelimiter(vpids,",");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         }
-        aurostd::ProcessKill(vasp_bin,pgid);
+        aurostd::ProcessKill(vasp_bin,XPGID);
       }else{
         message << "\""+vasp_bin+"\" has died before the kill command could be issued";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       }
