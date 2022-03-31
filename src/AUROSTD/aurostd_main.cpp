@@ -1895,21 +1895,19 @@ namespace aurostd {
     if(!aurostd::IsCommandAvailable("kill")) {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"\"kill\" command not found",_INPUT_ILLEGAL_);
     }
-    string command="kill",output_syscall="";
     bool process_killed=(!aurostd::ProcessRunning(process,pgid,user_specific));
+    if(process_killed){return;}
+    string output_syscall="";
+    vector<string> vpids=aurostd::ProcessPIDs(process,pgid,output_syscall,user_specific);
+    if(vpids.empty()){return;}
+    string command="kill";
     uint sleep_seconds=5; //2 seconds is too few
-    if(!process_killed){
-      vector<string> vpids=aurostd::ProcessPIDs(process,pgid,output_syscall,user_specific);
-      if(vpids.empty()){process_killed=true;}
-      else{
-        if(sigkill){command+=" -9";}
-        command+=" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
-        if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
-        aurostd::execute(command);
-        aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,pgid,user_specific));
-      }
+    if(sigkill){command+=" -9";}
+    command=" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
+    if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
+    aurostd::execute(command);
+    aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,pgid,user_specific));
       
-    }
     //can add checks here if the process wasn't killed completely
     if(!process_killed){
       throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::ProcessKill():","process could not be kill",_RUNTIME_ERROR_);

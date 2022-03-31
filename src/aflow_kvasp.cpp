@@ -5461,7 +5461,8 @@ namespace KBIN {
         for(uint i=0;i<vintel_paths.size();i++){
           if(aurostd::FileExist("/bin/bash") && aurostd::FileExist(vintel_paths[i])){
             command="";
-            if(aurostd::substring2bool(vintel_paths[i],".csh")){
+            // SD20220330 - need to use bash and tsch for sourcing .sh and .csh scripts, respectively
+            if(aurostd::substring2bool(vintel_paths[i],".csh")){ 
               command+="/bin/tcsh -c \"source "+vintel_paths[i]+" intel64; (";
               if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
               command+=binfile+" > /dev/null) >& /dev/null\""; //SD20220330 - source works in (t)csh

@@ -2366,6 +2366,7 @@ string Message(const string& filename,const string& list2print){
   if(aurostd::substring2bool(LIST2PRINT,"GROUP")) strout << " - [group=" << XHOST.group << "]";
   if(aurostd::substring2bool(LIST2PRINT,"HOST") || aurostd::substring2bool(LIST2PRINT,"HOSTNAME") || aurostd::substring2bool(LIST2PRINT,"MACHINE")) strout << " - [host=" << XHOST.hostname << "]";
   if(aurostd::substring2bool(LIST2PRINT,"TEMPERATURE")) if(init::GetTEMP()) for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {strout << (i==0?" - [temp(C)=":"") << XHOST.vTemperatureCore.at(i) << (i<XHOST.vTemperatureCore.size()-1?",":"]");}
+  if(aurostd::substring2bool(LIST2PRINT,"PGID")) strout << " - [PGID=" << XHOST.PGID << "]";  //SD20220330
   if(aurostd::substring2bool(LIST2PRINT,"PID")) strout << " - [PID=" << XHOST.PID << "]";  //CO20200502
   if(aurostd::substring2bool(LIST2PRINT,"TID")) strout << " - [TID=" << XHOST.TID << "]";  //CO20200502
   if(LIST2PRINT.empty() || aurostd::substring2bool(LIST2PRINT,"TIME") || aurostd::substring2bool(LIST2PRINT,"DATE")) strout << " - [date=" << aflow_get_time_string() << "]";   //CO20200624
