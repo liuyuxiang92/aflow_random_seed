@@ -432,6 +432,7 @@ namespace aurostd {
   void RemoveSubStringFirstInPlace(string& str_orig, const string& str_rm) __xprototype;  //CO20190712
   string RemoveSubString(const string& str_orig, const string& str_rm) __xprototype;
   void RemoveSubStringInPlace(string& str_orig, const string& str_rm) __xprototype; //CO20190712
+  double VersionString2Double(const string& version_str); //SD20220331
   vector<string> ProcessPIDs(const string& process,bool user_specific=true); //CO20210315
   vector<string> ProcessPIDs(const string& process,string& output_syscall,bool user_specific=true); //CO20210315
   vector<string> ProcessPIDs(const string& process,const string& pgid,string& output_syscall,bool user_specific=true); //SD20220329

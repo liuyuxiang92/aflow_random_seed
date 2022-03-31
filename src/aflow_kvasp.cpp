@@ -5325,6 +5325,32 @@ namespace KBIN {
 // ***************************************************************************
 
 namespace KBIN {
+  string BIN2VASPVersion(const string& binfile){ //SD20220331
+    bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
+    string soliloquy=XPID+"KBIN::BIN2VASPVersion():";
+    if(!aurostd::IsCommandAvailable("strings")){return "";}
+    string bin_str=aurostd::execute2string("strings "+binfile);
+    vector<string> vlines,tokens;
+    aurostd::string2vectorstring(bin_str,vlines);
+    for(uint iline=0;iline<vlines.size();iline++){
+      if(aurostd::substring2bool(vlines[iline],"vasp.") && aurostd::substring2bool(vlines[iline],"build")){
+        if(LDEBUG){cerr << soliloquy << " FOUND 'vasp.' line" << endl;}
+        aurostd::string2tokens(vlines[iline],tokens," ");
+        for(uint i=0;i<tokens.size();i++){
+          if(tokens[i].find("vasp.")!=string::npos){
+            return tokens[i];
+          }
+        }
+      }
+    }
+    return "";
+  }
+  string BIN2VASPVersionNumber(const string& binfile){  //SD20220331
+    return VASPVersionString2Number(BIN2VASPVersion(binfile));
+  }
+  double BIN2VASPVersionDouble(const string& binfile){  //SD20220331
+    return VASPVersionString2Double(BIN2VASPVersion(binfile));
+  }
   string OUTCAR2VASPVersion(const string& outcar){  //CO20210315
     //outcar -> vasp.4.6.35
     //outcar -> vasp.5.4.4.18Apr17-6-g9f103f2a35
@@ -5396,23 +5422,15 @@ namespace KBIN {
     return version_str_num;
   }
   double VASPVersionString2Double(const string& vasp_version){  //CO20210315
-    //vasp.4.6.35 -> 4.635
-    //vasp.5.4.4.18Apr17-6-g9f103f2a35 -> 5.44
-    //differs from 2Number in that it returns a double, might be good for `if(VASPVersionString2Double(vasp_bin)>4.6)`
+    //SD20220331 - Changed how the double is returned
+    //vasp.4.6.35 -> 4.00635
+    //vasp.5.4.4.18Apr17-6-g9f103f2a35 -> 5.0044
+    //differs from 2Number in that it returns a double
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::VASPVersionString2Double():";
     string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vasp_version);
     if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
-    if(version_str.empty()){return 0.0;}
-    //the best double representation is 4.6.35->4.635, so remove all but the first '.'
-    string::size_type pos1=version_str.find("."); //get first
-    string::size_type pos2=version_str.find(".",pos1+1);
-    while(pos2!=string::npos){
-      version_str.erase(pos2,1);
-      pos2=version_str.find(".",pos1+1);
-    }
-    if(LDEBUG){cerr << soliloquy << " version_str(double-able)=\"" << version_str << "\"" << endl;}
-    return aurostd::string2utype<double>(version_str);
+    return aurostd::VersionString2Double(KBIN::VASPVersionString2Number(version_str));
   }
   //ME20190219 - getVASPVersionString
   // Retrives the VASP version of a binary file.

@@ -3123,6 +3123,9 @@ namespace KBIN {
   bool VASP_OSZICARUnconverged(const string& oszicar,const string& outcar);
   void GetStatDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   void GetDynaDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
+  string BIN2VASPVersion(const string& binfile);  //SD20220331
+  string BIN2VASPVersionNumber(const string& binfile);  //SD20220331
+  double BIN2VASPVersionDouble(const string& binfile);  //SD20220331
   string OUTCAR2VASPVersion(const string& outcar);  //CO20210315
   string OUTCAR2VASPVersionNumber(const string& outcar);  //CO20210315
   double OUTCAR2VASPVersionDouble(const string& outcar);  //CO20210315

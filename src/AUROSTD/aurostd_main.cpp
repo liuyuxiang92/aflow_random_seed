@@ -1688,6 +1688,20 @@ namespace aurostd {
   }
 
   // ***************************************************************************
+  // Function VersionString2Double
+  // ***************************************************************************
+  // 5.1.311 -> 5.0013311
+  // 4.2.34 -> 4.00234
+  double VersionString2Double(const string& version_str){ //SD20220331 
+    vector<string> tokens;
+    aurostd::string2tokens(version_str,tokens,".");
+    if(tokens.size()==0){return 0.0;}
+    double version=0.0;;
+    for (uint i=0;i<tokens.size();i++){version+=aurostd::string2utype<double>(tokens[i])*std::pow(10.0,-3.0*(i+1)+3.0);}
+    return version;
+  }
+
+  // ***************************************************************************
   // Function ProcessPIDs
   // ***************************************************************************
   //CO20210315

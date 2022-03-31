@@ -1785,7 +1785,8 @@ namespace KBIN {
       cerr << soliloquy << " mpi_command=\"" << mpi_command << "\"" << endl;
       cerr << soliloquy << " vasp_path_full=\"" << vasp_path_full << "\"" << endl;
     }
-    double vaspVersion = getVASPVersionDouble(vasp_path_full,mpi_command); //CO20200610
+    double vaspVersion = BIN2VASPVersionDouble(vasp_path_full); //SD20220331
+    if (aurostd::isequal(vaspVersion,0.0)) {vaspVersion = getVASPVersionDouble(vasp_path_full,mpi_command);} //CO20200610
     if(LDEBUG){cerr << soliloquy << " vaspVersion=" << vaspVersion << endl;}
     if (aurostd::isequal(vaspVersion,0.0)) {  //CO20210713
       stringstream message;
