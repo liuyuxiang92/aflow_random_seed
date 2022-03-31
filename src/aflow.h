@@ -436,6 +436,7 @@ class _XHOST {
 };
 
 #define XPID XHOST.sPID
+#define XPGID XHOST.sPGID
 #define XTID XHOST.sTID
 
 #define XHOST_vGlobal_MAX                              256

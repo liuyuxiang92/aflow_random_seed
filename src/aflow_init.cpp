@@ -121,14 +121,6 @@ namespace init {
     XHOST.ARUN_POSTPROCESS=aurostd::args2flag(argv,cmds,"--postprocess");  //CT20181212
 
     // IMMEDIATELY GET PIDS
-    // get PGID
-    XHOST.PGID=getpgrp();    // PGID number
-    aurostd::StringstreamClean(XHOST.ostrPGID);
-    XHOST.ostrPGID<<XHOST.PGID;  // PGID as stringstream
-    XHOST.sPGID="";
-    XHOST.showPGID=aurostd::args2flag(argv,cmds,"--showPGID");
-    if(XHOST.showPID) XHOST.sPGID="[PGID="+aurostd::PaddedPRE(XHOST.ostrPGID.str(),7)+"] "; // PGID as a comment
-
     // get PID
     XHOST.PID=getpid();    // PID number
     aurostd::StringstreamClean(XHOST.ostrPID);
@@ -137,6 +129,14 @@ namespace init {
     XHOST.showPID=aurostd::args2flag(argv,cmds,"--showPID");
     if(XHOST.showPID) XHOST.sPID="[PID="+aurostd::PaddedPRE(XHOST.ostrPID.str(),7)+"] "; // PID as a comment
     aurostd::xerror_PID=XHOST.sPID;
+
+    // get PGID
+    XHOST.PGID=getpgrp();    // PGID number
+    aurostd::StringstreamClean(XHOST.ostrPGID);
+    XHOST.ostrPGID<<XHOST.PGID;  // PGID as stringstream
+    XHOST.sPGID="";
+    XHOST.showPGID=aurostd::args2flag(argv,cmds,"--showPGID");
+    if(XHOST.showPID) XHOST.sPGID="[PGID="+aurostd::PaddedPRE(XHOST.ostrPGID.str(),7)+"] "; // PGID as a comment
 
     // get TID
     XHOST.TID=getpid();    // TID number
@@ -2187,7 +2187,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   uint n_not_running=0;
   uint sleep_seconds=SECONDS_SLEEP_VASP_MONITOR;
   uint sleep_seconds_afterkill=sleep_seconds;
-  string pgid=aurostd::utype2string(XHOST.PGID);
+  string pgid=aurostd::utype2string(XPGID);
   aurostd::xoption xmessage,xwarning,xmonitor,xfixed;
   bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP);
   bool vasp_running=false;
