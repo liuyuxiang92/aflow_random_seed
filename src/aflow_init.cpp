@@ -2187,7 +2187,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   uint n_not_running=0;
   uint sleep_seconds=SECONDS_SLEEP_VASP_MONITOR;
   uint sleep_seconds_afterkill=sleep_seconds;
-  string pgid=aurostd::utype2string(XPGID);
+  string pgid=XPGID;
   aurostd::xoption xmessage,xwarning,xmonitor,xfixed;
   bool VERBOSE=(FALSE || VERBOSE_MONITOR_VASP);
   bool vasp_running=false;
