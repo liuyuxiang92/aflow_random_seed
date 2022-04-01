@@ -1696,7 +1696,7 @@ namespace aurostd {
     vector<string> tokens;
     aurostd::string2tokens(version_str,tokens,".");
     double version=0.0;;
-    for (uint i=0;i<tokens.size();i++){version+=aurostd::string2utype<double>(tokens[i])*std::pow(10.0,-3.0*(i+1)+3.0);}
+    for (uint i=0;i<tokens.size();i++){version+=aurostd::string2utype<double>(tokens[i])*std::pow(10.0,-3.0*i);}
     return version;
   }
 
