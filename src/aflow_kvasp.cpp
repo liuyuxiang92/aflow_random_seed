@@ -5423,8 +5423,8 @@ namespace KBIN {
   }
   double VASPVersionString2Double(const string& vasp_version){  //CO20210315
     //SD20220331 - Changed how the double is returned
-    //vasp.4.6.35 -> 4.00635
-    //vasp.5.4.4.18Apr17-6-g9f103f2a35 -> 5.0044
+    //vasp.4.6.35 -> 4.006035
+    //vasp.5.4.4.18Apr17-6-g9f103f2a35 -> 5.004004
     //differs from 2Number in that it returns a double
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::VASPVersionString2Double():";
