@@ -5326,7 +5326,7 @@ namespace KBIN {
 
 namespace KBIN {
   string BIN2VASPVersion(const string& binfile){ //SD20220331
-    // SD20220401 - this works for both vasp4 and vasp5
+    //SD20220401 - this works for both vasp4 and vasp5
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::BIN2VASPVersion():";
     ifstream infile(binfile.c_str(),std::ios::in | std::ios::binary);
@@ -5337,6 +5337,7 @@ namespace KBIN {
     vector<string> vlines,tokens;
     aurostd::string2vectorstring(bin_str,vlines);
     for(uint iline=0;iline<vlines.size();iline++){
+      //SD20220401 - need to search for both keywords to find the correct line with the VASP version; this could change in the future with new VASP releases
       if(aurostd::substring2bool(vlines[iline],"vasp.",false,false) && aurostd::substring2bool(vlines[iline],"complex",false,false)){
         if(LDEBUG){cerr << soliloquy << " FOUND 'vasp.' line" << endl;}
         aurostd::string2tokens(vlines[iline],tokens," ");
