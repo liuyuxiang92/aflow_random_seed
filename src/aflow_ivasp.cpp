@@ -1759,7 +1759,7 @@ namespace KBIN {
     string soliloquy=XPID+"KBIN::convertPOSCARFormat()";
     string mpi_command="";
     string vasp_path_full=kflags.KBIN_BIN;
-    double vaspVersion=KBIN::BIN2VASPVersionDouble(vasp_path_full); //SD20220331
+    double vaspVersion=KBIN::getVASPVersionDouble(vasp_path_full); //SD20220331
     if(aurostd::isequal(vaspVersion,0.0) && kflags.KBIN_MPI){  //CO20210713 - adding all the machine information
       vasp_path_full=kflags.KBIN_MPI_BIN;
       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH")) {mpi_command=MPI_COMMAND_DUKE_BETA_MPICH;vasp_path_full=MPI_BINARY_DIR_DUKE_BETA_MPICH+kflags.KBIN_MPI_BIN;}
@@ -1781,8 +1781,7 @@ namespace KBIN {
       else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) {mpi_command=MPI_COMMAND_CMU_EULER;vasp_path_full=MPI_BINARY_DIR_CMU_EULER+kflags.KBIN_MPI_BIN;}
       else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::OHAD")) {mpi_command=MPI_COMMAND_MACHINE2;vasp_path_full=MPI_BINARY_DIR_MACHINE2+kflags.KBIN_MPI_BIN;}
       else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::HOST1")) {mpi_command=MPI_COMMAND_MACHINE1;vasp_path_full=MPI_BINARY_DIR_MACHINE1+kflags.KBIN_MPI_BIN;}
-      vaspVersion=KBIN::BIN2VASPVersionDouble(vasp_path_full);
-      if(aurostd::isequal(vaspVersion,0.0)){vaspVersion = KBIN::getVASPVersionDouble(vasp_path_full,mpi_command);} //CO20200610 //SD20220331 - only call if BIN2VASP fails
+      vaspVersion = KBIN::getVASPVersionDouble(vasp_path_full,mpi_command); //CO20200610
     }
     if(LDEBUG){
       cerr << soliloquy << " mpi_command=\"" << mpi_command << "\"" << endl;

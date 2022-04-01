@@ -5384,7 +5384,7 @@ namespace KBIN {
   double OUTCAR2VASPVersionDouble(const string& outcar){  //CO20210315
     //outcar -> 4.635
     //outcar -> 5.44
-    return VASPVersionString2Double(OUTCAR2VASPVersionNumber(outcar));
+    return VASPVersionString2Double(OUTCAR2VASPVersion(outcar));
   }
   string VASPVersionString2Number(const string& vasp_version){  //CO20210315
     //vasp.4.6.35 -> 4.6.35
@@ -5440,6 +5440,7 @@ namespace KBIN {
   // when aflow.in files are moved between machines and the VASP binary files
   // have different names. This is not desirable when VASP does not need to be
   // run (e.g. for post-processing).
+  //SD20220401 - Calls BIN2VASP first, if it fails, then calls OUTCAR2VASP
   string getVASPVersion(const string& binfile,const string& mpi_command) {  //CO20210315
     // /home/bin/vasp_std -> vasp.4.6.35
     // /home/bin/vasp_std -> vasp.5.4.4.18Apr17-6-g9f103f2a35
@@ -5453,6 +5454,8 @@ namespace KBIN {
     // Get the full path to the binary
     string fullPathBinaryName = XHOST.command(binfile);
     if (fullPathBinaryName.empty()) return "";
+    string vaspVersion = KBIN::BIN2VASPVersion(binfile);
+    if (!vaspVersion.empty()) return vaspVersion; //SD20220401
 
     //CO20200610 START - run a dumb vasp to get vasp output file and grab version
     if(1){
@@ -5497,13 +5500,13 @@ namespace KBIN {
           }
         }
       }
-      string vasp_version_outcar=KBIN::OUTCAR2VASPVersion("OUTCAR");
-      if(LDEBUG){cerr << soliloquy << " vasp_version_outcar=" << vasp_version_outcar << endl;}
+      vaspVersion=KBIN::OUTCAR2VASPVersion("OUTCAR");
+      if(LDEBUG){cerr << soliloquy << " vaspVersion from OUTCAR=" << vaspVersion << endl;}
       chdir(pwddir.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(tmpdir);
 #endif
-      if(!vasp_version_outcar.empty()){return vasp_version_outcar;}
+      if(!vaspVersion.empty()){return vaspVersion;}
     }
     //CO20200610 END - run a dumb vasp to get vasp output file and grab version
 
@@ -5559,7 +5562,7 @@ namespace KBIN {
   double getVASPVersionDouble(const string& binfile,const string& mpi_command) {  //CO20200610
     // /home/bin/vasp_std -> 4.635
     // /home/bin/vasp_std -> 5.44
-    return VASPVersionString2Double(getVASPVersionNumber(binfile,mpi_command));
+    return VASPVersionString2Double(getVASPVersion(binfile,mpi_command));
   }
 }  // namespace KBIN
 
