@@ -660,7 +660,8 @@ namespace KBIN {
           message << "Checking VASP version for linear response calculations.";
           //[CO20210315 - new style]string vaspVersion;
           //[CO20210315 - new style]vaspVersion = getVASPVersionNumber( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );
-          double vaspVersion=KBIN::getVASPVersionDouble( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );  //CO20210315
+          double vaspVersion=KBIN::BIN2VASPVersionDouble( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) ); //SD20220331
+          if(aurostd::isequal(vaspVersion,0.0)){vaspVersion=KBIN::getVASPVersionDouble( (kflags.KBIN_MPI ? kflags.KBIN_MPI_BIN : kflags.KBIN_BIN ) );}  //CO20210315 //SD20220331 - only call if BIN2VASP fails
           //[CO20210315 - new style]if (!vaspVersion.empty())
           if (aurostd::isequal(vaspVersion,0.0)==false){  //CO20210315
             //[CO20210315 - new style]message << "[" << vaspVersion[0] << "]."; //CO20210315
