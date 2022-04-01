@@ -1691,7 +1691,7 @@ namespace aurostd {
   // Function VersionString2Double
   // ***************************************************************************
   // 5.1.311 -> 5.0013311
-  // 4.2.34 -> 4.00234
+  // 4.2.34 -> 4.002034
   double VersionString2Double(const string& version_str){ //SD20220331 
     vector<string> tokens;
     aurostd::string2tokens(version_str,tokens,".");
