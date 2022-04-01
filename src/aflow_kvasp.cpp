@@ -5326,24 +5326,29 @@ namespace KBIN {
 
 namespace KBIN {
   string BIN2VASPVersion(const string& binfile){ //SD20220331
+    // SD20220401 - this works for both vasp4 and vasp5
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::BIN2VASPVersion():";
-    if(!aurostd::IsCommandAvailable("strings")){return "";}
-    string bin_str=aurostd::execute2string("strings "+binfile);
+    ifstream infile(binfile.c_str(),std::ios::in | std::ios::binary);
+    stringstream ss;
+    ss << infile.rdbuf();
+    string _bin_str=ss.str(),bin_str,vaspVersion="";
+    aurostd::RemoveControlCodeCharactersFromString(_bin_str,bin_str);
     vector<string> vlines,tokens;
     aurostd::string2vectorstring(bin_str,vlines);
     for(uint iline=0;iline<vlines.size();iline++){
-      if(aurostd::substring2bool(vlines[iline],"vasp.") && aurostd::substring2bool(vlines[iline],"build")){
+      if(aurostd::substring2bool(vlines[iline],"vasp.",false,false) && aurostd::substring2bool(vlines[iline],"complex",false,false)){
         if(LDEBUG){cerr << soliloquy << " FOUND 'vasp.' line" << endl;}
         aurostd::string2tokens(vlines[iline],tokens," ");
         for(uint i=0;i<tokens.size();i++){
           if(tokens[i].find("vasp.")!=string::npos){
-            return tokens[i];
+            for(uint j=tokens[i].find("vasp.");j<tokens[i].size();j++){vaspVersion+=tokens[i][j];}
+            return vaspVersion;
           }
         }
       }
     }
-    return "";
+    return vaspVersion;
   }
   string BIN2VASPVersionNumber(const string& binfile){  //SD20220331
     return VASPVersionString2Number(BIN2VASPVersion(binfile));

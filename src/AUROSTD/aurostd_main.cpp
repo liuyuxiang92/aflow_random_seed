@@ -5526,19 +5526,21 @@ namespace aurostd {
     if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
     if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): [input=\"" << strstream << "\"], [substring=\"" << strsub1 << "\"]" << endl;
     if(_strstream.find(strsub1)==string::npos) return false;
-
-    vector<string> tokens;
-    aurostd::string2tokens(_strstream,tokens,"\n");
-    string strline="";
-    for(uint i=0;i<tokens.size();i++) {
-      if(RemoveComments){strline=aurostd::RemoveComments(tokens[i]);}  //CO20210315
-      if(strline.find(strsub1)!=string::npos) {
-        if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): END [substring=\"" << strsub1 << "\" found] [RemoveWS=" << RemoveWS << "]" << endl;
-        return true;
+    if(RemoveComments){
+      vector<string> tokens;
+      aurostd::string2tokens(_strstream,tokens,"\n");
+      string strline="";
+      for(uint i=0;i<tokens.size();i++) {
+        strline=aurostd::RemoveComments(tokens[i]);  //CO20210315
+        if(strline.find(strsub1)!=string::npos) {
+          if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): END [substring=\"" << strsub1 << "\" found] [RemoveWS=" << RemoveWS << "]" << endl;
+          return true;
+        }
       }
+      if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): END [substring=" << strsub1 << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
+      return false;
     }
-    if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): END [substring=" << strsub1 << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
-    return false;
+    return true;
   }
 
   bool substring2bool(const vector<string>& vstrstream,const string& strsub1,bool RemoveWS,bool RemoveComments) {
@@ -5851,24 +5853,27 @@ namespace aurostd {
     if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): [input=\"" << strstream << "\"], [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;
     if(_strstream.find(keyword)==string::npos) return false;
 
-    vector<string> tokens;
-    aurostd::string2tokens(_strstream,tokens,"\n");
-    string strline="",_keyword="",value="";
-    string::size_type idxS1;
-    for(uint i=0;i<tokens.size();i++) {
-      if(RemoveComments){strline=aurostd::RemoveComments(tokens[i]);}
-      idxS1=strline.find(delim);
-      if(idxS1!=string::npos){
-        _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(0,idxS1));
-        if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): _keyword=\"" << _keyword << "\"" << endl;
-        if(_keyword==keyword){
-          if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=\"" << keyword << "\" found] [RemoveWS=" << RemoveWS << "]" << endl;
-          return true;
+    if(RemoveComments){
+      vector<string> tokens;
+      aurostd::string2tokens(_strstream,tokens,"\n");
+      string strline="",_keyword="",value="";
+      string::size_type idxS1;
+      for(uint i=0;i<tokens.size();i++) {
+        strline=aurostd::RemoveComments(tokens[i]);
+        idxS1=strline.find(delim);
+        if(idxS1!=string::npos){
+          _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(0,idxS1));
+          if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): _keyword=\"" << _keyword << "\"" << endl;
+          if(_keyword==keyword){
+            if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=\"" << keyword << "\" found] [RemoveWS=" << RemoveWS << "]" << endl;
+            return true;
+          }
         }
       }
+      if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=" << keyword << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
+      return false;
     }
-    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=" << keyword << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
-    return false;
+    return true;
   }
 
   bool kvpairfound(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
