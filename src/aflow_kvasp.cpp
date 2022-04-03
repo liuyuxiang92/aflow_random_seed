@@ -5464,99 +5464,97 @@ namespace KBIN {
     if (!vaspVersion.empty()) return vaspVersion; //SD20220401
 
     //CO20200610 START - run a dumb vasp to get vasp output file and grab version
-    if(1){
-      string pwddir=aurostd::getPWD();
-      string tmpdir=aurostd::TmpDirectoryCreate("VASP_VERSION");
-      chdir(tmpdir.c_str());
-      stringstream empty;empty.str("");
-      aurostd::string2file("","./INCAR");
-      aurostd::string2file("","./KPOINTS");
-      aurostd::string2file("","./POSCAR");
-      aurostd::string2file("","./POTCAR");
-      if(LDEBUG){cerr << soliloquy << " ls[1]=" << endl << aurostd::execute2string("ls") << endl;}
-      //execute2string does not work well here...
-      string command="";
-      if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
-      command+=binfile+" > /dev/null 2>&1";
-      if(LDEBUG){cerr << soliloquy << " running command: \"" << command << "\"" << endl;}
-      aurostd::execute(command);  //ME20200610 - no output from vasp
-      if(LDEBUG){cerr << soliloquy << " ls[2]=" << endl << aurostd::execute2string("ls") << endl;}
-      if(!aurostd::FileExist("OUTCAR")){
-        //first re-try, source intel
-        vector<string> vintel_paths;
-        aurostd::string2tokens(INTEL_COMPILER_PATHS,vintel_paths,",");
-        for(uint i=0;i<vintel_paths.size();i++){
-          if(aurostd::FileExist("/bin/bash") && aurostd::FileExist(vintel_paths[i])){
-            command="";
-            // SD20220330 - need to use bash and tsch for sourcing .sh and .csh scripts, respectively
-            if(aurostd::substring2bool(vintel_paths[i],".csh")){ 
-              command+="/bin/tcsh -c \"source "+vintel_paths[i]+" intel64; (";
-              if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
-              command+=binfile+" > /dev/null) >& /dev/null\""; //SD20220330 - source works in (t)csh
-            }
-            else{
-              command+="/bin/bash -c \"source "+vintel_paths[i]+" intel64; ";
-              if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
-              command+=binfile+" > /dev/null 2>&1\"";  //ME20200610 - no output from vasp  //CO20210315 - source only works in bash
-            }
-            if(LDEBUG){cerr << soliloquy << " running command: \"" << command << "\"" << endl;}
-            aurostd::execute(command);
-            if(LDEBUG){cerr << soliloquy << " ls[3]=" << endl << aurostd::execute2string("ls") << endl;}
-            if(aurostd::FileExist("OUTCAR")){break;}
+    string pwddir=aurostd::getPWD();
+    string tmpdir=aurostd::TmpDirectoryCreate("VASP_VERSION");
+    chdir(tmpdir.c_str());
+    stringstream empty;empty.str("");
+    aurostd::string2file("","./INCAR");
+    aurostd::string2file("","./KPOINTS");
+    aurostd::string2file("","./POSCAR");
+    aurostd::string2file("","./POTCAR");
+    if(LDEBUG){cerr << soliloquy << " ls[1]=" << endl << aurostd::execute2string("ls") << endl;}
+    //execute2string does not work well here...
+    string command="";
+    if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
+    command+=binfile+" > /dev/null 2>&1";
+    if(LDEBUG){cerr << soliloquy << " running command: \"" << command << "\"" << endl;}
+    aurostd::execute(command);  //ME20200610 - no output from vasp
+    if(LDEBUG){cerr << soliloquy << " ls[2]=" << endl << aurostd::execute2string("ls") << endl;}
+    if(!aurostd::FileExist("OUTCAR")){
+      //first re-try, source intel
+      vector<string> vintel_paths;
+      aurostd::string2tokens(INTEL_COMPILER_PATHS,vintel_paths,",");
+      for(uint i=0;i<vintel_paths.size();i++){
+        if(aurostd::FileExist("/bin/bash") && aurostd::FileExist(vintel_paths[i])){
+          command="";
+          // SD20220330 - need to use bash and tsch for sourcing .sh and .csh scripts, respectively
+          if(aurostd::substring2bool(vintel_paths[i],".csh")){ 
+            command+="/bin/tcsh -c \"source "+vintel_paths[i]+" intel64; (";
+            if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
+            command+=binfile+" > /dev/null) >& /dev/null\""; //SD20220330 - source works in (t)csh
           }
+          else{
+            command+="/bin/bash -c \"source "+vintel_paths[i]+" intel64; ";
+            if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
+            command+=binfile+" > /dev/null 2>&1\"";  //ME20200610 - no output from vasp  //CO20210315 - source only works in bash
+          }
+          if(LDEBUG){cerr << soliloquy << " running command: \"" << command << "\"" << endl;}
+          aurostd::execute(command);
+          if(LDEBUG){cerr << soliloquy << " ls[3]=" << endl << aurostd::execute2string("ls") << endl;}
+          if(aurostd::FileExist("OUTCAR")){break;}
         }
       }
-      vaspVersion=KBIN::OUTCAR2VASPVersion("OUTCAR");
-      if(LDEBUG){cerr << soliloquy << " vaspVersion from OUTCAR=" << vaspVersion << endl;}
-      chdir(pwddir.c_str());
-#ifndef _AFLOW_TEMP_PRESERVE_
-      aurostd::RemoveDirectory(tmpdir);
-#endif
-      if(!vaspVersion.empty()){return vaspVersion;}
     }
+    vaspVersion=KBIN::OUTCAR2VASPVersion("OUTCAR");
+    if(LDEBUG){cerr << soliloquy << " vaspVersion from OUTCAR=" << vaspVersion << endl;}
+    chdir(pwddir.c_str());
+#ifnf _AFLOW_TEMP_PRESERVE_
+    aurostd::RemoveDirectory(tmpdir);
+#end
+    if(!vaspVersion.empty()){return vaspVersion;}
     //CO20200610 END - run a dumb vasp to get vasp output file and grab version
 
-    if(0){  //CO20210315 - this works well for vasp.4.6 or lower, does NOT work for vasp.5.4.4, true version info gets mixed up with notes about other versions
-      // Open the binary
-      ifstream infile(fullPathBinaryName.c_str(), std::ios::in | std::ios::binary);
-      if (!infile.is_open()) return "";
-
-      // Read bytes...
-      int bufferSize = 1024;
-      char buffer[bufferSize];
-      string versionString = "";
-      while (true) {
-        if (!infile.read(buffer, bufferSize))
-          bufferSize = infile.gcount();
-
-        for (int i = 0; i < bufferSize; i++) {
-          if ((buffer[i] == 'v') &&
-              (buffer[i + 1] == 'a') &&
-              (buffer[i + 2] == 's') &&
-              (buffer[i + 3] == 'p') &&
-              (buffer[i + 4] == '.') &&
-              (isdigit(buffer[i + 5])) &&
-              (isdigit(buffer[i + 6]) || buffer[i + 6] == '.') &&
-              TRUE) {
-            //[CO20200610 - include 'vasp.' in string]int j = i + 5;
-            int j=i;
-            while (buffer[j] != ' ')
-              versionString.push_back(buffer[j++]);
-            break;
-          }
-        }
-        if (!versionString.empty()) break;
-        if (infile.eof()) break;
-
-        // Shift cursor to avoid the case where "vasp." is on the boundary of two buffers...
-        infile.seekg(-20, std::ios::cur);
-      }
-
-      infile.close();
-      infile.clear();
-
-      if (!versionString.empty()) return versionString;
-    }
+    //[SD20220402 - OBSOLETE]if(0){  //CO20210315 - this works well for vasp.4.6 or lower, does NOT work for vasp.5.4.4, true version info gets mixed up with notes about other versions
+    //[SD20220402 - OBSOLETE]  // Open the binary
+    //[SD20220402 - OBSOLETE]  ifstream infile(fullPathBinaryName.c_str(), std::ios::in | std::ios::binary);
+    //[SD20220402 - OBSOLETE]  if (!infile.is_open()) return "";
+    //[SD20220402 - OBSOLETE]
+    //[SD20220402 - OBSOLETE]  // Read bytes...
+    //[SD20220402 - OBSOLETE]  int bufferSize = 1024;
+    //[SD20220402 - OBSOLETE]  char buffer[bufferSize];
+    //[SD20220402 - OBSOLETE]  string versionString = "";
+    //[SD20220402 - OBSOLETE]  while (true) {
+    //[SD20220402 - OBSOLETE]    if (!infile.read(buffer, bufferSize))
+    //[SD20220402 - OBSOLETE]      bufferSize = infile.gcount();
+    //[SD20220402 - OBSOLETE]
+    //[SD20220402 - OBSOLETE]    for (int i = 0; i < bufferSize; i++) {
+    //[SD20220402 - OBSOLETE]      if ((buffer[i] == 'v') &&
+    //[SD20220402 - OBSOLETE]          (buffer[i + 1] == 'a') &&
+    //[SD20220402 - OBSOLETE]          (buffer[i + 2] == 's') &&
+    //[SD20220402 - OBSOLETE]          (buffer[i + 3] == 'p') &&
+    //[SD20220402 - OBSOLETE]          (buffer[i + 4] == '.') &&
+    //[SD20220402 - OBSOLETE]          (isdigit(buffer[i + 5])) &&
+    //[SD20220402 - OBSOLETE]          (isdigit(buffer[i + 6]) || buffer[i + 6] == '.') &&
+    //[SD20220402 - OBSOLETE]          TRUE) {
+    //[SD20220402 - OBSOLETE]        //[CO20200610 - include 'vasp.' in string]int j = i + 5;
+    //[SD20220402 - OBSOLETE]        int j=i;
+    //[SD20220402 - OBSOLETE]        while (buffer[j] != ' ')
+    //[SD20220402 - OBSOLETE]          versionString.push_back(buffer[j++]);
+    //[SD20220402 - OBSOLETE]        break;
+    //[SD20220402 - OBSOLETE]      }
+    //[SD20220402 - OBSOLETE]    }
+    //[SD20220402 - OBSOLETE]    if (!versionString.empty()) break;
+    //[SD20220402 - OBSOLETE]    if (infile.eof()) break;
+    //[SD20220402 - OBSOLETE]
+    //[SD20220402 - OBSOLETE]    // Shift cursor to avoid the case where "vasp." is on the boundary of two buffers...
+    //[SD20220402 - OBSOLETE]    infile.seekg(-20, std::ios::cur);
+    //[SD20220402 - OBSOLETE]  }
+    //[SD20220402 - OBSOLETE]
+    //[SD20220402 - OBSOLETE]  infile.close();
+    //[SD20220402 - OBSOLETE]  infile.clear();
+    //[SD20220402 - OBSOLETE]
+    //[SD20220402 - OBSOLETE]  if (!versionString.empty()) return versionString;
+    //[SD20220402 - OBSOLETE]}
 
     return "";
   }
