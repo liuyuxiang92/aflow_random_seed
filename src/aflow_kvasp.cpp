@@ -5428,7 +5428,8 @@ namespace KBIN {
     return version_str_num;
   }
   double VASPVersionString2Double(const string& vasp_version){  //CO20210315
-    //SD20220331 - Changed how the double is returned
+    //SD20220331 - Changed how the double is returned, so we can do version comparison by comparing doubles,
+    //for example now: 4.1.311 > 4.1.4 since 4.001311 > 4.001004
     //vasp.4.6.35 -> 4.006035
     //vasp.5.4.4.18Apr17-6-g9f103f2a35 -> 5.004004
     //differs from 2Number in that it returns a double
@@ -5461,11 +5462,12 @@ namespace KBIN {
     string fullPathBinaryName = XHOST.command(binfile);
     if (fullPathBinaryName.empty()) return "";
     string vaspVersion = KBIN::BIN2VASPVersion(binfile);
+    if(LDEBUG){cerr << soliloquy << " vaspVersion from BIN=" << vaspVersion << endl;}
     if (!vaspVersion.empty()) return vaspVersion; //SD20220401
 
     //CO20200610 START - run a dumb vasp to get vasp output file and grab version
     string pwddir=aurostd::getPWD();
-    string tmpdir=aurostd::TmpDirectoryCreate("VASP_VERSION");
+    string tmpdir=aurostd::TmpDirectoryCreate("VASP_VERSION",XHOST.home); //SD20220403 - create the directory in $HOME in case of issues running in tmp
     chdir(tmpdir.c_str());
     stringstream empty;empty.str("");
     aurostd::string2file("","./INCAR");
@@ -5508,10 +5510,11 @@ namespace KBIN {
     vaspVersion=KBIN::OUTCAR2VASPVersion("OUTCAR");
     if(LDEBUG){cerr << soliloquy << " vaspVersion from OUTCAR=" << vaspVersion << endl;}
     chdir(pwddir.c_str());
-#ifnf _AFLOW_TEMP_PRESERVE_
+#ifndef _AFLOW_TEMP_PRESERVE_
     aurostd::RemoveDirectory(tmpdir);
-#end
-    if(!vaspVersion.empty()){return vaspVersion;}
+#endif
+    return vaspVersion;
+    //[SD20220402 - OBSOLETE]if(!vaspVersion.empty()){return vaspVersion;}
     //CO20200610 END - run a dumb vasp to get vasp output file and grab version
 
     //[SD20220402 - OBSOLETE]if(0){  //CO20210315 - this works well for vasp.4.6 or lower, does NOT work for vasp.5.4.4, true version info gets mixed up with notes about other versions
@@ -5555,8 +5558,8 @@ namespace KBIN {
     //[SD20220402 - OBSOLETE]
     //[SD20220402 - OBSOLETE]  if (!versionString.empty()) return versionString;
     //[SD20220402 - OBSOLETE]}
-
-    return "";
+    //[SD20220402 - OBSOLETE]
+    //[SD20220402 - OBSOLETE]return "";
   }
   string getVASPVersionNumber(const string& binfile,const string& mpi_command) {  //CO20200610
     // /home/bin/vasp_std -> 4.6.35

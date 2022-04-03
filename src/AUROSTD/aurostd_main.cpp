@@ -5526,7 +5526,7 @@ namespace aurostd {
     if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
     if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): [input=\"" << strstream << "\"], [substring=\"" << strsub1 << "\"]" << endl;
     if(_strstream.find(strsub1)==string::npos) return false;
-    if(RemoveComments){
+    if(RemoveComments){ //SD20220403 - substring exists, but now check if it exists outside of comments 
       vector<string> tokens;
       aurostd::string2tokens(_strstream,tokens,"\n");
       string strline="";
@@ -5540,7 +5540,9 @@ namespace aurostd {
       if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): END [substring=" << strsub1 << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
       return false;
     }
-    return true;
+    else{
+      return true; //SD20220403 - since substring exists, return true
+    }
   }
 
   bool substring2bool(const vector<string>& vstrstream,const string& strsub1,bool RemoveWS,bool RemoveComments) {
@@ -5853,7 +5855,7 @@ namespace aurostd {
     if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): [input=\"" << strstream << "\"], [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;
     if(_strstream.find(keyword)==string::npos) return false;
 
-    if(RemoveComments){
+    if(RemoveComments){ //SD20220403 - substring exists, but now check if it exists outside of comments
       vector<string> tokens;
       aurostd::string2tokens(_strstream,tokens,"\n");
       string strline="",_keyword="",value="";
@@ -5873,7 +5875,9 @@ namespace aurostd {
       if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=" << keyword << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
       return false;
     }
-    return true;
+    else{
+      return true; //SD20220403 - since substring exists, return true
+    }
   }
 
   bool kvpairfound(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
