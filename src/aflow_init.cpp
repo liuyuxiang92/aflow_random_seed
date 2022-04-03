@@ -2033,8 +2033,8 @@ bool AFLOW_VASP_instance_running(){ //CO20210315
   string soliloquy=XPID+"AFLOW_VASP_instance_running():";
   //[SD20220402 - OBSOLETE]//this needs to become more complicated as we add options other than --kill_vasp_all
   //[SD20220402 - OBSOLETE]if(XHOST.vflag_control.flag("MONITOR_VASP") && XHOST.vflag_control.flag("KILL_VASP_ALL")==false){
-  //[SD20220402 - OBSOLETE]   throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a targeted kill command for VASP not available yet: try --kill_vasp_all",_INPUT_ILLEGAL_);
-  //[SD20220402 - OBSOLETE] }
+  //[SD20220402 - OBSOLETE]  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"a targeted kill command for VASP not available yet: try --kill_vasp_all",_INPUT_ILLEGAL_);
+  //[SD20220402 - OBSOLETE]}
   return (aurostd::ProcessPIDs("aflow").size()>1);  //check that the instance of aflow running vasp is running
 }
 bool AFLOW_VASP_instance_running(const string& pgid){
