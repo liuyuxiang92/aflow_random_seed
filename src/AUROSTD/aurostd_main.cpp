@@ -5540,9 +5540,7 @@ namespace aurostd {
       if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): END [substring=" << strsub1 << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
       return false;
     }
-    else{
-      return true; //SD20220403 - since substring exists, return true
-    }
+    return true; //SD20220403 - since substring exists, return true
   }
 
   bool substring2bool(const vector<string>& vstrstream,const string& strsub1,bool RemoveWS,bool RemoveComments) {
@@ -5875,9 +5873,7 @@ namespace aurostd {
       if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=" << keyword << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
       return false;
     }
-    else{
-      return true; //SD20220403 - since substring exists, return true
-    }
+    return true; //SD20220403 - since substring exists, return true
   }
 
   bool kvpairfound(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
