@@ -5326,7 +5326,7 @@ namespace KBIN {
 
 namespace KBIN {
   string BIN2VASPVersion(const string& binfile){ //SD20220331
-    //SD20220401 - this works for vasp4, vasp5, and vasp6
+    //SD20220401 - based on ME20190219 getVASPVersionString; this works for vasp4, vasp5, and vasp6
     string soliloquy=XPID+"KBIN::BIN2VASPVersion():";
     ifstream infile(binfile.c_str(), std::ios::in | std::ios::binary);
     if (!infile.is_open()) {return "";}
