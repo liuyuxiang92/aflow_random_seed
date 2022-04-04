@@ -1916,7 +1916,7 @@ namespace aurostd {
     string command="kill";
     uint sleep_seconds=5; //2 seconds is too few
     if(sigkill){command+=" -9";}
-    command=" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
+    command+=" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
     if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
     aurostd::execute(command);
     aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,pgid,user_specific));

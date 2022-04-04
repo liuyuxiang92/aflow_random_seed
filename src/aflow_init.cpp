@@ -136,7 +136,7 @@ namespace init {
     XHOST.ostrPGID<<XHOST.PGID;  // PGID as stringstream
     XHOST.sPGID="";
     XHOST.showPGID=aurostd::args2flag(argv,cmds,"--showPGID");
-    if(XHOST.showPID) XHOST.sPGID="[PGID="+aurostd::PaddedPRE(XHOST.ostrPGID.str(),7)+"] "; // PGID as a comment
+    if(XHOST.showPGID) XHOST.sPGID="[PGID="+aurostd::PaddedPRE(XHOST.ostrPGID.str(),7)+"] "; // PGID as a comment
 
     // get TID
     XHOST.TID=getpid();    // TID number
@@ -218,6 +218,7 @@ namespace init {
     // some verbose
     if(INIT_VERBOSE) {
       oss << aurostd::PaddedPOST("XHOST.ostrPID = ",depth_short) << XHOST.ostrPID.str() << endl;
+      oss << aurostd::PaddedPOST("XHOST.ostrPGID = ",depth_short) << XHOST.ostrPGID.str() << endl;
       oss << aurostd::PaddedPOST("XHOST.ostrTID = ",depth_short) << XHOST.ostrTID.str() << endl;  //CO20200502 - threadID
       oss << aurostd::PaddedPOST("DEFAULT_KZIP_BIN = ",depth_short) << DEFAULT_KZIP_BIN << endl;
       oss << aurostd::PaddedPOST("DEFAULT_KZIP_EXT = ",depth_short) << DEFAULT_KZIP_EXT << endl;
@@ -2220,7 +2221,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   string memory_string="";
   double usage_percentage_ram=0.0,usage_percentage_swap=0.0;
 
-  while((AFLOW_VASP_instance_running(XPGID) || (nloop++)<NCOUNTS_WAIT_MONITOR) && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
+  while((AFLOW_VASP_instance_running(XHOST.ostrPGID.str()) || (nloop++)<NCOUNTS_WAIT_MONITOR) && vasp_bin.empty()){  //wait no more than 10 minutes for vasp bin to start up
     GetVASPBinaryFromLOCK(xvasp.Directory,vasp_bin,ncpus);
     vasp_bin=aurostd::basename(vasp_bin); //remove directory stuff
     if(vasp_bin.empty()){
@@ -2234,12 +2235,12 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
 
   nloop=0;
   n_not_running=0;
-  while(AFLOW_VASP_instance_running(XPGID) || n_not_running<NCOUNTS_WAIT_MONITOR){  //wait no more than 10 minutes for vasp bin to start up (again)
+  while(AFLOW_VASP_instance_running(XHOST.ostrPGID.str()) || n_not_running<NCOUNTS_WAIT_MONITOR){  //wait no more than 10 minutes for vasp bin to start up (again)
     if(!aurostd::FileExist(xvasp.Directory+"/"+_AFLOWLOCK_)){break;} //we needed it above to get the vasp_bin
     if(aurostd::EFileExist(xvasp.Directory+"/"+DEFAULT_AFLOW_END_OUT)){break;}  //check before continue below
     if(aurostd::EFileExist(xvasp.Directory+"/"+_STOPFLOW_)){aurostd::RemoveFile(xvasp.Directory+"/"+_STOPFLOW_);break;} //check before continue below
 
-    vasp_running=VASP_instance_running(vasp_bin,XPGID);
+    vasp_running=VASP_instance_running(vasp_bin,XHOST.ostrPGID.str());
     if(VERBOSE){
       message << "nloop=" << (nloop++);pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       message << "program \"" << vasp_bin << "\" is " << (vasp_running?"":"NOT ") << "running";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
@@ -2322,7 +2323,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
     }
 
     if(kill_vasp){
-      vasp_running=VASP_instance_running(vasp_bin,XPGID);
+      vasp_running=VASP_instance_running(vasp_bin,XHOST.ostrPGID.str());
       if(vasp_running){
         //special case for MEMORY, the error will be triggered in the --monitor_vasp instance, and not in the --run one
         //so write out "AFLOW ERROR: AFLOW_MEMORY" so it gets caught in the --run instance
@@ -2338,12 +2339,12 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
         message << "issuing kill command for: \""+vasp_bin+"\"";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         if(0){  //super debug
           string output_syscall="";
-          vector<string> vpids=aurostd::ProcessPIDs(vasp_bin,XPGID,output_syscall);
+          vector<string> vpids=aurostd::ProcessPIDs(vasp_bin,XHOST.ostrPGID.str(),output_syscall);
           message << "output_syscall=";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
           message << output_syscall;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
           message << "PIDs2kill="+aurostd::joinWDelimiter(vpids,",");pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         }
-        aurostd::ProcessKill(vasp_bin,XPGID);
+        aurostd::ProcessKill(vasp_bin,XHOST.ostrPGID.str());
       }else{
         message << "\""+vasp_bin+"\" has died before the kill command could be issued";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       }
@@ -2378,8 +2379,8 @@ string Message(const string& filename,const string& list2print){
   if(aurostd::substring2bool(LIST2PRINT,"GROUP")) strout << " - [group=" << XHOST.group << "]";
   if(aurostd::substring2bool(LIST2PRINT,"HOST") || aurostd::substring2bool(LIST2PRINT,"HOSTNAME") || aurostd::substring2bool(LIST2PRINT,"MACHINE")) strout << " - [host=" << XHOST.hostname << "]";
   if(aurostd::substring2bool(LIST2PRINT,"TEMPERATURE")) if(init::GetTEMP()) for(uint i=0;i<XHOST.vTemperatureCore.size();i++) {strout << (i==0?" - [temp(C)=":"") << XHOST.vTemperatureCore.at(i) << (i<XHOST.vTemperatureCore.size()-1?",":"]");}
-  if(aurostd::substring2bool(LIST2PRINT,"PGID")) strout << " - [PGID=" << XHOST.PGID << "]";  //SD20220330
   if(aurostd::substring2bool(LIST2PRINT,"PID")) strout << " - [PID=" << XHOST.PID << "]";  //CO20200502
+  if(aurostd::substring2bool(LIST2PRINT,"PGID")) strout << " - [PGID=" << XHOST.PGID << "]";  //SD20220330
   if(aurostd::substring2bool(LIST2PRINT,"TID")) strout << " - [TID=" << XHOST.TID << "]";  //CO20200502
   if(LIST2PRINT.empty() || aurostd::substring2bool(LIST2PRINT,"TIME") || aurostd::substring2bool(LIST2PRINT,"DATE")) strout << " - [date=" << aflow_get_time_string() << "]";   //CO20200624
   if(aurostd::substring2bool(LIST2PRINT,"MEMORY") && (XHOST.maxmem>0.0 && XHOST.maxmem<100)) strout << " - [mem=" << aurostd::utype2string<double>(AFLOW_checkMEMORY("vasp",XHOST.maxmem),4) << " (" << XHOST.maxmem << ")]"; //CO20170628 - slow otherwise!!!
