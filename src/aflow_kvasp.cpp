@@ -5332,39 +5332,44 @@ namespace KBIN {
     if (!infile.is_open()) {return "";}
     int bufferSize = 1024;
     char buffer[bufferSize];
-    string vaspVersion = "";
-    while (true) {
+    string vaspVersion = "", buffer_str = "";
+    bool found_vasp = false;
+    while (!infile.eof()) {
       if (!infile.read(buffer, bufferSize)) {bufferSize = infile.gcount();}
       //SD20220401 - need to search for multiple keywords to find the correct line with the VASP version; this could change in the future with new VASP releases
-      for (int i = 0; i < bufferSize; i++) {
+      for (int i = 0; !found_vasp && i < bufferSize - 5; i++) { // search for "vasp." in the buffer
         if ((buffer[i] == 'v') &&
             (buffer[i + 1] == 'a') &&
             (buffer[i + 2] == 's') &&
             (buffer[i + 3] == 'p') &&
             (buffer[i + 4] == '.')) {
-          for (int j = i; j < bufferSize; j++) {
-            if ((buffer[j] == '\n') ||
-                ((buffer[j] == '\\') && (buffer[j + 1] == 'n'))) {
-              break;
-            }
-            else if ((buffer[j] == 'c') &&
-                     (buffer[j + 1] == 'o') &&
-                     (buffer[j + 2] == 'm') &&
-                     (buffer[j + 3] == 'p') &&
-                     (buffer[j + 4] == 'l') &&
-                     (buffer[j + 5] == 'e') &&
-                     (buffer[j + 6] == 'x')) {
-              int k=i;
-              while (buffer[k] != ' ') {vaspVersion.push_back(buffer[k++]);}
-              infile.close();
-              infile.clear();
-              return vaspVersion;
-            }
-            if (infile.eof()) {break;}
+          found_vasp = true;
+        }
+      }
+      if (found_vasp) {
+        buffer_str += std::string(reinterpret_cast<char*>(buffer), bufferSize); // avoid null-terminator
+        if (aurostd::substring2bool(buffer_str, "vasp.", false, false)) { // first keyword
+          buffer_str = buffer_str.substr(buffer_str.find("vasp.")); // get the buffer string starting from "vasp."
+        }
+        if (aurostd::substring2bool(buffer_str, "complex", false, false)) { // second keyword
+          buffer_str = buffer_str.substr(0, buffer_str.find("complex")); // get the buffer string up to "complex"
+          if (aurostd::substring2bool(buffer_str, "\n", false, false) || aurostd::substring2bool(buffer_str, "\\n", false, false)) {
+            buffer_str = "";
+            found_vasp = false; // if there are newlines between the keywords then it is the wrong line
+          }
+          else { // no newlines, so this is the correct line
+            uint j = 0;
+            while (j < buffer_str.size() && buffer_str[j] != ' ') {vaspVersion.push_back(buffer_str[j++]);}
+            break;
           }
         }
-      if (infile.eof()) {break;}
+        else if (aurostd::substring2bool(buffer_str, "\n", false, false) || aurostd::substring2bool(buffer_str, "\\n", false, false)) {
+          buffer_str = "";
+          found_vasp = false; // if there are newlines in the buffer then it is the wrong line
+        }
       }
+      if (!vaspVersion.empty()) {break;}
+      infile.seekg(-10, std::ios::cur); // shift cursor to avoid the case where "vasp." is on the boundary of two buffers
     }
     return vaspVersion;
   }
