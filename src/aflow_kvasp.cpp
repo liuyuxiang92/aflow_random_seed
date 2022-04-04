@@ -5344,12 +5344,13 @@ namespace KBIN {
             (buffer[i + 3] == 'p') &&
             (buffer[i + 4] == '.')) {
           found_vasp = true;
+          break;
         }
       }
       if (found_vasp) {
         buffer_str += std::string(reinterpret_cast<char*>(buffer), bufferSize); // avoid null-terminator
-        if (i > 0) { // find("vasp.")
-          buffer_str = buffer_str.substr(i - 1); // get the buffer string starting from "vasp."
+        if (i != 0) { // find("vasp.")
+          buffer_str = buffer_str.substr(i); // get the buffer string starting from "vasp."
           i = 0;
         }
         if (buffer_str.find("complex") != string::npos) { // second keyword
