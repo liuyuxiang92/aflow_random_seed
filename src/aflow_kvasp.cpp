@@ -5327,28 +5327,43 @@ namespace KBIN {
 namespace KBIN {
   string BIN2VASPVersion(const string& binfile){ //SD20220331
     //SD20220401 - this works for vasp4, vasp5, and vasp6
-    bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::BIN2VASPVersion():";
-    ifstream infile(binfile.c_str(),std::ios::in | std::ios::binary);
-    stringstream ss;
-    ss << infile.rdbuf();
-    string _bin_str=ss.str(),bin_str,vaspVersion="";
-    aurostd::RemoveControlCodeCharactersFromString(_bin_str,bin_str);
-    bin_str=aurostd::StringSubst(bin_str,"\\n","\n"); //SD20220403 - need proper newlines
-    vector<string> vlines,tokens;
-    aurostd::string2vectorstring(bin_str,vlines);
-    for(uint iline=0;iline<vlines.size();iline++){
+    ifstream infile(binfile.c_str(), std::ios::in | std::ios::binary);
+    if (!infile.is_open()) {return "";}
+    int bufferSize = 1024;
+    char buffer[bufferSize];
+    string vaspVersion = "";
+    while (true) {
+      if (!infile.read(buffer, bufferSize)) {bufferSize = infile.gcount();}
       //SD20220401 - need to search for multiple keywords to find the correct line with the VASP version; this could change in the future with new VASP releases
-      if(aurostd::substring2bool(vlines[iline],"vasp.",false,false) && 
-         aurostd::substring2bool(vlines[iline],"complex",false,false)){
-        if(LDEBUG){cerr << soliloquy << " FOUND 'vasp.' line" << endl;}
-        aurostd::string2tokens(vlines[iline],tokens," ");
-        for(uint i=0;i<tokens.size();i++){
-          if(tokens[i].find("vasp.")!=string::npos){
-            for(uint j=tokens[i].find("vasp.");j<tokens[i].size();j++){vaspVersion+=tokens[i][j];}
-            return vaspVersion;
+      for (int i = 0; i < bufferSize; i++) {
+        if ((buffer[i] == 'v') &&
+            (buffer[i + 1] == 'a') &&
+            (buffer[i + 2] == 's') &&
+            (buffer[i + 3] == 'p') &&
+            (buffer[i + 4] == '.')) {
+          for (int j = i; j < bufferSize; j++) {
+            if ((buffer[j] == '\n') ||
+                ((buffer[j] == '\\') && (buffer[j + 1] == 'n'))) {
+              break;
+            }
+            else if ((buffer[j] == 'c') &&
+                     (buffer[j + 1] == 'o') &&
+                     (buffer[j + 2] == 'm') &&
+                     (buffer[j + 3] == 'p') &&
+                     (buffer[j + 4] == 'l') &&
+                     (buffer[j + 5] == 'e') &&
+                     (buffer[j + 6] == 'x')) {
+              int k=i;
+              while (buffer[k] != ' ') {vaspVersion.push_back(buffer[k++]);}
+              infile.close();
+              infile.clear();
+              return vaspVersion;
+            }
+            if (infile.eof()) {break;}
           }
         }
+      if (infile.eof()) {break;}
       }
     }
     return vaspVersion;
