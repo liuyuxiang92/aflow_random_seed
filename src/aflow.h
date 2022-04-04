@@ -337,10 +337,10 @@ class _XHOST {
     // _XHOST(const _XHOST& b);                          // constructor copy
     const _XHOST& operator=(const _XHOST &b);         // copy
     // BOOT
-    int PID,TID;                // aflow_init.cpp  PID/TID number  //CO20200508
-    ostringstream ostrPID,ostrTID; // aflow_init.cpp  PID/TID in ostringstream... //CO20200508
-    string sPID,sTID;           // aflow_init.cpp  [PID=12345678]  [TID=12345678]
-    bool showPID,showTID;       // aflow_init.cpp  check if --showPID
+    int PGID,PID,TID;                // aflow_init.cpp  PID/TID number  //CO20200508 //SD20220329 PGID number
+    ostringstream ostrPGID,ostrPID,ostrTID; // aflow_init.cpp  PID/TID in ostringstream... //CO20200508 
+    string sPGID,sPID,sTID;           // aflow_init.cpp  [PID=12345678]  [TID=12345678]
+    bool showPGID,showPID,showTID;       // aflow_init.cpp  check if --showPID
     // machinery
     bool QUIET,QUIET_CERR,QUIET_COUT,TEST,DEBUG,MPI;    // extra quiet SC20210617
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
@@ -436,6 +436,7 @@ class _XHOST {
 };
 
 #define XPID XHOST.sPID
+#define XPGID XHOST.sPGID
 #define XTID XHOST.sTID
 
 #define XHOST_vGlobal_MAX                              256
@@ -1112,8 +1113,10 @@ bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin);  //CO20210
 bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin,int& ncpus);  //CO20210315
 void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed);  //CO20210315
 bool AFLOW_VASP_instance_running(); //CO20210315
+bool AFLOW_VASP_instance_running(const string& pgid); //SD20220330
 bool AFLOW_MONITOR_instance_running(const _aflags& aflags); //CO20210315
 bool VASP_instance_running(const string& vasp_bin); //CO20210315
+bool VASP_instance_running(const string& vasp_bin,const string& pgid); //SD20220330
 void AFLOW_monitor_VASP();  //CO20210315
 void AFLOW_monitor_VASP(const string& directory);  //CO20210315
 
@@ -3120,6 +3123,9 @@ namespace KBIN {
   bool VASP_OSZICARUnconverged(const string& oszicar,const string& outcar);
   void GetStatDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   void GetDynaDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
+  string BIN2VASPVersion(const string& binfile);  //SD20220331
+  string BIN2VASPVersionNumber(const string& binfile);  //SD20220331
+  double BIN2VASPVersionDouble(const string& binfile);  //SD20220331
   string OUTCAR2VASPVersion(const string& outcar);  //CO20210315
   string OUTCAR2VASPVersionNumber(const string& outcar);  //CO20210315
   double OUTCAR2VASPVersionDouble(const string& outcar);  //CO20210315
