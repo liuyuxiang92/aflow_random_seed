@@ -10,6 +10,7 @@
 #ifndef _AFLOW_APDC_CPP_
 #define _AFLOW_APDC_CPP_
 #include "aflow.h"
+#include "aflow_pocc.h"
 #include "aflow_apdc.h"
 
 // ###############################################################################
@@ -117,6 +118,13 @@ namespace apdc {
  void GetPhaseDiagram(const string& aflowin, bool command_line_call) {
     _apdc_data apdc_data;
     string function_name = XPID + "GetPhaseDiagram():";
+    //cerr<<aurostd::file2string("/common/LIB6/TODO/CoCu_pvMg_pvNi_pvOZn:PAW_PBE/ARUN.POCC_18_H1C006/aflow.in")<<endl;
+    //cerr<<pocc::extractPARTCAR("/common/LIB6/TODO/CoCu_pvMg_pvNi_pvOZn:PAW_PBE/ARUN.POCC_18_H1C006/aflow.in")<<endl;
+    string AflowIn = "/home/sd453/tmp/testing/aflow.in";
+    stringstream ss;
+    aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,ss, "[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE", "[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE");
+    cerr<<ss.str()<<endl;
+    return;
     if (command_line_call) {
       // FORMAT: <plattice>:<element1>,<element2>,...<element(K)>:<conc1_i>,<conc1_f>,<conc2_i><conc2_f>,..<conc(K),i><conc(K)_f>
       vector<string> tokens;
