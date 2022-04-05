@@ -1794,7 +1794,10 @@ namespace aurostd {
     if(pgid.empty()) {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"PGID is empty",_INPUT_ILLEGAL_);
     }
-    if(LDEBUG){cerr << soliloquy << " looking for process=" << process << endl;}
+    if(LDEBUG){
+      cerr << soliloquy << " looking for pgid=" << pgid << endl;
+      cerr << soliloquy << " looking for process=" << process << endl;
+    }
     if(!aurostd::IsCommandAvailable("ps") || !aurostd::IsCommandAvailable("grep")) {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"\"pgrep\"-type command not found",_INPUT_ILLEGAL_);
     }
