@@ -1791,6 +1791,9 @@ namespace aurostd {
   vector<string> ProcessPIDs(const string& process,const string& pgid,string& output_syscall,bool user_specific){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::ProcessPIDs():";
+    if(pgid.empty()) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"PGID is empty",_INPUT_ILLEGAL_);
+    }
     if(LDEBUG){cerr << soliloquy << " looking for process=" << process << endl;}
     if(!aurostd::IsCommandAvailable("ps") || !aurostd::IsCommandAvailable("grep")) {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"\"pgrep\"-type command not found",_INPUT_ILLEGAL_);
@@ -1905,6 +1908,9 @@ namespace aurostd {
   void ProcessKill(const string& process,const string& pgid,bool user_specific,bool sigkill){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::ProcessKill():";
+    if(pgid.empty()) {
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"PGID is empty",_INPUT_ILLEGAL_);
+    }
     if(!aurostd::IsCommandAvailable("kill")) {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"\"kill\" command not found",_INPUT_ILLEGAL_);
     }
