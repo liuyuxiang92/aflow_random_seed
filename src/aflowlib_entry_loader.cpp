@@ -1119,10 +1119,19 @@ namespace aflowlib {
     auid_list.clear();
     std::string where = aurostd::joinWDelimiter(alloy_list, "','");
     where = "alloy IN ('" + where + "')";
-    std::vector <std::string> raw_lines = m_sqlite_alloy_db_ptr->getEntrySet(where, aflow_ft);
-    for (std::vector<std::string>::const_iterator line = raw_lines.begin(); line != raw_lines.end(); line++) {
-      auid_list.push_back(line->substr(5, 22));
-    }
+    vector<vector<string>> content = m_sqlite_alloy_db_ptr->getRowsMultiTables(where);
+    vector<string> keys = m_sqlite_alloy_db_ptr->getColumnNames("auid_00");
+    vector<string>::const_iterator search_auid = std::find(keys.begin(), keys.end(), "auid");
+    size_t auid_index = 0
+    if (search_auid!=keys.end()) {
+      auid_index = search_auid - keys.begin();
+      for (vector<vector<string>>::const_iterator row = content.begin(); row != content.end(); row++) {
+        auid_list.push_back(*row[auid_index]);
+      }
+    } else {
+      m_logger_message << "Could not find AUIDs in public alloy SQLITE DB" << url;
+      outError(__func__);
+    };
   }
 
   /// @brief load AFLOW lib entries for a given alloy directly from the filesystem (source FILESYSTEM_RAW)
