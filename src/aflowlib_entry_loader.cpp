@@ -60,7 +60,7 @@ namespace aflowlib {
   /// create shared pointer used to store the data views and read default values from flags
   /// @TODO use flags to overwrite defaults
   void EntryLoader::init() {
-    m_out_silent = false;
+    m_out_silent = true;
     m_out_debug = (XHOST.DEBUG || _DEBUG_ENTRY_LOADER_);
     m_xstructure_relaxed = false;
     m_xstructure_original = false;
@@ -90,7 +90,9 @@ namespace aflowlib {
     m_entries_layered_map = std::make_shared<std::map<short,
                                              std::map<std::string,
                                              std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>>>();
-    selectSource();
+    m_current_source = Source::NONE;
+    m_filesystem_available = false;
+    m_out_super_silent = false;
   }
 
   /// @brief clean a EntryLoader object
@@ -1119,19 +1121,7 @@ namespace aflowlib {
     auid_list.clear();
     std::string where = aurostd::joinWDelimiter(alloy_list, "','");
     where = "alloy IN ('" + where + "')";
-    vector<vector<string>> content = m_sqlite_alloy_db_ptr->getRowsMultiTables(where);
-    vector<string> keys = m_sqlite_alloy_db_ptr->getColumnNames("auid_00");
-    vector<string>::const_iterator search_auid = std::find(keys.begin(), keys.end(), "auid");
-    size_t auid_index = 0
-    if (search_auid!=keys.end()) {
-      auid_index = search_auid - keys.begin();
-      for (vector<vector<string>>::const_iterator row = content.begin(); row != content.end(); row++) {
-        auid_list.push_back(*row[auid_index]);
-      }
-    } else {
-      m_logger_message << "Could not find AUIDs in public alloy SQLITE DB" << url;
-      outError(__func__);
-    };
+    auid_list = m_sqlite_alloy_db_ptr->getValuesMultiTable("auid", where);
   }
 
   /// @brief load AFLOW lib entries for a given alloy directly from the filesystem (source FILESYSTEM_RAW)
@@ -1329,6 +1319,7 @@ namespace aflowlib {
   /// @return `false` if AUID is not valid
   /// @note the AUID is cleaned in place
   bool EntryLoader::cleanAUID(std::string & AUID) {
+    if (AUID.find("\"")!=std::string::npos) aurostd::StringSubst(AUID, "\"", "");
     if (AUID.substr(0, 5) == "auid:") AUID="aflow:" + AUID.substr(5);
     else if (AUID.substr(0, 6) != "aflow:") AUID="aflow:" + AUID;
     if (aurostd::_ishex(AUID.substr(6)) && AUID.size()==22) return true;

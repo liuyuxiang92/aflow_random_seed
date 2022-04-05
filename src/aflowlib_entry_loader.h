@@ -101,8 +101,6 @@ namespace aflowlib {
       void loadAlloy(const std::string & alloy, bool recursive=true);
       void loadAlloy(const std::vector<std::string> &alloy, bool recursive=true);
 
-      //TODO add loadICSD()
-
       // Direct entry loader
       void loadSqliteWhere(const std::string & where);
       void loadAFLUXQuery(const std::string & query);
@@ -150,10 +148,10 @@ namespace aflowlib {
 
       /// @brief Determines which source is used to load data
       /// @note should just be set by setSource()
-      Source m_current_source = Source::NONE;
-      bool m_filesystem_available = false; ///< helper to avoid repeatedly testing if the filesystem is available
+      Source m_current_source;
+      bool m_filesystem_available; ///< helper to avoid repeatedly testing if the filesystem is available
       std::stringstream m_logger_message;  ///< reusable stringstream for logging
-      bool m_out_super_silent = false;     ///< mute all output - used for private checks
+      bool m_out_super_silent;     ///< mute all output - used for private checks
 
       /// available ICSD symmetries to speed up the REST API searches
       const std::vector<std::string> m_icsd_symmetries = {"BCC/","BCT/","CUB/","FCC/","HEX/","MCL/","MCLC/",

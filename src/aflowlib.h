@@ -642,6 +642,7 @@ namespace aflowlib {
       vector<vector<string> > getRowsMultiTables(sqlite3*, const vector<string>&, const string& where="");
       string getValue(const string&, const string&, const string& where="");
       string getValue(sqlite3*, const string&, const string&, const string& where="");
+      std::vector<std::string> getValuesMultiTable(const std::string & col, const std::string & where); //HE20220405
       string getProperty(const string&, const string&, const string&, const string& where="");
       string getProperty(sqlite3*, const string&, const string&, const string&, const string& where="");
       vector<string> getPropertyMultiTables(const string&, const vector<string>&, const string&, const string& where="");

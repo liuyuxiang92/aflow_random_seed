@@ -1760,6 +1760,15 @@ namespace aflowlib {
     return sql::SQLexecuteCommandSCALAR(cursor, command);
   }
 
+  // Collects the values from a single column from all tables. //HE20220405
+  std::vector<std::string> AflowDB::getValuesMultiTable(const std::string & col, const std::string & where){
+    vector<string> tables = getTables();
+    uint ntables = tables.size();
+    vector<string> commands(ntables);
+    for (uint t = 0; t < ntables; t++) commands[t] = prepareSELECT(tables[t], "", col, where);
+    return sql::SQLexecuteCommandVECTOR(db, aurostd::joinWDelimiter(commands, " UNION ALL "));
+  }
+
 
   //getProperty///////////////////////////////////////////////////////////////
   // Gets a database property for a specific column.
