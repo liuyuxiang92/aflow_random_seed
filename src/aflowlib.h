@@ -278,6 +278,9 @@ namespace aflowlib {
       void clear();                                              // free space
       uint Load(const stringstream& stream,ostream& oss);        // load from stringstream it std is cout
       uint Load(const string& entry,ostream& oss);               // load from string it std is cout
+      uint Load(const vector<uint64_t> & key_hash, const vector<std::string> & content, ostream& oss);
+      void Set(const std::string & keyword, const std::string & content);   // set a class member to content // HE20220404
+      void SetByHash(const uint64_t key_hash, const std::string & content); // set a class member to content based on crc64 keyword hash // HE20220404
       uint file2aflowlib(const string& file,ostream& oss=std::cout);       // load from file
       uint url2aflowlib(const string& url,ostream& oss,bool=TRUE); // load from the web (VERBOSE)
       string aflowlib2string(string="out", bool=false);          //ME20210408 - added PRINT_NULL
@@ -300,6 +303,7 @@ namespace aflowlib {
     private:                                                     //
       void free();                                               // free space
       void copy(const _aflowlib_entry& b);                       //
+      void LoadCleanup();
   };
 }
 

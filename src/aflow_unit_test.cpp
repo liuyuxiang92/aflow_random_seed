@@ -397,7 +397,6 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   multi_check = (multi_check && (aurostd::string2utype<int>("-420", 5)) == -110);
   multi_check = (multi_check && (aurostd::string2utype<int>("-110100100", 2)) == -420);
   check_equal(multi_check, true, check_function, check_description, passed_checks, results);
-  cout << aurostd::string2utype<int>("-1011010", 2)<< endl;
   check_description = "float - bases 16, 10, 8, 5, 2";
   multi_check = true;
   multi_check = (multi_check && (aurostd::string2utype<float>("-4.20") == -4.20f));
@@ -415,6 +414,20 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   multi_check = (multi_check && (aurostd::string2utype<double>("-420", 5)) == -110.0);
   multi_check = (multi_check && (aurostd::string2utype<double>("-110100100", 2)) == -420.0);
   check_equal(multi_check, true, check_function, check_description, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | crc64 //HE20220404
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::crc64()";
+  check_description = "runtime hashing";
+  uint64_t expected_uint64 = 15013402708409085989;
+  uint64_t calculated_uint64 = aurostd::crc64("aflowlib_date");
+  check_equal(calculated_uint64, expected_uint64, check_function, check_description, passed_checks, results);
+
+  check_function = "aurostd::ctcrc64()";
+  check_description = "compiler hashing (constexpr)";
+  static constexpr uint64_t calculated_const_uint64 = aurostd::ctcrc64("aflowlib_date");
+  check_equal(calculated_const_uint64, expected_uint64, check_function, check_description, passed_checks, results);
 
   // present overall result
   return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
@@ -1517,10 +1530,14 @@ bool EntryLoaderTest(ofstream& FileMESSAGE,ostream& oss) {  //CO20200520
   // Check | load xstructure from file
   aurostd::StringstreamClean(check_description);
   check_function = "EntryLoader::loadXstructureFile()";
-  el.loadXstructureFile(test_entry, test_structure);
   check_description << "load xstructure extern";
-  check_equal(test_structure.atoms.size(), (size_t) 6, check_function, check_description.str(), passed_checks, results);
-
+  if (!test_entry.auid.empty()) {
+    el.loadXstructureFile(test_entry, test_structure);
+    check_equal(test_structure.atoms.size(), (size_t) 6, check_function, check_description.str(), passed_checks, results);
+  } else {
+    check_description << " | failed to load example structure form AFLUX in previous test";
+    check(false, 0, 0, check_function, check_description.str(), passed_checks, results);
+  }
 
   // ---------------------------------------------------------------------------
   // Check | load AURL

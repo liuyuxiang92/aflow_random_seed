@@ -129,7 +129,7 @@ namespace aflowlib {
     aurostd::StringstreamClean(m_logger_message);
 
     m_sqlite_db_ptr = b.m_sqlite_db_ptr;
-    m_sqlite_alloy_db_ptr = b.m_sqlite_db_ptr;
+    m_sqlite_alloy_db_ptr = b.m_sqlite_alloy_db_ptr;
 
     m_entries_flat = std::make_shared < std::vector < std::shared_ptr < aflowlib::_aflowlib_entry>>>(*b.m_entries_flat);
     m_entries_layered_map = std::make_shared < std::map < short,
@@ -489,12 +489,15 @@ namespace aflowlib {
   /// @param where part of the SQLITE query after a `WHERE` keyword
   /// @note use setSource() to change the current source to Source::SQLITE to ensure that the database is connected
   void EntryLoader::loadSqliteWhere(const std::string &where) {
-    std::vector <std::string> raw_lines = getRawSqliteWhere(where);
-    m_logger_message << raw_lines.size() << " entries found in DB for " << where;
+//    std::vector <std::string> raw_lines = getRawSqliteWhere(where);
+    vector<vector<string>> content = m_sqlite_db_ptr->getRowsMultiTables(where);
+    vector<string> keys = m_sqlite_db_ptr->getColumnNames("auid_00");
+
+    m_logger_message << content.size() << " entries found in DB for " << where;
     outDebug(__func__);
 
     size_t start_size = m_entries_flat->size();
-    loadText(raw_lines);
+    loadVector(keys, content);
 
     m_logger_message << "Loaded " << m_entries_flat->size() - start_size << " new entries";
     outInfo(__func__);
@@ -559,6 +562,26 @@ namespace aflowlib {
     for (std::vector<std::string>::const_iterator line = raw_data_lines.begin(); line != raw_data_lines.end(); line++) {
       std::shared_ptr <aflowlib::_aflowlib_entry> entry = std::make_shared<aflowlib::_aflowlib_entry>();
       entry->Load(*line, *p_oss);
+      if (!entry->auid.empty() && (std::find(m_auid_list.begin(),m_auid_list.end(), entry->auid) == m_auid_list.end())) {
+        m_entries_flat->push_back(entry);
+        (*m_entries_layered_map)[entry->nspecies][entry->species_pp].push_back(entry);
+        m_auid_list.emplace_back(entry->auid);
+        if (m_xstructure_original) addXstructure(*entry, true);
+        if (m_xstructure_relaxed) addXstructure(*entry);
+      }
+    }
+  }
+
+  /// @brief load entries from vectors
+  /// @param keys list of keys
+  /// @param content list of keys
+  /// @note each entry in content should correspond to one AFLOW lib entry
+  void EntryLoader::loadVector(const std::vector<std::string> &keys, const std::vector<std::vector<std::string>> & content) {
+    std::vector<uint64_t> hash_list;
+    for (std::vector<std::string>::const_iterator key = keys.begin(); key != keys.end(); key++) hash_list.emplace_back(aurostd::crc64(*key));
+    for (std::vector<std::vector<std::string>>::const_iterator row=content.begin(); row!=content.end(); row++) {
+      std::shared_ptr <aflowlib::_aflowlib_entry> entry = std::make_shared<aflowlib::_aflowlib_entry>();
+      entry->Load(hash_list, *row, *p_oss);
       if (!entry->auid.empty() && (std::find(m_auid_list.begin(),m_auid_list.end(), entry->auid) == m_auid_list.end())) {
         m_entries_flat->push_back(entry);
         (*m_entries_layered_map)[entry->nspecies][entry->species_pp].push_back(entry);
@@ -701,7 +724,7 @@ namespace aflowlib {
   /// @return list of result query strings
   std::vector <std::string> EntryLoader::getRawSqliteWhere(const std::string &where) const{
     if (m_sqlite_db_ptr != nullptr) return m_sqlite_db_ptr->getEntrySet(where, aflow_ft);
-    else return {"",};
+    else return {};
   }
 
   /// @brief query AFLUX using a matchbook

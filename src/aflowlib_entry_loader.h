@@ -110,8 +110,9 @@ namespace aflowlib {
       void loadRestAPIQueries(const std::vector<std::string> & queries, bool full_url=false);
       void loadFiles(const std::vector<std::string> & files);
       void loadText(const std::vector<std::string> & raw_data_lines);
+      void loadVector(const std::vector<std::string> &keys, const std::vector<std::vector<std::string>> & content);
 
-      // Source setter and getter
+    // Source setter and getter
       bool setSource(EntryLoader::Source new_source);
       EntryLoader::Source getSource() const;
 
