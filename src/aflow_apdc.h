@@ -83,7 +83,6 @@ namespace apdc {
   string CreateLatForATAT(const string& plattice, const vector<string>& elements);
   vector<xstructure> GetATATXstructures(const string& lat, const uint max_num_atoms);
   vector<int> GetMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads);
-  string POCCFunction(const string& plattice, const vector<string>& elements, const int max_num_atoms);
 }
 
 #endif
