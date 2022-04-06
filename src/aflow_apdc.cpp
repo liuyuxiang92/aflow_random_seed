@@ -118,13 +118,6 @@ namespace apdc {
  void GetPhaseDiagram(const string& aflowin, bool command_line_call) {
     _apdc_data apdc_data;
     string function_name = XPID + "GetPhaseDiagram():";
-    //cerr<<aurostd::file2string("/common/LIB6/TODO/CoCu_pvMg_pvNi_pvOZn:PAW_PBE/ARUN.POCC_18_H1C006/aflow.in")<<endl;
-    //cerr<<pocc::extractPARTCAR("/common/LIB6/TODO/CoCu_pvMg_pvNi_pvOZn:PAW_PBE/ARUN.POCC_18_H1C006/aflow.in")<<endl;
-    string AflowIn = "/home/sd453/tmp/testing/aflow.in";
-    stringstream ss;
-    aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,ss, "[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE", "[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE");
-    cerr<<ss.str()<<endl;
-    return;
     if (command_line_call) {
       // FORMAT: <plattice>:<element1>,<element2>,...<element(K)>:<conc1_i>,<conc1_f>,<conc2_i><conc2_f>,..<conc(K),i><conc(K)_f>
       vector<string> tokens;
@@ -134,7 +127,7 @@ namespace apdc {
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
       }
       if (tokens.size() != 3) {
-        string message = "Invalid input";
+        string message = "Invalid input, format is: <plattice>:<element1>,<element2>,...<element(K)>:<conc1_i>,<conc1_f>,<conc2_i><conc2_f>,..<conc(K),i><conc(K)_f>";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
       }
       apdc_data.min_sleep = DEFAULT_APDC_MIN_SLEEP_SECONDS;
@@ -259,6 +252,8 @@ namespace apdc {
 // Binodal construction based on the method developed in Y. Lederer et al., Acta Materialia, 159 (2018)
 namespace apdc {
   void GetBinodal(_apdc_data& apdc_data) {
+    POCCFunction(apdc_data.plattice, apdc_data.elements, apdc_data.max_num_atoms);
+    return;
     apdc_data.lat_atat = CreateLatForATAT(apdc_data.plattice, apdc_data.elements);
     apdc_data.vstr_atat = GetATATXstructures(apdc_data.lat_atat, (uint)apdc_data.max_num_atoms);
     //apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads, false);
@@ -625,6 +620,7 @@ namespace apdc {
 namespace apdc {
   string CreateLatForATAT(const string& plattice, const vector<string>& elements) {
     stringstream oss;
+    uint nelem = elements.size();
     xmatrix<double> lattice(3,3);
     xvector<double> angles = 90.0 * aurostd::ones_xv<double>(3);
     xvector<double> coorsys = aurostd::ones_xv<double>(3);
@@ -655,12 +651,12 @@ namespace apdc {
       oss << endl;
     }
     oss << 0.0 << " " << 0.0 << " " << 0.0 << " ";
-    for (uint i = 0; i < elements.size(); i++) {
+    for (uint i = 0; i < nelem; i++) {
       oss << elements[i] << ",";
     }
     if (plattice == "hcp") {
       oss << endl << 2.0 / 3.0 << " " << 1.0 / 3.0 << " " << 0.5 << " ";
-      for (uint i = 0; i < elements.size(); i++) {
+      for (uint i = 0; i < nelem; i++) {
         oss << elements[i] << ",";
       }
     }
@@ -727,7 +723,64 @@ namespace apdc {
   }
 }
 
-
+// ***************************************************************************
+// apdc::POCCFunction
+// ***************************************************************************
+namespace apdc {
+  string POCCFunction(const string& plattice, const vector<string>& elements, const int max_num_atoms) {
+    stringstream oss;
+    uint nelem = elements.size();
+    xmatrix<double> lattice(3,3);
+    double pocc = std::pow((double)nelem, -1.0);
+    oss.precision(_DOUBLE_WRITE_PRECISION_MAX_);
+    oss.setf(std::ios::fixed,std::ios::floatfield);
+    if (plattice == "fcc") {
+      lattice(1, 1) = 0.0; lattice(2, 1) = 0.5; lattice(3, 1) = 0.5;
+      lattice(1, 2) = 0.5; lattice(2, 2) = 0.0; lattice(3, 2) = 0.5;
+      lattice(1, 3) = 0.5; lattice(2, 3) = 0.5; lattice(3, 3) = 0.0;
+    }
+    else if (plattice == "bcc") {
+      lattice(1, 1) = -0.5; lattice(2, 1) = 0.5; lattice(3, 1) = 0.5;
+      lattice(1, 2) = 0.5; lattice(2, 2) = -0.5; lattice(3, 2) = 0.5;
+      lattice(1, 3) = 0.5; lattice(2, 3) = 0.5; lattice(3, 3) = -0.5;
+    }
+    else if (plattice == "hcp") {
+      double sqrt3 = std::sqrt(3.0), sqrt8 = std::sqrt(8.0);
+      lattice(1, 1) = -0.5 * sqrt3; lattice(2, 1) = 0.5; lattice(3, 1) = 0.0;
+      lattice(1, 2) = 0.5 * sqrt3; lattice(2, 2) = 0.5; lattice(3, 2) = 0.0;
+      lattice(1, 3) = 0.0; lattice(2, 3) = 0.0; lattice(3, 3) = sqrt8 / sqrt3;
+    }
+    oss << "[AFLOW]" << endl << "[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE" << endl;
+    oss << "TITLE" << endl << "1.0 " << -1 * max_num_atoms <<endl;
+    for (uint i = 1; i <= 3; i++) {
+      for (uint j = 1; j <= 3; j++) {
+        oss << lattice(i, j) << " ";
+      }
+      oss << endl;
+    }
+    for (uint i = 0; i < nelem; i++) {
+      oss << "1*" << pocc << " ";
+    }
+    oss << endl << "Direct(" << nelem << ")" << endl;
+    for (uint i = 0; i < nelem; i++) {
+      oss << 0.0 << " " << 0.0 << " " << 0.0 << " " << elements[i] << endl;
+    }
+    if (plattice == "hcp") {
+      for (uint i = 0; i < nelem; i++) {
+        oss << 2.0 / 3.0 << " " << 1.0 / 3.0 << " " << 0.5 << " " << elements[i] << endl;
+      }
+    }
+    oss << "[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE" << endl << "[AFLOW]" << endl;
+    cerr<<oss.str()<<endl;
+    xstructure xstr_pocc = pocc::extractPARTCAR(oss.str());
+    cerr << xstr_pocc.partial_occupation_HNF << endl;
+    return oss.str();
+    pocc::POccCalculator pcalc(xstr_pocc, oss);
+    pcalc.calculateHNF();
+    pcalc.getTotalPermutationsCount();
+    return oss.str();
+  }
+}
 
 
 
