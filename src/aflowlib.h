@@ -611,10 +611,10 @@ namespace aflowlib {
       vector<vector<string> > getRowsMultiTables(sqlite3*, const vector<string>&, const string& where="");
       string getValue(const string&, const string&, const string& where="");
       string getValue(sqlite3*, const string&, const string&, const string& where="");
-      string getProperty(const string&, const string&, const string&, const string& where="");
-      string getProperty(sqlite3*, const string&, const string&, const string&, const string& where="");
-      vector<string> getPropertyMultiTables(const string&, const vector<string>&, const string&, const string& where="");
-      vector<string> getPropertyMultiTables(sqlite3*, const string&, const vector<string>&, const string&, const string& where="");
+      string getDatabaseProperty(const string&, const string&, const string&, const string& where="");
+      string getDatabaseProperty(sqlite3*, const string&, const string&, const string&, const string& where="");
+      vector<string> getDatabasePropertyMultiTables(const string&, const vector<string>&, const string&, const string& where="");
+      vector<string> getDatabasePropertyMultiTables(sqlite3*, const string&, const vector<string>&, const string&, const string& where="");
       vector<string> getSet(const string&, const string&, bool distinct=false, const string& where="", int limit=0, const string& order_by="");
       vector<string> getSet(sqlite3*, const string&, const string&, bool distinct=false, const string& where="", int limit=0, const string& order_by="");
       vector<string> getSetMultiTables(const vector<string>&, const string&, bool distinct=false, const string& where="", int limit=0);
