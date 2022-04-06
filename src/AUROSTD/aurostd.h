@@ -437,10 +437,14 @@ namespace aurostd {
   void RemoveSubStringFirstInPlace(string& str_orig, const string& str_rm) __xprototype;  //CO20190712
   string RemoveSubString(const string& str_orig, const string& str_rm) __xprototype;
   void RemoveSubStringInPlace(string& str_orig, const string& str_rm) __xprototype; //CO20190712
+  double VersionString2Double(const string& version_str); //SD20220331
   vector<string> ProcessPIDs(const string& process,bool user_specific=true); //CO20210315
   vector<string> ProcessPIDs(const string& process,string& output_syscall,bool user_specific=true); //CO20210315
+  vector<string> ProcessPIDs(const string& process,const string& pgid,string& output_syscall,bool user_specific=true); //SD20220329
   bool ProcessRunning(const string& process,bool user_specific=true); //CO20210315
+  bool ProcessRunning(const string& process,const string& pgid,bool user_specific=true); //SD20220329
   void ProcessKill(const string& process,bool user_specific=true,bool sigkill=true); //CO20210315
+  void ProcessKill(const string& process,const string& pgid,bool user_specific=true,bool sigkill=true); //SD20220329
   void ProcessRenice(const string& process,int nvalue,bool user_specific=true); //CO20210315
   // about directories and file existing or not
   bool DirectoryMake(string Directory);
