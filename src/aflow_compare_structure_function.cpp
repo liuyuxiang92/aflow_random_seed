@@ -1537,6 +1537,21 @@ namespace compare{
     // { .attribute=<>, .attribute=<>, ...} doesn't work for old GCC versions
 
     structure_mapping_info misfit_info;
+    resetMisfitInfo(misfit_info, magnetic); //DX20220406 - consolidated
+    return misfit_info;
+  }
+}
+
+// ***************************************************************************
+// compare::resetMisfitInfo() //DX20220406
+// ***************************************************************************
+namespace compare{
+  void resetMisfitInfo(structure_mapping_info& misfit_info, bool magnetic){
+
+    // Reset misfit_info struct to default values
+    // DX20200317 - set attributes explicitly
+    // { .attribute=<>, .attribute=<>, ...} doesn't work for old GCC versions
+
     misfit_info.is_magnetic_misfit=magnetic;
     misfit_info.misfit=AUROSTD_MAX_DOUBLE;
     misfit_info.lattice_deviation=AUROSTD_MAX_DOUBLE;
@@ -1546,8 +1561,30 @@ namespace compare{
     misfit_info.magnetic_displacement=AUROSTD_MAX_DOUBLE;
     misfit_info.magnetic_failure=AUROSTD_MAX_DOUBLE;
 
-    misfit_info.rescale_factor=1.0;
-    return misfit_info;
+    uint resize=0;
+    resizeMappingInfo(misfit_info,resize);
+  }
+}
+
+// ***************************************************************************
+// compare::resetMappingInfo() //DX20220406
+// ***************************************************************************
+namespace compare{
+  void resetMappingInfo(structure_mapping_info& misfit_info){
+
+    // Reset anything related to the mapping info
+    // including the misfit and coordinate devation
+    // NOT the lattice displacement
+
+    misfit_info.misfit=AUROSTD_MAX_DOUBLE;
+    misfit_info.coordinate_displacement=AUROSTD_MAX_DOUBLE;
+    misfit_info.failure=AUROSTD_MAX_DOUBLE;
+    misfit_info.magnetic_misfit=AUROSTD_MAX_DOUBLE;
+    misfit_info.magnetic_displacement=AUROSTD_MAX_DOUBLE;
+    misfit_info.magnetic_failure=AUROSTD_MAX_DOUBLE;
+
+    uint resize=0;
+    resizeMappingInfo(misfit_info,resize);
   }
 }
 
@@ -5661,7 +5698,6 @@ bool XtalFinderCalculator::findMatch(
       cerr << function_name << " the minimization method did not reduce the mapping distances; use the original mapping distances." << endl;
     }
   }
-
   return true;
 }
 
@@ -6754,7 +6790,7 @@ void XtalFinderCalculator::latticeSearch(
             // ---------------------------------------------------------------------------
             // collect misfits and matching structure representations
             for(uint p=0;p<vstrs_matched.size();p++){
-              if(vstrs_matched[p].misfit<=match_info.misfit){
+              if(!aurostd::isequal(vstrs_matched[p].misfit,AUROSTD_MAX_DOUBLE) && vstrs_matched[p].misfit<=match_info.misfit){ //DX20220406 - check if AUROSTD_MAX_DOUBLE
                 match_info = vstrs_matched[p];
                 match_info.origin_shift = BringInCell(match_info.origin_shift+shift_xstr1);
                 // if xstr2 was given in Cartesian coordinates, convert shift //DX20210116
@@ -6766,7 +6802,7 @@ void XtalFinderCalculator::latticeSearch(
 
             // ---------------------------------------------------------------------------
             // quick return if found a match
-            if(match_info.misfit<0.1 && !optimize_match){
+            if(match_info.misfit<misfit_match && !optimize_match){ //DX20220406 - 0.1 to misfit_match (tunable)
               if(LDEBUG){cerr << function_name << " Found match (misfit = " << match_info.misfit << ")! Terminating search early." << endl;}
               return;
             }
@@ -7057,6 +7093,7 @@ bool XtalFinderCalculator::searchAtomMappings(
           // could not map atoms with this origin choice
           else{
             if(LDEBUG){ cerr << function_name << " Could not match atom positions. Try new origin choice." << endl; }
+            compare::resetMappingInfo(vstrs_matched[p]); //DX20220406 - need to reset if no maps were found
           }
         }
       }
