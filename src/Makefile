@@ -33,17 +33,18 @@ VERSNUMBER=3.2.12
 UNAME=$(shell uname)
 
 # for aflow
-CPP=g++ -std=c++11 #HE20220124 ensure c++ standard is consistent
+CPP=g++
 #-O2 -frepo
 # for sqllite
 CC=gcc
 ARCH=
 ifeq ($(UNAME),Darwin)
-CPP=clang++ -std=c++11 #HE20220124 ensure c++ standard is consistent
+CPP=clang++
 CC=clang
 ARCH=-D_MACOSX_
 endif
 
+CPP += -std=c++11 #HE20220124 ensure c++ standard is consistent
 
 #CPP=g++-fsf-7 
 #CPP=g++-fsf-4.9 -std=gnu++11
@@ -199,7 +200,7 @@ debug: aflow aflow_data
 .PHONY: mac
 mac:
 #	[CO20200508 - OBSOLETE]$(MAKE) CC=clang CPP=clang++ aflow_data
-	$(MAKE) CC=clang CPP="clang++ -std=c++11" ARCH=-D_MACOSX_ -j 4
+	$(MAKE) CC=clang CPP=clang++ ARCH=-D_MACOSX_ -j 4
 #	[CO20200508 - OBSOLETE]ln -sf aflow aflowd
 #	[CO20200508 - OBSOLETE]ln -sf aflow apennsy
 #	[CO20200508 - OBSOLETE]$(MAKE) check
