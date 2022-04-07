@@ -4714,14 +4714,16 @@ namespace aflowlib {
 namespace aflowlib {
   string AFLUXCall(const string& summons){
     // Performs AFLUX call based on summons input
+    // switched to aurostd::xhttp //HE20220407
     bool LDEBUG=(false || XHOST.DEBUG);
-    string base_url="http://aflowlib.duke.edu/API/aflux/?";
     string function_name = XPID + "AFLUXCall():";
+    string url = "http://aflow.org/API/aflux/?" + aurostd::httpPercentEncodingFull(summons);
     if(LDEBUG) {
       cerr << function_name << ": Summons = " << summons << endl;
+      cerr << function_name << ": URL = " << url << endl;
       cerr << function_name << ": Performing call ... please be patient ..." << endl;
     }
-    return aurostd::httpGet(base_url + aurostd::httpPercentEncodingFull(summons));;
+    return aurostd::httpGet(url);
   }
 }
 
