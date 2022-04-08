@@ -5206,11 +5206,16 @@ namespace aurostd {
   template<typename typeTo, typename typeFrom> typeTo stream2stream(const typeFrom& from) { //CO20210315 - cleaned up
     return (typeTo) stream2stream<typeTo>(from,AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);
   }
-  template<typename utype> utype string2utype(const string& from) {
-    if(from.empty()){return (utype) stream2stream<utype>("0",AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);;} //CO20210315 - stream2stream behavior is not defined for empty string input: https://stackoverflow.com/questions/4999650/c-how-do-i-check-if-the-cin-buffer-is-empty
+  template<typename utype> utype string2utype(const string& from, const uint base) {
+    if(from.empty()){return (utype) stream2stream<utype>("0",AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);} //CO20210315 - stream2stream behavior is not defined for empty string input: https://stackoverflow.com/questions/4999650/c-how-do-i-check-if-the-cin-buffer-is-empty
     string FROM=aurostd::toupper(from); //CO20210315
     if(FROM=="TRUE"||FROM=="T"||FROM==".TRUE."){return (utype) stream2stream<utype>("1",AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);;}  //CO20210315 - safe because inputs are generally digits
     if(FROM=="FALSE"||FROM=="F"||FROM==".FALSE."){return (utype) stream2stream<utype>("0",AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);;}  //CO20210315 - safe because inputs are generally digits
+    if (base != 10) { //HE20220324 add non-decimal bases (will ignore positions behind a point)
+      std::stringstream temp;
+      temp << std::stoll(from, nullptr, base); // stoll -> string to long long
+      return (utype) stream2stream<utype>(temp.str(),AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);
+    }
     //[CO20210315 - doesn't work]if(!aurostd::isfloat(from)){return (utype) 0;} //CO20210315 - stream2stream undefined behavior
     return (utype) stream2stream<utype>(from,AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);
   }
@@ -5434,6 +5439,12 @@ namespace aurostd {
     return strstring;
   }
 
+  //HE20220321 overload for const strings
+  string StringSubst(const string &strstring, const string &strfind, const string &strreplace) {
+    std::string work_copy = strstring;
+    return StringSubst(work_copy, strfind, strreplace);
+  }
+
   string StringSubst(string &strstring, const char &charfind, const char &charreplace) {
     string stroutput;
     for (uint i=0;i<strstring.size();i++)
@@ -5443,6 +5454,12 @@ namespace aurostd {
         stroutput+=strstring[i];
     strstring=stroutput;
     return strstring;
+  }
+
+  //HE20220321 overload for const strings
+  string StringSubst(const string &strstring, const char &charfind, const char &charreplace) {
+    std::string work_copy = strstring;
+    return StringSubst(work_copy, charfind, charreplace);
   }
 
   void StringStreamSubst(stringstream &strstringstream, const string &strfind, const string &strreplace) {

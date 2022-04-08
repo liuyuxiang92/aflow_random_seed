@@ -3174,21 +3174,23 @@ namespace KBIN {
     //therefore, the most robust way to define the binary is to search the LOCK file
     //[CO20210315 - OBSOLETE]string& vasp_bin=kflags.KBIN_MPI_BIN;
     //[CO20210315 - OBSOLETE]if(!(kflags.KBIN_MPI==true||XHOST.MPI==true)){vasp_bin=kflags.KBIN_BIN;}
-    string vasp_bin="";
+    string vasp_bin="",vasp_pgid="";
     GetVASPBinaryFromLOCK(xvasp.Directory,vasp_bin);
     vasp_bin=aurostd::basename(vasp_bin); //remove directory stuff
+    vasp_pgid=aurostd::utype2string(getpgrp()); //SD20220406 - need PGID for VASP_instance_running
     if(vasp_bin.empty()){ //rely on defaults here in case we're not running --monitor_vasp
       vasp_bin=kflags.KBIN_MPI_BIN;
       if(!(kflags.KBIN_MPI==true||XHOST.MPI==true)){vasp_bin=kflags.KBIN_BIN;}
     }
 
     //CO20210315 - determine if vasp is still running
-    bool vasp_still_running=false; //CO20210315 - look at wording, very careful, this bool implies vasp WAS running, and now is not
-    if(XHOST.vflag_control.flag("KILL_VASP_ALL")){
-      //KILL_VASP_ALL allows us to check for ANY instance of vasp running (assumes exclusivity in node environment)
-      //we will develop more precise methods for tracking parent/child processes of aflow to target specific vasp instances in the future
-      vasp_still_running=VASP_instance_running(vasp_bin);
-    }
+    //[SD20220406 - OBSOLETE]bool vasp_still_running=false; //CO20210315 - look at wording, very careful, this bool implies vasp WAS running, and now is not
+    //[SD20220406 - OBSOLETE]if(XHOST.vflag_control.flag("KILL_VASP_ALL")){
+    //[SD20220406 - OBSOLETE]  //KILL_VASP_ALL allows us to check for ANY instance of vasp running (assumes exclusivity in node environment)
+    //[SD20220406 - OBSOLETE]  //we will develop more precise methods for tracking parent/child processes of aflow to target specific vasp instances in the future
+    //[SD20220406 - OBSOLETE]  vasp_still_running=VASP_instance_running(vasp_bin);
+    //[SD20220406 - OBSOLETE]}
+    bool vasp_still_running=VASP_instance_running(vasp_bin,vasp_pgid); //SD20220406 - we are not using the --kill_vasp_all flag anymore
     if(LDEBUG){aus << soliloquy << " vasp_still_running=" << vasp_still_running << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
     //vasp can spit out many warnings quickly, going from ~10MB to 1GB within 2 minutes

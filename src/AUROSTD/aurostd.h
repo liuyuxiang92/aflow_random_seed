@@ -56,9 +56,13 @@
 #include <unistd.h>
 #include <signal.h>  //ME20191125 - needed for AflowDB
 #include <vector>
-#include <list> //CO20170806 - need for POCC
-#include <utility> //HE2021069 - for pairs in chull (C++98 changes, already included in SYMBOLICCPLUSPLUS)
-#include <netdb.h>  //CO20180321 - frisco needs for AFLUX
+#include <list>          //CO20170806 - need for POCC
+#include <utility>       //HE2021069 - for pairs in chull (C++98 changes, already included in SYMBOLICCPLUSPLUS)
+#include <netdb.h>       //CO20180321 - frisco needs for AFLUX + for EntryLoader
+#include <fts.h>         //HE20220222 - for EntryLoader (effective filesystem tree walk)
+#include <regex>         //HE20220222 - for EntryLoader (faster match of complex patterns like alloy matching)
+
+
 
 #define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)  //CO20200502 - moved from aflow.h
 
@@ -182,6 +186,7 @@ using std::vector;
 #include "aurostd_xcombos.h"
 #include "aurostd_xerror.h" //ME20180627
 #include "aurostd_xfit.h" //AS20200824
+#include "aurostd_xhttp.h" //HE20220121
 
 using aurostd::min;
 using aurostd::max;
@@ -748,7 +753,7 @@ namespace aurostd {
   // [OBSOLETE]  long double string2longdouble(const string& from) __xprototype;
   // [OBSOLETE]  int string2int(const string& from) __xprototype;
   string string2string(const string& from) __xprototype;
-  template<typename utype> utype string2utype(const string& from);  //CO20210315 - cleaned up
+  template<typename utype> utype string2utype(const string& from, const uint base=10);  //CO20210315 - cleaned up //HE20220324 add base option
   vector<int> vectorstring2vectorint(const vector<string>& from); //CO20210315 - cleaned up
   // [OBSOLETE] uint string2uint(const string& from) __xprototype;
   vector<uint> vectorstring2vectoruint(const vector<string>& from); //CO20210315 - cleaned up
@@ -808,8 +813,10 @@ namespace aurostd {
   bool StringsAlphabetic(const vector<string>& input,bool allow_identical=true);  //CO20180801
   bool StringsAlphabetic(const deque<string>& input,bool allow_identical=true);  //CO20180801
   string StringSubst(string &strstring, const string &strfind, const string &strreplace);
+  string StringSubst(const string &strstring, const string &strfind, const string &strreplace); //HE20220321
   //  string StringSubst(string &strstring, const string &strfind0, const string &strfind1, const string &strfind2, const string &strfind3, const string &strreplace);
   string StringSubst(string &strstring, const char &charfind, const char &charreplace);
+  string StringSubst(const string &strstring, const char &charfind, const char &charreplace);
   void StringStreamSubst(stringstream &strstring, const string &strfind, const string &strreplace);  //ME20190128 - fixed type declaration
   // about present substrings
   bool substring2bool(const string& strstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up

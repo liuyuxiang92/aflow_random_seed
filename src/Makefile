@@ -44,6 +44,7 @@ CC=clang
 ARCH=-D_MACOSX_
 endif
 
+CPP += -std=c++11 #HE20220124 ensure c++ standard is consistent
 
 #CPP=g++-fsf-7 
 #CPP=g++-fsf-4.9 -std=gnu++11
@@ -67,12 +68,12 @@ INCLUDE = -I ./
 #INCLUDE = -I ./ -I /opt/intel/mkl100/include
 
 # -fno-inline -fno-implicit-inline-templates-frepo
-OPTS=-std=c++11
+OPTS=
 #-O2
 #-O1
 #-O3
 # -march=opteron
-OPTS_MT=-O2 -std=c++11
+OPTS_MT=-O2
 TODAY=-DTODAY=\"$(TIME)\"
 VERS=-DAFLOW_VERSION=\"$(VERSNUMBER)\" $(TODAY)
 
