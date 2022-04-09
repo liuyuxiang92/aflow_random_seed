@@ -311,24 +311,24 @@ namespace aflowlib {
 }
 
 // ***************************************************************************
-// AFLUX STUFF
-namespace aflowlib {
-  class APIget {
-    private:
-      struct sockaddr_in client;
-      int sock;
-      int PORT;// = 80; //CO20180401
-      string Summons;
-      string API_Path;
-      string Domain;
-      bool establish();
-    public:
-      //DX20210615 [OBSOLETE] APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226
-      APIget( string a_Summons="", string a_API_Path="/API/aflux/?", string a_Domain="aflow.org" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226 //DX20210615 - updated domain name
-      void reset( string a_Summons="#", string a_API_Path="", string a_Domain="" );
-      friend ostream& operator<<( ostream& output, APIget& a );
-  };
-}
+// AFLUX STUFF // Obsolete with aurostd::xhttp //HE20220407
+//namespace aflowlib {
+//  class APIget {
+//    private:
+//      struct sockaddr_in client;
+//      int sock;
+//      int PORT;// = 80; //CO20180401
+//      string Summons;
+//      string API_Path;
+//      string Domain;
+//      bool establish();
+//    public:
+//      //DX20210615 [OBSOLETE] APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226
+//      APIget( string a_Summons="", string a_API_Path="/API/aflux/?", string a_Domain="aflow.org" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226 //DX20210615 - updated domain name
+//      void reset( string a_Summons="#", string a_API_Path="", string a_Domain="" );
+//      friend ostream& operator<<( ostream& output, APIget& a );
+//  };
+//}
 
 // ***************************************************************************
 namespace aflowlib {
