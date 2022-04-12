@@ -1849,8 +1849,9 @@ namespace chull {
     }
 
     // Build the raw facet collection
-    // Add unchanged facets (no sorting, as they should all be triangles)
+    //HE20220319 sorting needed for consistent 3D rendering (the order defines the facet normal)
     for (uint i=0; i<raw_facets_size; i++){
+      sortFacetVertices(raw_facets[i], i);
       if (std::find(remove_facet.begin(), remove_facet.end(), i) == remove_facet.end()) raw_facet_collection.push_back(raw_facets[i]);
     }
     // Add joined facets
@@ -1874,8 +1875,11 @@ namespace chull {
       for (std::vector<uint>::const_iterator p_id = vertices_to_remove.begin(); p_id != vertices_to_remove.end(); ++p_id) {
         vertices.erase(std::find(vertices.begin(), vertices.end(), *p_id));
       }
-      sortFacetVertices(vertices, *to_join->begin());
-      raw_facet_collection.push_back(vertices);
+      //HE20220319 never add facet with less than three vertices
+      if (vertices.size()>=3) {
+        sortFacetVertices(vertices, *to_join->begin());
+        raw_facet_collection.push_back(vertices);
+      }
     }
 
     // remove points that are on an edge and not a corner
@@ -1892,6 +1896,19 @@ namespace chull {
       }
       facet_collection.push_back(vec_vertices);
     }
+    //HE20210729 START
+    // Check for ghost facets with less than 3 vertices
+    // (they can be created when joining facet that are not perfectly coplanar)
+    vector<uint> ghost_facets;
+    for (uint i_facet = 0; i_facet < facet_collection.size(); i_facet++) {
+      if (facet_collection[i_facet].size() <= 2) ghost_facets.push_back(i_facet);
+    }
+    // start with the largest index when removing, as vector will shrink and indexes would change
+    sort(ghost_facets.begin(), ghost_facets.end(), std::greater<uint>());
+    for (uint i_ghost = 0; i_ghost < ghost_facets.size(); i_ghost++) {
+      facet_collection.erase(facet_collection.begin() + ghost_facets[i_ghost]);
+    }
+    //HE20210729 END
   }
   //since we don't check ALL attributes of entry, then we weed out MORE
   //entries existing in different catalogs will not be strictly identical
@@ -4907,14 +4924,37 @@ namespace chull {
         cerr << points_to_avoid[j].ch_index << "  h_coords=" << m_points[points_to_avoid[j].ch_index].h_coords << endl;
       }
     }
-
+    //HE20220412 START
+    //collect directions already spanned by `points_to_avoid`
+    vector<xvector<double>> directions;
+    if (points_to_avoid.size() >= 2) { // at least two points needed to create a direction
+      for (size_t avoid_i=1; avoid_i<points_to_avoid.size(); avoid_i++){
+        // using the first extreme point as our starting point for all directions
+        directions.push_back(m_points[points_to_avoid[avoid_i].ch_index].h_coords - m_points[points_to_avoid[0].ch_index].h_coords);
+      }
+    }
+    //HE20220412 END
     int h_coords_index=0;
     for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
       h_coords_index=(int)dim+m_points[h_points[i]].h_coords.lrows;
       if(h_coords_index>m_points[h_points[i]].h_coords.urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid coordinate index");}
       avoid=false;
-      for(uint j=0,fl_size_j=points_to_avoid.size();j<fl_size_j&&!avoid;j++){if(h_points[i]==points_to_avoid[j].ch_index){avoid=true;}}
+      for(uint j=0,fl_size_j=points_to_avoid.size();j<fl_size_j&&!avoid;j++){if(h_points[i]==points_to_avoid[j].ch_index){avoid=true; break;}} //HE20220412 added break to end loop when point is found
       if(avoid){continue;}
+      //ensure that considered points add new dimension
+      //HE20220412 START
+      if (!directions.empty()) {
+        xvector<double> new_direction = m_points[h_points[i]].h_coords - m_points[points_to_avoid[0].ch_index].h_coords;
+        for (vector<xvector<double>>::const_iterator direction = directions.begin();
+             direction != directions.end(); direction++) {
+          if (aurostd::isCollinear(*direction, new_direction, ZERO_TOL))  {
+            avoid=true;
+            break;
+          }
+        }
+        if(avoid){continue;}
+      }
+      //HE20220412 END
       if(abs(m_points[h_points[i]].h_coords[h_coords_index])>extreme){
         i_point=h_points[i];
         extreme=abs(m_points[h_points[i]].h_coords[h_coords_index]);
@@ -5644,7 +5684,7 @@ namespace chull {
 
   double ConvexHull::getDistanceToHull(uint i_point,bool redo,bool get_signed_distance) const{
     string soliloquy=XPID+"ConvexHull::getDistanceToHull():";
-    if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    if(i_point>(m_points.size()-1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");} //HE20210629 make comparsion more precies
     return getDistanceToHull(m_points[i_point],redo,get_signed_distance);
   }
 
