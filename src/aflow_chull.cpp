@@ -5686,7 +5686,7 @@ namespace chull {
 
   double ConvexHull::getDistanceToHull(uint i_point,bool redo,bool get_signed_distance) const{
     string soliloquy=XPID+"ConvexHull::getDistanceToHull():";
-    if(i_point>(m_points.size()-1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");} //HE20210629 make comparsion more precies
+    if(i_point>(m_points.size()-1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");} //HE20210629 make comparison more precise
     return getDistanceToHull(m_points[i_point],redo,get_signed_distance);
   }
 
