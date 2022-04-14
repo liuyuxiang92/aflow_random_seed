@@ -1,5 +1,6 @@
 3.2.13 - 2022/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz
+        -- fixed bug with printing atom mapping information in XtalFinder, reset for non-matches (DX)
         -- parallelized KBIN::CompressDirectory() (CO)
         -- Fixed CIF parser for CIF files with oxidation states in species list (ME)
         -- Added fallback solutions for reading CIF files with unregonized settings (ME)
