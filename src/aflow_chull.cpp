@@ -1851,8 +1851,9 @@ namespace chull {
     }
 
     // Build the raw facet collection
-    // Add unchanged facets (no sorting, as they should all be triangles)
+    //HE20220319 sorting needed for consistent 3D rendering (the order defines the facet normal)
     for (uint i=0; i<raw_facets_size; i++){
+      sortFacetVertices(raw_facets[i], i);
       if (std::find(remove_facet.begin(), remove_facet.end(), i) == remove_facet.end()) raw_facet_collection.push_back(raw_facets[i]);
     }
     // Add joined facets
@@ -1876,8 +1877,11 @@ namespace chull {
       for (std::vector<uint>::const_iterator p_id = vertices_to_remove.begin(); p_id != vertices_to_remove.end(); ++p_id) {
         vertices.erase(std::find(vertices.begin(), vertices.end(), *p_id));
       }
-      sortFacetVertices(vertices, *to_join->begin());
-      raw_facet_collection.push_back(vertices);
+      //HE20220319 never add facet with less than three vertices
+      if (vertices.size()>=3) {
+        sortFacetVertices(vertices, *to_join->begin());
+        raw_facet_collection.push_back(vertices);
+      }
     }
 
     // remove points that are on an edge and not a corner
@@ -1894,6 +1898,16 @@ namespace chull {
       }
       facet_collection.push_back(vec_vertices);
     }
+    //HE20220413 START
+    // Check for ghost facets with less than 3 vertices
+    // (they can be created when joining facets that are not perfectly coplanar)
+    // start with the largest index when removing, as vector will shrink and indexes would change
+    for (uint i_facet=facet_collection.size()-1; i_facet > 0; i_facet--){
+      if (facet_collection[i_facet].size() <= 2) {
+        facet_collection.erase(facet_collection.begin() + i_facet);
+      }
+    }
+    //HE20220413 END
   }
   //since we don't check ALL attributes of entry, then we weed out MORE
   //entries existing in different catalogs will not be strictly identical
@@ -4909,14 +4923,46 @@ namespace chull {
         cerr << points_to_avoid[j].ch_index << "  h_coords=" << m_points[points_to_avoid[j].ch_index].h_coords << endl;
       }
     }
-
+    //HE20220412 START
+    //collect directions already spanned by `points_to_avoid`
+    vector<xvector<double>> directions;
+      for (size_t avoid_i=1; avoid_i<points_to_avoid.size(); avoid_i++){
+        // using the first extreme point as our starting point for all directions
+        directions.push_back(m_points[points_to_avoid[avoid_i].ch_index].h_coords - m_points[points_to_avoid[0].ch_index].h_coords);
+      }
+    //HE20220412 END
     int h_coords_index=0;
+    xvector<double> new_direction;
     for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
       h_coords_index=(int)dim+m_points[h_points[i]].h_coords.lrows;
-      if(h_coords_index>m_points[h_points[i]].h_coords.urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid coordinate index");}
+      if(h_coords_index>m_points[h_points[i]].h_coords.urows){
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid coordinate index");
+      }
       avoid=false;
-      for(uint j=0,fl_size_j=points_to_avoid.size();j<fl_size_j&&!avoid;j++){if(h_points[i]==points_to_avoid[j].ch_index){avoid=true;}}
+      for(uint j=0,fl_size_j=points_to_avoid.size();j<fl_size_j&&!avoid;j++){
+        if(h_points[i]==points_to_avoid[j].ch_index){
+          avoid=true;
+          break;
+        }
+      } //HE20220412 added break to end loop when point is found
       if(avoid){continue;}
+      //ensure that considered points add a new dimension to the initial facet (not collinear)
+      //without this check, the first facet may not be spanning a dim-1 space
+      //resulting in a wrong normal vector that trips up the search algorithm for the next point to add
+      //which can lead to an endless loop in ConvexHull::calculateFacets()
+      //this check became necessary as the creation of atomic environments uses ConvexHull to create hulls from arbitrary points
+      //HE20220412 START
+      if (!directions.empty()) {
+        new_direction = m_points[h_points[i]].h_coords - m_points[points_to_avoid[0].ch_index].h_coords;
+        for (vector<xvector<double>>::const_iterator direction = directions.begin(); direction != directions.end(); direction++) {
+          if (aurostd::isCollinear(*direction, new_direction, ZERO_TOL))  {
+            avoid=true;
+            break;
+          }
+        }
+        if(avoid){continue;}
+      }
+      //HE20220412 END
       if(abs(m_points[h_points[i]].h_coords[h_coords_index])>extreme){
         i_point=h_points[i];
         extreme=abs(m_points[h_points[i]].h_coords[h_coords_index]);
@@ -5646,7 +5692,7 @@ namespace chull {
 
   double ConvexHull::getDistanceToHull(uint i_point,bool redo,bool get_signed_distance) const{
     string soliloquy=XPID+"ConvexHull::getDistanceToHull():";
-    if(i_point>m_points.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");}
+    if(i_point>(m_points.size()-1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Invalid index within points");} //HE20210629 make comparison more precise
     return getDistanceToHull(m_points[i_point],redo,get_signed_distance);
   }
 
