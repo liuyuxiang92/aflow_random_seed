@@ -249,20 +249,6 @@ namespace KBIN {
       _xflags& xflags, 
       ofstream& FileMESSAGE,
       ostream& oss) {
-    //ME20200107 - Wrap in a try statement so that faulty APL runs don't kill other post-processing
-    try {
-      RunPhonons_APL_20181216(xinput,AflowIn,aflags,kflags,xflags,FileMESSAGE);
-    } catch (aurostd::xerror e) {
-      pflow::logger(e.whereFileName(), e.whereFunction(), e.buildMessageString(), aflags.Directory, FileMESSAGE, oss, _LOGGER_ERROR_);
-    }
-  }
-  void RunPhonons_APL_20181216(_xinput& xinput,
-      string AflowIn,
-      _aflags& aflags,
-      _kflags& kflags,
-      _xflags& xflags, 
-      ofstream& FileMESSAGE,
-      ostream& oss) {
 
     bool LDEBUG = (FALSE || XHOST.DEBUG);
 

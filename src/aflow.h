@@ -4891,7 +4891,6 @@ namespace KBIN {
   bool runRelaxationsAPL_VASP(int, const string&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  //ME20200427
   void VASP_RunPhonons_APL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE, ostream& oss=std::cout);
   void RunPhonons_APL(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general
-  void RunPhonons_APL_20181216(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general //CO20181216
   // ----------------------------------------------------------------------------
   // aflow_agl_debye.cpp
   uint relaxStructureAGL_VASP(const string& AflowIn, _xvasp& xvasp, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMessage);  //CT20200501

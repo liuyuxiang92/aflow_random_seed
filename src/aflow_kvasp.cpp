@@ -2150,7 +2150,14 @@ namespace KBIN {
               //[CO20200624 - OBSOLETE]if (kflags.KBIN_PHONONS_CALCULATION_AGL) xvasp.aopts.push_attached("AFLOWIN_FLAG::MODULE", "AGL");  //CT20200319
               KBIN::VASP_RunPOCC(xvasp,AflowIn,aflags,kflags,vflags,FileMESSAGE);
             } //CO20180419
-            else if(kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_AAPL) {KBIN::VASP_RunPhonons_APL(xvasp,AflowIn,aflags,kflags,vflags,FileMESSAGE);} // PHONONIC PHONONIC PHONONIC //CO20170601
+            else if(kflags.KBIN_PHONONS_CALCULATION_APL || kflags.KBIN_PHONONS_CALCULATION_QHA || kflags.KBIN_PHONONS_CALCULATION_AAPL) {
+              //ME20200107 - Wrap in a try statement so that faulty APL runs don't kill other post-processing
+              try {
+                KBIN::VASP_RunPhonons_APL(xvasp,AflowIn,aflags,kflags,vflags,FileMESSAGE); // PHONONIC PHONONIC PHONONIC //CO20170601
+              } catch (aurostd::xerror e) {
+                pflow::logger(e.whereFileName(), e.whereFunction(), e.buildMessageString(), aflags.Directory, FileMESSAGE, std::cout, _LOGGER_ERROR_);
+              }
+            }
             else if(kflags.KBIN_PHONONS_CALCULATION_AGL==TRUE) {KBIN::VASP_RunPhonons_AGL(xvasp,AflowIn,aflags,kflags,vflags,FileMESSAGE);}
             else if(kflags.KBIN_PHONONS_CALCULATION_AEL==TRUE) {KBIN::VASP_RunPhonons_AEL(xvasp,AflowIn,aflags,kflags,vflags,FileMESSAGE);}
             else if(kflags.KBIN_PHONONS_CALCULATION_FROZSL) {KBIN::VASP_RunPhonons_FROZSL(xvasp,AflowIn,aflags,kflags,vflags,FileMESSAGE);}
