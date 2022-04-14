@@ -4948,6 +4948,7 @@ namespace chull {
       //without this check, the first facet may not be spanning a dim-1 space
       //resulting in a wrong normal vector that trips up the search algorithm for the next point to add
       //which can lead to an endless loop in ConvexHull::calculateFacets()
+      //this check became necessary as the creation of atomic environments uses ConvexHull to create hulls from arbitrary points
       //HE20220412 START
       if (!directions.empty()) {
         new_direction = m_points[h_points[i]].h_coords - m_points[points_to_avoid[0].ch_index].h_coords;
