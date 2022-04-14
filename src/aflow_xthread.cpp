@@ -614,6 +614,9 @@ namespace xthread {
 //     vector<double>&
 //   );
 //
+// Using const_iterators work the same way. The first template parameter of run
+// cannot be const though.
+//
 // Note that the iterable has to appear as the first template parameter.
 // The rules and caveats for member functions and const references are the same
 // as for functions using an index.
