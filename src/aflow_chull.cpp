@@ -4930,6 +4930,7 @@ namespace chull {
       }
     //HE20220412 END
     int h_coords_index=0;
+    xvector<double> new_direction;
     for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
       h_coords_index=(int)dim+m_points[h_points[i]].h_coords.lrows;
       if(h_coords_index>m_points[h_points[i]].h_coords.urows){
@@ -4943,12 +4944,14 @@ namespace chull {
         }
       } //HE20220412 added break to end loop when point is found
       if(avoid){continue;}
-      //ensure that considered points add new dimension
+      //ensure that considered points add a new dimension to the initial facet (not collinear)
+      //without this check, the first facet may not be spanning a dim-1 space
+      //resulting in a wrong normal vector that trips up the search algorithm for the next point to add
+      //which can lead to an endless loop in ConvexHull::calculateFacets()
       //HE20220412 START
       if (!directions.empty()) {
-        xvector<double> new_direction = m_points[h_points[i]].h_coords - m_points[points_to_avoid[0].ch_index].h_coords;
-        for (vector<xvector<double>>::const_iterator direction = directions.begin();
-             direction != directions.end(); direction++) {
+        new_direction = m_points[h_points[i]].h_coords - m_points[points_to_avoid[0].ch_index].h_coords;
+        for (vector<xvector<double>>::const_iterator direction = directions.begin(); direction != directions.end(); direction++) {
           if (aurostd::isCollinear(*direction, new_direction, ZERO_TOL))  {
             avoid=true;
             break;
