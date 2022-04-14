@@ -1063,9 +1063,9 @@ namespace aflowlib {
       }
 
       // Loops
-      for (auto& loop : total_stats.loop_counts) {
-        const string& key = loop.first;
-        loop.second += catalog_stats.loop_counts[key];
+      for (std::map<string, uint>::iterator it = total_stats.loop_counts.begin(); it != total_stats.loop_counts.end(); ++it) {
+        const string& key = (*it).first;
+        (*it).second += catalog_stats.loop_counts[key];
       }
 
       // Species
@@ -1350,8 +1350,8 @@ namespace aflowlib {
     json << "{";
     json << "\"count\":" << db_stats.nentries << ",";
     json << "\"systems\":" <<  db_stats.nsystems << ",";
-    for (const auto& loop: db_stats.loop_counts) {
-      json << "\"" << loop.first << "\":" << loop.second << ",";
+    for (std::map<string, uint>::const_iterator it = db_stats.loop_counts.begin(); it != db_stats.loop_counts.end(); ++it) {
+      json << "\"" << (*it).first << "\":" << (*it).second << ",";
     }
     json << "\"columns\":{";
     uint ncols = db_stats.columns.size();
