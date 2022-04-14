@@ -288,19 +288,15 @@ namespace KBIN {
     if(xinput.AFLOW_MODE_VASP){pflow::fixEmptyAtomNames(xinput.xvasp.str,true);}
 
     string _ASTROPT_ = ""; //CO20170601
-    string modulename = "";  //ME20200220 - for pflow::logger
     if (kflags.KBIN_PHONONS_CALCULATION_AAPL) {
-      modulename = "AAPL";  //ME20200220
       _ASTROPT_ = _ASTROPT_AAPL_;    //CO20170601
     } else if (kflags.KBIN_PHONONS_CALCULATION_QHA){
-      modulename = "QHA";  //ME20200220
       _ASTROPT_ = _ASTROPT_QHA_;    //CO20170601
     } else {
-      modulename = "APL";  //ME20200220
       _ASTROPT_ = _ASTROPT_APL_;    //CO20170601
     }
 
-    pflow::logger(_AFLOW_FILE_NAME_, modulename, "RUNNING...", aflags, FileMESSAGE, oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "RUNNING...", aflags, FileMESSAGE, oss);
 
     /////////////////////////////////////////////////////////////////////////////
     //                                                                         //
@@ -318,28 +314,28 @@ namespace KBIN {
       xinput.xvasp.aopts.flag("FLAG::AVASP_BADER",xflags.vflags.KBIN_VASP_FORCE_OPTION_BADER.option);
       if (!xflags.vflags.KBIN_VASP_FORCE_OPTION_BADER.isentry && DEFAULT_VASP_FORCE_OPTION_BADER) {
         message << "Switching OFF BADER for APL calculations (default: OFF)."; //CO20181226 - default OFF
-        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
       }
 
       xflags.vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.options2entry(AflowIn,_STROPT_+"CHGCAR=",false);
       xinput.xvasp.aopts.flag("FLAG::AVASP_CHGCAR",xflags.vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.option);
       if (!xflags.vflags.KBIN_VASP_FORCE_OPTION_CHGCAR.isentry && DEFAULT_VASP_FORCE_OPTION_CHGCAR) {
         message << "Switching OFF CHGCAR for APL calculations (default: OFF).";  //CO20181226 - default OFF
-        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
       }
 
       xflags.vflags.KBIN_VASP_FORCE_OPTION_ELF.options2entry(AflowIn,_STROPT_+"ELF=",false);
       xinput.xvasp.aopts.flag("FLAG::AVASP_ELF",xflags.vflags.KBIN_VASP_FORCE_OPTION_ELF.option);
       if (!xflags.vflags.KBIN_VASP_FORCE_OPTION_ELF.isentry && DEFAULT_VASP_FORCE_OPTION_ELF) {
         message << "Switching OFF ELF for APL calculations (default: OFF)."; //CO20181226 - default OFF
-        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
       }
 
       xflags.vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.options2entry(AflowIn,_STROPT_+"WAVECAR=",false);
       xinput.xvasp.aopts.flag("FLAG::AVASP_WAVECAR",xflags.vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option);
       if (!xflags.vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.isentry && DEFAULT_VASP_FORCE_OPTION_WAVECAR) {
         message << "Switching OFF WAVECAR for APL calculations (default: OFF).";  //CO20181226 - default OFF
-        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
       }
     }
 
@@ -374,7 +370,7 @@ namespace KBIN {
     for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.aplflags.size(); i++) {
       const string& key = kflags.KBIN_MODULE_OPTIONS.aplflags[i].keyword;
       message << (kflags.KBIN_MODULE_OPTIONS.aplflags[i].isentry? "Setting" : "DEFAULT") << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme;
-      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
       aplopts.flag(key, kflags.KBIN_MODULE_OPTIONS.aplflags[i].option);
       aplopts.flag(key + "_ENTRY", kflags.KBIN_MODULE_OPTIONS.aplflags[i].isentry); // ME20210505
       aplopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.aplflags[i].xscheme);
@@ -407,11 +403,11 @@ namespace KBIN {
           message << "APL has already performed " << (START_RELAX + 1) << " relaxations.";
           message << " Number of relaxations remaining: " << (_NUM_RELAX_ - START_RELAX + 1) << ".";
         }
-        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
       } else {
         aplopts.flag("RELAX", false);
         message << "RELAX option only supported for VASP. Relaxations will be skipped.";
-        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
     }
 
@@ -466,16 +462,16 @@ namespace KBIN {
         message << "Distortion directions will be determined for ALL sites." << std::endl;
       }
       // Output now so that the warning about positive directions are can be displayed properly
-      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
       if (aurostd::toupper(aplopts.getattachedscheme("DPM"))[0] == 'A') {
         message << "Positive/negative distortion directions will be determined for each site."; 
-        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
       } else if (aplopts.flag("DPM")) {
         message << "Distortions will be generated in both the positive and negative direction.";
-        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
       } else {
         message << "Distortions will only be generated in the positive direction - this is NOT recommended.";
-        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
       message << "Forces from the undistored state will " << (aplopts.flag("ZEROSTATE")?"":"NOT ") << "be used." << std::endl;
     }
@@ -538,7 +534,7 @@ namespace KBIN {
     } else {
       message << "Thermodynamic properties will NOT be calculated." << std::endl;
     }
-    pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
     //ME20181026 END
 
     // AAPL ----------------------------------------------------------------------
@@ -554,7 +550,7 @@ namespace KBIN {
       for (uint i = 0; i < kflags.KBIN_MODULE_OPTIONS.aaplflags.size(); i++) {
         const string& key = kflags.KBIN_MODULE_OPTIONS.aaplflags[i].keyword;
         message << (kflags.KBIN_MODULE_OPTIONS.aaplflags[i].isentry? "Setting" : "DEFAULT") << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme;
-        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
         aaplopts.flag(key, kflags.KBIN_MODULE_OPTIONS.aaplflags[i].option);
         aaplopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.aaplflags[i].xscheme);
       }
@@ -623,7 +619,7 @@ namespace KBIN {
     } else {
       message << "Anharmonic force constants and thermal conductivity will NOT be calculated.";
     }
-    pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
     //ME20181027 STOP
 
     if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " DEBUG [1c]" << std::endl;
@@ -651,7 +647,7 @@ namespace KBIN {
             //[CO20210315 - new style]if ((vaspVersion[0] - '0') < 5) //cool way of getting ascii value:  https://stackoverflow.com/questions/36310181/char-subtraction-in-c
             message << "[" << vaspVersion << "]."; //CO20210315
             if (vaspVersion < 5) {  //CO20210315
-              pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+              pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
               //ME20190107 - fix both serial and MPI binaries
               kflags.KBIN_SERIAL_BIN = DEFAULT_VASP5_BIN;
               kflags.KBIN_MPI_BIN = DEFAULT_VASP5_MPI_BIN;
@@ -661,20 +657,20 @@ namespace KBIN {
                 kflags.KBIN_BIN = kflags.KBIN_SERIAL_BIN;
               }
               message << "Modifying VASP bin to " << kflags.KBIN_BIN << " (AUTO modification).";  //ME20190109
-              pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+              pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
             } else {
               message << " OK.";
-              pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+              pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
             }
           } else {
             message << "Failed.";
-            pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+            pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
             throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Unexpected binary format.", _FILE_WRONG_FORMAT_);
           }
         } catch (aurostd::xerror& excpt) {
           message << "Failed to identify the version of the VASP binary." << std::endl;
           message << excpt.buildMessageString() << std::endl;
-          pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
         }
       }
     }
@@ -687,7 +683,7 @@ namespace KBIN {
     string phposcar_file = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_APL_PHPOSCAR_FILE);
     if (aurostd::EFileExist(phposcar_file)) {
       message << "Reading structure from file " << phposcar_file << ".";
-      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
       xinput.getXStr() = xstructure(phposcar_file, IOVASP_POSCAR);
     }
 
@@ -777,7 +773,7 @@ namespace KBIN {
         const string& key = kflags.KBIN_MODULE_OPTIONS.qhaflags[i].keyword;
         message << (kflags.KBIN_MODULE_OPTIONS.qhaflags[i].isentry? "Setting" : "DEFAULT")
           << " " << _ASTROPT_ << key << "=" << kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme;
-        pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
         qhaopts.flag(key, kflags.KBIN_MODULE_OPTIONS.qhaflags[i].option);
         qhaopts.push_attached(key, kflags.KBIN_MODULE_OPTIONS.qhaflags[i].xscheme);
       }
@@ -850,14 +846,14 @@ namespace KBIN {
         if (awakeAnharmIFCs) {
           try {
             message << "Reading anharmonic IFCs from " << ifcs_hib_file << ".";
-            pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+            pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
             phcalc.readAnharmonicIFCs(ifcs_hib_file);
           } catch (aurostd::xerror& excpt) {
             message<< excpt.buildMessageString() + " Skipping awakening of ";
             if (o == 3) message << "3rd";
             else message << aurostd::utype2string<int>(o) + "th";
             message << excpt.buildMessageString() + " order anharmonic IFCs.";
-            pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+            pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
             awakeAnharmIFCs = false;
           }
         }
@@ -886,7 +882,7 @@ namespace KBIN {
     // At least one calculation has not finished - return
     if (stagebreak) {
       message << "Stopped. Waiting for required calculations...";  //CO20181226
-      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss, _LOGGER_NOTICE_);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_NOTICE_);
       return;
     }
 
@@ -1014,7 +1010,7 @@ namespace KBIN {
         if (aplopts.flag("GROUP_VELOCITY")) {
           string gvelfile = aurostd::CleanFileName(aflags.Directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_GVEL_FILE);
           message << "Writing group velocities into file " << gvelfile << ".";
-          pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
           vector<vector<xvector<double> > > gvel = phcalc.calculateGroupVelocitiesOnMesh();
           phcalc.writeGroupVelocitiesToFile(gvelfile, gvel);
         }
@@ -1032,7 +1028,7 @@ namespace KBIN {
             message << "There are imaginary frequencies in the phonon DOS, covering "
               << std::fixed << std::setprecision(1) << idos_percent << "\% of the integrated DOS. "
               << "These frequencies were omitted in the calculation of thermodynamic properties.";
-            pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+            pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
           }
         }
       }
@@ -1058,7 +1054,7 @@ namespace KBIN {
 
     if (kflags.KBIN_PHONONS_CALCULATION_AAPL) {
       message << "Starting thermal conductivity calculations.";
-      pflow::logger(_AFLOW_FILE_NAME_, modulename, message, aflags, FileMESSAGE, oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss);
 
       apl::TCONDCalculator tcond(phcalc, aaplopts);
       tcond.calculateGrueneisenParameters();

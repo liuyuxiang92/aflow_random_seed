@@ -13,9 +13,6 @@
 
 #define _DEBUG_AAPL_TCOND_ false
 
-// String constants for file output and exception handling
-static const string _AAPL_TCOND_MODULE_ = "AAPL";
-
 static const int max_iter = 250;  // Maximum number of iterations for the iterative BTE solution
 static const aurostd::xcomplex<double> iONE(0.0, 1.0);  // imaginary number
 static const double TCOND_ITER_THRESHOLD = 1e-4;  // Convergence criterion for thermal conductivity
@@ -175,7 +172,7 @@ namespace apl {
 
     // Frequencies and group velocities
     message = "Calculating frequencies and group velocities.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     gvel = _pc->calculateGroupVelocitiesOnMesh(freq, eigenvectors);
     _initialized = true;
   }
@@ -267,7 +264,7 @@ namespace apl {
     }
     // Grueneisen parameters
     string message = "Calculating Grueneisen parameters.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
 
     vector<vector<vector<xcomplex<double> > > > phases = calculatePhases(false);  // false: not conjugate
     grueneisen_mode = calculateModeGrueneisen(phases);
@@ -368,7 +365,7 @@ namespace apl {
           if (g_mode.im > _FLOAT_TOL_) {  // _ZERO_TOL_ is too tight
             stringstream message;
             message << "Grueneisen parameter at mode " << iq << ", " << br << " is not real (" << g_mode.re << ", " << g_mode.im << ").";
-            pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS(), _LOGGER_WARNING_);
+            pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS(), _LOGGER_WARNING_);
           }
           grueneisen[iq][br] = g_mode.re;
         } else {
@@ -413,7 +410,7 @@ namespace apl {
   // boundary scattering. Also calculates the scattering phase space.
   void TCONDCalculator::calculateTransitionProbabilities() {
     string message = "Calculating transition probabilities.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
 #ifdef AFLOW_MULTITHREADS_ENABLE
     xthread::xThread xt(_pc->getNCPUs());
 #endif
@@ -424,7 +421,7 @@ namespace apl {
 
     // Three-phonon transition probabilities
     message = "Calculating transition probabilities for 3-phonon scattering processes.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     message = "Transition Probabilities";
     processes.clear();
     processes.resize(nIQPs);
@@ -445,7 +442,7 @@ namespace apl {
 
     if (calc_isotope) {
       message = "Calculating isotope transition probabilities.";
-      pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
 
       // Test if isotope scattering is possible
       const xstructure& pcell = _pc->getInputCellStructure();
@@ -458,7 +455,7 @@ namespace apl {
       if (at == natoms) {
         calc_isotope = false;
         message = "There are no atoms with isotopes of different masses. Isotope scattering will be turned off.";
-        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
       } else {
         processes_iso.resize(nIQPs);
         intr_trans_probs_iso.resize(nIQPs);
@@ -795,7 +792,7 @@ namespace apl {
 
     stringstream message;
     message << "Calculating grain boundary transition probabilities with a grain size of " << boundary_grain_size << " nm.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     for (iq = 0; iq < nIQPs; iq++) {
       for (br = 0; br < nBranches; br++) {
         q = _qm->getIbzqpts()[iq];
@@ -949,16 +946,16 @@ namespace apl {
       vector<vector<double> >& rates_anharm) {
     stringstream message;
     message << "Calculating thermal conductivity for " << T << " K.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     // Bose-Einstein distribution
     vector<vector<double> > occ = getOccupationNumbers(T);
 
     message << "Calculating scattering rates.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     rates_total = calculateTotalRates(occ, rates_anharm);
 
     message << "Calculating RTA";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     vector<vector<xvector<double> > > mfd = getMeanFreeDispRTA(rates_total);
     xmatrix<double> tcond = calcTCOND(T, occ, mfd); // RTA solution
 
@@ -968,7 +965,7 @@ namespace apl {
       int num_iter = 1;
       double norm = 0.0;
       message << "Begin SCF for the Boltzmann transport equation.";
-      pflow::logger(_AFLOW_FILE_NAME_, _AAPL_TCOND_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
       ostream& oss = *_pc->getOSS();
       oss << std::setiosflags(std::ios::fixed | std::ios::right);
       oss << std::setw(15) << "Iteration";

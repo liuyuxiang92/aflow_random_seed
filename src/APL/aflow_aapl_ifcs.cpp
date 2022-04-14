@@ -25,8 +25,6 @@ using std::vector;
 using aurostd::xcombos;
 using aurostd::xerror;
 
-static const string _AAPL_IFCS_MODULE_ = "AAPL";  // for the logger
-
 static const string _CLUSTER_SET_FILE_[2] = {"clusterSet_3rd.xml", "clusterSet_4th.xml"};
 
 // tform represents a tensor transformation containing the index and the
@@ -176,7 +174,7 @@ namespace apl {
         clst.readClusterSetFromFile(clust_hib_file);
       } catch (aurostd::xerror& excpt) {
         awakeClusterSet = false;
-        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, excpt.buildMessageString(), directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, excpt.buildMessageString(), directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
     }
     if (!awakeClusterSet) {
@@ -219,7 +217,7 @@ namespace apl {
     }
 
     bool stagebreak = false;
-    xinput.xvasp.AVASP_arun_mode = _AAPL_IFCS_MODULE_;
+    xinput.xvasp.AVASP_arun_mode = __AFLOW_FUNC__;
     stringstream _logger;
     _logger << "Managing directories for ";
     if (order == 3) {
@@ -228,7 +226,7 @@ namespace apl {
       _logger << "4th";
     }
     _logger << " order IFCs.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, _logger, directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, _logger, directory, *p_FileMESSAGE, *p_oss);
 
     // Determine the number of runs so the run ID in the folder name can be
     // padded with the appropriate number of zeros.
@@ -400,11 +398,11 @@ namespace apl {
     }
     vector<vector<vector<xvector<double> > > > force_tensors = storeForces(xInputs);
 
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Calculating anharmonic IFCs.", directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Calculating anharmonic IFCs.", directory, *p_FileMESSAGE, *p_oss);
     vector<vector<double> > ifcs_unsym = calculateUnsymmetrizedIFCs(clst.ineq_distortions, force_tensors);
     force_tensors.clear();
 
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Symmetrizing IFCs.", directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Symmetrizing IFCs.", directory, *p_FileMESSAGE, *p_oss);
     force_constants = symmetrizeIFCs(ifcs_unsym);
     return true;
   }
@@ -680,7 +678,7 @@ namespace apl {
     // Do iterations
     int num_iter = 0;
     double max_err = 0.0;
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Begin SCF for anharmonic force constants.", directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Begin SCF for anharmonic force constants.", directory, *p_FileMESSAGE, *p_oss);
     *p_oss << std::setiosflags(std::ios::fixed | std::ios::right);
     *p_oss << std::setw(15) << "Iteration";
     *p_oss << std::setiosflags(std::ios::fixed | std::ios::right);
@@ -713,7 +711,7 @@ namespace apl {
       }
       num_iter++;
     } while ((num_iter <= max_iter) && (max_err > sumrule_threshold));
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "End SCF for anharmonic force constants.", directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "End SCF for anharmonic force constants.", directory, *p_FileMESSAGE, *p_oss);
     if (num_iter > max_iter) {
       stringstream message;
       message << "Anharmonic force constants did not converge within " << max_iter << " iterations.";

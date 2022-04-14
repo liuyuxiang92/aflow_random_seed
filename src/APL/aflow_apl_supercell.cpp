@@ -18,7 +18,6 @@
 using namespace std;
 
 static const xcomplex<double> iONE(0.0, 1.0);  //ME20200116
-static const string _APL_SUPERCELL_MODULE_ = "SUPERCELL";  // for the logger
 
 namespace apl {
 
@@ -218,7 +217,7 @@ namespace apl {
     if (VERBOSE) {
       stringstream message;
       message << "Estimating the symmetry of structure and calculating the input structure. Please be patient."; //primitive cell." << apl::endl; //CO20180216 - we do NOT primitivize unless requested via [VASP_FORCE_OPTION]CONVERT_UNIT_CELL
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     }
     calculateWholeSymmetry(_inStructure, VERBOSE);
     if(LDEBUG){ //CO20190218
@@ -364,7 +363,7 @@ namespace apl {
         message << "Radius=" << aurostd::PaddedPOST(aurostd::utype2string<double>(radius, 3), 4)
           << " supercell=" << dims[1] << "x" << dims[2] << "x" << dims[3]
           << " natoms=" << natoms;
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
       }
     } else if (method == "MINATOMS_UNIFORM") {
       int minatoms = aurostd::string2utype<int>(value);
@@ -379,13 +378,13 @@ namespace apl {
         message << "Ni=" << Ni
           << " supercell=" << Ni << "x" << Ni << "x" << Ni
           << " natoms=" << natoms;
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
       }
     } else if (method == "SHELLS") {
       int shells = aurostd::string2utype<int>(value);
       if (opts.flag("SUPERCELL::VERBOSE")) {
         message << "Searching for suitable cell to handle " << shells << " shells...";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
       }
       bool get_full_shells = true;
       dims = getSupercellDimensionsShell(shells, get_full_shells);
@@ -429,7 +428,7 @@ namespace apl {
       if (VERBOSE) {
         message << "The supercell is going to build as " << dimstring;
         message << " (" << (dims[1] * dims[2] * dims[3] * _inStructure.atoms.size()) << " atoms).";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
       }
     } else {
       xmatrix<int> scmat = aurostd::reshape(dims, 3, 3);
@@ -438,13 +437,13 @@ namespace apl {
       if (VERBOSE) {
         message << "The supercell is going to build as [" << dimstring << "]";
         message << " (" << (aurostd::det(scmat) * _inStructure.atoms.size()) << " atoms).";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
       }
     }
 
     if (VERBOSE && _derivative_structure) {
       message << "Derivative structure detected, be patient as we calculate the symmetry of the supercell.";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     }
 
     // Get supercell
@@ -457,7 +456,7 @@ namespace apl {
     // OK.
     if (VERBOSE) {
       message << "Supercell successfully created.";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     }
     _isConstructed = TRUE;
 
@@ -979,7 +978,7 @@ namespace apl {
       if (countshell < MAX_NN_SHELLS) {
         stringstream message;
         message << "The supercell is too small to set up shell restrictions for " << MAX_NN_SHELLS << " shells.";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         break;
       }
       shell_radii[iat] = distances[at];
@@ -1436,7 +1435,7 @@ namespace apl {
   void Supercell::getFullBasisAGROUP() {
     string message = "Calculating the full basis for the site point groups of the supercell.";
     message += " This may take a few minutes for high-symmetry structures.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_SUPERCELL_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     if (!SYM::CalculateSitePointGroup_EquivalentSites(_scStructure, _sym_eps)) {
       message = "Could not calculate the bases of the site point groups.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);

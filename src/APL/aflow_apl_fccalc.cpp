@@ -13,8 +13,6 @@
 using std::vector;
 using std::string;
 
-static const string _APL_FCCALC_MODULE_ = "APL";  // for the logger
-
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
 //                         CONSTRUCTORS/DESTRUCTORS                         //
@@ -292,7 +290,7 @@ namespace apl {
     //CO END
 
     message = "Symmetrizing the force constant matrices.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
 
     vector<xmatrix<double> > row;
     for (uint i = 0; i < _supercell->getNumberOfAtoms(); i++) {
@@ -421,7 +419,7 @@ namespace apl {
       xInput.setDirectory(_directory + "/" + runname );
       if (!filesExistPhonons(xInput)) {
         string message = "Creating " + xInput.getDirectory();
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
         createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInput, *p_FileMESSAGE);
         stagebreak = true;
       }
@@ -443,7 +441,7 @@ namespace apl {
         infilename = directory + string("/OUTCAR");
         if (!aurostd::EFileExist(infilename, infilename)) {
           message << "The OUTCAR file in " << directory << " is missing.";
-          pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
           return false;
         }
       }
@@ -469,7 +467,7 @@ namespace apl {
       for (int b = 1; b <= 3; b++)
         message << std::fixed << std::setw(5) << std::setprecision(3) << _dielectricTensor(a, b) << " ";
 
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     return true;
   }
 
@@ -561,17 +559,17 @@ namespace apl {
     //CO END
     // Show charges
     message << "Input born effective charge tensors (for primitive cell):";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     for (uint i = 0; i < _bornEffectiveChargeTensor.size(); i++) {
       int id = i;
       message << "Atom [" << aurostd::PaddedNumString(id, 3) << "] ("
         << std::setw(2) << _supercell->getInputStructure().atoms[id].cleanname
         << ") Born effective charge = ";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
       for (int a = 1; a <= 3; a++)
         for (int b = 1; b <= 3; b++)
           message << std::fixed << std::setw(5) << std::setprecision(3) << _bornEffectiveChargeTensor[i](a, b) << " ";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     }
 
     // Step1
@@ -622,7 +620,7 @@ namespace apl {
 
     // Step 3
     message << "Forcing the acoustic sum rule (ASR). Resulting born effective charges (for the supercell):";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
 
     xmatrix<double> sum(3, 3);
     for (uint i = 0; i < _bornEffectiveChargeTensor.size(); i++)
@@ -647,7 +645,7 @@ namespace apl {
       for (int a = 1; a <= 3; a++)
         for (int b = 1; b <= 3; b++)
           message << std::fixed << std::setw(5) << std::setprecision(3) << _bornEffectiveChargeTensor[i](a, b) << " ";
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     }
   }
 
@@ -744,13 +742,13 @@ namespace apl {
     string base = _directory + "/" + DEFAULT_APL_FILE_PREFIX;
     string filename = aurostd::CleanFileName(base + DEFAULT_APL_HARMIFC_FILE);
     message = "Writing harmonic IFCs into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     writeHarmonicIFCs(filename);
     if (_isPolarMaterial) {
       filename = aurostd::CleanFileName(base + DEFAULT_APL_POLAR_FILE);
       message = "Writing harmonic IFCs into file " + filename + ".";
       writeBornChargesDielectricTensor(filename);
-      pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     }
   }
 
@@ -879,7 +877,7 @@ namespace apl {
     }
     if (xInputs.size() == 0) return;  // Nothing to write
     message = "Saving state of the force constant calculator into " + aurostd::CleanFileName(filename) + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     stringstream out;
     string tag = "[APL_FC_CALCULATOR]";
     out << AFLOWIN_SEPARATION_LINE << std::endl;
@@ -939,7 +937,7 @@ namespace apl {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     message = "Reading state of the phonon calculator from " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     if (!aurostd::EFileExist(filename)) {
       message = "Could not find file " + filename + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
@@ -1328,7 +1326,7 @@ namespace apl {
         generate_plus_minus = vvgenerate_plus_minus[i][j];
         if (AUTO_GENERATE_PLUS_MINUS && !generate_plus_minus) {
           message << "No negative distortion needed for distortion [atom=" << i << ",direction=" << j << "].";
-          pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
         }
         for (uint k = 0; k < (generate_plus_minus ? 2 : 1); k++) {
           //CO END
@@ -1391,7 +1389,7 @@ namespace apl {
             xInputs[idxRun].setDirectory(_directory + "/" + runname);
             if (!filesExistPhonons(xInputs[idxRun])) {
               message << "Creating " << xInputs[idxRun].getDirectory();
-              pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+              pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
               createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInputs[idxRun], *p_FileMESSAGE);
               stagebreak = true;
             }
@@ -1433,7 +1431,7 @@ namespace apl {
         xInputs[idxRun].setDirectory(_directory + "/" + runname);
         if (!filesExistPhonons(xInputs[idxRun])) {
           message << "Creating " << xInputs[idxRun].getDirectory();
-          pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
           createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInputs[idxRun], *p_FileMESSAGE);
           stagebreak = true;
         }
@@ -1614,7 +1612,7 @@ namespace apl {
       dof += _uniqueDistortions[i].size();
     }
     message << "Found " << dof << " degree(s) of freedom.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     uint natoms = DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms();
     for (uint i = 0; i < natoms; i++) {  //CO20200212 - int->uint
       uint id = (DISTORTION_INEQUIVONLY ? _supercell->getUniqueAtomID(i) : i); //CO20190218
@@ -1625,7 +1623,7 @@ namespace apl {
           << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](1) << ","
           << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](2) << ","
           << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](3) << "].";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
       }
     }
   }
@@ -1822,7 +1820,7 @@ namespace apl {
     //CO END
     // Show info
     message << "Calculating the missing force fields by symmetry.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
 
     // Let's go
     for (uint i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO20190218
@@ -2024,7 +2022,7 @@ namespace apl {
 
     //
     message << "Calculating the force constant matrices.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
 
     // We have a party. Let's fun with us...
     //vector<xmatrix<double> > row; //JAHNATEK ORIGINAL //CO20190218
@@ -2130,7 +2128,7 @@ namespace apl {
   // Writes the forces into a VASP DYNMAT format
   void ForceConstantCalculator::writeDYNMAT(const string& filename) {
     string message = "Writing forces into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
 
     stringstream outfile;
 
@@ -2184,13 +2182,13 @@ namespace apl {
 
   // [OBSOLETE] void ForceConstantCalculator::writeFORCES() {
   // [OBSOLETE]   string message = "Writing forces into file FORCES.";
-  // [OBSOLETE]   pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+  // [OBSOLETE]   pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
 
   // [OBSOLETE]   xstructure ix;
   // [OBSOLETE]   string filename = "SPOSCAR";
   // [OBSOLETE]   if (!aurostd::FileEmpty(filename)) {
   // [OBSOLETE]     message = "Reading " + filename;
-  // [OBSOLETE]     pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+  // [OBSOLETE]     pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
   // [OBSOLETE]     stringstream SPOSCAR;
   // [OBSOLETE]     aurostd::efile2stringstream(filename, SPOSCAR);
   // [OBSOLETE]     SPOSCAR >> ix;
@@ -2254,7 +2252,7 @@ namespace apl {
 
   // [OBSOLETE] void ForceConstantCalculator::writeXCrysDenForces() {
   // [OBSOLETE]   string message = "Writing forces into file XCrysDenForces.";
-  // [OBSOLETE]   pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+  // [OBSOLETE]   pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
   // [OBSOLETE]   _supercell->center_original();  //CO
 
   // [OBSOLETE]   stringstream outfile;  //CO
@@ -2352,7 +2350,7 @@ namespace apl {
       xInput.setDirectory(_directory + "/" + runname);
       if (!filesExistPhonons(xInput)) {
         string message = "Creating " + xInput.getDirectory();
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
         createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInput, *p_FileMESSAGE);
         stagebreak = true;
       }
@@ -2365,7 +2363,7 @@ namespace apl {
   bool ForceConstantCalculator::readForceConstantsFromVasprun(_xinput& xinp) {
     stringstream message;
     message << "Reading force constants from vasprun.xml";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
 
     // Read vasprun.xml
     string filename = aurostd::CleanFileName(xinp.getDirectory() + "/vasprun.xml.static");
@@ -2373,7 +2371,7 @@ namespace apl {
       filename = aurostd::CleanFileName(xinp.getDirectory() + "/vasprun.xml");
       if (aurostd::EFileExist(filename)) {
         message << "Could not find vasprun.xml file for linear response calculations.";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_FCCALC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
         return false;
       }
     }
