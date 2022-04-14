@@ -717,7 +717,7 @@ namespace aflowlib {
         if (stokens.size() == 6)
           for (uint j = 0; j < stokens.size(); j++)
             vgeometry.at(j) = aurostd::string2utype<double>(stokens.at(j));
-        } break; 
+        } break;
       //DX20190124 - add original crystal info - START
       case (aurostd::ctcrc64("geometry_orig")): {
         geometry_orig = content;
@@ -768,7 +768,7 @@ namespace aflowlib {
       case (aurostd::ctcrc64("stress_tensor")): {
         stress_tensor = content;
         vstress_tensor = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-        if (stokens.size() == 9) 
+        if (stokens.size() == 9)
           for (uint j = 0; j < stokens.size(); j++)
             vstress_tensor.at(j) = aurostd::string2utype<double>(stokens.at(j));
         } break;
@@ -846,7 +846,7 @@ namespace aflowlib {
         // aurostd::string2tokens(stoich, stokens);
         for (uint j = 0; j < stokens.size(); j++) vstoich.push_back(aurostd::string2utype<double>(stokens.at(j)));
         } break;
-      //SYMMETRY  
+      //SYMMETRY
       //DX20190124 - added original symmetry info - START
       case (aurostd::ctcrc64("crystal_family_orig")): { crystal_family_orig = content; } break;
       case (aurostd::ctcrc64("crystal_system_orig")): { crystal_system_orig = content; } break;
@@ -901,7 +901,7 @@ namespace aflowlib {
         if (stokens.size() == 6)
           for (uint j = 0; j < stokens.size(); j++)
             vreciprocal_geometry.at(j) = aurostd::string2utype<double>(stokens.at(j));
-        } break; 
+        } break;
       case (aurostd::ctcrc64("reciprocal_volume_cell")): { reciprocal_volume_cell = aurostd::string2utype<double>(content); } break;
       case (aurostd::ctcrc64("reciprocal_lattice_type")): { reciprocal_lattice_type = content; } break;
       case (aurostd::ctcrc64("reciprocal_lattice_variation_type")): { reciprocal_lattice_variation_type = content; } break;
@@ -1251,7 +1251,7 @@ namespace aflowlib {
       oss << "Bravais_superlattice_lattice_system_orig=" << Bravais_superlattice_lattice_system_orig << (html?"<br>":"") << endl;
       oss << "Pearson_symbol_superlattice_orig=" << Pearson_symbol_superlattice_orig << (html?"<br>":"") << endl;
       oss << "reciprocal_geometry_orig=" << reciprocal_geometry_orig << "  vreciprocal_geometry_orig= ";for(uint j=0;j<vreciprocal_geometry_orig.size();j++) oss << vreciprocal_geometry_orig.at(j) << " "; oss << (html?"<br>":"") << endl;
-      oss << "reciprocal_volume_cell_orig=" << reciprocal_volume_cell_orig << (html?"<br>":"") << endl; 
+      oss << "reciprocal_volume_cell_orig=" << reciprocal_volume_cell_orig << (html?"<br>":"") << endl;
       oss << "reciprocal_lattice_type_orig=" << reciprocal_lattice_type_orig << (html?"<br>":"") << endl;
       oss << "reciprocal_lattice_variation_type_orig=" << reciprocal_lattice_variation_type_orig << (html?"<br>":"") << endl;
       oss << "Wyckoff_letters_orig=" << Wyckoff_letters_orig << (html?"<br>":"") << endl;
@@ -1277,7 +1277,7 @@ namespace aflowlib {
       oss << "Bravais_superlattice_lattice_system=" << Bravais_superlattice_lattice_system << (html?"<br>":"") << endl;
       oss << "Pearson_symbol_superlattice=" << Pearson_symbol_superlattice << (html?"<br>":"") << endl;
       oss << "reciprocal_geometry=" << reciprocal_geometry << "  vreciprocal_geometry= ";for(uint j=0;j<vreciprocal_geometry.size();j++) oss << vreciprocal_geometry.at(j) << " "; oss << (html?"<br>":"") << endl;
-      oss << "reciprocal_volume_cell=" << reciprocal_volume_cell << (html?"<br>":"") << endl; 
+      oss << "reciprocal_volume_cell=" << reciprocal_volume_cell << (html?"<br>":"") << endl;
       oss << "reciprocal_lattice_type=" << reciprocal_lattice_type << (html?"<br>":"") << endl;
       oss << "reciprocal_lattice_variation_type=" << reciprocal_lattice_variation_type << (html?"<br>":"") << endl;
       oss << "Wyckoff_letters=" << Wyckoff_letters << (html?"<br>":"") << endl;
@@ -1402,7 +1402,7 @@ namespace aflowlib {
     // DONE
   }
 
-  // aflowlib2string 
+  // aflowlib2string
   string _aflowlib_entry::aflowlib2string(string mode, bool PRINT_NULL) {
     string soliloquy=XPID+"aflowlib::_aflowlib_entry::aflowlib2string():";
     stringstream sss("");
@@ -4757,87 +4757,82 @@ namespace aflowlib {
 
 //AFLUX integration
 //FR+CO20180329
-#define _DEBUG_AFLUX_ true
-namespace aflowlib {
-  bool APIget::establish(){
-    bool LDEBUG=(FALSE || _DEBUG_AFLUX_ || XHOST.DEBUG);
-    struct hostent * host = gethostbyname( Domain.c_str() );
-
-    //[CO20181226 - OBSOLETE]PORT=80;  //CO20180401
-
-    if ( (host == NULL) || (host->h_addr == NULL) ) {
-      pflow::logger(_AFLOW_FILE_NAME_,"aflowlib::APIget::establish():","Error retrieving DNS information.",std::cerr,_LOGGER_ERROR_);  //CO20200520
-      return false;
-    }
-
-    bzero(&client, sizeof(client));
-    client.sin_family = AF_INET;
-    client.sin_port = htons( PORT );
-    memcpy(&client.sin_addr, host->h_addr, host->h_length);
-
-    sock = socket(AF_INET, SOCK_STREAM, 0);
-
-    if (sock < 0) {
-      pflow::logger(_AFLOW_FILE_NAME_,"aflowlib::APIget::establish():","Error creating socket.",std::cerr,_LOGGER_ERROR_);  //CO20200520
-      return false;
-    }
-
-    if ( connect(sock, (struct sockaddr *)&client, sizeof(client)) < 0 ) {
-      close(sock);
-      pflow::logger(_AFLOW_FILE_NAME_,"aflowlib::APIget::establish():","Could not connect",std::cerr,_LOGGER_ERROR_);  //CO20200520
-      return false;
-    }
-
-    //do NOT use endl: endl is locale dependent and HTTP standard specifically calls out \r\n
-    stringstream ss;
-    ss << "GET " << API_Path << Summons << " HTTP/1.0\r\n";
-    ss << "HOST: " << Domain << "\r\n";
-    ss << "Connection: close\r\n";
-    ss << "\r\n";
-    string request = ss.str();
-
-    if(LDEBUG){cerr << "aflowlib::APIget::establish():" << " request=" << endl;cerr << request << endl;}  //CO20200520
-
-    if (send(sock, request.c_str(), request.length(), 0) != (int)request.length()) {
-      pflow::logger(_AFLOW_FILE_NAME_,"aflowlib::APIget::establish():","Error sending request.",std::cerr,_LOGGER_ERROR_);  //CO20200520
-      return false;
-    }
-    return true;
-  }
-  void APIget::reset( string a_Summons, string a_API_Path, string a_Domain ) {
-    if( a_Summons == "#" ) {
-      Summons = "";
-      //DX20210615 [OBSOLETE - old path] API_Path = "/search/API/?";
-      //DX20210615 [OBSOLETE - old domain] Domain = "aflowlib.duke.edu";
-      API_Path = "/API/aflux/?"; //DX20210615 - new path
-      Domain = "aflow.org"; //DX20210615 - new domain
-    } else {
-      Summons = a_Summons;
-      if( ! a_API_Path.empty() ) API_Path = a_API_Path;
-      if( ! a_Domain.empty() ) Domain = a_Domain;
-    }
-  }
-  ostream& operator<<( ostream& output, APIget& a ) { 
-    bool LDEBUG=(FALSE || _DEBUG_AFLUX_ || XHOST.DEBUG);
-    unsigned char cur;
-    bool responsedata = false;
-    bool waslinefeed = false;
-    if( a.establish() ) {
-      while ( ! responsedata ) { //discard headers
-        read(a.sock, &cur, 1);
-        if(LDEBUG){cerr << "aflowlib::APIget::operator<<()[headers]:" << " cur='" << cur << "'" << endl;}
-        if( waslinefeed && cur == '\r') responsedata = true;
-        if( cur == '\n' ) waslinefeed = true;
-        else waslinefeed = false;
-      };
-      read(a.sock, &cur, 1); //discard final \n in header \r\n\r\n
-      while ( read(a.sock, &cur, 1) > 0 ) output << cur;
-      if(LDEBUG){cerr << "aflowlib::APIget::operator<<()[data]:" << " cur='" << cur << "'" << endl;}
-      close(a.sock);
-    }
-    return output;
-  }
-}
+//Obsolete with aurostd::xhttp //HE20220407
+//namespace aflowlib {
+//  bool APIget::establish(){
+//    struct hostent * host = gethostbyname( Domain.c_str() );
+//
+//    //[CO20181226 - OBSOLETE]PORT=80;  //CO20180401
+//
+//    if ( (host == NULL) || (host->h_addr == NULL) ) {
+//      cerr << "Error retrieving DNS information." << endl;
+//      return false;
+//    }
+//
+//    bzero(&client, sizeof(client));
+//    client.sin_family = AF_INET;
+//    client.sin_port = htons( PORT );
+//    memcpy(&client.sin_addr, host->h_addr, host->h_length);
+//
+//    sock = socket(AF_INET, SOCK_STREAM, 0);
+//
+//    if (sock < 0) {
+//      cerr << "Error creating socket." << endl;
+//      return false;
+//    }
+//
+//    if ( connect(sock, (struct sockaddr *)&client, sizeof(client)) < 0 ) {
+//      close(sock);
+//      cerr << "Could not connect" << endl;
+//      return false;
+//    }
+//
+//    stringstream ss;
+//    ss << "GET " << API_Path << Summons << " HTTP/1.0\r\n" ;
+//    //    cerr << "GET " << API_Path << Summons << " HTTP/1.0\r\n" ;
+//    ss << "HOST: " << Domain << "\r\n";
+//    ss << "Connection: close\r\n";
+//    ss << "\r\n";
+//    string request = ss.str();
+//
+//    if (send(sock, request.c_str(), request.length(), 0) != (int)request.length()) {
+//      cerr << "Error sending request." << endl;
+//      return false;
+//    }
+//    return true;
+//  }
+//  void APIget::reset( string a_Summons, string a_API_Path, string a_Domain ) {
+//    if( a_Summons == "#" ) {
+//      Summons = "";
+//      //DX20210615 [OBSOLETE - old path] API_Path = "/search/API/?";
+//      //DX20210615 [OBSOLETE - old domain] Domain = "aflowlib.duke.edu";
+//      API_Path = "/API/aflux/?"; //DX20210615 - new path
+//      Domain = "aflow.org"; //DX20210615 - new domain
+//    } else {
+//      Summons = a_Summons;
+//      if( ! a_API_Path.empty() ) API_Path = a_API_Path;
+//      if( ! a_Domain.empty() ) Domain = a_Domain;
+//    }
+//  }
+//  ostream& operator<<( ostream& output, APIget& a ) {
+//    char cur;
+//    bool responsedata = false;
+//    bool waslinefeed = false;
+//    if( a.establish() ) {
+//      while ( ! responsedata ) { //discard headers
+//        read(a.sock, &cur, 1);
+//        //cerr << cur << ":" << (int)cur << endl;
+//        if( waslinefeed  && cur == '\r') responsedata = true;
+//        if( cur == '\n' ) waslinefeed = true;
+//        else waslinefeed = false;
+//      };
+//      read(a.sock, &cur, 1); //discard final \n in header \r\n\r\n
+//      while ( read(a.sock, &cur, 1) > 0 ) output << cur; //cout << cur;
+//      close(a.sock);
+//    }
+//    return output;
+//  }
+//}
 
 //DX+FR20190206 - AFLUX functionality via command line - START
 // ***************************************************************************
@@ -4874,45 +4869,21 @@ namespace aflowlib {
   }
   string AFLUXCall(const string& _summons){
 
+}
+
+namespace aflowlib {
+  string AFLUXCall(const string& summons){
     // Performs AFLUX call based on summons input
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    // switched to aurostd::xhttp //HE20220407
+    bool LDEBUG=(false || XHOST.DEBUG);
     string function_name = XPID + "AFLUXCall():";
-
-    // percent encoding (otherwise it will not work)
-    // NOT NEEDED - aurostd::StringSubst(summons,"\'","%27"); // percent encoding for "'" 
-    string summons(_summons);   //CO20200520
-    aurostd::StringSubst(summons," ","%20");  // percent encoding for space 
-    aurostd::StringSubst(summons,"#","%23");  // percent encoding for "#"
-
+    string url = "http://aflow.org/API/aflux/?" + aurostd::httpPercentEncodingFull(summons);
     if(LDEBUG) {
-      cerr << function_name << " Summons=\"" << summons << "\"" << endl;
-      cerr << function_name << " Performing call ... please be patient ..." << endl;
+      cerr << function_name << ": Summons = " << summons << endl;
+      cerr << function_name << ": URL = " << url << endl;
+      cerr << function_name << ": Performing call ... please be patient ..." << endl;
     }
-
-    //CO20200520 - added attempts and sleep
-    string response_str="";
-    uint attempts=0;
-    if(0){
-      stringstream response_ss;
-      aflowlib::APIget API_socket(summons);
-      while(response_str.empty() && (++attempts)<10){
-        if(LDEBUG){cerr << function_name << " attempt=" << attempts << endl;}
-        response_ss << API_socket;response_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(response_ss.str());
-        if(attempts>1){aurostd::Sleep(2);}
-      }
-    }
-    bool response=false;
-    string url=AFLOWLIB_SERVER_DEFAULT+"/"+_AFLUX_API_PATH_+summons;
-    aurostd::StringSubst(url,"//","/");
-    if(LDEBUG){cerr << function_name << " url=" << url << endl;}
-    while((response==false || response_str.empty()) && (++attempts)<10){
-      if(LDEBUG){cerr << function_name << " attempt=" << attempts << endl;}
-      response=aurostd::url2string(url,response_str,true);
-      response_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(response_str);
-      if(response==false || response_str.empty()){aurostd::Sleep(2);}
-    }
-    
-    return response_str;
+    return aurostd::httpGet(url);
   }
 }
 

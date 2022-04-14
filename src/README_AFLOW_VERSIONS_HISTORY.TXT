@@ -1,5 +1,6 @@
 3.2.13 - 2022/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz
+        -- fixed bug with printing atom mapping information in XtalFinder, reset for non-matches (DX)
         -- parallelized KBIN::CompressDirectory() (CO)
         -- Fixed CIF parser for CIF files with oxidation states in species list (ME)
         -- Added fallback solutions for reading CIF files with unregonized settings (ME)
@@ -21,11 +22,11 @@
         -- fixed logic bug in ProcessKill (SD)
         -- added temporary directory list to aflowrc (SD)
         -- fixed order of variable initializations in aflow_init.cpp (SD)
-        -- adding basic http functions to aurostd (HE)
-        -- new EntryLoader with automatic source selection (HE)
-        -- improved speed of aurostd::file2string (HE)
+        -- adding basic http1.1 functions to aurostd (HE)
         -- added const strings variant of aurostd::StringSubst (HE)
         -- added non decimal bases to aurostd::string2utype (HE)
+        -- new EntryLoader with automatic source selection (HE)
+        -- improved speed of aurostd::file2string (HE)
         -- removed "kill_vasp_all" and implemented a targeted kill vasp command (SD)
         -- added KBIN::BIN2VASPVersion (SD)
         -- fixed KBIN::VASPVersionString2Double, aurostd::substring2bool, aurostd::kvpairfound (SD)

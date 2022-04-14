@@ -433,7 +433,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("COMPARE::IGNORE_WYCKOFF",aurostd::args2flag(argv,cmds,"--ignore_Wyckoff")); //DX20190424
     vpflow.flag("COMPARE::IGNORE_ENVIRONMENT_ANALYSIS",aurostd::args2flag(argv,cmds,"--ignore_environment|--ignore_environment_analysis|--ignore_env")); //DX20190807
     vpflow.flag("COMPARE::REMOVE_DUPLICATE_COMPOUNDS",aurostd::args2flag(argv,cmds,"--remove_duplicates|--remove_duplicate_compounds")); //DX20190201
-    vpflow.flag("COMPARE::MATCH_TO_AFLOW_PROTOS",aurostd::args2flag(argv,cmds,"--add_matching_aflow_prototypes|--add_matching_aflow_protos|--add_matching_prototypes|--add_matching_protos")); //DX20190724
+    vpflow.flag("COMPARE::MATCH_TO_AFLOW_PROTOS",aurostd::args2flag(argv,cmds,"--match_to_aflow_prototypes|--add_matching_aflow_prototypes|--add_matching_aflow_protos|--add_matching_prototypes|--add_matching_protos")); //DX20190724 //DX20220411 - added --match_to_aflow_prototypes
     vpflow.flag("COMPARE::ADD_AFLOW_PROTOTYPE_DESIGNATION",aurostd::args2flag(argv,cmds,"--add_prototype_designation|--add_aflow_prototype_designation|--add_anrl_designation|--add_prototype|--add_prototype_information")); //DX20190724
     vpflow.flag("COMPARE::UNDECORATED_COMPARISON",aurostd::args2flag(argv,cmds,"--undecorated_comparison|--undecorated|--no_atom_decoration")); //DX20191212
     vpflow.flag("COMPARE::PRIMITIVIZE",aurostd::args2flag(argv,cmds,"--primitive|--primitivize|--prim")); //DX20201006

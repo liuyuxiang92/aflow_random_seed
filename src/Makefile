@@ -44,6 +44,7 @@ CC=clang
 ARCH=-D_MACOSX_
 endif
 
+CPP += -std=c++11 #HE20220124 ensure c++ standard is consistent
 
 #CPP=g++-fsf-7 
 #CPP=g++-fsf-4.9 -std=gnu++11

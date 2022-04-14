@@ -315,27 +315,24 @@ namespace aflowlib {
 }
 
 // ***************************************************************************
-// AFLUX STUFF
-//#define _AFLUX_API_PATH_ "/~frose/dev/aflux/src/?" //[CO20201220 - OBSOLETE]"/search/API/?"
-//#define _AFLUX_API_PATH_ "/~esters/API/aflux/v1.0/?" //[CO20201220 - OBSOLETE]"/search/API/?"
-#define _AFLUX_API_PATH_ "/API/aflux/v1.0/?" //[CO20201220 - OBSOLETE]"/search/API/?"
-namespace aflowlib {
-  class APIget {
-    private:
-      struct sockaddr_in client;
-      int sock;
-      int PORT;// = 80; //CO20180401
-      string Summons;
-      string API_Path;
-      string Domain;
-      bool establish();
-    public:
-      //DX20210615 [OBSOLETE] APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226
-      APIget( string a_Summons="", string a_API_Path=_AFLUX_API_PATH_, string a_Domain=AFLOWLIB_SERVER_DEFAULT ) : PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226 //DX20210615 - updated domain name
-      void reset( string a_Summons="#", string a_API_Path="", string a_Domain="" );
-      friend ostream& operator<<( ostream& output, APIget& a );
-  };
-}
+// AFLUX STUFF // Obsolete with aurostd::xhttp //HE20220407
+//namespace aflowlib {
+//  class APIget {
+//    private:
+//      struct sockaddr_in client;
+//      int sock;
+//      int PORT;// = 80; //CO20180401
+//      string Summons;
+//      string API_Path;
+//      string Domain;
+//      bool establish();
+//    public:
+//      //DX20210615 [OBSOLETE] APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226
+//      APIget( string a_Summons="", string a_API_Path="/API/aflux/?", string a_Domain="aflow.org" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226 //DX20210615 - updated domain name
+//      void reset( string a_Summons="#", string a_API_Path="", string a_Domain="" );
+//      friend ostream& operator<<( ostream& output, APIget& a );
+//  };
+//}
 
 namespace aflowlib {  //CO20201220
   ////////////////////////////////////////////////////////////////////////////////
@@ -595,7 +592,7 @@ namespace aflowlib {
     vector<string> types;
     string catalog;
   };
-  
+
   //CO20200520 START - moving from inside AflowDB
   vector<string> getSchemaKeys();
   vector<string> getDataNames();

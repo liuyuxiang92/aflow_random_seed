@@ -1,10 +1,10 @@
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2022           *
-// *           Aflow HAGEN ECKERT - Duke University 2021-2022                *
 // *                                                                         *
 // ***************************************************************************
-// Written by Hagen Eckert
+// Written by Frisco Rose in 2018
+// Complete rewrite by Hagen Eckert in 2022
 // hagen.eckert@duke.edu
 
 #ifndef AFLOW_SRC_AUROSTD_XHTTP_H

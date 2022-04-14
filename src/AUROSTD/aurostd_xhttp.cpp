@@ -1,10 +1,10 @@
 // ***************************************************************************
 // *                                                                         *
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2022           *
-// *           Aflow HAGEN ECKERT - Duke University 2021-2022                *
 // *                                                                         *
 // ***************************************************************************
-// Written by Hagen Eckert
+// Written by Frisco Rose in 2018
+// Complete rewrite by Hagen Eckert in 2022
 // hagen.eckert@duke.edu
 
 #ifndef _AUROSTD_XHTTP_CPP_
@@ -333,10 +333,7 @@ namespace aurostd {
   /// @param response raw http response
   /// @param success was the request successful
   ///
-  /// @todo implementing timeout
-  /// @todo write response into a file
-  ///
-  /// This function is primitive and is aimed to communicate with AFLOW's API servers.
+  /// This function is primitive and is designed to communicate with AFLOW's API servers.
   bool httpGetResponse(const xURL & url, std::string &response) {
 
     bool LDEBUG = (false || XHOST.DEBUG || _DEBUG_XHTTP_);
