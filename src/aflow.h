@@ -2951,19 +2951,20 @@ namespace KBIN {
   void *_threaded_interface_RUN_Directory(void *ptr);
 } // namespace KBIN
 namespace aurostd { // Multithreaded add on to aurostd
-  bool multithread_execute(deque<string> vcommand,int NUM_THREADS,bool VERBOSE);
-  bool multithread_execute(deque<string> vcommand,int NUM_THREADS);
-  bool multithread_execute(deque<string> vcommand);
-  bool multithread_execute(vector<string> vcommand,int NUM_THREADS,bool VERBOSE);
-  bool multithread_execute(vector<string> vcommand,int NUM_THREADS);
-  bool multithread_execute(vector<string> vcommand);
+  bool multithread_execute(const deque<string>& vcommand,int NUM_THREADS,bool VERBOSE);
+  bool multithread_execute(const deque<string>& vcommand,int NUM_THREADS);
+  bool multithread_execute(const deque<string>& vcommand);
+  bool multithread_execute(const vector<string>& vcommand,int NUM_THREADS,bool VERBOSE);
+  bool multithread_execute(const vector<string>& vcommand,int NUM_THREADS);
+  bool multithread_execute(const vector<string>& vcommand);
 } // namespace aurostd
 namespace AFLOW_PTHREADS {
-  bool MULTI_sh(vector<string> argv);
-  bool MULTI_compress(string cmd,vector<string> argv);
+  bool MULTI_sh(const vector<string>& argv);
+  bool MULTI_compress(const string& cmd,const vector<string>& argv);
   bool MULTI_zip(const vector<string>& argv); //CO20211104
-  bool MULTI_bz2xz(vector<string> argv);bool MULTI_xz2bz2(vector<string> argv);
-  bool MULTI_gz2xz(vector<string> argv);
+  bool MULTI_bz2xz(const vector<string>& argv);
+  bool MULTI_xz2bz2(const vector<string>& argv);
+  bool MULTI_gz2xz(const vector<string>& argv);
 }
 namespace sflow {
   void KILL(string options);
@@ -2997,6 +2998,8 @@ namespace xthread {
       void run(int ntasks, F& func, A&... args);
       template <typename F, typename... A>
       void run(unsigned long long int ntasks, F& func, A&... args);
+      template <typename IT, typename F, typename... A>
+      void run(const IT& it, F& func, A&... args);
       template <typename IT, typename F, typename... A>
       void run(IT& it, F& func, A&... args);
 

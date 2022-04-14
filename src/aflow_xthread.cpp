@@ -331,6 +331,16 @@ namespace xthread {
   /// ntasks will be converted to unsigned long long int because
   /// the progress bar counter in pflow is of that type.
   template <typename IT, typename F, typename... A>
+  void xThread::run(const IT& it, F& func, A&... args) {
+    int dist = (int) std::distance(it.begin(), it.end());
+    if (dist <= 0) return; // Cannot iterate backwards (yet)
+    unsigned long long int ntasks = (unsigned long long int) dist;
+    typename IT::const_iterator start = it.begin();
+    typename IT::const_iterator end = it.end();
+    run(start, end, ntasks, func, args...);
+  }
+
+  template <typename IT, typename F, typename... A>
   void xThread::run(IT& it, F& func, A&... args) {
     int dist = (int) std::distance(it.begin(), it.end());
     if (dist <= 0) return; // Cannot iterate backwards (yet)
@@ -648,8 +658,8 @@ namespace xthread {
   //lambda function inside aurostd::multithread_execute
   template void xThread::run<
     deque<string>,
-    std::function<void(deque<string>::iterator&)>
-  >(deque<string>&, std::function<void(deque<string>::iterator&)>&);
+    std::function<void(const deque<string>::const_iterator&)>
+  >(const deque<string>&, std::function<void(const deque<string>::const_iterator&)>&);
 
   //apl::PhononCalculator::calculateGroupVelocitiesThread
   template void xThread::run<
