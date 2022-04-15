@@ -1066,6 +1066,7 @@ namespace init {
 
     // NOW LOAD schema
     if (init::InitSchema(INIT_VERBOSE) == 0) return 0;
+    init::InitSchemaInternal(INIT_VERBOSE);
 
     // DONE
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [END]" << endl;
@@ -1088,9 +1089,8 @@ namespace init {
   long _GetRAM(void) {
     struct sysinfo s;
     if(sysinfo(&s)!=0) {
-      string function = XPID + "init::_GetRAM():";
       string message = "sysinfo error";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     return s.totalram;
   }
@@ -1103,9 +1103,8 @@ namespace init {
     uint64_t size;
     size_t len=sizeof(size);
     if(sysctl(mib,namelen,&size,&len,NULL,0)<0) {
-      string function = XPID + "init::GetRAM():";
       string message = "sysctl returned an error";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     return (long) size;
   }
@@ -1764,12 +1763,11 @@ bool CheckMaterialServer(const string& message) { //CO20200624
   if(XHOST.hostname==XHOST.AFLOW_WEB_SERVER) return TRUE;
   if(XHOST.hostname=="habana") return TRUE;
   if(XHOST.hostname=="aflowlib") return TRUE;
-  string function = XPID + "init::CheckMaterialServer():";
   stringstream messagestream;
   messagestream << "Your machine is \"" << XHOST.hostname << "\". ";
   if(message.length()>0) messagestream << "Command \"" << message << "\" can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\"." << endl;
   else messagestream << "The procedure can run only on \"" << XHOST.AFLOW_MATERIALS_SERVER << "\" or \"" << XHOST.AFLOW_WEB_SERVER << "\".";
-  throw aurostd::xerror(_AFLOW_FILE_NAME_, function, messagestream, _RUNTIME_ERROR_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _RUNTIME_ERROR_);
   return FALSE;
 }
 
@@ -3947,6 +3945,81 @@ namespace init {
     //SchemaFixName("Wyckoff_site_symmetries_orig","","strings");
   }
 }
+
+namespace init {
+
+  //ME20220208 - Initialize internal schema, which contain keywords that
+  //are inside the SQLite database, but are not served to the public.
+  uint InitSchemaInternal(bool INIT_VERBOSE) {
+    // DECLARATIONS
+    bool LDEBUG=(FALSE || XHOST.DEBUG || INIT_VERBOSE);
+    if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchemaInternal: [BEGIN]" << endl;
+
+    uint nschema = 0;
+
+    // schema is CAPITAL, content is not necessarily
+    XHOST.vschema_internal.push_attached("SCHEMA::NAME:ALLOY", "alloy");
+    XHOST.vschema_internal.push_attached("SCHEMA::UNIT:ALLOY", "");
+    XHOST.vschema_internal.push_attached("SCHEMA::TYPE:ALLOY", "string");
+    nschema++;
+
+    if(LDEBUG) cerr << "nschema=" << nschema << endl;
+    if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitSchemaInternal: [END]" << endl;
+
+    return nschema;
+  }
+
+}
+
+namespace init {
+
+  //getSchemaKeys/////////////////////////////////////////////////////////////
+  // Returns the keys from the AFLOW schema.
+  // Adapted from AflowDB
+  vector<string> getSchemaKeys(const aurostd::xoption& vschema) {
+    vector<string> keys;
+    string key = "";
+    for (uint i = 0, n = vschema.vxsghost.size(); i < n; i += 2) {
+      if(vschema.vxsghost[i].find("SCHEMA::NAME:") != string::npos) {  //CO20200520
+        key = aurostd::RemoveSubString(vschema.vxsghost[i], "SCHEMA::NAME:");
+        // schema keys are upper case
+        keys.push_back(aurostd::toupper(key));
+      }
+    }
+    return keys;
+  }
+
+  //getSchemaNames/////////////////////////////////////////////////////////////
+  // CO20200520
+  // Returns the names of the AFLOW schema keys
+  vector<string> getSchemaNames(const aurostd::xoption& vschema) {
+    vector<string> keys;
+    for (uint i = 0, n = vschema.vxsghost.size(); i < n; i += 2) {
+      if(vschema.vxsghost[i].find("SCHEMA::NAME:") != string::npos) {
+        keys.push_back(aurostd::RemoveSubString(vschema.vxsghost[i + 1], "SCHEMA::NAME:"));
+      }
+    }
+    return keys;
+  }
+
+  //getSchemaTypes/////////////////////////////////////////////////////////////
+  // Gets the data types of the schema keys.
+  // Adapted from AflowDB
+  vector<string> getSchemaTypes(const aurostd::xoption& vschema) {
+    return getSchemaTypes(vschema, getSchemaKeys(vschema));
+  }
+
+  vector<string> getSchemaTypes(const aurostd::xoption& vschema, const vector<string>& keys) {
+    uint nkeys = keys.size();
+    vector<string> types(nkeys);
+    string type = "";
+    for (uint k = 0; k < nkeys; k++) {
+      types.push_back(vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k])));
+    }
+    return types;
+  }
+}
+
 
 // **************************************************************************
 

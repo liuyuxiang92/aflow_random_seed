@@ -316,13 +316,13 @@ There are multiple parameters that control how the distortions for the direct me
 
       In this case, APL will generate VASP runs for three distortion directions per site.
 
-    * To prevent the automatic generation of negative distortions, the DPM entry needs to be unset:
+    * To prevent the automatic generation of negative distortions, the DPM entry needs to be set to:
 
-        [AFLOW_APL]DPM=OFF
+        [AFLOW_APL]DPM=AUTO
 
       In this case, APL will determine whether the negative distortions are required or if they
-      can be recovered by symmetry. If the DPM entry is not found, APL decides on a per-site basis
-      whether negative distortions are necessary.
+      can be recovered by symmetry. This will be decided on a per-site basis. For DPM=OFF, only
+      positive distortions will be created.
 
 If the primitive structure is not well relaxed or cannot be relaxed within a given precision, the
 unstrained state has some non-zero forces. In this case, it is possible to subtract these forces

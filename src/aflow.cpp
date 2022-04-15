@@ -615,8 +615,8 @@ int main(int _argc,char **_argv) {
   //[OBSOLETE]  return 1;
   //[OBSOLETE]}
   catch (aurostd::xerror& excpt) {
-    pflow::logger(excpt.whereFileName(), excpt.whereFunction(), excpt.error_message, oss, _LOGGER_ERROR_);
-    return excpt.error_code;
+    pflow::logger(excpt.whereFileName(), excpt.whereFunction(), excpt.buildMessageString(), oss, _LOGGER_ERROR_);
+    return excpt.whatCode();
   }
 }
 

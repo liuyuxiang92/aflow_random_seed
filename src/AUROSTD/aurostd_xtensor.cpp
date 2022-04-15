@@ -94,17 +94,16 @@ namespace aurostd{
   template<class utype>
     _subtensor<utype>& _subtensor<utype>::operator[] (const int& i) {
 #ifdef _CHECK_BOUNDS_
-      std::string function = _SUBTENSOR_ERR_PREFIX_ + "operator[]";
       std::stringstream message;
       if (indexed_dim == _tensor.ndim) {
         message << "Cannot subscribe tensor any further (tensor size: " << _tensor.ndim << ").";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_BOUNDS_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_BOUNDS_);
       } else if ((i < _tensor.lindex[indexed_dim]) ||
           (i > _tensor.uindex[indexed_dim])) {
         message << "Index " << i << " out of bounds for dimension " << (indexed_dim);
         message << " (lindex = " << _tensor.lindex[indexed_dim] <<", uindex = ";
         message << _tensor.uindex[indexed_dim] << ")";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_BOUNDS_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_BOUNDS_);
       }
 #endif
       shift += (i - _tensor.lindex[indexed_dim]) * _tensor.shifts[indexed_dim];
@@ -116,12 +115,11 @@ namespace aurostd{
     _subtensor<utype>& _subtensor<utype>::operator() (const std::vector<int>& ind) {
       uint isize = ind.size();
 #ifdef _CHECK_BOUNDS_
-      std::string function = _SUBTENSOR_ERR_PREFIX_ + "operator()";
       std::stringstream message;
       if (indexed_dim + isize > _tensor.ndim) {
         message  << "Too many indices for tensor with " << _tensor.ndim << " dimensions";
         message  << " (" << (indexed_dim + isize) << " provided).";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
 #endif
       for (uint i = 0; i < isize; i++) {
@@ -131,7 +129,7 @@ namespace aurostd{
           message << "Index " << ind[i] << " out of bounds for dimension " << (i+indexed_dim);
           message << " (lindex = " << _tensor.lindex[i+indexed_dim];
           message <<", uindex = " << _tensor.uindex[i+indexed_dim] << ")";
-          throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_BOUNDS_);
+          throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_BOUNDS_);
         }
 #endif
         shift += (ind[i] - _tensor.lindex[indexed_dim]) * _tensor.shifts[indexed_dim];
@@ -143,12 +141,11 @@ namespace aurostd{
   template<class utype>
     _subtensor<utype>& _subtensor<utype>::operator() (const aurostd::xvector<int>& ind) {
 #ifdef _CHECK_BOUNDS_
-      std::string function = _SUBTENSOR_ERR_PREFIX_ + "operator()";
       std::stringstream message;
       if (indexed_dim + ind.rows > _tensor.ndim) {
         message  << "Too many indices for tensor with " << _tensor.ndim << " dimensions";
         message  << " (" << (indexed_dim + ind.rows) << " provided).";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
 #endif
       for (int i = ind.lrows; i <= ind.urows; i++) {
@@ -158,7 +155,7 @@ namespace aurostd{
           message << "Index " << ind[i] << " out of bounds for dimension " << indexed_dim;
           message << " (lindex = " << _tensor.lindex[indexed_dim];
           message <<", uindex = " << _tensor.uindex[indexed_dim] << ")";
-          throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_BOUNDS_);
+          throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_BOUNDS_);
         }
 #endif
         shift += (ind[i] - _tensor.lindex[indexed_dim]) * _tensor.shifts[indexed_dim];
@@ -256,9 +253,8 @@ namespace aurostd{
           }
         }
       } else {
-        std::string function = _SUBTENSOR_ERR_PREFIX_ + "operator+=";
         std::string message = "Subtensors have different shapes.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       return *this;
     }
@@ -275,9 +271,8 @@ namespace aurostd{
           }
         }
       } else {
-        std::string function = _SUBTENSOR_ERR_PREFIX_ + "operator-=";
         std::string message = "Subtensors have different shapes.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       return *this;
     }
@@ -293,9 +288,8 @@ namespace aurostd{
           }
         }
       } else {
-        std::string function = _SUBTENSOR_ERR_PREFIX_ + "operator+=";
         std::string message = "Subtensor and tensor have different shapes.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       return *this;
     }
@@ -311,9 +305,8 @@ namespace aurostd{
           }
         }
       } else {
-        std::string function = _SUBTENSOR_ERR_PREFIX_ + "operator+=";
         std::string message = "Subtensor and tensor have different shapes.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       return *this;
     }
@@ -351,10 +344,9 @@ namespace aurostd{
         set(val, shift);
         // Exception handling
       } else {
-        std::string function = _SUBTENSOR_ERR_PREFIX_ + "operator=";
         std::stringstream message;
         message << "Cannot assign single value to tensor of size " << (_tensor.ndim - indexed_dim) << ".";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       return *this;
     }
@@ -368,9 +360,8 @@ namespace aurostd{
           corpus[i] = st.get(ist);
         }
       } else {
-        std::string function = _SUBTENSOR_ERR_PREFIX_ + "operator=";
         std::string message = "Subtensors have different shapes.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       return *this;
     }
@@ -383,9 +374,8 @@ namespace aurostd{
           corpus[ist] = tensor.get(i);
         }
       } else {
-        std::string function = _SUBTENSOR_ERR_PREFIX_ + "operator=";
         std::string message = "Subtensor and tensor have different shapes.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       return *this;
     }
@@ -415,8 +405,7 @@ namespace aurostd{
         message << "Tensor slice must be 1D to assign vector (is " << (_tensor.ndim - indexed_dim) << "D).";
       }
       if (throw_exception) {
-        std::string function = _SUBTENSOR_ERR_PREFIX_ + "operator=";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       return *this;
     }
@@ -445,8 +434,7 @@ namespace aurostd{
         message << "Tensor slice must be 1D to assign xvector (is " << (_tensor.ndim - indexed_dim) << "D).";
       }
       if (throw_exception) {
-        std::string function = _SUBTENSOR_ERR_PREFIX_ + "operator=";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       return *this;
     }
@@ -477,8 +465,7 @@ namespace aurostd{
         message << "Tensor slice must be 2D to assign xmatrix (is " << (_tensor.ndim - indexed_dim) << "D).";
       }
       if (throw_exception) {
-        std::string function = _SUBTENSOR_ERR_PREFIX_ + "operator=";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       return *this;
     }
@@ -673,14 +660,12 @@ namespace aurostd {
           std::cerr  << ", sizeof = " << size << ", tsize = " << tsize << std::endl;
         }
         if (!corpus) {
-          std::string function = _XTENSOR_ERR_PREFIX_ + "xtensor";
           std::string message = "Allocation failure in xtensor constructor.";
-          throw xerror(_AFLOW_FILE_NAME_,function, message, _ALLOC_ALLOCATE_);
+          throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _ALLOC_ALLOCATE_);
         }
         // Exception handling
       } else {
         tsize = 0;  // For destructor
-        std::string function = _XTENSOR_ERR_PREFIX_ + "xtensor";
         std::stringstream message;
         int code;
         if (uind.size() != lind.size()) {
@@ -694,7 +679,7 @@ namespace aurostd {
           }
           code = _INDEX_ILLEGAL_;
         }
-        throw xerror(_AFLOW_FILE_NAME_,function, message, code);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, code);
       }
     }
 
@@ -829,18 +814,17 @@ namespace aurostd {
   template<class utype>
     _subtensor<utype> xtensor<utype>::operator()(std::vector<int> indices) const {
 #ifdef _CHECK_BOUNDS_
-      std::string function = _XTENSOR_ERR_PREFIX_ + "operator()";
       std::stringstream message;
       uint isize = indices.size();
       if (isize > ndim) {
         message  << "Too many indices for tensor with " << ndim << " dimensions (" << isize << " provided).";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       } else {
         for (uint i = 0; i < isize; i++) {
           if ((indices[i] < lindex[i]) || indices[i] > uindex[i]) {
             message << "Index " << indices[i] << " out of bounds for dimension " << i;
             message << " (lindex = " << lindex[i] << ", uindex = " << uindex[i] <<").";
-            throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_BOUNDS_);
+            throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_BOUNDS_);
           }
         }
       }
@@ -851,17 +835,16 @@ namespace aurostd {
   template<class utype>
     _subtensor<utype> xtensor<utype>::operator()(aurostd::xvector<int> indices) const {
 #ifdef _CHECK_BOUNDS_
-      std::string function = _XTENSOR_ERR_PREFIX_ + "operator()";
       std::stringstream message;
       if (indices.rows > (int) ndim) {
         message << "Too many indices for tensor with " << ndim << " dimensions (" << indices.rows << " provided).";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       } else {
         for (int i = 0, ixvec = indices.lrows; ixvec <= indices.urows; i++, ixvec++) {
           if (indices[ixvec] < lindex[i] || indices[ixvec] > uindex[i]) {
             message << "Index " << indices[i] << " out of bounds for dimension "<< i;
             message << " (lindex = " << lindex[i] << ", uindex = " << uindex[i] << ").";
-            throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_BOUNDS_);
+            throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_BOUNDS_);
           }
         }
       }
@@ -873,11 +856,10 @@ namespace aurostd {
     _subtensor<utype> xtensor<utype>::operator[](int i) const {
 #ifdef _CHECK_BOUNDS_
       if ((i < lindex[0]) || (i > uindex[0])) {
-        std::string function = _XTENSOR_ERR_PREFIX_ + "operator[]";
         std::stringstream message;
         message << "Index " << i << " out of bounds for dimension 0";
         message << " (lindex = " << lindex[0] << ", uindex = " << uindex[0] << ").";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_BOUNDS_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_BOUNDS_);
       }
 #endif
       return _subtensor<utype>(i, corpus, *this);
@@ -941,9 +923,8 @@ namespace aurostd {
         return *this;
         // Exception handling
       } else {
-        std::string function = _XTENSOR_ERR_PREFIX_ + "operator+=";
         std::string message = "Tensors are of different size.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
     }
 
@@ -968,9 +949,8 @@ namespace aurostd {
         return *this;
         // Exception handling
       } else {
-        std::string function = _XTENSOR_ERR_PREFIX_ + "operator-=";
         std::string message = "Tensors are of different size.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
     }
 
@@ -1016,9 +996,8 @@ namespace aurostd {
         }
         return *this;
       } else {
-        std::string function = _XTENSOR_ERR_PREFIX_ + "operator+=";
         std::string message = "Tensor and subtensor are of different size.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
     }
 
@@ -1051,9 +1030,8 @@ namespace aurostd {
         }
         return *this;
       } else {
-        std::string function = _XTENSOR_ERR_PREFIX_ + "operator-=";
         std::string message = "Tensor and subtensor are of different size.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
     }
   ////// END with _subtensors
@@ -1099,9 +1077,8 @@ namespace aurostd {
         return tensor1;
         // Exception handling
       } else {
-        std::string function = _XTENSOR_ERR_PREFIX_ + "operator+";
         std::string message = "Tensors are of different size.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
     }
 
@@ -1124,9 +1101,8 @@ namespace aurostd {
         return tensor1;
         // Exception handling
       } else {
-        std::string function = _XTENSOR_ERR_PREFIX_ + "operator-";
         std::string message = "Tensors are of different size.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
     }
 
@@ -1216,10 +1192,9 @@ namespace aurostd {
       }
       if (tensor.ndim > 1) {
         // Exception handling
-        std::string function = _XTENSOR_ERR_PREFIX_ + "xtensor2vector";
         std::stringstream message;
         message << "Cannot convert xtensor with " << tensor.ndim << " dimensions to vector.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       } else {
         int rows = tensor.shape[0];
         std::vector<utype> vec(rows);
@@ -1244,10 +1219,9 @@ namespace aurostd {
       }
       if (tensor.ndim > 1) {
         // Exception handling
-        std::string function = _XTENSOR_ERR_PREFIX_ + "xtensor2xvector";
         std::stringstream message;
         message << "Cannot convert xtensor with " << tensor.ndim << " dimensions to xvector.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       } else {
         int rows = tensor.shape[0];
         aurostd::xvector<utype> xvec(rows);
@@ -1272,10 +1246,9 @@ namespace aurostd {
       }
       if (tensor.ndim > 2) {
         // Exception handling
-        std::string function = _XTENSOR_ERR_PREFIX_ + "xtensor2xmatrix";
         std::stringstream message;
         message << "Cannot convert xtensor with " << tensor.ndim << " dimensions to xmatrix.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _INDEX_MISMATCH_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       } else {
         int rows, cols;
         rows = tensor.shape[0];
@@ -1559,9 +1532,8 @@ namespace aurostd {
         }
         return trc;
       } else {
-        std::string function = _XTENSOR_ERR_PREFIX_ + "trace";
         std::string message = "Trace is only defined for cubic tensors.";
-        throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
     }
 

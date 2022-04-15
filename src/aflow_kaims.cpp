@@ -412,7 +412,12 @@ namespace KBIN{
               _xinput xinput(xaims);
               readModulesFromAflowIn(AflowIn, kflags, xinput);  //ME20181027
               _xflags xflags(aimsflags);
-              KBIN::RunPhonons_APL(xinput,AflowIn,aflags,kflags,xflags,FileMESSAGE);  //now it's general
+              //ME20200107 - Wrap in a try statement so that faulty APL runs don't kill other post-processing
+              try {
+                KBIN::RunPhonons_APL(xinput,AflowIn,aflags,kflags,xflags,FileMESSAGE);  //now it's general
+              } catch (aurostd::xerror e) {
+                pflow::logger(e.whereFileName(), e.whereFunction(), e.buildMessageString(), aflags.Directory, FileMESSAGE, std::cout, _LOGGER_ERROR_);
+              }
               //KBIN::RunPhonons_APL(xaims,AflowIn,aflags,kflags,aimsflags,FileMESSAGE);
             }
             //[MAKE XINPUT] here CORMAC WILL POOP an IF=>AGL

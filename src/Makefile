@@ -61,7 +61,7 @@ W_AMBIG_OBJ=-Wa,-mbig-obj
 endif
 CCFLAGS=-Wall -W -fno-inline $(W_AMBIG_OBJ)
 #ME20200514 - Allow inlining for threaded files (big performance penalty otherwise)
-CCFLAGS_MT=-Wall -W
+CCFLAGS_MT=-Wall -W -DAFLOW_MULTITHREADS_ENABLE
 #[CO20191217 - put in OPTS_MT]CCFLAGS_MT=$(CCFLAGS) -O2
 #CCFLAGS_GSA=$(CCFLAGS) -O1	#CO OBSOLETE 170601
 INCLUDE = -I ./
@@ -73,7 +73,7 @@ OPTS=
 #-O1
 #-O3
 # -march=opteron
-OPTS_MT=-O2 -std=gnu++0x
+OPTS_MT=-O2
 TODAY=-DTODAY=\"$(TIME)\"
 VERS=-DAFLOW_VERSION=\"$(VERSNUMBER)\" $(TODAY)
 
@@ -154,7 +154,7 @@ COUNTER_FILE=.aflow_counter
 all: aflow aflow_data 
 	$(MAKE) check
 include Makefile.aflow
-aflow: $(SQLITE_OBJ) $(AFLOW_DEPS) $(MFS) 
+aflow: $(SQLITE_OBJ) $(AFLOW_DEPS) $(MFS)
 #	$(MAKE) -C ../AFLOW2_FREE/EXTRA/APL2AGR/ && cd ../../
 #	cp -f aflow_apl*.o aflow_aapl*.o aflow_qha*.o ./APL/
 #	cp -f aflow_anrl*.o ./ANRL/
@@ -1652,13 +1652,14 @@ check_cif_parser:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	./aflow --cif_parser_test
 
-ifeq ($(UNAME),Linux)
-	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' | wc -l | sed 's/^ *//') && \
-		if [ "$$NUMBER_NULLPTRS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_NULLPTRS nullptrs in the source code; this is not backwards compatible with older GCC version. Please swap with 'NULL' and recompile." && exit 1; fi
-	@echo "aflow_gcc_compatibility test 1 passed!"
-else
-	@echo "aflow_gcc_compatibility test 1 (no 'nullptr') requires GNU grep, try: find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)'"
-endif
+#[ME20220205 - Obsolete with C++11]
+#ifeq ($(UNAME),Linux)
+#	@echo "Running aflow_gcc_compatibility test 1: no 'nullptr'" && ANSWER=0 && NUMBER_NULLPTRS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)' | wc -l | sed 's/^ *//') && \
+#		if [ "$$NUMBER_NULLPTRS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_NULLPTRS nullptrs in the source code; this is not backwards compatible with older GCC version. Please swap with 'NULL' and recompile." && exit 1; fi
+#	@echo "aflow_gcc_compatibility test 1 passed!"
+#else
+#	@echo "aflow_gcc_compatibility test 1 (no 'nullptr') requires GNU grep, try: find . -name '*.h' -o -name '*.cpp' | xargs grep -P '^(?=[\s]*+[^//])[^//]*(nullptr)'"
+#endif
 check_aflow_exits:
 	@echo "Running aflow_exits test 1: NO 'exit()'" && ANSWER=0 && NUMBER_EXITS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep 'exit(' | wc -l | sed 's/^ *//') && \
 		if [ "$$NUMBER_EXITS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_EXITS exits in the source code. Please swap with 'aurostd::xerror()' and recompile." && exit 1; fi

@@ -88,6 +88,7 @@ namespace makefile {
         getDependencies(dfile,files_already_explored,dfiles); //do not propagate mt_required from sub-dependencies
       }
       if(line.find("#define")==0 && line.find("AFLOW_")!=string::npos && line.find("_MULTITHREADS_ENABLE")!=string::npos){mt_required=true;}
+      if(line.find("AFLOW_MULTITHREADS_ENABLE")!=string::npos){mt_required=true;}  //ME20220204
     }
     std::sort(dfiles.begin(),dfiles.end());dfiles.erase( std::unique( dfiles.begin(), dfiles.end() ), dfiles.end() );  //get unique set of dependent files
     if(LDEBUG){cerr << soliloquy << " dfiles=" << aurostd::joinWDelimiter(dfiles,",") << endl;}
@@ -371,7 +372,8 @@ namespace makefile {
     trimPath(file);
     if(LDEBUG){cerr << soliloquy << " building dependency for " << file << endl;}
     vfiles.push_back(file);
-    vvdependencies.push_back(vector<string>(0));files_already_explored.clear();
+    vvdependencies.push_back(vector<string>(1, Makefile_aflow));  // ME20220210 - Add Makefile.aflow as dependency or files with changed flags/dependencies won't compile
+    files_already_explored.clear();
     mt_required=false;
     getDependencies(vfiles.back(),files_already_explored,vvdependencies.back(),mt_required); //[didn't compile for some reason]vmt_required.back());
     vvdependencies.back().insert(vvdependencies.back().begin(),file);  //put file at the BEGINNING for $<
@@ -410,7 +412,8 @@ namespace makefile {
     trimPath(file);
     if(LDEBUG){cerr << soliloquy << " building dependency for " << file << endl;}
     vfiles.push_back(file);
-    vvdependencies.push_back(vector<string>(0));files_already_explored.clear();
+    vvdependencies.push_back(vector<string>(1, Makefile_aflow));  // ME20220210 - Add Makefile.aflow as dependency or files with changed flags/dependencies won't compile
+    files_already_explored.clear();
     mt_required=false;
     getDependencies(vfiles.back(),files_already_explored,vvdependencies.back(),mt_required); //[didn't compile for some reason]vmt_required.back());
     vvdependencies.back().insert(vvdependencies.back().begin(),file);  //put file at the BEGINNING for $<
@@ -511,7 +514,8 @@ namespace makefile {
             //END skipping
             if(LDEBUG){cerr << soliloquy << " building dependency for " << file << endl;}
             vfiles.push_back(file);
-            vvdependencies.push_back(vector<string>(0));files_already_explored.clear();
+            vvdependencies.push_back(vector<string>(1, Makefile_aflow));  // ME20220210 - Add Makefile.aflow as dependency or files with changed flags/dependencies won't compile
+            files_already_explored.clear();
             //[didn't compile for some reason]vmt_required.push_back(false);
             mt_required=false;
             getDependencies(vfiles.back(),files_already_explored,vvdependencies.back(),mt_required); //[didn't compile for some reason]vmt_required.back());
