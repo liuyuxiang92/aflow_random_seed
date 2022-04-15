@@ -57,7 +57,7 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   RAM_MB=0.0;
   RAM_GB=0.0;
   CPU_Cores=0;
-  CPU_active=0;  //ME20220130
+  CPU_active=1;  //ME20220130 - count main thread
   CPU_Model="";
   CPU_MHz="";
   vTemperatureCore.clear();

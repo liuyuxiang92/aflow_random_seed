@@ -239,7 +239,8 @@ namespace xthread {
   /// @brief Sets the minimum and maximum number of CPUs used for threading
   ///
   /// @param nmax Maximum number of CPUs used by xThread (default: 0 for all available CPUs)
-  /// @param nmin Mininum number of CPUs required to spawn thread workers default: 1)
+  /// @param nmin Mininum number of CPUs required to spawn thread workers (default: 1);
+  //              set to 0 for nmin = nmax
   void xThread::setCPUs(int nmax, int nmin) {
     if (nmax < nmin) std::swap(nmax, nmin);
     ncpus_max = (nmax > 0)?nmax:(KBIN::get_NCPUS());
@@ -259,25 +260,31 @@ namespace xthread {
   int xThread::reserveThreads(unsigned long long int ntasks) {
     uint sleep_second = 10;
     int ncpus_max_available = KBIN::get_NCPUS();
+    int ncpus = 0, ncpus_available = 0, nmax = 0, nmin = 0;
     int nmax = ncpus_max;
     int nmin = ncpus_min;
-    // Adjust max. and min. number of CPUs to the number of tasks
-    if ((ntasks <= (unsigned long long int) AUROSTD_MAX_INT)) {
-      int n = (unsigned long long int) ntasks;
-      if (n < nmin) nmin = n;
-      if (n < nmax) nmax = n;
+    // Adjust max. and min. number of CPUs to the number of tasks.
+    // Decrement numbers by 1 because the main thread (which is idle
+    // during execution) should not count towards the total number
+    // of active CPUs
+    if (ntasks <= (unsigned long long int) ncpus_max_available) {
+      nmin = std::min(ncpus_min, ntasks) - 1;
+      nmax = std::min(ncpus_max, ntasks) - 1;
+    } else {
+      nmin = ncpus_min - 1;
+      nmax = ncpus_max - 1;
     }
-    int ncpus = 0, ncpus_available = 0;
     do {
+      xthread_cpu_check.lock();
       ncpus_available = ncpus_max_available - XHOST.CPU_active;
       if (ncpus_available >= nmin) {
-        xthread_cpu_check.lock();
         ncpus = std::min(ncpus_available, nmax);
         // "reserve" threads globally
         XHOST.CPU_active += ncpus;
+        // Increase by 1 - the main thread does not count towards the
+        // total, but should still be used to for a worker
+        ncpus++;
         xthread_cpu_check.unlock();
-      } else if ((ncpus_available == 0) && (nmin == 1)) {
-        return 1;  // Run single-threaded on the main thread
       } else {
         xthread_cpu_check.unlock();
         aurostd::Sleep(sleep_second);
@@ -291,7 +298,9 @@ namespace xthread {
   /// @param ncpus Number of threads to free
   void xThread::freeThreads(int ncpus) {
     std::lock_guard<std::mutex> lk(xthread_cpu_check);
-    XHOST.CPU_active -= ncpus;
+    // Decrease by 1 to account for the main thread not counting
+    // towards the number of active CPUs
+    XHOST.CPU_active -= (ncpus - 1);
   }
 
   // On-the-fly scheme --------------------------------------------------------
