@@ -9,7 +9,6 @@
 
 #include "aflow_apl.h"
 
-static const string _APL_ADISP_MODULE_ = "APL";  // for the logger
 static const xcomplex<double> iONE(0.0, 1.0);
 
 //////////////////////////////////////////////////////////////////////////////
@@ -163,7 +162,7 @@ namespace apl {
 
   void AtomicDisplacements::calculateMeanSquareDisplacementMatrices() {
     string message = "Calculating mean square displacement matrices.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     _displacement_matrices.clear();
     _displacement_modes.clear();
     calculateEigenvectors();
@@ -321,7 +320,7 @@ namespace apl {
     }
     filename = aurostd::CleanFileName(filename);
     string message = "Writing mean square displacements into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
     vector<vector<xvector<double> > > disp_vec = getDisplacementVectors();
     stringstream output;
     string tag = "[APL_DISPLACEMENTS]";
@@ -360,7 +359,7 @@ namespace apl {
     }
     filename = aurostd::CleanFileName(filename);
     string message = "Writing atomic displacements in XCRYSDEN format into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(),*_pc->getOSS());
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _pc->getDirectory(), *_pc->getOFStream(),*_pc->getOSS());
 
     uint nsteps = disp.size();
     uint natoms = scell.atoms.size();
@@ -405,7 +404,7 @@ namespace apl {
     }
     filename = aurostd::CleanFileName(filename);
     string message = "Writing atomic displacements in V_SIM format into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _pc->getDirectory(), *_pc->getOFStream(), *_pc->getOSS());
 
     stringstream output;
     // Lattice
@@ -541,7 +540,7 @@ namespace apl {
     if (format != "V_SIM") {
       if (branches_str.empty()) {
         message = "No branches selected. Displacements will be calculated for all modes.";
-        pflow::logger(_AFLOW_FILE_NAME_, _APL_ADISP_MODULE_, message, directory, mf, oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, directory, mf, oss);
       } else {
         aurostd::string2tokens(branches_str, branches, ",");
         // Branch index is based on 1, not 0

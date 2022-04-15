@@ -1759,7 +1759,8 @@ namespace KBIN {
     string soliloquy=XPID+"KBIN::convertPOSCARFormat()";
     string mpi_command="";
     string vasp_path_full=kflags.KBIN_BIN;
-    if(kflags.KBIN_MPI){  //CO20210713 - adding all the machine information
+    double vaspVersion=KBIN::getVASPVersionDouble(vasp_path_full); //SD20220331
+    if(aurostd::isequal(vaspVersion,0.0) && kflags.KBIN_MPI){  //CO20210713 - adding all the machine information
       vasp_path_full=kflags.KBIN_MPI_BIN;
       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH")) {mpi_command=MPI_COMMAND_DUKE_BETA_MPICH;vasp_path_full=MPI_BINARY_DIR_DUKE_BETA_MPICH+kflags.KBIN_MPI_BIN;}
       else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_OPENMPI")) {mpi_command=MPI_COMMAND_DUKE_BETA_OPENMPI;vasp_path_full=MPI_BINARY_DIR_DUKE_BETA_OPENMPI+kflags.KBIN_MPI_BIN;}
@@ -1780,12 +1781,12 @@ namespace KBIN {
       else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) {mpi_command=MPI_COMMAND_CMU_EULER;vasp_path_full=MPI_BINARY_DIR_CMU_EULER+kflags.KBIN_MPI_BIN;}
       else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::OHAD")) {mpi_command=MPI_COMMAND_MACHINE2;vasp_path_full=MPI_BINARY_DIR_MACHINE2+kflags.KBIN_MPI_BIN;}
       else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::HOST1")) {mpi_command=MPI_COMMAND_MACHINE1;vasp_path_full=MPI_BINARY_DIR_MACHINE1+kflags.KBIN_MPI_BIN;}
+      vaspVersion = KBIN::getVASPVersionDouble(vasp_path_full,mpi_command); //CO20200610
     }
     if(LDEBUG){
       cerr << soliloquy << " mpi_command=\"" << mpi_command << "\"" << endl;
       cerr << soliloquy << " vasp_path_full=\"" << vasp_path_full << "\"" << endl;
     }
-    double vaspVersion = getVASPVersionDouble(vasp_path_full,mpi_command); //CO20200610
     if(LDEBUG){cerr << soliloquy << " vaspVersion=" << vaspVersion << endl;}
     if (aurostd::isequal(vaspVersion,0.0)) {  //CO20210713
       stringstream message;
@@ -2951,9 +2952,9 @@ namespace KBIN {
     if(NPAR==0) {NPAR=4;NCORE=1;}
 
     //DX COME BACK: should these be set by machine? looks like they are being overridden below
-    if(xvasp.NCPUS==32)  {NPAR=4;NCORE=32;} // test for DX conrad and gordon
-    if(xvasp.NCPUS==48)  {NPAR=4;NCORE=48;} // test for DX gaffney, koehr, and mustang
-    if(xvasp.NCPUS==44)  {NPAR=4;NCORE=44;} // test for DX onyx
+    if(xvasp.NCPUS==32)  {NPAR=4;NCORE=32;} // test for DX
+    if(xvasp.NCPUS==48)  {NPAR=4;NCORE=48;} // test for DX
+    if(xvasp.NCPUS==44)  {NPAR=4;NCORE=44;} // test for DX
 
     // marylou fulton super computer center
     if(xvasp.NCPUS==4)  { // best 4 times

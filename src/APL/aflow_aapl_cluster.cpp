@@ -22,7 +22,6 @@ using aurostd::xcombos;
 using aurostd::xerror;
 
 #define _DEBUG_AAPL_CLUSTERS_ false
-static const string _AAPL_CLUSTER_MODULE_ = "CLUSTER";
 
 /************************** CONSTRUCTORS/DESTRUCTOR *************************/
 
@@ -157,7 +156,7 @@ namespace apl {
       double max_rad = getMaxRad(scell, cut_shell);
       if (max_rad > cut_rad) {
         message << "Cutoff has been modified to " << max_rad << " Angstroms.";
-        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, directory, *p_FileMESSAGE, *p_oss);
         cut_rad = max_rad;
       }
     }
@@ -329,7 +328,7 @@ namespace apl {
   void ClusterSet::buildShells() {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
     string message = "Building coordination shells.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, directory, *p_FileMESSAGE, *p_oss);
     int at1sc = 0;
     vector<int> shell;
     coordination_shells.clear();
@@ -377,7 +376,7 @@ namespace apl {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _DEBUG_AAPL_CLUSTERS_);
     stringstream message;
     message << "Building clusters of order " << order << ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, directory, *p_FileMESSAGE, *p_oss);
     buildShells();
     clusters = buildClusters();
     getInequivalentClusters(clusters, ineq_clusters);
@@ -474,7 +473,7 @@ namespace apl {
   void ClusterSet::getInequivalentClusters(vector<_cluster>& clusters,
       vector<vector<int> > & ineq_clst) {
     string message = "Determining inequivalent clusters.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, directory, *p_FileMESSAGE, *p_oss);
     int equivalent_clst = -1;
     vector<int> unique_atoms;
     vector<vector<int> > compositions;
@@ -706,7 +705,7 @@ namespace apl {
   // Builds the inequivalent distortions for the AAPL calculations.
   void ClusterSet::buildDistortions() {
     string message = "Getting inequivalent distortions.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, directory, *p_FileMESSAGE, *p_oss);
     distortion_vectors = getCartesianDistortionVectors();
     linear_combinations = getLinearCombinations();
     ineq_distortions = initializeIneqDists();
@@ -1320,7 +1319,7 @@ namespace apl {
   // Writes the ClusterSet object to an XML file.
   void ClusterSet::writeClusterSetToFile(const string& filename) {
     string message = "Writing ClusterSet to file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, directory, *p_FileMESSAGE, *p_oss);
     std::stringstream output;
     // Header
     output << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>" << std::endl;
@@ -1852,7 +1851,7 @@ namespace apl {
       } else {
         message << "The ClusterSet needs to be determined again.";
       }
-      pflow::logger(_AFLOW_FILE_NAME_, _AAPL_CLUSTER_MODULE_, message, directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     }
     return compatible;
   }

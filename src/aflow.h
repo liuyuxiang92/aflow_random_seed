@@ -337,10 +337,10 @@ class _XHOST {
     // _XHOST(const _XHOST& b);                          // constructor copy
     const _XHOST& operator=(const _XHOST &b);         // copy
     // BOOT
-    int PID,TID;                // aflow_init.cpp  PID/TID number  //CO20200508
-    ostringstream ostrPID,ostrTID; // aflow_init.cpp  PID/TID in ostringstream... //CO20200508
-    string sPID,sTID;           // aflow_init.cpp  [PID=12345678]  [TID=12345678]
-    bool showPID,showTID;       // aflow_init.cpp  check if --showPID
+    int PGID,PID,TID;                // aflow_init.cpp  PID/TID number  //CO20200508 //SD20220329 PGID number
+    ostringstream ostrPGID,ostrPID,ostrTID; // aflow_init.cpp  PID/TID in ostringstream... //CO20200508 
+    string sPGID,sPID,sTID;           // aflow_init.cpp  [PID=12345678]  [TID=12345678]
+    bool showPGID,showPID,showTID;       // aflow_init.cpp  check if --showPID
     // machinery
     bool QUIET,QUIET_CERR,QUIET_COUT,TEST,DEBUG,MPI;    // extra quiet SC20210617
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
@@ -438,6 +438,7 @@ class _XHOST {
 };
 
 #define XPID XHOST.sPID
+#define XPGID XHOST.sPGID
 #define XTID XHOST.sTID
 
 #define XHOST_vGlobal_MAX                              256
@@ -1132,8 +1133,10 @@ bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin);  //CO20210
 bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin,int& ncpus);  //CO20210315
 void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed);  //CO20210315
 bool AFLOW_VASP_instance_running(); //CO20210315
+bool AFLOW_VASP_instance_running(const string& pgid); //SD20220330
 bool AFLOW_MONITOR_instance_running(const _aflags& aflags); //CO20210315
 bool VASP_instance_running(const string& vasp_bin); //CO20210315
+bool VASP_instance_running(const string& vasp_bin,const string& pgid); //SD20220330
 void AFLOW_monitor_VASP();  //CO20210315
 void AFLOW_monitor_VASP(const string& directory);  //CO20210315
 
@@ -2930,19 +2933,20 @@ namespace KBIN {
   void *_threaded_interface_RUN_Directory(void *ptr);
 } // namespace KBIN
 namespace aurostd { // Multithreaded add on to aurostd
-  bool multithread_execute(deque<string> vcommand,int NUM_THREADS,bool VERBOSE);
-  bool multithread_execute(deque<string> vcommand,int NUM_THREADS);
-  bool multithread_execute(deque<string> vcommand);
-  bool multithread_execute(vector<string> vcommand,int NUM_THREADS,bool VERBOSE);
-  bool multithread_execute(vector<string> vcommand,int NUM_THREADS);
-  bool multithread_execute(vector<string> vcommand);
+  bool multithread_execute(const deque<string>& vcommand,int NUM_THREADS,bool VERBOSE);
+  bool multithread_execute(const deque<string>& vcommand,int NUM_THREADS);
+  bool multithread_execute(const deque<string>& vcommand);
+  bool multithread_execute(const vector<string>& vcommand,int NUM_THREADS,bool VERBOSE);
+  bool multithread_execute(const vector<string>& vcommand,int NUM_THREADS);
+  bool multithread_execute(const vector<string>& vcommand);
 } // namespace aurostd
 namespace AFLOW_PTHREADS {
-  bool MULTI_sh(vector<string> argv);
-  bool MULTI_compress(string cmd,vector<string> argv);
+  bool MULTI_sh(const vector<string>& argv);
+  bool MULTI_compress(const string& cmd,const vector<string>& argv);
   bool MULTI_zip(const vector<string>& argv); //CO20211104
-  bool MULTI_bz2xz(vector<string> argv);bool MULTI_xz2bz2(vector<string> argv);
-  bool MULTI_gz2xz(vector<string> argv);
+  bool MULTI_bz2xz(const vector<string>& argv);
+  bool MULTI_xz2bz2(const vector<string>& argv);
+  bool MULTI_gz2xz(const vector<string>& argv);
 }
 namespace sflow {
   void KILL(string options);
@@ -2976,6 +2980,8 @@ namespace xthread {
       void run(int ntasks, F& func, A&... args);
       template <typename F, typename... A>
       void run(unsigned long long int ntasks, F& func, A&... args);
+      template <typename IT, typename F, typename... A>
+      void run(const IT& it, F& func, A&... args);
       template <typename IT, typename F, typename... A>
       void run(IT& it, F& func, A&... args);
 
@@ -3187,6 +3193,9 @@ namespace KBIN {
   bool VASP_OSZICARUnconverged(const string& oszicar,const string& outcar);
   void GetStatDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   void GetDynaDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
+  string BIN2VASPVersion(const string& binfile);  //SD20220331
+  string BIN2VASPVersionNumber(const string& binfile);  //SD20220331
+  double BIN2VASPVersionDouble(const string& binfile);  //SD20220331
   string OUTCAR2VASPVersion(const string& outcar);  //CO20210315
   string OUTCAR2VASPVersionNumber(const string& outcar);  //CO20210315
   double OUTCAR2VASPVersionDouble(const string& outcar);  //CO20210315
@@ -4867,7 +4876,6 @@ namespace KBIN {
   bool runRelaxationsAPL_VASP(int, const string&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  //ME20200427
   void VASP_RunPhonons_APL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE, ostream& oss=std::cout);
   void RunPhonons_APL(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general
-  void RunPhonons_APL_20181216(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general //CO20181216
   // ----------------------------------------------------------------------------
   // aflow_agl_debye.cpp
   uint relaxStructureAGL_VASP(const string& AflowIn, _xvasp& xvasp, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMessage);  //CT20200501

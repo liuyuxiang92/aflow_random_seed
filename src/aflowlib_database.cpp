@@ -358,7 +358,7 @@ namespace aflowlib {
       ncols_tmp = props.size();
 
       // Get number of entries
-      props = getPropertyMultiTables("COUNT", tables, "*");
+      props = getDatabasePropertyMultiTables("COUNT", tables, "*");
       for (int i = 0; i < _N_AUID_TABLES_; i++) nentries_tmp += aurostd::string2utype<uint>(props[i]);
     }
 
@@ -397,7 +397,7 @@ namespace aflowlib {
         ncols_old = props.size();
 
         // Get number of entries
-        props = getPropertyMultiTables(main_db, "COUNT", tables, "*");
+        props = getDatabasePropertyMultiTables(main_db, "COUNT", tables, "*");
         for (int i = 0; i < _N_AUID_TABLES_; i++) nentries_old += aurostd::string2utype<uint>(props[i]);
 
         sql_code = sqlite3_close(main_db);
@@ -1063,9 +1063,9 @@ namespace aflowlib {
       }
 
       // Loops
-      for (auto& loop : total_stats.loop_counts) {
-        const string& key = loop.first;
-        loop.second += catalog_stats.loop_counts[key];
+      for (std::map<string, uint>::iterator it = total_stats.loop_counts.begin(); it != total_stats.loop_counts.end(); ++it) {
+        const string& key = (*it).first;
+        (*it).second += catalog_stats.loop_counts[key];
       }
 
       // Species
@@ -1153,7 +1153,7 @@ namespace aflowlib {
     vector<DBStats> colstats(tables.size(), stats);
 
     string where = "catalog='" + catalog + "'";
-    vector<string> entries = getPropertyMultiTables("COUNT", tables, "*", where);
+    vector<string> entries = getDatabasePropertyMultiTables("COUNT", tables, "*", where);
     uint ntables = tables.size();
     for (uint t = 0; t < ntables; t++) stats.nentries += aurostd::string2utype<int>(entries[t]);
     message << "Starting analysis for catalog " << catalog << " (" << stats.nentries << " entries).";
@@ -1278,18 +1278,18 @@ namespace aflowlib {
       for (uint c = 0; c < ncols; c++) {
         if (types[c] == "bool") {
           where = "catalog='" + catalog + "' AND " + cols[c] + "=";
-          cstats.count[c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'true'"));
-          cstats.count[c][1] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'false'"));
+          cstats.count[c][0] = aurostd::string2utype<int>(getDatabaseProperty(cursor, "COUNT", tables[i], cols[c], where + "'true'"));
+          cstats.count[c][1] = aurostd::string2utype<int>(getDatabaseProperty(cursor, "COUNT", tables[i], cols[c], where + "'false'"));
         } else {
           where = "catalog='" + catalog + "' AND " + cols[c] + " NOT NULL";
-          cstats.count[c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where));
+          cstats.count[c][0] = aurostd::string2utype<int>(getDatabaseProperty(cursor, "COUNT", tables[i], cols[c], where));
         }
         // No need to determine max, min, or set for bool
         if ((types[c] != "bool") && (cstats.count[c][0] > 0)) {
           // Max and  min only make sense for numbers
           if (types[c] == "number") {
-            cstats.max[c] = getProperty(cursor, "MAX", tables[i], cols[c], where);
-            cstats.min[c] = getProperty(cursor, "MIN", tables[i], cols[c], where);
+            cstats.max[c] = getDatabaseProperty(cursor, "MAX", tables[i], cols[c], where);
+            cstats.min[c] = getDatabaseProperty(cursor, "MIN", tables[i], cols[c], where);
           }
           cstats.set[c] = getSet(cursor, tables[i], cols[c], true, where, _DEFAULT_SET_LIMIT_ + 1);
         }
@@ -1297,7 +1297,7 @@ namespace aflowlib {
       for (std::map<string, uint>::iterator it = cstats.loop_counts.begin(); it != cstats.loop_counts.end(); ++it) {
         const string& key = (*it).first;
         where = "catalog='" + catalog + "' AND loop LIKE '%\"" + key + "\"%'";
-        (*it).second = aurostd::string2utype<int>(getProperty("COUNT", tables[i], "loop", where));
+        (*it).second = aurostd::string2utype<int>(getDatabaseProperty("COUNT", tables[i], "loop", where));
       }
 #ifdef AFLOW_MULTITHREADS_ENABLE
       std::lock_guard<std::mutex> lk(write_mutex);
@@ -1350,8 +1350,8 @@ namespace aflowlib {
     json << "{";
     json << "\"count\":" << db_stats.nentries << ",";
     json << "\"systems\":" <<  db_stats.nsystems << ",";
-    for (const auto& loop: db_stats.loop_counts) {
-      json << "\"" << loop.first << "\":" << loop.second << ",";
+    for (std::map<string, uint>::const_iterator it = db_stats.loop_counts.begin(); it != db_stats.loop_counts.end(); ++it) {
+      json << "\"" << (*it).first << "\":" << (*it).second << ",";
     }
     json << "\"columns\":{";
     uint ncols = db_stats.columns.size();
@@ -1711,26 +1711,26 @@ namespace aflowlib {
   }
 
 
-  //getProperty///////////////////////////////////////////////////////////////
+  //getDatabaseProperty///////////////////////////////////////////////////////
   // Gets a database property for a specific column.
-  string AflowDB::getProperty(const string& property, const string& table,
+  string AflowDB::getDatabaseProperty(const string& property, const string& table,
       const string& col, const string& where) {
-    return getProperty(db, property, table, col, where);
+    return getDatabaseProperty(db, property, table, col, where);
   }
-  string AflowDB::getProperty(sqlite3* cursor, const string& property, const string& table,
+  string AflowDB::getDatabaseProperty(sqlite3* cursor, const string& property, const string& table,
       const string& col, const string& where) {
     string command = prepareSELECT(table, property, col, where, 0, "");
     return sql::SQLexecuteCommandSCALAR(cursor, command);
   }
 
-  //getPropertyMultiTables////////////////////////////////////////////////////
+  //getDatabasePropertyMultiTables////////////////////////////////////////////
   // Gets a database property for a specific column across multiple tables.
-  vector<string> AflowDB::getPropertyMultiTables(const string& property, const vector<string>& tables,
+  vector<string> AflowDB::getDatabasePropertyMultiTables(const string& property, const vector<string>& tables,
       const string& col, const string& where) {
-    return getPropertyMultiTables(db, property, tables, col, where);
+    return getDatabasePropertyMultiTables(db, property, tables, col, where);
   }
 
-  vector<string> AflowDB::getPropertyMultiTables(sqlite3* cursor, const string& property, const vector<string>& tables,
+  vector<string> AflowDB::getDatabasePropertyMultiTables(sqlite3* cursor, const string& property, const vector<string>& tables,
       const string& col, const string& where) {
     uint ntables = tables.size();
     vector<string> commands(ntables);

@@ -7,8 +7,6 @@
 
 #include "aflow_apl.h"
 
-using namespace std;
-
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
 //                        PhononDispersionCalculator                        //
@@ -264,7 +262,7 @@ namespace apl {
     outfile << setprecision(8);
     double x = 0.0;
     double wholePathLength = _pb.getPathLength();
-    map<double, string> labelMap;
+    std::map<double, string> labelMap;
     for (uint i = 1; i < _pb.getPointSize(); i++) {
       outfile << "# <label>     " << x << " "
         << setw(5) << _pb.getPointLabel(i)

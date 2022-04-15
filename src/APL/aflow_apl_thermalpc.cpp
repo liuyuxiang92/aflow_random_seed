@@ -25,8 +25,6 @@
 using std::vector;
 using std::string;
 
-static const string _APL_TPC_MODULE_ = "APL";
-
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
 //                         CONSTRUCTORS/DESTRUCTORS                         //
@@ -160,7 +158,7 @@ namespace apl {
       double Tend,
       double Tstep) {
     string message = "Calculating thermal properties.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_TPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     if (Tstart > Tend) {
       message = "Tstart cannot be higher than Tend.";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
@@ -385,7 +383,7 @@ namespace apl {
   void ThermalPropertiesCalculator::writePropertiesToFile(string filename, filetype ft) {
     filename = aurostd::CleanFileName(filename);
     string message = "Writing thermal properties into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_TPC_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
 
     stringstream outfile;
     if (ft == json_ft) {

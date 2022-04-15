@@ -306,7 +306,7 @@ namespace KBIN {
 } // namespace KBIN
 
 namespace AFLOW_PTHREADS {
-  bool MULTI_sh(vector<string> argv) {
+  bool MULTI_sh(const vector<string>& argv) {
 
     string function_name=XPID+"AFLOW_PTHREADS::MULTI_sh()";
     stringstream message;
@@ -423,7 +423,7 @@ namespace AFLOW_PTHREADS {
 
 
 namespace AFLOW_PTHREADS {
-  bool MULTI_sh(vector<string> argv) {
+  bool MULTI_sh(const vector<string>& argv) {
 
     string function_name = XPID + "AFLOW_PTHREADS::MULTI_sh():";
     stringstream message;
@@ -449,7 +449,7 @@ namespace AFLOW_PTHREADS {
 } // AFLOW_PTHREADS
 
 namespace aurostd {
-  bool multithread_execute(deque<string> dcmds,int _NUM_THREADS,bool VERBOSE) {
+  bool multithread_execute(const deque<string>& dcmds,int _NUM_THREADS,bool VERBOSE) {
     bool LDEBUG=TRUE;
     string soliloquy=XPID+"aurostd::multithread_execute():";
     int NUM_THREADS=_NUM_THREADS;                                          // SAFETY
@@ -492,7 +492,7 @@ namespace aurostd {
 #endif //  AFLOW_PTHREADS_MULTISH_TIMESHARING_
 
 namespace aurostd {
-  bool multithread_execute(vector<string> vcmds,int _NUM_THREADS,bool VERBOSE) {
+  bool multithread_execute(const vector<string>& vcmds,int _NUM_THREADS,bool VERBOSE) {
     int NUM_THREADS=_NUM_THREADS;                                          // SAFETY
     if((int) vcmds.size()<=NUM_THREADS) NUM_THREADS=(uint) vcmds.size();   // SAFETY
 
@@ -507,17 +507,17 @@ namespace aurostd {
 // ***************************************************************************
 // adding something to aurostd
 namespace aurostd {
-  bool multithread_execute(deque<string> vcommand,int NUM_THREADS) {
+  bool multithread_execute(const deque<string>& vcommand,int NUM_THREADS) {
     return multithread_execute(vcommand,NUM_THREADS,FALSE);
   }
-  bool multithread_execute(vector<string> vcommand,int NUM_THREADS) {
+  bool multithread_execute(const vector<string>& vcommand,int NUM_THREADS) {
     return multithread_execute(vcommand,NUM_THREADS,FALSE);
   }
-  bool multithread_execute(deque<string> vcommand) {
+  bool multithread_execute(const deque<string>& vcommand) {
     AFLOW_PTHREADS::MAX_PTHREADS=AFLOW_PTHREADS::GetTotalCPUs();
     return multithread_execute(vcommand,AFLOW_PTHREADS::MAX_PTHREADS,FALSE);
   }
-  bool multithread_execute(vector<string> vcommand) {
+  bool multithread_execute(const vector<string>& vcommand) {
     AFLOW_PTHREADS::MAX_PTHREADS=AFLOW_PTHREADS::GetTotalCPUs();
     return multithread_execute(vcommand,AFLOW_PTHREADS::MAX_PTHREADS,FALSE);
   }
@@ -724,7 +724,7 @@ namespace AFLOW_PTHREADS {
 // AFLOW_PTHREADS::MULTI_compress
 // ***************************************************************************
 namespace AFLOW_PTHREADS {
-  bool MULTI_compress(string cmd,vector<string> argv) {
+  bool MULTI_compress(const string& cmd,const vector<string>& argv) {
     // aflow --multi[bzip2|xz|gzip] [--np XX | npmax | nothing] --F[ILE] file1[.bz2|.xz|.gz] file2[.bz2|.xz|.gz] file3[.bz2|.xz|.gz] ....
     bool VERBOSE=TRUE;
     vector<string> vfile;
@@ -755,7 +755,7 @@ namespace AFLOW_PTHREADS {
 // AFLOW_PTHREADS::MULTI_bz2xz 
 // ***************************************************************************
 namespace AFLOW_PTHREADS {
-  bool MULTI_bz2xz(vector<string> argv) {
+  bool MULTI_bz2xz(const vector<string>& argv) {
     // aflow --multi=bz2xz [--np XX | npmax | nothing] --F[ILE] file1.bz2 file2.bz2 file3.bz2 ....
     bool VERBOSE=TRUE;
     cerr << XPID << "AFLOW_PTHREADS::MULTI_bz2xz: BEGIN" << endl;
@@ -794,7 +794,7 @@ namespace AFLOW_PTHREADS {
 // AFLOW_PTHREADS::MULTI_xz2bz2
 // ***************************************************************************
 namespace AFLOW_PTHREADS {
-  bool MULTI_xz2bz2(vector<string> argv) {
+  bool MULTI_xz2bz2(const vector<string>& argv) {
     // aflow --multi=xz2bz2 [--np XX | npmax | nothing] --F[ILE] file1.xz file2.xz file3.xz ....
     bool VERBOSE=TRUE;
     cerr << XPID << "AFLOW_PTHREADS::MULTI_xz2bz2: BEGIN" << endl;
@@ -833,7 +833,7 @@ namespace AFLOW_PTHREADS {
 // AFLOW_PTHREADS::MULTI_gz2xz
 // ***************************************************************************
 namespace AFLOW_PTHREADS {
-  bool MULTI_gz2xz(vector<string> argv) {
+  bool MULTI_gz2xz(const vector<string>& argv) {
     // aflow --multi=gz2xz [--np XX | npmax | nothing] --F[ILE] file1.gz file2.gz file3.gz ....
     // load files
     bool VERBOSE=TRUE;
@@ -865,7 +865,7 @@ namespace AFLOW_PTHREADS {
 #ifdef AFLOW_MULTITHREADS_ENABLE
 
 namespace AFLOW_PTHREADS {
-  bool MULTI_sh(vector<string> argv) {
+  bool MULTI_sh(const vector<string>& argv) {
     stringstream message;
     ostringstream aus;
     _aflags aflags;
@@ -886,12 +886,12 @@ namespace AFLOW_PTHREADS {
 }
 
 namespace aurostd {
-  bool multithread_execute(deque<string> cmds, int _NUM_THREADS, bool VERBOSE) {
+  bool multithread_execute(const deque<string>& cmds, int _NUM_THREADS, bool VERBOSE) {
     bool LDEBUG = FALSE;
     if (VERBOSE) {}
     if (LDEBUG) std::cerr << "Commands to run:\n" << aurostd::joinWDelimiter(cmds, "\n") << std::endl;
 
-    std::function<void(deque<string>::iterator&)> fn = [&](deque<string>::iterator& it) {aurostd::execute(*it);};
+    std::function<void(const deque<string>::const_iterator&)> fn = [&](const deque<string>::const_iterator& it) {aurostd::execute(*it);};
     xthread::xThread xt(_NUM_THREADS);
     xt.run(cmds, fn);
     return true;

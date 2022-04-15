@@ -4588,81 +4588,82 @@ namespace aflowlib {
 
 //AFLUX integration
 //FR+CO20180329
-namespace aflowlib {
-  bool APIget::establish(){
-    struct hostent * host = gethostbyname( Domain.c_str() );
-
-    //[CO20181226 - OBSOLETE]PORT=80;  //CO20180401
-
-    if ( (host == NULL) || (host->h_addr == NULL) ) {
-      cerr << "Error retrieving DNS information." << endl;
-      return false;
-    }
-
-    bzero(&client, sizeof(client));
-    client.sin_family = AF_INET;
-    client.sin_port = htons( PORT );
-    memcpy(&client.sin_addr, host->h_addr, host->h_length);
-
-    sock = socket(AF_INET, SOCK_STREAM, 0);
-
-    if (sock < 0) {
-      cerr << "Error creating socket." << endl;
-      return false;
-    }
-
-    if ( connect(sock, (struct sockaddr *)&client, sizeof(client)) < 0 ) {
-      close(sock);
-      cerr << "Could not connect" << endl;
-      return false;
-    }
-
-    stringstream ss;
-    ss << "GET " << API_Path << Summons << " HTTP/1.0\r\n" ;
-    //    cerr << "GET " << API_Path << Summons << " HTTP/1.0\r\n" ;
-    ss << "HOST: " << Domain << "\r\n";
-    ss << "Connection: close\r\n";
-    ss << "\r\n";
-    string request = ss.str();
-
-    if (send(sock, request.c_str(), request.length(), 0) != (int)request.length()) {
-      cerr << "Error sending request." << endl;
-      return false;
-    }
-    return true;
-  }
-  void APIget::reset( string a_Summons, string a_API_Path, string a_Domain ) {
-    if( a_Summons == "#" ) {
-      Summons = "";
-      //DX20210615 [OBSOLETE - old path] API_Path = "/search/API/?";
-      //DX20210615 [OBSOLETE - old domain] Domain = "aflowlib.duke.edu";
-      API_Path = "/API/aflux/?"; //DX20210615 - new path
-      Domain = "aflow.org"; //DX20210615 - new domain
-    } else {
-      Summons = a_Summons;
-      if( ! a_API_Path.empty() ) API_Path = a_API_Path;
-      if( ! a_Domain.empty() ) Domain = a_Domain;
-    }
-  }
-  ostream& operator<<( ostream& output, APIget& a ) { 
-    char cur;
-    bool responsedata = false;
-    bool waslinefeed = false;
-    if( a.establish() ) {
-      while ( ! responsedata ) { //discard headers
-        read(a.sock, &cur, 1);
-        //cerr << cur << ":" << (int)cur << endl;
-        if( waslinefeed  && cur == '\r') responsedata = true;
-        if( cur == '\n' ) waslinefeed = true;
-        else waslinefeed = false;
-      };
-      read(a.sock, &cur, 1); //discard final \n in header \r\n\r\n
-      while ( read(a.sock, &cur, 1) > 0 ) output << cur; //cout << cur;
-      close(a.sock);
-    }
-    return output;
-  }
-}
+//Obsolete with aurostd::xhttp //HE20220407
+//namespace aflowlib {
+//  bool APIget::establish(){
+//    struct hostent * host = gethostbyname( Domain.c_str() );
+//
+//    //[CO20181226 - OBSOLETE]PORT=80;  //CO20180401
+//
+//    if ( (host == NULL) || (host->h_addr == NULL) ) {
+//      cerr << "Error retrieving DNS information." << endl;
+//      return false;
+//    }
+//
+//    bzero(&client, sizeof(client));
+//    client.sin_family = AF_INET;
+//    client.sin_port = htons( PORT );
+//    memcpy(&client.sin_addr, host->h_addr, host->h_length);
+//
+//    sock = socket(AF_INET, SOCK_STREAM, 0);
+//
+//    if (sock < 0) {
+//      cerr << "Error creating socket." << endl;
+//      return false;
+//    }
+//
+//    if ( connect(sock, (struct sockaddr *)&client, sizeof(client)) < 0 ) {
+//      close(sock);
+//      cerr << "Could not connect" << endl;
+//      return false;
+//    }
+//
+//    stringstream ss;
+//    ss << "GET " << API_Path << Summons << " HTTP/1.0\r\n" ;
+//    //    cerr << "GET " << API_Path << Summons << " HTTP/1.0\r\n" ;
+//    ss << "HOST: " << Domain << "\r\n";
+//    ss << "Connection: close\r\n";
+//    ss << "\r\n";
+//    string request = ss.str();
+//
+//    if (send(sock, request.c_str(), request.length(), 0) != (int)request.length()) {
+//      cerr << "Error sending request." << endl;
+//      return false;
+//    }
+//    return true;
+//  }
+//  void APIget::reset( string a_Summons, string a_API_Path, string a_Domain ) {
+//    if( a_Summons == "#" ) {
+//      Summons = "";
+//      //DX20210615 [OBSOLETE - old path] API_Path = "/search/API/?";
+//      //DX20210615 [OBSOLETE - old domain] Domain = "aflowlib.duke.edu";
+//      API_Path = "/API/aflux/?"; //DX20210615 - new path
+//      Domain = "aflow.org"; //DX20210615 - new domain
+//    } else {
+//      Summons = a_Summons;
+//      if( ! a_API_Path.empty() ) API_Path = a_API_Path;
+//      if( ! a_Domain.empty() ) Domain = a_Domain;
+//    }
+//  }
+//  ostream& operator<<( ostream& output, APIget& a ) {
+//    char cur;
+//    bool responsedata = false;
+//    bool waslinefeed = false;
+//    if( a.establish() ) {
+//      while ( ! responsedata ) { //discard headers
+//        read(a.sock, &cur, 1);
+//        //cerr << cur << ":" << (int)cur << endl;
+//        if( waslinefeed  && cur == '\r') responsedata = true;
+//        if( cur == '\n' ) waslinefeed = true;
+//        else waslinefeed = false;
+//      };
+//      read(a.sock, &cur, 1); //discard final \n in header \r\n\r\n
+//      while ( read(a.sock, &cur, 1) > 0 ) output << cur; //cout << cur;
+//      close(a.sock);
+//    }
+//    return output;
+//  }
+//}
 
 //DX+FR20190206 - AFLUX functionality via command line - START
 // ***************************************************************************
@@ -4706,25 +4707,18 @@ namespace aflowlib {
 }
 
 namespace aflowlib {
-  string AFLUXCall(const string& _summons){
+  string AFLUXCall(const string& summons){
     // Performs AFLUX call based on summons input
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-
-    // percent encoding (otherwise it will not work)
-    // NOT NEEDED - aurostd::StringSubst(summons,"\'","%27"); // percent encoding for "'" 
-    string summons(_summons);   //CO20200520
-    aurostd::StringSubst(summons," ","%20");  // percent encoding for space 
-    aurostd::StringSubst(summons,"#","%23");  // percent encoding for "#"
-
+    // switched to aurostd::xhttp //HE20220407
+    bool LDEBUG=(false || XHOST.DEBUG);
+    string function_name = XPID + "AFLUXCall():";
+    string url = "http://aflow.org/API/aflux/?" + aurostd::httpPercentEncodingFull(summons);
     if(LDEBUG) {
-      cerr << __AFLOW_FUNC__ << " Summons = " << summons << endl;
-      cerr << __AFLOW_FUNC__ << " Peforming call ... please be patient ..." << endl;
+      cerr << __AFLOW_FUNC__ << ": Summons = " << summons << endl;
+      cerr << __AFLOW_FUNC__ << ": URL = " << url << endl;
+      cerr << __AFLOW_FUNC__ << ": Performing call ... please be patient ..." << endl;
     }
-
-    aflowlib::APIget API_socket(summons);
-    stringstream response; response << API_socket;
-    return response.str();
-
+    return aurostd::httpGet(url);
   }
 }
 

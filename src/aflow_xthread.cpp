@@ -23,8 +23,8 @@
 // For on-the-fly redistribution, the function must have either an index
 // (integer type) or an iterable to parallelize over as its first parameter.
 //
-// For predistributed execution, the function must have two integer types
-// (start and end points) as first paramters. The pre-distributed scheme
+// For pre-distributed execution, the function must have two integer types
+// (start and end points) as first parameters. The pre-distributed scheme
 // cannot be used with iterators and currently does not support progress bars.
 //
 // Additionally, function inputs cannot be prvalues (see here for a distinction
@@ -106,7 +106,7 @@
 //   xt.run(ntasks, fn3);
 //
 // The template parameter in std::function takes the function return type and
-// the type of the function inputs exactly as written in the function defintion.
+// the type of the function inputs exactly as written in the function definition.
 // std::bind takes an address to the function and a pointer to the class
 // instance (always "this" when called inside the class). If the function has
 // arguments, one std::placeholders::_N for each argument of the function needs
@@ -127,7 +127,7 @@
 //
 // Setting the number of CPUs:
 // The default constructor uses as many threads as possible, but the number of
-// CPUs can be passed into the constructor or changes via setCPUs(). A minimum
+// CPUs can be passed into the constructor or changed via setCPUs(). A minimum
 // number of threads can be set as well. In that case, xThread will wait until
 // that minimum number of threads is available.
 //
@@ -239,7 +239,8 @@ namespace xthread {
   /// @brief Sets the minimum and maximum number of CPUs used for threading
   ///
   /// @param nmax Maximum number of CPUs used by xThread (default: 0 for all available CPUs)
-  /// @param nmin Mininum number of CPUs required to spawn thread workers default: 1)
+  /// @param nmin Mininum number of CPUs required to spawn thread workers (default: 1);
+  //              set to 0 for nmin = nmax
   void xThread::setCPUs(int nmax, int nmin) {
     if (nmax < nmin) std::swap(nmax, nmin);
     ncpus_max = (nmax > 0)?nmax:(KBIN::get_NCPUS());
@@ -256,30 +257,54 @@ namespace xthread {
   /// This prevents threaded functions that spawn other multi-threaded
   /// processes from allocating more threads than the machine can afford.
   /// This only works within a single AFLOW run
+  ///
+  /// There are two ways to allocate CPUs for competing processes:
+  ///   1) always maximize CPU usage: as soon as enough threads are available
+  ///      for a process, allocate and run. This will reduce idle time, but
+  ///      will prioritize smaller jobs. This is the default.
+  ///   2) first come, first serve: allocation is halted until the first
+  ///      process to call this function gets the threads it needs. This will
+  ///      make sure that large jobs are not stuck until all small tasks are
+  ///      finished, but can lead more idle time. This process can be set with
+  ///      the compiler flag -DXTHREAD_USE_QUEUE.
   int xThread::reserveThreads(unsigned long long int ntasks) {
     uint sleep_second = 10;
     int ncpus_max_available = KBIN::get_NCPUS();
-    int nmax = ncpus_max;
-    int nmin = ncpus_min;
-    // Adjust max. and min. number of CPUs to the number of tasks
-    if ((ntasks <= (unsigned long long int) AUROSTD_MAX_INT)) {
-      int n = (unsigned long long int) ntasks;
-      if (n < nmin) nmin = n;
-      if (n < nmax) nmax = n;
+    int ncpus = 0, ncpus_available = 0, nmax = 0, nmin = 0;
+    // Adjust max. and min. number of CPUs to the number of tasks.
+    // Decrement numbers by 1 because the main thread (which is idle
+    // during execution) should not count towards the total number
+    // of active CPUs
+    if (ntasks <= (unsigned long long int) ncpus_max_available) {
+      // Downcasting is safe because ntasks has a value in int range
+      nmin = std::min(ncpus_min, (int) ntasks) - 1;
+      nmax = std::min(ncpus_max, (int) ntasks) - 1;
+    } else {
+      nmin = ncpus_min - 1;
+      nmax = ncpus_max - 1;
     }
-    int ncpus = 0, ncpus_available = 0;
+#ifdef XTHREAD_USE_QUEUE
+    std::lock_guard<std::mutex> lk(xthread_cpu_check);
+#endif
     do {
+#ifndef XTHREAD_USE_QUEUE
+      xthread_cpu_check.lock();
+#endif
       ncpus_available = ncpus_max_available - XHOST.CPU_active;
       if (ncpus_available >= nmin) {
-        xthread_cpu_check.lock();
         ncpus = std::min(ncpus_available, nmax);
         // "reserve" threads globally
         XHOST.CPU_active += ncpus;
+        // Increase by 1 - the main thread does not count towards the
+        // total, but should still be used for a worker
+        ncpus++;
+#ifndef XTHREAD_USE_QUEUE
         xthread_cpu_check.unlock();
-      } else if ((ncpus_available == 0) && (nmin == 1)) {
-        return 1;  // Run single-threaded on the main thread
+#endif
       } else {
+#ifndef XTHREAD_USE_QUEUE
         xthread_cpu_check.unlock();
+#endif
         aurostd::Sleep(sleep_second);
       }
     } while (ncpus_available < nmin);
@@ -291,7 +316,9 @@ namespace xthread {
   /// @param ncpus Number of threads to free
   void xThread::freeThreads(int ncpus) {
     std::lock_guard<std::mutex> lk(xthread_cpu_check);
-    XHOST.CPU_active -= ncpus;
+    // Decrease by 1 to account for the main thread not counting
+    // towards the number of active CPUs
+    XHOST.CPU_active -= (ncpus - 1);
   }
 
   // On-the-fly scheme --------------------------------------------------------
@@ -330,6 +357,16 @@ namespace xthread {
   ///
   /// ntasks will be converted to unsigned long long int because
   /// the progress bar counter in pflow is of that type.
+  template <typename IT, typename F, typename... A>
+  void xThread::run(const IT& it, F& func, A&... args) {
+    int dist = (int) std::distance(it.begin(), it.end());
+    if (dist <= 0) return; // Cannot iterate backwards (yet)
+    unsigned long long int ntasks = (unsigned long long int) dist;
+    typename IT::const_iterator start = it.begin();
+    typename IT::const_iterator end = it.end();
+    run(start, end, ntasks, func, args...);
+  }
+
   template <typename IT, typename F, typename... A>
   void xThread::run(IT& it, F& func, A&... args) {
     int dist = (int) std::distance(it.begin(), it.end());
@@ -604,6 +641,9 @@ namespace xthread {
 //     vector<double>&
 //   );
 //
+// Using const_iterators work the same way. The first template parameter of run
+// cannot be const though.
+//
 // Note that the iterable has to appear as the first template parameter.
 // The rules and caveats for member functions and const references are the same
 // as for functions using an index.
@@ -648,8 +688,8 @@ namespace xthread {
   //lambda function inside aurostd::multithread_execute
   template void xThread::run<
     deque<string>,
-    std::function<void(deque<string>::iterator&)>
-  >(deque<string>&, std::function<void(deque<string>::iterator&)>&);
+    std::function<void(const deque<string>::const_iterator&)>
+  >(const deque<string>&, std::function<void(const deque<string>::const_iterator&)>&);
 
   //apl::PhononCalculator::calculateGroupVelocitiesThread
   template void xThread::run<

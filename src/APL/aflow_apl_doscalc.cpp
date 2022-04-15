@@ -327,7 +327,7 @@ namespace apl {
 
     // Normalize to number of branches
     // ME20210927 - Only normalize when inside full frequency spectrum
-    if ((fmin - _minFreq <= _ZERO_TOL_) && (fmax - _maxFreq >= -_ZERO_TOL_)) {
+    if ((fmin - _minFreq <= _ZERO_TOL_) && (_maxFreq - fmax <= _ZERO_TOL_)) {
       double sum = 0.0;
       for (int k = 0; k < USER_DOS_NPOINTS; k++)
         sum += _dos[k];

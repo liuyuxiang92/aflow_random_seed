@@ -97,9 +97,11 @@ struct structure_mapping_info {
 // ***************************************************************************
 namespace compare{
   structure_mapping_info initialize_misfit_struct(bool magnetic=false);
+  void resetMisfitInfo(structure_mapping_info& str_mis, bool magnetic=false); //DX20220406
   string printAtomMappings(const structure_mapping_info& misfit_info);
   string printUnmatchedAtoms(const structure_mapping_info& misfit_info,const xstructure& xstr1,const xstructure& xstr2);
-  void resizeMappingInfo(structure_mapping_info& str_mis);
+  void resetMappingInfo(structure_mapping_info& misfit_info); //DX20220406
+  void resizeMappingInfo(structure_mapping_info& str_mis, uint size); //DX20220406
 }
 
 //DX20200225 - temp struct; working on more robust scheme

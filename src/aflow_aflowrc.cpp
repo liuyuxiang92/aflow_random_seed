@@ -21,6 +21,8 @@
 #define         DEFAULT_KZIP_BIN                        XHOST.adefault.getattachedscheme("DEFAULT_KZIP_BIN")
 #define AFLOWRC_DEFAULT_KZIP_EXT                        string(".xz") 
 #define         DEFAULT_KZIP_EXT                        XHOST.adefault.getattachedscheme("DEFAULT_KZIP_EXT")
+#define AFLOWRC_DEFAULT_TMPFS_DIRECTORIES               string("/tmp/,/run/shm/,/dev/shm/")
+#define         DEFAULT_TMPFS_DIRECTORIES               XHOST.adefault.getattachedscheme("DEFAULT_TMPFS_DIRECTORIES")
 
 //ME20191001 START
 // DEFAULTS AFLOW DATABASE
@@ -1222,6 +1224,7 @@ namespace aflowrc {
     // DEFAULT DEFINITIONS
     aflowrc::load_default("DEFAULT_KZIP_BIN",AFLOWRC_DEFAULT_KZIP_BIN);
     aflowrc::load_default("DEFAULT_KZIP_EXT",AFLOWRC_DEFAULT_KZIP_EXT);
+    aflowrc::load_default("DEFAULT_TMPFS_DIRECTORIES",AFLOWRC_DEFAULT_TMPFS_DIRECTORIES);
 
     //ME20191001 START
     // AFLOW database files
@@ -1841,6 +1844,7 @@ namespace aflowrc {
     aflowrc << "// DEFAULT DEFINITIONS" << endl;
     aflowrc << "DEFAULT_KZIP_BIN=\"" << AFLOWRC_DEFAULT_KZIP_BIN << "\"" << endl;
     aflowrc << "DEFAULT_KZIP_EXT=\"" << AFLOWRC_DEFAULT_KZIP_EXT << "\"" << endl;
+    aflowrc << "DEFAULT_TMPFS_DIRECTORIES=\"" << AFLOWRC_DEFAULT_TMPFS_DIRECTORIES << "\"" << endl;
 
     aflowrc << " " << endl;
     //ME20191001 START
@@ -1978,14 +1982,14 @@ namespace aflowrc {
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS OPTIONS " << endl;
-    aflowrc << "DEFAULT_VASP_OUT=" << AFLOWRC_DEFAULT_VASP_OUT << endl;
-    aflowrc << "DEFAULT_VASP_EXTERNAL_INCAR=" << AFLOWRC_DEFAULT_VASP_EXTERNAL_INCAR << endl;
-    aflowrc << "DEFAULT_VASP_EXTERNAL_POSCAR=" << AFLOWRC_DEFAULT_VASP_EXTERNAL_POSCAR << endl;
-    aflowrc << "DEFAULT_VASP_EXTERNAL_POTCAR=" << AFLOWRC_DEFAULT_VASP_EXTERNAL_POTCAR << endl;
-    aflowrc << "DEFAULT_VASP_EXTERNAL_KPOINTS=" << AFLOWRC_DEFAULT_VASP_EXTERNAL_KPOINTS << endl;
-    aflowrc << "DEFAULT_AIMS_EXTERNAL_CONTROL=" << AFLOWRC_DEFAULT_AIMS_EXTERNAL_CONTROL << endl;
-    aflowrc << "DEFAULT_AIMS_EXTERNAL_GEOM=" << AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM << endl;
-    aflowrc << "DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE=" << AFLOWRC_DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE << endl;
+    aflowrc << "DEFAULT_VASP_OUT=\"" << AFLOWRC_DEFAULT_VASP_OUT << "\"" << endl;
+    aflowrc << "DEFAULT_VASP_EXTERNAL_INCAR=\"" << AFLOWRC_DEFAULT_VASP_EXTERNAL_INCAR << "\"" << endl;
+    aflowrc << "DEFAULT_VASP_EXTERNAL_POSCAR=\"" << AFLOWRC_DEFAULT_VASP_EXTERNAL_POSCAR << "\"" << endl;
+    aflowrc << "DEFAULT_VASP_EXTERNAL_POTCAR=\"" << AFLOWRC_DEFAULT_VASP_EXTERNAL_POTCAR << "\"" << endl;
+    aflowrc << "DEFAULT_VASP_EXTERNAL_KPOINTS=\"" << AFLOWRC_DEFAULT_VASP_EXTERNAL_KPOINTS << "\"" << endl;
+    aflowrc << "DEFAULT_AIMS_EXTERNAL_CONTROL=\"" << AFLOWRC_DEFAULT_AIMS_EXTERNAL_CONTROL << "\"" << endl;
+    aflowrc << "DEFAULT_AIMS_EXTERNAL_GEOM=\"" << AFLOWRC_DEFAULT_AIMS_EXTERNAL_GEOM << "\"" << endl;
+    aflowrc << "DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE=\"" << AFLOWRC_DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE << "\"" << endl;
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_RELAX_MODE_SCHEME << endl;
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_RELAX_COUNT << endl;
     aflowrc << "DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME=" << AFLOWRC_DEFAULT_VASP_FORCE_OPTION_PREC_SCHEME << endl;
@@ -2465,6 +2469,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "// DEFAULT DEFINITIONS" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_KZIP_BIN\")=\"" << DEFAULT_KZIP_BIN << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_KZIP_EXT\")=\"" << DEFAULT_KZIP_EXT << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_TMPFS_DIRECTORIES\")=\"" << DEFAULT_TMPFS_DIRECTORIES << "\"" << endl;
 
     if(LDEBUG) oss << "// FILENAMES FOR AFLOW.ORG ANALYSIS" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_FILE_AFLOWLIB_ENTRY_OUT\")=\"" << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << "\"" << endl;
