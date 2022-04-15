@@ -23,8 +23,8 @@
 // For on-the-fly redistribution, the function must have either an index
 // (integer type) or an iterable to parallelize over as its first parameter.
 //
-// For predistributed execution, the function must have two integer types
-// (start and end points) as first paramters. The pre-distributed scheme
+// For pre-distributed execution, the function must have two integer types
+// (start and end points) as first parameters. The pre-distributed scheme
 // cannot be used with iterators and currently does not support progress bars.
 //
 // Additionally, function inputs cannot be prvalues (see here for a distinction
@@ -106,7 +106,7 @@
 //   xt.run(ntasks, fn3);
 //
 // The template parameter in std::function takes the function return type and
-// the type of the function inputs exactly as written in the function defintion.
+// the type of the function inputs exactly as written in the function definition.
 // std::bind takes an address to the function and a pointer to the class
 // instance (always "this" when called inside the class). If the function has
 // arguments, one std::placeholders::_N for each argument of the function needs
@@ -127,7 +127,7 @@
 //
 // Setting the number of CPUs:
 // The default constructor uses as many threads as possible, but the number of
-// CPUs can be passed into the constructor or changes via setCPUs(). A minimum
+// CPUs can be passed into the constructor or changed via setCPUs(). A minimum
 // number of threads can be set as well. In that case, xThread will wait until
 // that minimum number of threads is available.
 //
