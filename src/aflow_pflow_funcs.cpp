@@ -7823,7 +7823,7 @@ namespace pflow {
       try {freeQueue();processQueue();SUCCESS=true;}
       catch(aurostd::xerror& err) {
         SUCCESS=false;
-        if(err.error_code!=_RUNTIME_EXTERNAL_FAIL_){attempts=ATTEMPTS_GETQUEUE_MAX;}
+        if(err.whatCode()!=_RUNTIME_EXTERNAL_FAIL_){attempts=ATTEMPTS_GETQUEUE_MAX;}
         if(attempts<ATTEMPTS_GETQUEUE_MAX){
           if(LDEBUG){cerr << soliloquy << " failed attempt, trying to process queue again" << endl;}
           aurostd::Sleep(2);

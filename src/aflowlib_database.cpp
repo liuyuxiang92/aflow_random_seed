@@ -64,26 +64,13 @@
 #define _AFLOW_DB_PATCH_INCOMPLETE_  201  // At least one patch was incomplete
 
 #include "aflowlib.h"
-#include "SQLITE/aflow_sqlite.h"
-
-// Some parts are written within the C++0x support in GCC, especially std::thread,
-// which is implemented in gcc 4.4 and higher. For multithreads with std::thread see:
-// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
-#if GCC_VERSION >= 40400
-#define AFLOW_DB_MULTITHREADS_ENABLE
-#include <thread>
-#include <mutex>
-std::mutex m;
-#else
-#warning "The multithread parts of AflowDB will not be included, since they need gcc 4.4 and higher (C++0x support)."
-#endif
 
 #define _AFLOW_DB_DEBUG_ false
 
 using std::string;
 using std::vector;
+using namespace std::placeholders;
 
-static const string _AFLOW_DB_ERR_PREFIX_ = "AflowDB::";
 static const uint _DEFAULT_SET_LIMIT_ = 16; //DX20200317 - int -> uint
 static const int _N_AUID_TABLES_ = 256;
 
@@ -94,27 +81,61 @@ namespace aflowlib {
   // Open the database for read access
   AflowDB::AflowDB(const string& db_file, ostream& oss) : xStream(oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " reading database" << std::endl;
     free();
-    database_file = db_file;
-    if (LDEBUG) std::cerr << "AflowDB: reading database" << std::endl;
-    open(SQLITE_OPEN_READONLY);
-    initializeExtraSchema();
+    aurostd::xoption dummy;
+    initialize(db_file, "", "", SQLITE_OPEN_READONLY, dummy, dummy);
+  }
+
+  AflowDB::AflowDB(const string& db_file, const aurostd::xoption& vschema_in, ostream& oss) : xStream(oss) {
+    bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " reading database" << std::endl;
+    free();
+    aurostd::xoption dummy;
+    initialize(db_file, "", "", SQLITE_OPEN_READONLY, vschema_in, dummy);
+  }
+
+  AflowDB::AflowDB(const string& db_file, const aurostd::xoption& vschema_in, const aurostd::xoption& vschema_internal_in, ostream& oss) : xStream(oss) {
+    bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " reading database" << std::endl;
+    free();
+    initialize(db_file, "", "", SQLITE_OPEN_READONLY, vschema_in, vschema_internal_in);
   }
 
   // Open the database for write access
-  AflowDB::AflowDB(const string& db_file, const string& dt_path, const string& lck_file, ostream& oss) : xStream (oss) {
+  AflowDB::AflowDB(const string& db_file, const string& dt_path, const string& lck_file,
+      const aurostd::xoption& vschema_in, ostream& oss) : xStream (oss) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
     free();
+    if (LDEBUG) {
+      std::cerr << __AFLOW_FUNC__ << " Database file: " << database_file << std::endl;
+      std::cerr << __AFLOW_FUNC__ << " Data path: " << data_path << std::endl;
+      std::cerr << __AFLOW_FUNC__ << " Lock file: " << lock_file << std::endl;
+    }
+    aurostd::xoption dummy;
+    initialize(db_file, dt_path, lck_file, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, vschema_in, dummy);
+  }
+
+  AflowDB::AflowDB(const string& db_file, const string& dt_path, const string& lck_file,
+      const aurostd::xoption& vschema_in, const aurostd::xoption& vschema_internal_in, ostream& oss) : xStream (oss) {
+    bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
+    free();
+    if (LDEBUG) {
+      std::cerr << __AFLOW_FUNC__ << " Database file: " << database_file << std::endl;
+      std::cerr << __AFLOW_FUNC__ << " Data path: " << data_path << std::endl;
+      std::cerr << __AFLOW_FUNC__ << " Lock file: " << lock_file << std::endl;
+    }
+    initialize(db_file, dt_path, lck_file, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, vschema_in, vschema_internal_in);
+  }
+
+  void AflowDB::initialize(const string& db_file, const string& dt_path, const string& lck_file,
+    int open_flags, const aurostd::xoption& schema_in, const aurostd::xoption& vschema_internal_in) {
     data_path = dt_path;
     database_file = db_file;
     lock_file = lck_file;
-    if (LDEBUG) {
-      std::cerr << "AflowDB: Database file: " << database_file << std::endl;
-      std::cerr << "AflowDB: Data path: " << data_path << std::endl;
-      std::cerr << "AflowDB: Lock file: " << lock_file << std::endl;
-    }
-    open();
-    initializeExtraSchema();
+    vschema = schema_in;
+    vschema_internal = vschema_internal_in;
+    open(open_flags);
   }
 
   // Copy constructors
@@ -133,7 +154,7 @@ namespace aflowlib {
     data_path = that.data_path;
     database_file = that.database_file;
     lock_file = that.lock_file;
-    vschema_extra = that.vschema_extra;
+    vschema_internal = that.vschema_internal;
     // Two databases should never operate on a temporary
     // file or have write access at the same time.
     is_tmp = false;
@@ -150,7 +171,8 @@ namespace aflowlib {
     data_path = "";
     database_file = "";
     lock_file = "";
-    vschema_extra.clear();
+    vschema.clear();
+    vschema_internal.clear();
     is_tmp = false;
   }
 
@@ -161,35 +183,27 @@ namespace aflowlib {
 
   // Opens the database file and creates the main cursor
   void AflowDB::open(int open_flags) {
-    string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "open():";
     string message = "Opening " + database_file + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
     int sql_code = sqlite3_open_v2(database_file.c_str(), &db, open_flags, NULL); //DX20200319 - nullptr -> NULL
     if (sql_code != SQLITE_OK) {
       message = "Could not open database file " + database_file;
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 
   // Closes the database file and removes the main cursor
   void AflowDB::close() {
     if (isTMP()) closeTmpFile(false, true, true);
-    string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "close():";
     string message = "Closing " + database_file + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
     int sql_code = sqlite3_close(db);
     if (sql_code != SQLITE_OK) {
       message = "Could not close database file " + database_file;
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
-  }
-
-  void AflowDB::initializeExtraSchema() {
-    vschema_extra.clear();
-    vschema_extra.push_attached("SCHEMA::NAME:ALLOY", "alloy");
-    vschema_extra.push_attached("SCHEMA::TYPE:ALLOY", "string");
   }
 
 }  // namespace aflowlib
@@ -202,12 +216,11 @@ namespace aflowlib {
   // Opens a temporary database file 
   void AflowDB::openTmpFile(int open_flags, bool copy_original) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
-    string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "openTmpFile():";
     stringstream message;
 
     string tmp_file = database_file + ".tmp";
     message << "Opening " << tmp_file;
-    pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
 
     // Create a symbolic link to lock the tmp file creation process. Since creating
     // symbolic links is an atomic process, it can be used to prevent race conditions.
@@ -216,10 +229,10 @@ namespace aflowlib {
       message << "Could not create symbolic link to lock file " + lock_file + ": ";
       if (errno == EEXIST) {
         message << "Another process has created it already.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_BUSY_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_BUSY_);
       } else {
         message << "Process exited with errno " << errno << ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
     }
 
@@ -232,7 +245,7 @@ namespace aflowlib {
       int pid = -1;
       bool del_tmp = false;
       if (LDEBUG) {
-        std::cerr << function << " Found temporary database file with time stamp " << tm_tmp
+        std::cerr << __AFLOW_FUNC__ << " Found temporary database file with time stamp " << tm_tmp
           << " (current time: " << tm_curr << ")." << std::endl;
       }
       // Check if the rebuild process that is saved in the lock file
@@ -252,14 +265,14 @@ namespace aflowlib {
         if (LDEBUG) {
           message << "Temporary database file already exists, but process has become stale."
             << " Removing temporary files and killing outstanding process.";
-          pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
         }
         if (pid > -1) {
           int killreturn = kill(pid, 9);
           if (killreturn) {
             aurostd::RemoveFile(lock_link);
             message << "Could not kill active process " << pid << "(errno =  " << errno << ").";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
           }
         }
         aurostd::RemoveFile(tmp_file);
@@ -267,7 +280,7 @@ namespace aflowlib {
       } else {
         aurostd::RemoveFile(lock_link);
         message << "Could not create temporary database file. File already exists and rebuild process is active.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_BUSY_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_BUSY_);
       }
     }
 
@@ -276,7 +289,7 @@ namespace aflowlib {
     if (sql_code != SQLITE_OK) {
       aurostd::RemoveFile(lock_link);
       message << "Could not close main database file " + database_file << " (SQL code " << sql_code << ").";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
 
     if (copy_original) {
@@ -287,14 +300,14 @@ namespace aflowlib {
       } else {
         aurostd::RemoveFile(lock_link);
         message << "Unable to copy original database file.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
       }
     }
 
     sql_code = sqlite3_open_v2(tmp_file.c_str(), &db, open_flags, NULL); //DX20200319 - nullptr -> NULL
     if (sql_code != SQLITE_OK) {
       message << "Could not open tmp database file " + tmp_file << " (SQL code " << sql_code << ").";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
 
     is_tmp = true;
@@ -310,10 +323,9 @@ namespace aflowlib {
   bool AflowDB::closeTmpFile(bool force_copy, bool keep, bool nocopy) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
     string tmp_file = database_file + ".tmp";
-    string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "closeTmpFile():";
     stringstream message;
     message << "Closing " << tmp_file;
-    pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
 
     // To throw
     bool found_error = false;
@@ -346,7 +358,7 @@ namespace aflowlib {
       ncols_tmp = props.size();
 
       // Get number of entries
-      props = getPropertyMultiTables("COUNT", tables, "*");
+      props = getDatabasePropertyMultiTables("COUNT", tables, "*");
       for (int i = 0; i < _N_AUID_TABLES_; i++) nentries_tmp += aurostd::string2utype<uint>(props[i]);
     }
 
@@ -354,7 +366,7 @@ namespace aflowlib {
     if (sql_code != SQLITE_OK) {
       message_error << "Could not close tmp database file " + tmp_file
         << " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message_error, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message_error, _FILE_ERROR_);
     }
     is_tmp = false;
 
@@ -363,19 +375,19 @@ namespace aflowlib {
       copied = false;
     } else if (force_copy) {
       message << "Force copy selected. Database will be overwritten.";
-      pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
       copied = aurostd::CopyFile(tmp_file, database_file);
     } else {
       if (!aurostd::FileEmpty(database_file)) {
         message << "Old database file found. Determining number of entries and properties to prevent data loss.";
-        pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
 
         sqlite3* main_db;
         sql_code = sqlite3_open_v2(database_file.c_str(), &main_db, SQLITE_OPEN_READONLY, NULL);
         if (sql_code != SQLITE_OK) {
           message_error << "Could not close main database file " + database_file
             << " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message_error, _FILE_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message_error, _FILE_ERROR_);
         }
         vector<string> props, tables;
         tables = getTables(main_db);
@@ -385,24 +397,24 @@ namespace aflowlib {
         ncols_old = props.size();
 
         // Get number of entries
-        props = getPropertyMultiTables(main_db, "COUNT", tables, "*");
+        props = getDatabasePropertyMultiTables(main_db, "COUNT", tables, "*");
         for (int i = 0; i < _N_AUID_TABLES_; i++) nentries_old += aurostd::string2utype<uint>(props[i]);
 
         sql_code = sqlite3_close(main_db);
         if (sql_code != SQLITE_OK) {
           message_error << "Could not close main database file " + database_file
             << " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message_error, _FILE_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message_error, _FILE_ERROR_);
         }
       } else {
-        if (LDEBUG) std::cerr << function << "No old datbase found." << std::endl;
+        if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " No old datbase found." << std::endl;
         ncols_old = 0;
         nentries_old = 0;
       }
 
       if (LDEBUG) {
-        std::cerr << function << "Number of entries: " << nentries_tmp << " (current database: " << nentries_old << ")." << std::endl;
-        std::cerr << function << "Number of properties: " << ncols_tmp << " (current database: " << ncols_old << ")." << std::endl;
+        std::cerr << __AFLOW_FUNC__ << " Number of entries: " << nentries_tmp << " (current database: " << nentries_old << ")." << std::endl;
+        std::cerr << __AFLOW_FUNC__ << " Number of properties: " << ncols_tmp << " (current database: " << ncols_old << ")." << std::endl;
       }
 
       if (nentries_tmp < nentries_old) {
@@ -430,19 +442,19 @@ namespace aflowlib {
         copied = aurostd::CopyFile(tmp_file, database_file);
       }
       message << "Database file " << (copied?"successfully":"not") << " copied.";
-      pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
     }
     if (!found_error && !keep) {
       aurostd::RemoveFile(tmp_file);
       message << "Temporary database file removed.";
-      pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
     } else if (LDEBUG) {
       message << "Temporary database file " << tmp_file << " will not be deleted.";
-      pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
     }
 
     if (found_error) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     open();
@@ -480,7 +492,6 @@ namespace aflowlib {
   }
 
   int AflowDB::rebuildDatabase(const vector<string>& patch_files_input, bool force_rebuild) {
-    string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "rebuildDatabase():";
     stringstream message;
     bool rebuild_db = false;
 
@@ -488,7 +499,7 @@ namespace aflowlib {
     rebuild_db = force_rebuild;
     if (rebuild_db) {
       message << "Rebuilding database (user rebuild).";
-      pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
     }
 
     // Always rebuild if the database file doesn't exist. Note: When the
@@ -498,7 +509,7 @@ namespace aflowlib {
       rebuild_db = aurostd::FileEmpty(database_file); // file_empty needed for LDEBUG
       if (rebuild_db) {
         message << "Rebuilding database (file not found or empty).";
-        pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
       }
     }
 
@@ -509,7 +520,7 @@ namespace aflowlib {
       columns = getColumnNames(table);
 
       // Properties
-      vector<string> keys_schema = (*this).getSchemaKeys();
+      vector<string> keys_schema = getAllSchemaKeys();
       uint nkeys = keys_schema.size();
       if (nkeys > columns.size()) {
         rebuild_db = true;
@@ -518,7 +529,7 @@ namespace aflowlib {
           << " current database (" << columns.size() << "). To prevent accidental"
           << " data loss, AFLOW will abort the update process. Rerun as"
           << " aflow --rebuild_database if the database should be updated regardless.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
 
       // Data types
@@ -529,9 +540,9 @@ namespace aflowlib {
         string key = "";
         uint k = 0;
         for (k = 0; k < nkeys; k++) {
-          key = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
+          key = vschema.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
           types_schema[k] = aurostd::RemoveSubString(types_schema[k], " COLLATE NOCASE");  // TEXT may contain directive to be case insensitive
-          if (key.empty()) key = vschema_extra.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
+          if (key.empty()) key = vschema_internal.getattachedscheme("SCHEMA::NAME:" + keys_schema[k]);
           if (!aurostd::WithinList(columns, key, index)) break;
           if (types_db[index] != types_schema[k]) break;
         }
@@ -539,7 +550,7 @@ namespace aflowlib {
       }
       if (rebuild_db) {
         message << " Rebuilding database (schema updated).";
-        pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
       }
     }
 
@@ -552,7 +563,7 @@ namespace aflowlib {
         json_files[i] = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".jsonl");
         if (!aurostd::EFileExist(json_files[i]) && !aurostd::FileExist(json_files[i])) {
           message << data_path << " is not a valid data path. Missing file for aflow:" << t.str() << ".";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
         }
       }
 
@@ -565,7 +576,7 @@ namespace aflowlib {
 
       if (rebuild_db) message << "Rebuilding database (updated files found).";
       else message << "No updated files found. Database will not be rebuilt.";
-      pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
     }
 
     // Check if the database may need to be patched
@@ -608,7 +619,6 @@ namespace aflowlib {
   }
 
   int AflowDB::patchDatabase(const vector<string>& patch_files_input, bool check_timestamps) {
-    string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "patchDatabase():";
     stringstream message;
     int patch_code = 0;
 
@@ -628,7 +638,7 @@ namespace aflowlib {
           filename = aurostd::CleanFileName(data_path + "/" + filename);
         } else {
           message << "File " << filename << " not found. Skipping.";
-          pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
 
           // If a file is missing, then the patch is incomplete
           patch_code = _AFLOW_DB_PATCH_INCOMPLETE_;
@@ -642,7 +652,7 @@ namespace aflowlib {
       } else {
         message << "Skipping file " << filename << ". File is older than the database.";
       }
-      pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
     }
 
     uint npatch = patch_files.size();
@@ -656,7 +666,7 @@ namespace aflowlib {
     uint entries_patched = 0;
     for (uint i = 0; i < npatch; i++) {
       message << "Patching database using " << patch_files[i] << ".";
-      pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
       openTmpFile(SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, true);  // Copy original
 
       // Do not constantly synchronize the database with file on disk (increases
@@ -669,20 +679,20 @@ namespace aflowlib {
       if (entries_patched > 0) {
         if (closeTmpFile(false)) {  // Do not force copy or a bad patch may break the database
           message << "Patched " << entries_patched << "/" << data.size() << " entries.";
-          pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
           // Patch incomplete, so adjust code (unless an error was found before)
           if ((patch_code < 200) && (entries_patched < data.size())) patch_code = _AFLOW_DB_PATCH_INCOMPLETE_;
           patches_applied++;
         } else {
           message << "Could not close temporary database file.";
-          pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
         }
       } else {
         closeTmpFile(false, false, true);  // Do not copy tmp file
         message << "No patches applied.";
         // Patch incomplete, so adjust code (unless an error was found before)
         if ((patch_code < 200) && (entries_patched < data.size())) patch_code = _AFLOW_DB_PATCH_INCOMPLETE_;
-        pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
     }
 
@@ -696,75 +706,68 @@ namespace aflowlib {
   //rebuildDB/////////////////////////////////////////////////////////////////
   // Rebuilds the database from scratch.
   void AflowDB::rebuildDB() {
-    string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "rebuildDB():";
     stringstream message;
 
     message << "Starting rebuild.";
-    pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
 
     // Do not constantly synchronize the database with file on disk (increases
     // performance significantly).
     sql::SQLexecuteCommand(db, "PRAGMA synchronous = OFF");
 
     // Get columns and types from schema
-    vector<string> keys = (*this).getSchemaKeys();
+    vector<string> keys = getAllSchemaKeys();
     uint nkeys = keys.size();
     vector<string> columns(nkeys);
     for (uint k = 0; k < nkeys; k++) {
-      columns[k] = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys[k]);
-      if (columns[k].empty()) columns[k] = vschema_extra.getattachedscheme("SCHEMA::NAME:" + keys[k]);
+      columns[k] = vschema.getattachedscheme("SCHEMA::NAME:" + keys[k]);
+      if (columns[k].empty()) columns[k] = vschema_internal.getattachedscheme("SCHEMA::NAME:" + keys[k]);
     }
     vector<string> types = getDataTypes(columns, true);
 
     // Rebuild
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
     int ncpus = init::GetCPUCores();
-    int max_cpu = 16;
+    int max_cpus = 16;
     if (ncpus < 1) ncpus = 1;
-    if (ncpus > max_cpu) ncpus = max_cpu;
-    vector<vector<int> > thread_dist = getThreadDistribution(_N_AUID_TABLES_, ncpus);
-    vector<std::thread*> threads;
-    for (int i = 0; i < ncpus; i++) {
-      threads.push_back(new std::thread(&AflowDB::buildTables, this,
-            thread_dist[i][0], thread_dist[i][1],
-            std::ref(columns), std::ref(types)));
-    }
-    for (int i = 0; i < ncpus; i++) {
-      threads[i]->join();
-      delete threads[i];
-    }
+    if (ncpus > max_cpus) ncpus = max_cpus;
+    xthread::xThread xt(ncpus);
+    std::function<void(int, const vector<string>&, const vector<string>&)> fn = std::bind(&AflowDB::buildTable, this, _1, _2, _3);
+    xt.run(_N_AUID_TABLES_, fn, columns, types);
 #else
-    buildTables(0, _N_AUID_TABLES_, columns, types);
+    for (uint i = 0; i < _N_AUID_TABLES_; i++) buildTable(i, columns, types);
 #endif
-    message << function << "Finished rebuild.";
-    pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+    message << __AFLOW_FUNC__ << " Finished rebuild.";
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
   }
 
   //buildTables///////////////////////////////////////////////////////////////
-  // Reads the .jsonl files and processes the JSONs for the database writer.
-  void AflowDB::buildTables(int startIndex, int endIndex, const vector<string>& columns, const vector<string>& types) {
-    for (int i = startIndex; i < endIndex; i++) {
-      stringstream t;
-      t << std::setfill('0') << std::setw(2) << std::hex << i;
-      string table = "auid_" + t.str();
+  // Reads a .jsonl files and processes the JSONs for the database writer.
+  void AflowDB::buildTable(int i, const vector<string>& columns, const vector<string>& types) {
+    stringstream t;
+    t << std::setfill('0') << std::setw(2) << std::hex << i;
+    string table = "auid_" + t.str();
+    string auid_prefix = "\"aflow:" + t.str();
 
-      string jsonfile = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".jsonl");
-      vector<string> data;
-      aurostd::efile2vectorstring(jsonfile, data);
-      vector<vector<string> > values;
-      uint ndata = data.size();
-      string aurl = "";
-      for (uint d = 0; d < ndata; d++) {
-        // Filter non-POCC ARUNs
-        aurl = aurostd::extractJsonValueAflow(data[d], "aurl");
-        if ((aurl.find("ARUN") != string::npos)
-            && (aurl.find("ARUN.POCC") == string::npos)) {
-          continue;
-        }
-        values.push_back(getDataValues(data[d], columns, types));
+    string jsonfile = aurostd::CleanFileName(data_path + "/aflow:" + t.str() + ".jsonl");
+    vector<string> data;
+    aurostd::efile2vectorstring(jsonfile, data);
+    vector<vector<string> > values;
+    uint ndata = data.size();
+    string aurl = "", auid = "";
+    for (uint d = 0; d < ndata; d++) {
+      // Filter auids that are in the wrong file
+      auid = aurostd::extractJsonValueAflow(data[d], "auid");
+      if (auid.rfind(auid_prefix, 0) != 0) continue;
+      // Filter non-POCC ARUNs
+      aurl = aurostd::extractJsonValueAflow(data[d], "aurl");
+      if ((aurl.find("ARUN") != string::npos)
+          && (aurl.find("ARUN.POCC") == string::npos)) {
+        continue;
       }
-      populateTable(table, columns, types, values);
+      values.push_back(getDataValues(data[d], columns, types));
     }
+    populateTable(table, columns, types, values);
   }
 
   //populateTable/////////////////////////////////////////////////////////////
@@ -775,9 +778,8 @@ namespace aflowlib {
   // why this function should never do any processing.
   void AflowDB::populateTable(const string& table, const vector<string>& columns, const vector<string>& types, const vector<vector<string> >& values) {
     bool LDEBUG = (FALSE || XHOST.DEBUG || _AFLOW_DB_DEBUG_);
-    string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "populateTable():";
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
-    std::unique_lock<std::mutex> lk(m);
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    std::unique_lock<std::mutex> lk(write_mutex);
 #endif
     createTable(table, columns, types);
     int chunk_size = 1000, count = 0;
@@ -807,7 +809,7 @@ namespace aflowlib {
       createIndex(index, table, index_expression);
     }
     transaction(false);
-    if (LDEBUG) std::cerr << function <<  " Finished building table " << table << std::endl;
+    if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " Finished building table " << table << std::endl;
   }
 
   // Patch -------------------------------------------------------------------
@@ -816,7 +818,6 @@ namespace aflowlib {
   // Applies database patches from data in jsonl format. Returns the number
   // of entries that were patched.
   uint AflowDB::applyPatchFromJsonl(const vector<string>& data) {
-    string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "applyPatchFromJsonl():";
     stringstream message;
 
     uint nlines = data.size();
@@ -824,7 +825,7 @@ namespace aflowlib {
 
     uint chunk_size = 1000;
 
-    vector<string> schema_keys = (*this).getSchemaKeys();
+    vector<string> schema_keys = getAllSchemaKeys();
 
     // Patch
     vector<string> keys, vals, cols, types;
@@ -848,19 +849,19 @@ namespace aflowlib {
 
       if (auid.empty()) {
         message << "Skipping line " << l << ". No AUID found in JSON.";
-        pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         continue;
       }
 
       if (!auidInDatabase(auid)) {
         message << "Skipping line " << l << ". AUID " << auid << " not in database.";
-        pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         continue;
       }
 
       if (cols.size() == 0) {
         message << "Skipping line " << l << ". No keys match properties in schema.";
-        pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         continue;
       }
 
@@ -872,8 +873,8 @@ namespace aflowlib {
         updateEntry(auid, cols, vals);
         npatches++;
       } catch (aurostd::xerror& e) {
-        message << "Failed to patch using line " << l << " (SQL error): " << e.error_message << ".";
-        pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+        message << "Failed to patch using line " << l << " (SQL error): " << e.buildMessageString() << ".";
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
         continue;
       }
 
@@ -906,32 +907,12 @@ namespace aflowlib {
     updateRow(table, cols, vals, where);
   }
 
-  // Schema ------------------------------------------------------------------
-  //getSchemaKeys/////////////////////////////////////////////////////////////
-  // Returns the keys from the AFLOW schema.
-  vector<string> getSchemaKeysBase() {  //CO20200520
-    vector<string> keys;
-    string key = "";
-    for (uint i = 0, n = XHOST.vschema.vxsghost.size(); i < n; i += 2) {
-      if(XHOST.vschema.vxsghost[i].find("SCHEMA::NAME:")!=string::npos) { //CO20200520
-        key=aurostd::RemoveSubString(XHOST.vschema.vxsghost[i], "SCHEMA::NAME:");
-        // schema keys are upper case
-        keys.push_back(aurostd::toupper(key));
-      }
-    }
-    return keys;
-  }
-
-  vector<string> AflowDB::getSchemaKeys() {
-    vector<string> keys=getSchemaKeysBase();
-    string key = "";
-    for (uint i = 0, n = vschema_extra.vxsghost.size(); i < n; i += 2) {
-      if(vschema_extra.vxsghost[i].find("SCHEMA::NAME:")!=string::npos) { //CO20200520
-        key=aurostd::RemoveSubString(vschema_extra.vxsghost[i], "SCHEMA::NAME:");
-        // schema keys are upper case
-        keys.push_back(aurostd::toupper(key));
-      }
-    }
+  //getAllSchemaKeys//////////////////////////////////////////////////////////
+  // Returns the keys from the schema and the internal schema
+  vector<string> AflowDB::getAllSchemaKeys() {
+    vector<string> keys = init::getSchemaKeys(vschema);
+    vector<string> keys_internal = init::getSchemaKeys(vschema_internal);
+    for (const string& key : keys_internal) keys.push_back(key);
     return keys;
   }
 
@@ -963,8 +944,8 @@ namespace aflowlib {
     string type = "";
     for (uint k = 0; k < nkeys; k++) {
       // AUID has to be unique
-      type = XHOST.vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
-      if (type.empty()) type = vschema_extra.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
+      type = vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
+      if (type.empty()) type = vschema_internal.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(keys[k]));
       if (unique && (keys[k] == "AUID")) {
         types[k] = "TEXT UNIQUE NOT NULL COLLATE NOCASE";  // Make string search not case sensitive
       } else if (type == "number") {
@@ -1044,9 +1025,8 @@ namespace aflowlib {
   void AflowDB::analyzeDatabase(const string& outfile) {
 
     if (aurostd::FileEmpty(database_file)) {
-      string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "analyzeDatabase():";
       string message = "Cannot analyze database. File empty.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     }
 
     // Get properties and tables for which statistics need to be collected
@@ -1099,10 +1079,10 @@ namespace aflowlib {
       }
 
       // Loops
-      for (uint i = 0; i < total_stats.loop_counts.size(); i++){
-        total_stats.loop_counts[i].second += catalog_stats.loop_counts[i].second;
+      for (std::map<string, uint>::iterator it = total_stats.loop_counts.begin(); it != total_stats.loop_counts.end(); ++it) {
+        const string& key = (*it).first;
+        (*it).second += catalog_stats.loop_counts[key];
       }
-
 
       // Species
       for (uint s = 0; s < catalog_stats.species.size(); s++) {
@@ -1145,18 +1125,17 @@ namespace aflowlib {
   }
 
   DBStats AflowDB::initDBStats(const string& catalog, const vector<string>& loops) {
-    vector<string> keys = (*this).getSchemaKeys();
+    vector<string> keys = getAllSchemaKeys();
     vector<string> excluded_properties, cols;
     string exclude = "alloy";
     aurostd::string2tokens(exclude, excluded_properties, ",");
     string key = "";
     for (uint i = 0, nkeys = keys.size(); i < nkeys; i++) {
-      key = XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + keys[i]);
-      if (key.empty()) key = vschema_extra.getattachedscheme("SCHEMA::NAME:" + keys[i]);
+      key = vschema.getattachedscheme("SCHEMA::NAME:" + keys[i]);
+      if (key.empty()) key = vschema_internal.getattachedscheme("SCHEMA::NAME:" + keys[i]);
       if (!key.empty() && !aurostd::WithinList(excluded_properties, key)) cols.push_back(key);
     }
     uint ncols = cols.size();
-    uint nloops = loops.size();
 
     DBStats stats;
     stats.catalog = catalog;
@@ -1167,16 +1146,14 @@ namespace aflowlib {
     stats.nentries = 0;
     stats.nsystems = 0;
     stats.set.resize(ncols);
-    stats.loop_counts.resize(nloops);
-    for (uint l = 0; l < nloops; l++) {
-      stats.loop_counts[l].first = loops[l];
-      stats.loop_counts[l].second = 0;
+    for (uint i = 0; i < loops.size(); i++) {
+      stats.loop_counts[loops[i]] = 0;
     }
 
     // Get types for post-processing
     vector<string> types(ncols);
-    for (uint i = 0; i < ncols; i++) {
-      types[i] = XHOST.vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(cols[i]));
+    for (uint c = 0; c < ncols; c++) {
+      types[c] = vschema.getattachedscheme("SCHEMA::TYPE:" + aurostd::toupper(cols[c]));
     }
     stats.types = types;
 
@@ -1186,86 +1163,71 @@ namespace aflowlib {
   //getCatalogStats///////////////////////////////////////////////////////////
   // Gets the statistics for all properties in the catalog.
   DBStats AflowDB::getCatalogStats(const string& catalog, const vector<string>& tables, const vector<string>& loops) {
-    string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "getCatalogStats():";
     stringstream message;
 
-    uint nloops = loops.size();
-
     DBStats stats = initDBStats(catalog, loops);
-    uint ncols = stats.columns.size();
-    const vector<string>& types = stats.types;
+    vector<DBStats> colstats(tables.size(), stats);
 
     string where = "catalog='" + catalog + "'";
-    vector<string> entries = getPropertyMultiTables("COUNT", tables, "*", where);
-    for (int t = 0; t < _N_AUID_TABLES_; t++) stats.nentries += aurostd::string2utype<int>(entries[t]);
+    vector<string> entries = getDatabasePropertyMultiTables("COUNT", tables, "*", where);
+    uint ntables = tables.size();
+    for (uint t = 0; t < ntables; t++) stats.nentries += aurostd::string2utype<int>(entries[t]);
     message << "Starting analysis for catalog " << catalog << " (" << stats.nentries << " entries).";
-    pflow::logger(_AFLOW_FILE_NAME_, function, message, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss);
 
     if (stats.nentries > 0) {
-      vector<vector<vector<string> >  > maxmin(_N_AUID_TABLES_, vector<vector<string> >(ncols, vector<string>(2))), sets(_N_AUID_TABLES_, vector<vector<string> >(ncols));
-      vector<vector<vector<int> > > counts(_N_AUID_TABLES_, vector<vector<int> >(ncols, vector<int>(2, 0)));
-      vector<vector<int> > loop_counts(_N_AUID_TABLES_, vector<int>(nloops));
-#ifdef AFLOW_DB_MULTITHREADS_ENABLE
+#ifdef AFLOW_MULTITHREADS_ENABLE
       int ncpus = init::GetCPUCores();
       if (ncpus < 1) ncpus = 1;
       // The maximum number of CPUs are empirically found values that appear
       // to result in the shortest run times. Further testing may be necessary.
-      int cpu_max = 32;
-      if (stats.nentries < 100000) cpu_max = 16;
-      if (stats.nentries < 50000) cpu_max = 8;
-      if (stats.nentries < 10000) cpu_max = 4;
-      if (ncpus > cpu_max) ncpus = cpu_max;
-      vector<vector<int> > thread_dist = getThreadDistribution(_N_AUID_TABLES_, ncpus);
-      vector<std::thread*> threads;
-      for (int i = 0; i < ncpus; i++) {
-        threads.push_back(new std::thread(&AflowDB::getColStats, this,
-              thread_dist[i][0], thread_dist[i][1],
-              std::ref(catalog), std::ref(tables),
-              std::ref(stats.columns), std::ref(types), std::ref(loops),
-              std::ref(counts), std::ref(loop_counts),
-              std::ref(maxmin), std::ref(sets)));
-      }
-      for (int i = 0; i < ncpus; i++) {
-        threads[i]->join();
-        delete threads[i];
-      }
+      int max_cpus = 32;
+      if (stats.nentries < 10000) max_cpus = 4;
+      else if (stats.nentries < 50000)  max_cpus = 8;
+      else if (stats.nentries < 100000) max_cpus = 16;
+      if (ncpus > max_cpus) ncpus = max_cpus;
+      xthread::xThread xt(ncpus);
+      std::function<void(uint, int, const vector<string>&, vector<DBStats>&)> fn = std::bind(&AflowDB::getColStats, this, _1, _2, _3, _4);
+      xt.runPredistributed(ntables, fn, tables, colstats);
 #else
-      getColStats(0, _N_AUID_TABLES_, catalog, tables, stats.columns, types,
-          loops, counts, loop_counts, maxmin, sets);
+      getColStats(0, ntables, tables, colstats);
 #endif
 
       // Properties: count, max, min, set
       vector<string> set;
       string max = "", min = "";
       uint nset = 0, n = 0;
+      uint ncols = stats.columns.size();
+      const vector<string>& types = stats.types;
       for (uint c = 0; c < ncols; c++) {
-        for (int t = 0; t < _N_AUID_TABLES_; t++) {
-          stats.count[c][0] += counts[t][c][0];
-          stats.count[c][1] += counts[t][c][1];
+        for (uint t = 0; t < ntables; t++) {
+          stats.count[c][0] += colstats[t].count[c][0];
+          stats.count[c][1] += colstats[t].count[c][1];
         }
         if (stats.count[c][0] + stats.count[c][1] > 0) {
           set.clear();
           max = ""; min = "";
           nset = 0; n = 0;
           if (types[c] != "bool") {  // No max, min, or set for bool
-            for (int t = 0; t < _N_AUID_TABLES_; t++) {
-              if (counts[t][c][0] > 0) {
+            for (uint t = 0; t < ntables; t++) {
+              const DBStats& cstats = colstats[t];
+              if (cstats.count[c][0] > 0) {
                 if (types[c] == "number") {
-                  if (max.empty()) max = maxmin[t][c][0];
-                  else if (aurostd::string2utype<double>(maxmin[t][c][0]) > aurostd::string2utype<double>(max)) max = maxmin[t][c][0];
+                  if (max.empty()) max = cstats.max[c];
+                  else if (aurostd::string2utype<double>(cstats.max[c]) > aurostd::string2utype<double>(max)) max = cstats.max[c];
 
-                  if (min.empty()) min = maxmin[t][c][1];
-                  else if (aurostd::string2utype<double>(maxmin[t][c][1]) < aurostd::string2utype<double>(min)) min = maxmin[t][c][1];
+                  if (min.empty()) min = cstats.min[c];
+                  else if (aurostd::string2utype<double>(cstats.min[c]) < aurostd::string2utype<double>(min)) min = cstats.min[c];
                 }
                 if (nset <= _DEFAULT_SET_LIMIT_) {
-                  n = sets[t][c].size();
+                  n = cstats.set[c].size();
                   if (n > _DEFAULT_SET_LIMIT_) {
-                    set = sets[t][c];
+                    set = cstats.set[c];
                     nset = n;
                   } else {
-                    for (uint i = 0; i < n; i++) {
-                      if (!aurostd::WithinList(set, sets[t][c][i])) {
-                        set.push_back(sets[t][c][i]);
+                    for (const string& s : cstats.set[c]) {
+                      if (!aurostd::WithinList(set, s)) {
+                        set.push_back(s);
                         nset++;
                       }
                       if (nset > _DEFAULT_SET_LIMIT_) break;
@@ -1300,8 +1262,9 @@ namespace aflowlib {
       stats.species = getUniqueFromJsonArrays(species);
 
       // Loop counts
-      for (uint l = 0; l < nloops; l++) {
-        for (int t = 0; t < _N_AUID_TABLES_; t++) stats.loop_counts[l].second += loop_counts[t][l];
+      for (std::map<string, uint>::iterator it = stats.loop_counts.begin(); it != stats.loop_counts.end(); ++it) {
+         const string& key = (*it).first;
+         for (uint t = 0; t < ntables; t++) (*it).second += colstats[t].loop_counts[key];
       }
     }
 
@@ -1310,51 +1273,58 @@ namespace aflowlib {
 
   //getColStats///////////////////////////////////////////////////////////////
   // Retrieves the statistics for each database property and the loops.
-  void AflowDB::getColStats(int startIndex, int endIndex, const string& catalog,
-      const vector<string>& tables, const vector<string>& cols, const vector<string>& types,
-      const vector<string>& loops, vector<vector<vector<int> > >& counts, vector<vector<int> >& loop_counts,
-      vector<vector<vector<string> > >& maxmin, vector<vector<vector<string> > >& sets) {
+  void AflowDB::getColStats(int startIndex, int endIndex, const vector<string>& tables, vector<DBStats>& colstats) {
     sqlite3* cursor;
-    string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "getColStats():";
     string message = "";
     int sql_code = sqlite3_open_v2(database_file.c_str(), &cursor, SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX, NULL); //DX20200319 - nullptr -> NULL
     if (sql_code != SQLITE_OK) {
       message = "Could not open cursor on database file " + database_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
 
-    uint ncols = cols.size();
     string where = "";
     for (int i = startIndex; i < endIndex; i++) {
+      // Writing directly to the colstats vector may not be thread-safe,
+      // so create copy first and merge later.
+      DBStats cstats = colstats[i];
+      const string& catalog = cstats.catalog;
+      const vector<string>& cols = cstats.columns;
+      const vector<string>& types = cstats.types;
+      uint ncols = cols.size();
       for (uint c = 0; c < ncols; c++) {
         if (types[c] == "bool") {
           where = "catalog='" + catalog + "' AND " + cols[c] + "=";
-          counts[i][c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'true'"));
-          counts[i][c][1] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where + "'false'"));
+          cstats.count[c][0] = aurostd::string2utype<int>(getDatabaseProperty(cursor, "COUNT", tables[i], cols[c], where + "'true'"));
+          cstats.count[c][1] = aurostd::string2utype<int>(getDatabaseProperty(cursor, "COUNT", tables[i], cols[c], where + "'false'"));
         } else {
           where = "catalog='" + catalog + "' AND " + cols[c] + " NOT NULL";
-          counts[i][c][0] = aurostd::string2utype<int>(getProperty(cursor, "COUNT", tables[i], cols[c], where));
+          cstats.count[c][0] = aurostd::string2utype<int>(getDatabaseProperty(cursor, "COUNT", tables[i], cols[c], where));
         }
         // No need to determine max, min, or set for bool
-        if ((types[c] != "bool") && (counts[i][c][0] > 0)) {
+        if ((types[c] != "bool") && (cstats.count[c][0] > 0)) {
           // Max and  min only make sense for numbers
           if (types[c] == "number") {
-            maxmin[i][c][0] = getProperty(cursor, "MAX", tables[i], cols[c], where);
-            maxmin[i][c][1] = getProperty(cursor, "MIN", tables[i], cols[c], where);
+            cstats.max[c] = getDatabaseProperty(cursor, "MAX", tables[i], cols[c], where);
+            cstats.min[c] = getDatabaseProperty(cursor, "MIN", tables[i], cols[c], where);
           }
-          sets[i][c] = getSet(cursor, tables[i], cols[c], true, where, _DEFAULT_SET_LIMIT_ + 1);
+          cstats.set[c] = getSet(cursor, tables[i], cols[c], true, where, _DEFAULT_SET_LIMIT_ + 1);
         }
       }
-      for (uint l = 0, nloops = loops.size(); l < nloops; l++) {
-        where = "catalog='" + catalog + "' AND loop LIKE '%\"" + loops[l] + "\"%'";
-        loop_counts[i][l] = aurostd::string2utype<int>(getProperty("COUNT", tables[i], "loop", where));
+      for (std::map<string, uint>::iterator it = cstats.loop_counts.begin(); it != cstats.loop_counts.end(); ++it) {
+        const string& key = (*it).first;
+        where = "catalog='" + catalog + "' AND loop LIKE '%\"" + key + "\"%'";
+        (*it).second = aurostd::string2utype<int>(getDatabaseProperty("COUNT", tables[i], "loop", where));
       }
+#ifdef AFLOW_MULTITHREADS_ENABLE
+      std::lock_guard<std::mutex> lk(write_mutex);
+#endif
+      colstats[i] = std::move(cstats);
     }
 
     sql_code = sqlite3_close(cursor);
     if (sql_code != SQLITE_OK) {
       message = "Could not close cursor on database file " + database_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 
@@ -1396,8 +1366,8 @@ namespace aflowlib {
     json << "{";
     json << "\"count\":" << db_stats.nentries << ",";
     json << "\"systems\":" <<  db_stats.nsystems << ",";
-    for (uint l = 0; l < db_stats.loop_counts.size(); l++) {
-      json << "\"" << db_stats.loop_counts[l].first << "\":" << db_stats.loop_counts[l].second << ",";
+    for (std::map<string, uint>::const_iterator it = db_stats.loop_counts.begin(); it != db_stats.loop_counts.end(); ++it) {
+      json << "\"" << (*it).first << "\":" << (*it).second << ",";
     }
     json << "\"columns\":{";
     uint ncols = db_stats.columns.size();
@@ -1606,10 +1576,9 @@ namespace aflowlib {
   void AflowDB::createTable(const string& table, const vector<string>& cols, const vector<string>& types) {
     uint ncols = cols.size();
     if (ncols != types.size()) {
-      string function = XPID + _AFLOW_DB_ERR_PREFIX_ + "createTable():";
       string message = "Could not create table. ";
       message += "Number of columns and number of types do not match.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     } else {
       string command = "CREATE TABLE IF NOT EXISTS " + table + " (";
       for (uint c = 0; c < ncols; c++) {
@@ -1637,10 +1606,9 @@ namespace aflowlib {
     uint ncols = cols.size();
     uint nvals = vals.size();
     if ((ncols > 0) && (ncols != nvals)) {
-      string function = XPID +  _AFLOW_DB_ERR_PREFIX_ + "insertValues():";
       string message = "Could not insert values. ";
       message += "Number of columns and number of values do not match.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     } else {
       string command = "INSERT INTO " + table;
       if (ncols > 0) command += " (" + aurostd::joinWDelimiter(cols, ", ") + ")";
@@ -1658,15 +1626,13 @@ namespace aflowlib {
     uint ncols = cols.size();
     uint nvals = vals.size();
     if (ncols == 0) {
-      string function = XPID +  _AFLOW_DB_ERR_PREFIX_ + "updateRow():";
       string message = "Could not update row. ";
       message += "No columns selected.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     } else if (ncols != nvals) {
-      string function = XPID +  _AFLOW_DB_ERR_PREFIX_ + "updateRow():";
       string message = "Could not update row. ";
       message += "Number of columns and number of values do not match.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     } else {
       string command = "UPDATE " + table + " SET ";
       for (uint i = 0; i < ncols; i++) {
@@ -1770,26 +1736,26 @@ namespace aflowlib {
   }
 
 
-  //getProperty///////////////////////////////////////////////////////////////
+  //getDatabaseProperty///////////////////////////////////////////////////////
   // Gets a database property for a specific column.
-  string AflowDB::getProperty(const string& property, const string& table,
+  string AflowDB::getDatabaseProperty(const string& property, const string& table,
       const string& col, const string& where) {
-    return getProperty(db, property, table, col, where);
+    return getDatabaseProperty(db, property, table, col, where);
   }
-  string AflowDB::getProperty(sqlite3* cursor, const string& property, const string& table,
+  string AflowDB::getDatabaseProperty(sqlite3* cursor, const string& property, const string& table,
       const string& col, const string& where) {
     string command = prepareSELECT(table, property, col, where, 0, "");
     return sql::SQLexecuteCommandSCALAR(cursor, command);
   }
 
-  //getPropertyMultiTables////////////////////////////////////////////////////
+  //getDatabasePropertyMultiTables////////////////////////////////////////////
   // Gets a database property for a specific column across multiple tables.
-  vector<string> AflowDB::getPropertyMultiTables(const string& property, const vector<string>& tables,
+  vector<string> AflowDB::getDatabasePropertyMultiTables(const string& property, const vector<string>& tables,
       const string& col, const string& where) {
-    return getPropertyMultiTables(db, property, tables, col, where);
+    return getDatabasePropertyMultiTables(db, property, tables, col, where);
   }
 
-  vector<string> AflowDB::getPropertyMultiTables(sqlite3* cursor, const string& property, const vector<string>& tables,
+  vector<string> AflowDB::getDatabasePropertyMultiTables(sqlite3* cursor, const string& property, const vector<string>& tables,
       const string& col, const string& where) {
     uint ntables = tables.size();
     vector<string> commands(ntables);

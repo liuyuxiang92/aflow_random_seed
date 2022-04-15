@@ -13,14 +13,14 @@
 #include "aflow_compare_structure.h"
 #include "aflow_symmetry_spacegroup.h"
 
-#undef AFLOW_COMPARE_MULTITHREADS_ENABLE
+//[OBSOLETE ME20220129 - not used] #undef AFLOW_COMPARE_MULTITHREADS_ENABLE
 
-#if GCC_VERSION >= 40400   // added two zeros
-#define AFLOW_COMPARE_MULTITHREADS_ENABLE 1
-#include <thread>
-#else
-#warning "The multithread parts of AFLOW-XtalFinder will be not included, since they need gcc 4.4 and higher (C++0x support)."
-#endif
+//[OBSOLETE ME20220129 - not used] #if GCC_VERSION >= 40400   // added two zeros
+//[OBSOLETE ME20220129 - not used] #define AFLOW_COMPARE_MULTITHREADS_ENABLE 1
+//[OBSOLETE ME20220129 - not used] #include <thread>
+//[OBSOLETE ME20220129 - not used] #else
+//[OBSOLETE ME20220129 - not used] #warning "The multithread parts of AFLOW-XtalFinder will be not included, since they need gcc 4.4 and higher (C++0x support)."
+//[OBSOLETE ME20220129 - not used] #endif
 
 // ***************************************************************************
 // SEE README_AFLOW_COMPARE.TXT FOR THE FULL LIST OF AFLOW COMMANDS

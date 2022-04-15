@@ -50,18 +50,21 @@ namespace aurostd {
       xerror(const std::string&, const std::stringstream&, const std::stringstream&, int = 1);
       xerror(const std::string&, const std::stringstream&, const std::string&, int = 1);
       ~xerror() throw() {};
-      int error_code;
       std::string what();
+      int whatCode();
       std::string whereFunction();  //CO20191201
       std::string whereFileName();  //CO20191201
-      std::string error_message;
+      std::string buildMessageString();
     private:
-      int error_type, error_number;
-      std::string file_name,function_name, message;
+      int error_code;
+      int error_number;
+      int error_type;
+      std::string file_name;
+      std::string function_name;
+      std::string error_message;
 
       void buildException(const std::string&, const std::string&, const std::string&, const int&);
       bool codeValid();
-      std::string buildMessageString();
       std::string error_string();
   };
 } // namespace aurostd

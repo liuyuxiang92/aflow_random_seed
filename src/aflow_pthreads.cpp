@@ -12,7 +12,9 @@
 #include "aflow_pflow.h"
 
 // #define  AFLOW_PTHREADS_MULTISH_PREEMPTIVE_
+#ifndef AFLOW_MULTITHREADS_ENABLE
 #define  AFLOW_PTHREADS_MULTISH_TIMESHARING_
+#endif
 //#define  AFLOW_PTHREADS::MULTISH_TIMESHARING_SEQUENTIAL_
 //#define  AFLOW_PTHREADS::MULTISH_TIMESHARING_CONCURRENT_
 
@@ -304,7 +306,7 @@ namespace KBIN {
 } // namespace KBIN
 
 namespace AFLOW_PTHREADS {
-  bool MULTI_sh(vector<string> argv) {
+  bool MULTI_sh(const vector<string>& argv) {
 
     string function_name=XPID+"AFLOW_PTHREADS::MULTI_sh()";
     stringstream message;
@@ -421,7 +423,7 @@ namespace AFLOW_PTHREADS {
 
 
 namespace AFLOW_PTHREADS {
-  bool MULTI_sh(vector<string> argv) {
+  bool MULTI_sh(const vector<string>& argv) {
 
     string function_name = XPID + "AFLOW_PTHREADS::MULTI_sh():";
     stringstream message;
@@ -447,7 +449,7 @@ namespace AFLOW_PTHREADS {
 } // AFLOW_PTHREADS
 
 namespace aurostd {
-  bool multithread_execute(deque<string> dcmds,int _NUM_THREADS,bool VERBOSE) {
+  bool multithread_execute(const deque<string>& dcmds,int _NUM_THREADS,bool VERBOSE) {
     bool LDEBUG=TRUE;
     string soliloquy=XPID+"aurostd::multithread_execute():";
     int NUM_THREADS=_NUM_THREADS;                                          // SAFETY
@@ -487,8 +489,10 @@ namespace aurostd {
   }
 } // namespace aurostd
 
+#endif //  AFLOW_PTHREADS_MULTISH_TIMESHARING_
+
 namespace aurostd {
-  bool multithread_execute(vector<string> vcmds,int _NUM_THREADS,bool VERBOSE) {
+  bool multithread_execute(const vector<string>& vcmds,int _NUM_THREADS,bool VERBOSE) {
     int NUM_THREADS=_NUM_THREADS;                                          // SAFETY
     if((int) vcmds.size()<=NUM_THREADS) NUM_THREADS=(uint) vcmds.size();   // SAFETY
 
@@ -498,24 +502,22 @@ namespace aurostd {
   }
 } // namespace aurostd
 
-#endif //  AFLOW_PTHREADS_MULTISH_TIMESHARING_
-
 // ***************************************************************************
 // MultiThread Execute vectors/deque of Strings
 // ***************************************************************************
 // adding something to aurostd
 namespace aurostd {
-  bool multithread_execute(deque<string> vcommand,int NUM_THREADS) {
+  bool multithread_execute(const deque<string>& vcommand,int NUM_THREADS) {
     return multithread_execute(vcommand,NUM_THREADS,FALSE);
   }
-  bool multithread_execute(vector<string> vcommand,int NUM_THREADS) {
+  bool multithread_execute(const vector<string>& vcommand,int NUM_THREADS) {
     return multithread_execute(vcommand,NUM_THREADS,FALSE);
   }
-  bool multithread_execute(deque<string> vcommand) {
+  bool multithread_execute(const deque<string>& vcommand) {
     AFLOW_PTHREADS::MAX_PTHREADS=AFLOW_PTHREADS::GetTotalCPUs();
     return multithread_execute(vcommand,AFLOW_PTHREADS::MAX_PTHREADS,FALSE);
   }
-  bool multithread_execute(vector<string> vcommand) {
+  bool multithread_execute(const vector<string>& vcommand) {
     AFLOW_PTHREADS::MAX_PTHREADS=AFLOW_PTHREADS::GetTotalCPUs();
     return multithread_execute(vcommand,AFLOW_PTHREADS::MAX_PTHREADS,FALSE);
   }
@@ -722,7 +724,7 @@ namespace AFLOW_PTHREADS {
 // AFLOW_PTHREADS::MULTI_compress
 // ***************************************************************************
 namespace AFLOW_PTHREADS {
-  bool MULTI_compress(string cmd,vector<string> argv) {
+  bool MULTI_compress(const string& cmd,const vector<string>& argv) {
     // aflow --multi[bzip2|xz|gzip] [--np XX | npmax | nothing] --F[ILE] file1[.bz2|.xz|.gz] file2[.bz2|.xz|.gz] file3[.bz2|.xz|.gz] ....
     bool VERBOSE=TRUE;
     vector<string> vfile;
@@ -737,8 +739,13 @@ namespace AFLOW_PTHREADS {
       if(cmd=="gunzip") { if(aurostd::substring2bool(vfile.at(i),".gz")) { vcmds.push_back("gzip -dvf "+vfile.at(i)); } }
       if(cmd=="xunz" || cmd=="xunzip") { if(aurostd::substring2bool(vfile.at(i),".xz")) { vcmds.push_back("xz -dvf "+vfile.at(i)); } }
     }
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    if (argv.size()) {}  // avoid compiler warnings
+    aurostd::multithread_execute(vcmds, KBIN::get_NCPUS(), VERBOSE);
+#else
     AFLOW_PTHREADS::Check_Threads_WrapperNP(argv,vcmds.size(),VERBOSE); // check treads from NP
     aurostd::multithread_execute(vcmds,AFLOW_PTHREADS::MAX_PTHREADS,VERBOSE);
+#endif
     cout << endl;
     return TRUE;
   }
@@ -748,7 +755,7 @@ namespace AFLOW_PTHREADS {
 // AFLOW_PTHREADS::MULTI_bz2xz 
 // ***************************************************************************
 namespace AFLOW_PTHREADS {
-  bool MULTI_bz2xz(vector<string> argv) {
+  bool MULTI_bz2xz(const vector<string>& argv) {
     // aflow --multi=bz2xz [--np XX | npmax | nothing] --F[ILE] file1.bz2 file2.bz2 file3.bz2 ....
     bool VERBOSE=TRUE;
     cerr << XPID << "AFLOW_PTHREADS::MULTI_bz2xz: BEGIN" << endl;
@@ -765,10 +772,17 @@ namespace AFLOW_PTHREADS {
       } 
     }
     cerr << XPID << "AFLOW_PTHREADS::MULTI_bz2xz: AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
+#ifndef AFLOW_MULTITHREADS_ENABLE
     AFLOW_PTHREADS::Check_Threads_WrapperNP(argv,vcmds.size(),VERBOSE); // check treads from NP
+#endif
 
     cerr << XPID << "AFLOW_PTHREADS::MULTI_bz2xz: PERFORMING" << endl;
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    if (argv.size()) {}  // avoid compiler warnings
+    aurostd::multithread_execute(vcmds, KBIN::get_NCPUS(), VERBOSE);
+#else
     aurostd::multithread_execute(vcmds,AFLOW_PTHREADS::MAX_PTHREADS,VERBOSE);
+#endif
     cout << endl;
     // done
     cerr << XPID << "AFLOW_PTHREADS::MULTI_bz2xz: END" << endl;
@@ -780,7 +794,7 @@ namespace AFLOW_PTHREADS {
 // AFLOW_PTHREADS::MULTI_xz2bz2
 // ***************************************************************************
 namespace AFLOW_PTHREADS {
-  bool MULTI_xz2bz2(vector<string> argv) {
+  bool MULTI_xz2bz2(const vector<string>& argv) {
     // aflow --multi=xz2bz2 [--np XX | npmax | nothing] --F[ILE] file1.xz file2.xz file3.xz ....
     bool VERBOSE=TRUE;
     cerr << XPID << "AFLOW_PTHREADS::MULTI_xz2bz2: BEGIN" << endl;
@@ -797,10 +811,17 @@ namespace AFLOW_PTHREADS {
       } 
     }
     cerr << XPID << "AFLOW_PTHREADS::MULTI_xz2bz2: AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
+#ifndef AFLOW_MULTITHREADS_ENABLE
     AFLOW_PTHREADS::Check_Threads_WrapperNP(argv,vcmds.size(),VERBOSE); // check treads from NP
+#endif
 
     cerr << XPID << "AFLOW_PTHREADS::MULTI_xz2bz2: PERFORMING" << endl;
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    if (argv.size()) {}  // avoid compiler warnings
+    aurostd::multithread_execute(vcmds, KBIN::get_NCPUS(), VERBOSE);
+#else
     aurostd::multithread_execute(vcmds,AFLOW_PTHREADS::MAX_PTHREADS,VERBOSE);
+#endif
     cout << endl;
     // done
     cerr << XPID << "AFLOW_PTHREADS::MULTI_xz2bz2: END" << endl;
@@ -812,7 +833,7 @@ namespace AFLOW_PTHREADS {
 // AFLOW_PTHREADS::MULTI_gz2xz
 // ***************************************************************************
 namespace AFLOW_PTHREADS {
-  bool MULTI_gz2xz(vector<string> argv) {
+  bool MULTI_gz2xz(const vector<string>& argv) {
     // aflow --multi=gz2xz [--np XX | npmax | nothing] --F[ILE] file1.gz file2.gz file3.gz ....
     // load files
     bool VERBOSE=TRUE;
@@ -826,15 +847,58 @@ namespace AFLOW_PTHREADS {
         vcmds.push_back("gzip -dvf "+vfile.at(i)+".gz && xz -9vf "+vfile.at(i));
       } 
     }
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    if (argv.size()) {}  // avoid compiler warnings
+    aurostd::multithread_execute(vcmds, KBIN::get_NCPUS(), VERBOSE);
+#else
     AFLOW_PTHREADS::Check_Threads_WrapperNP(argv,vcmds.size(),VERBOSE); // check treads from NP
     // for(uint i=0;i<vcmds.size();i++) cout << vcmds.at(i) << endl;
     aurostd::multithread_execute(vcmds,AFLOW_PTHREADS::MAX_PTHREADS,VERBOSE);
+#endif
     cout << endl;
     // done
     return TRUE;
   }
 } // namespace AFLOW_PTHREADS
 
+
+#ifdef AFLOW_MULTITHREADS_ENABLE
+
+namespace AFLOW_PTHREADS {
+  bool MULTI_sh(const vector<string>& argv) {
+    stringstream message;
+    ostringstream aus;
+    _aflags aflags;
+    // [OBSOLETE]    string file_name=aurostd::args2string(argv,"--FILE|--F|--f","xxxx");
+    string file_name=XHOST.vflag_control.getattachedscheme("FILE");
+    if(file_name.empty() || file_name=="--f") file_name=argv.at(argv.size()-1);
+    bool VERBOSE=FALSE;
+
+    if(!aurostd::FileExist(file_name)) {message << "FILE_NOT_FOUND = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);}
+    if( aurostd::FileEmpty(file_name)) {message << "FILE_EMPTY = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_CORRUPT_);}
+    aus << "MMMMM Loading File = " << file_name << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
+    vector<string> vcmds;
+    vcmds.clear();
+    aurostd::file2vectorstring(file_name,vcmds);
+    aus << "MMMMM Loaded Lines = " << vcmds.size() << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
+    return aurostd::multithread_execute(vcmds, KBIN::get_NCPUS(), VERBOSE);
+  }
+}
+
+namespace aurostd {
+  bool multithread_execute(const deque<string>& cmds, int _NUM_THREADS, bool VERBOSE) {
+    bool LDEBUG = FALSE;
+    if (VERBOSE) {}
+    if (LDEBUG) std::cerr << "Commands to run:\n" << aurostd::joinWDelimiter(cmds, "\n") << std::endl;
+
+    std::function<void(const deque<string>::const_iterator&)> fn = [&](const deque<string>::const_iterator& it) {aurostd::execute(*it);};
+    xthread::xThread xt(_NUM_THREADS);
+    xt.run(cmds, fn);
+    return true;
+  }
+}
+
+#endif
 
 // **************************************************************************
 // NOT MULTITHREAD BUT GOOD ENOUGH....
@@ -1064,44 +1128,6 @@ namespace sflow {
     if(LDEBUG) cerr << XPID << "sflow::QSUB: END" << endl;
   }
 } // namespace sflow
-
-//////////////////////////////////////////////////////////////////////////////
-
-// getThreadDistribution - ME20180801
-// Calculates the start and end indices for each thread for multi-thread
-// calculations. Note that the end index is not included in each thread.
-vector<vector<int> > getThreadDistribution(const int& nbins, const int& nthreads) {
-  bool LDEBUG = (false || XHOST.DEBUG);
-  vector<vector<int> > thread_dist(nthreads, vector<int>(2));
-  int binsperthread = nbins/nthreads;
-  int remainder = nbins % nthreads;
-  int startIndex, endIndex;
-  for (int t = 0; t < nthreads; t++) {
-    if (t < remainder) {
-      startIndex = (binsperthread + 1) * t;
-      endIndex = startIndex + binsperthread + 1;
-    } else {
-      startIndex = binsperthread * t + remainder;
-      endIndex = startIndex + binsperthread;
-    }
-    thread_dist[t][0] = startIndex;
-    thread_dist[t][1] = endIndex;
-  }
-  if (LDEBUG) {
-    std::cerr << "Thread distribution: " << std::endl;
-    std::cerr << std::setiosflags(std::ios::fixed | std::ios::right) << setw(10) << " Thread";
-    std::cerr << std::setiosflags(std::ios::fixed | std::ios::right) << setw(15) << " start Index";
-    std::cerr << std::setiosflags(std::ios::fixed | std::ios::right) << setw(15) << " end Index";
-    std::cerr << std::endl;
-    for (int t = 0; t < nthreads; t++) {
-      std::cerr << std::setiosflags(std::ios::fixed | std::ios::right) << setw(10) << t;
-      std::cerr << std::setiosflags(std::ios::fixed | std::ios::right) << setw(15) << thread_dist[t][0];
-      std::cerr << std::setiosflags(std::ios::fixed | std::ios::right) << setw(15) << thread_dist[t][1];
-      std::cerr << std::endl;
-    }
-  }
-  return thread_dist;
-}
 
 
 // **************************************************************************

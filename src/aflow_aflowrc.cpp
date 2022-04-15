@@ -544,7 +544,7 @@
 #define         DEFAULT_APL_RELAX                             XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_RELAX")
 #define AFLOWRC_DEFAULT_APL_RELAX_COMMENSURATE                TRUE  //ME20200427
 #define         DEFAULT_APL_RELAX_COMMENSURATE                XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_RELAX_COMMENSURATE")  //ME20200427
-#define AFLOWRC_DEFAULT_APL_ZEROSTATE                         TRUE  //CO20181216
+#define AFLOWRC_DEFAULT_APL_ZEROSTATE                         FALSE  //CO2018121  //ME20220415 - ZEROSTATE=ON and DPM=ON is unnecessary
 #define         DEFAULT_APL_ZEROSTATE                         XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_ZEROSTATE")
 #define AFLOWRC_DEFAULT_APL_ZEROSTATE_CHGCAR                  FALSE  //ME20191029
 #define         DEFAULT_APL_ZEROSTATE_CHGCAR                  XHOST.adefault.getattachedutype<bool>("DEFAULT_APL_ZEROSTATE_CHGCAR")  //ME20191029

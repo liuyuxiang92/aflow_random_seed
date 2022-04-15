@@ -358,6 +358,7 @@ class _XHOST {
     string AFLOW_MATERIALS_SERVER,AFLOW_WEB_SERVER;
     long double RAM,RAM_MB,RAM_GB;
     int CPU_Cores;
+    int CPU_active;  //ME20220130
     string CPU_Model;
     string CPU_MHz;
     vector<double> vTemperatureCore;
@@ -413,6 +414,7 @@ class _XHOST {
     aurostd::xoption vflag_outreach;  // argv/argc options following the xoption structure
     aurostd::xoption vflag_control;  // argv/argc options following the xoption structure
     aurostd::xoption vschema;        // keywords, names, units etc etc
+    aurostd::xoption vschema_internal;  //ME20220208
     // USUAL COMMANDS
     vector<string> vcat; //     cat, bzcat, xzcat, gzcat
     vector<string> vext; //      "",  .bz2,   .xz,   .gz
@@ -565,6 +567,19 @@ class _XHOST {
 
 // max is 128
 extern _XHOST XHOST; // this will be global
+
+// ME+HE20220321
+// Based on https://stackoverflow.com/questions/1666802/is-there-a-class-macro-in-c
+// Get full formatted name of function
+inline std::string aflowFunc(const std::string& pretty_func, const std::string& func) {
+  size_t end = pretty_func.find(func);
+  // Everything between the function name and the last space character
+  // are namespace and class name, if present
+  size_t begin = pretty_func.rfind(" ", end) + 1;
+  return XPID + pretty_func.substr(begin, end - begin) + func + "():";
+}
+
+#define __AFLOW_FUNC__ aflowFunc(__PRETTY_FUNCTION__, __func__)
 
 //DX20180131 - add symmetry definitions - START
 // symmetry 
@@ -1095,6 +1110,11 @@ namespace init {
   uint GetTEMP(void);
   double WaitTEMP(double TRESHOLD=AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT,ostream& oss=cout,bool LVERBOSE=FALSE,vector<string> vmessage=vector<string>(0));
   uint InitSchema(bool INIT_VERBOSE);
+  uint InitSchemaInternal(bool INIT_VERBOSE);  //ME20220208
+  vector<string> getSchemaKeys(const aurostd::xoption& vschema);  //ME20220223
+  vector<string> getSchemaNames(const aurostd::xoption& vschema);  //CO20200520
+  vector<string> getSchemaTypes(const aurostd::xoption& vschema);  //ME20220223
+  vector<string> getSchemaTypes(const aurostd::xoption& vschema, const vector<string>& keys);  //ME20220223
 } // namespace init
 
 uint AFLOW_getTEMP(const vector<string>& argv);
@@ -2934,19 +2954,20 @@ namespace KBIN {
   void *_threaded_interface_RUN_Directory(void *ptr);
 } // namespace KBIN
 namespace aurostd { // Multithreaded add on to aurostd
-  bool multithread_execute(deque<string> vcommand,int NUM_THREADS,bool VERBOSE);
-  bool multithread_execute(deque<string> vcommand,int NUM_THREADS);
-  bool multithread_execute(deque<string> vcommand);
-  bool multithread_execute(vector<string> vcommand,int NUM_THREADS,bool VERBOSE);
-  bool multithread_execute(vector<string> vcommand,int NUM_THREADS);
-  bool multithread_execute(vector<string> vcommand);
+  bool multithread_execute(const deque<string>& vcommand,int NUM_THREADS,bool VERBOSE);
+  bool multithread_execute(const deque<string>& vcommand,int NUM_THREADS);
+  bool multithread_execute(const deque<string>& vcommand);
+  bool multithread_execute(const vector<string>& vcommand,int NUM_THREADS,bool VERBOSE);
+  bool multithread_execute(const vector<string>& vcommand,int NUM_THREADS);
+  bool multithread_execute(const vector<string>& vcommand);
 } // namespace aurostd
 namespace AFLOW_PTHREADS {
-  bool MULTI_sh(vector<string> argv);
-  bool MULTI_compress(string cmd,vector<string> argv);
+  bool MULTI_sh(const vector<string>& argv);
+  bool MULTI_compress(const string& cmd,const vector<string>& argv);
   bool MULTI_zip(const vector<string>& argv); //CO20211104
-  bool MULTI_bz2xz(vector<string> argv);bool MULTI_xz2bz2(vector<string> argv);
-  bool MULTI_gz2xz(vector<string> argv);
+  bool MULTI_bz2xz(const vector<string>& argv);
+  bool MULTI_xz2bz2(const vector<string>& argv);
+  bool MULTI_gz2xz(const vector<string>& argv);
 }
 namespace sflow {
   void KILL(string options);
@@ -2956,7 +2977,72 @@ namespace sflow {
   void QDEL(string options);
   void QDEL(string options,string cmd);
 }
-vector<vector<int> > getThreadDistribution(const int&, const int&);  //ME20190218
+
+#ifdef AFLOW_MULTITHREADS_ENABLE
+//ME20220130
+namespace xthread {
+  class xThread {
+    public:
+      xThread(int nmax=0, int nmin=1);
+      xThread(ostream& oss, int nmax=0, int nmin=1);
+      xThread(const xThread& xt);
+      const xThread& operator=(const xThread& xt);
+      ~xThread();
+
+      void clear();
+
+      void setCPUs(int nmax, int nmin=1);
+      void setProgressBar(ostream& oss);
+      void unsetProgressBar();
+
+      template <typename F, typename... A>
+      void run(uint ntasks, F& func, A&... args);
+      template <typename F, typename... A>
+      void run(int ntasks, F& func, A&... args);
+      template <typename F, typename... A>
+      void run(unsigned long long int ntasks, F& func, A&... args);
+      template <typename IT, typename F, typename... A>
+      void run(const IT& it, F& func, A&... args);
+      template <typename IT, typename F, typename... A>
+      void run(IT& it, F& func, A&... args);
+
+      template <typename F, typename... A>
+      void runPredistributed(int ntasks, F& func, A&... args);
+      template <typename F, typename... A>
+      void runPredistributed(uint ntasks, F& func, A&... args);
+      template <typename F, typename... A>
+      void runPredistributed(unsigned long long int ntasks, F& func, A&... args);
+
+    private:
+      void free();
+      void copy(const xThread&);
+
+      int ncpus_max;
+      int ncpus_min;
+      std::mutex mtx;
+      ostream* progress_bar;
+      unsigned long long int progress_bar_counter;
+      bool progress_bar_set;
+
+      void initializeProgressBar(unsigned long long int ntasks);
+
+      int reserveThreads(unsigned long long int ntasks);
+      void freeThreads(int ncpus);
+
+      template <typename I, typename F, typename... A>
+      void run(I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
+      template <typename I, typename F, typename... A>
+      void spawnWorker(int ithread, I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
+      template <typename I>
+      I advance(I& it, I& end, unsigned long long int ntasks, bool update_progress_bar=false);
+
+      template <typename I, typename F, typename... A>
+      void runPredistributed(I ntasks, F& func, A&... args);
+      template <typename I, typename F, typename... A>
+      void spawnWorkerPredistributed(int ithread, I startIndex, I endIndex, F& func, A&... args);
+  };
+}
+#endif
 
 // ----------------------------------------------------------------------------
 // aflow_kbin.cpp
@@ -4811,7 +4897,6 @@ namespace KBIN {
   bool runRelaxationsAPL_VASP(int, const string&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  //ME20200427
   void VASP_RunPhonons_APL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE, ostream& oss=std::cout);
   void RunPhonons_APL(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general
-  void RunPhonons_APL_20181216(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general //CO20181216
   // ----------------------------------------------------------------------------
   // aflow_agl_debye.cpp
   uint relaxStructureAGL_VASP(const string& AflowIn, _xvasp& xvasp, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMessage);  //CT20200501
@@ -5302,8 +5387,6 @@ namespace xprototype {
       void copy(const xprototype& b);                    // copy space
   };
 }
-
-
 
 #endif
 // ***************************************************************************

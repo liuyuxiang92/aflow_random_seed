@@ -223,8 +223,8 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   }
   catch (aurostd::xerror e)
   {
-    if (e.error_code == expected_int) check(true, "", "", check_function, check_description, passed_checks, results);
-    else check(false, aurostd::utype2string(e.error_code), expected_error, check_function, check_description, passed_checks, results);
+    if (e.whatCode() == expected_int) check(true, "", "", check_function, check_description, passed_checks, results);
+    else check(false, aurostd::utype2string(e.whatCode()), expected_error, check_function, check_description, passed_checks, results);
   }
   catch (...) {
     check(false, std::string("not an xerror"), expected_error, check_function, check_description, passed_checks, results);
@@ -253,8 +253,8 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   }
   catch (aurostd::xerror e)
   {
-    if (e.error_code == expected_int) check(true, "", "", check_function, check_description, passed_checks, results);
-    else check(false, aurostd::utype2string(e.error_code), expected_error, check_function, check_description, passed_checks, results);
+    if (e.whatCode() == expected_int) check(true, "", "", check_function, check_description, passed_checks, results);
+    else check(false, aurostd::utype2string(e.whatCode()), expected_error, check_function, check_description, passed_checks, results);
   }
   catch (...) {
     check(false, std::string("not an xerror"), expected_error, check_function, check_description, passed_checks, results);

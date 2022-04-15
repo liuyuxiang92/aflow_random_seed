@@ -303,8 +303,9 @@ class XtalFinderCalculator : public xStream {
         vector<StructurePrototype>& prototypes,
         uint num_proc);
     void getMatchingAFLOWPrototypes(
+        uint i,
         vector<StructurePrototype>& prototypes,
-        aurostd::xoption vpflow_protos);
+        const aurostd::xoption& vpflow_protos);
 
     // ---------------------------------------------------------------------------
     // compare2database
@@ -374,6 +375,7 @@ class XtalFinderCalculator : public xStream {
     // ---------------------------------------------------------------------------
     // transform structures
     void performStructureConversions(
+        uint i,  //ME20220207 - new xThread scheme
         const vector<bool>& calculate_primitive_vec,
         const vector<bool>& calculate_Minkowski_vec,
         const vector<bool>& calculate_Niggli_vec); //DX20210113
@@ -459,7 +461,7 @@ class XtalFinderCalculator : public xStream {
 
     // ---------------------------------------------------------------------------
     // run multiple structures
-    vector<StructurePrototype> runComparisonScheme(vector<StructurePrototype>& comparison_schemes, 
+    vector<StructurePrototype> runComparisonScheme(vector<StructurePrototype>& comparison_schemes,
         bool same_species, uint num_proc, const aurostd::xoption& comparison_options, 
         bool quiet=false); //DX20200103 - condensed bools to xoptions
     void runComparisons(
@@ -467,9 +469,9 @@ class XtalFinderCalculator : public xStream {
         bool same_species, 
         bool scale_volume,
         bool optimize_match); 
-    void runComparisonThreads(vector<StructurePrototype>& comparison_schemes, 
-        const std::pair<uint,uint>& start_indices,
-        const std::pair<uint,uint>& end_indices,
+    void runComparisonThreads(uint index, vector<StructurePrototype>& comparison_schemes,
+        const vector<std::pair<uint,uint> >& vstart_indices,
+        const vector<std::pair<uint,uint> >& vend_indices,
         bool same_species, 
         bool scale_volume, bool optimize_match); //DX20190822 - added comparison log bool
 
@@ -477,7 +479,9 @@ class XtalFinderCalculator : public xStream {
     // ---------------------------------------------------------------------------
     // get aflow label
     void calculatePrototypeDesignations(vector<StructurePrototype>& prototypes,uint num_proc);
-    void getPrototypeDesignations(vector<StructurePrototype>& prototypes);
+    //ME20220207 - replaced with iterator for xThread
+    void getPrototypeDesignations(vector<StructurePrototype>::iterator& prototypes);
+    //void getPrototypeDesignations(vector<StructurePrototype>& prototypes);
     void getPrototypeDesignationsPreDistributed(
         vector<StructurePrototype>& prototypes,
         uint start_index=0,
@@ -529,13 +533,13 @@ class XtalFinderCalculator : public xStream {
     // ---------------------------------------------------------------------------
     // search for atom mappings 
     bool searchAtomMappings(
+        uint start_index, uint end_index,
         const xstructure& xstr1,
         const vector<double>& all_nn1,
         const xstructure& xstr2,
         const string& lfa,
         vector<xmatrix<double> >& lattices,
         vector<structure_mapping_info>& vstrs_matched,
-        const uint start_index, const uint end_index,
         bool same_species,
         bool optimize_match);
 
