@@ -257,36 +257,54 @@ namespace xthread {
   /// This prevents threaded functions that spawn other multi-threaded
   /// processes from allocating more threads than the machine can afford.
   /// This only works within a single AFLOW run
+  ///
+  /// There are two ways to allocate CPUs for competing processes:
+  ///   1) always maximize CPU usage: as soon as enough threads are available
+  ///      for a process, allocate and run. This will reduce idle time, but
+  ///      will prioritize smaller jobs. This is the default.
+  ///   2) first come, first serve: allocation is halted until the first
+  ///      process to call this function gets the threads it needs. This will
+  ///      make sure that large jobs are not stuck until all small tasks are
+  ///      finished, but can lead more idle time. This process can be set with
+  ///      the compiler flag -DXTHREAD_USE_QUEUE.
   int xThread::reserveThreads(unsigned long long int ntasks) {
     uint sleep_second = 10;
     int ncpus_max_available = KBIN::get_NCPUS();
     int ncpus = 0, ncpus_available = 0, nmax = 0, nmin = 0;
-    int nmax = ncpus_max;
-    int nmin = ncpus_min;
     // Adjust max. and min. number of CPUs to the number of tasks.
     // Decrement numbers by 1 because the main thread (which is idle
     // during execution) should not count towards the total number
     // of active CPUs
     if (ntasks <= (unsigned long long int) ncpus_max_available) {
-      nmin = std::min(ncpus_min, ntasks) - 1;
-      nmax = std::min(ncpus_max, ntasks) - 1;
+      // Downcasting is safe because ntasks has a value in int range
+      nmin = std::min(ncpus_min, (int) ntasks) - 1;
+      nmax = std::min(ncpus_max, (int) ntasks) - 1;
     } else {
       nmin = ncpus_min - 1;
       nmax = ncpus_max - 1;
     }
+#ifdef XTHREAD_USE_QUEUE
+    std::lock_guard<std::mutex> lk(xthread_cpu_check);
+#endif
     do {
+#ifndef XTHREAD_USE_QUEUE
       xthread_cpu_check.lock();
+#endif
       ncpus_available = ncpus_max_available - XHOST.CPU_active;
       if (ncpus_available >= nmin) {
         ncpus = std::min(ncpus_available, nmax);
         // "reserve" threads globally
         XHOST.CPU_active += ncpus;
         // Increase by 1 - the main thread does not count towards the
-        // total, but should still be used to for a worker
+        // total, but should still be used for a worker
         ncpus++;
+#ifndef XTHREAD_USE_QUEUE
         xthread_cpu_check.unlock();
+#endif
       } else {
+#ifndef XTHREAD_USE_QUEUE
         xthread_cpu_check.unlock();
+#endif
         aurostd::Sleep(sleep_second);
       }
     } while (ncpus_available < nmin);
