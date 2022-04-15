@@ -11,6 +11,7 @@
 #define _AFLOW_APDC_CPP_
 #include "aflow.h"
 #include "aflow_apdc.h"
+#include "aflow_pocc.h"
 
 // ###############################################################################
 //            AFLOW Alloy Phase Diagram Constructor (APDC) (2022-)
@@ -45,6 +46,7 @@ _apdc_data::_apdc_data() {
   mapstr.clear();
   // Cluster data
   num_atom_cluster.clear();
+  degeneracy_cluster.clear();
   conc_cluster.clear();
   excess_energy_cluster.clear();
   // Thermo data
@@ -85,6 +87,7 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
     mapstr = b.mapstr;
     // Cluster data
     num_atom_cluster = b.num_atom_cluster;
+    degeneracy_cluster = b.degeneracy_cluster;
     conc_cluster = b.conc_cluster;
     excess_energy_cluster = b.excess_energy_cluster;
     // Thermo data
@@ -251,7 +254,6 @@ namespace apdc {
 // Binodal construction based on the method developed in Y. Lederer et al., Acta Materialia, 159 (2018)
 namespace apdc {
   void GetBinodal(_apdc_data& apdc_data) {
-    return;
     apdc_data.lat_atat = CreateLatForATAT(apdc_data.plattice, apdc_data.elements);
     apdc_data.vstr_atat = GetATATXstructures(apdc_data.lat_atat, (uint)apdc_data.max_num_atoms);
     //apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads, false);
@@ -263,13 +265,19 @@ namespace apdc {
     apdc_data.num_atom_cluster = GetNumAtomCluster(apdc_data.vstr_atat);
     apdc_data.conc_cluster = GetConcentrationCluster(apdc_data.rundirpath, apdc_data.vstr_atat.size(), apdc_data.elements.size());
     apdc_data.excess_energy_cluster = GetExcessEnergyCluster(apdc_data.rundirpath, apdc_data.conc_cluster, apdc_data.num_atom_cluster);
-    apdc_data.conc_macro = GetConcentrationMacro(apdc_data.conc_range, apdc_data.conc_npts, apdc_data.elements.size());
     SetCongruentClusters(apdc_data);
-        cerr<<apdc_data.conc_cluster<<endl;return;
-    apdc_data.temp = GetTemperature(apdc_data.temp_range, apdc_data.temp_npts);
-    apdc_data.prob_ideal_cluster = GetProbabilityIdealCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.max_num_atoms);
+    apdc_data.degeneracy_cluster = GetDegeneracyCluster(apdc_data.plattice, apdc_data.vstr_atat, apdc_data.elements, apdc_data.max_num_atoms);
+    
+    return;
+    //vector<string> vinput;
+    //aurostd::file2vectorstring("/home/sd453/tmp/testing/multi",vinput);
+    //apdc_data.degeneracy_cluster = aurostd::vector2xvector(aurostd::vectorstring2vectorint(vinput));
+
+    apdc_data.conc_macro = GetConcentrationMacro(apdc_data.conc_range, apdc_data.conc_npts, apdc_data.elements.size());
+    apdc_data.prob_ideal_cluster = GetProbabilityIdealCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.degeneracy_cluster, apdc_data.max_num_atoms);
     CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_ideal_cluster);
     return;
+    apdc_data.temp = GetTemperature(apdc_data.temp_range, apdc_data.temp_npts);
     apdc_data.prob_cluster = GetProbabilityCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.excess_energy_cluster, apdc_data.prob_ideal_cluster, apdc_data.temp, apdc_data.max_num_atoms);
   }
 }
@@ -322,16 +330,16 @@ namespace apdc {
 // ***************************************************************************
 // P_j(X) = g_j*(X1^N1_j)*(X2^N2_j)*...(X(K)^N(K)_j)
 namespace apdc {
-  xmatrix<double> GetProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const int max_num_atoms) {
+  xmatrix<double> GetProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     LDEBUG=TRUE;
     int ncl = conc_cluster.rows, nx = conc_macro.rows, nelem = conc_macro.cols;
     xmatrix<double> prob_ideal_cluster(nx, ncl);
     for (int i = 1; i <= nx; i++) {
       for (int j = 1; j <= ncl; j++) {
-        prob_ideal_cluster(i, j) = aurostd::factorial(max_num_atoms);
+        prob_ideal_cluster(i, j) = (double)degeneracy_cluster(j);
         for (int k = 1; k <= nelem; k++) {
-          prob_ideal_cluster(i, j) *= std::pow(conc_macro(i, k), conc_cluster(j, k) * max_num_atoms) / aurostd::factorial(conc_cluster(j, k) * max_num_atoms);
+          prob_ideal_cluster(i, j) *= std::pow(conc_macro(i, k), conc_cluster(j, k) * max_num_atoms);
         }
       }
       prob_ideal_cluster.setmat(prob_ideal_cluster.getmat(i, i, 1, ncl) / aurostd::sum(prob_ideal_cluster.getmat(i, i, 1, ncl)), i, 1); // normalize sum to 1
@@ -390,14 +398,17 @@ namespace apdc {
       if (!(apdc_data.max_num_atoms % apdc_data.num_atom_cluster(i))) {indx_cluster.push_back(i);}
     }
     int ncl = indx_cluster.size(), nelem = apdc_data.elements.size();
+    vector<xstructure> _vstr_atat(ncl);
     xvector<int> v1(ncl);
     xvector<double> v2(ncl);
     xmatrix<double> m1(ncl, nelem);
     for (int i = 0; i < ncl; i++) {
+      _vstr_atat[i] = apdc_data.vstr_atat[indx_cluster[i] - 1];
       m1.setmat(apdc_data.conc_cluster.getmat(indx_cluster[i], indx_cluster[i], 1, nelem), i + 1, 1);
       v1(i + 1) = apdc_data.num_atom_cluster(indx_cluster[i]);
       v2(i + 1) = apdc_data.excess_energy_cluster(indx_cluster[i]);
     }
+    apdc_data.vstr_atat = _vstr_atat;
     apdc_data.conc_cluster = m1;
     apdc_data.num_atom_cluster = v1;
     apdc_data.excess_energy_cluster = v2;
@@ -417,6 +428,110 @@ namespace apdc {
       num_atom_cluster(i) = natom;
     }
     return num_atom_cluster;
+  }
+}
+
+// ***************************************************************************
+// apdc::GetDegeneracyCluster
+// ***************************************************************************
+namespace apdc {
+  xvector<int> GetDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms) {
+    vector<int> degeneracy_cluster;
+    xstructure str_plat, str;
+    deque<_atom> atoms;
+    _atom atom;
+    xmatrix<double> lattice(3,3);
+    // define primitive parent lattice and atom atoms
+    if (plattice == "fcc") {
+      lattice(1, 1) = 0.0; lattice(1, 2) = 0.5; lattice(1, 3) = 0.5;
+      lattice(2, 1) = 0.5; lattice(2, 2) = 0.0; lattice(2, 3) = 0.5;
+      lattice(3, 1) = 0.5; lattice(3, 2) = 0.5; lattice(3, 3) = 0.0;
+      str_plat.lattice = lattice;
+      atom.clear();
+      atom.fpos(1) = 0.0; atom.fpos(2) = 0.0; atom.fpos(3) = 0.0;
+      atom.cpos = str_plat.f2c * atom.fpos;
+      atoms.push_back(atom);
+    }
+    else if (plattice == "bcc") {
+      lattice(1, 1) = -0.5; lattice(1, 2) = 0.5; lattice(1, 3) = 0.5;
+      lattice(2, 1) = 0.5; lattice(2, 2) = -0.5; lattice(2, 3) = 0.5;
+      lattice(3, 1) = 0.5; lattice(3, 2) = 0.5; lattice(3, 3) = -0.5;
+      str_plat.lattice = lattice;
+      atom.clear();
+      atom.fpos(1) = 0.0; atom.fpos(2) = 0.0; atom.fpos(3) = 0.0;
+      atom.cpos = str_plat.f2c * atom.fpos;
+      atoms.push_back(atom);
+    }
+    else if (plattice == "hcp") {
+      double sqrt3 = std::sqrt(3.0), sqrt8 = std::sqrt(8.0);
+      lattice(1, 1) = 1.0; lattice(1, 2) = 0.0; lattice(1, 3) = 0.0;
+      lattice(2, 1) = -0.5; lattice(2, 2) = 0.5 * sqrt3; lattice(2, 3) = 0.0;
+      lattice(3, 1) = 0.0; lattice(3, 2) = 0.0; lattice(3, 3) = sqrt8 / sqrt3;
+      str_plat.lattice = lattice;
+      atom.clear();
+      atom.fpos(1) = 0.0; atom.fpos(2) = 0.0; atom.fpos(3) = 0.0;
+      atom.cpos = str_plat.f2c * atom.fpos;
+      atoms.push_back(atom);
+      atom.clear();
+      atom.fpos(1) = 2.0 / 3.0; atom.fpos(2) = 1.0 / 3.0; atom.fpos(3) = 0.5;
+      atom.cpos = str_plat.f2c * atom.fpos;
+      atoms.push_back(atom);
+    }
+    uint natoms = atoms.size();
+    for (uint i = 0; i < natoms; i++) {str_plat.AddAtom(atoms[i]);}
+    str_plat.DecorateWithElements();
+    str_plat.iomode = IOVASP_POSCAR;
+    str_plat.partial_occupation_HNF = max_num_atoms;
+    str_plat.partial_occupation_flag = true;
+    str_plat.neg_scale_second = true;
+    // enumerate unique sublattices
+    bool quiet = XHOST.QUIET;
+    XHOST.QUIET = true;
+    pocc::POccCalculator pcalc(str_plat);
+    pcalc.calculateHNF();
+    pcalc.getTotalPermutationsCount();
+    pcalc.calculate();
+    vector<xstructure> vstr_sub = pcalc.getUniqueDerivativeStructures();
+    XHOST.QUIET = quiet;
+    // enumerate all indicies
+    vector<vector<int>> all_indicies;
+    aurostd::xcombos xc(elements.size(), max_num_atoms, 'E', true);
+    while (xc.increment()) {all_indicies.push_back(xc.getCombo());}
+    // enumerate all superlattices
+    vector<xstructure> vstr_sup;
+    uint itype;
+    for (uint i = 0; i < vstr_sub.size(); i++) {
+      lattice = vstr_sub[i].lattice;
+      for (uint j = 0; j < all_indicies.size(); j++) {
+        str.clear();
+        atoms.clear();
+        for (uint k = 0; k < vstr_sub[i].atoms.size(); k++) {
+          atom.clear();
+          atom.name = atom.cleanname = elements[all_indicies[j][k]];
+          atom.cpos = vstr_sub[i].atoms[k].cpos;
+          atom.fpos = vstr_sub[i].c2f * atom.cpos;
+          atom.name_is_given = TRUE;
+          atoms.push_back(atom);
+        }  
+        std::stable_sort(atoms.begin(), atoms.end(), sortAtomsNames);
+        itype = 0;
+        atoms[0].type = itype;
+        for (uint k = 1; k < atoms.size(); k++) {
+          if (atoms[k].name != atoms[k - 1].name) {itype++;}
+          atoms[k].type = itype;
+        }
+        str.scale = 1.0;
+        str.neg_scale = false;
+        str.lattice = lattice;
+        str.AddAtom(atoms);
+        vstr_sup.push_back(str);
+      }
+    }
+    // find degenerate structures
+
+    return aurostd::vector2xvector(degeneracy_cluster);
+    
+
   }
 }
 
@@ -720,8 +835,6 @@ namespace apdc {
     return mapstr;
   }
 }
-
-
 
 
 
