@@ -259,19 +259,16 @@ namespace apdc {
     //apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads, false);
     apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads);
     // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
-    apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, apdc_data.aflow_max_num_atoms), apdc_data.vstr_aflow, apdc_data.num_threads);
+    apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, apdc_data.aflow_max_num_atoms), apdc_data.vstr_aflow, apdc_data.num_threads, apdc_data.rundirpath);
     GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.lat_atat, apdc_data.vstr_aflow, apdc_data.vstr_atat, apdc_data.mapstr);
     RunATAT(apdc_data.workdirpath, apdc_data.rundirpath, apdc_data.min_sleep);
     apdc_data.num_atom_cluster = GetNumAtomCluster(apdc_data.vstr_atat);
     apdc_data.conc_cluster = GetConcentrationCluster(apdc_data.rundirpath, apdc_data.vstr_atat.size(), apdc_data.elements.size());
     apdc_data.excess_energy_cluster = GetExcessEnergyCluster(apdc_data.rundirpath, apdc_data.conc_cluster, apdc_data.num_atom_cluster);
     SetCongruentClusters(apdc_data);
-    apdc_data.degeneracy_cluster = GetDegeneracyCluster(apdc_data.plattice, apdc_data.vstr_atat, apdc_data.elements, apdc_data.max_num_atoms);
+    apdc_data.degeneracy_cluster = GetDegeneracyCluster(apdc_data.plattice, apdc_data.vstr_atat, apdc_data.elements, apdc_data.max_num_atoms, apdc_data.rundirpath);
     
     return;
-    //vector<string> vinput;
-    //aurostd::file2vectorstring("/home/sd453/tmp/testing/multi",vinput);
-    //apdc_data.degeneracy_cluster = aurostd::vector2xvector(aurostd::vectorstring2vectorint(vinput));
 
     apdc_data.conc_macro = GetConcentrationMacro(apdc_data.conc_range, apdc_data.conc_npts, apdc_data.elements.size());
     apdc_data.prob_ideal_cluster = GetProbabilityIdealCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.degeneracy_cluster, apdc_data.max_num_atoms);
@@ -395,7 +392,7 @@ namespace apdc {
   void SetCongruentClusters(_apdc_data& apdc_data) {
     vector<int> indx_cluster;
     for (int i = 1; i <= apdc_data.num_atom_cluster.rows; i++) {
-      if (!(apdc_data.max_num_atoms % apdc_data.num_atom_cluster(i))) {indx_cluster.push_back(i);}
+      if (!(apdc_data.max_num_atoms % apdc_data.num_atom_cluster(i))) {indx_cluster.push_back(i);cerr<<"I="<<i-1<<"|"<<indx_cluster.size()-1<<endl<<apdc_data.vstr_atat[i-1]<<endl;}
     }
     int ncl = indx_cluster.size(), nelem = apdc_data.elements.size();
     vector<xstructure> _vstr_atat(ncl);
@@ -435,8 +432,18 @@ namespace apdc {
 // apdc::GetDegeneracyCluster
 // ***************************************************************************
 namespace apdc {
-  xvector<int> GetDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms) {
-    vector<int> degeneracy_cluster;
+  xvector<int> GetDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const string& rundirpath) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string function_name = XPID + "GetDegeneracyCluster():";
+    string filepath = "";
+    if (!rundirpath.empty()) {
+      vector<string> tokens;
+      aurostd::string2tokens(rundirpath, tokens, "/");
+      filepath = "/xstr_degen.dat";
+      for (int i = tokens.size() - 2; i >= 0; i--) {filepath = "/" + tokens[i] + filepath;}
+      if (aurostd::file2vectorstring(filepath, tokens)) {return aurostd::vector2xvector(aurostd::vectorstring2vectorint(tokens));}
+    }
+    xvector<int> degeneracy_cluster(vstr.size());
     xstructure str_plat, str;
     deque<_atom> atoms;
     _atom atom;
@@ -484,32 +491,32 @@ namespace apdc {
     str_plat.partial_occupation_HNF = max_num_atoms;
     str_plat.partial_occupation_flag = true;
     str_plat.neg_scale_second = true;
-    // enumerate unique sublattices
+    // enumerate unique superlattices
     bool quiet = XHOST.QUIET;
     XHOST.QUIET = true;
     pocc::POccCalculator pcalc(str_plat);
     pcalc.calculateHNF();
     pcalc.getTotalPermutationsCount();
     pcalc.calculate();
-    vector<xstructure> vstr_sub = pcalc.getUniqueDerivativeStructures();
-    XHOST.QUIET = quiet;
+    vector<xstructure> vstr_sup = pcalc.getUniqueDerivativeStructures();
+    if (LDEBUG) {cerr << "Number of unique superlattices (HNF) = " << vstr_sup.size() << endl;} 
     // enumerate all indicies
     vector<vector<int>> all_indicies;
     aurostd::xcombos xc(elements.size(), max_num_atoms, 'E', true);
     while (xc.increment()) {all_indicies.push_back(xc.getCombo());}
-    // enumerate all superlattices
-    vector<xstructure> vstr_sup;
+    // enumerate all derivative structures
+    vector<xstructure> vstr_ds;
     uint itype;
-    for (uint i = 0; i < vstr_sub.size(); i++) {
-      lattice = vstr_sub[i].lattice;
+    for (uint i = 0; i < vstr_sup.size(); i++) {
+      lattice = vstr_sup[i].lattice;
       for (uint j = 0; j < all_indicies.size(); j++) {
         str.clear();
         atoms.clear();
-        for (uint k = 0; k < vstr_sub[i].atoms.size(); k++) {
+        for (uint k = 0; k < vstr_sup[i].atoms.size(); k++) {
           atom.clear();
           atom.name = atom.cleanname = elements[all_indicies[j][k]];
-          atom.cpos = vstr_sub[i].atoms[k].cpos;
-          atom.fpos = vstr_sub[i].c2f * atom.cpos;
+          atom.cpos = vstr_sup[i].atoms[k].cpos;
+          atom.fpos = vstr_sup[i].c2f * atom.cpos;
           atom.name_is_given = TRUE;
           atoms.push_back(atom);
         }  
@@ -524,14 +531,38 @@ namespace apdc {
         str.neg_scale = false;
         str.lattice = lattice;
         str.AddAtom(atoms);
-        vstr_sup.push_back(str);
+        vstr_ds.push_back(str);
       }
     }
+    if (LDEBUG) {cerr << "Number of total derivative structures = " << vstr_ds.size() << endl;} 
     // find degenerate structures
+    vstr_ds.insert(vstr_ds.begin(), vstr.begin(), vstr.end()); // concatenate xstructures, subtract by 1 in the end
+    XtalFinderCalculator xtal_calc;
+    vector<vector<uint>> dsg = xtal_calc.groupSimilarXstructures(vstr_ds);
+    XHOST.QUIET = quiet;
 
-    return aurostd::vector2xvector(degeneracy_cluster);
-    
+    for (uint i=0;i<dsg.size();i++){
+      for (uint j=0;j<dsg[i].size();j++){cerr<<dsg[i][j]<<" ";}
+      cerr<<"| "<<dsg[i].size()-1<<endl;
+    }
+    cerr<<"DONE: "<<dsg.size()<<"|"<<degeneracy_cluster.rows<<endl;
 
+    for (uint i = 0; i < dsg.size(); i++) {
+      std::stable_sort(dsg[i].begin(), dsg[i].end()); // first index is the cluster index
+      if (dsg[i][0] < (uint)degeneracy_cluster.rows) {degeneracy_cluster(dsg[i][0] + 1) = dsg[i].size() - 1;}
+    }
+
+    cerr<<"CHECK: "<<aurostd::sum(degeneracy_cluster)<<"|"<<vstr_sup.size() * std::pow(elements.size(), max_num_atoms)<<endl;
+
+    if (!aurostd::isequal((int)dsg.size(), degeneracy_cluster.rows)) {
+      string message = "Number of unique derivative structures does not match input";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+    }
+    else if (!aurostd::isequal(aurostd::sum(degeneracy_cluster), (int)vstr_sup.size() * (int)std::pow(elements.size(), max_num_atoms))) {
+      string message = "Degeneracies do not satisfy the sum rule";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+    }
+    return degeneracy_cluster;
   }
 }
 
@@ -667,7 +698,7 @@ namespace apdc {
 // apdc::GetAFLOWXstructures
 // ***************************************************************************
 namespace apdc {
-  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_proc, bool use_sg) {
+  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_threads, bool use_sg) {
     vector<xstructure> vstr;
     vector<string> vstrlabel;
     string aflowlib, aflowurl;
@@ -717,7 +748,7 @@ namespace apdc {
           if (use_sg && (entry.spacegroup_orig == entry.spacegroup_relax)) {
             vstr.push_back(entry.vstr[0]);
           }
-          else if (compare::structuresMatch(entry.vstr[0], entry.vstr[entry.vstr.size() - 1], true, num_proc)) {
+          else if (compare::structuresMatch(entry.vstr[0], entry.vstr[entry.vstr.size() - 1], true, num_threads)) {
             vstr.push_back(entry.vstr[0]);
           }
         }
@@ -817,20 +848,33 @@ namespace apdc {
 // apdc::GetMapForXstructures
 // ***************************************************************************
 namespace apdc {
-  vector<int> GetMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_proc) {
+  vector<int> GetMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads, const string& rundirpath) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string filepath = "";
+    if (!rundirpath.empty()) {
+      vector<string> tokens;
+      aurostd::string2tokens(rundirpath, tokens, "/");
+      filepath = "/xstr_map.dat";
+      for (int i = tokens.size() - 2; i >= 0; i--) {filepath = "/" + tokens[i] + filepath;}
+      if (aurostd::file2vectorstring(filepath, tokens)) {return aurostd::vectorstring2vectorint(tokens);}
+    }
     vector<int> mapstr;
     bool match;
     for (uint i = 0; i < vstr1.size(); i++) {
       match = false;
       for (uint j = 0; j < vstr2.size() && !match; j++) {
-        if (compare::structuresMatch(vstr1[i], vstr2[j], true, num_proc)) {
+        if (compare::structuresMatch(vstr1[i], vstr2[j], true, num_threads)) {
           if (LDEBUG) {cerr << "str1 i=" << i << " matched str2 j=" << j << endl << "str1=" << vstr1[i] << endl << "str2=" << vstr2[j] << endl;}
           mapstr.push_back(j); 
           match = true;
         }
       }
       if (!match) {mapstr.push_back(-1);}
+    }
+    if (!filepath.empty()) {
+      stringstream ss;
+      for (uint i = 0; i < mapstr.size(); i++) {ss << mapstr[i] << endl;}
+      aurostd::stringstream2file(ss, filepath);
     }
     return mapstr;
   }
