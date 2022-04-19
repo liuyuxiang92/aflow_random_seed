@@ -361,16 +361,14 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // FLAG: consider magnetic structure in comparison
-    bool magnetic_comparison=false;
+    bool magnetic_comparison= vpflow.flag("COMPARE::MAGNETIC");
     vector<string> magmoms_for_systems;
-    if(vpflow.flag("COMPARE::MAGNETIC")){
-      magnetic_comparison=true;
+    if(magnetic_comparison){
       string magnetic_info=vpflow.getattachedscheme("COMPARE::MAGNETIC");
       aurostd::string2tokens(magnetic_info,magmoms_for_systems,":");
       message << "OPTIONS: Including magnetic moment information in comparisons. Magnetic input detected for " << magmoms_for_systems.size() << " systems.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
-    if(magnetic_comparison){} //CO20200508 - keep it busy
 
     //DX20190425 - added print and screen only flag - START
     // ---------------------------------------------------------------------------
@@ -1098,6 +1096,10 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   if(vpflow.flag("COMPARE2DATABASE::CATALOG")) {
     string catalog = aurostd::toupper(vpflow.getattachedscheme("COMPARE2DATABASE::CATALOG")); //DX20210615 - older versions of aflux require uppercase; safety
     if(catalog != "ALL"){ vmatchbook.push_back("catalog(\'" + catalog + "\')"); }
+    // ME20220419 - Add MUTE operator to reduce response size
+    if (!aurostd::WithinList(property_list, "catalog")) {
+      vmatchbook.back() = "$" + vmatchbook.back();
+    }
     message << "OPTIONS: Specify catalog/library (icsd, lib1, lib2, lib3, ...): " << catalog << " (default=all)" << endl;
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
@@ -1105,11 +1107,22 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   // ---------------------------------------------------------------------------
   // AFLUX matchbook preparations: add number of species and species
   vmatchbook.push_back("nspecies(" + aurostd::utype2string<uint>(structure_containers[0].ntypes) + ")");
-  if(same_species){ vmatchbook.push_back("species(" + aurostd::joinWDelimiter(structure_containers[0].elements,",") + ")"); }
+  // ME20220419 - Add MUTE operator to reduce response size
+  if (!aurostd::WithinList(property_list, "nspecies")) {
+    vmatchbook.back() = "$" + vmatchbook.back();
+  }
+  if(same_species){
+    vmatchbook.push_back("species(" + aurostd::joinWDelimiter(structure_containers[0].elements,",") + ")");
+    // ME20220419 - Add MUTE operator to reduce response size
+    if (!aurostd::WithinList(property_list, "species")) {
+      vmatchbook.back() = "$" + vmatchbook.back();
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // AFLUX matchbook preparations: add space group symmetry
   bool ignore_symmetry = comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY");
+  string sg_matchbook = "";
   if(!ignore_symmetry){
     if(!isSymmetryCalculated(structure_containers[0])){ calculateSymmetries(1); }  //1: one structure -> one processor
 
@@ -1121,13 +1134,25 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
     }
 
     // add space group query to AFLUX matchbook: get entries with compatible space groups, i.e., same or enantiomorph
-    vmatchbook.push_back(aflowlib::getSpaceGroupAFLUXSummons(structure_containers[0].space_group,relaxation_step));
+    sg_matchbook = aflowlib::getSpaceGroupAFLUXSummons(structure_containers[0].space_group,relaxation_step);
+    // ME20220419 - Add MUTE operator to reduce response size
+    vmatchbook.push_back(sg_matchbook);
+    if (!aurostd::WithinList(property_list, sg_matchbook.substr(0, sg_matchbook.find("(")))) {
+      vmatchbook.back() = "$" + vmatchbook.back();
+    }
   }
   else { setSymmetryPlaceholders(); }
 
   // ---------------------------------------------------------------------------
   // AFLUX matchbook preparations: add aurl for entry
   vmatchbook.push_back("aurl");
+  // ME20220419 - Suppress unused default properties
+  if ((sg_matchbook.find("spacegroup_relax") == string::npos) && !aurostd::WithinList(property_list, "spacegroup_relax")) {
+    vmatchbook.push_back("$spacegroup_relax");
+  }
+  if (!aurostd::WithinList(property_list, "Pearson_symbol_relax")) {
+    vmatchbook.push_back("$Pearson_symbol_relax");
+  }
 
   // ---------------------------------------------------------------------------
   // AFLUX matchbook preparations: format AFLUX output
@@ -1433,14 +1458,12 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // FLAG: consider magnetic structure in comparison //DX20191212
-    bool magnetic_comparison=false;
+    bool magnetic_comparison = vpflow.flag("COMPARE::MAGNETIC");
     vector<string> magmoms_for_systems;
-    if(vpflow.flag("COMPARE::MAGNETIC")){
-      magnetic_comparison=true;
+    if(magnetic_comparison){
       message << "OPTIONS: Including magnetic moment information in comparisons.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
-    if(magnetic_comparison){} //CO20200508 - keep it busy
 
     // ---------------------------------------------------------------------------
     // FLAG: property list to extract from database (using AFLUX)
@@ -1487,7 +1510,13 @@ namespace compare {
     string catalog = "";
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::CATALOG")) {
       catalog = aurostd::toupper(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::CATALOG")); //DX20190718 //DX20210615 - older versions of aflux require uppercase; safety
-      if(catalog != "ALL"){ vmatchbook.push_back("catalog(\'" + catalog + "\')"); }
+      if(catalog != "ALL"){
+        vmatchbook.push_back("catalog(\'" + catalog + "\')");
+        // ME20220419 - Add MUTE operator to reduce response size
+        if (!aurostd::WithinList(property_list, "catalog")) {
+          vmatchbook.back() = "$" + vmatchbook.back();
+        }
+      }
       message << "OPTIONS: Specify catalog/library (icsd, lib1, lib2, lib3, ...): " << catalog << " (default=all)" << endl;
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
@@ -1502,6 +1531,10 @@ namespace compare {
       message << "OPTIONS: Getting entries with nspecies=" << arity;
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
       if(arity!=0){ vmatchbook.push_back("nspecies(" + aurostd::utype2string<uint>(arity) + ")"); }
+      // ME20220419 - Add MUTE operator to reduce response size
+      if (!aurostd::WithinList(property_list, "nspecies")) {
+        vmatchbook.back() = "$" + vmatchbook.back();
+      }
     }
 
     // ---------------------------------------------------------------------------
@@ -1543,16 +1576,34 @@ namespace compare {
       }
       if(species.size()!=0){
         vmatchbook.push_back("species(" + aurostd::joinWDelimiter(species,",") + ")");
+        // ME20220419 - Add MUTE operator to reduce response size
+        if (!aurostd::WithinList(property_list, "species")) {
+          vmatchbook.back() = "$" + vmatchbook.back();
+        }
       }
     }
 
     // ---------------------------------------------------------------------------
     // AFLUX matchbook preparations: get space group(s) //DX20200929
-    vmatchbook.push_back(xtal_finder.getSpaceGroupMatchbookFromOptions(vpflow, relaxation_step));
+    string sg_matchbook = xtal_finder.getSpaceGroupMatchbookFromOptions(vpflow, relaxation_step);
+    if (!sg_matchbook.empty()) {
+      vmatchbook.push_back(sg_matchbook);
+      // ME20220419 - Add MUTE operator to reduce response size
+      if (!aurostd::WithinList(property_list, sg_matchbook.substr(0, sg_matchbook.find("(")))) {
+        vmatchbook.back() = "$" + vmatchbook.back();
+      }
+    }
 
     // ---------------------------------------------------------------------------
     // AFLUX matchbook preparations: get aurl for entry
     vmatchbook.push_back("aurl");
+    // ME20220419 - Suppress unused default properties
+    if ((sg_matchbook.find("spacegroup_relax") == string::npos) && !aurostd::WithinList(property_list, "spacegroup_relax")) {
+      vmatchbook.push_back("$spacegroup_relax");
+    }
+    if (!aurostd::WithinList(property_list, "Pearson_symbol_relax")) {
+      vmatchbook.push_back("$Pearson_symbol_relax");
+    }
 
     // ---------------------------------------------------------------------------
     // AFLUX matchbook preparations: format AFLUX output
