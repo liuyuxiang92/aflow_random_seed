@@ -75,7 +75,7 @@ namespace apdc {
   xvector<double> GetTemperature(const xvector<double>& temp_range, const int temp_npts);
   void SetCongruentClusters(_apdc_data& apdc_data);
   xvector<int> GetNumAtomCluster(const vector<xstructure>& vstr);
-  xvector<int> GetDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const string& rundirpath);
+  xvector<int> GetDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const string& rundirpath="");
   xmatrix<double> GetConcentrationCluster(const vector<string>& elements, const vector<xstructure>& vstr);
   xmatrix<double> GetConcentrationCluster(const string& rundirpath, const int nstr, const int nelem);
   xvector<double> GetExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const xvector<int>& natom);
@@ -83,8 +83,8 @@ namespace apdc {
   void GenerateFilesForATAT(const string& rundirpath, const string& lat_atat, const vector<xstructure>& vstr_aflow, const vector<xstructure>& vstr_atat, const vector<int>& mapstr);
   vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_threads, bool use_sg=true);
   string CreateLatForATAT(const string& plattice, const vector<string>& elements);
-  vector<xstructure> GetATATXstructures(const string& lat, const uint max_num_atoms);
-  vector<int> GetMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads, const string& rundirpath);
+  vector<xstructure> GetATATXstructures(const string& lat, const uint max_num_atoms, const string& rundirpath="");
+  vector<int> GetMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads, const string& rundirpath="");
 }
 
 #endif

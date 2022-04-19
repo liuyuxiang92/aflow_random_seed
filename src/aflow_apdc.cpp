@@ -254,14 +254,22 @@ namespace apdc {
 // Binodal construction based on the method developed in Y. Lederer et al., Acta Materialia, 159 (2018)
 namespace apdc {
   void GetBinodal(_apdc_data& apdc_data) {
-    apdc_data.lat_atat = CreateLatForATAT(apdc_data.plattice, apdc_data.elements);
-    apdc_data.vstr_atat = GetATATXstructures(apdc_data.lat_atat, (uint)apdc_data.max_num_atoms);
-    //apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads, false);
-    apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads);
-    // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
-    apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, apdc_data.aflow_max_num_atoms), apdc_data.vstr_aflow, apdc_data.num_threads, apdc_data.rundirpath);
-    GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.lat_atat, apdc_data.vstr_aflow, apdc_data.vstr_atat, apdc_data.mapstr);
-    RunATAT(apdc_data.workdirpath, apdc_data.rundirpath, apdc_data.min_sleep);
+    if (aurostd::FileExist(apdc_data.rundirpath + "/fit.out") && aurostd::FileExist(apdc_data.rundirpath + "/predstr.out")) { // read ATAT data
+      apdc_data.vstr_atat = GetATATXstructures(apdc_data.lat_atat, (uint)apdc_data.max_num_atoms, apdc_data.rundirpath);
+        for(uint i=0;i<apdc_data.vstr_atat.size();i++){cerr<<apdc_data.vstr_atat[i]<<endl;}
+    }
+    else { // run ATAT
+      apdc_data.lat_atat = CreateLatForATAT(apdc_data.plattice, apdc_data.elements);
+      apdc_data.vstr_atat = GetATATXstructures(apdc_data.lat_atat, (uint)apdc_data.max_num_atoms);
+      //apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads, false);
+      apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads);
+      // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
+      apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, apdc_data.aflow_max_num_atoms), apdc_data.vstr_aflow, apdc_data.num_threads, apdc_data.rundirpath);
+      GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.lat_atat, apdc_data.vstr_aflow, apdc_data.vstr_atat, apdc_data.mapstr);
+      RunATAT(apdc_data.workdirpath, apdc_data.rundirpath, apdc_data.min_sleep);
+        for(uint i=0;i<apdc_data.vstr_atat.size();i++){cerr<<apdc_data.vstr_atat[i]<<endl;}
+    }
+    return;
     apdc_data.num_atom_cluster = GetNumAtomCluster(apdc_data.vstr_atat);
     apdc_data.conc_cluster = GetConcentrationCluster(apdc_data.rundirpath, apdc_data.vstr_atat.size(), apdc_data.elements.size());
     apdc_data.excess_energy_cluster = GetExcessEnergyCluster(apdc_data.rundirpath, apdc_data.conc_cluster, apdc_data.num_atom_cluster);
@@ -392,7 +400,7 @@ namespace apdc {
   void SetCongruentClusters(_apdc_data& apdc_data) {
     vector<int> indx_cluster;
     for (int i = 1; i <= apdc_data.num_atom_cluster.rows; i++) {
-      if (!(apdc_data.max_num_atoms % apdc_data.num_atom_cluster(i))) {indx_cluster.push_back(i);cerr<<"I="<<i-1<<"|"<<indx_cluster.size()-1<<endl<<apdc_data.vstr_atat[i-1]<<endl;}
+      if (!(apdc_data.max_num_atoms % apdc_data.num_atom_cluster(i))) {indx_cluster.push_back(i);}
     }
     int ncl = indx_cluster.size(), nelem = apdc_data.elements.size();
     vector<xstructure> _vstr_atat(ncl);
@@ -539,28 +547,54 @@ namespace apdc {
     vstr_ds.insert(vstr_ds.begin(), vstr.begin(), vstr.end()); // concatenate xstructures, subtract by 1 in the end
     XtalFinderCalculator xtal_calc;
     vector<vector<uint>> dsg = xtal_calc.groupSimilarXstructures(vstr_ds);
-    XHOST.QUIET = quiet;
 
     for (uint i=0;i<dsg.size();i++){
       for (uint j=0;j<dsg[i].size();j++){cerr<<dsg[i][j]<<" ";}
       cerr<<"| "<<dsg[i].size()-1<<endl;
     }
-    cerr<<"DONE: "<<dsg.size()<<"|"<<degeneracy_cluster.rows<<endl;
+    cerr<<"DONE1"<<endl;
 
+    vector<xstructure> vstr_ds2 = vstr;
     for (uint i = 0; i < dsg.size(); i++) {
-      std::stable_sort(dsg[i].begin(), dsg[i].end()); // first index is the cluster index
-      if (dsg[i][0] < (uint)degeneracy_cluster.rows) {degeneracy_cluster(dsg[i][0] + 1) = dsg[i].size() - 1;}
+      std::sort(dsg[i].begin(), dsg[i].end()); // first index is the cluster index
+      if (dsg[i][0] < (uint)degeneracy_cluster.rows) {
+       degeneracy_cluster(dsg[i][0] + 1) = dsg[i].size() - 1;
+      }
+      else {
+        for (uint j = 0; j < dsg[i].size(); j++) {vstr_ds2.push_back(vstr_ds[dsg[i][j]]);}
+      }
+    }
+
+    cerr << "Number of ungrouped derivative structures = " << vstr_ds2.size() - vstr.size() << endl;
+
+    if (vstr_ds2.size() > vstr.size()) { // rerun groupSimilarXstructures for edge cases
+      if (LDEBUG) {cerr << "Number of ungrouped derivative structures = " << vstr_ds2.size() - vstr.size() << endl;} 
+      xtal_calc.clear();
+      vector<vector<uint>> dsg2 = xtal_calc.groupSimilarXstructures(vstr_ds2);
+      for (uint i = 0; i < dsg2.size(); i++) {
+        std::sort(dsg2[i].begin(), dsg2[i].end()); // first index is the cluster index
+        if (dsg2[i][0] < (uint)degeneracy_cluster.rows) {degeneracy_cluster(dsg2[i][0] + 1) += dsg2[i].size() - 1;}
+      }
+
+    for (uint i=0;i<dsg2.size();i++){
+      for (uint j=0;j<dsg2[i].size();j++){cerr<<dsg2[i][j]<<" ";}
+      cerr<<"| "<<dsg2[i].size()-1<<endl;
+    }
+    cerr<<"DONE2"<<endl;
+
     }
 
     cerr<<"CHECK: "<<aurostd::sum(degeneracy_cluster)<<"|"<<vstr_sup.size() * std::pow(elements.size(), max_num_atoms)<<endl;
 
-    if (!aurostd::isequal((int)dsg.size(), degeneracy_cluster.rows)) {
-      string message = "Number of unique derivative structures does not match input";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
-    }
-    else if (!aurostd::isequal(aurostd::sum(degeneracy_cluster), (int)vstr_sup.size() * (int)std::pow(elements.size(), max_num_atoms))) {
+    XHOST.QUIET = quiet;
+    if (!aurostd::isequal(aurostd::sum(degeneracy_cluster), (int)vstr_sup.size() * (int)std::pow(elements.size(), max_num_atoms))) {
       string message = "Degeneracies do not satisfy the sum rule";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+    }
+    if (!filepath.empty()) {
+      stringstream ss;
+      for (int i = 1; i <= degeneracy_cluster.rows; i++) {ss << degeneracy_cluster(i) << endl;}
+      aurostd::stringstream2file(ss, filepath);
     }
     return degeneracy_cluster;
   }
@@ -813,10 +847,27 @@ namespace apdc {
 // apdc::GetATATXstructures
 // ***************************************************************************
 namespace apdc {
-  vector<xstructure> GetATATXstructures(const string& lat, const uint max_num_atoms) {
+  vector<xstructure> GetATATXstructures(const string& lat, const uint max_num_atoms, const string& rundirpath) {
     string function_name = XPID + "GetATATXstructures():";
     vector<xstructure> vstr;
     stringstream oss;
+    if (!rundirpath.empty()) {
+      vector<string> files;
+      vector<xstructure> vstr_tmp;
+      vector<uint> index;
+      aurostd::DirectoryLS(rundirpath, files);
+      for (uint i = 0; i < files.size(); i++) {
+        if (aurostd::FileExist(rundirpath + "/" + files[i] + "/str.out")) {
+          aurostd::file2stringstream(rundirpath + "/" + files[i] + "/str.out", oss);
+          vstr_tmp.push_back(xstructure(oss, IOATAT_STR));
+          index.push_back(aurostd::string2utype<uint>(files[i]));
+          aurostd::StringstreamClean(oss);
+        }
+      }
+      vstr.resize(index.size());
+      for (uint i = 0; i < index.size(); i++) {vstr[index[i]] = vstr_tmp[i];}
+      return vstr;
+    }
     vector<string> vinput, tokens;
     string tmpfile = aurostd::TmpStrCreate();
     aurostd::string2file(lat, tmpfile);

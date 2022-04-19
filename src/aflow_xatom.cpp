@@ -6733,13 +6733,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // assign types
     uint itype = 0;
     atoms[0].type = itype;
-    for (uint i = 1;i < atoms.size(); i++) {
+    for (uint i = 1; i < atoms.size(); i++) {
       if (atoms[i].name != atoms[i - 1].name) {itype++;}
       atoms[i].type = itype;
     }
 
     // add atoms
-    for (uint i=0; i < atoms.size(); i++) {
+    for (uint i = 0; i < atoms.size(); i++) {
       a.AddAtom(atoms[i]);
       a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
     }
