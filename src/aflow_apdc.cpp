@@ -256,7 +256,6 @@ namespace apdc {
   void GetBinodal(_apdc_data& apdc_data) {
     if (aurostd::FileExist(apdc_data.rundirpath + "/fit.out") && aurostd::FileExist(apdc_data.rundirpath + "/predstr.out")) { // read ATAT data
       apdc_data.vstr_atat = GetATATXstructures(apdc_data.lat_atat, (uint)apdc_data.max_num_atoms, apdc_data.rundirpath);
-        for(uint i=0;i<apdc_data.vstr_atat.size();i++){cerr<<apdc_data.vstr_atat[i]<<endl;}
     }
     else { // run ATAT
       apdc_data.lat_atat = CreateLatForATAT(apdc_data.plattice, apdc_data.elements);
@@ -267,14 +266,12 @@ namespace apdc {
       apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, apdc_data.aflow_max_num_atoms), apdc_data.vstr_aflow, apdc_data.num_threads, apdc_data.rundirpath);
       GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.lat_atat, apdc_data.vstr_aflow, apdc_data.vstr_atat, apdc_data.mapstr);
       RunATAT(apdc_data.workdirpath, apdc_data.rundirpath, apdc_data.min_sleep);
-        for(uint i=0;i<apdc_data.vstr_atat.size();i++){cerr<<apdc_data.vstr_atat[i]<<endl;}
     }
-    return;
     apdc_data.num_atom_cluster = GetNumAtomCluster(apdc_data.vstr_atat);
     apdc_data.conc_cluster = GetConcentrationCluster(apdc_data.rundirpath, apdc_data.vstr_atat.size(), apdc_data.elements.size());
     apdc_data.excess_energy_cluster = GetExcessEnergyCluster(apdc_data.rundirpath, apdc_data.conc_cluster, apdc_data.num_atom_cluster);
     SetCongruentClusters(apdc_data);
-    apdc_data.degeneracy_cluster = GetDegeneracyCluster(apdc_data.plattice, apdc_data.vstr_atat, apdc_data.elements, apdc_data.max_num_atoms, apdc_data.rundirpath);
+    apdc_data.degeneracy_cluster = GetDegeneracyCluster(apdc_data.plattice, apdc_data.vstr_atat, apdc_data.elements, apdc_data.max_num_atoms, true, apdc_data.rundirpath);
     
     return;
 
@@ -440,7 +437,7 @@ namespace apdc {
 // apdc::GetDegeneracyCluster
 // ***************************************************************************
 namespace apdc {
-  xvector<int> GetDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const string& rundirpath) {
+  xvector<int> GetDegeneracyCluster(const string& plattice, const vector<xstructure>& _vstr, const vector<string>& elements, const int max_num_atoms, const bool shuffle, const string& rundirpath) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "GetDegeneracyCluster():";
     string filepath = "";
@@ -450,6 +447,13 @@ namespace apdc {
       filepath = "/xstr_degen.dat";
       for (int i = tokens.size() - 2; i >= 0; i--) {filepath = "/" + tokens[i] + filepath;}
       if (aurostd::file2vectorstring(filepath, tokens)) {return aurostd::vector2xvector(aurostd::vectorstring2vectorint(tokens));}
+    }
+    vector<xstructure> vstr = _vstr;
+    vector<uint> index;
+    for (uint i = 0; i < vstr.size(); i++) {index.push_back(i);}
+    if (shuffle) { // introduce randomness into groupings
+      aurostd::random_shuffle(index);
+      for (uint i = 0; i < index.size(); i++) {vstr[i] = _vstr[index[i]];}
     }
     xvector<int> degeneracy_cluster(vstr.size());
     xstructure str_plat, str;
@@ -547,49 +551,19 @@ namespace apdc {
     vstr_ds.insert(vstr_ds.begin(), vstr.begin(), vstr.end()); // concatenate xstructures, subtract by 1 in the end
     XtalFinderCalculator xtal_calc;
     vector<vector<uint>> dsg = xtal_calc.groupSimilarXstructures(vstr_ds);
-
-    for (uint i=0;i<dsg.size();i++){
-      for (uint j=0;j<dsg[i].size();j++){cerr<<dsg[i][j]<<" ";}
-      cerr<<"| "<<dsg[i].size()-1<<endl;
-    }
-    cerr<<"DONE1"<<endl;
-
-    vector<xstructure> vstr_ds2 = vstr;
     for (uint i = 0; i < dsg.size(); i++) {
       std::sort(dsg[i].begin(), dsg[i].end()); // first index is the cluster index
-      if (dsg[i][0] < (uint)degeneracy_cluster.rows) {
-       degeneracy_cluster(dsg[i][0] + 1) = dsg[i].size() - 1;
-      }
-      else {
-        for (uint j = 0; j < dsg[i].size(); j++) {vstr_ds2.push_back(vstr_ds[dsg[i][j]]);}
-      }
+      if (dsg[i][0] < (uint)degeneracy_cluster.rows) {degeneracy_cluster(dsg[i][0] + 1) = dsg[i].size() - 1;}
     }
-
-    cerr << "Number of ungrouped derivative structures = " << vstr_ds2.size() - vstr.size() << endl;
-
-    if (vstr_ds2.size() > vstr.size()) { // rerun groupSimilarXstructures for edge cases
-      if (LDEBUG) {cerr << "Number of ungrouped derivative structures = " << vstr_ds2.size() - vstr.size() << endl;} 
-      xtal_calc.clear();
-      vector<vector<uint>> dsg2 = xtal_calc.groupSimilarXstructures(vstr_ds2);
-      for (uint i = 0; i < dsg2.size(); i++) {
-        std::sort(dsg2[i].begin(), dsg2[i].end()); // first index is the cluster index
-        if (dsg2[i][0] < (uint)degeneracy_cluster.rows) {degeneracy_cluster(dsg2[i][0] + 1) += dsg2[i].size() - 1;}
-      }
-
-    for (uint i=0;i<dsg2.size();i++){
-      for (uint j=0;j<dsg2[i].size();j++){cerr<<dsg2[i][j]<<" ";}
-      cerr<<"| "<<dsg2[i].size()-1<<endl;
-    }
-    cerr<<"DONE2"<<endl;
-
-    }
-
-    cerr<<"CHECK: "<<aurostd::sum(degeneracy_cluster)<<"|"<<vstr_sup.size() * std::pow(elements.size(), max_num_atoms)<<endl;
-
     XHOST.QUIET = quiet;
-    if (!aurostd::isequal(aurostd::sum(degeneracy_cluster), (int)vstr_sup.size() * (int)std::pow(elements.size(), max_num_atoms))) {
-      string message = "Degeneracies do not satisfy the sum rule";
+    int sum_calculated = aurostd::sum(degeneracy_cluster), sum_accepted = (int)vstr_sup.size() * (int)std::pow(elements.size(), max_num_atoms);
+    if (!aurostd::isequal(sum_calculated, sum_accepted)) {
+      string message = "Degeneracies do not satisfy the sum rule, the sum is " + aurostd::utype2string<int>(sum_calculated) + " but should be " + aurostd::utype2string<int>(sum_accepted);
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+    }
+    if (shuffle) { // place in correct order
+      xvector<int> _degeneracy_cluster = degeneracy_cluster;
+      for (uint i = 0; i < index.size(); i++) {degeneracy_cluster(index[i] + 1) = _degeneracy_cluster(i + 1);}
     }
     if (!filepath.empty()) {
       stringstream ss;

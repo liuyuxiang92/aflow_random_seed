@@ -75,7 +75,7 @@ namespace apdc {
   xvector<double> GetTemperature(const xvector<double>& temp_range, const int temp_npts);
   void SetCongruentClusters(_apdc_data& apdc_data);
   xvector<int> GetNumAtomCluster(const vector<xstructure>& vstr);
-  xvector<int> GetDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const string& rundirpath="");
+  xvector<int> GetDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const bool shuffle, const string& rundirpath="");
   xmatrix<double> GetConcentrationCluster(const vector<string>& elements, const vector<xstructure>& vstr);
   xmatrix<double> GetConcentrationCluster(const string& rundirpath, const int nstr, const int nelem);
   xvector<double> GetExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const xvector<int>& natom);
