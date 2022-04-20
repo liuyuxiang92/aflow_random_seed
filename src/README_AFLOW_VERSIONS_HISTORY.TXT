@@ -23,6 +23,7 @@
         -- removed "kill_vasp_all" and implemented a targeted kill vasp command (SD)
         -- added KBIN::BIN2VASPVersion (SD)
         -- fixed KBIN::VASPVersionString2Double, aurostd::substring2bool, aurostd::kvpairfound (SD)
+        -- imporved AFLUX calls for --compare_database_entries and --compare2database (ME)
 3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)
