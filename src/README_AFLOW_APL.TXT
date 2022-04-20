@@ -843,12 +843,10 @@ The cut-off radius described above can be defined in two ways:
 
         [AFLOW_AAPL]CUT_RAD=5.0
 
-    This is also the default value.
-
   * Define the number of coordination shells that should be included in the interaction volume.
     This can be achieved via the CUT_SHELL parameter.
 
-        [AFLOW_AAPL]CUT_SHELL=4
+        [AFLOW_AAPL]CUT_SHELL=6
 
     This is also the default value. The cut-off radius is then determined automatically.
 
@@ -911,9 +909,9 @@ The default is BTE=FULL.
 
 The BTE gets solved along a q-point grid which can be defined using THERMALGRID:
 
-    [AFLOW_AAPL]THERMALGRID=q1Xq2Xq3
+    [AFLOW_AAPL]THERMALGRID=q1xq2xq3
 
-Where q1, q2, and q3 are the number of q-points along each dimension. The default is 26X26X26.
+Where q1, q2, and q3 are the number of q-points along each dimension. The default is 21x21x21.
 
 There are various factors which can influence the phonon scattering rates besides anharmonic phonon
 processes. Two mechanisms that are implemented in AAPL: isotope scattering and grain boundary
