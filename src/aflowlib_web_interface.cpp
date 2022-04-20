@@ -1044,9 +1044,6 @@ namespace aflowlib {
   }
 
 
-
-
-
   // file2aflowlib
   uint _aflowlib_entry::file2aflowlib(const string& file,ostream& oss) {
     if(!aurostd::FileExist(file)) {cerr << "ERROR - _aflowlib_entry::file2aflowlib: " << DEFAULT_FILE_AFLOWLIB_ENTRY_OUT << " not found =" << file << endl;return 0;}
@@ -1079,7 +1076,7 @@ namespace aflowlib {
   }
 
   // Load variant for EntryLoader //HE20220404
-  uint _aflowlib_entry::Load(const vector<uint64_t> & key_hash, const vector<string> & content, ostream& oss) {
+  uint _aflowlib_entry::Load(const vector<uint64_t> & key_hash, const vector<string> & content) {
     clear();
     for (size_t member_index=0; member_index<content.size(); member_index++)  {
       std::string single_content = content[member_index];
@@ -4863,11 +4860,7 @@ namespace aflowlib {
     string summons = aurostd::joinWDelimiter(matchbook,",");
     return AFLUXCall(summons);
   }
-  string AFLUXCall(const string& _summons){
 
-}
-
-namespace aflowlib {
   string AFLUXCall(const string& summons){
     // Performs AFLUX call based on summons input
     // switched to aurostd::xhttp //HE20220407
@@ -4929,7 +4922,7 @@ namespace aflowlib {  //CO20201220
   // mergeEntries()
   // ***************************************************************************
   //simple helper function for loading multiple libraries together, will take
-  //combinations of nested vectors and convert them to other nested vectors
+  //combinations of nested vectors and convert them to other nested vectors.
   //naries is output, entries_new is input
   //these assume vector<aflowlib::_aflowlib_entry> entries_new is all of the same
   //type, e.g., binaries of MnPd (e.g., MnPd2, Mn2Pd, etc., similar structure to LIBS)
@@ -4937,16 +4930,16 @@ namespace aflowlib {  //CO20201220
   //outer most - unary, binary, etc.
   //next outer - species match, Mn, Pd, MnPd, etc.
   //inner most - entries
-  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new) {
+  bool mergeEntries(vector<vector<vector<_aflowlib_entry> > >& naries,const vector<vector<vector<_aflowlib_entry> > >& entries_new) {
     for (uint i = 0; i < entries_new.size(); i++) {
       if(!mergeEntries(naries, entries_new[i], true)) { return false; }  //structured data
     }
     return true;
   }
-  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,const vector<vector<aflowlib::_aflowlib_entry> >& entries_new,bool entries_new_same_type) {
+  bool mergeEntries(vector<vector<vector<_aflowlib_entry> > >& naries,const vector<vector<_aflowlib_entry> >& entries_new,bool entries_new_same_type) {
     for (uint i = 0; i < entries_new.size(); i++) {
       if(naries.size() <= i + 1) {
-        naries.push_back(vector<vector<aflowlib::_aflowlib_entry> >(0));
+        naries.push_back(vector<vector<_aflowlib_entry> >(0));
       }
       if(!mergeEntries(naries[i], entries_new[i], entries_new_same_type, true)) {  //triple vector<> naries implies this structure
         return false;
@@ -4954,7 +4947,7 @@ namespace aflowlib {  //CO20201220
     }
     return true;
   }
-  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,const vector<aflowlib::_aflowlib_entry>& entries_new,bool entries_new_same_type) {
+  bool mergeEntries(vector<vector<vector<_aflowlib_entry> > >& naries,const vector<_aflowlib_entry>& entries_new,bool entries_new_same_type) {
     if(!entries_new.size()) { return true; }
     int index_layer1=-1, index_layer2=-1;
     if(entries_new_same_type) {
@@ -4968,15 +4961,15 @@ namespace aflowlib {  //CO20201220
     }
     return true;
   }
-  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,const aflowlib::_aflowlib_entry& entry_new) {
+  bool mergeEntries(vector<vector<vector<_aflowlib_entry> > >& naries,const _aflowlib_entry& entry_new) {
     int index_layer1 = -1;
     int index_layer2 = -1;
     return mergeEntries(naries, entry_new, index_layer1, index_layer2);
   }
-  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,const aflowlib::_aflowlib_entry& entry_new,int& index_layer1,int& index_layer2) {
+  bool mergeEntries(vector<vector<vector<_aflowlib_entry> > >& naries,const _aflowlib_entry& entry_new,int& index_layer1,int& index_layer2) {
     if(!entry_new.vspecies.size()) { return false; }    //what the heck is this?
     while (naries.size() < entry_new.vspecies.size()) {  //assumes entries_new all have the same vspecies.size()
-      naries.push_back(vector<vector<aflowlib::_aflowlib_entry> >(0));
+      naries.push_back(vector<vector<_aflowlib_entry> >(0));
     }
     index_layer1 = entry_new.vspecies.size() - 1;
     return mergeEntries(naries[index_layer1], entry_new, index_layer2, true);  //triple vector<> naries implies this structure
@@ -4988,19 +4981,19 @@ namespace aflowlib {  //CO20201220
   //is unaries, binary, etc. (no layer with different species)
   //if sort_by_species and we are coming from LIBs (entries_new_same_type==true), then we don't need to check every entry, we already
   //know they have the same type (binary of same species)
-  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new,bool sort_by_species) {
+  bool mergeEntries(vector<vector<_aflowlib_entry> >& naries,const vector<vector<vector<_aflowlib_entry> > >& entries_new,bool sort_by_species) {
     for (uint i = 0; i < entries_new.size(); i++) {
       if(!mergeEntries(naries, entries_new[i], true, sort_by_species)) { return false; }
     }
     return true;
   }
-  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,const vector<vector<aflowlib::_aflowlib_entry> >& entries_new,bool entries_new_same_type,bool sort_by_species) {
+  bool mergeEntries(vector<vector<_aflowlib_entry> >& naries,const vector<vector<_aflowlib_entry> >& entries_new,bool entries_new_same_type,bool sort_by_species) {
     for (uint i = 0; i < entries_new.size(); i++) {
       if(!mergeEntries(naries, entries_new[i], entries_new_same_type, sort_by_species)) { return false; }
     }
     return true;
   }
-  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,const vector<aflowlib::_aflowlib_entry>& entries_new,bool entries_new_same_type,bool sort_by_species) {
+  bool mergeEntries(vector<vector<_aflowlib_entry> >& naries,const vector<_aflowlib_entry>& entries_new,bool entries_new_same_type,bool sort_by_species) {
     if(!entries_new.size()) { return true; }
     int index;
     if(entries_new_same_type) {
@@ -5018,11 +5011,11 @@ namespace aflowlib {  //CO20201220
   //the second layer consisting of different species
   //otherwise, naries is the total entries (similar to naries above), where second layer
   //is unaries, binary, etc. (no layer with different species)
-  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,const aflowlib::_aflowlib_entry& entry_new,bool sort_by_species) {
+  bool mergeEntries(vector<vector<_aflowlib_entry> >& naries,const _aflowlib_entry& entry_new,bool sort_by_species) {
     int index = -1;
     return mergeEntries(naries, entry_new, index, sort_by_species);
   }
-  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,const aflowlib::_aflowlib_entry& entry_new,int& index,bool sort_by_species) {
+  bool mergeEntries(vector<vector<_aflowlib_entry> >& naries,const _aflowlib_entry& entry_new,int& index,bool sort_by_species) {
     if(!entry_new.vspecies.size()) { return false; }
     index = -1;
     if(sort_by_species) {
@@ -5033,20 +5026,20 @@ namespace aflowlib {  //CO20201220
         if(naries[i][0].vspecies == entry_new.vspecies) { index = i; }
       }
       if(index == -1) {
-        naries.push_back(vector<aflowlib::_aflowlib_entry>(0));
+        naries.push_back(vector<_aflowlib_entry>(0));
         index = naries.size() - 1;
       }
     } else {
       //just need to create space for unary, binary, etc.
       while (naries.size() < entry_new.vspecies.size()) {
-        naries.push_back(vector<aflowlib::_aflowlib_entry>(0));
+        naries.push_back(vector<_aflowlib_entry>(0));
       }
       index = entry_new.vspecies.size() - 1;
     }
     naries[index].push_back(entry_new);
     return true;
   }
-  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new) {
+  bool mergeEntries(vector<_aflowlib_entry>& naries,const vector<vector<vector<_aflowlib_entry> > >& entries_new) {
     for (uint i = 0; i < entries_new.size(); i++) {
       for (uint j = 0; j < entries_new[i].size(); j++) {
         if(!mergeEntries(naries, entries_new[i][j])) { return false; }
@@ -5054,19 +5047,19 @@ namespace aflowlib {  //CO20201220
     }
     return true;
   }
-  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,const vector<vector<aflowlib::_aflowlib_entry> >& entries_new) {
+  bool mergeEntries(vector<_aflowlib_entry>& naries,const vector<vector<_aflowlib_entry> >& entries_new) {
     for (uint i = 0; i < entries_new.size(); i++) {
       if(!mergeEntries(naries, entries_new[i])) { return false; }
     }
     return true;
   }
-  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,const vector<aflowlib::_aflowlib_entry>& entries_new) {
+  bool mergeEntries(vector<_aflowlib_entry>& naries,const vector<_aflowlib_entry>& entries_new) {
     for (uint i = 0; i < entries_new.size(); i++) {
       if(!mergeEntries(naries, entries_new[i])) { return false; }
     }
     return true;
   }
-  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,const aflowlib::_aflowlib_entry& entry_new) {
+  bool mergeEntries(vector<_aflowlib_entry>& naries,const _aflowlib_entry& entry_new) {
     naries.push_back(entry_new);
     return true;
   }
@@ -5234,7 +5227,6 @@ namespace aflowlib {
       vflags.flag("FLAG::POCC",FALSE);           // will setup later  //CO20201220
 
       // check if ICSD inside (anyway)
-      string lattices[]={"BCC","BCT","CUB","FCC","HEX","MCL","MCLC","ORC","ORCC","ORCF","ORCI","RHL","TET","TRI"};
       vector<string> vline,tokens;
 
       string html_TAB=" target=\"_blank\"";
@@ -5292,8 +5284,7 @@ namespace aflowlib {
             vflags.flag("FLAG::FOUND",TRUE);
             catalog=entry_tmp.catalog;
             label=directory;
-            for(uint ilat=0;ilat<14;ilat++)
-              aurostd::StringSubst(label,lattices[ilat]+"/","");
+            for(uint ilat=0;ilat<bravais_lattices.size();ilat++) aurostd::StringSubst(label,bravais_lattices[ilat]+"/",""); //HE20220420 switch to global bravais lattices list
             aurostd::StringSubst(label,"/",".");
           }
         }
@@ -5331,9 +5322,9 @@ namespace aflowlib {
         for(uint i=0;i<vdir2test.size()&&!vflags.flag("FLAG::FOUND");i++) { // allow i=j=k so that 1 OR 2 OR 3 dots are also tested
           dir2test=vdir2test.at(i);
           //		cout << "testing(" << i << ") = " << dir2test << endl;
-          for(uint ilat=0;ilat<14&&!vflags.flag("FLAG::FOUND");ilat++) {
-            if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("ICSD")+"/RAW/"+lattices[ilat]+"/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-              catalog="ICSD";directory=lattices[ilat]+"/"+dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);
+          for(uint ilat=0;ilat<bravais_lattices.size()&&!vflags.flag("FLAG::FOUND");ilat++) { //HE20220420 switch to global bravais lattices list
+            if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("ICSD")+"/RAW/"+bravais_lattices[ilat]+"/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+              catalog="ICSD";directory=bravais_lattices[ilat]+"/"+dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);
             }
           }
           if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB0")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {

@@ -39,7 +39,7 @@ CPP=g++ -std=c++11 #HE20220124 ensure c++ standard is consistent
 CC=gcc
 ARCH=
 ifeq ($(UNAME),Darwin)
-CPP=clang++ -std=c++11 #HE20220124 ensure c++ standard is consistent
+CPP=clang++ -std=c++11 -DAFLOW_MULTITHREADS_ENABLE #HE20220124 ensure c++ standard is consistent
 CC=clang
 ARCH=-D_MACOSX_
 endif

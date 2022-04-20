@@ -7,7 +7,6 @@
 #include "aflow.h"
 #include "aflow_anrl.h"  //DX20201104
 #include "aflow_compare_structure.h"  //ME20220125
-#include "aflowlib_entry_loader.h"
 
 
 // Collection of generic check functions, to streamline testing.

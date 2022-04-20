@@ -3,16 +3,20 @@
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2022           *
 // *                                                                         *
 // ***************************************************************************
-// Developed in fruitful collaboration by Corey Oses and Hagen Eckert.
-// corey.oses@duke.edu | hagen.eckert@duke.edu
+// This EntryLoader class is the combination/evolution of different prior solutions to integrate with the AFLOW database.
+// 2016 - Corey Oses (CHULL)
+// 2018 - Marco Esters (database design/integration)
+// 2018 - Frisco Rose (API requests)
+// 2020 - David Hicks (structural comparisons).
+// 2022 - Hagen Eckert (unified EntryLoader for all available database sources)
+// hagen.eckert@duke.edu
 
 
 #ifndef _AFLOWLIB_ENTRY_LOADER_CPP_
 #define _AFLOWLIB_ENTRY_LOADER_CPP_
 
-
 #include "aflow.h"
-#include "aflowlib_entry_loader.h"
+#include "aflowlib.h"
 
 #define _DEBUG_ENTRY_LOADER_ false
 
@@ -583,7 +587,7 @@ namespace aflowlib {
     for (std::vector<std::string>::const_iterator key = keys.begin(); key != keys.end(); key++) hash_list.emplace_back(aurostd::crc64(*key));
     for (std::vector<std::vector<std::string>>::const_iterator row=content.begin(); row!=content.end(); row++) {
       std::shared_ptr <aflowlib::_aflowlib_entry> entry = std::make_shared<aflowlib::_aflowlib_entry>();
-      entry->Load(hash_list, *row, *p_oss);
+      entry->Load(hash_list, *row);
       if (!entry->auid.empty() && (std::find(m_auid_list.begin(),m_auid_list.end(), entry->auid) == m_auid_list.end())) {
         m_entries_flat->push_back(entry);
         (*m_entries_layered_map)[entry->nspecies][entry->species_pp].push_back(entry);
@@ -1241,8 +1245,8 @@ namespace aflowlib {
     std::vector<std::string> icsd_search_path_list;
     std::vector<std::string> libx_search_path_list;
     std::vector<std::string> libx_crawl_list;
-    for (std::vector<std::string>::const_iterator sym = m_icsd_symmetries.begin(); sym != m_icsd_symmetries.end(); sym++) {
-      icsd_search_path_list.emplace_back(m_restapi_server + m_restapi_path + "ICSD" + "_" + m_restapi_collection + "/" + *sym);
+    for (std::vector<std::string>::const_iterator sym = bravais_lattices.begin(); sym != bravais_lattices.end(); sym++) {
+      icsd_search_path_list.emplace_back(m_restapi_server + m_restapi_path + "ICSD" + "_" + m_restapi_collection + "/" + *sym + "/");
     }
     if (alloy_list.size()>1) {
       for (uint lib_idx = 1; lib_idx <= lib_max; lib_idx++) {
@@ -1338,10 +1342,11 @@ namespace aflowlib {
       AURL = "aflowlib.duke.edu:" + AURL;
       return true;
     }
-
-    AURL = "aflowlib.duke.edu:AFLOWDATA/" + AURL;
-    return true;
-    //TODO how to check if AURL could be valid
+    if ((AURL.substr(0,3) == "LIB" || AURL.substr(0,4) == "ICSD")) {
+      AURL = "aflowlib.duke.edu:AFLOWDATA/" + AURL;
+      return true;
+    }
+    return false;
   }
 
   /// @brief create a AFLUX query string from a matchbook
@@ -1372,7 +1377,7 @@ namespace aflowlib {
       name.erase(std::min(name.find("_ICSD_"), name.size()));
     } else if (lib_type == 'L') { //LIBX
       name.erase(std::min(name.find(':'), name.size()));
-      name = std::regex_replace (name, m_re_ppclean,"");
+      name = std::regex_replace(name, m_re_ppclean,"");
     } else {
       return "";
     }

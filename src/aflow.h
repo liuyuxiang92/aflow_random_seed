@@ -105,6 +105,8 @@ static const string TAG_TITLE_POCC_ARUN=TAG_TITLE_ARUN+TAG_POCC+SEP_TAG2;
 static const string POCC_DOSCAR_PREFIX="DOSCAR.pocc_T";
 static const string POCC_PHDOSCAR_PREFIX="PHDOSCAR.pocc_T";  // ME20210927
 //CO20200731 END
+static const vector<std::string> bravais_lattices = {"BCC","BCT","CUB","FCC","HEX","MCL","MCLC",
+                                                     "ORC","ORCC","ORCF","ORCI","RHL","TET","TRI"}; //HE20220420
 
 //XRD
 #define XRAY_RADIATION_COPPER_Kalpha 1.5418   //Angstroms     //CO20190622
@@ -5030,10 +5032,6 @@ namespace makefile {
 // ----------------------------------------------------------------------------
 // aflow_apennsy stuff
 #include "aflow_apennsy.h"
-
-// ----------------------------------------------------------------------------
-// aflowlib.h stuff
-#include "aflowlib.h"
 
 // ----------------------------------------------------------------------------
 // aflowlib.h stuff
