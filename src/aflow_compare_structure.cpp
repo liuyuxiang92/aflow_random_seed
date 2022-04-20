@@ -1145,7 +1145,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
 
   // ---------------------------------------------------------------------------
   // AFLUX matchbook preparations: add aurl for entry
-  vmatchbook.push_back("aurl");
+  //vmatchbook.push_back("aurl");  // ME20220419 - Part of the response already; slows down AFLUX
   // ME20220419 - Suppress unused default properties
   if ((sg_matchbook.find("spacegroup_relax") == string::npos) && !aurostd::WithinList(property_list, "spacegroup_relax")) {
     vmatchbook.push_back("$spacegroup_relax");
@@ -1155,19 +1155,30 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   }
 
   // ---------------------------------------------------------------------------
-  // AFLUX matchbook preparations: format AFLUX output
-  vmatchbook.push_back("format(aflow)");
-  vmatchbook.push_back("paging(0)");
-
-  // ---------------------------------------------------------------------------
   // construct aflux summons, i.e., combine matchbook
   string Summons = aurostd::joinWDelimiter(vmatchbook,",");
   message << "AFLUX matchbook request: " << Summons;
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
   // ---------------------------------------------------------------------------
-  // call AFLUX
-  string response = aflowlib::AFLUXCall(Summons);
+  // AFLUX matchbook preparations: format AFLUX output
+  vmatchbook.push_back("format(aflow)");
+  // ME20220420 - Use paged requests to avoid timeouts
+  vmatchbook.push_back("");
+  uint page = 1;
+  uint page_size = 75000;  // Appears to be small enough to prevent timeouts while being large enough to limit the number of requests
+  string response = "", response_page = "";
+  do {
+    vmatchbook.back() = "paging(" + aurostd::utype2string<uint>(page) + "," + aurostd::utype2string<uint>(page_size) + ")";
+    Summons = aurostd::joinWDelimiter(vmatchbook, ",");
+
+    // ---------------------------------------------------------------------------
+    // call AFLUX
+    response_page = aflowlib::AFLUXCall(Summons);
+    response += response_page;
+    page++;
+
+  } while (!response_page.empty());
 
   vector<string> response_tokens;
   message << "Number of entries returned: " << aurostd::string2tokens(response,response_tokens,"\n");
@@ -1596,7 +1607,7 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // AFLUX matchbook preparations: get aurl for entry
-    vmatchbook.push_back("aurl");
+    //vmatchbook.push_back("aurl");  // ME20220419 - Part of the response already; slows down AFLUX
     // ME20220419 - Suppress unused default properties
     if ((sg_matchbook.find("spacegroup_relax") == string::npos) && !aurostd::WithinList(property_list, "spacegroup_relax")) {
       vmatchbook.push_back("$spacegroup_relax");
@@ -1606,25 +1617,36 @@ namespace compare {
     }
 
     // ---------------------------------------------------------------------------
-    // AFLUX matchbook preparations: format AFLUX output
-    vmatchbook.push_back("format(aflow)");
-    vmatchbook.push_back("paging(0)");
-
-    // ---------------------------------------------------------------------------
     // construct aflux summons, i.e., combine matchbook
     string Summons = aurostd::joinWDelimiter(vmatchbook,",");
     message << "AFLUX matchbook request: " << Summons;
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
     // ---------------------------------------------------------------------------
-    // call AFLUX
-    string response = aflowlib::AFLUXCall(Summons);
+    // AFLUX matchbook preparations: format AFLUX output
+    vmatchbook.push_back("format(aflow)");
+    // ME20220420 - Use paged requests to avoid timeouts
+    vmatchbook.push_back("");
+    uint page = 1;
+    uint page_size = 75000;  // Appears to be small enough to prevent timeouts while being large enough to limit the number of requests
+    string response = "", response_page = "";
+    do {
+      vmatchbook.back() = "paging(" + aurostd::utype2string<uint>(page) + "," + aurostd::utype2string<uint>(page_size) + ")";
+      Summons = aurostd::joinWDelimiter(vmatchbook, ",");
+
+      // ---------------------------------------------------------------------------
+      // call AFLUX
+      response_page = aflowlib::AFLUXCall(Summons);
+      response += response_page;
+      page++;
+
+    } while (!response_page.empty());
+
+    if(LDEBUG){cerr << function_name << "::AFLUX response:" << endl << response << endl;}
 
     vector<string> response_tokens;
     message << "Number of entries returned: " << aurostd::string2tokens(response,response_tokens,"\n");
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-
-    if(LDEBUG){cerr << function_name << "::AFLUX response:" << endl << response << endl;}
 
     // ---------------------------------------------------------------------------
     // extract properties from AFLUX response
