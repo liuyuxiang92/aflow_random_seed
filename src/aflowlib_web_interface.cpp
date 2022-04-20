@@ -4745,13 +4745,16 @@ namespace aflowlib {
       vector<std::pair<string,string> > property_pairs;
       for(uint i=0;i<fields.size();i++){
         aurostd::string2tokens(fields[i],key_value,"=");
-        if(key_value.size()!=2 && !aurostd::substring2bool(fields[i],"example") && !aurostd::substring2bool(fields[i],"description")){ 
+        if(key_value.size()<2 && !aurostd::substring2bool(fields[i],"example") && !aurostd::substring2bool(fields[i],"description")){
           string message = "Cannot find key-value pair splitting on \"=\" for the following field: \"" + fields[i] + "\".";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         }
         std::pair<string,string> property; 
         property.first = aurostd::RemoveWhiteSpaces(key_value[0]);  // key 
-        property.second = aurostd::RemoveWhiteSpaces(key_value[1]); // value
+        // ME20220419 - some entries have = inside a value,
+        // so remove first element and join the rest
+        key_value.erase(key_value.begin());
+        property.second = aurostd::RemoveWhiteSpaces(aurostd::joinWDelimiter(key_value, "=")); // value
         property_pairs.push_back(property);
       }
       properties_response.push_back(property_pairs);
