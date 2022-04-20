@@ -5136,7 +5136,12 @@ namespace aurostd {
       string function = XPID + "aurostd::hqr():";
       if(a.rows!=a.cols) {
         stringstream message;
-        message << "'a' matrix not square  a.rows" << a.rows << " a.cols=" << a.cols;
+        message << "'a' matrix not square  a.rows=" << a.rows << " a.cols=" << a.cols;
+        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      }
+      else if(wr.rows!=a.rows || wi.rows!=a.rows) {
+        stringstream message;
+        message << "'wr' and 'wi' lengths must be compatible with 'a' matrix, a.rows=" << a.rows << " wr.rows=" << wr.rows<< " wi.rows=" << wi.rows;
         throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
 

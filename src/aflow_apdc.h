@@ -54,7 +54,7 @@ class _apdc_data {
 
     // Thermo data
     xmatrix<double> prob_ideal_cluster; // DIM: Nc, J
-    xtensor<double> prob_cluster; // DIM: Nc, Nt, J
+    vector<xmatrix<double>> prob_cluster; // DIM: Nc, J, Nt
     
   private:
   void free();
@@ -68,9 +68,10 @@ namespace apdc {
   void ErrorChecks(_apdc_data& apdc_data);
   void GetBinodal(_apdc_data& apdc_data);
   void GetSpinodal(_apdc_data& apdc_data);
-  xtensor<double> GetProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms);
+  vector<xmatrix<double>> GetProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms);
   xmatrix<double> GetProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms);
-  bool CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob);
+  void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob, const string& ptype);
+  void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const vector<xmatrix<double>>& prob, const string& ptype);
   xmatrix<double> GetConcentrationMacro(const xvector<double>& conc_range, const int conc_npts, const int nelem);
   xvector<double> GetTemperature(const xvector<double>& temp_range, const int temp_npts);
   void SetCongruentClusters(_apdc_data& apdc_data);

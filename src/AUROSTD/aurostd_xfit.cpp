@@ -172,7 +172,7 @@ namespace aurostd{
   /// -p0 -p1 -p2 .. -p(n-1)
   xmatrix<double> companion_matrix(const xvector<double> &p)
   {
-    if (aurostd::isequal(p(p.urows), 0.0)) {
+    if (p(p.urows) == 0.0) {
       string function_name = XPID + "companion_matrix():";
       string message = "Leading polynomial coefficient is zero";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
@@ -181,8 +181,7 @@ namespace aurostd{
     xmatrix<double> CM(n, n);
     for (int i = 1; i < n; i++) {
       for (int j = 1; j <= n; j++) {
-        if (i == j - 1) {CM(i, j) = 1.0; continue;}
-        CM(i, j) = 0.0;
+        if (i == j - 1) {CM(i, j) = 1.0;}
       } 
     }
     for (int j = 1; j <= n; j++) {CM(n, j) = -p(j) / p(n + 1);}
@@ -195,13 +194,12 @@ namespace aurostd{
   /// DOI: 10.1090/S0025-5718-1995-1262279-2
   void polynomialFindRoots(const xvector<double> &p, xvector<double> &rr, xvector<double> &ri)
   {
+    string function_name = XPID + "polynomialFindRoots():";
     if (std::isnan(aurostd::sum(aurostd::abs(p)))) {
-      string function_name = XPID + "polynomialFindRoots():";
       string message = "NaN in polynomial coefficients";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
     }
-    if (aurostd::sum(aurostd::abs(p)) == INFINITY) {
-      string function_name = XPID + "polynomialFindRoots():";
+    else if (aurostd::sum(aurostd::abs(p)) == INFINITY) {
       string message = "Inf in polynomial coefficients";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
     }

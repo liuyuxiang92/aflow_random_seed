@@ -272,15 +272,12 @@ namespace apdc {
     apdc_data.excess_energy_cluster = GetExcessEnergyCluster(apdc_data.rundirpath, apdc_data.conc_cluster, apdc_data.num_atom_cluster);
     SetCongruentClusters(apdc_data);
     apdc_data.degeneracy_cluster = GetDegeneracyCluster(apdc_data.plattice, apdc_data.vstr_atat, apdc_data.elements, apdc_data.max_num_atoms, true, apdc_data.rundirpath);
-    
-    return;
-
     apdc_data.conc_macro = GetConcentrationMacro(apdc_data.conc_range, apdc_data.conc_npts, apdc_data.elements.size());
     apdc_data.prob_ideal_cluster = GetProbabilityIdealCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.degeneracy_cluster, apdc_data.max_num_atoms);
-    CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_ideal_cluster);
-    return;
+    CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_ideal_cluster, "Ideal solution (high T)");
     apdc_data.temp = GetTemperature(apdc_data.temp_range, apdc_data.temp_npts);
     apdc_data.prob_cluster = GetProbabilityCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.excess_energy_cluster, apdc_data.prob_ideal_cluster, apdc_data.temp, apdc_data.max_num_atoms);
+    CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_cluster, "Cluster");
   }
 }
 
@@ -297,27 +294,36 @@ namespace apdc {
 // apdc::GetProbabilityCluster
 // ***************************************************************************
 namespace apdc {
-  xtensor<double> GetProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms) {
+  vector<xmatrix<double>> GetProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    LDEBUG=TRUE;
     int nx = prob_ideal_cluster.rows, ncl = prob_ideal_cluster.cols, nt = temp.rows, neqs = conc_cluster.cols - 1;
-    xtensor<double> prob_cluster({nx, ncl, nt});
-    xvector<double> beta = aurostd::pow(CONSTANT_BOLTZMANN * temp, -1.0);
+    vector<xmatrix<double>> prob_cluster;
+    for (uint it = 0; it < (uint)nt; it++) {prob_cluster.push_back(0.0 * aurostd::ones_xm<double>(nx, ncl));} // initialize
+    xvector<double> beta = aurostd::pow(CONSTANT_BOLTZMANN * temp, -1.0), coeff(max_num_atoms + 1), rr(max_num_atoms), ri(max_num_atoms);
     xmatrix<int> natom_cluster = aurostd::xmatrixdouble2utype<int>((double)max_num_atoms * conc_cluster);
-    xvector<double> rr, ri;
+    xvector<double> soln(neqs);
     if (neqs == 1) {
-      for (int i = 1; i <= nx; i++) {
-        for (int j = 1; j <= nt; j++) {
-          xvector<double> coeff = 0.0 * aurostd::ones_xv<double>(max_num_atoms + 1);
-          for (int k = 1; k <= ncl; k++) {
-            coeff(natom_cluster(k, 1) + 1) += prob_ideal_cluster(i, k) * std::exp(-beta(j) * excess_energy_cluster(k)) * (conc_cluster(k, 1) - conc_macro(i, 1));
+      for (int it = 1; it <= nt; it++) {
+        for (int i = 1; i <= nx; i++) {
+          coeff.reset();
+          soln.reset();
+          for (int j = 1; j <= ncl; j++) {
+            coeff(natom_cluster(j, 1) + 1) += prob_ideal_cluster(i, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * (conc_cluster(j, 1) - conc_macro(i, 1));
           }
           aurostd::polynomialFindRoots(coeff, rr, ri);
           if (LDEBUG) {
-            cerr << "p=" << coeff << endl;
-            cerr << "i=" << i << " j=" << j << " | Real roots=" << rr << endl;
-            cerr << "i=" << i << " j=" << j << " | Imag roots=" << ri << endl;
+            cerr << "it=" << it << " i=" << i << " | p=" << coeff << endl;
+            cerr << "   Real roots=" << rr << endl;
+            cerr << "   Imag roots=" << ri << endl;
           }
+          for (int k = 1; k <= max_num_atoms; k++) {
+            if (rr(k) > soln(1) && aurostd::isequal(ri(k), 0.0)) {soln(1) = rr(k);} // solution must be real and greater than 0
+          }
+          for (int j = 1; j <= ncl; j++) {
+            prob_cluster[it - 1](i, j) = prob_ideal_cluster(i, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * std::pow(soln(1), natom_cluster(j, 1));
+          }
+          prob_cluster[it - 1].setmat(prob_cluster[it - 1].getmat(i, i, 1, ncl) / aurostd::sum(prob_cluster[it - 1].getmat(i, i, 1, ncl)), i, 1); // normalize sum to 1
+          if (LDEBUG) {cerr << "it=" << it << " i=" << i << " | SUM[P_cluster]=" << aurostd::sum(prob_cluster[it - 1].getmat(i, i, 1, ncl)) << endl;}
         }
       }
     }
@@ -334,7 +340,6 @@ namespace apdc {
 namespace apdc {
   xmatrix<double> GetProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    LDEBUG=TRUE;
     int ncl = conc_cluster.rows, nx = conc_macro.rows, nelem = conc_macro.cols;
     xmatrix<double> prob_ideal_cluster(nx, ncl);
     for (int i = 1; i <= nx; i++) {
@@ -345,7 +350,7 @@ namespace apdc {
         }
       }
       prob_ideal_cluster.setmat(prob_ideal_cluster.getmat(i, i, 1, ncl) / aurostd::sum(prob_ideal_cluster.getmat(i, i, 1, ncl)), i, 1); // normalize sum to 1
-      if (LDEBUG) {cerr << "i=" << i << " | SUM[P_j]=" << aurostd::sum(prob_ideal_cluster.getmat(i, i, 1, ncl)) << endl;}
+      if (LDEBUG) {cerr << "i=" << i << " | SUM[P_cluster]=" << aurostd::sum(prob_ideal_cluster.getmat(i, i, 1, ncl)) << endl;}
     }
     return prob_ideal_cluster;
   }
@@ -355,15 +360,35 @@ namespace apdc {
 // apdc::CheckProbability
 // ***************************************************************************
 namespace apdc {
-  bool CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob) {
+  void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob, const string& ptype) {
+    string function_name = XPID + "CheckProbability():";
     int nx = prob.rows;
     for (int i = 1; i <= nx; i++) {
-      if (!aurostd::isequal(aurostd::sum(prob(i)), 1.0)) {return false;}
-      cerr<<prob(i)*conc_cluster<<endl;
-      cerr<<conc_macro(i)<<endl;
-      cerr<<"++++"<<endl;
+      if (!aurostd::isequal(aurostd::sum(prob(i)), 1.0)) { // unnormalized
+        string message = ptype + " probability is unnormalized for cluster=" + aurostd::utype2string<int>(i);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+      }
+      else if (!aurostd::isequal(prob(i)*conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
+        string message = ptype + " probability does not satisfy concentration contraint for cluster=" + aurostd::utype2string<int>(i);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+      }
     }
-    return true;
+  }
+  void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const vector<xmatrix<double>>& prob, const string& ptype) {
+    string function_name = XPID + "CheckProbability():";
+    int nx = prob[0].rows;
+    for (uint it = 0; it < prob.size(); it++) {
+      for (int i = 1; i <= nx; i++) {
+        if (!aurostd::isequal(aurostd::sum(prob[it](i)), 1.0)) { // unnormalized
+          string message = ptype + " probability is unnormalized for cluster=" + aurostd::utype2string<int>(i);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+        }
+        else if (!aurostd::isequal(prob[it](i)*conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
+          string message = ptype + " probability does not satisfy concentration contraint for cluster=" + aurostd::utype2string<int>(i);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+        }
+      }
+    }
   }
 }
 
@@ -451,7 +476,9 @@ namespace apdc {
     vector<xstructure> vstr = _vstr;
     vector<uint> index;
     for (uint i = 0; i < vstr.size(); i++) {index.push_back(i);}
-    if (shuffle) { // introduce randomness into groupings
+    // Shuffling the xstructures is important because it can avoid edge case scenarios where the reference centroid
+    // in Xtalfinder does not pick up the proper neighbors
+    if (shuffle) { // introduce randomness into grouping
       aurostd::random_shuffle(index);
       for (uint i = 0; i < index.size(); i++) {vstr[i] = _vstr[index[i]];}
     }
@@ -561,7 +588,7 @@ namespace apdc {
       string message = "Degeneracies do not satisfy the sum rule, the sum is " + aurostd::utype2string<int>(sum_calculated) + " but should be " + aurostd::utype2string<int>(sum_accepted);
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
     }
-    if (shuffle) { // place in correct order
+    if (shuffle) { // place back in correct order
       xvector<int> _degeneracy_cluster = degeneracy_cluster;
       for (uint i = 0; i < index.size(); i++) {degeneracy_cluster(index[i] + 1) = _degeneracy_cluster(i + 1);}
     }
@@ -582,12 +609,12 @@ namespace apdc {
     uint nstr = vstr.size(), nelem = elements.size();
     xmatrix<double> conc_cluster(nstr, nelem);
     int ie = -1;
-    xvector<double> stoich;
+    xvector<double> stoich(nelem);
     vector<string> str_elements;
     for (uint i = 0; i < vstr.size(); i++) {
       if (nelem != vstr[i].stoich_each_type.size()) {
         str_elements = vstr[i].GetElements(true, true);
-        stoich = 0.0 * aurostd::ones_xv<double>(nelem);
+        stoich.reset();
         for (uint j = 0; j < nelem; j++) {
           if (aurostd::WithinList(str_elements, elements[j], ie)) {stoich(j + 1) = vstr[i].stoich_each_type[ie];}
         }
