@@ -1233,13 +1233,17 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
     vector<string> species = aurostd::getElements(compounds[i], vcomposition);
     if(LDEBUG){cerr << function_name << " species=" << aurostd::joinWDelimiter(species,",") << endl;}
     vector<uint> tmp_stoich;
-    for(uint j=0;j<vcomposition.size();j++){
+    // ME20220420 - Skip non-integer stoichiometry instead of throwing
+    uint j = 0;
+    for(;j<vcomposition.size();j++){
       if(aurostd::isinteger(vcomposition[j])){ tmp_stoich.push_back((uint)aurostd::nint(vcomposition[j])); }
       else {
-        message << "Expected natoms in " << auids[i] << " to be an integer.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
+        //message << "Expected natoms in " << auids[i] << " to be an integer.";
+        //throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
+        break;
       }
     }
+    if (j != vcomposition.size()) continue;
     vector<uint> tmp_reduced_stoich; aurostd::reduceByGCD(tmp_stoich, tmp_reduced_stoich); //DX20191125
     if(!same_species){ std::sort(tmp_reduced_stoich.begin(),tmp_reduced_stoich.end()); }
 
@@ -1697,13 +1701,17 @@ namespace compare {
       if(LDEBUG){cerr << function_name << " species=" << aurostd::joinWDelimiter(species,",") << endl;}
 
       vector<uint> tmp_stoich;
-      for(uint j=0;j<vcomposition.size();j++){
+      // ME20220420 - Skip non-integer stoichiometry instead of throwing
+      uint j = 0;
+      for(;j<vcomposition.size();j++){
         if(aurostd::isinteger(vcomposition[j])){ tmp_stoich.push_back((uint)aurostd::nint(vcomposition[j])); }
         else {
-          message << "Expected natoms in " << auids[i] << " to be an integer.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
+          //message << "Expected natoms in " << auids[i] << " to be an integer.";
+          //throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
+          break;
         }
       }
+      if (j != vcomposition.size()) continue;
       vector<uint> tmp_reduced_stoich; aurostd::reduceByGCD(tmp_stoich, tmp_reduced_stoich); //DX20191125
       if(!same_species){ std::sort(tmp_reduced_stoich.begin(),tmp_reduced_stoich.end()); }
 
