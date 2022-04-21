@@ -263,7 +263,7 @@ namespace apdc {
       //apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads, false);
       apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads);
       // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
-      apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, apdc_data.aflow_max_num_atoms), apdc_data.vstr_aflow, apdc_data.num_threads, apdc_data.rundirpath);
+      apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, apdc_data.aflow_max_num_atoms), apdc_data.vstr_aflow, apdc_data.num_threads);
       GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.lat_atat, apdc_data.vstr_aflow, apdc_data.vstr_atat, apdc_data.mapstr);
       RunATAT(apdc_data.workdirpath, apdc_data.rundirpath, apdc_data.min_sleep);
     }
@@ -277,7 +277,7 @@ namespace apdc {
     CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_ideal_cluster);
     apdc_data.temp = GetTemperature(apdc_data.temp_range, apdc_data.temp_npts);
     apdc_data.prob_cluster = GetProbabilityCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.excess_energy_cluster, apdc_data.prob_ideal_cluster, apdc_data.temp, apdc_data.max_num_atoms);
-    CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_cluster);
+    CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_ideal_cluster, apdc_data.prob_cluster);
   }
 }
 
@@ -365,28 +365,37 @@ namespace apdc {
     int nx = prob.rows;
     for (int i = 1; i <= nx; i++) {
       if (!aurostd::isequal(aurostd::sum(prob(i)), 1.0)) { // unnormalized
-        string message = "Ideal solution (high T) probability is unnormalized for cluster=" + aurostd::utype2string<int>(i);
+        string message = "Ideal solution (high T) probability is unnormalized for i=" + aurostd::utype2string<int>(i);
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
       }
       else if (!aurostd::isequal(prob(i)*conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
-        string message = "Ideal solution (high T) probability does not satisfy concentration contraint for cluster=" + aurostd::utype2string<int>(i);
+        string message = "Ideal solution (high T) probability does not satisfy concentration contraint for i=" + aurostd::utype2string<int>(i);
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
       }
     }
   }
-  void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const vector<xmatrix<double>>& prob) {
+  void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob0, const vector<xmatrix<double>>& prob) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "CheckProbability():";
     int nx = prob[0].rows;
+    double diff = AUROSTD_MAX_DOUBLE, diff_old;
     for (uint it = 0; it < prob.size(); it++) {
       for (int i = 1; i <= nx; i++) {
         if (!aurostd::isequal(aurostd::sum(prob[it](i)), 1.0)) { // unnormalized
-          string message = "Equilibrium probability is unnormalized for cluster=" + aurostd::utype2string<int>(i);
+          string message = "Equilibrium probability is unnormalized for i=" + aurostd::utype2string<int>(i);
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
         }
         else if (!aurostd::isequal(prob[it](i)*conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
-          string message = "Equilibrium probability does not satisfy concentration contraint for cluster=" + aurostd::utype2string<int>(i);
+          string message = "Equilibrium probability does not satisfy concentration contraint for i=" + aurostd::utype2string<int>(i);
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
         }
+      }
+      diff_old = diff;
+      diff = aurostd::sum(aurostd::abs(prob[it] - prob0));
+      if (LDEBUG) {cerr << "|P - P0| = " << diff << endl;}
+      if (diff > diff_old) {
+        string message = "Equilibrium probability does not converge to the high-T limit";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
     }
   }
@@ -469,7 +478,7 @@ namespace apdc {
     if (!rundirpath.empty()) {
       vector<string> tokens;
       aurostd::string2tokens(rundirpath, tokens, "/");
-      filepath = "/xstr_degen.dat";
+      filepath = "/degen_" + aurostd::utype2string<int>(max_num_atoms) + "_atom.dat";
       for (int i = tokens.size() - 2; i >= 0; i--) {filepath = "/" + tokens[i] + filepath;}
       if (aurostd::file2vectorstring(filepath, tokens)) {return aurostd::vector2xvector(aurostd::vectorstring2vectorint(tokens));}
     }
@@ -749,7 +758,7 @@ namespace apdc {
         for (uint i = 1; i < 30; i++) {vstrlabel.push_back(aurostd::utype2string<uint>(i));}
       }
       if (nelem >= 3) {
-        vstrlabel.push_back("TFCC001.ABC");vstrlabel.push_back("TFCC002.ABC");vstrlabel.push_back("TFCC003.ABC");
+        vstrlabel.push_back("TFCC001.ABC"); vstrlabel.push_back("TFCC002.ABC"); vstrlabel.push_back("TFCC003.ABC");
         for (uint i = 4; i < 17; i++) {
           vstrlabel.push_back("TFCC00" + aurostd::utype2string<uint>(i) + ".ABC");
           vstrlabel.push_back("TFCC00" + aurostd::utype2string<uint>(i) + ".BCA");
@@ -762,7 +771,7 @@ namespace apdc {
         for (uint i = 58; i < 87; i++) {vstrlabel.push_back(aurostd::utype2string<uint>(i));}
       }
       if (nelem >= 3) {
-        vstrlabel.push_back("TBCC001.ABC");vstrlabel.push_back("TBCC002.ABC");vstrlabel.push_back("TBCC003.ABC");
+        vstrlabel.push_back("TBCC001.ABC"); vstrlabel.push_back("TBCC002.ABC"); vstrlabel.push_back("TBCC003.ABC");
         for (uint i = 4; i < 17; i++) {
           vstrlabel.push_back("TBCC00" + aurostd::utype2string<uint>(i) + ".ABC");
           vstrlabel.push_back("TBCC00" + aurostd::utype2string<uint>(i) + ".BCA");
@@ -900,16 +909,8 @@ namespace apdc {
 // apdc::GetMapForXstructures
 // ***************************************************************************
 namespace apdc {
-  vector<int> GetMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads, const string& rundirpath) {
+  vector<int> GetMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string filepath = "";
-    if (!rundirpath.empty()) {
-      vector<string> tokens;
-      aurostd::string2tokens(rundirpath, tokens, "/");
-      filepath = "/xstr_map.dat";
-      for (int i = tokens.size() - 2; i >= 0; i--) {filepath = "/" + tokens[i] + filepath;}
-      if (aurostd::file2vectorstring(filepath, tokens)) {return aurostd::vectorstring2vectorint(tokens);}
-    }
     vector<int> mapstr;
     bool match;
     for (uint i = 0; i < vstr1.size(); i++) {
@@ -922,11 +923,6 @@ namespace apdc {
         }
       }
       if (!match) {mapstr.push_back(-1);}
-    }
-    if (!filepath.empty()) {
-      stringstream ss;
-      for (uint i = 0; i < mapstr.size(); i++) {ss << mapstr[i] << endl;}
-      aurostd::stringstream2file(ss, filepath);
     }
     return mapstr;
   }
