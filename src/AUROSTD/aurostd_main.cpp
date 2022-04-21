@@ -3850,20 +3850,6 @@ namespace aurostd {
 
   // *******************************************************************************************
   // *******************************************************************************************
-  uint ConvertNegativeIndex(const int index,const uint _size) {
-    // SD20220301 - Convert negative index to index within the vector
-    string soliloquy = XPID + "aurostd::ConvertNegativeIndex():";
-    int size=_size;
-    if(size==0) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "Vector has zero size", _VALUE_ERROR_);
-    }
-    if(std::abs(index)+(1+aurostd::sign(index))/2>size) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "Index outside of vector bounds", _INDEX_BOUNDS_);
-    }
-    return (uint)(index%size+size)%size;
-  }
-  // *******************************************************************************************
-
   // SD20220301 - Extract the nth entry to stringstream, negative values go backwards, n==0 returns all entries
   bool ExtractNthToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword,const int index) {
     aurostd::StringstreamClean(StringstreamOUTPUT);
@@ -3882,7 +3868,7 @@ namespace aurostd {
         for(uint i=0;i<tokens.size();i++) StringstreamOUTPUT << tokens[i] << endl;
       }
       else {
-        uint i=aurostd::ConvertNegativeIndex(index<0?index:index-1,tokens.size());
+        uint i=(uint)aurostd::boundary_conditions_periodic(1,tokens.size(),index<0?index:index-1);
         StringstreamOUTPUT << tokens[i] << endl;
       }
       return TRUE;

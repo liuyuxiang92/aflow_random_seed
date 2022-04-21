@@ -607,7 +607,6 @@ namespace aurostd {
   bool ExtractToStringstreamEXPLICIT(const string& StringIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop);
   bool ExtractToStringstreamEXPLICIT(const string& StringIN,stringstream& StringstreamOUTPUT,const string& Keyword);
   // take the nth //SD20220301
-  uint ConvertNegativeIndex(const int index,const uint _size);
   bool ExtractNthToStringstreamEXPLICIT(ifstream &FileIN,stringstream& StringstreamOUTPUT,const string& Keyword,const int index);
   bool ExtractNthToStringstreamEXPLICIT(ifstream &FileIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index);
   bool ExtractNthToStringstreamEXPLICIT(stringstream& StringStreamIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop,int index);
