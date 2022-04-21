@@ -26,7 +26,7 @@ namespace KBIN {
     if(AflowIn.length()==0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"KBIN::VASP_Produce_INPUT():","empty AflowIn",_FILE_CORRUPT_);} //CO20200624
     bool Krun=TRUE;
     if(load_POSCAR_from_xvasp){
-      if(Krun) Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp,aflags.Directory));     // produce POSCAR before KPOINTS  //CO20180420 - good for POCC //SD20220302 - Now should produce POSCAR.orig from AFLOWIN
+      if(Krun) Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp,aflags.Directory));     // produce POSCAR before KPOINTS  //CO20180420 - good for POCC
     } else {
       if(Krun) Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp,AflowIn,FileMESSAGE,aflags,kflags,vflags));     // produce POSCAR before KPOINTS
     }
