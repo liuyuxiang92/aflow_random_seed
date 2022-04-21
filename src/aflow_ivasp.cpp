@@ -1579,9 +1579,7 @@ namespace KBIN {
     xvasp.aopts.flag("FLAG::XVASP_POSCAR_changed",FALSE);
     xvasp.POSCAR << xvasp.str;
     // POSCAR done
-    //xvasp.POSCAR_orig << xvasp.POSCAR.str();
-    //SD20220302 - Create POSCAR.orig from AFLOWIN
-    xvasp.POSCAR_orig = KBIN::ExtractPOSCARFromDirectory(Directory,1);
+    xvasp.POSCAR_orig << xvasp.POSCAR.str();
     xvasp.aopts.flag("FLAG::XVASP_POSCAR_generated",TRUE);
     return Krun;
   };  // KBIN::VASP_Produce_POSCAR
