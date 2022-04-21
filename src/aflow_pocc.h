@@ -99,6 +99,8 @@ namespace pocc {
   void poccOld2New(ostream& oss=cout);
   void poccOld2New(ofstream& FileMESSAGE,ostream& oss=cout);
 
+  void POCC_Convolution(const aurostd::xoption& vpflow);
+
   string addDefaultPOCCTOL2string(const string& input);
 
   void getTemperatureStringParameters(int& temperature_precision,bool& temperatures_int,int& zero_padding_temperature);
@@ -529,6 +531,7 @@ namespace pocc {
       aurostd::xoption enumerator_mode;       //how do we determine duplicates - UFF, SNF, ...
 
       //post-processing
+      bool m_convolution;
       vector<string> m_ARUN_directories;
       double m_Hmix;
       double m_efa;
@@ -636,6 +639,10 @@ namespace pocc {
       void setKFlags(const _kflags& Kflags);                                    //standard _kflags
       void setVFlags(const _vflags& Vflags);                                    //standard _vflags
 
+      //path getters
+      string getARUNDirectoryPath(uint isupercell) const;
+      string getOutputPath() const;
+
       // Modules
       bool inputFilesFoundAnywhereAPL();  //ME20211004
       void createModuleAflowIns(const _xvasp& xvasp, const string& MODULE);  //ME20211004
@@ -664,6 +671,7 @@ namespace pocc {
       void resetSiteConfigurations();
 
       void CleanPostProcessing();
+      void convolution();
       void loadDataIntoCalculator();
       void setTemperatureStringParameters();
       void setTemperatureStringParameters(vector<double>& v_temperatures);
@@ -775,7 +783,11 @@ namespace pocc {
       void calculatePhononPropertiesAPL(const vector<double>& v_temperatures);
       vector<apl::PhononCalculator> initializePhononCalculators();
       vector<xDOSCAR> getPhononDoscars(vector<apl::PhononCalculator>& vphcalc, xoption& dosopts, vector<int>& vexclude);
-      void calculatePhononDOSThread(int startIndex, int endIndex, const vector<uint>& vcalc, const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos);
+#ifdef AFLOW_MULTITHREADS_ENABLE
+      void calculatePhononDOSThread(uint i, const vector<uint>& vcalc, const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos, std::mutex& m);
+#else
+      void calculatePhononDOSThread(uint i, const vector<uint>& vcalc, const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos);
+#endif
       xDOSCAR getAveragePhononDos(double T, const vector<xDOSCAR>& vxdos);
   };
 } // namespace pocc

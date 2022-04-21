@@ -41,7 +41,8 @@ namespace aurostd {  // namespace aurostd
       if(argi.size()>=2) if(argi.at(0)=='-' && argi.at(1)=='D') argi=string("-")+argi;  // for -D
 
       if(argi=="--machine") argi+=string("=");                  // forcing "=" after machine !
-      if(argi=="--aflowlib") argi+=string("=");                  // forcing "=" after machine !
+      if(argi=="--machine_name") argi+=string("=");             // forcing "=" after machine_name ! //HE20220309
+      if(argi=="--aflowlib") argi+=string("=");                 // forcing "=" after aflowlib !
       if(argi=="--np") argi+=string("=");                       // forcing "=" after np !
       if(argi.at(argi.size()-1)=='=' && i<_argc-1) {argi+=string(_argv[i+1]);i++;}  // fixing space after "= "
       out_argv.push_back(argi);
@@ -270,9 +271,8 @@ namespace aurostd {
 namespace aurostd {  // namespace aurostd
   bool get_itemized_vector_string_from_input(const vector<string> &argv,const string& s0,vector<string>& tokens,const string& delimiter) {// =":")
     if(aurostd::substring2bool(s0,"|")) {
-      string function = XPID + "aurostd::get_itemized_vector_string_from_input():";
       string message = "not ported to \"|\"";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
     }
     uint icount=0;
     string s0neq=s0,s0equ;aurostd::StringSubst(s0neq,"=","");s0equ=s0neq+"=";

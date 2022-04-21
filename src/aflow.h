@@ -93,10 +93,15 @@ enum vector_reduction_type {   //CO20190629
 #define _AFLOW_MESSAGE_DEFAULTS_ "user,host,pid,time" //tid //CO20200624 - only depends on XHOST (not aflags)
 
 //CO20200731 START
-static const string POCC_TITLE_TAG=":POCC_";
-static const string POCC_TITLE_TOL_TAG=":TOL_";
-static const string ARUN_TITLE_TAG=":ARUN.";
-static const string POCC_ARUN_TITLE_TAG=ARUN_TITLE_TAG+"POCC_";
+static const string SEP_TAG1=":";
+static const string SEP_TAG2="_";
+static const string TAG_POCC="POCC";
+static const string TAG_TOL="TOL";
+static const string TAG_ARUN="ARUN";
+static const string TAG_TITLE_POCC=SEP_TAG1+TAG_POCC+SEP_TAG2;
+static const string TAG_TITLE_POCC_TOL=SEP_TAG1+TAG_TOL+SEP_TAG2;
+static const string TAG_TITLE_ARUN=SEP_TAG1+TAG_ARUN+".";
+static const string TAG_TITLE_POCC_ARUN=TAG_TITLE_ARUN+TAG_POCC+SEP_TAG2;
 static const string POCC_DOSCAR_PREFIX="DOSCAR.pocc_T";
 static const string POCC_PHDOSCAR_PREFIX="PHDOSCAR.pocc_T";  // ME20210927
 //CO20200731 END
@@ -162,6 +167,7 @@ namespace AFLOW_PTHREADS {
 
 extern string _AFLOWIN_; 
 extern string _AFLOWLOCK_; 
+extern const string _LOCK_LINK_SUFFIX_; //SD20220224
 
 const string VASP_KEYWORD_EXECUTION=" Executing: ";
 
@@ -331,10 +337,10 @@ class _XHOST {
     // _XHOST(const _XHOST& b);                          // constructor copy
     const _XHOST& operator=(const _XHOST &b);         // copy
     // BOOT
-    int PID,TID;                // aflow_init.cpp  PID/TID number  //CO20200508
-    ostringstream ostrPID,ostrTID; // aflow_init.cpp  PID/TID in ostringstream... //CO20200508
-    string sPID,sTID;           // aflow_init.cpp  [PID=12345678]  [TID=12345678]
-    bool showPID,showTID;       // aflow_init.cpp  check if --showPID
+    int PGID,PID,TID;                // aflow_init.cpp  PID/TID number  //CO20200508 //SD20220329 PGID number
+    ostringstream ostrPGID,ostrPID,ostrTID; // aflow_init.cpp  PID/TID in ostringstream... //CO20200508 
+    string sPGID,sPID,sTID;           // aflow_init.cpp  [PID=12345678]  [TID=12345678]
+    bool showPGID,showPID,showTID;       // aflow_init.cpp  check if --showPID
     // machinery
     bool QUIET,QUIET_CERR,QUIET_COUT,TEST,DEBUG,MPI;    // extra quiet SC20210617
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
@@ -352,6 +358,7 @@ class _XHOST {
     string AFLOW_MATERIALS_SERVER,AFLOW_WEB_SERVER;
     long double RAM,RAM_MB,RAM_GB;
     int CPU_Cores;
+    int CPU_active;  //ME20220130
     string CPU_Model;
     string CPU_MHz;
     vector<double> vTemperatureCore;
@@ -407,6 +414,7 @@ class _XHOST {
     aurostd::xoption vflag_outreach;  // argv/argc options following the xoption structure
     aurostd::xoption vflag_control;  // argv/argc options following the xoption structure
     aurostd::xoption vschema;        // keywords, names, units etc etc
+    aurostd::xoption vschema_internal;  //ME20220208
     // USUAL COMMANDS
     vector<string> vcat; //     cat, bzcat, xzcat, gzcat
     vector<string> vext; //      "",  .bz2,   .xz,   .gz
@@ -419,6 +427,8 @@ class _XHOST {
     // AFLOWSYM
     bool SKEW_TEST; //DX20171019
     double SKEW_TOL; //DX20171019
+    // xstructure
+    bool READ_SPIN_FROM_ATOMLABEL; //SD20220316
     // WEB MODE
     //[CO20200404 - overload with --www]bool WEB_MODE;  //CO20190401
   private:                                                //
@@ -428,6 +438,7 @@ class _XHOST {
 };
 
 #define XPID XHOST.sPID
+#define XPGID XHOST.sPGID
 #define XTID XHOST.sTID
 
 #define XHOST_vGlobal_MAX                              256
@@ -556,6 +567,19 @@ class _XHOST {
 
 // max is 128
 extern _XHOST XHOST; // this will be global
+
+// ME+HE20220321
+// Based on https://stackoverflow.com/questions/1666802/is-there-a-class-macro-in-c
+// Get full formatted name of function
+inline std::string aflowFunc(const std::string& pretty_func, const std::string& func) {
+  size_t end = pretty_func.find(func);
+  // Everything between the function name and the last space character
+  // are namespace and class name, if present
+  size_t begin = pretty_func.rfind(" ", end) + 1;
+  return XPID + pretty_func.substr(begin, end - begin) + func + "():";
+}
+
+#define __AFLOW_FUNC__ aflowFunc(__PRETTY_FUNCTION__, __func__)
 
 //DX20180131 - add symmetry definitions - START
 // symmetry 
@@ -1086,6 +1110,11 @@ namespace init {
   uint GetTEMP(void);
   double WaitTEMP(double TRESHOLD=AFLOWRC_AFLOW_CORE_TEMPERATURE_HALT,ostream& oss=cout,bool LVERBOSE=FALSE,vector<string> vmessage=vector<string>(0));
   uint InitSchema(bool INIT_VERBOSE);
+  uint InitSchemaInternal(bool INIT_VERBOSE);  //ME20220208
+  vector<string> getSchemaKeys(const aurostd::xoption& vschema);  //ME20220223
+  vector<string> getSchemaNames(const aurostd::xoption& vschema);  //CO20200520
+  vector<string> getSchemaTypes(const aurostd::xoption& vschema);  //ME20220223
+  vector<string> getSchemaTypes(const aurostd::xoption& vschema, const vector<string>& keys);  //ME20220223
 } // namespace init
 
 uint AFLOW_getTEMP(const vector<string>& argv);
@@ -1104,8 +1133,10 @@ bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin);  //CO20210
 bool GetVASPBinaryFromLOCK(const string& directory,string& vasp_bin,int& ncpus);  //CO20210315
 void processFlagsFromLOCK(_xvasp& xvasp,_vflags& vflags,aurostd::xoption& xfixed);  //CO20210315
 bool AFLOW_VASP_instance_running(); //CO20210315
+bool AFLOW_VASP_instance_running(const string& pgid); //SD20220330
 bool AFLOW_MONITOR_instance_running(const _aflags& aflags); //CO20210315
 bool VASP_instance_running(const string& vasp_bin); //CO20210315
+bool VASP_instance_running(const string& vasp_bin,const string& pgid); //SD20220330
 void AFLOW_monitor_VASP();  //CO20210315
 void AFLOW_monitor_VASP(const string& directory);  //CO20210315
 
@@ -1513,6 +1544,7 @@ class AtomEnvironment{
 #define IOCIF         11 //DX20180723
 #define IOELK_AUTO    12 //DX20200310
 #define IOELK_GEOM    13 //DX20200310
+#define IOATAT_STR    14 //SD20220114
 
 #define NOSG string("NNN #0")
 
@@ -1540,9 +1572,12 @@ class xstructure {
     xstructure(const string& url,const string& file,int=IOVASP_POSCAR); // constructor from URL
     ~xstructure();                                                // destructor
     // I/O, mutators                                              // --------------------------------------
+    void initialize(const string& structure_title="");            // initialize xstructure based on input (avoids copying xstructure); //CO20211122
     void initialize(istream& input,int=IOVASP_POSCAR);            // initialize xstructure based on input (avoids copying xstructure); //DX20210129
     void initialize(ifstream& input,int=IOVASP_POSCAR);           // initialize xstructure based on input (avoids copying xstructure); //DX20210129
     void initialize(const stringstream& input,int=IOVASP_POSCAR); // initialize xstructure based on input (avoids copying xstructure); //DX20210129
+    void initialize(const string& input,int);                     // initialize xstructure based on input (avoids copying xstructure); //CO20211122
+    void initialize(const string& url,const string& file,int=IOVASP_POSCAR);  // initialize xstructure based on input (avoids copying xstructure); //CO20211122
     bool GetStoich(void);                                         // get stoich_each_type - CO20170724
     bool sortAtomsEquivalent(void);                               // sort by equivalent atoms - CO20190116
     bool FixLattices(void);                                       // Reciprocal/f2c/c2f
@@ -1651,8 +1686,9 @@ class xstructure {
     void DecorateWithElements(void);                              // Decorate with elements (alphabetic order) - useful for platon
     void DecorateWithFakeElements(void);                          // Decorate with fake elements - useful for prototypes //DX20200727
     vector<string> GetElements(bool clean_name=false,
-        bool fake_names=false);                                   //DX20200724
-    vector<string> GetElementsFromAtomNames(bool clean_name=true);//DX20200724
+        bool fake_names=false) const;                             //DX20200724 //SD20220222 - made function const
+    vector<string> GetElementsFromAtomNames(
+        bool clean_name=true) const;                              //DX20200724 //SD20220222 - made function const
     vector<uint> GetReducedComposition(bool numerical_sort=false);//DX20200724
     string platon2sg(bool P_EQUAL=DEFAULT_PLATON_P_EQUAL,
         bool P_EXACT=DEFAULT_PLATON_P_EXACT,
@@ -1701,6 +1737,7 @@ class xstructure {
     void xstructure2cif(void);                                    // some wrap up IOs to convert format to CIF //DX20190123
     void xstructure2abccar(void);                                 // some wrap up IOs to convert format to ABCCAR //DX20190123
     void xstructure2elk(void);                                    // some wrap up IOs to convert format to ELK //DX20200313
+    void xstructure2atat(void);                                   // some wrap up IOs to convert format to ATAT //SD20220123
     //[CO20180420 - moved outside of xstructure]bool sortAtomsTypes(const _atom& a1,const _atom& a2);		// sort atoms by types
     //[CO20180420 - moved outside of xstructure]bool sortAtomsNames(const _atom& a1,const _atom& a2);		// sort atoms by names
     // OPERATORS                                                  // --------------------------------------
@@ -2634,6 +2671,7 @@ xstructure input2ABINITxstr(istream& input);
 xstructure input2QExstr(istream& input);
 xstructure input2VASPxstr(istream& input,bool vasp5=false);
 xstructure input2ELKxstr(istream& input); //DX20200313
+xstructure input2ATATxstr(istream& input); //SD20220123
 
 // ----------------------------------------------------------------------------
 // centroid functions for structures //DX20200728
@@ -2683,6 +2721,8 @@ bool AtomicEnvironmentTest(ostream& oss=cout); //HE20210511
 bool AtomicEnvironmentTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210511
 bool aurostdTest(ostream& oss=cout); //HE20210512
 bool aurostdTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210512
+bool cifParserTest(ostream& oss=cout); //ME20220125
+bool cifParserTest(ofstream& FileMESSAGE, ostream& oss=cout); //ME202201025
 // ----------------------------------------------------------------------------
 // Structure Prototypes
 // aflow_xproto.cpp
@@ -2906,24 +2946,25 @@ namespace AFLOW_PTHREADS {
 }
 // interfaces
 namespace KBIN {
-  void MoveRun2NewDirectory(_aflags& aflags, const string& subdirectory_orig, const string& subdirectory_new); //DX20210901
+  bool MoveRun2NewDirectory(_aflags& aflags, const string& subdirectory_orig, const string& subdirectory_new); //DX20210901 //SD20220319 - return bool
   void RUN_Directory_PTHREADS(_aflags &aflags);
   void *_threaded_interface_RUN_Directory(void *ptr);
 } // namespace KBIN
 namespace aurostd { // Multithreaded add on to aurostd
-  bool multithread_execute(deque<string> vcommand,int NUM_THREADS,bool VERBOSE);
-  bool multithread_execute(deque<string> vcommand,int NUM_THREADS);
-  bool multithread_execute(deque<string> vcommand);
-  bool multithread_execute(vector<string> vcommand,int NUM_THREADS,bool VERBOSE);
-  bool multithread_execute(vector<string> vcommand,int NUM_THREADS);
-  bool multithread_execute(vector<string> vcommand);
+  bool multithread_execute(const deque<string>& vcommand,int NUM_THREADS,bool VERBOSE);
+  bool multithread_execute(const deque<string>& vcommand,int NUM_THREADS);
+  bool multithread_execute(const deque<string>& vcommand);
+  bool multithread_execute(const vector<string>& vcommand,int NUM_THREADS,bool VERBOSE);
+  bool multithread_execute(const vector<string>& vcommand,int NUM_THREADS);
+  bool multithread_execute(const vector<string>& vcommand);
 } // namespace aurostd
 namespace AFLOW_PTHREADS {
-  bool MULTI_sh(vector<string> argv);
-  bool MULTI_compress(string cmd,vector<string> argv);
+  bool MULTI_sh(const vector<string>& argv);
+  bool MULTI_compress(const string& cmd,const vector<string>& argv);
   bool MULTI_zip(const vector<string>& argv); //CO20211104
-  bool MULTI_bz2xz(vector<string> argv);bool MULTI_xz2bz2(vector<string> argv);
-  bool MULTI_gz2xz(vector<string> argv);
+  bool MULTI_bz2xz(const vector<string>& argv);
+  bool MULTI_xz2bz2(const vector<string>& argv);
+  bool MULTI_gz2xz(const vector<string>& argv);
 }
 namespace sflow {
   void KILL(string options);
@@ -2933,7 +2974,72 @@ namespace sflow {
   void QDEL(string options);
   void QDEL(string options,string cmd);
 }
-vector<vector<int> > getThreadDistribution(const int&, const int&);  //ME20190218
+
+#ifdef AFLOW_MULTITHREADS_ENABLE
+//ME20220130
+namespace xthread {
+  class xThread {
+    public:
+      xThread(int nmax=0, int nmin=1);
+      xThread(ostream& oss, int nmax=0, int nmin=1);
+      xThread(const xThread& xt);
+      const xThread& operator=(const xThread& xt);
+      ~xThread();
+
+      void clear();
+
+      void setCPUs(int nmax, int nmin=1);
+      void setProgressBar(ostream& oss);
+      void unsetProgressBar();
+
+      template <typename F, typename... A>
+      void run(uint ntasks, F& func, A&... args);
+      template <typename F, typename... A>
+      void run(int ntasks, F& func, A&... args);
+      template <typename F, typename... A>
+      void run(unsigned long long int ntasks, F& func, A&... args);
+      template <typename IT, typename F, typename... A>
+      void run(const IT& it, F& func, A&... args);
+      template <typename IT, typename F, typename... A>
+      void run(IT& it, F& func, A&... args);
+
+      template <typename F, typename... A>
+      void runPredistributed(int ntasks, F& func, A&... args);
+      template <typename F, typename... A>
+      void runPredistributed(uint ntasks, F& func, A&... args);
+      template <typename F, typename... A>
+      void runPredistributed(unsigned long long int ntasks, F& func, A&... args);
+
+    private:
+      void free();
+      void copy(const xThread&);
+
+      int ncpus_max;
+      int ncpus_min;
+      std::mutex mtx;
+      ostream* progress_bar;
+      unsigned long long int progress_bar_counter;
+      bool progress_bar_set;
+
+      void initializeProgressBar(unsigned long long int ntasks);
+
+      int reserveThreads(unsigned long long int ntasks);
+      void freeThreads(int ncpus);
+
+      template <typename I, typename F, typename... A>
+      void run(I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
+      template <typename I, typename F, typename... A>
+      void spawnWorker(int ithread, I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
+      template <typename I>
+      I advance(I& it, I& end, unsigned long long int ntasks, bool update_progress_bar=false);
+
+      template <typename I, typename F, typename... A>
+      void runPredistributed(I ntasks, F& func, A&... args);
+      template <typename I, typename F, typename... A>
+      void spawnWorkerPredistributed(int ithread, I startIndex, I endIndex, F& func, A&... args);
+  };
+}
+#endif
 
 // ----------------------------------------------------------------------------
 // aflow_kbin.cpp
@@ -2946,6 +3052,7 @@ namespace KBIN {
   bool CompressDirectory(const _aflags& aflags,const _kflags& kflags);
   bool CompressDirectory(const string& directory,const _kflags& kflags);  //ME20210927
   bool CompressDirectory(const _aflags& aflags);
+  bool CompressDirectory(const string& directory);  //CO20211130
   void Clean(const _aflags& aflags);
   void Clean(const string directory);
   void Clean(const _aflags& aflags,const aurostd::xoption& opts_clean);  //CO20210901
@@ -2954,8 +3061,12 @@ namespace KBIN {
   void GenerateAflowinFromVASPDirectory(_aflags& aflags);
   void StartStopCheck(const string &AflowIn,string str1,string str2,bool &flag,bool &flagS);
   void StartStopCheck(const string &AflowIn,string str1,bool &flag,bool &flagS);
-  bool Legitimate_aflowin(string aflowindir,const bool& osswrite,ostringstream& oss);
-  bool Legitimate_aflowin(string aflowindir);
+  bool Legitimate_krun(const _aflags& aflags,const bool osswrite,ostringstream& oss); //SD20220224
+  bool Legitimate_krun(const _aflags& aflags); //SD20220224
+  bool Legitimate_aflowin(const string& aflowindir,const bool osswrite,ostringstream& oss); //SD20220224 - made aflowindir const, removed reference from bool
+  bool Legitimate_aflowin(const string& aflowindir); //SD20220224 - made aflowindir const
+  bool Legitimate_aflowdir(const string& aflowindir,const _aflags& aflags,const bool osswrite,ostringstream& oss); //SD20220224
+  bool Legitimate_aflowdir(const string& aflowindir,const _aflags& aflags); //SD20220224
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ostream& oss=cout); //CO20191110
   void getAflowInFromAFlags(const _aflags& aflags,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss=cout); //CO20191110
   void getAflowInFromDirectory(const string& directory,string& AflowIn_file,string& AflowIn,ostream& oss=cout); //CO20191110
@@ -3098,14 +3209,17 @@ namespace KBIN {
   bool VASP_OSZICARUnconverged(const string& oszicar,const string& outcar);
   void GetStatDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
   void GetDynaDiel(string& outcar, xvector<double>& eigr, xvector<double>& eigi); // CAMILO
+  string BIN2VASPVersion(const string& binfile);  //SD20220331
+  string BIN2VASPVersionNumber(const string& binfile);  //SD20220331
+  double BIN2VASPVersionDouble(const string& binfile);  //SD20220331
   string OUTCAR2VASPVersion(const string& outcar);  //CO20210315
   string OUTCAR2VASPVersionNumber(const string& outcar);  //CO20210315
   double OUTCAR2VASPVersionDouble(const string& outcar);  //CO20210315
   string VASPVersionString2Number(const string& vasp_version);  //CO20210315
   double VASPVersionString2Double(const string& vasp_version);  //CO20210315
-  string getVASPVersion(const string& binfile);  //ME20190219
-  string getVASPVersionNumber(const string& binfile);  //CO20200610
-  double getVASPVersionDouble(const string& binfile);  //CO20200610
+  string getVASPVersion(const string& binfile,const string& mpi_command="");  //ME20190219
+  string getVASPVersionNumber(const string& binfile,const string& mpi_command="");  //CO20200610
+  double getVASPVersionDouble(const string& binfile,const string& mpi_command="");  //CO20200610
 }
 
 // ----------------------------------------------------------------------------
@@ -3454,7 +3568,9 @@ class xOUTCAR : public xStream { //CO20200404 - xStream integration for logging
     string         Egap_type_net;
     //CO20211106 - IONIC STEPS DATA
     bool GetIonicStepsData();   //CO20211106
-    void WriteMTPCFG(const string& outcar_path,stringstream& output_ss);   //CO20211106
+    void populateAFLOWLIBEntry(aflowlib::_aflowlib_entry& data,const string& outcar_path); //CO20220124
+    void WriteMTPCFG(stringstream& output_ss,const string& outcar_path);   //CO20211106
+    void WriteMTPCFG(stringstream& output_ss,const string& outcar_path,const vector<string>& velements);   //CO20211106
     //[CO20200404 - OBSOLETE]string ERROR;
     //int number_bands,number_kpoints; //CO20171006 - camilo garbage
     //int ISPIN; // turn this into spin = 0 if ISPIN = 1 //CO20171006 - camilo garbage
@@ -3534,6 +3650,9 @@ class xDOSCAR : public xStream { //CO20200404 - xStream integration for logging
     bool GetPropertiesFile(const string& fileIN,bool=TRUE);                 // get everything QUIET
     bool GetPropertiesUrlFile(const string& url,const string& file,bool=TRUE); // get everything from an aflowlib entry
     void convertSpinOFF2ON(); //CO20191217 - copies everything from spin channel 1 to spin channel 2
+    void addAtomChannel();  //CO20211124 - creates another atom channel, mimicking size of orbital, spin, and energy
+    void addOrbitalChannel(); //CO20211124 - creates another orbital channel, mimicking sizes of spin and energy
+    void resetVDOS(); //CO20211124 - set all vDOS to 0
     bool checkDOS(string& ERROR_out) const;  //CO20191010
     bool GetBandGap(double EFERMI=AUROSTD_NAN,double efermi_tol=AUROSTD_NAN,double energy_tol=1e-3,double occ_tol=1e-4); //CO20191110
     deque<deque<deque<deque<double> > > > GetVDOSSpecies(const xstructure& xstr) const; //vDOS.at(species).at(spin).at(energy_number)  //CO20191110
@@ -4040,8 +4159,8 @@ namespace plotter {
 
   // DOS
   bool dosDataAvailable(const deque<deque<deque<deque<double> > > >& vdos, int pdos); // ME20200305
-  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ostream& oss=cout);  //CO20200404
-  void generateDosPlot(stringstream&, const xDOSCAR&, const aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
+  void generateDosPlot(stringstream&,const xDOSCAR&,aurostd::xoption&,ostream& oss=cout);  //CO20200404
+  void generateDosPlot(stringstream&,const xDOSCAR&,aurostd::xoption&,ofstream& FileMESSAGE,ostream& oss=cout);  //CO20200404
 
   // Bands
   void generateBandPlot(stringstream&, const xEIGENVAL&, const xKPOINTS&, const xstructure&, const aurostd::xoption&);
@@ -4779,7 +4898,6 @@ namespace KBIN {
   bool runRelaxationsAPL_VASP(int, const string&, _xvasp&, _aflags&, _kflags&, _vflags&, ofstream&);  //ME20200427
   void VASP_RunPhonons_APL(_xvasp &xvasp,string AflowIn,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE, ostream& oss=std::cout);
   void RunPhonons_APL(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general
-  void RunPhonons_APL_20181216(_xinput &xinput,string AflowIn,_aflags &aflags,_kflags &kflags,_xflags &xflags,ofstream &FileMESSAGE, ostream& oss=std::cout);  //now it's general //CO20181216
   // ----------------------------------------------------------------------------
   // aflow_agl_debye.cpp
   uint relaxStructureAGL_VASP(const string& AflowIn, _xvasp& xvasp, _aflags& aflags, _kflags& kflags, _vflags& vflags, ofstream& FileMessage);  //CT20200501
@@ -4940,6 +5058,7 @@ namespace xelement {
       ~xelement();                                                    // kill everything
       const xelement& operator=(const xelement &b);                   // copy
       void clear();
+      static uint isElement(const string& element);  //CO20201220 //SD20220223 - made static
       void loadDefaultUnits();  //CO20201111
       void populate(const string& element,int oxidation_state=AUROSTD_MAX_INT); //CO20200520
       void populate(uint ZZ,int oxidation_state=AUROSTD_MAX_INT); //CO20200520
@@ -5269,8 +5388,6 @@ namespace xprototype {
       void copy(const xprototype& b);                    // copy space
   };
 }
-
-
 
 #endif
 // ***************************************************************************

@@ -1,6 +1,28 @@
-3.2.13 - 2021/XX/XX
+3.2.13 - 2022/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz
+        -- fixed bug with printing atom mapping information in XtalFinder, reset for non-matches (DX)
         -- parallelized KBIN::CompressDirectory() (CO)
+        -- Fixed CIF parser for CIF files with oxidation states in species list (ME)
+        -- Added fallback solutions for reading CIF files with unregonized settings (ME)
+        -- Added poscar2aflowin for non-POSCAR input files (ME)
+        -- generalizing DOS averaging for pocc systems with ARUNs having different numbers of atoms (CO)
+        -- added md5sum to --xplug (CO)
+        -- allow naming of generic hosts using --machine_name in combination with --machine (HE)
+        -- fixed logical statements in aflow_kvasp.cpp to be linear (SD)
+        -- fixed the LOCK file to be created atomically (SD)
+        -- added xmatrix reshape, mod_floored functions (SD)
+        -- added ATAT detector, reader and writer (SD)
+        -- fixed execute2string to force bash (SD)
+        -- added flag to CleanSpin() for reading spin from atom labels (SD)
+        -- fixed logic bug in ProcessKill (SD)
+        -- added temporary directory list to aflowrc (SD)
+        -- fixed order of variable initializations in aflow_init.cpp (SD)
+        -- adding basic http1.1 functions to aurostd (HE)
+        -- added const strings variant of aurostd::StringSubst (HE)
+        -- added non decimal bases to aurostd::string2utype (HE)
+        -- removed "kill_vasp_all" and implemented a targeted kill vasp command (SD)
+        -- added KBIN::BIN2VASPVersion (SD)
+        -- fixed KBIN::VASPVersionString2Double, aurostd::substring2bool, aurostd::kvpairfound (SD)
 3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)
