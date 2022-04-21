@@ -5139,7 +5139,7 @@ namespace aurostd {
         message << "'a' matrix not square  a.rows=" << a.rows << " a.cols=" << a.cols;
         throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
-      else if(wr.rows!=a.rows || wi.rows!=a.rows) {
+      else if(wr.rows!=a.rows || wi.rows!=a.rows) { //SD20220420 - output lengths need to match input
         stringstream message;
         message << "'wr' and 'wi' lengths must be compatible with 'a' matrix, a.rows=" << a.rows << " wr.rows=" << wr.rows<< " wi.rows=" << wi.rows;
         throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);

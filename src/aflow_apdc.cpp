@@ -274,10 +274,10 @@ namespace apdc {
     apdc_data.degeneracy_cluster = GetDegeneracyCluster(apdc_data.plattice, apdc_data.vstr_atat, apdc_data.elements, apdc_data.max_num_atoms, true, apdc_data.rundirpath);
     apdc_data.conc_macro = GetConcentrationMacro(apdc_data.conc_range, apdc_data.conc_npts, apdc_data.elements.size());
     apdc_data.prob_ideal_cluster = GetProbabilityIdealCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.degeneracy_cluster, apdc_data.max_num_atoms);
-    CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_ideal_cluster, "Ideal solution (high T)");
+    CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_ideal_cluster);
     apdc_data.temp = GetTemperature(apdc_data.temp_range, apdc_data.temp_npts);
     apdc_data.prob_cluster = GetProbabilityCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.excess_energy_cluster, apdc_data.prob_ideal_cluster, apdc_data.temp, apdc_data.max_num_atoms);
-    CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_cluster, "Cluster");
+    CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_cluster);
   }
 }
 
@@ -360,31 +360,31 @@ namespace apdc {
 // apdc::CheckProbability
 // ***************************************************************************
 namespace apdc {
-  void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob, const string& ptype) {
+  void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob) {
     string function_name = XPID + "CheckProbability():";
     int nx = prob.rows;
     for (int i = 1; i <= nx; i++) {
       if (!aurostd::isequal(aurostd::sum(prob(i)), 1.0)) { // unnormalized
-        string message = ptype + " probability is unnormalized for cluster=" + aurostd::utype2string<int>(i);
+        string message = "Ideal solution (high T) probability is unnormalized for cluster=" + aurostd::utype2string<int>(i);
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
       }
       else if (!aurostd::isequal(prob(i)*conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
-        string message = ptype + " probability does not satisfy concentration contraint for cluster=" + aurostd::utype2string<int>(i);
+        string message = "Ideal solution (high T) probability does not satisfy concentration contraint for cluster=" + aurostd::utype2string<int>(i);
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
       }
     }
   }
-  void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const vector<xmatrix<double>>& prob, const string& ptype) {
+  void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const vector<xmatrix<double>>& prob) {
     string function_name = XPID + "CheckProbability():";
     int nx = prob[0].rows;
     for (uint it = 0; it < prob.size(); it++) {
       for (int i = 1; i <= nx; i++) {
         if (!aurostd::isequal(aurostd::sum(prob[it](i)), 1.0)) { // unnormalized
-          string message = ptype + " probability is unnormalized for cluster=" + aurostd::utype2string<int>(i);
+          string message = "Equilibrium probability is unnormalized for cluster=" + aurostd::utype2string<int>(i);
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
         }
         else if (!aurostd::isequal(prob[it](i)*conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
-          string message = ptype + " probability does not satisfy concentration contraint for cluster=" + aurostd::utype2string<int>(i);
+          string message = "Equilibrium probability does not satisfy concentration contraint for cluster=" + aurostd::utype2string<int>(i);
           throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
         }
       }

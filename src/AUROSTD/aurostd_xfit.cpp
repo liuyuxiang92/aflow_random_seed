@@ -195,13 +195,17 @@ namespace aurostd{
   void polynomialFindRoots(const xvector<double> &p, xvector<double> &rr, xvector<double> &ri)
   {
     string function_name = XPID + "polynomialFindRoots():";
-    if (std::isnan(aurostd::sum(aurostd::abs(p)))) {
-      string message = "NaN in polynomial coefficients";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
-    }
-    else if (aurostd::sum(aurostd::abs(p)) == INFINITY) {
-      string message = "Inf in polynomial coefficients";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
+    for (int i = 1; i <= p.urows; i++) {
+      if (std::isnan(p(i))) {
+        stringstream message;
+        message << "NaN in polynomial coefficient i=" << i;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
+      }
+      else if (aurostd::abs(p(i)) == INFINITY) {
+        stringstream message;
+        message << "Inf in polynomial coefficient i=" << i;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
+      }
     }
     aurostd::eigen(companion_matrix(p), rr, ri);
   }
