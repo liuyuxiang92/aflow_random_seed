@@ -1523,9 +1523,7 @@ namespace KBIN {
       }
     }
     // POSCAR DONE **************************************************
-    //xvasp.POSCAR_orig << xvasp.POSCAR.str();
-    //SD20220302 - Create POSCAR.orig from AFLOWIN
-    xvasp.POSCAR_orig = KBIN::ExtractPOSCARFromAFLOWIN(AflowIn,1); // start counting from 1
+    xvasp.POSCAR_orig << xvasp.POSCAR.str();
     xvasp.aopts.flag("FLAG::XVASP_POSCAR_generated",TRUE);
     xvasp.aopts.flag("FLAG::XVASP_POSCAR_changed",FALSE);
 
@@ -6723,7 +6721,7 @@ namespace KBIN {
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         }
       }
-      Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp,aflags.Directory)); //creates xvasp.POSCAR //SD20220302 - Now should produce POSCAR.orig from AFLOWIN
+      Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp,aflags.Directory)); //creates xvasp.POSCAR
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
         Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR")));
       }
@@ -6766,7 +6764,7 @@ namespace KBIN {
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         }
       }
-      Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp,aflags.Directory)); //creates xvasp.POSCAR //SD20220302 - Now should produce POSCAR.orig from AFLOWIN
+      Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp,aflags.Directory)); //creates xvasp.POSCAR
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
         Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR")));
       }
@@ -6815,7 +6813,7 @@ namespace KBIN {
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         }
       }
-      Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp,aflags.Directory)); //CO20210315 - previously missing before  //creates xvasp.POSCAR //SD20220302 - Now should produce POSCAR.orig from AFLOWIN
+      Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp,aflags.Directory)); //CO20210315 - previously missing before  //creates xvasp.POSCAR
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
         Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR")));
       }
@@ -6861,7 +6859,7 @@ namespace KBIN {
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         }
       }
-      Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp,aflags.Directory)); //CO20210315 - previously missing before  //creates xvasp.POSCAR //SD20220302 - Now should produce POSCAR.orig from AFLOWIN
+      Krun=(Krun && KBIN::VASP_Produce_POSCAR(xvasp,aflags.Directory)); //CO20210315 - previously missing before  //creates xvasp.POSCAR
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
         Krun=(Krun && aurostd::stringstream2file(xvasp.POSCAR,string(xvasp.Directory+"/POSCAR")));
       }
@@ -8081,7 +8079,7 @@ namespace KBIN {
   // SD20220228 - Extract the nth POSCAR from the AFLOWIN, negative values go backwards
   stringstream ExtractPOSCARFromDirectory(const string& directory, int index) {
     string function_name = "KBIN::ExtractPOSCARFromDirectory():";
-    string AflowIn;
+    string AflowIn = "";
     if(!aurostd::file2string(directory + "/" + _AFLOWIN_, AflowIn)) {
       string message = "Could not find " + _AFLOWIN_ + " in " + directory;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_NOT_FOUND_);
