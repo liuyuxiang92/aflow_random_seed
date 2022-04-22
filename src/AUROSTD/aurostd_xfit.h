@@ -10,14 +10,15 @@
 //********************************************************************************
 //              Functions to work with polynomials
 namespace aurostd{
-  double evalPolynomial(double x, const xvector<double> &p);
-  void evalPolynomialDeriv(double x, const xvector<double> &p, xvector<double> &dp);
-  xvector<double> evalPolynomialDeriv(double x, const xvector<double> &p, uint n);
-  xmatrix<double> Vandermonde_matrix(const xvector<double> &x, int n);
-  double polynomialFindExtremum(const xvector<double> &p, double xmin, double xmax,
-      double tol=_mm_epsilon);
-  xmatrix<double> companion_matrix(const xvector<double> &p); //SD20220318
-  void polynomialFindRoots(const xvector<double> &p, xvector<double> &rr, xvector<double> &ri); // SD20220318
+  double evalPolynomial(const double& x, const xvector<double>& p);
+  void evalPolynomialDeriv(const double& x, const xvector<double>& p, xvector<double>& dp);
+  xvector<double> evalPolynomialDeriv(const double& x, const xvector<double>& p, const uint n);
+  xmatrix<double> Vandermonde_matrix(const xvector<double>& x, const int n);
+  double polynomialFindExtremum(const xvector<double>& p, const double& xmin, const double& xmax,
+      const double& tol=_mm_epsilon);
+  xvector<double> polynomialCurveFit(const xvector<double>& x, const xvector<double>& y, const int n, xvector<double> w); //SD20220422
+  xmatrix<double> companion_matrix(const xvector<double>& p); //SD20220318
+  void polynomialFindRoots(const xvector<double>& p, xvector<double>& rr, xvector<double>& ri); // SD20220318
 }
 
 //********************************************************************************
@@ -38,8 +39,8 @@ namespace aurostd{
     public:
       NonlinearFit();
       NonlinearFit(const NonlinearFit &nlf);
-      NonlinearFit(xvector<double> &x, xvector<double> &y, xvector<double> &guess,
-          double foo(const double x, const xvector<double> &p, xvector<double> &dydp),
+      NonlinearFit(xvector<double>& x, xvector<double>& y, xvector<double>& guess,
+          double foo(const double x, const xvector<double>& p, xvector<double>& dydp),
           double tol=1e-6, double tau=1e-12, int max_iter=1000);
       ~NonlinearFit();
       const NonlinearFit& operator=(const NonlinearFit &qha);

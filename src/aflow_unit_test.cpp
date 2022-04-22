@@ -373,6 +373,22 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 
   check_equal(ls, aurostd::linspace(1.0,2.5,5), check_function, check_description, passed_checks, results);
 
+
+  // ---------------------------------------------------------------------------
+  // Check | polynomialCurveFit //SD20220422
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::polynomialCurveFit()";
+  check_description = "calculate coefficients of a polynomial degree n that fits the data";
+  xvector<double> xdata(5), ydata(5), wts(5), pcf(4);
+  xdata(1) = 0.6557; xdata(2) = 0.0357; xdata(3) = 0.8491; xdata(4) = 0.9340; xdata(5) = 0.6787;
+  ydata(1) = -0.3584; ydata(2) = -0.9667; ydata(3) = 0.2438; ydata(4) = 0.6336; ydata(5) = -0.3046;
+  wts(1) = 0.8235; wts(2) = 0.6948; wts(3) = 0.3171; wts(4) = 0.9502; wts(5) = 0.0344;
+  pcf(1) = -0.999811863130501; pcf(2) = 0.994609918720966; pcf(3) = -1.986537348812413; pcf(4) = 2.991497664527984;
+
+  check_equal(pcf, aurostd::polynomialCurveFit(xdata, ydata, 3, wts), check_function, check_description, passed_checks, results);
+
+
   // present overall result
   return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
 }

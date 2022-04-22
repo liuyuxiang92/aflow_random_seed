@@ -445,6 +445,9 @@ namespace aurostd {
     trace(const xmatrix<utype>&) __xprototype;    //DX20180115 - double to utype
 
   template<class utype> xmatrix<utype>
+    HadamardProduct(const xmatrix<utype>&, const xmatrix<utype>&) __xprototype;  //SD20220422
+
+  template<class utype> xmatrix<utype>
     KroneckerProduct(const xmatrix<utype>&, const xmatrix<utype>&) __xprototype;  //ME20180614
 
   template<class utype> xmatrix<utype>

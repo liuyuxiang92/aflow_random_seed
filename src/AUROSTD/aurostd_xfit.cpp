@@ -20,7 +20,7 @@ namespace aurostd{
   ///
   /// The polynomial is represented in the following form:
   /// p(x) = p0+x*(p1+x*(p2+x*(p3+...x*(p(n-1)+x*(pn)))))
-  double evalPolynomial(double x, const xvector<double> &p)
+  double evalPolynomial(const double& x, const xvector<double>& p)
   {
     double res = p[p.urows];
     for (int i=p.urows-1; i>=p.lrows; i--) res = res*x + p[i];
@@ -32,7 +32,7 @@ namespace aurostd{
   ///
   /// The highest derivative is determined by the size of the dp array and the result
   /// is stored in ascending order starting from the zero's derivative (function itself).
-  void evalPolynomialDeriv(double x, const xvector<double> &p, xvector<double> &dp)
+  void evalPolynomialDeriv(const double& x, const xvector<double>& p, xvector<double>& dp)
   {
     for (int i=dp.lrows; i<=dp.urows; i++) dp[i] = 0.0;
     dp[dp.lrows] = p[p.urows];
@@ -54,7 +54,7 @@ namespace aurostd{
   /// The result is stored in ascending order starting from the zero's derivative
   /// (function itself).
   /// @param n is the highest order of the derivative to be calculated.
-  xvector<double> evalPolynomialDeriv(double x, const xvector<double> &p, uint n)
+  xvector<double> evalPolynomialDeriv(const double& x, const xvector<double>& p, const uint n)
   {
     xvector<double> dp(n+1);
     evalPolynomialDeriv(x, p, dp);
@@ -69,7 +69,7 @@ namespace aurostd{
   /// ...
   /// 1 xm^1 xm^2 .. xm^(n-1)
   /// where m is the size of x array
-  xmatrix<double> Vandermonde_matrix(const xvector<double> &x, int n)
+  xmatrix<double> Vandermonde_matrix(const xvector<double>& x, const int n)
   {
     xmatrix<double> VM(x.rows, n);
 
@@ -101,8 +101,8 @@ namespace aurostd{
   /// In this situation, f(x0)~0 and this condition is used as a criterion to stop the
   /// iteration procedure.
   ///
-  double polynomialFindExtremum(const xvector<double> &p, double xmin, double xmax,
-      double tol){
+  double polynomialFindExtremum(const xvector<double>& p, const double& xmin, const double& xmax,
+      const double& tol){
     bool LDEBUG = (FALSE || DEBUG_XFIT || XHOST.DEBUG);
     string function = XPID + "polynomialFindExtremum(): ";
     if (LDEBUG) cerr << function << "begin" << std::endl;
@@ -162,6 +162,35 @@ namespace aurostd{
     if (LDEBUG) cerr << function << "end" << std::endl;
     return middle;
   }
+
+  /// Simon Divilov
+  /// Calculate the coefficients for a polynomial p(x) of degree n that fits the y data with weights w
+  xvector<double> polynomialCurveFit(const xvector<double>& x, const xvector<double>& _y, const int n, const xvector<double> _w) {
+    string function_name = XPID + "polynomialCurveFit():";
+    double wtot = 0.0;
+    for (int i = 1; i <= _w.rows; i++) {
+      if (_w(i) < 0) {
+        stringstream message;
+        message << "Negative weight i=" << i;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
+      }
+      wtot += _w(i);
+    }
+    if (wtot == 0.0) {
+      string message = "Weights cannot be zero";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
+    }
+    xmatrix<double> VM = Vandermonde_matrix(x, n + 1);
+    xvector<double> w = _w / wtot; // normalize weights
+    for (int i = 1; i <= VM.rows; i++) {
+      VM.setmat(w(i) * VM.getmat(i, i, 1, VM.cols), i, 1);
+    }
+    xvector<double> y = aurostd::elementwise_product(w, _y);
+    aurostd::cematrix lsf(VM);
+    lsf.LeastSquare(y);
+    return aurostd::vector2xvector(lsf.AVec());
+  }
+
   /// Simon Divilov
   /// Calculate the (tranpose) n-by-n companion matrix of a polynomial, where n is the polynomial degree
   /// transposed companion matrix:
@@ -170,14 +199,14 @@ namespace aurostd{
   /// ...
   ///  0   0   0  ..  1
   /// -p0 -p1 -p2 .. -p(n-1)
-  xmatrix<double> companion_matrix(const xvector<double> &p)
+  xmatrix<double> companion_matrix(const xvector<double>& p)
   {
-    if (p(p.urows) == 0.0) {
+    if (p(p.rows) == 0.0) {
       string function_name = XPID + "companion_matrix():";
       string message = "Leading polynomial coefficient is zero";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
     }
-    int n = p.urows - 1;
+    int n = p.rows - 1;
     xmatrix<double> CM(n, n);
     for (int i = 1; i < n; i++) {
       for (int j = 1; j <= n; j++) {
@@ -192,10 +221,10 @@ namespace aurostd{
   /// Calculates the roots of a polynomial as the eigenvalues of the companion matrix
   /// The real and imaginary parts of the roots are returned in rr and ri, respectively
   /// DOI: 10.1090/S0025-5718-1995-1262279-2
-  void polynomialFindRoots(const xvector<double> &p, xvector<double> &rr, xvector<double> &ri)
+  void polynomialFindRoots(const xvector<double>& p, xvector<double>& rr, xvector<double>& ri)
   {
     string function_name = XPID + "polynomialFindRoots():";
-    for (int i = 1; i <= p.urows; i++) {
+    for (int i = 1; i <= p.rows; i++) {
       if (std::isnan(p(i))) {
         stringstream message;
         message << "NaN in polynomial coefficient i=" << i;
@@ -225,9 +254,9 @@ namespace aurostd{
     free(); copy(nlf);
   }
 
-  NonlinearFit::NonlinearFit(xvector<double> &x_in, xvector<double> &y_in,
-      xvector<double> &guess_in,
-      double foo(const double x, const xvector<double> &p, xvector<double> &dydp),
+  NonlinearFit::NonlinearFit(xvector<double>& x_in, xvector<double>& y_in,
+      xvector<double>& guess_in,
+      double foo(const double x, const xvector<double>& p, xvector<double>& dydp),
       double tol_in, double tau_in, int max_iter_in)
   {
     free();

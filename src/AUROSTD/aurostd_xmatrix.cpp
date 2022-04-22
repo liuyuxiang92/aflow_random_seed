@@ -2422,6 +2422,31 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {
   template<class utype>
+    xmatrix<utype> HadamardProduct(const xmatrix<utype>& A, const xmatrix<utype>& B) { //SD20220422 - also called element-wise product or Schur product
+      string function = XPID + "aurostd::HadamardProduct():";
+      if (A.rows != B.rows) {
+        stringstream message;
+        message << "A and B must have the same dimensions, A.rows=" << A.rows << " B.rows=" << B.rows;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+      }
+      else if (A.cols != B.cols) {
+        stringstream message;
+        message << "A and B must have the same dimensions, A.cols=" << A.cols << " B.cols=" << B.cols;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+      }
+      xmatrix<utype> product(A.rows, A.cols);
+      for (int i = 0; i < A.rows; i++) {
+        for (int j = 0; j < A.cols; j++) {
+          product(i + 1, j + 1) = A(A.lrows + i, A.lcols + j) * B(B.lrows + i, B.lcols + j);
+        }
+      }
+      return product;
+    }
+}
+
+// ----------------------------------------------------------------------------
+namespace aurostd {
+  template<class utype>
     xmatrix<utype> KroneckerProduct(const xmatrix<utype>& A, const xmatrix<utype>& B) { //ME20180614 - Kronecker product
       int rows, cols, r, c;
       utype aelement, belement;

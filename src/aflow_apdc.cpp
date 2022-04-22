@@ -249,6 +249,15 @@ namespace apdc {
 }
 
 // ***************************************************************************
+// apdc::GetSpinodal
+// ***************************************************************************
+namespace apdc {
+  void GetSpinodal(_apdc_data& apdc_data) {
+    cerr << apdc_data.rundirpath << endl;
+  }
+}
+
+// ***************************************************************************
 // apdc::GetBinodal
 // ***************************************************************************
 // Binodal construction based on the method developed in Y. Lederer et al., Acta Materialia, 159 (2018)
@@ -278,15 +287,27 @@ namespace apdc {
     apdc_data.temp = GetTemperature(apdc_data.temp_range, apdc_data.temp_npts);
     apdc_data.prob_cluster = GetProbabilityCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.excess_energy_cluster, apdc_data.prob_ideal_cluster, apdc_data.temp, apdc_data.max_num_atoms);
     CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_ideal_cluster, apdc_data.prob_cluster);
+    GetRelativeEntropyEC(apdc_data.conc_cluster, apdc_data.degeneracy_cluster, apdc_data.excess_energy_cluster, apdc_data.temp, apdc_data.max_num_atoms);
   }
 }
 
 // ***************************************************************************
-// apdc::GetSpinodal
+// apdc::GetRelativeEntropyEC
 // ***************************************************************************
 namespace apdc {
-  void GetSpinodal(_apdc_data& apdc_data) {
-    cerr << apdc_data.rundirpath << endl;
+  double GetRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& temp, const int max_num_atoms) {
+    int nelem = conc_cluster.cols;
+    xmatrix<double> conc_macro_ec(1, nelem);
+    for (int i = 1; i <= nelem; i++) {conc_macro_ec(1, i) = 1.0 / (double)nelem;}
+    xmatrix<double> prob_ideal_ec = GetProbabilityIdealCluster(conc_macro_ec, conc_cluster, degeneracy_cluster, max_num_atoms);
+    vector<xmatrix<double>> prob_ec = GetProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, temp, max_num_atoms);
+    xvector<double> order_param(prob_ec.size());
+    xmatrix<double> m1, m2, m3 = prob_ideal_ec * aurostd::trasp(prob_ideal_ec);
+    for (uint i = 0; i < prob_ec.size(); i++) {
+      m1 = prob_ec[i]*aurostd::trasp(prob_ideal_ec);
+      m2 = prob_ec[i] * aurostd::trasp(prob_ec[i]);
+      order_param(i + 1) = m1(1,1) / (aurostd::sqrt(m2(1,1)) * aurostd::sqrt(m3(1,1)));
+    }
   }
 }
 
@@ -365,15 +386,16 @@ namespace apdc {
     int nx = prob.rows;
     for (int i = 1; i <= nx; i++) {
       if (!aurostd::isequal(aurostd::sum(prob(i)), 1.0)) { // unnormalized
-        string message = "Ideal solution (high T) probability is unnormalized for i=" + aurostd::utype2string<int>(i);
+        string message = "Ideal solution (high-T) probability is unnormalized for i=" + aurostd::utype2string<int>(i);
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
       }
       else if (!aurostd::isequal(prob(i)*conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
-        string message = "Ideal solution (high T) probability does not satisfy concentration contraint for i=" + aurostd::utype2string<int>(i);
+        string message = "Ideal solution (high-T) probability does not satisfy concentration contraint for i=" + aurostd::utype2string<int>(i);
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
       }
     }
   }
+
   void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob0, const vector<xmatrix<double>>& prob) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name = XPID + "CheckProbability():";
@@ -393,7 +415,7 @@ namespace apdc {
       diff_old = diff;
       diff = aurostd::sum(aurostd::abs(prob[it] - prob0));
       if (LDEBUG) {cerr << "|P - P0| = " << diff << endl;}
-      if (diff > diff_old) {
+      if (diff > diff_old) { // P(T_inf) does not equal P0(T_inf)
         string message = "Equilibrium probability does not converge to the high-T limit";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }

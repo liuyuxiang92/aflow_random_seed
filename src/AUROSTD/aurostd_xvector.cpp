@@ -474,6 +474,23 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
+//SD20220422
+namespace aurostd {  // namespace aurostd
+  template<class utype> xvector<utype>
+    elementwise_product(const xvector<utype>& a,const xvector<utype>& b) {
+      if(a.rows!=b.rows) {
+        string function = XPID + "aurostd::xvector::elementwise_product():";
+        stringstream message;
+        message << "xvectors do not have the same size, a.rows=" << a.rows << " b.rows=" << b.rows;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+      }
+      xvector<utype> c(a.urows,a.lrows);
+      for(int i=a.lrows;i<=a.urows;i++)
+        c[i] = a[i]*b[b.lrows-a.lrows+i];
+      return c;
+    }
+}
+
 //ME20200327
 namespace aurostd {
   template<class utype> xmatrix<utype>
