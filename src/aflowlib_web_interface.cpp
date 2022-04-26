@@ -4718,7 +4718,20 @@ namespace aflowlib {
       cerr << __AFLOW_FUNC__ << ": URL = " << url << endl;
       cerr << __AFLOW_FUNC__ << ": Performing call ... please be patient ..." << endl;
     }
-    return aurostd::httpGet(url);
+    //ME20220426 - add error handling
+    int status_code = 0;
+    string response = aurostd::httpGet(url, status_code);
+    if (status_code < 200 || status_code >= 400) {
+      string message = "Bad status code for AFLUX request (" + aurostd::utype2string<int>(status_code) + ").";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_HTTP_);
+    }
+    if ((response.find("Lux Fail") != string::npos)
+      || (response.find("DB Fail") != string::npos)
+      || (response.find("Count Fail") != string::npos)) {
+      string message = "Bad response: " + response + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    }
+    return response;
   }
 }
 
