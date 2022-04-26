@@ -2164,6 +2164,111 @@ namespace aurostd {  // namespace aurostd
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
+  template<class utype>
+    void LUPDecomposition(const xmatrix<utype>& A, xmatrix<utype>& LU, xmatrix<utype>& P, utype tol) { //SD20220426
+      // A is a square matrix and LU is the LU decomposition, where LU=(L-I)+U such that A=trasp(P)*LU
+      // See: https://en.wikipedia.org/wiki/LU_decomposition
+      string function_name = XPID + "aurostd::LUPDecompoisiton():";
+      if (!A.issquare) {
+        string message = "Matrix needs to be square for LU decomposition";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
+      }
+      LU = A;
+      int imax, itmp;
+      double maxA, absA;
+      xvector<int> p(LU.urows, LU.lrows);
+      xmatrix<utype> tmpLU;
+      P = (utype)0 * ones_xm<utype>(LU.urows, LU.ucols, LU.lrows, LU.lcols);
+      for (int i = LU.lrows; i <= LU.urows; i++) {p(i) = i;} // initialize P
+      for (int i = LU.lrows; i <= LU.urows; i++) {
+        maxA = 0.0;
+        imax = i;
+        for (int j = i; j <= LU.urows; j++) {
+          absA = aurostd::abs(LU(j, i));
+          if (absA > maxA) {
+            maxA = absA;
+            imax = j;
+          }
+        }
+        if (maxA < tol) {
+          string message = "Matrix is degenerate";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
+        }
+        if (imax != i) {
+          // pivoting P
+          itmp = p(i);
+          p(i) = p(imax);
+          p(imax) = itmp;
+          // pivoting rows of A
+          tmpLU = LU.getmat(i, i, LU.lcols, LU.ucols);
+          LU.setmat(LU.getmat(imax, imax, LU.lcols, LU.ucols), i, 1);
+          LU.setmat(tmpLU, imax, 1);
+        }
+        for (int j = i + 1; j <= LU.urows; j++) {
+          LU(j, i) /= LU(i, i);
+          for (int k = i + 1; k <= LU.urows; k++) {
+            LU(j,k) -= LU(j, i) * LU(i, k);
+          }
+        }
+      }
+      for (int i = LU.lrows; i <= LU.urows; i++) {P(i, p(i)) = (utype)1;}
+    }
+  template<class utype>
+    void LUPDecomposition(const xmatrix<utype>& A, xmatrix<utype>& L, xmatrix<utype>& U, xmatrix<utype>& P, utype tol) { //SD20220426
+      // A is a square matrix and LU is the LU decomposition, where A=trasp(P)*LU
+      xmatrix<utype> LU;
+      LUPDecomposition(A, LU, P, tol);
+      L = aurostd::eye<utype>(LU.urows, LU.ucols, LU.lrows, LU.lcols);
+      U = L;
+      for (int i = LU.lrows + 1; i <= LU.urows; i++) {
+        L.setmat(LU.getmat(i, i, LU.lcols, i - LU.lcols), i, LU.lcols);
+      }
+      U += LU - L;
+    }
+  template<class utype>                                 // function inverse xmatrix<>
+    xmatrix<utype> inverseByLUP(const xmatrix<utype>& A) { //SD20220426
+      xmatrix<utype> IA, LU, P;
+      LUPDecomposition(A, LU, P);
+      IA = trasp(P);
+      for (int i = LU.lrows; i <= LU.urows; i++) {
+        for (int j = LU.lrows; j <= LU.urows; j++) {
+          for (int k = 1; k < j; k++) {
+            IA(j, i) -= LU(j, k) * IA(k, i);
+          }
+        }
+        for (int j = LU.urows; j >= LU.lrows; j--) {
+          for (int k = j + 1; k <= LU.urows; k++) {
+            IA(j, i) -= LU(j, k) * IA(k, i);
+          }
+          IA(j, i) /= LU(j, j);
+        }
+      }
+      return IA;
+    }
+}
+
+// ----------------------------------------------------------------------------
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+    double condition_number(const xmatrix<utype>& _a) { //SD20220425
+      double maxv = 0.0, minv = INFINITY;
+      xmatrix<utype> a = aurostd::abs(_a);
+      for(int i=a.lrows;i<=a.urows;i++) {
+        for(int j=a.lcols;j<=a.ucols;j++) {
+          if (a[i][j] > maxv) {
+            maxv = (double)a[i][j];
+          }
+          if (a[i][j] < minv && a[i][j] != 0.0) {
+            minv = (double)a[i][j];
+          }
+        }
+      }
+      return maxv / minv;
+    }
+}
+
+// ----------------------------------------------------------------------------
+namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>  // function roundoff clear small elements
     roundoff(const xmatrix<utype>& a,utype _tol_) {
       xmatrix<utype> c(a.urows,a.ucols,a.lrows,a.lcols);
@@ -2423,16 +2528,16 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {
   template<class utype>
     xmatrix<utype> HadamardProduct(const xmatrix<utype>& A, const xmatrix<utype>& B) { //SD20220422 - also called element-wise product or Schur product
-      string function = XPID + "aurostd::HadamardProduct():";
+      string function_name = XPID + "aurostd::HadamardProduct():";
       if (A.rows != B.rows) {
         stringstream message;
         message << "A and B must have the same dimensions, A.rows=" << A.rows << " B.rows=" << B.rows;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       else if (A.cols != B.cols) {
         stringstream message;
         message << "A and B must have the same dimensions, A.cols=" << A.cols << " B.cols=" << B.cols;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> product(A.rows, A.cols);
       for (int i = 0; i < A.rows; i++) {
@@ -3132,6 +3237,21 @@ namespace aurostd {  // namespace aurostd
 }
 
 // ----------------------------------------------------------------------------
+// SD20220426
+// Least squares approximation of linear functions to the data
+// Solves A*x=b, where A is a m-by-n matrix and b is a m-by-1 vector and
+// the output x is a n-by-1 vector
+// See: https://en.wikipedia.org/wiki/Linear_least_squares
+namespace aurostd {  // namespace aurostd
+  template<class utype>                                   
+    xvector<utype> LinearLeastSquares(xmatrix<utype>& A, xvector<utype>& b) {
+    xmatrix<utype> Q, R;
+    aurostd::QRDecomposition_HouseHolder(trasp(A) * A, Q, R); // inverse more stable with QR decomposition and pivoting
+    return aurostd::inverseByLUP(R) * trasp(Q) * trasp(A) * b;
+  }
+}
+
+// ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype>                                    // GaussJordan xmatrix
     void GaussJordan(xmatrix<utype>& A, xmatrix<utype>& B) {
@@ -3533,6 +3653,53 @@ namespace aurostd {
         message << "Extracted rotation should be an orthogonal matrix (R*R^T==I):" << endl << identity_matrix;
         throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
       }
+    }
+  }
+}
+
+
+// ----------------------------------------------------------------------------
+// SD20220425
+// Equilibrates a general rectangular matrix such that it has max-norm 1 in every row and column.
+// The equilibrated matrix A can be written in terms of the original matrix as: A = R * A_orig * C
+// DOI: 10.1137/S0895479891222088
+// See also: https://cs.stanford.edu/people/paulliu/files/cs517-project.pdf
+namespace aurostd {
+  template<class utype> void equilibrateMatrix(const xmatrix<utype>& A_orig, xmatrix<utype>& A, xmatrix<utype>& R, xmatrix<utype>& C, uint niter, utype tol) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    A = A_orig;
+    aurostd::shiftlrowscols(A, 1, 1);
+    int m = A.rows, n = A.cols, mn = m + n;
+    //           ( 0 | A )
+    // A_block = ( ----- ) // symmetric matrix
+    //           ( A'| 0 )
+    xmatrix<utype> A_block = (utype)0.0 * aurostd::ones_xm<utype>(mn, mn);
+    A_block.setmat(A, 1, m + 1);
+    A_block.setmat(trasp(A), m + 1, 1);
+    A = A_block;
+    xmatrix<utype> D = aurostd::eye<utype>(mn), D_tmp;
+    utype d;
+    bool flag_conv = false;
+    uint iter = 0;
+    if (LDEBUG) {cerr << "A_orig=" << A_orig << endl;}
+    while (iter < niter && flag_conv != true) {
+      flag_conv = true;
+      for (int i = 1; i <= mn; i++) {
+        D_tmp = aurostd::eye<utype>(mn);
+        d = (utype)1.0 / aurostd::sqrt(aurostd::linf_norm(A.getmat(1, mn, i, i)));
+        D_tmp(i, i) = d;
+        D = D * D_tmp;
+        A = D_tmp * A * D_tmp;
+        if (flag_conv && (aurostd::abs(1.0 - d) > tol)) {flag_conv = false;}
+      }
+      iter++;
+    }
+    R = D.getmat(1, m, 1, m);
+    C = D.getmat(m + 1, mn, m + 1, mn);
+    A = R * A_orig * C;
+    if (LDEBUG) {
+      cerr << "iter=" << iter << endl;
+      cerr << "A=" << A << endl;
     }
   }
 }

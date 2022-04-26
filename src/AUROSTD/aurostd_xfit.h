@@ -11,14 +11,16 @@
 //              Functions to work with polynomials
 namespace aurostd{
   double evalPolynomial(const double& x, const xvector<double>& p);
+  xvector<double> evalPolynomial(const xvector<double>& x, const xvector<double>& p);
   void evalPolynomialDeriv(const double& x, const xvector<double>& p, xvector<double>& dp);
   xvector<double> evalPolynomialDeriv(const double& x, const xvector<double>& p, const uint n);
+  xvector<double> evalPolynomialDeriv(const xvector<double>& p, const uint n); //SD20220425
   xmatrix<double> Vandermonde_matrix(const xvector<double>& x, const int n);
   double polynomialFindExtremum(const xvector<double>& p, const double& xmin, const double& xmax,
       const double& tol=_mm_epsilon);
   xvector<double> polynomialCurveFit(const xvector<double>& x, const xvector<double>& y, const int n, xvector<double> w); //SD20220422
   xmatrix<double> companion_matrix(const xvector<double>& p); //SD20220318
-  void polynomialFindRoots(const xvector<double>& p, xvector<double>& rr, xvector<double>& ri); // SD20220318
+  void polynomialFindRoots(const xvector<double>& p, xvector<double>& rr, xvector<double>& ri); //SD20220318
 }
 
 //********************************************************************************

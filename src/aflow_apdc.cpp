@@ -304,10 +304,19 @@ namespace apdc {
     xvector<double> order_param(prob_ec.size());
     xmatrix<double> m1, m2, m3 = prob_ideal_ec * aurostd::trasp(prob_ideal_ec);
     for (uint i = 0; i < prob_ec.size(); i++) {
-      m1 = prob_ec[i]*aurostd::trasp(prob_ideal_ec);
+      m1 = prob_ec[i] * aurostd::trasp(prob_ideal_ec);
       m2 = prob_ec[i] * aurostd::trasp(prob_ec[i]);
       order_param(i + 1) = m1(1,1) / (aurostd::sqrt(m2(1,1)) * aurostd::sqrt(m3(1,1)));
     }
+    double temp_mean = aurostd::mean(temp), temp_std = aurostd::stddev(temp);
+    xvector<double> temp_scaled = (temp - temp_mean) / temp_std; // scale for numerical stability
+    xvector<double> wts = aurostd::ones_xv<double>(order_param.rows);
+    xvector<double> coeffs = aurostd::polynomialCurveFit(temp_scaled, order_param, 10, wts);
+    
+    cerr<<"X= "<<temp_scaled<<endl;
+    cerr<<"Y= "<<order_param<<endl;
+    cerr<<"Y_fit= "<<aurostd::evalPolynomial(temp_scaled,coeffs)<<endl;
+    
   }
 }
 

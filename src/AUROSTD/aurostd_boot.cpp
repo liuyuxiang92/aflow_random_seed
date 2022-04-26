@@ -324,6 +324,10 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   m*=(utype)5;m/=(utype)6;  //CO20190911
   m.getmatInPlace(m,1,1,1,1,1,1);m.getmatInPlace(vv,1,1,1,1,1,1); //CO20190911
   m=x*m*x/x;o+=(m==m);o+=(m!=m);o+=trace(m);m=-n;traspSquareInPlace(m,false);traspInPlace(m,false);traspInPlace(m,m,false);m=trasp(m);clear(m);mkron=aurostd::KroneckerProduct(mm,mmm);		//CO20190329 - clang doesn't like x=x, changing to x=y
+  aurostd::LUPDecomposition(mm,m3,m3); //SD20220426
+  aurostd::LUPDecomposition(mm,m3,m3,m3); //SD20220426
+  aurostd::inverseByLUP(m3); //SD20220426
+  aurostd::condition_number(m); //SD20220425
   aurostd::HadamardProduct(mmm,mmm); //SD20220422
   o+=sum(m);o+=modulus(m);o+=modulussquare(m);o+=modulus2(m);m=nint(m);m=sign(m);o+=identical(m,m);o+=identical(m,m,x);o+=isdifferent(m,m);o+=isdifferent(m,m,x); //CO20191110
   o+=isequal(m,m);o+=isequal(m,m,x);cout<<m<<endl;
@@ -348,6 +352,8 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   aurostd::l1_norm(m);aurostd::frobenius_norm(m);aurostd::l2_norm(m);aurostd::linf_norm(m);
   // aurostd::trunc(m);aurostd::round(m);
   polarDecomposition(m3,m3,m3); //DX20210111
+  aurostd::equilibrateMatrix(mmm,mmm,mmm,mmm); //SD20220425
+  aurostd::LinearLeastSquares(mmm,vxu); //SD20220426
 
   //[ME20180627 START]
   std::vector<int> stdv(3, 3),stdv2(2, 3),vind(3, 1),vind2(2),stdv0(3, 0); std::vector<utype> vut(3);

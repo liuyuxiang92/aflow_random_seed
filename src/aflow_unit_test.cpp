@@ -373,7 +373,6 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 
   check_equal(ls, aurostd::linspace(1.0,2.5,5), check_function, check_description, passed_checks, results);
 
-
   // ---------------------------------------------------------------------------
   // Check | polynomialCurveFit //SD20220422
   // ---------------------------------------------------------------------------
@@ -387,7 +386,6 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   pcf(1) = -0.999811863130501; pcf(2) = 0.994609918720966; pcf(3) = -1.986537348812413; pcf(4) = 2.991497664527984;
 
   check_equal(pcf, aurostd::polynomialCurveFit(xdata, ydata, 3, wts), check_function, check_description, passed_checks, results);
-
 
   // present overall result
   return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
