@@ -426,7 +426,7 @@ string XtalFinderCalculator::getSpaceGroupMatchbookFromOptions(
 
   // ---------------------------------------------------------------------------
   // AFLUX matchbook preparations: get space group(s)
-  return aflowlib::getSpaceGroupAFLUXSummons(vspace_groups_uint, relaxation_step);
+  return aflowlib::getSpaceGroupMatchbook(vspace_groups_uint, relaxation_step);
 }
 
 // ***************************************************************************

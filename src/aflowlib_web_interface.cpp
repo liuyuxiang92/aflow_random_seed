@@ -4767,12 +4767,12 @@ namespace aflowlib {
 
 //DX20200929 - START
 namespace aflowlib {
-  string getSpaceGroupAFLUXSummons(const vector<uint>& space_groups, uint relaxation_step){
+  string getSpaceGroupMatchbook(const vector<uint>& space_groups, uint relaxation_step){
 
     vector<string> vsummons(space_groups.size());
 
     for(uint i=0;i<space_groups.size();i++){
-      vsummons[i] = getSpaceGroupAFLUXSummons(space_groups[i], relaxation_step, false); //false - signals more than one space group
+      vsummons[i] = getSpaceGroupMatchbook(space_groups[i], relaxation_step, false); //false - signals more than one space group
     }
     if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){ return "spacegroup_orig(" + aurostd::joinWDelimiter(vsummons,":") + ")"; } //DX20210615 - relaxation-step specific keyword
     else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){ return "sg2(" + aurostd::joinWDelimiter(vsummons,":") + ")"; } //DX20210615 - relaxation-step specific keyword
@@ -4782,7 +4782,7 @@ namespace aflowlib {
 }
 
 namespace aflowlib {
-  string getSpaceGroupAFLUXSummons(uint space_group_number, uint relaxation_step, bool only_one_sg){
+  string getSpaceGroupMatchbook(uint space_group_number, uint relaxation_step, bool only_one_sg){
 
     // Formats the space group summons for an AFLUX matchbook
     // This also grabs the relative enantiomorphs, since they
@@ -4814,7 +4814,7 @@ namespace aflowlib {
         space_group_summons = aurostd::utype2string<int>(space_group_number); //DX20210615
       }
       else{
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, "aflowlib::getSpaceGroupAFLUXSummons():", "Unexpected relaxation step input: " + aurostd::utype2string(_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_), _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Unexpected relaxation step input: " + aurostd::utype2string(_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_), _FILE_NOT_FOUND_);
       }
     }
     else { // need to get enantiomorph too
@@ -4837,7 +4837,7 @@ namespace aflowlib {
         space_group_summons += ":" + aurostd::utype2string<int>(enantiomorph_space_group_number); //DX20210615
       }
       else{
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, "aflowlib::getSpaceGroupAFLUXSummons():", "Unexpected relaxation step input: " + aurostd::utype2string(_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_), _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Unexpected relaxation step input: " + aurostd::utype2string(_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_), _FILE_NOT_FOUND_);
       }
     }
 

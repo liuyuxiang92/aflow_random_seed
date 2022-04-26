@@ -1136,7 +1136,7 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
     }
 
     // add space group query to AFLUX matchbook: get entries with compatible space groups, i.e., same or enantiomorph
-    sg_matchbook = aflowlib::getSpaceGroupAFLUXSummons(structure_containers[0].space_group,relaxation_step);
+    sg_matchbook = aflowlib::getSpaceGroupMatchbook(structure_containers[0].space_group,relaxation_step);
     // ME20220419 - Add MUTE operator to reduce response size
     vmatchbook.push_back(sg_matchbook);
     if (!aurostd::WithinList(property_list, sg_matchbook.substr(0, sg_matchbook.find("(")))) {
