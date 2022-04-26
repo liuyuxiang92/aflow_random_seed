@@ -22,6 +22,8 @@
 //[OBSOLETE ME20220129 - not used] #warning "The multithread parts of AFLOW-XtalFinder will be not included, since they need gcc 4.4 and higher (C++0x support)."
 //[OBSOLETE ME20220129 - not used] #endif
 
+  static uint DEFAULT_COMPARE_AFLUX_PAGE_SIZE = 75000;  // Appears to be small enough to prevent timeouts while being large enough to limit the number of requests
+
 // ***************************************************************************
 // SEE README_AFLOW_COMPARE.TXT FOR THE FULL LIST OF AFLOW COMMANDS
 // ***************************************************************************
@@ -1166,7 +1168,8 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   // ME20220420 - Use paged requests to avoid timeouts
   vmatchbook.push_back("");
   uint page = 1;
-  uint page_size = 75000;  // Appears to be small enough to prevent timeouts while being large enough to limit the number of requests
+  string page_size_str = vpflow.getattachedscheme("COMPARE::PAGE_SIZE");
+  uint page_size = page_size_str.empty()?DEFAULT_COMPARE_AFLUX_PAGE_SIZE:aurostd::string2utype<uint>(page_size_str);
   string response = "", response_page = "";
   do {
     vmatchbook.back() = "paging(" + aurostd::utype2string<uint>(page) + "," + aurostd::utype2string<uint>(page_size) + ")";
@@ -1632,7 +1635,8 @@ namespace compare {
     // ME20220420 - Use paged requests to avoid timeouts
     vmatchbook.push_back("");
     uint page = 1;
-    uint page_size = 75000;  // Appears to be small enough to prevent timeouts while being large enough to limit the number of requests
+    string page_size_str = vpflow.getattachedscheme("COMPARE::PAGE_SIZE");
+    uint page_size = page_size_str.empty()?DEFAULT_COMPARE_AFLUX_PAGE_SIZE:aurostd::string2utype<uint>(page_size_str);
     string response = "", response_page = "";
     do {
       vmatchbook.back() = "paging(" + aurostd::utype2string<uint>(page) + "," + aurostd::utype2string<uint>(page_size) + ")";
