@@ -300,7 +300,7 @@ namespace KBIN {
     vector<aurostd::xoption> aaplflags;
     aurostd::xoption opt;
     opt.keyword="BTE"; opt.xscheme = DEFAULT_AAPL_BTE; aaplflags.push_back(opt); opt.clear();
-    opt.keyword="FOURTH_ORDER"; opt.option = DEFAULT_AAPL_FOURTH_ORDER; opt.xscheme = (opt.option?"ON":"OFF"); aaplflags.push_back(opt); opt.clear();
+    //opt.keyword="FOURTH_ORDER"; opt.option = DEFAULT_AAPL_FOURTH_ORDER; opt.xscheme = (opt.option?"ON":"OFF"); aaplflags.push_back(opt); opt.clear();  //ME20220420 - not working, do not use
     opt.keyword="CUT_RAD"; opt.xscheme = DEFAULT_AAPL_CUT_RAD; aaplflags.push_back(opt); opt.clear();
     opt.keyword="CUT_SHELL"; opt.xscheme = DEFAULT_AAPL_CUT_SHELL; aaplflags.push_back(opt); opt.clear();
     opt.keyword="THERMALGRID"; opt.xscheme = DEFAULT_AAPL_THERMALGRID; aaplflags.push_back(opt); opt.clear();
