@@ -10,17 +10,23 @@ LATEST VERSION OF THE FILE:                            materials.duke.edu/AFLOW/
 Phonon calculations with deformations written by Marco Esters, Michal Jahnatek, Andriy Smolyanyuk,
 Corey Oses, Pinku Nath, Jose J. Plata, Stefano Curtarolo.
 
+For References, please see section 9 at the end of the file.
+
 The current version of the Automatic Phonon Library (APL) can calculate the phonon dispersion
 curves, phonon density of states, and thermal properties. All are calculated in the harmonic
 approximation. Two methods of calculation can be selected: the direct (supercell) method (DM) and
-the linear response method (LR). The resulting output files can be transformed into agr, ps, eps,
-or png by the tool apl2agr (located in SOURCES/APL2AGR).
+the linear response method (LR).
+
+The Quasi-Harmonic Approximation (QHA) performs APL calculations at several volumes to calculate a
+more accurate temperature-dependent free energy. It can be used to calculate thermomechanical
+properties such as thermal expansion, the bulk modulus, and heat capacities.
 
 The Automatic Anharmonic Phonon Library (AAPL) is an expansion of APL and can calculate the lattice
 thermal conductivity of a material via the Boltzmann Transport Equation using anharmonic
 interatomic force constants. 
 
-The default values of APL and AAPL can be changed by editing the appropriate values in aflow.rc.
+The default values of APL, QHAm and AAPL can be changed by editing the appropriate values in the
+aflow.rc file.
 
 ----------------------------------------------------------------------------------------------------
 
@@ -66,6 +72,8 @@ Table of Contents:
 8.3.    Lattice Thermal Conductivity Calculations
 8.4.    Plotting Thermal Conductivity
 8.5.    Example AAPL Input File
+
+9. References
 
 ----------------------------------------------------------------------------------------------------
 
@@ -1181,6 +1189,33 @@ Direct(2) [A1B1]
    0.50000000000000   0.50000000000000   0.50000000000000  Na    
 [VASP_POSCAR_MODE_EXPLICIT]STOP
 [AFLOW] *******************************************************************************************
+
+
+9. References
+
+APL:
+
+M. Esters, C. Oses, D. Hicks, M. J. Mehl, M. Jahnatek, M. D. Hossain, J.-P. Maria, D. W. Brenner,
+C. Toher, and S. Curtarolo, Settling the matter of the role of vibrations in the stability of
+high-entropy carbides, Nat. Commun. 12, 5747 (2021). DOI: 10.1038/s41467-021-25979-5.
+
+QHA:
+
+P. Nath, J. J. Plata, D. Usanmaz, R. Al Rahal Al Orabi, M. Fornari, M. Buongiorno Nardelli,
+C. Toher, and S. Curtarolo, High-throughput prediction of finite-temperature properties using the
+quasi-harmonic approximation, Comput. Mater. Sci. 125, 8291 (2016).
+DOI: 10.1016/j.commatsci.2016.07.043
+
+P. Nath, D. Usanmaz, D. Hicks, C. Oses, M. Fornari, M. B. Nardelli, C. Toher, and S. Curtarolo,
+AFLOWi-QHA3P: Robust and automated method to compute thermodynamic properties of solids, Phys. Rev.
+Materials 3, 073801 (2019). DOI: 10.1103/PhysRevMaterials.3.073801
+
+AAPL:
+
+J. J. Plata, P. Nath, D. Usanmaz, J. Carrete, C. Toher, M. de Jong, M. D. Asta, M. Fornari,
+M. Buongiorno Nardelli, and S. Curtarolo, An ecient and accurate framework for calculating lattice
+thermal conductivity of solids: AFLOW-AAPL Automatic Anharmonic Phonon Library, npj Comput. Mater.
+3, 45 (2017). DOI: 10.1038/s41524-017-0046-7
 
 ****************************************************************************************************
 *                                                                                                  *
