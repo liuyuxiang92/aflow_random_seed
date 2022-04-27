@@ -85,7 +85,6 @@ extern std::string README_AFLOW_SCRIPTING_TXT;
 extern std::string README_AFLOW_FROZSL_TXT;
 extern std::string README_AFLOW_POCC_TXT;
 extern std::string README_AFLOW_APL_TXT;
-extern std::string README_AFLOW_QHA_SCQHA_QHA3P_TXT;
 extern std::string README_AFLOW_AGL_TXT;
 extern std::string README_AFLOW_AEL_TXT;
 extern std::string README_AFLOW_ANRL_TXT;
@@ -231,7 +230,6 @@ int main(int _argc,char **_argv) {
       cout << aurostd::PaddedPOST("README_AFLOW_FROZSL_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_FROZSL_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_FROZSL_TXT,vtemp) << endl;
       cout << aurostd::PaddedPOST("README_AFLOW_POCC_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_POCC_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_POCC_TXT,vtemp) << endl;
       cout << aurostd::PaddedPOST("README_AFLOW_APL_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_APL_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_APL_TXT,vtemp) << endl;
-      cout << aurostd::PaddedPOST("README_AFLOW_QHA_SCQHA_QHA3P_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_QHA_SCQHA_QHA3P_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_QHA_SCQHA_QHA3P_TXT,vtemp) << endl;
       cout << aurostd::PaddedPOST("README_AFLOW_AGL_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_AGL_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_AGL_TXT,vtemp) << endl;
       cout << aurostd::PaddedPOST("README_AFLOW_AEL_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_AEL_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_AEL_TXT,vtemp) << endl;
       cout << aurostd::PaddedPOST("README_AFLOW_ANRL_TXT",40) << " size=" << aurostd::PaddedPOST(aurostd::utype2string(README_AFLOW_ANRL_TXT.size()),10) << "lines=" << aurostd::string2vectorstring(README_AFLOW_ANRL_TXT,vtemp) << endl;
@@ -347,7 +345,6 @@ int main(int _argc,char **_argv) {
     if(!found && argvi=="README_AFLOW_FROZSL_TXT") {found=TRUE;pstr=&README_AFLOW_FROZSL_TXT;} // << endl;
     if(!found && argvi=="README_AFLOW_POCC_TXT") {found=TRUE;pstr=&README_AFLOW_POCC_TXT;} // << endl;
     if(!found && argvi=="README_AFLOW_APL_TXT") {found=TRUE;pstr=&README_AFLOW_APL_TXT;} // << endl;
-    if(!found && argvi=="README_AFLOW_QHA_SCQHA_QHA3P_TXT") {found=TRUE;pstr=&README_AFLOW_QHA_SCQHA_QHA3P_TXT;} // << endl;
     if(!found && argvi=="README_AFLOW_AGL_TXT") {found=TRUE;pstr=&README_AFLOW_AGL_TXT;} // << endl;
     if(!found && argvi=="README_AFLOW_AEL_TXT") {found=TRUE;pstr=&README_AFLOW_AEL_TXT;} // << endl;
     if(!found && argvi=="README_AFLOW_ANRL_TXT") {found=TRUE;pstr=&README_AFLOW_ANRL_TXT;} // << endl;
