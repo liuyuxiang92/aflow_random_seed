@@ -1010,6 +1010,12 @@ directory.
 [VASP_POTCAR_FILE]Mg
 [VASP_POTCAR_FILE]O
 [AFLOW] *******************************************************************************************
+[VASP_KPOINTS_MODE_IMPLICIT]
+[VASP_KPOINTS_FILE]STATIC_KSCHEME=M
+[VASP_KPOINTS_FILE]STATIC_KPPRA=10000
+[VASP_KPOINTS_FILE]BANDS_LATTICE=AUTO
+[VASP_KPOINTS_FILE]BANDS_GRID=20
+[AFLOW] *******************************************************************************************
 [VASP_POSCAR_MODE_EXPLICIT]START
 MgO
 1.224745
