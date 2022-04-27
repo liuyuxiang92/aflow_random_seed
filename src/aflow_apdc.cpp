@@ -52,6 +52,10 @@ _apdc_data::_apdc_data() {
   // Thermo data
   prob_ideal_cluster.clear();
   prob_cluster.clear();
+  rel_s_ec = 0.0;
+  temp_ec = 0.0;
+  rel_s.clear();
+  binodal_boundary.clear();
 }
 
 // Destructor
@@ -93,6 +97,10 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
     // Thermo data
     prob_ideal_cluster = b.prob_ideal_cluster;
     prob_cluster = b.prob_cluster;
+    rel_s_ec = b.rel_s_ec;
+    temp_ec = b.temp_ec;
+    rel_s = b.rel_s;
+    binodal_boundary = b.binodal_boundary;
   }
   return *this;
 }
@@ -114,7 +122,7 @@ namespace apdc {
     // Binodal
     apdc_data.rundirpath += apdc_data.rootdirpath + "/" + pflow::arity_string(apdc_data.elements.size(), false, false) + "/" + apdc_data.plattice + "/" + apdc_data.alloyname;
     aurostd::DirectoryMake(apdc_data.rundirpath);
-    GetBinodal(apdc_data);
+    GetBinodalData(apdc_data);
   }
 
  void GetPhaseDiagram(const string& aflowin, bool command_line_call) {
@@ -249,20 +257,20 @@ namespace apdc {
 }
 
 // ***************************************************************************
-// apdc::GetSpinodal
+// apdc::GetSpinodalData
 // ***************************************************************************
 namespace apdc {
-  void GetSpinodal(_apdc_data& apdc_data) {
+  void GetSpinodalData(_apdc_data& apdc_data) {
     cerr << apdc_data.rundirpath << endl;
   }
 }
 
 // ***************************************************************************
-// apdc::GetBinodal
+// apdc::GetBinodalData
 // ***************************************************************************
 // Binodal construction based on the method developed in Y. Lederer et al., Acta Materialia, 159 (2018)
 namespace apdc {
-  void GetBinodal(_apdc_data& apdc_data) {
+  void GetBinodalData(_apdc_data& apdc_data) {
     if (aurostd::FileExist(apdc_data.rundirpath + "/fit.out") && aurostd::FileExist(apdc_data.rundirpath + "/predstr.out")) { // read ATAT data
       apdc_data.vstr_atat = GetATATXstructures(apdc_data.lat_atat, (uint)apdc_data.max_num_atoms, apdc_data.rundirpath);
     }
@@ -287,7 +295,52 @@ namespace apdc {
     apdc_data.temp = GetTemperature(apdc_data.temp_range, apdc_data.temp_npts);
     apdc_data.prob_cluster = GetProbabilityCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.excess_energy_cluster, apdc_data.prob_ideal_cluster, apdc_data.temp, apdc_data.max_num_atoms);
     CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_ideal_cluster, apdc_data.prob_cluster);
-    GetRelativeEntropyEC(apdc_data.conc_cluster, apdc_data.degeneracy_cluster, apdc_data.excess_energy_cluster, apdc_data.temp, apdc_data.max_num_atoms);
+    vector<double> data_ec = GetRelativeEntropyEC(apdc_data.conc_cluster, apdc_data.degeneracy_cluster, apdc_data.excess_energy_cluster, apdc_data.temp, apdc_data.max_num_atoms);
+    apdc_data.rel_s_ec = data_ec[0]; apdc_data.temp_ec = data_ec[1];
+    apdc_data.rel_s = GetRelativeEntropy(apdc_data.prob_cluster, apdc_data.prob_ideal_cluster);
+    apdc_data.binodal_boundary = GetBinodalBoundary(apdc_data.rel_s, apdc_data.rel_s_ec, apdc_data.temp);
+  }
+}
+
+// ***************************************************************************
+// apdc::GetBinodalBoundary
+// ***************************************************************************
+namespace apdc {
+  xvector<double> GetBinodalBoundary(const xmatrix<double>& rel_s, const double& rel_s_ec, const xvector<double>& temp) {
+    int nx = rel_s.rows, nt = rel_s.cols, n_fit = 8;
+    xvector<double> binodal_boundary(nx), p, rr(n_fit), ri(n_fit);
+    xvector<double> wts = aurostd::ones_xv<double>(nt);
+    double temp_mean = aurostd::mean(temp), temp_std = aurostd::stddev(temp);
+    xvector<double> temp_scaled = (temp - temp_mean) / temp_std; // scale for numerical stability
+    for (int i = 1; i <= nx; i++) {
+      p = aurostd::polynomialCurveFit(temp_scaled, rel_s(i) - rel_s_ec, n_fit, wts);
+      aurostd::polynomialFindRoots(p, rr, ri);
+      for (int j = 1; j <= n_fit && binodal_boundary(i) == 0.0; j++) {
+        if (rr(j) >= temp_scaled(1) && rr(j) <= temp_scaled(temp.rows) && aurostd::isequal(ri(j), 0.0)) {
+          binodal_boundary(i) = temp_std * rr(j) + temp_mean; // solution must be real and within temp range
+        }
+      }
+    }
+    cerr<<"T= "<<binodal_boundary<<endl;
+    return binodal_boundary;
+  }
+}
+
+// ***************************************************************************
+// apdc::GetRelativeEntropy
+// ***************************************************************************
+namespace apdc {
+  xmatrix<double> GetRelativeEntropy(const vector<xmatrix<double>>& prob_cluster, const xmatrix<double>& prob_cluster_ideal) {
+    int nx = prob_cluster_ideal.rows, ncl = prob_cluster_ideal.cols, nt = prob_cluster.size();
+    xmatrix<double> rel_s(nx, nt);
+    for (int i = 1; i <= nx; i++) {
+      for (int j = 1; j <= nt; j++) {
+        for (int k = 1; k <= ncl; k++) {
+          rel_s(i, j) += prob_cluster[j - 1](i, k) * aurostd::log(prob_cluster[j - 1](i, k) / prob_cluster_ideal(i, k));
+        }
+      }
+    }
+    return rel_s;
   }
 }
 
@@ -295,8 +348,10 @@ namespace apdc {
 // apdc::GetRelativeEntropyEC
 // ***************************************************************************
 namespace apdc {
-  double GetRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& temp, const int max_num_atoms) {
-    int nelem = conc_cluster.cols;
+  vector<double> GetRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& temp, const int max_num_atoms) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    double rel_s_ec = 0.0;
+    int nelem = conc_cluster.cols, n_fit = 8;
     xmatrix<double> conc_macro_ec(1, nelem);
     for (int i = 1; i <= nelem; i++) {conc_macro_ec(1, i) = 1.0 / (double)nelem;}
     xmatrix<double> prob_ideal_ec = GetProbabilityIdealCluster(conc_macro_ec, conc_cluster, degeneracy_cluster, max_num_atoms);
@@ -311,8 +366,15 @@ namespace apdc {
     double temp_mean = aurostd::mean(temp), temp_std = aurostd::stddev(temp);
     xvector<double> temp_scaled = (temp - temp_mean) / temp_std; // scale for numerical stability
     xvector<double> wts = aurostd::ones_xv<double>(order_param.rows);
-    xvector<double> coeffs = aurostd::polynomialCurveFit(temp_scaled, order_param, 8, wts);
-    
+    xvector<double> p = aurostd::polynomialCurveFit(temp_scaled, order_param, n_fit, wts);
+    int buffer = (int)std::floor(0.1 * temp.rows); // avoid edge points when evaluating derivatives
+    vector<double> temp_ec = {temp_std * aurostd::polynomialFindExtremum(aurostd::evalPolynomialDeriv(p, 1), temp_scaled(buffer), temp_scaled(temp.rows - buffer)) + temp_mean};
+    if (LDEBUG) {cerr << "T_ec(K)=" << temp_ec[0] << endl;}
+    prob_ec = GetProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, aurostd::vector2xvector(temp_ec), max_num_atoms);
+    for (int i = 1; i <= prob_ideal_ec.cols; i++) {
+      rel_s_ec += prob_ec[0](1, i) * aurostd::log(prob_ec[0](1, i) / prob_ideal_ec(1, i));
+    }
+    return {rel_s_ec, temp_ec[0]};
   }
 }
 
@@ -325,24 +387,23 @@ namespace apdc {
     int nx = prob_ideal_cluster.rows, ncl = prob_ideal_cluster.cols, nt = temp.rows, neqs = conc_cluster.cols - 1;
     vector<xmatrix<double>> prob_cluster;
     for (uint it = 0; it < (uint)nt; it++) {prob_cluster.push_back(0.0 * aurostd::ones_xm<double>(nx, ncl));} // initialize
-    xvector<double> beta = aurostd::pow(CONSTANT_BOLTZMANN * temp, -1.0), coeff(max_num_atoms + 1), rr(max_num_atoms), ri(max_num_atoms);
+    xvector<double> beta = aurostd::pow(KBOLTZEV * temp, -1.0), p(max_num_atoms + 1), rr(max_num_atoms), ri(max_num_atoms), soln(neqs);
     xmatrix<int> natom_cluster = aurostd::xmatrixdouble2utype<int>((double)max_num_atoms * conc_cluster);
-    xvector<double> soln(neqs);
     if (neqs == 1) {
       for (int it = 1; it <= nt; it++) {
         for (int i = 1; i <= nx; i++) {
-          coeff.reset();
+          p.reset();
           soln.reset();
           for (int j = 1; j <= ncl; j++) {
-            coeff(natom_cluster(j, 1) + 1) += prob_ideal_cluster(i, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * (conc_cluster(j, 1) - conc_macro(i, 1));
+            p(natom_cluster(j, 1) + 1) += prob_ideal_cluster(i, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * (conc_cluster(j, 1) - conc_macro(i, 1));
           }
-          aurostd::polynomialFindRoots(coeff, rr, ri);
+          aurostd::polynomialFindRoots(p, rr, ri);
           if (LDEBUG) {
-            cerr << "it=" << it << " i=" << i << " | p=" << coeff << endl;
+            cerr << "it=" << it << " i=" << i << " | p=" << p << endl;
             cerr << "   Real roots=" << rr << endl;
             cerr << "   Imag roots=" << ri << endl;
           }
-          for (int k = 1; k <= max_num_atoms; k++) {
+          for (int k = 1; k <= max_num_atoms && soln(1) == 0.0; k++) {
             if (rr(k) > soln(1) && aurostd::isequal(ri(k), 0.0)) {soln(1) = rr(k);} // solution must be real and greater than 0
           }
           for (int j = 1; j <= ncl; j++) {

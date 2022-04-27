@@ -17,7 +17,7 @@ namespace aurostd{
   xvector<double> evalPolynomialDeriv(const xvector<double>& p, const uint n); //SD20220425
   xmatrix<double> Vandermonde_matrix(const xvector<double>& x, const int n);
   double polynomialFindExtremum(const xvector<double>& p, const double& xmin, const double& xmax,
-      const double& tol=_mm_epsilon);
+      const double& tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
   xvector<double> polynomialCurveFit(const xvector<double>& x, const xvector<double>& y, const int n, xvector<double> w); //SD20220422
   xmatrix<double> companion_matrix(const xvector<double>& p); //SD20220318
   void polynomialFindRoots(const xvector<double>& p, xvector<double>& rr, xvector<double>& ri); //SD20220318

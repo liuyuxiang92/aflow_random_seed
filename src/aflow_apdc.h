@@ -11,7 +11,6 @@
 #define _AFLOW_APDC_H_
 
 #define DEFAULT_ATAT_ALAT 4.0 // Ang
-#define CONSTANT_BOLTZMANN 8.6173324e-5 // eV/K
 #define CONC_SHIFT 0.01 // concentration shift away from 0
 #define _APDC_STR_OPT_ string("[AFLOW_APDC]")
 
@@ -32,8 +31,8 @@ class _apdc_data {
     int aflow_max_num_atoms;
     int max_num_atoms;
     int conc_npts;
-    xvector<double> conc_range; // DIM: 2*K
-    xmatrix<double> conc_macro; // UNIT: unitless | DIM: Nc, K
+    xvector<double> conc_range; // DIM: 2*Nk
+    xmatrix<double> conc_macro; // UNIT: unitless | DIM: Nc, Nk
     int temp_npts;
     xvector<double> temp_range; // DIM: 2
     xvector<double> temp; // UNIT: K | DIM: Nt
@@ -43,18 +42,22 @@ class _apdc_data {
     string rundirpath;
     vector<xstructure> vstr_aflow;
     string lat_atat;
-    vector<xstructure> vstr_atat; // DIM: J
+    vector<xstructure> vstr_atat; // DIM: Nj
     vector<int> mapstr;
 
     // Cluster data
-    xvector<int> num_atom_cluster; // DIM: J
-    xvector<int> degeneracy_cluster; // DIM: J
-    xmatrix<double> conc_cluster; // UNIT: unitless | DIM: J, K
-    xvector<double> excess_energy_cluster; // UNIT: eV | DIM: J
+    xvector<int> num_atom_cluster; // DIM: Nj
+    xvector<int> degeneracy_cluster; // DIM: Nj
+    xmatrix<double> conc_cluster; // UNIT: unitless | DIM: Nj, Nk
+    xvector<double> excess_energy_cluster; // UNIT: eV | DIM: Nj
 
     // Thermo data
-    xmatrix<double> prob_ideal_cluster; // DIM: Nc, J
-    vector<xmatrix<double>> prob_cluster; // DIM: Nc, J, Nt
+    xmatrix<double> prob_ideal_cluster; // DIM: Nc, Nj
+    vector<xmatrix<double>> prob_cluster; // DIM: Nc, Nj, Nt
+    double rel_s_ec; // UNIT: unitless
+    double temp_ec; // UNIT: K
+    xmatrix<double> rel_s; // UNIT: unitless | DIM: Nc, Nt
+    xvector<double> binodal_boundary; // UNIT: K | DIM: Nc
     
   private:
   void free();
@@ -66,9 +69,11 @@ namespace apdc {
   void GetPhaseDiagram(const string& aflowin, bool command_line_call);
   void GetPhaseDiagram(istream& infile);
   void ErrorChecks(_apdc_data& apdc_data);
-  void GetSpinodal(_apdc_data& apdc_data);
-  void GetBinodal(_apdc_data& apdc_data);
-  double GetRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& temp, const int max_num_atoms);
+  void GetSpinodalData(_apdc_data& apdc_data);
+  void GetBinodalData(_apdc_data& apdc_data);
+  xvector<double> GetBinodalBoundary(const xmatrix<double>& rel_s, const double& rel_s_ec, const xvector<double>& temp);
+  xmatrix<double> GetRelativeEntropy(const vector<xmatrix<double>>& prob_cluster, const xmatrix<double>& prob_cluster_ideal);
+  vector<double> GetRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& temp, const int max_num_atoms);
   vector<xmatrix<double>> GetProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms);
   xmatrix<double> GetProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms);
   void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob);

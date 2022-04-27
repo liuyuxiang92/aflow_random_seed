@@ -986,7 +986,7 @@ namespace aurostd {  // namespace aurostd
     operator/(const xmatrix<utype>& a,const utype s) {
       return (utype) ((utype)1/s)*a;                     //DX20170115 - add utype to 1/s to account for xcomplex
     }
-  template<class utype> xmatrix<utype>                 // operator xmatrix / scalar
+  template<class utype> xmatrix<utype>                 // operator xmatrix / xmatrix
     operator/(const xmatrix<utype>& a,const xmatrix<utype>& b) {  //CO20191201
       return a*inverse(b);
     }
@@ -4462,7 +4462,11 @@ namespace aurostd {
         cerr << soliloquy << " R=" << endl;cerr << R << endl;
       }
 
-      if(!aurostd::isequal(mat_orig,Q*R,tol)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QR decomposition failed (A!=Q*R)",_RUNTIME_ERROR_);}
+      if(!aurostd::isequal(mat_orig,Q*R,tol)){
+        stringstream message;
+        message << "QR decomposition failed (A!=Q*R), condition number=" << aurostd::condition_number(mat_orig); //SD20220427
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+      }
       if(!aurostd::isequal(trasp(Q)*Q,eye<utype>(Q.urows,Q.ucols,Q.lrows,Q.lcols),tol)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QR decomposition failed (Q not orthonormal)",_RUNTIME_ERROR_);}
       if(LDEBUG){cerr << soliloquy << " END" << endl;}
     }
@@ -4531,7 +4535,11 @@ namespace aurostd {
         cerr << soliloquy << " R=" << endl;cerr << R << endl;
       }
 
-      if(!aurostd::isequal(mat_orig,Q*R,tol)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QR decomposition failed (A!=Q*R)",_RUNTIME_ERROR_);}
+      if(!aurostd::isequal(mat_orig,Q*R,tol)){
+        stringstream message;
+        message << "QR decomposition failed (A!=Q*R), condition number=" << aurostd::condition_number(mat_orig); //SD20220427
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+      }
       if(!aurostd::isequal(trasp(Q)*Q,eye<utype>(Q.urows,Q.ucols,Q.lrows,Q.lcols),tol)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QR decomposition failed (Q not orthonormal)",_RUNTIME_ERROR_);}
       if(LDEBUG){cerr << soliloquy << " END" << endl;}
     }

@@ -3856,8 +3856,8 @@ namespace pflow {
       test_int_xv_b[i] =  rand() % _max_int;
       test_float_xv_a[i] = PI * float((rand()%_max_int));
       test_float_xv_b[i] = PI * float((rand()%_max_int));
-      test_double_xv_a[i] = _mm_e * float((rand()%_max_int));
-      test_double_xv_b[i] = _mm_e * float((rand()%_max_int));
+      test_double_xv_a[i] = EULERSNUMBER * float((rand()%_max_int));
+      test_double_xv_b[i] = EULERSNUMBER * float((rand()%_max_int));
     }
 
     const int line_width = 60;
@@ -4355,8 +4355,8 @@ namespace pflow {
         test_int_xm_b[i][j] =  rand() % _max_int;
         test_float_xm_a[i][j] = PI * float((rand()%_max_int));
         test_float_xm_b[i][j] = PI * float((rand()%_max_int));
-        test_double_xm_a[i][j] = _mm_e * double((rand()%_max_int));
-        test_double_xm_b[i][j] = _mm_e * double((rand()%_max_int));
+        test_double_xm_a[i][j] = EULERSNUMBER * double((rand()%_max_int));
+        test_double_xm_b[i][j] = EULERSNUMBER * double((rand()%_max_int));
       }
     }
 

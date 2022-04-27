@@ -2499,7 +2499,7 @@ namespace apl
         w = extrapolateFrequency(V, xomega, qha_method) * THz2Hz * PLANCKSCONSTANTEV_h;
         ui = 0.5*w;
 
-        if (w>_mm_epsilon && T>_mm_epsilon) ui += w/(exp(w*beta)-1.0);
+        if (w>_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_ && T>_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_) ui += w/(exp(w*beta)-1.0);
 
         ui *= qpWeights[q];
         U += ui;
@@ -2535,7 +2535,7 @@ namespace apl
         w = extrapolateFrequency(V, xomega, SCQHA_CALC) * THz2Hz * PLANCKSCONSTANTEV_h;
         ui = 0.5*w;
 
-        if (w>_mm_epsilon && T>_mm_epsilon) ui += w/(exp(w*beta)-1.0);
+        if (w>_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_ && T>_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_) ui += w/(exp(w*beta)-1.0);
 
         ui *= qpWeights[q];
         calcVPgamma += ui * extrapolateGrueneisen(V, xomega, SCQHA_CALC);
