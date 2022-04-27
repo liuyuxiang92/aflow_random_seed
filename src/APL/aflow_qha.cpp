@@ -586,41 +586,6 @@ namespace apl
       bool eos_apl_data_available = false;
       bool gp_data_available = false;
 
-      // QHA3P, QHANP and SCQHA require a set of static EOS calculations.
-      // But for a QHA calculation, the EOS flag is used to toggle these types of 
-      // calculations.
-      if ((isQHA && isEOS) || isQHA3P || isSCQHA || isQHANP){
-        msg = "Checking if all required files from static DFT calculations exist.";
-        pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
-            *p_oss, _LOGGER_MESSAGE_);
-        vector<vector<bool> > file_is_present(subdirectories_static.size(),
-            vector<bool>(4));
-
-        uint n_static_calcs = checkStaticCalculations(file_is_present);
-        // read data from a set of static DFT calculations only when all required
-        // output files are present.
-        // Post-processing that requires a set of static DFT calculations (QHA+EOS,
-        // QHA3P, QHANP and SCQHA) will happen only when all required data from this
-        // set was read successfully.
-        if (n_static_calcs == subdirectories_static.size()){
-          eos_static_data_available = readStaticCalculationsData();
-        }
-        else{
-          // if there exists data for at least one completed static DFT calculation,
-          // print an error listing missing files/directories.
-          // Thus, errors are not printed if it is a first QHA run or QHA was run by
-          // mistake after the first run before the static DFT calculations were executed
-          if (n_static_calcs > 0) {
-            printMissingStaticFiles(file_is_present, subdirectories_static);
-          } else {
-            string message = "Waiting for required STATIC calculations.";
-            pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, currentDirectory, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
-          }
-
-          createSubdirectoriesStaticRun(xflags, aflags, kflags, file_is_present);
-        }
-      }
-
       // we need to clean THERMO file from previous calculations, since calculated data from
       // each QHA/EOS model is appended to the THERMO file and we do not want to mix
       // results of calculations with potentially different parameters
@@ -663,6 +628,46 @@ namespace apl
             writeThermalProperties(EOS_MURNAGHAN, QHA_CALC, currentDirectory);
             writeTphononDispersions(EOS_MURNAGHAN, QHA_CALC, currentDirectory);
           }
+        }
+      }
+
+      // ME20220427 - Do static last. There is so much phonon output that
+      // the NOTICE won't be easy to spot otherwise.
+      // QHA3P, QHANP and SCQHA require a set of static EOS calculations.
+      // But for a QHA calculation, the EOS flag is used to toggle these types of
+      // calculations.
+      if ((isQHA && isEOS) || isQHA3P || isSCQHA || isQHANP){
+        msg = "Checking if all required files from static DFT calculations exist.";
+        pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE,
+            *p_oss, _LOGGER_MESSAGE_);
+        vector<vector<bool> > file_is_present(subdirectories_static.size(),
+            vector<bool>(4));
+
+        uint n_static_calcs = checkStaticCalculations(file_is_present);
+        // read data from a set of static DFT calculations only when all required
+        // output files are present.
+        // Post-processing that requires a set of static DFT calculations (QHA+EOS,
+        // QHA3P, QHANP and SCQHA) will happen only when all required data from this
+        // set was read successfully.
+        if (n_static_calcs == subdirectories_static.size()){
+          eos_static_data_available = readStaticCalculationsData();
+        }
+        else{
+          // if there exists data for at least one completed static DFT calculation,
+          // print an error listing missing files/directories.
+          // Thus, errors are not printed if it is a first QHA run or QHA was run by
+          // mistake after the first run before the static DFT calculations were executed
+          if (n_static_calcs > 0) {
+            printMissingStaticFiles(file_is_present, subdirectories_static);
+          } else {
+            // ME20220427
+            // Add NOTICE when no static calculations have been performed, or QHA will
+            // finish as DONE without telling the user why no output has been produed.
+            string message = "Waiting for required STATIC calculations.";
+            pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, currentDirectory, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
+          }
+
+          createSubdirectoriesStaticRun(xflags, aflags, kflags, file_is_present);
         }
       }
 
@@ -1152,6 +1157,9 @@ namespace apl
       if (n_apl_calcs > 0) {
         printMissingAPLFiles(file_is_present, qhatype);
       } else {
+        // ME20220427
+        // Add NOTICE when no phonon calculations have been performed, or QHA will
+        // finish as DONE without telling the user why no output has been produed.
         string message = "Waiting for required PHONON calculations.";
         pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, currentDirectory, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
       }
