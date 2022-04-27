@@ -60,8 +60,11 @@ Table of Contents:
 6.    Example APL Input File
 
 7.    The Quasi-Harmonic Approximation
-7.3.    Plotting Thermophysical Properties
-7.4.    Example QHA Input File
+7.1.    Running QHA Calculations
+7.2.    QHA Modes
+7.3.    Equation of State Calculations
+7.4.    Plotting Thermophysical Properties
+7.5.    Example QHA Input File
 
 8.    The Automatic Anharmonic Phonon Library
 8.1     Running AAPL Calculations
@@ -809,7 +812,94 @@ then proceed with a subsequent analysis (QHA/AAPL) without the need to change th
 
 7. The Quasi-Harmonic Approximation
 
-7.3. Plotting Thermophysical Properties
+7.1. Running QHA Calculations
+
+The Quasi-Harmonic Approximation (QHA) calculates harmonic phonons at different volumes to compute
+the volume-dependent free energies. This data is then fitted to an equation of state (EOS) to
+obtain a temperature-dependent free-energy curve. This curve is the basis for a variety of
+thermomechanical properties such as thermal expansion, the bulk modulus, and heat capacities.
+
+To use QHA, the following needs to be added the aflow.in file:
+
+    [AFLOW_QHA]CALC
+
+This overrides all other APL CALC options. A QHA calculation requires three steps:
+
+    1. In a first AFLOW run, QHA will create subdirectories for an APL run and a STATIC run for each
+       selected volume. If the APL option REALX is set to ON, QHA will relax the structure before
+       creating the directories.
+    2. Run all DFT calculations required for each APL and STATIC directory.
+    3. Post-processing: run AFLOW again in the QHA directory to calculate thermomechanical
+       properties.
+
+QHA uses many parameters that are also used inside APL. See section 2. for a discussion on APL
+options.
+
+
+7.2. QHA Modes
+
+QHA can either calculate only Grueneisen parameters or the full equation of state. To calculate
+Grueneisen parameters, use:
+
+    [AFLOW_QHA]GP_FINITE_DIFF=ON|OFF
+    [AFLOW_QHA]GP_DISTORTION=3
+
+GP_DISTORTION is the volume expansion and compression in %. This will create three APL directories,
+at 97%, 100%, and 103% volume. No static calculations are needed.
+
+To run equation of state calculation, the following needs to be present in the aflow.in file:
+
+    [AFLOW_QHA]EOS=ON
+    [AFLOW_QHA]EOS_DISTORTION_RANGE=VSTART:VEND:VSTEP
+
+Where VSTART and VEND are the initial and final volumes and VSTEP is the step size in %. VSTART must
+be negative. These volumes will be used for the static calculations. The number of phonon
+calculations depend on the MODE parameter:
+
+    [AFLOW_QHA]MODE=QHA|SCQHA|QHA3P|QHANP
+
+QHA runs standard QHA and uses EOS_DISTORTION_RANGE. SCQHA (self-consistent QHA) and QHA3P (3-phonon
+QHA) only need three volumes and use GP_DISTORTION. QHANP (N-th order QHA) calculates the
+vibrational free energy based on a Taylor expansion of order N:
+
+    [AFLOW_QHA]TAYLOR_EXPANSION_ORDER=N
+
+It generates (2N + 1) phonon calculations.
+
+
+7.3. Equation of State Calculations
+
+When EOS=ON, QHA can be used to calculate thermomechanical properties. For this, the obtained free
+energies need to be fit to an equation of state:
+
+    [AFLOW_QHA]EOS_MODEL=M|BM2|BM3|BM4|SJ
+
+Here, M is the Murnaghan, BMX are the X-th order Birch-Murnaghan, and SJ the Stabilized Jellium
+model. The default is SJ. QHA will use the [AFLOW_APL]TPT option for the temperature range over
+which to fit.
+
+Electronic contributions to the free energy can be included via:
+
+    [AFLOW_QHA]INCLUDE_ELEC_CONTRIB=ON|OFF
+    [AFLOW_QHA]SOMMERFELD_EXPANSION=ON|OFF
+
+Setting SOMMERFELD_EXPANSION to ON will have QHA use the Sommerfeld model to calculate electronic
+free energies. If OFF, it will integrate the electronic structure.
+
+It is possible that at some volumes, the structure becomes dynamically unstable and has imaginary
+frequencies. QHA will not process volume sets that contain such structures and the set of volumes
+needs to be adjusted. Imaginary frequencies can also be ignored using:
+
+    [AFLOW_QHA]IGNORE_IMAGINARY=ON|OFF
+
+Temperature-dependent phonon dispersion can also be calculated. The temperatures are set using:
+
+    [AFLOW_QHA]T1,T2,T3,...
+
+Where T1, etc. are temperatures in K. This is not supported for QHANP.
+
+
+7.4. Plotting Thermomechanical Properties
 
 Thermophysical properties can be plotted using:
 
@@ -851,7 +941,8 @@ The dispersion of the Grueneisen parameter can be plotted via:
 The files PHPOSCAR, aflow.qha.kpoints.out, and aflow.qha.qp.disp.out must be present in the
 directory.
 
-7.4 Example QHA Input File
+
+7.5. Example QHA Input File
 
 [AFLOW] *******************************************************************************************
 [AFLOW]SYSTEM=MgO
