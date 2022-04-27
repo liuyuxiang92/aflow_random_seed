@@ -570,6 +570,12 @@ namespace apl
   {
     bool LDEBUG = (FALSE || DEBUG_QHA || XHOST.DEBUG);
 
+    // ME20220427 - must be one or the other
+    if (!isEOS && !isGP_FD) {
+      string message = "Nothing to be done. Selector EOS=ON or GP_FINITE_DIFF=ON";
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, currentDirectory, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+      return;
+    }
     string msg = "Performing a QHA calculation.";
     pflow::logger(QHA_ARUN_MODE, __AFLOW_FUNC__, msg, currentDirectory, *p_FileMESSAGE, *p_oss,
         _LOGGER_MESSAGE_);
