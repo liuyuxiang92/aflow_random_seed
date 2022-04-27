@@ -2062,8 +2062,9 @@ namespace aurostd {  // namespace aurostd
     xmatrix<utype> inverseByAdjoint(const xmatrix<utype>& a) {return (utype)1.0/det(a) * adjoint(a);} //CO20191201
   template<class utype>                                 // function inverse xmatrix<>
     xmatrix<utype> inverse(const xmatrix<utype>& a) {
+      string function_name = XPID + "aurostd::inverse():";
       // returns the inverse
-      if(!a.issquare){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::inverse()","a must be square",_INPUT_ILLEGAL_);}
+      if(!a.issquare){throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Matrix must be square",_INPUT_ILLEGAL_);}
       if(a.lrows!=1 || a.lcols!=1){
         xmatrix<utype> b(a);
         shiftlrowscols(b,1,1);
@@ -2075,7 +2076,7 @@ namespace aurostd {  // namespace aurostd
       xmatrix<utype> b(a.rows,a.cols);
       //  cerr << "DET CALL size="<<size<< endl;
       utype adet=det(a);
-      if(adet==(utype) 0)  {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::inverse()","singular matrix",_INPUT_ILLEGAL_);}
+      if(adet==(utype) 0)  {throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Singular matrix",_INPUT_ILLEGAL_);}
       if(size==1) {b[1][1]=(utype)1/a[1][1]; return b;}
       if(size==2) { //CO20191201
         b[1][1]=a[2][2]/adet;b[1][2]=-a[1][2]/adet;
@@ -2148,7 +2149,21 @@ namespace aurostd {  // namespace aurostd
       //[CO20191201 - OBSOLETE]GaussJordan(b,B);
       //    if(size>=6) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: " << size << "x" << size << " not written yet" << endl;}
       //[CO20191201 - OBSOLETE]return b;
-      return inverseByAdjoint(a);
+      //SD20220427 - Adjoint method is also unstable (and costly), instead we use LUP decomposition due to speed.
+      //If that method fails, then we use QR decomposition, where we invert R by LUP decomposition.
+      //If this further fails, then the user should look into pre-conditioning, see aurostd::equilibrateMatrix()
+      //For benefits of QR decomposition when finding the inverse, see: http://batty.mullikin.org/2601/num3.pdf
+      //[SD20220427 - OBSOLETE]return inverseByAdjoint(a);
+      xmatrix<utype> id = aurostd::identity(a);
+      b = aurostd::inverseByLUP(a);
+      if(aurostd::isequal(a * b, id)) {return b;} 
+      xmatrix<utype> q, r;
+      aurostd::QRDecomposition_HouseHolder(a, q, r);
+      b = aurostd::inverseByLUP(r) * trasp(q);
+      if(aurostd::isequal(a * b, id)) {return b;} 
+      stringstream message;
+      message << "Matrix is ill-conditioned, condition number=" << aurostd::condition_number(a);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
     }
 }
 
@@ -2578,17 +2593,18 @@ namespace aurostd {
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                          // identity xmatrix
-    identity(const xmatrix<utype>& a) {
+    identity(const xmatrix<utype>& _a) {
 #ifdef _XMATH_DEBUG_FUNCTIONS
       printf("M -> function identity xmatrix: ");
       printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
       printf("a.lcols=%i, a.ucols=%i\n",a.lcols,a.ucols);
 #endif
-      if(!a.issquare) {
+      if(!_a.issquare) {
         string function = XPID + "aurostd::identity():";
         string message = "Identity only defined for square matrces.";
         throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
       }
+      xmatrix<utype> a=_a;
       for(int i=a.lrows;i<=a.urows;i++)
         for(int j=a.lcols;j<=a.ucols;j++)
           a[i][j]=utype(0.0);
@@ -3245,9 +3261,7 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype>                                   
     xvector<utype> LinearLeastSquares(xmatrix<utype>& A, xvector<utype>& b) {
-    xmatrix<utype> Q, R;
-    aurostd::QRDecomposition_HouseHolder(trasp(A) * A, Q, R); // inverse more stable with QR decomposition and pivoting
-    return aurostd::inverseByLUP(R) * trasp(Q) * trasp(A) * b;
+    return aurostd::inverse(trasp(A) * A) * trasp(A) * b;
   }
 }
 

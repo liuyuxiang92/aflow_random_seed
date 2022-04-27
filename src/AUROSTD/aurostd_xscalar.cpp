@@ -209,6 +209,7 @@ namespace aurostd {
   double sqrt(double x) { return (double) std::sqrt(x);}
   long int sqrt(long int x) { return (long int) std::sqrt((double) x);}
   long long int sqrt(long long int x) { return (long long int) std::sqrt((double) x);}
+  unsigned long int sqrt(unsigned long int x) { return (unsigned long int) std::sqrt((double) x);}
   unsigned long long int sqrt(unsigned long long int x) { return (unsigned long long int) std::sqrt((double) x);}
   long double sqrt(long double x) { return (long double) sqrtl(x);}
 #ifdef _AUROSTD_XCOMPLEX_
@@ -621,7 +622,7 @@ namespace aurostd {
   bool iszero(uint x,uint){return (bool) x==(uint)0;}  //CO20191201
   bool iszero(int x,int){return (bool) x==(int)0;}  //CO20191201
   bool iszero(long int x,long int){return (bool) x==(long int)0;}  //CO20191201
-  bool iszero(unsigned long int x,long int){return (bool) x==(unsigned long int)0;}  //CO20191201
+  bool iszero(unsigned long int x,unsigned long int){return (bool) x==(unsigned long int)0;}  //CO20191201
   bool iszero(long long int x,long long int){return (bool) x==(long long int)0;}  //CO20191201
   bool iszero(unsigned long long int x,unsigned long long int){return (bool) x==(unsigned long long int)0;}  //CO20191201
   bool iszero(float x,float tolerance){return _iszero(x,tolerance);}  //CO20191201

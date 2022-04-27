@@ -311,11 +311,7 @@ namespace apdc {
     double temp_mean = aurostd::mean(temp), temp_std = aurostd::stddev(temp);
     xvector<double> temp_scaled = (temp - temp_mean) / temp_std; // scale for numerical stability
     xvector<double> wts = aurostd::ones_xv<double>(order_param.rows);
-    xvector<double> coeffs = aurostd::polynomialCurveFit(temp_scaled, order_param, 10, wts);
-    
-    cerr<<"X= "<<temp_scaled<<endl;
-    cerr<<"Y= "<<order_param<<endl;
-    cerr<<"Y_fit= "<<aurostd::evalPolynomial(temp_scaled,coeffs)<<endl;
+    xvector<double> coeffs = aurostd::polynomialCurveFit(temp_scaled, order_param, 8, wts);
     
   }
 }
