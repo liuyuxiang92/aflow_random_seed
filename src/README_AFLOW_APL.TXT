@@ -7,8 +7,8 @@
 LATEST VERSION OF THE FILE:                            materials.duke.edu/AFLOW/README_AFLOW_APL.TXT
 ****************************************************************************************************
 
-Phonon calculations with deformations written by Michal Jahnatek, Pinku Nath, Jose J. Plata, 
-Corey Oses, Marco Esters, and Stefano Curtarolo.
+Phonon calculations with deformations written by Marco Esters, Michal Jahnatek, Andriy Smolyanyuk,
+Corey Oses, Pinku Nath, Jose J. Plata, Stefano Curtarolo.
 
 The current version of the Automatic Phonon Library (APL) can calculate the phonon dispersion
 curves, phonon density of states, and thermal properties. All are calculated in the harmonic
@@ -542,7 +542,7 @@ To plot phonon dispersions, use:
      --print: specify the format of the output image (default: pdf)
      --title: the title of the plot in LaTeX format (default: title in PHEIGENVAL file)
      --unit: the unit of the phonon frequencies/energies (default: THz)
-     --outfile: the name of the output image file.
+     --outfile: the name of the output image file
     Example:
      aflow --plotphdisp=./ --print=png --unit=cm-1
 
@@ -573,7 +573,7 @@ Thermodynamic properties can be plotted using:
      --keep=gpl: keep the gnuplot script
      --print: specify the format of the output image (default: pdf)
      --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
-     --outfile: the name of the output image file.
+     --outfile: the name of the output image file
     Example:
      aflow --plotthermo=./,100,300
 
@@ -705,73 +705,87 @@ To avoid NPAR warnings from VASP 5.2+, the following option is added:
 The following is an example APL input file for PbS using the linear response method. For the
 direct method, use [AFLOW_APL]ENGINE=DM and uncomment #[AFLOW_APL]DMAG=0.015.
 
-    [AFLOW] **********************************************************************************
-    [AFLOW]SYSTEM=PbS
-    [AFLOW] **********************************************************************************
-    [AFLOW_MODE=VASP]
-    [AFLOW_MODE_ZIP=xz]
-    [AFLOW_MODE_BINARY=vasp54s]
-    [AFLOW] **********************************************************************************
-    #[AFLOW_MODE_MPI]
-    [AFLOW_MODE_MPI_MODE]NCPUS=MAX
-    [AFLOW_MODE_MPI_MODE]COMMAND ="mpirun -np"
-    [AFLOW_MODE_MPI_MODE]AUTOTUNE
-    [AFLOW_MODE_MPI_MODE]BINARY="mpivasp54s"
-    [AFLOW] **********************************************************************************
-    [AFLOW_APL]CALC
-    [AFLOW_APL]RELAX=ON
-    [AFLOW_APL]PREC=PHONONS
-    [AFLOW_APL]ENGINE=LR
-    #[AFLOW_APL]DMAG=0.015
-    [AFLOW_APL]POLAR=Y
-    [AFLOW_APL]SUPERCELL=4x4x4
-    [AFLOW_APL]DC=Y       
-    #[AFLOW_APL]DCUSERPATH=Gamma-X|X-U|K-Gamma|Gamma-L
-    [AFLOW_APL]DOS=Y                               
-    [AFLOW_APL]TP=Y                                
-    [AFLOW_APL]TPT=0:2000:10                       
-    [AFLOW_APL]KPPRA=1024                          
-    [AFLOW_APL]KSCHEME=G                           
-    [AFLOW_APL]KPOINTS=EVEN                        
-    [AFLOW_APL]DOSMESH=30x30x30
-    [AFLOW] **********************************************************************************
-    [VASP_RUN]RELAX=2
-    #[VASP_FORCE_OPTION]KPOINTS=KEEPK,EVEN,KSHIFT_GAMMA_EVEN,KSCHEME_GAMMA,GAMMA,IBZKPT
-    [VASP_FORCE_OPTION]SYM=ON
-    [VASP_FORCE_OPTION]AUTO_PSEUDOPOTENTIALS=potpaw_PBE
-    [VASP_FORCE_OPTION]NBANDS                       
-    [VASP_FORCE_OPTION]SPIN=OFF 
-    [VASP_FORCE_OPTION]RELAX_MODE=FORCES
-    [VASP_FORCE_OPTION]PREC=ACCURATE
-    [VASP_FORCE_OPTION]ALGO=FAST     
-    [VASP_FORCE_OPTION]RELAX
-    [VASP_FORCE_OPTION]TYPE=DEFAULT      
-    [VASP_FORCE_OPTION]CONVERT_UNIT_CELL=SPRIM,MINK
-    [AFLOW] **********************************************************************************
-    [VASP_INCAR_MODE_EXPLICIT]START
-    SYSTEM=PbS
-    [VASP_INCAR_MODE_EXPLICIT]STOP
-    [AFLOW] **********************************************************************************
-    [VASP_KPOINTS_MODE_IMPLICIT]
-    [VASP_KPOINTS_FILE]KSCHEME=G
-    [VASP_KPOINTS_FILE]KPPRA=400
-    [AFLOW] **********************************************************************************
-    [VASP_POTCAR_MODE_IMPLICIT]
-    [VASP_POTCAR_FILE]Pb
-    [VASP_POTCAR_FILE]S
-    [AFLOW] **********************************************************************************
-    [VASP_POSCAR_MODE_EXPLICIT]START
-    PbS   [FCC,FCC,cF8]
-    1.224745
-       0.00000000000000   2.45291416610433   2.45291416610433
-       2.45291416610433   0.00000000000000   2.45291416610433
-       2.45291416610433   2.45291416610433   0.00000000000000
-    1 1
-    Direct(2) [A1B1]
-       0.00000000000000   0.00000000000000   0.00000000000000  Pb
-       0.50000000000000   0.50000000000000   0.50000000000000  S 
-    [VASP_POSCAR_MODE_EXPLICIT]STOP
-    [AFLOW] **********************************************************************************
+[AFLOW] **********************************************************************************
+[AFLOW]SYSTEM=PbS
+[AFLOW] **********************************************************************************
+[AFLOW_MODE=VASP]
+[AFLOW_MODE_ZIP=xz]
+[AFLOW_MODE_BINARY=vasp54s]
+[AFLOW] **********************************************************************************
+[AFLOW_MODE_MPI]
+[AFLOW_MODE_MPI_MODE]NCPUS=MAX
+[AFLOW_MODE_MPI_MODE]COMMAND ="mpirun -np"
+[AFLOW_MODE_MPI_MODE]AUTOTUNE
+[AFLOW_MODE_MPI_MODE]BINARY="mpivasp54s"
+[AFLOW] **********************************************************************************
+[AFLOW_APL]CALC
+[AFLOW_APL]SUPERCELL=4x4x4
+[AFLOW_APL]DC=ON
+[AFLOW_APL]DCPATH=LATTICE
+[AFLOW_APL]DCPOINTS=100
+[AFLOW_APL]DINEQUIV_ONLY=ON
+[AFLOW_APL]DISPLACEMENTS=ON
+[AFLOW_APL]DMAG=0.015
+[AFLOW_APL]DOS=ON
+[AFLOW_APL]DOSMESH=21x21x21
+[AFLOW_APL]DOSMETHOD=LT
+[AFLOW_APL]DOSPOINTS=2000
+[AFLOW_APL]DOS_PROJECT=OFF
+[AFLOW_APL]DPM=ON
+[AFLOW_APL]DSYMMETRIZE=ON
+[AFLOW_APL]DXYZONLY=OFF
+[AFLOW_APL]ENGINE=DM
+[AFLOW_APL]FREQFORMAT=THZ|ALLOW_NEGATIVE
+[AFLOW_APL]GROUP_VELOCITY=ON
+[AFLOW_APL]HIBERNATE=ON
+[AFLOW_APL]KPPRA=3000
+[AFLOW_APL]KSCHEME=G
+[AFLOW_APL]MINATOMS=175
+[AFLOW_APL]POLAR=OFF
+[AFLOW_APL]PREC=PHONONS
+[AFLOW_APL]RELAX=ON
+[AFLOW_APL]RELAX_COMMENSURATE=ON
+[AFLOW_APL]TP=ON
+[AFLOW_APL]TPT=0:2000:10
+[AFLOW_APL]ZEROSTATE=OFF
+[AFLOW] **********************************************************************************
+[VASP_RUN]RELAX=2
+#[VASP_FORCE_OPTION]KPOINTS=KEEPK,EVEN,KSHIFT_GAMMA_EVEN,KSCHEME_GAMMA,GAMMA,IBZKPT
+[VASP_FORCE_OPTION]SYM=ON
+[VASP_FORCE_OPTION]AUTO_PSEUDOPOTENTIALS=potpaw_PBE
+[VASP_FORCE_OPTION]NBANDS
+[VASP_FORCE_OPTION]SPIN=OFF
+[VASP_FORCE_OPTION]RELAX_MODE=FORCES
+[VASP_FORCE_OPTION]PREC=ACCURATE
+[VASP_FORCE_OPTION]ALGO=FAST
+[VASP_FORCE_OPTION]RELAX
+[VASP_FORCE_OPTION]TYPE=DEFAULT
+[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=SPRIM,MINK
+[AFLOW] **********************************************************************************
+[VASP_INCAR_MODE_EXPLICIT]START
+SYSTEM=PbS
+[VASP_INCAR_MODE_EXPLICIT]STOP
+[AFLOW] **********************************************************************************
+[VASP_KPOINTS_MODE_IMPLICIT]
+[VASP_KPOINTS_FILE]KSCHEME=G
+[VASP_KPOINTS_FILE]KPPRA=400
+[AFLOW] **********************************************************************************
+[VASP_POTCAR_MODE_IMPLICIT]
+[VASP_POTCAR_FILE]Pb
+[VASP_POTCAR_FILE]S
+[AFLOW] **********************************************************************************
+[VASP_POSCAR_MODE_EXPLICIT]START
+PbS   [FCC,FCC,cF8]
+1.224745
+   0.00000000000000   2.45291416610433   2.45291416610433
+   2.45291416610433   0.00000000000000   2.45291416610433
+   2.45291416610433   2.45291416610433   0.00000000000000
+1 1
+Direct(2) [A1B1]
+   0.00000000000000   0.00000000000000   0.00000000000000  Pb
+   0.50000000000000   0.50000000000000   0.50000000000000  S
+[VASP_POSCAR_MODE_EXPLICIT]STOP
+[AFLOW] **********************************************************************************
 
 ***************************************************************************************************
 NB:
@@ -951,7 +965,7 @@ scattering.
 
 Thermal conductivity can be plotted using the command line:
 
-  aflow --plotthermo[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--outfile=]
+  aflow --plottcond[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--outfile=]
 
   Defaults.
    Directory: default = ./
@@ -961,11 +975,11 @@ Thermal conductivity can be plotted using the command line:
    --keep=gpl: keep the gnuplot script
    --print: specify the format of the output image (default: pdf)
    --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
-   --outfile: the name of the output image file.
+   --outfile: the name of the output image file
   Example:
    aflow --plottcond=./,100,300
 
-aflow.apl.thermal_properties.out must be present in the directory.
+aflow.aapl.tcond.out must be present in the directory.
 
 This feature requires gnuplot version 5 and pdflatex.
 
@@ -979,14 +993,15 @@ The following is an example AAPL input file for NaF. Four-phonon processes are i
 [AFLOW_MODE=VASP]
 [AFLOW_MODE_ZIP=bzip2]
 [AFLOW_MODE_BINARY=vasp46s]
+[AFLOW_MODE_MPI]
 [AFLOW_MODE_MPI_MODE]NCPUS=MAX
 [AFLOW_MODE_MPI_MODE]COMMAND="mpirun -np"
 [AFLOW_MODE_MPI_MODE]AUTOTUNE
 [AFLOW_MODE_MPI_MODE]BINARY="mpivasp46s"
 [AFLOW] *******************************************************************************************
 [AFLOW_AAPL]CALC
-[AFLOW_AAPL]CUT_SHELL=4,2
-#[AFLOW_AAPL]CUT_RAD=5.0,4.0
+[AFLOW_AAPL]CUT_SHELL=4
+#[AFLOW_AAPL]CUT_RAD=5.0
 [AFLOW_AAPL]SUMRULE=1E-7
 [AFLOW_AAPL]SUMRULE_MAX_ITER=1E-7
 [AFLOW_AAPL]MIXING_COEFFICIENT=1.0
@@ -1002,9 +1017,9 @@ The following is an example AAPL input file for NaF. Four-phonon processes are i
 [AFLOW_APL]RELAX=ON
 [AFLOW_APL]PREC=PHONONS
 [AFLOW_APL]DMAG=0.015
-#[AFLOW_APL]POLAR=Y
+[AFLOW_APL]POLAR=ON
 [AFLOW_APL]MINATOMS=100
-[AFLOW_APL]HIBERNATE=Y
+[AFLOW_APL]HIBERNATE=ON
 [AFLOW_APL]KPPRA=8000
 [AFLOW_APL]KSCHEME=G
 [AFLOW_APL]KPOINTS=EVEN
@@ -1021,18 +1036,9 @@ The following is an example AAPL input file for NaF. Four-phonon processes are i
 [VASP_POTCAR_FILE]F
 [VASP_POTCAR_FILE]Na
 [AFLOW] *******************************************************************************************
-[VASP_INCAR_MODE_EXPLICIT]START
-System = F1Na1_ICSD_262837
-NELM = 120
-NELMIN = 2
-LPLANE= .TRUE.
-LREAL = .FALSE.
-LSCALU = .FALSE.
-[VASP_INCAR_MODE_EXPLICIT]STOP
-[AFLOW] *******************************************************************************************
 [AFLOW_SYMMETRY]CALC
 [VASP_POSCAR_MODE_EXPLICIT]START
-F1Na1  [FCC,FCC,cF8] (STD_PRIM doi:10.1
+NaF
 1.224745
    0.00000000000000   1.91118771995223   1.91118771995223
    1.91118771995223   0.00000000000000   1.91118771995223
