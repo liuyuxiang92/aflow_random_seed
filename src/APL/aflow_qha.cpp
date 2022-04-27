@@ -610,8 +610,12 @@ namespace apl
           // print an error listing missing files/directories.
           // Thus, errors are not printed if it is a first QHA run or QHA was run by
           // mistake after the first run before the static DFT calculations were executed
-          if (n_static_calcs > 0) printMissingStaticFiles(file_is_present,
-              subdirectories_static);
+          if (n_static_calcs > 0) {
+            printMissingStaticFiles(file_is_present, subdirectories_static);
+          } else {
+            string message = "Waiting for required STATIC calculations.";
+            pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, currentDirectory, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
+          }
 
           createSubdirectoriesStaticRun(xflags, aflags, kflags, file_is_present);
         }
@@ -1145,7 +1149,12 @@ namespace apl
       /// printed listing missing files/directories.
       /// Thus, errors are not printed if it is a first QHA run or QHA was run by
       /// mistake after the first run before the APL calculations were executed.
-      if (n_apl_calcs > 0) printMissingAPLFiles(file_is_present, qhatype);
+      if (n_apl_calcs > 0) {
+        printMissingAPLFiles(file_is_present, qhatype);
+      } else {
+        string message = "Waiting for required PHONON calculations.";
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, currentDirectory, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
+      }
       createSubdirectoriesAPLRun(xflags, aflags, kflags, file_is_present, qhatype);
     }
     return apl_data_available;
