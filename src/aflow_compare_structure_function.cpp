@@ -3464,8 +3464,6 @@ namespace compare{
     matched_species_str2.resize(grouped_Wyckoffs_str2_sorted.size(), false); // set all to false
     vector<bool> Wyckoff_subset_matches;
 
-    // ---------------------------------------------------------------------------
-    // check if multiplicities and site symmetries are commensurate
     bool match_set_str1 = false;
     uint match_count = 0;
     for(uint i=0;i<grouped_Wyckoffs_str1_sorted.size();i++){
