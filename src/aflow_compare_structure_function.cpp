@@ -3425,8 +3425,8 @@ namespace compare{
 // ***************************************************************************
 namespace compare{
   bool matchableWyckoffPositions(
-      const vector<GroupedWyckoffPosition>& temp_grouped_Wyckoffs,
-      const vector<GroupedWyckoffPosition>& representative_grouped_Wyckoffs,
+      const vector<GroupedWyckoffPosition>& grouped_Wyckoffs_str1,
+      const vector<GroupedWyckoffPosition>& grouped_Wyckoffs_str2,
       bool same_species){
 
     // Determines if two sets of grouped Wyckoff positions are commensurate
@@ -3438,75 +3438,86 @@ namespace compare{
 
     // ---------------------------------------------------------------------------
     // quick check: are number of Wyckoff positions the same? cannot match otherwise
-    if(temp_grouped_Wyckoffs.size() != representative_grouped_Wyckoffs.size()){
+    if(grouped_Wyckoffs_str1.size() != grouped_Wyckoffs_str2.size()){
       if(LDEBUG) {
         cerr << function_name << " # of Wyckoff positions does not match ("
-          << temp_grouped_Wyckoffs.size() << " vs " << representative_grouped_Wyckoffs.size() << endl;
+          << grouped_Wyckoffs_str1.size() << " vs " << grouped_Wyckoffs_str2.size() << endl;
       }
       return false;
     }
 
     // ---------------------------------------------------------------------------
     // sort site symmetries to account for different cell choices
-    vector<GroupedWyckoffPosition> sorted_temp_grouped_Wyckoffs = compare::sortSiteSymmetryOfGroupedWyckoffPositions(temp_grouped_Wyckoffs);
-    vector<GroupedWyckoffPosition> sorted_representative_grouped_Wyckoffs = compare::sortSiteSymmetryOfGroupedWyckoffPositions(representative_grouped_Wyckoffs);
+    vector<GroupedWyckoffPosition> grouped_Wyckoffs_str1_sorted = compare::sortSiteSymmetryOfGroupedWyckoffPositions(grouped_Wyckoffs_str1);
+    vector<GroupedWyckoffPosition> grouped_Wyckoffs_str2_sorted = compare::sortSiteSymmetryOfGroupedWyckoffPositions(grouped_Wyckoffs_str2);
 
-    vector<vector<bool> > found_matches;
-    for(uint i=0;i<sorted_temp_grouped_Wyckoffs.size();i++){
-      vector<bool> tmp;
-      for(uint m=0;m<sorted_temp_grouped_Wyckoffs[i].multiplicities.size();m++){
-        tmp.push_back(false);
-      }
-      found_matches.push_back(tmp);
+    // ---------------------------------------------------------------------------
+    // DEBUG: print sorted Wyckoff positions
+    if(LDEBUG) {
+      for(uint i=0;i<grouped_Wyckoffs_str1_sorted.size();i++){ cerr << "str1: " << grouped_Wyckoffs_str1_sorted[i] << endl; }
+      for(uint i=0;i<grouped_Wyckoffs_str2_sorted.size();i++){ cerr << "str2: " << grouped_Wyckoffs_str2_sorted[i] << endl; }
     }
 
     // ---------------------------------------------------------------------------
     // check if multiplicities and site symmetries are commensurate
-    for(uint i=0;i<sorted_temp_grouped_Wyckoffs.size();i++){
-      for(uint j=0;j<sorted_representative_grouped_Wyckoffs.size();j++){
-        if(same_species && sorted_temp_grouped_Wyckoffs[i].element == sorted_representative_grouped_Wyckoffs[j].element &&
-            sorted_temp_grouped_Wyckoffs[i].multiplicities.size() == sorted_representative_grouped_Wyckoffs[j].multiplicities.size()){
-          uint match_counts = 0;
-          for(uint m=0;m<sorted_temp_grouped_Wyckoffs[i].multiplicities.size();m++){
-            for(uint n=0;n<sorted_representative_grouped_Wyckoffs[j].multiplicities.size();n++){
-              if(sorted_temp_grouped_Wyckoffs[i].multiplicities[m] == sorted_representative_grouped_Wyckoffs[j].multiplicities[n] &&
-                  sorted_temp_grouped_Wyckoffs[i].site_symmetries[m] == sorted_representative_grouped_Wyckoffs[j].site_symmetries[n]){
-                found_matches[i][m] = true;
-                match_counts++;
-              }
-            }
-          }
-        }
-        else if(!same_species && sorted_temp_grouped_Wyckoffs[i].multiplicities.size() == sorted_representative_grouped_Wyckoffs[j].multiplicities.size()){
-          uint match_counts = 0;
-          for(uint m=0;m<sorted_temp_grouped_Wyckoffs[i].multiplicities.size();m++){
-            for(uint n=0;n<sorted_representative_grouped_Wyckoffs[j].multiplicities.size();n++){
-              if(sorted_temp_grouped_Wyckoffs[i].multiplicities[m] == sorted_representative_grouped_Wyckoffs[j].multiplicities[n] &&
-                  sorted_temp_grouped_Wyckoffs[i].site_symmetries[m] == sorted_representative_grouped_Wyckoffs[j].site_symmetries[n] &&
-                  !found_matches[i][m]){ // and not already matched
-                found_matches[i][m] = true;
-                match_counts++;
+    vector<bool> matched_species_str2;
+    matched_species_str2.resize(grouped_Wyckoffs_str2_sorted.size(), false); // set all to false
+    vector<bool> Wyckoff_subset_matches;
+
+    // ---------------------------------------------------------------------------
+    // check if multiplicities and site symmetries are commensurate
+    bool match_set_str1 = false;
+    uint match_count = 0;
+    for(uint i=0;i<grouped_Wyckoffs_str1_sorted.size();i++){
+      match_set_str1 = false;
+      for(uint j=0;j<grouped_Wyckoffs_str2_sorted.size();j++){
+        // ---------------------------------------------------------------------------
+        // check if species in str2 have already been matched
+        if(matched_species_str2[j]){ continue; }
+        // ---------------------------------------------------------------------------
+        // check if multiplicities are the same size
+        // if considering species, check the element names
+        if(((same_species && grouped_Wyckoffs_str1_sorted[i].element == grouped_Wyckoffs_str2_sorted[j].element) || !same_species) && // check species requirement
+            grouped_Wyckoffs_str1_sorted[i].multiplicities.size() == grouped_Wyckoffs_str2_sorted[j].multiplicities.size()){ // check multiplicities
+          // ---------------------------------------------------------------------------
+          // loop through multiplicies and ensure each Wyckoff position is matched to
+          // only once (via vector<bool> Wyckoff_subset_matches)
+          match_count = 0;
+          Wyckoff_subset_matches.clear(); Wyckoff_subset_matches.resize(grouped_Wyckoffs_str2_sorted[i].multiplicities.size(), false);
+          for(uint m=0;m<grouped_Wyckoffs_str1_sorted[i].multiplicities.size();m++){
+            for(uint n=0;n<grouped_Wyckoffs_str2_sorted[j].multiplicities.size();n++){
+              if(grouped_Wyckoffs_str1_sorted[i].multiplicities[m] == grouped_Wyckoffs_str2_sorted[j].multiplicities[n] &&
+                  grouped_Wyckoffs_str1_sorted[i].site_symmetries[m] == grouped_Wyckoffs_str2_sorted[j].site_symmetries[n] &&
+                  !Wyckoff_subset_matches[n]){
+                match_count++;
+                Wyckoff_subset_matches[n] = true;
               }
             }
           }
           // ---------------------------------------------------------------------------
           // if any match, all need to match; otherwise the Wyckoff positions are not matchable
-          if(match_counts>0 && match_counts != sorted_temp_grouped_Wyckoffs[i].multiplicities.size()){
-            vector<bool> tmp; for(uint m=0;m<sorted_temp_grouped_Wyckoffs[i].multiplicities.size();m++){tmp.push_back(false);}
-            found_matches[i] = tmp;
+          if(match_count == grouped_Wyckoffs_str1_sorted[i].multiplicities.size()){
+            match_set_str1 = true;
+            matched_species_str2[j] = true;
           }
         }
+        // ---------------------------------------------------------------------------
+        // if we've matched the ith Wyckoff position in str1, we do not need to
+        // continue checking against the representative Wyckoff positions
+        if(match_set_str1) { break; }
       }
+      // ---------------------------------------------------------------------------
+      // if we cannot match the ith Wyckoff position in str1, then the Wyckoff
+      // sequences cannot be matched
+      if(!match_set_str1) { return false; }
     }
 
-    for(uint i=0;i<found_matches.size();i++){
-      for(uint j=0;j<found_matches[i].size();j++){
-        if(found_matches[i][j] == false){
-          // cerr << "could not match!!!: " << i << " " << j << endl;
-          return false;
-        }
-      }
+    // ---------------------------------------------------------------------------
+    // if all species in str2 have not been mapped, sequences do not match
+    for(uint i=0;i<matched_species_str2.size();i++){
+      if(!matched_species_str2[i]){ return false; }
     }
+
     return true;
   }
 }
