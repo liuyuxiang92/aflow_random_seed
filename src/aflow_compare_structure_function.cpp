@@ -3464,7 +3464,7 @@ namespace compare{
     matched_species_str2.resize(grouped_Wyckoffs_str2_sorted.size(), false); // set all to false
     vector<bool> Wyckoff_subset_matches;
 
-    bool match_set_str1 = false;
+    bool match_set_str1 = false, match_single_str1 = false;
     uint match_count = 0;
     for(uint i=0;i<grouped_Wyckoffs_str1_sorted.size();i++){
       match_set_str1 = false;
@@ -3481,20 +3481,26 @@ namespace compare{
           // loop through multiplicies and ensure each Wyckoff position is matched to
           // only once (via vector<bool> Wyckoff_subset_matches)
           match_count = 0;
-          Wyckoff_subset_matches.clear(); Wyckoff_subset_matches.resize(grouped_Wyckoffs_str2_sorted[i].multiplicities.size(), false);
+          Wyckoff_subset_matches.clear(); Wyckoff_subset_matches.resize(grouped_Wyckoffs_str2_sorted[j].multiplicities.size(), false);
           for(uint m=0;m<grouped_Wyckoffs_str1_sorted[i].multiplicities.size();m++){
+            match_single_str1 = false;
             for(uint n=0;n<grouped_Wyckoffs_str2_sorted[j].multiplicities.size();n++){
               if(grouped_Wyckoffs_str1_sorted[i].multiplicities[m] == grouped_Wyckoffs_str2_sorted[j].multiplicities[n] &&
                   grouped_Wyckoffs_str1_sorted[i].site_symmetries[m] == grouped_Wyckoffs_str2_sorted[j].site_symmetries[n] &&
                   !Wyckoff_subset_matches[n]){
                 match_count++;
+                match_single_str1 = true;
                 Wyckoff_subset_matches[n] = true;
+                break; // need to break to prevent a many-to-one mapping of Wyckoff sites
               }
             }
+            if(!match_single_str1){ break; } // if no matches for any Wyckoff positions in str1, then we cannot match to this Wyckoff set
           }
           // ---------------------------------------------------------------------------
           // if any match, all need to match; otherwise the Wyckoff positions are not matchable
-          if(match_count == grouped_Wyckoffs_str1_sorted[i].multiplicities.size()){
+          // Note: last two if-statements determine if all of the Wyckoff subsets in str2
+          // have been matched
+          if(match_count == grouped_Wyckoffs_str1_sorted[i].multiplicities.size() && std::equal(Wyckoff_subset_matches.begin(),Wyckoff_subset_matches.end(), Wyckoff_subset_matches.begin()) && Wyckoff_subset_matches[0]){
             match_set_str1 = true;
             matched_species_str2[j] = true;
           }
