@@ -15,9 +15,6 @@ using aurostd::xvector;
 using std::vector;
 using std::string;
 
-static const string _APL_QMESH_ERR_PREFIX_ = "apl::QMesh::";
-static const string _APL_QMESH_MODULE_ = "QMESH";  // for the logger
-
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
 //                         CONSTRUCTORS/DESTRUCTORS                         //
@@ -226,9 +223,8 @@ namespace apl {
 
     if ((include_inversions && !xs.pgroupk_Patterson_calculated) ||
         (!include_inversions && !xs.pgroupk_xtal_calculated)) {
-      string function = _APL_QMESH_ERR_PREFIX_ + "setupReciprocalCell()";
       string message = "Calculation of the crystallographic point group of the reciprocal cell unsuccessful.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     if (include_inversions) _recCell.pgroup=xs.pgroupk_Patterson;
@@ -241,7 +237,7 @@ namespace apl {
   void QMesh::generateGridPoints(bool force_gamma) {
     stringstream message;
     message << "Generating a " << _qptGrid[1] << "x" << _qptGrid[2] << "x" << _qptGrid[3] << " q-point mesh.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_QMESH_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     _qpoints.resize(_nQPs);
     _ibzqpts.resize(_nQPs);  // Before making the mesh irreducible, treat all q-points as irreducible q-points
     _weights.assign(_nQPs, 1);
@@ -358,7 +354,7 @@ namespace apl {
     }
     _reduced = true;
     message << "Found " << _nIQPs << " irreducible qpoints.";
-    pflow::logger(_AFLOW_FILE_NAME_, _APL_QMESH_MODULE_, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
   }
 
   //ME20200109
@@ -537,9 +533,8 @@ namespace apl {
     if (iq < _nIQPs) {
       return _littleGroups[iq];
     } else {
-      string function = _APL_QMESH_ERR_PREFIX_ + "getLittleGroup()";
       string message = "Little groups are only calculated for irreducible q-points.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_RANGE_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_RANGE_);
     }
   }
 
@@ -583,9 +578,8 @@ namespace apl {
     // Write to file
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = _APL_QMESH_ERR_PREFIX_ + "writeQpoints";
       string message = "Could not write q-points to file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 
@@ -625,9 +619,8 @@ namespace apl {
     // Write to file
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = _APL_QMESH_ERR_PREFIX_ + "writeIrredQpoints";
       string message = "Could not write irreducible q-points to file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 

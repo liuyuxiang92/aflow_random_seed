@@ -117,8 +117,7 @@ namespace aurostd{
   // SD20220427 - Throws error if zero is not found or bisection method is not converged
   double polynomialFindExtremum(const xvector<double>& p, const double& xmin, const double& xmax, const double& tol) {
     bool LDEBUG = (FALSE || DEBUG_XFIT || XHOST.DEBUG);
-    string function_name = XPID + "polynomialFindExtremum(): ";
-    if (LDEBUG) cerr << function_name << "begin" << std::endl;
+    if (LDEBUG) cerr << __AFLOW_FUNC__ << " begin" << std::endl;
 
     double left_end = xmin; double right_end = xmax;
     double middle = 0.5*(left_end + right_end);
@@ -134,13 +133,13 @@ namespace aurostd{
     // no root within a given interval
     if (sign(f_at_left_end) == sign(f_at_right_end)) {
       string message = "No root within the given interval";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     if (LDEBUG){
-      cerr << function_name << "left_end= "  << left_end  << "middle= ";
+      cerr << __AFLOW_FUNC__ << " left_end= "  << left_end  << "middle= ";
       cerr << middle  << "right_end= "  << right_end  << std::endl;
-      cerr << function_name << "f_left= " << f_at_left_end;
+      cerr << __AFLOW_FUNC__ << " f_left= " << f_at_left_end;
       cerr << "f_middle= " << f_at_middle << "f_right= ";
       cerr << f_at_right_end << std::endl;
     }
@@ -164,9 +163,9 @@ namespace aurostd{
       f_at_middle = dp[2];
 
       if (LDEBUG){
-        cerr << function_name << "left_end= "  << left_end  << "middle= ";
+        cerr << __AFLOW_FUNC__ << " left_end= "  << left_end  << "middle= ";
         cerr << middle  << "right_end= "  << right_end  << std::endl;
-        cerr << function_name << "f_left= " << f_at_left_end;
+        cerr << __AFLOW_FUNC__ << " f_left= " << f_at_left_end;
         cerr << "f_middle= " << f_at_middle << "f_right= ";
         cerr << f_at_right_end << std::endl;
       }
@@ -175,10 +174,10 @@ namespace aurostd{
     // double-check that the convergence criterion was reached
     if (std::abs(f_at_middle) > tol) {
       string message = "Bisection method did not converge";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
-    if (LDEBUG) cerr << function_name << "end" << std::endl;
+    if (LDEBUG) cerr << __AFLOW_FUNC__ << " end" << std::endl;
     return middle;
   }
 
@@ -186,30 +185,29 @@ namespace aurostd{
   // Calculate the coefficients for a polynomial p(x) of degree n that fits the y data with weights w
   xvector<double> polynomialCurveFit(const xvector<double>& x, const xvector<double>& _y, const int n, const xvector<double> _w) {
     bool LDEBUG = (FALSE || DEBUG_XFIT || XHOST.DEBUG);
-    string function_name = XPID + "polynomialCurveFit():";
     xvector<double> p;
     double wtot = 0.0;
     for (int i = 1; i <= _w.rows; i++) {
       if (_w(i) < 0) {
         stringstream message;
         message << "Negative weight i=" << i;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
       }
       else if (std::isnan(_w(i))) {
         stringstream message;
         message << "NaN weight i=" << i;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
       }
       else if (aurostd::abs(_w(i)) == INFINITY) {
         stringstream message;
         message << "Inf weight i=" << i;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
       }
       wtot += _w(i);
     }
     if (wtot == 0.0) {
       string message = "Weights cannot be zero";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     xmatrix<double> VM = Vandermonde_matrix(x, n + 1);
     if (LDEBUG) {cerr << "VM old=" << VM << endl;}
@@ -232,9 +230,8 @@ namespace aurostd{
   // -p0 -p1 -p2 .. -p(n-1)
   xmatrix<double> companion_matrix(const xvector<double>& p) {
     if (p(p.rows) == 0.0) {
-      string function_name = XPID + "companion_matrix():";
       string message = "Leading polynomial coefficient is zero";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     int n = p.rows - 1;
     xmatrix<double> CM(n, n);
@@ -252,17 +249,16 @@ namespace aurostd{
   // The real and imaginary parts of the roots are returned in rr and ri, respectively
   // DOI: 10.1090/S0025-5718-1995-1262279-2
   void polynomialFindRoots(const xvector<double>& p, xvector<double>& rr, xvector<double>& ri) {
-    string function_name = XPID + "polynomialFindRoots():";
     for (int i = 1; i <= p.rows; i++) {
       if (std::isnan(p(i))) {
         stringstream message;
         message << "NaN in polynomial coefficient i=" << i;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
       }
       else if (aurostd::abs(p(i)) == INFINITY) {
         stringstream message;
         message << "Inf in polynomial coefficient i=" << i;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
       }
     }
     aurostd::eigen(companion_matrix(p), rr, ri);
@@ -390,9 +386,8 @@ namespace aurostd{
   ///
   bool NonlinearFit::fitLevenbergMarquardt()
   {
-    string function_name = XPID + "NonlinearFit::fitLevenbergMarquardt(): ";
     bool LDEBUG = (FALSE || DEBUG_XFIT || XHOST.DEBUG);
-    if (LDEBUG) cerr << function_name << "begin"  << std::endl;
+    if (LDEBUG) cerr << __AFLOW_FUNC__ << " begin"  << std::endl;
 
     static const double step_scaling_factor = 10.0;
 
@@ -409,16 +404,16 @@ namespace aurostd{
 
     // determine initial step
     double lambda = tau*maxDiagonalElement(A);
-    if (LDEBUG) cerr << function_name << "lambda = " << lambda << std::endl;
+    if (LDEBUG) cerr << __AFLOW_FUNC__ << " lambda = " << lambda << std::endl;
 
     while (iter<max_iter){
       iter++;
-      if (LDEBUG) cerr << function_name << "iteration: " << iter << std::endl;
+      if (LDEBUG) cerr << __AFLOW_FUNC__ << " iteration: " << iter << std::endl;
 
       // M = A + lambda*diag(A)
       M = A; for (int i=1; i<=Nparams; i++) M[i][i] += lambda*A[i][i];
 
-      if (LDEBUG) cerr << function_name << " M:" << std::endl << M << std::endl;
+      if (LDEBUG) cerr << __AFLOW_FUNC__ << " M:" << std::endl << M << std::endl;
 
       // transformation: xvector(N) => xmatrix(N,1) to use GaussJordan function
       for (int i=1; i<=Nparams; i++) G[i][1] = g[i];
@@ -446,10 +441,10 @@ namespace aurostd{
       else{
         lambda *= step_scaling_factor;
       }
-      if (LDEBUG) cerr << function_name << "pnew = " << p << std::endl;
+      if (LDEBUG) cerr << __AFLOW_FUNC__ << " pnew = " << p << std::endl;
     }
 
-    if (LDEBUG) cerr << function_name << "end"  << std::endl;
+    if (LDEBUG) cerr << __AFLOW_FUNC__ << " end"  << std::endl;
     return iter < max_iter;
   }
 }

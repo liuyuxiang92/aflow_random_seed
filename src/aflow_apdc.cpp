@@ -127,18 +127,17 @@ namespace apdc {
 
  void GetPhaseDiagram(const string& aflowin, bool command_line_call) {
     _apdc_data apdc_data;
-    string function_name = XPID + "GetPhaseDiagram():";
     if (command_line_call) {
       // FORMAT: <plattice>:<element_1>,<element_2>,...<element_K>
       vector<string> tokens;
       aurostd::string2tokens(aflowin, tokens, ":");
       if (tokens.empty()) {
         string message = "Missing input";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
       }
       if (tokens.size() != 2) {
         string message = "Invalid input, format is: <plattice>:<element_1>,<element_2>,...<element_K>";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
       }
       apdc_data.min_sleep = DEFAULT_APDC_MIN_SLEEP_SECONDS;
       apdc_data.aflow_max_num_atoms = DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS;
@@ -165,7 +164,6 @@ namespace apdc {
 // ***************************************************************************
 namespace apdc {
   void ErrorChecks(_apdc_data& apdc_data) {
-    string function_name = XPID + "ErrorChecks():";
     // Check if number of threads is valid
     if (apdc_data.num_threads < 1) {apdc_data.num_threads = 1;}
     // Check if min sleep is at least 1 sec
@@ -173,33 +171,33 @@ namespace apdc {
     // Check if max number of atoms in cluster is valid
     if (apdc_data.aflow_max_num_atoms < 1 || apdc_data.max_num_atoms < 1) {
       string message = "Maximum number of atoms per cluster must be at least 1";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     // Check if directory is writable
     if (!aurostd::DirectoryMake(apdc_data.rootdirpath)) {
       string message = "Cannot create directory";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
     // Check if parent lattice is valid
     if (apdc_data.plattice != "fcc" && apdc_data.plattice != "bcc" && apdc_data.plattice != "hcp") {
       string message = "Invalid parent lattice";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
     // Check if alloy is at least binary
     if (apdc_data.elements.size() < 2) {
       string message = "Alloy must be at least binary";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
     // Check if HCP parent lattice is used for greater than binary
     if (apdc_data.plattice == "hcp" && apdc_data.elements.size() != 2) {
       string message = "HCP parent lattice of alloys greater than binary not supported";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
     }
     // Check if elements are valid, construct alloy name
     for (uint i = 0; i < apdc_data.elements.size(); i++) {
       if (!xelement::xelement::isElement(apdc_data.elements[i])) {
         string message = "Element \"" + apdc_data.elements[i] + "\" is invalid";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
       }
       apdc_data.alloyname += apdc_data.elements[i];
     }
@@ -207,11 +205,11 @@ namespace apdc {
     if (!apdc_data.conc_curve.empty()) {
       if (apdc_data.conc_curve.size() != 2 * apdc_data.elements.size()) {
         string message = "Concentration range must have format [X1_start, X1_end, X2_start, X2_end,...X(K)_start, X(K)_end]";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
       }
       if (apdc_data.conc_npts < 2) {
         string message = "Number of points for the concentration range must be at least 2";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
       }
       // Check if concentration curve is within [0,1] and sums to 1
       double totconc_init = 0.0, totconc_final = 0.0;
@@ -221,14 +219,14 @@ namespace apdc {
         if (apdc_data.conc_curve[2 * i] < 0 || apdc_data.conc_curve[2 * i] > 1 ||
             apdc_data.conc_curve[2 * i + 1] < 0 || apdc_data.conc_curve[2 * i + 1] > 1) {
           string message = "Concentration range must be defined on [0,1]";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
         }
         totconc_init += apdc_data.conc_curve[2 * i]; totconc_final += apdc_data.conc_curve[2 * i + 1];
         vconc_init.push_back(apdc_data.conc_curve[2 * i]); vconc_final.push_back(apdc_data.conc_curve[2 * i + 1]);
       }
       if (!aurostd::isequal(totconc_init, 1.0) || !aurostd::isequal(totconc_final, 1.0)) {
         string message = "Total concentration must sum to 1";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
       }
       // Redefine concentration curve from [0,1] to (0,1)
       aurostd::WithinList(vconc_init, 0.0, vzeros_init); aurostd::WithinList(vconc_final, 0.0, vzeros_final);
@@ -246,16 +244,16 @@ namespace apdc {
     // Check if temperature range format is valid
     if (apdc_data.temp_range.size() != 2) {
       string message = "Temperature range must have format [T_start T_end]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
     }
     if (apdc_data.temp_npts < 2) {
       string message = "Number of points for the temperature range must be at least 2";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     // Check if temperature values are valid
     if (apdc_data.temp_range[0] < 0 || apdc_data.temp_range[1] < 0) {
       string message = "Temperature cannot be below 0K";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
   }
 }
@@ -453,34 +451,32 @@ namespace apdc {
 // ***************************************************************************
 namespace apdc {
   void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob) {
-    string function_name = XPID + "CheckProbability():";
     int nx = prob.rows;
     for (int i = 1; i <= nx; i++) {
       if (!aurostd::isequal(aurostd::sum(prob(i)), 1.0)) { // unnormalized
         string message = "Ideal solution (high-T) probability is unnormalized for i=" + aurostd::utype2string<int>(i);
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
       }
       else if (!aurostd::isequal(prob(i)*conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
         string message = "Ideal solution (high-T) probability does not satisfy concentration contraint for i=" + aurostd::utype2string<int>(i);
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
       }
     }
   }
 
   void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob0, const vector<xmatrix<double>>& prob) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = XPID + "CheckProbability():";
     int nx = prob[0].rows;
     double diff = AUROSTD_MAX_DOUBLE, diff_old;
     for (uint it = 0; it < prob.size(); it++) {
       for (int i = 1; i <= nx; i++) {
         if (!aurostd::isequal(aurostd::sum(prob[it](i)), 1.0)) { // unnormalized
           string message = "Equilibrium probability is unnormalized for i=" + aurostd::utype2string<int>(i);
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
         }
         else if (!aurostd::isequal(prob[it](i)*conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
           string message = "Equilibrium probability does not satisfy concentration contraint for i=" + aurostd::utype2string<int>(i);
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
         }
       }
       diff_old = diff;
@@ -488,7 +484,7 @@ namespace apdc {
       if (LDEBUG) {cerr << "|P - P0| = " << diff << endl;}
       if (diff > diff_old) { // P(T_inf) does not equal P0(T_inf)
         string message = "Equilibrium probability does not converge to the high-T limit";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
     }
   }
@@ -499,7 +495,6 @@ namespace apdc {
 // ***************************************************************************
 namespace apdc {
   xmatrix<double> GetConcentrationMacro(const vector<double>& conc_curve, const int conc_npts, const uint nelem) {
-    string function_name = XPID + "GetConcentrationMacro():";
     xmatrix<double> conc_macro;
     if (!conc_curve.empty()) { // curve in concentration space
       xmatrix<double> _conc_macro(conc_npts, nelem);
@@ -603,7 +598,6 @@ namespace apdc {
 namespace apdc {
   xvector<int> GetDegeneracyCluster(const string& plattice, const vector<xstructure>& _vstr, const vector<string>& elements, const int max_num_atoms, const bool shuffle, const string& rundirpath) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = XPID + "GetDegeneracyCluster():";
     string filepath = "";
     if (!rundirpath.empty()) {
       vector<string> tokens;
@@ -725,7 +719,7 @@ namespace apdc {
     int sum_calculated = aurostd::sum(degeneracy_cluster), sum_accepted = (int)vstr_sup.size() * (int)std::pow(elements.size(), max_num_atoms);
     if (!aurostd::isequal(sum_calculated, sum_accepted)) {
       string message = "Degeneracies do not satisfy the sum rule, the sum is " + aurostd::utype2string<int>(sum_calculated) + " but should be " + aurostd::utype2string<int>(sum_accepted);
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     if (shuffle) { // place back in correct order
       xvector<int> _degeneracy_cluster = degeneracy_cluster;
@@ -817,11 +811,10 @@ namespace apdc {
 namespace apdc {
   void RunATAT(const string& workdirpath, const string& rundirpath, const uint min_sleep) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = XPID + "RunATAT():";
     uint iter = 0;
     if (aurostd::substring2bool(aurostd::execute2string("mmaps", stdouterr_fsio), "command not found")) {
       string message = "Missing mmaps program";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     aurostd::execute("touch " + rundirpath + "/stop"); // pre-kill mmaps gracefully
     aurostd::RemoveFile(rundirpath + "/maps_is_running");
@@ -835,7 +828,7 @@ namespace apdc {
       if (iter > 30) { // wait 30 times the minimum sleep (60 seconds)
         string message = "mmaps is taking too long to predict structures, dir=" + rundirpath;
         aurostd::RemoveFile(tmpfile);
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
       aurostd::Sleep(min_sleep);
       aurostd::file2string(rundirpath + "/maps.log", logstring);
@@ -988,7 +981,6 @@ namespace apdc {
 // ***************************************************************************
 namespace apdc {
   vector<xstructure> GetATATXstructures(const string& lat, const uint max_num_atoms, const string& rundirpath) {
-    string function_name = XPID + "GetATATXstructures():";
     vector<xstructure> vstr;
     stringstream oss;
     if (!rundirpath.empty()) {
@@ -1015,11 +1007,11 @@ namespace apdc {
     aurostd::RemoveFile(tmpfile);
     if (sstr.size() == 0 || aurostd::substring2bool(sstr, "Unable to open lattice file")) {
       string message = "Invalid lat.in file";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     }
     else if (aurostd::substring2bool(sstr, "command not found")) {
       string message = "Missing genstr program";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     aurostd::string2vectorstring(sstr, vinput);
     for (uint line = 0; line < vinput.size(); line++) {

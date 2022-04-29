@@ -3204,6 +3204,19 @@ namespace aurostd {  // namespace aurostd
 }
 
 // ----------------------------------------------------------------------------
+// SD20220426
+// Least squares approximation of linear functions to the data
+// Solves A*x=b, where A is a m-by-n matrix and b is a m-by-1 vector and
+// the output x is a n-by-1 vector
+// See: https://en.wikipedia.org/wiki/Linear_least_squares
+namespace aurostd {  // namespace aurostd
+  template<class utype>                                   
+    xvector<utype> LinearLeastSquares(xmatrix<utype>& A, xvector<utype>& b) {
+    return aurostd::inverse(trasp(A) * A) * trasp(A) * b;
+  }
+}
+
+// ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype>                                    // GaussJordan xmatrix
     void GaussJordan(xmatrix<utype>& A, xmatrix<utype>& B) {
@@ -3591,14 +3604,14 @@ namespace aurostd {
       xmatrix<utype> identity_matrix = rotation*trasp(rotation);
       if(LDEBUG){
         // R^T==R^-1
-        cerr << function_name << " transpose(R):" << endl << aurostd::trasp(rotation) << endl;
-        cerr << function_name << " inverse(R):" << endl << aurostd::inverse(rotation) << endl;
+        cerr << __AFLOW_FUNC__ << " transpose(R):" << endl << aurostd::trasp(rotation) << endl;
+        cerr << __AFLOW_FUNC__ << " inverse(R):" << endl << aurostd::inverse(rotation) << endl;
         // R*R^T=I
-        cerr << function_name << " identity? (R*R^T=I):" << endl << identity_matrix << endl;
+        cerr << __AFLOW_FUNC__ << " identity? (R*R^T=I):" << endl << identity_matrix << endl;
       }
       if(!aurostd::isidentity(identity_matrix)){
         message << "Extracted rotation should be an orthogonal matrix (R*R^T==I):" << endl << identity_matrix;
-        throw xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
     }
   }
@@ -5271,16 +5284,15 @@ namespace aurostd {
       utype z,y,x,w,v,u,t,s,r=0,q=0,p=0,anorm;
 
       n=a.rows;
-      string function = XPID + "aurostd::hqr():";
       if(a.rows!=a.cols) {
         stringstream message;
         message << "'a' matrix not square  a.rows=" << a.rows << " a.cols=" << a.cols;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
       else if(wr.rows!=a.rows || wi.rows!=a.rows) { //SD20220420 - output lengths need to match input
         stringstream message;
         message << "'wr' and 'wi' lengths must be compatible with 'a' matrix, a.rows=" << a.rows << " wr.rows=" << wr.rows<< " wi.rows=" << wi.rows;
-        throw xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
 
       anorm=aurostd::abs(a[1][1]);

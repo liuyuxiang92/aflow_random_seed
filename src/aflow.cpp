@@ -522,7 +522,7 @@ int main(int _argc,char **_argv) {
     } else if(XHOST.vflag_control.flag("README_APL"))  {
       banner_message << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
     } else if(XHOST.vflag_control.flag("README_QHA"))  {
-      banner_message << init::InitGlobalObject("README_AFLOW_QHA_SCQHA_QHA3P_TXT") << endl;
+      banner_message << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
     } else if(XHOST.vflag_control.flag("README_AAPL"))  {
       banner_message << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
     } else if(XHOST.vflag_control.flag("README_AGL"))  {
@@ -615,8 +615,8 @@ int main(int _argc,char **_argv) {
   //[OBSOLETE]  return 1;
   //[OBSOLETE]}
   catch (aurostd::xerror& excpt) {
-    pflow::logger(excpt.whereFileName(), excpt.whereFunction(), excpt.error_message, oss, _LOGGER_ERROR_);
-    return excpt.error_code;
+    pflow::logger(excpt.whereFileName(), excpt.whereFunction(), excpt.buildMessageString(), oss, _LOGGER_ERROR_);
+    return excpt.whatCode();
   }
 }
 
@@ -714,6 +714,7 @@ namespace aflow {
     strstream << tab << " --machine=beta|beta_openmpi|qrats|qflow|x|conrad|eos|materials|habana|aflowlib|ranger|kraken" << endl;
     strstream << tab << "           marylou|parsons|jellium|ohad|host1" << endl;
     strstream << tab << "           raptor --np=N|diamond --np=N" << endl;
+    strstream << tab << " --machine_name=XXXX " << endl;
     strstream << "******* END RUNNING MODE ***************************************************************************" << endl;
     strstream << endl;
     // --readme=htresources

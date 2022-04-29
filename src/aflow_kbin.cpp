@@ -49,8 +49,8 @@ namespace aurostd {
     aurostd::StringSubst(tmp_directory,"/"," ");
     vector<string> tokens;
     aurostd::string2tokens(tmp_directory,tokens);
-    if(tokens.size()>=2) tmp_directory=tokens.at(tokens.size()-2)+"/"+tokens.at(tokens.size()-1);
-    if(tokens.size()==1) tmp_directory=tokens.at(tokens.size()-1);
+    if(tokens.size()>=2) tmp_directory=tokens[tokens.size()-2]+"/"+tokens[tokens.size()-1];
+    if(tokens.size()==1) tmp_directory=tokens[tokens.size()-1];
 
     uint library=LIBRARY_NOTHING;
     // XHOST_LIBRARY_LIB0
@@ -152,16 +152,16 @@ namespace aurostd {
         tokens=XHOST_Library_CALCULATED_LIB9_RAW;
       }
       for(uint i=0;i<tokens.size();i++) {
-        if(aurostd::substring2bool(tokens.at(i),"/")) {
-          tmp=tokens.at(i);
+        if(aurostd::substring2bool(tokens[i],"/")) {
+          tmp=tokens[i];
           aurostd::StringSubst(tmp," ","");
           vLibrary.push_back(tmp);
         }
       }
       for(int i=vLibrary.size()-1;i>=0;i--) {
-        if(tmp_directory==vLibrary.at(i)) {
+        if(tmp_directory==vLibrary[i]) {
           already_in_database=TRUE;
-          if(LDEBUG) cerr << vLibrary.at(i) << " FOUND .." << endl; // NEW
+          if(LDEBUG) cerr << vLibrary[i] << " FOUND .." << endl; // NEW
         }
       }
     }
@@ -200,42 +200,99 @@ using aurostd::DirectoryUnwritable;
 #define PRIORITY_GREP_STRING string("grep -vi PRIORITY ")
 
 // ***************************************************************************
-// KBIN::Legitimate_aflowin
+// KBIN::Legitimate_krun
 // ***************************************************************************
 namespace KBIN {
-  bool Legitimate_aflowin(string _aflowindir,const bool& osswrite,ostringstream& oss) {
-    string aflowindir=_aflowindir;
+  bool Legitimate_krun(const _aflags& aflags,const bool osswrite,ostringstream& oss) {
+    string aflowindir=aflags.Directory,filename;
     aurostd::StringSubst(aflowindir,"//","/");
-
-    if(aurostd::FileExist(aflowindir)) {  // file must exist
-      if(!aurostd::FileEmpty(aflowindir)) { // must not be empty
-        if(aurostd::substring2bool(aflowindir,_AFLOWIN_)) {  // there must be an _AFLOWIN_
-          aurostd::StringSubst(aflowindir,_AFLOWIN_,"");
-          if(!aurostd::FileExist(aflowindir+_AFLOWLOCK_)) { // it should be UNLOCKED
-            //  if(osswrite) {oss << "MMMMM  Loading Valid File Entry = " << aflowindir << MessageTime(aflags);aurostd::PrintMessageStream(oss,XHOST.QUIET);};
-            return TRUE;	
-          } else { // must be unlocked
-            if(osswrite) {oss << "MMMMM  Directory locked = " << aflowindir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
-            return FALSE;
-          }
-        } else { // must contain _AFLOWIN_
-          if(osswrite) {oss << "MMMMM  Not loading file without " << _AFLOWIN_ << " = " << aflowindir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
-          return FALSE;
-        }
-      } else { // empty
-        if(osswrite) {oss << "MMMMM  Not loading empty file = " << aflowindir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
-        return FALSE;
-      }
-    } else { // unexisting
-      // if(osswrite) {oss << "MMMMM  Not loading unexisting file = " << aflowindir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+    if(!Legitimate_aflowdir(aflowindir,aflags,osswrite,oss)){ // aflowdir not legitimate
       return FALSE;
     }
-    return FALSE;
+    if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP){
+      filename=aflowindir+"/INCAR";
+    }
+    else if(aflags.KBIN_RUN_AFLOWIN || aflags.KBIN_GEN_VASP_FROM_AFLOWIN || aflags.KBIN_GEN_AIMS_FROM_AFLOWIN){
+      filename=aflowindir+"/"+_AFLOWIN_;
+    }
+    else { //SD20220319 - catch-all
+      return FALSE;
+    }
+    if(!aurostd::FileExist(filename)){ // file does not exist
+      if(osswrite) {oss << "MMMMM  File does not exist = " << filename << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+      return FALSE;
+    }
+    return TRUE;
   }
 }
 
 namespace KBIN {
-  bool Legitimate_aflowin(string aflowindir) { ostringstream aus; return KBIN::Legitimate_aflowin(aflowindir,FALSE,aus);};
+  bool Legitimate_krun(const _aflags& aflags) { ostringstream aus; return KBIN::Legitimate_krun(aflags,FALSE,aus);};
+}
+
+// ***************************************************************************
+// KBIN::Legitimate_aflowin
+// ***************************************************************************
+namespace KBIN {
+  bool Legitimate_aflowin(const string& _aflowindir,const bool osswrite,ostringstream& oss) {
+    string aflowindir=_aflowindir; //SD20220321 - aflowindir = aflowdir/_AFLOWIN_
+    aurostd::StringSubst(aflowindir,"//","/");
+    if(!aurostd::FileExist(aflowindir)){ // file does not exist
+      if(osswrite) {oss << "MMMMM  File does not exist = " << aflowindir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+      return FALSE;
+    }
+    if(aurostd::FileEmpty(aflowindir)){ // file is empty
+      if(osswrite) {oss << "MMMMM  File is empty = " << aflowindir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+      return FALSE;
+    }
+    if(!aurostd::substring2bool(aflowindir,_AFLOWIN_)){ // file name does not contain _AFLOWIN_
+      if(osswrite) {oss << "MMMMM  File name does not contain _AFLOWIN_ " << _AFLOWIN_ << " = " << aflowindir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+      return FALSE;
+    }
+    aurostd::StringSubst(aflowindir,_AFLOWIN_,"");
+    if(aurostd::DirectoryLocked(aflowindir,_AFLOWLOCK_)){ // LOCK file exists
+      if(osswrite) {oss << "MMMMM  Directory locked = " << aflowindir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+      return FALSE;
+    }
+    return TRUE;
+  }
+}
+
+namespace KBIN {
+  bool Legitimate_aflowin(const string aflowindir) { ostringstream aus; return KBIN::Legitimate_aflowin(aflowindir,FALSE,aus);};
+}
+
+// ***************************************************************************
+// KBIN::Legitimate_aflowdir
+// ***************************************************************************
+namespace KBIN {
+  bool Legitimate_aflowdir(const string& aflowdir,const _aflags& aflags,const bool osswrite,ostringstream& oss) {
+    if(!aurostd::IsDirectory(aflowdir)){ // directory does not exist
+      if(osswrite) {oss << "MMMMM  Directory does not exist = " << aflowdir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+      return FALSE;
+    }
+    if(aurostd::DirectoryUnwritable(aflowdir)){ // directory unwritable
+      if(osswrite) {oss << "MMMMM  Directory unwritable = " << aflowdir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+      return FALSE;
+    }
+    if(aurostd::DirectoryLocked(aflowdir,_AFLOWLOCK_)){ // directory locked
+      if(osswrite) {oss << "MMMMM  Directory locked = " << aflowdir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+      return FALSE;
+    }
+    if(aurostd::DirectorySkipped(aflowdir)){ // directory skipped
+      if(osswrite) {oss << "MMMMM  Directory skipped = " << aflowdir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+      return FALSE;
+    }
+    if(DirectoryAlreadyInDatabase(aflowdir,aflags.AFLOW_FORCE_RUN)){ // directory already in database
+      if(osswrite) {oss << "MMMMM  Directory already in database = " << aflowdir << Message(_AFLOW_FILE_NAME_) << endl;aurostd::PrintMessageStream(oss,XHOST.QUIET);};
+      return FALSE;
+    }
+    return TRUE;
+  }
+}
+
+namespace KBIN {
+  bool Legitimate_aflowdir(const string& aflowdir,const _aflags& aflags) { ostringstream aus; return KBIN::Legitimate_aflowdir(aflowdir,aflags,FALSE,aus);};
 }
 
 namespace KBIN {
@@ -262,6 +319,7 @@ namespace KBIN {
   int KBIN_Main(vector<string> argv) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy = XPID + "KBIN::KBIN_Main():";
+    if (argv.empty()){return 0;} //SD2022024 - check argv!=0
     string GENERIC;
     //  string Directory;
     int i;
@@ -299,11 +357,11 @@ namespace KBIN {
       vector<string> tokens;
       if(aurostd::args2attachedflag(argv,"--run=")) {
         aurostd::string2tokens(aurostd::args2attachedstring(argv,"--run=","1"),tokens,"=");
-        XHOST.AFLOW_RUNXnumber=aurostd::string2utype<uint>(tokens.at(tokens.size()-1));
+        XHOST.AFLOW_RUNXnumber=aurostd::string2utype<uint>(tokens[tokens.size()-1]);
       }
       if(aurostd::args2attachedflag(argv,"-run=")) {
         aurostd::string2tokens(aurostd::args2attachedstring(argv,"-run=","1"),tokens,"=");
-        XHOST.AFLOW_RUNXnumber=aurostd::string2utype<uint>(tokens.at(tokens.size()-1));
+        XHOST.AFLOW_RUNXnumber=aurostd::string2utype<uint>(tokens[tokens.size()-1]);
       }
       if(XHOST.AFLOW_RUNXnumber<1) XHOST.AFLOW_RUNXnumber=1;
     }
@@ -440,6 +498,15 @@ namespace KBIN {
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::CMU_EULER")) XHOST.maxmem=CMU_EULER_DEFAULT_KILL_MEM_CUTOFF;
     //DX20190107 - CMU EULER - END
 
+    //HE20220309 - Machine Name - START
+    // allow the use of generic machine templates while using descriptive names
+    stringstream machine_name;
+    string argv_machine_name = aurostd::args2attachedstring(argv, "--machine_name=", "");
+    if (!argv_machine_name.empty()) machine_name << argv_machine_name << "(" << aflags.AFLOW_MACHINE_GLOBAL << ")";
+    else machine_name << aflags.AFLOW_MACHINE_GLOBAL;
+    aflags.AFLOW_MACHINE_GLOBAL.addattachedscheme("NAME", machine_name.str() ,true);
+    //HE20220309 - Machine Name - END
+
 
     // turn off multi pthreads on specific machines
     if(aflags.AFLOW_MACHINE_GLOBAL.flag()) {
@@ -484,7 +551,7 @@ namespace KBIN {
     if(aflags.AFLOW_PERFORM_DIRECTORY) {
       // [OBSOLETE] vruns=aurostd::args2vectorstring(argv,"--DIRECTORY|--D|--d","./");
       aurostd::string2tokens(XHOST.vflag_control.getattachedscheme("VDIR"),vruns,",");
-      if(LDEBUG) { for(uint i=0;i<vruns.size();i++) cerr << XPID << "KBIN::Main: vruns.at(i)=" << vruns.at(i) << endl;}
+      if(LDEBUG) { for(uint i=0;i<vruns.size();i++) cerr << XPID << "KBIN::Main: vruns[i]=" << vruns[i] << endl;}
     } else {
       if(!aflags.AFLOW_PERFORM_FILE)
         vruns.push_back(aurostd::getPWD()); //CO20191112
@@ -524,7 +591,7 @@ namespace KBIN {
       }
 
       for(uint i=0;(i<vlines.size() && vruns.size()<XHOST_AFLOW_RUNXnumber_multiplier*maxcheck && vruns.size()<VRUNS_MAX_CUTOFF);i++) {  // XHOST_AFLOW_RUNXnumber_multiplier times more... for safety
-        if(KBIN::Legitimate_aflowin(vlines.at(i),FALSE,aus)) vruns.push_back(vlines.at(i));             // TRUE puts too much verbosity
+        if(Legitimate_aflowin(vlines[i],FALSE,aus)) {vruns.push_back(vlines[i]);} // TRUE puts too much verbosity
       }
 
       aus << "MMMMM  " <<  aurostd::PaddedPOST("Legitimate VRUNS = "+aurostd::utype2string(vruns.size()),40) << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
@@ -560,7 +627,7 @@ namespace KBIN {
     // ------------------------------------------------------------------------------------------------------------------------------------
     // nothing specified : CHECK IF DAEMON
     if(XHOST.AFLOW_RUNDIRflag) { // check if daemaon aflowd
-      string progname=argv.at(0);
+      string progname=argv[0];
       if(aurostd::substring2bool(progname,"aflowd")) {
         XHOST.AFLOW_MULTIflag=TRUE;
         XHOST.AFLOW_RUNXflag=FALSE;
@@ -579,8 +646,8 @@ namespace KBIN {
       vector<string> vDirectory=vruns;
       // fix the RUNS
       for(uint ii=0;ii<vDirectory.size();ii++)
-        if(aurostd::substring2bool(vDirectory.at(ii),_AFLOWIN_))
-          aurostd::StringSubst(vDirectory.at(ii),_AFLOWIN_,"");
+        if(aurostd::substring2bool(vDirectory[ii],_AFLOWIN_))
+          aurostd::StringSubst(vDirectory[ii],_AFLOWIN_,"");
 
       // if(aflags.AFLOW_PERFORM_ORDER_SORT) {   // SORT do something
       //   aus << "MMMMM  Requested SORT [aflags.AFLOW_PERFORM_ORDER_SORT=1] - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
@@ -601,24 +668,24 @@ namespace KBIN {
 
       for(uint idir=0;idir<vDirectory.size();idir++) {
         bool krun=TRUE;
-        aflags.Directory=vDirectory.at(idir);
+        aflags.Directory=vDirectory[idir];
         aus << "MMMMM  AFLOW: running " << _AFLOWIN_ << ", directory" << "=\""  << aflags.Directory << "\" - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(aus,XHOST.QUIET);
         // If necessary PERFORM CLEAN
         if(krun && aflags.AFLOW_PERFORM_CLEAN) {
-          aflags.Directory=vDirectory.at(idir);
+          aflags.Directory=vDirectory[idir];
           //[CO20210716 - OBSOLETE]aurostd::StringSubst(aflags.Directory,"/"+_AFLOWLOCK_,"");
           //[CO20210716 - OBSOLETE]for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/OUTCAR.relax1"+XHOST.vext.at(iext),"");    // CLEAN UP A LITTLE
-          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/OUTCAR.relax2"+XHOST.vext.at(iext),"");    // CLEAN UP A LITTLE
-          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/OUTCAR.static"+XHOST.vext.at(iext),"");    // CLEAN UP A LITTLE
-          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/OUTCAR.bands"+XHOST.vext.at(iext),"");     // CLEAN UP A LITTLE
+          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/OUTCAR.relax1"+XHOST.vext[iext],"");    // CLEAN UP A LITTLE
+          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/OUTCAR.relax2"+XHOST.vext[iext],"");    // CLEAN UP A LITTLE
+          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/OUTCAR.static"+XHOST.vext[iext],"");    // CLEAN UP A LITTLE
+          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/OUTCAR.bands"+XHOST.vext[iext],"");     // CLEAN UP A LITTLE
           //[CO20210716 - OBSOLETE]}
           //[CO20210716 - OBSOLETE]for(uint iext=1;iext<XHOST.vext.size();iext++) {  // SKIP uncompressed
-          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/EIGENVAL.relax1"+XHOST.vext.at(iext),"");  // CLEAN UP A LITTLE
-          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/EIGENVAL.relax2"+XHOST.vext.at(iext),"");  // CLEAN UP A LITTLE
-          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/EIGENVAL.static"+XHOST.vext.at(iext),"");  // CLEAN UP A LITTLE
-          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/EIGENVAL.bands"+XHOST.vext.at(iext),"");   // CLEAN UP A LITTLE
+          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/EIGENVAL.relax1"+XHOST.vext[iext],"");  // CLEAN UP A LITTLE
+          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/EIGENVAL.relax2"+XHOST.vext[iext],"");  // CLEAN UP A LITTLE
+          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/EIGENVAL.static"+XHOST.vext[iext],"");  // CLEAN UP A LITTLE
+          //[CO20210716 - OBSOLETE]  aurostd::StringSubst(aflags.Directory,"/EIGENVAL.bands"+XHOST.vext[iext],"");   // CLEAN UP A LITTLE
           //[CO20210716 - OBSOLETE]}
           //[CO20210716 - OBSOLETE]aurostd::StringSubst(aflags.Directory,"/OUTCAR","");  // so it is easier to search
           //[CO20210716 - OBSOLETE]aurostd::StringSubst(aflags.Directory,"/"+_AFLOWIN_,"");  // so it is easier to search
@@ -629,70 +696,74 @@ namespace KBIN {
         // RUN
         // cerr << "STEP0b" << endl;
         if(krun) {
-          if(LDEBUG) cerr << "STEP1b" << endl;  //CO20170622 - should be debug
-          ifstream FileCHECK;string FileNameCHECK;
-          // check for directory
-          FileNameCHECK=aflags.Directory;
-          FileCHECK.open(FileNameCHECK.c_str(),std::ios::in);
-          FileCHECK.clear();FileCHECK.close();
-          if(!FileCHECK) {                                                                        // ******* Directory is non existent
-            aus << "EEEEE  DIRECTORY_NOT_FOUND = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+          //[SD20220224 - OBSOLETE]if(LDEBUG) cerr << "STEP1b" << endl;  //CO20170622 - should be debug
+          //[SD20220224 - OBSOLETE]ifstream FileCHECK;string FileNameCHECK;
+          //[SD20220224 - OBSOLETE]// check for directory
+          //[SD20220224 - OBSOLETE]FileNameCHECK=aflags.Directory;
+          //[SD20220224 - OBSOLETE]FileCHECK.open(FileNameCHECK.c_str(),std::ios::in);
+          //[SD20220224 - OBSOLETE]FileCHECK.clear();FileCHECK.close();
+          //[SD20220224 - OBSOLETE]if(!FileCHECK) {                                                                        // ******* Directory is non existent
+          //[SD20220224 - OBSOLETE]  aus << "EEEEE  DIRECTORY_NOT_FOUND = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+          //[SD20220224 - OBSOLETE]  aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          //[SD20220224 - OBSOLETE]} else {                                                                                // ******* Directory EXISTS
+          //[SD20220224 - OBSOLETE]  if(LDEBUG) cerr << soliloquy << " STEP1c" << endl;
+          //[SD20220224 - OBSOLETE]  if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_)) {                                               // ******* Directory is locked
+          //[SD20220224 - OBSOLETE]    aus << "LLLLL  DIRECTORY_LOCKED ...bzzzz... !MULTI = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+          //[SD20220224 - OBSOLETE]    aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          //[SD20220224 - OBSOLETE]  } else {
+          //[SD20220224 - OBSOLETE]    if(LDEBUG) cerr << soliloquy << " STEP1d" << endl;
+          //[SD20220224 - OBSOLETE]    if(DirectorySkipped(aflags.Directory)) {                                            // ******* Directory is skipped
+          //[SD20220224 - OBSOLETE]      aus << "LLLLL  DIRECTORY_SKIPPED ...bzzzz... !MULTI = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+          //[SD20220224 - OBSOLETE]      aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          //[SD20220224 - OBSOLETE]    } else {        
+          //[SD20220224 - OBSOLETE]      if(LDEBUG) cerr << soliloquy << " STEP1e" << endl;
+          //[SD20220224 - OBSOLETE]      if(DirectoryAlreadyInDatabase(aflags.Directory,aflags.AFLOW_FORCE_RUN)) {         // ******* Directory is already in the database
+          //[SD20220224 - OBSOLETE]        aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ...bzzzz... !MULTI = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+          //[SD20220224 - OBSOLETE]        aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ... use \"aflow --multi\" to force the calculation of this entry "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+          //[SD20220224 - OBSOLETE]        aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          //[SD20220224 - OBSOLETE]      } else {        
+          //[SD20220224 - OBSOLETE]        if(LDEBUG) cerr << soliloquy << " STEP1f" << endl;
+          //[SD20220224 - OBSOLETE]        if(DirectoryUnwritable(aflags.Directory)) {                                     // ******* Directory is unwritable
+          //[SD20220224 - OBSOLETE]          aus << "LLLLL  DIRECTORY_UNWRITABLE ...bzzzz... !MULTI = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+          //[SD20220224 - OBSOLETE]          aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          //[SD20220224 - OBSOLETE]        } else {                                                                        // ******* Directory is ok
+          //[SD20220224 - OBSOLETE]          if(LDEBUG) cerr << soliloquy << " STEP1g" << endl;
+          //[SD20220224 - OBSOLETE]          if(_VERBOSE_) aus << "LLLLL  GOOD ...bzzz... !MULTI = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+          //[SD20220224 - OBSOLETE]          if(_VERBOSE_) aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          //[SD20220224 - OBSOLETE]          if(aflags.KBIN_RUN_AFLOWIN)               FileNameCHECK=aflags.Directory+"/"+_AFLOWIN_;
+          //[SD20220224 - OBSOLETE]          if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN)     FileNameCHECK=aflags.Directory+"/"+_AFLOWIN_;
+          //[SD20220224 - OBSOLETE]          if(aflags.KBIN_GEN_AIMS_FROM_AFLOWIN)     FileNameCHECK=aflags.Directory+"/"+_AFLOWIN_; //CO20180409
+          //[SD20220224 - OBSOLETE]          if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP)     FileNameCHECK=aflags.Directory+"/INCAR";
+          //[SD20220224 - OBSOLETE]          FileCHECK.open(FileNameCHECK.c_str(),std::ios::in);
+          //[SD20220224 - OBSOLETE]          FileCHECK.clear();FileCHECK.close();
+          //[SD20220224 - OBSOLETE]          if(!FileCHECK) {                                                                    // ******* _AFLOWIN_ does not exist
+          //[SD20220224 - OBSOLETE]            if(LDEBUG) cerr << soliloquy << " STEP1h" << endl;
+          //[SD20220224 - OBSOLETE]            if(aflags.KBIN_RUN_AFLOWIN)               aus << "EEEEE  " << _AFLOWIN_ << " not found  = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+          //[SD20220224 - OBSOLETE]            if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN)     aus << "EEEEE  " << _AFLOWIN_ << " not found  = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+          //[SD20220224 - OBSOLETE]            if(aflags.KBIN_GEN_AIMS_FROM_AFLOWIN)     aus << "EEEEE  " << _AFLOWIN_ << " not found  = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl; //CO20180409
+          //[SD20220224 - OBSOLETE]            if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP)     aus << "EEEEE  INCAR not found     = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+          //[SD20220224 - OBSOLETE]            aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          //[SD20220224 - OBSOLETE]          } else {                                                                            // ******* _AFLOWIN_ exists RUN
+          //[SD20220224 - OBSOLETE]            if(LDEBUG) cerr << soliloquy << " STEP1i" << endl;
+          //[SD20220224 - OBSOLETE]            if(aflags.KBIN_RUN_AFLOWIN)  {
+          //[SD20220224 - OBSOLETE]              KBIN::RUN_Directory(aflags);
+          //[SD20220224 - OBSOLETE]            }
+          //[SD20220224 - OBSOLETE]            // if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN)    KBIN::RUN_Directory(aflags);
+          //[SD20220224 - OBSOLETE]            if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP)     KBIN::GenerateAflowinFromVASPDirectory(aflags);
+          //[SD20220224 - OBSOLETE]            aus << "MMMMM  AFLOW: Run Done " << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+          //[SD20220224 - OBSOLETE]            aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          //[SD20220224 - OBSOLETE]          }
+          //[SD20220224 - OBSOLETE]        } // DIRECTORY WRITABLE
+          //[SD20220224 - OBSOLETE]      } // DIRECTORY NOT IN THE DATABASE
+          //[SD20220224 - OBSOLETE]    } // DIRECTORY UN SKIPPED
+          //[SD20220224 - OBSOLETE]  } // DIRECTORY UN LOCKED
+          //[SD20220224 - OBSOLETE]} // DIRECTORY FOUND
+          if(Legitimate_krun(aflags)){
+            if(aflags.KBIN_RUN_AFLOWIN){KBIN::RUN_Directory(aflags);}
+            if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP){KBIN::GenerateAflowinFromVASPDirectory(aflags);}
+            aus << "MMMMM  AFLOW: Done " << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
             aurostd::PrintMessageStream(aus,XHOST.QUIET);
-          } else {                                                                                // ******* Directory EXISTS
-            if(LDEBUG) cerr << soliloquy << " STEP1c" << endl;
-            if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_)) {                                               // ******* Directory is locked
-              aus << "LLLLL  DIRECTORY_LOCKED ...bzzzz... !MULTI = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-              aurostd::PrintMessageStream(aus,XHOST.QUIET);
-            } else {
-              if(LDEBUG) cerr << soliloquy << " STEP1d" << endl;
-              if(DirectorySkipped(aflags.Directory)) {                                            // ******* Directory is skipped
-                aus << "LLLLL  DIRECTORY_SKIPPED ...bzzzz... !MULTI = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-                aurostd::PrintMessageStream(aus,XHOST.QUIET);
-              } else {        
-                if(LDEBUG) cerr << soliloquy << " STEP1e" << endl;
-                if(DirectoryAlreadyInDatabase(aflags.Directory,aflags.AFLOW_FORCE_RUN)) {         // ******* Directory is already in the database
-                  aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ...bzzzz... !MULTI = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-                  aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ... use \"aflow --multi\" to force the calculation of this entry "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-                  aurostd::PrintMessageStream(aus,XHOST.QUIET);
-                } else {        
-                  if(LDEBUG) cerr << soliloquy << " STEP1f" << endl;
-                  if(DirectoryUnwritable(aflags.Directory)) {                                     // ******* Directory is unwritable
-                    aus << "LLLLL  DIRECTORY_UNWRITABLE ...bzzzz... !MULTI = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-                    aurostd::PrintMessageStream(aus,XHOST.QUIET);
-                  } else {                                                                        // ******* Directory is ok
-                    if(LDEBUG) cerr << soliloquy << " STEP1g" << endl;
-                    if(_VERBOSE_) aus << "LLLLL  GOOD ...bzzz... !MULTI = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-                    if(_VERBOSE_) aurostd::PrintMessageStream(aus,XHOST.QUIET);
-                    if(aflags.KBIN_RUN_AFLOWIN)               FileNameCHECK=aflags.Directory+"/"+_AFLOWIN_;
-                    if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN)     FileNameCHECK=aflags.Directory+"/"+_AFLOWIN_;
-                    if(aflags.KBIN_GEN_AIMS_FROM_AFLOWIN)     FileNameCHECK=aflags.Directory+"/"+_AFLOWIN_; //CO20180409
-                    if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP)     FileNameCHECK=aflags.Directory+"/INCAR";
-                    FileCHECK.open(FileNameCHECK.c_str(),std::ios::in);
-                    FileCHECK.clear();FileCHECK.close();
-                    if(!FileCHECK) {                                                                    // ******* _AFLOWIN_ does not exist
-                      if(LDEBUG) cerr << soliloquy << " STEP1h" << endl;
-                      if(aflags.KBIN_RUN_AFLOWIN)               aus << "EEEEE  " << _AFLOWIN_ << " not found  = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-                      if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN)     aus << "EEEEE  " << _AFLOWIN_ << " not found  = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-                      if(aflags.KBIN_GEN_AIMS_FROM_AFLOWIN)     aus << "EEEEE  " << _AFLOWIN_ << " not found  = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl; //CO20180409
-                      if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP)     aus << "EEEEE  INCAR not found     = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-                      aurostd::PrintMessageStream(aus,XHOST.QUIET);
-                    } else {                                                                            // ******* _AFLOWIN_ exists RUN
-                      if(LDEBUG) cerr << soliloquy << " STEP1i" << endl;
-                      if(aflags.KBIN_RUN_AFLOWIN)  {
-                        KBIN::RUN_Directory(aflags);
-                      }
-                      // if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN)    KBIN::RUN_Directory(aflags);
-                      if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP)     KBIN::GenerateAflowinFromVASPDirectory(aflags);
-                      aus << "MMMMM  AFLOW: Run Done " << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-                      aurostd::PrintMessageStream(aus,XHOST.QUIET);
-                    }
-                  } // DIRECTORY WRITABLE
-                } // DIRECTORY NOT IN THE DATABASE
-              } // DIRECTORY UN SKIPPED
-            } // DIRECTORY UN LOCKED
-          } // DIRECTORY FOUND
-          aus << "MMMMM  AFLOW: Done " << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-          aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          }
         }
       } // idir
       // aus << "MMMMM  AFLOW: Done " << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
@@ -742,9 +813,9 @@ namespace KBIN {
           bool isPRIORITY=FALSE;
           // NEW, the sorting is done internally (speed and reliability)
           for(int ifind=0;ifind<(int)vruns.size();ifind++) {
-            isPRIORITY=(aurostd::substring2bool(vruns.at(ifind),"PRIORITY") || aurostd::substring2bool(vruns.at(ifind),"priority"));
+            isPRIORITY=(aurostd::substring2bool(vruns[ifind],"PRIORITY") || aurostd::substring2bool(vruns[ifind],"priority"));
             if((isPRIORITY && aurostd::uniform(1.0)<=PRIORITY_PROBABILITY) || !isPRIORITY) {
-              aus << "find " << vruns.at(ifind) << " " << XHOST.Find_Parameters;
+              aus << "find " << vruns[ifind] << " " << XHOST.Find_Parameters;
               if(aflags.KBIN_RUN_AFLOWIN) aus << " -name \"" << _AFLOWIN_ << "\" ";
               // if(aflags.KBIN_RUN_AFLOWIN) aus << " -name \"" << _AFLOWIN_ << "\" ";
               // if(aflags.KBIN_RUN_AFLOWIN) aus << " -name \"" << _AFLOWIN_ << "\" ";
@@ -760,12 +831,12 @@ namespace KBIN {
           if(_VERBOSE_) aus << "MMMMM  AFLOW: searching subdirectories [d2] " << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           if(_VERBOSE_) aurostd::PrintMessageStream(aus,XHOST.QUIET);
           aurostd::string2tokens(aurostd::file2string(FileNameSUBDIR),vaflowin,"\n");
-          for(i=0;i<(int) vaflowin.size();i++) aurostd::StringSubst(vaflowin.at(i),_AFLOWIN_,"");
-          for(i=0;i<(int) vaflowin.size();i++) aurostd::StringSubst(vaflowin.at(i),"INCAR","");
-          if(STOP_DEBUG) for(i=0;i<(int) vaflowin.size();i++) cout << vaflowin.at(i) << endl;
+          for(i=0;i<(int) vaflowin.size();i++) aurostd::StringSubst(vaflowin[i],_AFLOWIN_,"");
+          for(i=0;i<(int) vaflowin.size();i++) aurostd::StringSubst(vaflowin[i],"INCAR","");
+          if(STOP_DEBUG) for(i=0;i<(int) vaflowin.size();i++) cout << vaflowin[i] << endl;
           // RANDOMIZING priority
           if(vaflowin.size()>1) { // only if I can poll
-            // if(aurostd::substring2bool(vaflowin.at(0),"PRIORITY") || aurostd::substring2bool(vaflowin.at(0),"priority")) aurostd::random_shuffle(vaflowin);
+            // if(aurostd::substring2bool(vaflowin[0],"PRIORITY") || aurostd::substring2bool(vaflowin[0],"priority")) aurostd::random_shuffle(vaflowin);
           }
           // loaded up
           aus << "rm -f " << FileNameSUBDIR << endl;
@@ -777,8 +848,8 @@ namespace KBIN {
           aus << "MMMMM  AFLOW: aflags.AFLOW_PERFORM_FILE==TRUE" << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
           vaflowin.clear();
           for(uint i=0;(i<vruns.size() && vaflowin.size()<maxcheck);i++) {
-            if(KBIN::Legitimate_aflowin(vruns.at(i),FALSE,aus)) vaflowin.push_back(vruns.at(i)); // TRUE puts too much verbosity
-            // vaflowin.push_back(vruns.at(i)); // just load them up... they were checked before //OLD MUST RECHECH THEM as things change on the fly
+            if(Legitimate_aflowin(vruns[i],FALSE,aus)) {vaflowin.push_back(vruns[i]);} // TRUE puts too much verbosity
+            // vaflowin.push_back(vruns[i]); // just load them up... they were checked before //OLD MUST RECHECH THEM as things change on the fly
           }
         }
         // NOW TIME OF SORTING/RANDOMIZING
@@ -795,49 +866,53 @@ namespace KBIN {
         aus << "MMMMM  " <<  aurostd::PaddedPOST("Legitimate VAFLOWIN = "+aurostd::utype2string(vaflowin.size()),40) << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
         //      aus << "MMMMM  Legitimate VAFLOWIN = " << vaflowin.size() << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
 
-        //	for(uint i=0;i<vaflowin.size();i++) cerr << i << " " << vaflowin.at(i) << endl;
+        //	for(uint i=0;i<vaflowin.size();i++) cerr << i << " " << vaflowin[i] << endl;
 
         // clean AFLOWIN // SAFETY
-        for(uint i=0;i<vaflowin.size();i++) aurostd::StringSubst(vaflowin.at(i),_AFLOWIN_,"");  
+        for(uint i=0;i<vaflowin.size();i++) aurostd::StringSubst(vaflowin[i],_AFLOWIN_,"");  
 
         if(MULTI_DEBUG) {aus << "MMMMM  SIZE vaflowin=" << vaflowin.size() << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}
-        if(MULTI_DEBUG) {for(uint i=0;i<vaflowin.size();i++) {aus << "MMMMM  vaflowin.at(i)=" << vaflowin.at(i) << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}}
+        if(MULTI_DEBUG) {for(uint i=0;i<vaflowin.size();i++) {aus << "MMMMM  vaflowin[i]=" << vaflowin[i] << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}}
         // cerr << vaflowin.at(10) << " " << vaflowin.at(20) << " " << vaflowin.at(30) << endl;
-        // if(aurostd::substring2bool(vaflowin.at(0),"PRIORITY") || aurostd::substring2bool(vaflowin.at(0),"priority")) aurostd::random_shuffle(vaflowin);
+        // if(aurostd::substring2bool(vaflowin[0],"PRIORITY") || aurostd::substring2bool(vaflowin[0],"priority")) aurostd::random_shuffle(vaflowin);
 
         FOUND=FALSE;
         for(uint i=0;i<vaflowin.size()&& !FOUND;i++) {
           aflags.Directory="NULL";
-          if(aurostd::DirectoryLocked(vaflowin.at(i),_AFLOWLOCK_)) {
-            if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  LOCKED ...bzzz... MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
-            if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
-            FOUND=FALSE;
-          } else {
-            if(DirectorySkipped(vaflowin.at(i))) {
-              if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  SKIPPED ...bzzz... MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
-              if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
-              FOUND=FALSE;
-            } else {
-              if(DirectoryAlreadyInDatabase(vaflowin.at(i),aflags.AFLOW_FORCE_RUN)) {
-                if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ...bzzz... MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
-                if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ... use \"aflow --multi\" to force the calculation of this entry...  MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
-                if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
-                FOUND=FALSE;
-              } else {
-                if(DirectoryUnwritable(vaflowin.at(i))) {
-                  if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  UNWRITABLE ...bzzz... MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
-                  if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
-                  FOUND=FALSE;
-                } else {
-                  if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  GOOD ...bzzz... MULTI "  << vaflowin.at(i) << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
-                  if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
-                  aflags.Directory=vaflowin.at(i);
-                  FOUND=TRUE;
-                } // DIRECTORY WRITABLE
-              } // DIRECTORY NOT IN THE DATABASE
-            } // DIRECTORY UN SKIPPED
-          } // DIRECTORY UN LOCKED
-        } // DIRECTORY FOUND
+          //[SD20220224 - OBSOLETE]if(aurostd::DirectoryLocked(vaflowin[i],_AFLOWLOCK_)) {
+          //[SD20220224 - OBSOLETE]  if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  LOCKED ...bzzz... MULTI "  << vaflowin[i] << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
+          //[SD20220224 - OBSOLETE]  if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          //[SD20220224 - OBSOLETE]  FOUND=FALSE;
+          //[SD20220224 - OBSOLETE]} else {
+          //[SD20220224 - OBSOLETE]  if(DirectorySkipped(vaflowin[i])) {
+          //[SD20220224 - OBSOLETE]    if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  SKIPPED ...bzzz... MULTI "  << vaflowin[i] << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
+          //[SD20220224 - OBSOLETE]    if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          //[SD20220224 - OBSOLETE]    FOUND=FALSE;
+          //[SD20220224 - OBSOLETE]  } else {
+          //[SD20220224 - OBSOLETE]    if(DirectoryAlreadyInDatabase(vaflowin[i],aflags.AFLOW_FORCE_RUN)) {
+          //[SD20220224 - OBSOLETE]      if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ...bzzz... MULTI "  << vaflowin[i] << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
+          //[SD20220224 - OBSOLETE]      if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ... use \"aflow --multi\" to force the calculation of this entry...  MULTI "  << vaflowin[i] << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
+          //[SD20220224 - OBSOLETE]      if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          //[SD20220224 - OBSOLETE]      FOUND=FALSE;
+          //[SD20220224 - OBSOLETE]    } else {
+          //[SD20220224 - OBSOLETE]      if(DirectoryUnwritable(vaflowin[i])) {
+          //[SD20220224 - OBSOLETE]        if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  UNWRITABLE ...bzzz... MULTI "  << vaflowin[i] << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
+          //[SD20220224 - OBSOLETE]        if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          //[SD20220224 - OBSOLETE]        FOUND=FALSE;
+          //[SD20220224 - OBSOLETE]      } else {
+          //[SD20220224 - OBSOLETE]        if(_VERBOSE_ || STOP_DEBUG) aus << "LLLLL  GOOD ...bzzz... MULTI "  << vaflowin[i] << " " << XHOST.hostname << " " << aflow_get_time_string() << endl;
+          //[SD20220224 - OBSOLETE]        if(_VERBOSE_ || STOP_DEBUG) aurostd::PrintMessageStream(aus,XHOST.QUIET);
+          //[SD20220224 - OBSOLETE]        aflags.Directory=vaflowin[i];
+          //[SD20220224 - OBSOLETE]        FOUND=TRUE;
+          //[SD20220224 - OBSOLETE]      } // DIRECTORY WRITABLE
+          //[SD20220224 - OBSOLETE]    } // DIRECTORY NOT IN THE DATABASE
+          //[SD20220224 - OBSOLETE]  } // DIRECTORY UN SKIPPED
+          //[SD20220224 - OBSOLETE]} // DIRECTORY UN LOCKED
+          if(Legitimate_aflowdir(vaflowin[i],aflags)){
+            aflags.Directory=vaflowin[i];
+            FOUND=TRUE;
+          }
+        }
         // exiting if STOP_DEBUG
         if(STOP_DEBUG) {cout << "aflow_kbin.cpp: STOP_DEBUG" << endl; return 1;}  //CO20200624 - previously exit
 
@@ -1111,8 +1186,9 @@ namespace KBIN {
 // from the scrubber, and move the aflow.in to the "run" filesystem/workspace
 // once it has been selected from the aflow daemon.
 // This is needed for machine001, machine002, machine003
+// SD20220319 - changed function to return a bool
 namespace KBIN {
-  void MoveRun2NewDirectory(_aflags& aflags, const string& subdirectory_orig, const string& subdirectory_new){
+  bool MoveRun2NewDirectory(_aflags& aflags, const string& subdirectory_orig, const string& subdirectory_new){
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string function_name=XPID+"KBIN::RUN_MoveRun2NewDirectory():";
@@ -1120,7 +1196,8 @@ namespace KBIN {
 
     // ---------------------------------------------------------------------------
     // create lock immediately // CO20210901
-    aus << "touch " << aflags.Directory << "LOCK";
+    //[SD20220224 - OBSOLETE]aus << "touch " << aflags.Directory << "/" << _AFLOWLOCK_;
+    if(!aurostd::LinkFileAtomic(aflags.Directory+"/"+_AFLOWIN_,aflags.Directory+"/"+_AFLOWLOCK_+_LOCK_LINK_SUFFIX_,false)){return FALSE;} // create LOCK link //SD20220224
     message <<    "MMMMM  Executing: \"" << aus.str() << "\"" << Message(_AFLOW_FILE_NAME_,aflags,"user,host,time") << endl;aurostd::PrintMessageStream(message,XHOST.QUIET);message.clear();message.str(std::string());
     aurostd::execute(aus);
     aus.clear();aus.str(std::string());
@@ -1141,10 +1218,11 @@ namespace KBIN {
 
     // ---------------------------------------------------------------------------
     // copy aflow.in to new directory
-    aus << "cp " << directory_orig << "/aflow.in " << aflags.Directory;
+    aus << "cp " << directory_orig << "/"+_AFLOWIN_+" " << aflags.Directory;
     message <<    "MMMMM  Executing: \"" << aus.str() << "\"" << Message(_AFLOW_FILE_NAME_,aflags,"user,host,time") << endl;aurostd::PrintMessageStream(message,XHOST.QUIET);message.clear();message.str(std::string());aurostd::execute(aus);aus.clear();aus.str(std::string());
 
     if(LDEBUG){ cerr << function_name << " new full directory " << aflags.Directory << endl; }
+    return TRUE;
   }
 }
 
@@ -1167,13 +1245,13 @@ namespace KBIN {
 
       string subdirectory_orig = aurostd::execute2string("echo $HOME");   // $HOME    : environment variable pointing to "home" filesystem (specific to machine001/002/003)
       string subdirectory_new = aurostd::execute2string("echo $WORKDIR"); // $WORKDIR : environment variable pointing to "work" filesystem (specific to machine001/002/003)
-      KBIN::MoveRun2NewDirectory(aflags, subdirectory_orig, subdirectory_new);
+      if(!KBIN::MoveRun2NewDirectory(aflags, subdirectory_orig, subdirectory_new)){return;}
     }
 
-    ifstream FileSUBDIR;string FileNameSUBDIR;
-    FileNameSUBDIR=aflags.Directory;
-    FileSUBDIR.open(FileNameSUBDIR.c_str(),std::ios::in);
-    FileSUBDIR.clear();FileSUBDIR.close();
+    //[SD20220224 - OBSOLETE]ifstream FileSUBDIR;string FileNameSUBDIR;
+    //[SD20220224 - OBSOLETE]FileNameSUBDIR=aflags.Directory;
+    //[SD20220224 - OBSOLETE]FileSUBDIR.open(FileNameSUBDIR.c_str(),std::ios::in);
+    //[SD20220224 - OBSOLETE]FileSUBDIR.clear();FileSUBDIR.close();
     // string::size_type sub_size1,sub_size2;
     string AflowIn,AflowInMode,subS,subS1,subS2;
     string::iterator pos;
@@ -1182,196 +1260,203 @@ namespace KBIN {
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
-    if(aflags.Directory.at(0)!='/' && aflags.Directory.at(0)!='.' && aflags.Directory.at(0)!=' ') aflags.Directory="./"+aflags.Directory;
+    if(aflags.Directory.empty() || (aflags.Directory[0]!='/' && aflags.Directory[0]!='.' && aflags.Directory[0]!=' ')){aflags.Directory="./"+aflags.Directory;}
 
-    if(!FileSUBDIR) {                                                                                           // ******* Directory is non existent
-      aus << "EEEEE  DIRECTORY_NOT_FOUND = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-      aurostd::PrintMessageStream(aus,XHOST.QUIET);
-    } else {                                                                                                    // ******* Directory EXISTS
+    //[SD20220224 - OBSOLETE]if(!FileSUBDIR) {                                                                                           // ******* Directory is non existent
+    //[SD20220224 - OBSOLETE]  aus << "EEEEE  DIRECTORY_NOT_FOUND = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    //[SD20220224 - OBSOLETE]  aurostd::PrintMessageStream(aus,XHOST.QUIET);
+    //[SD20220224 - OBSOLETE]} else {                                                                                                    // ******* Directory EXISTS
+    //[SD20220224 - OBSOLETE]  // ***************************************************************************
+    //[SD20220224 - OBSOLETE]  // Check LOCK again
+    //[SD20220224 - OBSOLETE]  if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_) || DirectorySkipped(aflags.Directory) || DirectoryAlreadyInDatabase(aflags.Directory,aflags.AFLOW_FORCE_RUN) || DirectoryUnwritable(aflags.Directory)) {
+    //[SD20220224 - OBSOLETE]    // ******* Directory is locked/skipped/unwritable
+    //[SD20220224 - OBSOLETE]    // LOCK/SKIP/UNWRITABLE exist, then RUN already RUN
+    //[SD20220224 - OBSOLETE]    if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_)) {
+    //[SD20220224 - OBSOLETE]      aus << "LLLLL  LOCKED ... bzzz ... KBIN::RUN_Directory "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    //[SD20220224 - OBSOLETE]      aus << "LLLLL  LOCKED ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    //[SD20220224 - OBSOLETE]      aurostd::PrintMessageStream(aus,XHOST.QUIET);
+    //[SD20220224 - OBSOLETE]    }
+    //[SD20220224 - OBSOLETE]    if(DirectorySkipped(aflags.Directory)) {
+    //[SD20220224 - OBSOLETE]      aus << "LLLLL  SKIPPED ... bzzz ... KBIN::RUN_Directory "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    //[SD20220224 - OBSOLETE]      aus << "LLLLL  SKIPPED ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    //[SD20220224 - OBSOLETE]      aurostd::PrintMessageStream(aus,XHOST.QUIET);
+    //[SD20220224 - OBSOLETE]    }
+    //[SD20220224 - OBSOLETE]    if(DirectoryAlreadyInDatabase(aflags.Directory,aflags.AFLOW_FORCE_RUN)) {
+    //[SD20220224 - OBSOLETE]      aus << "LLLLL  ALREADY_IN_DATABASE ... bzzz ... KBIN::RUN_Directory "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    //[SD20220224 - OBSOLETE]      aus << "LLLLL  ALREADY_IN_DATABASE ... use \"aflow --multi\" to force the calculation of this entry "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    //[SD20220224 - OBSOLETE]      aus << "LLLLL  ALREADY_IN_DATABASE ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    //[SD20220224 - OBSOLETE]      aurostd::PrintMessageStream(aus,XHOST.QUIET);
+    //[SD20220224 - OBSOLETE]    }
+    //[SD20220224 - OBSOLETE]    if(DirectoryUnwritable(aflags.Directory)) {
+    //[SD20220224 - OBSOLETE]      aus << "LLLLL  UNWRITABLE ... bzzz ... KBIN::RUN_Directory "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    //[SD20220224 - OBSOLETE]      aus << "LLLLL  UNWRITABLE ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    //[SD20220224 - OBSOLETE]      aurostd::PrintMessageStream(aus,XHOST.QUIET);
+    //[SD20220224 - OBSOLETE]    }
+    if(!Legitimate_aflowdir(aflags.Directory,aflags) || !aurostd::LinkFileAtomic(aflags.Directory+"/"+_AFLOWIN_,aflags.Directory+"/"+_AFLOWLOCK_+_LOCK_LINK_SUFFIX_,false)){return;} // create LOCK link //SD20220224
+    // SD20220224 - Dumb LOCK is now made with LinkFileAtomic, also we do not need to check if _AFLOWIN_ exists
+    // because LinkFileAtomic will throw an error if that is the case
+    //[SD20220224 - OBSOLETE]// make a dumb lock as soon as possible -------------------------------------
+    //[SD20220224 - OBSOLETE]aus.clear();aus.str(std::string());
+    //[SD20220224 - OBSOLETE]aus << "echo \"NNNNN  KBIN LOCK ASAP for NFS concurrent jobs (aflow" << string(AFLOW_VERSION) << ")\" >> " << aflags.Directory+"/"+_AFLOWLOCK_ << endl;
+    //[SD20220224 - OBSOLETE]// aus << "/home/auro/bin/aflow -machine >> " << aflags.Directory+"/"+_AFLOWLOCK_ << endl;
+    //[SD20220224 - OBSOLETE]// aus << XHOST.command("sensors") << " >> " << aflags.Directory+"/"+_AFLOWLOCK_ << endl;
+    //[SD20220224 - OBSOLETE]aurostd::execute(aus);
+    //[SD20220224 - OBSOLETE]// now change its permission
+    //[SD20220224 - OBSOLETE]aurostd::ChmodFile("664",string(aflags.Directory+"/"+_AFLOWLOCK_));
+    //[SD20220224 - OBSOLETE]// now the lock should be done ----------------------------------------------
+    //[SD20220224 - OBSOLETE]ifstream FileAFLOWIN;string FileNameAFLOWIN;
+    //[SD20220224 - OBSOLETE]FileNameAFLOWIN=aflags.Directory+"/"+_AFLOWIN_;
+    //[SD20220224 - OBSOLETE]FileAFLOWIN.open(FileNameAFLOWIN.c_str(),std::ios::in);
+    //[SD20220224 - OBSOLETE]if(!FileAFLOWIN) {                                                                                      // ******* _AFLOWIN_ does not exist
+    //[SD20220224 - OBSOLETE]  aus << "EEEEE  " << _AFLOWIN_ << " ABSENT   = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    //[SD20220224 - OBSOLETE]  aurostd::PrintMessageStream(aus,XHOST.QUIET);
+    //[SD20220224 - OBSOLETE]  FileAFLOWIN.clear();FileAFLOWIN.close();
+    //[SD20220224 - OBSOLETE]  return false;
+    //[SD20220224 - OBSOLETE]}
+    // ***************************************************************************
+    // RESET LOCK
+    ofstream FileLOCK;
+    string FileNameLOCK=aflags.Directory+"/"+_AFLOWLOCK_;
+    //	FileLOCK.open(FileNameLOCK.c_str(),std::ios::out);
+    FileLOCK.open(FileNameLOCK.c_str(),std::ios::app);
+    // ***************************************************************************
+    // WRITE LOCK
+    if(0) {
+      aus <<    "MMMMM  AFLOW VERSION " << string(AFLOW_VERSION) << " Automatic-Flow - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      aus <<    "MMMMM  (C) "<<XHOST.Copyright_Years<<", Stefano Curtarolo - Duke University   - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      aus <<    "MMMMM  High-Throughput ab-initio Computing - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
       // ***************************************************************************
-      // Check LOCK again
-      if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_) || DirectorySkipped(aflags.Directory) || DirectoryAlreadyInDatabase(aflags.Directory,aflags.AFLOW_FORCE_RUN) || DirectoryUnwritable(aflags.Directory)) {
-        // ******* Directory is locked/skipped/unwritable
-        // LOCK/SKIP/UNWRITABLE exist, then RUN already RUN
-        if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_)) {
-          aus << "LLLLL  LOCKED ... bzzz ... KBIN::RUN_Directory "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-          aus << "LLLLL  LOCKED ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-          aurostd::PrintMessageStream(aus,XHOST.QUIET);
-        }
-        if(DirectorySkipped(aflags.Directory)) {
-          aus << "LLLLL  SKIPPED ... bzzz ... KBIN::RUN_Directory "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-          aus << "LLLLL  SKIPPED ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-          aurostd::PrintMessageStream(aus,XHOST.QUIET);
-        }
-        if(DirectoryAlreadyInDatabase(aflags.Directory,aflags.AFLOW_FORCE_RUN)) {
-          aus << "LLLLL  ALREADY_IN_DATABASE ... bzzz ... KBIN::RUN_Directory "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-          aus << "LLLLL  ALREADY_IN_DATABASE ... use \"aflow --multi\" to force the calculation of this entry "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-          aus << "LLLLL  ALREADY_IN_DATABASE ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-          aurostd::PrintMessageStream(aus,XHOST.QUIET);
-        }
-        if(DirectoryUnwritable(aflags.Directory)) {
-          aus << "LLLLL  UNWRITABLE ... bzzz ... KBIN::RUN_Directory "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-          aus << "LLLLL  UNWRITABLE ... Probably other aflows are concurring with this. KBIN::RUN_Directory " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-          aurostd::PrintMessageStream(aus,XHOST.QUIET);
-        }
-      } else {                                                                                                  // ******* Directory is fine
-        // make a dumb lock as soon as possible -------------------------------------
-        aus.clear();aus.str(std::string());
-        aus << "echo \"NNNNN  KBIN LOCK ASAP for NFS concurrent jobs (aflow" << string(AFLOW_VERSION) << ")\" >> " << aflags.Directory+"/"+_AFLOWLOCK_ << endl;
-        // aus << "/home/auro/bin/aflow -machine >> " << aflags.Directory+"/"+_AFLOWLOCK_ << endl;
-        // aus << XHOST.command("sensors") << " >> " << aflags.Directory+"/"+_AFLOWLOCK_ << endl;
-        aurostd::execute(aus);
-        // now change its permission
-        aurostd::ChmodFile("664",string(aflags.Directory+"/"+_AFLOWLOCK_));
-        // now the lock should be done ----------------------------------------------
-        ifstream FileAFLOWIN;string FileNameAFLOWIN;
-        FileNameAFLOWIN=aflags.Directory+"/"+_AFLOWIN_;
-        FileAFLOWIN.open(FileNameAFLOWIN.c_str(),std::ios::in);
-        if(!FileAFLOWIN) {                                                                                      // ******* _AFLOWIN_ does not exist
-          aus << "EEEEE  " << _AFLOWIN_ << " ABSENT   = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-          aurostd::PrintMessageStream(aus,XHOST.QUIET);
-        } else {                                                                                                // ******* _AFLOWIN_ exists RUN    
-          // ***************************************************************************
-          // RESET LOCK
-          ofstream FileLOCK;
-          string FileNameLOCK=aflags.Directory+"/"+_AFLOWLOCK_;
-          //	FileLOCK.open(FileNameLOCK.c_str(),std::ios::out);
-          FileLOCK.open(FileNameLOCK.c_str(),std::ios::app);
-          // ***************************************************************************
-          // WRITE LOCK
-          if(0) {
-            aus <<    "MMMMM  AFLOW VERSION " << string(AFLOW_VERSION) << " Automatic-Flow - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-            aus <<    "MMMMM  (C) "<<XHOST.Copyright_Years<<", Stefano Curtarolo - Duke University   - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-            aus <<    "MMMMM  High-Throughput ab-initio Computing - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-            aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-            // ***************************************************************************
-            // WRITE AFLOW VERSION
-            // aus << "MMMMM  AFLOW VERSION " << string(AFLOW_VERSION) << " Automatic-Flow " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-            // aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-          }
-          // ***************************************************************************
-          // START DIRECTORY
-          aus      << "XXXXX  KBIN DIRECTORY BEGIN (aflow" << string(AFLOW_VERSION) << ")  "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-          //	aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-          aus      << "XXXXX  KBIN XHOST.CPU_Model : "<<  XHOST.CPU_Model << "" << endl;// << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-          aus      << "XXXXX  KBIN XHOST.CPU_Cores : "<<  XHOST.CPU_Cores << "" << endl;// << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-          aus      << "XXXXX  KBIN XHOST.CPU_MHz   : "<<  XHOST.CPU_MHz << "" << endl;// << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-          aus      << "XXXXX  KBIN XHOST.RAM_GB    : "<<  XHOST.RAM_GB << "" << endl;// << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-          aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
-          // ***************************************************************************
-          // FLUSH & REOPEN to avoid double writing
-          FileLOCK.flush();FileLOCK.close();FileLOCK.open(FileNameLOCK.c_str(),std::ios::app);
-          // ***************************************************************************
-          // NOW Digest AFLOWIN
-          FileAFLOWIN.clear();FileAFLOWIN.seekg(0);
-          //DX20190125 [OBSOLETE] - need to remove null bytes : AflowIn.clear();char c; while (FileAFLOWIN.get(c)) AflowIn+=c;               // READ _AFLOWIN_ and put into AflowIn
-          AflowIn.clear();char c; while (FileAFLOWIN.get(c)) if(c!='\0'){AflowIn+=c;}               // READ _AFLOWIN_ and put into AflowIn //DX20190125 - remove null bytes from AflowIn
-          FileAFLOWIN.clear();FileAFLOWIN.seekg(0);
-          AflowIn=aurostd::RemoveComments(AflowIn); // NOW Clean AFLOWIN
-          vector<string> vAflowIn;aurostd::string2vectorstring(AflowIn,vAflowIn); //CO20181226
+      // WRITE AFLOW VERSION
+      // aus << "MMMMM  AFLOW VERSION " << string(AFLOW_VERSION) << " Automatic-Flow " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      // aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+    }
+    // ***************************************************************************
+    // START DIRECTORY
+    aus      << "XXXXX  KBIN DIRECTORY BEGIN (aflow" << string(AFLOW_VERSION) << ")  "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    //	aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+    aus      << "XXXXX  KBIN XHOST.CPU_Model : "<<  XHOST.CPU_Model << "" << endl;// << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    aus      << "XXXXX  KBIN XHOST.CPU_Cores : "<<  XHOST.CPU_Cores << "" << endl;// << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    aus      << "XXXXX  KBIN XHOST.CPU_MHz   : "<<  XHOST.CPU_MHz << "" << endl;// << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    aus      << "XXXXX  KBIN XHOST.RAM_GB    : "<<  XHOST.RAM_GB << "" << endl;// << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    aurostd::PrintMessageStream(FileLOCK,aus,XHOST.QUIET);
+    // ***************************************************************************
+    // FLUSH & REOPEN to avoid double writing
+    FileLOCK.flush();FileLOCK.close();FileLOCK.open(FileNameLOCK.c_str(),std::ios::app);
+    aurostd::UnlinkFile(aflags.Directory+"/"+_AFLOWLOCK_+_LOCK_LINK_SUFFIX_); // Remove LOCK link //SD20220207
+    // ***************************************************************************
+    // NOW Digest AFLOWIN
+    //[SD20220224 - OBSOLETE]FileAFLOWIN.clear();FileAFLOWIN.seekg(0);
+    ifstream FileAFLOWIN;
+    string FileNameAFLOWIN=aflags.Directory+"/"+_AFLOWIN_; //SD20220224
+    FileAFLOWIN.open(FileNameAFLOWIN.c_str(),std::ios::in); //SD20220224
+    //DX20190125 [OBSOLETE] - need to remove null bytes : AflowIn.clear();char c; while (FileAFLOWIN.get(c)) AflowIn+=c;               // READ _AFLOWIN_ and put into AflowIn
+    AflowIn.clear();char c; while (FileAFLOWIN.get(c)) if(c!='\0'){AflowIn+=c;}               // READ _AFLOWIN_ and put into AflowIn //DX20190125 - remove null bytes from AflowIn
+    FileAFLOWIN.clear();FileAFLOWIN.seekg(0);
+    AflowIn=aurostd::RemoveComments(AflowIn); // NOW Clean AFLOWIN
+    vector<string> vAflowIn;aurostd::string2vectorstring(AflowIn,vAflowIn); //CO20181226
 
-          _kflags kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,FileLOCK,aflags); //CO20200624 - made separate function for getting kflags
+    _kflags kflags=KBIN::VASP_Get_Kflags_from_AflowIN(AflowIn,FileLOCK,aflags); //CO20200624 - made separate function for getting kflags
 
-          if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT || kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP) {  // [AFLOW_MODE_PRESCRIPT] construction
-            aurostd::stringstream2file(kflags.AFLOW_MODE_PRESCRIPT,string(aflags.Directory+"/"+DEFAULT_AFLOW_PRESCRIPT_COMMAND));
-            aurostd::ChmodFile("755",string(aflags.Directory+"/"+DEFAULT_AFLOW_PRESCRIPT_COMMAND));
-          }
-          if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT || kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP) {  // [AFLOW_MODE_POSTSCRIPT] construction
-            aurostd::stringstream2file(kflags.AFLOW_MODE_POSTSCRIPT,string(aflags.Directory+"/"+DEFAULT_AFLOW_POSTSCRIPT_COMMAND));
-            aurostd::ChmodFile("755",string(aflags.Directory+"/"+DEFAULT_AFLOW_POSTSCRIPT_COMMAND));
-          }
-          // ************************************************************************************************************************************
-          // ALIEN MODE
-          if(Krun && kflags.AFLOW_MODE_ALIEN) {
-            // ***************************************************************************
-            // ALIEN MODE  // must contain EMAIL perform
-            if(Krun) {
-              Krun=(Krun && ALIEN::Run_Directory(FileLOCK,aflags,kflags));
-            }
-            // ***************************************************************************
-            // COMPRESS
-            if(Krun && kflags.KZIP_COMPRESS) {
-              Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
-            }
-          }
-          // ************************************************************************************************************************************
-          // MATLAB MODE
-          if(Krun && kflags.AFLOW_MODE_MATLAB) {
-            if(Krun) {
-              aurostd::CommandRequired(DEFAULT_KBIN_MATLAB_BIN); // MATLAB MUST BE AVAILABLE
-              Krun=(Krun && KBIN_MATLAB_Directory(FileLOCK,aflags,kflags));
-            }
-            // ***************************************************************************
-            // COMPRESS
-            if(Krun && kflags.KZIP_COMPRESS)
-              Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
-            Krun=FALSE;
-          }
-          // ************************************************************************************************************************************
-          // AIMS MODE
-          if(Krun && kflags.AFLOW_MODE_AIMS) {
-            // ***************************************************************************
-            // AIMS MODE  // must contain EMAIL perform
-            if(Krun) {
-              Krun=(Krun && KBIN::AIMS_Directory(FileLOCK,aflags,kflags));
-            }
-            // ***************************************************************************
-            // COMPRESS
-            if(Krun && kflags.KZIP_COMPRESS)
-              Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
-          }
-          // ************************************************************************************************************************************
-          // ************************************************************************************************************************************
-          // VASP MODE
-          if(Krun && kflags.AFLOW_MODE_VASP) {
-            // ***************************************************************************
-            // VASP MODE  // must contain EMAIL perform
-            if(Krun) {
-              Krun=(Krun && KBIN::VASP_Directory(FileLOCK,aflags,kflags));
-            }
-            // ***************************************************************************
-            // COMPRESS	    
-            if(Krun && kflags.KZIP_COMPRESS) {
-              // cerr << aurostd::execute2string("ls -las "+aflags.Directory) << endl;
-              Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
-              // cerr << aurostd::execute2string("ls -las "+aflags.Directory) << endl;
-            }
-          }
-          // ************************************************************************************************************************************
-          // MATLAB MODE
-          if(Krun && kflags.KBIN_PHONONS_CALCULATION_FROZSL && !kflags.AFLOW_MODE_VASP) {
-            // PRESCRIPT
-            if(Krun && (kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT || kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP))
-              KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_PRESCRIPT_COMMAND,DEFAULT_AFLOW_PRESCRIPT_OUT);
-            // POSTSCRIPT
-            if(Krun && (kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT || kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP))
-              KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_POSTSCRIPT_COMMAND,DEFAULT_AFLOW_POSTSCRIPT_OUT);
-          }
-          // ***************************************************************************
-          // FINALIZE AFLOWIN
-          // DONE, turn OFF the flag
-          kflags.AFLOW_MODE_VASP=FALSE;    
-          // ***************************************************************************
-          // NFS cache-cleaning HACK, opendir() and closedir() to invalidate cache
-          // https://stackoverflow.com/questions/8311710/nfs-cache-cleaning-command
-          //CO20171106
-          vector<string> vfiles_dummyls;
-          aurostd::DirectoryLS(aflags.Directory,vfiles_dummyls);
-          // ***************************************************************************
-          // WRITE END
-          aurostd::string2file("AFLOW calculation complete"+string(Message(_AFLOW_FILE_NAME_,aflags)+"\n"),string(aflags.Directory+"/"+DEFAULT_AFLOW_END_OUT));
-          // ***************************************************************************
-          // MAKE READEABLE
-          aurostd::ChmodFile("664",string(aflags.Directory+"/"+_AFLOWLOCK_));
-          aus.clear();aus.str(std::string());
-          aus << "cp " << aflags.Directory << "/" << _AFLOWLOCK_ << " " << aflags.Directory << "/" << _AFLOWLOCK_ << "." << string(AFLOW_VERSION) << endl;  
-          aurostd::execute(aus);  
-          aurostd::ChmodFile("664",string(aflags.Directory+"/*"));
-          aurostd::ChmodFile("777",string(aflags.Directory+"/*"));
-        }
-        FileAFLOWIN.clear();FileAFLOWIN.close();
+    if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT || kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP) {  // [AFLOW_MODE_PRESCRIPT] construction
+      aurostd::stringstream2file(kflags.AFLOW_MODE_PRESCRIPT,string(aflags.Directory+"/"+DEFAULT_AFLOW_PRESCRIPT_COMMAND));
+      aurostd::ChmodFile("755",string(aflags.Directory+"/"+DEFAULT_AFLOW_PRESCRIPT_COMMAND));
+    }
+    if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT || kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP) {  // [AFLOW_MODE_POSTSCRIPT] construction
+      aurostd::stringstream2file(kflags.AFLOW_MODE_POSTSCRIPT,string(aflags.Directory+"/"+DEFAULT_AFLOW_POSTSCRIPT_COMMAND));
+      aurostd::ChmodFile("755",string(aflags.Directory+"/"+DEFAULT_AFLOW_POSTSCRIPT_COMMAND));
+    }
+    // ************************************************************************************************************************************
+    // ALIEN MODE
+    if(Krun && kflags.AFLOW_MODE_ALIEN) {
+      // ***************************************************************************
+      // ALIEN MODE  // must contain EMAIL perform
+      if(Krun) {
+        Krun=(Krun && ALIEN::Run_Directory(FileLOCK,aflags,kflags));
+      }
+      // ***************************************************************************
+      // COMPRESS
+      if(Krun && kflags.KZIP_COMPRESS) {
+        Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
       }
     }
+    // ************************************************************************************************************************************
+    // MATLAB MODE
+    if(Krun && kflags.AFLOW_MODE_MATLAB) {
+      if(Krun) {
+        aurostd::CommandRequired(DEFAULT_KBIN_MATLAB_BIN); // MATLAB MUST BE AVAILABLE
+        Krun=(Krun && KBIN_MATLAB_Directory(FileLOCK,aflags,kflags));
+      }
+      // ***************************************************************************
+      // COMPRESS
+      if(Krun && kflags.KZIP_COMPRESS)
+        Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
+      Krun=FALSE;
+    }
+    // ************************************************************************************************************************************
+    // AIMS MODE
+    if(Krun && kflags.AFLOW_MODE_AIMS) {
+      // ***************************************************************************
+      // AIMS MODE  // must contain EMAIL perform
+      if(Krun) {
+        Krun=(Krun && KBIN::AIMS_Directory(FileLOCK,aflags,kflags));
+      }
+      // ***************************************************************************
+      // COMPRESS
+      if(Krun && kflags.KZIP_COMPRESS)
+        Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
+    }
+    // ************************************************************************************************************************************
+    // ************************************************************************************************************************************
+    // VASP MODE
+    if(Krun && kflags.AFLOW_MODE_VASP) {
+      // ***************************************************************************
+      // VASP MODE  // must contain EMAIL perform
+      if(Krun) {
+        Krun=(Krun && KBIN::VASP_Directory(FileLOCK,aflags,kflags));
+      }
+      // ***************************************************************************
+      // COMPRESS	    
+      if(Krun && kflags.KZIP_COMPRESS) {
+        // cerr << aurostd::execute2string("ls -las "+aflags.Directory) << endl;
+        Krun=(Krun && KBIN::CompressDirectory(aflags,kflags));
+        // cerr << aurostd::execute2string("ls -las "+aflags.Directory) << endl;
+      }
+    }
+    // ************************************************************************************************************************************
+    // MATLAB MODE
+    if(Krun && kflags.KBIN_PHONONS_CALCULATION_FROZSL && !kflags.AFLOW_MODE_VASP) {
+      // PRESCRIPT
+      if(Krun && (kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT || kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP))
+        KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_PRESCRIPT_COMMAND,DEFAULT_AFLOW_PRESCRIPT_OUT);
+      // POSTSCRIPT
+      if(Krun && (kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT || kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP))
+        KBIN::RUN_DirectoryScript(aflags,DEFAULT_AFLOW_POSTSCRIPT_COMMAND,DEFAULT_AFLOW_POSTSCRIPT_OUT);
+    }
+    // ***************************************************************************
+    // FINALIZE AFLOWIN
+    // DONE, turn OFF the flag
+    kflags.AFLOW_MODE_VASP=FALSE;    
+    // ***************************************************************************
+    // NFS cache-cleaning HACK, opendir() and closedir() to invalidate cache
+    // https://stackoverflow.com/questions/8311710/nfs-cache-cleaning-command
+    //CO20171106
+    vector<string> vfiles_dummyls;
+    aurostd::DirectoryLS(aflags.Directory,vfiles_dummyls);
+    // ***************************************************************************
+    // WRITE END
+    aurostd::string2file("AFLOW calculation complete"+string(Message(_AFLOW_FILE_NAME_,aflags)+"\n"),string(aflags.Directory+"/"+DEFAULT_AFLOW_END_OUT));
+    // ***************************************************************************
+    // MAKE READEABLE
+    aurostd::ChmodFile("664",string(aflags.Directory+"/"+_AFLOWLOCK_));
+    aus.clear();aus.str(std::string());
+    aus << "cp " << aflags.Directory << "/" << _AFLOWLOCK_ << " " << aflags.Directory << "/" << _AFLOWLOCK_ << "." << string(AFLOW_VERSION) << endl;  
+    aurostd::execute(aus);  
+    aurostd::ChmodFile("664",string(aflags.Directory+"/*"));
+    aurostd::ChmodFile("777",string(aflags.Directory+"/*"));
+    
+    FileAFLOWIN.clear();FileAFLOWIN.close();
+      
   };
 } // namespace
 
@@ -1570,27 +1655,27 @@ namespace KBIN {
     aurostd::StringSubst(directory,"/"+_AFLOWLOCK_,"");  // so it is easier to search
 
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-      aurostd::StringSubst(directory,"/OUTCAR.bands"+XHOST.vext.at(iext),"");  // so it is easier to search
-      aurostd::StringSubst(directory,"/OUTCAR.static"+XHOST.vext.at(iext),"");  // so it is easier to search    
-      aurostd::StringSubst(directory,"/OUTCAR.relax2"+XHOST.vext.at(iext),"");  // so it is easier to search
-      aurostd::StringSubst(directory,"/OUTCAR.relax1"+XHOST.vext.at(iext),"");  // so it is easier to search
-      aurostd::StringSubst(directory,"/OUTCAR.relax"+XHOST.vext.at(iext),"");  // so it is easier to search
+      aurostd::StringSubst(directory,"/OUTCAR.bands"+XHOST.vext[iext],"");  // so it is easier to search
+      aurostd::StringSubst(directory,"/OUTCAR.static"+XHOST.vext[iext],"");  // so it is easier to search    
+      aurostd::StringSubst(directory,"/OUTCAR.relax2"+XHOST.vext[iext],"");  // so it is easier to search
+      aurostd::StringSubst(directory,"/OUTCAR.relax1"+XHOST.vext[iext],"");  // so it is easier to search
+      aurostd::StringSubst(directory,"/OUTCAR.relax"+XHOST.vext[iext],"");  // so it is easier to search
     }   
     aurostd::StringSubst(directory,"/OUTCAR","");      // so it is easier to search
 
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-      aurostd::StringSubst(directory,"/EIGENVAL.bands"+XHOST.vext.at(iext),"");  // so it is easier to search
-      aurostd::StringSubst(directory,"/EIGENVAL.static"+XHOST.vext.at(iext),"");  // so it is easier to search    
-      aurostd::StringSubst(directory,"/EIGENVAL.relax2"+XHOST.vext.at(iext),"");  // so it is easier to search
-      aurostd::StringSubst(directory,"/EIGENVAL.relax1"+XHOST.vext.at(iext),"");  // so it is easier to search
-      aurostd::StringSubst(directory,"/EIGENVAL.relax"+XHOST.vext.at(iext),"");  // so it is easier to search
+      aurostd::StringSubst(directory,"/EIGENVAL.bands"+XHOST.vext[iext],"");  // so it is easier to search
+      aurostd::StringSubst(directory,"/EIGENVAL.static"+XHOST.vext[iext],"");  // so it is easier to search    
+      aurostd::StringSubst(directory,"/EIGENVAL.relax2"+XHOST.vext[iext],"");  // so it is easier to search
+      aurostd::StringSubst(directory,"/EIGENVAL.relax1"+XHOST.vext[iext],"");  // so it is easier to search
+      aurostd::StringSubst(directory,"/EIGENVAL.relax"+XHOST.vext[iext],"");  // so it is easier to search
     }   
     aurostd::StringSubst(directory,"/EIGENVAL","");      // so it is easier to search
 
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-      aurostd::StringSubst(directory,"/agl_aflow.in"+XHOST.vext.at(iext),"");  // so it is easier to search
-      aurostd::StringSubst(directory,"/ael_aflow.in"+XHOST.vext.at(iext),"");  // so it is easier to search    
-      aurostd::StringSubst(directory,"/aflow.in"+XHOST.vext.at(iext),"");      // so it is easier to search
+      aurostd::StringSubst(directory,"/agl_aflow.in"+XHOST.vext[iext],"");  // so it is easier to search
+      aurostd::StringSubst(directory,"/ael_aflow.in"+XHOST.vext[iext],"");  // so it is easier to search    
+      aurostd::StringSubst(directory,"/aflow.in"+XHOST.vext[iext],"");      // so it is easier to search
     }   
     aurostd::StringSubst(directory,"/agl_aflow.in","");  // so it is easier to search
     aurostd::StringSubst(directory,"/ael_aflow.in","");  // so it is easier to search    
@@ -1632,21 +1717,21 @@ namespace KBIN {
         string file_path;
         aurostd::DirectoryLS(directory,vfiles);
         for(uint i=0;i<vfiles.size();i++) {
-          file_path=directory + "/" + vfiles.at(i);
-          if(aurostd::substring2bool(vfiles.at(i),_AFLOWIN_)){continue;}
-          if(aurostd::substring2bool(vfiles.at(i),"aflow.in")){continue;}
-          if(aurostd::substring2bool(vfiles.at(i),"agl_aflow.in")){continue;}
-          if(aurostd::substring2bool(vfiles.at(i),"ael_aflow.in")){continue;}
-          if(aurostd::substring2bool(vfiles.at(i),DEFAULT_AFLOW_FROZSL_INPUT_OUT)){continue;}
+          file_path=directory + "/" + vfiles[i];
+          if(aurostd::substring2bool(vfiles[i],_AFLOWIN_)){continue;}
+          if(aurostd::substring2bool(vfiles[i],"aflow.in")){continue;}
+          if(aurostd::substring2bool(vfiles[i],"agl_aflow.in")){continue;}
+          if(aurostd::substring2bool(vfiles[i],"ael_aflow.in")){continue;}
+          if(aurostd::substring2bool(vfiles[i],DEFAULT_AFLOW_FROZSL_INPUT_OUT)){continue;}
           if(aurostd::IsDirectory(file_path)){                 
-            if(aurostd::substring2bool(vfiles.at(i),KBIN_SUBDIRECTORIES)){ // only directories we don't ignore
+            if(aurostd::substring2bool(vfiles[i],KBIN_SUBDIRECTORIES)){ // only directories we don't ignore
               aurostd::RemoveDirectory(file_path);
             }
             continue;                                                   // ignore all other directories
           }
           if(aurostd::IsFile(file_path)){                 
-            if(vfiles.at(i).size() && vfiles.at(i)[0]=='.'){
-              if(aurostd::substring2bool(vfiles.at(i),".nfs")){            // only hidden files we don't ignore
+            if(vfiles[i].size() && vfiles[i][0]=='.'){
+              if(aurostd::substring2bool(vfiles[i],".nfs")){            // only hidden files we don't ignore
                 aurostd::RemoveFile(file_path);
               }
               continue;                                                 // ignore all other hidden files
@@ -1661,11 +1746,11 @@ namespace KBIN {
         // now DECOMPRESS _AFLOWIN_.EXT if a mistake was made
         for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
           ifstream FileCHECK;string FileNameCHECK;
-          FileNameCHECK=directory+"/" + _AFLOWIN_ + XHOST.vext.at(iext);                    // _AFLOWIN_.EXT
+          FileNameCHECK=directory+"/" + _AFLOWIN_ + XHOST.vext[iext];                    // _AFLOWIN_.EXT
           FileCHECK.open(FileNameCHECK.c_str(),std::ios::in);                         // _AFLOWIN_.EXT
           FileCHECK.clear();FileCHECK.close();                                        // _AFLOWIN_.EXT
           if(FileCHECK) {                                                             // _AFLOWIN_.EXT
-            aurostd::execute(XHOST.vzip.at(iext)+" -dqf "+_AFLOWIN_+XHOST.vext.at(iext)); // _AFLOWIN_.EXT
+            aurostd::execute(XHOST.vzip[iext]+" -dqf "+_AFLOWIN_+XHOST.vext[iext]); // _AFLOWIN_.EXT
           }
         } // _AFLOWIN_.EXT
       }
@@ -1691,11 +1776,11 @@ namespace KBIN {
     vector<string> vcheck2;aurostd::string2tokens(string("OUTCAR,OUTCAR,OUTCAR"),vcheck2,",");
 
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-      vcheck1.push_back("OUTCAR.relax1"+XHOST.vext.at(iext));
+      vcheck1.push_back("OUTCAR.relax1"+XHOST.vext[iext]);
     }
 
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-      vcheck2.push_back("OUTCAR.relax2"+XHOST.vext.at(iext));
+      vcheck2.push_back("OUTCAR.relax2"+XHOST.vext[iext]);
     }
 
     vector<string> vfile;
@@ -1704,20 +1789,20 @@ namespace KBIN {
     cout << soliloquy << " checking missing " << "OUTCAR*" << " with " << _AFLOWLOCK_ << endl;  // check OUTCAR.static
     aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" ./ -name "+_AFLOWLOCK_),vfile);
     for(uint j=0;j<vfile.size();j++) {
-      aurostd::StringSubst(vfile.at(j),_AFLOWLOCK_,"");
-      if(!aurostd::FileExist(vfile.at(j)+"OUTCAR") && !aurostd::EFileExist(vfile.at(j)+"OUTCAR.relax1")) {
-        cout << soliloquy << " cleaning=" << vfile.at(j) << endl;
-        if(!test) KBIN::Clean(vfile.at(j));
+      aurostd::StringSubst(vfile[j],_AFLOWLOCK_,"");
+      if(!aurostd::FileExist(vfile[j]+"OUTCAR") && !aurostd::EFileExist(vfile[j]+"OUTCAR.relax1")) {
+        cout << soliloquy << " cleaning=" << vfile[j] << endl;
+        if(!test) KBIN::Clean(vfile[j]);
       }
     }
     for(uint i=0;i<vcheck1.size();i++) {
-      cout << soliloquy << " checking missing " << vcheck2.at(i) << " with " << vcheck1.at(i) << endl;  // check OUTCAR.static
-      aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" ./ -name "+vcheck1.at(i)),vfile);
+      cout << soliloquy << " checking missing " << vcheck2[i] << " with " << vcheck1[i] << endl;  // check OUTCAR.static
+      aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" ./ -name "+vcheck1[i]),vfile);
       for(uint j=0;j<vfile.size();j++) {
-        aurostd::StringSubst(vfile.at(j),vcheck1.at(i),"");
-        if(!aurostd::FileExist(vfile.at(j)+vcheck2.at(i))) {
-          cout << soliloquy << " cleaning=" << vfile.at(j) << endl;
-          if(!test) KBIN::Clean(vfile.at(j));
+        aurostd::StringSubst(vfile[j],vcheck1[i],"");
+        if(!aurostd::FileExist(vfile[j]+vcheck2[i])) {
+          cout << soliloquy << " cleaning=" << vfile[j] << endl;
+          if(!test) KBIN::Clean(vfile[j]);
         }
       }
     }    
