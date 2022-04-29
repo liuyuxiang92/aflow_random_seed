@@ -275,8 +275,6 @@ namespace apdc {
 // Binodal construction based on the method developed in Y. Lederer et al., Acta Materialia, 159 (2018)
 namespace apdc {
   void GetBinodalData(_apdc_data& apdc_data) {
-    apdc_data.conc_macro = GetConcentrationMacro(apdc_data.conc_curve, apdc_data.conc_npts, apdc_data.elements.size());
-    return;
     if (aurostd::FileExist(apdc_data.rundirpath + "/fit.out") && aurostd::FileExist(apdc_data.rundirpath + "/predstr.out")) { // read ATAT data
       apdc_data.vstr_atat = GetATATXstructures(apdc_data.lat_atat, (uint)apdc_data.max_num_atoms, apdc_data.rundirpath);
     }
