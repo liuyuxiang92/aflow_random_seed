@@ -2095,21 +2095,6 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   // APL WRITING - ME20181027
   if(!xvasp.aopts.flag("FLAG::AVASP_APL=OFF")) { //CO20180214 - I interpret this flag to refer to WRITING APL options, not if they are on
     aflowin << aurostd::PaddedPOST((MODULE=="APL"?string(""):string("#"))+"[AFLOW_APL]CALC ",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl; //CO20180214
-    //[ME20181216] - OLD SCHEME
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]ENGINE=DM",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DMAG=0.015",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]//DX+CO START
-    //[ME20181216]aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string("#"):string(""))+"[AFLOW_APL]MINATOMS=100",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string(""):string("#"))+"[AFLOW_APL]SUPERCELL="+
-    //[ME20181216]    (xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"):"3x3x3"),_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;  //CO20180214
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DC=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DPM=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]ZEROSTATE=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]//DX+CO END
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DOS=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]TP=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]TPT=0:2000:10",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216] - NEW SCHEME
     string _ASTROPT_, key, scheme, xvaspflag;
     _ASTROPT_ = "[AFLOW_APL]";
     //vector<string> vkeys = xvasp.aplopts.getattachedschemekeys();
@@ -2128,7 +2113,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   }
 
   if(!xvasp.aopts.flag("FLAG::AVASP_QHA=OFF")) {
-    aflowin << aurostd::PaddedPOST((MODULE=="QHA"?string(""):string("#"))+"[AFLOW_QHA]CALC ",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    aflowin << aurostd::PaddedPOST((MODULE=="QHA"?string(""):string("#"))+"[AFLOW_QHA]CALC ",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     string _ASTROPT_ = "[AFLOW_QHA]", key="", scheme="", xvaspflag="";
 
     std::sort(xvasp.qhaopts.vxscheme.begin(), xvasp.qhaopts.vxscheme.end());
@@ -2139,23 +2124,9 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       key = xvaspflag;
       aurostd::StringSubst(key, "AFLOWIN_FLAG::QHA_", string(""));
       if (!scheme.empty()) {
-        aflowin << aurostd::PaddedPOST(_ASTROPT_+key+"="+scheme,_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+        aflowin << aurostd::PaddedPOST(_ASTROPT_+key+"="+scheme,_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
       }
     }
-
-    //[OBSOLETE AS20200302] aflowin << aurostd::PaddedPOST("[AFLOW_QHA]MODE=QHA3P",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE AS20200302] aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=y",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA=y",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_DISTORTION=0.03",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_DISTORTION=3",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_DISTORTION_RANGE=-3:6:1",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_PDIS_T=50,100,200",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_VOL_DISTORTION_PERCENTAGE=0.03",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]DISPLACEMENTS=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]PROJECTION_DIR=1:1:1",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=n",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_VOLRANGE_DIST=-2:4:0.5",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_KPOINTS_MODE=32768:10000:20:100000",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
 
@@ -2166,19 +2137,6 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       xvasp.aaplopts.pop_attached("AFLOWIN_FLAG::AAPL_FOURTH_ORDER");xvasp.aaplopts.push_attached("AFLOWIN_FLAG::AAPL_FOURTH_ORDER", "ON");
     }
     aflowin << aurostd::PaddedPOST((MODULE=="AAPL"?string(""):string("#"))+"[AFLOW_AAPL]CALC ",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216] - OLD SCHEME
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]TDMAG=0.015",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUT_SHELL=4",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUT_RAD=4.5",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]SUMRULE=1E-5",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]BTE=FULL",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]THERMALGRID=21x21x21",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]ISOTOPE=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUMULATIVEK=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]BOUNDARY=n",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]NANO_SIZE=100",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]TCT=200:700:20",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216] - NEW SCHEME
     string _ASTROPT_, key, scheme, xvaspflag;
     _ASTROPT_ = "[AFLOW_AAPL]";
     //vector<string> vkeys = xvasp.aaplopts.getattachedschemekeys();
@@ -3994,9 +3952,9 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
   if(!xvasp.aopts.flag("FLAGS::AVASP_QHA=OFF")) {
-    aflowin << aurostd::PaddedPOST((MODULE=="QHA"?string(""):string("#"))+"[AFLOW_QHA]CALC ",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_QHA]MODE=QHA3P",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=y",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    aflowin << aurostd::PaddedPOST((MODULE=="QHA"?string(""):string("#"))+"[AFLOW_QHA]CALC ",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_QHA]MODE=QHA3P",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA=y",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
     //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_DISTORTION=0.03",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
     //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_DISTORTION=3",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
