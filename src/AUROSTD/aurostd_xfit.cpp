@@ -16,17 +16,17 @@
 //********************************************************************************
 //              Functions to work with polynomials
 namespace aurostd{
-  // Evaluates the value of the polynomial with coefficients p at the value x.
+  //Evaluates the value of the polynomial with coefficients p at the value x.
   //
-  // The polynomial is represented in the following form:
-  // p(x) = p0+x*(p1+x*(p2+x*(p3+...x*(p(n-1)+x*(pn)))))
+  //The polynomial is represented in the following form:
+  //p(x) = p0+x*(p1+x*(p2+x*(p3+...x*(p(n-1)+x*(pn)))))
   double evalPolynomial(const double& x, const xvector<double>& p) {
     double res = p[p.urows];
     for (int i=p.urows-1; i>=p.lrows; i--) res = res*x + p[i];
     return res;
   }
 
-  // SD20220422
+  //SD20220422
   xvector<double> evalPolynomial(const xvector<double>& x, const xvector<double>& p) {
     xvector<double> res(x.rows);
     for (int i=1; i<=res.rows; i++) {
@@ -35,11 +35,11 @@ namespace aurostd{
     return res;
   }
 
-  // Evaluates the value and the derivatives of the polynomial with coefficients p at
-  // the value x and outputs the derivatives in the dp array.
+  //Evaluates the value and the derivatives of the polynomial with coefficients p at
+  //the value x and outputs the derivatives in the dp array.
   //
-  // The highest derivative is determined by the size of the dp array and the result
-  // is stored in ascending order starting from the zero's derivative (function itself).
+  //The highest derivative is determined by the size of the dp array and the result
+  //is stored in ascending order starting from the zero's derivative (function itself).
   void evalPolynomialDeriv(const double& x, const xvector<double>& p, xvector<double>& dp) {
     for (int i=dp.lrows; i<=dp.urows; i++) dp[i] = 0.0;
     dp[dp.lrows] = p[p.urows];
@@ -55,20 +55,20 @@ namespace aurostd{
     }
   }
 
-  // Evaluates the value and the derivatives of the polynomial with coefficients p at
-  // the value x and returns the result as an array (dp).
+  //Evaluates the value and the derivatives of the polynomial with coefficients p at
+  //the value x and returns the result as an array (dp).
   //
-  // The result is stored in ascending order starting from the zero's derivative
-  // (function itself).
-  // @param n is the highest order of the derivative to be calculated.
+  //The result is stored in ascending order starting from the zero's derivative
+  //(function itself).
+  //@param n is the highest order of the derivative to be calculated.
   xvector<double> evalPolynomialDeriv(const double& x, const xvector<double>& p, const uint n) {
     xvector<double> dp(n+1);
     evalPolynomialDeriv(x, p, dp);
     return dp;
   }
 
-  // SD20220422
-  // Returns the coefficients of the nth derivative of the polynomial
+  //SD20220422
+  //Returns the coefficients of the nth derivative of the polynomial
   xvector<double> evalPolynomialDeriv(const xvector<double>& p, const uint n) {
     if ((int)n >= p.rows) {return 0.0 * ones_xv<double>(1);}
     xvector<double> dp(p.rows - n);
@@ -78,14 +78,14 @@ namespace aurostd{
     return dp;
   }
 
-  // Constructs the Vandermonde matrix with columns up to a given number of columns n,
-  // which corresponds to the polynomial of degree n-1.
-  // Vandermonde matrix:
+  //Constructs the Vandermonde matrix with columns up to a given number of columns n,
+  //which corresponds to the polynomial of degree n-1.
+  //Vandermonde matrix:
   // 1 x1^1 x1^2 .. x1^(n-1)
   // 1 x2^1 x2^2 .. x2^(n-1)
   // ...
   // 1 xm^1 xm^2 .. xm^(n-1)
-  // where m is the size of x array
+  //where m is the size of x array
   xmatrix<double> Vandermonde_matrix(const xvector<double>& x, const int n) {
     xmatrix<double> VM(x.rows, n);
 
@@ -97,24 +97,24 @@ namespace aurostd{
     return VM;
   }
 
-  // Calculates the extremum of the polynomial bounded by the region [xmin,xmax] by searching
-  // for the value x where the derivative of polynomial equals to zero using the
-  // bisection method.
+  //Calculates the extremum of the polynomial bounded by the region [xmin,xmax] by searching
+  //for the value x where the derivative of polynomial equals to zero using the
+  //bisection method.
   //
-  // It is assumed that only one extremum exists between xmin and xmax.
-  // The specific use of this function is to search for the equilibrium volume of a given
-  // polynomial E(V) dependency.
+  //It is assumed that only one extremum exists between xmin and xmax.
+  //The specific use of this function is to search for the equilibrium volume of a given
+  //polynomial E(V) dependency.
   //
-  // The main idea: if a continuous function f(x) has the root f(x0)=0 in the interval [a,b], 
-  // then its sign in the interval [a,x0) is opposite to its sign in the interval (x0,b].
-  // The root searching algorithm is iterative: one bisects the interval [a,b] into two 
-  // subintervals and for the next iteration picks a subinterval where f(x) has 
-  // opposite sign on its ends.
-  // This process continues until the length of the interval is less than some negligibly
-  // small number and one picks the middle of the interval as x0.
-  // In this situation, f(x0)~0 and this condition is used as a criterion to stop the
-  // iteration procedure.
-  // SD20220427 - Throws error if zero is not found or bisection method is not converged
+  //The main idea: if a continuous function f(x) has the root f(x0)=0 in the interval [a,b], 
+  //then its sign in the interval [a,x0) is opposite to its sign in the interval (x0,b].
+  //The root searching algorithm is iterative: one bisects the interval [a,b] into two 
+  //subintervals and for the next iteration picks a subinterval where f(x) has 
+  //opposite sign on its ends.
+  //This process continues until the length of the interval is less than some negligibly
+  //small number and one picks the middle of the interval as x0.
+  //In this situation, f(x0)~0 and this condition is used as a criterion to stop the
+  //iteration procedure.
+  //SD20220427 - Throws error if zero is not found or bisection method is not converged
   double polynomialFindExtremum(const xvector<double>& p, const double& xmin, const double& xmax, const double& tol) {
     bool LDEBUG = (FALSE || DEBUG_XFIT || XHOST.DEBUG);
     if (LDEBUG) cerr << __AFLOW_FUNC__ << " begin" << std::endl;
@@ -181,8 +181,8 @@ namespace aurostd{
     return middle;
   }
 
-  // SD20220422
-  // Calculate the coefficients for a polynomial p(x) of degree n that fits the y data with weights w
+  //SD20220422
+  //Calculate the coefficients for a polynomial p(x) of degree n that fits the y data with weights w
   xvector<double> polynomialCurveFit(const xvector<double>& x, const xvector<double>& _y, const int n, const xvector<double> _w) {
     bool LDEBUG = (FALSE || DEBUG_XFIT || XHOST.DEBUG);
     xvector<double> p;
@@ -220,9 +220,9 @@ namespace aurostd{
     return aurostd::LinearLeastSquares(VM, y);
   }
 
-  // SD20220318
-  // Calculate the (tranpose) n-by-n companion matrix of a polynomial, where n is the polynomial degree
-  // transposed companion matrix:
+  //SD20220318
+  //Calculate the (tranpose) n-by-n companion matrix of a polynomial, where n is the polynomial degree
+  //transposed companion matrix:
   //  0   1   0  ..  0
   //  0   0   1  ..  0
   // ...
@@ -244,10 +244,10 @@ namespace aurostd{
     return CM;
   }
 
-  // SD20220318
-  // Calculates the roots of a polynomial as the eigenvalues of the companion matrix
-  // The real and imaginary parts of the roots are returned in rr and ri, respectively
-  // DOI: 10.1090/S0025-5718-1995-1262279-2
+  //SD20220318
+  //Calculates the roots of a polynomial as the eigenvalues of the companion matrix
+  //The real and imaginary parts of the roots are returned in rr and ri, respectively
+  //DOI: 10.1090/S0025-5718-1995-1262279-2
   void polynomialFindRoots(const xvector<double>& p, xvector<double>& rr, xvector<double>& ri) {
     for (int i = 1; i <= p.rows; i++) {
       if (std::isnan(p(i))) {

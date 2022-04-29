@@ -426,13 +426,21 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   // ---------------------------------------------------------------------------
   check_function = "aurostd::polynomialCurveFit()";
   check_description = "calculate the coefficients for a polynomial of degree n that fits the data";
-  xvector<double> xdata(5), ydata(5), wts(5), pcf(4);
-  xdata(1) = 0.6557; xdata(2) = 0.0357; xdata(3) = 0.8491; xdata(4) = 0.9340; xdata(5) = 0.6787;
-  ydata(1) = -0.3584; ydata(2) = -0.9667; ydata(3) = 0.2438; ydata(4) = 0.6336; ydata(5) = -0.3046;
-  wts(1) = 0.8235; wts(2) = 0.6948; wts(3) = 0.3171; wts(4) = 0.9502; wts(5) = 0.0344;
-  pcf(1) = -0.999811863130501; pcf(2) = 0.994609918720966; pcf(3) = -1.986537348812413; pcf(4) = 2.991497664527984;
+  xvector<double> xdata(10), ydata(10), wdata(10), pval(6);
+  xdata(1) =  0.551878738140095; ydata(1) = -1.895746346279865; wdata(1) = 0.757740130578333;
+  xdata(2) =  0.815194385592879; ydata(2) = -2.426516802630079; wdata(2) = 0.743132468124916;
+  xdata(3) = -1.436650500869055; ydata(3) = -0.329326356733414; wdata(3) = 0.392227019534168;
+  xdata(4) =  0.837122604741089; ydata(4) = -2.476265605752963; wdata(4) = 0.655477890177557;
+  xdata(5) =  0.024588378708606; ydata(5) = -1.148143476025739; wdata(5) = 0.171186687811562;
+  xdata(6) = -1.521792147897101; ydata(6) = -0.304622388440250; wdata(6) = 0.706046088019609;
+  xdata(7) = -0.998568921765830; ydata(7) = -0.471352985639471; wdata(7) = 0.031832846377421;
+  xdata(8) = -0.222562772922286; ydata(8) = -0.911928012994989; wdata(8) = 0.276922984960890;
+  xdata(9) =  0.964723358008907; ydata(9) = -2.783990433247946; wdata(9) = 0.046171390631154;
+  xdata(10) = 0.986066878262693; ydata(10) = -2.838593165314427; wdata(10) = 0.097131781235848;
+  pval(1) = -1.121837858162905; pval(2) = -1.056905122203599; pval(3) = -0.543168130435282;
+  pval(4) = -0.145858244844311; pval(5) = -0.007682867520147; pval(6) = 0.000748981621075;
 
-  check_equal(pcf, aurostd::polynomialCurveFit(xdata, ydata, 3, wts), check_function, check_description, passed_checks, results);
+  check_equal(pval, aurostd::polynomialCurveFit(xdata, ydata, 5, wdata), check_function, check_description, passed_checks, results);
 
   // present overall result
   return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);

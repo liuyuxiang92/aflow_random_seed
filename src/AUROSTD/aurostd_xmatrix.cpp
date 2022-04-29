@@ -2022,9 +2022,8 @@ namespace aurostd {  // namespace aurostd
     xmatrix<utype> inverseByAdjoint(const xmatrix<utype>& a) {return (utype)1.0/det(a) * adjoint(a);} //CO20191201
   template<class utype>                                 // function inverse xmatrix<>
     xmatrix<utype> inverse(const xmatrix<utype>& a) {
-      string function_name = XPID + "aurostd::inverse():";
       // returns the inverse
-      if(!a.issquare){throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Matrix must be square",_INPUT_ILLEGAL_);}
+      if(!a.issquare){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Matrix must be square",_INPUT_ILLEGAL_);}
       if(a.lrows!=1 || a.lcols!=1){
         xmatrix<utype> b(a);
         shiftlrowscols(b,1,1);
@@ -2036,7 +2035,7 @@ namespace aurostd {  // namespace aurostd
       xmatrix<utype> b(a.rows,a.cols);
       //  cerr << "DET CALL size="<<size<< endl;
       utype adet=det(a);
-      if(adet==(utype) 0)  {throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Singular matrix",_INPUT_ILLEGAL_);}
+      if(adet==(utype) 0)  {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Singular matrix",_INPUT_ILLEGAL_);}
       if(size==1) {b[1][1]=(utype)1/a[1][1]; return b;}
       if(size==2) { //CO20191201
         b[1][1]=a[2][2]/adet;b[1][2]=-a[1][2]/adet;
@@ -2109,21 +2108,26 @@ namespace aurostd {  // namespace aurostd
       //[CO20191201 - OBSOLETE]GaussJordan(b,B);
       //    if(size>=6) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: " << size << "x" << size << " not written yet" << endl;}
       //[CO20191201 - OBSOLETE]return b;
-      //SD20220427 - Adjoint method is also unstable (and costly), instead we use LUP decomposition due to speed.
+      //SD20220427 - Adjoint method is very costly, instead we use LUP decomposition due to speed.
       //If that method fails, then we use QR decomposition, where we invert R by LUP decomposition.
-      //If this further fails, then the user should look into pre-conditioning, see aurostd::equilibrateMatrix()
+      //If these fail, the user should look into pre-conditioning, see: aurostd::equilibrateMatrix()
       //For benefits of QR decomposition when finding the inverse, see: http://batty.mullikin.org/2601/num3.pdf
       //[SD20220427 - OBSOLETE]return inverseByAdjoint(a);
-      xmatrix<utype> id = aurostd::identity(a);
-      b = aurostd::inverseByLUP(a);
-      if(aurostd::isequal(a * b, id)) {return b;} 
-      xmatrix<utype> q, r;
-      aurostd::QRDecomposition_HouseHolder(a, q, r);
-      b = aurostd::inverseByLUP(r) * trasp(q);
-      if(aurostd::isequal(a * b, id)) {return b;} 
-      stringstream message;
-      message << "Matrix is ill-conditioned, condition number=" << aurostd::condition_number(a);
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _RUNTIME_ERROR_);
+      try { // we need a try block because LUP and QR decompositions can fail
+        xmatrix<utype> id = aurostd::identity(a);
+        b = aurostd::inverseByLUP(a);
+        if(aurostd::isequal(a * b, id)) {return b;} 
+        xmatrix<utype> q, r;
+        aurostd::QRDecomposition_HouseHolder(a, q, r);
+        b = aurostd::inverseByLUP(r) * trasp(q);
+        if(aurostd::isequal(a * b, id)) {return b;} 
+      }
+      catch (aurostd::xerror& e) {
+        stringstream message;
+        message << "Matrix inversion failed: determinant=" << aurostd::abs(aurostd::det(a)) << " | condition number=" << aurostd::condition_number(a);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      }
+      return b;
     }
 }
 
@@ -2143,10 +2147,9 @@ namespace aurostd {  // namespace aurostd
     void LUPDecomposition(const xmatrix<utype>& A, xmatrix<utype>& LU, xmatrix<utype>& P, utype tol) { //SD20220426
       // A is a square matrix and LU is the LU decomposition, where LU=(L-I)+U such that A=trasp(P)*LU
       // See: https://en.wikipedia.org/wiki/LU_decomposition
-      string function_name = XPID + "aurostd::LUPDecompoisiton():";
       if (!A.issquare) {
         string message = "Matrix needs to be square for LU decomposition";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
       }
       LU = A;
       int imax, itmp;
@@ -2167,7 +2170,7 @@ namespace aurostd {  // namespace aurostd
         }
         if (maxA < tol) {
           string message = "Matrix is degenerate";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INPUT_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
         }
         if (imax != i) {
           // pivoting P
@@ -2225,20 +2228,18 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype>
-    double condition_number(const xmatrix<utype>& _a) { //SD20220425
-      double maxv = 0.0, minv = INFINITY;
-      xmatrix<utype> a = aurostd::abs(_a);
-      for(int i=a.lrows;i<=a.urows;i++) {
-        for(int j=a.lcols;j<=a.ucols;j++) {
-          if (a[i][j] > maxv) {
-            maxv = (double)a[i][j];
-          }
-          if (a[i][j] < minv && a[i][j] != 0.0) {
-            minv = (double)a[i][j];
-          }
-        }
+    // See: https://en.wikipedia.org/wiki/Condition_number
+    utype condition_number(const xmatrix<utype>& _a) { //SD20220425
+      utype maxv = (utype)0.0, minv = (utype)INFINITY, v;
+      xmatrix<utype> a = _a*trasp(_a);
+      xvector<utype> rr(a.rows), ri(a.rows);
+      aurostd::eigen(a, rr, ri);
+      for(int i = 1; i <= a.rows; i++) {
+        v = aurostd::modulus(rr(i), ri(i));
+        if (v > maxv) {maxv = v;}
+        if (v < minv && v > (utype)0.0) {minv = v;}
       }
-      return maxv / minv;
+      return aurostd::sqrt(maxv / minv);
     }
 }
 
@@ -2498,20 +2499,19 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// ----------------------------------------------------------------------------
-namespace aurostd {
-  template<class utype>
-    xmatrix<utype> HadamardProduct(const xmatrix<utype>& A, const xmatrix<utype>& B) { //SD20220422 - also called element-wise product or Schur product
-      string function_name = XPID + "aurostd::HadamardProduct():";
-      if (A.rows != B.rows) {
-        stringstream message;
-        message << "A and B must have the same dimensions, A.rows=" << A.rows << " B.rows=" << B.rows;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+    // ----------------------------------------------------------------------------
+    namespace aurostd {
+      template<class utype>
+        xmatrix<utype> HadamardProduct(const xmatrix<utype>& A, const xmatrix<utype>& B) { //SD20220422 - also called element-wise product or Schur product
+          if (A.rows != B.rows) {
+            stringstream message;
+            message << "A and B must have the same dimensions, A.rows=" << A.rows << " B.rows=" << B.rows;
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       else if (A.cols != B.cols) {
         stringstream message;
         message << "A and B must have the same dimensions, A.cols=" << A.cols << " B.cols=" << B.cols;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> product(A.rows, A.cols);
       for (int i = 0; i < A.rows; i++) {
@@ -2552,16 +2552,17 @@ namespace aurostd {
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                          // identity xmatrix
-    identity(const xmatrix<utype>& a) {
+    identity(const xmatrix<utype>& _a) {
 #ifdef _XMATH_DEBUG_FUNCTIONS
       printf("M -> function identity xmatrix: ");
       printf("a.lrows=%i, a.urows=%i, ",a.lrows,a.urows);
       printf("a.lcols=%i, a.ucols=%i\n",a.lcols,a.ucols);
 #endif
-      if(!a.issquare) {
+      if(!_a.issquare) {
         string message = "Identity only defined for square matrces.";
         throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
+      xmatrix<utype> a = _a;
       for(int i=a.lrows;i<=a.urows;i++)
         for(int j=a.lcols;j<=a.ucols;j++)
           a[i][j]=utype(0.0);
@@ -4403,11 +4404,7 @@ namespace aurostd {
         cerr << soliloquy << " R=" << endl;cerr << R << endl;
       }
 
-      if(!aurostd::isequal(mat_orig,Q*R,tol)){
-        stringstream message;
-        message << "QR decomposition failed (A!=Q*R), condition number=" << aurostd::condition_number(mat_orig); //SD20220427
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
-      }
+      if(!aurostd::isequal(mat_orig,Q*R,tol)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QR decomposition failed (A!=Q*R)",_RUNTIME_ERROR_);}
       if(!aurostd::isequal(trasp(Q)*Q,eye<utype>(Q.urows,Q.ucols,Q.lrows,Q.lcols),tol)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QR decomposition failed (Q not orthonormal)",_RUNTIME_ERROR_);}
       if(LDEBUG){cerr << soliloquy << " END" << endl;}
     }
@@ -4476,11 +4473,7 @@ namespace aurostd {
         cerr << soliloquy << " R=" << endl;cerr << R << endl;
       }
 
-      if(!aurostd::isequal(mat_orig,Q*R,tol)){
-        stringstream message;
-        message << "QR decomposition failed (A!=Q*R), condition number=" << aurostd::condition_number(mat_orig); //SD20220427
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
-      }
+      if(!aurostd::isequal(mat_orig,Q*R,tol)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QR decomposition failed (A!=Q*R)",_RUNTIME_ERROR_);}
       if(!aurostd::isequal(trasp(Q)*Q,eye<utype>(Q.urows,Q.ucols,Q.lrows,Q.lcols),tol)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QR decomposition failed (Q not orthonormal)",_RUNTIME_ERROR_);}
       if(LDEBUG){cerr << soliloquy << " END" << endl;}
     }

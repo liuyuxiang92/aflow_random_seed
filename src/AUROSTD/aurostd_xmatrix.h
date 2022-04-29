@@ -405,7 +405,7 @@ namespace aurostd {
   template<class utype> xmatrix<utype>
     inverseByLUP(const xmatrix<utype>&) __xprototype;  //SD20220426
 
-  template<class utype> double
+  template<class utype> utype
     condition_number(const xmatrix<utype>&) __xprototype; //SD20220425
 
   template<class utype> xmatrix<utype>                  // clear values too small

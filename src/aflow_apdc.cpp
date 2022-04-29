@@ -518,14 +518,14 @@ namespace apdc {
         p1(1) = 0.0; p1(2) = 0.0;
         p2(1) = 1.0; p2(2) = 0.0;
         p3(1) = 1.0; p3(2) = 1.0;
-        uint ii = 0;
+        int ii = 1;
         for (int i = 1; i <= x.rows; i++) {
           for (int j = i + 1; j <= x.rows; j++) {
-            ii++;
             p4(1) = x(j); p4(2) = x(i);
             _conc_macro(ii, 1) = (p1(1) - p3(1)) * (p4(2) - p1(2)) - (p1(1) - p4(1)) * (p3(2) - p1(2));
             _conc_macro(ii, 2) = (p1(1) - p4(1)) * (p2(2) - p1(2)) - (p1(1) - p2(1)) * (p4(2) - p1(2));
             _conc_macro(ii, 3) = (p4(1) - p3(1)) * (p2(2) - p4(2)) - (p4(1) - p2(1)) * (p3(2) - p4(2));
+            ii++;
           }
         }
         conc_macro = _conc_macro;
