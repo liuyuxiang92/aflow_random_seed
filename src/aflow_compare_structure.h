@@ -644,8 +644,9 @@ namespace compare{
   void groupWyckoffPositionsFromGroupedString(uint space_group_number, uint setting, const vector<vector<string> >& grouped_Wyckoff_string, vector<GroupedWyckoffPosition>& grouped_positions); //DX20200622 - removed pointer to uints
   string printWyckoffString(const vector<GroupedWyckoffPosition>& grouped_positions, bool alphabetize=false);
   vector<GroupedWyckoffPosition> sortSiteSymmetryOfGroupedWyckoffPositions(const vector<GroupedWyckoffPosition>& grouped_Wyckoffs); //DX20190219
-  bool matchableWyckoffPositions(const vector<GroupedWyckoffPosition>& temp_grouped_Wyckoffs,
-      const vector<GroupedWyckoffPosition>& representative_grouped_Wyckoffs,
+  bool matchableWyckoffPositions(
+      const vector<GroupedWyckoffPosition>& grouped_Wyckoffs_str1,
+      const vector<GroupedWyckoffPosition>& grouped_Wyckoffs_str2,
       bool same_species);
   bool matchableWyckoffPositionSet(const vector<vector<vector<string> > >& grouped_possible_Wyckoff_letters,
       const vector<vector<string> >& grouped_Wyckoff_letters);
