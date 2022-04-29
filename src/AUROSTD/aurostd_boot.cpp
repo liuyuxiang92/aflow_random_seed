@@ -261,7 +261,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   aurostd::xvector<utype> v(2),w(2),vv,vvvv(1,2);		//CO20190329 - clang doesn't like x=x, changing to x=y
   std::vector<aurostd::xvector<utype> > vxv;
   v(1);v[1];o+=sum(v);sort(shellsort(heapsort(v+v)));o+=modulus(v);o+=modulus2(v);v=x*v*x/x;v=+w;v=-w;v+=w;v-=w;v+=x;v-=x;v*=x;v/=x;		//CO20190329 - clang doesn't like x=x, changing to x=y
-  v=v*i;v=nint(v);v=sign(v);v=i*v;v=v*d;v=d*v;v=d*v*d/d;o+=min(v);o+=max(v);o+=mini(v);o+=maxi(v);v=v+v;v=v-v;v=v-x;v=-v+v;
+  v=v*i;v=nint(v);v=sign(v);v=i*v;v=v*d;v=d*v;v=d*v*d/d;o+=min(v);o+=max(v);o+=mini(v);o+=maxi(v);v=v+x;v=x+v;v=v+v;v=v-x;v=x-v;v=v-v;v=-v+v;
   cout<<v<<endl;o+=scalar_product(v,v);o+=cos(v,v);o+=sin(v,v);o+=angle(v,v);v=vector_product(v,v);
   trasp(v);
   aurostd::identical(v); //DX20210503

@@ -31,10 +31,10 @@ class _apdc_data {
     int aflow_max_num_atoms;
     int max_num_atoms;
     int conc_npts;
-    xvector<double> conc_range; // DIM: 2*Nk
+    vector<double> conc_curve; // DIM: 2*Nk
     xmatrix<double> conc_macro; // UNIT: unitless | DIM: Nc, Nk
     int temp_npts;
-    xvector<double> temp_range; // DIM: 2
+    vector<double> temp_range; // UNIT: K | DIM: 2
     xvector<double> temp; // UNIT: K | DIM: Nt
 
     // Derived data
@@ -78,8 +78,8 @@ namespace apdc {
   xmatrix<double> GetProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms);
   void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob);
   void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob0, const vector<xmatrix<double>>& prob);
-  xmatrix<double> GetConcentrationMacro(const xvector<double>& conc_range, const int conc_npts, const int nelem);
-  xvector<double> GetTemperature(const xvector<double>& temp_range, const int temp_npts);
+  xmatrix<double> GetConcentrationMacro(const vector<double>& conc_curve, const int conc_npts, const uint nelem);
+  xvector<double> GetTemperature(const vector<double>& temp_range, const int temp_npts);
   void SetCongruentClusters(_apdc_data& apdc_data);
   xvector<int> GetNumAtomCluster(const vector<xstructure>& vstr);
   xvector<int> GetDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const bool shuffle, const string& rundirpath="");

@@ -288,7 +288,7 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// --------------------------------------------------------- operator += xvector
+// --------------------------------------------------------- operator += scalar
 namespace aurostd {  // namespace aurostd
   template<class utype> xvector<utype>&
     // removed inline
@@ -323,7 +323,7 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// --------------------------------------------------------- operator -= xvector
+// --------------------------------------------------------- operator -= scalar
 namespace aurostd {  // namespace aurostd
   template<class utype> xvector<utype>&  
     // removed inline
@@ -335,7 +335,7 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// --------------------------------------------------------- operator *= double
+// --------------------------------------------------------- operator *= scalar
 namespace aurostd {  // namespace aurostd
   template<class utype> xvector<utype>&
     // removed inline
@@ -352,7 +352,7 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// --------------------------------------------------------- operator /= double
+// --------------------------------------------------------- operator /= scalar
 namespace aurostd {  // namespace aurostd
   template<class utype> xvector<utype>&
     // removed inline
