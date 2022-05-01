@@ -7,20 +7,26 @@
 LATEST VERSION OF THE FILE:                            materials.duke.edu/AFLOW/README_AFLOW_APL.TXT
 ****************************************************************************************************
 
-Phonon calculations with deformations written by Michal Jahnatek, Pinku Nath, Jose J. Plata, 
-Corey Oses, Marco Esters, and Stefano Curtarolo.
+Phonon calculations with deformations written by Marco Esters, Michal Jahnatek, Andriy Smolyanyuk,
+Corey Oses, Pinku Nath, Jose J. Plata, Stefano Curtarolo.
+
+For References, please see section 9 at the end of the file.
 
 The current version of the Automatic Phonon Library (APL) can calculate the phonon dispersion
 curves, phonon density of states, and thermal properties. All are calculated in the harmonic
 approximation. Two methods of calculation can be selected: the direct (supercell) method (DM) and
-the linear response method (LR). The resulting output files can be transformed into agr, ps, eps,
-or png by the tool apl2agr (located in SOURCES/APL2AGR).
+the linear response method (LR).
+
+The Quasi-Harmonic Approximation (QHA) performs APL calculations at several volumes to calculate a
+more accurate temperature-dependent free energy. It can be used to calculate thermomechanical
+properties such as thermal expansion, the bulk modulus, and heat capacities.
 
 The Automatic Anharmonic Phonon Library (AAPL) is an expansion of APL and can calculate the lattice
 thermal conductivity of a material via the Boltzmann Transport Equation using anharmonic
 interatomic force constants. 
 
-The default values of APL and AAPL can be changed by editing the appropriate values in aflow.rc.
+The default values of APL, QHAm and AAPL can be changed by editing the appropriate values in the
+aflow.rc file.
 
 ----------------------------------------------------------------------------------------------------
 
@@ -53,15 +59,24 @@ Table of Contents:
 
 6.    Example APL Input File
 
-7.    The Automatic Anharmonic Phonon Library
-7.1     Running AAPL Calculations
-7.2.    Anharmonic Interatomic Force Constants
-7.2.1.    Cluster Parameters
-7.2.2.    Sum Rule Parameters
-7.2.3.    k-Point Parameters
-7.3.    Lattice Thermal Conductivity Calculations
-7.4.    Plotting Thermal Conductivity
-7.5.    Example AAPL Input File
+7.    The Quasi-Harmonic Approximation
+7.1.    Running QHA Calculations
+7.2.    QHA Modes
+7.3.    Equation of State Calculations
+7.4.    Plotting Thermophysical Properties
+7.5.    Example QHA Input File
+
+8.    The Automatic Anharmonic Phonon Library
+8.1     Running AAPL Calculations
+8.2.    Anharmonic Interatomic Force Constants
+8.2.1.    Cluster Parameters
+8.2.2.    Sum Rule Parameters
+8.2.3.    k-Point Parameters
+8.3.    Lattice Thermal Conductivity Calculations
+8.4.    Plotting Thermal Conductivity
+8.5.    Example AAPL Input File
+
+9. References
 
 ----------------------------------------------------------------------------------------------------
 
@@ -542,7 +557,7 @@ To plot phonon dispersions, use:
      --print: specify the format of the output image (default: pdf)
      --title: the title of the plot in LaTeX format (default: title in PHEIGENVAL file)
      --unit: the unit of the phonon frequencies/energies (default: THz)
-     --outfile: the name of the output image file.
+     --outfile: the name of the output image file
     Example:
      aflow --plotphdisp=./ --print=png --unit=cm-1
 
@@ -573,7 +588,7 @@ Thermodynamic properties can be plotted using:
      --keep=gpl: keep the gnuplot script
      --print: specify the format of the output image (default: pdf)
      --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
-     --outfile: the name of the output image file.
+     --outfile: the name of the output image file
     Example:
      aflow --plotthermo=./,100,300
 
@@ -705,73 +720,87 @@ To avoid NPAR warnings from VASP 5.2+, the following option is added:
 The following is an example APL input file for PbS using the linear response method. For the
 direct method, use [AFLOW_APL]ENGINE=DM and uncomment #[AFLOW_APL]DMAG=0.015.
 
-    [AFLOW] **********************************************************************************
-    [AFLOW]SYSTEM=PbS
-    [AFLOW] **********************************************************************************
-    [AFLOW_MODE=VASP]
-    [AFLOW_MODE_ZIP=xz]
-    [AFLOW_MODE_BINARY=vasp54s]
-    [AFLOW] **********************************************************************************
-    #[AFLOW_MODE_MPI]
-    [AFLOW_MODE_MPI_MODE]NCPUS=MAX
-    [AFLOW_MODE_MPI_MODE]COMMAND ="mpirun -np"
-    [AFLOW_MODE_MPI_MODE]AUTOTUNE
-    [AFLOW_MODE_MPI_MODE]BINARY="mpivasp54s"
-    [AFLOW] **********************************************************************************
-    [AFLOW_APL]CALC
-    [AFLOW_APL]RELAX=ON
-    [AFLOW_APL]PREC=PHONONS
-    [AFLOW_APL]ENGINE=LR
-    #[AFLOW_APL]DMAG=0.015
-    [AFLOW_APL]POLAR=Y
-    [AFLOW_APL]SUPERCELL=4x4x4
-    [AFLOW_APL]DC=Y       
-    #[AFLOW_APL]DCUSERPATH=Gamma-X|X-U|K-Gamma|Gamma-L
-    [AFLOW_APL]DOS=Y                               
-    [AFLOW_APL]TP=Y                                
-    [AFLOW_APL]TPT=0:2000:10                       
-    [AFLOW_APL]KPPRA=1024                          
-    [AFLOW_APL]KSCHEME=G                           
-    [AFLOW_APL]KPOINTS=EVEN                        
-    [AFLOW_APL]DOSMESH=30x30x30
-    [AFLOW] **********************************************************************************
-    [VASP_RUN]RELAX=2
-    #[VASP_FORCE_OPTION]KPOINTS=KEEPK,EVEN,KSHIFT_GAMMA_EVEN,KSCHEME_GAMMA,GAMMA,IBZKPT
-    [VASP_FORCE_OPTION]SYM=ON
-    [VASP_FORCE_OPTION]AUTO_PSEUDOPOTENTIALS=potpaw_PBE
-    [VASP_FORCE_OPTION]NBANDS                       
-    [VASP_FORCE_OPTION]SPIN=OFF 
-    [VASP_FORCE_OPTION]RELAX_MODE=FORCES
-    [VASP_FORCE_OPTION]PREC=ACCURATE
-    [VASP_FORCE_OPTION]ALGO=FAST     
-    [VASP_FORCE_OPTION]RELAX
-    [VASP_FORCE_OPTION]TYPE=DEFAULT      
-    [VASP_FORCE_OPTION]CONVERT_UNIT_CELL=SPRIM,MINK
-    [AFLOW] **********************************************************************************
-    [VASP_INCAR_MODE_EXPLICIT]START
-    SYSTEM=PbS
-    [VASP_INCAR_MODE_EXPLICIT]STOP
-    [AFLOW] **********************************************************************************
-    [VASP_KPOINTS_MODE_IMPLICIT]
-    [VASP_KPOINTS_FILE]KSCHEME=G
-    [VASP_KPOINTS_FILE]KPPRA=400
-    [AFLOW] **********************************************************************************
-    [VASP_POTCAR_MODE_IMPLICIT]
-    [VASP_POTCAR_FILE]Pb
-    [VASP_POTCAR_FILE]S
-    [AFLOW] **********************************************************************************
-    [VASP_POSCAR_MODE_EXPLICIT]START
-    PbS   [FCC,FCC,cF8]
-    1.224745
-       0.00000000000000   2.45291416610433   2.45291416610433
-       2.45291416610433   0.00000000000000   2.45291416610433
-       2.45291416610433   2.45291416610433   0.00000000000000
-    1 1
-    Direct(2) [A1B1]
-       0.00000000000000   0.00000000000000   0.00000000000000  Pb
-       0.50000000000000   0.50000000000000   0.50000000000000  S 
-    [VASP_POSCAR_MODE_EXPLICIT]STOP
-    [AFLOW] **********************************************************************************
+[AFLOW] **********************************************************************************
+[AFLOW]SYSTEM=PbS
+[AFLOW] **********************************************************************************
+[AFLOW_MODE=VASP]
+[AFLOW_MODE_ZIP=xz]
+[AFLOW_MODE_BINARY=vasp54s]
+[AFLOW] **********************************************************************************
+[AFLOW_MODE_MPI]
+[AFLOW_MODE_MPI_MODE]NCPUS=MAX
+[AFLOW_MODE_MPI_MODE]COMMAND ="mpirun -np"
+[AFLOW_MODE_MPI_MODE]AUTOTUNE
+[AFLOW_MODE_MPI_MODE]BINARY="mpivasp54s"
+[AFLOW] **********************************************************************************
+[AFLOW_APL]CALC
+[AFLOW_APL]SUPERCELL=4x4x4
+[AFLOW_APL]DC=ON
+[AFLOW_APL]DCPATH=LATTICE
+[AFLOW_APL]DCPOINTS=100
+[AFLOW_APL]DINEQUIV_ONLY=ON
+[AFLOW_APL]DISPLACEMENTS=ON
+[AFLOW_APL]DMAG=0.015
+[AFLOW_APL]DOS=ON
+[AFLOW_APL]DOSMESH=21x21x21
+[AFLOW_APL]DOSMETHOD=LT
+[AFLOW_APL]DOSPOINTS=2000
+[AFLOW_APL]DOS_PROJECT=OFF
+[AFLOW_APL]DPM=ON
+[AFLOW_APL]DSYMMETRIZE=ON
+[AFLOW_APL]DXYZONLY=OFF
+[AFLOW_APL]ENGINE=DM
+[AFLOW_APL]FREQFORMAT=THZ|ALLOW_NEGATIVE
+[AFLOW_APL]GROUP_VELOCITY=ON
+[AFLOW_APL]HIBERNATE=ON
+[AFLOW_APL]KPPRA=3000
+[AFLOW_APL]KSCHEME=G
+[AFLOW_APL]MINATOMS=175
+[AFLOW_APL]POLAR=OFF
+[AFLOW_APL]PREC=PHONONS
+[AFLOW_APL]RELAX=ON
+[AFLOW_APL]RELAX_COMMENSURATE=ON
+[AFLOW_APL]TP=ON
+[AFLOW_APL]TPT=0:2000:10
+[AFLOW_APL]ZEROSTATE=OFF
+[AFLOW] **********************************************************************************
+[VASP_RUN]RELAX=2
+#[VASP_FORCE_OPTION]KPOINTS=KEEPK,EVEN,KSHIFT_GAMMA_EVEN,KSCHEME_GAMMA,GAMMA,IBZKPT
+[VASP_FORCE_OPTION]SYM=ON
+[VASP_FORCE_OPTION]AUTO_PSEUDOPOTENTIALS=potpaw_PBE
+[VASP_FORCE_OPTION]NBANDS
+[VASP_FORCE_OPTION]SPIN=OFF
+[VASP_FORCE_OPTION]RELAX_MODE=FORCES
+[VASP_FORCE_OPTION]PREC=ACCURATE
+[VASP_FORCE_OPTION]ALGO=FAST
+[VASP_FORCE_OPTION]RELAX
+[VASP_FORCE_OPTION]TYPE=DEFAULT
+[VASP_FORCE_OPTION]CONVERT_UNIT_CELL=SPRIM,MINK
+[AFLOW] **********************************************************************************
+[VASP_INCAR_MODE_EXPLICIT]START
+SYSTEM=PbS
+[VASP_INCAR_MODE_EXPLICIT]STOP
+[AFLOW] **********************************************************************************
+[VASP_KPOINTS_MODE_IMPLICIT]
+[VASP_KPOINTS_FILE]KSCHEME=G
+[VASP_KPOINTS_FILE]KPPRA=400
+[AFLOW] **********************************************************************************
+[VASP_POTCAR_MODE_IMPLICIT]
+[VASP_POTCAR_FILE]Pb
+[VASP_POTCAR_FILE]S
+[AFLOW] **********************************************************************************
+[VASP_POSCAR_MODE_EXPLICIT]START
+PbS   [FCC,FCC,cF8]
+1.224745
+   0.00000000000000   2.45291416610433   2.45291416610433
+   2.45291416610433   0.00000000000000   2.45291416610433
+   2.45291416610433   2.45291416610433   0.00000000000000
+1 1
+Direct(2) [A1B1]
+   0.00000000000000   0.00000000000000   0.00000000000000  Pb
+   0.50000000000000   0.50000000000000   0.50000000000000  S
+[VASP_POSCAR_MODE_EXPLICIT]STOP
+[AFLOW] **********************************************************************************
 
 ***************************************************************************************************
 NB:
@@ -781,9 +810,230 @@ then proceed with a subsequent analysis (QHA/AAPL) without the need to change th
 ***************************************************************************************************
 
 
-7. The Automatic Anharmonic Phonon Library 
+7. The Quasi-Harmonic Approximation
 
-7.1. Running AAPL Calculations
+7.1. Running QHA Calculations
+
+The Quasi-Harmonic Approximation (QHA) calculates harmonic phonons at different volumes to compute
+the volume-dependent free energies. This data is then fitted to an equation of state (EOS) to
+obtain a temperature-dependent free-energy curve. This curve is the basis for a variety of
+thermomechanical properties such as thermal expansion, the bulk modulus, and heat capacities.
+
+To use QHA, the following needs to be added the aflow.in file:
+
+    [AFLOW_QHA]CALC
+
+This overrides all other APL CALC options. A QHA calculation requires three steps:
+
+    1. In a first AFLOW run, QHA will create subdirectories for an APL run and a STATIC run for each
+       selected volume. If the APL option REALX is set to ON, QHA will relax the structure before
+       creating the directories.
+    2. Run all DFT calculations required for each APL and STATIC directory.
+    3. Post-processing: run AFLOW again in the QHA directory to calculate thermomechanical
+       properties.
+
+QHA uses many parameters that are also used inside APL. See section 2. for a discussion on APL
+options.
+
+
+7.2. QHA Modes
+
+QHA can either calculate only Grueneisen parameters or the full equation of state. To calculate
+Grueneisen parameters, use:
+
+    [AFLOW_QHA]GP_FINITE_DIFF=ON|OFF
+    [AFLOW_QHA]GP_DISTORTION=3
+
+GP_DISTORTION is the volume expansion and compression in %. This will create three APL directories,
+at 97%, 100%, and 103% volume. No static calculations are needed.
+
+To run equation of state calculation, the following needs to be present in the aflow.in file:
+
+    [AFLOW_QHA]EOS=ON
+    [AFLOW_QHA]EOS_DISTORTION_RANGE=VSTART:VEND:VSTEP
+
+Where VSTART and VEND are the initial and final volumes and VSTEP is the step size in %. VSTART must
+be negative. These volumes will be used for the static calculations. The number of phonon
+calculations depend on the MODE parameter:
+
+    [AFLOW_QHA]MODE=QHA|SCQHA|QHA3P|QHANP
+
+QHA runs standard QHA and uses EOS_DISTORTION_RANGE. SCQHA (self-consistent QHA) and QHA3P (3-phonon
+QHA) only need three volumes and use GP_DISTORTION. QHANP (N-th order QHA) calculates the
+vibrational free energy based on a Taylor expansion of order N:
+
+    [AFLOW_QHA]TAYLOR_EXPANSION_ORDER=N
+
+It generates (2N + 1) phonon calculations.
+
+
+7.3. Equation of State Calculations
+
+When EOS=ON, QHA can be used to calculate thermomechanical properties. For this, the obtained free
+energies need to be fit to an equation of state:
+
+    [AFLOW_QHA]EOS_MODEL=M|BM2|BM3|BM4|SJ
+
+Here, M is the Murnaghan, BMX are the X-th order Birch-Murnaghan, and SJ the Stabilized Jellium
+model. The default is SJ. QHA will use the [AFLOW_APL]TPT option for the temperature range over
+which to fit.
+
+Electronic contributions to the free energy can be included via:
+
+    [AFLOW_QHA]INCLUDE_ELEC_CONTRIB=ON|OFF
+    [AFLOW_QHA]SOMMERFELD_EXPANSION=ON|OFF
+
+Setting SOMMERFELD_EXPANSION to ON will have QHA use the Sommerfeld model to calculate electronic
+free energies. If OFF, it will integrate the electronic structure.
+
+It is possible that at some volumes, the structure becomes dynamically unstable and has imaginary
+frequencies. QHA will not process volume sets that contain such structures and the set of volumes
+needs to be adjusted. Imaginary frequencies can also be ignored using:
+
+    [AFLOW_QHA]IGNORE_IMAGINARY=ON|OFF
+
+Temperature-dependent phonon dispersion can also be calculated. The temperatures are set using:
+
+    [AFLOW_QHA]T1,T2,T3,...
+
+Where T1, etc. are temperatures in K. This is not supported for QHANP.
+
+
+7.4. Plotting Thermomechanical Properties
+
+Thermophysical properties can be plotted using:
+
+  aflow --plotthermoqha[=directory[,Tmin[,Tmax]]] --eosmodel=SJ|BM2|BM3|BM4|M [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=]
+    Defaults.
+     Directory: default = ./
+     Tmin: The minimum temperature of the plot. Default value: 0 K
+     Tmax: The maximum temperature of the plot. Default value: maximum temperature
+    --eosmodel: The equation of state. Default: SJ
+    Optional arguments:
+     --keep=gpl: keep the gnuplot script
+     --print: specify the format of the output image (default: pdf)
+     --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
+     --outfile: the name of the output image file
+    Example:
+     aflow --plotthermo=./,100,300
+
+This command outputs separate files for the volume, free energy, bulk modulus, volumetric thermal
+expansion coefficient, isochoric and isobaric heat capacity, and average Grueneisen parameter. The
+file aflow.qha.thermo.out must be present in the directory and must contain data for the selected
+equation of state.
+
+The dispersion of the Grueneisen parameter can be plotted via:
+
+  aflow --plotgrdisp|--plotgruneisendispersion|--plotgrueneisendispersion[=directory,[gmin,[gmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--unit=THz|Hz|eV|meV|rcm|cm-1] [--outfile=]
+    Defaults.
+     Directory: default = ./
+     gmin: The minimum value of the plot. Default value: minimum Grueneisen parameter
+     gmax: The maximum value of the plot. Default value: maximum Grueneisen parameter
+    Optional arguments:
+     --keep=gpl: keep the gnuplot script
+     --print: specify the format of the output image (default: pdf)
+     --title: the title of the plot in LaTeX format (default: title in gp.disp.out file)
+     --unit: the unit of the phonon frequencies/energies (default: THz)
+     --outfile: the name of the output image file
+    Example:
+     aflow --plotgrdisp=./ --print=png
+
+The files PHPOSCAR, aflow.qha.kpoints.out, and aflow.qha.qp.disp.out must be present in the
+directory.
+
+
+7.5. Example QHA Input File
+
+[AFLOW] *******************************************************************************************
+[AFLOW]SYSTEM=MgO
+[AFLOW] *******************************************************************************************
+[AFLOW_MODE_ZIP=xz]
+[AFLOW_MODE_BINARY=vasp46s]
+[AFLOW_MODE_MPI]
+[AFLOW_MODE_MPI_MODE]NCPUS=MAX
+[AFLOW_MODE_MPI_MODE]COMMAND ="mpirun -np"
+[AFLOW_MODE_MPI_MODE]AUTOTUNE
+[AFLOW_MODE_MPI_MODE]BINARY="mpivasp46s"
+[AFLOW] *******************************************************************************************
+[AFLOW_APL]SUPERCELL=4x4x4
+[AFLOW_APL]DC=ON
+[AFLOW_APL]DCPATH=LATTICE
+[AFLOW_APL]DCPOINTS=100
+[AFLOW_APL]DINEQUIV_ONLY=ON
+[AFLOW_APL]DISPLACEMENTS=ON
+[AFLOW_APL]DMAG=0.015
+[AFLOW_APL]DOS=ON
+[AFLOW_APL]DOSMESH=21x21x21
+[AFLOW_APL]DOSMETHOD=LT
+[AFLOW_APL]DOSPOINTS=2000
+[AFLOW_APL]DOS_PROJECT=OFF
+[AFLOW_APL]DPM=ON
+[AFLOW_APL]DSYMMETRIZE=ON
+[AFLOW_APL]DXYZONLY=OFF
+[AFLOW_APL]ENGINE=DM
+[AFLOW_APL]FREQFORMAT=THZ|ALLOW_NEGATIVE
+[AFLOW_APL]GROUP_VELOCITY=ON
+[AFLOW_APL]HIBERNATE=ON
+[AFLOW_APL]KPPRA=3000
+[AFLOW_APL]KSCHEME=G
+[AFLOW_APL]MINATOMS=175
+[AFLOW_APL]POLAR=OFF
+[AFLOW_APL]PREC=PHONONS
+[AFLOW_APL]RELAX=ON
+[AFLOW_APL]RELAX_COMMENSURATE=ON
+[AFLOW_APL]TP=ON
+[AFLOW_APL]TPT=0:2000:10
+[AFLOW_APL]ZEROSTATE=OFF
+[AFLOW] *******************************************************************************************
+[AFLOW_QHA]CALC
+[AFLOW_QHA]EOS=ON
+[AFLOW_QHA]EOS_DISTORTION_RANGE=-3:9:1
+[AFLOW_QHA]EOS_MODEL=SJ
+[AFLOW_QHA]GP_DISTORTION=1
+[AFLOW_QHA]GP_FINITE_DIFF=OFF
+[AFLOW_QHA]IGNORE_IMAGINARY=OFF
+[AFLOW_QHA]INCLUDE_ELEC_CONTRIB=OFF
+[AFLOW_QHA]MODE=QHA
+[AFLOW_QHA]PDIS_T=300
+[AFLOW_QHA]SOMMERFELD_EXPANSION=OFF
+[AFLOW_QHA]TAYLOR_EXPANSION_ORDER=2
+[AFLOW] *******************************************************************************************
+[VASP_FORCE_OPTION]SYM=ON
+[VASP_FORCE_OPTION]AUTO_PSEUDOPOTENTIALS=potpaw_PBE
+[VASP_FORCE_OPTION]NBANDS
+[VASP_FORCE_OPTION]SPIN=OFF
+[VASP_FORCE_OPTION]TYPE=DEFAULT
+[VASP_FORCE_OPTION]PREC=ACCURATE
+[VASP_FORCE_OPTION]ALGO=NORMAL
+[AFLOW] *******************************************************************************************
+[VASP_POTCAR_MODE_IMPLICIT]
+[VASP_POTCAR_FILE]Mg
+[VASP_POTCAR_FILE]O
+[AFLOW] *******************************************************************************************
+[VASP_KPOINTS_MODE_IMPLICIT]
+[VASP_KPOINTS_FILE]STATIC_KSCHEME=M
+[VASP_KPOINTS_FILE]STATIC_KPPRA=10000
+[VASP_KPOINTS_FILE]BANDS_LATTICE=AUTO
+[VASP_KPOINTS_FILE]BANDS_GRID=20
+[AFLOW] *******************************************************************************************
+[VASP_POSCAR_MODE_EXPLICIT]START
+MgO
+1.224745
+   0.00000000000000   1.73138099985724   1.73138099985724
+   1.73138099985724   0.00000000000000   1.73138099985724
+   1.73138099985724   1.73138099985724   0.00000000000000
+Mg O
+1 1
+Direct(2) [A1B1]
+   0.00000000000000   0.00000000000000   0.00000000000000  Mg
+   0.50000000000000   0.50000000000000   0.50000000000000  O
+[VASP_POSCAR_MODE_EXPLICIT]STOP
+[AFLOW] *******************************************************************************************
+
+
+8. The Automatic Anharmonic Phonon Library
+
+8.1. Running AAPL Calculations
 
 The Automatic Anharmonic Phonon Library (AAPL) is the anharmonic extension to APL and calculates
 anharmonic interatomic force constants (IFCs). These can then be used to calculate the lattice
@@ -813,7 +1063,7 @@ number of calculations for AAPL is very large, so processing the DFT calculation
 time whereas reading the hibernate files takes only a couple of seconds. Moreover, if LR is chosen
 for the APL calculations, the DMAG keyword still needs to be specified for AAPL.
 
-7.2. Anharmonic Interatomic Force Constants
+8.2. Anharmonic Interatomic Force Constants
 
 Anharmonic IFCs are calculated using the direct method. It is necessary to define a cut-off radius
 beyond which the interactions between atoms are considered negligible. Within this shell, clusters
@@ -832,7 +1082,7 @@ index appears twice on the same atom, the atom is not distorted twice into the s
 Once the DFT calculations are finished, the forces are read and the IFCs are determined using a
 self-consistent field. 
 
-7.2.1. Cluster Parameters
+8.2.1. Cluster Parameters
 
 The supercell and the distortion magnitude are defined the same way as in APL. See Section 2.1.1.
 for the supercell parameters and Section 2.2. for the distortion magnitude.
@@ -843,19 +1093,17 @@ The cut-off radius described above can be defined in two ways:
 
         [AFLOW_AAPL]CUT_RAD=5.0
 
-    This is also the default value.
-
   * Define the number of coordination shells that should be included in the interaction volume.
     This can be achieved via the CUT_SHELL parameter.
 
-        [AFLOW_AAPL]CUT_SHELL=4
+        [AFLOW_AAPL]CUT_SHELL=6
 
     This is also the default value. The cut-off radius is then determined automatically.
 
 It is possible to use both parameters. In this case, AAPL determines the cut-off radius based on
 the CUT_SHELL parameter and chooses whichever value is greater.
 
-7.2.2. Sum Rule Parameters
+8.2.2. Sum Rule Parameters
 
 The iterative procedure behind the calculation of the anharmonic IFCs has a few adjustable
 parameters.
@@ -882,7 +1130,7 @@ parameters.
       convergence cannot be reached because the corrections are too large, this parameter should
       be adjusted.
 
-7.2.3. k-Point Parameters
+8.2.3. k-Point Parameters
 
 The KPPRA parameter can be set separately for AAPL calculations. This may be desirable to reduce
 the computational cost. The parameter to set is KPPRA_AAPL:
@@ -891,7 +1139,7 @@ the computational cost. The parameter to set is KPPRA_AAPL:
 
 If no entry is found or if the parameter is smaller than 1, the KPPRA value for APL will be used.
 
-7.3. Lattice Thermal Conductivity Calculations
+8.3. Lattice Thermal Conductivity Calculations
 
 The lattice thermal conductivity tensor is calculated by solving the Boltzmann Transport
 Equation (BTE) for a specific temperature range. To set the temperature range, the parameter TCT
@@ -911,9 +1159,9 @@ The default is BTE=FULL.
 
 The BTE gets solved along a q-point grid which can be defined using THERMALGRID:
 
-    [AFLOW_AAPL]THERMALGRID=q1Xq2Xq3
+    [AFLOW_AAPL]THERMALGRID=q1xq2xq3
 
-Where q1, q2, and q3 are the number of q-points along each dimension. The default is 26X26X26.
+Where q1, q2, and q3 are the number of q-points along each dimension. The default is 21x21x21.
 
 There are various factors which can influence the phonon scattering rates besides anharmonic phonon
 processes. Two mechanisms that are implemented in AAPL: isotope scattering and grain boundary
@@ -949,11 +1197,11 @@ scattering.
 
         Which corresponds to the grain size/mean free path threshold in nm. The default is 100 nm.
 
-7.4. Plotting Thermal Conductivity
+8.4. Plotting Thermal Conductivity
 
 Thermal conductivity can be plotted using the command line:
 
-  aflow --plotthermo[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--outfile=]
+  aflow --plottcond[=directory[,Tmin[,Tmax]]] [--keep=gpl] [--print=pdf|eps|gif|jpg|png] [--title=] [--outfile=]
 
   Defaults.
    Directory: default = ./
@@ -963,15 +1211,15 @@ Thermal conductivity can be plotted using the command line:
    --keep=gpl: keep the gnuplot script
    --print: specify the format of the output image (default: pdf)
    --title: the title of the plot in LaTeX format (default: SYSTEM in out file)
-   --outfile: the name of the output image file.
+   --outfile: the name of the output image file
   Example:
    aflow --plottcond=./,100,300
 
-aflow.apl.thermal_properties.out must be present in the directory.
+aflow.aapl.tcond.out must be present in the directory.
 
 This feature requires gnuplot version 5 and pdflatex.
 
-7.5. Example AAPL Input File
+8.5. Example AAPL Input File
 
 The following is an example AAPL input file for NaF. Four-phonon processes are included.
 
@@ -981,14 +1229,15 @@ The following is an example AAPL input file for NaF. Four-phonon processes are i
 [AFLOW_MODE=VASP]
 [AFLOW_MODE_ZIP=bzip2]
 [AFLOW_MODE_BINARY=vasp46s]
+[AFLOW_MODE_MPI]
 [AFLOW_MODE_MPI_MODE]NCPUS=MAX
 [AFLOW_MODE_MPI_MODE]COMMAND="mpirun -np"
 [AFLOW_MODE_MPI_MODE]AUTOTUNE
 [AFLOW_MODE_MPI_MODE]BINARY="mpivasp46s"
 [AFLOW] *******************************************************************************************
 [AFLOW_AAPL]CALC
-[AFLOW_AAPL]CUT_SHELL=4,2
-#[AFLOW_AAPL]CUT_RAD=5.0,4.0
+[AFLOW_AAPL]CUT_SHELL=4
+#[AFLOW_AAPL]CUT_RAD=5.0
 [AFLOW_AAPL]SUMRULE=1E-7
 [AFLOW_AAPL]SUMRULE_MAX_ITER=1E-7
 [AFLOW_AAPL]MIXING_COEFFICIENT=1.0
@@ -1004,9 +1253,9 @@ The following is an example AAPL input file for NaF. Four-phonon processes are i
 [AFLOW_APL]RELAX=ON
 [AFLOW_APL]PREC=PHONONS
 [AFLOW_APL]DMAG=0.015
-#[AFLOW_APL]POLAR=Y
+[AFLOW_APL]POLAR=ON
 [AFLOW_APL]MINATOMS=100
-[AFLOW_APL]HIBERNATE=Y
+[AFLOW_APL]HIBERNATE=ON
 [AFLOW_APL]KPPRA=8000
 [AFLOW_APL]KSCHEME=G
 [AFLOW_APL]KPOINTS=EVEN
@@ -1023,18 +1272,9 @@ The following is an example AAPL input file for NaF. Four-phonon processes are i
 [VASP_POTCAR_FILE]F
 [VASP_POTCAR_FILE]Na
 [AFLOW] *******************************************************************************************
-[VASP_INCAR_MODE_EXPLICIT]START
-System = F1Na1_ICSD_262837
-NELM = 120
-NELMIN = 2
-LPLANE= .TRUE.
-LREAL = .FALSE.
-LSCALU = .FALSE.
-[VASP_INCAR_MODE_EXPLICIT]STOP
-[AFLOW] *******************************************************************************************
 [AFLOW_SYMMETRY]CALC
 [VASP_POSCAR_MODE_EXPLICIT]START
-F1Na1  [FCC,FCC,cF8] (STD_PRIM doi:10.1
+NaF
 1.224745
    0.00000000000000   1.91118771995223   1.91118771995223
    1.91118771995223   0.00000000000000   1.91118771995223
@@ -1046,6 +1286,33 @@ Direct(2) [A1B1]
    0.50000000000000   0.50000000000000   0.50000000000000  Na    
 [VASP_POSCAR_MODE_EXPLICIT]STOP
 [AFLOW] *******************************************************************************************
+
+
+9. References
+
+APL:
+
+M. Esters, C. Oses, D. Hicks, M. J. Mehl, M. Jahnatek, M. D. Hossain, J.-P. Maria, D. W. Brenner,
+C. Toher, and S. Curtarolo, Settling the matter of the role of vibrations in the stability of
+high-entropy carbides, Nat. Commun. 12, 5747 (2021). DOI: 10.1038/s41467-021-25979-5.
+
+QHA:
+
+P. Nath, J. J. Plata, D. Usanmaz, R. Al Rahal Al Orabi, M. Fornari, M. Buongiorno Nardelli,
+C. Toher, and S. Curtarolo, High-throughput prediction of finite-temperature properties using the
+quasi-harmonic approximation, Comput. Mater. Sci. 125, 8291 (2016).
+DOI: 10.1016/j.commatsci.2016.07.043
+
+P. Nath, D. Usanmaz, D. Hicks, C. Oses, M. Fornari, M. B. Nardelli, C. Toher, and S. Curtarolo,
+AFLOWi-QHA3P: Robust and automated method to compute thermodynamic properties of solids, Phys. Rev.
+Materials 3, 073801 (2019). DOI: 10.1103/PhysRevMaterials.3.073801
+
+AAPL:
+
+J. J. Plata, P. Nath, D. Usanmaz, J. Carrete, C. Toher, M. de Jong, M. D. Asta, M. Fornari,
+M. Buongiorno Nardelli, and S. Curtarolo, An ecient and accurate framework for calculating lattice
+thermal conductivity of solids: AFLOW-AAPL Automatic Anharmonic Phonon Library, npj Comput. Mater.
+3, 45 (2017). DOI: 10.1038/s41524-017-0046-7
 
 ****************************************************************************************************
 *                                                                                                  *

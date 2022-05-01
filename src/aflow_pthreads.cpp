@@ -449,7 +449,8 @@ namespace AFLOW_PTHREADS {
 } // AFLOW_PTHREADS
 
 namespace aurostd {
-  bool multithread_execute(const deque<string>& dcmds,int _NUM_THREADS,bool VERBOSE) {
+  bool multithread_execute(const deque<string>& dcmds_in,int _NUM_THREADS,bool VERBOSE) {
+    deque<string> dcmds = dcmds_in;
     bool LDEBUG=TRUE;
     string soliloquy=XPID+"aurostd::multithread_execute():";
     int NUM_THREADS=_NUM_THREADS;                                          // SAFETY
