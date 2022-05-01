@@ -103,9 +103,9 @@ namespace pocc {
     stringstream unique_structures_ss;
     for(uint i=0;i<vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size();i++){
       unique_structures_ss << AFLOWIN_SEPARATION_LINE << endl;
-      unique_structures_ss << _VASP_POSCAR_MODE_EXPLICIT_START_ << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING[i] << endl;
+      unique_structures_ss << _VASP_POSCAR_MODE_EXPLICIT_START_P_ << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING[i] << endl;
       unique_structures_ss << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRUCTURE[i];
-      unique_structures_ss << _VASP_POSCAR_MODE_EXPLICIT_STOP_ << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING[i] << endl;
+      unique_structures_ss << _VASP_POSCAR_MODE_EXPLICIT_STOP_P_ << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING[i] << endl;
       unique_structures_ss << AFLOWIN_SEPARATION_LINE << endl;
     }
     aurostd::stringstream2file(unique_structures_ss,aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE);
@@ -116,8 +116,8 @@ namespace pocc {
     uint iline=0;
     for(iline=0;iline<vlines_orig.size();iline++){
       const string& line=vlines_orig[iline];
-      if(line.find(_VASP_POSCAR_MODE_EXPLICIT_STOP_)!=string::npos){reading_explicit=false;}
-      else if(line.find(_VASP_POSCAR_MODE_EXPLICIT_START_)!=string::npos){reading_explicit=true;}
+      if(line.find(_VASP_POSCAR_MODE_EXPLICIT_STOP_P_)!=string::npos){reading_explicit=false;}
+      else if(line.find(_VASP_POSCAR_MODE_EXPLICIT_START_P_)!=string::npos){reading_explicit=true;}
       else{
         if(reading_explicit==false){vlines.push_back(line);}
       }

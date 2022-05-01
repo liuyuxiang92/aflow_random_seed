@@ -8122,7 +8122,7 @@ namespace KBIN {
       string message = "Index cannot be 0";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
     }
-    if(!aurostd::ExtractNthToStringstreamEXPLICIT(AflowIn, poscar, POSCAR_START_tag, POSCAR_STOP_tag, index)) {
+    if(!aurostd::ExtractNthToStringstreamEXPLICIT(AflowIn, poscar, _VASP_POSCAR_MODE_EXPLICIT_START_, _VASP_POSCAR_MODE_EXPLICIT_STOP_, index)) {
       string message = "Invalid " + _AFLOWIN_;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_WRONG_FORMAT_);
     }

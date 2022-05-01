@@ -3600,100 +3600,36 @@ namespace aurostd {
   // *******************************************************************************************
   // SD20220301 - Extract the nth entry to stringstream, negative values go backwards, n==0 returns all entries
   bool ExtractNthToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword,const int index) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "LDEBUG: ExtractNthToStringstreamEXPLICIT" << endl;
+    // SD2020501 - Memory efficient version
     aurostd::StringstreamClean(StringstreamOUTPUT);
+    string strline="";
+    FileIN.clear();FileIN.seekg(0);
     vector<string> tokens;
-    aurostd::stream2vectorstring(FileIN,tokens);
-    int iter=0;
-    if(index>0) {
-      for(uint i=0;i<tokens.size();i++) {
-        if(aurostd::substring2bool(tokens[i],Keyword)) {
-          iter++;
-          if(index==iter) {StringstreamOUTPUT << tokens[i] << endl;break;}
-        }
+    while(getline(FileIN,strline)) {
+      if(aurostd::substring2bool(strline,Keyword)) {
+        tokens.push_back(strline.substr(strline.find(Keyword)+Keyword.length()));
+        StringstreamOUTPUT << strline.substr(strline.find(Keyword)+Keyword.length()) << endl;
       }
-      if(LDEBUG) cerr << "LDEBUG: " << StringstreamOUTPUT.str() << endl;
-      return TRUE;
-    } 
-    else if(index<0) {
-      for(int i=tokens.size()-1;i>=0;i--) {
-        if(aurostd::substring2bool(tokens[i],Keyword)) {
-          iter--;
-          if(index==iter) {StringstreamOUTPUT << tokens[i] << endl;break;}
-        }
+    }
+    FileIN.clear();FileIN.seekg(0);
+    if(tokens.size()>0) {
+      if(index==0) {
+        for(uint i=0;i<tokens.size();i++) StringstreamOUTPUT << tokens[i] << endl;
       }
-      if(LDEBUG) cerr << "LDEBUG: " << StringstreamOUTPUT.str() << endl;
-      return TRUE;
-    } 
-    else {
-      for(uint i=0;i<tokens.size();i++) {
-        if(aurostd::substring2bool(tokens[i],Keyword)) {
-          StringstreamOUTPUT << tokens[i] << endl;
-        }
+      else {
+        uint i=aurostd::ConvertNegativeIndex(index,tokens.size());
+        StringstreamOUTPUT << tokens[i] << endl;
       }
-      if(LDEBUG) cerr << "LDEBUG: " << StringstreamOUTPUT.str() << endl;
       return TRUE;
     }
     return FALSE;
   }
 
   bool ExtractNthToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "LDEBUG: ExtractNthToStringstreamEXPLICIT" << endl;
     aurostd::StringstreamClean(StringstreamOUTPUT);
-    vector<string> tokens;
-    vector<uint> vstart, vstop;
-    aurostd::stream2vectorstring(FileIN,tokens);
-    uint istart=0,istop=0;
-    int iter=0;
-    if(index>0) {
-      for(uint i=0;i<tokens.size();i++) {
-        if(aurostd::substring2bool(tokens[i],Keyword_stop)) {
-          istop=i-1;
-          if(index==iter) {vstop.push_back(istop);break;}
-        }
-        if(aurostd::substring2bool(tokens[i],Keyword_start)) {
-          iter++;
-          istart=i+1;
-          if(index==iter) {vstart.push_back(istart);}
-        }
-      }
-    }
-    else if(index<0) {
-      for(int i=tokens.size()-1;i>=0;i--) {
-        if(aurostd::substring2bool(tokens[i],Keyword_stop)) {
-          iter--;
-          istop=i-1;
-          if(index==iter) {vstop.push_back(istop);}
-        }
-        if(aurostd::substring2bool(tokens[i],Keyword_start)) {
-          istart=i+1;
-          if(index==iter) {vstart.push_back(istart);break;}
-        }
-      }
-    }
-    else {
-      for(uint i=0;i<tokens.size();i++) {
-        if(aurostd::substring2bool(tokens[i],Keyword_stop)) {
-          istop=i-1;
-          vstop.push_back(istop);
-        }
-        if(aurostd::substring2bool(tokens[i],Keyword_start)) {
-          istart=i+1;
-          vstart.push_back(istart);
-        }
-      }
-    }
-    if(vstop.size()>0) {
-      if(vstop.size()!=vstart.size()) vstart.pop_back(); // remove unfinished start
-        for(uint i=0;i<vstart.size();i++) {
-          for(uint j=vstart[i];j<=vstop[i];j++) StringstreamOUTPUT << tokens[j] << endl;
-        }
-      if(LDEBUG) cerr << "LDEBUG: " << StringstreamOUTPUT.str() << endl;
-      return TRUE;
-    }
-    return FALSE;
+    string stringIN="";
+    aurostd::file2string(FileIN,stringIN);
+    ExtractNthToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start,Keyword_stop,index);
   }
 
   bool ExtractNthToStringstreamEXPLICIT(stringstream& StringStreamIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index) {
