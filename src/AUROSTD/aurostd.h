@@ -593,10 +593,27 @@ namespace aurostd {
   unsigned int Sleep(unsigned int seconds);
   // about extracting from to files
   vector<string> GrepFile(const string& filename,const string& keyword,bool RemoveWS=false,bool RemoveComments=true); //CO20210623
-  bool ExtractToFileEXPLICIT(ifstream& FileIN,string FileNameOUTPUT,const string& Keyword);
-  bool ExtractToFileEXPLICIT(const string& StringIN,string FileNameOUTPUT,const string& Keyword);
-  bool ExtractToFileEXPLICIT(ifstream& FileIN,string FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop);
-  bool ExtractToFileEXPLICIT(const string& StringIN,string FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop);
+  // take the nth //SD20220301
+  bool ExtractNthToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword,const int index);
+  bool ExtractNthToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index);
+  bool ExtractNthToStringstreamEXPLICIT(stringstream& StringStreamIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop,int index);
+  bool ExtractNthToStringstreamEXPLICIT(const string& StringIN,stringstream& StringstreamOUTPUT,const string& Keyword,const int index);
+  bool ExtractNthToStringstreamEXPLICIT(const string& StringIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index);
+  bool ExtractNthToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword,const int index);
+  bool ExtractNthToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index);
+  bool ExtractNthToFileEXPLICIT(stringstream& StringStreamIN,const string& FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop,int index);
+  bool ExtractNthToFileEXPLICIT(const string& StringIN,const string& FileNameOUTPUT,const string& Keyword,const int index);
+  bool ExtractNthToFileEXPLICIT(const string& StringIN,const string& FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index);
+  bool ExtractNthToStringEXPLICIT(ifstream& FileIN,string& StringOUTPUT,const string& Keyword,const int index);
+  bool ExtractNthToStringEXPLICIT(ifstream& FileIN,string& StringOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index);
+  bool ExtractNthToStringEXPLICIT(stringstream& StringStreamIN,string& StringOUTPUT,const string& Keyword_start,const string& Keyword_stop,int index);
+  bool ExtractNthToStringEXPLICIT(const string& StringIN,string& StringOUTPUT,const string& Keyword,const int index);
+  bool ExtractNthToStringEXPLICIT(const string& StringIN,string& StringOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index);
+  // take all
+  bool ExtractToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword);
+  bool ExtractToFileEXPLICIT(const string& StringIN,const string& FileNameOUTPUT,const string& Keyword);
+  bool ExtractToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop);
+  bool ExtractToFileEXPLICIT(const string& StringIN,const string& FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop);
   bool ExtractToStringEXPLICIT(ifstream& FileIN,string& StringOUTPUT,const string& Keyword);
   bool ExtractToStringEXPLICIT(const string& StringIN,string& StringOUTPUT,const string& Keyword);
   bool ExtractToStringEXPLICIT(ifstream& FileIN,string& StringOUTPUT,const string& Keyword_start,const string& Keyword_stop);
@@ -606,18 +623,13 @@ namespace aurostd {
   bool ExtractToStringstreamEXPLICIT(stringstream& StringStreamIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop);
   bool ExtractToStringstreamEXPLICIT(const string& StringIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop);
   bool ExtractToStringstreamEXPLICIT(const string& StringIN,stringstream& StringstreamOUTPUT,const string& Keyword);
-  // take the nth //SD20220301
-  bool ExtractNthToStringstreamEXPLICIT(ifstream &FileIN,stringstream& StringstreamOUTPUT,const string& Keyword,const int index);
-  bool ExtractNthToStringstreamEXPLICIT(ifstream &FileIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index);
-  bool ExtractNthToStringstreamEXPLICIT(stringstream& StringStreamIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop,int index);
-  bool ExtractNthToStringstreamEXPLICIT(const string& StringIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index);
   // take the last
-  bool ExtractLastToStringstreamEXPLICIT(ifstream &FileIN,stringstream& StringstreamOUTPUT,const string& Keyword);
-  bool ExtractLastToStringstreamEXPLICIT(ifstream &FileIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop);
+  bool ExtractLastToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword);
+  bool ExtractLastToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop);
   bool ExtractLastToStringstreamEXPLICIT(stringstream& StringStreamIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop);
   bool ExtractLastToStringstreamEXPLICIT(const string& StringIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop);
   // take just after
-  bool ExtractJustAfterToFileEXPLICIT(ifstream& FileIN,string FileNameOUTPUT,const string& Keyword_start);
+  bool ExtractJustAfterToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword_start);
   bool ExtractJustAfterToStringEXPLICIT(ifstream& FileIN,string& StringOUTPUT,const string& Keyword_start);
   bool ExtractJustAfterToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword_start);
   bool ExtractJustAfterToStringstreamEXPLICIT(stringstream& StringStreamIN,stringstream& StringstreamOUTPUT,const string& Keyword_start);

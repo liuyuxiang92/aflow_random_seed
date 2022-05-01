@@ -8076,29 +8076,29 @@ namespace KBIN {
 // KBIN::ExtractPOSCARFromAFLOWIN
 // ***************************************************************************
 namespace KBIN {
-  // SD20220228 - Extract the nth POSCAR from the AFLOWIN, negative values go backwards
-  stringstream ExtractPOSCARFromDirectory(const string& directory, int index) {
-    string function_name = "KBIN::ExtractPOSCARFromDirectory():";
+  // SD20220228 - Extract the nth POSCAR from the AFLOWIN, negative values go backwards, n==0 returns everything
+  stringstream ExtractPOSCARStringStreamFromDirectory(const string& directory, int index) {
+    string function_name = "KBIN::ExtractPOSCARStringStreamFromDirectory():";
     string AflowIn = "";
     if(!aurostd::file2string(directory + "/" + _AFLOWIN_, AflowIn)) {
       string message = "Could not find " + _AFLOWIN_ + " in " + directory;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_NOT_FOUND_);
     }
-    return ExtractPOSCARFromAFLOWIN(AflowIn, index);
+    return ExtractPOSCARStringStreamFromAFLOWIN(AflowIn, index);
   }
 
-  xstructure ExtractPOSCARFromDirectory(const string& directory, int iomode, int index) {
-    string function_name = "KBIN::ExtractPOSCARFromDirectory():";
+  xstructure ExtractPOSCARXStructureFromDirectory(const string& directory, int iomode, int index) {
+    string function_name = "KBIN::ExtractPOSCARXStructureFromDirectory():";
     string AflowIn;
     if(!aurostd::file2string(directory + "/" + _AFLOWIN_, AflowIn)) { 
       string message = "Could not find " + _AFLOWIN_ + " in " + directory;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_NOT_FOUND_);
     }
-    return ExtractPOSCARFromAFLOWIN(AflowIn, iomode, index);
+    return ExtractPOSCARXStructureFromAFLOWIN(AflowIn, iomode, index);
   }
 
-  stringstream ExtractPOSCARFromAFLOWIN(const string& AflowIn, int index) {
-    string function_name = "KBIN::ExtractPOSCARFromAFLOWIN():";
+  stringstream ExtractPOSCARStringStreamFromAFLOWIN(const string& AflowIn, int index) {
+    string function_name = "KBIN::ExtractPOSCARStringStreamFromAFLOWIN():";
     stringstream poscar;
     string POSCAR_START_tag="[VASP_POSCAR_MODE_EXPLICIT]START"; //no-period is important
     string POSCAR_STOP_tag="[VASP_POSCAR_MODE_EXPLICIT]STOP"; //no-period is important
@@ -8113,8 +8113,8 @@ namespace KBIN {
     return poscar;
   }
 
-  xstructure ExtractPOSCARFromAFLOWIN(const string& AflowIn, int iomode, int index) {
-    string function_name = "KBIN::ExtractPOSCARFromAFLOWIN():";
+  xstructure ExtractPOSCARXStructureFromAFLOWIN(const string& AflowIn, int iomode, int index) {
+    string function_name = "KBIN::ExtractPOSCARXStructureFromAFLOWIN():";
     stringstream poscar;
     string POSCAR_START_tag="[VASP_POSCAR_MODE_EXPLICIT]START"; //no-period is important
     string POSCAR_STOP_tag="[VASP_POSCAR_MODE_EXPLICIT]STOP"; //no-period is important
