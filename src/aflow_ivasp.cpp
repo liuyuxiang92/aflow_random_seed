@@ -8116,8 +8116,6 @@ namespace KBIN {
   xstructure ExtractPOSCARXStructureFromAFLOWIN(const string& AflowIn, int iomode, int index) {
     string function_name = "KBIN::ExtractPOSCARXStructureFromAFLOWIN():";
     stringstream poscar;
-    string POSCAR_START_tag="[VASP_POSCAR_MODE_EXPLICIT]START"; //no-period is important
-    string POSCAR_STOP_tag="[VASP_POSCAR_MODE_EXPLICIT]STOP"; //no-period is important
     if(index==0) {
       string message = "Index cannot be 0";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
