@@ -425,7 +425,7 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   // Check | polynomialCurveFit //SD20220422
   // ---------------------------------------------------------------------------
   check_function = "aurostd::polynomialCurveFit()";
-  check_description = "calculate the coefficients for a polynomial of degree n that fits the data";
+  check_description = "calculate the coefficients for a quintic polynomial that fits the data";
   xvector<double> xdata(10), ydata(10), wdata(10), pval(6);
   xdata(1) =  0.551878738140095; ydata(1) = -1.895746346279865; wdata(1) = 0.757740130578333;
   xdata(2) =  0.815194385592879; ydata(2) = -2.426516802630079; wdata(2) = 0.743132468124916;
