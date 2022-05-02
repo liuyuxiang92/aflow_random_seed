@@ -109,7 +109,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"APDC::DIRECTORY","--directory=","./");
     vpflow.args2addattachedscheme(argv,cmds,"APDC::PLATTICE","--plattice=","");
     vpflow.args2addattachedscheme(argv,cmds,"APDC::ELEMENTS","--elements=","");
-    vpflow.args2addattachedscheme(argv,cmds,"APDC::MAX_NUM_ATOMS","--max_num_atoms=|--maxnumatoms=|--mna=","");
+    vpflow.args2addattachedscheme(argv,cmds,"APDC::MAX_NUM_ATOMS","--max_num_atoms=|--mna=","");
     vpflow.args2addattachedscheme(argv,cmds,"APDC::CONC_CURVE","--conc_curve=","");
     vpflow.args2addattachedscheme(argv,cmds,"APDC::CONC_NPTS","--conc_npts=","");
     vpflow.args2addattachedscheme(argv,cmds,"APDC::TEMP_RANGE","--temp_range=","");

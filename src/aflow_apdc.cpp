@@ -114,6 +114,10 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
 // ***************************************************************************
 namespace apdc {
  void GetPhaseDiagram(const aurostd::xoption& vpflow) {
+    if (vpflow.flag("APDC::USAGE")) {
+      DisplayUsage(vpflow);
+      return;
+    }
     _apdc_data apdc_data;
     apdc_data.min_sleep = DEFAULT_APDC_MIN_SLEEP_SECONDS;
     apdc_data.aflow_max_num_atoms = DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS;
@@ -1065,6 +1069,38 @@ namespace apdc {
   }
 }
 
-
+// ***************************************************************************
+// apdc::DisplayUsage
+// ***************************************************************************
+namespace apdc {
+ void DisplayUsage(const aurostd::xoption& vpflow) {
+    vector<string> usage_options;
+    usage_options.push_back("aflow --phase_diagram|--phasediagram --plattice=fcc --elements=Au,Pt[,Zn] [apdc_options] [--directory=[DIRECTORY]]");
+    usage_options.push_back(" ");
+    usage_options.push_back("apdc_options");
+    usage_options.push_back(" ");
+    usage_options.push_back("GENERAL OPTIONS:");
+    usage_options.push_back("--usage");
+    usage_options.push_back("--screen_only");
+    usage_options.push_back("--no_plot|--noplot");
+    usage_options.push_back(" ");
+    usage_options.push_back("BINODAL OPTIONS:");
+    usage_options.push_back("--max_num_atoms=|--mna=8");
+    usage_options.push_back("--conc_curve=0,1,1,0");
+    usage_options.push_back("--conc_npts=20");
+    usage_options.push_back("--temp_range=300,2000");
+    usage_options.push_back("--temp_npts=100");
+    usage_options.push_back(" ");
+    usage_options.push_back("SPINODAL OPTIONS:");
+    usage_options.push_back("--spinodal");
+    usage_options.push_back(" ");
+    usage_options.push_back("FORMAT OPTIONS:");
+    usage_options.push_back("format_data=|--data_format=txt|json");
+    usage_options.push_back("format_plot=|--plot_format=png|pdf|latex");
+    usage_options.push_back(" ");
+    if (!vpflow.flag("APDC::SCREEN_ONLY")) {init::MessageOption("--usage", "APDC()", usage_options);}
+    return;
+ }
+}
 
 #endif
