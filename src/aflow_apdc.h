@@ -24,6 +24,7 @@ class _apdc_data {
     // Input data
     int num_threads;
     uint min_sleep;
+    string oformat;
     string workdirpath;
     string rootdirpath;
     string plattice;
@@ -65,9 +66,8 @@ class _apdc_data {
 
 // Namespace for functions used by APDC
 namespace apdc {
+  void GetPhaseDiagram(const aurostd::xoption& vpflow);
   void GetPhaseDiagram(_apdc_data& apdc_data);
-  void GetPhaseDiagram(const string& aflowin, bool command_line_call);
-  void GetPhaseDiagram(istream& infile);
   void ErrorChecks(_apdc_data& apdc_data);
   void GetSpinodalData(_apdc_data& apdc_data);
   void GetBinodalData(_apdc_data& apdc_data);

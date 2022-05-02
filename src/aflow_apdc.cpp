@@ -25,6 +25,7 @@ _apdc_data::_apdc_data() {
   // Input data
   num_threads = 0;
   min_sleep = 0;
+  oformat = "";
   workdirpath = "";
   rootdirpath = "";
   plattice = "";
@@ -71,6 +72,7 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
     // Input data
     num_threads = b.num_threads;
     min_sleep = b.min_sleep;
+    oformat = b.oformat;
     workdirpath = b.workdirpath;
     rootdirpath = b.rootdirpath;
     plattice = b.plattice;
@@ -109,6 +111,50 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
 // apdc::GetPhaseDiagram
 // ***************************************************************************
 namespace apdc {
+ void GetPhaseDiagram(const aurostd::xoption& vpflow) {
+    _apdc_data apdc_data;
+    apdc_data.min_sleep = DEFAULT_APDC_MIN_SLEEP_SECONDS;
+    apdc_data.aflow_max_num_atoms = DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS;
+    if (!vpflow.getattachedscheme("APDC::DIRECTORY").empty()) {
+      apdc_data.rootdirpath = vpflow.getattachedscheme("APDC::DIRECTORY");
+    }
+    else {
+      apdc_data.rootdirpath = aurostd::getPWD();
+    }
+    apdc_data.plattice = vpflow.getattachedscheme("APDC::PLATTICE");
+    if (!vpflow.getattachedscheme("APDC::ELEMENTS").empty()) {
+      aurostd::string2tokens(vpflow.getattachedscheme("APDC::ELEMENTS"), apdc_data.elements, ",");
+    }
+    if (!vpflow.getattachedscheme("APDC::MAX_NUM_ATOMS").empty()) {
+      apdc_data.max_num_atoms = aurostd::string2utype<int>(vpflow.getattachedscheme("APDC::MAX_NUM_ATOMS"));
+    }
+    else {
+      apdc_data.max_num_atoms = DEFAULT_APDC_MAX_NUM_ATOMS;
+    }
+    if (!vpflow.getattachedscheme("APDC::CONC_CURVE").empty()) {
+      aurostd::string2tokens(vpflow.getattachedscheme("APDC::CONC_CURVE"), apdc_data.conc_curve, ",");
+    }
+    if (!vpflow.getattachedscheme("APDC::CONC_NPTS").empty()) {
+      apdc_data.conc_npts = aurostd::string2utype<int>(vpflow.getattachedscheme("APDC::CONC_NPTS"));
+    }
+    else {
+      apdc_data.conc_npts = DEFAULT_APDC_CONC_NPTS;
+    }
+    if (!vpflow.getattachedscheme("APDC::TEMP_RANGE").empty()) {
+      aurostd::string2tokens(vpflow.getattachedscheme("APDC::TEMP_RANGE"), apdc_data.temp_range, ",");
+    }
+    else {
+      apdc_data.temp_range = {DEFAULT_APDC_TEMP_MIN, DEFAULT_APDC_TEMP_MAX};
+    }
+    if (!vpflow.getattachedscheme("APDC::TEMP_NPTS").empty()) {
+      apdc_data.temp_npts = aurostd::string2utype<int>(vpflow.getattachedscheme("APDC::TEMP_NPTS"));
+    }
+    else {
+      apdc_data.temp_npts = DEFAULT_APDC_TEMP_NPTS;
+    }
+    GetPhaseDiagram(apdc_data);
+ }
+
   void GetPhaseDiagram(_apdc_data& apdc_data) {
     // Clean-up input data and check for errors
     if (XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && !(XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX"))) {
@@ -124,39 +170,6 @@ namespace apdc {
     aurostd::DirectoryMake(apdc_data.rundirpath);
     GetBinodalData(apdc_data);
   }
-
- void GetPhaseDiagram(const string& aflowin, bool command_line_call) {
-    _apdc_data apdc_data;
-    if (command_line_call) {
-      // FORMAT: <plattice>:<element_1>,<element_2>,...<element_K>
-      vector<string> tokens;
-      aurostd::string2tokens(aflowin, tokens, ":");
-      if (tokens.empty()) {
-        string message = "Missing input";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
-      }
-      if (tokens.size() != 2) {
-        string message = "Invalid input, format is: <plattice>:<element_1>,<element_2>,...<element_K>";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
-      }
-      apdc_data.min_sleep = DEFAULT_APDC_MIN_SLEEP_SECONDS;
-      apdc_data.aflow_max_num_atoms = DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS;
-      apdc_data.max_num_atoms = DEFAULT_APDC_MAX_NUM_ATOMS;
-      apdc_data.rootdirpath = aurostd::getPWD();
-      apdc_data.plattice = tokens[0];
-      aurostd::string2tokens(tokens[1], apdc_data.elements, ",");
-      apdc_data.conc_npts = DEFAULT_APDC_CONC_NPTS;
-      //  aurostd::string2tokens(tokens[2], apdc_data.conc_curve, ",");
-      apdc_data.temp_npts = DEFAULT_APDC_TEMP_NPTS;
-      apdc_data.temp_range = {DEFAULT_APDC_TEMP_MIN, DEFAULT_APDC_TEMP_MAX};
-    }
-    else {
-      cerr<<aflowin<<endl;
-    }
-    GetPhaseDiagram(apdc_data);
- }
-
- void GetPhaseDiagram(istream& infile) {string aflowin; std::getline(infile, aflowin); GetPhaseDiagram(aflowin, false);}
 }
 
 // ***************************************************************************

@@ -100,9 +100,23 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   //DX20190206 - add AFLUX functionality to command line - END
   vpflow.flag("ANALYZEDB", aurostd::args2flag(argv,cmds,"--analyze_database"));  //ME20191001
 
-  //SD20220323 - APDC command line functionality - START
-  vpflow.args2addattachedscheme(argv,cmds,"APDC::CALC_PHASE_DIAGRAM","--calc_phase_diagram=|--calc_phasediagram=","");
-  //SD20220323 - APDC command line functionality - END
+  vpflow.flag("APDC::INIT", aurostd::args2flag(argv,cmds,"--phase_diagram|--phasediagram")); //SD20220323 - initiate phase diagram calculation
+  if(vpflow.flag("APDC::INIT")) {
+    vpflow.flag("APDC::USAGE", aurostd::args2flag(argv,cmds,"--usage"));
+    vpflow.flag("APDC::SPINODAL", aurostd::args2flag(argv,cmds,"--spinodal"));
+    vpflow.flag("APDC::SCREEN_ONLY", aurostd::args2flag(argv,cmds,"--screen_only"));
+    vpflow.flag("APDC::NO_PLOT", aurostd::args2flag(argv,cmds,"--no_plot|--noplot"));
+    vpflow.args2addattachedscheme(argv,cmds,"APDC::DIRECTORY","--directory=","./");
+    vpflow.args2addattachedscheme(argv,cmds,"APDC::PLATTICE","--plattice=","");
+    vpflow.args2addattachedscheme(argv,cmds,"APDC::ELEMENTS","--elements=","");
+    vpflow.args2addattachedscheme(argv,cmds,"APDC::MAX_NUM_ATOMS","--max_num_atoms=|--maxnumatoms=|--mna=","");
+    vpflow.args2addattachedscheme(argv,cmds,"APDC::CONC_CURVE","--conc_curve=","");
+    vpflow.args2addattachedscheme(argv,cmds,"APDC::CONC_NPTS","--conc_npts=","");
+    vpflow.args2addattachedscheme(argv,cmds,"APDC::TEMP_RANGE","--temp_range=","");
+    vpflow.args2addattachedscheme(argv,cmds,"APDC::TEMP_NPTS","--temp_npts=","");
+    vpflow.args2addattachedscheme(argv,cmds,"APDC::DATA_FORMAT","--data_format=","txt");
+    vpflow.args2addattachedscheme(argv,cmds,"APDC::PLOT_FORMAT","--plot_format=","png");
+  }
 
   // Commands for serializing bands and DOS data to JSON
   vpflow.args2addattachedscheme(argv,cmds,"DOSDATA2JSON","--dosdata2json=","./"); //EG
@@ -1730,8 +1744,7 @@ namespace pflow {
       if(vpflow.flag("AFLOWLIB_AURL2LOOP")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AURL2LOOP"),"AFLOWLIB_AURL2LOOP"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWSYM_PYTHON")){ SYM::writePythonScript(cout); _PROGRAMRUN=true;} //DX20210202
       if(vpflow.flag("AFLUX")) {cout << aflowlib::AFLUXCall(vpflow) << endl; _PROGRAMRUN=true;}  //DX20190206 - add AFLUX command line functionality
-      if(vpflow.flag("APDC::CALC_PHASE_DIAGRAM")) {apdc::GetPhaseDiagram(vpflow.getattachedscheme("APDC::CALC_PHASE_DIAGRAM"), true); _PROGRAMRUN=true;} //SD20220323
-      if(vpflow.flag("APDC::CALC_PHASE_DIAGRAM_TODO")) {apdc::GetPhaseDiagram(std::cin); _PROGRAMRUN=true;} //SD20220323 - CHANGE LATER
+      if(vpflow.flag("APDC::INIT")) {apdc::GetPhaseDiagram(vpflow); _PROGRAMRUN=true;} //SD20220323
       if(vpflow.flag("ATAT")) {cout << input2ATATxstr(cin); _PROGRAMRUN=true;} //SD20220123
       // B
       if(vpflow.flag("BANDGAP_WAHYU")) {AConvaspBandgap(argv); _PROGRAMRUN=true;}
@@ -2330,6 +2343,7 @@ namespace pflow {
     strstream << tab << x << " --aflowlib_aurl2auid=aurl1,aurl2.... [ --aurl2auid=..." << endl;
     strstream << tab << x << " --aflowlib_auid2loop=auid1,auid2....|--auid2loop=..." << endl;
     strstream << tab << x << " --aflowlib_aurl2loop=aurl1,aurl2.... [ --aurl2loop=..." << endl;
+    strstream << tab << x << " --atat < POSCAR" << endl;
     strstream << tab << x << " [options] --bader -D DIRECTORY" << endl;
     strstream << tab << xspaces << " " << "options are:  --usage" << endl;
     strstream << tab << xspaces << " " << "              --critical_points|--cp" << endl;
