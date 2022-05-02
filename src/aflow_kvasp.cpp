@@ -1446,7 +1446,7 @@ namespace KBIN {
     // [OBSOLETE] vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_START_STOP       =    aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_) &&  aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_STOP_);
     if(aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_) &&  aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_STOP_)) vflags.KBIN_VASP_POSCAR_MODE.push("EXPLICIT_START_STOP");
 
-    // [OBSOLETE] vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_START_P_STOP_POINT =    (aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_P_) && aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_STOP_P_)); //CO20200624
+    // [OBSOLETE] vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_START_STOP_POINT =    (aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_P_) && aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_STOP_P_)); //CO20200624
     if((aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_P_) && aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_STOP_P_))) vflags.KBIN_VASP_POSCAR_MODE.push("EXPLICIT_START_STOP_POINT");  //CO20200624
 
     if(vflags.KBIN_VASP_POSCAR_MODE.flag("EXPLICIT_START_STOP_POINT") && !kflags.KBIN_FROZSL) {  // NO FROZSL
@@ -1474,10 +1474,8 @@ namespace KBIN {
         if(LDEBUG) cerr << "DEBUG= " << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i) << endl;
       // load up the structures
       for(uint i=0;i<vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size();i++) {
-        string START=_VASP_POSCAR_MODE_EXPLICIT_START_; //SD20220501
-        string STOP=_VASP_POSCAR_MODE_EXPLICIT_STOP_; //SD20220501
-        START=_VASP_POSCAR_MODE_EXPLICIT_START_P_+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i); //CO20200624
-        STOP=_VASP_POSCAR_MODE_EXPLICIT_STOP_P_+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i); //CO20200624
+        string START=_VASP_POSCAR_MODE_EXPLICIT_START_P_+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i); //CO20200624
+        string STOP=_VASP_POSCAR_MODE_EXPLICIT_STOP_P_+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i); //CO20200624
         stringstream POSCAR;POSCAR.clear();POSCAR.str(std::string());
         if(aurostd::substring2bool(input_file.str(),START) && aurostd::substring2bool(input_file.str(),STOP))
           aurostd::ExtractToStringstreamEXPLICIT(input_file.str(),POSCAR,START,STOP);

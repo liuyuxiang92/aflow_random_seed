@@ -3600,7 +3600,7 @@ namespace aurostd {
   // *******************************************************************************************
   // SD20220301 - Extract the nth entry to stringstream, negative values go backwards, n==0 returns all entries
   bool ExtractNthToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword,const int index) {
-    // SD2020501 - Memory efficient version
+    // SD2020501 - Memory efficient version, we do not overload this function because we do not want to load the whole file to memory
     aurostd::StringstreamClean(StringstreamOUTPUT);
     string strline="";
     FileIN.clear();FileIN.seekg(0);
@@ -3739,9 +3739,7 @@ namespace aurostd {
   bool ExtractNthToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword,const int index) {
     stringstream StringstreamOUTPUT;
     if (ExtractNthToStringstreamEXPLICIT(FileIN,StringstreamOUTPUT,Keyword,index)) {
-      ofstream FileOUT(FileNameOUTPUT);
-      FileOUT << StringstreamOUTPUT.rdbuf();
-      FileOUT.close();
+      aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
       return TRUE;
     }
     return FALSE;
@@ -3750,9 +3748,7 @@ namespace aurostd {
   bool ExtractNthToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index) {
     stringstream StringstreamOUTPUT;
     if (ExtractNthToStringstreamEXPLICIT(FileIN,StringstreamOUTPUT,Keyword_start,Keyword_stop,index)) {
-      ofstream FileOUT(FileNameOUTPUT);
-      FileOUT << StringstreamOUTPUT.rdbuf();
-      FileOUT.close();
+      aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
       return TRUE;
     }
     return FALSE;
@@ -3761,9 +3757,7 @@ namespace aurostd {
   bool ExtractNthToFileEXPLICIT(stringstream& StringStreamIN,const string& FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop,int index) {
     stringstream StringstreamOUTPUT;
     if (ExtractNthToStringstreamEXPLICIT(StringStreamIN,StringstreamOUTPUT,Keyword_start,Keyword_stop,index)) {
-      ofstream FileOUT(FileNameOUTPUT);
-      FileOUT << StringstreamOUTPUT.rdbuf();
-      FileOUT.close();
+      aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
       return TRUE;
     }
     return FALSE;
@@ -3772,9 +3766,7 @@ namespace aurostd {
   bool ExtractNthToFileEXPLICIT(const string& StringIN,const string& FileNameOUTPUT,const string& Keyword,const int index) {
     stringstream StringstreamOUTPUT;
     if (ExtractNthToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword,index)) {
-      ofstream FileOUT(FileNameOUTPUT);
-      FileOUT << StringstreamOUTPUT.rdbuf();
-      FileOUT.close();
+      aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
       return TRUE;
     }
     return FALSE;
@@ -3783,9 +3775,7 @@ namespace aurostd {
   bool ExtractNthToFileEXPLICIT(const string& StringIN,const string& FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index) {
     stringstream StringstreamOUTPUT;
     if (ExtractNthToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start,Keyword_stop,index)) {
-      ofstream FileOUT(FileNameOUTPUT);
-      FileOUT << StringstreamOUTPUT.rdbuf();
-      FileOUT.close();
+      aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
       return TRUE;
     }
     return FALSE;
@@ -4104,33 +4094,6 @@ namespace aurostd {
   // *******************************************************************************************
   // *******************************************************************************************
 
-  bool ExtractJustAfterToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword_start) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    ofstream FileOUTPUT;
-    FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
-    string strline="";
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    bool status=FALSE;
-    while(getline(FileIN,strline)) {
-      if(status) FileOUTPUT << strline << endl;
-      if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
-    }
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-    return status;  // return FALSE if something got messed up
-  }
-
-  bool ExtractJustAfterToStringEXPLICIT(ifstream& FileIN,string& StringOUTPUT,const string& Keyword_start) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    string strline="";
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    bool status=FALSE;
-    while(getline(FileIN,strline)) {
-      if(status) StringOUTPUT=StringOUTPUT+strline+"\n";
-      if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
-    }
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    return status;  // return FALSE if something got messed up
-  }
-
   bool ExtractJustAfterToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword_start) {    // AFLOW_FUNCTION_IMPLEMENTATION
     aurostd::StringstreamClean(StringstreamOUTPUT);
     string strline="";
@@ -4162,11 +4125,56 @@ namespace aurostd {
     return status;  // return FALSE if something got messed up
   }
 
-  bool ExtractJustAfterToStringEXPLICIT(const string& StringIN,string& StringOUTPUT,const string& Keyword_start) {  // AFLOW_FUNCTION_IMPLEMENTATION
+  bool ExtractJustAfterToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword_start) {        // AFLOW_FUNCTION_IMPLEMENTATION
+    //[SD20220502 - OBSOLETE]ofstream FileOUTPUT;
+    //[SD20220502 - OBSOLETE]FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
+    //[SD20220502 - OBSOLETE]string strline="";
+    //[SD20220502 - OBSOLETE]FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+    //[SD20220502 - OBSOLETE]bool status=FALSE;
+    //[SD20220502 - OBSOLETE]while(getline(FileIN,strline)) {
+    //[SD20220502 - OBSOLETE]  if(status) FileOUTPUT << strline << endl;
+    //[SD20220502 - OBSOLETE]  if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
+    //[SD20220502 - OBSOLETE]}
+    //[SD20220502 - OBSOLETE]FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+    //[SD20220502 - OBSOLETE]FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
+    //[SD20220502 - OBSOLETE]return status;  // return FALSE if something got messed up
     stringstream StringstreamOUTPUT;
-    bool out=ExtractJustAfterToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start);
-    StringOUTPUT=StringstreamOUTPUT.str();
-    return out;  // return FALSE if something got messed up
+    if(ExtractJustAfterToStringstreamEXPLICIT(FileIN,StringstreamOUTPUT,Keyword_start)) {
+      aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  bool ExtractJustAfterToStringEXPLICIT(ifstream& FileIN,string& StringOUTPUT,const string& Keyword_start) {        // AFLOW_FUNCTION_IMPLEMENTATION
+    //[SD20220502 - OBSOLETE]string strline="";
+    //[SD20220502 - OBSOLETE]FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+    //[SD20220502 - OBSOLETE]bool status=FALSE;
+    //[SD20220502 - OBSOLETE]while(getline(FileIN,strline)) {
+    //[SD20220502 - OBSOLETE]  if(status) StringOUTPUT=StringOUTPUT+strline+"\n";
+    //[SD20220502 - OBSOLETE]  if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
+    //[SD20220502 - OBSOLETE]}
+    //[SD20220502 - OBSOLETE]FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+    //[SD20220502 - OBSOLETE]return status;  // return FALSE if something got messed up
+    stringstream StringstreamOUTPUT;
+    if(ExtractJustAfterToStringstreamEXPLICIT(FileIN,StringstreamOUTPUT,Keyword_start)) {
+      StringOUTPUT=StringstreamOUTPUT.str();
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  bool ExtractJustAfterToStringEXPLICIT(const string& StringIN,string& StringOUTPUT,const string& Keyword_start) {  // AFLOW_FUNCTION_IMPLEMENTATION
+    //[SD20220502 - OBSOLETE]stringstream StringstreamOUTPUT;
+    //[SD20220502 - OBSOLETE]bool out=ExtractJustAfterToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start);
+    //[SD20220502 - OBSOLETE]StringOUTPUT=StringstreamOUTPUT.str();
+    //[SD20220501 - OBSOLETE]return out;  // return FALSE if something got messed up
+    stringstream StringstreamOUTPUT;
+    if(ExtractJustAfterToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start)) {
+      StringOUTPUT=StringstreamOUTPUT.str();
+      return TRUE;
+    }
+    return FALSE;
   }
 
   // ***************************************************************************

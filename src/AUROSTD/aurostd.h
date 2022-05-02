@@ -629,11 +629,11 @@ namespace aurostd {
   bool ExtractLastToStringstreamEXPLICIT(stringstream& StringStreamIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop);
   bool ExtractLastToStringstreamEXPLICIT(const string& StringIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop);
   // take just after
-  bool ExtractJustAfterToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword_start);
-  bool ExtractJustAfterToStringEXPLICIT(ifstream& FileIN,string& StringOUTPUT,const string& Keyword_start);
   bool ExtractJustAfterToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword_start);
   bool ExtractJustAfterToStringstreamEXPLICIT(stringstream& StringStreamIN,stringstream& StringstreamOUTPUT,const string& Keyword_start);
   bool ExtractJustAfterToStringstreamEXPLICIT(const string& StringIN,stringstream& StringstreamOUTPUT,const string& Keyword_start);
+  bool ExtractJustAfterToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword_start);
+  bool ExtractJustAfterToStringEXPLICIT(ifstream& FileIN,string& StringOUTPUT,const string& Keyword_start);
   bool ExtractJustAfterToStringEXPLICIT(const string& StringIN,string& StringOUTPUT,const string& Keyword_start);
   // about taking in istreams and stringstream and strings
   uint stream2vectorstring(std::istream& istreamIN,vector<string> &vstringout);
