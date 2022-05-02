@@ -24,7 +24,8 @@ class _apdc_data {
     // Input data
     int num_threads;
     uint min_sleep;
-    string oformat;
+    string format_data;
+    string format_plot;
     string workdirpath;
     string rootdirpath;
     string plattice;

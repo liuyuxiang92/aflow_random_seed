@@ -25,7 +25,8 @@ _apdc_data::_apdc_data() {
   // Input data
   num_threads = 0;
   min_sleep = 0;
-  oformat = "";
+  format_data = "";
+  format_plot = "";
   workdirpath = "";
   rootdirpath = "";
   plattice = "";
@@ -72,7 +73,8 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
     // Input data
     num_threads = b.num_threads;
     min_sleep = b.min_sleep;
-    oformat = b.oformat;
+    format_data = b.format_data;
+    format_plot = b.format_plot;
     workdirpath = b.workdirpath;
     rootdirpath = b.rootdirpath;
     plattice = b.plattice;

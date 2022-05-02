@@ -114,8 +114,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"APDC::CONC_NPTS","--conc_npts=","");
     vpflow.args2addattachedscheme(argv,cmds,"APDC::TEMP_RANGE","--temp_range=","");
     vpflow.args2addattachedscheme(argv,cmds,"APDC::TEMP_NPTS","--temp_npts=","");
-    vpflow.args2addattachedscheme(argv,cmds,"APDC::DATA_FORMAT","--data_format=","txt");
-    vpflow.args2addattachedscheme(argv,cmds,"APDC::PLOT_FORMAT","--plot_format=","png");
+    vpflow.args2addattachedscheme(argv,cmds,"APDC::FORMAT_DATA","format_data=|--data_format=","txt");
+    vpflow.args2addattachedscheme(argv,cmds,"APDC::FORMAT_PLOT","format_plot=|--plot_format=","png");
   }
 
   // Commands for serializing bands and DOS data to JSON
