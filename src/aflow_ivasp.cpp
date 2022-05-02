@@ -1399,10 +1399,10 @@ namespace KBIN {
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         // normal get ONE of ONE
         if(vflags.KBIN_VASP_POSCAR_MODE.flag("EXPLICIT_START_STOP")) {
-          if(aurostd::substring2bool(AflowIn,"[VASP_POSCAR_MODE_EXPLICIT]START") &&
-              aurostd::substring2bool(AflowIn,"[VASP_POSCAR_MODE_EXPLICIT]STOP"))
-            // [OBSOLETE]	  aurostd::ExtractLastToStringstreamEXPLICIT(FileAFLOWIN,xvasp.POSCAR,"[VASP_POSCAR_MODE_EXPLICIT]START","[VASP_POSCAR_MODE_EXPLICIT]STOP");
-            aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,xvasp.POSCAR,"[VASP_POSCAR_MODE_EXPLICIT]START","[VASP_POSCAR_MODE_EXPLICIT]STOP");
+          if(aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_) &&
+              aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_STOP_))
+            // [OBSOLETE]	  aurostd::ExtractLastToStringstreamEXPLICIT(FileAFLOWIN,xvasp.POSCAR,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_);
+            aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,xvasp.POSCAR,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_);
           xvasp.str=xstructure(xvasp.POSCAR,IOVASP_AUTO);   // load structure
         }
         // get ONE of MANY
@@ -1436,7 +1436,7 @@ namespace KBIN {
         aus << "----------------------------------------------------------------------------------------------------" << endl;
         aus << "[AFLOW] POSCAR EXPLICIT MODE with START/STOP" << endl;
         aus << "[VASP_POSCAR_MODE_EXPLICIT]" << endl;
-        aus << "[VASP_POSCAR_MODE_EXPLICIT]START" << endl;
+        aus << _VASP_POSCAR_MODE_EXPLICIT_START_ << endl;
         aus << "POSCAR of the structure example with START/STOP" << endl;
         aus << "-98.5397" << endl;
         aus << "   4.18890 0.00000 0.00000" << endl;
@@ -1450,7 +1450,7 @@ namespace KBIN {
         aus << "0.00000 0.00000 0.50000 Ti" << endl;
         aus << "0.33333 0.66666 0.75000 Ti" << endl;
         aus << "0.66666 0.33333 0.25000 Ti" << endl;
-        aus << "[VASP_POSCAR_MODE_EXPLICIT]STOP" << endl;
+        aus << _VASP_POSCAR_MODE_EXPLICIT_STOP_ << endl;
         aus << "[AFLOW]" << endl;
         aus << "----------------------------------------------------------------------------------------------------" << endl;
         aus << "EEEEE  [VASP_POSCAR_MODE_EXPLICIT] Note " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
@@ -8100,13 +8100,11 @@ namespace KBIN {
   stringstream ExtractPOSCARStringStreamFromAFLOWIN(const string& AflowIn, int index) {
     string function_name = "KBIN::ExtractPOSCARStringStreamFromAFLOWIN():";
     stringstream poscar;
-    string POSCAR_START_tag="[VASP_POSCAR_MODE_EXPLICIT]START"; //no-period is important
-    string POSCAR_STOP_tag="[VASP_POSCAR_MODE_EXPLICIT]STOP"; //no-period is important
     if(index==0) {
       string message = "Index cannot be 0";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
     }
-    if(!aurostd::ExtractNthToStringstreamEXPLICIT(AflowIn, poscar, POSCAR_START_tag, POSCAR_STOP_tag, index)) {
+    if(!aurostd::ExtractNthToStringstreamEXPLICIT(AflowIn, poscar, _VASP_POSCAR_MODE_EXPLICIT_START_, _VASP_POSCAR_MODE_EXPLICIT_STOP_, index)) {
       string message = "Invalid " + _AFLOWIN_;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_WRONG_FORMAT_);
     }

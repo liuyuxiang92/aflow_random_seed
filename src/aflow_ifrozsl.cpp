@@ -51,10 +51,8 @@ namespace KBIN {
       if(LDEBUG) cerr << "DEBUG= " << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i) << endl;
     // load up the structures
     for(uint i=0;i<vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size();i++) {
-      string START="[VASP_POSCAR_MODE_EXPLICIT]START";
-      string STOP="[VASP_POSCAR_MODE_EXPLICIT]STOP";
-      START=_VASP_POSCAR_MODE_EXPLICIT_START_P_+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i); //CO20200624
-      STOP=_VASP_POSCAR_MODE_EXPLICIT_STOP_P_+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i); //CO20200624
+      string START=_VASP_POSCAR_MODE_EXPLICIT_START_P_+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i); //CO20200624
+      string STOP=_VASP_POSCAR_MODE_EXPLICIT_STOP_P_+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i); //CO20200624
       stringstream POSCAR;POSCAR.clear();POSCAR.str(std::string());
       if(aurostd::substring2bool(input_file,START) && aurostd::substring2bool(input_file,STOP))
         aurostd::ExtractToStringstreamEXPLICIT(input_file,POSCAR,START,STOP);

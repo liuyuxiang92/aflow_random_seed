@@ -3608,7 +3608,6 @@ namespace aurostd {
     while(getline(FileIN,strline)) {
       if(aurostd::substring2bool(strline,Keyword)) {
         tokens.push_back(strline.substr(strline.find(Keyword)+Keyword.length()));
-        StringstreamOUTPUT << strline.substr(strline.find(Keyword)+Keyword.length()) << endl;
       }
     }
     FileIN.clear();FileIN.seekg(0);

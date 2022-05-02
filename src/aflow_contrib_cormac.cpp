@@ -158,15 +158,13 @@ namespace pflow {
     }
     // Determines number of atoms in unit cell by reading POSCAR part of _AFLOWIN_ file if it exists
     if(aurostd::FileExist(_AFLOWIN_)) {
-      string START = "[VASP_POSCAR_MODE_EXPLICIT]START";
-      string STOP = "[VASP_POSCAR_MODE_EXPLICIT]STOP";
       stringstream iafile;
       iafile.clear(); iafile.str(std::string());
       aurostd::file2stringstream(_AFLOWIN_, iafile);    
-      if(aurostd::substring2bool(iafile.str(),START) && aurostd::substring2bool(iafile.str(),STOP)) {
+      if(aurostd::substring2bool(iafile.str(),_VASP_POSCAR_MODE_EXPLICIT_START_) && aurostd::substring2bool(iafile.str(),_VASP_POSCAR_MODE_EXPLICIT_STOP_)) {
         stringstream POSCAR;
         POSCAR.clear();   POSCAR.str(std::string());
-        aurostd::ExtractToStringstreamEXPLICIT(iafile.str(),POSCAR,START,STOP);
+        aurostd::ExtractToStringstreamEXPLICIT(iafile.str(),POSCAR,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_);
         xstructure xstr = xstructure(POSCAR, IOVASP_AUTO);
         int ntypes = xstr.num_each_type.size();
         natoms = 0;

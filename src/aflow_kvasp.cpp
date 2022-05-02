@@ -1443,8 +1443,8 @@ namespace KBIN {
     // [OBSOLETE] vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT                  =    aurostd::substring2bool(AflowIn,"[VASP_POSCAR_MODE_EXPLICIT]");
     if(aurostd::substring2bool(AflowIn,"[VASP_POSCAR_MODE_EXPLICIT]")) vflags.KBIN_VASP_POSCAR_MODE.push("EXPLICIT");
 
-    // [OBSOLETE] vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_START_P_STOP       =    aurostd::substring2bool(AflowIn,"[VASP_POSCAR_MODE_EXPLICIT]START") &&  aurostd::substring2bool(AflowIn,"[VASP_POSCAR_MODE_EXPLICIT]STOP");
-    if(aurostd::substring2bool(AflowIn,"[VASP_POSCAR_MODE_EXPLICIT]START") &&  aurostd::substring2bool(AflowIn,"[VASP_POSCAR_MODE_EXPLICIT]STOP")) vflags.KBIN_VASP_POSCAR_MODE.push("EXPLICIT_START_STOP");
+    // [OBSOLETE] vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_START_STOP       =    aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_) &&  aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_STOP_);
+    if(aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_) &&  aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_STOP_)) vflags.KBIN_VASP_POSCAR_MODE.push("EXPLICIT_START_STOP");
 
     // [OBSOLETE] vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_START_P_STOP_POINT =    (aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_P_) && aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_STOP_P_)); //CO20200624
     if((aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_P_) && aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_STOP_P_))) vflags.KBIN_VASP_POSCAR_MODE.push("EXPLICIT_START_STOP_POINT");  //CO20200624
@@ -5045,9 +5045,9 @@ namespace KBIN {
       aus << "[AFLOW] SELF-MODIFICATION" << endl;
       aus << "[AFLOW] Recycling CONTCAR of " << ext << endl;
       aus << AFLOWIN_SEPARATION_LINE << endl;
-      aus << "[VASP_POSCAR_MODE_EXPLICIT]START" << endl;
+      aus << _VASP_POSCAR_MODE_EXPLICIT_START_ << endl;
       aus << xstr;
-      aus << "[VASP_POSCAR_MODE_EXPLICIT]STOP" << endl;
+      aus << _VASP_POSCAR_MODE_EXPLICIT_STOP_ << endl;
       aus << AFLOWIN_SEPARATION_LINE << endl;
       KBIN::AFLOWIN_ADD(aflowin,aus,"");
       KBIN::AFLOWIN_REMOVE(aflowin,"[VASP_FORCE_OPTION]VOLUME",operation); //CO20210315
