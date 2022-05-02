@@ -3617,7 +3617,7 @@ namespace aurostd {
         for(uint i=0;i<tokens.size();i++) StringstreamOUTPUT << tokens[i] << endl;
       }
       else {
-        uint i=aurostd::ConvertNegativeIndex(index,tokens.size());
+        uint i=(uint)aurostd::boundary_conditions_periodic(1,tokens.size(),index<0?index:index-1);
         StringstreamOUTPUT << tokens[i] << endl;
       }
       return TRUE;
@@ -3627,9 +3627,10 @@ namespace aurostd {
 
   bool ExtractNthToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index) {
     aurostd::StringstreamClean(StringstreamOUTPUT);
-    string stringIN="";
-    aurostd::file2string(FileIN,stringIN);
-    ExtractNthToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start,Keyword_stop,index);
+    StringstreamOUTPUT << FileIN.rdbuf();
+    string StringIN=StringstreamOUTPUT.str();
+    aurostd::StringstreamClean(StringstreamOUTPUT);
+    return ExtractNthToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start,Keyword_stop,index);
   }
 
   bool ExtractNthToStringstreamEXPLICIT(stringstream& StringStreamIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index) {
