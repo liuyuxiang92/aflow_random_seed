@@ -1077,7 +1077,7 @@ namespace apdc {
     vector<string> usage_options;
     usage_options.push_back("aflow --phase_diagram|--phasediagram --plattice=fcc --elements=Au,Pt[,Zn] [apdc_options] [--directory=[DIRECTORY]]");
     usage_options.push_back(" ");
-    usage_options.push_back("apdc_options");
+    usage_options.push_back("apdc_options:");
     usage_options.push_back(" ");
     usage_options.push_back("GENERAL OPTIONS:");
     usage_options.push_back("--usage");
