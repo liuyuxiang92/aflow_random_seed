@@ -423,6 +423,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE::MISFIT_MATCH","--misfit_match=",""); //DX20201118
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE::MISFIT_FAMILY","--misfit_family=",""); //DX20201118
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE::NP","--np=|--num_proc=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE::PAGE_SIZE","--page_size=","");  //ME20220426 - page size for AFLUX
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE::MAGNETIC","--mag=|--magnetic=|--magmom=|--magmoms=|--magnetic_moment=|--magnetic_moments=",""); //DX20170803
     // booleans
     vpflow.flag("COMPARE::USAGE",aurostd::args2flag(argv,cmds,"--usage"));

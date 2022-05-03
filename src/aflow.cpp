@@ -518,7 +518,7 @@ int main(int _argc,char **_argv) {
     } else if(XHOST.vflag_control.flag("README_APL"))  {
       banner_message << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
     } else if(XHOST.vflag_control.flag("README_QHA"))  {
-      banner_message << init::InitGlobalObject("README_AFLOW_QHA_SCQHA_QHA3P_TXT") << endl;
+      banner_message << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
     } else if(XHOST.vflag_control.flag("README_AAPL"))  {
       banner_message << init::InitGlobalObject("README_AFLOW_APL_TXT") << endl;
     } else if(XHOST.vflag_control.flag("README_AGL"))  {
