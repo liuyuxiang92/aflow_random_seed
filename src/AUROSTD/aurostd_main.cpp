@@ -3601,46 +3601,89 @@ namespace aurostd {
   // SD20220301 - Extract the nth entry to stringstream, negative values go backwards, n==0 returns all entries
   bool ExtractNthToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword,const int index) {
     // SD2020501 - Memory efficient version, we do not overload this function because we do not want to load the whole file to memory
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    if(LDEBUG) cerr << "LDEBUG: " << __AFLOW_FUNC__ << endl;
     aurostd::StringstreamClean(StringstreamOUTPUT);
     string strline="";
     FileIN.clear();FileIN.seekg(0);
     vector<string> tokens;
-    while(getline(FileIN,strline)) {
+    int iter=0;
+    while(getline(FileIN,strline) && (index==0 || iter!=index)) {
       if(aurostd::substring2bool(strline,Keyword)) {
         tokens.push_back(strline.substr(strline.find(Keyword)+Keyword.length()));
+        iter++;
       }
     }
     FileIN.clear();FileIN.seekg(0);
     if(tokens.size()>0) {
       if(index==0) {
-        for(uint i=0;i<tokens.size();i++) StringstreamOUTPUT << tokens[i] << endl;
+        for(uint i=0;i<tokens.size();i++) {StringstreamOUTPUT << tokens[i] << endl;}
       }
-      else {
-        uint i=(uint)aurostd::boundary_conditions_periodic(1,tokens.size(),index<0?index:index-1);
+      else if(index>0) {
+        StringstreamOUTPUT << tokens[tokens.size()-1] << endl;
+      }
+      else if(index<0) {
+        uint i=(uint)aurostd::boundary_conditions_periodic(0,tokens.size()-1,index);
         StringstreamOUTPUT << tokens[i] << endl;
       }
+      if(LDEBUG) cerr << "StringstreamOUTPUT.str()= " << endl << StringstreamOUTPUT.str() << endl;
       return TRUE;
     }
     return FALSE;
   }
 
   bool ExtractNthToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index) {
+    // SD2020501 - Memory efficient version, we do not overload this function because we do not want to load the whole file to memory
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    if(LDEBUG) cerr << "LDEBUG: " << __AFLOW_FUNC__ << endl;
     aurostd::StringstreamClean(StringstreamOUTPUT);
-    StringstreamOUTPUT << FileIN.rdbuf();
-    string StringIN=StringstreamOUTPUT.str();
-    aurostd::StringstreamClean(StringstreamOUTPUT);
-    return ExtractNthToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start,Keyword_stop,index);
+    string strline="";
+    FileIN.clear();FileIN.seekg(0);
+    vector<string> vlines,tokens;
+    bool read=FALSE;
+    int iter=0;
+    while(getline(FileIN,strline) && (index==0 || iter!=index)) {
+      if(read==FALSE && aurostd::substring2bool(strline,Keyword_start)) {
+        vlines.push_back(strline.substr(strline.find(Keyword_start)+Keyword_start.length()));
+        read=TRUE;
+      }
+      else if(read==TRUE && aurostd::substring2bool(strline,Keyword_stop)) {
+        vlines.push_back(strline.substr(0,strline.find(Keyword_stop)));
+        read=FALSE;
+        tokens.push_back(aurostd::vectorstring2string(vlines));
+        vlines.clear();
+        iter++;
+      }
+      else if(read) {
+        vlines.push_back(strline);
+      }
+    }
+    FileIN.clear();FileIN.seekg(0);
+    if(tokens.size()>0) {
+      if(index==0) {
+        for(uint i=0;i<tokens.size();i++) {StringstreamOUTPUT << tokens[i] << endl;}
+      }
+      else if(index>0) {
+        StringstreamOUTPUT << tokens[tokens.size()-1] << endl;
+      }
+      else if(index<0) {
+        uint i=(uint)aurostd::boundary_conditions_periodic(0,tokens.size()-1,index);
+        StringstreamOUTPUT << tokens[i] << endl;
+      }
+      if(LDEBUG) cerr << "StringstreamOUTPUT.str()= " << endl << StringstreamOUTPUT.str() << endl;
+      return TRUE;
+    }    
+    return FALSE;
   }
 
   bool ExtractNthToStringstreamEXPLICIT(stringstream& StringStreamIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index) {
-    aurostd::StringstreamClean(StringstreamOUTPUT);
     string StringIN=StringStreamIN.str();
     return ExtractNthToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start,Keyword_stop,index);
   }
 
   bool ExtractNthToStringstreamEXPLICIT(const string& StringIN,stringstream& StringstreamOUTPUT,const string& Keyword, const int index) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "LDEBUG: ExtractNthToStringstreamEXPLICIT" << endl;
+    if(LDEBUG) cerr << "LDEBUG: " << __AFLOW_FUNC__ << endl;
     aurostd::StringstreamClean(StringstreamOUTPUT);
     vector<string> tokens;
     aurostd::string2vectorstring(StringIN,tokens);
@@ -3652,7 +3695,7 @@ namespace aurostd {
           if(index==iter) {StringstreamOUTPUT << tokens[i] << endl;break;}
         }
       }
-      if(LDEBUG) cerr << "LDEBUG: " << StringstreamOUTPUT.str() << endl;
+      if(LDEBUG) cerr << "StringstreamOUTPUT.str()= " << endl << StringstreamOUTPUT.str() << endl;
       return TRUE;
     }
     else if(index<0) {
@@ -3662,7 +3705,7 @@ namespace aurostd {
           if(index==iter) {StringstreamOUTPUT << tokens[i] << endl;break;}
         }
       }
-      if(LDEBUG) cerr << "LDEBUG: " << StringstreamOUTPUT.str() << endl;
+      if(LDEBUG) cerr << "StringstreamOUTPUT.str()= " << endl << StringstreamOUTPUT.str() << endl;
       return TRUE;
     }
     else {
@@ -3671,7 +3714,7 @@ namespace aurostd {
           StringstreamOUTPUT << tokens[i] << endl;
         }
       }
-      if(LDEBUG) cerr << "LDEBUG: " << StringstreamOUTPUT.str() << endl;
+      if(LDEBUG) cerr << "StringstreamOUTPUT.str()= " << endl << StringstreamOUTPUT.str() << endl;
       return TRUE;
     }
     return FALSE;
@@ -3729,7 +3772,7 @@ namespace aurostd {
         for(uint i=0;i<vstart.size();i++) {
           for(uint j=vstart[i];j<=vstop[i];j++) StringstreamOUTPUT << tokens[j] << endl;
         }
-      if(LDEBUG) cerr << "LDEBUG: " << StringstreamOUTPUT.str() << endl;
+      if(LDEBUG) cerr << "StringstreamOUTPUT.str()= " << endl << StringstreamOUTPUT.str() << endl;
       return TRUE;
     }
     return FALSE;
@@ -4055,7 +4098,7 @@ namespace aurostd {
     //[SD20220501 - OBSOLETE]if(LDEBUG) cerr << "LDEBUG: " << istart << " " << istop << endl;
     //[SD20220501 - OBSOLETE]if(istart>0 && istop>0) {
     //[SD20220501 - OBSOLETE]  for(int i=istart;i<=istop;i++) StringstreamOUTPUT << tokens[i] << endl;
-    //[SD20220501 - OBSOLETE]  if(LDEBUG) cerr << "LDEBUG: " << StringstreamOUTPUT.str() << endl;
+    //[SD20220501 - OBSOLETE]  if(LDEBUG) cerr << "StringstreamOUTPUT.str()= " << endl << StringstreamOUTPUT.str() << endl;
     //[SD20220501 - OBSOLETE]  return TRUE;
     //[SD20220501 - OBSOLETE]}
     //[SD20220501 - OBSOLETE]return FALSE;
@@ -4084,7 +4127,7 @@ namespace aurostd {
     //[SD20220501 - OBSOLETE]if(LDEBUG) cerr << "LDEBUG: " << istart << " " << istop << endl;
     //[SD20220501 - OBSOLETE]if(istart>0 && istop>0) {
     //[SD20220501 - OBSOLETE]  for(int i=istart;i<=istop;i++) StringstreamOUTPUT << tokens[i] << endl;
-    //[SD20220501 - OBSOLETE]  if(LDEBUG) cerr << "LDEBUG: " << StringstreamOUTPUT.str() << endl;
+    //[SD20220501 - OBSOLETE]  if(LDEBUG) cerr << "StringstreamOUTPUT.str()= " << endl << StringstreamOUTPUT.str() << endl;
     //[SD20220501 - OBSOLETE]  return TRUE;
     //[SD20220501 - OBSOLETE]}
     //[SD20220501 - OBSOLETE]return FALSE;
