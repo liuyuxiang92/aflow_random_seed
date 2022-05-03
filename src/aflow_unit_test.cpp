@@ -127,11 +127,12 @@ namespace unittest {
     test_functions["proto"] = xchk;
 
     // ovasp
-    xchk = initializeXCheck();
-    xchk.func = std::bind(&UnitTest::xoutcarTest, this, _1, _2, _3);
-    xchk.function_name= "xoutcarTest():";
-    xchk.task_description = "xOUTCAR class";
-    test_functions["outcar"] = xchk;
+    //Not working yet because we cannot load OUTCARs via the RestAPI
+    //xchk = initializeXCheck();
+    //xchk.func = std::bind(&UnitTest::xoutcarTest, this, _1, _2, _3);
+    //xchk.function_name= "xoutcarTest():";
+    //xchk.task_description = "xOUTCAR class";
+    //test_functions["outcar"] = xchk;
   }
 
   xcheck UnitTest::initializeXCheck() {
@@ -164,7 +165,7 @@ namespace unittest {
     test_groups["database"] = {"schema"};
     test_groups["structure"] = {"atomic_environment", "xstructure", "xstructure_parser"};
     test_groups["structure_gen"] = {"ceramgen", "proto"};
-    test_groups["ovasp"] = {"outcar"};
+    //test_groups["ovasp"] = {"outcar"};
 
     for (std::map<string, vector<string> >::iterator it = test_groups.begin(); it != test_groups.end(); ++it) {
       const vector<string>& members = (*it).second;
@@ -227,7 +228,6 @@ namespace unittest {
     string whitelist_str = "unittest::UnitTest::runUnitTest():,unittest::UnitTest::displayResult():";
     vector<string> whitelist;
     aurostd::string2tokens(whitelist_str, whitelist, ",");
-    std::cout << aurostd::joinWDelimiter(XHOST.LOGGER_WHITELIST, ",") << std::endl;
     if (!XHOST.QUIET) {
       XHOST.QUIET = true;
       for (uint i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.push_back(whitelist[i]);
@@ -785,8 +785,8 @@ namespace unittest {
     check_function = "aurostd::getEHermite()";
     check_description = "calculate elementary Hermite transformation";
     expected_xmatint = xmatrix<int>(2, 2);
-    calculated_xmatint[1][1] =   5; calculated_xmatint[1][2] = -2;
-    calculated_xmatint[2][1] = -12; calculated_xmatint[2][2] =  5;
+    expected_xmatint[1][1] =   5; expected_xmatint[1][2] = -2;
+    expected_xmatint[2][1] = -12; expected_xmatint[2][2] =  5;
     calculated_xmatint = xmatrix<int>(2, 2);
     aurostd::getEHermite(5, 12, calculated_xmatint);
     checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
@@ -1663,7 +1663,7 @@ namespace unittest {
 
     // Get number of all protoypes + parameter sets
     uint expected_uint = 0;
-    for (uint i = 0; num_protos; i++) {
+    for (uint i = 0; i < num_protos; i++) {
       expected_uint += anrl::getANRLParameters(prototype_labels[i], "all").size();
     }
 
