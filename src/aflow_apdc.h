@@ -26,6 +26,7 @@ class _apdc_data {
     uint min_sleep;
     string format_data;
     string format_plot;
+    bool image_only;
     string workdirpath;
     string rootdirpath;
     string plattice;
@@ -95,6 +96,8 @@ namespace apdc {
   vector<int> GetMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads);
   void DisplayUsage(void);
   void PrintData(const _apdc_data& apdc_data);
+  void PlotData(const _apdc_data& apdc_data);
+  void PlotData(const string& rundirpath);
 }
 
 #endif

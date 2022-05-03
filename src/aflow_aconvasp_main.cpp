@@ -105,6 +105,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("APDC::USAGE", aurostd::args2flag(argv,cmds,"--usage"));
     vpflow.flag("APDC::SPINODAL", aurostd::args2flag(argv,cmds,"--spinodal"));
     vpflow.flag("APDC::SCREEN_ONLY", aurostd::args2flag(argv,cmds,"--screen_only"));
+    vpflow.flag("APDC::IMAGE_ONLY", aurostd::args2flag(argv,cmds,"--image_only|--image"));
     vpflow.flag("APDC::NO_PLOT", aurostd::args2flag(argv,cmds,"--no_plot|--noplot"));
     vpflow.args2addattachedscheme(argv,cmds,"APDC::DIRECTORY","--directory=","./");
     vpflow.args2addattachedscheme(argv,cmds,"APDC::PLATTICE","--plattice=","");
@@ -115,7 +116,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"APDC::TEMP_RANGE","--temp_range=","");
     vpflow.args2addattachedscheme(argv,cmds,"APDC::TEMP_NPTS","--temp_npts=","");
     vpflow.args2addattachedscheme(argv,cmds,"APDC::FORMAT_DATA","format_data=|--data_format=","txt");
-    vpflow.args2addattachedscheme(argv,cmds,"APDC::FORMAT_PLOT","format_plot=|--plot_format=","png");
+    vpflow.args2addattachedscheme(argv,cmds,"APDC::FORMAT_PLOT","format_plot=|--plot_format=","pdf");
   }
 
   // Commands for serializing bands and DOS data to JSON
