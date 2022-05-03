@@ -3068,7 +3068,9 @@ namespace aurostd {
     }
     if(message_parts.size()==0){return;}
 
-    bool verbose=(!XHOST.QUIET && !quiet && osswrite);
+    //ME20220503 - XHOST.QUIET should be part of quiet to allow for whitelisting
+    //bool verbose=(!XHOST.QUIET && !quiet && osswrite);
+    bool verbose=(!quiet && osswrite);
     bool fancy_print=(!XHOST.vflag_control.flag("WWW")&&!XHOST.vflag_control.flag("NO_FANCY_PRINT"));  //CO20200404 - new web flag
 
     FILE* fstr=stdout;
@@ -3168,7 +3170,9 @@ namespace aurostd {
     }
     if(message_parts.size()==0){return;}
 
-    bool verbose=(!XHOST.QUIET && !quiet && osswrite);  //[CO2010315 - not always, removing for OUTCARs read during vasp runs]verbose=true; //ALWAYS!
+    //ME20220503 - XHOST.QUIET should be part of quiet to allow for whitelisting
+    //bool verbose=(!XHOST.QUIET && !quiet && osswrite);  //[CO2010315 - not always, removing for OUTCARs read during vasp runs]verbose=true; //ALWAYS!
+    bool verbose=(!quiet && osswrite);
     bool fancy_print=(!XHOST.vflag_control.flag("WWW")&&!XHOST.vflag_control.flag("NO_FANCY_PRINT"));  //CO20200404 - new web flag
 
     FILE* fstr=stderr;
@@ -3244,7 +3248,9 @@ namespace aurostd {
     }
     if(message_parts.size()==0){return;}
 
-    bool verbose=(!XHOST.QUIET && !quiet && osswrite);  //[CO2010315 - not always, removing for OUTCARs read during vasp runs]verbose=true; //ALWAYS!
+    //ME20220503 - XHOST.QUIET should be part of quiet to allow for whitelisting
+    //bool verbose=(!XHOST.QUIET && !quiet && osswrite);  //[CO2010315 - not always, removing for OUTCARs read during vasp runs]verbose=true; //ALWAYS!
+    bool verbose=(!quiet && osswrite);
     bool fancy_print=(!XHOST.vflag_control.flag("WWW")&&!XHOST.vflag_control.flag("NO_FANCY_PRINT"));  //CO20200404 - new web flag
 
     FILE* fstr=stderr;

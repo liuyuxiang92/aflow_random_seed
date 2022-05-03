@@ -223,6 +223,15 @@ namespace unittest {
     }
 
     // Run
+    bool quiet_copy = XHOST.QUIET;
+    string whitelist_str = "unittest::UnitTest::runUnitTest():,unittest::UnitTest::displayResult():";
+    vector<string> whitelist;
+    aurostd::string2tokens(whitelist_str, whitelist, ",");
+    std::cout << aurostd::joinWDelimiter(XHOST.LOGGER_WHITELIST, ",") << std::endl;
+    if (!XHOST.QUIET) {
+      XHOST.QUIET = true;
+      for (uint i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.push_back(whitelist[i]);
+    }
 #ifdef AFLOW_MULTITHREADS_ENABLE
     std::mutex mtx;
     xthread::xThread xt(KBIN::get_NCPUS());
@@ -231,6 +240,10 @@ namespace unittest {
 #else
     for (vector<string>::iterator it = unit_tests.begin(); it != unit_tests.end(); ++it) runUnitTest(it, tasks);
 #endif
+    XHOST.QUIET = quiet_copy;
+    if (!XHOST.QUIET) {
+      for (uint i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.pop_back();
+    }
 
     // Print final summary
     uint nsuccess = 0;
@@ -325,20 +338,20 @@ namespace unittest {
         // All attempted checks passed, but there were errors.
         // This happens when a prerequisite for a test fails (e.g. file loading).
         message << "FAIL " << xchk.task_description << " due to runtime errors" << std::endl;
-        pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
+        pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
       } else {
         message << "SUCCESS " << xchk.task_description << " (passing " << check_num << " checks)" << std::endl;
-        pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
+        pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
       }
     } else {
       message << "FAIL " << xchk.task_description << " (" << (check_num - xchk.passed_checks) << " of " << check_num << " checks failed)" << std::endl;
-      pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
     }
     message << "  " << aurostd::joinWDelimiter(xchk.results, "\n  ");
-    pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+    pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     if (xchk.errors.size() > 0) {
       message << "\nAdditional error messages:\n" << aurostd::joinWDelimiter(xchk.errors, "\n");
-      pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+      pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     }
   }
 

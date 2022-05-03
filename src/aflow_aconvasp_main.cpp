@@ -10501,11 +10501,15 @@ namespace pflow {
         stream << endl;
       }
     }
+    //HE+ME20220503
+    bool quiet = XHOST.QUIET;
+    if (XHOST.QUIET) quiet = !aurostd::SubstringWithinList(XHOST.LOGGER_WHITELIST, function_name);
+    else quiet = aurostd::SubstringWithinList(XHOST.LOGGER_BLACKLIST, function_name);
 
     bool osswrite=!silent;
-    if (type == _LOGGER_ERROR_) {aurostd::PrintErrorStream(FileMESSAGE,stream,XHOST.QUIET,osswrite);} //oss - DEFAULT TO cerr
-    else if (type == _LOGGER_WARNING_) {aurostd::PrintWarningStream(FileMESSAGE,stream,XHOST.QUIET,osswrite);}  //oss - DEFAULT TO cerr
-    else{aurostd::PrintMessageStream(FileMESSAGE,stream,XHOST.QUIET,osswrite,oss);}
+    if (type == _LOGGER_ERROR_) {aurostd::PrintErrorStream(FileMESSAGE,stream,quiet,osswrite);} //oss - DEFAULT TO cerr
+    else if (type == _LOGGER_WARNING_) {aurostd::PrintWarningStream(FileMESSAGE,stream,quiet,osswrite);}  //oss - DEFAULT TO cerr
+    else{aurostd::PrintMessageStream(FileMESSAGE,stream,quiet,osswrite,oss);}
   }
 } // namespace pflow
 
