@@ -115,7 +115,7 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
 namespace apdc {
  void GetPhaseDiagram(const aurostd::xoption& vpflow) {
     if (vpflow.flag("APDC::USAGE")) {
-      DisplayUsage(vpflow);
+      if (!vpflow.flag("APDC::SCREEN_ONLY")) {DisplayUsage();}
       return;
     }
     _apdc_data apdc_data;
@@ -158,6 +158,22 @@ namespace apdc {
     else {
       apdc_data.temp_npts = DEFAULT_APDC_TEMP_NPTS;
     }
+    if (!vpflow.flag("APDC::SCREEN_ONLY")) {
+      if (!vpflow.getattachedscheme("APDC::FORMAT_DATA").empty()) {
+        apdc_data.format_data = vpflow.getattachedscheme("APDC::FORMAT_DATA");
+      }
+      else {
+        apdc_data.format_data = DEFAULT_APDC_FORMAT_DATA;
+      }
+      if (!vpflow.flag("APDC::NO_PLOT")) {
+        if (!vpflow.getattachedscheme("APDC::FORMAT_PLOT").empty()) {
+          apdc_data.format_plot = vpflow.getattachedscheme("APDC::FORMAT_PLOT");
+        }
+        else {
+          apdc_data.format_plot = DEFAULT_APDC_FORMAT_PLOT;
+        }
+      }
+    }
     GetPhaseDiagram(apdc_data);
  }
 
@@ -169,12 +185,15 @@ namespace apdc {
     apdc_data.workdirpath = aurostd::getPWD();
     apdc_data.rootdirpath = aurostd::CleanFileName(apdc_data.rootdirpath);
     apdc_data.plattice = aurostd::tolower(apdc_data.plattice);
+    apdc_data.format_data = aurostd::tolower(apdc_data.format_data);
+    apdc_data.format_plot = aurostd::tolower(apdc_data.format_plot);
     aurostd::sort_remove_duplicates(apdc_data.elements);
     ErrorChecks(apdc_data);
     // Binodal
     apdc_data.rundirpath += apdc_data.rootdirpath + "/" + pflow::arity_string(apdc_data.elements.size(), false, false) + "/" + apdc_data.plattice + "/" + apdc_data.alloyname;
     aurostd::DirectoryMake(apdc_data.rundirpath);
     GetBinodalData(apdc_data);
+    PrintData(apdc_data);
   }
 }
 
@@ -199,7 +218,7 @@ namespace apdc {
     }
     // Check if parent lattice is valid
     if (apdc_data.plattice != "fcc" && apdc_data.plattice != "bcc" && apdc_data.plattice != "hcp") {
-      string message = "Invalid parent lattice";
+      string message = "Parent lattice \"" + apdc_data.plattice + "\" is invalid";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
     // Check if alloy is at least binary
@@ -220,15 +239,16 @@ namespace apdc {
       }
       apdc_data.alloyname += apdc_data.elements[i];
     }
+    // Check if concentration range has enough points
+    if (apdc_data.conc_npts < 2) {
+      string message = "Number of points for the concentration range must be at least 2";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+    }
     // Check if concentration curve format is valid
     if (!apdc_data.conc_curve.empty()) {
       if (apdc_data.conc_curve.size() != 2 * apdc_data.elements.size()) {
-        string message = "Concentration range must have format [X1_start, X1_end, X2_start, X2_end,...X(K)_start, X(K)_end]";
+        string message = "Concentration curve must have format [X1_start, X1_end, X2_start, X2_end,...X(K)_start, X(K)_end]";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
-      }
-      if (apdc_data.conc_npts < 2) {
-        string message = "Number of points for the concentration range must be at least 2";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
       }
       // Check if concentration curve is within [0,1] and sums to 1
       double totconc_init = 0.0, totconc_final = 0.0;
@@ -237,7 +257,7 @@ namespace apdc {
       for (uint i = 0; i < apdc_data.elements.size() && totconc_init <= 1.0 && totconc_final <= 1.0; i++) {
         if (apdc_data.conc_curve[2 * i] < 0 || apdc_data.conc_curve[2 * i] > 1 ||
             apdc_data.conc_curve[2 * i + 1] < 0 || apdc_data.conc_curve[2 * i + 1] > 1) {
-          string message = "Concentration range must be defined on [0,1]";
+          string message = "Concentration curve must be defined on [0,1]";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
         }
         totconc_init += apdc_data.conc_curve[2 * i]; totconc_final += apdc_data.conc_curve[2 * i + 1];
@@ -265,6 +285,7 @@ namespace apdc {
       string message = "Temperature range must have format [T_start T_end]";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
     }
+    // Check if temperature range has enough points
     if (apdc_data.temp_npts < 2) {
       string message = "Number of points for the temperature range must be at least 2";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
@@ -273,6 +294,15 @@ namespace apdc {
     if (apdc_data.temp_range[0] < 0 || apdc_data.temp_range[1] < 0) {
       string message = "Temperature cannot be below 0K";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+    }
+    // Check if output format is valid
+    if (!apdc_data.format_data.empty() && (apdc_data.format_data != "txt" && apdc_data.format_data != "json")) {
+      string message = "Format \"" + apdc_data.format_data + "\" is invalid";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
+    }
+    if (!apdc_data.format_plot.empty() && (apdc_data.format_plot != "png" && apdc_data.format_plot != "pdf" && apdc_data.format_plot != "latex")) {
+      string message = "Format \"" + apdc_data.format_plot + "\" is invalid";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
     }
   }
 }
@@ -342,7 +372,6 @@ namespace apdc {
         }
       }
     }
-    cerr<<"T= "<<binodal_boundary<<endl;
     return binodal_boundary;
   }
 }
@@ -621,7 +650,7 @@ namespace apdc {
     if (!rundirpath.empty()) {
       vector<string> tokens;
       aurostd::string2tokens(rundirpath, tokens, "/");
-      filepath = "/degen_" + aurostd::utype2string<int>(max_num_atoms) + "_atom.dat";
+      filepath = "/" + APDC_FILE_PREFIX + "degen_" + aurostd::utype2string<int>(max_num_atoms) + "_atom.txt";
       for (int i = tokens.size() - 2; i >= 0; i--) {filepath = "/" + tokens[i] + filepath;}
       if (aurostd::file2vectorstring(filepath, tokens)) {return aurostd::vector2xvector(aurostd::vectorstring2vectorint(tokens));}
     }
@@ -1073,7 +1102,7 @@ namespace apdc {
 // apdc::DisplayUsage
 // ***************************************************************************
 namespace apdc {
- void DisplayUsage(const aurostd::xoption& vpflow) {
+  void DisplayUsage(void) {
     vector<string> usage_options;
     usage_options.push_back("aflow --phase_diagram|--phasediagram --plattice=fcc --elements=Au,Pt[,Zn] [apdc_options] [--directory=[DIRECTORY]]");
     usage_options.push_back(" ");
@@ -1098,9 +1127,41 @@ namespace apdc {
     usage_options.push_back("format_data=|--data_format=txt|json");
     usage_options.push_back("format_plot=|--plot_format=png|pdf|latex");
     usage_options.push_back(" ");
-    if (!vpflow.flag("APDC::SCREEN_ONLY")) {init::MessageOption("--usage", "APDC()", usage_options);}
+    init::MessageOption("--usage", "APDC()", usage_options);
     return;
- }
+  }
+}
+
+// ***************************************************************************
+// apdc::PrintData
+// ***************************************************************************
+namespace apdc {
+  void PrintData(const _apdc_data& apdc_data) {
+    if (apdc_data.format_data == "txt") {
+      stringstream output;
+      string info_prefix = "";
+      output << "APDC DATA" << endl;
+      info_prefix = "Input data ";
+      output << " " << info_prefix << "Alloy name                     = " << apdc_data.alloyname << endl;
+      output << " " << info_prefix << "Parent lattice                 = " << apdc_data.plattice << endl;
+      output << " " << info_prefix << "Macroscopic concentration      = " << apdc_data.conc_macro << endl;
+      output << " " << info_prefix << "Temperature range (K)          = " << apdc_data.temp << endl;
+      output << " " << info_prefix << "Max atoms per cell             = " << apdc_data.max_num_atoms << endl;
+      info_prefix = "Cluster data ";
+      output << " " << info_prefix << "Number of atoms                = " << apdc_data.num_atom_cluster << endl;
+      output << " " << info_prefix << "Degeneracy                     = " << apdc_data.degeneracy_cluster << endl;
+      output << " " << info_prefix << "Cluster concentration          = " << apdc_data.conc_cluster << endl;
+      output << " " << info_prefix << "Excess energy (eV)             = " << apdc_data.excess_energy_cluster << endl;
+      info_prefix = "Thermo data ";
+      output << " " << info_prefix << "Cluster probability (ideal)    = " << apdc_data.prob_ideal_cluster << endl;
+      //output << " " << info_prefix << "Cluster probability            = " << apdc_data.prob_cluster << endl;
+      output << " " << info_prefix << "EC transition temperature (K)  = " << apdc_data.temp_ec << endl;
+      output << " " << info_prefix << "Binodal boundary (K)           = " << apdc_data.binodal_boundary << endl;
+      cerr<<output.str()<<endl;
+    }
+    else if (apdc_data.format_data == "json") {
+    }
+  }
 }
 
 #endif

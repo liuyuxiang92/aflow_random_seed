@@ -12,7 +12,7 @@
 
 #define DEFAULT_ATAT_ALAT 4.0 // Ang
 #define CONC_SHIFT 0.01 // concentration shift away from 0
-#define _APDC_STR_OPT_ string("[AFLOW_APDC]")
+#define APDC_FILE_PREFIX string("apdc_")
 
 // Class _apdc data
 class _apdc_data {
@@ -93,7 +93,8 @@ namespace apdc {
   string CreateLatForATAT(const string& plattice, const vector<string>& elements);
   vector<xstructure> GetATATXstructures(const string& lat, const uint max_num_atoms, const string& rundirpath="");
   vector<int> GetMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads);
-  void DisplayUsage(const aurostd::xoption& vpflow);
+  void DisplayUsage(void);
+  void PrintData(const _apdc_data& apdc_data);
 }
 
 #endif

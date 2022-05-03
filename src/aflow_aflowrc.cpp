@@ -854,6 +854,10 @@
 #define         DEFAULT_APDC_TEMP_MIN                         XHOST.adefault.getattachedutype<double>("DEFAULT_APDC_TEMP_MIN")
 #define AFLOWRC_DEFAULT_APDC_TEMP_MAX                         2000 // K
 #define         DEFAULT_APDC_TEMP_MAX                         XHOST.adefault.getattachedutype<double>("DEFAULT_APDC_TEMP_MAX")
+#define AFLOWRC_DEFAULT_APDC_FORMAT_DATA                      string("txt")
+#define         DEFAULT_APDC_FORMAT_DATA                      XHOST.adefault.getattachedscheme("DEFAULT_APDC_FORMAT_DATA")
+#define AFLOWRC_DEFAULT_APDC_FORMAT_PLOT                      string("png")
+#define         DEFAULT_APDC_FORMAT_PLOT                      XHOST.adefault.getattachedscheme("DEFAULT_APDC_FORMAT_PLOT")
 
 //RF20200413 START
 // DEFAULT CCE
@@ -1685,6 +1689,8 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APDC_TEMP_NPTS",AFLOWRC_DEFAULT_APDC_TEMP_NPTS);
     aflowrc::load_default("DEFAULT_APDC_TEMP_MIN",AFLOWRC_DEFAULT_APDC_TEMP_MIN);
     aflowrc::load_default("DEFAULT_APDC_TEMP_MAX",AFLOWRC_DEFAULT_APDC_TEMP_MAX);
+    aflowrc::load_default("DEFAULT_APDC_FORMAT_DATA",AFLOWRC_DEFAULT_APDC_FORMAT_DATA);
+    aflowrc::load_default("DEFAULT_APDC_FORMAT_PLOT",AFLOWRC_DEFAULT_APDC_FORMAT_PLOT);
 
     //RF20200413 START
     // DEFAULT CCE
@@ -2318,6 +2324,8 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APDC_TEMP_NPTS" << AFLOWRC_DEFAULT_APDC_TEMP_NPTS << endl;
     aflowrc << "DEFAULT_APDC_TEMP_MIN" << AFLOWRC_DEFAULT_APDC_TEMP_MIN << endl;
     aflowrc << "DEFAULT_APDC_TEMP_MAX" << AFLOWRC_DEFAULT_APDC_TEMP_MAX << endl;
+    aflowrc << "DEFAULT_APDC_FORMAT_DATA" << AFLOWRC_DEFAULT_APDC_FORMAT_DATA << endl;
+    aflowrc << "DEFAULT_APDC_FORMAT_PLOT" << AFLOWRC_DEFAULT_APDC_FORMAT_PLOT << endl;
     //SD20220323 - APDC END
 
     //RF20200413 START
@@ -2923,6 +2931,8 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_TEMP_NPTS\")=" << AFLOWRC_DEFAULT_APDC_TEMP_NPTS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_TEMP_MIN\")=" << AFLOWRC_DEFAULT_APDC_TEMP_MIN << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_TEMP_MAX\")=" << AFLOWRC_DEFAULT_APDC_TEMP_MAX << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_FORMAT_DATA\")=" << AFLOWRC_DEFAULT_APDC_FORMAT_DATA << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_FORMAT_PLOT\")=" << AFLOWRC_DEFAULT_APDC_FORMAT_PLOT << endl;
     //SD20220323 - APDC END
 
     //RF20200413 START
