@@ -832,6 +832,10 @@ namespace aurostd {
   bool WithinList(const vector<uint>&, uint, int&,bool sorted=false);  //ME20190905
   bool EWithinList(const vector<string>& list,const string& input); //CO20200223
   bool EWithinList(const vector<string>& list, const string& input, string& output); //CO20200223
+  bool SubstringWithinList(const deque<string>& list, const string& input);  //ME20220503
+  bool SubstringWithinList(const deque<string>& list, const string& input, int& index);  //ME20220503
+  bool SubstringWithinList(const vector<string>& list, const string& input);  //ME20220503
+  bool SubstringWithinList(const vector<string>& list, const string& input, int& index);  //ME20220503
   // about present substrings and taking off the value
   string substring2string(const string& strstream, const string& strsub1, bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
   string substring2string(const stringstream& strstream, const string& strsub1, bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up

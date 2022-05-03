@@ -5637,6 +5637,37 @@ namespace aurostd {
     return false;
   }
 
+  //ME20220503
+  bool SubstringWithinList(const deque<string>& list, const string& input) {
+    int index = -1;
+    return SubstringWithinList(list, input, index);
+  }
+
+  bool SubstringWithinList(const deque<string>& list, const string& input, int& index) {
+    for (deque<string>::const_iterator it = list.begin(); it != list.end(); ++it) {
+      if ((*it).find(input) != string::npos) {
+        index = std::distance(list.begin(), it);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool SubstringWithinList(const vector<string>& list, const string& input) {
+    int index = -1;
+    return SubstringWithinList(list, input, index);
+  }
+
+  bool SubstringWithinList(const vector<string>& list, const string& input, int& index) {
+    for (vector<string>::const_iterator it = list.begin(); it != list.end(); ++it) {
+      if ((*it).find(input) != string::npos) {
+        index = std::distance(list.begin(), it);
+        return true;
+      }
+    }
+    return false;
+  }
+
   bool EWithinList(const vector<string>& list,const string& input) { //CO20200223
     string output="";
     return EWithinList(list, input, output);

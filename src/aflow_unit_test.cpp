@@ -3,6 +3,8 @@
 // *           Aflow STEFANO CURTAROLO - Duke University 2003-2022           *
 // *                                                                         *
 // ***************************************************************************
+// Written by Marco Esters, 2022
+// Based on prior work by Hagen Eckert
 
 #include "aflow.h"
 #include "aflow_anrl.h"  //DX20201104
@@ -116,18 +118,20 @@ namespace unittest {
     xchk.func = std::bind(&UnitTest::ceramgenTest, this, _1, _2, _3);
     xchk.function_name= "ceramgenTest():";
     xchk.task_description = "pflow::GENERATE_CERAMICS()";
+    test_functions["ceramgen"] = xchk;
 
     xchk = initializeXCheck();
     xchk.func = std::bind(&UnitTest::prototypeGeneratorTest, this, _1, _2, _3);
     xchk.function_name= "prototypeGeneratorTest():";
     xchk.task_description = "Generate all prototypes and test symmetry";
+    test_functions["proto"] = xchk;
 
-    // ovasp
     // ovasp
     xchk = initializeXCheck();
     xchk.func = std::bind(&UnitTest::xoutcarTest, this, _1, _2, _3);
     xchk.function_name= "xoutcarTest():";
     xchk.task_description = "xOUTCAR class";
+    test_functions["outcar"] = xchk;
   }
 
   xcheck UnitTest::initializeXCheck() {
@@ -159,6 +163,7 @@ namespace unittest {
     test_groups["aurostd"] = {"xscalar", "xvector", "xmatrix"};
     test_groups["database"] = {"schema"};
     test_groups["structure"] = {"atomic_environment", "xstructure", "xstructure_parser"};
+    test_groups["structure_gen"] = {"ceramgen", "proto"};
     test_groups["ovasp"] = {"outcar"};
 
     for (std::map<string, vector<string> >::iterator it = test_groups.begin(); it != test_groups.end(); ++it) {
