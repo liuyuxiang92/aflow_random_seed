@@ -392,7 +392,7 @@ namespace unittest {
     size_t maxcol = 0;
     for (size_t r = 0; r < nrows; r++) {
       maxcol = std::max(table[r].size(), maxcol);
-      for (size_t c = 0; c < table[r].size() - 1; c++) {
+      for (size_t c = 0; c < table[r].size(); c++) {
         str_length = table[r][c].length();
         if (c == col_sizes.size()) {
           col_sizes.push_back(str_length);
@@ -406,13 +406,15 @@ namespace unittest {
     vector<string> output(nrows), row;
     string col = "";
     for (size_t r = 0; r < nrows; r++) {
+      row.clear();
+      // Last column does not need padding
       for (size_t c = 0; c < maxcol - 1; c++) {
         if (col_sizes[c] > 0) {
           col = (c == 0?"  ":"") + aurostd::PaddedPOST((c < table[r].size()?table[r][c]:""), col_sizes[c]);
           row.push_back(col);
         }
       }
-      if (table[r].size() == maxcol) row.back() = table[r].back();
+      if (table[r].size() == maxcol) row.push_back(table[r].back());
       output[r] = aurostd::joinWDelimiter(row, " | ");
     }
     return aurostd::joinWDelimiter(output, "\n");
