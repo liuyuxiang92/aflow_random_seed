@@ -336,7 +336,8 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   o+=det(m);o+=determinant(m);m=submatrix(m,1,1);submatrixInPlace(m,m,1,1);o+=minordet(m,1,1);o+=minordeterminant(m,1,1);v*m;m*v;
   vector<utype> vvv=xvector2vector(v);vector2xvector(vvv,1);
   vector<string> vs;vxu=vector2xvector<utype>(vs,1); //CO20201111
-  vector<vector<utype> > mvv=xmatrix2vectorvector(m);vectorvector2xmatrix(mvv);
+  vector<vector<utype> > mvv=xmatrix2vectorvector(m);vectorvector2xmatrix(mvv,1,1);
+  vector<vector<string>> ms;vectorvector2xmatrix<utype>(ms,1,1); //SD20220504
   if(det(m)==0 || sum(m)==0) return FALSE;
   reshape(m3,9,1);
   reshape(v);reshape(v,v);reshape(v,v,v);reshape(v,v,v,v);reshape(v,v,v,v,v);reshape(v,v,v,v,v,v);

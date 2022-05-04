@@ -176,6 +176,7 @@ namespace apdc {
         apdc_data.format_plot = DEFAULT_APDC_FORMAT_PLOT;
       }
     }
+    if (vpflow.flag("APDC::IMAGE_ONLY")) {apdc_data.image_only = true;}
     GetPhaseDiagram(apdc_data);
     return;
  }
@@ -197,7 +198,8 @@ namespace apdc {
     // Only plot data from JSON file. This is useful when the plotting routine cannot be ran on the machine
     // running the calculation.
     if (apdc_data.image_only) {
-      PlotData(apdc_data.rundirpath);
+      ReadData(apdc_data);
+      PlotData(apdc_data);
       return;
     }
     // Calculations
@@ -1196,15 +1198,29 @@ namespace apdc {
 }
 
 // ***************************************************************************
+// apdc::ReadData
+// ***************************************************************************
+namespace apdc {
+  void ReadData(_apdc_data& apdc_data) {
+    string filepath = apdc_data.rundirpath + "/" + APDC_FILE_PREFIX + "output.json";
+    if (!aurostd::FileExist(filepath)) {
+      string message = "The JSON file does not exist, filepath=" + filepath; 
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
+    }
+    string jsonfile = aurostd::file2string(filepath);
+    apdc_data.alloyname = aurostd::extractJsonValueAflow(jsonfile, "Alloy name");
+    apdc_data.conc_macro = aurostd::vectorvector2xmatrix<double>(aurostd::extractJsonMatrixAflow(jsonfile, "Macroscopic concentration"));
+    apdc_data.temp = aurostd::vector2xvector<double>(aurostd::extractJsonVectorAflow(jsonfile, "Temperature range (K)"));
+    apdc_data.binodal_boundary = aurostd::vector2xvector<double>(aurostd::extractJsonVectorAflow(jsonfile, "Binodal boundary (K)"));
+  }
+}
+
+// ***************************************************************************
 // apdc::PlotData
 // ***************************************************************************
 namespace apdc {
   void PlotData(const _apdc_data& apdc_data) {
     if (apdc_data.format_data.empty()) {return;}
-  }
-
-  void PlotData(const string& rundirpath) {
-    cerr<<rundirpath<<endl;
   }
 }
 

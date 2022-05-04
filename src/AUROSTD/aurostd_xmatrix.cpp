@@ -1643,14 +1643,24 @@ namespace aurostd {                   // conversion to vector<vector<utype> >
     }
 }
 
+//SD20220504 - Rewritten vectorvector2xmatrix to be more like vector2xvector
 namespace aurostd {                   // conversion to xmatrix<utype>
   template<class utype> xmatrix<utype>
-    vectorvector2xmatrix(const vector<vector<utype> >& mat) __xprototype {
-      int isize=mat.size(),jsize=mat.at(0).size();
-      xmatrix<utype> xmat(isize,jsize);
-      for(int i=1;i<=isize;i++)
-        for(int j=1;j<=jsize;j++)
-          xmat(i,j)=mat.at(i-1).at(j-1);
+    vectorvector2xmatrix(const vector<vector<utype> >& mat, int lrows, int lcols) __xprototype {
+      int isize=mat.size(),jsize=mat[0].size();
+      xmatrix<utype> xmat(isize+lrows-1,jsize+lcols-1);
+      for(int i=lrows;i<=isize+lrows-1;i++)
+        for(int j=lcols;j<=jsize+lcols-1;j++)
+          xmat[i][j]=mat[i-lrows][j-lcols];
+      return xmat;
+    }
+  template<class utype> xmatrix<utype>
+    vectorvector2xmatrix(const vector<vector<string> >& mat, int lrows, int lcols) __xprototype {
+      int isize=mat.size(),jsize=mat[0].size();
+      xmatrix<utype> xmat(isize+lrows-1,jsize+lcols-1);
+      for(int i=lrows;i<=isize+lrows-1;i++)
+        for(int j=lcols;j<=jsize+lcols-1;j++)
+          xmat[i][j]=aurostd::string2utype<utype>(mat[i-lrows][j-lcols]);
       return xmat;
     }
 }
