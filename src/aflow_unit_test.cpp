@@ -5,6 +5,12 @@
 // ***************************************************************************
 // Written by Marco Esters, 2022
 // Based on prior work by Hagen Eckert
+//
+// Unit test class to conduct parallelized unit tests with unified output.
+//
+// Tests are grouped into categories so that entire suites can be tested.
+// For example, the test "aurostd" calls xscalar, xmatrix, etc. The individual
+// tests can be called as well.
 
 #include "aflow.h"
 #include "aflow_anrl.h"  //DX20201104
@@ -62,6 +68,7 @@ namespace unittest {
     initializeTestGroups();
   }
 
+  /// @brief Initialize unit tests and add them to map of test functions.
   void UnitTest::initializeTestFunctions() {
     xcheck xchk;
 
@@ -132,6 +139,7 @@ namespace unittest {
     //test_functions["outcar"] = xchk;
   }
 
+  /// @brief Initialize xcheck struct to an empty object.
   xcheck UnitTest::initializeXCheck() {
     xcheck xt;
     resetUnitTest(xt);
@@ -142,12 +150,14 @@ namespace unittest {
     return xt;
   }
 
+  /// @brief Reset a unit test to its pre-run state based on test name.
   void UnitTest::resetUnitTest(const string& test_name) {
     if (test_functions.count(test_name)) {
       resetUnitTest(test_functions[test_name]);
     }
   }
 
+  /// @brief Reset an xcheck object to its pre-run state.
   void UnitTest::resetUnitTest(xcheck& test) {
     test.errors.clear();
     test.finished = false;
@@ -155,6 +165,7 @@ namespace unittest {
     test.results.clear();
   }
 
+  /// @brief Create unit test groups.
   void UnitTest::initializeTestGroups() {
     test_groups.clear();
 
@@ -174,18 +185,33 @@ namespace unittest {
 
 }
 
+// Run functions
 namespace unittest {
 
+  /// @brief Run single unit test.
+  ///
+  /// @param unit_test Unit test name
+  ///
+  /// @return Whether all tests were successful.
   bool UnitTest::runTestSuites(const string& unit_test) {
-    vector<string> vunit_test = {unit_test};
+    vector<string> vunit_test(1, unit_test);
     return runTestSuites(vunit_test);
   }
 
+  /// @brief Run a set of unit tests.
+  ///
+  /// @param unit_tests_in Set of unit test names.
+  ///
+  /// @return Whether all tests were successful.
+  ///
+  /// The function consists of three steps:
+  ///   1) Collect the set of tasks and expand test groups into individual tests.
+  ///   2) Run all requested test functions, outputting results as test groups finish.
+  ///   3) Print final summary.
   bool UnitTest::runTestSuites(const vector<string>& unit_tests_in) {
     stringstream  message;
-    // Create task lists (groups or individual tests)
-    // unit_test is the individual small tests over
-    // which to parallelize
+    // Create task lists (groups or individual tests).
+    // unit_test is the individual small tests over which to parallelize
     vector<string> unit_tests, tasks;
     for (size_t t = 0; t < unit_tests_in.size(); t++) {
       const string& test = unit_tests_in[t];
@@ -220,12 +246,17 @@ namespace unittest {
       return true;
     }
 
-    // Run
+    // Run tests
+    // Many AFLOW functions produce output to screen without the opportunity
+    // to silence it, which makes unit test output harder to read and can
+    // lead to garbled output when run in parallel. To get clean output,
+    // silence output globally except for the functions that produce desired
+    // unit test output, unless --quiet is requested or --debug is run.
     bool quiet_copy = XHOST.QUIET;
     string whitelist_str = "unittest::UnitTest::runUnitTest():,unittest::UnitTest::displayResult():";
     vector<string> whitelist;
     aurostd::string2tokens(whitelist_str, whitelist, ",");
-    if (!XHOST.QUIET) {
+    if (!XHOST.QUIET && !XHOST.DEBUG) {
       XHOST.QUIET = true;
       for (size_t i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.push_back(whitelist[i]);
     }
@@ -238,7 +269,8 @@ namespace unittest {
     for (vector<string>::iterator it = unit_tests.begin(); it != unit_tests.end(); ++it) runUnitTest(it, tasks);
 #endif
     XHOST.QUIET = quiet_copy;
-    if (!XHOST.QUIET) {
+    if (!XHOST.QUIET && !XHOST.DEBUG) {
+      XHOST.QUIET = quiet_copy;
       for (size_t i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.pop_back();
     }
 
@@ -263,14 +295,18 @@ namespace unittest {
     return (nsuccess == ntasks);
   }
 
+  /// @brief Run unit test function inside a thread.
+  ///
+  /// @param it    Iterator pointing to the unit test name.
+  /// @param tasks Set of task names.
   void UnitTest::runUnitTest(vector<string>::iterator& it, const vector<string>& tasks) {
     const string& test_name = (*it);
     xcheck& test = test_functions[test_name];
     resetUnitTest(test);
     test.func(test.passed_checks, test.results, test.errors);
+    // Output results
     std::lock_guard<std::mutex> lk(mtx);
     test.finished = true;
-    // Output results
     if (aurostd::WithinList(tasks, test_name)) {
       // If the test name is in the task list, it is not part
       // of a group, so no need to check if other members are done
@@ -294,7 +330,7 @@ namespace unittest {
         }
         stringstream message;
         if (nsuccess == ntests_group) {
-          message << "Unit tests of group " << group << " passed successfully (passsing " << ntests_group << " tests).";
+          message << "Unit tests of group " << group << " passed successfully (passing " << ntests_group << " tests).";
           pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
         } else {
           message << "Some unit tests of group " << group << " failed (" << (ntests_group - nsuccess) << " of " << ntests_group << " failed).";
@@ -307,6 +343,16 @@ namespace unittest {
     }
   }
 
+  /// @brief Check if a task has finished successfully.
+  ///
+  /// @param task The task to check.
+  ///
+  /// @return Whether a tasks has finished without errors.
+  ///
+  /// Criteria for returning true:
+  ///   1) Task is finished.
+  ///   2) All unit tests passed.
+  ///   3) There are no additional errors.
   bool UnitTest::taskSuccessful(const string& task) {
     std::map<string, vector<string> >::iterator it = test_groups.find(task);
     if (it != test_groups.end()) {
@@ -322,10 +368,25 @@ namespace unittest {
       return (xchk.finished && (xchk.errors.size() == 0) && (xchk.passed_checks == xchk.results.size()));
     }
   }
+}
 
+// Output formatters
+namespace unittest {
+  /// @brief Convert results vector into a formatted table.
+  ///
+  /// @param table Structured table data.
+  ///
+  /// @return Formatted table string.
+  ///
+  /// This function makes no assumption about the table dimensions, so tables
+  /// rows can have different sizes.
+  /// Empty columns will be skipped, but not empty rows.
+  /// The first column will have spaces prepended to indent the table.
   string UnitTest::formatResultsTable(const vector<vector<string> >& table) {
     size_t nrows = table.size();
     if (nrows == 0) return "";  // Empty table
+
+    // Determine dimensions of the table
     vector<size_t> col_sizes;
     size_t str_length = 0;
     size_t maxcol = 0;
@@ -342,10 +403,14 @@ namespace unittest {
     }
     if (maxcol == 0) return "";  // Empty rows
 
-    vector<string> output(nrows), row(maxcol);
+    vector<string> output(nrows), row;
+    string col = "";
     for (size_t r = 0; r < nrows; r++) {
       for (size_t c = 0; c < maxcol - 1; c++) {
-        row[c] = (c == 0?"  ":"") + aurostd::PaddedPOST((c < table[r].size()?table[r][c]:""), col_sizes[c]);
+        if (col_sizes[c] > 0) {
+          col = (c == 0?"  ":"") + aurostd::PaddedPOST((c < table[r].size()?table[r][c]:""), col_sizes[c]);
+          row.push_back(col);
+        }
       }
       if (table[r].size() == maxcol) row.back() = table[r].back();
       output[r] = aurostd::joinWDelimiter(row, " | ");
@@ -353,9 +418,9 @@ namespace unittest {
     return aurostd::joinWDelimiter(output, "\n");
   }
 
-}
-
-namespace unittest {
+  /// @brief Display results of a unit test.
+  ///
+  /// @param xchk Unit test object containing all results.
   void UnitTest::displayResult(const xcheck& xchk) {
     stringstream message;
     size_t check_num = xchk.results.size();
@@ -381,50 +446,8 @@ namespace unittest {
   }
 }
 
+// Collection of generic check functions, to streamline testing.
 namespace unittest {
-  // Collection of generic check functions, to streamline testing.
-  template <typename utype>
-  void UnitTest::check(const bool passed, const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
-    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-    check(passed, aurostd::joinWDelimiter(calculated, ","), aurostd::joinWDelimiter(expected, ","), check_function, check_description, passed_checks, results);
-  }
-  void UnitTest::check(const bool passed, const vector<double>& calculated, const vector<double>& expected, const string& check_function,
-    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-    check(passed, aurostd::joinWDelimiter(aurostd::vecDouble2vecString(calculated), ","), aurostd::joinWDelimiter(aurostd::vecDouble2vecString(expected), ","), check_function, check_description, passed_checks, results);
-  }
-
-  template <typename utype>
-  void UnitTest::check(const bool passed, const xmatrix<utype>& calculated, const xmatrix<utype>& expected, const string& check_function,
-    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-    check(passed, aurostd::xmat2String(calculated), aurostd::xmat2String(expected), check_function, check_description, passed_checks, results);
-  }
-  void UnitTest::check(const bool passed, const xmatrix<double>& calculated, const xmatrix<double>& expected, const string& check_function,
-    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-    check(passed, aurostd::xmatDouble2String(calculated), aurostd::xmatDouble2String(expected), check_function, check_description, passed_checks, results);
-  }
-
-  template <typename utype>
-  void UnitTest::check(const bool passed, const utype& calculated, const utype& expected, const string& check_function,
-      const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-    vector<string> result;
-    uint check_num = results.size() + 1;
-    result.push_back(aurostd::utype2string<uint>(check_num));
-    if (passed) {
-      passed_checks++;
-      result.push_back("pass");
-    } else {
-      result.push_back("FAIL");
-    }
-    result.push_back(check_function);
-    result.push_back(check_description);
-    if (!passed) {
-      stringstream failstring;
-      failstring << " (result: " << calculated << " | expected: " << expected << ")";
-      result.back() += failstring.str();
-    }
-    results.push_back(result);
-  }
-
   template <typename utype>
   void UnitTest::checkEqual(const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
       const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
@@ -458,6 +481,57 @@ namespace unittest {
       const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
     bool passed = (calculated == expected);
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
+  }
+
+  template <typename utype>
+  void UnitTest::check(const bool passed, const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
+    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
+    check(passed, aurostd::joinWDelimiter(calculated, ","), aurostd::joinWDelimiter(expected, ","), check_function, check_description, passed_checks, results);
+  }
+  void UnitTest::check(const bool passed, const vector<double>& calculated, const vector<double>& expected, const string& check_function,
+    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
+    check(passed, aurostd::joinWDelimiter(aurostd::vecDouble2vecString(calculated), ","), aurostd::joinWDelimiter(aurostd::vecDouble2vecString(expected), ","), check_function, check_description, passed_checks, results);
+  }
+
+  template <typename utype>
+  void UnitTest::check(const bool passed, const xmatrix<utype>& calculated, const xmatrix<utype>& expected, const string& check_function,
+    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
+    check(passed, aurostd::xmat2String(calculated), aurostd::xmat2String(expected), check_function, check_description, passed_checks, results);
+  }
+  void UnitTest::check(const bool passed, const xmatrix<double>& calculated, const xmatrix<double>& expected, const string& check_function,
+    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
+    check(passed, aurostd::xmatDouble2String(calculated), aurostd::xmatDouble2String(expected), check_function, check_description, passed_checks, results);
+  }
+
+  /// @brief Base function to check results and update results.
+  ///
+  /// @param passed            Whether the test has passed.
+  /// @param calculated        Calculated value.
+  /// @param expected          Expected value.
+  /// @param check_function    Function called for the test.
+  /// @param check_description Description of the performed test.
+  /// @param passed_checks     Number of passed checks.
+  /// @param results           Results data - doubles as number of performed checks.
+  template <typename utype>
+  void UnitTest::check(const bool passed, const utype& calculated, const utype& expected, const string& check_function,
+      const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
+    vector<string> result;
+    uint check_num = results.size() + 1;
+    result.push_back(aurostd::utype2string<uint>(check_num));
+    if (passed) {
+      passed_checks++;
+      result.push_back("pass");
+    } else {
+      result.push_back("FAIL");
+    }
+    result.push_back(check_function);
+    result.push_back(check_description);
+    if (!passed) {
+      stringstream failstring;
+      failstring << " (result: " << calculated << " | expected: " << expected << ")";
+      result.back() += failstring.str();
+    }
+    results.push_back(result);
   }
 
 }
