@@ -347,9 +347,10 @@ namespace unittest {
 
     vector<string> output(nrows), row(maxcol);
     for (size_t r = 0; r < nrows; r++) {
-      for (size_t c = 0; c < maxcol; c++) {
+      for (size_t c = 0; c < maxcol - 1; c++) {
         row[c] = (c == 0?"  ":"") + aurostd::PaddedPOST((c < table[r].size()?table[r][c]:""), col_sizes[c]);
       }
+      if (table[r].size() == maxcol) row.back() = table[r].back();
       output[r] = aurostd::joinWDelimiter(row, " | ");
     }
     return aurostd::joinWDelimiter(output, "\n");
@@ -375,8 +376,7 @@ namespace unittest {
       message << "FAIL " << xchk.task_description << " (" << (check_num - xchk.passed_checks) << " of " << check_num << " checks failed)" << std::endl;
       pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
     }
-    message << "  " << aurostd::joinWDelimiter(xchk.results, "\n  ");
-    pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+    pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,formatResultsTable(xchk.results),aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     if (xchk.errors.size() > 0) {
       message << "\nAdditional error messages:\n" << aurostd::joinWDelimiter(xchk.errors, "\n");
       pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
@@ -386,54 +386,51 @@ namespace unittest {
 
 namespace unittest {
   // Collection of generic check functions, to streamline testing.
-  // HE20210616
   template <typename utype>
   void UnitTest::check(const bool passed, const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
-    const string& check_description, uint& passed_checks, vector<string>& results) {
+    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
     check(passed, aurostd::joinWDelimiter(calculated, ","), aurostd::joinWDelimiter(expected, ","), check_function, check_description, passed_checks, results);
   }
   void UnitTest::check(const bool passed, const vector<double>& calculated, const vector<double>& expected, const string& check_function,
-    const string& check_description, uint& passed_checks, vector<string>& results) {
+    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
     check(passed, aurostd::joinWDelimiter(aurostd::vecDouble2vecString(calculated), ","), aurostd::joinWDelimiter(aurostd::vecDouble2vecString(expected), ","), check_function, check_description, passed_checks, results);
   }
 
   template <typename utype>
   void UnitTest::check(const bool passed, const xmatrix<utype>& calculated, const xmatrix<utype>& expected, const string& check_function,
-    const string& check_description, uint& passed_checks, vector<string>& results) {
+    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
     check(passed, aurostd::xmat2String(calculated), aurostd::xmat2String(expected), check_function, check_description, passed_checks, results);
   }
   void UnitTest::check(const bool passed, const xmatrix<double>& calculated, const xmatrix<double>& expected, const string& check_function,
-    const string& check_description, uint& passed_checks, vector<string>& results) {
+    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
     check(passed, aurostd::xmatDouble2String(calculated), aurostd::xmatDouble2String(expected), check_function, check_description, passed_checks, results);
   }
 
   template <typename utype>
   void UnitTest::check(const bool passed, const utype& calculated, const utype& expected, const string& check_function,
-      const string& check_description, uint& passed_checks, vector<string>& results) {
-    stringstream result;
+      const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
+    vector<string> result;
     uint check_num = results.size() + 1;
+    result.push_back(aurostd::utype2string<uint>(check_num));
     if (passed) {
       passed_checks++;
-      if (check_function.empty()) {
-        result << std::setw(3) << check_num << " | pass | " << check_description;
-      } else {
-        result << std::setw(3) << check_num << " | pass | " << check_function << " | " << check_description;
-      }
+      result.push_back("pass");
     } else {
-      if (check_function.empty()) {
-        result << std::setw(3) << check_num << " | FAIL | " << check_description
-          << " (result: " << calculated << " | expected: " << expected << ")";
-      } else {
-        result << std::setw(3) << check_num << " | FAIL | " << check_function << " | " << check_description
-          << " (result: " << calculated << " | expected: " << expected << ")";
-      }
+      result.push_back("FAIL");
     }
-    results.push_back(result.str());
+    result.push_back(check_function);
+    result.push_back(check_description);
+    if (!passed) {
+      stringstream failstring;
+      failstring << " (result: " << calculated << " | expected: " << expected << ")";
+      result.back() += failstring.str();
+    }
+    results.push_back(result);
   }
 
   template <typename utype>
   void UnitTest::checkEqual(const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
-      const string& check_description, uint& passed_checks, vector<string>& results) {
+      const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
     bool passed = (calculated.size() == expected.size());
     for (size_t i = 0; i < calculated.size() && passed; i++) {
       passed = aurostd::isequal(calculated[i], expected[i]);
@@ -441,7 +438,7 @@ namespace unittest {
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
   }
   void UnitTest::checkEqual(const vector<string>& calculated, const vector<string>& expected, const string& check_function,
-      const string& check_description, uint& passed_checks, vector<string>& results) {
+      const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
     bool passed = (calculated.size() == expected.size());
     for (size_t i = 0; i < calculated.size() && passed; i++) {
       passed = (calculated[i] == expected[i]);
@@ -451,26 +448,27 @@ namespace unittest {
 
   template <typename utype>
   void UnitTest::checkEqual(const utype& calculated, const utype& expected, const string& check_function,
-      const string& check_description, uint& passed_checks, vector<string>& results) {
+      const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
     bool passed = (aurostd::isequal(calculated, expected));
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
   }
   void UnitTest::checkEqual(const string& calculated, const string& expected, const string& check_function,
-      const string& check_description, uint & passed_checks, vector<string>& results) {
+      const string& check_description, uint & passed_checks, vector<vector<string> >& results) {
     bool passed = (calculated == expected);
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
   }
   void UnitTest::checkEqual(const bool calculated, const bool expected, const string& check_function,
-      const string& check_description, uint& passed_checks, vector<string>& results) {
+      const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
     bool passed = (calculated == expected);
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
   }
+
 }
 
 // aurostd
 namespace unittest {
 
-  void UnitTest::xscalarTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
+  void UnitTest::xscalarTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
     if (errors.size()) {}  // Suppress compiler warnings
     // setup test environment
     string check_function = "", check_description = "";
@@ -567,7 +565,7 @@ namespace unittest {
     checkEqual(calculated_vint, expected_vint, check_function, check_description, passed_checks, results);
   }
 
-  void UnitTest::xvectorTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
+  void UnitTest::xvectorTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
     if (errors.size()) {}  // Suppress compiler warnings
     // setup test environment
     string check_function = "", check_description = "";
@@ -792,7 +790,7 @@ namespace unittest {
     checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
   }
 
-  void UnitTest::xmatrixTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
+  void UnitTest::xmatrixTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
     if (errors.size()) {}  // Suppress compiler warnings
     // setup test environment
     string check_function = "", check_description = "";
@@ -829,7 +827,7 @@ namespace unittest {
 // database
 namespace unittest {
 
-  void UnitTest::schemaTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
+  void UnitTest::schemaTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if (errors.size()) {}  // Suppress compiler warnings
 
@@ -888,7 +886,7 @@ namespace unittest {
 namespace unittest {
 
   //HE20210511
-  void UnitTest::atomicEnvironmentTest(uint& passed_checks, vector<string> & results, vector<string>& errors) {
+  void UnitTest::atomicEnvironmentTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
     if (errors.size()) {}  // Suppress compiler warnings
 
     // setup test environment
@@ -984,7 +982,7 @@ namespace unittest {
     checkEqual(AE[test_AE].facet_order[2], uint(0), check_function, check_description, passed_checks, results);
   }
 
-  void UnitTest::xstructureParserTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
+  void UnitTest::xstructureParserTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if (errors.size()) {}  // Suppress compiler warnings
 
@@ -1280,7 +1278,7 @@ namespace unittest {
     checkEqual(expected_bool, calculated_bool, check_function, check_description, passed_checks, results);
   }
 
-  void UnitTest::xstructureTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
+  void UnitTest::xstructureTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
     if (errors.size()) {} // Suppress compiler warnings
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // Set up test environment
@@ -1522,7 +1520,7 @@ namespace unittest {
 namespace unittest {
 
   //CO20190520
-  void UnitTest::ceramgenTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
+  void UnitTest::ceramgenTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
     if (errors.size()) {} // Suppress compiler warnings
 
     // setup test environment
@@ -1661,7 +1659,7 @@ namespace unittest {
     }
   }
 
-  void UnitTest::prototypeGeneratorTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
+  void UnitTest::prototypeGeneratorTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
 
     // Set up test environment
@@ -1716,7 +1714,7 @@ namespace unittest {
 
 // ovasp
 namespace unittest {
-  void UnitTest::xoutcarTest(uint& passed_checks, vector<string>& results, vector<string>& errors) {
+  void UnitTest::xoutcarTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
 
     // setup test environment

@@ -5375,7 +5375,7 @@ namespace xprototype {
 
 namespace unittest {
 
-  typedef std::function<void(uint&, vector<string>&, vector<string>&)> unitTestFunction;
+  typedef std::function<void(uint&, vector<vector<string> >&, vector<string>&)> unitTestFunction;
 
   struct xcheck {
     vector<string> errors;
@@ -5383,7 +5383,7 @@ namespace unittest {
     string function_name;
     string task_description;
     uint passed_checks;
-    vector<string> results;
+    vector<vector<string> > results;
     bool finished;
   };
 
@@ -5430,52 +5430,52 @@ namespace unittest {
 
       template <typename utype>
       void check(const bool passed, const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
-          const string& checkDescription, uint& passed_checks, vector<string>& results);
+          const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
       void check(const bool passed, const vector<double>& calculated, const vector<double>& expected, const string& check_function,
-          const string& checkDescription, uint& passed_checks, vector<string>& results);
+          const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
       template <typename utype>
       void check(const bool passed, const xmatrix<utype>& calculated, const xmatrix<utype>& expected, const string& check_function,
-          const string& checkDescription, uint& passed_checks, vector<string>& results);
+          const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
       void check(const bool passed, const xmatrix<double>& calculated, const xmatrix<double>& expected, const string& check_function,
-          const string& checkDescription, uint& passed_checks, vector<string>& results);
+          const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
       template <typename utype>
       void check(const bool passed, const utype& calculated, const utype& expected, const string& check_function,
-          const string& checkDescription, uint& passed_checks, vector<string>& results);
+          const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
 
       template <typename utype>
       void checkEqual(const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
-          const string& check_description, uint& passed_checks, vector<string>& results);
+          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
       void checkEqual(const vector<string>& calculated, const vector<string>& expected, const string& check_function,
-          const string& check_description, uint& passed_checks, vector<string>& results);
+          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
       template <typename utype>
       void checkEqual(const utype& calculated, const utype& expected, const string& check_function,
-          const string& check_description, uint& passed_checks, vector<string>& results);
+          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
       void checkEqual(const string& calculated, const string& expected, const string& check_function,
-          const string& check_description, uint& passed_checks, vector<string>& results);
+          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
       void checkEqual(const bool calculated, const bool expected, const string& check_function,
-          const string& check_description, uint& passed_checks, vector<string>& results);
+          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
 
       // Test functions ---------------------------------
 
       // aurostd
-      void xvectorTest(uint&, vector<string>&, vector<string>&);
-      void xscalarTest(uint&, vector<string>&, vector<string>&);
-      void xmatrixTest(uint&, vector<string>&, vector<string>&);
+      void xvectorTest(uint&, vector<vector<string> >&, vector<string>&);
+      void xscalarTest(uint&, vector<vector<string> >&, vector<string>&);
+      void xmatrixTest(uint&, vector<vector<string> >&, vector<string>&);
 
       // database
-      void schemaTest(uint&, vector<string>&, vector<string>&);
+      void schemaTest(uint&, vector<vector<string> >&, vector<string>&);
 
       // xstructure
-      void atomicEnvironmentTest(uint&, vector<string>&, vector<string>&);
-      void xstructureParserTest(uint&, vector<string>&, vector<string>&);
-      void xstructureTest(uint&, vector<string>&, vector<string>&);
+      void atomicEnvironmentTest(uint&, vector<vector<string> >&, vector<string>&);
+      void xstructureParserTest(uint&, vector<vector<string> >&, vector<string>&);
+      void xstructureTest(uint&, vector<vector<string> >&, vector<string>&);
 
       // structure generation
-      void ceramgenTest(uint&, vector<string>&, vector<string>&);
-      void prototypeGeneratorTest(uint&, vector<string>&, vector<string>&);
+      void ceramgenTest(uint&, vector<vector<string> >&, vector<string>&);
+      void prototypeGeneratorTest(uint&, vector<vector<string> >&, vector<string>&);
 
       // ovasp
-      void xoutcarTest(uint&, vector<string>&, vector<string>&);
+      void xoutcarTest(uint&, vector<vector<string> >&, vector<string>&);
   };
 
 }
