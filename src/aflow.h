@@ -5382,6 +5382,7 @@ namespace unittest {
     unitTestFunction func;
     string function_name;
     string task_description;
+    string test_group;
     uint passed_checks;
     vector<vector<string> > results;
     bool finished;

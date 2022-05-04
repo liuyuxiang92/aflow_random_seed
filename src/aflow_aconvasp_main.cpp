@@ -10502,6 +10502,8 @@ namespace pflow {
       }
     }
     //HE+ME20220503
+    // Be permissive and search for substrings to allow for white/black listing
+    // of groups of functions or namespaces without implementing regexes
     bool quiet = XHOST.QUIET;
     if (XHOST.QUIET) quiet = !aurostd::SubstringWithinList(XHOST.LOGGER_WHITELIST, function_name);
     else quiet = aurostd::SubstringWithinList(XHOST.LOGGER_BLACKLIST, function_name);

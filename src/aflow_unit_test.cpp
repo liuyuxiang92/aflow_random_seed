@@ -8,7 +8,7 @@
 
 #include "aflow.h"
 #include "aflow_anrl.h"  //DX20201104
-#include "aflow_compare_structure.h"  //ME20220125
+#include "aflow_compare_structure.h"
 
 using namespace std::placeholders;
 
@@ -44,7 +44,6 @@ namespace unittest {
     aflags.clear();
     test_functions.clear();
     test_groups.clear();
-    test2group.clear();
   }
 
   void UnitTest::copy(const UnitTest& ut) {
@@ -52,7 +51,6 @@ namespace unittest {
     aflags = ut.aflags;
     test_functions = ut.test_functions;
     test_groups = ut.test_groups;
-    test2group = ut.test2group;
   }
 
   void UnitTest::initialize() {
@@ -65,7 +63,6 @@ namespace unittest {
   }
 
   void UnitTest::initializeTestFunctions() {
-    // Initialize unit tests
     xcheck xchk;
 
     // aurostd
@@ -141,6 +138,7 @@ namespace unittest {
     xt.func = nullptr;
     xt.function_name = "";
     xt.task_description = "";
+    xt.test_group = "";
     return xt;
   }
 
@@ -159,7 +157,6 @@ namespace unittest {
 
   void UnitTest::initializeTestGroups() {
     test_groups.clear();
-    test2group.clear();
 
     test_groups["aurostd"] = {"xscalar", "xvector", "xmatrix"};
     test_groups["database"] = {"schema"};
@@ -170,7 +167,7 @@ namespace unittest {
     for (std::map<string, vector<string> >::iterator it = test_groups.begin(); it != test_groups.end(); ++it) {
       const vector<string>& members = (*it).second;
       for (size_t i = 0; i < members.size(); i++) {
-        test2group[members[i]] = (*it).first;
+        test_functions[members[i]].test_group = (*it).first;
       }
     }
   }
@@ -211,7 +208,7 @@ namespace unittest {
         for (size_t m = 0; m < members.size(); m++) {
           unit_tests.push_back(members[m]);
         }
-      } else if (!aurostd::WithinList(tasks, test2group[test])) {
+      } else if (!aurostd::WithinList(tasks, test_functions[test].test_group)) {
         unit_tests.push_back(test);
         tasks.push_back(test);
       }
@@ -281,7 +278,7 @@ namespace unittest {
     } else {
       // Test if part of a test group, so check if all members
       // of the group have finished before producing output
-      const string& group = test2group[test_name];
+      const string& group = test_functions[test_name].test_group;
       const vector<string>& vtests_group = test_groups[group];
       uint ntests_group = vtests_group.size();
       uint i = 0;
