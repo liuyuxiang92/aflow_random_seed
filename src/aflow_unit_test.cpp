@@ -169,7 +169,7 @@ namespace unittest {
 
     for (std::map<string, vector<string> >::iterator it = test_groups.begin(); it != test_groups.end(); ++it) {
       const vector<string>& members = (*it).second;
-      for (uint i = 0; i < members.size(); i++) {
+      for (size_t i = 0; i < members.size(); i++) {
         test2group[members[i]] = (*it).first;
       }
     }
@@ -190,14 +190,14 @@ namespace unittest {
     // unit_test is the individual small tests over
     // which to parallelize
     vector<string> unit_tests, tasks;
-    for (uint t = 0; t < unit_tests_in.size(); t++) {
+    for (size_t t = 0; t < unit_tests_in.size(); t++) {
       const string& test = unit_tests_in[t];
       bool isgroup = (test_groups.find(test) != test_groups.end());
       if (test == "all") {
         tasks.clear();
         for (std::map<string, vector<string> >::iterator it = test_groups.begin(); it != test_groups.end(); ++it) {
           tasks.push_back((*it).first);
-          for (uint m = 0; m < (*it).second.size(); m++) {
+          for (size_t m = 0; m < (*it).second.size(); m++) {
             unit_tests.push_back((*it).second[m]);
           }
         }
@@ -208,7 +208,7 @@ namespace unittest {
       } else if (isgroup && !aurostd::WithinList(tasks, test)) {
         tasks.push_back(test);
         const vector<string>& members = test_groups[test];
-        for (uint m = 0; m < members.size(); m++) {
+        for (size_t m = 0; m < members.size(); m++) {
           unit_tests.push_back(members[m]);
         }
       } else if (!aurostd::WithinList(tasks, test2group[test])) {
@@ -230,7 +230,7 @@ namespace unittest {
     aurostd::string2tokens(whitelist_str, whitelist, ",");
     if (!XHOST.QUIET) {
       XHOST.QUIET = true;
-      for (uint i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.push_back(whitelist[i]);
+      for (size_t i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.push_back(whitelist[i]);
     }
 #ifdef AFLOW_MULTITHREADS_ENABLE
     std::mutex mtx;
@@ -242,16 +242,17 @@ namespace unittest {
 #endif
     XHOST.QUIET = quiet_copy;
     if (!XHOST.QUIET) {
-      for (uint i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.pop_back();
+      for (size_t i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.pop_back();
     }
 
     // Print final summary
     uint nsuccess = 0;
-    stringstream summary;
-    for (uint t = 0; t < tasks.size(); t++) {
+    vector<vector<string> > summary(tasks.size(), vector<string>(2));
+    for (size_t t = 0; t < tasks.size(); t++) {
       bool success = taskSuccessful(tasks[t]);
       if (success) nsuccess++;
-      summary << "  " << tasks[t] << " | " << (success?"pass":"fail") << "\n";
+      summary[t][0] = tasks[t];
+      summary[t][1] = (success?"pass":"fail");
     }
 
     if (nsuccess == ntasks) {
@@ -261,7 +262,7 @@ namespace unittest {
       message << "Some unit tests failed (" << (ntasks - nsuccess) << " of " << ntasks << " failed).";
       pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     }
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, summary, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, formatResultsTable(summary), aflags, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_);
     return (nsuccess == ntasks);
   }
 
@@ -291,7 +292,7 @@ namespace unittest {
       if (i == ntests_group) {
         // All finished - print output
         uint nsuccess = 0;
-        for (uint t = 0; t < vtests_group.size(); t++) {
+        for (size_t t = 0; t < vtests_group.size(); t++) {
           if (taskSuccessful(vtests_group[t])) nsuccess++;
         }
         stringstream message;
@@ -302,7 +303,7 @@ namespace unittest {
           message << "Some unit tests of group " << group << " failed (" << (ntests_group - nsuccess) << " of " << ntests_group << " failed).";
           pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
         }
-        for (uint t = 0; t < vtests_group.size(); t++) {
+        for (size_t t = 0; t < vtests_group.size(); t++) {
           displayResult(test_functions[vtests_group[t]]);
         }
       }
@@ -313,7 +314,7 @@ namespace unittest {
     std::map<string, vector<string> >::iterator it = test_groups.find(task);
     if (it != test_groups.end()) {
       const vector<string> members = (*it).second;
-      for (uint m = 0; m < members.size(); m++) {
+      for (size_t m = 0; m < members.size(); m++) {
         const string& member = members[m];
         const xcheck& xchk = test_functions[member];
         if (!xchk.finished || (xchk.errors.size() > 0) || (xchk.passed_checks != xchk.results.size())) return false;
@@ -325,14 +326,41 @@ namespace unittest {
     }
   }
 
+  string UnitTest::formatResultsTable(const vector<vector<string> >& table) {
+    size_t nrows = table.size();
+    if (nrows == 0) return "";  // Empty table
+    vector<size_t> col_sizes;
+    size_t str_length = 0;
+    size_t maxcol = 0;
+    for (size_t r = 0; r < nrows; r++) {
+      maxcol = std::max(table[r].size(), maxcol);
+      for (size_t c = 0; c < table[r].size() - 1; c++) {
+        str_length = table[r][c].length();
+        if (c == col_sizes.size()) {
+          col_sizes.push_back(str_length);
+        } else if (str_length > col_sizes[c]) {
+          col_sizes[c] = str_length;
+        }
+      }
+    }
+    if (maxcol == 0) return "";  // Empty rows
+
+    vector<string> output(nrows), row(maxcol);
+    for (size_t r = 0; r < nrows; r++) {
+      for (size_t c = 0; c < maxcol; c++) {
+        row[c] = (c == 0?"  ":"") + aurostd::PaddedPOST((c < table[r].size()?table[r][c]:""), col_sizes[c]);
+      }
+      output[r] = aurostd::joinWDelimiter(row, " | ");
+    }
+    return aurostd::joinWDelimiter(output, "\n");
+  }
+
 }
 
 namespace unittest {
-  // Collection of generic check functions, to streamline testing.
-  // HE20210616
   void UnitTest::displayResult(const xcheck& xchk) {
     stringstream message;
-    uint check_num = xchk.results.size();
+    size_t check_num = xchk.results.size();
     if (xchk.passed_checks == check_num) {
       if (xchk.errors.size() > 0) {
         // All attempted checks passed, but there were errors.
@@ -354,7 +382,11 @@ namespace unittest {
       pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     }
   }
+}
 
+namespace unittest {
+  // Collection of generic check functions, to streamline testing.
+  // HE20210616
   template <typename utype>
   void UnitTest::check(const bool passed, const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
     const string& check_description, uint& passed_checks, vector<string>& results) {
@@ -403,7 +435,7 @@ namespace unittest {
   void UnitTest::checkEqual(const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
       const string& check_description, uint& passed_checks, vector<string>& results) {
     bool passed = (calculated.size() == expected.size());
-    for (uint i = 0; i < calculated.size() && passed; i++) {
+    for (size_t i = 0; i < calculated.size() && passed; i++) {
       passed = aurostd::isequal(calculated[i], expected[i]);
     }
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
@@ -411,7 +443,7 @@ namespace unittest {
   void UnitTest::checkEqual(const vector<string>& calculated, const vector<string>& expected, const string& check_function,
       const string& check_description, uint& passed_checks, vector<string>& results) {
     bool passed = (calculated.size() == expected.size());
-    for (uint i = 0; i < calculated.size() && passed; i++) {
+    for (size_t i = 0; i < calculated.size() && passed; i++) {
       passed = (calculated[i] == expected[i]);
     }
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
@@ -814,11 +846,11 @@ namespace unittest {
     vector<string> vschema_types = {"UNIT", "TYPE"};
     string key = "";
     uint ninconsistent = 0;
-    for (uint i = 0; i < XHOST.vschema.vxsghost.size(); i+= 2) {
+    for (size_t i = 0; i < XHOST.vschema.vxsghost.size(); i+= 2) {
       if(XHOST.vschema.vxsghost[i].find("::NAME:") != string::npos) {
         key=aurostd::RemoveSubString(XHOST.vschema.vxsghost[i], "SCHEMA::NAME:");
         vschema_keys.push_back(XHOST.vschema.getattachedscheme("SCHEMA::NAME:" + key));
-        for (uint j = 0; j < vschema_types.size(); j++) {
+        for (size_t j = 0; j < vschema_types.size(); j++) {
           if (!XHOST.vschema.isdefined("SCHEMA::" + vschema_types[j] + ":" + key)) {
             ninconsistent++;
             if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " SCHEMA::" << vschema_types[j] << ":" << key << " not found." << std::endl;
@@ -840,7 +872,7 @@ namespace unittest {
     vector<string> vkeys_ignore = {"data_language", "error_status", "natoms_orig",
                                    "density_orig", "volume_cell_orig", "volume_atom_orig",
                                    "spinD_magmom_orig"};
-    for (uint k = 0; k < json_keys.size(); k++) {
+    for (size_t k = 0; k < json_keys.size(); k++) {
       const string& key = json_keys[k];
       if (!aurostd::WithinList(vkeys_ignore, key) && !aurostd::WithinList(vschema_keys, key)) {
         ninconsistent++;
@@ -1079,7 +1111,7 @@ namespace unittest {
     vwyckoff[2].type = "O"; vwyckoff[2].letter = "b"; vwyckoff[2].site_symmetry = "m.."; vwyckoff[2].multiplicity = 4; vwyckoff[2].coord[1] = 0.25; vwyckoff[2].coord[2] = 0.2677; vwyckoff[2].coord[3] = 0.3755;
     vwyckoff[3].type = "O"; vwyckoff[3].letter = "b"; vwyckoff[3].site_symmetry = "m.."; vwyckoff[3].multiplicity = 4; vwyckoff[3].coord[1] = 0.25; vwyckoff[3].coord[2] = 0.6078; vwyckoff[3].coord[3] = 0.3284;
     check_passed = (vwyckoff.size() == xstr_cif.wyckoff_sites_ITC.size());
-    for (uint i = 0; i < vwyckoff.size() && check_passed; i++) {
+    for (size_t i = 0; i < vwyckoff.size() && check_passed; i++) {
       check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].type == vwyckoff[i].type));
       check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].letter == vwyckoff[i].letter));
       check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].multiplicity == vwyckoff[i].multiplicity));
@@ -1110,7 +1142,7 @@ namespace unittest {
     vwyckoff[2].coord[1] = 0.25; vwyckoff[2].coord[2] = 0.76770; vwyckoff[2].coord[3] = 0.8755;
     vwyckoff[3].coord[1] = 0.25; vwyckoff[3].coord[2] = 0.60780; vwyckoff[3].coord[3] = 0.3284;
     check_passed = (vwyckoff.size() == xstr_cif.wyckoff_sites_ITC.size());
-    for (uint i = 0; i < vwyckoff.size() && check_passed; i++) {
+    for (size_t i = 0; i < vwyckoff.size() && check_passed; i++) {
       check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].type == vwyckoff[i].type));
       check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].letter == vwyckoff[i].letter));
       check_passed = (check_passed && (xstr_cif.wyckoff_sites_ITC[i].multiplicity == vwyckoff[i].multiplicity));
@@ -1566,7 +1598,7 @@ namespace unittest {
     ofstream ofs("/dev/null");
 
     vector<string> parameter_sets = anrl::getANRLParameters(prototype_labels[i], "all");
-    for (uint j = 0; j < parameter_sets.size(); j++) {
+    for (size_t j = 0; j < parameter_sets.size(); j++) {
       string error = "";
       try {
         xstr = aflowlib::PrototypeLibraries(ofs,prototype_labels[i],parameter_sets[j],1);

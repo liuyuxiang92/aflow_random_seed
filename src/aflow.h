@@ -5425,6 +5425,7 @@ namespace unittest {
       void runUnitTest(vector<string>::iterator& it, const vector<string>& tasks);
       bool taskSuccessful(const string& task);
 
+      string formatResultsTable(const vector<vector<string> >& table);
       void displayResult(const xcheck& xchk);
 
       template <typename utype>
