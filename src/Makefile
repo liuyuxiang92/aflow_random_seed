@@ -1596,7 +1596,7 @@ check_cce:
 check_aflow_exits:
 	@echo "Running aflow_exits test 1: NO 'exit()'" && ANSWER=0 && NUMBER_EXITS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep 'exit(' | wc -l | sed 's/^ *//') && \
 		if [ "$$NUMBER_EXITS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_EXITS exits in the source code. Please swap with 'aurostd::xerror()' and recompile." && exit 1; fi
-unit_tests:
+unit_test:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	./aflow --unit_test
 ###################################################################################################
