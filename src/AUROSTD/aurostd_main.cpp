@@ -5131,6 +5131,26 @@ namespace aurostd {
     return out;
   }
 
+  //SD20220504 - Makes use of "find" rather than "find_first_of"
+  uint StringSplit(const string& str, vector<string>& tokens, const string& delimiter) { //SD20220504
+    tokens.clear();
+    uint dlen = delimiter.length();
+    string::size_type lpos = 0, cpos = str.find(delimiter, lpos);
+    while (cpos != string::npos) {
+      tokens.push_back(str.substr(lpos, cpos - lpos));
+      lpos = cpos + dlen;
+      cpos = str.find(delimiter, lpos);
+    }
+    return tokens.size();
+  }
+  uint StringSplit(const string& str, deque<string>& tokens, const string& delimiter) { //SD20220504
+    tokens.clear();
+    vector<string> vtokens;
+    uint i = aurostd::StringSplit(str, vtokens, delimiter);
+    for (i = 0; i < tokens.size(); i++) {tokens.push_back(vtokens[i]);}
+    return tokens.size();
+  }
+
   // ***************************************************************************
   // Function string2tokensAdd string2tokensAdd<utype>
   // ***************************************************************************

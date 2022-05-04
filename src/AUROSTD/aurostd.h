@@ -743,6 +743,8 @@ namespace aurostd {
   uint string2tokensAdd(const string& str,deque<string>& tokens,const string& delimiters = " ") __xprototype;
   template<class utype> uint string2tokensAdd(const string& str,std::vector<utype>& tokens,const string& delimiters = " ") __xprototype;
   template<class utype> uint string2tokensAdd(const string& str,std::deque<utype>& tokens,const string& delimiters = " ") __xprototype;
+  uint StringSplit(const string& str, vector<string>& tokens, const string& delimiter); //SD20220504
+  uint StringSplit(const string& str, deque<string>& tokens, const string& delimiter); //SD20220504
 
   //[CO20210315 - OBSOLETE use stream2stream()]template<typename typeTo, typename typeFrom> typeTo StringStreamConvert(const typeFrom& from);  //CO20210315 - cleaned up
   //[CO20210315 - OBSOLETE use stream2stream()]template<typename typeFrom> string StringConvert(const typeFrom& from);  //CO20210315 - cleaned up
