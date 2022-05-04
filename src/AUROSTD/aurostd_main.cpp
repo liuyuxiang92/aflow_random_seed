@@ -3782,8 +3782,7 @@ namespace aurostd {
   bool ExtractNthToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword,const int index) {
     stringstream StringstreamOUTPUT;
     if (ExtractNthToStringstreamEXPLICIT(FileIN,StringstreamOUTPUT,Keyword,index)) {
-      aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
-      return TRUE;
+      return aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
     }
     return FALSE;
   }
@@ -3791,8 +3790,7 @@ namespace aurostd {
   bool ExtractNthToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index) {
     stringstream StringstreamOUTPUT;
     if (ExtractNthToStringstreamEXPLICIT(FileIN,StringstreamOUTPUT,Keyword_start,Keyword_stop,index)) {
-      aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
-      return TRUE;
+      return aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
     }
     return FALSE;
   }
@@ -3800,8 +3798,7 @@ namespace aurostd {
   bool ExtractNthToFileEXPLICIT(stringstream& StringStreamIN,const string& FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop,int index) {
     stringstream StringstreamOUTPUT;
     if (ExtractNthToStringstreamEXPLICIT(StringStreamIN,StringstreamOUTPUT,Keyword_start,Keyword_stop,index)) {
-      aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
-      return TRUE;
+      return aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
     }
     return FALSE;
   }
@@ -3809,8 +3806,7 @@ namespace aurostd {
   bool ExtractNthToFileEXPLICIT(const string& StringIN,const string& FileNameOUTPUT,const string& Keyword,const int index) {
     stringstream StringstreamOUTPUT;
     if (ExtractNthToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword,index)) {
-      aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
-      return TRUE;
+      return aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
     }
     return FALSE;
   }
@@ -3818,8 +3814,7 @@ namespace aurostd {
   bool ExtractNthToFileEXPLICIT(const string& StringIN,const string& FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index) {
     stringstream StringstreamOUTPUT;
     if (ExtractNthToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start,Keyword_stop,index)) {
-      aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
-      return TRUE;
+      return aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
     }
     return FALSE;
   }
@@ -4151,7 +4146,6 @@ namespace aurostd {
   }
 
   bool ExtractJustAfterToStringstreamEXPLICIT(stringstream& StringStreamIN,stringstream& StringstreamOUTPUT,const string& Keyword_start) { // AFLOW_FUNCTION_IMPLEMENTATION
-    aurostd::StringstreamClean(StringstreamOUTPUT);
     string StringIN=StringStreamIN.str();
     return ExtractJustAfterToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start);
   }
@@ -4183,8 +4177,7 @@ namespace aurostd {
     //[SD20220502 - OBSOLETE]return status;  // return FALSE if something got messed up
     stringstream StringstreamOUTPUT;
     if(ExtractJustAfterToStringstreamEXPLICIT(FileIN,StringstreamOUTPUT,Keyword_start)) {
-      aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
-      return TRUE;
+      return aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
     }
     return FALSE;
   }
