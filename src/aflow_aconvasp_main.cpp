@@ -111,12 +111,12 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"APDC::PLATTICE","--plattice=","");
     vpflow.args2addattachedscheme(argv,cmds,"APDC::ELEMENTS","--elements=","");
     vpflow.args2addattachedscheme(argv,cmds,"APDC::MAX_NUM_ATOMS","--max_num_atoms=|--mna=","");
-    vpflow.args2addattachedscheme(argv,cmds,"APDC::CONC_CURVE","--conc_curve=","");
+    vpflow.args2addattachedscheme(argv,cmds,"APDC::CONC_CURVE_RANGE","--conc_curve_range=|--conc_curve=","");
     vpflow.args2addattachedscheme(argv,cmds,"APDC::CONC_NPTS","--conc_npts=","");
     vpflow.args2addattachedscheme(argv,cmds,"APDC::TEMP_RANGE","--temp_range=","");
     vpflow.args2addattachedscheme(argv,cmds,"APDC::TEMP_NPTS","--temp_npts=","");
     vpflow.args2addattachedscheme(argv,cmds,"APDC::FORMAT_DATA","format_data=|--data_format=","txt");
-    vpflow.args2addattachedscheme(argv,cmds,"APDC::FORMAT_PLOT","format_plot=|--plot_format=","pdf");
+    vpflow.args2addattachedscheme(argv,cmds,"APDC::FORMAT_PLOT","format_image=|--image_format=","pdf");
   }
 
   // Commands for serializing bands and DOS data to JSON
@@ -2355,7 +2355,7 @@ namespace pflow {
     strstream << endl;
     strstream << tab << xspaces << " " << "BINODAL OPTIONS:" << endl;
     strstream << tab << xspaces << " " << "              --max_num_atoms=|--mna=8" << endl;
-    strstream << tab << xspaces << " " << "              --conc_curve=0,1,1,0" << endl;
+    strstream << tab << xspaces << " " << "              --conc_curve_range=|--conc_curve=0,1,1,0" << endl;
     strstream << tab << xspaces << " " << "              --conc_npts=20" << endl;
     strstream << tab << xspaces << " " << "              --temp_range=300,2000" << endl;
     strstream << tab << xspaces << " " << "              --temp_npts=100" << endl;
@@ -2364,7 +2364,7 @@ namespace pflow {
     strstream << tab << xspaces << " " << "              --spinodal" << endl;
     strstream << tab << xspaces << " " << "FORMAT OPTIONS:" << endl;
     strstream << tab << xspaces << " " << "              --format_data=|--data_format=txt|json" << endl;
-    strstream << tab << xspaces << " " << "              --format_plot=|--plot_format=pdf|eps|png" << endl;
+    strstream << tab << xspaces << " " << "              --format_image=|--image_format=pdf|eps|png" << endl;
     strstream << tab << x << " --atat < POSCAR" << endl;
     strstream << tab << x << " [options] --bader -D DIRECTORY" << endl;
     strstream << tab << xspaces << " " << "options are:  --usage" << endl;

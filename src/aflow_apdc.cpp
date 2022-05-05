@@ -26,7 +26,7 @@ _apdc_data::_apdc_data() {
   num_threads = 0;
   min_sleep = 0;
   format_data = "";
-  format_plot = "";
+  format_image = "";
   image_only = false;
   workdirpath = "";
   rootdirpath = "";
@@ -35,7 +35,8 @@ _apdc_data::_apdc_data() {
   aflow_max_num_atoms = 0;
   max_num_atoms = 0;
   conc_npts = 0;
-  conc_curve.clear();
+  conc_curve = false;
+  conc_curve_range.clear();
   conc_macro.clear();
   temp_npts = 0;
   temp_range.clear();
@@ -75,7 +76,7 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
     num_threads = b.num_threads;
     min_sleep = b.min_sleep;
     format_data = b.format_data;
-    format_plot = b.format_plot;
+    format_image = b.format_image;
     image_only = b.image_only;
     workdirpath = b.workdirpath;
     rootdirpath = b.rootdirpath;
@@ -84,6 +85,7 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
     max_num_atoms = b.max_num_atoms;
     conc_npts = b.conc_npts;
     conc_curve = b.conc_curve;
+    conc_curve_range = b.conc_curve_range;
     conc_macro = b.conc_macro;
     temp_npts = b.temp_npts;
     temp_range = b.temp_range;
@@ -139,8 +141,9 @@ namespace apdc {
     else {
       apdc_data.max_num_atoms = DEFAULT_APDC_MAX_NUM_ATOMS;
     }
-    if (!vpflow.getattachedscheme("APDC::CONC_CURVE").empty()) {
-      aurostd::string2tokens(vpflow.getattachedscheme("APDC::CONC_CURVE"), apdc_data.conc_curve, ",");
+    if (!vpflow.getattachedscheme("APDC::CONC_CURVE_RANGE").empty()) {
+      apdc_data.conc_curve = true;
+      aurostd::string2tokens(vpflow.getattachedscheme("APDC::CONC_CURVE_RANGE"), apdc_data.conc_curve_range, ",");
     }
     if (!vpflow.getattachedscheme("APDC::CONC_NPTS").empty()) {
       apdc_data.conc_npts = aurostd::string2utype<int>(vpflow.getattachedscheme("APDC::CONC_NPTS"));
@@ -169,11 +172,11 @@ namespace apdc {
       }
     }
     if (!vpflow.flag("APDC::NO_PLOT")) {
-      if (!vpflow.getattachedscheme("APDC::FORMAT_PLOT").empty()) {
-        apdc_data.format_plot = vpflow.getattachedscheme("APDC::FORMAT_PLOT");
+      if (!vpflow.getattachedscheme("APDC::FORMAT_IMAGE").empty()) {
+        apdc_data.format_image = vpflow.getattachedscheme("APDC::FORMAT_IMAGE");
       }
       else {
-        apdc_data.format_plot = DEFAULT_APDC_FORMAT_PLOT;
+        apdc_data.format_image = DEFAULT_APDC_FORMAT_PLOT;
       }
     }
     if (vpflow.flag("APDC::IMAGE_ONLY")) {apdc_data.image_only = true;}
@@ -190,7 +193,7 @@ namespace apdc {
     apdc_data.rootdirpath = aurostd::CleanFileName(apdc_data.rootdirpath);
     apdc_data.plattice = aurostd::tolower(apdc_data.plattice);
     apdc_data.format_data = aurostd::tolower(apdc_data.format_data);
-    apdc_data.format_plot = aurostd::tolower(apdc_data.format_plot);
+    apdc_data.format_image = aurostd::tolower(apdc_data.format_image);
     aurostd::sort_remove_duplicates(apdc_data.elements);
     ErrorChecks(apdc_data);
     apdc_data.rundirpath += apdc_data.rootdirpath + "/" + pflow::arity_string(apdc_data.elements.size(), false, false) + "/" + apdc_data.plattice + "/" + apdc_data.alloyname;
@@ -259,8 +262,8 @@ namespace apdc {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     // Check if concentration curve format is valid
-    if (!apdc_data.conc_curve.empty()) {
-      if (apdc_data.conc_curve.size() != 2 * apdc_data.elements.size()) {
+    if (apdc_data.conc_curve) {
+      if (apdc_data.conc_curve_range.size() != 2 * apdc_data.elements.size()) {
         string message = "Concentration curve must have format [X1_start, X1_end, X2_start, X2_end,...X(K)_start, X(K)_end]";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
       }
@@ -269,13 +272,13 @@ namespace apdc {
       vector<double> vconc_init, vconc_final;
       vector<int> vzeros_init, vzeros_final;
       for (uint i = 0; i < apdc_data.elements.size() && totconc_init <= 1.0 && totconc_final <= 1.0; i++) {
-        if (apdc_data.conc_curve[2 * i] < 0 || apdc_data.conc_curve[2 * i] > 1 ||
-            apdc_data.conc_curve[2 * i + 1] < 0 || apdc_data.conc_curve[2 * i + 1] > 1) {
+        if (apdc_data.conc_curve_range[2 * i] < 0 || apdc_data.conc_curve_range[2 * i] > 1 ||
+            apdc_data.conc_curve_range[2 * i + 1] < 0 || apdc_data.conc_curve_range[2 * i + 1] > 1) {
           string message = "Concentration curve must be defined on [0,1]";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
         }
-        totconc_init += apdc_data.conc_curve[2 * i]; totconc_final += apdc_data.conc_curve[2 * i + 1];
-        vconc_init.push_back(apdc_data.conc_curve[2 * i]); vconc_final.push_back(apdc_data.conc_curve[2 * i + 1]);
+        totconc_init += apdc_data.conc_curve_range[2 * i]; totconc_final += apdc_data.conc_curve_range[2 * i + 1];
+        vconc_init.push_back(apdc_data.conc_curve_range[2 * i]); vconc_final.push_back(apdc_data.conc_curve_range[2 * i + 1]);
       }
       if (!aurostd::isequal(totconc_init, 1.0) || !aurostd::isequal(totconc_final, 1.0)) {
         string message = "Total concentration must sum to 1";
@@ -285,12 +288,12 @@ namespace apdc {
       aurostd::WithinList(vconc_init, 0.0, vzeros_init); aurostd::WithinList(vconc_final, 0.0, vzeros_final);
       double cdelta_init = CONC_SHIFT * (double)vzeros_init.size() / ((double)vconc_init.size() - (double)vzeros_init.size());
       double cdelta_final = CONC_SHIFT * (double)vzeros_final.size() / ((double)vconc_final.size() - (double)vzeros_final.size());
-      for (uint i = 0; i < apdc_data.conc_curve.size(); i++) {
-        if (aurostd::isequal(apdc_data.conc_curve[i], 0.0)) {
-          apdc_data.conc_curve[i] += CONC_SHIFT;
+      for (uint i = 0; i < apdc_data.conc_curve_range.size(); i++) {
+        if (aurostd::isequal(apdc_data.conc_curve_range[i], 0.0)) {
+          apdc_data.conc_curve_range[i] += CONC_SHIFT;
         }
         else {
-          apdc_data.conc_curve[i] -= (i % 2) ? cdelta_final : cdelta_init;
+          apdc_data.conc_curve_range[i] -= (i % 2) ? cdelta_final : cdelta_init;
         }
       }
     }
@@ -314,8 +317,8 @@ namespace apdc {
       string message = "Format \"" + apdc_data.format_data + "\" is invalid";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
     }
-    if (!apdc_data.format_plot.empty() && (apdc_data.format_plot != "pdf" && apdc_data.format_plot != "eps" && apdc_data.format_plot != "png")) {
-      string message = "Format \"" + apdc_data.format_plot + "\" is invalid";
+    if (!apdc_data.format_image.empty() && (apdc_data.format_image != "pdf" && apdc_data.format_image != "eps" && apdc_data.format_image != "png")) {
+      string message = "Format \"" + apdc_data.format_image + "\" is invalid";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
     }
   }
@@ -342,10 +345,8 @@ namespace apdc {
     else { // run ATAT
       apdc_data.lat_atat = CreateLatForATAT(apdc_data.plattice, apdc_data.elements);
       apdc_data.vstr_atat = GetATATXstructures(apdc_data.lat_atat, (uint)apdc_data.max_num_atoms);
-      //apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads, false);
       apdc_data.vstr_aflow = GetAFLOWXstructures(apdc_data.plattice, apdc_data.elements, apdc_data.num_threads);
-      // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
-      apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, apdc_data.aflow_max_num_atoms), apdc_data.vstr_aflow, apdc_data.num_threads);
+      apdc_data.mapstr = GetMapForXstructures(GetATATXstructures(apdc_data.lat_atat, apdc_data.aflow_max_num_atoms), apdc_data.vstr_aflow, apdc_data.num_threads); // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
       GenerateFilesForATAT(apdc_data.rundirpath, apdc_data.lat_atat, apdc_data.vstr_aflow, apdc_data.vstr_atat, apdc_data.mapstr);
       RunATAT(apdc_data.workdirpath, apdc_data.rundirpath, apdc_data.min_sleep);
     }
@@ -354,7 +355,7 @@ namespace apdc {
     apdc_data.excess_energy_cluster = GetExcessEnergyCluster(apdc_data.rundirpath, apdc_data.conc_cluster, apdc_data.num_atom_cluster);
     SetCongruentClusters(apdc_data);
     apdc_data.degeneracy_cluster = GetDegeneracyCluster(apdc_data.plattice, apdc_data.vstr_atat, apdc_data.elements, apdc_data.max_num_atoms, true, apdc_data.rundirpath);
-    apdc_data.conc_macro = GetConcentrationMacro(apdc_data.conc_curve, apdc_data.conc_npts, apdc_data.elements.size());
+    apdc_data.conc_macro = GetConcentrationMacro(apdc_data.conc_curve_range, apdc_data.conc_npts, apdc_data.elements.size());
     apdc_data.prob_ideal_cluster = GetProbabilityIdealCluster(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.degeneracy_cluster, apdc_data.max_num_atoms);
     CheckProbability(apdc_data.conc_macro, apdc_data.conc_cluster, apdc_data.prob_ideal_cluster);
     apdc_data.temp = GetTemperature(apdc_data.temp_range, apdc_data.temp_npts);
@@ -556,12 +557,12 @@ namespace apdc {
 // apdc::GetConcentrationMacro
 // ***************************************************************************
 namespace apdc {
-  xmatrix<double> GetConcentrationMacro(const vector<double>& conc_curve, const int conc_npts, const uint nelem) {
+  xmatrix<double> GetConcentrationMacro(const vector<double>& conc_curve_range, const int conc_npts, const uint nelem) {
     xmatrix<double> conc_macro;
-    if (!conc_curve.empty()) { // curve in concentration space
+    if (!conc_curve_range.empty()) { // curve in concentration space
       xmatrix<double> _conc_macro(conc_npts, nelem);
       for (uint i = 0; i < nelem; i++) {
-        _conc_macro.setcol(aurostd::linspace(conc_curve[2 * i], conc_curve[2 * i + 1], conc_npts), i + 1);
+        _conc_macro.setcol(aurostd::linspace(conc_curve_range[2 * i], conc_curve_range[2 * i + 1], conc_npts), i + 1);
       }
       conc_macro = _conc_macro;
     }
@@ -1130,7 +1131,7 @@ namespace apdc {
     usage_options.push_back(" ");
     usage_options.push_back("BINODAL OPTIONS:");
     usage_options.push_back("--max_num_atoms=|--mna=8");
-    usage_options.push_back("--conc_curve=0,1,1,0");
+    usage_options.push_back("--conc_curve_range=|--conc_curve=0,1,1,0");
     usage_options.push_back("--conc_npts=20");
     usage_options.push_back("--temp_range=300,2000");
     usage_options.push_back("--temp_npts=100");
@@ -1140,7 +1141,7 @@ namespace apdc {
     usage_options.push_back(" ");
     usage_options.push_back("FORMAT OPTIONS:");
     usage_options.push_back("--format_data=|--data_format=txt|json");
-    usage_options.push_back("--format_plot=|--plot_format=pdf|eps|png");
+    usage_options.push_back("--format_image=|--image_format=pdf|eps|png");
     usage_options.push_back(" ");
     init::MessageOption("--usage", "APDC()", usage_options);
     return;
@@ -1181,7 +1182,9 @@ namespace apdc {
     else if (apdc_data.format_data == "json") {
       aurostd::JSONwriter json;
       json.addString("Alloy name", apdc_data.alloyname);
+      json.addVector("Elements", apdc_data.elements);
       json.addString("Parent lattice", apdc_data.plattice);
+      json.addNumber("Concentration curve", apdc_data.conc_curve);
       json.addMatrix("Macroscopic concentration", apdc_data.conc_macro);
       json.addVector("Temperature range (K)", apdc_data.temp);
       json.addNumber("Max atoms per cell", apdc_data.max_num_atoms);
@@ -1209,6 +1212,7 @@ namespace apdc {
     }
     string jsonfile = aurostd::file2string(filepath);
     apdc_data.alloyname = aurostd::extractJsonValueAflow(jsonfile, "Alloy name");
+    apdc_data.conc_curve = aurostd::string2utype<bool>(aurostd::extractJsonValueAflow(jsonfile, "Concentration curve"));
     apdc_data.conc_macro = aurostd::vectorvector2xmatrix<double>(aurostd::extractJsonMatrixAflow(jsonfile, "Macroscopic concentration"));
     apdc_data.temp = aurostd::vector2xvector<double>(aurostd::extractJsonVectorAflow(jsonfile, "Temperature range (K)"));
     apdc_data.binodal_boundary = aurostd::vector2xvector<double>(aurostd::extractJsonVectorAflow(jsonfile, "Binodal boundary (K)"));
@@ -1220,7 +1224,71 @@ namespace apdc {
 // ***************************************************************************
 namespace apdc {
   void PlotData(const _apdc_data& apdc_data) {
-    if (apdc_data.format_data.empty()) {return;}
+    stringstream gpfile;
+    aurostd::xoption plotoptions;
+    vector<vector<double>> data;
+    // BEGIN - set standard
+    plotoptions.push_attached("BACKGROUND_COLOR", "#FFFFFF");
+    plotoptions.push_attached("GRID_COLOR", "#808080");
+    plotoptions.push_attached("GRID_WIDTH", "1");
+    plotoptions.push_attached("GRID_LINE_TYPE", "0");
+    plotoptions.push_attached("PLOT_SIZE", "5.333, 3");
+    // END - set standard
+    // START - set default
+    plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
+    plotoptions.push_attached("FILE_NAME", apdc_data.rundirpath + "/" + APDC_FILE_PREFIX + "plot");
+    plotoptions.push_attached("FILE_NAME_LATEX", apdc_data.rundirpath + "/" + APDC_FILE_PREFIX + "plot");
+    plotoptions.push_attached("IMAGE_FORMAT", apdc_data.format_image);
+    plotoptions.push_attached("PLOT_TITLE", apdc_data.alloyname);
+    plotoptions.push_attached("XLABEL", "Concentration");
+    plotoptions.push_attached("XMIN", "0.0");
+    plotoptions.push_attached("XMAX", "1.0");
+    plotoptions.push_attached("XUNIT", "");
+    plotoptions.push_attached("YLABEL", "Temperature");
+    plotoptions.push_attached("YMIN", "10.0");
+    plotoptions.push_attached("YMAX", aurostd::utype2string(1.2 * aurostd::max(apdc_data.binodal_boundary)));
+    plotoptions.push_attached("YUNIT", "K");
+    plotoptions.push_attached("TITLES", "Binodal,Spinodal");
+    plotoptions.push_attached("COLORS", "#000000,#000000");
+    plotoptions.push_attached("LINETYPES", "-1,7");
+    // END - set default
+    plotter::generateHeader(gpfile, plotoptions, false);
+    if (apdc_data.conc_curve) { // generic x-axis for the concentration curve
+      xvector<double> a = aurostd::linspace(0.0, 1.0, apdc_data.conc_macro.rows);
+      for (int i = 1; i <= apdc_data.conc_macro.rows; i++) {data.push_back({a(i), apdc_data.binodal_boundary(i)});}
+        // START - custom
+        gpfile << "# Custom" << endl;
+        gpfile << "set label '\\shortstack{c}{$" << apdc_data.elements[0] << "$=" << apdc_data.conc_macro(1, 1);
+        for (uint i = 1; i < apdc_data.elements.size(); i++) {
+          gpfile << "\\\\$" << apdc_data.elements[i] << "$=" << apdc_data.conc_macro(1, i + 1);
+        }
+        gpfile << "}' at 0.0,0.0 center offset 0.0,-2.5" << endl;
+        gpfile << "set label '\\shortstack{c}{$" << apdc_data.elements[0] << "$=" << apdc_data.conc_macro(apdc_data.conc_macro.rows, 1);
+        for (uint i = 1; i < apdc_data.elements.size(); i++) {
+          gpfile << "\\\\$" << apdc_data.elements[i] << "$=" << apdc_data.conc_macro(apdc_data.conc_macro.rows, i + 1);
+        }
+        gpfile << "}' at 0.0,0.0 center offset 0.0,-2.5" << endl;
+        // END - custom
+    }
+    else if (apdc_data.elements.size() == 2) {
+      xvector<double> a = apdc_data.conc_macro.getcol(1);
+      for (int i = 1; i <= apdc_data.conc_macro.rows; i++) {data.push_back({a(i), apdc_data.binodal_boundary(i)});}
+      // START - custom
+      gpfile << "# Custom" << endl;
+      gpfile << "set label '$" << apdc_data.elements[0] << "$' at 0.0,0.0 center offset 0.0,-2.5" << endl;
+      gpfile << "set label '$" << apdc_data.elements[1] << "$' at 1.0,0.0 center offset 0.0,-2.5" << endl;
+      // END - custom
+    }
+    else {
+      return; // no plotting support for alloys higher than binary
+    }
+    if (!apdc_data.format_data.empty()) {
+      plotter::savePlotGNUPLOT(plotoptions, gpfile);
+    }
+    else {
+      cout << gpfile.str() << endl;
+    }
+    return;
   }
 }
 

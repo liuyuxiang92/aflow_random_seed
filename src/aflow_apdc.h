@@ -25,7 +25,7 @@ class _apdc_data {
     int num_threads;
     uint min_sleep;
     string format_data;
-    string format_plot;
+    string format_image;
     bool image_only;
     string workdirpath;
     string rootdirpath;
@@ -34,7 +34,8 @@ class _apdc_data {
     int aflow_max_num_atoms;
     int max_num_atoms;
     int conc_npts;
-    vector<double> conc_curve; // DIM: 2*Nk
+    bool conc_curve;
+    vector<double> conc_curve_range; // DIM: 2*Nk
     xmatrix<double> conc_macro; // UNIT: unitless | DIM: Nc, Nk
     int temp_npts;
     vector<double> temp_range; // UNIT: K | DIM: 2
@@ -80,7 +81,7 @@ namespace apdc {
   xmatrix<double> GetProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms);
   void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob);
   void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob0, const vector<xmatrix<double>>& prob);
-  xmatrix<double> GetConcentrationMacro(const vector<double>& conc_curve, const int conc_npts, const uint nelem);
+  xmatrix<double> GetConcentrationMacro(const vector<double>& conc_curve_range, const int conc_npts, const uint nelem);
   xvector<double> GetTemperature(const vector<double>& temp_range, const int temp_npts);
   void SetCongruentClusters(_apdc_data& apdc_data);
   xvector<int> GetNumAtomCluster(const vector<xstructure>& vstr);
@@ -90,7 +91,7 @@ namespace apdc {
   xvector<double> GetExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const xvector<int>& natom);
   void RunATAT(const string& workdirpath, const string& rundirpath, const uint min_sleep);
   void GenerateFilesForATAT(const string& rundirpath, const string& lat_atat, const vector<xstructure>& vstr_aflow, const vector<xstructure>& vstr_atat, const vector<int>& mapstr);
-  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_threads, bool use_sg=true);
+  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_threads, bool use_sg=false);
   string CreateLatForATAT(const string& plattice, const vector<string>& elements);
   vector<xstructure> GetATATXstructures(const string& lat, const uint max_num_atoms, const string& rundirpath="");
   vector<int> GetMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads);

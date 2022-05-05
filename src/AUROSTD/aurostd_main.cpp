@@ -5141,6 +5141,7 @@ namespace aurostd {
       lpos = cpos + dlen;
       cpos = str.find(delimiter, lpos);
     }
+    tokens.push_back(str.substr(lpos, str.length() - lpos));
     return tokens.size();
   }
   uint StringSplit(const string& str, deque<string>& tokens, const string& delimiter) { //SD20220504
