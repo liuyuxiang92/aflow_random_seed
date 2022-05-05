@@ -10504,6 +10504,7 @@ namespace pflow {
     //HE+ME20220503
     // Be permissive and search for substrings to allow for white/black listing
     // of groups of functions or namespaces without implementing regexes
+    // The white and black lists should be treated like a stack: only push and pop
     bool quiet = XHOST.QUIET;
     if (XHOST.QUIET) quiet = !aurostd::substringlist2bool(function_name, XHOST.LOGGER_WHITELIST, false);
     else quiet = aurostd::substringlist2bool(function_name, XHOST.LOGGER_BLACKLIST, false);
