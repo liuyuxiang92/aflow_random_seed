@@ -442,6 +442,23 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 
   check_equal(pval, aurostd::polynomialCurveFit(xdata, ydata, 5, wdata), check_function, check_description, passed_checks, results);
 
+  // ---------------------------------------------------------------------------
+  // Check | equilibrateMatrix //SD20220505
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::equilibrateMatrix()";
+  check_description = "pre-condition an ill-conditioned matrix";
+  xmatrix<double> icm(4,4);
+  icm(1,1) = 0.7577; icm(1,2) = 0.1712e-5; icm(1,3) = 0.0462; icm(1,4) = 0.3171;
+  icm(2,1) = 0.7431; icm(2,2) = 0.7060; icm(2,3) = 0.0971; icm(2,4) = 0.9502;
+  icm(3,1) = 0.3922; icm(3,2) = 0.0318; icm(3,3) = 0.8235; icm(3,4) = 0.0344;
+  icm(4,1) = 0.6555; icm(4,2) = 0.2769; icm(4,3) = 0.6948e5; icm(4,4) = 0.4387;
+  xmatrix<double> em, rm, cm;
+  aurostd::equilibrateMatrix(icm, em, rm, cm);
+  bool success = aurostd::isequal(1.0, aurostd::sign(aurostd::condition_number(icm) - aurostd::condition_number(em))) &&
+                 aurostd::isequal(icm, aurostd::inverse(rm) * em * aurostd::inverse(cm));
+
+  check_equal(true, success, check_function, check_description, passed_checks, results);
+
   // present overall result
   return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
 }

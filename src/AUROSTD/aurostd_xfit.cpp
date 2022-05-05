@@ -27,10 +27,21 @@ namespace aurostd{
   }
 
   //SD20220422
-  xvector<double> evalPolynomial(const xvector<double>& x, const xvector<double>& p) {
+  xvector<double> evalPolynomial_xv(const xvector<double>& x, const xvector<double>& p) {
     xvector<double> res(x.rows);
-    for (int i=1; i<=res.rows; i++) {
+    for (int i = 1; i <= res.rows; i++) {
       res(i) = evalPolynomial(x(i), p);
+    }
+    return res;
+  }
+
+  //SD20220505
+  xmatrix<double> evalPolynomial_xm(const xmatrix<double>& x, const xvector<double>& p) {
+    xmatrix<double> res(x.rows, x.cols);
+    for (int i = 1; i <= res.rows; i++) {
+      for (int j = 1; j <= res.cols; j++) {
+        res(i, j) = evalPolynomial(x(i, j), p);
+      }
     }
     return res;
   }
@@ -69,7 +80,7 @@ namespace aurostd{
 
   //SD20220422
   //Returns the coefficients of the nth derivative of the polynomial
-  xvector<double> evalPolynomialDeriv(const xvector<double>& p, const uint n) {
+  xvector<double> evalPolynomialCoeff(const xvector<double>& p, const uint n) {
     if ((int)n >= p.rows) {return 0.0 * ones_xv<double>(1);}
     xvector<double> dp(p.rows - n);
     for (int i = p.rows; i > (int)n; i--) {

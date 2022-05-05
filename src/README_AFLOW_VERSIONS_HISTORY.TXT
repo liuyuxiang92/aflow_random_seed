@@ -26,6 +26,15 @@
         -- added KBIN::BIN2VASPVersion (SD)
         -- fixed KBIN::VASPVersionString2Double, aurostd::substring2bool, aurostd::kvpairfound (SD)
         -- imporved AFLUX calls for --compare_database_entries and --compare2database (ME)
+        -- added univariate polynomial solver (SD)
+        -- added univariate polynomial fit with weights (SD)
+        -- added LUP decomposition (SD)
+        -- updated aurostd::inverse function to be more robust (SD)
+        -- added aurostd::condition_number (SD)
+        -- added matrix pre-conditioner in aurostd::equilibrateMatrix (SD)
+        -- added linspace function (SD)
+        -- added simplistic JSON extractor for vectors and matrices (SD)
+        -- added binodal construction module (SD)
 3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)

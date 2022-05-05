@@ -204,8 +204,8 @@ namespace apdc {
     }
     // Calculations
     GetBinodalData(apdc_data);
-    // Print and plot results
-    PrintData(apdc_data);
+    // Write and plot results
+    WriteData(apdc_data);
     PlotData(apdc_data);
     return;
   }
@@ -432,7 +432,7 @@ namespace apdc {
     xvector<double> wts = aurostd::ones_xv<double>(order_param.rows);
     xvector<double> p = aurostd::polynomialCurveFit(temp_scaled, order_param, n_fit, wts);
     int buffer = (int)std::floor(0.1 * temp.rows); // avoid edge points when evaluating derivatives
-    vector<double> temp_ec = {temp_std * aurostd::polynomialFindExtremum(aurostd::evalPolynomialDeriv(p, 1), temp_scaled(buffer), temp_scaled(temp.rows - buffer)) + temp_mean};
+    vector<double> temp_ec = {temp_std * aurostd::polynomialFindExtremum(aurostd::evalPolynomialCoeff(p, 1), temp_scaled(buffer), temp_scaled(temp.rows - buffer)) + temp_mean};
     if (LDEBUG) {cerr << "T_ec(K)=" << temp_ec[0] << endl;}
     prob_ec = GetProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, aurostd::vector2xvector(temp_ec), max_num_atoms);
     for (int i = 1; i <= prob_ideal_ec.cols; i++) {
@@ -1139,8 +1139,8 @@ namespace apdc {
     usage_options.push_back("--spinodal");
     usage_options.push_back(" ");
     usage_options.push_back("FORMAT OPTIONS:");
-    usage_options.push_back("format_data=|--data_format=txt|json");
-    usage_options.push_back("format_plot=|--plot_format=pdf|eps|png");
+    usage_options.push_back("--format_data=|--data_format=txt|json");
+    usage_options.push_back("--format_plot=|--plot_format=pdf|eps|png");
     usage_options.push_back(" ");
     init::MessageOption("--usage", "APDC()", usage_options);
     return;
@@ -1148,10 +1148,10 @@ namespace apdc {
 }
 
 // ***************************************************************************
-// apdc::PrintData
+// apdc::WriteData
 // ***************************************************************************
 namespace apdc {
-  void PrintData(const _apdc_data& apdc_data) {
+  void WriteData(const _apdc_data& apdc_data) {
     string filepath = apdc_data.rundirpath + "/" + APDC_FILE_PREFIX + "output." + apdc_data.format_data;
     if (apdc_data.format_data.empty() || apdc_data.format_data == "txt") {
       stringstream output;
