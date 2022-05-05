@@ -286,7 +286,7 @@ namespace unittest {
     }
 
     if (nsuccess == ntasks) {
-      message << "Unit tests passed successfully (passing " << ntasks << " tests).";
+      message << "Unit tests passed successfully (passing " << ntasks << " task" + string((ntasks == 1)?"":"s") + ").";
       pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
     } else {
       message << "Some unit tests failed (" << (ntasks - nsuccess) << " of " << ntasks << " failed).";
@@ -331,7 +331,7 @@ namespace unittest {
         }
         stringstream message;
         if (nsuccess == ntests_group) {
-          message << "Unit tests of group " << group << " passed successfully (passing " << ntests_group << " tests).";
+          message << "Unit tests of group " << group << " passed successfully (passing " << ntests_group << " test" << ((ntests_group == 1)?"":"s") << ").";
           pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
         } else {
           message << "Some unit tests of group " << group << " failed (" << (ntests_group - nsuccess) << " of " << ntests_group << " failed).";
@@ -434,7 +434,7 @@ namespace unittest {
         message << "FAIL " << xchk.task_description << " due to runtime errors" << std::endl;
         pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
       } else {
-        message << "SUCCESS " << xchk.task_description << " (passing " << check_num << " checks)" << std::endl;
+        message << "SUCCESS " << xchk.task_description << " (passing " << check_num << " check" << ((check_num == 1)?"":"s") << ")" << std::endl;
         pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
       }
     } else {

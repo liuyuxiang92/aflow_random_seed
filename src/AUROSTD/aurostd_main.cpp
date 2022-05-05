@@ -5579,6 +5579,39 @@ namespace aurostd {
     return FALSE;
   }
 
+  // ME20220505
+  // Matches a list of substrings to a string
+  // match_all: only substring must be inside the string
+  bool substringlist2bool(const string& strin, const vector<string>& substrings, bool match_all) {
+    for (uint i = 0; i < substrings.size(); i++) {
+      if (strin.find(substrings[i]) == string::npos) {
+        // Didn't find substring, but need all
+        if (match_all) return false;
+      } else if (!match_all) {
+        // Found something and only need one
+        return true;
+      }
+    }
+    // Code only gets here when all substrings are
+    // in the string (match_all) or none have (!match_all)
+    return match_all;
+  }
+
+  bool substringlist2bool(const string& strin, const deque<string>& substrings, bool match_all) {
+    for (uint i = 0; i < substrings.size(); i++) {
+      if (strin.find(substrings[i]) == string::npos) {
+        // Didn't find substring, but need all
+        if (match_all) return false;
+      } else if (!match_all) {
+        // Found something and only need one
+        return true;
+      }
+    }
+    // Code only gets here when all substrings are
+    // in the string (match_all) or none have (!match_all)
+    return match_all;
+  }
+
   bool substring2bool(const stringstream& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) {
     return aurostd::substring2bool(strstream.str(),strsub1,RemoveWS,RemoveComments);
   }

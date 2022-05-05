@@ -10505,8 +10505,8 @@ namespace pflow {
     // Be permissive and search for substrings to allow for white/black listing
     // of groups of functions or namespaces without implementing regexes
     bool quiet = XHOST.QUIET;
-    if (XHOST.QUIET) quiet = !aurostd::SubstringWithinList(XHOST.LOGGER_WHITELIST, function_name);
-    else quiet = aurostd::SubstringWithinList(XHOST.LOGGER_BLACKLIST, function_name);
+    if (XHOST.QUIET) quiet = !aurostd::substringlist2bool(function_name, XHOST.LOGGER_WHITELIST, false);
+    else quiet = aurostd::substringlist2bool(function_name, XHOST.LOGGER_BLACKLIST, false);
 
     bool osswrite=!silent;
     if (type == _LOGGER_ERROR_) {aurostd::PrintErrorStream(FileMESSAGE,stream,quiet,osswrite);} //oss - DEFAULT TO cerr
