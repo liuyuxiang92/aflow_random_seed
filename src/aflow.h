@@ -5421,7 +5421,6 @@ namespace unittest {
 
       void resetUnitTest(xcheck&);
       xcheck initializeXCheck();
-      void multiplyByFive();
 
       void runUnitTest(vector<string>::iterator& it, const vector<string>& tasks);
       bool taskSuccessful(const string& task);
