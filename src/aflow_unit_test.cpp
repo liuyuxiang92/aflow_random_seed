@@ -253,7 +253,7 @@ namespace unittest {
     // silence output globally except for the functions that produce desired
     // unit test output, unless --quiet is requested or --debug is run.
     bool quiet_copy = XHOST.QUIET;
-    string whitelist_str = "unittest::UnitTest::runUnitTest():,unittest::UnitTest::displayResult():";
+    string whitelist_str = "unittest::UnitTest::runUnitTest(),unittest::UnitTest::displayResult()";
     vector<string> whitelist;
     aurostd::string2tokens(whitelist_str, whitelist, ",");
     if (!XHOST.QUIET && !XHOST.DEBUG) {
