@@ -27,6 +27,7 @@ _apdc_data::_apdc_data() {
   min_sleep = 0;
   format_data = "";
   format_image = "";
+  screen_only = false;
   image_only = false;
   workdirpath = "";
   rootdirpath = "";
@@ -77,6 +78,7 @@ const _apdc_data& _apdc_data::operator=(const _apdc_data &b) {
     min_sleep = b.min_sleep;
     format_data = b.format_data;
     format_image = b.format_image;
+    screen_only = b.screen_only;
     image_only = b.image_only;
     workdirpath = b.workdirpath;
     rootdirpath = b.rootdirpath;
@@ -163,13 +165,11 @@ namespace apdc {
     else {
       apdc_data.temp_npts = DEFAULT_APDC_TEMP_NPTS;
     }
-    if (!vpflow.flag("APDC::SCREEN_ONLY")) {
-      if (!vpflow.getattachedscheme("APDC::FORMAT_DATA").empty()) {
-        apdc_data.format_data = vpflow.getattachedscheme("APDC::FORMAT_DATA");
-      }
-      else {
-        apdc_data.format_data = DEFAULT_APDC_FORMAT_DATA;
-      }
+    if (!vpflow.getattachedscheme("APDC::FORMAT_DATA").empty()) {
+      apdc_data.format_data = vpflow.getattachedscheme("APDC::FORMAT_DATA");
+    }
+    else {
+      apdc_data.format_data = DEFAULT_APDC_FORMAT_DATA;
     }
     if (!vpflow.flag("APDC::NO_PLOT")) {
       if (!vpflow.getattachedscheme("APDC::FORMAT_IMAGE").empty()) {
@@ -179,6 +179,7 @@ namespace apdc {
         apdc_data.format_image = DEFAULT_APDC_FORMAT_PLOT;
       }
     }
+    if (vpflow.flag("APDC::SCREEN_ONLY")) {apdc_data.screen_only = true;}
     if (vpflow.flag("APDC::IMAGE_ONLY")) {apdc_data.image_only = true;}
     GetPhaseDiagram(apdc_data);
     return;
@@ -313,11 +314,11 @@ namespace apdc {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     // Check if output format is valid
-    if (!apdc_data.format_data.empty() && (apdc_data.format_data != "txt" && apdc_data.format_data != "json")) {
+    if (apdc_data.format_data != "txt" && apdc_data.format_data != "json") {
       string message = "Format \"" + apdc_data.format_data + "\" is invalid";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
     }
-    if (!apdc_data.format_image.empty() && (apdc_data.format_image != "pdf" && apdc_data.format_image != "eps" && apdc_data.format_image != "png")) {
+    if (apdc_data.format_image != "" && apdc_data.format_image != "pdf" && apdc_data.format_image != "eps" && apdc_data.format_image != "png") {
       string message = "Format \"" + apdc_data.format_image + "\" is invalid";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
     }
@@ -1154,8 +1155,8 @@ namespace apdc {
 namespace apdc {
   void WriteData(const _apdc_data& apdc_data) {
     string filepath = apdc_data.rundirpath + "/" + APDC_FILE_PREFIX + "output." + apdc_data.format_data;
-    if (apdc_data.format_data.empty() || apdc_data.format_data == "txt") {
-      stringstream output;
+    stringstream output;
+    if (apdc_data.format_data == "txt") {
       string info_prefix = "";
       output << "APDC DATA" << endl;
       info_prefix = "Input data ";
@@ -1172,12 +1173,6 @@ namespace apdc {
       info_prefix = "Thermo data ";
       output << " " << info_prefix << "EC transition temperature (K)  = " << apdc_data.temp_ec << endl;
       output << " " << info_prefix << "Binodal boundary (K)           = " << endl << trasp(apdc_data.binodal_boundary) << endl;
-      if (!apdc_data.format_data.empty()) {
-        aurostd::stringstream2file(output, filepath);
-      }
-      else {
-        cout << output.str() << endl;
-      }
     }
     else if (apdc_data.format_data == "json") {
       aurostd::JSONwriter json;
@@ -1195,6 +1190,12 @@ namespace apdc {
       json.addNumber("EC transition temperature (K)", apdc_data.temp_ec);
       json.addVector("Binodal boundary (K)", apdc_data.binodal_boundary);
       aurostd::string2file(json.toString(), filepath);
+    }
+    if (apdc_data.screen_only) {
+      cout << output.str() << endl;
+    }
+    else {
+      aurostd::stringstream2file(output, filepath);
     }
     return;
   }
@@ -1224,6 +1225,7 @@ namespace apdc {
 // ***************************************************************************
 namespace apdc {
   void PlotData(const _apdc_data& apdc_data) {
+    if (apdc_data.format_image.empty()) {return;}
     stringstream gpfile;
     aurostd::xoption plotoptions;
     vector<vector<double>> data;
@@ -1249,7 +1251,7 @@ namespace apdc {
     plotoptions.push_attached("YMAX", aurostd::utype2string(1.2 * aurostd::max(apdc_data.binodal_boundary)));
     plotoptions.push_attached("YUNIT", "K");
     plotoptions.push_attached("TITLES", "Binodal,Spinodal");
-    plotoptions.push_attached("COLORS", "#000000,#000000");
+    plotoptions.push_attached("COLORS", "#000000");
     plotoptions.push_attached("LINETYPES", "-1,7");
     // END - set default
     plotter::generateHeader(gpfile, plotoptions, false);
@@ -1282,11 +1284,12 @@ namespace apdc {
     else {
       return; // no plotting support for alloys higher than binary
     }
-    if (!apdc_data.format_data.empty()) {
-      plotter::savePlotGNUPLOT(plotoptions, gpfile);
+    plotter::generatePlotGNUPLOT(gpfile, plotoptions, data);
+    if (apdc_data.screen_only) {
+      cout << gpfile.str() << endl;
     }
     else {
-      cout << gpfile.str() << endl;
+      plotter::savePlotGNUPLOT(plotoptions, gpfile);
     }
     return;
   }

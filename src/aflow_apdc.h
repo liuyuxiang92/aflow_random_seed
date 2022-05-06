@@ -26,6 +26,7 @@ class _apdc_data {
     uint min_sleep;
     string format_data;
     string format_image;
+    bool screen_only;
     bool image_only;
     string workdirpath;
     string rootdirpath;
