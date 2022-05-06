@@ -1168,7 +1168,7 @@ namespace apec {
       info_prefix = "Cluster data ";
       output << " " << info_prefix << "Number of atoms                = " << endl << trasp(apec_data.num_atom_cluster) << endl;
       output << " " << info_prefix << "Degeneracy                     = " << endl << trasp(apec_data.degeneracy_cluster) << endl;
-      output << " " << info_prefix << "Concentration                  = " << apec_data.conc_cluster << endl;
+      output << " " << info_prefix << "Concentration                  = " << endl << apec_data.conc_cluster << endl;
       output << " " << info_prefix << "Excess energy (eV)             = " << endl << trasp(apec_data.excess_energy_cluster) << endl;
       info_prefix = "Thermo data ";
       output << " " << info_prefix << "EC transition temperature (K)  = " << apec_data.temp_ec << endl;
