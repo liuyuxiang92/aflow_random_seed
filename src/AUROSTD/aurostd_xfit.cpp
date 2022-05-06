@@ -20,7 +20,7 @@ namespace aurostd{
   //
   //The polynomial is represented in the following form:
   //p(x) = p0+x*(p1+x*(p2+x*(p3+...x*(p(n-1)+x*(pn)))))
-  double evalPolynomial(const double& x, const xvector<double>& p) {
+  double evalPolynomial(const double x, const xvector<double>& p) {
     double res = p[p.urows];
     for (int i=p.urows-1; i>=p.lrows; i--) res = res*x + p[i];
     return res;
@@ -51,7 +51,7 @@ namespace aurostd{
   //
   //The highest derivative is determined by the size of the dp array and the result
   //is stored in ascending order starting from the zero's derivative (function itself).
-  void evalPolynomialDeriv(const double& x, const xvector<double>& p, xvector<double>& dp) {
+  void evalPolynomialDeriv(const double x, const xvector<double>& p, xvector<double>& dp) {
     for (int i=dp.lrows; i<=dp.urows; i++) dp[i] = 0.0;
     dp[dp.lrows] = p[p.urows];
     for (int i=p.urows-1; i>=p.lrows; i--){
@@ -72,7 +72,7 @@ namespace aurostd{
   //The result is stored in ascending order starting from the zero's derivative
   //(function itself).
   //@param n is the highest order of the derivative to be calculated.
-  xvector<double> evalPolynomialDeriv(const double& x, const xvector<double>& p, const uint n) {
+  xvector<double> evalPolynomialDeriv(const double x, const xvector<double>& p, const uint n) {
     xvector<double> dp(n+1);
     evalPolynomialDeriv(x, p, dp);
     return dp;
@@ -126,7 +126,7 @@ namespace aurostd{
   //In this situation, f(x0)~0 and this condition is used as a criterion to stop the
   //iteration procedure.
   //SD20220427 - Throws error if zero is not found or bisection method is not converged
-  double polynomialFindExtremum(const xvector<double>& p, const double& xmin, const double& xmax, const double& tol) {
+  double polynomialFindExtremum(const xvector<double>& p, const double xmin, const double xmax, const double tol) {
     bool LDEBUG = (FALSE || DEBUG_XFIT || XHOST.DEBUG);
     if (LDEBUG) cerr << __AFLOW_FUNC__ << " begin" << std::endl;
 
