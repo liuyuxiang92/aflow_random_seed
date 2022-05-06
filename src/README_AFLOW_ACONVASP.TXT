@@ -111,6 +111,7 @@ LATEST VERSION OF THE FILE:                              materials.duke.edu/AFLO
          --qe
          --abinit
          --aims
+         --atat
          --list
          --params=....  { check aflow --readme=anrl }
          --hex          { check aflow --readme=anrl }

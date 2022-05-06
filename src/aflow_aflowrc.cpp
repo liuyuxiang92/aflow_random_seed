@@ -839,25 +839,25 @@
 #define AFLOWRC_DEFAULT_AGL_PLOT_RESULTS                      FALSE
 #define         DEFAULT_AGL_PLOT_RESULTS                      XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_PLOT_RESULTS")
 
-//// DEFAULT APDC
-#define AFLOWRC_DEFAULT_APDC_MIN_SLEEP_SECONDS                2 // seconds
-#define         DEFAULT_APDC_MIN_SLEEP_SECONDS                XHOST.adefault.getattachedutype<int>("DEFAULT_APDC_MIN_SLEEP_SECONDS")
-#define AFLOWRC_DEFAULT_APDC_MAX_NUM_ATOMS                    8
-#define         DEFAULT_APDC_MAX_NUM_ATOMS                    XHOST.adefault.getattachedutype<int>("DEFAULT_APDC_MAX_NUM_ATOMS")
-#define AFLOWRC_DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS              4
-#define         DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS              XHOST.adefault.getattachedutype<int>("DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS")
-#define AFLOWRC_DEFAULT_APDC_CONC_NPTS                        20
-#define         DEFAULT_APDC_CONC_NPTS                        XHOST.adefault.getattachedutype<double>("DEFAULT_APDC_CONC_NPTS")
-#define AFLOWRC_DEFAULT_APDC_TEMP_NPTS                        100
-#define         DEFAULT_APDC_TEMP_NPTS                        XHOST.adefault.getattachedutype<double>("DEFAULT_APDC_TEMP_NPTS")
-#define AFLOWRC_DEFAULT_APDC_TEMP_MIN                         300 // K
-#define         DEFAULT_APDC_TEMP_MIN                         XHOST.adefault.getattachedutype<double>("DEFAULT_APDC_TEMP_MIN")
-#define AFLOWRC_DEFAULT_APDC_TEMP_MAX                         2000 // K
-#define         DEFAULT_APDC_TEMP_MAX                         XHOST.adefault.getattachedutype<double>("DEFAULT_APDC_TEMP_MAX")
-#define AFLOWRC_DEFAULT_APDC_FORMAT_DATA                      string("txt")
-#define         DEFAULT_APDC_FORMAT_DATA                      XHOST.adefault.getattachedscheme("DEFAULT_APDC_FORMAT_DATA")
-#define AFLOWRC_DEFAULT_APDC_FORMAT_PLOT                      string("png")
-#define         DEFAULT_APDC_FORMAT_PLOT                      XHOST.adefault.getattachedscheme("DEFAULT_APDC_FORMAT_PLOT")
+//// DEFAULT APEC
+#define AFLOWRC_DEFAULT_APEC_MIN_SLEEP_SECONDS                2 // seconds
+#define         DEFAULT_APEC_MIN_SLEEP_SECONDS                XHOST.adefault.getattachedutype<int>("DEFAULT_APEC_MIN_SLEEP_SECONDS")
+#define AFLOWRC_DEFAULT_APEC_MAX_NUM_ATOMS                    8
+#define         DEFAULT_APEC_MAX_NUM_ATOMS                    XHOST.adefault.getattachedutype<int>("DEFAULT_APEC_MAX_NUM_ATOMS")
+#define AFLOWRC_DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS              4
+#define         DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS              XHOST.adefault.getattachedutype<int>("DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS")
+#define AFLOWRC_DEFAULT_APEC_CONC_NPTS                        20
+#define         DEFAULT_APEC_CONC_NPTS                        XHOST.adefault.getattachedutype<double>("DEFAULT_APEC_CONC_NPTS")
+#define AFLOWRC_DEFAULT_APEC_TEMP_NPTS                        100
+#define         DEFAULT_APEC_TEMP_NPTS                        XHOST.adefault.getattachedutype<double>("DEFAULT_APEC_TEMP_NPTS")
+#define AFLOWRC_DEFAULT_APEC_TEMP_MIN                         300 // K
+#define         DEFAULT_APEC_TEMP_MIN                         XHOST.adefault.getattachedutype<double>("DEFAULT_APEC_TEMP_MIN")
+#define AFLOWRC_DEFAULT_APEC_TEMP_MAX                         2000 // K
+#define         DEFAULT_APEC_TEMP_MAX                         XHOST.adefault.getattachedutype<double>("DEFAULT_APEC_TEMP_MAX")
+#define AFLOWRC_DEFAULT_APEC_FORMAT_DATA                      string("txt")
+#define         DEFAULT_APEC_FORMAT_DATA                      XHOST.adefault.getattachedscheme("DEFAULT_APEC_FORMAT_DATA")
+#define AFLOWRC_DEFAULT_APEC_FORMAT_PLOT                      string("png")
+#define         DEFAULT_APEC_FORMAT_PLOT                      XHOST.adefault.getattachedscheme("DEFAULT_APEC_FORMAT_PLOT")
 
 //RF20200413 START
 // DEFAULT CCE
@@ -1681,16 +1681,16 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_AGL_WRITE_GIBBS_INPUT",AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT);
     aflowrc::load_default("DEFAULT_AGL_PLOT_RESULTS",AFLOWRC_DEFAULT_AGL_PLOT_RESULTS);    
 
-    // DEFAULT APDC
-    aflowrc::load_default("DEFAULT_APDC_MIN_SLEEP_SECONDS",AFLOWRC_DEFAULT_APDC_MIN_SLEEP_SECONDS);
-    aflowrc::load_default("DEFAULT_APDC_MAX_NUM_ATOMS",AFLOWRC_DEFAULT_APDC_MAX_NUM_ATOMS);
-    aflowrc::load_default("DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS",AFLOWRC_DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS);
-    aflowrc::load_default("DEFAULT_APDC_CONC_NPTS",AFLOWRC_DEFAULT_APDC_CONC_NPTS);
-    aflowrc::load_default("DEFAULT_APDC_TEMP_NPTS",AFLOWRC_DEFAULT_APDC_TEMP_NPTS);
-    aflowrc::load_default("DEFAULT_APDC_TEMP_MIN",AFLOWRC_DEFAULT_APDC_TEMP_MIN);
-    aflowrc::load_default("DEFAULT_APDC_TEMP_MAX",AFLOWRC_DEFAULT_APDC_TEMP_MAX);
-    aflowrc::load_default("DEFAULT_APDC_FORMAT_DATA",AFLOWRC_DEFAULT_APDC_FORMAT_DATA);
-    aflowrc::load_default("DEFAULT_APDC_FORMAT_PLOT",AFLOWRC_DEFAULT_APDC_FORMAT_PLOT);
+    // DEFAULT APEC
+    aflowrc::load_default("DEFAULT_APEC_MIN_SLEEP_SECONDS",AFLOWRC_DEFAULT_APEC_MIN_SLEEP_SECONDS);
+    aflowrc::load_default("DEFAULT_APEC_MAX_NUM_ATOMS",AFLOWRC_DEFAULT_APEC_MAX_NUM_ATOMS);
+    aflowrc::load_default("DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS",AFLOWRC_DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS);
+    aflowrc::load_default("DEFAULT_APEC_CONC_NPTS",AFLOWRC_DEFAULT_APEC_CONC_NPTS);
+    aflowrc::load_default("DEFAULT_APEC_TEMP_NPTS",AFLOWRC_DEFAULT_APEC_TEMP_NPTS);
+    aflowrc::load_default("DEFAULT_APEC_TEMP_MIN",AFLOWRC_DEFAULT_APEC_TEMP_MIN);
+    aflowrc::load_default("DEFAULT_APEC_TEMP_MAX",AFLOWRC_DEFAULT_APEC_TEMP_MAX);
+    aflowrc::load_default("DEFAULT_APEC_FORMAT_DATA",AFLOWRC_DEFAULT_APEC_FORMAT_DATA);
+    aflowrc::load_default("DEFAULT_APEC_FORMAT_PLOT",AFLOWRC_DEFAULT_APEC_FORMAT_PLOT);
 
     //RF20200413 START
     // DEFAULT CCE
@@ -2314,19 +2314,19 @@ namespace aflowrc {
     aflowrc << "DEFAULT_AGL_WRITE_GIBBS_INPUT=" << AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT << endl;
     aflowrc << "DEFAULT_AGL_PLOT_RESULTS=" << AFLOWRC_DEFAULT_AGL_PLOT_RESULTS << endl;    
 
-    //SD20220323 - APDC START
+    //SD20220323 - APEC START
     aflowrc << " " << endl;
-    aflowrc << "// DEFAULTS APDC " << endl;
-    aflowrc << "DEFAULT_APDC_MIN_SLEEP_SECONDS" << AFLOWRC_DEFAULT_APDC_MIN_SLEEP_SECONDS << endl;
-    aflowrc << "DEFAULT_APDC_MAX_NUM_ATOMS" << AFLOWRC_DEFAULT_APDC_MAX_NUM_ATOMS << endl;
-    aflowrc << "DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS" << AFLOWRC_DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS << endl;
-    aflowrc << "DEFAULT_APDC_CONC_NPTS" << AFLOWRC_DEFAULT_APDC_CONC_NPTS << endl;
-    aflowrc << "DEFAULT_APDC_TEMP_NPTS" << AFLOWRC_DEFAULT_APDC_TEMP_NPTS << endl;
-    aflowrc << "DEFAULT_APDC_TEMP_MIN" << AFLOWRC_DEFAULT_APDC_TEMP_MIN << endl;
-    aflowrc << "DEFAULT_APDC_TEMP_MAX" << AFLOWRC_DEFAULT_APDC_TEMP_MAX << endl;
-    aflowrc << "DEFAULT_APDC_FORMAT_DATA" << AFLOWRC_DEFAULT_APDC_FORMAT_DATA << endl;
-    aflowrc << "DEFAULT_APDC_FORMAT_PLOT" << AFLOWRC_DEFAULT_APDC_FORMAT_PLOT << endl;
-    //SD20220323 - APDC END
+    aflowrc << "// DEFAULTS APEC " << endl;
+    aflowrc << "DEFAULT_APEC_MIN_SLEEP_SECONDS" << AFLOWRC_DEFAULT_APEC_MIN_SLEEP_SECONDS << endl;
+    aflowrc << "DEFAULT_APEC_MAX_NUM_ATOMS" << AFLOWRC_DEFAULT_APEC_MAX_NUM_ATOMS << endl;
+    aflowrc << "DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS" << AFLOWRC_DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS << endl;
+    aflowrc << "DEFAULT_APEC_CONC_NPTS" << AFLOWRC_DEFAULT_APEC_CONC_NPTS << endl;
+    aflowrc << "DEFAULT_APEC_TEMP_NPTS" << AFLOWRC_DEFAULT_APEC_TEMP_NPTS << endl;
+    aflowrc << "DEFAULT_APEC_TEMP_MIN" << AFLOWRC_DEFAULT_APEC_TEMP_MIN << endl;
+    aflowrc << "DEFAULT_APEC_TEMP_MAX" << AFLOWRC_DEFAULT_APEC_TEMP_MAX << endl;
+    aflowrc << "DEFAULT_APEC_FORMAT_DATA" << AFLOWRC_DEFAULT_APEC_FORMAT_DATA << endl;
+    aflowrc << "DEFAULT_APEC_FORMAT_PLOT" << AFLOWRC_DEFAULT_APEC_FORMAT_PLOT << endl;
+    //SD20220323 - APEC END
 
     //RF20200413 START
     aflowrc << " " << endl;
@@ -2922,18 +2922,18 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_WRITE_GIBBS_INPUT\")=" << AFLOWRC_DEFAULT_AGL_WRITE_GIBBS_INPUT << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_AGL_PLOT_RESULTS\")=" << AFLOWRC_DEFAULT_AGL_PLOT_RESULTS << endl;    
 
-    //SD20220323 - APDC START
-    if(LDEBUG) oss << "// DEFAULTS APDC " << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_MIN_SLEEP_SECONDS\")=" << AFLOWRC_DEFAULT_APDC_MIN_SLEEP_SECONDS << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_MAX_NUM_ATOMS\")=" << AFLOWRC_DEFAULT_APDC_MAX_NUM_ATOMS << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS\")=" << AFLOWRC_DEFAULT_APDC_AFLOW_MAX_NUM_ATOMS << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_CONC_NPTS\")=" << AFLOWRC_DEFAULT_APDC_CONC_NPTS << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_TEMP_NPTS\")=" << AFLOWRC_DEFAULT_APDC_TEMP_NPTS << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_TEMP_MIN\")=" << AFLOWRC_DEFAULT_APDC_TEMP_MIN << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_TEMP_MAX\")=" << AFLOWRC_DEFAULT_APDC_TEMP_MAX << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_FORMAT_DATA\")=" << AFLOWRC_DEFAULT_APDC_FORMAT_DATA << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APDC_FORMAT_PLOT\")=" << AFLOWRC_DEFAULT_APDC_FORMAT_PLOT << endl;
-    //SD20220323 - APDC END
+    //SD20220323 - APEC START
+    if(LDEBUG) oss << "// DEFAULTS APEC " << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APEC_MIN_SLEEP_SECONDS\")=" << AFLOWRC_DEFAULT_APEC_MIN_SLEEP_SECONDS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APEC_MAX_NUM_ATOMS\")=" << AFLOWRC_DEFAULT_APEC_MAX_NUM_ATOMS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS\")=" << AFLOWRC_DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APEC_CONC_NPTS\")=" << AFLOWRC_DEFAULT_APEC_CONC_NPTS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APEC_TEMP_NPTS\")=" << AFLOWRC_DEFAULT_APEC_TEMP_NPTS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APEC_TEMP_MIN\")=" << AFLOWRC_DEFAULT_APEC_TEMP_MIN << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APEC_TEMP_MAX\")=" << AFLOWRC_DEFAULT_APEC_TEMP_MAX << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APEC_FORMAT_DATA\")=" << AFLOWRC_DEFAULT_APEC_FORMAT_DATA << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APEC_FORMAT_PLOT\")=" << AFLOWRC_DEFAULT_APEC_FORMAT_PLOT << endl;
+    //SD20220323 - APEC END
 
     //RF20200413 START
     if(LDEBUG) oss << "// DEFAULTS CCE" << endl;
