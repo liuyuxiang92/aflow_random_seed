@@ -5461,6 +5461,7 @@ namespace unittest {
       void xvectorTest(uint&, vector<vector<string> >&, vector<string>&);
       void xscalarTest(uint&, vector<vector<string> >&, vector<string>&);
       void xmatrixTest(uint&, vector<vector<string> >&, vector<string>&);
+      void aurostdMainTest(uint&, vector<vector<string> >&, vector<string>&);
 
       // database
       void schemaTest(uint&, vector<vector<string> >&, vector<string>&);

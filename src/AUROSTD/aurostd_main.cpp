@@ -5689,6 +5689,7 @@ namespace aurostd {
         return true;
       }
     }
+    index = -1;
     return false;
   }
 
@@ -5704,6 +5705,7 @@ namespace aurostd {
         return true;
       }
     }
+    index = -1;
     return false;
   }
 

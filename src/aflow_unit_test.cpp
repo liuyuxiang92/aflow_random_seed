@@ -91,6 +91,12 @@ namespace unittest {
     xchk.task_description = "xmatrix functions";
     test_functions["xmatrix"] = xchk;
 
+    xchk = initializeXCheck();
+    xchk.func = std::bind(&UnitTest::aurostdMainTest, this, _1, _2, _3);
+    xchk.function_name = "aurostdMainTest():";
+    xchk.task_description = "aurostd_main functions";
+    test_functions["aurostd_main"] = xchk;
+
     // database
     xchk = initializeXCheck();
     xchk.func = std::bind(&UnitTest::schemaTest, this, _1, _2, _3);
@@ -169,7 +175,7 @@ namespace unittest {
   void UnitTest::initializeTestGroups() {
     test_groups.clear();
 
-    test_groups["aurostd"] = {"xscalar", "xvector", "xmatrix"};
+    test_groups["aurostd"] = {"xscalar", "xvector", "xmatrix", "aurostd_main"};
     test_groups["database"] = {"schema"};
     test_groups["structure"] = {"atomic_environment", "xstructure", "xstructure_parser"};
     test_groups["structure_gen"] = {"ceramgen", "proto"};
@@ -894,6 +900,65 @@ namespace unittest {
     calculated_xmatint = xmatrix<int>(2, 2);
     aurostd::getEHermite(5, 12, calculated_xmatint);
     checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
+  }
+
+  void UnitTest::aurostdMainTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
+    if (errors.size()) {}  // Suppress compiler warnings
+    string check_function = "", check_description = "";
+    bool calculated_bool = false, expected_bool = false;
+    int calculated_int = 0, expected_int = 0;
+
+    // ---------------------------------------------------------------------------
+    // Check | substringlist2bool
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::substringlist2bool()";
+    string str = "hawk owl";
+    vector<string> strlist;
+
+    strlist.push_back("falcon");
+    check_description = aurostd::joinWDelimiter(strlist, " and ") + " in " + str + " (match all)";
+    expected_bool = false;
+    calculated_bool = aurostd::substringlist2bool(str, strlist, true);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+
+    check_description = aurostd::joinWDelimiter(strlist, " or ") + " in " + str + " (match one)";
+    expected_bool = false;
+    calculated_bool = aurostd::substringlist2bool(str, strlist, false);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+
+    strlist.push_back("owl");
+    check_description = aurostd::joinWDelimiter(strlist, " and ") + " in " + str + " (match all)";
+    expected_bool = false;
+    calculated_bool = aurostd::substringlist2bool(str, strlist, true);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+
+    check_description = aurostd::joinWDelimiter(strlist, " or ") + " in " + str + " (match one)";
+    expected_bool = true;
+    calculated_bool = aurostd::substringlist2bool(str, strlist, false);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+
+    strlist[0] = "hawk";
+    check_description = aurostd::joinWDelimiter(strlist, " and ") + " in " + str + " (match all)";
+    expected_bool = true;
+    calculated_bool = aurostd::substringlist2bool(str, strlist, true);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+
+    check_description = aurostd::joinWDelimiter(strlist, " or ") + " in " + str + " (match one)";
+    expected_bool = true;
+    calculated_bool = aurostd::substringlist2bool(str, strlist, false);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+
+    str = "falcon";
+    check_description = "Find substring " + str + " in [" + aurostd::joinWDelimiter(strlist, ", ") + "]";
+    expected_int = -1;
+    aurostd::SubstringWithinList(strlist, str, calculated_int);
+    checkEqual(calculated_int, expected_int, check_function, check_description, passed_checks, results);
+
+    strlist.push_back("peregrine falcon");
+    check_description = "Find substring " + str + " in [" + aurostd::joinWDelimiter(strlist, ", ") + "]";
+    expected_int = (int) strlist.size() - 1;
+    aurostd::SubstringWithinList(strlist, str, calculated_int);
+    checkEqual(calculated_int, expected_int, check_function, check_description, passed_checks, results);
   }
 
 }
