@@ -549,7 +549,7 @@ namespace unittest {
 namespace unittest {
 
   void UnitTest::xscalarTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
-    if (errors.size()) {}  // Suppress compiler warnings
+    (void) errors;  // Suppress compiler warnings
     // setup test environment
     string check_function = "", check_description = "";
     double calculated_dbl = 0.0, expected_dbl = 0.0;
@@ -646,7 +646,7 @@ namespace unittest {
   }
 
   void UnitTest::xvectorTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
-    if (errors.size()) {}  // Suppress compiler warnings
+    (void) errors;  // Suppress compiler warnings
     // setup test environment
     string check_function = "", check_description = "";
 
@@ -871,7 +871,7 @@ namespace unittest {
   }
 
   void UnitTest::xmatrixTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
-    if (errors.size()) {}  // Suppress compiler warnings
+    (void) errors;  // Suppress compiler warnings
     // setup test environment
     string check_function = "", check_description = "";
 
@@ -903,7 +903,7 @@ namespace unittest {
   }
 
   void UnitTest::aurostdMainTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
-    if (errors.size()) {}  // Suppress compiler warnings
+    (void) errors;  // Suppress compiler warnings
     string check_function = "", check_description = "";
     bool calculated_bool = false, expected_bool = false;
     int calculated_int = 0, expected_int = 0;
@@ -968,7 +968,7 @@ namespace unittest {
 
   void UnitTest::schemaTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if (errors.size()) {}  // Suppress compiler warnings
+    (void) errors;  // Suppress compiler warnings
 
     // Set up test environment
     string check_function = "";
@@ -1026,7 +1026,7 @@ namespace unittest {
 
   //HE20210511
   void UnitTest::atomicEnvironmentTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
-    if (errors.size()) {}  // Suppress compiler warnings
+    (void) errors;  // Suppress compiler warnings
 
     // setup test environment
     string check_function = "";
@@ -1123,7 +1123,7 @@ namespace unittest {
 
   void UnitTest::xstructureParserTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if (errors.size()) {}  // Suppress compiler warnings
+    (void) errors;  // Suppress compiler warnings
 
     if (LDEBUG) std::cerr << "Running " << __AFLOW_FUNC__ << std::endl;
 
@@ -1418,7 +1418,7 @@ namespace unittest {
   }
 
   void UnitTest::xstructureTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
-    if (errors.size()) {} // Suppress compiler warnings
+    (void) errors;  // Suppress compiler warnings
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // Set up test environment
     string check_function = "", check_description = "";
@@ -1660,7 +1660,7 @@ namespace unittest {
 
   //CO20190520
   void UnitTest::ceramgenTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
-    if (errors.size()) {} // Suppress compiler warnings
+    (void) errors;  // Suppress compiler warnings
 
     // setup test environment
     string check_function = "", check_description = "";
