@@ -41,6 +41,7 @@ class _apec_data {
     int temp_npts;
     vector<double> temp_range; // UNIT: K | DIM: 2
     xvector<double> temp; // UNIT: K | DIM: Nt
+    double cv_cut; // UNIT: eV
 
     // Derived data
     string alloyname;
@@ -51,6 +52,7 @@ class _apec_data {
     vector<int> mapstr;
 
     // Cluster data
+    double cv_cluster; // UNIT: eV
     xvector<int> num_atom_cluster; // DIM: Nj
     xvector<int> degeneracy_cluster; // DIM: Nj
     xmatrix<double> conc_cluster; // UNIT: unitless | DIM: Nj, Nk
@@ -70,36 +72,37 @@ class _apec_data {
 
 // Namespace for functions used by APEC
 namespace apec {
-  void GetPhaseDiagram(const aurostd::xoption& vpflow);
-  void GetPhaseDiagram(_apec_data& apec_data);
-  void ErrorChecks(_apec_data& apec_data);
-  void GetSpinodalData(_apec_data& apec_data);
-  void GetBinodalData(_apec_data& apec_data);
-  xvector<double> GetBinodalBoundary(const xmatrix<double>& rel_s, const double& rel_s_ec, const xvector<double>& temp);
-  xmatrix<double> GetRelativeEntropy(const vector<xmatrix<double>>& prob_cluster, const xmatrix<double>& prob_cluster_ideal);
-  vector<double> GetRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& temp, const int max_num_atoms);
-  vector<xmatrix<double>> GetProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms);
-  xmatrix<double> GetProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms);
-  void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob);
-  void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob0, const vector<xmatrix<double>>& prob);
-  xmatrix<double> GetConcentrationMacro(const vector<double>& conc_curve_range, const int conc_npts, const uint nelem);
-  xvector<double> GetTemperature(const vector<double>& temp_range, const int temp_npts);
-  void SetCongruentClusters(_apec_data& apec_data);
-  xvector<int> GetNumAtomCluster(const vector<xstructure>& vstr);
-  xvector<int> GetDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const bool shuffle, const string& rundirpath="");
-  xmatrix<double> GetConcentrationCluster(const vector<string>& elements, const vector<xstructure>& vstr);
-  xmatrix<double> GetConcentrationCluster(const string& rundirpath, const int nstr, const int nelem);
-  xvector<double> GetExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const xvector<int>& natom);
-  void RunATAT(const string& workdirpath, const string& rundirpath, const uint min_sleep);
-  void GenerateFilesForATAT(const string& rundirpath, const string& lat_atat, const vector<xstructure>& vstr_aflow, const vector<xstructure>& vstr_atat, const vector<int>& mapstr);
-  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_threads, bool use_sg=false);
-  string CreateLatForATAT(const string& plattice, const vector<string>& elements);
-  vector<xstructure> GetATATXstructures(const string& lat, const uint max_num_atoms, const string& rundirpath="");
-  vector<int> GetMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads);
-  void DisplayUsage(void);
-  void WriteData(const _apec_data& apec_data);
-  void ReadData(_apec_data& apec_data);
-  void PlotData(const _apec_data& apec_data);
+  void getPhaseDiagram(const aurostd::xoption& vpflow);
+  void getPhaseDiagram(_apec_data& apec_data);
+  void errorChecks(_apec_data& apec_data);
+  void getSpinodalData(_apec_data& apec_data);
+  void getBinodalData(_apec_data& apec_data);
+  xvector<double> getBinodalBoundary(const xmatrix<double>& rel_s, const double rel_s_ec, const xvector<double>& temp);
+  xmatrix<double> getRelativeEntropy(const vector<xmatrix<double>>& prob_cluster, const xmatrix<double>& prob_cluster_ideal);
+  vector<double> getRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& temp, const int max_num_atoms);
+  vector<xmatrix<double>> getProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms);
+  xmatrix<double> getProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms);
+  void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob);
+  void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob0, const vector<xmatrix<double>>& prob);
+  xmatrix<double> getConcentrationMacro(const vector<double>& conc_curve_range, const int conc_npts, const uint nelem);
+  xvector<double> getTemperature(const vector<double>& temp_range, const int temp_npts);
+  void setCongruentClusters(_apec_data& apec_data);
+  xvector<int> getNumAtomCluster(const vector<xstructure>& vstr);
+  xvector<int> getDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const bool shuffle, const string& rundirpath="");
+  xmatrix<double> getConcentrationCluster(const vector<string>& elements, const vector<xstructure>& vstr);
+  xmatrix<double> getConcentrationCluster(const string& rundirpath, const int nstr, const int nelem);
+  xvector<double> getExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const xvector<int>& natom);
+  double getCVCluster(const string& rundirpath, const double cv_cut);
+  void runATAT(const string& workdirpath, const string& rundirpath, const uint min_sleep);
+  void generateFilesForATAT(const string& rundirpath, const string& lat_atat, const vector<xstructure>& vstr_aflow, const vector<xstructure>& vstr_atat, const vector<int>& mapstr);
+  vector<xstructure> getAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_threads, bool use_sg=false);
+  string createLatForATAT(const string& plattice, const vector<string>& elements);
+  vector<xstructure> getATATXstructures(const string& lat, const uint max_num_atoms, const string& rundirpath="");
+  vector<int> getMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads);
+  void displayUsage(void);
+  void writeData(const _apec_data& apec_data);
+  void readData(_apec_data& apec_data);
+  void plotData(const _apec_data& apec_data);
 }
 
 #endif

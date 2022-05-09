@@ -35,6 +35,7 @@ _apec_data::_apec_data() {
   elements.clear();
   aflow_max_num_atoms = 0;
   max_num_atoms = 0;
+  cv_cut = 0.0;
   conc_npts = 0;
   conc_curve = false;
   conc_curve_range.clear();
@@ -50,6 +51,7 @@ _apec_data::_apec_data() {
   vstr_atat.clear();
   mapstr.clear();
   // Cluster data
+  cv_cluster = 0.0;
   num_atom_cluster.clear();
   degeneracy_cluster.clear();
   conc_cluster.clear();
@@ -85,6 +87,7 @@ const _apec_data& _apec_data::operator=(const _apec_data &b) {
     plattice = b.plattice;
     elements = b.elements;
     max_num_atoms = b.max_num_atoms;
+    cv_cut = b.cv_cut;
     conc_npts = b.conc_npts;
     conc_curve = b.conc_curve;
     conc_curve_range = b.conc_curve_range;
@@ -100,6 +103,7 @@ const _apec_data& _apec_data::operator=(const _apec_data &b) {
     vstr_atat = b.vstr_atat;
     mapstr = b.mapstr;
     // Cluster data
+    cv_cluster = b.cv_cluster;
     num_atom_cluster = b.num_atom_cluster;
     degeneracy_cluster = b.degeneracy_cluster;
     conc_cluster = b.conc_cluster;
@@ -116,12 +120,12 @@ const _apec_data& _apec_data::operator=(const _apec_data &b) {
 }
 
 // ***************************************************************************
-// apec::GetPhaseDiagram
+// apec::getPhaseDiagram
 // ***************************************************************************
 namespace apec {
- void GetPhaseDiagram(const aurostd::xoption& vpflow) {
+ void getPhaseDiagram(const aurostd::xoption& vpflow) {
     if (vpflow.flag("APEC::USAGE")) {
-      if (!vpflow.flag("APEC::SCREEN_ONLY")) {DisplayUsage();}
+      if (!vpflow.flag("APEC::SCREEN_ONLY")) {displayUsage();}
       return;
     }
     _apec_data apec_data;
@@ -142,6 +146,12 @@ namespace apec {
     }
     else {
       apec_data.max_num_atoms = DEFAULT_APEC_MAX_NUM_ATOMS;
+    }
+    if (!vpflow.getattachedscheme("APEC::CV_CUTOFF").empty()) {
+      apec_data.cv_cut = aurostd::string2utype<double>(vpflow.getattachedscheme("APEC::CV_CUTOFF"));
+    }
+    else {
+      apec_data.cv_cut = DEFAULT_APEC_CV_CUTOFF;
     }
     if (!vpflow.getattachedscheme("APEC::CONC_CURVE_RANGE").empty()) {
       apec_data.conc_curve = true;
@@ -181,11 +191,11 @@ namespace apec {
     }
     if (vpflow.flag("APEC::SCREEN_ONLY")) {apec_data.screen_only = true;}
     if (vpflow.flag("APEC::IMAGE_ONLY")) {apec_data.image_only = true;}
-    GetPhaseDiagram(apec_data);
+    getPhaseDiagram(apec_data);
     return;
  }
 
-  void GetPhaseDiagram(_apec_data& apec_data) {
+  void getPhaseDiagram(_apec_data& apec_data) {
     // Clean-up input data and check for errors
     if (XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && !(XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX"))) {
       apec_data.num_threads = aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));
@@ -196,30 +206,30 @@ namespace apec {
     apec_data.format_data = aurostd::tolower(apec_data.format_data);
     apec_data.format_image = aurostd::tolower(apec_data.format_image);
     aurostd::sort_remove_duplicates(apec_data.elements);
-    ErrorChecks(apec_data);
+    errorChecks(apec_data);
     apec_data.rundirpath += apec_data.rootdirpath + "/" + pflow::arity_string(apec_data.elements.size(), false, false) + "/" + apec_data.plattice + "/" + apec_data.alloyname;
     aurostd::DirectoryMake(apec_data.rundirpath);
     // Only plot data from JSON file. This is useful when the plotting routine cannot be ran on the machine
     // running the calculation.
     if (apec_data.image_only) {
-      ReadData(apec_data);
-      PlotData(apec_data);
+      readData(apec_data);
+      plotData(apec_data);
       return;
     }
     // Calculations
-    GetBinodalData(apec_data);
+    getBinodalData(apec_data);
     // Write and plot results
-    WriteData(apec_data);
-    PlotData(apec_data);
+    writeData(apec_data);
+    plotData(apec_data);
     return;
   }
 }
 
 // ***************************************************************************
-// apec::ErrorChecks
+// apec::errorChecks
 // ***************************************************************************
 namespace apec {
-  void ErrorChecks(_apec_data& apec_data) {
+  void errorChecks(_apec_data& apec_data) {
     // Check if number of threads is valid
     if (apec_data.num_threads < 1) {apec_data.num_threads = 1;}
     // Check if min sleep is at least 1 sec
@@ -326,66 +336,81 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::GetSpinodalData
+// apec::getSpinodalData
 // ***************************************************************************
 namespace apec {
-  void GetSpinodalData(_apec_data& apec_data) {
+  void getSpinodalData(_apec_data& apec_data) {
     cerr << apec_data.rundirpath << endl;
   }
 }
 
 // ***************************************************************************
-// apec::GetBinodalData
+// apec::getBinodalData
 // ***************************************************************************
 // Binodal construction based on the method developed in Y. Lederer et al., Acta Materialia, 159 (2018)
 namespace apec {
-  void GetBinodalData(_apec_data& apec_data) {
+  void getBinodalData(_apec_data& apec_data) {
     if (aurostd::FileExist(apec_data.rundirpath + "/fit.out") && aurostd::FileExist(apec_data.rundirpath + "/predstr.out")) { // read ATAT data
-      apec_data.vstr_atat = GetATATXstructures(apec_data.lat_atat, (uint)apec_data.max_num_atoms, apec_data.rundirpath);
+      apec_data.vstr_atat = getATATXstructures(apec_data.lat_atat, (uint)apec_data.max_num_atoms, apec_data.rundirpath);
     }
     else { // run ATAT
-      apec_data.lat_atat = CreateLatForATAT(apec_data.plattice, apec_data.elements);
-      apec_data.vstr_atat = GetATATXstructures(apec_data.lat_atat, (uint)apec_data.max_num_atoms);
-      apec_data.vstr_aflow = GetAFLOWXstructures(apec_data.plattice, apec_data.elements, apec_data.num_threads);
-      apec_data.mapstr = GetMapForXstructures(GetATATXstructures(apec_data.lat_atat, apec_data.aflow_max_num_atoms), apec_data.vstr_aflow, apec_data.num_threads); // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
-      GenerateFilesForATAT(apec_data.rundirpath, apec_data.lat_atat, apec_data.vstr_aflow, apec_data.vstr_atat, apec_data.mapstr);
-      RunATAT(apec_data.workdirpath, apec_data.rundirpath, apec_data.min_sleep);
+      apec_data.lat_atat = createLatForATAT(apec_data.plattice, apec_data.elements);
+      apec_data.vstr_atat = getATATXstructures(apec_data.lat_atat, (uint)apec_data.max_num_atoms);
+      apec_data.vstr_aflow = getAFLOWXstructures(apec_data.plattice, apec_data.elements, apec_data.num_threads);
+      apec_data.mapstr = getMapForXstructures(getATATXstructures(apec_data.lat_atat, apec_data.aflow_max_num_atoms), apec_data.vstr_aflow, apec_data.num_threads); // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
+      generateFilesForATAT(apec_data.rundirpath, apec_data.lat_atat, apec_data.vstr_aflow, apec_data.vstr_atat, apec_data.mapstr);
+      runATAT(apec_data.workdirpath, apec_data.rundirpath, apec_data.min_sleep);
     }
-    apec_data.num_atom_cluster = GetNumAtomCluster(apec_data.vstr_atat);
-    apec_data.conc_cluster = GetConcentrationCluster(apec_data.rundirpath, apec_data.vstr_atat.size(), apec_data.elements.size());
-    apec_data.excess_energy_cluster = GetExcessEnergyCluster(apec_data.rundirpath, apec_data.conc_cluster, apec_data.num_atom_cluster);
-    SetCongruentClusters(apec_data);
-    apec_data.degeneracy_cluster = GetDegeneracyCluster(apec_data.plattice, apec_data.vstr_atat, apec_data.elements, apec_data.max_num_atoms, true, apec_data.rundirpath);
-    apec_data.conc_macro = GetConcentrationMacro(apec_data.conc_curve_range, apec_data.conc_npts, apec_data.elements.size());
-    apec_data.prob_ideal_cluster = GetProbabilityIdealCluster(apec_data.conc_macro, apec_data.conc_cluster, apec_data.degeneracy_cluster, apec_data.max_num_atoms);
-    CheckProbability(apec_data.conc_macro, apec_data.conc_cluster, apec_data.prob_ideal_cluster);
-    apec_data.temp = GetTemperature(apec_data.temp_range, apec_data.temp_npts);
-    apec_data.prob_cluster = GetProbabilityCluster(apec_data.conc_macro, apec_data.conc_cluster, apec_data.excess_energy_cluster, apec_data.prob_ideal_cluster, apec_data.temp, apec_data.max_num_atoms);
-    CheckProbability(apec_data.conc_macro, apec_data.conc_cluster, apec_data.prob_ideal_cluster, apec_data.prob_cluster);
-    vector<double> data_ec = GetRelativeEntropyEC(apec_data.conc_cluster, apec_data.degeneracy_cluster, apec_data.excess_energy_cluster, apec_data.temp, apec_data.max_num_atoms);
+    apec_data.cv_cluster = getCVCluster(apec_data.rundirpath, apec_data.cv_cut);
+    apec_data.num_atom_cluster = getNumAtomCluster(apec_data.vstr_atat);
+    apec_data.conc_cluster = getConcentrationCluster(apec_data.rundirpath, apec_data.vstr_atat.size(), apec_data.elements.size());
+    apec_data.excess_energy_cluster = getExcessEnergyCluster(apec_data.rundirpath, apec_data.conc_cluster, apec_data.num_atom_cluster);
+    setCongruentClusters(apec_data);
+    apec_data.degeneracy_cluster = getDegeneracyCluster(apec_data.plattice, apec_data.vstr_atat, apec_data.elements, apec_data.max_num_atoms, true, apec_data.rundirpath);
+    apec_data.conc_macro = getConcentrationMacro(apec_data.conc_curve_range, apec_data.conc_npts, apec_data.elements.size());
+    apec_data.prob_ideal_cluster = getProbabilityIdealCluster(apec_data.conc_macro, apec_data.conc_cluster, apec_data.degeneracy_cluster, apec_data.max_num_atoms);
+    checkProbability(apec_data.conc_macro, apec_data.conc_cluster, apec_data.prob_ideal_cluster);
+    apec_data.temp = getTemperature(apec_data.temp_range, apec_data.temp_npts);
+    apec_data.prob_cluster = getProbabilityCluster(apec_data.conc_macro, apec_data.conc_cluster, apec_data.excess_energy_cluster, apec_data.prob_ideal_cluster, apec_data.temp, apec_data.max_num_atoms);
+    checkProbability(apec_data.conc_macro, apec_data.conc_cluster, apec_data.prob_ideal_cluster, apec_data.prob_cluster);
+    vector<double> data_ec = getRelativeEntropyEC(apec_data.conc_cluster, apec_data.degeneracy_cluster, apec_data.excess_energy_cluster, apec_data.temp, apec_data.max_num_atoms);
     apec_data.rel_s_ec = data_ec[0]; apec_data.temp_ec = data_ec[1];
-    apec_data.rel_s = GetRelativeEntropy(apec_data.prob_cluster, apec_data.prob_ideal_cluster);
-    apec_data.binodal_boundary = GetBinodalBoundary(apec_data.rel_s, apec_data.rel_s_ec, apec_data.temp);
+    apec_data.rel_s = getRelativeEntropy(apec_data.prob_cluster, apec_data.prob_ideal_cluster);
+    apec_data.binodal_boundary = getBinodalBoundary(apec_data.rel_s, apec_data.rel_s_ec, apec_data.temp);
   }
 }
 
 // ***************************************************************************
-// apec::GetBinodalBoundary
+// apec::getBinodalBoundary
 // ***************************************************************************
 namespace apec {
-  xvector<double> GetBinodalBoundary(const xmatrix<double>& rel_s, const double& rel_s_ec, const xvector<double>& temp) {
+  xvector<double> getBinodalBoundary(const xmatrix<double>& rel_s, const double rel_s_ec, const xvector<double>& temp) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     int nx = rel_s.rows, nt = rel_s.cols, n_fit = 8;
     xvector<double> binodal_boundary(nx), p, rr(n_fit), ri(n_fit);
     xvector<double> wts = aurostd::ones_xv<double>(nt);
     double temp_mean = aurostd::mean(temp), temp_std = aurostd::stddev(temp);
     xvector<double> temp_scaled = (temp - temp_mean) / temp_std; // scale for numerical stability
+    bool soln_found;
     for (int i = 1; i <= nx; i++) {
+      soln_found = false;
       p = aurostd::polynomialCurveFit(temp_scaled, rel_s(i) - rel_s_ec, n_fit, wts);
       aurostd::polynomialFindRoots(p, rr, ri);
-      for (int j = 1; j <= n_fit && binodal_boundary(i) == 0.0; j++) {
-        if (rr(j) >= temp_scaled(1) && rr(j) <= temp_scaled(temp.rows) && aurostd::isequal(ri(j), 0.0)) {
-          binodal_boundary(i) = temp_std * rr(j) + temp_mean; // solution must be real and within temp range
+      if (LDEBUG) {
+        cerr << " i=" << i << " | p=" << p << endl;
+        cerr << "   Real roots=" << rr << endl;
+        cerr << "   Imag roots=" << ri << endl;
+      }
+      for (int j = 1; j <= n_fit && !soln_found; j++) {
+        if (rr(j) >= temp_scaled(1) && rr(j) <= temp_scaled(temp.rows) && aurostd::isequal(ri(j), 0.0)) { // solution must be real and within temp range
+          binodal_boundary(i) = temp_std * rr(j) + temp_mean;
+          soln_found = true;
         }
+      }
+      if (!soln_found) {
+        stringstream message;
+        message << "Binodal boundary does not exist for i=" << i;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
     }
     return binodal_boundary;
@@ -393,10 +418,10 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::GetRelativeEntropy
+// apec::getRelativeEntropy
 // ***************************************************************************
 namespace apec {
-  xmatrix<double> GetRelativeEntropy(const vector<xmatrix<double>>& prob_cluster, const xmatrix<double>& prob_cluster_ideal) {
+  xmatrix<double> getRelativeEntropy(const vector<xmatrix<double>>& prob_cluster, const xmatrix<double>& prob_cluster_ideal) {
     int nx = prob_cluster_ideal.rows, ncl = prob_cluster_ideal.cols, nt = prob_cluster.size();
     xmatrix<double> rel_s(nx, nt);
     for (int i = 1; i <= nx; i++) {
@@ -411,17 +436,17 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::GetRelativeEntropyEC
+// apec::getRelativeEntropyEC
 // ***************************************************************************
 namespace apec {
-  vector<double> GetRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& temp, const int max_num_atoms) {
+  vector<double> getRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& temp, const int max_num_atoms) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     double rel_s_ec = 0.0;
     int nelem = conc_cluster.cols, n_fit = 8;
     xmatrix<double> conc_macro_ec(1, nelem);
     conc_macro_ec.set(1.0 / (double)nelem);
-    xmatrix<double> prob_ideal_ec = GetProbabilityIdealCluster(conc_macro_ec, conc_cluster, degeneracy_cluster, max_num_atoms);
-    vector<xmatrix<double>> prob_ec = GetProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, temp, max_num_atoms);
+    xmatrix<double> prob_ideal_ec = getProbabilityIdealCluster(conc_macro_ec, conc_cluster, degeneracy_cluster, max_num_atoms);
+    vector<xmatrix<double>> prob_ec = getProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, temp, max_num_atoms);
     xvector<double> order_param(prob_ec.size());
     xmatrix<double> m1, m2, m3 = prob_ideal_ec * aurostd::trasp(prob_ideal_ec);
     for (uint i = 0; i < prob_ec.size(); i++) {
@@ -434,9 +459,16 @@ namespace apec {
     xvector<double> wts = aurostd::ones_xv<double>(order_param.rows);
     xvector<double> p = aurostd::polynomialCurveFit(temp_scaled, order_param, n_fit, wts);
     int buffer = (int)std::floor(0.1 * temp.rows); // avoid edge points when evaluating derivatives
+LDEBUG=TRUE;
+    if (LDEBUG) {
+      cerr << "ORIG=" << order_param << endl;
+      cerr << "D[alpha, 0]=" << aurostd::evalPolynomial_xv(temp_scaled, aurostd::evalPolynomialCoeff(p, 0)) << endl;
+      cerr << "D[alpha, 1]=" << aurostd::evalPolynomial_xv(temp_scaled, aurostd::evalPolynomialCoeff(p, 1)) << endl;
+      cerr << "D[alpha, 2]=" << aurostd::evalPolynomial_xv(temp_scaled, aurostd::evalPolynomialCoeff(p, 2)) << endl;
+    }
     vector<double> temp_ec = {temp_std * aurostd::polynomialFindExtremum(aurostd::evalPolynomialCoeff(p, 1), temp_scaled(buffer), temp_scaled(temp.rows - buffer)) + temp_mean};
     if (LDEBUG) {cerr << "T_ec(K)=" << temp_ec[0] << endl;}
-    prob_ec = GetProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, aurostd::vector2xvector(temp_ec), max_num_atoms);
+    prob_ec = getProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, aurostd::vector2xvector(temp_ec), max_num_atoms);
     for (int i = 1; i <= prob_ideal_ec.cols; i++) {
       rel_s_ec += prob_ec[0](1, i) * aurostd::log(prob_ec[0](1, i) / prob_ideal_ec(1, i));
     }
@@ -445,10 +477,10 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::GetProbabilityCluster
+// apec::getProbabilityCluster
 // ***************************************************************************
 namespace apec {
-  vector<xmatrix<double>> GetProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms) {
+  vector<xmatrix<double>> getProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     int nx = prob_ideal_cluster.rows, ncl = prob_ideal_cluster.cols, nt = temp.rows, neqs = conc_cluster.cols - 1;
     vector<xmatrix<double>> prob_cluster;
@@ -456,11 +488,13 @@ namespace apec {
     for (uint it = 0; it < (uint)nt; it++) {prob_cluster.push_back(zeros);} // initialize
     xvector<double> beta = aurostd::pow(KBOLTZEV * temp, -1.0), p(max_num_atoms + 1), rr(max_num_atoms), ri(max_num_atoms), soln(neqs);
     xmatrix<int> natom_cluster = aurostd::xmatrixdouble2utype<int>((double)max_num_atoms * conc_cluster);
+    bool soln_found;
     if (neqs == 1) {
       for (int it = 1; it <= nt; it++) {
         for (int i = 1; i <= nx; i++) {
           p.reset();
           soln.reset();
+          soln_found = false;
           for (int j = 1; j <= ncl; j++) {
             p(natom_cluster(j, 1) + 1) += prob_ideal_cluster(i, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * (conc_cluster(j, 1) - conc_macro(i, 1));
           }
@@ -470,8 +504,16 @@ namespace apec {
             cerr << "   Real roots=" << rr << endl;
             cerr << "   Imag roots=" << ri << endl;
           }
-          for (int k = 1; k <= max_num_atoms && soln(1) == 0.0; k++) {
-            if (rr(k) > soln(1) && aurostd::isequal(ri(k), 0.0)) {soln(1) = rr(k);} // solution must be real and greater than 0
+          for (int k = 1; k <= max_num_atoms && !soln_found; k++) {
+            if (rr(k) > soln(1) && aurostd::isequal(ri(k), 0.0)) { // solution must be real and greater than 0
+              soln(1) = rr(k); 
+              soln_found = true;
+            }
+          }
+          if (!soln_found) {
+            stringstream message;
+            message << "Physical equilibrium probability does not exist for it=" << it << " i=" << i;
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
           }
           for (int j = 1; j <= ncl; j++) {
             prob_cluster[it - 1](i, j) = prob_ideal_cluster(i, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * std::pow(soln(1), natom_cluster(j, 1));
@@ -488,11 +530,11 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::GetProbabilityIdealCluster
+// apec::getProbabilityIdealCluster
 // ***************************************************************************
 // P_j(X) = g_j*(X1^N1_j)*(X2^N2_j)*...(X(K)^N(K)_j)
 namespace apec {
-  xmatrix<double> GetProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms) {
+  xmatrix<double> getProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     int ncl = conc_cluster.rows, nx = conc_macro.rows, nelem = conc_macro.cols;
     xmatrix<double> prob_ideal_cluster(nx, ncl);
@@ -511,35 +553,39 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::CheckProbability
+// apec::checkProbability
 // ***************************************************************************
 namespace apec {
-  void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob) {
+  void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob) {
     int nx = prob.rows;
     for (int i = 1; i <= nx; i++) {
       if (!aurostd::isequal(aurostd::sum(prob(i)), 1.0)) { // unnormalized
-        string message = "Ideal solution (high-T) probability is unnormalized for i=" + aurostd::utype2string<int>(i);
+        stringstream message;
+        message << "Ideal solution (high-T) probability is unnormalized for i=" << i;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
       }
       else if (!aurostd::isequal(prob(i)*conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
-        string message = "Ideal solution (high-T) probability does not satisfy concentration contraint for i=" + aurostd::utype2string<int>(i);
+        stringstream message;
+        message << "Ideal solution (high-T) probability does not satisfy concentration contraint for i=" << i;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
       }
     }
   }
 
-  void CheckProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob0, const vector<xmatrix<double>>& prob) {
+  void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob0, const vector<xmatrix<double>>& prob) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     int nx = prob[0].rows;
     double diff = AUROSTD_MAX_DOUBLE, diff_old;
     for (uint it = 0; it < prob.size(); it++) {
       for (int i = 1; i <= nx; i++) {
         if (!aurostd::isequal(aurostd::sum(prob[it](i)), 1.0)) { // unnormalized
-          string message = "Equilibrium probability is unnormalized for i=" + aurostd::utype2string<int>(i);
+          stringstream message;
+          message << "Equilibrium probability is unnormalized for i=" << i;
           throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
         }
         else if (!aurostd::isequal(prob[it](i)*conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
-          string message = "Equilibrium probability does not satisfy concentration contraint for i=" + aurostd::utype2string<int>(i);
+          stringstream message;
+          message << "Equilibrium probability does not satisfy concentration contraint for i=" << i;
           throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
         }
       }
@@ -555,10 +601,10 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::GetConcentrationMacro
+// apec::getConcentrationMacro
 // ***************************************************************************
 namespace apec {
-  xmatrix<double> GetConcentrationMacro(const vector<double>& conc_curve_range, const int conc_npts, const uint nelem) {
+  xmatrix<double> getConcentrationMacro(const vector<double>& conc_curve_range, const int conc_npts, const uint nelem) {
     xmatrix<double> conc_macro;
     if (!conc_curve_range.empty()) { // curve in concentration space
       xmatrix<double> _conc_macro(conc_npts, nelem);
@@ -605,19 +651,19 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::GetTemperature
+// apec::getTemperature
 // ***************************************************************************
 namespace apec {
-  xvector<double> GetTemperature(const vector<double>& temp_range, const int temp_npts) {
+  xvector<double> getTemperature(const vector<double>& temp_range, const int temp_npts) {
     return aurostd::linspace(temp_range[0], temp_range[1], temp_npts);
   }
 }
 
 // ***************************************************************************
-// apec::SetCongruentClusters
+// apec::setCongruentClusters
 // ***************************************************************************
 namespace apec {
-  void SetCongruentClusters(_apec_data& apec_data) {
+  void setCongruentClusters(_apec_data& apec_data) {
     vector<int> indx_cluster;
     for (int i = 1; i <= apec_data.num_atom_cluster.rows; i++) {
       if (!(apec_data.max_num_atoms % apec_data.num_atom_cluster(i))) {indx_cluster.push_back(i);}
@@ -641,10 +687,10 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::GetNumAtomCluster
+// apec::getNumAtomCluster
 // ***************************************************************************
 namespace apec {
-  xvector<int> GetNumAtomCluster(const vector<xstructure>& vstr) {
+  xvector<int> getNumAtomCluster(const vector<xstructure>& vstr) {
     int nstr = vstr.size(), natom;
     xvector<int> num_atom_cluster(nstr);
     for (int i = 1; i <= nstr; i++) {
@@ -657,10 +703,10 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::GetDegeneracyCluster
+// apec::getDegeneracyCluster
 // ***************************************************************************
 namespace apec {
-  xvector<int> GetDegeneracyCluster(const string& plattice, const vector<xstructure>& _vstr, const vector<string>& elements, const int max_num_atoms, const bool shuffle, const string& rundirpath) {
+  xvector<int> getDegeneracyCluster(const string& plattice, const vector<xstructure>& _vstr, const vector<string>& elements, const int max_num_atoms, const bool shuffle, const string& rundirpath) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string filepath = "";
     if (!rundirpath.empty()) {
@@ -777,12 +823,20 @@ namespace apec {
     vector<vector<uint>> dsg = xtal_calc.groupSimilarXstructures(vstr_ds);
     for (uint i = 0; i < dsg.size(); i++) {
       std::sort(dsg[i].begin(), dsg[i].end()); // first index is the cluster index
-      if (dsg[i][0] < (uint)degeneracy_cluster.rows) {degeneracy_cluster(dsg[i][0] + 1) = dsg[i].size() - 1;}
+      if (dsg[i][0] < (uint)degeneracy_cluster.rows) {
+        degeneracy_cluster(dsg[i][0] + 1) = dsg[i].size() - 1;
+        if (LDEBUG) {
+          cerr << "i=" << i << " | DG=" << dsg[i].size() - 1 << " | ";
+          for (uint j = 0; j < dsg[i].size(); j++) {cerr << dsg[i][j] << " ";}
+          cerr << endl;
+        }
+      }
     }
     XHOST.QUIET = quiet;
     int sum_calculated = aurostd::sum(degeneracy_cluster), sum_accepted = (int)vstr_sup.size() * (int)std::pow(elements.size(), max_num_atoms);
     if (!aurostd::isequal(sum_calculated, sum_accepted)) {
-      string message = "Degeneracies do not satisfy the sum rule, the sum is " + aurostd::utype2string<int>(sum_calculated) + " but should be " + aurostd::utype2string<int>(sum_accepted);
+      stringstream message;
+      message << "Degeneracies do not satisfy the sum rule, the sum is " << sum_calculated << " but should be " << sum_accepted;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     if (shuffle) { // place back in correct order
@@ -799,10 +853,10 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::GetConcentrationCluster
+// apec::getConcentrationCluster
 // ***************************************************************************
 namespace apec {
-  xmatrix<double> GetConcentration(const vector<string>& elements, const vector<xstructure>& vstr) {
+  xmatrix<double> getConcentration(const vector<string>& elements, const vector<xstructure>& vstr) {
     uint nstr = vstr.size(), nelem = elements.size();
     xmatrix<double> conc_cluster(nstr, nelem);
     int ie = -1;
@@ -824,7 +878,7 @@ namespace apec {
     return conc_cluster;
   }
 
-  xmatrix<double> GetConcentrationCluster(const string& rundirpath, const int nstr, const int nelem) {
+  xmatrix<double> getConcentrationCluster(const string& rundirpath, const int nstr, const int nelem) {
     xmatrix<double> conc_cluster(nstr, nelem);
     vector<string> vinput, tokens;
     aurostd::file2vectorstring(rundirpath + "/fit.out", vinput);
@@ -846,10 +900,10 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::GetExcessEnergyCluster
+// apec::getExcessEnergyCluster
 // ***************************************************************************
 namespace apec {
-  xvector<double> GetExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const xvector<int>& num_atom_cluster) {
+  xvector<double> getExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const xvector<int>& num_atom_cluster) {
     int nstr = conc_cluster.rows, nelem = conc_cluster.cols;
     vector<string> vinput, tokens;
     aurostd::file2vectorstring(rundirpath + "/ref_energy.out", vinput);
@@ -870,10 +924,32 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::RunATAT
+// apec::getCVCluster
 // ***************************************************************************
 namespace apec {
-  void RunATAT(const string& workdirpath, const string& rundirpath, const uint min_sleep) {
+  double getCVCluster(const string& rundirpath, const double cv_cut) {
+    vector<string> vinput, tokens;
+    aurostd::file2vectorstring(rundirpath + "/maps.log", vinput);
+    aurostd::string2tokens(vinput[vinput.size() - 1], tokens, " ");
+    if (tokens[0] != "Crossvalidation") {
+      string message = "ATAT run did not complete";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    }
+    double cv_cluster = aurostd::string2utype<double>(tokens[2]);
+    if (cv_cluster > cv_cut) {
+      stringstream message;
+      message << "Cluster cross-validation score is above the cut-off, CV_cluster=" << cv_cluster << " CV_cutoff=" << cv_cut;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    }
+    return cv_cluster;
+  }
+}
+
+// ***************************************************************************
+// apec::runATAT
+// ***************************************************************************
+namespace apec {
+  void runATAT(const string& workdirpath, const string& rundirpath, const uint min_sleep) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     uint iter = 0;
     if (aurostd::substring2bool(aurostd::execute2string("mmaps", stdouterr_fsio), "command not found")) {
@@ -903,10 +979,10 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::GenerateFilesForATAT
+// apec::generateFilesForATAT
 // ***************************************************************************
 namespace apec {
-  void GenerateFilesForATAT(const string& rundirpath, const string& lat_atat, const vector<xstructure>& vstr_aflow, const vector<xstructure>& vstr_atat, const vector<int>& mapstr) {
+  void generateFilesForATAT(const string& rundirpath, const string& lat_atat, const vector<xstructure>& vstr_aflow, const vector<xstructure>& vstr_atat, const vector<int>& mapstr) {
     stringstream oss;
     vector<xstructure> vstr;
     // Generate lat.in file
@@ -926,10 +1002,10 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::GetAFLOWXstructures
+// apec::getAFLOWXstructures
 // ***************************************************************************
 namespace apec {
-  vector<xstructure> GetAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_threads, bool use_sg) {
+  vector<xstructure> getAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_threads, bool use_sg) {
     vector<xstructure> vstr;
     vector<string> vstrlabel;
     string aflowlib, aflowurl;
@@ -990,10 +1066,10 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::CreateLatForATAT
+// apec::createLatForATAT
 // ***************************************************************************
 namespace apec {
-  string CreateLatForATAT(const string& plattice, const vector<string>& elements) {
+  string createLatForATAT(const string& plattice, const vector<string>& elements) {
     stringstream oss;
     uint nelem = elements.size();
     xmatrix<double> lattice(3,3);
@@ -1041,10 +1117,10 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::GetATATXstructures
+// apec::getATATXstructures
 // ***************************************************************************
 namespace apec {
-  vector<xstructure> GetATATXstructures(const string& lat, const uint max_num_atoms, const string& rundirpath) {
+  vector<xstructure> getATATXstructures(const string& lat, const uint max_num_atoms, const string& rundirpath) {
     vector<xstructure> vstr;
     stringstream oss;
     if (!rundirpath.empty()) {
@@ -1092,10 +1168,10 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::GetMapForXstructures
+// apec::getMapForXstructures
 // ***************************************************************************
 namespace apec {
-  vector<int> GetMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads) {
+  vector<int> getMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     vector<int> mapstr;
     bool match;
@@ -1115,10 +1191,10 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::DisplayUsage
+// apec::displayUsage
 // ***************************************************************************
 namespace apec {
-  void DisplayUsage(void) {
+  void displayUsage(void) {
     vector<string> usage_options;
     usage_options.push_back("aflow --phase_equilibria --plattice=fcc --elements=Au,Pt[,Zn] [apec_options] [--directory=[DIRECTORY]]");
     usage_options.push_back(" ");
@@ -1132,6 +1208,7 @@ namespace apec {
     usage_options.push_back(" ");
     usage_options.push_back("BINODAL OPTIONS:");
     usage_options.push_back("--max_num_atoms=|--mna=8");
+    usage_options.push_back("--cv_cutoff=|--cv_cut=0.05");
     usage_options.push_back("--conc_curve_range=|--conc_curve=0,1,1,0");
     usage_options.push_back("--conc_npts=20");
     usage_options.push_back("--temp_range=300,2000");
@@ -1150,10 +1227,10 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::WriteData
+// apec::writeData
 // ***************************************************************************
 namespace apec {
-  void WriteData(const _apec_data& apec_data) {
+  void writeData(const _apec_data& apec_data) {
     string filepath = apec_data.rundirpath + "/" + APEC_FILE_PREFIX + "output." + apec_data.format_data;
     stringstream output;
     if (apec_data.format_data == "txt") {
@@ -1166,6 +1243,7 @@ namespace apec {
       output << " " << info_prefix << "Temperature range (K)          = " << endl << trasp(apec_data.temp) << endl;
       output << " " << info_prefix << "Max atoms per cell             = " << apec_data.max_num_atoms << endl;
       info_prefix = "Cluster data ";
+      output << " " << info_prefix << "CV score (eV)                  = " << apec_data.cv_cluster << endl;
       output << " " << info_prefix << "Number of atoms                = " << endl << trasp(apec_data.num_atom_cluster) << endl;
       output << " " << info_prefix << "Degeneracy                     = " << endl << trasp(apec_data.degeneracy_cluster) << endl;
       output << " " << info_prefix << "Concentration                  = " << endl << apec_data.conc_cluster << endl;
@@ -1183,6 +1261,7 @@ namespace apec {
       json.addMatrix("Macroscopic concentration", apec_data.conc_macro);
       json.addVector("Temperature range (K)", apec_data.temp);
       json.addNumber("Max atoms per cell", apec_data.max_num_atoms);
+      json.addNumber("Cluster CV score (eV)", apec_data.cv_cluster);
       json.addVector("Cluster number of atoms", aurostd::xvectorint2double(apec_data.num_atom_cluster));
       json.addVector("Cluster degeneracy", aurostd::xvectorint2double(apec_data.degeneracy_cluster));
       json.addMatrix("Cluster concentration", apec_data.conc_cluster);
@@ -1202,10 +1281,10 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::ReadData
+// apec::readData
 // ***************************************************************************
 namespace apec {
-  void ReadData(_apec_data& apec_data) {
+  void readData(_apec_data& apec_data) {
     string filepath = apec_data.rundirpath + "/" + APEC_FILE_PREFIX + "output.json";
     if (!aurostd::FileExist(filepath)) {
       string message = "The JSON file does not exist, filepath=" + filepath; 
@@ -1221,10 +1300,10 @@ namespace apec {
 }
 
 // ***************************************************************************
-// apec::PlotData
+// apec::plotData
 // ***************************************************************************
 namespace apec {
-  void PlotData(const _apec_data& apec_data) {
+  void plotData(const _apec_data& apec_data) {
     if (apec_data.format_image.empty()) {return;}
     stringstream gpfile;
     aurostd::xoption plotoptions;

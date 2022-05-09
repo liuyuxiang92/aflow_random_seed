@@ -32,12 +32,12 @@ LTVC method [Acta Mater. 159, 364 (2018)].
 LIST OF AFLOW-APEC COMMANDS:
 
   aflow --phase_equilibria --plattice=fcc --elements=Au,Pt[,Zn] [apec_options] [--directory=[DIRECTORY]]
-      Loads the alloy data from the AFLOW database and constructs the binodal curve and returns,
+      Loads the alloy data from the AFLOW database, constructs the binodal curve and returns,
       the output as a TXT (default, see --format_data).
       --phase_equilibria : Necessary argument, enter the mode to calculate the phase equilibria
           properties.
-      --plattice : Necessary argument, specify the parent lattice of the alloy
-      --elements : Necessary argument, specify the elements present in the alloy
+      --plattice : Necessary argument, specify the parent lattice of the alloy.
+      --elements : Necessary argument, specify the elements present in the alloy.
       [--directory=[DIRECTORY]] : Optional argument, specify the directory where to run the
           calculation.
           Default: "./"
@@ -56,6 +56,11 @@ LIST OF AFLOW-APEC COMMANDS:
       BINODAL OPTIONS:
       [--max_num_atoms=|--mna=8] : Specify the maximum number of atoms in the alloy
           Default: 8
+      [--cv_cutoff=|--cv_cut=0.05] : Specify the cross validation (CV) score cut-off for
+          the cluster expansion. The calculation will terminate prematurely if the CV
+          score is below the cut-off.
+          Default: 0.05
+          Units: eV
       [--conc_curve_range=|--conc_curve=0,1,1,0] : Define the concentration curve
           to evalute the equilibria properties. The format of this argument is:
           <c_1i>,<c_c1f>,<c_2i>,<c_2f>,...,<c_[K]i>,<c_[K]f> where <c_[k]i> is the 
@@ -68,6 +73,7 @@ LIST OF AFLOW-APEC COMMANDS:
           equilibria properties. The format of this argument is: <T_i>,<T_f>
           where <T_i> and <T_f> is the initial and final temperature, respectively.
           Default: 300,2000
+          Units: K
       [--temp_npts=100] : Number of points used to determine the sub-division of
           the temperature profile.
           Default: 100

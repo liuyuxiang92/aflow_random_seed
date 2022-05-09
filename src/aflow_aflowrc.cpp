@@ -846,6 +846,8 @@
 #define         DEFAULT_APEC_MAX_NUM_ATOMS                    XHOST.adefault.getattachedutype<int>("DEFAULT_APEC_MAX_NUM_ATOMS")
 #define AFLOWRC_DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS              4
 #define         DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS              XHOST.adefault.getattachedutype<int>("DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS")
+#define AFLOWRC_DEFAULT_APEC_CV_CUTOFF                        0.05
+#define         DEFAULT_APEC_CV_CUTOFF                        XHOST.adefault.getattachedutype<double>("DEFAULT_APEC_CV_CUTOFF")
 #define AFLOWRC_DEFAULT_APEC_CONC_NPTS                        20
 #define         DEFAULT_APEC_CONC_NPTS                        XHOST.adefault.getattachedutype<double>("DEFAULT_APEC_CONC_NPTS")
 #define AFLOWRC_DEFAULT_APEC_TEMP_NPTS                        100
@@ -1685,6 +1687,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_APEC_MIN_SLEEP_SECONDS",AFLOWRC_DEFAULT_APEC_MIN_SLEEP_SECONDS);
     aflowrc::load_default("DEFAULT_APEC_MAX_NUM_ATOMS",AFLOWRC_DEFAULT_APEC_MAX_NUM_ATOMS);
     aflowrc::load_default("DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS",AFLOWRC_DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS);
+    aflowrc::load_default("DEFAULT_APEC_CV_CUTOFF",AFLOWRC_DEFAULT_APEC_CV_CUTOFF);
     aflowrc::load_default("DEFAULT_APEC_CONC_NPTS",AFLOWRC_DEFAULT_APEC_CONC_NPTS);
     aflowrc::load_default("DEFAULT_APEC_TEMP_NPTS",AFLOWRC_DEFAULT_APEC_TEMP_NPTS);
     aflowrc::load_default("DEFAULT_APEC_TEMP_MIN",AFLOWRC_DEFAULT_APEC_TEMP_MIN);
@@ -2320,6 +2323,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_APEC_MIN_SLEEP_SECONDS" << AFLOWRC_DEFAULT_APEC_MIN_SLEEP_SECONDS << endl;
     aflowrc << "DEFAULT_APEC_MAX_NUM_ATOMS" << AFLOWRC_DEFAULT_APEC_MAX_NUM_ATOMS << endl;
     aflowrc << "DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS" << AFLOWRC_DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS << endl;
+    aflowrc << "DEFAULT_APEC_CV_CUTOFF" << AFLOWRC_DEFAULT_APEC_CV_CUTOFF << endl;
     aflowrc << "DEFAULT_APEC_CONC_NPTS" << AFLOWRC_DEFAULT_APEC_CONC_NPTS << endl;
     aflowrc << "DEFAULT_APEC_TEMP_NPTS" << AFLOWRC_DEFAULT_APEC_TEMP_NPTS << endl;
     aflowrc << "DEFAULT_APEC_TEMP_MIN" << AFLOWRC_DEFAULT_APEC_TEMP_MIN << endl;
@@ -2927,6 +2931,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APEC_MIN_SLEEP_SECONDS\")=" << AFLOWRC_DEFAULT_APEC_MIN_SLEEP_SECONDS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APEC_MAX_NUM_ATOMS\")=" << AFLOWRC_DEFAULT_APEC_MAX_NUM_ATOMS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS\")=" << AFLOWRC_DEFAULT_APEC_AFLOW_MAX_NUM_ATOMS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APEC_CV_CUTOFF\")=" << AFLOWRC_DEFAULT_APEC_CV_CUTOFF << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APEC_CONC_NPTS\")=" << AFLOWRC_DEFAULT_APEC_CONC_NPTS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APEC_TEMP_NPTS\")=" << AFLOWRC_DEFAULT_APEC_TEMP_NPTS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_APEC_TEMP_MIN\")=" << AFLOWRC_DEFAULT_APEC_TEMP_MIN << endl;

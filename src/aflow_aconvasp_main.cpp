@@ -111,6 +111,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"APEC::PLATTICE","--plattice=","");
     vpflow.args2addattachedscheme(argv,cmds,"APEC::ELEMENTS","--elements=","");
     vpflow.args2addattachedscheme(argv,cmds,"APEC::MAX_NUM_ATOMS","--max_num_atoms=|--mna=","");
+    vpflow.args2addattachedscheme(argv,cmds,"APEC::CV_CUTOFF","--cv_cutoff=|--cv_cut=","");
     vpflow.args2addattachedscheme(argv,cmds,"APEC::CONC_CURVE_RANGE","--conc_curve_range=|--conc_curve=","");
     vpflow.args2addattachedscheme(argv,cmds,"APEC::CONC_NPTS","--conc_npts=","");
     vpflow.args2addattachedscheme(argv,cmds,"APEC::TEMP_RANGE","--temp_range=","");
@@ -1745,7 +1746,7 @@ namespace pflow {
       if(vpflow.flag("AFLOWLIB_AURL2LOOP")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AURL2LOOP"),"AFLOWLIB_AURL2LOOP"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWSYM_PYTHON")){ SYM::writePythonScript(cout); _PROGRAMRUN=true;} //DX20210202
       if(vpflow.flag("AFLUX")) {cout << aflowlib::AFLUXCall(vpflow) << endl; _PROGRAMRUN=true;}  //DX20190206 - add AFLUX command line functionality
-      if(vpflow.flag("APEC::INIT")) {apec::GetPhaseDiagram(vpflow); _PROGRAMRUN=true;} //SD20220323
+      if(vpflow.flag("APEC::INIT")) {apec::getPhaseDiagram(vpflow); _PROGRAMRUN=true;} //SD20220323
       if(vpflow.flag("ATAT")) {cout << input2ATATxstr(cin); _PROGRAMRUN=true;} //SD20220123
       // B
       if(vpflow.flag("BANDGAP_WAHYU")) {AConvaspBandgap(argv); _PROGRAMRUN=true;}
@@ -2355,6 +2356,7 @@ namespace pflow {
     strstream << endl;
     strstream << tab << xspaces << " " << "BINODAL OPTIONS:" << endl;
     strstream << tab << xspaces << " " << "              --max_num_atoms=|--mna=8" << endl;
+    strstream << tab << xspaces << " " << "              --cv_cutoff=|--cv_cut=0.05" << endl;
     strstream << tab << xspaces << " " << "              --conc_curve_range=|--conc_curve=0,1,1,0" << endl;
     strstream << tab << xspaces << " " << "              --conc_npts=20" << endl;
     strstream << tab << xspaces << " " << "              --temp_range=300,2000" << endl;
