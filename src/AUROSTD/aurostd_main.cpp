@@ -7728,6 +7728,9 @@ namespace aurostd {
     }
     return vout;
   }
+  string vecDouble2String(const vector<double>& vin,int precision, bool roff, double tol, char FORMAT) {
+    return aurostd::joinWDelimiter(vecDouble2vecString(vin, precision, roff, tol, FORMAT), ",");
+  }
   // [OBSOLETE] vector<string> xvecDouble2vecString(const xvector<double>& vin, bool roff) {
   // [OBSOLETE]   vector<string> vout;
   // [OBSOLETE]   for(uint i=1;i<(uint)vin.rows+1;i++){
@@ -7745,6 +7748,9 @@ namespace aurostd {
       vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); //DX20170822 - add roundoff
     }
     return vout;
+  }
+  string xvecDouble2String(const xvector<double>& vin,int precision, bool roff, double tol, char FORMAT) {
+    return aurostd::joinWDelimiter(xvecDouble2vecString(vin, precision, roff, tol, FORMAT), ",");
   }
   // [OBSOLETE] deque<string> deqDouble2deqString(const deque<double>& vin, bool roff) {
   // [OBSOLETE]   deque<string> vout;
@@ -7764,6 +7770,9 @@ namespace aurostd {
       vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); //DX20170822 - add roundoff
     }
     return vout;
+  }
+  string vecDouble2String(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT) {
+    return aurostd::joinWDelimiter(vecDouble2vecString(vin, precision, roff, tol, FORMAT), ",");
   }
 }
 

@@ -499,7 +499,7 @@ namespace unittest {
   }
   void UnitTest::check(const bool passed, const vector<double>& calculated, const vector<double>& expected, const string& check_function,
     const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-    check(passed, aurostd::joinWDelimiter(aurostd::vecDouble2vecString(calculated), ","), aurostd::joinWDelimiter(aurostd::vecDouble2vecString(expected), ","), check_function, check_description, passed_checks, results);
+    check(passed, aurostd::vecDouble2String(calculated), aurostd::vecDouble2String(expected), check_function, check_description, passed_checks, results);
   }
 
   template <typename utype>
