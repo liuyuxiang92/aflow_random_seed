@@ -87,11 +87,11 @@ namespace apec {
   xmatrix<double> getConcentrationMacro(const vector<double>& conc_curve_range, const int conc_npts, const uint nelem);
   xvector<double> getTemperature(const vector<double>& temp_range, const int temp_npts);
   void setCongruentClusters(_apec_data& apec_data);
-  xvector<int> getNumAtomCluster(const vector<xstructure>& vstr);
-  xvector<int> getDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const bool shuffle, const string& rundirpath="");
+  xvector<double> getExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const int max_num_atoms);
   xmatrix<double> getConcentrationCluster(const vector<string>& elements, const vector<xstructure>& vstr);
   xmatrix<double> getConcentrationCluster(const string& rundirpath, const int nstr, const int nelem);
-  xvector<double> getExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const xvector<int>& natom);
+  xvector<int> getNumAtomCluster(const vector<xstructure>& vstr);
+  xvector<int> getDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const bool shuffle, const string& rundirpath="");
   double getCVCluster(const string& rundirpath, const double cv_cut);
   void runATAT(const string& workdirpath, const string& rundirpath, const uint min_sleep);
   void generateFilesForATAT(const string& rundirpath, const string& lat_atat, const vector<xstructure>& vstr_aflow, const vector<xstructure>& vstr_atat, const vector<int>& mapstr);

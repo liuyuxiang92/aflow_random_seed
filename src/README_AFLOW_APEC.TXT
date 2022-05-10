@@ -22,17 +22,17 @@ GENERAL OVERVIEW
 
 AFLOW-APEC is an automated tool to calculate phase equilibria properties of alloys for a given 
 parent lattice. Alloy data is downloaded from the AFLOW database and the cluster expansion is 
-performed to calculcate the energies of additional derivatice structures using the Alloy Theoretic 
+performed to calculate the energies of additional derivative structures using the Alloy Theoretic 
 Automated Toolkit [J. Phase Equilib. 23, 348 (2002)].
 
-Using the generalized quasi-chemical approximation, the binodal curve is calculcated, based on the
+Using the generalized quasi-chemical approximation, the binodal curve is calculated, based on the
 LTVC method [Acta Mater. 159, 364 (2018)].
 
 ****************************************************************************************************
 LIST OF AFLOW-APEC COMMANDS:
 
   aflow --phase_equilibria --plattice=fcc --elements=Au,Pt[,Zn] [apec_options] [--directory=[DIRECTORY]]
-      Loads the alloy data from the AFLOW database, constructs the binodal curve and returns,
+      Loads the alloy data from the AFLOW database, constructs the binodal curve, and returns
       the output as a TXT (default, see --format_data).
       --phase_equilibria : Necessary argument, enter the mode to calculate the phase equilibria
           properties.
@@ -43,18 +43,18 @@ LIST OF AFLOW-APEC COMMANDS:
           Default: "./"
 
       GENERAL OPTIONS:
-      [--usage] : Returns usage commands and options.
+      [--usage] : Return the usage commands and options.
           Default: OFF
       [--screen_only] : Output directly to screen (stdout) instead of writing to a file.
           Default: OFF
       [--image_only|--image] : Only read the output data and plot the results. Plotting
           is only implemented for binary alloys.
           Default: OFF
-      [--no_plot|--noplot] : Do not plot the results after the calculcation is complete.
+      [--no_plot|--noplot] : Skip plotting the results after the calculation is complete.
           Default: OFF
 
       BINODAL OPTIONS:
-      [--max_num_atoms=|--mna=8] : Specify the maximum number of atoms in the alloy
+      [--max_num_atoms=|--mna=8] : Specify the maximum number of atoms in the alloy.
           Default: 8
       [--cv_cutoff=|--cv_cut=0.05] : Specify the cross validation (CV) score cut-off for
           the cluster expansion. The calculation will terminate prematurely if the CV
@@ -62,9 +62,10 @@ LIST OF AFLOW-APEC COMMANDS:
           Default: 0.05
           Units: eV
       [--conc_curve_range=|--conc_curve=0,1,1,0] : Define the concentration curve
-          to evalute the equilibria properties. The format of this argument is:
-          <c_1i>,<c_c1f>,<c_2i>,<c_2f>,...,<c_[K]i>,<c_[K]f> where <c_[k]i> is the 
-          initial concentration and <c_[k]f> is the final concentration.
+          to evaluate the equilibria properties. The format of this argument is:
+          <c_1i>,<c_1f>,<c_2i>,<c_2f>,...,<c_[K]i>,<c_[K]f> where K is number
+          of elements, <c_[k]i> is the initial concentration and <c_[k]f> is the 
+          final concentration. The concentration is defined on [0,1].
           Default: NONE
       [--conc_npts=20] : Number of points used to determine the sub-division of 
           the concentration profile.

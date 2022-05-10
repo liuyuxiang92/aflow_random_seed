@@ -324,6 +324,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   m*=(utype)5;m/=(utype)6;  //CO20190911
   m.getmatInPlace(m,1,1,1,1,1,1);m.getmatInPlace(vv,1,1,1,1,1,1); //CO20190911
   m=x*m*x/x;o+=(m==m);o+=(m!=m);o+=trace(m);m=-n;traspSquareInPlace(m,false);traspInPlace(m,false);traspInPlace(m,m,false);m=trasp(m);clear(m);mkron=aurostd::KroneckerProduct(mm,mmm);		//CO20190329 - clang doesn't like x=x, changing to x=y
+  m(1)*v; //SD20220510
   aurostd::LUPDecomposition(mm,m3,m3); //SD20220426
   aurostd::LUPDecomposition(mm,m3,m3,m3); //SD20220426
   aurostd::inverseByLUP(m3); //SD20220426

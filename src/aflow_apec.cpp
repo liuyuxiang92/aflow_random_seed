@@ -11,6 +11,7 @@
 #define _AFLOW_APEC_CPP_
 #include "aflow.h"
 #include "aflow_apec.h"
+#include "aflow_chull.h"
 #include "aflow_pocc.h"
 
 // ###############################################################################
@@ -364,7 +365,7 @@ namespace apec {
     apec_data.cv_cluster = getCVCluster(apec_data.rundirpath, apec_data.cv_cut);
     apec_data.num_atom_cluster = getNumAtomCluster(apec_data.vstr_atat);
     apec_data.conc_cluster = getConcentrationCluster(apec_data.rundirpath, apec_data.vstr_atat.size(), apec_data.elements.size());
-    apec_data.excess_energy_cluster = getExcessEnergyCluster(apec_data.rundirpath, apec_data.conc_cluster, apec_data.num_atom_cluster);
+    apec_data.excess_energy_cluster = getExcessEnergyCluster(apec_data.rundirpath, apec_data.conc_cluster, apec_data.max_num_atoms);
     setCongruentClusters(apec_data);
     apec_data.degeneracy_cluster = getDegeneracyCluster(apec_data.plattice, apec_data.vstr_atat, apec_data.elements, apec_data.max_num_atoms, true, apec_data.rundirpath);
     apec_data.conc_macro = getConcentrationMacro(apec_data.conc_curve_range, apec_data.conc_npts, apec_data.elements.size());
@@ -391,9 +392,7 @@ namespace apec {
     xvector<double> wts = aurostd::ones_xv<double>(nt);
     double temp_mean = aurostd::mean(temp), temp_std = aurostd::stddev(temp);
     xvector<double> temp_scaled = (temp - temp_mean) / temp_std; // scale for numerical stability
-    bool soln_found;
     for (int i = 1; i <= nx; i++) {
-      soln_found = false;
       p = aurostd::polynomialCurveFit(temp_scaled, rel_s(i) - rel_s_ec, n_fit, wts);
       aurostd::polynomialFindRoots(p, rr, ri);
       if (LDEBUG) {
@@ -401,16 +400,10 @@ namespace apec {
         cerr << "   Real roots=" << rr << endl;
         cerr << "   Imag roots=" << ri << endl;
       }
-      for (int j = 1; j <= n_fit && !soln_found; j++) {
+      for (int j = 1; j <= n_fit && binodal_boundary(i) == 0.0; j++) {
         if (rr(j) >= temp_scaled(1) && rr(j) <= temp_scaled(temp.rows) && aurostd::isequal(ri(j), 0.0)) { // solution must be real and within temp range
           binodal_boundary(i) = temp_std * rr(j) + temp_mean;
-          soln_found = true;
         }
-      }
-      if (!soln_found) {
-        stringstream message;
-        message << "Binodal boundary does not exist for i=" << i;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
     }
     return binodal_boundary;
@@ -459,9 +452,8 @@ namespace apec {
     xvector<double> wts = aurostd::ones_xv<double>(order_param.rows);
     xvector<double> p = aurostd::polynomialCurveFit(temp_scaled, order_param, n_fit, wts);
     int buffer = (int)std::floor(0.1 * temp.rows); // avoid edge points when evaluating derivatives
-LDEBUG=TRUE;
     if (LDEBUG) {
-      cerr << "ORIG=" << order_param << endl;
+      cerr << "alpha_orig=" << order_param << endl;
       cerr << "D[alpha, 0]=" << aurostd::evalPolynomial_xv(temp_scaled, aurostd::evalPolynomialCoeff(p, 0)) << endl;
       cerr << "D[alpha, 1]=" << aurostd::evalPolynomial_xv(temp_scaled, aurostd::evalPolynomialCoeff(p, 1)) << endl;
       cerr << "D[alpha, 2]=" << aurostd::evalPolynomial_xv(temp_scaled, aurostd::evalPolynomialCoeff(p, 2)) << endl;
@@ -687,6 +679,100 @@ namespace apec {
 }
 
 // ***************************************************************************
+// apec::getExcessEnergyCluster
+// ***************************************************************************
+// Define cluster excess energies relative to the convex hull
+namespace apec {
+  xvector<double> getExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const int max_num_atoms) {
+    int ind, nstr = conc_cluster.rows, nelem = conc_cluster.cols;
+    vector<string> vinput, tokens;
+    aurostd::file2vectorstring(rundirpath + "/ref_energy.out", vinput);
+    xvector<double> nrg_ref = aurostd::vector2xvector(aurostd::vectorstring2vectordouble(vinput));
+    xvector<double> nrg(nstr);
+    aurostd::file2vectorstring(rundirpath + "/fit.out", vinput);
+    // Calculate total energies per atom
+    for (uint line = 0; line < vinput.size(); line++) {
+      aurostd::string2tokens(vinput[line], tokens, " ");
+      ind = aurostd::string2utype<int>(tokens[tokens.size() - 1]) + 1;
+      nrg(ind) = (aurostd::string2utype<double>(tokens[nelem]) + conc_cluster(ind) * nrg_ref);
+    }
+    aurostd::file2vectorstring(rundirpath + "/predstr.out", vinput);
+    for (uint line = 0; line < vinput.size(); line++) {
+      aurostd::string2tokens(vinput[line], tokens, " ");
+      ind = aurostd::string2utype<int>(tokens[tokens.size() - 2]) + 1;
+      nrg(ind) = (aurostd::string2utype<double>(tokens[nelem]) + conc_cluster(ind) * nrg_ref);
+    }
+    // Calculate convex hull
+    bool quiet = XHOST.QUIET;
+    XHOST.QUIET = true;
+    aurostd::xoption ch_opts;
+    ch_opts.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY", true);
+    vector<chull::ChullPoint> vcp;
+    xvector<double> cp(nelem);
+    for (int i = 1; i <= nstr; i++) {
+      cp = conc_cluster(i);
+      cp(nelem) = nrg(i);
+      vcp.push_back(chull::ChullPoint(cp, cout, true, true, false));
+    }
+    chull::ConvexHull ch = chull::ConvexHull(ch_opts, vcp, cout, false, false);
+    XHOST.QUIET = quiet;
+    // Calculate excess energies per atom as the distance from the convex hull
+    for (int i = 1; i <= nstr; i++) {
+      nrg(i) = ch.getDistanceToHull(vcp[i - 1]);
+    }
+cerr<<nrg<<endl;
+    return nrg * max_num_atoms; // per cell
+  }
+}
+
+// ***************************************************************************
+// apec::getConcentrationCluster
+// ***************************************************************************
+namespace apec {
+  xmatrix<double> getConcentration(const vector<string>& elements, const vector<xstructure>& vstr) {
+    uint nstr = vstr.size(), nelem = elements.size();
+    xmatrix<double> conc_cluster(nstr, nelem);
+    int ie = -1;
+    xvector<double> stoich(nelem);
+    vector<string> str_elements;
+    for (uint i = 0; i < vstr.size(); i++) {
+      if (nelem != vstr[i].stoich_each_type.size()) {
+        str_elements = vstr[i].GetElements(true, true);
+        stoich.reset();
+        for (uint j = 0; j < nelem; j++) {
+          if (aurostd::WithinList(str_elements, elements[j], ie)) {stoich(j + 1) = vstr[i].stoich_each_type[ie];}
+        }
+      }
+      else {
+        stoich = aurostd::vector2xvector(aurostd::deque2vector(vstr[i].stoich_each_type));
+      }
+      for (uint j = 0; j < nelem; j++) {conc_cluster(i + 1, j + 1) = stoich(j + 1);}
+    }
+    return conc_cluster;
+  }
+
+  xmatrix<double> getConcentrationCluster(const string& rundirpath, const int nstr, const int nelem) {
+    xmatrix<double> conc_cluster(nstr, nelem);
+    vector<string> vinput, tokens;
+    aurostd::file2vectorstring(rundirpath + "/fit.out", vinput);
+    for (uint line = 0; line < vinput.size(); line++) {
+      aurostd::string2tokens(vinput[line], tokens, " ");
+      for (int i = 1; i <= nelem; i++) {
+        conc_cluster(aurostd::string2utype<int>(tokens[tokens.size() - 1]) + 1, i) = aurostd::string2utype<double>(tokens[i - 1]);
+      }
+    }
+    aurostd::file2vectorstring(rundirpath + "/predstr.out", vinput);
+    for (uint line = 0; line < vinput.size(); line++) {
+      aurostd::string2tokens(vinput[line], tokens, " ");
+      for (int i = 1; i <= nelem; i++) {
+        conc_cluster(aurostd::string2utype<int>(tokens[tokens.size() - 2]) + 1, i) = aurostd::string2utype<double>(tokens[i - 1]);
+      }
+    }
+    return conc_cluster;
+  }
+}
+
+// ***************************************************************************
 // apec::getNumAtomCluster
 // ***************************************************************************
 namespace apec {
@@ -781,7 +867,7 @@ namespace apec {
     pcalc.getTotalPermutationsCount();
     pcalc.calculate();
     vector<xstructure> vstr_sup = pcalc.getUniqueDerivativeStructures();
-    if (LDEBUG) {cerr << "Number of unique superlattices (HNF) = " << vstr_sup.size() << endl;} 
+    if (LDEBUG) {cerr << "Number of unique superlattices (HNF) = " << vstr_sup.size() << endl;}
     // enumerate all indicies
     vector<vector<int>> all_indicies;
     aurostd::xcombos xc(elements.size(), max_num_atoms, 'E', true);
@@ -801,7 +887,7 @@ namespace apec {
           atom.fpos = vstr_sup[i].c2f * atom.cpos;
           atom.name_is_given = TRUE;
           atoms.push_back(atom);
-        }  
+        }
         std::stable_sort(atoms.begin(), atoms.end(), sortAtomsNames);
         itype = 0;
         atoms[0].type = itype;
@@ -816,11 +902,11 @@ namespace apec {
         vstr_ds.push_back(str);
       }
     }
-    if (LDEBUG) {cerr << "Number of total derivative structures = " << vstr_ds.size() << endl;} 
+    if (LDEBUG) {cerr << "Number of total derivative structures = " << vstr_ds.size() << endl;}
     // find degenerate structures
     vstr_ds.insert(vstr_ds.begin(), vstr.begin(), vstr.end()); // concatenate xstructures, subtract by 1 in the end
     XtalFinderCalculator xtal_calc;
-    vector<vector<uint>> dsg = xtal_calc.groupSimilarXstructures(vstr_ds);
+    vector<vector<uint>> dsg = xtal_calc.groupSimilarXstructures(vstr_ds); // costly part of the function
     for (uint i = 0; i < dsg.size(); i++) {
       std::sort(dsg[i].begin(), dsg[i].end()); // first index is the cluster index
       if (dsg[i][0] < (uint)degeneracy_cluster.rows) {
@@ -849,77 +935,6 @@ namespace apec {
       aurostd::stringstream2file(ss, filepath);
     }
     return degeneracy_cluster;
-  }
-}
-
-// ***************************************************************************
-// apec::getConcentrationCluster
-// ***************************************************************************
-namespace apec {
-  xmatrix<double> getConcentration(const vector<string>& elements, const vector<xstructure>& vstr) {
-    uint nstr = vstr.size(), nelem = elements.size();
-    xmatrix<double> conc_cluster(nstr, nelem);
-    int ie = -1;
-    xvector<double> stoich(nelem);
-    vector<string> str_elements;
-    for (uint i = 0; i < vstr.size(); i++) {
-      if (nelem != vstr[i].stoich_each_type.size()) {
-        str_elements = vstr[i].GetElements(true, true);
-        stoich.reset();
-        for (uint j = 0; j < nelem; j++) {
-          if (aurostd::WithinList(str_elements, elements[j], ie)) {stoich(j + 1) = vstr[i].stoich_each_type[ie];}
-        }
-      }
-      else {
-        stoich = aurostd::vector2xvector(aurostd::deque2vector(vstr[i].stoich_each_type));
-      }
-      for (uint j = 0; j < nelem; j++) {conc_cluster(i + 1, j + 1) = stoich(j + 1);}
-    }
-    return conc_cluster;
-  }
-
-  xmatrix<double> getConcentrationCluster(const string& rundirpath, const int nstr, const int nelem) {
-    xmatrix<double> conc_cluster(nstr, nelem);
-    vector<string> vinput, tokens;
-    aurostd::file2vectorstring(rundirpath + "/fit.out", vinput);
-    for (uint line = 0; line < vinput.size(); line++) {
-      aurostd::string2tokens(vinput[line], tokens, " ");
-      for (int i = 1; i <= nelem; i++) {
-        conc_cluster(aurostd::string2utype<int>(tokens[tokens.size() - 1]) + 1, i) = aurostd::string2utype<double>(tokens[i - 1]);
-      }
-    }
-    aurostd::file2vectorstring(rundirpath + "/predstr.out", vinput);
-    for (uint line = 0; line < vinput.size(); line++) {
-      aurostd::string2tokens(vinput[line], tokens, " ");
-      for (int i = 1; i <= nelem; i++) {
-        conc_cluster(aurostd::string2utype<int>(tokens[tokens.size() - 2]) + 1, i) = aurostd::string2utype<double>(tokens[i - 1]);
-      }
-    }
-    return conc_cluster;
-  }
-}
-
-// ***************************************************************************
-// apec::getExcessEnergyCluster
-// ***************************************************************************
-namespace apec {
-  xvector<double> getExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const xvector<int>& num_atom_cluster) {
-    int nstr = conc_cluster.rows, nelem = conc_cluster.cols;
-    vector<string> vinput, tokens;
-    aurostd::file2vectorstring(rundirpath + "/ref_energy.out", vinput);
-    xvector<double> nrg_ref = aurostd::vector2xvector(aurostd::vectorstring2vectordouble(vinput));
-    xvector<double> nrg(nstr);
-    aurostd::file2vectorstring(rundirpath + "/fit.out", vinput);
-    for (uint line = 0; line < vinput.size(); line++) {
-      aurostd::string2tokens(vinput[line], tokens, " ");
-      nrg(aurostd::string2utype<int>(tokens[tokens.size() - 1]) + 1) = aurostd::string2utype<double>(tokens[nelem]) * num_atom_cluster(aurostd::string2utype<int>(tokens[tokens.size() - 1]) + 1);
-    }
-    aurostd::file2vectorstring(rundirpath + "/predstr.out", vinput);
-    for (uint line = 0; line < vinput.size(); line++) {
-      aurostd::string2tokens(vinput[line], tokens, " ");
-      nrg(aurostd::string2utype<int>(tokens[tokens.size() - 2]) + 1) = aurostd::string2utype<double>(tokens[nelem]) * num_atom_cluster(aurostd::string2utype<int>(tokens[tokens.size() - 2]) + 1);
-    }
-    return nrg;
   }
 }
 
