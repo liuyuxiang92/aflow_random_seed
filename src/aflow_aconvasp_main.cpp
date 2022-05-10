@@ -29,7 +29,7 @@
 #include "aflow_gfa.h" //DF20190329
 #include "aflow_cce.h" //RF20200203
 #include "APL/aflow_apl.h"  //ME20200330
-#include "aflow_apec.h" //SD20220323
+#include "aflow_qca.h" //SD20220323
 
 extern double NearestNeighbor(const xstructure& a);
 
@@ -100,24 +100,24 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   //DX20190206 - add AFLUX functionality to command line - END
   vpflow.flag("ANALYZEDB", aurostd::args2flag(argv,cmds,"--analyze_database"));  //ME20191001
 
-  vpflow.flag("APEC::INIT", aurostd::args2flag(argv,cmds,"--phase_equilibria")); //SD20220323 - initiate phase equilibria calculation
-  if(vpflow.flag("APEC::INIT")) {
-    vpflow.flag("APEC::USAGE", aurostd::args2flag(argv,cmds,"--usage"));
-    vpflow.flag("APEC::SPINODAL", aurostd::args2flag(argv,cmds,"--spinodal"));
-    vpflow.flag("APEC::SCREEN_ONLY", aurostd::args2flag(argv,cmds,"--screen_only"));
-    vpflow.flag("APEC::IMAGE_ONLY", aurostd::args2flag(argv,cmds,"--image_only|--image"));
-    vpflow.flag("APEC::NO_PLOT", aurostd::args2flag(argv,cmds,"--no_plot|--noplot"));
-    vpflow.args2addattachedscheme(argv,cmds,"APEC::DIRECTORY","--directory=","./");
-    vpflow.args2addattachedscheme(argv,cmds,"APEC::PLATTICE","--plattice=","");
-    vpflow.args2addattachedscheme(argv,cmds,"APEC::ELEMENTS","--elements=","");
-    vpflow.args2addattachedscheme(argv,cmds,"APEC::MAX_NUM_ATOMS","--max_num_atoms=|--mna=","");
-    vpflow.args2addattachedscheme(argv,cmds,"APEC::CV_CUTOFF","--cv_cutoff=|--cv_cut=","");
-    vpflow.args2addattachedscheme(argv,cmds,"APEC::CONC_CURVE_RANGE","--conc_curve_range=|--conc_curve=","");
-    vpflow.args2addattachedscheme(argv,cmds,"APEC::CONC_NPTS","--conc_npts=","");
-    vpflow.args2addattachedscheme(argv,cmds,"APEC::TEMP_RANGE","--temp_range=","");
-    vpflow.args2addattachedscheme(argv,cmds,"APEC::TEMP_NPTS","--temp_npts=","");
-    vpflow.args2addattachedscheme(argv,cmds,"APEC::FORMAT_DATA","format_data=|--data_format=","txt");
-    vpflow.args2addattachedscheme(argv,cmds,"APEC::FORMAT_PLOT","format_image=|--image_format=","pdf");
+  vpflow.flag("QCA::INIT", aurostd::args2flag(argv,cmds,"--phase_equilibria")); //SD20220323 - initiate phase equilibria calculation
+  if(vpflow.flag("QCA::INIT")) {
+    vpflow.flag("QCA::USAGE", aurostd::args2flag(argv,cmds,"--usage"));
+    vpflow.flag("QCA::SPINODAL", aurostd::args2flag(argv,cmds,"--spinodal"));
+    vpflow.flag("QCA::SCREEN_ONLY", aurostd::args2flag(argv,cmds,"--screen_only"));
+    vpflow.flag("QCA::IMAGE_ONLY", aurostd::args2flag(argv,cmds,"--image_only|--image"));
+    vpflow.flag("QCA::NO_PLOT", aurostd::args2flag(argv,cmds,"--no_plot|--noplot"));
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::DIRECTORY","--directory=","./");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::PLATTICE","--plattice=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::ELEMENTS","--elements=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::MAX_NUM_ATOMS","--max_num_atoms=|--mna=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::CV_CUTOFF","--cv_cutoff=|--cv_cut=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::CONC_CURVE_RANGE","--conc_curve_range=|--conc_curve=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::CONC_NPTS","--conc_npts=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::TEMP_RANGE","--temp_range=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::TEMP_NPTS","--temp_npts=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::FORMAT_DATA","format_data=|--data_format=","txt");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::FORMAT_PLOT","format_image=|--image_format=","pdf");
   }
 
   // Commands for serializing bands and DOS data to JSON
@@ -1746,7 +1746,7 @@ namespace pflow {
       if(vpflow.flag("AFLOWLIB_AURL2LOOP")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AURL2LOOP"),"AFLOWLIB_AURL2LOOP"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWSYM_PYTHON")){ SYM::writePythonScript(cout); _PROGRAMRUN=true;} //DX20210202
       if(vpflow.flag("AFLUX")) {cout << aflowlib::AFLUXCall(vpflow) << endl; _PROGRAMRUN=true;}  //DX20190206 - add AFLUX command line functionality
-      if(vpflow.flag("APEC::INIT")) {apec::getPhaseDiagram(vpflow); _PROGRAMRUN=true;} //SD20220323
+      if(vpflow.flag("QCA::INIT")) {qca::getPhaseDiagram(vpflow); _PROGRAMRUN=true;} //SD20220323
       if(vpflow.flag("ATAT")) {cout << input2ATATxstr(cin); _PROGRAMRUN=true;} //SD20220123
       // B
       if(vpflow.flag("BANDGAP_WAHYU")) {AConvaspBandgap(argv); _PROGRAMRUN=true;}
@@ -2345,7 +2345,7 @@ namespace pflow {
     strstream << tab << x << " --aflowlib_aurl2auid=aurl1,aurl2.... [ --aurl2auid=..." << endl;
     strstream << tab << x << " --aflowlib_auid2loop=auid1,auid2....|--auid2loop=..." << endl;
     strstream << tab << x << " --aflowlib_aurl2loop=aurl1,aurl2.... [ --aurl2loop=..." << endl;
-    strstream << tab << x << " --phase_equilibria --plattice=fcc --elements=Au,Pt[,Zn] [apec_options] [--directory=[DIRECTORY]]" << endl;
+    strstream << tab << x << " --quasi_chem_approx|--qca --plattice=fcc --elements=Au,Pt[,Zn] [qca_options] [--directory=[DIRECTORY]]" << endl;
     strstream << tab << xspaces << " " << "options are:" << endl;
     strstream << endl;
     strstream << tab << xspaces << " " << "GENERAL OPTIONS:" << endl;
