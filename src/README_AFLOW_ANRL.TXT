@@ -99,6 +99,9 @@ A description of each input is described below:
                 -  ...
                 -  ...
 
+              Note: for space group 47, we denote the 27th Wyckoff position, "alpha", as a capital "A"
+              e.g., A_oP8_47_A
+
   A:B:C...:   The prototype can be decorated with different atoms by appending the elements
               to the label separated by colons ":".
 
