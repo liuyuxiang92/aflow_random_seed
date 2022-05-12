@@ -220,6 +220,40 @@ namespace aurostd {
 }
 
 // ----------------------------------------------------------------------------
+// exp  exp  exp  exp  exp
+namespace aurostd {
+  // namespace aurostd
+  // EXP(X)
+  char exp(char x) { return (char) std::exp((double) x);}
+  int exp(int x) { return (int) std::exp((double) x);}
+  uint exp(uint x) { return (uint) std::exp((double) x);}
+  float exp(float x) { return (float) expf(x);}
+  double exp(double x) { return (double) std::exp(x);}
+  long int exp(long int x) { return (long int) std::exp((double) x);}
+  long long int exp(long long int x) { return (long long int) std::exp((double) x);}
+  unsigned long int exp(unsigned long int x) { return (unsigned long int) std::exp((double) x);}
+  unsigned long long int exp(unsigned long long int x) { return (unsigned long long int) std::exp((double) x);}
+  long double exp(long double x) { return (long double) expl(x);}
+}
+
+// ----------------------------------------------------------------------------
+// pow  pow  pow  pow  pow
+namespace aurostd {
+  // namespace aurostd
+  // POW(X)
+  char pow(char x,char d) { return (char) std::pow((double) x,(double) d);}
+  int pow(int x,int d) { return (int) std::pow((double) x,(double) d);}
+  uint pow(uint x,uint d) { return (uint) std::pow((double) x,(double) d);}
+  float pow(float x,float d) { return (float) powf(x,d);}
+  double pow(double x,double d) { return (double) std::pow(x,d);}
+  long int pow(long int x,long int d) { return (long int) std::pow((double) x,(double) d);}
+  long long int pow(long long int x,long long int d) { return (long long int) std::pow((double) x,(double) d);}
+  unsigned long int pow(unsigned long int x,unsigned long int d) { return (unsigned long int) std::pow((double) x,(double) d);}
+  unsigned long long int pow(unsigned long long int x,unsigned long long int d) { return (unsigned long long int) std::pow((double) x,(double) d);}
+  long double pow(long double x,long double d) { return (long double) powl(x,d);}
+}
+
+// ----------------------------------------------------------------------------
 // round  floor ceil trunc
 namespace aurostd {  // namespace aurostd
   // ROUND(X)
@@ -733,26 +767,6 @@ namespace aurostd {
     else {
       return x - y * std::floor((double)x/y);
     }
-  }
-}
-
-// ***************************************************************************
-// Function mod_floored
-// ***************************************************************************
-namespace aurostd {
-  // SD20220324
-  template<class utype> utype pow(utype x, utype y) {
-    if (std::isnan(x)) {
-      string soliloquy = XPID + "aurostd::pow():";
-      string message = "NAN value in base";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ILLEGAL_);
-    }
-    if (std::isnan(y)) {
-      string soliloquy = XPID + "aurostd::pow():";
-      string message = "NAN value in exponent";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ILLEGAL_);
-    }
-    return std::pow((double)x,(double)y);
   }
 }
 

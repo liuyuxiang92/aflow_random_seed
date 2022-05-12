@@ -1252,28 +1252,54 @@ namespace aurostd {                   // conversion to xvector<utype>
     }
 }
 
-//CO20190516
-namespace aurostd {                   // conversion from xvector<int> to xvector<double>
-  xvector<double> xvectorint2double(const xvector<int>& a){
-    xvector<double> b(a.urows,a.lrows);
-    for(int i=a.lrows;i<=a.urows;i++){b[i]=(double)a[i];}  //nint is for safety
-    return b;
-  }
+//[SD20220512 - OBSOLETE]//CO20190516
+//[SD20220512 - OBSOLETE]namespace aurostd {                   // conversion from xvector<int> to xvector<double>
+//[SD20220512 - OBSOLETE]  xvector<double> xvectorint2double(const xvector<int>& a){
+//[SD20220512 - OBSOLETE]    xvector<double> b(a.urows,a.lrows);
+//[SD20220512 - OBSOLETE]    for(int i=a.lrows;i<=a.urows;i++){b[i]=(double)a[i];}
+//[SD20220512 - OBSOLETE]    return b;
+//[SD20220512 - OBSOLETE]  }
+//[SD20220512 - OBSOLETE]}
+
+//[SD20220512 - OBSOLETE]//CO20190516
+//[SD20220512 - OBSOLETE]namespace aurostd {                   // conversion from xvector<double> to xvector<int>
+//[SD20220512 - OBSOLETE]  xvector<int> xvectordouble2int(const xvector<double>& a,bool check_int){
+//[SD20220512 - OBSOLETE]    xvector<int> b(a.urows,a.lrows);
+//[SD20220512 - OBSOLETE]    if(check_int){
+//[SD20220512 - OBSOLETE]      for(int i=a.lrows;i<=a.urows;i++){
+//[SD20220512 - OBSOLETE]        if(!isinteger(a[i])){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvectordouble2int():","non-integer found",_INPUT_ILLEGAL_);}
+//[SD20220512 - OBSOLETE]      }
+//[SD20220512 - OBSOLETE]    }
+//[SD20220512 - OBSOLETE]    for(int i=a.lrows;i<=a.urows;i++){b[i]=(int)nint(a[i]);}  //nint is for safety
+//[SD20220512 - OBSOLETE]    return b;
+//[SD20220512 - OBSOLETE]  }
+//[SD20220512 - OBSOLETE]}
+
+//SD20220512
+namespace aurostd {                   // conversion from xvector<utype> to xvector<double>
+  template<class utype> 
+    xvector<double> xvectorutype2double(const xvector<utype>& a){
+      xvector<double> b(a.urows,a.lrows);
+      for(int i=a.lrows;i<=a.urows;i++){b[i]=(double)a[i];}
+      return b;
+    }
 }
 
-//CO20190516
-namespace aurostd {                   // conversion from xvector<double> to xvector<int>
-  xvector<int> xvectordouble2int(const xvector<double>& a,bool check_int){
-    xvector<int> b(a.urows,a.lrows);
-    if(check_int){
-      for(int i=a.lrows;i<=a.urows;i++){
-        if(!isinteger(a[i])){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvectordouble2int():","non-integer found",_INPUT_ILLEGAL_);}
+//SD20220512
+namespace aurostd {                   // conversion from xvector<double> to xvector<utype>
+  template<class utype> 
+    xvector<utype> xvectordouble2utype(const xvector<double>& a,bool check_int){
+      xvector<utype> b(a.urows,a.lrows);
+      if(check_int){
+        for(int i=a.lrows;i<=a.urows;i++){
+          if(!isinteger(a[i])){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvectordouble2utype():","non-integer found ["+aurostd::utype2string(a[i])+"]",_INPUT_ILLEGAL_);}
+        }
       }
+      for(int i=a.lrows;i<=a.urows;i++){b[i]=(utype)nint(a[i]);}  //nint is for safety
+      return b;
     }
-    for(int i=a.lrows;i<=a.urows;i++){b[i]=(int)nint(a[i]);}  //nint is for safety
-    return b;
-  }
 }
+
 
 // ----------------------------------------------------------------------------
 // ------------------------------------------------------- set reset operations

@@ -134,10 +134,10 @@ namespace aurostd {
   template<class utype> int _size(utype) __xprototype;
   template<class utype> utype abs(utype) __xprototype;
   template<class utype> utype sqrt(utype) __xprototype;
+  template<class utype> utype exp(utype) __xprototype; //SD20220512
   template<class utype> utype sign(utype) __xprototype;
   template<class utype> utype mod(utype,utype) __xprototype;
   template<class utype> utype mod_floored(utype,utype) __xprototype;
-  template<class utype> utype pow(utype,utype) __xprototype;
   template<class utype> utype nint(utype) __xprototype;
   template<class utype> void _GCD(int a,int b, int& gcd, int& x, int& y); //CO20180409  //CO20191112 - extended GCD, get Bezout coefficients
   template<class utype> void _GCD(int a,int b, int& gcd); //CO20180409
@@ -479,6 +479,38 @@ namespace aurostd {
   //  double sqrt(xcomplex<double> x) __xprototype;
   long double sqrt(xcomplex<long double> x) __xprototype;
 #endif
+}
+
+// ----------------------------------------------------------------------------
+// exp  exp  exp  exp  exp
+namespace aurostd {
+  // namespace aurostd
+  // EXP(X)
+  char exp(char x) __xprototype; //SD20220512
+  int exp(int x) __xprototype; //SD20220512
+  uint exp(uint x) __xprototype; //SD20220512
+  float exp(float x) __xprototype; //SD20220512
+  double exp(double x) __xprototype; //SD20220512
+  long int exp(long int x) __xprototype; //SD20220512
+  long long int exp(long long int x) __xprototype; //SD20220512
+  unsigned long long int exp(unsigned long long int x) __xprototype; //SD20220512
+  long double exp(long double x) __xprototype; //SD20220512
+}
+
+// ----------------------------------------------------------------------------
+// pow  pow  pow  pow  pow
+namespace aurostd {
+  // namespace aurostd
+  // POW(X)
+  char pow(char x,char d) __xprototype; //SD20220512
+  int pow(int x,int d) __xprototype; //SD20220512
+  uint pow(uint x, uint d) __xprototype; //SD20220512
+  float pow(float x, float d) __xprototype; //SD20220512
+  double pow(double x,double d) __xprototype; //SD20220512
+  long int pow(long int x,long int d) __xprototype; //SD20220512
+  long long int pow(long long int x,long long int d) __xprototype; //SD20220512
+  unsigned long long int pow(unsigned long long int x,unsigned long long int d) __xprototype; //SD20220512
+  long double pow(long double x,long double d) __xprototype; //SD20220512
 }
 
 //--------------------------------------------------------------- round

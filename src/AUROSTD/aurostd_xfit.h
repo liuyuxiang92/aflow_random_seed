@@ -10,18 +10,18 @@
 //********************************************************************************
 //              Functions to work with polynomials
 namespace aurostd{
-  double evalPolynomial(const double x, const xvector<double>& p);
-  xvector<double> evalPolynomial_xv(const xvector<double>& x, const xvector<double>& p);
-  xmatrix<double> evalPolynomial_xm(const xmatrix<double>& x, const xvector<double>& p);
-  void evalPolynomialDeriv(const double x, const xvector<double>& p, xvector<double>& dp);
-  xvector<double> evalPolynomialDeriv(const double x, const xvector<double>& p, const uint n);
-  xvector<double> evalPolynomialCoeff(const xvector<double>& p, const uint n); //SD20220425
-  xmatrix<double> Vandermonde_matrix(const xvector<double>& x, const int n);
-  double polynomialFindExtremum(const xvector<double>& p, const double xmin, const double xmax,
-      const double tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
-  xvector<double> polynomialCurveFit(const xvector<double>& x, const xvector<double>& y, const int n, xvector<double> w); //SD20220422
-  xmatrix<double> companion_matrix(const xvector<double>& p); //SD20220318
-  void polynomialFindRoots(const xvector<double>& p, xvector<double>& rr, xvector<double>& ri); //SD20220318
+  template<class utype> utype evalPolynomial(const utype x, const xvector<utype>& p) __xprototype;
+  template<class utype> xvector<utype> evalPolynomial_xv(const xvector<utype>& x, const xvector<utype>& p) __xprototype;
+  template<class utype> xmatrix<utype> evalPolynomial_xm(const xmatrix<utype>& x, const xvector<utype>& p) __xprototype;
+  template<class utype> void evalPolynomialDeriv(const utype x, const xvector<utype>& p, xvector<utype>& dp) __xprototype;
+  template<class utype> xvector<utype> evalPolynomialDeriv(const utype x, const xvector<utype>& p, const uint n) __xprototype;
+  template<class utype> xvector<utype> evalPolynomialCoeff(const xvector<utype>& p, const uint n) __xprototype; //SD20220425
+  template<class utype> xmatrix<utype> Vandermonde_matrix(const xvector<utype>& x, const int n) __xprototype;
+  template<class utype> utype polynomialFindExtremum(const xvector<utype>& p, const utype xmin, const utype xmax,
+      const utype tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_) __xprototype;
+  template<class utype> xvector<utype> polynomialCurveFit(const xvector<utype>& x, const xvector<utype>& y, const int n, const xvector<utype> w) __xprototype; //SD20220422
+  template<class utype> xmatrix<utype> companion_matrix(const xvector<utype>& p) __xprototype; //SD20220318
+  template<class utype> void polynomialFindRoots(const xvector<utype>& p, xvector<utype>& rr, xvector<utype>& ri) __xprototype; //SD20220318
 }
 
 //********************************************************************************

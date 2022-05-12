@@ -100,7 +100,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   //DX20190206 - add AFLUX functionality to command line - END
   vpflow.flag("ANALYZEDB", aurostd::args2flag(argv,cmds,"--analyze_database"));  //ME20191001
 
-  vpflow.flag("QCA::INIT", aurostd::args2flag(argv,cmds,"--phase_equilibria")); //SD20220323 - initiate phase equilibria calculation
+  vpflow.flag("QCA::INIT", aurostd::args2flag(argv,cmds,"--quasi_chem_approx|--qca")); //SD20220323 - initiate quasi-chemical approx calculation
   if(vpflow.flag("QCA::INIT")) {
     vpflow.flag("QCA::USAGE", aurostd::args2flag(argv,cmds,"--usage"));
     vpflow.flag("QCA::SPINODAL", aurostd::args2flag(argv,cmds,"--spinodal"));
@@ -114,7 +114,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"QCA::CV_CUTOFF","--cv_cutoff=|--cv_cut=","");
     vpflow.args2addattachedscheme(argv,cmds,"QCA::CONC_CURVE_RANGE","--conc_curve_range=|--conc_curve=","");
     vpflow.args2addattachedscheme(argv,cmds,"QCA::CONC_NPTS","--conc_npts=","");
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::TEMP_RANGE","--temp_range=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::TEMP_RANGE","--temp_range=|--temp=","");
     vpflow.args2addattachedscheme(argv,cmds,"QCA::TEMP_NPTS","--temp_npts=","");
     vpflow.args2addattachedscheme(argv,cmds,"QCA::FORMAT_DATA","format_data=|--data_format=","txt");
     vpflow.args2addattachedscheme(argv,cmds,"QCA::FORMAT_PLOT","format_image=|--image_format=","pdf");
@@ -2359,8 +2359,8 @@ namespace pflow {
     strstream << tab << xspaces << " " << "              --cv_cutoff=|--cv_cut=0.05" << endl;
     strstream << tab << xspaces << " " << "              --conc_curve_range=|--conc_curve=0,1,1,0" << endl;
     strstream << tab << xspaces << " " << "              --conc_npts=20" << endl;
-    strstream << tab << xspaces << " " << "              --temp_range=300,2000" << endl;
-    strstream << tab << xspaces << " " << "              --temp_npts=100" << endl;
+    strstream << tab << xspaces << " " << "              --temp_range=|--temp=300,5000" << endl;
+    strstream << tab << xspaces << " " << "              --temp_npts=150" << endl;
     strstream << endl;
     strstream << tab << xspaces << " " << "SPINODAL OPTIONS:" << endl;
     strstream << tab << xspaces << " " << "              --spinodal" << endl;

@@ -850,11 +850,11 @@
 #define         DEFAULT_QCA_CV_CUTOFF                         XHOST.adefault.getattachedutype<double>("DEFAULT_QCA_CV_CUTOFF")
 #define AFLOWRC_DEFAULT_QCA_CONC_NPTS                         20
 #define         DEFAULT_QCA_CONC_NPTS                         XHOST.adefault.getattachedutype<double>("DEFAULT_QCA_CONC_NPTS")
-#define AFLOWRC_DEFAULT_QCA_TEMP_NPTS                         100
+#define AFLOWRC_DEFAULT_QCA_TEMP_NPTS                         150
 #define         DEFAULT_QCA_TEMP_NPTS                         XHOST.adefault.getattachedutype<double>("DEFAULT_QCA_TEMP_NPTS")
 #define AFLOWRC_DEFAULT_QCA_TEMP_MIN                          300 // K
 #define         DEFAULT_QCA_TEMP_MIN                          XHOST.adefault.getattachedutype<double>("DEFAULT_QCA_TEMP_MIN")
-#define AFLOWRC_DEFAULT_QCA_TEMP_MAX                          2000 // K
+#define AFLOWRC_DEFAULT_QCA_TEMP_MAX                          5000 // K
 #define         DEFAULT_QCA_TEMP_MAX                          XHOST.adefault.getattachedutype<double>("DEFAULT_QCA_TEMP_MAX")
 #define AFLOWRC_DEFAULT_QCA_FORMAT_DATA                       string("txt")
 #define         DEFAULT_QCA_FORMAT_DATA                       XHOST.adefault.getattachedscheme("DEFAULT_QCA_FORMAT_DATA")
