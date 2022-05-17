@@ -433,7 +433,7 @@ namespace qca {
 // qca::getRelativeEntropyEC
 // ***************************************************************************
 namespace qca {
-  vector<double> getRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& temp, const int max_num_atoms) {
+  vector<double> getRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& temp, const int max_num_atoms, bool interp) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     double rel_s_ec = 0.0;
     int nelem = conc_cluster.cols, n_fit = 8;
@@ -446,21 +446,39 @@ namespace qca {
     for (uint i = 0; i < prob_ec.size(); i++) {
       m1 = prob_ec[i] * aurostd::trasp(prob_ideal_ec);
       m2 = prob_ec[i] * aurostd::trasp(prob_ec[i]);
-      order_param(i + 1) = m1(1,1) / (aurostd::sqrt(m2(1,1)) * aurostd::sqrt(m3(1,1)));
+      order_param(i + 1) = m1(1, 1) / (aurostd::sqrt(m2(1, 1)) * aurostd::sqrt(m3(1, 1)));
+    }
+    // Check for divergence of the order parameter at low temperature
+    bool low_t_div = false;
+    if (order_param.rows > 3) {
+      double d1 = (order_param(3) - order_param(1)) / (temp(3) - temp(1)), d2 = (order_param(4) - order_param(2)) / (temp(4) - temp(2));
+      if (std::abs(d1) > std::abs(d2)) {low_t_div = true;}
     }
     double temp_mean = aurostd::mean(temp), temp_std = aurostd::stddev(temp);
     xvector<double> temp_scaled = (temp - temp_mean) / temp_std; // scale for numerical stability
     xvector<double> wts = aurostd::ones_xv<double>(order_param.rows);
-    xvector<double> p = aurostd::polynomialCurveFit(temp_scaled, order_param, n_fit, wts), rr(n_fit - 2), ri(n_fit - 2);
-    xvector<double> p1 = aurostd::evalPolynomialCoeff(p, 1);
-    xvector<double> p2 = aurostd::evalPolynomialCoeff(p, 2);
-LDEBUG=TRUE;
+    xvector<double> p = aurostd::polynomialCurveFit(temp_scaled, order_param, n_fit, wts);
+    xvector<double> p1 = aurostd::evalPolynomialCoeff(p, 1), p2 = aurostd::evalPolynomialCoeff(p, 2);
+    // If the order parameter diverges, then we can interpolate
+    if (interp && low_t_div) {
+      xvector<double> dadt = aurostd::evalPolynomial_xv(temp_scaled, p1), temp_interp(temp.rows + 1), dadt_interp(temp.rows + 1);
+      for (int i = 1; i <= temp.rows; i++) {temp_interp(i + 1) = temp(i);} // add T = 0K
+      for (int i = 1; i <= dadt.rows; i++) {dadt_interp(i + 1) = dadt(i);} // add Da/DT(0K) = 0
+      temp_mean = aurostd::mean(temp_interp), temp_std = aurostd::stddev(temp_interp);
+      temp_scaled = (temp_interp - temp_mean) / temp_std;
+      wts = aurostd::exp(temp_scaled); // scale weights by temperature, since high-T is more accurate
+      wts(1) = wts(wts.rows); // force convergence at T = 0K
+      p1 = aurostd::polynomialCurveFit(temp_scaled, dadt_interp, n_fit - 1, wts);
+      p2 = aurostd::evalPolynomialCoeff(p1, 1);
+    }
     if (LDEBUG) {
+      cerr << "interpolated=" << (interp && low_t_div) << endl;
       cerr << "alpha_orig=" << order_param << endl;
       cerr << "D[alpha, 0]=" << aurostd::evalPolynomial_xv(temp_scaled, p) << endl;
       cerr << "D[alpha, 1]=" << aurostd::evalPolynomial_xv(temp_scaled, p1) << endl;
       cerr << "D[alpha, 2]=" << aurostd::evalPolynomial_xv(temp_scaled, p2) << endl;
     }
+    xvector<double> rr(n_fit - 2), ri(n_fit - 2);
     aurostd::polynomialFindRoots(p2, rr, ri);
     if (LDEBUG) {
       cerr << " p2=" << p2 << endl;
