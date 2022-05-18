@@ -856,6 +856,8 @@
 #define         DEFAULT_QCA_TEMP_MIN                          XHOST.adefault.getattachedutype<double>("DEFAULT_QCA_TEMP_MIN")
 #define AFLOWRC_DEFAULT_QCA_TEMP_MAX                          5000 // K
 #define         DEFAULT_QCA_TEMP_MAX                          XHOST.adefault.getattachedutype<double>("DEFAULT_QCA_TEMP_MAX")
+#define AFLOWRC_DEFAULT_QCA_TEMP_MIN_LIMIT                    10000 // K
+#define         DEFAULT_QCA_TEMP_MIN_LIMIT                    XHOST.adefault.getattachedutype<double>("DEFAULT_QCA_TEMP_MIN_LIMIT")
 #define AFLOWRC_DEFAULT_QCA_FORMAT_DATA                       string("txt")
 #define         DEFAULT_QCA_FORMAT_DATA                       XHOST.adefault.getattachedscheme("DEFAULT_QCA_FORMAT_DATA")
 #define AFLOWRC_DEFAULT_QCA_FORMAT_PLOT                       string("png")
@@ -1692,6 +1694,7 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_QCA_TEMP_NPTS",AFLOWRC_DEFAULT_QCA_TEMP_NPTS);
     aflowrc::load_default("DEFAULT_QCA_TEMP_MIN",AFLOWRC_DEFAULT_QCA_TEMP_MIN);
     aflowrc::load_default("DEFAULT_QCA_TEMP_MAX",AFLOWRC_DEFAULT_QCA_TEMP_MAX);
+    aflowrc::load_default("DEFAULT_QCA_TEMP_MIN_LIMIT",AFLOWRC_DEFAULT_QCA_TEMP_MIN_LIMIT);
     aflowrc::load_default("DEFAULT_QCA_FORMAT_DATA",AFLOWRC_DEFAULT_QCA_FORMAT_DATA);
     aflowrc::load_default("DEFAULT_QCA_FORMAT_PLOT",AFLOWRC_DEFAULT_QCA_FORMAT_PLOT);
 
@@ -2328,6 +2331,7 @@ namespace aflowrc {
     aflowrc << "DEFAULT_QCA_TEMP_NPTS" << AFLOWRC_DEFAULT_QCA_TEMP_NPTS << endl;
     aflowrc << "DEFAULT_QCA_TEMP_MIN" << AFLOWRC_DEFAULT_QCA_TEMP_MIN << endl;
     aflowrc << "DEFAULT_QCA_TEMP_MAX" << AFLOWRC_DEFAULT_QCA_TEMP_MAX << endl;
+    aflowrc << "DEFAULT_QCA_TEMP_MIN_LIMIT" << AFLOWRC_DEFAULT_QCA_TEMP_MIN_LIMIT << endl;
     aflowrc << "DEFAULT_QCA_FORMAT_DATA" << AFLOWRC_DEFAULT_QCA_FORMAT_DATA << endl;
     aflowrc << "DEFAULT_QCA_FORMAT_PLOT" << AFLOWRC_DEFAULT_QCA_FORMAT_PLOT << endl;
     //SD20220323 - QCA END
@@ -2936,6 +2940,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QCA_TEMP_NPTS\")=" << AFLOWRC_DEFAULT_QCA_TEMP_NPTS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QCA_TEMP_MIN\")=" << AFLOWRC_DEFAULT_QCA_TEMP_MIN << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QCA_TEMP_MAX\")=" << AFLOWRC_DEFAULT_QCA_TEMP_MAX << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QCA_TEMP_MIN_LIMIT\")=" << AFLOWRC_DEFAULT_QCA_TEMP_MIN_LIMIT << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QCA_FORMAT_DATA\")=" << AFLOWRC_DEFAULT_QCA_FORMAT_DATA << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_QCA_FORMAT_PLOT\")=" << AFLOWRC_DEFAULT_QCA_FORMAT_PLOT << endl;
     //SD20220323 - QCA END

@@ -466,7 +466,7 @@ namespace qca {
       shift_temp = true;
       temp += dtemp;
     }
-    if (shift_temp && aurostd::min(temp) > 1e4) {
+    if (shift_temp && aurostd::min(temp) > DEFAULT_QCA_TEMP_MIN_LIMIT) {
       string message = "Could not find a temperature at equi-concentration that leads to a physical solution";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
