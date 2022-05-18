@@ -103,6 +103,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("QCA::INIT", aurostd::args2flag(argv,cmds,"--quasi_chem_approx|--qca")); //SD20220323 - initiate quasi-chemical approx calculation
   if(vpflow.flag("QCA::INIT")) {
     vpflow.flag("QCA::USAGE", aurostd::args2flag(argv,cmds,"--usage"));
+    vpflow.flag("QCA::BINODAL", aurostd::args2flag(argv,cmds,"--binodal"));
     vpflow.flag("QCA::SPINODAL", aurostd::args2flag(argv,cmds,"--spinodal"));
     vpflow.flag("QCA::SCREEN_ONLY", aurostd::args2flag(argv,cmds,"--screen_only"));
     vpflow.flag("QCA::IMAGE_ONLY", aurostd::args2flag(argv,cmds,"--image_only|--image"));
@@ -1746,7 +1747,7 @@ namespace pflow {
       if(vpflow.flag("AFLOWLIB_AURL2LOOP")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AURL2LOOP"),"AFLOWLIB_AURL2LOOP"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWSYM_PYTHON")){ SYM::writePythonScript(cout); _PROGRAMRUN=true;} //DX20210202
       if(vpflow.flag("AFLUX")) {cout << aflowlib::AFLUXCall(vpflow) << endl; _PROGRAMRUN=true;}  //DX20190206 - add AFLUX command line functionality
-      if(vpflow.flag("QCA::INIT")) {qca::getPhaseDiagram(vpflow); _PROGRAMRUN=true;} //SD20220323
+      if(vpflow.flag("QCA::INIT")) {qca::quasiChemicalApprox(vpflow); _PROGRAMRUN=true;} //SD20220323
       if(vpflow.flag("ATAT")) {cout << input2ATATxstr(cin); _PROGRAMRUN=true;} //SD20220123
       // B
       if(vpflow.flag("BANDGAP_WAHYU")) {AConvaspBandgap(argv); _PROGRAMRUN=true;}
@@ -2355,6 +2356,7 @@ namespace pflow {
     strstream << tab << xspaces << " " << "              --no_plot|--noplot" << endl;
     strstream << endl;
     strstream << tab << xspaces << " " << "BINODAL OPTIONS:" << endl;
+    strstream << tab << xspaces << " " << "              --binodal" << endl;
     strstream << tab << xspaces << " " << "              --max_num_atoms=|--mna=8" << endl;
     strstream << tab << xspaces << " " << "              --cv_cutoff=|--cv_cut=0.05" << endl;
     strstream << tab << xspaces << " " << "              --conc_curve_range=|--conc_curve=0,1,1,0" << endl;

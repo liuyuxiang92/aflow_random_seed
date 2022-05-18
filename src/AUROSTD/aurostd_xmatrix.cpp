@@ -913,6 +913,31 @@ namespace aurostd {
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
+  template<class utype> xmatrix<utype>                 // operator xmatrix + scalar
+    operator+(const utype s,const xmatrix<utype>& a) {
+      xmatrix<utype> c(a.urows,a.ucols,a.lrows,a.lcols);
+      for(int i=c.lrows;i<=c.urows;i++)
+        for(int j=c.lcols;j<=c.ucols;j++)
+          c[i][j]=(utype) a[i][j]+(utype) s;
+      return c;
+    }
+}
+
+// ----------------------------------------------------------------------------
+namespace aurostd {  // namespace aurostd
+  template<class utype> xmatrix<utype>                //  operator scalar + xmatrix
+    operator+(const xmatrix<utype>& a,const utype s) {
+      xmatrix<utype> c(a.urows,a.ucols,a.lrows,a.lcols);
+      for(int i=c.lrows;i<=c.urows;i++)
+        for(int j=c.lcols;j<=c.ucols;j++)
+          c[i][j]=(utype) s+(utype) a[i][j];
+      return c;
+    }
+}
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                 // operator xmatrix * scalar
     operator*(const utype s,const xmatrix<utype>& a) {
       xmatrix<utype> c(a.urows,a.ucols,a.lrows,a.lcols);
@@ -3222,7 +3247,7 @@ namespace aurostd {  // namespace aurostd
 // See: https://en.wikipedia.org/wiki/Linear_least_squares
 namespace aurostd {  // namespace aurostd
   template<class utype>                                   
-    xvector<utype> LinearLeastSquares(xmatrix<utype>& A, xvector<utype>& b) {
+    xvector<utype> LinearLeastSquares(const xmatrix<utype>& A, const xvector<utype>& b) {
     return aurostd::inverse(trasp(A) * A) * trasp(A) * b;
   }
 }

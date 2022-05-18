@@ -177,6 +177,9 @@ namespace aurostd {
   template<class utype> xvector<utype>                
     vector_product(const xvector<utype>&,const xvector<utype>&) __xprototype;
 
+  template<class utype> xvector<utype>                
+    elementwise_product(const xvector<utype>&,const xvector<utype>&) __xprototype; //SD20220422
+
   //ME20200327
   template<class utype> xmatrix<utype>
     outer_product(const xvector<utype>&, const xvector<utype>&) __xprototype;

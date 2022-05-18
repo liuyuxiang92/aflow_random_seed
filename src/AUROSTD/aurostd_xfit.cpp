@@ -14,8 +14,9 @@
 #define DEBUG_XFIT false // toggles debug output for xfit
 
 //********************************************************************************
-//              Functions to work with polynomials
-namespace aurostd{
+// Functions to work with polynomials
+//********************************************************************************
+namespace aurostd {
   //Evaluates the value of the polynomial with coefficients p at the value x.
   //
   //The polynomial is represented in the following form:
@@ -273,6 +274,100 @@ namespace aurostd{
       }
     }
     aurostd::eigen(companion_matrix(p), rr, ri);
+  }
+}
+
+//********************************************************************************
+namespace aurostd {
+  //SD20220517
+  //Find the zeros of a univariate function by Brent's method
+  //Based on the version by J. Burkardt
+  double findZeroBrent(const double a, const double b, const std::function<double(double)>& f, const uint niter, const double _tol) {
+    double c, d, e, fa, fb, fc, m, p, q, r, s, sa, sb, tol;
+    if (aurostd::isequal(aurostd::sign(f(a)), aurostd::sign(f(b)))) {
+      stringstream message;
+      message << "Function evalution at the endpoints have the same sign, F(a)=" << f(a) << " F(b)=" << f(b);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    }
+    sa = a;
+    sb = b;
+    fa = f(sa);
+    fb = f(sb);
+    c = sa;
+    fc = fa;
+    e = sb - sa;
+    d = e;
+    uint iter = 0;
+    while (iter < niter) {
+      if (std::abs(fc) < std::abs(fb)) {
+        sa = sb;
+        sb = c;
+        c = sa;
+        fa = fb;
+        fb = fc;
+        fc = fa;
+      }
+      tol = 2.0 * _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_ * std::abs(sb) + _tol;
+      m = 0.5 * (c - sb);
+      if (std::abs(m) <= tol || aurostd::isequal(fb, 0.0)) {break;}
+      if (std::abs(e) < tol || std::abs(fa) <= std::abs(fb)) {
+        e = m;
+        d = e;
+      }
+      else {
+        s = fb / fa;
+        if (aurostd::isequal(sa, c)) {
+          p = 2.0 * m * s;
+          q = 1.0 - s;
+        }
+        else {
+          q = fa / fc;
+          r = fb / fc;
+          p = s * (2.0 * m * q * (q - r) - (sb - sa) * (r - 1.0));
+          q = (q - 1.0) * (r - 1.0) * (s - 1.0);
+        }
+        if (0.0 < p) {
+          q = - q;
+        }
+        else {
+          p = - p;
+        }
+        s = e;
+        e = d;
+        if (2.0 * p < 3.0 * m * q - std::abs(tol * q) && p < std::abs(0.5 * s * q)) {
+          d = p / q;
+        }
+        else {
+          e = m;
+          d = e;
+        }
+      }
+      sa = sb;
+      fa = fb;
+      if (tol < std::abs(d)) {
+        sb = sb + d;
+      }
+      else if (0.0 < m) {
+        sb = sb + tol;
+      }
+      else {
+        sb = sb - tol;
+      }
+      fb = f(sb);
+      if ((0.0 < fb && 0.0 < fc) || (fb <= 0.0 && fc <= 0.0)) {
+        c = sa;
+        fc = fa;
+        e = sb - sa;
+        d = e;
+      }
+      iter++;
+    }
+    if (iter == niter) {
+      string message;
+      message = "Finding the zero, using Brent's method, failed to converge";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    }
+    return sb;
   }
 }
 

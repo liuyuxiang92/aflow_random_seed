@@ -28,6 +28,8 @@ class _qca_data {
     string format_image;
     bool screen_only;
     bool image_only;
+    bool calc_binodal;
+    bool calc_spinodal;
     string workdirpath;
     string rootdirpath;
     string plattice;
@@ -72,18 +74,18 @@ class _qca_data {
 
 // Namespace for functions used by QCA
 namespace qca {
-  void getPhaseDiagram(const aurostd::xoption& vpflow);
-  void getPhaseDiagram(_qca_data& qca_data);
+  void quasiChemicalApprox(const aurostd::xoption& vpflow);
+  void quasiChemicalApprox(_qca_data& qca_data);
   void errorChecks(_qca_data& qca_data);
-  void getSpinodalData(_qca_data& qca_data);
-  void getBinodalData(_qca_data& qca_data);
+  void calcSpinodalData(_qca_data& qca_data);
+  void calcBinodalData(_qca_data& qca_data);
   xvector<double> getBinodalBoundary(const xmatrix<double>& rel_s, const double rel_s_ec, const xvector<double>& temp);
   xmatrix<double> getRelativeEntropy(const vector<xmatrix<double>>& prob_cluster, const xmatrix<double>& prob_cluster_ideal);
   vector<double> getRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& temp, const int max_num_atoms, bool interp=true);
-  vector<xmatrix<double>> getProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms);
+  bool setProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms, vector<xmatrix<double>>& prob_cluster);
   xmatrix<double> getProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms);
   void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob);
-  void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob_ideal_cluster, const vector<xmatrix<double>>& prob);
+  void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob_ideal_cluster, const vector<xmatrix<double>>& prob, const xvector<double>& temp);
   xmatrix<double> getConcentrationMacro(const vector<double>& conc_curve_range, const int conc_npts, const uint nelem);
   xvector<double> getTemperature(const vector<double>& temp_range, const int temp_npts);
   void setCongruentClusters(_qca_data& qca_data);

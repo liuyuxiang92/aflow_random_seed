@@ -25,17 +25,16 @@ parent lattice. Alloy data is downloaded from the AFLOW database and the cluster
 performed to calculate the energies of additional derivative structures using the Alloy Theoretic 
 Automated Toolkit [J. Phase Equilib. 23, 348 (2002)].
 
-Using the generalized quasi-chemical approximation, the binodal curve is calculated, based on the
-LTVC method [Acta Mater. 159, 364 (2018)].
+Using the generalized quasi-chemical approximation, the equi-concentration transition temperature 
+and the binodal curve are calculated, based on the LTVC method [Acta Mater. 159, 364 (2018)].
 
 ****************************************************************************************************
 LIST OF AFLOW-QCA COMMANDS:
 
   aflow --quasi_chem_approx|--qca --plattice=fcc --elements=Au,Pt[,Zn] [qca_options] [--directory=[DIRECTORY]]
-      Loads the alloy data from the AFLOW database, constructs the binodal curve, and returns
-      the output as a TXT (default, see --format_data).
-      --phase_equilibria : Necessary argument, enter the mode to calculate the phase equilibria
-          properties.
+      Loads the alloy data from the AFLOW database, calculate the equi-concentration transition
+      temperature, and returns the output as a TXT (default, see --format_data).
+      --quasi_chem_approx|--qca : Necessary argument, enter the mode to use the QCA.
       --plattice : Necessary argument, specify the parent lattice of the alloy.
       --elements : Necessary argument, specify the elements present in the alloy.
       [--directory=[DIRECTORY]] : Optional argument, specify the directory where to run the
@@ -54,6 +53,9 @@ LIST OF AFLOW-QCA COMMANDS:
           Default: OFF
 
       BINODAL OPTIONS:
+      [--binodal] : Calculate the binodal curve for the given concentration and temperature
+          profiles.
+          Default: OFF
       [--max_num_atoms=|--mna=8] : Specify the maximum number of atoms in the alloy.
           Default: 8
       [--cv_cutoff=|--cv_cut=0.05] : Specify the cross validation (CV) score cut-off for
@@ -80,7 +82,8 @@ LIST OF AFLOW-QCA COMMANDS:
           Default: 150
 
       SPINODAL OPTIONS:
-      [--spinodal] : Calculate the spinodal curve (NOT IMPLEMENTED)
+      [--spinodal] : Calculate the binodal curve for the given concentration and temperature
+          profiles.
           Default: OFF
 
       FORMAT OPTIONS:

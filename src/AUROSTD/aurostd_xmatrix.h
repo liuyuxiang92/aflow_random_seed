@@ -120,6 +120,12 @@ namespace aurostd {
   template<class utype> xvector<xcomplex<utype> >
     operator*(const xmatrix<utype>&, const xvector<xcomplex<utype> >&) __xprototype;
 
+  template<class utype> xmatrix<utype>                                   // scalar+matrix
+    operator+(const utype,const xmatrix<utype>&) __xprototype;           // scalar+matrix
+
+  template<class utype> xmatrix<utype>                                   // matrix+scalar
+    operator+(const xmatrix<utype>&,const utype) __xprototype;           // matrix+scalar
+
   template<class utype> xmatrix<utype>                                   // scalar*matrix
     operator*(const utype,const xmatrix<utype>&) __xprototype;           // scalar*matrix
 
@@ -605,7 +611,7 @@ namespace aurostd {
     atanh(const xmatrix<utype>&) __xprototype;   // MISSING
 
   template<class utype>
-    xvector<utype> LinearLeastSquares(xmatrix<utype>&, xvector<utype>&) __xprototype; //SD20220426
+    xvector<utype> LinearLeastSquares(const xmatrix<utype>&, const xvector<utype>&) __xprototype; //SD20220426
 
   template<class utype>                          // 25 april 2007
     void GaussJordan(xmatrix<utype>&, xmatrix<utype>&) __xprototype;

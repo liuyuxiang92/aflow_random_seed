@@ -30,6 +30,8 @@ _qca_data::_qca_data() {
   format_image = "";
   screen_only = false;
   image_only = false;
+  calc_binodal = false;
+  calc_spinodal = false;
   workdirpath = "";
   rootdirpath = "";
   plattice = "";
@@ -83,6 +85,8 @@ const _qca_data& _qca_data::operator=(const _qca_data &b) {
     format_image = b.format_image;
     screen_only = b.screen_only;
     image_only = b.image_only;
+    calc_binodal = b.calc_binodal;
+    calc_spinodal = b.calc_spinodal;
     workdirpath = b.workdirpath;
     rootdirpath = b.rootdirpath;
     plattice = b.plattice;
@@ -121,10 +125,10 @@ const _qca_data& _qca_data::operator=(const _qca_data &b) {
 }
 
 // ***************************************************************************
-// qca::getPhaseDiagram
+// qca::quasiChemicalApprox
 // ***************************************************************************
 namespace qca {
- void getPhaseDiagram(const aurostd::xoption& vpflow) {
+ void quasiChemicalApprox(const aurostd::xoption& vpflow) {
     if (vpflow.flag("QCA::USAGE")) {
       if (!vpflow.flag("QCA::SCREEN_ONLY")) {displayUsage();}
       return;
@@ -192,11 +196,13 @@ namespace qca {
     }
     if (vpflow.flag("QCA::SCREEN_ONLY")) {qca_data.screen_only = true;}
     if (vpflow.flag("QCA::IMAGE_ONLY")) {qca_data.image_only = true;}
-    getPhaseDiagram(qca_data);
+    if (vpflow.flag("QCA::BINODAL")) {qca_data.calc_binodal = true;}
+    if (vpflow.flag("QCA::SPINODAL")) {qca_data.calc_spinodal = true;}
+    quasiChemicalApprox(qca_data);
     return;
  }
 
-  void getPhaseDiagram(_qca_data& qca_data) {
+  void quasiChemicalApprox(_qca_data& qca_data) {
     // Clean-up input data and check for errors
     if (XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && !(XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX"))) {
       qca_data.num_threads = aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));
@@ -218,10 +224,12 @@ namespace qca {
       return;
     }
     // Calculations
-    getBinodalData(qca_data);
+    calcBinodalData(qca_data);
     // Write and plot results
-    writeData(qca_data);
-    plotData(qca_data);
+    if (qca_data.calc_binodal) {
+      writeData(qca_data);
+      plotData(qca_data);
+    }
     return;
   }
 }
@@ -337,20 +345,20 @@ namespace qca {
 }
 
 // ***************************************************************************
-// qca::getSpinodalData
+// qca::calcSpinodalData
 // ***************************************************************************
 namespace qca {
-  void getSpinodalData(_qca_data& qca_data) {
+  void calcSpinodalData(_qca_data& qca_data) {
     cerr << qca_data.rundirpath << endl;
   }
 }
 
 // ***************************************************************************
-// qca::getBinodalData
+// qca::calcBinodalData
 // ***************************************************************************
 // Binodal construction based on the method developed in Y. Lederer et al., Acta Materialia, 159 (2018)
 namespace qca {
-  void getBinodalData(_qca_data& qca_data) {
+  void calcBinodalData(_qca_data& qca_data) {
     if (aurostd::FileExist(qca_data.rundirpath + "/fit.out") && aurostd::FileExist(qca_data.rundirpath + "/predstr.out")) { // read ATAT data
       qca_data.vstr_atat = getATATXstructures(qca_data.lat_atat, (uint)qca_data.max_num_atoms, qca_data.rundirpath);
     }
@@ -369,15 +377,23 @@ namespace qca {
     setCongruentClusters(qca_data);
     qca_data.degeneracy_cluster = getDegeneracyCluster(qca_data.plattice, qca_data.vstr_atat, qca_data.elements, qca_data.max_num_atoms, true, qca_data.rundirpath);
     qca_data.conc_macro = getConcentrationMacro(qca_data.conc_curve_range, qca_data.conc_npts, qca_data.elements.size());
-    qca_data.prob_ideal_cluster = getProbabilityIdealCluster(qca_data.conc_macro, qca_data.conc_cluster, qca_data.degeneracy_cluster, qca_data.max_num_atoms);
-    checkProbability(qca_data.conc_macro, qca_data.conc_cluster, qca_data.prob_ideal_cluster);
     qca_data.temp = getTemperature(qca_data.temp_range, qca_data.temp_npts);
-    qca_data.prob_cluster = getProbabilityCluster(qca_data.conc_macro, qca_data.conc_cluster, qca_data.excess_energy_cluster, qca_data.prob_ideal_cluster, qca_data.temp, qca_data.max_num_atoms);
-    checkProbability(qca_data.conc_macro, qca_data.conc_cluster, qca_data.prob_ideal_cluster, qca_data.prob_cluster);
     vector<double> data_ec = getRelativeEntropyEC(qca_data.conc_cluster, qca_data.degeneracy_cluster, qca_data.excess_energy_cluster, qca_data.temp, qca_data.max_num_atoms);
     qca_data.rel_s_ec = data_ec[0]; qca_data.temp_ec = data_ec[1];
-    qca_data.rel_s = getRelativeEntropy(qca_data.prob_cluster, qca_data.prob_ideal_cluster);
-    qca_data.binodal_boundary = getBinodalBoundary(qca_data.rel_s, qca_data.rel_s_ec, qca_data.temp);
+    if (qca_data.calc_binodal) {
+      qca_data.prob_ideal_cluster = getProbabilityIdealCluster(qca_data.conc_macro, qca_data.conc_cluster, qca_data.degeneracy_cluster, qca_data.max_num_atoms);
+      checkProbability(qca_data.conc_macro, qca_data.conc_cluster, qca_data.prob_ideal_cluster);
+      setProbabilityCluster(qca_data.conc_macro, qca_data.conc_cluster, qca_data.excess_energy_cluster, qca_data.prob_ideal_cluster, qca_data.temp, qca_data.max_num_atoms, qca_data.prob_cluster);
+      try {
+        checkProbability(qca_data.conc_macro, qca_data.conc_cluster, qca_data.prob_ideal_cluster, qca_data.prob_cluster, qca_data.temp);
+      }
+      catch (aurostd::xerror& err) {
+        return;
+      }
+      qca_data.rel_s = getRelativeEntropy(qca_data.prob_cluster, qca_data.prob_ideal_cluster);
+      qca_data.binodal_boundary = getBinodalBoundary(qca_data.rel_s, qca_data.rel_s_ec, qca_data.temp);
+    }
+    return;
   }
 }
 
@@ -433,20 +449,33 @@ namespace qca {
 // qca::getRelativeEntropyEC
 // ***************************************************************************
 namespace qca {
-  vector<double> getRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& temp, const int max_num_atoms, bool interp) {
+  vector<double> getRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& _temp, const int max_num_atoms, bool interp) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     double rel_s_ec = 0.0;
     int nelem = conc_cluster.cols, n_fit = 8;
+    xvector<double> temp = _temp;
     xmatrix<double> conc_macro_ec(1, nelem);
     conc_macro_ec.set(1.0 / (double)nelem);
     xmatrix<double> prob_ideal_ec = getProbabilityIdealCluster(conc_macro_ec, conc_cluster, degeneracy_cluster, max_num_atoms);
-    vector<xmatrix<double>> prob_ec = getProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, temp, max_num_atoms);
+    vector<xmatrix<double>> prob_ec;
+    // Check that the probability is physical, if not, shift the temperature range upward
+    bool shift_temp = false;
+    double dtemp = temp(2) - temp(1);
+    while (!setProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, temp, max_num_atoms, prob_ec) && 
+           aurostd::min(temp) < 1e4) {
+      shift_temp = true;
+      temp += dtemp;
+    }
+    if (shift_temp && aurostd::min(temp) > 1e4) {
+      string message = "Could not find a temperature at equi-concentration that leads to a physical solution";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    }
     xvector<double> order_param(prob_ec.size());
     xmatrix<double> m1, m2, m3 = prob_ideal_ec * aurostd::trasp(prob_ideal_ec);
     for (uint i = 0; i < prob_ec.size(); i++) {
       m1 = prob_ec[i] * aurostd::trasp(prob_ideal_ec);
       m2 = prob_ec[i] * aurostd::trasp(prob_ec[i]);
-      order_param(i + 1) = m1(1, 1) / (aurostd::sqrt(m2(1, 1)) * aurostd::sqrt(m3(1, 1)));
+      order_param(i + 1) = m1(1, 1) / (aurostd::sqrt(m2(1, 1)) * aurostd::sqrt(m3(1, 1)) + _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
     }
     // Check for divergence of the order parameter at low temperature
     bool low_t_div = false;
@@ -472,6 +501,7 @@ namespace qca {
       p2 = aurostd::evalPolynomialCoeff(p1, 1);
     }
     if (LDEBUG) {
+      cerr << "shifted=" << shift_temp << endl;
       cerr << "interpolated=" << (interp && low_t_div) << endl;
       cerr << "alpha_orig=" << order_param << endl;
       cerr << "D[alpha, 0]=" << aurostd::evalPolynomial_xv(temp_scaled, p) << endl;
@@ -497,8 +527,8 @@ namespace qca {
       }
     }
     temp_ec[0] = temp_std * temp_ec[0] + temp_mean;
-    if (LDEBUG) {cerr << "T_ec(K)=" << temp_ec[0] << endl;}
-    prob_ec = getProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, aurostd::vector2xvector(temp_ec), max_num_atoms);
+    if (LDEBUG) {cerr << "T_ec=" << temp_ec[0] << "K" << endl;}
+    setProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, aurostd::vector2xvector(temp_ec), max_num_atoms, prob_ec);
     for (int i = 1; i <= prob_ideal_ec.cols; i++) {
       rel_s_ec += prob_ec[0](1, i) * aurostd::log(prob_ec[0](1, i) / prob_ideal_ec(1, i));
     }
@@ -507,24 +537,23 @@ namespace qca {
 }
 
 // ***************************************************************************
-// qca::getProbabilityCluster
+// qca::setProbabilityCluster
 // ***************************************************************************
 namespace qca {
-  vector<xmatrix<double>> getProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms) {
+  bool setProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms, vector<xmatrix<double>>& prob_cluster) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    vector<xmatrix<double>> prob_cluster;
+    prob_cluster.clear();
     int nx = prob_ideal_cluster.rows, ncl = prob_ideal_cluster.cols, nt = temp.rows, neqs = conc_cluster.cols - 1;
     xmatrix<double> zeros(nx, ncl);
     for (uint it = 0; it < (uint)nt; it++) {prob_cluster.push_back(zeros);} // initialize
     xvector<double> beta = aurostd::pow(KBOLTZEV * temp, -1.0), p(max_num_atoms + 1), rr(max_num_atoms), ri(max_num_atoms), soln(neqs);
     xmatrix<int> natom_cluster = aurostd::xmatrixdouble2utype<int>((double)max_num_atoms * conc_cluster);
-    bool soln_found;
+    bool soln_found = false;
     if (neqs == 1) {
       for (int it = 1; it <= nt; it++) {
         for (int i = 1; i <= nx; i++) {
           p.reset();
           soln.reset();
-          soln_found = false;
           for (int j = 1; j <= ncl; j++) {
             p(natom_cluster(j, 1) + 1) += prob_ideal_cluster(i, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * (conc_cluster(j, 1) - conc_macro(i, 1));
           }
@@ -534,21 +563,15 @@ namespace qca {
             cerr << "   Real roots=" << rr << endl;
             cerr << "   Imag roots=" << ri << endl;
           }
-          for (int k = 1; k <= max_num_atoms && !soln_found; k++) {
-            if (rr(k) > 0.0 && aurostd::isequal(ri(k), 0.0)) {
+          for (int k = 1; k <= max_num_atoms; k++) {
+            if (rr(k) > soln(1) && aurostd::isequal(ri(k), 0.0) && ncl * std::pow(rr(k), max_num_atoms) != INFINITY) { // solution must be positive, real and finite
               soln(1) = rr(k);
-              soln_found = true;
-              break; // solution must be real, positive and unique so we can break
-            }
-            else if (aurostd::isequal(rr(k), 0.0) && aurostd::isequal(ri(k), 0.0)) { // edge case when all real solutions are near zero
-              soln(1) = _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_;
               soln_found = true;
             }
           }
-          if (!soln_found) {
-            stringstream message;
-            message << "Physical equilibrium probability does not exist for it=" << it << " i=" << i;
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+          if (!soln_found) { // physical solution does not exist
+            if (LDEBUG) {cerr << "Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(i) << " ]";}
+            return false;
           }
           for (int j = 1; j <= ncl; j++) {
             prob_cluster[it - 1](i, j) = prob_ideal_cluster(i, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * std::pow(soln(1), natom_cluster(j, 1));
@@ -560,7 +583,7 @@ namespace qca {
     }
     else { // homotopy continuation
     }
-    return prob_cluster;
+    return true;
   }
 }
 
@@ -601,34 +624,35 @@ namespace qca {
       }
       else if (!aurostd::isequal(prob(i)*conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
         stringstream message;
-        message << "Ideal solution (high-T) probability does not satisfy concentration contraint for i=" << i;
+        message << "Ideal solution (high-T) probability does not satisfy concentration contraint for X=[" << conc_macro(i) << " ]";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
       }
     }
   }
 
-  void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob_ideal_cluster, const vector<xmatrix<double>>& prob) {
+  void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob_ideal_cluster, const vector<xmatrix<double>>& prob, const xvector<double>& temp) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     int nx = prob[0].rows;
     double diff = AUROSTD_MAX_DOUBLE, diff_old;
-    for (uint it = 0; it < prob.size(); it++) {
+    for (int it = 1; it <= (int)prob.size(); it++) {
       for (int i = 1; i <= nx; i++) {
-        if (!aurostd::isequal(aurostd::sum(prob[it](i)), 1.0)) { // unnormalized
+        if (!aurostd::isequal(aurostd::sum(prob[it - 1](i)), 1.0)) { // unnormalized
           stringstream message;
-          message << "Equilibrium probability is unnormalized for i=" << i;
+          message << "Equilibrium probability is unnormalized for T=" << temp(it) << "K, i=" << i;
           throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
         }
-        else if (!aurostd::isequal(prob[it](i)*conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
+        else if (!aurostd::isequal(prob[it - 1](i)*conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
           stringstream message;
-          message << "Equilibrium probability does not satisfy concentration contraint for it=" << it << " i=" << i;
+          message << "Equilibrium probability does not satisfy concentration contraint for T=" << temp(it) << "K, X=[" << conc_macro(i) << " ]";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
         }
       }
       diff_old = diff;
-      diff = aurostd::sum(aurostd::abs(prob[it] - prob_ideal_cluster));
+      diff = aurostd::sum(aurostd::abs(prob[it - 1] - prob_ideal_cluster));
       if (LDEBUG) {cerr << "|P - P0| = " << diff << endl;}
       if (diff > diff_old) { // P(T_inf) does not equal P0(T_inf)
-        string message = "Equilibrium probability does not converge to the high-T limit";
+        stringstream message;
+        message << "Equilibrium probability does not converge to the high-T limit for T=" << temp(it) << "K";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
     }
@@ -976,7 +1000,7 @@ namespace qca {
     double cv_cluster = aurostd::string2utype<double>(tokens[2]);
     if (cv_cluster > cv_cut) {
       stringstream message;
-      message << "Cluster cross-validation score is above the cut-off, CV_cluster=" << cv_cluster << " CV_cutoff=" << cv_cut;
+      message << "Cluster cross-validation score is above the cut-off, CV_cluster=" << cv_cluster << ", CV_cutoff=" << cv_cut;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     return cv_cluster;
@@ -1239,6 +1263,7 @@ namespace qca {
     usage_options.push_back("qca_options:");
     usage_options.push_back(" ");
     usage_options.push_back("GENERAL OPTIONS:");
+    usage_options.push_back("--binodal");
     usage_options.push_back("--usage");
     usage_options.push_back("--screen_only");
     usage_options.push_back("--image_only|--image");
