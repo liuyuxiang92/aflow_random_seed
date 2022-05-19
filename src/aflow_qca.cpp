@@ -194,7 +194,10 @@ namespace qca {
         qca_data.format_image = DEFAULT_QCA_FORMAT_PLOT;
       }
     }
-    if (vpflow.flag("QCA::SCREEN_ONLY")) {qca_data.screen_only = true;}
+    if (vpflow.flag("QCA::SCREEN_ONLY")) {
+      qca_data.screen_only = true;
+      qca_data.format_data = DEFAULT_QCA_FORMAT_DATA;
+    }
     if (vpflow.flag("QCA::IMAGE_ONLY")) {qca_data.image_only = true;}
     if (vpflow.flag("QCA::BINODAL")) {qca_data.calc_binodal = true;}
     if (vpflow.flag("QCA::SPINODAL")) {qca_data.calc_spinodal = true;}
@@ -1314,8 +1317,10 @@ namespace qca {
       info_prefix = "Thermo data ";
       output << " " << info_prefix << "EC transition temperature (K)  = " << qca_data.temp_ec << endl;
       output << " " << info_prefix << "Binodal boundary (K)           = " << endl << trasp(qca_data.binodal_boundary) << endl;
-      if (!qca_data.screen_only) {aurostd::stringstream2file(output, filepath);}
-      return;
+      if (!qca_data.screen_only) {
+        aurostd::stringstream2file(output, filepath);
+        return;
+      }
     }
     else if (qca_data.format_data == "json") {
       aurostd::JSONwriter json;
