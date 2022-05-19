@@ -109,8 +109,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("QCA::IMAGE_ONLY", aurostd::args2flag(argv,cmds,"--image_only|--image"));
     vpflow.flag("QCA::NO_PLOT", aurostd::args2flag(argv,cmds,"--no_plot|--noplot"));
     vpflow.args2addattachedscheme(argv,cmds,"QCA::DIRECTORY","--directory=","./");
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::PLATTICE","--plattice=","");
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::ELEMENTS","--elements=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::PLATTICE","--plattice=|--plat=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::ELEMENTS","--elements=|--elem=","");
     vpflow.args2addattachedscheme(argv,cmds,"QCA::MAX_NUM_ATOMS","--max_num_atoms=|--mna=","");
     vpflow.args2addattachedscheme(argv,cmds,"QCA::CV_CUTOFF","--cv_cutoff=|--cv_cut=","");
     vpflow.args2addattachedscheme(argv,cmds,"QCA::CONC_CURVE_RANGE","--conc_curve_range=|--conc_curve=","");
@@ -2346,7 +2346,7 @@ namespace pflow {
     strstream << tab << x << " --aflowlib_aurl2auid=aurl1,aurl2.... [ --aurl2auid=..." << endl;
     strstream << tab << x << " --aflowlib_auid2loop=auid1,auid2....|--auid2loop=..." << endl;
     strstream << tab << x << " --aflowlib_aurl2loop=aurl1,aurl2.... [ --aurl2loop=..." << endl;
-    strstream << tab << x << " --quasi_chem_approx|--qca --plattice=fcc --elements=Au,Pt[,Zn] [qca_options] [--directory=[DIRECTORY]]" << endl;
+    strstream << tab << x << " --quasi_chem_approx|--qca --plattice=|--plat=fcc --elements=|--elem=Au,Pt[,Zn] [qca_options] [--directory=[DIRECTORY]]" << endl;
     strstream << tab << xspaces << " " << "options are:" << endl;
     strstream << endl;
     strstream << tab << xspaces << " " << "GENERAL OPTIONS:" << endl;

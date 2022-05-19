@@ -31,12 +31,12 @@ and the binodal curve are calculated, based on the LTVC method [Acta Mater. 159,
 ****************************************************************************************************
 LIST OF AFLOW-QCA COMMANDS:
 
-  aflow --quasi_chem_approx|--qca --plattice=fcc --elements=Au,Pt[,Zn] [qca_options] [--directory=[DIRECTORY]]
+  aflow --quasi_chem_approx|--qca --plattice=|--plat=fcc --elements=|--elem=Au,Pt[,Zn] [qca_options] [--directory=[DIRECTORY]]
       Loads the alloy data from the AFLOW database, calculate the equi-concentration transition
       temperature, and returns the output as a TXT (default, see --format_data).
       --quasi_chem_approx|--qca : Necessary argument, enter the mode to use the QCA.
-      --plattice : Necessary argument, specify the parent lattice of the alloy.
-      --elements : Necessary argument, specify the elements present in the alloy.
+      --plattice|--plat : Necessary argument, specify the parent lattice of the alloy.
+      --elements|--elem : Necessary argument, specify the elements present in the alloy.
       [--directory=[DIRECTORY]] : Optional argument, specify the directory where to run the
           calculation.
           Default: "./"

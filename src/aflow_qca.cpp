@@ -1258,7 +1258,7 @@ namespace qca {
 namespace qca {
   void displayUsage(void) {
     vector<string> usage_options;
-    usage_options.push_back("aflow --quasi_chem_approx|--qca --plattice=fcc --elements=Au,Pt[,Zn] [qca_options] [--directory=[DIRECTORY]]");
+    usage_options.push_back("aflow --quasi_chem_approx|--qca --plattice=|--plat=fcc --elements=|--elem=Au,Pt[,Zn] [qca_options] [--directory=[DIRECTORY]]");
     usage_options.push_back(" ");
     usage_options.push_back("qca_options:");
     usage_options.push_back(" ");
@@ -1314,6 +1314,8 @@ namespace qca {
       info_prefix = "Thermo data ";
       output << " " << info_prefix << "EC transition temperature (K)  = " << qca_data.temp_ec << endl;
       output << " " << info_prefix << "Binodal boundary (K)           = " << endl << trasp(qca_data.binodal_boundary) << endl;
+      if (!qca_data.screen_only) {aurostd::stringstream2file(output, filepath);}
+      return;
     }
     else if (qca_data.format_data == "json") {
       aurostd::JSONwriter json;
@@ -1332,13 +1334,9 @@ namespace qca {
       json.addNumber("EC transition temperature (K)", qca_data.temp_ec);
       json.addVector("Binodal boundary (K)", qca_data.binodal_boundary);
       aurostd::string2file(json.toString(), filepath);
+      return;
     }
-    if (qca_data.screen_only) {
-      cout << output.str() << endl;
-    }
-    else {
-      aurostd::stringstream2file(output, filepath);
-    }
+    cout << output.str() << endl;
     return;
   }
 }
