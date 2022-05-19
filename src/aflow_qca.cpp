@@ -377,7 +377,7 @@ namespace qca {
     qca_data.num_atom_cluster = getNumAtomCluster(qca_data.vstr_atat);
     qca_data.conc_cluster = getConcentrationCluster(qca_data.rundirpath, qca_data.vstr_atat.size(), qca_data.elements.size());
     qca_data.excess_energy_cluster = getExcessEnergyCluster(qca_data.rundirpath, qca_data.conc_cluster, qca_data.max_num_atoms);
-    setCongruentClusters(qca_data);
+    calcCongruentClusters(qca_data);
     qca_data.degeneracy_cluster = getDegeneracyCluster(qca_data.plattice, qca_data.vstr_atat, qca_data.elements, qca_data.max_num_atoms, true, qca_data.rundirpath);
     qca_data.conc_macro = getConcentrationMacro(qca_data.conc_curve_range, qca_data.conc_npts, qca_data.elements.size());
     qca_data.temp = getTemperature(qca_data.temp_range, qca_data.temp_npts);
@@ -386,7 +386,7 @@ namespace qca {
     if (qca_data.calc_binodal) {
       qca_data.prob_ideal_cluster = getProbabilityIdealCluster(qca_data.conc_macro, qca_data.conc_cluster, qca_data.degeneracy_cluster, qca_data.max_num_atoms);
       checkProbability(qca_data.conc_macro, qca_data.conc_cluster, qca_data.prob_ideal_cluster);
-      setProbabilityCluster(qca_data.conc_macro, qca_data.conc_cluster, qca_data.excess_energy_cluster, qca_data.prob_ideal_cluster, qca_data.temp, qca_data.max_num_atoms, qca_data.prob_cluster);
+      calcProbabilityCluster(qca_data.conc_macro, qca_data.conc_cluster, qca_data.excess_energy_cluster, qca_data.prob_ideal_cluster, qca_data.temp, qca_data.max_num_atoms, qca_data.prob_cluster);
       try {
         checkProbability(qca_data.conc_macro, qca_data.conc_cluster, qca_data.prob_ideal_cluster, qca_data.prob_cluster, qca_data.temp);
       }
@@ -464,7 +464,7 @@ namespace qca {
     // Check that the probability is physical, if not, shift the temperature range upward
     bool shift_temp = false;
     double dtemp = temp(2) - temp(1);
-    while (!setProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, temp, max_num_atoms, prob_ec) && 
+    while (!calcProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, temp, max_num_atoms, prob_ec) && 
            aurostd::min(temp) < 1e4) {
       shift_temp = true;
       temp += dtemp;
@@ -531,7 +531,7 @@ namespace qca {
     }
     temp_ec[0] = temp_std * temp_ec[0] + temp_mean;
     if (LDEBUG) {cerr << "T_ec=" << temp_ec[0] << "K" << endl;}
-    setProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, aurostd::vector2xvector(temp_ec), max_num_atoms, prob_ec);
+    calcProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, aurostd::vector2xvector(temp_ec), max_num_atoms, prob_ec);
     for (int i = 1; i <= prob_ideal_ec.cols; i++) {
       rel_s_ec += prob_ec[0](1, i) * aurostd::log(prob_ec[0](1, i) / prob_ideal_ec(1, i));
     }
@@ -540,10 +540,10 @@ namespace qca {
 }
 
 // ***************************************************************************
-// qca::setProbabilityCluster
+// qca::calcProbabilityCluster
 // ***************************************************************************
 namespace qca {
-  bool setProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms, vector<xmatrix<double>>& prob_cluster) {
+  bool calcProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms, vector<xmatrix<double>>& prob_cluster) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     prob_cluster.clear();
     int nx = prob_ideal_cluster.rows, ncl = prob_ideal_cluster.cols, nt = temp.rows, neqs = conc_cluster.cols - 1;
@@ -722,10 +722,10 @@ namespace qca {
 }
 
 // ***************************************************************************
-// qca::setCongruentClusters
+// qca::calcCongruentClusters
 // ***************************************************************************
 namespace qca {
-  void setCongruentClusters(_qca_data& qca_data) {
+  void calcCongruentClusters(_qca_data& qca_data) {
     vector<int> indx_cluster;
     for (int i = 1; i <= qca_data.num_atom_cluster.rows; i++) {
       if (!(qca_data.max_num_atoms % qca_data.num_atom_cluster(i))) {indx_cluster.push_back(i);}
