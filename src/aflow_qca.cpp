@@ -128,7 +128,8 @@ const _qca_data& _qca_data::operator=(const _qca_data &b) {
 // qca::quasiChemicalApprox
 // ***************************************************************************
 namespace qca {
- void quasiChemicalApprox(const aurostd::xoption& vpflow) {
+  /// @brief Initializes the QCA variables based on the input flags.
+  void quasiChemicalApprox(const aurostd::xoption& vpflow) {
     if (vpflow.flag("QCA::USAGE")) {
       if (!vpflow.flag("QCA::SCREEN_ONLY")) {displayUsage();}
       return;
@@ -205,6 +206,7 @@ namespace qca {
     return;
  }
 
+  /// @brief Runs the QCA module.
   void quasiChemicalApprox(_qca_data& qca_data) {
     // Clean-up input data and check for errors
     if (XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && !(XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX"))) {
@@ -241,6 +243,7 @@ namespace qca {
 // qca::errorChecks
 // ***************************************************************************
 namespace qca {
+  /// @brief Checks for errors in the input variables.
   void errorChecks(_qca_data& qca_data) {
     // Check if number of threads is valid
     if (qca_data.num_threads < 1) {qca_data.num_threads = 1;}
@@ -351,6 +354,7 @@ namespace qca {
 // qca::calcSpinodalData
 // ***************************************************************************
 namespace qca {
+  /// @brief Calculates the spinodal curve and the quantities needed for the calculation.
   void calcSpinodalData(_qca_data& qca_data) {
     cerr << qca_data.rundirpath << endl;
   }
@@ -361,6 +365,7 @@ namespace qca {
 // ***************************************************************************
 // Binodal construction based on the method developed in Y. Lederer et al., Acta Materialia, 159 (2018)
 namespace qca {
+  /// @brief Calculates the binodal curve and the quantities needed for the calculation.
   void calcBinodalData(_qca_data& qca_data) {
     if (aurostd::FileExist(qca_data.rundirpath + "/fit.out") && aurostd::FileExist(qca_data.rundirpath + "/predstr.out")) { // read ATAT data
       qca_data.vstr_atat = getATATXstructures(qca_data.lat_atat, (uint)qca_data.max_num_atoms, qca_data.rundirpath);
@@ -404,6 +409,13 @@ namespace qca {
 // qca::getBinodalBoundary
 // ***************************************************************************
 namespace qca {
+  /// @brief Gets the binodal boundary.
+  ///
+  /// @param rel_s Relative entropy as a function of concentration and temperature.
+  /// @param rel_s_ec Relative entropy at the equi-concentration and the transition temperature.
+  /// @param temp Temperature range.
+  ///
+  /// @return Binodal boundary as a function of the concentration
   xvector<double> getBinodalBoundary(const xmatrix<double>& rel_s, const double rel_s_ec, const xvector<double>& temp) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     int nx = rel_s.rows, nt = rel_s.cols, n_fit = 8;
@@ -434,6 +446,12 @@ namespace qca {
 // qca::getRelativeEntropy
 // ***************************************************************************
 namespace qca {
+  /// @brief Gets the relative entropy.
+  ///
+  /// @param prob_cluster Equilibrium probability of the clusters as a function of concentration and temperature.
+  /// @param prob_cluster_ideal Ideal (high-T) probability of the clusters as a function of concentration and temperature.
+  ///
+  /// @return Relative entropy as a function of concentration and temperature.
   xmatrix<double> getRelativeEntropy(const vector<xmatrix<double>>& prob_cluster, const xmatrix<double>& prob_cluster_ideal) {
     int nx = prob_cluster_ideal.rows, ncl = prob_cluster_ideal.cols, nt = prob_cluster.size();
     xmatrix<double> rel_s(nx, nt);
@@ -452,6 +470,16 @@ namespace qca {
 // qca::getRelativeEntropyEC
 // ***************************************************************************
 namespace qca {
+  /// @brief Gets the relative entropy evaluated at equi-concentration and the transition temperature.
+  ///
+  /// @param conc_cluster Concentration of the clusters.
+  /// @param degeneracy_cluster Degeneracy of the clusters.
+  /// @param excess_energy_cluster Excess energy of the clusters.
+  /// @param temp Temperature range.
+  /// @param max_num_atoms Maximum number of atoms in the cluster expansion.
+  /// @param interp Interpolate order parameter to 0K
+  ///
+  /// @return Relative entropy at the equi-concentration and the transition temperature.
   vector<double> getRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& _temp, const int max_num_atoms, bool interp) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     double rel_s_ec = 0.0;
@@ -543,6 +571,17 @@ namespace qca {
 // qca::calcProbabilityCluster
 // ***************************************************************************
 namespace qca {
+  /// @brief Calculates the equilibrium cluster probability.
+  ///
+  /// @param conc_macro Macroscopic concentration of the alloy.
+  /// @param conc_cluster Concentration of the clusters.
+  /// @param excess_energy_cluster Excess energy of the clusters.
+  /// @param prob_cluster_ideal Ideal (high-T) probability of the clusters as a function of concentration and temperature.
+  /// @param temp Temperature range.
+  /// @param max_num_atoms Maximum number of atoms in the cluster expansion.
+  /// @param prob_cluster Equilibrium probability of the clusters as a function of concentration and temperature.
+  ///
+  /// @return Whether the calculation finished successfully.
   bool calcProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms, vector<xmatrix<double>>& prob_cluster) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     prob_cluster.clear();
@@ -593,8 +632,15 @@ namespace qca {
 // ***************************************************************************
 // qca::getProbabilityIdealCluster
 // ***************************************************************************
-// P_j(X) = g_j*(X1^N1_j)*(X2^N2_j)*...(X(K)^N(K)_j)
 namespace qca {
+  /// @brief Gets the ideal (high-T) cluster probability.
+  ///
+  /// @param conc_macro Macroscopic concentration of the alloy.
+  /// @param conc_cluster Concentration of the clusters.
+  /// @param degeneracy_cluster Degeneracy of the clusters.
+  /// @param max_num_atoms Maximum number of atoms in the cluster expansion.
+  ///
+  /// @return Ideal (high-T) probability of the clusters as a function of concentration and temperature.
   xmatrix<double> getProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     int ncl = conc_cluster.rows, nx = conc_macro.rows, nelem = conc_macro.cols;
@@ -617,15 +663,20 @@ namespace qca {
 // qca::checkProbability
 // ***************************************************************************
 namespace qca {
-  void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob) {
-    int nx = prob.rows;
+  /// @brief Checks the ideal (high-T) probability for errors.
+  ///
+  /// @param conc_macro Macroscopic concentration of the alloy.
+  /// @param conc_cluster Concentration of the clusters.
+  /// @param prob_cluster_ideal Ideal (high-T) probability of the clusters as a function of concentration and temperature.
+  void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob_cluster_ideal) {
+    int nx = prob_cluster_ideal.rows;
     for (int i = 1; i <= nx; i++) {
-      if (!aurostd::isequal(aurostd::sum(prob(i)), 1.0)) { // unnormalized
+      if (!aurostd::isequal(aurostd::sum(prob_cluster_ideal(i)), 1.0)) { // unnormalized
         stringstream message;
         message << "Ideal solution (high-T) probability is unnormalized for i=" << i;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
       }
-      else if (!aurostd::isequal(prob(i)*conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
+      else if (!aurostd::isequal(prob_cluster_ideal(i) * conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
         stringstream message;
         message << "Ideal solution (high-T) probability does not satisfy concentration contraint for X=[" << conc_macro(i) << " ]";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
@@ -633,25 +684,32 @@ namespace qca {
     }
   }
 
-  void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob_ideal_cluster, const vector<xmatrix<double>>& prob, const xvector<double>& temp) {
+  /// @brief Checks the equilibrium probability for errors.
+  ///
+  /// @param conc_macro Macroscopic concentration of the alloy.
+  /// @param conc_cluster Concentration of the clusters.
+  /// @param prob_cluster_ideal Ideal (high-T) probability of the clusters as a function of concentration and temperature.
+  /// @param prob_cluster Equilibrium probability of the clusters as a function of concentration and temperature.
+  /// @param temp Temperature range.
+  void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob_ideal_cluster, const vector<xmatrix<double>>& prob_cluster, const xvector<double>& temp) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    int nx = prob[0].rows;
+    int nx = prob_cluster[0].rows;
     double diff = AUROSTD_MAX_DOUBLE, diff_old;
-    for (int it = 1; it <= (int)prob.size(); it++) {
+    for (int it = 1; it <= (int)prob_cluster.size(); it++) {
       for (int i = 1; i <= nx; i++) {
-        if (!aurostd::isequal(aurostd::sum(prob[it - 1](i)), 1.0)) { // unnormalized
+        if (!aurostd::isequal(aurostd::sum(prob_cluster[it - 1](i)), 1.0)) { // unnormalized
           stringstream message;
           message << "Equilibrium probability is unnormalized for T=" << temp(it) << "K, i=" << i;
           throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
         }
-        else if (!aurostd::isequal(prob[it - 1](i)*conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
+        else if (!aurostd::isequal(prob_cluster[it - 1](i) * conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
           stringstream message;
           message << "Equilibrium probability does not satisfy concentration contraint for T=" << temp(it) << "K, X=[" << conc_macro(i) << " ]";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
         }
       }
       diff_old = diff;
-      diff = aurostd::sum(aurostd::abs(prob[it - 1] - prob_ideal_cluster));
+      diff = aurostd::sum(aurostd::abs(prob_cluster[it - 1] - prob_ideal_cluster));
       if (LDEBUG) {cerr << "|P - P0| = " << diff << endl;}
       if (diff > diff_old) { // P(T_inf) does not equal P0(T_inf)
         stringstream message;
@@ -666,6 +724,13 @@ namespace qca {
 // qca::getConcentrationMacro
 // ***************************************************************************
 namespace qca {
+  /// @brief Gets the macroscopic concentration.
+  ///
+  /// @param conc_curve_range Concentration endpoints used to evaluate the macroscopic concentration
+  /// @param conc_npts Number of points used to evaluate the macroscopic concentration
+  /// @param nelem Number of elements in the alloy.
+  ///
+  /// @return Macroscopic concentration of the alloy.
   xmatrix<double> getConcentrationMacro(const vector<double>& conc_curve_range, const int conc_npts, const uint nelem) {
     xmatrix<double> conc_macro;
     if (!conc_curve_range.empty()) { // curve in concentration space
@@ -716,6 +781,12 @@ namespace qca {
 // qca::getTemperature
 // ***************************************************************************
 namespace qca {
+  /// @brief Gets the temperature profile.
+  ///
+  /// @param temp_range Temperature endpoints used to evaluate the temperature range.
+  /// @param temp_npts Number of points used to evaluate the temperature range.
+  ///
+  /// @return Temperature range.
   xvector<double> getTemperature(const vector<double>& temp_range, const int temp_npts) {
     return aurostd::linspace(temp_range[0], temp_range[1], temp_npts);
   }
@@ -725,6 +796,7 @@ namespace qca {
 // qca::calcCongruentClusters
 // ***************************************************************************
 namespace qca {
+  /// @brief Prune the clusters to only include clusters congruent with the maximum number of atoms in the cluster expansion.
   void calcCongruentClusters(_qca_data& qca_data) {
     vector<int> indx_cluster;
     for (int i = 1; i <= qca_data.num_atom_cluster.rows; i++) {
@@ -752,6 +824,13 @@ namespace qca {
 // qca::getExcessEnergyCluster
 // ***************************************************************************
 namespace qca {
+  /// @brief Gets the cluster excess energy.
+  ///
+  /// @param rundirpath Path to the directory where AFLOW is running.
+  /// @param conc_cluster Concentration of the clusters.
+  /// @param max_num_atoms Maximum number of atoms in the cluster expansion.
+  ///
+  /// @return Excess energy of the clusters.
   xvector<double> getExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const int max_num_atoms) {
     int ind, nstr = conc_cluster.rows, nelem = conc_cluster.cols;
     vector<string> vinput, tokens;
@@ -779,6 +858,12 @@ namespace qca {
 // qca::getConcentrationCluster
 // ***************************************************************************
 namespace qca {
+  /// @brief Gets the cluster concentration.
+  ///
+  /// @param elements Elements in the alloy.
+  /// @param vstr Xstructures of the clusters.
+  ///
+  /// @return Concentration of the clusters.
   xmatrix<double> getConcentration(const vector<string>& elements, const vector<xstructure>& vstr) {
     uint nstr = vstr.size(), nelem = elements.size();
     xmatrix<double> conc_cluster(nstr, nelem);
@@ -801,6 +886,13 @@ namespace qca {
     return conc_cluster;
   }
 
+  /// @brief Gets the cluster concentration.
+  ///
+  /// @param rundirpath Path to the directory where AFLOW is running.
+  /// @param nstr Number of clusters.
+  /// @param nelem Number of elements in the alloy.
+  ///
+  /// @return Concentration of the clusters.
   xmatrix<double> getConcentrationCluster(const string& rundirpath, const int nstr, const int nelem) {
     xmatrix<double> conc_cluster(nstr, nelem);
     vector<string> vinput, tokens;
@@ -826,6 +918,11 @@ namespace qca {
 // qca::getNumAtomCluster
 // ***************************************************************************
 namespace qca {
+  /// @brief Gets the cluster number of atoms.
+  ///
+  /// @param vstr Xstructures of the clusters.
+  ///
+  /// @return Number of atoms of the clusters.
   xvector<int> getNumAtomCluster(const vector<xstructure>& vstr) {
     int nstr = vstr.size(), natom;
     xvector<int> num_atom_cluster(nstr);
@@ -842,6 +939,16 @@ namespace qca {
 // qca::getDegeneracyCluster
 // ***************************************************************************
 namespace qca {
+  /// @brief Gets the cluster degeneracy.
+  ///
+  /// @param plattice Parent lattice of the alloy.
+  /// @param vstr Xstructures of the clusters.
+  /// @param elements Elements in the alloy.
+  /// @param max_num_atoms Maximum number of atoms in the cluster expansion.
+  /// @param shuffle Shuffle the order of the clusters.
+  /// @param rundirpath Path to the directory where AFLOW is running.
+  ///
+  /// @return Degeneracy of the clusters.
   xvector<int> getDegeneracyCluster(const string& plattice, const vector<xstructure>& _vstr, const vector<string>& elements, const int max_num_atoms, const bool shuffle, const string& rundirpath) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string filepath = "";
@@ -992,6 +1099,12 @@ namespace qca {
 // qca::getCVCluster
 // ***************************************************************************
 namespace qca {
+  /// @brief Gets the coefficient of variation.
+  ///
+  /// @param rundirpath Path to the directory where AFLOW is running.
+  /// @param cv_cut Coefficient of variation cut-off.
+  ///
+  /// @return Coefficient of variation of the cluster expansion.
   double getCVCluster(const string& rundirpath, const double cv_cut) {
     vector<string> vinput, tokens;
     aurostd::file2vectorstring(rundirpath + "/maps.log", vinput);
@@ -1014,6 +1127,11 @@ namespace qca {
 // qca::runATAT
 // ***************************************************************************
 namespace qca {
+  /// @brief Runs the ATAT program.
+  ///
+  /// @param workdirpath Path to the directory where ATAT is running.
+  /// @param rundirpath Path to the directory where AFLOW is running.
+  /// @param min_sleep Minimum number of seconds to sleep.
   void runATAT(const string& workdirpath, const string& rundirpath, const uint min_sleep) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     uint iter = 0;
@@ -1047,6 +1165,12 @@ namespace qca {
 // qca::generateFilesForATAT
 // ***************************************************************************
 namespace qca {
+  /// @brief Generates the files for the ATAT program.
+  ///
+  /// @param rundirpath Path to the directory where AFLOW is running.
+  /// @param vstr_aflow Xstructures from AFLOW runs.
+  /// @param vstr_atat Xstructures from ATAT runs.
+  /// @param mapstr Xstructure map between AFLOW and ATAT.
   void generateFilesForATAT(const string& rundirpath, const string& lat_atat, const vector<xstructure>& vstr_aflow, const vector<xstructure>& vstr_atat, const vector<int>& mapstr) {
     stringstream oss;
     vector<xstructure> vstr;
@@ -1070,6 +1194,15 @@ namespace qca {
 // qca::getAFLOWXstructures
 // ***************************************************************************
 namespace qca {
+  /// @brief Gets the AFLOW xstructures.
+  ///
+  /// @param rundirpath Path to the directory where AFLOW is running.
+  /// @param plattice Parent lattice of the alloy.
+  /// @param elements Elements in the alloy.
+  /// @param num_threads Number of threads to run AFLOW-SYM.
+  /// @param use_sg Compare initial and final xstructures only using their space groups.
+  ///
+  /// @return Xstructures from AFLOW runs.
   vector<xstructure> getAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_threads, bool use_sg) {
     vector<xstructure> vstr;
     vector<string> vstrlabel;
@@ -1134,6 +1267,12 @@ namespace qca {
 // qca::createLatForATAT
 // ***************************************************************************
 namespace qca {
+  /// @brief Gets the lattice file for ATAT.
+  ///
+  /// @param plattice Parent lattice of the alloy.
+  /// @param elements Elements in the alloy.
+  ///
+  /// @return Lattice file for ATAT.
   string createLatForATAT(const string& plattice, const vector<string>& elements) {
     stringstream oss;
     uint nelem = elements.size();
@@ -1185,6 +1324,13 @@ namespace qca {
 // qca::getATATXstructures
 // ***************************************************************************
 namespace qca {
+  /// @brief Gets the ATAT xstructures.
+  ///
+  /// @param lat Lattice file for ATAT.
+  /// @param max_num_atoms Maximum number of atoms in the cluster expansion.
+  /// @param rundirpath Path to the directory where AFLOW is running.
+  ///
+  /// @return Xstructures from ATAT runs.
   vector<xstructure> getATATXstructures(const string& lat, const uint max_num_atoms, const string& rundirpath) {
     vector<xstructure> vstr;
     stringstream oss;
@@ -1236,6 +1382,13 @@ namespace qca {
 // qca::getMapForXstructures
 // ***************************************************************************
 namespace qca {
+  /// @brief Gets the map between two groups of xstructures.
+  ///
+  /// @param vstr1 First group of xstructures.
+  /// @param vstr2 Second group of xstructures.
+  /// @param num_threads Number of threads to run AFLOW-SYM.
+  ///
+  /// @return Xstructure map between the two groups.
   vector<int> getMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     vector<int> mapstr;
@@ -1259,6 +1412,7 @@ namespace qca {
 // qca::displayUsage
 // ***************************************************************************
 namespace qca {
+  /// @brief Displays the usage commands and options.
   void displayUsage(void) {
     vector<string> usage_options;
     usage_options.push_back("aflow --quasi_chem_approx|--qca --plattice=|--plat=fcc --elements=|--elem=Au,Pt[,Zn] [qca_options] [--directory=[DIRECTORY]]");
@@ -1296,6 +1450,7 @@ namespace qca {
 // qca::writeData
 // ***************************************************************************
 namespace qca {
+  /// @brief Write the QCA data to screen or to file.
   void writeData(const _qca_data& qca_data) {
     string filepath = qca_data.rundirpath + "/" + QCA_FILE_PREFIX + "output." + qca_data.format_data;
     stringstream output;
@@ -1350,6 +1505,7 @@ namespace qca {
 // qca::readData
 // ***************************************************************************
 namespace qca {
+  /// @brief Reads the QCA data.
   void readData(_qca_data& qca_data) {
     string filepath = qca_data.rundirpath + "/" + QCA_FILE_PREFIX + "output.json";
     if (!aurostd::FileExist(filepath)) {
@@ -1369,6 +1525,7 @@ namespace qca {
 // qca::plotData
 // ***************************************************************************
 namespace qca {
+  /// @brief Plots the QCA data.
   void plotData(const _qca_data& qca_data) {
     if (qca_data.format_image.empty()) {return;}
     stringstream gpfile;
