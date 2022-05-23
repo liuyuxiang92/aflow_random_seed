@@ -5893,7 +5893,7 @@ namespace aurostd {
         if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
         if(tokens[i].find(strsub1)!=string::npos) {
           iter++;
-          if(index==iter) {strstream << tokens[i] << endl;break;}
+          if(index==iter) {strstream << tokens[i].substr(tokens[i].find(strsub1)+strsub1.length()) << endl;break;}
         }
       }
       if(LDEBUG) cerr << "strstream.str()= " << endl << strstream.str() << endl;
@@ -5904,7 +5904,7 @@ namespace aurostd {
         if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
         if(tokens[i].find(strsub1)!=string::npos) {
           iter--;
-          if(index==iter) {strstream << tokens[i] << endl;break;}
+          if(index==iter) {strstream << tokens[i].substr(tokens[i].find(strsub1)+strsub1.length()) << endl;break;}
         }
       }
       if(LDEBUG) cerr << "strstream.str()= " << endl << strstream.str() << endl;
@@ -5914,7 +5914,7 @@ namespace aurostd {
       for(uint i=0;i<tokens.size();i++) {
         if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
         if(tokens[i].find(strsub1)!=string::npos) {
-          strstream << tokens[i] << endl;
+          strstream << tokens[i].substr(tokens[i].find(strsub1)+strsub1.length()) << endl;
         }
       }
       if(LDEBUG) cerr << "strstream.str()= " << endl << strstream.str() << endl;
