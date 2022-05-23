@@ -455,6 +455,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     o+=aurostd::string2utype<double>("0");
     o+=aurostd::string2utype<long double>("0");
 
+
     vector<bool> vxb;vector<char> vxc;vector<string> vxs;vector<unsigned int> vxui;vector<int> vxi;vector<long int> vxli;vector<long long int> vxlli;vector<float> vxf;vector<double> vxd;vector<long double> vxld;  //CO20181226
     deque<bool> dxb;deque<char> dxc;deque<string> dxs;deque<unsigned int> dxui;deque<int> dxi;deque<long int> dxli;deque<long long int> dxlli;deque<float> dxf;deque<double> dxd;deque<long double> dxld; //CO20181226
 
@@ -479,6 +480,17 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     vxf=aurostd::deque2vector<float>(dxf);  //CO20181226
     vxd=aurostd::deque2vector<double>(dxd); //CO20181226
     vxld=aurostd::deque2vector<long double>(dxld);  //CO20181226
+
+    vectorstring2vectorutype<bool>(vxs); //SD20220520
+    vectorstring2vectorutype<char>(vxs); //SD20220520
+    vectorstring2vectorutype<unsigned int>(vxs); //SD20220520
+    vectorstring2vectorutype<int>(vxs); //SD20220520
+    vectorstring2vectorutype<long int>(vxs); //SD20220520
+    vectorstring2vectorutype<long long int>(vxs); //SD20220520
+    vectorstring2vectorutype<unsigned long long int>(vxs); //SD20220520
+    vectorstring2vectorutype<float>(vxs); //SD20220520
+    vectorstring2vectorutype<double>(vxs); //SD20220520
+    vectorstring2vectorutype<long double>(vxs); //SD20220520
 
 #define AUROSTD_INITIALIZE_BOOL
     //#define AUROSTD_INITIALIZE_CHAR

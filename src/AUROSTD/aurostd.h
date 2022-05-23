@@ -593,23 +593,6 @@ namespace aurostd {
   unsigned int Sleep(unsigned int seconds);
   // about extracting from to files
   vector<string> GrepFile(const string& filename,const string& keyword,bool RemoveWS=false,bool RemoveComments=true); //CO20210623
-  // take the nth //SD20220301
-  bool ExtractNthToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword,const int index);
-  bool ExtractNthToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index);
-  bool ExtractNthToStringstreamEXPLICIT(stringstream& StringStreamIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop,int index);
-  bool ExtractNthToStringstreamEXPLICIT(const string& StringIN,stringstream& StringstreamOUTPUT,const string& Keyword,const int index);
-  bool ExtractNthToStringstreamEXPLICIT(const string& StringIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index);
-  bool ExtractNthToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword,const int index);
-  bool ExtractNthToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index);
-  bool ExtractNthToFileEXPLICIT(stringstream& StringStreamIN,const string& FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop,int index);
-  bool ExtractNthToFileEXPLICIT(const string& StringIN,const string& FileNameOUTPUT,const string& Keyword,const int index);
-  bool ExtractNthToFileEXPLICIT(const string& StringIN,const string& FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index);
-  bool ExtractNthToStringEXPLICIT(ifstream& FileIN,string& StringOUTPUT,const string& Keyword,const int index);
-  bool ExtractNthToStringEXPLICIT(ifstream& FileIN,string& StringOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index);
-  bool ExtractNthToStringEXPLICIT(stringstream& StringStreamIN,string& StringOUTPUT,const string& Keyword_start,const string& Keyword_stop,int index);
-  bool ExtractNthToStringEXPLICIT(const string& StringIN,string& StringOUTPUT,const string& Keyword,const int index);
-  bool ExtractNthToStringEXPLICIT(const string& StringIN,string& StringOUTPUT,const string& Keyword_start,const string& Keyword_stop,const int index);
-  // take all
   bool ExtractToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword);
   bool ExtractToFileEXPLICIT(const string& StringIN,const string& FileNameOUTPUT,const string& Keyword);
   bool ExtractToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop);
@@ -852,25 +835,41 @@ namespace aurostd {
   bool EWithinList(const vector<string>& list,const string& input); //CO20200223
   bool EWithinList(const vector<string>& list, const string& input, string& output); //CO20200223
   // about present substrings and taking off the value
-  string substring2string(const string& strstream, const string& strsub1, bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
-  string substring2string(const stringstream& strstream, const string& strsub1, bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
-  //[CO20210315 - not used, not sure the purpose of strsub2]string substring2string(const string& strstream, const string& strsub1, const string& strsub2, bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
-  template<typename utype> utype substring2utype(const string& strstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
-  template<typename utype> utype substring2utype(const stringstream& strstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
-  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, const string& strsub2, bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
+  string substring2string(ifstream& input,const string& strsub1,const int index=1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
+  string substring2string(const string& input,const string& strsub1,const int index=1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up //SD20220520 - rewritten
+  string substring2string(const stringstream& input,const string& strsub1,const int index=1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up //SD20220520 - rewritten
+  string substring2string(ifstream& input,const string& strsub1,const string& strsub2,const int index=1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
+  string substring2string(const string& input,const string& strsub1,const string& strsub2,const int index=1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD20220520 - rewritten
+  string substring2string(const stringstream& input,const string& strsub1,const string& strsub2,const int index=1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
+  template<typename utype> utype substring2utype(ifstream& input,const string& strsub1,const int index=1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
+  template<typename utype> utype substring2utype(const string& input,const string& strsub1,const int index=1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD20220520 - rewritten
+  template<typename utype> utype substring2utype(const stringstream& input,const string& strsub1,const int index=1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD20220520 - rewritten
+  template<typename utype> utype substring2utype(ifstream& input,const string& strsub1,const string& strsub2,const int index=1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
+  template<typename utype> utype substring2utype(const string& input,const string& strsub1,const string& strsub2,const int index=1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
+  template<typename utype> utype substring2utype(const stringstream& input,const string& strsub1,const string& strsub2,const int index=1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
 
+  bool kvpairfound(ifstream& input,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true);  //SD20220520
   bool kvpairfound(const string& strstream,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315
   bool kvpairfound(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315
-  string kvpair2value(const string& strstream,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315
-  string kvpair2value(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315
-  template<typename utype> utype kvpair2utype(const string& strstream,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
-  template<typename utype> utype kvpair2utype(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
+  string kvpair2value(ifstream& input,const string& keyword,const string& delim,const int index=1,bool RemoveWS=false,bool RemoveComments=true);  //SD20220520
+  string kvpair2value(const string& input,const string& keyword,const string& delim,const int index=1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 //SD20220520 - rewritten
+  string kvpair2value(const stringstream& input,const string& keyword,const string& delim,const int index=1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 //SD20220520 - rewritten
+  template<typename utype> utype kvpair2utype(ifstream& input,const string& keyword,const string& delim,const int index=1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
+  template<typename utype> utype kvpair2utype(const string& input,const string& keyword,const string& delim,const int index=1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD20220520 - rewritten
+  template<typename utype> utype kvpair2utype(const stringstream& input,const string& keyword,const string& delim,const int index=1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD20220520 - rewritten
 
-  uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
-  //[CO20210315 - not used, not sure the purpose of strsub2]uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
-  template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
-  template<typename utype> uint substring2utypes(const stringstream& strstream, vector<string> &vstringout, const string& strsub1, bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
-  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> uint substring2utypes(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
+  uint substring2strings(ifstream& input,vector<string> &vstringout,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520 - rewritten
+  uint substring2strings(const string& input,vector<string> &vstringout,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD20220520 - rewritten
+  uint substring2strings(const string& input,vector<string> &vstringout,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD20220520 - rewritten
+  uint substring2strings(ifstream& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
+  uint substring2strings(const string& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,bool RemoveWS=false,bool RemoveComments=true); //SD20220520 - rewritten
+  uint substring2strings(const stringstream& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
+  template<typename utype> uint substring2utypes(ifstream& input,vector<utype> &vutypeout,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //SD202205020
+  template<typename utype> uint substring2utypes(const string& input,vector<utype> &vutypeout,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD202205020 - added utype
+  template<typename utype> uint substring2utypes(const stringstream& input,vector<utype> &vutypeout,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD202205020 - added utype
+  template<typename utype> uint substring2utypes(ifstream& input,vector<utype> &vutypeout,const string& strsub1,const string& strsub2,bool RemoveWS=false,bool RemoveComments=true); //SD202205020 - added utype
+  template<typename utype> uint substring2utypes(const string& input,vector<utype> &vutypeout,const string& strsub1,const string& strsub2,bool RemoveWS=false,bool RemoveComments=true); //SD202205020
+  template<typename utype> uint substring2utypes(const stringstream& input,vector<utype> &vutypeout,const string& strsub1,const string& strsub2,bool RemoveWS=false,bool RemoveComments=true); //SD202205020
 }
 
 // ***************************************************************************
