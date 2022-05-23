@@ -605,7 +605,7 @@ namespace FROZSL {
     input_file.clear();input_file.str(std::string());
 
     if(aurostd::substring2bool(AflowIn,"[AFLOW_FROZSL]FILE=",TRUE)) {
-      kflags.KBIN_FROZSL_FILE_NAME=aurostd::substring2string(AflowIn,"[AFLOW_FROZSL]FILE=",FALSE);
+      kflags.KBIN_FROZSL_FILE_NAME=aurostd::substring2string(AflowIn,"[AFLOW_FROZSL]FILE=",1,FALSE);
     } else {
       kflags.KBIN_FROZSL_FILE_NAME=DEFAULT_AFLOW_FROZSL_INPUT_OUT;
     }

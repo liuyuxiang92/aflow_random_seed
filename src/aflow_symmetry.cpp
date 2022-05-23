@@ -8947,12 +8947,12 @@ bool KBIN_StepSymmetryPerform_20161205(xstructure& a,string AflowIn,ofstream &Fi
   if(aurostd::substring2bool(AflowIn,"[AFLOW_SYMMETRY]CALC",TRUE)) {
     kflags.KBIN_SYMMETRY_CALCULATION=TRUE;
     kflags.KBIN_SYMMETRY_SGROUP_WRITE=aurostd::substring2bool(AflowIn,"[AFLOW_SYMMETRY]SGROUP_WRITE",TRUE);
-    kflags.KBIN_SYMMETRY_SGROUP_RADIUS=aurostd::substring2utype<double>(AflowIn,"[AFLOW_SYMMETRY]SGROUP_RADIUS=",TRUE);
+    kflags.KBIN_SYMMETRY_SGROUP_RADIUS=aurostd::substring2utype<double>(AflowIn,"[AFLOW_SYMMETRY]SGROUP_RADIUS=",1,TRUE);
   }
   if(aurostd::substring2bool(AflowIn,"[VASP_SYMMETRY]CALC",TRUE)) {
     kflags.KBIN_SYMMETRY_CALCULATION=TRUE;
     kflags.KBIN_SYMMETRY_SGROUP_WRITE=aurostd::substring2bool(AflowIn,"[VASP_SYMMETRY]SGROUP_WRITE",TRUE);
-    kflags.KBIN_SYMMETRY_SGROUP_RADIUS=aurostd::substring2utype<double>(AflowIn,"[VASP_SYMMETRY]SGROUP_RADIUS=",TRUE);
+    kflags.KBIN_SYMMETRY_SGROUP_RADIUS=aurostd::substring2utype<double>(AflowIn,"[VASP_SYMMETRY]SGROUP_RADIUS=",1,TRUE);
   }
   if(kflags.KBIN_SYMMETRY_CALCULATION==TRUE) {
     kflags.KBIN_SYMMETRY_PGROUP_WRITE=TRUE;
@@ -8989,12 +8989,12 @@ bool KBIN_StepSymmetryPerform_20160101(xstructure& a,string AflowIn,ofstream &Fi
   if(aurostd::substring2bool(AflowIn,"[AFLOW_SYMMETRY]CALC",TRUE)) {
     kflags.KBIN_SYMMETRY_CALCULATION=TRUE;
     kflags.KBIN_SYMMETRY_SGROUP_WRITE=aurostd::substring2bool(AflowIn,"[AFLOW_SYMMETRY]SGROUP_WRITE",TRUE);
-    kflags.KBIN_SYMMETRY_SGROUP_RADIUS=aurostd::substring2utype<double>(AflowIn,"[AFLOW_SYMMETRY]SGROUP_RADIUS=",TRUE);
+    kflags.KBIN_SYMMETRY_SGROUP_RADIUS=aurostd::substring2utype<double>(AflowIn,"[AFLOW_SYMMETRY]SGROUP_RADIUS=",1,TRUE);
   }
   if(aurostd::substring2bool(AflowIn,"[VASP_SYMMETRY]CALC",TRUE)) {
     kflags.KBIN_SYMMETRY_CALCULATION=TRUE;
     kflags.KBIN_SYMMETRY_SGROUP_WRITE=aurostd::substring2bool(AflowIn,"[VASP_SYMMETRY]SGROUP_WRITE",TRUE);
-    kflags.KBIN_SYMMETRY_SGROUP_RADIUS=aurostd::substring2utype<double>(AflowIn,"[VASP_SYMMETRY]SGROUP_RADIUS=",TRUE);
+    kflags.KBIN_SYMMETRY_SGROUP_RADIUS=aurostd::substring2utype<double>(AflowIn,"[VASP_SYMMETRY]SGROUP_RADIUS=",1,TRUE);
   }
   if(kflags.KBIN_SYMMETRY_CALCULATION==TRUE) {
     // point group
