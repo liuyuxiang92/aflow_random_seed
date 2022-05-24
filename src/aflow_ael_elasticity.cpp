@@ -713,7 +713,7 @@ namespace AEL_functions {
     // Check's if the system name is present in the aflow.in file
     // If it exists, it is used to write the output filenames
     if( aurostd::substring2bool(AflowIn,_AFSTROPT_+"SYSTEM=",TRUE) ) {
-      USER_SYSTEM_NAME = aurostd::substring2string(AflowIn,_AFSTROPT_+"SYSTEM=",1,1,TRUE);
+      USER_SYSTEM_NAME = aurostd::substring2string(AflowIn,_AFSTROPT_+"SYSTEM=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "System name = " << USER_SYSTEM_NAME.c_str() << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -861,12 +861,12 @@ namespace AEL_functions {
 
     // Get the user's number of normal strains to be used in the calculation
     if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"NNORMAL_STRAINS=",TRUE) ) {
-      USER_NNORMAL_STRAINS = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NNORMAL_STRAINS=",1,TRUE);
+      USER_NNORMAL_STRAINS = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NNORMAL_STRAINS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Number of normal strains = " << USER_NNORMAL_STRAINS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"NNORMALSTRAINS=",TRUE) ) {
-      USER_NNORMAL_STRAINS = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NNORMALSTRAINS=",1,TRUE);
+      USER_NNORMAL_STRAINS = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NNORMALSTRAINS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Number of normal strains = " << USER_NNORMAL_STRAINS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -881,12 +881,12 @@ namespace AEL_functions {
     }     
     // Get the user's number of shear strains to be used in the calculation
     if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"NSHEAR_STRAINS=",TRUE) ) {
-      USER_NSHEAR_STRAINS = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NSHEAR_STRAINS=",1,TRUE);
+      USER_NSHEAR_STRAINS = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NSHEAR_STRAINS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Number of shear strains = " << USER_NSHEAR_STRAINS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"NSHEARSTRAINS=",TRUE) ) {
-      USER_NSHEAR_STRAINS = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NSHEARSTRAINS=",1,TRUE);
+      USER_NSHEAR_STRAINS = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NSHEARSTRAINS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Number of shear strains = " << USER_NSHEAR_STRAINS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -902,12 +902,12 @@ namespace AEL_functions {
     // Get the user's number of polynomial coefficients to be used to fit the normal strain-stress data
     // This includes the zeroth order coefficient, so actual polynomial degree will be one less than this number
     if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"NORMAL_POLYFIT_ORDER=",TRUE) ) {
-      USER_NORMAL_POLYFIT_ORDER = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NORMAL_POLYFIT_ORDER=",1,TRUE);
+      USER_NORMAL_POLYFIT_ORDER = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NORMAL_POLYFIT_ORDER=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Normal strain polynomial fitting order = " << USER_NORMAL_POLYFIT_ORDER << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"NORMALPOLYFITORDER=",TRUE) ) {
-      USER_NORMAL_POLYFIT_ORDER = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NORMALPOLYFITORDER=",1,TRUE);
+      USER_NORMAL_POLYFIT_ORDER = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NORMALPOLYFITORDER=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Normal strain polynomial fitting order = " << USER_NORMAL_POLYFIT_ORDER << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -929,12 +929,12 @@ namespace AEL_functions {
     // Get the user's number of polynomial coefficients to be used to fit the shear strain-stress data
     // This includes the zeroth order coefficient, so actual polynomial degree will be one less than this number
     if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"SHEAR_POLYFIT_ORDER=",TRUE) ) {
-      USER_SHEAR_POLYFIT_ORDER = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"SHEAR_POLYFIT_ORDER=",1,TRUE);
+      USER_SHEAR_POLYFIT_ORDER = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"SHEAR_POLYFIT_ORDER=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Shear strain polynomial fitting order = " << USER_SHEAR_POLYFIT_ORDER << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"SHEARPOLYFITORDER=",TRUE) ) {
-      USER_SHEAR_POLYFIT_ORDER = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"SHEARPOLYFITORDER=",1,TRUE);
+      USER_SHEAR_POLYFIT_ORDER = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"SHEARPOLYFITORDER=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Shear strain polynomial fitting order = " << USER_SHEAR_POLYFIT_ORDER << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -955,12 +955,12 @@ namespace AEL_functions {
     }    
     // Get the user's number of independent strain directions to be used in the calculation
     if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"NIND_STRAIN_DIRS=",TRUE) ) {
-      USER_NIND_STRAIN_DIRS = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NIND_STRAIN_DIRS=",1,TRUE);
+      USER_NIND_STRAIN_DIRS = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NIND_STRAIN_DIRS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Number of independent strain directions = " << USER_NIND_STRAIN_DIRS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"NINDSTRAINDIRS=",TRUE) ) {
-      USER_NIND_STRAIN_DIRS = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NINDSTRAINDIRS=",1,TRUE);
+      USER_NIND_STRAIN_DIRS = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NINDSTRAINDIRS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Number of independent strain directions = " << USER_NIND_STRAIN_DIRS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -975,24 +975,24 @@ namespace AEL_functions {
     }      
     // Get the user's fractional tolerance for checking symmetry and consistency of elastic tensor
     if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"SYM_TOL_FRAC=",TRUE) ) {
-      USER_SYM_TOL_FRAC = aurostd::substring2utype<double>(AflowIn,_AELSTROPT_+"SYM_TOL_FRAC=",1,TRUE);
+      USER_SYM_TOL_FRAC = aurostd::substring2utype<double>(AflowIn,_AELSTROPT_+"SYM_TOL_FRAC=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Fractional tolerance for checking symmetry and consistency of elastic tensor = " << USER_SYM_TOL_FRAC << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"SYMTOLFRAC=",TRUE) ) {
-      USER_SYM_TOL_FRAC = aurostd::substring2utype<double>(AflowIn,_AELSTROPT_+"SYMTOLFRAC=",1,TRUE);
+      USER_SYM_TOL_FRAC = aurostd::substring2utype<double>(AflowIn,_AELSTROPT_+"SYMTOLFRAC=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Fractional tolerance for checking symmetry and consistency of elastic tensor = " << USER_SYM_TOL_FRAC << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } 
     // Get the user's normal strain step size to be used in the calculation
     if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"NORMAL_STRAIN_STEP=",TRUE) ) {
-      USER_NORMAL_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AELSTROPT_+"NORMAL_STRAIN_STEP=",1,TRUE);
+      USER_NORMAL_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AELSTROPT_+"NORMAL_STRAIN_STEP=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Normal strain step size = " << USER_NORMAL_STRAIN_STEP << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"NORMALSTRAINSTEP=",TRUE) ) {
-      USER_NORMAL_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AELSTROPT_+"NORMALSTRAINSTEP=",1,TRUE);
+      USER_NORMAL_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AELSTROPT_+"NORMALSTRAINSTEP=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Normal strain step size = " << USER_NORMAL_STRAIN_STEP << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1007,12 +1007,12 @@ namespace AEL_functions {
     }  
     // Get the user's shear strain step size to be used in the calculation
     if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"SHEAR_STRAIN_STEP=",TRUE) ) {
-      USER_SHEAR_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AELSTROPT_+"SHEAR_STRAIN_STEP=",1,TRUE);
+      USER_SHEAR_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AELSTROPT_+"SHEAR_STRAIN_STEP=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Shear strain step size = " << USER_SHEAR_STRAIN_STEP << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"SHEARSTRAINSTEP=",TRUE) ) {
-      USER_SHEAR_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AELSTROPT_+"SHEARSTRAINSTEP=",1,TRUE);
+      USER_SHEAR_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AELSTROPT_+"SHEARSTRAINSTEP=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Shear strain step size = " << USER_SHEAR_STRAIN_STEP << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1076,12 +1076,12 @@ namespace AEL_functions {
     } 	
     // Get the user's list of failed run subdirectories to skip when calculating the elastic constants
     if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"SKIP_FAILED_ARUNS=",TRUE) ) {
-      USER_SKIP_FAILED_ARUNS = aurostd::substring2string(AflowIn,_AELSTROPT_+"SKIP_FAILED_ARUNS=",1,1,TRUE);
+      USER_SKIP_FAILED_ARUNS = aurostd::substring2string(AflowIn,_AELSTROPT_+"SKIP_FAILED_ARUNS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Failed ARUNS to skip = " << USER_SKIP_FAILED_ARUNS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"SKIPFAILEDARUNS=",TRUE) ) {
-      USER_SKIP_FAILED_ARUNS = aurostd::substring2string(AflowIn,_AELSTROPT_+"SKIPFAILEDARUNS=",1,1,TRUE);
+      USER_SKIP_FAILED_ARUNS = aurostd::substring2string(AflowIn,_AELSTROPT_+"SKIPFAILEDARUNS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Failed ARUNS to skip = " << USER_SKIP_FAILED_ARUNS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1100,12 +1100,12 @@ namespace AEL_functions {
     } 		
     // Get the user's option of maximum number of failed run subdirectories to skip in each independent direction
     if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"SKIP_ARUNS_MAX=",TRUE) ) {
-      USER_SKIP_ARUNS_MAX = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"SKIP_ARUNS_MAX=",1,TRUE);
+      USER_SKIP_ARUNS_MAX = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"SKIP_ARUNS_MAX=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Maximum number of ARUNS to skip = " << USER_SKIP_ARUNS_MAX << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"SKIPARUNSMAX=",TRUE) ) {
-      USER_SKIP_ARUNS_MAX = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"SKIPARUNSMAX=",1,TRUE);
+      USER_SKIP_ARUNS_MAX = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"SKIPARUNSMAX=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AELSTR_MESSAGE_ + "Maximum number of ARUNS to skip = " << USER_SKIP_ARUNS_MAX << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);

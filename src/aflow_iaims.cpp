@@ -207,7 +207,7 @@ namespace KBIN {
       }
       if(!aimsflags.KBIN_AIMS_CONTROL_FILE.flag("COMMAND") && (aimsflags.KBIN_AIMS_CONTROL_FILE.flag("FILE") || !aimsflags.KBIN_AIMS_CONTROL_FILE.flag("FILE"))) {
         if(aimsflags.KBIN_AIMS_CONTROL_FILE.flag("FILE")) {
-          file=aurostd::substring2string(AflowIn,"[AIMS_CONTROL_FILE]FILE=",1,TRUE);
+          file=aurostd::substring2string(AflowIn,"[AIMS_CONTROL_FILE]FILE=",TRUE);
           aus << "00000  MESSAGE CONTROL   generation from file=" << file << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         } else {
@@ -230,7 +230,7 @@ namespace KBIN {
         xaims.CONTROL << aurostd::file2string(file);
       }
       if(aimsflags.KBIN_AIMS_CONTROL_FILE.flag("COMMAND") && !aimsflags.KBIN_AIMS_CONTROL_FILE.flag("FILE")) {
-        file=aurostd::substring2string(AflowIn,"[AIMS_CONTROL_FILE]COMMAND=",1,FALSE);
+        file=aurostd::substring2string(AflowIn,"[AIMS_CONTROL_FILE]COMMAND=",FALSE);
         aus << "00000  MESSAGE CONTROL   generation from command= '" << file << "' " << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         file=file+" > ./_aflow_CONTROL."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+".tmp";    // create temp  //CO20200502 - threadID
@@ -360,7 +360,7 @@ namespace KBIN {
         std::vector<string> tokens,tokens2,atomABC;
         std::string structure,label,parameters="";  // FIX NRL
         vector<double> volumeABC;
-        structure=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]PROTOTYPE=",1,TRUE);
+        structure=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]PROTOTYPE=",TRUE);
         aurostd::string2tokens(structure,tokens,";");
         label=tokens[0];
         for(uint i=1;i<tokens.size();i++) {
@@ -504,7 +504,7 @@ namespace KBIN {
       }
       if(!aimsflags.KBIN_AIMS_GEOM_FILE.flag("COMMAND") && (aimsflags.KBIN_AIMS_GEOM_FILE.flag("FILE") || !aimsflags.KBIN_AIMS_GEOM_FILE.flag("FILE"))) {
         if(aimsflags.KBIN_AIMS_GEOM_FILE.flag("FILE")) {
-          file=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]FILE=",1,TRUE);
+          file=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]FILE=",TRUE);
           aus << "00000  MESSAGE GEOM  generation from file=" << file << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         } else {
@@ -528,7 +528,7 @@ namespace KBIN {
         xaims.str=xstructure(xaims.GEOM,IOAIMS_GEOM);  // load structure
       }
       if(aimsflags.KBIN_AIMS_GEOM_FILE.flag("COMMAND") && !aimsflags.KBIN_AIMS_GEOM_FILE.flag("FILE")) {
-        file=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]COMMAND=",1,FALSE);
+        file=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]COMMAND=",FALSE);
         aus << "00000  MESSAGE GEOM  generation from command= '" << file << "' " << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         file=file+" > ./_aflow_GEOM."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+".tmp";    // create temp //CO20200502 - threadID
@@ -810,7 +810,7 @@ namespace KBIN {
 
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.flag(\"EQUAL_EQUAL\")=" << aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.flag("EQUAL_EQUAL") << endl;
     if(Krun && aimsflags.KBIN_AIMS_GEOM_MODE.flag("IMPLICIT") && aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.flag("EQUAL_EQUAL")) {  // [AIMS_GEOM_FILE]VOLUME=                       /*************** GEOM **************/
-      double factor=aurostd::substring2utype<double>(AflowIn,"[AIMS_GEOM_FILE]VOLUME=",1,FALSE);
+      double factor=aurostd::substring2utype<double>(AflowIn,"[AIMS_GEOM_FILE]VOLUME=",FALSE);
       aus << "00000  MESSAGE GEOM  IMPLICIT Volume = " << factor << " " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       if(factor<=0.0) {
@@ -833,7 +833,7 @@ namespace KBIN {
 
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.flag(\"EQUAL_EQUAL\")=" << aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.flag("EQUAL_EQUAL") << endl;
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.flag("EQUAL_EQUAL")) {  // [AIMS_FORCE_OPTION]VOLUME=                                                    /*************** GEOM **************/
-      double factor1=aurostd::substring2utype<double>(AflowIn,"[AIMS_FORCE_OPTION]VOLUME=",1,FALSE);
+      double factor1=aurostd::substring2utype<double>(AflowIn,"[AIMS_FORCE_OPTION]VOLUME=",FALSE);
       double factor=aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.getattachedutype<double>("EQUAL_EQUAL");
       aus << "00000  MESSAGE GEOM  FORCE Volume = " << factor << " (factor1=" << factor1 << ")  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -857,7 +857,7 @@ namespace KBIN {
 
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.flag(\"MULTIPLY_EQUAL\")=" << aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.flag("MULTIPLY_EQUAL") << endl;
     if(Krun && aimsflags.KBIN_AIMS_GEOM_MODE.flag("IMPLICIT") && aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.flag("MULTIPLY_EQUAL")) {  // [AIMS_GEOM_FILE]VOLUME*=             /*************** GEOM **************/
-      double factor=aurostd::substring2utype<double>(AflowIn,"[AIMS_GEOM_FILE]VOLUME*=",1,FALSE);
+      double factor=aurostd::substring2utype<double>(AflowIn,"[AIMS_GEOM_FILE]VOLUME*=",FALSE);
       //     double factor=aurostd::string2utype<double>(aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.getattachedscheme("MULTIPLY_EQUAL"));
       //      cerr << "CORMAC MULTIPLY_EQUAL=" << factor << endl;
       aus << "00000  MESSAGE GEOM  IMPLICIT Volume *= " << factor << " " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
@@ -882,7 +882,7 @@ namespace KBIN {
 
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.flag(\"MULTIPLY_EQUAL\")=" << aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.flag("MULTIPLY_EQUAL") << endl;
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.flag("MULTIPLY_EQUAL")) {  // [AIMS_FORCE_OPTION]VOLUME*=                                                    /*************** GEOM **************/
-      double factor1=aurostd::substring2utype<double>(AflowIn,"[AIMS_FORCE_OPTION]VOLUME*=",1,FALSE);
+      double factor1=aurostd::substring2utype<double>(AflowIn,"[AIMS_FORCE_OPTION]VOLUME*=",FALSE);
       double factor=aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.getattachedutype<double>("MULTIPLY_EQUAL");
       aus << "00000  MESSAGE GEOM  FORCE Volume *= " << factor << " (factor1=" << factor1 << ")  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -906,7 +906,7 @@ namespace KBIN {
 
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.flag(PLUS_EQUAL)=" << aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.flag("PLUS_EQUAL") << endl;
     if(Krun && aimsflags.KBIN_AIMS_GEOM_MODE.flag("IMPLICIT") && aimsflags.KBIN_AIMS_GEOM_FILE_VOLUME.flag("PLUS_EQUAL")) {  // [AIMS_GEOM_FILE]VOLUME+=               /*************** GEOM **************/
-      double factor=aurostd::substring2utype<double>(AflowIn,"[AIMS_GEOM_FILE]VOLUME+=",1,FALSE);
+      double factor=aurostd::substring2utype<double>(AflowIn,"[AIMS_GEOM_FILE]VOLUME+=",FALSE);
       aus << "00000  MESSAGE GEOM  IMPLICIT Volume += " << factor << " " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       aus << "00000  MESSAGE GEOM  IMPLICIT Old Volume= " << xaims.str.Volume() << " " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
@@ -923,7 +923,7 @@ namespace KBIN {
 
     if(LDEBUG) cerr << "aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.flag(PLUS_EQUAL)=" << aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.flag("PLUS_EQUAL") << endl;
     if(Krun && aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.flag("PLUS_EQUAL")) {  // [AIMS_FORCE_OPTION]VOLUME+=                                                    /*************** GEOM **************/
-      double factor1=aurostd::substring2utype<double>(AflowIn,"[AIMS_FORCE_OPTION]VOLUME+=",1,FALSE);
+      double factor1=aurostd::substring2utype<double>(AflowIn,"[AIMS_FORCE_OPTION]VOLUME+=",FALSE);
       double factor=aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.getattachedutype<double>("PLUS_EQUAL");
       aus << "00000  MESSAGE GEOM  FORCE Volume += " << factor << " (factor1=" << factor1 << ")  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);

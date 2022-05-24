@@ -23,7 +23,7 @@ namespace ALIEN {
         aurostd::substring2bool(AflowIn,"[ALIEN_COMMAND]",TRUE);
       if(alienflags.KBIN_ALIEN_COMMAND_BINARY_FLAG)
         alienflags.KBIN_ALIEN_COMMAND_BINARY_VALUE =
-          aurostd::substring2string(AflowIn,"[ALIEN_COMMAND]",1,FALSE);
+          aurostd::substring2string(AflowIn,"[ALIEN_COMMAND]",FALSE);
     } else {
       alienflags.KBIN_ALIEN_COMMAND_BINARY_FLAG = FALSE;
       alienflags.KBIN_ALIEN_COMMAND_BINARY_VALUE="";
@@ -56,22 +56,22 @@ namespace ALIEN {
       aurostd::substring2bool(AflowIn,"[ALIEN_INPUT_FILE]FILE=",TRUE);
     if(alienflags.KBIN_ALIEN_INPUT_FILE_FILE_FLAG)
       alienflags.KBIN_ALIEN_INPUT_FILE_FILE_VALUE =
-        aurostd::substring2string(AflowIn,"[ALIEN_INPUT_FILE]FILE=",1,TRUE);
+        aurostd::substring2string(AflowIn,"[ALIEN_INPUT_FILE]FILE=",TRUE);
     alienflags.KBIN_ALIEN_INPUT_FILE_COMMAND_FLAG    =
       aurostd::substring2bool(AflowIn,"[ALIEN_INPUT_FILE]COMMAND=",TRUE);
     if(alienflags.KBIN_ALIEN_INPUT_FILE_COMMAND_FLAG)
       alienflags.KBIN_ALIEN_INPUT_FILE_COMMAND_VALUE =
-        aurostd::substring2string(AflowIn,"[ALIEN_INPUT_FILE]COMMAND=",1,FALSE);
+        aurostd::substring2string(AflowIn,"[ALIEN_INPUT_FILE]COMMAND=",FALSE);
     alienflags.KBIN_ALIEN_INPUT_MODE_INPUT_FLAG    =
       aurostd::substring2bool(AflowIn,"[ALIEN_INPUT_FILE_NAME]INPUT=",TRUE);
     if(alienflags.KBIN_ALIEN_INPUT_MODE_INPUT_FLAG)
       alienflags.KBIN_ALIEN_INPUT_MODE_INPUT_VALUE =
-        aurostd::substring2string(AflowIn,"[ALIEN_INPUT_FILE_NAME]INPUT=",1,TRUE);
+        aurostd::substring2string(AflowIn,"[ALIEN_INPUT_FILE_NAME]INPUT=",TRUE);
     alienflags.KBIN_ALIEN_OUTPUT_MODE_OUTPUT_FLAG    =
       aurostd::substring2bool(AflowIn,"[ALIEN_OUTPUT_FILE_NAME]OUTPUT=",TRUE);
     if(alienflags.KBIN_ALIEN_OUTPUT_MODE_OUTPUT_FLAG)
       alienflags.KBIN_ALIEN_OUTPUT_MODE_OUTPUT_VALUE =
-        aurostd::substring2string(AflowIn,"[ALIEN_OUTPUT_FILE_NAME]OUTPUT=",1,TRUE);
+        aurostd::substring2string(AflowIn,"[ALIEN_OUTPUT_FILE_NAME]OUTPUT=",TRUE);
 
     alienflags.KBIN_ALIEN_INPUT_MODE_EXTERNAL=FALSE;
     if(alienflags.KBIN_ALIEN_INPUT_FILE_FILE_FLAG) alienflags.KBIN_ALIEN_INPUT_MODE_EXTERNAL=TRUE;

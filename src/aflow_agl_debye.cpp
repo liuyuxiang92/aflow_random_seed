@@ -963,7 +963,7 @@ namespace AGL_functions {
     // Check's if the system name is present in the _AFLOWIN_ file
     // If it exists, it is used to write the output filenames
     if( aurostd::substring2bool(AflowIn,_AFSTROPT_+"SYSTEM=",TRUE) ) {
-      USER_SYSTEM_NAME = aurostd::substring2string(AflowIn,_AFSTROPT_+"SYSTEM=",1,1,TRUE);
+      USER_SYSTEM_NAME = aurostd::substring2string(AflowIn,_AFSTROPT_+"SYSTEM=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "System name = " << USER_SYSTEM_NAME.c_str() << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1179,12 +1179,12 @@ namespace AGL_functions {
 
     // Get the user's number of strained structures to be used in the calculation
     if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"NSTRUCTURES=",TRUE) ) {
-      USER_NSTRUCTURES = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"NSTRUCTURES=",1,TRUE);
+      USER_NSTRUCTURES = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"NSTRUCTURES=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Number of structures = " << USER_NSTRUCTURES << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"NSTRUCTURES=",TRUE) ) {
-      USER_NSTRUCTURES = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"NSTRUCTURES=",1,TRUE);
+      USER_NSTRUCTURES = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"NSTRUCTURES=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Number of structures = " << USER_NSTRUCTURES << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1199,22 +1199,22 @@ namespace AGL_functions {
     }     
     // Get the user's strain step size to be used in the calculation
     if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"STRAIN_STEP=",TRUE) ) {
-      USER_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"STRAIN_STEP=",1,TRUE);
+      USER_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"STRAIN_STEP=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Strain step size = " << USER_STRAIN_STEP << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"STRAIN_STEP=",TRUE) ) {
-      USER_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+"STRAIN_STEP=",1,TRUE);
+      USER_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+"STRAIN_STEP=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Strain step size = " << USER_STRAIN_STEP << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"STRAINSTEP=",TRUE) ) {
-      USER_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"STRAINSTEP=",1,TRUE);
+      USER_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"STRAINSTEP=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Strain step size = " << USER_STRAIN_STEP << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"STRAINSTEP=",TRUE) ) {
-      USER_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+"STRAINSTEP=",1,TRUE);
+      USER_STRAIN_STEP = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+"STRAINSTEP=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Strain step size = " << USER_STRAIN_STEP << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1237,12 +1237,12 @@ namespace AGL_functions {
     // 5: Spinodal equation of state
     // 6: Spinodal equation of state using numerical evaluation of thermal properties
     if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"IEOS=",TRUE) ) {
-      USER_IEOS = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"IEOS=",1,TRUE);
+      USER_IEOS = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"IEOS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Equation of state option = " << USER_IEOS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"IEOS=",TRUE) ) {
-      USER_IEOS = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"IEOS=",1,TRUE);
+      USER_IEOS = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"IEOS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Equation of state option = " << USER_IEOS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1252,12 +1252,12 @@ namespace AGL_functions {
     // 1: Optimization
     // 2: Optimization setting initial bcnt_beta value to saved value
     if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"IOPT_G=",TRUE) ) {
-      USER_IOPTIMIZE_BETA = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"IOPT_G=",1,TRUE);
+      USER_IOPTIMIZE_BETA = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"IOPT_G=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "BCNT optimization option = " << USER_IOPTIMIZE_BETA << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"IOPT_G=",TRUE) ) {
-      USER_IOPTIMIZE_BETA = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"IOPT_G=",1,TRUE);
+      USER_IOPTIMIZE_BETA = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"IOPT_G=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "BCNT optimization option = " << USER_IOPTIMIZE_BETA << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1269,19 +1269,19 @@ namespace AGL_functions {
     // 2: Self-consistent calculation of Debye temperature
     // 3: Debye temperature calculated from static bulk modulus at equilibrium volume
     if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"IDEBYE=",TRUE) ) {
-      USER_IDEBYE = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"IDEBYE=",1,TRUE);
+      USER_IDEBYE = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"IDEBYE=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Debye temperature option = " << USER_STRAIN_STEP << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"IDEBYE=",TRUE) ) {
-      USER_IDEBYE = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"IDEBYE=",1,TRUE);
+      USER_IDEBYE = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"IDEBYE=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Debye temperature option = " << USER_STRAIN_STEP << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }     
     // Get the user's value of Poisson ratio to be used in the calculation
     if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"POISSON_RATIO=",TRUE) ) {
-      USER_POISSON_RATIO = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"POISSON_RATIO=",1,TRUE);
+      USER_POISSON_RATIO = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"POISSON_RATIO=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Poisson ratio = " << USER_POISSON_RATIO << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1293,7 +1293,7 @@ namespace AGL_functions {
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"POISSON_RATIO=",TRUE) ) {
-      USER_POISSON_RATIO = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+"POISSON_RATIO=",1,TRUE);
+      USER_POISSON_RATIO = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+"POISSON_RATIO=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Poisson ratio = " << USER_POISSON_RATIO << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1305,7 +1305,7 @@ namespace AGL_functions {
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
     } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"POISSONRATIO=",TRUE) ) {
-      USER_POISSON_RATIO = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"POISSONRATIO=",1,TRUE);
+      USER_POISSON_RATIO = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"POISSONRATIO=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Poisson ratio = " << USER_POISSON_RATIO << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1317,7 +1317,7 @@ namespace AGL_functions {
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"POISSONRATIO=",TRUE) ) {
-      USER_POISSON_RATIO = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+"POISSONRATIO=",1,TRUE);
+      USER_POISSON_RATIO = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+"POISSONRATIO=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Poisson ratio = " << USER_POISSON_RATIO << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1347,12 +1347,12 @@ namespace AGL_functions {
     } 
     // Get the user's value of energy for infinite volume. This is just used to set the zero of the energy scale.
     if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"EINF=",TRUE) ) {
-      USER_EINF = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"EINF=",1,TRUE);
+      USER_EINF = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"EINF=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Energy at infinite volume = " << USER_EINF << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"EINF=",TRUE) ) {
-      USER_EINF = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+"EINF=",1,TRUE);
+      USER_EINF = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+"EINF=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Energy at infinite volume = " << USER_EINF << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1363,12 +1363,12 @@ namespace AGL_functions {
     } else {
       // Otherwise, check in aflow.in file
       if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"NPRESSURE=",TRUE) ) {
-        USER_NPRESSURE = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"NPRESSURE=",1,TRUE);
+        USER_NPRESSURE = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"NPRESSURE=",TRUE);
         aurostd::StringstreamClean(aus);
         aus << _AGLSTR_MESSAGE_ << "Number of pressure points = " << USER_NPRESSURE << endl;  
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"NPRESSURE=",TRUE) ) {
-        USER_NPRESSURE = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"NPRESSURE=",1,TRUE);
+        USER_NPRESSURE = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"NPRESSURE=",TRUE);
         aurostd::StringstreamClean(aus);
         aus << _AGLSTR_MESSAGE_ << "Number of pressure points = " << USER_NPRESSURE << endl;  
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1390,12 +1390,12 @@ namespace AGL_functions {
     } else {
       // Otherwise, check in aflow.in file    
       if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"SPRESSURE=",TRUE) ) {
-        USER_SPRESSURE = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"SPRESSURE=",1,TRUE);
+        USER_SPRESSURE = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"SPRESSURE=",TRUE);
         aurostd::StringstreamClean(aus);
         aus << _AGLSTR_MESSAGE_ << "Pressure interval = " << USER_SPRESSURE << endl;  
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"SPRESSURE=",TRUE) ) {
-        USER_SPRESSURE = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"SPRESSURE=",1,TRUE);
+        USER_SPRESSURE = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"SPRESSURE=",TRUE);
         aurostd::StringstreamClean(aus);
         aus << _AGLSTR_MESSAGE_ << "Pressure interval = " << USER_SPRESSURE << endl;  
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1417,12 +1417,12 @@ namespace AGL_functions {
     } else {
       // Otherwise, check in aflow.in file    
       if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"NTEMP=",TRUE) ) {
-        USER_NTEMPERATURE = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"NTEMP=",1,TRUE);
+        USER_NTEMPERATURE = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"NTEMP=",TRUE);
         aurostd::StringstreamClean(aus);
         aus << _AGLSTR_MESSAGE_ << "Number of temperature points = " << USER_NTEMPERATURE << endl;  
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"NTEMP=",TRUE) ) {
-        USER_NTEMPERATURE = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"NTEMP=",1,TRUE);
+        USER_NTEMPERATURE = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"NTEMP=",TRUE);
         aurostd::StringstreamClean(aus);
         aus << _AGLSTR_MESSAGE_ << "Number of temperature points = " << USER_NTEMPERATURE << endl;  
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1444,12 +1444,12 @@ namespace AGL_functions {
     } else {
       // Otherwise, check in aflow.in file    
       if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"STEMP=",TRUE) ) {
-        USER_STEMPERATURE = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"STEMP=",1,TRUE);
+        USER_STEMPERATURE = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+"STEMP=",TRUE);
         aurostd::StringstreamClean(aus);
         aus << _AGLSTR_MESSAGE_ << "Temperature interval = " << USER_STEMPERATURE << endl;  
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"STEMP=",TRUE) ) {
-        USER_STEMPERATURE = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+"STEMP=",1,TRUE);
+        USER_STEMPERATURE = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+"STEMP=",TRUE);
         aurostd::StringstreamClean(aus);
         aus << _AGLSTR_MESSAGE_ << "Temperature interval = " << USER_STEMPERATURE << endl;  
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1467,22 +1467,22 @@ namespace AGL_functions {
     // Get the user's maximum limit on the number of covergence iterations to be performed in the functions scdebye and gauleg. 
     // This limit is to prevent these functions from getting stuck in an infinite loop. Default value is 250.
     if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"MAX_LOOPS=",TRUE) ) {
-      USER_MAX_LOOPS = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAX_LOOPS=",1,TRUE);
+      USER_MAX_LOOPS = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAX_LOOPS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum number of convergence loops = " << USER_MAX_LOOPS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"MAX_LOOPS=",TRUE) ) {
-      USER_MAX_LOOPS = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"MAX_LOOPS=",1,TRUE);
+      USER_MAX_LOOPS = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"MAX_LOOPS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum number of convergence loops = " << USER_MAX_LOOPS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"MAXLOOPS=",TRUE) ) {
-      USER_MAX_LOOPS = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAXLOOPS=",1,TRUE);
+      USER_MAX_LOOPS = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAXLOOPS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum number of convergence loops = " << USER_MAX_LOOPS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"MAXLOOPS=",TRUE) ) {
-      USER_MAX_LOOPS = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"MAXLOOPS=",1,TRUE);
+      USER_MAX_LOOPS = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"MAXLOOPS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum number of convergence loops = " << USER_MAX_LOOPS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1498,22 +1498,22 @@ namespace AGL_functions {
     // Get the user's maximum limit on the number of fitting iterations to be performed in the functions fitt and debfitt. 
     // Default value is 500.
     if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"MAX_FITS=",TRUE) ) {
-      USER_MAX_FITS = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAX_FITS=",1,TRUE);
+      USER_MAX_FITS = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAX_FITS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum number of fitting iterations = " << USER_MAX_FITS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"MAX_FITS=",TRUE) ) {
-      USER_MAX_FITS = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAX_FITS=",1,TRUE);
+      USER_MAX_FITS = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAX_FITS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum number of fitting iterations = " << USER_MAX_FITS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"MAXFITS=",TRUE) ) {
-      USER_MAX_FITS = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAXFITS=",1,TRUE);
+      USER_MAX_FITS = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAXFITS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum number of fitting iterations = " << USER_MAX_FITS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"MAXFITS=",TRUE) ) {
-      USER_MAX_FITS = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAXFITS=",1,TRUE);
+      USER_MAX_FITS = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAXFITS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum number of fitting iterations = " << USER_MAX_FITS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1529,22 +1529,22 @@ namespace AGL_functions {
     // Get the user's maximum limit on the number of terms in the polynomial to be fitted to the (E, V) data. 
     // Default value is 50.
     if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"MAX_PAR=",TRUE) ) {
-      USER_MAX_PAR = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAX_PAR=",1,TRUE);
+      USER_MAX_PAR = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAX_PAR=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum number of terms in the polynomial = " << USER_MAX_PAR << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"MAX_PAR=",TRUE) ) {
-      USER_MAX_PAR = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"MAX_PAR=",1,TRUE);
+      USER_MAX_PAR = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"MAX_PAR=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum number of terms in the polynomial = " << USER_MAX_PAR << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"MAXPAR=",TRUE) ) {
-      USER_MAX_PAR = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAXPAR=",1,TRUE);
+      USER_MAX_PAR = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAXPAR=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum number of terms in the polynomial = " << USER_MAX_PAR << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"MAXPAR=",TRUE) ) {
-      USER_MAX_PAR = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"MAXPAR=",1,TRUE);
+      USER_MAX_PAR = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"MAXPAR=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum number of terms in the polynomial = " << USER_MAX_PAR << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1560,22 +1560,22 @@ namespace AGL_functions {
     // Get the user's maximum limit on the fitting order for the Birch-Murnaghan equation of state. 
     // Default value is 2.
     if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"BIRCH_FIT_ORDER_IG=",TRUE) ) {
-      USER_BIRCH_FIT_ORDER_IG = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"BIRCH_FIT_ORDER_IG=",1,TRUE);
+      USER_BIRCH_FIT_ORDER_IG = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"BIRCH_FIT_ORDER_IG=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum fitting order for Birch-Murnaghan equation of state = " << USER_BIRCH_FIT_ORDER_IG << endl; 
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"BIRCH_FIT_ORDER_IG=",TRUE) ) {
-      USER_BIRCH_FIT_ORDER_IG = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"BIRCH_FIT_ORDER_IG=",1,TRUE);
+      USER_BIRCH_FIT_ORDER_IG = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"BIRCH_FIT_ORDER_IG=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum fitting order for Birch-Murnaghan equation of state = " << USER_BIRCH_FIT_ORDER_IG << endl; 
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"BIRCHFITORDER_IG=",TRUE) ) {
-      USER_BIRCH_FIT_ORDER_IG = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"BIRCHFITORDER_IG=",1,TRUE);
+      USER_BIRCH_FIT_ORDER_IG = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"BIRCHFITORDER_IG=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum fitting order for Birch-Murnaghan equation of state = " << USER_BIRCH_FIT_ORDER_IG << endl; 
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"BIRCHFITORDER_IG=",TRUE) ) {
-      USER_BIRCH_FIT_ORDER_IG = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"BIRCHFITORDER_IG=",1,TRUE);
+      USER_BIRCH_FIT_ORDER_IG = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"BIRCHFITORDER_IG=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum fitting order for Birch-Murnaghan equation of state = " << USER_BIRCH_FIT_ORDER_IG << endl; 
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1590,22 +1590,22 @@ namespace AGL_functions {
     }   
     // Get the user's value of the maximum number of concavity check iterations. The default value is "1".
     if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"MAX_CC_ITER=",TRUE) ) {
-      USER_MAX_CC_ITER = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAX_CC_ITER=",1,TRUE);
+      USER_MAX_CC_ITER = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAX_CC_ITER=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum (E, V) concavity check iterations = " << USER_MAX_CC_ITER << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"MAX_CC_ITER=",TRUE) ) {
-      USER_MAX_CC_ITER = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"MAX_CC_ITER=",1,TRUE);
+      USER_MAX_CC_ITER = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"MAX_CC_ITER=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum (E, V) concavity check iterations = " << USER_MAX_CC_ITER << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"MAXCCITER=",TRUE) ) {
-      USER_MAX_CC_ITER = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAXCCITER=",1,TRUE);
+      USER_MAX_CC_ITER = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAXCCITER=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum (E, V) concavity check iterations = " << USER_MAX_CC_ITER << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"MAXCCITER=",TRUE) ) {
-      USER_MAX_CC_ITER = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"MAXCCITER=",1,TRUE);
+      USER_MAX_CC_ITER = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"MAXCCITER=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum (E, V) concavity check iterations = " << USER_MAX_CC_ITER << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1620,22 +1620,22 @@ namespace AGL_functions {
     }    
     // Get the user's value of the maximum number of minimum check iterations. The default value is "5".
     if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"MAX_CM_ITER=",TRUE) ) {
-      USER_MAX_CM_ITER = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAX_CM_ITER=",1,TRUE);
+      USER_MAX_CM_ITER = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAX_CM_ITER=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum (E, V) minimum check iterations = " << USER_MAX_CM_ITER << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"MAX_CM_ITER=",TRUE) ) {
-      USER_MAX_CM_ITER = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"MAX_CM_ITER=",1,TRUE);
+      USER_MAX_CM_ITER = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"MAX_CM_ITER=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum (E, V) minimum check iterations = " << USER_MAX_CM_ITER << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"MAXCMITER=",TRUE) ) {
-      USER_MAX_CM_ITER = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAXCMITER=",1,TRUE);
+      USER_MAX_CM_ITER = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"MAXCMITER=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum (E, V) minimum check iterations = " << USER_MAX_CM_ITER << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"MAXCMITER=",TRUE) ) {
-      USER_MAX_CM_ITER = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"MAXCMITER=",1,TRUE);
+      USER_MAX_CM_ITER = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"MAXCMITER=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Maximum (E, V) minimum check iterations = " << USER_MAX_CM_ITER << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1656,22 +1656,22 @@ namespace AGL_functions {
     // A value of "4" results in the fitting algorithm selecting all points, and then fitting these by a polynomial to generate a new concave set of points
     // A value of "5" results (E, V) data 
     if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"FIT_TYPE=",TRUE) ) {
-      USER_FIT_TYPE = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"FIT_TYPE=",1,TRUE);
+      USER_FIT_TYPE = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"FIT_TYPE=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Fitting algorithm selection = " << USER_FIT_TYPE << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"FIT_TYPE=",TRUE) ) {
-      USER_FIT_TYPE = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"FIT_TYPE=",1,TRUE);
+      USER_FIT_TYPE = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"FIT_TYPE=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Fitting algorithm selection = " << USER_FIT_TYPE << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"FITTYPE=",TRUE) ) {
-      USER_FIT_TYPE = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"FITTYPE=",1,TRUE);
+      USER_FIT_TYPE = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"FITTYPE=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Fitting algorithm selection = " << USER_FIT_TYPE << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGIBBSTROPT_+"FITTYPE=",TRUE) ) {
-      USER_FIT_TYPE = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"FITTYPE=",1,TRUE);
+      USER_FIT_TYPE = aurostd::substring2utype<int>(AflowIn,_AGIBBSTROPT_+"FITTYPE=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "Fitting algorithm selection = " << USER_FIT_TYPE << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1859,12 +1859,12 @@ namespace AGL_functions {
     }
     // Get the user's list of failed run subdirectories to skip when calculating the thermal properties
     if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"SKIP_FAILED_ARUNS=",TRUE) ) {
-      USER_SKIP_FAILED_ARUNS = aurostd::substring2string(AflowIn,_AGLSTROPT_+"SKIP_FAILED_ARUNS=",1,1,TRUE);
+      USER_SKIP_FAILED_ARUNS = aurostd::substring2string(AflowIn,_AGLSTROPT_+"SKIP_FAILED_ARUNS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ + "Failed ARUNS to skip = " << USER_SKIP_FAILED_ARUNS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"SKIPFAILEDARUNS=",TRUE) ) {
-      USER_SKIP_FAILED_ARUNS = aurostd::substring2string(AflowIn,_AGLSTROPT_+"SKIPFAILEDARUNS=",1,1,TRUE);
+      USER_SKIP_FAILED_ARUNS = aurostd::substring2string(AflowIn,_AGLSTROPT_+"SKIPFAILEDARUNS=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ + "Failed ARUNS to skip = " << USER_SKIP_FAILED_ARUNS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1883,12 +1883,12 @@ namespace AGL_functions {
     }	
     // Get the user's option of maximum number of failed run subdirectories to skip 
     if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"SKIP_ARUNS_MAX=",TRUE) ) {
-      USER_SKIP_ARUNS_MAX = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"SKIP_ARUNS_MAX=",1,TRUE);
+      USER_SKIP_ARUNS_MAX = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"SKIP_ARUNS_MAX=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ + "Maximum number of ARUNS to skip = " << USER_SKIP_ARUNS_MAX << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"SKIPARUNSMAX=",TRUE) ) {
-      USER_SKIP_ARUNS_MAX = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"SKIPARUNSMAX=",1,TRUE);
+      USER_SKIP_ARUNS_MAX = aurostd::substring2utype<int>(AflowIn,_AGLSTROPT_+"SKIPARUNSMAX=",TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ + "Maximum number of ARUNS to skip = " << USER_SKIP_ARUNS_MAX << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1946,7 +1946,7 @@ namespace AGL_functions {
     if (AGL_data.ael_pressure_calc) {
       // Get the user's number of pressure points to be used in the calculation
       if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"NPRESSURE=",TRUE) ) {
-        USER_NPRESSURE = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NPRESSURE=",1,TRUE);
+        USER_NPRESSURE = aurostd::substring2utype<int>(AflowIn,_AELSTROPT_+"NPRESSURE=",TRUE);
         aurostd::StringstreamClean(aus);
         aus << _AGLSTR_MESSAGE_ << "Number of pressure points = " << USER_NPRESSURE << endl;  
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1961,7 +1961,7 @@ namespace AGL_functions {
       } 
       // Get the user's step size for the pressure values to be used in the calculation
       if( aurostd::substring2bool(AflowIn,_AELSTROPT_+"SPRESSURE=",TRUE) ) {
-        USER_SPRESSURE = aurostd::substring2utype<double>(AflowIn,_AELSTROPT_+"SPRESSURE=",1,TRUE);
+        USER_SPRESSURE = aurostd::substring2utype<double>(AflowIn,_AELSTROPT_+"SPRESSURE=",TRUE);
         aurostd::StringstreamClean(aus);
         aus << _AGLSTR_MESSAGE_ << "Pressure interval = " << USER_SPRESSURE << endl;  
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -2128,9 +2128,9 @@ namespace AGL_functions {
         string stridsaflt = "PRESSURE_VALUE_" + strids + "=";
         if( aurostd::substring2bool(AflowIn,stridsafl,TRUE) || aurostd::substring2bool(AflowIn,stridsagbfl,TRUE) ) {
           if( aurostd::substring2bool(AflowIn,stridsafl,TRUE) ) {
-            USER_PRES_VAL = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+stridsaflt,1,TRUE);
+            USER_PRES_VAL = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+stridsaflt,TRUE);
           } else if( aurostd::substring2bool(AflowIn,stridsagbfl,TRUE) ) {
-            USER_PRES_VAL = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+stridsaflt,1,TRUE);
+            USER_PRES_VAL = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+stridsaflt,TRUE);
           }
           if(USER_PRES_VAL < 0.0) {
             // Skip negative pressure values
@@ -2206,10 +2206,10 @@ namespace AGL_functions {
         string stridsagbfl = _AGIBBSTROPT_ + "DEBYE_TEMP_" + strids + "=";
         string stridsaflt = "DEBYE_TEMP_" + strids + "=";
         if( aurostd::substring2bool(AflowIn,stridsafl,TRUE) ) {
-          USER_DEBYE_TEMP = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+stridsaflt,1,TRUE);
+          USER_DEBYE_TEMP = aurostd::substring2utype<double>(AflowIn,_AGLSTROPT_+stridsaflt,TRUE);
           AGL_data.tdebye.push_back(USER_DEBYE_TEMP);
         } else if( aurostd::substring2bool(AflowIn,stridsagbfl,TRUE) ) {
-          USER_DEBYE_TEMP = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+stridsaflt,1,TRUE);
+          USER_DEBYE_TEMP = aurostd::substring2utype<double>(AflowIn,_AGIBBSTROPT_+stridsaflt,TRUE);
           AGL_data.tdebye.push_back(USER_DEBYE_TEMP);
         } else {
           aurostd::StringstreamClean(aus);
