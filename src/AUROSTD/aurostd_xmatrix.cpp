@@ -2145,10 +2145,11 @@ namespace aurostd {  // namespace aurostd
       //[CO20191201 - OBSOLETE]return b;
       //SD20220427 - Adjoint method is very costly, instead we use LUP decomposition due to speed.
       //If that method fails, then we use QR decomposition, where we invert R by LUP decomposition.
-      //If these fail, the user should look into pre-conditioning, see: aurostd::equilibrateMatrix()
+      //If these fail, we fall back on the adjoint
+      //Also the user should look into pre-conditioning, see: aurostd::equilibrateMatrix()
       //For benefits of QR decomposition when finding the inverse, see: http://batty.mullikin.org/2601/num3.pdf
       //[SD20220427 - OBSOLETE]return inverseByAdjoint(a);
-      try { // we need a try block because LUP and QR decompositions can fail
+      try { // we need a try block because LUP and QR decompositions can fail with errors
         xmatrix<utype> id = aurostd::identity(a);
         b = aurostd::inverseByLUP(a);
         if(aurostd::isequal(a * b, id)) {return b;} 
@@ -2162,7 +2163,7 @@ namespace aurostd {  // namespace aurostd
         message << "Matrix inversion failed: determinant=" << aurostd::abs(aurostd::det(a)) << " | condition number=" << aurostd::condition_number(a);
         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
-      return b;
+      return aurostd::inverseByAdjoint(a);
     }
 }
 
@@ -2179,19 +2180,24 @@ namespace aurostd {  // namespace aurostd
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
   template<class utype>
-    void LUPDecomposition(const xmatrix<utype>& A, xmatrix<utype>& LU, xmatrix<utype>& P, utype tol) { //SD20220426
+    void LUPDecomposition(const xmatrix<utype>& A, xmatrix<double>& LU, xmatrix<double>& P, utype tol) { //SD20220426
       // A is a square matrix and LU is the LU decomposition, where LU=(L-I)+U such that A=trasp(P)*LU
       // See: https://en.wikipedia.org/wiki/LU_decomposition
       if (!A.issquare) {
         string message = "Matrix needs to be square for LU decomposition";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
       }
-      LU = A;
-      int imax, itmp;
+      LU = aurostd::ones_xm<double>(A.urows, A.ucols, A.lrows, A.lcols);
+      for (int i = LU.lrows; i <= LU.urows; i++) {
+        for (int j = LU.lcols; j <= LU.ucols; j++) {
+          LU(i, j) = (double)A(i, j);
+        }
+      }
+      int imax, _p;
       double maxA, absA;
       xvector<int> p(LU.urows, LU.lrows);
-      xmatrix<utype> tmpLU;
-      P = (utype)0 * ones_xm<utype>(LU.urows, LU.ucols, LU.lrows, LU.lcols);
+      xmatrix<double> _LU(LU.urows, LU.ucols, LU.lrows, LU.lcols);
+      P = 0.0 * ones_xm<double>(LU.urows, LU.ucols, LU.lrows, LU.lcols);
       for (int i = LU.lrows; i <= LU.urows; i++) {p(i) = i;} // initialize P
       for (int i = LU.lrows; i <= LU.urows; i++) {
         maxA = 0.0;
@@ -2203,19 +2209,20 @@ namespace aurostd {  // namespace aurostd
             imax = j;
           }
         }
-        if (maxA < tol) {
+        if (maxA < (double)tol) {
           string message = "Matrix is degenerate";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
         }
         if (imax != i) {
           // pivoting P
-          itmp = p(i);
+          _p = p(i);
           p(i) = p(imax);
-          p(imax) = itmp;
+          p(imax) = _p;
           // pivoting rows of A
-          tmpLU = LU.getmat(i, i, LU.lcols, LU.ucols);
-          LU.setmat(LU.getmat(imax, imax, LU.lcols, LU.ucols), i, 1);
-          LU.setmat(tmpLU, imax, 1);
+          _LU = LU.getmat(i, i, LU.lcols, LU.ucols);
+          LU.setmat(LU.getmat(imax, imax, LU.lcols, LU.ucols), i, LU.lcols);
+          LU.setmat(_LU, imax, LU.lcols);
+          //LU.setmat(_LU.getmat(i, i, LU.lcols, LU.ucols), imax, LU.lcols);
         }
         for (int j = i + 1; j <= LU.urows; j++) {
           LU(j, i) /= LU(i, i);
@@ -2224,36 +2231,44 @@ namespace aurostd {  // namespace aurostd
           }
         }
       }
-      for (int i = LU.lrows; i <= LU.urows; i++) {P(i, p(i)) = (utype)1;}
+      for (int i = LU.lrows; i <= LU.urows; i++) {P(i, p(i)) = 1.0;}
+      return;
     }
   template<class utype>
-    void LUPDecomposition(const xmatrix<utype>& A, xmatrix<utype>& L, xmatrix<utype>& U, xmatrix<utype>& P, utype tol) { //SD20220426
+    void LUPDecomposition(const xmatrix<utype>& A, xmatrix<double>& L, xmatrix<double>& U, xmatrix<double>& P, utype tol) { //SD20220426
       // A is a square matrix and LU is the LU decomposition, where A=trasp(P)*LU
-      xmatrix<utype> LU;
+      xmatrix<double> LU;
       LUPDecomposition(A, LU, P, tol);
-      L = aurostd::eye<utype>(LU.urows, LU.ucols, LU.lrows, LU.lcols);
+      L = aurostd::eye<double>(LU.urows, LU.ucols, LU.lrows, LU.lcols);
       U = L;
       for (int i = LU.lrows + 1; i <= LU.urows; i++) {
         L.setmat(LU.getmat(i, i, LU.lcols, i - LU.lcols), i, LU.lcols);
       }
       U += LU - L;
+      return;
     }
   template<class utype>                                 // function inverse xmatrix<>
     xmatrix<utype> inverseByLUP(const xmatrix<utype>& A) { //SD20220426
-      xmatrix<utype> IA, LU, P;
+      xmatrix<double> LU, P, _IA;
+      xmatrix<utype> IA(A.urows, A.ucols, A.lrows, A.lcols);
       LUPDecomposition(A, LU, P);
-      IA = trasp(P);
+      _IA = trasp(P);
       for (int i = LU.lrows; i <= LU.urows; i++) {
-        for (int j = LU.lrows; j <= LU.urows; j++) {
+        for (int j = LU.lcols; j <= LU.ucols; j++) {
           for (int k = 1; k < j; k++) {
-            IA(j, i) -= LU(j, k) * IA(k, i);
+            _IA(j, i) -= LU(j, k) * _IA(k, i);
           }
         }
         for (int j = LU.urows; j >= LU.lrows; j--) {
           for (int k = j + 1; k <= LU.urows; k++) {
-            IA(j, i) -= LU(j, k) * IA(k, i);
+            _IA(j, i) -= LU(j, k) * _IA(k, i);
           }
-          IA(j, i) /= LU(j, j);
+          _IA(j, i) /= LU(j, j);
+        }
+      }
+      for (int i = LU.lrows; i <= LU.urows; i++) {
+        for (int j = LU.lcols; j <= LU.ucols; j++) {
+          IA(i, j) = (utype)_IA(i, j);
         }
       }
       return IA;
