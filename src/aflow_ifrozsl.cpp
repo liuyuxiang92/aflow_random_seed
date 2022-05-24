@@ -55,7 +55,8 @@ namespace KBIN {
       string STOP=_VASP_POSCAR_MODE_EXPLICIT_STOP_P_+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i); //CO20200624
       stringstream POSCAR;POSCAR.clear();POSCAR.str(std::string());
       if(aurostd::substring2bool(input_file,START) && aurostd::substring2bool(input_file,STOP))
-        aurostd::ExtractToStringstreamEXPLICIT(input_file,POSCAR,START,STOP);
+        POSCAR.str(aurostd::substring2string(input_file,START,STOP,0,false,true));
+        //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(input_file,POSCAR,START,STOP);
       vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRUCTURE.push_back(xstructure(POSCAR,IOVASP_AUTO));
     }
 
@@ -484,7 +485,8 @@ namespace FROZSL {
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       aus << "00000  MESSAGE FROZSL_STRUCTURE generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      aurostd::ExtractToStringstreamEXPLICIT(AflowIn,ssfrozslSTRUCTURE,"[FROZSL_STRUCTURE_FILE]");
+      ssfrozslSTRUCTURE.str(aurostd::substring2string(AflowIn,"[FROZSL_STRUCTURE_FILE]",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn,ssfrozslSTRUCTURE,"[FROZSL_STRUCTURE_FILE]");
       kflags.KBIN_FROZSL_STRUCTURE_STRING=ssfrozslSTRUCTURE.str();
       //    aus << kflags.KBIN_FROZSL_STRUCTURE_STRING;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       //flagSTRUCTURE=TRUE;
@@ -497,7 +499,8 @@ namespace FROZSL {
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       aus << "00000  MESSAGE FROZSL_STRUCTURE generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      aurostd::ExtractToStringstreamEXPLICIT(AflowIn,ssfrozslSTRUCTURE,"[FROZSL_MODE_EXPLICIT]START.FROZSL_STRUCTURE","[FROZSL_MODE_EXPLICIT]STOP.FROZSL_STRUCTURE");
+      ssfrozslSTRUCTURE.str(aurostd::substring2string(AflowIn,"[FROZSL_MODE_EXPLICIT]START.FROZSL_STRUCTURE","[FROZSL_MODE_EXPLICIT]STOP.FROZSL_STRUCTURE",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn,ssfrozslSTRUCTURE,"[FROZSL_MODE_EXPLICIT]START.FROZSL_STRUCTURE","[FROZSL_MODE_EXPLICIT]STOP.FROZSL_STRUCTURE");
       kflags.KBIN_FROZSL_STRUCTURE_STRING=ssfrozslSTRUCTURE.str();
       //   aus << kflags.KBIN_FROZSL_STRUCTURE_STRING;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       //flagSTRUCTURE=TRUE;
@@ -559,7 +562,8 @@ namespace FROZSL {
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       aus << "00000  MESSAGE FROZSL_DIELECTRIC generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      aurostd::ExtractToStringstreamEXPLICIT(AflowIn,ssfrozslDIELECTRIC,"[FROZSL_DIELECTRIC_FILE]");
+      ssfrozslDIELECTRIC.str(aurostd::substring2string(AflowIn,"[FROZSL_DIELECTRIC_FILE]",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn,ssfrozslDIELECTRIC,"[FROZSL_DIELECTRIC_FILE]");
       kflags.KBIN_FROZSL_DIELECTRIC_STRING=ssfrozslDIELECTRIC.str();
       //    aus << kflags.KBIN_FROZSL_DIELECTRIC_STRING;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       //flagDIELECTRIC=TRUE;
@@ -573,7 +577,8 @@ namespace FROZSL {
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       aus << "00000  MESSAGE FROZSL_DIELECTRIC generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-      aurostd::ExtractToStringstreamEXPLICIT(AflowIn,ssfrozslDIELECTRIC,"[FROZSL_MODE_EXPLICIT]START.FROZSL_DIELECTRIC","[FROZSL_MODE_EXPLICIT]STOP.FROZSL_DIELECTRIC");
+      ssfrozslDIELECTRIC.str(aurostd::substring2string(AflowIn,"[FROZSL_MODE_EXPLICIT]START.FROZSL_DIELECTRIC","[FROZSL_MODE_EXPLICIT]STOP.FROZSL_DIELECTRIC",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn,ssfrozslDIELECTRIC,"[FROZSL_MODE_EXPLICIT]START.FROZSL_DIELECTRIC","[FROZSL_MODE_EXPLICIT]STOP.FROZSL_DIELECTRIC");
       kflags.KBIN_FROZSL_DIELECTRIC_STRING=ssfrozslDIELECTRIC.str();
       //   aus << kflags.KBIN_FROZSL_DIELECTRIC_STRING;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       //flagDIELECTRIC=TRUE;

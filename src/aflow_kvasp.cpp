@@ -494,22 +494,26 @@ namespace KBIN {
     if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT) {  // [AFLOW_MODE_PRESCRIPT] construction
       aus << "00000  MESSAGE Generating " << DEFAULT_AFLOW_PRESCRIPT_COMMAND << " file from " << _AFLOWIN_ << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,oss);
-      aurostd::ExtractToStringstreamEXPLICIT(AflowIn,kflags.AFLOW_MODE_PRESCRIPT,"[AFLOW_MODE_PRESCRIPT]"); //CO20200624 - FileAFLOWIN->AflowIn
+      kflags.AFLOW_MODE_PRESCRIPT.str(aurostd::substring2string(AflowIn,"[AFLOW_MODE_PRESCRIPT]",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn,kflags.AFLOW_MODE_PRESCRIPT,"[AFLOW_MODE_PRESCRIPT]"); //CO20200624 - FileAFLOWIN->AflowIn
     }
     if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP) {  // [AFLOW_MODE_PRESCRIPT] construction
       aus << "00000  MESSAGE Generating " << DEFAULT_AFLOW_PRESCRIPT_COMMAND << " file from START/STOP " << _AFLOWIN_ << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,oss);
-      aurostd::ExtractToStringstreamEXPLICIT(AflowIn,kflags.AFLOW_MODE_PRESCRIPT,"[AFLOW_MODE_PRESCRIPT]START","[AFLOW_MODE_PRESCRIPT]STOP"); //CO20200624 - FileAFLOWIN->AflowIn
+      kflags.AFLOW_MODE_PRESCRIPT.str(aurostd::substring2string(AflowIn,"[AFLOW_MODE_PRESCRIPT]START","[AFLOW_MODE_PRESCRIPT]STOP",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn,kflags.AFLOW_MODE_PRESCRIPT,"[AFLOW_MODE_PRESCRIPT]START","[AFLOW_MODE_PRESCRIPT]STOP"); //CO20200624 - FileAFLOWIN->AflowIn
     }
     if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT) {  // [AFLOW_MODE_POSTSCRIPT] construction
       aus << "00000  MESSAGE Generating " << DEFAULT_AFLOW_POSTSCRIPT_COMMAND << " file from " << _AFLOWIN_ << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,oss);
-      aurostd::ExtractToStringstreamEXPLICIT(AflowIn,kflags.AFLOW_MODE_POSTSCRIPT,"[AFLOW_MODE_POSTSCRIPT]"); //CO20200624 - FileAFLOWIN->AflowIn
+      kflags.AFLOW_MODE_POSTSCRIPT.str(aurostd::substring2string(AflowIn,"[AFLOW_MODE_POSTSCRIPT]",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn,kflags.AFLOW_MODE_POSTSCRIPT,"[AFLOW_MODE_POSTSCRIPT]"); //CO20200624 - FileAFLOWIN->AflowIn
     }
     if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP) {  // [AFLOW_MODE_POSTSCRIPT] construction
       aus << "00000  MESSAGE Generating " << DEFAULT_AFLOW_POSTSCRIPT_COMMAND << " file from START/STOP " << _AFLOWIN_ << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,oss);
-      aurostd::ExtractToStringstreamEXPLICIT(AflowIn,kflags.AFLOW_MODE_POSTSCRIPT,"[AFLOW_MODE_POSTSCRIPT]START","[AFLOW_MODE_POSTSCRIPT]STOP");  //CO20200624 - FileAFLOWIN->AflowIn
+      kflags.AFLOW_MODE_POSTSCRIPT.str(aurostd::substring2string(AflowIn,"[AFLOW_MODE_POSTSCRIPT]START","[AFLOW_MODE_POSTSCRIPT]STOP",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn,kflags.AFLOW_MODE_POSTSCRIPT,"[AFLOW_MODE_POSTSCRIPT]START","[AFLOW_MODE_POSTSCRIPT]STOP");  //CO20200624 - FileAFLOWIN->AflowIn
     }
     // ************************************************************************************************************************************
     // ALIEN MODE
@@ -1338,10 +1342,12 @@ namespace KBIN {
     if(aurostd::substring2bool(AflowIn,"[VASP_INCAR_MODE_EXPLICIT]")) vflags.KBIN_VASP_INCAR_MODE.push("EXPLICIT");
     if(aurostd::substring2bool(AflowIn,"[VASP_INCAR_MODE_EXPLICIT]START") && aurostd::substring2bool(AflowIn,"[VASP_INCAR_MODE_EXPLICIT]STOP")) vflags.KBIN_VASP_INCAR_MODE.push("EXPLICIT_START_STOP");
     if (vflags.KBIN_VASP_INCAR_FILE.flag("KEYWORD")) { //ME20181113
-      aurostd::ExtractToStringstreamEXPLICIT(AflowIn, vflags.KBIN_VASP_INCAR_EXPLICIT, "[VASP_INCAR_FILE]");
+      vflags.KBIN_VASP_INCAR_EXPLICIT.str(aurostd::substring2string(AflowIn,"[VASP_INCAR_FILE]",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn, vflags.KBIN_VASP_INCAR_EXPLICIT, "[VASP_INCAR_FILE]");
     }
     if (vflags.KBIN_VASP_INCAR_MODE.flag("EXPLICIT_START_STOP")) { //ME20181113
-      aurostd::ExtractToStringstreamEXPLICIT(AflowIn, vflags.KBIN_VASP_INCAR_EXPLICIT_START_STOP, "[VASP_INCAR_MODE_EXPLICIT]START", "[VASP_INCAR_MODE_EXPLICIT]STOP");
+      vflags.KBIN_VASP_INCAR_EXPLICIT.str(aurostd::substring2string(AflowIn,"[VASP_INCAR_MODE_EXPLICIT]START", "[VASP_INCAR_MODE_EXPLICIT]STOP",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn, vflags.KBIN_VASP_INCAR_EXPLICIT_START_STOP, "[VASP_INCAR_MODE_EXPLICIT]START", "[VASP_INCAR_MODE_EXPLICIT]STOP");
     }
     if(aurostd::substring2bool(AflowIn,"[VASP_INCAR_MODE_IMPLICIT]")) vflags.KBIN_VASP_INCAR_MODE.push("IMPLICIT");
     if(aurostd::substring2bool(AflowIn,"[VASP_INCAR_MODE_EXTERNAL]")) vflags.KBIN_VASP_INCAR_MODE.push("EXTERNAL");
@@ -1357,10 +1363,12 @@ namespace KBIN {
     if(aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_MODE_EXPLICIT]")) vflags.KBIN_VASP_KPOINTS_MODE.push("EXPLICIT");
     if(aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_MODE_EXPLICIT]START") && aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_MODE_EXPLICIT]STOP")) vflags.KBIN_VASP_KPOINTS_MODE.push("EXPLICIT_START_STOP");
     if (vflags.KBIN_VASP_KPOINTS_FILE.flag("KEYWORD")) { //ME20181113
-      aurostd::ExtractToStringstreamEXPLICIT(AflowIn, vflags.KBIN_VASP_KPOINTS_EXPLICIT, "[VASP_KPOINTS_FILE]");
+      vflags.KBIN_VASP_KPOINTS_EXPLICIT.str(aurostd::substring2string(AflowIn,"[VASP_KPOINTS_FILE]",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn, vflags.KBIN_VASP_KPOINTS_EXPLICIT, "[VASP_KPOINTS_FILE]");
     }
     if (vflags.KBIN_VASP_KPOINTS_MODE.flag("EXPLICIT_START_STOP")) { //ME20181113
-      aurostd::ExtractToStringstreamEXPLICIT(AflowIn, vflags.KBIN_VASP_KPOINTS_EXPLICIT_START_STOP, "[VASP_KPOINTS_MODE_EXPLICIT]START", "[VASP_KPOINTS_MODE_EXPLICIT]STOP");
+      vflags.KBIN_VASP_KPOINTS_EXPLICIT.str(aurostd::substring2string(AflowIn,"[VASP_KPOINTS_MODE_EXPLICIT]START", "[VASP_KPOINTS_MODE_EXPLICIT]STOP",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn, vflags.KBIN_VASP_KPOINTS_EXPLICIT_START_STOP, "[VASP_KPOINTS_MODE_EXPLICIT]START", "[VASP_KPOINTS_MODE_EXPLICIT]STOP");
     }
     if(aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_MODE_IMPLICIT]")) vflags.KBIN_VASP_KPOINTS_MODE.push("IMPLICIT");
     if(aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_MODE_EXTERNAL]")) vflags.KBIN_VASP_KPOINTS_MODE.push("EXTERNAL");
@@ -1478,7 +1486,8 @@ namespace KBIN {
         string STOP=_VASP_POSCAR_MODE_EXPLICIT_STOP_P_+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i); //CO20200624
         stringstream POSCAR;POSCAR.clear();POSCAR.str(std::string());
         if(aurostd::substring2bool(input_file.str(),START) && aurostd::substring2bool(input_file.str(),STOP))
-          aurostd::ExtractToStringstreamEXPLICIT(input_file.str(),POSCAR,START,STOP);
+          POSCAR.str(aurostd::substring2string(input_file.str(),START,STOP,0,false,true));
+          //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(input_file.str(),POSCAR,START,STOP);
         vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRUCTURE.push_back(xstructure(POSCAR,IOVASP_AUTO));
       }
       if(LDEBUG) cerr << "DEBUG " << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size() << endl;
@@ -1623,7 +1632,8 @@ namespace KBIN {
     }
 
     if (vflags.KBIN_VASP_POTCAR_FILE.flag("KEYWORD")) { //CO20181113
-      aurostd::ExtractToStringstreamEXPLICIT(AflowIn, vflags.KBIN_VASP_POTCAR_EXPLICIT, "[VASP_POTCAR_FILE]");
+      vflags.KBIN_VASP_POTCAR_EXPLICIT.str(aurostd::substring2string(AflowIn,"[VASP_POTCAR_FILE]",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn, vflags.KBIN_VASP_POTCAR_EXPLICIT, "[VASP_POTCAR_FILE]");
     }
 
 

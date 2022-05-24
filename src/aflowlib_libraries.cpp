@@ -5403,7 +5403,8 @@ namespace aflowlib {
     abader_ss.clear();
     if(aurostd::FileExist(directory_RAW+"/"+abader_out)) {
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+abader_out) << endl;
-      aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+abader_out),abader_ss,"[BADER_RESULTS]START","[BADER_RESULTS]STOP");
+      abader_ss.str(aurostd::substring2string(aurostd::efile2string(directory_RAW+"/"+abader_out),"[BADER_RESULTS]START","[BADER_RESULTS]STOP",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+abader_out),abader_ss,"[BADER_RESULTS]START","[BADER_RESULTS]STOP");
       aurostd::stream2vectorstring(abader_ss,vline);
       for (uint i=0;i<vline.size();i++) {
         aurostd::StringSubst(vline.at(i),"="," ");
@@ -5475,7 +5476,8 @@ namespace aflowlib {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"AGL_gibbs_energy_pT.out",directory_RAW,"AGL_gibbs_energy_pT.out",vfile,MESSAGE);  // AGL_gibbs_energy_pT.out //CT20181212
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"AGL_Hugoniot.out",directory_RAW,"AGL_Hugoniot.out",vfile,MESSAGE);  // AGL_Hugoniot.out //CT20181212
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"aflow.agl.out") << endl;
-      aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+"aflow.agl.out"),aflow_agl_out,"[AGL_RESULTS]START","[AGL_RESULTS]STOP");
+      aflow_agl_out.str(aurostd::substring2string(aurostd::efile2string(directory_RAW+"/"+"aflow.agl.out"),"[AGL_RESULTS]START","[AGL_RESULTS]STOP",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+"aflow.agl.out"),aflow_agl_out,"[AGL_RESULTS]START","[AGL_RESULTS]STOP");
       aurostd::stream2vectorstring(aflow_agl_out,vline);
       for (uint i=0;i<vline.size();i++) {
         aurostd::StringSubst(vline.at(i),"="," ");
@@ -5546,7 +5548,8 @@ namespace aflowlib {
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"aflow.ael.out") << endl;
       //ME20191105
       string ael_out_str = aurostd::efile2string(directory_RAW + "/aflow.ael.out");
-      aurostd::ExtractToStringstreamEXPLICIT(ael_out_str, aflow_ael_out, "[AEL_RESULTS]START", "[AEL_RESULTS]STOP");
+      aflow_ael_out.str(aurostd::substring2string(ael_out_str, "[AEL_RESULTS]START", "[AEL_RESULTS]STOP", 0, false, true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(ael_out_str, aflow_ael_out, "[AEL_RESULTS]START", "[AEL_RESULTS]STOP");
       //aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+"aflow.ael.out"),aflow_ael_out,"[AEL_RESULTS]START","[AEL_RESULTS]STOP");  OBSOLETE ME20191105
       aurostd::stream2vectorstring(aflow_ael_out,vline);
       for (uint i=0;i<vline.size();i++) {
@@ -5575,7 +5578,8 @@ namespace aflowlib {
       //ME20191105 BEGIN
       xmatrix<double> tensor(6, 6);
       vector<double> row;
-      aurostd::ExtractToStringstreamEXPLICIT(ael_out_str, aflow_ael_out, "[AEL_STIFFNESS_TENSOR]START", "[AEL_STIFFNESS_TENSOR]STOP");
+      aflow_ael_out.str(aurostd::substring2string(ael_out_str, "[AEL_STIFFNESS_TENSOR]START", "[AEL_STIFFNESS_TENSOR]STOP", 0, false, true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(ael_out_str, aflow_ael_out, "[AEL_STIFFNESS_TENSOR]START", "[AEL_STIFFNESS_TENSOR]STOP");
       aurostd::stream2vectorstring(aflow_ael_out, vline);
       if (vline.size() > 0) {
         vline.pop_back();  // Remove empty line at the end
@@ -5606,7 +5610,8 @@ namespace aflowlib {
       }
 
       tensor.clear();
-      aurostd::ExtractToStringstreamEXPLICIT(ael_out_str, aflow_ael_out, "[AEL_COMPLIANCE_TENSOR]START", "[AEL_COMPLIANCE_TENSOR]STOP");
+      aflow_ael_out.str(aurostd::substring2string(ael_out_str, "[AEL_COMPLIANCE_TENSOR]START", "[AEL_COMPLIANCE_TENSOR]STOP", 0, false, true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(ael_out_str, aflow_ael_out, "[AEL_COMPLIANCE_TENSOR]START", "[AEL_COMPLIANCE_TENSOR]STOP");
       aurostd::stream2vectorstring(aflow_ael_out, vline);
       if (vline.size() > 0) {
         vline.pop_back();  // Remove empty line at the end
@@ -5693,7 +5698,8 @@ namespace aflowlib {
     // aflow.apl.out
     file = DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_OUT_FILE;
     aflowlib::LIB2RAW_FileNeeded(directory_LIB, file, directory_RAW, file, vfile, MESSAGE);
-    aurostd::ExtractToStringEXPLICIT(aurostd::efile2string(directory_RAW + "/" + file), lines, "[APL_THERMO_RESULTS]START", "[APL_THERMO_RESULTS]STOP");
+    lines = aurostd::substring2string(aurostd::efile2string(directory_RAW + "/" + file), "[APL_THERMO_RESULTS]START", "[APL_THERMO_RESULTS]STOP", 0, false, true);
+    //[SD20220520 - OBSOLETE]aurostd::ExtractToStringEXPLICIT(aurostd::efile2string(directory_RAW + "/" + file), lines, "[APL_THERMO_RESULTS]START", "[APL_THERMO_RESULTS]STOP");
     aurostd::string2vectorstring(lines, vlines);
     for (uint i = 0; i < vlines.size(); i++) {
       aurostd::StringSubst(vlines[i], "=", " ");
@@ -5835,7 +5841,8 @@ namespace aflowlib {
 
       // read QHA data from the aflow.qha.out file
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+"out") << endl;
-      aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+"out"),aflow_qha_out,"[QHA_RESULTS]START","[QHA_RESULTS]STOP");
+      aflow_qha_out.str(aurostd::substring2string(aurostd::efile2string(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+"out"),"[QHA_RESULTS]START","[QHA_RESULTS]STOP",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+DEFAULT_QHA_FILE_PREFIX+"out"),aflow_qha_out,"[QHA_RESULTS]START","[QHA_RESULTS]STOP");
       aurostd::stream2vectorstring(aflow_qha_out,vline);
       for (uint i=0;i<vline.size();i++) {
         aurostd::StringSubst(vline.at(i),"="," ");
@@ -5971,7 +5978,8 @@ namespace aflowlib {
         }
       }
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE) << endl;
-      aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE),aflow_pocc_out,"[AFLOW_POCC]START_TEMPERATURE=ALL","[AFLOW_POCC]STOP_TEMPERATURE=ALL");
+      aflow_pocc_out.str(aurostd::substring2string(aurostd::efile2string(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE),"[AFLOW_POCC]START_TEMPERATURE=ALL","[AFLOW_POCC]STOP_TEMPERATURE=ALL",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_OUT_FILE),aflow_pocc_out,"[AFLOW_POCC]START_TEMPERATURE=ALL","[AFLOW_POCC]STOP_TEMPERATURE=ALL");
       aurostd::stream2vectorstring(aflow_pocc_out,vline);
       for(i=0;i<vline.size();i++) {
         aurostd::StringSubst(vline.at(i),"="," ");
@@ -6004,7 +6012,8 @@ namespace aflowlib {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.pocc_agl.out",directory_RAW,"aflow.pocc_agl.out",vfile,MESSAGE);  // aflow.pocc_agl.out
       if(AFLOWLIB_VERBOSE) cout << MESSAGE << " loading " << string(directory_RAW+"/"+"aflow.pocc_agl.out") << endl;
       //0K START
-      aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+"aflow.pocc_agl.out"),aflow_pocc_agl_out,"[POCC_AGL_RESULTS]START_TEMPERATURE=0000_K","[POCC_AGL_RESULTS]STOP_TEMPERATURE=0000_K");
+      aflow_pocc_agl_out.str(aurostd::substring2string(aurostd::efile2string(directory_RAW+"/"+"aflow.pocc_agl.out"),"[POCC_AGL_RESULTS]START_TEMPERATURE=0000_K","[POCC_AGL_RESULTS]STOP_TEMPERATURE=0000_K",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+"aflow.pocc_agl.out"),aflow_pocc_agl_out,"[POCC_AGL_RESULTS]START_TEMPERATURE=0000_K","[POCC_AGL_RESULTS]STOP_TEMPERATURE=0000_K");
       aurostd::stream2vectorstring(aflow_pocc_agl_out,vline);
       for(i=0;i<vline.size();i++) {
         aurostd::StringSubst(vline.at(i),"="," ");
@@ -6035,7 +6044,8 @@ namespace aflowlib {
       if(AFLOWLIB_VERBOSE && !data.agl_poisson_ratio_source.empty()) cout << MESSAGE << " agl_poisson_ratio_source=" << data.agl_poisson_ratio_source << endl;
       //0K STOP
       //300K START
-      aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+"aflow.pocc_agl.out"),aflow_pocc_agl_out,"[POCC_AGL_RESULTS]START_TEMPERATURE=0300_K","[POCC_AGL_RESULTS]STOP_TEMPERATURE=0300_K");
+      aflow_pocc_agl_out.str(aurostd::substring2string(aurostd::efile2string(directory_RAW+"/"+"aflow.pocc_agl.out"),"[POCC_AGL_RESULTS]START_TEMPERATURE=0300_K","[POCC_AGL_RESULTS]STOP_TEMPERATURE=0300_K",0,false,true));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(directory_RAW+"/"+"aflow.pocc_agl.out"),aflow_pocc_agl_out,"[POCC_AGL_RESULTS]START_TEMPERATURE=0300_K","[POCC_AGL_RESULTS]STOP_TEMPERATURE=0300_K");
       aurostd::stream2vectorstring(aflow_pocc_agl_out,vline);
       for(i=0;i<vline.size();i++) {
         aurostd::StringSubst(vline.at(i),"="," ");
@@ -6085,12 +6095,12 @@ namespace aflowlib {
       }
       aflowlib::LIB2RAW_FileNeeded(directory_LIB, aplout, directory_RAW, aplout, vfile, MESSAGE);
       if (AFLOWLIB_VERBOSE) std::cout << MESSAGE << " loading " << directory_RAW << "/" << aplout << std::endl;
-      string lines = "";
-      aurostd::ExtractToStringEXPLICIT(aurostd::efile2string(directory_RAW + "/" + aplout), lines, "[POCC_APL_RESULTS]START_TEMPERATURE=0300_K","[POCC_APL_RESULTS]STOP_TEMPERATURE=0300_K");
+      string lines = aurostd::substring2string(aurostd::efile2string(directory_RAW + "/" + aplout),"[POCC_APL_RESULTS]START_TEMPERATURE=0300_K","[POCC_APL_RESULTS]STOP_TEMPERATURE=0300_K",0,false,true);
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToStringEXPLICIT(aurostd::efile2string(directory_RAW + "/" + aplout), lines, "[POCC_APL_RESULTS]START_TEMPERATURE=0300_K","[POCC_APL_RESULTS]STOP_TEMPERATURE=0300_K");
       if (!lines.empty()) {
-        string lines_300K = "";
+        string lines_300K = aurostd::substring2string(lines, "[APL_THERMO_RESULTS]START", "[APL_THERMO_RESULTS]STOP", 0, false, true);
         vector<string> vlines;
-        aurostd::ExtractToStringEXPLICIT(lines, lines_300K, "[APL_THERMO_RESULTS]START", "[APL_THERMO_RESULTS]STOP");
+        //[SD20220520 - OBSOLETE]aurostd::ExtractToStringEXPLICIT(lines, lines_300K, "[APL_THERMO_RESULTS]START", "[APL_THERMO_RESULTS]STOP");
         aurostd::string2vectorstring(lines_300K, vlines);
         for (uint i = 0; i < vlines.size(); i++) {
           aurostd::StringSubst(vlines[i], "=", " ");

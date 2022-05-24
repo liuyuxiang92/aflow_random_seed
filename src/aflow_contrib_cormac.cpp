@@ -163,8 +163,9 @@ namespace pflow {
       aurostd::file2stringstream(_AFLOWIN_, iafile);    
       if(aurostd::substring2bool(iafile.str(),_VASP_POSCAR_MODE_EXPLICIT_START_) && aurostd::substring2bool(iafile.str(),_VASP_POSCAR_MODE_EXPLICIT_STOP_)) {
         stringstream POSCAR;
-        POSCAR.clear();   POSCAR.str(std::string());
-        aurostd::ExtractToStringstreamEXPLICIT(iafile.str(),POSCAR,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_);
+        POSCAR.str(aurostd::substring2string(iafile.str(),_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_,0,false,true));
+        //[SD20220520 - OBSOLETE]POSCAR.clear();   POSCAR.str(std::string());
+        //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(iafile.str(),POSCAR,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_);
         xstructure xstr = xstructure(POSCAR, IOVASP_AUTO);
         int ntypes = xstr.num_each_type.size();
         natoms = 0;
