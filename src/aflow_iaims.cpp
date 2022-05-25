@@ -152,8 +152,8 @@ namespace KBIN {
       } else if(!aimsflags.KBIN_AIMS_CONTROL_FILE.flag("KEYWORD") && aimsflags.KBIN_AIMS_CONTROL_MODE.flag("EXPLICIT_START_STOP")) {
         aus << "00000  MESSAGE CONTROL   generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-        if(aurostd::substring2bool(AflowIn,"[AIMS_CONTROL_MODE_EXPLICIT]START") && aurostd::substring2bool(AflowIn,"[AIMS_CONTROL_MODE_EXPLICIT]STOP"))
-          xaims.CONTROL.str(aurostd::substring2string(AflowIn,"[AIMS_CONTROL_MODE_EXPLICIT]START","[AIMS_CONTROL_MODE_EXPLICIT]STOP",0,false,true));
+        xaims.CONTROL.str(aurostd::substring2string(AflowIn,"[AIMS_CONTROL_MODE_EXPLICIT]START","[AIMS_CONTROL_MODE_EXPLICIT]STOP",0,false,true));
+        //[SD20220520 - OBSOLETE]if(aurostd::substring2bool(AflowIn,"[AIMS_CONTROL_MODE_EXPLICIT]START") && aurostd::substring2bool(AflowIn,"[AIMS_CONTROL_MODE_EXPLICIT]STOP"))
           // [OBSOLETE]	aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xaims.CONTROL,"[AIMS_CONTROL_MODE_EXPLICIT]START","[AIMS_CONTROL_MODE_EXPLICIT]STOP");
           //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn,xaims.CONTROL,"[AIMS_CONTROL_MODE_EXPLICIT]START","[AIMS_CONTROL_MODE_EXPLICIT]STOP");
       } else {
@@ -431,12 +431,12 @@ namespace KBIN {
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         // normal get ONE of ONE
         if(aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP")) {
-          if(aurostd::substring2bool(AflowIn,"[AIMS_GEOM_MODE_EXPLICIT]START") &&
-              aurostd::substring2bool(AflowIn,"[AIMS_GEOM_MODE_EXPLICIT]STOP"))
-            xaims.GEOM.str(aurostd::substring2string(AflowIn,"[AIMS_GEOM_MODE_EXPLICIT]START","[AIMS_GEOM_MODE_EXPLICIT]STOP",-1,false,true));
+          //[SD20220520 - OBSOLETE]if(aurostd::substring2bool(AflowIn,"[AIMS_GEOM_MODE_EXPLICIT]START") &&
+          //[SD20220520 - OBSOLETE]    aurostd::substring2bool(AflowIn,"[AIMS_GEOM_MODE_EXPLICIT]STOP"))
+          xaims.GEOM.str(aurostd::substring2string(AflowIn,"[AIMS_GEOM_MODE_EXPLICIT]START","[AIMS_GEOM_MODE_EXPLICIT]STOP",-1,false,true));
             // [OBSOLETE]	  aurostd::ExtractLastToStringstreamEXPLICIT(FileAFLOWIN,xaims.GEOM,"[AIMS_GEOM_MODE_EXPLICIT]START","[AIMS_GEOM_MODE_EXPLICIT]STOP");
             //[SD20220520 - OBSOLETE]aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,xaims.GEOM,"[AIMS_GEOM_MODE_EXPLICIT]START","[AIMS_GEOM_MODE_EXPLICIT]STOP");
-          xaims.str=xstructure(xaims.GEOM,IOAIMS_AUTO);   // load structure
+          if(!xaims.GEOM.str().empty()) {xaims.str=xstructure(xaims.GEOM,IOAIMS_AUTO);}   // load structure
         }
         // get ONE of MANY
         if(aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP_POINT")) {

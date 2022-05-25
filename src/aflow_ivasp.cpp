@@ -1399,14 +1399,14 @@ namespace KBIN {
         aus << "00000  MESSAGE POSCAR  generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         // normal get ONE of ONE
-        if(vflags.KBIN_VASP_POSCAR_MODE.flag("EXPLICIT_START_STOP")) {
-          if(aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_) &&
-              aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_STOP_))
-            xvasp.POSCAR.str(aurostd::substring2string(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_,-1,false,true));
+        xvasp.POSCAR.str(aurostd::substring2string(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_,-1,false,true));
+        //[SD20220520 - OBSOLETE]if(vflags.KBIN_VASP_POSCAR_MODE.flag("EXPLICIT_START_STOP")) {
+        //[SD20220520 - OBSOLETE]  if(aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_) &&
+        //[SD20220520 - OBSOLETE]      aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_STOP_))
             // [OBSOLETE]	  aurostd::ExtractLastToStringstreamEXPLICIT(FileAFLOWIN,xvasp.POSCAR,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_);
-            //[SD20220520 - OBSOLETE]aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,xvasp.POSCAR,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_);
-          xvasp.str=xstructure(xvasp.POSCAR,IOVASP_AUTO);   // load structure
-        }
+        //[SD20220520 - OBSOLETE]    aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,xvasp.POSCAR,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_);
+        //[SD20220520 - OBSOLETE]}
+        if(!xvasp.POSCAR.str().empty()) {xvasp.str=xstructure(xvasp.POSCAR,IOVASP_AUTO);}   // load structure
         // get ONE of MANY
         if(vflags.KBIN_VASP_POSCAR_MODE.flag("EXPLICIT_START_STOP_POINT")) {
           xvasp.str=vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRUCTURE.at(xvasp.POSCAR_index);

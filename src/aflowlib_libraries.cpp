@@ -5538,7 +5538,7 @@ namespace aflowlib {
     stringstream aflow_ael_out;
 
     // AFLOW AEL
-    aflow_ael_out.clear();
+    //[SD20220520 - OBSOLETE]aflow_ael_out.clear();
     if(aurostd::FileExist(directory_LIB+"/"+"aflow.ael.out") || aurostd::EFileExist(directory_LIB+"/"+"aflow.ael.out")) {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"aflow.ael.out",directory_RAW,"aflow.ael.out",vfile,MESSAGE);  // aflow.ael.out
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"AEL_Elastic_constants.out",directory_RAW,"AEL_Elastic_constants.out",vfile,MESSAGE);  // AEL_Elastic_constants.out

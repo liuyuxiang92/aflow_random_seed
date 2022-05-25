@@ -89,8 +89,8 @@ namespace ALIEN {
       } else if(!alienflags.KBIN_ALIEN_INPUT_FILE && alienflags.KBIN_ALIEN_INPUT_MODE_EXPLICIT_START_STOP) {
         aus << "00000  MESSAGE INPUT  generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
-        if(aurostd::substring2bool(AflowIn,"[ALIEN_INPUT_FILE_EXPLICIT]START") && aurostd::substring2bool(AflowIn,"[ALIEN_INPUT_FILE_EXPLICIT]STOP"))
-          xalien.INPUT.str(aurostd::substring2string(FileAFLOWIN,"[ALIEN_INPUT_FILE_EXPLICIT]START","[ALIEN_INPUT_FILE_EXPLICIT]STOP",0,false,true));
+        xalien.INPUT.str(aurostd::substring2string(FileAFLOWIN,"[ALIEN_INPUT_FILE_EXPLICIT]START","[ALIEN_INPUT_FILE_EXPLICIT]STOP",0,false,true));
+        //[SD20220520 - OBSOLETE]if(aurostd::substring2bool(AflowIn,"[ALIEN_INPUT_FILE_EXPLICIT]START") && aurostd::substring2bool(AflowIn,"[ALIEN_INPUT_FILE_EXPLICIT]STOP"))
           //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xalien.INPUT,"[ALIEN_INPUT_FILE_EXPLICIT]START","[ALIEN_INPUT_FILE_EXPLICIT]STOP");
         // DO SOME LOADING
         // DEBUG  xalien.str=xstructure(xalien.INPUT,IOALIEN);   // load structure
