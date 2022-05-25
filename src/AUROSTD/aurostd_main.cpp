@@ -5996,15 +5996,13 @@ namespace aurostd {
         }
       }
     }
-    if(vstop.size()>0) {
-      if(vstop.size()!=vstart.size()) vstart.pop_back(); // remove unfinished start
-        for(uint i=0;i<vstart.size();i++) {
-          for(uint j=vstart[i];j<=vstop[i];j++) strstream << tokens[j] << endl;
-        }
-      if(LDEBUG) {cerr << "strstream.str()= " << endl << strstream.str() << endl;}
-      return strstream.str();
+    if(vstop.empty()) {return "";}
+    if(vstop.size()!=vstart.size()) {vstart.pop_back();} // remove unfinished start
+    for(uint i=0;i<vstart.size();i++) {
+      for(uint j=vstart[i];j<=vstop[i];j++) {strstream << tokens[j] << endl;}
     }
-    return "";
+    if(LDEBUG) {cerr << "strstream.str()= " << endl << strstream.str() << endl;}
+    return strstream.str();
   }
   string substring2string(const string& input,const string& strsub1,const string& strsub2,bool RemoveWS,bool RemoveComments) {return substring2string(input,strsub1,strsub2,1,RemoveWS,RemoveComments);}
 
@@ -6121,7 +6119,7 @@ namespace aurostd {
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input.rdbuf() << "\"], [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;}
     string strline="",_keyword="";
-    string::size_type idx;
+    string::size_type idx=0;
     while(getline(input,strline)) {
       if(RemoveWS) {strline=aurostd::RemoveWhiteSpaces(strline,'"');}
       if(RemoveComments) {strline=aurostd::RemoveComments(strline);}
@@ -6151,7 +6149,7 @@ namespace aurostd {
       vector<string> tokens;
       aurostd::string2tokens(_input,tokens,"\n");
       string strline="",_keyword="";
-      string::size_type idx;
+      string::size_type idx=0;
       for(uint i=0;i<tokens.size();i++) {
         strline=aurostd::RemoveComments(tokens[i]);
         idx=strline.find(delim);
@@ -6198,7 +6196,7 @@ namespace aurostd {
     string strline="",_keyword="";
     input.clear();input.seekg(0);
     vector<string> tokens;
-    string::size_type idx;
+    string::size_type idx=0;
     int iter=0;
     while(getline(input,strline) && (index==0 || iter!=index)) {
       if(RemoveWS) {strline=aurostd::RemoveWhiteSpaces(strline,'"');}
@@ -6240,7 +6238,7 @@ namespace aurostd {
     vector<string> tokens;
     aurostd::string2vectorstring(input,tokens);
     string _keyword="";
-    string::size_type idx;
+    string::size_type idx=0;
     int iter=0;
     if(index>0) {
       for(uint i=0;i<tokens.size();i++) {
