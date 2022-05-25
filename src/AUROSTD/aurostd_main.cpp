@@ -5796,6 +5796,18 @@ namespace aurostd {
   //Original substring2string always returned just the first entry
   //When two substrings are present substr1 is the start keyword and substr2 is the stop keyword
   string substring2string(ifstream& input,const string& strsub1,const int index,bool RemoveWS,bool RemoveComments) {
+    //substring2string and kvpair2value are similar but distinct
+    //substring2string will match any strsub1 and return everything AFTER strsub1
+    //kvpair2value will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return VALUE
+    //matching KEY exactly is useful, e.g.:
+    //_FILE_START_
+    //IALGO==48
+    //ALGO==FAST
+    //_FILE_END_
+    //strsub1="ALGO",index=1: substring2string will return "==48"
+    //keyword="ALGO,delim="==": kvpair2value will return "FAST"
+    //kvpair2value must match KEY exactly! skips the rest
+    //substring2string is good for aflow.in's which has no set delimiter style: [AFLOW_BIN_XZ] vs. [AFLOW_BIN=XZ] vs. [AFLOW_BIN]XZ vs. [AFLOW]BIN=XZ
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << "LDEBUG: " << __AFLOW_FUNC__ << endl;
     stringstream strstream;
@@ -5812,21 +5824,19 @@ namespace aurostd {
       }
     }
     input.clear();input.seekg(0);
-    if(tokens.size()>0) {
-      if(index==0) {
-        for(uint i=0;i<tokens.size();i++) {strstream << tokens[i] << endl;}
-      }
-      else if(index>0) {
-        strstream << tokens[tokens.size()-1] << endl;
-      }
-      else if(index<0) {
-        uint i=(uint)aurostd::boundary_conditions_periodic(0,tokens.size()-1,index);
-        strstream << tokens[i] << endl;
-      }
-      if(LDEBUG) cerr << "strstream.str()= " << endl << strstream.str() << endl;
-      return strstream.str();
+    if(tokens.size()==0) {return "";}
+    if(index==0) {
+      for(uint i=0;i<tokens.size();i++) {strstream << tokens[i] << endl;}
     }
-    return "";
+    else if(index>0) {
+      strstream << tokens[tokens.size()-1];
+    }
+    else if(index<0) {
+      uint i=(uint)aurostd::boundary_conditions_periodic(0,tokens.size()-1,index);
+      strstream << tokens[i];
+    }
+    if(LDEBUG) cerr << "strstream.str()= " << endl << strstream.str() << endl;
+    return strstream.str();
   }
   string substring2string(ifstream& input,const string& strsub1,bool RemoveWS,bool RemoveComments) {return substring2string(input,strsub1,1,RemoveWS,RemoveComments);}
   
@@ -5837,6 +5847,7 @@ namespace aurostd {
     stringstream strstream;
     string input=_input;
     if(RemoveWS) {input=aurostd::RemoveWhiteSpaces(_input,'"');}
+    if(input.find(strsub1)==string::npos) {return "";}
     vector<string> tokens;
     aurostd::string2vectorstring(input,tokens);
     int iter=0;
@@ -5845,7 +5856,7 @@ namespace aurostd {
         if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
         if(tokens[i].find(strsub1)!=string::npos) {
           iter++;
-          if(index==iter) {strstream << tokens[i].substr(tokens[i].find(strsub1)+strsub1.length()) << endl;break;}
+          if(index==iter) {strstream << tokens[i].substr(tokens[i].find(strsub1)+strsub1.length());break;}
         }
       }
       if(LDEBUG) cerr << "strstream.str()= " << endl << strstream.str() << endl;
@@ -5856,13 +5867,13 @@ namespace aurostd {
         if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
         if(tokens[i].find(strsub1)!=string::npos) {
           iter--;
-          if(index==iter) {strstream << tokens[i].substr(tokens[i].find(strsub1)+strsub1.length()) << endl;break;}
+          if(index==iter) {strstream << tokens[i].substr(tokens[i].find(strsub1)+strsub1.length());break;}
         }
       }
       if(LDEBUG) cerr << "strstream.str()= " << endl << strstream.str() << endl;
       return strstream.str();
     }
-    else {
+    else { //index==0
       for(uint i=0;i<tokens.size();i++) {
         if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
         if(tokens[i].find(strsub1)!=string::npos) {
@@ -5909,21 +5920,19 @@ namespace aurostd {
       }
     }
     input.clear();input.seekg(0);
-    if(tokens.size()>0) {
-      if(index==0) {
-        for(uint i=0;i<tokens.size();i++) {strstream << tokens[i] << endl;}
-      }
-      else if(index>0) {
-        strstream << tokens[tokens.size()-1] << endl;
-      }
-      else if(index<0) {
-        uint i=(uint)aurostd::boundary_conditions_periodic(0,tokens.size()-1,index);
-        strstream << tokens[i] << endl;
-      }
-      if(LDEBUG) cerr << "strstream.str()= " << endl << strstream.str() << endl;
-      return strstream.str();
+    if(tokens.size()==0) {return "";}
+    if(index==0) {
+      for(uint i=0;i<tokens.size();i++) {strstream << tokens[i] << endl;}
     }
-    return "";
+    else if(index>0) {
+      strstream << tokens[tokens.size()-1];
+    }
+    else if(index<0) {
+      uint i=(uint)aurostd::boundary_conditions_periodic(0,tokens.size()-1,index);
+      strstream << tokens[i];
+    }
+    if(LDEBUG) cerr << "strstream.str()= " << endl << strstream.str() << endl;
+    return strstream.str();
   }
   string substring2string(ifstream& input,const string& strsub1,const string& strsub2,bool RemoveWS,bool RemoveComments) {return substring2string(input,strsub1,strsub2,1,RemoveWS,RemoveComments);}
 
@@ -5933,6 +5942,7 @@ namespace aurostd {
     stringstream strstream;
     string input=_input;
     if(RemoveWS) {input=aurostd::RemoveWhiteSpaces(_input,'"');}
+    if(input.find(strsub1)==string::npos || input.find(strsub2)==string::npos) {return "";}
     vector<string> tokens;
     vector<uint> vstart, vstop;
     aurostd::string2vectorstring(input,tokens);
@@ -5966,7 +5976,7 @@ namespace aurostd {
         }
       }
     }
-    else {
+    else { //index==0
       for(uint i=0;i<tokens.size();i++) {
         if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
         if(tokens[i].find(strsub2)!=string::npos) {
@@ -6094,23 +6104,23 @@ namespace aurostd {
     //kvpairfound will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return true
     //matching KEY exactly is useful, e.g.:
     //_FILE_START_
-    //IALGO=48
+    //IALGO==48
     //_FILE_END_
     //strsub1="ALGO": substring2bool will return true
-    //keyword="ALGO,delim="=": kvpairfound will return false
+    //keyword="ALGO,delim="==": kvpairfound will return false
     //kvpairfound must match KEY exactly! skips the rest
     //substring2bool is good for aflow.in's which has no set delimiter style: [AFLOW_BIN_XZ] vs. [AFLOW_BIN=XZ] vs. [AFLOW_BIN]XZ vs. [AFLOW]BIN=XZ
     bool LDEBUG=FALSE;//TRUE;
     if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
     if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): [input=\"" << input.rdbuf() << "\"], [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;
     string strline="",_keyword="";
-    string::size_type idxS1;
+    string::size_type idx;
     while(getline(input,strline)) {
       if(RemoveWS) {strline=aurostd::RemoveWhiteSpaces(strline,'"');}
       if(RemoveComments) {strline=aurostd::RemoveComments(strline);}
-      idxS1=strline.find(delim);
-      if(idxS1!=string::npos){
-        _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(0,idxS1));
+      idx=strline.find(delim);
+      if(idx!=string::npos){
+        _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(0,idx));
         if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): _keyword=\"" << _keyword << "\"" << endl;
         if(_keyword==keyword){
           if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=\"" << keyword << "\" found] [RemoveWS=" << RemoveWS << "]" << endl;
@@ -6123,17 +6133,6 @@ namespace aurostd {
   }
 
   bool kvpairfound(const string& input,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315
-    //substring2bool and kvpairfound are similar but distinct
-    //substring2bool will match any strsub1 and return true
-    //kvpairfound will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return true
-    //matching KEY exactly is useful, e.g.:
-    //_FILE_START_
-    //IALGO=48
-    //_FILE_END_
-    //strsub1="ALGO": substring2bool will return true
-    //keyword="ALGO,delim="=": kvpairfound will return false
-    //kvpairfound must match KEY exactly! skips the rest
-    //substring2bool is good for aflow.in's which has no set delimiter style: [AFLOW_BIN_XZ] vs. [AFLOW_BIN=XZ] vs. [AFLOW_BIN]XZ vs. [AFLOW]BIN=XZ
     bool LDEBUG=FALSE;//TRUE;
     if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
     string _input(input);
@@ -6145,12 +6144,12 @@ namespace aurostd {
       vector<string> tokens;
       aurostd::string2tokens(_input,tokens,"\n");
       string strline="",_keyword="";
-      string::size_type idxS1;
+      string::size_type idx;
       for(uint i=0;i<tokens.size();i++) {
         strline=aurostd::RemoveComments(tokens[i]);
-        idxS1=strline.find(delim);
-        if(idxS1!=string::npos){
-          _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(0,idxS1));
+        idx=strline.find(delim);
+        if(idx!=string::npos){
+          _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(0,idx));
           if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): _keyword=\"" << _keyword << "\"" << endl;
           if(_keyword==keyword){
             if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=\"" << keyword << "\" found] [RemoveWS=" << RemoveWS << "]" << endl;
@@ -6173,6 +6172,18 @@ namespace aurostd {
   //n==0 returns all entries, starts counting from 1, negative numbers go backwards
   //Original kvpair2value always returned just the first entry
   string kvpair2value(ifstream& input,const string& keyword,const string& delim,const int index,bool RemoveWS,bool RemoveComments) {
+    //substring2string and kvpair2value are similar but distinct
+    //substring2string will match any strsub1 and return everything AFTER strsub1
+    //kvpair2value will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return VALUE
+    //matching KEY exactly is useful, e.g.:
+    //_FILE_START_
+    //IALGO==48
+    //ALGO==FAST
+    //_FILE_END_
+    //strsub1="ALGO",index=1: substring2string will return "==48"
+    //keyword="ALGO,delim="==": kvpair2value will return "FAST"
+    //kvpair2value must match KEY exactly! skips the rest
+    //substring2string is good for aflow.in's which has no set delimiter style: [AFLOW_BIN_XZ] vs. [AFLOW_BIN=XZ] vs. [AFLOW_BIN]XZ vs. [AFLOW]BIN=XZ
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << "LDEBUG: " << __AFLOW_FUNC__ << endl;
     stringstream strstream;
@@ -6194,21 +6205,19 @@ namespace aurostd {
       }
     }
     input.clear();input.seekg(0);
-    if(tokens.size()>0) {
-      if(index==0) {
-        for(uint i=0;i<tokens.size();i++) {strstream << tokens[i] << endl;}
-      }
-      else if(index>0) {
-        strstream << tokens[tokens.size()-1] << endl;
-      }
-      else if(index<0) {
-        uint i=(uint)aurostd::boundary_conditions_periodic(0,tokens.size()-1,index);
-        strstream << tokens[i] << endl;
-      }
-      if(LDEBUG) cerr << "strstream.str()= " << endl << strstream.str() << endl;
-      return strstream.str();
+    if(tokens.size()==0) {return "";}
+    if(index==0) {
+      for(uint i=0;i<tokens.size();i++) {strstream << tokens[i] << endl;}
     }
-    return "";
+    else if(index>0) {
+      strstream << tokens[tokens.size()-1];
+    }
+    else if(index<0) {
+      uint i=(uint)aurostd::boundary_conditions_periodic(0,tokens.size()-1,index);
+      strstream << tokens[i];
+    }
+    if(LDEBUG) cerr << "strstream.str()= " << endl << strstream.str() << endl;
+    return strstream.str();
   }
   string kvpair2value(ifstream& input,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) {return kvpair2value(input,keyword,delim,1,RemoveWS,RemoveComments);}
 
@@ -6218,6 +6227,7 @@ namespace aurostd {
     stringstream strstream;
     string input=_input;
     if(RemoveWS) {input=aurostd::RemoveWhiteSpaces(_input,'"');}
+    if(input.find(delim)==string::npos || input.find(keyword)==string::npos) {return "";}
     vector<string> tokens;
     aurostd::string2vectorstring(input,tokens);
     string _keyword="";
@@ -6231,7 +6241,7 @@ namespace aurostd {
           _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[i].substr(0,idx));
           if(_keyword==keyword) {
             iter++;
-            if(index==iter) {strstream << aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[i].substr(idx+delim.length())) << endl;break;}
+            if(index==iter) {strstream << aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[i].substr(idx+delim.length()));break;}
           }
         }
       }
@@ -6246,14 +6256,14 @@ namespace aurostd {
           _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[i].substr(0,idx));
           if(_keyword==keyword) {
             iter--;
-            if(index==iter) {strstream << aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[i].substr(idx+delim.length())) << endl;break;}
+            if(index==iter) {strstream << aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[i].substr(idx+delim.length()));break;}
           }
         }
       }
       if(LDEBUG) cerr << "strstream.str()= " << endl << strstream.str() << endl;
       return strstream.str();
     }
-    else {
+    else { //index==0
       for(uint i=0;i<tokens.size();i++) {
         if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
         idx=tokens[i].find(delim);
