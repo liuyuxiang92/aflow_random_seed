@@ -8091,7 +8091,7 @@ namespace KBIN {
 
   xstructure ExtractPOSCARXStructureFromDirectory(const string& directory, const int iomode, const int index) {
     string function_name = "KBIN::ExtractPOSCARXStructureFromDirectory():";
-    string AflowIn;
+    string AflowIn = "";
     if(!aurostd::file2string(directory + "/" + _AFLOWIN_, AflowIn)) { 
       string message = "Could not find " + _AFLOWIN_ + " in " + directory;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_NOT_FOUND_);
