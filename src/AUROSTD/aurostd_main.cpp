@@ -5234,27 +5234,30 @@ namespace aurostd {
     return (utype) stream2stream<utype>(from,AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);
   }
 
+  string string2string(const string& from) {return from;}
+
   template<typename utype> vector<utype> vectorstring2vectorutype(const vector<string>& from) { //SD20220520
     vector<utype> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<utype>(from[i]));return vout;
   }
-
-  vector<double> vectorstring2vectordouble(const vector<string>& from) {  //CO20210315 - cleaned up
-    vector<double> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<double>(from[i]));return vout;
+  template<typename utype> vector<utype> vectorstring2vectorutype(const deque<string>& from) { //SD20220520
+    vector<utype> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<utype>(from[i]));return vout;
   }
 
-  string string2string(const string& from) {return from;}
+  //[SD20220525 - OBSOLETE]vector<double> vectorstring2vectordouble(const vector<string>& from) {  //CO20210315 - cleaned up
+  //[SD20220525 - OBSOLETE]  vector<double> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<double>(from[i]));return vout;
+  //[SD20220525 - OBSOLETE]}
 
-  vector<int> vectorstring2vectorint(const vector<string>& from) {  //CO20210315 - cleaned up
-    vector<int> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<int>(from[i]));return vout;
-  }
+  //[SD20220525 - OBSOLETE]vector<int> vectorstring2vectorint(const vector<string>& from) {  //CO20210315 - cleaned up
+  //[SD20220525 - OBSOLETE]  vector<int> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<int>(from[i]));return vout;
+  //[SD20220525 - OBSOLETE]}
 
-  vector<uint> vectorstring2vectoruint(const vector<string>& from) { //CO20210315 - cleaned up
-    vector<uint> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<uint>(from[i]));return vout;
-  }
+  //[SD20220525 - OBSOLETE]vector<uint> vectorstring2vectoruint(const vector<string>& from) { //CO20210315 - cleaned up
+  //[SD20220525 - OBSOLETE]  vector<uint> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<uint>(from[i]));return vout;
+  //[SD20220525 - OBSOLETE]}
 
-  vector<float> vectorstring2vectorfloat(const vector<string>& from) { //CO20210315 - cleaned up
-    vector<float> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<float>(from[i]));return vout;
-  }
+  //[SD20220525 - OBSOLETE]vector<float> vectorstring2vectorfloat(const vector<string>& from) { //CO20210315 - cleaned up
+  //[SD20220525 - OBSOLETE]  vector<float> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<float>(from[i]));return vout;
+  //[SD20220525 - OBSOLETE]}
 
   string vectorstring2string(const vector<string>& vstrings) {
     string out="";
@@ -5845,11 +5848,11 @@ namespace aurostd {
   string substring2string(const string& _input,const string& strsub1,const int index,bool RemoveWS,bool RemoveComments) {
     bool LDEBUG=FALSE;
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [substring=\"" << strsub1 << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
-    stringstream strstream;
     string input=_input;
     if(RemoveWS) {input=aurostd::RemoveWhiteSpaces(_input,'"');}
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input << "\"], [substring=\"" << strsub1 << "\"]" << endl;}
     if(input.find(strsub1)==string::npos) {return "";}
+    stringstream strstream;
     vector<string> tokens;
     aurostd::string2vectorstring(input,tokens);
     int iter=0;
@@ -5942,11 +5945,11 @@ namespace aurostd {
   string substring2string(const string& _input,const string& strsub1,const string& strsub2,const int index,bool RemoveWS,bool RemoveComments) {
     bool LDEBUG=FALSE;
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
-    stringstream strstream;
     string input=_input;
     if(RemoveWS) {input=aurostd::RemoveWhiteSpaces(_input,'"');}
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input << "\"], [substring=\"" << strsub1 << "\"], [substring=\"" << strsub2 << "\"]" << endl;}
     if(input.find(strsub1)==string::npos || input.find(strsub2)==string::npos) {return "";}
+    stringstream strstream;
     vector<string> tokens;
     vector<uint> vstart, vstop;
     aurostd::string2vectorstring(input,tokens);
@@ -6229,11 +6232,11 @@ namespace aurostd {
   string kvpair2value(const string& _input,const string& keyword,const string& delim,const int index,bool RemoveWS,bool RemoveComments) {
     bool LDEBUG=FALSE;
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
-    stringstream strstream;
     string input=_input;
     if(RemoveWS) {input=aurostd::RemoveWhiteSpaces(_input,'"');}
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input << "\"], [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;}
     if(input.find(delim)==string::npos || input.find(keyword)==string::npos) {return "";}
+    stringstream strstream;
     vector<string> tokens;
     aurostd::string2vectorstring(input,tokens);
     string _keyword="";

@@ -100,16 +100,16 @@ namespace aflowlib {
     aurostd::string2tokens(TokenExtractAFLOWLIB(line,query),value,",");return TokenPresentAFLOWLIB(line,query); }
   bool TokenExtractAFLOWLIB(string line,string query,vector<int> &value) {
     // cerr << XPID << "HERE=[TokenExtractAFLOWLIB(string line,string query,vector<int> &value)]" << TokenExtractAFLOWLIB(line,query) << "<br>" << endl;
-    vector<string> vvalue;aurostd::string2tokens(TokenExtractAFLOWLIB(line,query),vvalue,",");value=aurostd::vectorstring2vectorint(vvalue);return TokenPresentAFLOWLIB(line,query); }
+    vector<string> vvalue;aurostd::string2tokens(TokenExtractAFLOWLIB(line,query),vvalue,",");value=aurostd::vectorstring2vectorutype<int>(vvalue);return TokenPresentAFLOWLIB(line,query); }
   bool TokenExtractAFLOWLIB(string line,string query,vector<uint> &value) {
     // cerr << XPID << "HERE=[TokenExtractAFLOWLIB(string line,string query,vector<uint> &value)]" << TokenExtractAFLOWLIB(line,query) << "<br>" << endl;
-    vector<string> vvalue;aurostd::string2tokens(TokenExtractAFLOWLIB(line,query),vvalue,",");value=aurostd::vectorstring2vectoruint(vvalue);return TokenPresentAFLOWLIB(line,query); }
+    vector<string> vvalue;aurostd::string2tokens(TokenExtractAFLOWLIB(line,query),vvalue,",");value=aurostd::vectorstring2vectorutype<uint>(vvalue);return TokenPresentAFLOWLIB(line,query); }
   bool TokenExtractAFLOWLIB(string line,string query,vector<float> &value) {
     // cerr << XPID << "HERE=[TokenExtractAFLOWLIB(string line,string query,vector<float> &value)]" << TokenExtractAFLOWLIB(line,query) << "<br>" << endl;
-    vector<string> vvalue;aurostd::string2tokens(TokenExtractAFLOWLIB(line,query),vvalue,",");value=aurostd::vectorstring2vectorfloat(vvalue);return TokenPresentAFLOWLIB(line,query); }
+    vector<string> vvalue;aurostd::string2tokens(TokenExtractAFLOWLIB(line,query),vvalue,",");value=aurostd::vectorstring2vectorutype<float>(vvalue);return TokenPresentAFLOWLIB(line,query); }
   bool TokenExtractAFLOWLIB(string line,string query,vector<double> &value) {
     // cerr << XPID << "HERE=[TokenExtractAFLOWLIB(string line,string query,vector<double> &value)]" << TokenExtractAFLOWLIB(line,query) << "<br>" << endl;
-    vector<string> vvalue;aurostd::string2tokens(TokenExtractAFLOWLIB(line,query),vvalue,",");value=aurostd::vectorstring2vectordouble(vvalue);return TokenPresentAFLOWLIB(line,query); }
+    vector<string> vvalue;aurostd::string2tokens(TokenExtractAFLOWLIB(line,query),vvalue,",");value=aurostd::vectorstring2vectorutype<double>(vvalue);return TokenPresentAFLOWLIB(line,query); }
 }
 
 // ******************************************************************************************************************************************************
