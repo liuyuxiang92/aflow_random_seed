@@ -3297,8 +3297,8 @@ namespace KBIN {
   void XVASP_INCAR_LDAU_ADIABATIC(_xvasp& xvasp,int step);
   void XVASP_INCAR_LDAU_CUTOFF(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_KPOINTS_Dielectric_SET(_xvasp& xvasp,_kflags &kflags,_vflags& vflags,string mode_dielectric);
-  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& entry,const string& COMMENT,bool VERBOSE);  //CO20200624 - using aurostd::kvpairfound() now
-  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& entries,const string& COMMENT,bool VERBOSE);  //CO20200624 - using aurostd::kvpairfound() now
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& entry,const string& COMMENT,bool VERBOSE);  //CO20200624 - using aurostd::kvpair2bool() now
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& entries,const string& COMMENT,bool VERBOSE);  //CO20200624 - using aurostd::kvpair2bool() now
 
   bool AFLOWIN_REMOVE(const string& aflowin_file,const string& keyword,const string& comment); //CO20210314
   bool AFLOWIN_REMOVE(const string& aflowin_file,const vector<string>& vkeywords,const string& comment); //CO20210314

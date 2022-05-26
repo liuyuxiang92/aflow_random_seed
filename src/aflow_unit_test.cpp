@@ -390,13 +390,31 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
   check_equal(aurostd::substring2string(test_string,"ALGO",3), expected_string, check_function, check_description, passed_checks, results);
 
   // ---------------------------------------------------------------------------
-  // Check | kvpair2value //SD20220525
+  // Check | kvpair2string //SD20220525
   // ---------------------------------------------------------------------------
-  check_function = "aurostd::kvpair2value()";
+  check_function = "aurostd::kvpair2string()";
   check_description = "return the second match of the kvpair";
   expected_string = "MEDIUM";
 
-  check_equal(aurostd::kvpair2value(test_string,"ALGO","==",2), expected_string, check_function, check_description, passed_checks, results);
+  check_equal(aurostd::kvpair2string(test_string,"ALGO","==",2), expected_string, check_function, check_description, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | substring2string //SD20220525
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::substring2string()";
+  check_description = "return the last match of the substring";
+  expected_string = "==SLOW";
+
+  check_equal(aurostd::substring2string(test_string,"ALGO",-1), expected_string, check_function, check_description, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | kvpair2string //SD20220525
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::kvpair2string()";
+  check_description = "return the last match of the kvpair";
+  expected_string = "SLOW";
+
+  check_equal(aurostd::kvpair2string(test_string,"ALGO","==",-1), expected_string, check_function, check_description, passed_checks, results);
 
   // present overall result
   return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);

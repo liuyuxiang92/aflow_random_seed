@@ -161,9 +161,9 @@ namespace pflow {
       stringstream iafile;
       iafile.clear(); iafile.str(std::string());
       aurostd::file2stringstream(_AFLOWIN_, iafile);    
-      //[SD20220520 - OBSOLETE]if(aurostd::substring2bool(iafile.str(),_VASP_POSCAR_MODE_EXPLICIT_START_) && aurostd::substring2bool(iafile.str(),_VASP_POSCAR_MODE_EXPLICIT_STOP_)) {
+      //[SD20220520 - OBSOLETE]if(aurostd::substring2bool(iafile.str(),_VASP_POSCAR_MODE_EXPLICIT_START_) && aurostd::substring2bool(iafile.str(),_VASP_POSCAR_MODE_EXPLICIT_STOP_))
       stringstream POSCAR;
-      POSCAR.str(aurostd::substring2string(iafile.str(),_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_,0,false,true));
+      POSCAR.str(aurostd::substrings2string(iafile.str(),_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_,0));
       if(!POSCAR.str().empty()) {
         //[SD20220520 - OBSOLETE]POSCAR.clear();   POSCAR.str(std::string());
         //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(iafile.str(),POSCAR,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_);

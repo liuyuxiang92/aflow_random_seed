@@ -26,7 +26,7 @@ namespace ALIEN {
           aurostd::substring2string(AflowIn,"[ALIEN_COMMAND]",FALSE);
     } else {
       alienflags.KBIN_ALIEN_COMMAND_BINARY_FLAG = FALSE;
-      alienflags.KBIN_ALIEN_COMMAND_BINARY_VALUE=aurostd::substring2string(AflowIn,"[ALIEN_COMMAND]START","[ALIEN_COMMAND]STOP",0,false,true);
+      alienflags.KBIN_ALIEN_COMMAND_BINARY_VALUE=aurostd::substring2string(AflowIn,"[ALIEN_COMMAND]START","[ALIEN_COMMAND]STOP",0);
       //[SD20220520 - OBSOLETE]aurostd::ExtractToStringEXPLICIT(AflowIn,alienflags.KBIN_ALIEN_COMMAND_BINARY_VALUE,"[ALIEN_COMMAND]START","[ALIEN_COMMAND]STOP");
     }
     // HOW TO RUN

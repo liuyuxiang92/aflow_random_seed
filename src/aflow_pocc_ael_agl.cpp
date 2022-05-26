@@ -157,7 +157,7 @@ namespace pocc {
         _AFLOWLOCK_=_AFLOWLOCK_orig;
       }
       if(aurostd::EFileExist(pocc_directory_abs+"/aflow.ael.out")) {
-        aflow_ael_out.str(aurostd::substring2string(aurostd::efile2string(pocc_directory_abs+"/"+"aflow.ael.out"),"[AEL_RESULTS]START","[AEL_RESULTS]STOP",0,false,true));
+        aflow_ael_out.str(aurostd::substring2string(aurostd::efile2string(pocc_directory_abs+"/"+"aflow.ael.out"),"[AEL_RESULTS]START","[AEL_RESULTS]STOP",0));
         //[SD20220520 - OBSOLETE]aurostd::StringstreamClean(aflow_ael_out);
         //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(pocc_directory_abs+"/"+"aflow.ael.out"),aflow_ael_out,"[AEL_RESULTS]START","[AEL_RESULTS]STOP");
         if(LDEBUG) {
@@ -177,7 +177,7 @@ namespace pocc {
             if(tokens.at(0)=="ael_shear_modulus_vrh") ael_shear_modulus_vrh=aurostd::string2utype<double>(tokens.at(1));
           }
         }
-        aflow_elastic_tensor.str(aurostd::substring2string(aurostd::efile2string(ael_filename),"[AEL_STIFFNESS_TENSOR]START","[AEL_STIFFNESS_TENSOR]STOP",0,false,true));
+        aflow_elastic_tensor.str(aurostd::substring2string(aurostd::efile2string(ael_filename),"[AEL_STIFFNESS_TENSOR]START","[AEL_STIFFNESS_TENSOR]STOP",0));
         //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(ael_filename),aflow_elastic_tensor,"[AEL_STIFFNESS_TENSOR]START","[AEL_STIFFNESS_TENSOR]STOP");
         if(LDEBUG) {
           //aurostd::StringstreamClean(aus);
@@ -196,7 +196,7 @@ namespace pocc {
             elastic_tensor.push_back(elastic_const_row);
           }
         }
-        aflow_compliance_tensor.str(aurostd::substring2string(aurostd::efile2string(ael_filename),"[AEL_COMPLIANCE_TENSOR]START","[AEL_COMPLIANCE_TENSOR]STOP",0,false,true));
+        aflow_compliance_tensor.str(aurostd::substring2string(aurostd::efile2string(ael_filename),"[AEL_COMPLIANCE_TENSOR]START","[AEL_COMPLIANCE_TENSOR]STOP",0));
         //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(ael_filename),aflow_compliance_tensor,"[AEL_COMPLIANCE_TENSOR]START","[AEL_COMPLIANCE_TENSOR]STOP");
         if(LDEBUG) {
           //aurostd::StringstreamClean(aus);
@@ -280,7 +280,7 @@ namespace pocc {
       // if(!aurostd::EFileExist(ael_filename,ael_filename)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No aflow.ael.out file found [dir="+pocc_directory_abs+"]",_FILE_NOT_FOUND_);}
       if(aurostd::EFileExist(ael_filename,ael_filename)){
         message << "Reading " << m_ARUN_directories[isupercell]+"/aflow.ael.out";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200404
-        aflow_ael_out.str(aurostd::substring2string(aurostd::efile2string(ael_filename),"[AEL_RESULTS]START","[AEL_RESULTS]STOP",0,false,true));
+        aflow_ael_out.str(aurostd::substring2string(aurostd::efile2string(ael_filename),"[AEL_RESULTS]START","[AEL_RESULTS]STOP",0));
         //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(ael_filename),aflow_ael_out,"[AEL_RESULTS]START","[AEL_RESULTS]STOP");
         aelfilezipped = true;
         //[CO20200404 - OBSOLETE]} else if (aurostd::FileExist(ael_filename))
@@ -309,10 +309,10 @@ namespace pocc {
       }
     }
     if (aelfilezipped) {
-      aflow_elastic_tensor.str(aurostd::substring2string(aurostd::efile2string(ael_filename),"[AEL_STIFFNESS_TENSOR]START","[AEL_STIFFNESS_TENSOR]STOP",0,false,true));
+      aflow_elastic_tensor.str(aurostd::substring2string(aurostd::efile2string(ael_filename),"[AEL_STIFFNESS_TENSOR]START","[AEL_STIFFNESS_TENSOR]STOP",0));
       //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(ael_filename),aflow_elastic_tensor,"[AEL_STIFFNESS_TENSOR]START","[AEL_STIFFNESS_TENSOR]STOP");
     } else {
-      aflow_elastic_tensor.str(aurostd::substring2string(aurostd::file2string(ael_filename),"[AEL_STIFFNESS_TENSOR]START","[AEL_STIFFNESS_TENSOR]STOP",0,false,true));
+      aflow_elastic_tensor.str(aurostd::substring2string(aurostd::file2string(ael_filename),"[AEL_STIFFNESS_TENSOR]START","[AEL_STIFFNESS_TENSOR]STOP",0));
       //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::file2string(ael_filename),aflow_elastic_tensor,"[AEL_STIFFNESS_TENSOR]START","[AEL_STIFFNESS_TENSOR]STOP");
     }
     if(LDEBUG) {
@@ -333,10 +333,10 @@ namespace pocc {
       }
     }
     if (aelfilezipped) {
-      aflow_compliance_tensor.str(aurostd::substring2string(aurostd::efile2string(ael_filename),"[AEL_COMPLIANCE_TENSOR]START","[AEL_COMPLIANCE_TENSOR]STOP",0,false,true));
+      aflow_compliance_tensor.str(aurostd::substring2string(aurostd::efile2string(ael_filename),"[AEL_COMPLIANCE_TENSOR]START","[AEL_COMPLIANCE_TENSOR]STOP",0));
       //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(ael_filename),aflow_compliance_tensor,"[AEL_COMPLIANCE_TENSOR]START","[AEL_COMPLIANCE_TENSOR]STOP");
     } else {
-      aflow_compliance_tensor.str(aurostd::substring2string(aurostd::file2string(ael_filename),"[AEL_COMPLIANCE_TENSOR]START","[AEL_COMPLIANCE_TENSOR]STOP",0,false,true));
+      aflow_compliance_tensor.str(aurostd::substring2string(aurostd::file2string(ael_filename),"[AEL_COMPLIANCE_TENSOR]START","[AEL_COMPLIANCE_TENSOR]STOP",0));
       //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::file2string(ael_filename),aflow_compliance_tensor,"[AEL_COMPLIANCE_TENSOR]START","[AEL_COMPLIANCE_TENSOR]STOP");
     }
     if(LDEBUG) {
@@ -919,7 +919,7 @@ namespace pocc {
         _AFLOWLOCK_=_AFLOWLOCK_orig;
       }
       if(aurostd::EFileExist(pocc_directory_abs+"/aflow.agl.out")) {
-        aflow_agl_out.str(aurostd::substring2string(aurostd::efile2string(pocc_directory_abs+"/"+"aflow.agl.out"),"[AGL_RESULTS]START","[AGL_RESULTS]STOP",0,false,true));
+        aflow_agl_out.str(aurostd::substring2string(aurostd::efile2string(pocc_directory_abs+"/"+"aflow.agl.out"),"[AGL_RESULTS]START","[AGL_RESULTS]STOP",0));
         //[SD20220520 - OBSOLETE]aurostd::StringstreamClean(aflow_agl_out);
         //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(pocc_directory_abs+"/"+"aflow.agl.out"),aflow_agl_out,"[AGL_RESULTS]START","[AGL_RESULTS]STOP");
         if(LDEBUG) {
@@ -943,7 +943,7 @@ namespace pocc {
             if(tokens.at(0)=="agl_thermal_conductivity_300K") agl_thermal_conductivity_300K=aurostd::string2utype<double>(tokens.at(1));
           }
         }
-        aflow_agl_energies_out.str(aurostd::substring2string(aurostd::efile2string(pocc_directory_abs+"/"+"aflow.agl.out"),"[AGL_ENERGIES_TEMPERATURE]START","[AGL_ENERGIES_TEMPERATURE]STOP",0,false,true));
+        aflow_agl_energies_out.str(aurostd::substring2string(aurostd::efile2string(pocc_directory_abs+"/"+"aflow.agl.out"),"[AGL_ENERGIES_TEMPERATURE]START","[AGL_ENERGIES_TEMPERATURE]STOP",0));
         //[SD20220520 - OBSOLETE]aurostd::StringstreamClean(aflow_agl_energies_out);
         //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(pocc_directory_abs+"/"+"aflow.agl.out"),aflow_agl_energies_out,"[AGL_ENERGIES_TEMPERATURE]START","[AGL_ENERGIES_TEMPERATURE]STOP");
         if(LDEBUG) {
@@ -1025,7 +1025,7 @@ namespace pocc {
       agl_filename=pocc_directory_abs+"/aflow.agl.out";
       if(aurostd::EFileExist(agl_filename,agl_filename)){
         message << "Reading " << m_ARUN_directories[isupercell]+"/aflow.agl.out";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); //CO20200404
-        aflow_agl_out.str(aurostd::substring2string(aurostd::efile2string(agl_filename),"[AGL_RESULTS]START","[AGL_RESULTS]STOP",0,false,true));
+        aflow_agl_out.str(aurostd::substring2string(aurostd::efile2string(agl_filename),"[AGL_RESULTS]START","[AGL_RESULTS]STOP",0));
         //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(agl_filename),aflow_agl_out,"[AGL_RESULTS]START","[AGL_RESULTS]STOP");
         aglfilezipped = true;
         //[CO20200404 - OBSOLETE]} else if (aurostd::FileExist(agl_filename))
@@ -1057,10 +1057,10 @@ namespace pocc {
     }
     aurostd::StringstreamClean(aflow_agl_energies_out);
     if (aglfilezipped) {
-      aflow_agl_energies_out.str(aurostd::substring2string(aurostd::efile2string(agl_filename),"[AGL_ENERGIES_TEMPERATURE]START","[AGL_ENERGIES_TEMPERATURE]STOP",0,false,true));
+      aflow_agl_energies_out.str(aurostd::substring2string(aurostd::efile2string(agl_filename),"[AGL_ENERGIES_TEMPERATURE]START","[AGL_ENERGIES_TEMPERATURE]STOP",0));
       //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::efile2string(agl_filename),aflow_agl_energies_out,"[AGL_ENERGIES_TEMPERATURE]START","[AGL_ENERGIES_TEMPERATURE]STOP");
     } else {
-      aflow_agl_energies_out.str(aurostd::substring2string(aurostd::file2string(agl_filename),"[AGL_ENERGIES_TEMPERATURE]START","[AGL_ENERGIES_TEMPERATURE]STOP",0,false,true));
+      aflow_agl_energies_out.str(aurostd::substring2string(aurostd::file2string(agl_filename),"[AGL_ENERGIES_TEMPERATURE]START","[AGL_ENERGIES_TEMPERATURE]STOP",0));
       //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(aurostd::file2string(agl_filename),aflow_agl_energies_out,"[AGL_ENERGIES_TEMPERATURE]START","[AGL_ENERGIES_TEMPERATURE]STOP");
     }
     if(LDEBUG) {

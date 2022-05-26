@@ -1388,7 +1388,7 @@ namespace KBIN {
       if(vflags.KBIN_VASP_POSCAR_FILE.flag("KEYWORD") && !vflags.KBIN_VASP_POSCAR_MODE.flag("EXPLICIT_START_STOP") && !vflags.KBIN_VASP_POSCAR_MODE.flag("EXPLICIT_START_STOP_POINT")) {
         aus << "00000  MESSAGE POSCAR  generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-        xvasp.POSCAR.str(aurostd::substring2string(AflowIn,"[VASP_POSCAR_FILE]",0,false,true));
+        xvasp.POSCAR.str(aurostd::substring2string(AflowIn,"[VASP_POSCAR_FILE]",0));
         // [OBSOLETE]    aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xvasp.POSCAR,"[VASP_POSCAR_FILE]");
         //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn,xvasp.POSCAR,"[VASP_POSCAR_FILE]");
         xvasp.str=xstructure(xvasp.POSCAR,IOVASP_AUTO);  // load structure
@@ -1399,7 +1399,7 @@ namespace KBIN {
         aus << "00000  MESSAGE POSCAR  generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         // normal get ONE of ONE
-        xvasp.POSCAR.str(aurostd::substring2string(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_,-1,false,true));
+        xvasp.POSCAR.str(aurostd::substring2string(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_,-1));
         //[SD20220520 - OBSOLETE]if(vflags.KBIN_VASP_POSCAR_MODE.flag("EXPLICIT_START_STOP")) {
         //[SD20220520 - OBSOLETE]  if(aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_) &&
         //[SD20220520 - OBSOLETE]      aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_STOP_))
@@ -3206,7 +3206,7 @@ namespace KBIN {
     //this hack is required to be backwards-compatible with all ICSD aflow.in's in database
     //this is the ONLY exception for not overwriting a property, use the VASP_FORCE_OPTIONs otherwise
     //the only properties that should go in the [VASP_INCAR_MODE_EXPLICIT] section are those NOT overwritten by AUTOTUNE
-    bool nelm_patch=(aurostd::kvpairfound(FileContent,"NELM","=")==false);
+    bool nelm_patch=(aurostd::kvpair2bool(FileContent,"NELM","=")==false);
     //[CO20210315 - always patch, you might have NELM in INCAR section of aflow.in](vflags.KBIN_VASP_FORCE_OPTION_NELM_EQUAL.content_int!=AFLOWRC_DEFAULT_VASP_FORCE_OPTION_NELM); //CO20200624 - default for VASP is 60, don't add the line if unnecessary
 
     // RELAX_MODE=ENERGY mode
@@ -3870,9 +3870,9 @@ namespace KBIN {
   bool XVASP_INCAR_Read_MAGMOM(_xvasp& xvasp){  //CO20210315
     //needs support for LNONCOLLINEAR=.TRUE., add later
     //order_parameter_value should probably become double, not necessary for now
-    if(aurostd::kvpairfound(xvasp.INCAR,"LNONCOLLINEAR","=") && aurostd::kvpair2value(xvasp.INCAR,"LNONCOLLINEAR","=")==".TRUE."){return false;}
-    if(!aurostd::kvpairfound(xvasp.INCAR,"MAGMOM","=")){return false;}
-    string value=aurostd::kvpair2value(xvasp.INCAR,"MAGMOM","=");
+    if(aurostd::kvpair2bool(xvasp.INCAR,"LNONCOLLINEAR","=") && aurostd::kvpair2string(xvasp.INCAR,"LNONCOLLINEAR","=")==".TRUE."){return false;}
+    if(!aurostd::kvpair2bool(xvasp.INCAR,"MAGMOM","=")){return false;}
+    string value=aurostd::kvpair2string(xvasp.INCAR,"MAGMOM","=");
     vector<string> vtokens,vtokens2;
     vector<int> vmags;
     aurostd::string2tokens(value,vtokens," ");
@@ -3941,8 +3941,8 @@ namespace KBIN {
         else if(svalue=="DAMPED")   {incar_input=keyword+"=Damped";   incar_comment="a damped velocity friction algorithm (IALGO=53)";}
         else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"svalue="+svalue+" unknown (command="+command+")",_INPUT_ILLEGAL_);}
 
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -3966,8 +3966,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+aurostd::utype2string(dvalue,_IVASP_DOUBLE2STRING_PRECISION_);
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -3993,8 +3993,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+aurostd::utype2string(dvalue,_IVASP_DOUBLE2STRING_PRECISION_);
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4028,8 +4028,8 @@ namespace KBIN {
             incar_input+="0";
           }
         }
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"="); //add space 
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"="); //add space 
           if(incar_input==incar_input_old){Krun=false;}
         }
       }
@@ -4052,8 +4052,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+aurostd::utype2string(dvalue,_IVASP_DOUBLE2STRING_PRECISION_);
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4079,8 +4079,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+aurostd::utype2string(dvalue,_IVASP_DOUBLE2STRING_PRECISION_);
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4104,8 +4104,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+aurostd::utype2string(dvalue,_IVASP_DOUBLE2STRING_PRECISION_);
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4129,8 +4129,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+aurostd::utype2string(dvalue,_IVASP_DOUBLE2STRING_PRECISION_);
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4154,8 +4154,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+aurostd::utype2string(dvalue*xvasp.POTCAR_ENMAX,_IVASP_DOUBLE2STRING_PRECISION_);
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4179,8 +4179,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+aurostd::utype2string(ivalue);
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4209,8 +4209,8 @@ namespace KBIN {
         // Use negative values to just remove ICHARG
         if(ivalue>=0) {
           incar_input=keyword+"="+aurostd::utype2string(ivalue);
-          if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-            incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+          if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+            incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
             if(incar_input==incar_input_old){Krun=false;}
           }
           //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4233,8 +4233,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+aurostd::utype2string(ivalue);
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4259,8 +4259,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+aurostd::utype2string(ivalue);
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4294,8 +4294,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+(OPTION==ON?string(".TRUE."):string(".FALSE."));
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4319,8 +4319,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+(OPTION==ON?string(".TRUE."):string(".FALSE."));
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4344,8 +4344,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+(OPTION==ON?string(".TRUE."):string(".FALSE."));
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4370,8 +4370,8 @@ namespace KBIN {
       //do a check that we're not already doing the ls-coupling-type calculation, LSORBIT is a good enough check
       if(Krun){
         incar_input=keyword+"="+(OPTION==ON?".TRUE.":".FALSE.");
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
       }
@@ -4406,8 +4406,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+aurostd::utype2string(ivalue);
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4435,8 +4435,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+aurostd::utype2string(ivalue);
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4460,8 +4460,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+aurostd::utype2string(ivalue);
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4485,8 +4485,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+aurostd::utype2string(ivalue);
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4510,8 +4510,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+aurostd::utype2string(dvalue,_IVASP_DOUBLE2STRING_PRECISION_);
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4535,8 +4535,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+aurostd::utype2string(dvalue,_IVASP_DOUBLE2STRING_PRECISION_);
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4560,8 +4560,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+aurostd::utype2string(dvalue,_IVASP_DOUBLE2STRING_PRECISION_);
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4586,8 +4586,8 @@ namespace KBIN {
       //do a check that we're not already doing the spin-type calculation, ISPIN is a good enough check
       if(Krun){
         incar_input=keyword+"="+(OPTION==ON?"2":"1");
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
       }
@@ -4603,7 +4603,7 @@ namespace KBIN {
         }
         if(remove_magmom){XVASP_INCAR_REMOVE_ENTRY(xvasp,"MAGMOM",operation_option,VERBOSE);}  //CO20200624
         //otherwise, check if has already been specified (e.g., in INCAR section of _AFLOWIN_)
-        bool magmom_already_specified=aurostd::kvpairfound(xvasp.INCAR,"MAGMOM","=");  //CO20210315 - must use kvpairfound instead of substring2bool() since magmom values have spaces
+        bool magmom_already_specified=aurostd::kvpair2bool(xvasp.INCAR,"MAGMOM","=");  //CO20210315 - must use kvpair2bool instead of substring2bool() since magmom values have spaces
         //ADD LINES
         if(VERBOSE)  xvasp.INCAR << "# Performing " << operation_option << " [AFLOW] begin" << endl;
         xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << operation_option << endl;
@@ -4633,8 +4633,8 @@ namespace KBIN {
           if(vflags.KBIN_VASP_FORCE_OPTION_SPIN.isentry && vflags.KBIN_VASP_FORCE_OPTION_SPIN.option){incar_input=keyword+"=-1";incar_comment="SYMMETRY=OFF (MAGNETIC)";} //SPIN==ON
           else{incar_input=keyword+"=0";incar_comment="SYMMETRY=OFF";}  //SPIN==OFF
         }
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespaces
@@ -4658,8 +4658,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"=1E-7";  //no other value worth trying. hacking SYMPREC is a cheap way to avoid the error, it's better to get to more robust solutions
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //CO20210315 - remove whitespaces
@@ -4688,12 +4688,12 @@ namespace KBIN {
         else if(svalue=="SEMICONDUCTOR" || svalue=="INSULATOR") {incar_input=keyword+"=0";incar_input2=keyword2+"=0.05";incar_comment="for insulators/semiconductors";}
         else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"svalue="+svalue+" unknown (command="+command+")",_INPUT_ILLEGAL_);}
         bool Krun1=true,Krun2=true;
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun1=false;}
         }
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword2,"=")){
-          incar_input_old=keyword2+"="+aurostd::kvpair2value(xvasp.INCAR,keyword2,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword2,"=")){
+          incar_input_old=keyword2+"="+aurostd::kvpair2string(xvasp.INCAR,keyword2,"=");
           if(incar_input2==incar_input_old){Krun2=false;}
         }
         if(Krun1==false&&Krun2==false){Krun=false;}
@@ -4718,8 +4718,8 @@ namespace KBIN {
 
       if(Krun){
         incar_input=keyword+"="+(OPTION==ON?string(".TRUE."):string(".FALSE."));
-        if(aurostd::kvpairfound(xvasp.INCAR,keyword,"=")){
-          incar_input_old=keyword+"="+aurostd::kvpair2value(xvasp.INCAR,keyword,"=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,keyword,"=")){
+          incar_input_old=keyword+"="+aurostd::kvpair2string(xvasp.INCAR,keyword,"=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //CO20210315 - remove whitespaces
@@ -5339,7 +5339,7 @@ namespace KBIN {
       const string& strline=vlines[iline];
       found=false;
       for(i=0;i<vkeywords.size()&&!found;i++){
-        if(aurostd::kvpairfound(strline,vkeywords[i],"=")){found=true;}
+        if(aurostd::kvpair2bool(strline,vkeywords[i],"=")){found=true;}
       }
       if(found){
         if(VERBOSE){xvasp.INCAR << patch << strline << endl;}  //aurostd::PaddedPOST("# "+aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline),_incarpad_) << " # AFLOW REMOVED (" << function << ") " << comment << endl;
@@ -5398,7 +5398,7 @@ namespace KBIN {
     if(!comment.empty()){patch+=" ("+comment+")";}
     patch+="] ";
 
-    //vkeywords2ignore avoids matching ALGO and IAGO, AFLOW has no particular delimiter (kvpairfound)
+    //vkeywords2ignore avoids matching ALGO and IAGO, AFLOW has no particular delimiter (kvpair2bool)
 
     bool mod_made=false;
     bool found=false,found_ignore=false;
@@ -6028,18 +6028,18 @@ namespace KBIN {
       nbands=OUTCAR_NBANDS.NBANDS;
       nelectrons=OUTCAR_NBANDS.nelectrons;
     }
-    if(nbands==0 && aurostd::kvpairfound(xvasp.INCAR,"NBANDS","=")) {  // GET BANDS FROM INCAR //CO20210315 - the kvpairfound() is more robust than substring2bool
+    if(nbands==0 && aurostd::kvpair2bool(xvasp.INCAR,"NBANDS","=")) {  // GET BANDS FROM INCAR //CO20210315 - the kvpair2bool() is more robust than substring2bool
       if(LDEBUG) cerr << soliloquy << " GET NBANDS FROM INCAR" << endl;
       nbands=aurostd::kvpair2utype<int>(xvasp.INCAR,"NBANDS","=");  //CO20210315
       //no need to spit error, if it doesn't find NBANDS in INCAR, then use defaults (below)
     }
     //CO20210315 - get NPAR, as NBANDS will be set internally to something divisible by NPAR
     int npar=1;  //default in vasp in ncore, which is 1
-    if(aurostd::kvpairfound(xvasp.INCAR,"NPAR","=")) {
+    if(aurostd::kvpair2bool(xvasp.INCAR,"NPAR","=")) {
       if(LDEBUG) cerr << soliloquy << " GET NPAR FROM INCAR" << endl;
       npar=aurostd::kvpair2utype<int>(xvasp.INCAR,"NPAR","=");  //CO20210315
     }
-    else if(aurostd::kvpairfound(xvasp.INCAR,"NCORE","=")) {  //default is npar=ncore
+    else if(aurostd::kvpair2bool(xvasp.INCAR,"NCORE","=")) {  //default is npar=ncore
       if(LDEBUG) cerr << soliloquy << " GET NCORE FROM INCAR" << endl;
       npar=aurostd::kvpair2utype<int>(xvasp.INCAR,"NCORE","=");  //CO20210315
     }
@@ -6106,7 +6106,7 @@ namespace KBIN {
       xOUTCAR OUTCAR_POTIM(xvasp.Directory+"/OUTCAR",true);  //quiet, there might be issues with halfway-written OUTCARs
       potim=OUTCAR_POTIM.POTIM;
     }
-    if(aurostd::isequal(potim,0.0) && aurostd::kvpairfound(xvasp.INCAR,"POTIM","=")) {  // GET POTIM FROM INCAR  //CO20210315 - the kvpairfound() is more robust than substring2bool
+    if(aurostd::isequal(potim,0.0) && aurostd::kvpair2bool(xvasp.INCAR,"POTIM","=")) {  // GET POTIM FROM INCAR  //CO20210315 - the kvpair2bool() is more robust than substring2bool
       if(LDEBUG) cerr << soliloquy << " GET POTIM FROM INCAR" << endl;
       potim=aurostd::kvpair2utype<double>(xvasp.INCAR,"POTIM","="); //CO20210315
     }
@@ -6152,7 +6152,7 @@ namespace KBIN {
       xOUTCAR OUTCAR_NELM(xvasp.Directory+"/OUTCAR",true); //quiet, there might be issues with halfway-written OUTCARs
       nelm=OUTCAR_NELM.NELM;
     }
-    if(nelm==0 && aurostd::kvpairfound(xvasp.INCAR,"NELM","=")) {  // GET NELM FROM INCAR  //CO20210315 - the kvpairfound() is more robust than substring2bool
+    if(nelm==0 && aurostd::kvpair2bool(xvasp.INCAR,"NELM","=")) {  // GET NELM FROM INCAR  //CO20210315 - the kvpair2bool() is more robust than substring2bool
       if(LDEBUG) cerr << soliloquy << " GET NELM FROM INCAR" << endl;
       nelm=aurostd::kvpair2utype<int>(xvasp.INCAR,"NELM","=");  //CO20210315
     }
@@ -6226,8 +6226,8 @@ namespace KBIN {
     //[CO20210315 - OBSOLETE]}
 
     string incar_input="EFIELD_PEAD="+aurostd::utype2string(E[1],6)+" "+aurostd::utype2string(E[2],6)+" "+aurostd::utype2string(E[3],6);
-    if(aurostd::kvpairfound(xvasp.INCAR,"EFIELD_PEAD","=")){
-      string incar_input_old="EFIELD_PEAD="+aurostd::kvpair2value(xvasp.INCAR,"EFIELD_PEAD","=");
+    if(aurostd::kvpair2bool(xvasp.INCAR,"EFIELD_PEAD","=")){
+      string incar_input_old="EFIELD_PEAD="+aurostd::kvpair2string(xvasp.INCAR,"EFIELD_PEAD","=");
       if(incar_input==incar_input_old){return false;}
     }
     //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){return false;}  //remove whitespaces
@@ -6285,10 +6285,10 @@ namespace KBIN {
     //[CO20210315 - OBSOLETE]}
     //[CO20210315 - OBSOLETE]if(Krun && (fix.find("RELAX_MODE")!=string::npos || fix=="POTIM")){ //check for IBRION/NSW
     //[CO20210315 - OBSOLETE]  VASP_Reread_INCAR(xvasp);
-    //[CO20210315 - OBSOLETE]  if(!aurostd::kvpairfound(xvasp.INCAR,"IBRION","=")){Krun=false;}
+    //[CO20210315 - OBSOLETE]  if(!aurostd::kvpair2bool(xvasp.INCAR,"IBRION","=")){Krun=false;}
     //[CO20210315 - OBSOLETE]  else{ //STATIC also has IBRION, but NSW=0 so POTIM has no effect
-    //[CO20210315 - OBSOLETE]    if(!aurostd::kvpairfound(xvasp.INCAR,"NSW","=")){Krun=false;} //NSW=0 by default
-    //[CO20210315 - OBSOLETE]    if(aurostd::kvpairfound(xvasp.INCAR,"NSW","=") && aurostd::kvpair2utype<int>(xvasp.INCAR,"NSW","=")==0){Krun=false;}
+    //[CO20210315 - OBSOLETE]    if(!aurostd::kvpair2bool(xvasp.INCAR,"NSW","=")){Krun=false;} //NSW=0 by default
+    //[CO20210315 - OBSOLETE]    if(aurostd::kvpair2bool(xvasp.INCAR,"NSW","=") && aurostd::kvpair2utype<int>(xvasp.INCAR,"NSW","=")==0){Krun=false;}
     //[CO20210315 - OBSOLETE]  }
     //[CO20210315 - OBSOLETE]}
     //do not rely on xvasp.NRELAXING, etc., access to this information is limited for vasp monitor
@@ -6296,8 +6296,8 @@ namespace KBIN {
     //for linear-response calcs, you also have IBRION, we must also look for NSW and make sure it is bigger than 0
     bool relaxing=false;
     VASP_Reread_INCAR(xvasp);
-    if(aurostd::kvpairfound(xvasp.INCAR,"IBRION","=")){
-      if(aurostd::kvpairfound(xvasp.INCAR,"NSW","=") && aurostd::kvpair2utype<int>(xvasp.INCAR,"NSW","=")>0){relaxing=true;}
+    if(aurostd::kvpair2bool(xvasp.INCAR,"IBRION","=")){
+      if(aurostd::kvpair2bool(xvasp.INCAR,"NSW","=") && aurostd::kvpair2utype<int>(xvasp.INCAR,"NSW","=")>0){relaxing=true;}
     }
     if(relaxing){
       //add here any fixes that would not apply for relaxations
@@ -6487,7 +6487,7 @@ namespace KBIN {
           param_double=OUTCAR.EDIFF;
         }
         //try INCAR next
-        if(param_double==AUROSTD_MAX_DOUBLE && aurostd::kvpairfound(xvasp.INCAR,"EDIFF","=")){
+        if(param_double==AUROSTD_MAX_DOUBLE && aurostd::kvpair2bool(xvasp.INCAR,"EDIFF","=")){
           param_double=aurostd::kvpair2utype<double>(xvasp.INCAR,"EDIFF","=");
         }
         if(param_double==AUROSTD_MAX_DOUBLE){param_double=1e-4;}  //default for vasp
@@ -6517,7 +6517,7 @@ namespace KBIN {
       Krun=(Krun && VASP_Reread_INCAR(xvasp));  //preload incar
       if(Krun){
         param_double=AUROSTD_MAX_DOUBLE;
-        if(aurostd::kvpairfound(xvasp.INCAR,"ENMAX","=")){param_double=aurostd::kvpair2utype<int>(xvasp.INCAR,"ENMAX","=");}  //CO20210315 - the kvpairfound check makes sure we don't get enmax=0 for lack of input
+        if(aurostd::kvpair2bool(xvasp.INCAR,"ENMAX","=")){param_double=aurostd::kvpair2utype<int>(xvasp.INCAR,"ENMAX","=");}  //CO20210315 - the kvpair2bool check makes sure we don't get enmax=0 for lack of input
         else{param_double=DEFAULT_VASP_PREC_ENMAX_ACCURATE*xvasp.POTCAR_ENMAX;}
         if(param_double==AUROSTD_MAX_DOUBLE || aurostd::isequal(param_double,0.0)){param_double=500.0;}  //CO20210315
         param_double*=0.97; // reduce 3%.... if enough // param_double*=0.99; // reduce 1%.... if enough
@@ -6787,13 +6787,13 @@ namespace KBIN {
         //CO20210315 - need to make sure fix magmom too (if it's there)
         //load into xvasp.str.atoms[i].order_parameter_atom/value, convert to sconv, then print out
         VASP_Reread_INCAR(xvasp);  //preload incar - MAGMOM
-        bool remove_magmom=aurostd::kvpairfound(xvasp.INCAR,"MAGMOM","=");
+        bool remove_magmom=aurostd::kvpair2bool(xvasp.INCAR,"MAGMOM","=");
         bool write_magmom=XVASP_INCAR_Read_MAGMOM(xvasp);
         if(VERBOSE){
           aus << "00000  MESSAGE WARNING changing to the conventional cell" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           aus << "00000  MESSAGE BEFORE: a,b,c,alpha,beta,gamma=" << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
           aus << "00000  MESSAGE BEFORE: volume=" << xvasp.str.GetVolume() << endl;
-          if(write_magmom){aus << "00000  MESSAGE BEFORE: MAGMOM=" << aurostd::kvpair2value(xvasp.INCAR,"MAGMOM","=") << endl;}
+          if(write_magmom){aus << "00000  MESSAGE BEFORE: MAGMOM=" << aurostd::kvpair2string(xvasp.INCAR,"MAGMOM","=") << endl;}
           aus << "00000  MESSAGE BEFORE: structure: " << endl;
           aus << xvasp.str;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -6809,7 +6809,7 @@ namespace KBIN {
         if(VERBOSE){
           aus << "00000  MESSAGE AFTER: a,b,c,alpha,beta,gamma=" << xvasp.str.a << "," << xvasp.str.b << "," << xvasp.str.c << "," << xvasp.str.alpha << "," << xvasp.str.beta << "," << xvasp.str.gamma << endl;
           aus << "00000  MESSAGE AFTER: volume=" << xvasp.str.GetVolume() << endl;
-          if(write_magmom){aus << "00000  MESSAGE AFTER: MAGMOM=" << aurostd::kvpair2value(xvasp.INCAR,"MAGMOM","=") << endl;}
+          if(write_magmom){aus << "00000  MESSAGE AFTER: MAGMOM=" << aurostd::kvpair2string(xvasp.INCAR,"MAGMOM","=") << endl;}
           aus << "00000  MESSAGE AFTER: structure: " << endl;
           aus << xvasp.str;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -6884,8 +6884,8 @@ namespace KBIN {
         //we're probably coming from RELAX=ENERGY, so only change non-overlapping settings
         //first do a check that we're not already doing RELAX_MODE=FORCES, IBRION is a good enough check
         incar_input="IBRION=1";
-        if(aurostd::kvpairfound(xvasp.INCAR,"IBRION","=")){
-          string incar_input_old="IBRION="+aurostd::kvpair2value(xvasp.INCAR,"IBRION","=");
+        if(aurostd::kvpair2bool(xvasp.INCAR,"IBRION","=")){
+          string incar_input_old="IBRION="+aurostd::kvpair2string(xvasp.INCAR,"IBRION","=");
           if(incar_input==incar_input_old){Krun=false;}
         }
         //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){Krun=false;}  //remove whitespace
@@ -8106,7 +8106,7 @@ namespace KBIN {
       string message = "Index cannot be 0";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
     }
-    poscar.str(aurostd::substring2string(AflowIn, _VASP_POSCAR_MODE_EXPLICIT_START_, _VASP_POSCAR_MODE_EXPLICIT_STOP_, index, false, true));
+    poscar.str(aurostd::substring2string(AflowIn, _VASP_POSCAR_MODE_EXPLICIT_START_, _VASP_POSCAR_MODE_EXPLICIT_STOP_, index));
     if(poscar.str().empty()) {
       string message = "Invalid " + _AFLOWIN_;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_WRONG_FORMAT_);
@@ -8121,7 +8121,7 @@ namespace KBIN {
       string message = "Index cannot be 0";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
     }
-    poscar.str(aurostd::substring2string(AflowIn, _VASP_POSCAR_MODE_EXPLICIT_START_, _VASP_POSCAR_MODE_EXPLICIT_STOP_, index, false, true));
+    poscar.str(aurostd::substring2string(AflowIn, _VASP_POSCAR_MODE_EXPLICIT_START_, _VASP_POSCAR_MODE_EXPLICIT_STOP_, index));
     if(poscar.str().empty()) {
       string message = "Invalid " + _AFLOWIN_;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_WRONG_FORMAT_);
