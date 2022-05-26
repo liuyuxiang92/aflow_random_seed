@@ -1276,8 +1276,8 @@ namespace qca {
     stringstream oss;
     uint nelem = elements.size();
     double alat = 0.0;
-    for (uint i = 0; i <= elements.size(); i++) {alat += GetAtomRadiusCovalent(elements[i]);}
-    alat /= elements.size();
+    for (uint i = 0; i < nelem; i++) {alat += GetAtomRadiusCovalent(elements[i]);}
+    alat /= nelem;
     xmatrix<double> lattice(3,3);
     xvector<double> angles = 90.0 * aurostd::ones_xv<double>(3);
     xvector<double> coorsys = aurostd::ones_xv<double>(3);
