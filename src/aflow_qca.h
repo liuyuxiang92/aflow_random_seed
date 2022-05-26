@@ -10,9 +10,8 @@
 #ifndef _AFLOW_QCA_H_
 #define _AFLOW_QCA_H_
 
-#define DEFAULT_ATAT_ALAT 4.0 // Ang
 #define CONC_SHIFT 0.01 // concentration shift away from 0
-#define QCA_FILE_PREFIX string("qca_")
+#define QCA_FILE_PREFIX string("aflow_qca_")
 
 // Class _qca data
 class _qca_data {

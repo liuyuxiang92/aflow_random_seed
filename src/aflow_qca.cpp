@@ -11,7 +11,6 @@
 #define _AFLOW_QCA_CPP_
 #include "aflow.h"
 #include "aflow_qca.h"
-#include "aflow_chull.h"
 #include "aflow_pocc.h"
 
 // ###############################################################################
@@ -1276,27 +1275,33 @@ namespace qca {
   string createLatForATAT(const string& plattice, const vector<string>& elements) {
     stringstream oss;
     uint nelem = elements.size();
+    double alat = 0.0;
+    for (uint i = 0; i <= elements.size(); i++) {alat += GetAtomRadiusCovalent(elements[i]);}
+    alat /= elements.size();
     xmatrix<double> lattice(3,3);
     xvector<double> angles = 90.0 * aurostd::ones_xv<double>(3);
     xvector<double> coorsys = aurostd::ones_xv<double>(3);
     oss.precision(_DOUBLE_WRITE_PRECISION_MAX_);
     oss.setf(std::ios::fixed,std::ios::floatfield);
     if (plattice == "fcc") {
+      alat *= 2.0 * std::sqrt(2.0);
       lattice(1, 1) = 0.0; lattice(2, 1) = 0.5; lattice(3, 1) = 0.5;
       lattice(1, 2) = 0.5; lattice(2, 2) = 0.0; lattice(3, 2) = 0.5;
       lattice(1, 3) = 0.5; lattice(2, 3) = 0.5; lattice(3, 3) = 0.0;
     }
     else if (plattice == "bcc") {
+      alat *= 4.0 * std::sqrt(3.0) / 3.0;
       lattice(1, 1) = -0.5; lattice(2, 1) = 0.5; lattice(3, 1) = 0.5;
       lattice(1, 2) = 0.5; lattice(2, 2) = -0.5; lattice(3, 2) = 0.5;
       lattice(1, 3) = 0.5; lattice(2, 3) = 0.5; lattice(3, 3) = -0.5;
     }
     else if (plattice == "hcp") {
+      alat *= 2.0;
       lattice = aurostd::eye<double>(3, 3);
       coorsys(3) = std::sqrt(8.0 / 3.0);
       angles(3) = 120.0;
     }
-    for (uint i = 1; i <= 3; i++) {oss << DEFAULT_ATAT_ALAT * coorsys(i) << " ";}
+    for (uint i = 1; i <= 3; i++) {oss << alat * coorsys(i) << " ";}
     for (uint i = 1; i <= 3; i++) {oss << angles(i) << " ";}
     oss << endl;
     for (uint i = 1; i <= 3; i++) {
