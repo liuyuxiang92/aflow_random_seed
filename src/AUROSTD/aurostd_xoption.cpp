@@ -252,6 +252,7 @@ namespace aurostd {
 
     preserved=FALSE;
     for(uint i=0;i<vxscheme.size()&&!preserved;i++) preserved=(vxscheme.at(i)=="PRESERVED");
+VERBOSE=TRUE;
     if(VERBOSE) cerr << "DEBUG - " << soliloquy << " isentry=" << (isentry?"TRUE":"FALSE") << endl;
     if(VERBOSE) cerr << "DEBUG - " << soliloquy << " content_string=\"" << content_string << "\"" << endl;
     if(VERBOSE) cerr << "DEBUG - " << soliloquy << " content_double=\"" << content_double << "\"" << endl;
@@ -259,7 +260,7 @@ namespace aurostd {
     if(VERBOSE) cerr << "DEBUG - " << soliloquy << " content_uint=\"" << content_uint << "\"" << endl;
     if(VERBOSE) cerr << "DEBUG - " << soliloquy << " option=" << (option?"TRUE":"FALSE") << endl;
     if(VERBOSE) cerr << "DEBUG - " << soliloquy << " preserved=" << (preserved?"TRUE":"FALSE") << endl;
-    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " xscheme=" << xscheme << endl << endl;
+    if(VERBOSE) cerr << "DEBUG - " << soliloquy << " xscheme=\"" << xscheme << "\"" << endl;
     if(isentry && content_string.empty()) {
       stringstream message;
       message << "Content string empty. content_string=" <<  content_string
