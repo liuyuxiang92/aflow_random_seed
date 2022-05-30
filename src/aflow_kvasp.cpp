@@ -500,7 +500,7 @@ namespace KBIN {
     if(kflags.AFLOW_MODE_PRESCRIPT_EXPLICIT_START_STOP) {  // [AFLOW_MODE_PRESCRIPT] construction
       aus << "00000  MESSAGE Generating " << DEFAULT_AFLOW_PRESCRIPT_COMMAND << " file from START/STOP " << _AFLOWIN_ << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,oss);
-      kflags.AFLOW_MODE_PRESCRIPT.str(aurostd::substrings2string(AflowIn,"[AFLOW_MODE_PRESCRIPT]START","[AFLOW_MODE_PRESCRIPT]STOP",0));
+      kflags.AFLOW_MODE_PRESCRIPT.str(aurostd::substring2string(AflowIn,"[AFLOW_MODE_PRESCRIPT]START","[AFLOW_MODE_PRESCRIPT]STOP",0));
       //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn,kflags.AFLOW_MODE_PRESCRIPT,"[AFLOW_MODE_PRESCRIPT]START","[AFLOW_MODE_PRESCRIPT]STOP"); //CO20200624 - FileAFLOWIN->AflowIn
     }
     if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT) {  // [AFLOW_MODE_POSTSCRIPT] construction
@@ -512,7 +512,7 @@ namespace KBIN {
     if(kflags.AFLOW_MODE_POSTSCRIPT_EXPLICIT_START_STOP) {  // [AFLOW_MODE_POSTSCRIPT] construction
       aus << "00000  MESSAGE Generating " << DEFAULT_AFLOW_POSTSCRIPT_COMMAND << " file from START/STOP " << _AFLOWIN_ << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,oss);
-      kflags.AFLOW_MODE_POSTSCRIPT.str(aurostd::substrings2string(AflowIn,"[AFLOW_MODE_POSTSCRIPT]START","[AFLOW_MODE_POSTSCRIPT]STOP",0));
+      kflags.AFLOW_MODE_POSTSCRIPT.str(aurostd::substring2string(AflowIn,"[AFLOW_MODE_POSTSCRIPT]START","[AFLOW_MODE_POSTSCRIPT]STOP",0));
       //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn,kflags.AFLOW_MODE_POSTSCRIPT,"[AFLOW_MODE_POSTSCRIPT]START","[AFLOW_MODE_POSTSCRIPT]STOP");  //CO20200624 - FileAFLOWIN->AflowIn
     }
     // ************************************************************************************************************************************
@@ -1158,13 +1158,13 @@ namespace KBIN {
     if(vflags.KBIN_VASP_FORCE_OPTION_LDAU1.isentry || vflags.KBIN_VASP_FORCE_OPTION_LDAU2.isentry)  vflags.KBIN_VASP_FORCE_OPTION_LDAU0.isentry=FALSE;
     if(vflags.KBIN_VASP_FORCE_OPTION_LDAU1.isentry || vflags.KBIN_VASP_FORCE_OPTION_LDAU2.isentry) {
       if(aurostd::substring2bool(AflowIn,_STROPT_+"LDAU_SPECIES=",TRUE))
-        vflags.KBIN_VASP_LDAU_SPECIES=aurostd::substring2string(AflowIn,_STROPT_+"LDAU_SPECIES=",FALSE);
+        vflags.KBIN_VASP_LDAU_SPECIES=aurostd::substring2string(AflowIn,_STROPT_+"LDAU_SPECIES=",1,FALSE);
       if(aurostd::substring2bool(AflowIn,_STROPT_+"LDAU1_SPECIES=",TRUE))
-        vflags.KBIN_VASP_LDAU_SPECIES=aurostd::substring2string(AflowIn,_STROPT_+"LDAU1_SPECIES=",FALSE);
+        vflags.KBIN_VASP_LDAU_SPECIES=aurostd::substring2string(AflowIn,_STROPT_+"LDAU1_SPECIES=",1,FALSE);
       if(aurostd::substring2bool(AflowIn,_STROPT_+"LDAU2_SPECIES=",TRUE))
-        vflags.KBIN_VASP_LDAU_SPECIES=aurostd::substring2string(AflowIn,_STROPT_+"LDAU2_SPECIES=",FALSE);
+        vflags.KBIN_VASP_LDAU_SPECIES=aurostd::substring2string(AflowIn,_STROPT_+"LDAU2_SPECIES=",1,FALSE);
       if(aurostd::substring2bool(AflowIn,_STROPT_+"LDAU_PARAMETERS=",TRUE)) 
-        vflags.KBIN_VASP_LDAU_PARAMETERS=RemoveWhiteSpaces(aurostd::substring2string(AflowIn,_STROPT_+"LDAU_PARAMETERS=",FALSE));
+        vflags.KBIN_VASP_LDAU_PARAMETERS=RemoveWhiteSpaces(aurostd::substring2string(AflowIn,_STROPT_+"LDAU_PARAMETERS=",1,FALSE));
       if(vflags.KBIN_VASP_LDAU_SPECIES!="") 
         vflags.KBIN_VASP_LDAU_AFLOW_AUTO_flag=TRUE;
       if(vflags.KBIN_VASP_LDAU_PARAMETERS!="") 
@@ -1327,11 +1327,11 @@ namespace KBIN {
     if(aurostd::substring2bool(AflowIn,"[VASP_INCAR_FILE]")) vflags.KBIN_VASP_INCAR_FILE.push("KEYWORD");
     if(aurostd::substring2bool(AflowIn,"[VASP_INCAR_FILE]SYSTEM_AUTO",TRUE)) vflags.KBIN_VASP_INCAR_FILE.push("SYSTEM_AUTO");
     if(aurostd::substring2bool(AflowIn,"[VASP_INCAR_FILE]FILE=",TRUE)) { //ME20181113
-      string file = aurostd::substring2string(AflowIn,"[VASP_INCAR_FILE]FILE=", TRUE);
+      string file = aurostd::substring2string(AflowIn,"[VASP_INCAR_FILE]FILE=", 1, TRUE);
       vflags.KBIN_VASP_INCAR_FILE.push_attached("FILE", file);
     }
     if(aurostd::substring2bool(AflowIn,"[VASP_INCAR_FILE]COMMAND=",TRUE)) { //ME20181113
-      string command = aurostd::substring2string(AflowIn,"[VASP_INCAR_FILE]COMMAND=", TRUE);
+      string command = aurostd::substring2string(AflowIn,"[VASP_INCAR_FILE]COMMAND=", 1, TRUE);
       vflags.KBIN_VASP_INCAR_FILE.push_attached("COMMAND", command);
     }
 
@@ -1346,7 +1346,7 @@ namespace KBIN {
       //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn, vflags.KBIN_VASP_INCAR_EXPLICIT, "[VASP_INCAR_FILE]");
     }
     if (vflags.KBIN_VASP_INCAR_MODE.flag("EXPLICIT_START_STOP")) { //ME20181113
-      vflags.KBIN_VASP_INCAR_EXPLICIT.str(aurostd::substrings2string(AflowIn,"[VASP_INCAR_MODE_EXPLICIT]START", "[VASP_INCAR_MODE_EXPLICIT]STOP",0));
+      vflags.KBIN_VASP_INCAR_EXPLICIT.str(aurostd::substring2string(AflowIn,"[VASP_INCAR_MODE_EXPLICIT]START", "[VASP_INCAR_MODE_EXPLICIT]STOP",0));
       //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn, vflags.KBIN_VASP_INCAR_EXPLICIT_START_STOP, "[VASP_INCAR_MODE_EXPLICIT]START", "[VASP_INCAR_MODE_EXPLICIT]STOP");
     }
     if(aurostd::substring2bool(AflowIn,"[VASP_INCAR_MODE_IMPLICIT]")) vflags.KBIN_VASP_INCAR_MODE.push("IMPLICIT");
@@ -1367,7 +1367,7 @@ namespace KBIN {
       //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn, vflags.KBIN_VASP_KPOINTS_EXPLICIT, "[VASP_KPOINTS_FILE]");
     }
     if (vflags.KBIN_VASP_KPOINTS_MODE.flag("EXPLICIT_START_STOP")) { //ME20181113
-      vflags.KBIN_VASP_KPOINTS_EXPLICIT.str(aurostd::substrings2string(AflowIn,"[VASP_KPOINTS_MODE_EXPLICIT]START", "[VASP_KPOINTS_MODE_EXPLICIT]STOP",0));
+      vflags.KBIN_VASP_KPOINTS_EXPLICIT.str(aurostd::substring2string(AflowIn,"[VASP_KPOINTS_MODE_EXPLICIT]START", "[VASP_KPOINTS_MODE_EXPLICIT]STOP",0));
       //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn, vflags.KBIN_VASP_KPOINTS_EXPLICIT_START_STOP, "[VASP_KPOINTS_MODE_EXPLICIT]START", "[VASP_KPOINTS_MODE_EXPLICIT]STOP");
     }
     if(aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_MODE_IMPLICIT]")) vflags.KBIN_VASP_KPOINTS_MODE.push("IMPLICIT");
@@ -1376,11 +1376,11 @@ namespace KBIN {
     // [OBSOLETE] vflags.KBIN_VASP_KPOINTS_FILE_COMMAND              =    aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_FILE]COMMAND=",TRUE);
 
     if(aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_FILE]FILE=",TRUE)) { //ME20181113
-      string file = aurostd::substring2string(AflowIn,"[VASP_KPOINTS_FILE]FILE=", TRUE);
+      string file = aurostd::substring2string(AflowIn,"[VASP_KPOINTS_FILE]FILE=", 1, TRUE);
       vflags.KBIN_VASP_KPOINTS_FILE.push_attached("FILE", file);
     }
     if(aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_FILE]COMMAND=",TRUE)) { //ME20181113
-      string command = aurostd::substring2string(AflowIn,"[VASP_KPOINTS_FILE]COMMAND=", TRUE);
+      string command = aurostd::substring2string(AflowIn,"[VASP_KPOINTS_FILE]COMMAND=", 1, TRUE);
       vflags.KBIN_VASP_KPOINTS_FILE.push_attached("COMMAND", command);
     }
 
@@ -1407,7 +1407,7 @@ namespace KBIN {
     //cerr << "vflags.KBIN_VASP_KPOINTS_STATIC_KSHIFT.isentry=" << vflags.KBIN_VASP_KPOINTS_STATIC_KSHIFT.isentry << endl << "vflags.KBIN_VASP_KPOINTS_STATIC_KSHIFT.xscheme=" << vflags.KBIN_VASP_KPOINTS_STATIC_KSHIFT.xscheme << endl;
 
     // [OBSOLETE] vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG        =    aurostd::substring2bool(AflowIn,"[VASP_KPOINTS_FILE]BANDS_LATTICE=",TRUE);
-    // [OBSOLETE] if(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG) vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_VALUE=aurostd::RemoveWhiteSpaces(aurostd::substring2string(AflowIn,"[VASP_KPOINTS_FILE]BANDS_LATTICE=",TRUE));
+    // [OBSOLETE] if(vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_FLAG) vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_VALUE=aurostd::RemoveWhiteSpaces(aurostd::substring2string(AflowIn,"[VASP_KPOINTS_FILE]BANDS_LATTICE=",1,TRUE));
     // [OBSOLETE]  else {vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_VALUE=DEFAULT_BANDS_LATTICE;vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE_AUTO_FLAG=TRUE;} // DEFAULT FIX
 
     vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.options2entry(AflowIn,"[VASP_KPOINTS_FILE]BANDS_LATTICE=",FALSE,vflags.KBIN_VASP_KPOINTS_BANDS_LATTICE.xscheme); // scheme already loaded in aflow_xclasses.cpp is AUTO
@@ -1486,7 +1486,7 @@ namespace KBIN {
         string STOP=_VASP_POSCAR_MODE_EXPLICIT_STOP_P_+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i); //CO20200624
         stringstream POSCAR;POSCAR.clear();POSCAR.str(std::string());
         if(aurostd::substring2bool(input_file.str(),START) && aurostd::substring2bool(input_file.str(),STOP))
-          POSCAR.str(aurostd::substrings2string(input_file.str(),START,STOP,0));
+          POSCAR.str(aurostd::substring2string(input_file.str(),START,STOP,0));
           //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(input_file.str(),POSCAR,START,STOP);
         vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRUCTURE.push_back(xstructure(POSCAR,IOVASP_AUTO));
       }
@@ -1615,19 +1615,19 @@ namespace KBIN {
     if(aurostd::substring2bool(AflowIn,"[VASP_POTCAR_MODE_EXTERNAL]")) vflags.KBIN_VASP_POTCAR_MODE.push("EXTERNAL");
 
     if(aurostd::substring2bool(AflowIn,"[VASP_POTCAR_FILE]PREFIX=",TRUE)) { //CO20181113
-      string file = aurostd::substring2string(AflowIn,"[VASP_POTCAR_FILE]PREFIX=", TRUE);
+      string file = aurostd::substring2string(AflowIn,"[VASP_POTCAR_FILE]PREFIX=", 1, TRUE);
       vflags.KBIN_VASP_POTCAR_FILE.push_attached("PREFIX", file);
     }
     if(aurostd::substring2bool(AflowIn,"[VASP_POTCAR_FILE]SUFFIX=",TRUE)) { //CO20181113
-      string file = aurostd::substring2string(AflowIn,"[VASP_POTCAR_FILE]SUFFIX=", TRUE);
+      string file = aurostd::substring2string(AflowIn,"[VASP_POTCAR_FILE]SUFFIX=", 1, TRUE);
       vflags.KBIN_VASP_POTCAR_FILE.push_attached("SUFFIX", file);
     }
     if(aurostd::substring2bool(AflowIn,"[VASP_POTCAR_FILE]FILE=",TRUE)) { //CO20181113
-      string file = aurostd::substring2string(AflowIn,"[VASP_POTCAR_FILE]FILE=", TRUE);
+      string file = aurostd::substring2string(AflowIn,"[VASP_POTCAR_FILE]FILE=", 1, TRUE);
       vflags.KBIN_VASP_POTCAR_FILE.push_attached("FILE", file);
     }
     if(aurostd::substring2bool(AflowIn,"[VASP_POTCAR_FILE]COMMAND=",TRUE)) { //CO20181113
-      string command = aurostd::substring2string(AflowIn,"[VASP_POTCAR_FILE]COMMAND=", TRUE);
+      string command = aurostd::substring2string(AflowIn,"[VASP_POTCAR_FILE]COMMAND=", 1, TRUE);
       vflags.KBIN_VASP_POTCAR_FILE.push_attached("COMMAND", command);
     }
 

@@ -140,8 +140,8 @@ namespace aurostd {
         // start the scan
         isentry=aurostd::substring2bool(options_FILE,keyword,TRUE);
         if(isentry && xscheme_DEFAULT.empty()) {
-          content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,FALSE));
-          if(content_string.empty()){content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,TRUE));}  //CO20200731 - "[AFLOW]SYSTEM=" vs. "[AFLOW] SYSTEM = "
+          content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,1,FALSE));
+          if(content_string.empty()){content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,1,TRUE));}  //CO20200731 - "[AFLOW]SYSTEM=" vs. "[AFLOW] SYSTEM = "
           string saus=content_string;content_string="";
           if(VERBOSE) cerr << "DEBUG - " << soliloquy << " found saus=" << saus << endl;
           vector<string> tokens;aurostd::string2tokens(saus,tokens,",");
@@ -161,8 +161,8 @@ namespace aurostd {
         if(VERBOSE) cerr << "DEBUG - " << soliloquy << " xscheme_DEFAULT.empty()=" << xscheme_DEFAULT.empty() << endl;
         if(isentry && !xscheme_DEFAULT.empty()) {
           if(VERBOSE) cerr << "DEBUG - " << soliloquy << " SCHEME MODE" << endl;
-          content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,FALSE));
-          if(content_string.empty()){content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,TRUE));}  //CO20200731 - "[AFLOW]SYSTEM=" vs. "[AFLOW] SYSTEM = "
+          content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,1,FALSE));
+          if(content_string.empty()){content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,1,TRUE));}  //CO20200731 - "[AFLOW]SYSTEM=" vs. "[AFLOW] SYSTEM = "
           //ME20181030 - Special case: if the scheme is a Boolean keyword, unset option
           //ME20190107 - Cannot use N or F because it's ambiguous (nitrogen, fluorine)
           string content = aurostd::toupper(content_string);
@@ -174,8 +174,8 @@ namespace aurostd {
         }
         if(isentry && (xscheme_DEFAULT.empty() && content_string.empty())) {
           if(VERBOSE) cerr << "DEBUG - " << soliloquy << " SCHEME MODE EMPTY DEFAULT STILL EMPTY CONTENT" << endl;
-          content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,FALSE));
-          if(content_string.empty()){content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,TRUE));}  //CO20200731 - "[AFLOW]SYSTEM=" vs. "[AFLOW] SYSTEM = "
+          content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,1,FALSE));
+          if(content_string.empty()){content_string=aurostd::RemoveWhiteSpaces(aurostd::substring2string(options_FILE,keyword,1,TRUE));}  //CO20200731 - "[AFLOW]SYSTEM=" vs. "[AFLOW] SYSTEM = "
           option=isentry;
         }
         if(!isentry && option_DEFAULT) {
@@ -190,7 +190,7 @@ namespace aurostd {
         for(uint i=0;i<voptions_FILE.size();i++) {
           if(aurostd::substring2bool(voptions_FILE.at(i),keyword,TRUE)) {
             vector<string> vstrcheck;
-            string strcheck=aurostd::toupper(aurostd::RemoveWhiteSpaces(aurostd::substring2string(voptions_FILE.at(i),keyword,FALSE)));
+            string strcheck=aurostd::toupper(aurostd::RemoveWhiteSpaces(aurostd::substring2string(voptions_FILE.at(i),keyword,1,FALSE)));
             aurostd::StringSubst(strcheck,";",",");
             aurostd::string2tokens(strcheck,vstrcheck,","); 
             for(uint j=0;j<vstrcheck.size();j++) {
@@ -252,7 +252,6 @@ namespace aurostd {
 
     preserved=FALSE;
     for(uint i=0;i<vxscheme.size()&&!preserved;i++) preserved=(vxscheme.at(i)=="PRESERVED");
-VERBOSE=TRUE;
     if(VERBOSE) cerr << "DEBUG - " << soliloquy << " isentry=" << (isentry?"TRUE":"FALSE") << endl;
     if(VERBOSE) cerr << "DEBUG - " << soliloquy << " content_string=\"" << content_string << "\"" << endl;
     if(VERBOSE) cerr << "DEBUG - " << soliloquy << " content_double=\"" << content_double << "\"" << endl;

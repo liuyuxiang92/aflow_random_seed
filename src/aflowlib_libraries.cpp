@@ -72,7 +72,7 @@ namespace aflowlib {
       aurostd::string2tokens(tokens[i],tk,"=");
       if(tk.size()==2) { //   cerr << XPID << tk.at(0) << endl;
         if(tk.at(0)==qquery) { return tk.at(1); }
-        // return aurostd::substring2string(tokens[i],query,TRUE);
+        // return aurostd::substring2string(tokens[i],query,1,TRUE);
       }
     }
     return "";
@@ -1198,7 +1198,7 @@ namespace aflowlib {
 
       // strip the directory_LIB of everything else
       directory_LIB=directory; // somewhere to start
-      if(aurostd::substring2bool(directory_LIB,"LIB/")) directory_LIB=aurostd::substring2string(directory_LIB,"LIB/",FALSE);
+      if(aurostd::substring2bool(directory_LIB,"LIB/")) directory_LIB=aurostd::substring2string(directory_LIB,"LIB/",1,FALSE);
       directory_RAW=directory_LIB;
       directory_WEB=directory_LIB;
       directory_LIB=aurostd::CleanFileName(PROJECT_LIBRARY+"/LIB/"+directory_LIB);
@@ -4030,15 +4030,15 @@ namespace aflowlib {
         vector<string> vdata1;aurostd::string2vectorstring(data1,vdata1);
         for(uint i=0;i<vdata1.size();i++) {
           if(aurostd::substring2bool(vdata1.at(i),"Stoich Str1")) {
-            data.stoich=aurostd::substring2string(vdata1.at(i),"Stoich Str1: ",FALSE);
+            data.stoich=aurostd::substring2string(vdata1.at(i),"Stoich Str1: ",1,FALSE);
             ssfile << "STOICH " << data.stoich << endl;
           }
           if(aurostd::substring2bool(vdata1.at(i),"Vol Str1")) {
-            data_v_atom=aurostd::substring2string(vdata1.at(i),"Vol Str1: ",FALSE);
+            data_v_atom=aurostd::substring2string(vdata1.at(i),"Vol Str1: ",1,FALSE);
             ssfile << "V_ATOM " << data_v_atom << endl;
           }
           if(aurostd::substring2bool(vdata1.at(i),"Cell Str1")) {
-            data_ucelld=aurostd::substring2string(vdata1.at(i),"Cell Str1: ",FALSE);
+            data_ucelld=aurostd::substring2string(vdata1.at(i),"Cell Str1: ",1,FALSE);
             ssfile << "UCELLD " << data_ucelld << endl;
           }
         }
@@ -4052,7 +4052,7 @@ namespace aflowlib {
               string string2find,string2search="Pairs between types: "+aurostd::utype2string(isp1)+" "+aurostd::utype2string(isp2);
               tokens.clear();tokens.push_back("");
               if(aurostd::substring2bool(vdata1.at(i),string2search)) {
-                string2find=aurostd::substring2string(vdata1.at(i),string2search,FALSE);
+                string2find=aurostd::substring2string(vdata1.at(i),string2search,1,FALSE);
                 aurostd::string2tokens(string2find,tokens);
                 vnbondxx_OLD.push_back(aurostd::string2utype<double>(tokens.at(0))); // will do better but for now it is OK
                 //[CO20171024 OBSOLETE]data.vnbondxx.push_back(aurostd::string2utype<double>(tokens.at(0))); // will do better but for now it is OK
@@ -4125,7 +4125,7 @@ namespace aflowlib {
               string string2find,string2search="Pairs between types: "+aurostd::utype2string(isp1)+" "+aurostd::utype2string(isp2);
               tokens.clear();tokens.push_back("");
               if(aurostd::substring2bool(vdata1.at(i),string2search)) {
-                string2find=aurostd::substring2string(vdata1.at(i),string2search,FALSE);
+                string2find=aurostd::substring2string(vdata1.at(i),string2search,1,FALSE);
                 aurostd::string2tokens(string2find,tokens);
                 aus_data_nbondxx.push_back(tokens.at(0));
               }

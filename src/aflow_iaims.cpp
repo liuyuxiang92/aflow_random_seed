@@ -209,7 +209,7 @@ namespace KBIN {
       }
       if(!aimsflags.KBIN_AIMS_CONTROL_FILE.flag("COMMAND") && (aimsflags.KBIN_AIMS_CONTROL_FILE.flag("FILE") || !aimsflags.KBIN_AIMS_CONTROL_FILE.flag("FILE"))) {
         if(aimsflags.KBIN_AIMS_CONTROL_FILE.flag("FILE")) {
-          file=aurostd::substring2string(AflowIn,"[AIMS_CONTROL_FILE]FILE=",TRUE);
+          file=aurostd::substring2string(AflowIn,"[AIMS_CONTROL_FILE]FILE=",1,TRUE);
           aus << "00000  MESSAGE CONTROL   generation from file=" << file << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         } else {
@@ -232,7 +232,7 @@ namespace KBIN {
         xaims.CONTROL << aurostd::file2string(file);
       }
       if(aimsflags.KBIN_AIMS_CONTROL_FILE.flag("COMMAND") && !aimsflags.KBIN_AIMS_CONTROL_FILE.flag("FILE")) {
-        file=aurostd::substring2string(AflowIn,"[AIMS_CONTROL_FILE]COMMAND=",FALSE);
+        file=aurostd::substring2string(AflowIn,"[AIMS_CONTROL_FILE]COMMAND=",1,FALSE);
         aus << "00000  MESSAGE CONTROL   generation from command= '" << file << "' " << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         file=file+" > ./_aflow_CONTROL."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+".tmp";    // create temp  //CO20200502 - threadID
@@ -362,19 +362,19 @@ namespace KBIN {
         std::vector<string> tokens,tokens2,atomABC;
         std::string structure,label,parameters="";  // FIX NRL
         vector<double> volumeABC;
-        structure=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]PROTOTYPE=",TRUE);
+        structure=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]PROTOTYPE=",1,TRUE);
         aurostd::string2tokens(structure,tokens,";");
         label=tokens[0];
         for(uint i=1;i<tokens.size();i++) {
           // find SPECIES
           if(aurostd::substring2bool(tokens[i],"SPECIES=",TRUE) || aurostd::substring2bool(tokens[i],"SPECIE=",TRUE)) {
-            aurostd::string2tokens(aurostd::substring2string(tokens[i],"=",TRUE),tokens2,",");
+            aurostd::string2tokens(aurostd::substring2string(tokens[i],"=",1,TRUE),tokens2,",");
             for(uint j=0;j<tokens2.size();j++)
               atomABC.push_back(tokens2[j]);
           }
           // find VOLUMES
           if(aurostd::substring2bool(tokens[i],"VOLUMES=",TRUE) || aurostd::substring2bool(tokens[i],"VOLUME=",TRUE)) {
-            aurostd::string2tokens(aurostd::substring2string(tokens[i],"=",TRUE),tokens2,",");
+            aurostd::string2tokens(aurostd::substring2string(tokens[i],"=",1,TRUE),tokens2,",");
             for(uint j=0;j<tokens2.size();j++)
               volumeABC.push_back(aurostd::string2utype<double>(tokens2[j]));
           }
@@ -508,7 +508,7 @@ namespace KBIN {
       }
       if(!aimsflags.KBIN_AIMS_GEOM_FILE.flag("COMMAND") && (aimsflags.KBIN_AIMS_GEOM_FILE.flag("FILE") || !aimsflags.KBIN_AIMS_GEOM_FILE.flag("FILE"))) {
         if(aimsflags.KBIN_AIMS_GEOM_FILE.flag("FILE")) {
-          file=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]FILE=",TRUE);
+          file=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]FILE=",1,TRUE);
           aus << "00000  MESSAGE GEOM  generation from file=" << file << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         } else {
@@ -532,7 +532,7 @@ namespace KBIN {
         xaims.str=xstructure(xaims.GEOM,IOAIMS_GEOM);  // load structure
       }
       if(aimsflags.KBIN_AIMS_GEOM_FILE.flag("COMMAND") && !aimsflags.KBIN_AIMS_GEOM_FILE.flag("FILE")) {
-        file=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]COMMAND=",FALSE);
+        file=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]COMMAND=",1,FALSE);
         aus << "00000  MESSAGE GEOM  generation from command= '" << file << "' " << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         file=file+" > ./_aflow_GEOM."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+".tmp";    // create temp //CO20200502 - threadID

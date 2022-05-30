@@ -83,7 +83,7 @@ namespace KBIN{
         STOP="[AIMS_GEOM_MODE_EXPLICIT]STOP."+aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.at(i);
         stringstream GEOM;GEOM.clear();GEOM.str(std::string());
         if(aurostd::substring2bool(input_file.str(),START) && aurostd::substring2bool(input_file.str(),STOP))
-          GEOM.str(aurostd::substrings2string(input_file.str(),START,STOP,0));
+          GEOM.str(aurostd::substring2string(input_file.str(),START,STOP,0));
           //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(input_file.str(),GEOM,START,STOP);
         aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.push_back(xstructure(GEOM,IOAIMS_AUTO));
       }

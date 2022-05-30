@@ -857,7 +857,7 @@ namespace aurostd {
   string kvpair2string(const stringstream& input,const string& keyword,const string& delim,const int instance=1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 //SD20220520 - rewritten
   template<typename utype> utype kvpair2utype(ifstream& input,const string& keyword,const string& delim,const int instance=1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
   template<typename utype> utype kvpair2utype(const string& input,const string& keyword,const string& delim,const int instance=1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD20220520 - rewritten
-  template<typename utype> utype kvpair2utype(const stringstream& input,const string& keyword,const string& delim,const int index,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD20220520 - rewritten
+  template<typename utype> utype kvpair2utype(const stringstream& input,const string& keyword,const string& delim,const int instance=1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD20220520 - rewritten
 
   uint substring2strings(ifstream& input,vector<string> &vstringout,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520 - rewritten
   uint substring2strings(const string& input,vector<string> &vstringout,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD20220520 - rewritten

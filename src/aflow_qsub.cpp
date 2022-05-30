@@ -60,7 +60,7 @@ namespace KBIN {
         aus << "00000  MESSAGE QSUB: COMMAND string is missing, taking COMMAND=\"" << kflags.KBIN_QSUB_COMMAND << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
-        kflags.KBIN_QSUB_COMMAND=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_QSUB_MODE]COMMAND=",TRUE),'"');
+        kflags.KBIN_QSUB_COMMAND=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_QSUB_MODE]COMMAND=",1,TRUE),'"');
         aus << "00000  MESSAGE QSUB: found COMMAND=\"" << kflags.KBIN_QSUB_COMMAND << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
@@ -70,7 +70,7 @@ namespace KBIN {
         aus << "00000  MESSAGE QSUB: PARAMS string is missing, taking PARAMS=\"" << kflags.KBIN_QSUB_PARAMS << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
-        kflags.KBIN_QSUB_PARAMS=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_QSUB_MODE]PARAMS=",TRUE),'"');
+        kflags.KBIN_QSUB_PARAMS=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_QSUB_MODE]PARAMS=",1,TRUE),'"');
         aus << "00000  MESSAGE QSUB: found PARAMS=\"" << kflags.KBIN_QSUB_PARAMS << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }

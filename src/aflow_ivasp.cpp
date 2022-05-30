@@ -635,7 +635,7 @@ namespace KBIN {
       }
       if(!vflags.KBIN_VASP_INCAR_FILE.flag("COMMAND") && (vflags.KBIN_VASP_INCAR_FILE.flag("FILE") || !vflags.KBIN_VASP_INCAR_FILE.flag("FILE"))) {
         if(vflags.KBIN_VASP_INCAR_FILE.flag("FILE")) {
-          // [ME20181226 OBSOLETE] file=aurostd::substring2string(AflowIn,"[VASP_INCAR_FILE]FILE=",TRUE);
+          // [ME20181226 OBSOLETE] file=aurostd::substring2string(AflowIn,"[VASP_INCAR_FILE]FILE=",1,TRUE);
           file = vflags.KBIN_VASP_INCAR_FILE.getattachedscheme("FILE"); //ME20181113
           aus << "00000  MESSAGE INCAR   generation from file=" << file << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -659,7 +659,7 @@ namespace KBIN {
         xvasp.INCAR << aurostd::file2string(file);
       }
       if(vflags.KBIN_VASP_INCAR_FILE.flag("COMMAND") && !vflags.KBIN_VASP_INCAR_FILE.flag("FILE")) {
-        // [ME20181226 OBSOLETE] file=aurostd::substring2string(AflowIn,"[VASP_INCAR_FILE]COMMAND=",FALSE);
+        // [ME20181226 OBSOLETE] file=aurostd::substring2string(AflowIn,"[VASP_INCAR_FILE]COMMAND=",1,FALSE);
         file = vflags.KBIN_VASP_INCAR_FILE.getattachedscheme("COMMAND"); //ME20181113
         aus << "00000  MESSAGE INCAR   generation from command= '" << file << "'" << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1328,19 +1328,19 @@ namespace KBIN {
         std::vector<string> tokens,tokens2,atomABC;
         std::string structure,label,parameters="";  // FIX NRL
         vector<double> volumeABC;
-        structure=aurostd::substring2string(AflowIn,"[VASP_POSCAR_FILE]PROTOTYPE=",TRUE);
+        structure=aurostd::substring2string(AflowIn,"[VASP_POSCAR_FILE]PROTOTYPE=",1,TRUE);
         aurostd::string2tokens(structure,tokens,";");
         label=tokens[0];
         for(uint i=1;i<tokens.size();i++) {
           // find SPECIES
           if(aurostd::substring2bool(tokens[i],"SPECIES=",TRUE) || aurostd::substring2bool(tokens[i],"SPECIE=",TRUE)) {
-            aurostd::string2tokens(aurostd::substring2string(tokens[i],"=",TRUE),tokens2,",");
+            aurostd::string2tokens(aurostd::substring2string(tokens[i],"=",1,TRUE),tokens2,",");
             for(uint j=0;j<tokens2.size();j++)
               atomABC.push_back(tokens2[j]);
           }
           // find VOLUMES
           if(aurostd::substring2bool(tokens[i],"VOLUMES=",TRUE) || aurostd::substring2bool(tokens[i],"VOLUME=",TRUE)) {
-            aurostd::string2tokens(aurostd::substring2string(tokens[i],"=",TRUE),tokens2,",");
+            aurostd::string2tokens(aurostd::substring2string(tokens[i],"=",1,TRUE),tokens2,",");
             for(uint j=0;j<tokens2.size();j++)
               volumeABC.push_back(aurostd::string2utype<double>(tokens2[j]));
           }
@@ -1477,7 +1477,7 @@ namespace KBIN {
       }
       if(!vflags.KBIN_VASP_POSCAR_FILE.flag("COMMAND") && (vflags.KBIN_VASP_POSCAR_FILE.flag("FILE") || !vflags.KBIN_VASP_POSCAR_FILE.flag("FILE"))) {
         if(vflags.KBIN_VASP_POSCAR_FILE.flag("FILE")) {
-          file=aurostd::substring2string(AflowIn,"[VASP_POSCAR_FILE]FILE=",TRUE);
+          file=aurostd::substring2string(AflowIn,"[VASP_POSCAR_FILE]FILE=",1,TRUE);
           aus << "00000  MESSAGE POSCAR  generation from file=" << file << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         } else {
@@ -1501,7 +1501,7 @@ namespace KBIN {
         xvasp.str=xstructure(xvasp.POSCAR,IOVASP_POSCAR);  // load structure
       }
       if(vflags.KBIN_VASP_POSCAR_FILE.flag("COMMAND") && !vflags.KBIN_VASP_POSCAR_FILE.flag("FILE")) {
-        file=aurostd::substring2string(AflowIn,"[VASP_POSCAR_FILE]COMMAND=",FALSE);
+        file=aurostd::substring2string(AflowIn,"[VASP_POSCAR_FILE]COMMAND=",1,FALSE);
         aus << "00000  MESSAGE POSCAR  generation from command= '" << file << "'" << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         file=file+" > ./_aflow_POSCAR."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+".tmp";    // create temp //CO20200502 - threadID
@@ -2296,7 +2296,7 @@ namespace KBIN {
       }
       if(!vflags.KBIN_VASP_KPOINTS_FILE.flag("COMMAND") && (vflags.KBIN_VASP_KPOINTS_FILE.flag("FILE") || !vflags.KBIN_VASP_KPOINTS_FILE.flag("FILE"))) {
         if(vflags.KBIN_VASP_KPOINTS_FILE.flag("FILE")) {
-          // [ME20181226 OBSOLETE] file=aurostd::substring2string(AflowIn,"[VASP_KPOINTS_FILE]FILE=",TRUE);
+          // [ME20181226 OBSOLETE] file=aurostd::substring2string(AflowIn,"[VASP_KPOINTS_FILE]FILE=",1,TRUE);
           file = vflags.KBIN_VASP_KPOINTS_FILE.getattachedscheme("FILE"); //ME20181113
           aus << "00000  MESSAGE KPOINTS  generation from file=" << file << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -2320,7 +2320,7 @@ namespace KBIN {
         xvasp.KPOINTS << aurostd::file2string(file);
       }
       if(vflags.KBIN_VASP_KPOINTS_FILE.flag("COMMAND") && !vflags.KBIN_VASP_KPOINTS_FILE.flag("FILE")) {
-        // [ME20181226 OBSOLETE] file=aurostd::substring2string(AflowIn,"[VASP_KPOINTS_FILE]COMMAND=",FALSE);
+        // [ME20181226 OBSOLETE] file=aurostd::substring2string(AflowIn,"[VASP_KPOINTS_FILE]COMMAND=",1,FALSE);
         file = vflags.KBIN_VASP_KPOINTS_FILE.getattachedscheme("COMMAND"); //ME20181113
         aus << "00000  MESSAGE KPOINTS  generation from command= '" << file << "'" << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -2668,10 +2668,10 @@ namespace KBIN {
               subS+=DEFAULT_VASP_PSEUDOPOTENTIAL_TYPE+"/"+DEFAULT_VASP_POTCAR_DATE+"/";
             }
             if(vflags.KBIN_VASP_POTCAR_FILE.flag("PREFIX")) {
-              subS=vflags.KBIN_VASP_POTCAR_FILE.getattachedscheme("PREFIX");  //aurostd::substring2string(AflowIn,"[VASP_POTCAR_FILE]PREFIX=",TRUE);  //CO20181226
+              subS=vflags.KBIN_VASP_POTCAR_FILE.getattachedscheme("PREFIX");  //aurostd::substring2string(AflowIn,"[VASP_POTCAR_FILE]PREFIX=",1,TRUE);  //CO20181226
               if(LDEBUG) cerr << "DEBUG subS=" << subS << endl;
               if(aurostd::substring2bool(subS,subSDIR)) {
-                subS=vVASP_POTCAR_DIRECTORIES.at(0)+aurostd::substring2string(subS,subSDIR,TRUE);
+                subS=vVASP_POTCAR_DIRECTORIES.at(0)+aurostd::substring2string(subS,subSDIR,1,TRUE);
               }
               if(LDEBUG) cerr << "DEBUG subS=" << subS << endl;
             }
@@ -2679,7 +2679,7 @@ namespace KBIN {
             if(!vflags.KBIN_VASP_POTCAR_FILE.flag("SUFFIX"))
               subS+=DEFAULT_VASP_POTCAR_SUFFIX;
             if(vflags.KBIN_VASP_POTCAR_FILE.flag("SUFFIX"))
-              subS+="/"+vflags.KBIN_VASP_POTCAR_FILE.getattachedscheme("SUFFIX"); //aurostd::substring2string(AflowIn,"[VASP_POTCAR_FILE]SUFFIX=",TRUE);  //CO20181226
+              subS+="/"+vflags.KBIN_VASP_POTCAR_FILE.getattachedscheme("SUFFIX"); //aurostd::substring2string(AflowIn,"[VASP_POTCAR_FILE]SUFFIX=",1,TRUE);  //CO20181226
             FilePotcars.push_back(subS);
           }
         }
@@ -2830,7 +2830,7 @@ namespace KBIN {
       }
       if(!vflags.KBIN_VASP_POTCAR_FILE.flag("COMMAND") && (vflags.KBIN_VASP_POTCAR_FILE.flag("FILE") || !vflags.KBIN_VASP_POTCAR_FILE.flag("FILE"))) {
         if(vflags.KBIN_VASP_POTCAR_FILE.flag("FILE")) {
-          file=vflags.KBIN_VASP_POTCAR_FILE.getattachedscheme("FILE"); //aurostd::substring2string(AflowIn,"[VASP_POTCAR_FILE]FILE=",TRUE); //CO20181226
+          file=vflags.KBIN_VASP_POTCAR_FILE.getattachedscheme("FILE"); //aurostd::substring2string(AflowIn,"[VASP_POTCAR_FILE]FILE=",1,TRUE); //CO20181226
           aus << "00000  MESSAGE POTCAR  generation from file=" << file << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         } else {
@@ -2853,7 +2853,7 @@ namespace KBIN {
         xvasp.POTCAR << aurostd::file2string(file);
       }
       if(vflags.KBIN_VASP_POTCAR_FILE.flag("COMMAND") && !vflags.KBIN_VASP_POTCAR_FILE.flag("FILE")) {
-        file=vflags.KBIN_VASP_POTCAR_FILE.getattachedscheme("COMMAND"); //aurostd::substring2string(AflowIn,"[VASP_POTCAR_FILE]COMMAND=",FALSE);  //CO20181226
+        file=vflags.KBIN_VASP_POTCAR_FILE.getattachedscheme("COMMAND"); //aurostd::substring2string(AflowIn,"[VASP_POTCAR_FILE]COMMAND=",1,FALSE);  //CO20181226
         aus << "00000  MESSAGE POTCAR  generation from command= '" << file << "'" << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         file=file+" > ./_aflow_POTCAR."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+".tmp";    // create temp //CO20200502 - threadID

@@ -6435,7 +6435,7 @@ namespace aurostd {
     return vutypeout.size();
   }
   template<typename utype> uint substring2utypes(const stringstream& input,vector<utype> &vutypeout,const string& strsub1,const string& strsub2,bool RemoveWS,bool RemoveComments) { //SD202205020
-    return substrings2utypes<utype>(input.str(),vutypeout,strsub1,strsub2,RemoveWS,RemoveComments);
+    return substring2utypes<utype>(input.str(),vutypeout,strsub1,strsub2,RemoveWS,RemoveComments);
   }
 }
 

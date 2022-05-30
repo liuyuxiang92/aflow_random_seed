@@ -963,7 +963,7 @@ namespace AGL_functions {
     // Check's if the system name is present in the _AFLOWIN_ file
     // If it exists, it is used to write the output filenames
     if( aurostd::substring2bool(AflowIn,_AFSTROPT_+"SYSTEM=",TRUE) ) {
-      USER_SYSTEM_NAME = aurostd::substring2string(AflowIn,_AFSTROPT_+"SYSTEM=",TRUE);
+      USER_SYSTEM_NAME = aurostd::substring2string(AflowIn,_AFSTROPT_+"SYSTEM=",1,TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ << "System name = " << USER_SYSTEM_NAME.c_str() << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
@@ -1859,12 +1859,12 @@ namespace AGL_functions {
     }
     // Get the user's list of failed run subdirectories to skip when calculating the thermal properties
     if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"SKIP_FAILED_ARUNS=",TRUE) ) {
-      USER_SKIP_FAILED_ARUNS = aurostd::substring2string(AflowIn,_AGLSTROPT_+"SKIP_FAILED_ARUNS=",TRUE);
+      USER_SKIP_FAILED_ARUNS = aurostd::substring2string(AflowIn,_AGLSTROPT_+"SKIP_FAILED_ARUNS=",1,TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ + "Failed ARUNS to skip = " << USER_SKIP_FAILED_ARUNS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     } else if( aurostd::substring2bool(AflowIn,_AGLSTROPT_+"SKIPFAILEDARUNS=",TRUE) ) {
-      USER_SKIP_FAILED_ARUNS = aurostd::substring2string(AflowIn,_AGLSTROPT_+"SKIPFAILEDARUNS=",TRUE);
+      USER_SKIP_FAILED_ARUNS = aurostd::substring2string(AflowIn,_AGLSTROPT_+"SKIPFAILEDARUNS=",1,TRUE);
       aurostd::StringstreamClean(aus);
       aus << _AGLSTR_MESSAGE_ + "Failed ARUNS to skip = " << USER_SKIP_FAILED_ARUNS << endl;  
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);

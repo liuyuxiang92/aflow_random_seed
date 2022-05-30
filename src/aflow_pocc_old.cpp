@@ -79,7 +79,7 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
     stringstream input_file; input_file.clear();input_file.str("");
     stringstream input_file_aus; input_file_aus.clear();input_file_aus.str("");
 
-    sspoccSTRUCTURE.str(aurostd::substrings2string(AflowIn,"[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE","[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE"));
+    sspoccSTRUCTURE.str(aurostd::substring2string(AflowIn,"[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE","[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE"));
     //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn,sspoccSTRUCTURE, "[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE", "[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE");
 
     xstructure  xstr_pocc(sspoccSTRUCTURE, IOVASP_POSCAR);
@@ -3384,7 +3384,7 @@ void ExtracAllPOSCARSFromAflowin(vector<xstructure>& vxstr, const string& str_af
     START=POSCAR_START_DELIMITER+vKBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING[i];
     STOP=POSCAR_STOP_DELIMITER+vKBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING[i];
     stringstream POSCAR;
-    POSCAR.str(aurostd::substrings2string(str_aflowin,START,STOP,0));
+    POSCAR.str(aurostd::substring2string(str_aflowin,START,STOP,0));
     //[SD20220520 - OBSOLETE]if(aurostd::substring2bool(str_aflowin,START) && aurostd::substring2bool(str_aflowin,STOP)) {
     //[SD20220520 - OBSOLETE]  aurostd::ExtractToStringstreamEXPLICIT(str_aflowin,POSCAR,START,STOP);
     //[SD20220520 - OBSOLETE]}
