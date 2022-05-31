@@ -845,9 +845,9 @@ namespace aurostd {
   template<typename utype> utype substring2utype(ifstream& input,const string& strsub1,const int instance=1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
   template<typename utype> utype substring2utype(const string& input,const string& strsub1,const int instance=1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD20220520 - rewritten
   template<typename utype> utype substring2utype(const stringstream& input,const string& strsub1,const int instance=1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up //SD20220520 - rewritten
-  template<typename utype> utype substrings2utype(ifstream& input,const string& strsub1,const string& strsub2,const int instance=1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
-  template<typename utype> utype substrings2utype(const string& input,const string& strsub1,const string& strsub2,const int instance=1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
-  template<typename utype> utype substrings2utype(const stringstream& input,const string& strsub1,const string& strsub2,const int instance=1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
+  template<typename utype> utype substring2utype(ifstream& input,const string& strsub1,const string& strsub2,const int instance=1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
+  template<typename utype> utype substring2utype(const string& input,const string& strsub1,const string& strsub2,const int instance=1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
+  template<typename utype> utype substring2utype(const stringstream& input,const string& strsub1,const string& strsub2,const int instance=1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
 
   bool kvpair2bool(ifstream& input,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
   bool kvpair2bool(const string& input,const string& keyword,const string& delim,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315

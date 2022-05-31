@@ -6080,14 +6080,14 @@ namespace aurostd {
   template<typename utype> utype substring2utype(const stringstream& input,const string& strsub1,const int instance,bool RemoveWS,bool RemoveComments) {
     return substring2utype<utype>(input.str(),strsub1,instance,RemoveWS,RemoveComments);
   }
-  template<typename utype> utype substrings2utype(ifstream& input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
+  template<typename utype> utype substring2utype(ifstream& input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
     return string2utype<utype>(substring2string(input,strsub1,strsub2,instance,RemoveWS,RemoveComments));
   }
-  template<typename utype> utype substrings2utype(const string& input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
+  template<typename utype> utype substring2utype(const string& input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
     return string2utype<utype>(substring2string(input,strsub1,strsub2,instance,RemoveWS,RemoveComments));
   }
-  template<typename utype> utype substrings2utype(const stringstream& input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
-    return substrings2utype<utype>(input.str(),strsub1,strsub2,instance,RemoveWS,RemoveComments);
+  template<typename utype> utype substring2utype(const stringstream& input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
+    return substring2utype<utype>(input.str(),strsub1,strsub2,instance,RemoveWS,RemoveComments);
   }
 
   bool kvpair2bool(ifstream& input,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //SD20220520
