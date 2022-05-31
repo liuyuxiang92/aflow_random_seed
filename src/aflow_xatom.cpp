@@ -18802,7 +18802,7 @@ string xstructure2json(xstructure& xstr) {
 
   // TITLE 
   if(xstr.title.size()){
-    sscontent_json << "\"title\":\"" << xstr.title << "\"" << eendl;
+    sscontent_json << "\"title\":\"" << aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr.title) << "\"" << eendl;
   } else {
     if(PRINT_NULL_JSON){ sscontent_json << "\"title\":null" << eendl;}
   }
