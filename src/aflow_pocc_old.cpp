@@ -3384,7 +3384,7 @@ void ExtracAllPOSCARSFromAflowin(vector<xstructure>& vxstr, const string& str_af
     START=POSCAR_START_DELIMITER+vKBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING[i];
     STOP=POSCAR_STOP_DELIMITER+vKBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING[i];
     stringstream POSCAR;
-    POSCAR.str(aurostd::substring2string(str_aflowin,START,STOP,0));
+    POSCAR.str(aurostd::substring2string(str_aflowin,START,STOP,-1));
     //[SD20220520 - OBSOLETE]if(aurostd::substring2bool(str_aflowin,START) && aurostd::substring2bool(str_aflowin,STOP)) {
     //[SD20220520 - OBSOLETE]  aurostd::ExtractToStringstreamEXPLICIT(str_aflowin,POSCAR,START,STOP);
     //[SD20220520 - OBSOLETE]}

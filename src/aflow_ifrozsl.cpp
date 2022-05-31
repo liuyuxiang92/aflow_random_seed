@@ -54,7 +54,7 @@ namespace KBIN {
       string START=_VASP_POSCAR_MODE_EXPLICIT_START_P_+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i); //CO20200624
       string STOP=_VASP_POSCAR_MODE_EXPLICIT_STOP_P_+vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.at(i); //CO20200624
       stringstream POSCAR;POSCAR.clear();POSCAR.str(std::string());
-      POSCAR.str(aurostd::substring2string(input_file,START,STOP,0));
+      POSCAR.str(aurostd::substring2string(input_file,START,STOP,-1));
       //[SD20220520 - OBSOLETE]if(aurostd::substring2bool(input_file,START) && aurostd::substring2bool(input_file,STOP))
         //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(input_file,POSCAR,START,STOP);
       if(!POSCAR.str().empty()) {vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRUCTURE.push_back(xstructure(POSCAR,IOVASP_AUTO));}
