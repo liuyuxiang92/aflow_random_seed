@@ -25,9 +25,6 @@ using std::vector;
 using aurostd::xcombos;
 using aurostd::xerror;
 
-static const string _AAPL_IFCS_ERR_PREFIX_ = "apl::AnharmonicIFCs::";
-static const string _AAPL_IFCS_MODULE_ = "AAPL";  // for the logger
-
 static const string _CLUSTER_SET_FILE_[2] = {"clusterSet_3rd.xml", "clusterSet_4th.xml"};
 
 // tform represents a tensor transformation containing the index and the
@@ -146,7 +143,6 @@ namespace apl {
   }
 
   void AnharmonicIFCs::initialize(const Supercell& scell, int _order, const aurostd::xoption& opts) {
-    string function = "apl::AnharmonicIFCs::initialize()";
     string message = "";
     // Initialize IFC parameters
     order = _order;
@@ -161,13 +157,13 @@ namespace apl {
     aurostd::string2tokens(opts.getattachedscheme("CUT_RAD"), tokens, ",");
     if (tokens.size() < (uint) order - 2) {
       message = "Not enough parameters for CUT_RAD";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
     double cut_rad = aurostd::string2utype<double>(tokens[order - 3]);
     aurostd::string2tokens(opts.getattachedscheme("CUT_SHELL"), tokens, ",");
     if (tokens.size() < (uint) order - 2) {
       message = "Not enough parameters for CUT_SHELL";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
     int cut_shell = aurostd::string2utype<int>(tokens[order - 3]);
     clst.initialize(scell, _order, cut_shell, cut_rad);
@@ -178,8 +174,7 @@ namespace apl {
         clst.readClusterSetFromFile(clust_hib_file);
       } catch (aurostd::xerror& excpt) {
         awakeClusterSet = false;
-        string message = excpt.error_message;
-        pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, message, directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, excpt.buildMessageString(), directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
     }
     if (!awakeClusterSet) {
@@ -211,19 +206,18 @@ namespace apl {
 namespace apl {
 
   bool AnharmonicIFCs::runVASPCalculations(_xinput& xinput, _aflags& aflags, _kflags& kflags, _xflags& xflags) {
-    string function = _AAPL_IFCS_ERR_PREFIX_ + "runVASPCalculations():";
     string message = "";
     if (order > 4) {
       message = "Not implemented for order > 4.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     if (!initialized) {
       message = "Not initialized.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
 
     bool stagebreak = false;
-    xinput.xvasp.AVASP_arun_mode = _AAPL_IFCS_MODULE_;
+    xinput.xvasp.AVASP_arun_mode = __AFLOW_FUNC__;
     stringstream _logger;
     _logger << "Managing directories for ";
     if (order == 3) {
@@ -232,7 +226,7 @@ namespace apl {
       _logger << "4th";
     }
     _logger << " order IFCs.";
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, _logger, directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, _logger, directory, *p_FileMESSAGE, *p_oss);
 
     // Determine the number of runs so the run ID in the folder name can be
     // padded with the appropriate number of zeros.
@@ -392,9 +386,8 @@ namespace apl {
         }
       }
       if (d == ndir) {
-        string function = "apl::AnharmonicIFCs::calculateForceConstants()";
         string message = "Could not find ZEROSTATE directory.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
       } else {
         _xinput zerostate(xInputs[0]);
         xstructure& xstr = zerostate.getXStr();
@@ -405,11 +398,11 @@ namespace apl {
     }
     vector<vector<vector<xvector<double> > > > force_tensors = storeForces(xInputs);
 
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Calculating anharmonic IFCs.", directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Calculating anharmonic IFCs.", directory, *p_FileMESSAGE, *p_oss);
     vector<vector<double> > ifcs_unsym = calculateUnsymmetrizedIFCs(clst.ineq_distortions, force_tensors);
     force_tensors.clear();
 
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Symmetrizing IFCs.", directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Symmetrizing IFCs.", directory, *p_FileMESSAGE, *p_oss);
     force_constants = symmetrizeIFCs(ifcs_unsym);
     return true;
   }
@@ -552,10 +545,9 @@ namespace apl {
       }
     }
     // If the for-loop runs until the end, the atom was not found
-    string function = _AAPL_IFCS_ERR_PREFIX_ + "getTransformedAtom():";
     stringstream message;
     message << "Could not transform atom " << at;
-    throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+    throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
   }
   //END Forces
 
@@ -686,7 +678,7 @@ namespace apl {
     // Do iterations
     int num_iter = 0;
     double max_err = 0.0;
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "Begin SCF for anharmonic force constants.", directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Begin SCF for anharmonic force constants.", directory, *p_FileMESSAGE, *p_oss);
     *p_oss << std::setiosflags(std::ios::fixed | std::ios::right);
     *p_oss << std::setw(15) << "Iteration";
     *p_oss << std::setiosflags(std::ios::fixed | std::ios::right);
@@ -719,12 +711,11 @@ namespace apl {
       }
       num_iter++;
     } while ((num_iter <= max_iter) && (max_err > sumrule_threshold));
-    pflow::logger(_AFLOW_FILE_NAME_, _AAPL_IFCS_MODULE_, "End SCF for anharmonic force constants.", directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "End SCF for anharmonic force constants.", directory, *p_FileMESSAGE, *p_oss);
     if (num_iter > max_iter) {
-      string function = _AAPL_IFCS_ERR_PREFIX_ + "symmetrizeIFCs";
       stringstream message;
       message << "Anharmonic force constants did not converge within " << max_iter << " iterations.";
-      throw xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+      throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     } else {
       return ifcs;
     }
@@ -997,9 +988,8 @@ namespace apl {
     output << "</anharmonicifcs>" << std::endl;
     aurostd::stringstream2file(output, filename);
     if (!aurostd::FileExist(filename)) {
-      string function = _AAPL_IFCS_ERR_PREFIX_ + "writeIFCsToFile";
       string message = "Could not write tensor to file.";
-      throw xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+      throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 

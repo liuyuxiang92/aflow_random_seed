@@ -56,6 +56,9 @@
 #ifndef _AUROSTD_XFIT_CPP_  //AS20200824
 #include "aurostd_xfit.cpp" //AS20200824
 #endif
+#ifndef _AUROSTD_XHTTP_CPP_  //HE20220121
+#include "aurostd_xhttp.cpp" //HE20220121
+#endif
 
 #endif  // _AURO_IMPLEMENTATIONS_
 

@@ -1785,8 +1785,8 @@ namespace plotter {
   //generateDosPlot///////////////////////////////////////////////////////////
   // Generates the data for a DOS plot. 
   // ME20200305 - added DOS data checking
-  void generateDosPlot(stringstream& out, const xDOSCAR& xdos, const xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return generateDosPlot(out,xdos,plotoptions,FileMESSAGE,oss);} //CO20200404
-  void generateDosPlot(stringstream& out, const xDOSCAR& xdos, const xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
+  void generateDosPlot(stringstream& out,const xDOSCAR& xdos,xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return generateDosPlot(out,xdos,plotoptions,FileMESSAGE,oss);} //CO20200404
+  void generateDosPlot(stringstream& out,const xDOSCAR& xdos,xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
     string soliloquy=XPID+"plotter::generateDosPlot():";
     deque<deque<deque<double> > > dos;
@@ -1945,6 +1945,10 @@ namespace plotter {
       string message = "Unknown projection scheme " + projection + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _INPUT_ILLEGAL_);
     }
+    if(plotoptions.flag("LEGEND_HORIZONTAL")==false && labels.size()>4){  //CO20211227, avoid overlap between legend and DOS
+      plotoptions.flag("LEGEND_HORIZONTAL",true);
+      plotoptions.push_attached("LEGEND_MAXCOLS","5");
+    }
     string outformat = plotoptions.getattachedscheme("OUTPUT_FORMAT");
     if (outformat == "GNUPLOT") {
       if (plotoptions.flag("NOSHIFT")) {
@@ -1965,9 +1969,8 @@ namespace plotter {
     uint nsegments = xkpts.vpath.size()/2;
     // Make sure that the number of k-points is consistent with EIGENVAL
     if (xeigen.number_kpoints != nsegments * xkpts.path_grid) {
-      string function = "plotter::generateBandPlot():";
       string message = "Number of k-points in EIGENVAL and KPOINTS files do not match.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     // Labels
@@ -2146,7 +2149,7 @@ namespace plotter {
     if (dos.size() == xdos.spin + 1) { // no need for key when only total DOS is plotted, NO-SPIN: xdos.spin==0, SPIN: xdos.spin==1  //CO20200404
       out << "unset key" << std::endl;
     } else {
-      if(plotoptions.flag("LEGEND_HORIZONTAL")){  //CO20200404 - ME LOOK HERE
+      if(plotoptions.flag("LEGEND_HORIZONTAL")){  //CO20200404
         int maxcols=3;
         string maxcols_str=plotoptions.getattachedscheme("LEGEND_MAXCOLS");
         if(!maxcols_str.empty()){maxcols=aurostd::string2utype<int>(maxcols_str);}
@@ -2729,9 +2732,8 @@ namespace plotter {
         out.str("");  //ME20200513 - reset stringstream
       }
     } else {
-      string function = "plotter::PLOT_THERMO():";
       string message = "Could not find file " + thermo_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
   }
 
@@ -2750,7 +2752,7 @@ namespace plotter {
   void PLOT_THERMO_QHA(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE; PLOT_THERMO_QHA(plotoptions,out,FileMESSAGE,oss);} //CO20200404
   void PLOT_THERMO_QHA(xoption& plotoptions, stringstream& out,ofstream& FileMESSAGE,ostream& oss) 
   {
-    string function = "plotter::PLOT_THERMO_QHA():", msg = "";
+    string msg = "";
 
     // Set labels
     static const int nprops = 7;
@@ -2767,7 +2769,7 @@ namespace plotter {
         eos_model != "BM4" && eos_model != "M"){
       msg = "Wrong name of the EOS model was specified. ";
       msg += "Only SJ, BM2, BM3, BM4 or M labels are allowed.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, msg, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, msg, _INPUT_ILLEGAL_);
     }
     string keyword = "QHA_" + eos_model + "_THERMO";
 
@@ -2797,7 +2799,7 @@ namespace plotter {
       }
     } else {
       msg = "Could not find file " + thermo_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, msg, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, msg, _FILE_NOT_FOUND_);
     }
   }
   //AS20200909 END
@@ -2899,14 +2901,13 @@ namespace plotter {
       plotoptions.push_attached("KEYWORD", "AAPL_THERMAL_CONDUCTIVITY");
       plotoptions.flag("CONTRAVARIANT", true);
       plotoptions.push_attached("YMIN", "0");
-      plotoptions.flag("LEGEND_HORIZONTAL"); //CO20200404 - ME LOOK HERE, NO LONGER DEFAULT
-      plotoptions.push_attached("LEGEND_MAXCOLS","3");  //CO20200404 - ME LOOK HERE, NO LONGER DEFAULT
+      plotoptions.flag("LEGEND_HORIZONTAL", true); //CO20200404
+      plotoptions.push_attached("LEGEND_MAXCOLS","3");  //CO20200404
       setPlotLabels(plotoptions, "T", "K", "\\kappa", "W/m K");
       plotMatrix(plotoptions, out,FileMESSAGE,oss);  //CO20200404
     } else {
-      string function = "plotter::PLOT_TCOND()";
       string message = "Could not find file " + tcond_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
   }
 
@@ -3005,7 +3006,6 @@ namespace plotter {
   // Reads data from an AFLOW data file. Requires a START and STOP string to
   // be present so that it can skip headers and other data sets.
   vector<vector<double> > readAflowDataFile(xoption& plotoptions) {
-    string function = "plotter::readAflowDataFile():";
     string message = "";
     vector<vector<double> > data;
     vector<double> row;
@@ -3039,13 +3039,13 @@ namespace plotter {
       if (vcontent[iline] == stopstring) break;
       if (iline == nlines) {
         message = "Wrong file format. No STOP tag found.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_WRONG_FORMAT_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
       }
     }
     if (data.size() == 0) {
       message = "No data extracted from file " + path_to_file + ".";
       message += "File is either empty or has the wrong format.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_WRONG_FORMAT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
     }
     return data;
   }
@@ -3132,7 +3132,7 @@ namespace plotter {
     if (ndata == 1) {  // No need for legend if only one set of data to plot
       out << "unset key" << std::endl;
     } else {
-      if(plotoptions.flag("LEGEND_HORIZONTAL")){  //CO20200404 - ME LOOK HERE
+      if(plotoptions.flag("LEGEND_HORIZONTAL")){  //CO20200404
         int maxcols=3;
         string maxcols_str=plotoptions.getattachedscheme("LEGEND_MAXCOLS");
         if(!maxcols_str.empty()){maxcols=aurostd::string2utype<int>(maxcols_str);}

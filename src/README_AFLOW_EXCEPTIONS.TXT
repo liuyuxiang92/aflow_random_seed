@@ -132,6 +132,7 @@ Code     Error Type          Error                     Name of Constant
   53                         busy                      _RUNTIME_BUSY_
   54                         external command missing  _RUNTIME_EXTERNAL_MISS_
   55                         external command failed   _RUNTIME_EXTERNAL_FAIL_
+  56                         HTTP error                _RUNTIME_HTTP_
   60     Allocation Error    generic                   _ALLOC_ERROR_
   61                         could not allocate        _ALLOC_ALLOCATE_
   62                         insufficient memory       _ALLOC_INSUFFICIENT_
@@ -210,6 +211,8 @@ Code     Error Type          Error                     Name of Constant
   54. external command not found: Used when an external subsystem call cannot be found.
 
   55. external command failed: Used when an external subsystem call fails.
+
+  56. HTTP error: Used when an http request fails.
 
 [61 - 69] Allocation Error: Errors associated with memory allocation.
 

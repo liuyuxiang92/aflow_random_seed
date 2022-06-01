@@ -13,14 +13,16 @@
 #include "aflow_compare_structure.h"
 #include "aflow_symmetry_spacegroup.h"
 
-#undef AFLOW_COMPARE_MULTITHREADS_ENABLE
+//[OBSOLETE ME20220129 - not used] #undef AFLOW_COMPARE_MULTITHREADS_ENABLE
 
-#if GCC_VERSION >= 40400   // added two zeros
-#define AFLOW_COMPARE_MULTITHREADS_ENABLE 1
-#include <thread>
-#else
-#warning "The multithread parts of AFLOW-XtalFinder will be not included, since they need gcc 4.4 and higher (C++0x support)."
-#endif
+//[OBSOLETE ME20220129 - not used] #if GCC_VERSION >= 40400   // added two zeros
+//[OBSOLETE ME20220129 - not used] #define AFLOW_COMPARE_MULTITHREADS_ENABLE 1
+//[OBSOLETE ME20220129 - not used] #include <thread>
+//[OBSOLETE ME20220129 - not used] #else
+//[OBSOLETE ME20220129 - not used] #warning "The multithread parts of AFLOW-XtalFinder will be not included, since they need gcc 4.4 and higher (C++0x support)."
+//[OBSOLETE ME20220129 - not used] #endif
+
+  static uint DEFAULT_COMPARE_AFLUX_PAGE_SIZE = 75000;  // Appears to be small enough to prevent timeouts while being large enough to limit the number of requests
 
 // ***************************************************************************
 // SEE README_AFLOW_COMPARE.TXT FOR THE FULL LIST OF AFLOW COMMANDS
@@ -361,16 +363,14 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // FLAG: consider magnetic structure in comparison
-    bool magnetic_comparison=false;
+    bool magnetic_comparison= vpflow.flag("COMPARE::MAGNETIC");
     vector<string> magmoms_for_systems;
-    if(vpflow.flag("COMPARE::MAGNETIC")){
-      magnetic_comparison=true;
+    if(magnetic_comparison){
       string magnetic_info=vpflow.getattachedscheme("COMPARE::MAGNETIC");
       aurostd::string2tokens(magnetic_info,magmoms_for_systems,":");
       message << "OPTIONS: Including magnetic moment information in comparisons. Magnetic input detected for " << magmoms_for_systems.size() << " systems.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
-    if(magnetic_comparison){} //CO20200508 - keep it busy
 
     //DX20190425 - added print and screen only flag - START
     // ---------------------------------------------------------------------------
@@ -1098,6 +1098,10 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   if(vpflow.flag("COMPARE2DATABASE::CATALOG")) {
     string catalog = aurostd::toupper(vpflow.getattachedscheme("COMPARE2DATABASE::CATALOG")); //DX20210615 - older versions of aflux require uppercase; safety
     if(catalog != "ALL"){ vmatchbook.push_back("catalog(\'" + catalog + "\')"); }
+    // ME20220419 - Add MUTE operator to reduce response size
+    if (!aurostd::WithinList(property_list, "catalog")) {
+      vmatchbook.back() = "$" + vmatchbook.back();
+    }
     message << "OPTIONS: Specify catalog/library (icsd, lib1, lib2, lib3, ...): " << catalog << " (default=all)" << endl;
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
@@ -1105,11 +1109,22 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   // ---------------------------------------------------------------------------
   // AFLUX matchbook preparations: add number of species and species
   vmatchbook.push_back("nspecies(" + aurostd::utype2string<uint>(structure_containers[0].ntypes) + ")");
-  if(same_species){ vmatchbook.push_back("species(" + aurostd::joinWDelimiter(structure_containers[0].elements,",") + ")"); }
+  // ME20220419 - Add MUTE operator to reduce response size
+  if (!aurostd::WithinList(property_list, "nspecies")) {
+    vmatchbook.back() = "$" + vmatchbook.back();
+  }
+  if(same_species){
+    vmatchbook.push_back("species(" + aurostd::joinWDelimiter(structure_containers[0].elements,",") + ")");
+    // ME20220419 - Add MUTE operator to reduce response size
+    if (!aurostd::WithinList(property_list, "species")) {
+      vmatchbook.back() = "$" + vmatchbook.back();
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // AFLUX matchbook preparations: add space group symmetry
   bool ignore_symmetry = comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY");
+  string sg_matchbook = "";
   if(!ignore_symmetry){
     if(!isSymmetryCalculated(structure_containers[0])){ calculateSymmetries(1); }  //1: one structure -> one processor
 
@@ -1121,18 +1136,25 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
     }
 
     // add space group query to AFLUX matchbook: get entries with compatible space groups, i.e., same or enantiomorph
-    vmatchbook.push_back(aflowlib::getSpaceGroupAFLUXSummons(structure_containers[0].space_group,relaxation_step));
+    sg_matchbook = aflowlib::getSpaceGroupMatchbook(structure_containers[0].space_group,relaxation_step);
+    // ME20220419 - Add MUTE operator to reduce response size
+    vmatchbook.push_back(sg_matchbook);
+    if (!aurostd::WithinList(property_list, sg_matchbook.substr(0, sg_matchbook.find("(")))) {
+      vmatchbook.back() = "$" + vmatchbook.back();
+    }
   }
   else { setSymmetryPlaceholders(); }
 
   // ---------------------------------------------------------------------------
   // AFLUX matchbook preparations: add aurl for entry
-  vmatchbook.push_back("aurl");
-
-  // ---------------------------------------------------------------------------
-  // AFLUX matchbook preparations: format AFLUX output
-  vmatchbook.push_back("format(aflow)");
-  vmatchbook.push_back("paging(0)");
+  //vmatchbook.push_back("aurl");  // ME20220419 - Part of the response already; slows down AFLUX
+  // ME20220419 - Suppress unused default properties
+  if ((sg_matchbook.find("spacegroup_relax") == string::npos) && !aurostd::WithinList(property_list, "spacegroup_relax")) {
+    vmatchbook.push_back("$spacegroup_relax");
+  }
+  if (!aurostd::WithinList(property_list, "Pearson_symbol_relax")) {
+    vmatchbook.push_back("$Pearson_symbol_relax");
+  }
 
   // ---------------------------------------------------------------------------
   // construct aflux summons, i.e., combine matchbook
@@ -1141,8 +1163,25 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
   pflow::logger(_AFLOW_FILE_NAME_, function_name, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
   // ---------------------------------------------------------------------------
-  // call AFLUX
-  string response = aflowlib::AFLUXCall(Summons);
+  // AFLUX matchbook preparations: format AFLUX output
+  vmatchbook.push_back("format(aflow)");
+  // ME20220420 - Use paged requests to avoid timeouts
+  vmatchbook.push_back("");
+  uint page = 1;
+  string page_size_str = vpflow.getattachedscheme("COMPARE::PAGE_SIZE");
+  uint page_size = page_size_str.empty()?DEFAULT_COMPARE_AFLUX_PAGE_SIZE:aurostd::string2utype<uint>(page_size_str);
+  string response = "", response_page = "";
+  do {
+    vmatchbook.back() = "paging(" + aurostd::utype2string<uint>(page) + "," + aurostd::utype2string<uint>(page_size) + ")";
+    Summons = aurostd::joinWDelimiter(vmatchbook, ",");
+
+    // ---------------------------------------------------------------------------
+    // call AFLUX
+    response_page = aflowlib::AFLUXCall(Summons);
+    response += response_page;
+    page++;
+
+  } while (!response_page.empty());
 
   vector<string> response_tokens;
   message << "Number of entries returned: " << aurostd::string2tokens(response,response_tokens,"\n");
@@ -1197,13 +1236,17 @@ vector<StructurePrototype> XtalFinderCalculator::compare2database(
     vector<string> species = aurostd::getElements(compounds[i], vcomposition);
     if(LDEBUG){cerr << function_name << " species=" << aurostd::joinWDelimiter(species,",") << endl;}
     vector<uint> tmp_stoich;
-    for(uint j=0;j<vcomposition.size();j++){
+    // ME20220420 - Skip non-integer stoichiometry instead of throwing
+    uint j = 0;
+    for(;j<vcomposition.size();j++){
       if(aurostd::isinteger(vcomposition[j])){ tmp_stoich.push_back((uint)aurostd::nint(vcomposition[j])); }
       else {
-        message << "Expected natoms in " << auids[i] << " to be an integer.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
+        //message << "Expected natoms in " << auids[i] << " to be an integer.";
+        //throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
+        break;
       }
     }
+    if (j != vcomposition.size()) continue;
     vector<uint> tmp_reduced_stoich; aurostd::reduceByGCD(tmp_stoich, tmp_reduced_stoich); //DX20191125
     if(!same_species){ std::sort(tmp_reduced_stoich.begin(),tmp_reduced_stoich.end()); }
 
@@ -1433,14 +1476,12 @@ namespace compare {
 
     // ---------------------------------------------------------------------------
     // FLAG: consider magnetic structure in comparison //DX20191212
-    bool magnetic_comparison=false;
+    bool magnetic_comparison = vpflow.flag("COMPARE::MAGNETIC");
     vector<string> magmoms_for_systems;
-    if(vpflow.flag("COMPARE::MAGNETIC")){
-      magnetic_comparison=true;
+    if(magnetic_comparison){
       message << "OPTIONS: Including magnetic moment information in comparisons.";
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
-    if(magnetic_comparison){} //CO20200508 - keep it busy
 
     // ---------------------------------------------------------------------------
     // FLAG: property list to extract from database (using AFLUX)
@@ -1487,7 +1528,13 @@ namespace compare {
     string catalog = "";
     if(vpflow.flag("COMPARE_DATABASE_ENTRIES::CATALOG")) {
       catalog = aurostd::toupper(vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::CATALOG")); //DX20190718 //DX20210615 - older versions of aflux require uppercase; safety
-      if(catalog != "ALL"){ vmatchbook.push_back("catalog(\'" + catalog + "\')"); }
+      if(catalog != "ALL"){
+        vmatchbook.push_back("catalog(\'" + catalog + "\')");
+        // ME20220419 - Add MUTE operator to reduce response size
+        if (!aurostd::WithinList(property_list, "catalog")) {
+          vmatchbook.back() = "$" + vmatchbook.back();
+        }
+      }
       message << "OPTIONS: Specify catalog/library (icsd, lib1, lib2, lib3, ...): " << catalog << " (default=all)" << endl;
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
     }
@@ -1502,6 +1549,10 @@ namespace compare {
       message << "OPTIONS: Getting entries with nspecies=" << arity;
       pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
       if(arity!=0){ vmatchbook.push_back("nspecies(" + aurostd::utype2string<uint>(arity) + ")"); }
+      // ME20220419 - Add MUTE operator to reduce response size
+      if (!aurostd::WithinList(property_list, "nspecies")) {
+        vmatchbook.back() = "$" + vmatchbook.back();
+      }
     }
 
     // ---------------------------------------------------------------------------
@@ -1543,21 +1594,34 @@ namespace compare {
       }
       if(species.size()!=0){
         vmatchbook.push_back("species(" + aurostd::joinWDelimiter(species,",") + ")");
+        // ME20220419 - Add MUTE operator to reduce response size
+        if (!aurostd::WithinList(property_list, "species")) {
+          vmatchbook.back() = "$" + vmatchbook.back();
+        }
       }
     }
 
     // ---------------------------------------------------------------------------
     // AFLUX matchbook preparations: get space group(s) //DX20200929
-    vmatchbook.push_back(xtal_finder.getSpaceGroupMatchbookFromOptions(vpflow, relaxation_step));
+    string sg_matchbook = xtal_finder.getSpaceGroupMatchbookFromOptions(vpflow, relaxation_step);
+    if (!sg_matchbook.empty()) {
+      vmatchbook.push_back(sg_matchbook);
+      // ME20220419 - Add MUTE operator to reduce response size
+      if (!aurostd::WithinList(property_list, sg_matchbook.substr(0, sg_matchbook.find("(")))) {
+        vmatchbook.back() = "$" + vmatchbook.back();
+      }
+    }
 
     // ---------------------------------------------------------------------------
     // AFLUX matchbook preparations: get aurl for entry
-    vmatchbook.push_back("aurl");
-
-    // ---------------------------------------------------------------------------
-    // AFLUX matchbook preparations: format AFLUX output
-    vmatchbook.push_back("format(aflow)");
-    vmatchbook.push_back("paging(0)");
+    //vmatchbook.push_back("aurl");  // ME20220419 - Part of the response already; slows down AFLUX
+    // ME20220419 - Suppress unused default properties
+    if ((sg_matchbook.find("spacegroup_relax") == string::npos) && !aurostd::WithinList(property_list, "spacegroup_relax")) {
+      vmatchbook.push_back("$spacegroup_relax");
+    }
+    if (!aurostd::WithinList(property_list, "Pearson_symbol_relax")) {
+      vmatchbook.push_back("$Pearson_symbol_relax");
+    }
 
     // ---------------------------------------------------------------------------
     // construct aflux summons, i.e., combine matchbook
@@ -1566,14 +1630,31 @@ namespace compare {
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
 
     // ---------------------------------------------------------------------------
-    // call AFLUX
-    string response = aflowlib::AFLUXCall(Summons);
+    // AFLUX matchbook preparations: format AFLUX output
+    vmatchbook.push_back("format(aflow)");
+    // ME20220420 - Use paged requests to avoid timeouts
+    vmatchbook.push_back("");
+    uint page = 1;
+    string page_size_str = vpflow.getattachedscheme("COMPARE::PAGE_SIZE");
+    uint page_size = page_size_str.empty()?DEFAULT_COMPARE_AFLUX_PAGE_SIZE:aurostd::string2utype<uint>(page_size_str);
+    string response = "", response_page = "";
+    do {
+      vmatchbook.back() = "paging(" + aurostd::utype2string<uint>(page) + "," + aurostd::utype2string<uint>(page_size) + ")";
+      Summons = aurostd::joinWDelimiter(vmatchbook, ",");
+
+      // ---------------------------------------------------------------------------
+      // call AFLUX
+      response_page = aflowlib::AFLUXCall(Summons);
+      response += response_page;
+      page++;
+
+    } while (!response_page.empty());
+
+    if(LDEBUG){cerr << function_name << "::AFLUX response:" << endl << response << endl;}
 
     vector<string> response_tokens;
     message << "Number of entries returned: " << aurostd::string2tokens(response,response_tokens,"\n");
     pflow::logger(_AFLOW_FILE_NAME_, function_name, message, FileMESSAGE, logstream, _LOGGER_MESSAGE_);
-
-    if(LDEBUG){cerr << function_name << "::AFLUX response:" << endl << response << endl;}
 
     // ---------------------------------------------------------------------------
     // extract properties from AFLUX response
@@ -1624,13 +1705,17 @@ namespace compare {
       if(LDEBUG){cerr << function_name << " species=" << aurostd::joinWDelimiter(species,",") << endl;}
 
       vector<uint> tmp_stoich;
-      for(uint j=0;j<vcomposition.size();j++){
+      // ME20220420 - Skip non-integer stoichiometry instead of throwing
+      uint j = 0;
+      for(;j<vcomposition.size();j++){
         if(aurostd::isinteger(vcomposition[j])){ tmp_stoich.push_back((uint)aurostd::nint(vcomposition[j])); }
         else {
-          message << "Expected natoms in " << auids[i] << " to be an integer.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
+          //message << "Expected natoms in " << auids[i] << " to be an integer.";
+          //throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name,message,_RUNTIME_ERROR_);
+          break;
         }
       }
+      if (j != vcomposition.size()) continue;
       vector<uint> tmp_reduced_stoich; aurostd::reduceByGCD(tmp_stoich, tmp_reduced_stoich); //DX20191125
       if(!same_species){ std::sort(tmp_reduced_stoich.begin(),tmp_reduced_stoich.end()); }
 

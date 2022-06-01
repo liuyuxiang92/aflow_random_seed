@@ -1757,31 +1757,36 @@ namespace KBIN {
   void convertPOSCARFormat(_xvasp& xvasp, const _aflags& aflags, const _kflags& kflags) {
     bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
     string soliloquy=XPID+"KBIN::convertPOSCARFormat()";
+    string mpi_command="";
     string vasp_path_full=kflags.KBIN_BIN;
-    if(kflags.KBIN_MPI){  //CO20210713 - adding all the machine information
+    double vaspVersion=KBIN::getVASPVersionDouble(vasp_path_full); //SD20220331
+    if(aurostd::isequal(vaspVersion,0.0) && kflags.KBIN_MPI){  //CO20210713 - adding all the machine information
       vasp_path_full=kflags.KBIN_MPI_BIN;
-      if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH")) {vasp_path_full=MPI_BINARY_DIR_DUKE_BETA_MPICH+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_OPENMPI")) {vasp_path_full=MPI_BINARY_DIR_DUKE_BETA_OPENMPI+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QRATS_MPICH")) {vasp_path_full=MPI_BINARY_DIR_DUKE_QRATS_MPICH+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QFLOW_OPENMPI")) {vasp_path_full=MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_X")) {vasp_path_full=MPI_BINARY_DIR_DUKE_X+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) {vasp_path_full=MPI_BINARY_DIR_MPCDF_EOS+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO")) {vasp_path_full=MPI_BINARY_DIR_MPCDF_DRACO+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA")) {vasp_path_full=MPI_BINARY_DIR_MPCDF_COBRA+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_HYDRA")) {vasp_path_full=MPI_BINARY_DIR_MPCDF_HYDRA+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) {vasp_path_full=MPI_BINARY_DIR_MACHINE001+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) {vasp_path_full=MPI_BINARY_DIR_MACHINE002+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE003")) {vasp_path_full=MPI_BINARY_DIR_MACHINE003+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) {vasp_path_full=MPI_BINARY_DIR_DUKE_MATERIALS+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_AFLOWLIB")) {vasp_path_full=MPI_BINARY_DIR_DUKE_AFLOWLIB+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_HABANA")) {vasp_path_full=MPI_BINARY_DIR_DUKE_HABANA+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::FULTON_MARYLOU")) {vasp_path_full=MPI_BINARY_DIR_FULTON_MARYLOU+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) {vasp_path_full=MPI_BINARY_DIR_CMU_EULER+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::OHAD")) {vasp_path_full=MPI_BINARY_DIR_MACHINE2+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::HOST1")) {vasp_path_full=MPI_BINARY_DIR_MACHINE1+kflags.KBIN_MPI_BIN;}
+      if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH")) {mpi_command=MPI_COMMAND_DUKE_BETA_MPICH;vasp_path_full=MPI_BINARY_DIR_DUKE_BETA_MPICH+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_OPENMPI")) {mpi_command=MPI_COMMAND_DUKE_BETA_OPENMPI;vasp_path_full=MPI_BINARY_DIR_DUKE_BETA_OPENMPI+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QRATS_MPICH")) {mpi_command=MPI_COMMAND_DUKE_QRATS_MPICH;vasp_path_full=MPI_BINARY_DIR_DUKE_QRATS_MPICH+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QFLOW_OPENMPI")) {mpi_command=MPI_COMMAND_DUKE_QFLOW_OPENMPI;vasp_path_full=MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_X")) {mpi_command=MPI_COMMAND_DUKE_X;vasp_path_full=MPI_BINARY_DIR_DUKE_X+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) {mpi_command=MPI_COMMAND_MPCDF_EOS;vasp_path_full=MPI_BINARY_DIR_MPCDF_EOS+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO")) {mpi_command=MPI_COMMAND_MPCDF_DRACO;vasp_path_full=MPI_BINARY_DIR_MPCDF_DRACO+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA")) {mpi_command=MPI_COMMAND_MPCDF_COBRA;vasp_path_full=MPI_BINARY_DIR_MPCDF_COBRA+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_HYDRA")) {mpi_command=MPI_COMMAND_MPCDF_HYDRA;vasp_path_full=MPI_BINARY_DIR_MPCDF_HYDRA+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) {mpi_command=MPI_COMMAND_MACHINE001;vasp_path_full=MPI_BINARY_DIR_MACHINE001+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) {mpi_command=MPI_COMMAND_MACHINE002;vasp_path_full=MPI_BINARY_DIR_MACHINE002+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE003")) {mpi_command=MPI_COMMAND_MACHINE003;vasp_path_full=MPI_BINARY_DIR_MACHINE003+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) {mpi_command=MPI_COMMAND_DUKE_MATERIALS;vasp_path_full=MPI_BINARY_DIR_DUKE_MATERIALS+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_AFLOWLIB")) {mpi_command=MPI_COMMAND_DUKE_AFLOWLIB;vasp_path_full=MPI_BINARY_DIR_DUKE_AFLOWLIB+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_HABANA")) {mpi_command=MPI_COMMAND_DUKE_HABANA;vasp_path_full=MPI_BINARY_DIR_DUKE_HABANA+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::FULTON_MARYLOU")) {mpi_command=MPI_COMMAND_FULTON_MARYLOU;vasp_path_full=MPI_BINARY_DIR_FULTON_MARYLOU+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) {mpi_command=MPI_COMMAND_CMU_EULER;vasp_path_full=MPI_BINARY_DIR_CMU_EULER+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::OHAD")) {mpi_command=MPI_COMMAND_MACHINE2;vasp_path_full=MPI_BINARY_DIR_MACHINE2+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::HOST1")) {mpi_command=MPI_COMMAND_MACHINE1;vasp_path_full=MPI_BINARY_DIR_MACHINE1+kflags.KBIN_MPI_BIN;}
+      vaspVersion = KBIN::getVASPVersionDouble(vasp_path_full,mpi_command); //CO20200610
     }
-    if(LDEBUG){cerr << soliloquy << " vasp_path_full=" << vasp_path_full << endl;}
-    double vaspVersion = getVASPVersionDouble(vasp_path_full); //CO20200610
+    if(LDEBUG){
+      cerr << soliloquy << " mpi_command=\"" << mpi_command << "\"" << endl;
+      cerr << soliloquy << " vasp_path_full=\"" << vasp_path_full << "\"" << endl;
+    }
     if(LDEBUG){cerr << soliloquy << " vaspVersion=" << vaspVersion << endl;}
     if (aurostd::isequal(vaspVersion,0.0)) {  //CO20210713
       stringstream message;
@@ -2947,9 +2952,9 @@ namespace KBIN {
     if(NPAR==0) {NPAR=4;NCORE=1;}
 
     //DX COME BACK: should these be set by machine? looks like they are being overridden below
-    if(xvasp.NCPUS==32)  {NPAR=4;NCORE=32;} // test for DX conrad and gordon
-    if(xvasp.NCPUS==48)  {NPAR=4;NCORE=48;} // test for DX gaffney, koehr, and mustang
-    if(xvasp.NCPUS==44)  {NPAR=4;NCORE=44;} // test for DX onyx
+    if(xvasp.NCPUS==32)  {NPAR=4;NCORE=32;} // test for DX
+    if(xvasp.NCPUS==48)  {NPAR=4;NCORE=48;} // test for DX
+    if(xvasp.NCPUS==44)  {NPAR=4;NCORE=44;} // test for DX
 
     // marylou fulton super computer center
     if(xvasp.NCPUS==4)  { // best 4 times
@@ -6178,8 +6183,8 @@ namespace KBIN {
     //this is all done inside the main XVASP_Afix() function
     //BE CAREFUL not to overwrite xvasp.INCAR
     bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
-    string function="KBIN::XVASP_Afix_EFIELD_PEAD";
-    string soliloquy=XPID+function+"():";
+    string function_name="KBIN::XVASP_Afix_EFIELD_PEAD";
+    string soliloquy=XPID+function_name+"():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
@@ -6225,10 +6230,10 @@ namespace KBIN {
     }
     //[CO20210315 - substring2bool() can match ENMAX=2 with ENMAX=20]if(aurostd::substring2bool(xvasp.INCAR,incar_input,true)){return false;}  //remove whitespaces
 
-    KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"EFIELD_PEAD",function,vflags.KBIN_VASP_INCAR_VERBOSE);  //CO20200624
-    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing " << function << " [AFLOW] start" << endl;
-    xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << function << endl;
-    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing " << function << " [AFLOW] end" << endl;
+    KBIN::XVASP_INCAR_REMOVE_ENTRY(xvasp,"EFIELD_PEAD",__AFLOW_FUNC__,vflags.KBIN_VASP_INCAR_VERBOSE);  //CO20200624
+    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing " << __AFLOW_FUNC__ << " [AFLOW] start" << endl;
+    xvasp.INCAR << aurostd::PaddedPOST(incar_input,_incarpad_) << " # " << __AFLOW_FUNC__ << endl;
+    if(vflags.KBIN_VASP_INCAR_VERBOSE) xvasp.INCAR << "# Performing " << __AFLOW_FUNC__ << " [AFLOW] end" << endl;
 
     //[CO20210315 - avoid writing orig]xvasp.aopts.flag("FLAG::XVASP_INCAR_changed",TRUE); //CO20200624
 
@@ -7899,9 +7904,8 @@ namespace KBIN {
   string ExtractSystemName(const string& directory) {
     string system_name = ExtractSystemNameFromAFLOWIN(directory);
     if (system_name.empty()) {
-      string function = "KBIN::ExtractSystemName()";
       string message = "Could not extract system.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     }
     aurostd::StringSubst(system_name,":.","."); //CO20200731 - patching bug in system name generation
     aurostd::StringSubst(system_name,"@ARUN.A",":ARUN.A");  //CO20200731 - patching for AEL/AGL ARUNs - @ in filenames are NOT good
@@ -7916,9 +7920,8 @@ namespace KBIN {
     string system_name = "";
     string aflowin_path = directory + "/" + _AFLOWIN_;
     if(!aurostd::FileExist(aflowin_path)) {
-      string function = "KBIN::ExtractSystemNameFromAFLOWIN():";
       string message = "Could not find file " + aflowin_path + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
     // ME20200525 - Need to take potential white space between [AFLOW],
     // SYSTEM, and = into account.

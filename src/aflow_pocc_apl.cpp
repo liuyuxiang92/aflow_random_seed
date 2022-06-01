@@ -15,16 +15,6 @@
 
 #define _DEBUG_POCC_APL_ false
 
-// Some parts are written within the C++0x support in GCC, especially the std::thread,
-// which is implemented in gcc 4.4 and higher.... For multithreads with std::thread see:
-// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
-#if GCC_VERSION >= 40400  // added two zeros
-#define AFLOW_APL_MULTITHREADS_ENABLE 1
-#include <thread>
-#else
-#warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
-#endif
-
 using std::string;
 using std::vector;
 using std::deque;
@@ -35,17 +25,16 @@ static const double _FREQ_WARNING_THRESHOLD_ = 1e-3;
 namespace pocc {
 
   void POccCalculator::calculatePhononPropertiesAPL(const vector<double>& v_temperatures) {
-    string function = XPID + "POccCalculator::calculatePhononProperties()";
     stringstream message;
     // Make sure that everything is consistent
     uint nruns = m_ARUN_directories.size();
     if (nruns == 0) {
       message << "Number of ARUN directories is zero.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     if (l_supercell_sets.size() != nruns) {
       message << "Number of directories and number of supercells are different.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     vector<int> vexclude;
@@ -81,7 +70,7 @@ namespace pocc {
         return;
       } else {
         message << "No phonon DOSCARs calculated.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
     }
     vphcalc.clear();
@@ -102,7 +91,7 @@ namespace pocc {
     aurostd::stringstream2file(phposcar, phposcar_file);
     if (!aurostd::FileExist(phposcar_file)) {
       message << "Could not write file " << phposcar_file << ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
 
     uint nexclude = vexclude.size();
@@ -160,7 +149,7 @@ namespace pocc {
       aurostd::stringstream2file(phdoscar, filename);
       if (!aurostd::FileExist(filename)) {
         message << "Could not write file " << filename << ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
       }
 
       tpc.clear();
@@ -179,7 +168,7 @@ namespace pocc {
       aurostd::stringstream2file(aplout, filename);
       if (!aurostd::FileExist(filename)) {
         message << "Cannot open output file " << filename << ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
       }
     }
 
@@ -198,7 +187,6 @@ namespace pocc {
   }
 
   vector<apl::PhononCalculator> POccCalculator::initializePhononCalculators() {
-    string function = XPID + "POccCalculator::initializePhononCalculators()";
     string message = "Initializing phonon calculators.";
     pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, m_aflags, *p_FileMESSAGE, *p_oss);
 
@@ -215,7 +203,7 @@ namespace pocc {
       string statefile = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_STATE_FILE);
       if (!aurostd::EFileExist(statefile)) {
         message = "Cannot find state file in directory " + directory + ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
       }
 
       // Initialize phonon calculator
@@ -235,7 +223,7 @@ namespace pocc {
           pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
           phcalc.awake();
         } catch (aurostd::xerror& e) {
-          message = e.error_message + " Recalculating force constants.";
+          message = e.buildMessageString() + " Recalculating force constants.";
           pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, directory, *p_FileMESSAGE, *p_oss);
           awakeHarmIFCs = false;
         }
@@ -258,7 +246,7 @@ namespace pocc {
           phcalc.setHarmonicForceConstants(fccalc);
         } else {
           message = "Could not calculate harmonic force constants for directory " + directory + ".";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         }
       }
 
@@ -270,7 +258,6 @@ namespace pocc {
   }
 
   vector<xDOSCAR> POccCalculator::getPhononDoscars(vector<apl::PhononCalculator>& vphcalc, xoption& aplopts, vector<int>& vexclude) {
-    string function = XPID + "POccCalculator::getPhononDoscars()";
     string message = "Calculating phonon densities of states.";
     pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, m_aflags, *p_FileMESSAGE, *p_oss);
 
@@ -314,36 +301,29 @@ namespace pocc {
     else message = "Calculating phonon DOS using the root sampling method.";
     pflow::logger(_AFLOW_FILE_NAME_, _POCC_APL_MODULE_, message, m_aflags, *p_FileMESSAGE, *p_oss);
 
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    int ncpus = KBIN::get_NCPUS(m_kflags);
-    vector<std::thread*> threads;
-    if (ncpus > (int) nruns) ncpus = (int) nruns;
-    if (ncpus > 1) {
-      vector<vector<int> > thread_dist = getThreadDistribution((int) nruns, ncpus);
-      for (int i = 0; i < ncpus; i++) {
-        int startIndex = thread_dist[i][0];
-        int endIndex = thread_dist[i][1];
-        threads.push_back(new std::thread(&POccCalculator::calculatePhononDOSThread, this, startIndex, endIndex,
-              vcalc, std::ref(aplopts), std::ref(vphdos), std::ref(vxdos)));
-      }
-
-      for (uint i = 0; i < threads.size(); i++) {
-        threads[i]->join();
-        delete threads[i];
-      }
-    } else {
-      calculatePhononDOSThread(0, (int) nruns, vcalc, aplopts, vphdos, vxdos);
-    }
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    std::mutex m;
+    xthread::xThread xt(KBIN::get_NCPUS(m_kflags), 1);
+    std::function<void(uint, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&,
+        vector<xDOSCAR>&, std::mutex&)> fn = std::bind(&POccCalculator::calculatePhononDOSThread, this,
+        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+        std::placeholders::_4, std::placeholders::_5, std::placeholders::_6);
+    xt.run(nruns, fn, vcalc, aplopts, vphdos, vxdos, m);
 #else
-    calculatePhononDOSThread(0, (int) nruns, vcalc, aplopts, vphdos, vxdos);
+    for (uint i = 0; i < nruns; i++) calculatePhononDOSThread(i, vcalc, aplopts, vphdos, vxdos);
 #endif
 
     return vxdos;
   }
 
-  void POccCalculator::calculatePhononDOSThread(int startIndex, int endIndex, const vector<uint>& vcalc,
-      const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos) {
-    string function = XPID + "POccCalculator::getPhononDoscars()";
+#ifdef AFLOW_MULTITHREADS_ENABLE
+  void POccCalculator::calculatePhononDOSThread(uint i, const vector<uint>& vcalc,
+      const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos, std::mutex& m)
+#else
+  void POccCalculator::calculatePhononDOSThread(uint i, const vector<uint>& vcalc,
+      const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos)
+#endif
+      {
 
     // Normalize to number of branches in the parent structure
     double pocc_sum = aurostd::sum(xstr_pocc.comp_each_type);  // Will be needed for projections
@@ -355,55 +335,55 @@ namespace pocc {
     double minfreq = aurostd::string2utype<double>(aplopts.getattachedscheme("MINFREQ"));
     double maxfreq = aurostd::string2utype<double>(aplopts.getattachedscheme("MAXFREQ"));
 
-    for (int i = startIndex; i < endIndex; i++) {
-      uint icalc = vcalc[i];
-      vphdos[icalc].calc(dos_npoints, dos_smear, minfreq, maxfreq, false);
-      xDOSCAR phdos = vphdos[icalc].createDOSCAR();
+    uint icalc = vcalc[i];
+    vphdos[icalc].calc(dos_npoints, dos_smear, minfreq, maxfreq, false);
+    xDOSCAR phdos = vphdos[icalc].createDOSCAR();
 
-      // Normalize
-      double norm_factor = nbranches/((double) vphdos[icalc].getNumberOfBranches());
-      for (uint e = 0; e < phdos.number_energies; e++) phdos.viDOS[0][e] *= norm_factor;
+    // Normalize
+    double norm_factor = nbranches/((double) vphdos[icalc].getNumberOfBranches());
+    for (uint e = 0; e < phdos.number_energies; e++) phdos.viDOS[0][e] *= norm_factor;
 
-      const xstructure& xstr_phcalc = vphdos[icalc].getInputStructure();
-      uint natoms_phcalc = xstr_phcalc.atoms.size();
-      uint nproj = phdos.vDOS[0].size();
-      bool projected = (nproj > 1);
-      for (uint at = 0; at < (projected?(natoms_phcalc + 1):1); at++) {  // +1 for totals
+    const xstructure& xstr_phcalc = vphdos[icalc].getInputStructure();
+    uint natoms_phcalc = xstr_phcalc.atoms.size();
+    uint nproj = phdos.vDOS[0].size();
+    bool projected = (nproj > 1);
+    for (uint at = 0; at < (projected?(natoms_phcalc + 1):1); at++) {  // +1 for totals
+      for (uint p = 0; p < nproj; p++) {
+        for (uint e = 0; e < phdos.number_energies; e++) {
+          phdos.vDOS[at][p][0][e] *= norm_factor;
+        }
+      }
+    }
+
+    uint natoms_pocc = xstr_pocc.atoms.size();
+    phdos.number_atoms = natoms_pocc;
+
+    // If there are projected DOS, add the DOS contributions that belong to
+    // each site in the parent structure.
+    if (projected) {
+      vector<uint> map = getMapToPARTCAR((unsigned long long int) icalc, xstr_phcalc);
+
+      deque<deque<deque<deque<double> > > > vDOS_pocc(natoms_pocc + 1, deque<deque<deque<double> > >(nproj, deque<deque<double> >(1, deque<double>(phdos.number_energies, 0.0))));
+      vDOS_pocc[0] = phdos.vDOS[0];  // Totals stay the same
+
+      uint at_mapped = 0;
+      for (uint at = 0; at < natoms_phcalc; at++) {
+        at_mapped = map[at];
         for (uint p = 0; p < nproj; p++) {
           for (uint e = 0; e < phdos.number_energies; e++) {
-            phdos.vDOS[at][p][0][e] *= norm_factor;
+            vDOS_pocc[at_mapped + 1][p][0][e] += phdos.vDOS[at + 1][p][0][e];
           }
         }
       }
-
-      uint natoms_pocc = xstr_pocc.atoms.size();
-      phdos.number_atoms = natoms_pocc;
-
-      // If there are projected DOS, add the DOS contributions that belong to
-      // each site in the parent structure.
-      if (projected) {
-        vector<uint> map = getMapToPARTCAR((unsigned long long int) icalc, xstr_phcalc);
-
-        deque<deque<deque<deque<double> > > > vDOS_pocc(natoms_pocc + 1, deque<deque<deque<double> > >(nproj, deque<deque<double> >(1, deque<double>(phdos.number_energies, 0.0))));
-        vDOS_pocc[0] = phdos.vDOS[0];  // Totals stay the same
-
-        uint at_mapped = 0;
-        for (uint at = 0; at < natoms_phcalc; at++) {
-          at_mapped = map[at];
-          for (uint p = 0; p < nproj; p++) {
-            for (uint e = 0; e < phdos.number_energies; e++) {
-              vDOS_pocc[at_mapped + 1][p][0][e] += phdos.vDOS[at + 1][p][0][e];
-            }
-          }
-        }
-        phdos.vDOS = vDOS_pocc;
-      }
-      vxdos[i] = phdos;
+      phdos.vDOS = vDOS_pocc;
     }
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    std::lock_guard<std::mutex> lk(m);
+#endif
+    vxdos[i] = std::move(phdos);
   }
 
   xDOSCAR POccCalculator::getAveragePhononDos(double T, const vector<xDOSCAR>& vxdos) {
-    string function = XPID + "POccCalculator::getAveragePhononDos()";
     stringstream message;
     xDOSCAR xdos;
 
@@ -453,7 +433,7 @@ namespace pocc {
             }
           }
         }
-        if (mismatch) throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        if (mismatch) throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       uint nat = xdos.vDOS.size();
       uint nproj = xdos.vDOS[0].size();

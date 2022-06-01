@@ -16,11 +16,10 @@
 // ***************************************************************************
 namespace LATTICE {
   bool lattice_is_working(string lat) {
-    string function = XPID + "LATTICE::lattice_is_working():";
     string message = "";
     if(lat.empty()){
       message = "input lattice string is empty";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     if(lat=="CUB" || lat=="cP") return TRUE;
     if(lat=="BCC" || lat=="cI") return TRUE;
@@ -38,7 +37,7 @@ namespace LATTICE {
     if(lat=="TRI" || lat=="aP") return TRUE;
 
     message = "BZ for " + lat + " is not ready";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_); // you do not want to produce or run stuff that is not ready so you do not clog the computers
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_); // you do not want to produce or run stuff that is not ready so you do not clog the computers
     return FALSE;
   }
 }
@@ -62,8 +61,7 @@ namespace LATTICE {
     if(lattice_type=="FCC"){ return "cF"; }
     if(lattice_type=="BCC"){ return "cI"; }
 
-    string function_name = XPID + "LATTICE::lattice2typeAndCentering()";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,lattice_type+" is not a possible lattice type.",_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,lattice_type+" is not a possible lattice type.",_VALUE_ILLEGAL_);
 
     return "";
   }
@@ -80,9 +78,8 @@ namespace LATTICE {
     else if(lattice_centering == 'R'){ return 3; }
     else if(lattice_centering == 'F'){ return 4; }
     else{
-      string function_name = XPID + "LATTICE::Conventional2PrimitiveRatio():";
       stringstream message; message << lattice_centering << " is not a possible lattice centering.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     }
 
     return 1;
@@ -183,9 +180,8 @@ namespace LATTICE {
     for(uint sg=1;sg<=230;sg++) {
       LATTICE::SpaceGroup2Lattice(sg,lattice_type,lattice_system);
       if(lattice_type=="error") {
-        string function = XPID + "LATTICE::Lattice2SpaceGroup():";
         string message = "Could not find the lattice type for space group=" + aurostd::utype2string(sg) + ". Check the space group input or the LATTICE::Lattice2SpaceGroup() function.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
       if(lattice_type==lattice) vsgn.push_back(sg);
     }
@@ -335,7 +331,6 @@ namespace LATTICE {
 namespace LATTICE {
   string ConventionalLattice_SpaceGroup(uint sg,double a,double b,double c) {
     double eps=0.05;
-    string function = XPID + "LATTICE::ConventionalLattice_SpaceGroup():";
     string message = "";
     /*
     // 1. "TRI"
@@ -374,7 +369,7 @@ namespace LATTICE {
       message += "a = " + aurostd::utype2string<double>(a);
       message += ", b = " + aurostd::utype2string<double>(b);
       message += ", c = " + aurostd::utype2string<double>(c);
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     // 4. ORC
     if((sg>=16 && sg <=19) || (sg>=25 && sg<=34) || (sg>=47 && sg<=62)) return "ORC";
@@ -385,7 +380,7 @@ namespace LATTICE {
       message += "a = " + aurostd::utype2string<double>(a);
       message += ", b = " + aurostd::utype2string<double>(b);
       message += ", c = " + aurostd::utype2string<double>(c);
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     // 6. ORCF
     if(sg==22 || sg==42 || sg==43 ||sg==69 || sg==70) {
@@ -398,7 +393,7 @@ namespace LATTICE {
       message += "a = " + aurostd::utype2string<double>(a);
       message += ", b = " + aurostd::utype2string<double>(b);
       message += ", c = " + aurostd::utype2string<double>(c);
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     // 7. ORCI
     if(sg==23 || sg==24 || (sg>=44 && sg<=46) || (sg>=71 && sg<=74)) return "ORCI";
@@ -414,7 +409,7 @@ namespace LATTICE {
       message += "a = " + aurostd::utype2string<double>(a);
       message += ", b = " + aurostd::utype2string<double>(b);
       message += ", c = " + aurostd::utype2string<double>(c);
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     // 10. Trigonal, can be rhombohedral or hexagonal
     if(sg>=143 && sg<=167) {
@@ -705,7 +700,6 @@ namespace LATTICE {
       double eps){
 
     bool LDEBUG=(FALSE || XHOST.DEBUG || _DEBUG_COMPARE_);
-    string function_name = XPID + "LATTICE::findLattices():";
 
     // ---------------------------------------------------------------------------
     // get volume of original structure and volume tolerance
@@ -719,7 +713,7 @@ namespace LATTICE {
     xmatrix<double> tmp_lattice(3,3), tmp_lattice_orig(3,3); // store temporary lattices
 
     uint n_translations = translation_vectors.size();
-    if(LDEBUG) { cerr << function_name << " Number of lattice vectors: " << n_translations << endl; }
+    if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Number of lattice vectors: " << n_translations << endl; }
 
     // ---------------------------------------------------------------------------
     // all crystal systems use this loop except for cubic systems
@@ -2282,7 +2276,6 @@ namespace LATTICE {
       if(aurostd::abs(aurostd::abs(det(str_sp.scale*str_sp.lattice))-aurostd::abs(det(str_in.scale*str_in.lattice))) < eps_volume){ 
         if(!aurostd::identical(str_sp.scale*str_sp.lattice,str_sp.transform_coordinates_original2new*str_in.scale*str_in.lattice*str_sp.rotate_lattice_original2new) || //check orig2final
             !aurostd::identical(str_in.scale*str_in.lattice,str_sp.transform_coordinates_new2original*str_sp.scale*str_sp.lattice*str_sp.rotate_lattice_new2original)){  //check final2orig
-          string function = XPID + "LATTICE::Standard_Lattice_Structure():";
           stringstream message;
           message << "Standard_Lattice_Structure::ERROR: Lattice transformations are incorrect:" << endl;
           message << "original lattice: " << str_in.scale*str_in.lattice << endl;
@@ -2293,7 +2286,7 @@ namespace LATTICE {
           message << "==========================================" << endl;
           message << "str_sp.transform_coordinates_original2new: " << str_sp.transform_coordinates_original2new << endl;
           message << "str_sp.rotate_lattice_original2new: " << str_sp.rotate_lattice_original2new;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         }
       }
       else {

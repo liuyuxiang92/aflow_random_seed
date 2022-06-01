@@ -423,6 +423,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE::MISFIT_MATCH","--misfit_match=",""); //DX20201118
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE::MISFIT_FAMILY","--misfit_family=",""); //DX20201118
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE::NP","--np=|--num_proc=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE::PAGE_SIZE","--page_size=","");  //ME20220426 - page size for AFLUX
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE::MAGNETIC","--mag=|--magnetic=|--magmom=|--magmoms=|--magnetic_moment=|--magnetic_moments=",""); //DX20170803
     // booleans
     vpflow.flag("COMPARE::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
@@ -433,7 +434,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("COMPARE::IGNORE_WYCKOFF",aurostd::args2flag(argv,cmds,"--ignore_Wyckoff")); //DX20190424
     vpflow.flag("COMPARE::IGNORE_ENVIRONMENT_ANALYSIS",aurostd::args2flag(argv,cmds,"--ignore_environment|--ignore_environment_analysis|--ignore_env")); //DX20190807
     vpflow.flag("COMPARE::REMOVE_DUPLICATE_COMPOUNDS",aurostd::args2flag(argv,cmds,"--remove_duplicates|--remove_duplicate_compounds")); //DX20190201
-    vpflow.flag("COMPARE::MATCH_TO_AFLOW_PROTOS",aurostd::args2flag(argv,cmds,"--add_matching_aflow_prototypes|--add_matching_aflow_protos|--add_matching_prototypes|--add_matching_protos")); //DX20190724
+    vpflow.flag("COMPARE::MATCH_TO_AFLOW_PROTOS",aurostd::args2flag(argv,cmds,"--match_to_aflow_prototypes|--add_matching_aflow_prototypes|--add_matching_aflow_protos|--add_matching_prototypes|--add_matching_protos")); //DX20190724 //DX20220411 - added --match_to_aflow_prototypes
     vpflow.flag("COMPARE::ADD_AFLOW_PROTOTYPE_DESIGNATION",aurostd::args2flag(argv,cmds,"--add_prototype_designation|--add_aflow_prototype_designation|--add_anrl_designation|--add_prototype|--add_prototype_information")); //DX20190724
     vpflow.flag("COMPARE::UNDECORATED_COMPARISON",aurostd::args2flag(argv,cmds,"--undecorated_comparison|--undecorated|--no_atom_decoration")); //DX20191212
     vpflow.flag("COMPARE::PRIMITIVIZE",aurostd::args2flag(argv,cmds,"--primitive|--primitivize|--prim")); //DX20201006
@@ -1214,6 +1215,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("ABINIT",aurostd::args2flag(argv,cmds,"--abinit") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO"));
   vpflow.flag("AIMS",aurostd::args2flag(argv,cmds,"--aims") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO"));
   vpflow.flag("ELK",aurostd::args2flag(argv,cmds,"--elk") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20200313
+  vpflow.flag("ATAT",aurostd::args2flag(argv,cmds,"--atat") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //SD20220123
 
   //DX20190123 - CIF to work with PROTO - START 
   vpflow.flag("CIF",aurostd::args2flag(argv,cmds,"--cif") && (vpflow.flag("PROTO_AFLOW") || vpflow.flag("PROTO"))); //DX20190123 - to differentiate between proto and istream 
@@ -1723,6 +1725,7 @@ namespace pflow {
       if(vpflow.flag("AFLOWLIB_AURL2LOOP")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AURL2LOOP"),"AFLOWLIB_AURL2LOOP"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWSYM_PYTHON")){ SYM::writePythonScript(cout); _PROGRAMRUN=true;} //DX20210202
       if(vpflow.flag("AFLUX")) {cout << aflowlib::AFLUXCall(vpflow) << endl; _PROGRAMRUN=true;}  //DX20190206 - add AFLUX command line functionality
+      if(vpflow.flag("ATAT")) {cout << input2ATATxstr(cin); _PROGRAMRUN=true;} //SD20220123
       // B
       if(vpflow.flag("BANDGAP_WAHYU")) {AConvaspBandgap(argv); _PROGRAMRUN=true;}
       if(vpflow.flag("BANDGAP"))       {pflow::BANDGAP(vpflow, cout); _PROGRAMRUN=true;} // CAMILO  //CO20171006
@@ -2000,7 +2003,7 @@ namespace pflow {
       //ME20200829 - Added patch functionality
       if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB") || vpflow.flag("PATCHDB")) {
         int return_code = 199;  // Placeholder: return code in the 100s do not run the analysis
-        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, DEFAULT_AFLOW_DB_DATA_PATH, DEFAULT_AFLOW_DB_LOCK_FILE);
+        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, DEFAULT_AFLOW_DB_DATA_PATH, DEFAULT_AFLOW_DB_LOCK_FILE, XHOST.vschema, XHOST.vschema_internal);
         string patchfiles = vpflow.getattachedscheme("DBPATCHFILES");
         // Hierarchy: rebuild > update > patch
         if (vpflow.flag("REBUILDDB") || vpflow.flag("UPDATEDB")) {
@@ -2016,7 +2019,7 @@ namespace pflow {
         return return_code;
       }
       if (vpflow.flag("ANALYZEDB")) {
-        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE);
+        aflowlib::AflowDB db(DEFAULT_AFLOW_DB_FILE, XHOST.vschema, XHOST.vschema_internal);
         db.analyzeDatabase(DEFAULT_AFLOW_DB_STATS_FILE);
         _PROGRAMRUN = true;
       }
@@ -2949,6 +2952,7 @@ namespace pflow {
     AVASP_DefaultValuesBinary_AFLOWIN(xvasp);
     xvasp.AVASP_prototype_mode=LIBRARY_MODE_PROTOTYPE;
     xvasp.AVASP_flag_PRECISION_scheme="H";
+    str.iomode = IOVASP_POSCAR;  //ME20220113 - set to POSCAR or else the input format will be used
     xvasp.str=str;
     if(xvasp.str.atoms.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"pflow::POSCAR2AFLOWIN():","POSCAR has no atoms",_INPUT_ILLEGAL_);} //CO20200102
     if(xvasp.str.atoms[0].name_is_given==false){throw aurostd::xerror(_AFLOW_FILE_NAME_,"pflow::POSCAR2AFLOWIN():","POSCAR is missing species information",_INPUT_ILLEGAL_);} //CO20200102
@@ -13472,7 +13476,6 @@ namespace pflow {
   }
 
   void PYTHON_MODULES(const vector<string>& vmodules_in, ofstream& FileMESSAGE, ostream& oss) {
-    string function = "pflow::PYTHON_MODULES():";
     string directory = XHOST.vflag_control.getattachedscheme("DIRECTORY");
     if (directory.empty()) directory = ".";
 
@@ -13498,7 +13501,7 @@ namespace pflow {
     if (vskip.size() > 0) {
       message << "Could not find modules " << aurostd::joinWDelimiter(vskip, ", ") << "."
         << " Available modules: " << aurostd::joinWDelimiter(vavailable, ", ") << ".";
-      pflow::logger(_AFLOW_FILE_NAME_, function, message, directory, FileMESSAGE, oss, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, directory, FileMESSAGE, oss, _LOGGER_WARNING_);
     }
     if (vmodules.size() > 0) {
       // Dependencies
@@ -13526,10 +13529,10 @@ namespace pflow {
         }
       }
       message << "Successfully installed modules " << aurostd::joinWDelimiter(vmodules, ", ") << ".";
-      pflow::logger(_AFLOW_FILE_NAME_, function, message, directory, FileMESSAGE, oss, _LOGGER_NOTICE_);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, directory, FileMESSAGE, oss, _LOGGER_NOTICE_);
     } else {
       message << "No modules left to write.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
     }
   }
 }
