@@ -379,6 +379,43 @@ bool aurostdTest(ofstream& FileMESSAGE, ostream& oss) { //HE20210511
 
   check_equal(aurostd::reshape(aurostd::reshape(xmat,4,3),3,4), xmat, check_function, check_description, passed_checks, results);
 
+  // ---------------------------------------------------------------------------
+  // Check | substring2string //SD20220525
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::substring2string()";
+  check_description = "return the third match of the substring";
+  string test_string = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
+  string expected_string = "==49";
+    
+  check_equal(aurostd::substring2string(test_string,"ALGO",3), expected_string, check_function, check_description, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | kvpair2string //SD20220525
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::kvpair2string()";
+  check_description = "return the second match of the kvpair";
+  expected_string = "MEDIUM";
+
+  check_equal(aurostd::kvpair2string(test_string,"ALGO","==",2), expected_string, check_function, check_description, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | substring2string //SD20220525
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::substring2string()";
+  check_description = "return the last match of the substring";
+  expected_string = "==SLOW";
+
+  check_equal(aurostd::substring2string(test_string,"ALGO",-1), expected_string, check_function, check_description, passed_checks, results);
+
+  // ---------------------------------------------------------------------------
+  // Check | kvpair2string //SD20220525
+  // ---------------------------------------------------------------------------
+  check_function = "aurostd::kvpair2string()";
+  check_description = "return the last match of the kvpair";
+  expected_string = "SLOW";
+
+  check_equal(aurostd::kvpair2string(test_string,"ALGO","==",-1), expected_string, check_function, check_description, passed_checks, results);
+
   // present overall result
   return display_result(passed_checks, task_description, results, function_name, FileMESSAGE, oss);
 }

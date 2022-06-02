@@ -1085,7 +1085,7 @@ namespace KBIN {
         aus << "00000  MESSAGE MPI: START string is missing, taking START=\"" << kflags.KBIN_MPI_START << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
-        kflags.KBIN_MPI_START=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]START=",TRUE),'"');
+        kflags.KBIN_MPI_START=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]START=",1,TRUE),'"');
         aus << "00000  MESSAGE MPI: found START=\"" << kflags.KBIN_MPI_START << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
@@ -1095,7 +1095,7 @@ namespace KBIN {
         aus << "00000  MESSAGE MPI: STOP string is missing, taking STOP=\"" << kflags.KBIN_MPI_STOP << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
-        kflags.KBIN_MPI_STOP=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]STOP=",TRUE),'"');
+        kflags.KBIN_MPI_STOP=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]STOP=",1,TRUE),'"');
         aus << "00000  MESSAGE MPI: found STOP=\"" << kflags.KBIN_MPI_STOP << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
@@ -1105,7 +1105,7 @@ namespace KBIN {
         aus << "00000  MESSAGE MPI: COMMAND string is missing, taking COMMAND=\"" << kflags.KBIN_MPI_COMMAND << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
-        kflags.KBIN_MPI_COMMAND=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]COMMAND=",TRUE),'"');
+        kflags.KBIN_MPI_COMMAND=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]COMMAND=",1,TRUE),'"');
         aus << "00000  MESSAGE MPI: found COMMAND=\"" << kflags.KBIN_MPI_COMMAND << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
@@ -1125,7 +1125,7 @@ namespace KBIN {
         aus << "00000  MESSAGE MPI: BINARY string is missing, taking BIN=\"" << kflags.KBIN_MPI_BIN << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
-        kflags.KBIN_MPI_BIN=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]BINARY=",TRUE),'"');
+        kflags.KBIN_MPI_BIN=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]BINARY=",1,TRUE),'"');
         aus << "00000  MESSAGE MPI: found BINARY=\"" << kflags.KBIN_MPI_BIN << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
@@ -1145,7 +1145,7 @@ namespace KBIN {
         aus << "00000  MESSAGE MPI: OPTIONS string is missing, taking OPTIONS=\"" << kflags.KBIN_MPI_OPTIONS << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
-        kflags.KBIN_MPI_OPTIONS=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]OPTIONS=",TRUE),'"');
+        kflags.KBIN_MPI_OPTIONS=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_MODE_MPI_MODE]OPTIONS=",1,TRUE),'"');
         aus << "00000  MESSAGE MPI: found OPTIONS=\"" << kflags.KBIN_MPI_OPTIONS << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
