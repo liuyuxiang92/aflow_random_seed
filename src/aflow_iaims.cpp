@@ -146,14 +146,16 @@ namespace KBIN {
       if(aimsflags.KBIN_AIMS_CONTROL_FILE.flag("KEYWORD") && !aimsflags.KBIN_AIMS_CONTROL_MODE.flag("EXPLICIT_START_STOP")) {
         aus << "00000  MESSAGE CONTROL   generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        xaims.CONTROL.str(aurostd::substring2string(AflowIn,"[AIMS_CONTROL_FILE]",0));
         // [OBSOLETE]    aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xaims.CONTROL,"[AIMS_CONTROL_FILE]");
-        aurostd::ExtractToStringstreamEXPLICIT(AflowIn,xaims.CONTROL,"[AIMS_CONTROL_FILE]");
+        //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn,xaims.CONTROL,"[AIMS_CONTROL_FILE]");
       } else if(!aimsflags.KBIN_AIMS_CONTROL_FILE.flag("KEYWORD") && aimsflags.KBIN_AIMS_CONTROL_MODE.flag("EXPLICIT_START_STOP")) {
         aus << "00000  MESSAGE CONTROL   generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
-        if(aurostd::substring2bool(AflowIn,"[AIMS_CONTROL_MODE_EXPLICIT]START") && aurostd::substring2bool(AflowIn,"[AIMS_CONTROL_MODE_EXPLICIT]STOP"))
+        xaims.CONTROL.str(aurostd::substring2string(AflowIn,"[AIMS_CONTROL_MODE_EXPLICIT]START","[AIMS_CONTROL_MODE_EXPLICIT]STOP",0));
+        //[SD20220520 - OBSOLETE]if(aurostd::substring2bool(AflowIn,"[AIMS_CONTROL_MODE_EXPLICIT]START") && aurostd::substring2bool(AflowIn,"[AIMS_CONTROL_MODE_EXPLICIT]STOP"))
           // [OBSOLETE]	aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xaims.CONTROL,"[AIMS_CONTROL_MODE_EXPLICIT]START","[AIMS_CONTROL_MODE_EXPLICIT]STOP");
-          aurostd::ExtractToStringstreamEXPLICIT(AflowIn,xaims.CONTROL,"[AIMS_CONTROL_MODE_EXPLICIT]START","[AIMS_CONTROL_MODE_EXPLICIT]STOP");
+          //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn,xaims.CONTROL,"[AIMS_CONTROL_MODE_EXPLICIT]START","[AIMS_CONTROL_MODE_EXPLICIT]STOP");
       } else {
         aus << "EEEEE  [AIMS_CONTROL_MODE_EXPLICIT] do not confuse aflow !!" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aus << "EEEEE  [AIMS_CONTROL_MODE_EXPLICIT] Possible modes " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
@@ -207,7 +209,7 @@ namespace KBIN {
       }
       if(!aimsflags.KBIN_AIMS_CONTROL_FILE.flag("COMMAND") && (aimsflags.KBIN_AIMS_CONTROL_FILE.flag("FILE") || !aimsflags.KBIN_AIMS_CONTROL_FILE.flag("FILE"))) {
         if(aimsflags.KBIN_AIMS_CONTROL_FILE.flag("FILE")) {
-          file=aurostd::substring2string(AflowIn,"[AIMS_CONTROL_FILE]FILE=",TRUE);
+          file=aurostd::substring2string(AflowIn,"[AIMS_CONTROL_FILE]FILE=",1,TRUE);
           aus << "00000  MESSAGE CONTROL   generation from file=" << file << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         } else {
@@ -230,7 +232,7 @@ namespace KBIN {
         xaims.CONTROL << aurostd::file2string(file);
       }
       if(aimsflags.KBIN_AIMS_CONTROL_FILE.flag("COMMAND") && !aimsflags.KBIN_AIMS_CONTROL_FILE.flag("FILE")) {
-        file=aurostd::substring2string(AflowIn,"[AIMS_CONTROL_FILE]COMMAND=",FALSE);
+        file=aurostd::substring2string(AflowIn,"[AIMS_CONTROL_FILE]COMMAND=",1,FALSE);
         aus << "00000  MESSAGE CONTROL   generation from command= '" << file << "' " << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         file=file+" > ./_aflow_CONTROL."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+".tmp";    // create temp  //CO20200502 - threadID
@@ -360,19 +362,19 @@ namespace KBIN {
         std::vector<string> tokens,tokens2,atomABC;
         std::string structure,label,parameters="";  // FIX NRL
         vector<double> volumeABC;
-        structure=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]PROTOTYPE=",TRUE);
+        structure=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]PROTOTYPE=",1,TRUE);
         aurostd::string2tokens(structure,tokens,";");
         label=tokens[0];
         for(uint i=1;i<tokens.size();i++) {
           // find SPECIES
           if(aurostd::substring2bool(tokens[i],"SPECIES=",TRUE) || aurostd::substring2bool(tokens[i],"SPECIE=",TRUE)) {
-            aurostd::string2tokens(aurostd::substring2string(tokens[i],"=",TRUE),tokens2,",");
+            aurostd::string2tokens(aurostd::substring2string(tokens[i],"=",1,TRUE),tokens2,",");
             for(uint j=0;j<tokens2.size();j++)
               atomABC.push_back(tokens2[j]);
           }
           // find VOLUMES
           if(aurostd::substring2bool(tokens[i],"VOLUMES=",TRUE) || aurostd::substring2bool(tokens[i],"VOLUME=",TRUE)) {
-            aurostd::string2tokens(aurostd::substring2string(tokens[i],"=",TRUE),tokens2,",");
+            aurostd::string2tokens(aurostd::substring2string(tokens[i],"=",1,TRUE),tokens2,",");
             for(uint j=0;j<tokens2.size();j++)
               volumeABC.push_back(aurostd::string2utype<double>(tokens2[j]));
           }
@@ -417,8 +419,9 @@ namespace KBIN {
       if(aimsflags.KBIN_AIMS_GEOM_FILE.flag("KEYWORD") && !aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP") && !aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP_POINT")) {
         aus << "00000  MESSAGE GEOM  generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+        xaims.GEOM.str(aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]",0));
         // [OBSOLETE]    aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xaims.GEOM,"[AIMS_GEOM_FILE]");
-        aurostd::ExtractToStringstreamEXPLICIT(AflowIn,xaims.GEOM,"[AIMS_GEOM_FILE]");
+        //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(AflowIn,xaims.GEOM,"[AIMS_GEOM_FILE]");
         xaims.str=xstructure(xaims.GEOM,IOAIMS_AUTO);  // load structure
         xaims.GEOM.str(std::string());xaims.GEOM.clear();
         xaims.str.iomode=IOAIMS_GEOM;
@@ -428,11 +431,12 @@ namespace KBIN {
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         // normal get ONE of ONE
         if(aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP")) {
-          if(aurostd::substring2bool(AflowIn,"[AIMS_GEOM_MODE_EXPLICIT]START") &&
-              aurostd::substring2bool(AflowIn,"[AIMS_GEOM_MODE_EXPLICIT]STOP"))
+          //[SD20220520 - OBSOLETE]if(aurostd::substring2bool(AflowIn,"[AIMS_GEOM_MODE_EXPLICIT]START") &&
+          //[SD20220520 - OBSOLETE]    aurostd::substring2bool(AflowIn,"[AIMS_GEOM_MODE_EXPLICIT]STOP"))
+          xaims.GEOM.str(aurostd::substring2string(AflowIn,"[AIMS_GEOM_MODE_EXPLICIT]START","[AIMS_GEOM_MODE_EXPLICIT]STOP",-1));
             // [OBSOLETE]	  aurostd::ExtractLastToStringstreamEXPLICIT(FileAFLOWIN,xaims.GEOM,"[AIMS_GEOM_MODE_EXPLICIT]START","[AIMS_GEOM_MODE_EXPLICIT]STOP");
-            aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,xaims.GEOM,"[AIMS_GEOM_MODE_EXPLICIT]START","[AIMS_GEOM_MODE_EXPLICIT]STOP");
-          xaims.str=xstructure(xaims.GEOM,IOAIMS_AUTO);   // load structure
+            //[SD20220520 - OBSOLETE]aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,xaims.GEOM,"[AIMS_GEOM_MODE_EXPLICIT]START","[AIMS_GEOM_MODE_EXPLICIT]STOP");
+          if(!xaims.GEOM.str().empty()) {xaims.str=xstructure(xaims.GEOM,IOAIMS_AUTO);}   // load structure
         }
         // get ONE of MANY
         if(aimsflags.KBIN_AIMS_GEOM_MODE.flag("EXPLICIT_START_STOP_POINT")) {
@@ -504,7 +508,7 @@ namespace KBIN {
       }
       if(!aimsflags.KBIN_AIMS_GEOM_FILE.flag("COMMAND") && (aimsflags.KBIN_AIMS_GEOM_FILE.flag("FILE") || !aimsflags.KBIN_AIMS_GEOM_FILE.flag("FILE"))) {
         if(aimsflags.KBIN_AIMS_GEOM_FILE.flag("FILE")) {
-          file=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]FILE=",TRUE);
+          file=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]FILE=",1,TRUE);
           aus << "00000  MESSAGE GEOM  generation from file=" << file << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         } else {
@@ -528,7 +532,7 @@ namespace KBIN {
         xaims.str=xstructure(xaims.GEOM,IOAIMS_GEOM);  // load structure
       }
       if(aimsflags.KBIN_AIMS_GEOM_FILE.flag("COMMAND") && !aimsflags.KBIN_AIMS_GEOM_FILE.flag("FILE")) {
-        file=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]COMMAND=",FALSE);
+        file=aurostd::substring2string(AflowIn,"[AIMS_GEOM_FILE]COMMAND=",1,FALSE);
         aus << "00000  MESSAGE GEOM  generation from command= '" << file << "' " << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         file=file+" > ./_aflow_GEOM."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+".tmp";    // create temp //CO20200502 - threadID
