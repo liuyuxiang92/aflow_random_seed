@@ -907,6 +907,7 @@ namespace unittest {
     string check_function = "", check_description = "";
     bool calculated_bool = false, expected_bool = false;
     int calculated_int = 0, expected_int = 0;
+    string calculated_string = "", expected_string = "";
 
     // ---------------------------------------------------------------------------
     // Check | substringlist2bool
@@ -959,6 +960,47 @@ namespace unittest {
     expected_int = (int) strlist.size() - 1;
     aurostd::SubstringWithinList(strlist, str, calculated_int);
     checkEqual(calculated_int, expected_int, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | substring2string //SD20220525
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::substring2string()";
+    check_description = "return the third match of the substring";
+    string test_string = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
+    calculated_string = aurostd::substring2string(test_string,"ALGO",3);
+    expected_string = "==49";
+      
+    checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+  
+    // ---------------------------------------------------------------------------
+    // Check | kvpair2string //SD20220525
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::kvpair2string()";
+    check_description = "return the second match of the kvpair";
+    calculated_string = aurostd::kvpair2string(test_string,"ALGO","==",2);
+    expected_string = "MEDIUM";
+  
+    checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+  
+    // ---------------------------------------------------------------------------
+    // Check | substring2string //SD20220525
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::substring2string()";
+    check_description = "return the last match of the substring";
+    calculated_string = aurostd::substring2string(test_string,"ALGO",-1);
+    expected_string = "==SLOW";
+  
+    checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+  
+    // ---------------------------------------------------------------------------
+    // Check | kvpair2string //SD20220525
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::kvpair2string()";
+    check_description = "return the last match of the kvpair";
+    calculated_string = aurostd::kvpair2string(test_string,"ALGO","==",-1);
+    expected_string = "SLOW";
+  
+    checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
   }
 
 }

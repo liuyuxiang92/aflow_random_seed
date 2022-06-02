@@ -1818,8 +1818,8 @@ void XtalFinderCalculator::loadStructuresFromStringstream(
 
   // ---------------------------------------------------------------------------
   // structure delimiters
-  string START="[VASP_POSCAR_MODE_EXPLICIT]START";
-  string STOP="[VASP_POSCAR_MODE_EXPLICIT]STOP";
+  string START=_VASP_POSCAR_MODE_EXPLICIT_START_;
+  string STOP=_VASP_POSCAR_MODE_EXPLICIT_STOP_;
 
   // ---------------------------------------------------------------------------
   // used to find the total number of structures
@@ -2053,22 +2053,19 @@ namespace compare {
 
       // ---------------------------------------------------------------------------
       // structure delimiters
-      string START="[VASP_POSCAR_MODE_EXPLICIT]START";
-      string STOP="[VASP_POSCAR_MODE_EXPLICIT]STOP";
-
       bool structure_lines = false;
       uint structure_count = 0;
       stringstream geometry;geometry.clear();geometry.str(std::string());
       for(uint i=0;i<lines.size();i++){
-        if(lines[i].find(START) != std::string::npos){
+        if(lines[i].find(_VASP_POSCAR_MODE_EXPLICIT_START_) != std::string::npos){
           stringstream geometry;geometry.clear();geometry.str(std::string());
           structure_lines = true;
           structure_count+=1;
         }
-        else if(structure_lines && structure_count==structure_number && lines[i].find(STOP) == std::string::npos){
+        else if(structure_lines && structure_count==structure_number && lines[i].find(_VASP_POSCAR_MODE_EXPLICIT_STOP_) == std::string::npos){
           geometry << lines[i] << endl;
         }
-        else if(lines[i].find(STOP) != std::string::npos && structure_lines){
+        else if(lines[i].find(_VASP_POSCAR_MODE_EXPLICIT_STOP_) != std::string::npos && structure_lines){
           structure_lines = false;
           xstructure xstr(geometry);
           structure = xstr;

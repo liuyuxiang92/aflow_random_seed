@@ -24,10 +24,10 @@
 #define _DEBUG_POCC_ false  //CO20190116
 #define _DEBUG_POCC_CLUSTER_ANALYSIS_ false && _DEBUG_POCC_  //CO20190116
 
-const string POSCAR_START_tag="[VASP_POSCAR_MODE_EXPLICIT]START"; //no-period is important
-const string POSCAR_STOP_tag="[VASP_POSCAR_MODE_EXPLICIT]STOP"; //no-period is important
-const string POSCAR_series_START_tag=POSCAR_START_tag+"."; //period is important
-const string POSCAR_series_STOP_tag=POSCAR_STOP_tag+"."; //period is important
+const string POSCAR_START_tag=_VASP_POSCAR_MODE_EXPLICIT_START_; //no-period is important
+const string POSCAR_STOP_tag=_VASP_POSCAR_MODE_EXPLICIT_STOP_; //no-period is important
+const string POSCAR_series_START_tag=_VASP_POSCAR_MODE_EXPLICIT_START_P_; //period is important
+const string POSCAR_series_STOP_tag=_VASP_POSCAR_MODE_EXPLICIT_STOP_P_; //period is important
 const string POSCAR_POCC_series_START_tag=POSCAR_series_START_tag+"POCC_";
 const string POSCAR_POCC_series_STOP_tag=POSCAR_series_STOP_tag+"POCC_";
 
@@ -103,9 +103,9 @@ namespace pocc {
     stringstream unique_structures_ss;
     for(uint i=0;i<vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size();i++){
       unique_structures_ss << AFLOWIN_SEPARATION_LINE << endl;
-      unique_structures_ss << _VASP_POSCAR_MODE_EXPLICIT_START_ << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING[i] << endl;
+      unique_structures_ss << _VASP_POSCAR_MODE_EXPLICIT_START_P_ << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING[i] << endl;
       unique_structures_ss << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRUCTURE[i];
-      unique_structures_ss << _VASP_POSCAR_MODE_EXPLICIT_STOP_ << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING[i] << endl;
+      unique_structures_ss << _VASP_POSCAR_MODE_EXPLICIT_STOP_P_ << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING[i] << endl;
       unique_structures_ss << AFLOWIN_SEPARATION_LINE << endl;
     }
     aurostd::stringstream2file(unique_structures_ss,aflags.Directory+"/"+POCC_FILE_PREFIX+POCC_UNIQUE_SUPERCELLS_FILE);
@@ -116,8 +116,8 @@ namespace pocc {
     uint iline=0;
     for(iline=0;iline<vlines_orig.size();iline++){
       const string& line=vlines_orig[iline];
-      if(line.find(_VASP_POSCAR_MODE_EXPLICIT_STOP_)!=string::npos){reading_explicit=false;}
-      else if(line.find(_VASP_POSCAR_MODE_EXPLICIT_START_)!=string::npos){reading_explicit=true;}
+      if(line.find(_VASP_POSCAR_MODE_EXPLICIT_STOP_P_)!=string::npos){reading_explicit=false;}
+      else if(line.find(_VASP_POSCAR_MODE_EXPLICIT_START_P_)!=string::npos){reading_explicit=true;}
       else{
         if(reading_explicit==false){vlines.push_back(line);}
       }
@@ -358,7 +358,8 @@ namespace pocc {
   xstructure extractPARTCAR(const string& AflowIn){
     string soliloquy=XPID+"pocc::extractPARTCAR():";
     stringstream ss_pocc_structure;
-    aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,ss_pocc_structure, "[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE", "[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE");
+    ss_pocc_structure.str(aurostd::substring2string(AflowIn,"[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE","[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE",-1));
+    //[SD20220520 - OBSOLETE]aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,ss_pocc_structure, "[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE", "[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE");
     if(ss_pocc_structure.str().empty()){
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No PARTCAR found (looking for [POCC_MODE_EXPLICIT]START.POCC_STRUCTURE / [POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE)");
     }
