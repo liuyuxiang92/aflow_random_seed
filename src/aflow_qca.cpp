@@ -1301,7 +1301,7 @@ namespace qca {
       coorsys(3) = std::sqrt(8.0 / 3.0);
       angles(3) = 120.0;
     }
-    alat = aurostd::round(alat, 6); // need to round to prevent error propagation
+    alat = aurostd::round(alat, 3); // need to round due to ATAT bug
     for (uint i = 1; i <= 3; i++) {oss << alat * coorsys(i) << " ";}
     for (uint i = 1; i <= 3; i++) {oss << angles(i) << " ";}
     oss << endl;
