@@ -515,7 +515,7 @@ namespace aurostd {
 
 //--------------------------------------------------------------- round
 namespace aurostd {
-  double round(double x);
+  double round(double x, uint decimals=0); //SD20220603
 }
 
 //--------------------------------------------------------------- isequal

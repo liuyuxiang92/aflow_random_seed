@@ -257,62 +257,76 @@ namespace aurostd {
 // round  floor ceil trunc
 namespace aurostd {  // namespace aurostd
   // ROUND(X)
-  double round(double x) { //CO20210701 //std::round() only works in C++11
-    //algo inspired from here: http://www.cplusplus.com/forum/articles/3638/
-    //https://stackoverflow.com/questions/12696764/round-is-not-a-member-of-std - it's a gcc bug
-    //1.2   ->   1
-    //-1.2  ->  -1
-    //0.1   ->   0
-    //-0.1  ->  -0  //this is ok, (int)round(-0.1)=0
-    //2.5   ->   3
-    //-2.5  ->  -3
-    //2.7   ->   3
-    //-2.7  ->  -3
-    //2.1   ->   2
-    //-2.1  ->  -2
-    //10.7  ->   11
-    //-10.7 ->  -11
-    //[CO20210624 - does not work for negative numbers]return std::floor( x + 0.5 );
-#ifdef _XSCALAR_DEBUG_
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-#endif
-    double fracpart=0.0,intpart=0.0;
-    fracpart=modf(x,&intpart);
-#ifdef _XSCALAR_DEBUG_
-    if(LDEBUG){
-      string soliloquy="aurostd::round():";
-      cerr << soliloquy << " x=" << x << endl;
-      cerr << soliloquy << " fracpart=" << fracpart << endl;
-      cerr << soliloquy << " intpart=" << intpart << endl;
-      cerr << soliloquy << " floor(x)=" << std::floor(x) << endl;
-      cerr << soliloquy << " ceil(x)=" << std::ceil(x) << endl;
-    }
-#endif
-    if(abs(fracpart)>=.5){return x>=0?std::ceil(x):std::floor(x);}  //not sure why fracpart would ever be negative, but it is for negative inputs
-    else{return x<0?std::ceil(x):std::floor(x);}
+  double round(double x, uint decimals) { //SD20220603
+    //Uses the "round half away from zero" rounding strategy, see: https://en.wikipedia.org/wiki/Rounding
+    //This is the strategy employed by Python (except for +-0.5) and Matlab
+    //  0.5  ->   1
+    // -0.5  ->  -1
+    //  1.2  ->   1
+    // -1.2  ->  -1
+    //  1.5  ->   2
+    // -1.5  ->  -2
+    //  1.7  ->   2
+    // -1.7  ->  -2
+    double mult = std::pow(10.0, (double) decimals);
+    return -aurostd::sign(x) * std::ceil(-std::abs(x) * mult - 0.5) / mult;
   }
-  // [OBSOLETE]  float round(float x) { return (float) std::roundf(float(x));}
-  // [OBSOLETE]  long double round(long double x) { return (long double) std::roundl((long double) x);}
-  // [OBSOLETE]  int round(int x) { return (int) std::round(double(x));}
-  // [OBSOLETE]  long round(long x) { return (long) std::round(double(x));}
-  // [OBSOLETE]  // FLOOR(X)
-  // [OBSOLETE]  //  double floor(double x) { return (double) std::floor(double(x));}
-  // [OBSOLETE]  float floor(float x) { return (float) std::floorf(float(x));}
-  // [OBSOLETE]  long double floor(long double x) { return (long double) std::floorl((long double) x);}
-  // [OBSOLETE]  int floor(int x) { return (int) std::floor(double(x));}
-  // [OBSOLETE]  long floor(long x) { return (long) std::floor(double(x));}
-  // [OBSOLETE]  // CEIL(X)
-  // [OBSOLETE]  double ceil(double x) { return (double) std::ceil(double(x));}
-  // [OBSOLETE]  float ceil(float x) { return (float) std::ceilf(float(x));}
-  // [OBSOLETE]  long double ceil(long double x) { return (long double) std::ceill((long double) x);}
-  // [OBSOLETE]  int ceil(int x) { return (int) std::ceil(double(x));}
-  // [OBSOLETE]  long ceil(long x) { return (long) std::ceil(double(x));}
-  // [OBSOLETE]  // TRUNC(X)
-  // [OBSOLETE]  double trunc(double x) { return (double) std::trunc(double(x));}
-  // [OBSOLETE]  float trunc(float x) { return (float) std::truncf(float(x));}
-  // [OBSOLETE]  long double trunc(long double x) { return (long double) std::truncl((long double) x);}
-  // [OBSOLETE]  int trunc(int x) { return (int) std::trunc(double(x));}
-  // [OBSOLETE]  long trunc(long x) { return (long) std::trunc(double(x));}
+ //[SD20220603 - OBSOLETE] double round(double x) { //CO20210701 //std::round() only works in C++11
+ //[SD20220603 - OBSOLETE]   //algo inspired from here: http://www.cplusplus.com/forum/articles/3638/
+ //[SD20220603 - OBSOLETE]   //https://stackoverflow.com/questions/12696764/round-is-not-a-member-of-std - it's a gcc bug
+ //[SD20220603 - OBSOLETE]   //1.2   ->   1
+ //[SD20220603 - OBSOLETE]   //-1.2  ->  -1
+ //[SD20220603 - OBSOLETE]   //0.1   ->   0
+ //[SD20220603 - OBSOLETE]   //-0.1  ->  -0  //this is ok, (int)round(-0.1)=0
+ //[SD20220603 - OBSOLETE]   //2.5   ->   3
+ //[SD20220603 - OBSOLETE]   //-2.5  ->  -3
+ //[SD20220603 - OBSOLETE]   //2.7   ->   3
+ //[SD20220603 - OBSOLETE]   //-2.7  ->  -3
+ //[SD20220603 - OBSOLETE]   //2.1   ->   2
+ //[SD20220603 - OBSOLETE]   //-2.1  ->  -2
+ //[SD20220603 - OBSOLETE]   //10.7  ->   11
+ //[SD20220603 - OBSOLETE]   //-10.7 ->  -11
+ //[SD20220603 - OBSOLETE]   //[CO20210624 - does not work for negative numbers]return std::floor( x + 0.5 );
+ //[SD20220603 - OBSOLETE]#ifdef _XSCALAR_DEBUG_
+ //[SD20220603 - OBSOLETE]   bool LDEBUG=(FALSE || XHOST.DEBUG);
+ //[SD20220603 - OBSOLETE]#endif
+ //[SD20220603 - OBSOLETE]   double fracpart=0.0,intpart=0.0;
+ //[SD20220603 - OBSOLETE]   fracpart=modf(x,&intpart);
+ //[SD20220603 - OBSOLETE]#ifdef _XSCALAR_DEBUG_
+ //[SD20220603 - OBSOLETE]   if(LDEBUG){
+ //[SD20220603 - OBSOLETE]     string soliloquy="aurostd::round():";
+ //[SD20220603 - OBSOLETE]     cerr << soliloquy << " x=" << x << endl;
+ //[SD20220603 - OBSOLETE]     cerr << soliloquy << " fracpart=" << fracpart << endl;
+ //[SD20220603 - OBSOLETE]     cerr << soliloquy << " intpart=" << intpart << endl;
+ //[SD20220603 - OBSOLETE]     cerr << soliloquy << " floor(x)=" << std::floor(x) << endl;
+ //[SD20220603 - OBSOLETE]     cerr << soliloquy << " ceil(x)=" << std::ceil(x) << endl;
+ //[SD20220603 - OBSOLETE]   }
+ //[SD20220603 - OBSOLETE]#endif
+ //[SD20220603 - OBSOLETE]   if(abs(fracpart)>=.5){return x>=0?std::ceil(x):std::floor(x);}  //not sure why fracpart would ever be negative, but it is for negative inputs
+ //[SD20220603 - OBSOLETE]   else{return x<0?std::ceil(x):std::floor(x);}
+ //[SD20220603 - OBSOLETE] }
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  float round(float x) { return (float) std::roundf(float(x));}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  long double round(long double x) { return (long double) std::roundl((long double) x);}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  int round(int x) { return (int) std::round(double(x));}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  long round(long x) { return (long) std::round(double(x));}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  // FLOOR(X)
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  //  double floor(double x) { return (double) std::floor(double(x));}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  float floor(float x) { return (float) std::floorf(float(x));}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  long double floor(long double x) { return (long double) std::floorl((long double) x);}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  int floor(int x) { return (int) std::floor(double(x));}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  long floor(long x) { return (long) std::floor(double(x));}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  // CEIL(X)
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  double ceil(double x) { return (double) std::ceil(double(x));}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  float ceil(float x) { return (float) std::ceilf(float(x));}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  long double ceil(long double x) { return (long double) std::ceill((long double) x);}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  int ceil(int x) { return (int) std::ceil(double(x));}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  long ceil(long x) { return (long) std::ceil(double(x));}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  // TRUNC(X)
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  double trunc(double x) { return (double) std::trunc(double(x));}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  float trunc(float x) { return (float) std::truncf(float(x));}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  long double trunc(long double x) { return (long double) std::truncl((long double) x);}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  int trunc(int x) { return (int) std::trunc(double(x));}
+ //[SD20220603 - OBSOLETE] // [OBSOLETE]  long trunc(long x) { return (long) std::trunc(double(x));}
 }
 
 namespace aurostd {
