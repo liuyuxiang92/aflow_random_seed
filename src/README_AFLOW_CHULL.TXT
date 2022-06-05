@@ -47,7 +47,7 @@ LIST OF AFLOW-CHULL COMMANDS:
           There are two input modes:  raw (comma-separated) and combinatorial (colon- and comma-separated).
           Raw input:  --alloy=MnPdPt,AlCuZn.
           Combinatorial input:  --alloy=Ag,Au:Mn.  This is interpreted as --alloy=AgMn,AuMn.
-      [--np=1] : number of processors for multiple alloy inputs.
+      [--np=1] : Number of processors for multiple alloy inputs.
       [--destination=[DIRECTORY]] : Optional argument, specify the directory for the output.  
           Default is "./".
       [--usage] : Returns usage commands and options.
