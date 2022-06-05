@@ -95,17 +95,17 @@ LIST OF AFLOW-CHULL COMMANDS:
           --hull_formation_enthalpy=0.5,0.25, where the composition of the last component is implicitly 1-sum(0.5+0.25).
           Providing an additional component (e.g., --dist2hull=0.5,0.25,0.1) results in a rigid shift in the energy axis and,
           thus, a constant added to the final distance calculated (0.1 is in units of eV for formation energy hulls).
-      [--skip_structure_comparison|--skipstructruecomparison|--skipstructcomp|--ssc] : structure comparison analysis for determination of
+      [--skip_structure_comparison|--skipstructruecomparison|--skipstructcomp|--ssc] : Structure comparison analysis for determination of
           equivalent ground state structures is skipped (can be time consuming).
-      [--skip_stability_criterion_analysis|--skipstabilitycriterionanalysis|--skipscriterion|--sscriterion] : analysis
+      [--skip_stability_criterion_analysis|--skipstabilitycriterionanalysis|--skipscriterion|--sscriterion] : Analysis
           of stability criterion for ground state structures is skipped (can be time consuming).
-      [--skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skipnplus1|--snp1|--snpo] : analysis
+      [--skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skipnplus1|--snp1|--snpo] : Analysis
           of N+1 enthalpy gain for ground state structures is skipped (can be time consuming).
-      [--include_skewed_hulls|--include_skewed|--ish] : process hull despite skewed endpoints (abs(ground state endpoint energy) < 15 meV).
-      [--include_unreliable_hulls|--include_unreliable|--iuh] : process hull despite poor statistics (binary hull count < 200).
-      [--include_outliers|--io] : include any detected outliers (output/warning is still shown).
-      [--strict_outlier_analysis|--soa] : terminate hull analysis if binary hull statistics not satisfied.
-      [--force] : force output despite warnings.
+      [--include_skewed_hulls|--include_skewed|--ish] : Process hull despite skewed endpoints (abs(ground state endpoint energy) < 15 meV).
+      [--include_unreliable_hulls|--include_unreliable|--iuh] : Process hull despite poor statistics (binary hull count < 200).
+      [--include_outliers|--io] : Include any detected outliers (output/warning is still shown).
+      [--strict_outlier_analysis|--soa] : Terminate hull analysis if binary hull statistics not satisfied.
+      [--force] : Force output despite warnings.
 
       LATEX/PDF/PNG OPTIONS:
       [--image_only|--imageonly|--image] : Latex/PDF output mode only. Similar to --document_only, 
