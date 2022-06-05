@@ -38,7 +38,7 @@ Various output formats are provided, including plain text, json, PDF, and Jupyte
 ****************************************************************************************************
 LIST OF AFLOW-CHULL COMMANDS:
   
-  aflow --convex_hull=|--chull --alloy=MnPdPt[,AlCuZn,...] [chull_options] [--destination=[DIRECTORY]]
+  aflow --convex_hull=|--chull --alloy=MnPdPt[,AlCuZn,...] [--np=1] [chull_options] [--destination=[DIRECTORY]]
       Queries the AFLOW API for relevant entries (see --load_library), calculates
       the convex hull, and returns the information as a PDF (default, see --output).
       --chull : Necessary flag for entering mode for calculating convex hull.
@@ -47,6 +47,7 @@ LIST OF AFLOW-CHULL COMMANDS:
           There are two input modes:  raw (comma-separated) and combinatorial (colon- and comma-separated).
           Raw input:  --alloy=MnPdPt,AlCuZn.
           Combinatorial input:  --alloy=Ag,Au:Mn.  This is interpreted as --alloy=AgMn,AuMn.
+      [--np=1] : number of processors for multiple alloy inputs.
       [--destination=[DIRECTORY]] : Optional argument, specify the directory for the output.  
           Default is "./".
       [--usage] : Returns usage commands and options.

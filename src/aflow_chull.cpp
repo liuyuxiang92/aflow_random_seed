@@ -119,7 +119,7 @@ namespace chull {
     // START Display usage, if requested
     //////////////////////////////////////////////////////////////////////////////
 
-    string usage_usage="aflow --convex_hull=|--chull --alloy=MnPdPt[,AlCuZn,...] [chull_options] [--destination=[DIRECTORY]]";
+    string usage_usage="aflow --convex_hull=|--chull --alloy=MnPdPt[,AlCuZn,...] [--np=1] [chull_options] [--destination=[DIRECTORY]]";
     vector<string> usage_options;
     usage_options.push_back(usage_usage);
     usage_options.push_back(" ");
