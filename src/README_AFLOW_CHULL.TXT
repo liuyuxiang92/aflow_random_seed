@@ -87,7 +87,7 @@ LIST OF AFLOW-CHULL COMMANDS:
           a warning if structure is not a ground state one. It removes the point from the 
           hull, calculates the new hull, and calculates the distance of this point from
           below/above (Hf/Ts) hull.
-      [--n+1_enthalpy_gain=|--n+1_energy_gain=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=|--n+1_enthalpygain=|--n+1+energygain=|--n+1_egain=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774] :
+      [--n+1_enthalpy_gain=|--n+1_energy_gain=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=|--n+1_enthalpygain=|--n+1+energygain=|--n+1_egain=|--nplus1=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774] :
           Calculates the N+1 enthalpy gain of the ground state structure. Will return
           a warning if structure is not a ground state one. It removes all points having the 
           same dimensionality from the hull, calculates the new hull, and calculates the 
