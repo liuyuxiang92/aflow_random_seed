@@ -99,9 +99,9 @@ LIST OF AFLOW-CHULL COMMANDS:
           thus, a constant added to the final distance calculated (0.1 is in units of eV for formation energy hulls).
       [--skip_structure_comparison|--skipstructruecomparison|--skipstructcomp|--ssc] : Structure comparison analysis for determination of
           equivalent ground state structures is skipped (can be time consuming).
-      [--skip_stability_criterion_analysis|--skipstabilitycriterionanalysis|--skipscriterion|--sscriterion] : Analysis
+      [--skip_stability_criterion_analysis|--skipstabilitycriterionanalysis|--skip_scriterion|--skipscriterion|--sscriterion] : Analysis
           of stability criterion for ground state structures is skipped (can be time consuming).
-      [--skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skipnplus1|--snp1|--snpo] : Analysis
+      [--skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skip_nplus1|--skipnplus1|--snp1|--snpo] : Analysis
           of N+1 enthalpy gain for ground state structures is skipped (can be time consuming).
       [--include_skewed_hulls|--include_skewed|--ish] : Process hull despite skewed endpoints (abs(ground state endpoint energy) < 15 meV).
       [--include_unreliable_hulls|--include_unreliable|--iuh] : Process hull despite poor statistics (binary hull count < 200).

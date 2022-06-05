@@ -147,8 +147,8 @@ namespace chull {
     usage_options.push_back("--n+1_enthalpy_gain=|--=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=|--n+1_enthalpygain=|--n+1+energygain=|--n+1_egain=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774");
     usage_options.push_back("--hull_formation_enthalpy=|--hull_enthalpy=|--hull_energy=0.25,0.25");
     usage_options.push_back("--skip_structure_comparison|--skipstructruecomparison|--skipstructcomp|--ssc");
-    usage_options.push_back("--skip_stability_criterion_analysis|--skipstabilitycriterionanalysis|--skipscriterion|--sscriterion");
-    usage_options.push_back("--skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skipnplus1|--snp1|--snpo");
+    usage_options.push_back("--skip_stability_criterion_analysis|--skipstabilitycriterionanalysis|--skip_scriterion|--skipscriterion|--sscriterion");
+    usage_options.push_back("--skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skip_nplus1|--skipnplus1|--snp1|--snpo");
     usage_options.push_back("--include_skewed_hulls|--include_skewed|--ish");
     usage_options.push_back("--include_unreliable_hulls|--include_unreliable|--iuh");
     usage_options.push_back("--include_outliers|--io");
