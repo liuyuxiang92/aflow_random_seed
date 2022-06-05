@@ -38,7 +38,7 @@ Various output formats are provided, including plain text, json, PDF, and Jupyte
 ****************************************************************************************************
 LIST OF AFLOW-CHULL COMMANDS:
   
-  aflow --convex_hull=|--chull --alloy=MnPdPt[,AlCuZn,...] [--np=1] [chull_options] [--destination=[DIRECTORY]]
+  aflow --convex_hull=|--chull --alloy=MnPdPt[,AlCuZn,...] [--np=1] [chull_options] [--destination=DIRECTORY]
       Queries the AFLOW API for relevant entries (see --load_library), calculates
       the convex hull, and returns the information as a PDF (default, see --output).
       --chull : Necessary flag for entering mode for calculating convex hull.
@@ -48,7 +48,7 @@ LIST OF AFLOW-CHULL COMMANDS:
           Raw input:  --alloy=MnPdPt,AlCuZn.
           Combinatorial input:  --alloy=Ag,Au:Mn.  This is interpreted as --alloy=AgMn,AuMn.
       [--np=1] : Number of processors for multiple alloy inputs.
-      [--destination=[DIRECTORY]] : Optional argument, specify the directory for the output.  
+      [--destination=DIRECTORY] : Optional argument, specify the directory for the output.  
           Default is "./".
       [--usage] : Returns usage commands and options.
       [--print=|--p=|--output=|--o=latex|pdf|png|json|text|jupyter|jupyter2|jupyter3] : Select the output format. Latex/PDF are the same (.pdf).
@@ -57,6 +57,8 @@ LIST OF AFLOW-CHULL COMMANDS:
           Default is Latex/PDF.
       [--screen_only] : Output is direct to screen (stdout) instead of writing to a file. 
           All logging output is suppressed.
+      [--keep=tex|--keep_tex|--keeptex|--tex] : Latex/PDF output mode only. Will keep latex .tex and put it in
+          --destination=DIRECTORY.
       [--keep=log|--keep_log|--keeplog|--log] : Prints a log file of relevant output.
       [--keep=tex,log] : Keep both.
       
@@ -90,7 +92,7 @@ LIST OF AFLOW-CHULL COMMANDS:
           a warning if structure is not a ground state one. It removes all points having the 
           same dimensionality from the hull, calculates the new hull, and calculates the 
           distance of this point from below/above (Hf/Ts) hull.
-      [--hull_formation_enthalpy=|--hull_energy=0.25,0.25] : Returns the value of the convex hull surface at the specified coordinate/concentration.
+      [--hull_formation_enthalpy=|--hull_enthalpy=|--hull_energy=0.25,0.25] : Returns the value of the convex hull surface at the specified coordinate/concentration.
           For stoichiometric hulls, provide the reduced composition form, i.e., for the compound Mn2PdPt, use
           --hull_formation_enthalpy=0.5,0.25, where the composition of the last component is implicitly 1-sum(0.5+0.25).
           Providing an additional component (e.g., --dist2hull=0.5,0.25,0.1) results in a rigid shift in the energy axis and,
@@ -116,8 +118,6 @@ LIST OF AFLOW-CHULL COMMANDS:
           Dimensions: 8.5x11 inches (standard page), landscape.
       [--document_only|--documentonly|--doc_only|--doconly|--doc] : Latex/PDF output mode only.
           Exclude convex hull illustration. This is the default for quaternary systems and above.
-      [--keep=tex|--keep_tex|--keeptex|--tex] : Latex/PDF output mode only. Will keep latex .tex and put it in
-          --destination=[DIRECTORY].
       [--latex_output|--latexoutput] : Latex/PDF output mode only. See full latex output.
           Good for troubleshooting.
       [--latex_interactive|--latexinteractive] : Latex/PDF output mode only. Allows you
