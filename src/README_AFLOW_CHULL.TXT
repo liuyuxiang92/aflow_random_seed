@@ -50,12 +50,12 @@ LIST OF AFLOW-CHULL COMMANDS:
       [--destination=[DIRECTORY]] : Optional argument, specify the directory for the output.  
           Default is "./".
       [--usage] : Returns usage commands and options.
-      [--print=|--p=|--output=|--o=latex|pdf|json|text|jupyter|jupyter2|jupyter3] : Select the output format. Latex/PDF are the same (.pdf).
+      [--print=|--p=|--output=|--o=latex|pdf|png|json|text|jupyter|jupyter2|jupyter3] : Select the output format. Latex/PDF are the same (.pdf).
           JSON and plain text have the following extensions:  .json and .txt.
           jupyter|jupyter2|jupyter3 creates a jupter notebook json file that plots a convex hull for the specified alloy (jupyter3 is default).
           Default is Latex/PDF.
       [--screen_only] : Output is direct to screen (stdout) instead of writing to a file. 
-          All logging output is surpressed.
+          All logging output is suppressed.
       [--keep=log|--keep_log|--keeplog|--log] : Prints a log file of relevant output.
       [--keep=tex,log] : Keep both.
       
@@ -68,7 +68,7 @@ LIST OF AFLOW-CHULL COMMANDS:
           all entries loaded from the AFLOW API.
       [--neglect=|--ban=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774] :
           Ban specific entries from the convex hull calculation, done by AUID.
-      [--see_neglect|--seeneglect| --sn] : Show why entries were neglected.
+      [--see_neglect|--seeneglect|--sn] : Show why entries were neglected.
       [--remove_extreme_points=|--removeextremepoints=|--remove_extrema=|--removeextrema=|--rep=-1000] :
           Exclude points based on Hf/Ts (floor/ceiling). Units are meV/atom / K.
       [--entropic_temperature|--entropictemperature|--entroptemp] : Calculate the Ts
@@ -106,7 +106,7 @@ LIST OF AFLOW-CHULL COMMANDS:
       [--strict_outlier_analysis|--soa] : terminate hull analysis if binary hull statistics not satisfied.
       [--force] : force output despite warnings.
 
-      PDF/LATEX OPTIONS:
+      LATEX/PDF/PNG OPTIONS:
       [--image_only|--imageonly|--image] : Latex/PDF output mode only. Similar to --document_only, 
           but the image dimensions are not necessarily for a standard page. Preferred option for 
           importing into papers/presentations.
