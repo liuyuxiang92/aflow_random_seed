@@ -3611,286 +3611,257 @@ namespace aurostd {
 
   // *******************************************************************************************
   // *******************************************************************************************
-  bool ExtractToFileEXPLICIT(ifstream& FileIN,string FileNameOUTPUT,string Keyword) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    ofstream FileOUTPUT;
-    FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
-    string strline,subS2;
-    subS2=Keyword; // STRING TO SEARCH
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    bool status=FALSE;
-    while(getline(FileIN,strline))
-      if(aurostd::substring2bool(strline,subS2)) {
-        FileOUTPUT << strline.substr(strline.find(subS2)+subS2.length()) << endl;
-        status=TRUE;
-      }
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-    return status;  // return FALSE if the keyword was never found
-  }
+  //[SD20220501 - OBSOLETE]bool ExtractToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]  ofstream FileOUTPUT;
+  //[SD20220501 - OBSOLETE]  FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
+  //[SD20220501 - OBSOLETE]  string strline="";
+  //[SD20220501 - OBSOLETE]  FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+  //[SD20220501 - OBSOLETE]  bool status=FALSE;
+  //[SD20220501 - OBSOLETE]  while(getline(FileIN,strline)) {
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(strline,Keyword)) {
+  //[SD20220501 - OBSOLETE]      FileOUTPUT << strline.substr(strline.find(Keyword)+Keyword.length()) << endl;
+  //[SD20220501 - OBSOLETE]      status=TRUE;
+  //[SD20220501 - OBSOLETE]    }
+  //[SD20220501 - OBSOLETE]  }
+  //[SD20220501 - OBSOLETE]  FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+  //[SD20220501 - OBSOLETE]  FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
+  //[SD20220501 - OBSOLETE]  return status;  // return FALSE if the keyword was never found
+  //[SD20220501 - OBSOLETE]}
 
-  bool ExtractToFileEXPLICIT(string StringIN,string FileNameOUTPUT,string Keyword) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    ofstream FileOUTPUT;
-    FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
-    string strline,subS2;
-    subS2=Keyword; // STRING TO SEARCH
-    bool status=FALSE;
-    vector<string> tokens;
-    aurostd::string2tokens(StringIN,tokens,"\n");
-    for(uint i=0;i<tokens.size();i++) {
-      strline=tokens[i];
-      if(aurostd::substring2bool(strline,subS2)) {
-        FileOUTPUT << strline.substr(strline.find(subS2)+subS2.length()) << endl;
-        status=TRUE;
-      }
-    }
-    FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-    return status;  // return FALSE if the keyword was never found
-  }
-
-  // *******************************************************************************************
-  bool ExtractToFileEXPLICIT(ifstream& FileIN,string FileNameOUTPUT,string Keyword_start,string Keyword_stop) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    ofstream FileOUTPUT;
-    FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
-    string strline,subS2;
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    bool status=FALSE;
-    while(getline(FileIN,strline)) {
-      if(aurostd::substring2bool(strline,Keyword_stop))  status=FALSE;
-      if(status) FileOUTPUT << strline << endl;
-      if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
-    }
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-    return status;  // return FALSE if something got messed up
-  }
-
-  bool ExtractToFileEXPLICIT(string StringIN,string FileNameOUTPUT,string Keyword_start,string Keyword_stop) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    ofstream FileOUTPUT;
-    FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
-    string strline,subS2;
-    bool status=FALSE;
-    vector<string> tokens;
-    aurostd::string2tokens(StringIN,tokens,"\n");
-    for(uint i=0;i<tokens.size();i++) {
-      strline=tokens[i];
-      if(aurostd::substring2bool(strline,Keyword_stop))  status=FALSE;
-      if(status) FileOUTPUT << strline << endl;
-      if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
-    }
-    FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-    return status;  // return FALSE if something got messed up
-  }
+  //[SD20220501 - OBSOLETE]bool ExtractToFileEXPLICIT(const string& StringIN,const string& FileNameOUTPUT,const string& Keyword) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]  ofstream FileOUTPUT;
+  //[SD20220501 - OBSOLETE]  FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
+  //[SD20220501 - OBSOLETE]  string strline="";
+  //[SD20220501 - OBSOLETE]  bool status=FALSE;
+  //[SD20220501 - OBSOLETE]  vector<string> tokens;
+  //[SD20220501 - OBSOLETE]  aurostd::string2tokens(StringIN,tokens,"\n");
+  //[SD20220501 - OBSOLETE]  for(uint i=0;i<tokens.size();i++) {
+  //[SD20220501 - OBSOLETE]    strline=tokens[i];
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(strline,Keyword)) {
+  //[SD20220501 - OBSOLETE]      FileOUTPUT << strline.substr(strline.find(Keyword)+Keyword.length()) << endl;
+  //[SD20220501 - OBSOLETE]      status=TRUE;
+  //[SD20220501 - OBSOLETE]    }
+  //[SD20220501 - OBSOLETE]  }
+  //[SD20220501 - OBSOLETE]  FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
+  //[SD20220501 - OBSOLETE]  return status;  // return FALSE if the keyword was never found
+  //[SD20220501 - OBSOLETE]}
 
   // *******************************************************************************************
-  // *******************************************************************************************
-  bool ExtractToStringEXPLICIT(ifstream& FileIN,string& StringOUTPUT,string Keyword) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    string strline,subS2;
-    subS2=Keyword; // STRING TO SEARCH
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    bool status=FALSE;
-    while(getline(FileIN,strline))
-      if(aurostd::substring2bool(strline,subS2)) {
-        StringOUTPUT=StringOUTPUT+strline.substr(strline.find(subS2)+subS2.length())+"\n";
-        status=TRUE;
-      }
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    return status;  // return FALSE if the keyword was never found
-  }
+  //[SD20220501 - OBSOLETE]bool ExtractToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]  ofstream FileOUTPUT;
+  //[SD20220501 - OBSOLETE]  FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
+  //[SD20220501 - OBSOLETE]  string strline="";
+  //[SD20220501 - OBSOLETE]  FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+  //[SD20220501 - OBSOLETE]  bool status=FALSE;
+  //[SD20220501 - OBSOLETE]  while(getline(FileIN,strline)) {
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(strline,Keyword_stop))  status=FALSE;
+  //[SD20220501 - OBSOLETE]    if(status) FileOUTPUT << strline << endl;
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
+  //[SD20220501 - OBSOLETE]  }
+  //[SD20220501 - OBSOLETE]  FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+  //[SD20220501 - OBSOLETE]  FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
+  //[SD20220501 - OBSOLETE]  return status;  // return FALSE if something got messed up
+  //[SD20220501 - OBSOLETE]}
 
-  bool ExtractToStringEXPLICIT(string StringIN,string& StringOUTPUT,string Keyword) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    string strline,subS2;
-    subS2=Keyword; // STRING TO SEARCH
-    bool status=FALSE;
-    vector<string> tokens;
-    aurostd::string2tokens(StringIN,tokens,"\n");
-    for(uint i=0;i<tokens.size();i++) {
-      strline=tokens[i];
-      if(aurostd::substring2bool(strline,subS2)) {
-        StringOUTPUT=StringOUTPUT+strline.substr(strline.find(subS2)+subS2.length())+"\n";
-        status=TRUE;
-      }
-    }
-    return status;  // return FALSE if the keyword was never found
-  }
-
-  // *******************************************************************************************
-  bool ExtractToStringEXPLICIT(ifstream& FileIN,string& StringOUTPUT,string Keyword_start,string Keyword_stop) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    string strline,subS2;
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    bool status=FALSE;
-    while(getline(FileIN,strline)) {
-      if(aurostd::substring2bool(strline,Keyword_stop))  status=FALSE;
-      if(status) StringOUTPUT=StringOUTPUT+strline+"\n";
-      if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
-    }
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    return status;  // return FALSE if something got messed up
-  }
-
-  bool ExtractToStringEXPLICIT(string StringIN,string& StringOUTPUT,string Keyword_start,string Keyword_stop) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    string strline,subS2;
-    bool status=FALSE;
-    vector<string> tokens;
-    aurostd::string2tokens(StringIN,tokens,"\n");
-    for(uint i=0;i<tokens.size();i++) {
-      strline=tokens[i];
-      if(aurostd::substring2bool(strline,Keyword_stop))  status=FALSE;
-      if(status) StringOUTPUT=StringOUTPUT+strline+"\n";
-      if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
-    }
-    return status;  // return FALSE if something got messed up
-  }
+  //[SD20220501 - OBSOLETE]bool ExtractToFileEXPLICIT(const string& StringIN,const string& FileNameOUTPUT,const string& Keyword_start,const string& Keyword_stop) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]  ofstream FileOUTPUT;
+  //[SD20220501 - OBSOLETE]  FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
+  //[SD20220501 - OBSOLETE]  string strline="";
+  //[SD20220501 - OBSOLETE]  bool status=FALSE;
+  //[SD20220501 - OBSOLETE]  vector<string> tokens;
+  //[SD20220501 - OBSOLETE]  aurostd::string2tokens(StringIN,tokens,"\n");
+  //[SD20220501 - OBSOLETE]  for(uint i=0;i<tokens.size();i++) {
+  //[SD20220501 - OBSOLETE]    strline=tokens[i];
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(strline,Keyword_stop))  status=FALSE;
+  //[SD20220501 - OBSOLETE]    if(status) FileOUTPUT << strline << endl;
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
+  //[SD20220501 - OBSOLETE]  }
+  //[SD20220501 - OBSOLETE]  FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
+  //[SD20220501 - OBSOLETE]  return status;  // return FALSE if something got messed up
+  //[SD20220501 - OBSOLETE]}
 
   // *******************************************************************************************
   // *******************************************************************************************
-  bool ExtractToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,string Keyword) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]bool ExtractToStringEXPLICIT(ifstream& FileIN,string& StringOUTPUT,const string& Keyword) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]  string strline="";
+  //[SD20220501 - OBSOLETE]  FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+  //[SD20220501 - OBSOLETE]  bool status=FALSE;
+  //[SD20220501 - OBSOLETE]  while(getline(FileIN,strline)) {
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(strline,Keyword)) {
+  //[SD20220501 - OBSOLETE]      StringOUTPUT=StringOUTPUT+strline.substr(strline.find(Keyword)+Keyword.length())+"\n";
+  //[SD20220501 - OBSOLETE]      status=TRUE;
+  //[SD20220501 - OBSOLETE]    }
+  //[SD20220501 - OBSOLETE]  }
+  //[SD20220501 - OBSOLETE]  FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+  //[SD20220501 - OBSOLETE]  return status;  // return FALSE if the keyword was never found
+  //[SD20220501 - OBSOLETE]}
+
+  //[SD20220501 - OBSOLETE]bool ExtractToStringEXPLICIT(const string& StringIN,string& StringOUTPUT,const string& Keyword) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]  string strline="";
+  //[SD20220501 - OBSOLETE]  bool status=FALSE;
+  //[SD20220501 - OBSOLETE]  vector<string> tokens;
+  //[SD20220501 - OBSOLETE]  aurostd::string2tokens(StringIN,tokens,"\n");
+  //[SD20220501 - OBSOLETE]  for(uint i=0;i<tokens.size();i++) {
+  //[SD20220501 - OBSOLETE]    strline=tokens[i];
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(strline,Keyword)) {
+  //[SD20220501 - OBSOLETE]      StringOUTPUT=StringOUTPUT+strline.substr(strline.find(Keyword)+Keyword.length())+"\n";
+  //[SD20220501 - OBSOLETE]      status=TRUE;
+  //[SD20220501 - OBSOLETE]    }
+  //[SD20220501 - OBSOLETE]  }
+  //[SD20220501 - OBSOLETE]  return status;  // return FALSE if the keyword was never found
+  //[SD20220501 - OBSOLETE]}
+
+  // *******************************************************************************************
+  //[SD20220501 - OBSOLETE]bool ExtractToStringEXPLICIT(ifstream& FileIN,string& StringOUTPUT,const string& Keyword_start,const string& Keyword_stop) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]  string strline="";
+  //[SD20220501 - OBSOLETE]  FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+  //[SD20220501 - OBSOLETE]  bool status=FALSE;
+  //[SD20220501 - OBSOLETE]  while(getline(FileIN,strline)) {
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(strline,Keyword_stop))  status=FALSE;
+  //[SD20220501 - OBSOLETE]    if(status) StringOUTPUT=StringOUTPUT+strline+"\n";
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
+  //[SD20220501 - OBSOLETE]  }
+  //[SD20220501 - OBSOLETE]  FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+  //[SD20220501 - OBSOLETE]  return status;  // return FALSE if something got messed up
+  //[SD20220501 - OBSOLETE]}
+
+  //[SD20220501 - OBSOLETE]bool ExtractToStringEXPLICIT(const string& StringIN,string& StringOUTPUT,const string& Keyword_start,const string& Keyword_stop) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]  string strline="";
+  //[SD20220501 - OBSOLETE]  bool status=FALSE;
+  //[SD20220501 - OBSOLETE]  vector<string> tokens;
+  //[SD20220501 - OBSOLETE]  aurostd::string2tokens(StringIN,tokens,"\n");
+  //[SD20220501 - OBSOLETE]  for(uint i=0;i<tokens.size();i++) {
+  //[SD20220501 - OBSOLETE]    strline=tokens[i];
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(strline,Keyword_stop))  status=FALSE;
+  //[SD20220501 - OBSOLETE]    if(status) StringOUTPUT=StringOUTPUT+strline+"\n";
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
+  //[SD20220501 - OBSOLETE]  }
+  //[SD20220501 - OBSOLETE]  return status;  // return FALSE if something got messed up
+  //[SD20220501 - OBSOLETE]}
+
+  // *******************************************************************************************
+  // *******************************************************************************************
+  //[SD20220501 - OBSOLETE]bool ExtractToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword) {        // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]  aurostd::StringstreamClean(StringstreamOUTPUT);
+  //[SD20220501 - OBSOLETE]  string strline="";
+  //[SD20220501 - OBSOLETE]  FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+  //[SD20220501 - OBSOLETE]  bool status=FALSE;
+  //[SD20220501 - OBSOLETE]  while(getline(FileIN,strline)) {
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(strline,Keyword)) {
+  //[SD20220501 - OBSOLETE]      StringstreamOUTPUT << strline.substr(strline.find(Keyword)+Keyword.length()) << endl;
+  //[SD20220501 - OBSOLETE]      status=TRUE;
+  //[SD20220501 - OBSOLETE]    }
+  //[SD20220501 - OBSOLETE]  }
+  //[SD20220501 - OBSOLETE]  FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+  //[SD20220501 - OBSOLETE]  return status;  // return FALSE if the keyword was never found
+  //[SD20220501 - OBSOLETE]}
+
+  // *******************************************************************************************
+  //[SD20220501 - OBSOLETE]bool ExtractToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop) {    // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]  aurostd::StringstreamClean(StringstreamOUTPUT);
+  //[SD20220501 - OBSOLETE]  string strline="";
+  //[SD20220501 - OBSOLETE]  FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+  //[SD20220501 - OBSOLETE]  bool status=FALSE;
+  //[SD20220501 - OBSOLETE]  while(getline(FileIN,strline)) {
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(strline,Keyword_stop))  status=FALSE;
+  //[SD20220501 - OBSOLETE]    if(status) StringstreamOUTPUT << strline << endl;
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
+  //[SD20220501 - OBSOLETE]  }
+  //[SD20220501 - OBSOLETE]  FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+  //[SD20220501 - OBSOLETE]  return status;  // return FALSE if something got messed up
+  //[SD20220501 - OBSOLETE]}
+
+  //[SD20220501 - OBSOLETE]bool ExtractToStringstreamEXPLICIT(stringstream& StringStreamIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop) { // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]  aurostd::StringstreamClean(StringstreamOUTPUT);
+  //[SD20220501 - OBSOLETE]  string StringIN=StringStreamIN.str();
+  //[SD20220501 - OBSOLETE]  return ExtractToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start,Keyword_stop);
+  //[SD20220501 - OBSOLETE]}
+
+  //[SD20220501 - OBSOLETE]bool ExtractToStringstreamEXPLICIT(const string& StringIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop) {  // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]  aurostd::StringstreamClean(StringstreamOUTPUT);
+  //[SD20220501 - OBSOLETE]  bool status=FALSE;
+  //[SD20220501 - OBSOLETE]  vector<string> tokens;
+  //[SD20220501 - OBSOLETE]  aurostd::string2tokens(StringIN,tokens,"\n");
+  //[SD20220501 - OBSOLETE]  for(uint i=0;i<tokens.size();i++) {
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(tokens[i],Keyword_stop))  status=FALSE;
+  //[SD20220501 - OBSOLETE]    if(status) StringstreamOUTPUT << tokens[i] << endl;
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(tokens[i],Keyword_start)) status=TRUE;
+  //[SD20220501 - OBSOLETE]  }
+  //[SD20220501 - OBSOLETE]  return status;  // return FALSE if something got messed up
+  //[SD20220501 - OBSOLETE]}
+
+  //[SD20220501 - OBSOLETE]bool ExtractToStringstreamEXPLICIT(const string& StringIN,stringstream& StringstreamOUTPUT,const string& Keyword) {  // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]  aurostd::StringstreamClean(StringstreamOUTPUT);
+  //[SD20220501 - OBSOLETE]  bool status=FALSE;
+  //[SD20220501 - OBSOLETE]  vector<string> tokens;
+  //[SD20220501 - OBSOLETE]  aurostd::string2tokens(StringIN,tokens,"\n");
+  //[SD20220501 - OBSOLETE]  for(uint i=0;i<tokens.size();i++) {
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(tokens[i],Keyword)) StringstreamOUTPUT << tokens[i].substr(tokens[i].find(Keyword)+Keyword.length()) << endl;
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(tokens[i],Keyword)) status=TRUE;
+  //[SD20220501 - OBSOLETE]  }
+  //[SD20220501 - OBSOLETE]  return status;  // return FALSE if something got messed up
+  //[SD20220501 - OBSOLETE]}
+
+  // *******************************************************************************************
+  // *******************************************************************************************
+  //[SD20220501 - OBSOLETE]bool ExtractLastToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword) {   // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]  return ExtractToStringstreamEXPLICIT(FileIN,StringstreamOUTPUT,Keyword);
+  //[SD20220501 - OBSOLETE]}
+
+  // *******************************************************************************************
+  //[SD20220501 - OBSOLETE]bool ExtractLastToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop) { // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  //[SD20220501 - OBSOLETE]  if(LDEBUG) cerr << "LDEBUG: ExtractLastToStringstreamEXPLICIT" << endl;
+  //[SD20220501 - OBSOLETE]  aurostd::StringstreamClean(StringstreamOUTPUT);
+  //[SD20220501 - OBSOLETE]  vector<string> tokens;
+  //[SD20220501 - OBSOLETE]  aurostd::stream2vectorstring(FileIN,tokens);
+  //[SD20220501 - OBSOLETE]  int istart=-1,istop=-1;
+  //[SD20220501 - OBSOLETE]  for(int i=(int) tokens.size()-1;i>0;i--) {
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(tokens[i],Keyword_stop)  && istop<1)  istop=i-1;
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(tokens[i],Keyword_start) && istart<1) istart=i+1;
+  //[SD20220501 - OBSOLETE]  }
+  //[SD20220501 - OBSOLETE]  if(LDEBUG) cerr << "LDEBUG: " << istart << " " << istop << endl;
+  //[SD20220501 - OBSOLETE]  if(istart>0 && istop>0) {
+  //[SD20220501 - OBSOLETE]    for(int i=istart;i<=istop;i++) StringstreamOUTPUT << tokens[i] << endl;
+  //[SD20220501 - OBSOLETE]    if(LDEBUG) cerr << "StringstreamOUTPUT.str()= " << endl << StringstreamOUTPUT.str() << endl;
+  //[SD20220501 - OBSOLETE]    return TRUE;
+  //[SD20220501 - OBSOLETE]  }
+  //[SD20220501 - OBSOLETE]  return FALSE;
+  //[SD20220501 - OBSOLETE]}
+
+
+  //[SD20220501 - OBSOLETE]bool ExtractLastToStringstreamEXPLICIT(stringstream& StringStreamIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop) { // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]  aurostd::StringstreamClean(StringstreamOUTPUT);
+  //[SD20220501 - OBSOLETE]  string StringIN=StringStreamIN.str();
+  //[SD20220501 - OBSOLETE]  return ExtractLastToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start,Keyword_stop);
+  //[SD20220501 - OBSOLETE]}
+
+  //[SD20220501 - OBSOLETE]bool ExtractLastToStringstreamEXPLICIT(const string& StringIN,stringstream& StringstreamOUTPUT,const string& Keyword_start,const string& Keyword_stop) {  // AFLOW_FUNCTION_IMPLEMENTATION
+  //[SD20220501 - OBSOLETE]  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  //[SD20220501 - OBSOLETE]  if(LDEBUG) cerr << "LDEBUG: ExtractLastToStringstreamEXPLICIT" << endl;
+  //[SD20220501 - OBSOLETE]  aurostd::StringstreamClean(StringstreamOUTPUT);
+  //[SD20220501 - OBSOLETE]  vector<string> tokens;
+  //[SD20220501 - OBSOLETE]  aurostd::string2vectorstring(StringIN,tokens);
+  //[SD20220501 - OBSOLETE]  int istart=-1,istop=-1;
+  //[SD20220501 - OBSOLETE]  for(int i=(int) tokens.size()-1;i>0;i--) {
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(tokens[i],Keyword_stop)  && istop<1)  istop=i-1;
+  //[SD20220501 - OBSOLETE]    if(aurostd::substring2bool(tokens[i],Keyword_start) && istart<1) istart=i+1;
+  //[SD20220501 - OBSOLETE]  }
+  //[SD20220501 - OBSOLETE]  if(LDEBUG) cerr << "LDEBUG: " << istart << " " << istop << endl;
+  //[SD20220501 - OBSOLETE]  if(istart>0 && istop>0) {
+  //[SD20220501 - OBSOLETE]    for(int i=istart;i<=istop;i++) StringstreamOUTPUT << tokens[i] << endl;
+  //[SD20220501 - OBSOLETE]    if(LDEBUG) cerr << "StringstreamOUTPUT.str()= " << endl << StringstreamOUTPUT.str() << endl;
+  //[SD20220501 - OBSOLETE]    return TRUE;
+  //[SD20220501 - OBSOLETE]  }
+  //[SD20220501 - OBSOLETE]  return FALSE;
+  //[SD20220501 - OBSOLETE]}
+
+  // *******************************************************************************************
+  // *******************************************************************************************
+
+  bool ExtractJustAfterToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,const string& Keyword_start) {    // AFLOW_FUNCTION_IMPLEMENTATION
     aurostd::StringstreamClean(StringstreamOUTPUT);
-    string strline,subS2;
-    subS2=Keyword; // STRING TO SEARCH
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    bool status=FALSE;
-    while(getline(FileIN,strline))
-      if(aurostd::substring2bool(strline,subS2)) {
-        StringstreamOUTPUT << strline.substr(strline.find(subS2)+subS2.length()) << endl;
-        status=TRUE;
-      }
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    return status;  // return FALSE if the keyword was never found
-  }
-
-  // *******************************************************************************************
-  bool ExtractToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop) {    // AFLOW_FUNCTION_IMPLEMENTATION
-    aurostd::StringstreamClean(StringstreamOUTPUT);
-    string strline;
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    bool status=FALSE;
-    while(getline(FileIN,strline)) {
-      if(aurostd::substring2bool(strline,Keyword_stop))  status=FALSE;
-      if(status) StringstreamOUTPUT << strline << endl;
-      if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
-    }
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    return status;  // return FALSE if something got messed up
-  }
-
-  bool ExtractToStringstreamEXPLICIT(stringstream StringStreamIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop) { // AFLOW_FUNCTION_IMPLEMENTATION
-    aurostd::StringstreamClean(StringstreamOUTPUT);
-    string StringIN=StringStreamIN.str();
-    return ExtractToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start,Keyword_stop);
-  }
-
-  bool ExtractToStringstreamEXPLICIT(string StringIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop) {  // AFLOW_FUNCTION_IMPLEMENTATION
-    aurostd::StringstreamClean(StringstreamOUTPUT);
-    bool status=FALSE;
-    vector<string> tokens;
-    aurostd::string2tokens(StringIN,tokens,"\n");
-    for(uint i=0;i<tokens.size();i++) {
-      if(aurostd::substring2bool(tokens[i],Keyword_stop))  status=FALSE;
-      if(status) StringstreamOUTPUT << tokens[i] << endl;
-      if(aurostd::substring2bool(tokens[i],Keyword_start)) status=TRUE;
-    }
-    return status;  // return FALSE if something got messed up
-  }
-
-  bool ExtractToStringstreamEXPLICIT(string StringIN,stringstream& StringstreamOUTPUT,string Keyword) {  // AFLOW_FUNCTION_IMPLEMENTATION
-    aurostd::StringstreamClean(StringstreamOUTPUT);
-    bool status=FALSE;
-    vector<string> tokens;
-    aurostd::string2tokens(StringIN,tokens,"\n");
-    for(uint i=0;i<tokens.size();i++) {
-      if(aurostd::substring2bool(tokens[i],Keyword)) StringstreamOUTPUT << tokens[i].substr(tokens[i].find(Keyword)+Keyword.length()) << endl;
-      if(aurostd::substring2bool(tokens[i],Keyword)) status=TRUE;
-    }
-    return status;  // return FALSE if something got messed up
-  }
-
-  // *******************************************************************************************
-  // *******************************************************************************************
-  bool ExtractLastToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,string Keyword) {   // AFLOW_FUNCTION_IMPLEMENTATION
-    return ExtractToStringstreamEXPLICIT(FileIN,StringstreamOUTPUT,Keyword);
-  }
-
-  // *******************************************************************************************
-  bool ExtractLastToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop) { // AFLOW_FUNCTION_IMPLEMENTATION
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "LDEBUG: ExtractLastToStringstreamEXPLICIT" << endl;
-    aurostd::StringstreamClean(StringstreamOUTPUT);
-    vector<string> tokens;
-    aurostd::stream2vectorstring(FileIN,tokens);
-    int istart=-1,istop=-1;
-    for(int i=(int) tokens.size()-1;i>0;i--) {
-      if(aurostd::substring2bool(tokens[i],Keyword_stop)  && istop<1)  istop=i-1;
-      if(aurostd::substring2bool(tokens[i],Keyword_start) && istart<1) istart=i+1;
-    }
-    if(LDEBUG) cerr << "LDEBUG: " << istart << " " << istop << endl;
-    if(istart>0 && istop>0) {
-      for(int i=istart;i<=istop;i++) StringstreamOUTPUT << tokens[i] << endl;
-      if(LDEBUG) cerr << "LDEBUG: " << StringstreamOUTPUT.str() << endl;
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-
-  bool ExtractLastToStringstreamEXPLICIT(stringstream StringStreamIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop) { // AFLOW_FUNCTION_IMPLEMENTATION
-    aurostd::StringstreamClean(StringstreamOUTPUT);
-    string StringIN=StringStreamIN.str();
-    return ExtractLastToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start,Keyword_stop);
-  }
-
-  bool ExtractLastToStringstreamEXPLICIT(string StringIN,stringstream& StringstreamOUTPUT,string Keyword_start,string Keyword_stop) {  // AFLOW_FUNCTION_IMPLEMENTATION
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << "LDEBUG: ExtractLastToStringstreamEXPLICIT" << endl;
-    aurostd::StringstreamClean(StringstreamOUTPUT);
-    vector<string> tokens;
-    aurostd::string2vectorstring(StringIN,tokens);
-    int istart=-1,istop=-1;
-    for(int i=(int) tokens.size()-1;i>0;i--) {
-      if(aurostd::substring2bool(tokens[i],Keyword_stop)  && istop<1)  istop=i-1;
-      if(aurostd::substring2bool(tokens[i],Keyword_start) && istart<1) istart=i+1;
-    }
-    if(LDEBUG) cerr << "LDEBUG: " << istart << " " << istop << endl;
-    if(istart>0 && istop>0) {
-      for(int i=istart;i<=istop;i++) StringstreamOUTPUT << tokens[i] << endl;
-      if(LDEBUG) cerr << "LDEBUG: " << StringstreamOUTPUT.str() << endl;
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  // *******************************************************************************************
-  // *******************************************************************************************
-
-  bool ExtractJustAfterToFileEXPLICIT(ifstream& FileIN,string FileNameOUTPUT,string Keyword_start) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    ofstream FileOUTPUT;
-    FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
-    string strline,subS2;
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    bool status=FALSE;
-    while(getline(FileIN,strline)) {
-      if(status) FileOUTPUT << strline << endl;
-      if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
-    }
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
-    return status;  // return FALSE if something got messed up
-  }
-
-  bool ExtractJustAfterToStringEXPLICIT(ifstream& FileIN,string& StringOUTPUT,string Keyword_start) {        // AFLOW_FUNCTION_IMPLEMENTATION
-    string strline,subS2;
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    bool status=FALSE;
-    while(getline(FileIN,strline)) {
-      if(status) StringOUTPUT=StringOUTPUT+strline+"\n";
-      if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
-    }
-    FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
-    return status;  // return FALSE if something got messed up
-  }
-
-  bool ExtractJustAfterToStringstreamEXPLICIT(ifstream& FileIN,stringstream& StringstreamOUTPUT,string Keyword_start) {    // AFLOW_FUNCTION_IMPLEMENTATION
-    aurostd::StringstreamClean(StringstreamOUTPUT);
-    string strline;
+    string strline="";
     FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
     bool status=FALSE;
     while(getline(FileIN,strline)) {
@@ -3901,13 +3872,12 @@ namespace aurostd {
     return status;  // return FALSE if something got messed up
   }
 
-  bool ExtractJustAfterToStringstreamEXPLICIT(stringstream StringStreamIN,stringstream& StringstreamOUTPUT,string Keyword_start) { // AFLOW_FUNCTION_IMPLEMENTATION
-    aurostd::StringstreamClean(StringstreamOUTPUT);
+  bool ExtractJustAfterToStringstreamEXPLICIT(stringstream& StringStreamIN,stringstream& StringstreamOUTPUT,const string& Keyword_start) { // AFLOW_FUNCTION_IMPLEMENTATION
     string StringIN=StringStreamIN.str();
     return ExtractJustAfterToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start);
   }
 
-  bool ExtractJustAfterToStringstreamEXPLICIT(string StringIN,stringstream& StringstreamOUTPUT,string Keyword_start) {  // AFLOW_FUNCTION_IMPLEMENTATION
+  bool ExtractJustAfterToStringstreamEXPLICIT(const string& StringIN,stringstream& StringstreamOUTPUT,const string& Keyword_start) {  // AFLOW_FUNCTION_IMPLEMENTATION
     aurostd::StringstreamClean(StringstreamOUTPUT);
     bool status=FALSE;
     vector<string> tokens;
@@ -3919,11 +3889,55 @@ namespace aurostd {
     return status;  // return FALSE if something got messed up
   }
 
-  bool ExtractJustAfterToStringEXPLICIT(string StringIN,string& StringOUTPUT,string Keyword_start) {  // AFLOW_FUNCTION_IMPLEMENTATION
+  bool ExtractJustAfterToFileEXPLICIT(ifstream& FileIN,const string& FileNameOUTPUT,const string& Keyword_start) {        // AFLOW_FUNCTION_IMPLEMENTATION
+    //[SD20220502 - OBSOLETE]ofstream FileOUTPUT;
+    //[SD20220502 - OBSOLETE]FileOUTPUT.open(FileNameOUTPUT.c_str(),std::ios::out);
+    //[SD20220502 - OBSOLETE]string strline="";
+    //[SD20220502 - OBSOLETE]FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+    //[SD20220502 - OBSOLETE]bool status=FALSE;
+    //[SD20220502 - OBSOLETE]while(getline(FileIN,strline)) {
+    //[SD20220502 - OBSOLETE]  if(status) FileOUTPUT << strline << endl;
+    //[SD20220502 - OBSOLETE]  if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
+    //[SD20220502 - OBSOLETE]}
+    //[SD20220502 - OBSOLETE]FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+    //[SD20220502 - OBSOLETE]FileOUTPUT.flush();FileOUTPUT.clear();FileOUTPUT.close();
+    //[SD20220502 - OBSOLETE]return status;  // return FALSE if something got messed up
     stringstream StringstreamOUTPUT;
-    bool out=ExtractJustAfterToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start);
-    StringOUTPUT=StringstreamOUTPUT.str();
-    return out;  // return FALSE if something got messed up
+    if(ExtractJustAfterToStringstreamEXPLICIT(FileIN,StringstreamOUTPUT,Keyword_start)) {
+      return aurostd::stringstream2file(StringstreamOUTPUT,FileNameOUTPUT);
+    }
+    return FALSE;
+  }
+
+  bool ExtractJustAfterToStringEXPLICIT(ifstream& FileIN,string& StringOUTPUT,const string& Keyword_start) {        // AFLOW_FUNCTION_IMPLEMENTATION
+    //[SD20220502 - OBSOLETE]string strline="";
+    //[SD20220502 - OBSOLETE]FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+    //[SD20220502 - OBSOLETE]bool status=FALSE;
+    //[SD20220502 - OBSOLETE]while(getline(FileIN,strline)) {
+    //[SD20220502 - OBSOLETE]  if(status) StringOUTPUT=StringOUTPUT+strline+"\n";
+    //[SD20220502 - OBSOLETE]  if(aurostd::substring2bool(strline,Keyword_start)) status=TRUE;
+    //[SD20220502 - OBSOLETE]}
+    //[SD20220502 - OBSOLETE]FileIN.clear();FileIN.seekg(0); // ******* INPUT FILE goes at the beginning
+    //[SD20220502 - OBSOLETE]return status;  // return FALSE if something got messed up
+    stringstream StringstreamOUTPUT;
+    if(ExtractJustAfterToStringstreamEXPLICIT(FileIN,StringstreamOUTPUT,Keyword_start)) {
+      StringOUTPUT=StringstreamOUTPUT.str();
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  bool ExtractJustAfterToStringEXPLICIT(const string& StringIN,string& StringOUTPUT,const string& Keyword_start) {  // AFLOW_FUNCTION_IMPLEMENTATION
+    //[SD20220502 - OBSOLETE]stringstream StringstreamOUTPUT;
+    //[SD20220502 - OBSOLETE]bool out=ExtractJustAfterToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start);
+    //[SD20220502 - OBSOLETE]StringOUTPUT=StringstreamOUTPUT.str();
+    //[SD20220501 - OBSOLETE]return out;  // return FALSE if something got messed up
+    stringstream StringstreamOUTPUT;
+    if(ExtractJustAfterToStringstreamEXPLICIT(StringIN,StringstreamOUTPUT,Keyword_start)) {
+      StringOUTPUT=StringstreamOUTPUT.str();
+      return TRUE;
+    }
+    return FALSE;
   }
 
   // ***************************************************************************
@@ -5233,23 +5247,30 @@ namespace aurostd {
     return (utype) stream2stream<utype>(from,AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);
   }
 
-  vector<double> vectorstring2vectordouble(const vector<string>& from) {  //CO20210315 - cleaned up
-    vector<double> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<double>(from[i]));return vout;
-  }
-
   string string2string(const string& from) {return from;}
 
-  vector<int> vectorstring2vectorint(const vector<string>& from) {  //CO20210315 - cleaned up
-    vector<int> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<int>(from[i]));return vout;
+  template<typename utype> vector<utype> vectorstring2vectorutype(const vector<string>& from) { //SD20220520
+    vector<utype> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<utype>(from[i]));return vout;
+  }
+  template<typename utype> vector<utype> vectorstring2vectorutype(const deque<string>& from) { //SD20220520
+    vector<utype> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<utype>(from[i]));return vout;
   }
 
-  vector<uint> vectorstring2vectoruint(const vector<string>& from) { //CO20210315 - cleaned up
-    vector<uint> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<uint>(from[i]));return vout;
-  }
+  //[SD20220525 - OBSOLETE]vector<double> vectorstring2vectordouble(const vector<string>& from) {  //CO20210315 - cleaned up
+  //[SD20220525 - OBSOLETE]  vector<double> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<double>(from[i]));return vout;
+  //[SD20220525 - OBSOLETE]}
 
-  vector<float> vectorstring2vectorfloat(const vector<string>& from) { //CO20210315 - cleaned up
-    vector<float> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<float>(from[i]));return vout;
-  }
+  //[SD20220525 - OBSOLETE]vector<int> vectorstring2vectorint(const vector<string>& from) {  //CO20210315 - cleaned up
+  //[SD20220525 - OBSOLETE]  vector<int> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<int>(from[i]));return vout;
+  //[SD20220525 - OBSOLETE]}
+
+  //[SD20220525 - OBSOLETE]vector<uint> vectorstring2vectoruint(const vector<string>& from) { //CO20210315 - cleaned up
+  //[SD20220525 - OBSOLETE]  vector<uint> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<uint>(from[i]));return vout;
+  //[SD20220525 - OBSOLETE]}
+
+  //[SD20220525 - OBSOLETE]vector<float> vectorstring2vectorfloat(const vector<string>& from) { //CO20210315 - cleaned up
+  //[SD20220525 - OBSOLETE]  vector<float> vout;for(uint i=0;i<from.size();i++) vout.push_back(aurostd::string2utype<float>(from[i]));return vout;
+  //[SD20220525 - OBSOLETE]}
 
   string vectorstring2string(const vector<string>& vstrings) {
     string out="";
@@ -5541,16 +5562,16 @@ namespace aurostd {
   // Function SubStringsPresent
   // ***************************************************************************
   bool substring2bool(const string& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
-    //substring2bool and kvpairfound are similar but distinct
+    //substring2bool and kvpair2bool are similar but distinct
     //substring2bool will match any strsub1 and return true
-    //kvpairfound will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return true
+    //kvpair2bool will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return true
     //matching KEY exactly is useful, e.g.:
     //_FILE_START_
     //IALGO=48
     //_FILE_END_
     //strsub1="ALGO": substring2bool will return true
-    //keyword="ALGO,delim="=": kvpairfound will return false
-    //kvpairfound must match KEY exactly! skips the rest
+    //keyword="ALGO,delim="=": kvpair2bool will return false
+    //kvpair2bool must match KEY exactly! skips the rest
     //substring2bool is good for aflow.in's which has no set delimiter style: [AFLOW_BIN_XZ] vs. [AFLOW_BIN=XZ] vs. [AFLOW_BIN]XZ vs. [AFLOW]BIN=XZ
     bool LDEBUG=FALSE;//TRUE;
     if(LDEBUG) cerr << XPID << "aurostd::substring2bool(): BEGIN [substring=\"" << strsub1 << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
@@ -5785,47 +5806,254 @@ namespace aurostd {
   // ***************************************************************************
   // Function SubStringsPresent and EXTRACT
   // ***************************************************************************
-  string substring2string(const string& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
-    //substring2string and kvpair2value are similar but distinct
+  //SD20220520
+  //Rewritten substring2string to be more understandable, accept more input types, and incorporate extracting Nth entries
+  //n==0 returns all entries, starts counting from 1, negative numbers go backwards
+  //Original substring2string always returned just the first entry
+  //When two substrings are present strsub1 is the start keyword and strsub2 is the stop keyword
+  string substring2string(ifstream& input,const string& strsub1,const int instance,bool RemoveWS,bool RemoveComments) {
+    //substring2string and kvpair2string are similar but distinct
     //substring2string will match any strsub1 and return everything AFTER strsub1
-    //kvpair2value will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return VALUE
+    //kvpair2string will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return VALUE
     //matching KEY exactly is useful, e.g.:
     //_FILE_START_
-    //IALGO=48
-    //ALGO=FAST
+    //IALGO==48
+    //ALGO==FAST
     //_FILE_END_
-    //strsub1="ALGO": substring2string will return "=48"
-    //keyword="ALGO,delim="=": kvpair2value will return "FAST"
-    //kvpair2value must match KEY exactly! skips the rest
+    //strsub1="ALGO",instance=1: substring2string will return "==48"
+    //keyword="ALGO,delim="==": kvpair2string will return "FAST"
+    //kvpair2string must match KEY exactly! skips the rest
     //substring2string is good for aflow.in's which has no set delimiter style: [AFLOW_BIN_XZ] vs. [AFLOW_BIN=XZ] vs. [AFLOW_BIN]XZ vs. [AFLOW]BIN=XZ
-    bool LDEBUG=FALSE;//TRUE;
-    if(LDEBUG) cerr << XPID << "aurostd::substring2string(): BEGIN [substring=\"" << strsub1 << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
-    string _strstream(strstream);
-    if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
-    if(LDEBUG) cerr << XPID << "aurostd::substring2string(): [input=\"" << strstream << "\"], [substring=\"" << strsub1 << "\"]" << endl;
-    if(_strstream.find(strsub1)==string::npos) return "";
-
-    vector<string> tokens;
-    aurostd::string2tokens(_strstream,tokens,"\n");
+    bool LDEBUG=FALSE;
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [substring=\"" << strsub1 << "\"] [instance=" << instance << "] [RemoveWS=" << RemoveWS << "]" << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input.rdbuf() << "\"] [substring=\"" << strsub1 << "\"]" << endl;}
     string strline="";
-    string::size_type idxS1;
-    for(uint i=0;i<tokens.size();i++) {
-      if(RemoveComments){strline=aurostd::RemoveComments(tokens[i]);}  //CO20210315
-      idxS1=strline.find(strsub1);
-      if(idxS1!=string::npos) {
-        strline=strline.substr(idxS1+strsub1.length());
-        strline=aurostd::RemoveWhiteSpacesFromTheBack(strline);
-        if(LDEBUG) cerr << XPID << "aurostd::substring2string(): END [substring=\"" << strsub1 << "\" found] [output=\"" << strline << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
-        return strline;
+    input.clear();input.seekg(0);
+    vector<string> tokens;
+    int iter=0;
+    while(getline(input,strline) && (instance==0 || iter!=instance)) {
+      if(RemoveWS) {strline=aurostd::RemoveWhiteSpaces(strline,'"');}
+      if(RemoveComments) {strline=aurostd::RemoveComments(strline);}
+      if(strline.find(strsub1)!=string::npos) {
+        tokens.push_back(strline.substr(strline.find(strsub1)+strsub1.length()));
+        iter++;
       }
     }
-    if(LDEBUG) cerr << XPID << "aurostd::substring2string(): END [substring=" << strsub1 << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
+    input.clear();input.seekg(0);
+    if(tokens.size()==0 || (uint)aurostd::abs(instance)>tokens.size()) {return "";}
+    stringstream strstream;
+    if(instance==0) {
+      for(uint i=0;i<tokens.size();i++) {strstream << tokens[i] << endl;}
+    }
+    else if(instance>0) {
+      strstream << tokens[tokens.size()-1];
+    }
+    else if(instance<0) {
+      uint i=(uint)aurostd::boundary_conditions_periodic(0,tokens.size()-1,instance);
+      strstream << tokens[i];
+    }
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "END [substring=\"" << strsub1 << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+    return strstream.str();
+  }
+
+  string substring2string(const string& _input,const string& strsub1,const int instance,bool RemoveWS,bool RemoveComments) {
+    bool LDEBUG=FALSE;
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [substring=\"" << strsub1 << "\"] [instance=" << instance << "] [RemoveWS=" << RemoveWS << "]" << endl;}
+    string input=_input;
+    if(RemoveWS) {input=aurostd::RemoveWhiteSpaces(_input,'"');}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input << "\"] [substring=\"" << strsub1 << "\"]" << endl;}
+    if(input.find(strsub1)==string::npos) {return "";}
+    stringstream strstream;
+    vector<string> tokens;
+    aurostd::string2vectorstring(input,tokens);
+    int iter=0;
+    if(instance>0) {
+      for(uint i=0;i<tokens.size();i++) {
+        if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
+        if(tokens[i].find(strsub1)!=string::npos) {
+          iter++;
+          if(instance==iter) {strstream << tokens[i].substr(tokens[i].find(strsub1)+strsub1.length());break;}
+        }
+      }
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << "END [substring=\"" << strsub1 << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+      return strstream.str();
+    }
+    else if(instance<0) {
+      for(int i=tokens.size()-1;i>=0;i--) {
+        if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
+        if(tokens[i].find(strsub1)!=string::npos) {
+          iter--;
+          if(instance==iter) {strstream << tokens[i].substr(tokens[i].find(strsub1)+strsub1.length());break;}
+        }
+      }
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << "END [substring=\"" << strsub1 << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+      return strstream.str();
+    }
+    else { //instance==0
+      for(uint i=0;i<tokens.size();i++) {
+        if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
+        if(tokens[i].find(strsub1)!=string::npos) {
+          strstream << tokens[i].substr(tokens[i].find(strsub1)+strsub1.length()) << endl;
+        }
+      }
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << "END [substring=\"" << strsub1 << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+      return strstream.str();
+    }
     return "";
   }
 
-  string substring2string(const stringstream& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
-    return substring2string(strstream.str(),strsub1,RemoveWS,RemoveComments);
+  string substring2string(const stringstream& input,const string& strsub1,const int instance,bool RemoveWS,bool RemoveComments) {
+    return substring2string(input.str(),strsub1,instance,RemoveWS,RemoveComments);
   }
+
+  string substring2string(ifstream& input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
+    bool LDEBUG=FALSE;
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"] [instance=" << instance << "] [RemoveWS=" << RemoveWS << "]" << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input.rdbuf() << "\"] [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"]" << endl;}
+    string strline="";
+    input.clear();input.seekg(0);
+    vector<string> vlines,tokens;
+    bool read=FALSE;
+    int iter=0;
+    while(getline(input,strline) && (instance==0 || iter!=instance)) {
+      if(RemoveWS) {strline=aurostd::RemoveWhiteSpaces(strline,'"');}
+      if(RemoveComments) {strline=aurostd::RemoveComments(strline);}
+      if(read==FALSE && strline.find(strsub1)!=string::npos) {
+        vlines.push_back(strline.substr(strline.find(strsub1)+strsub1.length()));
+        read=TRUE;
+      }
+      else if(read==TRUE && strline.find(strsub2)!=string::npos) {
+        vlines.push_back(strline.substr(0,strline.find(strsub2)));
+        read=FALSE;
+        tokens.push_back(aurostd::vectorstring2string(vlines));
+        vlines.clear();
+        iter++;
+      }
+      else if(read) {
+        vlines.push_back(strline);
+      }
+    }
+    input.clear();input.seekg(0);
+    if(tokens.size()==0 || (uint)aurostd::abs(instance)>tokens.size()) {return "";}
+    stringstream strstream;
+    if(instance==0) {
+      for(uint i=0;i<tokens.size();i++) {strstream << tokens[i] << endl;}
+    }
+    else if(instance>0) {
+      strstream << tokens[tokens.size()-1];
+    }
+    else if(instance<0) {
+      uint i=(uint)aurostd::boundary_conditions_periodic(0,tokens.size()-1,instance);
+      strstream << tokens[i];
+    }
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "END [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+    return strstream.str();
+  }
+
+  string substring2string(const string& _input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
+    bool LDEBUG=FALSE;
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"] [instance=" << instance << "] [RemoveWS=" << RemoveWS << "]" << endl;}
+    string input=_input;
+    if(RemoveWS) {input=aurostd::RemoveWhiteSpaces(_input,'"');}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input << "\"] [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"]" << endl;}
+    if(input.find(strsub1)==string::npos || input.find(strsub2)==string::npos) {return "";}
+    stringstream strstream;
+    vector<string> tokens;
+    vector<uint> vstart, vstop;
+    aurostd::string2vectorstring(input,tokens);
+    uint istart=0,istop=0;
+    int iter=0;
+    if(instance>0) {
+      for(uint i=0;i<tokens.size();i++) {
+        if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
+        if(tokens[i].find(strsub2)!=string::npos) {
+          istop=i-1;
+          if(instance==iter) {vstop.push_back(istop);break;}
+        }
+        if(tokens[i].find(strsub1)!=string::npos) {
+          iter++;
+          istart=i+1;
+          if(instance==iter) {vstart.push_back(istart);}
+        }
+      }
+    }
+    else if(instance<0) {
+      for(int i=tokens.size()-1;i>=0;i--) {
+        if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
+        if(tokens[i].find(strsub2)!=string::npos) {
+          iter--;
+          istop=i-1;
+          if(instance==iter) {vstop.push_back(istop);}
+        }
+        if(tokens[i].find(strsub1)!=string::npos) {
+          istart=i+1;
+          if(instance==iter) {vstart.push_back(istart);break;}
+        }
+      }
+    }
+    else { //instance==0
+      for(uint i=0;i<tokens.size();i++) {
+        if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
+        if(tokens[i].find(strsub2)!=string::npos) {
+          istop=i-1;
+          vstop.push_back(istop);
+        }
+        if(tokens[i].find(strsub1)!=string::npos) {
+          istart=i+1;
+          vstart.push_back(istart);
+        }
+      }
+    }
+    if(vstop.empty()) {return "";}
+    if(vstop.size()!=vstart.size()) {vstart.pop_back();} // remove unfinished start
+    for(uint i=0;i<vstart.size();i++) {
+      for(uint j=vstart[i];j<=vstop[i];j++) {strstream << tokens[j] << endl;}
+    }
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "END [substring=\"" << strsub1 << "\"] [substring=\"" << strsub2 << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+    return strstream.str();
+  }
+
+  string substring2string(const stringstream& input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) { 
+    return substring2string(input.str(),strsub1,strsub2,instance,RemoveWS,RemoveComments);
+  }
+
+  //[SD20220520 - OBSOLETE]string substring2string(const string& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
+  //[SD20220520 - OBSOLETE]  //substring2string and kvpair2string are similar but distinct
+  //[SD20220520 - OBSOLETE]  //substring2string will match any strsub1 and return everything AFTER strsub1
+  //[SD20220520 - OBSOLETE]  //kvpair2string will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return VALUE
+  //[SD20220520 - OBSOLETE]  //matching KEY exactly is useful, e.g.:
+  //[SD20220520 - OBSOLETE]  //_FILE_START_
+  //[SD20220520 - OBSOLETE]  //IALGO=48
+  //[SD20220520 - OBSOLETE]  //ALGO=FAST
+  //[SD20220520 - OBSOLETE]  //_FILE_END_
+  //[SD20220520 - OBSOLETE]  //strsub1="ALGO": substring2string will return "=48"
+  //[SD20220520 - OBSOLETE]  //keyword="ALGO,delim="=": kvpair2string will return "FAST"
+  //[SD20220520 - OBSOLETE]  //kvpair2string must match KEY exactly! skips the rest
+  //[SD20220520 - OBSOLETE]  //substring2string is good for aflow.in's which has no set delimiter style: [AFLOW_BIN_XZ] vs. [AFLOW_BIN=XZ] vs. [AFLOW_BIN]XZ vs. [AFLOW]BIN=XZ
+  //[SD20220520 - OBSOLETE]  bool LDEBUG=FALSE;//TRUE;
+  //[SD20220520 - OBSOLETE]  if(LDEBUG) cerr << XPID << "aurostd::substring2string(): BEGIN [substring=\"" << strsub1 << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
+  //[SD20220520 - OBSOLETE]  string _strstream(strstream);
+  //[SD20220520 - OBSOLETE]  if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
+  //[SD20220520 - OBSOLETE]  if(LDEBUG) cerr << XPID << "aurostd::substring2string(): [input=\"" << strstream << "\"], [substring=\"" << strsub1 << "\"]" << endl;
+  //[SD20220520 - OBSOLETE]  if(_strstream.find(strsub1)==string::npos) return "";
+  //[SD20220520 - OBSOLETE]
+  //[SD20220520 - OBSOLETE]  vector<string> tokens;
+  //[SD20220520 - OBSOLETE]  aurostd::string2tokens(_strstream,tokens,"\n");
+  //[SD20220520 - OBSOLETE]  string strline="";
+  //[SD20220520 - OBSOLETE]  string::size_type idxS1;
+  //[SD20220520 - OBSOLETE]  for(uint i=0;i<tokens.size();i++) {
+  //[SD20220520 - OBSOLETE]    if(RemoveComments){strline=aurostd::RemoveComments(tokens[i]);}  //CO20210315
+  //[SD20220520 - OBSOLETE]    idxS1=strline.find(strsub1);
+  //[SD20220520 - OBSOLETE]    if(idxS1!=string::npos) {
+  //[SD20220520 - OBSOLETE]      strline=strline.substr(idxS1+strsub1.length());
+  //[SD20220520 - OBSOLETE]      strline=aurostd::RemoveWhiteSpacesFromTheBack(strline);
+  //[SD20220520 - OBSOLETE]      if(LDEBUG) cerr << XPID << "aurostd::substring2string(): END [substring=\"" << strsub1 << "\" found] [output=\"" << strline << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
+  //[SD20220520 - OBSOLETE]      return strline;
+  //[SD20220520 - OBSOLETE]    }
+  //[SD20220520 - OBSOLETE]  }
+  //[SD20220520 - OBSOLETE]  if(LDEBUG) cerr << XPID << "aurostd::substring2string(): END [substring=" << strsub1 << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
+  //[SD20220520 - OBSOLETE]  return "";
+  //[SD20220520 - OBSOLETE]}
 
   //[CO20210315 - not used, not sure the purpose of strsub2]string substring2string(const string& strstream, const string& strsub1, const string& strsub2, bool RemoveWS) {
   //[CO20210315 - not used, not sure the purpose of strsub2]  bool LDEBUG=(FALSE || XHOST.DEBUG);
@@ -5856,190 +6084,372 @@ namespace aurostd {
   //[CO20210315 - not used, not sure the purpose of strsub2]  return (string) strout;
   //[CO20210315 - not used, not sure the purpose of strsub2]}
 
-  template<typename utype> utype substring2utype(const string& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) {
-    return string2utype<utype>(substring2string(strstream,strsub1,RemoveWS,RemoveComments));
+  template<typename utype> utype substring2utype(ifstream& input,const string& strsub1,const int instance,bool RemoveWS,bool RemoveComments) {
+    return string2utype<utype>(substring2string(input,strsub1,instance,RemoveWS,RemoveComments));
   }
-  template<typename utype> utype substring2utype(const stringstream& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) {
-    return substring2utype<utype>(strstream.str(),strsub1,RemoveWS,RemoveComments);
+  template<typename utype> utype substring2utype(const string& input,const string& strsub1,const int instance,bool RemoveWS,bool RemoveComments) {
+    return string2utype<utype>(substring2string(input,strsub1,instance,RemoveWS,RemoveComments));
   }
-  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> utype substring2utype(const string& strstream, const string& strsub1, const string& strsub2, bool RemoveWS) {
-  //[CO20210315 - not used, not sure the purpose of strsub2]  return string2utype<utype>(substring2string(strstream,strsub1,strsub2,RemoveWS));
-  //[CO20210315 - not used, not sure the purpose of strsub2]}
+  template<typename utype> utype substring2utype(const stringstream& input,const string& strsub1,const int instance,bool RemoveWS,bool RemoveComments) {
+    return substring2utype<utype>(input.str(),strsub1,instance,RemoveWS,RemoveComments);
+  }
+  template<typename utype> utype substring2utype(ifstream& input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
+    return string2utype<utype>(substring2string(input,strsub1,strsub2,instance,RemoveWS,RemoveComments));
+  }
+  template<typename utype> utype substring2utype(const string& input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
+    return string2utype<utype>(substring2string(input,strsub1,strsub2,instance,RemoveWS,RemoveComments));
+  }
+  template<typename utype> utype substring2utype(const stringstream& input,const string& strsub1,const string& strsub2,const int instance,bool RemoveWS,bool RemoveComments) {
+    return substring2utype<utype>(input.str(),strsub1,strsub2,instance,RemoveWS,RemoveComments);
+  }
 
-  bool kvpairfound(const string& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315
-    //substring2bool and kvpairfound are similar but distinct
+  bool kvpair2bool(ifstream& input,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //SD20220520
+    //substring2bool and kvpair2bool are similar but distinct
     //substring2bool will match any strsub1 and return true
-    //kvpairfound will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return true
+    //kvpair2bool will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return true
     //matching KEY exactly is useful, e.g.:
     //_FILE_START_
-    //IALGO=48
+    //IALGO==48
     //_FILE_END_
     //strsub1="ALGO": substring2bool will return true
-    //keyword="ALGO,delim="=": kvpairfound will return false
-    //kvpairfound must match KEY exactly! skips the rest
+    //keyword="ALGO,delim="==": kvpair2bool will return false
+    //kvpair2bool must match KEY exactly! skips the rest
     //substring2bool is good for aflow.in's which has no set delimiter style: [AFLOW_BIN_XZ] vs. [AFLOW_BIN=XZ] vs. [AFLOW_BIN]XZ vs. [AFLOW]BIN=XZ
-    bool LDEBUG=FALSE;//TRUE;
-    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
-    string _strstream(strstream);
-    if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
-    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): [input=\"" << strstream << "\"], [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;
-    if(_strstream.find(keyword)==string::npos) return false;
+    bool LDEBUG=FALSE;
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input.rdbuf() << "\"] [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;}
+    string strline="",_keyword="";
+    string::size_type idx=0;
+    while(getline(input,strline)) {
+      if(RemoveWS) {strline=aurostd::RemoveWhiteSpaces(strline,'"');}
+      if(RemoveComments) {strline=aurostd::RemoveComments(strline);}
+      idx=strline.find(delim);
+      if(idx!=string::npos){
+        _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(0,idx));
+        if(LDEBUG) {cerr << __AFLOW_FUNC__ << "_keyword=\"" << _keyword << "\"" << endl;}
+        if(_keyword==keyword){
+          if(LDEBUG) {cerr << __AFLOW_FUNC__ << "END [keyword=\"" << keyword << "\" found] [RemoveWS=" << RemoveWS << "]" << endl;}
+          return true;
+        }
+      }
+    }
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << "END [keyword=\"" << keyword << "\" NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
+    return false;
+  }
+
+  bool kvpair2bool(const string& input,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315
+    bool LDEBUG=FALSE;
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+    string _input(input);
+    if(RemoveWS==TRUE) _input=aurostd::RemoveWhiteSpaces(_input,'"');
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input << "\"], [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;}
+    if(_input.find(keyword)==string::npos) return false;
 
     if(RemoveComments){ //SD20220403 - substring exists, but now check if it exists outside of comments
       vector<string> tokens;
-      aurostd::string2tokens(_strstream,tokens,"\n");
-      string strline="",_keyword="",value="";
-      string::size_type idxS1;
+      aurostd::string2tokens(_input,tokens,"\n");
+      string strline="",_keyword="";
+      string::size_type idx=0;
       for(uint i=0;i<tokens.size();i++) {
         strline=aurostd::RemoveComments(tokens[i]);
-        idxS1=strline.find(delim);
-        if(idxS1!=string::npos){
-          _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(0,idxS1));
-          if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): _keyword=\"" << _keyword << "\"" << endl;
+        idx=strline.find(delim);
+        if(idx!=string::npos){
+          _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(0,idx));
+          if(LDEBUG) {cerr << __AFLOW_FUNC__ << "_keyword=\"" << _keyword << "\"" << endl;}
           if(_keyword==keyword){
-            if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=\"" << keyword << "\" found] [RemoveWS=" << RemoveWS << "]" << endl;
+            if(LDEBUG) {cerr << __AFLOW_FUNC__ << "END [keyword=\"" << keyword << "\" found] [RemoveWS=" << RemoveWS << "]" << endl;}
             return true;
           }
         }
       }
-      if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=" << keyword << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << "END [keyword=\"" << keyword << "\" NOT found] [RemoveWS=" << RemoveWS << "]" << endl;}
       return false;
     }
     return true; //SD20220403 - since substring exists, return true
   }
 
-  bool kvpairfound(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
-    return kvpairfound(strstream.str(),keyword,delim,RemoveWS,RemoveComments);
+  bool kvpair2bool(const stringstream& input,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
+    return kvpair2bool(input.str(),keyword,delim,RemoveWS,RemoveComments);
   }
 
-  string kvpair2value(const string& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315
-    //substring2string and kvpair2value are similar but distinct
+  //SD20220520
+  //Rewritten kvpair2string to be more understandable, accept more input types, allow for multi-char delimiters and incorporate extracting Nth entries
+  //n==0 returns all entries, starts counting from 1, negative numbers go backwards
+  //Original kvpair2string always returned just the first entry
+  string kvpair2string(ifstream& input,const string& keyword,const string& delim,const int instance,bool RemoveWS,bool RemoveComments) {
+    //substring2string and kvpair2string are similar but distinct
     //substring2string will match any strsub1 and return everything AFTER strsub1
-    //kvpair2value will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return VALUE
+    //kvpair2string will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return VALUE
     //matching KEY exactly is useful, e.g.:
     //_FILE_START_
-    //IALGO=48
-    //ALGO=FAST
+    //IALGO==48
+    //ALGO==FAST
     //_FILE_END_
-    //strsub1="ALGO": substring2string will return "=48"
-    //keyword="ALGO,delim="=": kvpair2value will return "FAST"
-    //kvpair2value must match KEY exactly! skips the rest
+    //strsub1="ALGO",instance=1: substring2string will return "==48"
+    //keyword="ALGO,delim="==": kvpair2string will return "FAST"
+    //kvpair2string must match KEY exactly! skips the rest
     //substring2string is good for aflow.in's which has no set delimiter style: [AFLOW_BIN_XZ] vs. [AFLOW_BIN=XZ] vs. [AFLOW_BIN]XZ vs. [AFLOW]BIN=XZ
-    bool LDEBUG=FALSE;//TRUE;
-    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
-    string _strstream(strstream);
-    if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
-    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): [input=\"" << strstream << "\"], [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;
-    if(_strstream.find(keyword)==string::npos) return "";
-
+    bool LDEBUG=FALSE;
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [instance=" << instance << "] [RemoveWS=" << RemoveWS << "]" << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input.rdbuf() << "\"] [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;}
+    string strline="",_keyword="";
+    input.clear();input.seekg(0);
     vector<string> tokens;
-    aurostd::string2tokens(_strstream,tokens,"\n");
-    string strline="",_keyword="",value="";
-    string::size_type idxS1;
-    for(uint i=0;i<tokens.size();i++) {
-      if(RemoveComments){strline=aurostd::RemoveComments(tokens[i]);}
-      idxS1=strline.find(delim);
-      if(idxS1!=string::npos){
-        _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(0,idxS1));
-        if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): _keyword=\"" << _keyword << "\"" << endl;
-        if(_keyword==keyword){
-          value=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(idxS1+1));
-          if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=\"" << keyword << "\" found] [output=\"" << value << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
-          return value;
+    string::size_type idx=0;
+    int iter=0;
+    while(getline(input,strline) && (instance==0 || iter!=instance)) {
+      if(RemoveWS) {strline=aurostd::RemoveWhiteSpaces(strline,'"');}
+      if(RemoveComments) {strline=aurostd::RemoveComments(strline);}
+      idx=strline.find(delim);
+      if(idx!=string::npos) {
+        _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(0,idx));
+        if(_keyword==keyword) {
+          tokens.push_back(aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(idx+delim.length())));
+          iter++;
         }
       }
     }
-    if(LDEBUG) cerr << XPID << "aurostd::kvpair2value(): END [keyword=" << keyword << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
+    input.clear();input.seekg(0);
+    if(tokens.size()==0 || (uint)aurostd::abs(instance)>tokens.size()) {return "";}
+    stringstream strstream;
+    if(instance==0) {
+      for(uint i=0;i<tokens.size();i++) {strstream << tokens[i] << endl;}
+    }
+    else if(instance>0) {
+      strstream << tokens[tokens.size()-1];
+    }
+    else if(instance<0) {
+      uint i=(uint)aurostd::boundary_conditions_periodic(0,tokens.size()-1,instance);
+      strstream << tokens[i];
+    }
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+    return strstream.str();
+  }
+
+  string kvpair2string(const string& _input,const string& keyword,const string& delim,const int instance,bool RemoveWS,bool RemoveComments) {
+    bool LDEBUG=FALSE;
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [instance=" << instance << "] [RemoveWS=" << RemoveWS << "]" << endl;}
+    string input=_input;
+    if(RemoveWS) {input=aurostd::RemoveWhiteSpaces(_input,'"');}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << "[input=\"" << input << "\"] [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;}
+    if(input.find(delim)==string::npos || input.find(keyword)==string::npos) {return "";}
+    stringstream strstream;
+    vector<string> tokens;
+    aurostd::string2vectorstring(input,tokens);
+    string _keyword="";
+    string::size_type idx=0;
+    int iter=0;
+    if(instance>0) {
+      for(uint i=0;i<tokens.size();i++) {
+        if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
+        idx=tokens[i].find(delim);
+        if(idx!=string::npos) {
+          _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[i].substr(0,idx));
+          if(_keyword==keyword) {
+            iter++;
+            if(instance==iter) {strstream << aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[i].substr(idx+delim.length()));break;}
+          }
+        }
+      }
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+      return strstream.str();
+    }
+    else if(instance<0) {
+      for(int i=tokens.size()-1;i>=0;i--) {
+        if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
+        idx=tokens[i].find(delim);
+        if(idx!=string::npos) {
+          _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[i].substr(0,idx));
+          if(_keyword==keyword) {
+            iter--;
+            if(instance==iter) {strstream << aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[i].substr(idx+delim.length()));break;}
+          }
+        }
+      }
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+      return strstream.str();
+    }
+    else { //instance==0
+      for(uint i=0;i<tokens.size();i++) {
+        if(RemoveComments) {tokens[i]=aurostd::RemoveComments(tokens[i]);}
+        idx=tokens[i].find(delim);
+        if(idx!=string::npos) {
+          _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[i].substr(0,idx));
+          if(_keyword==keyword) {
+            strstream << aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[i].substr(idx+delim.length())) << endl;
+          }
+        }
+      }
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << "BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [instance=" << instance << "] [output=\"" << strstream.str() << "\"] [RemoveWS=" << RemoveWS << "]" << endl;}
+      return strstream.str();
+    }
     return "";
   }
 
-  string kvpair2value(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315 - cleaned up
-    return kvpair2value(strstream.str(),keyword,delim,RemoveWS,RemoveComments);
+  string kvpair2string(const stringstream& input,const string& keyword,const string& delim,const int instance,bool RemoveWS,bool RemoveComments) {
+    return kvpair2string(input.str(),keyword,delim,instance,RemoveWS,RemoveComments);
   }
 
-  template<typename utype> utype kvpair2utype(const string& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) {
-    return string2utype<utype>(kvpair2value(strstream,keyword,delim,RemoveWS,RemoveComments));
+  //[SD20220520 - OBSOLETE]string kvpair2string(const string& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) { //CO20210315
+  //[SD20220520 - OBSOLETE]  //substring2string and kvpair2string are similar but distinct
+  //[SD20220520 - OBSOLETE]  //substring2string will match any strsub1 and return everything AFTER strsub1
+  //[SD20220520 - OBSOLETE]  //kvpair2string will assume the line is written KEY+DELIMITER+VALUE, if it matches KEY and DELIMITER exactly, it will return VALUE
+  //[SD20220520 - OBSOLETE]  //matching KEY exactly is useful, e.g.:
+  //[SD20220520 - OBSOLETE]  //_FILE_START_
+  //[SD20220520 - OBSOLETE]  //IALGO=48
+  //[SD20220520 - OBSOLETE]  //ALGO=FAST
+  //[SD20220520 - OBSOLETE]  //_FILE_END_
+  //[SD20220520 - OBSOLETE]  //strsub1="ALGO": substring2string will return "=48"
+  //[SD20220520 - OBSOLETE]  //keyword="ALGO,delim="=": kvpair2string will return "FAST"
+  //[SD20220520 - OBSOLETE]  //kvpair2string must match KEY exactly! skips the rest
+  //[SD20220520 - OBSOLETE]  //substring2string is good for aflow.in's which has no set delimiter style: [AFLOW_BIN_XZ] vs. [AFLOW_BIN=XZ] vs. [AFLOW_BIN]XZ vs. [AFLOW]BIN=XZ
+  //[SD20220520 - OBSOLETE]  bool LDEBUG=FALSE;//TRUE;
+  //[SD20220520 - OBSOLETE]  if(LDEBUG) cerr << XPID << "aurostd::kvpair2string(): BEGIN [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
+  //[SD20220520 - OBSOLETE]  string _strstream(strstream);
+  //[SD20220520 - OBSOLETE]  if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
+  //[SD20220520 - OBSOLETE]  if(LDEBUG) cerr << XPID << "aurostd::kvpair2string(): [input=\"" << strstream << "\"], [keyword=\"" << keyword << "\"] [delimiter=\"" << delim << "\"]" << endl;
+  //[SD20220520 - OBSOLETE]  if(_strstream.find(keyword)==string::npos) return "";
+  //[SD20220520 - OBSOLETE]
+  //[SD20220520 - OBSOLETE]  vector<string> tokens;
+  //[SD20220520 - OBSOLETE]  aurostd::string2tokens(_strstream,tokens,"\n");
+  //[SD20220520 - OBSOLETE]  string strline="",_keyword="",value="";
+  //[SD20220520 - OBSOLETE]  string::size_type idxS1;
+  //[SD20220520 - OBSOLETE]  for(uint i=0;i<tokens.size();i++) {
+  //[SD20220520 - OBSOLETE]    if(RemoveComments){strline=aurostd::RemoveComments(tokens[i]);}
+  //[SD20220520 - OBSOLETE]    idxS1=strline.find(delim);
+  //[SD20220520 - OBSOLETE]    if(idxS1!=string::npos){
+  //[SD20220520 - OBSOLETE]      _keyword=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(0,idxS1));
+  //[SD20220520 - OBSOLETE]      if(LDEBUG) cerr << XPID << "aurostd::kvpair2string(): _keyword=\"" << _keyword << "\"" << endl;
+  //[SD20220520 - OBSOLETE]      if(_keyword==keyword){
+  //[SD20220520 - OBSOLETE]        value=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(strline.substr(idxS1+1));
+  //[SD20220520 - OBSOLETE]        if(LDEBUG) cerr << XPID << "aurostd::kvpair2string(): END [keyword=\"" << keyword << "\" found] [output=\"" << value << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
+  //[SD20220520 - OBSOLETE]        return value;
+  //[SD20220520 - OBSOLETE]      }
+  //[SD20220520 - OBSOLETE]    }
+  //[SD20220520 - OBSOLETE]  }
+  //[SD20220520 - OBSOLETE]  if(LDEBUG) cerr << XPID << "aurostd::kvpair2string(): END [keyword=" << keyword << " NOT found] [RemoveWS=" << RemoveWS << "]" << endl;
+  //[SD20220520 - OBSOLETE]  return "";
+  //[SD20220520 - OBSOLETE]}
+
+  template<typename utype> utype kvpair2utype(ifstream& input,const string& keyword,const string& delim,const int instance,bool RemoveWS,bool RemoveComments) {
+    return string2utype<utype>(kvpair2string(input,keyword,delim,instance,RemoveWS,RemoveComments));
   }
-  template<typename utype> utype kvpair2utype(const stringstream& strstream,const string& keyword,const string& delim,bool RemoveWS,bool RemoveComments) {
-    return kvpair2utype<utype>(strstream.str(),keyword,delim,RemoveWS,RemoveComments);
+  template<typename utype> utype kvpair2utype(const string& input,const string& keyword,const string& delim,const int instance,bool RemoveWS,bool RemoveComments) {
+    return string2utype<utype>(kvpair2string(input,keyword,delim,instance,RemoveWS,RemoveComments));
+  }
+  template<typename utype> utype kvpair2utype(const stringstream& input,const string& keyword,const string& delim,const int instance,bool RemoveWS,bool RemoveComments) {
+    return kvpair2utype<utype>(input.str(),keyword,delim,instance,RemoveWS,RemoveComments);
   }
 
   // ***************************************************************************
   // Function SubStringsPresentExtractString and other
   // ***************************************************************************
-  uint substring2strings(const string& strstream,vector<string> &vstringout,const string& strsub1,bool RemoveWS,bool RemoveComments) {
-    //an AFLOW-specific substring matcher: will remove comments before searching
-    bool LDEBUG=FALSE;//TRUE;
-    if(LDEBUG) cerr << XPID << "aurostd::substring2strings(): BEGIN [substring=\"" << strsub1 << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
-    vstringout.clear();
-    string _strstream(strstream);
-    if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
-    if(LDEBUG) cerr << XPID << "aurostd::substring2strings(): [input=\"" << strstream << "\"], [substring=\"" << strsub1 << "\"]" << endl;
-    if(_strstream.find(strsub1)==string::npos) return 0;
-
-    vector<string> tokens;
-    aurostd::string2tokens(_strstream,tokens,"\n");
-    string strline="";
-    string::size_type idxS1;
-    for(uint i=0;i<tokens.size();i++) {
-      if(RemoveComments){strline=aurostd::RemoveComments(tokens[i]);}  //CO20210315
-      idxS1=strline.find(strsub1);
-      if(idxS1!=string::npos) {
-        strline=strline.substr(idxS1+strsub1.length());
-        strline=aurostd::RemoveWhiteSpacesFromTheBack(strline);
-        if(LDEBUG) cerr << XPID << "aurostd::substring2strings(): [substring=\"" << strsub1 << "\" found] [output=\"" << strline << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
-        vstringout.push_back(strline);
-      }
-    }
-    if(LDEBUG) cerr << XPID << "aurostd::substring2strings(): END [substring=\"" << strsub1 << "\"] [hits=" << vstringout.size() << "] [RemoveWS=" << RemoveWS << "]" << endl;
+  uint substring2strings(ifstream& input,vector<string> &vstringout,const string& strsub1,bool RemoveWS,bool RemoveComments) { //SD20220520
+    vstringout=aurostd::string2vectorstring(aurostd::substring2string(input,strsub1,0,RemoveWS,RemoveComments));
+    return vstringout.size();
+  }
+  uint substring2strings(const string& input,vector<string> &vstringout,const string& strsub1,bool RemoveWS,bool RemoveComments) {
+    //[SD20220520 - OBSOLETE]//an AFLOW-specific substring matcher: will remove comments before searching
+    //[SD20220520 - OBSOLETE]bool LDEBUG=FALSE;//TRUE;
+    //[SD20220520 - OBSOLETE]if(LDEBUG) cerr << XPID << "aurostd::substring2strings(): BEGIN [substring=\"" << strsub1 << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
+    //[SD20220520 - OBSOLETE]vstringout.clear();
+    //[SD20220520 - OBSOLETE]string _strstream(strstream);
+    //[SD20220520 - OBSOLETE]if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
+    //[SD20220520 - OBSOLETE]if(LDEBUG) cerr << XPID << "aurostd::substring2strings(): [input=\"" << strstream << "\"], [substring=\"" << strsub1 << "\"]" << endl;
+    //[SD20220520 - OBSOLETE]if(_strstream.find(strsub1)==string::npos) return 0;
+    //[SD20220520 - OBSOLETE]
+    //[SD20220520 - OBSOLETE]vector<string> tokens;
+    //[SD20220520 - OBSOLETE]aurostd::string2tokens(_strstream,tokens,"\n");
+    //[SD20220520 - OBSOLETE]string strline="";
+    //[SD20220520 - OBSOLETE]string::size_type idxS1;
+    //[SD20220520 - OBSOLETE]for(uint i=0;i<tokens.size();i++) {
+    //[SD20220520 - OBSOLETE]  if(RemoveComments){strline=aurostd::RemoveComments(tokens[i]);}  //CO20210315
+    //[SD20220520 - OBSOLETE]  idxS1=strline.find(strsub1);
+    //[SD20220520 - OBSOLETE]  if(idxS1!=string::npos) {
+    //[SD20220520 - OBSOLETE]    strline=strline.substr(idxS1+strsub1.length());
+    //[SD20220520 - OBSOLETE]    strline=aurostd::RemoveWhiteSpacesFromTheBack(strline);
+    //[SD20220520 - OBSOLETE]    if(LDEBUG) cerr << XPID << "aurostd::substring2strings(): [substring=\"" << strsub1 << "\" found] [output=\"" << strline << "\"] [RemoveWS=" << RemoveWS << "]" << endl;
+    //[SD20220520 - OBSOLETE]    vstringout.push_back(strline);
+    //[SD20220520 - OBSOLETE]  }
+    //[SD20220520 - OBSOLETE]}
+    //[SD20220520 - OBSOLETE]if(LDEBUG) cerr << XPID << "aurostd::substring2strings(): END [substring=\"" << strsub1 << "\"] [hits=" << vstringout.size() << "] [RemoveWS=" << RemoveWS << "]" << endl;
+    //[SD20220520 - OBSOLETE]return vstringout.size();
+    vstringout=aurostd::string2vectorstring(aurostd::substring2string(input,strsub1,0,RemoveWS,RemoveComments));
+    return vstringout.size();
+  }
+  uint substring2strings(const stringstream& input,vector<string> &vstringout,const string& strsub1,bool RemoveWS,bool RemoveComments) {
+    vstringout=aurostd::string2vectorstring(aurostd::substring2string(input,strsub1,0,RemoveWS,RemoveComments));
     return vstringout.size();
   }
 
-  //[CO20210315 - not used, not sure the purpose of strsub2]uint substring2strings(const string& strstream, vector<string> &vstringout, const string& strsub1, const string& strsub2, bool RemoveWS) {
-  //[CO20210315 - not used, not sure the purpose of strsub2]  bool LDEBUG=(FALSE || XHOST.DEBUG);
-  //[CO20210315 - not used, not sure the purpose of strsub2]  if(LDEBUG) cerr << "DEBUG substring2strings5: (BEGIN) " << strsub1 << " " << strsub2 << " " << RemoveWS << endl;
-  //[CO20210315 - not used, not sure the purpose of strsub2]  string _strstream(strstream),_strline,_strsub1(strsub1),_strsub2(strsub2);
-  //[CO20210315 - not used, not sure the purpose of strsub2]  string::size_type idxS1,idxS2;
-  //[CO20210315 - not used, not sure the purpose of strsub2]  vstringout.clear(); // clear so it is empty
-  //[CO20210315 - not used, not sure the purpose of strsub2]  if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
-  //[CO20210315 - not used, not sure the purpose of strsub2]  if(_strstream.find(_strsub1)==string::npos) return 0; // there is not
-  //[CO20210315 - not used, not sure the purpose of strsub2]  if(_strstream.find(_strsub2)==string::npos) return 0; // there is not
-  //[CO20210315 - not used, not sure the purpose of strsub2]  //  transform(_strstream.begin(),_strstream.end(),_strstream.begin(),toupper); // pout everything UPPER
-  //[CO20210315 - not used, not sure the purpose of strsub2]  vector<string> tokens;
-  //[CO20210315 - not used, not sure the purpose of strsub2]  aurostd::string2tokens(_strstream,tokens,"\n");
-  //[CO20210315 - not used, not sure the purpose of strsub2]  for(uint i=0;i<tokens.size();i++) {
-  //[CO20210315 - not used, not sure the purpose of strsub2]    _strline=tokens[i];
-  //[CO20210315 - not used, not sure the purpose of strsub2]    if(_strline.find(COMMENT_NEGLECT_1)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_1));
-  //[CO20210315 - not used, not sure the purpose of strsub2]    if(_strline.find(COMMENT_NEGLECT_2)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_2));
-  //[CO20210315 - not used, not sure the purpose of strsub2]    if(_strline.find(COMMENT_NEGLECT_3)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_3));
-  //[CO20210315 - not used, not sure the purpose of strsub2]    idxS1=_strline.find(_strsub1);
-  //[CO20210315 - not used, not sure the purpose of strsub2]    idxS2=_strline.find(_strsub2);
-  //[CO20210315 - not used, not sure the purpose of strsub2]    if(idxS1!=string::npos && idxS2!=string::npos) {
-  //[CO20210315 - not used, not sure the purpose of strsub2]      vstringout.push_back(aurostd::RemoveWhiteSpacesFromTheBack(_strline.substr(std::max(_strline.find(_strsub2)+_strsub2.length(),_strline.find(_strsub1)+_strsub1.length()))));
-  //[CO20210315 - not used, not sure the purpose of strsub2]    }
-  //[CO20210315 - not used, not sure the purpose of strsub2]  }
-  //[CO20210315 - not used, not sure the purpose of strsub2]  if(LDEBUG) cerr << "DEBUG substring2string5: (END) " << strsub1 << " " << strsub2 << " " << vstringout.size() << " " << RemoveWS << endl;
-  //[CO20210315 - not used, not sure the purpose of strsub2]  return vstringout.size();
-  //[CO20210315 - not used, not sure the purpose of strsub2]}
+  uint substring2strings(ifstream& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,bool RemoveWS,bool RemoveComments) {
+    vstringout=aurostd::string2vectorstring(aurostd::substring2string(input,strsub1,strsub2,0,RemoveWS,RemoveComments));
+    return vstringout.size();
+  }
+  uint substring2strings(const string& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,bool RemoveWS,bool RemoveComments) {
+    //[SD20220520 - OBSOLETE]bool LDEBUG=(FALSE || XHOST.DEBUG);
+    //[SD20220520 - OBSOLETE]if(LDEBUG) cerr << "DEBUG substring2strings5: (BEGIN) " << strsub1 << " " << strsub2 << " " << RemoveWS << endl;
+    //[SD20220520 - OBSOLETE]string _strstream(strstream),_strline,_strsub1(strsub1),_strsub2(strsub2);
+    //[SD20220520 - OBSOLETE]string::size_type idxS1,idxS2;
+    //[SD20220520 - OBSOLETE]vstringout.clear(); // clear so it is empty
+    //[SD20220520 - OBSOLETE]if(RemoveWS==TRUE) _strstream=aurostd::RemoveWhiteSpaces(_strstream,'"');
+    //[SD20220520 - OBSOLETE]if(_strstream.find(_strsub1)==string::npos) return 0; // there is not
+    //[SD20220520 - OBSOLETE]if(_strstream.find(_strsub2)==string::npos) return 0; // there is not
+    //[SD20220520 - OBSOLETE]//  transform(_strstream.begin(),_strstream.end(),_strstream.begin(),toupper); // pout everything UPPER
+    //[SD20220520 - OBSOLETE]vector<string> tokens;
+    //[SD20220520 - OBSOLETE]aurostd::string2tokens(_strstream,tokens,"\n");
+    //[SD20220520 - OBSOLETE]for(uint i=0;i<tokens.size();i++) {
+    //[SD20220520 - OBSOLETE]  _strline=tokens[i];
+    //[SD20220520 - OBSOLETE]  if(_strline.find(COMMENT_NEGLECT_1)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_1));
+    //[SD20220520 - OBSOLETE]  if(_strline.find(COMMENT_NEGLECT_2)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_2));
+    //[SD20220520 - OBSOLETE]  if(_strline.find(COMMENT_NEGLECT_3)!=string::npos) _strline=_strline.substr(0,_strline.find(COMMENT_NEGLECT_3));
+    //[SD20220520 - OBSOLETE]  idxS1=_strline.find(_strsub1);
+    //[SD20220520 - OBSOLETE]  idxS2=_strline.find(_strsub2);
+    //[SD20220520 - OBSOLETE]  if(idxS1!=string::npos && idxS2!=string::npos) {
+    //[SD20220520 - OBSOLETE]    vstringout.push_back(aurostd::RemoveWhiteSpacesFromTheBack(_strline.substr(std::max(_strline.find(_strsub2)+_strsub2.length(),_strline.find(_strsub1)+_strsub1.length()))));
+    //[SD20220520 - OBSOLETE]  }
+    //[SD20220520 - OBSOLETE]}
+    //[SD20220520 - OBSOLETE]if(LDEBUG) cerr << "DEBUG substring2string5: (END) " << strsub1 << " " << strsub2 << " " << vstringout.size() << " " << RemoveWS << endl;
+    //[SD20220520 - OBSOLETE]return vstringout.size();
+    vstringout=aurostd::string2vectorstring(aurostd::substring2string(input,strsub1,strsub2,0,RemoveWS,RemoveComments));
+    return vstringout.size();
+  }
+  uint substring2strings(const stringstream& input,vector<string> &vstringout,const string& strsub1,const string& strsub2,bool RemoveWS,bool RemoveComments) {
+    vstringout=aurostd::string2vectorstring(aurostd::substring2string(input,strsub1,strsub2,0,RemoveWS,RemoveComments));
+    return vstringout.size();
+  }
 
-  template<typename utype> uint substring2utypes(const string& strstream,vector<int> &vintout,const string& strsub1,bool RemoveWS,bool RemoveComments) {  //CO20210315 - cleaned up
-    vintout.clear();
+  template<typename utype> uint substring2utypes(ifstream& input,vector<utype> &vutypeout,const string& strsub1,bool RemoveWS,bool RemoveComments) {  //SD202205020
     vector<string> vstringout;
-    aurostd::substring2strings(strstream,vstringout,strsub1,RemoveWS,RemoveComments);
-    vintout=aurostd::vectorstring2vectorint(vstringout);
-    return vintout.size();
+    aurostd::substring2strings(input,vstringout,strsub1,RemoveWS,RemoveComments);
+    vutypeout=aurostd::vectorstring2vectorutype<utype>(vstringout);
+    return vutypeout.size();
   }
-  template<typename utype> uint substring2utypes(const stringstream& strstream,vector<int> &vintout,const string& strsub1,bool RemoveWS,bool RemoveComments) {  //CO20210315 - cleaned up
-    return substring2utypes<utype>(strstream.str(),vintout,strsub1,RemoveWS,RemoveComments);
+  template<typename utype> uint substring2utypes(const string& input,vector<utype> &vutypeout,const string& strsub1,bool RemoveWS,bool RemoveComments) {  //CO20210315 - cleaned up //SD202205020 - added utype
+    vector<string> vstringout;
+    aurostd::substring2strings(input,vstringout,strsub1,RemoveWS,RemoveComments);
+    vutypeout=aurostd::vectorstring2vectorutype<utype>(vstringout);
+    return vutypeout.size();
   }
-  //[CO20210315 - not used, not sure the purpose of strsub2]template<typename utype> uint substring2utypes(const string& strstream, vector<int> &vintout, const string& strsub1, const string& strsub2, bool RemoveWS) {
-  //[CO20210315 - not used, not sure the purpose of strsub2]  string _strstream(strstream),_strsub1(strsub1),_strsub2(strsub2);
-  //[CO20210315 - not used, not sure the purpose of strsub2]  vintout.clear();
-  //[CO20210315 - not used, not sure the purpose of strsub2]  vector<string> vstringout;
-  //[CO20210315 - not used, not sure the purpose of strsub2]  uint i=aurostd::substring2strings(_strstream,vstringout,_strsub1,_strsub2,RemoveWS);
-  //[CO20210315 - not used, not sure the purpose of strsub2]  for(i=0;i<vstringout.size();i++) vintout.push_back(string2utype<utype>(vstringout[i]));
-  //[CO20210315 - not used, not sure the purpose of strsub2]  return vintout.size();
-  //[CO20210315 - not used, not sure the purpose of strsub2]}
+  template<typename utype> uint substring2utypes(const stringstream& input,vector<utype> &vutypeout,const string& strsub1,bool RemoveWS,bool RemoveComments) {  //CO20210315 - cleaned up //SD202205020 - added utype
+    return substring2utypes<utype>(input.str(),vutypeout,strsub1,RemoveWS,RemoveComments);
+  }
+
+  template<typename utype> uint substring2utypes(ifstream& input,vector<utype> &vutypeout,const string& strsub1,const string& strsub2,bool RemoveWS,bool RemoveComments) { //SD202205020
+    vector<string> vstringout;
+    aurostd::substring2strings(input,vstringout,strsub1,strsub2,RemoveWS,RemoveComments);
+    vutypeout=aurostd::vectorstring2vectorutype<utype>(vstringout);
+    return vutypeout.size();
+  }
+  template<typename utype> uint substring2utypes(const string& input,vector<utype> &vutypeout,const string& strsub1,const string& strsub2,bool RemoveWS,bool RemoveComments) { //SD202205020 - added utype
+    vector<string> vstringout;
+    aurostd::substring2strings(input,vstringout,strsub1,strsub2,RemoveWS,RemoveComments);
+    vutypeout=aurostd::vectorstring2vectorutype<utype>(vstringout);
+    return vutypeout.size();
+  }
+  template<typename utype> uint substring2utypes(const stringstream& input,vector<utype> &vutypeout,const string& strsub1,const string& strsub2,bool RemoveWS,bool RemoveComments) { //SD202205020
+    return substring2utypes<utype>(input.str(),vutypeout,strsub1,strsub2,RemoveWS,RemoveComments);
+  }
 }
 
 // ***************************************************************************
