@@ -165,7 +165,7 @@ namespace chull {
     usage_options.push_back("--light_contrast|--lightcontrast|--lc");
     usage_options.push_back("--large_font|--largefont|--large|--lf");
     usage_options.push_back("--png_resolution=|--pngresolution=|--pngr=300");
-    usage_options.push_back("--plot_iso_max_latent_heat|--iso_max|--isomax");
+    usage_options.push_back("--plot_iso_max_latent_heat|--plot_isomax|--iso_max|--isomax");
     usage_options.push_back(" ");
     // output usage
     if(vpflow.flag("CHULL::USAGE")) {

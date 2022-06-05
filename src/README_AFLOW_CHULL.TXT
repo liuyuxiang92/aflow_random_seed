@@ -127,7 +127,7 @@ LIST OF AFLOW-CHULL COMMANDS:
       [--large_font|--largefont|--large|--lf] : Latex/PDF output mode only. Prints a "larger" font size 
           for convex hull illustration.
       [--png_resolution=|--pngresolution=|--pngr=300] : Set PNG resolution (-density in convert).
-      [--plot_iso_max_latent_heat|--iso_max|--isomax] : Plot iso-max-latent-heat lines for ground state structures.
+      [--plot_iso_max_latent_heat|--plot_isomax|--iso_max|--isomax] : Plot iso-max-latent-heat lines for ground state structures.
           See dx.doi.org/10.1063/1.4902865.
 
 For additional information contact: Corey Oses (corey.oses@duke.edu)

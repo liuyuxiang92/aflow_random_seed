@@ -325,7 +325,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("CHULL::LATEX_OUTPUT",aurostd::args2flag(argv,cmds,"--latex_output|--latexoutput"));    //verbose latex output (cout and FileMESSAGE)
     vpflow.flag("CHULL::LATEX_INTERACTIVE",aurostd::args2flag(argv,cmds,"--latex_interactive|--latexinteractive"));  //interact with latex (execute vs. execute2string)
     if(vpflow.flag("CHULL::LATEX_INTERACTIVE")&&!vpflow.flag("CHULL::LATEX_OUTPUT")){vpflow.flag("CHULL::LATEX_OUTPUT",TRUE);}    //keep verbose latex output
-    vpflow.flag("CHULL::PLOT_ISO_MAX_LATENT_HEAT",aurostd::args2flag(argv,cmds,"--plot_iso_max_latent_heat|--iso_max|--isomax"));    //plot iso-max latent heat lines for hull points
+    vpflow.flag("CHULL::PLOT_ISO_MAX_LATENT_HEAT",aurostd::args2flag(argv,cmds,"--plot_iso_max_latent_heat|--plot_isomax|--iso_max|--isomax"));    //plot iso-max latent heat lines for hull points
     //need to determine output type immediately, so we can accept/ignore output specific flags (SAFE)
     vpflow.args2addattachedscheme(argv,cmds,"CHULL::OUTPUT","--print=|--p=|--output=|--o=",""); //determine how to get output, could pull from XHOST, but --output was used previously (backwards compatibility)
     if(vpflow.flag("CHULL::OUTPUT")){
@@ -2422,7 +2422,7 @@ namespace pflow {
     strstream << tab << xspaces << " " << "              --light_contrast|--lightcontrast|--lc" << endl;
     strstream << tab << xspaces << " " << "              --large_font|--largefont|--large|--lf" << endl;
     strstream << tab << xspaces << " " << "              --png_resolution=|--pngresolution=|--pngr=300" << endl;
-    strstream << tab << xspaces << " " << "              --plot_iso_max_latent_heat|--iso_max|--isomax" << endl;
+    strstream << tab << xspaces << " " << "              --plot_iso_max_latent_heat|--plot_isomax|--iso_max|--isomax" << endl;
     strstream << tab << x << " --corners|--corner < POSCAR" << endl;
     strstream << tab << x << " --data[=<tolerance_value>|=tight|=loose] [--no_scan] [--print=txt|json] < POSCAR" << endl;
     strstream << tab << x << " --data1=rcut < POSCAR" << endl;
