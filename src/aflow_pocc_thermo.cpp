@@ -106,7 +106,6 @@ namespace pocc {
       const string &calc_type, apl::EOSmethod eos_method, bool isFVTprovided,
       ofstream &FileMESSAGE, ostream &oss)
   {
-    string function = XPID + "EnsembleThermo::EnsembleThermo():";
     string msg = "", file = "";
 
     bool LDEBUG = false || _DEBUG_POCC_THERMO_ || XHOST.DEBUG;
@@ -127,26 +126,26 @@ namespace pocc {
       if (!aurostd::EFileExist(file)){
         msg = "File " + file + " does not exists:";
         msg += " the calculation will be stopped.";
-        pflow::logger(_AFLOW_FILE_NAME_, function, msg, directories[i],
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, msg, directories[i],
          *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
         return;
       }
 
       if (isFVTprovided){
-        if (LDEBUG) cerr << function << "FVT mode" << std::endl;
+        if (LDEBUG) cerr << __AFLOW_FUNC__ << "FVT mode" << std::endl;
 
         uint Nvolumes = 0, Ntemperatures = 0;
         readFVTParameters(file, calc_type, Nvolumes, Ntemperatures);
 
         if (LDEBUG){
-          cerr << function << "Nvolumes="  << Nvolumes;
+          cerr << __AFLOW_FUNC__ << "Nvolumes="  << Nvolumes;
           cerr << " Ntemperatures=" << Ntemperatures << std::endl;
         }
         readFVTdata(directories[i], fname, calc_type, Nvolumes, Ntemperatures,
             T, coeffs, Vmin, Vmax);
       }
       else{
-        if (LDEBUG) cerr << function << "COFF mode" << std::endl;
+        if (LDEBUG) cerr << __AFLOW_FUNC__ << "COFF mode" << std::endl;
 
         readCoeffParameters(file, Vmin, Vmax);
 
@@ -157,7 +156,7 @@ namespace pocc {
           msg = "No data was extracted for " + calc_type;
           msg += " with " + apl::EOSmethod2label(eos_method) + " EOS.";
           msg += " The calculation will be stopped.";
-          pflow::logger(_AFLOW_FILE_NAME_, function, msg, directories[i],
+          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, msg, directories[i],
             *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
           return;
         }
@@ -175,7 +174,7 @@ namespace pocc {
     Ensemble_Vmax *= 1.05;
 
     if (LDEBUG){
-      cerr << function << " Ensemble_Vmin = " << Ensemble_Vmin;
+      cerr << __AFLOW_FUNC__ << " Ensemble_Vmin = " << Ensemble_Vmin;
       cerr << " Ensemble_Vmax = " << Ensemble_Vmax << std::endl;
     }
 
@@ -183,7 +182,7 @@ namespace pocc {
     Nstructures = T_list.size();
     if (!Nstructures){
       msg="No data was extracted: check that all QHA calculations are complete.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_ERROR_);
     }
 
     // the temperature range, where QHA is able to calculate the thermodynamic
@@ -206,7 +205,7 @@ namespace pocc {
         if (!aurostd::isequal(T_list[i][row], T_list[i+1][row])){
           msg="Inconsistent list of temperatures among different ";
           msg+="POCC::QHA calculations.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg,
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, msg,
               _VALUE_ILLEGAL_);
         }
       }
@@ -220,7 +219,7 @@ namespace pocc {
       if (ncols != coeffs_list[i].cols){
         msg="Inconsistent number of fitting coefficients among different ";
         msg+="POCC::QHA calculations.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg,
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, msg,
               _VALUE_ILLEGAL_);
       }
     }
@@ -249,7 +248,7 @@ namespace pocc {
   void EnsembleThermo::readFVTParameters(const string &filename,
       const string &blockname, uint &Nvolumes, uint &Ntemperatures)
   {
-    string function = "EnsembleThermo::readFVTParameters():", msg = "";
+    string msg = "";
 
     Nvolumes = 0; Ntemperatures = 0;
 
@@ -268,7 +267,7 @@ namespace pocc {
         }
         else{
           msg = "Failed to extract N_VOLUMES parameter.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_CORRUPT_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_CORRUPT_);
         }
       }
 
@@ -279,7 +278,7 @@ namespace pocc {
         }
         else{
           msg = "Failed to extract N_TEMPERATURES parameter.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_CORRUPT_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_CORRUPT_);
         }
       }
     }
@@ -316,7 +315,7 @@ namespace pocc {
       const string& blockname, uint n_volumes, uint n_temperatures,
       xvector<double> &t, xmatrix<double> &c, double &Vmin, double &Vmax)
   {
-    string function = "EnsembleThermo::readFVTdata():", msg = "";
+    string msg = "";
 
     string block = "[" + blockname + "_FVT]";
     string file = aurostd::efile2string(dirname + "/" + filename);
@@ -325,7 +324,7 @@ namespace pocc {
 
     if (v_data_block.size() != (n_volumes+1)*n_temperatures){ // +1 to account for the line with the value of temperature
       msg = "Inconsistent size of the block of data with N_VOLUMES and N_TEMPERATURES parameters.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_CORRUPT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_CORRUPT_);
     }
 
     vector<double> temperatures;
@@ -340,7 +339,7 @@ namespace pocc {
       aurostd::string2tokens(v_data_block[id], d_tokens, "=");
       if (d_tokens.size() != 2){
         msg = "Failed to extract the value of the temperature.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_CORRUPT_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_CORRUPT_);
       }
 
       T = d_tokens[1];
@@ -394,7 +393,7 @@ namespace pocc {
   bool EnsembleThermo::readCoeffData(const string& filename, const string& blockname,
       xvector<double> &T, xmatrix<double> &coeffs)
   {
-    string function = "readCoeffData():", msg = "";
+    string msg = "";
     string block = "[" + blockname + "_COEFF]";
 
     bool LDEBUG = false || _DEBUG_POCC_THERMO_ || XHOST.DEBUG;
@@ -413,7 +412,7 @@ namespace pocc {
       if (ncols <= 1){
         msg = "Data block " + blockname + " contains only one column or no data";
         msg += " at all: the file might be corrupt.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_CORRUPT_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, msg, _FILE_CORRUPT_);
       }
     }
     else{
@@ -430,7 +429,7 @@ namespace pocc {
       if (tokens.size() != ncols){
         msg = "Data block " + blockname + " does not have the same amount of";
         msg += " columns in each line: the file " + filename + " might be corrupt.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_CORRUPT_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, msg, _FILE_CORRUPT_);
       }
 
       T[i+1] = tokens[0];
@@ -438,8 +437,8 @@ namespace pocc {
     }
 
     if (LDEBUG){
-      cerr << function << "nrows="  << nrows << " ncols=" << ncols << std::endl;
-      cerr << function << "coeffs=" << coeffs << std::endl;
+      cerr << __AFLOW_FUNC__ << "nrows="  << nrows << " ncols=" << ncols << std::endl;
+      cerr << __AFLOW_FUNC__ << "coeffs=" << coeffs << std::endl;
     }
 
     return true;
@@ -453,7 +452,7 @@ namespace pocc {
   void EnsembleThermo::readCoeffParameters(const string& filename, double &Vmin,
       double &Vmax)
   {
-    string function = "readCoeffParameters():", msg = "";
+    string msg = "";
 
     vector<string> vlines;
     Vmin = 0; Vmax = 0;
@@ -470,7 +469,7 @@ namespace pocc {
           msg = "Number of tokens for VMIN parameter is ";
           msg += aurostd::utype2string(tokens.size()) + " instead of 2:";
           msg += "file " + filename + " might be corrupt.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_CORRUPT_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, msg, _FILE_CORRUPT_);
         }
         Vmin = tokens[1];
         Vmin_found = true;
@@ -482,7 +481,7 @@ namespace pocc {
           msg = "Number of tokens for VMAX parameter is ";
           msg += aurostd::utype2string(tokens.size()) + " instead of 2:";
           msg += "file " + filename + " might be corrupt.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_CORRUPT_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, msg, _FILE_CORRUPT_);
         }
         Vmax = tokens[1];
         Vmax_found = true;
@@ -514,7 +513,7 @@ namespace pocc {
   /// differentiation.
   xvector<double> EnsembleThermo::calcThermalExpansionSG(const xvector<double> &volumes, double dT)
   {
-    string function = "calcThermalExpansion():", msg = "";
+    string msg = "";
 
     int npoints = volumes.rows;
     if (npoints<5){
@@ -522,7 +521,7 @@ namespace pocc {
       msg += aurostd::utype2string(npoints) + " were provided.";
       msg += " Make sure that the minimum range among the set of POCC structures,";
       msg += "defined by the [AFLOW_APL]TPT parameter for each, is reasonable.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INDEX_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, msg, _INDEX_ILLEGAL_);
     }
 
     xvector<double> beta = aurostd::diffSG(volumes, dT);
@@ -561,14 +560,14 @@ namespace pocc {
     SGvec[5]= 2.8571428571428570E-001;
     ////////////////////////////////////////////////////////////////////////////////
 
-    string function = "calcThermalExpansionSG():", msg = "";
+    string msg = "";
     int npoints = free_energies.rows;
     if (npoints<5){
       msg = "Savitzky-Golay filter requires at least 5 points: only ";
       msg += aurostd::utype2string(npoints) + " were provided.";
       msg += " Make sure that the minimum range among the set of POCC structures,";
       msg += "defined by the [AFLOW_APL]TPT parameter for each, is reasonable.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INDEX_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, msg, _INDEX_ILLEGAL_);
     }
 
     xvector<double> endpoints(5), dummy(5);
@@ -605,7 +604,6 @@ namespace pocc {
 
   void EnsembleThermo::calculateThermodynamicProperties()
   {
-    string function = XPID + "EnsembleThermo::calculateThermodynamicProperties():";
     bool LDEBUG = false;
 
     xvector<double> F(Nvolumes), E(Nstructures);
@@ -624,7 +622,7 @@ namespace pocc {
             // EOS for each POCC structure
             E[s+1] = qha.evalEOSmodel(volumes[v], coeffs_list[s](i), eos_method);
           }
-          if (LDEBUG) cerr << function << " E: " << E << std::endl;
+          if (LDEBUG) cerr << __AFLOW_FUNC__ << " E: " << E << std::endl;
           // the set of free energies (includes the contribution from the configurational
           // entropy) to be used in the fitting procedure
           F[v] = -KBOLTZEV * T[i] * logZ(E, degeneracies, T[i]);
@@ -637,8 +635,8 @@ namespace pocc {
         B[i]      = qha.EOS_bulk_modulus_at_equilibrium;
         Bprime[i] = qha.EOS_Bprime_at_equilibrium;
         if (LDEBUG){
-          cerr << function << " V: " << volumes << std::endl;
-          cerr << function << " F: " << F << std::endl;
+          cerr << __AFLOW_FUNC__ << " V: " << volumes << std::endl;
+          cerr << __AFLOW_FUNC__ << " F: " << F << std::endl;
         }
       }
     } catch (aurostd::xerror e){
@@ -658,7 +656,7 @@ namespace pocc {
     // calculation of the thermal expansion and heat capacity involves derivatives:
     // dT is a temperature step for the derivative
     double dT = (max(T)-min(T))/(nrows-1);
-    if (LDEBUG) cerr << function << " dT = " << dT << std::endl;
+    if (LDEBUG) cerr << __AFLOW_FUNC__ << " dT = " << dT << std::endl;
 
     // calculate the thermal expansion coefficients
     beta = calcThermalExpansionSG(Veq, dT);
@@ -681,7 +679,6 @@ namespace pocc {
 
   void EnsembleThermo::writeThermodynamicProperties()
   {
-    string function = XPID + "EnsembleThermo::writeThermodynamicProperties()";
     string msg = "";
     apl::QHAmethod qha_method = apl::QHA_CALC;
 
@@ -726,13 +723,13 @@ namespace pocc {
     if (aurostd::FileExist(filename)){
       if (!aurostd::stringstream2file(file, filename, "APPEND")){
         msg = "Error writing to " + filename + " file.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_ERROR_);
       }
     }
     else{
       if (!aurostd::stringstream2file(file, filename)){
         msg = "Error writing to " + filename + " file.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_ERROR_);
       }
     }
   }
@@ -741,10 +738,10 @@ namespace pocc {
   /// with various EOS models.
   void POccCalculator::calculateQHAProperties()
   {
-    string function = "POccCalculator::calculateQHAProperties()", msg = "";
+    string msg = "";
     msg = "Calculating thermodynamic properties for the POCC ensemble using";
     msg += " the data obtained by QHA";
-    pflow::logger(_AFLOW_FILE_NAME_, function, msg, aurostd::getPWD(),
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, msg, aurostd::getPWD(),
             *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
     apl::QHAmethod qha_method = apl::QHA_CALC;

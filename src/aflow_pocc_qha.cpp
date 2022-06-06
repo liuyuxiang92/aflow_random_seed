@@ -78,13 +78,12 @@ namespace pocc {
 
   /// Calcualates POCC-average of QHA-related properties.
   void POccCalculator::calculateQHAPropertiesAVG(const vector<double>& v_temperatures) {
-    string function = XPID +  "POccCalculator::calculateQHAProperties():";
     string msg = "", filename = "";
 
     bool LDEBUG = false || _DEBUG_POCC_QHA_ || XHOST.DEBUG;
 
     msg = "Performing POCC+QHA post-processing step.";
-    pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, msg, m_aflags.Directory,
       *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
     apl::QHAmethod qha_method = apl::QHA_CALC;
@@ -120,14 +119,14 @@ namespace pocc {
 
       filename = m_aflags.Directory + "/" + m_ARUN_directories[i] + "/";
       filename += DEFAULT_QHA_FILE_PREFIX + DEFAULT_QHA_THERMO_FILE;
-      if (LDEBUG) cerr << function << " file: " << filename << endl;
+      if (LDEBUG) cerr << __AFLOW_FUNC__ << " file: " << filename << endl;
 
       if (aurostd::EFileExist(filename)){
          data = aurostd::substring2string(aurostd::efile2string(filename),
           "[QHA_SJ_THERMO]START", "[QHA_SJ_THERMO]STOP", 0);
 
         vector<string> lines = aurostd::string2vectorstring(data);
-        if (LDEBUG) cerr << function << " datasize: " <<  lines.size() << endl;
+        if (LDEBUG) cerr << __AFLOW_FUNC__ << " datasize: " <<  lines.size() << endl;
         if (lines.size() > 1){
           lines.erase(lines.begin()); // remove the first line containing properties labels
 
@@ -147,7 +146,7 @@ namespace pocc {
             else{
               msg="Inconsistent amount of properties (columns) among different";
               msg+="POCC-QHA calculations.";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg,
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, msg,
                   _INDEX_MISMATCH_);
             }
           }
@@ -155,23 +154,23 @@ namespace pocc {
         }
         else{
           msg = "The " + filename + " file is empty.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_ERROR_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, msg, _FILE_ERROR_);
         }
       }
       else{
         msg = "The " + filename + " file is missing.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, msg, _FILE_NOT_FOUND_);
       }
     }
 
     if (!ncols) {
       msg = "POCC+QHA was not able to extract any data.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_CORRUPT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_CORRUPT_);
     }
 
     if (LDEBUG){
-      cerr << function << " ncols: " << ncols << endl;
-      cerr << function << " pocc_qha size: " << pocc_qha_thermo_properties.size();
+      cerr << __AFLOW_FUNC__ << " ncols: " << ncols << endl;
+      cerr << __AFLOW_FUNC__ << " pocc_qha size: " << pocc_qha_thermo_properties.size();
       cerr << endl;
     }
 
@@ -199,7 +198,7 @@ namespace pocc {
                               pocc_qha_thermo_properties[i+1][row][0])){
           msg="Inconsistent list of temperatures among different";
           msg+="POCC-QHA calculations.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg,
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, msg,
               _VALUE_ILLEGAL_);
         }
       }
@@ -340,13 +339,13 @@ namespace pocc {
 
     string output_file = POCC_FILE_PREFIX + DEFAULT_POCC_QHA_AVGTHERMO_FILE;
     msg = "Writing the averaged POCC+QHA data to " + output_file+" file.";
-    pflow::logger(_AFLOW_FILE_NAME_, function, msg, m_aflags.Directory,
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, msg, m_aflags.Directory,
         *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     output_file = m_aflags.Directory + "/" + output_file;
 
     if (!aurostd::stringstream2file(file, output_file)){
       msg = "Error writing to " + output_file + " file.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function,msg,_FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,msg,_FILE_ERROR_);
     }
   }
 }
