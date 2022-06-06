@@ -481,6 +481,17 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     vxd=aurostd::deque2vector<double>(dxd); //CO20181226
     vxld=aurostd::deque2vector<long double>(dxld);  //CO20181226
 
+    aurostd::vectorstring2vectorutype<bool>(vxs); //SD20220520
+    aurostd::vectorstring2vectorutype<char>(vxs); //SD20220520
+    aurostd::vectorstring2vectorutype<unsigned int>(vxs); //SD20220520
+    aurostd::vectorstring2vectorutype<int>(vxs); //SD20220520
+    aurostd::vectorstring2vectorutype<long int>(vxs); //SD20220520
+    aurostd::vectorstring2vectorutype<long long int>(vxs); //SD20220520
+    aurostd::vectorstring2vectorutype<unsigned long long int>(vxs); //SD20220520
+    aurostd::vectorstring2vectorutype<float>(vxs); //SD20220520
+    aurostd::vectorstring2vectorutype<double>(vxs); //SD20220520
+    aurostd::vectorstring2vectorutype<long double>(vxs); //SD20220520
+
 #define AUROSTD_INITIALIZE_BOOL
     //#define AUROSTD_INITIALIZE_CHAR
 #define AUROSTD_INITIALIZE_STRING

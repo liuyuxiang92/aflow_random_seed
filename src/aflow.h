@@ -213,8 +213,10 @@ const string VASP_KEYWORD_EXECUTION=" Executing: ";
 #define VASPLS_BIN_POSTFIX_DEFAULT       "LS"
 #define GRND_BIN_DEFAULT                 "./grnd_intel"
 
-#define _VASP_POSCAR_MODE_EXPLICIT_START_ "[VASP_POSCAR_MODE_EXPLICIT]START."  //CO20200624
-#define _VASP_POSCAR_MODE_EXPLICIT_STOP_ "[VASP_POSCAR_MODE_EXPLICIT]STOP."  //CO20200624
+#define _VASP_POSCAR_MODE_EXPLICIT_START_ "[VASP_POSCAR_MODE_EXPLICIT]START"  //SD20220501
+#define _VASP_POSCAR_MODE_EXPLICIT_STOP_ "[VASP_POSCAR_MODE_EXPLICIT]STOP"  //SD20220501
+#define _VASP_POSCAR_MODE_EXPLICIT_START_P_ _VASP_POSCAR_MODE_EXPLICIT_START_ "."  //CO20200624
+#define _VASP_POSCAR_MODE_EXPLICIT_STOP_P_ _VASP_POSCAR_MODE_EXPLICIT_STOP_ "."  //CO20200624
 
 // --------------------------------------------------------------------------
 // definitions for projects
@@ -3300,8 +3302,8 @@ namespace KBIN {
   void XVASP_INCAR_LDAU_ADIABATIC(_xvasp& xvasp,int step);
   void XVASP_INCAR_LDAU_CUTOFF(_xvasp& xvasp,bool VERBOSE);
   void XVASP_INCAR_KPOINTS_Dielectric_SET(_xvasp& xvasp,_kflags &kflags,_vflags& vflags,string mode_dielectric);
-  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& entry,const string& COMMENT,bool VERBOSE);  //CO20200624 - using aurostd::kvpairfound() now
-  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& entries,const string& COMMENT,bool VERBOSE);  //CO20200624 - using aurostd::kvpairfound() now
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const string& entry,const string& COMMENT,bool VERBOSE);  //CO20200624 - using aurostd::kvpair2bool() now
+  void XVASP_INCAR_REMOVE_ENTRY(_xvasp& xvasp,const vector<string>& entries,const string& COMMENT,bool VERBOSE);  //CO20200624 - using aurostd::kvpair2bool() now
 
   bool AFLOWIN_REMOVE(const string& aflowin_file,const string& keyword,const string& comment); //CO20210314
   bool AFLOWIN_REMOVE(const string& aflowin_file,const vector<string>& vkeywords,const string& comment); //CO20210314
@@ -3346,6 +3348,10 @@ namespace KBIN {
   string ExtractSystemName(const string& directory);  //ME20200217
   string ExtractSystemNameFromAFLOWIN(const string& directory);  //ME20200217
   string ExtractSystemNameFromVASP(const string& directory);  //ME20200217
+  xstructure ExtractPOSCARXStructureFromDirectory(const string& directory,const int iomode,const int index); //SD20220228
+  stringstream ExtractPOSCARStringStreamFromDirectory(const string& directory,int index); //SD20220228
+  xstructure ExtractPOSCARXStructureFromAFLOWIN(const string& AflowIn,const int iomode,const int index); //SD20220228
+  stringstream ExtractPOSCARStringStreamFromAFLOWIN(const string& AflowIn,const int index); //SD20220228
   double ExtractEfermiOUTCAR(string directory);
   xstructure GetMostRelaxedStructure(string directory); //CO20180627
   vector<string> ExtractAtomicSpecies(const string& directory,ostream& oss=cout);

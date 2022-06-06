@@ -268,7 +268,7 @@ bool _NEW_is_alphabetic(string alloy_dir) {
   vector<string> vspeciesD,vspeciesP;
   for(uint i=0;i<vaflowlib_entry.size();i++) {
     if(aurostd::substring2bool(vaflowlib_entry.at(i),"aurl=")) {
-      aurostd::string2tokens(aurostd::substring2string(vaflowlib_entry.at(i),"aurl=",TRUE),tokens,"/");
+      aurostd::string2tokens(aurostd::substring2string(vaflowlib_entry.at(i),"aurl=",1,TRUE),tokens,"/");
       for(uint j=0;j<tokens.size();j++) if(tokens.at(j)=="3") XATOM_SplitAlloySpecies(tokens.at(j-1),vspeciesD);
       if(vspeciesD.size()==0) {;}
       if(vspeciesD.size()==1) {;}
@@ -280,7 +280,7 @@ bool _NEW_is_alphabetic(string alloy_dir) {
       }
     }
     if(aurostd::substring2bool(vaflowlib_entry.at(i),"species=") && !aurostd::substring2bool(vaflowlib_entry.at(i),"nspecies=")) {
-      aurostd::string2tokens(aurostd::substring2string(vaflowlib_entry.at(i),"species=",TRUE),vspeciesP,",");
+      aurostd::string2tokens(aurostd::substring2string(vaflowlib_entry.at(i),"species=",1,TRUE),vspeciesP,",");
       if(vspeciesP.size()==0) {;}
       if(vspeciesP.size()==1) {;}
       if(vspeciesP.size()==2) {

@@ -4149,7 +4149,7 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
         tmp_str=vtokens[1];
         aurostd::string2tokens(tmp_str,vtokens," ");
         if(vtokens.size()>0 && vtokens.size()==species_pp.size()){
-          num_each_type=aurostd::vector2deque(aurostd::vectorstring2vectorint(vtokens));
+          num_each_type=aurostd::vector2deque(aurostd::vectorstring2vectorutype<int>(vtokens));
           if(LDEBUG){
             cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;
           }

@@ -2389,7 +2389,7 @@ namespace anrl {
       vparameters_temp[0]="1.0"; //fix
       parameters=aurostd::joinWDelimiter(vparameters_temp,",");
     }
-    vector<double> vparameters = aurostd::vectorstring2vectordouble(vparameters_temp);
+    vector<double> vparameters = aurostd::vectorstring2vectorutype<double>(vparameters_temp);
     if(LDEBUG){ cerr << function_name << " parameter_values=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vparameters,AUROSTD_DEFAULT_PRECISION,FIXED_STREAM),",") << endl; }
 
     // ---------------------------------------------------------------------------

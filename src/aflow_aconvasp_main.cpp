@@ -423,6 +423,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE::MISFIT_MATCH","--misfit_match=",""); //DX20201118
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE::MISFIT_FAMILY","--misfit_family=",""); //DX20201118
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE::NP","--np=|--num_proc=","");
+    vpflow.args2addattachedscheme(argv,cmds,"COMPARE::PAGE_SIZE","--page_size=","");  //ME20220426 - page size for AFLUX
     vpflow.args2addattachedscheme(argv,cmds,"COMPARE::MAGNETIC","--mag=|--magnetic=|--magmom=|--magmoms=|--magnetic_moment=|--magnetic_moments=",""); //DX20170803
     // booleans
     vpflow.flag("COMPARE::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
@@ -2936,9 +2937,9 @@ namespace pflow {
     stringstream oss;
     xstructure str(input,IOAFLOW_AUTO);
     oss << AFLOWIN_SEPARATION_LINE << endl;
-    oss << "[VASP_POSCAR_MODE_EXPLICIT]START" << endl;
+    oss << _VASP_POSCAR_MODE_EXPLICIT_START_ << endl;
     oss << str << "";
-    oss << "[VASP_POSCAR_MODE_EXPLICIT]STOP" << endl;
+    oss << _VASP_POSCAR_MODE_EXPLICIT_STOP_ << endl;
     oss << AFLOWIN_SEPARATION_LINE << endl;
     return oss.str();
   }
@@ -7802,9 +7803,9 @@ namespace pflow {
     for(unsigned long long int i=0;i<pcalc.getUniqueSuperCellsCount();i++) {
       //populate POCC_UNIQUE_DERIVATIVE_STRUCTURES_FILE
       oss << AFLOWIN_SEPARATION_LINE << endl;
-      oss << "[VASP_POSCAR_MODE_EXPLICIT]START" << endl; // ." << ss_pocc_count.str() << endl;
+      oss << _VASP_POSCAR_MODE_EXPLICIT_START_ << endl; // ." << ss_pocc_count.str() << endl;
       oss << pcalc.getUniqueSuperCell(i);
-      oss << "[VASP_POSCAR_MODE_EXPLICIT]STOP" << endl; // ." << ss_pocc_count.str() << endl;
+      oss << _VASP_POSCAR_MODE_EXPLICIT_STOP_ << endl; // ." << ss_pocc_count.str() << endl;
       oss << AFLOWIN_SEPARATION_LINE << endl;
     }
     return pcalc.m_initialized;
@@ -7935,9 +7936,9 @@ namespace pflow {
     if(argv.size()==2) {tolerance=str.partial_occupation_site_tol;} //CO20180409
     oss << "[AFLOW] hnf_tolerance=" << tolerance << endl;
     oss << AFLOWIN_SEPARATION_LINE << endl;    // --------------------------------
-    oss << "[VASP_POSCAR_MODE_EXPLICIT]START" << endl;
+    oss << _VASP_POSCAR_MODE_EXPLICIT_START_ << endl;
     oss << str;// << endl;
-    oss << "[VASP_POSCAR_MODE_EXPLICIT]STOP" << endl;
+    oss << _VASP_POSCAR_MODE_EXPLICIT_STOP_ << endl;
     oss << AFLOWIN_SEPARATION_LINE << endl;    // --------------------------------
     oss.precision(digits);
     double error=1.0,eps;

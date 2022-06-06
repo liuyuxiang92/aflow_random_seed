@@ -4872,7 +4872,20 @@ namespace aflowlib {
       cerr << __AFLOW_FUNC__ << ": URL = " << url << endl;
       cerr << __AFLOW_FUNC__ << ": Performing call ... please be patient ..." << endl;
     }
-    return aurostd::httpGet(url);
+    //ME20220426 - add error handling
+    int status_code = 0;
+    string response = aurostd::httpGet(url, status_code);
+    if (status_code < 200 || status_code >= 400) {
+      string message = "Bad status code for AFLUX request (" + aurostd::utype2string<int>(status_code) + ").";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_HTTP_);
+    }
+    if ((response.find("Lux Fail") != string::npos)
+      || (response.find("DB Fail") != string::npos)
+      || (response.find("Count Fail") != string::npos)) {
+      string message = "Bad response: " + response + ".";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    }
+    return response;
   }
 }
 
@@ -4900,13 +4913,16 @@ namespace aflowlib {
       vector<std::pair<string,string> > property_pairs;
       for(uint i=0;i<fields.size();i++){
         aurostd::string2tokens(fields[i],key_value,"=");
-        if(key_value.size()!=2 && !aurostd::substring2bool(fields[i],"example") && !aurostd::substring2bool(fields[i],"description")){ 
+        if(key_value.size()<2 && !aurostd::substring2bool(fields[i],"example") && !aurostd::substring2bool(fields[i],"description")){
           string message = "Cannot find key-value pair splitting on \"=\" for the following field: \"" + fields[i] + "\".";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         }
         std::pair<string,string> property; 
         property.first = aurostd::RemoveWhiteSpaces(key_value[0]);  // key 
-        property.second = aurostd::RemoveWhiteSpaces(key_value[1]); // value
+        // ME20220419 - some entries have = inside a value,
+        // so remove first element and join the rest
+        key_value.erase(key_value.begin());
+        property.second = aurostd::RemoveWhiteSpaces(aurostd::joinWDelimiter(key_value, "=")); // value
         property_pairs.push_back(property);
       }
       properties_response.push_back(property_pairs);
@@ -5067,12 +5083,12 @@ namespace aflowlib {  //CO20201220
 
 //DX20200929 - START
 namespace aflowlib {
-  string getSpaceGroupAFLUXSummons(const vector<uint>& space_groups, uint relaxation_step){
+  string getSpaceGroupMatchbook(const vector<uint>& space_groups, uint relaxation_step){
 
     vector<string> vsummons(space_groups.size());
 
     for(uint i=0;i<space_groups.size();i++){
-      vsummons[i] = getSpaceGroupAFLUXSummons(space_groups[i], relaxation_step, false); //false - signals more than one space group
+      vsummons[i] = getSpaceGroupMatchbook(space_groups[i], relaxation_step, false); //false - signals more than one space group
     }
     if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_ORIGINAL_){ return "spacegroup_orig(" + aurostd::joinWDelimiter(vsummons,":") + ")"; } //DX20210615 - relaxation-step specific keyword
     else if(relaxation_step==_COMPARE_DATABASE_GEOMETRY_RELAX1_){ return "sg2(" + aurostd::joinWDelimiter(vsummons,":") + ")"; } //DX20210615 - relaxation-step specific keyword
@@ -5082,7 +5098,7 @@ namespace aflowlib {
 }
 
 namespace aflowlib {
-  string getSpaceGroupAFLUXSummons(uint space_group_number, uint relaxation_step, bool only_one_sg){
+  string getSpaceGroupMatchbook(uint space_group_number, uint relaxation_step, bool only_one_sg){
 
     // Formats the space group summons for an AFLUX matchbook
     // This also grabs the relative enantiomorphs, since they
@@ -5114,7 +5130,7 @@ namespace aflowlib {
         space_group_summons = aurostd::utype2string<int>(space_group_number); //DX20210615
       }
       else{
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, "aflowlib::getSpaceGroupAFLUXSummons():", "Unexpected relaxation step input: " + aurostd::utype2string(_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_), _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Unexpected relaxation step input: " + aurostd::utype2string(_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_), _FILE_NOT_FOUND_);
       }
     }
     else { // need to get enantiomorph too
@@ -5137,7 +5153,7 @@ namespace aflowlib {
         space_group_summons += ":" + aurostd::utype2string<int>(enantiomorph_space_group_number); //DX20210615
       }
       else{
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, "aflowlib::getSpaceGroupAFLUXSummons():", "Unexpected relaxation step input: " + aurostd::utype2string(_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_), _FILE_NOT_FOUND_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Unexpected relaxation step input: " + aurostd::utype2string(_COMPARE_DATABASE_GEOMETRY_MOST_RELAXED_), _FILE_NOT_FOUND_);
       }
     }
 
