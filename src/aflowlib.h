@@ -829,7 +829,6 @@ namespace aflowlib {
     // xstructure loaders
     void addXstructure(aflowlib::_aflowlib_entry & entry, bool orig = false);
     bool loadXstructureFile(const aflowlib::_aflowlib_entry & entry, xstructure & new_structure, bool orig=false);
-    bool loadXstructureLibEntry(const aflowlib::_aflowlib_entry & entry, xstructure & new_structure);
     bool loadXstructureAflowIn(const aflowlib::_aflowlib_entry & entry, xstructure & new_structure);
 
     // getter for views on the loaded aflowlib entries (using zero copy shared_ptr)

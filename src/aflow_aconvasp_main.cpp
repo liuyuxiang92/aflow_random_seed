@@ -10014,6 +10014,89 @@ namespace pflow {
 
     return true;
   }
+
+  /// @brief load a xstructure directly from a AFLOW lib entry
+  /// @param entry AFLOW lib entry
+  /// @param new_structure save-to structure
+  /// @return xstructure
+  /// @note this is always the final structure
+  /// @note does not add the structure to entry.vstr
+  bool loadXstructureLibEntry(const aflowlib::_aflowlib_entry &entry, xstructure &new_structure) { //HE20220606
+    if (entry.positions_cartesian.empty()) return false;
+    new_structure.title = "Relaxed AFLUX: " + entry.aurl;
+    new_structure.scale = 1.0;
+    new_structure.neg_scale = false;
+    new_structure.iomode = IOAFLOW_AUTO;
+    std::vector<double> geometry;
+    aurostd::string2tokens(entry.geometry, geometry, ",");
+    new_structure.a = geometry[0];
+    new_structure.b = geometry[1];
+    new_structure.c = geometry[2];
+    new_structure.alpha = geometry[3];
+    new_structure.beta = geometry[4];
+    new_structure.gamma = geometry[5];
+    new_structure.lattice = GetClat(new_structure.a, new_structure.b, new_structure.c,
+                                    new_structure.alpha, new_structure.beta, new_structure.gamma);
+    new_structure.spacegroupnumber = entry.spacegroup_relax;
+    new_structure.spacegrouplabel = GetSpaceGroupLabel(new_structure.spacegroupnumber);
+    if (new_structure.spacegroupnumber > 0 && new_structure.spacegroupnumber <= 230) {
+      new_structure.spacegroup = GetSpaceGroupName(new_structure.spacegroupnumber, new_structure.directory);
+    } else new_structure.spacegroup = "";
+    new_structure.coord_flag = _COORDS_FRACTIONAL_;
+    strcpy(new_structure.coord_type, "D");
+    new_structure.FixLattices();
+
+    std::vector<int> composition;
+    aurostd::string2tokens(entry.composition, composition, ",");
+    uint num_atoms = 0;
+    std::vector <std::vector<double>> positions_fractional;
+    std::vector<double> positions_fractional_raw;
+    std::vector <std::string> positions_fractional_raw_str;
+    aurostd::string2tokens(entry.positions_fractional, positions_fractional_raw_str, ";");
+    for (std::vector<std::string>::const_iterator pf_str = positions_fractional_raw_str.begin(); pf_str != positions_fractional_raw_str.end(); pf_str++) {
+      positions_fractional_raw.clear();
+      aurostd::string2tokens(*pf_str, positions_fractional_raw, ",");
+      positions_fractional.emplace_back(positions_fractional_raw);
+    }
+
+    std::vector <std::string> species;
+    aurostd::string2tokens(entry.species, species, ",");
+    xvector<double> v(3);
+    for (uint type_idx = 0; type_idx < composition.size(); type_idx++) {
+      for (int atom_idx = 0; atom_idx < composition[type_idx]; atom_idx++) {
+        _atom atom;
+        v.clear();
+        v(1) = positions_fractional[num_atoms][0];
+        v(2) = positions_fractional[num_atoms][1];
+        v(3) = positions_fractional[num_atoms][2];
+        atom.fpos = v;
+        atom.cpos = new_structure.f2c * atom.fpos;
+        atom.basis = num_atoms;
+        atom.ijk(1) = 0;
+        atom.ijk(2) = 0;
+        atom.ijk(3) = 0;
+        atom.corigin(1) = 0.0;
+        atom.corigin(2) = 0.0;
+        atom.corigin(3) = 0.0; // inside the zero cell
+        atom.coord(1) = 0.0;
+        atom.coord(2) = 0.0;
+        atom.coord(3) = 0.0; // inside the zero cell
+        atom.spin = 0.0;
+        atom.noncoll_spin.clear();
+        atom.type = type_idx;
+        atom.order_parameter_value = 0;
+        atom.order_parameter_atom = false;
+        atom.partial_occupation_value = 1.0;
+        atom.partial_occupation_flag = false;
+        atom.name = species[type_idx];
+        atom.cleanname = species[type_idx];
+        atom.name_is_given = true;
+        new_structure.AddAtom(atom);
+        num_atoms++;
+      }
+    }
+    return true;
+  }
 }  // namespace pflow
 
 //[CO20190712 - OBSOLETE]namespace pflow {
