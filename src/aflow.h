@@ -5482,6 +5482,9 @@ namespace unittest {
 
       // ovasp
       void xoutcarTest(uint&, vector<vector<string> >&, vector<string>&);
+
+      // entryLoader
+      void entryLoaderTest(uint&, vector<vector<string> >&, vector<string>&);
   };
 
 }

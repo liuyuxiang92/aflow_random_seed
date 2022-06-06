@@ -136,6 +136,14 @@ namespace unittest {
     xchk.task_description = "Generate all prototypes and test symmetry";
     test_functions["proto"] = xchk;
 
+    //EntryLoader
+    xchk = initializeXCheck();
+    xchk.func = std::bind(&UnitTest::entryLoaderTest, this, _1, _2, _3);
+    xchk.function_name = "entryLoaderTest():";
+    xchk.task_description = "entryLoader functions";
+    test_functions["entry_loader"] = xchk;
+
+
     // ovasp
     //Not working yet because we cannot load OUTCARs via the RestAPI
     //xchk = initializeXCheck();
@@ -176,7 +184,7 @@ namespace unittest {
     test_groups.clear();
 
     test_groups["aurostd"] = {"xscalar", "xvector", "xmatrix", "aurostd_main"};
-    test_groups["database"] = {"schema"};
+    test_groups["database"] = {"schema", "entry_loader"};
     test_groups["structure"] = {"atomic_environment", "xstructure", "xstructure_parser"};
     test_groups["structure_gen"] = {"ceramgen", "proto"};
     //test_groups["ovasp"] = {"outcar"};
@@ -548,7 +556,7 @@ namespace unittest {
 // aurostd
 namespace unittest {
 
-  void UnitTest::xscalarTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
+  void UnitTest::xscalarTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
     (void) errors;  // Suppress compiler warnings
     // setup test environment
     string check_function = "", check_description = "";
@@ -565,8 +573,9 @@ namespace unittest {
     double test_double = 1.625;
     int numerator = 1, denominator = 1;
     string answer = "13/8";
-    aurostd::double2fraction(test_double,numerator,denominator);
-    stringstream result_ss; result_ss << numerator << "/" << denominator;
+    aurostd::double2fraction(test_double, numerator, denominator);
+    stringstream result_ss;
+    result_ss << numerator << "/" << denominator;
 
     checkEqual(result_ss.str(), answer, check_function, check_description, passed_checks, results);
 
@@ -607,45 +616,49 @@ namespace unittest {
     check_description = "floored mod; divisor is inf";
     expected_dbl = 11.11;
 
-    calculated_dbl = aurostd::mod_floored(11.11, (double)INFINITY);
+    calculated_dbl = aurostd::mod_floored(11.11, (double) INFINITY);
     checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
     // Check | gcd //CO20190520
     // ---------------------------------------------------------------------------
     check_function = "aurostd::GCD()";
-    int a=0,b=0,x1=0,y1=0,gcd=0;
+    int a = 0, b = 0, x1 = 0, y1 = 0, gcd = 0;
 
     check_description = "gcd(25,15)";
-    a=25;b=15;
+    a = 25;
+    b = 15;
     expected_vint = {5, -1, 2};
-    aurostd::GCD(a,b,gcd,x1,y1);
+    aurostd::GCD(a, b, gcd, x1, y1);
     calculated_vint = {gcd, x1, y1};
     checkEqual(calculated_vint, expected_vint, check_function, check_description, passed_checks, results);
 
     check_description = "gcd(25,0)";
-    a=25;b=0;
+    a = 25;
+    b = 0;
     expected_vint = {25, 1, 0};
-    aurostd::GCD(a,b,gcd,x1,y1);
+    aurostd::GCD(a, b, gcd, x1, y1);
     calculated_vint = {gcd, x1, y1};
     checkEqual(calculated_vint, expected_vint, check_function, check_description, passed_checks, results);
 
     check_description = "gcd(0,15)";
-    a=0;b=15;
+    a = 0;
+    b = 15;
     expected_vint = {15, 0, 1};
-    aurostd::GCD(a,b,gcd,x1,y1);
+    aurostd::GCD(a, b, gcd, x1, y1);
     calculated_vint = {gcd, x1, y1};
     checkEqual(calculated_vint, expected_vint, check_function, check_description, passed_checks, results);
 
     check_description = "gcd(-5100,30450)";
-    a=-5100;b=30450;
+    a = -5100;
+    b = 30450;
     expected_vint = {150, -6, -1};
-    aurostd::GCD(a,b,gcd,x1,y1);
+    aurostd::GCD(a, b, gcd, x1, y1);
     calculated_vint = {gcd, x1, y1};
     checkEqual(calculated_vint, expected_vint, check_function, check_description, passed_checks, results);
   }
 
-  void UnitTest::xvectorTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
+  void UnitTest::xvectorTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
     (void) errors;  // Suppress compiler warnings
     // setup test environment
     string check_function = "", check_description = "";
@@ -654,47 +667,125 @@ namespace unittest {
     double expected_dbl = 0.0, calculated_dbl = 0.0;
     int expected_int = 0;
     string expected_str = "";
-    vector<xvector<double> > points;
-    vector<xvector<int> > ipoints;
-    vector<vector<uint> > facets;
-    vector<uint> facet;
+    vector <xvector<double>> points;
+    vector <xvector<int>> ipoints;
+    vector <vector<uint>> facets;
+    vector <uint> facet;
 
     // variables to store examples as doubles (p#) and int (p#i) variants
-    xvector<double> p0(3,1); xvector<int> p0i(3,1);
-    xvector<double> p1(3,1); xvector<int> p1i(3,1);
-    xvector<double> p2(3,1); xvector<int> p2i(3,1);
-    xvector<double> p3(3,1); xvector<int> p3i(3,1);
-    xvector<double> p4(3,1); xvector<int> p4i(3,1);
-    xvector<double> p5(3,1); xvector<int> p5i(3,1);
-    xvector<double> p6(3,1); xvector<int> p6i(3,1);
-    xvector<double> p7(3,1); xvector<int> p7i(3,1);
-    xvector<double> p8(3,1); xvector<int> p8i(3,1);
-    xvector<double> p9(3,1); xvector<int> p9i(3,1);
-    xvector<double> p10(3,1); xvector<int> p10i(3,1);
-    xvector<double> p11(3,1); xvector<int> p11i(3,1);
+    xvector<double> p0(3, 1);
+    xvector<int> p0i(3, 1);
+    xvector<double> p1(3, 1);
+    xvector<int> p1i(3, 1);
+    xvector<double> p2(3, 1);
+    xvector<int> p2i(3, 1);
+    xvector<double> p3(3, 1);
+    xvector<int> p3i(3, 1);
+    xvector<double> p4(3, 1);
+    xvector<int> p4i(3, 1);
+    xvector<double> p5(3, 1);
+    xvector<int> p5i(3, 1);
+    xvector<double> p6(3, 1);
+    xvector<int> p6i(3, 1);
+    xvector<double> p7(3, 1);
+    xvector<int> p7i(3, 1);
+    xvector<double> p8(3, 1);
+    xvector<int> p8i(3, 1);
+    xvector<double> p9(3, 1);
+    xvector<int> p9i(3, 1);
+    xvector<double> p10(3, 1);
+    xvector<int> p10i(3, 1);
+    xvector<double> p11(3, 1);
+    xvector<int> p11i(3, 1);
 
     // define convex solid
-    p0i(1) = p0(1) = 0.0; p0i(2) = p0(2) = 0.0; p0i(3) = p0(3) = 0.0;
-    p1i(1) = p1(1) = 1.0; p1i(2) = p1(2) = 0.0; p1i(3) = p1(3) = 0.0;
-    p2i(1) = p2(1) = 1.0; p2i(2) = p2(2) = 1.0; p2i(3) = p2(3) = 0.0;
-    p3i(1) = p3(1) = 0.0; p3i(2) = p3(2) = 1.0; p3i(3) = p3(3) = 0.0;
-    p4i(1) = p4(1) = 0.0; p4i(2) = p4(2) = 0.0; p4i(3) = p4(3) = 2.0;
-    p5i(1) = p5(1) = 1.0; p5i(2) = p5(2) = 0.0; p5i(3) = p5(3) = 2.0;
-    p6i(1) = p6(1) = 1.0; p6i(2) = p6(2) = 1.0; p6i(3) = p6(3) = 3.0;
-    p7i(1) = p7(1) = 0.0; p7i(2) = p7(2) = 1.0; p7i(3) = p7(3) = 3.0;
+    p0i(1) = p0(1) = 0.0;
+    p0i(2) = p0(2) = 0.0;
+    p0i(3) = p0(3) = 0.0;
+    p1i(1) = p1(1) = 1.0;
+    p1i(2) = p1(2) = 0.0;
+    p1i(3) = p1(3) = 0.0;
+    p2i(1) = p2(1) = 1.0;
+    p2i(2) = p2(2) = 1.0;
+    p2i(3) = p2(3) = 0.0;
+    p3i(1) = p3(1) = 0.0;
+    p3i(2) = p3(2) = 1.0;
+    p3i(3) = p3(3) = 0.0;
+    p4i(1) = p4(1) = 0.0;
+    p4i(2) = p4(2) = 0.0;
+    p4i(3) = p4(3) = 2.0;
+    p5i(1) = p5(1) = 1.0;
+    p5i(2) = p5(2) = 0.0;
+    p5i(3) = p5(3) = 2.0;
+    p6i(1) = p6(1) = 1.0;
+    p6i(2) = p6(2) = 1.0;
+    p6i(3) = p6(3) = 3.0;
+    p7i(1) = p7(1) = 0.0;
+    p7i(2) = p7(2) = 1.0;
+    p7i(3) = p7(3) = 3.0;
 
     // transfer data into vectors
-    points.clear(); ipoints.clear(); facets.clear();
-    points.push_back(p0); points.push_back(p1); points.push_back(p2); points.push_back(p3); points.push_back(p4);
-    points.push_back(p5); points.push_back(p6); points.push_back(p7);
-    ipoints.push_back(p0i); ipoints.push_back(p1i); ipoints.push_back(p2i); ipoints.push_back(p3i); ipoints.push_back(p4i);
-    ipoints.push_back(p5i); ipoints.push_back(p6i); ipoints.push_back(p7i);
-    facet.clear(); facet.resize(4); facet[0]=0; facet[1]=1; facet[2]=2; facet[3]=3; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=4; facet[1]=5; facet[2]=6; facet[3]=7; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=1; facet[1]=2; facet[2]=6; facet[3]=5; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=0; facet[1]=3; facet[2]=7; facet[3]=7; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=0; facet[1]=1; facet[2]=5; facet[3]=4; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=3; facet[1]=2; facet[2]=6; facet[3]=7; facets.push_back(facet);
+    points.clear();
+    ipoints.clear();
+    facets.clear();
+    points.push_back(p0);
+    points.push_back(p1);
+    points.push_back(p2);
+    points.push_back(p3);
+    points.push_back(p4);
+    points.push_back(p5);
+    points.push_back(p6);
+    points.push_back(p7);
+    ipoints.push_back(p0i);
+    ipoints.push_back(p1i);
+    ipoints.push_back(p2i);
+    ipoints.push_back(p3i);
+    ipoints.push_back(p4i);
+    ipoints.push_back(p5i);
+    ipoints.push_back(p6i);
+    ipoints.push_back(p7i);
+    facet.clear();
+    facet.resize(4);
+    facet[0] = 0;
+    facet[1] = 1;
+    facet[2] = 2;
+    facet[3] = 3;
+    facets.push_back(facet);
+    facet.clear();
+    facet.resize(4);
+    facet[0] = 4;
+    facet[1] = 5;
+    facet[2] = 6;
+    facet[3] = 7;
+    facets.push_back(facet);
+    facet.clear();
+    facet.resize(4);
+    facet[0] = 1;
+    facet[1] = 2;
+    facet[2] = 6;
+    facet[3] = 5;
+    facets.push_back(facet);
+    facet.clear();
+    facet.resize(4);
+    facet[0] = 0;
+    facet[1] = 3;
+    facet[2] = 7;
+    facet[3] = 7;
+    facets.push_back(facet);
+    facet.clear();
+    facet.resize(4);
+    facet[0] = 0;
+    facet[1] = 1;
+    facet[2] = 5;
+    facet[3] = 4;
+    facets.push_back(facet);
+    facet.clear();
+    facet.resize(4);
+    facet[0] = 3;
+    facet[1] = 2;
+    facet[2] = 6;
+    facet[3] = 7;
+    facets.push_back(facet);
 
     // ---------------------------------------------------------------------------
     // Check | convex solid volume (double)
@@ -717,36 +808,132 @@ namespace unittest {
 
 
     // define non convex solid
-    p0i(1) = p0(1)   = 0.0; p0i(2) = p0(2)   = 0.0; p0i(3) = p0(3)   = 0.0;
-    p1i(1) = p1(1)   = 0.0; p1i(2) = p1(2)   = 4.0; p1i(3) = p1(3)   = 0.0;
-    p2i(1) = p2(1)   = 2.0; p2i(2) = p2(2)   = 4.0; p2i(3) = p2(3)   = 0.0;
-    p3i(1) = p3(1)   = 1.0; p3i(2) = p3(2)   = 1.0; p3i(3) = p3(3)   = 0.0;
-    p4i(1) = p4(1)   = 4.0; p4i(2) = p4(2)   = 2.0; p4i(3) = p4(3)   = 0.0;
-    p5i(1) = p5(1)   = 4.0; p5i(2) = p5(2)   = 0.0; p5i(3) = p5(3)   = 0.0;
-    p6i(1) = p6(1)   = 0.0; p6i(2) = p6(2)   = 0.0; p6i(3) = p6(3)   = 4.0;
-    p7i(1) = p7(1)   = 0.0; p7i(2) = p7(2)   = 4.0; p7i(3) = p7(3)   = 4.0;
-    p8i(1) = p8(1)   = 2.0; p8i(2) = p8(2)   = 4.0; p8i(3) = p8(3)   = 4.0;
-    p9i(1) = p9(1)   = 1.0; p9i(2) = p9(2)   = 1.0; p9i(3) = p9(3)   = 4.0;
-    p10i(1) = p10(1) = 4.0; p10i(2) = p10(2) = 2.0; p10i(3) = p10(3) = 4.0;
-    p11i(1) = p11(1) = 4.0; p11i(2) = p11(2) = 0.0; p11i(3) = p11(3) = 4.0;
+    p0i(1) = p0(1) = 0.0;
+    p0i(2) = p0(2) = 0.0;
+    p0i(3) = p0(3) = 0.0;
+    p1i(1) = p1(1) = 0.0;
+    p1i(2) = p1(2) = 4.0;
+    p1i(3) = p1(3) = 0.0;
+    p2i(1) = p2(1) = 2.0;
+    p2i(2) = p2(2) = 4.0;
+    p2i(3) = p2(3) = 0.0;
+    p3i(1) = p3(1) = 1.0;
+    p3i(2) = p3(2) = 1.0;
+    p3i(3) = p3(3) = 0.0;
+    p4i(1) = p4(1) = 4.0;
+    p4i(2) = p4(2) = 2.0;
+    p4i(3) = p4(3) = 0.0;
+    p5i(1) = p5(1) = 4.0;
+    p5i(2) = p5(2) = 0.0;
+    p5i(3) = p5(3) = 0.0;
+    p6i(1) = p6(1) = 0.0;
+    p6i(2) = p6(2) = 0.0;
+    p6i(3) = p6(3) = 4.0;
+    p7i(1) = p7(1) = 0.0;
+    p7i(2) = p7(2) = 4.0;
+    p7i(3) = p7(3) = 4.0;
+    p8i(1) = p8(1) = 2.0;
+    p8i(2) = p8(2) = 4.0;
+    p8i(3) = p8(3) = 4.0;
+    p9i(1) = p9(1) = 1.0;
+    p9i(2) = p9(2) = 1.0;
+    p9i(3) = p9(3) = 4.0;
+    p10i(1) = p10(1) = 4.0;
+    p10i(2) = p10(2) = 2.0;
+    p10i(3) = p10(3) = 4.0;
+    p11i(1) = p11(1) = 4.0;
+    p11i(2) = p11(2) = 0.0;
+    p11i(3) = p11(3) = 4.0;
 
     // transfer data into vectors
-    points.clear(); ipoints.clear(); facets.clear();
-    points.push_back(p0); points.push_back(p1); points.push_back(p2); points.push_back(p3); points.push_back(p4);
-    points.push_back(p5); points.push_back(p6); points.push_back(p7); points.push_back(p8); points.push_back(p9);
-    points.push_back(p10); points.push_back(p11);
-    ipoints.push_back(p0i); ipoints.push_back(p1i); ipoints.push_back(p2i); ipoints.push_back(p3i); ipoints.push_back(p4i);
-    ipoints.push_back(p5i); ipoints.push_back(p6i); ipoints.push_back(p7i); ipoints.push_back(p8i); ipoints.push_back(p9i);
-    ipoints.push_back(p10i); ipoints.push_back(p11i);
+    points.clear();
+    ipoints.clear();
+    facets.clear();
+    points.push_back(p0);
+    points.push_back(p1);
+    points.push_back(p2);
+    points.push_back(p3);
+    points.push_back(p4);
+    points.push_back(p5);
+    points.push_back(p6);
+    points.push_back(p7);
+    points.push_back(p8);
+    points.push_back(p9);
+    points.push_back(p10);
+    points.push_back(p11);
+    ipoints.push_back(p0i);
+    ipoints.push_back(p1i);
+    ipoints.push_back(p2i);
+    ipoints.push_back(p3i);
+    ipoints.push_back(p4i);
+    ipoints.push_back(p5i);
+    ipoints.push_back(p6i);
+    ipoints.push_back(p7i);
+    ipoints.push_back(p8i);
+    ipoints.push_back(p9i);
+    ipoints.push_back(p10i);
+    ipoints.push_back(p11i);
 
-    facet.clear(); facet.resize(6); facet[0]=5; facet[1]=4; facet[2]=3; facet[3]=2; facet[4]=1; facet[5]=0; facets.push_back(facet);
-    facet.clear(); facet.resize(6); facet[0]=6; facet[1]=7; facet[2]=8; facet[3]=9; facet[4]=10; facet[5]=11; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=0; facet[1]=6; facet[2]=11; facet[3]=5; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=4; facet[1]=5; facet[2]=11; facet[3]=10; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=3; facet[1]=4; facet[2]=10; facet[3]=9; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=3; facet[1]=9; facet[2]=8; facet[3]=2; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=1; facet[1]=2; facet[2]=8; facet[3]=7; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=0; facet[1]=1; facet[2]=7; facet[3]=6; facets.push_back(facet);
+    facet.clear();
+    facet.resize(6);
+    facet[0] = 5;
+    facet[1] = 4;
+    facet[2] = 3;
+    facet[3] = 2;
+    facet[4] = 1;
+    facet[5] = 0;
+    facets.push_back(facet);
+    facet.clear();
+    facet.resize(6);
+    facet[0] = 6;
+    facet[1] = 7;
+    facet[2] = 8;
+    facet[3] = 9;
+    facet[4] = 10;
+    facet[5] = 11;
+    facets.push_back(facet);
+    facet.clear();
+    facet.resize(4);
+    facet[0] = 0;
+    facet[1] = 6;
+    facet[2] = 11;
+    facet[3] = 5;
+    facets.push_back(facet);
+    facet.clear();
+    facet.resize(4);
+    facet[0] = 4;
+    facet[1] = 5;
+    facet[2] = 11;
+    facet[3] = 10;
+    facets.push_back(facet);
+    facet.clear();
+    facet.resize(4);
+    facet[0] = 3;
+    facet[1] = 4;
+    facet[2] = 10;
+    facet[3] = 9;
+    facets.push_back(facet);
+    facet.clear();
+    facet.resize(4);
+    facet[0] = 3;
+    facet[1] = 9;
+    facet[2] = 8;
+    facet[3] = 2;
+    facets.push_back(facet);
+    facet.clear();
+    facet.resize(4);
+    facet[0] = 1;
+    facet[1] = 2;
+    facet[2] = 8;
+    facet[3] = 7;
+    facets.push_back(facet);
+    facet.clear();
+    facet.resize(4);
+    facet[0] = 0;
+    facet[1] = 1;
+    facet[2] = 7;
+    facet[3] = 6;
+    facets.push_back(facet);
 
     // ---------------------------------------------------------------------------
     // Check | non convex solid volume (double)
@@ -763,7 +950,7 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     check_function = "aurostd::volume()";
     check_description = "error: facet/normals mismatch";
-    vector<xvector<double> > normals;
+    vector <xvector<double>> normals;
     expected_str = "xerror code 30 (VALUE_ERROR)";
     expected_int = _VALUE_ERROR_;
 
@@ -771,13 +958,15 @@ namespace unittest {
       calculated_dbl = aurostd::volume(points, facets, normals);
       check(false, std::string("no error"), expected_str, check_function, check_description, passed_checks, results);
     }
-    catch (aurostd::xerror e)
-    {
+    catch (aurostd::xerror e) {
       if (e.whatCode() == expected_int) check(true, "", "", check_function, check_description, passed_checks, results);
-      else check(false, aurostd::utype2string(e.whatCode()), expected_str, check_function, check_description, passed_checks, results);
+      else
+        check(false, aurostd::utype2string(e.whatCode()), expected_str, check_function, check_description,
+              passed_checks, results);
     }
     catch (...) {
-      check(false, std::string("not an xerror"), expected_str, check_function, check_description, passed_checks, results);
+      check(false, std::string("not an xerror"), expected_str, check_function, check_description, passed_checks,
+            results);
     }
 
     // ---------------------------------------------------------------------------
@@ -798,18 +987,24 @@ namespace unittest {
     expected_str = "xerror code 30 (VALUE_ERROR)";
     expected_int = _VALUE_ERROR_;
 
-    facet.clear(); facet.resize(2); facet[0]=1; facet[1]=2; facets.push_back(facet);
+    facet.clear();
+    facet.resize(2);
+    facet[0] = 1;
+    facet[1] = 2;
+    facets.push_back(facet);
     try {
       calculated_dbl = aurostd::volume(points, facets);
       check(false, std::string("no error"), expected_str, check_function, check_description, passed_checks, results);
     }
-    catch (aurostd::xerror e)
-    {
+    catch (aurostd::xerror e) {
       if (e.whatCode() == expected_int) check(true, "", "", check_function, check_description, passed_checks, results);
-      else check(false, aurostd::utype2string(e.whatCode()), expected_str, check_function, check_description, passed_checks, results);
+      else
+        check(false, aurostd::utype2string(e.whatCode()), expected_str, check_function, check_description,
+              passed_checks, results);
     }
     catch (...) {
-      check(false, std::string("not an xerror"), expected_str, check_function, check_description, passed_checks, results);
+      check(false, std::string("not an xerror"), expected_str, check_function, check_description, passed_checks,
+            results);
     }
 
     // ---------------------------------------------------------------------------
@@ -820,10 +1015,20 @@ namespace unittest {
     expected_dbl = 10.0;
 
     //fill vectors with data
-    points.clear(); ipoints.clear(); facets.clear();
-    points.push_back(p0); points.push_back(p1); points.push_back(p2); points.push_back(p3); points.push_back(p4);
+    points.clear();
+    ipoints.clear();
+    facets.clear();
+    points.push_back(p0);
+    points.push_back(p1);
+    points.push_back(p2);
+    points.push_back(p3);
+    points.push_back(p4);
     points.push_back(p5);
-    ipoints.push_back(p0i); ipoints.push_back(p1i); ipoints.push_back(p2i); ipoints.push_back(p3i); ipoints.push_back(p4i);
+    ipoints.push_back(p0i);
+    ipoints.push_back(p1i);
+    ipoints.push_back(p2i);
+    ipoints.push_back(p3i);
+    ipoints.push_back(p4i);
     ipoints.push_back(p5i);
 
     calculated_dbl = aurostd::areaPointsOnPlane(points);
@@ -841,13 +1046,25 @@ namespace unittest {
 
 
     // define triangle in 3D to better test int handling
-    p0i(1) = p0(1) = 0.0; p0i(2) = p0(2) = 0.0; p0i(3) = p0(3) = 0.0;
-    p1i(1) = p1(1) = 1.0; p1i(2) = p1(2) = 1.0; p1i(3) = p1(3) = 1.0;
-    p2i(1) = p2(1) = 5.0; p2i(2) = p2(2) = 0.0; p2i(3) = p2(3) = 5.0;
+    p0i(1) = p0(1) = 0.0;
+    p0i(2) = p0(2) = 0.0;
+    p0i(3) = p0(3) = 0.0;
+    p1i(1) = p1(1) = 1.0;
+    p1i(2) = p1(2) = 1.0;
+    p1i(3) = p1(3) = 1.0;
+    p2i(1) = p2(1) = 5.0;
+    p2i(2) = p2(2) = 0.0;
+    p2i(3) = p2(3) = 5.0;
 
-    points.clear(); ipoints.clear(); facets.clear();
-    points.push_back(p0); points.push_back(p1); points.push_back(p2);
-    ipoints.push_back(p0i); ipoints.push_back(p1i); ipoints.push_back(p2i);
+    points.clear();
+    ipoints.clear();
+    facets.clear();
+    points.push_back(p0);
+    points.push_back(p1);
+    points.push_back(p2);
+    ipoints.push_back(p0i);
+    ipoints.push_back(p1i);
+    ipoints.push_back(p2i);
 
     // ---------------------------------------------------------------------------
     // Check | 3d triangle area (double)
@@ -870,7 +1087,7 @@ namespace unittest {
     checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
   }
 
-  void UnitTest::xmatrixTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
+  void UnitTest::xmatrixTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
     (void) errors;  // Suppress compiler warnings
     // setup test environment
     string check_function = "", check_description = "";
@@ -882,11 +1099,20 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     check_function = "aurostd::reshape()";
     check_description = "reshape a rectangular matrix";
-    expected_xmatint = xmatrix<int>(3,4);
-    expected_xmatint(1,1) = 1; expected_xmatint(1,2) =  2; expected_xmatint(1,3) =  3; expected_xmatint(1,4) = 4;
-    expected_xmatint(2,1) = 5; expected_xmatint(2,2) =  6; expected_xmatint(2,3) =  7; expected_xmatint(2,4) = 8;
-    expected_xmatint(3,1) = 9; expected_xmatint(3,2) = 10; expected_xmatint(3,3) = 11; expected_xmatint(3,4) = 12;
-    calculated_xmatint = aurostd::reshape(aurostd::reshape(expected_xmatint,4,3),3,4);
+    expected_xmatint = xmatrix<int>(3, 4);
+    expected_xmatint(1, 1) = 1;
+    expected_xmatint(1, 2) = 2;
+    expected_xmatint(1, 3) = 3;
+    expected_xmatint(1, 4) = 4;
+    expected_xmatint(2, 1) = 5;
+    expected_xmatint(2, 2) = 6;
+    expected_xmatint(2, 3) = 7;
+    expected_xmatint(2, 4) = 8;
+    expected_xmatint(3, 1) = 9;
+    expected_xmatint(3, 2) = 10;
+    expected_xmatint(3, 3) = 11;
+    expected_xmatint(3, 4) = 12;
+    calculated_xmatint = aurostd::reshape(aurostd::reshape(expected_xmatint, 4, 3), 3, 4);
     checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
@@ -895,26 +1121,31 @@ namespace unittest {
     check_function = "aurostd::getEHermite()";
     check_description = "calculate elementary Hermite transformation";
     expected_xmatint = xmatrix<int>(2, 2);
-    expected_xmatint[1][1] =   5; expected_xmatint[1][2] = -2;
-    expected_xmatint[2][1] = -12; expected_xmatint[2][2] =  5;
+    expected_xmatint[1][1] = 5;
+    expected_xmatint[1][2] = -2;
+    expected_xmatint[2][1] = -12;
+    expected_xmatint[2][2] = 5;
     calculated_xmatint = xmatrix<int>(2, 2);
     aurostd::getEHermite(5, 12, calculated_xmatint);
     checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
   }
 
-  void UnitTest::aurostdMainTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
+  void UnitTest::aurostdMainTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
     (void) errors;  // Suppress compiler warnings
     string check_function = "", check_description = "";
     bool calculated_bool = false, expected_bool = false;
     int calculated_int = 0, expected_int = 0;
     string calculated_string = "", expected_string = "";
+    bool multi_check = true;
+    uint64_t expected_uint64 = 0;
+    uint64_t calculated_uint64 = 0;
 
     // ---------------------------------------------------------------------------
     // Check | substringlist2bool
     // ---------------------------------------------------------------------------
     check_function = "aurostd::substringlist2bool()";
     string str = "hawk owl";
-    vector<string> strlist;
+    vector <string> strlist;
 
     strlist.push_back("falcon");
     check_description = aurostd::joinWDelimiter(strlist, " and ") + " in " + str + " (match all)";
@@ -967,7 +1198,7 @@ namespace unittest {
     check_function = "aurostd::substring2string()";
     check_description = "return the third match of the substring";
     string test_string = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
-    calculated_string = aurostd::substring2string(test_string,"ALGO",3);
+    calculated_string = aurostd::substring2string(test_string, "ALGO", 3);
     expected_string = "==49";
 
     checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
@@ -977,7 +1208,7 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     check_function = "aurostd::kvpair2string()";
     check_description = "return the second match of the kvpair";
-    calculated_string = aurostd::kvpair2string(test_string,"ALGO","==",2);
+    calculated_string = aurostd::kvpair2string(test_string, "ALGO", "==", 2);
     expected_string = "MEDIUM";
 
     checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
@@ -987,7 +1218,7 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     check_function = "aurostd::substring2string()";
     check_description = "return the last match of the substring";
-    calculated_string = aurostd::substring2string(test_string,"ALGO",-1);
+    calculated_string = aurostd::substring2string(test_string, "ALGO", -1);
     expected_string = "==SLOW";
 
     checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
@@ -997,12 +1228,212 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     check_function = "aurostd::kvpair2string()";
     check_description = "return the last match of the kvpair";
-    calculated_string = aurostd::kvpair2string(test_string,"ALGO","==",-1);
+    calculated_string = aurostd::kvpair2string(test_string, "ALGO", "==", -1);
     expected_string = "SLOW";
 
     checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
-  }
 
+    // ---------------------------------------------------------------------------
+    // Check | string2utype //HE20220324
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::string2utype()";
+    check_description = "int - bases 16, 10, 8, 5, 2";
+    multi_check = true;
+    multi_check = (multi_check && (aurostd::string2utype<int>("-420") == -420));
+    multi_check = (multi_check && (aurostd::string2utype<int>("-420", 16)) == -1056);
+    multi_check = (multi_check && (aurostd::string2utype<int>("-0x420", 16)) == -1056);
+    multi_check = (multi_check && (aurostd::string2utype<int>("-0X420", 16)) == -1056);
+    multi_check = (multi_check && (aurostd::string2utype<int>("-420", 16)) == -1056);
+    multi_check = (multi_check && (aurostd::string2utype<int>("-420", 8)) == -272);
+    multi_check = (multi_check && (aurostd::string2utype<int>("-0420", 8)) == -272);
+    multi_check = (multi_check && (aurostd::string2utype<int>("-420", 5)) == -110);
+    multi_check = (multi_check && (aurostd::string2utype<int>("-110100100", 2)) == -420);
+    checkEqual(multi_check, true, check_function, check_description, passed_checks, results);
+    check_description = "float - bases 16, 10, 8, 5, 2";
+    multi_check = true;
+    multi_check = (multi_check && (aurostd::string2utype<float>("-4.20") == -4.20f));
+    multi_check = (multi_check && (aurostd::string2utype<float>("-420", 16)) == -1056.0f);
+    multi_check = (multi_check && (aurostd::string2utype<float>("-420", 8)) == -272.0f);
+    multi_check = (multi_check && (aurostd::string2utype<float>("-420", 5)) == -110.0f);
+    multi_check = (multi_check && (aurostd::string2utype<float>("-110100100", 2)) == -420.0f);
+    checkEqual(multi_check, true, check_function, check_description, passed_checks, results);
+
+    check_description = "double - bases 16, 10, 8, 5, 2";
+    multi_check = true;
+    multi_check = (multi_check && (aurostd::string2utype<double>("-4.20") == -4.20));
+    multi_check = (multi_check && (aurostd::string2utype<double>("-420", 16)) == -1056.0);
+    multi_check = (multi_check && (aurostd::string2utype<double>("-420", 8)) == -272.0);
+    multi_check = (multi_check && (aurostd::string2utype<double>("-420", 5)) == -110.0);
+    multi_check = (multi_check && (aurostd::string2utype<double>("-110100100", 2)) == -420.0);
+    checkEqual(multi_check, true, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | crc64 //HE20220404
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::crc64()";
+    check_description = "runtime hashing";
+    expected_uint64 = 15013402708409085989UL;
+    calculated_uint64 = aurostd::crc64("aflowlib_date");
+    checkEqual(calculated_uint64, expected_uint64, check_function, check_description, passed_checks, results);
+
+    check_function = "aurostd::ctcrc64()";
+    check_description = "compiler hashing (constexpr)";
+    static constexpr uint64_t
+    calculated_const_uint64 = aurostd::ctcrc64("aflowlib_date");
+    checkEqual(calculated_const_uint64, expected_uint64, check_function, check_description, passed_checks, results);
+  }
+}
+
+namespace unittest {
+  void UnitTest::entryLoaderTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
+    (void) errors;  // Suppress compiler warnings
+
+    // setup test environment
+    string task_description = "Testing EntryLoader";
+    stringstream result;
+    stringstream check_description;
+    string check_function = "";
+
+    std::string test_alloy = "MnPdPt";
+    bool recursive = false;
+    aflowlib::EntryLoader el;
+    aflowlib::_aflowlib_entry test_entry;
+    xstructure test_structure;
+
+    size_t expected_size_t = 0;
+    std::vector <std::string> test_AUIDs = {
+        "aflow:2de63b1ebe0a1a83",
+        "4d8cf7edb50d1901",
+        "auid:6d47aa3f4f1286d0",
+        "aflow:7dd846bc04c764e8",
+        "9d84facf8161aa60",
+        "broken"
+    };
+    std::string test_AUID = "aflow:0d16c1946df2435c";
+
+    std::vector <std::string> test_AURLs = {
+        "aflowlib.duke.edu:AFLOWDATA/LIB2_WEB/Ca_svCu_pv/84",
+        "AFLOWDATA/LIB2_WEB/Ca_svCu_pv/546",
+        "aurl:AFLOWDATA/LIB2_WEB/Ca_svCu_pv/724.BA",
+        "LIB2_WEB/Ca_svCu_pv/253",
+        "aflowlib.duke.edu:AFLOWDATA/LIB2_WEB/Ca_svCu_pv/230"
+    };
+    std::string test_AURL = "aflowlib.duke.edu:AFLOWDATA/LIB2_WEB/Ca_svCu_pv/539";
+
+    std::map <std::string, aflowlib::EntryLoader::Source> test_sources = {
+        {"AUTO SELECT",    aflowlib::EntryLoader::Source::NONE},
+        {"SQLITE",         aflowlib::EntryLoader::Source::SQLITE},
+        {"AFLUX",          aflowlib::EntryLoader::Source::AFLUX},
+        {"FILESYSTEM",     aflowlib::EntryLoader::Source::FILESYSTEM},
+        {"RESTAPI",        aflowlib::EntryLoader::Source::RESTAPI},
+        {"FILESYSTEM_RAW", aflowlib::EntryLoader::Source::FILESYSTEM_RAW},
+        {"RESTAPI_RAW",    aflowlib::EntryLoader::Source::RESTAPI_RAW}
+    };
+
+    std::map <std::string, aflowlib::EntryLoader::Source> short_test_sources = {
+        {"SQLITE",     aflowlib::EntryLoader::Source::SQLITE},
+        {"AFLUX",      aflowlib::EntryLoader::Source::AFLUX},
+        {"FILESYSTEM", aflowlib::EntryLoader::Source::FILESYSTEM},
+        {"RESTAPI",    aflowlib::EntryLoader::Source::RESTAPI},
+    };
+
+    // ---------------------------------------------------------------------------
+    // Check | load alloys
+    for (std::map<std::string, aflowlib::EntryLoader::Source>::iterator source = test_sources.begin();
+         source != test_sources.end(); source++) {
+      aurostd::StringstreamClean(check_description);
+      check_function = "EntryLoader::loadAlloy()";
+      if (source->first == "RESTAPI" || source->first == "RESTAPI_RAW") recursive = false;
+      else recursive = true;
+      check_description << source->first << " - " << test_alloy;
+      if (recursive) {
+        check_description << " - recursive";
+        expected_size_t = 2500;
+      } else expected_size_t = 90;
+      el.clear();
+      el.m_out_silent = true;
+      {
+        long double start = aurostd::get_seconds();
+        if (el.setSource(source->second)) { // don't test if basic requirements are not met for a source
+          el.loadAlloy(test_alloy, recursive);
+          long double duration = aurostd::get_delta_seconds(start);
+          check_description << " | speed " << el.m_entries_flat->size() / duration << " entries/s; "
+                            << el.m_entries_flat->size() << " entries";
+          check((expected_size_t < el.m_entries_flat->size()), el.m_entries_flat->size(), expected_size_t,
+                check_function,
+                check_description.str(), passed_checks, results);
+        }
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Check | load AUID + Xstructure
+
+    for (std::map<std::string, aflowlib::EntryLoader::Source>::iterator source = short_test_sources.begin();
+         source != short_test_sources.end(); source++) {
+      aurostd::StringstreamClean(check_description);
+      check_function = "EntryLoader::loadAUID()";
+      check_description << source->first << " + xstructure";
+      expected_size_t = 6;
+      el.clear();
+      el.m_out_silent = true;
+      el.m_xstructure_original = true;
+      el.m_xstructure_relaxed = true;
+      if (source->first == "RESTAPI" || source->first == "RESTAPI_RAW")
+        el.m_filesystem_path = "/fake/"; // force xstructure test to use REST API
+      long double start = aurostd::get_seconds();
+      if (el.setSource(source->second)) { // don't test if basic requirements are not met for a source
+        el.loadAUID(test_AUID);
+        if (source->first == "AFLUX") test_entry = *el.m_entries_flat->back();
+        el.loadAUID(test_AUIDs);
+
+        long double duration = aurostd::get_delta_seconds(start);
+        check_description << " | speed " << el.m_entries_flat->size() / duration << " entries/s; "
+                          << el.m_entries_flat->size() << " entries";
+        checkEqual(el.m_entries_flat->size(), expected_size_t, check_function,
+                   check_description.str(), passed_checks, results);
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Check | load xstructure from file
+    aurostd::StringstreamClean(check_description);
+    check_function = "EntryLoader::loadXstructureFile()";
+    check_description << "load xstructure extern";
+    if (!test_entry.auid.empty()) {
+      el.loadXstructureFile(test_entry, test_structure);
+      checkEqual(test_structure.atoms.size(), (size_t)
+      6, check_function, check_description.str(), passed_checks, results);
+    } else {
+      check_description << " | failed to load example structure form AFLUX in previous test";
+      check(false, 0, 0, check_function, check_description.str(), passed_checks, results);
+    }
+
+    // ---------------------------------------------------------------------------
+    // Check | load AURL
+
+    for (std::map<std::string, aflowlib::EntryLoader::Source>::iterator source = short_test_sources.begin();
+         source != short_test_sources.end(); source++) {
+      aurostd::StringstreamClean(check_description);
+      check_function = "EntryLoader::loadAURL()";
+      check_description << source->first;
+      expected_size_t = 6;
+      el.clear();
+      el.m_out_silent = true;
+      {
+        long double start = aurostd::get_seconds();
+        if (el.setSource(source->second)) { // don't test if basic requirements are not met for a source
+          el.loadAURL(test_AURLs);
+          el.loadAURL(test_AURL);
+          long double duration = aurostd::get_delta_seconds(start);
+          check_description << " | speed " << el.m_entries_flat->size() / duration << " entries/s; "
+                            << el.m_entries_flat->size() << " entries";
+          checkEqual(el.m_entries_flat->size(), expected_size_t, check_function,
+                     check_description.str(), passed_checks, results);
+        }
+      }
+    }
+  }
 }
 
 // database
