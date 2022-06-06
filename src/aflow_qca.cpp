@@ -367,14 +367,14 @@ namespace qca {
   /// @brief Calculates the binodal curve and the quantities needed for the calculation.
   void calcBinodalData(_qca_data& qca_data) {
     if (aurostd::FileExist(qca_data.rundirpath + "/fit.out") && aurostd::FileExist(qca_data.rundirpath + "/predstr.out")) { // read ATAT data
-      qca_data.vstr_atat = getATATXstructures(qca_data.lat_atat, (uint)qca_data.max_num_atoms, qca_data.rundirpath);
+      qca_data.vstr_atat = getATATXstructures(qca_data.lat_atat, qca_data.plattice, qca_data.elements, (uint)qca_data.max_num_atoms, qca_data.rundirpath);
     }
     else { // run ATAT
       qca_data.lat_atat = createLatForATAT(qca_data.plattice, qca_data.elements);
-      qca_data.vstr_atat = getATATXstructures(qca_data.lat_atat, (uint)qca_data.max_num_atoms);
+      qca_data.vstr_atat = getATATXstructures(qca_data.lat_atat, qca_data.plattice, qca_data.elements, (uint)qca_data.max_num_atoms);
       qca_data.vstr_aflow = getAFLOWXstructures(qca_data.plattice, qca_data.elements, qca_data.num_threads);
-      qca_data.mapstr = getMapForXstructures(getATATXstructures(qca_data.lat_atat, qca_data.aflow_max_num_atoms), qca_data.vstr_aflow, qca_data.num_threads); // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
-      generateFilesForATAT(qca_data.rundirpath, qca_data.lat_atat, qca_data.vstr_aflow, qca_data.vstr_atat, qca_data.mapstr);
+      qca_data.mapstr = getMapForXstructures(getATATXstructures(qca_data.lat_atat, qca_data.plattice, qca_data.elements, qca_data.aflow_max_num_atoms), qca_data.vstr_aflow, qca_data.num_threads); // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
+      generateFilesForATAT(qca_data.rundirpath, createLatForATAT(qca_data.plattice, qca_data.elements, true), qca_data.vstr_aflow, qca_data.vstr_atat, qca_data.mapstr);
       runATAT(qca_data.workdirpath, qca_data.rundirpath, qca_data.min_sleep);
     }
     qca_data.cv_cluster = getCVCluster(qca_data.rundirpath, qca_data.cv_cut);
@@ -834,7 +834,7 @@ namespace qca {
     int ind, nstr = conc_cluster.rows, nelem = conc_cluster.cols;
     vector<string> vinput, tokens;
     aurostd::file2vectorstring(rundirpath + "/ref_energy.out", vinput);
-    xvector<double> nrg_ref = aurostd::vector2xvector(aurostd::vectorstring2vectordouble(vinput));
+    xvector<double> nrg_ref = aurostd::vector2xvector(aurostd::vectorstring2vectorutype<double>(vinput));
     xvector<double> nrg(nstr);
     aurostd::file2vectorstring(rundirpath + "/fit.out", vinput);
     // Read energies per atom
@@ -863,7 +863,7 @@ namespace qca {
   /// @param vstr Xstructures of the clusters.
   ///
   /// @return Concentration of the clusters.
-  xmatrix<double> getConcentration(const vector<string>& elements, const vector<xstructure>& vstr) {
+  xmatrix<double> getConcentrationCluster(const vector<string>& elements, const vector<xstructure>& vstr) {
     uint nstr = vstr.size(), nelem = elements.size();
     xmatrix<double> conc_cluster(nstr, nelem);
     int ie = -1;
@@ -956,7 +956,7 @@ namespace qca {
       aurostd::string2tokens(rundirpath, tokens, "/");
       filepath = "/" + QCA_FILE_PREFIX + "degen_" + aurostd::utype2string<int>(max_num_atoms) + "_atom.txt";
       for (int i = tokens.size() - 2; i >= 0; i--) {filepath = "/" + tokens[i] + filepath;}
-      if (aurostd::file2vectorstring(filepath, tokens)) {return aurostd::vector2xvector(aurostd::vectorstring2vectorint(tokens));}
+      if (aurostd::file2vectorstring(filepath, tokens)) {return aurostd::vector2xvector(aurostd::vectorstring2vectorutype<int>(tokens));}
     }
     vector<xstructure> vstr = _vstr;
     vector<uint> index;
@@ -1107,7 +1107,7 @@ namespace qca {
   double getCVCluster(const string& rundirpath, const double cv_cut) {
     vector<string> vinput, tokens;
     aurostd::file2vectorstring(rundirpath + "/maps.log", vinput);
-    aurostd::string2tokens(vinput[vinput.size() - 1], tokens, " ");
+    aurostd::string2tokens(vinput.back(), tokens, " ");
     if (tokens[0] != "Crossvalidation") {
       string message = "ATAT run did not complete";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
@@ -1252,7 +1252,7 @@ namespace qca {
           if (use_sg && (entry.spacegroup_orig == entry.spacegroup_relax)) {
             vstr.push_back(entry.vstr[0]);
           }
-          else if (compare::structuresMatch(entry.vstr[0], entry.vstr[entry.vstr.size() - 1], true, num_threads)) {
+          else if (compare::structuresMatch(entry.vstr[0], entry.vstr.back(), true, num_threads)) {
             vstr.push_back(entry.vstr[0]);
           }
         }
@@ -1272,7 +1272,7 @@ namespace qca {
   /// @param elements Elements in the alloy.
   ///
   /// @return Lattice file for ATAT.
-  string createLatForATAT(const string& plattice, const vector<string>& elements) {
+  string createLatForATAT(const string& plattice, const vector<string>& elements, bool scale) {
     stringstream oss;
     uint nelem = elements.size();
     double alat = 0.0;
@@ -1301,7 +1301,12 @@ namespace qca {
       coorsys(3) = std::sqrt(8.0 / 3.0);
       angles(3) = 120.0;
     }
-    alat = aurostd::round(alat, 3); // need to round due to ATAT bug
+    if (scale) {
+      alat = aurostd::round(alat, 3);
+    }
+    else {
+      alat = 1.0;
+    }
     for (uint i = 1; i <= 3; i++) {oss << alat * coorsys(i) << " ";}
     for (uint i = 1; i <= 3; i++) {oss << angles(i) << " ";}
     oss << endl;
@@ -1334,10 +1339,11 @@ namespace qca {
   ///
   /// @param lat Lattice file for ATAT.
   /// @param max_num_atoms Maximum number of atoms in the cluster expansion.
+  /// @param elements Elements in the alloy.
   /// @param rundirpath Path to the directory where AFLOW is running.
   ///
   /// @return Xstructures from ATAT runs.
-  vector<xstructure> getATATXstructures(const string& lat, const uint max_num_atoms, const string& rundirpath) {
+  vector<xstructure> getATATXstructures(const string& lat, const string& plattice, const vector<string>& elements, const uint max_num_atoms, const string& rundirpath) {
     vector<xstructure> vstr;
     stringstream oss;
     if (!rundirpath.empty()) {
@@ -1357,6 +1363,20 @@ namespace qca {
       for (uint i = 0; i < index.size(); i++) {vstr[index[i]] = vstr_tmp[i];}
       return vstr;
     }
+    uint nelem = elements.size();
+    double scale = 0.0;
+    for (uint i = 0; i < nelem; i++) {scale += GetAtomRadiusCovalent(elements[i]);}
+    scale /= nelem;
+    if (plattice == "fcc") {
+      scale *= 2.0 * std::sqrt(2.0);
+    }
+    else if (plattice == "bcc") {
+      scale *= 4.0 * std::sqrt(3.0) / 3.0;
+    }
+    else if (plattice == "hcp") {
+      scale *= 2.0;
+    }
+    scale = aurostd::round(scale, 3);
     vector<string> vinput, tokens;
     string tmpfile = aurostd::TmpStrCreate();
     aurostd::string2file(lat, tmpfile);
@@ -1374,6 +1394,8 @@ namespace qca {
     for (uint line = 0; line < vinput.size(); line++) {
       if (aurostd::substring2bool(vinput[line], "end")) {
         vstr.push_back(xstructure(oss, IOATAT_STR));
+        vstr.back().scale = scale;
+        vstr.back().ReScale(1.0);
         aurostd::StringstreamClean(oss);
       }
       else {

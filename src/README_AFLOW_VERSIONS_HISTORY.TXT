@@ -26,6 +26,7 @@
         -- removed "kill_vasp_all" and implemented a targeted kill vasp command (SD)
         -- added KBIN::BIN2VASPVersion (SD)
         -- fixed KBIN::VASPVersionString2Double, aurostd::substring2bool, aurostd::kvpairfound (SD)
+        -- added extract POSCAR from aflowin (SD)
         -- imporved AFLUX calls for --compare_database_entries and --compare2database (ME)
         -- added univariate polynomial solver (SD)
         -- added univariate polynomial fit with weights (SD)

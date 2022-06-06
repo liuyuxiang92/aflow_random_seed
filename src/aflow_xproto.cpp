@@ -29,7 +29,7 @@ using spacegroup::SpaceGroupOptionRequired;
 using std::ostream;
 using std::vector;
 using std::deque;
-using aurostd::ExtractToStringEXPLICIT;
+//[SD20220520 - OBSOLETE]using aurostd::ExtractToStringEXPLICIT;
 
 // [OBSOLETE] std::string Library_ICSD;
 // [OBSOLETE] std::vector<std::string> vLibrary_ICSD_ALL;

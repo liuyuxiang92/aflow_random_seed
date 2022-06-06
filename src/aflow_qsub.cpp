@@ -60,7 +60,7 @@ namespace KBIN {
         aus << "00000  MESSAGE QSUB: COMMAND string is missing, taking COMMAND=\"" << kflags.KBIN_QSUB_COMMAND << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
-        kflags.KBIN_QSUB_COMMAND=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_QSUB_MODE]COMMAND=",TRUE),'"');
+        kflags.KBIN_QSUB_COMMAND=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_QSUB_MODE]COMMAND=",1,TRUE),'"');
         aus << "00000  MESSAGE QSUB: found COMMAND=\"" << kflags.KBIN_QSUB_COMMAND << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
@@ -70,7 +70,7 @@ namespace KBIN {
         aus << "00000  MESSAGE QSUB: PARAMS string is missing, taking PARAMS=\"" << kflags.KBIN_QSUB_PARAMS << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       } else {
-        kflags.KBIN_QSUB_PARAMS=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_QSUB_MODE]PARAMS=",TRUE),'"');
+        kflags.KBIN_QSUB_PARAMS=aurostd::RemoveCharacter(aurostd::substring2string(AflowIn,"[AFLOW_QSUB_MODE]PARAMS=",1,TRUE),'"');
         aus << "00000  MESSAGE QSUB: found PARAMS=\"" << kflags.KBIN_QSUB_PARAMS << "\"  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
       }
@@ -86,12 +86,14 @@ namespace KBIN {
         if(kflags.KBIN_QSUB_FILE && !kflags.KBIN_QSUB_MODE_EXPLICIT_START_STOP) {
           aus << "00000  MESSAGE QSUB   generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
-          aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xqsub.QSUB,"[AFLOW_QSUB_FILE]");
+          xqsub.QSUB.str(aurostd::substring2string(FileAFLOWIN,"[AFLOW_QSUB_FILE]"));
+          //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xqsub.QSUB,"[AFLOW_QSUB_FILE]");
         } else if(!kflags.KBIN_QSUB_FILE && kflags.KBIN_QSUB_MODE_EXPLICIT_START_STOP) {
           aus << "00000  MESSAGE QSUB   generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
           if(aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE_EXPLICIT]START") && aurostd::substring2bool(AflowIn,"[AFLOW_QSUB_MODE_EXPLICIT]STOP"))
-            aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xqsub.QSUB,"[AFLOW_QSUB_MODE_EXPLICIT]START","[AFLOW_QSUB_MODE_EXPLICIT]STOP");
+          xqsub.QSUB.str(aurostd::substring2string(FileAFLOWIN,"[AFLOW_QSUB_MODE_EXPLICIT]START","[AFLOW_QSUB_MODE_EXPLICIT]STOP"));
+            //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(FileAFLOWIN,xqsub.QSUB,"[AFLOW_QSUB_MODE_EXPLICIT]START","[AFLOW_QSUB_MODE_EXPLICIT]STOP");
         } else {
           aus << "EEEEE  [AFLOW_QSUB_MODE_EXPLICIT] do not confuse aflow !!"  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           aus << "EEEEE  [AFLOW_QSUB_MODE_EXPLICIT] Possible modes "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;

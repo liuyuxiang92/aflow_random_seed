@@ -89,7 +89,7 @@ namespace qca {
   xvector<double> getTemperature(const vector<double>& temp_range, const int temp_npts);
   void calcCongruentClusters(_qca_data& qca_data);
   xvector<double> getExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const int max_num_atoms);
-  xmatrix<double> getConcentrationCluster(const vector<string>& elements, const vector<xstructure>& vstr);
+  xmatrix<double> getConcentrationCluster(const vector<xstructure>& vstr, const vector<string>& elements);
   xmatrix<double> getConcentrationCluster(const string& rundirpath, const int nstr, const int nelem);
   xvector<int> getNumAtomCluster(const vector<xstructure>& vstr);
   xvector<int> getDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const bool shuffle, const string& rundirpath="");
@@ -97,8 +97,8 @@ namespace qca {
   void runATAT(const string& workdirpath, const string& rundirpath, const uint min_sleep);
   void generateFilesForATAT(const string& rundirpath, const string& lat_atat, const vector<xstructure>& vstr_aflow, const vector<xstructure>& vstr_atat, const vector<int>& mapstr);
   vector<xstructure> getAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_threads, bool use_sg=false);
-  string createLatForATAT(const string& plattice, const vector<string>& elements);
-  vector<xstructure> getATATXstructures(const string& lat, const uint max_num_atoms, const string& rundirpath="");
+  string createLatForATAT(const string& plattice, const vector<string>& elements, bool scale=false);
+  vector<xstructure> getATATXstructures(const string& lat, const string& plattice, const vector<string>& elements, const uint max_num_atoms, const string& rundirpath="");
   vector<int> getMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads);
   void displayUsage(void);
   void writeData(const _qca_data& qca_data);

@@ -81,10 +81,11 @@ namespace KBIN{
         string STOP="[AIMS_GEOM_MODE_EXPLICIT]STOP";
         START="[AIMS_GEOM_MODE_EXPLICIT]START."+aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.at(i);
         STOP="[AIMS_GEOM_MODE_EXPLICIT]STOP."+aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.at(i);
-        stringstream GEOM;GEOM.clear();GEOM.str(std::string());
-        if(aurostd::substring2bool(input_file.str(),START) && aurostd::substring2bool(input_file.str(),STOP))
-          aurostd::ExtractToStringstreamEXPLICIT(input_file.str(),GEOM,START,STOP);
-        aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.push_back(xstructure(GEOM,IOAIMS_AUTO));
+        stringstream GEOM;
+        GEOM.str(aurostd::substring2string(input_file.str(),START,STOP,-1));
+        //[SD20220520 - OBSOLETE]if(aurostd::substring2bool(input_file.str(),START) && aurostd::substring2bool(input_file.str(),STOP))
+          //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(input_file.str(),GEOM,START,STOP);
+        if(!GEOM.str().empty()) aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.push_back(xstructure(GEOM,IOAIMS_AUTO));
       }
       if(LDEBUG) cerr << "DEBUG " << aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size() << endl;
       if(LDEBUG) cerr << "DEBUG " << aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size() << endl;
