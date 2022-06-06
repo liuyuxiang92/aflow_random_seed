@@ -57,6 +57,7 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   RAM_MB=0.0;
   RAM_GB=0.0;
   CPU_Cores=0;
+  CPU_active=1;  //ME20220130 - count main thread
   CPU_Model="";
   CPU_MHz="";
   vTemperatureCore.clear();
@@ -103,6 +104,7 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   vflag_outreach.clear();
   vflag_control.clear();
   vschema.clear();
+  vschema_internal.clear(); //ME20220208
   XHOST_LIBRARY_LIB0=LIBRARY_NOTHING;
   XHOST_LIBRARY_LIB1=LIBRARY_NOTHING;
   XHOST_LIBRARY_LIB2=LIBRARY_NOTHING;
@@ -127,6 +129,8 @@ _XHOST::_XHOST() {  // constructor PUBLIC
   // AFLOWSYM
   SKEW_TEST=FALSE; //DX20171019
   SKEW_TOL=AUROSTD_NAN; //DX20171019
+  // xstructure
+  READ_SPIN_FROM_ATOMLABEL=FALSE; //SD20220316 - spin and pp label can conflict with one another
   // WEB
   //[CO20200404 - overload with --www]WEB_MODE=FALSE; //CO20190402
 };
@@ -171,6 +175,7 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   RAM_MB=b.RAM_MB;
   RAM_GB=b.RAM_GB;
   CPU_Cores=b.CPU_Cores;
+  CPU_active=b.CPU_active;  //ME20220130
   CPU_Model=b.CPU_Model;
   CPU_MHz=b.CPU_MHz;
   vTemperatureCore.clear();for(uint i=0;i<b.vTemperatureCore.size();i++) vTemperatureCore.push_back(b.vTemperatureCore.at(i));
@@ -217,6 +222,7 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   vflag_outreach=b.vflag_outreach;
   vflag_control=b.vflag_control;
   vschema=b.vschema;
+  vschema_internal = b.vschema_internal;  //ME20220208
   // extensions
   vcat.clear();for(uint i=0;i<b.vcat.size();i++) vcat.push_back(b.vcat.at(i));
   vext.clear();for(uint i=0;i<b.vext.size();i++) vext.push_back(b.vext.at(i));
@@ -229,6 +235,8 @@ void _XHOST::copy(const _XHOST& b) { // copy PRIVATE
   // AFLOWSYM
   SKEW_TEST=b.SKEW_TEST; //DX20171019
   SKEW_TOL=b.SKEW_TOL; //DX20171019
+  // xstructure
+  READ_SPIN_FROM_ATOMLABEL=b.READ_SPIN_FROM_ATOMLABEL; //SD20220316
   // WEB
   //[CO20200404 - overload with --www]WEB_MODE=b.WEB_MODE;  //CO20190402
 }
@@ -267,6 +275,7 @@ void _XHOST::free() { // free PRIVATE
   vflag_outreach.clear();
   vflag_control.clear();
   vschema.clear();
+  vschema_internal.clear();  //ME20220208
   // extensions
   vcat.clear();vcat.push_back("cat");vcat.push_back("bzcat"); vcat.push_back("xzcat");vcat.push_back("gzcat");
   vext.clear();vext.push_back("");   vext.push_back(".bz2");  vext.push_back(".xz");  vext.push_back(".gz");

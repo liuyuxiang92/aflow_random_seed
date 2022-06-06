@@ -34,7 +34,7 @@ namespace aurostd {
     {"file not found", "wrong format", "file corrupt", "", "", "", "", "", ""},
     {"illegal value", "out of range", "", "", "", "", "", "", ""},
     {"illegal value", "out of bounds", "mismatch", "", "", "", "", "", ""},
-    {"not initialized", "SQL error", "busy", "external command not found", "external command failed", "", "", "", ""}, //CO20200531
+    {"not initialized", "SQL error", "busy", "external command not found", "external command failed", "HTTP error", "", "", ""}, //CO20200531
     {"could not allocate", "insufficient memory", "", "", "", "", "", "", ""}};
 
   //Constructors////////////////////////////////////////////////////////////////
@@ -56,10 +56,10 @@ namespace aurostd {
 
   //buildExeption///////////////////////////////////////////////////////////////
   // builds the xerror object.
-  void xerror::buildException(const std::string& filename, const std::string& function, const std::string& msg, const int& code) {
+  void xerror::buildException(const std::string& filename, const std::string& fname, const std::string& msg, const int& code) {
     file_name = filename;
-    function_name = function;
-    message = msg;
+    function_name = fname;
+    error_message = msg;
     error_code = code;
     error_type = error_code/10;
     error_number = error_code%10;
@@ -68,7 +68,6 @@ namespace aurostd {
       error_type = 0;
       error_number = 2;
     }
-    error_message = buildMessageString();
   }
 
   //codeValid///////////////////////////////////////////////////////////////////
@@ -97,9 +96,9 @@ namespace aurostd {
       msgstr << "Supplied error message: ";
     }
     msgstr << what();  // detailed error message
-    if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){  //CO20200624
-      msgstr << " [dir=" << XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN") << "]";
-    }
+    //[CO20211125 - OBSOLETE]if(XHOST.vflag_control.flag("DIRECTORY_CLEAN")){  //CO20200624
+    //[CO20211125 - OBSOLETE]  msgstr << " [dir=" << XHOST.vflag_control.getattachedscheme("DIRECTORY_CLEAN") << "]";
+    //[CO20211125 - OBSOLETE]}
     return msgstr.str();
   }
 
@@ -129,7 +128,11 @@ namespace aurostd {
   }
 
   std::string xerror::what() {
-    return message;
+    return error_message;
+  }
+
+  int xerror::whatCode() {
+    return error_code;
   }
 } // namespace aurostd
 #endif

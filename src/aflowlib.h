@@ -311,24 +311,24 @@ namespace aflowlib {
 }
 
 // ***************************************************************************
-// AFLUX STUFF
-namespace aflowlib {
-  class APIget {
-    private:
-      struct sockaddr_in client;
-      int sock;
-      int PORT;// = 80; //CO20180401
-      string Summons;
-      string API_Path;
-      string Domain;
-      bool establish();
-    public:
-      //DX20210615 [OBSOLETE] APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226
-      APIget( string a_Summons="", string a_API_Path="/API/aflux/?", string a_Domain="aflow.org" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226 //DX20210615 - updated domain name
-      void reset( string a_Summons="#", string a_API_Path="", string a_Domain="" );
-      friend ostream& operator<<( ostream& output, APIget& a );
-  };
-}
+// AFLUX STUFF // Obsolete with aurostd::xhttp //HE20220407
+//namespace aflowlib {
+//  class APIget {
+//    private:
+//      struct sockaddr_in client;
+//      int sock;
+//      int PORT;// = 80; //CO20180401
+//      string Summons;
+//      string API_Path;
+//      string Domain;
+//      bool establish();
+//    public:
+//      //DX20210615 [OBSOLETE] APIget( string a_Summons="", string a_API_Path="/search/API/?", string a_Domain="aflowlib.duke.edu" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226
+//      APIget( string a_Summons="", string a_API_Path="/API/aflux/?", string a_Domain="aflow.org" ): PORT(80), Summons(a_Summons), API_Path(a_API_Path), Domain(a_Domain) {}; //CO20181226 //DX20210615 - updated domain name
+//      void reset( string a_Summons="#", string a_API_Path="", string a_Domain="" );
+//      friend ostream& operator<<( ostream& output, APIget& a );
+//  };
+//}
 
 // ***************************************************************************
 namespace aflowlib {
@@ -340,8 +340,8 @@ namespace aflowlib {
   string AFLUXCall(const vector<string>& matchbook); //DX20190206 - add AFLUX functionality
   string AFLUXCall(const string& summons); //DX20190206 - add AFLUX functionality 
   vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(const string& response); //DX20190206 - get properties from AFLUX response
-  string getSpaceGroupAFLUXSummons(const vector<uint>& space_groups, uint relaxation_step); //DX20200929
-  string getSpaceGroupAFLUXSummons(uint space_group_number, uint relaxation_step, bool only_one_sg=true); //DX20200929
+  string getSpaceGroupMatchbook(const vector<uint>& space_groups, uint relaxation_step); //DX20200929
+  string getSpaceGroupMatchbook(uint space_group_number, uint relaxation_step, bool only_one_sg=true); //DX20200929
   // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP(string options,ostream& oss); //SC20200327
   uint WEB_Aflowlib_Entry(string options,ostream& oss); 
   // [OBSOLETE] uint WEB_Aflowlib_Entry_PHP3(string options,ostream& oss);  //SC20190813
@@ -415,6 +415,7 @@ namespace aflowlib {
   bool LIB2RAW_FileNeeded(string directory_LIB,string fileLIB,string directory_RAW,string fileRAW,vector<string> &vfiles,const string& MESSAGE);
   // [OBSOLETE] bool LIB2RAW(vector<string> argv,bool overwrite);
   void CleanDirectoryLIB(string& directory);  //CO20200624
+  void setAURL(aflowlib::_aflowlib_entry& aflowlib_data,const string& directory_LIB,bool LOCAL=false);
   bool LIB2RAW(const string& options,bool overwrite,bool LOCAL=false);
   bool XPLUG_CHECK_ONLY(const vector<string>& argv); //CO20200501
   bool XPLUG_CHECK_ONLY(const vector<string>& argv,deque<string>& vdirsOUT,deque<string>& vzips,deque<string>& vcleans); //CO20200501
@@ -555,7 +556,7 @@ namespace aflowlib {
   struct DBStats {
     vector<string> columns;
     vector<vector<int> > count;  // 2D to accommodate bool
-    vector<std::pair<string, int> > loop_counts;
+    std::map<string, uint> loop_counts;
     vector<string> max;
     vector<string> min;
     int nentries;
@@ -569,7 +570,10 @@ namespace aflowlib {
   class AflowDB : public xStream {
     public:
       AflowDB(const string&, ostream& oss=std::cout);
-      AflowDB(const string&, const string&, const string&, ostream& oss=std::cout);
+      AflowDB(const string&, const aurostd::xoption&, ostream& oss=std::cout);
+      AflowDB(const string&, const aurostd::xoption&, const aurostd::xoption&, ostream& oss=std::cout);
+      AflowDB(const string&, const string&, const string&, const aurostd::xoption&, ostream& oss=std::cout);
+      AflowDB(const string&, const string&, const string&, const aurostd::xoption&, const aurostd::xoption&, ostream& oss=std::cout);
       AflowDB(const AflowDB&);
       AflowDB& operator=(const AflowDB&);
       ~AflowDB();
@@ -607,10 +611,10 @@ namespace aflowlib {
       vector<vector<string> > getRowsMultiTables(sqlite3*, const vector<string>&, const string& where="");
       string getValue(const string&, const string&, const string& where="");
       string getValue(sqlite3*, const string&, const string&, const string& where="");
-      string getProperty(const string&, const string&, const string&, const string& where="");
-      string getProperty(sqlite3*, const string&, const string&, const string&, const string& where="");
-      vector<string> getPropertyMultiTables(const string&, const vector<string>&, const string&, const string& where="");
-      vector<string> getPropertyMultiTables(sqlite3*, const string&, const vector<string>&, const string&, const string& where="");
+      string getDatabaseProperty(const string&, const string&, const string&, const string& where="");
+      string getDatabaseProperty(sqlite3*, const string&, const string&, const string&, const string& where="");
+      vector<string> getDatabasePropertyMultiTables(const string&, const vector<string>&, const string&, const string& where="");
+      vector<string> getDatabasePropertyMultiTables(sqlite3*, const string&, const vector<string>&, const string&, const string& where="");
       vector<string> getSet(const string&, const string&, bool distinct=false, const string& where="", int limit=0, const string& order_by="");
       vector<string> getSet(sqlite3*, const string&, const string&, bool distinct=false, const string& where="", int limit=0, const string& order_by="");
       vector<string> getSetMultiTables(const vector<string>&, const string&, bool distinct=false, const string& where="", int limit=0);
@@ -620,38 +624,41 @@ namespace aflowlib {
 
     private:
       void free();
-      void open(int = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
+      void open(int=SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX);
       void close();
       void copy(const AflowDB&);
-      void initializeExtraSchema();
+      void initialize(const string& db_file, const string& dt_path, const string& lck_file,
+                      int open_flags, const aurostd::xoption& schema_in, const aurostd::xoption& schema_internal_in);
 
       sqlite3* db;
       bool is_tmp;
-      aurostd::xoption vschema_extra;
+      aurostd::xoption vschema_internal;
+      aurostd::xoption vschema;
       string data_path;
       string database_file;
       string lock_file;
+#ifdef AFLOW_MULTITHREADS_ENABLE
+      std::mutex write_mutex;
+#endif
 
       void openTmpFile(int open_flags=SQLITE_OPEN_READWRITE|SQLITE_OPEN_CREATE|SQLITE_OPEN_FULLMUTEX, bool copy_original=false);
       bool closeTmpFile(bool force_copy=false, bool keep=false, bool nocopy=false);
 
       void rebuildDB();
-      void buildTables(int, int, const vector<string>&, const vector<string>&);
+      void buildTable(int, const vector<string>&, const vector<string>&);
       void populateTable(const string&, const vector<string>&, const vector<string>&, const vector<vector<string> >&);
 
       uint applyPatchFromJsonl(const vector<string>&);
       bool auidInDatabase(const string&);
       void updateEntry(const string&, const vector<string>&, const vector<string>&);
 
-      vector<string> getSchemaKeys();
+      vector<string> getAllSchemaKeys();
       vector<string> getDataTypes(const vector<string>&, bool);
       vector<string> getDataValues(const string&, const vector<string>&, const vector<string>&);
 
       DBStats initDBStats(const string&, const vector<string>&);
       DBStats getCatalogStats(const string&, const vector<string>&, const vector<string>&);
-      void getColStats(int, int, const string&, const vector<string>&, const vector<string>&,
-          const vector<string>&, const vector<string>&, vector<vector<vector<int> > >&, vector<vector<int> >&,
-          vector<vector<vector<string> > >&, vector<vector<vector<string> > >&);
+      void getColStats(int, int, const vector<string>&, vector<DBStats>&);
       vector<string> getUniqueFromJsonArrays(const vector<string>&);
       string stats2json(const DBStats&);
 

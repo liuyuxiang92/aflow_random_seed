@@ -47,6 +47,11 @@ DEFAULT_KZIP_EXT
   type: string
   default: ".xz"
 
+DEFAULT_TMPFS_DIRECTORIES
+  description: Path(s) to search for the temporary directory 
+  type: string
+  default: "/tmp/,/run/shm/,/dev/shm/"
+
 ####################################################################################################
 DEFAULTS FOR THE AFLOW DATABASE
 
@@ -1579,22 +1584,17 @@ DEFAULT_AAPL_BTE
   choices: "FULL", "RTA"
   default: "FULL"
 
-DEFAULT_AAPL_FOURTH_ORDER
-  description: Calculates fourth-order anharmonic force constants.
-  type: bool
-  default: 0
-
 DEFAULT_AAPL_CUT_RAD
-  description: Cut-off radius for third (rad3) and fourth (rad4) order anharmonic force constants.
+  description: Cut-off radius for anharmonic force constants.
   type: string
-  format: "rad3,rad4"
-  default: "5.0,3.0"
+  format: "rad3"
+  default: "0.0"
 
 DEFAULT_AAPL_CUT_SHELL
-  description: Cut-off shell for third (shell3) and fourth (shell4) order anharmonic force constants.
+  description: Cut-off shell for anharmonic force constants.
   type: string
-  format: "shell3,shell4"
-  default: "5,3"
+  format: "shell3"
+  default: "6"
 
 DEFAULT_AAPL_THERMALGRID
   description: q-point grid for thermal conductivity calculations.

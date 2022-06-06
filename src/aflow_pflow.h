@@ -418,6 +418,8 @@ namespace pflow {
   void FIX_POCC_PARAMS(const xstructure& xstr,string& pocc_params); //CO20181226
   bool checkAnionSublattice(const xstructure& xstr);  //CO20210201
   bool convertXStr2POCC(xstructure& xstr,const string& pocc_params,const vector<string>& vspecies,const vector<double>& vvolumes);  //CO20181226
+  bool POccInputs2Xstr(const string& pocc_input,aurostd::xoption& pocc_settings,xstructure& xstr,ostream& oss); //CO20211130
+  bool POccInputs2Xstr(const string& pocc_input,aurostd::xoption& pocc_settings,xstructure& xstr,ofstream& FileMESSAGE,ostream& oss);  //CO20211130
   xstructure PROTO_LIBRARIES(aurostd::xoption vpflow);
   bool PROTO_AFLOW(aurostd::xoption vpflow,bool flag_REVERSE);  // too many options
   // [OBSOLETE] xstructure PROTO_HTQC_PURE(vector<string>);

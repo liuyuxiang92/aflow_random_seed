@@ -255,9 +255,8 @@ void AVASP_Get_LDAU_Parameters(string _species,bool &LDAU,vector<string>& vLDAUs
 
   // ELSE
   if(species=="Np") {
-    string function = XPID + "AVASP_Get_LDAU_Parameters()";
     string message = "LDAU for " + species + " is not implemented yet.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
   }
 
   // LDAU=FALSE; // dont modify
@@ -311,7 +310,6 @@ void AVASP_Get_LDAU_Parameters(string _species,bool &LDAU,vector<string>& vLDAUs
 
 // ***************************************************************************
 string AVASP_Get_PseudoPotential_PAW_PBE_KIN(string species) {
-  string function = XPID + "AVASP_Get_PseudoPotential_PAW_PBE_KIN()";
   string error = "";
   bool ALLOW_ACTINIDIES=TRUE; //FALSE;
   if(ALLOW_ACTINIDIES==FALSE) {
@@ -319,11 +317,11 @@ string AVASP_Get_PseudoPotential_PAW_PBE_KIN(string species) {
         species=="Np" || species=="Pu" || species=="Am" || species=="Cm" || species=="Bk" || species=="Cf" ||
         species=="Es" || species=="Fm" || species=="Md" || species=="No" || species=="Lw") {
       error="not producing Actinides";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
     }
     if(species=="D" || species=="T") {
       error="not producing heavy hydrogen";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
     }
   }
 
@@ -430,7 +428,7 @@ string AVASP_Get_PseudoPotential_PAW_PBE_KIN(string species) {
 
   // If not found then UNKNOWN
   error="Potential not found: "+species;
-  throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error, _VALUE_ILLEGAL_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
 }
 
 // ***************************************************************************
@@ -443,7 +441,6 @@ string AVASP_Get_PseudoPotential_PAW_LDA_KIN(string species) {
 
 // ***************************************************************************
 string AVASP_Get_PseudoPotential_PAW_PBE(string species) {
-  string function = XPID + "AVASP_Get_PseudoPotential_PAW_PBE_PBE():";
   string error = "";
   bool ALLOW_ACTINIDIES=TRUE; //FALSE;
   if(ALLOW_ACTINIDIES==FALSE) {
@@ -451,11 +448,11 @@ string AVASP_Get_PseudoPotential_PAW_PBE(string species) {
         species=="Np" || species=="Pu" || species=="Am" || species=="Cm" || species=="Bk" || species=="Cf" ||
         species=="Es" || species=="Fm" || species=="Md" || species=="No" || species=="Lw") {
       error="not producing Actinides";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
     }
     if(species=="D" || species=="T") {
       error="not producing heavy hydrogen";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
     }
   }
 
@@ -561,11 +558,11 @@ string AVASP_Get_PseudoPotential_PAW_PBE(string species) {
 
   if(species=="Po") {
     error="No pseudopotential available for "+species;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
   }
   // If not found then UNKNOWN
   error="Potential not found: "+species;
-  throw aurostd::xerror(_AFLOW_FILE_NAME_, function, error, _VALUE_ILLEGAL_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
 }
 
 // ***************************************************************************
@@ -1405,9 +1402,11 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   //  for(uint i=0;i<xvasp.str.species.size();i++) cerr << "xvasp.str.species_mass=" << xvasp.str.species_mass.at(i) << endl;
 
   //CO202010624 - final modification for bader calc
+  //ME20220311 - do not override APL/QHA/AAPL settings or aflow will create GBs of unwanted data
   //DEFAULT_VASP_FORCE_OPTION_BADER_STATIC depends on RUN type, it must be fixed above here
   if(DEFAULT_VASP_FORCE_OPTION_BADER_STATIC && 
-      (xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS || xvasp.AVASP_flag_RUN_RELAX_STATIC || xvasp.AVASP_flag_RUN_STATIC || xvasp.AVASP_flag_RUN_STATIC_BANDS)){
+      (xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS || xvasp.AVASP_flag_RUN_RELAX_STATIC || xvasp.AVASP_flag_RUN_STATIC || xvasp.AVASP_flag_RUN_STATIC_BANDS)
+    && ((xvasp.AVASP_arun_mode != "APL") && (xvasp.AVASP_arun_mode != "AAPL") && (xvasp.AVASP_arun_mode != "QHA"))){
     xvasp.aopts.flag("FLAG::AVASP_BADER",TRUE);
   }
 
@@ -1913,12 +1912,12 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   //DX20190326 - moved up and added if-statement cases - END
 
   if(pocc){ //CO20181226
-    string pocc_params_add_on=POCC_TITLE_TAG+xvasp.AVASP_pocc_parameters;
+    string pocc_params_add_on=TAG_TITLE_POCC+xvasp.AVASP_pocc_parameters;
     system+=pocc_params_add_on;directory+=pocc_params_add_on;xvasp.AVASP_label+=pocc_params_add_on;
     if(!xvasp.AVASP_pocc_tol.empty()){
       string pocc_tol_str_tmp=xvasp.AVASP_pocc_tol;
       aurostd::StringSubst(pocc_tol_str_tmp,":","_"); //TOL_0.001_0.001 - first is site tol, second is stoich tol
-      string pocc_params_add_on=POCC_TITLE_TOL_TAG+pocc_tol_str_tmp; //CO20200624 - xvasp.AVASP_pocc_tol;
+      string pocc_params_add_on=TAG_TITLE_POCC_TOL+pocc_tol_str_tmp; //CO20200624 - xvasp.AVASP_pocc_tol;
       system+=pocc_params_add_on;directory+=pocc_params_add_on;xvasp.AVASP_label+=pocc_params_add_on;
     }
   }
@@ -2096,21 +2095,6 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   // APL WRITING - ME20181027
   if(!xvasp.aopts.flag("FLAG::AVASP_APL=OFF")) { //CO20180214 - I interpret this flag to refer to WRITING APL options, not if they are on
     aflowin << aurostd::PaddedPOST((MODULE=="APL"?string(""):string("#"))+"[AFLOW_APL]CALC ",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl; //CO20180214
-    //[ME20181216] - OLD SCHEME
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]ENGINE=DM",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DMAG=0.015",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]//DX+CO START
-    //[ME20181216]aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string("#"):string(""))+"[AFLOW_APL]MINATOMS=100",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST((xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?string(""):string("#"))+"[AFLOW_APL]SUPERCELL="+
-    //[ME20181216]    (xvasp.aopts.flag("AFLOWIN_FLAG::APL_SUPERCELL")?xvasp.aopts.getattachedscheme("AFLOWIN_FLAG::APL_SUPERCELL"):"3x3x3"),_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;  //CO20180214
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DC=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DPM=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]ZEROSTATE=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]//DX+CO END
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]DOS=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]TP=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_APL]TPT=0:2000:10",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216] - NEW SCHEME
     string _ASTROPT_, key, scheme, xvaspflag;
     _ASTROPT_ = "[AFLOW_APL]";
     //vector<string> vkeys = xvasp.aplopts.getattachedschemekeys();
@@ -2129,7 +2113,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   }
 
   if(!xvasp.aopts.flag("FLAG::AVASP_QHA=OFF")) {
-    aflowin << aurostd::PaddedPOST((MODULE=="QHA"?string(""):string("#"))+"[AFLOW_QHA]CALC ",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    aflowin << aurostd::PaddedPOST((MODULE=="QHA"?string(""):string("#"))+"[AFLOW_QHA]CALC ",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     string _ASTROPT_ = "[AFLOW_QHA]", key="", scheme="", xvaspflag="";
 
     std::sort(xvasp.qhaopts.vxscheme.begin(), xvasp.qhaopts.vxscheme.end());
@@ -2140,23 +2124,9 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       key = xvaspflag;
       aurostd::StringSubst(key, "AFLOWIN_FLAG::QHA_", string(""));
       if (!scheme.empty()) {
-        aflowin << aurostd::PaddedPOST(_ASTROPT_+key+"="+scheme,_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+        aflowin << aurostd::PaddedPOST(_ASTROPT_+key+"="+scheme,_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
       }
     }
-
-    //[OBSOLETE AS20200302] aflowin << aurostd::PaddedPOST("[AFLOW_QHA]MODE=QHA3P",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE AS20200302] aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=y",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA=y",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_DISTORTION=0.03",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_DISTORTION=3",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_DISTORTION_RANGE=-3:6:1",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_PDIS_T=50,100,200",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_VOL_DISTORTION_PERCENTAGE=0.03",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]DISPLACEMENTS=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]PROJECTION_DIR=1:1:1",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=n",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_VOLRANGE_DIST=-2:4:0.5",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[OBSOLETE CO20180705]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS_KPOINTS_MODE=32768:10000:20:100000",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
 
@@ -2167,19 +2137,6 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
       xvasp.aaplopts.pop_attached("AFLOWIN_FLAG::AAPL_FOURTH_ORDER");xvasp.aaplopts.push_attached("AFLOWIN_FLAG::AAPL_FOURTH_ORDER", "ON");
     }
     aflowin << aurostd::PaddedPOST((MODULE=="AAPL"?string(""):string("#"))+"[AFLOW_AAPL]CALC ",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216] - OLD SCHEME
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]TDMAG=0.015",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUT_SHELL=4",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUT_RAD=4.5",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]SUMRULE=1E-5",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]BTE=FULL",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]THERMALGRID=21x21x21",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]ISOTOPE=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]CUMULATIVEK=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]BOUNDARY=n",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]NANO_SIZE=100",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216]aflowin << aurostd::PaddedPOST("[AFLOW_AAPL]TCT=200:700:20",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
-    //[ME20181216] - NEW SCHEME
     string _ASTROPT_, key, scheme, xvaspflag;
     _ASTROPT_ = "[AFLOW_AAPL]";
     //vector<string> vkeys = xvasp.aaplopts.getattachedschemekeys();
@@ -2421,10 +2378,13 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   }
 
   // BADER WRITING
+  // CO+ME20220311 - Always write Bader settings. While this may increase the size of the aflow.in, some
+  // settings are necessary to ensure portability of the aflow.in file. In this case, relying on the
+  // default can result in GBs of potentially unwanted data when moving aflow.in files between systems
   if(xvasp.aopts.flag("FLAG::AVASP_BADER")) {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=ON",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_BADER in .aflow.rc)" << endl;
   } else {
-    // aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=OFF",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_BADER in .aflow.rc)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=OFF",_AFLOWINPAD_) << " // ON | OFF (default: DEFAULT_VASP_FORCE_OPTION_BADER in .aflow.rc)" << endl;
   }
   // ELF WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_ELF")) {
@@ -3992,9 +3952,9 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
     aflowin << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
   }
   if(!xvasp.aopts.flag("FLAGS::AVASP_QHA=OFF")) {
-    aflowin << aurostd::PaddedPOST((MODULE=="QHA"?string(""):string("#"))+"[AFLOW_QHA]CALC ",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_QHA]MODE=QHA3P",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
-    aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=y",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
+    aflowin << aurostd::PaddedPOST((MODULE=="QHA"?string(""):string("#"))+"[AFLOW_QHA]CALC ",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_QHA]MODE=QHA3P",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
+    aflowin << aurostd::PaddedPOST("[AFLOW_QHA]EOS=y",_AFLOWINPAD_) << " // README_AFLOW_APL.TXT" << endl;
     //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA=y",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
     //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]GP_DISTORTION=0.03",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
     //[OBSOLETE PN20180717]aflowin << aurostd::PaddedPOST("[AFLOW_QHA]SCQHA_DISTORTION=3",_AFLOWINPAD_) << " // README_AFLOW_QHA_SCQHA_QHA3P.TXT" << endl;
@@ -4069,8 +4029,11 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
   }
 
   // CHGCAR WRITING
+  // CO+ME20220311 - Always write CHGCAR settings. While this may increase the size of the aflow.in, some
+  // settings are necessary to ensure portability of the aflow.in file. In this case, relying on the
+  // default can result in GBs of potentially unwanted data when moving aflow.in files between systems
   if(xvasp.aopts.flag("FLAG::AVASP_CHGCAR")) {
-    //aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=ON",_AFLOWINPAD_) << " // ON | OFF (default ON)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=ON",_AFLOWINPAD_) << " // ON | OFF (default ON)" << endl;
   } else {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]CHGCAR=OFF",_AFLOWINPAD_) << " // ON | OFF (default ON)" << endl;
   }
@@ -4162,10 +4125,13 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
   }
 
   // BADER WRITING
+  // CO+ME20220311 - Always write Bader settings. While this may increase the size of the aflow.in, some
+  // settings are necessary to ensure portability of the aflow.in file. In this case, relying on the
+  // default can result in GBs of potentially unwanted data when moving aflow.in files between systems
   if(xvasp.aopts.flag("FLAG::AVASP_BADER")) {
     aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=ON",_AFLOWINPAD_) << " // ON | OFF (default OFF)" << endl;
   } else {
-    //    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=OFF",_AFLOWINPAD_) << " // ON | OFF (default OFF)" << endl;
+    aflowin << aurostd::PaddedPOST("[VASP_FORCE_OPTION]BADER=OFF",_AFLOWINPAD_) << " // ON | OFF (default OFF)" << endl;
   }
   // ELF WRITING
   if(xvasp.aopts.flag("FLAG::AVASP_ELF")) {
@@ -6714,9 +6680,8 @@ bool AVASP_ADD_LDAU(_xvasp &xvasp) {
     }
     LDAU=(xvasp.aopts.flag("FLAG::AVASP_LDAU1") || xvasp.aopts.flag("FLAG::AVASP_LDAU2"));
     if(xvasp.aopts.flag("FLAG::AVASP_LDAU1")==TRUE && xvasp.aopts.flag("FLAG::AVASP_LDAU2")==TRUE) {
-      string function = XPID + "AVASP_ADD_LDAU():";
       string message = "AVASP_ADD_LDAU: you can not be here: xvasp.aopts.flag(\"FLAG::AVASP_LDAU1\")==TRUE && xvasp.aopts.flag(\"FLAG::AVASP_LDAU2\")==TRUE: need to get different LDAU parameterization";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     stringstream aus;
     aus.clear();aus.str(std::string());

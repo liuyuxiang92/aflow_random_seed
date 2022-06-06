@@ -123,8 +123,8 @@ namespace pocc {
       if (LDEBUG) cerr << function << " file: " << filename << endl;
 
       if (aurostd::EFileExist(filename)){
-         aurostd::ExtractToStringEXPLICIT(aurostd::efile2string(filename), data,
-          "[QHA_SJ_THERMO]START", "[QHA_SJ_THERMO]STOP");
+         data = aurostd::substring2string(aurostd::efile2string(filename),
+          "[QHA_SJ_THERMO]START", "[QHA_SJ_THERMO]STOP", 0);
 
         vector<string> lines = aurostd::string2vectorstring(data);
         if (LDEBUG) cerr << function << " datasize: " <<  lines.size() << endl;

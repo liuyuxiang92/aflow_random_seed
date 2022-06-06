@@ -273,7 +273,7 @@ namespace plotter {
     if (missing_binaries.size() == 0) {
       string directory_work = plotoptions.getattachedscheme("DIRECTORY");
       if(directory_work.empty()){directory_work=aurostd::getPWD();}  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")//CO20191004
-      if(LDEBUG) { cerr << soliloquy << " directory_work=" << directory_work << endl;}
+      if(LDEBUG) {cerr << soliloquy << " directory_work=" << directory_work << endl;}
       string filename = plotoptions.getattachedscheme("FILE_NAME");
       if(LDEBUG){cerr << soliloquy << " filename=" << filename << endl;}
       string filename_latex = plotoptions.getattachedscheme("FILE_NAME_LATEX");
@@ -333,7 +333,7 @@ namespace plotter {
       }
       chdir(current_dir.c_str());
       aurostd::CopyFile(directory_tmp + filename_latex + "." + format,directory_work + "/" + filename + "." + format);
-      if(LDEBUG) { cerr << soliloquy << " moving file to: " << directory_work + "/" + filename + "." + format << endl;}
+      if(LDEBUG) {cerr << soliloquy << " moving file to: " << directory_work + "/" + filename + "." + format << endl;}
       // Keep gnuplot file if aflow was called with --keep=gpl
       if (XHOST.vflag_control.flag("KEEP::GPL")) {
         aurostd::CopyFile(directory_tmp + filename + ".plt", directory_work);
@@ -356,9 +356,9 @@ namespace plotter {
   // [OBSOLETE]   string soliloquy = XPID + "plotter::savePlotGNUPLOT():";
   // [OBSOLETE]   string directory_work = plotoptions.getattachedscheme("DIRECTORY");
   // [OBSOLETE]   if(directory_work.empty()){directory_work=aurostd::getPWD();}  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")//CO20191004
-  // [OBSOLETE]   if(LDEBUG) { cerr << soliloquy << " directory_work=" << directory_work << endl;}
+  // [OBSOLETE]   if(LDEBUG) {cerr << soliloquy << " directory_work=" << directory_work << endl;}
   // [OBSOLETE]   string filename = plotoptions.getattachedscheme("FILE_NAME");
-  // [OBSOLETE]   if(LDEBUG) { cerr << soliloquy << " filename=" << filename << endl;}
+  // [OBSOLETE]   if(LDEBUG) {cerr << soliloquy << " filename=" << filename << endl;}
   // [OBSOLETE]   string filename_latex = plotoptions.getattachedscheme("FILE_NAME_LATEX");
   // [OBSOLETE]   // PDF is default since we use pdflatex to compile
   // [OBSOLETE]   string format = plotoptions.getattachedscheme("IMAGE_FORMAT");
@@ -377,7 +377,7 @@ namespace plotter {
   // [OBSOLETE]   }
   // [OBSOLETE]   chdir(current_dir.c_str());
   // [OBSOLETE]   aurostd::CopyFile(directory_tmp + filename_latex + "." + format,directory_work + "/" + filename + "." + format);
-  // [OBSOLETE]   if(LDEBUG) { cerr << soliloquy << " moving file to: " << directory_work + "/" + filename + "." + format << endl;}
+  // [OBSOLETE]   if(LDEBUG) {cerr << soliloquy << " moving file to: " << directory_work + "/" + filename + "." + format << endl;}
   // [OBSOLETE]   // Keep gnuplot file if aflow was called with --keep=gpl
   // [OBSOLETE]   if (XHOST.vflag_control.flag("KEEP::GPL")) {
   // [OBSOLETE]    aurostd::CopyFile(directory_tmp + filename + ".plt", directory_work);
@@ -456,7 +456,7 @@ namespace plotter {
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG);
     string soliloquy=XPID+"plotter::formatDefaultPlotTitle():";
     string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
-    if(LDEBUG) { cerr << soliloquy << " default_title=" << default_title << endl;}
+    if(LDEBUG) {cerr << soliloquy << " default_title=" << default_title << endl;}
     if (default_title.empty()) return default_title;
     string title="";
     if (default_title.find("_ICSD_")!=string::npos) {  // Check if AFLOW ICSD format
@@ -470,7 +470,7 @@ namespace plotter {
       } else { // Title not in ICSD format
         return aurostd::fixStringLatex(default_title, false, false);
       }
-    } else if (aurostd::substring2bool(default_title, POCC_TITLE_TAG)) {  // Check if in POCC format
+    } else if (aurostd::substring2bool(default_title, TAG_TITLE_POCC)) {  // Check if in POCC format
       if(LDEBUG){cerr << soliloquy << " found POCC" << endl;}
       title = formatDefaultTitlePOCC(plotoptions,FileMESSAGE,oss); //CO20200404
     } else if (aurostd::substring2bool(default_title, ".")) {  // Check if AFLOW prototype format
@@ -534,7 +534,7 @@ namespace plotter {
     } else {  // Not an AFLOW-formatted default
       return aurostd::fixStringLatex(default_title, false, false);
     }
-    if(LDEBUG) { cerr << soliloquy << " title=" << title << endl;}
+    if(LDEBUG) {cerr << soliloquy << " title=" << title << endl;}
     // Code only gets here if the title is AFLOW-formatted
     string set = plotoptions.getattachedscheme("DATASET");
     if (aurostd::string2utype<int>(set) > 0) {
@@ -602,110 +602,26 @@ namespace plotter {
     string soliloquy=XPID+"plotter::formatDefaultTitlePOCC():";
     stringstream message;
     string default_title = plotoptions.getattachedscheme("DEFAULT_TITLE");
-    if(LDEBUG) { cerr << soliloquy << " default_title=" << default_title << endl;}
-    //example: Cs_svEuIPb_d:PAW_PBE.AB3C_cP5_221_a_c_b:POCC_S0-1xA_S1-1xC_S2-0.5xB-0.5xD
-    //ARUN example: Cs_afEuIPb_d:PAW_PBE.AB3C_cP5_221_a_c_b:POCC_S0-1xA_S1-1xC_S2-0.5xB-0.5xD:ARUN.POCC_1_H0C0
-    //convert to: --proto=AB3C_cP5_221_a_c_b:Cs_sv:Eu:I:Pb_d --pocc_params=S0-1xA_S1-1xC_S2-0.5xB-0.5xD
-    //arun stuff separate
+    if(LDEBUG) {cerr << soliloquy << " default_title=" << default_title << endl;}
 
-    if(!aurostd::substring2bool(default_title,POCC_TITLE_TAG)){  //use generic
-      message << "No POCC_TITLE_TAG found [" << POCC_TITLE_TAG << "], using generic SYSTEM name as title";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_); //CO20200404
-      return aurostd::fixStringLatex(default_title, false, false);
-    }
-    //Get all the pieces of the default title
-    string::size_type t = default_title.find(POCC_TITLE_TAG);
-    string elements_prototype_str = default_title.substr(0, t);  //contains elements and prototype
-    string pocc_params_arun_str = default_title.substr(t + POCC_TITLE_TAG.length(), string::npos);  //pocc_params and ARUN(?)
-    if(LDEBUG){
-      cerr << soliloquy << " elements_prototype_str=" << elements_prototype_str << endl;
-      cerr << soliloquy << " pocc_params_arun_str=" << pocc_params_arun_str << endl;
-    }
-    //parse elements_prototype_str by "."
-    //PROBLEM: "." can exist in pp_string (not really important for standard PP, but it exists), as well
-    //as proto: .ABC...
-    //we will go in loop over "." parses until we get a structure!
-    t=elements_prototype_str.find('.');
-    string pps="";
-    string proto="";
-    vector<string> velements;
-    string pocc_params="";
-    string arun_pocc="";
-    string arun_module="";
-    string::size_type c=0,m=0;
+    aurostd::xoption pocc_settings;
     xstructure xstr;
-    while(t!=string::npos && (t+1)<elements_prototype_str.length()){
-      pps=elements_prototype_str.substr(0,t);
-      proto=elements_prototype_str.substr(t+1,string::npos);
-      if(LDEBUG){
-        cerr << soliloquy << " pps=" << pps << endl;
-        cerr << soliloquy << " proto=" << proto << endl;
-      }
+    bool found_pocc=pflow::POccInputs2Xstr(default_title,pocc_settings,xstr,FileMESSAGE,oss);
+    if(!found_pocc){return aurostd::fixStringLatex(default_title, false, false);}
 
-      velements=aurostd::getElements(pps,pp_string,true,false,true);  //clean, no sort_elements, pseudopotential string, keep_pp
-      if(LDEBUG) { cerr << soliloquy << " velements=" << aurostd::joinWDelimiter(velements,",") << endl;}
-
-      pocc_params=pocc_params_arun_str;
-      c=pocc_params_arun_str.find(POCC_ARUN_TITLE_TAG);
-      if(c!=string::npos && (c+1)<pocc_params_arun_str.length()){
-        pocc_params=pocc_params_arun_str.substr(0,c);
-        arun_pocc=pocc_params_arun_str.substr(c+1,string::npos);
-        if(LDEBUG){cerr << soliloquy << " arun_pocc(with-module)=" << arun_pocc << endl;}
-        m=arun_pocc.find(":");
-        if(m!=string::npos && (m+1)<arun_pocc.length()){
-          string arun_pocc_new=arun_pocc.substr(0,m);
-          arun_module=arun_pocc.substr(m+1,string::npos);
-          arun_pocc=arun_pocc_new;
-        }
-      }
-      //CO20210315 - might find pocc_params='P0-1xA_P1-0.2xB-0.2xC-0.2xD-0.2xE-0.2xF:ARUN.AGL_9_SF_0.95' which is a bad system name, missing ARUN.POCC
-      m=pocc_params.find(ARUN_TITLE_TAG);
-      if(m!=string::npos){
-        arun_module=pocc_params.substr(m+1,string::npos);  //grab whatever follows the ARUN_TITLE_TAG
-        pocc_params=pocc_params.substr(0,m);  //parse it out of pocc_parms
-      }
-      if(LDEBUG){
-        cerr << soliloquy << " pocc_params=" << pocc_params << endl;
-        cerr << soliloquy << " arun_pocc=" << arun_pocc << endl;
-        cerr << soliloquy << " arun_module=" << arun_module << endl;
-      }
-
-      aurostd::xoption proto_flags;
-      proto_flags.push_attached("PROTO",proto + ":" + aurostd::joinWDelimiter(velements,":"));
-      proto_flags.push_attached("POCC_PARAMS",pocc_params);
-      if(LDEBUG){
-        cerr << soliloquy << " proto_flags.getattachedscheme(\"PROTO\")=" << proto_flags.getattachedscheme("PROTO") << endl;
-        cerr << soliloquy << " proto_flags.getattachedscheme(\"POCC_PARAMS\")=" << proto_flags.getattachedscheme("POCC_PARAMS") << endl;
-      }
-
-      try{
-        xstr=pflow::PROTO_LIBRARIES(proto_flags);
-        break;
-      }
-      catch(aurostd::xerror& excpt){
-        xstr.clear(); //DX20191220 - uppercase to lowercase clear
-        t=elements_prototype_str.find('.',t+1);
-        continue;
-      }
-    }
-
-    if(xstr.atoms.size()==0){  //use generic
-      message << "Cannot extract identifiable prototype from SYSTEM [" << default_title << "], using generic SYSTEM name as title";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);  //CO20200404
-      return aurostd::fixStringLatex(default_title, false, false);
-    }
-
-    if(LDEBUG) { cerr << soliloquy << " xstr_found: " << endl;cerr << xstr << endl;}
-
-    if(xstr.species.size()!=xstr.comp_each_type.size()){ //use generic
-      message << "Cannot extract composition from prototype [" << proto << "], using generic SYSTEM name as title";pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, FileMESSAGE, oss, _LOGGER_WARNING_);  //CO20200404
-      return aurostd::fixStringLatex(default_title, false, false);
-    }
+    string pps=pocc_settings.getattachedscheme("PPS");
+    string proto=pocc_settings.getattachedscheme("PROTO");
+    string pocc_params=pocc_settings.getattachedscheme("POCC_PARAMS");
+    string pocc_tol=pocc_settings.getattachedscheme("POCC_TOL");
+    string pocc_arun=pocc_settings.getattachedscheme("POCC_ARUN");
+    string module_arun=pocc_settings.getattachedscheme("MODULE_ARUN");
 
     string new_title="";
     string clean_specie="";
     int comp_prec=(int)ceil(log10(1.0/xstr.partial_occupation_stoich_tol));  //ceil ensures we round up above 1 //CO20181226
     for(uint ispecies=0;ispecies<xstr.species.size();ispecies++){
       clean_specie=KBIN::VASP_PseudoPotential_CleanName(xstr.species[ispecies]);
-      if(LDEBUG) { cerr << soliloquy << " species[ispecies=" << ispecies << "]=" << clean_specie << endl;}
+      if(LDEBUG) {cerr << soliloquy << " species[ispecies=" << ispecies << "]=" << clean_specie << endl;}
       new_title+=aurostd::fixStringLatex(clean_specie,false,false);
       new_title+=(aurostd::isequal(xstr.comp_each_type[ispecies],1.0,xstr.partial_occupation_stoich_tol) ? "" : "$_{"+aurostd::utype2string(xstr.comp_each_type[ispecies],comp_prec)+"}$");
     }
@@ -713,15 +629,15 @@ namespace plotter {
 
     vector<string> tokens;
     //ARUN.POCC_49
-    if(!arun_pocc.empty()){
-      aurostd::string2tokens(arun_pocc,tokens,"_");
+    if(!pocc_arun.empty()){
+      aurostd::string2tokens(pocc_arun,tokens,"_");
       string pocc_hash="";
       if(tokens.size()>1){pocc_hash=tokens.back();}
       if(!pocc_hash.empty()){new_title+=":"+aurostd::fixStringLatex(pocc_hash,false,false);}
     }
-    //arun_module=ARUN.AGL_6_SF_0.92
-    if(!arun_module.empty()){
-      aurostd::string2tokens(arun_module,tokens,"_");
+    //module_arun=ARUN.AGL_6_SF_0.92
+    if(!module_arun.empty()){
+      aurostd::string2tokens(module_arun,tokens,"_");
       string module_hash="";
       if(tokens.size()>1){
         vector<string> new_tokens;
@@ -733,7 +649,7 @@ namespace plotter {
 
     new_title+=")";
 
-    if(LDEBUG) { cerr << soliloquy << " new_title=" << new_title << endl;}
+    if(LDEBUG) {cerr << soliloquy << " new_title=" << new_title << endl;}
 
     return new_title; //aurostd::fixStringLatex(new_title, false, false);  //substs $ for \\$
   }
@@ -752,7 +668,7 @@ namespace plotter {
     bool generic = false;
     // Need _S because S could theoretically also be a decorator
     if (aurostd::substring2bool(pocc, "_S")) generic = true;
-    if(LDEBUG) { cerr << soliloquy << " found _S tag = " << generic << endl;}
+    if(LDEBUG) {cerr << soliloquy << " found _S tag = " << generic << endl;}
     pocc = pocc.substr(1, pocc.size());  // Remove the leading _
 
     // Get the HNF matrix string
@@ -762,7 +678,7 @@ namespace plotter {
       t = pocc.find(":");
       hnf = pocc.substr(t + 1, string::npos);
       pocc = pocc.substr(0, t);  // Remove ARUN from pocc
-      if(LDEBUG) { cerr << soliloquy << " hnf=" << hnf << endl;}
+      if(LDEBUG) {cerr << soliloquy << " hnf=" << hnf << endl;}
       if (!hnf.empty()) {
         aurostd::string2tokens(hnf, tokens, "_");
         hnf = tokens.back();
@@ -982,7 +898,7 @@ namespace plotter {
     // Read files
     string directory = plotoptions.getattachedscheme("DIRECTORY");
     xDOSCAR xdos;
-    if(LDEBUG) { cerr << soliloquy << " directory=" << directory << endl;}
+    if(LDEBUG) {cerr << soliloquy << " directory=" << directory << endl;}
     //CO20210701 - adding support for POCC
     //check if POCC directory
     vector<string> vfiles,vpocc_doscars;
@@ -1030,7 +946,9 @@ namespace plotter {
         if(LDEBUG){cerr << soliloquy << " looking at POCC DOSCAR: " << vpocc_doscars[i] << endl;}
         xdos.GetPropertiesFile(vpocc_doscars[i]);
         temperature=pocc::poccDOSCAR2temperature(vpocc_doscars[i]);
+        plotoptions.push_attached("NORMALIZATION","ATOM");  //CO20211124
         plotoptions.push_attached("EXTENSION","dos_"+aurostd::tolower(pscheme)+"_T"+pocc::getTemperatureString(temperature,temperature_precision,temperatures_int,zero_padding_temperature)+"K");
+        aurostd::StringstreamClean(out);  //CO20211210 - otherwise it writes out of other temperatures
         PLOT_DOS(plotoptions, out, xdos,FileMESSAGE,oss);  //CO20200404
         savePlotGNUPLOT(plotoptions, out);
       }
@@ -1047,13 +965,13 @@ namespace plotter {
 
     const string& directory = plotoptions.getattachedscheme("DIRECTORY");
     if (!aurostd::FileExist(directory + "/" + _AFLOWIN_)) return;  //ME20200922
-    if(LDEBUG) { cerr << soliloquy << " directory=" << directory << endl;}
+    if(LDEBUG) {cerr << soliloquy << " directory=" << directory << endl;}
     string SYSTEM=KBIN::ExtractSystemName(directory); //CO20200731
     if(!SYSTEM.empty()){
-      if(LDEBUG) { cerr << soliloquy << " DEFAULT_TITLE(OLD)=" << plotoptions.getattachedscheme("DEFAULT_TITLE") << endl;}
+      if(LDEBUG) {cerr << soliloquy << " DEFAULT_TITLE(OLD)=" << plotoptions.getattachedscheme("DEFAULT_TITLE") << endl;}
       plotoptions.pop_attached("DEFAULT_TITLE");
       plotoptions.push_attached("DEFAULT_TITLE", SYSTEM);
-      if(LDEBUG) { cerr << soliloquy << " DEFAULT_TITLE(NEW)=" << plotoptions.getattachedscheme("DEFAULT_TITLE") << endl;}
+      if(LDEBUG) {cerr << soliloquy << " DEFAULT_TITLE(NEW)=" << plotoptions.getattachedscheme("DEFAULT_TITLE") << endl;}
     }
   }
 
@@ -1084,7 +1002,7 @@ namespace plotter {
       plotoptions.push_attached("EFERMI", "0.0");
     }
 
-    if(LDEBUG) { cerr << soliloquy << " EFERMI set" << endl;}
+    if(LDEBUG) {cerr << soliloquy << " EFERMI set" << endl;}
 
     // Set Emin and Emax
     setEMinMax(plotoptions, xdos.energy_min, xdos.energy_max);
@@ -1867,8 +1785,8 @@ namespace plotter {
   //generateDosPlot///////////////////////////////////////////////////////////
   // Generates the data for a DOS plot. 
   // ME20200305 - added DOS data checking
-  void generateDosPlot(stringstream& out, const xDOSCAR& xdos, const xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return generateDosPlot(out,xdos,plotoptions,FileMESSAGE,oss);} //CO20200404
-  void generateDosPlot(stringstream& out, const xDOSCAR& xdos, const xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
+  void generateDosPlot(stringstream& out,const xDOSCAR& xdos,xoption& plotoptions,ostream& oss) {ofstream FileMESSAGE;return generateDosPlot(out,xdos,plotoptions,FileMESSAGE,oss);} //CO20200404
+  void generateDosPlot(stringstream& out,const xDOSCAR& xdos,xoption& plotoptions,ofstream& FileMESSAGE,ostream& oss) {  //CO20200404
     bool LDEBUG=(FALSE || _DEBUG_PLOTTER_ || XHOST.DEBUG); 
     string soliloquy=XPID+"plotter::generateDosPlot():";
     deque<deque<deque<double> > > dos;
@@ -1926,7 +1844,7 @@ namespace plotter {
           dos = xdos.vDOS[pdos];
         }
       }
-      if(LDEBUG) { cerr << soliloquy << " norbitals=" << norbitals << endl;}
+      if(LDEBUG) {cerr << soliloquy << " norbitals=" << norbitals << endl;}
       //CO20191010 - do labels last
       for (int i = 0; i < norbitals; i++) {
         labels.push_back("$" + ORBITALS[i] + "$");
@@ -2027,6 +1945,10 @@ namespace plotter {
       string message = "Unknown projection scheme " + projection + ".";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _INPUT_ILLEGAL_);
     }
+    if(plotoptions.flag("LEGEND_HORIZONTAL")==false && labels.size()>4){  //CO20211227, avoid overlap between legend and DOS
+      plotoptions.flag("LEGEND_HORIZONTAL",true);
+      plotoptions.push_attached("LEGEND_MAXCOLS","5");
+    }
     string outformat = plotoptions.getattachedscheme("OUTPUT_FORMAT");
     if (outformat == "GNUPLOT") {
       if (plotoptions.flag("NOSHIFT")) {
@@ -2047,9 +1969,8 @@ namespace plotter {
     uint nsegments = xkpts.vpath.size()/2;
     // Make sure that the number of k-points is consistent with EIGENVAL
     if (xeigen.number_kpoints != nsegments * xkpts.path_grid) {
-      string function = "plotter::generateBandPlot():";
       string message = "Number of k-points in EIGENVAL and KPOINTS files do not match.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     // Labels
@@ -2209,69 +2130,70 @@ namespace plotter {
       }
       out << std::endl;
     }
-    out << "EOD" << std::endl;
+    out << "EOD" << std::endl << std::endl;
 
     // Margins
     out << "# Margins" << std::endl;
     if (banddos) {
-      out << " set lmargin at screen 0.73" << std::endl;
-      out << " set rmargin at screen 0.98" << std::endl;
-      out << " set tmargin at screen 0.9" << std::endl;
-      out << " set bmargin at screen 0.12" << std::endl;
+      out << "set lmargin at screen 0.73" << std::endl;
+      out << "set rmargin at screen 0.98" << std::endl;
+      out << "set tmargin at screen 0.9" << std::endl;
+      out << "set bmargin at screen 0.12" << std::endl;
     } else {
-      out << " set tmargin at screen 0.9" << std::endl;
-      out << " set bmargin at screen 0.2" << std::endl;
+      out << "set tmargin at screen 0.9" << std::endl;
+      out << "set bmargin at screen 0.2" << std::endl;
     }
 
     // Key
     out << std::endl << "# Key" << std::endl;
     if (dos.size() == xdos.spin + 1) { // no need for key when only total DOS is plotted, NO-SPIN: xdos.spin==0, SPIN: xdos.spin==1  //CO20200404
-      out << " unset key" << std::endl;
+      out << "unset key" << std::endl;
     } else {
-      if(plotoptions.flag("LEGEND_HORIZONTAL")){  //CO20200404 - ME LOOK HERE
+      if(plotoptions.flag("LEGEND_HORIZONTAL")){  //CO20200404
         int maxcols=3;
         string maxcols_str=plotoptions.getattachedscheme("LEGEND_MAXCOLS");
         if(!maxcols_str.empty()){maxcols=aurostd::string2utype<int>(maxcols_str);}
-        out << " set key horizontal maxcols " << maxcols << std::endl;
+        out << "set key horizontal maxcols " << maxcols << std::endl;
       }
-      out << " set key samplen 2.5" << std::endl;  // Shorter lines to fit key into image
+      out << "set key samplen 2.5" << std::endl;  // Shorter lines to fit key into image
     }
 
     // Axes
     out << std::endl << "# Axes" << std::endl;
     if (banddos) {
-      out << " unset xtics" << std::endl;
-      out << " unset xrange" << std::endl;
+      out << "unset xtics" << std::endl;
+      out << "unset xrange" << std::endl;
     }
 
-    out << " set " << (swap?"x":"y") << "tics " << (dosmax/(2 * (2 - xdos.spin))) << std::endl;
-    if(banddos){out << " set ytics format \"\"" << std::endl;}  //CO+ME20210729
-    //[CO+ME20210729 - breaks for LIB0 which has swap==false and banddos]out << " set ytics" << (banddos?" format \"\"":"") << std::endl;
-    out << " set tic scale 0" << std::endl;
-    out << " set " << (swap?"y":"x") << "range [" << Emin << ":" << Emax << "]" << std::endl;
-    out << " set " << (swap?"x":"y") << "range [" << mindos << ":" << maxdos << "]" << std::endl;
+    out << "set " << (swap?"x":"y") << "tics " << (dosmax/(2 * (2 - xdos.spin))) << std::endl;
+    if(banddos){out << "set ytics format \"\"" << std::endl;}  //CO+ME20210729
+    //[CO+ME20210729 - breaks for LIB0 which has swap==false and banddos]out << "set ytics" << (banddos?" format \"\"":"") << std::endl;
+    out << "set tic scale 0" << std::endl;
+    out << "set " << (swap?"y":"x") << "range [" << Emin << ":" << Emax << "]" << std::endl;
+    out << "set " << (swap?"x":"y") << "range [" << mindos << ":" << maxdos << "]" << std::endl;
+    string normalization=aurostd::tolower(plotoptions.getattachedscheme("NORMALIZATION"));
     if (banddos) {
-      out << " unset ylabel" << std::endl;
-      out << " set title 'DOS (states/" << unit << ")' offset 0,-0.7" << std::endl;
+      out << "unset ylabel" << std::endl;
+      out << "set title 'DOS (states/" << unit << (!normalization.empty()?"/"+normalization:"") << ")' offset 0,-0.7" << std::endl;
     } else {
-      out << " set " << (swap?"y":"x") << "label '" << energyLabel << " (" << unit << ")' offset graph 0.00" << std::endl;
-      out << " set " << (swap?"x":"y") << "label 'DOS (states/" << unit << ")' offset graph 0.00" << std::endl;
+      out << "set " << (swap?"y":"x") << "label '" << energyLabel << " (" << unit << ")' offset graph 0.00" << std::endl;
+      out << "set " << (swap?"x":"y") << "label 'DOS (states/" << unit << (!normalization.empty()?"/"+normalization:"") << ")' offset graph 0.00" << std::endl;
     }
 
     // Fermi level
     if (Efermi > Emin) {
       out << std::endl << "# Fermi level" << std::endl;
       if (swap) {
-        out << " set arrow from " << mindos << "," << Efermi << " to " << maxdos << "," << Efermi;
+        out << "set arrow from " << mindos << "," << Efermi << " to " << maxdos << "," << Efermi;
       } else {
-        out << " set arrow from " << Efermi << ", graph 0 to " << Efermi << ", graph 1";
+        out << "set arrow from " << Efermi << ", graph 0 to " << Efermi << ", graph 1";
       }
       out << " nohead lt 1 lc rgb '" << EFERMI_COLOR << "' lw 3" << std::endl;
     }
 
     // Plot data
     out << std::endl << "# Data" << std::endl;
-    out << " plot ";
+    out << "plot ";
     int xcol, ycol;
     if (swap) ycol = 1;
     else xcol = 1;
@@ -2280,7 +2202,7 @@ namespace plotter {
     for (uint i = 0; i < ndos; i++) {
       if (swap) xcol = i + 2;
       else ycol = i + 2;
-      if (i > 0) out << "      ";
+      if (i > 0) out << "     ";
       out << "'$dos_data' u " << xcol << ":" << ycol << " w l lt -1 "
         << "lc rgb '" << ESTRUCTURE_COLORS[i % ESTRUCTURE_NCOLORS] << "' lw 2 title '" << labels[i] << "'"
         << (((xdos.spin == 1) || (i < ndos - 1))?",\\":"") << std::endl;
@@ -2343,11 +2265,11 @@ namespace plotter {
       }
     }
 
-    if(LDEBUG) { cerr << soliloquy << " dosmax(FOUND)=" << dosmax << endl;}
+    if(LDEBUG) {cerr << soliloquy << " dosmax(FOUND)=" << dosmax << endl;}
 
     if (!dosscale.empty()) dosmax *= aurostd::string2utype<double>(dosscale);
 
-    if(LDEBUG) { cerr << soliloquy << " dosmax(SCALED)=" << dosmax << endl;}
+    if(LDEBUG) {cerr << soliloquy << " dosmax(SCALED)=" << dosmax << endl;}
 
     // l = order of magnitude
     // x = scalar multiple
@@ -2382,7 +2304,7 @@ namespace plotter {
     //  * The maximum (l) is smaller than 1, in which case they all have decimal points.
     //  * The number is divisible by 4.
     if (!((xdos.spin == 1) || (l > 1) || (l < -1) || (2 * x % 4 == 0))) {x++;}
-    if(LDEBUG) { cerr << soliloquy << " x(new2)=" << x << endl;}
+    if(LDEBUG) {cerr << soliloquy << " x(new2)=" << x << endl;}
 
     dosmax = x * std::pow(10.0, l); 
 
@@ -2452,52 +2374,52 @@ namespace plotter {
     // Margins
     out << "# Margins" << std::endl;
     if (banddos) {
-      out << " set lmargin at screen 0.08" << std::endl;
-      out << " set rmargin at screen 0.70" << std::endl;
-      out << " set tmargin at screen 0.9" << std::endl;
-      out << " set bmargin at screen 0.12" << std::endl;
+      out << "set lmargin at screen 0.08" << std::endl;
+      out << "set rmargin at screen 0.70" << std::endl;
+      out << "set tmargin at screen 0.9" << std::endl;
+      out << "set bmargin at screen 0.12" << std::endl;
     } else {
-      out << " set tmargin at screen 0.9" << std::endl;
-      out << " set bmargin at screen 0.15" << std::endl;
+      out << "set tmargin at screen 0.9" << std::endl;
+      out << "set bmargin at screen 0.15" << std::endl;
     }
 
     // Key
     out << std::endl << "# Key" << std::endl;
-    out << " unset key" << std::endl;
+    out << "unset key" << std::endl;
 
     // Axes
     out << std::endl << "# Axes" << std::endl;
-    out << " unset xtics" << std::endl;
-    out << " set xtics(";
+    out << "unset xtics" << std::endl;
+    out << "set xtics(";
     uint ntics = ticvals.size();
     for (uint i = 0; i < ntics; i++) {
       out << "'" << ticlabels[i] << "' " << ticvals[i];
       if (i < ntics - 1) out << ", ";
     }
     out << ")" << std::endl;
-    out << " set tic scale 0" << std::endl;
-    out << " set xrange [0:1]" << std::endl;
-    out << " set yrange [" << Emin << ":" << Emax << "]" << std::endl;
+    out << "set tic scale 0" << std::endl;
+    out << "set xrange [0:1]" << std::endl;
+    out << "set yrange [" << Emin << ":" << Emax << "]" << std::endl;
     if (unit.empty()){//AS20210701 this might be a Grueneisen parameter dispersion plot, unitless
-      out << " set ylabel '" << energyLabel << std::endl;
+      out << "set ylabel '" << energyLabel << std::endl;
     }
     else{
-      out << " set ylabel '" << energyLabel << " (" << unit << ")'" << std::endl;
+      out << "set ylabel '" << energyLabel << " (" << unit << ")'" << std::endl;
     }
 
     // Fermi level
     if (Efermi > Emin) {
       out << std::endl << "# Fermi level" << std::endl;
-      out << " set arrow from 0, " << Efermi << " to graph 1, first " << Efermi
+      out << "set arrow from 0, " << Efermi << " to graph 1, first " << Efermi
         << " nohead lt 1 lc rgb '" << EFERMI_COLOR << "' lw 3" << std::endl;
     }
 
     // Plot data
     out << std::endl << "# Data" << std::endl;
-    out << " plot ";
+    out << "plot ";
     // Majority spin
     for (uint b = 0; b < xeigen.number_bands; b++) {
-      if (b > 0) out << "      ";
+      if (b > 0) out << "     ";
       out << "'$band_data' u 1:" << (b + 2)
         << " w l lt -1 lc rgb '" <<  ISPIN_COLORS[0] << "' lw 2"
         << (((xeigen.spin == 1) || (b < xeigen.number_bands - 1))?",\\":"") << std::endl;
@@ -2810,9 +2732,8 @@ namespace plotter {
         out.str("");  //ME20200513 - reset stringstream
       }
     } else {
-      string function = "plotter::PLOT_THERMO():";
       string message = "Could not find file " + thermo_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
   }
 
@@ -2831,7 +2752,7 @@ namespace plotter {
   void PLOT_THERMO_QHA(xoption& plotoptions, stringstream& out,ostream& oss) {ofstream FileMESSAGE; PLOT_THERMO_QHA(plotoptions,out,FileMESSAGE,oss);} //CO20200404
   void PLOT_THERMO_QHA(xoption& plotoptions, stringstream& out,ofstream& FileMESSAGE,ostream& oss) 
   {
-    string function = "plotter::PLOT_THERMO_QHA():", msg = "";
+    string msg = "";
 
     // Set labels
     static const int nprops = 7;
@@ -2848,7 +2769,7 @@ namespace plotter {
         eos_model != "BM4" && eos_model != "M"){
       msg = "Wrong name of the EOS model was specified. ";
       msg += "Only SJ, BM2, BM3, BM4 or M labels are allowed.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, msg, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, msg, _INPUT_ILLEGAL_);
     }
     string keyword = "QHA_" + eos_model + "_THERMO";
 
@@ -2878,7 +2799,7 @@ namespace plotter {
       }
     } else {
       msg = "Could not find file " + thermo_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, msg, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, msg, _FILE_NOT_FOUND_);
     }
   }
   //AS20200909 END
@@ -2980,14 +2901,13 @@ namespace plotter {
       plotoptions.push_attached("KEYWORD", "AAPL_THERMAL_CONDUCTIVITY");
       plotoptions.flag("CONTRAVARIANT", true);
       plotoptions.push_attached("YMIN", "0");
-      plotoptions.flag("LEGEND_HORIZONTAL"); //CO20200404 - ME LOOK HERE, NO LONGER DEFAULT
-      plotoptions.push_attached("LEGEND_MAXCOLS","3");  //CO20200404 - ME LOOK HERE, NO LONGER DEFAULT
+      plotoptions.flag("LEGEND_HORIZONTAL", true); //CO20200404
+      plotoptions.push_attached("LEGEND_MAXCOLS","3");  //CO20200404
       setPlotLabels(plotoptions, "T", "K", "\\kappa", "W/m K");
       plotMatrix(plotoptions, out,FileMESSAGE,oss);  //CO20200404
     } else {
-      string function = "plotter::PLOT_TCOND()";
       string message = "Could not find file " + tcond_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
   }
 
@@ -3086,7 +3006,6 @@ namespace plotter {
   // Reads data from an AFLOW data file. Requires a START and STOP string to
   // be present so that it can skip headers and other data sets.
   vector<vector<double> > readAflowDataFile(xoption& plotoptions) {
-    string function = "plotter::readAflowDataFile():";
     string message = "";
     vector<vector<double> > data;
     vector<double> row;
@@ -3120,13 +3039,13 @@ namespace plotter {
       if (vcontent[iline] == stopstring) break;
       if (iline == nlines) {
         message = "Wrong file format. No STOP tag found.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_WRONG_FORMAT_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
       }
     }
     if (data.size() == 0) {
       message = "No data extracted from file " + path_to_file + ".";
       message += "File is either empty or has the wrong format.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_WRONG_FORMAT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
     }
     return data;
   }
@@ -3197,35 +3116,35 @@ namespace plotter {
 
     // Margins
     out << "# Margins" << std::endl;
-    out << " set tmargin at screen 0.9" << std::endl;
-    out << " set bmargin at screen 0.22" << std::endl;
+    out << "set tmargin at screen 0.9" << std::endl;
+    out << "set bmargin at screen 0.22" << std::endl;
 
     // Axes
     out << "# Axes" << std::endl;
-    out << " set xrange [" << xmin << ":" << xmax << "]" << std::endl;
-    out << " set yrange [" << ymin << ":" << ymax << "]" << std::endl;
-    out << " set xlabel '$" << xlabel << "$" << xunit << "'" << std::endl;
-    out << " set ylabel '$" << ylabel << "$" << yunit << "'" << std::endl;
-    out << " set tics nomirror out" << std::endl;
+    out << "set xrange [" << xmin << ":" << xmax << "]" << std::endl;
+    out << "set yrange [" << ymin << ":" << ymax << "]" << std::endl;
+    out << "set xlabel '$" << xlabel << "$" << xunit << "'" << std::endl;
+    out << "set ylabel '$" << ylabel << "$" << yunit << "'" << std::endl;
+    out << "set tics nomirror out" << std::endl;
 
     // Key
     out << std::endl << "# Key" << std::endl;
     if (ndata == 1) {  // No need for legend if only one set of data to plot
-      out << " unset key" << std::endl;
+      out << "unset key" << std::endl;
     } else {
-      if(plotoptions.flag("LEGEND_HORIZONTAL")){  //CO20200404 - ME LOOK HERE
+      if(plotoptions.flag("LEGEND_HORIZONTAL")){  //CO20200404
         int maxcols=3;
         string maxcols_str=plotoptions.getattachedscheme("LEGEND_MAXCOLS");
         if(!maxcols_str.empty()){maxcols=aurostd::string2utype<int>(maxcols_str);}
-        out << " set key horizontal maxcols " << maxcols << std::endl;
+        out << "set key horizontal maxcols " << maxcols << std::endl;
       }
     }
 
     // Plot
     out << std::endl << "# Plot" << std::endl;
-    out << " plot ";
+    out << "plot ";
     for (uint i = 0; i < ndata; i++) {
-      if (i > 0) out << "      ";
+      if (i > 0) out << "     ";
       out << "'$matrix_data' u 1:" << (i + 2) << " w " << plotstyle;
       if (lines) out << " lw 2";
       if (lines_set) out << " lt " << line_types[i];

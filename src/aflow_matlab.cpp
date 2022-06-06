@@ -28,11 +28,13 @@ bool KBIN_MATLAB_Extract(string AflowIn,ifstream &FileAFLOWIN,ofstream &FileMESS
     if(kflags.AFLOW_MATLAB_FILE && !kflags.AFLOW_MATLAB_MODE_EXPLICIT_START_STOP) {
       aus << "00000  MESSAGE MATLAB  generation EXPLICIT file from " << _AFLOWIN_ << " " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
-      aurostd::ExtractToFileEXPLICIT(FileAFLOWIN,string(aflags.Directory+"/aflow.m"),"[AFLOW_MATLAB_FILE]");
+      aurostd::string2file(aurostd::substring2string(FileAFLOWIN,"[AFLOW_MATLAB_FILE]",0),string(aflags.Directory+"/aflow.m"));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToFileEXPLICIT(FileAFLOWIN,string(aflags.Directory+"/aflow.m"),"[AFLOW_MATLAB_FILE]");
     } else if(!kflags.AFLOW_MATLAB_FILE && kflags.AFLOW_MATLAB_MODE_EXPLICIT_START_STOP) {
       aus << "00000  MESSAGE MATLAB  generation EXPLICIT file from " << _AFLOWIN_ << " with START/STOP  " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);    
-      aurostd::ExtractToFileEXPLICIT(FileAFLOWIN,string(aflags.Directory+"/aflow.m"),"[MATLAB_MODE_EXPLICIT]START","[MATLAB_MODE_EXPLICIT]STOP");
+      aurostd::string2file(aurostd::substring2string(FileAFLOWIN,"[MATLAB_MODE_EXPLICIT]START","[MATLAB_MODE_EXPLICIT]STOP",0),string(aflags.Directory+"/aflow.m"));
+      //[SD20220520 - OBSOLETE]aurostd::ExtractToFileEXPLICIT(FileAFLOWIN,string(aflags.Directory+"/aflow.m"),"[MATLAB_MODE_EXPLICIT]START","[MATLAB_MODE_EXPLICIT]STOP");
     } else {
       aus << "EEEEE  [MATLAB_MODE_EXPLICIT] do not confuse aflow !!"  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       aus << "EEEEE  [MATLAB_MODE_EXPLICIT] Possible modes "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
@@ -214,7 +216,7 @@ bool KBIN_MATLAB_Extract(string AflowIn,ifstream &FileAFLOWIN,ofstream &FileMESS
     }
     if(!kflags.AFLOW_MATLAB_FILE_COMMAND && (kflags.AFLOW_MATLAB_FILE_FILE || !kflags.AFLOW_MATLAB_FILE_FILE)) {
       if(kflags.AFLOW_MATLAB_FILE_FILE) {
-        file=aurostd::substring2string(AflowIn,"[AFLOW_MATLAB_FILE]FILE=",TRUE);
+        file=aurostd::substring2string(AflowIn,"[AFLOW_MATLAB_FILE]FILE=",1,TRUE);
         aus << "00000  MESSAGE aflow.m   generation from file=" << file << endl;
         aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  
       } else {
@@ -239,7 +241,7 @@ bool KBIN_MATLAB_Extract(string AflowIn,ifstream &FileAFLOWIN,ofstream &FileMESS
       if(Krun) Krun=(Krun && aurostd::stringstream2file(aflowm,string(aflags.Directory+"/aflow.m")));
     }
     if(kflags.AFLOW_MATLAB_FILE_COMMAND && !kflags.AFLOW_MATLAB_FILE_FILE) {
-      file=aurostd::substring2string(AflowIn,"[AFLOW_MATLAB_FILE]COMMAND=",FALSE);
+      file=aurostd::substring2string(AflowIn,"[AFLOW_MATLAB_FILE]COMMAND=",1,FALSE);
       aus << "00000  MESSAGE aflow.m   generation from command= '" << file << "' " << endl;
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);  
       file=file+" > ./_aflow_AFLOWM."+XHOST.ostrPID.str()+"."+XHOST.ostrTID.str()+".tmp";    // create temp //CO20200502 - threadID

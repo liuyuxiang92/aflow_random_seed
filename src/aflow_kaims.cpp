@@ -81,10 +81,11 @@ namespace KBIN{
         string STOP="[AIMS_GEOM_MODE_EXPLICIT]STOP";
         START="[AIMS_GEOM_MODE_EXPLICIT]START."+aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.at(i);
         STOP="[AIMS_GEOM_MODE_EXPLICIT]STOP."+aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.at(i);
-        stringstream GEOM;GEOM.clear();GEOM.str(std::string());
-        if(aurostd::substring2bool(input_file.str(),START) && aurostd::substring2bool(input_file.str(),STOP))
-          aurostd::ExtractToStringstreamEXPLICIT(input_file.str(),GEOM,START,STOP);
-        aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.push_back(xstructure(GEOM,IOAIMS_AUTO));
+        stringstream GEOM;
+        GEOM.str(aurostd::substring2string(input_file.str(),START,STOP,-1));
+        //[SD20220520 - OBSOLETE]if(aurostd::substring2bool(input_file.str(),START) && aurostd::substring2bool(input_file.str(),STOP))
+          //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(input_file.str(),GEOM,START,STOP);
+        if(!GEOM.str().empty()) aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.push_back(xstructure(GEOM,IOAIMS_AUTO));
       }
       if(LDEBUG) cerr << "DEBUG " << aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size() << endl;
       if(LDEBUG) cerr << "DEBUG " << aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size() << endl;
@@ -208,8 +209,8 @@ namespace KBIN{
     // *********************************************************************************************************************
     // OPERATIONS related to PARTICULAR MACHINES ***************************************************************************
 
-    if(LDEBUG) cerr << "[DEBUG] aflags.AFLOW_MACHINE_GLOBAL=" << aflags.AFLOW_MACHINE_GLOBAL << endl;
-    if(LDEBUG) cerr << "[DEBUG] aflags.AFLOW_MACHINE_LOCAL=" << aflags.AFLOW_MACHINE_LOCAL << endl;
+    if(LDEBUG) cerr << "[DEBUG] aflags.AFLOW_MACHINE_GLOBAL=" << aflags.AFLOW_MACHINE_GLOBAL.getattachedscheme("NAME") << endl; //HE20220309 use machine name
+    if(LDEBUG) cerr << "[DEBUG] aflags.AFLOW_MACHINE_LOCAL=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << endl; //HE20220309 use machine name
 
     // ***************************************************************************
     // Get the KBIN_BIN name
@@ -412,7 +413,12 @@ namespace KBIN{
               _xinput xinput(xaims);
               readModulesFromAflowIn(AflowIn, kflags, xinput);  //ME20181027
               _xflags xflags(aimsflags);
-              KBIN::RunPhonons_APL(xinput,AflowIn,aflags,kflags,xflags,FileMESSAGE);  //now it's general
+              //ME20200107 - Wrap in a try statement so that faulty APL runs don't kill other post-processing
+              try {
+                KBIN::RunPhonons_APL(xinput,AflowIn,aflags,kflags,xflags,FileMESSAGE);  //now it's general
+              } catch (aurostd::xerror e) {
+                pflow::logger(e.whereFileName(), e.whereFunction(), e.buildMessageString(), aflags.Directory, FileMESSAGE, std::cout, _LOGGER_ERROR_);
+              }
               //KBIN::RunPhonons_APL(xaims,AflowIn,aflags,kflags,aimsflags,FileMESSAGE);
             }
             //[MAKE XINPUT] here CORMAC WILL POOP an IF=>AGL

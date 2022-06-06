@@ -4112,7 +4112,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
 //[CO20200404 - OBSOLETE]}
 
 bool xOUTCAR::GetIonicStepsData(){  //CO20211106
-  bool LDEBUG=(1||FALSE || XHOST.DEBUG);
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy=XPID+"xOUTCAR::GetIonicStepsData():";
   vxstr_ionic.clear();
   venergy_ionic.clear();
@@ -4149,7 +4149,7 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
         tmp_str=vtokens[1];
         aurostd::string2tokens(tmp_str,vtokens," ");
         if(vtokens.size()>0 && vtokens.size()==species_pp.size()){
-          num_each_type=aurostd::vector2deque(aurostd::vectorstring2vectorint(vtokens));
+          num_each_type=aurostd::vector2deque(aurostd::vectorstring2vectorutype<int>(vtokens));
           if(LDEBUG){
             cerr << soliloquy << " vcontent[iline=" << iline << "]=\"" << vcontent[iline] << "\"" << endl;
           }
@@ -4300,26 +4300,67 @@ bool xOUTCAR::GetIonicStepsData(){  //CO20211106
   return true;
 }
 
-void xOUTCAR::WriteMTPCFG(const string& outcar_path,stringstream& output_ss){  //CO20211106
+void xOUTCAR::populateAFLOWLIBEntry(aflowlib::_aflowlib_entry& data,const string& outcar_path){ //CO20220124
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy=XPID+"xOUTCAR::populateAFLOWLIBEntry():";
+
+  if(LDEBUG){cerr << soliloquy << " outcar_path=" << outcar_path << endl;}
+  data.clear();
+  data.vspecies.clear(); for(uint i=0;i<species.size();i++) { data.vspecies.push_back(species.at(i)); } // for aflowlib_libraries.cpp
+  data.nspecies=data.vspecies.size();
+  data.vspecies_pp_AUID.clear(); for(uint i=0;i<species_pp_AUID.size();i++) { data.vspecies_pp_AUID.push_back(species_pp_AUID.at(i)); } // for aflowlib_libraries.cpp
+  data.dft_type=pp_type;
+  data.METAGGA=METAGGA;
+
+  data.catalog="LIB"+aurostd::utype2string(data.vspecies.size()); //default
+  if(!outcar_path.empty()){
+    aflowlib::setAURL(data,aurostd::dirname(outcar_path));  //outcar_path is a path to a file, not a directory like directory_LIB
+  }
+
+  if(LDEBUG){
+    cerr << soliloquy << " vspecies=" << aurostd::joinWDelimiter(data.vspecies,",") << endl;
+    cerr << soliloquy << " vspecies_pp_AUID=" << aurostd::joinWDelimiter(data.vspecies_pp_AUID,",") << endl;
+    cerr << soliloquy << " dft_type=" << data.dft_type << endl;
+    cerr << soliloquy << " METAGGA=" << data.METAGGA << endl;
+    cerr << soliloquy << " aurl=" << data.aurl << endl;
+    cerr << soliloquy << " catalog=" << data.catalog << endl;
+  }
+}
+
+void xOUTCAR::WriteMTPCFG(stringstream& output_ss,const string& outcar_path){  //CO20211106
+  vector<string> velements;
+  return WriteMTPCFG(output_ss,outcar_path,velements);
+}
+void xOUTCAR::WriteMTPCFG(stringstream& output_ss,const string& outcar_path,const vector<string>& _velements){  //CO20211106
   string soliloquy=XPID+"xOUTCAR::WriteMTPCFG():";
 
   if(vxstr_ionic.size()!=venergy_ionic.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vxstr_ionic.size()!=venergy_ionic",_FILE_CORRUPT_);}
   if(vxstr_ionic.size()!=vstresses_ionic.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vxstr_ionic.size()!=vstresses_ionic",_FILE_CORRUPT_);}
+
+  aflowlib::_aflowlib_entry data;
+  populateAFLOWLIBEntry(data,outcar_path);
+  vector<string> velements=_velements;
+  if(velements.empty()){velements=data.vspecies;}
+  bool FORMATION_CALC=false;
 
   output_ss.setf(std::ios::fixed,std::ios::floatfield);
   uint _precision_=_DOUBLE_WRITE_PRECISION_MAX_; //14; //was 16 SC 10 DM //CO20180515
   output_ss.precision(_precision_);
 
   string tab=" ";
+  uint istr,iatom,itype=0;
+  uint i=0,j=0;
+  int icoord=0;
+  bool found_itype=false;
 
-  for(uint istr=0;istr<vxstr_ionic.size();istr++){
+  for(istr=0;istr<vxstr_ionic.size();istr++){
     const xstructure& a=vxstr_ionic[istr];
     output_ss << "BEGIN_CFG" << endl;
     output_ss << tab << "Size" << endl;
     output_ss << tab << tab << a.atoms.size() << endl;
     output_ss << tab << "Supercell" << endl;
-    for(uint i=1;i<=3;i++) {
-      for(uint j=1;j<=3;j++) {
+    for(i=1;i<=3;i++) {
+      for(j=1;j<=3;j++) {
         output_ss << tab << tab << " ";
         if(abs(a.lattice(i,j))<10.0) output_ss << " ";
         if(!std::signbit(a.lattice(i,j))) output_ss << " ";
@@ -4328,20 +4369,36 @@ void xOUTCAR::WriteMTPCFG(const string& outcar_path,stringstream& output_ss){  /
       output_ss << endl;
     }
     output_ss << tab << "AtomData: id type direct_x direct_y direct_z  fx fy fz" << endl;
-    for(uint iatom=0;iatom<a.atoms.size();iatom++){
+    for(iatom=0;iatom<a.atoms.size();iatom++){
       output_ss << tab << tab;
       if(iatom<10) output_ss << "  ";
       else if(iatom<100) output_ss << " ";
       output_ss << iatom << " ";
-      if(abs(a.atoms[iatom].type)<10) output_ss << "  ";
-      else if(abs(a.atoms[iatom].type)<100) output_ss << " ";
-      output_ss << a.atoms[iatom].type << " ";
-      for(int icoord=a.atoms[iatom].fpos.lrows;icoord<=a.atoms[iatom].fpos.urows;icoord++){
+      if(0){
+        //this assumes all of the OUTCARs have the species in the right order
+        //if we're looking at the CrMn alloy, some systems in LIB2 have Mn only
+        //itype==1, base it on input velements (if available)
+        if(abs(a.atoms[iatom].type)<10) output_ss << "  ";
+        else if(abs(a.atoms[iatom].type)<100) output_ss << " ";
+        output_ss << a.atoms[iatom].type << " ";
+      }else{
+        found_itype=false;
+        for(itype=0;itype<velements.size()&&!found_itype;itype++){
+          if(a.atoms[iatom].cleanname==velements[itype]){
+            if(itype<10) output_ss << "  ";
+            else if(itype<100) output_ss << " ";
+            output_ss << itype << " ";
+            found_itype=true;
+          }
+        }
+        if(!found_itype){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"itype not found",_FILE_CORRUPT_);}
+      }
+      for(icoord=a.atoms[iatom].fpos.lrows;icoord<=a.atoms[iatom].fpos.urows;icoord++){
         if(!std::signbit(a.atoms[iatom].fpos[icoord])) output_ss << " ";
         output_ss << a.atoms[iatom].fpos[icoord] << (icoord<a.atoms[iatom].fpos.urows?" ":"");
       }
       output_ss << " ";
-      for(int icoord=a.atoms[iatom].force.lrows;icoord<=a.atoms[iatom].force.urows;icoord++){
+      for(icoord=a.atoms[iatom].force.lrows;icoord<=a.atoms[iatom].force.urows;icoord++){
         if(abs(a.atoms[iatom].force[icoord])<10) output_ss << "  ";
         else if(abs(a.atoms[iatom].force[icoord])<100) output_ss << " ";
         if(!std::signbit(a.atoms[iatom].force[icoord])) output_ss << " ";
@@ -4353,17 +4410,23 @@ void xOUTCAR::WriteMTPCFG(const string& outcar_path,stringstream& output_ss){  /
     output_ss << tab << tab << venergy_ionic[istr] << endl;
     output_ss << tab << "PlusStress: xx yy zz xy yz xz" << endl; //order as vasp
     output_ss << tab << tab;
-    for(int icoord=vstresses_ionic[istr].lrows;icoord<=vstresses_ionic[istr].urows;icoord++){
+    for(icoord=vstresses_ionic[istr].lrows;icoord<=vstresses_ionic[istr].urows;icoord++){
       if(abs(vstresses_ionic[istr][icoord])<10) output_ss << "  ";
       else if(abs(vstresses_ionic[istr][icoord])<100) output_ss << " ";
       if(!std::signbit(vstresses_ionic[istr][icoord])) output_ss << " ";
       output_ss << vstresses_ionic[istr][icoord] << (icoord<vstresses_ionic[istr].urows?" ":"");
     }
     output_ss << endl;
+    data.enthalpy_cell=data.enthalpy_atom=venergy_ionic[istr];
+    data.enthalpy_atom/=a.atoms.size();
+    FORMATION_CALC=aflowlib::LIB2RAW_Calculate_FormationEnthalpy(data,a,soliloquy);
+    if(FORMATION_CALC){
+      output_ss << tab << "Feature enthalpy_formation_atom " << data.enthalpy_formation_atom << endl;
+    }
     output_ss << tab << "Feature EFS_by vasp" << endl;
     output_ss << tab << "Feature from aflow.org:" << outcar_path << ":ionic_step=" << istr+1 << endl;
     output_ss << tab << "Feature elements ";
-    for(uint ispecies=0;ispecies<a.species.size();ispecies++){output_ss << KBIN::VASP_PseudoPotential_CleanName(a.species[ispecies]);}
+    for(itype=0;itype<a.species.size();itype++){output_ss << KBIN::VASP_PseudoPotential_CleanName(a.species[itype]);}
     output_ss << endl;
     output_ss << "END_CFG" << endl;
   }
@@ -4866,13 +4929,14 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 void xDOSCAR::convertSpinOFF2ON() { //CO20191217
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   string soliloquy = XPID + "xDOSCAR::convertSpinOFF2ON():";
-  long double seconds=aurostd::get_seconds();
-  if(LDEBUG){cerr << soliloquy << " BEGIN (" << time_delay(seconds) << ")" << endl;}
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
+  uint iatom=0,iorbital=0;
+  
   //check that it is truly SPIN-OFF
   if(viDOS.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"viDOS.size()!=1",_INPUT_ERROR_);}; //no conversion needed
-  for(uint iatom=0;iatom<vDOS.size();iatom++){
-    for(uint iorbital=0;iorbital<vDOS[iatom].size();iorbital++){
+  for(iatom=0;iatom<vDOS.size();iatom++){
+    for(iorbital=0;iorbital<vDOS[iatom].size();iorbital++){
       if(vDOS[iatom][iorbital].size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vDOS[iatom][iorbital].size()!=1",_INPUT_ERROR_);}; //no conversion needed
     }
   }
@@ -4885,8 +4949,8 @@ void xDOSCAR::convertSpinOFF2ON() { //CO20191217
 
   //copy everything over
   viDOS.push_back(viDOS.back());
-  for(uint iatom=0;iatom<vDOS.size();iatom++){
-    for(uint iorbital=0;iorbital<vDOS[iatom].size();iorbital++){
+  for(iatom=0;iatom<vDOS.size();iatom++){
+    for(iorbital=0;iorbital<vDOS[iatom].size();iorbital++){
       vDOS[iatom][iorbital].push_back(vDOS[iatom][iorbital].back());
     }
   }
@@ -4896,6 +4960,65 @@ void xDOSCAR::convertSpinOFF2ON() { //CO20191217
   Egap_fit.push_back(Egap_fit.back());
   Egap_type.push_back(Egap_type.back());
   spin=1;
+}
+
+void xDOSCAR::addAtomChannel(){  //CO20211124
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy = XPID + "xDOSCAR::addOrbitalChannel():";
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+  string ERROR_out="";
+  if(!checkDOS(ERROR_out)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,ERROR_out,_INDEX_BOUNDS_);} //no conversion needed
+
+  uint atoms_size=vDOS.size();if(atoms_size==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vDOS.size()==0",_INDEX_BOUNDS_);} //no conversion needed
+  uint orbital_size=vDOS.front().size();
+  uint spin_size=0;if(orbital_size>0){spin_size=vDOS.front().front().size();}
+  uint energy_size=0;if(orbital_size>0 && spin_size>0){energy_size=vDOS.front().front().front().size();}
+  vDOS.push_back(deque<deque<deque<double> > >(0));
+  uint iorbital=0,ispin=0;
+  if(orbital_size>0){vDOS.back().resize(orbital_size);}
+  if(spin_size>0){
+    for(iorbital=0;iorbital<orbital_size;iorbital++){
+      vDOS.back()[iorbital].resize(spin_size);
+      if(energy_size>0){
+        for(ispin=0;ispin<spin_size;ispin++){vDOS.back()[iorbital][ispin].resize(energy_size,0.0);}
+      }
+    }
+  }
+  number_atoms+=1;
+}
+
+void xDOSCAR::addOrbitalChannel(){  //CO20211124
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  string soliloquy = XPID + "xDOSCAR::addOrbitalChannel():";
+  if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+
+  string ERROR_out="";
+  if(!checkDOS(ERROR_out)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,ERROR_out,_INDEX_BOUNDS_);} //no conversion needed
+
+  uint atoms_size=vDOS.size();if(atoms_size==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"vDOS.size()==0",_INDEX_BOUNDS_);} //no conversion needed
+  uint orbital_size=vDOS.front().size();
+  uint spin_size=0;if(orbital_size>0){spin_size=vDOS.front().front().size();}
+  uint energy_size=0;if(orbital_size>0 && spin_size>0){energy_size=vDOS.front().front().front().size();}
+  uint iatom=0,ispin=0;
+  for(iatom=0;iatom<atoms_size;iatom++){
+    vDOS[iatom].push_back(deque<deque<double> >(0));
+    if(spin_size>0){vDOS[iatom].back().resize(spin_size);}
+    if(energy_size>0){
+      for(ispin=0;ispin<spin_size;ispin++){vDOS[iatom].back()[ispin].resize(energy_size,0.0);}
+    }
+  }
+}
+
+void xDOSCAR::resetVDOS(){  //CO20211124
+  uint iatom=0,iorbital=0,ispin=0;
+  for(iatom=0;iatom<vDOS.size();iatom++){
+    for(iorbital=0;iorbital<vDOS[iatom].size();iorbital++){
+      for(ispin=0;ispin<vDOS[iatom][iorbital].size();ispin++){
+        std::fill(vDOS[iatom][iorbital][ispin].begin(),vDOS[iatom][iorbital][ispin].end(),0.0);
+      }
+    }
+  }
 }
 
 bool xDOSCAR::checkDOS(string& ERROR_out) const { //CO20191110
@@ -5134,7 +5257,7 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
 deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(const xstructure& xstr) const {return GetVDOSSpecies(xstr.num_each_type);} //CO20191004
 deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(deque<int> num_each_type) const { //CO20191004
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XPID + "xDOSCAR::GetBandGap():";
+  string soliloquy = XPID + "xDOSCAR::GetVDOSSpecies():";
   stringstream message;
 
   if((content == "") || (vcontent.size() == 0)) {
@@ -5171,7 +5294,8 @@ deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(deque<int> num_eac
   }
 
   if(atoms_total+1!=IATOM){ //total column
-    message << "Input xstructure and DOS mismatch: atoms_total+1!=vDOS.size()";
+    message << "Input xstructure and DOS mismatch: atoms_total+1!=vDOS.size()" << endl;
+    message << "For POCC runs, check that all ARUN.POCC's have the same num_each_type" << endl;
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INDEX_MISMATCH_);
   }
 
@@ -7412,9 +7536,8 @@ bool IBZextrema(xEIGENVAL& xeigenval,
               curvature.clear() ; posvec.clear() ;
             }
             //ME20200724 - there used to be an exit here without comment or explanation
-            string function = "IBZextrema()";
             string message = "branches.at(itr0).at(itr1)[1] > branches.at(itr0).at(itr1)[2])";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message);
           } else if(branches.at(itr0).at(itr1)[1] < branches.at(itr0).at(itr1)[2]) {
             for(int itr2=branches.at(itr0).at(itr1)[1]+2; itr2<=branches.at(itr0).at(itr1)[2]-2; itr2++) {
               ndxvec[1] = itr2-2 ;

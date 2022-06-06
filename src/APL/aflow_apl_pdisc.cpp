@@ -7,18 +7,6 @@
 
 #include "aflow_apl.h"
 
-// Some parts are written within the C++0x support in GCC, especially the std::thread,
-// which is implemented in gcc 4.4 and higher.... For multithreads with std::thread see:
-// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
-#if GCC_VERSION >= 40400  // added two zeros
-#define AFLOW_APL_MULTITHREADS_ENABLE 1
-#include <thread>
-#else
-#warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
-#endif
-
-using namespace std;
-
 //////////////////////////////////////////////////////////////////////////////
 //                                                                          //
 //                        PhononDispersionCalculator                        //
@@ -91,15 +79,14 @@ namespace apl {
       const string& USER_DC_INITLABELS,
       int USER_DC_NPOINTS, 
       bool CARTESIAN_COORDS) {
-    string function = "apl::PhononDispersionCalculator::initPathCoords():";
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     if(USER_DC_INITCOORDS.empty() || USER_DC_INITLABELS.empty()) {
       string message = "Inputs are empty.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INPUT_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
     }
     _pb.defineCustomPoints(USER_DC_INITCOORDS,USER_DC_INITLABELS,_pc->getSupercell(),CARTESIAN_COORDS);
     _pb.setDensity(USER_DC_NPOINTS);
@@ -107,11 +94,10 @@ namespace apl {
   }
 
   void PhononDispersionCalculator::initPathLattice(const string& USER_DC_INITLATTICE,int USER_DC_NPOINTS){
-    string function = "apl::PhononDispersionCalculator::initPathLattice():";
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     string lattice = USER_DC_INITLATTICE;
     if (lattice.empty()) {
@@ -178,9 +164,8 @@ namespace apl {
         aurostd::string2tokens(USER_DC_OWNPATH, tokens, "-");
         string path;
         if (tokens[0].find('|') != string::npos) {
-          string function = "PhononDispersionCalculator::setPath():";
           string message = "Cannot have | in the first path coordinate";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _INPUT_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
         } else {
           path = tokens[0];
         }
@@ -201,31 +186,26 @@ namespace apl {
 
   //////////////////////////////////////////////////////////////////////////////
 
-  void PhononDispersionCalculator::calculateInOneThread(int startIndex, int endIndex) {
-    //cout << "Thread: from " << startIndex << " to " <<  endIndex << std::endl;
-    for (int iqp = startIndex; iqp < endIndex; iqp++) {
-      //ME20200206 - get direction for q-points near Gamma for non-analytical correction
-      // or the discontinuity due to LO-TO splitting is not accurately captured.
-      if (_pc->isPolarMaterial() && (aurostd::modulus(_qpoints[iqp]) < 0.005)) {
-        int npts = _pb.getDensity() + 1;
-        int i = iqp/npts;
-        xvector<double> qpoint_nac = _qpoints[i * npts] - _qpoints[(i + 1) * npts - 1];
-        _freqs[iqp] = _pc->getFrequency(_qpoints[iqp], qpoint_nac, _frequencyFormat);
-      } else {
-        _freqs[iqp] = _pc->getFrequency(_qpoints[iqp], _frequencyFormat);
-      }
-      //std::this_thread::yield();
+  void PhononDispersionCalculator::calculateInOneThread(int iqp) {
+    //ME20200206 - get direction for q-points near Gamma for non-analytical correction
+    // or the discontinuity due to LO-TO splitting is not accurately captured.
+    if (_pc->isPolarMaterial() && (aurostd::modulus(_qpoints[iqp]) < 0.005)) {
+      int npts = _pb.getDensity() + 1;
+      int i = iqp/npts;
+      xvector<double> qpoint_nac = _qpoints[i * npts] - _qpoints[(i + 1) * npts - 1];
+      _freqs[iqp] = _pc->getFrequency(_qpoints[iqp], qpoint_nac, _frequencyFormat);
+    } else {
+      _freqs[iqp] = _pc->getFrequency(_qpoints[iqp], _frequencyFormat);
     }
   }
 
   //////////////////////////////////////////////////////////////////////////////
 
   void PhononDispersionCalculator::calc(const IPCFreqFlags frequencyFormat) {
-    string function = "apl::PhononDispersionCalculator::calc():";
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     // Save
     _frequencyFormat = frequencyFormat;
@@ -234,7 +214,7 @@ namespace apl {
     if (_qpoints.empty()) {
       //throw apl::APLRuntimeError("There are no points for calculation.");
       message = "There are no points for the calculation.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     // Compute frequencies for each q-point
@@ -247,41 +227,23 @@ namespace apl {
     for (uint i = 0; i < _qpoints.size(); i++)
       _freqs.push_back(zero);
 
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
-    // Get the number of CPUS
-    int ncpus = _pc->getNCPUs();
-
-    if (ncpus > 1) {
-      int startIndex, endIndex;
-      std::vector<std::thread*> threads;
-      vector<vector<int> > thread_dist = getThreadDistribution((int) _qpoints.size(), ncpus);
-      for (int icpu = 0; icpu < ncpus; icpu++) {
-        startIndex = thread_dist[icpu][0];
-        endIndex = thread_dist[icpu][1];
-        threads.push_back(new std::thread(&PhononDispersionCalculator::calculateInOneThread, this, startIndex, endIndex));
-      }
-
-      for (uint i = 0; i < threads.size(); i++) {
-        threads[i]->join();
-        delete threads[i];
-      }
-      threads.clear();
-    } else {
-      calculateInOneThread(0, (int) _qpoints.size());
-    }
+    int nqps = (int) _qpoints.size();
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    xthread::xThread xt(_pc->getNCPUs());
+    std::function<void(int)> fn = std::bind(&PhononDispersionCalculator::calculateInOneThread, this, std::placeholders::_1);
+    xt.run(nqps, fn);
 #else
-    calculateInOneThread(0, (int) _qpoints.size());
+    for (int i = 0; i < nqps; i++) calculateInOneThread(i);
 #endif
   }
 
   //////////////////////////////////////////////////////////////////////////////
 
   void PhononDispersionCalculator::writePDIS(const string& directory) {
-    string function = "apl::PhononDispersionCalculator::writePDIS():";
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_PDIS_FILE); //ME20181226
     message = "Writing dispersion curves into file " + filename + ".";
@@ -307,7 +269,7 @@ namespace apl {
     outfile << setprecision(8);
     double x = 0.0;
     double wholePathLength = _pb.getPathLength();
-    map<double, string> labelMap;
+    std::map<double, string> labelMap;
     for (uint i = 1; i < _pb.getPointSize(); i++) {
       outfile << "# <label>     " << x << " "
         << setw(5) << _pb.getPointLabel(i)
@@ -410,7 +372,7 @@ namespace apl {
     aurostd::stringstream2file(outfile, filename); //ME20181226
     if (!aurostd::FileExist(filename)) { //ME20181226
       message = "Cannot open output file " + filename + "."; //ME20181226
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
 
     //PN //PN20180705
@@ -418,7 +380,7 @@ namespace apl {
     aurostd::stringstream2file(ouths, hskptsfile); //ME20181226
     if (!aurostd::FileExist(hskptsfile)) { //ME20181226
       message = "Cannot open output file " + hskptsfile + "."; //ME20181226
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
     //PN
   }
@@ -456,11 +418,10 @@ namespace apl {
   //ME20190614 START
   // Write the eigenvalues into a VASP EIGENVAL-formatted file
   void PhononDispersionCalculator::writePHEIGENVAL(const string& directory) {
-    string function = "PhononDispersionCalculator::writePHEIGENVAL():";
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHEIGENVAL_FILE);
     message = "Writing phonon eigenvalues into file " + filename + ".";
@@ -470,7 +431,7 @@ namespace apl {
     aurostd::stringstream2file(eigenval, filename);
     if (!aurostd::FileExist(filename)) {
       message = "Cannot open output file " + filename + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
 
     // Also write PHKPOINTS and PHPOSCAR file
@@ -483,17 +444,15 @@ namespace apl {
     // poscar << xstr;
     // aurostd::stringstream2file(poscar, filename);
     // if (!aurostd::FileExist(filename)) {
-    //   string function = "PhononDispersionCalculator::writePHPOSCAR()";
     //   string message = "Cannot open output file " + filename + ".";
-    //   throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+    //   throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     // }
   }
 
   xEIGENVAL PhononDispersionCalculator::createEIGENVAL() {
     if (!_pc_set) {
-      string function = "apl::PhononDispersionCalculator::createEIGENVAL():";
       string message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     xEIGENVAL xeigen;
     stringstream outfile;
@@ -545,11 +504,10 @@ namespace apl {
 
   // Write the k-point path into a VASP KPOINTS-formatted file
   void PhononDispersionCalculator::writePHKPOINTS(const string& directory) {
-    string function = "PhononDispersionCalculator::writePHKPOINTS():";
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHKPOINTS_FILE);
     stringstream kpoints;
@@ -557,7 +515,7 @@ namespace apl {
     aurostd::stringstream2file(kpoints, filename);
     if (!aurostd::FileExist(filename)) {
       message = "Cannot open output file " + filename + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 
@@ -688,9 +646,8 @@ namespace apl {
     if( p.rows != _pointsVectorDimension ) {
       //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::addPoint(); Wrong dimension of the point.");
-      string function = "apl::PathBuilder::addPoint():";
       string message = "Wrong dimension of the point.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     if( p.lrows != _pointsVectorStartingIndex ) {
@@ -718,9 +675,8 @@ namespace apl {
     if( n < 0 ) {
       //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::setDensity(); The density should be >= 0.");
-      string function = "apl::PathBuilder::setDensity():";
       string message = "The density should be >= 0.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     _nPointsPerSubPath = n;
   }
@@ -728,7 +684,6 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   void PathBuilder::buildPath() {
-    string function = "apl::PathBuilder::buildPath():";
     string message = "";
     // Remove the old path
     _path.clear();
@@ -738,7 +693,7 @@ namespace apl {
       //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::buildPath; There are no points.");
       message ="There are no points.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     };
 
     // Create path in the SINGLE_POINT_MODE
@@ -765,7 +720,7 @@ namespace apl {
         //ME20191031 - use xerror
         //throw APLRuntimeError("apl::PathBuilder::buildPath(); The number of points is odd.");
         message = "The number of points is odd.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
 
       xvector<double> startPoint(3), endPoint(3);
@@ -808,9 +763,8 @@ namespace apl {
 
     //ME20191031 - use xerror
     //throw APLRuntimeError("apl::PathBuilder::getPointSize(); Unknown mode.");
-    string function = "apl::PathBuilder::getPointSize():";
     string message = "Unknown mode.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -828,9 +782,8 @@ namespace apl {
     else {
       //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::getPointLength(); Unknown mode.");
-      string function = "apl::PathBuilder::getPointLength():";
       string message = "Unknown mode.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
 
     //
@@ -846,13 +799,12 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   double PathBuilder::getPathLength(uint i) {
-    string function = "apl::PathBuilder::getPathLength():";
     string message = "";
     if( i <= 0 ) {
       //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::getPathLength(); Wrong index. The index has to start from 1.");
       message = "Wrong index. The index has to start from 1.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
 
     // Quick solution 1...
@@ -865,7 +817,7 @@ namespace apl {
         //ME20191031 - use xerror
         //throw APLRuntimeError("apl::PathBuilder::getPathLength(); Wrong index.");
         message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
       }
       if( _store == RECIPROCAL_LATTICE ) {
         length = aurostd::modulus( F2C(trasp(reciprocalLattice),_points[i]) - F2C(trasp(reciprocalLattice),_points[i-1]) );
@@ -880,7 +832,7 @@ namespace apl {
         //ME20191031 - use xerror
         //throw APLRuntimeError("apl::PathBuilder::getPathLength(); Wrong index.");
         message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
       }
       if( _store == RECIPROCAL_LATTICE ) {
         length = aurostd::modulus( F2C(trasp(reciprocalLattice),_points[(i*2)-1]) - F2C(trasp(reciprocalLattice),_points[(i-1)*2]) );
@@ -893,26 +845,25 @@ namespace apl {
     //ME20191031 - use xerror
     //throw APLRuntimeError("apl::PathBuilder::getPathLength(); Unknown mode.");
     message = "Unknown mode.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
   xvector<double> PathBuilder::getPoint(uint i) {
-    string function = "apl::PathBuilder::getPoint():";
     string message = "";
     if( i <= 0 ) {
       //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::getPoint(); Wrong index. The index has to start from 1.");
       message = "Wrong index. The index has to start from 1.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
     if( _mode == SINGLE_POINT_MODE ) {
       if( i > _points.size() ) {
         //ME20191031 - use xerror
         //throw APLRuntimeError("apl::PathBuilder::getPoint(); Wrong index.");
         message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
       }
       return _points[i-1];
     } else if( _mode == COUPLE_POINT_MODE ) {
@@ -920,7 +871,7 @@ namespace apl {
         //ME20191031 - use xerro
         //throw APLRuntimeError("apl::PathBuilder::getPoint(); Wrong index.");
         message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
       }
       if( i == 1 ) return _points[0];
       if( i == (_points.size()/2)+1 ) return _points[_points.size()-1];
@@ -930,28 +881,26 @@ namespace apl {
     //ME20191031 - use xerror
     //throw APLRuntimeError("apl::PathBuilder::getPoint(); Unknown mode.");
     message = "Unknown mode.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
   }
 
   // ///////////////////////////////////////////////////////////////////////////
 
   string PathBuilder::getPointLabel(uint i) {
-    string function = "apl::PathBuilder::getPointLabel():";
     string message = "";
     if( i <= 0 ) {
       //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::getPointLabel(); Wrong index. The index has to start from 1.");
       message = "Wrong index. The index has to start from 1.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
 
     if( _mode == SINGLE_POINT_MODE ) {
       if( i > _labels.size() ) {
         //ME20191031 - use xerror
         //throw APLRuntimeError("apl::PathBuilder::getPointLabel(); Wrong index.");
-        string function = "apl::PathBuilder::getPointLabel()";
         string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
       }
       return _labels[i-1];
     } else if( _mode == COUPLE_POINT_MODE ) {
@@ -959,7 +908,7 @@ namespace apl {
         //ME20191031 - use xerror
         //throw APLRuntimeError("apl::PathBuilder::getPointLabel(); Wrong index.");
         message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_BOUNDS_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
       }
       if( i == 1 ) return _labels[0];
       if( i == (_labels.size()/2)+1 ) return _labels[_labels.size()-1];
@@ -976,7 +925,7 @@ namespace apl {
     //ME20191031 - use xerror
     //throw APLRuntimeError("apl::PathBuilder::getPointLabel(); Unknown mode.");
     message = "Unknown mode.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -1001,9 +950,8 @@ namespace apl {
       if( j == _labels.size() ) {
         //ME20191031 - use xerror
         //throw APLRuntimeError("apl::PathBuilder::getPath(); Undefined label of the point.");
-        string function = "apl::PathBuilder::getPath():";
         string message = "Undefined label of the point.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
 
       new_points.push_back(_points[j]);      
@@ -1161,9 +1109,8 @@ namespace apl {
     if( !foundBZ ) {
       //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::takeAflowElectronicPath(); The BZ not found for this lattice.");
-      string function = "apl::PathBuilder::takeAflowElectronicPath()";
       string message = "The Brillouin zone was not found for this lattice.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     //   cerr << fileKPOINTS.str() << std::endl;

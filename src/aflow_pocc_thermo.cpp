@@ -256,9 +256,7 @@ namespace pocc {
     string file = aurostd::efile2string(filename);
 
     string block = "[" + blockname + "_FVT_PARAMETERS]";
-    string params_block;
-    aurostd::ExtractToStringEXPLICIT(file, params_block, block + "START",
-        block + "STOP");
+    string params_block = aurostd::substring2string(file, block + "START", block + "STOP", 0);
 
     vector<string> v_params_block = aurostd::string2vectorstring(params_block);
     vector<uint> tokens;
@@ -321,9 +319,8 @@ namespace pocc {
     string function = "EnsembleThermo::readFVTdata():", msg = "";
 
     string block = "[" + blockname + "_FVT]";
-    string data_block;
     string file = aurostd::efile2string(dirname + "/" + filename);
-    aurostd::ExtractToStringEXPLICIT(file, data_block, block + "START", block + "STOP");
+    string data_block = aurostd::substring2string(file, block + "START", block + "STOP", 0);
     vector<string> v_data_block = aurostd::string2vectorstring(data_block);
 
     if (v_data_block.size() != (n_volumes+1)*n_temperatures){ // +1 to account for the line with the value of temperature
@@ -361,8 +358,8 @@ namespace pocc {
         // the energy-volume relation: at this point the calculation of
         // thermodynamic properties should be stopped and a warning should be
         // printed, and all calculated data should be saved to the file
-        if (e.error_code == _VALUE_RANGE_){
-          pflow::logger(e.whereFileName(), e.whereFunction(), e.error_message,
+        if (e.whatCode() == _VALUE_RANGE_){
+          pflow::logger(e.whereFileName(), e.whereFunction(), e.what(),
             dirname, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
           break;
         }
@@ -399,13 +396,11 @@ namespace pocc {
   {
     string function = "readCoeffData():", msg = "";
     string block = "[" + blockname + "_COEFF]";
-    string data;
 
     bool LDEBUG = false || _DEBUG_POCC_THERMO_ || XHOST.DEBUG;
 
     // extract data
-    aurostd::ExtractToStringEXPLICIT(aurostd::efile2string(filename), data,
-        block + "START", block + "STOP");
+    string data = aurostd::substring2string(aurostd::efile2string(filename), block + "START", block + "STOP", 0);
     vector<string> v_data = aurostd::string2vectorstring(data);
 
     // determine number of columns in the file and do some consistency check
@@ -651,8 +646,8 @@ namespace pocc {
       // the energy-volume relation: at this point the calculation of
       // thermodynamic properties should be stopped and a warning should be
       // printed, and all calculated data should be saved to the file
-      if (e.error_code == _VALUE_RANGE_){
-        pflow::logger(e.whereFileName(), e.whereFunction(), e.error_message,
+      if (e.whatCode() == _VALUE_RANGE_){
+        pflow::logger(e.whereFileName(), e.whereFunction(), e.what(),
           aurostd::getPWD(), *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
       else{

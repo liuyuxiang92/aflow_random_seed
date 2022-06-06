@@ -6,18 +6,6 @@
 
 #include "aflow_apl.h"
 
-//CO START
-// Some parts are written within the C++0x support in GCC, especially the std::thread,
-// which is implemented in gcc 4.4 and higher.... For multithreads with std::thread see:
-// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
-#if GCC_VERSION >= 40400  // added two zeros
-#define AFLOW_APL_MULTITHREADS_ENABLE 1
-#include <thread>
-#else
-#warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
-#endif
-//CO END
-
 static const double MIN_FREQ_THRESHOLD = -0.1;
 
 namespace apl {
@@ -100,11 +88,10 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   void DOSCalculator::initialize(const xoption &aplopts){
-    string function = "apl::DOSCalculator::initialize():";
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     //AS20200312 BEGIN: now initialization parameters are passed using xoption
     _bzmethod = aplopts.getattachedscheme("DOSMETHOD");
@@ -141,13 +128,13 @@ namespace apl {
 
     if (!_pc->getSupercell().isConstructed()) {
       message = "The supercell structure has not been initialized yet.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
 
     QMesh& _qm = _pc->getQMesh();
     if (!_qm.initialized()) {
       message = "q-point mesh is not initialized.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     if (_projections.size() == 0) _qm.makeIrreducible();
 
@@ -157,12 +144,8 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
 
   //CO START
-  void DOSCalculator::calculateInOneThread(int startIndex, int endIndex) {
-    //cout << "Thread: from " << startIndex << " to " <<  endIndex << std::endl;
-    for (int iqp = startIndex; iqp < endIndex; iqp++) {
-      _freqs[iqp] = _pc->getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, _eigen[iqp]);  //ME20190624
-      //std::this_thread::yield();
-    }
+  void DOSCalculator::calculateInOneThread(int iqp) {
+    _freqs[iqp] = _pc->getFrequency(_qpoints[iqp], apl::THZ | apl::ALLOW_NEGATIVE, _eigen[iqp]);  //ME20190624
   }
   //CO END
 
@@ -183,30 +166,13 @@ namespace apl {
       _freqs.push_back(zero);
     _eigen.resize(_qpoints.size(), xmatrix<xcomplex<double> >(_pc->getNumberOfBranches(), _pc->getNumberOfBranches()));  // M20190624
 
-#ifdef AFLOW_APL_MULTITHREADS_ENABLE
-
-    // Get the number of CPUS
-    int ncpus = _pc->getNCPUs();
-
-    if (ncpus > 1) {
-      int startIndex, endIndex;
-      std::vector<std::thread*> threads;
-      vector<vector<int> > thread_dist = getThreadDistribution((int) _qpoints.size(), ncpus);
-      for (int icpu = 0; icpu < ncpus; icpu++) {
-        startIndex = thread_dist[icpu][0];
-        endIndex = thread_dist[icpu][1];
-        threads.push_back(new std::thread(&DOSCalculator::calculateInOneThread, this, startIndex, endIndex));
-      }
-      for (uint i = 0; i < threads.size(); i++) {
-        threads[i]->join();
-        delete threads[i];
-      }
-      threads.clear();
-    } else {
-      calculateInOneThread(0, (int) _qpoints.size());
-    }
+    int nqps = (int) _qpoints.size();
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    xthread::xThread xt(_pc->getNCPUs());
+    std::function<void(int)> fn = std::bind(&DOSCalculator::calculateInOneThread, this, std::placeholders::_1);
+    xt.run(nqps, fn);
 #else
-    calculateInOneThread(0, (int) _qpoints.size());
+    for (int i = 0; i < nqps; i++) calculateInOneThread(i);
 #endif
     //CO END
 
@@ -302,16 +268,15 @@ namespace apl {
   // ///////////////////////////////////////////////////////////////////////////
   void DOSCalculator::calc(int USER_DOS_NPOINTS, double USER_DOS_SMEAR,
       double fmin, double fmax, bool VERBOSE) {
-    string function = "DOSCalculator::calc():";
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     // Check parameters
     if (aurostd::isequal(fmax, fmin, _FLOAT_TOL_)) {
       message = "Frequency range of phonon DOS is nearly zero.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     } else if (fmin > fmax) {
       double tmp = fmax;
       fmax = fmin;
@@ -362,7 +327,7 @@ namespace apl {
 
     // Normalize to number of branches
     // ME20210927 - Only normalize when inside full frequency spectrum
-    if ((fmin - _minFreq <= _ZERO_TOL_) && (fmax - _maxFreq >= -_ZERO_TOL_)) {
+    if ((fmin - _minFreq <= _ZERO_TOL_) && (_maxFreq - fmax <= _ZERO_TOL_)) {
       double sum = 0.0;
       for (int k = 0; k < USER_DOS_NPOINTS; k++)
         sum += _dos[k];
@@ -530,11 +495,10 @@ namespace apl {
   //ME20190423 END
 
   void DOSCalculator::writePDOS(const string& directory) {
-    string function = "DOSCalculator::writePDOS():";
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     // Write PHDOS file
     //CO START
@@ -568,7 +532,7 @@ namespace apl {
     aurostd::stringstream2file(outfile, filename); //ME20181226
     if (!aurostd::FileExist(filename)) { //ME20181226
       message = "Cannot open output file " + filename + "."; //ME20181226
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
       //    throw apl::APLRuntimeError("DOSCalculator::writePDOS(); Cannot open output PDOS file.");
     }
     //outfile.clear();
@@ -578,11 +542,10 @@ namespace apl {
 
   //ME20190614 - writes phonon DOS in DOSCAR format
   void DOSCalculator::writePHDOSCAR(const string& directory) {
-    string function = "DOSCalculator::writePHDOSCAR():";
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     string filename = aurostd::CleanFileName(directory + "/" + DEFAULT_APL_PHDOSCAR_FILE);
     message = "Writing phonon density of states into file " + filename + ".";
@@ -593,7 +556,7 @@ namespace apl {
     aurostd::stringstream2file(doscar, filename);
     if (!aurostd::FileExist(filename)) {
       message = "Cannot open output file " + filename + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
     // OBSOLETE ME20191219 - PHPOSCAR is already written in KBIN::RunPhonons_APL
     // if (xdos.partial) {  // Write PHPOSCAR if there are projected DOS
@@ -604,18 +567,16 @@ namespace apl {
     //   poscar << xstr;
     //   aurostd::stringstream2file(poscar, filename);
     //   if (!aurostd::FileExist(filename)) {
-    //     string function = "PhononDispersionCalculator::writePHPOSCAR()";
     //     string message = "Cannot open output file " + filename + ".";
-    //     throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+    //     throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     //   }
     // }
   }
 
   xDOSCAR DOSCalculator::createDOSCAR() const {
     if (!_pc_set) {
-      string function = "DOSCalculator::createDOSCAR()";
       string message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     xDOSCAR xdos;
     xdos.spin = 0;
@@ -725,11 +686,10 @@ namespace apl {
   //PN START
   void DOSCalculator::writePDOS(string path, string ex)  //[PN]
   {
-    string function = "DOSCalculator::writePDOS():";
     string message = "";
     if (!_pc_set) {
       message = "PhononCalculator pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     //CO START
     // Write PHDOS file
@@ -759,7 +719,7 @@ namespace apl {
     aurostd::stringstream2file(outfile, file);
     if (!aurostd::FileExist(file)) {
       message = "Cannot open output file " + filename + "."; //ME20181226
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _FILE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
     //CO END
   }
