@@ -956,7 +956,7 @@ namespace aflowlib {
       aflowin_content = getRawRestAPIQuery(base_url + "aflow.in", true);
       m_out_super_silent = false;
     }
-    std::string poscar = aflowin2poscar(aflowin_content);
+    std::string poscar = KBIN::ExtractPOSCARStringStreamFromAFLOWIN(aflowin_content, -1).str();
     if (!poscar.empty()) { // load from aflow.in
       new_structure = xstructure((std::stringstream) poscar, IOVASP_AUTO);
       return true;
@@ -1385,32 +1385,6 @@ namespace aflowlib {
                                             std::sregex_token_iterator());
     std::sort(element_match.begin(), element_match.end());
     return aurostd::joinWDelimiter(element_match, "");
-  }
-
-  /// @brief extract the first POSCAR entry from `aflow.in`
-  /// \param raw_in content of `aflow.in`
-  /// \return poscar content
-  /// @note can only read `VASP_POSCAR_MODE_EXPLICIT` variants
-  std::string EntryLoader::aflowin2poscar(std::string raw_in) const {
-    size_t explicit_start = raw_in.find("[VASP_POSCAR_MODE_EXPLICIT]");
-    std::string poscar;
-    if (explicit_start != std::string::npos) {
-      raw_in.erase(0, explicit_start);
-      size_t explicit_stop = raw_in.find("[VASP_POSCAR_MODE_EXPLICIT]STOP");
-      // START/STOP variant
-      if (explicit_stop != std::string::npos) {
-        poscar = raw_in.substr(38, explicit_stop - 38);
-        // VASP_POSCAR_FILE variant
-      } else {
-        std::vector <std::string> raw_lines;
-        aurostd::string2vectorstring(raw_in, raw_lines);
-        for (std::vector<std::string>::const_iterator line = raw_lines.begin(); line != raw_lines.end(); line++) {
-          if (line->substr(0, 18) == "[VASP_POSCAR_FILE]") poscar += line->substr(16) + "\n";
-          else break;
-        }
-      }
-    }
-    return poscar;
   }
 
   void EntryLoader::outInfo(const std::string & function_name) {

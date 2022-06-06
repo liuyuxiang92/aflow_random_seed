@@ -868,7 +868,6 @@ namespace aflowlib {
     bool cleanAURL(std::string & AURL);
     std::string buildAFLUXQuery(const std::map<std::string, std::string> & matchbook) const;
     std::string extractAlloy(std::string name, char lib_type) const;
-    std::string aflowin2poscar(std::string raw_in) const;
 
     // Logging helper
     void outInfo(const std::string & function_name);
