@@ -1188,29 +1188,17 @@ check:
 	$(MAKE) check_proto
 .PHONY: check_full
 check_full:
-	$(MAKE) check_schema
-	$(MAKE) check_CeramGen
-	#[WAITING FOR ICSD LIB2RAW REDO]$(MAKE) check_Egap
 	$(MAKE) check_aflow_exits
-	$(MAKE) check_gcd
 	$(MAKE) check_smith
-	$(MAKE) check_coordination
 	$(MAKE) check_proto
-	$(MAKE) check_slab
 	$(MAKE) check_chull
 	$(MAKE) check_aflowSG
 	$(MAKE) check_AFLOWSYM
 	$(MAKE) check_edata
 	$(MAKE) check_aflow_xtal_finder
-	$(MAKE) check_fold_atoms_in_cell_routine
 	$(MAKE) check_cce
 	$(MAKE) check_pocc
-	$(MAKE) check_prototype_generator
-	$(MAKE) check_prototype_symmetry
-	$(MAKE) check_prototype_uniqueness
-	$(MAKE) check_atomic_environment
-	$(MAKE) check_aurostd
-	$(MAKE) check_cif_parser
+	$(MAKE) unit_test
 .PHONY: check_proto
 check_proto:
 	@echo "Performing 'aflow --proto' test"
@@ -1225,34 +1213,10 @@ check_proto:
 #	./aflow --proto=4:Bi:Tc | ./aflow --sprim | md5sum
 #	#ffb9c5681045fb80f391e9a931f21d1
 #	./aflow --checki | grep FAIL
-.PHONY: check_schema
-check_schema:
-	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --schema_test
-.PHONY: check_Egap
-check_Egap:
-	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --Egap_test
-.PHONY: check_CeramGen
-check_CeramGen:
-	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --CeramGen_test
-.PHONY: check_gcd
-check_gcd:
-	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --gcd_test
 .PHONY: check_smith
 check_smith:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
 	./aflow --smith_test
-.PHONY: check_coordination
-check_coordination:
-	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --coordination_test
-.PHONY: check_slab
-check_slab:
-	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --slab_test
 .PHONY: check_chull
 check_chull:
 	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
@@ -1579,22 +1543,6 @@ check_aflow_xtal_finder:
 		if [ $$MATCH != $$ANSWER ]; then "aflow_xtal_finder did not return $$ANSWER for './aflow --proto=A_cI2_229_a:Cr | ./aflow --sconv >A_cI2_229_a_sconv.poscar ; ./aflow --compare_materials=A_cI2_229_a_sconv.poscar,A_cI2_229_a_sconv.poscar --magmoms=1,1:-1,-1 --quiet', found $$MATCH instead" && exit 1; fi
 	@echo "aflow_xtal_finder - compare magnetic configuration test 3 (ferro-up vs ferro-down) passed!"
 	@rm -f A_cI2_229_a_sconv.poscar
-.PHONY: check_fold_atoms_in_cell_routine
-check_fold_atoms_in_cell_routine:
-	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --FoldAtomsInCell_test
-.PHONY: check_prototype_generator
-check_prototype_generator:
-	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --PrototypeGenerator_test
-.PHONY: check_prototype_symmetry
-check_prototype_symmetry:
-	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	if !([ -n "$$TRAVIS" ] || [ "$$CI" = true ]); then ./aflow --PrototypeSymmetry_test; fi
-.PHONY: check_prototype_uniqueness
-check_prototype_uniqueness:
-	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	if !([ -n "$$TRAVIS" ] || [ "$$CI" = true ]); then ./aflow --PrototypeUniqueness_test; fi
 #RF20200302 - START
 .PHONY: check_cce
 check_cce:
@@ -1641,18 +1589,6 @@ check_cce:
 	@echo "Running CCE test 20: LiCaN"
 	@wget --quiet https://aflowlib.duke.edu/AFLOWDATA/ICSD_WEB/ORC/Ca1Li1N1_ICSD_107304/CONTCAR.relax.vasp; ANSWER=0.834,0.653,-2.298,-2.474,-1.133,-1.311,0.960,0.792,-8.794,-8.613,-8.814,-8.638,-8.787,-8.609,-8.840,-8.672,-8.518; mv CONTCAR.relax.vasp CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304; RESULT=$$(./aflow --cce=CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304 --cce_test --dft_formation_energies=-7.960,-11.112,-9.920,-7.880,0 --functionals=PBE,LDA,SCAN,PBE+U:ICSD,exp); if [ "$$RESULT" != "$$ANSWER" ]; then echo "CCE test 20 failed!, check CCE on CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304" && exit 1; else echo "CCE test 20 passed!"; rm -f CONTCAR.relax.vasp_Ca1Li1N1_ICSD_107304 ; fi
 #RF20200302 - STOP
-.PHONY: check_atomic_environment #HE20210616
-check_atomic_environment:
-	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --AtomicEnvironment_test
-.PHONY: check_aurostd
-check_aurostd:
-	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --aurostd_test
-.PHONY: check_cif_parser
-check_cif_parser:
-	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
-	./aflow --cif_parser_test
 
 #[ME20220205 - Obsolete with C++11]
 #ifeq ($(UNAME),Linux)
@@ -1665,4 +1601,7 @@ check_cif_parser:
 check_aflow_exits:
 	@echo "Running aflow_exits test 1: NO 'exit()'" && ANSWER=0 && NUMBER_EXITS=$$(find . -name '*.h' -o -name '*.cpp' | xargs grep 'exit(' | wc -l | sed 's/^ *//') && \
 		if [ "$$NUMBER_EXITS" -ne "$$ANSWER" ]; then echo "Found $$NUMBER_EXITS exits in the source code. Please swap with 'aurostd::xerror()' and recompile." && exit 1; fi
+unit_test:
+	@if [ ! -f ./aflow ]; then echo "No local aflow binary found (./aflow)" && exit 1; fi
+	./aflow --unit_test
 ###################################################################################################

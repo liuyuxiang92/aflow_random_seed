@@ -10410,11 +10410,18 @@ namespace pflow {
         stream << endl;
       }
     }
+    //HE+ME20220503
+    // Be permissive and search for substrings to allow for white/black listing
+    // of groups of functions or namespaces without implementing regexes
+    // The white and black lists should be treated like a stack: only push and pop
+    bool quiet = XHOST.QUIET;
+    if (XHOST.QUIET) quiet = !aurostd::substringlist2bool(function_name, XHOST.LOGGER_WHITELIST, false);
+    else quiet = aurostd::substringlist2bool(function_name, XHOST.LOGGER_BLACKLIST, false);
 
     bool osswrite=!silent;
-    if (type == _LOGGER_ERROR_) {aurostd::PrintErrorStream(FileMESSAGE,stream,XHOST.QUIET,osswrite);} //oss - DEFAULT TO cerr
-    else if (type == _LOGGER_WARNING_) {aurostd::PrintWarningStream(FileMESSAGE,stream,XHOST.QUIET,osswrite);}  //oss - DEFAULT TO cerr
-    else{aurostd::PrintMessageStream(FileMESSAGE,stream,XHOST.QUIET,osswrite,oss);}
+    if (type == _LOGGER_ERROR_) {aurostd::PrintErrorStream(FileMESSAGE,stream,quiet,osswrite);} //oss - DEFAULT TO cerr
+    else if (type == _LOGGER_WARNING_) {aurostd::PrintWarningStream(FileMESSAGE,stream,quiet,osswrite);}  //oss - DEFAULT TO cerr
+    else{aurostd::PrintMessageStream(FileMESSAGE,stream,quiet,osswrite,oss);}
   }
 } // namespace pflow
 

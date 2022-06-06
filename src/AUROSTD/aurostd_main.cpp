@@ -3068,7 +3068,9 @@ namespace aurostd {
     }
     if(message_parts.size()==0){return;}
 
-    bool verbose=(!XHOST.QUIET && !quiet && osswrite);
+    //ME20220503 - XHOST.QUIET should be part of quiet to allow for whitelisting
+    //bool verbose=(!XHOST.QUIET && !quiet && osswrite);
+    bool verbose=(!quiet && osswrite);
     bool fancy_print=(!XHOST.vflag_control.flag("WWW")&&!XHOST.vflag_control.flag("NO_FANCY_PRINT"));  //CO20200404 - new web flag
 
     FILE* fstr=stdout;
@@ -3168,7 +3170,9 @@ namespace aurostd {
     }
     if(message_parts.size()==0){return;}
 
-    bool verbose=(!XHOST.QUIET && !quiet && osswrite);  //[CO2010315 - not always, removing for OUTCARs read during vasp runs]verbose=true; //ALWAYS!
+    //ME20220503 - XHOST.QUIET should be part of quiet to allow for whitelisting
+    //bool verbose=(!XHOST.QUIET && !quiet && osswrite);  //[CO2010315 - not always, removing for OUTCARs read during vasp runs]verbose=true; //ALWAYS!
+    bool verbose=(!quiet && osswrite);
     bool fancy_print=(!XHOST.vflag_control.flag("WWW")&&!XHOST.vflag_control.flag("NO_FANCY_PRINT"));  //CO20200404 - new web flag
 
     FILE* fstr=stderr;
@@ -3244,7 +3248,9 @@ namespace aurostd {
     }
     if(message_parts.size()==0){return;}
 
-    bool verbose=(!XHOST.QUIET && !quiet && osswrite);  //[CO2010315 - not always, removing for OUTCARs read during vasp runs]verbose=true; //ALWAYS!
+    //ME20220503 - XHOST.QUIET should be part of quiet to allow for whitelisting
+    //bool verbose=(!XHOST.QUIET && !quiet && osswrite);  //[CO2010315 - not always, removing for OUTCARs read during vasp runs]verbose=true; //ALWAYS!
+    bool verbose=(!quiet && osswrite);
     bool fancy_print=(!XHOST.vflag_control.flag("WWW")&&!XHOST.vflag_control.flag("NO_FANCY_PRINT"));  //CO20200404 - new web flag
 
     FILE* fstr=stderr;
@@ -5612,6 +5618,39 @@ namespace aurostd {
     return FALSE;
   }
 
+  // ME20220505
+  // Matches a list of substrings to a string
+  // match_all: only substring must be inside the string
+  bool substringlist2bool(const string& strin, const vector<string>& substrings, bool match_all) {
+    for (uint i = 0; i < substrings.size(); i++) {
+      if (strin.find(substrings[i]) == string::npos) {
+        // Didn't find substring, but need all
+        if (match_all) return false;
+      } else if (!match_all) {
+        // Found something and only need one
+        return true;
+      }
+    }
+    // Code only gets here when all substrings are
+    // in the string (match_all) or none have (!match_all)
+    return match_all;
+  }
+
+  bool substringlist2bool(const string& strin, const deque<string>& substrings, bool match_all) {
+    for (uint i = 0; i < substrings.size(); i++) {
+      if (strin.find(substrings[i]) == string::npos) {
+        // Didn't find substring, but need all
+        if (match_all) return false;
+      } else if (!match_all) {
+        // Found something and only need one
+        return true;
+      }
+    }
+    // Code only gets here when all substrings are
+    // in the string (match_all) or none have (!match_all)
+    return match_all;
+  }
+
   bool substring2bool(const stringstream& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) {
     return aurostd::substring2bool(strstream.str(),strsub1,RemoveWS,RemoveComments);
   }
@@ -5669,6 +5708,39 @@ namespace aurostd {
       if(sorted && list[i]>input){break;} //CO20201111
       if(list[i]==input) {
         index = i;
+        return true;
+      }
+    }
+    index = -1;
+    return false;
+  }
+
+  //ME20220503
+  bool SubstringWithinList(const deque<string>& list, const string& input) {
+    int index = -1;
+    return SubstringWithinList(list, input, index);
+  }
+
+  bool SubstringWithinList(const deque<string>& list, const string& input, int& index) {
+    for (deque<string>::const_iterator it = list.begin(); it != list.end(); ++it) {
+      if ((*it).find(input) != string::npos) {
+        index = std::distance(list.begin(), it);
+        return true;
+      }
+    }
+    index = -1;
+    return false;
+  }
+
+  bool SubstringWithinList(const vector<string>& list, const string& input) {
+    int index = -1;
+    return SubstringWithinList(list, input, index);
+  }
+
+  bool SubstringWithinList(const vector<string>& list, const string& input, int& index) {
+    for (vector<string>::const_iterator it = list.begin(); it != list.end(); ++it) {
+      if ((*it).find(input) != string::npos) {
+        index = std::distance(list.begin(), it);
         return true;
       }
     }
@@ -7400,6 +7472,7 @@ namespace aurostd {
   // setprecision,fixed, etc.
   // m_delimiter is used if input is exactly length 2
   // l_delimiter otherwise
+  // ME20220324 - added missing uint variant for xvector
   string joinWDelimiter(const xvector<int>& ientries, const char& _delimiter) {
     return joinWDelimiter(ientries, _delimiter, _delimiter, _delimiter);
   }
@@ -7438,6 +7511,72 @@ namespace aurostd {
     return joinWDelimiter(ientries, delimiter, delimiter, l_delimiter);
   }
   string joinWDelimiter(const xvector<int>& ientries, const stringstream& delimiter,
+      const stringstream& m_delimiter,
+      const stringstream& l_delimiter) {
+    stringstream output;
+    string delim = delimiter.str();
+    string mDelim = m_delimiter.str();
+    string lDelim = l_delimiter.str();
+
+    if (ientries.rows > 2) {
+      for (int i =ientries.lrows; i <= ientries.urows; i++) {
+        output << ientries[i];
+        if (i == ientries.urows - 1) {  //CO20180216 - added -1
+          output << lDelim;
+        } else if (i !=ientries.urows) {
+          output << delim;
+        }
+      }
+    } else {
+      for (int i = ientries.lrows; i <= ientries.urows; i++) {
+        output << ientries[i];
+        if (i == ientries.urows - 1) {  //CO20180216 - added -1
+          output << mDelim;
+        } else if (i != ientries.urows) {
+          output << delim;
+        }
+      }
+    }
+    return output.str();
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const char& _delimiter) {
+    return joinWDelimiter(ientries, _delimiter, _delimiter, _delimiter);
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const char& _delimiter,
+      const char& _l_delimiter) {
+    return joinWDelimiter(ientries, _delimiter, _delimiter, _l_delimiter);
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const char& _delimiter,
+      const char& _m_delimiter, const char& _l_delimiter) {
+    stringstream delimiter, m_delimiter, l_delimiter;
+    delimiter << _delimiter;
+    m_delimiter << _m_delimiter;
+    l_delimiter << _l_delimiter;
+    return joinWDelimiter(ientries, delimiter, m_delimiter, l_delimiter);
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const string& _delimiter) {
+    return joinWDelimiter(ientries, _delimiter, _delimiter, _delimiter);
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const string& _delimiter,
+      const string& _l_delimiter) {
+    return joinWDelimiter(ientries, _delimiter, _delimiter, _l_delimiter);
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const string& _delimiter,
+      const string& _m_delimiter, const string& _l_delimiter) {
+    stringstream delimiter, m_delimiter, l_delimiter;
+    delimiter << _delimiter;
+    m_delimiter << _m_delimiter;
+    l_delimiter << _l_delimiter;
+    return joinWDelimiter(ientries, delimiter, m_delimiter, l_delimiter);
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const stringstream& delimiter) {
+    return joinWDelimiter(ientries, delimiter, delimiter, delimiter);
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const stringstream& delimiter,
+      const stringstream& l_delimiter) {
+    return joinWDelimiter(ientries, delimiter, delimiter, l_delimiter);
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const stringstream& delimiter,
       const stringstream& m_delimiter,
       const stringstream& l_delimiter) {
     stringstream output;
@@ -7967,7 +8106,7 @@ namespace aurostd {
   string xmatDouble2String(const xmatrix<double>& xmat_in, int precision, bool roff, double tol, char FORMAT){
     stringstream output;
     vector<string> rows;
-    for(int i=1;i<=xmat_in.urows;i++){ //DX20180323 - fixed typo for initial index "int i=1" not "int i=xmat_in.urows"
+    for(int i=xmat_in.lrows;i<=xmat_in.urows;i++){ //DX20180323 - fixed typo for initial index "int i=1" not "int i=xmat_in.urows" //ME20220324 - changed to lrows
       stringstream row;
       xvector<double> xvec = xmat_in(i); //DX20170822 - added roundoff
       //if(roff){ xvec = roundoff(xvec,tol);} //DX20170822 - added roundoff
@@ -7978,6 +8117,18 @@ namespace aurostd {
     output << joinWDelimiter(rows,",");
     return output.str();
   }
+
+  //ME20220324
+  template <typename utype>
+  string xmat2String(const xmatrix<utype>& xmat_in) {
+    vector<string> rows;
+    for (int i = xmat_in.lrows; i <= xmat_in.urows; i++) {
+      rows.push_back("[" + joinWDelimiter(xmat_in(i), ",") + "]");
+    }
+    return joinWDelimiter(rows, ",");
+  }
+  template string xmat2String(const xmatrix<int>&);
+  template string xmat2String(const xmatrix<uint>&);
 }
 //DX20170803 START: Matrix to END
 
@@ -8005,6 +8156,9 @@ namespace aurostd {
     }
     return vout;
   }
+  string vecDouble2String(const vector<double>& vin,int precision, bool roff, double tol, char FORMAT) {
+    return aurostd::joinWDelimiter(vecDouble2vecString(vin, precision, roff, tol, FORMAT), ",");
+  }
   // [OBSOLETE] vector<string> xvecDouble2vecString(const xvector<double>& vin, bool roff) {
   // [OBSOLETE]   vector<string> vout;
   // [OBSOLETE]   for(uint i=1;i<(uint)vin.rows+1;i++){
@@ -8022,6 +8176,9 @@ namespace aurostd {
       vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); //DX20170822 - add roundoff
     }
     return vout;
+  }
+  string xvecDouble2String(const xvector<double>& vin,int precision, bool roff, double tol, char FORMAT) {
+    return aurostd::joinWDelimiter(xvecDouble2vecString(vin, precision, roff, tol, FORMAT), ",");
   }
   // [OBSOLETE] deque<string> deqDouble2deqString(const deque<double>& vin, bool roff) {
   // [OBSOLETE]   deque<string> vout;
@@ -8041,6 +8198,9 @@ namespace aurostd {
       vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); //DX20170822 - add roundoff
     }
     return vout;
+  }
+  string vecDouble2String(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT) {
+    return aurostd::joinWDelimiter(vecDouble2vecString(vin, precision, roff, tol, FORMAT), ",");
   }
 }
 
