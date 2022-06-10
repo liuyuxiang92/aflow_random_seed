@@ -1065,11 +1065,10 @@ namespace aflowlib {
       return;
     }
 
-    char *paths[search_path_list.size() + 1];
+    char **paths = new char*[search_path_list.size()+1](); // initialize the array with nullptr, +1 ensures it is null terminated
     for (size_t list_idx = 0; list_idx < search_path_list.size(); list_idx++) {
       paths[list_idx] = (char *) search_path_list[list_idx].c_str();
     }
-    paths[search_path_list.size() + 1] = nullptr;
 
     size_t scanned = 0;
     size_t found = 0;
@@ -1138,6 +1137,7 @@ namespace aflowlib {
         }
       }
     }
+    delete *paths;
     m_logger_message << "Finishing search in the filesystem after scanning " << scanned << " objects";
     outInfo(__func__);
     loadFiles(found_entries);
