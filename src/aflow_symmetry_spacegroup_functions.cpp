@@ -2832,7 +2832,7 @@ namespace SYM {
 // formatWyckoffPosition
 // ******************************************************************************
 namespace SYM {
-  string formatWyckoffPosition(const vector<sdouble>& sd_coordinate, bool convert2frac, bool keep_multiplication_symbol){
+  string formatWyckoffPosition(const vector<sdouble>& sd_coordinate, bool convert2frac, bool keep_multiplication_symbol,int precision){ //CO20220607 - added precision
 
     // put variables first (e.g., 1/2+x -> x+1/2)
     // reduce non-variables (e.g., 0.5+0.25 -> 0.75)
@@ -2842,7 +2842,7 @@ namespace SYM {
 
     string soliloquy = XPID + "SYM::formatWyckoffPosition()";
 
-    stringstream ss_eqn;
+    stringstream ss_eqn;ss_eqn.precision(precision);  //CO20220607 - added precision
     string coordinate = "";
     vector<string> vec_coord;
     double running_double = 0.0;
@@ -3509,7 +3509,7 @@ namespace SYM {
 // whichchar
 // ******************************************************************************
 namespace SYM {
-  char whichchar(string str_in) {
+  char whichchar(const string& str_in) {
     char c = '\0';
     for (uint i = 0; i < str_in.length(); i++) {
       if(isalpha(str_in[i]))
@@ -3811,7 +3811,8 @@ namespace SYM {
 // simplify
 // ******************************************************************************
 namespace SYM{
-  vector<sdouble> simplify(string str) {
+  vector<sdouble> simplify(const string& _str) {
+    string str=_str;
     if(str[0] == ' ') {
       str.erase(str.begin(), str.begin() + 1);
     }
