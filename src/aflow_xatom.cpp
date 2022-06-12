@@ -1751,7 +1751,7 @@ string _kpoint::str() const { //CO20220611 - negative sign formatting
   oss.precision(4);
   oss << "   ";
   for(int i=fpos.lrows;i<=fpos.urows;i++){
-    if(fpos[i]>10) oss << " ";  //will never happen
+    if(fpos[i]<10) oss << " ";  //will never happen
     if(!std::signbit(fpos[i])) oss << " ";
     oss << aurostd::utype2string(fpos[i],4,true,1e-4,FIXED_STREAM);
     if(i<fpos.urows) oss << "   ";
