@@ -1745,10 +1745,20 @@ const _kpoint& _kpoint::operator=(const _kpoint& b) {       // operator=
 }
 
 // print kpoint string
-string _kpoint::str() const {
-  string tmp = "   " + aurostd::joinWDelimiter(xvecDouble2vecString(fpos,4,true,1e-4,FIXED_STREAM),"   ") + "   ! " + label;
-  if(is_transformed){ tmp += "\'"; } //add prime
-  return tmp;
+string _kpoint::str() const { //CO20220611 - negative sign formatting
+  //[CO20220611 - adding spacing for minus]string tmp = "   " + aurostd::joinWDelimiter(xvecDouble2vecString(fpos,4,true,1e-4,FIXED_STREAM),"   ") + "   ! " + label;
+  stringstream oss;
+  oss.precision(4);
+  oss << "   ";
+  for(int i=fpos.lrows;i<=fpos.urows;i++){
+    if(fpos[i]>10) oss << " ";  //will never happen
+    if(!std::signbit(fpos[i])) oss << " ";
+    oss << aurostd::utype2string(fpos[i],4,true,1e-4,FIXED_STREAM);
+    if(i<fpos.urows) oss << "   ";
+  }
+  oss << "   ! " << label;
+  if(is_transformed){ oss << "\'"; } //add prime
+  return oss.str();
 }
 
 // operator<<
