@@ -98,7 +98,7 @@ namespace unittest {
     test_functions["aurostd_main"] = xchk;
 
     xchk = initializeXCheck();
-    xchk.func = std::bind(&UnitTest::aurostdMainTest, this, _1, _2, _3);
+    xchk.func = std::bind(&UnitTest::xfitTest, this, _1, _2, _3);
     xchk.function_name = "xfitTest():";
     xchk.task_description = "xfit functions";
     test_functions["xfit"] = xchk;
@@ -181,7 +181,7 @@ namespace unittest {
   void UnitTest::initializeTestGroups() {
     test_groups.clear();
 
-    test_groups["aurostd"] = {"xscalar", "xvector", "xmatrix", "aurostd_main"};
+    test_groups["aurostd"] = {"xscalar", "xvector", "xmatrix", "aurostd_main", "xfit"};
     test_groups["database"] = {"schema"};
     test_groups["structure"] = {"atomic_environment", "xstructure", "xstructure_parser"};
     test_groups["structure_gen"] = {"ceramgen", "proto"};
@@ -883,6 +883,7 @@ namespace unittest {
     // setup test environment
     string check_function = "", check_description = "";
 
+    bool calculated_bool = false, expected_bool = false;
     xmatrix<int> calculated_xmatint, expected_xmatint;
 
     // ---------------------------------------------------------------------------
@@ -908,6 +909,23 @@ namespace unittest {
     calculated_xmatint = xmatrix<int>(2, 2);
     aurostd::getEHermite(5, 12, calculated_xmatint);
     checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | equilibrateMatrix //SD20220505
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::equilibrateMatrix()";
+    check_description = "pre-condition an ill-conditioned matrix";
+    xmatrix<double> icm(4, 4);
+    icm(1, 1) = 0.7577; icm(1, 2) = 0.1712e-5; icm(1, 3) =   0.0462; icm(1, 4) = 0.3171;
+    icm(2, 1) = 0.7431; icm(2, 2) =    0.7060; icm(2, 3) =   0.0971; icm(2, 4) = 0.9502;
+    icm(3, 1) = 0.3922; icm(3, 2) =    0.0318; icm(3, 3) =   0.8235; icm(3, 4) = 0.0344;
+    icm(4, 1) = 0.6555; icm(4, 2) =    0.2769; icm(4, 3) = 0.6948e5; icm(4, 4) = 0.4387;
+    xmatrix<double> em, rm, cm;
+    aurostd::equilibrateMatrix(icm, em, rm, cm);
+    calculated_bool = aurostd::isequal(1.0, aurostd::sign(aurostd::condition_number(icm) - aurostd::condition_number(em))) &&
+                      aurostd::isequal(icm, aurostd::inverse(rm) * em * aurostd::inverse(cm));
+    expected_bool = true;
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
   }
 
   void UnitTest::aurostdMainTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
@@ -915,6 +933,7 @@ namespace unittest {
     string check_function = "", check_description = "";
     bool calculated_bool = false, expected_bool = false;
     int calculated_int = 0, expected_int = 0;
+    xvector<double> calculated_xvecdbl, expected_xvecdbl;
     string calculated_string = "", expected_string = "";
 
     // ---------------------------------------------------------------------------
@@ -974,10 +993,9 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     check_function = "aurostd::substring2string()";
     check_description = "return the third match of the substring";
-    string test_string = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
-    calculated_string = aurostd::substring2string(test_string,"ALGO",3);
+    str = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
+    calculated_string = aurostd::substring2string(str, "ALGO", 3);
     expected_string = "==49";
-      
     checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
   
     // ---------------------------------------------------------------------------
@@ -985,9 +1003,8 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     check_function = "aurostd::kvpair2string()";
     check_description = "return the second match of the kvpair";
-    calculated_string = aurostd::kvpair2string(test_string,"ALGO","==",2);
+    calculated_string = aurostd::kvpair2string(str, "ALGO", "==", 2);
     expected_string = "MEDIUM";
-  
     checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
   
     // ---------------------------------------------------------------------------
@@ -995,9 +1012,8 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     check_function = "aurostd::substring2string()";
     check_description = "return the last match of the substring";
-    calculated_string = aurostd::substring2string(test_string,"ALGO",-1);
+    calculated_string = aurostd::substring2string(str, "ALGO", -1);
     expected_string = "==SLOW";
-  
     checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
   
     // ---------------------------------------------------------------------------
@@ -1005,10 +1021,19 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     check_function = "aurostd::kvpair2string()";
     check_description = "return the last match of the kvpair";
-    calculated_string = aurostd::kvpair2string(test_string,"ALGO","==",-1);
+    calculated_string = aurostd::kvpair2string(str,"ALGO", "==", -1);
     expected_string = "SLOW";
-  
     checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | linspace //SD20220324
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::linspace()";
+    check_description = "generate n linearly spaced points";
+    expected_xvecdbl = xvector<double>(5);
+    expected_xvecdbl(1) = 1.0; expected_xvecdbl(2) = 1.375; expected_xvecdbl(3) = 1.75; expected_xvecdbl(4) = 2.125; expected_xvecdbl(5) = 2.5;
+    calculated_xvecdbl = aurostd::linspace(1.0, 2.5, 5);
+    checkEqual(calculated_xvecdbl, expected_xvecdbl, check_function, check_description, passed_checks, results);
   }
 
   void UnitTest::xfitTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
@@ -1016,36 +1041,72 @@ namespace unittest {
     // setup test environment
     string check_function = "", check_description = "";
 
-    xmatrix<int> calculated_xmatint, expected_xmatint;
-    xmatrix<int> calculated_xmatdouble, expected_xmatdouble;
-
-    // ---------------------------------------------------------------------------
-    // Check | reshape //SD20220319
-    // ---------------------------------------------------------------------------
-    check_function = "aurostd::reshape()";
-    check_description = "reshape a rectangular matrix";
-    expected_xmatint = xmatrix<int>(3,4);
-    expected_xmatint(1,1) = 1; expected_xmatint(1,2) =  2; expected_xmatint(1,3) =  3; expected_xmatint(1,4) = 4;
-    expected_xmatint(2,1) = 5; expected_xmatint(2,2) =  6; expected_xmatint(2,3) =  7; expected_xmatint(2,4) = 8;
-    expected_xmatint(3,1) = 9; expected_xmatint(3,2) = 10; expected_xmatint(3,3) = 11; expected_xmatint(3,4) = 12;
-    calculated_xmatint = aurostd::reshape(aurostd::reshape(expected_xmatint,4,3),3,4);
-    checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
+    double calculated_dbl, expected_dbl;
+    xvector<double> calculated_xvecdbl, expected_xvecdbl;
+    xvector<double> calculated_xvecdbl_r, expected_xvecdbl_r;
+    xvector<double> calculated_xvecdbl_i, expected_xvecdbl_i;
+    xmatrix<double> calculated_xmatdbl, expected_xmatdbl;
 
     // ---------------------------------------------------------------------------
     // Check | companion matrix //SD20220318
     // ---------------------------------------------------------------------------
     check_function = "aurostd::companion_matrix()";
     check_description = "calculate the companion matrix of a univariate polynomial";
+    xvector<double> pc(4);
+    expected_xmatdbl = xmatrix<double>(3, 3);
+    pc(1) = 6.0; pc(2) = -5.0; pc(3) = -2.0; pc(4) = 3.0;
+    expected_xmatdbl(1, 1) = 0.0; expected_xmatdbl(1, 2) = 1.0; expected_xmatdbl(1, 3) = 0.0;
+    expected_xmatdbl(2, 1) = 0.0; expected_xmatdbl(2, 2) = 0.0; expected_xmatdbl(2, 3) = 1.0;
+    expected_xmatdbl(3, 1) = -6.0 / 3.0; expected_xmatdbl(3, 2) = 5.0 / 3.0; expected_xmatdbl(3, 3) = 2.0 / 3.0;
+    calculated_xmatdbl = aurostd::companion_matrix(pc);
+    checkEqual(calculated_xmatdbl, expected_xmatdbl, check_function, check_description, passed_checks, results);
 
-    xvector<double> pc1(4);
-    expected_xmatdouble = xmatrix<double>(3,3);
-    vp(1) = 6.0; vp(2) = -5.0; vp(3) = -2.0; vp(4) = 3.0;
-    expected_xmatdouble(1, 1) = 0.0; expected_xmatdouble(1, 2) = 1.0; expected_xmatdouble(1, 3) = 0.0;
-    expected_xmatdouble(2, 1) = 0.0; expected_xmatdouble(2, 2) = 0.0; expected_xmatdouble(2, 3) = 1.0;
-    expected_xmatdouble(3, 1) = -6.0 / 3.0; expected_xmatdouble(3, 2) = 5.0 / 3.0; expected_xmatdouble(3, 3) = 2.0 / 3.0;
-    calculated_xmatdouble = aurostd::companion_matrix(pc1);
-    checkEqual(calculated_xmatdouble, expected_xmatdouble, check_function, check_description, passed_checks, results);
+    // ---------------------------------------------------------------------------
+    // Check | polynomialFindRoots //SD20220318
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::polynomialFindRoots()";
+    pc(1) = 6.0; pc(2) = -5.0; pc(3) = -2.0; pc(4) = 3.0;
+    calculated_xvecdbl_r = xvector<double>(3), calculated_xvecdbl_i = xvector<double>(3);
+    expected_xvecdbl_r = xvector<double>(3), expected_xvecdbl_i = xvector<double>(3);
+    expected_xvecdbl_r(1) = 1.05576592536838; expected_xvecdbl_r(2) = 1.05576592536838; expected_xvecdbl_r(3) = -1.44486518407010;
+    expected_xvecdbl_i(1) = -0.519201791550296; expected_xvecdbl_i(2) = 0.519201791550296; expected_xvecdbl_i(3) = 0.0;
+    aurostd::polynomialFindRoots(pc, calculated_xvecdbl_r, calculated_xvecdbl_i);
+    check_description = "calculate the roots of a univariate polynomial (real part)";
+    checkEqual(calculated_xvecdbl_r, expected_xvecdbl_r, check_function, check_description, passed_checks, results);
+    check_description = "calculate the roots of a univariate polynomial (imag part)";
+    checkEqual(calculated_xvecdbl_i, expected_xvecdbl_i, check_function, check_description, passed_checks, results);
 
+    // ---------------------------------------------------------------------------
+    // Check | polynomialCurveFit //SD20220422
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::polynomialCurveFit()";
+    check_description = "calculate the coefficients for a quintic polynomial that fits the data";
+    xvector<double> xdata(10), ydata(10), wdata(10);
+    xdata(1) =  0.551878738140095; ydata(1) = -1.895746346279865; wdata(1) = 0.757740130578333;
+    xdata(2) =  0.815194385592879; ydata(2) = -2.426516802630079; wdata(2) = 0.743132468124916;
+    xdata(3) = -1.436650500869055; ydata(3) = -0.329326356733414; wdata(3) = 0.392227019534168;
+    xdata(4) =  0.837122604741089; ydata(4) = -2.476265605752963; wdata(4) = 0.655477890177557;
+    xdata(5) =  0.024588378708606; ydata(5) = -1.148143476025739; wdata(5) = 0.171186687811562;
+    xdata(6) = -1.521792147897101; ydata(6) = -0.304622388440250; wdata(6) = 0.706046088019609;
+    xdata(7) = -0.998568921765830; ydata(7) = -0.471352985639471; wdata(7) = 0.031832846377421;
+    xdata(8) = -0.222562772922286; ydata(8) = -0.911928012994989; wdata(8) = 0.276922984960890;
+    xdata(9) =  0.964723358008907; ydata(9) = -2.783990433247946; wdata(9) = 0.046171390631154;
+    xdata(10) = 0.986066878262693; ydata(10) = -2.838593165314427; wdata(10) = 0.097131781235848;
+    expected_xvecdbl = xvector<double>(6);
+    expected_xvecdbl(1) = -1.121837858162905; expected_xvecdbl(2) = -1.056905122203599; expected_xvecdbl(3) = -0.543168130435282;
+    expected_xvecdbl(4) = -0.145858244844311; expected_xvecdbl(5) = -0.007682867520147; expected_xvecdbl(6) = 0.000748981621075;
+    calculated_xvecdbl = aurostd::polynomialCurveFit(xdata, ydata, 5, wdata);
+    checkEqual(expected_xvecdbl, calculated_xvecdbl, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | findZeroBrent //SD20220517
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::findZeroBrent()";
+    check_description = "find the zero of a univariate function using Brent's method";
+    std::function<double(double)> func = [](double x) {return std::pow(x, 2.0) - 3.0;};
+    expected_dbl = 1.732050807568877;
+    calculated_dbl = aurostd::findZeroBrent(0.0, 10.0, func);
+    checkEqual(expected_dbl, calculated_dbl, check_function, check_description, passed_checks, results);
   }
 
 }
