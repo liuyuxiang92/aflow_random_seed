@@ -2232,7 +2232,6 @@ namespace aurostd {  // namespace aurostd
         }
       }
       for (int i = LU.lrows; i <= LU.urows; i++) {P(i, p(i)) = 1.0;}
-      return;
     }
   template<class utype>
     void LUPDecomposition(const xmatrix<utype>& A, xmatrix<double>& L, xmatrix<double>& U, xmatrix<double>& P, utype tol) { //SD20220426
@@ -2245,7 +2244,6 @@ namespace aurostd {  // namespace aurostd
         L.setmat(LU.getmat(i, i, LU.lcols, i - LU.lcols), i, LU.lcols);
       }
       U += LU - L;
-      return;
     }
   template<class utype>                                 // function inverse xmatrix<>
     xmatrix<utype> inverseByLUP(const xmatrix<utype>& A) { //SD20220426
@@ -2549,14 +2547,14 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-    // ----------------------------------------------------------------------------
-    namespace aurostd {
-      template<class utype>
-        xmatrix<utype> HadamardProduct(const xmatrix<utype>& A, const xmatrix<utype>& B) { //SD20220422 - also called element-wise product or Schur product
-          if (A.rows != B.rows) {
-            stringstream message;
-            message << "A and B must have the same dimensions, A.rows=" << A.rows << " B.rows=" << B.rows;
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+// ----------------------------------------------------------------------------
+namespace aurostd {
+  template<class utype>
+    xmatrix<utype> HadamardProduct(const xmatrix<utype>& A, const xmatrix<utype>& B) { //SD20220422 - also called element-wise product or Schur product
+      if (A.rows != B.rows) {
+        stringstream message;
+        message << "A and B must have the same dimensions, A.rows=" << A.rows << " B.rows=" << B.rows;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       else if (A.cols != B.cols) {
         stringstream message;

@@ -17,123 +17,18 @@
 //            AFLOW Quasi-Chemical Approximation (QCA) (2022-)
 // ###############################################################################
 
-// **************************************************************************
-// Class _qca data
-// **************************************************************************
-// Constructor
-_qca_data::_qca_data() {
-  // Input data
-  num_threads = 0;
-  min_sleep = 0;
-  format_data = "";
-  format_image = "";
-  screen_only = false;
-  image_only = false;
-  calc_binodal = false;
-  calc_spinodal = false;
-  workdirpath = "";
-  rootdirpath = "";
-  plattice = "";
-  elements.clear();
-  aflow_max_num_atoms = 0;
-  max_num_atoms = 0;
-  cv_cut = 0.0;
-  conc_npts = 0;
-  conc_curve = false;
-  conc_curve_range.clear();
-  conc_macro.clear();
-  temp_npts = 0;
-  temp_range.clear();
-  temp.clear();
-  // Derived data
-  alloyname = "";
-  rundirpath = "";
-  vstr_aflow.clear();
-  lat_atat = "";
-  vstr_atat.clear();
-  mapstr.clear();
-  // Cluster data
-  cv_cluster = 0.0;
-  num_atom_cluster.clear();
-  degeneracy_cluster.clear();
-  conc_cluster.clear();
-  excess_energy_cluster.clear();
-  // Thermo data
-  prob_ideal_cluster.clear();
-  prob_cluster.clear();
-  rel_s_ec = 0.0;
-  temp_ec = 0.0;
-  rel_s.clear();
-  binodal_boundary.clear();
-}
-
-// Destructor
-_qca_data::~_qca_data() {
-  free();
-}
-void _qca_data::free() {
-}
-
-// Copy constructor
-const _qca_data& _qca_data::operator=(const _qca_data &b) {
-  if (this != &b) {
-    // Input data
-    num_threads = b.num_threads;
-    min_sleep = b.min_sleep;
-    format_data = b.format_data;
-    format_image = b.format_image;
-    screen_only = b.screen_only;
-    image_only = b.image_only;
-    calc_binodal = b.calc_binodal;
-    calc_spinodal = b.calc_spinodal;
-    workdirpath = b.workdirpath;
-    rootdirpath = b.rootdirpath;
-    plattice = b.plattice;
-    elements = b.elements;
-    max_num_atoms = b.max_num_atoms;
-    cv_cut = b.cv_cut;
-    conc_npts = b.conc_npts;
-    conc_curve = b.conc_curve;
-    conc_curve_range = b.conc_curve_range;
-    conc_macro = b.conc_macro;
-    temp_npts = b.temp_npts;
-    temp_range = b.temp_range;
-    temp = b.temp;
-    // Derived data
-    alloyname = b.alloyname;
-    rundirpath = b.rundirpath;
-    vstr_aflow = b.vstr_aflow;
-    lat_atat = b.lat_atat;
-    vstr_atat = b.vstr_atat;
-    mapstr = b.mapstr;
-    // Cluster data
-    cv_cluster = b.cv_cluster;
-    num_atom_cluster = b.num_atom_cluster;
-    degeneracy_cluster = b.degeneracy_cluster;
-    conc_cluster = b.conc_cluster;
-    excess_energy_cluster = b.excess_energy_cluster;
-    // Thermo data
-    prob_ideal_cluster = b.prob_ideal_cluster;
-    prob_cluster = b.prob_cluster;
-    rel_s_ec = b.rel_s_ec;
-    temp_ec = b.temp_ec;
-    rel_s = b.rel_s;
-    binodal_boundary = b.binodal_boundary;
-  }
-  return *this;
-}
-
 // ***************************************************************************
 // qca::quasiChemicalApprox
 // ***************************************************************************
 namespace qca {
-  /// @brief Initializes the QCA variables based on the input flags.
+  /// @brief Modifies the QCA variables based on the input flags and starts the module.
   void quasiChemicalApprox(const aurostd::xoption& vpflow) {
     if (vpflow.flag("QCA::USAGE")) {
       if (!vpflow.flag("QCA::SCREEN_ONLY")) {displayUsage();}
       return;
     }
     _qca_data qca_data;
+    initQCA(qca_data);
     qca_data.min_sleep = DEFAULT_QCA_MIN_SLEEP_SECONDS;
     qca_data.aflow_max_num_atoms = DEFAULT_QCA_AFLOW_MAX_NUM_ATOMS;
     if (!vpflow.getattachedscheme("QCA::DIRECTORY").empty()) {
@@ -201,12 +96,69 @@ namespace qca {
     if (vpflow.flag("QCA::IMAGE_ONLY")) {qca_data.image_only = true;}
     if (vpflow.flag("QCA::BINODAL")) {qca_data.calc_binodal = true;}
     if (vpflow.flag("QCA::SPINODAL")) {qca_data.calc_spinodal = true;}
-    quasiChemicalApprox(qca_data);
+    runQCA(qca_data);
     return;
- }
+   }
+}
 
+// ***************************************************************************
+// qca::initQCA
+// ***************************************************************************
+namespace qca {
+  /// @brief Initializes the QCA variables
+  void initQCA(_qca_data& qca_data) {
+    // Input data
+    qca_data.num_threads = 0;
+    qca_data.min_sleep = 0;
+    qca_data.format_data = "";
+    qca_data.format_image = "";
+    qca_data.screen_only = false;
+    qca_data.image_only = false;
+    qca_data.calc_binodal = false;
+    qca_data.calc_spinodal = false;
+    qca_data.workdirpath = "";
+    qca_data.rootdirpath = "";
+    qca_data.plattice = "";
+    qca_data.elements.clear();
+    qca_data.aflow_max_num_atoms = 0;
+    qca_data.max_num_atoms = 0;
+    qca_data.cv_cut = 0.0;
+    qca_data.conc_npts = 0;
+    qca_data.conc_curve = false;
+    qca_data.conc_curve_range.clear();
+    qca_data.conc_macro.clear();
+    qca_data.temp_npts = 0;
+    qca_data.temp_range.clear();
+    qca_data.temp.clear();
+    // Derived data
+    qca_data.alloyname = "";
+    qca_data.rundirpath = "";
+    qca_data.vstr_aflow.clear();
+    qca_data.lat_atat = "";
+    qca_data.vstr_atat.clear();
+    qca_data.mapstr.clear();
+    // Cluster data
+    qca_data.cv_cluster = 0.0;
+    qca_data.num_atom_cluster.clear();
+    qca_data.degeneracy_cluster.clear();
+    qca_data.conc_cluster.clear();
+    qca_data.excess_energy_cluster.clear();
+    // Thermo data
+    qca_data.prob_ideal_cluster.clear();
+    qca_data.prob_cluster.clear();
+    qca_data.rel_s_ec = 0.0;
+    qca_data.temp_ec = 0.0;
+    qca_data.rel_s.clear();
+    qca_data.binodal_boundary.clear();
+  }
+}
+
+// ***************************************************************************
+// qca::runQCA
+// ***************************************************************************
+namespace qca {
   /// @brief Runs the QCA module.
-  void quasiChemicalApprox(_qca_data& qca_data) {
+  void runQCA(_qca_data& qca_data) {
     // Clean-up input data and check for errors
     if (XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && !(XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX"))) {
       qca_data.num_threads = aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));

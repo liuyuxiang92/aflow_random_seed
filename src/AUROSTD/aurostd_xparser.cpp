@@ -812,37 +812,10 @@ namespace aurostd {
 
   //extractJsonVectorAflow/////////////////////////////////////////////////////
   vector<string> extractJsonVectorAflow(const string& json, string key) { //SD20220504
+    string value = extractJsonValueAflow(json, key);
+    string::size_type start = value.find("["), stop = value.rfind("]");
     vector<string> vec, tokens;
-    string array = "";
-    key = "\"" + key + "\":";
-    string::size_type start = 0, end = 0;
-    start = json.find(key + "[");
-    if (start != string::npos) {
-      start += key.length() + 1;
-      end = json.find("\":", start);
-      if (end != string::npos) {
-        // In case there is any white space between key and array
-        array = aurostd::RemoveWhiteSpacesFromTheFront(json.substr(start, end - start));
-        // If we have a nested object, "array" should only be '{' + white space by now.
-        if (array[0] == '{') {
-          string message = "JSON parser cannot read nested objects.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
-        }
-        end = array.find("],\"");
-        array = array.substr(0, end);
-      } 
-      else {
-        end = json.find("]}", start);
-        // In case there is any white space between key and array
-        array = aurostd::RemoveWhiteSpacesFromTheFront(json.substr(start, end - start));
-        // If we have a nested object, it should start with '{'
-        if (array[0] == '{') {
-          string message = "JSON parser cannot read nested objects.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
-        }
-      }
-    }
-    aurostd::string2tokens(array, tokens, ",");
+    aurostd::string2tokens(value.substr(start + 1, stop - 1), tokens, ",");
     for (uint i = 0; i < tokens.size(); i++) {
       vec.push_back(tokens[i]);
     }
@@ -851,38 +824,11 @@ namespace aurostd {
 
   //extractJsonMatrixAflow/////////////////////////////////////////////////////
   vector<vector<string>> extractJsonMatrixAflow(const string& json, string key) { //SD20220504
+    string value = extractJsonValueAflow(json, key);
+    string::size_type start = value.find("[["), stop = value.rfind("]]");
     vector<vector<string>> mat;
     vector<string> vec, tokens1, tokens2;
-    string array = "";
-    key = "\"" + key + "\":";
-    string::size_type start = 0, end = 0;
-    start = json.find(key + "[[");
-    if (start != string::npos) {
-      start += key.length() + 2;
-      end = json.find("\":", start);
-      if (end != string::npos) {
-        // In case there is any white space between key and array
-        array = aurostd::RemoveWhiteSpacesFromTheFront(json.substr(start, end - start));
-        // If we have a nested object, "array" should only be '{' + white space by now.
-        if (array[0] == '{') {
-          string message = "JSON parser cannot read nested objects.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
-        }
-        end = array.find("]],\"");
-        array = array.substr(0, end);
-      }
-      else {
-        end = json.find("]]}", start);
-        // In case there is any white space between key and array
-        array = aurostd::RemoveWhiteSpacesFromTheFront(json.substr(start, end - start));
-        // If we have a nested object, it should start with '{'
-        if (array[0] == '{') {
-          string message = "JSON parser cannot read nested objects.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
-        }
-      }
-    }
-    aurostd::string2tokensByDelimiter(array, tokens1, "],[");
+    aurostd::string2tokensByDelimiter(value.substr(start + 2, stop - 2), tokens1, "],[");
     for (uint i = 0; i < tokens1.size(); i++) {
       aurostd::string2tokens(tokens1[i], tokens2, ",");
       vec.clear();

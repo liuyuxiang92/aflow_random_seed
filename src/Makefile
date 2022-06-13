@@ -33,7 +33,7 @@ VERSNUMBER=3.2.12
 UNAME=$(shell uname)
 
 # for aflow
-CPP=g++ -std=c++11
+CPP=g++
 #-O2 -frepo
 # for sqllite
 CC=gcc

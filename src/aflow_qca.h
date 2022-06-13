@@ -13,68 +13,61 @@
 #define CONC_SHIFT 0.01 // concentration shift away from 0
 #define QCA_FILE_PREFIX string("aflow_qca_")
 
-// Class _qca data
-class _qca_data {
-  public:
-    _qca_data();
-    ~_qca_data();
-    const _qca_data& operator=(const _qca_data &b);
-    
-    // Input data
-    int num_threads;
-    uint min_sleep;
-    string format_data;
-    string format_image;
-    bool screen_only;
-    bool image_only;
-    bool calc_binodal;
-    bool calc_spinodal;
-    string workdirpath;
-    string rootdirpath;
-    string plattice;
-    vector<string> elements;
-    int aflow_max_num_atoms;
-    int max_num_atoms;
-    int conc_npts;
-    bool conc_curve;
-    vector<double> conc_curve_range; // DIM: 2*Nk
-    xmatrix<double> conc_macro; // UNIT: unitless | DIM: Nc, Nk
-    int temp_npts;
-    vector<double> temp_range; // UNIT: K | DIM: 2
-    xvector<double> temp; // UNIT: K | DIM: Nt
-    double cv_cut; // UNIT: eV
+// Struct _qca data
+struct _qca_data {
+  // Input data
+  int num_threads;
+  uint min_sleep;
+  string format_data;
+  string format_image;
+  bool screen_only;
+  bool image_only;
+  bool calc_binodal;
+  bool calc_spinodal;
+  string workdirpath;
+  string rootdirpath;
+  string plattice;
+  vector<string> elements;
+  int aflow_max_num_atoms;
+  int max_num_atoms;
+  int conc_npts;
+  bool conc_curve;
+  vector<double> conc_curve_range; // DIM: 2*Nk
+  xmatrix<double> conc_macro; // UNIT: unitless | DIM: Nc, Nk
+  int temp_npts;
+  vector<double> temp_range; // UNIT: K | DIM: 2
+  xvector<double> temp; // UNIT: K | DIM: Nt
+  double cv_cut; // UNIT: eV
 
-    // Derived data
-    string alloyname;
-    string rundirpath;
-    vector<xstructure> vstr_aflow;
-    string lat_atat;
-    vector<xstructure> vstr_atat; // DIM: Nj
-    vector<int> mapstr;
+  // Derived data
+  string alloyname;
+  string rundirpath;
+  vector<xstructure> vstr_aflow;
+  string lat_atat;
+  vector<xstructure> vstr_atat; // DIM: Nj
+  vector<int> mapstr;
 
-    // Cluster data
-    double cv_cluster; // UNIT: eV
-    xvector<int> num_atom_cluster; // DIM: Nj
-    xvector<int> degeneracy_cluster; // DIM: Nj
-    xmatrix<double> conc_cluster; // UNIT: unitless | DIM: Nj, Nk
-    xvector<double> excess_energy_cluster; // UNIT: eV | DIM: Nj
+  // Cluster data
+  double cv_cluster; // UNIT: eV
+  xvector<int> num_atom_cluster; // DIM: Nj
+  xvector<int> degeneracy_cluster; // DIM: Nj
+  xmatrix<double> conc_cluster; // UNIT: unitless | DIM: Nj, Nk
+  xvector<double> excess_energy_cluster; // UNIT: eV | DIM: Nj
 
-    // Thermo data
-    xmatrix<double> prob_ideal_cluster; // DIM: Nc, Nj
-    vector<xmatrix<double>> prob_cluster; // DIM: Nc, Nj, Nt
-    double rel_s_ec; // UNIT: unitless
-    double temp_ec; // UNIT: K
-    xmatrix<double> rel_s; // UNIT: unitless | DIM: Nc, Nt
-    xvector<double> binodal_boundary; // UNIT: K | DIM: Nc
-    
-  private:
-  void free();
+  // Thermo data
+  xmatrix<double> prob_ideal_cluster; // DIM: Nc, Nj
+  vector<xmatrix<double>> prob_cluster; // DIM: Nc, Nj, Nt
+  double rel_s_ec; // UNIT: unitless
+  double temp_ec; // UNIT: K
+  xmatrix<double> rel_s; // UNIT: unitless | DIM: Nc, Nt
+  xvector<double> binodal_boundary; // UNIT: K | DIM: Nc
 };
 
 // Namespace for functions used by QCA
 namespace qca {
   void quasiChemicalApprox(const aurostd::xoption& vpflow);
-  void quasiChemicalApprox(_qca_data& qca_data);
+  void initQCA(_qca_data& qca_data);
+  void runQCA(_qca_data& qca_data);
   void errorChecks(_qca_data& qca_data);
   void calcSpinodalData(_qca_data& qca_data);
   void calcBinodalData(_qca_data& qca_data);

@@ -30,7 +30,7 @@ namespace aurostd {
   //SD20220422
   template<class utype> xvector<utype> evalPolynomial_xv(const xvector<utype>& x, const xvector<utype>& p) {
     xvector<utype> res(x.rows);
-    for (int i = 1; i <= res.rows; i++) {
+    for (int i = res.lrows; i <= res.urows; i++) {
       res(i) = evalPolynomial(x(i), p);
     }
     return res;
@@ -39,8 +39,8 @@ namespace aurostd {
   //SD20220505
   template<class utype> xmatrix<utype> evalPolynomial_xm(const xmatrix<utype>& x, const xvector<utype>& p) {
     xmatrix<utype> res(x.rows, x.cols);
-    for (int i = 1; i <= res.rows; i++) {
-      for (int j = 1; j <= res.cols; j++) {
+    for (int i = res.lrows; i <= res.urows; i++) {
+      for (int j = res.lcols; j <= res.ucols; j++) {
         res(i, j) = evalPolynomial(x(i, j), p);
       }
     }
@@ -51,7 +51,7 @@ namespace aurostd {
   //the value x and outputs the derivatives in the dp array.
   //
   //The highest derivative is determined by the size of the dp array and the result
-  //is stored in ascending order starting from the zero's derivative (function itself).
+  //is stored in ascending order starting from the zeroth derivative (function itself).
   template<class utype> void evalPolynomialDeriv(const utype x, const xvector<utype>& p, xvector<utype>& dp) {
     for (int i=dp.lrows; i<=dp.urows; i++) dp[i] = 0.0;
     dp[dp.lrows] = p[p.urows];
@@ -82,9 +82,9 @@ namespace aurostd {
   //SD20220422
   //Returns the coefficients of the nth derivative of the polynomial
   template<class utype> xvector<utype> evalPolynomialCoeff(const xvector<utype>& p, const uint n) {
-    if ((int)n >= p.rows) {return 0.0 * ones_xv<utype>(1);}
-    xvector<utype> dp(p.rows - n);
-    for (int i = p.rows; i > (int)n; i--) {
+    if ((int)n >= p.urows) {return 0.0 * ones_xv<utype>(1);}
+    xvector<utype> dp(p.urows - n);
+    for (int i = p.urows; i > (int)n; i--) {
       dp(i - n) = p(i) * aurostd::factorial<utype>(i - 1) / aurostd::factorial<utype>(i - n - 1);
     }
     return dp;
@@ -101,7 +101,7 @@ namespace aurostd {
   template<class utype> xmatrix<utype> Vandermonde_matrix(const xvector<utype>& x, const int n) {
     xmatrix<utype> VM(x.rows, n);
 
-    for (int i=1; i<=x.rows; i++){
+    for (int i=x.lrows; i<=x.urows; i++){
       VM[i][1] = 1.0;
       for (int j=2; j<=n; j++) VM[i][j] = std::pow(x[i], j-1);
     }
@@ -194,12 +194,13 @@ namespace aurostd {
   }
 
   //SD20220422
-  //Calculate the coefficients for a polynomial p(x) of degree n that fits the y data with weights w
-  template<class utype> xvector<utype> polynomialCurveFit(const xvector<utype>& x, const xvector<utype>& _y, const int n, const xvector<utype> _w) {
+  //Calculate the coefficients for a polynomial p(x) of degree n that fits the y data with weights w.
+  //The weight w_i determines how much one wants to weight the point y_i when performing the fit
+  template<class utype> xvector<utype> polynomialCurveFit(const xvector<utype>& x, const xvector<utype>& _y, const int n, const xvector<utype>& _w) {
     bool LDEBUG = (FALSE || DEBUG_XFIT || XHOST.DEBUG);
     xvector<utype> p;
     utype wtot = 0.0;
-    for (int i = 1; i <= _w.rows; i++) {
+    for (int i = _w.lrows; i <= _w.urows; i++) {
       if (_w(i) < (utype)0.0) {
         stringstream message;
         message << "Negative weight i=" << i;
@@ -217,14 +218,14 @@ namespace aurostd {
       }
       wtot += _w(i);
     }
-    if (wtot == 0.0) {
-      string message = "Weights cannot be zero";
+    if (aurostd::isequal(wtot, (utype)0.0)) {
+      string message = "All the weights cannot be zero";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     xmatrix<utype> VM = Vandermonde_matrix(x, n + 1);
     if (LDEBUG) {cerr << "VM old=" << VM << endl;}
     xvector<utype> w = _w / wtot; // normalize weights
-    for (int i = 1; i <= VM.rows; i++) {
+    for (int i = VM.lrows; i <= VM.urows; i++) {
       VM.setmat(w(i) * VM.getmat(i, i, 1, VM.cols), i, 1);
     }
     if (LDEBUG) {cerr << "VM new=" << VM << endl;}
@@ -241,18 +242,14 @@ namespace aurostd {
   //  0   0   0  ..  1
   // -p0 -p1 -p2 .. -p(n-1)
   template<class utype> xmatrix<utype> companion_matrix(const xvector<utype>& p) {
-    if (p(p.rows) == 0.0) {
+    if (p(p.urows) == 0.0) {
       string message = "Leading polynomial coefficient is zero";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
-    int n = p.rows - 1;
+    int n = p.urows - 1;
     xmatrix<utype> CM(n, n);
-    for (int i = 1; i < n; i++) {
-      for (int j = 1; j <= n; j++) {
-        if (i == j - 1) {CM(i, j) = 1.0;}
-      } 
-    }
-    for (int j = 1; j <= n; j++) {CM(n, j) = -p(j) / p(n + 1);}
+    for (int i = p.lrows; i < n; i++) {CM(i, i + 1) = 1.0;}
+    for (int i = p.lrows; i <= n; i++) {CM(n, i) = -p(i) / p(n + 1);}
     return CM;
   }
 
@@ -261,7 +258,7 @@ namespace aurostd {
   //The real and imaginary parts of the roots are returned in rr and ri, respectively
   //DOI: 10.1090/S0025-5718-1995-1262279-2
   template<class utype> void polynomialFindRoots(const xvector<utype>& p, xvector<utype>& rr, xvector<utype>& ri) {
-    for (int i = 1; i <= p.rows; i++) {
+    for (int i = p.lrows; i <= p.urows; i++) {
       if (std::isnan(p(i))) {
         stringstream message;
         message << "NaN in polynomial coefficient i=" << i;
