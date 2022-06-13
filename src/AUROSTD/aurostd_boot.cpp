@@ -70,8 +70,6 @@ using aurostd::getEHermite; //CO20191110
 using aurostd::getSmithNormalForm; //CO20191110
 using aurostd::xmatrixutype2double; //CO20191201
 using aurostd::xmatrixdouble2utype; //CO20191201
-using aurostd::xvectorutype2double; //SD20220512
-using aurostd::xvectordouble2utype; //SD20220512
 using aurostd::tqli;
 using aurostd::balanc;
 using aurostd::elmhes;

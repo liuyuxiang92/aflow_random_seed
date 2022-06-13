@@ -5145,8 +5145,8 @@ namespace aurostd {
     return out;
   }
 
-  //SD20220504 - Makes use of "find" rather than "find_first_of"
-  uint StringSplit(const string& str, vector<string>& tokens, const string& delimiter) { //SD20220504
+  //SD20220504 - string2tokens, but using a single delimiter that can have more than one char. Makes use of "find" rather than "find_first_of"
+  uint string2tokensByDelimiter(const string& str, vector<string>& tokens, const string& delimiter) { //SD20220504
     tokens.clear();
     uint dlen = delimiter.length();
     string::size_type lpos = 0, cpos = str.find(delimiter, lpos);
@@ -5158,10 +5158,10 @@ namespace aurostd {
     tokens.push_back(str.substr(lpos, str.length() - lpos));
     return tokens.size();
   }
-  uint StringSplit(const string& str, deque<string>& tokens, const string& delimiter) { //SD20220504
+  uint string2tokensByDelimiter(const string& str, deque<string>& tokens, const string& delimiter) { //SD20220504
     tokens.clear();
     vector<string> vtokens;
-    uint i = aurostd::StringSplit(str, vtokens, delimiter);
+    uint i = aurostd::string2tokensByDelimiter(str, vtokens, delimiter);
     for (i = 0; i < tokens.size(); i++) {tokens.push_back(vtokens[i]);}
     return tokens.size();
   }
@@ -5619,7 +5619,7 @@ namespace aurostd {
     return aurostd::substring2bool(strstream.str(),strsub1,RemoveWS,RemoveComments);
   }
 
-  bool WithinList(const vector<double>& list,const double& input,bool sorted) { //SD20220325
+  bool WithinList(const vector<double>& list,const double input,bool sorted) { //SD20220325
     int index=-1;
     return WithinList(list, input, index, sorted);
   }
@@ -5647,7 +5647,7 @@ namespace aurostd {
   }
 
   //SD20220325 - added double version
-  bool WithinList(const vector<double>& list, const double& input, int& index, bool sorted) {
+  bool WithinList(const vector<double>& list, const double input, int& index, bool sorted) {
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
       if(sorted && list[i]>input){break;} 
       if(aurostd::isequal(list[i],input)) {
@@ -5660,7 +5660,7 @@ namespace aurostd {
   }
 
   //SD20220325 - returns all matches as a vector<int>
-  bool WithinList(const vector<double>& list, const double& input, vector<int>& index, bool sorted) {
+  bool WithinList(const vector<double>& list, const double input, vector<int>& index, bool sorted) {
     index.clear();
     for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
       if(sorted && list[i]>input){break;}
@@ -5668,7 +5668,7 @@ namespace aurostd {
         index.push_back(i);
       }
     }
-    return index.empty()?false:true;
+    return !index.empty();
   }
 
   //ME20190813 - added versions that also determine the index of the item in the list
@@ -5693,7 +5693,7 @@ namespace aurostd {
         index.push_back(i);
       }
     }
-    return index.empty()?false:true;
+    return !index.empty();
   }
   bool WithinList(const deque<string>& list, const string& input, vector<int>& index, bool sorted) {return WithinList(aurostd::deque2vector(list), input, index, sorted);}
 
@@ -5718,7 +5718,7 @@ namespace aurostd {
         index.push_back(i);
       }
     }
-    return index.empty()?false:true;
+    return !index.empty();
   }
 
   bool WithinList(const vector<uint>& list, uint input, int& index, bool sorted) {
@@ -5742,7 +5742,7 @@ namespace aurostd {
         index.push_back(i);
       }
     }
-    return index.empty()?false:true;
+    return !index.empty();
   }
 
   bool EWithinList(const vector<string>& list,const string& input) { //CO20200223
@@ -7200,20 +7200,15 @@ template<class utype> utype Cnk(utype n,utype k) { return combinations(n,k);}  /
 // SD20220324
 // linspace
 // Generates n linearly spaced points, the spacing between the points is (stop-start)/(n-1)
-// If n==1, return v(1)=stop
 // If n is a double, then round n
 namespace aurostd {
   xvector<double> linspace(const double start, const double stop, const int n) {
-    if (n < 1) {
-      string message = "Number of points must be greater than 0";
+    if (n <= 1) {
+      string message = "Number of points must be greater than one";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     xvector<double> v(n);
     double dx = stop - start;
-    if (n == 1) {
-      v(v.lrows) = stop;
-      return v;
-    }
     for (int i = v.lrows; i <= v.urows; i++) {
       v(i) = start + (i - 1) * dx / (n - 1);
     }

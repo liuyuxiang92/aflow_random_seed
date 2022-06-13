@@ -743,8 +743,8 @@ namespace aurostd {
   uint string2tokensAdd(const string& str,deque<string>& tokens,const string& delimiters = " ") __xprototype;
   template<class utype> uint string2tokensAdd(const string& str,std::vector<utype>& tokens,const string& delimiters = " ") __xprototype;
   template<class utype> uint string2tokensAdd(const string& str,std::deque<utype>& tokens,const string& delimiters = " ") __xprototype;
-  uint StringSplit(const string& str, vector<string>& tokens, const string& delimiter); //SD20220504
-  uint StringSplit(const string& str, deque<string>& tokens, const string& delimiter); //SD20220504
+  uint string2tokensByDelimiter(const string& str, vector<string>& tokens, const string& delimiter); //SD20220504
+  uint string2tokensByDelimiter(const string& str, deque<string>& tokens, const string& delimiter); //SD20220504
 
   //[CO20210315 - OBSOLETE use stream2stream()]template<typename typeTo, typename typeFrom> typeTo StringStreamConvert(const typeFrom& from);  //CO20210315 - cleaned up
   //[CO20210315 - OBSOLETE use stream2stream()]template<typename typeFrom> string StringConvert(const typeFrom& from);  //CO20210315 - cleaned up
@@ -828,16 +828,16 @@ namespace aurostd {
   bool substring2bool(const stringstream& strstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
   bool substring_present_file(const string& FileName,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
   bool substring_present_file_FAST(const string& FileName,const string& strsub1,bool RemoveWS=false,bool case_insensitive=false,bool expect_near_end=false,unsigned long long int size_max=AUROSTD_MAX_ULLINT);  //CO20210315 - cleaned up
-  bool WithinList(const vector<double>& list,const double& input,bool sorted=false);  //SD20220325
+  bool WithinList(const vector<double>& list,const double input,bool sorted=false);  //SD20220325
   bool WithinList(const vector<string>& list,const string& input,bool sorted=false);  //CO20181010
   bool WithinList(const deque<string>& list,const string& input,bool sorted=false);  //CO20181010
   bool WithinList(const vector<int>& list,int input,bool sorted=false); //CO20181010
   bool WithinList(const vector<uint>& list,uint input,bool sorted=false); //CO20181010
-  bool WithinList(const vector<double>&, const double&, int&,bool sorted=false);  //SD20220325
+  bool WithinList(const vector<double>&, const double, int&,bool sorted=false);  //SD20220325
   bool WithinList(const vector<string>&, const string&, int&,bool sorted=false);  //ME20190905
   bool WithinList(const vector<int>&, int, int&,bool sorted=false);  //ME20190905
   bool WithinList(const vector<uint>&, uint, int&,bool sorted=false);  //ME20190905
-  bool WithinList(const vector<double>&, const double&, vector<int>&,bool sorted=false);  //SD20220325
+  bool WithinList(const vector<double>&, const double, vector<int>&,bool sorted=false);  //SD20220325
   bool WithinList(const vector<string>&, const string&, vector<int>&,bool sorted=false);  //SD20220325
   bool WithinList(const vector<int>&, int, vector<int>&,bool sorted=false);  //SD20220325
   bool WithinList(const vector<uint>&, uint, vector<int>&,bool sorted=false);  //SD20220325

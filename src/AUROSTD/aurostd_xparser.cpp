@@ -882,7 +882,7 @@ namespace aurostd {
         }
       }
     }
-    aurostd::StringSplit(array, tokens1, "],[");
+    aurostd::string2tokensByDelimiter(array, tokens1, "],[");
     for (uint i = 0; i < tokens1.size(); i++) {
       aurostd::string2tokens(tokens1[i], tokens2, ",");
       vec.clear();
