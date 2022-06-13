@@ -36,16 +36,30 @@
 // --------------------------------------------------------------- constructors
 namespace aurostd {  // namespace aurostd
   template<class utype>                                    // default constructor
-    xvector<utype>::xvector(int nh,int nl) : vsize(0) {        
+    xvector<utype>::xvector(int nh,int nl) {
+      rows = 0; lrows = 0; urows = 0;  //HE20220613 initialize all member of xvector
+      size = 0; vsize= 0;
+      isfloat = false; iscomplex = false;
       resize(nh,nl);  //CO20201111
     }
 }
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                       // copy constructor
-    xvector<utype>::xvector(const xvector<utype>& b) : vsize(0) {copy(b);} //CO20191110
+    xvector<utype>::xvector(const xvector<utype>& b) {
+    rows = 0; lrows = 0; urows = 0;  //HE20220613 initialize all member of xvector
+    size = 0; vsize= 0;
+    isfloat = false; iscomplex = false;
+    copy(b);
+    } //CO20191110
   template<class utype>                                       // copy constructor
-    xvector<utype>::xvector(const xmatrix<utype>& b) : vsize(0) {copy(b);} //CO20191110
+    xvector<utype>::xvector(const xmatrix<utype>& b) {
+    rows = 0; lrows = 0;  //HE20220613 initialize all member of xvector
+    urows = 0; size = 0;
+    vsize= 0; isfloat = false;
+    iscomplex = false;
+    copy(b);
+    } //CO20191110
 }
 
 // ----------------------------------------------------------------------------
@@ -87,7 +101,7 @@ namespace aurostd {  // namespace aurostd
         printf("xxvector -> default constructor: lrows=%i, urows=%i,",lrows,urows);
 #endif
         if(vsize>0) {
-          corpus=new utype[rows+XXEND];
+          corpus=new utype[rows+XXEND](); //HE20220613 initialize corpus memory
           if(!corpus) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvector<utype>::copy():","allocation failure in COPY",_ALLOC_ERROR_);}
           corpus+= -lrows+XXEND;
         }
@@ -137,7 +151,7 @@ namespace aurostd {  // namespace aurostd
       cerr << "xxvector -> default constructor: lrows=" << lrows << ", urows=" << urows << ", rows=" << rows << endl;
 #endif
       if(lrows!=lrows_old||urows!=urows_old||vsize!=vsize_old) { //vsize>0
-        corpus=new utype[rows+XXEND];
+        corpus=new utype[rows+XXEND](); //HE20220613 initialize corpus memory
         if(!corpus) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvector<utype>::xvector():","allocation failure in default constructor",_ALLOC_ERROR_);}
         corpus+= -lrows+XXEND;
         reset(); //CO20191110
