@@ -7790,7 +7790,10 @@ namespace pflow {
       if(std::signbit(tol)){
         xstr.neg_scale_second=true;
         xstr.partial_occupation_HNF=-1*(int)tol;
-      } else {xstr.partial_occupation_site_tol=tol;}
+      } else {
+        //defaults both tols, stoich_tol to be overwritten if another tolerance is provided
+        xstr.partial_occupation_site_tol=xstr.partial_occupation_stoich_tol=tol;
+      }
     }
     if(tokens.size()>1){
       if(!aurostd::isfloat(tokens[1])){
