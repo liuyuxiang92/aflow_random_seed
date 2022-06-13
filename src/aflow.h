@@ -345,6 +345,8 @@ class _XHOST {
     bool showPGID,showPID,showTID;       // aflow_init.cpp  check if --showPID
     // machinery
     bool QUIET,QUIET_CERR,QUIET_COUT,TEST,DEBUG,MPI;    // extra quiet SC20210617
+    vector<string> LOGGER_WHITELIST;  //HE+ME20220305 - for logging
+    vector<string> LOGGER_BLACKLIST;  //HE+ME20220305 - for logging
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
     bool POSTPROCESS; //CO20200624 - generic postprocessing, including --lib2raw and --lib2lib
     bool ARUN_POSTPROCESS; //CT20181212 - this is for the --postprocess flag needed for AEL/AGL, can be extended to other modules too
@@ -2703,28 +2705,10 @@ void minimumCoordinationShell(const xstructure& xstr, uint center_index,
     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX20191122
 
 //makefile tests
-bool SchemaTest(ostream& oss=std::cout);  //ME20210408
-bool SchemaTest(ofstream& FileMESSAGE,ostream& oss=std::cout);  //ME20210408
-bool CeramGenTest(ostream& oss=cout);
-bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss=cout);
-bool EgapTest(ostream& oss=cout);
-bool EgapTest(ofstream& FileMESSAGE,ostream& oss=cout);
-bool gcdTest(ostream& oss=cout);
-bool gcdTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool smithTest(ostream& oss=cout);
 bool smithTest(ofstream& FileMESSAGE,ostream& oss=cout);
-bool coordinationTest(ostream& oss=cout);
-bool coordinationTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool PrototypeGeneratorTest(ostream& oss=cout, bool check_symmetry=false, bool check_uniqueness=false); //DX20200928
 bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss=cout, bool check_symmetry=false, bool check_uniqueness=false); //DX20200928
-bool FoldAtomsInCellTest(ostream& oss=cout); //DX20210129
-bool FoldAtomsInCellTest(ofstream& FileMESSAGE,ostream& oss=cout); //DX20210129
-bool AtomicEnvironmentTest(ostream& oss=cout); //HE20210511
-bool AtomicEnvironmentTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210511
-bool aurostdTest(ostream& oss=cout); //HE20210512
-bool aurostdTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210512
-bool cifParserTest(ostream& oss=cout); //ME20220125
-bool cifParserTest(ofstream& FileMESSAGE, ostream& oss=cout); //ME202201025
 // ----------------------------------------------------------------------------
 // Structure Prototypes
 // aflow_xproto.cpp
@@ -3018,7 +3002,9 @@ namespace xthread {
 
       int ncpus_max;
       int ncpus_min;
+#ifdef AFLOW_MULTITHREADS_ENABLE
       std::mutex mtx;
+#endif
       ostream* progress_bar;
       unsigned long long int progress_bar_counter;
       bool progress_bar_set;
@@ -4832,8 +4818,6 @@ namespace slab { //CO20190601
   xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
   xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout);  //CO20190321
 
-  bool slabTest(ostream& oss=cout);  //CO20190520
-  bool slabTest(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20190520
 } // namespace slab
 
 // ----------------------------------------------------------------------------
@@ -5389,6 +5373,118 @@ namespace xprototype {
       void free();                                       // free space
       void copy(const xprototype& b);                    // copy space
   };
+}
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Unit Tests - ME20220127
+
+namespace unittest {
+
+  typedef std::function<void(uint&, vector<vector<string> >&, vector<string>&)> unitTestFunction;
+
+  struct xcheck {
+    vector<string> errors;
+    unitTestFunction func;
+    string function_name;
+    string task_description;
+    string test_group;
+    uint passed_checks;
+    vector<vector<string> > results;
+    bool finished;
+  };
+
+  class UnitTest : public xStream {
+    public:
+      UnitTest(ostream& oss=std::cout);
+      UnitTest(ofstream& mf, ostream& oss=std::cout);
+      UnitTest(const UnitTest& ut);
+      const UnitTest& operator=(const UnitTest& ut);
+      ~UnitTest();
+
+      _aflags aflags;
+
+      void clear();
+
+      void resetUnitTest(const string& test_name);
+      bool runTestSuites(const string& unit_test);
+      bool runTestSuites(const vector<string>& unit_tests_in);
+
+    private:
+      std::map<string, xcheck> test_functions;
+      std::map<string, vector<string> > test_groups;
+      std::map<string, string> test2group;
+#ifdef AFLOW_MULTITHREADS_ENABLE
+      std::mutex mtx;
+#endif
+
+      void free();
+      void copy(const UnitTest& ut);
+
+      void initialize();
+      void initializeTestFunctions();
+      void initializeTestGroups();
+
+      void resetUnitTest(xcheck&);
+      xcheck initializeXCheck();
+
+      void runUnitTest(vector<string>::iterator& it, const vector<string>& tasks);
+      bool taskSuccessful(const string& task);
+
+      string formatResultsTable(const vector<vector<string> >& table);
+      void displayResult(const xcheck& xchk);
+
+      template <typename utype>
+      void check(const bool passed, const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
+          const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
+      void check(const bool passed, const vector<double>& calculated, const vector<double>& expected, const string& check_function,
+          const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
+      template <typename utype>
+      void check(const bool passed, const xmatrix<utype>& calculated, const xmatrix<utype>& expected, const string& check_function,
+          const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
+      void check(const bool passed, const xmatrix<double>& calculated, const xmatrix<double>& expected, const string& check_function,
+          const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
+      template <typename utype>
+      void check(const bool passed, const utype& calculated, const utype& expected, const string& check_function,
+          const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
+
+      template <typename utype>
+      void checkEqual(const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
+          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
+      void checkEqual(const vector<string>& calculated, const vector<string>& expected, const string& check_function,
+          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
+      template <typename utype>
+      void checkEqual(const utype& calculated, const utype& expected, const string& check_function,
+          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
+      void checkEqual(const string& calculated, const string& expected, const string& check_function,
+          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
+      void checkEqual(const bool calculated, const bool expected, const string& check_function,
+          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
+
+      // Test functions ---------------------------------
+
+      // aurostd
+      void xvectorTest(uint&, vector<vector<string> >&, vector<string>&);
+      void xscalarTest(uint&, vector<vector<string> >&, vector<string>&);
+      void xmatrixTest(uint&, vector<vector<string> >&, vector<string>&);
+      void aurostdMainTest(uint&, vector<vector<string> >&, vector<string>&);
+
+      // database
+      void schemaTest(uint&, vector<vector<string> >&, vector<string>&);
+
+      // xstructure
+      void atomicEnvironmentTest(uint&, vector<vector<string> >&, vector<string>&);
+      void xstructureParserTest(uint&, vector<vector<string> >&, vector<string>&);
+      void xstructureTest(uint&, vector<vector<string> >&, vector<string>&);
+
+      // structure generation
+      void ceramgenTest(uint&, vector<vector<string> >&, vector<string>&);
+      void prototypeGeneratorTest(uint&, vector<vector<string> >&, vector<string>&);
+
+      // ovasp
+      void xoutcarTest(uint&, vector<vector<string> >&, vector<string>&);
+  };
+
 }
 
 #endif
