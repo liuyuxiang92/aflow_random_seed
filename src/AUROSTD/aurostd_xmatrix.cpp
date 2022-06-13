@@ -65,10 +65,10 @@ namespace aurostd {  // namespace aurostd
         << ", rows="  << rows  << ", cols="  << cols << endl;
 #endif
       if(msize>0) {
-        corpus=new utype *[rows+XXEND];
+        corpus=new utype *[rows+XXEND]();  //HE20220613 initialize corpus memory
         if(!corpus){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::xmatrix():","allocation failure 1 (int,int,int,int)",_ALLOC_ERROR_);}
         corpus+= -lrows+ XXEND;
-        corpus[lrows]= new utype[rows*cols+XXEND];
+        corpus[lrows]= new utype[rows*cols+XXEND]();  //HE20220613 initialize corpus memory
         if(!corpus[lrows]){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::xmatrix():","allocation failure 2 (int,int,int,int)",_ALLOC_ERROR_);}
         corpus[lrows]+= -lcols+XXEND;
         for(int i=lrows+1;i<=urows;i++){corpus[i]=corpus[i-1]+cols;}  //this propagates previous line to all lrows
@@ -83,9 +83,20 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                       // copy constructor
-    xmatrix<utype>::xmatrix(const xmatrix<utype>& b) : msize(0) {copy(b);}  //CO20191112
+    xmatrix<utype>::xmatrix(const xmatrix<utype>& b) {
+      rows=0; lrows=0; urows= 0; //HE20220613 initialize all members of xmatrix
+      cols=0; lcols=0; ucols=0;
+      issquare=false; isfloat=false; iscomplex=false;
+      size=0; msize=0;
+      copy(b);
+    }  //CO20191112
   template<class utype>                                       // copy constructor
-    xmatrix<utype>::xmatrix(const xvector<utype>& b) : msize(0) {copy(b);}  //CO20191112
+    xmatrix<utype>::xmatrix(const xvector<utype>& b) {
+    rows=0; lrows=0; urows= 0;  //HE20220613 initialize all members of xmatrix
+    cols=0; lcols=0; ucols=0;
+    issquare=false; isfloat=false; iscomplex=false;
+    size=0; msize=0;copy(b);
+    }  //CO20191112
 }
 
 namespace aurostd {  // namespace aurostd
@@ -101,10 +112,10 @@ namespace aurostd {  // namespace aurostd
         << ", rows="  << rows  << ", cols="  << cols << endl;
 #endif
       if(msize>0) {
-        corpus=new utype *[rows+XXEND];
+        corpus=new utype *[rows+XXEND]();  //HE20220613 initialize corpus memory
         if(!corpus){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::xmatrix():","allocation failure 1 (int,int,utype*)",_ALLOC_ERROR_);}
         corpus+= -lrows+ XXEND;
-        corpus[lrows]= new utype[rows*cols+XXEND];
+        corpus[lrows]= new utype[rows*cols+XXEND]();  //HE20220613 initialize corpus memory
         if(!corpus[lrows]){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::xmatrix():","allocation failure 2 (int,int,utype*)",_ALLOC_ERROR_);}
         corpus[lrows]+= -lcols+XXEND;
         int i=0,j=0;
@@ -174,10 +185,10 @@ namespace aurostd {  // namespace aurostd
           << ", rows="  << rows  << ", cols="  << cols << endl;
 #endif
         if(msize>0) {
-          corpus=new utype *[rows+XXEND];
+          corpus=new utype *[rows+XXEND]();  //HE20220613 initialize corpus memory
           if(!corpus){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::copy():","allocation failure 1 in COPY",_ALLOC_ERROR_);}
           corpus+= -lrows+ XXEND;
-          corpus[lrows]= new utype[rows*cols+XXEND];
+          corpus[lrows]= new utype[rows*cols+XXEND]();  //HE20220613 initialize corpus memory
           if(!corpus[lrows]){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::copy():","allocation failure 2 in COPY",_ALLOC_ERROR_);}
           corpus[lrows]+= -lcols+XXEND;
           for(int i=lrows+1;i<=urows;i++){corpus[i]=corpus[i-1]+cols;}  //this propagates previous line to all lrows
@@ -6056,8 +6067,8 @@ namespace aurostd {
     xmatrix2matrix(const xmatrix<utype>& _xmatrix) {
       int isize=_xmatrix.rows,jsize=_xmatrix.cols;
       matrix<utype> _matrix(isize,jsize);
-      for(register int i=0;i<isize;i++)
-        for(register int j=0;j<jsize;j++)
+      for(int i=0;i<isize;i++)   //HE20220124 removed register as it is deprecated in C++11 and gone in C++17
+        for(int j=0;j<jsize;j++) //Defect report 809 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4193.html#809
           _matrix[i][j]=_xmatrix(i+_xmatrix.lrows,j+_xmatrix.lcols);
       return _matrix;
     }
@@ -6075,8 +6086,8 @@ namespace aurostd {
     matrix2xmatrix(const matrix<utype>& _matrix) {
       int isize=_matrix.size(),jsize=_matrix[0].size();
       xmatrix<utype> _xmatrix(isize,jsize);
-      for(register int i=1;i<=isize;i++)
-        for(register int j=1;j<=jsize;j++)
+      for(int i=1;i<=isize;i++)   //HE20220124 removed register as it is deprecated in C++11 and gone in C++17
+        for(int j=1;j<=jsize;j++) //Defect report 809 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4193.html#809
           _xmatrix(i,j)=_matrix[i-1][j-1];
       return _xmatrix;
     }
