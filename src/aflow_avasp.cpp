@@ -933,6 +933,7 @@ bool AVASP_populateXVASP(const _aflags& aflags,const _kflags& kflags,const _vfla
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::EDIFFG\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::EDIFFG") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::ENMAX_MULTIPLY\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::ENMAX_MULTYPLY\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::ENMAX_MULTYPLY") << endl;}
+  if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::ITC\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::ITC") << endl;} //CO20220613
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::IVDW\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::IVDW") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::KPPRA\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA") << endl;}
   if(LDEBUG) {cerr << soliloquy << " xvasp.aopts.flag(\"AFLOWIN_FLAG::KPPRA_STATIC\")=" << xvasp.aopts.flag("AFLOWIN_FLAG::KPPRA_STATIC") << endl;}
@@ -2987,7 +2988,9 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     }
     if(pocc){aflowin << "[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE " << endl;}
     else {aflowin << "[VASP_POSCAR_MODE_EXPLICIT]START " << endl;}
-    aflowin << xvasp.str;
+    xstructure _str(xvasp.str);_str.xstructure2vasp();  //CO20220613
+    if(xvasp.aopts.flag("AFLOWIN_FLAG::ITC")){_str.xstructure2itc();} //CO20220613
+    aflowin << _str;  //CO20220613
     if(pocc){aflowin << "[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE " << endl;}
     else {aflowin << "[VASP_POSCAR_MODE_EXPLICIT]STOP " << endl;}
   }
@@ -2998,6 +3001,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     // aflowin_qe << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
     aflowin_qe << "[QE_GEOM_MODE_EXPLICIT]START " << endl;
     xstructure _str(xvasp.str);_str.xstructure2qe();
+    if(xvasp.aopts.flag("AFLOWIN_FLAG::ITC")){_str.xstructure2itc();} //CO20220613
     aflowin_qe << _str;
     aflowin_qe << "[QE_GEOM_MODE_EXPLICIT]STOP " << endl;
     //   aflowin_qe << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
@@ -3009,6 +3013,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     // aflowin_abinit << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
     aflowin_abinit << "[ABINIT_GEOM_MODE_EXPLICIT]START " << endl;
     xstructure _str(xvasp.str);_str.xstructure2abinit();
+    if(xvasp.aopts.flag("AFLOWIN_FLAG::ITC")){_str.xstructure2itc();} //CO20220613
     aflowin_abinit << _str;
     aflowin_abinit << "[ABINIT_GEOM_MODE_EXPLICIT]STOP " << endl;
     //   aflowin_abinit << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
@@ -3020,6 +3025,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     // aflowin_aims << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
     aflowin_aims << "[AIMS_GEOM_MODE_EXPLICIT]START " << endl;
     xstructure _str(xvasp.str);_str.xstructure2aims();
+    if(xvasp.aopts.flag("AFLOWIN_FLAG::ITC")){_str.xstructure2itc();} //CO20220613
     aflowin_aims << _str;
     aflowin_aims << "[AIMS_GEOM_MODE_EXPLICIT]STOP " << endl;
     //   aflowin_aims << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
@@ -3033,6 +3039,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     // aflowin_aims << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
     aflowin_cif << "[CIF_GEOM_MODE_EXPLICIT]START " << endl;
     xstructure _str(xvasp.str);_str.xstructure2cif();
+    if(xvasp.aopts.flag("AFLOWIN_FLAG::ITC")){_str.xstructure2itc();} //CO20220613
     aflowin_cif << _str;
     aflowin_cif << "[CIF_GEOM_MODE_EXPLICIT]STOP " << endl;
     //   aflowin_cif << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
@@ -3047,6 +3054,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     // aflowin_aims << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
     aflowin_abccar << "[ABCCAR_GEOM_MODE_EXPLICIT]START " << endl;
     xstructure _str(xvasp.str);_str.xstructure2abccar();
+    if(xvasp.aopts.flag("AFLOWIN_FLAG::ITC")){_str.xstructure2itc();} //CO20220613
     aflowin_abccar << _str;
     aflowin_abccar << "[ABCCAR_GEOM_MODE_EXPLICIT]STOP " << endl;
     //   aflowin_abccar << AFLOWIN_SEPARATION_LINE << endl; // [AFLOW] **************************************************
@@ -5009,6 +5017,7 @@ void PARAMS2xvasp(_AVASP_PROTO *PARAMS,_xvasp& xvasp){  //CO20210624 - avoid dup
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_LDAU",TRUE);
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTONOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_NOLDAU",TRUE);
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::VASP")) xvasp.aopts.flag("AFLOWIN_FLAG::VASP",TRUE);
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ITC")) xvasp.aopts.flag("AFLOWIN_FLAG::ITC",TRUE); //CO20220613
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::ABCCAR")) xvasp.aopts.flag("AFLOWIN_FLAG::ABCCAR",TRUE); //DX20190123 - add ABCCAR
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::ABINIT")) xvasp.aopts.flag("AFLOWIN_FLAG::ABINIT",TRUE);
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::AIMS")) xvasp.aopts.flag("AFLOWIN_FLAG::AIMS",TRUE);
@@ -6001,6 +6010,7 @@ bool AVASP_MakePrototype_AFLOWIN_20180101(_AVASP_PROTO *PARAMS) {
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_LDAU",TRUE);
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::AUTONOLDAU")) xvasp.aopts.flag("FLAG::AVASP_FORCE_NOLDAU",TRUE);
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::VASP")) xvasp.aopts.flag("AFLOWIN_FLAG::VASP",TRUE);
+  if(PARAMS->vparams.flag("AFLOWIN_FLAG::ITC")) xvasp.aopts.flag("AFLOWIN_FLAG::ITC",TRUE); //CO20220613
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::ABCCAR")) xvasp.aopts.flag("AFLOWIN_FLAG::ABCCAR",TRUE); //DX20190123 - add ABCCAR
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::ABINIT")) xvasp.aopts.flag("AFLOWIN_FLAG::ABINIT",TRUE);
   if(PARAMS->vparams.flag("AFLOWIN_FLAG::AIMS")) xvasp.aopts.flag("AFLOWIN_FLAG::AIMS",TRUE);

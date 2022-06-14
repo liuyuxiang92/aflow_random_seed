@@ -16552,6 +16552,26 @@ void xstructure::xstructure2vasp(void) {
 }
 
 // ***************************************************************************
+// Function xstructure2itc
+// ***************************************************************************
+void xstructure::xstructure2itc(void) { //CO20220613
+  ReScale(1.0);
+  neg_scale=FALSE;
+  coord_flag=_COORDS_FRACTIONAL_;
+  char iomode_orig=iomode;  //save
+  iomode=IOVASP_WYCKCAR;
+  (*this).spacegroupnumber = (*this).SpaceGroup_ITC();
+  (*this).lattice = (*this).standard_lattice_ITC; // need to update the lattice; may have rotated
+  if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
+  stringstream ss;
+  ss << (*this);
+  (*this).clear();
+  ss >> (*this);
+  iomode=iomode_orig;
+  return;
+}
+
+// ***************************************************************************
 // Function xstructure2aims
 // ***************************************************************************
 void xstructure::xstructure2aims(void) {
@@ -17683,6 +17703,12 @@ xstructure input2VASPxstr(istream& input,bool vasp5) {  //CO20210119 - added vas
   a.xstructure2vasp();
   if(vasp5){a.is_vasp4_poscar_format=false;a.is_vasp5_poscar_format=true;}  //CO20210119
   //  cerr << a.title << endl;
+  return a;
+}
+
+xstructure input2ITCxstr(istream& input) {  //CO20220613
+  xstructure a(input,IOAFLOW_AUTO);
+  a.xstructure2itc();
   return a;
 }
 

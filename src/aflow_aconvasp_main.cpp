@@ -1046,6 +1046,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW","--aflow_proto=|--aflow_proto_icsd=","");      // --aflow_proto=123:A:B:C  --aflow_proto_icsd=Gd1Mn2Si2_ICSD_54947 
   if(vpflow.flag("PROTO")||vpflow.flag("PROTO_AFLOW")) {  //CO20180622 - set these flags if structure is downloaded from web
     vpflow.flag("PROTO::VASP",aurostd::args2flag(argv,cmds,"--vasp") || (!aurostd::args2flag(argv,cmds,"--qe") && !aurostd::args2flag(argv,cmds,"--abinit") && !aurostd::args2flag(argv,cmds,"--aims")  && !aurostd::args2flag(argv,cmds,"--cif") && !aurostd::args2flag(argv,cmds,"--elk"))); //DX20190131 //DX20200313 - added elk
+    vpflow.flag("PROTO::ITC",aurostd::args2flag(argv,cmds,"--itc"));  //CO20220613
     vpflow.flag("PROTO::QE",aurostd::args2flag(argv,cmds,"--qe"));
     vpflow.flag("PROTO::ABCCAR",aurostd::args2flag(argv,cmds,"--abccar")); //DX20190123 - add abccar output
     vpflow.flag("PROTO::ABINIT",aurostd::args2flag(argv,cmds,"--abinit"));
@@ -1171,12 +1172,15 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     if(vpflow.flag("PROTO_AFLOW::RHL")) vlist+="--rhl ";                                                     // recursion is GNU's pleasure (SC2016)
     vpflow.flag("PROTO_AFLOW::VASP",aurostd::args2flag(argv,cmds,"--vasp"));
     if(vpflow.flag("PROTO_AFLOW::VASP")) vlist+="--vasp ";                                                   // recursion is GNU's pleasure (SC2014)
+    vpflow.flag("PROTO_AFLOW::ITC",aurostd::args2flag(argv,cmds,"--itc"));  //CO20220613
+    if(vpflow.flag("PROTO_AFLOW::ITC")) vlist+="--itc ";                                                   // recursion is GNU's pleasure (SC2014)  //CO20220613
     vpflow.flag("PROTO_AFLOW::HTQC",aurostd::args2flag(argv,"--htqc"));
     if(vpflow.flag("PROTO_AFLOW::HTQC")) vlist+="--htqc ";                                                   // recursion is GNU's pleasure (SC2014)
     vpflow.flag("PROTO_AFLOW::LIST",aurostd::args2flag(argv,cmds,"--list"));
     //     if(vpflow.flag("PROTO_AFLOW::LIST")) vlist+="--listDEBUG ";
     if(vpflow.flag("PROTO_AFLOW::LIST")) vpflow.push_attached("PROTO_AFLOW::LIST_VCMD",vlist);           // recursion is GNU's pleasure (SC2014)
     vpflow.flag("KPOINTS",FALSE);   // PRIORITIES
+    vpflow.flag("ITC",FALSE);        // PRIORITIES  //CO20220613
     vpflow.flag("QE",FALSE);        // PRIORITIES
     vpflow.flag("ABCCAR",FALSE);    // PRIORITIES //DX20190123 - add ABCCAR
     vpflow.flag("ABINIT",FALSE);    // PRIORITIES
@@ -1210,6 +1214,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   }
 
   // MOVE ON
+  vpflow.flag("ITC",aurostd::args2flag(argv,cmds,"--itc") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //CO20220613
   vpflow.flag("QE",aurostd::args2flag(argv,cmds,"--qe") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO"));
   vpflow.flag("ABCCAR",aurostd::args2flag(argv,cmds,"--abccar") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //DX20190123 - moved ABCCAR to here
   vpflow.flag("ABINIT",aurostd::args2flag(argv,cmds,"--abinit") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO"));
@@ -1703,6 +1708,25 @@ namespace pflow {
     }
     // *********************************************************************
     if(argv.size()>=2 && !_PROGRAMRUN) {
+      //CO20220613 - must go first
+      if(vpflow.flag("ITC")) {
+        xstructure xstr(cin);
+        if(vpflow.flag("ABINIT")){xstr.xstructure2abinit();vpflow.flag("ABINIT",false);}
+        if(vpflow.flag("AIMS")){xstr.xstructure2aims();vpflow.flag("AIMS",false);}
+        if(vpflow.flag("ATAT")){xstr.xstructure2atat();vpflow.flag("ATAT",false);}
+        if(vpflow.flag("ELK")){xstr.xstructure2elk();vpflow.flag("ELK",false);}
+        if(vpflow.flag("QE")){xstr.xstructure2qe();vpflow.flag("QE",false);}
+        if(vpflow.flag("VASP")||vpflow.flag("VASP5")){
+          xstr.xstructure2vasp();
+          if(vpflow.flag("VASP5")){a.is_vasp4_poscar_format=false;a.is_vasp5_poscar_format=true;}
+          vpflow.flag("VASP",false);
+          vpflow.flag("VASP5",false);
+        }
+        xstr.xstructure2itc();
+        cout << xstr;
+        _PROGRAMRUN=true;
+      }
+
       // A
       if(vpflow.flag("ABINIT")) {cout << input2ABINITxstr(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("AIMS")) {cout << input2AIMSxstr(cin); _PROGRAMRUN=true;}
@@ -2569,6 +2593,7 @@ namespace pflow {
     strstream << tab << x << " --uffenergy|--ue  < POSCAR" << endl;
     strstream << tab << x << " --unique_atom_decorations < POSCAR" << endl; //DX20210611
     strstream << tab << x << " --vasp < GEOM" << endl;
+    strstream << tab << x << " --itc < GEOM" << endl; //CO20220613
     strstream << tab << x << " --volume=x|--volume*=x|--volume+=x < POSCAR" << endl;
     strstream << tab << x << " --wyccar [TOL] < POSCAR" << endl;
     strstream << tab << x << " --wyccman|--WyccarManual|--wm [TOL] [ITERATION] < POSCAR" << endl;
@@ -2598,7 +2623,7 @@ namespace pflow {
     strstream << endl;
     strstream << " Prototypes ICSD (from the local machine or aflowlib servers)" << endl;
     strstream << tab << x << " [--server=nnnnnnnnnn] --prototypes_icsd[=N]|--protos_icsd[=N]" << endl;
-    strstream << tab << x << " [--server=nnnnnnnnnn] [--vasp|--qe|--abinit|--aims] --proto_icsd=label" << endl;
+    strstream << tab << x << " [--server=nnnnnnnnnn] [--vasp|--itc|--qe|--abinit|--aims] --proto_icsd=label" << endl; //CO20220613
     strstream << endl;
     strstream << " Order Parameter [EXPERIMENTA]" << endl;
     strstream << tab << x << " --order_parameter [--order_parameter_sum XXX] [--Li8Mn16O32] < POSCAR [EXPERIMENTA]" << endl;
@@ -12411,7 +12436,7 @@ namespace pflow {
           aurostd::liststring2string("aflow [options] --proto=label*[:speciesA*[:speciesB*]..[:volumeA*[:volumeB*].. | :volume]] [--params=..... [--hex]]",
             "                --proto[_icsd]=ICSD_number.{ABC}[:speciesA*[:speciesB*]..[:volumeA*[:volumeB*].. | :volume]]",
             "                --proto_icsd=label_ICSD_number",
-            "options = [--server=xxxxxxx]  [--vasp | --qe | --abinit | --aims | --cif | --abccar] [--params=... | --hex]]",
+            "options = [--server=xxxxxxx]  [--vasp | --itc | --qe | --abinit | --aims | --cif | --abccar] [--params=... | --hex]]",
             "To get the list of prototypes --protos or --protos_icsd ."));
     }
 
@@ -12753,6 +12778,8 @@ namespace pflow {
       // now checking ELK //DX20200313
       if(vpflow.flag("PROTO::ELK")) str.xstructure2elk();
 
+      // now checking ITC
+      if(vpflow.flag("PROTO::ITC")) str.xstructure2itc(); //CO20220613
     }
 
     if(LDEBUG) cerr << soliloquy << " END" << endl;  
@@ -13086,8 +13113,9 @@ namespace pflow {
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ENMAX_MULTIPLY\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ENMAX_MULTIPLY") << endl;
 
     // check ABINIT QE VASP AIMS
-    if(LDEBUG) cerr << soliloquy << " CHECK VASP/ABCCAR/QE/ABINIT/AIMS/CIF/ELK" << endl; //DX20190123 - add CIF //DX20200313 - add ELK
+    if(LDEBUG) cerr << soliloquy << " CHECK VASP/ABCCAR/ITC/QE/ABINIT/AIMS/CIF/ELK" << endl; //DX20190123 - add CIF //DX20200313 - add ELK  //CO20220613
     PARAMS.vparams.flag("AFLOWIN_FLAG::VASP",TRUE); // default
+    PARAMS.vparams.flag("AFLOWIN_FLAG::ITC",vpflow.flag("PROTO_AFLOW::ITC")); //CO20220613
     PARAMS.vparams.flag("AFLOWIN_FLAG::QE",vpflow.flag("PROTO_AFLOW::QE"));
     PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR",vpflow.flag("PROTO_AFLOW::ABCCAR")); //DX20190123 - add ABCCAR
     PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT",vpflow.flag("PROTO_AFLOW::ABINIT"));
@@ -13109,6 +13137,10 @@ namespace pflow {
       PARAMS.vparams.flag("AFLOWIN_FLAG::CIF",FALSE); //DX20190123 - add CIF
       PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR",FALSE); //DX20190123 - add ABCCAR
       PARAMS.vparams.flag("AFLOWIN_FLAG::ELK",FALSE); //DX20200313 - add ELK
+    }
+    //CO20220613 - add ITC - START
+    if(PARAMS.vparams.flag("AFLOWIN_FLAG::ITC")) {  //CO20220613
+      //CO20220613 - --itc can be added with another flag
     }
     //DX20190123 - add ABCCAR - START
     if(PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR")) {
@@ -13160,6 +13192,7 @@ namespace pflow {
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ABINIT\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::QE\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::QE") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::VASP\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::VASP") << endl;
+    if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ITC\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ITC") << endl; //CO20220613
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::CIF\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::CIF") << endl; //DX20190123 - add CIF
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ABCCAR\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ABCCAR") << endl; //DX20190123 - add ABCCAR
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ELK\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ELK") << endl; //DX20200313 - add ELK
@@ -13286,6 +13319,7 @@ namespace pflow {
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::HTQC_ICSD\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::HTQC_ICSD") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::NEGLECT_NOMIX\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::NEGLECT_NOMIX") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::VASP\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::VASP") << endl;
+    if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ITC\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ITC") << endl; //CO20220613
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::ABINIT\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::ABINIT") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::AIMS\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::AIMS") << endl;
     if(LDEBUG) cerr << soliloquy << " PARAMS.vparams.flag(\"AFLOWIN_FLAG::QE\")=" << PARAMS.vparams.flag("AFLOWIN_FLAG::QE") << endl;
