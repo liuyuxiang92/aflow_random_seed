@@ -773,8 +773,8 @@ namespace aflowlib {
     std::string m_filesystem_collection; ///< collection to use for queries
 
     // Attributes
-    std::shared_ptr<aflowlib::AflowDB> m_sqlite_db_ptr;       ///< pointer to an instance of the internal AFLUX SQLITE DB
-    std::shared_ptr<aflowlib::AflowDB> m_sqlite_alloy_db_ptr; ///< pointer to an instance of the public alloy SQLITE DB
+    std::unique_ptr<aflowlib::AflowDB> m_sqlite_db_ptr;       ///< pointer to an instance of the internal AFLUX SQLITE DB
+    std::unique_ptr<aflowlib::AflowDB> m_sqlite_alloy_db_ptr; ///< pointer to an instance of the public alloy SQLITE DB
     /// @brief set that contains all loaded AUIDs
     /// @note `std::set` is stored sorted and is therefore faster at finding entries compared to `std::vector`
     std::vector<std::string> m_auid_list;

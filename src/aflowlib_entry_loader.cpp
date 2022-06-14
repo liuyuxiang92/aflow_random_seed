@@ -108,7 +108,7 @@ namespace aflowlib {
   /// @brief create a copy (privat)
   void EntryLoader::copy(const EntryLoader &b) {  //copy PRIVATE
     m_out_debug = b.m_out_debug;
-    m_out_silent = b. m_out_silent;
+    m_out_silent = b.m_out_silent;
     m_xstructure_relaxed = b.m_xstructure_relaxed;
     m_xstructure_original = b.m_xstructure_original;
     m_xstructure_original_file_name = b.m_xstructure_original_file_name;
@@ -134,8 +134,8 @@ namespace aflowlib {
     m_auid_list = b.m_auid_list;
     aurostd::StringstreamClean(m_logger_message);
 
-    m_sqlite_db_ptr = b.m_sqlite_db_ptr;
-    m_sqlite_alloy_db_ptr = b.m_sqlite_alloy_db_ptr;
+    m_sqlite_db_ptr = nullptr;
+    m_sqlite_alloy_db_ptr = nullptr;
 
     m_entries_flat = std::make_shared < std::vector < std::shared_ptr < aflowlib::_aflowlib_entry>>>(*b.m_entries_flat);
     m_entries_layered_map = std::make_shared < std::map < short,
@@ -390,7 +390,7 @@ namespace aflowlib {
   void EntryLoader::loadAlloy(const std::string &alloy, bool recursive) {
     std::vector <std::string> alloy_elements;
     if (alloy.find(", ") != std::string::npos) aurostd::string2tokens(alloy, alloy_elements, ", ");
-    else if (alloy.find(",") != std::string::npos) aurostd::string2tokens(alloy, alloy_elements, ",");
+    else if (alloy.find(',') != std::string::npos) aurostd::string2tokens(alloy, alloy_elements, ",");
     else alloy_elements = aurostd::getElements(alloy);
     loadAlloy(alloy_elements, recursive);
   }
@@ -439,8 +439,8 @@ namespace aflowlib {
       final_alloy_list.push_back(alloy_tmp);
     }
     m_logger_message << "Try loading " << final_alloy_list.size() << " systems: ";
-    for (std::vector<std::string>::const_iterator alloy = final_alloy_list.begin(); alloy != final_alloy_list.end(); alloy++) {
-      m_logger_message << "\"" << *alloy << "\" ";
+    for (std::vector<std::string>::const_iterator i_alloy = final_alloy_list.begin(); i_alloy != final_alloy_list.end(); i_alloy++) {
+      m_logger_message << "\"" << *i_alloy << "\" ";
     }
     outInfo(__func__);
 
@@ -617,7 +617,8 @@ namespace aflowlib {
       case Source::SQLITE: {
         if (aurostd::FileExist(m_sqlite_file)) {
           if (m_sqlite_db_ptr == nullptr) {
-            m_sqlite_db_ptr = std::make_shared<aflowlib::AflowDB>(m_sqlite_file);
+            std::unique_ptr<aflowlib::AflowDB> tmpPtr(new aflowlib::AflowDB(m_sqlite_file));
+            m_sqlite_db_ptr = std::move(tmpPtr);
           }
           m_current_source = Source::SQLITE;
           return true;
@@ -643,7 +644,8 @@ namespace aflowlib {
         if (m_filesystem_available) {
           if (aurostd::FileExist(m_sqlite_alloy_file)) { //
             if (m_sqlite_alloy_db_ptr == nullptr) {
-              m_sqlite_alloy_db_ptr = std::make_shared<aflowlib::AflowDB>(m_sqlite_alloy_file);
+              std::unique_ptr<aflowlib::AflowDB> tmpPtr(new aflowlib::AflowDB(m_sqlite_alloy_file));
+              m_sqlite_alloy_db_ptr = std::move(tmpPtr);
             }
             m_current_source = Source::FILESYSTEM;
             return true;
@@ -662,7 +664,8 @@ namespace aflowlib {
         if (m_filesystem_available) { //
           if (aurostd::FileExist(m_sqlite_alloy_file)) { // use the alloy DB to optimize the RAW results
             if (m_sqlite_alloy_db_ptr == nullptr) {
-              m_sqlite_alloy_db_ptr = std::make_shared<aflowlib::AflowDB>(m_sqlite_alloy_file);
+              std::unique_ptr<aflowlib::AflowDB> tmpPtr(new aflowlib::AflowDB(m_sqlite_alloy_file));
+              m_sqlite_alloy_db_ptr = std::move(tmpPtr);
             }
           }
           m_current_source = Source::FILESYSTEM_RAW;
@@ -678,7 +681,8 @@ namespace aflowlib {
         if (200 == aurostd::httpGetStatus(m_restapi_server+m_restapi_path+"ICSD_WEB/")) {
           if (aurostd::FileExist(m_sqlite_alloy_file)) {
             if (m_sqlite_alloy_db_ptr == nullptr) {
-              m_sqlite_alloy_db_ptr = std::make_shared<aflowlib::AflowDB>(m_sqlite_alloy_file);
+              std::unique_ptr<aflowlib::AflowDB> tmpPtr(new aflowlib::AflowDB(m_sqlite_alloy_file));
+              m_sqlite_alloy_db_ptr = std::move(tmpPtr);
             }
             m_current_source = Source::RESTAPI;
             return true;
@@ -698,7 +702,8 @@ namespace aflowlib {
         if (200 == aurostd::httpGetStatus(m_restapi_server+m_restapi_path+"ICSD_WEB/")) {
           if (aurostd::FileExist(m_sqlite_alloy_file)) {
             if (m_sqlite_alloy_db_ptr == nullptr) {
-              m_sqlite_alloy_db_ptr = std::make_shared<aflowlib::AflowDB>(m_sqlite_alloy_file);
+              std::unique_ptr<aflowlib::AflowDB> tmpPtr(new aflowlib::AflowDB(m_sqlite_alloy_file));
+              m_sqlite_alloy_db_ptr = std::move(tmpPtr);
             }
           }
           m_current_source = Source::RESTAPI_RAW;
@@ -1137,7 +1142,10 @@ namespace aflowlib {
         }
       }
     }
-    delete *paths;
+    fts_close(tree);
+    delete[] paths;
+
+
     m_logger_message << "Finishing search in the filesystem after scanning " << scanned << " objects";
     outInfo(__func__);
     loadFiles(found_entries);
@@ -1240,7 +1248,7 @@ namespace aflowlib {
   /// @return `false` if AUID is not valid
   /// @note the AUID is cleaned in place
   bool EntryLoader::cleanAUID(std::string & AUID) {
-    if (AUID.find("\"")!=std::string::npos) aurostd::StringSubst(AUID, "\"", "");
+    if (AUID.find('\"')!=std::string::npos) aurostd::StringSubst(AUID, "\"", "");
     if (AUID.substr(0, 5) == "auid:") AUID="aflow:" + AUID.substr(5);
     else if (AUID.substr(0, 6) != "aflow:") AUID="aflow:" + AUID;
     if (aurostd::_ishex(AUID.substr(6)) && AUID.size()==22) return true;
