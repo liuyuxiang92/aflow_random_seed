@@ -405,6 +405,9 @@ namespace aurostd {
   template<class utype> bool
     isNonInvertible(const xmatrix<utype>&, xmatrix<utype>&) __xprototype; // RETURN ERROR if non invertible
 
+  template<class utype> xmatrix<utype>
+    inverseByQR(const xmatrix<utype>&) __xprototype;  //SD20220426
+
   template<class utype> void
     LUPDecomposition(const xmatrix<utype>& A, xmatrix<double>& LU, xmatrix<double>& P, utype tol=_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_) __xprototype; //SD20220426
   template<class utype> void

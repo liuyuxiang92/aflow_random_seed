@@ -332,6 +332,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   o+=m(1)*v; //SD20220510
   aurostd::LUPDecomposition(mm,dxm,dxm); //SD20220426
   aurostd::LUPDecomposition(mm,dxm,dxm,dxm); //SD20220426
+  aurostd::inverseByQR(m3); //SD20220426
   aurostd::inverseByLUP(m3); //SD20220426
   aurostd::condition_number(m); //SD20220425
   aurostd::HadamardProduct(mmm,mmm); //SD20220422

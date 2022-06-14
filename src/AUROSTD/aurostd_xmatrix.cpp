@@ -2143,27 +2143,21 @@ namespace aurostd {  // namespace aurostd
       //[CO20191201 - OBSOLETE]GaussJordan(b,B);
       //    if(size>=6) {cerr << _AUROSTD_XLIBS_ERROR_ << "ERROR - aurostd::xmatrix<utype>::inverse: " << size << "x" << size << " not written yet" << endl;}
       //[CO20191201 - OBSOLETE]return b;
-      //SD20220427 - Adjoint method is very costly, instead we use LUP decomposition due to speed.
-      //If that method fails, then we use QR decomposition, where we invert R by LUP decomposition.
-      //If these fail, we fall back on the adjoint
-      //Also the user should look into pre-conditioning, see: aurostd::equilibrateMatrix()
-      //For benefits of QR decomposition when finding the inverse, see: http://batty.mullikin.org/2601/num3.pdf
-      //[SD20220427 - OBSOLETE]return inverseByAdjoint(a);
-      try { // we need a try block because LUP and QR decompositions can fail with errors
-        xmatrix<utype> id = aurostd::identity(a);
-        b = aurostd::inverseByLUP(a);
-        if(aurostd::isequal(a * b, id)) {return b;} 
-        xmatrix<utype> q, r;
-        aurostd::QRDecomposition_HouseHolder(a, q, r);
-        b = aurostd::inverseByLUP(r) * trasp(q);
-        if(aurostd::isequal(a * b, id)) {return b;} 
+      //SD20220427 - start with finding the inverse by adjoint since an answer is guaranteed, if the answer is wrong, then go on to other methods
+      xmatrix<utype> id = aurostd::identity(a);
+      b = aurostd::inverseByAdjoint(a);
+      if(aurostd::isequal(a * b, id)) {return b;} 
+      try { //SD20220427 - we need a try block because LUP and QR decompositions can fail with errors
+        b = aurostd::inverseByQR(a);
       }
       catch (aurostd::xerror& e) {
+      }
+      if(!aurostd::isequal(a * b, id)) {
         stringstream message;
         message << "Matrix inversion failed: determinant=" << aurostd::abs(aurostd::det(a)) << " | condition number=" << aurostd::condition_number(a);
         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
-      return aurostd::inverseByAdjoint(a);
+      return b;
     }
 }
 
@@ -2174,6 +2168,16 @@ namespace aurostd {  // namespace aurostd
       utype c=aurostd::det(a);
       if(abs(c)<10e-14) {return TRUE;}
       return FALSE;
+    }
+}
+
+// ----------------------------------------------------------------------------
+namespace aurostd {  // namespace aurostd
+  template<class utype>                                 // function inverse xmatrix<>
+    xmatrix<utype> inverseByQR(const xmatrix<utype>& A) { //SD20220426
+      xmatrix<utype> Q, R;
+      aurostd::QRDecomposition_HouseHolder(A, Q, R);
+      return aurostd::inverseByLUP(R) * trasp(Q);
     }
 }
 
