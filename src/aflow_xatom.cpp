@@ -13159,7 +13159,7 @@ void xstructure::BringInCell(double tolerance, double upper_bound, double lower_
 // ***************************************************************************
 // Make a structure where all the atoms are all the
 // atoms are mapped through the unit and neighbors cells
-// to minimixe the shortest possible bond with an adjacent atom
+// to minimize the shortest possible bond with an adjacent atom
 // This option is very useful if you run big and complicate
 // molecules where atoms exit of the unit cell and you have
 // problems understanding where they are because visualization
