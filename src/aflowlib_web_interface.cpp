@@ -1021,11 +1021,11 @@ namespace aflowlib {
       //ME20210927 END
       //AS20200901 BEGIN
       // QHA
-      case (aurostd::ctcrc64("gruneisen_qha")): { gruneisen_qha = aurostd::string2utype<double>(content); }
-      case (aurostd::ctcrc64("gruneisen_qha_300K")): { gruneisen_qha_300K = aurostd::string2utype<double>(content); }
+      case (aurostd::ctcrc64("gruneisen_qha")): { gruneisen_qha = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("gruneisen_qha_300K")): { gruneisen_qha_300K = aurostd::string2utype<double>(content); } break;
       case (aurostd::ctcrc64("thermal_expansion_qha_300K")): {
         thermal_expansion_qha_300K = aurostd::string2utype<double>(content); } break;
-      case (aurostd::ctcrc64("modulus_bulk_qha_300K")): { modulus_bulk_qha_300K = aurostd::string2utype<double>(content); }
+      case (aurostd::ctcrc64("modulus_bulk_qha_300K")): { modulus_bulk_qha_300K = aurostd::string2utype<double>(content); } break;
       //AS20200901 END
       //AS20201008 BEGIN
       case (aurostd::ctcrc64("modulus_bulk_derivative_pressure_qha_300K")): { modulus_bulk_derivative_pressure_qha_300K = aurostd::string2utype<double>(content); } break;
@@ -1033,7 +1033,7 @@ namespace aflowlib {
       case (aurostd::ctcrc64("heat_capacity_Cv_cell_qha_300K")): { heat_capacity_Cv_cell_qha_300K = aurostd::string2utype<double>(content); } break;
       case (aurostd::ctcrc64("heat_capacity_Cp_atom_qha_300K")): { heat_capacity_Cp_atom_qha_300K = aurostd::string2utype<double>(content); } break;
       case (aurostd::ctcrc64("heat_capacity_Cp_cell_qha_300K")): { heat_capacity_Cp_cell_qha_300K = aurostd::string2utype<double>(content); } break;
-      case (aurostd::ctcrc64("volume_atom_qha_300K")): { volume_atom_qha_300K = aurostd::string2utype<double>(content); }
+      case (aurostd::ctcrc64("volume_atom_qha_300K")): { volume_atom_qha_300K = aurostd::string2utype<double>(content); } break;
       case (aurostd::ctcrc64("energy_free_atom_qha_300K")): { energy_free_atom_qha_300K = aurostd::string2utype<double>(content); } break;
       case (aurostd::ctcrc64("energy_free_cell_qha_300K")): { energy_free_cell_qha_300K = aurostd::string2utype<double>(content); } break;
       //AS20201008 END
