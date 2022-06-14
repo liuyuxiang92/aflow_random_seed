@@ -2988,7 +2988,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     }
     if(pocc){aflowin << "[POCC_MODE_EXPLICIT]START.POCC_STRUCTURE " << endl;}
     else {aflowin << "[VASP_POSCAR_MODE_EXPLICIT]START " << endl;}
-    xstructure _str(xvasp.str);_str.xstructure2vasp();  //CO20220613
+    xstructure _str(xvasp.str); //[CO20220614 - this enforces certain internal flags, might change the aesthetics of the output]_str.xstructure2vasp();  //CO20220613
     if(xvasp.aopts.flag("AFLOWIN_FLAG::ITC")){_str.xstructure2itc();} //CO20220613
     aflowin << _str;  //CO20220613
     if(pocc){aflowin << "[POCC_MODE_EXPLICIT]STOP.POCC_STRUCTURE " << endl;}
