@@ -26,6 +26,7 @@ struct _qca_data {
   bool calc_spinodal;
   string workdirpath;
   string rootdirpath;
+  string aflowlibpath;
   string plattice;
   vector<string> elements;
   int aflow_max_num_atoms;
@@ -90,6 +91,7 @@ namespace qca {
   void runATAT(const string& workdirpath, const string& rundirpath, const uint min_sleep);
   void generateFilesForATAT(const string& rundirpath, const string& lat_atat, const vector<xstructure>& vstr_aflow, const vector<xstructure>& vstr_atat, const vector<int>& mapstr);
   vector<xstructure> getAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_threads, bool use_sg=false);
+  vector<xstructure> getAFLOWXstructures(const string& aflowlibpath, const int num_threads, bool use_sg=false);
   string createLatForATAT(const string& plattice, const vector<string>& elements, bool scale=false);
   vector<xstructure> getATATXstructures(const string& lat, const string& plattice, const vector<string>& elements, const uint max_num_atoms, const string& rundirpath="");
   vector<int> getMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads);

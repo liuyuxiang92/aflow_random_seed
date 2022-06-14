@@ -32,65 +32,68 @@ and the binodal curve are calculated, based on the LTVC method [Acta Mater. 159,
 LIST OF AFLOW-QCA COMMANDS:
 
   aflow --quasi_chem_approx|--qca --plattice=|--plat=fcc --elements=|--elem=Au,Pt[,Zn] [qca_options] [--directory=[DIRECTORY]]
-      Loads the alloy data from the AFLOW database, calculate the equi-concentration transition
+      Loads the alloy data from the AFLOW database, calculates the equi-concentration transition
       temperature, and returns the output as a TXT (default, see --format_data).
-      --quasi_chem_approx|--qca : Necessary argument, enter the mode to use the QCA.
-      --plattice|--plat : Necessary argument, specify the parent lattice of the alloy.
-      --elements|--elem : Necessary argument, specify the elements present in the alloy.
-      [--directory=[DIRECTORY]] : Optional argument, specify the directory where to run the
+      --quasi_chem_approx|--qca : Necessary argument, enters the mode to use the QCA.
+      --plattice|--plat : Necessary argument, specifies the parent lattice of the alloy.
+      --elements|--elem : Necessary argument, specifies the elements present in the alloy.
+      [--directory=[DIRECTORY]] : Optional argument, specifies the directory where to run the
           calculation.
           Default: "./"
 
       GENERAL OPTIONS:
-      [--usage] : Return the usage commands and options.
+      [--usage] : Returns the usage commands and options.
           Default: OFF
-      [--screen_only] : Output directly to screen (stdout) instead of writing to a file.
+      [--screen_only] : Outputs directly to screen (stdout) instead of writing to a file.
           Default: OFF
-      [--image_only|--image] : Only read the output data and plot the results. Plotting
+      [--image_only|--image] : Reads only the output data and plot the results. Plotting
           is only implemented for binary alloys.
           Default: OFF
-      [--no_plot|--noplot] : Skip plotting the results after the calculation is complete.
+      [--no_plot|--noplot] : Skips plotting the results after the calculation is complete.
           Default: OFF
 
       BINODAL OPTIONS:
-      [--binodal] : Calculate the binodal curve for the given concentration and temperature
+      [--binodal] : Calculates the binodal curve for the given concentration and temperature
           profiles.
           Default: OFF
-      [--max_num_atoms=|--mna=8] : Specify the maximum number of atoms in the alloy.
+      [--max_num_atoms_aflow=4] : Specifies the maximum number of atoms in the unit cell of
+          the AFLOW calculations.
+          Default: 4
+      [--max_num_atoms=|--mna=8] : Specifies the maximum number of atoms in the alloy.
           Default: 8
-      [--cv_cutoff=|--cv_cut=0.05] : Specify the cross validation (CV) score cut-off for
+      [--cv_cutoff=|--cv_cut=0.05] : Specifies the cross validation (CV) score cut-off for
           the cluster expansion. The calculation will terminate prematurely if the CV
           score is below the cut-off.
           Default: 0.05
           Units: eV
-      [--conc_curve_range=|--conc_curve=0,1,1,0] : Define the concentration curve
+      [--conc_curve_range=|--conc_curve=0,1,1,0] : Specifies the concentration curve
           to evaluate the equilibria properties. The format of this argument is:
           <c_1i>,<c_1f>,<c_2i>,<c_2f>,...,<c_[K]i>,<c_[K]f> where K is number
           of elements, <c_[k]i> is the initial concentration and <c_[k]f> is the 
           final concentration. The concentration is defined on [0,1].
           Default: NONE
-      [--conc_npts=20] : Number of points used to determine the sub-division of 
+      [--conc_npts=20] : Specifies the number of points used to determine the sub-division of 
           the concentration profile.
           Default: 20
-      [--temp_range=|--temp=300,5000] : Define the temperature range to evaluate the
+      [--temp_range=|--temp=300,5000] : Specifies the temperature range to evaluate the
           equilibria properties. The format of this argument is: <T_i>,<T_f>
           where <T_i> and <T_f> is the initial and final temperature, respectively.
           Default: 300,2000
           Units: K
-      [--temp_npts=100] : Number of points used to determine the sub-division of
+      [--temp_npts=100] : Specifies the number of points used to determine the sub-division of
           the temperature profile.
           Default: 150
 
       SPINODAL OPTIONS:
-      [--spinodal] : Calculate the binodal curve for the given concentration and temperature
+      [--spinodal] : Calculates the binodal curve for the given concentration and temperature
           profiles.
           Default: OFF
 
       FORMAT OPTIONS:
-      [--format_data=|--data_format=txt|json] : Specify the format of the output
+      [--format_data=|--data_format=txt|json] : Specifies the format of the output
           data.
           Default: txt
-      [--format_image=|--image_format=pdf|eps|png] : Specify the format of the
+      [--format_image=|--image_format=pdf|eps|png] : Specifies the format of the
           image produced by the plotting function.
           Default: pdf
 

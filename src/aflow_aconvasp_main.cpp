@@ -119,6 +119,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"QCA::TEMP_NPTS","--temp_npts=","");
     vpflow.args2addattachedscheme(argv,cmds,"QCA::FORMAT_DATA","format_data=|--data_format=","txt");
     vpflow.args2addattachedscheme(argv,cmds,"QCA::FORMAT_PLOT","format_image=|--image_format=","pdf");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::AFLOWLIB_DIRECTORY","--aflowlib_directory=|--aflowlib_dir=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::AFLOW_MAX_NUM_ATOMS","--aflow_max_num_atoms=","");
   }
 
   // Commands for serializing bands and DOS data to JSON
@@ -2354,9 +2356,11 @@ namespace pflow {
     strstream << tab << xspaces << " " << "              --screen_only" << endl;
     strstream << tab << xspaces << " " << "              --image_only|--image" << endl;
     strstream << tab << xspaces << " " << "              --no_plot|--noplot" << endl;
+    strstream << tab << xspaces << " " << "              --aflowlib_directory=|--aflowlib_dir=..." << endl;
     strstream << endl;
     strstream << tab << xspaces << " " << "BINODAL OPTIONS:" << endl;
     strstream << tab << xspaces << " " << "              --binodal" << endl;
+    strstream << tab << xspaces << " " << "              --aflow_max_num_atoms=4" << endl;
     strstream << tab << xspaces << " " << "              --max_num_atoms=|--mna=8" << endl;
     strstream << tab << xspaces << " " << "              --cv_cutoff=|--cv_cut=0.05" << endl;
     strstream << tab << xspaces << " " << "              --conc_curve_range=|--conc_curve=0,1,1,0" << endl;

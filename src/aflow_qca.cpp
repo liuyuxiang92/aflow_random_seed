@@ -30,12 +30,18 @@ namespace qca {
     _qca_data qca_data;
     initQCA(qca_data);
     qca_data.min_sleep = DEFAULT_QCA_MIN_SLEEP_SECONDS;
-    qca_data.aflow_max_num_atoms = DEFAULT_QCA_AFLOW_MAX_NUM_ATOMS;
     if (!vpflow.getattachedscheme("QCA::DIRECTORY").empty()) {
       qca_data.rootdirpath = vpflow.getattachedscheme("QCA::DIRECTORY");
     }
     else {
       qca_data.rootdirpath = aurostd::getPWD();
+    }
+    if (!vpflow.getattachedscheme("QCA::AFLOWLIB_DIRECTORY").empty()) {qca_data.aflowlibpath = vpflow.getattachedscheme("QCA::AFLOWLIB_DIRECTORY");}
+    if (!vpflow.getattachedscheme("QCA::AFLOW_MAX_NUM_ATOMS").empty()) {
+      qca_data.aflow_max_num_atoms = aurostd::string2utype<int>(vpflow.getattachedscheme("QCA::AFLOW_MAX_NUM_ATOMS"));
+    }
+    else {
+      qca_data.aflow_max_num_atoms = DEFAULT_QCA_AFLOW_MAX_NUM_ATOMS;
     }
     qca_data.plattice = vpflow.getattachedscheme("QCA::PLATTICE");
     if (!vpflow.getattachedscheme("QCA::ELEMENTS").empty()) {
@@ -118,6 +124,7 @@ namespace qca {
     qca_data.calc_spinodal = false;
     qca_data.workdirpath = "";
     qca_data.rootdirpath = "";
+    qca_data.aflowlibpath = "";
     qca_data.plattice = "";
     qca_data.elements.clear();
     qca_data.aflow_max_num_atoms = 0;
@@ -325,6 +332,10 @@ namespace qca {
       qca_data.lat_atat = createLatForATAT(qca_data.plattice, qca_data.elements);
       qca_data.vstr_atat = getATATXstructures(qca_data.lat_atat, qca_data.plattice, qca_data.elements, (uint)qca_data.max_num_atoms);
       qca_data.vstr_aflow = getAFLOWXstructures(qca_data.plattice, qca_data.elements, qca_data.num_threads);
+      if (!qca_data.aflowlibpath.empty()) { // add custom xstrs
+        vector<xstructure> vstr_add = getAFLOWXstructures(qca_data.aflowlibpath, qca_data.num_threads);
+        qca_data.vstr_aflow.insert(qca_data.vstr_aflow.end(), vstr_add.begin(), vstr_add.end());
+      }
       qca_data.mapstr = getMapForXstructures(getATATXstructures(qca_data.lat_atat, qca_data.plattice, qca_data.elements, qca_data.aflow_max_num_atoms), qca_data.vstr_aflow, qca_data.num_threads); // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
       generateFilesForATAT(qca_data.rundirpath, createLatForATAT(qca_data.plattice, qca_data.elements, true), qca_data.vstr_aflow, qca_data.vstr_atat, qca_data.mapstr);
       runATAT(qca_data.workdirpath, qca_data.rundirpath, qca_data.min_sleep);
@@ -1145,9 +1156,8 @@ namespace qca {
 // qca::getAFLOWXstructures
 // ***************************************************************************
 namespace qca {
-  /// @brief Gets the AFLOW xstructures.
+  /// @brief Gets the AFLOW xstructures from the AFLOW database.
   ///
-  /// @param rundirpath Path to the directory where AFLOW is running.
   /// @param plattice Parent lattice of the alloy.
   /// @param elements Elements in the alloy.
   /// @param num_threads Number of threads to run AFLOW-SYM.
@@ -1198,8 +1208,8 @@ namespace qca {
     }
     for (uint i = 0; i < vstrlabel.size(); i++) {
         entry.Load(aurostd::file2string(aflowlib + "/" + vstrlabel[i] + "/aflowlib.out"), oss);
-        entry.aurl = aflowurl + "/" + vstrlabel[i];
         if (pflow::loadXstructures(entry, oss, false)) { // initial = unrelaxed; final = relaxed
+          entry.aurl = aflowurl + "/" + vstrlabel[i];
           entry.vstr[0].qm_E_cell = entry.enthalpy_cell; // ATAT needs energy per cell
           if (use_sg && (entry.spacegroup_orig == entry.spacegroup_relax)) {
             vstr.push_back(entry.vstr[0]);
@@ -1209,6 +1219,35 @@ namespace qca {
           }
         }
         entry.clear();
+    }
+    return vstr;
+  }
+
+  /// @brief Gets the AFLOW xstructures from a given directory
+  ///
+  /// @param aflowlibpath Path to the parent directory where the aflowlib output files are stored
+  /// @param num_threads Number of threads to run AFLOW-SYM.
+  /// @param use_sg Compare initial and final xstructures only using their space groups.
+  ///
+  /// @return Xstructures from AFLOW runs.
+  vector<xstructure> getAFLOWXstructures(const string& aflowlibpath, const int num_threads, bool use_sg) {
+    vector<xstructure> vstr;
+    vector<string> vdir;
+    aurostd::SubDirectoryLS(aflowlibpath, vdir);
+    stringstream oss;
+    aflowlib::_aflowlib_entry entry;
+    for (uint i = 0; i < vdir.size(); i++) {
+      entry.Load(aurostd::file2string(vdir[i] + "/aflowlib.out"), oss);
+      if (pflow::loadXstructures(entry, oss, false)) { // initial = unrelaxed; final = relaxed
+        entry.vstr[0].qm_E_cell = entry.enthalpy_cell; // ATAT needs energy per cell
+        if (use_sg && (entry.spacegroup_orig == entry.spacegroup_relax)) {
+          vstr.push_back(entry.vstr[0]);
+        }
+        else if (compare::structuresMatch(entry.vstr[0], entry.vstr.back(), true, num_threads)) {
+          vstr.push_back(entry.vstr[0]);
+        }
+      }
+      entry.clear();
     }
     return vstr;
   }
