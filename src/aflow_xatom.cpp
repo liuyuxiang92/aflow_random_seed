@@ -16528,6 +16528,7 @@ void xstructure::xstructure2qe(void) {
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_; 
   iomode=IOQE_GEOM;
+  if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
   return;
 }
 
@@ -16568,6 +16569,7 @@ void xstructure::xstructure2itc(void) { //CO20220613
   (*this).clear();
   ss >> (*this);
   iomode=iomode_orig;
+  if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
   return;
 }
 
@@ -16591,6 +16593,7 @@ void xstructure::xstructure2abinit(void) {
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_; 
   iomode=IOABINIT_GEOM;
+  if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
   return;
 }
 
@@ -16604,6 +16607,7 @@ void xstructure::xstructure2cif(void) { //DX20190131
   iomode=IOCIF;
   (*this).spacegroupnumber = (*this).SpaceGroup_ITC();
   (*this).lattice = (*this).standard_lattice_ITC; // need to update the lattice; may have rotated
+  if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
   return;
 }
 
@@ -16615,6 +16619,7 @@ void xstructure::xstructure2abccar(void) { //DX20190131
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_; 
   iomode=IOVASP_ABCCAR;
+  if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
   return;
 }
 
@@ -16626,6 +16631,7 @@ void xstructure::xstructure2elk(void) { //DX20200313
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_; 
   iomode=IOELK_GEOM;
+  if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
   return;
 }
 
@@ -16637,6 +16643,7 @@ void xstructure::xstructure2atat(void) { //SD20220123
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_;
   iomode=IOATAT_STR;
+  if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
   return;
 }
 

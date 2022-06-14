@@ -1708,29 +1708,45 @@ namespace pflow {
     }
     // *********************************************************************
     if(argv.size()>=2 && !_PROGRAMRUN) {
-      //CO20220613 - must go first
-      if(vpflow.flag("ITC")) {
+      //CO20220613 - must go first, as many manipulations are now possible at once
+      //do not micromanage the user, if they want to run nonsensical options simultaneously, let them
+      if(vpflow.flag("ABCCAR")||vpflow.flag("ABINIT")||vpflow.flag("AIMS")||vpflow.flag("ATAT")||vpflow.flag("CIF")||vpflow.flag("ELK")||vpflow.flag("QE")||vpflow.flag("VASP")||vpflow.flag("VASP5")||vpflow.flag("ITC")||
+         vpflow.flag("INCELL")||vpflow.flag("INCOMPACT")||vpflow.flag("INWS")||vpflow.flag("MINKOWSKI_BASIS_REDUCTION")||vpflow.flag("NIGGLI")||vpflow.flag("STDCONVCELL")||vpflow.flag("STDPRIMCELL")||
+         vpflow.flag("CART")||vpflow.flag("FRAC")){
+        //use functions as much as possible to avoid repetition of the workflow
         xstructure xstr(cin);
-        if(vpflow.flag("ABINIT")){xstr.xstructure2abinit();vpflow.flag("ABINIT",false);}
-        if(vpflow.flag("AIMS")){xstr.xstructure2aims();vpflow.flag("AIMS",false);}
-        if(vpflow.flag("ATAT")){xstr.xstructure2atat();vpflow.flag("ATAT",false);}
-        if(vpflow.flag("ELK")){xstr.xstructure2elk();vpflow.flag("ELK",false);}
-        if(vpflow.flag("QE")){xstr.xstructure2qe();vpflow.flag("QE",false);}
+        //change iomode - will also ReScale(1.0)
+        if(vpflow.flag("ABCCAR")){xstr.xstructure2abccar();}
+        if(vpflow.flag("ABINIT")){xstr.xstructure2abinit();}
+        if(vpflow.flag("AIMS")){xstr.xstructure2aims();}
+        if(vpflow.flag("ATAT")){xstr.xstructure2atat();}
+        if(vpflow.flag("CIF")){xstr.xstructure2cif();}
+        if(vpflow.flag("ELK")){xstr.xstructure2elk();}
+        if(vpflow.flag("QE")){xstr.xstructure2qe();}
         if(vpflow.flag("VASP")||vpflow.flag("VASP5")){
           xstr.xstructure2vasp();
           if(vpflow.flag("VASP5")){a.is_vasp4_poscar_format=false;a.is_vasp5_poscar_format=true;}
-          vpflow.flag("VASP",false);
-          vpflow.flag("VASP5",false);
         }
-        xstr.xstructure2itc();
+        if(vpflow.flag("ITC")){xstr.xstructure2itc();}
+        //perform structure/lattice normalization
+        if(vpflow.flag("INCELL")){xstr.BringInCell();}
+        if(vpflow.flag("INCOMPACT")){xstr.BringInCompact();}
+        if(vpflow.flag("INWS")){xstr.BringInWignerSeitz();}
+        if(vpflow.flag("MINKOWSKI_BASIS_REDUCTION")){xstr.MinkowskiBasisReduction();}
+        if(vpflow.flag("NIGGLI")){xstr.NiggliUnitCellForm();}
+        if(vpflow.flag("STDCONVCELL")){xstr.Standard_Conventional_UnitCellForm();}
+        if(vpflow.flag("STDPRIMCELL")){xstr.Standard_Primitive_UnitCellForm();}
+        //change coord_flag
+        if(vpflow.flag("CART")){xstr.SetCoordinates(_COORDS_CARTESIAN_);}
+        if(vpflow.flag("FRAC")){xstr.SetCoordinates(_COORDS_FRACTIONAL_);}
         cout << xstr;
         _PROGRAMRUN=true;
       }
 
       // A
-      if(vpflow.flag("ABINIT")) {cout << input2ABINITxstr(cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("AIMS")) {cout << input2AIMSxstr(cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("ABCCAR")) {cout << pflow::ABCCAR(cin); _PROGRAMRUN=true;}
+      //[CO20220614 - moved up]if(vpflow.flag("ABCCAR")) {cout << pflow::ABCCAR(cin); _PROGRAMRUN=true;}
+      //[CO20220614 - moved up]if(vpflow.flag("ABINIT")) {cout << input2ABINITxstr(cin); _PROGRAMRUN=true;}
+      //[CO20220614 - moved up]if(vpflow.flag("AIMS")) {cout << input2AIMSxstr(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("ACE")) {pflow::ACE(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWIN")) {cout << pflow::AFLOWIN(cin); _PROGRAMRUN=true;}
       //DX20170818 [OBSOLETE] if(vpflow.flag("AGROUP")) {pflow::AGROUP(aflags,cin); _PROGRAMRUN=true;}
@@ -1749,7 +1765,7 @@ namespace pflow {
       if(vpflow.flag("AFLOWLIB_AURL2LOOP")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AURL2LOOP"),"AFLOWLIB_AURL2LOOP"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWSYM_PYTHON")){ SYM::writePythonScript(cout); _PROGRAMRUN=true;} //DX20210202
       if(vpflow.flag("AFLUX")) {cout << aflowlib::AFLUXCall(vpflow) << endl; _PROGRAMRUN=true;}  //DX20190206 - add AFLUX command line functionality
-      if(vpflow.flag("ATAT")) {cout << input2ATATxstr(cin); _PROGRAMRUN=true;} //SD20220123
+      //[CO20220614 - moved up]if(vpflow.flag("ATAT")) {cout << input2ATATxstr(cin); _PROGRAMRUN=true;} //SD20220123
       // B
       if(vpflow.flag("BANDGAP_WAHYU")) {AConvaspBandgap(argv); _PROGRAMRUN=true;}
       if(vpflow.flag("BANDGAP"))       {pflow::BANDGAP(vpflow, cout); _PROGRAMRUN=true;} // CAMILO  //CO20171006
@@ -1779,7 +1795,7 @@ namespace pflow {
       // C
       if(vpflow.flag("CAGES") && !AFLOW_PTHREADS::FLAG) {pflow::CAGES(aflags,vpflow.getattachedscheme("CAGES"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("CAGES") &&  AFLOW_PTHREADS::FLAG) {pflow::CAGES(aflags,vpflow.getattachedscheme("CAGES"),cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("CART")) {cout << pflow::CART(cin); _PROGRAMRUN=true;}
+      //[CO20220614 - moved up]if(vpflow.flag("CART")) {cout << pflow::CART(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("CCE_CORRECTION")) {cce::run(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("CCE_CORRECTION::POSCAR2CCE")) {cce::run(vpflow, std::cin); _PROGRAMRUN=true;} //ME20200508  //CO20201105
       if(vpflow.flag("CCE_CORRECTION::GET_CCE_CORRECTION")) {cce::run(vpflow, std::cin); _PROGRAMRUN=true;} //RF20200916  //CO20201105
@@ -1787,7 +1803,7 @@ namespace pflow {
       if(vpflow.flag("CCE_CORRECTION::GET_CATION_COORDINATION_NUMBERS")) {cce::run(vpflow, std::cin); _PROGRAMRUN=true;} //RF20200814 //CO20201105
       if(vpflow.flag("CHECKINTEGRITIY")) {pflow::CheckIntegritiy(); _PROGRAMRUN=true;}
       if(vpflow.flag("CHANGESUFFIX")) {pflow::ChangeSuffix(vpflow.getattachedscheme("CHANGESUFFIX")); _PROGRAMRUN=true;} //KY20131222
-      if(vpflow.flag("CIF") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")) {pflow::CIF(cin,vpflow); _PROGRAMRUN=true;} //DX20180806 - added vpflow
+      //[CO20220614 - moved up]if(vpflow.flag("CIF") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")) {pflow::CIF(cin,vpflow); _PROGRAMRUN=true;} //DX20180806 - added vpflow
       if(vpflow.flag("CLEANALL")) {pflow::CLEANALL(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("CORNERS")) {cout << pflow::CORNERS(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("CALCULATED_ICSD_RANDOM")) {cout << aflowlib::CALCULATED_ICSD_RANDOM(); _PROGRAMRUN=true; return 0;}
@@ -1822,7 +1838,7 @@ namespace pflow {
       //  if(vpflow.flag("EFFECTIVEMASS")) {pflow::EffectiveMass(argv,aurostd::args2string(argv,"--em","./"),cout); _PROGRAMRUN=true;}
       if(vpflow.flag("EIGCURV")) {pflow::EIGCURV(vpflow.getattachedscheme("EIGCURV"),cout) ; _PROGRAMRUN=true ;} // CAMILO
       //DX20170818 [OBSOLETE] if(vpflow.flag("EQUIVALENT")) {cout << pflow::EQUIVALENT(aflags,cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("ELK")) {cout << input2ELKxstr(cin); _PROGRAMRUN=true;} //DX20200313
+      //[CO20220614 - moved up]if(vpflow.flag("ELK")) {cout << input2ELKxstr(cin); _PROGRAMRUN=true;} //DX20200313
       if(vpflow.flag("EQUIVALENT")) {cout << pflow::EQUIVALENT(aflags,cin,vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("EWALD")) {pflow::EWALD(vpflow.getattachedscheme("EWALD"),cin); _PROGRAMRUN=true;}
       // F
@@ -1834,7 +1850,7 @@ namespace pflow {
       if(vpflow.flag("FROZSL_OUTPUT")) {cout << pflow::FROZSL_OUTPUT(); _PROGRAMRUN=true;}
       //DX20170818 [OBSOLETE] if(vpflow.flag("FGROUP")) {pflow::FGROUP(aflags,cin); _PROGRAMRUN=true;}
       if(vpflow.flag("FGROUP")) {pflow::SYMMETRY_GROUPS(aflags,cin,vpflow,cout); _PROGRAMRUN=true;} //DX20170818
-      if(vpflow.flag("FRAC")) {cout << pflow::FRAC(cin); _PROGRAMRUN=true;}
+      //[CO20220614 - moved up]if(vpflow.flag("FRAC")) {cout << pflow::FRAC(cin); _PROGRAMRUN=true;}
       // G
       if(vpflow.flag("GETTEMP")) {
         AFLOW_getTEMP(argv); _PROGRAMRUN=true; 
@@ -1880,10 +1896,10 @@ namespace pflow {
       if(vpflow.flag("ICSD2PROTO")) {pflow::ICSD_2PROTO(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("ICSD2WYCK")) {pflow::ICSD_2WYCK(cin,vpflow.flag("SOF")); _PROGRAMRUN=true;}
       if(vpflow.flag("IDENTICAL")) {cout << pflow::IDENTICAL(cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("INCELL")) {cout << pflow::INCELL(cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("INCOMPACT")) {cout << pflow::INCOMPACT(cin); _PROGRAMRUN=true;}
+      //[CO20220614 - moved up]if(vpflow.flag("INCELL")) {cout << pflow::INCELL(cin); _PROGRAMRUN=true;}
+      //[CO20220614 - moved up]if(vpflow.flag("INCOMPACT")) {cout << pflow::INCOMPACT(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("INTPOL")) {pflow::INTPOL(vpflow.getattachedscheme("INTPOL")); _PROGRAMRUN=true;}
-      if(vpflow.flag("INWS")) {cout << pflow::INWS(cin); _PROGRAMRUN=true;}
+      //[CO20220614 - moved up]if(vpflow.flag("INWS")) {cout << pflow::INWS(cin); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("INFLATE_LATTICE")) {cout << pflow::INFLATE_LATTICE(cin,aurostd::args2utype(argv,"--inflate_lattice|--ilattice",1.0)); _PROGRAMRUN=true;}
       // [OBSOLETE] if(vpflow.flag("INFLATE_VOLUME")) {cout << pflow::INFLATE_VOLUME(cin,aurostd::args2utype(argv,"--inflate_volume|--ivolume",1.0)); _PROGRAMRUN=true;}
       if(vpflow.flag("INFLATE_LATTICE")) {cout << pflow::INFLATE_LATTICE(vpflow.getattachedscheme("INFLATE_LATTICE"),cin); _PROGRAMRUN=true;}
@@ -1915,7 +1931,7 @@ namespace pflow {
       if(vpflow.flag("MULTI=SH")) {AFLOW_PTHREADS::MULTI_sh(argv);_PROGRAMRUN=true;}
       if(vpflow.flag("MULTI=ZIP")) {AFLOW_PTHREADS::MULTI_zip(argv);_PROGRAMRUN=true;}
       if(vpflow.flag("MAGNETICPARAMETERS")) {pflow::MagneticParameters(aurostd::args2attachedstring(argv,"--magpara=","./"),cout); _PROGRAMRUN=true;}
-      if(vpflow.flag("MINKOWSKI_BASIS_REDUCTION")) {cout << pflow::MINKOWSKIBASISREDUCTION(cin); _PROGRAMRUN=true;}
+      //[CO20220614 - moved up]if(vpflow.flag("MINKOWSKI_BASIS_REDUCTION")) {cout << pflow::MINKOWSKIBASISREDUCTION(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("MSI")) {pflow::MSI(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("MOM")) {pflow::MOM(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("MULTIENUMALL")) {pocc::MultienumPrintAllXstr(cin); _PROGRAMRUN=true;}
@@ -1927,7 +1943,7 @@ namespace pflow {
       if(vpflow.flag("NATOMS")) {cout << pflow::NATOMS(cin) << endl; _PROGRAMRUN=true;}
       if(vpflow.flag("NBONDXX")) {cout << pflow::NBONDXX(cin); _PROGRAMRUN=true;} //CO20171025
       if(vpflow.flag("NDATA")) {pflow::NDATA(cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("NIGGLI")) {cout << pflow::NIGGLI(cin); _PROGRAMRUN=true;}
+      //[CO20220614 - moved up]if(vpflow.flag("NIGGLI")) {cout << pflow::NIGGLI(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("NNDIST")) {cout << pflow::NNDIST(cin) << endl; _PROGRAMRUN=true;}
       if(vpflow.flag("NOORDERPARAMETER")) {cout << pflow::NOORDERPARAMETER(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("NSPECIES")) {cout << pflow::NSPECIES(cin) << endl; _PROGRAMRUN=true;}
@@ -2013,7 +2029,7 @@ namespace pflow {
       if(vpflow.flag("PYTHON_MODULES")) {pflow::PYTHON_MODULES(vpflow.getattachedscheme("PYTHON_MODULES")); _PROGRAMRUN=true;}  //ME20211103
 
       // Q
-      if(vpflow.flag("QE")) {cout << input2QExstr(cin); _PROGRAMRUN=true;}
+      //[CO20220614 - moved up]if(vpflow.flag("QE")) {cout << input2QExstr(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("QDEL")) {sflow::QDEL(vpflow.getattachedscheme("QDEL")); _PROGRAMRUN=true;} // NEW
       if(vpflow.flag("QMVASP")) {pflow::QMVASP(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("QSUB")) {sflow::QSUB(vpflow.getattachedscheme("QSUB")); _PROGRAMRUN=true;} // NEW
@@ -2089,8 +2105,8 @@ namespace pflow {
       //DX20170818 [OBSOLETE] if(vpflow.flag("SGROUP")) {pflow::SGROUP(aflags,cin,KBIN_SYMMETRY_SGROUP_RADIUS_DEFAULT); _PROGRAMRUN=true;}
       if(vpflow.flag("SGROUP")) {pflow::SYMMETRY_GROUPS(aflags,cin,vpflow,cout); _PROGRAMRUN=true;} //DX20170818
       if(vpflow.flag("SPECIES")) {cout << pflow::SPECIES(cin); _PROGRAMRUN=true;}
-      if(vpflow.flag("STDCONVCELL")) {cout << GetStandardConventional(xstructure(cin,IOAFLOW_AUTO)); _PROGRAMRUN=true;}
-      if(vpflow.flag("STDPRIMCELL")) {cout << GetStandardPrimitive(xstructure(cin,IOAFLOW_AUTO)); _PROGRAMRUN=true;}
+      //[CO20220614 - moved up]if(vpflow.flag("STDCONVCELL")) {cout << GetStandardConventional(xstructure(cin,IOAFLOW_AUTO)); _PROGRAMRUN=true;}
+      //[CO20220614 - moved up]if(vpflow.flag("STDPRIMCELL")) {cout << GetStandardPrimitive(xstructure(cin,IOAFLOW_AUTO)); _PROGRAMRUN=true;}
       if(vpflow.flag("SCALE")) {cout << pflow::SCALE(vpflow.getattachedscheme("SCALE"),cin); _PROGRAMRUN=true;}
       if(vpflow.flag("STRUCTURE2JSON")) {xstructure xstr(cin,IOAFLOW_AUTO); cout << xstructure2json(xstr) << endl; _PROGRAMRUN=true;} //DX20190508
 
@@ -2100,7 +2116,7 @@ namespace pflow {
       // U
       if(vpflow.flag("UFFENERGY")) {pocc::UFFENERGY(cin); _PROGRAMRUN=true;}
       // V
-      if(vpflow.flag("VASP")||vpflow.flag("VASP5")) {cout << input2VASPxstr(cin,vpflow.flag("VASP5")); _PROGRAMRUN=true;} //added bool for vasp5
+      //[CO20220614 - moved up]if(vpflow.flag("VASP")||vpflow.flag("VASP5")) {cout << input2VASPxstr(cin,vpflow.flag("VASP5")); _PROGRAMRUN=true;} //added bool for vasp5
       if(vpflow.flag("VISUALIZE_PHONONS")) {apl::createAtomicDisplacementSceneFile(vpflow); _PROGRAMRUN=true;} //ME20200330
       if(vpflow.flag("VOLUME::EQUAL")) {cout << pflow::VOLUME("VOLUME::EQUAL,"+vpflow.getattachedscheme("VOLUME::EQUAL"),cin); _PROGRAMRUN=true;} 
       if(vpflow.flag("VOLUME::MULTIPLY_EQUAL")) {cout << pflow::VOLUME("VOLUME::MULTIPLY_EQUAL,"+vpflow.getattachedscheme("VOLUME::MULTIPLY_EQUAL"),cin); _PROGRAMRUN=true;} 
