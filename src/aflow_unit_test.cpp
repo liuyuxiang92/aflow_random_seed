@@ -1293,7 +1293,8 @@ namespace unittest {
     // setup test environment
     string task_description = "Testing EntryLoader";
     stringstream result;
-    stringstream check_description;
+    string check_description;
+    stringstream check_description_helper;
     string check_function = "";
 
     std::string test_alloy = "MnPdPt";
@@ -1343,13 +1344,12 @@ namespace unittest {
     // Check | load alloys
     for (std::map<std::string, aflowlib::EntryLoader::Source>::iterator source = test_sources.begin();
          source != test_sources.end(); source++) {
-      aurostd::StringstreamClean(check_description);
       check_function = "EntryLoader::loadAlloy()";
       if (source->first == "RESTAPI" || source->first == "RESTAPI_RAW") recursive = false;
       else recursive = true;
-      check_description << source->first << " - " << test_alloy;
+      check_description = source->first + " - " + test_alloy;
       if (recursive) {
-        check_description << " - recursive";
+        check_description += " - recursive";
         expected_size_t = 2500;
       } else expected_size_t = 90;
       el.clear();
@@ -1359,11 +1359,12 @@ namespace unittest {
         if (el.setSource(source->second)) { // don't test if basic requirements are not met for a source
           el.loadAlloy(test_alloy, recursive);
           long double duration = aurostd::get_delta_seconds(start);
-          check_description << " | speed " << el.m_entries_flat->size() / duration << " entries/s; "
+          aurostd::StringstreamClean(check_description_helper);
+          check_description_helper << " | speed " << el.m_entries_flat->size() / duration << " entries/s; "
                             << el.m_entries_flat->size() << " entries";
+          check_description += check_description_helper.str();
           check((expected_size_t < el.m_entries_flat->size()), el.m_entries_flat->size(), expected_size_t,
-                check_function,
-                check_description.str(), passed_checks, results);
+                check_function, check_description, passed_checks, results);
         }
       }
     }
@@ -1373,9 +1374,8 @@ namespace unittest {
 
     for (std::map<std::string, aflowlib::EntryLoader::Source>::iterator source = short_test_sources.begin();
          source != short_test_sources.end(); source++) {
-      aurostd::StringstreamClean(check_description);
       check_function = "EntryLoader::loadAUID()";
-      check_description << source->first << " + xstructure";
+      check_description = source->first + " + xstructure";
       expected_size_t = 6;
       el.clear();
       el.m_out_silent = true;
@@ -1390,25 +1390,26 @@ namespace unittest {
         el.loadAUID(test_AUIDs);
 
         long double duration = aurostd::get_delta_seconds(start);
-        check_description << " | speed " << el.m_entries_flat->size() / duration << " entries/s; "
-                          << el.m_entries_flat->size() << " entries";
+        aurostd::StringstreamClean(check_description_helper);
+        check_description_helper << " | speed " << el.m_entries_flat->size() / duration << " entries/s; "
+                                 << el.m_entries_flat->size() << " entries";
+        check_description += check_description_helper.str();
         checkEqual(el.m_entries_flat->size(), expected_size_t, check_function,
-                   check_description.str(), passed_checks, results);
+                   check_description, passed_checks, results);
       }
     }
 
     // ---------------------------------------------------------------------------
     // Check | load xstructure from file
-    aurostd::StringstreamClean(check_description);
     check_function = "EntryLoader::loadXstructureFile()";
-    check_description << "load xstructure extern";
+    check_description = "load xstructure extern";
     if (!test_entry.auid.empty()) {
       el.loadXstructureFile(test_entry, test_structure);
       checkEqual(test_structure.atoms.size(), (size_t)
-      6, check_function, check_description.str(), passed_checks, results);
+      6, check_function, check_description, passed_checks, results);
     } else {
-      check_description << " | failed to load example structure form AFLUX in previous test";
-      check(false, 0, 0, check_function, check_description.str(), passed_checks, results);
+      check_description += " | failed to load example structure form AFLUX in previous test";
+      check(false, 0, 0, check_function, check_description, passed_checks, results);
     }
 
     // ---------------------------------------------------------------------------
@@ -1416,9 +1417,8 @@ namespace unittest {
 
     for (std::map<std::string, aflowlib::EntryLoader::Source>::iterator source = short_test_sources.begin();
          source != short_test_sources.end(); source++) {
-      aurostd::StringstreamClean(check_description);
       check_function = "EntryLoader::loadAURL()";
-      check_description << source->first;
+      check_description = source->first;
       expected_size_t = 6;
       el.clear();
       el.m_out_silent = true;
@@ -1428,10 +1428,12 @@ namespace unittest {
           el.loadAURL(test_AURLs);
           el.loadAURL(test_AURL);
           long double duration = aurostd::get_delta_seconds(start);
-          check_description << " | speed " << el.m_entries_flat->size() / duration << " entries/s; "
-                            << el.m_entries_flat->size() << " entries";
+          aurostd::StringstreamClean(check_description_helper);
+          check_description_helper << " | speed " << el.m_entries_flat->size() / duration << " entries/s; "
+                                   << el.m_entries_flat->size() << " entries";
+          check_description += check_description_helper.str();
           checkEqual(el.m_entries_flat->size(), expected_size_t, check_function,
-                     check_description.str(), passed_checks, results);
+                     check_description, passed_checks, results);
         }
       }
     }

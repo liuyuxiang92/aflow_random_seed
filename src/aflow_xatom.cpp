@@ -3234,8 +3234,8 @@ void xstructure::initialize(const string& url,const string& file,int _iomode) { 
   free(); //DX20191220 - added free to initialize
   stringstream strstream;
   string _url = url;
-  if(url.find(".edu:AFLOW")!=string::npos){ //HE20220615 safeguard against the direct use of AURLs as suggested by CO
-    _url = aurostd::StringSubst(url,".edu:AFLOW",".edu/AFLOW");
+  if(url.find(":AFLOW")!=string::npos){ //HE20220615 safeguard against the direct use of AURLs as suggested by CO
+    _url = aurostd::StringSubst(url,":AFLOW","/AFLOW");
   }
   aurostd::url2stringstream(_url+"/"+file,strstream);
   (*this).iomode=_iomode;
