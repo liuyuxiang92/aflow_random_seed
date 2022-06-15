@@ -7486,6 +7486,8 @@ void xstructure::AddAtom(const deque<_atom>& atoms_in, bool check_present) { //D
   }
 
   GetStoich();  //CO20170724
+  //ME20220612 - Originally had sortAtomsTypes, but other parts of xstructure use sortAtomsNames,
+  //leading to inconsistencies when the input structure is not alphabetic.
   std::stable_sort(atoms.begin(), atoms.end(), sortAtomsNames);
   MakeBasis(); // need to update NUMBER and BASIS
 }

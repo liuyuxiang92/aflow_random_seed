@@ -1018,7 +1018,7 @@ namespace aurostd{
 //DX20210908 - double2fraction functionality - STOP
 
 // ******************************************************************************
-// dbl2frac Double to Fraction //DX20200313
+// frac2dbl Fraction to Double //DX20200313
 // ******************************************************************************
 namespace aurostd {
   double frac2dbl(const string& str) {

@@ -378,7 +378,7 @@ namespace SYM {
   vector<string> findWyckoffEquations(uint space_group_number, string& space_group_setting,
       string& Wyckoff_letter, uint Wyckoff_multiplicity, bool convert2frac=true); //DX 20191029 //DX20200423 - add convert2frac
   vector<string> findWyckoffEquations(string& spacegroupstring, string& Wyckoff_letter, uint Wyckoff_multplicity, bool convert2frac=true, bool keep_multiplication_symbol=false); //DX 20190128 //DX20200423 - add convert2frac, keep_multiplication_symbol
-  string formatWyckoffPosition(const vector<sdouble>& sd_coordinate, bool convert2frac=true, bool keep_multiplication_symbol=false); //DX 20190723 //DX20200423 - add convert2frac, keep_multiplication_symbol
+  string formatWyckoffPosition(const vector<sdouble>& sd_coordinate, bool convert2frac=true, bool keep_multiplication_symbol=false,int precision=AUROSTD_DEFAULT_PRECISION); //DX 20190723 //DX20200423 - add convert2frac, keep_multiplication_symbol  //CO20220607 - added precision
   string reorderWyckoffPosition(const string& orig_position); //DX 20190708
   bool shiftWyckoffPositions(deque<deque<_atom> >& equivalent_atoms_shifted, xvector<double>& previous_shift, xvector<double>& new_shift);
   bool findWyckoffPositions(xstructure& CCell, deque<_atom>& atomicbasis, vector<vector<vector<string> > >& tmpvvvstring,
@@ -448,7 +448,7 @@ namespace SYM {
   bool havechar(string str_in, char c);  //see template function "invec"
   //DX20210421 [OBSOLETE] bool intinvec(vector<int> vint, int n);
   int whereischar(string str, char c);
-  char whichchar(string str_in);
+  char whichchar(const string& str_in);
   double whichnum(string str_in);
   //DX20200313 [MOVED TO AUROSTD] double frac2dbl(string str);  //expand to cover case when input is e.g., ".5"
   //DX20190724 [MOVED TO AUROSTD] string dbl2frac(double a, bool sign_prefix=true);
@@ -459,7 +459,7 @@ namespace SYM {
   vector<string> splitstringbyspaces(string str);
   vector<string> splitstring(string str);
   vector<string> splitstring_2(string str);
-  vector<sdouble> simplify(string str);
+  vector<sdouble> simplify(const string& str);
   xvector<double> get_triplet(string str);
 
   // Used to check atomic basis
