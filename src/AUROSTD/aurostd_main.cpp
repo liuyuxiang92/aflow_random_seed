@@ -4711,38 +4711,16 @@ namespace aurostd {
   // Function url2string
   // ***************************************************************************
   // wget URL to string - Stefano Curtarolo
+  // HE20220615 changed to aurostd http code to reduce system calls
+  // Use the function in aurostd_xhttp for new code
+  // Old use-cases of this function should be replaced, kept for now to maintain compatibility
+  // As the original this function does not support SSL (https)
   bool url2string(const string& url,string& stringIN,bool verbose) {
-    bool LDEBUG=(FALSE || verbose || XHOST.DEBUG);
-    string soliloquy="aurostd::url2string():";
-    if(!aurostd::IsCommandAvailable("wget")) {
-      cerr << "ERROR - " << soliloquy << " command \"wget\" is necessary !" << endl;
-      return FALSE;
-    }
-    string _url=url;
-    aurostd::StringSubst(_url,"http://","");
-    aurostd::StringSubst(_url,"//","/");
-    if(LDEBUG) cerr << soliloquy << " Loading url=" << _url << endl;
-    string command="";
-#ifndef _MACOSX_
-    command="wget --quiet --no-cache -O /dev/stdout 'http://"+_url+"'";
-#else
-    command="wget --quiet -O /dev/stdout 'http://"+_url+"'"; // _MACOSX_
-#endif    
-    if(LDEBUG){cerr << soliloquy << " command=\"" << command << "\"" << endl;}
-    stringIN="";
-    stringIN=aurostd::execute2string(command);
-    if(stringIN.empty()) {
-      if(command.find(":AFLOW")!=string::npos){
-        aurostd::StringSubst(command,":AFLOW","/AFLOW");
-        stringIN=aurostd::execute2string(command);
-      }
-      if(stringIN.empty()) {
-        if(LDEBUG){cerr << "ERROR - " << soliloquy << " URL not found http://" << _url << endl;} //CO20200731 - silence this, it's not an error
-        return FALSE;
-      }
-    }
-    //    aurostd::StringSubst(stringIN,"h1h","h1,"); // old Frisco php error patch
-    return TRUE;
+    if (verbose) cerr << __AFLOW_FUNC__ << " Loading url=" << url << endl;
+    int return_code = aurostd::httpGetStatus(url, stringIN);
+    if (verbose) cerr << __AFLOW_FUNC__ << " " << url << " returned " << return_code <<endl;
+    if(stringIN.empty()) return false;
+    else return true;
   }
 
   // ***************************************************************************

@@ -3233,9 +3233,13 @@ void xstructure::initialize(const string& _input,int _iomode) { //CO20211122 - i
 void xstructure::initialize(const string& url,const string& file,int _iomode) { //CO20211122 - initialize structure; avoid copying of xstructure
   free(); //DX20191220 - added free to initialize
   stringstream strstream;
-  aurostd::url2stringstream(url+"/"+file,strstream);
+  string _url = url;
+  if(url.find(".edu:AFLOW")!=string::npos){ //HE20220615 safeguard against the direct use of AURLs as suggested by CO
+    _url = aurostd::StringSubst(url,".edu:AFLOW",".edu/AFLOW");
+  }
+  aurostd::url2stringstream(_url+"/"+file,strstream);
   (*this).iomode=_iomode;
-  (*this).directory = url+"/"+file; //DX20180526 - location of xstructure
+  (*this).directory = _url+"/"+file; //DX20180526 - location of xstructure
   strstream >> (*this);
 }
 
