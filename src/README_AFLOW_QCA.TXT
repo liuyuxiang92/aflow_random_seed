@@ -56,7 +56,7 @@ LIST OF AFLOW-QCA COMMANDS:
       [--binodal] : Calculates the binodal curve for the given concentration and temperature
           profiles.
           Default: OFF
-      [--max_num_atoms_aflow=4] : Specifies the maximum number of atoms in the unit cell of
+      [--aflow_max_num_atoms=4] : Specifies the maximum number of atoms in the unit cell of
           the AFLOW calculations.
           Default: 4
       [--max_num_atoms=|--mna=8] : Specifies the maximum number of atoms in the alloy.

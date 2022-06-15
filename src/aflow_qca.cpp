@@ -1234,18 +1234,26 @@ namespace qca {
     vector<xstructure> vstr;
     vector<string> vdir;
     aurostd::SubDirectoryLS(aflowlibpath, vdir);
+    string data;
     stringstream oss;
     aflowlib::_aflowlib_entry entry;
     for (uint i = 0; i < vdir.size(); i++) {
+      if (!aurostd::FileExist(vdir[i] + "/aflowlib.out") ||
+          !aurostd::FileExist(vdir[i] + "/POSCAR.orig") ||
+          !aurostd::FileExist(vdir[i] + "/POSCAR.relax2")) {
+        continue;
+      }
       entry.Load(aurostd::file2string(vdir[i] + "/aflowlib.out"), oss);
-      if (pflow::loadXstructures(entry, oss, false)) { // initial = unrelaxed; final = relaxed
-        entry.vstr[0].qm_E_cell = entry.enthalpy_cell; // ATAT needs energy per cell
-        if (use_sg && (entry.spacegroup_orig == entry.spacegroup_relax)) {
-          vstr.push_back(entry.vstr[0]);
-        }
-        else if (compare::structuresMatch(entry.vstr[0], entry.vstr.back(), true, num_threads)) {
-          vstr.push_back(entry.vstr[0]);
-        }
+      oss.str(aurostd::file2string(vdir[i] + "/POSCAR.orig"));
+      entry.vstr.push_back(xstructure(oss));
+      oss.str(aurostd::file2string(vdir[i] + "/POSCAR.relax2"));
+      entry.vstr.push_back(xstructure(oss));
+      entry.vstr[0].qm_E_cell = entry.enthalpy_cell; // ATAT needs energy per cell
+      if (use_sg && (entry.spacegroup_orig == entry.spacegroup_relax)) {
+        vstr.push_back(entry.vstr[0]);
+      }
+      else if (compare::structuresMatch(entry.vstr[0], entry.vstr.back(), true, num_threads)) {
+        vstr.push_back(entry.vstr[0]);
       }
       entry.clear();
     }
@@ -1444,8 +1452,10 @@ namespace qca {
     usage_options.push_back("--screen_only");
     usage_options.push_back("--image_only|--image");
     usage_options.push_back("--no_plot|--noplot");
+    usage_options.push_back("--aflowlib_directory=|--aflowlib_dir=...");
     usage_options.push_back(" ");
     usage_options.push_back("BINODAL OPTIONS:");
+    usage_options.push_back("--aflow_max_num_atoms=4");
     usage_options.push_back("--max_num_atoms=|--mna=8");
     usage_options.push_back("--cv_cutoff=|--cv_cut=0.05");
     usage_options.push_back("--conc_curve_range=|--conc_curve=0,1,1,0");
