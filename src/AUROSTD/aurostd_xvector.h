@@ -65,6 +65,7 @@ namespace aurostd {
         long int vsize;
 
         //NECESSARY PRIVATE CLASS METHODS - START
+        void init(); //HE20220515
         void free();  //CO20190808
         void copy(const xvector<utype>& b);  //CO20190808
         void copy(const xmatrix<utype>& b);  //CO20190808

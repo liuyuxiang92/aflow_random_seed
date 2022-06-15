@@ -37,30 +37,31 @@
 namespace aurostd {  // namespace aurostd
   template<class utype>                                    // default constructor
     xvector<utype>::xvector(int nh,int nl) {
-      rows = 0; lrows = 0; urows = 0;  //HE20220613 initialize all member of xvector
-      size = 0; vsize= 0;
-      isfloat = false; iscomplex = false;
+      init();
       resize(nh,nl);  //CO20201111
     }
-}
 
-namespace aurostd {  // namespace aurostd
   template<class utype>                                       // copy constructor
     xvector<utype>::xvector(const xvector<utype>& b) {
-    rows = 0; lrows = 0; urows = 0;  //HE20220613 initialize all member of xvector
-    size = 0; vsize= 0;
-    isfloat = false; iscomplex = false;
-    copy(b);
+      init();
+      copy(b);
     } //CO20191110
   template<class utype>                                       // copy constructor
     xvector<utype>::xvector(const xmatrix<utype>& b) {
-    rows = 0; lrows = 0;  //HE20220613 initialize all member of xvector
-    urows = 0; size = 0;
-    vsize= 0; isfloat = false;
-    iscomplex = false;
-    copy(b);
+      init();
+      copy(b);
     } //CO20191110
+
+  template<class utype>
+    void xvector<utype>::init() { //HE20220613 initialize all member of xvector
+      rows = 0; lrows = 0;
+      urows = 0; size = 0;
+      vsize= 0; isfloat = false;
+      iscomplex = false;
+    }
 }
+
+
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------- destructor

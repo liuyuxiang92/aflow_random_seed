@@ -84,19 +84,23 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype>                                       // copy constructor
     xmatrix<utype>::xmatrix(const xmatrix<utype>& b) {
-      rows=0; lrows=0; urows= 0; //HE20220613 initialize all members of xmatrix
-      cols=0; lcols=0; ucols=0;
-      issquare=false; isfloat=false; iscomplex=false;
-      size=0; msize=0;
+      init();
       copy(b);
     }  //CO20191112
   template<class utype>                                       // copy constructor
     xmatrix<utype>::xmatrix(const xvector<utype>& b) {
-    rows=0; lrows=0; urows= 0;  //HE20220613 initialize all members of xmatrix
+      init();
+      copy(b);
+    }  //CO20191112
+
+  template<class utype>
+  void xmatrix<utype>::init(){  //HE20220613 initialize all members of xmatrix
+    rows=0; lrows=0; urows= 0;
     cols=0; lcols=0; ucols=0;
     issquare=false; isfloat=false; iscomplex=false;
-    size=0; msize=0;copy(b);
-    }  //CO20191112
+    size=0; msize=0;
+  }
+
 }
 
 namespace aurostd {  // namespace aurostd
