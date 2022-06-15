@@ -563,9 +563,9 @@ namespace qca {
           for (int j = 1; j <= ncl; j++) {
             p(natom_cluster(j, 1) + 1) += prob_ideal_cluster(i, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * (conc_cluster(j, 1) - conc_macro(i, 1));
           }
+          if (LDEBUG) {cerr << "it=" << it << " i=" << i << " | p=" << p << endl;}
           aurostd::polynomialFindRoots(p, rr, ri);
           if (LDEBUG) {
-            cerr << "it=" << it << " i=" << i << " | p=" << p << endl;
             cerr << "   Real roots=" << rr << endl;
             cerr << "   Imag roots=" << ri << endl;
           }
@@ -1112,7 +1112,7 @@ namespace qca {
     while (!aurostd::substring2bool(logstring, "true and predicted ground states agree") && !aurostd::substring2bool(logstring, "No other ground states")) {
       iter++;
       if (LDEBUG) {cerr << "Sleeping, iter=" << iter << endl;}
-      if (iter > 30) { // wait 30 times the minimum sleep (60 seconds)
+      if (iter > 60) { // wait 60 times the minimum sleep
         string message = "mmaps is taking too long to predict structures, dir=" + rundirpath;
         aurostd::RemoveFile(tmpfile);
         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);

@@ -840,7 +840,7 @@
 #define         DEFAULT_AGL_PLOT_RESULTS                      XHOST.adefault.getattachedutype<bool>("DEFAULT_AGL_PLOT_RESULTS")
 
 //// DEFAULT QCA
-#define AFLOWRC_DEFAULT_QCA_MIN_SLEEP_SECONDS                 2 // seconds
+#define AFLOWRC_DEFAULT_QCA_MIN_SLEEP_SECONDS                 60 // seconds
 #define         DEFAULT_QCA_MIN_SLEEP_SECONDS                 XHOST.adefault.getattachedutype<int>("DEFAULT_QCA_MIN_SLEEP_SECONDS")
 #define AFLOWRC_DEFAULT_QCA_MAX_NUM_ATOMS                     8
 #define         DEFAULT_QCA_MAX_NUM_ATOMS                     XHOST.adefault.getattachedutype<int>("DEFAULT_QCA_MAX_NUM_ATOMS")
