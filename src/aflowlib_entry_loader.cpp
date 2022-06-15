@@ -156,7 +156,7 @@ namespace aflowlib {
     outInfo(__AFLOW_FUNC__);
     if (!cleanAUID(AUID)) {
       m_logger_message << "AUID cleaning failed";
-      outError(__AFLOW_FUNC__, __LINE__)
+      outError(__AFLOW_FUNC__, __LINE__);
       return;
     }
 
@@ -208,7 +208,7 @@ namespace aflowlib {
 
     if (clean_AUID.size()!=AUID.size()) {
       m_logger_message << "cleaning of " << AUID.size() - clean_AUID.size()  << " AUIDs failed";
-      outError(__AFLOW_FUNC__, __LINE__)
+      outError(__AFLOW_FUNC__, __LINE__);
     }
 
     switch (m_current_source) {
@@ -276,7 +276,7 @@ namespace aflowlib {
     outInfo(__AFLOW_FUNC__);
     if (!cleanAURL(AURL)) {
       m_logger_message << "AURL cleaning failed";
-      outError(__AFLOW_FUNC__, __LINE__)
+      outError(__AFLOW_FUNC__, __LINE__);
       return;
     }
 
@@ -330,7 +330,7 @@ namespace aflowlib {
 
     if (clean_AURL.size()!=AURL.size()) {
       m_logger_message << "cleaning of " << AURL.size() - clean_AURL.size()  << " AURLs failed";
-      outError(__AFLOW_FUNC__, __LINE__)
+      outError(__AFLOW_FUNC__, __LINE__);
     }
 
     switch (m_current_source) {
@@ -406,7 +406,7 @@ namespace aflowlib {
     for (std::vector<std::string>::const_iterator element = alloy.begin(); element != alloy.end(); element++) {
       if (xelement::xelement::isElement(*element) == 0) {
         m_logger_message << *element << " is not an element";
-        outError(__AFLOW_FUNC__, __LINE__)
+        outError(__AFLOW_FUNC__, __LINE__);
       } else alloy_clean.emplace_back(*element);
     }
 
@@ -624,7 +624,7 @@ namespace aflowlib {
           return true;
         } else {
           m_logger_message << "Internal AFLUX SQLITE DB not found at " << m_sqlite_file;
-          outError(__AFLOW_FUNC__, __LINE__)
+          outError(__AFLOW_FUNC__, __LINE__);
         }
         break;
       }
@@ -635,7 +635,7 @@ namespace aflowlib {
           return true;
         } else {
           m_logger_message << "AFLUX API could not be reached at " << m_aflux_server;
-          outError(__AFLOW_FUNC__, __LINE__)
+          outError(__AFLOW_FUNC__, __LINE__);
         }
         break;
       }
@@ -656,7 +656,7 @@ namespace aflowlib {
           }
         } else {
           m_logger_message << "Could not find AFLOW entries in the filesystem at " << m_filesystem_path;
-          outError(__AFLOW_FUNC__, __LINE__)
+          outError(__AFLOW_FUNC__, __LINE__);
         }
       }
 
@@ -672,7 +672,7 @@ namespace aflowlib {
           return true;
         } else {
           m_logger_message << "Could not find AFLOW entries in the filesystem at " << m_filesystem_path;
-          outError(__AFLOW_FUNC__, __LINE__)
+          outError(__AFLOW_FUNC__, __LINE__);
         }
         break;
       }
@@ -693,7 +693,7 @@ namespace aflowlib {
           }
         } else {
           m_logger_message << "AFLOW REST API could not be reached at " << m_aflux_server+m_restapi_path;
-          outError(__AFLOW_FUNC__, __LINE__)
+          outError(__AFLOW_FUNC__, __LINE__);
         }
         break;
       }
@@ -711,7 +711,7 @@ namespace aflowlib {
         }
         else {
           m_logger_message << "AFLOW REST API could not be reached at " << m_aflux_server+m_restapi_path;
-          outError(__AFLOW_FUNC__, __LINE__)
+          outError(__AFLOW_FUNC__, __LINE__);
         }
         break;
       }
@@ -757,7 +757,7 @@ namespace aflowlib {
     } else {
       m_logger_message << "Failed to get AFLUX query ";
       m_logger_message << "(" << m_aflux_server << " | " << m_aflux_path << " | " << query << ")";
-      outError(__AFLOW_FUNC__, __LINE__)
+      outError(__AFLOW_FUNC__, __LINE__);
     }
     return raw_lines;
   }
@@ -775,7 +775,7 @@ namespace aflowlib {
       return output;
     } else {
       m_logger_message << "Failed to get REST API query " << "(" << url << ")";
-      outError(__AFLOW_FUNC__, __LINE__)
+      outError(__AFLOW_FUNC__, __LINE__);
       return "";
     }
   }
@@ -797,7 +797,7 @@ namespace aflowlib {
           entry.vstr.push_back(new_structure);
         } else {
           m_logger_message << "Failed to add original structure to " << entry.auid << " (" << entry.aurl << ")";
-          outError(__AFLOW_FUNC__, __LINE__)
+          outError(__AFLOW_FUNC__, __LINE__);
         }
       }
     } else {
@@ -810,7 +810,7 @@ namespace aflowlib {
         }
         else {
           m_logger_message << "Failed to add relaxed structure to " << entry.auid << " (" << entry.aurl << ")";
-          outError(__AFLOW_FUNC__, __LINE__)
+          outError(__AFLOW_FUNC__, __LINE__);
         }
       }
     }
@@ -878,9 +878,10 @@ namespace aflowlib {
       aflowin_content = getRawRestAPIQuery(base_url + "aflow.in", true);
       m_out_super_silent = false;
     }
-    std::string poscar = KBIN::ExtractPOSCARStringStreamFromAFLOWIN(aflowin_content, -1).str();
-    if (!poscar.empty()) { // load from aflow.in
-      new_structure = xstructure((std::stringstream) poscar, IOVASP_AUTO);
+    std::stringstream poscar;
+    bool poscar_loaded =  KBIN::ExtractPOSCARStringStreamFromAFLOWIN(aflowin_content, poscar, -1);
+    if (poscar_loaded) { // load from aflow.in
+      new_structure = xstructure((std::stringstream) poscar.str(), IOVASP_AUTO);
       return true;
     }
     return false;

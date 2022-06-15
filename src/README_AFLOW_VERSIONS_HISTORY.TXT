@@ -1,5 +1,6 @@
 3.2.13 - 2022/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz
+        -- constexp variant of crc64 hashing to enable string based switch cases (HE)
         -- changed the "alpha" Wyckoff position to "A" in space group 47, fixes corner cases prototype commands (DX)
         -- fixed bug in matching Wyckoff positions for isopointal structures (DX)
         -- updated README_PROTO.TXT for correct Bixbyte prototype label (DX)
