@@ -104,6 +104,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   if(vpflow.flag("QCA::INIT")) {
     vpflow.flag("QCA::USAGE", aurostd::args2flag(argv,cmds,"--usage"));
     vpflow.flag("QCA::BINODAL", aurostd::args2flag(argv,cmds,"--binodal"));
+    vpflow.flag("QCA::USE_SG", aurostd::args2flag(argv,cmds,"--use_sg"));
     vpflow.flag("QCA::SPINODAL", aurostd::args2flag(argv,cmds,"--spinodal"));
     vpflow.flag("QCA::SCREEN_ONLY", aurostd::args2flag(argv,cmds,"--screen_only"));
     vpflow.flag("QCA::IMAGE_ONLY", aurostd::args2flag(argv,cmds,"--image_only|--image"));
@@ -2360,6 +2361,7 @@ namespace pflow {
     strstream << endl;
     strstream << tab << xspaces << " " << "BINODAL OPTIONS:" << endl;
     strstream << tab << xspaces << " " << "              --binodal" << endl;
+    strstream << tab << xspaces << " " << "              --use_sg" << endl;
     strstream << tab << xspaces << " " << "              --aflow_max_num_atoms=4" << endl;
     strstream << tab << xspaces << " " << "              --max_num_atoms=|--mna=8" << endl;
     strstream << tab << xspaces << " " << "              --cv_cutoff=|--cv_cut=0.05" << endl;

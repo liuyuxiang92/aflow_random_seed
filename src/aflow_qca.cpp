@@ -101,6 +101,7 @@ namespace qca {
     }
     if (vpflow.flag("QCA::IMAGE_ONLY")) {qca_data.image_only = true;}
     if (vpflow.flag("QCA::BINODAL")) {qca_data.calc_binodal = true;}
+    if (vpflow.flag("QCA::USE_SG")) {qca_data.use_sg = true;}
     if (vpflow.flag("QCA::SPINODAL")) {qca_data.calc_spinodal = true;}
     runQCA(qca_data);
     return;
@@ -121,6 +122,7 @@ namespace qca {
     qca_data.screen_only = false;
     qca_data.image_only = false;
     qca_data.calc_binodal = false;
+    qca_data.use_sg = false;
     qca_data.calc_spinodal = false;
     qca_data.workdirpath = "";
     qca_data.rootdirpath = "";
@@ -331,9 +333,9 @@ namespace qca {
     else { // run ATAT
       qca_data.lat_atat = createLatForATAT(qca_data.plattice, qca_data.elements);
       qca_data.vstr_atat = getATATXstructures(qca_data.lat_atat, qca_data.plattice, qca_data.elements, (uint)qca_data.max_num_atoms);
-      qca_data.vstr_aflow = getAFLOWXstructures(qca_data.plattice, qca_data.elements, qca_data.num_threads);
+      qca_data.vstr_aflow = getAFLOWXstructures(qca_data.plattice, qca_data.elements, qca_data.num_threads, qca_data.use_sg);
       if (!qca_data.aflowlibpath.empty()) { // add custom xstrs
-        vector<xstructure> vstr_add = getAFLOWXstructures(qca_data.aflowlibpath, qca_data.num_threads);
+        vector<xstructure> vstr_add = getAFLOWXstructures(qca_data.aflowlibpath, qca_data.num_threads, qca_data.use_sg);
         qca_data.vstr_aflow.insert(qca_data.vstr_aflow.end(), vstr_add.begin(), vstr_add.end());
       }
       qca_data.mapstr = getMapForXstructures(getATATXstructures(qca_data.lat_atat, qca_data.plattice, qca_data.elements, qca_data.aflow_max_num_atoms), qca_data.vstr_aflow, qca_data.num_threads); // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
@@ -1447,7 +1449,6 @@ namespace qca {
     usage_options.push_back("qca_options:");
     usage_options.push_back(" ");
     usage_options.push_back("GENERAL OPTIONS:");
-    usage_options.push_back("--binodal");
     usage_options.push_back("--usage");
     usage_options.push_back("--screen_only");
     usage_options.push_back("--image_only|--image");
@@ -1455,6 +1456,8 @@ namespace qca {
     usage_options.push_back("--aflowlib_directory=|--aflowlib_dir=...");
     usage_options.push_back(" ");
     usage_options.push_back("BINODAL OPTIONS:");
+    usage_options.push_back("--binodal");
+    usage_options.push_back("--use_sg");
     usage_options.push_back("--aflow_max_num_atoms=4");
     usage_options.push_back("--max_num_atoms=|--mna=8");
     usage_options.push_back("--cv_cutoff=|--cv_cut=0.05");

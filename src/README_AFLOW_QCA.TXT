@@ -56,6 +56,8 @@ LIST OF AFLOW-QCA COMMANDS:
       [--binodal] : Calculates the binodal curve for the given concentration and temperature
           profiles.
           Default: OFF
+      [--use_sg] : Uses the space groups for structure comparison.
+          Default: OFF
       [--aflow_max_num_atoms=4] : Specifies the maximum number of atoms in the unit cell of
           the AFLOW calculations.
           Default: 4
