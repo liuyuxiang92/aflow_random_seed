@@ -33,7 +33,7 @@ VERSNUMBER=3.2.12
 UNAME=$(shell uname)
 
 # for aflow
-CPP=g++ -std=c++11 #HE20220124 ensure c++ standard is consistent
+CPP=g++ -std=c++11  -DAFLOW_MULTITHREADS_ENABLE #HE20220124 ensure c++ standard is consistent
 #-O2 -frepo
 # for sqllite
 CC=gcc
@@ -43,8 +43,6 @@ CPP=clang++ -std=c++11 -DAFLOW_MULTITHREADS_ENABLE #HE20220124 ensure c++ standa
 CC=clang
 ARCH=-D_MACOSX_
 endif
-
-CPP += -std=c++11 #HE20220124 ensure c++ standard is consistent
 
 #CPP=g++-fsf-7 
 #CPP=g++-fsf-4.9 -std=gnu++11

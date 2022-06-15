@@ -320,7 +320,9 @@ namespace unittest {
     resetUnitTest(test);
     test.func(test.passed_checks, test.results, test.errors);
     // Output results
+#ifdef AFLOW_MULTITHREADS_ENABLE
     std::lock_guard<std::mutex> lk(mtx);
+#endif
     test.finished = true;
     if (aurostd::WithinList(tasks, test_name)) {
       // If the test name is in the task list, it is not part
