@@ -8,7 +8,8 @@
 #define _AUROSTD_XFIT_H_
 
 //********************************************************************************
-//              Functions to work with polynomials
+// Functions to work with polynomials
+//********************************************************************************
 namespace aurostd {
   template<class utype> utype evalPolynomial(const utype x, const xvector<utype>& p) __xprototype;
   template<class utype> xvector<utype> evalPolynomial_xv(const xvector<utype>& x, const xvector<utype>& p) __xprototype;
@@ -24,8 +25,12 @@ namespace aurostd {
   template<class utype> void polynomialFindRoots(const xvector<utype>& p, xvector<utype>& rr, xvector<utype>& ri) __xprototype; //SD20220318
 }
 
+//********************************************************************************
+// Root-finding algorithms
+//********************************************************************************
 namespace aurostd {
-  double findZeroBrent(const double a, const double b, const std::function<double(double)>& f, const uint niter=100, const double tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //SD20220517
+  bool findZeroBrent(const double a, const double b, const std::function<double(double)>& f, double& zero, const uint niter=100, const double tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //SD20220517
+  bool findZeroNewtonRaphson(const xvector<double>& x0, const vector<std::function<double(xvector<double>)>>& vf, const vector<vector<std::function<double(xvector<double>)>>>& jac, xvector<double>& x, const uint niter=100, const double tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //SD20220616
 }
 
 //********************************************************************************

@@ -1105,8 +1105,30 @@ namespace unittest {
     check_description = "find the zero of a univariate function using Brent's method";
     std::function<double(double)> func = [](double x) {return std::pow(x, 2.0) - 3.0;};
     expected_dbl = 1.732050807568877;
-    calculated_dbl = aurostd::findZeroBrent(0.0, 10.0, func);
-    checkEqual(expected_dbl, calculated_dbl, check_function, check_description, passed_checks, results);
+    aurostd::findZeroBrent(0.0, 10.0, func, calculated_dbl);
+    checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | findZeroNewtonRaphson //SD20220616
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::findZeroNewtonRaphson()";
+    check_description = "find the zeros of a 2D nonlinear square system";
+    xvector<double> x0(2);
+    vector<std::function<double(xvector<double>)>> vfunc, vdfunc;
+    vector<vector<std::function<double(xvector<double>)>>> jac;
+    vfunc.push_back([](xvector<double> x) {return std::exp(-std::exp(-(x(1) + x(2)))) - x(2) * (1.0 + std::pow(x(1), 2.0));});
+    vfunc.push_back([](xvector<double> x) {return x(1) * std::cos(x(2)) + x(2) * std::sin(x(1)) - 0.5;});
+    vdfunc.push_back([](xvector<double> x) {return std::exp(-std::exp(-(x(1) - x(2))) - x(1) - x(2)) - 2 * x(1) * x(2);});
+    vdfunc.push_back([](xvector<double> x) {return std::exp(-std::exp(-(x(1) - x(2))) - x(1) - x(2)) - (1.0 + std::pow(x(1), 2.0));});
+    jac.push_back(vdfunc);
+    vdfunc.clear();
+    vdfunc.push_back([](xvector<double> x) {return x(2) * std::cos(x(1)) + std::cos(x(2));});
+    vdfunc.push_back([](xvector<double> x) {return std::sin(x(1)) - x(1) * std::sin(x(2));});
+    jac.push_back(vdfunc);
+    aurostd::findZeroNewtonRaphson(x0, vfunc, jac, calculated_xvecdbl);
+    expected_xvecdbl = xvector<double>(2);
+    expected_xvecdbl(1) = 0.353246561918931; expected_xvecdbl(2) = 0.606082026502552;
+    checkEqual(calculated_xvecdbl, expected_xvecdbl, check_function, check_description, passed_checks, results);
   }
 
 }

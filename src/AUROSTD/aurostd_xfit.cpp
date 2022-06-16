@@ -275,37 +275,41 @@ namespace aurostd {
 }
 
 //********************************************************************************
+
+//********************************************************************************
+// Root-finding algorithms
+//********************************************************************************
 namespace aurostd {
   //SD20220517
   //Find the zeros of a univariate function by Brent's method
   //Based on the version by J. Burkardt
-  double findZeroBrent(const double a, const double b, const std::function<double(double)>& f, const uint niter, const double _tol) {
-    double c, d, e, fa, fb, fc, m, p, q, r, s, sa, sb, tol;
+  bool findZeroBrent(const double a, const double b, const std::function<double(double)>& f, double& zero, const uint niter, const double _tol) {
+    double c, d, e, fa, fb, fc, m, p, q, r, s, sa, tol;
     if (aurostd::isequal(aurostd::sign(f(a)), aurostd::sign(f(b)))) {
       stringstream message;
       message << "Function evalution at the endpoints have the same sign, F(a)=" << f(a) << " F(b)=" << f(b);
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     sa = a;
-    sb = b;
+    zero = b;
     fa = f(sa);
-    fb = f(sb);
+    fb = f(zero);
     c = sa;
     fc = fa;
-    e = sb - sa;
+    e = zero - sa;
     d = e;
     uint iter = 0;
     while (iter < niter) {
       if (std::abs(fc) < std::abs(fb)) {
-        sa = sb;
-        sb = c;
+        sa = zero;
+        zero = c;
         c = sa;
         fa = fb;
         fb = fc;
         fc = fa;
       }
-      tol = 2.0 * _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_ * std::abs(sb) + _tol;
-      m = 0.5 * (c - sb);
+      tol = 2.0 * _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_ * std::abs(zero) + _tol;
+      m = 0.5 * (c - zero);
       if (std::abs(m) <= tol || aurostd::isequal(fb, 0.0)) {break;}
       if (std::abs(e) < tol || std::abs(fa) <= std::abs(fb)) {
         e = m;
@@ -320,7 +324,7 @@ namespace aurostd {
         else {
           q = fa / fc;
           r = fb / fc;
-          p = s * (2.0 * m * q * (q - r) - (sb - sa) * (r - 1.0));
+          p = s * (2.0 * m * q * (q - r) - (zero - sa) * (r - 1.0));
           q = (q - 1.0) * (r - 1.0) * (s - 1.0);
         }
         if (0.0 < p) {
@@ -339,35 +343,68 @@ namespace aurostd {
           d = e;
         }
       }
-      sa = sb;
+      sa = zero;
       fa = fb;
       if (tol < std::abs(d)) {
-        sb = sb + d;
+        zero = zero + d;
       }
       else if (0.0 < m) {
-        sb = sb + tol;
+        zero = zero + tol;
       }
       else {
-        sb = sb - tol;
+        zero = zero - tol;
       }
-      fb = f(sb);
+      fb = f(zero);
       if ((0.0 < fb && 0.0 < fc) || (fb <= 0.0 && fc <= 0.0)) {
         c = sa;
         fc = fa;
-        e = sb - sa;
+        e = zero - sa;
         d = e;
       }
       iter++;
     }
-    if (iter == niter) {
-      string message;
-      message = "Finding the zero, using Brent's method, failed to converge";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
-    }
-    return sb;
+    return (iter == niter) ? false : true;
   }
-}
 
+  //SD20220616
+  //Find the zeros for a square system (N variables, N equations) using the Newton-Raphson method
+  //DOI: 10.1007/978-3-319-69407-8; Appendix A
+  //@param x0 initial guess for the solution
+  //@param vf vector of functions
+  //@param jac vector of vector of first derivative functions (Jacobian)
+  //@param x zeros of the system
+  bool findZeroNewtonRaphson(const xvector<double>& _x0, const vector<std::function<double(xvector<double>)>>& vf, const vector<vector<std::function<double(xvector<double>)>>>& jac, xvector<double>& x, const uint niter, const double tol) {
+    uint n = (uint)_x0.rows;
+    if (n != vf.size() || n != jac[0].size() || n != jac.size()) {
+      string message;
+      message = "System of equations is not square";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+    }
+    xvector<double> x0 = _x0, f(n);
+    xmatrix<double> J(n, n), iJ;
+    bool converged = false;
+    uint iter = 0;
+    while (iter < niter) {
+      for (uint i = 0; i < n; i++) {
+        for (uint j = 0; j < n; j++) {
+          J(i + 1, j + 1) = jac[i][j](x0);
+        }
+      }
+      iJ = aurostd::inverse(J);
+      for (uint i = 0; i < n; i++) {f(i + 1) = vf[i](x0);}
+      x = x0 - iJ * f;
+      converged = true;
+      for (int i = x.lrows; i <= x.urows && converged; i++) {
+        if (aurostd::abs(x(i) - x0(i)) > tol) {converged = false;}
+      }
+      if (converged) {break;}
+      x0 = x;
+      iter++;
+    }
+    return (iter == niter) ? false : true;
+  }
+
+}
 //********************************************************************************
 //              Definitions of the NonlinearFit class members
 namespace aurostd{

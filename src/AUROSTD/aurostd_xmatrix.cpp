@@ -1812,17 +1812,17 @@ namespace aurostd {  // namespace aurostd
 }
 
 // ----------------------------------------------------------------------------
-namespace aurostd {  // namespace aurostd
-  template<class utype>                           // function vector<xmatrix<>>
-    xvector<utype> vector(const xmatrix<utype>& a) {
-      int n=(a.rows*a.cols);
-      xvector<utype> c(1,n);
-      for(int i=0;i<n;i++) {
-        c[i+1]=(utype) a(int(i/a.cols)+a.lrows,mod(i,a.cols)+a.lcols);
-      }
-      return c;
-    }
-}
+//[SD20220616 - OBSOLETE]namespace aurostd {  // namespace aurostd
+//[SD20220616 - OBSOLETE]  template<class utype>                           // function vector<xmatrix<>>
+//[SD20220616 - OBSOLETE]    xvector<utype> vector(const xmatrix<utype>& a) {
+//[SD20220616 - OBSOLETE]      int n=(a.rows*a.cols);
+//[SD20220616 - OBSOLETE]      xvector<utype> c(1,n);
+//[SD20220616 - OBSOLETE]      for(int i=0;i<n;i++) {
+//[SD20220616 - OBSOLETE]        c[i+1]=(utype) a(int(i/a.cols)+a.lrows,mod(i,a.cols)+a.lcols);
+//[SD20220616 - OBSOLETE]      }
+//[SD20220616 - OBSOLETE]      return c;
+//[SD20220616 - OBSOLETE]    }
+//[SD20220616 - OBSOLETE]}
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
