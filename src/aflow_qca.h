@@ -95,7 +95,7 @@ namespace qca {
   vector<xstructure> getAFLOWXstructures(const string& aflowlibpath, const int num_threads, bool use_sg);
   string createLatForATAT(const string& plattice, const vector<string>& elements, bool scale=false);
   vector<xstructure> getATATXstructures(const string& lat, const string& plattice, const vector<string>& elements, const uint max_num_atoms, const string& rundirpath="");
-  vector<int> getMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads);
+  vector<int> getMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const bool shuffle);
   void displayUsage(void);
   void writeData(const _qca_data& qca_data);
   void readData(_qca_data& qca_data);

@@ -338,7 +338,7 @@ namespace qca {
         vector<xstructure> vstr_add = getAFLOWXstructures(qca_data.aflowlibpath, qca_data.num_threads, qca_data.use_sg);
         qca_data.vstr_aflow.insert(qca_data.vstr_aflow.end(), vstr_add.begin(), vstr_add.end());
       }
-      qca_data.mapstr = getMapForXstructures(getATATXstructures(qca_data.lat_atat, qca_data.plattice, qca_data.elements, qca_data.aflow_max_num_atoms), qca_data.vstr_aflow, qca_data.num_threads); // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
+      qca_data.mapstr = getMapForXstructures(getATATXstructures(qca_data.lat_atat, qca_data.plattice, qca_data.elements, qca_data.aflow_max_num_atoms), qca_data.vstr_aflow, true); // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
       generateFilesForATAT(qca_data.rundirpath, createLatForATAT(qca_data.plattice, qca_data.elements, true), qca_data.vstr_aflow, qca_data.vstr_atat, qca_data.mapstr);
       runATAT(qca_data.workdirpath, qca_data.rundirpath, qca_data.min_sleep);
     }
@@ -1415,23 +1415,58 @@ namespace qca {
   ///
   /// @param vstr1 First group of xstructures.
   /// @param vstr2 Second group of xstructures.
-  /// @param num_threads Number of threads to run AFLOW-SYM.
+  /// @param shuffle Shuffle the order of the first group.
   ///
   /// @return Xstructure map between the two groups.
-  vector<int> getMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads) {
+  vector<int> getMapForXstructures(const vector<xstructure>& _vstr1, const vector<xstructure>& vstr2, const bool shuffle) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     vector<int> mapstr;
-    bool match;
-    for (uint i = 0; i < vstr1.size(); i++) {
-      match = false;
-      for (uint j = 0; j < vstr2.size() && !match; j++) {
-        if (compare::structuresMatch(vstr1[i], vstr2[j], true, num_threads)) {
-          if (LDEBUG) {cerr << "str1 i=" << i << " matched str2 j=" << j << endl << "str1=" << vstr1[i] << endl << "str2=" << vstr2[j] << endl;}
-          mapstr.push_back(j); 
-          match = true;
+    bool quiet = XHOST.QUIET;
+    XHOST.QUIET = true;
+    vector<xstructure> vstr1 = _vstr1;
+    vector<uint> index;
+    for (uint i = 0; i < vstr1.size(); i++) {index.push_back(i);}
+    // Shuffling the xstructures is important because it can avoid edge case scenarios where the reference centroid
+    // in Xtalfinder does not pick up the proper neighbors
+    if (shuffle) { // introduce randomness into grouping
+      aurostd::random_shuffle(index);
+      for (uint i = 0; i < index.size(); i++) {vstr1[i] = _vstr1[index[i]];}
+    }
+    vector<xstructure> vstr3 = vstr1;
+    vstr3.insert(vstr3.end(), vstr2.begin(), vstr2.end());
+    XtalFinderCalculator xtal_calc;
+    vector<vector<uint>> gsx = xtal_calc.groupSimilarXstructures(vstr3);
+    XHOST.QUIET = quiet;
+    for (uint i = 0; i < gsx.size(); i++) {
+      std::sort(gsx[i].begin(), gsx[i].end());
+      if (gsx[i][0] > vstr1.size() -  1) { // index is not part of vstr1
+        continue;
+      }
+      else if (gsx[i].size() == 1) { // no match for xstr in vstr1
+        mapstr.push_back(-1);
+      }
+      else { // take first match of xstr in vstr2 to xstr in vstr1
+        for (uint j = 1; j < gsx[i].size(); j++) {
+          if (gsx[i][j] > vstr1.size() - 1) {
+            mapstr.push_back((int)gsx[i][j] - (int)vstr1.size());
+            break;
+          }
         }
       }
-      if (!match) {mapstr.push_back(-1);}
+      if (LDEBUG) {
+        cerr << "i=" << i << " | ";
+        for (uint j = 0; j < gsx[i].size(); j++) {cerr << gsx[i][j] << " ";}
+        cerr << endl;
+      }
+    }
+    if (mapstr.size() != index.size()) {
+      stringstream message;
+      message << "Something went wrong in the mapping of the xstructures; index.size()=" << index.size() << " | mapstr.size()=" << mapstr.size() << endl;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+    }
+    if (shuffle) { // place back in correct order
+      vector<int> _mapstr = mapstr;
+      for (uint i = 0; i < index.size(); i++) {mapstr[index[i]] = _mapstr[i];}
     }
     return mapstr;
   }
