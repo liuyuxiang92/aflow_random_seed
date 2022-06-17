@@ -41,6 +41,13 @@ namespace aurostd {  // namespace aurostd
       resize(nh,nl);  //CO20201111
     }
 
+  template<class utype>                                    // initializer_list constructor //HE20220616
+  xvector<utype>::xvector(std::initializer_list<utype> l) {
+    // usage: xvector<double> new_vector({2.0, 3.0, 4.0});
+    init();
+    copy(l);
+  }
+
   template<class utype>                                       // copy constructor
     xvector<utype>::xvector(const xvector<utype>& b) {
       init();
@@ -104,7 +111,7 @@ namespace aurostd {  // namespace aurostd
         if(vsize>0) {
           corpus=new utype[rows+XXEND](); //HE20220613 initialize corpus memory
           if(!corpus) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvector<utype>::copy():","allocation failure in COPY",_ALLOC_ERROR_);}
-          corpus+= -lrows+XXEND;
+          corpus+= -lrows+XXEND; // move the pointer to allow direct access
         }
 #ifdef _AUROSTD_XVECTOR_DEBUG_CONSTRUCTORS
         printf(" isfloat=%i, iscomplex=%i, sizeof=%i, vsize=%i\n",isfloat,iscomplex,size,vsize);
@@ -123,6 +130,16 @@ namespace aurostd {  // namespace aurostd
       if(b.rows==1){return copy(b(b.lrows));}
       else if(b.cols==1)return copy(b.getcol(b.lcols));
       throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvector<utype>::copy():","xmatrix input cannot be converted to xvector",_VALUE_ILLEGAL_);
+    }
+
+  template<class utype>
+    void xvector<utype>::copy(const std::initializer_list<utype> l) { // initializer_list copy //HE20220616
+      resize(l.size(), 1);
+      size_t new_index = 0;
+      for (ili entry=l.begin(); entry < l.end(); entry++){
+        new_index+=1;
+        corpus[new_index] = *entry;
+      }
     }
 }
 
@@ -170,6 +187,13 @@ namespace aurostd {  // namespace aurostd
   template<class utype>                                             // operator =
     xvector<utype>& xvector<utype>::operator=(const xvector<utype>& b) { //CO20191110
       if(this!=&b) {copy(b);}
+      return *this;
+    }
+  template<class utype>                                             // operator =
+    xvector<utype>& xvector<utype>::operator=(const std::initializer_list<utype> l) { // initializer_list assignment //HE20220616
+      // usage: xvector<double> new_vector;
+      // new_vector = {2.0, 3.0, 4.0};
+      copy(l);
       return *this;
     }
 }
@@ -295,7 +319,22 @@ namespace aurostd {  // namespace aurostd
       return *this;
     }
 }
-
+// --------------------------------------------------------- operator += xvector
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+  xvector<utype> & xvector<utype>::operator+=(const std::initializer_list <utype> l) { // HE20220616
+    if (this->rows != (int) l.size()) { //convert to int to avoid compiler warning
+      string message = "failure in operator-=: (this->rows!=r.rows)=FALSE";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+    }
+    size_t new_index = lrows;
+    for (ili entry = l.begin(); entry < l.end(); entry++) {
+      corpus[new_index] += *entry;
+      new_index += 1;
+    }
+   return *this;
+  }
+}
 // --------------------------------------------------------- operator += xvector
 namespace aurostd {  // namespace aurostd
   template<class utype> xvector<utype>&
@@ -330,6 +369,22 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
+// --------------------------------------------------------- operator -= xvector
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+  xvector<utype> & xvector<utype>::operator-=(const std::initializer_list <utype> l) { // HE20220616
+    if (this->rows != (int) l.size()) { //convert to int to avoid compiler warning
+      string message = "failure in operator-=: (this->rows!=r.rows)=FALSE";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+    }
+    size_t new_index = lrows;
+    for (ili entry = l.begin(); entry < l.end(); entry++) {
+      corpus[new_index] -= *entry;
+      new_index += 1;
+    }
+    return *this;
+  }
+}
 // --------------------------------------------------------- operator -= xvector
 namespace aurostd {  // namespace aurostd
   template<class utype> xvector<utype>&  
@@ -3291,6 +3346,18 @@ namespace aurostd {
     return peak_indices;
   }
 } // namespace aurostd
+
+namespace aurostd { //force the compiler to instantiate the template at this point (avoids linker issues)
+  template class xvector<int>;
+  template class xvector<unsigned int>;
+  template class xvector<long int>;
+  template class xvector<long unsigned int>;
+  template class xvector<long long int>;
+  template class xvector<long long unsigned int>;
+  template class xvector<float>;
+  template class xvector<double>;
+  template class xvector<long double>;
+}
 
 #endif  // _AUROSTD_XVECTOR_IMPLEMENTATIONS_
 
