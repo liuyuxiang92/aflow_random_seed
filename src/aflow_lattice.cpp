@@ -5487,17 +5487,17 @@ namespace LATTICE {
     if(tokens.size()>=4) Ks=tokens.at(3);
     return TRUE;
   }
-  uint kpoint2stream(stringstream& oss, xvector<double> Kx,string Ks,uint &nkpoint) {
+  uint kpoint2stream(stringstream& oss, const xvector<double>& Kx,const string& Ks,uint &nkpoint) {
     oss.setf(std::ios::fixed);
     oss.precision(4);
     nkpoint++;
-    oss << "  " << (Kx[1]>=0.0?" ":"") << Kx[1] 
-      << " " << (Kx[2]>=0.0?" ":"") << Kx[2] 
-      << " " << (Kx[3]>=0.0?" ":"") << Kx[3] 
+    oss << "  " << (Kx[1]>=0.0?" ":"") << (std::signbit(Kx[1])?"":" ") << Kx[1]   //CO20220611 - negative sign formatting
+      << " "    << (Kx[2]>=0.0?" ":"") << (std::signbit(Kx[2])?"":" ") << Kx[2]   //CO20220611 - negative sign formatting
+      << " "    << (Kx[3]>=0.0?" ":"") << (std::signbit(Kx[3])?"":" ") << Kx[3]   //CO20220611 - negative sign formatting
       << "   " << double(1.0) << "   ! " << aurostd::PaddedPOST(Ks,20," ") << " // nkpoint=" << nkpoint << endl;
     return nkpoint;
   }
-  uint kpoint2stream(stringstream& oss, bool isVASP, bool isQE, string A, string B, double grid,uint &nkpoint) {
+  uint kpoint2stream(stringstream& oss, bool isVASP, bool isQE, const string& A, const string& B, double grid,uint &nkpoint) {
     // prepare points
     xvector<double> Ax(3),Bx(3);
     string As="",Bs="";

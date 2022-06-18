@@ -12787,16 +12787,16 @@ namespace pflow {
       // now checking CIF
       if(vpflow.flag("PROTO::CIF")) str.xstructure2cif();
 
-      // now checking ABCCAR
-      if(vpflow.flag("PROTO::ABCCAR")) str.xstructure2abccar();
-      //DX20190123 - add CIF/ABCCAR - END
-
       // now checking ELK //DX20200313
       if(vpflow.flag("PROTO::ELK")) str.xstructure2elk();
 
       // now checking ITC
       if(vpflow.flag("PROTO::ITC")) str.xstructure2itc(); //CO20220613
     }
+    
+    // now checking ABCCAR
+    if(vpflow.flag("PROTO::ABCCAR")) str.xstructure2abccar();
+    //DX20190123 - add CIF/ABCCAR - END
 
     if(LDEBUG) cerr << soliloquy << " END" << endl;  
     return str;
