@@ -8078,53 +8078,37 @@ namespace KBIN {
 // KBIN::ExtractPOSCARFromAFLOWIN
 // ***************************************************************************
 namespace KBIN {
-  // SD20220228 - Extract the nth POSCAR from the AFLOWIN, negative values go backwards, n==0 returns everything
-  stringstream ExtractPOSCARStringStreamFromDirectory(const string& directory, const int index) {
-    string function_name = "KBIN::ExtractPOSCARStringStreamFromDirectory():";
+  // SD20220228 - Extract the nth POSCAR from the AFLOWIN, negative values go backwards
+  bool ExtractPOSCARStringStreamFromDirectory(const string& directory, stringstream& poscar, const int index) {
     string AflowIn = "";
-    if(!aurostd::file2string(directory + "/" + _AFLOWIN_, AflowIn)) {
-      string message = "Could not find " + _AFLOWIN_ + " in " + directory;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_NOT_FOUND_);
-    }
-    return ExtractPOSCARStringStreamFromAFLOWIN(AflowIn, index);
+    if(!aurostd::file2string(directory + "/" + _AFLOWIN_, AflowIn)) {return false;}
+    return ExtractPOSCARStringStreamFromAFLOWIN(AflowIn, poscar, index);
   }
 
-  xstructure ExtractPOSCARXStructureFromDirectory(const string& directory, const int iomode, const int index) {
-    string function_name = "KBIN::ExtractPOSCARXStructureFromDirectory():";
-    string AflowIn = "";
-    if(!aurostd::file2string(directory + "/" + _AFLOWIN_, AflowIn)) { 
-      string message = "Could not find " + _AFLOWIN_ + " in " + directory;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_NOT_FOUND_);
-    }
-    return ExtractPOSCARXStructureFromAFLOWIN(AflowIn, iomode, index);
-  }
-
-  stringstream ExtractPOSCARStringStreamFromAFLOWIN(const string& AflowIn, const int index) {
-    string function_name = "KBIN::ExtractPOSCARStringStreamFromAFLOWIN():";
+  xstructure GetPOSCARXStructureFromDirectory(const string& directory, const int iomode, const int index) {
     stringstream poscar;
+    if(!ExtractPOSCARStringStreamFromDirectory(directory, poscar, index)) {
+      string message = "Could not find valid " + _AFLOWIN_ + " in " + directory;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
+    }
+    return xstructure(poscar, iomode);
+  }
+
+  bool ExtractPOSCARStringStreamFromAFLOWIN(const string& AflowIn, stringstream& poscar, const int index) {
     if(index==0) {
       string message = "Index cannot be 0";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     poscar.str(aurostd::substring2string(AflowIn, _VASP_POSCAR_MODE_EXPLICIT_START_, _VASP_POSCAR_MODE_EXPLICIT_STOP_, index));
-    if(poscar.str().empty()) {
-      string message = "Invalid " + _AFLOWIN_;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_WRONG_FORMAT_);
-    }
-    return poscar;
+    if(poscar.str().empty()) {return false;}
+    return true;
   }
 
-  xstructure ExtractPOSCARXStructureFromAFLOWIN(const string& AflowIn, const int iomode, const int index) {
-    string function_name = "KBIN::ExtractPOSCARXStructureFromAFLOWIN():";
+  xstructure GetPOSCARXStructureFromAFLOWIN(const string& AflowIn, const int iomode, const int index) {
     stringstream poscar;
-    if(index==0) {
-      string message = "Index cannot be 0";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _VALUE_ERROR_);
-    }
-    poscar.str(aurostd::substring2string(AflowIn, _VASP_POSCAR_MODE_EXPLICIT_START_, _VASP_POSCAR_MODE_EXPLICIT_STOP_, index));
-    if(poscar.str().empty()) {
+    if(!ExtractPOSCARStringStreamFromAFLOWIN(AflowIn, poscar, index)) {
       string message = "Invalid " + _AFLOWIN_;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, function_name, message, _FILE_WRONG_FORMAT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
     }
     return xstructure(poscar, iomode);
   }

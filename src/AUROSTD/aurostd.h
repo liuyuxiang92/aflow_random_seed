@@ -62,8 +62,6 @@
 #include <fts.h>         //HE20220222 - for EntryLoader (effective filesystem tree walk)
 #include <regex>         //HE20220222 - for EntryLoader (faster match of complex patterns like alloy matching)
 
-
-
 #define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)  //CO20200502 - moved from aflow.h
 
 //CO20200502 START - including gettid()
@@ -824,6 +822,8 @@ namespace aurostd {
   bool substring2bool(const vector<string>& vstrstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
   bool substring2bool(const deque<string>& vstrstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
   bool substring2bool(const stringstream& strstream,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up
+  bool substringlist2bool(const string& strin, const vector<string>& substrings, bool match_all=true); //ME20220505
+  bool substringlist2bool(const string& strin, const deque<string>& substrings, bool match_all=true);  //ME20220505
   bool substring_present_file(const string& FileName,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
   bool substring_present_file_FAST(const string& FileName,const string& strsub1,bool RemoveWS=false,bool case_insensitive=false,bool expect_near_end=false,unsigned long long int size_max=AUROSTD_MAX_ULLINT);  //CO20210315 - cleaned up
   bool WithinList(const vector<string>& list,const string& input,bool sorted=false);  //CO20181010
@@ -835,6 +835,10 @@ namespace aurostd {
   bool WithinList(const vector<uint>&, uint, int&,bool sorted=false);  //ME20190905
   bool EWithinList(const vector<string>& list,const string& input); //CO20200223
   bool EWithinList(const vector<string>& list, const string& input, string& output); //CO20200223
+  bool SubstringWithinList(const deque<string>& list, const string& input);  //ME20220503
+  bool SubstringWithinList(const deque<string>& list, const string& input, int& index);  //ME20220503
+  bool SubstringWithinList(const vector<string>& list, const string& input);  //ME20220503
+  bool SubstringWithinList(const vector<string>& list, const string& input, int& index);  //ME20220503
   // about present substrings and taking off the value
   string substring2string(ifstream& input,const string& strsub1,const int instance=1,bool RemoveWS=false,bool RemoveComments=true); //SD20220520
   string substring2string(const string& input,const string& strsub1,const int instance=1,bool RemoveWS=false,bool RemoveComments=true);  //CO20210315 - cleaned up //SD20220520 - rewritten
@@ -1280,6 +1284,21 @@ namespace aurostd {
   string joinWDelimiter(const xvector<int>& ientries, const stringstream& delimiter,
       const stringstream& m_delimiter,
       const stringstream& l_delimiter);
+  // ME20220324 - added missing uint variant for xvector
+  string joinWDelimiter(const xvector<uint>& ientries, const char& _delimiter);
+  string joinWDelimiter(const xvector<uint>& ientries, const char& _delimiter,
+      const char& _l_delimiter);
+  string joinWDelimiter(const xvector<uint>& ientries, const char& _delimiter,
+      const char& _m_delimiter, const char& _l_delimiter);
+  string joinWDelimiter(const xvector<uint>& ientries, const string& _delimiter);
+  string joinWDelimiter(const xvector<uint>& ientries, const string& _delimiter,
+      const string& _l_delimiter);
+  string joinWDelimiter(const xvector<uint>& ientries, const string& _delimiter,
+      const string& _m_delimiter, const string& _l_delimiter);
+  string joinWDelimiter(const xvector<uint>& ientries, const stringstream& delimiter);
+  string joinWDelimiter(const xvector<uint>& ientries, const stringstream& delimiter,
+      const stringstream& m_delimiter,
+      const stringstream& l_delimiter);
   string joinWDelimiter(const vector<int>& ientries, const char& _delimiter);
   string joinWDelimiter(const vector<int>& ientries, const char& _delimiter,
       const char& _l_delimiter);
@@ -1391,6 +1410,9 @@ namespace aurostd {
 namespace aurostd {
   // [OBSOLETE] string xmatDouble2String(const xmatrix<double>& xmat_in, bool roff=false);
   string xmatDouble2String(const xmatrix<double>& xmat_in, int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
+  // ME20220324
+  template <typename utype>
+  string xmat2String(const xmatrix<utype>& mat_in);
 }
 
 //CO20171215 - more json functionality
@@ -1402,10 +1424,14 @@ namespace aurostd {
 namespace aurostd {
   // [OBSOLETE] vector<string> vecDouble2vecString(const vector<double>& vin, bool roff=false);
   vector<string> vecDouble2vecString(const vector<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
+  string vecDouble2String(const vector<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
+  // [OBSOLETE] vector<string> xvecDouble2vecString(const xvector<double>& vin, bool roff=false);
   // [OBSOLETE] vector<string> xvecDouble2vecString(const xvector<double>& vin, bool roff=false);
   vector<string> xvecDouble2vecString(const xvector<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
+  string xvecDouble2String(const xvector<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
   // [OBSOLETE] deque<string> deqDouble2deqString(const deque<double>& vin, bool roff=false);
   deque<string> vecDouble2vecString(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
+  string vecDouble2String(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
   // deque<string> deqDouble2deqString(const deque<double>& vin,int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
 }
 
