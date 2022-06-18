@@ -3635,7 +3635,7 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
               if(tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE";date=tokens.at(4);}
               if(tokens.at(2)=="PAW_PBE") {pottype="PAW_PBE_KIN";date=tokens.at(4);} // FIX CO+SC PBE_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized"
               if(tokens.at(2)=="PAW_LDA") {pottype="PAW_LDA_KIN";date=tokens.at(4);} // FIX CO+SC LDA_KIN CHECK PRESENCE OF "mkinetic energy-density pseudized"
-              // SEE https://cms.mpi.univie.ac.at/wiki/index.php/METAGGA
+              // SEE https://www.vasp.at/wiki/index.php/METAGGA
             }
             if(pottype.empty()) {
               cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] = " << FilePotcar << "  wrong pottype:" << sgrep << endl; 
