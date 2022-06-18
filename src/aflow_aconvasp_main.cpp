@@ -7287,7 +7287,7 @@ namespace pflow {
     for(uint i=0;i<tokens.size();i++)
       if(aurostd::substring2bool(tokens.at(i),":"))
         vinput.push_back(tokens.at(i));
-    // find minimun
+    // find minimum
     double minE=1.0e6;
     for(uint i=0;i<vinput.size();i++) {
       aurostd::string2tokens(vinput.at(i),tokens,"=");

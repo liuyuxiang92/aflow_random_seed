@@ -863,7 +863,7 @@ LATTICES = (the ones with "")
   aflow --cluster=structure_type,atom_num_min,atom_num_max,neighbour_min,neighbour_max
         Get clusters
         atom_num_min, atom_num_max : minimum and maximum numbers of atoms in a cluster
-        neighbour_min, neighbour_max : minimun and maximum nearest neighbour
+        neighbour_min, neighbour_max : minimum and maximum nearest neighbour
         pairs including in a cluster
 
   aflow --cmp_str POSCAR1 POSCAR2 rcut  
@@ -3377,7 +3377,7 @@ LATTICES = (the ones with "")
       structure: bcc/fcc/hcp
       atom_num : maximum number of atoms in a cluster
       neighbour_num : maximum number of nearest neighbour pairs in a cluster
-      sl_num_min : minimun number of the base structure in the superlattice
+      sl_num_min : minimum number of the base structure in the superlattice
       sl_num_max : maximum number of the base structure in the superlattice
 
       To generate sqs bcc structure, one needs first to generate a

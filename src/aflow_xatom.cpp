@@ -10032,7 +10032,7 @@ string KPPRA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const int& 
       kk++;
       if(dk<=1e-5) {
         k1=1;k2=1;k3=1;
-        aus << "00000  MESSAGE KPOINTS KPPRA minimun not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
+        aus << "00000  MESSAGE KPOINTS KPPRA minimum not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
       }
       kk1=(int) floor((double) nb1/dk);db1=b1/((double) kk1);
       kk2=(int) floor((double) nb2/dk);db2=b2/((double) kk2);
@@ -10087,7 +10087,7 @@ string KPPRA_LAT(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const i
       kk++;
       if(dk<=1e-5) {
         k1=1;k2=1;k3=1;
-        aus << "00000  MESSAGE KPOINTS KPPRA minimun not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
+        aus << "00000  MESSAGE KPOINTS KPPRA minimum not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
       }
       kk1=(int) floor((double) nb1/dk);db1=b1/((double) kk1);
       kk2=(int) floor((double) nb2/dk);db2=b2/((double) kk2);
