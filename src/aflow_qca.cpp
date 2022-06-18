@@ -549,21 +549,21 @@ namespace qca {
   bool calcProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms, vector<xmatrix<double>>& prob_cluster) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     prob_cluster.clear();
-    int nx = prob_ideal_cluster.rows, ncl = prob_ideal_cluster.cols, nt = temp.rows, neqs = conc_cluster.cols - 1;
-    xmatrix<double> zeros(nx, ncl);
+    int nx = prob_ideal_cluster.rows, ncl = prob_ideal_cluster.cols, nt = temp.rows, neq = conc_cluster.cols - 1;
+    xmatrix<double> zeros(nx, ncl), natom_cluster = (double)max_num_atoms * conc_cluster;
     for (uint it = 0; it < (uint)nt; it++) {prob_cluster.push_back(zeros);} // initialize
-    xvector<double> beta = aurostd::pow(KBOLTZEV * temp, -1.0), p(max_num_atoms + 1), rr(max_num_atoms), ri(max_num_atoms), soln(neqs);
-    xmatrix<int> natom_cluster = aurostd::xmatrixdouble2utype<int>((double)max_num_atoms * conc_cluster);
+    xvector<double> beta = aurostd::pow(KBOLTZEV * temp, -1.0), soln(neq);
     bool soln_found = false;
-    if (neqs == 1) {
+    if (neq == 0) {
+      xvector<double> p(max_num_atoms + 1), rr(max_num_atoms), ri(max_num_atoms);
       for (int it = 1; it <= nt; it++) {
-        for (int i = 1; i <= nx; i++) {
+        for (int ix = 1; ix <= nx; ix++) {
           p.reset();
           soln.reset();
           for (int j = 1; j <= ncl; j++) {
-            p(natom_cluster(j, 1) + 1) += prob_ideal_cluster(i, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * (conc_cluster(j, 1) - conc_macro(i, 1));
+            p((int)natom_cluster(j, 1) + 1) += prob_ideal_cluster(ix, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * (conc_cluster(j, 1) - conc_macro(ix, 1));
           }
-          if (LDEBUG) {cerr << "it=" << it << " i=" << i << " | p=" << p << endl;}
+          if (LDEBUG) {cerr << "it=" << it << " ix=" << ix << " | p=" << p << endl;}
           aurostd::polynomialFindRoots(p, rr, ri);
           if (LDEBUG) {
             cerr << "   Real roots=" << rr << endl;
@@ -576,20 +576,75 @@ namespace qca {
             }
           }
           if (!soln_found) { // physical solution does not exist
-            if (LDEBUG) {cerr << "Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(i) << " ]";}
+            if (LDEBUG) {cerr << "Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]";}
             return false;
           }
           for (int j = 1; j <= ncl; j++) {
-            prob_cluster[it - 1](i, j) = prob_ideal_cluster(i, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * std::pow(soln(1), natom_cluster(j, 1));
+            prob_cluster[it - 1](ix, j) = prob_ideal_cluster(ix, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * std::pow(soln(1), natom_cluster(j, 1));
           }
-          prob_cluster[it - 1].setmat(prob_cluster[it - 1].getmat(i, i, 1, ncl) / aurostd::sum(prob_cluster[it - 1].getmat(i, i, 1, ncl)), i, 1); // normalize sum to 1
-          if (LDEBUG) {cerr << "it=" << it << " i=" << i << " | SUM[P_cluster]=" << aurostd::sum(prob_cluster[it - 1].getmat(i, i, 1, ncl)) << endl;}
+          prob_cluster[it - 1].setmat(prob_cluster[it - 1].getmat(ix, ix, 1, ncl) / aurostd::sum(prob_cluster[it - 1].getmat(ix, ix, 1, ncl)), ix, 1); // normalize sum to 1
         }
       }
     }
-    else { // homotopy continuation
+    else {
+      xmatrix<double> soln0 = aurostd::ones_xm<double>(neq, nx); //CHANGE TO RAND HERE WHEN WORKING
+      vector<std::function<double(xvector<double>)>> vpoly, vdpoly;
+      vector<vector<std::function<double(xvector<double>)>>> jac;
+      for (int it = nt; it >= 1; it--) { // go backwards
+        for (int ix = 1; ix <= nx; ix++) {
+          for (int ieq = 1; ieq <= neq; ieq++) {
+            vpoly.push_back([conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq](xvector<double> xvar) {return getProbabilityConstraint(conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq, 0, xvar);});
+            for (int ideq = 1; ideq <= neq; ideq++) {
+              vdpoly.push_back([conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq, ideq](xvector<double> xvar) {return getProbabilityConstraint(conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq, ideq, xvar);});
+            }
+            jac.push_back(vdpoly);
+            vdpoly.clear();
+          }
+          if (LDEBUG) {cerr << "it=" << it << " ix=" << ix << " | soln0=" << soln0 << endl;}
+          soln_found = findZeroNewtonRaphson(soln0.getcol(ix), vpoly, jac, soln);
+          if (LDEBUG) {cerr << "   Real roots=" << soln << endl;}
+          for (int ieq = 1; ieq <= neq && soln_found; ieq++) {
+            if (soln(ieq) < 0.0) {soln_found = false;} // solution must be positive, real and finite
+          }
+          if (!soln_found) {
+            if (LDEBUG) {cerr << "Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]";}
+            return false;
+          }
+          if (it == nt) {soln0.setcol(soln, ix);} // use the high temperature solution as an initial guess for lower temperature
+          vpoly.clear();
+          vdpoly.clear();
+          jac.clear();
+          for (int j = 1; j <= ncl; j++) {
+            prob_cluster[it - 1](ix, j) = prob_ideal_cluster(ix, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * aurostd::elements_product(aurostd::pow(soln, aurostd::xmatrix2xvector(natom_cluster, j, 1, j, neq, 1)));
+          }
+          prob_cluster[it - 1].setmat(prob_cluster[it - 1].getmat(ix, ix, 1, ncl) / aurostd::sum(prob_cluster[it - 1].getmat(ix, ix, 1, ncl)), ix, 1); // normalize sum to 1
+        }
+      }
     }
     return true;
+  }
+}
+
+// ***************************************************************************
+// qca::getProbabilityConstraint
+// ***************************************************************************
+namespace qca {
+  double getProbabilityConstraint(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& beta, const xmatrix<double>& natom_cluster, const int it, const int ix, const int ik, const int ikd, const xvector<double>& xvar) {
+    double totsum = 0.0, prodx;
+    int ncl = prob_ideal_cluster.cols, neq = conc_cluster.cols - 1;
+    for (int j = 1; j <= ncl; j++) {
+      prodx = 1.0;
+      for (int k = 1; k <= neq; k++) {
+        if (k == ikd) {
+          prodx *= natom_cluster(j, k) * std::pow(xvar(k), natom_cluster(j, k) - 1);
+        }
+        else {
+          prodx *= std::pow(xvar(k), natom_cluster(j, k));
+        }
+      }
+      totsum += prob_ideal_cluster(ix, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * (conc_cluster(j, ik) - conc_macro(ix, ik)) * prodx;
+    }
+    return totsum;
   }
 }
 

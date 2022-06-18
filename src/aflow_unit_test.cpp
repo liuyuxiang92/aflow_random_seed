@@ -1102,7 +1102,7 @@ namespace unittest {
     // Check | findZeroBrent //SD20220517
     // ---------------------------------------------------------------------------
     check_function = "aurostd::findZeroBrent()";
-    check_description = "find the zero of a univariate function using Brent's method";
+    check_description = "find the zero of a univariate function";
     std::function<double(double)> func = [](double x) {return std::pow(x, 2.0) - 3.0;};
     expected_dbl = 1.732050807568877;
     aurostd::findZeroBrent(0.0, 10.0, func, calculated_dbl);

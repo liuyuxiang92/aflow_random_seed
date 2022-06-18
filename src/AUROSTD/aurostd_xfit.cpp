@@ -369,7 +369,7 @@ namespace aurostd {
   //SD20220616
   //Find the zeros for a square system (N variables, N equations) using the Newton-Raphson method
   //DOI: 10.1007/978-3-319-69407-8; Appendix A
-  //@param x0 initial guess for the solution
+  //@param x0 initial guess for the zeros
   //@param vf vector of functions
   //@param jac vector of vector of first derivative functions (Jacobian)
   //@param x zeros of the system

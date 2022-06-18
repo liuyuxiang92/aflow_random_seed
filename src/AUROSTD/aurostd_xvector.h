@@ -180,6 +180,9 @@ namespace aurostd {
   template<class utype> xvector<utype>                
     elementwise_product(const xvector<utype>&,const xvector<utype>&) __xprototype; //SD20220422
 
+  template<class utype> utype
+    elements_product(const xvector<utype>&) __xprototype; //SD20220617
+
   //ME20200327
   template<class utype> xmatrix<utype>
     outer_product(const xvector<utype>&, const xvector<utype>&) __xprototype;
@@ -291,7 +294,10 @@ namespace aurostd {
     xfloat(const xvector<utype>&) __xprototype;
 
   template<class utype> xvector<utype>
-    pow(const xvector<utype>&,utype d) __xprototype;  //SD20220324
+    pow(const xvector<utype>&,const utype d) __xprototype;  //SD20220324
+
+  template<class utype> xvector<utype>
+    pow(const xvector<utype>&,const xvector<utype>&) __xprototype;  //SD20220324
 
   template<class utype> xvector<long int>
     xlongint(const xvector<utype>&) __xprototype;

@@ -265,11 +265,13 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   cout<<v<<endl;o+=scalar_product(v,v);o+=cos(v,v);o+=sin(v,v);o+=angle(v,v);v=vector_product(v,v);
   trasp(v);
   aurostd::identical(v); //DX20210503
-  exp(v); //SD20220511
-  pow(v,(utype)1); //SD20220512
+  v=aurostd::exp(v); //SD20220511
+  v=aurostd::pow(v,(utype)1); //SD20220512
+  v=aurostd::pow(v,v); //SD20220512
   //  sin(v);sinh(v);cos(v);cosh(v);exp(v);
   aurostd::linspace(d,d,i); //SD20220324
   aurostd::elementwise_product(v,v); //SD20220422
+  aurostd::elements_product(v); //SD20220617
   aurostd::xvectordouble2utype<utype>(dxv); //SD20220512
   aurostd::xvectorutype2double(vxu); //SD20220512
 

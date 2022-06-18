@@ -464,16 +464,26 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype> xvector<utype>
     elementwise_product(const xvector<utype>& a,const xvector<utype>& b) {
-      if(a.rows!=b.rows) {
-        string function = XPID + "aurostd::xvector::elementwise_product():";
+      if(a.rows != b.rows) {
         stringstream message;
         message << "xvectors do not have the same size, a.rows=" << a.rows << " b.rows=" << b.rows;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
-      xvector<utype> c(a.urows,a.lrows);
-      for(int i=a.lrows;i<=a.urows;i++)
-        c[i] = a[i]*b[b.lrows-a.lrows+i];
+      xvector<utype> c(a.urows, a.lrows);
+      for(int i=a.lrows; i<=a.urows; i++)
+        c[i] = a[i] * b[b.lrows - a.lrows + i];
       return c;
+    }
+}
+
+//SD20220617
+namespace aurostd {  // namespace aurostd
+  template<class utype> utype
+    elements_product(const xvector<utype>& a) {
+      utype prod = (utype)1.0;
+      for(int i=a.lrows; i<=a.urows; i++)
+        prod *= a[i];
+      return prod;
     }
 }
 
@@ -1174,10 +1184,25 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                 // function pow
-    xvector<utype> pow(const xvector<utype> &a,utype d) {  // SD20220324
+    xvector<utype> pow(const xvector<utype> &a,const utype d) {  // SD20220324
       xvector<utype> c(a.urows,a.lrows);
       for(int i=a.lrows;i<=a.urows;i++)
           c[i]=pow(a[i],d);
+      return c;
+    }
+}
+
+namespace aurostd {  // namespace aurostd
+  template<class utype>                                 // function pow
+    xvector<utype> pow(const xvector<utype> &a,const xvector<utype> &b) {  // SD20220324
+      if(a.rows != b.rows) {
+        stringstream message;
+        message << "xvectors do not have the same size, a.rows=" << a.rows << " b.rows=" << b.rows;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+      }
+      xvector<utype> c(a.urows,a.lrows);
+      for(int i=a.lrows;i<=a.urows;i++)
+          c[i]=pow(a[i],b[i]);
       return c;
     }
 }
