@@ -29,8 +29,16 @@ namespace aurostd {
 // Root-finding algorithms
 //********************************************************************************
 namespace aurostd {
-  bool findZeroBrent(const double a, const double b, const std::function<double(double)>& f, double& zero, const uint niter=100, const double tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //SD20220517
-  bool findZeroNewtonRaphson(const xvector<double>& x0, const vector<std::function<double(xvector<double>)>>& vf, const vector<vector<std::function<double(xvector<double>)>>>& jac, xvector<double>& x, const uint niter=100, const double tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //SD20220616
+  bool findZeroBrent(const double a, const double b, const std::function<double(double)>& f, double& zero, const uint niter=1000, const double tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //SD20220517
+  bool findZeroNewtonRaphson(const xvector<double>& x0, const vector<std::function<double(xvector<double>)>>& vf, const vector<vector<std::function<double(xvector<double>)>>>& jac, xvector<double>& x, const uint niter=1000, const double tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //SD20220616
+  bool findZeroDeflation(const xvector<double>& x0, const vector<std::function<double(xvector<double>)>>& vf, const vector<vector<std::function<double(xvector<double>)>>>& jac, vector<xvector<double>>& vx, const uint niter=1000, const double tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //SD20220619
+}
+
+//********************************************************************************
+// Auxiliary functions
+//********************************************************************************
+namespace aurostd {
+  bool checkDerivatives(const xvector<double>& x, const std::function<double(xvector<double>)>& f, const vector<std::function<double(xvector<double>)>>& df, const double tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //SD20220622
 }
 
 //********************************************************************************

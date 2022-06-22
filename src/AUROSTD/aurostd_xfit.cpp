@@ -395,7 +395,7 @@ namespace aurostd {
       x = x0 - iJ * f;
       converged = true;
       for (int i = x.lrows; i <= x.urows && converged; i++) {
-        if (aurostd::abs(x(i) - x0(i)) > tol) {converged = false;}
+        if (std::abs(x(i) - x0(i)) > tol) {converged = false;}
       }
       if (converged) {break;}
       x0 = x;
@@ -404,7 +404,100 @@ namespace aurostd {
     return (iter == niter) ? false : true;
   }
 
+  //SD20220619
+  //Find the zeros for a square system (N variables, N equations) using gradient deflation
+  //DOI: 10.1007/bf02165004
+  //@param x0 initial guess for the zeros
+  //@param vf vector of functions
+  //@param jac vector of vector of first derivative functions (Jacobian)
+  //@param vx vector of zeros for the system
+  bool findZeroDeflation(const xvector<double>& x0, const vector<std::function<double(xvector<double>)>>& _vf, const vector<vector<std::function<double(xvector<double>)>>>& _jac, vector<xvector<double>>& vx, const uint niter, const double tol) {
+    vx.clear();
+    vector<std::function<double(xvector<double>)>> vf = _vf, vdf, m;
+    vector<vector<std::function<double(xvector<double>)>>> jac = _jac, mm;
+    vector<std::function<double(uint i, xvector<double>)>> dm;
+    vector<vector<std::function<double(uint i, xvector<double>)>>> dmm;
+    std::function<double(uint i, xvector<double>)> coeff;
+    std::function<double(uint i, uint j, xvector<double>)> dcoeff;
+    xvector<double> r;
+
+std::function<double(xvector<double>)> test_f;
+vector<std::function<double(xvector<double>)>> test_df;
+
+
+    while (aurostd::findZeroNewtonRaphson(x0, vf, jac, r, niter, tol)) {
+cerr<<"START"<<endl;
+      vx.push_back(r);
+      m.clear();
+      for (uint i = 0; i < _vf.size(); i++) {
+        m.push_back([i, r, _jac](xvector<double> x) {double inprod = 0.0; for (uint j = 0; j < _jac.size(); j++) {inprod += _jac[i][j](r) * (x[j] - r[j]);} return std::pow(inprod, -1.0);});
+      }
+      mm.push_back(m);
+      coeff = [mm](uint i, xvector<double> x) {double elprod = 1.0; for (uint ix = 0; ix < mm.size(); ix++) {elprod *= mm[ix][i](x);} return elprod;};
+      dm.clear();
+      for (uint i = 0; i < _vf.size(); i++) {
+        dm.push_back([i, r, _jac, m](uint j, xvector<double> x) {return -1.0 * _jac[i][j](r) * m[i](x) * m[i](x);});
+      }
+
+      test_f = m[0];
+      test_df.clear();
+      for (uint i = 0; i < _vf.size(); i++) {test_df.push_back([i, dm](xvector<double> x) {return dm[0](i, x);});}
+      cerr<<aurostd::checkDerivatives(x0,test_f,test_df)<<endl;
+
+      test_f = m[1];
+      test_df.clear();
+      for (uint i = 0; i < _vf.size(); i++) {test_df.push_back([i, dm](xvector<double> x) {return dm[1](i, x);});}
+      cerr<<aurostd::checkDerivatives(x0,test_f,test_df)<<endl;
+
+      aurostd::Sleep(100);
+
+
+
+      dmm.push_back(dm);
+      dcoeff = [dmm](uint i, uint j, xvector<double> x) {double dsum = 0.0; for (uint ix = 0; ix < dmm.size(); ix++) {dsum += dmm[ix][i](j, x);} return dsum;};
+      vf.clear();
+      for (uint i = 0; i < _vf.size(); i++) {
+        vf.push_back([i, _vf, coeff](xvector<double> x) {return coeff(i, x) * _vf[i](x);});
+        for (uint j = 0; j < _vf.size(); j++) {
+          vdf.push_back([i, j, _vf, _jac, coeff, dcoeff](xvector<double> x) {return coeff(i, x) * _jac[i][j](x) - dcoeff(i, j, x)  * _vf[i](x);});
+        }
+      }
+    }
+    return (vx.size() == 0) ? false : true;
+  }
 }
+
+//********************************************************************************
+// Auxiliary functions
+//********************************************************************************
+namespace aurostd {
+  //SD20220619
+  //Check whether the numerical and analytical derivatives match
+  bool checkDerivatives(const xvector<double>& _x, const std::function<double(xvector<double>)>& f, const vector<std::function<double(xvector<double>)>>& df, const double tol) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+LDEBUG=TRUE;
+    if ((uint)_x.rows != df.size()) {
+      string message;
+      message = "Number of variables and derivatives must be equal";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+    }
+    double dx = 10.0 * tol, df_approx, df_exact;
+    xvector<double> x1 = _x, x2 = _x;
+    bool match = true;
+    for (int i = _x.lrows; i <= _x.urows; i++) {
+      x1(i) -= dx;
+      x2(i) += dx;
+      df_approx = 0.5 * (f(x2) - f(x1)) / dx;
+      df_exact = df[(uint)i - (uint)_x.lrows](_x);
+      if (LDEBUG) {cerr << __AFLOW_FUNC__ << " i=" << i << " | df_approx=" << df_approx << " | df_exact=" << df_exact << endl;} 
+      if (!aurostd::isequal(df_approx, df_exact, tol)) {match = false;}
+      x1 = _x;
+      x2 = _x;
+    }
+    return match;
+  }
+}
+
 //********************************************************************************
 //              Definitions of the NonlinearFit class members
 namespace aurostd{

@@ -592,6 +592,9 @@ namespace qca {
       vector<vector<std::function<double(xvector<double>)>>> jac;
       for (int it = nt; it >= 1; it--) { // go backwards
         for (int ix = 1; ix <= nx; ix++) {
+          vpoly.clear();
+          vdpoly.clear();
+          jac.clear();
           for (int ieq = 1; ieq <= neq; ieq++) {
             vpoly.push_back([conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq](xvector<double> xvar) {return getProbabilityConstraint(conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq, 0, xvar);});
             for (int ideq = 1; ideq <= neq; ideq++) {
@@ -611,9 +614,6 @@ namespace qca {
             return false;
           }
           if (it == nt) {soln0.setcol(soln, ix);} // use the high temperature solution as an initial guess for lower temperature
-          vpoly.clear();
-          vdpoly.clear();
-          jac.clear();
           for (int j = 1; j <= ncl; j++) {
             prob_cluster[it - 1](ix, j) = prob_ideal_cluster(ix, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * aurostd::elements_product(aurostd::pow(soln, aurostd::xmatrix2xvector(natom_cluster, j, 1, j, neq, 1)));
           }
@@ -629,13 +629,13 @@ namespace qca {
 // qca::getProbabilityConstraint
 // ***************************************************************************
 namespace qca {
-  double getProbabilityConstraint(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& beta, const xmatrix<double>& natom_cluster, const int it, const int ix, const int ik, const int ikd, const xvector<double>& xvar) {
+  double getProbabilityConstraint(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& beta, const xmatrix<double>& natom_cluster, const int it, const int ix, const int ik, const int ideq, const xvector<double>& xvar) {
     double totsum = 0.0, prodx;
     int ncl = prob_ideal_cluster.cols, neq = conc_cluster.cols - 1;
     for (int j = 1; j <= ncl; j++) {
       prodx = 1.0;
       for (int k = 1; k <= neq; k++) {
-        if (k == ikd) {
+        if (k == ideq) {
           prodx *= natom_cluster(j, k) * std::pow(xvar(k), natom_cluster(j, k) - 1);
         }
         else {

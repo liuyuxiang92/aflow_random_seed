@@ -1041,11 +1041,13 @@ namespace unittest {
     // setup test environment
     string check_function = "", check_description = "";
 
+    bool calculated_bool, expected_bool;
     double calculated_dbl, expected_dbl;
     xvector<double> calculated_xvecdbl, expected_xvecdbl;
     xvector<double> calculated_xvecdbl_r, expected_xvecdbl_r;
     xvector<double> calculated_xvecdbl_i, expected_xvecdbl_i;
     xmatrix<double> calculated_xmatdbl, expected_xmatdbl;
+    vector<xvector<double>> calculated_vecxvecdbl, expected_vecxvecdbl;
 
     // ---------------------------------------------------------------------------
     // Check | companion matrix //SD20220318
@@ -1109,11 +1111,25 @@ namespace unittest {
     checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
+    // Check | checkDerivatives //SD20220622
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::checkDerivatives()";
+    check_description = "check that the analytical derivatives of a 2D function are correct";
+    xvector<double> x0(2);
+    x0(1) = aurostd::ran2(); x0(2) = aurostd::ran2();
+    std::function<double(xvector<double>)> testf = [](xvector<double> x) {return std::sin(x(1)) + std::cos(x(2));}; 
+    vector<std::function<double(xvector<double>)>> testdf;
+    testdf.push_back([](xvector<double> x) {return std::cos(x(1));});
+    testdf.push_back([](xvector<double> x) {return -1.0 * std::sin(x(2));});
+    expected_bool = true;
+    calculated_bool = checkDerivatives(x0, testf, testdf);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
     // Check | findZeroNewtonRaphson //SD20220616
     // ---------------------------------------------------------------------------
     check_function = "aurostd::findZeroNewtonRaphson()";
     check_description = "find the zeros of a 2D nonlinear square system";
-    xvector<double> x0(2);
     vector<std::function<double(xvector<double>)>> vfunc, vdfunc;
     vector<vector<std::function<double(xvector<double>)>>> jac;
     vfunc.push_back([](xvector<double> x) {return std::exp(-std::exp(-(x(1) + x(2)))) - x(2) * (1.0 + std::pow(x(1), 2.0));});
@@ -1129,6 +1145,26 @@ namespace unittest {
     expected_xvecdbl = xvector<double>(2);
     expected_xvecdbl(1) = 0.353246561918931; expected_xvecdbl(2) = 0.606082026502552;
     checkEqual(calculated_xvecdbl, expected_xvecdbl, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | findZeroHomotopy //SD20220616
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::findZeroHomotopy()";
+    check_description = "find all the of a 2D nonlinear square system";
+    vfunc.clear();
+    vdfunc.clear();
+    jac.clear();
+    vfunc.push_back([](xvector<double> x) {return x(1) * x(2) - 1.0;});
+    vfunc.push_back([](xvector<double> x) {return std::pow(x(1), 2.0) + std::pow(x(2), 2.0) - 4.0;});
+    vdfunc.push_back([](xvector<double> x) {return x(2);});
+    vdfunc.push_back([](xvector<double> x) {return 2.0 * x(1);});
+    jac.push_back(vdfunc);
+    vdfunc.clear();
+    vdfunc.push_back([](xvector<double> x) {return x(1);});
+    vdfunc.push_back([](xvector<double> x) {return 2.0 * x(2);});
+    jac.push_back(vdfunc);
+    aurostd::findZeroDeflation(x0, vfunc, jac, calculated_vecxvecdbl);
+    for (uint i = 0; i < calculated_vecxvecdbl.size(); i++) {cerr<<calculated_vecxvecdbl[i]<<endl;}
   }
 
 }
