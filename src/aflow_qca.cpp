@@ -391,9 +391,9 @@ namespace qca {
       p = aurostd::polynomialCurveFit(temp_scaled, rel_s(i) - rel_s_ec, n_fit, wts);
       aurostd::polynomialFindRoots(p, rr, ri);
       if (LDEBUG) {
-        cerr << " i=" << i << " | p=" << p << endl;
-        cerr << "   Real roots=" << rr << endl;
-        cerr << "   Imag roots=" << ri << endl;
+        cerr << __AFLOW_FUNC__ << " i=" << i << " | p=" << p << endl;
+        cerr << __AFLOW_FUNC__ << "   Real roots=" << rr << endl;
+        cerr << __AFLOW_FUNC__ << "   Imag roots=" << ri << endl;
       }
       rr = temp_std * rr + temp_mean;
       for (int j = 1; j <= n_fit; j++) {
@@ -496,19 +496,19 @@ namespace qca {
       p2 = aurostd::evalPolynomialCoeff(p1, 1);
     }
     if (LDEBUG) {
-      cerr << "shifted=" << shift_temp << endl;
-      cerr << "interpolated=" << (interp && low_t_div) << endl;
-      cerr << "alpha_orig=" << order_param << endl;
-      cerr << "D[alpha, 0]=" << aurostd::evalPolynomial_xv(temp_scaled, p) << endl;
-      cerr << "D[alpha, 1]=" << aurostd::evalPolynomial_xv(temp_scaled, p1) << endl;
-      cerr << "D[alpha, 2]=" << aurostd::evalPolynomial_xv(temp_scaled, p2) << endl;
+      cerr << __AFLOW_FUNC__ << " shifted=" << shift_temp << endl;
+      cerr << __AFLOW_FUNC__ << " interpolated=" << (interp && low_t_div) << endl;
+      cerr << __AFLOW_FUNC__ << " alpha_orig=" << order_param << endl;
+      cerr << __AFLOW_FUNC__ << " D[alpha, 0]=" << aurostd::evalPolynomial_xv(temp_scaled, p) << endl;
+      cerr << __AFLOW_FUNC__ << " D[alpha, 1]=" << aurostd::evalPolynomial_xv(temp_scaled, p1) << endl;
+      cerr << __AFLOW_FUNC__ << " D[alpha, 2]=" << aurostd::evalPolynomial_xv(temp_scaled, p2) << endl;
     }
     xvector<double> rr(n_fit - 2), ri(n_fit - 2);
     aurostd::polynomialFindRoots(p2, rr, ri);
     if (LDEBUG) {
-      cerr << " p2=" << p2 << endl;
-      cerr << "   Real roots=" << rr << endl;
-      cerr << "   Imag roots=" << ri << endl;
+      cerr << __AFLOW_FUNC__ << " p2=" << p2 << endl;
+      cerr << __AFLOW_FUNC__ << "   Real roots=" << rr << endl;
+      cerr << __AFLOW_FUNC__ << "   Imag roots=" << ri << endl;
     }
     vector<double> temp_ec;
     for (int j = 1; j <= n_fit; j++) {
@@ -522,7 +522,7 @@ namespace qca {
       }
     }
     temp_ec[0] = temp_std * temp_ec[0] + temp_mean;
-    if (LDEBUG) {cerr << "T_ec=" << temp_ec[0] << "K" << endl;}
+    if (LDEBUG) {cerr << __AFLOW_FUNC__ << " T_ec=" << temp_ec[0] << "K" << endl;}
     calcProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, aurostd::vector2xvector(temp_ec), max_num_atoms, prob_ec);
     for (int i = 1; i <= prob_ideal_ec.cols; i++) {
       rel_s_ec += prob_ec[0](1, i) * aurostd::log(prob_ec[0](1, i) / prob_ideal_ec(1, i));
@@ -563,11 +563,11 @@ namespace qca {
           for (int j = 1; j <= ncl; j++) {
             p((int)natom_cluster(j, 1) + 1) += prob_ideal_cluster(ix, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * (conc_cluster(j, 1) - conc_macro(ix, 1));
           }
-          if (LDEBUG) {cerr << "it=" << it << " ix=" << ix << " | p=" << p << endl;}
+          if (LDEBUG) {cerr << __AFLOW_FUNC__ << " it=" << it << " ix=" << ix << " | p=" << p << endl;}
           aurostd::polynomialFindRoots(p, rr, ri);
           if (LDEBUG) {
-            cerr << "   Real roots=" << rr << endl;
-            cerr << "   Imag roots=" << ri << endl;
+            cerr << __AFLOW_FUNC__ << "   Real roots=" << rr << endl;
+            cerr << __AFLOW_FUNC__ << "   Imag roots=" << ri << endl;
           }
           for (int k = 1; k <= max_num_atoms; k++) {
             if (rr(k) > soln(1) && aurostd::isequal(ri(k), 0.0) && ncl * std::pow(rr(k), max_num_atoms) != INFINITY) { // solution must be positive, real and finite
@@ -576,7 +576,7 @@ namespace qca {
             }
           }
           if (!soln_found) { // physical solution does not exist
-            if (LDEBUG) {cerr << "Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]";}
+            if (LDEBUG) {cerr << __AFLOW_FUNC__ << " Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]";}
             return false;
           }
           for (int j = 1; j <= ncl; j++) {
@@ -603,14 +603,14 @@ namespace qca {
             jac.push_back(vdpoly);
             vdpoly.clear();
           }
-          if (LDEBUG) {cerr << "it=" << it << " ix=" << ix << " | soln0=" << soln0 << endl;}
+          if (LDEBUG) {cerr << __AFLOW_FUNC__ << " it=" << it << " ix=" << ix << " | soln0=" << soln0 << endl;}
           soln_found = findZeroNewtonRaphson(soln0.getcol(ix), vpoly, jac, soln);
-          if (LDEBUG) {cerr << "   Real roots=" << soln << endl;}
+          if (LDEBUG) {cerr << __AFLOW_FUNC__ << "   Real roots=" << soln << endl;}
           for (int ieq = 1; ieq <= neq && soln_found; ieq++) {
             if (soln(ieq) < 0.0) {soln_found = false;} // solution must be positive, real and finite
           }
           if (!soln_found) {
-            if (LDEBUG) {cerr << "Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]";}
+            if (LDEBUG) {cerr << __AFLOW_FUNC__ << " Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]";}
             return false;
           }
           if (it == nt) {soln0.setcol(soln, ix);} // use the high temperature solution as an initial guess for lower temperature
@@ -672,7 +672,7 @@ namespace qca {
         }
       }
       prob_ideal_cluster.setmat(prob_ideal_cluster.getmat(i, i, 1, ncl) / aurostd::sum(prob_ideal_cluster.getmat(i, i, 1, ncl)), i, 1); // normalize sum to 1
-      if (LDEBUG) {cerr << "i=" << i << " | SUM[P_cluster]=" << aurostd::sum(prob_ideal_cluster.getmat(i, i, 1, ncl)) << endl;}
+      if (LDEBUG) {cerr << __AFLOW_FUNC__ << " i=" << i << " | SUM[P_cluster]=" << aurostd::sum(prob_ideal_cluster.getmat(i, i, 1, ncl)) << endl;}
     }
     return prob_ideal_cluster;
   }
@@ -729,7 +729,7 @@ namespace qca {
       }
       diff_old = diff;
       diff = aurostd::sum(aurostd::abs(prob_cluster[it - 1] - prob_ideal_cluster));
-      if (LDEBUG) {cerr << "|P - P0| = " << diff << endl;}
+      if (LDEBUG) {cerr << __AFLOW_FUNC__ << " |P - P0| = " << diff << endl;}
       if (diff > diff_old) { // P(T_inf) does not equal P0(T_inf)
         stringstream message;
         message << "Equilibrium probability does not converge to the high-T limit for T=" << temp(it) << "K";
@@ -1043,7 +1043,7 @@ namespace qca {
     pcalc.getTotalPermutationsCount();
     pcalc.calculate();
     vector<xstructure> vstr_sup = pcalc.getUniqueDerivativeStructures();
-    if (LDEBUG) {cerr << "Number of unique superlattices (HNF) = " << vstr_sup.size() << endl;}
+    if (LDEBUG) {cerr << __AFLOW_FUNC__ << " Number of unique superlattices (HNF) = " << vstr_sup.size() << endl;}
     // Enumerate all indicies
     vector<vector<int>> all_indicies;
     aurostd::xcombos xc(elements.size(), max_num_atoms, 'E', true);
@@ -1078,7 +1078,7 @@ namespace qca {
         vstr_ds.push_back(str);
       }
     }
-    if (LDEBUG) {cerr << "Number of total derivative structures = " << vstr_ds.size() << endl;}
+    if (LDEBUG) {cerr << __AFLOW_FUNC__ << " Number of total derivative structures = " << vstr_ds.size() << endl;}
     // Find degenerate structures
     vstr_ds.insert(vstr_ds.begin(), vstr.begin(), vstr.end()); // concatenate xstructures, subtract by 1 in the end
     XtalFinderCalculator xtal_calc;
@@ -1088,7 +1088,7 @@ namespace qca {
       if (dsg[i][0] < (uint)degeneracy_cluster.rows) {
         degeneracy_cluster(dsg[i][0] + 1) = dsg[i].size() - 1;
         if (LDEBUG) {
-          cerr << "i=" << i << " | DG=" << dsg[i].size() - 1 << " | ";
+          cerr << __AFLOW_FUNC__ << " i=" << i << " | DG=" << dsg[i].size() - 1 << " | ";
           for (uint j = 0; j < dsg[i].size(); j++) {cerr << dsg[i][j] << " ";}
           cerr << endl;
         }
@@ -1166,7 +1166,7 @@ namespace qca {
     aurostd::execute("mmaps -d > " + tmpfile + " 2>&1 &");
     while (!aurostd::substring2bool(logstring, "true and predicted ground states agree") && !aurostd::substring2bool(logstring, "No other ground states")) {
       iter++;
-      if (LDEBUG) {cerr << "Sleeping, iter=" << iter << endl;}
+      if (LDEBUG) {cerr << __AFLOW_FUNC__ << " Sleeping, iter=" << iter << endl;}
       if (iter > 60) { // wait 60 times the minimum sleep
         string message = "mmaps is taking too long to predict structures, dir=" + rundirpath;
         aurostd::RemoveFile(tmpfile);
@@ -1509,7 +1509,7 @@ namespace qca {
         }
       }
       if (LDEBUG) {
-        cerr << "i=" << i << " | ";
+        cerr << __AFLOW_FUNC__ << " i=" << i << " | ";
         for (uint j = 0; j < gsx[i].size(); j++) {cerr << gsx[i][j] << " ";}
         cerr << endl;
       }
