@@ -338,7 +338,7 @@ namespace qca {
         vector<xstructure> vstr_add = getAFLOWXstructures(qca_data.aflowlibpath, qca_data.num_threads, qca_data.use_sg);
         qca_data.vstr_aflow.insert(qca_data.vstr_aflow.end(), vstr_add.begin(), vstr_add.end());
       }
-      qca_data.mapstr = getMapForXstructures(getATATXstructures(qca_data.lat_atat, qca_data.plattice, qca_data.elements, qca_data.aflow_max_num_atoms), qca_data.vstr_aflow, true); // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
+      qca_data.mapstr = calcMapForXstructures(getATATXstructures(qca_data.lat_atat, qca_data.plattice, qca_data.elements, qca_data.aflow_max_num_atoms), qca_data.vstr_aflow, true); // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
       generateFilesForATAT(qca_data.rundirpath, createLatForATAT(qca_data.plattice, qca_data.elements, true), qca_data.vstr_aflow, qca_data.vstr_atat, qca_data.mapstr);
       runATAT(qca_data.workdirpath, qca_data.rundirpath, qca_data.min_sleep);
     }
@@ -346,14 +346,14 @@ namespace qca {
     qca_data.num_atom_cluster = getNumAtomCluster(qca_data.vstr_atat);
     qca_data.conc_cluster = getConcentrationCluster(qca_data.rundirpath, qca_data.vstr_atat.size(), qca_data.elements.size());
     qca_data.excess_energy_cluster = getExcessEnergyCluster(qca_data.rundirpath, qca_data.conc_cluster, qca_data.max_num_atoms);
-    calcCongruentClusters(qca_data);
-    qca_data.degeneracy_cluster = getDegeneracyCluster(qca_data.plattice, qca_data.vstr_atat, qca_data.elements, qca_data.max_num_atoms, true, qca_data.rundirpath);
+    setCongruentClusters(qca_data);
+    qca_data.degeneracy_cluster = calcDegeneracyCluster(qca_data.plattice, qca_data.vstr_atat, qca_data.elements, qca_data.max_num_atoms, true, qca_data.rundirpath);
     qca_data.conc_macro = getConcentrationMacro(qca_data.conc_curve_range, qca_data.conc_npts, qca_data.elements.size());
     qca_data.temp = getTemperature(qca_data.temp_range, qca_data.temp_npts);
-    vector<double> data_ec = getRelativeEntropyEC(qca_data.conc_cluster, qca_data.degeneracy_cluster, qca_data.excess_energy_cluster, qca_data.temp, qca_data.max_num_atoms);
+    vector<double> data_ec = calcRelativeEntropyEC(qca_data.conc_cluster, qca_data.degeneracy_cluster, qca_data.excess_energy_cluster, qca_data.temp, qca_data.max_num_atoms);
     qca_data.rel_s_ec = data_ec[0]; qca_data.temp_ec = data_ec[1];
     if (qca_data.calc_binodal) {
-      qca_data.prob_ideal_cluster = getProbabilityIdealCluster(qca_data.conc_macro, qca_data.conc_cluster, qca_data.degeneracy_cluster, qca_data.max_num_atoms);
+      qca_data.prob_ideal_cluster = calcProbabilityIdealCluster(qca_data.conc_macro, qca_data.conc_cluster, qca_data.degeneracy_cluster, qca_data.max_num_atoms);
       checkProbability(qca_data.conc_macro, qca_data.conc_cluster, qca_data.prob_ideal_cluster);
       calcProbabilityCluster(qca_data.conc_macro, qca_data.conc_cluster, qca_data.excess_energy_cluster, qca_data.prob_ideal_cluster, qca_data.temp, qca_data.max_num_atoms, qca_data.prob_cluster);
       try {
@@ -362,15 +362,15 @@ namespace qca {
       catch (aurostd::xerror& err) {
         return;
       }
-      qca_data.rel_s = getRelativeEntropy(qca_data.prob_cluster, qca_data.prob_ideal_cluster);
-      qca_data.binodal_boundary = getBinodalBoundary(qca_data.rel_s, qca_data.rel_s_ec, qca_data.temp);
+      qca_data.rel_s = calcRelativeEntropy(qca_data.prob_cluster, qca_data.prob_ideal_cluster);
+      qca_data.binodal_boundary = calcBinodalBoundary(qca_data.rel_s, qca_data.rel_s_ec, qca_data.temp);
     }
     return;
   }
 }
 
 // ***************************************************************************
-// qca::getBinodalBoundary
+// qca::calcBinodalBoundary
 // ***************************************************************************
 namespace qca {
   /// @brief Gets the binodal boundary.
@@ -380,7 +380,7 @@ namespace qca {
   /// @param temp Temperature range.
   ///
   /// @return Binodal boundary as a function of the concentration
-  xvector<double> getBinodalBoundary(const xmatrix<double>& rel_s, const double rel_s_ec, const xvector<double>& temp) {
+  xvector<double> calcBinodalBoundary(const xmatrix<double>& rel_s, const double rel_s_ec, const xvector<double>& temp) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     int nx = rel_s.rows, nt = rel_s.cols, n_fit = 8;
     xvector<double> binodal_boundary(nx), p, rr(n_fit), ri(n_fit);
@@ -407,16 +407,16 @@ namespace qca {
 }
 
 // ***************************************************************************
-// qca::getRelativeEntropy
+// qca::calcRelativeEntropy
 // ***************************************************************************
 namespace qca {
-  /// @brief Gets the relative entropy.
+  /// @brief Calculates the relative entropy.
   ///
   /// @param prob_cluster Equilibrium probability of the clusters as a function of concentration and temperature.
   /// @param prob_cluster_ideal Ideal (high-T) probability of the clusters as a function of concentration and temperature.
   ///
   /// @return Relative entropy as a function of concentration and temperature.
-  xmatrix<double> getRelativeEntropy(const vector<xmatrix<double>>& prob_cluster, const xmatrix<double>& prob_cluster_ideal) {
+  xmatrix<double> calcRelativeEntropy(const vector<xmatrix<double>>& prob_cluster, const xmatrix<double>& prob_cluster_ideal) {
     int nx = prob_cluster_ideal.rows, ncl = prob_cluster_ideal.cols, nt = prob_cluster.size();
     xmatrix<double> rel_s(nx, nt);
     for (int i = 1; i <= nx; i++) {
@@ -431,10 +431,10 @@ namespace qca {
 }
 
 // ***************************************************************************
-// qca::getRelativeEntropyEC
+// qca::calcRelativeEntropyEC
 // ***************************************************************************
 namespace qca {
-  /// @brief Gets the relative entropy evaluated at equi-concentration and the transition temperature.
+  /// @brief Calculates the relative entropy evaluated at equi-concentration and the transition temperature.
   ///
   /// @param conc_cluster Concentration of the clusters.
   /// @param degeneracy_cluster Degeneracy of the clusters.
@@ -444,14 +444,14 @@ namespace qca {
   /// @param interp Interpolate order parameter to 0K
   ///
   /// @return Relative entropy at the equi-concentration and the transition temperature.
-  vector<double> getRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& _temp, const int max_num_atoms, bool interp) {
+  vector<double> calcRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& _temp, const int max_num_atoms, bool interp) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     double rel_s_ec = 0.0;
     int nelem = conc_cluster.cols, n_fit = 8;
     xvector<double> temp = _temp;
     xmatrix<double> conc_macro_ec(1, nelem);
     conc_macro_ec.set(1.0 / (double)nelem);
-    xmatrix<double> prob_ideal_ec = getProbabilityIdealCluster(conc_macro_ec, conc_cluster, degeneracy_cluster, max_num_atoms);
+    xmatrix<double> prob_ideal_ec = calcProbabilityIdealCluster(conc_macro_ec, conc_cluster, degeneracy_cluster, max_num_atoms);
     vector<xmatrix<double>> prob_ec;
     // Check that the probability is physical, if not, shift the temperature range upward
     bool shift_temp = false;
@@ -596,9 +596,9 @@ namespace qca {
           vdpoly.clear();
           jac.clear();
           for (int ieq = 1; ieq <= neq; ieq++) {
-            vpoly.push_back([conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq](xvector<double> xvar) {return getProbabilityConstraint(conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq, 0, xvar);});
+            vpoly.push_back([conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq](xvector<double> xvar) {return calcProbabilityConstraint(conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq, 0, xvar);});
             for (int ideq = 1; ideq <= neq; ideq++) {
-              vdpoly.push_back([conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq, ideq](xvector<double> xvar) {return getProbabilityConstraint(conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq, ideq, xvar);});
+              vdpoly.push_back([conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq, ideq](xvector<double> xvar) {return calcProbabilityConstraint(conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq, ideq, xvar);});
             }
             jac.push_back(vdpoly);
             vdpoly.clear();
@@ -626,10 +626,24 @@ namespace qca {
 }
 
 // ***************************************************************************
-// qca::getProbabilityConstraint
+// qca::calcProbabilityConstraint
 // ***************************************************************************
+  /// @brief Calculates the probability constraint for a particular set of indices
+  ///
+  /// @param conc_macro Macroscopic concentration of the alloy.
+  /// @param conc_cluster Concentration of the clusters.
+  /// @param excess_energy_cluster Excess energy of the clusters.
+  /// @param prob_cluster_ideal Ideal (high-T) probability of the clusters as a function of concentration and temperature.
+  /// @param beta Inverse temperature range.
+  /// @param natom_cluster Number of atoms in the clusters.
+  /// @param it Temperature index
+  /// @param ix Macroscopic concentration index
+  /// @param ik Element index
+  /// @param ideq Index of the equation that is differentiated
+  ///
+  /// @return Value of the constraint for a particular set of indices
 namespace qca {
-  double getProbabilityConstraint(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& beta, const xmatrix<double>& natom_cluster, const int it, const int ix, const int ik, const int ideq, const xvector<double>& xvar) {
+  double calcProbabilityConstraint(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& beta, const xmatrix<double>& natom_cluster, const int it, const int ix, const int ik, const int ideq, const xvector<double>& xvar) {
     double totsum = 0.0, prodx;
     int ncl = prob_ideal_cluster.cols, neq = conc_cluster.cols - 1;
     for (int j = 1; j <= ncl; j++) {
@@ -649,10 +663,10 @@ namespace qca {
 }
 
 // ***************************************************************************
-// qca::getProbabilityIdealCluster
+// qca::calcProbabilityIdealCluster
 // ***************************************************************************
 namespace qca {
-  /// @brief Gets the ideal (high-T) cluster probability.
+  /// @brief Calculates the ideal (high-T) cluster probability.
   ///
   /// @param conc_macro Macroscopic concentration of the alloy.
   /// @param conc_cluster Concentration of the clusters.
@@ -660,7 +674,7 @@ namespace qca {
   /// @param max_num_atoms Maximum number of atoms in the cluster expansion.
   ///
   /// @return Ideal (high-T) probability of the clusters as a function of concentration and temperature.
-  xmatrix<double> getProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms) {
+  xmatrix<double> calcProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     int ncl = conc_cluster.rows, nx = conc_macro.rows, nelem = conc_macro.cols;
     xmatrix<double> prob_ideal_cluster(nx, ncl);
@@ -812,11 +826,11 @@ namespace qca {
 }
 
 // ***************************************************************************
-// qca::calcCongruentClusters
+// qca::setCongruentClusters
 // ***************************************************************************
 namespace qca {
   /// @brief Prune the clusters to only include clusters congruent with the maximum number of atoms in the cluster expansion.
-  void calcCongruentClusters(_qca_data& qca_data) {
+  void setCongruentClusters(_qca_data& qca_data) {
     vector<int> indx_cluster;
     for (int i = 1; i <= qca_data.num_atom_cluster.rows; i++) {
       if (!(qca_data.max_num_atoms % qca_data.num_atom_cluster(i))) {indx_cluster.push_back(i);}
@@ -955,10 +969,10 @@ namespace qca {
 }
 
 // ***************************************************************************
-// qca::getDegeneracyCluster
+// qca::calcDegeneracyCluster
 // ***************************************************************************
 namespace qca {
-  /// @brief Gets the cluster degeneracy.
+  /// @brief Calculates the cluster degeneracy.
   ///
   /// @param plattice Parent lattice of the alloy.
   /// @param vstr Xstructures of the clusters.
@@ -968,7 +982,7 @@ namespace qca {
   /// @param rundirpath Path to the directory where AFLOW is running.
   ///
   /// @return Degeneracy of the clusters.
-  xvector<int> getDegeneracyCluster(const string& plattice, const vector<xstructure>& _vstr, const vector<string>& elements, const int max_num_atoms, const bool shuffle, const string& rundirpath) {
+  xvector<int> calcDegeneracyCluster(const string& plattice, const vector<xstructure>& _vstr, const vector<string>& elements, const int max_num_atoms, const bool shuffle, const string& rundirpath) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string filepath = "";
     if (!rundirpath.empty()) {
@@ -1463,17 +1477,17 @@ namespace qca {
 }
 
 // ***************************************************************************
-// qca::getMapForXstructures
+// qca::calcMapForXstructures
 // ***************************************************************************
 namespace qca {
-  /// @brief Gets the map between two groups of xstructures.
+  /// @brief Calculates the map between two groups of xstructures.
   ///
   /// @param vstr1 First group of xstructures.
   /// @param vstr2 Second group of xstructures.
   /// @param shuffle Shuffle the order of the first group.
   ///
   /// @return Xstructure map between the two groups.
-  vector<int> getMapForXstructures(const vector<xstructure>& _vstr1, const vector<xstructure>& vstr2, const bool shuffle) {
+  vector<int> calcMapForXstructures(const vector<xstructure>& _vstr1, const vector<xstructure>& vstr2, const bool shuffle) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     vector<int> mapstr;
     bool quiet = XHOST.QUIET;
