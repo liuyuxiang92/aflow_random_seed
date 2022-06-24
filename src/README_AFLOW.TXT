@@ -39,14 +39,14 @@ aflow
                                     See IGNORE_AFIX below for what/how errors are detected.
                                     If there is a patch available, a kill command is issued for VASP, allowing
                                     the primary instance of aflow (running VASP) to correct the errors and rerun.
-                                    This command is still under development, and should only be run with jobs that occupy the
-                                    full compute node (see --kill_vasp_all).
                                     Use the --DIRECTORY=. command to specify the directory where VASP is running, or the
                                     --FILE=LOCK to point to the AFLOW LOCK file for the run of interest.
+                                    Use the --vasp_script_name command to specify the scipt name that starts the VASP runs,
+                                    that must be killed under certain system errors.
 
                                     Example use case in a qsub file:
                                     [QSUB_EXAMPLE]START
-                                    aflow --monitor_vasp --kill_vasp_all --FILE=$RUN_PATH/LOCK --use_aflow.in=aflow.in --use_LOCK=LOCK &
+                                    aflow --monitor_vasp --FILE=$RUN_PATH/LOCK --use_aflow.in=aflow.in --use_LOCK=LOCK &
                                     MONITOR_PID=$!
                                     aflow --run --mpi --np=64 --force --use_aflow.in=aflow.in --use_LOCK=LOCK -D $RUN_PATH >> $LOG_PATH
 
