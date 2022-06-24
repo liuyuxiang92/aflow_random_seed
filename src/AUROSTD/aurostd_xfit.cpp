@@ -411,58 +411,48 @@ namespace aurostd {
   //@param vf vector of functions
   //@param jac vector of vector of first derivative functions (Jacobian)
   //@param vx vector of zeros for the system
-  bool findZeroDeflation(const xvector<double>& x0, const vector<std::function<double(xvector<double>)>>& _vf, const vector<vector<std::function<double(xvector<double>)>>>& _jac, vector<xvector<double>>& vx, const uint niter, const double tol) {
-    vx.clear();
-    vector<std::function<double(xvector<double>)>> vf = _vf, vdf, m;
-    vector<vector<std::function<double(xvector<double>)>>> jac = _jac, mm;
-    vector<std::function<double(uint i, xvector<double>)>> dm;
-    vector<vector<std::function<double(uint i, xvector<double>)>>> dmm;
+  bool findZeroDeflation(const xvector<double>& x0, const vector<std::function<double(xvector<double>)>>& _vf, const vector<vector<std::function<double(xvector<double>)>>>& _jac, xmatrix<double>& mx, const uint niter, const double tol) {
+    vector<vector<double>> vx;
+    vector<std::function<double(xvector<double>)>> vf = _vf, vdf;
+    vector<vector<std::function<double(xvector<double>)>>> jac = _jac;
+    vector<std::function<double(xvector<double>)>> gfac;
+    vector<vector<std::function<double(xvector<double>)>>> vgfac;
+    vector<vector<std::function<double(xvector<double>)>>> dgfac;
+    vector<vector<vector<std::function<double(xvector<double>)>>>> vdgfac;
     std::function<double(uint i, xvector<double>)> coeff;
     std::function<double(uint i, uint j, xvector<double>)> dcoeff;
     xvector<double> r;
-
-std::function<double(xvector<double>)> test_f;
-vector<std::function<double(xvector<double>)>> test_df;
-
-
     while (aurostd::findZeroNewtonRaphson(x0, vf, jac, r, niter, tol)) {
-cerr<<"START"<<endl;
-      vx.push_back(r);
-      m.clear();
-      for (uint i = 0; i < _vf.size(); i++) {
-        m.push_back([i, r, _jac](xvector<double> x) {double inprod = 0.0; for (uint j = 0; j < _jac.size(); j++) {inprod += _jac[i][j](r) * (x[j] - r[j]);} return std::pow(inprod, -1.0);});
-      }
-      mm.push_back(m);
-      coeff = [mm](uint i, xvector<double> x) {double elprod = 1.0; for (uint ix = 0; ix < mm.size(); ix++) {elprod *= mm[ix][i](x);} return elprod;};
-      dm.clear();
-      for (uint i = 0; i < _vf.size(); i++) {
-        dm.push_back([i, r, _jac, m](uint j, xvector<double> x) {return -1.0 * _jac[i][j](r) * m[i](x) * m[i](x);});
-      }
-
-      test_f = m[0];
-      test_df.clear();
-      for (uint i = 0; i < _vf.size(); i++) {test_df.push_back([i, dm](xvector<double> x) {return dm[0](i, x);});}
-      cerr<<aurostd::checkDerivatives(x0,test_f,test_df)<<endl;
-
-      test_f = m[1];
-      test_df.clear();
-      for (uint i = 0; i < _vf.size(); i++) {test_df.push_back([i, dm](xvector<double> x) {return dm[1](i, x);});}
-      cerr<<aurostd::checkDerivatives(x0,test_f,test_df)<<endl;
-
-      aurostd::Sleep(100);
-
-
-
-      dmm.push_back(dm);
-      dcoeff = [dmm](uint i, uint j, xvector<double> x) {double dsum = 0.0; for (uint ix = 0; ix < dmm.size(); ix++) {dsum += dmm[ix][i](j, x);} return dsum;};
+      vx.push_back(aurostd::xvector2vector<double>(r));
       vf.clear();
+      vdf.clear();
+      jac.clear();
+      gfac.clear();
+      for (uint i = 0; i < _vf.size(); i++) {
+        gfac.push_back([i, r, _jac](xvector<double> x) {double gfac = 0.0; for (uint j = 0; j < _jac.size(); j++) {gfac += _jac[i][j](r) * (x(j + 1) - r(j + 1));} return std::pow(gfac, -1.0);});
+      }
+      vgfac.push_back(gfac);
+      coeff = [vgfac](uint i, xvector<double> x) {double coeff = 1.0; for (uint ix = 0; ix < vgfac.size(); ix++) {coeff *= vgfac[ix][i](x);} return coeff;};
+      dgfac.clear();
+      for (uint i = 0; i < _vf.size(); i++) {
+        for (uint j = 0; j < _vf.size(); j++) {
+          vdf.push_back([i, j, r, _jac, gfac](xvector<double> x) {return -1.0 * _jac[i][j](r) * std::pow(gfac[i](x), 2.0);});
+        }
+        dgfac.push_back(vdf);
+        vdf.clear();
+      }
+      vdgfac.push_back(dgfac);
+      dcoeff = [coeff, vgfac, vdgfac](uint i, uint j, xvector<double> x) {double dcoeff = 0.0; for (uint ix = 0; ix < vdgfac.size(); ix++) {dcoeff += vdgfac[ix][i][j](x) / vgfac[ix][i](x);} return coeff(i, x) * dcoeff;};
       for (uint i = 0; i < _vf.size(); i++) {
         vf.push_back([i, _vf, coeff](xvector<double> x) {return coeff(i, x) * _vf[i](x);});
         for (uint j = 0; j < _vf.size(); j++) {
-          vdf.push_back([i, j, _vf, _jac, coeff, dcoeff](xvector<double> x) {return coeff(i, x) * _jac[i][j](x) - dcoeff(i, j, x)  * _vf[i](x);});
+          vdf.push_back([i, j, _vf, _jac, coeff, dcoeff](xvector<double> x) {return coeff(i, x) * _jac[i][j](x) + dcoeff(i, j, x)  * _vf[i](x);});
         }
+        jac.push_back(vdf);
+        vdf.clear();
       }
     }
+    mx = aurostd::vectorvector2xmatrix<double>(vx);
     return (vx.size() == 0) ? false : true;
   }
 }
@@ -475,7 +465,6 @@ namespace aurostd {
   //Check whether the numerical and analytical derivatives match
   bool checkDerivatives(const xvector<double>& _x, const std::function<double(xvector<double>)>& f, const vector<std::function<double(xvector<double>)>>& df, const double tol) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-LDEBUG=TRUE;
     if ((uint)_x.rows != df.size()) {
       string message;
       message = "Number of variables and derivatives must be equal";

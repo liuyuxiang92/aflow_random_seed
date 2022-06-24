@@ -1047,7 +1047,6 @@ namespace unittest {
     xvector<double> calculated_xvecdbl_r, expected_xvecdbl_r;
     xvector<double> calculated_xvecdbl_i, expected_xvecdbl_i;
     xmatrix<double> calculated_xmatdbl, expected_xmatdbl;
-    vector<xvector<double>> calculated_vecxvecdbl, expected_vecxvecdbl;
 
     // ---------------------------------------------------------------------------
     // Check | companion matrix //SD20220318
@@ -1147,24 +1146,27 @@ namespace unittest {
     checkEqual(calculated_xvecdbl, expected_xvecdbl, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
-    // Check | findZeroHomotopy //SD20220616
+    // Check | findZeroDeflation //SD20220616
     // ---------------------------------------------------------------------------
-    check_function = "aurostd::findZeroHomotopy()";
-    check_description = "find all the of a 2D nonlinear square system";
+    check_function = "aurostd::findZeroDeflation()";
+    check_description = "find multiple zeros of a 2D nonlinear square system";
     vfunc.clear();
     vdfunc.clear();
     jac.clear();
     vfunc.push_back([](xvector<double> x) {return x(1) * x(2) - 1.0;});
     vfunc.push_back([](xvector<double> x) {return std::pow(x(1), 2.0) + std::pow(x(2), 2.0) - 4.0;});
     vdfunc.push_back([](xvector<double> x) {return x(2);});
-    vdfunc.push_back([](xvector<double> x) {return 2.0 * x(1);});
+    vdfunc.push_back([](xvector<double> x) {return x(1);});
     jac.push_back(vdfunc);
     vdfunc.clear();
-    vdfunc.push_back([](xvector<double> x) {return x(1);});
+    vdfunc.push_back([](xvector<double> x) {return 2.0 * x(1);});
     vdfunc.push_back([](xvector<double> x) {return 2.0 * x(2);});
     jac.push_back(vdfunc);
-    aurostd::findZeroDeflation(x0, vfunc, jac, calculated_vecxvecdbl);
-    for (uint i = 0; i < calculated_vecxvecdbl.size(); i++) {cerr<<calculated_vecxvecdbl[i]<<endl;}
+    aurostd::findZeroDeflation(aurostd::vector2xvector<double>({0.5, 2.0}), vfunc, jac, calculated_xmatdbl);
+    expected_xmatdbl = xmatrix<double>(2, 2);
+    expected_xmatdbl(1, 1) = 0.517638090205041; expected_xmatdbl(1, 2) = 1.93185165257813;
+    expected_xmatdbl(2, 1) = -0.517638090205041; expected_xmatdbl(2, 2) = -1.93185165257813;
+    checkEqual(calculated_xmatdbl, expected_xmatdbl, check_function, check_description, passed_checks, results);
   }
 
 }
