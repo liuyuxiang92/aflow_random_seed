@@ -1125,12 +1125,42 @@ namespace unittest {
     checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
+    // Check | calcNumericalJacobian //SD20220624
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::calcNumericalJacobian()";
+    check_description = "calculate the numerical Jacobian of a 3D rectangular system";
+    xvector<double> dx = 10.0 * _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_ * aurostd::ones_xv<double>(3);
+    x0 = xvector<double>(3);
+    x0(1) = aurostd::ran2(); x0(2) = aurostd::ran2(); x0(3) = aurostd::ran2();
+    vector<std::function<double(xvector<double>)>> vfunc, vdfunc;
+    vector<vector<std::function<double(xvector<double>)>>> jac;
+    vfunc.push_back([](xvector<double> x) {return std::exp(1.0 * x(1) + 2.0 * x(2) + 3.0 * x(3));});
+    vfunc.push_back([](xvector<double> x) {return std::cos(1.0 * x(1) + 2.0 * x(2) + 3.0 * x(3));});
+    for (int i = 1; i <= 3; i++) {vdfunc.push_back([i](xvector<double> x) {return (double)i * std::exp(1.0 * x(1) + 2.0 * x(2) + 3.0 * x(3));});}
+    jac.push_back(vdfunc);
+    vdfunc.clear();
+    for (int i = 1; i <= 3; i++) {vdfunc.push_back([i](xvector<double> x) {return -1.0 * (double)i * std::sin(1.0 * x(1) + 2.0 * x(2) + 3.0 * x(3));});}
+    jac.push_back(vdfunc);
+    expected_bool = true;
+    calculated_bool = true;
+    vector<vector<std::function<double(xvector<double>)>>> testjac = aurostd::calcNumericalJacobian(vfunc, dx);
+    for (uint i = 0; i < jac.size(); i++) {
+      for (uint j = 0; j < jac[0].size(); j++) {
+        calculated_bool = calculated_bool && aurostd::isequal(jac[i][j](x0), testjac[i][j](x0));
+      }
+    }
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
     // Check | findZeroNewtonRaphson //SD20220616
     // ---------------------------------------------------------------------------
     check_function = "aurostd::findZeroNewtonRaphson()";
     check_description = "find the zeros of a 2D nonlinear square system";
-    vector<std::function<double(xvector<double>)>> vfunc, vdfunc;
-    vector<vector<std::function<double(xvector<double>)>>> jac;
+    x0 = xvector<double>(2);
+    x0(1) = aurostd::ran2(); x0(2) = aurostd::ran2();
+    vfunc.clear();
+    vdfunc.clear();
+    jac.clear();
     vfunc.push_back([](xvector<double> x) {return std::exp(-std::exp(-(x(1) + x(2)))) - x(2) * (1.0 + std::pow(x(1), 2.0));});
     vfunc.push_back([](xvector<double> x) {return x(1) * std::cos(x(2)) + x(2) * std::sin(x(1)) - 0.5;});
     vdfunc.push_back([](xvector<double> x) {return std::exp(-std::exp(-(x(1) - x(2))) - x(1) - x(2)) - 2 * x(1) * x(2);});
@@ -1149,7 +1179,7 @@ namespace unittest {
     // Check | findZeroDeflation //SD20220616
     // ---------------------------------------------------------------------------
     check_function = "aurostd::findZeroDeflation()";
-    check_description = "find multiple zeros of a 2D nonlinear square system";
+    check_description = "find all the zeros of a 2D nonlinear square system";
     vfunc.clear();
     vdfunc.clear();
     jac.clear();
@@ -1162,10 +1192,12 @@ namespace unittest {
     vdfunc.push_back([](xvector<double> x) {return 2.0 * x(1);});
     vdfunc.push_back([](xvector<double> x) {return 2.0 * x(2);});
     jac.push_back(vdfunc);
-    aurostd::findZeroDeflation(aurostd::vector2xvector<double>({0.5, 2.0}), vfunc, jac, calculated_xmatdbl);
-    expected_xmatdbl = xmatrix<double>(2, 2);
-    expected_xmatdbl(1, 1) = 0.517638090205041; expected_xmatdbl(1, 2) = 1.93185165257813;
-    expected_xmatdbl(2, 1) = -0.517638090205041; expected_xmatdbl(2, 2) = -1.93185165257813;
+    aurostd::findZeroDeflation(aurostd::vector2xvector<double>({0.0, 1.0}), vfunc, jac, calculated_xmatdbl);
+    expected_xmatdbl = xmatrix<double>(2, 4);
+    expected_xmatdbl(1, 1) = 0.517638090205041; expected_xmatdbl(2, 1) = 1.93185165257813;
+    expected_xmatdbl(1, 2) = 1.93185165257813; expected_xmatdbl(2, 2) = 0.517638090205041;
+    expected_xmatdbl(1, 3) = -1.93185165257813; expected_xmatdbl(2, 3) = -0.517638090205041;
+    expected_xmatdbl(1, 4) = -0.517638090205041; expected_xmatdbl(2, 4) = -1.93185165257813;
     checkEqual(calculated_xmatdbl, expected_xmatdbl, check_function, check_description, passed_checks, results);
   }
 

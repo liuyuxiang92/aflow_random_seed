@@ -381,7 +381,7 @@ namespace aurostd {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     xvector<double> x0 = _x0, f(n);
-    xmatrix<double> J(n, n), iJ;
+    xmatrix<double> J(n, n), iJ, I = aurostd::identity(J);
     bool converged = false;
     uint iter = 0;
     while (iter < niter) {
@@ -390,6 +390,7 @@ namespace aurostd {
           J(i + 1, j + 1) = jac[i][j](x0);
         }
       }
+      J = J + 10.0 * tol * I; // Tikhanov regularization
       iJ = aurostd::inverse(J);
       for (uint i = 0; i < n; i++) {f(i + 1) = vf[i](x0);}
       x = x0 - iJ * f;
@@ -452,7 +453,7 @@ namespace aurostd {
         vdf.clear();
       }
     }
-    mx = aurostd::vectorvector2xmatrix<double>(vx);
+    mx = aurostd::trasp(aurostd::vectorvector2xmatrix<double>(vx));
     return (vx.size() == 0) ? false : true;
   }
 }
@@ -484,6 +485,22 @@ namespace aurostd {
       x2 = _x;
     }
     return match;
+  }
+
+  //SD20220624
+  //Calculate the numerical Jacobian
+  vector<vector<std::function<double(xvector<double>)>>> calcNumericalJacobian(const vector<std::function<double(xvector<double>)>>& vf, const xvector<double>& _dx) {
+    vector<std::function<double(xvector<double>)>> df;
+    vector<vector<std::function<double(xvector<double>)>>> jac;
+    xvector<double> dx = aurostd::abs(_dx);
+    for (uint i = 0; i < vf.size(); i++) {
+      for (int j = dx.lrows; j <= dx.urows; j++) {
+        df.push_back([i, j, dx, vf](xvector<double> x) {xvector<double> x1 = x, x2 = x; x1(j) -= dx(j); x2(j) += dx(j); return 0.5 * (vf[i](x2) - vf[i](x1)) / dx(j);});
+      }
+      jac.push_back(df);
+      df.clear();
+    }
+    return jac;
   }
 }
 

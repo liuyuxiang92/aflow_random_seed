@@ -39,6 +39,7 @@ namespace aurostd {
 //********************************************************************************
 namespace aurostd {
   bool checkDerivatives(const xvector<double>& x, const std::function<double(xvector<double>)>& f, const vector<std::function<double(xvector<double>)>>& df, const double tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //SD20220622
+  vector<vector<std::function<double(xvector<double>)>>> calcNumericalJacobian(const vector<std::function<double(xvector<double>)>>& vf, const xvector<double>& _dx); //SD20220624
 }
 
 //********************************************************************************
