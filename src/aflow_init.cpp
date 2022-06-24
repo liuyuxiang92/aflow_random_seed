@@ -645,8 +645,8 @@ namespace init {
     XHOST.vflag_control.flag("MULTI=ZIP",aurostd::args2flag(argv,cmds,"--multi=zip"));
     XHOST.vflag_control.flag("MONITOR",aurostd::args2flag(argv,cmds,"--monitor"));
     XHOST.vflag_control.flag("MONITOR_VASP",aurostd::args2flag(argv,cmds,"--monitor_vasp"));
-    XHOST.vflag_control.flag("AFLOW_STARTUP_SCRIPT_NAME",aurostd::args2attachedflag(argv,cmds,"--aflow_startup_script_name=")); //SD20220502
-    XHOST.vflag_control.push_attached("AFLOW_STARTUP_SCRIPT_NAME",aurostd::args2attachedstring(argv,"--aflow_startup_script_name=","")); //SD20220502
+    XHOST.vflag_control.flag("AFLOW_STARTUP_SCRIPT",aurostd::args2attachedflag(argv,cmds,"--aflow_startup_script=")); //SD20220502
+    XHOST.vflag_control.push_attached("AFLOW_STARTUP_SCRIPT",aurostd::args2attachedstring(argv,"--aflow_startup_script=","")); //SD20220502
     //[SD20220402 - OBSOLETE]XHOST.vflag_control.flag("KILL_VASP_ALL",aurostd::args2flag(argv,cmds,"--kill_vasp_all|--killvaspall"));  //CO20210315 - issue non-specific killall vasp command
     XHOST.vflag_control.flag("KILL_VASP_OOM",aurostd::args2flag(argv,cmds,"--kill_vasp_oom|--killvaspoom"));  //CO20210315 - kill vasp if approaching OOM
     XHOST.vflag_control.flag("GETTEMP",aurostd::args2flag(argv,cmds,"--getTEMP|--getTEMPS|--getTEMPs|--gettemp|--gettemps"));
@@ -2223,8 +2223,8 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   message << "vasp_binary=\"" << vasp_bin << "\" (from " << _AFLOWLOCK_ << ")";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
   //SD20220602 - check that an OUTCAR is produced on the initial launch of vasp
-  if(XHOST.vflag_control.flag("AFLOW_STARTUP_SCRIPT_NAME") && !aurostd::FileExist(xvasp.Directory+"/OUTCAR")){
-    string startup_script_name=XHOST.vflag_control.getattachedscheme("AFLOW_STARTUP_SCRIPT_NAME");
+  if(XHOST.vflag_control.flag("AFLOW_STARTUP_SCRIPT") && !aurostd::FileExist(xvasp.Directory+"/OUTCAR")){
+    string startup_script_name=XHOST.vflag_control.getattachedscheme("AFLOW_STARTUP_SCRIPT");
     while (aurostd::ProcessRunning(startup_script_name,vasp_pgid) && (n_running++)<NCOUNTS_WAIT_MONITOR){ //try killing the script for no more than 10 minutes
       message << "initial launch of vasp did not produce an OUTCAR file; killing the whole AFLOW startup script \"" << startup_script_name << "\"";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       aurostd::ProcessKill(startup_script_name,vasp_pgid,true,false); //send SIGTERM rather than SIGKILL so we can trap it
@@ -2262,8 +2262,8 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
     }
 
     //SD20220602 - check that an OUTCAR is produced on the new vasp instance
-    if(XHOST.vflag_control.flag("AFLOW_STARTUP_SCRIPT_NAME") && !aurostd::FileExist(xvasp.Directory+"/OUTCAR")){
-      string startup_script_name=XHOST.vflag_control.getattachedscheme("AFLOW_STARTUP_SCRIPT_NAME");
+    if(XHOST.vflag_control.flag("AFLOW_STARTUP_SCRIPT") && !aurostd::FileExist(xvasp.Directory+"/OUTCAR")){
+      string startup_script_name=XHOST.vflag_control.getattachedscheme("AFLOW_STARTUP_SCRIPT");
       while (aurostd::ProcessRunning(startup_script_name,vasp_pgid) && (n_running++)<NCOUNTS_WAIT_MONITOR){ //try killing the script for no more than 10 minutes
         message << "new vasp instance did not produce an OUTCAR file, killing the whole AFLOW startup script \"" << startup_script_name << "\"";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         aurostd::ProcessKill(startup_script_name,vasp_pgid,true,false); //send SIGTERM rather than SIGKILL so we can trap it
