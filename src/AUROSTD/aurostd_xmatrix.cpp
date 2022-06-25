@@ -6056,8 +6056,8 @@ namespace aurostd {
     xmatrix2matrix(const xmatrix<utype>& _xmatrix) {
       int isize=_xmatrix.rows,jsize=_xmatrix.cols;
       matrix<utype> _matrix(isize,jsize);
-      for(register int i=0;i<isize;i++)
-        for(register int j=0;j<jsize;j++)
+      for(int i=0;i<isize;i++)
+        for(int j=0;j<jsize;j++)
           _matrix[i][j]=_xmatrix(i+_xmatrix.lrows,j+_xmatrix.lcols);
       return _matrix;
     }
@@ -6065,8 +6065,8 @@ namespace aurostd {
   //   matrix<double> xmatrix2matrix(const xmatrix<double>& _xmatrix) {
   //     int isize=_xmatrix.rows,jsize=_xmatrix.cols;
   //     matrix<double> _matrix(isize,jsize);
-  //     for(register int i=0;i<isize;i++)
-  //       for(register int j=0;j<jsize;j++)
+  //     for(int i=0;i<isize;i++)
+  //       for(int j=0;j<jsize;j++)
   // 	_matrix[i][j]=_xmatrix(i+_xmatrix.lrows,j+_xmatrix.lcols);
   //     return _matrix;
   //   }
@@ -6075,8 +6075,8 @@ namespace aurostd {
     matrix2xmatrix(const matrix<utype>& _matrix) {
       int isize=_matrix.size(),jsize=_matrix[0].size();
       xmatrix<utype> _xmatrix(isize,jsize);
-      for(register int i=1;i<=isize;i++)
-        for(register int j=1;j<=jsize;j++)
+      for(int i=1;i<=isize;i++)
+        for(int j=1;j<=jsize;j++)
           _xmatrix(i,j)=_matrix[i-1][j-1];
       return _xmatrix;
     }

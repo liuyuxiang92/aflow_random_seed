@@ -44,7 +44,7 @@ const int TEMPERATURE_PRECISION=2;  //not really going to explore more than 2000
 
 namespace pocc {
   class POccCalculator; //forward declaration
-  struct POccSuperCellSet; //forward declaration
+  class POccSuperCellSet; //forward declaration
 
   string POCC_MINIMUM_CONFIGURATION(const aurostd::xoption& vpflow);
   string POCC_MINIMUM_CONFIGURATION(const string& directory="./");
@@ -68,7 +68,7 @@ namespace pocc {
 
   class POccUnit;  //forward declaration
   class POccSiteConfiguration;    //forward declaration
-  struct UFFParamAtom;  //forward declaration
+  class UFFParamAtom;  //forward declaration
   struct UFFParamBond;  //forward declaration
 
   //bool sortAtoms(const _atom& a1,const _atom& a2);
@@ -201,43 +201,70 @@ namespace pocc {
 } // namespace pocc
 
 namespace pocc {
-  struct POccSuperCellSet{
-    //no need (YET) to make a class, simple ints and double, no real methods
-    const POccSuperCellSet& operator=(const POccSuperCellSet& b);
-    bool operator<(const POccSuperCellSet& other) const;
-    unsigned long long int getDegeneracy() const;
-    const POccSuperCell& getSuperCell() const;
-    double getHNFIndex() const; //ME20211006
-    xmatrix<int> getHNFMatrix() const;
-    double getSiteConfigIndex() const;
-    vector<vector<int> > getSiteConfig() const; //ME20211006
-    xstructure getStructure() const; //ME20211006
-    double getUFFEnergy() const;
-
-    vector<POccSuperCell> m_psc_set;
-    double m_energy_dft;  //only calculate this for the set
-    double m_probability;
+  class POccSuperCellSet{
+    public:
+      //NECESSARY PUBLIC CLASS METHODS - START
+      //constructors - START
+      POccSuperCellSet();
+      POccSuperCellSet(const POccSuperCellSet& b);
+      //constructors - STOP
+      ~POccSuperCellSet();
+      const POccSuperCellSet& operator=(const POccSuperCellSet& b);
+      bool operator<(const POccSuperCellSet& other) const;
+      void clear();
+      //NECESSARY PUBLIC CLASS METHODS - END
+    
+      vector<POccSuperCell> m_psc_set;
+      double m_energy_dft;  //only calculate this for the set
+      double m_probability;
+      
+      unsigned long long int getDegeneracy() const;
+      const POccSuperCell& getSuperCell() const;
+      double getHNFIndex() const; //ME20211006
+      xmatrix<int> getHNFMatrix() const;
+      double getSiteConfigIndex() const;
+      vector<vector<int> > getSiteConfig() const; //ME20211006
+      xstructure getStructure() const; //ME20211006
+      double getUFFEnergy() const;
+    private:
+      //NECESSARY PRIVATE CLASS METHODS - START
+      void free();
+      void copy(const POccSuperCellSet& b);
+      //NECESSARY END CLASS METHODS - END
   };
   bool sortPSCSetsUFFEnergy(const POccSuperCellSet& a, const POccSuperCellSet& b);
 } // namespace pocc
 
 namespace pocc{
-  struct UFFParamAtom{
-    //no need (YET) to make a class, simple ints and double, no real methods
-    const UFFParamAtom& operator=(const UFFParamAtom& b);
+  class UFFParamAtom{
+    public:
+      //NECESSARY PUBLIC CLASS METHODS - START
+      //constructors - START
+      UFFParamAtom();
+      UFFParamAtom(const UFFParamAtom& b);
+      //constructors - STOP
+      ~UFFParamAtom();
+      const UFFParamAtom& operator=(const UFFParamAtom& b);
+      void clear();
+      //NECESSARY PUBLIC CLASS METHODS - END
 
-    string symbol;
-    double r1;        //bond distance
-    double theta0;
-    double x1;        //nonbond distance
-    double D1;        //nonbond energy
-    double zeta;      //scale
-    double Z1;        //effective charge
-    double Vi;
-    double Uj;
-    double ChiI;       //electronegativity
-    double hard;
-    double radius;
+      string symbol;
+      double r1;        //bond distance
+      double theta0;
+      double x1;        //nonbond distance
+      double D1;        //nonbond energy
+      double zeta;      //scale
+      double Z1;        //effective charge
+      double Vi;
+      double Uj;
+      double ChiI;       //electronegativity
+      double hard;
+      double radius;
+    private:
+      //NECESSARY PRIVATE CLASS METHODS - START
+      void free();
+      void copy(const UFFParamAtom& b);
+      //NECESSARY END CLASS METHODS - END
   };
 
   struct UFFParamBond{
