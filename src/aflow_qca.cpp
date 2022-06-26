@@ -549,7 +549,6 @@ namespace qca {
   bool calcProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms, vector<xmatrix<double>>& prob_cluster) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     prob_cluster.clear();
-LDEBUG=TRUE;
     int nx = prob_ideal_cluster.rows, ncl = prob_ideal_cluster.cols, nt = temp.rows, neq = conc_cluster.cols - 1;
     xmatrix<double> zeros(nx, ncl), natom_cluster = (double)max_num_atoms * conc_cluster;
     for (uint it = 0; it < (uint)nt; it++) {prob_cluster.push_back(zeros);} // initialize
