@@ -354,7 +354,6 @@ namespace qca {
       qca_data.prob_ideal_cluster = calcProbabilityIdealCluster(qca_data.conc_macro, qca_data.conc_cluster, qca_data.degeneracy_cluster, qca_data.max_num_atoms);
       checkProbability(qca_data.conc_macro, qca_data.conc_cluster, qca_data.prob_ideal_cluster);
       calcProbabilityCluster(qca_data.conc_macro, qca_data.conc_cluster, qca_data.excess_energy_cluster, qca_data.prob_ideal_cluster, qca_data.temp, qca_data.max_num_atoms, qca_data.prob_cluster);
-        checkProbability(qca_data.conc_macro, qca_data.conc_cluster, qca_data.prob_ideal_cluster, qca_data.prob_cluster, qca_data.temp);
       try {
         checkProbability(qca_data.conc_macro, qca_data.conc_cluster, qca_data.prob_ideal_cluster, qca_data.prob_cluster, qca_data.temp);
       }
