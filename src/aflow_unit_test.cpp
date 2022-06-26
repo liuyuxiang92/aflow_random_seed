@@ -1179,7 +1179,7 @@ namespace unittest {
     // Check | findZeroDeflation //SD20220616
     // ---------------------------------------------------------------------------
     check_function = "aurostd::findZeroDeflation()";
-    check_description = "find all the zeros of a 2D nonlinear square system";
+    check_description = "find multiple zeros of a 2D nonlinear square system";
     vfunc.clear();
     vdfunc.clear();
     jac.clear();
@@ -1193,11 +1193,10 @@ namespace unittest {
     vdfunc.push_back([](xvector<double> x) {return 2.0 * x(2);});
     jac.push_back(vdfunc);
     aurostd::findZeroDeflation(aurostd::vector2xvector<double>({0.0, 1.0}), vfunc, jac, calculated_xmatdbl);
-    expected_xmatdbl = xmatrix<double>(2, 4);
+    expected_xmatdbl = xmatrix<double>(2, 3);
     expected_xmatdbl(1, 1) = 0.517638090205041; expected_xmatdbl(2, 1) = 1.93185165257813;
     expected_xmatdbl(1, 2) = 1.93185165257813; expected_xmatdbl(2, 2) = 0.517638090205041;
     expected_xmatdbl(1, 3) = -1.93185165257813; expected_xmatdbl(2, 3) = -0.517638090205041;
-    expected_xmatdbl(1, 4) = -0.517638090205041; expected_xmatdbl(2, 4) = -1.93185165257813;
     checkEqual(calculated_xmatdbl, expected_xmatdbl, check_function, check_description, passed_checks, results);
   }
 

@@ -36,9 +36,9 @@
         -- added matrix pre-conditioner in aurostd::equilibrateMatrix (SD)
         -- added linspace function (SD)
         -- added simplistic JSON extractor for vectors and matrices (SD)
-        -- added binodal construction module (SD)
         -- added Newton-Raphson method to solve nonlinear square systems (SD)
         -- added deflation method to find multiple zeros in nonlinear square systems (SD)
+        -- added binodal construction module for n-ary alloys (SD)
 3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)

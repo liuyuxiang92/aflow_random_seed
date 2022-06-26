@@ -155,8 +155,7 @@ namespace qca {
     // Thermo data
     qca_data.prob_ideal_cluster.clear();
     qca_data.prob_cluster.clear();
-    qca_data.rel_s_ec = 0.0;
-    qca_data.temp_ec = 0.0;
+    qca_data.param_ec.first = 0.0; qca_data.param_ec.second = 0.0;
     qca_data.rel_s.clear();
     qca_data.binodal_boundary.clear();
   }
@@ -350,12 +349,12 @@ namespace qca {
     qca_data.degeneracy_cluster = calcDegeneracyCluster(qca_data.plattice, qca_data.vstr_atat, qca_data.elements, qca_data.max_num_atoms, true, qca_data.rundirpath);
     qca_data.conc_macro = getConcentrationMacro(qca_data.conc_curve_range, qca_data.conc_npts, qca_data.elements.size());
     qca_data.temp = getTemperature(qca_data.temp_range, qca_data.temp_npts);
-    vector<double> data_ec = calcRelativeEntropyEC(qca_data.conc_cluster, qca_data.degeneracy_cluster, qca_data.excess_energy_cluster, qca_data.temp, qca_data.max_num_atoms);
-    qca_data.rel_s_ec = data_ec[0]; qca_data.temp_ec = data_ec[1];
+    qca_data.param_ec = calcRelativeEntropyEC(qca_data.conc_cluster, qca_data.degeneracy_cluster, qca_data.excess_energy_cluster, qca_data.temp, qca_data.max_num_atoms);
     if (qca_data.calc_binodal) {
       qca_data.prob_ideal_cluster = calcProbabilityIdealCluster(qca_data.conc_macro, qca_data.conc_cluster, qca_data.degeneracy_cluster, qca_data.max_num_atoms);
       checkProbability(qca_data.conc_macro, qca_data.conc_cluster, qca_data.prob_ideal_cluster);
       calcProbabilityCluster(qca_data.conc_macro, qca_data.conc_cluster, qca_data.excess_energy_cluster, qca_data.prob_ideal_cluster, qca_data.temp, qca_data.max_num_atoms, qca_data.prob_cluster);
+        checkProbability(qca_data.conc_macro, qca_data.conc_cluster, qca_data.prob_ideal_cluster, qca_data.prob_cluster, qca_data.temp);
       try {
         checkProbability(qca_data.conc_macro, qca_data.conc_cluster, qca_data.prob_ideal_cluster, qca_data.prob_cluster, qca_data.temp);
       }
@@ -363,7 +362,7 @@ namespace qca {
         return;
       }
       qca_data.rel_s = calcRelativeEntropy(qca_data.prob_cluster, qca_data.prob_ideal_cluster);
-      qca_data.binodal_boundary = calcBinodalBoundary(qca_data.rel_s, qca_data.rel_s_ec, qca_data.temp);
+      qca_data.binodal_boundary = calcBinodalBoundary(qca_data.rel_s, qca_data.param_ec.first, qca_data.temp);
     }
     return;
   }
@@ -444,9 +443,9 @@ namespace qca {
   /// @param interp Interpolate order parameter to 0K
   ///
   /// @return Relative entropy at the equi-concentration and the transition temperature.
-  vector<double> calcRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& _temp, const int max_num_atoms, bool interp) {
+  std::pair<double, double> calcRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& _temp, const int max_num_atoms, bool interp) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    double rel_s_ec = 0.0;
+    std::pair<double, double> param_ec(0.0, 0.0);
     int nelem = conc_cluster.cols, n_fit = 8;
     xvector<double> temp = _temp;
     xmatrix<double> conc_macro_ec(1, nelem);
@@ -510,24 +509,25 @@ namespace qca {
       cerr << __AFLOW_FUNC__ << "   Real roots=" << rr << endl;
       cerr << __AFLOW_FUNC__ << "   Imag roots=" << ri << endl;
     }
-    vector<double> temp_ec;
+    bool unset = true;
     for (int j = 1; j <= n_fit; j++) {
       if (rr(j) >= temp_scaled(1) && rr(j) <= temp_scaled(temp.rows) && aurostd::isequal(ri(j), 0.0)) { // solution must be real and within temp range
-        if (temp_ec.empty()) {
-          temp_ec.push_back(rr(j));
+        if (unset) {
+          param_ec.second = rr(j);
+          unset = false;
         }
-        else if (aurostd::evalPolynomial(temp_ec[0], p1) < aurostd::evalPolynomial(rr(j), p1)) { // keep largest gradient
-          temp_ec[0] = rr(j);
+        else if (aurostd::evalPolynomial(param_ec.second, p1) < aurostd::evalPolynomial(rr(j), p1)) { // keep largest gradient
+          param_ec.second = rr(j);
         }
       }
     }
-    temp_ec[0] = temp_std * temp_ec[0] + temp_mean;
-    if (LDEBUG) {cerr << __AFLOW_FUNC__ << " T_ec=" << temp_ec[0] << "K" << endl;}
-    calcProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, aurostd::vector2xvector(temp_ec), max_num_atoms, prob_ec);
+    param_ec.second = temp_std * param_ec.second + temp_mean;
+    if (LDEBUG) {cerr << __AFLOW_FUNC__ << " T_ec=" << param_ec.second << "K" << endl;}
+    calcProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, aurostd::vector2xvector(vector<double> {param_ec.second}), max_num_atoms, prob_ec);
     for (int i = 1; i <= prob_ideal_ec.cols; i++) {
-      rel_s_ec += prob_ec[0](1, i) * aurostd::log(prob_ec[0](1, i) / prob_ideal_ec(1, i));
+      param_ec.first += prob_ec[0](1, i) * aurostd::log(prob_ec[0](1, i) / prob_ideal_ec(1, i));
     }
-    return {rel_s_ec, temp_ec[0]};
+    return param_ec;
   }
 }
 
@@ -549,12 +549,13 @@ namespace qca {
   bool calcProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms, vector<xmatrix<double>>& prob_cluster) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     prob_cluster.clear();
+LDEBUG=TRUE;
     int nx = prob_ideal_cluster.rows, ncl = prob_ideal_cluster.cols, nt = temp.rows, neq = conc_cluster.cols - 1;
     xmatrix<double> zeros(nx, ncl), natom_cluster = (double)max_num_atoms * conc_cluster;
     for (uint it = 0; it < (uint)nt; it++) {prob_cluster.push_back(zeros);} // initialize
     xvector<double> beta = aurostd::pow(KBOLTZEV * temp, -1.0), soln(neq);
     bool soln_found = false;
-    if (neq == 0) {
+    if (neq == 1) {
       xvector<double> p(max_num_atoms + 1), rr(max_num_atoms), ri(max_num_atoms);
       for (int it = 1; it <= nt; it++) {
         for (int ix = 1; ix <= nx; ix++) {
@@ -576,7 +577,7 @@ namespace qca {
             }
           }
           if (!soln_found) { // physical solution does not exist
-            if (LDEBUG) {cerr << __AFLOW_FUNC__ << " Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]";}
+            if (LDEBUG) {cerr << __AFLOW_FUNC__ << " Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]" << endl;}
             return false;
           }
           for (int j = 1; j <= ncl; j++) {
@@ -587,7 +588,7 @@ namespace qca {
       }
     }
     else {
-      xmatrix<double> soln0 = aurostd::ones_xm<double>(neq, nx); //CHANGE TO RAND HERE WHEN WORKING
+      xmatrix<double> soln0 = aurostd::ones_xm<double>(neq, nx), msoln;
       vector<std::function<double(xvector<double>)>> vpoly, vdpoly;
       vector<vector<std::function<double(xvector<double>)>>> jac;
       for (int it = nt; it >= 1; it--) { // go backwards
@@ -603,19 +604,26 @@ namespace qca {
             jac.push_back(vdpoly);
             vdpoly.clear();
           }
-          if (LDEBUG) {cerr << __AFLOW_FUNC__ << " it=" << it << " ix=" << ix << " | soln0=" << soln0 << endl;}
-          soln_found = findZeroNewtonRaphson(soln0.getcol(ix), vpoly, jac, soln);
-          if (LDEBUG) {cerr << __AFLOW_FUNC__ << "   Real roots=" << soln << endl;}
-          for (int ieq = 1; ieq <= neq && soln_found; ieq++) {
-            if (soln(ieq) < 0.0) {soln_found = false;} // solution must be positive, real and finite
+          if (LDEBUG) {cerr << __AFLOW_FUNC__ << " it=" << it << " ix=" << ix << endl;}
+          soln_found = aurostd::findZeroDeflation(soln0.getcol(ix), vpoly, jac, msoln, 100, 10.0 * _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
+          if (LDEBUG) {cerr << __AFLOW_FUNC__ << "   Real roots=" << endl << msoln << endl;}
+          for (int isol = 1; isol <= msoln.cols && soln_found; isol++) { // first soln_found checks whether to enter loop
+            for (int ieq = 1; ieq <= neq && soln_found; ieq++) {
+              if (msoln.getcol(isol)(ieq) <= 0.0) {soln_found = false;} // solution must be positive, real and finite
+            }
+            if (soln_found) {
+              soln = msoln.getcol(isol);
+              break;
+            }
+            soln_found = true;
           }
           if (!soln_found) {
-            if (LDEBUG) {cerr << __AFLOW_FUNC__ << " Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]";}
+            if (LDEBUG) {cerr << __AFLOW_FUNC__ << " Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]" << endl;}
             return false;
           }
-          if (it == nt) {soln0.setcol(soln, ix);} // use the high temperature solution as an initial guess for lower temperature
+          soln0.setcol(soln, ix); // use the higher temperature solution as an initial guess for lower temperature
           for (int j = 1; j <= ncl; j++) {
-            prob_cluster[it - 1](ix, j) = prob_ideal_cluster(ix, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * aurostd::elements_product(aurostd::pow(soln, aurostd::xmatrix2xvector(natom_cluster, j, 1, j, neq, 1)));
+            prob_cluster[it - 1](ix, j) = prob_ideal_cluster(ix, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * aurostd::elements_product(aurostd::pow(soln, natom_cluster.getmat(j, j, 1, neq)(1)));
           }
           prob_cluster[it - 1].setmat(prob_cluster[it - 1].getmat(ix, ix, 1, ncl) / aurostd::sum(prob_cluster[it - 1].getmat(ix, ix, 1, ncl)), ix, 1); // normalize sum to 1
         }
@@ -675,7 +683,6 @@ namespace qca {
   ///
   /// @return Ideal (high-T) probability of the clusters as a function of concentration and temperature.
   xmatrix<double> calcProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
     int ncl = conc_cluster.rows, nx = conc_macro.rows, nelem = conc_macro.cols;
     xmatrix<double> prob_ideal_cluster(nx, ncl);
     for (int i = 1; i <= nx; i++) {
@@ -686,7 +693,6 @@ namespace qca {
         }
       }
       prob_ideal_cluster.setmat(prob_ideal_cluster.getmat(i, i, 1, ncl) / aurostd::sum(prob_ideal_cluster.getmat(i, i, 1, ncl)), i, 1); // normalize sum to 1
-      if (LDEBUG) {cerr << __AFLOW_FUNC__ << " i=" << i << " | SUM[P_cluster]=" << aurostd::sum(prob_ideal_cluster.getmat(i, i, 1, ncl)) << endl;}
     }
     return prob_ideal_cluster;
   }
@@ -706,12 +712,12 @@ namespace qca {
     for (int i = 1; i <= nx; i++) {
       if (!aurostd::isequal(aurostd::sum(prob_cluster_ideal(i)), 1.0)) { // unnormalized
         stringstream message;
-        message << "Ideal solution (high-T) probability is unnormalized for i=" << i;
+        message << "Ideal solution (high-T) probability is unnormalized for i=" << i << " | SUM[P_cluster]=" << aurostd::sum(prob_cluster_ideal(i));
         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
       }
       else if (!aurostd::isequal(prob_cluster_ideal(i) * conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
         stringstream message;
-        message << "Ideal solution (high-T) probability does not satisfy concentration contraint for X=[" << conc_macro(i) << " ]";
+        message << "Ideal solution (high-T) probability does not satisfy concentration contraint X=[" << conc_macro(i) << " ], X_calc=[" << prob_cluster_ideal(i) * conc_cluster << "]";
         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
       }
     }
@@ -732,12 +738,12 @@ namespace qca {
       for (int i = 1; i <= nx; i++) {
         if (!aurostd::isequal(aurostd::sum(prob_cluster[it - 1](i)), 1.0)) { // unnormalized
           stringstream message;
-          message << "Equilibrium probability is unnormalized for T=" << temp(it) << "K, i=" << i;
+          message << "Equilibrium probability is unnormalized for T=" << temp(it) << "K, i=" << i << " | SUM[P_cluster]=" << aurostd::sum(prob_cluster[it - 1](i));
           throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
         }
         else if (!aurostd::isequal(prob_cluster[it - 1](i) * conc_cluster, conc_macro(i))) { // does not satisfy concentration constraints
           stringstream message;
-          message << "Equilibrium probability does not satisfy concentration contraint for T=" << temp(it) << "K, X=[" << conc_macro(i) << " ]";
+          message << "Equilibrium probability does not satisfy concentration contraint for T=" << temp(it) << "K, X=[" << conc_macro(i) << " ], X_calc=[" << prob_cluster[it - 1](i) * conc_cluster << "]";
           throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
         }
       }
@@ -1606,7 +1612,7 @@ namespace qca {
       output << " " << info_prefix << "Concentration                  = " << endl << qca_data.conc_cluster << endl;
       output << " " << info_prefix << "Excess energy (eV)             = " << endl << trasp(qca_data.excess_energy_cluster) << endl;
       info_prefix = "Thermo data ";
-      output << " " << info_prefix << "EC transition temperature (K)  = " << qca_data.temp_ec << endl;
+      output << " " << info_prefix << "EC transition temperature (K)  = " << qca_data.param_ec.second << endl;
       output << " " << info_prefix << "Binodal boundary (K)           = " << endl << trasp(qca_data.binodal_boundary) << endl;
       if (!qca_data.screen_only) {
         aurostd::stringstream2file(output, filepath);
@@ -1627,7 +1633,7 @@ namespace qca {
       json.addVector("Cluster degeneracy", aurostd::xvectorutype2double(qca_data.degeneracy_cluster));
       json.addMatrix("Cluster concentration", qca_data.conc_cluster);
       json.addVector("Cluster excess energy (eV)", qca_data.excess_energy_cluster);
-      json.addNumber("EC transition temperature (K)", qca_data.temp_ec);
+      json.addNumber("EC transition temperature (K)", qca_data.param_ec.second);
       json.addVector("Binodal boundary (K)", qca_data.binodal_boundary);
       aurostd::string2file(json.toString(), filepath);
       return;

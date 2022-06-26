@@ -374,6 +374,7 @@ namespace aurostd {
   //@param jac vector of vector of first derivative functions (Jacobian)
   //@param x zeros of the system
   bool findZeroNewtonRaphson(const xvector<double>& _x0, const vector<std::function<double(xvector<double>)>>& vf, const vector<vector<std::function<double(xvector<double>)>>>& jac, xvector<double>& x, const uint niter, const double tol) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     uint n = (uint)_x0.rows;
     if (n != vf.size() || n != jac[0].size() || n != jac.size()) {
       string message;
@@ -390,8 +391,13 @@ namespace aurostd {
           J(i + 1, j + 1) = jac[i][j](x0);
         }
       }
-      J = J + 10.0 * tol * I; // Tikhanov regularization
-      iJ = aurostd::inverse(J);
+      try { // check for singular matrix
+        iJ = aurostd::inverse(J);
+      }
+      catch (aurostd::xerror& err) {
+        J = J + tol * I; // Tikhanov regularization
+        iJ = aurostd::inverse(J);
+      }
       for (uint i = 0; i < n; i++) {f(i + 1) = vf[i](x0);}
       x = x0 - iJ * f;
       converged = true;
@@ -402,6 +408,7 @@ namespace aurostd {
       x0 = x;
       iter++;
     }
+    if (LDEBUG) {cerr << __AFLOW_FUNC__ << " iter=" << iter << " | dx=" << aurostd::modulus(x - x0) << endl;} 
     return (iter == niter) ? false : true;
   }
 
@@ -453,8 +460,9 @@ namespace aurostd {
         vdf.clear();
       }
     }
+    if (vx.size() == 0) {return false;}
     mx = aurostd::trasp(aurostd::vectorvector2xmatrix<double>(vx));
-    return (vx.size() == 0) ? false : true;
+    return true;
   }
 }
 

@@ -59,8 +59,7 @@ struct _qca_data {
   // Thermo data
   xmatrix<double> prob_ideal_cluster; // DIM: Nc, Nj
   vector<xmatrix<double>> prob_cluster; // DIM: Nc, Nj, Nt
-  double rel_s_ec; // UNIT: unitless
-  double temp_ec; // UNIT: K
+  std::pair<double, double> param_ec; // UNIT: unitless, K
   xmatrix<double> rel_s; // UNIT: unitless | DIM: Nc, Nt
   xvector<double> binodal_boundary; // UNIT: K | DIM: Nc
 };
@@ -75,7 +74,7 @@ namespace qca {
   void calcBinodalData(_qca_data& qca_data);
   xvector<double> calcBinodalBoundary(const xmatrix<double>& rel_s, const double rel_s_ec, const xvector<double>& temp);
   xmatrix<double> calcRelativeEntropy(const vector<xmatrix<double>>& prob_cluster, const xmatrix<double>& prob_cluster_ideal);
-  vector<double> calcRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& temp, const int max_num_atoms, bool interp=true);
+  std::pair<double, double> calcRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& temp, const int max_num_atoms, bool interp=true);
   bool calcProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms, vector<xmatrix<double>>& prob_cluster);
   double calcProbabilityConstraint(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& beta, const xmatrix<double>& natom_cluster, const int it, const int ix, const int ik, const int ideq, const xvector<double>& xvar);
   xmatrix<double> calcProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms);
