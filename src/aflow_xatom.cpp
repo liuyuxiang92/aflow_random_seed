@@ -7486,7 +7486,9 @@ void xstructure::AddAtom(const deque<_atom>& atoms_in, bool check_present) { //D
   }
 
   GetStoich();  //CO20170724
-  std::stable_sort(atoms.begin(), atoms.end(), sortAtomsTypes);
+  //ME20220612 - Originally had sortAtomsTypes, but other parts of xstructure use sortAtomsNames,
+  //leading to inconsistencies when the input structure is not alphabetic.
+  std::stable_sort(atoms.begin(), atoms.end(), sortAtomsNames);
   MakeBasis(); // need to update NUMBER and BASIS
 }
 
@@ -18802,7 +18804,7 @@ string xstructure2json(xstructure& xstr) {
 
   // TITLE 
   if(xstr.title.size()){
-    sscontent_json << "\"title\":\"" << xstr.title << "\"" << eendl;
+    sscontent_json << "\"title\":\"" << aurostd::RemoveWhiteSpacesFromTheFrontAndBack(xstr.title) << "\"" << eendl; //CO20220531 - removing whitespace
   } else {
     if(PRINT_NULL_JSON){ sscontent_json << "\"title\":null" << eendl;}
   }
