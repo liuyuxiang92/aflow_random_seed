@@ -377,38 +377,38 @@ _atom ConvertAtomToLat(const _atom& in_at, const xmatrix<double>& lattice) {
 // [OBSOLETE]   }
 // [OBSOLETE] }
 
-// **************************************************************************
-// Function GetStrNeighData
-// **************************************************************************
-// This function collects all the neighbor data out to some
-//  cutoff and stores it for each atom in the structure.
-namespace pflow {
-  void GetStrNeighData(const xstructure& str, const double cutoff,
-      deque<deque<_atom> >& neigh_mat) {
-    deque<_atom> atom_vec;
-    neigh_mat.clear();
-    // Get data from str.
-    // Set scale to 1 so you don't need to rescale coordinates.
-    xstructure sstr=str;
-    sstr=ReScale(sstr,1.0);
-
-    // Create atom objects for each atom in structure.
-    xvector<int> ijk(3);ijk.clear();
-    for(uint iat=0;iat<sstr.atoms.size();iat++) {
-      _atom a=sstr.atoms.at(iat);
-      a.name=sstr.atoms.at(iat).name;
-      a.number=iat;
-      a.ijk=sstr.atoms.at(iat).ijk;
-      a.cpos=sstr.atoms.at(iat).cpos;
-      a.fpos=sstr.atoms.at(iat).fpos;//cerr << sstr.atoms.at(iat).fpos << endl;
-      a.type=sstr.atoms.at(iat).type;
-      atom_vec.push_back(a);
-    }
-    double rmin=1e-6;
-    // [OBSOLETE]    GetNeighData(atom_vec,sstr,rmin,cutoff,neigh_mat);
-    sstr.GetNeighData(atom_vec,rmin,cutoff,neigh_mat);
-  }
-}
+//[CO20220623 - OBSOLETE]// **************************************************************************
+//[CO20220623 - OBSOLETE]// Function GetStrNeighData
+//[CO20220623 - OBSOLETE]// **************************************************************************
+//[CO20220623 - OBSOLETE]// This function collects all the neighbor data out to some
+//[CO20220623 - OBSOLETE]//  cutoff and stores it for each atom in the structure.
+//[CO20220623 - OBSOLETE]namespace pflow {
+//[CO20220623 - OBSOLETE]  void GetStrNeighData(const xstructure& str, const double cutoff,
+//[CO20220623 - OBSOLETE]      deque<deque<_atom> >& neigh_mat) {
+//[CO20220623 - OBSOLETE]    deque<_atom> atom_vec;
+//[CO20220623 - OBSOLETE]    neigh_mat.clear();
+//[CO20220623 - OBSOLETE]    // Get data from str.
+//[CO20220623 - OBSOLETE]    // Set scale to 1 so you don't need to rescale coordinates.
+//[CO20220623 - OBSOLETE]    xstructure sstr=str;
+//[CO20220623 - OBSOLETE]    sstr=ReScale(sstr,1.0);
+//[CO20220623 - OBSOLETE]
+//[CO20220623 - OBSOLETE]    // Create atom objects for each atom in structure.
+//[CO20220623 - OBSOLETE]    xvector<int> ijk(3);ijk.clear();
+//[CO20220623 - OBSOLETE]    for(uint iat=0;iat<sstr.atoms.size();iat++) {
+//[CO20220623 - OBSOLETE]      _atom a=sstr.atoms.at(iat);
+//[CO20220623 - OBSOLETE]      a.name=sstr.atoms.at(iat).name;
+//[CO20220623 - OBSOLETE]      a.number=iat;
+//[CO20220623 - OBSOLETE]      a.ijk=sstr.atoms.at(iat).ijk;
+//[CO20220623 - OBSOLETE]      a.cpos=sstr.atoms.at(iat).cpos;
+//[CO20220623 - OBSOLETE]      a.fpos=sstr.atoms.at(iat).fpos;//cerr << sstr.atoms.at(iat).fpos << endl;
+//[CO20220623 - OBSOLETE]      a.type=sstr.atoms.at(iat).type;
+//[CO20220623 - OBSOLETE]      atom_vec.push_back(a);
+//[CO20220623 - OBSOLETE]    }
+//[CO20220623 - OBSOLETE]    double rmin=1e-6;
+//[CO20220623 - OBSOLETE]    // [OBSOLETE]    GetNeighData(atom_vec,sstr,rmin,cutoff,neigh_mat);
+//[CO20220623 - OBSOLETE]    sstr.GetNeighData_20220101(atom_vec,rmin,cutoff,neigh_mat);
+//[CO20220623 - OBSOLETE]  }
+//[CO20220623 - OBSOLETE]}
 
 // **************************************************************************
 // Function GetXrayScattFactor

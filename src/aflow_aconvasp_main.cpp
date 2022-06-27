@@ -1256,6 +1256,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("RBDIST",aurostd::args2flag(argv,cmds,"--rbdist") && argv.at(1)=="--rbdist");
   // [OBSOLETE]  vvpflow.flag("RDF",(aurostd::args2flag(argv,cmds,"--rdf") && argv.at(1)=="--rdf"));
   vpflow.args2addattachedscheme(argv,cmds,"RDF","--rdf=","");
+  vpflow.flag("RDF::RAW_COUNTS",aurostd::args2flag(argv,cmds,"--raw_counts"));  //CO20220627
   // [OBSOLETE]  vpflow.flag("RDFCMP",(aurostd::args2flag(argv,cmds,"--rdfcmp") && argv.at(1)=="--rdfcmp"));
   vpflow.args2addattachedscheme(argv,cmds,"RDFCMP","--rdfcmp=","");
 
@@ -1994,7 +1995,7 @@ namespace pflow {
       if(vpflow.flag("QMVASP")) {pflow::QMVASP(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("QSUB")) {sflow::QSUB(vpflow.getattachedscheme("QSUB")); _PROGRAMRUN=true;} // NEW
       // R
-      if(vpflow.flag("RDF")) {pflow::RDF(vpflow.getattachedscheme("RDF"),cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("RDF")) {pflow::RDF(vpflow.getattachedscheme("RDF"),cin,vpflow.flag("RDF::RAW_COUNTS")); _PROGRAMRUN=true;}  //CO20220627
       if(vpflow.flag("RDFCMP")) {pflow::RDFCMP(vpflow.getattachedscheme("RDFCMP")); _PROGRAMRUN=true;}
       if(vpflow.flag("RMCOPIES")) {cout << pflow::RMCOPIES(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("RSM")) {pflow::RSM(argv,cin); _PROGRAMRUN=true;}
@@ -2542,7 +2543,7 @@ namespace pflow {
     strstream << tab << x << " --revsg [#] [n] [l] [m]" << endl;
     strstream << tab << x << " --rm_atom iatom < POSCAR" << endl;
     strstream << tab << x << " --rm_copies < POSCAR" << endl;
-    strstream << tab << x << " --rdf[=rmax[,nbins[,sigma]]] < POSCAR" << endl;
+    strstream << tab << x << " --rdf[=rmax[,nbins[,sigma[,window_gaussian]]]] [--raw_counts] < POSCAR" << endl; //CO20220627
     strstream << tab << x << " --scale=s < POSCAR" << endl;
     strstream << tab << x << " --sd A1 A2 ... < POSCAR" << endl;
     strstream << tab << x << " --setcm cm1 cm2 cm3 < POSCAR" << endl;
@@ -10909,13 +10910,13 @@ namespace pflow {
     if(aflowlib_legacy_format){
       for(uint itype=0;itype<first_itypes.size();itype++){
         for(uint jtype=itype;jtype<first_itypes.size();jtype++){
-          output << aurostd::PaddedPOST("BOND_"+names[itype]+names[jtype],11) << " " << aurostd::utype2string(nbondxx[iat++],6) << " [Angst]" << endl;
+          output << aurostd::PaddedPOST("BOND_"+names[itype]+names[jtype],11) << " " << aurostd::utype2string(nbondxx[iat++],6,FIXED_STREAM) << " [Angst]" << endl; //CO20220627
         }
       }
     } else {
       for(uint itype=0;itype<first_itypes.size();itype++){
         for(uint jtype=itype;jtype<first_itypes.size();jtype++){
-          output << aurostd::PaddedPOST(names[itype]+"-"+names[jtype]+":",8) << " " << aurostd::utype2string(nbondxx[iat++],6) << " [Angst]" << endl;
+          output << aurostd::PaddedPOST(names[itype]+"-"+names[jtype]+":",8) << " " << aurostd::utype2string(nbondxx[iat++],6,FIXED_STREAM) << " [Angst]" << endl;  //CO20220627
         }
       }
     }
@@ -13915,38 +13916,41 @@ namespace pflow {
 // pflow::RDF
 // ***************************************************************************
 namespace pflow {
-  void RDF(const string& options,istream& input) {
+  void RDF(const string& options,istream& input,bool raw_counts) {  //CO220627 - rewritten
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"pflow::RDF():";  //CO20200624
-    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
-    if(tokens.size()>3) {
-      init::ErrorOption(options,soliloquy,"aflow --rdf[=rmax[,nbins[,sigma]]] < POSCAR");
-    } 
+    if(tokens.size()>3){init::ErrorOption(options,__AFLOW_FUNC__,"aflow --rdf[=rmax[,nbins[,sigma[,window_gaussian]]]] [--raw_counts] < POSCAR");}
 
     xstructure a(input,IOAFLOW_AUTO);
     double rmax=(double) 5.0;
     int nbins=(int) 25;
-    int smooth_width=(int) 0;
-    if(LDEBUG) cerr << XPID << "pflow::RDF: tokens.size()=" << tokens.size() << endl;
-    if(tokens.size()>=1) rmax=aurostd::string2utype<double>(tokens.at(0));
-    if(tokens.size()>=1) cerr << XPID << "pflow::RDF: tokens.at(0)=" << tokens.at(0) << endl;
-    if(tokens.size()>=2) nbins=aurostd::string2utype<int>(tokens.at(1));
-    if(tokens.size()>=3) smooth_width=aurostd::string2utype<int>(tokens.at(2));
+    double sigma=(int) 0;
+    int window_gaussian=(int) 0;
+    if(LDEBUG){cerr << XPID << "pflow::RDF: tokens.size()=" << tokens.size() << endl;}
+    if(tokens.size()>=1){rmax=aurostd::string2utype<double>(tokens[0]);}
+    if(tokens.size()>=1){cerr << XPID << "pflow::RDF: tokens[0]=" << tokens[0] << endl;}
+    if(tokens.size()>=2){nbins=aurostd::string2utype<int>(tokens[1]);}
+    if(tokens.size()>=3){sigma=aurostd::string2utype<double>(tokens[2]);}
+    if(tokens.size()>=4){window_gaussian=aurostd::string2utype<int>(tokens[3]);}
 
-    aurostd::matrix<double> rdf_all; //CO20200404 pflow::matrix()->aurostd::matrix()
-    cerr << "[1]" << endl;
-    pflow::GetRDF(a,rmax,nbins,rdf_all);
-    cerr << "[1]" << endl;
-    // for(int i=0;i<rdf_all.size();i++) {for(int j=0;j<rdf_all[i].size();j++) cerr << rdf_all[i][j] << " "; cerr << endl;}
-    aurostd::matrix<double> rdf_all_sm;  //CO20200404 pflow::matrix()->aurostd::matrix()
-    rdf_all_sm=pflow::GetSmoothRDF(rdf_all,smooth_width);
-    aurostd::matrix<double> rdfsh_all; //CO20200404 pflow::matrix()->aurostd::matrix()
-    aurostd::matrix<double> rdfsh_loc; // Radial location of rdf shells. //CO20200404 pflow::matrix()->aurostd::matrix()
-    pflow::GetRDFShells(a,rmax,nbins,smooth_width,rdf_all_sm,rdfsh_all,rdfsh_loc);
-    PrintRDF(a,rmax,nbins,smooth_width,rdf_all_sm,rdfsh_all,rdfsh_loc,cout);
-    if(LDEBUG) cerr << soliloquy << " END" << endl;
+    aurostd::xmatrix<double> rdf_all;
+    pflow::GetRDF(a,rdf_all,rmax,nbins,raw_counts,sigma,window_gaussian);
+    //to be implemented/patched later: GetRDFShells()
+    //this function is supposed to count the number of wiggles in the rdf above/below horizontal asymptote (constant)
+    
+
+    //[CO20220625 - OBSOLETE]cerr << "[1]" << endl;
+    //[CO20220625 - OBSOLETE]cerr << "[1]" << endl;
+    //[CO20220625 - OBSOLETE]// for(int i=0;i<rdf_all.size();i++) {for(int j=0;j<rdf_all[i].size();j++) cerr << rdf_all[i][j] << " "; cerr << endl;}
+    //[CO20220625 - OBSOLETE]aurostd::matrix<double> rdf_all_sm;  //CO20200404 pflow::matrix()->aurostd::matrix()
+    //[CO20220625 - OBSOLETE]rdf_all_sm=pflow::GetSmoothRDF(rdf_all,smooth_width);
+    //[CO20220625 - OBSOLETE]aurostd::matrix<double> rdfsh_all; //CO20200404 pflow::matrix()->aurostd::matrix()
+    //[CO20220625 - OBSOLETE]aurostd::matrix<double> rdfsh_loc; // Radial location of rdf shells. //CO20200404 pflow::matrix()->aurostd::matrix()
+    //[CO20220625 - OBSOLETE]pflow::GetRDFShells(a,rmax,nbins,smooth_width,rdf_all_sm,rdfsh_all,rdfsh_loc);
+    //[CO20220625 - OBSOLETE]PrintRDF(a,rmax,nbins,smooth_width,rdf_all_sm,rdfsh_all,rdfsh_loc,cout);
+    //[CO20220625 - OBSOLETE]if(LDEBUG) cerr << soliloquy << " END" << endl;
   }
 } // namespace pflow
 
@@ -13979,8 +13983,8 @@ namespace pflow {
     // Get rdfs
     aurostd::matrix<double> rdf_all_A; //CO20200404 pflow::matrix()->aurostd::matrix()
     aurostd::matrix<double> rdf_all_B; //CO20200404 pflow::matrix()->aurostd::matrix()
-    pflow::GetRDF(strA,rmax,nbins,rdf_all_A);
-    pflow::GetRDF(strB,rmax,nbins,rdf_all_B);
+    pflow::GetRDF_20220101(strA,rmax,nbins,rdf_all_A);  //CO20220627 - rewrite later
+    pflow::GetRDF_20220101(strB,rmax,nbins,rdf_all_B);  //CO20220627 - rewrite later
     aurostd::matrix<double> rdf_all_A_sm=pflow::GetSmoothRDF(rdf_all_A,smooth_width);  //CO20200404 pflow::matrix()->aurostd::matrix()
     aurostd::matrix<double> rdf_all_B_sm=pflow::GetSmoothRDF(rdf_all_B,smooth_width);  //CO20200404 pflow::matrix()->aurostd::matrix()
     // Get shells

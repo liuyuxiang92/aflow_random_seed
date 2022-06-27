@@ -2021,9 +2021,12 @@ class xstructure {
     //
     // NEIGHBORS OBEJCTS OLD-ACONVASP BUT WORKS                  // NEIGHBORS OBEJCTS 
     // GetNeighData collects all the neighbor data between rmin and rmax and stores it for each atom in a vector of atom objects in order of increasing distance.  
-    void GetNeighData(const deque<_atom>& in_atom_vec,const double& rmin, const double& rmax,deque<deque<_atom> >& neigh_mat);
-    // GetStrNeighData collects all the neighbor data out to some cutoff and stores it for each atom in the structure.
-    void GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat) const; //RF+CO20200513
+    void GetNeighData(const double rmax,deque<deque<_atom> >& neigh_mat,const double rmin=_ZERO_TOL_) const; //CO20220623 - use this function
+    void GetNeighData(deque<_atom>& atoms_cell,const double rmax,deque<deque<_atom> >& neigh_mat,const double rmin=_ZERO_TOL_) const; //CO20220623 - use this function
+    void GetNeighData_20220101(const deque<_atom>& in_atom_vec,const double rmin, const double rmax,deque<deque<_atom> >& neigh_mat) const; //CO20220623 - AVOID this function, use one above
+    //[CO20220623 - OBSOLETE]// GetStrNeighData collects all the neighbor data out to some cutoff and stores it for each atom in the structure.
+    //[CO20220623 - OBSOLETE]void GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat) const; //RF+CO20200513
+    //[CO20220623 - OBSOLETE]void GetStrNeighData_20220101(const double cutoff,deque<deque<_atom> >& neigh_mat) const; //RF+CO20200513
 
     // ----------------------------------------------------------------------------------------
     // OUTPUT/ERROR FLAGS                                         // --------------------------------------

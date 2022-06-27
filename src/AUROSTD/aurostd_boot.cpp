@@ -551,6 +551,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     deque<int> di; jwi.addVector("",di);//AS20201217
     vector<vector<int> > vvi; jwi.addMatrix("",vvi);//AS20201217
     deque<deque<int> > ddi; jwi.addMatrix("",ddi);
+    while(xc.increment()){xc.applyCombo(vvi);}  //CO20220627
 #endif
 #ifdef AUROSTD_INITIALIZE_UINT
     o+=aurostd::string2utype<uint>(aurostd::utype2string<uint>(uint())+aurostd::utype2string<uint>(uint(),int()));

@@ -108,14 +108,6 @@ namespace chull {
   double isoMaxLatentHeat(const ChullPoint& point, double x, char units=_std_);
   double isoMaxLatentHeat(const aflowlib::_aflowlib_entry& entry, double x, char units=_std_);
   ////////////////////////////////////////////////////////////////////////////////
-  int roundDouble(double doub, int multiple, bool up);
-  ////////////////////////////////////////////////////////////////////////////////
-  bool greaterEqualZero(double val);
-  bool lessEqualZero(double val);
-  bool notPositive(double val,bool soft_cutoff,double tol=ZERO_TOL);
-  bool notNegative(double val,bool soft_cutoff,double tol=ZERO_TOL);
-  bool zeroWithinTol(double val,double tol=ZERO_TOL);
-  bool nonZeroWithinTol(double val,double tol=ZERO_TOL);
   bool subspaceBelongs(const xvector<int>& space,const xvector<int>& subspace);
   bool correctSignVerticalDistance(double dist_2_hull,bool should_be_positive);
   xvector<double> getTruncatedCoords(const xvector<double>& coords,const xvector<int>& elements_present); //truncated arbitrary coords

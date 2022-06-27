@@ -17842,7 +17842,7 @@ void xstructure::checkStructure(){
 // **************************************************************************
 // rewrite of GetNeighData()
 // atoms_cell is the atoms for which neighbors are found (could be iatoms), hence it determines the sizes of i_neighbors and distances
-// i_neighbors are indices to gird_atoms
+// i_neighbors are indices to grid_atoms (xstructure attribute)
 // CO20200912
 void xstructure::GetNeighbors(deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmin,bool prim,bool unique_only){
   deque<_atom> atoms_cell;
@@ -18113,9 +18113,40 @@ void GetCoordinations(const xstructure& xstr_in,deque<_atom>& atoms_cell,deque<d
 // This function collects all the neighbor data between rmin and rmax and stores 
 // it for each atom in a vector of atom objects in order of increasing distance.  
 
-void xstructure::GetNeighData(const deque<_atom>& in_atom_vec,		
-    const double& rmin, const double& rmax,
-    deque<deque<_atom> >& neigh_mat) {
+void xstructure::GetNeighData(const double rmax,deque<deque<_atom> >& neigh_mat,const double rmin) const {  //CO20220623
+  deque<_atom> atoms_cell;
+  return GetNeighData(atoms_cell,rmax,neigh_mat,rmin);
+}
+void xstructure::GetNeighData(deque<_atom>& atoms_cell,const double rmax,deque<deque<_atom> >& neigh_mat,const double rmin) const {
+  //CO20220623 - rewritten using GetNeighbors() (MUCH faster)
+  bool LDEBUG=(FALSE || XHOST.DEBUG);
+  xstructure xstr_tmp(*this); //make copy so we can modify xstr
+  deque<deque<uint> > i_neighbors;
+  deque<deque<double> > distances;
+  bool prim=true;bool unique_only=false;
+  xstr_tmp.GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
+  //now build neigh_mat
+  uint i=0,j=0;
+  for(i=0;i<neigh_mat.size();i++){neigh_mat[i].clear();}neigh_mat.clear();  //clear
+  for(i=0;i<i_neighbors.size();i++){
+    neigh_mat.push_back(deque<_atom>(0));
+    neigh_mat[i].push_back(atoms_cell[i]);  //first atom is self
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " neigh_mat[i=" << i << "][j=0].cpos=" << neigh_mat[i].back().cpos << endl;}
+    for(j=0;j<i_neighbors[i].size();j++){
+      neigh_mat[i].push_back(xstr_tmp.grid_atoms[i_neighbors[i][j]]);
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " neigh_mat[i=" << i << "][j=" << j << "].cpos=" << neigh_mat[i].back().cpos << "; dist=" << distances[i][j] << endl;}
+    }
+  }
+}
+void xstructure::GetNeighData_20220101(const deque<_atom>& in_atom_vec,		
+    const double rmin, const double rmax,
+    deque<deque<_atom> >& neigh_mat) const {  
+  //CO20220623 - AVOID USING THIS FUNCTION, use the one above
+  //this one relies on an input of in_atom_vec which is usually the atoms of the structure
+  //there is only one exception: GetGoodShellPoints() in aflow_pflow_print.cpc; this function should be rewritten in the future
+  //considering the name of this function, it should only operate on the atoms of the structure
+  //no point of having two sources of truth, it's confusing
+  //the rewrite for an input of atoms should avoid ad-hoc, a posteriori mappings introducing noise in positions: GetUnitCellRep() and ConvertAtomToLat()
   double epsilon=1.0e-3;  // sometimes you have wrong images due to roundoff
   deque<_atom> neigh_vec;
   // Get data from str.
@@ -18240,35 +18271,35 @@ void xstructure::GetNeighData(const deque<_atom>& in_atom_vec,
   }
 }
 
-// **************************************************************************
-// Function GetStrNeighData
-// **************************************************************************
-// This function collects all the neighbor data out to some
-// cutoff and stores it for each atom in the structure.
-void xstructure::GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat) const { //RF+CO20200513
-  deque<_atom> atom_vec;
-  neigh_mat.clear();
-  // Get data from str.
-  // Set scale to 1 so you don't need to rescale coordinates.
-  xstructure sstr(*this);
-  // [OBSOLETE]  sstr=ReScale(sstr,1.0);
-  sstr.ReScale(1.0);
-  // Create atom objects for each atom in structure.
-  xvector<int> ijk(3);ijk.clear();
-  for(uint iat=0;iat<sstr.atoms.size();iat++) {
-    _atom a=sstr.atoms.at(iat);
-    a.name=sstr.atoms.at(iat).name;
-    a.number=iat;
-    a.ijk=sstr.atoms.at(iat).ijk;
-    a.cpos=sstr.atoms.at(iat).cpos;
-    a.fpos=sstr.atoms.at(iat).fpos;//cerr << sstr.atoms.at(iat).fpos << endl;
-    a.type=sstr.atoms.at(iat).type;
-    atom_vec.push_back(a);
-  }
-  double rmin=1e-6;
-  // [OBSOLETE] GetNeighData(atom_vec,sstr,rmin,cutoff,neigh_mat);
-  sstr.GetNeighData(atom_vec,rmin,cutoff,neigh_mat);
-}
+//[CO20220623 - OBSOLETE]// **************************************************************************
+//[CO20220623 - OBSOLETE]// Function GetStrNeighData
+//[CO20220623 - OBSOLETE]// **************************************************************************
+//[CO20220623 - OBSOLETE]// This function collects all the neighbor data out to some
+//[CO20220623 - OBSOLETE]// cutoff and stores it for each atom in the structure.
+//[CO20220623 - OBSOLETE]void xstructure::GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat) const { //RF+CO20200513
+//[CO20220623 - OBSOLETE]  deque<_atom> atom_vec;
+//[CO20220623 - OBSOLETE]  neigh_mat.clear();
+//[CO20220623 - OBSOLETE]  // Get data from str.
+//[CO20220623 - OBSOLETE]  // Set scale to 1 so you don't need to rescale coordinates.
+//[CO20220623 - OBSOLETE]  xstructure sstr(*this);
+//[CO20220623 - OBSOLETE]  // [OBSOLETE]  sstr=ReScale(sstr,1.0);
+//[CO20220623 - OBSOLETE]  sstr.ReScale(1.0);
+//[CO20220623 - OBSOLETE]  // Create atom objects for each atom in structure.
+//[CO20220623 - OBSOLETE]  xvector<int> ijk(3);ijk.clear();
+//[CO20220623 - OBSOLETE]  for(uint iat=0;iat<sstr.atoms.size();iat++) {
+//[CO20220623 - OBSOLETE]    _atom a=sstr.atoms.at(iat);
+//[CO20220623 - OBSOLETE]    a.name=sstr.atoms.at(iat).name;
+//[CO20220623 - OBSOLETE]    a.number=iat;
+//[CO20220623 - OBSOLETE]    a.ijk=sstr.atoms.at(iat).ijk;
+//[CO20220623 - OBSOLETE]    a.cpos=sstr.atoms.at(iat).cpos;
+//[CO20220623 - OBSOLETE]    a.fpos=sstr.atoms.at(iat).fpos;//cerr << sstr.atoms.at(iat).fpos << endl;
+//[CO20220623 - OBSOLETE]    a.type=sstr.atoms.at(iat).type;
+//[CO20220623 - OBSOLETE]    atom_vec.push_back(a);
+//[CO20220623 - OBSOLETE]  }
+//[CO20220623 - OBSOLETE]  double rmin=1e-6;
+//[CO20220623 - OBSOLETE]  // [OBSOLETE] GetNeighData(atom_vec,sstr,rmin,cutoff,neigh_mat);
+//[CO20220623 - OBSOLETE]  sstr.GetNeighData_20220101(atom_vec,rmin,cutoff,neigh_mat);
+//[CO20220623 - OBSOLETE]}
 
 // **************************************************************************
 // Function GetBasisTransformation //DX20201015

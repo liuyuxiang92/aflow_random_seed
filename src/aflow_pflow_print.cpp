@@ -92,8 +92,8 @@ namespace pflow {
     //  oss.setf(std::ios::fixed,std::ios::floatfield);
     //  oss.precision(10);
     deque<deque<_atom> > neigh_mat;
-    // [OBSOLETE]  GetStrNeighData(str,cutoff,neigh_mat);
-    str.GetStrNeighData(cutoff,neigh_mat);   // once PrintAngles goes in xstructure I can remove the copy
+    // [OBSOLETE]  GetNeighData(str,cutoff,neigh_mat);
+    str.GetNeighData(cutoff,neigh_mat);   // once PrintAngles goes in xstructure I can remove the copy  //CO20220623 - using new GetNeighData()
     double tol=1e-15;
 
     // Output header
@@ -793,8 +793,8 @@ namespace pflow {
     int nsh_max=2;
     aurostd::matrix<double> rdf_all_1; //CO20200404 pflow::matrix()->aurostd::matrix()
     aurostd::matrix<double> rdf_all_2; //CO20200404 pflow::matrix()->aurostd::matrix()
-    GetRDF(sstr1,cutoff,nbins,rdf_all_1);
-    GetRDF(sstr2,cutoff,nbins,rdf_all_2);
+    GetRDF_20220101(sstr1,cutoff,nbins,rdf_all_1);
+    GetRDF_20220101(sstr2,cutoff,nbins,rdf_all_2);
     aurostd::matrix<double> rdf_all_1_sm=GetSmoothRDF(rdf_all_1,smooth_width); //CO20200404 pflow::matrix()->aurostd::matrix()
     aurostd::matrix<double> rdf_all_2_sm=GetSmoothRDF(rdf_all_2,smooth_width); //CO20200404 pflow::matrix()->aurostd::matrix()
     // Get shells
@@ -2588,8 +2588,8 @@ namespace pflow {
     //  oss.setf(std::ios::fixed,std::ios::floatfield);
     //  oss.precision(10);
     deque<deque<_atom> > neigh_mat;
-    // [OBSOLETE]  pflow::GetStrNeighData(str,cutoff,neigh_mat);
-    str.GetStrNeighData(cutoff,neigh_mat);
+    // [OBSOLETE]  pflow::GetNeighData(str,cutoff,neigh_mat);
+    str.GetNeighData(cutoff,neigh_mat); //CO20220623 - using new GetNeighData()
     // double tol=1e-15;   //DM not used
     xmatrix<double> lattice(3);
     lattice=str.lattice;
@@ -2655,8 +2655,8 @@ namespace pflow {
     //  oss.setf(std::ios::fixed,std::ios::floatfield);
     oss.precision(10);
     deque<deque<_atom> > neigh_mat;
-    // [OBSOLETE] pflow::GetStrNeighData(str,cutoff,neigh_mat);
-    str.GetStrNeighData(cutoff,neigh_mat);
+    // [OBSOLETE] pflow::GetNeighData(str,cutoff,neigh_mat);  //CO20220623 - using new GetNeighData()
+    str.GetNeighData(cutoff,neigh_mat);                       //CO20220623 - using new GetNeighData()
     //  cerr << "DEBUG: neigh_mat.size()=" << neigh_mat.size() << endl;
     //  for(uint i=0;i<neigh_mat.size();i++)
     //   cerr << "DEBUG: neigh_mat.at(i).size()=" << neigh_mat.at(i).size() << endl;
@@ -4309,7 +4309,7 @@ void GetGoodShellPoints(vector<xvector<double> >& points, const xstructure& str,
 
   // Send atoms to GetNeighData to get their neigh info.
   //[OBSOLETE]  pflow::GetNeighData(atvec,str,rmin,rmax,neigh_mat);
-  sstr.GetNeighData(atvec,rmin,rmax,neigh_mat);
+  sstr.GetNeighData_20220101(atvec,rmin,rmax,neigh_mat);  //CO20220623 - use orig GetNeighData() since input is NOT the atoms of the structure, this routine should be rewritten
 
   // Remove every point that does not have ns atoms in shell.
   deque<deque<_atom> > nnm;

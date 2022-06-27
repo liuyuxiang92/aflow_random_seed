@@ -2206,6 +2206,107 @@ namespace pflow {
 // ***************************************************************************
 // Function GetRDF
 // ***************************************************************************
+namespace pflow {
+  void GetRDF(const xstructure& xstr_in,aurostd::xmatrix<double>& rdf_all,const double rmax,const int nbins,bool raw_counts,const double sigma,const int window_gaussian) { //CO20220624 - new procedure
+    bool LDEBUG=(true || XHOST.DEBUG);
+    xstructure xstr(xstr_in);
+    if(xstr.species.size()==0){xstr.species=aurostd::vector2deque(pflow::getFakeElements(xstr.num_each_type.size()));}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " species=" << aurostd::joinWDelimiter(xstr.species,",") << endl;}
+    deque<_atom> atoms_cell;
+    deque<deque<uint> > i_neighbors;
+    deque<deque<double> > distances;
+    double rmin=0;
+    bool prim=true,unique_only=false;
+    xstr.GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " atoms_cell.size()=" << atoms_cell.size() << endl;}
+    //for compound ABC, need counts for AA, AB, AC, BB, BC, CC
+    //this is bit-enumeration for sets of two (i,j) ensuring i<j
+    vector<vector<int> > _vvitypes,vvitypes;
+    vector<int> vitypes,vsizes;
+    uint i=0,j=0,k=0;
+    for(i=0;i<2;i++){
+      _vvitypes.push_back(vector<int>(0));
+      for(j=0;j<xstr.num_each_type.size();j++){_vvitypes.back().push_back(j);}  //initial set, not all of these are viable options
+      vsizes.push_back(xstr.num_each_type.size());
+    }
+    aurostd::xcombos xc(vsizes,'E');
+    while(xc.increment()){
+      vitypes=xc.applyCombo(_vvitypes);
+      if(vitypes[1]<vitypes[0]){continue;}  //filter so we don't get duplicates
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " vitypes=" << aurostd::joinWDelimiter(vitypes,",") << endl;}
+      vvitypes.push_back(vitypes);
+    }
+
+    rdf_all=aurostd::xmatrix<double>(nbins,vvitypes.size()+1); //resize, +1 because last column will be totals
+    int itype=0,ibin=0;
+    double dist=0.0,rad=0.0;
+    double drad=rmax/(double)nbins; //sphere shell volume=4*pi*r^2*dr
+    for(i=0;i<i_neighbors.size();i++){
+      for(j=0;j<i_neighbors[i].size();j++){
+        dist=distances[i][j];
+        if(dist<rmax){
+          ibin=int((dist/rmax)*nbins)+rdf_all.lrows;
+          //need to figure out which bin to increment
+          //first create vitypes of two atoms, sort just in case
+          vitypes.clear();
+          vitypes.push_back(atoms_cell[i].type);vitypes.push_back(xstr.grid_atoms[i_neighbors[i][j]].type);
+          std::sort(vitypes.begin(),vitypes.end());
+          //search vvitypes for match
+          itype=AUROSTD_MAX_INT;
+          for(k=0;k<vvitypes.size()&&itype==AUROSTD_MAX_INT;k++){
+            if(vitypes==vvitypes[k]){itype=k;}
+          }
+          if(itype==AUROSTD_MAX_INT){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"could not find itype",_INDEX_MISMATCH_);}
+          itype+=rdf_all.lcols; //+1 because xmatrix starts with 1
+          if(LDEBUG){
+            cerr << __AFLOW_FUNC__ << " ibin=" << ibin << " (dist=" << dist << ")" << endl;
+            cerr << __AFLOW_FUNC__ << " itype=" << itype << endl;
+          }
+          rdf_all[ibin][itype]++;
+          rdf_all[ibin][rdf_all.ucols]++;  //last row is totals
+        }
+      }
+    }
+    if(raw_counts==false){
+      for(ibin=rdf_all.lrows;ibin<=rdf_all.urows;ibin++){
+        rad=drad*(ibin-rdf_all.lrows);
+        if(ibin==rdf_all.lrows && !aurostd::iszero(rdf_all[ibin][rdf_all.ucols],_ZERO_TOL_)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"first bin cannot be normalized (rad==0), increase nbins",_VALUE_ILLEGAL_);}
+        for(itype=rdf_all.lcols;itype<=rdf_all.ucols;itype++){
+          if(aurostd::nonZeroWithinTol(rad,_ZERO_TOL_)){rdf_all[ibin][itype]/=(4.0*PI*std::pow(rad,2.0)*drad);}
+        }
+      }
+    }
+    if(!aurostd::iszero(sigma)){  //smooth
+
+    }
+    if(LDEBUG){
+      int padding=8,padding_extra=4;  //4 because of 10,100,1000,neg below
+      string eset="";
+      cerr << aurostd::PaddedPRE("rad",padding+padding_extra) << " ";
+      for(k=0;k<vvitypes.size();k++){
+        eset=xstr.species[vvitypes[k][0]]+"-"+xstr.species[vvitypes[k][1]];
+        cerr << aurostd::PaddedPRE(eset,padding+padding_extra) << " ";
+      }
+      cerr << aurostd::PaddedPRE("total",padding+padding_extra) << " ";
+      cerr << endl;
+      for(ibin=rdf_all.lrows;ibin<=rdf_all.urows;ibin++){
+        rad=drad*(ibin-rdf_all.lrows);
+        cerr << (rad<10?" ":"");
+        cerr << (rad<100?" ":"");
+        cerr << (rad<1000?" ":"");
+        cerr << (std::signbit(rad)?"":" ");
+        cerr << aurostd::PaddedPOST(aurostd::utype2string(rad,padding-2,FIXED_STREAM),padding) << " ";
+        for(itype=rdf_all.lcols;itype<=rdf_all.ucols;itype++){
+          cerr << (rdf_all[ibin][itype]<10?" ":"");
+          cerr << (rdf_all[ibin][itype]<100?" ":"");
+          cerr << (rdf_all[ibin][itype]<1000?" ":"");
+          cerr << (std::signbit(rdf_all[ibin][itype])?"":" ");
+          cerr << aurostd::PaddedPOST(aurostd::utype2string(rdf_all[ibin][itype],padding-2,FIXED_STREAM),padding) << " ";
+        }
+        cerr << endl;
+      }
+    }
+  }
 // This function gets the radial distribution functions (RDF).
 // The RDF for an atom is just a binned histogram of the
 // number of atoms (possibly of a given type) a distance r away.  
@@ -2218,16 +2319,17 @@ namespace pflow {
 // lines (ntypes+1)*natoms+K+(ntypes+1)*J = type J / type K average RDF.
 //    (if row: K=ntypes then the rdf is the type I / All types RDF.)
 // Dane Morgan, Modified by Stefano Curtarolo
-namespace pflow {
-  void GetRDF(xstructure str, const double& rmax,
-      const int& nbins, aurostd::matrix<double>& rdf_all) {  //CO20200404 pflow::matrix()->aurostd::matrix()
+// CO20220627 - not working, tethered to a few old routines, will need to be rewritten (later)
+// use new procedure above GetRDF()
+  void GetRDF_20220101(const xstructure& str, const double rmax,
+      const int nbins, aurostd::matrix<double>& rdf_all) {  //CO20200404 pflow::matrix()->aurostd::matrix()
     int natoms=str.atoms.size();
     std::deque<int> num_each_type=str.num_each_type;
     int ntyp=num_each_type.size();
     rdf_all=aurostd::matrix<double> ((ntyp+1)*natoms,nbins); //CO20200404 pflow::matrix()->aurostd::matrix()
     deque<deque<_atom> > nmat;
-    // [OBSOLETE]    pflow::GetStrNeighData(str,rmax,nmat);
-    str.GetStrNeighData(rmax,nmat);   // once GetRD goes in xstructure I can remove the copy
+    // [OBSOLETE]    pflow::GetNeighData(str,rmax,nmat);  //CO20220623 - using new GetNeighData()
+    str.GetNeighData(rmax,nmat);   // once GetRD goes in xstructure I can remove the copy //CO20220623 - using new GetNeighData()
     // for(int i=0;i<nmat[0].size();i++) cout << AtomDist(nmat[0][0],nmat[0][i]) << " "; cout << endl;
     for(int I1=0;I1<(int)nmat.size();I1++) { // Each atom for which we find RDF.
       int I2=1;
@@ -2498,10 +2600,10 @@ namespace pflow {
 
     deque<deque<_atom> > neigh_mat1;
     deque<deque<_atom> > neigh_mat2;
-    // [OBSOLETE] pflow::GetStrNeighData(str1,cutoff,neigh_mat1);
-    // [OBSOLETE] pflow::GetStrNeighData(str2,cutoff,neigh_mat2);
-    str1.GetStrNeighData(cutoff,neigh_mat1);
-    str2.GetStrNeighData(cutoff,neigh_mat2);
+    // [OBSOLETE] pflow::GetNeighData(str1,cutoff,neigh_mat1);  //CO20220623 - using new GetNeighData()
+    // [OBSOLETE] pflow::GetNeighData(str2,cutoff,neigh_mat2);  //CO20220623 - using new GetNeighData()
+    str1.GetNeighData(cutoff,neigh_mat1); //CO20220623 - using new GetNeighData()
+    str2.GetNeighData(cutoff,neigh_mat2); //CO20220623 - using new GetNeighData()
 
     int ntypes1=(int)str1.num_each_type.size();
     int ntypes2=(int)str2.num_each_type.size();

@@ -278,6 +278,33 @@ namespace aurostd {  // namespace aurostd
   // [OBSOLETE]  long double trunc(long double x) { return (long double) std::truncl((long double) x);}
   // [OBSOLETE]  int trunc(int x) { return (int) std::trunc(double(x));}
   // [OBSOLETE]  long trunc(long x) { return (long) std::trunc(double(x));}
+  
+  int roundDouble(double doub, int multiple, bool up) { //CO20220624 (moved from chull)
+    // rounds double to the nearest (multiple), choose round up or down
+    // http://stackoverflow.com/questions/3407012/c-rounding-up-to-the-nearest-multiple-of-a-number
+    // round up - round further from 0 if doub is positive, closer to 0 if doub is negative
+    // opposite for round down
+    // round up === MORE positive
+    // round down === MORE negative
+    // a little confusing, but a very powerful way to define for AXES MAX/MIN + INTERVALS
+    int numToRound = round(doub);
+    if(multiple == 0) {return numToRound;}
+    int remainder = abs(numToRound) % multiple;
+    if(remainder == 0) {return numToRound;}
+    if(up) {
+      if(numToRound < 0) {return -(abs(numToRound) - remainder);}
+      else {return numToRound + multiple - remainder;}
+    } else {  //down
+      if(numToRound < 0) {return -(abs(numToRound) + (multiple - remainder));}
+      else {return numToRound - remainder;}
+    }
+  }
+  bool greaterEqualZero(double val){return (val>=0.0);} //CO20220624 (moved from chull)
+  bool lessEqualZero(double val){return (val<=0.0);}  //CO20220624 (moved from chull)
+  bool notPositive(double val,bool soft_cutoff,double tol){return (soft_cutoff? val<=tol : lessEqualZero(val));}  //CO20220624 (moved from chull)
+  bool notNegative(double val,bool soft_cutoff,double tol){return (soft_cutoff? val>=-tol : greaterEqualZero(val));}  //CO20220624 (moved from chull)
+  bool zeroWithinTol(double val,double tol){return notPositive(abs(val),true,tol);} //CO20220624 (moved from chull)
+  bool nonZeroWithinTol(double val,double tol){return !zeroWithinTol(val,tol);} //CO20220624 (moved from chull)
 }
 
 namespace aurostd {

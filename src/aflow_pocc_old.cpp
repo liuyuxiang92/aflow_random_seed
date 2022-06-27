@@ -4127,7 +4127,7 @@ namespace pocc {
     const double radius = 10.00; //12;//8.05323*1.5;//10.00; //CO TEST, this number is very important, and not well explained...
     deque<deque<_atom> > neigh_mat;
     xstructure xstr_tmp = xstr;
-    xstr_tmp.GetStrNeighData(radius, neigh_mat); // radius 12 angstrom
+    xstr_tmp.GetNeighData(radius, neigh_mat); // radius 12 angstrom //CO20220623 - using new GetNeighData()
 
     deque<_atom>  atom_tmp_bonded;
     deque<_atom>  atom_tmp_nonbonded;
