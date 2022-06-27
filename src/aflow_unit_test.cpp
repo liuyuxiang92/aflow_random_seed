@@ -278,7 +278,7 @@ namespace unittest {
     XHOST.QUIET = quiet_copy;
     if (!XHOST.QUIET && !XHOST.DEBUG) {
       XHOST.QUIET = quiet_copy;
-      //for (size_t i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.pop_back();
+      for (size_t i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.pop_back();
     }
 
     // Print final summary
