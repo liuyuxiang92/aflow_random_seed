@@ -1854,7 +1854,8 @@ namespace aurostd {
   // Function ProcessKill
   // ***************************************************************************
   //CO20210315
-  void ProcessKill(const string& process,bool user_specific,bool sigkill){ //CO20210315
+  //SD20220627 - Typicall signals that we use to kill processes are 9 (SIGKILL), 15 (SIGTERM) and 5 (SIGTRAP)
+  void ProcessKill(const string& process,bool user_specific,uint signal){ //CO20210315
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::ProcessKill():";
     string command="";
@@ -1865,8 +1866,7 @@ namespace aurostd {
       if(aurostd::IsCommandAvailable("killall")) {
         command="killall";
         if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
-        if(sigkill){command+=" -9";}
-        command+=" "+process+" 2>/dev/null";
+        command+=" -"+aurostd::utype2string(signal)+" "+process+" 2>/dev/null";
         if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
         aurostd::execute(command);
         aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,user_specific));
@@ -1876,8 +1876,7 @@ namespace aurostd {
       if(aurostd::IsCommandAvailable("pkill")) {
         command="pkill";
         if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
-        if(sigkill){command+=" -9";}
-        command+=" "+process+" 2>/dev/null";
+        command+=" -"+aurostd::utype2string(signal)+" "+process+" 2>/dev/null";
         if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
         aurostd::execute(command);
         aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,user_specific));
@@ -1890,8 +1889,7 @@ namespace aurostd {
         else{
           command="kill";
           //[CO20210315 - does not work, user-specific comes from PID search]if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
-          if(sigkill){command+=" -9";}
-          command+=" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
+          command+=" -"+aurostd::utype2string(signal)+" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
           if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
           aurostd::execute(command);
           aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,user_specific));
@@ -1906,7 +1904,7 @@ namespace aurostd {
   }
 
   //SD20220329 - overload to allow for only killing the PIDs with a specific PGID
-  void ProcessKill(const string& process,const string& pgid,bool user_specific,bool sigkill){
+  void ProcessKill(const string& process,const string& pgid,bool user_specific,uint signal){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string soliloquy=XPID+"aurostd::ProcessKill():";
     if(pgid.empty()) {
@@ -1922,8 +1920,7 @@ namespace aurostd {
     if(vpids.empty()){return;}
     string command="kill";
     uint sleep_seconds=5; //2 seconds is too few
-    if(sigkill){command+=" -9";}
-    command+=" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
+    command+=" -"+aurostd::utype2string(signal)+" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
     if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
     aurostd::execute(command);
     aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,pgid,user_specific));

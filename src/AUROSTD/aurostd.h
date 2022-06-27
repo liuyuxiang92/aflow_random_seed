@@ -446,8 +446,8 @@ namespace aurostd {
   vector<string> ProcessPIDs(const string& process,const string& pgid,string& output_syscall,bool user_specific=true); //SD20220329
   bool ProcessRunning(const string& process,bool user_specific=true); //CO20210315
   bool ProcessRunning(const string& process,const string& pgid,bool user_specific=true); //SD20220329
-  void ProcessKill(const string& process,bool user_specific=true,bool sigkill=true); //CO20210315
-  void ProcessKill(const string& process,const string& pgid,bool user_specific=true,bool sigkill=true); //SD20220329
+  void ProcessKill(const string& process,bool user_specific=true,uint signal=9); //CO20210315
+  void ProcessKill(const string& process,const string& pgid,bool user_specific=true,uint signal=9); //SD20220329
   void ProcessRenice(const string& process,int nvalue,bool user_specific=true); //CO20210315
   // about directories and file existing or not
   bool DirectoryMake(string Directory);
