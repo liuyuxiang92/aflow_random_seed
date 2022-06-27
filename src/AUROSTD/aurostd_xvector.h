@@ -255,8 +255,9 @@ namespace aurostd {
   template<class utype> xvector<utype> null_xv() __xprototype;  //CO20200731 - friend so it can access refresh()
   template<class utype> xvector<utype> ones_xv(int=3,int=1) __xprototype;
   template<class utype> xvector<utype> box_filter_xv(int window,int lrows=1) __xprototype;
+  template<class utype> int gaussian_filter_get_window(utype sigma) __xprototype;  //CO20220627
   template<class utype> xvector<utype> gaussian_filter_xv(utype sigma) __xprototype;  //if you need lrows!=1, use shiftlrows()
-  template<class utype> xvector<utype> gaussian_filter_xv(utype sigma,int window,int lrows=1) __xprototype;
+  template<class utype> xvector<utype> gaussian_filter_xv(utype sigma,int window,int lrows=1) __xprototype; //CO20190419
 }
 
 namespace aurostd {

@@ -292,6 +292,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   o+=aurostd::mean(v);aurostd::meanWeighted(v,v);aurostd::meanWeighted(v,v,x);o+=aurostd::var(v,1);o+=aurostd::stddev(v,1);o+=aurostd::mode(v);o+=aurostd::correlation_Pearson_fast(v,v);o+=aurostd::correlation_Pearson_slow(v,v);o+=aurostd::correlation_Pearson_fast(v,x,x,v,x,x); //CO20190520
   v=aurostd::box_filter_xv<utype>(1);v=aurostd::box_filter_xv<utype>(1,1); //CO20190520
   v=aurostd::gaussian_filter_xv<utype>(x);v=aurostd::gaussian_filter_xv<utype>(x,1);v=aurostd::gaussian_filter_xv<utype>(x,1,1); //CO20190520
+  aurostd::gaussian_filter_get_window(x);  //CO20220627
   vector<uint> vii; //CO20190622
   o+=aurostd::getMAD(v,x);v=aurostd::convolution(v,v,0);v=aurostd::convolution(v,v,vii,0);v=aurostd::moving_average(v,x); //CO20190520
   vector<int> peaks=getPeaks(v);peaks=getPeaks(v,w);

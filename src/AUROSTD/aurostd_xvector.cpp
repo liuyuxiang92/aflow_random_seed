@@ -1061,10 +1061,14 @@ namespace aurostd {
     return filter;
   }
 #define STDDEV_TRUNCATE_GAUSSIAN 4 //after 4 stddev's, gaussian is effectively 0
-  template<class utype> xvector<utype> gaussian_filter_xv(utype sigma) __xprototype { //CO20190419
-    int half_width=(int) (sigma * STDDEV_TRUNCATE_GAUSSIAN);
+  template<class utype> int gaussian_filter_get_window(utype sigma) __xprototype { //CO20190419
+    int half_width=(int) (sigma * (utype)STDDEV_TRUNCATE_GAUSSIAN);
     int window=2*half_width+1;
     if(window%2==0){window++;}
+    return window;
+  }
+  template<class utype> xvector<utype> gaussian_filter_xv(utype sigma) __xprototype { //CO20190419
+    int window=gaussian_filter_get_window(sigma);
     return gaussian_filter_xv<utype>(sigma,window); //if you need lrows!=1, use shiftlrows()
   }
   template<class utype> xvector<utype> gaussian_filter_xv(utype sigma,int window,int lrows) __xprototype { //CO20190419

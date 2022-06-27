@@ -13921,7 +13921,7 @@ namespace pflow {
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
-    if(tokens.size()>3){init::ErrorOption(options,__AFLOW_FUNC__,"aflow --rdf[=rmax[,nbins[,sigma[,window_gaussian]]]] [--raw_counts] < POSCAR");}
+    if(tokens.size()>4){init::ErrorOption(options,__AFLOW_FUNC__,"aflow --rdf[=rmax[,nbins[,sigma[,window_gaussian]]]] [--raw_counts] < POSCAR");}
 
     xstructure a(input,IOAFLOW_AUTO);
     double rmax=(double) 5.0;

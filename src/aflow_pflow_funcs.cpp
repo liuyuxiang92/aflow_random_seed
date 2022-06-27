@@ -2207,8 +2207,9 @@ namespace pflow {
 // Function GetRDF
 // ***************************************************************************
 namespace pflow {
-  void GetRDF(const xstructure& xstr_in,aurostd::xmatrix<double>& rdf_all,const double rmax,const int nbins,bool raw_counts,const double sigma,const int window_gaussian) { //CO20220624 - new procedure
+  void GetRDF(const xstructure& xstr_in,aurostd::xmatrix<double>& rdf_all,const double rmax,const int nbins,bool raw_counts,const double sigma,const int _window_gaussian) { //CO20220624 - new procedure
     bool LDEBUG=(true || XHOST.DEBUG);
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
     xstructure xstr(xstr_in);
     if(xstr.species.size()==0){xstr.species=aurostd::vector2deque(pflow::getFakeElements(xstr.num_each_type.size()));}
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " species=" << aurostd::joinWDelimiter(xstr.species,",") << endl;}
@@ -2277,7 +2278,20 @@ namespace pflow {
       }
     }
     if(!aurostd::iszero(sigma)){  //smooth
-
+      aurostd::xvector<double> _xcol,xcol,filter_gaussian;
+      int window_gaussian=_window_gaussian;
+      if(window_gaussian==0){window_gaussian=aurostd::gaussian_filter_get_window(sigma);}
+      filter_gaussian=aurostd::gaussian_filter_xv(sigma,window_gaussian,rdf_all.lrows);
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " filter_gaussian[sigma=" << sigma << ",window_gaussian=" << window_gaussian << "]=" << filter_gaussian << endl;}
+      for(itype=rdf_all.lcols;itype<=rdf_all.ucols;itype++){
+        _xcol=rdf_all.getcol(itype);  //extract column
+        xcol=aurostd::convolution(_xcol,filter_gaussian,CONV_SHAPE_SAME);
+        if(LDEBUG){
+          cerr << __AFLOW_FUNC__ << " xcol(pre)[itype=" << itype << "]=" << _xcol << endl;
+          cerr << __AFLOW_FUNC__ << " xcol(post)[itype=" << itype << "]=" << xcol << endl;
+        }
+        for(ibin=rdf_all.lrows;ibin<=rdf_all.urows;ibin++){rdf_all[ibin][itype]=xcol[ibin];}  //plug back in
+      }
     }
     if(LDEBUG){
       int padding=8,padding_extra=4;  //4 because of 10,100,1000,neg below
@@ -2306,6 +2320,7 @@ namespace pflow {
         cerr << endl;
       }
     }
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " END" << endl;}
   }
 // This function gets the radial distribution functions (RDF).
 // The RDF for an atom is just a binned histogram of the
