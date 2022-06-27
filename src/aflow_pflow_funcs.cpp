@@ -2207,8 +2207,27 @@ namespace pflow {
 // Function GetRDF
 // ***************************************************************************
 namespace pflow {
+  vector<vector<int> > getvvitypesRDF(const xstructure& xstr){  //CO20220627
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    vector<vector<int> > _vvitypes,vvitypes;
+    vector<int> vitypes,vsizes;
+    uint i=0,j=0;
+    for(i=0;i<2;i++){
+      _vvitypes.push_back(vector<int>(0));
+      for(j=0;j<xstr.num_each_type.size();j++){_vvitypes.back().push_back(j);}  //initial set, not all of these are viable options
+      vsizes.push_back(xstr.num_each_type.size());
+    }
+    aurostd::xcombos xc(vsizes,'E');
+    while(xc.increment()){
+      vitypes=xc.applyCombo(_vvitypes);
+      if(vitypes[1]<vitypes[0]){continue;}  //filter so we don't get duplicates
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " vitypes=" << aurostd::joinWDelimiter(vitypes,",") << endl;}
+      vvitypes.push_back(vitypes);
+    }
+    return vvitypes;
+  }
   void GetRDF(const xstructure& xstr_in,aurostd::xmatrix<double>& rdf_all,const double rmax,const int nbins,bool raw_counts,const double sigma,const int _window_gaussian) { //CO20220624 - new procedure
-    bool LDEBUG=(true || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
     xstructure xstr(xstr_in);
     if(xstr.species.size()==0){xstr.species=aurostd::vector2deque(pflow::getFakeElements(xstr.num_each_type.size()));}
@@ -2222,26 +2241,13 @@ namespace pflow {
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " atoms_cell.size()=" << atoms_cell.size() << endl;}
     //for compound ABC, need counts for AA, AB, AC, BB, BC, CC
     //this is bit-enumeration for sets of two (i,j) ensuring i<j
-    vector<vector<int> > _vvitypes,vvitypes;
-    vector<int> vitypes,vsizes;
-    uint i=0,j=0,k=0;
-    for(i=0;i<2;i++){
-      _vvitypes.push_back(vector<int>(0));
-      for(j=0;j<xstr.num_each_type.size();j++){_vvitypes.back().push_back(j);}  //initial set, not all of these are viable options
-      vsizes.push_back(xstr.num_each_type.size());
-    }
-    aurostd::xcombos xc(vsizes,'E');
-    while(xc.increment()){
-      vitypes=xc.applyCombo(_vvitypes);
-      if(vitypes[1]<vitypes[0]){continue;}  //filter so we don't get duplicates
-      if(LDEBUG){cerr << __AFLOW_FUNC__ << " vitypes=" << aurostd::joinWDelimiter(vitypes,",") << endl;}
-      vvitypes.push_back(vitypes);
-    }
-
+    vector<vector<int> > vvitypes=getvvitypesRDF(xstr);
     rdf_all=aurostd::xmatrix<double>(nbins,vvitypes.size()+1); //resize, +1 because last column will be totals
     int itype=0,ibin=0;
     double dist=0.0,rad=0.0;
     double drad=rmax/(double)nbins; //sphere shell volume=4*pi*r^2*dr
+    vector<int> vitypes;
+    uint i=0,j=0,k=0;
     for(i=0;i<i_neighbors.size();i++){
       for(j=0;j<i_neighbors[i].size();j++){
         dist=distances[i][j];
@@ -2293,33 +2299,7 @@ namespace pflow {
         for(ibin=rdf_all.lrows;ibin<=rdf_all.urows;ibin++){rdf_all[ibin][itype]=xcol[ibin];}  //plug back in
       }
     }
-    if(LDEBUG){
-      int padding=8,padding_extra=4;  //4 because of 10,100,1000,neg below
-      string eset="";
-      cerr << aurostd::PaddedPRE("rad",padding+padding_extra) << " ";
-      for(k=0;k<vvitypes.size();k++){
-        eset=xstr.species[vvitypes[k][0]]+"-"+xstr.species[vvitypes[k][1]];
-        cerr << aurostd::PaddedPRE(eset,padding+padding_extra) << " ";
-      }
-      cerr << aurostd::PaddedPRE("total",padding+padding_extra) << " ";
-      cerr << endl;
-      for(ibin=rdf_all.lrows;ibin<=rdf_all.urows;ibin++){
-        rad=drad*(ibin-rdf_all.lrows);
-        cerr << (rad<10?" ":"");
-        cerr << (rad<100?" ":"");
-        cerr << (rad<1000?" ":"");
-        cerr << (std::signbit(rad)?"":" ");
-        cerr << aurostd::PaddedPOST(aurostd::utype2string(rad,padding-2,FIXED_STREAM),padding) << " ";
-        for(itype=rdf_all.lcols;itype<=rdf_all.ucols;itype++){
-          cerr << (rdf_all[ibin][itype]<10?" ":"");
-          cerr << (rdf_all[ibin][itype]<100?" ":"");
-          cerr << (rdf_all[ibin][itype]<1000?" ":"");
-          cerr << (std::signbit(rdf_all[ibin][itype])?"":" ");
-          cerr << aurostd::PaddedPOST(aurostd::utype2string(rdf_all[ibin][itype],padding-2,FIXED_STREAM),padding) << " ";
-        }
-        cerr << endl;
-      }
-    }
+    if(LDEBUG){PrintRDF(xstr,rmax,nbins,rdf_all,cerr);}
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " END" << endl;}
   }
 // This function gets the radial distribution functions (RDF).

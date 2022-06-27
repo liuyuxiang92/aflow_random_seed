@@ -1043,6 +1043,76 @@ namespace pocc {
     return t_ss.str();
   }
 
+  void POccCalculator::setAvgRDF(double temperature){
+    bool LDEBUG=(true || _DEBUG_POCC_ || XHOST.DEBUG);
+    stringstream message;
+
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
+
+    if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+    if(m_ARUN_directories.size()!=l_supercell_sets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"m_ARUN_directories.size()!=l_supercell_sets.size()",_RUNTIME_ERROR_);}
+
+    setPOccStructureProbabilities(temperature); //done in calculateRELAXProperties() - repetita iuvant
+
+    //check if pdos can be averaged
+    //depends not only the number of atoms (after relaxation), but also whether species/num_each_type are identical
+    bool perform_rdf=true;
+    vector<string> vspecies,_vspecies;
+    deque<int> num_each_type;
+    xstructure xstr;
+    unsigned long long int isupercell=0;
+    string POSCAR_file="";
+    bool found_POSCAR_file=false;
+    uint i=0;
+    double rmax=50;
+    int nbins=50;
+    bool raw_counts=false;
+    double sigma=0;
+    int window_gaussian=0;
+    aurostd::xmatrix<double> rdf_all;
+    m_rdf_all.clear();
+    for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end()&&perform_rdf==true;++it){
+      isupercell=std::distance(l_supercell_sets.begin(),it);
+      if(aflowlib::GetSpeciesDirectory(getARUNDirectoryPath(isupercell),_vspecies)==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Cannot extract vspecies from "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
+      found_POSCAR_file=false;
+      if(found_POSCAR_file==false){found_POSCAR_file=aurostd::EFileExist(getARUNDirectoryPath(isupercell)+"/CONTCAR.relax",POSCAR_file);}
+      if(found_POSCAR_file==false){found_POSCAR_file=aurostd::EFileExist(getARUNDirectoryPath(isupercell)+"/CONTCAR.relax"+aurostd::utype2string(m_relaxation_max),POSCAR_file);}
+      if(found_POSCAR_file==false){
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"CONTCAR.relax"+aurostd::utype2string(m_relaxation_max)+" not found in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);
+      }
+      xstr.clear();
+      xstr.initialize(POSCAR_file,IOVASP_POSCAR);
+      if(LDEBUG){
+        cerr << __AFLOW_FUNC__ << " xstr[isupercell=" << isupercell << "]=" << endl << xstr;
+        cerr << __AFLOW_FUNC__ << " xstr.atoms.size()=" << xstr.atoms.size() << endl;
+        cerr << __AFLOW_FUNC__ << " xstr.num_each_type=" << aurostd::joinWDelimiter(xstr.num_each_type,",") << endl;
+        cerr << __AFLOW_FUNC__ << " vspecies=" << aurostd::joinWDelimiter(_vspecies,",") << endl;
+      }
+      if(xstr.species.empty()||(xstr.species.size()>0 && xstr.species[0].empty())){xstr.SetSpecies(aurostd::vector2deque(_vspecies));}
+      if(isupercell==0){
+        vspecies.clear();for(i=0;i<_vspecies.size();i++){vspecies.push_back(_vspecies[i]);}
+        num_each_type.clear();for(i=0;i<xstr.num_each_type.size();i++){num_each_type.push_back(xstr.num_each_type[i]);}
+        //
+        pflow::GetRDF(xstr,rdf_all,rmax,nbins,raw_counts,sigma,window_gaussian);
+        m_rdf_all=(*it).m_probability * rdf_all;
+      }else{
+        if(perform_rdf && (vspecies!=_vspecies)){
+          message << "Found a mismatch in vspecies in " << m_ARUN_directories[isupercell] << ", not performing pdos averaging";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+          perform_rdf=false;
+        }
+        if(perform_rdf && (num_each_type!=xstr.num_each_type)){
+          message << "Found a mismatch in num_each_type in " << m_ARUN_directories[isupercell] << ", not performing pdos averaging";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+          perform_rdf=false;
+        }
+        //
+        pflow::GetRDF(xstr,rdf_all,rmax,nbins,raw_counts,sigma,window_gaussian);
+        m_rdf_all+=(*it).m_probability * rdf_all;
+      }
+    }
+    if(perform_rdf==false){m_rdf_all.clear();return;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " m_rdf_all=" << endl << m_rdf_all << endl;}
+  }
+
   void POccCalculator::setAvgDOSCAR(double temperature){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"POccCalculator::setAvgDOSCAR():";
@@ -1337,14 +1407,14 @@ namespace pocc {
     if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
 
     //get most relaxed outcar
-    uint i=0,max=10,max_found=0;
+    uint i=0,max=10,m_relaxation_max=0;
     for(i=1;i<=max;i++){  //i=max;i<=max;i--
-      if(aurostd::EFileExist(getARUNDirectoryPath(0)+"/OUTCAR.relax"+aurostd::utype2string(i))){max_found=i;}
+      if(aurostd::EFileExist(getARUNDirectoryPath(0)+"/OUTCAR.relax"+aurostd::utype2string(i))){m_relaxation_max=i;}
       else{break;}
     }
-    if(max_found==0){return;} //no runs completed
+    if(m_relaxation_max==0){return;} //no runs completed
 
-    string OUTCAR_relax="OUTCAR.relax"+aurostd::utype2string(max_found);
+    string OUTCAR_relax="OUTCAR.relax"+aurostd::utype2string(m_relaxation_max);
     if(LDEBUG){cerr << soliloquy << " OUTCAR_relax=" << OUTCAR_relax << endl;}
 
     bool found_all_OUTCARs=true;
@@ -1357,6 +1427,7 @@ namespace pocc {
     if(!found_all_OUTCARs){return;}
 
     setPOccStructureProbabilities(temperature);
+    setAvgRDF(temperature);
   }
 
   void POccCalculator::calculateSTATICProperties(double temperature){
@@ -2394,8 +2465,10 @@ namespace pocc {
     m_temperature_precision=TEMPERATURE_PRECISION;
     m_zero_padding_temperature=0;
     m_temperatures_int=false;
+    m_relaxation_max=AUROSTD_MAX_UINT;
     m_energy_dft_ground=AUROSTD_MAX_DOUBLE;
     m_ARUN_directory_ground=AUROSTD_MAX_UINT;
+    m_rdf_all.clear();
     m_xdoscar.clear();
     m_Egap_DOS.clear();
     m_Egap.clear();
@@ -2437,10 +2510,12 @@ namespace pocc {
     m_temperature_precision=b.m_temperature_precision;
     m_zero_padding_temperature=b.m_zero_padding_temperature;
     m_temperatures_int=b.m_temperatures_int;
+    m_relaxation_max=b.m_relaxation_max;
     m_energy_dft_ground=b.m_energy_dft_ground;
     m_convolution=b.m_convolution;
     m_ARUN_directory_ground=b.m_ARUN_directory_ground;
     m_ARUN_directories.clear();for(uint i=0;i<b.m_ARUN_directories.size();i++){m_ARUN_directories.push_back(b.m_ARUN_directories[i]);}
+    m_rdf_all=b.m_rdf_all;
     m_xdoscar=b.m_xdoscar;
     m_Egap_DOS.clear();for(uint ispin=0;ispin<b.m_Egap_DOS.size();ispin++){m_Egap_DOS.push_back(b.m_Egap_DOS[ispin]);}
     m_Egap.clear();for(uint ispin=0;ispin<b.m_Egap.size();ispin++){m_Egap.push_back(b.m_Egap[ispin]);}

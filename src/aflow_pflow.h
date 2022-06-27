@@ -535,7 +535,8 @@ void PrintNdata(const xstructure&,ostream& oss=cout);
 //void PrintNeatProj(projdata& pd);
 void PrintPDB(const xstructure&,ostream& oss=cout);
 void platon2print(xstructure,bool P_EQUAL,bool P_EXACT,double P_ang,double P_d1,double P_d2,double P_d3,ostream& sout);
-void PrintRDF(const xstructure& str,const double& rmax,const int& nbins,const int& smooth_width,const aurostd::matrix<double>& rdf_all,
+void PrintRDF(const xstructure& xstr,const double rmax,const int nbins,const xmatrix<double>& rdf_all,ostream& oss=cout); //CO20220627
+void PrintRDF_20220101(const xstructure& str,const double& rmax,const int& nbins,const int& smooth_width,const aurostd::matrix<double>& rdf_all,
     aurostd::matrix<double>& rdfsh_all,aurostd::matrix<double>& rdfsh_loc,ostream& oss=cout);  //CO20200404 pflow::matrix()->aurostd::matrix()
 void PrintRDFCmp(const xstructure& str_A,const xstructure& str_B,const double& rmax,const int nbins,
     const double& smooth_width,const int nsh,const aurostd::matrix<double>& rdfsh_all_A,
@@ -586,6 +587,7 @@ namespace pflow {
   void GetXrayData(const xstructure& str,vector<double>& dist,vector<double>& sf,
       vector<double>& scatt_fact,vector<double>& mass,vector<double>& twoB_vec,
       vector<vector<double> >& ids,aurostd::matrix<double>& data,double lambda=XRAY_RADIATION_COPPER_Kalpha);  //CO20190409  //CO20190620 - intmax can be grabbed later  //CO20200404 pflow::matrix()->aurostd::matrix()
+  vector<vector<int> > getvvitypesRDF(const xstructure& xstr);  //CO20220627
   void GetRDF(const xstructure& xstr,aurostd::xmatrix<double>& rdf_all,const double rmax=5.0,const int nbins=25,bool raw_counts=false,const double sigma=0.0,const int window_gaussian=0);  //CO20220627 - rewritten
   void GetRDF_20220101(const xstructure& xstr,const double rmax,const int nbins,aurostd::matrix<double>& rdf_all);  //CO20200404 pflow::matrix()->aurostd::matrix() //CO20220627 - rewrite later
   void GetRDFShells(const xstructure& str,const double& rmax,const int& nbins,const int& smooth_width,

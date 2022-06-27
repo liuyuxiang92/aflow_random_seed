@@ -13924,13 +13924,13 @@ namespace pflow {
     if(tokens.size()>4){init::ErrorOption(options,__AFLOW_FUNC__,"aflow --rdf[=rmax[,nbins[,sigma[,window_gaussian]]]] [--raw_counts] < POSCAR");}
 
     xstructure a(input,IOAFLOW_AUTO);
+    if(a.species.size()==0){a.species=aurostd::vector2deque(pflow::getFakeElements(a.num_each_type.size()));}
     double rmax=(double) 5.0;
     int nbins=(int) 25;
     double sigma=(int) 0;
     int window_gaussian=(int) 0;
-    if(LDEBUG){cerr << XPID << "pflow::RDF: tokens.size()=" << tokens.size() << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " tokens.size()=" << tokens.size() << endl;}
     if(tokens.size()>=1){rmax=aurostd::string2utype<double>(tokens[0]);}
-    if(tokens.size()>=1){cerr << XPID << "pflow::RDF: tokens[0]=" << tokens[0] << endl;}
     if(tokens.size()>=2){nbins=aurostd::string2utype<int>(tokens[1]);}
     if(tokens.size()>=3){sigma=aurostd::string2utype<double>(tokens[2]);}
     if(tokens.size()>=4){window_gaussian=aurostd::string2utype<int>(tokens[3]);}
@@ -13939,7 +13939,11 @@ namespace pflow {
     pflow::GetRDF(a,rdf_all,rmax,nbins,raw_counts,sigma,window_gaussian);
     //to be implemented/patched later: GetRDFShells()
     //this function is supposed to count the number of wiggles in the rdf above/below horizontal asymptote (constant)
-    
+    cout << aflow::Banner("BANNER_TINY") << endl;
+    PrintRDF(a,rmax,nbins,rdf_all,cout);
+
+    //stringstream gout;
+    //xoption plotoptions;
 
     //[CO20220625 - OBSOLETE]cerr << "[1]" << endl;
     //[CO20220625 - OBSOLETE]cerr << "[1]" << endl;
@@ -13949,8 +13953,9 @@ namespace pflow {
     //[CO20220625 - OBSOLETE]aurostd::matrix<double> rdfsh_all; //CO20200404 pflow::matrix()->aurostd::matrix()
     //[CO20220625 - OBSOLETE]aurostd::matrix<double> rdfsh_loc; // Radial location of rdf shells. //CO20200404 pflow::matrix()->aurostd::matrix()
     //[CO20220625 - OBSOLETE]pflow::GetRDFShells(a,rmax,nbins,smooth_width,rdf_all_sm,rdfsh_all,rdfsh_loc);
-    //[CO20220625 - OBSOLETE]PrintRDF(a,rmax,nbins,smooth_width,rdf_all_sm,rdfsh_all,rdfsh_loc,cout);
-    //[CO20220625 - OBSOLETE]if(LDEBUG) cerr << soliloquy << " END" << endl;
+    //[CO20220625 - OBSOLETE]PrintRDF_20220101(a,rmax,nbins,smooth_width,rdf_all_sm,rdfsh_all,rdfsh_loc,cout);
+    
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " END" << endl;}
   }
 } // namespace pflow
 

@@ -538,8 +538,10 @@ namespace pocc {
       int m_temperature_precision;
       int m_zero_padding_temperature;
       bool m_temperatures_int;
+      uint m_relaxation_max;
       double m_energy_dft_ground;
       uint m_ARUN_directory_ground;
+      aurostd::xmatrix<double> m_rdf_all;
       xDOSCAR m_xdoscar;
       vector<double> m_Egap_DOS,m_Egap;
       double m_Egap_DOS_net,m_Egap_net;
@@ -686,6 +688,7 @@ namespace pocc {
       void calculatePlasmonicProperties(double temperature=300);
       void setPOccStructureProbabilities(double temperature=300); //room temperature
       string getTemperatureString(double temperature) const;
+      void setAvgRDF(double temperature=300);  //depends on probabilities
       void setAvgDOSCAR(double temperature=300);  //depends on probabilities
       void setAvgPlasmonicData(double temperature=300);  //depends on probabilities
       void plotAvgDOSCAR(double temperature) const; //no default temperature, needs to be set inside setAvgDOSCAR()

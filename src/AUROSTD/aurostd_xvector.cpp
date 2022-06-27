@@ -3231,7 +3231,7 @@ namespace aurostd {
           cerr << soliloquy << " k=" << k << " j=" << j << " ind=" << ind << endl;
 #endif
           conv[k]+=signal_input[j]*response_input[ind];
-          sum_counts_full[k]++;
+          sum_counts_full[k-conv.lrows]++;  //CO20220627 - BIG BUG, need to make sure to subtract conv.lrows
         }else{ //keep k that require zero-padding (invalid indices), contains duplicates, but don't do work unless needed
           if(k_added==false){
             ind_zero_padding.push_back(k);

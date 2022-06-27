@@ -3228,9 +3228,45 @@ void PrintRBPoscarDisp(const xstructure& diffstr, double& totdist,
 // **************************************************************************
 // PrintRDF
 // **************************************************************************
+void PrintRDF(const xstructure& xstr,const double rmax,const int nbins,const xmatrix<double>& rdf_all,ostream& oss){ //CO20220627 - new procedure
+  int padding=8,padding_extra=5;  //4 because of 10,100,1000,neg below
+  string eset="";
+  vector<vector<int> > vvitypes=pflow::getvvitypesRDF(xstr);
+  double rad=0.0;
+  double drad=rmax/(double)nbins; //sphere shell volume=4*pi*r^2*dr
+  uint k=0;
+  int ibin=0,itype=0;
+  oss << aurostd::PaddedPOST("#bin",padding) << " ";
+  oss << aurostd::PaddedPRE("rad",padding+padding_extra) << " ";
+  for(k=0;k<vvitypes.size();k++){
+    eset=xstr.species[vvitypes[k][0]]+"-"+xstr.species[vvitypes[k][1]];
+    oss << aurostd::PaddedPRE(eset,padding+padding_extra) << " ";
+  }
+  oss << aurostd::PaddedPRE("total",padding+padding_extra) << " ";
+  oss << endl;
+  for(ibin=rdf_all.lrows;ibin<=rdf_all.urows;ibin++){
+    oss << aurostd::PaddedPOST(aurostd::utype2string(ibin,padding-3,FIXED_STREAM),padding) << " ";
+    rad=drad*(ibin-rdf_all.lrows);
+    oss << (rad<10?" ":"");
+    oss << (rad<100?" ":"");
+    oss << (rad<1000?" ":"");
+    oss << (rad<10000?" ":"");
+    oss << (std::signbit(rad)?"":" ");
+    oss << aurostd::PaddedPOST(aurostd::utype2string(rad,padding-2,FIXED_STREAM),padding) << " ";
+    for(itype=rdf_all.lcols;itype<=rdf_all.ucols;itype++){
+      oss << (rdf_all[ibin][itype]<10?" ":"");
+      oss << (rdf_all[ibin][itype]<100?" ":"");
+      oss << (rdf_all[ibin][itype]<1000?" ":"");
+      oss << (rdf_all[ibin][itype]<10000?" ":"");
+      oss << (std::signbit(rdf_all[ibin][itype])?"":" ");
+      oss << aurostd::PaddedPOST(aurostd::utype2string(rdf_all[ibin][itype],padding-2,FIXED_STREAM),padding) << " ";
+    }
+    oss << endl;
+  }
+}
 // This function prints out the RDF information.
 // Dane Morgan - Stefano Curtarolo
-void PrintRDF(const xstructure& str, const double& rmax,
+void PrintRDF_20220101(const xstructure& str, const double& rmax,
     const int& nbins,
     const int& smooth_width,
     const aurostd::matrix<double>& rdf_all,  //CO20200404 pflow::matrix()->aurostd::matrix()
