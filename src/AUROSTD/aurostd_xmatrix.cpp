@@ -65,10 +65,10 @@ namespace aurostd {  // namespace aurostd
         << ", rows="  << rows  << ", cols="  << cols << endl;
 #endif
       if(msize>0) {
-        corpus=new utype *[rows+XXEND];
+        corpus=new utype *[rows+XXEND]();  //HE20220613 initialize corpus memory
         if(!corpus){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::xmatrix():","allocation failure 1 (int,int,int,int)",_ALLOC_ERROR_);}
         corpus+= -lrows+ XXEND;
-        corpus[lrows]= new utype[rows*cols+XXEND];
+        corpus[lrows]= new utype[rows*cols+XXEND]();  //HE20220613 initialize corpus memory
         if(!corpus[lrows]){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::xmatrix():","allocation failure 2 (int,int,int,int)",_ALLOC_ERROR_);}
         corpus[lrows]+= -lcols+XXEND;
         for(int i=lrows+1;i<=urows;i++){corpus[i]=corpus[i-1]+cols;}  //this propagates previous line to all lrows
@@ -83,9 +83,31 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>                                       // copy constructor
-    xmatrix<utype>::xmatrix(const xmatrix<utype>& b) : msize(0) {copy(b);}  //CO20191112
+    xmatrix<utype>::xmatrix(const xmatrix<utype>& b) {
+      init();
+      copy(b);
+    }  //CO20191112
   template<class utype>                                       // copy constructor
-    xmatrix<utype>::xmatrix(const xvector<utype>& b) : msize(0) {copy(b);}  //CO20191112
+    xmatrix<utype>::xmatrix(const xvector<utype>& b) {
+      init();
+      copy(b);
+    }  //CO20191112
+  template<class utype>  // initializer_list constructor //HE20220616
+  xmatrix<utype>::xmatrix(const std::initializer_list<std::initializer_list<utype>> ll) {
+    // usage: xmatrix<double> new_matrix({{1,0, 2.0, 3.0, 4.0},
+    //                                    {5,0, 6.0, 7.0, 8.0}});
+    init();
+    copy(ll);
+  }
+
+  template<class utype>
+  void xmatrix<utype>::init(){  //HE20220613 initialize all members of xmatrix
+    rows=0; lrows=0; urows= 0;
+    cols=0; lcols=0; ucols=0;
+    issquare=false; isfloat=false; iscomplex=false;
+    size=0; msize=0;
+  }
+
 }
 
 namespace aurostd {  // namespace aurostd
@@ -101,10 +123,10 @@ namespace aurostd {  // namespace aurostd
         << ", rows="  << rows  << ", cols="  << cols << endl;
 #endif
       if(msize>0) {
-        corpus=new utype *[rows+XXEND];
+        corpus=new utype *[rows+XXEND]();  //HE20220613 initialize corpus memory
         if(!corpus){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::xmatrix():","allocation failure 1 (int,int,utype*)",_ALLOC_ERROR_);}
         corpus+= -lrows+ XXEND;
-        corpus[lrows]= new utype[rows*cols+XXEND];
+        corpus[lrows]= new utype[rows*cols+XXEND]();  //HE20220613 initialize corpus memory
         if(!corpus[lrows]){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::xmatrix():","allocation failure 2 (int,int,utype*)",_ALLOC_ERROR_);}
         corpus[lrows]+= -lcols+XXEND;
         int i=0,j=0;
@@ -174,10 +196,10 @@ namespace aurostd {  // namespace aurostd
           << ", rows="  << rows  << ", cols="  << cols << endl;
 #endif
         if(msize>0) {
-          corpus=new utype *[rows+XXEND];
+          corpus=new utype *[rows+XXEND]();  //HE20220613 initialize corpus memory
           if(!corpus){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::copy():","allocation failure 1 in COPY",_ALLOC_ERROR_);}
           corpus+= -lrows+ XXEND;
-          corpus[lrows]= new utype[rows*cols+XXEND];
+          corpus[lrows]= new utype[rows*cols+XXEND]();  //HE20220613 initialize corpus memory
           if(!corpus[lrows]){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xmatrix<utype>::copy():","allocation failure 2 in COPY",_ALLOC_ERROR_);}
           corpus[lrows]+= -lcols+XXEND;
           for(int i=lrows+1;i<=urows;i++){corpus[i]=corpus[i-1]+cols;}  //this propagates previous line to all lrows
@@ -202,6 +224,28 @@ namespace aurostd {  // namespace aurostd
       for(int i=b.lrows;i<=b.urows;i++){a[i][1]=b[i];}
       copy(a);
     }
+   template<class utype>
+    void xmatrix<utype>::copy(std::initializer_list<std::initializer_list<utype>> ll) { //HE20220616
+      int ll_rows = ll.size();
+      int ll_cols = ll.begin()->size();
+      xmatrix<utype> a(ll_rows,ll_cols,1,1);
+      size_t new_row = 0;
+      size_t new_col = 0;
+      for (il2i l=ll.begin(); l<ll.end(); l++){
+        new_row += 1;
+        if (ll_cols != (int) l->size()) {
+          stringstream message;
+          message << "failure in copy - column size size mismatch ";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+        }
+        for (ili entry = l->begin(); entry < l->end(); entry++) {
+          new_col += 1;
+          a[new_row][new_col] = *entry;
+        }
+        new_col = 0;
+      }
+      copy(a);
+    }
 }
 
 namespace aurostd {  // namespace aurostd
@@ -210,6 +254,14 @@ namespace aurostd {  // namespace aurostd
       if(this!=&b) {copy(b);}
       return *this;
     }
+  template<class utype>                                             // operator =
+  xmatrix<utype>& xmatrix<utype>::operator=(const std::initializer_list<std::initializer_list<utype>> ll) {  //CO20191112
+    // usage: xmatrix<double> new_matrix;
+    // new_matrix = {{1,0, 2.0, 3.0, 4.0},
+    //               {5,0, 6.0, 7.0, 8.0}};
+    copy(ll);
+    return *this;
+  }
 }
 
 namespace aurostd {  // namespace aurostd
@@ -490,31 +542,6 @@ namespace aurostd {  // namespace aurostd
   template<class utype>                        // operator () boundary conditions
     // removed inline
     utype& xmatrix<utype>::operator()(int i,int j,bool bc) const {
-      if(bc==BOUNDARY_CONDITIONS_NONE) {
-#ifdef _XMATRIX_CHECK_BOUNDARIES_
-        if(i>urows) {
-          stringstream message;
-          message << "M -> i=" << i << " > urows=" << urows;
-          throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
-        }
-        if(i<lrows) {
-          stringstream message;
-          message << "M -> i=" << i << " < lrows=" << lrows;
-          throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
-        }
-        if(j>ucols) {
-          stringstream message;
-          message << "M -> j=" << j << " > ucols=" << ucols;
-          throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
-        }
-        if(j<lcols) {
-          stringstream message;
-          message << "M -> j=" << j << " < lcols=" << lcols;
-          throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
-        }
-#endif
-        return corpus[i][j];
-      }
       if(bc==BOUNDARY_CONDITIONS_PERIODIC) {
         int ii=i,jj=j;
         if(ii==urows+1) ii=lrows; // fast switching
@@ -549,6 +576,31 @@ namespace aurostd {  // namespace aurostd
 #endif
         return corpus[ii][jj];
       }
+      else { // ensure that this function always hit a return //HE20220616
+#ifdef _XMATRIX_CHECK_BOUNDARIES_
+          if(i>urows) {
+            stringstream message;
+            message << "M -> i=" << i << " > urows=" << urows;
+            throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+          }
+          if(i<lrows) {
+            stringstream message;
+            message << "M -> i=" << i << " < lrows=" << lrows;
+            throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+          }
+          if(j>ucols) {
+            stringstream message;
+            message << "M -> j=" << j << " > ucols=" << ucols;
+            throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+          }
+          if(j<lcols) {
+            stringstream message;
+            message << "M -> j=" << j << " < lcols=" << lcols;
+            throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+          }
+#endif
+          return corpus[i][j];
+      }
     }
 }
 
@@ -578,6 +630,30 @@ namespace aurostd {  // namespace aurostd
           corpus[i+lrows][j+lcols]+=r[i+r.lrows][j+r.lcols];
       return *this;
     }
+
+  template<class utype> xmatrix<utype>&
+  xmatrix<utype>::operator +=(const std::initializer_list<std::initializer_list<utype>> ll){ //HE20220616
+    int ll_rows = ll.size();
+    int ll_cols = ll.begin()->size();
+    if(this->rows!=ll_rows||this->cols!=ll_cols) {
+      string message = "shape miss-match";
+      throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+    }
+    size_t new_row = lrows;
+    size_t new_col = lcols;
+    for (il2i l=ll.begin(); l<ll.end(); l++){
+      if (ll_cols != (int) l->size()) {
+        string message = "column size size mismatch ";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+      }
+      for (ili entry = l->begin(); entry < l->end(); entry++) {
+        corpus[new_row][new_col] += *entry;
+        new_col += 1;
+      }
+      new_row += 1;
+    }
+    return *this;
+  }
 }
 
 // -------------------------------------------------- operator xmatrix -= xmatrix
@@ -603,6 +679,30 @@ namespace aurostd {  // namespace aurostd
           corpus[i+lrows][j+lcols]-=r[i+r.lrows][j+r.lcols];
       return *this;
     }
+  template<class utype> xmatrix<utype>&
+  xmatrix<utype>::operator -=(const std::initializer_list<std::initializer_list<utype>> ll) {//HE20220616
+    int ll_rows = ll.size();
+    int ll_cols = ll.begin()->size();
+    if(this->rows!=ll_rows||this->cols!=ll_cols) {
+      string message = "shape miss-match";
+      throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+    }
+    size_t new_row = lrows;
+    size_t new_col = lcols;
+    for (il2i l=ll.begin(); l<ll.end(); l++){
+      if (ll_cols != (int) l->size()) {
+        string message = "column size size mismatch ";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+      }
+      for (ili entry = l->begin(); entry < l->end(); entry++) {
+        corpus[new_row][new_col] -= *entry;
+        new_col += 1;
+      }
+      new_row += 1;
+    }
+    return *this;
+  }
+
 }
 
 // -------------------------------------------------- operator xmatrix *= xmatrix
@@ -6069,8 +6169,8 @@ namespace aurostd {
     xmatrix2matrix(const xmatrix<utype>& _xmatrix) {
       int isize=_xmatrix.rows,jsize=_xmatrix.cols;
       matrix<utype> _matrix(isize,jsize);
-      for(register int i=0;i<isize;i++)
-        for(register int j=0;j<jsize;j++)
+      for(int i=0;i<isize;i++)   //HE20220124 removed register as it is deprecated in C++11 and gone in C++17
+        for(int j=0;j<jsize;j++) //Defect report 809 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4193.html#809
           _matrix[i][j]=_xmatrix(i+_xmatrix.lrows,j+_xmatrix.lcols);
       return _matrix;
     }
@@ -6088,8 +6188,8 @@ namespace aurostd {
     matrix2xmatrix(const matrix<utype>& _matrix) {
       int isize=_matrix.size(),jsize=_matrix[0].size();
       xmatrix<utype> _xmatrix(isize,jsize);
-      for(register int i=1;i<=isize;i++)
-        for(register int j=1;j<=jsize;j++)
+      for(int i=1;i<=isize;i++)   //HE20220124 removed register as it is deprecated in C++11 and gone in C++17
+        for(int j=1;j<=jsize;j++) //Defect report 809 http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4193.html#809
           _xmatrix(i,j)=_matrix[i-1][j-1];
       return _xmatrix;
     }
@@ -6099,7 +6199,17 @@ namespace aurostd {
 }
 
 // **************************************************************************
-
+namespace aurostd { //force the compiler to instantiate the template at this point (avoids linker issues)
+  template class xmatrix<int>;
+  template class xmatrix<unsigned int>;
+  template class xmatrix<long int>;
+  template class xmatrix<long unsigned int>;
+  template class xmatrix<long long int>;
+  template class xmatrix<long long unsigned int>;
+  template class xmatrix<float>;
+  template class xmatrix<double>;
+  template class xmatrix<long double>;
+}
 
 
 #endif
