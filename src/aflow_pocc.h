@@ -542,6 +542,8 @@ namespace pocc {
       double m_energy_dft_ground;
       uint m_ARUN_directory_ground;
       aurostd::xmatrix<double> m_rdf_all;
+      double m_rdf_rmax;
+      int m_rdf_nbins;
       xDOSCAR m_xdoscar;
       vector<double> m_Egap_DOS,m_Egap;
       double m_Egap_DOS_net,m_Egap_net;

@@ -1064,13 +1064,13 @@ namespace pocc {
     string POSCAR_file="";
     bool found_POSCAR_file=false;
     uint i=0;
-    double rmax=50;
-    int nbins=50;
-    bool raw_counts=false;
-    double sigma=0;
-    int window_gaussian=0;
+    bool raw_counts=false;  //make options for these later
+    double sigma=0; //make options for these later
+    int window_gaussian=0;  //make options for these later
     aurostd::xmatrix<double> rdf_all;
     m_rdf_all.clear();
+    m_rdf_rmax=DEFAULT_POCC_RDF_RMAX;
+    m_rdf_nbins=DEFAULT_POCC_RDF_NBINS;
     for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end()&&perform_rdf==true;++it){
       isupercell=std::distance(l_supercell_sets.begin(),it);
       if(aflowlib::GetSpeciesDirectory(getARUNDirectoryPath(isupercell),_vspecies)==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Cannot extract vspecies from "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
@@ -1080,6 +1080,7 @@ namespace pocc {
       if(found_POSCAR_file==false){
         throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"CONTCAR.relax"+aurostd::utype2string(m_relaxation_max)+" not found in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);
       }
+      message << "Processing CONTCAR.relax of " << m_ARUN_directories[isupercell] << " for the RDF (takes some time)";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
       xstr.clear();
       xstr.initialize(POSCAR_file,IOVASP_POSCAR);
       if(LDEBUG){
@@ -1093,7 +1094,7 @@ namespace pocc {
         vspecies.clear();for(i=0;i<_vspecies.size();i++){vspecies.push_back(_vspecies[i]);}
         num_each_type.clear();for(i=0;i<xstr.num_each_type.size();i++){num_each_type.push_back(xstr.num_each_type[i]);}
         //
-        pflow::GetRDF(xstr,rdf_all,rmax,nbins,raw_counts,sigma,window_gaussian);
+        pflow::GetRDF(xstr,rdf_all,m_rdf_rmax,m_rdf_nbins,raw_counts,sigma,window_gaussian);
         m_rdf_all=(*it).m_probability * rdf_all;
       }else{
         if(perform_rdf && (vspecies!=_vspecies)){
@@ -1105,9 +1106,10 @@ namespace pocc {
           perform_rdf=false;
         }
         //
-        pflow::GetRDF(xstr,rdf_all,rmax,nbins,raw_counts,sigma,window_gaussian);
+        pflow::GetRDF(xstr,rdf_all,m_rdf_rmax,m_rdf_nbins,raw_counts,sigma,window_gaussian);
         m_rdf_all+=(*it).m_probability * rdf_all;
       }
+      PrintRDF(xstr,m_rdf_rmax,m_rdf_nbins,rdf_all,*p_oss);
     }
     if(perform_rdf==false){m_rdf_all.clear();return;}
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " m_rdf_all=" << endl << m_rdf_all << endl;}
@@ -1407,12 +1409,13 @@ namespace pocc {
     if(m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
 
     //get most relaxed outcar
-    uint i=0,max=10,m_relaxation_max=0;
+    uint i=0,max=10;
+    m_relaxation_max=AUROSTD_MAX_UINT;
     for(i=1;i<=max;i++){  //i=max;i<=max;i--
       if(aurostd::EFileExist(getARUNDirectoryPath(0)+"/OUTCAR.relax"+aurostd::utype2string(i))){m_relaxation_max=i;}
       else{break;}
     }
-    if(m_relaxation_max==0){return;} //no runs completed
+    if(m_relaxation_max==AUROSTD_MAX_UINT){return;} //no runs completed
 
     string OUTCAR_relax="OUTCAR.relax"+aurostd::utype2string(m_relaxation_max);
     if(LDEBUG){cerr << soliloquy << " OUTCAR_relax=" << OUTCAR_relax << endl;}
@@ -1661,6 +1664,12 @@ namespace pocc {
       isupercell=std::distance(l_supercell_sets.begin(),it);
       //pocc_out_ss << "probability[" << m_ARUN_directories[isupercell] << "]=" << aurostd::utype2string((*it).m_probability,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << endl;
       pocc_out_ss << "probability_supercell_" << std::setfill('0') << std::setw(aurostd::getZeroPadding(l_supercell_sets.size())) << isupercell+1  << "=" << aurostd::utype2string((*it).m_probability,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  [" << m_ARUN_directories[isupercell] << "]" << endl; //+1 so we start at 1, not 0 (count)
+    }
+    
+    if(m_rdf_all.rows!=0){
+      pocc_out_ss << POCC_AFLOWIN_tag << "START_RDF" << endl;
+      pocc_out_ss << RDF2string(xstr_pocc,m_rdf_rmax,m_rdf_nbins,m_rdf_all);
+      pocc_out_ss << POCC_AFLOWIN_tag << "STOP_RDF" << endl;
     }
 
     //fix m_Egap and m_Egap_net for metals (Egap==0!)
@@ -2469,6 +2478,8 @@ namespace pocc {
     m_energy_dft_ground=AUROSTD_MAX_DOUBLE;
     m_ARUN_directory_ground=AUROSTD_MAX_UINT;
     m_rdf_all.clear();
+    m_rdf_rmax=AUROSTD_MAX_DOUBLE;
+    m_rdf_nbins=AUROSTD_MAX_INT;
     m_xdoscar.clear();
     m_Egap_DOS.clear();
     m_Egap.clear();
@@ -2516,6 +2527,8 @@ namespace pocc {
     m_ARUN_directory_ground=b.m_ARUN_directory_ground;
     m_ARUN_directories.clear();for(uint i=0;i<b.m_ARUN_directories.size();i++){m_ARUN_directories.push_back(b.m_ARUN_directories[i]);}
     m_rdf_all=b.m_rdf_all;
+    m_rdf_rmax=b.m_rdf_rmax;
+    m_rdf_nbins=b.m_rdf_nbins;
     m_xdoscar=b.m_xdoscar;
     m_Egap_DOS.clear();for(uint ispin=0;ispin<b.m_Egap_DOS.size();ispin++){m_Egap_DOS.push_back(b.m_Egap_DOS[ispin]);}
     m_Egap.clear();for(uint ispin=0;ispin<b.m_Egap.size();ispin++){m_Egap.push_back(b.m_Egap[ispin]);}

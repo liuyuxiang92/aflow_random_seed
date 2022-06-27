@@ -3228,7 +3228,7 @@ void PrintRBPoscarDisp(const xstructure& diffstr, double& totdist,
 // **************************************************************************
 // PrintRDF
 // **************************************************************************
-void PrintRDF(const xstructure& xstr,const double rmax,const int nbins,const xmatrix<double>& rdf_all,ostream& oss){ //CO20220627 - new procedure
+string RDF2string(const xstructure& xstr,const double rmax,const int nbins,const xmatrix<double>& rdf_all){ //CO20220627 - new procedure
   int padding=8,padding_extra=5;  //4 because of 10,100,1000,neg below
   string eset="";
   vector<vector<int> > vvitypes=pflow::getvvitypesRDF(xstr);
@@ -3236,6 +3236,7 @@ void PrintRDF(const xstructure& xstr,const double rmax,const int nbins,const xma
   double drad=rmax/(double)nbins; //sphere shell volume=4*pi*r^2*dr
   uint k=0;
   int ibin=0,itype=0;
+  stringstream oss;
   oss << aurostd::PaddedPOST("#bin",padding) << " ";
   oss << aurostd::PaddedPRE("rad",padding+padding_extra) << " ";
   for(k=0;k<vvitypes.size();k++){
@@ -3263,6 +3264,10 @@ void PrintRDF(const xstructure& xstr,const double rmax,const int nbins,const xma
     }
     oss << endl;
   }
+  return oss.str();
+}
+void PrintRDF(const xstructure& xstr,const double rmax,const int nbins,const xmatrix<double>& rdf_all,ostream& oss){ //CO20220627 - new procedure
+  oss << RDF2string(xstr,rmax,nbins,rdf_all);
 }
 // This function prints out the RDF information.
 // Dane Morgan - Stefano Curtarolo

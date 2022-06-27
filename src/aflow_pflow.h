@@ -535,6 +535,7 @@ void PrintNdata(const xstructure&,ostream& oss=cout);
 //void PrintNeatProj(projdata& pd);
 void PrintPDB(const xstructure&,ostream& oss=cout);
 void platon2print(xstructure,bool P_EQUAL,bool P_EXACT,double P_ang,double P_d1,double P_d2,double P_d3,ostream& sout);
+string RDF2string(const xstructure& xstr,const double rmax,const int nbins,const xmatrix<double>& rdf_all); //CO20220627
 void PrintRDF(const xstructure& xstr,const double rmax,const int nbins,const xmatrix<double>& rdf_all,ostream& oss=cout); //CO20220627
 void PrintRDF_20220101(const xstructure& str,const double& rmax,const int& nbins,const int& smooth_width,const aurostd::matrix<double>& rdf_all,
     aurostd::matrix<double>& rdfsh_all,aurostd::matrix<double>& rdfsh_loc,ostream& oss=cout);  //CO20200404 pflow::matrix()->aurostd::matrix()
