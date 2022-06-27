@@ -1852,53 +1852,42 @@ namespace aurostd {
   // ***************************************************************************
   //CO20210315
   //SD20220627 - Typicall signals that we use to kill processes are 9 (SIGKILL), 15 (SIGTERM) and 5 (SIGTRAP)
+  //Do not throw an error since only SIGKILL and SIGTERM actually kill the process
   void ProcessKill(const string& process,bool user_specific,uint signal){ //CO20210315
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if(signal<1 || signal>64){
       throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"invalid signal specification",_VALUE_ILLEGAL_);
     }
-    string command="";
-    bool process_killed=(!aurostd::ProcessRunning(process,user_specific));
-    uint sleep_seconds=5; //2 seconds is too few
-    if(!process_killed){
-      if(aurostd::IsCommandAvailable("killall")) {
-        command="killall";
-        if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
-        command+=" -"+aurostd::utype2string(signal)+" "+process+" 2>/dev/null";
-        if(LDEBUG){cerr << __AFLOW_FUNC__ << " running command=\"" << command << "\"" << endl;}
-        aurostd::execute(command);
-        aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,user_specific));
-      }
-    }
-    if(!process_killed){
-      if(aurostd::IsCommandAvailable("pkill")) {
-        command="pkill";
-        if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
-        command+=" -"+aurostd::utype2string(signal)+" "+process+" 2>/dev/null";
-        if(LDEBUG){cerr << __AFLOW_FUNC__ << " running command=\"" << command << "\"" << endl;}
-        aurostd::execute(command);
-        aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,user_specific));
-      }
-    }
-    if(!process_killed){
-      if(aurostd::IsCommandAvailable("kill")) {
-        vector<string> vpids=aurostd::ProcessPIDs(process,user_specific);
-        if(vpids.empty()){process_killed=true;}
-        else{
-          command="kill";
-          //[CO20210315 - does not work, user-specific comes from PID search]if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
-          command+=" -"+aurostd::utype2string(signal)+" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
-          if(LDEBUG){cerr << __AFLOW_FUNC__ << " running command=\"" << command << "\"" << endl;}
-          aurostd::execute(command);
-          aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,user_specific));
-        }
-      }
-    }
-    //can add checks here if the process wasn't killed completely
-
-    if(!process_killed){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"process could not be kill",_RUNTIME_ERROR_);
-    }
+    vector<string> vpids=aurostd::ProcessPIDs(process,user_specific);
+    if(vpids.empty()){return;}
+    string command="kill";
+    //[CO20210315 - does not work, user-specific comes from PID search]if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
+    command+=" -"+aurostd::utype2string(signal)+" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " running command=\"" << command << "\"" << endl;}
+    aurostd::execute(command);
+    //[SD20220627 - OBSOLETE]string command="";
+    //[SD20220627 - OBSOLETE]bool process_killed=(!aurostd::ProcessRunning(process,user_specific));
+    //[SD20220627 - OBSOLETE]uint sleep_seconds=5; //2 seconds is too few
+    //[SD20220627 - OBSOLETE]if(!process_killed){
+    //[SD20220627 - OBSOLETE]  if(aurostd::IsCommandAvailable("killall")) {
+    //[SD20220627 - OBSOLETE]    command="killall";
+    //[SD20220627 - OBSOLETE]    if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
+    //[SD20220627 - OBSOLETE]    command+=" -"+aurostd::utype2string(signal)+" "+process+" 2>/dev/null";
+    //[SD20220627 - OBSOLETE]    if(LDEBUG){cerr << __AFLOW_FUNC__ << " running command=\"" << command << "\"" << endl;}
+    //[SD20220627 - OBSOLETE]    aurostd::execute(command);
+    //[SD20220627 - OBSOLETE]    aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,user_specific));
+    //[SD20220627 - OBSOLETE]  }
+    //[SD20220627 - OBSOLETE]}
+    //[SD20220627 - OBSOLETE]if(!process_killed){
+    //[SD20220627 - OBSOLETE]  if(aurostd::IsCommandAvailable("pkill")) {
+    //[SD20220627 - OBSOLETE]    command="pkill";
+    //[SD20220627 - OBSOLETE]    if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
+    //[SD20220627 - OBSOLETE]    command+=" -"+aurostd::utype2string(signal)+" "+process+" 2>/dev/null";
+    //[SD20220627 - OBSOLETE]    if(LDEBUG){cerr << __AFLOW_FUNC__ << " running command=\"" << command << "\"" << endl;}
+    //[SD20220627 - OBSOLETE]    aurostd::execute(command);
+    //[SD20220627 - OBSOLETE]    aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,user_specific));
+    //[SD20220627 - OBSOLETE]  }
+    //[SD20220627 - OBSOLETE]}
   }
 
   //SD20220329 - overload to allow for only killing the PIDs with a specific PGID
@@ -1910,25 +1899,13 @@ namespace aurostd {
     if(pgid.empty()) {
       throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"PGID is empty",_INPUT_ILLEGAL_);
     }
-    if(!aurostd::IsCommandAvailable("kill")) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"\"kill\" command not found",_INPUT_ILLEGAL_);
-    }
-    bool process_killed=(!aurostd::ProcessRunning(process,pgid,user_specific));
-    if(process_killed){return;}
     string output_syscall="";
     vector<string> vpids=aurostd::ProcessPIDs(process,pgid,output_syscall,user_specific);
     if(vpids.empty()){return;}
     string command="kill";
-    uint sleep_seconds=5; //2 seconds is too few
     command+=" -"+aurostd::utype2string(signal)+" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " running command=\"" << command << "\"" << endl;}
     aurostd::execute(command);
-    aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,pgid,user_specific));
-      
-    //can add checks here if the process wasn't killed completely
-    if(!process_killed){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"process could not be kill",_RUNTIME_ERROR_);
-    }
   }
 
   // ***************************************************************************
