@@ -1686,7 +1686,7 @@ namespace aurostd {                   // conversion to xvector
         xvector<utype> xv((urow-lrow)+1,lrows_out);
         for(int i=lrow;i<=urow;i++){xv(i-lrow+xv.lrows)=xmat[lcol][i];}
         return xv;
-      }else{throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"cannot create 2D xvector",_INPUT_ILLEGAL_);}// AZ20220627
+      }else{throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"cannot create 2D xvector",_INPUT_ILLEGAL_);} // AZ20220627
       return xvector<utype>(0);
     }
 }
