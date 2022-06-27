@@ -353,10 +353,12 @@ namespace aurostd {  // namespace aurostd
     xmatrix<utype>::getmatInPlace(xmatrix<utype>& mat_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
       if(lrows_out==AUROSTD_MAX_INT){lrows_out=lrows;}
       if(lcols_out==AUROSTD_MAX_INT){lcols_out=lcols;}
+      //AZ20220627
       if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow<lrows",_VALUE_ILLEGAL_);}
       if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_VALUE_ILLEGAL_);}
       if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol<lcols",_VALUE_ILLEGAL_);}
       if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ucol>ucols",_VALUE_ILLEGAL_);}
+      //AZ20220627
       int rows_out=(urow-lrow)+1;
       int cols_out=(ucol-lcol)+1;
       if(! ( mat_out.rows==rows_out && mat_out.cols==cols_out && mat_out.lrows==lrows_out && mat_out.lcols==lcols_out ) ) { //check if necessary to create new object
@@ -369,12 +371,14 @@ namespace aurostd {  // namespace aurostd
     }
   template<class utype> void
     xmatrix<utype>::getmatInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output //CO20191110
+      //AZ20220627
       if(lrows_out==AUROSTD_MAX_INT){lrows_out=lrows;}
       if(lcols_out==AUROSTD_MAX_INT){lcols_out=lcols;}
       if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow<lrows",_VALUE_ILLEGAL_);}
       if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_VALUE_ILLEGAL_);}
       if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol<lcols",_VALUE_ILLEGAL_);}
       if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ucol>ucols",_VALUE_ILLEGAL_);}
+      //AZ20220627
       xmatrix<utype> xmat;
       (*this).getmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
       xv_out=xmatrix2xvector(xmat,urow,ucol,lrow,lcol,(urow==lrow) ? lrows_out : lcols_out);
@@ -1663,6 +1667,7 @@ namespace aurostd {                   // conversion to xmatrix<utype>
 namespace aurostd {                   // conversion to xvector
   template<class utype> xvector<utype>
     xmatrix2xvector(const xmatrix<utype>& xmat,int urow,int ucol,int lrow,int lcol,int lrows_out) __xprototype {  //CO20191110
+      //AZ20220627
       bool LDEBUG=(FALSE || XHOST.DEBUG);
       if(LDEBUG){
         cerr << __AFLOW_FUNC__ << " xmat=" << xmat << endl;
@@ -1672,6 +1677,7 @@ namespace aurostd {                   // conversion to xvector
         cerr << __AFLOW_FUNC__ << " lcol=" << lcol << endl;
         cerr << __AFLOW_FUNC__ << " lrows_out=" << lrows_out << endl;
       }
+      //AZ20220627
       if(urow==lrow){
         xvector<utype> xv((ucol-lcol)+1,lrows_out);
         for(int i=lcol;i<=ucol;i++){xv(i-lcol+xv.lrows)=xmat[i][lrow];}
@@ -1680,7 +1686,7 @@ namespace aurostd {                   // conversion to xvector
         xvector<utype> xv((urow-lrow)+1,lrows_out);
         for(int i=lrow;i<=urow;i++){xv(i-lrow+xv.lrows)=xmat[lcol][i];}
         return xv;
-      }else{throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"cannot create 2D xvector",_INPUT_ILLEGAL_);}
+      }else{throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"cannot create 2D xvector",_INPUT_ILLEGAL_);}// AZ20220627
       return xvector<utype>(0);
     }
 }
