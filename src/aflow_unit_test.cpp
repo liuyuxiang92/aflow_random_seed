@@ -263,7 +263,7 @@ namespace unittest {
     if (!XHOST.QUIET && !XHOST.DEBUG) {
       whitelist.push_back("unittest::UnitTest::runUnitTest()");
       // Add function names to whitelist for displayResults
-      for (uint i = 0; i < unit_tests.size(); i++) whitelist.push_back(test_functions[unit_tests[i]].function_name);
+//      for (uint i = 0; i < unit_tests.size(); i++) whitelist.push_back(test_functions[unit_tests[i]].function_name);
       XHOST.QUIET = true;
       for (size_t i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.push_back(whitelist[i]);
     }
@@ -891,6 +891,18 @@ namespace unittest {
     calculated_xmatint = aurostd::reshape(aurostd::reshape(expected_xmatint,4,3),3,4);
     checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
 
+    // ---------------------------------------------------------------------------
+    // Check | reshape //SD20220319
+    // ---------------------------------------------------------------------------
+    
+    check_function = "aurostd::getvec()";
+    check_description = "get an xvector from xmatrix";
+    xmatrix<int> full_xmatint;
+    full_xmatint = xmatrix<int>(3,4);
+    full_xmatint(1,1) = 1; full_xmatint(1,2) =  2; full_xmatint(1,3) =  3; full_xmatint(1,4) = 4;
+    full_xmatint(2,1) = 5; full_xmatint(2,2) =  6; full_xmatint(2,3) =  7; full_xmatint(2,4) = 8;
+    full_xmatint(3,1) = 9; full_xmatint(3,2) = 10; full_xmatint(3,3) = 11; full_xmatint(3,4) = 12;
+    calculated_xmatint = full_xmatint.getvec(1,1,1,1);
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520
     // ---------------------------------------------------------------------------
