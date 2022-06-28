@@ -895,8 +895,8 @@ namespace unittest {
     // Check | getvec //AZ20220627
     // ---------------------------------------------------------------------------
     
-    //check_function = "aurostd::getvec()";
-    //check_description = "get an xvector from xmatrix";
+    check_function = "aurostd::getvec()";
+    check_description = "get an xvector from xmatrix";
     xmatrix<int> full_xmatint;
     full_xmatint = xmatrix<int>(3,4);
     xvector<int> expected_xvecint;
