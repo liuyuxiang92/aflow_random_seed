@@ -263,9 +263,9 @@ namespace unittest {
     if (!XHOST.QUIET && !XHOST.DEBUG) {
       whitelist.push_back("unittest::UnitTest::runUnitTest()");
       // Add function names to whitelist for displayResults
-//      for (uint i = 0; i < unit_tests.size(); i++) whitelist.push_back(test_functions[unit_tests[i]].function_name);
+      for (uint i = 0; i < unit_tests.size(); i++) whitelist.push_back(test_functions[unit_tests[i]].function_name);
       XHOST.QUIET = true;
-      for (size_t i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.push_back(whitelist[i]);
+//      for (size_t i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.push_back(whitelist[i]);
     }
 #ifdef AFLOW_MULTITHREADS_ENABLE
     std::mutex mtx;
@@ -895,14 +895,44 @@ namespace unittest {
     // Check | reshape //SD20220319
     // ---------------------------------------------------------------------------
     
-    check_function = "aurostd::getvec()";
-    check_description = "get an xvector from xmatrix";
+    //check_function = "aurostd::getvec()";
+    //check_description = "get an xvector from xmatrix";
     xmatrix<int> full_xmatint;
     full_xmatint = xmatrix<int>(3,4);
+    xvector<int> expected_xvecint;
+    xvector<int> expected_vecint(3,1);
+    expected_vecint(1) = 1;
+    expected_vecint(2) = 5;
+    expected_vecint(3) = 9;
+    xmatrix<int> expected_xmatrix;
+    xvector<int> calculated_xvecint;
     full_xmatint(1,1) = 1; full_xmatint(1,2) =  2; full_xmatint(1,3) =  3; full_xmatint(1,4) = 4;
     full_xmatint(2,1) = 5; full_xmatint(2,2) =  6; full_xmatint(2,3) =  7; full_xmatint(2,4) = 8;
     full_xmatint(3,1) = 9; full_xmatint(3,2) = 10; full_xmatint(3,3) = 11; full_xmatint(3,4) = 12;
-    calculated_xmatint = full_xmatint.getvec(1,1,1,1);
+
+    //entering Adam debug land
+    cerr << "full matrix" << endl;
+    cerr << full_xmatint << endl;
+    calculated_xvecint = full_xmatint.getvec(1,3,1,1);//good example
+    calculated_xmatint = full_xmatint.getmat(1,3,1,1);//core dumps if you try (1,1,1,3)
+    cerr << "makes sense (1,3,1,1)" << endl;						      
+    cerr << "expected" << endl;
+    cerr << expected_vecint << endl;
+    cerr << "calculated with getvec" << endl;
+    cerr << calculated_xvecint << endl;
+    cerr << "calculated with getmat (this is transposed because xmatrix prints differently)" << endl;
+    cerr << calculated_xmatint << endl;
+    calculated_xvecint = full_xmatint.getvec(1,1,3,1);//maybe this behavior should throw an error 
+    calculated_xmatint = full_xmatint.getmat(1,1,3,1);
+    cerr << "makes less sense (1,1,3,1)" << endl;						      
+    cerr << "expected" << endl;
+    cerr << expected_vecint << endl;
+    cerr << "calculated with getvec" << endl;
+    cerr << calculated_xvecint << endl;
+    cerr << "calculated with getmat" << endl;
+    cerr << calculated_xmatint << endl;
+    //leaving Adam debug land
+
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520
     // ---------------------------------------------------------------------------
