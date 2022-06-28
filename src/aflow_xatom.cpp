@@ -18143,7 +18143,7 @@ void xstructure::GetNeighData_20220101(const deque<_atom>& in_atom_vec,
     deque<deque<_atom> >& neigh_mat) const {  
   //CO20220623 - AVOID USING THIS FUNCTION, use the one above
   //this one relies on an input of in_atom_vec which is usually the atoms of the structure
-  //there is only one exception: GetGoodShellPoints() in aflow_pflow_print.cpc; this function should be rewritten in the future
+  //there is only one exception: GetGoodShellPoints() in aflow_pflow_print.cpp; this function should be rewritten in the future
   //considering the name of this function, it should only operate on the atoms of the structure
   //no point of having two sources of truth, it's confusing
   //the rewrite for an input of atoms should avoid ad-hoc, a posteriori mappings introducing noise in positions: GetUnitCellRep() and ConvertAtomToLat()
