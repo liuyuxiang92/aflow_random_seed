@@ -899,17 +899,16 @@ namespace unittest {
     check_description = "get an xvector from xmatrix";
     xmatrix<int> full_xmatint;
     full_xmatint = xmatrix<int>(3,4);
-    xvector<int> expected_xvecint;
-    xvector<int> expected_vecint(3,1);
-    expected_vecint(1) = 1;
-    expected_vecint(2) = 5;
-    expected_vecint(3) = 9;
+    xvector<int> expected_xvecint(3,1);
+    expected_xvecint(1) = 1;
+    expected_xvecint(2) = 5;
+    expected_xvecint(3) = 9;
     xvector<int> calculated_xvecint;
     full_xmatint(1,1) = 1; full_xmatint(1,2) =  2; full_xmatint(1,3) =  3; full_xmatint(1,4) = 4;
     full_xmatint(2,1) = 5; full_xmatint(2,2) =  6; full_xmatint(2,3) =  7; full_xmatint(2,4) = 8;
     full_xmatint(3,1) = 9; full_xmatint(3,2) = 10; full_xmatint(3,3) = 11; full_xmatint(3,4) = 12;
-    calculated_xvecint = full_xmatint.getvec(1,3,1,1);
-    checkEqual(calculated_xvecint, expected_xmatint, check_function, check_description, passed_checks, results);
+    calculated_xvecint = full_xmatint.getvec(3,1,1,1);
+    checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520
     // ---------------------------------------------------------------------------
