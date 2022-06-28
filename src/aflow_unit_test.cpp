@@ -892,7 +892,7 @@ namespace unittest {
     checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
-    // Check | reshape //SD20220319
+    // Check | getvec //AZ20220627
     // ---------------------------------------------------------------------------
     
     //check_function = "aurostd::getvec()";
