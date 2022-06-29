@@ -913,6 +913,9 @@ namespace unittest {
     //cerr << "here" << endl;
     cerr << full_xmatint.getvec(3,3,4,4) << endl;
     //cerr << "there" << endl;
+    cerr << "final test" << endl;
+    cerr << "returned matrix" << full_xmatint.getvec(3,3,4,4) << endl;
+    cerr << "final test" << endl;
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520
