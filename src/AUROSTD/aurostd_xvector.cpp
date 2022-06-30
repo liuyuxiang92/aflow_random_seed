@@ -3277,6 +3277,65 @@ namespace aurostd {
   }
 } // namespace aurostd
 
+
+namespace aurostd {
+  //AS20210901 BEGIN
+  /// Calculates the first derivative of a given function f employing the
+  /// Savitzky-Golay filter for the differentiation.
+  xvector<double> diffSG(const xvector<double> &f, double dx)
+  {
+    // Convolution weights for the Savitzky-Golay 5pt cubic filter as reported in:
+    // "General least-squares smoothing and differentiation by the convolution (Savitzky-Golay) method"
+    // Peter A. Gorry Analytical Chemistry 1990 62 (6), 570-573
+    // https://doi.org/10.1021/ac00205a007
+    const static xmatrix<double> SGmat(5,5);
+    SGmat[1][1]=-125.0/84.0; SGmat[1][2]=-19.0/42.0; SGmat[1][3]= 1.0/12.0; SGmat[1][4]=  5.0/42.0; SGmat[1][5]= -29.0/84.0;
+    SGmat[2][1]= 136.0/84.0; SGmat[2][2]= -1.0/42.0; SGmat[2][3]=-8.0/12.0; SGmat[2][4]=-13.0/42.0; SGmat[2][5]=  88.0/84.0;
+    SGmat[3][1]=  48.0/84.0; SGmat[3][2]= 12.0/42.0; SGmat[3][3]= 0.0/12.0; SGmat[3][4]=-12.0/42.0; SGmat[3][5]= -48.0/84.0;
+    SGmat[4][1]= -88.0/84.0; SGmat[4][2]= 13.0/42.0; SGmat[4][3]= 8.0/12.0; SGmat[4][4]=  1.0/42.0; SGmat[4][5]=-136.0/84.0;
+    SGmat[5][1]=  29.0/84.0; SGmat[5][2]= -5.0/42.0; SGmat[5][3]=-1.0/12.0; SGmat[5][4]= 19.0/42.0; SGmat[5][5]= 125.0/84.0;
+    const static xvector<double> SGvec(5);
+    SGvec[1]= 1.0/12.0; SGvec[2]=-8.0/12.0; SGvec[3]= 0.0/12.0; SGvec[4]= 8.0/12.0; SGvec[5]=-1.0/12.0;
+    ////////////////////////////////////////////////////////////////////////////////
+
+    string function = "calcThermalExpansionSG():", msg = "";
+    int npoints = f.rows;
+    if (npoints<5){
+      msg = "Savitzky-Golay filter requires at least 5 points: only ";
+      msg += aurostd::utype2string(npoints) + " were provided.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INDEX_ILLEGAL_);
+    }
+
+    xvector<double> endpoints(5), dummy(5);
+    xvector<double> dfdx(npoints);
+
+    // calculate derivatives for the first 2 points
+    for (int i=1; i<=5; i++) dummy[i] = f[i];
+    endpoints = dummy*SGmat;
+    for (int i=1; i<=2; i++) dfdx[i] = endpoints[i];
+
+    // calculate derivatives for the [3:end-3] points
+    int id = 0;
+    for (int i=3; i<=npoints-2; i++){
+      dfdx[i] = 0.0;
+      for (int j=1; j<=5; j++){
+        id = i - 3 + j;
+        dfdx[i] += SGvec[j]*f[id];
+      }
+    }
+
+    // calculate derivatives for the last 2 points
+    for (int i=1; i<=5; i++) dummy[i] = f[npoints-5+i];
+    endpoints = dummy*SGmat;
+    for (int i=4; i<=5; i++) dfdx[npoints-5+i] = endpoints[i];
+
+    for (int i=1; i<=npoints; i++) dfdx[i] /= dx;
+
+    return dfdx;
+  }
+  //AS20210901 END
+}
+
 #endif  // _AUROSTD_XVECTOR_IMPLEMENTATIONS_
 
 // **************************************************************************
