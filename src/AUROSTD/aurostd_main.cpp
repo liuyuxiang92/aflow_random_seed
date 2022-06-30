@@ -61,25 +61,24 @@ namespace aurostd {
   void get_offset_utc(const tm& _tstruct_inp,int& offset_hours,int& offset_mins) {  //CO20210601
     //https://codereview.stackexchange.com/questions/175353/getting-current-timezone
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"aurostd::get_offset_utc():";
     char buffer[30];
     tm tstruct_inp=_tstruct_inp; //mktime modifies tstruct, make copy
     time_t t_inp=std::mktime(&tstruct_inp);
     if(LDEBUG){
-      cerr << soliloquy << " ///////////////////////////////////////////////" << endl;
-      cerr << soliloquy << " LOOKING AT: tstruct_inp" << endl;
-      cerr << soliloquy << " tstruct_inp.tm_sec=" << tstruct_inp.tm_sec << endl;
-      cerr << soliloquy << " tstruct_inp.tm_min=" << tstruct_inp.tm_min << endl;
-      cerr << soliloquy << " tstruct_inp.tm_hour=" << tstruct_inp.tm_hour << endl;
-      cerr << soliloquy << " tstruct_inp.tm_mday=" << tstruct_inp.tm_mday << endl;
-      cerr << soliloquy << " tstruct_inp.tm_mon=" << tstruct_inp.tm_mon << endl;
-      cerr << soliloquy << " tstruct_inp.tm_year=" << tstruct_inp.tm_year << endl;
-      cerr << soliloquy << " tstruct_inp.tm_wday=" << tstruct_inp.tm_wday << endl;
-      cerr << soliloquy << " tstruct_inp.tm_yday=" << tstruct_inp.tm_yday << endl;
-      cerr << soliloquy << " tstruct_inp.tm_isdst=" << tstruct_inp.tm_isdst << endl;
-      cerr << soliloquy << " mktime(tstruct_inp)=" << t_inp << endl;
-      strftime(buffer,30,"%F %T %Z",&tstruct_inp);cerr << soliloquy << " tstruct_inp=" << buffer << endl;  //%Y:%m:%d %H:%M:%S
-      cerr << soliloquy << " ///////////////////////////////////////////////" << endl;
+      cerr << __AFLOW_FUNC__ << " ///////////////////////////////////////////////" << endl;
+      cerr << __AFLOW_FUNC__ << " LOOKING AT: tstruct_inp" << endl;
+      cerr << __AFLOW_FUNC__ << " tstruct_inp.tm_sec=" << tstruct_inp.tm_sec << endl;
+      cerr << __AFLOW_FUNC__ << " tstruct_inp.tm_min=" << tstruct_inp.tm_min << endl;
+      cerr << __AFLOW_FUNC__ << " tstruct_inp.tm_hour=" << tstruct_inp.tm_hour << endl;
+      cerr << __AFLOW_FUNC__ << " tstruct_inp.tm_mday=" << tstruct_inp.tm_mday << endl;
+      cerr << __AFLOW_FUNC__ << " tstruct_inp.tm_mon=" << tstruct_inp.tm_mon << endl;
+      cerr << __AFLOW_FUNC__ << " tstruct_inp.tm_year=" << tstruct_inp.tm_year << endl;
+      cerr << __AFLOW_FUNC__ << " tstruct_inp.tm_wday=" << tstruct_inp.tm_wday << endl;
+      cerr << __AFLOW_FUNC__ << " tstruct_inp.tm_yday=" << tstruct_inp.tm_yday << endl;
+      cerr << __AFLOW_FUNC__ << " tstruct_inp.tm_isdst=" << tstruct_inp.tm_isdst << endl;
+      cerr << __AFLOW_FUNC__ << " mktime(tstruct_inp)=" << t_inp << endl;
+      strftime(buffer,30,"%F %T %Z",&tstruct_inp);cerr << __AFLOW_FUNC__ << " tstruct_inp=" << buffer << endl;  //%Y:%m:%d %H:%M:%S
+      cerr << __AFLOW_FUNC__ << " ///////////////////////////////////////////////" << endl;
     }
     //
     time_t t_local=t_inp;
@@ -87,44 +86,44 @@ namespace aurostd {
     if(fix_utc_2_now){t_local=time(0);} //struct tm *tstruct_now=localtime(&t_now);
     struct tm *ptr_tstruct_gmt=std::gmtime(&t_local); //get gmt wrt to local (now vs. input)
     if(LDEBUG){
-      cerr << soliloquy << " ///////////////////////////////////////////////" << endl;
-      cerr << soliloquy << " LOOKING AT: ptr_tstruct_gmt (BEFORE DST CHANGE)" << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_sec=" << ptr_tstruct_gmt->tm_sec << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_min=" << ptr_tstruct_gmt->tm_min << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_hour=" << ptr_tstruct_gmt->tm_hour << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_mday=" << ptr_tstruct_gmt->tm_mday << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_mon=" << ptr_tstruct_gmt->tm_mon << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_year=" << ptr_tstruct_gmt->tm_year << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_wday=" << ptr_tstruct_gmt->tm_wday << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_yday=" << ptr_tstruct_gmt->tm_yday << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_isdst=" << ptr_tstruct_gmt->tm_isdst << endl;
+      cerr << __AFLOW_FUNC__ << " ///////////////////////////////////////////////" << endl;
+      cerr << __AFLOW_FUNC__ << " LOOKING AT: ptr_tstruct_gmt (BEFORE DST CHANGE)" << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_sec=" << ptr_tstruct_gmt->tm_sec << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_min=" << ptr_tstruct_gmt->tm_min << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_hour=" << ptr_tstruct_gmt->tm_hour << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_mday=" << ptr_tstruct_gmt->tm_mday << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_mon=" << ptr_tstruct_gmt->tm_mon << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_year=" << ptr_tstruct_gmt->tm_year << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_wday=" << ptr_tstruct_gmt->tm_wday << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_yday=" << ptr_tstruct_gmt->tm_yday << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_isdst=" << ptr_tstruct_gmt->tm_isdst << endl;
       tm tstruct_tmp=*ptr_tstruct_gmt;  //mktime modifies tstruct
-      cerr << soliloquy << " mktime(ptr_tstruct_gmt)=" << std::mktime(&tstruct_tmp) << endl;
-      strftime(buffer,30,"%F %T %Z",ptr_tstruct_gmt);cerr << soliloquy << " tstruct_gmt=" << buffer << endl;  //%Y:%m:%d %H:%M:%S
-      cerr << soliloquy << " ///////////////////////////////////////////////" << endl;
+      cerr << __AFLOW_FUNC__ << " mktime(ptr_tstruct_gmt)=" << std::mktime(&tstruct_tmp) << endl;
+      strftime(buffer,30,"%F %T %Z",ptr_tstruct_gmt);cerr << __AFLOW_FUNC__ << " tstruct_gmt=" << buffer << endl;  //%Y:%m:%d %H:%M:%S
+      cerr << __AFLOW_FUNC__ << " ///////////////////////////////////////////////" << endl;
     }
     //NB: before the following DST change, the %Z of ptr_struct_gmt is GMT, after it is EST (or EDT)
     ptr_tstruct_gmt->tm_isdst=-1; //VERY IMPORTANT, forces mktime to figure out dst
     time_t t_gmt=std::mktime(ptr_tstruct_gmt);
     if(LDEBUG){
-      cerr << soliloquy << " ///////////////////////////////////////////////" << endl;
-      cerr << soliloquy << " LOOKING AT: ptr_tstruct_gmt (AFTER DST CHANGE)" << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_sec=" << ptr_tstruct_gmt->tm_sec << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_min=" << ptr_tstruct_gmt->tm_min << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_hour=" << ptr_tstruct_gmt->tm_hour << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_mday=" << ptr_tstruct_gmt->tm_mday << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_mon=" << ptr_tstruct_gmt->tm_mon << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_year=" << ptr_tstruct_gmt->tm_year << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_wday=" << ptr_tstruct_gmt->tm_wday << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_yday=" << ptr_tstruct_gmt->tm_yday << endl;
-      cerr << soliloquy << " ptr_tstruct_gmt->tm_isdst=" << ptr_tstruct_gmt->tm_isdst << endl;
-      cerr << soliloquy << " mktime(ptr_tstruct_gmt)=" << t_gmt << endl;
-      strftime(buffer,30,"%F %T %Z",ptr_tstruct_gmt);cerr << soliloquy << " tstruct_gmt=" << buffer << endl;  //%Y:%m:%d %H:%M:%S
-      cerr << soliloquy << " ///////////////////////////////////////////////" << endl;
+      cerr << __AFLOW_FUNC__ << " ///////////////////////////////////////////////" << endl;
+      cerr << __AFLOW_FUNC__ << " LOOKING AT: ptr_tstruct_gmt (AFTER DST CHANGE)" << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_sec=" << ptr_tstruct_gmt->tm_sec << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_min=" << ptr_tstruct_gmt->tm_min << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_hour=" << ptr_tstruct_gmt->tm_hour << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_mday=" << ptr_tstruct_gmt->tm_mday << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_mon=" << ptr_tstruct_gmt->tm_mon << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_year=" << ptr_tstruct_gmt->tm_year << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_wday=" << ptr_tstruct_gmt->tm_wday << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_yday=" << ptr_tstruct_gmt->tm_yday << endl;
+      cerr << __AFLOW_FUNC__ << " ptr_tstruct_gmt->tm_isdst=" << ptr_tstruct_gmt->tm_isdst << endl;
+      cerr << __AFLOW_FUNC__ << " mktime(ptr_tstruct_gmt)=" << t_gmt << endl;
+      strftime(buffer,30,"%F %T %Z",ptr_tstruct_gmt);cerr << __AFLOW_FUNC__ << " tstruct_gmt=" << buffer << endl;  //%Y:%m:%d %H:%M:%S
+      cerr << __AFLOW_FUNC__ << " ///////////////////////////////////////////////" << endl;
     }
     //
     long int t_diff=static_cast<long int>(t_inp-t_gmt); //flip to get right sign
-    if(LDEBUG){cerr << soliloquy << " t_diff=" << t_diff << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " t_diff=" << t_diff << endl;}
     double offset=(double)t_diff/3600.0;
     offset_hours=(int)std::floor(offset);
     offset_mins=(int)(round((offset-(double)offset_hours)*60.0));
@@ -1708,9 +1707,8 @@ namespace aurostd {
   }
   vector<string> ProcessPIDs(const string& process,string& output_syscall,bool user_specific){ //CO20210315
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"aurostd::ProcessPIDs():";
-    if(LDEBUG){cerr << soliloquy << " looking for process=" << process << endl;}
-    if(0){cerr << soliloquy << " ps table:" << endl << aurostd::execute2string("ps aux") << endl;}  //not a good idea to run this all the time
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking for process=" << process << endl;}
+    if(0){cerr << __AFLOW_FUNC__ << " ps table:" << endl << aurostd::execute2string("ps aux") << endl;}  //not a good idea to run this all the time
 
     string command="";
     vector<string> vlines,vtokens,vpids;
@@ -1722,9 +1720,9 @@ namespace aurostd {
         command=command_pgrep; //the -a/-l is important, we will need to neglect the subshell call below
         if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
         command+=" -f "+process+" 2> /dev/null";  //the -f is important, will match mpivasp46s in /usr/bin/mpivasp46s
-        if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " running command=\"" << command << "\"" << endl;}
         string output=output_syscall=aurostd::execute2string(command);
-        if(LDEBUG){cerr << soliloquy << " pgrep output:" << endl << "\"" << output << "\"" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " pgrep output:" << endl << "\"" << output << "\"" << endl;}
         if(0){  //before -f and -l
           aurostd::StringSubst(output,"\n"," ");
           output=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(output);
@@ -1738,14 +1736,14 @@ namespace aurostd {
           const string& pid=vtokens[0];
           string proc=vtokens[1]; //since we split on " ", we need to join columns 11-onward
           for(j=2;j<vtokens.size();j++){proc+=" "+vtokens[j];}
-          if(LDEBUG){cerr << soliloquy << " proc[i=" << i << "]=\"" << proc << "\"" << endl;}
+          if(LDEBUG){cerr << __AFLOW_FUNC__ << " proc[i=" << i << "]=\"" << proc << "\"" << endl;}
           if(proc.find(process)==string::npos){continue;}
           if(proc.find(command)!=string::npos){continue;} //ps aux | grep ... always returns itself, neglect  //do a find() instead of == here
           vpids.push_back(pid);
         }
         if(LDEBUG){
-          cerr << soliloquy << " vpids=" << aurostd::joinWDelimiter(vpids,",") << endl;
-          cerr << soliloquy << " vpids.empty()=" << vpids.empty() << endl;
+          cerr << __AFLOW_FUNC__ << " vpids=" << aurostd::joinWDelimiter(vpids,",") << endl;
+          cerr << __AFLOW_FUNC__ << " vpids.empty()=" << vpids.empty() << endl;
         }
         return vpids;
       }
@@ -1759,9 +1757,9 @@ namespace aurostd {
       if(user_specific){command+=" ux";}
       else{command+=" aux";}
       command+=" 2>/dev/null | "+command_grep+" 2> /dev/null";
-      if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " running command=\"" << command << "\"" << endl;}
       string output=output_syscall=aurostd::execute2string(command);
-      if(LDEBUG){cerr << soliloquy << " ps/grep output:" << endl << output << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " ps/grep output:" << endl << output << endl;}
       aurostd::string2vectorstring(output,vlines);
       for(i=0;i<vlines.size();i++){
         aurostd::string2tokens(vlines[i],vtokens," ");
@@ -1769,35 +1767,34 @@ namespace aurostd {
         const string& pid=vtokens[1];
         string proc=vtokens[10]; //since we split on " ", we need to join columns 11-onward
         for(j=11;j<vtokens.size();j++){proc+=" "+vtokens[j];}
-        if(LDEBUG){cerr << soliloquy << " proc[i=" << i << "]=\"" << proc << "\"" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " proc[i=" << i << "]=\"" << proc << "\"" << endl;}
         if(proc.find(process)==string::npos){continue;}
         if(proc.find(command)!=string::npos){continue;} //ps aux | grep ... always returns itself, neglect  //do a find() instead of == here
         if(proc==command_grep){continue;} //ps aux | grep ... always returns itself, neglect  //do a == instead a find() here
         vpids.push_back(pid);
       }
       if(LDEBUG){
-        cerr << soliloquy << " vpids=" << aurostd::joinWDelimiter(vpids,",") << endl;
-        cerr << soliloquy << " vpids.empty()=" << vpids.empty() << endl;
+        cerr << __AFLOW_FUNC__ << " vpids=" << aurostd::joinWDelimiter(vpids,",") << endl;
+        cerr << __AFLOW_FUNC__ << " vpids.empty()=" << vpids.empty() << endl;
       }
       return vpids;
     }
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"\"pgrep\"-type command not found",_INPUT_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"\"pgrep\"-type command not found",_INPUT_ILLEGAL_);
     return vpids;
   }
 
   //SD20220329 - overload to allow for only getting the PIDs with a specific PGID
   vector<string> ProcessPIDs(const string& process,const string& pgid,string& output_syscall,bool user_specific){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"aurostd::ProcessPIDs():";
     if(pgid.empty()) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"PGID is empty",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"PGID is empty",_INPUT_ILLEGAL_);
     }
     if(LDEBUG){
-      cerr << soliloquy << " looking for pgid=" << pgid << endl;
-      cerr << soliloquy << " looking for process=" << process << endl;
+      cerr << __AFLOW_FUNC__ << " looking for pgid=" << pgid << endl;
+      cerr << __AFLOW_FUNC__ << " looking for process=" << process << endl;
     }
     if(!aurostd::IsCommandAvailable("ps") || !aurostd::IsCommandAvailable("grep")) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"\"pgrep\"-type command not found",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"\"pgrep\"-type command not found",_INPUT_ILLEGAL_);
     }
     string ps_opts=" uid,pgid,pid,etime,pcpu,pmem,args"; // user-defined options, since just "u" or "j" might not be good enough
     string command="ps";
@@ -1810,12 +1807,12 @@ namespace aurostd {
     else{command+=" axo";}
     command+=ps_opts;
     if(!aurostd::execute2string(command+" > /dev/null",stderr_fsio).empty()) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown options in \"ps\"",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Unknown options in \"ps\"",_INPUT_ILLEGAL_);
     }
     command+=" 2>/dev/null | "+command_grep+" 2> /dev/null";
-    if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " running command=\"" << command << "\"" << endl;}
     string output=output_syscall=aurostd::execute2string(command);
-    if(LDEBUG){cerr << soliloquy << " ps/grep output:" << endl << output << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " ps/grep output:" << endl << output << endl;}
     aurostd::string2vectorstring(output,vlines);
     for(i=0;i<vlines.size();i++){
       aurostd::string2tokens(vlines[i],vtokens," ");
@@ -1824,7 +1821,7 @@ namespace aurostd {
       if (vtokens[1]==pgid) { // set by ps_opts
         string proc=vtokens[nopts-1]; // set by ps_opts
         for(j=nopts;j<vtokens.size();j++){proc+=" "+vtokens[j];} // set by ps_opts
-        if(LDEBUG){cerr << soliloquy << " proc[i=" << i << "]=\"" << proc << "\"" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " proc[i=" << i << "]=\"" << proc << "\"" << endl;}
         if(proc.find(process)==string::npos){continue;}
         if(proc.find(command)!=string::npos){continue;}
         if(proc==command_grep){continue;}
@@ -1832,8 +1829,8 @@ namespace aurostd {
       }
     }
     if(LDEBUG){
-      cerr << soliloquy << " vpids=" << aurostd::joinWDelimiter(vpids,",") << endl;
-      cerr << soliloquy << " vpids.empty()=" << vpids.empty() << endl;
+      cerr << __AFLOW_FUNC__ << " vpids=" << aurostd::joinWDelimiter(vpids,",") << endl;
+      cerr << __AFLOW_FUNC__ << " vpids.empty()=" << vpids.empty() << endl;
     }
     return vpids;
   }
@@ -1854,84 +1851,61 @@ namespace aurostd {
   // Function ProcessKill
   // ***************************************************************************
   //CO20210315
-  void ProcessKill(const string& process,bool user_specific,bool sigkill){ //CO20210315
+  //SD20220627 - Typicall signals that we use to kill processes are 9 (SIGKILL), 15 (SIGTERM) and 5 (SIGTRAP)
+  //Do not throw an error since only SIGKILL and SIGTERM actually kill the process
+  void ProcessKill(const string& process,bool user_specific,uint signal){ //CO20210315
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"aurostd::ProcessKill():";
-    string command="";
-
-    bool process_killed=(!aurostd::ProcessRunning(process,user_specific));
-    uint sleep_seconds=5; //2 seconds is too few
-    if(!process_killed){
-      if(aurostd::IsCommandAvailable("killall")) {
-        command="killall";
-        if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
-        if(sigkill){command+=" -9";}
-        command+=" "+process+" 2>/dev/null";
-        if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
-        aurostd::execute(command);
-        aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,user_specific));
-      }
+    if(signal<1 || signal>64){
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"invalid signal specification",_VALUE_ILLEGAL_);
     }
-    if(!process_killed){
-      if(aurostd::IsCommandAvailable("pkill")) {
-        command="pkill";
-        if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
-        if(sigkill){command+=" -9";}
-        command+=" "+process+" 2>/dev/null";
-        if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
-        aurostd::execute(command);
-        aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,user_specific));
-      }
-    }
-    if(!process_killed){
-      if(aurostd::IsCommandAvailable("kill")) {
-        vector<string> vpids=aurostd::ProcessPIDs(process,user_specific);
-        if(vpids.empty()){process_killed=true;}
-        else{
-          command="kill";
-          //[CO20210315 - does not work, user-specific comes from PID search]if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
-          if(sigkill){command+=" -9";}
-          command+=" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
-          if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
-          aurostd::execute(command);
-          aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,user_specific));
-        }
-      }
-    }
-    //can add checks here if the process wasn't killed completely
-
-    if(!process_killed){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::ProcessKill():","process could not be kill",_RUNTIME_ERROR_);
-    }
+    vector<string> vpids=aurostd::ProcessPIDs(process,user_specific);
+    if(vpids.empty()){return;}
+    string command="kill";
+    //[CO20210315 - does not work, user-specific comes from PID search]if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
+    command+=" -"+aurostd::utype2string(signal)+" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " running command=\"" << command << "\"" << endl;}
+    aurostd::execute(command);
+    //[SD20220627 - OBSOLETE]string command="";
+    //[SD20220627 - OBSOLETE]bool process_killed=(!aurostd::ProcessRunning(process,user_specific));
+    //[SD20220627 - OBSOLETE]uint sleep_seconds=5; //2 seconds is too few
+    //[SD20220627 - OBSOLETE]if(!process_killed){
+    //[SD20220627 - OBSOLETE]  if(aurostd::IsCommandAvailable("killall")) {
+    //[SD20220627 - OBSOLETE]    command="killall";
+    //[SD20220627 - OBSOLETE]    if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
+    //[SD20220627 - OBSOLETE]    command+=" -"+aurostd::utype2string(signal)+" "+process+" 2>/dev/null";
+    //[SD20220627 - OBSOLETE]    if(LDEBUG){cerr << __AFLOW_FUNC__ << " running command=\"" << command << "\"" << endl;}
+    //[SD20220627 - OBSOLETE]    aurostd::execute(command);
+    //[SD20220627 - OBSOLETE]    aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,user_specific));
+    //[SD20220627 - OBSOLETE]  }
+    //[SD20220627 - OBSOLETE]}
+    //[SD20220627 - OBSOLETE]if(!process_killed){
+    //[SD20220627 - OBSOLETE]  if(aurostd::IsCommandAvailable("pkill")) {
+    //[SD20220627 - OBSOLETE]    command="pkill";
+    //[SD20220627 - OBSOLETE]    if(user_specific && !XHOST.user.empty()){command+=" -u "+XHOST.user;}
+    //[SD20220627 - OBSOLETE]    command+=" -"+aurostd::utype2string(signal)+" "+process+" 2>/dev/null";
+    //[SD20220627 - OBSOLETE]    if(LDEBUG){cerr << __AFLOW_FUNC__ << " running command=\"" << command << "\"" << endl;}
+    //[SD20220627 - OBSOLETE]    aurostd::execute(command);
+    //[SD20220627 - OBSOLETE]    aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,user_specific));
+    //[SD20220627 - OBSOLETE]  }
+    //[SD20220627 - OBSOLETE]}
   }
 
   //SD20220329 - overload to allow for only killing the PIDs with a specific PGID
-  void ProcessKill(const string& process,const string& pgid,bool user_specific,bool sigkill){
+  void ProcessKill(const string& process,const string& pgid,bool user_specific,uint signal){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"aurostd::ProcessKill():";
+    if(signal<1 || signal>64){
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"invalid signal specification",_VALUE_ILLEGAL_);
+    }
     if(pgid.empty()) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"PGID is empty",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"PGID is empty",_INPUT_ILLEGAL_);
     }
-    if(!aurostd::IsCommandAvailable("kill")) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"\"kill\" command not found",_INPUT_ILLEGAL_);
-    }
-    bool process_killed=(!aurostd::ProcessRunning(process,pgid,user_specific));
-    if(process_killed){return;}
     string output_syscall="";
     vector<string> vpids=aurostd::ProcessPIDs(process,pgid,output_syscall,user_specific);
     if(vpids.empty()){return;}
     string command="kill";
-    uint sleep_seconds=5; //2 seconds is too few
-    if(sigkill){command+=" -9";}
-    command+=" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
-    if(LDEBUG){cerr << soliloquy << " running command=\"" << command << "\"" << endl;}
+    command+=" -"+aurostd::utype2string(signal)+" "+aurostd::joinWDelimiter(vpids," ")+" 2>/dev/null";
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " running command=\"" << command << "\"" << endl;}
     aurostd::execute(command);
-    aurostd::Sleep(sleep_seconds);process_killed=(!aurostd::ProcessRunning(process,pgid,user_specific));
-      
-    //can add checks here if the process wasn't killed completely
-    if(!process_killed){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::ProcessKill():","process could not be kill",_RUNTIME_ERROR_);
-    }
   }
 
   // ***************************************************************************
@@ -2624,7 +2598,6 @@ namespace aurostd {
 
   bool GetMemoryUsagePercentage(double& usage_percentage_ram,double& usage_percentage_swap){ //CO20210601
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"aurostd::GetMemoryUsagePercentage():";
 
     unsigned long long int free_ram=0,total_ram=0;
     unsigned long long int free_swap=0,total_swap=0;
@@ -2634,20 +2607,20 @@ namespace aurostd {
       if(total_ram>0){usage_percentage_ram=100.0*(((double)(total_ram-free_ram))/((double)(total_ram)));}
       if(total_swap>0){usage_percentage_swap=100.0*(((double)(total_swap-free_swap))/((double)(total_swap)));}  //some qrats nodes have no swap
       if(LDEBUG){
-        cerr << soliloquy << " [date=" << aflow_get_time_string() << "]" << endl; //helps debugging
-        cerr << soliloquy << " free_ram=" << free_ram << endl;
-        cerr << soliloquy << " used_ram=" << total_ram-free_ram << endl;
-        cerr << soliloquy << " total_ram=" << total_ram << endl;
-        cerr << soliloquy << " usage_percentage_ram=" << usage_percentage_ram << endl;
-        cerr << soliloquy << " free_swap=" << free_swap << endl;
-        cerr << soliloquy << " used_swap=" << total_swap-free_swap << endl;
-        cerr << soliloquy << " total_swap=" << total_swap << endl;
-        cerr << soliloquy << " usage_percentage_swap=" << usage_percentage_swap << endl;
+        cerr << __AFLOW_FUNC__ << " [date=" << aflow_get_time_string() << "]" << endl; //helps debugging
+        cerr << __AFLOW_FUNC__ << " free_ram=" << free_ram << endl;
+        cerr << __AFLOW_FUNC__ << " used_ram=" << total_ram-free_ram << endl;
+        cerr << __AFLOW_FUNC__ << " total_ram=" << total_ram << endl;
+        cerr << __AFLOW_FUNC__ << " usage_percentage_ram=" << usage_percentage_ram << endl;
+        cerr << __AFLOW_FUNC__ << " free_swap=" << free_swap << endl;
+        cerr << __AFLOW_FUNC__ << " used_swap=" << total_swap-free_swap << endl;
+        cerr << __AFLOW_FUNC__ << " total_swap=" << total_swap << endl;
+        cerr << __AFLOW_FUNC__ << " usage_percentage_swap=" << usage_percentage_swap << endl;
         cerr << endl; //helps debugging
       }
     }
     else{
-      if(LDEBUG){cerr << soliloquy << " unable to query memory on the node" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " unable to query memory on the node" << endl;}
     }
     return memory_read;
   }
@@ -2662,11 +2635,10 @@ namespace aurostd {
     //https://unix.stackexchange.com/questions/14102/real-memory-usage
     //free will follow real memory (physical RAM), using the available column will follow the actual memory (what could become available if necessary)
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"aurostd::GetMemory():";
 
     if(!aurostd::IsCommandAvailable("free")){return false;}
     string output=aurostd::execute2string("free");
-    if(LDEBUG){cerr << soliloquy << " free output:" << endl << output << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " free output:" << endl << output << endl;}
     //on most linux machines:
     //                            total        used        free      shared  buff/cache   available
     //              Mem:      395654628    41363940    30948848     4106252   323341840   349143640
@@ -2689,7 +2661,7 @@ namespace aurostd {
     total_ram=aurostd::string2utype<unsigned long long int>(vtokens[1]);
     if(!aurostd::isfloat(vtokens[3])){return false;}
     free_ram=aurostd::string2utype<unsigned long long int>(vtokens[3]);
-    if(LDEBUG){cerr << soliloquy << " free_ram=" << free_ram << " total_ram=" << total_ram << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " free_ram=" << free_ram << " total_ram=" << total_ram << endl;}
     //swap
     iline=2;
     if(vlines[iline].find("Swap:")==string::npos){iline++;}  //try next line
@@ -2699,7 +2671,7 @@ namespace aurostd {
     total_swap=aurostd::string2utype<unsigned long long int>(vtokens[1]);
     if(!aurostd::isfloat(vtokens[3])){return false;}
     free_swap=aurostd::string2utype<unsigned long long int>(vtokens[3]);
-    if(LDEBUG){cerr << soliloquy << " free_swap=" << free_swap << " total_swap=" << total_swap << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " free_swap=" << free_swap << " total_swap=" << total_swap << endl;}
     //
     return true;
   }
@@ -3068,7 +3040,9 @@ namespace aurostd {
     }
     if(message_parts.size()==0){return;}
 
-    bool verbose=(!XHOST.QUIET && !quiet && osswrite);
+    //ME20220503 - XHOST.QUIET should be part of quiet to allow for whitelisting
+    //bool verbose=(!XHOST.QUIET && !quiet && osswrite);
+    bool verbose=(!quiet && osswrite);
     bool fancy_print=(!XHOST.vflag_control.flag("WWW")&&!XHOST.vflag_control.flag("NO_FANCY_PRINT"));  //CO20200404 - new web flag
 
     FILE* fstr=stdout;
@@ -3168,7 +3142,9 @@ namespace aurostd {
     }
     if(message_parts.size()==0){return;}
 
-    bool verbose=(!XHOST.QUIET && !quiet && osswrite);  //[CO2010315 - not always, removing for OUTCARs read during vasp runs]verbose=true; //ALWAYS!
+    //ME20220503 - XHOST.QUIET should be part of quiet to allow for whitelisting
+    //bool verbose=(!XHOST.QUIET && !quiet && osswrite);  //[CO2010315 - not always, removing for OUTCARs read during vasp runs]verbose=true; //ALWAYS!
+    bool verbose=(!quiet && osswrite);
     bool fancy_print=(!XHOST.vflag_control.flag("WWW")&&!XHOST.vflag_control.flag("NO_FANCY_PRINT"));  //CO20200404 - new web flag
 
     FILE* fstr=stderr;
@@ -3244,7 +3220,9 @@ namespace aurostd {
     }
     if(message_parts.size()==0){return;}
 
-    bool verbose=(!XHOST.QUIET && !quiet && osswrite);  //[CO2010315 - not always, removing for OUTCARs read during vasp runs]verbose=true; //ALWAYS!
+    //ME20220503 - XHOST.QUIET should be part of quiet to allow for whitelisting
+    //bool verbose=(!XHOST.QUIET && !quiet && osswrite);  //[CO2010315 - not always, removing for OUTCARs read during vasp runs]verbose=true; //ALWAYS!
+    bool verbose=(!quiet && osswrite);
     bool fancy_print=(!XHOST.vflag_control.flag("WWW")&&!XHOST.vflag_control.flag("NO_FANCY_PRINT"));  //CO20200404 - new web flag
 
     FILE* fstr=stderr;
@@ -3383,12 +3361,11 @@ namespace aurostd {
   }
 
   bool execute(const string& _command) {
-    string soliloquy=XPID+"aurostd::execute():";
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // cerr << "COMMAND " <<  command.c_str() << endl;
     string command=aurostd::CleanCommand4Execute(_command); //CO20200624
-    if(LDEBUG){cerr << soliloquy << " command.c_str()=\"" << command.c_str() << "\"" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " command.c_str()=\"" << command.c_str() << "\"" << endl;}
     system(command.c_str());
     //   command="";
     return TRUE;
@@ -3423,7 +3400,6 @@ namespace aurostd {
   // ***************************************************************************
   string execute2string(const string& _command,FSIO fsio) { //CO20200624 - added file system IO mode
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"aurostd::execute2string():";
 
     // bool INIT_VERBOSE=TRUE;
     // cerr << "COMMAND " <<  command << endl;
@@ -3439,7 +3415,7 @@ namespace aurostd {
     if(fsio==stdouterr_fsio){cmdstream << "bash -c \"" << command << " &> " << file << "\"";}  //CO20200624 //SD20220311 - force bash, &> does not work in sh; be careful with quotes within quotes, althought it seems to work
     else if(fsio==stderr_fsio){cmdstream << command << " 2> " << file;} //CO20200624
     else{cmdstream << command << " > " << file;} //CO20200624
-    if(LDEBUG){cerr << soliloquy << " cmdstream=\"" << cmdstream.str() << "\"" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " cmdstream=\"" << cmdstream.str() << "\"" << endl;}
     system(cmdstream.str().c_str());
     // command="";
     strstream << aurostd::file2string(file);
@@ -3451,7 +3427,7 @@ namespace aurostd {
     if(strout.length()>0)
       if(strout.at(strout.length()-1)=='\n')
         strout.erase(strout.length()-1);
-    if(LDEBUG){cerr << soliloquy << " strout=\"" << strout << "\"" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " strout=\"" << strout << "\"" << endl;}
     return strout;
   }
 
@@ -3490,19 +3466,18 @@ namespace aurostd {
 
   string CleanCommand4Execute(const string& _command){ //CO20200624
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"aurostd::CleanCommand4Execute():";
 
-    if(LDEBUG){cerr << soliloquy << " command(pre )=\"" << _command << "\"" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " command(pre )=\"" << _command << "\"" << endl;}
     //CO20200624 START - some command cleanup
     vector<string> vtokens,vtokens_new;
     aurostd::string2vectorstring(aurostd::RemoveWhiteSpacesFromTheFrontAndBack(_command),vtokens);
     string tmp="";
     uint i=0;
     for(i=0;i<vtokens.size();i++){
-      if(LDEBUG){cerr << soliloquy << " vtokens[i=" << i << "](pre )=\"" << vtokens[i] << "\"" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " vtokens[i=" << i << "](pre )=\"" << vtokens[i] << "\"" << endl;}
       tmp=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vtokens[i]);
       aurostd::CleanStringASCII_InPlace(tmp);
-      if(LDEBUG){cerr << soliloquy << " vtokens[i=" << i << "](post)=\"" << tmp << "\"" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " vtokens[i=" << i << "](post)=\"" << tmp << "\"" << endl;}
       if(!tmp.empty()){vtokens_new.push_back(tmp);}
     }
     if(vtokens_new.size()==0){return "";}
@@ -3522,7 +3497,7 @@ namespace aurostd {
       }
     }
     //CO20200624 END - some command cleanup
-    if(LDEBUG){cerr << soliloquy << " command(post)=\"" << command << "\"" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " command(post)=\"" << command << "\"" << endl;}
     return command;
   }
 
@@ -3575,8 +3550,7 @@ namespace aurostd {
   // *******************************************************************************************
   vector<string> GrepFile(const string& filename,const string& keyword,bool RemoveWS,bool RemoveComments){  //CO20210623 - update after integrating new substring2bool (RemoveWS,RemoveComments)
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"aurostd::GrepFile():";
-    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
 
     vector<string> vout;
     if(aurostd::FileExist(filename)==false){return vout;}
@@ -3587,12 +3561,12 @@ namespace aurostd {
     ifstream FileStream;FileStream.open(filename.c_str(),std::ios::in);
     while(getline(FileStream,strline)){
       if(aurostd::substring2bool(strline,keyword,RemoveWS)) {
-        if(LDEBUG){cerr << soliloquy << " found matching line: \"" << strline << "\"" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " found matching line: \"" << strline << "\"" << endl;}
         vout.push_back(strline);
       }
     }
 
-    if(LDEBUG){cerr << soliloquy << " END" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " END" << endl;}
     return vout;
   }
 
@@ -4727,9 +4701,8 @@ namespace aurostd {
   //CO20200223
   bool eurl2stringstream(const string& url,stringstream& stringstreamIN,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aurostd::eurl2stringstream():";
-    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
-    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " Loading url=" << url << endl;
+    if(verbose) cout << __AFLOW_FUNC__ << " Loading url=" << url << endl;
     string stringIN="";  //CO20200404
     bool out=eurl2string(url,stringIN,verbose);
     aurostd::StringstreamClean(stringstreamIN); stringstreamIN << stringIN;
@@ -4742,9 +4715,8 @@ namespace aurostd {
   // wget URL to stringstream - Stefano Curtarolo
   bool url2stringstream(const string& url,stringstream& stringstreamIN,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aurostd::url2stringstream():";
-    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
-    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " Loading url=" << url << endl;
+    if(verbose) cout << __AFLOW_FUNC__ << " Loading url=" << url << endl;
     string stringIN="";  //CO20200404
     bool out=url2string(url,stringIN,verbose);
     aurostd::StringstreamClean(stringstreamIN); stringstreamIN << stringIN;
@@ -4757,9 +4729,8 @@ namespace aurostd {
   //CO20200223
   bool eurl2vectorstring(const string& url,vector<string>& vlines,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aurostd::eurl2vectorstring():";
-    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
-    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " Loading url=" << url << endl;
+    if(verbose) cout << __AFLOW_FUNC__ << " Loading url=" << url << endl;
     string stringIN="";  //CO20200404
     bool out=eurl2string(url,stringIN,verbose);
     aurostd::string2tokens(stringIN,vlines);
@@ -4771,9 +4742,8 @@ namespace aurostd {
   // wget URL to vectorstring - Stefano Curtarolo
   bool url2vectorstring(const string& url,vector<string>& vlines,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aurostd::url2vectorstring():";
-    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
-    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " Loading url=" << url << endl;
+    if(verbose) cout << __AFLOW_FUNC__ << " Loading url=" << url << endl;
     string stringIN="";  //CO20200404
     bool out=url2string(url,stringIN,verbose);
     aurostd::string2tokens(stringIN,vlines);
@@ -4786,9 +4756,8 @@ namespace aurostd {
   //CO20200223
   bool eurl2dequestring(const string& url,deque<string>& vlines,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aurostd::eurl2dequestring():";
-    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
-    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " Loading url=" << url << endl;
+    if(verbose) cout << __AFLOW_FUNC__ << " Loading url=" << url << endl;
     string stringIN="";  //CO20200404
     bool out=eurl2string(url,stringIN,verbose);
     aurostd::string2tokens(stringIN,vlines);
@@ -4801,9 +4770,8 @@ namespace aurostd {
   // wget URL to dequestring - Stefano Curtarolo
   bool url2dequestring(const string& url,deque<string>& vlines,bool verbose) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aurostd::url2dequestring():";
-    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
-    if(verbose) cout << soliloquy << " Loading url=" << url << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " Loading url=" << url << endl;
+    if(verbose) cout << __AFLOW_FUNC__ << " Loading url=" << url << endl;
     string stringIN="";  //CO20200404
     bool out=url2string(url,stringIN,verbose);
     aurostd::string2tokens(stringIN,vlines);
@@ -4816,20 +4784,19 @@ namespace aurostd {
   //CO20200223
   template<typename utype> uint eurl2tokens(const string& url,vector<utype>& tokens,const string& delimiters) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aurostd::url2tokens<utype>(vector):";
-    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " Loading url=" << url << endl;
     if(!aurostd::IsCommandAvailable("wget")) {
-      cerr << "ERROR - " << soliloquy << ": command \"wget\" is necessary !" << endl;
+      cerr << "ERROR - " << __AFLOW_FUNC__ << ": command \"wget\" is necessary !" << endl;
       return 0;}	
     tokens.clear(); 
     string content = "";
     aurostd::eurl2string(url,content);
     if(LDEBUG) { //CO20180627
-      cerr << soliloquy << " content=" << endl;
+      cerr << __AFLOW_FUNC__ << " content=" << endl;
       cerr << content << endl;
     }
     if(content.empty()) {
-      if(LDEBUG){cerr << "ERROR - " << soliloquy << ": URL empty http://" << url << endl;} //CO20200731 - silence this, it's not an error
+      if(LDEBUG){cerr << "ERROR - " << __AFLOW_FUNC__ << ": URL empty http://" << url << endl;} //CO20200731 - silence this, it's not an error
       return 0;
     }
 
@@ -4838,7 +4805,7 @@ namespace aurostd {
     for(uint i=0;i<stokens.size();i++)
       if(!stokens[i].empty()) 
         tokens.push_back(aurostd::string2utype<utype>(stokens[i]));
-    if(LDEBUG) cerr << soliloquy << " [5] tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " [5] tokens.size()=" << tokens.size() << endl;
     return tokens.size();
   }
 
@@ -4848,20 +4815,19 @@ namespace aurostd {
   // wget URL to vector of tokens - Stefano Curtarolo
   template<typename utype> uint url2tokens(const string& url,vector<utype>& tokens,const string& delimiters) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="aurostd::url2tokens<utype>(vector):";
-    if(LDEBUG) cerr << soliloquy << " Loading url=" << url << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " Loading url=" << url << endl;
     if(!aurostd::IsCommandAvailable("wget")) {
-      cerr << "ERROR - " << soliloquy << ": command \"wget\" is necessary !" << endl;
+      cerr << "ERROR - " << __AFLOW_FUNC__ << ": command \"wget\" is necessary !" << endl;
       return 0;}	
     tokens.clear(); 
     string content = "";
     aurostd::url2string(url,content);
     if(LDEBUG) { //CO20180627
-      cerr << soliloquy << " content=" << endl;
+      cerr << __AFLOW_FUNC__ << " content=" << endl;
       cerr << content << endl;
     }
     if(content.empty()) {
-      if(LDEBUG){cerr << "ERROR - " << soliloquy << ": URL empty http://" << url << endl;} //CO20200731 - silence this, it's not an error
+      if(LDEBUG){cerr << "ERROR - " << __AFLOW_FUNC__ << ": URL empty http://" << url << endl;} //CO20200731 - silence this, it's not an error
       return 0;
     }
 
@@ -4870,7 +4836,7 @@ namespace aurostd {
     for(uint i=0;i<stokens.size();i++)
       if(stokens[i]!="") 
         tokens.push_back(aurostd::string2utype<utype>(stokens[i]));
-    if(LDEBUG) cerr << soliloquy << " [5] tokens.size()=" << tokens.size() << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " [5] tokens.size()=" << tokens.size() << endl;
     return tokens.size();
   }
 
@@ -5594,6 +5560,39 @@ namespace aurostd {
     return FALSE;
   }
 
+  // ME20220505
+  // Matches a list of substrings to a string
+  // match_all: only substring must be inside the string
+  bool substringlist2bool(const string& strin, const vector<string>& substrings, bool match_all) {
+    for (uint i = 0; i < substrings.size(); i++) {
+      if (strin.find(substrings[i]) == string::npos) {
+        // Didn't find substring, but need all
+        if (match_all) return false;
+      } else if (!match_all) {
+        // Found something and only need one
+        return true;
+      }
+    }
+    // Code only gets here when all substrings are
+    // in the string (match_all) or none have (!match_all)
+    return match_all;
+  }
+
+  bool substringlist2bool(const string& strin, const deque<string>& substrings, bool match_all) {
+    for (uint i = 0; i < substrings.size(); i++) {
+      if (strin.find(substrings[i]) == string::npos) {
+        // Didn't find substring, but need all
+        if (match_all) return false;
+      } else if (!match_all) {
+        // Found something and only need one
+        return true;
+      }
+    }
+    // Code only gets here when all substrings are
+    // in the string (match_all) or none have (!match_all)
+    return match_all;
+  }
+
   bool substring2bool(const stringstream& strstream,const string& strsub1,bool RemoveWS,bool RemoveComments) {
     return aurostd::substring2bool(strstream.str(),strsub1,RemoveWS,RemoveComments);
   }
@@ -5658,6 +5657,39 @@ namespace aurostd {
     return false;
   }
 
+  //ME20220503
+  bool SubstringWithinList(const deque<string>& list, const string& input) {
+    int index = -1;
+    return SubstringWithinList(list, input, index);
+  }
+
+  bool SubstringWithinList(const deque<string>& list, const string& input, int& index) {
+    for (deque<string>::const_iterator it = list.begin(); it != list.end(); ++it) {
+      if ((*it).find(input) != string::npos) {
+        index = std::distance(list.begin(), it);
+        return true;
+      }
+    }
+    index = -1;
+    return false;
+  }
+
+  bool SubstringWithinList(const vector<string>& list, const string& input) {
+    int index = -1;
+    return SubstringWithinList(list, input, index);
+  }
+
+  bool SubstringWithinList(const vector<string>& list, const string& input, int& index) {
+    for (vector<string>::const_iterator it = list.begin(); it != list.end(); ++it) {
+      if ((*it).find(input) != string::npos) {
+        index = std::distance(list.begin(), it);
+        return true;
+      }
+    }
+    index = -1;
+    return false;
+  }
+
   bool EWithinList(const vector<string>& list,const string& input) { //CO20200223
     string output="";
     return EWithinList(list, input, output);
@@ -5702,12 +5734,11 @@ namespace aurostd {
     //adding size_max: if the file is bigger than size_max, then do not search and return FALSE
     //files that are too big will freeze-up the grep command
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "aurostd::substring_present_file_FAST():";
     string message = "";
 
     if(!aurostd::FileExist(FileName)) {
       message = "file input not found =" + FileName;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
     if(size_max!=AUROSTD_MAX_ULLINT){
       unsigned long long int fsize=aurostd::FileSize(FileName);
@@ -5729,11 +5760,11 @@ namespace aurostd {
         strsub1=aurostd::joinWDelimiter(vtokens,"\\s*");
         if(!strsub1_keep.empty() && strsub1_keep[0]==' '){strsub1="\\s*"+strsub1;}  //insert at the front
         if(!strsub1_keep.empty() && strsub1_keep[strsub1_keep.size()-1]==' '){strsub1+="\\s*";} //append at the back
-        if(LDEBUG){cerr << soliloquy << " strsub1(regex)=\"" << strsub1 << "\"" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " strsub1(regex)=\"" << strsub1 << "\"" << endl;}
         if(strsub1.find("\\s*")!=string::npos){is_regex_used=true;}
       }else{
         strsub1=aurostd::RemoveWhiteSpaces(strsub1);
-        if(LDEBUG){cerr << soliloquy << " strsub1(!regex)=\"" << strsub1 << "\"" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " strsub1(!regex)=\"" << strsub1 << "\"" << endl;}
       }
     }
 
@@ -5747,7 +5778,7 @@ namespace aurostd {
 
     string cat_command="cat";
     if(expect_near_end && aurostd::IsCommandAvailable("tac")){cat_command="tac";}
-    if(LDEBUG){cerr << soliloquy << " cat_command=\"" << cat_command << "\"" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " cat_command=\"" << cat_command << "\"" << endl;}
 
     aus << cat_command << " \"" << FileName << "\"";
     if(use_regex==false && RemoveWS==true){aus << " | sed \"s/ //g\" | sed \"s/\\t//g\"";}
@@ -5763,20 +5794,20 @@ namespace aurostd {
 
     string grep_command="grep";
     if(aurostd::IsCommandAvailable("fgrep") && is_regex_used==false){grep_command="fgrep";}  //fixed string search
-    if(LDEBUG){cerr << soliloquy << " grep_command=\"" << grep_command << "\"" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " grep_command=\"" << grep_command << "\"" << endl;}
 
     string grep_flags="-c"; //return count instead of strings matching
     if(case_insensitive==true){grep_flags="-ic";} //case-insensitive, should work with both grep and fgrep (tested by CO20210601)
     if(is_regex_used){grep_flags="-E "+grep_flags;} //regex flag
-    if(LDEBUG){cerr << soliloquy << " grep_flags=\"" << grep_flags << "\"" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " grep_flags=\"" << grep_flags << "\"" << endl;}
 
     aus << " | " << grep_command << " " << grep_flags << " -m 1 \"" << strsub1 << "\" > " << temp_file  << endl;  //-m 1: stop when you find a match
     aus << "echo >> " << temp_file << endl; // to give EOL
-    if(LDEBUG){cerr << soliloquy << " command=\"" << aus.str() << "\"" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " command=\"" << aus.str() << "\"" << endl;}
     aurostd::execute(aus);
     if(!aurostd::FileExist(temp_file)) {
       message = "file output not found =" + FileName;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
     FileFile.open(temp_file.c_str(),std::ios::in);
     FileFile.clear();FileFile.seekg(0);
@@ -6679,7 +6710,6 @@ namespace aurostd {
     // see http://tex.stackexchange.com/questions/34580/escape-character-in-latex
     // double_back_slash was needed SOMETIMES for gnuplot output, as one backslash
     // went away when writing to file, and  -- OBSOLETE NOW
-    string soliloquy="ConvexHull::fixStringLatex():";
     string output;
     vector<char> problem_characters;
     problem_characters.push_back('&');
@@ -6765,8 +6795,8 @@ namespace aurostd {
           if(!found_escaped_char) {
             stringstream message;
             message << "Extraneous backslash found in \"" << input << "\" which may cause problems for LaTeX/gnuplot";
-            //[moved from chull]pflow::logger(soliloquy,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
-            cerr << soliloquy << " ERROR - " << message.str() << endl;
+            //[moved from chull]pflow::logger(__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
+            cerr << __AFLOW_FUNC__ << " ERROR - " << message.str() << endl;
             return input;
           }
         }
@@ -7382,6 +7412,7 @@ namespace aurostd {
   // setprecision,fixed, etc.
   // m_delimiter is used if input is exactly length 2
   // l_delimiter otherwise
+  // ME20220324 - added missing uint variant for xvector
   string joinWDelimiter(const xvector<int>& ientries, const char& _delimiter) {
     return joinWDelimiter(ientries, _delimiter, _delimiter, _delimiter);
   }
@@ -7420,6 +7451,72 @@ namespace aurostd {
     return joinWDelimiter(ientries, delimiter, delimiter, l_delimiter);
   }
   string joinWDelimiter(const xvector<int>& ientries, const stringstream& delimiter,
+      const stringstream& m_delimiter,
+      const stringstream& l_delimiter) {
+    stringstream output;
+    string delim = delimiter.str();
+    string mDelim = m_delimiter.str();
+    string lDelim = l_delimiter.str();
+
+    if (ientries.rows > 2) {
+      for (int i =ientries.lrows; i <= ientries.urows; i++) {
+        output << ientries[i];
+        if (i == ientries.urows - 1) {  //CO20180216 - added -1
+          output << lDelim;
+        } else if (i !=ientries.urows) {
+          output << delim;
+        }
+      }
+    } else {
+      for (int i = ientries.lrows; i <= ientries.urows; i++) {
+        output << ientries[i];
+        if (i == ientries.urows - 1) {  //CO20180216 - added -1
+          output << mDelim;
+        } else if (i != ientries.urows) {
+          output << delim;
+        }
+      }
+    }
+    return output.str();
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const char& _delimiter) {
+    return joinWDelimiter(ientries, _delimiter, _delimiter, _delimiter);
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const char& _delimiter,
+      const char& _l_delimiter) {
+    return joinWDelimiter(ientries, _delimiter, _delimiter, _l_delimiter);
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const char& _delimiter,
+      const char& _m_delimiter, const char& _l_delimiter) {
+    stringstream delimiter, m_delimiter, l_delimiter;
+    delimiter << _delimiter;
+    m_delimiter << _m_delimiter;
+    l_delimiter << _l_delimiter;
+    return joinWDelimiter(ientries, delimiter, m_delimiter, l_delimiter);
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const string& _delimiter) {
+    return joinWDelimiter(ientries, _delimiter, _delimiter, _delimiter);
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const string& _delimiter,
+      const string& _l_delimiter) {
+    return joinWDelimiter(ientries, _delimiter, _delimiter, _l_delimiter);
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const string& _delimiter,
+      const string& _m_delimiter, const string& _l_delimiter) {
+    stringstream delimiter, m_delimiter, l_delimiter;
+    delimiter << _delimiter;
+    m_delimiter << _m_delimiter;
+    l_delimiter << _l_delimiter;
+    return joinWDelimiter(ientries, delimiter, m_delimiter, l_delimiter);
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const stringstream& delimiter) {
+    return joinWDelimiter(ientries, delimiter, delimiter, delimiter);
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const stringstream& delimiter,
+      const stringstream& l_delimiter) {
+    return joinWDelimiter(ientries, delimiter, delimiter, l_delimiter);
+  }
+  string joinWDelimiter(const xvector<uint>& ientries, const stringstream& delimiter,
       const stringstream& m_delimiter,
       const stringstream& l_delimiter) {
     stringstream output;
@@ -7949,7 +8046,7 @@ namespace aurostd {
   string xmatDouble2String(const xmatrix<double>& xmat_in, int precision, bool roff, double tol, char FORMAT){
     stringstream output;
     vector<string> rows;
-    for(int i=1;i<=xmat_in.urows;i++){ //DX20180323 - fixed typo for initial index "int i=1" not "int i=xmat_in.urows"
+    for(int i=xmat_in.lrows;i<=xmat_in.urows;i++){ //DX20180323 - fixed typo for initial index "int i=1" not "int i=xmat_in.urows" //ME20220324 - changed to lrows
       stringstream row;
       xvector<double> xvec = xmat_in(i); //DX20170822 - added roundoff
       //if(roff){ xvec = roundoff(xvec,tol);} //DX20170822 - added roundoff
@@ -7960,6 +8057,18 @@ namespace aurostd {
     output << joinWDelimiter(rows,",");
     return output.str();
   }
+
+  //ME20220324
+  template <typename utype>
+  string xmat2String(const xmatrix<utype>& xmat_in) {
+    vector<string> rows;
+    for (int i = xmat_in.lrows; i <= xmat_in.urows; i++) {
+      rows.push_back("[" + joinWDelimiter(xmat_in(i), ",") + "]");
+    }
+    return joinWDelimiter(rows, ",");
+  }
+  template string xmat2String(const xmatrix<int>&);
+  template string xmat2String(const xmatrix<uint>&);
 }
 //DX20170803 START: Matrix to END
 
@@ -7987,6 +8096,9 @@ namespace aurostd {
     }
     return vout;
   }
+  string vecDouble2String(const vector<double>& vin,int precision, bool roff, double tol, char FORMAT) {
+    return aurostd::joinWDelimiter(vecDouble2vecString(vin, precision, roff, tol, FORMAT), ",");
+  }
   // [OBSOLETE] vector<string> xvecDouble2vecString(const xvector<double>& vin, bool roff) {
   // [OBSOLETE]   vector<string> vout;
   // [OBSOLETE]   for(uint i=1;i<(uint)vin.rows+1;i++){
@@ -8004,6 +8116,9 @@ namespace aurostd {
       vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); //DX20170822 - add roundoff
     }
     return vout;
+  }
+  string xvecDouble2String(const xvector<double>& vin,int precision, bool roff, double tol, char FORMAT) {
+    return aurostd::joinWDelimiter(xvecDouble2vecString(vin, precision, roff, tol, FORMAT), ",");
   }
   // [OBSOLETE] deque<string> deqDouble2deqString(const deque<double>& vin, bool roff) {
   // [OBSOLETE]   deque<string> vout;
@@ -8023,6 +8138,9 @@ namespace aurostd {
       vout.push_back(aurostd::utype2string(vin[i],precision,roff,tol,FORMAT)); //DX20170822 - add roundoff
     }
     return vout;
+  }
+  string vecDouble2String(const deque<double>& vin,int precision, bool roff, double tol, char FORMAT) {
+    return aurostd::joinWDelimiter(vecDouble2vecString(vin, precision, roff, tol, FORMAT), ",");
   }
 }
 
