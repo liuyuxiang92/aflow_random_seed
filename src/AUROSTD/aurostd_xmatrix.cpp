@@ -379,41 +379,38 @@ namespace aurostd {  // namespace aurostd
   template<class utype> void
     xmatrix<utype>::getmatInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output //CO20191110
       //AZ20220627 START
+      bool LDEBUG=(FALSE || XHOST.DEBUG);
       if(lrows_out==AUROSTD_MAX_INT){lrows_out=lrows;}
       if(lcols_out==AUROSTD_MAX_INT){lcols_out=lcols;}
-<<<<<<< HEAD
       if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow<lrows",_INDEX_BOUNDS_);}
       if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_INDEX_BOUNDS_);}
       if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol<lcols",_INDEX_BOUNDS_);}
       if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ucol>ucols",_INDEX_BOUNDS_);}
-=======
-      if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow<lrows",_VALUE_ILLEGAL_);}
-      cerr << "1" << endl;
-      if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_VALUE_ILLEGAL_);}
-      cerr << "1" << endl;
-      if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol<lcols",_VALUE_ILLEGAL_);}
-      cerr << "1" << endl;
-      if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ucol>ucols",_VALUE_ILLEGAL_);}
-      cerr << "1" << endl;
->>>>>>> 58164c3f (debugging xmatrix2xvector call in getmatInPlace)
+      
       //AZ20220627 END
       xmatrix<utype> xmat;
       (*this).getmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
-     
-      cerr << "inplace_complete in vec overload" << endl;
-      cerr << "xmat.lrows: " << xmat.lrows << " lrows: " << lrows << endl;
-      cerr << "xmat.urows: " << xmat.urows << " urows: " << urows << endl;
-      cerr << "xmat.lcols: " << xmat.lcols << " lcols: " << lcols << endl;
-      cerr << "xmat.ucols: " << xmat.ucols << " ucols: " << ucols << endl;
-      //cerr << "urows: " << urows << endl;
-      //cerr << "urow: " << urow << endl;
-      //cerr << "lrow: " << lrow << endl;
-      //cerr << "lrows_out" << lrows_out << endl;
-      //cerr << "lcols_out" << lcols_out << endl;
-      //AZ Hack that makes it work
-      xv_out=xmatrix2xvector(xmat,xmat.urows, xmat.ucols, xmat.lrows, xmat.lcols, (xmat.urows==xmat.lrows) ? lrows_out : lcols_out);
-      //xv_out=xmatrix2xvector(xmat,urow,ucol,lrow,lcol,(urow==lrow) ? lrows_out : lcols_out);
-
+      if(LDEBUG){
+        cerr << "xmat=" << endl << xmat << endl;
+        cerr << "urows=" << urows << " xmat.urows=" << xmat.urows << endl;
+        cerr << "ucols=" << ucols << " xmat.ucols=" << xmat.ucols << endl;
+        cerr << "lrows=" << lrows << " xmat.lrows=" << xmat.lrows << endl;
+        cerr << "lcols=" << lcols << " xmat.lcols=" << xmat.lcols << endl;
+        cerr << "urow=" << urow << endl;
+        cerr << "ucol=" << ucol << endl;
+        cerr << "lrow=" << lrow << endl;
+        cerr << "lcol=" << lcol << endl;
+       }
+      //AZ20220630 START
+      int m2vlout=lrows;
+      if((xmat.urows==xmat.lrows)&&(xmat.ucols==xmat.lcols)){m2vlout=lrows_out;}
+      else if(xmat.urows==xmat.lrows){m2vlout=lrows_out;}
+      else{m2vlout=lcols_out;}
+      xv_out=xmatrix2xvector(xmat,xmat.urows,xmat.ucols,xmat.lrows,xmat.lcols,m2vlout);
+      //xmatrix2xvector was called incorrectly using lcol, ucol, lrow, urow with no xmat prefix
+      //one-line version of above logic:
+      //xv_out=xmatrix2xvector(xmat,xmat.urows,xmat.ucols,xmat.lrows,xmat.lcols,(xmat.urows==xmat.lrows) ? lrows_out : lcols_out);
+      //AZ20220630 END 
     }
   template<class utype> xmatrix<utype>
     xmatrix<utype>::getmat(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
@@ -423,13 +420,7 @@ namespace aurostd {  // namespace aurostd
     }
   template<class utype> xvector<utype>
     xmatrix<utype>::getvec(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
-<<<<<<< HEAD
       if((lcol!=ucol)&&(lrow!=urow)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"(lcol!=ucol)&&(lrow!=urow)",_INDEX_BOUNDS_);}
-      //AZ20220628 makes sure it returns a 1d vector
-=======
-      //if(!((lcol!=ucol)||(lrow!=urow))){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"(lcol!=ucol)&&(lrow!=urow)",_INDEX_BOUNDS_);} //AZ20220628 makes sure it returns a 1d vector
-      cerr << "in getvec" << endl;
->>>>>>> 58164c3f (debugging xmatrix2xvector call in getmatInPlace)
       xvector<utype> xvec;
       (*this).getmatInPlace(xvec,lrow,urow,lcol,ucol,lrows_out,lcols_out);
       return xvec;
@@ -1707,17 +1698,19 @@ namespace aurostd {                   // conversion to xvector
   template<class utype> xvector<utype>
     xmatrix2xvector(const xmatrix<utype>& xmat,int urow,int ucol,int lrow,int lcol,int lrows_out) __xprototype {  //CO20191110
       //AZ20220627 START
-      bool LDEBUG=(FALSE || XHOST.DEBUG);
+      //Beware the argument order in xmatrix2xvector
+      bool LDEBUG=(false || XHOST.DEBUG);
       if(LDEBUG){
-        cerr << __AFLOW_FUNC__ << " xmat=" << xmat << endl;
-        cerr << __AFLOW_FUNC__ << " urow=" << urow << endl;
-        cerr << __AFLOW_FUNC__ << " ucol=" << ucol << endl;
-        cerr << __AFLOW_FUNC__ << " lrow=" << lrow << endl;
-        cerr << __AFLOW_FUNC__ << " lcol=" << lcol << endl;
+        cerr << __AFLOW_FUNC__ << " xmat=" << endl << xmat << endl;
+        cerr << __AFLOW_FUNC__ << " xmat.urows=" << xmat.urows << " urow=" << urow << endl;
+        cerr << __AFLOW_FUNC__ << " xmat.ucols=" << xmat.ucols << " ucol=" << ucol << endl;
+        cerr << __AFLOW_FUNC__ << " xmat.lrows=" << xmat.lrows << " lrow=" << lrow << endl;
+        cerr << __AFLOW_FUNC__ << " xmat.lcols=" << xmat.lcols << " lcol=" << lcol << endl;
         cerr << __AFLOW_FUNC__ << " lrows_out=" << lrows_out << endl;
       }
       //AZ20220627 END
       if(urow==lrow){
+<<<<<<< HEAD
 	cerr << "urow==lrow" << endl;
         xvector<utype> xv((ucol-lcol)+1,lrows_out);
         for(int i=lcol;i<=ucol;i++){cerr << "xv_index" << i-lcol+xv.lrows << endl;
@@ -1731,8 +1724,23 @@ namespace aurostd {                   // conversion to xvector
         return xv;
       }else if(ucol==lcol){
 	cerr << "ucol==lcol" << endl;
+=======
+	if(LDEBUG){cerr << __AFLOW_FUNC__ << " entering case urow==lrow" << endl;}
+        xvector<utype> xv((ucol-lcol)+1,lrows_out);
+        for(int i=lcol;i<=ucol;i++){
+		if(LDEBUG){
+			cerr << __AFLOW_FUNC__ << " i=" << i << endl;
+			cerr << __AFLOW_FUNC__ << " i-lcol+xv.lrows=" << i-lcol+xv.lrows << endl;
+			cerr << __AFLOW_FUNC__ << " lrow=" << lrow << endl;
+		}
+		xv(i-lcol+xv.lrows)=xmat[lrow][i];
+	}
+        return xv;
+      }else if(ucol==lcol){
+	if(LDEBUG){cerr << __AFLOW_FUNC__ << " entering case ucol==lcol" << endl;}
+>>>>>>> another_old_state
         xvector<utype> xv((urow-lrow)+1,lrows_out);
-        for(int i=lrow;i<=urow;i++){xv(i-lrow+xv.lrows)=xmat[lcol][i];}
+        for(int i=lrow;i<=urow;i++){xv(i-lrow+xv.lrows)=xmat[i][lcol];}
         return xv;
       }else{cerr << "inxmatrix2xvector" << endl;}// throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"cannot create 2D xvector",_INPUT_ILLEGAL_);} // AZ20220627
       return xvector<utype>(0);
