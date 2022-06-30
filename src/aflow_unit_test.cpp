@@ -265,7 +265,7 @@ namespace unittest {
       // Add function names to whitelist for displayResults
       for (uint i = 0; i < unit_tests.size(); i++) whitelist.push_back(test_functions[unit_tests[i]].function_name);
       XHOST.QUIET = true;
-      for (size_t i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.push_back(whitelist[i]);
+      //for (size_t i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.push_back(whitelist[i]);
     }
 #ifdef AFLOW_MULTITHREADS_ENABLE
     std::mutex mtx;
@@ -897,7 +897,7 @@ namespace unittest {
     check_function = "aurostd::getvec()";
     check_description = "get an xvector from xmatrix";
     string check_description1 = "get a 1x1 vector from xmatrix";
-    xmatrix<int> full_xmatint;
+    xmatrix<int> full_xmatint, xmatint;
     full_xmatint = xmatrix<int>(3,4);
     xvector<int> expected_xvecint(3);
     expected_xvecint(1) = 1;
@@ -911,8 +911,21 @@ namespace unittest {
     full_xmatint(3,1) = 9; full_xmatint(3,2) = 10; full_xmatint(3,3) = 11; full_xmatint(3,4) = 12;
     calculated_xvecint = full_xmatint.getvec(1,3,1,1);
     calculated_xvecint1 = full_xmatint.getvec(3,3,4,4);
-    checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
-    checkEqual(calculated_xvecint1, expected_xvecint1, check_function, check_description1, passed_checks, results);
+
+    full_xmatint.getmatInPlace(xmatint,2,3,4,4);
+    cout << "output of getmatInPlace" << endl << xmatint << endl;
+    cout << "xmatint.lrows=" << xmatint.lrows << endl;
+    cout << "xmatint.lcols=" << xmatint.lcols << endl;
+    cout << "xmatint.urows=" << xmatint.urows << endl;
+    cout << "xmatint.ucols=" << xmatint.ucols << endl;
+    cout << "xmatint[1][1]=" << xmatint[1][1] << endl;
+    cout << "xmatint[2][1]=" << xmatint[2][1] << endl;
+    full_xmatint.getmatInPlace(xmatint,1,1,1,3);
+    cout << "output of getmatInPlace" << endl << xmatint << endl;
+    cout << "xmatint.lrows=" << xmatint.lrows << endl;
+    cout << "xmatint.lcols=" << xmatint.lcols << endl;
+    cout << "xmatint.urows=" << xmatint.urows << endl;
+    cout << "xmatint.ucols=" << xmatint.ucols << endl;
 
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520

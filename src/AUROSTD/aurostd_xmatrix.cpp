@@ -1709,20 +1709,22 @@ namespace aurostd {                   // conversion to xvector
 	if(LDEBUG){cerr << __AFLOW_FUNC__ << " entering case urow==lrow" << endl;}
         xvector<utype> xv((ucol-lcol)+1,lrows_out);
         for(int i=lcol;i<=ucol;i++){
-		if(LDEBUG){
-			cerr << __AFLOW_FUNC__ << " i=" << i << endl;
-			cerr << __AFLOW_FUNC__ << " i-lcol+xv.lrows=" << i-lcol+xv.lrows << endl;
-			cerr << __AFLOW_FUNC__ << " lrow=" << lrow << endl;
-		}
-		xv(i-lcol+xv.lrows)=xmat[lrow][i];
-	}
+          if(LDEBUG){
+            cerr << __AFLOW_FUNC__ << " i=" << i << endl;
+            cerr << __AFLOW_FUNC__ << " i-lcol+xv.lrows=" << i-lcol+xv.lrows << endl;
+            cerr << __AFLOW_FUNC__ << " lrow=" << lrow << endl;
+          }
+          xv(i-lcol+xv.lrows)=xmat[lrow][i];
+        }
         return xv;
-      }else if(ucol==lcol){
+      }
+      else if(ucol==lcol){
 	if(LDEBUG){cerr << __AFLOW_FUNC__ << " entering case ucol==lcol" << endl;}
         xvector<utype> xv((urow-lrow)+1,lrows_out);
         for(int i=lrow;i<=urow;i++){xv(i-lrow+xv.lrows)=xmat[i][lcol];}
         return xv;
-      }else{cerr << "inxmatrix2xvector" << endl;}// throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"cannot create 2D xvector",_INPUT_ILLEGAL_);} // AZ20220627
+      }
+      else{cerr << "inxmatrix2xvector" << endl;}// throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"cannot create 2D xvector",_INPUT_ILLEGAL_);} // AZ20220627
       return xvector<utype>(0);
     }
 }
