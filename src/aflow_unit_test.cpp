@@ -265,7 +265,7 @@ namespace unittest {
       // Add function names to whitelist for displayResults
       for (uint i = 0; i < unit_tests.size(); i++) whitelist.push_back(test_functions[unit_tests[i]].function_name);
       XHOST.QUIET = true;
-      //for (size_t i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.push_back(whitelist[i]);
+      for (size_t i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.push_back(whitelist[i]);
     }
 #ifdef AFLOW_MULTITHREADS_ENABLE
     std::mutex mtx;
