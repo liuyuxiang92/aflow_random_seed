@@ -395,14 +395,16 @@ namespace aurostd {  // namespace aurostd
         cerr << "lrow=" << lrow << endl;
         cerr << "lcol=" << lcol << endl;
        }
-      //xmat: 1xcols: (xmat,xmat.urows,xmat.ucols,xmat.lrows,xmat.lcols,();
-      //xmat: rowsx1: (xmat,xmat.urows,xmat.ucols,xmat.lrows,xmat.lcols,();
+      //AZ20220630 START
       int m2vlout=lrows;
       if((xmat.urows==xmat.lrows)&&(xmat.ucols==xmat.lcols)){m2vlout=lrows_out;}
       else if(xmat.urows==xmat.lrows){m2vlout=lrows_out;}
       else{m2vlout=lcols_out;}
-      //xv_out=xmatrix2xvector(xmat,xmat.urows,xmat.ucols,xmat.lrows,xmat.lcols,m2vlout);
-      xv_out=xmatrix2xvector(xmat,xmat.urows,xmat.ucols,xmat.lrows,xmat.lcols,(xmat.urows==xmat.lrows) ? lrows_out : lcols_out);
+      xv_out=xmatrix2xvector(xmat,xmat.urows,xmat.ucols,xmat.lrows,xmat.lcols,m2vlout);
+      //AZ20220630 xmatrix2xvector was called incorrectly using lcol, ucol, lrow, urow with no xmat prefix
+      //one-line version of above logic:
+      //xv_out=xmatrix2xvector(xmat,xmat.urows,xmat.ucols,xmat.lrows,xmat.lcols,(xmat.urows==xmat.lrows) ? lrows_out : lcols_out);
+      //AZ20220630 END 
     }
   template<class utype> xmatrix<utype>
     xmatrix<utype>::getmat(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
@@ -412,8 +414,6 @@ namespace aurostd {  // namespace aurostd
     }
   template<class utype> xvector<utype>
     xmatrix<utype>::getvec(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
-      //if((lcol!=ucol)&&(lrow!=urow)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"(lcol!=ucol)&&(lrow!=urow)",_INDEX_BOUNDS_);}
-      //AZ20220628 makes sure it returns a 1d vector
       xvector<utype> xvec;
       (*this).getmatInPlace(xvec,lrow,urow,lcol,ucol,lrows_out,lcols_out);
       return xvec;
@@ -1691,6 +1691,7 @@ namespace aurostd {                   // conversion to xvector
   template<class utype> xvector<utype>
     xmatrix2xvector(const xmatrix<utype>& xmat,int urow,int ucol,int lrow,int lcol,int lrows_out) __xprototype {  //CO20191110
       //AZ20220627 START
+      //Beware the argument order in xmatrix2xvector
       bool LDEBUG=(false || XHOST.DEBUG);
       if(LDEBUG){
         cerr << __AFLOW_FUNC__ << " xmat=" << endl << xmat << endl;

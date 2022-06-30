@@ -265,7 +265,7 @@ namespace unittest {
       // Add function names to whitelist for displayResults
       for (uint i = 0; i < unit_tests.size(); i++) whitelist.push_back(test_functions[unit_tests[i]].function_name);
       XHOST.QUIET = true;
-      //for (size_t i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.push_back(whitelist[i]);
+      for (size_t i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.push_back(whitelist[i]);
     }
 #ifdef AFLOW_MULTITHREADS_ENABLE
     std::mutex mtx;
@@ -894,58 +894,26 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     // Check | getvec //AZ20220627
     // ---------------------------------------------------------------------------
-    
     check_function = "aurostd::getvec()";
     check_description = "get an xvector from xmatrix";
+    string check_description1 = "get a 1x1 vector from xmatrix";
     xmatrix<int> full_xmatint;
     full_xmatint = xmatrix<int>(3,4);
     xvector<int> expected_xvecint(3,1);
     expected_xvecint(1) = 1;
     expected_xvecint(2) = 5;
     expected_xvecint(3) = 9;
-    xvector<int> other_expected_xvecint(1);
-    other_expected_xvecint(1) = 11;
-    xvector<int> calculated_xvecint, other_calculated_xvecint;
+    xvector<int> expected_xvecint1(1);
+    expected_xvecint1(1) = 12;
+    xvector<int> calculated_xvecint, calculated_xvecint1;
     full_xmatint(1,1) = 1; full_xmatint(1,2) =  2; full_xmatint(1,3) =  3; full_xmatint(1,4) = 4;
     full_xmatint(2,1) = 5; full_xmatint(2,2) =  6; full_xmatint(2,3) =  7; full_xmatint(2,4) = 8;
     full_xmatint(3,1) = 9; full_xmatint(3,2) = 10; full_xmatint(3,3) = 11; full_xmatint(3,4) = 12;
     calculated_xvecint = full_xmatint.getvec(1,3,1,1);
-    other_calculated_xvecint = full_xmatint.getvec(3,3,3,3);
-    xvector<int> output;
-    for(int uc = 1; uc<= full_xmatint.ucols; uc++){
-	    for(int ur = 1; ur <= full_xmatint.urows; ur++){
-		    for(int lc = 1; lc <= uc; lc++){
-			    for(int lr = 1; lr <= ur; lr++){
-				    if(uc!=lc && ur!=lr){continue;}
-				    cerr << "full_xmatint=" << endl << full_xmatint << endl;
-				    cerr << "urow=" <<  ur << " ucol=" << uc << " lrow=" << lr << " lcol=" << lc << endl;
-				    output=full_xmatint.getvec(lr, ur, lc, uc);
-				    cerr << "getvec=" << output << endl;
-				    //cerr << full_xmatint[lc][lr] << endl;
-			    }}	    
-	    }} 
-    
-    for(int uc = 1; uc<= full_xmatint.ucols; uc++){
-	    for(int ur = 1; ur <= full_xmatint.urows; ur++){
-		    for(int lc = 1; lc <= uc; lc++){
-			    for(int lr = 1; lr <= ur; lr++){
-				    if(uc!=lc && ur!=lr){continue;}
-				    cerr << "full_xmatint=" << endl << full_xmatint << endl;
-				    cerr << "urow=" <<  ur << " ucol=" << uc << " lrow=" << lr << " lcol=" << lc << endl;
-				    output=full_xmatint.getvec(lr, ur, lc, uc);
-				    cerr << "getvec=" << output << endl;
-				    for(int i = lr; i <= ur; i++){
-				        for(int j = lc; j <= uc; j++){
-					    
-				            cerr << "manual_iteration" << " i: "<< i << " j: "<< j << " mat_element=" << full_xmatint[i][j];
-					}}
-				    
-		    cerr << endl;
-			    }}	    
-	    }} 
-    cerr << "other_calculated_xvecint=" << other_calculated_xvecint << endl;
-    cerr << "other_expected_xvecint=" << other_expected_xvecint << endl;
+    calculated_xvecint1 = full_xmatint.getvec(3,3,4,4);
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+    checkEqual(calculated_xvecint1, expected_xvecint1, check_function, check_description1, passed_checks, results);
+
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520
     // ---------------------------------------------------------------------------
