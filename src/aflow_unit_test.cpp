@@ -912,21 +912,6 @@ namespace unittest {
     calculated_xvecint = full_xmatint.getvec(1,3,1,1);
     calculated_xvecint1 = full_xmatint.getvec(3,3,4,4);
 
-    full_xmatint.getmatInPlace(xmatint,2,3,4,4);
-    cout << "output of getmatInPlace" << endl << xmatint << endl;
-    cout << "xmatint.lrows=" << xmatint.lrows << endl;
-    cout << "xmatint.lcols=" << xmatint.lcols << endl;
-    cout << "xmatint.urows=" << xmatint.urows << endl;
-    cout << "xmatint.ucols=" << xmatint.ucols << endl;
-    cout << "xmatint[1][1]=" << xmatint[1][1] << endl;
-    cout << "xmatint[2][1]=" << xmatint[2][1] << endl;
-    full_xmatint.getmatInPlace(xmatint,1,1,1,3);
-    cout << "output of getmatInPlace" << endl << xmatint << endl;
-    cout << "xmatint.lrows=" << xmatint.lrows << endl;
-    cout << "xmatint.lcols=" << xmatint.lcols << endl;
-    cout << "xmatint.urows=" << xmatint.urows << endl;
-    cout << "xmatint.ucols=" << xmatint.ucols << endl;
-
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520
     // ---------------------------------------------------------------------------
