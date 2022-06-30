@@ -796,6 +796,10 @@ namespace pocc {
       void calculatePhononDOSThread(uint i, const vector<uint>& vcalc, const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos);
 #endif
       xDOSCAR getAveragePhononDos(double T, const vector<xDOSCAR>& vxdos);
+
+      //AS20210204 QHA
+      void calculateQHAProperties();
+      void calculateQHAPropertiesAVG(const vector<double>& v_temperatures);
   };
 } // namespace pocc
 
@@ -853,6 +857,53 @@ namespace pocc {
       void free();
       void copy(const POccStructuresFile& b);
       //NECESSARY END CLASS METHODS - END
+  };
+}
+
+namespace pocc {
+  /// This class is used to calculate  thermodynamic properties over the ensemble,
+  /// defined by structures generated using POCC method.
+  class EnsembleThermo : public xStream {
+    public:
+      EnsembleThermo(ostream &oss=std::cout);
+      EnsembleThermo(const EnsembleThermo &ens);
+      EnsembleThermo(const string & currentDir, vector<string> &directories,
+          const string &filename, const string &calc_type,
+          apl::EOSmethod eos_method, bool isFVTprovided,
+          ofstream &FileMESSAGE, ostream &oss=std::cout);
+      const EnsembleThermo& operator=(const EnsembleThermo &ens);
+      ~EnsembleThermo();
+      apl::QHA qha;
+      apl::EOSmethod eos_method;
+      uint Nstructures;
+      int Nvolumes;
+      int nrows;
+      double Ensemble_Vmin, Ensemble_Vmax;
+      string currentDirectory;
+      xvector<double> T;
+      xmatrix<double> FV;
+      xvector<double> volumes;
+      vector<int> degeneracies;
+      vector<xmatrix<double> > coeffs_list;
+      xvector<double> Veq, Feq, B, Bprime, Cv, Cp, gamma, beta;
+      double logZ(const xvector<double> &E, const vector<int> &degeneracies, double T);
+      xvector<double> calcThermalExpansionSG(const xvector<double> &volumes, double dT);
+      xvector<double> calcIsobaricSpecificHeatSG(const xvector<double> &free_energies, double dT);
+      void calculateThermodynamicProperties();
+      void writeThermodynamicProperties();
+      void clear();
+    private:
+     void readFVTParameters(const string &filename, const string &blockname,
+         uint &Nvolumes, uint &Ntemperatures);
+      void readFVTdata(const string & dirname, const string& filename,
+        const string& blockname, uint n_volumes, uint n_temperatures, xvector<double> &t,
+        xmatrix<double> &c, double &Vmin, double &Vmax);
+      bool readCoeffData(const string& filename, const string& blockname,
+        xvector<double> &T, xmatrix<double> &coeffs);
+      void readCoeffParameters(const string& filename, double &Vmin, double &Vmax);
+      // mandatory
+      void free();
+      void copy(const EnsembleThermo &ens);
   };
 }
 

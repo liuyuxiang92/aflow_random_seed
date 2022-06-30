@@ -1996,6 +1996,11 @@ namespace pocc {
       if(LDEBUG){cerr << "Running APL postprocessing" << endl;}
       calculatePhononPropertiesAPL(v_temperatures);
     }
+    if (m_kflags.KBIN_PHONONS_CALCULATION_QHA) { //AS20210402
+      if(LDEBUG){cerr << "Running QHA postprocessing" << endl;}
+      calculateQHAProperties();
+      calculateQHAPropertiesAVG(v_temperatures);
+    }
 
     //END: TEMPERATURE DEPENDENT PROPERTIES
 
