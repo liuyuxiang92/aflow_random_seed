@@ -641,6 +641,11 @@ namespace aurostd { //CO20190620
   template<class utype> vector<int> getPeaks(const xvector<utype>& signal_input,xvector<utype>& signal_smooth,uint smoothing_iterations=4,uint avg_window=4,int width_maximum=1,double significance_multiplier=1.0);  //CO20190620
 }
 
+namespace aurostd {
+  // differenitation
+  xvector<double> diffSG(const xvector<double> &f, double dx);//AS20210901
+}
+
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 
