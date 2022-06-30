@@ -358,22 +358,18 @@ namespace aurostd {  // namespace aurostd
       if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_VALUE_ILLEGAL_);}
       if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol<lcols",_VALUE_ILLEGAL_);}
       if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ucol>ucols",_VALUE_ILLEGAL_);}
-      //if(lcol>ucol){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol>ucol",_VALUE_ILLEGAL_);}
-      //if(lrow>urow){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow>urow",_VALUE_ILLEGAL_);}
-      cerr << "in matrix operating getmat inplace"<< endl;
+      if(lcol>ucol){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol>ucol",_VALUE_ILLEGAL_);}
+      if(lrow>urow){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow>urow",_VALUE_ILLEGAL_);}
       //AZ20220627 END
       int rows_out=(urow-lrow)+1;
       int cols_out=(ucol-lcol)+1;
       if(! ( mat_out.rows==rows_out && mat_out.cols==cols_out && mat_out.lrows==lrows_out && mat_out.lcols==lcols_out ) ) { //check if necessary to create new object
 
-        cerr << "in first condition"<< endl;
         xmatrix<utype> mat(rows_out,cols_out,lrows_out,lcols_out);
         mat_out=mat;
       }
       for(int i=lrow;i<=urow;i++){
-        cerr << "in loop"<< endl;
-	cerr << i << endl;
-        for(int j=lcol;j<=ucol;j++){mat_out[(i-lrow)+mat_out.lrows][(j-lcol)+mat_out.lcols]=corpus[i][j]; cerr << "i" << i << "j" << j << endl;}
+        for(int j=lcol;j<=ucol;j++){mat_out[(i-lrow)+mat_out.lrows][(j-lcol)+mat_out.lcols]=corpus[i][j];}
       }
     }
   template<class utype> void
@@ -1710,21 +1706,6 @@ namespace aurostd {                   // conversion to xvector
       }
       //AZ20220627 END
       if(urow==lrow){
-<<<<<<< HEAD
-	cerr << "urow==lrow" << endl;
-        xvector<utype> xv((ucol-lcol)+1,lrows_out);
-        for(int i=lcol;i<=ucol;i++){cerr << "xv_index" << i-lcol+xv.lrows << endl;
-		cerr << "i" << i << endl;
-		cerr << "lrow" << lrow << endl;
-		cerr << "call of xv index" << xv(i-lcol+xv.lrows) << endl;
-		cerr << "print xmatrix" << xmat << endl;
-		cerr << "print xmatrix[1][1]" << xmat[1][1] << endl;
-		xv(i-lcol+xv.lrows)=xmat[i][lcol];
-	}
-        return xv;
-      }else if(ucol==lcol){
-	cerr << "ucol==lcol" << endl;
-=======
 	if(LDEBUG){cerr << __AFLOW_FUNC__ << " entering case urow==lrow" << endl;}
         xvector<utype> xv((ucol-lcol)+1,lrows_out);
         for(int i=lcol;i<=ucol;i++){
@@ -1738,7 +1719,6 @@ namespace aurostd {                   // conversion to xvector
         return xv;
       }else if(ucol==lcol){
 	if(LDEBUG){cerr << __AFLOW_FUNC__ << " entering case ucol==lcol" << endl;}
->>>>>>> another_old_state
         xvector<utype> xv((urow-lrow)+1,lrows_out);
         for(int i=lrow;i<=urow;i++){xv(i-lrow+xv.lrows)=xmat[i][lcol];}
         return xv;
