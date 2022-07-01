@@ -806,6 +806,7 @@ namespace aflowlib {
         // if(XHOST.vflag_pflow.flag("PROTO::AIMS")) {xstructure str_aims(aurl,"CONTCAR.relax.aims",IOAIMS_AUTO);return str_aims;}
         //CO20180622 - aflow_proto does not declare PROTO::VASP default for some reason
         if(str.atoms.size()==0){xstructure str_vasp(aurl,"CONTCAR.relax.vasp",IOVASP_AUTO);str=str_vasp;str.title+=" [ICSD from "+XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+"]" ;} //catch all
+        if(XHOST.vflag_pflow.flag("PROTO::ITC")) {str.xstructure2itc();}  //CO20220613
         if(mode==LIBRARY_MODE_ICSD_AFLOWLIB) {
           //CO20181106 - patch mass first, it defaults to 0 for loaded-in POSCARs
           //since it comes from the database, we trust that it contains mass-able components
