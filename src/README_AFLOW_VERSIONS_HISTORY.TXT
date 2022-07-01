@@ -30,6 +30,7 @@
         -- fixed KBIN::VASPVersionString2Double, aurostd::substring2bool, aurostd::kvpairfound (SD)
         -- added extract POSCAR from aflowin (SD)
         -- imporved AFLUX calls for --compare_database_entries and --compare2database (ME)
+        -- added --itc flag for structure generation (CO+DX)
         -- fixed RDF function (CO)
         -- added RDF to pocc (CO)
 3.2.12 - 2021/11/29

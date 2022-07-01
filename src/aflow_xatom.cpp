@@ -1745,10 +1745,20 @@ const _kpoint& _kpoint::operator=(const _kpoint& b) {       // operator=
 }
 
 // print kpoint string
-string _kpoint::str() const {
-  string tmp = "   " + aurostd::joinWDelimiter(xvecDouble2vecString(fpos,4,true,1e-4,FIXED_STREAM),"   ") + "   ! " + label;
-  if(is_transformed){ tmp += "\'"; } //add prime
-  return tmp;
+string _kpoint::str() const { //CO20220611 - negative sign formatting
+  //[CO20220611 - adding spacing for minus]string tmp = "   " + aurostd::joinWDelimiter(xvecDouble2vecString(fpos,4,true,1e-4,FIXED_STREAM),"   ") + "   ! " + label;
+  stringstream oss;
+  oss.precision(4);
+  oss << "   ";
+  for(int i=fpos.lrows;i<=fpos.urows;i++){
+    if(fpos[i]<10) oss << " ";  //will never happen
+    if(!std::signbit(fpos[i])) oss << " ";
+    oss << aurostd::utype2string(fpos[i],4,true,1e-4,FIXED_STREAM);
+    if(i<fpos.urows) oss << "   ";
+  }
+  oss << "   ! " << label;
+  if(is_transformed){ oss << "\'"; } //add prime
+  return oss.str();
 }
 
 // operator<<
@@ -10022,7 +10032,7 @@ string KPPRA(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const int& 
       kk++;
       if(dk<=1e-5) {
         k1=1;k2=1;k3=1;
-        aus << "00000  MESSAGE KPOINTS KPPRA minimun not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
+        aus << "00000  MESSAGE KPOINTS KPPRA minimum not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
       }
       kk1=(int) floor((double) nb1/dk);db1=b1/((double) kk1);
       kk2=(int) floor((double) nb2/dk);db2=b2/((double) kk2);
@@ -10077,7 +10087,7 @@ string KPPRA_LAT(int& k1,int& k2,int& k3,const xmatrix<double>& rlattice,const i
       kk++;
       if(dk<=1e-5) {
         k1=1;k2=1;k3=1;
-        aus << "00000  MESSAGE KPOINTS KPPRA minimun not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
+        aus << "00000  MESSAGE KPOINTS KPPRA minimum not found k=[" << k1 << "," << k2 << "," << k3 << "]=" << k1*k2*k3 << endl;
       }
       kk1=(int) floor((double) nb1/dk);db1=b1/((double) kk1);
       kk2=(int) floor((double) nb2/dk);db2=b2/((double) kk2);
@@ -13159,7 +13169,7 @@ void xstructure::BringInCell(double tolerance, double upper_bound, double lower_
 // ***************************************************************************
 // Make a structure where all the atoms are all the
 // atoms are mapped through the unit and neighbors cells
-// to minimixe the shortest possible bond with an adjacent atom
+// to minimize the shortest possible bond with an adjacent atom
 // This option is very useful if you run big and complicate
 // molecules where atoms exit of the unit cell and you have
 // problems understanding where they are because visualization
@@ -16528,6 +16538,7 @@ void xstructure::xstructure2qe(void) {
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_; 
   iomode=IOQE_GEOM;
+  if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
   return;
 }
 
@@ -16552,6 +16563,26 @@ void xstructure::xstructure2vasp(void) {
 }
 
 // ***************************************************************************
+// Function xstructure2itc
+// ***************************************************************************
+void xstructure::xstructure2itc(void) { //CO20220613
+  ReScale(1.0);
+  neg_scale=FALSE;
+  coord_flag=_COORDS_FRACTIONAL_;
+  char iomode_orig=iomode;  //save
+  iomode=IOVASP_WYCKCAR;
+  if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
+  (*this).spacegroupnumber = (*this).SpaceGroup_ITC();
+  (*this).lattice = (*this).standard_lattice_ITC; // need to update the lattice; may have rotated
+  stringstream ss;
+  ss << (*this);
+  (*this).clear();
+  ss >> (*this);
+  iomode=iomode_orig;
+  return;
+}
+
+// ***************************************************************************
 // Function xstructure2aims
 // ***************************************************************************
 void xstructure::xstructure2aims(void) {
@@ -16571,6 +16602,7 @@ void xstructure::xstructure2abinit(void) {
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_; 
   iomode=IOABINIT_GEOM;
+  if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
   return;
 }
 
@@ -16584,6 +16616,7 @@ void xstructure::xstructure2cif(void) { //DX20190131
   iomode=IOCIF;
   (*this).spacegroupnumber = (*this).SpaceGroup_ITC();
   (*this).lattice = (*this).standard_lattice_ITC; // need to update the lattice; may have rotated
+  if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
   return;
 }
 
@@ -16595,6 +16628,7 @@ void xstructure::xstructure2abccar(void) { //DX20190131
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_; 
   iomode=IOVASP_ABCCAR;
+  if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
   return;
 }
 
@@ -16606,6 +16640,7 @@ void xstructure::xstructure2elk(void) { //DX20200313
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_; 
   iomode=IOELK_GEOM;
+  if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
   return;
 }
 
@@ -16617,6 +16652,7 @@ void xstructure::xstructure2atat(void) { //SD20220123
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_;
   iomode=IOATAT_STR;
+  if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
   return;
 }
 
@@ -17683,6 +17719,12 @@ xstructure input2VASPxstr(istream& input,bool vasp5) {  //CO20210119 - added vas
   a.xstructure2vasp();
   if(vasp5){a.is_vasp4_poscar_format=false;a.is_vasp5_poscar_format=true;}  //CO20210119
   //  cerr << a.title << endl;
+  return a;
+}
+
+xstructure input2ITCxstr(istream& input) {  //CO20220613
+  xstructure a(input,IOAFLOW_AUTO);
+  a.xstructure2itc();
   return a;
 }
 
