@@ -13871,9 +13871,9 @@ namespace pflow {
       }
     }
 
-    int num_atoms=0;
-    for(i=0;i<(int) a.num_each_type.size();i++)
-      num_atoms+=a.num_each_type.at(i);
+    //[CO20220623 - not used]int num_atoms=0;
+    //[CO20220623 - not used]for(i=0;i<(int) a.num_each_type.size();i++)
+    //[CO20220623 - not used]  num_atoms+=a.num_each_type.at(i);
 
     PrintRSM(a,cout);
   }

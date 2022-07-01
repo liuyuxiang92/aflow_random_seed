@@ -28,22 +28,26 @@ namespace aurostd {
   template<class utype>
     class xvector {
       public:
-        //   xvector();                                        // default constructor
+        // xvector();                                          // default constructor
         // xvector(int);                                       // default constructor
         xvector(int=3,int=1);                                  // default constructor
+        xvector(const std::initializer_list<utype>);           //  initializer_list constructor //HE20220616
         xvector(const xvector<utype>&);                        // copy constructor
         xvector(const xmatrix<utype>&);                        // copy constructor //CO20191110
         // xvector (const xmatrix<utype>&);                    // make a vector of a xmatrix
-        xvector<utype>& operator=(const xvector<utype>&);	   // assignment
-        //     operator xvector<utype>() { return *this;};      // IBM_CPP
+        xvector<utype>& operator=(const xvector<utype>&);	     // assignment
+        xvector<utype>& operator=(const std::initializer_list<utype>); // initializer_list assignment //HE20220616
+        // operator xvector<utype>() { return *this;};         // IBM_CPP
         ~xvector();                                            // default destructor
-        utype& operator[](int) const;		                    // indicize
-        utype& operator()(int) const;		                    // indicize
-        utype& operator()(int,bool) const;        // indicize boundary conditions
+        utype& operator[](int) const;		                       // indicize
+        utype& operator()(int) const;		                       // indicize
+        utype& operator()(int,bool) const;                     // indicize boundary conditions
         xvector<utype>& operator +=(const xvector<utype>&);
+        xvector<utype>& operator +=(const std::initializer_list<utype>); //HE20220616
         xvector<utype>& operator +=(utype); //CO20180409
         xvector<utype>& operator -=(const xvector<utype>&);
         xvector<utype>& operator -=(utype); //CO20180409
+        xvector<utype>& operator -=(const std::initializer_list<utype>); //HE20220616
         xvector<utype>& operator *=(utype r); //(const utype& r) //CO20171130 - v*=v[1] doesn't work //CO20180409
         xvector<utype>& operator /=(utype r); //(const utype& r) //CO20171130 - v/=v[1] doesn't work //CO20180409
         // xvector<utype>& operator *=(const xvector<utype>&);
@@ -63,12 +67,16 @@ namespace aurostd {
         // bool isfloat,iscomplex;
         char size;
         long int vsize;
+        typedef typename std::initializer_list<utype>::const_iterator ili; // initializer list iterator //HE20220616
 
         //NECESSARY PRIVATE CLASS METHODS - START
+        void init(); //HE20220515
         void free();  //CO20190808
         void copy(const xvector<utype>& b);  //CO20190808
         void copy(const xmatrix<utype>& b);  //CO20190808
+        void copy(const std::initializer_list<utype> l);  //HE20220616
         void refresh(); //CO20190808 - refresh internal properties dependent on lrows, urows, utype
+
         //NECESSARY END CLASS METHODS - END
     };
 }
@@ -631,6 +639,11 @@ namespace aurostd { //CO20190620
   //signal processing
   template<class utype> vector<int> getPeaks(const xvector<utype>& signal_input,uint smoothing_iterations=4,uint avg_window=4,int width_maximum=1,double significance_multiplier=1.0);  //CO20190620
   template<class utype> vector<int> getPeaks(const xvector<utype>& signal_input,xvector<utype>& signal_smooth,uint smoothing_iterations=4,uint avg_window=4,int width_maximum=1,double significance_multiplier=1.0);  //CO20190620
+}
+
+namespace aurostd {
+  // differenitation
+  xvector<double> diffSG(const xvector<double> &f, double dx);//AS20210901
 }
 
 // ----------------------------------------------------------------------------

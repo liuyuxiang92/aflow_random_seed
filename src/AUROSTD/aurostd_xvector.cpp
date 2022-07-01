@@ -36,16 +36,36 @@
 // --------------------------------------------------------------- constructors
 namespace aurostd {  // namespace aurostd
   template<class utype>                                    // default constructor
-    xvector<utype>::xvector(int nh,int nl) : vsize(0) {        
+    xvector<utype>::xvector(int nh,int nl) {
+      init();
       resize(nh,nl);  //CO20201111
     }
-}
 
-namespace aurostd {  // namespace aurostd
+  template<class utype>                                    // initializer_list constructor //HE20220616
+  xvector<utype>::xvector(std::initializer_list<utype> l) {
+    // usage: xvector<double> new_vector({2.0, 3.0, 4.0});
+    init();
+    copy(l);
+  }
+
   template<class utype>                                       // copy constructor
-    xvector<utype>::xvector(const xvector<utype>& b) : vsize(0) {copy(b);} //CO20191110
+    xvector<utype>::xvector(const xvector<utype>& b) {
+      init();
+      copy(b);
+    } //CO20191110
   template<class utype>                                       // copy constructor
-    xvector<utype>::xvector(const xmatrix<utype>& b) : vsize(0) {copy(b);} //CO20191110
+    xvector<utype>::xvector(const xmatrix<utype>& b) {
+      init();
+      copy(b);
+    } //CO20191110
+
+  template<class utype>
+    void xvector<utype>::init() { //HE20220613 initialize all member of xvector
+      rows = 0; lrows = 0;
+      urows = 0; size = 0;
+      vsize= 0; isfloat = false;
+      iscomplex = false;
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -87,9 +107,9 @@ namespace aurostd {  // namespace aurostd
         printf("xxvector -> default constructor: lrows=%i, urows=%i,",lrows,urows);
 #endif
         if(vsize>0) {
-          corpus=new utype[rows+XXEND];
+          corpus=new utype[rows+XXEND](); //HE20220613 initialize corpus memory
           if(!corpus) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvector<utype>::copy():","allocation failure in COPY",_ALLOC_ERROR_);}
-          corpus+= -lrows+XXEND;
+          corpus+= -lrows+XXEND; // move the pointer to allow direct access
         }
 #ifdef _AUROSTD_XVECTOR_DEBUG_CONSTRUCTORS
         printf(" isfloat=%i, iscomplex=%i, sizeof=%i, vsize=%i\n",isfloat,iscomplex,size,vsize);
@@ -108,6 +128,16 @@ namespace aurostd {  // namespace aurostd
       if(b.rows==1){return copy(b(b.lrows));}
       else if(b.cols==1)return copy(b.getcol(b.lcols));
       throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvector<utype>::copy():","xmatrix input cannot be converted to xvector",_VALUE_ILLEGAL_);
+    }
+
+  template<class utype>
+    void xvector<utype>::copy(const std::initializer_list<utype> l) { // initializer_list copy //HE20220616
+      resize(l.size(), 1);
+      size_t new_index = 0;
+      for (ili entry=l.begin(); entry < l.end(); entry++){
+        new_index+=1;
+        corpus[new_index] = *entry;
+      }
     }
 }
 
@@ -137,7 +167,7 @@ namespace aurostd {  // namespace aurostd
       cerr << "xxvector -> default constructor: lrows=" << lrows << ", urows=" << urows << ", rows=" << rows << endl;
 #endif
       if(lrows!=lrows_old||urows!=urows_old||vsize!=vsize_old) { //vsize>0
-        corpus=new utype[rows+XXEND];
+        corpus=new utype[rows+XXEND](); //HE20220613 initialize corpus memory
         if(!corpus) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvector<utype>::xvector():","allocation failure in default constructor",_ALLOC_ERROR_);}
         corpus+= -lrows+XXEND;
         reset(); //CO20191110
@@ -155,6 +185,13 @@ namespace aurostd {  // namespace aurostd
   template<class utype>                                             // operator =
     xvector<utype>& xvector<utype>::operator=(const xvector<utype>& b) { //CO20191110
       if(this!=&b) {copy(b);}
+      return *this;
+    }
+  template<class utype>                                             // operator =
+    xvector<utype>& xvector<utype>::operator=(const std::initializer_list<utype> l) { // initializer_list assignment //HE20220616
+      // usage: xvector<double> new_vector;
+      // new_vector = {2.0, 3.0, 4.0};
+      copy(l);
       return *this;
     }
 }
@@ -280,7 +317,22 @@ namespace aurostd {  // namespace aurostd
       return *this;
     }
 }
-
+// --------------------------------------------------------- operator += xvector
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+  xvector<utype> & xvector<utype>::operator+=(const std::initializer_list <utype> l) { // HE20220616
+    if (this->rows != (int) l.size()) { //convert to int to avoid compiler warning
+      string message = "failure in operator-=: (this->rows!=r.rows)=FALSE";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+    }
+    size_t new_index = lrows;
+    for (ili entry = l.begin(); entry < l.end(); entry++) {
+      corpus[new_index] += *entry;
+      new_index += 1;
+    }
+   return *this;
+  }
+}
 // --------------------------------------------------------- operator += xvector
 namespace aurostd {  // namespace aurostd
   template<class utype> xvector<utype>&
@@ -315,6 +367,22 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
+// --------------------------------------------------------- operator -= xvector
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+  xvector<utype> & xvector<utype>::operator-=(const std::initializer_list <utype> l) { // HE20220616
+    if (this->rows != (int) l.size()) { //convert to int to avoid compiler warning
+      string message = "failure in operator-=: (this->rows!=r.rows)=FALSE";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+    }
+    size_t new_index = lrows;
+    for (ili entry = l.begin(); entry < l.end(); entry++) {
+      corpus[new_index] -= *entry;
+      new_index += 1;
+    }
+    return *this;
+  }
+}
 // --------------------------------------------------------- operator -= xvector
 namespace aurostd {  // namespace aurostd
   template<class utype> xvector<utype>&  
@@ -3276,6 +3344,77 @@ namespace aurostd {
     return peak_indices;
   }
 } // namespace aurostd
+
+namespace aurostd { //force the compiler to instantiate the template at this point (avoids linker issues)
+  template class xvector<int>;
+  template class xvector<unsigned int>;
+  template class xvector<long int>;
+  template class xvector<long unsigned int>;
+  template class xvector<long long int>;
+  template class xvector<long long unsigned int>;
+  template class xvector<float>;
+  template class xvector<double>;
+  template class xvector<long double>;
+}
+
+
+namespace aurostd {
+  //AS20210901 BEGIN
+  /// Calculates the first derivative of a given function f employing the
+  /// Savitzky-Golay filter for the differentiation.
+  xvector<double> diffSG(const xvector<double> &f, double dx)
+  {
+    // Convolution weights for the Savitzky-Golay 5pt cubic filter as reported in:
+    // "General least-squares smoothing and differentiation by the convolution (Savitzky-Golay) method"
+    // Peter A. Gorry Analytical Chemistry 1990 62 (6), 570-573
+    // https://doi.org/10.1021/ac00205a007
+    const static xmatrix<double> SGmat(5,5);
+    SGmat[1][1]=-125.0/84.0; SGmat[1][2]=-19.0/42.0; SGmat[1][3]= 1.0/12.0; SGmat[1][4]=  5.0/42.0; SGmat[1][5]= -29.0/84.0;
+    SGmat[2][1]= 136.0/84.0; SGmat[2][2]= -1.0/42.0; SGmat[2][3]=-8.0/12.0; SGmat[2][4]=-13.0/42.0; SGmat[2][5]=  88.0/84.0;
+    SGmat[3][1]=  48.0/84.0; SGmat[3][2]= 12.0/42.0; SGmat[3][3]= 0.0/12.0; SGmat[3][4]=-12.0/42.0; SGmat[3][5]= -48.0/84.0;
+    SGmat[4][1]= -88.0/84.0; SGmat[4][2]= 13.0/42.0; SGmat[4][3]= 8.0/12.0; SGmat[4][4]=  1.0/42.0; SGmat[4][5]=-136.0/84.0;
+    SGmat[5][1]=  29.0/84.0; SGmat[5][2]= -5.0/42.0; SGmat[5][3]=-1.0/12.0; SGmat[5][4]= 19.0/42.0; SGmat[5][5]= 125.0/84.0;
+    const static xvector<double> SGvec(5);
+    SGvec[1]= 1.0/12.0; SGvec[2]=-8.0/12.0; SGvec[3]= 0.0/12.0; SGvec[4]= 8.0/12.0; SGvec[5]=-1.0/12.0;
+    ////////////////////////////////////////////////////////////////////////////////
+
+    string function = "calcThermalExpansionSG():", msg = "";
+    int npoints = f.rows;
+    if (npoints<5){
+      msg = "Savitzky-Golay filter requires at least 5 points: only ";
+      msg += aurostd::utype2string(npoints) + " were provided.";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, function, msg, _INDEX_ILLEGAL_);
+    }
+
+    xvector<double> endpoints(5), dummy(5);
+    xvector<double> dfdx(npoints);
+
+    // calculate derivatives for the first 2 points
+    for (int i=1; i<=5; i++) dummy[i] = f[i];
+    endpoints = dummy*SGmat;
+    for (int i=1; i<=2; i++) dfdx[i] = endpoints[i];
+
+    // calculate derivatives for the [3:end-3] points
+    int id = 0;
+    for (int i=3; i<=npoints-2; i++){
+      dfdx[i] = 0.0;
+      for (int j=1; j<=5; j++){
+        id = i - 3 + j;
+        dfdx[i] += SGvec[j]*f[id];
+      }
+    }
+
+    // calculate derivatives for the last 2 points
+    for (int i=1; i<=5; i++) dummy[i] = f[npoints-5+i];
+    endpoints = dummy*SGmat;
+    for (int i=4; i<=5; i++) dfdx[npoints-5+i] = endpoints[i];
+
+    for (int i=1; i<=npoints; i++) dfdx[i] /= dx;
+
+    return dfdx;
+  }
+  //AS20210901 END
+}
 
 #endif  // _AUROSTD_XVECTOR_IMPLEMENTATIONS_
 
