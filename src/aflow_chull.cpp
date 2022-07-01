@@ -7965,6 +7965,10 @@ namespace chull {
   }
 
   string ConvexHull::getDelta(bool helvetica_font) const {return (helvetica_font?"\\Updelta":"\\Delta");}
+  string ConvexHull::getStabilityCriterionSymbol(bool helvetica_font) const {
+    return getDelta(helvetica_font)+" H_{\\mathrm{sc}}";
+    //return "\\delta_{\\mathrm{sc}}";
+  }
 
   string ConvexHull::getSnapshotTableHeader(string headers,bool designate_HEADER) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
@@ -10970,7 +10974,7 @@ namespace chull {
                   print_scriterion=true;
                   precision_tmp=0;
                   tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
-                  scriterion_data_ss << "$\\delta_{\\mathrm{sc}}="; //this delta is okay, should be italicized
+                  scriterion_data_ss << "$" << getStabilityCriterionSymbol(helvetica_font) << "="; //this delta is okay, should be italicized
                   scriterion_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_stability_criterion,(m_formation_energy_hull?_m_:_std_)),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
                   scriterion_data_ss << "$~" << (m_formation_energy_hull?string("meV/atom"):string("K"));
                 }

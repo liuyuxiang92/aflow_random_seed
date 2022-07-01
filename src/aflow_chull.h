@@ -918,6 +918,7 @@ namespace chull {
       bool unwantedFacetLine(uint vi,uint vj,vector<vector<uint> >& facet_lines,bool check_border=true) const;
       string getPointsPropertyHeaderList(filetype ftype) const;
       string getDelta(bool helvetica_font) const;
+      string getStabilityCriterionSymbol(bool helvetica_font) const;
       string getSnapshotTableHeader(string headers,bool designate_HEADER=false) const;
       bool addInternalHyperlinks(bool internal_links_graph2report=true,bool internal_links_withinreport=true) const;
       bool addExternalHyperlinks() const;
