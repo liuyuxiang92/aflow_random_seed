@@ -1848,6 +1848,7 @@ void XtalFinderCalculator::loadStructuresFromStringstream(
       structure_lines.push_back(geometry.str());
     }
   }
+  if(LDEBUG){cerr << __AFLOW_FUNC__ << " structure_count=" << structure_count << endl;}
 
   uint relaxation_step = 0;
   for(uint i=0;i<structure_lines.size();i++){
@@ -2809,7 +2810,7 @@ bool XtalFinderCalculator::splitComparisonIntoThreads(
     cerr << function_name << " Number of comparisons per thread: " << num_per_thread << endl;
   }
 
-  uint tmp =0;
+  //[CO20220625 - not used]uint tmp =0;
 
   uint count = 0;
   uint thread_count = 0;
@@ -2820,7 +2821,7 @@ bool XtalFinderCalculator::splitComparisonIntoThreads(
     for(uint j=0;j<comparison_schemes[i].structures_duplicate.size();j++){
       indices.first=i, indices.second=j;
       count+=1;
-      tmp+=1;
+      //[CO20220625 - not used]tmp+=1;
       if(count == num_per_thread && thread_count<num_proc-1){
         thread_count+=1;
         start_indices.push_back(tmp_start);

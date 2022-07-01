@@ -687,6 +687,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     vector<unsigned long long int> vulli;getElements("MnPd",vulli);getElements("MnPd",vulli,pp_string,FileMESSAGE); //CO20200624
 #endif
   }
+  if(o>0){;}  //CO20220625 - keep o busy (compiler)
   return TRUE;
 }
 
