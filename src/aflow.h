@@ -1741,6 +1741,7 @@ class xstructure {
     void buildGenericTitle(bool vasp_input=false,bool force_fix=false); // build a nice title with atoms
     void xstructure2qe(void);                                     // some wrap up IOs to convert format to QE
     void xstructure2vasp(void);                                   // some wrap up IOs to convert format to VASP
+    void xstructure2itc(void);                                    // some wrap up IOs to convert format to ITC  //CO20220613
     void xstructure2abinit(void);                                 // some wrap up IOs to convert format to ABINIT
     void xstructure2aims(void);                                   // some wrap up IOs to convert format to AIMS
     void xstructure2cif(void);                                    // some wrap up IOs to convert format to CIF //DX20190123
@@ -2679,6 +2680,7 @@ xstructure input2AIMSxstr(istream& input);
 xstructure input2ABINITxstr(istream& input);
 xstructure input2QExstr(istream& input);
 xstructure input2VASPxstr(istream& input,bool vasp5=false);
+xstructure input2ITCxstr(istream& input); //CO20220613
 xstructure input2ELKxstr(istream& input); //DX20200313
 xstructure input2ATATxstr(istream& input); //SD20220123
 

@@ -30,9 +30,11 @@
         -- fixed KBIN::VASPVersionString2Double, aurostd::substring2bool, aurostd::kvpairfound (SD)
         -- improved AFLUX calls for --compare_database_entries and --compare2database (ME)
         -- added extract POSCAR from aflowin (SD)
+        -- added --itc flag for structure generation (CO+DX)
         -- parallelized --chull --alloy (CO)
         -- fixed some logger, adding some QUIETs (CO)
         -- fixing --npmax and --np=max options (CO)
+>>>>>>> staging
 3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)
