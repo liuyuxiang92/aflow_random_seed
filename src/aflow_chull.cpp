@@ -19,17 +19,17 @@
 #include "aflow_chull_jupyter_requirements.cpp"  //MB20190305
 #include "aflow_chull_python.cpp"  //MB20190305
 
-// Some parts are written within the C++0x support in GCC, especially std::thread,
-// which is implemented in gcc 4.4 and higher. For multithreads with std::thread see:
-// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
-#if GCC_VERSION >= 40400
-#define AFLOW_CHULL_MULTITHREADS_ENABLE
-#include <thread>
-#include <mutex>
-static std::mutex m;
-#else
-#warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
-#endif
+//[CO20220630 - OBSOLETE]// Some parts are written within the C++0x support in GCC, especially std::thread,
+//[CO20220630 - OBSOLETE]// which is implemented in gcc 4.4 and higher. For multithreads with std::thread see:
+//[CO20220630 - OBSOLETE]// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
+//[CO20220630 - OBSOLETE]#if GCC_VERSION >= 40400
+//[CO20220630 - OBSOLETE]#define AFLOW_CHULL_MULTITHREADS_ENABLE
+//[CO20220630 - OBSOLETE]#include <thread>
+//[CO20220630 - OBSOLETE]#include <mutex>
+//[CO20220630 - OBSOLETE]static std::mutex m;
+//[CO20220630 - OBSOLETE]#else
+//[CO20220630 - OBSOLETE]#warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
+//[CO20220630 - OBSOLETE]#endif
 
 #define _DEBUG_CHULL_ false  //CO20190116
 
@@ -324,8 +324,7 @@ namespace chull {
       }
     } else {std::sort(vinputs.begin(),vinputs.end());vinputs.erase( std::unique( vinputs.begin(), vinputs.end() ), vinputs.end() );}
 
-    message << "Total convex hull inputs: " << vinputs.size();
-    pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    message << "Total convex hull inputs: " << vinputs.size();pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
     //////////////////////////////////////////////////////////////////////////////
     // END Gathering hull inputs
@@ -353,11 +352,6 @@ namespace chull {
     // END Adding --sc=XX to CHULL::NEGLECT if --output=web
     //////////////////////////////////////////////////////////////////////////////
     
-#ifdef AFLOW_CHULL_MULTITHREADS_ENABLE
-    uint ncpus=KBIN::get_NCPUS();
-    if(ncpus>vinputs.size()){ncpus=vinputs.size();}
-#endif
-
     //////////////////////////////////////////////////////////////////////////////
     // START Looping over hull inputs and creating desired output
     //////////////////////////////////////////////////////////////////////////////
@@ -365,59 +359,43 @@ namespace chull {
     //do NOT pass FileMESSAGE
     //oss is attached to cout or cerr, so it doesn't matter
 
+    uint ntasks=vinputs.size();
     bool Krun=true,KrunSingle=true;
-    uint counter_vinputs=0;
-    if(ncpus>1){
-      uint counter_progress_bar=0;
-      pflow::updateProgressBar(counter_progress_bar,vinputs.size(),oss);
-      bool XHOST_QUIET_THREADED=XHOST.QUIET_THREADED; //original
-      XHOST.QUIET_THREADED=true;
-      vector<std::thread*> threads;
-      for(uint icpu=0;icpu<ncpus;icpu++) {
-        threads.push_back(new std::thread(chull::convexHullThreaded,
-              std::ref(vpflow),std::ref(vinputs),std::ref(counter_vinputs),std::ref(counter_progress_bar),std::ref(aflags),std::ref(KrunSingle),std::ref(oss)));
-        Krun=(Krun && KrunSingle);
-      }
-      for(uint t=0;t<threads.size();t++) {
-        threads[t]->join();
-        delete threads[t];
-      }
-      XHOST.QUIET_THREADED=XHOST_QUIET_THREADED;
-    }else{
-      for(counter_vinputs=0;counter_vinputs<vinputs.size();counter_vinputs++){ //increments inside convexHullSingle()
-        KrunSingle=convexHullSingle(vpflow,vinputs[counter_vinputs],aflags,oss,(bool)counter_vinputs);
-        Krun=(Krun && KrunSingle);
-      }
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    bool XHOST_QUIET_THREADED=XHOST.QUIET_THREADED; //original
+    XHOST.QUIET_THREADED=true;
+    xthread::xThread xt(oss,KBIN::get_NCPUS(), 1);
+    vector<uint> vKrun(ntasks,1); //c++ doesn't like vector<bool>
+    std::function<void(uint,vector<string>&,const aurostd::xoption&,const _aflags&,vector<uint>&,ostream&)> fn = 
+      [&] (uint i,vector<string>& vinputs,const aurostd::xoption& xoptions,const _aflags& aflags,vector<uint>& vKrun,ostream& oss) {
+        vKrun[i]=(convexHull(vinputs[i],xoptions,aflags,oss,true)?1:0);
+      };
+    xt.run(ntasks,fn,vinputs,vpflow,aflags,vKrun,oss);
+    XHOST.QUIET_THREADED=XHOST_QUIET_THREADED;
+    char logger_type=_LOGGER_COMPLETE_;
+    for(uint i=0;i<ntasks;i++){
+      Krun=(vKrun[i]==1?true:false);
+      if(Krun){logger_type=_LOGGER_COMPLETE_;message << vinputs[i] << " completed successfully";}
+      else{logger_type=_LOGGER_ERROR_;message << vinputs[i] << " did not complete successfully, run serially";}
+      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, logger_type);
+      Krun=(Krun && KrunSingle);
     }
-    
+#else
+    for(uint i=0;i<ntasks;i++){
+      KrunSingle=convexHull(vinputs[i],vpflow,aflags,oss,(bool)i);
+      Krun=(Krun && KrunSingle);
+    }
+#endif
+
     //////////////////////////////////////////////////////////////////////////////
     // END Looping over hull inputs and creating desired output
     //////////////////////////////////////////////////////////////////////////////
     return Krun;
   }
 
-  void convexHullThreaded(const aurostd::xoption& vpflow,const vector<string>& vinputs,uint& counter_vinputs,uint& counter_progress_bar,const _aflags& aflags,bool& Krun,ostream& oss) {
-    // Set up index for threaded execution
-    uint i=AUROSTD_MAX_UINT;
-    if(counter_vinputs<vinputs.size()) {
-#ifdef AFLOW_CHULL_MULTITHREADS_ENABLE
-      std::unique_lock<std::mutex> lk(m);  // For thread-safe assignment
-#endif
-      i=counter_vinputs++;
-    } else {  // All bins are already distributed, so return
-      return;
-    }
-
-    string input=vinputs[i];
-    Krun=convexHullSingle(vpflow,input,aflags,oss,true);  //silent_flag_check==true, everything is silenced
-    counter_progress_bar++;
-    pflow::updateProgressBar(counter_progress_bar,vinputs.size(),oss);
-    return;
-  }
-  
-  bool convexHullSingle(const aurostd::xoption& _vpflow,const string& input,const _aflags& aflags,ostream& oss,bool silent_flag_check) {
+  bool convexHull(const string& input,const aurostd::xoption& _vpflow,const _aflags& aflags,ostream& oss,bool silence_flag_check) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    string soliloquy=XPID+"chull::convexHullSingle():";
+    string soliloquy=XPID+"chull::convexHull():";
     stringstream message;
 
     if(LDEBUG){cerr << soliloquy << " BEGIN with input=" << input << endl;}
@@ -459,7 +437,7 @@ namespace chull {
     message << "Starting " << aurostd::joinWDelimiter(velements,"") << " " << pflow::arity_string(velements.size(),false,false) << " convex hull";
     pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
     getPath(vpflow, FileMESSAGE, oss, false); //CO20180220 - directory stuff for logging
-    chull::flagCheck(vpflow, velements, FileMESSAGE, oss, (bool)silent_flag_check);  // spit out all flag options
+    chull::flagCheck(vpflow, velements, FileMESSAGE, oss, (bool)silence_flag_check);  // spit out all flag options
 
     ////////////////////////////////////////////////////////////////////////////
     // START Stability criterion calculation
@@ -6997,11 +6975,19 @@ namespace chull {
     cflags.flag("FAKE_HULL",true); //need to avoid "Very skewed ground-state..." and "Unreliable hull" issues, we're removing points, so these may (and likely will) come up
     cflags.flag("FORCE",true); //need to avoid outlier issues, we're removing points, so these may (and likely will) come up
     //let's skip all this extra output
-    bool see_sub_output=false;//true;
-    ostream& oss_empty=cout;if(!see_sub_output){oss_empty.setstate(std::ios_base::badbit);}  //like NULL
     ofstream devnull("/dev/null");  //NULL
-    fake_hull.initialize(cflags,new_points,velements,devnull,oss_empty,m_half_hull,m_add_artificial_unaries);
-    oss_empty.clear();  //clear badbit, as cout is GLOBAL
+    //https://stackoverflow.com/questions/366955/obtain-a-stdostream-either-from-stdcout-or-stdofstreamfile`
+    bool see_sub_output=false;//true;
+    std::streambuf* buf_fh;
+    if(see_sub_output){buf_fh=std::cout.rdbuf();} //to cout
+    else{buf_fh=devnull.rdbuf();} //to devnull
+    //ostream& oss_empty=cout;if(!see_sub_output){oss_empty.setstate(std::ios_base::badbit);}  //like NULL
+    //https://stackoverflow.com/questions/7818371/printing-to-nowhere-with-ostream
+    //stringstream oss_empty; //also an option, might be better than setting a badbit to cout
+    //ostream oss_empty(0); //setting badbit to entirely new instance of object
+    ostream oss_fh(buf_fh);
+    fake_hull.initialize(cflags,new_points,velements,devnull,oss_fh,m_half_hull,m_add_artificial_unaries);
+    //oss_empty.clear();  //clear badbit, as cout is GLOBAL
     if(!fake_hull.m_initialized){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Could not create pseudo convex hull");}
     if(LDEBUG) {cerr << soliloquy << " New (pseudo) hull created" << endl;}
   }

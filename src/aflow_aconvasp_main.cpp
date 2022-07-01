@@ -10337,7 +10337,14 @@ namespace pflow {
   // ME20200512 - Created by CO for POCC.
   const int BAR_WIDTH = 70;
   void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss){
-    if(XHOST.QUIET || XHOST.vflag_control.flag("WWW")){return;} //CO20190520 - no progress bar for web stuff  //CO20200404 - new web flag // ME20210428 - do not update when quiet either
+    //CO20220630 - decide if we should print
+    //this is one of the few functions that escapes pflow::logger() and aurostd::PrintXXStream() for printing
+    //all other printing should route through pflow::logger() (routing directly through aurostd::PrintXXStream() is obsolete)
+    //notable exception here is QUIET_THREADED
+    if(XHOST.QUIET || XHOST.QUIET_GLOBAL || XHOST.vflag_control.flag("WWW")){return;} //CO20190520 - no progress bar for web stuff  //CO20200404 - new web flag // ME20210428 - do not update when quiet either
+    if((&oss==&cout) && XHOST.QUIET_COUT){return;}
+    if((&oss==&cerr) && XHOST.QUIET_CERR){return;}
+
     double progress = (double)current/(double)end;
     int pos = BAR_WIDTH * progress;
 
@@ -10504,11 +10511,21 @@ namespace pflow {
         stream << endl;
       }
     }
+    //HE+ME20220503
+    // Be permissive and search for substrings to allow for white/black listing
+    // of groups of functions or namespaces without implementing regexes
+    // The white and black lists should be treated like a stack: only push and pop
+    bool quiet = XHOST.QUIET;
+    if (XHOST.QUIET) quiet = !aurostd::substringlist2bool(function_name, XHOST.LOGGER_WHITELIST, false);
+    else quiet = aurostd::substringlist2bool(function_name, XHOST.LOGGER_BLACKLIST, false);
 
+    //CO20220630 - note about osswrite, it is redundant with quiet, so it would be nice to get rid of it in the future
+    //but it would require a full overhaul of many critical aflow printing functions
+    //better not to touch and leave the overloads
     bool osswrite=!silent;
-    if (type == _LOGGER_ERROR_) {aurostd::PrintErrorStream(FileMESSAGE,stream,XHOST.QUIET,osswrite);} //oss - DEFAULT TO cerr
-    else if (type == _LOGGER_WARNING_) {aurostd::PrintWarningStream(FileMESSAGE,stream,XHOST.QUIET,osswrite);}  //oss - DEFAULT TO cerr
-    else{aurostd::PrintMessageStream(FileMESSAGE,stream,XHOST.QUIET,osswrite,oss);}
+    if (type == _LOGGER_ERROR_) {aurostd::PrintErrorStream(FileMESSAGE,stream,quiet,osswrite);} //oss - DEFAULT TO cerr
+    else if (type == _LOGGER_WARNING_) {aurostd::PrintWarningStream(FileMESSAGE,stream,quiet,osswrite);}  //oss - DEFAULT TO cerr
+    else{aurostd::PrintMessageStream(FileMESSAGE,stream,quiet,osswrite,oss);}
   }
 } // namespace pflow
 

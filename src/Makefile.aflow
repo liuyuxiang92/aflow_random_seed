@@ -68,7 +68,7 @@ aflow_bader.o: aflow_bader.cpp $(AFLOW_H_DEPS) Makefile.aflow aflow_bader.h
 aflow_cce.o: aflow_cce.cpp $(AFLOW_H_DEPS) Makefile.aflow aflow_cce.h aflow_cce_python.cpp
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_chull.o: aflow_chull.cpp $(AFLOW_H_DEPS) Makefile.aflow aflow_chull.h aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_jupyter_requirements.cpp aflow_chull_python.cpp
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 aflow_compare_structure.o: aflow_compare_structure.cpp $(AFLOW_H_DEPS) Makefile.aflow aflow_symmetry_spacegroup.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_compare_structure_function.o: aflow_compare_structure_function.cpp $(AFLOW_H_DEPS) Makefile.aflow aflow_symmetry_spacegroup.h aflow_xtalfinder_python.cpp
@@ -160,7 +160,7 @@ aflow_symmetry_spacegroup_ITC_library.o: aflow_symmetry_spacegroup_ITC_library.c
 aflow_symmetry_spacegroup_functions.o: aflow_symmetry_spacegroup_functions.cpp $(AFLOW_H_DEPS) Makefile.aflow aflow_contrib_shidong_cluster_expansion.h aflow_symmetry_spacegroup.h
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_unit_test.o: aflow_unit_test.cpp $(AFLOW_H_DEPS) Makefile.aflow SYMBOLICCPLUSPLUS/array.h SYMBOLICCPLUSPLUS/cloning.h SYMBOLICCPLUSPLUS/constants.h SYMBOLICCPLUSPLUS/derive.h SYMBOLICCPLUSPLUS/equation.h SYMBOLICCPLUSPLUS/functions.h SYMBOLICCPLUSPLUS/identity.h SYMBOLICCPLUSPLUS/integrate.h SYMBOLICCPLUSPLUS/matnorm.h SYMBOLICCPLUSPLUS/matrix.h SYMBOLICCPLUSPLUS/multinomial.h SYMBOLICCPLUSPLUS/number.h SYMBOLICCPLUSPLUS/polynomial.h SYMBOLICCPLUSPLUS/product.h SYMBOLICCPLUSPLUS/quatern.h SYMBOLICCPLUSPLUS/rational.h SYMBOLICCPLUSPLUS/solve.h SYMBOLICCPLUSPLUS/sum.h SYMBOLICCPLUSPLUS/symbol.h SYMBOLICCPLUSPLUS/symbolic.h SYMBOLICCPLUSPLUS/symbolic_main.h SYMBOLICCPLUSPLUS/symbolicc++.h SYMBOLICCPLUSPLUS/symerror.h SYMBOLICCPLUSPLUS/symmatrix.h SYMBOLICCPLUSPLUS/vecnorm.h SYMBOLICCPLUSPLUS/vector.h SYMBOLICCPLUSPLUS/verylong.h aflow_anrl.h aflow_symbolic.h aflow_symmetry_spacegroup.h
-	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 aflow_wyckoff.o: aflow_wyckoff.cpp $(AFLOW_H_DEPS) Makefile.aflow
 	$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\""$<"\" $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_xatom.o: aflow_xatom.cpp $(AFLOW_H_DEPS) Makefile.aflow SYMBOLICCPLUSPLUS/array.h SYMBOLICCPLUSPLUS/cloning.h SYMBOLICCPLUSPLUS/constants.h SYMBOLICCPLUSPLUS/derive.h SYMBOLICCPLUSPLUS/equation.h SYMBOLICCPLUSPLUS/functions.h SYMBOLICCPLUSPLUS/identity.h SYMBOLICCPLUSPLUS/integrate.h SYMBOLICCPLUSPLUS/matnorm.h SYMBOLICCPLUSPLUS/matrix.h SYMBOLICCPLUSPLUS/multinomial.h SYMBOLICCPLUSPLUS/number.h SYMBOLICCPLUSPLUS/polynomial.h SYMBOLICCPLUSPLUS/product.h SYMBOLICCPLUSPLUS/quatern.h SYMBOLICCPLUSPLUS/rational.h SYMBOLICCPLUSPLUS/solve.h SYMBOLICCPLUSPLUS/sum.h SYMBOLICCPLUSPLUS/symbol.h SYMBOLICCPLUSPLUS/symbolic.h SYMBOLICCPLUSPLUS/symbolic_main.h SYMBOLICCPLUSPLUS/symbolicc++.h SYMBOLICCPLUSPLUS/symerror.h SYMBOLICCPLUSPLUS/symmatrix.h SYMBOLICCPLUSPLUS/vecnorm.h SYMBOLICCPLUSPLUS/vector.h SYMBOLICCPLUSPLUS/verylong.h aflow_chull.h aflow_symbolic.h aflow_symmetry_spacegroup.h

@@ -164,7 +164,7 @@ static std::mutex xthread_cpu_check;
 
 namespace xthread {
 
-  /// @brief Constructur for xThread
+  /// @brief Constructor for xThread
   ///
   /// @param nmax Maximum number of CPUs used by xThread (default: 0 for all available CPUs)
   /// @param nmin Mininum number of CPUs required to spawn thread workers default: 1)
@@ -627,7 +627,7 @@ namespace xthread {
 //   vector<int> v1;
 //   vector<double> v2;
 //   xthread::xThread xt;
-//   xt.run(v1, v2);
+//   xt.run(v1, f1, v2);
 //
 // The instantiation is then:
 //
@@ -830,6 +830,59 @@ namespace xthread {
     deque<bool>&,
     std::mutex&
   );
+
+  //UnitTest::runUnitTest
+  template void xThread::run<
+    vector<string>,
+    std::function<void(vector<string>::iterator&, const vector<string>&)>,
+    vector<string>
+  >(
+    vector<string>&,
+    std::function<void(vector<string>::iterator&, const vector<string>&)>&,
+    vector<string>&
+  );
+
+  //_testPrototype
+  template void xThread::run<
+      void(uint, const vector<string>&, vector<uint>&, vector<string>&, std::mutex&),
+      vector<string>,
+      vector<uint>,
+      vector<string>,
+      std::mutex
+    >(uint,
+      void(&) (uint, const vector<string>&, vector<uint>&, vector<string>&, std::mutex&),
+      vector<string>&,
+      vector<uint>&,
+      vector<string>&,
+      std::mutex&
+  );
+
+  //convexHull  //ME+CO20220630
+  template void xthread::xThread::run<
+    std::function<void (
+        uint,
+        vector<string>&,
+        const aurostd::xoption&,
+        const _aflags&,
+        vector<uint>&,
+        std::ostream&
+        )>,
+    vector<string>,
+    aurostd::xoption,
+    _aflags,
+    vector<uint>,
+    std::ostream
+      >(uint,
+          std::function<void (
+            uint,
+            vector<string>&,
+            const aurostd::xoption&,
+            const _aflags&,
+            vector<uint>&,
+            std::ostream&
+            )>&,
+          vector<string>&,
+          aurostd::xoption&, _aflags&, vector<uint>&, std::ostream&);
 
   // runPredistributed --------------------------------------------------------
 

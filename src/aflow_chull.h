@@ -71,8 +71,7 @@ namespace chull {
   class ChullPoint; //forward declaration
   class ConvexHull; //forward declaration
   bool convexHull(const aurostd::xoption& vpflow);
-  void convexHullThreaded(const aurostd::xoption& vpflow,const vector<string>& vinputs,uint& counter_vinputs,uint& counter_progress_bar,const _aflags& aflags,bool& Krun,ostream& oss=cout);
-  bool convexHullSingle(const aurostd::xoption& vpflow,const string& input,const _aflags& aflags,ostream& oss=cout,bool silent_flag_check=false);
+  bool convexHull(const string& input,const aurostd::xoption& vpflow,const _aflags& aflags,ostream& oss=cout,bool silence_flag_check=false);
   ////////////////////////////////////////////////////////////////////////////////
   // gets path to redirect output
   string getPath(bool add_backslash=true);
