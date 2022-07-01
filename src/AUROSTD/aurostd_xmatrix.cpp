@@ -1692,6 +1692,24 @@ namespace aurostd {                   // conversion to xmatrix<utype>
 
 namespace aurostd {                   // conversion to xvector
   template<class utype> xvector<utype>
+    best_getvec(int stuff) __xprototype {  //CO20191110
+      //if((xmat.ucols != xmat.lcols)&&(xmat.lrows != xmat.urows)){
+               //cerr << "2d indices" << endl;   
+    //}
+  //
+      //else{
+          //int size = (xmat.ucols-xmat.lcols+1)*(xmat.cols-xmat.lcols+1);
+          //xvector<utype> xv(size);
+          //for(int i = xmat.lrows; i <= xmat.urows; i++){
+            //for(int j = xmat.lcols; j <= xmat.ucols; j++){
+               //xv(size-i-j) = xmat[i][j];
+            //}}}
+           cerr << "testing" << 1 << endl;
+      return xvector<utype>(0);
+    }
+}
+namespace aurostd {                   // conversion to xvector
+  template<class utype> xvector<utype>
     xmatrix2xvector(const xmatrix<utype>& xmat,int urow,int ucol,int lrow,int lcol,int lrows_out) __xprototype {  //CO20191110
       //AZ20220627 START
       //Beware the argument order in xmatrix2xvector

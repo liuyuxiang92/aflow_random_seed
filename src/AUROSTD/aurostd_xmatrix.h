@@ -50,6 +50,7 @@ namespace aurostd {
         void getmatInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol,int lrows_out=AUROSTD_MAX_INT,int lcols_out=AUROSTD_MAX_INT) const; //return submatrix as xvector //CO20191110
         xmatrix<utype> getmat(int lrow,int urow,int lcol,int ucol,int lrows_out=AUROSTD_MAX_INT,int lcols_out=AUROSTD_MAX_INT) const; // return submatrix as xmatrix //CO20191110
         xvector<utype> getvec(int lrow,int urow,int lcol,int ucol,int lrows_out=AUROSTD_MAX_INT,int lcols_out=AUROSTD_MAX_INT) const; //return submatrix as xvector //CO20191110
+        xvector<utype> best_getvec(int stuff) const; //return submatrix as xvector //CO20191110
         void setrow(const xvector<utype>& row,int irow=1);                  // set row of matrix //CO20190808
         void setcol(const xvector<utype>& col,int icol=1);                  // set col of matrix //CO20190808
         void setmat(const xmatrix<utype>& mat,int irow=1,int icol=1);       // set submat  //CO20190808
@@ -343,6 +344,9 @@ namespace aurostd {
 
   template<class utype> xvector<utype>
     xmatrix2xvector(const xmatrix<utype>& xmat,int urow,int ucol,int lrow,int lcol,int lrows_out) __xprototype; //CO20191110
+
+  template<class utype> xvector<utype>
+    best_getvec(const xmatrix<utype>& xmat, int stuff) __xprototype; //CO20191110
 
   template<class utype> xmatrix<double> 
     xmatrixutype2double(const xmatrix<utype>& a); //CO20191201
