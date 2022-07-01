@@ -1,8 +1,18 @@
-name: AFLOW-src C++ build
+name: AFLOW inhouse build
 #c++ builds: https://github.community/t/conditional-matrices/17206
 #env var: https://dev.to/mihinduranasinghe/working-with-environment-variables-github-actions-part-2-46po
 
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+  push:
+    branches: [ master, staging ]
+  pull_request:
+    branches: [ master, staging ]
+    
+  #[CO20220325 - now only PR]    branches: [ master, staging ]
+  #[CO20220325 - now only PR]  pull_request:
+  #[CO20220325 - now only PR]    branches: [ master, staging ]
+  #[HE20220701 - use self hosted runners on spin
   #[CO20220325 - now only PR]  push:
   #[CO20220325 - now only PR]    branches: [ master, staging ]
   #[CO20220325 - now only PR]  pull_request:
@@ -10,66 +20,13 @@ on: workflow_dispatch
   #[CO20220101 - reduce time]pull_request:
   #[CO20220101 - reduce time]push:
   #[CO20220101 - reduce time]  branches: staging
-
+  
 jobs:
-  build_ubuntu_latest:
-    runs-on: ubuntu-latest
+  build_pod_ubuntu:
+    runs-on: [self-hosted, Linux, X64]
     steps:
     - uses: actions/checkout@v2
     - name: make
-      run: make -C src
-    - name: make check_full
-      run: make -C src check_full
-  build_ubuntu_1804:
-    runs-on: ubuntu-18.04
-    steps:
-    - uses: actions/checkout@v2
-    - name: make
-      run: make -C src
-    #[CO20220606 - reduce time]- name: make check_full
-    #[CO20220606 - reduce time]  #[CO20220325 - now only PR]if: github.event_name == 'push'
-    #[CO20220606 - reduce time]  run: make -C src check_full
-    - name: make check
-      run: make -C src check
-#[CO20220101 - might not work]  build_ubuntu_1604:
-#[CO20220101 - might not work]    runs-on: ubuntu-16.04
-#[CO20220101 - might not work]    steps:
-#[CO20220101 - might not work]    - uses: actions/checkout@v2
-#[CO20220101 - might not work]    - name: make
-#[CO20220101 - might not work]      if: github.event_name == 'push'
-#[CO20220101 - might not work]      run: make -C src
-#[CO20220101 - might not work]    - name: make check_full
-#[CO20220101 - might not work]      if: github.event_name == 'push'
-#[CO20220101 - might not work]      run: make -C src check_full
-  build_mac_latest:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: make
-      #[CO20220325 - now only PR]if: github.event_name == 'push'
-      run: make -C src
-    - name: make check_full
-      #[CO20220325 - now only PR]if: github.event_name == 'push'
-      run: make -C src check_full
-#[HE+CO20220606 - desktop latest only (servers update slower)]  build_mac_1100:
-#[HE+CO20220606 - desktop latest only (servers update slower)]    runs-on: macos-11.0
-#[HE+CO20220606 - desktop latest only (servers update slower)]    steps:
-#[HE+CO20220606 - desktop latest only (servers update slower)]    - uses: actions/checkout@v2
-#[HE+CO20220606 - desktop latest only (servers update slower)]    - name: make
-#[HE+CO20220606 - desktop latest only (servers update slower)]      #[CO20220325 - now only PR]if: github.event_name == 'push'
-#[HE+CO20220606 - desktop latest only (servers update slower)]      run: make -C src
-#[HE+CO20220606 - desktop latest only (servers update slower)]    - name: make check_full
-#[HE+CO20220606 - desktop latest only (servers update slower)]      #[CO20220325 - now only PR]if: github.event_name == 'push'
-#[HE+CO20220606 - desktop latest only (servers update slower)]      run: make -C src check_full
-#[HE+CO20220606 - desktop latest only (servers update slower)]  build_mac_1015:
-#[HE+CO20220606 - desktop latest only (servers update slower)]    runs-on: macos-10.15
-#[HE+CO20220606 - desktop latest only (servers update slower)]    steps:
-#[HE+CO20220606 - desktop latest only (servers update slower)]    - uses: actions/checkout@v2
-#[HE+CO20220606 - desktop latest only (servers update slower)]    - name: make
-#[HE+CO20220606 - desktop latest only (servers update slower)]      #[CO20220325 - now only PR]if: github.event_name == 'push'
-#[HE+CO20220606 - desktop latest only (servers update slower)]      run: make -C src
-#[HE+CO20220606 - desktop latest only (servers update slower)]    #[CO20220606 - reduce time]- name: make check_full
-#[HE+CO20220606 - desktop latest only (servers update slower)]    #[CO20220606 - reduce time]  #[CO20220325 - now only PR]if: github.event_name == 'push'
-#[HE+CO20220606 - desktop latest only (servers update slower)]    #[CO20220606 - reduce time]  run: make -C src check_full
-#[HE+CO20220606 - desktop latest only (servers update slower)]    - name: make check
-#[HE+CO20220606 - desktop latest only (servers update slower)]      run: make -C src check
+      run: make -j -C src
+    - name: run unit_test
+      run: ./src/aflow --unit_test aurostd,database,structure
