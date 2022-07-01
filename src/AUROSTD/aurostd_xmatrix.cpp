@@ -1692,7 +1692,7 @@ namespace aurostd {                   // conversion to xmatrix<utype>
 
 namespace aurostd {                   // conversion to xvector
   template<class utype> xvector<utype>
-    best_getvec(int stuff) __xprototype {  //CO20191110
+    best_getvec(unt stuff) __xprototype {  //CO20191110
       //if((xmat.ucols != xmat.lcols)&&(xmat.lrows != xmat.urows)){
                //cerr << "2d indices" << endl;   
     //}
