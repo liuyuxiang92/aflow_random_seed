@@ -1732,14 +1732,17 @@ namespace pocc {
     if(m_ARUN_directories.size()!=l_supercell_sets.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_ARUN_directories.size()!=l_supercell_sets.size()",_RUNTIME_ERROR_);}
 
     bool found_all_QMVASPs=true;
-    for(unsigned long long int isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_QMVASPs==true;isupercell++){
-      if(!aurostd::EFileExist(getARUNDirectoryPath(isupercell)+"/"+DEFAULT_AFLOW_QMVASP_OUT)){
+    string qmvasp_file="";
+    unsigned long long int isupercell=0;
+    for(isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_QMVASPs==true;isupercell++){
+      qmvasp_file=getARUNDirectoryPath(isupercell)+"/"+DEFAULT_AFLOW_QMVASP_OUT;
+      if(!aurostd::EFileExist(qmvasp_file)){
         if(LDEBUG){cerr << soliloquy << " " << DEFAULT_AFLOW_QMVASP_OUT << " not found in "+m_ARUN_directories[isupercell] << endl;}
         found_all_QMVASPs=false;
       }
     }
     if(!found_all_QMVASPs){
-      message << "Waiting for complete VASP calculations";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_NOTICE_);
+      message << "Waiting for complete VASP calculations (" << qmvasp_file << " is missing)";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_NOTICE_);
       return false;
     }
 
