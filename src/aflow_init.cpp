@@ -77,7 +77,6 @@ namespace init {
     XHOST.vflag_control.flag("AFLOWRC::READ",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=read|--aflowrc_read"));
     if(XHOST.vflag_control.flag("AFLOWRC::READ")) {aflowrc::print_aflowrc(oss,TRUE);return false;}
     // SD20220223 - read AFLOWRC to determine the temporary directory, which is needed for execute2string
-
     // SD20220223 - check to make sure the temporary directory is writable
     vector<string> tokens;
     string tmpfs_str=DEFAULT_TMPFS_DIRECTORIES;
