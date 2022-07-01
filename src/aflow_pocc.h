@@ -44,7 +44,7 @@ const int TEMPERATURE_PRECISION=2;  //not really going to explore more than 2000
 
 namespace pocc {
   class POccCalculator; //forward declaration
-  struct POccSuperCellSet; //forward declaration
+  class POccSuperCellSet; //forward declaration
 
   string POCC_MINIMUM_CONFIGURATION(const aurostd::xoption& vpflow);
   string POCC_MINIMUM_CONFIGURATION(const string& directory="./");
@@ -68,7 +68,7 @@ namespace pocc {
 
   class POccUnit;  //forward declaration
   class POccSiteConfiguration;    //forward declaration
-  struct UFFParamAtom;  //forward declaration
+  class UFFParamAtom;  //forward declaration
   struct UFFParamBond;  //forward declaration
 
   //bool sortAtoms(const _atom& a1,const _atom& a2);
@@ -201,43 +201,70 @@ namespace pocc {
 } // namespace pocc
 
 namespace pocc {
-  struct POccSuperCellSet{
-    //no need (YET) to make a class, simple ints and double, no real methods
-    const POccSuperCellSet& operator=(const POccSuperCellSet& b);
-    bool operator<(const POccSuperCellSet& other) const;
-    unsigned long long int getDegeneracy() const;
-    const POccSuperCell& getSuperCell() const;
-    double getHNFIndex() const; //ME20211006
-    xmatrix<int> getHNFMatrix() const;
-    double getSiteConfigIndex() const;
-    vector<vector<int> > getSiteConfig() const; //ME20211006
-    xstructure getStructure() const; //ME20211006
-    double getUFFEnergy() const;
-
-    vector<POccSuperCell> m_psc_set;
-    double m_energy_dft;  //only calculate this for the set
-    double m_probability;
+  class POccSuperCellSet{
+    public:
+      //NECESSARY PUBLIC CLASS METHODS - START
+      //constructors - START
+      POccSuperCellSet();
+      POccSuperCellSet(const POccSuperCellSet& b);
+      //constructors - STOP
+      ~POccSuperCellSet();
+      const POccSuperCellSet& operator=(const POccSuperCellSet& b);
+      bool operator<(const POccSuperCellSet& other) const;
+      void clear();
+      //NECESSARY PUBLIC CLASS METHODS - END
+    
+      vector<POccSuperCell> m_psc_set;
+      double m_energy_dft;  //only calculate this for the set
+      double m_probability;
+      
+      unsigned long long int getDegeneracy() const;
+      const POccSuperCell& getSuperCell() const;
+      double getHNFIndex() const; //ME20211006
+      xmatrix<int> getHNFMatrix() const;
+      double getSiteConfigIndex() const;
+      vector<vector<int> > getSiteConfig() const; //ME20211006
+      xstructure getStructure() const; //ME20211006
+      double getUFFEnergy() const;
+    private:
+      //NECESSARY PRIVATE CLASS METHODS - START
+      void free();
+      void copy(const POccSuperCellSet& b);
+      //NECESSARY END CLASS METHODS - END
   };
   bool sortPSCSetsUFFEnergy(const POccSuperCellSet& a, const POccSuperCellSet& b);
 } // namespace pocc
 
 namespace pocc{
-  struct UFFParamAtom{
-    //no need (YET) to make a class, simple ints and double, no real methods
-    const UFFParamAtom& operator=(const UFFParamAtom& b);
+  class UFFParamAtom{
+    public:
+      //NECESSARY PUBLIC CLASS METHODS - START
+      //constructors - START
+      UFFParamAtom();
+      UFFParamAtom(const UFFParamAtom& b);
+      //constructors - STOP
+      ~UFFParamAtom();
+      const UFFParamAtom& operator=(const UFFParamAtom& b);
+      void clear();
+      //NECESSARY PUBLIC CLASS METHODS - END
 
-    string symbol;
-    double r1;        //bond distance
-    double theta0;
-    double x1;        //nonbond distance
-    double D1;        //nonbond energy
-    double zeta;      //scale
-    double Z1;        //effective charge
-    double Vi;
-    double Uj;
-    double ChiI;       //electronegativity
-    double hard;
-    double radius;
+      string symbol;
+      double r1;        //bond distance
+      double theta0;
+      double x1;        //nonbond distance
+      double D1;        //nonbond energy
+      double zeta;      //scale
+      double Z1;        //effective charge
+      double Vi;
+      double Uj;
+      double ChiI;       //electronegativity
+      double hard;
+      double radius;
+    private:
+      //NECESSARY PRIVATE CLASS METHODS - START
+      void free();
+      void copy(const UFFParamAtom& b);
+      //NECESSARY END CLASS METHODS - END
   };
 
   struct UFFParamBond{
@@ -794,6 +821,10 @@ namespace pocc {
       void calculatePhononDOSThread(uint i, const vector<uint>& vcalc, const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos);
 #endif
       xDOSCAR getAveragePhononDos(double T, const vector<xDOSCAR>& vxdos);
+
+      //AS20210204 QHA
+      void calculateQHAProperties();
+      void calculateQHAPropertiesAVG(const vector<double>& v_temperatures);
   };
 } // namespace pocc
 
@@ -851,6 +882,53 @@ namespace pocc {
       void free();
       void copy(const POccStructuresFile& b);
       //NECESSARY END CLASS METHODS - END
+  };
+}
+
+namespace pocc {
+  /// This class is used to calculate  thermodynamic properties over the ensemble,
+  /// defined by structures generated using POCC method.
+  class EnsembleThermo : public xStream {
+    public:
+      EnsembleThermo(ostream &oss=std::cout);
+      EnsembleThermo(const EnsembleThermo &ens);
+      EnsembleThermo(const string & currentDir, vector<string> &directories,
+          const string &filename, const string &calc_type,
+          apl::EOSmethod eos_method, bool isFVTprovided,
+          ofstream &FileMESSAGE, ostream &oss=std::cout);
+      const EnsembleThermo& operator=(const EnsembleThermo &ens);
+      ~EnsembleThermo();
+      apl::QHA qha;
+      apl::EOSmethod eos_method;
+      uint Nstructures;
+      int Nvolumes;
+      int nrows;
+      double Ensemble_Vmin, Ensemble_Vmax;
+      string currentDirectory;
+      xvector<double> T;
+      xmatrix<double> FV;
+      xvector<double> volumes;
+      vector<int> degeneracies;
+      vector<xmatrix<double> > coeffs_list;
+      xvector<double> Veq, Feq, B, Bprime, Cv, Cp, gamma, beta;
+      double logZ(const xvector<double> &E, const vector<int> &degeneracies, double T);
+      xvector<double> calcThermalExpansionSG(const xvector<double> &volumes, double dT);
+      xvector<double> calcIsobaricSpecificHeatSG(const xvector<double> &free_energies, double dT);
+      void calculateThermodynamicProperties();
+      void writeThermodynamicProperties();
+      void clear();
+    private:
+     void readFVTParameters(const string &filename, const string &blockname,
+         uint &Nvolumes, uint &Ntemperatures);
+      void readFVTdata(const string & dirname, const string& filename,
+        const string& blockname, uint n_volumes, uint n_temperatures, xvector<double> &t,
+        xmatrix<double> &c, double &Vmin, double &Vmax);
+      bool readCoeffData(const string& filename, const string& blockname,
+        xvector<double> &T, xmatrix<double> &coeffs);
+      void readCoeffParameters(const string& filename, double &Vmin, double &Vmax);
+      // mandatory
+      void free();
+      void copy(const EnsembleThermo &ens);
   };
 }
 

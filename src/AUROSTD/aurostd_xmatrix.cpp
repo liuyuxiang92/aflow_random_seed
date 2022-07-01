@@ -6178,8 +6178,8 @@ namespace aurostd {
   //   matrix<double> xmatrix2matrix(const xmatrix<double>& _xmatrix) {
   //     int isize=_xmatrix.rows,jsize=_xmatrix.cols;
   //     matrix<double> _matrix(isize,jsize);
-  //     for(register int i=0;i<isize;i++)
-  //       for(register int j=0;j<jsize;j++)
+  //     for(int i=0;i<isize;i++)
+  //       for(int j=0;j<jsize;j++)
   // 	_matrix[i][j]=_xmatrix(i+_xmatrix.lrows,j+_xmatrix.lcols);
   //     return _matrix;
   //   }
