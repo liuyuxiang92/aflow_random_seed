@@ -1821,14 +1821,15 @@ namespace KBIN {
     return get_NCPUS(kflags);
   }
 
-  int get_NCPUS(const _kflags& kflags) {
-    string ncpus_str = "MAX";
-    int ncpus = 1;
-    if (kflags.KBIN_MPI_NCPUS > 0) ncpus_str = aurostd::utype2string<int>(kflags.KBIN_MPI_NCPUS);
-    if (XHOST.vflag_control.isdefined("XPLUG_NUM_THREADS")) ncpus_str = XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS");
-    if (ncpus_str == "MAX") ncpus = MPI_NCPUS_MAX;
-    else ncpus = aurostd::string2utype<int>(ncpus_str);
-    if (ncpus < 1) ncpus = 1;
+  int get_NCPUS(const _kflags& kflags) {  //CO20220630 - rewritten
+    int ncpus=1;
+    if(kflags.KBIN_MPI_NCPUS>0){ncpus=kflags.KBIN_MPI_NCPUS;} //aflow.in is lowest priority
+    if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")){  //command line argument overrides
+      string ncpus_str=XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS");
+      if(aurostd::isfloat(ncpus_str)){ncpus=aurostd::string2utype<int>(ncpus_str);}
+      if(ncpus_str=="MAX"){ncpus=MPI_NCPUS_MAX;}
+    }
+    if(ncpus<1){ncpus=1;}
     return ncpus;
   }
 }  // namespace KBIN

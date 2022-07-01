@@ -30,6 +30,7 @@
         -- added extract POSCAR from aflowin (SD)
         -- parallelized --chull --alloy (CO)
         -- fixed some logger, adding some QUIETs (CO)
+        -- fixing --npmax and --np=max options (CO)
 3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)

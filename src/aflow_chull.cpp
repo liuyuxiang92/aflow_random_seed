@@ -362,23 +362,31 @@ namespace chull {
     uint ntasks=vinputs.size();
     bool Krun=true,KrunSingle=true;
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    bool XHOST_QUIET_THREADED=XHOST.QUIET_THREADED; //original
-    XHOST.QUIET_THREADED=true;
-    xthread::xThread xt(oss,KBIN::get_NCPUS(), 1);
-    vector<uint> vKrun(ntasks,1); //c++ doesn't like vector<bool>
-    std::function<void(uint,vector<string>&,const aurostd::xoption&,const _aflags&,vector<uint>&,ostream&)> fn = 
-      [&] (uint i,vector<string>& vinputs,const aurostd::xoption& xoptions,const _aflags& aflags,vector<uint>& vKrun,ostream& oss) {
-        vKrun[i]=(convexHull(vinputs[i],xoptions,aflags,oss,true)?1:0);
-      };
-    xt.run(ntasks,fn,vinputs,vpflow,aflags,vKrun,oss);
-    XHOST.QUIET_THREADED=XHOST_QUIET_THREADED;
-    char logger_type=_LOGGER_COMPLETE_;
-    for(uint i=0;i<ntasks;i++){
-      Krun=(vKrun[i]==1?true:false);
-      if(Krun){logger_type=_LOGGER_COMPLETE_;message << vinputs[i] << " completed successfully";}
-      else{logger_type=_LOGGER_ERROR_;message << vinputs[i] << " did not complete successfully, run serially";}
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, logger_type);
-      Krun=(Krun && KrunSingle);
+    int ncpus=KBIN::get_NCPUS();
+    if(ncpus>1){
+      bool XHOST_QUIET_THREADED=XHOST.QUIET_THREADED; //original
+      XHOST.QUIET_THREADED=true;
+      xthread::xThread xt(oss,KBIN::get_NCPUS(), 1);
+      vector<uint> vKrun(ntasks,1); //c++ doesn't like vector<bool>
+      std::function<void(uint,vector<string>&,const aurostd::xoption&,const _aflags&,vector<uint>&,ostream&)> fn = 
+        [&] (uint i,vector<string>& vinputs,const aurostd::xoption& xoptions,const _aflags& aflags,vector<uint>& vKrun,ostream& oss) {
+          vKrun[i]=(convexHull(vinputs[i],xoptions,aflags,oss,true)?1:0);
+        };
+      xt.run(ntasks,fn,vinputs,vpflow,aflags,vKrun,oss);
+      XHOST.QUIET_THREADED=XHOST_QUIET_THREADED;
+      char logger_type=_LOGGER_COMPLETE_;
+      for(uint i=0;i<ntasks;i++){
+        Krun=(vKrun[i]==1?true:false);
+        if(Krun){logger_type=_LOGGER_COMPLETE_;message << vinputs[i] << " completed successfully";}
+        else{logger_type=_LOGGER_ERROR_;message << vinputs[i] << " did not complete successfully, run serially";}
+        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, aflags, FileMESSAGE, oss, logger_type);
+        Krun=(Krun && KrunSingle);
+      }
+    }else{
+      for(uint i=0;i<ntasks;i++){
+        KrunSingle=convexHull(vinputs[i],vpflow,aflags,oss,(bool)i);
+        Krun=(Krun && KrunSingle);
+      }
     }
 #else
     for(uint i=0;i<ntasks;i++){
@@ -7977,7 +7985,7 @@ namespace chull {
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else if(vheaders[i]=="spin_atom"){vlabels.push_back("spin $\\left(\\mu_{\\mathrm{B}}\\mathrm{/atom}\\right)$"); vpaddings.push_back(30); valignments_headertable_string.push_back("X[2,c,m]");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else if(vheaders[i]=="enthalpy_formation_atom"){vlabels.push_back("$H_{\\mathrm{f}}$ (meV/atom)"); vpaddings.push_back(30); valignments_headertable_string.push_back("X[2,c,m]");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else if(vheaders[i]=="entropic_temperature"){vlabels.push_back("$T_{\\mathrm{S}}$ (K)"); vpaddings.push_back(30); valignments_headertable_string.push_back("X[2,c,m]");}
-    //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else if(vheaders[i]=="distance_hull_enthalpy_formation_atom"){vlabels.push_back("$"+getDelta(helvetica_font)+" H_{\\mathrm{f}}$ (meV/atom)"); vpaddings.push_back(30); valignments_headertable_string.push_back("X[2,c,m]");}
+    //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else if(vheaders[i]=="distance_hull_enthalpy_formation_atom"){vlabels.push_back("$"+getDelta(helvetica_font)+" H_{\\mathrm{hull}}$ (meV/atom)"); vpaddings.push_back(30); valignments_headertable_string.push_back("X[2,c,m]");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else if(vheaders[i]=="distance_hull_entropic_temperature"){vlabels.push_back("$"+getDelta(helvetica_font)+" T_{\\mathrm{S}}$ (K)"); vpaddings.push_back(30); valignments_headertable_string.push_back("X[2,c,m]");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown property");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]  }
@@ -7994,7 +8002,7 @@ namespace chull {
       else if(vheaders[i]=="spin_atom"){vlabels.push_back("spin $\\left(\\mu_{\\mathrm{B}}\\mathrm{/atom}\\right)$"); vpaddings.push_back(30); valignments_headertable_uint.push_back(2); total_alignment+=valignments_headertable_uint.back();}
       else if(vheaders[i]=="enthalpy_formation_atom"){vlabels.push_back("$H_{\\mathrm{f}}$ (meV/atom)"); vpaddings.push_back(30); valignments_headertable_uint.push_back(2); total_alignment+=valignments_headertable_uint.back();}
       else if(vheaders[i]=="entropic_temperature"){vlabels.push_back("$T_{\\mathrm{S}}$ (K)"); vpaddings.push_back(30); valignments_headertable_uint.push_back(2); total_alignment+=valignments_headertable_uint.back();}
-      else if(vheaders[i]=="distance_hull_enthalpy_formation_atom"){vlabels.push_back("$"+getDelta(helvetica_font)+" H_{\\mathrm{f}}$ (meV/atom)"); vpaddings.push_back(30); valignments_headertable_uint.push_back(2); total_alignment+=valignments_headertable_uint.back();}
+      else if(vheaders[i]=="distance_hull_enthalpy_formation_atom"){vlabels.push_back("$"+getDelta(helvetica_font)+" H_{\\mathrm{hull}}$ (meV/atom)"); vpaddings.push_back(30); valignments_headertable_uint.push_back(2); total_alignment+=valignments_headertable_uint.back();}
       else if(vheaders[i]=="distance_hull_entropic_temperature"){vlabels.push_back("$"+getDelta(helvetica_font)+" T_{\\mathrm{S}}$ (K)"); vpaddings.push_back(30); valignments_headertable_uint.push_back(2); total_alignment+=valignments_headertable_uint.back();}
       else {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unknown property");}
     }
@@ -10096,7 +10104,7 @@ namespace chull {
                 // shortstack newline
                 node_content_ss << "\\\\";
                 if(m_formation_energy_hull) {
-                  node_content_ss << "$" << getDelta(helvetica_font) << " H_{\\mathrm{f}}$=" << aurostd::utype2string(point.getDist2Hull(_m_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";  //CHULL_PRECISION
+                  node_content_ss << "$" << getDelta(helvetica_font) << " H_{\\mathrm{hull}}$=" << aurostd::utype2string(point.getDist2Hull(_m_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";  //CHULL_PRECISION
                 } else {
                   node_content_ss << "$" << getDelta(helvetica_font) << " T_{\\mathrm{S}}$=" << aurostd::utype2string(point.getDist2Hull(_std_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " K"; //CHULL_PRECISION
                 }
@@ -10962,7 +10970,6 @@ namespace chull {
                   print_scriterion=true;
                   precision_tmp=0;
                   tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
-                  //scriterion_data_ss << "$\\mathit{\\Delta}_{\\mathrm{sc}}="; //this delta is okay, should be italicized
                   scriterion_data_ss << "$\\delta_{\\mathrm{sc}}="; //this delta is okay, should be italicized
                   scriterion_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_stability_criterion,(m_formation_energy_hull?_m_:_std_)),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
                   scriterion_data_ss << "$~" << (m_formation_energy_hull?string("meV/atom"):string("K"));
@@ -10971,11 +10978,10 @@ namespace chull {
                   print_np1=true;
                   precision_tmp=0;
                   tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
-                  //np1_data_ss << "$\\mathit{\\Delta}_{\\mathrm{sc}}="; //this delta is okay, should be italicized
                   if(0){
-                    np1_data_ss << "$\\Delta H[N|\\{1,\\cdots,N-1\\}]="; //this delta is okay, should be italicized
+                    np1_data_ss << "$" << getDelta(helvetica_font) << " H[N|\\{1,\\cdots,N-1\\}]="; //this delta is okay, should be italicized
                   }else{
-                    np1_data_ss << "$\\Delta H[" << m_coord_groups[i_coord_group].m_i_nary+1 << "|"; //this delta is okay, should be italicized
+                    np1_data_ss << "$" << getDelta(helvetica_font) << " H[" << m_coord_groups[i_coord_group].m_i_nary+1 << "|"; //this delta is okay, should be italicized
                     if(m_coord_groups[i_coord_group].m_i_nary==0){np1_data_ss << "0";}  //not allowed anymore, but we can print the value
                     else if(m_coord_groups[i_coord_group].m_i_nary==1){np1_data_ss << "1";}
                     else if(m_coord_groups[i_coord_group].m_i_nary==2){np1_data_ss << "\\{1,2\\}";}

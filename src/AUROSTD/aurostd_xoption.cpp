@@ -395,10 +395,10 @@ namespace aurostd {
     string a,b;   //SC20200114
     // check schemes list going through vxscheme 1 by 1   //SC20200114
     // check attached schemes list going through vxsghost 2 by 2  //SC20191227    //SC20200114
+    b=aurostd::toupper(check);                                  // shortcuts   //SC20200114 //CO20220630 - no need to redo over and over again
     for(uint i=0;i<vxsghost.size();i+=2) {   //SC20200114
       //    cerr << "xoption::isscheme for attached scheme i=" << i << " " << a << " " << b << endl;     //SC20200114
       a=aurostd::toupper(vxsghost.at(i));                         // shortcuts   //SC20200114
-      b=aurostd::toupper(check);                                  // shortcuts   //SC20200114
       if(a==b) {   //SC20200114
         //	cerr << "xoption::isscheme BINGO FOUND ATTACHED SCHEME" << a << " " << b << endl;     //SC20200114
         return TRUE;   //SC20200114

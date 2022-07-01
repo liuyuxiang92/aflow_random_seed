@@ -939,12 +939,14 @@ namespace init {
     if(!XHOST.vflag_control.flag("XPLUG_NUM_SIZE")) XHOST.vflag_control.push_attached("XPLUG_NUM_SIZE",aurostd::utype2string(128));
     XHOST.vflag_control.flag("XPLUG_NUM_THREADS",aurostd::args2attachedflag(argv,"--np="));
     XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX",aurostd::args2attachedflag(argv,"--npmax")); //CO20180124
-    if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")) XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::args2attachedstring(argv,"--np=","0")); //SC20200319
-    if(!XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX")) { //ME20181113
-      XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS","MAX"); //ME20181113
-      //  else {XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::utype2string(XHOST.CPU_Cores/2));  OBSOLETE ME20181113  //[CO20200106 - close bracket for indenting]}
+    if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")||XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX")){
+      XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::args2attachedstring(argv,"--np=","1")); //SC20200319
+      if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX")||aurostd::toupper(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"))=="MAX"){ //so both --npmax and --np=max work
+        XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS","MAX"); //ME20181113
+      }
     }
-
+    //  else {XHOST.vflag_control.push_attached("XPLUG_NUM_THREADS",aurostd::utype2string(XHOST.CPU_Cores/2));  OBSOLETE ME20181113  //[CO20200106 - close bracket for indenting]}
+    
     // USEFUL shortcuts //SC20200319
     if(!aurostd::args2attachedflag(argv,"--np=")) {
       deque<string> vshort; 
