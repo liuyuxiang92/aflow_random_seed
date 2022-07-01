@@ -344,6 +344,14 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+    xvector<utype> xmatrix<utype>::best_getvec(int k,int _lrows) const { //CO20191210
+      xvector<utype> diag(1,1);
+      return diag;
+    }
+}
+
 //CO20190808
 namespace aurostd {  // namespace aurostd
   //this function returns a submatrix mat_out spanning urow:lrow,ucol:lcol of the original matrix
