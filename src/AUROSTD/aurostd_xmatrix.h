@@ -33,14 +33,16 @@ namespace aurostd {
   template<class utype>
     class xmatrix  {
       public:
-        //  xmatrix ();                                                     // default constructor
-        //  xmatrix (int=3);                                                // default constructor
+        // xmatrix ();                                                      // default constructor
+        // xmatrix (int=3);                                                 // default constructor
         xmatrix (int=3,int=3,int=1,int=1);                                  // default constructor
-        //    xmatrix (int,int,int,int);                                    // default constructor
+        // xmatrix (int,int,int,int);                                       // default constructor
+        xmatrix(const std::initializer_list<std::initializer_list<utype>>); // initializer_list constructor //HE20220616
         xmatrix (int,int,utype*);                                           // copy constructor
         xmatrix (const xmatrix<utype>&);                                    // copy constructor
         xmatrix (const xvector<utype>&);                                    // copy constructor
         xmatrix<utype>& operator=(const xmatrix<utype>&);                   // assignment
+        xmatrix<utype>& operator=(const std::initializer_list<std::initializer_list<utype>>); // initializer_list assignment //HE20220616
         ~xmatrix ();                                                        // default destructor
         utype* operator[](int) const;                                       // indicize i,j
         xvector<utype> operator()(int) const;                               // indicize i
@@ -56,10 +58,12 @@ namespace aurostd {
         void setmat(const xvector<utype>& xv,int icol=1,bool col=true);     // set submat  //CO20190808
         utype& operator()(int,int) const;                                   // indicize i,j
         utype& operator()(int,int,bool) const;                              // indicize boundary conditions
-        //      xmatrix operator()(int,int,int,int) const;                  // indicize i1,j1,i2,j2
+        // xmatrix operator()(int,int,int,int) const;                       // indicize i1,j1,i2,j2
         // math operators
         xmatrix<utype>& operator +=(const xmatrix<utype>&);
+        xmatrix<utype>& operator +=(const std::initializer_list<std::initializer_list<utype>>); //HE20220616
         xmatrix<utype>& operator -=(const xmatrix<utype>&);
+        xmatrix<utype>& operator -=(const std::initializer_list<std::initializer_list<utype>>); //HE20220616
         xmatrix<utype>& operator *=(const xmatrix<utype>&);
         xmatrix<utype>& operator *=(utype r); //CO20190911
         // xmatrix<utype>& operator /=(const xmatrix<utype>&);
@@ -82,11 +86,14 @@ namespace aurostd {
         //  bool isfloat,iscomplex;
         char size;
         long int msize;
-
+        typedef typename std::initializer_list<utype>::const_iterator ili; // initializer list iterator //HE20220616
+        typedef typename std::initializer_list<std::initializer_list<utype>>::const_iterator il2i; // nested initializer list iterator //HE20220616
         //NECESSARY PRIVATE CLASS METHODS - START
+        void init();  //HE20220615
         void free();  //CO20190808
         void copy(const xmatrix<utype>& b);  //CO20190808
         void copy(const xvector<utype>& b);  //CO20190808
+        void copy(const std::initializer_list<std::initializer_list<utype>> ll); //HE20220616
         void refresh(); //CO20190808 - refresh internal properties dependent on lrows, urows, utype
         //NECESSARY END CLASS METHODS - END
     };

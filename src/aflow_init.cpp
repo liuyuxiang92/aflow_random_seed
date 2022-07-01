@@ -67,8 +67,11 @@ namespace init {
     // AFLOWRC LOAD DEFAULTS FROM AFLOWRC.
     // XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
     // XHOST.vflag_control.flag("AFLOWRC::OVERWRITE",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=overwrite|--aflowrc_overwrite"));
-    XHOST.home=getenv("HOME");  //AS SOON AS POSSIBLE
-    XHOST.user=getenv("USER");  //AS SOON AS POSSIBLE
+    // getenv returns a char pointer, that can be null if the environment variable is not set
+    // assigning a nullptr to a string is undefined behavior
+    // always use aurostd::getenv2string that contains the necessary check HE20220701 //SD20220701
+    XHOST.home = aurostd::getenv2string("HOME"); //AS SOON AS POSSIBLE
+    XHOST.user = aurostd::getenv2string("USER");  //AS SOON AS POSSIBLE
     if(!aflowrc::is_available(oss,INIT_VERBOSE || XHOST.DEBUG)) aflowrc::write_default(oss,INIT_VERBOSE || XHOST.DEBUG);
     aflowrc::read(oss,INIT_VERBOSE || XHOST.DEBUG);
     XHOST.vflag_control.flag("AFLOWRC::READ",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=read|--aflowrc_read"));
@@ -2227,9 +2230,10 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
   //SD20220602 - check that an OUTCAR is produced on the initial launch of vasp
   if(XHOST.vflag_control.flag("AFLOW_STARTUP_SCRIPT") && !aurostd::FileExist(xvasp.Directory+"/OUTCAR")){
     string startup_script_name=XHOST.vflag_control.getattachedscheme("AFLOW_STARTUP_SCRIPT");
+    aurostd::ProcessKill(startup_script_name,vasp_pgid,true,5); //send SIGTRAP rather than SIGKILL so we can trap it
     while (aurostd::ProcessRunning(startup_script_name,vasp_pgid) && (n_running++)<NCOUNTS_WAIT_MONITOR){ //try killing the script for no more than 10 minutes
       message << "initial launch of vasp did not produce an OUTCAR file; killing the whole AFLOW startup script \"" << startup_script_name << "\"";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-      aurostd::ProcessKill(startup_script_name,vasp_pgid,true,false); //send SIGTERM rather than SIGKILL so we can trap it
+      aurostd::ProcessKill(startup_script_name,vasp_pgid); //send SIGKILL
       aurostd::Sleep(sleep_seconds_afterkill); //sleep to wait for the script to get killed
     }
     throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Initial launch of vasp did not produce an OUTCAR file, tried killing the whole AFLOW startup script",_RUNTIME_ERROR_);
@@ -2266,9 +2270,10 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
     //SD20220602 - check that an OUTCAR is produced on the new vasp instance
     if(XHOST.vflag_control.flag("AFLOW_STARTUP_SCRIPT") && !aurostd::FileExist(xvasp.Directory+"/OUTCAR")){
       string startup_script_name=XHOST.vflag_control.getattachedscheme("AFLOW_STARTUP_SCRIPT");
+      aurostd::ProcessKill(startup_script_name,vasp_pgid,true,5); //send SIGTRAP rather than SIGKILL so we can trap it
       while (aurostd::ProcessRunning(startup_script_name,vasp_pgid) && (n_running++)<NCOUNTS_WAIT_MONITOR){ //try killing the script for no more than 10 minutes
         message << "new vasp instance did not produce an OUTCAR file, killing the whole AFLOW startup script \"" << startup_script_name << "\"";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-        aurostd::ProcessKill(startup_script_name,vasp_pgid,true,false); //send SIGTERM rather than SIGKILL so we can trap it
+        aurostd::ProcessKill(startup_script_name,vasp_pgid); //send SIGKILL
         aurostd::Sleep(sleep_seconds_afterkill); //sleep to wait for the script to get killed
       }
       throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"New vasp instance did not produce an OUTCAR file, tried killing the whole AFLOW startup script",_RUNTIME_ERROR_);
@@ -2358,7 +2363,7 @@ void AFLOW_monitor_VASP(const string& directory){ //CO20210601
           message << output_syscall;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
           message << "PIDs2kill="+aurostd::joinWDelimiter(vpids,",");pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
         }
-        aurostd::ProcessKill(vasp_bin,vasp_pgid);
+        aurostd::ProcessKill(vasp_bin,vasp_pgid); //send SIGKILL
       }else{
         message << "\"" << vasp_bin << "\" has died before the kill command could be issued";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       }

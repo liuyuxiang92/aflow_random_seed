@@ -5,6 +5,8 @@
         -- updated README_PROTO.TXT for correct Bixbyte prototype label (DX)
         -- fixed bug with printing atom mapping information in XtalFinder, reset for non-matches (DX)
         -- parallelized KBIN::CompressDirectory() (CO)
+        -- implemented QH-POCC and POCC+QHA (AS)
+        -- improved formatting of aflow.qha.thermo.out file (AS)
         -- Fixed CIF parser for CIF files with oxidation states in species list (ME)
         -- Added fallback solutions for reading CIF files with unregonized settings (ME)
         -- Added poscar2aflowin for non-POSCAR input files (ME)
@@ -34,6 +36,7 @@
 3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)
+        -- added machine settings for machine004 (DX)
         -- Added POCC+APL workflow (ME)
         -- Added LIB2RAW for APL (ME)
         -- added function to move aflow run to another directory (DX)
