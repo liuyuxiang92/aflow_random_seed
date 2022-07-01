@@ -2,7 +2,16 @@ name: AFLOW inhouse build
 #c++ builds: https://github.community/t/conditional-matrices/17206
 #env var: https://dev.to/mihinduranasinghe/working-with-environment-variables-github-actions-part-2-46po
 
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+  push:
+    branches: [ master, staging ]
+  pull_request:
+    branches: [ master, staging ]
+    
+  #[CO20220325 - now only PR]    branches: [ master, staging ]
+  #[CO20220325 - now only PR]  pull_request:
+  #[CO20220325 - now only PR]    branches: [ master, staging ]
   #[HE20220701 - use self hosted runners on spin
   #[CO20220325 - now only PR]  push:
   #[CO20220325 - now only PR]    branches: [ master, staging ]
