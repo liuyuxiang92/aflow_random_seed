@@ -24,8 +24,7 @@ struct _qca_data {
   bool image_only;
   bool calc_binodal;
   bool use_sg;
-  bool calc_spinodal;
-  string workdirpath;
+  string cdirpath;
   string rootdirpath;
   string aflowlibpath;
   string plattice;
@@ -69,7 +68,7 @@ namespace qca {
   void quasiChemicalApprox(const aurostd::xoption& vpflow);
   void initQCA(_qca_data& qca_data);
   void runQCA(_qca_data& qca_data);
-  void errorChecks(_qca_data& qca_data);
+  void errorFix(_qca_data& qca_data);
   void calcSpinodalData(_qca_data& qca_data);
   void calcBinodalData(_qca_data& qca_data);
   xvector<double> calcBinodalBoundary(const xmatrix<double>& rel_s, const double rel_s_ec, const xvector<double>& temp);
@@ -87,15 +86,15 @@ namespace qca {
   xmatrix<double> getConcentrationCluster(const vector<xstructure>& vstr, const vector<string>& elements);
   xmatrix<double> getConcentrationCluster(const string& rundirpath, const int nstr, const int nelem);
   xvector<int> getNumAtomCluster(const vector<xstructure>& vstr);
-  xvector<int> calcDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const bool shuffle, const string& rundirpath="");
+  xvector<int> calcDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const int num_threads, const string& rundirpath="", const string& algo="SLOW");
   double getCVCluster(const string& rundirpath, const double cv_cut);
-  void runATAT(const string& workdirpath, const string& rundirpath, const uint min_sleep);
+  void runATAT(const string& cdirpath, const string& rundirpath, const uint min_sleep);
   void generateFilesForATAT(const string& rundirpath, const string& lat_atat, const vector<xstructure>& vstr_aflow, const vector<xstructure>& vstr_atat, const vector<int>& mapstr);
   vector<xstructure> getAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_threads, bool use_sg);
   vector<xstructure> getAFLOWXstructures(const string& aflowlibpath, const int num_threads, bool use_sg);
   string createLatForATAT(const string& plattice, const vector<string>& elements, bool scale=false);
   vector<xstructure> getATATXstructures(const string& lat, const string& plattice, const vector<string>& elements, const uint max_num_atoms, const string& rundirpath="");
-  vector<int> calcMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const bool shuffle);
+  vector<int> calcMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads, const string& algo="SLOW");
   void displayUsage(void);
   void writeData(const _qca_data& qca_data);
   void readData(_qca_data& qca_data);

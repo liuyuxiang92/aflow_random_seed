@@ -660,6 +660,7 @@ namespace unittest {
 
     //HE20210511
     double expected_dbl = 0.0, calculated_dbl = 0.0;
+    xvector<double> calculated_xvecdbl, expected_xvecdbl;
     int expected_int = 0;
     string expected_str = "";
     vector<xvector<double> > points;
@@ -876,6 +877,16 @@ namespace unittest {
 
     calculated_dbl = aurostd::areaPointsOnPlane(ipoints);
     checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | linspace //SD20220324
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::linspace()";
+    check_description = "generate n linearly spaced points";
+    expected_xvecdbl = xvector<double>(5);
+    expected_xvecdbl(1) = 1.0; expected_xvecdbl(2) = 1.375; expected_xvecdbl(3) = 1.75; expected_xvecdbl(4) = 2.125; expected_xvecdbl(5) = 2.5;
+    calculated_xvecdbl = aurostd::linspace(1.0, 2.5, 5);
+    checkEqual(calculated_xvecdbl, expected_xvecdbl, check_function, check_description, passed_checks, results);
   }
 
   void UnitTest::xmatrixTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
@@ -914,18 +925,21 @@ namespace unittest {
     // Check | equilibrateMatrix //SD20220505
     // ---------------------------------------------------------------------------
     check_function = "aurostd::equilibrateMatrix()";
-    check_description = "pre-condition an ill-conditioned matrix";
-    xmatrix<double> icm(4, 4);
-    icm(1, 1) = 0.7577; icm(1, 2) = 0.1712e-5; icm(1, 3) =   0.0462; icm(1, 4) = 0.3171;
-    icm(2, 1) = 0.7431; icm(2, 2) =    0.7060; icm(2, 3) =   0.0971; icm(2, 4) = 0.9502;
-    icm(3, 1) = 0.3922; icm(3, 2) =    0.0318; icm(3, 3) =   0.8235; icm(3, 4) = 0.0344;
-    icm(4, 1) = 0.6555; icm(4, 2) =    0.2769; icm(4, 3) = 0.6948e5; icm(4, 4) = 0.4387;
+    check_description = "pre-condition a Hilbert matrix, lowers the condition number";
+    xmatrix<double> icm(10, 10);
+    // define a Hilbert matrix
+    for (int i = 1; i <= icm.rows; i++) {
+      for (int j = 1; j <= icm.cols; j++) {
+        icm(i, j) = 1.0 / (i + j - 1.0);
+      }
+    }
     xmatrix<double> em, rm, cm;
     aurostd::equilibrateMatrix(icm, em, rm, cm);
-    calculated_bool = aurostd::isequal(1.0, aurostd::sign(aurostd::condition_number(icm) - aurostd::condition_number(em))) &&
-                      aurostd::isequal(icm, aurostd::inverse(rm) * em * aurostd::inverse(cm));
     expected_bool = true;
+    calculated_bool = aurostd::isequal(1.0, aurostd::sign(aurostd::condition_number(icm) - aurostd::condition_number(em)));
     checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+    check_description = "pre-condition a Hilbert matrix, finds the inverse";
+    checkEqual(icm, aurostd::inverse(rm) * em * aurostd::inverse(cm), check_function, check_description, passed_checks, results);
   }
 
   void UnitTest::aurostdMainTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
@@ -933,7 +947,6 @@ namespace unittest {
     string check_function = "", check_description = "";
     bool calculated_bool = false, expected_bool = false;
     int calculated_int = 0, expected_int = 0;
-    xvector<double> calculated_xvecdbl, expected_xvecdbl;
     string calculated_string = "", expected_string = "";
 
     // ---------------------------------------------------------------------------
@@ -1024,16 +1037,6 @@ namespace unittest {
     calculated_string = aurostd::kvpair2string(str,"ALGO", "==", -1);
     expected_string = "SLOW";
     checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
-
-    // ---------------------------------------------------------------------------
-    // Check | linspace //SD20220324
-    // ---------------------------------------------------------------------------
-    check_function = "aurostd::linspace()";
-    check_description = "generate n linearly spaced points";
-    expected_xvecdbl = xvector<double>(5);
-    expected_xvecdbl(1) = 1.0; expected_xvecdbl(2) = 1.375; expected_xvecdbl(3) = 1.75; expected_xvecdbl(4) = 2.125; expected_xvecdbl(5) = 2.5;
-    calculated_xvecdbl = aurostd::linspace(1.0, 2.5, 5);
-    checkEqual(calculated_xvecdbl, expected_xvecdbl, check_function, check_description, passed_checks, results);
   }
 
   void UnitTest::xfitTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
@@ -1067,8 +1070,8 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     check_function = "aurostd::polynomialFindRoots()";
     pc(1) = 6.0; pc(2) = -5.0; pc(3) = -2.0; pc(4) = 3.0;
-    calculated_xvecdbl_r = xvector<double>(3), calculated_xvecdbl_i = xvector<double>(3);
     expected_xvecdbl_r = xvector<double>(3), expected_xvecdbl_i = xvector<double>(3);
+    calculated_xvecdbl_r = xvector<double>(3), calculated_xvecdbl_i = xvector<double>(3);
     expected_xvecdbl_r(1) = 1.05576592536838; expected_xvecdbl_r(2) = 1.05576592536838; expected_xvecdbl_r(3) = -1.44486518407010;
     expected_xvecdbl_i(1) = -0.519201791550296; expected_xvecdbl_i(2) = 0.519201791550296; expected_xvecdbl_i(3) = 0.0;
     aurostd::polynomialFindRoots(pc, calculated_xvecdbl_r, calculated_xvecdbl_i);
@@ -1170,9 +1173,9 @@ namespace unittest {
     vdfunc.push_back([](xvector<double> x) {return x(2) * std::cos(x(1)) + std::cos(x(2));});
     vdfunc.push_back([](xvector<double> x) {return std::sin(x(1)) - x(1) * std::sin(x(2));});
     jac.push_back(vdfunc);
-    aurostd::findZeroNewtonRaphson(x0, vfunc, jac, calculated_xvecdbl);
     expected_xvecdbl = xvector<double>(2);
     expected_xvecdbl(1) = 0.353246561918931; expected_xvecdbl(2) = 0.606082026502552;
+    aurostd::findZeroNewtonRaphson(x0, vfunc, jac, calculated_xvecdbl);
     checkEqual(calculated_xvecdbl, expected_xvecdbl, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
@@ -1192,11 +1195,11 @@ namespace unittest {
     vdfunc.push_back([](xvector<double> x) {return 2.0 * x(1);});
     vdfunc.push_back([](xvector<double> x) {return 2.0 * x(2);});
     jac.push_back(vdfunc);
-    aurostd::findZeroDeflation(aurostd::vector2xvector<double>({0.0, 1.0}), vfunc, jac, calculated_xmatdbl);
     expected_xmatdbl = xmatrix<double>(2, 3);
     expected_xmatdbl(1, 1) = 0.517638090205041; expected_xmatdbl(2, 1) = 1.93185165257813;
     expected_xmatdbl(1, 2) = 1.93185165257813; expected_xmatdbl(2, 2) = 0.517638090205041;
     expected_xmatdbl(1, 3) = -1.93185165257813; expected_xmatdbl(2, 3) = -0.517638090205041;
+    aurostd::findZeroDeflation(aurostd::vector2xvector<double>({0.0, 1.0}), vfunc, jac, calculated_xmatdbl);
     checkEqual(calculated_xmatdbl, expected_xmatdbl, check_function, check_description, passed_checks, results);
   }
 

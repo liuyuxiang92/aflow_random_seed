@@ -2575,6 +2575,29 @@ namespace aurostd {
 
 }
 
+// ***************************************************************************
+// GRID GENERATION
+// ----------------------------------------------------------------------------
+// SD20220324
+// linspace
+// Generates n linearly spaced points, the spacing between the points is (stop-start)/(n-1)
+// If n is a double, then round n
+namespace aurostd {
+  xvector<double> linspace(const double start, const double stop, const int n) {
+    if (n <= 1) {
+      string message = "Number of points must be greater than one";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+    }
+    xvector<double> v(n);
+    double dx = stop - start;
+    for (int i = v.lrows; i <= v.urows; i++) {
+      v(i) = start + (i - 1) * dx / (n - 1);
+    }
+    return v;
+  }
+  xvector<double> linspace(const double start, const double stop, const double n) {int m = (int)aurostd::round(n); return linspace(start, stop, m);}
+}
+
 // ----------------------------------------------------------------------------
 // ------------------------------------------------------- simple sort routines
 

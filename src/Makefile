@@ -39,7 +39,7 @@ CPP=g++
 CC=gcc
 ARCH=
 ifeq ($(UNAME),Darwin)
-CPP=clang++ -std=c++11
+CPP=clang++
 CC=clang
 ARCH=-D_MACOSX_
 endif

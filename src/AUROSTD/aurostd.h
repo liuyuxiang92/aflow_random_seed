@@ -1245,13 +1245,6 @@ template<class utype> utype combinations(utype n,utype k) __xprototype; // http:
 template<class utype> utype Cnk(utype n,utype k) __xprototype; // http://en.wikipedia.org/wiki/Combination
 
 // ***************************************************************************
-// grid generation
-namespace aurostd {
-  xvector<double> linspace(const double start, const double stop, const int n);
-  xvector<double> linspace(const double start, const double stop, const double n);
-}
-
-// ***************************************************************************
 namespace aurostd {
   //template <typename utype> utype sum(vector<utype>& a) {
   //utype result = 0;

@@ -100,30 +100,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   //DX20190206 - add AFLUX functionality to command line - END
   vpflow.flag("ANALYZEDB", aurostd::args2flag(argv,cmds,"--analyze_database"));  //ME20191001
 
-  vpflow.flag("QCA::INIT", aurostd::args2flag(argv,cmds,"--quasi_chem_approx|--qca")); //SD20220323 - initiate quasi-chemical approx calculation
-  if(vpflow.flag("QCA::INIT")) {
-    vpflow.flag("QCA::USAGE", aurostd::args2flag(argv,cmds,"--usage"));
-    vpflow.flag("QCA::BINODAL", aurostd::args2flag(argv,cmds,"--binodal"));
-    vpflow.flag("QCA::USE_SG", aurostd::args2flag(argv,cmds,"--use_sg"));
-    vpflow.flag("QCA::SPINODAL", aurostd::args2flag(argv,cmds,"--spinodal"));
-    vpflow.flag("QCA::SCREEN_ONLY", aurostd::args2flag(argv,cmds,"--screen_only"));
-    vpflow.flag("QCA::IMAGE_ONLY", aurostd::args2flag(argv,cmds,"--image_only|--image"));
-    vpflow.flag("QCA::NO_PLOT", aurostd::args2flag(argv,cmds,"--no_plot|--noplot"));
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::DIRECTORY","--directory=","./");
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::PLATTICE","--plattice=|--plat=","");
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::ELEMENTS","--elements=|--elem=","");
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::MAX_NUM_ATOMS","--max_num_atoms=|--mna=","");
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::CV_CUTOFF","--cv_cutoff=|--cv_cut=","");
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::CONC_CURVE_RANGE","--conc_curve_range=|--conc_curve=","");
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::CONC_NPTS","--conc_npts=","");
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::TEMP_RANGE","--temp_range=|--temp=","");
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::TEMP_NPTS","--temp_npts=","");
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::FORMAT_DATA","format_data=|--data_format=","txt");
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::FORMAT_PLOT","format_image=|--image_format=","pdf");
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::AFLOWLIB_DIRECTORY","--aflowlib_directory=|--aflowlib_dir=","");
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::AFLOW_MAX_NUM_ATOMS","--aflow_max_num_atoms=","");
-  }
-
   // Commands for serializing bands and DOS data to JSON
   vpflow.args2addattachedscheme(argv,cmds,"DOSDATA2JSON","--dosdata2json=","./"); //EG
   if(vpflow.flag("DOSDATA2JSON")){vpflow.args2addattachedscheme(argv,cmds,"DOSDATA2JSON::PARAMS","--dos_parameters=","");}  //CO20180214 removed params confusion
@@ -1273,6 +1249,29 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
 
   vpflow.flag("PFLOW::QUEUE_STATUS",aurostd::args2flag(argv,cmds,"--queue_status|--queue|--q"));  //CO20200526
 
+  vpflow.flag("QCA::INIT", aurostd::args2flag(argv,cmds,"--quasi_chem_approx|--qca")); //SD20220323 - initiate quasi-chemical approx calculation
+  if(vpflow.flag("QCA::INIT")) {
+    vpflow.flag("QCA::USAGE", aurostd::args2flag(argv,cmds,"--usage"));
+    vpflow.flag("QCA::BINODAL", aurostd::args2flag(argv,cmds,"--binodal"));
+    vpflow.flag("QCA::USE_SG", aurostd::args2flag(argv,cmds,"--use_sg"));
+    vpflow.flag("QCA::SCREEN_ONLY", aurostd::args2flag(argv,cmds,"--screen_only"));
+    vpflow.flag("QCA::IMAGE_ONLY", aurostd::args2flag(argv,cmds,"--image_only|--image"));
+    vpflow.flag("QCA::NO_PLOT", aurostd::args2flag(argv,cmds,"--no_plot|--noplot"));
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::DIRECTORY","--directory=","./");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::PLATTICE","--plattice=|--plat=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::ELEMENTS","--elements=|--elem=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::MAX_NUM_ATOMS","--max_num_atoms=|--mna=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::CV_CUTOFF","--cv_cutoff=|--cv_cut=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::CONC_CURVE_RANGE","--conc_curve_range=|--conc_curve=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::CONC_NPTS","--conc_npts=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::TEMP_RANGE","--temp_range=|--temp=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::TEMP_NPTS","--temp_npts=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::FORMAT_DATA","format_data=|--data_format=","txt");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::FORMAT_PLOT","format_image=|--image_format=","pdf");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::AFLOWLIB_DIRECTORY","--aflowlib_directory=|--aflowlib_dir=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::AFLOW_MAX_NUM_ATOMS","--aflow_max_num_atoms=","");
+  }
+
   // [OBSOLETE]  vpflow.flag("RASMOL",aurostd::args2flag(argv,cmds,"--rasmol"));
   vpflow.args2addattachedscheme(argv,cmds,"RASMOL","--rasmol=","");
 
@@ -2349,32 +2348,6 @@ namespace pflow {
     strstream << tab << x << " --aflowlib_aurl2auid=aurl1,aurl2.... [ --aurl2auid=..." << endl;
     strstream << tab << x << " --aflowlib_auid2loop=auid1,auid2....|--auid2loop=..." << endl;
     strstream << tab << x << " --aflowlib_aurl2loop=aurl1,aurl2.... [ --aurl2loop=..." << endl;
-    strstream << tab << x << " --quasi_chem_approx|--qca --plattice=|--plat=fcc --elements=|--elem=Au,Pt[,Zn] [qca_options] [--directory=[DIRECTORY]]" << endl;
-    strstream << tab << xspaces << " " << "options are:" << endl;
-    strstream << endl;
-    strstream << tab << xspaces << " " << "GENERAL OPTIONS:" << endl;
-    strstream << tab << xspaces << " " << "              --usage" << endl;
-    strstream << tab << xspaces << " " << "              --screen_only" << endl;
-    strstream << tab << xspaces << " " << "              --image_only|--image" << endl;
-    strstream << tab << xspaces << " " << "              --no_plot|--noplot" << endl;
-    strstream << tab << xspaces << " " << "              --aflowlib_directory=|--aflowlib_dir=..." << endl;
-    strstream << endl;
-    strstream << tab << xspaces << " " << "BINODAL OPTIONS:" << endl;
-    strstream << tab << xspaces << " " << "              --binodal" << endl;
-    strstream << tab << xspaces << " " << "              --use_sg" << endl;
-    strstream << tab << xspaces << " " << "              --aflow_max_num_atoms=4" << endl;
-    strstream << tab << xspaces << " " << "              --max_num_atoms=|--mna=8" << endl;
-    strstream << tab << xspaces << " " << "              --cv_cutoff=|--cv_cut=0.05" << endl;
-    strstream << tab << xspaces << " " << "              --conc_curve_range=|--conc_curve=0,1,1,0" << endl;
-    strstream << tab << xspaces << " " << "              --conc_npts=20" << endl;
-    strstream << tab << xspaces << " " << "              --temp_range=|--temp=300,5000" << endl;
-    strstream << tab << xspaces << " " << "              --temp_npts=150" << endl;
-    strstream << endl;
-    strstream << tab << xspaces << " " << "SPINODAL OPTIONS:" << endl;
-    strstream << tab << xspaces << " " << "              --spinodal" << endl;
-    strstream << tab << xspaces << " " << "FORMAT OPTIONS:" << endl;
-    strstream << tab << xspaces << " " << "              --format_data=|--data_format=txt|json" << endl;
-    strstream << tab << xspaces << " " << "              --format_image=|--image_format=pdf|eps|png" << endl;
     strstream << tab << x << " --atat < POSCAR" << endl;
     strstream << tab << x << " [options] --bader -D DIRECTORY" << endl;
     strstream << tab << xspaces << " " << "options are:  --usage" << endl;
@@ -2591,6 +2564,30 @@ namespace pflow {
     strstream << tab << x << " --python_modules[=module1,module2] | --create_python_modules=[module1,module2] [-D directory]" << endl;
     strstream << tab << x << " --qe < POSCAR" << endl;
     strstream << tab << x << " --qmvasp [--static] [-D directory]" << endl;
+    strstream << tab << x << " --quasi_chem_approx|--qca --plattice=|--plat=fcc --elements=|--elem=Au,Pt[,Zn] [qca_options] [--directory=[DIRECTORY]]" << endl;
+    strstream << tab << xspaces << " " << "options are:" << endl;
+    strstream << endl;
+    strstream << tab << xspaces << " " << "GENERAL OPTIONS:" << endl;
+    strstream << tab << xspaces << " " << "              --usage" << endl;
+    strstream << tab << xspaces << " " << "              --screen_only" << endl;
+    strstream << tab << xspaces << " " << "              --image_only|--image" << endl;
+    strstream << tab << xspaces << " " << "              --no_plot|--noplot" << endl;
+    strstream << tab << xspaces << " " << "              --aflowlib_directory=|--aflowlib_dir=..." << endl;
+    strstream << endl;
+    strstream << tab << xspaces << " " << "BINODAL OPTIONS:" << endl;
+    strstream << tab << xspaces << " " << "              --binodal" << endl;
+    strstream << tab << xspaces << " " << "              --use_sg" << endl;
+    strstream << tab << xspaces << " " << "              --aflow_max_num_atoms=4" << endl;
+    strstream << tab << xspaces << " " << "              --max_num_atoms=|--mna=8" << endl;
+    strstream << tab << xspaces << " " << "              --cv_cutoff=|--cv_cut=0.05" << endl;
+    strstream << tab << xspaces << " " << "              --conc_curve_range=|--conc_curve=0,1,1,0" << endl;
+    strstream << tab << xspaces << " " << "              --conc_npts=20" << endl;
+    strstream << tab << xspaces << " " << "              --temp_range=|--temp=300,5000" << endl;
+    strstream << tab << xspaces << " " << "              --temp_npts=150" << endl;
+    strstream << endl;
+    strstream << tab << xspaces << " " << "FORMAT OPTIONS:" << endl;
+    strstream << tab << xspaces << " " << "              --format_data=|--data_format=txt|json" << endl;
+    strstream << tab << xspaces << " " << "              --format_image=|--image_format=pdf|eps|png" << endl;
     strstream << tab << x << " --rasmol[=n1[,n2[,n3]]] < POSCAR" << endl;
     strstream << tab << x << " --revsg [#] [n] [l] [m]" << endl;
     strstream << tab << x << " --rm_atom iatom < POSCAR" << endl;

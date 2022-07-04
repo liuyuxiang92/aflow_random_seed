@@ -22,6 +22,8 @@
 // ***************************************************************************
 namespace qca {
   /// @brief Modifies the QCA variables based on the input flags and starts the module.
+  ///
+  /// @param vpflow Command line options
   void quasiChemicalApprox(const aurostd::xoption& vpflow) {
     if (vpflow.flag("QCA::USAGE")) {
       if (!vpflow.flag("QCA::SCREEN_ONLY")) {displayUsage();}
@@ -29,6 +31,13 @@ namespace qca {
     }
     _qca_data qca_data;
     initQCA(qca_data);
+    qca_data.num_threads = KBIN::get_NCPUS();
+    qca_data.cdirpath = aurostd::getPWD();
+    qca_data.rootdirpath = aurostd::CleanFileName(qca_data.rootdirpath);
+    qca_data.plattice = aurostd::tolower(qca_data.plattice);
+    qca_data.format_data = aurostd::tolower(qca_data.format_data);
+    qca_data.format_image = aurostd::tolower(qca_data.format_image);
+    aurostd::sort_remove_duplicates(qca_data.elements);
     qca_data.min_sleep = DEFAULT_QCA_MIN_SLEEP_SECONDS;
     if (!vpflow.getattachedscheme("QCA::DIRECTORY").empty()) {
       qca_data.rootdirpath = vpflow.getattachedscheme("QCA::DIRECTORY");
@@ -102,9 +111,8 @@ namespace qca {
     if (vpflow.flag("QCA::IMAGE_ONLY")) {qca_data.image_only = true;}
     if (vpflow.flag("QCA::BINODAL")) {qca_data.calc_binodal = true;}
     if (vpflow.flag("QCA::USE_SG")) {qca_data.use_sg = true;}
-    if (vpflow.flag("QCA::SPINODAL")) {qca_data.calc_spinodal = true;}
+    errorFix(qca_data);
     runQCA(qca_data);
-    return;
    }
 }
 
@@ -113,6 +121,8 @@ namespace qca {
 // ***************************************************************************
 namespace qca {
   /// @brief Initializes the QCA variables
+  ///
+  /// @param qca_data Object that contains all the QCA data needed to perform the calculation.
   void initQCA(_qca_data& qca_data) {
     // Input data
     qca_data.num_threads = 0;
@@ -123,8 +133,7 @@ namespace qca {
     qca_data.image_only = false;
     qca_data.calc_binodal = false;
     qca_data.use_sg = false;
-    qca_data.calc_spinodal = false;
-    qca_data.workdirpath = "";
+    qca_data.cdirpath = "";
     qca_data.rootdirpath = "";
     qca_data.aflowlibpath = "";
     qca_data.plattice = "";
@@ -166,21 +175,12 @@ namespace qca {
 // ***************************************************************************
 namespace qca {
   /// @brief Runs the QCA module.
+  ///
+  /// @param qca_data Object that contains all the QCA data needed to perform the calculation.
   void runQCA(_qca_data& qca_data) {
-    // Clean-up input data and check for errors
-    if (XHOST.vflag_control.flag("XPLUG_NUM_THREADS") && !(XHOST.vflag_control.flag("XPLUG_NUM_THREADS_MAX"))) {
-      qca_data.num_threads = aurostd::string2utype<int>(XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS"));
-    }
-    qca_data.workdirpath = aurostd::getPWD();
-    qca_data.rootdirpath = aurostd::CleanFileName(qca_data.rootdirpath);
-    qca_data.plattice = aurostd::tolower(qca_data.plattice);
-    qca_data.format_data = aurostd::tolower(qca_data.format_data);
-    qca_data.format_image = aurostd::tolower(qca_data.format_image);
-    aurostd::sort_remove_duplicates(qca_data.elements);
-    errorChecks(qca_data);
     qca_data.rundirpath += qca_data.rootdirpath + "/" + pflow::arity_string(qca_data.elements.size(), false, false) + "/" + qca_data.plattice + "/" + qca_data.alloyname;
     aurostd::DirectoryMake(qca_data.rundirpath);
-    // Only plot data from JSON file. This is useful when the plotting routine cannot be ran on the machine
+    // Only plot data from JSON file. This is useful when the plotting routine cannot be run on the machine
     // running the calculation.
     if (qca_data.image_only) {
       readData(qca_data);
@@ -194,16 +194,17 @@ namespace qca {
       writeData(qca_data);
       plotData(qca_data);
     }
-    return;
   }
 }
 
 // ***************************************************************************
-// qca::errorChecks
+// qca::errorFix
 // ***************************************************************************
 namespace qca {
-  /// @brief Checks for errors in the input variables.
-  void errorChecks(_qca_data& qca_data) {
+  /// @brief Checks and fixes errors in the input variables.
+  ///
+  /// @param qca_data Object that contains all the QCA data needed to perform the calculation.
+  void errorFix(_qca_data& qca_data) {
     // Check if number of threads is valid
     if (qca_data.num_threads < 1) {qca_data.num_threads = 1;}
     // Check if min sleep is at least 1 sec
@@ -310,16 +311,6 @@ namespace qca {
 }
 
 // ***************************************************************************
-// qca::calcSpinodalData
-// ***************************************************************************
-namespace qca {
-  /// @brief Calculates the spinodal curve and the quantities needed for the calculation.
-  void calcSpinodalData(_qca_data& qca_data) {
-    cerr << qca_data.rundirpath << endl;
-  }
-}
-
-// ***************************************************************************
 // qca::calcBinodalData
 // ***************************************************************************
 // Binodal construction based on the method developed in Y. Lederer et al., Acta Materialia, 159 (2018)
@@ -337,16 +328,16 @@ namespace qca {
         vector<xstructure> vstr_add = getAFLOWXstructures(qca_data.aflowlibpath, qca_data.num_threads, qca_data.use_sg);
         qca_data.vstr_aflow.insert(qca_data.vstr_aflow.end(), vstr_add.begin(), vstr_add.end());
       }
-      qca_data.mapstr = calcMapForXstructures(getATATXstructures(qca_data.lat_atat, qca_data.plattice, qca_data.elements, qca_data.aflow_max_num_atoms), qca_data.vstr_aflow, true); // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
+      qca_data.mapstr = calcMapForXstructures(getATATXstructures(qca_data.lat_atat, qca_data.plattice, qca_data.elements, qca_data.aflow_max_num_atoms), qca_data.vstr_aflow, qca_data.num_threads); // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
       generateFilesForATAT(qca_data.rundirpath, createLatForATAT(qca_data.plattice, qca_data.elements, true), qca_data.vstr_aflow, qca_data.vstr_atat, qca_data.mapstr);
-      runATAT(qca_data.workdirpath, qca_data.rundirpath, qca_data.min_sleep);
+      runATAT(qca_data.cdirpath, qca_data.rundirpath, qca_data.min_sleep);
     }
     qca_data.cv_cluster = getCVCluster(qca_data.rundirpath, qca_data.cv_cut);
     qca_data.num_atom_cluster = getNumAtomCluster(qca_data.vstr_atat);
     qca_data.conc_cluster = getConcentrationCluster(qca_data.rundirpath, qca_data.vstr_atat.size(), qca_data.elements.size());
     qca_data.excess_energy_cluster = getExcessEnergyCluster(qca_data.rundirpath, qca_data.conc_cluster, qca_data.max_num_atoms);
     setCongruentClusters(qca_data);
-    qca_data.degeneracy_cluster = calcDegeneracyCluster(qca_data.plattice, qca_data.vstr_atat, qca_data.elements, qca_data.max_num_atoms, true, qca_data.rundirpath);
+    qca_data.degeneracy_cluster = calcDegeneracyCluster(qca_data.plattice, qca_data.vstr_atat, qca_data.elements, qca_data.max_num_atoms, qca_data.num_threads, qca_data.rundirpath);
     qca_data.conc_macro = getConcentrationMacro(qca_data.conc_curve_range, qca_data.conc_npts, qca_data.elements.size());
     qca_data.temp = getTemperature(qca_data.temp_range, qca_data.temp_npts);
     qca_data.param_ec = calcRelativeEntropyEC(qca_data.conc_cluster, qca_data.degeneracy_cluster, qca_data.excess_energy_cluster, qca_data.temp, qca_data.max_num_atoms);
@@ -455,7 +446,7 @@ namespace qca {
     bool shift_temp = false;
     double dtemp = temp(2) - temp(1);
     while (!calcProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, temp, max_num_atoms, prob_ec) && 
-           aurostd::min(temp) < 1e4) {
+           aurostd::min(temp) < DEFAULT_QCA_TEMP_MIN_LIMIT) {
       shift_temp = true;
       temp += dtemp;
     }
@@ -550,7 +541,7 @@ namespace qca {
     prob_cluster.clear();
     int nx = prob_ideal_cluster.rows, ncl = prob_ideal_cluster.cols, nt = temp.rows, neq = conc_cluster.cols - 1;
     xmatrix<double> zeros(nx, ncl), natom_cluster = (double)max_num_atoms * conc_cluster;
-    for (uint it = 0; it < (uint)nt; it++) {prob_cluster.push_back(zeros);} // initialize
+    prob_cluster.assign(nt, zeros); // initialize
     xvector<double> beta = aurostd::pow(KBOLTZEV * temp, -1.0), soln(neq);
     bool soln_found = false;
     if (neq == 1) {
@@ -587,6 +578,11 @@ namespace qca {
     }
     else {
       xmatrix<double> soln0 = aurostd::ones_xm<double>(neq, nx), msoln;
+      std::function<double(int it, int ix, int ieq, int ideq, xvector<double>)> 
+        poly = [conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster]
+               (int it, int ix, int ieq, int ideq, xvector<double> xvar) {
+                 return calcProbabilityConstraint(conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq, ideq, xvar);
+               };
       vector<std::function<double(xvector<double>)>> vpoly, vdpoly;
       vector<vector<std::function<double(xvector<double>)>>> jac;
       for (int it = nt; it >= 1; it--) { // go backwards
@@ -595,19 +591,19 @@ namespace qca {
           vdpoly.clear();
           jac.clear();
           for (int ieq = 1; ieq <= neq; ieq++) {
-            vpoly.push_back([conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq](xvector<double> xvar) {return calcProbabilityConstraint(conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq, 0, xvar);});
+            vpoly.push_back([poly, it, ix, ieq](xvector<double> xvar) {return poly(it, ix, ieq, 0, xvar);});
             for (int ideq = 1; ideq <= neq; ideq++) {
-              vdpoly.push_back([conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq, ideq](xvector<double> xvar) {return calcProbabilityConstraint(conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster, it, ix, ieq, ideq, xvar);});
+              vdpoly.push_back([poly, it, ix, ieq, ideq](xvector<double> xvar) {return poly(it, ix, ieq, ideq, xvar);});
             }
             jac.push_back(vdpoly);
             vdpoly.clear();
           }
           if (LDEBUG) {cerr << __AFLOW_FUNC__ << " it=" << it << " ix=" << ix << endl;}
-          soln_found = aurostd::findZeroDeflation(soln0.getcol(ix), vpoly, jac, msoln, 100, 10.0 * _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
+          soln_found = aurostd::findZeroDeflation(soln0.getcol(ix), vpoly, jac, msoln);
           if (LDEBUG) {cerr << __AFLOW_FUNC__ << "   Real roots=" << endl << msoln << endl;}
           for (int isol = 1; isol <= msoln.cols && soln_found; isol++) { // first soln_found checks whether to enter loop
             for (int ieq = 1; ieq <= neq && soln_found; ieq++) {
-              if (msoln.getcol(isol)(ieq) <= 0.0) {soln_found = false;} // solution must be positive, real and finite
+              soln_found = (msoln.getcol(isol)(ieq) <= 0.0); // solution must be positive, real and finite
             }
             if (soln_found) {
               soln = msoln.getcol(isol);
@@ -982,11 +978,12 @@ namespace qca {
   /// @param vstr Xstructures of the clusters.
   /// @param elements Elements in the alloy.
   /// @param max_num_atoms Maximum number of atoms in the cluster expansion.
-  /// @param shuffle Shuffle the order of the clusters.
+  /// @param num_threads Number of threads to run structure comparison.
   /// @param rundirpath Path to the directory where AFLOW is running.
+  /// @param algo Algorithm to do the structure comparison.
   ///
   /// @return Degeneracy of the clusters.
-  xvector<int> calcDegeneracyCluster(const string& plattice, const vector<xstructure>& _vstr, const vector<string>& elements, const int max_num_atoms, const bool shuffle, const string& rundirpath) {
+  xvector<int> calcDegeneracyCluster(const string& plattice, const vector<xstructure>& _vstr, const vector<string>& elements, const int max_num_atoms, const int num_threads, const string& rundirpath, const string& algo) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     string filepath = "";
     if (!rundirpath.empty()) {
@@ -997,14 +994,6 @@ namespace qca {
       if (aurostd::file2vectorstring(filepath, tokens)) {return aurostd::vector2xvector(aurostd::vectorstring2vectorutype<int>(tokens));}
     }
     vector<xstructure> vstr = _vstr;
-    vector<uint> index;
-    for (uint i = 0; i < vstr.size(); i++) {index.push_back(i);}
-    // Shuffling the xstructures is important because it can avoid edge case scenarios where the reference centroid
-    // in Xtalfinder does not pick up the proper neighbors
-    if (shuffle) { // introduce randomness into grouping
-      aurostd::random_shuffle(index);
-      for (uint i = 0; i < index.size(); i++) {vstr[i] = _vstr[index[i]];}
-    }
     xvector<int> degeneracy_cluster(vstr.size());
     xstructure str_plat, str;
     deque<_atom> atoms;
@@ -1098,19 +1087,42 @@ namespace qca {
     }
     if (LDEBUG) {cerr << __AFLOW_FUNC__ << " Number of total derivative structures = " << vstr_ds.size() << endl;}
     // Find degenerate structures
-    vstr_ds.insert(vstr_ds.begin(), vstr.begin(), vstr.end()); // concatenate xstructures, subtract by 1 in the end
-    XtalFinderCalculator xtal_calc;
-    vector<vector<uint>> dsg = xtal_calc.groupSimilarXstructures(vstr_ds); // costly part of the function
-    for (uint i = 0; i < dsg.size(); i++) {
-      std::sort(dsg[i].begin(), dsg[i].end()); // first index is the cluster index
-      if (dsg[i][0] < (uint)degeneracy_cluster.rows) {
-        degeneracy_cluster(dsg[i][0] + 1) = dsg[i].size() - 1;
-        if (LDEBUG) {
-          cerr << __AFLOW_FUNC__ << " i=" << i << " | DG=" << dsg[i].size() - 1 << " | ";
-          for (uint j = 0; j < dsg[i].size(); j++) {cerr << dsg[i][j] << " ";}
-          cerr << endl;
+    if (aurostd::tolower(algo) == "slow") {
+      int nmatch;
+      for (uint i = 0; i < vstr.size(); i++) {
+        nmatch = 0;
+        for (vector<xstructure>::iterator it = vstr_ds.begin(); it != vstr_ds.end(); it++) {
+          if (compare::structuresMatch(vstr[i], *it, true, num_threads)) {
+            nmatch++;
+            vstr_ds.erase(it--); // remove matched xstructures
+          }
+        }
+        degeneracy_cluster(i + 1) = nmatch;
+      }
+    }
+    else if (aurostd::tolower(algo) == "fast") {
+      vector<uint> index;
+      for (uint i = 0; i < vstr.size(); i++) {index.push_back(i);}
+      // Shuffling the xstructures is important because it can avoid edge case scenarios where the reference centroid
+      // in Xtalfinder does not pick up the proper neighbors
+      aurostd::random_shuffle(index);
+      for (uint i = 0; i < index.size(); i++) {vstr[i] = _vstr[index[i]];}
+      vstr_ds.insert(vstr_ds.begin(), vstr.begin(), vstr.end()); // concatenate xstructures, subtract by 1 in the end
+      XtalFinderCalculator xtal_calc;
+      vector<vector<uint>> dsg = xtal_calc.groupSimilarXstructures(vstr_ds); // costly part of the function
+      for (uint i = 0; i < dsg.size(); i++) {
+        std::sort(dsg[i].begin(), dsg[i].end()); // first index is the cluster index
+        if (dsg[i][0] < (uint)degeneracy_cluster.rows) {
+          degeneracy_cluster(dsg[i][0] + 1) = dsg[i].size() - 1;
+          if (LDEBUG) {
+            cerr << __AFLOW_FUNC__ << " i=" << i << " | DG=" << dsg[i].size() - 1 << " | ";
+            for (uint j = 0; j < dsg[i].size(); j++) {cerr << dsg[i][j] << " ";}
+            cerr << endl;
+          }
         }
       }
+      xvector<int> _degeneracy_cluster = degeneracy_cluster;
+      for (uint i = 0; i < index.size(); i++) {degeneracy_cluster(index[i] + 1) = _degeneracy_cluster(i + 1);}
     }
     XHOST.QUIET = quiet;
     int sum_calculated = aurostd::sum(degeneracy_cluster), sum_accepted = (int)vstr_sup.size() * (int)std::pow(elements.size(), max_num_atoms);
@@ -1118,10 +1130,6 @@ namespace qca {
       stringstream message;
       message << "Degeneracies do not satisfy the sum rule, the sum is " << sum_calculated << " but should be " << sum_accepted;
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
-    }
-    if (shuffle) { // place back in correct order
-      xvector<int> _degeneracy_cluster = degeneracy_cluster;
-      for (uint i = 0; i < index.size(); i++) {degeneracy_cluster(index[i] + 1) = _degeneracy_cluster(i + 1);}
     }
     if (!filepath.empty()) {
       stringstream ss;
@@ -1166,10 +1174,10 @@ namespace qca {
 namespace qca {
   /// @brief Runs the ATAT program.
   ///
-  /// @param workdirpath Path to the directory where ATAT is running.
+  /// @param cdirpath Path to the directory where the original command was run.
   /// @param rundirpath Path to the directory where AFLOW is running.
   /// @param min_sleep Minimum number of seconds to sleep.
-  void runATAT(const string& workdirpath, const string& rundirpath, const uint min_sleep) {
+  void runATAT(const string& cdirpath, const string& rundirpath, const uint min_sleep) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     uint iter = 0;
     if (aurostd::substring2bool(aurostd::execute2string("mmaps", stdouterr_fsio), "command not found")) {
@@ -1194,7 +1202,7 @@ namespace qca {
       aurostd::file2string(rundirpath + "/maps.log", logstring);
     }
     aurostd::RemoveFile(tmpfile);
-    chdir(workdirpath.c_str());
+    chdir(cdirpath.c_str());
   }
 }
 
@@ -1235,7 +1243,7 @@ namespace qca {
   ///
   /// @param plattice Parent lattice of the alloy.
   /// @param elements Elements in the alloy.
-  /// @param num_threads Number of threads to run AFLOW-SYM.
+  /// @param num_threads Number of threads to run structure comparison.
   /// @param use_sg Compare initial and final xstructures only using their space groups.
   ///
   /// @return Xstructures from AFLOW runs.
@@ -1364,7 +1372,7 @@ namespace qca {
       lattice(1, 3) = 0.5; lattice(2, 3) = 0.5; lattice(3, 3) = 0.0;
     }
     else if (plattice == "bcc") {
-      alat *= 4.0 * std::sqrt(3.0) / 3.0;
+      alat *= 4.0 / std::sqrt(3.0);
       lattice(1, 1) = -0.5; lattice(2, 1) = 0.5; lattice(3, 1) = 0.5;
       lattice(1, 2) = 0.5; lattice(2, 2) = -0.5; lattice(3, 2) = 0.5;
       lattice(1, 3) = 0.5; lattice(2, 3) = 0.5; lattice(3, 3) = -0.5;
@@ -1375,12 +1383,7 @@ namespace qca {
       coorsys(3) = std::sqrt(8.0 / 3.0);
       angles(3) = 120.0;
     }
-    if (scale) {
-      alat = aurostd::round(alat, 3);
-    }
-    else {
-      alat = 1.0;
-    }
+    alat = (scale) ? aurostd::round(alat, 3) : 1.0;
     for (uint i = 1; i <= 3; i++) {oss << alat * coorsys(i) << " ";}
     for (uint i = 1; i <= 3; i++) {oss << angles(i) << " ";}
     oss << endl;
@@ -1445,7 +1448,7 @@ namespace qca {
       scale *= 2.0 * std::sqrt(2.0);
     }
     else if (plattice == "bcc") {
-      scale *= 4.0 * std::sqrt(3.0) / 3.0;
+      scale *= 4.0 / std::sqrt(3.0);
     }
     else if (plattice == "hcp") {
       scale *= 2.0;
@@ -1488,56 +1491,68 @@ namespace qca {
   ///
   /// @param vstr1 First group of xstructures.
   /// @param vstr2 Second group of xstructures.
-  /// @param shuffle Shuffle the order of the first group.
+  /// @param num_threads Number of threads to run structure comparison.
+  /// @param algo Algorithm to do the structure comparison.
   ///
   /// @return Xstructure map between the two groups.
-  vector<int> calcMapForXstructures(const vector<xstructure>& _vstr1, const vector<xstructure>& vstr2, const bool shuffle) {
+  vector<int> calcMapForXstructures(const vector<xstructure>& _vstr1, const vector<xstructure>& vstr2, const int num_threads, const string& algo) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     vector<int> mapstr;
-    bool quiet = XHOST.QUIET;
-    XHOST.QUIET = true;
     vector<xstructure> vstr1 = _vstr1;
-    vector<uint> index;
-    for (uint i = 0; i < vstr1.size(); i++) {index.push_back(i);}
-    // Shuffling the xstructures is important because it can avoid edge case scenarios where the reference centroid
-    // in Xtalfinder does not pick up the proper neighbors
-    if (shuffle) { // introduce randomness into grouping
-      aurostd::random_shuffle(index);
-      for (uint i = 0; i < index.size(); i++) {vstr1[i] = _vstr1[index[i]];}
-    }
-    vector<xstructure> vstr3 = vstr1;
-    vstr3.insert(vstr3.end(), vstr2.begin(), vstr2.end());
-    XtalFinderCalculator xtal_calc;
-    vector<vector<uint>> gsx = xtal_calc.groupSimilarXstructures(vstr3);
-    XHOST.QUIET = quiet;
-    for (uint i = 0; i < gsx.size(); i++) {
-      std::sort(gsx[i].begin(), gsx[i].end());
-      if (gsx[i][0] > vstr1.size() -  1) { // index is not part of vstr1
-        continue;
-      }
-      else if (gsx[i].size() == 1) { // no match for xstr in vstr1
-        mapstr.push_back(-1);
-      }
-      else { // take first match of xstr in vstr2 to xstr in vstr1
-        for (uint j = 1; j < gsx[i].size(); j++) {
-          if (gsx[i][j] > vstr1.size() - 1) {
-            mapstr.push_back((int)gsx[i][j] - (int)vstr1.size());
-            break;
+    if (aurostd::tolower(algo) == "slow") {
+      bool match;
+      for (uint i = 0; i < vstr1.size(); i++) {
+        match = false;
+        for (uint j = 0; j < vstr2.size() && !match; j++) {
+          if (compare::structuresMatch(vstr1[i], vstr2[j], true, num_threads)) {
+            match = true;
+            mapstr.push_back(j);
           }
         }
-      }
-      if (LDEBUG) {
-        cerr << __AFLOW_FUNC__ << " i=" << i << " | ";
-        for (uint j = 0; j < gsx[i].size(); j++) {cerr << gsx[i][j] << " ";}
-        cerr << endl;
+        if (!match) {mapstr.push_back(-1);}
       }
     }
-    if (mapstr.size() != index.size()) {
-      stringstream message;
-      message << "Something went wrong in the mapping of the xstructures; index.size()=" << index.size() << " | mapstr.size()=" << mapstr.size() << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
-    }
-    if (shuffle) { // place back in correct order
+    else if (aurostd::tolower(algo) == "fast") {
+      bool quiet = XHOST.QUIET;
+      XHOST.QUIET = true;
+      vector<uint> index;
+      for (uint i = 0; i < vstr1.size(); i++) {index.push_back(i);}
+      // Shuffling the xstructures is important because it can avoid edge case scenarios where the reference centroid
+      // in Xtalfinder does not pick up the proper neighbors
+      aurostd::random_shuffle(index); 
+      for (uint i = 0; i < index.size(); i++) {vstr1[i] = _vstr1[index[i]];}
+      vector<xstructure> vstr3 = vstr1;
+      vstr3.insert(vstr3.end(), vstr2.begin(), vstr2.end());
+      XtalFinderCalculator xtal_calc;
+      vector<vector<uint>> gsx = xtal_calc.groupSimilarXstructures(vstr3);
+      XHOST.QUIET = quiet;
+      for (uint i = 0; i < gsx.size(); i++) {
+        std::sort(gsx[i].begin(), gsx[i].end());
+        if (gsx[i][0] > vstr1.size() -  1) { // index is not part of vstr1
+          continue;
+        }
+        else if (gsx[i].size() == 1) { // no match for xstr in vstr1
+          mapstr.push_back(-1);
+        }
+        else { // take first match of xstr in vstr2 to xstr in vstr1
+          for (uint j = 1; j < gsx[i].size(); j++) {
+            if (gsx[i][j] > vstr1.size() - 1) {
+              mapstr.push_back((int)gsx[i][j] - (int)vstr1.size());
+              break;
+            }
+          }
+        }
+        if (LDEBUG) {
+          cerr << __AFLOW_FUNC__ << " i=" << i << " | ";
+          for (uint j = 0; j < gsx[i].size(); j++) {cerr << gsx[i][j] << " ";}
+          cerr << endl;
+        }
+      }
+      if (mapstr.size() != index.size()) {
+        stringstream message;
+        message << "Something went wrong in the mapping of the xstructures; index.size()=" << index.size() << " | mapstr.size()=" << mapstr.size() << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+      }
       vector<int> _mapstr = mapstr;
       for (uint i = 0; i < index.size(); i++) {mapstr[index[i]] = _mapstr[i];}
     }
@@ -1574,15 +1589,11 @@ namespace qca {
     usage_options.push_back("--temp_range=|--temp=300,5000");
     usage_options.push_back("--temp_npts=150");
     usage_options.push_back(" ");
-    usage_options.push_back("SPINODAL OPTIONS:");
-    usage_options.push_back("--spinodal");
-    usage_options.push_back(" ");
     usage_options.push_back("FORMAT OPTIONS:");
     usage_options.push_back("--format_data=|--data_format=txt|json");
     usage_options.push_back("--format_image=|--image_format=pdf|eps|png");
     usage_options.push_back(" ");
     init::MessageOption("--usage", "QCA()", usage_options);
-    return;
   }
 }
 
@@ -1637,7 +1648,6 @@ namespace qca {
       return;
     }
     cout << output.str() << endl;
-    return;
   }
 }
 
@@ -1733,7 +1743,6 @@ namespace qca {
     else {
       plotter::savePlotGNUPLOT(plotoptions, gpfile);
     }
-    return;
   }
 }
 
