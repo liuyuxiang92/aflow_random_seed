@@ -425,13 +425,13 @@ namespace aurostd {  // namespace aurostd
         }
         return xv;
       }
-      
     }
-    
 }
 namespace aurostd {  // namespace aurostd
   template<class utype>
     xvector<utype> xmatrix<utype>::getvec() const {
+    //CO2019110 original author of xmatrix2xvector and AZ20220704
+    //moved type-conversion functionality here
       int size = (ucols-lcols+1)*(urows-lrows+1);
       if((ucols != lcols)&&(lrows != urows)){
         throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"(ucols != lcols)&&(lrows != urows)",_INDEX_BOUNDS_);
@@ -450,7 +450,7 @@ namespace aurostd {  // namespace aurostd
         }
         return xv;
       }
-  }
+    }
 }
 
 //CO20190808
@@ -473,7 +473,6 @@ namespace aurostd {  // namespace aurostd
       int rows_out=(urow-lrow)+1;
       int cols_out=(ucol-lcol)+1;
       if(! ( mat_out.rows==rows_out && mat_out.cols==cols_out && mat_out.lrows==lrows_out && mat_out.lcols==lcols_out ) ) { //check if necessary to create new object
-
         xmatrix<utype> mat(rows_out,cols_out,lrows_out,lcols_out);
         mat_out=mat;
       }
@@ -506,9 +505,7 @@ namespace aurostd {  // namespace aurostd
         cerr << "lcol=" << lcol << endl;
         cerr << xmat << endl;
        }
-      //AZ20220627 START
-      xv_out=xmat.getvec();
-      //AZ20220627 END
+      xv_out=xmat.getvec();//AZ20220627 replaced xmatrix2xvector with xmat.getvec()
     }
   template<class utype> xmatrix<utype>
     xmatrix<utype>::getmat(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
