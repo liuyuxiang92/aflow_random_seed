@@ -346,7 +346,7 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>
-    xvector<utype> xmatrix<utype>::best_getvec(int k,int _lrows) const { //CO20191210
+    xvector<utype> xmatrix<utype>::best_getvec() const { //CO20191210
       //xvector<utype> diag(1,1);
       
       cerr << "ucols=" << ucols << endl;

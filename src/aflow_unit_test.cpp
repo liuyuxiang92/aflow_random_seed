@@ -915,7 +915,7 @@ namespace unittest {
     checkEqual(calculated_xvecint1, expected_xvecint1, check_function, check_description1, passed_checks, results);
 
     
-    calculated_xvecint = full_xmatint.getmat(1,1,1,1).best_getvec(1,1);
+    calculated_xvecint = full_xmatint.getmat(1,1,1,1).best_getvec();
     cerr << calculated_xvecint << endl;
 
     // ---------------------------------------------------------------------------
