@@ -344,6 +344,71 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+    xvector<utype> xmatrix<utype>::getvec(int lrow, int urow, int lcol, int ucol) const {
+      if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow<lrows",_INDEX_BOUNDS_);}
+      if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_INDEX_BOUNDS_);}
+      if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol<lcols",_INDEX_BOUNDS_);}
+      if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ucol>ucols",_INDEX_BOUNDS_);}
+      if(lcol>ucol){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol>ucol",_INDEX_BOUNDS_);}
+      if(lrow>urow){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow>urow",_INDEX_BOUNDS_);}
+      int size = (ucol-lcol+1)*(urow-lrow+1);
+      if((ucol != lcol)&&(lrow != urow)){
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"(ucol != lcol)&&(lrow != urow)",_INDEX_BOUNDS_);
+      }
+      else if(ucol == lcol){
+        xvector<utype> xv(size);
+        for(int i = 1; i <= size; i++){
+           xv(i) = corpus[lrow+i-1][lcol];
+        }
+        return xv;
+      }
+      else if(urow == lrow){
+        xvector<utype> xv(size);
+        for(int j = 1; j <= size; j++){
+          xv(j) = corpus[lrow][lcol+j-1];
+        }
+        return xv;
+      }
+      else{cerr << "messed up" << endl; 
+        return xvector<utype>(0);
+      }
+    }
+    
+}
+namespace aurostd {  // namespace aurostd
+  template<class utype>
+    xvector<utype> xmatrix<utype>::getvec() const {
+      int size = (ucols-lcols+1)*(urows-lrows+1);
+      if((ucols != lcols)&&(lrows != urows)){
+          cerr << "alive" << endl;
+          cerr << "lrows=" << lrows << endl;
+          cerr << "urows=" << urows << endl;
+          cerr << "lcols=" << lcols << endl;
+          cerr << "ucols=" << ucols << endl;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"(ucols != lcols)&&(lrows != urows)",_INDEX_BOUNDS_);
+      }
+      
+      else if(ucols == lcols){
+        xvector<utype> xv(size);
+        for(int i = 1; i <= size; i++){
+          xv(i) = corpus[lrows+i-1][lcols];
+        }
+        return xv;
+      }
+      else if(urows == lrows){
+        xvector<utype> xv(size);
+        for(int j = 1; j <= size; j++){
+          xv(j) = corpus[lrows][lcols+j-1];
+        }
+        return xv;
+      }
+      else{cerr << "messed up" << endl; 
+        return xvector<utype>(0);}
+      }
+}
+
 //CO20190808
 namespace aurostd {  // namespace aurostd
   //this function returns a submatrix mat_out spanning urow:lrow,ucol:lcol of the original matrix
@@ -375,15 +440,14 @@ namespace aurostd {  // namespace aurostd
   template<class utype> void
     xmatrix<utype>::getmatInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output //CO20191110
       //AZ20220627 START
-      bool LDEBUG=(FALSE || XHOST.DEBUG);
+      bool LDEBUG=(true || XHOST.DEBUG);
       if(lrows_out==AUROSTD_MAX_INT){lrows_out=lrows;}
       if(lcols_out==AUROSTD_MAX_INT){lcols_out=lcols;}
+      //AZ20220627 END
       if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow<lrows",_INDEX_BOUNDS_);}
       if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_INDEX_BOUNDS_);}
       if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol<lcols",_INDEX_BOUNDS_);}
       if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ucol>ucols",_INDEX_BOUNDS_);}
-      
-      //AZ20220627 END
       xmatrix<utype> xmat;
       (*this).getmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
       if(LDEBUG){
@@ -396,30 +460,17 @@ namespace aurostd {  // namespace aurostd
         cerr << "ucol=" << ucol << endl;
         cerr << "lrow=" << lrow << endl;
         cerr << "lcol=" << lcol << endl;
+        cerr << xmat << endl;
        }
-      //AZ20220630 START
-      int m2vlout=lrows;
-      if((xmat.urows==xmat.lrows)&&(xmat.ucols==xmat.lcols)){m2vlout=lrows_out;}
-      else if(xmat.urows==xmat.lrows){m2vlout=lrows_out;}
-      else{m2vlout=lcols_out;}
-      xv_out=xmatrix2xvector(xmat,xmat.urows,xmat.ucols,xmat.lrows,xmat.lcols,m2vlout);
-      //xmatrix2xvector was called incorrectly using lcol, ucol, lrow, urow with no xmat prefix
-      //one-line version of above logic:
-      //xv_out=xmatrix2xvector(xmat,xmat.urows,xmat.ucols,xmat.lrows,xmat.lcols,(xmat.urows==xmat.lrows) ? lrows_out : lcols_out);
-      //AZ20220630 END 
+      //AZ20220627 START
+      xv_out=xmat.getvec();
+      //AZ20220627 END
     }
   template<class utype> xmatrix<utype>
     xmatrix<utype>::getmat(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
       xmatrix<utype> xmat;
       (*this).getmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
       return xmat;
-    }
-  template<class utype> xvector<utype>
-    xmatrix<utype>::getvec(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
-      if((lcol!=ucol)&&(lrow!=urow)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"(lcol!=ucol)&&(lrow!=urow)",_INDEX_BOUNDS_);}
-      xvector<utype> xvec;
-      (*this).getmatInPlace(xvec,lrow,urow,lcol,ucol,lrows_out,lcols_out);
-      return xvec;
     }
 }
 
@@ -1687,63 +1738,6 @@ namespace aurostd {                   // conversion to xmatrix<utype>
         for(int j=1;j<=jsize;j++)
           xmat(i,j)=mat.at(i-1).at(j-1);
       return xmat;
-    }
-}
-
-namespace aurostd {                   // conversion to xvector
-  template<class utype> xvector<utype>
-    best_getvec(unt stuff) __xprototype {  //CO20191110
-      //if((xmat.ucols != xmat.lcols)&&(xmat.lrows != xmat.urows)){
-               //cerr << "2d indices" << endl;   
-    //}
-  //
-      //else{
-          //int size = (xmat.ucols-xmat.lcols+1)*(xmat.cols-xmat.lcols+1);
-          //xvector<utype> xv(size);
-          //for(int i = xmat.lrows; i <= xmat.urows; i++){
-            //for(int j = xmat.lcols; j <= xmat.ucols; j++){
-               //xv(size-i-j) = xmat[i][j];
-            //}}}
-           cerr << "testing" << 1 << endl;
-      return xvector<utype>(0);
-    }
-}
-namespace aurostd {                   // conversion to xvector
-  template<class utype> xvector<utype>
-    xmatrix2xvector(const xmatrix<utype>& xmat,int urow,int ucol,int lrow,int lcol,int lrows_out) __xprototype {  //CO20191110
-      //AZ20220627 START
-      //Beware the argument order in xmatrix2xvector
-      bool LDEBUG=(false || XHOST.DEBUG);
-      if(LDEBUG){
-        cerr << __AFLOW_FUNC__ << " xmat=" << endl << xmat << endl;
-        cerr << __AFLOW_FUNC__ << " xmat.urows=" << xmat.urows << " urow=" << urow << endl;
-        cerr << __AFLOW_FUNC__ << " xmat.ucols=" << xmat.ucols << " ucol=" << ucol << endl;
-        cerr << __AFLOW_FUNC__ << " xmat.lrows=" << xmat.lrows << " lrow=" << lrow << endl;
-        cerr << __AFLOW_FUNC__ << " xmat.lcols=" << xmat.lcols << " lcol=" << lcol << endl;
-        cerr << __AFLOW_FUNC__ << " lrows_out=" << lrows_out << endl;
-      }
-      //AZ20220627 END
-      if(urow==lrow){
-	if(LDEBUG){cerr << __AFLOW_FUNC__ << " entering case urow==lrow" << endl;}
-        xvector<utype> xv((ucol-lcol)+1,lrows_out);
-        for(int i=lcol;i<=ucol;i++){
-          if(LDEBUG){
-            cerr << __AFLOW_FUNC__ << " i=" << i << endl;
-            cerr << __AFLOW_FUNC__ << " i-lcol+xv.lrows=" << i-lcol+xv.lrows << endl;
-            cerr << __AFLOW_FUNC__ << " lrow=" << lrow << endl;
-          }
-          xv(i-lcol+xv.lrows)=xmat[lrow][i];
-        }
-        return xv;
-      }
-      else if(ucol==lcol){
-	if(LDEBUG){cerr << __AFLOW_FUNC__ << " entering case ucol==lcol" << endl;}
-        xvector<utype> xv((urow-lrow)+1,lrows_out);
-        for(int i=lrow;i<=urow;i++){xv(i-lrow+xv.lrows)=xmat[i][lcol];}
-        return xv;
-      }
-      else{cerr << "inxmatrix2xvector" << endl;}// throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"cannot create 2D xvector",_INPUT_ILLEGAL_);} // AZ20220627
-      return xvector<utype>(0);
     }
 }
 
