@@ -21,7 +21,7 @@ Citation info: TBA
 GENERAL OVERVIEW
 
 AFLOW-QCA is an automated tool to calculate phase equilibria properties of alloys for a given 
-parent lattice. Alloy data is downloaded from the AFLOW database and the cluster expansion is 
+parent lattice. Alloy data is downloaded from the AFLOW database and cluster expansion is 
 performed to calculate the energies of additional derivative structures using the Alloy Theoretic 
 Automated Toolkit [J. Phase Equilib. 23, 348 (2002)].
 
