@@ -347,8 +347,46 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype>
     xvector<utype> xmatrix<utype>::best_getvec(int k,int _lrows) const { //CO20191210
-      xvector<utype> diag(1,1);
-      return diag;
+      //xvector<utype> diag(1,1);
+      
+      cerr << "ucols=" << ucols << endl;
+      cerr << "lcols=" << lcols << endl;
+      cerr << "urows=" << urows << endl;
+      cerr << "lrows=" << lrows << endl;
+  int size = (ucols-lcols+1)*(urows-lrows+1);
+  if((ucols != lcols)&&(lrows != urows)){
+               cerr << "2d indices" << endl;   
+      return xvector<utype>(0);
+    }
+  
+  else if(ucols == lcols){
+      xvector<utype> xv(size);
+      cerr << "entering ucols == lcols" << endl;
+      for(int i = 1; i <= size; i++){
+          cerr << "size=" << size << endl;
+          cerr << "corpus" << "[" << i << "][" << lcols << "]=" << corpus[lrows+i-1][lcols] << endl; 
+          cerr << "xv=" << xv << endl;
+          cerr << "i-size" << size-i << endl;
+          xv(i) = corpus[lrows+i-1][lcols];
+      }
+      return xv;
+  }
+  else if(urows == lrows){
+      xvector<utype> xv(size);
+      cerr << "entering urows == lrows" << endl;
+      for(int j = 1; j <= size; j++){
+          cerr << "size=" << size << endl;
+          cerr << "corpus" << "[" << j << "][" << lcols << "]=" << corpus[lrows][lcols+j-1] << endl; 
+          cerr << "xv=" << xv << endl;
+          cerr << "i-size" << size-j << endl;
+          xv(j) = corpus[lrows][lcols+j-1];
+      }
+  
+        return xv;
+      }
+      else{cerr << "messed up" << endl; 
+
+      return xvector<utype>(0);}
     }
 }
 

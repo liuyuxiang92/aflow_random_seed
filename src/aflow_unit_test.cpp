@@ -265,7 +265,7 @@ namespace unittest {
       // Add function names to whitelist for displayResults
       for (uint i = 0; i < unit_tests.size(); i++) whitelist.push_back(test_functions[unit_tests[i]].function_name);
       XHOST.QUIET = true;
-      for (size_t i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.push_back(whitelist[i]);
+      //for (size_t i = 0; i < whitelist.size(); i++) XHOST.LOGGER_WHITELIST.push_back(whitelist[i]);
     }
 #ifdef AFLOW_MULTITHREADS_ENABLE
     std::mutex mtx;
@@ -913,6 +913,10 @@ namespace unittest {
     calculated_xvecint1 = full_xmatint.getvec(3,3,4,4);
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
     checkEqual(calculated_xvecint1, expected_xvecint1, check_function, check_description1, passed_checks, results);
+
+    
+    calculated_xvecint = full_xmatint.getmat(1,1,1,1).best_getvec(1,1);
+    cerr << calculated_xvecint << endl;
 
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520
