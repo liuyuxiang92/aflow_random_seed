@@ -343,9 +343,6 @@ namespace aurostd {
   template<class utype> xmatrix<utype>
     vectorvector2xmatrix(const vector<vector<utype> >& xmat) __xprototype;
 
-  template<class utype> xvector<utype>
-    xmatrix2xvector(const xmatrix<utype>& xmat,int urow,int ucol,int lrow,int lcol,int lrows_out) __xprototype; //CO20191110
-
   template<class utype> xmatrix<double> 
     xmatrixutype2double(const xmatrix<utype>& a); //CO20191201
   template<class utype> xmatrix<utype> 

@@ -1741,43 +1741,6 @@ namespace aurostd {                   // conversion to xmatrix<utype>
     }
 }
 
-namespace aurostd {                   // conversion to xvector
-  template<class utype> xvector<utype>
-    xmatrix2xvector(const xmatrix<utype>& xmat,int urow,int ucol,int lrow,int lcol,int lrows_out) __xprototype {  //CO20191110
-      //AZ20220627 START
-      //Beware the argument order in xmatrix2xvector
-      bool LDEBUG=(false || XHOST.DEBUG);
-      if(LDEBUG){
-        cerr << __AFLOW_FUNC__ << " xmat=" << endl << xmat << endl;
-        cerr << __AFLOW_FUNC__ << " xmat.urows=" << xmat.urows << " urow=" << urow << endl;
-        cerr << __AFLOW_FUNC__ << " xmat.ucols=" << xmat.ucols << " ucol=" << ucol << endl;
-        cerr << __AFLOW_FUNC__ << " xmat.lrows=" << xmat.lrows << " lrow=" << lrow << endl;
-        cerr << __AFLOW_FUNC__ << " xmat.lcols=" << xmat.lcols << " lcol=" << lcol << endl;
-        cerr << __AFLOW_FUNC__ << " lrows_out=" << lrows_out << endl;
-      }
-      //AZ20220627 END
-      if(urow==lrow){
-	if(LDEBUG){cerr << __AFLOW_FUNC__ << " entering case urow==lrow" << endl;}
-        xvector<utype> xv((ucol-lcol)+1,lrows_out);
-        for(int i=lcol;i<=ucol;i++){
-		if(LDEBUG){
-			cerr << __AFLOW_FUNC__ << " i=" << i << endl;
-			cerr << __AFLOW_FUNC__ << " i-lcol+xv.lrows=" << i-lcol+xv.lrows << endl;
-			cerr << __AFLOW_FUNC__ << " lrow=" << lrow << endl;
-		}
-		xv(i-lcol+xv.lrows)=xmat[lrow][i];
-	}
-        return xv;
-      }else if(ucol==lcol){
-	if(LDEBUG){cerr << __AFLOW_FUNC__ << " entering case ucol==lcol" << endl;}
-        xvector<utype> xv((urow-lrow)+1,lrows_out);
-        for(int i=lrow;i<=urow;i++){xv(i-lrow+xv.lrows)=xmat[i][lcol];}
-        return xv;
-      }else{cerr << "inxmatrix2xvector" << endl;}// throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"cannot create 2D xvector",_INPUT_ILLEGAL_);} // AZ20220627
-      return xvector<utype>(0);
-    }
-}
-
 //CO20191201
 namespace aurostd {                   // conversion from xmatrix<int> to xmatrix<double>
   template<class utype> xmatrix<double>
