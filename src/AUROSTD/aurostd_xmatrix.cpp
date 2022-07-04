@@ -399,6 +399,8 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype>
     xvector<utype> xmatrix<utype>::getvec(int lrow, int urow, int lcol, int ucol) const {
+    //CO2019110 original author of xmatrix2xvector and AZ20220704
+    //moved all functionality all into getvec
       if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow<lrows",_INDEX_BOUNDS_);}
       if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_INDEX_BOUNDS_);}
       if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol<lcols",_INDEX_BOUNDS_);}
@@ -423,9 +425,7 @@ namespace aurostd {  // namespace aurostd
         }
         return xv;
       }
-      else{cerr << "messed up" << endl; 
-        return xvector<utype>(0);
-      }
+      
     }
     
 }
@@ -434,14 +434,8 @@ namespace aurostd {  // namespace aurostd
     xvector<utype> xmatrix<utype>::getvec() const {
       int size = (ucols-lcols+1)*(urows-lrows+1);
       if((ucols != lcols)&&(lrows != urows)){
-          cerr << "alive" << endl;
-          cerr << "lrows=" << lrows << endl;
-          cerr << "urows=" << urows << endl;
-          cerr << "lcols=" << lcols << endl;
-          cerr << "ucols=" << ucols << endl;
         throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"(ucols != lcols)&&(lrows != urows)",_INDEX_BOUNDS_);
       }
-      
       else if(ucols == lcols){
         xvector<utype> xv(size);
         for(int i = 1; i <= size; i++){
@@ -456,9 +450,7 @@ namespace aurostd {  // namespace aurostd
         }
         return xv;
       }
-      else{cerr << "messed up" << endl; 
-        return xvector<utype>(0);}
-      }
+  }
 }
 
 //CO20190808
@@ -471,12 +463,12 @@ namespace aurostd {  // namespace aurostd
       if(lrows_out==AUROSTD_MAX_INT){lrows_out=lrows;}
       if(lcols_out==AUROSTD_MAX_INT){lcols_out=lcols;}
       //AZ20220627 START
-      if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow<lrows",_VALUE_ILLEGAL_);}
-      if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_VALUE_ILLEGAL_);}
-      if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol<lcols",_VALUE_ILLEGAL_);}
-      if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ucol>ucols",_VALUE_ILLEGAL_);}
-      if(lcol>ucol){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol>ucol",_VALUE_ILLEGAL_);}
-      if(lrow>urow){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow>urow",_VALUE_ILLEGAL_);}
+      if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow<lrows",_INDEX_BOUNDS_);}
+      if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_INDEX_BOUNDS_);}
+      if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol<lcols",_INDEX_BOUNDS_);}
+      if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ucol>ucols",_INDEX_BOUNDS_);}
+      if(lcol>ucol){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol>ucol",_INDEX_BOUNDS_);}
+      if(lrow>urow){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow>urow",_INDEX_BOUNDS_);}
       //AZ20220627 END
       int rows_out=(urow-lrow)+1;
       int cols_out=(ucol-lcol)+1;
@@ -492,14 +484,14 @@ namespace aurostd {  // namespace aurostd
   template<class utype> void
     xmatrix<utype>::getmatInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output //CO20191110
       //AZ20220627 START
-      bool LDEBUG=(true || XHOST.DEBUG);
+      bool LDEBUG=(false || XHOST.DEBUG);
       if(lrows_out==AUROSTD_MAX_INT){lrows_out=lrows;}
       if(lcols_out==AUROSTD_MAX_INT){lcols_out=lcols;}
-      //AZ20220627 END
       if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow<lrows",_INDEX_BOUNDS_);}
       if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_INDEX_BOUNDS_);}
       if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol<lcols",_INDEX_BOUNDS_);}
       if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ucol>ucols",_INDEX_BOUNDS_);}
+      //AZ20220627 END
       xmatrix<utype> xmat;
       (*this).getmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
       if(LDEBUG){

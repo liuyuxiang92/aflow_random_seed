@@ -913,7 +913,8 @@ namespace unittest {
     full_xmatint(3,1) = 9; full_xmatint(3,2) = 10; full_xmatint(3,3) = 11; full_xmatint(3,4) = 12;
     calculated_xvecint = full_xmatint.getvec(1,3,1,1);
     calculated_xvecint1 = full_xmatint.getvec(3,3,4,4);
-
+    checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+    checkEqual(calculated_xvecint1, expected_xvecint1, check_function, check_description, passed_checks, results);
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520
     // ---------------------------------------------------------------------------
