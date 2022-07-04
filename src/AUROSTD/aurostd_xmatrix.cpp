@@ -414,17 +414,15 @@ namespace aurostd {  // namespace aurostd
       else if(ucol == lcol){
         xvector<utype> xv(size);
         for(int i = 1; i <= size; i++){
-           xv(i) = corpus[lrow+i-1][lcol];
+          xv(i) = corpus[lrow+i-1][lcol];
         }
         return xv;
       }
-      else if(urow == lrow){
-        xvector<utype> xv(size);
-        for(int j = 1; j <= size; j++){
-          xv(j) = corpus[lrow][lcol+j-1];
-        }
-        return xv;
+      xvector<utype> xv(size);
+      for(int j = 1; j <= size; j++){
+        xv(j) = corpus[lrow][lcol+j-1];
       }
+      return xv;
     }
 }
 namespace aurostd {  // namespace aurostd
@@ -443,13 +441,11 @@ namespace aurostd {  // namespace aurostd
         }
         return xv;
       }
-      else if(urows == lrows){
-        xvector<utype> xv(size);
-        for(int j = 1; j <= size; j++){
-          xv(j) = corpus[lrows][lcols+j-1];
-        }
-        return xv;
+      xvector<utype> xv(size);
+      for(int j = 1; j <= size; j++){
+        xv(j) = corpus[lrows][lcols+j-1];
       }
+      return xv;
     }
 }
 
