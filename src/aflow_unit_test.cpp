@@ -661,42 +661,30 @@ namespace unittest {
     vector<vector<uint> > facets;
     vector<uint> facet;
 
-    // variables to store examples as doubles (p#) and int (p#i) variants
-    xvector<double> p0(3,1); xvector<int> p0i(3,1);
-    xvector<double> p1(3,1); xvector<int> p1i(3,1);
-    xvector<double> p2(3,1); xvector<int> p2i(3,1);
-    xvector<double> p3(3,1); xvector<int> p3i(3,1);
-    xvector<double> p4(3,1); xvector<int> p4i(3,1);
-    xvector<double> p5(3,1); xvector<int> p5i(3,1);
-    xvector<double> p6(3,1); xvector<int> p6i(3,1);
-    xvector<double> p7(3,1); xvector<int> p7i(3,1);
-    xvector<double> p8(3,1); xvector<int> p8i(3,1);
-    xvector<double> p9(3,1); xvector<int> p9i(3,1);
-    xvector<double> p10(3,1); xvector<int> p10i(3,1);
-    xvector<double> p11(3,1); xvector<int> p11i(3,1);
-
-    // define convex solid
-    p0i(1) = p0(1) = 0.0; p0i(2) = p0(2) = 0.0; p0i(3) = p0(3) = 0.0;
-    p1i(1) = p1(1) = 1.0; p1i(2) = p1(2) = 0.0; p1i(3) = p1(3) = 0.0;
-    p2i(1) = p2(1) = 1.0; p2i(2) = p2(2) = 1.0; p2i(3) = p2(3) = 0.0;
-    p3i(1) = p3(1) = 0.0; p3i(2) = p3(2) = 1.0; p3i(3) = p3(3) = 0.0;
-    p4i(1) = p4(1) = 0.0; p4i(2) = p4(2) = 0.0; p4i(3) = p4(3) = 2.0;
-    p5i(1) = p5(1) = 1.0; p5i(2) = p5(2) = 0.0; p5i(3) = p5(3) = 2.0;
-    p6i(1) = p6(1) = 1.0; p6i(2) = p6(2) = 1.0; p6i(3) = p6(3) = 3.0;
-    p7i(1) = p7(1) = 0.0; p7i(2) = p7(2) = 1.0; p7i(3) = p7(3) = 3.0;
-
-    // transfer data into vectors
+    // Define test data
     points.clear(); ipoints.clear(); facets.clear();
-    points.push_back(p0); points.push_back(p1); points.push_back(p2); points.push_back(p3); points.push_back(p4);
-    points.push_back(p5); points.push_back(p6); points.push_back(p7);
-    ipoints.push_back(p0i); ipoints.push_back(p1i); ipoints.push_back(p2i); ipoints.push_back(p3i); ipoints.push_back(p4i);
-    ipoints.push_back(p5i); ipoints.push_back(p6i); ipoints.push_back(p7i);
-    facet.clear(); facet.resize(4); facet[0]=0; facet[1]=1; facet[2]=2; facet[3]=3; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=4; facet[1]=5; facet[2]=6; facet[3]=7; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=1; facet[1]=2; facet[2]=6; facet[3]=5; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=0; facet[1]=3; facet[2]=7; facet[3]=7; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=0; facet[1]=1; facet[2]=5; facet[3]=4; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=3; facet[1]=2; facet[2]=6; facet[3]=7; facets.push_back(facet);
+    points.push_back({0.0, 0.0, 0.0});
+    points.push_back({1.0, 0.0, 0.0});
+    points.push_back({1.0, 1.0, 0.0});
+    points.push_back({0.0, 1.0, 0.0});
+    points.push_back({0.0, 0.0, 2.0});
+    points.push_back({1.0, 0.0, 2.0});
+    points.push_back({1.0, 1.0, 3.0});
+    points.push_back({0.0, 1.0, 3.0});
+
+    // covert points to integer to test special implementation
+    for (size_t i_point=0; i_point<points.size(); i_point++){
+      ipoints.push_back({(int) points[i_point][1], (int) points[i_point][2], (int) points[i_point][3]});
+    }
+
+    // define the facets
+    facets.push_back({0, 1, 2, 3});
+    facets.push_back({4, 5, 6, 7});
+    facets.push_back({1, 2, 6, 5});
+    facets.push_back({0, 3, 7});
+    facets.push_back({0, 1, 5, 4});
+    facets.push_back({3, 2, 6, 7});
+
 
     // ---------------------------------------------------------------------------
     // Check | convex solid volume (double)
@@ -717,38 +705,36 @@ namespace unittest {
     calculated_dbl = aurostd::volume(ipoints, facets, true);
     checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
 
-
     // define non convex solid
-    p0i(1) = p0(1)   = 0.0; p0i(2) = p0(2)   = 0.0; p0i(3) = p0(3)   = 0.0;
-    p1i(1) = p1(1)   = 0.0; p1i(2) = p1(2)   = 4.0; p1i(3) = p1(3)   = 0.0;
-    p2i(1) = p2(1)   = 2.0; p2i(2) = p2(2)   = 4.0; p2i(3) = p2(3)   = 0.0;
-    p3i(1) = p3(1)   = 1.0; p3i(2) = p3(2)   = 1.0; p3i(3) = p3(3)   = 0.0;
-    p4i(1) = p4(1)   = 4.0; p4i(2) = p4(2)   = 2.0; p4i(3) = p4(3)   = 0.0;
-    p5i(1) = p5(1)   = 4.0; p5i(2) = p5(2)   = 0.0; p5i(3) = p5(3)   = 0.0;
-    p6i(1) = p6(1)   = 0.0; p6i(2) = p6(2)   = 0.0; p6i(3) = p6(3)   = 4.0;
-    p7i(1) = p7(1)   = 0.0; p7i(2) = p7(2)   = 4.0; p7i(3) = p7(3)   = 4.0;
-    p8i(1) = p8(1)   = 2.0; p8i(2) = p8(2)   = 4.0; p8i(3) = p8(3)   = 4.0;
-    p9i(1) = p9(1)   = 1.0; p9i(2) = p9(2)   = 1.0; p9i(3) = p9(3)   = 4.0;
-    p10i(1) = p10(1) = 4.0; p10i(2) = p10(2) = 2.0; p10i(3) = p10(3) = 4.0;
-    p11i(1) = p11(1) = 4.0; p11i(2) = p11(2) = 0.0; p11i(3) = p11(3) = 4.0;
-
-    // transfer data into vectors
     points.clear(); ipoints.clear(); facets.clear();
-    points.push_back(p0); points.push_back(p1); points.push_back(p2); points.push_back(p3); points.push_back(p4);
-    points.push_back(p5); points.push_back(p6); points.push_back(p7); points.push_back(p8); points.push_back(p9);
-    points.push_back(p10); points.push_back(p11);
-    ipoints.push_back(p0i); ipoints.push_back(p1i); ipoints.push_back(p2i); ipoints.push_back(p3i); ipoints.push_back(p4i);
-    ipoints.push_back(p5i); ipoints.push_back(p6i); ipoints.push_back(p7i); ipoints.push_back(p8i); ipoints.push_back(p9i);
-    ipoints.push_back(p10i); ipoints.push_back(p11i);
+    points.push_back({0.0, 0.0, 0.0});
+    points.push_back({0.0, 4.0, 0.0});
+    points.push_back({2.0, 4.0, 0.0});
+    points.push_back({1.0, 1.0, 0.0});
+    points.push_back({4.0, 2.0, 0.0});
+    points.push_back({4.0, 0.0, 0.0});
+    points.push_back({0.0, 0.0, 4.0});
+    points.push_back({0.0, 4.0, 4.0});
+    points.push_back({2.0, 4.0, 4.0});
+    points.push_back({1.0, 1.0, 4.0});
+    points.push_back({4.0, 2.0, 4.0});
+    points.push_back({4.0, 0.0, 4.0});
 
-    facet.clear(); facet.resize(6); facet[0]=5; facet[1]=4; facet[2]=3; facet[3]=2; facet[4]=1; facet[5]=0; facets.push_back(facet);
-    facet.clear(); facet.resize(6); facet[0]=6; facet[1]=7; facet[2]=8; facet[3]=9; facet[4]=10; facet[5]=11; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=0; facet[1]=6; facet[2]=11; facet[3]=5; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=4; facet[1]=5; facet[2]=11; facet[3]=10; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=3; facet[1]=4; facet[2]=10; facet[3]=9; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=3; facet[1]=9; facet[2]=8; facet[3]=2; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=1; facet[1]=2; facet[2]=8; facet[3]=7; facets.push_back(facet);
-    facet.clear(); facet.resize(4); facet[0]=0; facet[1]=1; facet[2]=7; facet[3]=6; facets.push_back(facet);
+    // covert points to integer to test special implementation
+    for (size_t i_point=0; i_point<points.size(); i_point++){
+      ipoints.push_back({(int) points[i_point][1], (int) points[i_point][2], (int) points[i_point][3]});
+    }
+
+    // define the facets
+    facets.push_back({5,4,3,2,1,0});
+    facets.push_back({6,7,8,9,10,11});
+    facets.push_back({0,6,11,5});
+    facets.push_back({4,5,11,10});
+    facets.push_back({3,4,10,9});
+    facets.push_back({3,9,8,2});
+    facets.push_back({1,2,8,7});
+    facets.push_back({0,1,7,6});
+
 
     // ---------------------------------------------------------------------------
     // Check | non convex solid volume (double)
@@ -800,7 +786,7 @@ namespace unittest {
     expected_str = "xerror code 30 (VALUE_ERROR)";
     expected_int = _VALUE_ERROR_;
 
-    facet.clear(); facet.resize(2); facet[0]=1; facet[1]=2; facets.push_back(facet);
+    facet.clear(); facets.push_back({1,2});
     try {
       calculated_dbl = aurostd::volume(points, facets);
       check(false, std::string("no error"), expected_str, check_function, check_description, passed_checks, results);
@@ -823,10 +809,21 @@ namespace unittest {
 
     //fill vectors with data
     points.clear(); ipoints.clear(); facets.clear();
-    points.push_back(p0); points.push_back(p1); points.push_back(p2); points.push_back(p3); points.push_back(p4);
-    points.push_back(p5);
-    ipoints.push_back(p0i); ipoints.push_back(p1i); ipoints.push_back(p2i); ipoints.push_back(p3i); ipoints.push_back(p4i);
-    ipoints.push_back(p5i);
+    points.push_back({0.0, 0.0, 0.0});
+    points.push_back({0.0, 4.0, 0.0});
+    points.push_back({2.0, 4.0, 0.0});
+    points.push_back({1.0, 1.0, 0.0});
+    points.push_back({4.0, 2.0, 0.0});
+    points.push_back({4.0, 0.0, 0.0});
+
+    // covert points to integer to test special implementation
+    for (size_t i_point=0; i_point<points.size(); i_point++){
+      ipoints.push_back({(int) points[i_point][1], (int) points[i_point][2], (int) points[i_point][3]});
+    }
+//    points.push_back(p0); points.push_back(p1); points.push_back(p2); points.push_back(p3); points.push_back(p4);
+//    points.push_back(p5);
+//    ipoints.push_back(p0i); ipoints.push_back(p1i); ipoints.push_back(p2i); ipoints.push_back(p3i); ipoints.push_back(p4i);
+//    ipoints.push_back(p5i);
 
     calculated_dbl = aurostd::areaPointsOnPlane(points);
     checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
@@ -843,13 +840,15 @@ namespace unittest {
 
 
     // define triangle in 3D to better test int handling
-    p0i(1) = p0(1) = 0.0; p0i(2) = p0(2) = 0.0; p0i(3) = p0(3) = 0.0;
-    p1i(1) = p1(1) = 1.0; p1i(2) = p1(2) = 1.0; p1i(3) = p1(3) = 1.0;
-    p2i(1) = p2(1) = 5.0; p2i(2) = p2(2) = 0.0; p2i(3) = p2(3) = 5.0;
-
     points.clear(); ipoints.clear(); facets.clear();
-    points.push_back(p0); points.push_back(p1); points.push_back(p2);
-    ipoints.push_back(p0i); ipoints.push_back(p1i); ipoints.push_back(p2i);
+    points.push_back({0.0, 0.0, 0.0});
+    points.push_back({1.0, 1.0, 1.0});
+    points.push_back({5.0, 0.0, 5.0});
+
+    // covert points to integer to test special implementation
+    for (size_t i_point=0; i_point<points.size(); i_point++){
+      ipoints.push_back({(int) points[i_point][1], (int) points[i_point][2], (int) points[i_point][3]});
+    }
 
     // ---------------------------------------------------------------------------
     // Check | 3d triangle area (double)
@@ -884,11 +883,14 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     check_function = "aurostd::reshape()";
     check_description = "reshape a rectangular matrix";
-    expected_xmatint = xmatrix<int>(3,4);
-    expected_xmatint(1,1) = 1; expected_xmatint(1,2) =  2; expected_xmatint(1,3) =  3; expected_xmatint(1,4) = 4;
-    expected_xmatint(2,1) = 5; expected_xmatint(2,2) =  6; expected_xmatint(2,3) =  7; expected_xmatint(2,4) = 8;
-    expected_xmatint(3,1) = 9; expected_xmatint(3,2) = 10; expected_xmatint(3,3) = 11; expected_xmatint(3,4) = 12;
-    calculated_xmatint = aurostd::reshape(aurostd::reshape(expected_xmatint,4,3),3,4);
+    expected_xmatint = {{1,2,3,4},
+                        {5,6,7,8},
+                        {9,10,11,12}};
+    calculated_xmatint = {{1,2,3},
+                          {4,5,6},
+                          {7,8,9},
+                          {10,11,12}};
+    calculated_xmatint = aurostd::reshape(calculated_xmatint ,3,4);
     checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
@@ -917,9 +919,7 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     check_function = "aurostd::getEHermite()";
     check_description = "calculate elementary Hermite transformation";
-    expected_xmatint = xmatrix<int>(2, 2);
-    expected_xmatint[1][1] =   5; expected_xmatint[1][2] = -2;
-    expected_xmatint[2][1] = -12; expected_xmatint[2][2] =  5;
+    expected_xmatint = {{5,-2}, {-12, 5}};
     calculated_xmatint = xmatrix<int>(2, 2);
     aurostd::getEHermite(5, 12, calculated_xmatint);
     checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
@@ -1127,11 +1127,7 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     // Check | coordinate matching
     check_description = "coordinate matching";
-    xvector<double> compare_point(3,1);
-    compare_point(1) = -1.9551925593108925e0;
-    compare_point(2) = -2.2642136090979212e0;
-    compare_point(3) = 2.4896636484942385e0;
-
+    xvector<double> compare_point = {-1.9551925593108925e0, -2.2642136090979212e0, 2.4896636484942385e0};
     checkEqual(AE[1].index2Point(2), compare_point, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
@@ -1584,8 +1580,8 @@ namespace unittest {
     string xstr_str = "";
     stringstream xstrss;
     double min_dist = 0.0, min_dist_orig = 0.0;
-    xvector<int> hkl(3);
-    hkl[1] = 1; hkl[2] = 0; hkl[3] = 4;
+    xvector<int> hkl({1, 0, 4});
+//    hkl[1] = 1; hkl[2] = 0; hkl[3] = 4;
 
     //create input structure
     xstr_str =
@@ -2020,9 +2016,10 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   _aflags aflags;aflags.Directory=".";
 
   xmatrix<int> A1(3,3),U1,V1,S1;
-  A1[1][1]=3;A1[1][2]=2;A1[1][3]=1;
-  A1[2][1]=5;A1[2][2]=3;A1[2][3]=1;
-  A1[3][1]=6;A1[3][2]=8;A1[3][3]=9;
+  A1 ={{3,2,1}, {5,3,1}, {6,8,9}};
+//  A1[1][1]=3;A1[1][2]=2;A1[1][3]=1;
+//  A1[2][1]=5;A1[2][2]=3;A1[2][3]=1;
+//  A1[3][1]=6;A1[3][2]=8;A1[3][3]=9;
 
   aurostd::getSmithNormalForm(A1,U1,V1,S1);
 
@@ -2065,11 +2062,16 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
   //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
 
   xmatrix<long long int> A2(5,5),U2,V2,S2;  //long long int is CRUCIAL, Matlab actually gets this wrong because it uses long int by default
-  A2[1][1]=25;    A2[1][2]=-300;   A2[1][3]=1050;    A2[1][4]=-1400;   A2[1][5]=630;
-  A2[2][1]=-300;  A2[2][2]=4800;   A2[2][3]=-18900;  A2[2][4]=26880;   A2[2][5]=-12600;
-  A2[3][1]=1050;  A2[3][2]=-18900; A2[3][3]=79380;   A2[3][4]=-117600; A2[3][5]=56700;
-  A2[4][1]=-1400; A2[4][2]=26880;  A2[4][3]=-117600; A2[4][4]=179200;  A2[4][5]=-88200;
-  A2[5][1]=630;   A2[5][2]=-12600; A2[5][3]=56700;   A2[5][4]=-88200;  A2[5][5]=44100;
+  A2 = {{ 25,  -300,   1050, -1400,   630},
+        {-300,  4800, -18900, 26880, -12600},
+        { 1050,-18900, 79380,-117600, 56700},
+        {-1400, 26880,-117600,179200,-88200},
+        { 630, -12600, 56700,-88200,  44100}};
+//  A2[1][1]=25;    A2[1][2]=-300;   A2[1][3]=1050;    A2[1][4]=-1400;   A2[1][5]=630;
+//  A2[2][1]=-300;  A2[2][2]=4800;   A2[2][3]=-18900;  A2[2][4]=26880;   A2[2][5]=-12600;
+//  A2[3][1]=1050;  A2[3][2]=-18900; A2[3][3]=79380;   A2[3][4]=-117600; A2[3][5]=56700;
+//  A2[4][1]=-1400; A2[4][2]=26880;  A2[4][3]=-117600; A2[4][4]=179200;  A2[4][5]=-88200;
+//  A2[5][1]=630;   A2[5][2]=-12600; A2[5][3]=56700;   A2[5][4]=-88200;  A2[5][5]=44100;
 
   aurostd::getSmithNormalForm(A2,U2,V2,S2);
 
