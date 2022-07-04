@@ -915,6 +915,7 @@ namespace unittest {
     calculated_xvecint1 = full_xmatint.getvec(3,3,4,4);
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
     checkEqual(calculated_xvecint1, expected_xvecint1, check_function, check_description, passed_checks, results);
+    
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520
     // ---------------------------------------------------------------------------
