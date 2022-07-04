@@ -346,7 +346,7 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>
-    xvector<utype> xmatrix<utype>::best_getvec(int lrow, int urow, int lcol, int ucol) const {
+    xvector<utype> xmatrix<utype>::getvec(int lrow, int urow, int lcol, int ucol) const {
       if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow<lrows",_INDEX_BOUNDS_);}
       if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_INDEX_BOUNDS_);}
       if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol<lcols",_INDEX_BOUNDS_);}
@@ -379,7 +379,7 @@ namespace aurostd {  // namespace aurostd
 }
 namespace aurostd {  // namespace aurostd
   template<class utype>
-    xvector<utype> xmatrix<utype>::best_getvec() const {
+    xvector<utype> xmatrix<utype>::getvec() const {
       int size = (ucols-lcols+1)*(urows-lrows+1);
       if((ucols != lcols)&&(lrows != urows)){
           cerr << "alive" << endl;
@@ -463,7 +463,7 @@ namespace aurostd {  // namespace aurostd
         cerr << xmat << endl;
        }
       //AZ20220627 START
-      xv_out=xmat.best_getvec();
+      xv_out=xmat.getvec();
       //AZ20220627 END
     }
   template<class utype> xmatrix<utype>
