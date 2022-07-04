@@ -29,7 +29,7 @@
         -- added KBIN::BIN2VASPVersion (SD)
         -- fixed KBIN::VASPVersionString2Double, aurostd::substring2bool, aurostd::kvpairfound (SD)
         -- added extract POSCAR from aflowin (SD)
-        -- imporved AFLUX calls for --compare_database_entries and --compare2database (ME)
+        -- improved AFLUX calls for --compare_database_entries and --compare2database (ME)
         -- fixed xmatrix.getvec bug where lcols_out and lrows_out defaulted to AFLOW_MAX_INT (AZ)
         -- moved xmatrix2xvector functionality aurostd::getvec() (AZ)
 3.2.12 - 2021/11/29
