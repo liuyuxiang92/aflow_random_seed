@@ -894,32 +894,25 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     // Check | getvec //AZ20220627
     // ---------------------------------------------------------------------------
- //   check_function = "aurostd::getvec()";
- //   check_description = "get an xvector from xmatrix";
- //   string check_description1 = "get a 1x1 vector from xmatrix";
-   xmatrix<int> full_xmatint;
+    check_function = "aurostd::best_getvec()";
+    check_description = "get an xvector from xmatrix";
+    string check_description1 = "get a 1x1 vector from xmatrix";
+    xmatrix<int> full_xmatint;
     full_xmatint = xmatrix<int>(3,4);
     xvector<int> expected_xvecint(3);
- //   expected_xvecint(1) = 1;
- //   expected_xvecint(2) = 5;
- //   expected_xvecint(3) = 9;
+    expected_xvecint(1) = 1;
+    expected_xvecint(2) = 5;
+    expected_xvecint(3) = 9;
     xvector<int> expected_xvecint1(1);
- //   expected_xvecint1(1) = 12;
+    expected_xvecint1(1) = 12;
     xvector<int> calculated_xvecint, calculated_xvecint1;
     full_xmatint(1,1) = 1; full_xmatint(1,2) =  2; full_xmatint(1,3) =  3; full_xmatint(1,4) = 4;
     full_xmatint(2,1) = 5; full_xmatint(2,2) =  6; full_xmatint(2,3) =  7; full_xmatint(2,4) = 8;
     full_xmatint(3,1) = 9; full_xmatint(3,2) = 10; full_xmatint(3,3) = 11; full_xmatint(3,4) = 12;
- //   calculated_xvecint = full_xmatint.getvec(1,3,1,1);
- //   calculated_xvecint1 = full_xmatint.getvec(3,3,4,4);
- //   checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
- //   checkEqual(calculated_xvecint1, expected_xvecint1, check_function, check_description1, passed_checks, results);
-    full_xmatint.getmatInPlace(expected_xvecint,1,3,1,1,1,1);
-    cerr << expected_xvecint << endl;
-    calculated_xvecint = full_xmatint.getmat(1,3,1,1).best_getvec();
-    cerr << calculated_xvecint << endl;
-
-    calculated_xvecint1 = full_xmatint.best_getvec(1,3,1,1);    
-    cerr << calculated_xvecint1 << endl;
+    calculated_xvecint = full_xmatint.best_getvec(1,3,1,1);
+    calculated_xvecint1 = full_xmatint.best_getvec(3,3,4,4);
+    checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+    checkEqual(calculated_xvecint1, expected_xvecint1, check_function, check_description1, passed_checks, results);
 
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520
