@@ -6081,14 +6081,14 @@ namespace pocc {
     //reset
     v_site_configs.clear();
 
-    //trivial site_config, no pocc
-    POccSiteConfiguration site_config(site,i_hnf,m_pocc_sites[site].m_pocc_groups); //sc_dummy;
-
     //test of stupidity
     if(m_pocc_sites[site].m_pocc_groups.size()<1){
       message << "Invalid count of POCC site groups (m_pocc_sites[" << site << "].m_pocc_groups.size()=" << m_pocc_sites[site].m_pocc_groups.size() << ")";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
     }
+
+    //trivial site_config, no pocc
+    POccSiteConfiguration site_config(site,i_hnf,m_pocc_sites[site].m_pocc_groups); //sc_dummy;
 
     //if it's truly non-pocc, then there's only one m_pocc_sites[site].m_pocc_groups; 
     //otherwise, there's more than 1 and it doesn't matter
@@ -6273,7 +6273,7 @@ namespace pocc {
     vector<int> v_config_iterators;
     vector<vector<int> > v_types_config;
     xvector<double> stoich_each_type_new;
-    double stoich_error;
+    double stoich_error=0.0;
     double eps=1.0; //(double)m_pocc_sites.size();   //number of sites
     //cerr << "CO START" << endl;
     //std::vector<double>::iterator it_max_stoich;
