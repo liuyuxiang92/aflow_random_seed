@@ -2120,8 +2120,22 @@ namespace pocc {
 } // namespace pocc
 
 namespace pocc {
+  POccSuperCellSet::POccSuperCellSet() {free();}
+  POccSuperCellSet::POccSuperCellSet(const POccSuperCellSet& b) {copy(b);}
+  POccSuperCellSet::~POccSuperCellSet() {free();}
+  void POccSuperCellSet::free() {
+    m_psc_set.clear();
+    m_energy_dft=AUROSTD_MAX_DOUBLE;
+    m_probability=AUROSTD_MAX_DOUBLE;
+  }
+  void POccSuperCellSet::copy(const POccSuperCellSet& b){
+    m_psc_set.clear();for(uint i=0;i<b.m_psc_set.size();i++){m_psc_set.push_back(b.m_psc_set[i]);}
+    m_energy_dft=b.m_energy_dft;
+    m_probability=b.m_probability;
+  }
+  void POccSuperCellSet::clear() {free();}
   const POccSuperCellSet& POccSuperCellSet::operator=(const POccSuperCellSet& b){
-    if(this!=&b){m_psc_set.clear();for(uint i=0;i<b.m_psc_set.size();i++){m_psc_set.push_back(b.m_psc_set[i]);}}
+    if(this!=&b){copy(b);}
     return *this;
   }
   bool POccSuperCellSet::operator<(const POccSuperCellSet& other) const {
@@ -2149,21 +2163,40 @@ namespace pocc {
 } // namespace pocc
 
 namespace pocc {
+  UFFParamAtom::UFFParamAtom() {free();}
+  UFFParamAtom::UFFParamAtom(const UFFParamAtom& b) {copy(b);}
+  UFFParamAtom::~UFFParamAtom() {free();}
+  void UFFParamAtom::free() {
+    symbol.clear();
+    r1=AUROSTD_MAX_DOUBLE;
+    theta0=AUROSTD_MAX_DOUBLE;
+    x1=AUROSTD_MAX_DOUBLE;
+    D1=AUROSTD_MAX_DOUBLE;
+    zeta=AUROSTD_MAX_DOUBLE;
+    Z1=AUROSTD_MAX_DOUBLE;
+    Vi=AUROSTD_MAX_DOUBLE;
+    Uj=AUROSTD_MAX_DOUBLE;
+    ChiI=AUROSTD_MAX_DOUBLE;
+    hard=AUROSTD_MAX_DOUBLE;
+    radius=AUROSTD_MAX_DOUBLE;
+  }
+  void UFFParamAtom::copy(const UFFParamAtom& b){
+    symbol=b.symbol;
+    r1=b.r1;
+    theta0=b.theta0;
+    x1=b.x1;
+    D1=b.D1;
+    zeta=b.zeta;
+    Z1=b.Z1;
+    Vi=b.Vi;
+    Uj=b.Uj;
+    ChiI=b.ChiI;
+    hard=b.hard;
+    radius=b.radius;
+  }
+  void UFFParamAtom::clear() {free();}
   const UFFParamAtom& UFFParamAtom::operator=(const UFFParamAtom& b){
-    if(this!=&b){
-      symbol=b.symbol;
-      r1=b.r1;
-      theta0=b.theta0;
-      x1=b.x1;
-      D1=b.D1;
-      zeta=b.zeta;
-      Z1=b.Z1;
-      Vi=b.Vi;
-      Uj=b.Uj;
-      ChiI=b.ChiI;
-      hard=b.hard;
-      radius=b.radius;
-    }
+    if(this!=&b){copy(b);}
     return *this;
   }
 } // namespace pocc
@@ -6048,14 +6081,14 @@ namespace pocc {
     //reset
     v_site_configs.clear();
 
-    //trivial site_config, no pocc
-    POccSiteConfiguration site_config(site,i_hnf,m_pocc_sites[site].m_pocc_groups); //sc_dummy;
-
     //test of stupidity
     if(m_pocc_sites[site].m_pocc_groups.size()<1){
       message << "Invalid count of POCC site groups (m_pocc_sites[" << site << "].m_pocc_groups.size()=" << m_pocc_sites[site].m_pocc_groups.size() << ")";
       throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message);
     }
+
+    //trivial site_config, no pocc
+    POccSiteConfiguration site_config(site,i_hnf,m_pocc_sites[site].m_pocc_groups); //sc_dummy;
 
     //if it's truly non-pocc, then there's only one m_pocc_sites[site].m_pocc_groups; 
     //otherwise, there's more than 1 and it doesn't matter
@@ -6240,7 +6273,7 @@ namespace pocc {
     vector<int> v_config_iterators;
     vector<vector<int> > v_types_config;
     xvector<double> stoich_each_type_new;
-    double stoich_error;
+    double stoich_error=0.0;
     double eps=1.0; //(double)m_pocc_sites.size();   //number of sites
     //cerr << "CO START" << endl;
     //std::vector<double>::iterator it_max_stoich;

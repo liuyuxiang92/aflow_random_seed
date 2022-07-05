@@ -67,8 +67,11 @@ namespace init {
     // AFLOWRC LOAD DEFAULTS FROM AFLOWRC.
     // XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
     // XHOST.vflag_control.flag("AFLOWRC::OVERWRITE",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=overwrite|--aflowrc_overwrite"));
-    XHOST.home=getenv("HOME");  //AS SOON AS POSSIBLE
-    XHOST.user=getenv("USER");  //AS SOON AS POSSIBLE
+    // getenv returns a char pointer, that can be null if the environment variable is not set
+    // assigning a nullptr to a string is undefined behavior
+    // always use aurostd::getenv2string that contains the necessary check HE20220701 //SD20220701
+    XHOST.home = aurostd::getenv2string("HOME"); //AS SOON AS POSSIBLE
+    XHOST.user = aurostd::getenv2string("USER");  //AS SOON AS POSSIBLE
     if(!aflowrc::is_available(oss,INIT_VERBOSE || XHOST.DEBUG)) aflowrc::write_default(oss,INIT_VERBOSE || XHOST.DEBUG);
     aflowrc::read(oss,INIT_VERBOSE || XHOST.DEBUG);
     XHOST.vflag_control.flag("AFLOWRC::READ",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=read|--aflowrc_read"));

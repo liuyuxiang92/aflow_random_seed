@@ -30,6 +30,7 @@
         -- fixed KBIN::VASPVersionString2Double, aurostd::substring2bool, aurostd::kvpairfound (SD)
         -- added extract POSCAR from aflowin (SD)
         -- imporved AFLUX calls for --compare_database_entries and --compare2database (ME)
+        -- added --itc flag for structure generation (CO+DX)
         -- added univariate polynomial solver (SD)
         -- added univariate polynomial fit with weights (SD)
         -- added LUP decomposition (SD)
