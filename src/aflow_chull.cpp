@@ -364,16 +364,16 @@ namespace chull {
 #ifdef AFLOW_MULTITHREADS_ENABLE
     int ncpus=KBIN::get_NCPUS();
     if(ncpus>1){
-      bool XHOST_QUIET_THREADED=XHOST.QUIET_THREADED; //original
-      XHOST.QUIET_THREADED=true;
       xthread::xThread xt(oss,KBIN::get_NCPUS(), 1);
       vector<uint> vKrun(ntasks,1); //c++ doesn't like vector<bool>
       std::function<void(uint,vector<string>&,const aurostd::xoption&,const _aflags&,vector<uint>&,ostream&)> fn = 
         [&] (uint i,vector<string>& vinputs,const aurostd::xoption& xoptions,const _aflags& aflags,vector<uint>& vKrun,ostream& oss) {
           vKrun[i]=(convexHull(vinputs[i],xoptions,aflags,oss,true)?1:0);
         };
-      xt.run(ntasks,fn,vinputs,vpflow,aflags,vKrun,oss);
-      XHOST.QUIET_THREADED=XHOST_QUIET_THREADED;
+      //create dumb oss for threaded environment
+      ofstream devnull("/dev/null");  //NULL
+      ostream oss_dn(devnull.rdbuf());
+      xt.run(ntasks,fn,vinputs,vpflow,aflags,vKrun,oss_dn);
       char logger_type=_LOGGER_COMPLETE_;
       for(uint i=0;i<ntasks;i++){
         Krun=(vKrun[i]==1?true:false);

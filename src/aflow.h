@@ -348,7 +348,6 @@ class _XHOST {
     bool QUIET_GLOBAL;    //CO20220630 - exclusively for --quiet (headless server), do not set/unset inside code (GLOBAL SILENCE)
     bool QUIET_CERR;      //CO20220630 - silences cerr exclusively  // extra quiet SC20210617 
     bool QUIET_COUT;      //CO20220630 - silences cout exclusively  // extra quiet SC20210617 
-    bool QUIET_THREADED;  //CO20220129 - silences output that should not appear in threaded environment, exceptions include updateProgressBar(), etc.
     bool TEST,DEBUG,MPI;
     vector<string> LOGGER_WHITELIST;  //HE+ME20220305 - for logging
     vector<string> LOGGER_BLACKLIST;  //HE+ME20220305 - for logging
