@@ -80,7 +80,7 @@ namespace qca {
   void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob_ideal_cluster);
   void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob_ideal_cluster, const vector<xmatrix<double>>& prob_cluster, const xvector<double>& temp);
   xmatrix<double> getConcentrationMacro(const vector<double>& conc_curve_range, const int conc_npts, const uint nelem);
-  xvector<double> getTemperature(const vector<double>& temp_range, const int temp_npts);
+  xvector<double> getTemperatureRange(const vector<double>& temp_range, const int temp_npts);
   void setCongruentClusters(_qca_data& qca_data);
   xvector<double> getExcessEnergyCluster(const string& rundirpath, const xmatrix<double>& conc_cluster, const int max_num_atoms);
   xmatrix<double> getConcentrationCluster(const vector<xstructure>& vstr, const vector<string>& elements);

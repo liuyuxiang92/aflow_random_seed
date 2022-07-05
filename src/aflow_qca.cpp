@@ -339,7 +339,7 @@ namespace qca {
     setCongruentClusters(qca_data);
     qca_data.degeneracy_cluster = calcDegeneracyCluster(qca_data.plattice, qca_data.vstr_atat, qca_data.elements, qca_data.max_num_atoms, qca_data.num_threads, qca_data.rundirpath);
     qca_data.conc_macro = getConcentrationMacro(qca_data.conc_curve_range, qca_data.conc_npts, qca_data.elements.size());
-    qca_data.temp = getTemperature(qca_data.temp_range, qca_data.temp_npts);
+    qca_data.temp = getTemperatureRange(qca_data.temp_range, qca_data.temp_npts);
     qca_data.param_ec = calcRelativeEntropyEC(qca_data.conc_cluster, qca_data.degeneracy_cluster, qca_data.excess_energy_cluster, qca_data.temp, qca_data.max_num_atoms);
     if (qca_data.calc_binodal) {
       qca_data.prob_ideal_cluster = calcProbabilityIdealCluster(qca_data.conc_macro, qca_data.conc_cluster, qca_data.degeneracy_cluster, qca_data.max_num_atoms);
@@ -556,11 +556,11 @@ namespace qca {
           if (LDEBUG) {cerr << __AFLOW_FUNC__ << " it=" << it << " ix=" << ix << " | p=" << p << endl;}
           aurostd::polynomialFindRoots(p, rr, ri);
           if (LDEBUG) {
-            cerr << __AFLOW_FUNC__ << "   Real roots=" << rr << endl;
-            cerr << __AFLOW_FUNC__ << "   Imag roots=" << ri << endl;
+            cerr << __AFLOW_FUNC__ << "   real roots=" << rr << endl;
+            cerr << __AFLOW_FUNC__ << "   imag roots=" << ri << endl;
           }
           for (int k = 1; k <= max_num_atoms; k++) {
-            if (rr(k) > soln(1) && aurostd::isequal(ri(k), 0.0) && ncl * std::pow(rr(k), max_num_atoms) != INFINITY) { // solution must be positive, real and finite
+            if (rr(k) > soln(1) && aurostd::isequal(ri(k), 0.0) && ncl * std::pow(rr(k), max_num_atoms) != INFINITY) { // solution must be positive, real, and finite
               soln(1) = rr(k);
               soln_found = true;
             }
@@ -600,24 +600,27 @@ namespace qca {
           }
           if (LDEBUG) {cerr << __AFLOW_FUNC__ << " it=" << it << " ix=" << ix << endl;}
           soln_found = aurostd::findZeroDeflation(soln0.getcol(ix), vpoly, jac, msoln);
-          if (LDEBUG) {cerr << __AFLOW_FUNC__ << "   Real roots=" << endl << msoln << endl;}
-          for (int isol = 1; isol <= msoln.cols && soln_found; isol++) { // first soln_found checks whether to enter loop
-            for (int ieq = 1; ieq <= neq && soln_found; ieq++) {
-              soln_found = (msoln.getcol(isol)(ieq) <= 0.0); // solution must be positive, real and finite
+          if (LDEBUG) {cerr << __AFLOW_FUNC__ << "   exist=" << soln_found << " | real roots=" << endl << msoln << endl;}
+          if (soln_found) { // if solution is found, it must also be positive, real, and finite
+            for (int isol = 1; isol <= msoln.cols; isol++) {
+              soln_found = true;
+              for (int ieq = 1; ieq <= neq && soln_found; ieq++) {
+                soln_found = !(msoln.getcol(isol)(ieq) <= 0.0);
+              }
+              if (soln_found) {
+                soln = msoln.getcol(isol);
+                break;
+              }
             }
-            if (soln_found) {
-              soln = msoln.getcol(isol);
-              break;
-            }
-            soln_found = true;
           }
           if (!soln_found) {
             if (LDEBUG) {cerr << __AFLOW_FUNC__ << " Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]" << endl;}
             return false;
           }
-          soln0.setcol(soln, ix); // use the higher temperature solution as an initial guess for lower temperature
+          soln0.setcol(soln, ix); // use the higher temperature solution as an initial guess for lower temperature solution
           for (int j = 1; j <= ncl; j++) {
-            prob_cluster[it - 1](ix, j) = prob_ideal_cluster(ix, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * aurostd::elements_product(aurostd::pow(soln, natom_cluster.getmat(j, j, 1, neq)(1)));
+            prob_cluster[it - 1](ix, j) = prob_ideal_cluster(ix, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * 
+                                          aurostd::elements_product(aurostd::pow(soln, natom_cluster.getmat(j, j, 1, neq)(1)));
           }
           prob_cluster[it - 1].setmat(prob_cluster[it - 1].getmat(ix, ix, 1, ncl) / aurostd::sum(prob_cluster[it - 1].getmat(ix, ix, 1, ncl)), ix, 1); // normalize sum to 1
         }
@@ -811,7 +814,7 @@ namespace qca {
 }
 
 // ***************************************************************************
-// qca::getTemperature
+// qca::getTemperatureRange
 // ***************************************************************************
 namespace qca {
   /// @brief Gets the temperature profile.
@@ -820,7 +823,7 @@ namespace qca {
   /// @param temp_npts Number of points used to evaluate the temperature range.
   ///
   /// @return Temperature range.
-  xvector<double> getTemperature(const vector<double>& temp_range, const int temp_npts) {
+  xvector<double> getTemperatureRange(const vector<double>& temp_range, const int temp_npts) {
     return aurostd::linspace(temp_range[0], temp_range[1], temp_npts);
   }
 }
@@ -903,18 +906,18 @@ namespace qca {
     int ie = -1;
     xvector<double> stoich(nelem);
     vector<string> str_elements;
-    for (uint i = 0; i < vstr.size(); i++) {
+    for (size_t i = 0; i < vstr.size(); i++) {
       if (nelem != vstr[i].stoich_each_type.size()) {
         str_elements = vstr[i].GetElements(true, true);
         stoich.reset();
-        for (uint j = 0; j < nelem; j++) {
+        for (size_t j = 0; j < nelem; j++) {
           if (aurostd::WithinList(str_elements, elements[j], ie)) {stoich(j + 1) = vstr[i].stoich_each_type[ie];}
         }
       }
       else {
         stoich = aurostd::vector2xvector(aurostd::deque2vector(vstr[i].stoich_each_type));
       }
-      for (uint j = 0; j < nelem; j++) {conc_cluster(i + 1, j + 1) = stoich(j + 1);}
+      for (size_t j = 0; j < nelem; j++) {conc_cluster(i + 1, j + 1) = stoich(j + 1);}
     }
     return conc_cluster;
   }
@@ -990,7 +993,7 @@ namespace qca {
       vector<string> tokens;
       aurostd::string2tokens(rundirpath, tokens, "/");
       filepath = "/" + QCA_FILE_PREFIX + "degen_" + aurostd::utype2string<int>(max_num_atoms) + "_atom.txt";
-      for (int i = tokens.size() - 2; i >= 0; i--) {filepath = "/" + tokens[i] + filepath;}
+      for (int i = tokens.size() - 2; i >= 0; i--) {filepath = "/" + tokens[i] + filepath;} // well defined path due to how we define rundirpath
       if (aurostd::file2vectorstring(filepath, tokens)) {return aurostd::vector2xvector(aurostd::vectorstring2vectorutype<int>(tokens));}
     }
     vector<xstructure> vstr = _vstr;
@@ -1035,8 +1038,7 @@ namespace qca {
       atom.cpos = str_plat.f2c * atom.fpos;
       atoms.push_back(atom);
     }
-    uint natoms = atoms.size();
-    for (uint i = 0; i < natoms; i++) {str_plat.AddAtom(atoms[i]);}
+    for (size_t i = 0; i < atoms.size(); i++) {str_plat.AddAtom(atoms[i]);}
     str_plat.DecorateWithElements();
     str_plat.iomode = IOVASP_POSCAR;
     str_plat.partial_occupation_HNF = max_num_atoms;
@@ -1058,12 +1060,12 @@ namespace qca {
     // Enumerate all derivative structures
     vector<xstructure> vstr_ds;
     uint itype;
-    for (uint i = 0; i < vstr_sup.size(); i++) {
+    for (size_t i = 0; i < vstr_sup.size(); i++) {
       lattice = vstr_sup[i].lattice;
-      for (uint j = 0; j < all_indicies.size(); j++) {
+      for (size_t j = 0; j < all_indicies.size(); j++) {
         str.clear();
         atoms.clear();
-        for (uint k = 0; k < vstr_sup[i].atoms.size(); k++) {
+        for (size_t k = 0; k < vstr_sup[i].atoms.size(); k++) {
           atom.clear();
           atom.name = atom.cleanname = elements[all_indicies[j][k]];
           atom.cpos = vstr_sup[i].atoms[k].cpos;
@@ -1074,7 +1076,7 @@ namespace qca {
         std::stable_sort(atoms.begin(), atoms.end(), sortAtomsNames);
         itype = 0;
         atoms[0].type = itype;
-        for (uint k = 1; k < atoms.size(); k++) {
+        for (size_t k = 1; k < atoms.size(); k++) {
           if (atoms[k].name != atoms[k - 1].name) {itype++;}
           atoms[k].type = itype;
         }
@@ -1089,7 +1091,7 @@ namespace qca {
     // Find degenerate structures
     if (aurostd::tolower(algo) == "slow") {
       int nmatch;
-      for (uint i = 0; i < vstr.size(); i++) {
+      for (size_t i = 0; i < vstr.size(); i++) {
         nmatch = 0;
         for (vector<xstructure>::iterator it = vstr_ds.begin(); it != vstr_ds.end(); it++) {
           if (compare::structuresMatch(vstr[i], *it, true, num_threads)) {
@@ -1102,27 +1104,27 @@ namespace qca {
     }
     else if (aurostd::tolower(algo) == "fast") {
       vector<uint> index;
-      for (uint i = 0; i < vstr.size(); i++) {index.push_back(i);}
+      for (size_t i = 0; i < vstr.size(); i++) {index.push_back(i);}
       // Shuffling the xstructures is important because it can avoid edge case scenarios where the reference centroid
       // in Xtalfinder does not pick up the proper neighbors
       aurostd::random_shuffle(index);
-      for (uint i = 0; i < index.size(); i++) {vstr[i] = _vstr[index[i]];}
+      for (size_t i = 0; i < index.size(); i++) {vstr[i] = _vstr[index[i]];}
       vstr_ds.insert(vstr_ds.begin(), vstr.begin(), vstr.end()); // concatenate xstructures, subtract by 1 in the end
       XtalFinderCalculator xtal_calc;
       vector<vector<uint>> dsg = xtal_calc.groupSimilarXstructures(vstr_ds); // costly part of the function
-      for (uint i = 0; i < dsg.size(); i++) {
+      for (size_t i = 0; i < dsg.size(); i++) {
         std::sort(dsg[i].begin(), dsg[i].end()); // first index is the cluster index
         if (dsg[i][0] < (uint)degeneracy_cluster.rows) {
           degeneracy_cluster(dsg[i][0] + 1) = dsg[i].size() - 1;
           if (LDEBUG) {
             cerr << __AFLOW_FUNC__ << " i=" << i << " | DG=" << dsg[i].size() - 1 << " | ";
-            for (uint j = 0; j < dsg[i].size(); j++) {cerr << dsg[i][j] << " ";}
+            for (size_t j = 0; j < dsg[i].size(); j++) {cerr << dsg[i][j] << " ";}
             cerr << endl;
           }
         }
       }
       xvector<int> _degeneracy_cluster = degeneracy_cluster;
-      for (uint i = 0; i < index.size(); i++) {degeneracy_cluster(index[i] + 1) = _degeneracy_cluster(i + 1);}
+      for (size_t i = 0; i < index.size(); i++) {degeneracy_cluster(index[i] + 1) = _degeneracy_cluster(i + 1);}
     }
     XHOST.QUIET = quiet;
     int sum_calculated = aurostd::sum(degeneracy_cluster), sum_accepted = (int)vstr_sup.size() * (int)std::pow(elements.size(), max_num_atoms);
@@ -1255,7 +1257,7 @@ namespace qca {
     aflowlib::_aflowlib_entry entry;
     uint nelem = elements.size();
     stringstream oss;
-    for (uint i = 0; i < nelem; i++) {alloyname += AVASP_Get_PseudoPotential_PAW_PBE(elements[i]);}
+    for (size_t i = 0; i < nelem; i++) {alloyname += AVASP_Get_PseudoPotential_PAW_PBE(elements[i]);}
     aflowlib = "/common/LIB" + aurostd::utype2string<uint>(nelem) + "/RAW/" + alloyname;
     aflowurl = "aflowlib.duke.edu:AFLOWDATA/LIB" + aurostd::utype2string<uint>(nelem) + "_RAW/" + alloyname;
     if (plattice == "fcc") {
@@ -1289,7 +1291,7 @@ namespace qca {
         for (uint i = 115; i < 178; i++) {vstrlabel.push_back(aurostd::utype2string<uint>(i));}
       }
     }
-    for (uint i = 0; i < vstrlabel.size(); i++) {
+    for (size_t i = 0; i < vstrlabel.size(); i++) {
         entry.Load(aurostd::file2string(aflowlib + "/" + vstrlabel[i] + "/aflowlib.out"), oss);
         if (pflow::loadXstructures(entry, oss, false)) { // initial = unrelaxed; final = relaxed
           entry.aurl = aflowurl + "/" + vstrlabel[i];
@@ -1320,7 +1322,7 @@ namespace qca {
     string data;
     stringstream oss;
     aflowlib::_aflowlib_entry entry;
-    for (uint i = 0; i < vdir.size(); i++) {
+    for (size_t i = 0; i < vdir.size(); i++) {
       if (!aurostd::FileExist(vdir[i] + "/aflowlib.out") ||
           !aurostd::FileExist(vdir[i] + "/POSCAR.orig") ||
           !aurostd::FileExist(vdir[i] + "/POSCAR.relax2")) {
@@ -1358,7 +1360,7 @@ namespace qca {
     stringstream oss;
     uint nelem = elements.size();
     double alat = 0.0;
-    for (uint i = 0; i < nelem; i++) {alat += GetAtomRadiusCovalent(elements[i]);}
+    for (size_t i = 0; i < nelem; i++) {alat += GetAtomRadiusCovalent(elements[i]);}
     alat /= nelem;
     xmatrix<double> lattice(3,3);
     xvector<double> angles = 90.0 * aurostd::ones_xv<double>(3);
@@ -1394,12 +1396,12 @@ namespace qca {
       oss << endl;
     }
     oss << 0.0 << " " << 0.0 << " " << 0.0 << " ";
-    for (uint i = 0; i < nelem; i++) {
+    for (size_t i = 0; i < nelem; i++) {
       oss << elements[i] << ",";
     }
     if (plattice == "hcp") {
       oss << endl << 2.0 / 3.0 << " " << 1.0 / 3.0 << " " << 0.5 << " ";
-      for (uint i = 0; i < nelem; i++) {
+      for (size_t i = 0; i < nelem; i++) {
         oss << elements[i] << ",";
       }
     }
@@ -1437,12 +1439,12 @@ namespace qca {
         }
       }
       vstr.resize(index.size());
-      for (uint i = 0; i < index.size(); i++) {vstr[index[i]] = vstr_tmp[i];}
+      for (size_t i = 0; i < index.size(); i++) {vstr[index[i]] = vstr_tmp[i];}
       return vstr;
     }
     uint nelem = elements.size();
     double scale = 0.0;
-    for (uint i = 0; i < nelem; i++) {scale += GetAtomRadiusCovalent(elements[i]);}
+    for (size_t i = 0; i < nelem; i++) {scale += GetAtomRadiusCovalent(elements[i]);}
     scale /= nelem;
     if (plattice == "fcc") {
       scale *= 2.0 * std::sqrt(2.0);
@@ -1468,7 +1470,7 @@ namespace qca {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     aurostd::string2vectorstring(sstr, vinput);
-    for (uint line = 0; line < vinput.size(); line++) {
+    for (size_t line = 0; line < vinput.size(); line++) {
       if (aurostd::substring2bool(vinput[line], "end")) {
         vstr.push_back(xstructure(oss, IOATAT_STR));
         vstr.back().scale = scale;
@@ -1501,9 +1503,9 @@ namespace qca {
     vector<xstructure> vstr1 = _vstr1;
     if (aurostd::tolower(algo) == "slow") {
       bool match;
-      for (uint i = 0; i < vstr1.size(); i++) {
+      for (size_t i = 0; i < vstr1.size(); i++) {
         match = false;
-        for (uint j = 0; j < vstr2.size() && !match; j++) {
+        for (size_t j = 0; j < vstr2.size() && !match; j++) {
           if (compare::structuresMatch(vstr1[i], vstr2[j], true, num_threads)) {
             match = true;
             mapstr.push_back(j);
@@ -1520,13 +1522,13 @@ namespace qca {
       // Shuffling the xstructures is important because it can avoid edge case scenarios where the reference centroid
       // in Xtalfinder does not pick up the proper neighbors
       aurostd::random_shuffle(index); 
-      for (uint i = 0; i < index.size(); i++) {vstr1[i] = _vstr1[index[i]];}
+      for (size_t i = 0; i < index.size(); i++) {vstr1[i] = _vstr1[index[i]];}
       vector<xstructure> vstr3 = vstr1;
       vstr3.insert(vstr3.end(), vstr2.begin(), vstr2.end());
       XtalFinderCalculator xtal_calc;
       vector<vector<uint>> gsx = xtal_calc.groupSimilarXstructures(vstr3);
       XHOST.QUIET = quiet;
-      for (uint i = 0; i < gsx.size(); i++) {
+      for (size_t i = 0; i < gsx.size(); i++) {
         std::sort(gsx[i].begin(), gsx[i].end());
         if (gsx[i][0] > vstr1.size() -  1) { // index is not part of vstr1
           continue;
@@ -1535,7 +1537,7 @@ namespace qca {
           mapstr.push_back(-1);
         }
         else { // take first match of xstr in vstr2 to xstr in vstr1
-          for (uint j = 1; j < gsx[i].size(); j++) {
+          for (size_t j = 1; j < gsx[i].size(); j++) {
             if (gsx[i][j] > vstr1.size() - 1) {
               mapstr.push_back((int)gsx[i][j] - (int)vstr1.size());
               break;
@@ -1544,7 +1546,7 @@ namespace qca {
         }
         if (LDEBUG) {
           cerr << __AFLOW_FUNC__ << " i=" << i << " | ";
-          for (uint j = 0; j < gsx[i].size(); j++) {cerr << gsx[i][j] << " ";}
+          for (size_t j = 0; j < gsx[i].size(); j++) {cerr << gsx[i][j] << " ";}
           cerr << endl;
         }
       }
@@ -1554,7 +1556,7 @@ namespace qca {
         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
       }
       vector<int> _mapstr = mapstr;
-      for (uint i = 0; i < index.size(); i++) {mapstr[index[i]] = _mapstr[i];}
+      for (size_t i = 0; i < index.size(); i++) {mapstr[index[i]] = _mapstr[i];}
     }
     return mapstr;
   }
@@ -1713,12 +1715,12 @@ namespace qca {
         // START - custom
         gpfile << "# Custom" << endl;
         gpfile << "set label '\\shortstack{c}{$" << qca_data.elements[0] << "$=" << qca_data.conc_macro(1, 1);
-        for (uint i = 1; i < qca_data.elements.size(); i++) {
+        for (size_t i = 1; i < qca_data.elements.size(); i++) {
           gpfile << "\\\\$" << qca_data.elements[i] << "$=" << qca_data.conc_macro(1, i + 1);
         }
         gpfile << "}' at 0.0,0.0 center offset 0.0,-2.5" << endl;
         gpfile << "set label '\\shortstack{c}{$" << qca_data.elements[0] << "$=" << qca_data.conc_macro(qca_data.conc_macro.rows, 1);
-        for (uint i = 1; i < qca_data.elements.size(); i++) {
+        for (size_t i = 1; i < qca_data.elements.size(); i++) {
           gpfile << "\\\\$" << qca_data.elements[i] << "$=" << qca_data.conc_macro(qca_data.conc_macro.rows, i + 1);
         }
         gpfile << "}' at 0.0,0.0 center offset 0.0,-2.5" << endl;
