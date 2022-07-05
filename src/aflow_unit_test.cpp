@@ -924,7 +924,7 @@ namespace unittest {
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
     checkEqual(calculated_xvecint1, expected_xvecint1, check_function, check_description1, passed_checks, results);
     checkEqual(calculated_xvecint2, expected_xvecint2, check_function, check_description2, passed_checks, results);
-    checkEqual(calculated_xvecint3, expected_xvecint, check_function, check_description2, passed_checks, results);
+    checkEqual(calculated_xvecint3, expected_xvecint, check_function, check_description3, passed_checks, results);
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520
     // ---------------------------------------------------------------------------
