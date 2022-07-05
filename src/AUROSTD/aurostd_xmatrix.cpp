@@ -460,17 +460,9 @@ namespace aurostd {  // namespace aurostd
     }
   template<class utype> void
     xmatrix<utype>::getmatInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output //CO20191110
-      //AZ20220627 START
-      bool LDEBUG=(false || XHOST.DEBUG);
-      if(lrows_out==AUROSTD_MAX_INT){lrows_out=lrows;}
-      if(lcols_out==AUROSTD_MAX_INT){lcols_out=lcols;}
-      if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow<lrows",_INDEX_BOUNDS_);}
-      if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_INDEX_BOUNDS_);}
-      if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol<lcols",_INDEX_BOUNDS_);}
-      if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ucol>ucols",_INDEX_BOUNDS_);}
-      //AZ20220627 END
       xmatrix<utype> xmat;
       (*this).getmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
+      bool LDEBUG=(FALSE || XHOST.DEBUG);
       if(LDEBUG){
         cerr << "xmat=" << endl << xmat << endl;
         cerr << "urows=" << urows << " xmat.urows=" << xmat.urows << endl;
