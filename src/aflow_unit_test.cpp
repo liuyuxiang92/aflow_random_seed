@@ -1160,7 +1160,6 @@ namespace unittest {
 
     // ---------------------------------------------------------------------------
     // Check | load AUID + Xstructure
-
     for (std::map<std::string, aflowlib::EntryLoader::Source>::iterator source = short_test_sources.begin();
          source != short_test_sources.end(); source++) {
       check_function = "EntryLoader::loadAUID()";
@@ -1203,7 +1202,6 @@ namespace unittest {
 
     // ---------------------------------------------------------------------------
     // Check | load AURL
-
     for (std::map<std::string, aflowlib::EntryLoader::Source>::iterator source = short_test_sources.begin();
          source != short_test_sources.end(); source++) {
       check_function = "EntryLoader::loadAURL()";
