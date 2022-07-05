@@ -834,20 +834,20 @@ namespace qca {
 namespace qca {
   /// @brief Prune the clusters to only include clusters congruent with the maximum number of atoms in the cluster expansion.
   void setCongruentClusters(_qca_data& qca_data) {
-    vector<int> indx_cluster;
+    vector<int> index_cluster;
     for (int i = 1; i <= qca_data.num_atom_cluster.rows; i++) {
-      if (!(qca_data.max_num_atoms % qca_data.num_atom_cluster(i))) {indx_cluster.push_back(i);}
+      if (!(qca_data.max_num_atoms % qca_data.num_atom_cluster(i))) {index_cluster.push_back(i);}
     }
-    int ncl = indx_cluster.size(), nelem = qca_data.elements.size();
+    int ncl = index_cluster.size(), nelem = qca_data.elements.size();
     vector<xstructure> _vstr_atat(ncl);
     xvector<int> v1(ncl);
     xvector<double> v2(ncl);
     xmatrix<double> m1(ncl, nelem);
     for (int i = 0; i < ncl; i++) {
-      _vstr_atat[i] = qca_data.vstr_atat[indx_cluster[i] - 1];
-      m1.setmat(qca_data.conc_cluster.getmat(indx_cluster[i], indx_cluster[i], 1, nelem), i + 1, 1);
-      v1(i + 1) = qca_data.num_atom_cluster(indx_cluster[i]);
-      v2(i + 1) = qca_data.excess_energy_cluster(indx_cluster[i]);
+      _vstr_atat[i] = qca_data.vstr_atat[index_cluster[i] - 1];
+      m1.setmat(qca_data.conc_cluster.getmat(index_cluster[i], index_cluster[i], 1, nelem), i + 1, 1);
+      v1(i + 1) = qca_data.num_atom_cluster(index_cluster[i]);
+      v2(i + 1) = qca_data.excess_energy_cluster(index_cluster[i]);
     }
     qca_data.vstr_atat = _vstr_atat;
     qca_data.conc_cluster = m1;
@@ -873,15 +873,25 @@ namespace qca {
     aurostd::file2vectorstring(rundirpath + "/ref_energy.out", vinput);
     xvector<double> nrg_ref = aurostd::vector2xvector(aurostd::vectorstring2vectorutype<double>(vinput));
     xvector<double> nrg(nstr);
-    aurostd::file2vectorstring(rundirpath + "/fit.out", vinput);
     // Read energies per atom
-    for (uint line = 0; line < vinput.size(); line++) {
+    aurostd::file2vectorstring(rundirpath + "/fit.out", vinput);
+    aurostd::string2tokens(vinput[0], tokens, " ");
+    if (nelem > (int)tokens.size()) {
+      string message = "fit.out has the wrong output format";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    }
+    for (size_t line = 0; line < vinput.size(); line++) {
       aurostd::string2tokens(vinput[line], tokens, " ");
       ind = aurostd::string2utype<int>(tokens[tokens.size() - 1]) + 1;
       nrg(ind) = aurostd::string2utype<double>(tokens[nelem]);
     }
     aurostd::file2vectorstring(rundirpath + "/predstr.out", vinput);
-    for (uint line = 0; line < vinput.size(); line++) {
+    aurostd::string2tokens(vinput[0], tokens, " ");
+    if (nelem > (int)tokens.size()) {
+      string message = "predstr.out has the wrong output format";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    }
+    for (size_t line = 0; line < vinput.size(); line++) {
       aurostd::string2tokens(vinput[line], tokens, " ");
       ind = aurostd::string2utype<int>(tokens[tokens.size() - 2]) + 1;
       nrg(ind) = aurostd::string2utype<double>(tokens[nelem]);
