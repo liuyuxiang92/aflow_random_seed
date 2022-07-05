@@ -428,27 +428,9 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype>
     xvector<utype> xmatrix<utype>::getvec() const {
-    //CO2019110 original author of xmatrix2xvector and AZ20220704
-    //moved type-conversion functionality here
-      int size = (ucols-lcols+1)*(urows-lrows+1);
-      if((ucols != lcols)&&(lrows != urows)){
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"(ucols != lcols)&&(lrows != urows)",_INDEX_BOUNDS_);
-      }
-      else if(ucols == lcols){
-        xvector<utype> xv(size);
-        for(int i = 1; i <= size; i++){
-          xv(i) = corpus[lrows+i-1][lcols];
-        }
-        return xv;
-      }
-      xvector<utype> xv(size);
-      for(int j = 1; j <= size; j++){
-        xv(j) = corpus[lrows][lcols+j-1];
-      }
-      return xv;
-    }
+    return getvec(lrows, urows, lcols, ucols);
 }
-
+}
 //CO20190808
 namespace aurostd {  // namespace aurostd
   //this function returns a submatrix mat_out spanning urow:lrow,ucol:lcol of the original matrix
