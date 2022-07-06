@@ -5618,8 +5618,15 @@ namespace aurostd {
     return aurostd::substring2bool(strstream.str(),strsub1,RemoveWS,RemoveComments);
   }
 
-  //SD20220705 - We create an extra function for strings to handle string literals, because otherwise they are treated
-  //char arrays causing a mismatch between the utypes 
+  /// @brief Determines whether a specific value exists inside a list
+  ///
+  /// @param list List of values
+  /// @param input Specific value to match the values within the list
+  /// @param index Index of the element that matched the input
+  /// @param sorted Whether the list is sorted
+  /// @return Boolean if the input was found in the list or not
+  ///
+  /// @note index is assigned the value of 0 if the input is not found in the list
   template<class utype> bool WithinList(const vector<utype>& list, const utype& input, size_t& index, bool sorted) { //SD20220705
     for (size_t i = 0; i < list.size(); i++) {
       if(sorted && list[i]>input){break;}
