@@ -418,6 +418,7 @@ namespace aurostd {  // namespace aurostd
         }
         return xv;
       }
+      //urow == lrow
       xvector<utype> xv(size);
       for(int j = 1; j <= size; j++){
         xv(j) = corpus[lrow][lcol+j-1];
