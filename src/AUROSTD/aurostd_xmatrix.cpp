@@ -398,9 +398,9 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype>
-    xvector<utype> xmatrix<utype>::getvec(int lrow, int urow, int lcol, int ucol) const {
+    xvector<utype> xmatrix<utype>::getxvec(int lrow, int urow, int lcol, int ucol) const {
     //CO2019110 original author of xmatrix2xvector and AZ20220704
-    //moved all functionality all into getvec
+    //moved all functionality all into getxvec
       if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow<lrows",_INDEX_BOUNDS_);}
       if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_INDEX_BOUNDS_);}
       if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol<lcols",_INDEX_BOUNDS_);}
@@ -427,8 +427,8 @@ namespace aurostd {  // namespace aurostd
 }
 namespace aurostd {  // namespace aurostd
   template<class utype>
-    xvector<utype> xmatrix<utype>::getvec() const {
-    return getvec(lrows, urows, lcols, ucols);
+    xvector<utype> xmatrix<utype>::getxvec() const {
+    return getxvec(lrows, urows, lcols, ucols);
 }
 }
 //CO20190808
@@ -437,7 +437,7 @@ namespace aurostd {  // namespace aurostd
   //lrows_out,lcols_out specifies lrows,lcols of mat_out
   //this is different than submatrix(), which returns back a submatrix by cutting out irow,jcol
   template<class utype> void
-    xmatrix<utype>::getmatInPlace(xmatrix<utype>& mat_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
+    xmatrix<utype>::getxmatInPlace(xmatrix<utype>& mat_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
       if(lrows_out==AUROSTD_MAX_INT){lrows_out=lrows;}
       if(lcols_out==AUROSTD_MAX_INT){lcols_out=lcols;}
       //AZ20220627 START
@@ -459,9 +459,9 @@ namespace aurostd {  // namespace aurostd
       }
     }
   template<class utype> void
-    xmatrix<utype>::getmatInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output //CO20191110
+    xmatrix<utype>::getxmatInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output //CO20191110
       xmatrix<utype> xmat;
-      (*this).getmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
+      (*this).getxmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
       bool LDEBUG=(FALSE || XHOST.DEBUG);
       if(LDEBUG){
         cerr << "xmat=" << endl << xmat << endl;
@@ -475,12 +475,12 @@ namespace aurostd {  // namespace aurostd
         cerr << "lcol=" << lcol << endl;
         cerr << xmat << endl;
        }
-      xv_out=xmat.getvec();//AZ20220627 replaced xmatrix2xvector with xmat.getvec()
+      xv_out=xmat.getxvec();//AZ20220627 replaced xmatrix2xvector with xmat.getxvec()
     }
   template<class utype> xmatrix<utype>
-    xmatrix<utype>::getmat(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
+    xmatrix<utype>::getxmat(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
       xmatrix<utype> xmat;
-      (*this).getmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
+      (*this).getxmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
       return xmat;
     }
 }
@@ -4299,7 +4299,7 @@ namespace aurostd {
       for(int k=R.lcols;k<=R.ucols;k++) {
         if(LDEBUG){cerr << soliloquy << " step k=" << k << endl;}
         xmatrix<utype> x(R.urows,R.lcols,R.lrows,R.lcols);
-        x.setmat(R.getmat(k,R.urows,k,k),k,R.lcols);  //x(k:m,1)=R(k:m,k);
+        x.setmat(R.getxmat(k,R.urows,k,k),k,R.lcols);  //x(k:m,1)=R(k:m,k);
         if(LDEBUG){cerr << soliloquy << " x=" << endl;cerr << x << endl;}
         xmatrix<utype> v(x);  //+x first
         v[k][v.lcols]=x[k][x.lcols]+aurostd::modulus(x);
@@ -4344,12 +4344,12 @@ namespace aurostd {
       R=mat_orig; //reset
 
       int i=0,k=0;
-      xmatrix<utype> x,A; //since x and A changes size with each loop, let getmatInPlace() handle it internally
+      xmatrix<utype> x,A; //since x and A changes size with each loop, let getxmatInPlace() handle it internally
       utype vModulus = (utype)0;
       std::vector<xmatrix<utype> > V; //we need to save v's, Q is calculated afterwards and needs all v's present
       for(k=R.lcols;k<=R.ucols;k++) {
         if(LDEBUG){cerr << soliloquy << " step k=" << k << endl;}
-        R.getmatInPlace(x,k,R.urows,k,k);  //build R([k:m],l)
+        R.getxmatInPlace(x,k,R.urows,k,k);  //build R([k:m],l)
         if(LDEBUG){cerr << soliloquy << " x=" << endl;cerr << x << endl;}
         //v_k=sign(x1)||x||e1+x
         xmatrix<utype> v(x);  //+x first
@@ -4361,7 +4361,7 @@ namespace aurostd {
           v/=vModulus;
           if(LDEBUG){cerr << soliloquy << " v(  normalized)=" << endl;cerr << v << endl;}
           if(LDEBUG){cerr << soliloquy << " R( pre)=" << endl;cerr << R << endl;}
-          R.getmatInPlace(A,k,R.urows,k,R.ucols);  //build R([k:m],[k:m])
+          R.getxmatInPlace(A,k,R.urows,k,R.ucols);  //build R([k:m],[k:m])
           if(LDEBUG){cerr << soliloquy << " A( pre)=" << endl;cerr << A << endl;}
           A-=(utype)2.0*v*trasp(v)*A;
           if(LDEBUG){cerr << soliloquy << " A(post)=" << endl;cerr << A << endl;}
@@ -4378,7 +4378,7 @@ namespace aurostd {
         for(i=R.lrows;i<=R.urows;i++){ek[i][ek.lcols]=(i==k) ? (utype)1 : (utype)0;}
         if(LDEBUG){cerr << soliloquy << " ek( pre)=" << endl;cerr << ek << endl;}
         for(i=R.ucols;i>=R.lcols;i--){
-          ek.getmatInPlace(x,i,R.urows,R.lcols,R.lcols);
+          ek.getxmatInPlace(x,i,R.urows,R.lcols,R.lcols);
           if(LDEBUG){cerr << soliloquy << " x( pre)=" << endl;cerr << x << endl;}
           x-=(utype)2.0*V[i-R.lcols]*trasp(V[i-R.lcols])*x;
           if(LDEBUG){cerr << soliloquy << " x(post)=" << endl;cerr << x << endl;}

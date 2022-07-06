@@ -30,8 +30,8 @@
         -- fixed KBIN::VASPVersionString2Double, aurostd::substring2bool, aurostd::kvpairfound (SD)
         -- added extract POSCAR from aflowin (SD)
         -- improved AFLUX calls for --compare_database_entries and --compare2database (ME)
-        -- fixed aurostd::getvec() bug where lcols_out and lrows_out defaulted to AFLOW_MAX_INT (AZ)
-        -- moved xmatrix2xvector functionality aurostd::getvec() and use getvec() in getmatInPlace (AZ)
+        -- fixed aurostd::getxvec() bug where lcols_out and lrows_out defaulted to AFLOW_MAX_INT (AZ)
+        -- moved xmatrix2xvector functionality aurostd::getxvec() and use getxvec() in getmatInPlace (AZ)
         -- added --itc flag for structure generation (CO+DX)
 3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
