@@ -474,7 +474,6 @@ namespace aurostd {  // namespace aurostd
         cerr << "ucol=" << ucol << endl;
         cerr << "lrow=" << lrow << endl;
         cerr << "lcol=" << lcol << endl;
-        cerr << xmat << endl;
        }
       xv_out=xmat.getxvec();//AZ20220627 replaced xmatrix2xvector with xmat.getxvec()
     }
