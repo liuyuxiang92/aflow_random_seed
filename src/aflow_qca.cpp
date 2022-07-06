@@ -1650,8 +1650,8 @@ namespace qca {
       json.addVector("Temperature range (K)", qca_data.temp);
       json.addNumber("Max atoms per cell", qca_data.max_num_atoms);
       json.addNumber("Cluster CV score (eV)", qca_data.cv_cluster);
-      json.addVector("Cluster number of atoms", aurostd::xvectorutype2double(qca_data.num_atom_cluster));
-      json.addVector("Cluster degeneracy", aurostd::xvectorutype2double(qca_data.degeneracy_cluster));
+      json.addVector("Cluster number of atoms", aurostd::xvectorutype2xvectordouble(qca_data.num_atom_cluster));
+      json.addVector("Cluster degeneracy", aurostd::xvectorutype2xvectordouble(qca_data.degeneracy_cluster));
       json.addMatrix("Cluster concentration", qca_data.conc_cluster);
       json.addVector("Cluster excess energy (eV)", qca_data.excess_energy_cluster);
       json.addNumber("EC transition temperature (K)", qca_data.param_ec.second);

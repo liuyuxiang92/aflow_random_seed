@@ -2041,7 +2041,7 @@ namespace slab {
     //useful relationship: kM=(2*PI)^2*inverse(M)
     //https://it.iucr.org/Ba/ch1o1v0001/ - metric tensors of the covariant (direct) and contravariant (reciprocal) bases
     //http://physastro-msci.tripod.com/webonmediacontents/notes1.pdf
-    xvector<double> dhkl=aurostd::xvectorutype2double(hkl); //need double for operations
+    xvector<double> dhkl=aurostd::xvectorutype2xvectordouble(hkl); //need double for operations
     xmatrix<double> klattice=ReciprocalLattice(lattice);
     xmatrix<double> kf2c=trasp(klattice);       //convert fractional to cartesian
     //[CO20190520 - this is wrong, do not convert to real space]#if !HKL_DUAL_TEST
@@ -2263,7 +2263,7 @@ namespace slab {
     //http://lafactoria.lec.csic.es/mcc/attachments/article/12/Introduction%20to%20Reciprocal%20Space.pdf
     //https://web.stanford.edu/group/glam/xlab/MatSci162_172/LectureNotes/02_Geometry,%20RecLattice.pdf
     //useful relationship: kM=(2*PI)^2*inverse(M)
-    xvector<double> dhkl=aurostd::xvectorutype2double(hkl); //need double for operations
+    xvector<double> dhkl=aurostd::xvectorutype2xvectordouble(hkl); //need double for operations
     xmatrix<double> klattice=ReciprocalLattice(lattice);
     xmatrix<double> kM=MetricTensor(klattice);
     double d_spacing=2.0*PI/sqrt(aurostd::scalar_product(dhkl,kM*dhkl));  //2*pi factor here is very important (counters the one in ReciprocalLattice())
@@ -2286,8 +2286,8 @@ namespace slab {
     //http://lafactoria.lec.csic.es/mcc/attachments/article/12/Introduction%20to%20Reciprocal%20Space.pdf
     //https://web.stanford.edu/group/glam/xlab/MatSci162_172/LectureNotes/02_Geometry,%20RecLattice.pdf
     //useful relationship: kM=(2*PI)^2*inverse(M)
-    xvector<double> dhkl1=aurostd::xvectorutype2double(hkl1); //need double for operations
-    xvector<double> dhkl2=aurostd::xvectorutype2double(hkl2); //need double for operations
+    xvector<double> dhkl1=aurostd::xvectorutype2xvectordouble(hkl1); //need double for operations
+    xvector<double> dhkl2=aurostd::xvectorutype2xvectordouble(hkl2); //need double for operations
     xmatrix<double> klattice=ReciprocalLattice(lattice);
     xmatrix<double> kf2c=trasp(klattice);       //convert fractional to cartesian
     xvector<double> n1=kf2c*dhkl1;              //h*b1+k*b2+l*b3

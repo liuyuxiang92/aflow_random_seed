@@ -1012,6 +1012,7 @@ namespace aurostd {
 
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
+//SD20220705
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                 // operator xmatrix + scalar
     operator+(const utype s,const xmatrix<utype>& a) {
@@ -1024,6 +1025,7 @@ namespace aurostd {  // namespace aurostd
 }
 
 // ----------------------------------------------------------------------------
+//SD20220705
 namespace aurostd {  // namespace aurostd
   template<class utype> xmatrix<utype>                //  operator scalar + xmatrix
     operator+(const xmatrix<utype>& a,const utype s) {
@@ -2337,6 +2339,7 @@ namespace aurostd {  // namespace aurostd
       }
       for (int i = LU.lrows; i <= LU.urows; i++) {P(i, p(i)) = 1.0;}
     }
+
   template<class utype>
     void LUPDecomposition(const xmatrix<utype>& A, xmatrix<double>& L, xmatrix<double>& U, xmatrix<double>& P, utype tol) { //SD20220426
       // A is a square matrix and LU is the LU decomposition, where A=trasp(P)*LU
@@ -2349,6 +2352,7 @@ namespace aurostd {  // namespace aurostd
       }
       U += LU - L;
     }
+
   template<class utype>                                 // function inverse xmatrix<>
     xmatrix<utype> inverseByLUP(const xmatrix<utype>& A) { //SD20220426
       xmatrix<double> LU, P, _IA;
@@ -2655,14 +2659,10 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {
   template<class utype>
     xmatrix<utype> HadamardProduct(const xmatrix<utype>& A, const xmatrix<utype>& B) { //SD20220422 - also called element-wise product or Schur product
-      if (A.rows != B.rows) {
+      if ((A.rows != B.rows) || (A.cols != B.cols)) {
         stringstream message;
-        message << "A and B must have the same dimensions, A.rows=" << A.rows << " B.rows=" << B.rows;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
-      }
-      else if (A.cols != B.cols) {
-        stringstream message;
-        message << "A and B must have the same dimensions, A.cols=" << A.cols << " B.cols=" << B.cols;
+        message << "A and B must have the same dimensions, A.rows=" << A.rows << " B.rows=" << B.rows
+                << ", A.cols=" << A.cols << " B.cols=" << B.cols;
         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       xmatrix<utype> product(A.rows, A.cols);

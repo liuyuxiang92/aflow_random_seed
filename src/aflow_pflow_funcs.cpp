@@ -447,7 +447,7 @@ namespace pflow {
 
     //[CO20190515 - WRONG, [hkl] WITH brackets is ALREADY in direct space]xvector<double> n_s=HKLPlane2Normal(xstr_bulk.lattice,hkl_s);  //we need UN-ROTATED lattice here so we can get the right distance
     //[CO20190515 - WRONG, [hkl] WITH brackets is ALREADY in direct space]double d_layers=getDistanceBetweenImages(xstr_bulk.lattice,h_s,k_s,l_s); //this depends on UN-ROTATED lattice
-    xvector<double> n_s=xstr_bulk.f2c*aurostd::xvectorutype2double(hkl_s);n_s/=aurostd::modulus(n_s); //f2c=trasp(xstr_bulk.lattice)
+    xvector<double> n_s=xstr_bulk.f2c*aurostd::xvectorutype2xvectordouble(hkl_s);n_s/=aurostd::modulus(n_s); //f2c=trasp(xstr_bulk.lattice)
     xvector<double> n_s_ORIG=n_s;
     if(LDEBUG) {cerr << soliloquy << " n_s[hkl=" << hkl_s << "]=" << n_s << endl;}
 
@@ -628,9 +628,9 @@ namespace pflow {
         //cannot use n_s, as it is normalized
         //rotated hkl_s by v_pgroups
         //rotate in Cartesian coordinates, then convert to fractional
-        xvector<double> n_s_tmp=xstr_bulk.f2c*aurostd::xvectorutype2double(hkl_s);  //do not normalize
+        xvector<double> n_s_tmp=xstr_bulk.f2c*aurostd::xvectorutype2xvectordouble(hkl_s);  //do not normalize
         n_s_tmp=v_pgroups[v_pgs[0]].Uc*n_s_tmp; //rotate
-        hkl_s=aurostd::xvectordouble2utype<int>(xstr_bulk.c2f*n_s_tmp);  //convert to fractional
+        hkl_s=aurostd::xvectordouble2xvectorutype<int>(xstr_bulk.c2f*n_s_tmp);  //convert to fractional
 
         message << "Selecting symmetrically equivalent hkl_s=" << hkl_s << endl;
         message << "n_s=" << n_s << endl;

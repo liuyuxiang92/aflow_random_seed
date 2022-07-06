@@ -5115,6 +5115,7 @@ namespace aurostd {
   uint string2tokensByDelimiter(const string& str, vector<string>& tokens, const string& delimiter) { //SD20220504
     tokens.clear();
     uint dlen = delimiter.length();
+    if (dlen == 1) {return aurostd::string2tokens(str, tokens, delimiter);}
     string::size_type lpos = 0, cpos = str.find(delimiter, lpos);
     while (cpos != string::npos) {
       tokens.push_back(str.substr(lpos, cpos - lpos));
@@ -5127,8 +5128,8 @@ namespace aurostd {
   uint string2tokensByDelimiter(const string& str, deque<string>& tokens, const string& delimiter) { //SD20220504
     tokens.clear();
     vector<string> vtokens;
-    uint i = aurostd::string2tokensByDelimiter(str, vtokens, delimiter);
-    for (i = 0; i < tokens.size(); i++) {tokens.push_back(vtokens[i]);}
+    aurostd::string2tokensByDelimiter(str, vtokens, delimiter);
+    tokens = aurostd::vector2deque(vtokens);
     return tokens.size();
   }
 

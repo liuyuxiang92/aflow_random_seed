@@ -17,10 +17,15 @@
 // Functions to work with polynomials
 //********************************************************************************
 namespace aurostd {
-  //Evaluates the value of the polynomial with coefficients p at the value x.
-  //
-  //The polynomial is represented in the following form:
-  //p(x) = p0+x*(p1+x*(p2+x*(p3+...x*(p(n-1)+x*(pn)))))
+  /// @brief Evaluates the value of the polynomial with coefficients p at the value x.
+  ///
+  /// @param x Value at which to evlaute the polynomial.
+  /// @param p Coefficients of the polynomial.
+  ///
+  /// @return Polynomial evaluated at x.
+  ///
+  /// @note The polynomial is represented in the following form:
+  /// p(x) = p0+x*(p1+x*(p2+x*(p3+...x*(p(n-1)+x*(pn)))))
   template<class utype> utype evalPolynomial(const utype x, const xvector<utype>& p) {
     utype res = p[p.urows];
     for (int i=p.urows-1; i>=p.lrows; i--) res = res*x + p[i];
@@ -28,6 +33,12 @@ namespace aurostd {
   }
 
   //SD20220422
+  /// @brief Evaluates the value of the polynomial with coefficients p at the values x.
+  ///
+  /// @param x Values at which to evlaute the polynomial.
+  /// @param p Coefficients of the polynomial.
+  ///
+  /// @return Polynomial evaluated at x.
   template<class utype> xvector<utype> evalPolynomial_xv(const xvector<utype>& x, const xvector<utype>& p) {
     xvector<utype> res(x.rows);
     for (int i = res.lrows; i <= res.urows; i++) {
@@ -37,6 +48,12 @@ namespace aurostd {
   }
 
   //SD20220505
+  /// @brief Evaluates the value of the polynomial with coefficients p at the values x.
+  ///
+  /// @param x Values at which to evaluate the polynomial.
+  /// @param p Coefficients of the polynomial.
+  ///
+  /// @return Polynomial evaluated at x.
   template<class utype> xmatrix<utype> evalPolynomial_xm(const xmatrix<utype>& x, const xvector<utype>& p) {
     xmatrix<utype> res(x.rows, x.cols);
     for (int i = res.lrows; i <= res.urows; i++) {
@@ -47,11 +64,15 @@ namespace aurostd {
     return res;
   }
 
-  //Evaluates the value and the derivatives of the polynomial with coefficients p at
-  //the value x and outputs the derivatives in the dp array.
-  //
-  //The highest derivative is determined by the size of the dp array and the result
-  //is stored in ascending order starting from the zeroth derivative (function itself).
+  /// @brief Evaluates the value and the derivatives of the polynomial with coefficients p at
+  /// the value x and outputs the derivatives in the dp array.
+  ///
+  /// @param x Values at which to evaluate the polynomial.
+  /// @param p Coefficients of the polynomial.
+  /// @param dp Coefficients of the derivative of the polynomial multiplied by the monomial base.
+  ///
+  /// @note The highest derivative is determined by the size of the dp array and the result
+  /// is stored in ascending order starting from the zeroth derivative (function itself).
   template<class utype> void evalPolynomialDeriv(const utype x, const xvector<utype>& p, xvector<utype>& dp) {
     for (int i=dp.lrows; i<=dp.urows; i++) dp[i] = 0.0;
     dp[dp.lrows] = p[p.urows];
@@ -67,12 +88,17 @@ namespace aurostd {
     }
   }
 
-  //Evaluates the value and the derivatives of the polynomial with coefficients p at
-  //the value x and returns the result as an array (dp).
-  //
-  //The result is stored in ascending order starting from the zero's derivative
-  //(function itself).
-  //@param n is the highest order of the derivative to be calculated.
+  /// @brief Evaluates the value and the derivatives of the polynomial with coefficients p at
+  /// the value x and returns the result as an array (dp).
+  ///
+  /// @param x Values at which to evaluate the polynomial.
+  /// @param p Coefficients of the polynomial.
+  /// @param n Order of the derivative.
+  ///
+  /// @return Coefficients of the nth derivative of the polynomial multiplied by the monomial base.
+  ///
+  /// @note The result is stored in ascending order starting from the zero's derivative
+  /// (function itself).
   template<class utype> xvector<utype> evalPolynomialDeriv(const utype x, const xvector<utype>& p, const uint n) {
     xvector<utype> dp(n+1);
     evalPolynomialDeriv(x, p, dp);
@@ -80,7 +106,13 @@ namespace aurostd {
   }
 
   //SD20220422
-  //Returns the coefficients of the nth derivative of the polynomial
+  /// @brief Returns the coefficients of the nth derivative of the polynomial.
+  ///
+  /// @param x Values at which to evaluate the polynomial.
+  /// @param p Coefficients of the polynomial.
+  /// @param n Order of the derivartive.
+  ///
+  /// @return Coefficients of the nth derivative of the polynomial.
   template<class utype> xvector<utype> evalPolynomialCoeff(const xvector<utype>& p, const uint n) {
     if ((int)n >= p.urows) {return 0.0 * ones_xv<utype>(1);}
     xvector<utype> dp(p.urows - n);
@@ -90,14 +122,20 @@ namespace aurostd {
     return dp;
   }
 
-  //Constructs the Vandermonde matrix with columns up to a given number of columns n,
-  //which corresponds to the polynomial of degree n-1.
-  //Vandermonde matrix:
-  // 1 x1^1 x1^2 .. x1^(n-1)
-  // 1 x2^1 x2^2 .. x2^(n-1)
-  // ...
-  // 1 xm^1 xm^2 .. xm^(n-1)
-  //where m is the size of x array
+  /// @brief Constructs the Vandermonde matrix with columns up to a given number of columns n,
+  /// which corresponds to the polynomial of degree n-1.
+  ///
+  /// @param x Values at which to evaluate the polynomial.
+  /// @param n Order of the polynomial.
+  ///
+  /// @return Vandermonde matrix.
+  ///
+  /// Vandermonde matrix:
+  ///  1 x1^1 x1^2 .. x1^(n-1)
+  ///  1 x2^1 x2^2 .. x2^(n-1)
+  ///  ...
+  ///  1 xm^1 xm^2 .. xm^(n-1)
+  /// where m is the size of x array
   template<class utype> xmatrix<utype> Vandermonde_matrix(const xvector<utype>& x, const int n) {
     xmatrix<utype> VM(x.rows, n);
 
@@ -109,23 +147,29 @@ namespace aurostd {
     return VM;
   }
 
-  //Calculates the extremum of the polynomial bounded by the region [xmin,xmax] by searching
-  //for the value x where the derivative of polynomial equals to zero using the
-  //bisection method.
-  //
-  //It is assumed that only one extremum exists between xmin and xmax.
-  //The specific use of this function is to search for the equilibrium volume of a given
-  //polynomial E(V) dependency.
-  //
-  //The main idea: if a continuous function f(x) has the root f(x0)=0 in the interval [a,b], 
-  //then its sign in the interval [a,x0) is opposite to its sign in the interval (x0,b].
-  //The root searching algorithm is iterative: one bisects the interval [a,b] into two 
-  //subintervals and for the next iteration picks a subinterval where f(x) has 
-  //opposite sign on its ends.
-  //This process continues until the length of the interval is less than some negligibly
-  //small number and one picks the middle of the interval as x0.
-  //In this situation, f(x0)~0 and this condition is used as a criterion to stop the
-  //iteration procedure.
+  /// @brief Calculates the extremum of the polynomial bounded by the region [xmin,xmax] by searching
+  /// for the value x where the derivative of polynomial equals to zero using the bisection method.
+  ///
+  /// @param p Coefficients of the polynomial.
+  /// @param xmin Minimum value of range to search for the extremum.
+  /// @param xmax Maximum value of range to search for the extremum.
+  /// @param tol Tolerence when to terminate the search.
+  ///
+  /// @return Value at which the polynomial has an extremum.
+  ///
+  /// @note It is assumed that only one extremum exists between xmin and xmax.
+  /// The specific use of this function is to search for the equilibrium volume of a given
+  /// polynomial E(V) dependency.
+  ///
+  /// The main idea: if a continuous function f(x) has the root f(x0)=0 in the interval [a,b], 
+  /// then its sign in the interval [a,x0) is opposite to its sign in the interval (x0,b].
+  /// The root searching algorithm is iterative: one bisects the interval [a,b] into two 
+  /// subintervals and for the next iteration picks a subinterval where f(x) has 
+  /// opposite sign on its ends.
+  /// This process continues until the length of the interval is less than some negligibly
+  /// small number and one picks the middle of the interval as x0.
+  /// In this situation, f(x0)~0 and this condition is used as a criterion to stop the
+  /// iteration procedure.
   //SD20220427 - Throws error if zero is not found or bisection method is not converged
   template<class utype> utype polynomialFindExtremum(const xvector<utype>& p, const utype xmin, const utype xmax, const utype tol) {
     bool LDEBUG = (FALSE || DEBUG_XFIT || XHOST.DEBUG);
@@ -194,11 +238,18 @@ namespace aurostd {
   }
 
   //SD20220422
-  //Calculate the coefficients for a polynomial p(x) of degree n that fits the y data with weights w.
-  //The weight w_i determines how much one wants to weight the point y_i when performing the fit
+  /// @brief Calculates the coefficients for a polynomial p(x) of degree n that fits the y data with weights w.
+  ///
+  /// @param x Input value of the data points.
+  /// @param y Output value of the data points.
+  /// @param n Order of the polynomial.
+  /// @param w Weight of the data points.
+  ///
+  /// @return Coefficients of the polynomial.
+  ///
+  /// @note The weight w_i determines how much one wants to weight the point y_i when performing the fit
   template<class utype> xvector<utype> polynomialCurveFit(const xvector<utype>& x, const xvector<utype>& _y, const int n, const xvector<utype>& _w) {
     bool LDEBUG = (FALSE || DEBUG_XFIT || XHOST.DEBUG);
-    xvector<utype> p;
     utype wtot = 0.0;
     for (int i = _w.lrows; i <= _w.urows; i++) {
       if (_w(i) < (utype)0.0) {
@@ -234,29 +285,39 @@ namespace aurostd {
   }
 
   //SD20220318
-  //Calculate the (tranpose) n-by-n companion matrix of a polynomial, where n is the polynomial degree
-  //transposed companion matrix:
-  //  0   1   0  ..  0
-  //  0   0   1  ..  0
-  // ...
-  //  0   0   0  ..  1
-  // -p0 -p1 -p2 .. -p(n-1)
+  /// @brief Calculates the (tranpose) n-by-n companion matrix of a polynomial, where n is the polynomial degree
+  /// transposed companion matrix.
+  ///
+  /// @param p Coefficients of the polynomial.
+  ///
+  /// @return Companion matrix of the polynomial.
+  ///
+  ///   0   1   0  ..  0
+  ///   0   0   1  ..  0
+  ///  ...
+  ///   0   0   0  ..  1
+  ///  -p0 -p1 -p2 .. -p(n-1)
   template<class utype> xmatrix<utype> companion_matrix(const xvector<utype>& p) {
     if (p(p.urows) == 0.0) {
       string message = "Leading polynomial coefficient is zero";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
-    int n = p.urows - 1;
-    xmatrix<utype> CM(n, n);
-    for (int i = p.lrows; i < n; i++) {CM(i, i + 1) = 1.0;}
-    for (int i = p.lrows; i <= n; i++) {CM(n, i) = -p(i) / p(n + 1);}
+    xmatrix<utype> CM(p.urows - 1, p.urows - 1, p.lrows, p.lrows);
+    for (int i = p.lrows; i < p.urows - 1; i++) {CM(i, i + 1) = 1.0;}
+    for (int i = p.lrows; i <= p.urows - 1; i++) {CM(p.urows - 1, i) = -p(i) / p(p.urows);}
     return CM;
   }
 
   //SD20220318
-  //Calculates the roots of a polynomial as the eigenvalues of the companion matrix
-  //The real and imaginary parts of the roots are returned in rr and ri, respectively
-  //DOI: 10.1090/S0025-5718-1995-1262279-2
+  /// @brief Calculates the roots of a polynomial as the eigenvalues of the companion matrix.
+  ///
+  /// @param p Coefficients of the polynomial.
+  /// @param rr Real part of the polynomial roots.
+  /// @param ri Imaginary part of the polynomial roots.
+  ///
+  /// @note The real and imaginary parts of the roots are returned in rr and ri, respectively
+  ///
+  /// DOI: 10.1090/S0025-5718-1995-1262279-2
   template<class utype> void polynomialFindRoots(const xvector<utype>& p, xvector<utype>& rr, xvector<utype>& ri) {
     for (int i = p.lrows; i <= p.urows; i++) {
       if (std::isnan(p(i))) {
@@ -281,13 +342,23 @@ namespace aurostd {
 //********************************************************************************
 namespace aurostd {
   //SD20220517
-  //Find the zeros of a univariate function by Brent's method
-  //Based on the version by J. Burkardt
+  /// @brief Finds the zeros of a univariate function by Brent's method.
+  ///
+  /// @param a Lower (or upper) bound of the search space.
+  /// @param b Upper (or lower) bound of the search space.
+  /// @param f Univeriate function, stored as a lambda expression.
+  /// @param zero Value of the argument at which the function is zero.
+  /// @param niter Number of iterations to perform.
+  /// @param tol Tolerence when to terminate the search.
+  ///
+  /// @return Bolean whether the zero was found.
+  ///
+  /// Based on the version by J. Burkardt
   bool findZeroBrent(const double a, const double b, const std::function<double(double)>& f, double& zero, const uint niter, const double _tol) {
     double c, d, e, fa, fb, fc, m, p, q, r, s, sa, tol;
     if (aurostd::isequal(aurostd::sign(f(a)), aurostd::sign(f(b)))) {
       stringstream message;
-      message << "Function evalution at the endpoints have the same sign, F(a)=" << f(a) << " F(b)=" << f(b);
+      message << "Function evaluation at the endpoints have the same sign, F(a)=" << f(a) << " F(b)=" << f(b);
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     sa = a;
@@ -367,12 +438,16 @@ namespace aurostd {
   }
 
   //SD20220616
-  //Find the zeros for a square system (N variables, N equations) using the Newton-Raphson method
-  //DOI: 10.1007/978-3-319-69407-8; Appendix A
-  //@param x0 initial guess for the zeros
-  //@param vf vector of functions
-  //@param jac vector of vector of first derivative functions (Jacobian)
-  //@param x zeros of the system
+  /// @brief Finds a set of zeros for a square system (N variables, N equations) using the Newton-Raphson method.
+  ///
+  /// @param x0 Initial guess for the zeros.
+  /// @param vf Vector of functions, stored as lambda expressions.
+  /// @param jac Vector of vector of the first derivatives of the functions (Jacobian), stored as lambda expressions.
+  /// @param x Set of zeros of the system.
+  ///
+  /// @return Bolean whether a set zeros was found.
+  ///
+  /// DOI: 10.1007/978-3-319-69407-8; Appendix A
   bool findZeroNewtonRaphson(const xvector<double>& _x0, const vector<std::function<double(xvector<double>)>>& vf, const vector<vector<std::function<double(xvector<double>)>>>& jac, xvector<double>& x, const uint niter, const double tol) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     uint n = (uint)_x0.rows;
@@ -413,13 +488,18 @@ namespace aurostd {
   }
 
   //SD20220619
-  //Find the zeros for a square system (N variables, N equations) using gradient deflation
-  //DOI: 10.1007/bf02165004
-  //@param x0 initial guess for the zeros
-  //@param vf vector of functions
-  //@param jac vector of vector of first derivative functions (Jacobian)
-  //@param vx vector of zeros for the system
+  /// @brief Finds the set of zeros for a square system (N variables, N equations) using gradient deflation.
+  ///
+  /// @param x0 Initial guess for the zeros.
+  /// @param vf Vector of functions, stored as lambda expressions.
+  /// @param jac Vector of vector of the first derivatives of the functions (Jacobian), stored as lambda expressions.
+  /// @param mx Matrix of zeros for the system, each column is a different set of zeros.
+  ///
+  /// @return Bolean whether a set of zeros was found.
+  ///
+  /// DOI: 10.1007/bf02165004
   bool findZeroDeflation(const xvector<double>& x0, const vector<std::function<double(xvector<double>)>>& _vf, const vector<vector<std::function<double(xvector<double>)>>>& _jac, xmatrix<double>& mx, const uint niter, const double tol) {
+    mx.clear();
     vector<vector<double>> vx;
     vector<std::function<double(xvector<double>)>> vf = _vf, vdf;
     vector<vector<std::function<double(xvector<double>)>>> jac = _jac;
@@ -437,24 +517,48 @@ namespace aurostd {
       jac.clear();
       gfac.clear();
       for (uint i = 0; i < _vf.size(); i++) {
-        gfac.push_back([i, r, _jac](xvector<double> x) {double gfac = 0.0; for (uint j = 0; j < _jac.size(); j++) {gfac += _jac[i][j](r) * (x(j + 1) - r(j + 1));} return std::pow(gfac, -1.0);});
+        gfac.push_back(
+                        [i, r, _jac](xvector<double> x) {
+                          double gfac = 0.0; 
+                          for (uint j = 0; j < _jac.size(); j++) {
+                            gfac += _jac[i][j](r) * (x(j + 1) - r(j + 1));
+                          }
+                          return std::pow(gfac, -1.0);
+                        }
+                      );
       }
       vgfac.push_back(gfac);
-      coeff = [vgfac](uint i, xvector<double> x) {double coeff = 1.0; for (uint ix = 0; ix < vgfac.size(); ix++) {coeff *= vgfac[ix][i](x);} return coeff;};
+      coeff = [vgfac](uint i, xvector<double> x) {
+                double coeff = 1.0;
+                for (uint ix = 0; ix < vgfac.size(); ix++) {coeff *= vgfac[ix][i](x);} 
+                return coeff;
+              };
       dgfac.clear();
       for (uint i = 0; i < _vf.size(); i++) {
         for (uint j = 0; j < _vf.size(); j++) {
-          vdf.push_back([i, j, r, _jac, gfac](xvector<double> x) {return -1.0 * _jac[i][j](r) * std::pow(gfac[i](x), 2.0);});
+          vdf.push_back(
+                         [i, j, r, _jac, gfac](xvector<double> x) {
+                           return -1.0 * _jac[i][j](r) * std::pow(gfac[i](x), 2.0);
+                         }
+                       );
         }
         dgfac.push_back(vdf);
         vdf.clear();
       }
       vdgfac.push_back(dgfac);
-      dcoeff = [coeff, vgfac, vdgfac](uint i, uint j, xvector<double> x) {double dcoeff = 0.0; for (uint ix = 0; ix < vdgfac.size(); ix++) {dcoeff += vdgfac[ix][i][j](x) / vgfac[ix][i](x);} return coeff(i, x) * dcoeff;};
+      dcoeff = [coeff, vgfac, vdgfac](uint i, uint j, xvector<double> x) {
+                 double dcoeff = 0.0;
+                 for (uint ix = 0; ix < vdgfac.size(); ix++) {dcoeff += vdgfac[ix][i][j](x) / vgfac[ix][i](x);} 
+                 return coeff(i, x) * dcoeff;
+               };
       for (uint i = 0; i < _vf.size(); i++) {
         vf.push_back([i, _vf, coeff](xvector<double> x) {return coeff(i, x) * _vf[i](x);});
         for (uint j = 0; j < _vf.size(); j++) {
-          vdf.push_back([i, j, _vf, _jac, coeff, dcoeff](xvector<double> x) {return coeff(i, x) * _jac[i][j](x) + dcoeff(i, j, x)  * _vf[i](x);});
+          vdf.push_back(
+                         [i, j, _vf, _jac, coeff, dcoeff](xvector<double> x) {
+                           return coeff(i, x) * _jac[i][j](x) + dcoeff(i, j, x)  * _vf[i](x);
+                         }
+                       );
         }
         jac.push_back(vdf);
         vdf.clear();
@@ -471,12 +575,18 @@ namespace aurostd {
 //********************************************************************************
 namespace aurostd {
   //SD20220619
-  //Check whether the numerical and analytical derivatives match
+  /// @brief Checks whether the numerical and analytical derivatives match.
+  ///
+  /// @param x Test value for the arguments at which to valuate the function and its derivatives.
+  /// @param vf Function of interest, stored as a lambda expression.
+  /// @param df Vector of the first derivative of the function, stored as lambda expressions.
+  /// @param tol Tolerance at which the numerical and analytical derivatives are equal.
+  ///
+  /// @return Bolean whether the numerical and analytical derivatives are equal.
   bool checkDerivatives(const xvector<double>& _x, const std::function<double(xvector<double>)>& f, const vector<std::function<double(xvector<double>)>>& df, const double tol) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if ((uint)_x.rows != df.size()) {
-      string message;
-      message = "Number of variables and derivatives must be equal";
+      string message = "Number of variables and derivatives must be equal";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     double dx = 10.0 * tol, df_approx, df_exact;
@@ -496,14 +606,24 @@ namespace aurostd {
   }
 
   //SD20220624
-  //Calculate the numerical Jacobian
+  /// @brief Numerically calculates the Jacobian of a system of functions using finite difference.
+  ///
+  /// @param vf Vector of functions, stored as lambda expressions.
+  /// @param dx Step sizes to perform the central difference.
+  ///
+  /// @return Vector of vector of the first derivatives of the functions (Jacobian), stored as lambda expressions.
   vector<vector<std::function<double(xvector<double>)>>> calcNumericalJacobian(const vector<std::function<double(xvector<double>)>>& vf, const xvector<double>& _dx) {
     vector<std::function<double(xvector<double>)>> df;
     vector<vector<std::function<double(xvector<double>)>>> jac;
     xvector<double> dx = aurostd::abs(_dx);
     for (uint i = 0; i < vf.size(); i++) {
       for (int j = dx.lrows; j <= dx.urows; j++) {
-        df.push_back([i, j, dx, vf](xvector<double> x) {xvector<double> x1 = x, x2 = x; x1(j) -= dx(j); x2(j) += dx(j); return 0.5 * (vf[i](x2) - vf[i](x1)) / dx(j);});
+        df.push_back(
+                      [i, j, dx, vf](xvector<double> x) {
+                        xvector<double> x1 = x, x2 = x; x1(j) -= dx(j); x2(j) += dx(j); 
+                        return 0.5 * (vf[i](x2) - vf[i](x1)) / dx(j);
+                      }
+                    );
       }
       jac.push_back(df);
       df.clear();

@@ -1373,7 +1373,7 @@ namespace aurostd {                   // conversion to xvector<utype>
 //SD20220512
 namespace aurostd {                   // conversion from xvector<utype> to xvector<double>
   template<class utype> 
-    xvector<double> xvectorutype2double(const xvector<utype>& a){
+    xvector<double> xvectorutype2xvectordouble(const xvector<utype>& a){
       xvector<double> b(a.urows,a.lrows);
       for(int i=a.lrows;i<=a.urows;i++){b[i]=(double)a[i];}
       return b;
@@ -1383,11 +1383,11 @@ namespace aurostd {                   // conversion from xvector<utype> to xvect
 //SD20220512
 namespace aurostd {                   // conversion from xvector<double> to xvector<utype>
   template<class utype> 
-    xvector<utype> xvectordouble2utype(const xvector<double>& a,bool check_int){
+    xvector<utype> xvectordouble2xvectorutype(const xvector<double>& a,bool check_int){
       xvector<utype> b(a.urows,a.lrows);
       if(check_int){
         for(int i=a.lrows;i<=a.urows;i++){
-          if(!isinteger(a[i])){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::xvectordouble2utype():","non-integer found ["+aurostd::utype2string(a[i])+"]",_INPUT_ILLEGAL_);}
+          if(!isinteger(a[i])){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"non-integer found ["+aurostd::utype2string(a[i])+"]",_INPUT_ILLEGAL_);}
         }
       }
       for(int i=a.lrows;i<=a.urows;i++){b[i]=(utype)nint(a[i]);}  //nint is for safety

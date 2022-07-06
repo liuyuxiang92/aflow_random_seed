@@ -814,11 +814,8 @@ namespace aurostd {
   vector<string> extractJsonVectorAflow(const string& json, string key) { //SD20220504
     string value = extractJsonValueAflow(json, key);
     string::size_type start = value.find("["), stop = value.rfind("]");
-    vector<string> vec, tokens;
-    aurostd::string2tokens(value.substr(start + 1, stop - 1), tokens, ",");
-    for (uint i = 0; i < tokens.size(); i++) {
-      vec.push_back(tokens[i]);
-    }
+    vector<string> vec;
+    aurostd::string2tokens(value.substr(start + 1, stop - 1), vec, ",");
     return vec;
   }
 
@@ -827,14 +824,10 @@ namespace aurostd {
     string value = extractJsonValueAflow(json, key);
     string::size_type start = value.find("[["), stop = value.rfind("]]");
     vector<vector<string>> mat;
-    vector<string> vec, tokens1, tokens2;
-    aurostd::string2tokensByDelimiter(value.substr(start + 2, stop - 2), tokens1, "],[");
-    for (uint i = 0; i < tokens1.size(); i++) {
-      aurostd::string2tokens(tokens1[i], tokens2, ",");
-      vec.clear();
-      for (uint j = 0; j < tokens2.size(); j++) {
-        vec.push_back(tokens2[j]);
-      }
+    vector<string> vec, tokens;
+    aurostd::string2tokensByDelimiter(value.substr(start + 2, stop - 2), tokens, "],[");
+    for (uint i = 0; i < tokens.size(); i++) {
+      aurostd::string2tokens(tokens[i], vec, ",");
       mat.push_back(vec);
     }
     return mat;
