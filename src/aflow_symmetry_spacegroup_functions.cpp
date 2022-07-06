@@ -4916,10 +4916,10 @@ namespace SYM {
 namespace SYM {
   vector<int> countWyckoffTypes(const vector<wyckoffsite_ITC>& Wyckoff_positions){
     vector<int> types, types_count;
-    uint nWyckoff_sites = Wyckoff_positions.size();
-    int index = 0;
-    for(uint i=0;i<nWyckoff_sites;i++){
-      if(!aurostd::WithinList(types,Wyckoff_positions[i].index,index)){
+    size_t nWyckoff_sites = Wyckoff_positions.size();
+    size_t index = 0;
+    for(size_t i=0;i<nWyckoff_sites;i++){
+      if(!aurostd::WithinList(types,(int)Wyckoff_positions[i].index,index)){
         types.push_back(Wyckoff_positions[i].index);
         types_count.push_back(1);
       }
@@ -5416,7 +5416,7 @@ namespace SYM {
 
     for (uint k = 0; k < tmpvvvsd[s].size(); k++) {
       //DX20210421 [OBSOLETE] if(intinvec(genlocations, k + 1))
-      if(aurostd::WithinList(genlocations, k + 1)) { //DX20210421
+      if(aurostd::WithinList(genlocations, (int)k + 1)) { //DX20210421
         xvector<double> oneshift;
         for (uint j = 0; j < tmpvvvsd[s][k].size(); j++) {
           double filler = 0;

@@ -828,19 +828,25 @@ namespace aurostd {
   bool substringlist2bool(const string& strin, const deque<string>& substrings, bool match_all=true);  //ME20220505
   bool substring_present_file(const string& FileName,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
   bool substring_present_file_FAST(const string& FileName,const string& strsub1,bool RemoveWS=false,bool case_insensitive=false,bool expect_near_end=false,unsigned long long int size_max=AUROSTD_MAX_ULLINT);  //CO20210315 - cleaned up
-  bool WithinList(const vector<double>& list,const double input,bool sorted=false);  //SD20220325
-  bool WithinList(const vector<string>& list,const string& input,bool sorted=false);  //CO20181010
-  bool WithinList(const deque<string>& list,const string& input,bool sorted=false);  //CO20181010
-  bool WithinList(const vector<int>& list,int input,bool sorted=false); //CO20181010
-  bool WithinList(const vector<uint>& list,uint input,bool sorted=false); //CO20181010
-  bool WithinList(const vector<double>&, const double, int&,bool sorted=false);  //SD20220325
-  bool WithinList(const vector<string>&, const string&, int&,bool sorted=false);  //ME20190905
-  bool WithinList(const vector<int>&, int, int&,bool sorted=false);  //ME20190905
-  bool WithinList(const vector<uint>&, uint, int&,bool sorted=false);  //ME20190905
-  bool WithinList(const vector<double>&, const double, vector<int>&,bool sorted=false);  //SD20220325
-  bool WithinList(const vector<string>&, const string&, vector<int>&,bool sorted=false);  //SD20220325
-  bool WithinList(const vector<int>&, int, vector<int>&,bool sorted=false);  //SD20220325
-  bool WithinList(const vector<uint>&, uint, vector<int>&,bool sorted=false);  //SD20220325
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<string>& list,const string& input,bool sorted=false);  //CO20181010
+  //[SD20220705 - OBSOLETE]bool WithinList(const deque<string>& list,const string& input,bool sorted=false);  //CO20181010
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<int>& list,int input,bool sorted=false); //CO20181010
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<uint>& list,uint input,bool sorted=false); //CO20181010
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<string>&, const string&, int&,bool sorted=false);  //ME20190905
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<int>&, int, int&,bool sorted=false);  //ME20190905
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<uint>&, uint, int&,bool sorted=false);  //ME20190905
+  template<class utype> bool WithinList(const vector<utype>& list, const utype& input, size_t& index, bool sorted=false); //SD20220705
+  bool WithinList(const vector<string>& list, const string& input, size_t& index, bool sorted=false); //SD20220705
+  template<class utype> bool WithinList(const deque<utype>& list, const utype& input, size_t& index, bool sorted=false); //SD20220705
+  bool WithinList(const deque<string>& list, const string& input, size_t& index, bool sorted=false); //SD20220705
+  template<class utype> bool WithinList(const vector<utype>& list, const utype& input, bool sorted=false); //SD20220705
+  bool WithinList(const vector<string>& list, const string& input, bool sorted=false); //SD20220705
+  template<class utype> bool WithinList(const deque<utype>& list, const utype& input, bool sorted=false); //SD20220705
+  bool WithinList(const deque<string>& list, const string& input, bool sorted=false); //SD20220705
+  template<class utype> bool WithinList(const vector<utype>& list, const utype& input, vector<size_t>& index, bool sorted=false); //SD20220705
+  bool WithinList(const vector<string>& list, const string& input, vector<size_t>& index, bool sorted=false); //SD20220705
+  template<class utype> bool WithinList(const deque<utype>& list, const utype& input, vector<size_t>& index, bool sorted=false); //SD20220705
+  bool WithinList(const deque<string>& list, const string& input, vector<size_t>& index, bool sorted=false); //SD20220705
   bool EWithinList(const vector<string>& list,const string& input); //CO20200223
   bool EWithinList(const vector<string>& list, const string& input, string& output); //CO20200223
   bool SubstringWithinList(const deque<string>& list, const string& input);  //ME20220503

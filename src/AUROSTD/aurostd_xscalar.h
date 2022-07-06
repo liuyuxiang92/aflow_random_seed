@@ -523,10 +523,19 @@ namespace aurostd {
   // with const utype&
   template<class utype> bool identical(const utype&,const utype&,const utype&) __xprototype;
   template<class utype> bool identical(const utype&,const utype&) __xprototype;
+  bool identical (const bool a,const bool b); //SD20220705
+  bool identical (const char a,const char b); //SD20220705
+  bool identical (const string& a,const string& b); //SD20220705
   template<class utype> bool isdifferent(const utype&,const utype&,const utype&) __xprototype;
   template<class utype> bool isdifferent(const utype&,const utype&) __xprototype;
+  bool isdifferent (const bool a,const bool b); //SD20220705
+  bool isdifferent (const char a,const char b); //SD20220705
+  bool isdifferent (const string& a,const string& b); //SD20220705
   template<class utype> bool isequal(const utype&,const utype&,const utype&) __xprototype;
   template<class utype> bool isequal(const utype&,const utype&) __xprototype;
+  bool isequal (const bool a,const bool b); //SD20220705
+  bool isequal (const char a,const char b); //SD20220705
+  bool isequal (const string& a,const string& b); //SD20220705
   // with utype
   //template<class utype> bool identical(utype,utype,utype) __xprototype;
   //template<class utype> bool identical(utype,utype) __xprototype;

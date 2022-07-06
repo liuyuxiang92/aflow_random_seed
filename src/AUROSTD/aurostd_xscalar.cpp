@@ -1142,18 +1142,30 @@ namespace aurostd {
 }
 
 // ----------------------------------------------------------------------------
-//--------------------------------------------------------------- extra_minmax min/max
+//--------------------------------------------------------------- isequal/isdifferent
 namespace aurostd {
   // with const utype&
   template<class utype> bool                             // is scalar == scalar ?
     identical(const utype& a,const utype& b,const utype& _tol_) {
-      if(abs(a-b)<=_tol_) return TRUE;
-      return FALSE;
+      if(abs(a-b)<=_tol_) return true;
+      return false;
     }
   template<class utype> bool                             // is scalar == scalar ?
     identical(const utype& a,const utype& b) {
       return (bool) identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
     } 
+  bool identical (const bool a,const bool b) { //SD20220705
+      if(a==b) return true;
+      return false;
+  }
+  bool identical (const char a,const char b) { //SD20220705
+      if(a==b) return true;
+      return false;
+  }
+  bool identical (const string& a,const string& b) { //SD20220705
+      if(a==b) return true;
+      return false;
+  }
   template<class utype> bool                             // is scalar != scalar ?
     isdifferent(const utype& a,const utype& b,const utype& _tol_) {
       return (bool) !identical(a,b,_tol_);
@@ -1162,6 +1174,15 @@ namespace aurostd {
     isdifferent(const utype& a,const utype& b) {
       return (bool) !identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
     }
+  bool isdifferent(const bool a,const bool b) { //SD20220705
+      return (bool) !identical(a,b);
+  }
+  bool isdifferent(const char a,const char b) { //SD20220705
+      return (bool) !identical(a,b);
+  }
+  bool isdifferent(const string& a,const string& b) { //SD20220705
+      return (bool) !identical(a,b);
+  }
   template<class utype> bool                             // is scalar == scalar ?
     isequal(const utype& a,const utype& b,const utype& _tol_) {
       return (bool) identical(a,b,_tol_);
@@ -1170,6 +1191,15 @@ namespace aurostd {
     isequal(const utype& a,const utype& b) {
       return (bool) identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
     }
+  bool isequal(const bool a,const bool b) { //SD20220705
+      return (bool) identical(a,b);
+  }
+  bool isequal(const char a,const char b) { //SD20220705
+      return (bool) identical(a,b);
+  }
+  bool isequal(const string& a,const string& b) { //SD20220705
+      return (bool) identical(a,b);
+  }
   //// with utype
   //template<class utype> bool                             // is scalar == scalar ?
   //identical(utype a,utype b,utype _tol_) {

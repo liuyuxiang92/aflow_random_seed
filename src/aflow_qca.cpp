@@ -256,7 +256,7 @@ namespace qca {
       // Check if concentration curve is within [0,1] and sums to 1
       double totconc_init = 0.0, totconc_final = 0.0;
       vector<double> vconc_init, vconc_final;
-      vector<int> vzeros_init, vzeros_final;
+      vector<size_t> vzeros_init, vzeros_final;
       for (uint i = 0; i < qca_data.elements.size() && totconc_init <= 1.0 && totconc_final <= 1.0; i++) {
         if (qca_data.conc_curve_range[2 * i] < 0 || qca_data.conc_curve_range[2 * i] > 1 ||
             qca_data.conc_curve_range[2 * i + 1] < 0 || qca_data.conc_curve_range[2 * i + 1] > 1) {
@@ -913,7 +913,7 @@ namespace qca {
   xmatrix<double> getConcentrationCluster(const vector<string>& elements, const vector<xstructure>& vstr) {
     uint nstr = vstr.size(), nelem = elements.size();
     xmatrix<double> conc_cluster(nstr, nelem);
-    int ie = -1;
+    size_t ie;
     xvector<double> stoich(nelem);
     vector<string> str_elements;
     for (size_t i = 0; i < vstr.size(); i++) {

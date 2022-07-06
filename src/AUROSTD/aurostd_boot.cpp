@@ -141,6 +141,13 @@ template<class utype> bool initialize_scalar(utype d) {
 
   aurostd::JSONwriter jw; jw.addNumber("", d);//AS20201217
   jw.addNumber("", s); //DX20201230 - enables a string to be written as a number
+  o+=aurostd::WithinList(vu,u,(size_t)1); //SD20220705
+  o+=aurostd::WithinList(du,u,(size_t)1); //SD20220705
+  o+=aurostd::WithinList(vu,u); //SD20220705
+  o+=aurostd::WithinList(du,u); //SD20220705
+  vector<size_t> vst;
+  o+=aurostd::WithinList(vu,u,vst); //SD20220705
+  o+=aurostd::WithinList(du,u,vst); //SD20220705
   return (o<0);
 }
 
@@ -235,7 +242,6 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   aurostd::reduceByGCD(dutype,dutype); //DX201911225
   aurostd::reduceByGCD(duint,duint); //DX201911225
   o+=aurostd::identical(dutype); //DX20210502
-  aurostd::WithinList(vdouble,d,i); //SD20220325
 
   // initialize vector/deque 
   aurostd::string2tokens(s,vstring,"");aurostd::string2tokens(s,dstring,"");

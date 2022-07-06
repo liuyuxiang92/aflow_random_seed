@@ -474,14 +474,14 @@ namespace unittest {
     }
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
   }
-  void UnitTest::checkEqual(const vector<string>& calculated, const vector<string>& expected, const string& check_function,
-      const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-    bool passed = (calculated.size() == expected.size());
-    for (size_t i = 0; i < calculated.size() && passed; i++) {
-      passed = (calculated[i] == expected[i]);
-    }
-    check(passed, calculated, expected, check_function, check_description, passed_checks, results);
-  }
+  //[SD20220705 - OBSOLETE]void UnitTest::checkEqual(const vector<string>& calculated, const vector<string>& expected, const string& check_function,
+  //[SD20220705 - OBSOLETE]    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
+  //[SD20220705 - OBSOLETE]  bool passed = (calculated.size() == expected.size());
+  //[SD20220705 - OBSOLETE]  for (size_t i = 0; i < calculated.size() && passed; i++) {
+  //[SD20220705 - OBSOLETE]    passed = (calculated[i] == expected[i]);
+  //[SD20220705 - OBSOLETE]  }
+  //[SD20220705 - OBSOLETE]  check(passed, calculated, expected, check_function, check_description, passed_checks, results);
+  //[SD20220705 - OBSOLETE]}
 
   template <typename utype>
   void UnitTest::checkEqual(const utype& calculated, const utype& expected, const string& check_function,
@@ -489,16 +489,16 @@ namespace unittest {
     bool passed = (aurostd::isequal(calculated, expected));
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
   }
-  void UnitTest::checkEqual(const string& calculated, const string& expected, const string& check_function,
-      const string& check_description, uint & passed_checks, vector<vector<string> >& results) {
-    bool passed = (calculated == expected);
-    check(passed, calculated, expected, check_function, check_description, passed_checks, results);
-  }
-  void UnitTest::checkEqual(const bool calculated, const bool expected, const string& check_function,
-      const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-    bool passed = (calculated == expected);
-    check(passed, calculated, expected, check_function, check_description, passed_checks, results);
-  }
+  //[SD20220705 - OBSOLETE]void UnitTest::checkEqual(const string& calculated, const string& expected, const string& check_function,
+  //[SD20220705 - OBSOLETE]    const string& check_description, uint & passed_checks, vector<vector<string> >& results) {
+  //[SD20220705 - OBSOLETE]  bool passed = (calculated == expected);
+  //[SD20220705 - OBSOLETE]  check(passed, calculated, expected, check_function, check_description, passed_checks, results);
+  //[SD20220705 - OBSOLETE]}
+  //[SD20220705 - OBSOLETE]void UnitTest::checkEqual(const bool calculated, const bool expected, const string& check_function,
+  //[SD20220705 - OBSOLETE]    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
+  //[SD20220705 - OBSOLETE]  bool passed = (calculated == expected);
+  //[SD20220705 - OBSOLETE]  check(passed, calculated, expected, check_function, check_description, passed_checks, results);
+  //[SD20220705 - OBSOLETE]}
 
   template <typename utype>
   void UnitTest::check(const bool passed, const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
@@ -1216,7 +1216,7 @@ namespace unittest {
         }
       }
     }
-    checkEqual(ninconsistent, 0, check_function, check_description, passed_checks, results);
+    checkEqual(ninconsistent, (uint)0, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
     // Check | consistency between _aflowlib_entry and schema
@@ -1237,7 +1237,7 @@ namespace unittest {
         if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " " << key << " not found in schema." << std::endl;
       }
     }
-    checkEqual(ninconsistent, 0, check_function, check_description, passed_checks, results);
+    checkEqual(ninconsistent, (uint)0, check_function, check_description, passed_checks, results);
   }
 
 }
