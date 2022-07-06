@@ -2132,6 +2132,13 @@ namespace aflowlib {
       //ME20190614 END
     }
 
+    xKPOINTS kpoints_static;
+    kpoints_static.GetPropertiesFile(directory_RAW+"/KPOINTS.static");
+    data.kpoints_nnn_static=kpoints_static.nnn_kpoints;
+    if(!data.kpoints.empty()){data.kpoints+=";";} //CO20220706
+    data.kpoints+=aurostd::utype2string(kpoints_static.nnn_kpoints[1])+","+aurostd::utype2string(kpoints_static.nnn_kpoints[2])+","+aurostd::utype2string(kpoints_static.nnn_kpoints[3]);
+
+    cout << MESSAGE << " " << soliloquy << " end " << directory_LIB << endl;
     return true;
   }
 }
@@ -2180,10 +2187,6 @@ namespace aflowlib {
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,"POSCAR.bands",directory_RAW,"POSCAR.bands",vfile,MESSAGE);  // POSCAR.bands
     }
 
-    xKPOINTS kpoints_static;
-    kpoints_static.GetPropertiesFile(directory_RAW+"/KPOINTS.static");
-    data.kpoints_nnn_static=kpoints_static.nnn_kpoints;
-    data.kpoints+=";"+aurostd::utype2string(kpoints_static.nnn_kpoints[1])+","+aurostd::utype2string(kpoints_static.nnn_kpoints[2])+","+aurostd::utype2string(kpoints_static.nnn_kpoints[3]);
     xKPOINTS kpoints_bands;
     kpoints_bands.GetPropertiesFile(directory_RAW+"/KPOINTS.bands");
     //get pairs
@@ -2194,7 +2197,8 @@ namespace aflowlib {
       }
     }
     data.kpoints_bands_path_grid=kpoints_bands.path_grid;
-    data.kpoints+=";"+kpoints_bands.path+";"+aurostd::utype2string(kpoints_bands.path_grid);
+    if(!data.kpoints.empty()){data.kpoints+=";";} //CO20220706
+    data.kpoints+=kpoints_bands.path+";"+aurostd::utype2string(kpoints_bands.path_grid);
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " KPOINTS = " << data.kpoints << endl;
 
     if(flag_use_MATLAB) { // MATLAB STUFF  OLD WSETYAWAN+SC

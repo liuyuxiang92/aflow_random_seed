@@ -10381,7 +10381,6 @@ namespace pflow {
     //CO20220630 - decide if we should print
     //this is one of the few functions that escapes pflow::logger() and aurostd::PrintXXStream() for printing
     //all other printing should route through pflow::logger() (routing directly through aurostd::PrintXXStream() is obsolete)
-    //notable exception here is QUIET_THREADED
     if(XHOST.QUIET || XHOST.QUIET_GLOBAL || XHOST.vflag_control.flag("WWW")){return;} //CO20190520 - no progress bar for web stuff  //CO20200404 - new web flag // ME20210428 - do not update when quiet either
     if((&oss==&cout) && XHOST.QUIET_COUT){return;}
     if((&oss==&cerr) && XHOST.QUIET_CERR){return;}
