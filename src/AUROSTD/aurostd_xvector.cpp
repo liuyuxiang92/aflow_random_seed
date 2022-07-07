@@ -2172,12 +2172,14 @@ namespace aurostd { //HE20210511
 }
 
 namespace aurostd { //HE20210511
-
   /// @brief volume of a solid defined by points, facets their normals
   /// @param points collection of points
   /// @param facets collection of ordered point indices describing a facet
   /// @param normals collection of facet normals pointing all either outwards or inwards of the solid
   /// @return volume
+  ///
+  /// @authors
+  /// @mod{HE,20210721,created}
   ///
   /// A series of pyramids are generated from the solid with the facets as bases and origin as their tips.
   /// Their volumes (1/3 * base area * height) is then summed up.
@@ -2185,15 +2187,16 @@ namespace aurostd { //HE20210511
   /// Depending upon the normal direction, the height and, therefore, the volume can be negative.
   /// This ensures that overlapping volumes are handled properly.
   ///
+  /// \f[
   /// \frac{1}{3} \left| \sum_F (P0_F \cdot N_F) A_F \right|
-  /// P0_F first point of a facet (could be any point on facet F)
-  /// N_F facet normal vector
-  /// A_F facet area
+  /// \f]
   ///
-  /// More details:
-  /// Cha Zhang and Tsuhan Chen "Efficient feature extraction for 2D/3D objects in mesh representation"
-  /// Proceedings 2001 International Conference on Image Processing (Cat. No.01CH37205), 2001, pp. 935-938 vol.3
-  /// doi: 10.1109/ICIP.2001.958278.
+  /// - \f$ P0_F \f$ first point of a facet (could be any point on facet F)
+  /// - \f$ N_F \f$ facet normal vector
+  /// - \f$ A_F \f$ facet area
+  ///
+  /// @see
+  /// @doi{10.1109/ICIP.2001.958278}
   template<class utype>
     double
     volume(const vector <xvector<utype> > &points, const vector <vector<uint> > &facets,

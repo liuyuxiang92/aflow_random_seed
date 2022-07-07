@@ -74,3 +74,6 @@ src/compile_output*.txt
 
 # old Makefiles
 Makefile.aflow.OLD
+
+# generated documentation
+doc/out
