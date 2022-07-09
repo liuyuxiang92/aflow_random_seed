@@ -397,38 +397,54 @@ namespace aurostd {  // namespace aurostd
 }
 
 namespace aurostd {  // namespace aurostd
-  template<class utype>
-    xvector<utype> xmatrix<utype>::getxvec(int lrow, int urow, int lcol, int ucol) const {
+  template<class utype> void
+    xmatrix<utype>::getxvecInPlace(xvector<utype>& vec_out, int lrow, int urow, int lcol, int ucol, int size) const {
     //CO2019110 original author of xmatrix2xvector and AZ20220704
     //moved all functionality all into getxvec
+      bool LDEBUG=(FALSE || XHOST.DEBUG);
+      if(LDEBUG){
+        cerr << "xmat=" << endl << (*this) << endl;
+        cerr << "urows=" << urows << endl;
+        cerr << "ucols=" << ucols << endl;
+        cerr << "lrows=" << lrows << endl;
+        cerr << "lcols=" << lcols << endl;
+        cerr << "urow=" << urow << endl;
+        cerr << "ucol=" << ucol << endl;
+        cerr << "lrow=" << lrow << endl;
+        cerr << "lcol=" << lcol << endl;
+       }
       if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow<lrows",_INDEX_BOUNDS_);}
       if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_INDEX_BOUNDS_);}
       if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol<lcols",_INDEX_BOUNDS_);}
       if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ucol>ucols",_INDEX_BOUNDS_);}
       if(lcol>ucol){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol>ucol",_INDEX_BOUNDS_);}
       if(lrow>urow){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow>urow",_INDEX_BOUNDS_);}
-      int size = (ucol-lcol+1)*(urow-lrow+1);
       if((ucol != lcol)&&(lrow != urow)){
         throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"(ucol != lcol)&&(lrow != urow)",_INDEX_BOUNDS_);
       }
       else if(ucol == lcol){
-        xvector<utype> xv(size);
         for(int i = 1; i <= size; i++){
-          xv(i) = corpus[lrow+i-1][lcol];
+          vec_out(i) = corpus[lrow+i-1][lcol];
         }
-        return xv;
+        return;
       }
-      xvector<utype> xv(size);
       for(int j = 1; j <= size; j++){
-        xv(j) = corpus[lrow][lcol+j-1];
+        vec_out(j) = corpus[lrow][lcol+j-1];
       }
-      return xv;
     }
 }
 namespace aurostd {  // namespace aurostd
-  template<class utype>
-    xvector<utype> xmatrix<utype>::getxvec() const {
-    return getxvec(lrows, urows, lcols, ucols);
+  template<class utype> xvector<utype> 
+      xmatrix<utype>::getxvec(int lrow, int urow, int lcol, int ucol) const {
+    int size = (ucol-lcol+1)*(urow-lrow+1);
+    xvector<utype> xv(size);
+    (*this).getxvecInPlace(xv, lrow, urow, lcol, ucol, size);
+    return xv;
+      }}
+namespace aurostd {  // namespace aurostd
+  template<class utype> xvector<utype>
+      xmatrix<utype>::getxvec() const {
+      return (*this).getxvec(lrows, urows, lcols, ucols);
 }
 }
 //CO20190808
@@ -457,25 +473,6 @@ namespace aurostd {  // namespace aurostd
       for(int i=lrow;i<=urow;i++){
         for(int j=lcol;j<=ucol;j++){mat_out[(i-lrow)+mat_out.lrows][(j-lcol)+mat_out.lcols]=corpus[i][j];}
       }
-    }
-  template<class utype> void
-    xmatrix<utype>::getxmatInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output //CO20191110
-      xmatrix<utype> xmat;
-      (*this).getxmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
-      bool LDEBUG=(FALSE || XHOST.DEBUG);
-      if(LDEBUG){
-        cerr << "xmat=" << endl << xmat << endl;
-        cerr << "urows=" << urows << " xmat.urows=" << xmat.urows << endl;
-        cerr << "ucols=" << ucols << " xmat.ucols=" << xmat.ucols << endl;
-        cerr << "lrows=" << lrows << " xmat.lrows=" << xmat.lrows << endl;
-        cerr << "lcols=" << lcols << " xmat.lcols=" << xmat.lcols << endl;
-        cerr << "urow=" << urow << endl;
-        cerr << "ucol=" << ucol << endl;
-        cerr << "lrow=" << lrow << endl;
-        cerr << "lcol=" << lcol << endl;
-        cerr << xmat << endl;
-       }
-      xv_out=xmat.getxvec();//AZ20220627 replaced xmatrix2xvector with xmat.getxvec()
     }
   template<class utype> xmatrix<utype>
     xmatrix<utype>::getxmat(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110

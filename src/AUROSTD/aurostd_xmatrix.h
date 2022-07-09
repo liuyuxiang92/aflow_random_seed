@@ -51,7 +51,7 @@ namespace aurostd {
         xvector<utype> getxvec() const;                                      // updated function to return a vector from a 1-d matrix input //AZ20220704
         xvector<utype> getxvec(int lrow,int urow,int lcol,int ucol) const;   // return a vector from a matrix input //AZ20220704
         void getxmatInPlace(xmatrix<utype>& mat_out,int lrow,int urow,int lcol,int ucol,int lrows_out=AUROSTD_MAX_INT,int lcols_out=AUROSTD_MAX_INT) const; // return submatrix as xmatrix //CO20191110
-        void getxmatInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol,int lrows_out=AUROSTD_MAX_INT,int lcols_out=AUROSTD_MAX_INT) const; //return submatrix as xvector //CO20191110
+        void getxvecInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol,int size) const; // return xvectorInPlace from xmatrix 
         xmatrix<utype> getxmat(int lrow,int urow,int lcol,int ucol,int lrows_out=AUROSTD_MAX_INT,int lcols_out=AUROSTD_MAX_INT) const; // return submatrix as xmatrix //CO20191110
         void setrow(const xvector<utype>& row,int irow=1);                  // set row of matrix //CO20190808
         void setcol(const xvector<utype>& col,int icol=1);                  // set col of matrix //CO20190808
