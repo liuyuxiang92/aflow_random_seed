@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['platon_5fmin_5fvolume_5fper_5fatom_14458',['PLATON_MIN_VOLUME_PER_ATOM',['../aflow__xatom_8cpp.html#aea0783ab4839518d96eec0496dc3f1e2',1,'aflow_xatom.cpp']]],
+  ['platon_5ftolerance_5fangle_14459',['PLATON_TOLERANCE_ANGLE',['../aflow__xatom_8cpp.html#a2b8a5ec124f84ccf87fda8cb856578b9',1,'aflow_xatom.cpp']]],
+  ['platon_5ftolerance_5fd1_14460',['PLATON_TOLERANCE_D1',['../aflow__xatom_8cpp.html#a86b38df1aa9e42a024e68f3014ea7c34',1,'aflow_xatom.cpp']]],
+  ['platon_5ftolerance_5fd2_14461',['PLATON_TOLERANCE_D2',['../aflow__xatom_8cpp.html#a78e9048fa0f904047b69afd2c114bb65',1,'aflow_xatom.cpp']]],
+  ['platon_5ftolerance_5fd3_14462',['PLATON_TOLERANCE_D3',['../aflow__xatom_8cpp.html#ace868a739a0be62301305adbf4c34ce4',1,'aflow_xatom.cpp']]],
+  ['pocc_5fall_5fhnf_5fmatrices_5ffile_14463',['POCC_ALL_HNF_MATRICES_FILE',['../aflow__aflowrc_8cpp.html#a2937eb5ba82de4b177d81e65d70d61d3',1,'aflow_aflowrc.cpp']]],
+  ['pocc_5fall_5fsite_5fconfigurations_5ffile_14464',['POCC_ALL_SITE_CONFIGURATIONS_FILE',['../aflow__aflowrc_8cpp.html#a7ff6ea6f63eb69397b6dbfeaf68aab96',1,'aflow_aflowrc.cpp']]],
+  ['pocc_5fall_5fsupercells_5ffile_14465',['POCC_ALL_SUPERCELLS_FILE',['../aflow__aflowrc_8cpp.html#a983507c0cbfb36400353fd203dda2762',1,'aflow_aflowrc.cpp']]],
+  ['pocc_5fanions_5flist_14466',['POCC_ANIONS_LIST',['../aflow__aflowrc_8cpp.html#a4d65d9e52a09f0581daaa14c2748fcb0',1,'aflow_aflowrc.cpp']]],
+  ['pocc_5fapl_5fout_5ffile_14467',['POCC_APL_OUT_FILE',['../aflow__aflowrc_8cpp.html#a6dc409a129b991399193bf1878a4c576',1,'aflow_aflowrc.cpp']]],
+  ['pocc_5fdoscar_5ffile_14468',['POCC_DOSCAR_FILE',['../aflow__aflowrc_8cpp.html#a210945d9542ed75cd866382fb83fb52b',1,'aflow_aflowrc.cpp']]],
+  ['pocc_5ffile_5fprefix_14469',['POCC_FILE_PREFIX',['../aflow__aflowrc_8cpp.html#af921b1cc320702daea1d1359279794d1',1,'aflow_aflowrc.cpp']]],
+  ['pocc_5fout_5ffile_14470',['POCC_OUT_FILE',['../aflow__aflowrc_8cpp.html#aefad9595f4101449eadd3e81b7d0a7cb',1,'aflow_aflowrc.cpp']]],
+  ['pocc_5fphdoscar_5ffile_14471',['POCC_PHDOSCAR_FILE',['../aflow__aflowrc_8cpp.html#ab9868ba9bd7aec7e50b388dabb222b7e',1,'aflow_aflowrc.cpp']]],
+  ['pocc_5fprecision_14472',['pocc_precision',['../aflow__pocc_8cpp.html#a3e40ee090694b431a4dfa8861b1bc220',1,'aflow_pocc.cpp']]],
+  ['pocc_5froundoff_5ftol_14473',['pocc_roundoff_tol',['../aflow__pocc_8cpp.html#a34062c53845e6109b4ef0e02dfde737d',1,'aflow_pocc.cpp']]],
+  ['pocc_5funique_5fsupercells_5ffile_14474',['POCC_UNIQUE_SUPERCELLS_FILE',['../aflow__aflowrc_8cpp.html#a3c2603917f069fd5e76c3c8909d6f6a9',1,'aflow_aflowrc.cpp']]],
+  ['precision_14475',['PRECISION',['../aflow__pocc__qha_8cpp.html#a9c7b069fee3c8184e14a7de8e5da2dc6',1,'aflow_pocc_qha.cpp']]],
+  ['pressure_5fzero_5fenthalpy_5fenergy_14476',['PRESSURE_ZERO_ENTHALPY_ENERGY',['../aflowlib_8h.html#abde81aa58131a09401a9a24acea998e8',1,'aflowlib.h']]],
+  ['print_5fnull_5fjson_14477',['PRINT_NULL_JSON',['../aflow_8h.html#a1a6746e5f109b8966acdf31c00bb9ffa',1,'aflow.h']]],
+  ['priority_5fgrep_5fstring_14478',['PRIORITY_GREP_STRING',['../aflow__kbin_8cpp.html#a387af13dc2e59bcabe2f71841d20280d',1,'aflow_kbin.cpp']]],
+  ['priority_5fprobability_14479',['PRIORITY_PROBABILITY',['../aflow__kbin_8cpp.html#ae6ee8df509351e887ce523a4f0447fff',1,'aflow_kbin.cpp']]],
+  ['pseudopotential_5fgenerator_5fpad_14480',['PSEUDOPOTENTIAL_GENERATOR_pad',['../aflow__ovasp_8cpp.html#a0e4950799eb5f48cdf881b53998999ef',1,'PSEUDOPOTENTIAL_GENERATOR_pad():&#160;aflow_ovasp.cpp'],['../aflow__xpseudopotentials_8cpp.html#a0e4950799eb5f48cdf881b53998999ef',1,'PSEUDOPOTENTIAL_GENERATOR_pad():&#160;aflow_xpseudopotentials.cpp']]],
+  ['pthreads_5fdefault_14481',['PTHREADS_DEFAULT',['../aflow_8h.html#a81f015beacc8304eb424919683ae22a1',1,'aflow.h']]]
+];
