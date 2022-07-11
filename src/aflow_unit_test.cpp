@@ -894,7 +894,7 @@ namespace unittest {
     checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
-    // Check | getxvec //AZ20220627
+    // Check convert to xvector //AZ20220627
     // ---------------------------------------------------------------------------
     check_function = "aurostd::getxvec()";
     xmatrix<int> full_xmatint, xmatint;
@@ -903,23 +903,23 @@ namespace unittest {
     full_xmatint = {{1,2,3,4},
                     {5,6,7,8},
                     {9,10,11,12}};
-    
+     
     check_description = "getxvec() test for type conversion";
     xvector<int> expected_xvecint(3);
     xvector<int> calculated_xvecint(3);
     expected_xvecint = {1,5,9};
     calculated_xvecint = full_xmatint.getxmat(1,3,1,1).getxvec();
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
-    
+
     // ---------------------------------------------------------------------------
-    // Check | getxvec 
+    // Check | column xvector //AZ20220627
     // ---------------------------------------------------------------------------
     check_description = "get column xvector from xmatrix";
     calculated_xvecint = full_xmatint.getxvec(1,3,1,1);
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
     
     // ---------------------------------------------------------------------------
-    // Check | getxvec 
+    // Check | row xvector //AZ20220627
     // ---------------------------------------------------------------------------
     check_description = "get row xvector from xmatrix";
     expected_xvecint = {1,2,3};
@@ -927,7 +927,7 @@ namespace unittest {
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
-    // Check | getxvec
+    // Check | 1x1 xvector //AZ20220627
     // ---------------------------------------------------------------------------
     check_description = "get a 1x1 vector from xmatrix";
     expected_xvecint = xvector<int>(1);
