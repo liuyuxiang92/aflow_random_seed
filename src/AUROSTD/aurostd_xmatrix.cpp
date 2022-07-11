@@ -398,9 +398,31 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype> void
-    xmatrix<utype>::getxvecInPlace(xvector<utype>& vec_out, int lrow, int urow, int lcol, int ucol, int size) const {
-    //CO2019110 original author of xmatrix2xvector and AZ20220704
-    //moved all functionality all into getxvec
+    xmatrix<utype>::getxvecInPlace(xvector<utype>& xv_out, int lrow, int urow, int lcol, int ucol, int size) const {
+    /// @brief Convert xmatrix into xvector given a set of indices. 
+    ///
+    /// @param xv_out the xvector that will be changed InPlace
+    /// @param lrow lower row to include in xvector 
+    /// @param urow upper row to include in xvector
+    /// @param lcol lower column to include in xvector
+    /// @param ucol upper column to include in xvector
+    /// @param size the size of the output xvector
+    ///
+    /// @return void 
+    ///
+    /// @authors
+    /// @mod{CO,2019110,created as getxmatInPlace (xvector overload) + xmatrix2xvector}
+    /// @mod{AZ,20220711,refactored into getxvecInPlace}
+    ///
+    /// This is a function that slices an xmatrix into vectors, originally written
+    /// by CO as the xv overload of getmatInPlace. It enforces that the vector is 1 dimensional
+    /// when slicing the xmatrix. lrow is lower row. urow is upper row. lcol is 
+    /// lower column and ucol is upper column. Note that the indices are inclusive.
+    /// i.e any index given will be returned. Also lcol == ucol or lrow == urow in
+    /// order to be a vector. This function is designed similarly to getxmatInPlace,
+    /// where there the base "InPlace" function drives the rest of the functions. The
+    /// InPlace designation means you must supply a vector that will then be changed
+    /// InPlace to the matrix elements that are specified by the arguments.
       bool LDEBUG=(FALSE || XHOST.DEBUG);
       if(LDEBUG){
         cerr << "xmat=" << endl << (*this) << endl;
@@ -424,16 +446,35 @@ namespace aurostd {  // namespace aurostd
       }
       else if(ucol == lcol){
         for(int i = 1; i <= size; i++){
-          vec_out(i) = corpus[lrow+i-1][lcol];
+          xv_out(i) = corpus[lrow+i-1][lcol];
         }
         return;
       }
       for(int j = 1; j <= size; j++){
-        vec_out(j) = corpus[lrow][lcol+j-1];
+        xv_out(j) = corpus[lrow][lcol+j-1];
       }
     }
 }
 namespace aurostd {  // namespace aurostd
+    /// @brief Convert xmatrix into xvector given a set of indices. 
+    ///
+    /// @param xv_out the xvector that will be changed InPlace
+    /// @param lrow lower row to include in xvector 
+    /// @param urow upper row to include in xvector
+    /// @param lcol lower column to include in xvector
+    /// @param ucol upper column to include in xvector
+    ///
+    /// @return xvector 
+    ///
+    /// @authors
+    /// @mod{CO,2019110,created as getxmatInPlace() + xmatrix2xvector()}
+    /// @mod{AZ,20220711,refactored into getxvecInPlace()}
+    ///
+    /// This function allocates the xvector and calculates the size 
+    /// internally, then calls getxvecInPlace(). 
+    /// @see
+    /// @xlink{aurostd::getxvecInPlace()}
+    /// @xlink{aurostd::getxmatInPlace()} 
   template<class utype> xvector<utype> 
       xmatrix<utype>::getxvec(int lrow, int urow, int lcol, int ucol) const {
     int size = (ucol-lcol+1)*(urow-lrow+1);
@@ -442,6 +483,21 @@ namespace aurostd {  // namespace aurostd
     return xv;
       }}
 namespace aurostd {  // namespace aurostd
+    /// @brief Convert xmatrix into xvector given a set of indices. 
+    ///
+    /// @param void 
+    ///
+    /// @return xvector 
+    ///
+    /// @authors
+    /// @mod{AZ,20220711,created}
+    ///
+    /// This function performs the same task as getxvecInPlace(), but it 
+    /// assumes that you have already passed it a 1-d slice of the xmatrix
+    /// and then performs the type conversion.
+    /// @see
+    /// @xlink{aurostd::getxvecInPlace()}
+    /// @xlink{aurostd::getxmatInPlace()} 
   template<class utype> xvector<utype>
       xmatrix<utype>::getxvec() const {
       return (*this).getxvec(lrows, urows, lcols, ucols);
@@ -449,9 +505,35 @@ namespace aurostd {  // namespace aurostd
 }
 //CO20190808
 namespace aurostd {  // namespace aurostd
-  //this function returns a submatrix mat_out spanning urow:lrow,ucol:lcol of the original matrix
-  //lrows_out,lcols_out specifies lrows,lcols of mat_out
-  //this is different than submatrix(), which returns back a submatrix by cutting out irow,jcol
+    /// @brief Convert xmatrix into a submatrix given a set of indices. 
+    ///
+    /// @param mat_out the matrix that will be changed InPlace
+    /// @param lrow lower row to include in submatrix 
+    /// @param urow upper row to include in submatrix
+    /// @param lcol lower column to include in submatrix
+    /// @param ucol upper column to include in submatrix
+    /// @param lrows_out the lower row of the matrix that will be written over mat_out 
+    /// @param lcol_out the lower column of the matrix that will be written over mat_out 
+    ///
+    /// @return void 
+    ///
+    /// @authors
+    /// @mod{CO,2019110,created}
+    /// @mod{AZ,20220711,modified}
+    ///
+    /// This is a function that slices an xmatrix into into a submatrix, originally written
+    /// by CO. When slicing the xmatrix. lrow is lower row. urow is upper row. lcol is 
+    /// lower column and ucol is upper column. Note that the indices are inclusive.
+    /// i.e any index given will be returned. Also lcol == ucol or lrow == urow in
+    /// order to be a vector. This function is designed so the base "InPlace" function
+    /// drives the rest of the functions. The InPlace designation means you must supply 
+    /// a matrix that will then be changed InPlace to the matrix elements that are specified
+    /// by the arguments.
+    /// @note
+    ///
+    /// CO: this function returns a submatrix mat_out spanning urow:lrow,ucol:lcol of the original matrix
+    /// lrows_out,lcols_out specifies lrows,lcols of mat_out
+    /// this is different than submatrix(), which returns back a submatrix by cutting out irow,jcol
   template<class utype> void
     xmatrix<utype>::getxmatInPlace(xmatrix<utype>& mat_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
       if(lrows_out==AUROSTD_MAX_INT){lrows_out=lrows;}

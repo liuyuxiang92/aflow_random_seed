@@ -894,94 +894,42 @@ namespace unittest {
     checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
-    // Check | getxvec //AZ20220627
+    // Check convert to xvector //AZ20220627
     // ---------------------------------------------------------------------------
-    /// @brief Convert xmatrix into xvector given a set of indices. 
-    ///
-    /// @param lrow, urow, lcol, ucol 
-    ///
-    /// @return vector, probably 
-    ///
-    /// This is a function that slices xmatrix into vectors, originally written
-    /// by CO as xmatrix2xvector. It enforces that the vector is 1 dimensional
-    /// when slicing the xmatrix. lrow is lower row. urow is upper row. lcol is 
-    /// lower column and ucol is upper column. Note that the indices are inclusive.
-    /// i.e a ucol given will be returned. Also lcol == ucol or lrow == urow in
-    /// order to be a vector.
     check_function = "aurostd::getxvec()";
     xmatrix<int> full_xmatint, xmatint;
     full_xmatint = xmatrix<int>(3,4);
     full_xmatint = {{1,2,3,4},
-                        {5,6,7,8},
-                        {9,10,11,12}};
+                    {5,6,7,8},
+                    {9,10,11,12}};
     check_description = "getxvec() test for type conversion";
     xvector<int> expected_xvecint(3);
     xvector<int> calculated_xvecint(3);
-    expected_xvecint(1) = 1;
-    expected_xvecint(2) = 5;
-    expected_xvecint(3) = 9;
+    expected_xvecint = {1,5,9};
     calculated_xvecint = full_xmatint.getxmat(1,3,1,1).getxvec();
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
-    // ---------------------------------------------------------------------------
-    // Check | getxvec //AZ20220627
-    // ---------------------------------------------------------------------------
-    /// @brief Convert 1d xmatrix into xvector
-    ///
-    /// @param none 
-    ///
-    /// @return xvector
-    ///
-    /// This is a function that slices xmatrix into xvectors, originally written
-    /// by CO as xmatrix2xvector. It enforces that the vector is 1 dimensional
-    /// when slicing the xmatrix. lrow is lower row. urow is upper row. lcol is 
-    /// lower column and ucol is upper column. Note that the indices are inclusive.
-    /// i.e a ucol given will be returned. Also lcol == ucol or lrow == urow in
-    /// order to be a vector.
 
+    // ---------------------------------------------------------------------------
+    // Check | column xvector //AZ20220627
+    // ---------------------------------------------------------------------------
     check_description = "get column xvector from xmatrix";
     calculated_xvecint = full_xmatint.getxvec(1,3,1,1);
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
     
     // ---------------------------------------------------------------------------
-    // Check | getxvec //AZ20220627
+    // Check | row xvector //AZ20220627
     // ---------------------------------------------------------------------------
-    /// @brief Convert xmatrix into xvector given a set of indices. 
-    ///
-    /// @param lrow, urow, lcol, ucol 
-    ///
-    /// @return vector, probably 
-    ///
-    /// This is a function that slices xmatrix into xvectors, originally written
-    /// by CO as xmatrix2xvector. It enforces that the vector is 1 dimensional
-    /// when slicing the xmatrix. lrow is lower row. urow is upper row. lcol is 
-    /// lower column and ucol is upper column. Note that the indices are inclusive.
-    /// i.e a ucol given will be returned. Also lcol == ucol or lrow == urow in
-    /// order to be a vector.
-
     check_description = "get row xvector from xmatrix";
-    expected_xvecint(1) = 1;
-    expected_xvecint(2) = 2;
-    expected_xvecint(3) = 3;
+    expected_xvecint = {1,2,3};
     calculated_xvecint = full_xmatint.getxvec(1,1,1,3);
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+
     // ---------------------------------------------------------------------------
-    // Check | getxvec //AZ20220627
+    // Check | 1x1 xvector //AZ20220627
     // ---------------------------------------------------------------------------
-    /// @brief Convert xmatrix into xvector given a set of indices. 
-    ///
-    /// @param lrow, urow, lcol, ucol 
-    ///
-    /// @return vector, probably 
-    ///
-    /// This is a function that slices xmatrix into xvectors, originally written
-    /// by CO as xmatrix2xvector. It enforces that the vector is 1 dimensional
-    /// when slicing the xmatrix. lrow is lower row. urow is upper row. lcol is 
-    /// lower column and ucol is upper column. Note that the indices are inclusive.
-    /// i.e a ucol given will be returned. Also lcol == ucol or lrow == urow in
-    /// order to be a vector.
-    
     check_description = "get a 1x1 vector from xmatrix";
     expected_xvecint = xvector<int>(1);
+    expected_xvecint(1) = 12;
     calculated_xvecint = full_xmatint.getxvec(3,3,4,4);
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
     
