@@ -816,7 +816,7 @@ namespace unittest {
     points.push_back({4.0, 2.0, 0.0});
     points.push_back({4.0, 0.0, 0.0});
 
-    // covert points to integer to test special implementation
+    // convert points to integer to test special implementation
     for (size_t i_point=0; i_point<points.size(); i_point++){
       ipoints.push_back({(int) points[i_point][1], (int) points[i_point][2], (int) points[i_point][3]});
     }
@@ -845,7 +845,7 @@ namespace unittest {
     points.push_back({1.0, 1.0, 1.0});
     points.push_back({5.0, 0.0, 5.0});
 
-    // covert points to integer to test special implementation
+    // convert points to integer to test special implementation
     for (size_t i_point=0; i_point<points.size(); i_point++){
       ipoints.push_back({(int) points[i_point][1], (int) points[i_point][2], (int) points[i_point][3]});
     }
@@ -896,98 +896,49 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     // Check | getxvec //AZ20220627
     // ---------------------------------------------------------------------------
-    /// @brief Convert xmatrix into xvector given a set of indices. 
-    ///
-    /// @param lrow, urow, lcol, ucol 
-    ///
-    /// @return vector, probably 
-    ///
-    /// This is a function that slices xmatrix into vectors, originally written
-    /// by CO as xmatrix2xvector. It enforces that the vector is 1 dimensional
-    /// when slicing the xmatrix. lrow is lower row. urow is upper row. lcol is 
-    /// lower column and ucol is upper column. Note that the indices are inclusive.
-    /// i.e a ucol given will be returned. Also lcol == ucol or lrow == urow in
-    /// order to be a vector.
     check_function = "aurostd::getxvec()";
     xmatrix<int> full_xmatint, xmatint;
+    // need this matrix to test slicing
     full_xmatint = xmatrix<int>(3,4);
     full_xmatint = {{1,2,3,4},
-                        {5,6,7,8},
-                        {9,10,11,12}};
+                    {5,6,7,8},
+                    {9,10,11,12}};
+    
     check_description = "getxvec() test for type conversion";
     xvector<int> expected_xvecint(3);
     xvector<int> calculated_xvecint(3);
-    expected_xvecint(1) = 1;
-    expected_xvecint(2) = 5;
-    expected_xvecint(3) = 9;
+    expected_xvecint = {1,5,9};
     calculated_xvecint = full_xmatint.getxmat(1,3,1,1).getxvec();
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+    
     // ---------------------------------------------------------------------------
-    // Check | getxvec //AZ20220627
+    // Check | getxvec 
     // ---------------------------------------------------------------------------
-    /// @brief Convert 1d xmatrix into xvector
-    ///
-    /// @param none 
-    ///
-    /// @return xvector
-    ///
-    /// This is a function that slices xmatrix into xvectors, originally written
-    /// by CO as xmatrix2xvector. It enforces that the vector is 1 dimensional
-    /// when slicing the xmatrix. lrow is lower row. urow is upper row. lcol is 
-    /// lower column and ucol is upper column. Note that the indices are inclusive.
-    /// i.e a ucol given will be returned. Also lcol == ucol or lrow == urow in
-    /// order to be a vector.
-
     check_description = "get column xvector from xmatrix";
     calculated_xvecint = full_xmatint.getxvec(1,3,1,1);
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
     
     // ---------------------------------------------------------------------------
-    // Check | getxvec //AZ20220627
+    // Check | getxvec 
     // ---------------------------------------------------------------------------
-    /// @brief Convert xmatrix into xvector given a set of indices. 
-    ///
-    /// @param lrow, urow, lcol, ucol 
-    ///
-    /// @return vector, probably 
-    ///
-    /// This is a function that slices xmatrix into xvectors, originally written
-    /// by CO as xmatrix2xvector. It enforces that the vector is 1 dimensional
-    /// when slicing the xmatrix. lrow is lower row. urow is upper row. lcol is 
-    /// lower column and ucol is upper column. Note that the indices are inclusive.
-    /// i.e a ucol given will be returned. Also lcol == ucol or lrow == urow in
-    /// order to be a vector.
-
     check_description = "get row xvector from xmatrix";
-    expected_xvecint(1) = 1;
-    expected_xvecint(2) = 2;
-    expected_xvecint(3) = 3;
+    expected_xvecint = {1,2,3};
     calculated_xvecint = full_xmatint.getxvec(1,1,1,3);
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+
     // ---------------------------------------------------------------------------
-    // Check | getxvec //AZ20220627
+    // Check | getxvec
     // ---------------------------------------------------------------------------
-    /// @brief Convert xmatrix into xvector given a set of indices. 
-    ///
-    /// @param lrow, urow, lcol, ucol 
-    ///
-    /// @return vector, probably 
-    ///
-    /// This is a function that slices xmatrix into xvectors, originally written
-    /// by CO as xmatrix2xvector. It enforces that the vector is 1 dimensional
-    /// when slicing the xmatrix. lrow is lower row. urow is upper row. lcol is 
-    /// lower column and ucol is upper column. Note that the indices are inclusive.
-    /// i.e a ucol given will be returned. Also lcol == ucol or lrow == urow in
-    /// order to be a vector.
-    
     check_description = "get a 1x1 vector from xmatrix";
     expected_xvecint = xvector<int>(1);
+    expected_xvecint(1) = 12;
     calculated_xvecint = full_xmatint.getxvec(3,3,4,4);
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
     
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520
     // ---------------------------------------------------------------------------
+     
     check_function = "aurostd::getEHermite()";
     check_description = "calculate elementary Hermite transformation";
     expected_xmatint = {{5,-2}, {-12, 5}};

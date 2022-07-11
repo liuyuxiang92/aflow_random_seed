@@ -434,6 +434,18 @@ namespace aurostd {  // namespace aurostd
     }
 }
 namespace aurostd {  // namespace aurostd
+    /// @brief Convert xmatrix into xvector given a set of indices. 
+    ///
+    /// @param lrow, urow, lcol, ucol 
+    ///
+    /// @return vector
+    ///
+    /// This is a function that slices xmatrix into vectors, originally written
+    /// by CO as xmatrix2xvector. It enforces that the vector is 1 dimensional
+    /// when slicing the xmatrix. lrow is lower row. urow is upper row. lcol is 
+    /// lower column and ucol is upper column. Note that the indices are inclusive.
+    /// i.e a ucol given will be returned. Also lcol == ucol or lrow == urow in
+    /// order to be a vector.
   template<class utype> xvector<utype> 
       xmatrix<utype>::getxvec(int lrow, int urow, int lcol, int ucol) const {
     int size = (ucol-lcol+1)*(urow-lrow+1);
