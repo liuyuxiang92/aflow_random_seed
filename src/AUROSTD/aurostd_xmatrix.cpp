@@ -398,7 +398,7 @@ namespace aurostd {  // namespace aurostd
 
 namespace aurostd {  // namespace aurostd
   template<class utype> void
-    xmatrix<utype>::getxvecInPlace(xvector<utype>& xv_out, int lrow, int urow, int lcol, int ucol, int size) const {
+    xmatrix<utype>::getxvecInPlace(xvector<utype>& xv_out, int lrow, int urow, int lcol, int ucol, int lrows_out) const {
     /// @brief Convert xmatrix into xvector given a set of indices. 
     ///
     /// @param xv_out the xvector that will be changed InPlace
@@ -406,7 +406,7 @@ namespace aurostd {  // namespace aurostd
     /// @param urow upper row to include in xvector
     /// @param lcol lower column to include in xvector
     /// @param ucol upper column to include in xvector
-    /// @param size the size of the output xvector
+    /// @param lrows_out the lower rows of the output xvector (if it does not match the xvector will be resized)
     ///
     /// @return void 
     ///
@@ -441,16 +441,24 @@ namespace aurostd {  // namespace aurostd
       if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ucol>ucols",_INDEX_BOUNDS_);}
       if(lcol>ucol){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol>ucol",_INDEX_BOUNDS_);}
       if(lrow>urow){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow>urow",_INDEX_BOUNDS_);}
+
       if((ucol != lcol)&&(lrow != urow)){
         throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"(ucol != lcol)&&(lrow != urow)",_INDEX_BOUNDS_);
       }
+      
+      int rows_out = (ucol-lcol+1)*(urow-lrow+1);
+      if(! (xv_out.rows==rows_out && xv_out.lrows==lrows_out) ) { //check if necessary to create new object
+        xvector<utype> xv(rows_out, lrows_out);
+        xv_out=xv;
+      }
+
       else if(ucol == lcol){
-        for(int i = 1; i <= size; i++){
+        for(int i = 1; i <= rows_out; i++){
           xv_out(i) = corpus[lrow+i-1][lcol];
         }
         return;
       }
-      for(int j = 1; j <= size; j++){
+      for(int j = 1; j <= rows_out; j++){
         xv_out(j) = corpus[lrow][lcol+j-1];
       }
     }
@@ -466,8 +474,7 @@ namespace aurostd {  // namespace aurostd
     ///
     /// @return xvector 
     ///
-    /// This function allocates the xvector and calculates the size 
-    /// internally, then calls getxvecInPlace(). 
+    /// This function allocates the xvector then calls getxvecInPlace(). 
     //
     /// @authors
     /// @mod{CO,2019110,created as getxmatInPlace() + xmatrix2xvector()}
@@ -478,11 +485,11 @@ namespace aurostd {  // namespace aurostd
     /// @xlink{aurostd::getxmatInPlace()} 
   template<class utype> xvector<utype> 
       xmatrix<utype>::getxvec(int lrow, int urow, int lcol, int ucol) const {
-    int size = (ucol-lcol+1)*(urow-lrow+1);
-    xvector<utype> xv(size);
-    (*this).getxvecInPlace(xv, lrow, urow, lcol, ucol, size);
-    return xv;
-      }}
+      xvector<utype> xv_out;
+      (*this).getxvecInPlace(xv_out, lrow, urow, lcol, ucol, 1);
+    return xv_out;
+  }
+}
 namespace aurostd {  // namespace aurostd
     /// @brief Convert xmatrix into xvector given a set of indices. 
     ///
@@ -513,8 +520,8 @@ namespace aurostd {  // namespace aurostd
     /// @param urow upper row to include in submatrix
     /// @param lcol lower column to include in submatrix
     /// @param ucol upper column to include in submatrix
-    /// @param lrows_out the lower row of the matrix that will be written over mat_out 
-    /// @param lcol_out the lower column of the matrix that will be written over mat_out 
+    /// @param lrows_out the lower row of the matrix that will be written over mat_out (if it is not the same it will allocate a new matrix)
+    /// @param lcols_out the lower column of the matrix that will be written over mat_out (if it is not the same it will allocate a new matrix)
     ///
     /// @return void 
     ///
@@ -537,8 +544,6 @@ namespace aurostd {  // namespace aurostd
     /// this is different than submatrix(), which returns back a submatrix by cutting out irow,jcol
   template<class utype> void
     xmatrix<utype>::getxmatInPlace(xmatrix<utype>& mat_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
-      if(lrows_out==AUROSTD_MAX_INT){lrows_out=lrows;}
-      if(lcols_out==AUROSTD_MAX_INT){lcols_out=lcols;}
       //AZ20220627 START
       if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow<lrows",_INDEX_BOUNDS_);}
       if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_INDEX_BOUNDS_);}
@@ -549,6 +554,7 @@ namespace aurostd {  // namespace aurostd
       //AZ20220627 END
       int rows_out=(urow-lrow)+1;
       int cols_out=(ucol-lcol)+1;
+      
       if(! ( mat_out.rows==rows_out && mat_out.cols==cols_out && mat_out.lrows==lrows_out && mat_out.lcols==lcols_out ) ) { //check if necessary to create new object
         xmatrix<utype> mat(rows_out,cols_out,lrows_out,lcols_out);
         mat_out=mat;

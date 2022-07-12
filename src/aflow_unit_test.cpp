@@ -903,7 +903,6 @@ namespace unittest {
     full_xmatint = {{1,2,3,4},
                     {5,6,7,8},
                     {9,10,11,12}};
-     
     check_description = "getxvec() test for type conversion";
     xvector<int> expected_xvecint(3);
     xvector<int> calculated_xvecint(3);
