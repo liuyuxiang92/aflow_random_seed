@@ -1260,7 +1260,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("RBANAL",aurostd::args2flag(argv,cmds,"--rbanal") && argv.at(1)=="--rbanal");
   vpflow.flag("RBDIST",aurostd::args2flag(argv,cmds,"--rbdist") && argv.at(1)=="--rbdist");
   // [OBSOLETE]  vvpflow.flag("RDF",(aurostd::args2flag(argv,cmds,"--rdf") && argv.at(1)=="--rdf"));
-  vpflow.args2addattachedscheme(argv,cmds,"RDF","--rdf=","");
+  vpflow.flag("RDF",aurostd::args2flag(argv,cmds,"--rdf")); //CO20220711
+  if(!vpflow.flag("RDF")){vpflow.args2addattachedscheme(argv,cmds,"RDF","--rdf=","");}  //CO20220711 - also look for '=' variant, must be XOR with flag (without '=')
   vpflow.flag("RDF::RAW_COUNTS",aurostd::args2flag(argv,cmds,"--raw_counts"));  //CO20220627
   // [OBSOLETE]  vpflow.flag("RDFCMP",(aurostd::args2flag(argv,cmds,"--rdfcmp") && argv.at(1)=="--rdfcmp"));
   vpflow.args2addattachedscheme(argv,cmds,"RDFCMP","--rdfcmp=","");

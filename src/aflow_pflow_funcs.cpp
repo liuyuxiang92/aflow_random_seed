@@ -2236,6 +2236,8 @@ namespace pflow {
     deque<deque<uint> > i_neighbors;
     deque<deque<double> > distances;
     double rmin=0;
+    //SC+CO20220711 - unique_only can only be true if we scale properly by the Wyckoff multiplicity
+    //easier to brute force count
     bool prim=true,unique_only=false;
     xstr.GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " atoms_cell.size()=" << atoms_cell.size() << endl;}
@@ -2243,11 +2245,18 @@ namespace pflow {
     //this is bit-enumeration for sets of two (i,j) ensuring i<j
     vector<vector<int> > vvitypes=getvvitypesRDF(xstr);
     rdf_all=aurostd::xmatrix<double>(nbins,vvitypes.size()+1); //resize, +1 because last column will be totals
+    uint i=0;
+    //SC+CO20220711
+    //if the unit cell has more than one atom of each type, we need to average their contributions
+    //this is equivalent to adding partial contribution based on num_each_type
+    vector<double> vincrements;
+    for(i=0;i<atoms_cell.size();i++){vincrements.push_back( 1.0/xstr.num_each_type[ atoms_cell[i].type ] );}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " vincrements=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vincrements),",") << endl;}
     int itype=0,ibin=0;
     double dist=0.0,rad=0.0;
-    double drad=rmax/(double)nbins; //sphere shell volume=4*pi*r^2*dr
+    double drad=rmax/(double)nbins; //sphere shell volume=4*pi*rad^2*drad
     vector<int> vitypes;
-    uint i=0,j=0,k=0;
+    uint j=0,k=0;
     for(i=0;i<i_neighbors.size();i++){
       for(j=0;j<i_neighbors[i].size();j++){
         dist=distances[i][j];
@@ -2269,8 +2278,8 @@ namespace pflow {
             cerr << __AFLOW_FUNC__ << " ibin=" << ibin << " (dist=" << dist << ")" << endl;
             cerr << __AFLOW_FUNC__ << " itype=" << itype << endl;
           }
-          rdf_all[ibin][itype]++;
-          rdf_all[ibin][rdf_all.ucols]++;  //last row is totals
+          rdf_all[ibin][itype]+=vincrements[i];
+          rdf_all[ibin][rdf_all.ucols]+=vincrements[i];  //last row is totals
         }
       }
     }
