@@ -399,7 +399,7 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype> void
     xmatrix<utype>::getxvecInPlace(xvector<utype>& xv_out, int lrow, int urow, int lcol, int ucol, int lrows_out) const {
-    /// @brief Convert xmatrix into xvector given a set of indices. 
+    /// @brief Convert an xmatrix into an xvector given a set of indices. 
     ///
     /// @param xv_out the xvector that will be changed InPlace
     /// @param lrow lower row to include in xvector 
@@ -414,15 +414,10 @@ namespace aurostd {  // namespace aurostd
     /// @mod{CO,2019110,created as getxmatInPlace (xvector overload) + xmatrix2xvector}
     /// @mod{AZ,20220711,refactored into getxvecInPlace}
     ///
-    /// This is a function that slices an xmatrix into vectors, originally written
-    /// by CO as the xv overload of getmatInPlace. It enforces that the vector is 1 dimensional
-    /// when slicing the xmatrix. lrow is lower row. urow is upper row. lcol is 
-    /// lower column and ucol is upper column. Note that the indices are inclusive.
-    /// i.e any index given will be returned. Also lcol == ucol or lrow == urow in
-    /// order to be a vector. This function is designed similarly to getxmatInPlace,
-    /// where there the base "InPlace" function drives the rest of the functions. The
-    /// InPlace designation means you must supply a vector that will then be changed
-    /// InPlace to the matrix elements that are specified by the arguments.
+    /// This is a function that slices an xmatrix into an xvector, It checks that the vector is 1-dimensional
+    /// when slicing the xmatrix. Note that the indices are inclusive.
+    /// @see
+    /// @xlink{aurostd::getxmatInplace}
       bool LDEBUG=(FALSE || XHOST.DEBUG);
       if(LDEBUG){
         cerr << "xmat=" << endl << (*this) << endl;
@@ -446,25 +441,26 @@ namespace aurostd {  // namespace aurostd
         throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"(ucol != lcol)&&(lrow != urow)",_INDEX_BOUNDS_);
       }
       
-      int rows_out = (ucol-lcol+1)*(urow-lrow+1);
-      if(! (xv_out.rows==rows_out && xv_out.lrows==lrows_out) ) { //check if necessary to create new object
-        xvector<utype> xv(rows_out, lrows_out);
+      int size_out = (ucol-lcol+1)*(urow-lrow+1);
+      int urows_out = size_out+lrows_out-1;
+      if(! (xv_out.rows==size_out && xv_out.lrows==lrows_out) ) { //check if necessary to create new object
+        xvector<utype> xv(urows_out, lrows_out);
         xv_out=xv;
       }
 
       else if(ucol == lcol){
-        for(int i = 1; i <= rows_out; i++){
+        for(int i = 1; i <= size_out; i++){
           xv_out(i) = corpus[lrow+i-1][lcol];
         }
         return;
       }
-      for(int j = 1; j <= rows_out; j++){
+      for(int j = 1; j <= size_out; j++){
         xv_out(j) = corpus[lrow][lcol+j-1];
       }
     }
 }
 namespace aurostd {  // namespace aurostd
-    /// @brief Convert xmatrix into xvector given a set of indices. 
+    /// @brief Convert an xmatrix into an xvector given a set of indices. 
     ///
     /// @param xv_out the xvector that will be changed InPlace
     /// @param lrow lower row to include in xvector 
@@ -475,7 +471,7 @@ namespace aurostd {  // namespace aurostd
     /// @return xvector 
     ///
     /// This function allocates the xvector then calls getxvecInPlace(). 
-    //
+    ///
     /// @authors
     /// @mod{CO,2019110,created as getxmatInPlace() + xmatrix2xvector()}
     /// @mod{AZ,20220711,refactored into getxvecInPlace()}
