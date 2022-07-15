@@ -31,6 +31,7 @@
         -- added extract POSCAR from aflowin (SD)
         -- imporved AFLUX calls for --compare_database_entries and --compare2database (ME)
         -- added --itc flag for structure generation (CO+DX)
+        -- fixing --cif with pocc structure (DX+CO)
 3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)
