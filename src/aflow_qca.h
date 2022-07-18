@@ -10,6 +10,9 @@
 #ifndef _AFLOW_QCA_H_
 #define _AFLOW_QCA_H_
 
+#include "aflow.h"
+#include "aflow_pocc.h"
+
 #define CONC_SHIFT 0.01 // concentration shift away from 0
 #define QCA_FILE_PREFIX string("aflow_qca_")
 

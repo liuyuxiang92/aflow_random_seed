@@ -9,9 +9,8 @@
 // 
 #ifndef _AFLOW_QCA_CPP_
 #define _AFLOW_QCA_CPP_
-#include "aflow.h"
+
 #include "aflow_qca.h"
-#include "aflow_pocc.h"
 
 // ###############################################################################
 //            AFLOW Quasi-Chemical Approximation (QCA) (2022-)
