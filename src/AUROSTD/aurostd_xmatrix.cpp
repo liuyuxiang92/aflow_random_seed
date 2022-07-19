@@ -480,9 +480,9 @@ namespace aurostd {  // namespace aurostd
     /// @xlink{aurostd::getxvecInPlace()}
     /// @xlink{aurostd::getxmatInPlace()} 
   template<class utype> xvector<utype> 
-      xmatrix<utype>::getxvec(int lrow, int urow, int lcol, int ucol) const {
+      xmatrix<utype>::getxvec(int lrow, int urow, int lcol, int ucol, int lrows_out) const {
       xvector<utype> xv_out;
-      (*this).getxvecInPlace(xv_out, lrow, urow, lcol, ucol, 1);
+      (*this).getxvecInPlace(xv_out, lrow, urow, lcol, ucol, lrows_out);
     return xv_out;
   }
 }
