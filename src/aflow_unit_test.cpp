@@ -929,15 +929,13 @@ namespace unittest {
     // Check | 1x1 xvector //AZ20220627
     // ---------------------------------------------------------------------------
     check_description = "get a 1x1 vector from xmatrix";
-    expected_xvecint = xvector<int>(1);
-    expected_xvecint(1) = 12;
+    expected_xvecint = {12};
     calculated_xvecint = full_xmatint.getxvec(3,3,4,4);
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
     
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520
     // ---------------------------------------------------------------------------
-     
     check_function = "aurostd::getEHermite()";
     check_description = "calculate elementary Hermite transformation";
     expected_xmatint = {{5,-2}, {-12, 5}};

@@ -449,12 +449,12 @@ namespace aurostd {  // namespace aurostd
       }
 
       else if(ucol == lcol){
-        for(int i = 1; i <= size_out; i++){
+        for(int i = lrows_out; i <= urows_out; i++){
           xv_out(i) = corpus[lrow+i-1][lcol];
         }
         return;
       }
-      for(int j = 1; j <= size_out; j++){
+      for(int j = lrows_out; j <= urows_out; j++){
         xv_out(j) = corpus[lrow][lcol+j-1];
       }
     }
