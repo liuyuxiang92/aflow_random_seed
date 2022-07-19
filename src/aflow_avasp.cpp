@@ -6768,20 +6768,20 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
       if(DEBUG_SKIP) cerr << "SKIP (calculated): " << xvasp.AVASP_label << endl;
       return TRUE;
     }
-    for(uint ilattice=0;ilattice<bravais_lattices.size();ilattice++) {//HE20220420 switch to global bravais lattices list
+    for(uint ilattice=0;ilattice<BRAVAIS_LATTICES.size();ilattice++) {//HE20220420 switch to global bravais lattices list
       // [OBSOLETE] if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),lattices[ilattice]+"/"+xvasp.AVASP_label+" "))
-      if(aurostd::substring2bool(XHOST_Library_CALCULATED_ICSD_LIB,bravais_lattices[ilattice]+"/"+xvasp.AVASP_label+" ")) {
-        if(DEBUG_SKIP) cerr << "SKIP (calculated): " << bravais_lattices[ilattice] << "/" << xvasp.AVASP_label << endl;
+      if(aurostd::substring2bool(XHOST_Library_CALCULATED_ICSD_LIB,BRAVAIS_LATTICES[ilattice]+"/"+xvasp.AVASP_label+" ")) {
+        if(DEBUG_SKIP) cerr << "SKIP (calculated): " << BRAVAIS_LATTICES[ilattice] << "/" << xvasp.AVASP_label << endl;
         return TRUE;
       }
     }
     // TEST IF PREPARED
     string label;
     label="./ICSD/"+xvasp.AVASP_label+"/"+_AFLOWIN_;if(aurostd::FileExist(label)) {if(DEBUG_SKIP) cerr << "SKIP (prepared): " << xvasp.AVASP_label << endl; return TRUE;}
-    for(uint ilattice=0;ilattice<bravais_lattices.size();ilattice++) {//HE20220420 switch to global bravais lattices list
-      label="./ICSD/"+bravais_lattices[ilattice]+"/"+xvasp.AVASP_label+"/"+_AFLOWIN_;
+    for(uint ilattice=0;ilattice<BRAVAIS_LATTICES.size();ilattice++) {//HE20220420 switch to global bravais lattices list
+      label="./ICSD/"+BRAVAIS_LATTICES[ilattice]+"/"+xvasp.AVASP_label+"/"+_AFLOWIN_;
       if(aurostd::FileExist(label)) {
-        if(DEBUG_SKIP) cerr << "SKIP (prepared): " << bravais_lattices[ilattice] << "/" << xvasp.AVASP_label << endl;
+        if(DEBUG_SKIP) cerr << "SKIP (prepared): " << BRAVAIS_LATTICES[ilattice] << "/" << xvasp.AVASP_label << endl;
         return TRUE;
       }
     }

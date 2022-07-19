@@ -470,11 +470,11 @@ namespace aflowlib {
       aflowlib::_aflowlib_entry data;
       vector<aflowlib::_aflowlib_entry> vdata;
       if(!silent){oss << "aflowlib::PrototypeLibraries: Contacting \"" <<  XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER") << "\"" << endl;}
-      for(uint i=0;i<bravais_lattices.size();i++) {//HE20220420 switch to global bravais lattices list
+      for(uint i=0;i<BRAVAIS_LATTICES.size();i++) {//HE20220420 switch to global bravais lattices list
         data.clear();
-        if(!silent){oss << "aflowlib::PrototypeLibraries: Scanning " << bravais_lattices[i] << " ";}
-        data.url2aflowlib(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+bravais_lattices[i]+"/?format=text",oss,FALSE);vdata.push_back(data);
-        if(LDEBUG) { cerr << XPID << "aflowlib::PrototypeLibraries: AFLOWLIB " << bravais_lattices[i] << "=" << data.vaflowlib_entries.size() << endl; }
+        if(!silent){oss << "aflowlib::PrototypeLibraries: Scanning " << BRAVAIS_LATTICES[i] << " ";}
+        data.url2aflowlib(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+BRAVAIS_LATTICES[i]+"/?format=text",oss,FALSE);vdata.push_back(data);
+        if(LDEBUG) { cerr << XPID << "aflowlib::PrototypeLibraries: AFLOWLIB " << BRAVAIS_LATTICES[i] << "=" << data.vaflowlib_entries.size() << endl; }
         for(uint j=0;j<data.vaflowlib_entries.size();j++) {
           _label2=data.vaflowlib_entries.at(j);
           aurostd::string2tokens(_label2,tokens,"_");
@@ -761,15 +761,15 @@ namespace aflowlib {
       if(tokensl.size()>1) label_postfix_ICSD_AFLOWLIB=tokensl.at(1);
 
 
-      for(uint i=0;i<bravais_lattices.size()&&aurl.empty();i++) { //HE20220420 switch to global bravais lattices list
+      for(uint i=0;i<BRAVAIS_LATTICES.size()&&aurl.empty();i++) { //HE20220420 switch to global bravais lattices list
         data.clear();
-        *voss << "aflowlib::PrototypeLibraries: Scanning " << bravais_lattices[i] << " ";
-        data.url2aflowlib(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+bravais_lattices[i]+"/?format=text",*voss,FALSE);vdata.push_back(data);
-        if(LDEBUG) { *voss << "aflowlib::PrototypeLibraries: AFLOWLIB " << bravais_lattices[i] << "=" << data.vaflowlib_entries.size() << endl; }
+        *voss << "aflowlib::PrototypeLibraries: Scanning " << BRAVAIS_LATTICES[i] << " ";
+        data.url2aflowlib(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+BRAVAIS_LATTICES[i]+"/?format=text",*voss,FALSE);vdata.push_back(data);
+        if(LDEBUG) { *voss << "aflowlib::PrototypeLibraries: AFLOWLIB " << BRAVAIS_LATTICES[i] << "=" << data.vaflowlib_entries.size() << endl; }
         for(uint j=0;j<data.vaflowlib_entries.size()&&aurl.empty();j++) {
           if(mode==LIBRARY_MODE_ICSD_AFLOWLIB) {
             if(data.vaflowlib_entries.at(j)==label) {
-              aurl=XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+bravais_lattices[i]+"/"+data.vaflowlib_entries.at(j);
+              aurl=XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+BRAVAIS_LATTICES[i]+"/"+data.vaflowlib_entries.at(j);
               aurostd::StringSubst(aurl,AFLOWLIB_SERVER_DEFAULT,XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER"));
               found=TRUE;
               *voss << "found aurl=" << aurl;
@@ -779,7 +779,7 @@ namespace aflowlib {
             aurostd::string2tokens(data.vaflowlib_entries.at(j),tokensd,"_");
             if(tokensd.size()>0 && !label_icsd_ICSD_AFLOWLIB.empty()) {
               if(label_icsd_ICSD_AFLOWLIB==tokensd.at(tokensd.size()-1)) {
-                aurl=XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+bravais_lattices[i]+"/"+data.vaflowlib_entries.at(j);
+                aurl=XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+BRAVAIS_LATTICES[i]+"/"+data.vaflowlib_entries.at(j);
                 aurostd::StringSubst(aurl,AFLOWLIB_SERVER_DEFAULT,XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER"));
                 found=TRUE;
                 *voss << "found aurl=" << aurl;
@@ -2446,15 +2446,15 @@ namespace aflowlib {
       aflowlib::_aflowlib_entry data;
       vector<aflowlib::_aflowlib_entry> vdata;
 
-      for(uint i=0;i<bravais_lattices.size();i++) { //HE20220420 switch to global bravais lattices list
+      for(uint i=0;i<BRAVAIS_LATTICES.size();i++) { //HE20220420 switch to global bravais lattices list
         data.clear();
-        cerr << soliloquy << " Scanning " << bravais_lattices[i] << " "; //CO20181128
-        data.url2aflowlib(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+bravais_lattices[i]+"/?format=text",cout,FALSE);vdata.push_back(data);
+        cerr << soliloquy << " Scanning " << BRAVAIS_LATTICES[i] << " "; //CO20181128
+        data.url2aflowlib(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+BRAVAIS_LATTICES[i]+"/?format=text",cout,FALSE);vdata.push_back(data);
         for(uint j=0;j<data.vaflowlib_entries.size();j++) {
           aurostd::string2tokens(data.vaflowlib_entries.at(j),tokens,"_");
           KBIN::VASP_SplitAlloySpecies(tokens.at(0),speciesX,vnatomsX);
           if(speciesX.size()<=voutput.size()) {
-            voutput.at(speciesX.size()-1).push_back(tokens.at(0)+" ["+tokens.at(0)+"] "+bravais_lattices[i]+" "+data.vaflowlib_entries.at(j)+" ICSD_"+tokens.at(tokens.size()-1)+"       ("+aurostd::utype2string(speciesX.size())+")");
+            voutput.at(speciesX.size()-1).push_back(tokens.at(0)+" ["+tokens.at(0)+"] "+BRAVAIS_LATTICES[i]+" "+data.vaflowlib_entries.at(j)+" ICSD_"+tokens.at(tokens.size()-1)+"       ("+aurostd::utype2string(speciesX.size())+")");
           }
         }
         cerr << "[" << data.vaflowlib_entries.size() << " entries]" << endl;

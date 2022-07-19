@@ -1171,7 +1171,7 @@ namespace aflowlib {
     std::vector<std::string> icsd_search_path_list;
     std::vector<std::string> libx_search_path_list;
     std::vector<std::string> libx_crawl_list;
-    for (std::vector<std::string>::const_iterator sym = bravais_lattices.begin(); sym != bravais_lattices.end(); sym++) {
+    for (std::vector<std::string>::const_iterator sym = BRAVAIS_LATTICES.begin(); sym != BRAVAIS_LATTICES.end(); sym++) {
       icsd_search_path_list.emplace_back(m_restapi_server + m_restapi_path + "ICSD" + "_" + m_restapi_collection + "/" + *sym + "/");
     }
     if (alloy_list.size()>1) {

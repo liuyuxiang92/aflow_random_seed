@@ -5300,7 +5300,7 @@ namespace aflowlib {
             vflags.flag("FLAG::FOUND",TRUE);
             catalog=entry_tmp.catalog;
             label=directory;
-            for(uint ilat=0;ilat<bravais_lattices.size();ilat++) aurostd::StringSubst(label,bravais_lattices[ilat]+"/",""); //HE20220420 switch to global bravais lattices list
+            for(uint ilat=0;ilat<BRAVAIS_LATTICES.size();ilat++) aurostd::StringSubst(label,BRAVAIS_LATTICES[ilat]+"/",""); //HE20220420 switch to global bravais lattices list
             aurostd::StringSubst(label,"/",".");
           }
         }
@@ -5338,9 +5338,9 @@ namespace aflowlib {
         for(uint i=0;i<vdir2test.size()&&!vflags.flag("FLAG::FOUND");i++) { // allow i=j=k so that 1 OR 2 OR 3 dots are also tested
           dir2test=vdir2test.at(i);
           //		cout << "testing(" << i << ") = " << dir2test << endl;
-          for(uint ilat=0;ilat<bravais_lattices.size()&&!vflags.flag("FLAG::FOUND");ilat++) { //HE20220420 switch to global bravais lattices list
-            if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("ICSD")+"/RAW/"+bravais_lattices[ilat]+"/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-              catalog="ICSD";directory=bravais_lattices[ilat]+"/"+dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);
+          for(uint ilat=0;ilat<BRAVAIS_LATTICES.size()&&!vflags.flag("FLAG::FOUND");ilat++) { //HE20220420 switch to global bravais lattices list
+            if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("ICSD")+"/RAW/"+BRAVAIS_LATTICES[ilat]+"/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+              catalog="ICSD";directory=BRAVAIS_LATTICES[ilat]+"/"+dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);
             }
           }
           if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB0")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
