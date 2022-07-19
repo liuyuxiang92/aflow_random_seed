@@ -48,10 +48,11 @@ namespace aurostd {
         xvector<utype> operator()(int) const;                               // indicize i
         xvector<utype> getcol(int) const;                                   // return column i  //CO20191110
         xvector<utype> getdiag(int k=0,int _lrows=1) const;                 // return diagonal, k=0 is main diagonal, k>0 is above diagonal //CO20191201
-        void getmatInPlace(xmatrix<utype>& mat_out,int lrow,int urow,int lcol,int ucol,int lrows_out=AUROSTD_MAX_INT,int lcols_out=AUROSTD_MAX_INT) const; // return submatrix as xmatrix //CO20191110
-        void getmatInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol,int lrows_out=AUROSTD_MAX_INT,int lcols_out=AUROSTD_MAX_INT) const; //return submatrix as xvector //CO20191110
-        xmatrix<utype> getmat(int lrow,int urow,int lcol,int ucol,int lrows_out=AUROSTD_MAX_INT,int lcols_out=AUROSTD_MAX_INT) const; // return submatrix as xmatrix //CO20191110
-        xvector<utype> getvec(int lrow,int urow,int lcol,int ucol,int lrows_out=AUROSTD_MAX_INT,int lcols_out=AUROSTD_MAX_INT) const; //return submatrix as xvector //CO20191110
+        xvector<utype> getxvec() const;                                      // updated function to return a vector from a 1-d matrix //AZ20220704
+        xvector<utype> getxvec(int lrow,int urow,int lcol,int ucol, int lrows_out=1) const;   // return a vector from a matrix //AZ20220704
+        void getxmatInPlace(xmatrix<utype>& mat_out,int lrow,int urow,int lcol,int ucol,int lrows_out=1,int lcols_out=1) const; // return submatrix as xmatrix //CO20191110
+        void getxvecInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol, int lrows_out=1) const; // return xvectorInPlace from xmatrix 
+        xmatrix<utype> getxmat(int lrow,int urow,int lcol,int ucol,int lrows_out=1,int lcols_out=1) const; // return submatrix as xmatrix //CO20191110
         void setrow(const xvector<utype>& row,int irow=1);                  // set row of matrix //CO20190808
         void setcol(const xvector<utype>& col,int icol=1);                  // set col of matrix //CO20190808
         void setmat(const xmatrix<utype>& mat,int irow=1,int icol=1);       // set submat  //CO20190808
@@ -347,9 +348,6 @@ namespace aurostd {
 
   template<class utype> xmatrix<utype>
     vectorvector2xmatrix(const vector<vector<utype> >& xmat) __xprototype;
-
-  template<class utype> xvector<utype>
-    xmatrix2xvector(const xmatrix<utype>& xmat,int urow,int ucol,int lrow,int lcol,int lrows_out) __xprototype; //CO20191110
 
   template<class utype> xmatrix<double> 
     xmatrixutype2double(const xmatrix<utype>& a); //CO20191201
