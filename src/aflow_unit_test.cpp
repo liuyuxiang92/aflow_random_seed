@@ -816,7 +816,7 @@ namespace unittest {
     points.push_back({4.0, 2.0, 0.0});
     points.push_back({4.0, 0.0, 0.0});
 
-    // covert points to integer to test special implementation
+    // convert points to integer to test special implementation
     for (size_t i_point=0; i_point<points.size(); i_point++){
       ipoints.push_back({(int) points[i_point][1], (int) points[i_point][2], (int) points[i_point][3]});
     }
@@ -845,7 +845,7 @@ namespace unittest {
     points.push_back({1.0, 1.0, 1.0});
     points.push_back({5.0, 0.0, 5.0});
 
-    // covert points to integer to test special implementation
+    // convert points to integer to test special implementation
     for (size_t i_point=0; i_point<points.size(); i_point++){
       ipoints.push_back({(int) points[i_point][1], (int) points[i_point][2], (int) points[i_point][3]});
     }
@@ -893,6 +893,46 @@ namespace unittest {
     calculated_xmatint = aurostd::reshape(calculated_xmatint ,3,4);
     checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
 
+    // ---------------------------------------------------------------------------
+    // Check convert to xvector //AZ20220627
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::getxvec()";
+    xmatrix<int> full_xmatint, xmatint;
+    // need this matrix to test slicing
+    full_xmatint = xmatrix<int>(3,4);
+    full_xmatint = {{1,2,3,4},
+                    {5,6,7,8},
+                    {9,10,11,12}};
+    check_description = "getxvec() test for type conversion";
+    xvector<int> expected_xvecint(3);
+    xvector<int> calculated_xvecint(3);
+    expected_xvecint = {1,5,9};
+    calculated_xvecint = full_xmatint.getxmat(1,3,1,1).getxvec();
+    checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | column xvector //AZ20220627
+    // ---------------------------------------------------------------------------
+    check_description = "get column xvector from xmatrix";
+    calculated_xvecint = full_xmatint.getxvec(1,3,1,1);
+    checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+    
+    // ---------------------------------------------------------------------------
+    // Check | row xvector //AZ20220627
+    // ---------------------------------------------------------------------------
+    check_description = "get row xvector from xmatrix";
+    expected_xvecint = {1,2,3};
+    calculated_xvecint = full_xmatint.getxvec(1,1,1,3);
+    checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | 1x1 xvector //AZ20220627
+    // ---------------------------------------------------------------------------
+    check_description = "get a 1x1 vector from xmatrix";
+    expected_xvecint = {12};
+    calculated_xvecint = full_xmatint.getxvec(3,3,4,4);
+    checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
+    
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520
     // ---------------------------------------------------------------------------
