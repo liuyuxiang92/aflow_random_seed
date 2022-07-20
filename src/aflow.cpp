@@ -170,9 +170,9 @@ int main(int _argc,char **_argv) {
       mat(2,1)=7;mat(2,2)=10;mat(2,3)=13;
       mat(3,1)=8;mat(3,2)=11;mat(3,3)=14;
       if(LDEBUG){cerr << soliloquy << " mat=" << endl;cerr << mat << endl;}
-      //getmat()
+      //getxmat()
       xmatrix<double> submat;
-      mat.getmatInPlace(submat,2,3,2,3);
+      mat.getxmatInPlace(submat,2,3,2,3);
       if(LDEBUG){cerr << soliloquy << " submat=" << endl;cerr << submat << endl;}
       //setmat()
       mat.setmat(submat,1,1); //do nothing
