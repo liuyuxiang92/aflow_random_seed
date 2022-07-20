@@ -3558,9 +3558,9 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
-    XHOST.vschema.push_attached("SCHEMA::NAME:RECIPROCAL_GEOMETRY","reciprocal_geometry");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:RECIPROCAL_GEOMETRY","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:RECIPROCAL_GEOMETRY","numbers");
+    XHOST.vschema.push_attached("SCHEMA::NAME:RECIPROCAL_GEOMETRY_RELAX","reciprocal_geometry_relax");
+    XHOST.vschema.push_attached("SCHEMA::UNIT:RECIPROCAL_GEOMETRY_RELAX","");
+    XHOST.vschema.push_attached("SCHEMA::TYPE:RECIPROCAL_GEOMETRY_RELAX","numbers");
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
