@@ -678,7 +678,7 @@ namespace aflowlib {
         aurostd::string2tokens(content, tokens, ",");
         kpoints_nnn_static = aurostd::vector2xvector(tokens);
         } break;  //ME20190129
-      case (aurostd::ctcrc64("kpoints_bands_path")): { aurostd::string2tokens(content, kpoints_pairs, ","); }  //ME20190129
+      case (aurostd::ctcrc64("kpoints_bands_path")): { aurostd::string2tokens(content, kpoints_pairs, ","); } break;  //ME20190129
       case (aurostd::ctcrc64("kpoints_bands_nkpts")): {kpoints_bands_path_grid = aurostd::string2utype<int>(content); } break;  //ME20190129
       case (aurostd::ctcrc64("enthalpy_cell")): { enthalpy_cell = aurostd::string2utype<double>(content); } break;
       case (aurostd::ctcrc64("enthalpy_atom")): { enthalpy_atom = aurostd::string2utype<double>(content); } break;

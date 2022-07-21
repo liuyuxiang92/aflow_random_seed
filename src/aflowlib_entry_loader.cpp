@@ -658,6 +658,7 @@ namespace aflowlib {
           m_logger_message << "Could not find AFLOW entries in the filesystem at " << m_filesystem_path;
           outError(__AFLOW_FUNC__, __LINE__);
         }
+        break;
       }
 
       case Source::FILESYSTEM_RAW: {
