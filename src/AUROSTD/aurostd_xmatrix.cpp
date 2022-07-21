@@ -396,22 +396,161 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
+namespace aurostd {  // namespace aurostd
+  template<class utype> void
+    xmatrix<utype>::getxvecInPlace(xvector<utype>& xv_out, int lrow, int urow, int lcol, int ucol, int lrows_out) const {
+    /// @brief Convert an xmatrix into an xvector given a set of indices. 
+    ///
+    /// @param xv_out the xvector that will be changed InPlace
+    /// @param lrow lower row to include in xvector 
+    /// @param urow upper row to include in xvector
+    /// @param lcol lower column to include in xvector
+    /// @param ucol upper column to include in xvector
+    /// @param lrows_out the lower rows of the output xvector (if it does not match the xvector will be resized)
+    ///
+    /// @return void 
+    ///
+    /// @authors
+    /// @mod{CO,2019110,created as getxmatInPlace (xvector overload) + xmatrix2xvector}
+    /// @mod{AZ,20220711,refactored into getxvecInPlace}
+    ///
+    /// This is a function that slices an xmatrix into an xvector, It checks that the vector is 1-dimensional
+    /// when slicing the xmatrix. Note that the indices are inclusive.
+    /// @see
+    /// @xlink{aurostd::getxmatInplace}
+      bool LDEBUG=(FALSE || XHOST.DEBUG);
+      if(LDEBUG){
+        cerr << "xmat=" << endl << (*this) << endl;
+        cerr << "urows=" << urows << endl;
+        cerr << "ucols=" << ucols << endl;
+        cerr << "lrows=" << lrows << endl;
+        cerr << "lcols=" << lcols << endl;
+        cerr << "urow=" << urow << endl;
+        cerr << "ucol=" << ucol << endl;
+        cerr << "lrow=" << lrow << endl;
+        cerr << "lcol=" << lcol << endl;
+       }
+      if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow<lrows",_INDEX_BOUNDS_);}
+      if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_INDEX_BOUNDS_);}
+      if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol<lcols",_INDEX_BOUNDS_);}
+      if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ucol>ucols",_INDEX_BOUNDS_);}
+      if(lcol>ucol){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol>ucol",_INDEX_BOUNDS_);}
+      if(lrow>urow){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow>urow",_INDEX_BOUNDS_);}
+
+      if((ucol != lcol)&&(lrow != urow)){
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"(ucol != lcol)&&(lrow != urow)",_INDEX_BOUNDS_);
+      }
+      
+      int size_out = (ucol-lcol+1)*(urow-lrow+1);
+      int urows_out = size_out+lrows_out-1;
+      if(! (xv_out.rows==size_out && xv_out.lrows==lrows_out) ) { //check if necessary to create new object
+        xvector<utype> xv(urows_out, lrows_out);
+        xv_out=xv;
+      }
+
+      else if(ucol == lcol){
+        for(int i = lrows_out; i <= urows_out; i++){
+          xv_out(i) = corpus[lrow+i-1][lcol];
+        }
+        return;
+      }
+      for(int j = lrows_out; j <= urows_out; j++){
+        xv_out(j) = corpus[lrow][lcol+j-1];
+      }
+    }
+}
+namespace aurostd {  // namespace aurostd
+    /// @brief Convert an xmatrix into an xvector given a set of indices. 
+    ///
+    /// @param xv_out the xvector that will be changed InPlace
+    /// @param lrow lower row to include in xvector 
+    /// @param urow upper row to include in xvector
+    /// @param lcol lower column to include in xvector
+    /// @param ucol upper column to include in xvector
+    ///
+    /// @return xvector 
+    ///
+    /// This function allocates the xvector then calls getxvecInPlace(). 
+    ///
+    /// @authors
+    /// @mod{CO,2019110,created as getxmatInPlace() + xmatrix2xvector()}
+    /// @mod{AZ,20220711,refactored into getxvecInPlace()}
+    ///
+    /// @see
+    /// @xlink{aurostd::getxvecInPlace()}
+    /// @xlink{aurostd::getxmatInPlace()} 
+  template<class utype> xvector<utype> 
+      xmatrix<utype>::getxvec(int lrow, int urow, int lcol, int ucol, int lrows_out) const {
+      xvector<utype> xv_out;
+      (*this).getxvecInPlace(xv_out, lrow, urow, lcol, ucol, lrows_out);
+    return xv_out;
+  }
+}
+namespace aurostd {  // namespace aurostd
+    /// @brief Convert xmatrix into xvector given a set of indices. 
+    ///
+    /// @param void 
+    ///
+    /// @return xvector 
+    ///
+    /// @authors
+    /// @mod{AZ,20220711,created}
+    ///
+    /// This function performs the same task as getxvecInPlace(), but it 
+    /// assumes that you have already passed it a 1-d slice of the xmatrix
+    /// and then performs the type conversion.
+    /// @see
+    /// @xlink{aurostd::getxvecInPlace()}
+    /// @xlink{aurostd::getxmatInPlace()} 
+  template<class utype> xvector<utype>
+      xmatrix<utype>::getxvec() const {
+      return (*this).getxvec(lrows, urows, lcols, ucols);
+}
+}
 //CO20190808
 namespace aurostd {  // namespace aurostd
-  //this function returns a submatrix mat_out spanning urow:lrow,ucol:lcol of the original matrix
-  //lrows_out,lcols_out specifies lrows,lcols of mat_out
-  //this is different than submatrix(), which returns back a submatrix by cutting out irow,jcol
+    /// @brief Convert xmatrix into a submatrix given a set of indices. 
+    ///
+    /// @param mat_out the matrix that will be changed InPlace
+    /// @param lrow lower row to include in submatrix 
+    /// @param urow upper row to include in submatrix
+    /// @param lcol lower column to include in submatrix
+    /// @param ucol upper column to include in submatrix
+    /// @param lrows_out the lower row of the matrix that will be written over mat_out (if it is not the same it will allocate a new matrix)
+    /// @param lcols_out the lower column of the matrix that will be written over mat_out (if it is not the same it will allocate a new matrix)
+    ///
+    /// @return void 
+    ///
+    /// @authors
+    /// @mod{CO,2019110,created}
+    /// @mod{AZ,20220711,modified}
+    ///
+    /// This is a function that slices an xmatrix into into a submatrix, originally written
+    /// by CO. When slicing the xmatrix. lrow is lower row. urow is upper row. lcol is 
+    /// lower column and ucol is upper column. Note that the indices are inclusive.
+    /// i.e any index given will be returned. Also lcol == ucol or lrow == urow in
+    /// order to be a vector. This function is designed so the base "InPlace" function
+    /// drives the rest of the functions. The InPlace designation means you must supply 
+    /// a matrix that will then be changed InPlace to the matrix elements that are specified
+    /// by the arguments.
+    /// @note
+    ///
+    /// CO: this function returns a submatrix mat_out spanning urow:lrow,ucol:lcol of the original matrix
+    /// lrows_out,lcols_out specifies lrows,lcols of mat_out
+    /// this is different than submatrix(), which returns back a submatrix by cutting out irow,jcol
   template<class utype> void
-    xmatrix<utype>::getmatInPlace(xmatrix<utype>& mat_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
-      string soliloquy="aurostd::getmatInPlace():";
-      if(lrows_out==AUROSTD_MAX_INT){lrows_out=lrows;}
-      if(lcols_out==AUROSTD_MAX_INT){lcols_out=lcols;}
-      if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lrow<lrows",_VALUE_ILLEGAL_);}
-      if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"urow>urows",_VALUE_ILLEGAL_);}
-      if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"lcol<lcols",_VALUE_ILLEGAL_);}
-      if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ucol>ucols",_VALUE_ILLEGAL_);}
+    xmatrix<utype>::getxmatInPlace(xmatrix<utype>& mat_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
+      //AZ20220627 START
+      if(lrow<lrows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow<lrows",_INDEX_BOUNDS_);}
+      if(urow>urows){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"urow>urows",_INDEX_BOUNDS_);}
+      if(lcol<lcols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol<lcols",_INDEX_BOUNDS_);}
+      if(ucol>ucols){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ucol>ucols",_INDEX_BOUNDS_);}
+      if(lcol>ucol){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lcol>ucol",_INDEX_BOUNDS_);}
+      if(lrow>urow){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lrow>urow",_INDEX_BOUNDS_);}
+      //AZ20220627 END
       int rows_out=(urow-lrow)+1;
       int cols_out=(ucol-lcol)+1;
+      
       if(! ( mat_out.rows==rows_out && mat_out.cols==cols_out && mat_out.lrows==lrows_out && mat_out.lcols==lcols_out ) ) { //check if necessary to create new object
         xmatrix<utype> mat(rows_out,cols_out,lrows_out,lcols_out);
         mat_out=mat;
@@ -420,23 +559,11 @@ namespace aurostd {  // namespace aurostd
         for(int j=lcol;j<=ucol;j++){mat_out[(i-lrow)+mat_out.lrows][(j-lcol)+mat_out.lcols]=corpus[i][j];}
       }
     }
-  template<class utype> void
-    xmatrix<utype>::getmatInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output //CO20191110
-      xmatrix<utype> xmat;
-      (*this).getmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
-      xv_out=xmatrix2xvector(xmat,urow,ucol,lrow,lcol,(urow==lrow) ? lrows_out : lcols_out);
-    }
   template<class utype> xmatrix<utype>
-    xmatrix<utype>::getmat(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
+    xmatrix<utype>::getxmat(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
       xmatrix<utype> xmat;
-      (*this).getmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
+      (*this).getxmatInPlace(xmat,lrow,urow,lcol,ucol,lrows_out,lcols_out);
       return xmat;
-    }
-  template<class utype> xvector<utype>
-    xmatrix<utype>::getvec(int lrow,int urow,int lcol,int ucol,int lrows_out,int lcols_out) const { //lrow, lcol references corpus, lrows_out references output  //CO20191110
-      xvector<utype> xvec;
-      (*this).getmatInPlace(xvec,lrow,urow,lcol,ucol,lrows_out,lcols_out);
-      return xvec;
     }
 }
 
@@ -1789,23 +1916,6 @@ namespace aurostd {                   // conversion to xmatrix<utype>
         for(int j=lcols;j<=jsize+lcols-1;j++)
           xmat[i][j]=aurostd::string2utype<utype>(mat[i-lrows][j-lcols]);
       return xmat;
-    }
-}
-
-namespace aurostd {                   // conversion to xvector
-  template<class utype> xvector<utype>
-    xmatrix2xvector(const xmatrix<utype>& xmat,int urow,int ucol,int lrow,int lcol,int lrows_out) __xprototype {  //CO20191110
-      string soliloquy="aurostd::xmatrix2xvector():";
-      if(urow==lrow){
-        xvector<utype> xv((ucol-lcol)+1,lrows_out);
-        for(int i=lcol;i<=ucol;i++){xv(i-lcol+xv.lrows)=xmat[i][lrow];}
-        return xv;
-      }else if(ucol==lcol){
-        xvector<utype> xv((urow-lrow)+1,lrows_out);
-        for(int i=lrow;i<=urow;i++){xv(i-lrow+xv.lrows)=xmat[lcol][i];}
-        return xv;
-      }else{throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"cannot create 2D xvector",_INPUT_ILLEGAL_);}
-      return xvector<utype>(0);
     }
 }
 
@@ -4529,7 +4639,7 @@ namespace aurostd {
       for(int k=R.lcols;k<=R.ucols;k++) {
         if(LDEBUG){cerr << soliloquy << " step k=" << k << endl;}
         xmatrix<utype> x(R.urows,R.lcols,R.lrows,R.lcols);
-        x.setmat(R.getmat(k,R.urows,k,k),k,R.lcols);  //x(k:m,1)=R(k:m,k);
+        x.setmat(R.getxmat(k,R.urows,k,k),k,R.lcols);  //x(k:m,1)=R(k:m,k);
         if(LDEBUG){cerr << soliloquy << " x=" << endl;cerr << x << endl;}
         xmatrix<utype> v(x);  //+x first
         v[k][v.lcols]=x[k][x.lcols]+aurostd::modulus(x);
@@ -4574,12 +4684,12 @@ namespace aurostd {
       R=mat_orig; //reset
 
       int i=0,k=0;
-      xmatrix<utype> x,A; //since x and A changes size with each loop, let getmatInPlace() handle it internally
+      xmatrix<utype> x,A; //since x and A changes size with each loop, let getxmatInPlace() handle it internally
       utype vModulus = (utype)0;
       std::vector<xmatrix<utype> > V; //we need to save v's, Q is calculated afterwards and needs all v's present
       for(k=R.lcols;k<=R.ucols;k++) {
         if(LDEBUG){cerr << soliloquy << " step k=" << k << endl;}
-        R.getmatInPlace(x,k,R.urows,k,k);  //build R([k:m],l)
+        R.getxmatInPlace(x,k,R.urows,k,k);  //build R([k:m],l)
         if(LDEBUG){cerr << soliloquy << " x=" << endl;cerr << x << endl;}
         //v_k=sign(x1)||x||e1+x
         xmatrix<utype> v(x);  //+x first
@@ -4591,7 +4701,7 @@ namespace aurostd {
           v/=vModulus;
           if(LDEBUG){cerr << soliloquy << " v(  normalized)=" << endl;cerr << v << endl;}
           if(LDEBUG){cerr << soliloquy << " R( pre)=" << endl;cerr << R << endl;}
-          R.getmatInPlace(A,k,R.urows,k,R.ucols);  //build R([k:m],[k:m])
+          R.getxmatInPlace(A,k,R.urows,k,R.ucols);  //build R([k:m],[k:m])
           if(LDEBUG){cerr << soliloquy << " A( pre)=" << endl;cerr << A << endl;}
           A-=(utype)2.0*v*trasp(v)*A;
           if(LDEBUG){cerr << soliloquy << " A(post)=" << endl;cerr << A << endl;}
@@ -4608,7 +4718,7 @@ namespace aurostd {
         for(i=R.lrows;i<=R.urows;i++){ek[i][ek.lcols]=(i==k) ? (utype)1 : (utype)0;}
         if(LDEBUG){cerr << soliloquy << " ek( pre)=" << endl;cerr << ek << endl;}
         for(i=R.ucols;i>=R.lcols;i--){
-          ek.getmatInPlace(x,i,R.urows,R.lcols,R.lcols);
+          ek.getxmatInPlace(x,i,R.urows,R.lcols,R.lcols);
           if(LDEBUG){cerr << soliloquy << " x( pre)=" << endl;cerr << x << endl;}
           x-=(utype)2.0*V[i-R.lcols]*trasp(V[i-R.lcols])*x;
           if(LDEBUG){cerr << soliloquy << " x(post)=" << endl;cerr << x << endl;}

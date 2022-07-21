@@ -333,8 +333,11 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   aurostd::xmatrix<double> dxm; //SD20220512
   xdouble(m);xint(m);m=+m;m=-m;o+=m(1)[1];o+=m(1,1);o+=m[1][1];m=identity(m);m=identity(x,1,1);m=identity(x,1);
   vv=m.getcol(1);vv=m.getdiag(0,1);m.setrow(v);m.setcol(v);m.setmat(n);m.setmat(v);m=n;m=m+n;m=m-n;m=m*n;adjointInPlace(m,n);n=adjoint(m);m=inverseByAdjoint(m);m=inverse(m);isNonInvertible(m);m=reduce_to_shortest_basis(m);		//CO20190329 - clang doesn't like x=x, changing to x=y  //CO20191110  //CO20191201
-  m*=(utype)5;m/=(utype)6;m+=(utype)7;  //CO20190911
-  m.getmatInPlace(m,1,1,1,1,1,1);m.getmatInPlace(vv,1,1,1,1,1,1); //CO20190911
+  m*=(utype)5;m/=(utype)6;  //CO20190911
+  m.getxmatInPlace(m,1,1,1,1,1,1); //CO20190911
+  m.getxmat(1,1,1,1,1); //AZ20220627
+  m.getxvecInPlace(vv,1,1,1,1,1); //AZ20220704 
+  vv=m.getxvec();vv=m.getxvec(1,1,1,1); //AZ20220704 
   m=x*m*x/x;o+=(m==m);o+=(m!=m);o+=trace(m);m=-n;traspSquareInPlace(m,false);traspInPlace(m,false);traspInPlace(m,m,false);m=trasp(m);clear(m);mkron=aurostd::KroneckerProduct(mm,mmm);		//CO20190329 - clang doesn't like x=x, changing to x=y
   m=m+x;m=x+m; //SD20220518
   o+=m(1)*v; //SD20220510
