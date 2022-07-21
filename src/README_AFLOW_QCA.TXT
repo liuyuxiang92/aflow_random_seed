@@ -11,11 +11,7 @@ AFLOW-QCA README:
 
 README written by: Simon Divilov (simon.divilov@duke.edu)
 
-Citation info: TBA
-
-
-
-
+Citation info: Lederer, Toher, Vecchio, Curtarolo, Acta Materialia 159, 364 (2018)
 
 ****************************************************************************************************
 GENERAL OVERVIEW
