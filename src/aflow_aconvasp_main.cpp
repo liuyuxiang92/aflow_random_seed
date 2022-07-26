@@ -1059,6 +1059,13 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("PROTO::EQUATIONS_ONLY",aurostd::args2flag(argv,cmds,"--equations_only")); //DX20180615 - add equation info
     vpflow.flag("PROTO::USE_ANRL_LATTICE_PARAM",aurostd::args2flag(argv,cmds,"--use_anrl_lattice_param|--use_anrl_lattice_parameter")); //DX20190227 - add original lattice parameter option
     vpflow.flag("BADER",false); //CO20181226 don't run bader
+    vpflow.flag("ITC",FALSE);        // PRIORITIES  //CO20220613
+    vpflow.flag("QE",FALSE);        // PRIORITIES
+    vpflow.flag("ABCCAR",FALSE);    // PRIORITIES //DX20190123 - add ABCCAR
+    vpflow.flag("ABINIT",FALSE);    // PRIORITIES
+    vpflow.flag("AIMS",FALSE);      // PRIORITIES
+    vpflow.flag("CIF",FALSE);       // PRIORITIES //DX20190123 - add CIF
+    vpflow.flag("ELK",FALSE);       // PRIORITIES //DX20200313 - add ELK
   } 
   //[CO20180627 - MOVED UP]vpflow.args2addattachedscheme(argv,cmds,"PROTO_AFLOW","--aflow_proto=|--aflow_proto_icsd=","");      // --aflow_proto=123:A:B:C  --aflow_proto_icsd=Gd1Mn2Si2_ICSD_54947 
   if(vpflow.flag("PROTO_AFLOW")) {
@@ -1223,19 +1230,20 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("ATAT",aurostd::args2flag(argv,cmds,"--atat") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")); //SD20220123
 
   //DX20190123 - CIF to work with PROTO - START 
-  vpflow.flag("CIF",aurostd::args2flag(argv,cmds,"--cif") && (vpflow.flag("PROTO_AFLOW") || vpflow.flag("PROTO"))); //DX20190123 - to differentiate between proto and istream 
-  if(!vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")){
+  //CO20220715 - rewriting a bit for clarity
+  if(!(vpflow.flag("PROTO_AFLOW") || vpflow.flag("PROTO"))){ //DX20190123 - to differentiate between proto and istream  //DX20190123 - ensure not a prototype run
+    vpflow.flag("CIF",aurostd::args2flag(argv,cmds,"--cif"));
     vpflow.args2addattachedscheme(argv,cmds,"CIF","--cif=|--CIF=","");
-  }
-  if(vpflow.flag("CIF") && !vpflow.flag("PROTO_AFLOW") && !vpflow.flag("PROTO")){ //DX20190123 - ensure not a prototype run
-    vpflow.flag("CIF::USAGE",aurostd::args2flag(argv,cmds,"--usage|--USAGE"));
-    vpflow.flag("CIF::NO_SYMMETRY",aurostd::args2flag(argv,cmds,"--no_symmetry|--no_sym"));
-    vpflow.flag("CIF::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan")); //DX20210610
-    if(aurostd::args2attachedflag(argv,"--cif=|--CIF=")){ //DX20170803
-      vpflow.args2addattachedscheme(argv,cmds,"CIF::TOLERANCE","--cif=|--CIF=",""); //DX20200907 - default is system specific, leaving empty
-    }
-    if(aurostd::args2attachedflag(argv,"--setting=")){ 
-      vpflow.args2addattachedscheme(argv,cmds,"CIF::SETTING","--setting=","1");
+    if(vpflow.flag("CIF")){
+      vpflow.flag("CIF::USAGE",aurostd::args2flag(argv,cmds,"--usage|--USAGE"));
+      vpflow.flag("CIF::NO_SYMMETRY",aurostd::args2flag(argv,cmds,"--no_symmetry|--no_sym"));
+      vpflow.flag("CIF::NO_SCAN",aurostd::args2flag(argv,cmds,"--no_scan")); //DX20210610
+      if(aurostd::args2attachedflag(argv,"--cif=|--CIF=")){ //DX20170803
+        vpflow.args2addattachedscheme(argv,cmds,"CIF::TOLERANCE","--cif=|--CIF=",""); //DX20200907 - default is system specific, leaving empty
+      }
+      if(aurostd::args2attachedflag(argv,"--setting=")){ 
+        vpflow.args2addattachedscheme(argv,cmds,"CIF::SETTING","--setting=","1");
+      }
     }
   }
   //DX20190123 - CIF to work with PROTO - END
@@ -12783,16 +12791,16 @@ namespace pflow {
       // now checking AIMS
       if(vpflow.flag("PROTO::AIMS")) str.xstructure2aims();
 
-      //DX20190123 - add CIF/ABCCAR - START
-      // now checking CIF
-      if(vpflow.flag("PROTO::CIF")) str.xstructure2cif();
-
       // now checking ELK //DX20200313
       if(vpflow.flag("PROTO::ELK")) str.xstructure2elk();
 
       // now checking ITC
       if(vpflow.flag("PROTO::ITC")) str.xstructure2itc(); //CO20220613
     }
+    
+    //DX20190123 - add CIF/ABCCAR - START
+    // now checking CIF
+    if(vpflow.flag("PROTO::CIF")) str.xstructure2cif();
     
     // now checking ABCCAR
     if(vpflow.flag("PROTO::ABCCAR")) str.xstructure2abccar();
