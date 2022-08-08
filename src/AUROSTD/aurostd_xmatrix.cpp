@@ -2435,10 +2435,10 @@ namespace aurostd {  // namespace aurostd
           p(i) = p(imax);
           p(imax) = _p;
           // pivoting rows of A
-          _LU = LU.getmat(i, i, LU.lcols, LU.ucols);
-          LU.setmat(LU.getmat(imax, imax, LU.lcols, LU.ucols), i, LU.lcols);
+          _LU = LU.getxmat(i, i, LU.lcols, LU.ucols);
+          LU.setmat(LU.getxmat(imax, imax, LU.lcols, LU.ucols), i, LU.lcols);
           LU.setmat(_LU, imax, LU.lcols);
-          //LU.setmat(_LU.getmat(i, i, LU.lcols, LU.ucols), imax, LU.lcols);
+          //LU.setmat(_LU.getxmat(i, i, LU.lcols, LU.ucols), imax, LU.lcols);
         }
         for (int j = i + 1; j <= LU.urows; j++) {
           LU(j, i) /= LU(i, i);
@@ -2458,7 +2458,7 @@ namespace aurostd {  // namespace aurostd
       L = aurostd::eye<double>(LU.urows, LU.ucols, LU.lrows, LU.lcols);
       U = L;
       for (int i = LU.lrows + 1; i <= LU.urows; i++) {
-        L.setmat(LU.getmat(i, i, LU.lcols, i - LU.lcols), i, LU.lcols);
+        L.setmat(LU.getxmat(i, i, LU.lcols, i - LU.lcols), i, LU.lcols);
       }
       U += LU - L;
     }
@@ -3909,7 +3909,7 @@ namespace aurostd {
       flag_conv = true;
       for (int i = 1; i <= mn; i++) {
         D_tmp = aurostd::eye<utype>(mn);
-        d = (utype)1.0 / aurostd::sqrt(aurostd::linf_norm(A.getmat(1, mn, i, i)));
+        d = (utype)1.0 / aurostd::sqrt(aurostd::linf_norm(A.getxmat(1, mn, i, i)));
         D_tmp(i, i) = d;
         D = D * D_tmp;
         A = D_tmp * A * D_tmp;
@@ -3917,8 +3917,8 @@ namespace aurostd {
       }
       iter++;
     }
-    R = D.getmat(1, m, 1, m);
-    C = D.getmat(m + 1, mn, m + 1, mn);
+    R = D.getxmat(1, m, 1, m);
+    C = D.getxmat(m + 1, mn, m + 1, mn);
     A = R * A_orig * C;
     if (LDEBUG) {
       cerr << "iter=" << iter << endl;

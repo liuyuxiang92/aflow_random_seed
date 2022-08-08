@@ -2980,8 +2980,11 @@ LATTICES = (the ones with "")
         [--image_only|--image] : Reads only the output data and plot the results. Plotting
             is only implemented for binary alloys.
             Default: OFF
-        [--no_plot|--noplot] : Skips plotting the results after the calculation is complete.
-            Default: OFF
+        [--aflowlib_directory=|--aflowlib_dir=] : Specifies a directory (including
+            its subdirectories) from where to read additional aflowlib files.
+            Default: ""
+        [--print=|--p=|--output=|--o=txt|json|pdf|eps|png] : Selects the output format.
+            Default: txt
 
         BINODAL OPTIONS:
         [--binodal] : Calculates the binodal curve for the given concentration and temperature
@@ -3016,14 +3019,6 @@ LATTICES = (the ones with "")
         [--temp_npts=100] : Specifies the number of points used to determine the sub-division of
             the temperature profile.
             Default: 150
-
-        FORMAT OPTIONS:
-        [--format_data=|--data_format=txt|json] : Specifies the format of the output
-            data.
-            Default: txt
-        [--format_image=|--image_format=pdf|eps|png] : Specifies the format of the
-            image produced by the plotting function.
-            Default: pdf
 
   aflow --rasmol[=n1[,n2[,n3]]] < POSCAR
         Similar to --xyz. Starts rasmol (must be available) with a file

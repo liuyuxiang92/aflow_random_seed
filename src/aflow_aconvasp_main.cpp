@@ -1261,7 +1261,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("QCA::USE_SG", aurostd::args2flag(argv,cmds,"--use_sg"));
     vpflow.flag("QCA::SCREEN_ONLY", aurostd::args2flag(argv,cmds,"--screen_only"));
     vpflow.flag("QCA::IMAGE_ONLY", aurostd::args2flag(argv,cmds,"--image_only|--image"));
-    vpflow.flag("QCA::NO_PLOT", aurostd::args2flag(argv,cmds,"--no_plot|--noplot"));
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::PRINT","--print=|--p=|--output=|--o=","");
     vpflow.args2addattachedscheme(argv,cmds,"QCA::DIRECTORY","--directory=","./");
     vpflow.args2addattachedscheme(argv,cmds,"QCA::PLATTICE","--plattice=|--plat=","");
     vpflow.args2addattachedscheme(argv,cmds,"QCA::ELEMENTS","--elements=|--elem=","");
@@ -1271,8 +1271,6 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"QCA::CONC_NPTS","--conc_npts=","");
     vpflow.args2addattachedscheme(argv,cmds,"QCA::TEMP_RANGE","--temp_range=|--temp=","");
     vpflow.args2addattachedscheme(argv,cmds,"QCA::TEMP_NPTS","--temp_npts=","");
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::FORMAT_DATA","format_data=|--data_format=","txt");
-    vpflow.args2addattachedscheme(argv,cmds,"QCA::FORMAT_PLOT","format_image=|--image_format=","pdf");
     vpflow.args2addattachedscheme(argv,cmds,"QCA::AFLOWLIB_DIRECTORY","--aflowlib_directory=|--aflowlib_dir=","");
     vpflow.args2addattachedscheme(argv,cmds,"QCA::AFLOW_MAX_NUM_ATOMS","--aflow_max_num_atoms=","");
   }
@@ -2611,8 +2609,8 @@ namespace pflow {
     strstream << tab << xspaces << " " << "              --usage" << endl;
     strstream << tab << xspaces << " " << "              --screen_only" << endl;
     strstream << tab << xspaces << " " << "              --image_only|--image" << endl;
-    strstream << tab << xspaces << " " << "              --no_plot|--noplot" << endl;
     strstream << tab << xspaces << " " << "              --aflowlib_directory=|--aflowlib_dir=..." << endl;
+    strstream << tab << xspaces << " " << "              --print=|--p=|--output=|--o=txt" << endl;
     strstream << endl;
     strstream << tab << xspaces << " " << "BINODAL OPTIONS:" << endl;
     strstream << tab << xspaces << " " << "              --binodal" << endl;
@@ -2624,10 +2622,6 @@ namespace pflow {
     strstream << tab << xspaces << " " << "              --conc_npts=20" << endl;
     strstream << tab << xspaces << " " << "              --temp_range=|--temp=300,5000" << endl;
     strstream << tab << xspaces << " " << "              --temp_npts=150" << endl;
-    strstream << endl;
-    strstream << tab << xspaces << " " << "FORMAT OPTIONS:" << endl;
-    strstream << tab << xspaces << " " << "              --format_data=|--data_format=txt|json" << endl;
-    strstream << tab << xspaces << " " << "              --format_image=|--image_format=pdf|eps|png" << endl;
     strstream << tab << x << " --rasmol[=n1[,n2[,n3]]] < POSCAR" << endl;
     strstream << tab << x << " --revsg [#] [n] [l] [m]" << endl;
     strstream << tab << x << " --rm_atom iatom < POSCAR" << endl;

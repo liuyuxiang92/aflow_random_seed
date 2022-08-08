@@ -46,8 +46,11 @@ LIST OF AFLOW-QCA COMMANDS:
         [--image_only|--image] : Reads only the output data and plot the results. Plotting
             is only implemented for binary alloys.
             Default: OFF
-        [--no_plot|--noplot] : Skips plotting the results after the calculation is complete.
-            Default: OFF
+        [--aflowlib_directory=|--aflowlib_dir=] : Specifies a directory (including
+            its subdirectories) from where to read additional aflowlib files.
+            Default: ""
+        [--print=|--p=|--output=|--o=txt|json|pdf|eps|png] : Selects the output format.
+            Default: txt
 
         BINODAL OPTIONS:
         [--binodal] : Calculates the binodal curve for the given concentration and temperature
@@ -82,14 +85,6 @@ LIST OF AFLOW-QCA COMMANDS:
         [--temp_npts=100] : Specifies the number of points used to determine the sub-division of
             the temperature profile.
             Default: 150
-
-        FORMAT OPTIONS:
-        [--format_data=|--data_format=txt|json] : Specifies the format of the output
-            data.
-            Default: txt
-        [--format_image=|--image_format=pdf|eps|png] : Specifies the format of the
-            image produced by the plotting function.
-            Default: pdf
 
 For additional information contact: Simon Divilov (simon.divilov@duke.edu)
 

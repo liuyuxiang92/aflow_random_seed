@@ -21,8 +21,7 @@ struct _qca_data {
   // Input data
   int num_threads;
   uint min_sleep;
-  string format_data;
-  string format_image;
+  string print;
   bool screen_only;
   bool image_only;
   bool calc_binodal;
@@ -89,7 +88,7 @@ namespace qca {
   xmatrix<double> getConcentrationCluster(const vector<xstructure>& vstr, const vector<string>& elements);
   xmatrix<double> getConcentrationCluster(const string& rundirpath, const int nstr, const int nelem);
   xvector<int> getNumAtomCluster(const vector<xstructure>& vstr);
-  xvector<int> calcDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const int num_threads, const string& rundirpath="", const string& algo="SLOW");
+  xvector<int> calcDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const int num_threads, const string& rundirpath="", const string& algo="FAST");
   double getCVCluster(const string& rundirpath, const double cv_cut);
   void runATAT(const string& cdirpath, const string& rundirpath, const uint min_sleep);
   void generateFilesForATAT(const string& rundirpath, const string& lat_atat, const vector<xstructure>& vstr_aflow, const vector<xstructure>& vstr_atat, const vector<int>& mapstr);
@@ -97,7 +96,7 @@ namespace qca {
   vector<xstructure> getAFLOWXstructures(const string& aflowlibpath, const int num_threads, bool use_sg);
   string createLatForATAT(const string& plattice, const vector<string>& elements, bool scale=false);
   vector<xstructure> getATATXstructures(const string& lat, const string& plattice, const vector<string>& elements, const uint max_num_atoms, const string& rundirpath="");
-  vector<int> calcMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads, const string& algo="SLOW");
+  vector<int> calcMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads, const string& algo="FAST");
   void displayUsage(void);
   void writeData(const _qca_data& qca_data);
   void readData(_qca_data& qca_data);

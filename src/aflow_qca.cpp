@@ -37,8 +37,7 @@ namespace qca {
     qca_data.cdirpath = aurostd::getPWD();
     qca_data.rootdirpath = aurostd::CleanFileName(qca_data.rootdirpath);
     qca_data.plattice = aurostd::tolower(qca_data.plattice);
-    qca_data.format_data = aurostd::tolower(qca_data.format_data);
-    qca_data.format_image = aurostd::tolower(qca_data.format_image);
+    qca_data.print = aurostd::tolower(qca_data.print);
     aurostd::sort_remove_duplicates(qca_data.elements);
     qca_data.min_sleep = DEFAULT_QCA_MIN_SLEEP_SECONDS;
     if (!vpflow.getattachedscheme("QCA::DIRECTORY").empty()) {
@@ -92,24 +91,13 @@ namespace qca {
     else {
       qca_data.temp_npts = DEFAULT_QCA_TEMP_NPTS;
     }
-    if (!vpflow.getattachedscheme("QCA::FORMAT_DATA").empty()) {
-      qca_data.format_data = vpflow.getattachedscheme("QCA::FORMAT_DATA");
+    if (!vpflow.getattachedscheme("QCA::PRINT").empty()) {
+      qca_data.print = vpflow.getattachedscheme("QCA::PRINT");
     }
     else {
-      qca_data.format_data = DEFAULT_QCA_FORMAT_DATA;
+      qca_data.print = DEFAULT_QCA_PRINT;
     }
-    if (!vpflow.flag("QCA::NO_PLOT")) {
-      if (!vpflow.getattachedscheme("QCA::FORMAT_IMAGE").empty()) {
-        qca_data.format_image = vpflow.getattachedscheme("QCA::FORMAT_IMAGE");
-      }
-      else {
-        qca_data.format_image = DEFAULT_QCA_FORMAT_PLOT;
-      }
-    }
-    if (vpflow.flag("QCA::SCREEN_ONLY")) {
-      qca_data.screen_only = true;
-      qca_data.format_data = DEFAULT_QCA_FORMAT_DATA;
-    }
+    if (vpflow.flag("QCA::SCREEN_ONLY")) {qca_data.screen_only = true;}
     if (vpflow.flag("QCA::IMAGE_ONLY")) {qca_data.image_only = true;}
     if (vpflow.flag("QCA::BINODAL")) {qca_data.calc_binodal = true;}
     if (vpflow.flag("QCA::USE_SG")) {qca_data.use_sg = true;}
@@ -132,8 +120,7 @@ namespace qca {
     // Input data
     qca_data.num_threads = 0;
     qca_data.min_sleep = 0;
-    qca_data.format_data = "";
-    qca_data.format_image = "";
+    qca_data.print = "";
     qca_data.screen_only = false;
     qca_data.image_only = false;
     qca_data.calc_binodal = false;
@@ -310,12 +297,9 @@ namespace qca {
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     // Check if output format is valid
-    if (qca_data.format_data != "txt" && qca_data.format_data != "json") {
-      string message = "Format \"" + qca_data.format_data + "\" is invalid";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
-    }
-    if (qca_data.format_image != "" && qca_data.format_image != "pdf" && qca_data.format_image != "eps" && qca_data.format_image != "png") {
-      string message = "Format \"" + qca_data.format_image + "\" is invalid";
+    if (qca_data.print != "txt" && qca_data.print != "json" &&
+        qca_data.print != "pdf" && qca_data.print != "eps" && qca_data.print != "png") {
+      string message = "Format \"" + qca_data.print + "\" is invalid";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
     }
   }
@@ -600,7 +584,7 @@ namespace qca {
           for (int j = 1; j <= ncl; j++) {
             prob_cluster[it - 1](ix, j) = prob_ideal_cluster(ix, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * std::pow(soln(1), natom_cluster(j, 1));
           }
-          prob_cluster[it - 1].setmat(prob_cluster[it - 1].getmat(ix, ix, 1, ncl) / aurostd::sum(prob_cluster[it - 1].getmat(ix, ix, 1, ncl)), ix, 1); // normalize sum to 1
+          prob_cluster[it - 1].setmat(prob_cluster[it - 1].getxmat(ix, ix, 1, ncl) / aurostd::sum(prob_cluster[it - 1].getxmat(ix, ix, 1, ncl)), ix, 1); // normalize sum to 1
         }
       }
     }
@@ -648,9 +632,9 @@ namespace qca {
           soln0.setcol(soln, ix); // use the higher temperature solution as an initial guess for lower temperature solution
           for (int j = 1; j <= ncl; j++) {
             prob_cluster[it - 1](ix, j) = prob_ideal_cluster(ix, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * 
-                                          aurostd::elements_product(aurostd::pow(soln, natom_cluster.getmat(j, j, 1, neq)(1)));
+                                          aurostd::elements_product(aurostd::pow(soln, natom_cluster.getxvec(j, j, 1, neq)));
           }
-          prob_cluster[it - 1].setmat(prob_cluster[it - 1].getmat(ix, ix, 1, ncl) / aurostd::sum(prob_cluster[it - 1].getmat(ix, ix, 1, ncl)), ix, 1); // normalize sum to 1
+          prob_cluster[it - 1].setmat(prob_cluster[it - 1].getxmat(ix, ix, 1, ncl) / aurostd::sum(prob_cluster[it - 1].getxmat(ix, ix, 1, ncl)), ix, 1); // normalize sum to 1
         }
       }
     }
@@ -723,7 +707,7 @@ namespace qca {
           prob_ideal_cluster(i, j) *= std::pow(conc_macro(i, k), conc_cluster(j, k) * max_num_atoms);
         }
       }
-      prob_ideal_cluster.setmat(prob_ideal_cluster.getmat(i, i, 1, ncl) / aurostd::sum(prob_ideal_cluster.getmat(i, i, 1, ncl)), i, 1); // normalize sum to 1
+      prob_ideal_cluster.setmat(prob_ideal_cluster.getxmat(i, i, 1, ncl) / aurostd::sum(prob_ideal_cluster.getxmat(i, i, 1, ncl)), i, 1); // normalize sum to 1
     }
     return prob_ideal_cluster;
   }
@@ -894,7 +878,7 @@ namespace qca {
     xmatrix<double> m1(ncl, nelem);
     for (int i = 0; i < ncl; i++) {
       _vstr_atat[i] = qca_data.vstr_atat[index_cluster[i] - 1];
-      m1.setmat(qca_data.conc_cluster.getmat(index_cluster[i], index_cluster[i], 1, nelem), i + 1, 1);
+      m1.setmat(qca_data.conc_cluster.getxmat(index_cluster[i], index_cluster[i], 1, nelem), i + 1, 1);
       v1(i + 1) = qca_data.num_atom_cluster(index_cluster[i]);
       v2(i + 1) = qca_data.excess_energy_cluster(index_cluster[i]);
     }
@@ -1678,8 +1662,8 @@ namespace qca {
     usage_options.push_back("--usage");
     usage_options.push_back("--screen_only");
     usage_options.push_back("--image_only|--image");
-    usage_options.push_back("--no_plot|--noplot");
     usage_options.push_back("--aflowlib_directory=|--aflowlib_dir=...");
+    usage_options.push_back("--print=|--p=|--output=|--o=txt");
     usage_options.push_back(" ");
     usage_options.push_back("BINODAL OPTIONS:");
     usage_options.push_back("--binodal");
@@ -1691,10 +1675,6 @@ namespace qca {
     usage_options.push_back("--conc_npts=20");
     usage_options.push_back("--temp_range=|--temp=300,5000");
     usage_options.push_back("--temp_npts=150");
-    usage_options.push_back(" ");
-    usage_options.push_back("FORMAT OPTIONS:");
-    usage_options.push_back("--format_data=|--data_format=txt|json");
-    usage_options.push_back("--format_image=|--image_format=pdf|eps|png");
     usage_options.push_back(" ");
     init::MessageOption("--usage", "QCA()", usage_options);
   }
@@ -1709,9 +1689,9 @@ namespace qca {
   /// @authors
   /// @mod{SD,20220718,created function}
   void writeData(const _qca_data& qca_data) {
-    string filepath = qca_data.rundirpath + "/" + QCA_FILE_PREFIX + "output." + qca_data.format_data;
+    string filepath = qca_data.rundirpath + "/" + QCA_FILE_PREFIX + "output." + qca_data.print;
     stringstream output;
-    if (qca_data.format_data == "txt") {
+    if (qca_data.print == "txt") {
       string info_prefix = "";
       output << "QCA DATA" << endl;
       info_prefix = "Input data ";
@@ -1734,7 +1714,7 @@ namespace qca {
         return;
       }
     }
-    else if (qca_data.format_data == "json") {
+    else if (qca_data.print == "json") {
       aurostd::JSONwriter json;
       json.addString("Alloy name", qca_data.alloyname);
       json.addVector("Elements", qca_data.elements);
@@ -1789,7 +1769,7 @@ namespace qca {
   /// @authors
   /// @mod{SD,20220718,created function}
   void plotData(const _qca_data& qca_data) {
-    if (qca_data.format_image.empty()) {return;}
+    if (qca_data.print == "txt" || qca_data.print == "json") {return;}
     stringstream gpfile;
     aurostd::xoption plotoptions;
     vector<vector<double>> data;
@@ -1804,7 +1784,7 @@ namespace qca {
     plotoptions.push_attached("OUTPUT_FORMAT", "GNUPLOT");
     plotoptions.push_attached("FILE_NAME", qca_data.rundirpath + "/" + QCA_FILE_PREFIX + "plot");
     plotoptions.push_attached("FILE_NAME_LATEX", qca_data.rundirpath + "/" + QCA_FILE_PREFIX + "plot");
-    plotoptions.push_attached("IMAGE_FORMAT", qca_data.format_image);
+    plotoptions.push_attached("IMAGE_FORMAT", qca_data.print);
     plotoptions.push_attached("PLOT_TITLE", qca_data.alloyname);
     plotoptions.push_attached("XLABEL", "Concentration");
     plotoptions.push_attached("XMIN", "0.0");

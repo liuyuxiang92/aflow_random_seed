@@ -304,7 +304,7 @@ namespace aurostd {
     if (LDEBUG) {cerr << "VM old=" << VM << endl;}
     xvector<utype> w = _w / wtot; // normalize weights
     for (int i = VM.lrows; i <= VM.urows; i++) {
-      VM.setmat(w(i) * VM.getmat(i, i, 1, VM.cols), i, 1);
+      VM.setmat(w(i) * VM.getxmat(i, i, 1, VM.cols), i, 1);
     }
     if (LDEBUG) {cerr << "VM new=" << VM << endl;}
     xvector<utype> y = aurostd::elementwise_product(w, _y);
