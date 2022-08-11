@@ -278,8 +278,9 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   aurostd::linspace(d,d,i); //SD20220324
   aurostd::elementwise_product(v,v); //SD20220422
   aurostd::elements_product(v); //SD20220617
-  aurostd::xvectordouble2xvectorutype<utype>(dxv); //SD20220512
-  aurostd::xvectorutype2xvectordouble(vxu); //SD20220512
+  aurostd::xvectorutype2xvectorvtype<utype,utype>(v); //SD20220512
+  aurostd::xvectorutype2xvectorvtype<utype,double>(v); //SD20220512
+  aurostd::xvectorutype2xvectorvtype<utype,int>(v); //SD20220512
 
   vector<vector<utype> > vvu;sort(vvu.begin(),vvu.end(),aurostd::compareVecElements<utype>);  //CO20190629
   vector<xvector<utype> > vxvu;sort(vxvu.begin(),vxvu.end(),aurostd::compareXVecElements<utype>);  //CO20190629

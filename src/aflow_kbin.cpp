@@ -302,13 +302,12 @@ namespace KBIN {
   }
   void getAflowInFromDirectory(const string& directory,string& AflowIn_file,string& AflowIn,ostream& oss) {ofstream FileMESSAGE;return getAflowInFromDirectory(directory,AflowIn_file,AflowIn,FileMESSAGE,oss);}  //CO20191110
   void getAflowInFromDirectory(const string& directory,string& AflowIn_file,string& AflowIn,ofstream& FileMESSAGE,ostream& oss) { //CO20191110
-    string soliloquy = XPID + "KBIN::getAflowInFromDirectory():";
     AflowIn_file=aurostd::CleanFileName(directory+"/"+_AFLOWIN_); //CO20200624
-    if(!aurostd::FileExist(AflowIn_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Input file does not exist: "+AflowIn_file,_INPUT_ERROR_);}
-    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"Using input file: "+AflowIn_file,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    if(!aurostd::FileExist(AflowIn_file)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Input file does not exist: "+AflowIn_file,_INPUT_ERROR_);}
+    pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Using input file: "+AflowIn_file,FileMESSAGE,oss,_LOGGER_MESSAGE_);
     aurostd::file2string(AflowIn_file,AflowIn);
     AflowIn=aurostd::RemoveComments(AflowIn); // NOW Clean AFLOWIN
-    pflow::logger(_AFLOW_FILE_NAME_,soliloquy,"AflowIn.size()="+aurostd::utype2string(AflowIn.size()),FileMESSAGE,oss,_LOGGER_MESSAGE_); //CO20200624 - check size!=0
+    pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"AflowIn.size()="+aurostd::utype2string(AflowIn.size()),FileMESSAGE,oss,_LOGGER_MESSAGE_); //CO20200624 - check size!=0
   }
 }
 
@@ -318,7 +317,6 @@ namespace KBIN {
 namespace KBIN {
   int KBIN_Main(vector<string> argv) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "KBIN::KBIN_Main():";
     if (argv.empty()){return 0;} //SD2022024 - check argv!=0
     string GENERIC;
     //  string Directory;
@@ -351,7 +349,7 @@ namespace KBIN {
     // do some running
 
 
-    //   cerr << soliloquy << " XHOST.AFLOW_RUNXflag=" << XHOST.AFLOW_RUNXflag << endl; //
+    //   cerr << __AFLOW_FUNC__ << " XHOST.AFLOW_RUNXflag=" << XHOST.AFLOW_RUNXflag << endl; //
 
     if(XHOST.AFLOW_RUNXflag) {
       vector<string> tokens;
@@ -379,7 +377,7 @@ namespace KBIN {
       XHOST.AFLOW_RUNXflag=FALSE;
     }
 
-    //    cerr << soliloquy << " XHOST.AFLOW_RUNXflag=" << XHOST.AFLOW_RUNXflag << endl; //
+    //    cerr << __AFLOW_FUNC__ << " XHOST.AFLOW_RUNXflag=" << XHOST.AFLOW_RUNXflag << endl; //
 
     if(XHOST.vflag_aflow.flag("LOOP")) {aus << "MMMMM  KBIN option XHOST.vflag_aflow.flag(\"LOOP\") - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}
     if(XHOST.AFLOW_RUNDIRflag) {aus << "MMMMM  KBIN option [--run] (XHOST.AFLOW_RUNDIRflag=TRUE) - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}
@@ -604,7 +602,7 @@ namespace KBIN {
     }
 
     if(aflags.AFLOW_PERFORM_CLEAN && !aflags.AFLOW_PERFORM_DIRECTORY) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"to use --clean, you must specify one or more directories",_INPUT_MISSING_);  //CO20200624
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"to use --clean, you must specify one or more directories",_INPUT_MISSING_);  //CO20200624
     }
     if(aflags.AFLOW_PERFORM_CLEAN && aflags.AFLOW_PERFORM_DIRECTORY) {
       //    cout << "DEBUG CLEAN = " << vruns.size() << endl;
@@ -641,7 +639,7 @@ namespace KBIN {
     // run specified directory: XHOST.AFLOW_RUNDIRflag
     if(XHOST.AFLOW_RUNDIRflag) {
       //    bool krun=TRUE;
-      if(LDEBUG) cerr << soliloquy << " STEP0b" << endl;
+      if(LDEBUG) cerr << __AFLOW_FUNC__ << " STEP0b" << endl;
       // [OBSOLETE]   vector<string> vDirectory(aurostd::args2vectorstring(argv,"--DIRECTORY|--D|--d","./"));
       vector<string> vDirectory=vruns;
       // fix the RUNS
@@ -706,28 +704,28 @@ namespace KBIN {
           //[SD20220224 - OBSOLETE]  aus << "EEEEE  DIRECTORY_NOT_FOUND = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           //[SD20220224 - OBSOLETE]  aurostd::PrintMessageStream(aus,XHOST.QUIET);
           //[SD20220224 - OBSOLETE]} else {                                                                                // ******* Directory EXISTS
-          //[SD20220224 - OBSOLETE]  if(LDEBUG) cerr << soliloquy << " STEP1c" << endl;
+          //[SD20220224 - OBSOLETE]  if(LDEBUG) cerr << __AFLOW_FUNC__ << " STEP1c" << endl;
           //[SD20220224 - OBSOLETE]  if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_)) {                                               // ******* Directory is locked
           //[SD20220224 - OBSOLETE]    aus << "LLLLL  DIRECTORY_LOCKED ...bzzzz... !MULTI = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           //[SD20220224 - OBSOLETE]    aurostd::PrintMessageStream(aus,XHOST.QUIET);
           //[SD20220224 - OBSOLETE]  } else {
-          //[SD20220224 - OBSOLETE]    if(LDEBUG) cerr << soliloquy << " STEP1d" << endl;
+          //[SD20220224 - OBSOLETE]    if(LDEBUG) cerr << __AFLOW_FUNC__ << " STEP1d" << endl;
           //[SD20220224 - OBSOLETE]    if(DirectorySkipped(aflags.Directory)) {                                            // ******* Directory is skipped
           //[SD20220224 - OBSOLETE]      aus << "LLLLL  DIRECTORY_SKIPPED ...bzzzz... !MULTI = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           //[SD20220224 - OBSOLETE]      aurostd::PrintMessageStream(aus,XHOST.QUIET);
           //[SD20220224 - OBSOLETE]    } else {        
-          //[SD20220224 - OBSOLETE]      if(LDEBUG) cerr << soliloquy << " STEP1e" << endl;
+          //[SD20220224 - OBSOLETE]      if(LDEBUG) cerr << __AFLOW_FUNC__ << " STEP1e" << endl;
           //[SD20220224 - OBSOLETE]      if(DirectoryAlreadyInDatabase(aflags.Directory,aflags.AFLOW_FORCE_RUN)) {         // ******* Directory is already in the database
           //[SD20220224 - OBSOLETE]        aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ...bzzzz... !MULTI = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           //[SD20220224 - OBSOLETE]        aus << "LLLLL  DIRECTORY_ALREADY_IN_DATABASE ... use \"aflow --multi\" to force the calculation of this entry "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           //[SD20220224 - OBSOLETE]        aurostd::PrintMessageStream(aus,XHOST.QUIET);
           //[SD20220224 - OBSOLETE]      } else {        
-          //[SD20220224 - OBSOLETE]        if(LDEBUG) cerr << soliloquy << " STEP1f" << endl;
+          //[SD20220224 - OBSOLETE]        if(LDEBUG) cerr << __AFLOW_FUNC__ << " STEP1f" << endl;
           //[SD20220224 - OBSOLETE]        if(DirectoryUnwritable(aflags.Directory)) {                                     // ******* Directory is unwritable
           //[SD20220224 - OBSOLETE]          aus << "LLLLL  DIRECTORY_UNWRITABLE ...bzzzz... !MULTI = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           //[SD20220224 - OBSOLETE]          aurostd::PrintMessageStream(aus,XHOST.QUIET);
           //[SD20220224 - OBSOLETE]        } else {                                                                        // ******* Directory is ok
-          //[SD20220224 - OBSOLETE]          if(LDEBUG) cerr << soliloquy << " STEP1g" << endl;
+          //[SD20220224 - OBSOLETE]          if(LDEBUG) cerr << __AFLOW_FUNC__ << " STEP1g" << endl;
           //[SD20220224 - OBSOLETE]          if(_VERBOSE_) aus << "LLLLL  GOOD ...bzzz... !MULTI = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           //[SD20220224 - OBSOLETE]          if(_VERBOSE_) aurostd::PrintMessageStream(aus,XHOST.QUIET);
           //[SD20220224 - OBSOLETE]          if(aflags.KBIN_RUN_AFLOWIN)               FileNameCHECK=aflags.Directory+"/"+_AFLOWIN_;
@@ -737,14 +735,14 @@ namespace KBIN {
           //[SD20220224 - OBSOLETE]          FileCHECK.open(FileNameCHECK.c_str(),std::ios::in);
           //[SD20220224 - OBSOLETE]          FileCHECK.clear();FileCHECK.close();
           //[SD20220224 - OBSOLETE]          if(!FileCHECK) {                                                                    // ******* _AFLOWIN_ does not exist
-          //[SD20220224 - OBSOLETE]            if(LDEBUG) cerr << soliloquy << " STEP1h" << endl;
+          //[SD20220224 - OBSOLETE]            if(LDEBUG) cerr << __AFLOW_FUNC__ << " STEP1h" << endl;
           //[SD20220224 - OBSOLETE]            if(aflags.KBIN_RUN_AFLOWIN)               aus << "EEEEE  " << _AFLOWIN_ << " not found  = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           //[SD20220224 - OBSOLETE]            if(aflags.KBIN_GEN_VASP_FROM_AFLOWIN)     aus << "EEEEE  " << _AFLOWIN_ << " not found  = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           //[SD20220224 - OBSOLETE]            if(aflags.KBIN_GEN_AIMS_FROM_AFLOWIN)     aus << "EEEEE  " << _AFLOWIN_ << " not found  = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl; //CO20180409
           //[SD20220224 - OBSOLETE]            if(aflags.KBIN_GEN_AFLOWIN_FROM_VASP)     aus << "EEEEE  INCAR not found     = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
           //[SD20220224 - OBSOLETE]            aurostd::PrintMessageStream(aus,XHOST.QUIET);
           //[SD20220224 - OBSOLETE]          } else {                                                                            // ******* _AFLOWIN_ exists RUN
-          //[SD20220224 - OBSOLETE]            if(LDEBUG) cerr << soliloquy << " STEP1i" << endl;
+          //[SD20220224 - OBSOLETE]            if(LDEBUG) cerr << __AFLOW_FUNC__ << " STEP1i" << endl;
           //[SD20220224 - OBSOLETE]            if(aflags.KBIN_RUN_AFLOWIN)  {
           //[SD20220224 - OBSOLETE]              KBIN::RUN_Directory(aflags);
           //[SD20220224 - OBSOLETE]            }
@@ -768,7 +766,7 @@ namespace KBIN {
       } // idir
       // aus << "MMMMM  AFLOW: Done " << " - " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
       // aurostd::PrintMessageStream(aus,XHOST.QUIET);
-      if(LDEBUG) cerr << soliloquy << " STEP2" << endl;
+      if(LDEBUG) cerr << __AFLOW_FUNC__ << " STEP2" << endl;
     }
 
     // ERRORS ------------------------------------------------------------------------------------------------
@@ -1232,7 +1230,6 @@ namespace KBIN {
 namespace KBIN {
   void RUN_Directory(_aflags& aflags) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::RUN_Directory():";
     ostringstream aus;
 
     // ---------------------------------------------------------------------------
@@ -1258,7 +1255,7 @@ namespace KBIN {
     bool Krun=TRUE;
     //  int i;
 
-    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
 
     if(aflags.Directory.empty() || (aflags.Directory[0]!='/' && aflags.Directory[0]!='.' && aflags.Directory[0]!=' ')){aflags.Directory="./"+aflags.Directory;}
 
@@ -1489,8 +1486,7 @@ namespace KBIN {
 
   bool CompressDirectory(const string& directory, const _kflags& kflags) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "KBIN::CompressDirectory():";
-    if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
     //DX+CO START
     // [OBSOLETE] aus << "cd " << aflags.Directory << " && ";
     // [OBSOLETE]  aus << "ls | grep -v .EXT | ";                                //CO, skip anything with bzip extension
@@ -1498,11 +1494,11 @@ namespace KBIN {
     // [OBSOLETE] aus << "grep -v SKIP | ";
     // [OBSOLETE] aus << "grep -v " << KBIN_SUBDIRECTORIES << " | ";
     // [OBSOLETE]  aus << "grep -v aflow.in | grep -v " << _AFLOWIN_ << " ";;    //CO, never zip aflow.in or _aflow.in (agl_aflow.in) or newly defined aflow.in
-    if(LDEBUG){cerr << soliloquy << " directory=" << directory << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " directory=" << directory << endl;}
     vector<string> _vfiles,vfiles;
     string compressed_variant="";
     aurostd::DirectoryLS(directory,_vfiles);
-    if(LDEBUG){cerr << soliloquy << "_vfiles=" << aurostd::joinWDelimiter(_vfiles,",") << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << "_vfiles=" << aurostd::joinWDelimiter(_vfiles,",") << endl;}
     string file_path="";
     uint i=0;
     for(i=0;i<_vfiles.size();i++){
@@ -1518,7 +1514,7 @@ namespace KBIN {
       if(aurostd::substring2bool(_vfiles[i],DEFAULT_AFLOW_END_OUT) || aurostd::substring2bool(_vfiles[i],"aflow.end.out")){continue;}  //CO20170613, file is special because it gets written after compression
       if(aurostd::substring2bool(_vfiles[i],_AFLOWIN_)){continue;}
       file_path=directory + "/" + _vfiles[i];
-      if(LDEBUG) {cerr << soliloquy << " file_path=" << file_path << endl;}
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " file_path=" << file_path << endl;}
       if(aurostd::IsDirectory(file_path)){continue;}  //compress files only
       // [OBSOLETE]  if(aurostd::EFileExist(file_path,compressed_variant)){ //SC20200408
       // [OBSOLETE]  //need full path here, also, notice the placement here, actual compressed variant would have been skipped, this is for the uncompressed variant //SC20200408
@@ -1530,7 +1526,7 @@ namespace KBIN {
       vfiles.push_back(_vfiles[i]);
     }
     std::sort(vfiles.begin(),vfiles.end()); //sort in order
-    if(LDEBUG){cerr << soliloquy << " vfiles=" << aurostd::joinWDelimiter(vfiles,",") << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " vfiles=" << aurostd::joinWDelimiter(vfiles,",") << endl;}
     // [OBSOLETE] aurostd::string2vectorstring(aurostd::execute2string(aus),vfiles);
     // [OBSOLETE] cerr << vfiles.size() << endl;
     // [OBSOLETE] aurostd::StringstreamClean(aus);
@@ -1545,14 +1541,14 @@ namespace KBIN {
       uint nprocessors=(uint) floor(((double)ncpus_total)/((double)ncpus_xz));  //floor is safe
       stringstream aus;
       for(i=0;i<vfiles.size();i++){aus << directory+"/"+vfiles[i] << '\0';} //emulates -print0
-      if(LDEBUG){cerr << soliloquy << " contents of tmpfile=\"" << aus.str() << "\"" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " contents of tmpfile=\"" << aus.str() << "\"" << endl;}
       string tmpfile=aurostd::TmpFileCreate("CompressDirectory");
       aurostd::stringstream2file(aus,tmpfile);
       aurostd::StringstreamClean(aus);
       aus << "cat " << tmpfile << " | xargs -0 -P" << nprocessors << " -I{} " << kflags.KZIP_BIN << " -9fq";
       if(aurostd::substring2bool(kflags.KZIP_BIN,"xz")){aus << " -T" << ncpus_xz;}
       aus << " {}";
-      if(LDEBUG){cerr << soliloquy << " command=\"" << aus.str() << "\"" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " command=\"" << aus.str() << "\"" << endl;}
       aurostd::execute(aus);
 #ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveFile(tmpfile);
@@ -1577,7 +1573,7 @@ namespace KBIN {
       for(i=0;i<vfiles.size();i++){ //better than doing it all in one shot
         aus << kflags.KZIP_BIN << " -9fq " << (aurostd::substring2bool(kflags.KZIP_BIN,"xz")?"-T0 ":"") << directory << "/" << vfiles[i] << "; " << endl;  // semi-colon is important, keeps going if it stalls on one //CO20211130 - added q
       }
-      if(LDEBUG){cerr << soliloquy << " command=\"" << aus.str() << "\"" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " command=\"" << aus.str() << "\"" << endl;}
       aurostd::execute(aus);
       //CO20211130 - test if files were successfully compressed
       //if not, try again one by one
@@ -1599,7 +1595,7 @@ namespace KBIN {
       for(uint i=0;i<vfiles.size();i++){ //better than doing it all in one shot
         aus << kflags.KZIP_BIN << " -9fq " << directory << "/" << vfiles[i] << "; " << endl;  // semi-colon is important, keeps going if it stalls on one //CO20211130 - added q
       }
-      if(LDEBUG){cerr << soliloquy << " command=\"" << aus.str() << "\"" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " command=\"" << aus.str() << "\"" << endl;}
       // aus << kflags.KZIP_BIN << " " << aurostd::joinWDelimiter(vfiles," ") << endl; //AVOID, because if one fails, the whole command stops
       aurostd::execute(aus);
       // cerr << aus.str() << endl;
@@ -1764,12 +1760,11 @@ namespace KBIN {
 namespace KBIN {
   void XClean(string options) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::XClean():";
-    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;  
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " BEGIN" << endl;  
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()!=0) {
-      init::ErrorOption(options,soliloquy,"aflow --xclean");
+      init::ErrorOption(options,__AFLOW_FUNC__,"aflow --xclean");
     }
 
     vector<string> vcheck1;aurostd::string2tokens(string("OUTCAR.static,OUTCAR.relax2,OUTCAR.relax1"),vcheck1,",");
@@ -1786,27 +1781,27 @@ namespace KBIN {
     vector<string> vfile;
     bool test=false;
 
-    cout << soliloquy << " checking missing " << "OUTCAR*" << " with " << _AFLOWLOCK_ << endl;  // check OUTCAR.static
+    cout << __AFLOW_FUNC__ << " checking missing " << "OUTCAR*" << " with " << _AFLOWLOCK_ << endl;  // check OUTCAR.static
     aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" ./ -name "+_AFLOWLOCK_),vfile);
     for(uint j=0;j<vfile.size();j++) {
       aurostd::StringSubst(vfile[j],_AFLOWLOCK_,"");
       if(!aurostd::FileExist(vfile[j]+"OUTCAR") && !aurostd::EFileExist(vfile[j]+"OUTCAR.relax1")) {
-        cout << soliloquy << " cleaning=" << vfile[j] << endl;
+        cout << __AFLOW_FUNC__ << " cleaning=" << vfile[j] << endl;
         if(!test) KBIN::Clean(vfile[j]);
       }
     }
     for(uint i=0;i<vcheck1.size();i++) {
-      cout << soliloquy << " checking missing " << vcheck2[i] << " with " << vcheck1[i] << endl;  // check OUTCAR.static
+      cout << __AFLOW_FUNC__ << " checking missing " << vcheck2[i] << " with " << vcheck1[i] << endl;  // check OUTCAR.static
       aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("find")+" ./ -name "+vcheck1[i]),vfile);
       for(uint j=0;j<vfile.size();j++) {
         aurostd::StringSubst(vfile[j],vcheck1[i],"");
         if(!aurostd::FileExist(vfile[j]+vcheck2[i])) {
-          cout << soliloquy << " cleaning=" << vfile[j] << endl;
+          cout << __AFLOW_FUNC__ << " cleaning=" << vfile[j] << endl;
           if(!test) KBIN::Clean(vfile[j]);
         }
       }
     }    
-    if(LDEBUG) cerr << soliloquy << " END" << endl;  
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " END" << endl;  
   }
 } // namespace KBIN
 

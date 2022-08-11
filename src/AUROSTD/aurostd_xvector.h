@@ -327,10 +327,8 @@ namespace aurostd {
   //[SD20220512 - OBSOLETE]xvector<double> xvectorint2double(const xvector<int>&); //CO20180515
   //[SD20220512 - OBSOLETE]xvector<int> xvectordouble2int(const xvector<double>&,bool check_int=true); //CO20180515
 
-  template<class utype> xvector<double>
-    xvectorutype2xvectordouble(const xvector<utype>& a); //SD20220512
-  template<class utype> xvector<utype>
-    xvectordouble2xvectorutype(const xvector<double>& a,bool check_int=true); //SD20220512
+  template<class utype,class vtype> xvector<vtype>
+    xvectorutype2xvectorvtype(const xvector<utype>& a) __xprototype; //SD20220512
 
   // OPERATIONS ON XVECTORS
 

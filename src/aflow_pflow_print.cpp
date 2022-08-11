@@ -247,34 +247,33 @@ namespace pflow {
       const string& output_name,
       ostream& oss) {  
 
-    string soliloquy = XPID + "pflow::PrintCHGCAR():  ";     // so you know who's talking
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) oss << soliloquy << "BEGIN" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << "BEGIN" << endl;
     stringstream CHGCARout_ss;
     uint npts,natoms=pflow::GetNumAtoms(str),indx=0,numcolumns;
 
     // print POSCAR
-    if(LDEBUG) oss << soliloquy << "PRINTING POSCAR" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << "PRINTING POSCAR" << endl;
     CHGCARout_ss << chgcar_header.str();
     // empty line
     CHGCARout_ss << " " << endl;    //put space so AFLOW pick this up as a line
     // grid
     if(ngrid.size()!=3) {
       oss << endl;
-      oss << soliloquy << "ERROR: ngrid must be length 3." << endl;
-      oss << soliloquy << "Exiting." << endl;
+      oss << __AFLOW_FUNC__ << "ERROR: ngrid must be length 3." << endl;
+      oss << __AFLOW_FUNC__ << "Exiting." << endl;
       oss << endl;
       return FALSE;
     }
-    if(LDEBUG) oss << soliloquy << "PRINTING GRID" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << "PRINTING GRID" << endl;
     for(uint i=0;i<ngrid.size();i++) {
       CHGCARout_ss << "   " << ngrid.at(i);
     }
     CHGCARout_ss << " " << endl;    //put space so AFLOW pick this up as a line
     npts=ngrid.at(0)*ngrid.at(1)*ngrid.at(2);
     // chg_tot
-    if(LDEBUG) oss << soliloquy << "PRINTING CHG_TOT" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << "PRINTING CHG_TOT" << endl;
     for(uint i=0;i<npts;i+=format_dim.at(indx)) {
       // make sure we get exactly format_dim.at(indx) 0's and not more
       if(npts-i>=(uint)format_dim.at(indx)) {
@@ -294,8 +293,8 @@ namespace pflow {
     indx++;
     // augmentation occupancies, all set to 0
     if(format_dim.size()>1) {   // we have CHGCAR, not AECCAR
-      if(LDEBUG) oss << soliloquy << "THIS IS A CHGCAR FILE, NOT AN AECCAR FILE" << endl;
-      if(LDEBUG) oss << soliloquy << "PRINTING AUGMENTATION OCCUPANCIES (ALL SET TO 0)" << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << "THIS IS A CHGCAR FILE, NOT AN AECCAR FILE" << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << "PRINTING AUGMENTATION OCCUPANCIES (ALL SET TO 0)" << endl;
       for(uint i=1;i<(natoms+1);i++) {
         CHGCARout_ss << "augmentation occupancies " << i << " " << format_dim.at(indx) << endl;
         for(uint j=0;j<(uint)format_dim.at(indx);j+=(uint)format_dim.at(indx+1)) {
@@ -314,7 +313,7 @@ namespace pflow {
       }
     }
     if(chg_diff.size()>0) {     // we have spin-polarized
-      if(LDEBUG) oss << soliloquy << "THIS IS A SPIN-POLARIZED CALCULATION" << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << "THIS IS A SPIN-POLARIZED CALCULATION" << endl;
       // add line of 0's
       for(uint i=0;i<(uint)format_dim.at(indx);i++) { //mimic formatting of chg_diff for 0's line
         // standard shows +1 more 0
@@ -322,13 +321,13 @@ namespace pflow {
       }
       CHGCARout_ss << " " << endl;    //put space so AFLOW pick this up as a line
       // grid
-      if(LDEBUG) oss << soliloquy << "PRINTING GRID" << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << "PRINTING GRID" << endl;
       for(uint i=0;i<ngrid.size();i++) {
         CHGCARout_ss << "   " << ngrid.at(i);
       }
       CHGCARout_ss << " " << endl;    //put space so AFLOW pick this up as a line
       // chg_diff
-      if(LDEBUG) oss << soliloquy << "PRINTING CHG_DIFF" << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << "PRINTING CHG_DIFF" << endl;
       for(uint i=0;i<npts;i+=format_dim.at(indx)) {
         // make sure we get exactly format_dim.at(indx) 0's and not more
         if(npts-i>=(uint)format_dim.at(indx)) {
@@ -345,7 +344,7 @@ namespace pflow {
       indx++;
       // check for augmentation occupancies
       if(format_dim.size()>indx) { // we have more augmentation occupancies to write out, all set to 0
-        if(LDEBUG) oss << soliloquy << "PRINTING AUGMENTATION OCCUPANCIES (ALL SET TO 0)" << endl;
+        if(LDEBUG) oss << __AFLOW_FUNC__ << "PRINTING AUGMENTATION OCCUPANCIES (ALL SET TO 0)" << endl;
         for(uint i=1;i<(natoms+1);i++) {
           CHGCARout_ss << "augmentation occupancies " << i << " " << format_dim.at(indx) << endl;
           for(uint j=0;j<(uint)format_dim.at(indx);j+=(uint)format_dim.at(indx+1)) {
@@ -368,14 +367,14 @@ namespace pflow {
 
     // check if output file exists, delete it first
     if(aurostd::FileExist(output_name)) {
-      if(LDEBUG) oss << soliloquy << "DELETING EXISTING OUTPUT FILE" << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << "DELETING EXISTING OUTPUT FILE" << endl;
       aurostd::RemoveFile(output_name);
     }
 
     // write out to file
-    if(LDEBUG) oss << soliloquy << "WRITING OUTPUT FILE" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << "WRITING OUTPUT FILE" << endl;
     aurostd::stringstream2file(CHGCARout_ss,output_name);
-    if(LDEBUG) oss << soliloquy << "DONE" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << "DONE" << endl;
     return TRUE;
   }
 } // namespace pflow
@@ -578,10 +577,9 @@ namespace pflow {
 namespace pflow {
   void PrintClat(const xvector<double>& data, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"pflow::PrintClat():";
-    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " BEGIN" << endl;
     if(data.rows!=6) {
-      init::ErrorOption("",soliloquy,aurostd::liststring2string("data.size()=",aurostd::utype2string(data.rows)));
+      init::ErrorOption("",__AFLOW_FUNC__,aurostd::liststring2string("data.size()=",aurostd::utype2string(data.rows)));
     }
     oss.setf(std::ios::fixed,std::ios::floatfield);
     oss.precision(10);
@@ -591,7 +589,7 @@ namespace pflow {
     oss << lattice(1,1) << " " << lattice(1,2) << " " << lattice(1,3) << endl;
     oss << lattice(2,1) << " " << lattice(2,2) << " " << lattice(2,3) << endl;
     oss << lattice(3,1) << " " << lattice(3,2) << " " << lattice(3,3) << endl;
-    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " BEGIN" << endl;
   }
 } // namespace pflow
 
@@ -2886,7 +2884,6 @@ void PrintImages(xstructure strA, xstructure strB, const int& ni, const string& 
 //  This funtion prints out structural data in a msi format (for cerius).
 // Dane Morgan - Stefano Curtarolo
 void PrintMSI(const xstructure& str, ostream& oss) {
-  string soliloquy=XPID+"PrintMSI():";
   oss.setf(std::ios::fixed,std::ios::floatfield);
   oss.precision(10);
   xstructure sstr=str;
@@ -2903,7 +2900,7 @@ void PrintMSI(const xstructure& str, ostream& oss) {
   for(uint i=0;i<sstr.atoms.size();i++) {
     sstr.atoms.at(i).CleanName();
     if(sstr.atoms.at(i).atomic_number<1) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"atomic_number not found: sstr.atoms.at("+aurostd::utype2string(i)+").cleanname="+sstr.atoms.at(i).cleanname,_INPUT_ILLEGAL_);  //CO20200624
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"atomic_number not found: sstr.atoms.at("+aurostd::utype2string(i)+").cleanname="+sstr.atoms.at(i).cleanname,_INPUT_ILLEGAL_);  //CO20200624
     }
   }
 

@@ -1962,10 +1962,9 @@ ostream& operator<<(ostream& oss, const AtomEnvironment& AtomEnvironment){
 
 /// @brief constructed a convex hull around the atomic environment
 void AtomEnvironment::constructAtomEnvironmentHull(void){
-  string soliloquy=XPID+"AtomEnvironment::constructAtomEnvironmentHull():";
   bool LDEBUG=(false || XHOST.DEBUG);
   if (has_hull) {
-    if(LDEBUG) cerr << soliloquy << " AE hull is already set" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " AE hull is already set" << endl;
     return;
   }
 
@@ -1974,7 +1973,7 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
     points.push_back(index2Point(t));
   }
 
-  if (LDEBUG) cerr << soliloquy << " create AE hull around " << num_neighbors << " atoms" << endl;
+  if (LDEBUG) cerr << __AFLOW_FUNC__ << " create AE hull around " << num_neighbors << " atoms" << endl;
   xoption hull_options;
   hull_options.flag("CHULL::FULL_HULL", true);
   hull_options.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS", true);
@@ -1984,7 +1983,7 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
   chull::ConvexHull AEhull;
   AEhull = chull::ConvexHull(hull_options, points);
 
-  if (LDEBUG) cerr << soliloquy << " resulting hull has " << AEhull.m_facets.size() << " raw facets" << endl;
+  if (LDEBUG) cerr << __AFLOW_FUNC__ << " resulting hull has " << AEhull.m_facets.size() << " raw facets" << endl;
 
   vector<vector<uint> > facet_collection;
   AEhull.getJoinedFacets(facet_collection);
@@ -1993,7 +1992,7 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
     for (std::vector<uint>::const_iterator v = f->begin(); v != f->end(); ++v) nf.push_back(*v);
     facets.push_back(nf);
   }
-  if(LDEBUG) cerr << soliloquy << " after joining " << facets.size() << " facets are remaining" << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " after joining " << facets.size() << " facets are remaining" << endl;
 
   for (std::vector<vector<uint> >::const_iterator f = facets.begin(); f != facets.end(); ++f) {
     if (f->size()<10) facet_order[f->size()-3]++;
@@ -2019,12 +2018,11 @@ void AtomEnvironment::constructAtomEnvironmentHull(void){
 /// @param index neighbor index
 /// @return neighbor coordinates
 xvector<double> AtomEnvironment::index2Point(uint index){
-  string soliloquy=XPID+"AtomEnvironment::index2Point():";
   for(uint i=0;i<coordinates_neighbor.size();i++){
     if (index < coordinations_neighbor[i]) return coordinates_neighbor[i][index];
     else index -= coordinations_neighbor[i];
   }
-  throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "index out of bounds", _INDEX_BOUNDS_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "index out of bounds", _INDEX_BOUNDS_);
 }
 
 // ***************************************************************************
@@ -2034,7 +2032,6 @@ xvector<double> AtomEnvironment::index2Point(uint index){
 /// @brief serialize AtomEnvironment class to json
 /// @return json string
 aurostd::JSONwriter AtomEnvironment::toJSON(bool full) const{
-  string soliloquy=XPID+"AtomEnvironment::toJSON():";
 
   aurostd::JSONwriter ae_json;
 
@@ -2220,7 +2217,6 @@ vector<AtomEnvironment> getAtomEnvironments(const xstructure& xstr, uint mode){
 void writeAtomEnvironments(vector<AtomEnvironment> AE, const std::map<string, string> meta_data){
 
   bool LDEBUG = (false || XHOST.DEBUG);
-  string soliloquy = XPID + "pflow::writeAtomEnvironments():";
 
   vector<aurostd::JSONwriter> ae_collection;
   aurostd::JSONwriter ae_json;
@@ -2242,7 +2238,7 @@ void writeAtomEnvironments(vector<AtomEnvironment> AE, const std::map<string, st
 
   // for now just JSON is supported
   if(ftype != json_ft){
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "Just JSON is supported at the moment.", _INPUT_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Just JSON is supported at the moment.", _INPUT_ERROR_);
   }
 
   // construct file path
@@ -2268,7 +2264,7 @@ void writeAtomEnvironments(vector<AtomEnvironment> AE, const std::map<string, st
   if (!directory_name.empty()) file_path = directory_name + "/" + file_name;
   else file_path = file_name;
 
-  if(LDEBUG) cerr << soliloquy << " Saving " << AE.size() << " atomic environments" << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " Saving " << AE.size() << " atomic environments" << endl;
 
   for(uint i=0; i<AE.size(); i++) ae_collection.push_back(AE[i].toJSON());
 
@@ -2280,7 +2276,7 @@ void writeAtomEnvironments(vector<AtomEnvironment> AE, const std::map<string, st
 
   ae_json.addVector("atomic_environments", ae_collection);
   aurostd::string2file(ae_json.toString(), file_path, "WRITE");
-  if(LDEBUG) cerr << soliloquy << " Written to " << file_path << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " Written to " << file_path << endl;
 }
 
 
@@ -3255,7 +3251,6 @@ void xstructure::initialize(const string& url,const string& file,int _iomode) { 
 // print an xstructure in a variety of forms
 ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XPID + "XSTRUCTURE::operator<<():";
   stringstream message;
   int a_iomode=a.iomode;
   //  DEBUG=TRUE;
@@ -3417,7 +3412,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
         double last_pocc=0.0;
         if(LDEBUG) {
           for(uint i=0;i<a.atoms.size();i++){
-            cerr << soliloquy << " name=" << a.atoms[i].name << " type=" << a.atoms[i].type << " pocc=" << a.atoms[i].partial_occupation_value << endl;
+            cerr << __AFLOW_FUNC__ << " name=" << a.atoms[i].name << " type=" << a.atoms[i].type << " pocc=" << a.atoms[i].partial_occupation_value << endl;
           }
         }
         if(a.atoms.size()){
@@ -3438,7 +3433,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
         if(LDEBUG) {
           for(uint i=0;i<vsame_pocc.size();i++){
             for(uint j=0;j<vsame_pocc[i].size();j++){
-              cerr << soliloquy << " vsame_pocc[" << i << "][" << j << "]=" << vsame_pocc[i][j] << endl;
+              cerr << __AFLOW_FUNC__ << " vsame_pocc[" << i << "][" << j << "]=" << vsame_pocc[i][j] << endl;
             }
           }
         }
@@ -3659,7 +3654,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
         oss << " " << aurostd::PaddedPOST(KBIN::VASP_PseudoPotential_CleanName(a.atoms.at(iat).name),5," ") << " ";
       } else {
         message << "QE needs atoms species names";  //CO20190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_MISSING_); //CO20190629
       }
       for(uint j=1;j<=3;j++) {
         //  oss << " ";
@@ -4283,27 +4278,26 @@ istream& operator>>(istream& cinput, xstructure& a) {
 #define oss cout
   // this is also a constructor so everything should look well defined
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XPID + "XSTRUCTURE>>:";
   stringstream message;
 
-  if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " BEGIN" << endl;
   if(LDEBUG){
-    if(a.iomode==IOAFLOW_AUTO) cerr << soliloquy << " a.iomode = IOAFLOW_AUTO" << endl;
-    if(a.iomode==IOVASP_AUTO) cerr << soliloquy << " a.iomode = IOVASP_AUTO" << endl;
-    if(a.iomode==IOVASP_POSCAR) cerr << soliloquy << " a.iomode = IOVASP_POSCAR" << endl;
-    if(a.iomode==IOVASP_ABCCAR) cerr << soliloquy << " a.iomode = IOVASP_ABCCAR" << endl;
-    if(a.iomode==IOVASP_WYCKCAR) cerr << soliloquy << " a.iomode = IOVASP_WYCKCAR" << endl;
-    if(a.iomode==IOQE_AUTO) cerr << soliloquy << " a.iomode = IOQE_AUTO" << endl;
-    if(a.iomode==IOQE_GEOM) cerr << soliloquy << " a.iomode = IOQE_GEOM" << endl;
-    if(a.iomode==IOAIMS_AUTO) cerr << soliloquy << " a.iomode = IOAIMS_AUTO" << endl;  //CO20171008
-    if(a.iomode==IOAIMS_GEOM) cerr << soliloquy << " a.iomode = IOAIMS_GEOM" << endl;  //CO20171008
-    if(a.iomode==IOABINIT_GEOM) cerr << soliloquy << " a.iomode = IOABINIT_GEOM" << endl;  //DX20200310
-    if(a.iomode==IOELK_GEOM) cerr << soliloquy << " a.iomode = IOELK_GEOM" << endl;  //DX20200310
-    if(a.iomode==IOCIF) cerr << soliloquy << " a.iomode = IOCIF" << endl;  //DX20180723
-    if(a.iomode==IOATAT_STR) cerr << soliloquy << " a.iomode = IOATAT_STR" << endl;  //SD20220114
+    if(a.iomode==IOAFLOW_AUTO) cerr << __AFLOW_FUNC__ << " a.iomode = IOAFLOW_AUTO" << endl;
+    if(a.iomode==IOVASP_AUTO) cerr << __AFLOW_FUNC__ << " a.iomode = IOVASP_AUTO" << endl;
+    if(a.iomode==IOVASP_POSCAR) cerr << __AFLOW_FUNC__ << " a.iomode = IOVASP_POSCAR" << endl;
+    if(a.iomode==IOVASP_ABCCAR) cerr << __AFLOW_FUNC__ << " a.iomode = IOVASP_ABCCAR" << endl;
+    if(a.iomode==IOVASP_WYCKCAR) cerr << __AFLOW_FUNC__ << " a.iomode = IOVASP_WYCKCAR" << endl;
+    if(a.iomode==IOQE_AUTO) cerr << __AFLOW_FUNC__ << " a.iomode = IOQE_AUTO" << endl;
+    if(a.iomode==IOQE_GEOM) cerr << __AFLOW_FUNC__ << " a.iomode = IOQE_GEOM" << endl;
+    if(a.iomode==IOAIMS_AUTO) cerr << __AFLOW_FUNC__ << " a.iomode = IOAIMS_AUTO" << endl;  //CO20171008
+    if(a.iomode==IOAIMS_GEOM) cerr << __AFLOW_FUNC__ << " a.iomode = IOAIMS_GEOM" << endl;  //CO20171008
+    if(a.iomode==IOABINIT_GEOM) cerr << __AFLOW_FUNC__ << " a.iomode = IOABINIT_GEOM" << endl;  //DX20200310
+    if(a.iomode==IOELK_GEOM) cerr << __AFLOW_FUNC__ << " a.iomode = IOELK_GEOM" << endl;  //DX20200310
+    if(a.iomode==IOCIF) cerr << __AFLOW_FUNC__ << " a.iomode = IOCIF" << endl;  //DX20180723
+    if(a.iomode==IOATAT_STR) cerr << __AFLOW_FUNC__ << " a.iomode = IOATAT_STR" << endl;  //SD20220114
   }
 
-  if(LDEBUG) cerr << soliloquy << " definitions" << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " definitions" << endl;
   uint iline=0;
   vector<string> vinput,tokens;
   aurostd::stream2vectorstring(cinput,vinput);
@@ -4311,10 +4305,10 @@ istream& operator>>(istream& cinput, xstructure& a) {
   string input_no_spaces=aurostd::joinWDelimiter(vinput,"");
   input_no_spaces=aurostd::RemoveWhiteSpaces(input_no_spaces);
   if(input_no_spaces.empty()){
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No input",_INPUT_MISSING_);  //CO20190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No input",_INPUT_MISSING_);  //CO20190629
   }  //CO20180702
 
-  if(LDEBUG) cerr << soliloquy << " DeStupidizer" << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " DeStupidizer" << endl;
   // now clean for comments, tabs, double spaces ... etc
   //CO20180409 - fixing for issues with # at the beginning of the line
   string::size_type loc;  //CO20180409
@@ -4333,7 +4327,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     DeStupidizer(vinput[i]);
   }
   if(vinput.size()==0) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"No input",_INPUT_MISSING_);  //CO20190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No input",_INPUT_MISSING_);  //CO20190629
   }  //CO20180420
 
   //  for(uint i=0;i<vinput.size();i++) cerr << "[" << i << "] " <<  vinput[i] << " " << "[X]" << endl;   throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"sortAtomsTypes():","Throw for debugging purposes.",_GENERIC_ERROR_);
@@ -4346,7 +4340,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   //a.atoms.clear();  //CO20190219 - need to use RemoveAtom() (safe)
   //CO20190219 - really remove atoms
   for(uint i=a.atoms.size()-1;i<a.atoms.size();i--){
-    if(LDEBUG) cerr << soliloquy << " removing atom[" << i << "]" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " removing atom[" << i << "]" << endl;
     a.RemoveAtom(i);
   }
 
@@ -4355,10 +4349,10 @@ istream& operator>>(istream& cinput, xstructure& a) {
   //  LDEBUG=TRUE;
   // PAULING PROTO DETECTOR
   if(!IOMODE_found) {
-    if(LDEBUG) cerr << soliloquy << " PAULING PROTO DETECTOR" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " PAULING PROTO DETECTOR" << endl;
     aurostd::string2tokens(vinput.at(0),tokens);
     if(tokens.size() && (tokens.at(0)=="PAULING" || tokens.at(0)=="pauling" || tokens.at(0)=="Pauling")) {  //CO20180420 - ask for size() to print core file
-      if(LDEBUG) cerr << soliloquy << " PAULING PROTO DETECTOR = TRUE" << endl;
+      if(LDEBUG) cerr << __AFLOW_FUNC__ << " PAULING PROTO DETECTOR = TRUE" << endl;
       IOMODE_found=TRUE;
       PAULING_WyckoffDetector(vinput);
       tokens.clear();
@@ -4368,38 +4362,38 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // ----------------------------------------------------------------------
   // QUANTUM ESPRESSO FINDER
   if(!IOMODE_found) {
-    if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " QUANTUM ESPRESSO DETECTOR" << endl;
     uint QE=0;
     bool QE_ERROR=FALSE;
     if(LDEBUG) for(uint i=0;i<vinput.size();i++) cerr << vinput[i] << endl;
     for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"&system",true)+aurostd::substring2bool(vinput[i],"&SYSTEM",true); //DX20180123 - added true to clean the spaces in string
-    if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(&system)=" << QE << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " QUANTUM ESPRESSO DETECTOR QE(&system)=" << QE << endl;
     for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"ibrav=",true)+aurostd::substring2bool(vinput[i],"IBRAV=",true); //DX20180123 - added true to clean the spaces in string
-    if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(ibrav)=" << QE << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " QUANTUM ESPRESSO DETECTOR QE(ibrav)=" << QE << endl;
     for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"nat=",true)+aurostd::substring2bool(vinput[i],"NAT=",true); //DX20180123 - added true to clean the spaces in string
-    if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(nat)=" << QE << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " QUANTUM ESPRESSO DETECTOR QE(nat)=" << QE << endl;
     for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"ntyp=",true)+aurostd::substring2bool(vinput[i],"NTYP=",true); //DX20180123 - added true to clean the spaces in string
-    if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(ntyp)=" << QE << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " QUANTUM ESPRESSO DETECTOR QE(ntyp)=" << QE << endl;
     for(uint i=0;i<vinput.size();i++) QE+=aurostd::substring2bool(vinput[i],"atomic_positions",true)+aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS",true); //DX20180123 - added true to clean the spaces in string
-    if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR QE(ATOMIC_POSITIONS)=" << QE << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " QUANTUM ESPRESSO DETECTOR QE(ATOMIC_POSITIONS)=" << QE << endl;
 
     for(uint i=0;i<vinput.size()&&QE==5;i++) {
       if(aurostd::substring2bool(vinput[i],"ATOMIC_POSITIONS") && 
           !aurostd::substring2bool(vinput[i],"crystal","CRYSTAL") && 
           !aurostd::substring2bool(vinput[i],"bohr","BOHR") && //DX added
           !aurostd::substring2bool(vinput[i],"angstrom","ANGSTROM")) {
-        cerr << soliloquy << " QE input(1) not supported vinput.at(" << i << ")= \"" << vinput[i] << "\"" << endl;QE_ERROR=TRUE;
+        cerr << __AFLOW_FUNC__ << " QE input(1) not supported vinput.at(" << i << ")= \"" << vinput[i] << "\"" << endl;QE_ERROR=TRUE;
       }
       if( aurostd::substring2bool(vinput[i],"&system")) {
-        //	cerr << soliloquy << " QE input(2) not supported vinput.at(" << i << ")= \"" << vinput[i] << "\"" << endl;QE_ERROR=TRUE;
+        //	cerr << __AFLOW_FUNC__ << " QE input(2) not supported vinput.at(" << i << ")= \"" << vinput[i] << "\"" << endl;QE_ERROR=TRUE;
       }
     }
     if(QE==5 && QE_ERROR) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"QE input errors",_INPUT_MISSING_); //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"QE input errors",_INPUT_MISSING_); //CO20190629
     }
     if(QE==5 && !QE_ERROR) {
       a.iomode=IOQE_AUTO; // might need further discipline but for now it is ok.. 2013 May SC
-      if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO DETECTOR = TRUE" << endl;
+      if(LDEBUG) cerr << __AFLOW_FUNC__ << " QUANTUM ESPRESSO DETECTOR = TRUE" << endl;
       IOMODE_found=TRUE;
     }
   }
@@ -4407,7 +4401,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // ----------------------------------------------------------------------
   //for CIF input //DX20180723 - add cif reader - START
   if(!IOMODE_found) {
-    if(LDEBUG) cerr << soliloquy << " CIF DETECTOR" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CIF DETECTOR" << endl;
     uint CIF=0;
     if(LDEBUG) for(uint i=0;i<vinput.size();i++) cerr << vinput[i] << endl;
     for(uint i=0;i<vinput.size();i++){ 
@@ -4421,7 +4415,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
     if(CIF==3){
       a.iomode=IOCIF; 
-      if(LDEBUG) cerr << soliloquy << " CIF DETECTOR = TRUE" << endl;
+      if(LDEBUG) cerr << __AFLOW_FUNC__ << " CIF DETECTOR = TRUE" << endl;
       IOMODE_found=TRUE;
     }
   }
@@ -4432,29 +4426,29 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // based on documentation found at https://docs.abinit.org/variables/basic/
   // NOTE: originally had acell and rprim as keywords, but they are not mandatory
   if(!IOMODE_found) {
-    if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " ABINIT DETECTOR" << endl;
     uint ABINIT=0;
     // find number of atoms (natom)
     for(uint i=0;i<vinput.size();i++){ 
       if(aurostd::substring2bool(vinput[i],"natom",true)){ ABINIT+=1; break;} 
     }
-    if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR (natom)=" << ABINIT << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " ABINIT DETECTOR (natom)=" << ABINIT << endl;
     // find types of atoms (typat)
     for(uint i=0;i<vinput.size();i++){ 
       if(aurostd::substring2bool(vinput[i],"typat",true)){ ABINIT+=1; break;} 
     }
-    if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR (typat)=" << ABINIT << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " ABINIT DETECTOR (typat)=" << ABINIT << endl;
     // find atom positions (xred, xcart, xangst)
     for(uint i=0;i<vinput.size();i++){ 
       if(aurostd::substring2bool(vinput[i],"xred",true) || 
           aurostd::substring2bool(vinput[i],"xcart",true) || 
           aurostd::substring2bool(vinput[i],"xangst",true)){ ABINIT+=1; break;} 
     }
-    if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR (xred,xcart,xangst)=" << ABINIT << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " ABINIT DETECTOR (xred,xcart,xangst)=" << ABINIT << endl;
 
     if(ABINIT==3){
       a.iomode = IOABINIT_GEOM;
-      if(LDEBUG) cerr << soliloquy << " ABINIT DETECTOR = TRUE" << endl;
+      if(LDEBUG) cerr << __AFLOW_FUNC__ << " ABINIT DETECTOR = TRUE" << endl;
       IOMODE_found = TRUE;
     }
   }
@@ -4463,22 +4457,22 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // ----------------------------------------------------------------------
   // ELK input - START (DX20200310)
   if(!IOMODE_found) {
-    if(LDEBUG) cerr << soliloquy << " ELK DETECTOR" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " ELK DETECTOR" << endl;
     uint ELK=0;
     // find atoms keyword (atoms)
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(vinput[i],"atoms",true)){ ELK+=1; break;}
     }
-    if(LDEBUG) cerr << soliloquy << " ELK DETECTOR (atoms)=" << ELK << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " ELK DETECTOR (atoms)=" << ELK << endl;
     // find lattice keyword (avec)
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(vinput[i],"avec",true)){ ELK+=1; break;}
     }
-    if(LDEBUG) cerr << soliloquy << " ELK DETECTOR (avec)=" << ELK << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " ELK DETECTOR (avec)=" << ELK << endl;
 
     if(ELK==2){
       a.iomode = IOELK_GEOM;
-      if(LDEBUG) cerr << soliloquy << " ELK DETECTOR = TRUE" << endl;
+      if(LDEBUG) cerr << __AFLOW_FUNC__ << " ELK DETECTOR = TRUE" << endl;
       IOMODE_found = TRUE;
     }
   }
@@ -4487,7 +4481,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // ----------------------------------------------------------------------
   // ATAT input - START (SD20220117)
   if(!IOMODE_found) {
-    if (LDEBUG) cerr << soliloquy << " ATAT DETECTOR" << endl; 
+    if (LDEBUG) cerr << __AFLOW_FUNC__ << " ATAT DETECTOR" << endl; 
     uint ATAT = 1;
     // count number of entries for axes and fractional cell vectors, check for correct type
     uint line = 0;
@@ -4503,7 +4497,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
     if (ATAT == 1) {
       a.iomode = IOATAT_STR;
-      if (LDEBUG) cerr << soliloquy << " ATAT DETECTOR = TRUE" << endl; 
+      if (LDEBUG) cerr << __AFLOW_FUNC__ << " ATAT DETECTOR = TRUE" << endl; 
       IOMODE_found = TRUE; 
     }
   }
@@ -4525,7 +4519,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       }
     }
     if(IOMODE_found){
-      if(LDEBUG) {cerr << soliloquy << " AIMS GEOM DETECTOR = TRUE" << endl;}
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " AIMS GEOM DETECTOR = TRUE" << endl;}
       a.iomode=IOAIMS_GEOM;
       //if atom_frac, then lattice MUST be provided
       //if atom, no need for lattice
@@ -4542,15 +4536,15 @@ istream& operator>>(istream& cinput, xstructure& a) {
         atom_found=(aurostd::substring2bool(tokens_line[0],"atom"));
         atom_found_anywhere=(atom_found_anywhere || atom_found || frac_found_anywhere);
         if(LDEBUG) {
-          cerr << soliloquy << " AIMS line[" << i+1 << "]: " << vinput[i] << endl;
-          cerr << soliloquy << " AIMS lat_found=" << lat_found << endl;
-          cerr << soliloquy << " AIMS lat_found_anywhere=" << lat_found_anywhere << endl;
-          cerr << soliloquy << " AIMS lat1_found=" << lat1_found << endl;
-          cerr << soliloquy << " AIMS lat2_found=" << lat2_found << endl;
-          cerr << soliloquy << " AIMS lat3_found=" << lat3_found << endl;
-          cerr << soliloquy << " AIMS atom_found=" << atom_found << endl;
-          cerr << soliloquy << " AIMS atom_found_anywhere=" << atom_found_anywhere << endl;
-          cerr << soliloquy << " AIMS frac_found_anywhere=" << frac_found_anywhere << endl;
+          cerr << __AFLOW_FUNC__ << " AIMS line[" << i+1 << "]: " << vinput[i] << endl;
+          cerr << __AFLOW_FUNC__ << " AIMS lat_found=" << lat_found << endl;
+          cerr << __AFLOW_FUNC__ << " AIMS lat_found_anywhere=" << lat_found_anywhere << endl;
+          cerr << __AFLOW_FUNC__ << " AIMS lat1_found=" << lat1_found << endl;
+          cerr << __AFLOW_FUNC__ << " AIMS lat2_found=" << lat2_found << endl;
+          cerr << __AFLOW_FUNC__ << " AIMS lat3_found=" << lat3_found << endl;
+          cerr << __AFLOW_FUNC__ << " AIMS atom_found=" << atom_found << endl;
+          cerr << __AFLOW_FUNC__ << " AIMS atom_found_anywhere=" << atom_found_anywhere << endl;
+          cerr << __AFLOW_FUNC__ << " AIMS frac_found_anywhere=" << frac_found_anywhere << endl;
         }
         if(lat_found || atom_found){
           if(lat_found && tokens_line.size()<4){  //could be more, but not less
@@ -4558,7 +4552,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
             message << "lattice_vector "; //CO20190629
             message << "at line[" << i+1 << "] is ill-defined" << endl; //CO20190629
             message << "line: " << vinput[i] << endl; //CO20190629
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
           }
           if(atom_found && tokens_line.size()<5){  //could be more, but not less (need name/type in last column)
             message << " AIMS input error, "; //CO20190629
@@ -4567,12 +4561,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
             if(tokens_line.size()==4){message << "is missing the atom name" << endl;} //CO20190629
             else {message << "is ill-defined" << endl;} //CO20190629
             message << "line: " << vinput[i] << endl;  //CO20190629
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
           }
         }
       }
       if(!atom_found_anywhere){
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, no atoms found",_INPUT_ERROR_); //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"AIMS input error, no atoms found",_INPUT_ERROR_); //CO20190629
       }
       a.coord_flag=_COORDS_CARTESIAN_;
       if(lat_found_anywhere || frac_found_anywhere){
@@ -4583,45 +4577,45 @@ istream& operator>>(istream& cinput, xstructure& a) {
           aurostd::string2tokens(vinput[i],tokens_line," ");
           if(tokens_line.size() && tokens_line[0]=="lattice_vector"){
             lat_count++;
-            if(LDEBUG) {cerr << soliloquy << " AIMS lat_count=" << lat_count << " line[" << i << "," << vinput[i] << "]" << endl;}
+            if(LDEBUG) {cerr << __AFLOW_FUNC__ << " AIMS lat_count=" << lat_count << " line[" << i << "," << vinput[i] << "]" << endl;}
             if(lat_count==1){lat1_found=true;}
             else if(lat_count==2){lat2_found=true;}
             else if(lat_count==3){lat3_found=true;}
             else {
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, too many lattice vectors found",_INPUT_ERROR_);  //CO20190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"AIMS input error, too many lattice vectors found",_INPUT_ERROR_);  //CO20190629
             }
           }
         }
         if(!lat1_found || !lat2_found || !lat3_found){
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS input error, incomplete lattice vector specification (needed if atom_frac found)",_INPUT_ERROR_);  //CO20190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"AIMS input error, incomplete lattice vector specification (needed if atom_frac found)",_INPUT_ERROR_);  //CO20190629
         }
       }
     }
-    else {if(LDEBUG) {cerr << soliloquy << " AIMS GEOM DETECTOR = FALSE" << endl;}}
+    else {if(LDEBUG) {cerr << __AFLOW_FUNC__ << " AIMS GEOM DETECTOR = FALSE" << endl;}}
   }
   // DESPERATE FINDING => VASP
   if(!IOMODE_found) {
-    if(LDEBUG) cerr << soliloquy << " VASP DETECTOR" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " VASP DETECTOR" << endl;
     if(a.iomode==IOAFLOW_AUTO) {
       a.iomode=IOVASP_AUTO; // still not found, need something to eat.
       //  if(a.iomode==IOVASP_AUTO) a.iomode=IOVASP_POSCAR;
       IOMODE_found=TRUE;
-      if(LDEBUG) cerr << soliloquy << " VASP DETECTOR = TRUE" << endl;
+      if(LDEBUG) cerr << __AFLOW_FUNC__ << " VASP DETECTOR = TRUE" << endl;
     }
   }
 
   // ----------------------------------------------------------------------
   // SOME EXTRA VERBOSE
-  if(LDEBUG) if(a.iomode==IOAFLOW_AUTO) cerr << soliloquy << " a.iomode = IOAFLOW_AUTO" << endl;
-  if(LDEBUG) if(a.iomode==IOVASP_AUTO) cerr << soliloquy << " a.iomode = IOVASP_AUTO" << endl;
-  if(LDEBUG) if(a.iomode==IOVASP_POSCAR) cerr << soliloquy << " a.iomode = IOVASP_POSCAR" << endl;
-  if(LDEBUG) if(a.iomode==IOVASP_ABCCAR) cerr << soliloquy << " a.iomode = IOVASP_ABCCAR" << endl;
-  if(LDEBUG) if(a.iomode==IOVASP_WYCKCAR) cerr << soliloquy << " a.iomode = IOVASP_WYCKCAR" << endl;
-  if(LDEBUG) if(a.iomode==IOQE_AUTO) cerr << soliloquy << " a.iomode = IOQE_AUTO" << endl;
-  if(LDEBUG) if(a.iomode==IOQE_GEOM) cerr << soliloquy << " a.iomode = IOQE_GEOM" << endl;
-  if(LDEBUG) if(a.iomode==IOAIMS_AUTO) cerr << soliloquy << " a.iomode = IOAIMS_AUTO" << endl;  //CO20171008
-  if(LDEBUG) if(a.iomode==IOAIMS_GEOM) cerr << soliloquy << " a.iomode = IOAIMS_GEOM" << endl;  //CO20171008
-  if(LDEBUG) if(a.iomode==IOATAT_STR) cerr << soliloquy << " a.iomode = IOATAT_STR" << endl;  //SD20220114
+  if(LDEBUG) if(a.iomode==IOAFLOW_AUTO) cerr << __AFLOW_FUNC__ << " a.iomode = IOAFLOW_AUTO" << endl;
+  if(LDEBUG) if(a.iomode==IOVASP_AUTO) cerr << __AFLOW_FUNC__ << " a.iomode = IOVASP_AUTO" << endl;
+  if(LDEBUG) if(a.iomode==IOVASP_POSCAR) cerr << __AFLOW_FUNC__ << " a.iomode = IOVASP_POSCAR" << endl;
+  if(LDEBUG) if(a.iomode==IOVASP_ABCCAR) cerr << __AFLOW_FUNC__ << " a.iomode = IOVASP_ABCCAR" << endl;
+  if(LDEBUG) if(a.iomode==IOVASP_WYCKCAR) cerr << __AFLOW_FUNC__ << " a.iomode = IOVASP_WYCKCAR" << endl;
+  if(LDEBUG) if(a.iomode==IOQE_AUTO) cerr << __AFLOW_FUNC__ << " a.iomode = IOQE_AUTO" << endl;
+  if(LDEBUG) if(a.iomode==IOQE_GEOM) cerr << __AFLOW_FUNC__ << " a.iomode = IOQE_GEOM" << endl;
+  if(LDEBUG) if(a.iomode==IOAIMS_AUTO) cerr << __AFLOW_FUNC__ << " a.iomode = IOAIMS_AUTO" << endl;  //CO20171008
+  if(LDEBUG) if(a.iomode==IOAIMS_GEOM) cerr << __AFLOW_FUNC__ << " a.iomode = IOAIMS_GEOM" << endl;  //CO20171008
+  if(LDEBUG) if(a.iomode==IOATAT_STR) cerr << __AFLOW_FUNC__ << " a.iomode = IOATAT_STR" << endl;  //SD20220114
   // ----------------------------------------------------------------------
   // VASP INPUT
   if(a.iomode==IOVASP_AUTO || a.iomode==IOVASP_POSCAR || a.iomode==IOVASP_ABCCAR || a.iomode==IOVASP_WYCKCAR) { // VASP POSCAR
@@ -4638,7 +4632,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(vinput.size()-1<iline) {
       message << "missing line[" << iline << "]" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }  //CO20180420 - check for missing lines
     //DX+ME20210525 [OBSOLETE - need to remove control code characters from input, important for web] a.title=vinput.at(iline++);
     aurostd::RemoveControlCodeCharactersFromString(vinput[iline++],a.title); //DX+ME20210525 - need to remove control code characters from input, important for web
@@ -4647,7 +4641,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(vinput.size()-1<iline) {
       message << "missing line[" << iline << "]" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }  //CO20180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
@@ -4655,9 +4649,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(tokens.size()==0) {
       message << "missing second line in poscar" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }
-    // oss << tokens.size() <<  " = " << tokens.at(0) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    // oss << tokens.size() <<  " = " << tokens.at(0) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
     a.scale=0.0;
     if(tokens.size()>0) {a.scale=aurostd::string2utype<double>(tokens.at(0));}
     if(tokens.size()>1) {/*a.neg_scale_second=TRUE;*/a.scale_second=aurostd::string2utype<double>(tokens.at(1));a.neg_scale_second=std::signbit(a.scale_second);} //CO20180409
@@ -4670,7 +4664,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(vinput.size()-1<iline) {
       message << "missing line[" << iline << "]" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }  //CO20180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::string2tokens(stmp,tokens);
@@ -4681,7 +4675,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //    oss << " LDEBUG token.size()=" << tokens.size() << "" << endl;
     // ---------------------------------------------------------------
     if(a.iomode==IOVASP_POSCAR) {
-      // oss << soliloquy << " Chosen IOVASP_POSCAR" << endl;
+      // oss << __AFLOW_FUNC__ << " Chosen IOVASP_POSCAR" << endl;
       //    input >> a.lattice(1,1) >> a.lattice(1,2) >> a.lattice(1,3);
       a.lattice(1,1)=aurostd::string2utype<double>(tokens[0]);
       a.lattice(1,2)=aurostd::string2utype<double>(tokens[1]);
@@ -4690,14 +4684,14 @@ istream& operator>>(istream& cinput, xstructure& a) {
       if(vinput.size()-1<iline) {
         message << "missing line[" << iline << "]" << endl; //CO20190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
       }  //CO20180420 - check for missing lines
       input_tmp.clear();input_tmp.str(vinput.at(iline++));
       input_tmp >> a.lattice(2,1) >> a.lattice(2,2) >> a.lattice(2,3);
       if(vinput.size()-1<iline) {
         message << "missing line[" << iline << "]" << endl; //CO20190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
       }  //CO20180420 - check for missing lines
       input_tmp.clear();input_tmp.str(vinput.at(iline++));
       input_tmp >> a.lattice(3,1) >> a.lattice(3,2) >> a.lattice(3,3);
@@ -4708,7 +4702,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
     // ---------------------------------------------------------------
     if(a.iomode==IOVASP_ABCCAR) {
-      // cerr << soliloquy << " Chosen IOVASP_ABCCAR" << endl;
+      // cerr << __AFLOW_FUNC__ << " Chosen IOVASP_ABCCAR" << endl;
       a.a=aurostd::string2utype<double>(tokens[0]);
       a.b=aurostd::string2utype<double>(tokens[1]);
       a.c=aurostd::string2utype<double>(tokens[2]);
@@ -4719,7 +4713,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
     // ---------------------------------------------------------------
     if(a.iomode==IOVASP_WYCKCAR) {
-      //     cerr << soliloquy << " Chosen IOVASP_WYCKCAR" << endl;
+      //     cerr << __AFLOW_FUNC__ << " Chosen IOVASP_WYCKCAR" << endl;
       //DX20170905 - GET SYM_EPS
       vector<string> title_tokens;
       aurostd::string2tokens(a.title,title_tokens);
@@ -4767,7 +4761,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO20190629 - OBSOLETE]message << "missing D/C/S line" << endl;  //CO20190629
       message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_MISSING_); //CO20190629
     }
 
     // VASP 4
@@ -4792,7 +4786,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(!(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c')){
       message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_MISSING_); //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_MISSING_); //CO20190629
     }
 
     //[CO20190629 - OBSOLETE]if(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c') {
@@ -4815,16 +4809,16 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //}
     if(a.partial_occupation_flag) //&& a.neg_scale_second) //CO20180409
     { //CO20200106 - patching for auto-indenting
-      if(LDEBUG) {cerr << soliloquy << " a.neg_scale_second=" << a.neg_scale_second << ", a.scale_second=" << a.scale_second << endl;}
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " a.neg_scale_second=" << a.neg_scale_second << ", a.scale_second=" << a.scale_second << endl;}
       if(a.neg_scale_second){a.partial_occupation_HNF=(int) (-a.scale_second);} //CO20180409
       else {
         a.partial_occupation_site_tol=a.partial_occupation_stoich_tol=a.scale_second; //CO20180409
         if(a.scale_third.isentry){a.partial_occupation_stoich_tol=a.scale_third.content_double;} //CO20170803 - site tol
       }
       if(LDEBUG) {
-        cerr << soliloquy << " a.partial_occupation_HNF=" << a.partial_occupation_HNF << endl;
-        cerr << soliloquy << " a.partial_occupation_site_tol=" << a.partial_occupation_site_tol << endl;
-        cerr << soliloquy << " a.partial_occupation_stoich_tol=" << a.partial_occupation_stoich_tol << endl;
+        cerr << __AFLOW_FUNC__ << " a.partial_occupation_HNF=" << a.partial_occupation_HNF << endl;
+        cerr << __AFLOW_FUNC__ << " a.partial_occupation_site_tol=" << a.partial_occupation_site_tol << endl;
+        cerr << __AFLOW_FUNC__ << " a.partial_occupation_stoich_tol=" << a.partial_occupation_stoich_tol << endl;
       }
       //if(a.scale_second==0.0) {//CO20180409
       //  a.partial_occupation_stoich_tol=DEFAULT_PARTIAL_OCCUPATION_TOLERANCE; // nothing defined
@@ -4840,7 +4834,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       if(vinput.size()-1<iline) {
         message << "missing line[" << iline << "]" << endl; //CO20190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
       }  //CO20180420 - check for missing lines
       stmp=vinput.at(iline++);  // to skip toward vasp5
     }
@@ -4850,7 +4844,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(vinput.size()-1<iline) {
       message << "missing line[" << iline << "]" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }  //CO20180420 - check for missing lines
     stmp=vinput.at(iline++);
     // The following is necessary because if the last lattice parameter has
@@ -4863,7 +4857,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       if(vinput.size()-1<iline) {
         message << "missing line[" << iline << "]" << endl; //CO20190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
       }  //CO20180420 - check for missing lines
       stmp=vinput.at(iline++);
     }
@@ -4878,7 +4872,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         a.partial_occupation_flag=TRUE;
     // -------------- no partial occupation
     if(a.partial_occupation_flag==FALSE) {
-      if(LDEBUG) cerr << soliloquy << " PARTIAL OCCUPATION = FALSE" << endl;
+      if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARTIAL OCCUPATION = FALSE" << endl;
       for(uint i=0;i<tokens_i.size();i++) {
         number=aurostd::string2utype<int>(tokens_i.at(i));dpocc=1.0;
         a.num_each_type.push_back(number); num_atoms+=number;
@@ -4888,7 +4882,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
     // -------------- yes partial occupation
     if(a.partial_occupation_flag==TRUE) {
-      if(LDEBUG) cerr << soliloquy << " PARTIAL OCCUPATION = TRUE" << endl;
+      if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARTIAL OCCUPATION = TRUE" << endl;
       for(uint i=0;i<tokens_i.size();i++) {
         if(!aurostd::substring2bool(tokens_i.at(i),"*") && !aurostd::substring2bool(tokens_i.at(i),"+")) { // NO POCC KEYWORD
           number=aurostd::string2utype<int>(tokens_i.at(i));dpocc=1.0;
@@ -4903,7 +4897,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
             if(tokens_k.size()==0) {
               message << "PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl; //CO20190629
               for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
             }
             nnumber=aurostd::string2utype<int>(tokens_k.at(0));
             if(tokens_k.size()==1) dpocc=1.0;
@@ -4917,7 +4911,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
             if(tokens_k.size()>=3) {
               message << "PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl; //CO20190629
               for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
             }
           } // loop on +
           a.num_each_type.push_back(number);
@@ -4925,17 +4919,17 @@ istream& operator>>(istream& cinput, xstructure& a) {
       }
       if(LDEBUG) {cerr << "P(" << poccaus.size()<< ") = ";for(uint j=0;j<poccaus.size();j++) cerr << poccaus.at(j) << " ";cerr << endl;}
     }
-    //  cerr << "num_atoms=" << num_atoms << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_); // num_atoms is the SUM of the atoms in the numbers
+    //  cerr << "num_atoms=" << num_atoms << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_); // num_atoms is the SUM of the atoms in the numbers
     // -------------- COORDINATE TYPES
     // Type of coordinates (Fractional or Cartesian) - only 1st character matters (D/d or C/c).
     // This line might also be the Selective Dynamics line so you must check for that (S/s).
     a.isd=FALSE;
     string stmp;
-    if(LDEBUG) cerr << soliloquy << " DEBUG [1]" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " DEBUG [1]" << endl;
     if(vinput.size()-1<iline) {
       message << "missing line[" << iline << "]" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }  //CO20180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::StringSubst(stmp,"\t"," ");
@@ -4945,9 +4939,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(stmp_tokens.size()==0) {
       message << "Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;  //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     } else {
-      if(LDEBUG) cerr << soliloquy << " DEBUG [2]" << endl;
+      if(LDEBUG) cerr << __AFLOW_FUNC__ << " DEBUG [2]" << endl;
       string sstmp=stmp_tokens.at(0);
       a.order_parameter_structure=FALSE;
       if(sstmp[0]=='S' || sstmp[0]=='s') {
@@ -4955,12 +4949,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
         if(vinput.size()-1<iline){
           message << "missing line[" << iline << "]" << endl; //CO20190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
         }  //CO20180420 - check for missing lines
         stmp=vinput.at(iline++);
         sstmp=aurostd::RemoveSpaces(stmp);
       }
-      if(LDEBUG) cerr << soliloquy << " DEBUG [3]" << endl;
+      if(LDEBUG) cerr << __AFLOW_FUNC__ << " DEBUG [3]" << endl;
       if(sstmp[0]=='D' || sstmp[0]=='d') {
         //	cerr << "FRAC" << endl;
         a.coord_type[0]=sstmp[0];
@@ -4973,12 +4967,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
           if(a.iomode==IOVASP_WYCKCAR) {
             message << "WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;  //CO20190629
             for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
           }
         } else {
           message << "Did not find coordinate type D/d or C/c." << endl;  //CO20190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
         }
       }
       a.coord_type[1]='\0';
@@ -4988,9 +4982,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
           //	  if(stmp_tokens.at(ipos)[0]=='P' || stmp_tokens.at(ipos)[0]=='p') a.partial_occupation_flag=TRUE;
         }
       }
-      if(LDEBUG) cerr << soliloquy << " DEBUG a.order_parameter_structure=" << a.order_parameter_structure << endl;
+      if(LDEBUG) cerr << __AFLOW_FUNC__ << " DEBUG a.order_parameter_structure=" << a.order_parameter_structure << endl;
     }
-    if(LDEBUG) cerr << soliloquy << " DEBUG [4]" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " DEBUG [4]" << endl;
 
     // --------------  Basis atom positions and names
     //   int cnt;
@@ -5020,7 +5014,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     for(itype=0;itype<a.num_each_type.size();itype++) {
       //  cerr << a.num_each_type.at(itype) << endl;
       for(j=0;j<(uint) a.num_each_type.at(itype);j++) {
-        if(LDEBUG) cerr << soliloquy << " DEBUG [5] itype,j=" << itype << "," << j << endl;
+        if(LDEBUG) cerr << __AFLOW_FUNC__ << " DEBUG [5] itype,j=" << itype << "," << j << endl;
         //	bool plug_atom=TRUE;
         iat++; // it startf from -1 so the first is ZERO
         //  cerr << iat << " type=" << itype << endl;
@@ -5029,22 +5023,22 @@ istream& operator>>(istream& cinput, xstructure& a) {
         _atom atom;                                        // create new atom
         string stmp;
         stmp=vinput.at(iline++);
-        if(LDEBUG) cerr << soliloquy << " " << iline << " " << vinput.size() << "," << iline-iline_ref << "," << num_atoms << "," << stmp << endl;
+        if(LDEBUG) cerr << __AFLOW_FUNC__ << " " << iline << " " << vinput.size() << "," << iline-iline_ref << "," << num_atoms << "," << stmp << endl;
         if(iline==vinput.size() && (iline-iline_ref<(uint) num_atoms)) {
           message << "Insufficient number of atom lines." << endl;  //CO20190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
         }  
-        if(LDEBUG) cerr << soliloquy << " DEBUG [6]" << endl;
+        if(LDEBUG) cerr << __AFLOW_FUNC__ << " DEBUG [6]" << endl;
         stmp=aurostd::RemoveCharacter(stmp,'\t');
         aurostd::StringSubst(stmp,"\t"," ");
         std::vector<string> stmp_tokens;
         aurostd::string2tokens(stmp,stmp_tokens);
-        if(LDEBUG) cerr << soliloquy << " DEBUG [6b] stmp_tokens.size()=" << stmp_tokens.size() << endl;
+        if(LDEBUG) cerr << __AFLOW_FUNC__ << " DEBUG [6b] stmp_tokens.size()=" << stmp_tokens.size() << endl;
         if(stmp_tokens.size()<3) {
           message << "Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; //CO20190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
         }  
 
         int id=0;
@@ -5076,7 +5070,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         atom.partial_occupation_flag=FALSE;
         //	plug_atom=TRUE;   // not used
         // NO ORDER PARAMETER
-        if(LDEBUG) cerr << soliloquy << " DEBUG [7]" << endl;
+        if(LDEBUG) cerr << __AFLOW_FUNC__ << " DEBUG [7]" << endl;
         if(a.order_parameter_structure==FALSE) {
           // stmp_tokens.size() = 4 (plus possible comments).
           // Read in the names.
@@ -5114,7 +5108,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
               message << " where x,y,z are the coordinates " << endl; //CO20190629
               message << " Name is the symbol of the atom  " << endl; //CO20190629
               message << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl; //CO20190629
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
             }
           }
           if(stmp_tokens.size()==5 || stmp_tokens.size()==6) {
@@ -5140,7 +5134,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
             }
           }
         }
-        if(LDEBUG) cerr << soliloquy << " DEBUG [8]" << endl;
+        if(LDEBUG) cerr << __AFLOW_FUNC__ << " DEBUG [8]" << endl;
         // now plug atom into the atomlist
         //      cerr << atom.name << endl;
         //      cerr << atom.cleanname << endl;
@@ -5155,7 +5149,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // QE INPUT
   if(a.iomode==IOQE_AUTO || a.iomode==IOQE_GEOM) {
     // LDEBUG=TRUE;
-    if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO IOQE_AUTO/GEOM" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " QUANTUM ESPRESSO IOQE_AUTO/GEOM" << endl;
     // START FROM CELL
     a.scale=1.0; // standard
     a.neg_scale=FALSE; // standard
@@ -5327,7 +5321,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //DX20180123 - added ibrav/parameters - END
     else {
       if(iline<vinput.size()-3) { // IN a1 / a2 / a3 rows version
-        if(LDEBUG) cerr << soliloquy << " QUANTUM ESPRESSO FOUND 3 extra lines after, trying a1/a2/a3 on raws" << endl;
+        if(LDEBUG) cerr << __AFLOW_FUNC__ << " QUANTUM ESPRESSO FOUND 3 extra lines after, trying a1/a2/a3 on raws" << endl;
         stringstream input_tmp;
         input_tmp.clear();input_tmp.str(vinput.at(iline++));
         input_tmp >> a.lattice(1,1) >> a.lattice(1,2) >> a.lattice(1,3);
@@ -5395,11 +5389,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
       stmp=vinput[i];       stmp=aurostd::RemoveCharacter(vinput[i],'\t');aurostd::StringSubst(stmp,"\t"," ");
       std::vector<string> stmp_tokens;
       aurostd::string2tokens(stmp,stmp_tokens);
-      if(LDEBUG) cerr << soliloquy << " DEBUG [6b] stmp_tokens.size()=" << stmp_tokens.size() << endl;
+      if(LDEBUG) cerr << __AFLOW_FUNC__ << " DEBUG [6b] stmp_tokens.size()=" << stmp_tokens.size() << endl;
       if(stmp_tokens.size()<4) {
         message << "Insufficient number of atom entries in atom=" << i << "" << endl; //CO20190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
       }  
       int id=0;
       string name;
@@ -5467,7 +5461,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // ----------------------------------------------------------------------
   // ABINIT INPUT (DX20200310)
   if(a.iomode==IOABINIT_AUTO || a.iomode==IOABINIT_GEOM) { // ABINIT
-    if(LDEBUG){ cerr << soliloquy << " ABINIT READER begin" << endl; }
+    if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER begin" << endl; }
 
     a.scale=1.0; // standard
     a.neg_scale=FALSE; // standard
@@ -5477,7 +5471,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     xvector<double> acell; acell(1)=1.0; acell(2)=1.0; acell(3)=1.0;
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ACELL",true)){
-        if(LDEBUG){ cerr << soliloquy << " ABINIT READER acell line=" << vinput[i] << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER acell line=" << vinput[i] << endl; }
         string acell_line = aurostd::toupper(vinput[i]);
         aurostd::StringSubst(acell_line,"ACELL","");
 
@@ -5519,10 +5513,10 @@ istream& operator>>(istream& cinput, xstructure& a) {
           }
           else{
             message << "Unable to parse the acell line; unexpected format. acell_line = " << acell_line << " tokens: " << aurostd::joinWDelimiter(tokens,",");
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
           }
         }
-        if(LDEBUG){ cerr << soliloquy << " ABINIT READER extracted acell = " << acell << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER extracted acell = " << acell << endl; }
       }
     }
 
@@ -5537,7 +5531,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.lattice = aurostd::identity((double) 0,3); //abinit default //DX20200521 - new identity format
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"RPRIM",true)){
-        if(LDEBUG){ cerr << soliloquy << " ABINIT READER rprim line found = " << vinput[i] << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER rprim line found = " << vinput[i] << endl; }
         is_lattice_line = true;
       }
       if(is_lattice_line){
@@ -5570,11 +5564,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
         else if(number_tokens==0){ continue; }
         else{
           message << "Unable to parse the rprim line; unexpected format.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
         }
       }
     }
-    if(LDEBUG){ cerr << soliloquy << " ABINIT READER lattice (row-major; AFLOW convention) = " << endl << a.lattice << endl; }
+    if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER lattice (row-major; AFLOW convention) = " << endl << a.lattice << endl; }
 
     // ----------------------------------------------------------------------
     // get number of atoms
@@ -5584,7 +5578,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     uint number_of_atoms = 0;
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"NATOM",true)){
-        if(LDEBUG){ cerr << soliloquy << " ABINIT READER natom line = " << vinput[i] << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER natom line = " << vinput[i] << endl; }
         string natom_line = aurostd::toupper(vinput[i]);
         vector<string> tokens; 
         aurostd::string2tokens(natom_line,tokens," ");
@@ -5594,18 +5588,18 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         if(number_of_atoms == 0){ 
           message << "Unable to parse the natom line; unexpected format. vinput[i] = \"" << natom_line << "\".";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
         }
       }
     }
-    if(LDEBUG){ cerr << soliloquy << " ABINIT READER number of atoms; natom = " << number_of_atoms << endl; }
+    if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER number of atoms; natom = " << number_of_atoms << endl; }
 
     // natrd (optional)
     bool found_natrd = false;
     uint number_of_atoms_to_read = 0;
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"NATRD",true)){
-        if(LDEBUG){ cerr << soliloquy << " ABINIT READER natrd line = " << vinput[i] << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER natrd line = " << vinput[i] << endl; }
         found_natrd = true;
         string natrd_line = aurostd::toupper(vinput[i]);
         vector<string> tokens; 
@@ -5616,16 +5610,16 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         if(number_of_atoms_to_read == 0){ 
           message << "Unable to parse the natrd line; unexpected format. natrd_line = \"" << natrd_line << "\".";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
         }
-        if(LDEBUG){ cerr << soliloquy << " ABINIT READER number of atoms to read; natrd = " << number_of_atoms_to_read << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER number of atoms to read; natrd = " << number_of_atoms_to_read << endl; }
       }
     }
     if(!found_natrd){ number_of_atoms_to_read = number_of_atoms; } // if natrd not specified set to natom
 
     if(number_of_atoms != number_of_atoms_to_read){
       message << "The natoms != natrd, i.e., unit cell requires atoms (iatoms) to be expanded by symmetry. Functionality not yet supported.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
     }
 
     // ----------------------------------------------------------------------
@@ -5634,7 +5628,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     uint number_of_atom_types = 0;
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"NTYPAT",true)){
-        if(LDEBUG){ cerr << soliloquy << " ABINIT READER ntypat line = " << vinput[i] << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER ntypat line = " << vinput[i] << endl; }
         found_ntypat = true;
         string ntypat_line = aurostd::toupper(vinput[i]);
         vector<string> tokens; 
@@ -5645,9 +5639,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         if(number_of_atoms_to_read == 0){ 
           message << "Unable to parse the ntypat line; unexpected format. ntypat_line = \"" << ntypat_line << "\".";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
         }
-        if(LDEBUG){ cerr << soliloquy << " ABINIT READER number of atom types; ntypat = " << number_of_atom_types << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER number of atom types; ntypat = " << number_of_atom_types << endl; }
       }
     }
 
@@ -5657,7 +5651,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     vector<uint> atom_types; //follows order of atoms
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"TYPAT",true)){
-        if(LDEBUG){ cerr << soliloquy << " ABINIT READER typat line = " << vinput[i] << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER typat line = " << vinput[i] << endl; }
         string typat_line = aurostd::toupper(vinput[i]);
         vector<string> tokens; 
         aurostd::string2tokens(typat_line,tokens," ");
@@ -5686,7 +5680,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         if(!found_typat){ continue; } //found ntypat not typat, try another line
       }
     }
-    if(LDEBUG){ cerr << soliloquy << " ABINIT READER atom type sequence (matches order of atom positions); typat = " << aurostd::joinWDelimiter(atom_types,",") << endl; }
+    if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER atom type sequence (matches order of atom positions); typat = " << aurostd::joinWDelimiter(atom_types,",") << endl; }
 
     // check the number of unique types matches ntypat
     vector<uint> unique_types = atom_types;
@@ -5694,11 +5688,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
     unique_types.erase(std::unique(unique_types.begin(),unique_types.end()),unique_types.end());
     if(found_ntypat && (unique_types.size() != number_of_atom_types)){
       message << "Number of atom types does not match ntypat variable. typat=" << aurostd::joinWDelimiter(unique_types,",") << " | ntypat=" << number_of_atom_types;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
     }
     if(atom_types.size() != number_of_atoms_to_read){ 
       message << "Number of atom types does not match the number of atoms to read. typat=" << aurostd::joinWDelimiter(atom_types,",") << " | natom=" << number_of_atoms;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
     }
 
     // ----------------------------------------------------------------------
@@ -5706,7 +5700,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     vector<uint> nuclear_charge;
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"ZNUCL",true)){
-        if(LDEBUG){ cerr << soliloquy << " ABINIT READER znucl line = " << vinput[i] << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER znucl line = " << vinput[i] << endl; }
         string znucl_line = aurostd::toupper(vinput[i]);
         vector<string> tokens; 
         aurostd::string2tokens(znucl_line,tokens," ");
@@ -5727,37 +5721,37 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
       }
     }
-    if(LDEBUG){ cerr << soliloquy << " ABINIT READER nuclear charge of each atom type (order corresponds to typat index); znucl = " << aurostd::joinWDelimiter(nuclear_charge,",") << endl; }
+    if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER nuclear charge of each atom type (order corresponds to typat index); znucl = " << aurostd::joinWDelimiter(nuclear_charge,",") << endl; }
 
     // ----------------------------------------------------------------------
     // normally a mandatory keyword, but the AFLOW-ABINIT writer has not been printing this keyword
     // for backwards compatability, we will throw a warning (for now)
     if(nuclear_charge.size()==0){ 
       message << "The atom elements/types (znucl) are not specified. Using fictious atoms.";
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,std::cerr,_LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,std::cerr,_LOGGER_WARNING_);
     }
 
     // ----------------------------------------------------------------------
     // get atom positions
-    if(LDEBUG){ cerr << soliloquy << " ABINIT READER reading atom positions" << endl; }
+    if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER reading atom positions" << endl; }
     deque<_atom> atoms_temp;
     bool is_atom_line = false;
     bool is_Bohr_units = false;
     uint atom_line_count = 0;
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"XRED",true)){
-        if(LDEBUG){ cerr << soliloquy << " ABINIT READER xred (fractional) line = " << vinput[i] << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER xred (fractional) line = " << vinput[i] << endl; }
         a.coord_flag = _COORDS_FRACTIONAL_;
         is_atom_line = true;
       }
       else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"XCART",true)){
-        if(LDEBUG){ cerr << soliloquy << " ABINIT READER xcart (Cartesian, unit=Bohr) line = " << vinput[i] << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER xcart (Cartesian, unit=Bohr) line = " << vinput[i] << endl; }
         a.coord_flag = _COORDS_CARTESIAN_;
         is_Bohr_units = true;
         is_atom_line = true;
       }
       else if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"XANGST",true)){
-        if(LDEBUG){ cerr << soliloquy << " ABINIT READER xangst (Cartesian, unit=Angstrom) line = " << vinput[i] << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER xangst (Cartesian, unit=Angstrom) line = " << vinput[i] << endl; }
         a.coord_flag = _COORDS_CARTESIAN_;
         is_atom_line = true;
       }
@@ -5811,7 +5805,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         else if(number_tokens==0){ continue; }
         else{
           message << "Unable to parse the atom line; unexpected format. vinput[i] = " << atom_line;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
         }
         if(atom_line_count == number_of_atoms_to_read){ break;}
       }
@@ -5819,7 +5813,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
     if(LDEBUG){ 
       for(uint iat=0;iat<atoms_temp.size();iat++){
-        cerr << soliloquy << " ABINIT READER atom position [" << iat << "] = " << atoms_temp[iat] << endl;
+        cerr << __AFLOW_FUNC__ << " ABINIT READER atom position [" << iat << "] = " << atoms_temp[iat] << endl;
       }
     }
 
@@ -5827,20 +5821,20 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // ensure correct number of atoms
     if(atoms_temp.size() != number_of_atoms_to_read){ 
       message << "The number of atoms is not commensurate: number of atom positions found = " << atoms_temp.size() << " vs natom/natrd = " << number_of_atoms_to_read;
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,std::cerr,_RUNTIME_ERROR_);
+      pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,std::cerr,_RUNTIME_ERROR_);
     }
 
     // ----------------------------------------------------------------------
     // add atoms to xstructure 
     // add name/type info as well
     for(uint i=0;i<atoms_temp.size();i++){
-      if(LDEBUG) {cerr << soliloquy << " ABINIT READER finding element/type for atom [" << a << "]" << endl; }
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " ABINIT READER finding element/type for atom [" << a << "]" << endl; }
       xelement::xelement element;
       // use nuclear charge associated atom index
       if(nuclear_charge.size()){ element = xelement::xelement(nuclear_charge[atom_types[i]-1]); } //i-1 since index doesn't start at zero
       // use arbitrary element names (in order of increasing Z)
       else{ element = xelement::xelement(atom_types[i]); }
-      if(LDEBUG) {cerr << soliloquy << " ABINIT READER element/type for atom [" << a << "] = " << element.symbol << endl; }
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " ABINIT READER element/type for atom [" << a << "] = " << element.symbol << endl; }
       atoms_temp[i].name=element.symbol;
       atoms_temp[i].CleanName();
       atoms_temp[i].CleanSpin();
@@ -5864,7 +5858,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       a.partial_occupation_sublattice.push_back(_pocc_no_sublattice_);
 
     }
-    if(LDEBUG) {cerr << soliloquy << " ABINIT READER fixing atom information (alphabetize, make basis, set species, etc.)" << endl; }
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " ABINIT READER fixing atom information (alphabetize, make basis, set species, etc.)" << endl; }
     a.SpeciesPutAlphabetic();
     std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames);
     a.MakeBasis();
@@ -5882,7 +5876,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.is_vasp4_poscar_format=FALSE;
     a.is_vasp5_poscar_format=FALSE;
 
-    if(LDEBUG) {cerr << soliloquy << " ABINIT READER - Finished" << endl; }
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " ABINIT READER - Finished" << endl; }
 
   }
 
@@ -5890,7 +5884,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // ELK INPUT - START (DX20200310)
   // based on information from http://elk.sourceforge.net/elk.pdf
   if(a.iomode==IOELK_AUTO || a.iomode==IOELK_GEOM) { // ELK
-    if(LDEBUG){ cerr << soliloquy << " ELK READER begin" << endl; }
+    if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ELK READER begin" << endl; }
 
     a.scale=1.0; // standard
     a.neg_scale=FALSE; // standard
@@ -5913,28 +5907,28 @@ istream& operator>>(istream& cinput, xstructure& a) {
         if(aurostd::substring2bool(scaling_title_line,"SCALE1",true) ||
             aurostd::substring2bool(scaling_title_line,"SCALE2",true) ||
             aurostd::substring2bool(scaling_title_line,"SCALE3",true)){
-          if(LDEBUG){ cerr << soliloquy << " ELK READER isotropic scaling line found = " << vinput[i] << endl; }
+          if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ELK READER isotropic scaling line found = " << vinput[i] << endl; }
           uint vector_index = aurostd::string2utype<uint>(aurostd::RemoveWhiteSpacesFromTheFrontAndBack(aurostd::StringSubst(scaling_title_line,"SCALE","")));
           string scaling_line = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vinput[i+1]); // scaling value is in the next line
           anisotropic_scaling(vector_index) = aurostd::string2utype<double>(scaling_line);
 
           if(anisotropic_scaling(vector_index)<_ZERO_TOL_){
             message << "Anisotropic scaling factor is zero or negative for " << vector_index << " component;; unable to parse the scale line; unexpected format. scaling_line = " << scaling_line;
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
           }
-          if(LDEBUG){ cerr << soliloquy << " ELK READER anisotropic scaling for vector " << vector_index << " = " << anisotropic_scaling(vector_index) << endl; }
+          if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ELK READER anisotropic scaling for vector " << vector_index << " = " << anisotropic_scaling(vector_index) << endl; }
         }
         // ----------------------------------------------------------------------
         // isotropic
         else{
-          if(LDEBUG){ cerr << soliloquy << " ELK READER isotropic scaling line found = " << vinput[i] << endl; }
+          if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ELK READER isotropic scaling line found = " << vinput[i] << endl; }
           string scaling_line = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vinput[i+1]); // scaling is the next line
           isotropic_scaling = aurostd::string2utype<double>(scaling_line);
           if(isotropic_scaling<_ZERO_TOL_){
             message << "Isotropic scaling factor is zero or negative; unable to parse the scale line; unexpected format. scaling_line = " << scaling_line;
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
           }
-          if(LDEBUG){ cerr << soliloquy << " ELK READER isotropic scaling = " << isotropic_scaling << endl; }
+          if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ELK READER isotropic scaling = " << isotropic_scaling << endl; }
         }
       }
     }
@@ -5945,7 +5939,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     uint lattice_line_count = 0;
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),"AVEC",true)){
-        if(LDEBUG){ cerr << soliloquy << " ELK READER avec line found = " << vinput[i] << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ELK READER avec line found = " << vinput[i] << endl; }
         is_lattice_line = true;
       }
       if(is_lattice_line){
@@ -5978,12 +5972,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
         else if(number_tokens==0){ continue; }
         else{
           message << "Unable to parse the avec line; unexpected format.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
         }
       }
     }
     a.lattice = a.lattice*bohr2angstrom; // convert to Angstroms
-    if(LDEBUG){ cerr << soliloquy << " ELK READER lattice (row-major; AFLOW convention) = " << endl << a.lattice << endl; }
+    if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ELK READER lattice (row-major; AFLOW convention) = " << endl << a.lattice << endl; }
 
     // ----------------------------------------------------------------------
     // get number of atom types (atoms)
@@ -5998,9 +5992,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
         if(number_of_atom_types == 0){
           message << "Unable to parse the atoms line; unexpected format. atoms_line = \"" << tokens[0] << "\".";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
         }
-        if(LDEBUG){ cerr << soliloquy << " ELK READER number of atom types atoms = " << number_of_atom_types << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ELK READER number of atom types atoms = " << number_of_atom_types << endl; }
         break;
       }
     }
@@ -6013,7 +6007,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     for(uint i=0;i<vinput.size();i++){
       if(aurostd::substring2bool(aurostd::toupper(vinput[i]),".IN",true)){
         number_of_element_dot_in_files++;
-        if(LDEBUG){ cerr << soliloquy << " ELK READER \"ELEMENT.in\" file line found = " << vinput[i] << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ELK READER \"ELEMENT.in\" file line found = " << vinput[i] << endl; }
 
         vector<string> tokens;
         // ----------------------------------------------------------------------
@@ -6023,14 +6017,14 @@ istream& operator>>(istream& cinput, xstructure& a) {
         element_symbol = aurostd::RemoveCharacterFromTheFrontAndBack(element_symbol,'\''); //clean
         element_symbol = aurostd::RemoveWhiteSpacesFromTheFrontAndBack(element_symbol); //clean
         tokens.clear();
-        if(LDEBUG){ cerr << soliloquy << " ELK READER element extracted = " << element_symbol << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ELK READER element extracted = " << element_symbol << endl; }
 
         // ----------------------------------------------------------------------
         // get number of that element (+1 line down)
         aurostd::string2tokens(vinput[i+1],tokens," "); // note: +1 line down
         uint num_of_this_type = aurostd::string2utype<uint>(aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[0])); //clean
         num_each_type.push_back(num_of_this_type);
-        if(LDEBUG){ cerr << soliloquy << " ELK READER number of " << element_symbol << " atoms = " << num_of_this_type << endl; }
+        if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ELK READER number of " << element_symbol << " atoms = " << num_of_this_type << endl; }
         tokens.clear();
 
         // ----------------------------------------------------------------------
@@ -6057,7 +6051,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
               magnetic_field(3) = aurostd::string2utype<double>(tokens[5]);
               atom.noncoll_spin_is_given = TRUE; //DX20210409
               atom.noncoll_spin = magnetic_field; //DX20210409
-              if(LDEBUG){ cerr << soliloquy << " ELK READER magnetic field/spin found : " << atom.noncoll_spin << endl; }
+              if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ELK READER magnetic field/spin found : " << atom.noncoll_spin << endl; }
             }
           }
           // F2C
@@ -6080,7 +6074,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           atom.partial_occupation_value=1.0;
           atom.partial_occupation_flag=FALSE;
 
-          if(LDEBUG){ cerr << soliloquy << " ELK READER atom added = " << atom << endl; }
+          if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ELK READER atom added = " << atom << endl; }
           // DONE
           a.AddAtom(atom);
           // NO PARTIAL OCCUPATION
@@ -6094,17 +6088,17 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // check number of element types is consistent
     if(number_of_atom_types == 0 || number_of_atom_types != number_of_element_dot_in_files){
       message << "The number of atom types do not match the number of \"ELEMENT.in\" files: atom = " << number_of_atom_types << " vs # .in files = " << number_of_element_dot_in_files;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
     }
     // ----------------------------------------------------------------------
     // check number of total atoms is consistent
     uint sum_each_type = aurostd::sum(num_each_type);
     if(sum_each_type != a.atoms.size()){
       message << "The total number of atoms does not match the sum of each atom type: a.atoms.size() = " << a.atoms.size() << " vs sum(num_each_type) = " << sum_each_type;;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_FILE_WRONG_FORMAT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
     }
 
-    if(LDEBUG) {cerr << soliloquy << " ELK READER fixing atom information (alphabetize, make basis, set species, etc.)" << endl; }
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " ELK READER fixing atom information (alphabetize, make basis, set species, etc.)" << endl; }
     a.SpeciesPutAlphabetic();
     std::stable_sort(a.atoms.begin(),a.atoms.end(),sortAtomsNames);
     a.MakeBasis();
@@ -6123,13 +6117,13 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.is_vasp4_poscar_format=FALSE;
     a.is_vasp5_poscar_format=FALSE;
 
-    if(LDEBUG) {cerr << soliloquy << " ELK READER - Finished" << endl; }
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " ELK READER - Finished" << endl; }
   }
 
   // ----------------------------------------------------------------------
   // CIF INPUT
   if(a.iomode==IOCIF) { // CIF
-    if(LDEBUG) cerr << soliloquy << " CIF" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " CIF" << endl;
     a.scale=1.0; 
     a.neg_scale=FALSE; 
     a.lattice=aurostd::eye<double>(3,3); //CO20190520
@@ -6165,7 +6159,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
             a.spacegroupnumber = GetSpaceGroupNumber(spacegroupsymbol); 
           } //DX20191029 - added try/catch sequence
           catch(aurostd::xerror& re){ 
-            if(LDEBUG){ message << "Cannot determine space group setting from the Hermann-Mauguin symbol; non-standard setting."; pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, std::cerr, _LOGGER_WARNING_); } 
+            if(LDEBUG){ message << "Cannot determine space group setting from the Hermann-Mauguin symbol; non-standard setting."; pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, std::cerr, _LOGGER_WARNING_); } 
           } //DX20191029 - added try/catch sequence
         }
       }
@@ -6190,7 +6184,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //DX20191029 - check if space group number is found - START
     if(a.spacegroupnumber==0){
       message << "Either space group number was not given or it was given in a non-standard setting.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy,message,_VALUE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__,message,_VALUE_ERROR_);
     }
     //DX20191029 - check if space group number is found - END
     //ME20220124 - Read symmetry operations without consistency checks first
@@ -6322,7 +6316,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           //oss << "ERROR - xstructure::operator>>: Symmetry operations do not match between input operations and space group number/option." << endl; 
           //print(general_wyckoff_position);
           //print(spacegroup_symop_xyz);
-          //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+          //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
           continue; //try a different setting
         }
         else {
@@ -6337,12 +6331,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
       // ME20220124 - Changed to warning
       message << "Symmetry operations do not match between input operations and space group number/option.";  //CO20190629
       message << " Building structure using symmetry operations in CIF file with space group P1.";
-      pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, std::cerr, _LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, std::cerr, _LOGGER_WARNING_);
       a.spacegroupnumber = 1;
       if (LDEBUG) {
         for(uint i=0;i<vinput.size();i++) std::cerr << vinput[i] << endl;  //CO20190629 // ME20220124 - moved to LDEBUG because outputting the entire CIF makes the error message unreadable
       }
-      //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+      //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }
     // get lattice
     for(uint i=0;i<vinput.size();i++) {
@@ -6484,7 +6478,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } else {
           message << "Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl;  //CO20190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
         }
       }
     }
@@ -6523,7 +6517,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //remember, we already did all the debugging above
     //if we get here, we can assume geometry.in is solid!
     //if more debugging needed, test above where we detect iomode
-    if(LDEBUG) cerr << soliloquy << " AIMS IOAIMS_AUTO/IOAIMS_GEOM" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " AIMS IOAIMS_AUTO/IOAIMS_GEOM" << endl;
     // START FROM CELL
     a.scale=1.0; // standard
     a.neg_scale=FALSE; // standard
@@ -6546,11 +6540,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //a.f2c=trasp(a.lattice), a.c2f=inverse(a.f2c);
 
     if(LDEBUG) {
-      cerr << soliloquy << " AIMS lattice" << endl;
+      cerr << __AFLOW_FUNC__ << " AIMS lattice" << endl;
       cerr << a.lattice << endl;
-      cerr << soliloquy << " AIMS f2c" << endl;
+      cerr << __AFLOW_FUNC__ << " AIMS f2c" << endl;
       cerr << a.f2c << endl;
-      cerr << soliloquy << " AIMS c2f" << endl;
+      cerr << __AFLOW_FUNC__ << " AIMS c2f" << endl;
       cerr << a.c2f << endl;
     }
 
@@ -6573,7 +6567,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           atom.fpos=a.c2f*atom.cpos;
           atom.name=atom.cleanname=tokens[4];
           if(LDEBUG) {
-            cerr << soliloquy << " AIMS atom[" << atom.name <<"] found (cartesian):" << endl;
+            cerr << __AFLOW_FUNC__ << " AIMS atom[" << atom.name <<"] found (cartesian):" << endl;
             cerr << "    cpos" << atom.cpos << endl;
             cerr << "    fpos" << atom.fpos << endl;
           }
@@ -6585,7 +6579,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           atom.cpos=a.f2c*atom.fpos;
           atom.name=atom.cleanname=tokens[4];
           if(LDEBUG) {
-            cerr << soliloquy << " AIMS atom[" << atom.name <<"] found (fractional):" << endl;
+            cerr << __AFLOW_FUNC__ << " AIMS atom[" << atom.name <<"] found (fractional):" << endl;
             cerr << "    fpos" << atom.fpos << endl;
             cerr << "    cpos" << atom.cpos << endl;
           }
@@ -6597,8 +6591,8 @@ istream& operator>>(istream& cinput, xstructure& a) {
           atom.name_is_given=true;
           //atom.CleanName();
           if(LDEBUG) {
-            cerr << soliloquy << " AIMS line=" << vinput[i] << endl;
-            cerr << soliloquy << " AIMS atom.cleanname=" << atom.cleanname << endl;
+            cerr << __AFLOW_FUNC__ << " AIMS line=" << vinput[i] << endl;
+            cerr << __AFLOW_FUNC__ << " AIMS atom.cleanname=" << atom.cleanname << endl;
           }
           atom.CleanSpin();
           //FIXED BELOW atom.number=atoms.size();    // reference position for convasp
@@ -6650,7 +6644,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
     if(LDEBUG) {
       for(uint i=0;i<a.num_each_type.size();i++){
-        cerr << soliloquy << " AIMS num_each_type[" << i <<"]=" <<a.num_each_type[i] << ", ";
+        cerr << __AFLOW_FUNC__ << " AIMS num_each_type[" << i <<"]=" <<a.num_each_type[i] << ", ";
         cerr << "comp_each_type[" << i <<"]=" <<a.comp_each_type[i] << endl;
       }
     }
@@ -6667,7 +6661,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     }
     if(a.title.empty()){a.buildGenericTitle();}
 
-    if(LDEBUG) {cerr << soliloquy << " AIMS title=" << a.title << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " AIMS title=" << a.title << endl;}
 
     a.partial_occupation_flag=FALSE;
     a.is_vasp4_poscar_format=FALSE;
@@ -6682,7 +6676,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   //  Alloy-Theoretic Automated Toolkit
   //  See: https://www.brown.edu/Departments/Engineering/Labs/avdw/atat/manual.pdf
   if(a.iomode==IOATAT_STR) {
-    if (LDEBUG) cerr << soliloquy << " ATAT IOATAT_STR" << endl;
+    if (LDEBUG) cerr << __AFLOW_FUNC__ << " ATAT IOATAT_STR" << endl;
     a.scale = 1.0;
     a.neg_scale = FALSE;
     xmatrix<double> axes(3, 3), frac_cell(3, 3);
@@ -6709,11 +6703,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
     a.lattice = axes * frac_cell;
     a.FixLattices();
     if (LDEBUG) {
-      cerr << soliloquy << " ATAT lattice" << endl;
+      cerr << __AFLOW_FUNC__ << " ATAT lattice" << endl;
       cerr << a.lattice << endl;
-      cerr << soliloquy << " ATAT f2c" << endl;
+      cerr << __AFLOW_FUNC__ << " ATAT f2c" << endl;
       cerr << a.f2c << endl;
-      cerr << soliloquy << " ATAT c2f" << endl;
+      cerr << __AFLOW_FUNC__ << " ATAT c2f" << endl;
       cerr << a.c2f << endl;
     }
 
@@ -6733,7 +6727,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       atom.name_is_given = (!atom.name.empty());
       atoms.push_back(atom);
       if (LDEBUG) {
-        cerr << soliloquy << " ATAT atom[" << atom.name <<"] found:" << endl;
+        cerr << __AFLOW_FUNC__ << " ATAT atom[" << atom.name <<"] found:" << endl;
         cerr << "    fpos" << atom.fpos << endl;
         cerr << "    cpos" << atom.cpos << endl;
       }
@@ -6768,7 +6762,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
   // COMMON CODE (NEED TO BE PATCHED, THOUGH).
   // FIX NORMAL AND PARTIAL OCCUPAITON
-  if(LDEBUG) cerr << soliloquy << " COMMON CODE [9]" << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " COMMON CODE [9]" << endl;
   if(a.partial_occupation_flag==FALSE) {
     // have partial
     a.comp_each_type.clear();
@@ -6779,7 +6773,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(poccaus.size()!=a.atoms.size()) {
       message << "poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;  //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }
     // create list (empty)
     a.comp_each_type.clear();
@@ -6804,7 +6798,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   // cerr << a.atoms.size() << endl;
   // cerr << a.partial_occupation_sublattice.size() << endl;
   // for(uint i=0;i<a.partial_occupation_sublattice.size();i++) cerr << a.partial_occupation_sublattice.at(i) << endl;
-  if(LDEBUG) cerr << soliloquy << " PARTIAL OCCUPATION STUFF [10]" << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " PARTIAL OCCUPATION STUFF [10]" << endl;
   for(uint iatom=0;iatom<a.atoms.size();iatom++) {
     vector<uint> partial_occupation_sublattice_iatom;
     if(a.partial_occupation_sublattice.at(iatom)== _pocc_no_sublattice_) {
@@ -6823,7 +6817,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   }
   // ---------------------------------------------------------------
   // REMOVE ORDER PARAMETER
-  if(LDEBUG) cerr << soliloquy << " REMOVE ORDER PARAMETER [11]" << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " REMOVE ORDER PARAMETER [11]" << endl;
   a.order_parameter_atoms.clear();
   for(uint i=0;i<a.atoms.size();i++)
     if(a.atoms.at(i).order_parameter_atom==TRUE)
@@ -6831,9 +6825,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
   a.order_parameter_structure=(a.order_parameter_atoms.size()>0);
   // ---------------------------------------------------------------
   // -------------- SPECIES
-  if(LDEBUG) cerr << soliloquy << " SPECIES [12]" << endl;
-  if(LDEBUG) cerr << soliloquy << " a.is_vasp4_poscar_format=" << a.is_vasp4_poscar_format << endl;
-  if(LDEBUG) cerr << soliloquy << " a.is_vasp5_poscar_format=" << a.is_vasp5_poscar_format << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " SPECIES [12]" << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " a.is_vasp4_poscar_format=" << a.is_vasp4_poscar_format << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " a.is_vasp5_poscar_format=" << a.is_vasp5_poscar_format << endl;
   if(a.is_vasp4_poscar_format==TRUE) {
     a.species.clear();a.species_pp.clear();a.species_pp_type.clear();a.species_pp_version.clear();a.species_pp_ZVAL.clear();a.species_pp_vLDAU.clear();a.species_volume.clear();a.species_mass.clear();
     // Plug the species
@@ -6857,7 +6851,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       message << "You need to specify the same number of species and atoms types" << endl;  //CO20190629
       message << "      a.num_each_type.size()=" << a.num_each_type.size() << endl; //CO20190629
       message << "      tokens.size()=" << tokens.size() << endl; //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }
     for(uint i=0;i<tokens.size();i++) {
       a.species.push_back(tokens.at(i));
@@ -6881,7 +6875,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   }
   // ---------------------------------------------------------------
   // ALL atoms have been added. Now add the wyckoff ones
-  if(LDEBUG) cerr << soliloquy << " WYCKCAR [13]" << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " WYCKCAR [13]" << endl;
   if(a.iomode==IOVASP_WYCKCAR) {
     // cerr << "[" << a.atoms.size() << "]" << endl;
     a=WyckoffPOSITIONS(a.spacegroupnumber,a.spacegroupnumberoption,a);
@@ -6891,7 +6885,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
   // ---------------------------------------------------------------
   // Make spaces and links inside the qm part
-  if(LDEBUG) cerr << soliloquy << " QM_SPACE [14]" << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " QM_SPACE [14]" << endl;
   for(uint i=0;i<a.atoms.size();i++) {
     xvector<double> v(3); v.clear();
     _atom atom;
@@ -6903,7 +6897,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   }
 
   // ---------------------------------------------------------------
-  if(LDEBUG) cerr << soliloquy << " WRAPPING [13]" << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " WRAPPING [13]" << endl;
   // TOLERANCES ------------------------
   a.equiv_fpos_epsilon=_EQUIV_FPOS_EPS_; // standard but you can change
   // SORT ATOMS (FALSE) -----------------------------
@@ -7003,25 +6997,25 @@ istream& operator>>(istream& cinput, xstructure& a) {
   if(a.atoms.size()!=a.qm_atoms.size())     {
     message << "a.atoms.size()!=a.qm_atoms.size() " << endl;  //CO20190629
     for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
   }
   if(a.atoms.size()!=a.qm_forces.size())    {
     message << "a.atoms.size()!=a.qm_forces.size() " << endl; //CO20190629
     for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
   }
   if(a.atoms.size()!=a.qm_positions.size()) {
     message << "a.atoms.size()!=a.qm_positions.size() " << endl;  //CO20190629
     for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_); //CO20190629
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
   }
   if(det(a.lattice)<0.0){ //CO20200201
     message << "Found negative determinant for lattice (det()=" << det(a.lattice) << "). Flip your basis."; //CO20200201
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_); //CO20200201
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200201
   } //CO20200201
 
   // ---------------------------------------------------------------
-  if(LDEBUG) cerr << soliloquy << " DONE [99]" << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " DONE [99]" << endl;
   // DONE
   return cinput;
 }
@@ -7184,7 +7178,6 @@ bool xstructure::GetStoich(void) { //CO20171025
   if(partial_occupation_flag){
     try{
       bool LDEBUG=(FALSE || XHOST.DEBUG); 
-      string soliloquy="xstructure::GetStoich():";
       total_comp=0.0;
       int numerator=0,denominator=0;
       double stoich=0.0;
@@ -7197,7 +7190,7 @@ bool xstructure::GetStoich(void) { //CO20171025
       }
       for(uint i=0;i<comp_each_type.size();i++){vstoich[i]/=total_comp;}
       stoich_each_type=vstoich;
-      if(LDEBUG){cerr << soliloquy << " stoich_each_type=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(stoich_each_type),",") << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " stoich_each_type=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(stoich_each_type),",") << endl;}
     }
     catch(aurostd::xerror& re){;} //do nothing
   }
@@ -7210,7 +7203,6 @@ bool xstructure::GetStoich(void) { //CO20171025
 // cluster together atoms by equivalent atoms
 bool xstructure::sortAtomsEquivalent(void) {
   bool LDEBUG=(FALSE || XHOST.DEBUG); 
-  string soliloquy = XPID + "xstructure::sortAtomsEquivalent():";
   if(partial_occupation_flag==false){
     if(!(*this).iatoms_calculated){pflow::PerformFullSymmetry(*this);}
     if(!(*this).iatoms_calculated){return false;}
@@ -7218,7 +7210,7 @@ bool xstructure::sortAtomsEquivalent(void) {
   if(LDEBUG) {
     bool write_inequivalent_flag=(*this).write_inequivalent_flag;
     (*this).write_inequivalent_flag=true;
-    cerr << soliloquy << " structure before iatoms sorting" << endl;
+    cerr << __AFLOW_FUNC__ << " structure before iatoms sorting" << endl;
     cerr << (*this) << endl;
     (*this).write_inequivalent_flag=write_inequivalent_flag;
   }
@@ -7233,14 +7225,14 @@ bool xstructure::sortAtomsEquivalent(void) {
       }
     }
   }
-  if(LDEBUG) {cerr << soliloquy << " sort " << (sort_needed?string(""):string("NOT ")) << "needed for this structure!" << endl;}
+  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " sort " << (sort_needed?string(""):string("NOT ")) << "needed for this structure!" << endl;}
   (*this).MakeBasis();  //make sure the basis is set, sortAtomsEquiv tries not to mess with relative order using basis
   if(!sort_needed){return true;}
   deque<_atom> atoms=(*this).atoms;
   std::stable_sort(atoms.begin(),atoms.end(),sortAtomsEquiv); //safe because we do AddAtom() below
   if(LDEBUG) {
     //check order before AddAtom()
-    cerr << soliloquy << " newly sorted atoms pre-AddAtom()" << endl;
+    cerr << __AFLOW_FUNC__ << " newly sorted atoms pre-AddAtom()" << endl;
     bool print_RHT=false;
     bool verbose=false;
     bool print_cartesian=false;
@@ -7256,18 +7248,18 @@ bool xstructure::sortAtomsEquivalent(void) {
   }
   uint atoms_size=(*this).atoms.size();
   for(uint i=atoms_size-1;i<atoms_size;i--){
-    if(LDEBUG) cerr << soliloquy << " removing atom[" << i << "]" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " removing atom[" << i << "]" << endl;
     (*this).RemoveAtom(i);
   }
-  if(LDEBUG) {cerr << soliloquy << " all atoms removed" << endl;}
+  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " all atoms removed" << endl;}
   for(uint i=0;i<atoms.size();i++){
-    if(LDEBUG) cerr << soliloquy << " adding atom[" << i << "]" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " adding atom[" << i << "]" << endl;
     (*this).AddAtom(atoms[i]);
   }
-  if(LDEBUG) {cerr << soliloquy << " all atoms added back" << endl;}
+  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " all atoms added back" << endl;}
   (*this).ClearSymmetry();  //new structure, clear symmetry
   if(LDEBUG) {
-    cerr << soliloquy << " newly sorted structure" << endl;
+    cerr << __AFLOW_FUNC__ << " newly sorted structure" << endl;
     cerr << (*this) << endl;
   }
   return true;
@@ -7675,16 +7667,15 @@ void xstructure::ReplaceAtoms(const deque<_atom>& new_atoms, bool check_present)
   //this is the SAFEST/CLEANEST way to replace atoms in an xstructure
   //it takes care of num_each_type, species, etc.
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XPID + "xstructure::ReplaceAtoms():";
 
   //DX20210129 [OBSOLETE - remove all at once] for(uint i=atoms.size()-1;i<atoms.size();i--){  //removing atoms
-  //DX20210129 [OBSOLETE - remove all at once]   if(LDEBUG) cerr << soliloquy << " removing atom[" << i << "]" << endl;
+  //DX20210129 [OBSOLETE - remove all at once]   if(LDEBUG) cerr << __AFLOW_FUNC__ << " removing atom[" << i << "]" << endl;
   //DX20210129 [OBSOLETE - remove all at once]   RemoveAtom(i);
   //DX20210129 [OBSOLETE - remove all at once] }
-  if(LDEBUG) cerr << soliloquy << " removing all atoms" << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " removing all atoms" << endl;
   RemoveAtom(); //DX20210129 - remove all atoms and clear species variables
 
-  if(LDEBUG) cerr << soliloquy << " adding new atoms" << endl;
+  if(LDEBUG) cerr << __AFLOW_FUNC__ << " adding new atoms" << endl;
   //DX20210202 [OBSOLETE] for(uint i=0;i<new_atoms.size();i++){AddAtom(new_atoms[i]);}  //adding atoms
   AddAtom(new_atoms, check_present);  //adding atoms
 
@@ -7767,7 +7758,6 @@ void xstructure::RemoveCartesianCopies(double tol) {
 // **************************************************************************
 void xstructure::AddCorners(void) {
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy=XPID+"xstructure::AddCorners()";
   xstructure str;
   BringInCell();str=*this;
   while(atoms.size()) RemoveAtom(0);   
@@ -7778,7 +7768,7 @@ void xstructure::AddCorners(void) {
           _atom atom=str.atoms.at(iat);
           atom.fpos[1]+=i;atom.fpos[2]+=j;atom.fpos[3]+=k;
           atom.cpos=F2C(lattice,atom.fpos);
-          if(LDEBUG){cerr << soliloquy << " atom.fpos=" << atom.fpos;}
+          if(LDEBUG){cerr << __AFLOW_FUNC__ << " atom.fpos=" << atom.fpos;}
           if(atom.fpos[1]<=1.0 && atom.fpos[2]<=1.0 && atom.fpos[3]<=1.0){
             if(LDEBUG){cerr << " : adding atom";}
             AddAtom(atom,false);  //CO20210116 - do NOT check if atom is already there
@@ -7915,12 +7905,11 @@ string GetElementName(string stringin) {
 // GetSpaceGroupName
 // ***************************************************************************
 string GetSpaceGroupName(int spacegroupnumber, string directory) {
-  string soliloquy = XPID + "aflow_xatom.cpp::GetSpaceGroupName()"; //DX20190708 - for xerror
   if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX20190708 - for xerror
     stringstream message; //DX20190708 - for xerror
     message << "routine: space group specified invalid (1-230): "; //DX20190708 - for xerror
     message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX20190708 - for xerror
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
   }
   // OK
   //DX+ME20190708 - changed subsequent "if" to "else if" -> efficiency
@@ -8396,14 +8385,13 @@ string GetSpaceGroupName(int spacegroupnumber, string directory) {
 // ***************************************************************************
 int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
   //DX20190708
-  string soliloquy = XPID + "aflow_xatom.cpp::GetSpaceGroupNumber()";
   stringstream message;
   int spacegroupnumber=0;
   if(spacegroupsymbol[0] != 'P' && spacegroupsymbol[0] != 'I' && spacegroupsymbol[0] != 'F' &&
       spacegroupsymbol[0] != 'R' && spacegroupsymbol[0] != 'C' && spacegroupsymbol[0] != 'A') {
     message << "routine: space group specified invalid (lattice centering not identified: P,I,F,R,C,A): ";
     message << "input symbol=" << spacegroupsymbol << " [dir=" << directory << "]." << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
   }
   // OK
   //DX+ME20190708 - changed subsequent "if" to "else if" -> efficiency
@@ -8871,7 +8859,7 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
   else{
     message << "routine: space group specified invalid; perhaps non-ITC setting: ";
     message << "space group symbol=" << spacegroupsymbol << " [dir=" << directory << "].";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
   }
   return spacegroupnumber;
 }
@@ -8880,12 +8868,11 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
 // GetSpaceGroupSchoenflies
 // ***************************************************************************
 string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory) {
-  string soliloquy = XPID + "aflow_xatom.cpp::GetSpaceGroupSchoenflies()"; //DX20190708 - for xerror
   if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX20190708 - for xerror
     stringstream message; //DX20190708 - for xerror
     message << "routine: space group specified invalid (1-230): "; //DX20190708 - for xerror
     message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX20190708 - for xerror
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
   }
   // OK
   //ME20210210 - converted to switch statement (faster)
@@ -9363,13 +9350,12 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   //DX - Hall distinguishes space group setting.  This table assumes the first 
   //      setting that appears in the ITC.
   //      For more settings, they need to be hard-coded here.
-  string soliloquy = XPID + "aflow_xatom.cpp::GetSpaceGroupHall()"; //DX20190708 - for xerror
   stringstream message; //DX20190708 - for xerror
   string spacegroup=""; //DX20190708 - for xerror
   if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX20190708 - for xerror
     message << "routine: space group specified invalid (1-230): "; //DX20190708 - for xerror
     message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX20190708 - for xerror
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
   }
   // OK
   if(setting==SG_SETTING_ANRL){ setting = anrl::getANRLSettingChoice(spacegroupnumber); } //DX20210420
@@ -9386,7 +9372,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   }
   if(setting < 1 || setting > 2) {
     message << "routine: setting choice is invalid (1 or 2 only): " << setting << " [dir=" << directory << "]."; //DX20190708 - for xerror
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
   }
   // OK
   //DX+ME20190708 - changed subsequent "if" to "else if" -> efficiency
@@ -10675,7 +10661,6 @@ xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radi
 #if DEBUG_LATTICE_DIMENSIONS
   bool LDEBUG=(FALSE || XHOST.DEBUG);
 #endif
-  string soliloquy = XPID + "LatticeDimensionSphere():"; //CO20190520
   xmatrix<double> lattice; lattice=scale*_lattice;
   int i,j,k;
   xmatrix<double> invlattice(3,3),normals(3,3),frac_normals(3,3);
@@ -10706,7 +10691,7 @@ xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radi
 #if DEBUG_LATTICE_DIMENSIONS
   if(LDEBUG) {
     for(uint i=1;i<(uint)normals.rows+1;i++){
-      cerr << soliloquy << " normals(" << i << ")=" << normals(i) << endl;
+      cerr << __AFLOW_FUNC__ << " normals(" << i << ")=" << normals(i) << endl;
     }
   }
 #endif
@@ -10727,9 +10712,9 @@ xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radi
   invlattice=aurostd::inverse(lattice);
 #if DEBUG_LATTICE_DIMENSIONS
   if(LDEBUG) { //CO20190520
-    cerr << soliloquy << " normals="<< endl;cerr << normals << endl; //CO20190520
-    cerr << soliloquy << " lattice="<< endl;cerr << lattice << endl; //CO20190520
-    cerr << soliloquy << " inverse(lattice)="<< endl;cerr << invlattice << endl; //CO20190520
+    cerr << __AFLOW_FUNC__ << " normals="<< endl;cerr << normals << endl; //CO20190520
+    cerr << __AFLOW_FUNC__ << " lattice="<< endl;cerr << lattice << endl; //CO20190520
+    cerr << __AFLOW_FUNC__ << " inverse(lattice)="<< endl;cerr << invlattice << endl; //CO20190520
   } //CO20190520
 #endif
 
@@ -10744,12 +10729,12 @@ xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radi
   //encompasses a sphere of radius = radius
   for(i=1;i<=3;i++){
 #if DEBUG_LATTICE_DIMENSIONS
-    if(LDEBUG) {cerr << soliloquy << " abs(frac_normals(i,i))=" << abs(frac_normals(i,i)) << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " abs(frac_normals(i,i))=" << abs(frac_normals(i,i)) << endl;}
 #endif
     dim(i)=(int)ceil(abs(frac_normals(i,i)));
   }
   if(max(dim)==0) { 
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,_AUROSTD_XLIBS_ERROR_+" dim=0!!",_INPUT_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,_AUROSTD_XLIBS_ERROR_+" dim=0!!",_INPUT_ILLEGAL_);
   }
   return dim;
 }
@@ -11775,15 +11760,14 @@ string xstructure::SpeciesString(void) {
 // ***************************************************************************
 // Set the species  Stefano Curtarolo Nov 2014
 uint xstructure::SetSpecies(const deque<string>& vspecies) {
-  string soliloquy = XPID + "xstructure::SetSpecies():"; //CO20190317
   stringstream message; //CO20190317
   if(vspecies.size()!=species.size() ) {
     message << "vspecies.size()!=species.size()"; //CO20190317
-    aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO20190317
+    aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_RANGE_); //CO20190317
   }
   if(vspecies.size()!=num_each_type.size() ) {
     message << "vspecies.size()!=num_each_type.size()"; //CO20190317
-    aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_); //CO20190317
+    aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_RANGE_); //CO20190317
   }
   int iatom=0;
   for(uint itype=0;itype<num_each_type.size();itype++) {
@@ -12667,7 +12651,6 @@ void xstructure::foldAtomsInCell(const xmatrix<double>& lattice_new, bool skew, 
 
 deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_new, bool skew, double tol, bool check_min_dists) { //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190619 = added check_min_dists bool
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XPID + "foldAtomsInCell():";
 
   double volume_original=abs(aurostd::det(a.lattice));
   double volume_new=abs(aurostd::det(lattice_new));
@@ -12681,21 +12664,21 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
     double radius=RadiusSphereLattice(lattice_new);
     xvector<int> dims=LatticeDimensionSphere(a.lattice,radius);//int dim=max(dims)+1; //dim=3;  //CO20190520
     if(LDEBUG){
-      cerr << soliloquy << " a.lattice=" << endl;cerr << a.lattice << endl;
-      cerr << soliloquy << " lattice_new=" << endl;cerr << lattice_new << endl;
-      cerr << soliloquy << " vol(a.lattice)=" << abs(aurostd::det(a.lattice)) << endl;
-      cerr << soliloquy << " vol(lattice_new)=" << abs(aurostd::det(lattice_new)) << endl;
-      cerr << soliloquy << " radius(a.lattice)=" << RadiusSphereLattice(a.lattice) << endl;
-      cerr << soliloquy << " radius(lattice_new)=" << radius << endl;
-      cerr << soliloquy << " dims=" << dims << endl;
+      cerr << __AFLOW_FUNC__ << " a.lattice=" << endl;cerr << a.lattice << endl;
+      cerr << __AFLOW_FUNC__ << " lattice_new=" << endl;cerr << lattice_new << endl;
+      cerr << __AFLOW_FUNC__ << " vol(a.lattice)=" << abs(aurostd::det(a.lattice)) << endl;
+      cerr << __AFLOW_FUNC__ << " vol(lattice_new)=" << abs(aurostd::det(lattice_new)) << endl;
+      cerr << __AFLOW_FUNC__ << " radius(a.lattice)=" << RadiusSphereLattice(a.lattice) << endl;
+      cerr << __AFLOW_FUNC__ << " radius(lattice_new)=" << radius << endl;
+      cerr << __AFLOW_FUNC__ << " dims=" << dims << endl;
     }
     //[CO20190520 - excessive, too large of an exploration radius]xmatrix<double> supercell; supercell(1,1)=dims(1); supercell(2,2)=dims(2); supercell(3,3)=dims(3);  //NO NEED, function ensures radius is encompassed //be safe and go +1 out
     //xmatrix<double> supercell; supercell(1,1)=dim; supercell(2,2)=dim; supercell(3,3)=dim;  //NO NEED, function ensures radius is encompassed //be safe and go +1 out
     //vector<int> sc2pcMap, pc2scMap; //dummy
-    if(LDEBUG) {cerr << soliloquy << " building atomic grid with dims=[" << dims << "]" << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " building atomic grid with dims=[" << dims << "]" << endl;}
     atomic_grid=a;atomic_grid.clean(); //DX20191220 - uppercase to lowercase clean
     atomic_grid.GenerateGridAtoms(dims[1],dims[2],dims[3]); //much faster than supercell
-    if(LDEBUG) {cerr << soliloquy << " atomic grid built" << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " atomic grid built" << endl;}
     ptr_atoms=&atomic_grid.grid_atoms;  //CO20190808 - GenerateGridAtoms() populates grid_atoms, not atoms
     atoms=*ptr_atoms; //DX20210129 - set inside if-statement, otherwise, grid atoms goes out of scope
   }
@@ -12706,7 +12689,6 @@ deque<_atom> foldAtomsInCell(const xstructure& a,const xmatrix<double>& lattice_
 
 deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& lattice_orig,const xmatrix<double>& lattice_new,bool skew, double tol, bool check_min_dists) {  //DX20190619 - added check_min_dists bool
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XPID + "foldAtomsInCell():";
 
   deque<_atom> atoms_in_cell;
 
@@ -12714,8 +12696,8 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
   xmatrix<double> c2f_new=inverse(f2c_new);
 
   if(LDEBUG){
-    cerr << soliloquy << " f2c_new=" << endl;cerr << f2c_new << endl;
-    cerr << soliloquy << " c2f_new=" << endl;cerr << c2f_new << endl;
+    cerr << __AFLOW_FUNC__ << " f2c_new=" << endl;cerr << f2c_new << endl;
+    cerr << __AFLOW_FUNC__ << " c2f_new=" << endl;cerr << c2f_new << endl;
   }
 
   _atom tmp;
@@ -12756,13 +12738,13 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
     double min_dist_orig=SYM::minimumDistance(atoms);  //lattice_orig //this does NOT work if we use GenerateGridAtoms (no longer periodic with lattice), so simply compare distances between atoms. NOTE: this is no longer the TRUE minimumDistance(), which requires knowledge of the lattice vectors
     double min_dist_new=SYM::minimumDistance(atoms_in_cell);  //lattice_new
     if(LDEBUG){
-      cerr << soliloquy << " lattice_orig=" << endl;cerr << lattice_orig << endl;
-      cerr << soliloquy << " lattice_new=" << endl;cerr << lattice_new << endl;
-      cerr << soliloquy << " atoms_orig=" << endl;for(uint i=0;i<atoms.size();i++){cerr << atoms[i] << endl;}
-      cerr << soliloquy << " min_dist_orig=" << endl;cerr << min_dist_orig << endl;
-      cerr << soliloquy << " min_dist_new=" << endl;cerr << min_dist_new << endl;
+      cerr << __AFLOW_FUNC__ << " lattice_orig=" << endl;cerr << lattice_orig << endl;
+      cerr << __AFLOW_FUNC__ << " lattice_new=" << endl;cerr << lattice_new << endl;
+      cerr << __AFLOW_FUNC__ << " atoms_orig=" << endl;for(uint i=0;i<atoms.size();i++){cerr << atoms[i] << endl;}
+      cerr << __AFLOW_FUNC__ << " min_dist_orig=" << endl;cerr << min_dist_orig << endl;
+      cerr << __AFLOW_FUNC__ << " min_dist_new=" << endl;cerr << min_dist_new << endl;
     }
-    if(!aurostd::isequal(min_dist_orig,min_dist_new,0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist_new,0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
 
   // sort atoms //DX+CO20210119
@@ -13918,26 +13900,25 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
 
 //ME20220208 [OBSOLETE - not used] xstructure GetPrimitiveMULTITHREAD(const xstructure& _a,double tolerance) {  // APRIL 2009 JUNE 2012 added tolerance
 //ME20220208 [OBSOLETE - not used]   bool LDEBUG=(FALSE || XHOST.DEBUG);
-//ME20220208 [OBSOLETE - not used]   string soliloquy="GetPrimitiveMULTITHREAD():"; //CO20200201
-//ME20220208 [OBSOLETE - not used]   if(LDEBUG) cerr << soliloquy << " BEGIN " << endl; //CO20200201
-//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << soliloquy << " _a=" << endl;cerr << _a << endl;} //CO20200201
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG) cerr << __AFLOW_FUNC__ << " BEGIN " << endl; //CO20200201
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << __AFLOW_FUNC__ << " _a=" << endl;cerr << _a << endl;} //CO20200201
 //ME20220208 [OBSOLETE - not used]   cout.setf(std::ios::fixed,std::ios::floatfield);
 //ME20220208 [OBSOLETE - not used]   cout.precision(10);
 //ME20220208 [OBSOLETE - not used]   xstructure a(_a);
 //ME20220208 [OBSOLETE - not used]   xstructure sstr=a;
-//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << soliloquy << " sstr=" << endl;cerr << sstr << endl;} //CO20200201
-//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << soliloquy << " sstr.atoms.size()=" << sstr.atoms.size() << endl;}  //CO20200201
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << __AFLOW_FUNC__ << " sstr=" << endl;cerr << sstr << endl;} //CO20200201
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << __AFLOW_FUNC__ << " sstr.atoms.size()=" << sstr.atoms.size() << endl;}  //CO20200201
 //ME20220208 [OBSOLETE - not used]   sstr.SetVolume(sstr.atoms.size());
-//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << soliloquy << " sstr(post Vol)=" << endl;cerr << sstr << endl;} //CO20200201
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << __AFLOW_FUNC__ << " sstr(post Vol)=" << endl;cerr << sstr << endl;} //CO20200201
 //ME20220208 [OBSOLETE - not used]   sstr=ReScale(sstr,1.0);
-//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << soliloquy << " sstr(pre BringInCell)=" << endl;cerr << sstr << endl;} //CO20200201
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << __AFLOW_FUNC__ << " sstr(pre BringInCell)=" << endl;cerr << sstr << endl;} //CO20200201
 //ME20220208 [OBSOLETE - not used]   sstr=BringInCell(sstr);
-//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << soliloquy << " sstr(post BringInCell)=" << endl;cerr << sstr << endl;} //CO20200201
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << __AFLOW_FUNC__ << " sstr(post BringInCell)=" << endl;cerr << sstr << endl;} //CO20200201
 //ME20220208 [OBSOLETE - not used]   //  sstr.CalculateSymmetry();
 //ME20220208 [OBSOLETE - not used]   if(tolerance<=0.0) a.equiv_fpos_epsilon=_EQUIV_FPOS_EPS_; else a.equiv_fpos_epsilon=tolerance;
 //ME20220208 [OBSOLETE - not used]   double sstr_volume=sstr.Volume();
 //ME20220208 [OBSOLETE - not used]
-//ME20220208 [OBSOLETE - not used]   if(LDEBUG) cerr << soliloquy << " [1] " << endl; //CO20200201
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG) cerr << __AFLOW_FUNC__ << " [1] " << endl; //CO20200201
 //ME20220208 [OBSOLETE - not used]
 //ME20220208 [OBSOLETE - not used]   _aflags aflags;
 //ME20220208 [OBSOLETE - not used]   // identify the minimum set of atoms
@@ -13953,7 +13934,7 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
 //ME20220208 [OBSOLETE - not used]   xvector<double> fdisp(3),cdisp(3);
 //ME20220208 [OBSOLETE - not used]   std::vector<xvector<double> > candidate_lattice_vector;
 //ME20220208 [OBSOLETE - not used]
-//ME20220208 [OBSOLETE - not used]   if(LDEBUG) cerr << soliloquy << " [2] " << endl; //CO20200201
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG) cerr << __AFLOW_FUNC__ << " [2] " << endl; //CO20200201
 //ME20220208 [OBSOLETE - not used]
 //ME20220208 [OBSOLETE - not used]   int specie_min=sstr.num_each_type.at(0),ispecie_min=0,specie_min_threshold=_PRIM_MULTITHREAD_MIN_ATOMS_THRESHOLD_; // seems a good threshold
 //ME20220208 [OBSOLETE - not used]   for(uint ispecie=0;ispecie<sstr.num_each_type.size();ispecie++)
@@ -13970,7 +13951,7 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
 //ME20220208 [OBSOLETE - not used]   candidate_lattice_vector.push_back(sstr.lattice(3));  // lattice is made of good vectors
 //ME20220208 [OBSOLETE - not used]   // no threads
 //ME20220208 [OBSOLETE - not used]
-//ME20220208 [OBSOLETE - not used]   if(LDEBUG) cerr << soliloquy << " [3] " << endl; //CO20200201
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG) cerr << __AFLOW_FUNC__ << " [3] " << endl; //CO20200201
 //ME20220208 [OBSOLETE - not used]
 //ME20220208 [OBSOLETE - not used]   if(!AFLOW_PTHREADS::FLAG || specie_min<=specie_min_threshold) {
 //ME20220208 [OBSOLETE - not used]     //   cerr << "NO PTHREADS" << endl;
@@ -14071,14 +14052,14 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
 //ME20220208 [OBSOLETE - not used]     // collect
 //ME20220208 [OBSOLETE - not used]     for(int ithread=0;ithread<AFLOW_PTHREADS::MAX_PTHREADS;ithread++)
 //ME20220208 [OBSOLETE - not used]       pthread_join((AFLOW_PTHREADS::vpthread[ithread]),NULL);
-//ME20220208 [OBSOLETE - not used]     if(LDEBUG) cerr << soliloquy << " END THREADS " << endl; //CO20200201
+//ME20220208 [OBSOLETE - not used]     if(LDEBUG) cerr << __AFLOW_FUNC__ << " END THREADS " << endl; //CO20200201
 //ME20220208 [OBSOLETE - not used]   }
 //ME20220208 [OBSOLETE - not used]
 //ME20220208 [OBSOLETE - not used]   plattice=olattice;
 //ME20220208 [OBSOLETE - not used]
 //ME20220208 [OBSOLETE - not used]   // done
 //ME20220208 [OBSOLETE - not used]
-//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << soliloquy << " sstr=" << endl;cerr << sstr << endl;} //CO20200201
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG){cerr << __AFLOW_FUNC__ << " sstr=" << endl;cerr << sstr << endl;} //CO20200201
 //ME20220208 [OBSOLETE - not used]   xstructure b=sstr;
 //ME20220208 [OBSOLETE - not used]   b.lattice=plattice;//b.lattice=roundoff(b.lattice,_EPS_FPOS_EQUAL_);
 //ME20220208 [OBSOLETE - not used]   b.FixLattices();
@@ -14130,7 +14111,7 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
 //ME20220208 [OBSOLETE - not used]     throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::GetPrimitive(void)",message,_RUNTIME_ERROR_);
 //ME20220208 [OBSOLETE - not used]   }
 //ME20220208 [OBSOLETE - not used]   // everything ok
-//ME20220208 [OBSOLETE - not used]   if(LDEBUG) cerr << soliloquy << " END [ok]=" << fraction_atoms << endl;  //CO20200201
+//ME20220208 [OBSOLETE - not used]   if(LDEBUG) cerr << __AFLOW_FUNC__ << " END [ok]=" << fraction_atoms << endl;  //CO20200201
 //ME20220208 [OBSOLETE - not used]   b.ClearSymmetry();  //CO20181226 - new structure, symmetry not calculated
 //ME20220208 [OBSOLETE - not used]   b.primitive_calculated = TRUE; //DX20201007
 //ME20220208 [OBSOLETE - not used]   return b;
@@ -15026,12 +15007,11 @@ xstructure SetVolume(const xstructure& a,const double &in_volume) {
 // Function SetAutoVolume
 // ***************************************************************************
 void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO20191010
-  string soliloquy = XPID + "xstructure::setAutoVolume():";
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   stringstream message;
 
-  if(LDEBUG) {cerr << soliloquy << " fixing volume" << endl;}
-  if(LDEBUG) {cerr << soliloquy << " volume_orig=" << GetVolume() << endl;}
+  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " fixing volume" << endl;}
+  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " volume_orig=" << GetVolume() << endl;}
   double volume=0; //,voli=0;
   bool use_AFLOW_defaults=use_AFLOW_defaults_in;
   //try and pull from species_volume first
@@ -15039,11 +15019,11 @@ void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO20191010
     for(uint j=0;j<num_each_type.size()&&!use_AFLOW_defaults;j++){
       if(atoms[i].name==species[j]){
         const double& voli=species_volume[j];
-        if(LDEBUG) {cerr << soliloquy << " atoms[i].name=" << atoms[i].name << " atoms[i].vol=" << voli << endl;}
+        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " atoms[i].name=" << atoms[i].name << " atoms[i].vol=" << voli << endl;}
         if(voli==NNN || aurostd::isequal(voli,0.0,_ZERO_TOL_)){use_AFLOW_defaults=true;}
         if(aurostd::isequal(atoms[i].partial_occupation_value,0.0,_ZERO_TOL_)){
           message << "partial_occupation_value==0.0 for atom=" << i;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
         }
         volume+=atoms[i].partial_occupation_value*voli;
       }
@@ -15051,7 +15031,7 @@ void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO20191010
   }
   //otherwise get defaults from AFLOW
   if(use_AFLOW_defaults || abs(volume)<_XPROTO_ZERO_VOL_){
-    if(LDEBUG) {cerr << soliloquy << " using automatic volumes" << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " using automatic volumes" << endl;}
     volume=0;
     double voli;
     for(uint i=0;i<atoms.size();i++){
@@ -15060,11 +15040,11 @@ void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO20191010
           voli=GetAtomVolume(atoms[i].name);
           if(voli==NNN || aurostd::isequal(voli,0.0,_ZERO_TOL_)){
             message << "No volume found for " << atoms[i].name << " (auto volumes)";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
           }
           if(aurostd::isequal(atoms[i].partial_occupation_value,0.0,_ZERO_TOL_)){
             message << "partial_occupation_value==0.0 for atom=" << i;
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
           }
           volume+=atoms[i].partial_occupation_value*voli;
         }
@@ -15073,10 +15053,10 @@ void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO20191010
   }
   if(abs(volume)<_XPROTO_ZERO_VOL_){
     message << "Final volume==0, check species default volumes";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   }
   SetVolume(volume);
-  if(LDEBUG) {cerr << soliloquy << " volume_new=" << GetVolume() << endl;}
+  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " volume_new=" << GetVolume() << endl;}
 }
 
 // ***************************************************************************
@@ -15267,10 +15247,9 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   //#define _eps_scell_ 0.0
   // check for error
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy = XPID + "GetSuperCell():";
   stringstream message;
   double vol_supercell=det(supercell);
-  if(abs(vol_supercell)<0.001){message << "Singular supercell matrix";throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);}
+  if(abs(vol_supercell)<0.001){message << "Singular supercell matrix";throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_);}
   xstructure a(aa); a.ReScale(1.0); //the nuclear option, the only way not to mess around with scale EVERYWHERE
   //DO NOT MODIFY STRUCTURE IN HERE, WE WANT TO PROPAGATE SYMMETRY FROM PRIMITIVE STRUCTURE!
   //a.BringInCell();
@@ -15329,7 +15308,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
     dims=LatticeDimensionSphere(a.lattice,radius);//[CO20190520 - EXCESSIVE]dim=max(dims)+1;
   } 
 
-  if(LDEBUG){cerr << soliloquy << " dims=" << dims << endl;}
+  if(LDEBUG){cerr << __AFLOW_FUNC__ << " dims=" << dims << endl;}
   //DX20190319 - added option to expand strictly by uniform supercell matrix - END
   // if(LDEBUG) cerr << "DEBUG  dims=" << dims << " " << " radius=" << radius << endl;  // DEBUG
 
@@ -15452,7 +15431,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
           // ME20210506 - Strict mapping is done outside to account for non-diagonal supercells
           //if(force_strict_pc2scMap){
           //  message << "pc2scMap not found for atom[i=" << a.iatoms[ia][iia] << "]";
-          //  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INDEX_MISMATCH_);
+          //  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INDEX_MISMATCH_);
           //}
           ignore_pcmap=true;
           pc2scMap.clear();
@@ -15545,7 +15524,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
       if(!ignore_pcmap && !pcmap && !force_strict_pc2scMap){
         //if(force_strict_pc2scMap){
         //  message << "pc2scMap not found for atom[i=" << ia << "]";
-        //  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _INDEX_MISMATCH_);
+        //  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
         //}
         ignore_pcmap=true;
         pc2scMap.clear();
@@ -15577,7 +15556,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
     }
     if (s == nshifts) {
       message << "pc2scMap not found";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
   }
 
@@ -15585,8 +15564,8 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   b.MakeBasis(); // need to update NUMBER and BASIS
 
   if(LDEBUG) {
-    cerr << soliloquy << " sc2pcMap=" << aurostd::joinWDelimiter(sc2pcMap," ") << endl;
-    cerr << soliloquy << " pc2scMap=" << aurostd::joinWDelimiter(pc2scMap," ") << endl;
+    cerr << __AFLOW_FUNC__ << " sc2pcMap=" << aurostd::joinWDelimiter(sc2pcMap," ") << endl;
+    cerr << __AFLOW_FUNC__ << " pc2scMap=" << aurostd::joinWDelimiter(pc2scMap," ") << endl;
   }
 
   // some check
@@ -15623,7 +15602,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
     message << "a.lattice          = " << endl;
     message << a.lattice << endl;
 
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
   }
 
   bool pretend_uniform=false;//true;  //CO TEST, REMOVE ME
@@ -15764,7 +15743,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
                 //if(!SYM::getFullSymBasis(b.atoms,b.lattice,b.c2f,b.f2c,fSymOp,TRUE,skew,b.sym_eps,fSymOp.basis_atoms_map,fSymOp.basis_types_map)) {
                 //cerr << "Unable to find atom/types basis for fgroup" << endl;
                 //cerr << fSymOp << endl;
-                //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+                //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
                 //KRUN = FALSE;
                 //}
                 fSymOp.basis_map_calculated=KRUN;
@@ -15877,7 +15856,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
               //if(!SYM::getFullSymBasis(b_atoms,b.lattice,b.c2f,b.f2c,aSymOp,TRUE,skew,b.sym_eps,aSymOp.basis_atoms_map,aSymOp.basis_types_map)) {
               //cerr << "Unable to find atom/types basis for agroup" << endl;
               //cerr << aSymOp << endl;
-              //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+              //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
               //KRUN = FALSE;
               //}
               aSymOp.basis_map_calculated=KRUN;
@@ -15896,7 +15875,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
             }
           }
           //KRUN = FALSE;
-          //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Unable to propagate site symmetry to equivalent atoms.",_RUNTIME_ERROR_);
+          //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Unable to propagate site symmetry to equivalent atoms.",_RUNTIME_ERROR_);
         } else {
           //can be faster than procedure above because there are MANY fgroups
           KRUN = KRUN && SYM::CalculateSitePointGroup(FileMESSAGE,b,1,aflags,_write_,osswrite,oss);  //we already know get_full_basis==FALSE, so don't waste time calculating for eatoms
@@ -15949,10 +15928,9 @@ xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell,ve
     _supercell(1,1)=supercell(1);_supercell(2,2)=supercell(2);_supercell(3,3)=supercell(3);
     return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   }
-  string soliloquy = XPID + "GetSuperCell():";
   stringstream message;
   message << "Matrix must have 9 or 3 elements";
-  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_);
 }
 
 xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vector<int>& sc2pcMap,vector<int>& pc2scMap,
@@ -15970,10 +15948,9 @@ xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vecto
     _supercell(1,1)=supercell(1);_supercell(2,2)=supercell(2);_supercell(3,3)=supercell(3);
     return GetSuperCell(a,_supercell,sc2pcMap,pc2scMap,get_symmetry,get_full_basis,force_supercell_matrix,force_strict_pc2scMap); //DX20190319 - added force_supercell_matrix  //CO20190409 - added force_strict_pc2scMap
   }
-  string soliloquy = XPID + "GetSuperCell():";
   stringstream message;
   message << "Matrix must have 9 or 3 elements";
-  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_);
 }
 
 xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33,vector<int>& sc2pcMap,vector<int>& pc2scMap,
@@ -16482,11 +16459,10 @@ void CalculateSymmetryPointGroupKPatterson(xstructure& str) {
 // ***************************************************************************
 void xstructure::fixEmptyAtomNames(bool force_fix){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy=XPID+"xstructure::fixEmptyAtomNames():";
   if(species.size()==species_pp.size()) { //CO20190218
     for(uint itype=0;itype<species.size();itype++) {
       if((force_fix || species.at(itype)=="") && species_pp.at(itype)!=""){
-        if(LDEBUG) {cerr << soliloquy << " species_pp.at(" << itype << ")=" << species_pp.at(itype) << endl;}
+        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " species_pp.at(" << itype << ")=" << species_pp.at(itype) << endl;}
         species.at(itype)=species_pp.at(itype); //KBIN::VASP_PseudoPotential_CleanName(species_pp.at(itype));  //CO20181226 KEEP PP INFO if available (auto aflow.in)
       }
     }
@@ -16950,11 +16926,10 @@ xstructure Rotate(const xstructure&a, const xmatrix<double>& rm) {
 // modifies in-place (efficient)
 void xstructure::Rotate(const xmatrix<double>& rm) {
   bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
-  string soliloquy = XPID + "xstructure::Rotate():"; //CO20190520
   if(LDEBUG) { //CO20190520
-    cerr << soliloquy << " (*this)=" << endl;cerr << (*this) << endl; //CO20190520
-    cerr << soliloquy << " (*this).origin=" << (*this).origin << endl; //CO20190520
-    cerr << soliloquy << " rm=" << endl;cerr << rm << endl; //ME20200204
+    cerr << __AFLOW_FUNC__ << " (*this)=" << endl;cerr << (*this) << endl; //CO20190520
+    cerr << __AFLOW_FUNC__ << " (*this).origin=" << (*this).origin << endl; //CO20190520
+    cerr << __AFLOW_FUNC__ << " rm=" << endl;cerr << rm << endl; //ME20200204
   }
   if (aurostd::isidentity(rm)) return;  //ME20200204 - no need to go through all the motions for identity matrix
   // Get R_0(p) for all cartesian positions.
@@ -17345,12 +17320,11 @@ int xstructure::GenerateGridAtoms(const xvector<int>& dims) {return GenerateGrid
 int xstructure::GenerateGridAtoms(int i1,int i2,int j1,int j2,int k1,int k2) {return GenerateGridAtoms_20191218(i1,i2,j1,j2,k1,k2);}
 int xstructure::GenerateGridAtoms_20190520(int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218 - added date [ORIG]
   bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
-  string soliloquy = XPID + "GenerateGridAtoms():"; //CO20190520
   if(LDEBUG) { //CO20190520
-    cerr << soliloquy << " str=" << endl;cerr << (*this) << endl; //CO20190520
-    cerr << soliloquy << " i=" << i1 << ":" << i2 << endl; //CO20190520
-    cerr << soliloquy << " j=" << j1 << ":" << j2 << endl; //CO20190520
-    cerr << soliloquy << " k=" << k1 << ":" << k2 << endl; //CO20190520
+    cerr << __AFLOW_FUNC__ << " str=" << endl;cerr << (*this) << endl; //CO20190520
+    cerr << __AFLOW_FUNC__ << " i=" << i1 << ":" << i2 << endl; //CO20190520
+    cerr << __AFLOW_FUNC__ << " j=" << j1 << ":" << j2 << endl; //CO20190520
+    cerr << __AFLOW_FUNC__ << " k=" << k1 << ":" << k2 << endl; //CO20190520
   } //CO20190520
   // same scale as before
   grid_atoms.clear();
@@ -17382,10 +17356,10 @@ int xstructure::GenerateGridAtoms_20190520(int i1,int i2,int j1,int j2,int k1,in
             grid_atoms.push_back(atom);
             grid_atoms_sc2pcMap.push_back(iat); //CO20171025
             if(LDEBUG) { //CO20190520
-              cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].cpos=" << grid_atoms.back().cpos << endl; //CO20190520
-              cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].fpos=" << grid_atoms.back().fpos << endl; //CO20190520
-              cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "]=" << grid_atoms.back() << endl; //DX20191218
-              cerr << soliloquy << " grid_atoms_sc2pcMap[" << grid_atoms.size()-1 << "]=" << grid_atoms_sc2pcMap.back() << endl; //DX20191218
+              cerr << __AFLOW_FUNC__ << " grid_atoms[" << grid_atoms.size()-1 << "].cpos=" << grid_atoms.back().cpos << endl; //CO20190520
+              cerr << __AFLOW_FUNC__ << " grid_atoms[" << grid_atoms.size()-1 << "].fpos=" << grid_atoms.back().fpos << endl; //CO20190520
+              cerr << __AFLOW_FUNC__ << " grid_atoms[" << grid_atoms.size()-1 << "]=" << grid_atoms.back() << endl; //DX20191218
+              cerr << __AFLOW_FUNC__ << " grid_atoms_sc2pcMap[" << grid_atoms.size()-1 << "]=" << grid_atoms_sc2pcMap.back() << endl; //DX20191218
             } //CO20190520
           }
         }
@@ -17402,7 +17376,7 @@ int xstructure::GenerateGridAtoms_20190520(int i1,int i2,int j1,int j2,int k1,in
         }
       }
     }
-    if(!aurostd::isequal(min_dist,SYM::minimumDistance((*this)),0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
+    if(!aurostd::isequal(min_dist,SYM::minimumDistance((*this)),0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
   grid_atoms_calculated=TRUE;
   grid_atoms_dimsL[1]=i1;grid_atoms_dimsL[2]=j1;grid_atoms_dimsL[3]=k1;
@@ -17416,12 +17390,11 @@ int xstructure::GenerateGridAtoms_20190520(int i1,int i2,int j1,int j2,int k1,in
 
 int xstructure::GenerateGridAtoms_20191218(int i1,int i2,int j1,int j2,int k1,int k2) { //DX20191218 - [NEW]
   bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
-  string soliloquy = XPID + "GenerateGridAtoms():"; //CO20190520
   if(LDEBUG) { //CO20190520
-    cerr << soliloquy << " str=" << endl;cerr << (*this) << endl; //CO20190520
-    cerr << soliloquy << " i=" << i1 << ":" << i2 << endl; //CO20190520
-    cerr << soliloquy << " j=" << j1 << ":" << j2 << endl; //CO20190520
-    cerr << soliloquy << " k=" << k1 << ":" << k2 << endl; //CO20190520
+    cerr << __AFLOW_FUNC__ << " str=" << endl;cerr << (*this) << endl; //CO20190520
+    cerr << __AFLOW_FUNC__ << " i=" << i1 << ":" << i2 << endl; //CO20190520
+    cerr << __AFLOW_FUNC__ << " j=" << j1 << ":" << j2 << endl; //CO20190520
+    cerr << __AFLOW_FUNC__ << " k=" << k1 << ":" << k2 << endl; //CO20190520
   } //CO20190520
   // same scale as before
   grid_atoms.clear();
@@ -17472,8 +17445,8 @@ int xstructure::GenerateGridAtoms_20191218(int i1,int i2,int j1,int j2,int k1,in
   //grid_atoms.push_back(atom);
   //grid_atoms_sc2pcMap.push_back(iat); //CO20171025
   //if(LDEBUG) { //CO20190520
-  //cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].cpos=" << grid_atoms.back().cpos << endl; //CO20190520
-  //cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].fpos=" << grid_atoms.back().fpos << endl; //CO20190520
+  //cerr << __AFLOW_FUNC__ << " grid_atoms[" << grid_atoms.size()-1 << "].cpos=" << grid_atoms.back().cpos << endl; //CO20190520
+  //cerr << __AFLOW_FUNC__ << " grid_atoms[" << grid_atoms.size()-1 << "].fpos=" << grid_atoms.back().fpos << endl; //CO20190520
   //} //CO20190520
   //}
   //}
@@ -17507,12 +17480,12 @@ int xstructure::GenerateGridAtoms_20191218(int i1,int i2,int j1,int j2,int k1,in
             grid_atoms[grid_atom_count] = atom;
             grid_atoms_sc2pcMap[grid_atom_count] = iat; //CO20171025
             //DX20200320 [OBSOLETE-moved outside of loop for speed] if(LDEBUG) { //CO20190520
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].cpos=" << grid_atoms.back().cpos << endl; //CO20190520
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].fpos=" << grid_atoms.back().fpos << endl; //CO20190520
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].cpos=" << grid_atoms[grid_atom_count].cpos << endl; //CO20190520
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "].fpos=" << grid_atoms[grid_atom_count].fpos << endl; //CO20190520
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms[" << grid_atom_count << "]=" << grid_atoms[grid_atom_count] << endl; //DX20191218
-            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << soliloquy << " grid_atoms_sc2pcMap[" << grid_atom_count << "]=" << grid_atoms_sc2pcMap[grid_atom_count] << endl; //DX20191218
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   //DX20191122 [OBSOLETE-PUSH_BACK] cerr << __AFLOW_FUNC__ << " grid_atoms[" << grid_atoms.size()-1 << "].cpos=" << grid_atoms.back().cpos << endl; //CO20190520
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   //DX20191122 [OBSOLETE-PUSH_BACK] cerr << __AFLOW_FUNC__ << " grid_atoms[" << grid_atoms.size()-1 << "].fpos=" << grid_atoms.back().fpos << endl; //CO20190520
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << __AFLOW_FUNC__ << " grid_atoms[" << grid_atom_count << "].cpos=" << grid_atoms[grid_atom_count].cpos << endl; //CO20190520
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << __AFLOW_FUNC__ << " grid_atoms[" << grid_atom_count << "].fpos=" << grid_atoms[grid_atom_count].fpos << endl; //CO20190520
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << __AFLOW_FUNC__ << " grid_atoms[" << grid_atom_count << "]=" << grid_atoms[grid_atom_count] << endl; //DX20191218
+            //DX20200320 [OBSOLETE-moved outside of loop for speed]   cerr << __AFLOW_FUNC__ << " grid_atoms_sc2pcMap[" << grid_atom_count << "]=" << grid_atoms_sc2pcMap[grid_atom_count] << endl; //DX20191218
             //DX20200320 [OBSOLETE-moved outside of loop for speed] } //CO20190520
             grid_atom_count++; //DX20191122
           }
@@ -17523,12 +17496,12 @@ int xstructure::GenerateGridAtoms_20191218(int i1,int i2,int j1,int j2,int k1,in
   //DX20200320 - moved outside of loop so that LDEBUG boolean is not checked every time (speed increase when grid atoms is large)
   if(LDEBUG) { //CO20190520
     for(uint i=0;i<grid_atoms.size();i++){
-      //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].cpos=" << grid_atoms.back().cpos << endl; //CO20190520
-      //DX20191122 [OBSOLETE-PUSH_BACK] cerr << soliloquy << " grid_atoms[" << grid_atoms.size()-1 << "].fpos=" << grid_atoms.back().fpos << endl; //CO20190520
-      cerr << soliloquy << " grid_atoms[" << i << "].cpos=" << grid_atoms[i].cpos << endl; //CO20190520
-      cerr << soliloquy << " grid_atoms[" << i << "].fpos=" << grid_atoms[i].fpos << endl; //CO20190520
-      cerr << soliloquy << " grid_atoms[" << i << "]=" << grid_atoms[i] << endl; //DX20191218
-      cerr << soliloquy << " grid_atoms_sc2pcMap[" << i << "]=" << grid_atoms_sc2pcMap[i] << endl; //DX20191218
+      //DX20191122 [OBSOLETE-PUSH_BACK] cerr << __AFLOW_FUNC__ << " grid_atoms[" << grid_atoms.size()-1 << "].cpos=" << grid_atoms.back().cpos << endl; //CO20190520
+      //DX20191122 [OBSOLETE-PUSH_BACK] cerr << __AFLOW_FUNC__ << " grid_atoms[" << grid_atoms.size()-1 << "].fpos=" << grid_atoms.back().fpos << endl; //CO20190520
+      cerr << __AFLOW_FUNC__ << " grid_atoms[" << i << "].cpos=" << grid_atoms[i].cpos << endl; //CO20190520
+      cerr << __AFLOW_FUNC__ << " grid_atoms[" << i << "].fpos=" << grid_atoms[i].fpos << endl; //CO20190520
+      cerr << __AFLOW_FUNC__ << " grid_atoms[" << i << "]=" << grid_atoms[i] << endl; //DX20191218
+      cerr << __AFLOW_FUNC__ << " grid_atoms_sc2pcMap[" << i << "]=" << grid_atoms_sc2pcMap[i] << endl; //DX20191218
     } //CO20190520
   }
   if(0){  //CO20190808 - quick check of mindist
@@ -17541,7 +17514,7 @@ int xstructure::GenerateGridAtoms_20191218(int i1,int i2,int j1,int j2,int k1,in
         }
       }
     }
-    if(!aurostd::isequal(min_dist,SYM::minimumDistance((*this)),0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
+    if(!aurostd::isequal(min_dist,SYM::minimumDistance((*this)),0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
   grid_atoms_calculated=TRUE;
   grid_atoms_dimsL[1]=i1;grid_atoms_dimsL[2]=j1;grid_atoms_dimsL[3]=k1;
@@ -17850,29 +17823,28 @@ class compare_GetNeighData {
 // rescale structure to 1 and check whether e.g. species and atoms are present
 void xstructure::checkStructure(){
   bool LDEBUG = (FALSE || XHOST.DEBUG);
-  string soliloquy=XPID+"xstructure::checkStructure():";
   stringstream message;
   (*this).ReScale(1.0); // rescales scaling factor in second line of POSCAR to 1, needed for correct distances
   //throw some general information such as input structure
   if(LDEBUG){
-    cerr << soliloquy << endl << "INPUT STRUCTURE:" << endl;
-    cerr << soliloquy << (*this) << endl;
+    cerr << __AFLOW_FUNC__ << endl << "INPUT STRUCTURE:" << endl;
+    cerr << __AFLOW_FUNC__ << (*this) << endl;
   }
   // check whether the species vector is populated, otherwise throw error
   if ((*this).species.size() == 0){
     message << " BAD NEWS: It seems there are no species in the structure. Please adjust the structure and rerun.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   }
   // check whether there are any atoms in the structure
   if ((*this).atoms.size() == 0){
     message << " BAD NEWS: It seems there are no atoms in the structure. Please adjust the structure and rerun.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   }
   // if species of atoms are not known like in VASP4 format, throw error
   for(uint k=0,ksize=(*this).atoms.size();k<ksize;k++){
     if ((*this).atoms[k].cleanname == ""){
       message << " BAD NEWS: It seems you are providing a structure without complete species information as input. This implementation requires a structure with the species information included. For a VASP4 POSCAR, the species must be written on the right side next to the coordinates for each atom. Please adjust the structure and rerun.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
     }
   }
 }
@@ -17900,7 +17872,6 @@ void xstructure::GetNeighbors(deque<deque<uint> >& i_neighbors,deque<deque<doubl
 }
 void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,double rmax,double rmin,bool prim,bool unique_only){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy=XPID+"xstructure::GetNeighbors():";
 
   uint i=0,k=0;
 
@@ -17929,16 +17900,16 @@ void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_ne
   }
 
   if(LDEBUG){
-    cerr << soliloquy << " atoms_cell.size()=" << atoms_cell.size() << endl;
-    cerr << soliloquy << " atomscell2atoms_mapping=" << aurostd::joinWDelimiter(atomscell2atoms_mapping,",") << endl;
+    cerr << __AFLOW_FUNC__ << " atoms_cell.size()=" << atoms_cell.size() << endl;
+    cerr << __AFLOW_FUNC__ << " atomscell2atoms_mapping=" << aurostd::joinWDelimiter(atomscell2atoms_mapping,",") << endl;
   }
 
-  if(LDEBUG){cerr << soliloquy << " GenerateGridAtoms(): starting" << endl;}
+  if(LDEBUG){cerr << __AFLOW_FUNC__ << " GenerateGridAtoms(): starting" << endl;}
   GenerateGridAtoms(rmax);
-  if(LDEBUG){cerr << soliloquy << " GenerateGridAtoms(): done" << endl;}
-  if(LDEBUG){cerr << soliloquy << " grid_atoms_number=" << grid_atoms_number << endl;}
+  if(LDEBUG){cerr << __AFLOW_FUNC__ << " GenerateGridAtoms(): done" << endl;}
+  if(LDEBUG){cerr << __AFLOW_FUNC__ << " grid_atoms_number=" << grid_atoms_number << endl;}
 
-  if(LDEBUG){cerr << soliloquy << " generating neighbors" << endl;}
+  if(LDEBUG){cerr << __AFLOW_FUNC__ << " generating neighbors" << endl;}
   //[STILL SLOWER THAN AUROSTD::SORT()]//[SHAVES 1 SECOND]vector<double> v_mindist;
   double dist=0.0;
   uint atom1=0,atom2=0;
@@ -17964,7 +17935,7 @@ void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_ne
     vector<uint> i2remove;
     double cutoff=0.0;
     for(k=0;k<distances.size();k++){
-      if(LDEBUG){cerr << soliloquy << " START distances[k=" << k << "].size()=" << distances[k].size() << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " START distances[k=" << k << "].size()=" << distances[k].size() << endl;}
       i2remove.clear();
       cutoff=1.25*min(distances[k]); //v_mindist[k];  //focus on first shell: does not require an input tol
       for(i=0;i<distances[k].size();i++){
@@ -17974,12 +17945,12 @@ void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_ne
         i_neighbors[k].erase(i_neighbors[k].begin()+i2remove[i]);
         distances[k].erase(distances[k].begin()+i2remove[i]);
       }
-      if(LDEBUG){cerr << soliloquy << " STOP  distances[k=" << k << "].size()=" << distances[k].size() << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " STOP  distances[k=" << k << "].size()=" << distances[k].size() << endl;}
     }
   }
 
   //now sort
-  if(LDEBUG){cerr << soliloquy << " sorting" << endl;}
+  if(LDEBUG){cerr << __AFLOW_FUNC__ << " sorting" << endl;}
   //[TOO SLOW FOR LARGE VECTORS]uint uint_tmp=0;
   //[TOO SLOW FOR LARGE VECTORS]double double_tmp=0;
   //[TOO SLOW FOR LARGE VECTORS]for(k=0;k<i_neighbors.size();k++){
@@ -18019,7 +17990,7 @@ void xstructure::GetNeighbors(deque<_atom>& atoms_cell,deque<deque<uint> >& i_ne
 
   if(LDEBUG){
     for(k=0;k<i_neighbors.size();k++){
-      cerr << soliloquy << " ATOMS_CELL[k=" << k << "]: " << atoms_cell[k].name << endl;
+      cerr << __AFLOW_FUNC__ << " ATOMS_CELL[k=" << k << "]: " << atoms_cell[k].name << endl;
       for(i=0;i<i_neighbors[k].size();i++){
         cerr << "  neighbor[i=" << i << "]: " << grid_atoms[i_neighbors[k][i]].name << " dist=" << distances[k][i] << endl;
       }
@@ -18085,7 +18056,6 @@ void xstructure::GetCoordinations(deque<deque<uint> >& i_neighbors,deque<deque<d
 }
 void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& i_neighbors,deque<deque<double> >& distances,deque<deque<uint> >& coordinations,double rmax,double rmin,double tol,bool prim,bool unique_only){
   bool LDEBUG=(FALSE || XHOST.DEBUG);
-  string soliloquy=XPID+"xstructure::GetCoordinations():";
 
   GetNeighbors(atoms_cell,i_neighbors,distances,rmax,rmin,prim,unique_only);
 
@@ -18107,7 +18077,7 @@ void xstructure::GetCoordinations(deque<_atom>& atoms_cell,deque<deque<uint> >& 
 
   if(LDEBUG){
     for(k=0;k<i_neighbors.size();k++){
-      cerr << soliloquy << " ATOMS_CELL[k=" << k << "]: " << atoms_cell[k].name << endl;
+      cerr << __AFLOW_FUNC__ << " ATOMS_CELL[k=" << k << "]: " << atoms_cell[k].name << endl;
       for(i=0;i<coordinations[k].size();i++){
         cerr << "  coordination[i=" << i << "]: " << coordinations[k][i] << endl;
       }

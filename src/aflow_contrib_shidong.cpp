@@ -2728,7 +2728,6 @@ void GenerateAflowInputFile(string structure_type,
 // ***************************************************************************
 
 void CheckAllInputFileExistence(string structure_type) {
-  string soliloquy=XPID+"CheckAllInputFileExistence():";
   // if no cluster data exists, ask user to
   // obtain it first
   string filename;
@@ -2787,7 +2786,7 @@ void CheckAllInputFileExistence(string structure_type) {
   }
 
   if( flag_cluster_cal || flag_SL_cal ) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"no input",_INPUT_MISSING_); //CO20200624
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"no input",_INPUT_MISSING_); //CO20200624
   } else {
     cerr << "All input files are found. Calculation begins.\n"
       << endl;

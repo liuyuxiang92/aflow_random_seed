@@ -301,7 +301,6 @@ void _XHOST::clear() {  // clear PRIVATE
 pthread_mutex_t mutex_XAFLOW_XHOST=PTHREAD_MUTEX_INITIALIZER;
 
 std::string _XHOST::command(const string& command) {
-  string soliloquy = XPID + "_XHOST::command():";  //CO20190629
   string _command=command;
 #ifdef _MACOSX_
   if(command=="beep") return string("echo -ne '\007'");
@@ -335,7 +334,7 @@ std::string _XHOST::command(const string& command) {
     }
   }
   //CO20180705 STOP
-  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"command="+command+" not found",_INPUT_MISSING_);
+  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"command="+command+" not found",_INPUT_MISSING_);
   return string();
 }
 

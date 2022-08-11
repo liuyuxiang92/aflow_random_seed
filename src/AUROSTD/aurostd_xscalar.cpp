@@ -294,12 +294,11 @@ namespace aurostd {  // namespace aurostd
  //[SD20220603 - OBSOLETE]   fracpart=modf(x,&intpart);
  //[SD20220603 - OBSOLETE]#ifdef _XSCALAR_DEBUG_
  //[SD20220603 - OBSOLETE]   if(LDEBUG){
- //[SD20220603 - OBSOLETE]     string soliloquy="aurostd::round():";
- //[SD20220603 - OBSOLETE]     cerr << soliloquy << " x=" << x << endl;
- //[SD20220603 - OBSOLETE]     cerr << soliloquy << " fracpart=" << fracpart << endl;
- //[SD20220603 - OBSOLETE]     cerr << soliloquy << " intpart=" << intpart << endl;
- //[SD20220603 - OBSOLETE]     cerr << soliloquy << " floor(x)=" << std::floor(x) << endl;
- //[SD20220603 - OBSOLETE]     cerr << soliloquy << " ceil(x)=" << std::ceil(x) << endl;
+ //[SD20220603 - OBSOLETE]     cerr << __AFLOW_FUNC__ << " x=" << x << endl;
+ //[SD20220603 - OBSOLETE]     cerr << __AFLOW_FUNC__ << " fracpart=" << fracpart << endl;
+ //[SD20220603 - OBSOLETE]     cerr << __AFLOW_FUNC__ << " intpart=" << intpart << endl;
+ //[SD20220603 - OBSOLETE]     cerr << __AFLOW_FUNC__ << " floor(x)=" << std::floor(x) << endl;
+ //[SD20220603 - OBSOLETE]     cerr << __AFLOW_FUNC__ << " ceil(x)=" << std::ceil(x) << endl;
  //[SD20220603 - OBSOLETE]   }
  //[SD20220603 - OBSOLETE]#endif
  //[SD20220603 - OBSOLETE]   if(abs(fracpart)>=.5){return x>=0?std::ceil(x):std::floor(x);}  //not sure why fracpart would ever be negative, but it is for negative inputs
@@ -769,14 +768,12 @@ namespace aurostd {
       return (utype)-INFINITY;
     }
     else if (std::isnan(y)) {
-      string soliloquy = XPID + "aurostd::mod_floored():";
       string message = "NAN value in divisor";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     else if (std::isnan(x)) {
-      string soliloquy = XPID + "aurostd::mod_floored():";
       string message = "NAN value in dividend";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     else {
       return x - y * std::floor((double)x/y);
@@ -886,7 +883,6 @@ namespace aurostd {
 namespace aurostd {
   string dbl2frac(double a, bool sign_prefix) {
 
-    string soliloquy = "aurostd::dbl2frac()";
     stringstream message;
 
     string out = ""; //DX20200427 - missing initialization
@@ -946,7 +942,7 @@ namespace aurostd {
     } //DX20180726 - added
     else {
       //DX20200427 [should not throw if not found, just return decimal] message << "Could not find hard-coded fraction for the double " << a << ".";
-      //DX20200427 [should not throw if not found, just return decimal] throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
+      //DX20200427 [should not throw if not found, just return decimal] throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
       out = aurostd::utype2string<double>(a);
     }
     if(sign_prefix){

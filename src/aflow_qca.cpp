@@ -31,9 +31,12 @@ namespace qca {
       if (!vpflow.flag("QCA::SCREEN_ONLY")) {displayUsage();}
       return;
     }
+    stringstream message;
+    _aflags aflags;
+    ofstream FileMESSAGE;
+    ostream& p_oss = cout;
     _qca_data qca_data;
     initQCA(qca_data);
-    qca_data.num_threads = KBIN::get_NCPUS();
     qca_data.cdirpath = aurostd::getPWD();
     qca_data.rootdirpath = aurostd::CleanFileName(qca_data.rootdirpath);
     qca_data.plattice = aurostd::tolower(qca_data.plattice);
@@ -46,57 +49,83 @@ namespace qca {
     else {
       qca_data.rootdirpath = aurostd::getPWD();
     }
+    message << "Root directory = " << qca_data.rootdirpath;
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     if (!vpflow.getattachedscheme("QCA::AFLOWLIB_DIRECTORY").empty()) {qca_data.aflowlibpath = vpflow.getattachedscheme("QCA::AFLOWLIB_DIRECTORY");}
+    message << "AFLOWLIB directory = " << qca_data.aflowlibpath;
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     if (!vpflow.getattachedscheme("QCA::AFLOW_MAX_NUM_ATOMS").empty()) {
       qca_data.aflow_max_num_atoms = aurostd::string2utype<int>(vpflow.getattachedscheme("QCA::AFLOW_MAX_NUM_ATOMS"));
     }
     else {
       qca_data.aflow_max_num_atoms = DEFAULT_QCA_AFLOW_MAX_NUM_ATOMS;
     }
+    message << "Maximum number of atoms in AFLOW = " << qca_data.aflow_max_num_atoms;
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     qca_data.plattice = vpflow.getattachedscheme("QCA::PLATTICE");
+    message << "Parent lattice = " << qca_data.plattice;
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     if (!vpflow.getattachedscheme("QCA::ELEMENTS").empty()) {
       aurostd::string2tokens(vpflow.getattachedscheme("QCA::ELEMENTS"), qca_data.elements, ",");
     }
+    message << "Alloy elements = " << aurostd::joinWDelimiter(qca_data.elements, ",");
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     if (!vpflow.getattachedscheme("QCA::MAX_NUM_ATOMS").empty()) {
       qca_data.max_num_atoms = aurostd::string2utype<int>(vpflow.getattachedscheme("QCA::MAX_NUM_ATOMS"));
     }
     else {
       qca_data.max_num_atoms = DEFAULT_QCA_MAX_NUM_ATOMS;
     }
+    message << "Maximum number of atoms in cluster expansion = " << qca_data.max_num_atoms;
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     if (!vpflow.getattachedscheme("QCA::CV_CUTOFF").empty()) {
       qca_data.cv_cut = aurostd::string2utype<double>(vpflow.getattachedscheme("QCA::CV_CUTOFF"));
     }
     else {
       qca_data.cv_cut = DEFAULT_QCA_CV_CUTOFF;
     }
+    message << "Cross validation cutoff = " << qca_data.cv_cut;
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     if (!vpflow.getattachedscheme("QCA::CONC_CURVE_RANGE").empty()) {
       qca_data.conc_curve = true;
       aurostd::string2tokens(vpflow.getattachedscheme("QCA::CONC_CURVE_RANGE"), qca_data.conc_curve_range, ",");
     }
+    message << "Concentration curve range = " << std::fixed << std::setprecision(4);
+    for (size_t i = 0; i < qca_data.conc_curve_range.size(); i++) {message << qca_data.conc_curve_range[i] << " ";}
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     if (!vpflow.getattachedscheme("QCA::CONC_NPTS").empty()) {
       qca_data.conc_npts = aurostd::string2utype<int>(vpflow.getattachedscheme("QCA::CONC_NPTS"));
     }
     else {
       qca_data.conc_npts = DEFAULT_QCA_CONC_NPTS;
     }
+    message << "Number of points (concentration) = " << qca_data.conc_npts;
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     if (!vpflow.getattachedscheme("QCA::TEMP_RANGE").empty()) {
       aurostd::string2tokens(vpflow.getattachedscheme("QCA::TEMP_RANGE"), qca_data.temp_range, ",");
     }
     else {
       qca_data.temp_range = {DEFAULT_QCA_TEMP_MIN, DEFAULT_QCA_TEMP_MAX};
     }
+    message << "Temperature range (K) = " <<  std::fixed << std::setprecision(2) 
+            << qca_data.temp_range[0] << " " << qca_data.temp_range[1];
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     if (!vpflow.getattachedscheme("QCA::TEMP_NPTS").empty()) {
       qca_data.temp_npts = aurostd::string2utype<int>(vpflow.getattachedscheme("QCA::TEMP_NPTS"));
     }
     else {
       qca_data.temp_npts = DEFAULT_QCA_TEMP_NPTS;
     }
+    message << "Number of points (temperature) = " << qca_data.temp_npts;
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     if (!vpflow.getattachedscheme("QCA::PRINT").empty()) {
       qca_data.print = vpflow.getattachedscheme("QCA::PRINT");
     }
     else {
       qca_data.print = DEFAULT_QCA_PRINT;
     }
+    message << "Output format = " << qca_data.print;
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     if (vpflow.flag("QCA::SCREEN_ONLY")) {qca_data.screen_only = true;}
     if (vpflow.flag("QCA::IMAGE_ONLY")) {qca_data.image_only = true;}
     if (vpflow.flag("QCA::BINODAL")) {qca_data.calc_binodal = true;}
@@ -118,7 +147,6 @@ namespace qca {
   /// @mod{SD,20220718,created function}
   void initQCA(_qca_data& qca_data) {
     // Input data
-    qca_data.num_threads = 0;
     qca_data.min_sleep = 0;
     qca_data.print = "";
     qca_data.screen_only = false;
@@ -203,8 +231,6 @@ namespace qca {
   /// @authors
   /// @mod{SD,20220718,created function}
   void errorFix(_qca_data& qca_data) {
-    // Check if number of threads is valid
-    if (qca_data.num_threads < 1) {qca_data.num_threads = 1;}
     // Check if min sleep is at least 1 sec
     if (qca_data.min_sleep < 1) {qca_data.min_sleep = 1;}
     // Check if max number of atoms in cluster is valid
@@ -255,7 +281,7 @@ namespace qca {
       double totconc_init = 0.0, totconc_final = 0.0;
       vector<double> vconc_init, vconc_final;
       vector<size_t> vzeros_init, vzeros_final;
-      for (uint i = 0; i < qca_data.elements.size() && totconc_init <= 1.0 && totconc_final <= 1.0; i++) {
+      for (size_t i = 0; i < qca_data.elements.size() && totconc_init <= 1.0 && totconc_final <= 1.0; i++) {
         if (qca_data.conc_curve_range[2 * i] < 0 || qca_data.conc_curve_range[2 * i] > 1 ||
             qca_data.conc_curve_range[2 * i + 1] < 0 || qca_data.conc_curve_range[2 * i + 1] > 1) {
           string message = "Concentration curve must be defined on [0,1]";
@@ -272,7 +298,7 @@ namespace qca {
       aurostd::WithinList(vconc_init, 0.0, vzeros_init); aurostd::WithinList(vconc_final, 0.0, vzeros_final);
       double cdelta_init = CONC_SHIFT * (double)vzeros_init.size() / ((double)vconc_init.size() - (double)vzeros_init.size());
       double cdelta_final = CONC_SHIFT * (double)vzeros_final.size() / ((double)vconc_final.size() - (double)vzeros_final.size());
-      for (uint i = 0; i < qca_data.conc_curve_range.size(); i++) {
+      for (size_t i = 0; i < qca_data.conc_curve_range.size(); i++) {
         if (aurostd::isequal(qca_data.conc_curve_range[i], 0.0)) {
           qca_data.conc_curve_range[i] += CONC_SHIFT;
         }
@@ -323,12 +349,12 @@ namespace qca {
     else { // run ATAT
       qca_data.lat_atat = createLatForATAT(qca_data.plattice, qca_data.elements);
       qca_data.vstr_atat = getATATXstructures(qca_data.lat_atat, qca_data.plattice, qca_data.elements, (uint)qca_data.max_num_atoms);
-      qca_data.vstr_aflow = getAFLOWXstructures(qca_data.plattice, qca_data.elements, qca_data.num_threads, qca_data.use_sg);
+      qca_data.vstr_aflow = getAFLOWXstructures(qca_data.plattice, qca_data.elements, qca_data.use_sg);
       if (!qca_data.aflowlibpath.empty()) { // add custom xstrs
-        vector<xstructure> vstr_add = getAFLOWXstructures(qca_data.aflowlibpath, qca_data.num_threads, qca_data.use_sg);
+        vector<xstructure> vstr_add = getAFLOWXstructures(qca_data.aflowlibpath, qca_data.use_sg);
         qca_data.vstr_aflow.insert(qca_data.vstr_aflow.end(), vstr_add.begin(), vstr_add.end());
       }
-      qca_data.mapstr = calcMapForXstructures(getATATXstructures(qca_data.lat_atat, qca_data.plattice, qca_data.elements, qca_data.aflow_max_num_atoms), qca_data.vstr_aflow, qca_data.num_threads); // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
+      qca_data.mapstr = calcMapForXstructures(getATATXstructures(qca_data.lat_atat, qca_data.plattice, qca_data.elements, qca_data.aflow_max_num_atoms), qca_data.vstr_aflow); // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
       generateFilesForATAT(qca_data.rundirpath, createLatForATAT(qca_data.plattice, qca_data.elements, true), qca_data.vstr_aflow, qca_data.vstr_atat, qca_data.mapstr);
       runATAT(qca_data.cdirpath, qca_data.rundirpath, qca_data.min_sleep);
     }
@@ -337,7 +363,7 @@ namespace qca {
     qca_data.conc_cluster = getConcentrationCluster(qca_data.rundirpath, qca_data.vstr_atat.size(), qca_data.elements.size());
     qca_data.excess_energy_cluster = getExcessEnergyCluster(qca_data.rundirpath, qca_data.conc_cluster, qca_data.max_num_atoms);
     setCongruentClusters(qca_data);
-    qca_data.degeneracy_cluster = calcDegeneracyCluster(qca_data.plattice, qca_data.vstr_atat, qca_data.elements, qca_data.max_num_atoms, qca_data.num_threads, qca_data.rundirpath);
+    qca_data.degeneracy_cluster = calcDegeneracyCluster(qca_data.plattice, qca_data.vstr_atat, qca_data.elements, qca_data.max_num_atoms, qca_data.rundirpath);
     qca_data.conc_macro = getConcentrationMacro(qca_data.conc_curve_range, qca_data.conc_npts, qca_data.elements.size());
     qca_data.temp = getTemperatureRange(qca_data.temp_range, qca_data.temp_npts);
     qca_data.param_ec = calcRelativeEntropyEC(qca_data.conc_cluster, qca_data.degeneracy_cluster, qca_data.excess_energy_cluster, qca_data.temp, qca_data.max_num_atoms);
@@ -374,12 +400,18 @@ namespace qca {
   /// @mod{SD,20220718,created function}
   xvector<double> calcBinodalBoundary(const xmatrix<double>& rel_s, const double rel_s_ec, const xvector<double>& temp) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    int nx = rel_s.rows, nt = rel_s.cols, n_fit = 8;
-    xvector<double> binodal_boundary(nx), p, rr(n_fit), ri(n_fit);
-    xvector<double> wts = aurostd::ones_xv<double>(nt);
+    stringstream message;
+    _aflags aflags;
+    ofstream FileMESSAGE;
+    ostream& p_oss = cout;
+    int n_fit = 8;
+    xvector<double> binodal_boundary(rel_s.rows), p, rr(n_fit), ri(n_fit);
+    xvector<double> wts = aurostd::ones_xv<double>(rel_s.cols);
     double temp_mean = aurostd::mean(temp), temp_std = aurostd::stddev(temp);
     xvector<double> temp_scaled = (temp - temp_mean) / temp_std; // scale for numerical stability
-    for (int i = 1; i <= nx; i++) {
+    message << "Calculating binodal curve";
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
+    for (int i = rel_s.lrows; i <= rel_s.urows; i++) {
       p = aurostd::polynomialCurveFit(temp_scaled, rel_s(i) - rel_s_ec, n_fit, wts);
       aurostd::polynomialFindRoots(p, rr, ri);
       if (LDEBUG) {
@@ -393,6 +425,7 @@ namespace qca {
           binodal_boundary(i) = rr(j);
         }
       }
+      pflow::updateProgressBar(i - rel_s.lrows + 1, rel_s.rows, p_oss);
     }
     return binodal_boundary;
   }
@@ -412,12 +445,11 @@ namespace qca {
   /// @authors
   /// @mod{SD,20220718,created function}
   xmatrix<double> calcRelativeEntropy(const vector<xmatrix<double>>& prob_cluster, const xmatrix<double>& prob_cluster_ideal) {
-    int nx = prob_cluster_ideal.rows, ncl = prob_cluster_ideal.cols, nt = prob_cluster.size();
-    xmatrix<double> rel_s(nx, nt);
-    for (int i = 1; i <= nx; i++) {
-      for (int j = 1; j <= nt; j++) {
-        for (int k = 1; k <= ncl; k++) {
-          rel_s(i, j) += prob_cluster[j - 1](i, k) * aurostd::log(prob_cluster[j - 1](i, k) / prob_cluster_ideal(i, k));
+    xmatrix<double> rel_s(prob_cluster_ideal.rows, prob_cluster.size());
+    for (int i = prob_cluster_ideal.lrows; i <= prob_cluster_ideal.urows; i++) {
+      for (int j = 1; j <= (int)prob_cluster.size(); j++) {
+        for (int k = prob_cluster_ideal.lcols; k <= prob_cluster_ideal.ucols; k++) {
+          rel_s(i, j) += prob_cluster[j - 1](i, k) * aurostd::log((prob_cluster[j - 1](i, k) + _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_) / (prob_cluster_ideal(i, k) + _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_));
         }
       }
     }
@@ -442,30 +474,38 @@ namespace qca {
   ///
   /// @authors
   /// @mod{SD,20220718,created function}
-  std::pair<double, double> calcRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& _temp, const int max_num_atoms, bool interp) {
+  std::pair<double, double> calcRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<long int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& _temp, const int max_num_atoms, bool interp) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    stringstream message;
+    _aflags aflags;
+    ofstream FileMESSAGE;
+    ostream& p_oss = cout;
     std::pair<double, double> param_ec(0.0, 0.0);
-    int nelem = conc_cluster.cols, n_fit = 8;
+    int n_fit = 8;
     xvector<double> temp = _temp;
-    xmatrix<double> conc_macro_ec(1, nelem);
-    conc_macro_ec.set(1.0 / (double)nelem);
+    xmatrix<double> conc_macro_ec(1, conc_cluster.cols);
+    conc_macro_ec.set(1.0 / (double)conc_cluster.cols);
     xmatrix<double> prob_ideal_ec = calcProbabilityIdealCluster(conc_macro_ec, conc_cluster, degeneracy_cluster, max_num_atoms);
     vector<xmatrix<double>> prob_ec;
     // Check that the probability is physical, if not, shift the temperature range upward
     bool shift_temp = false;
     double dtemp = temp(2) - temp(1);
+    message << "Checking for physical probabilites at equi-composition";
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     while (!calcProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, temp, max_num_atoms, prob_ec) && 
            aurostd::min(temp) < DEFAULT_QCA_TEMP_MIN_LIMIT) {
       shift_temp = true;
       temp += dtemp;
     }
+    message << "Equi-composition temperature range = [" << temp(1) << "K, " << temp(temp.urows) << "K]";
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     if (shift_temp && aurostd::min(temp) > DEFAULT_QCA_TEMP_MIN_LIMIT) {
-      string message = "Could not find a temperature at equi-concentration that leads to a physical solution";
+      message << "Could not find a temperature at equi-concentration that leads to a physical solution";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     xvector<double> order_param(prob_ec.size());
     xmatrix<double> m1, m2, m3 = prob_ideal_ec * aurostd::trasp(prob_ideal_ec);
-    for (uint i = 0; i < prob_ec.size(); i++) {
+    for (size_t i = 0; i < prob_ec.size(); i++) {
       m1 = prob_ec[i] * aurostd::trasp(prob_ideal_ec);
       m2 = prob_ec[i] * aurostd::trasp(prob_ec[i]);
       order_param(i + 1) = m1(1, 1) / (aurostd::sqrt(m2(1, 1)) * aurostd::sqrt(m3(1, 1)) + _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
@@ -483,9 +523,11 @@ namespace qca {
     xvector<double> p1 = aurostd::evalPolynomialCoeff(p, 1), p2 = aurostd::evalPolynomialCoeff(p, 2);
     // If the order parameter diverges, then we can interpolate
     if (interp && low_t_div) {
+      message << "Order parameter diverges at low temperature, using interpolation";
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_WARNING_);
       xvector<double> dadt = aurostd::evalPolynomial_xv(temp_scaled, p1), temp_interp(temp.rows + 1), dadt_interp(temp.rows + 1);
-      for (int i = 1; i <= temp.rows; i++) {temp_interp(i + 1) = temp(i);} // add T = 0K
-      for (int i = 1; i <= dadt.rows; i++) {dadt_interp(i + 1) = dadt(i);} // add Da/DT(0K) = 0
+      for (int i = temp.lrows; i <= temp.urows; i++) {temp_interp(i + 1) = temp(i);} // add T = 0K
+      for (int i = dadt.lrows; i <= dadt.urows; i++) {dadt_interp(i + 1) = dadt(i);} // add Da/DT(0K) = 0
       temp_mean = aurostd::mean(temp_interp), temp_std = aurostd::stddev(temp_interp);
       temp_scaled = (temp_interp - temp_mean) / temp_std;
       wts = aurostd::exp(temp_scaled); // scale weights by temperature, since high-T is more accurate
@@ -494,8 +536,6 @@ namespace qca {
       p2 = aurostd::evalPolynomialCoeff(p1, 1);
     }
     if (LDEBUG) {
-      cerr << __AFLOW_FUNC__ << " shifted=" << shift_temp << endl;
-      cerr << __AFLOW_FUNC__ << " interpolated=" << (interp && low_t_div) << endl;
       cerr << __AFLOW_FUNC__ << " alpha_orig=" << order_param << endl;
       cerr << __AFLOW_FUNC__ << " D[alpha, 0]=" << aurostd::evalPolynomial_xv(temp_scaled, p) << endl;
       cerr << __AFLOW_FUNC__ << " D[alpha, 1]=" << aurostd::evalPolynomial_xv(temp_scaled, p1) << endl;
@@ -521,10 +561,11 @@ namespace qca {
       }
     }
     param_ec.second = temp_std * param_ec.second + temp_mean;
-    if (LDEBUG) {cerr << __AFLOW_FUNC__ << " T_ec=" << param_ec.second << "K" << endl;}
+    message << "Equi-composition transition temperature = " << param_ec.second << "K";
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_COMPLETE_);
     calcProbabilityCluster(conc_macro_ec, conc_cluster, excess_energy_cluster, prob_ideal_ec, aurostd::vector2xvector(vector<double> {param_ec.second}), max_num_atoms, prob_ec);
-    for (int i = 1; i <= prob_ideal_ec.cols; i++) {
-      param_ec.first += prob_ec[0](1, i) * aurostd::log(prob_ec[0](1, i) / prob_ideal_ec(1, i));
+    for (int i = prob_ideal_ec.lcols; i <= prob_ideal_ec.ucols; i++) {
+      param_ec.first += prob_ec[0](1, i) * aurostd::log((prob_ec[0](1, i) + _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_) / (prob_ideal_ec(1, i) + _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_));
     }
     return param_ec;
   }
@@ -550,19 +591,25 @@ namespace qca {
   /// @mod{SD,20220718,created function}
   bool calcProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms, vector<xmatrix<double>>& prob_cluster) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    stringstream message;
+    _aflags aflags;
+    ofstream FileMESSAGE;
+    ostream& p_oss = cout;
     prob_cluster.clear();
-    int nx = prob_ideal_cluster.rows, ncl = prob_ideal_cluster.cols, nt = temp.rows, neq = conc_cluster.cols - 1;
-    xmatrix<double> zeros(nx, ncl), natom_cluster = (double)max_num_atoms * conc_cluster;
-    prob_cluster.assign(nt, zeros); // initialize
+    int neq = conc_cluster.cols - 1;
+    xmatrix<double> zeros(prob_ideal_cluster.rows, prob_ideal_cluster.cols), natom_cluster = (double)max_num_atoms * conc_cluster;
+    prob_cluster.assign(temp.rows, zeros); // initialize
     xvector<double> beta = aurostd::pow(KBOLTZEV * temp, -1.0), soln(neq);
     bool soln_found = false;
+    message << "Calculating cluster probabilities";
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     if (neq == 1) {
       xvector<double> p(max_num_atoms + 1), rr(max_num_atoms), ri(max_num_atoms);
-      for (int it = 1; it <= nt; it++) {
-        for (int ix = 1; ix <= nx; ix++) {
+      for (int it = temp.lrows; it <= temp.urows; it++) {
+        for (int ix = prob_ideal_cluster.lrows; ix <= prob_ideal_cluster.urows; ix++) {
           p.reset();
           soln.reset();
-          for (int j = 1; j <= ncl; j++) {
+          for (int j = prob_ideal_cluster.lcols; j <= prob_ideal_cluster.ucols; j++) {
             p((int)natom_cluster(j, 1) + 1) += prob_ideal_cluster(ix, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * (conc_cluster(j, 1) - conc_macro(ix, 1));
           }
           if (LDEBUG) {cerr << __AFLOW_FUNC__ << " it=" << it << " ix=" << ix << " | p=" << p << endl;}
@@ -572,24 +619,29 @@ namespace qca {
             cerr << __AFLOW_FUNC__ << "   imag roots=" << ri << endl;
           }
           for (int k = 1; k <= max_num_atoms; k++) {
-            if (rr(k) > soln(1) && aurostd::isequal(ri(k), 0.0) && ncl * std::pow(rr(k), max_num_atoms) != INFINITY) { // solution must be positive, real, and finite
+            if (rr(k) > soln(1) && 
+                aurostd::isequal(ri(k), 0.0) && 
+                prob_ideal_cluster.cols * std::pow(rr(k), max_num_atoms) != INFINITY) { // solution must be positive, real, and finite
               soln(1) = rr(k);
               soln_found = true;
             }
           }
           if (!soln_found) { // physical solution does not exist
-            if (LDEBUG) {cerr << __AFLOW_FUNC__ << " Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]" << endl;}
+            message << " Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]" << endl;
+            pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_WARNING_);
             return false;
           }
-          for (int j = 1; j <= ncl; j++) {
+          for (int j = prob_ideal_cluster.lcols; j <= prob_ideal_cluster.ucols; j++) {
             prob_cluster[it - 1](ix, j) = prob_ideal_cluster(ix, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * std::pow(soln(1), natom_cluster(j, 1));
           }
-          prob_cluster[it - 1].setmat(prob_cluster[it - 1].getxmat(ix, ix, 1, ncl) / aurostd::sum(prob_cluster[it - 1].getxmat(ix, ix, 1, ncl)), ix, 1); // normalize sum to 1
+          prob_cluster[it - 1].setmat(prob_cluster[it - 1].getxmat(ix, ix, prob_ideal_cluster.lcols, prob_ideal_cluster.ucols) / 
+                                      aurostd::sum(prob_cluster[it - 1].getxmat(ix, ix, prob_ideal_cluster.lcols, prob_ideal_cluster.ucols)), ix, 1); // normalize sum to 1
+          pflow::updateProgressBar((it - temp.lrows) * prob_ideal_cluster.rows + (ix - prob_ideal_cluster.lrows) + 1, temp.rows * prob_ideal_cluster.rows, p_oss);
         }
       }
     }
     else {
-      xmatrix<double> soln0 = aurostd::ones_xm<double>(neq, nx), msoln;
+      xmatrix<double> soln0 = aurostd::ones_xm<double>(neq, prob_ideal_cluster.rows), msoln;
       std::function<double(int it, int ix, int ieq, int ideq, xvector<double>)> 
         poly = [conc_macro, conc_cluster, excess_energy_cluster, prob_ideal_cluster, beta, natom_cluster]
                (int it, int ix, int ieq, int ideq, xvector<double> xvar) {
@@ -597,8 +649,8 @@ namespace qca {
                };
       vector<std::function<double(xvector<double>)>> vpoly, vdpoly;
       vector<vector<std::function<double(xvector<double>)>>> jac;
-      for (int it = nt; it >= 1; it--) { // go backwards
-        for (int ix = 1; ix <= nx; ix++) {
+      for (int it = temp.urows; it >= temp.lrows; it--) { // go backwards
+        for (int ix = prob_ideal_cluster.lrows; ix <= prob_ideal_cluster.urows; ix++) {
           vpoly.clear();
           vdpoly.clear();
           jac.clear();
@@ -626,15 +678,18 @@ namespace qca {
             }
           }
           if (!soln_found) {
-            if (LDEBUG) {cerr << __AFLOW_FUNC__ << " Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]" << endl;}
+            message << " Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]" << endl;
+            pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_WARNING_);
             return false;
           }
           soln0.setcol(soln, ix); // use the higher temperature solution as an initial guess for lower temperature solution
-          for (int j = 1; j <= ncl; j++) {
+          for (int j = prob_ideal_cluster.lcols; j <= prob_ideal_cluster.ucols; j++) {
             prob_cluster[it - 1](ix, j) = prob_ideal_cluster(ix, j) * std::exp(-beta(it) * excess_energy_cluster(j)) * 
                                           aurostd::elements_product(aurostd::pow(soln, natom_cluster.getxvec(j, j, 1, neq)));
           }
-          prob_cluster[it - 1].setmat(prob_cluster[it - 1].getxmat(ix, ix, 1, ncl) / aurostd::sum(prob_cluster[it - 1].getxmat(ix, ix, 1, ncl)), ix, 1); // normalize sum to 1
+          prob_cluster[it - 1].setmat(prob_cluster[it - 1].getxmat(ix, ix, prob_ideal_cluster.lcols, prob_ideal_cluster.ucols) / 
+                                      aurostd::sum(prob_cluster[it - 1].getxmat(ix, ix, prob_ideal_cluster.lcols, prob_ideal_cluster.ucols)), ix, 1); // normalize sum to 1
+          pflow::updateProgressBar((it - temp.lrows) * prob_ideal_cluster.rows + (ix - prob_ideal_cluster.lrows) + 1, temp.rows * prob_ideal_cluster.rows, p_oss);
         }
       }
     }
@@ -665,8 +720,8 @@ namespace qca {
 namespace qca {
   double calcProbabilityConstraint(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& beta, const xmatrix<double>& natom_cluster, const int it, const int ix, const int ik, const int ideq, const xvector<double>& xvar) {
     double totsum = 0.0, prodx;
-    int ncl = prob_ideal_cluster.cols, neq = conc_cluster.cols - 1;
-    for (int j = 1; j <= ncl; j++) {
+    int neq = conc_cluster.cols - 1;
+    for (int j = prob_ideal_cluster.lcols; j <= prob_ideal_cluster.ucols; j++) {
       prodx = 1.0;
       for (int k = 1; k <= neq; k++) {
         if (k == ideq) {
@@ -697,17 +752,17 @@ namespace qca {
   ///
   /// @authors
   /// @mod{SD,20220718,created function}
-  xmatrix<double> calcProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms) {
-    int ncl = conc_cluster.rows, nx = conc_macro.rows, nelem = conc_macro.cols;
-    xmatrix<double> prob_ideal_cluster(nx, ncl);
-    for (int i = 1; i <= nx; i++) {
-      for (int j = 1; j <= ncl; j++) {
+  xmatrix<double> calcProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<long int>& degeneracy_cluster, const int max_num_atoms) {
+    xmatrix<double> prob_ideal_cluster(conc_macro.rows, conc_cluster.rows);
+    for (int i = conc_macro.lrows; i <= conc_macro.urows; i++) {
+      for (int j = conc_cluster.lrows; j <= conc_cluster.urows; j++) {
         prob_ideal_cluster(i, j) = (double)degeneracy_cluster(j);
-        for (int k = 1; k <= nelem; k++) {
+        for (int k = conc_macro.lcols; k <= conc_macro.ucols; k++) {
           prob_ideal_cluster(i, j) *= std::pow(conc_macro(i, k), conc_cluster(j, k) * max_num_atoms);
         }
       }
-      prob_ideal_cluster.setmat(prob_ideal_cluster.getxmat(i, i, 1, ncl) / aurostd::sum(prob_ideal_cluster.getxmat(i, i, 1, ncl)), i, 1); // normalize sum to 1
+      prob_ideal_cluster.setmat(prob_ideal_cluster.getxmat(i, i, conc_cluster.lrows, conc_cluster.urows) /
+                                aurostd::sum(prob_ideal_cluster.getxmat(i, i, conc_cluster.lrows, conc_cluster.urows)), i, 1); // normalize sum to 1
     }
     return prob_ideal_cluster;
   }
@@ -726,8 +781,7 @@ namespace qca {
   /// @authors
   /// @mod{SD,20220718,created function}
   void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob_cluster_ideal) {
-    int nx = prob_cluster_ideal.rows;
-    for (int i = 1; i <= nx; i++) {
+    for (int i = prob_cluster_ideal.lrows; i <= prob_cluster_ideal.urows; i++) {
       if (!aurostd::isequal(aurostd::sum(prob_cluster_ideal(i)), 1.0)) { // unnormalized
         stringstream message;
         message << "Ideal solution (high-T) probability is unnormalized for i=" << i << " | SUM[P_cluster]=" << aurostd::sum(prob_cluster_ideal(i));
@@ -753,10 +807,10 @@ namespace qca {
   /// @mod{SD,20220718,created function}
   void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob_ideal_cluster, const vector<xmatrix<double>>& prob_cluster, const xvector<double>& temp) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    int nx = prob_cluster[0].rows;
+    if (prob_cluster.empty()) {return;}
     double diff = AUROSTD_MAX_DOUBLE, diff_old;
     for (int it = 1; it <= (int)prob_cluster.size(); it++) {
-      for (int i = 1; i <= nx; i++) {
+      for (int i = prob_cluster[0].lrows; i <= prob_cluster[0].urows; i++) {
         if (!aurostd::isequal(aurostd::sum(prob_cluster[it - 1](i)), 1.0)) { // unnormalized
           stringstream message;
           message << "Equilibrium probability is unnormalized for T=" << temp(it) << "K, i=" << i << " | SUM[P_cluster]=" << aurostd::sum(prob_cluster[it - 1](i));
@@ -819,8 +873,8 @@ namespace qca {
         p2(1) = 1.0; p2(2) = 0.0;
         p3(1) = 1.0; p3(2) = 1.0;
         int ii = 1;
-        for (int i = 1; i <= x.rows; i++) {
-          for (int j = i + 1; j <= x.rows; j++) {
+        for (int i = x.lrows; i <= x.rows; i++) {
+          for (int j = x.lrows + 1; j <= x.rows; j++) {
             p4(1) = x(j); p4(2) = x(i);
             _conc_macro(ii, 1) = (p1(1) - p3(1)) * (p4(2) - p1(2)) - (p1(1) - p4(1)) * (p3(2) - p1(2));
             _conc_macro(ii, 2) = (p1(1) - p4(1)) * (p2(2) - p1(2)) - (p1(1) - p2(1)) * (p4(2) - p1(2));
@@ -876,7 +930,7 @@ namespace qca {
     xvector<int> v1(ncl);
     xvector<double> v2(ncl);
     xmatrix<double> m1(ncl, nelem);
-    for (int i = 0; i < ncl; i++) {
+    for (size_t i = 0; i < index_cluster.size(); i++) {
       _vstr_atat[i] = qca_data.vstr_atat[index_cluster[i] - 1];
       m1.setmat(qca_data.conc_cluster.getxmat(index_cluster[i], index_cluster[i], 1, nelem), i + 1, 1);
       v1(i + 1) = qca_data.num_atom_cluster(index_cluster[i]);
@@ -1015,12 +1069,12 @@ namespace qca {
   /// @authors
   /// @mod{SD,20220718,created function}
   xvector<int> getNumAtomCluster(const vector<xstructure>& vstr) {
-    int nstr = vstr.size(), natom;
-    xvector<int> num_atom_cluster(nstr);
-    for (int i = 1; i <= nstr; i++) {
+    int natom = 0;
+    xvector<int> num_atom_cluster(vstr.size());
+    for (size_t i = 0; i < vstr.size(); i++) {
       natom = 0;
-      for (uint j = 0; j < vstr[i - 1].num_each_type.size(); j++) {natom += vstr[i - 1].num_each_type[j];}
-      num_atom_cluster(i) = natom;
+      for (size_t j = 0; j < vstr[i].num_each_type.size(); j++) {natom += vstr[i].num_each_type[j];}
+      num_atom_cluster(i + 1) = natom;
     }
     return num_atom_cluster;
   }
@@ -1036,156 +1090,133 @@ namespace qca {
   /// @param vstr xstructures of the clusters
   /// @param elements elements in the alloy
   /// @param max_num_atoms maximum number of atoms in the cluster expansion
-  /// @param num_threads number of threads to run structure comparison
   /// @param rundirpath path to the directory where AFLOW is running
-  /// @param algo algorithm to do the structure comparison
   ///
   /// @return degeneracy of the clusters
   ///
   /// @authors
   /// @mod{SD,20220718,created function}
-  xvector<int> calcDegeneracyCluster(const string& plattice, const vector<xstructure>& _vstr, const vector<string>& elements, const int max_num_atoms, const int num_threads, const string& rundirpath, const string& algo) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
+  xvector<long int> calcDegeneracyCluster(const string& plattice, const vector<xstructure>& _vstr, const vector<string>& elements, const int max_num_atoms, const string& rundirpath) {
+    stringstream message;
+    _aflags aflags;
+    ofstream FileMESSAGE;
+    ostream& p_oss = cout;
     string filepath = "";
     if (!rundirpath.empty()) {
       vector<string> tokens;
       aurostd::string2tokens(rundirpath, tokens, "/");
       filepath = "/" + QCA_FILE_PREFIX + "degen_" + aurostd::utype2string<int>(max_num_atoms) + "_atom.txt";
       for (int i = tokens.size() - 2; i >= 0; i--) {filepath = "/" + tokens[i] + filepath;} // well defined path due to how we define rundirpath
-      if (aurostd::file2vectorstring(filepath, tokens)) {return aurostd::vector2xvector(aurostd::vectorstring2vectorutype<int>(tokens));}
+      if (aurostd::file2vectorstring(filepath, tokens)) {return aurostd::vector2xvector(aurostd::vectorstring2vectorutype<long int>(tokens));}
     }
+    message << "Generating derivative structures";
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     vector<xstructure> vstr = _vstr;
-    xvector<int> degeneracy_cluster(vstr.size());
-    xstructure str_plat, str;
-    deque<_atom> atoms;
+    xvector<long int> degeneracy_cluster(vstr.size());
+    xstructure str_pocc, str;
+    deque<_atom> patoms, atoms;
     _atom atom;
+    uint itype;
     xmatrix<double> lattice(3,3);
-    // Define primitive parent lattice and atom atoms
+    // Define primitive parent lattice and pocc atoms
     if (plattice == "fcc") {
       lattice(1, 1) = 0.0; lattice(1, 2) = 0.5; lattice(1, 3) = 0.5;
       lattice(2, 1) = 0.5; lattice(2, 2) = 0.0; lattice(2, 3) = 0.5;
       lattice(3, 1) = 0.5; lattice(3, 2) = 0.5; lattice(3, 3) = 0.0;
-      str_plat.lattice = lattice;
       atom.clear();
       atom.fpos(1) = 0.0; atom.fpos(2) = 0.0; atom.fpos(3) = 0.0;
-      atom.cpos = str_plat.f2c * atom.fpos;
-      atoms.push_back(atom);
+      patoms.push_back(atom);
     }
     else if (plattice == "bcc") {
       lattice(1, 1) = -0.5; lattice(1, 2) = 0.5; lattice(1, 3) = 0.5;
       lattice(2, 1) = 0.5; lattice(2, 2) = -0.5; lattice(2, 3) = 0.5;
       lattice(3, 1) = 0.5; lattice(3, 2) = 0.5; lattice(3, 3) = -0.5;
-      str_plat.lattice = lattice;
       atom.clear();
       atom.fpos(1) = 0.0; atom.fpos(2) = 0.0; atom.fpos(3) = 0.0;
-      atom.cpos = str_plat.f2c * atom.fpos;
-      atoms.push_back(atom);
+      patoms.push_back(atom);
     }
     else if (plattice == "hcp") {
       double sqrt3 = std::sqrt(3.0), sqrt8 = std::sqrt(8.0);
       lattice(1, 1) = 1.0; lattice(1, 2) = 0.0; lattice(1, 3) = 0.0;
       lattice(2, 1) = -0.5; lattice(2, 2) = 0.5 * sqrt3; lattice(2, 3) = 0.0;
       lattice(3, 1) = 0.0; lattice(3, 2) = 0.0; lattice(3, 3) = sqrt8 / sqrt3;
-      str_plat.lattice = lattice;
       atom.clear();
       atom.fpos(1) = 0.0; atom.fpos(2) = 0.0; atom.fpos(3) = 0.0;
-      atom.cpos = str_plat.f2c * atom.fpos;
-      atoms.push_back(atom);
+      patoms.push_back(atom);
       atom.clear();
       atom.fpos(1) = 2.0 / 3.0; atom.fpos(2) = 1.0 / 3.0; atom.fpos(3) = 0.5;
-      atom.cpos = str_plat.f2c * atom.fpos;
-      atoms.push_back(atom);
+      patoms.push_back(atom);
     }
-    for (size_t i = 0; i < atoms.size(); i++) {str_plat.AddAtom(atoms[i]);}
-    str_plat.DecorateWithElements();
-    str_plat.iomode = IOVASP_POSCAR;
-    str_plat.partial_occupation_HNF = max_num_atoms;
-    str_plat.partial_occupation_flag = true;
-    str_plat.neg_scale_second = true;
-    // Enumerate unique superlattices
-    bool quiet = XHOST.QUIET;
-    XHOST.QUIET = true;
-    pocc::POccCalculator pcalc(str_plat);
-    pcalc.calculateHNF();
-    pcalc.getTotalPermutationsCount();
-    pcalc.calculate();
-    vector<xstructure> vstr_sup = pcalc.getUniqueDerivativeStructures();
-    if (LDEBUG) {cerr << __AFLOW_FUNC__ << " Number of unique superlattices (HNF) = " << vstr_sup.size() << endl;}
-    // Enumerate all indicies
-    vector<vector<int>> all_indicies;
-    aurostd::xcombos xc(elements.size(), max_num_atoms, 'E', true);
-    while (xc.increment()) {all_indicies.push_back(xc.getCombo());}
-    // Enumerate all derivative structures
-    vector<xstructure> vstr_ds;
-    uint itype;
-    for (size_t i = 0; i < vstr_sup.size(); i++) {
-      lattice = vstr_sup[i].lattice;
-      for (size_t j = 0; j < all_indicies.size(); j++) {
-        str.clear();
-        atoms.clear();
-        for (size_t k = 0; k < vstr_sup[i].atoms.size(); k++) {
+    aurostd::xcombos xcpocc(max_num_atoms + 1, elements.size(), 'E', false);
+    vector<xvector<double>> vpocc;
+    while (xcpocc.increment()) {
+      if (aurostd::sum(xcpocc.getCombo()) == max_num_atoms) {
+        vpocc.push_back(aurostd::xvectorutype2xvectorvtype<int, double>(aurostd::vector2xvector(xcpocc.getCombo())) / (double)max_num_atoms);
+      }
+    }
+    vector<xstructure> vstr_ds, vstr_u;
+    long int sum_calculated = 0, sum_accepted = 0;
+    for (size_t i = 0; i < vpocc.size(); i++) {
+      str_pocc.clear();
+      str_pocc.lattice = lattice;
+      str_pocc.partial_occupation_HNF = max_num_atoms;
+      str_pocc.partial_occupation_flag = true;
+      str_pocc.neg_scale_second = true;
+      atoms.clear();
+      for (size_t j = 0; j < elements.size(); j++) {
+        for (size_t k = 0; k < patoms.size(); k++) {
           atom.clear();
-          atom.name = atom.cleanname = elements[all_indicies[j][k]];
-          atom.cpos = vstr_sup[i].atoms[k].cpos;
-          atom.fpos = vstr_sup[i].c2f * atom.cpos;
-          atom.name_is_given = TRUE;
+          atom.name = atom.cleanname = elements[j];
+          atom.name_is_given = true;
+          atom.partial_occupation_flag = true;
+          atom.partial_occupation_value = vpocc[i](j + 1);
+          atom.fpos = patoms[k].fpos;
+          atom.cpos = str_pocc.f2c * patoms[k].fpos;
           atoms.push_back(atom);
         }
-        std::stable_sort(atoms.begin(), atoms.end(), sortAtomsNames);
-        itype = 0;
-        atoms[0].type = itype;
-        for (size_t k = 1; k < atoms.size(); k++) {
-          if (atoms[k].name != atoms[k - 1].name) {itype++;}
-          atoms[k].type = itype;
-        }
-        str.scale = 1.0;
-        str.neg_scale = false;
-        str.lattice = lattice;
-        str.AddAtom(atoms);
-        vstr_ds.push_back(str);
       }
+      std::stable_sort(atoms.begin(), atoms.end(), sortAtomsNames);
+      itype = 0;
+      atoms[0].type = itype;
+      for (size_t j = 1; j < atoms.size(); j++) {
+        if (atoms[j].name != atoms[j - 1].name) {itype++;}
+        atoms[j].type = itype;
+      }
+      str_pocc.AddAtom(atoms);
+      // Enumerate unique superlattices
+      pocc::POccCalculator pcalc(str_pocc);
+      pcalc.calculateHNF();
+      pcalc.getTotalPermutationsCount();
+      pcalc.calculate();
+      vstr_u = pcalc.getUniqueDerivativeStructures();
+      for (vector<xstructure>::iterator it = vstr_u.begin(); it != vstr_u.end(); it++) {vstr_ds.push_back(*it);}
+      sum_accepted += pcalc.total_permutations_count;
     }
-    if (LDEBUG) {cerr << __AFLOW_FUNC__ << " Number of total derivative structures = " << vstr_ds.size() << endl;}
+    message << "Generated all unique derivative structures, count = " << vstr_ds.size();
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_COMPLETE_);
     // Find degenerate structures
-    if (aurostd::tolower(algo) == "slow") {
-      int nmatch;
-      for (size_t i = 0; i < vstr.size(); i++) {
-        nmatch = 0;
-        for (vector<xstructure>::iterator it = vstr_ds.begin(); it != vstr_ds.end(); it++) {
-          if (compare::structuresMatch(vstr[i], *it, true, num_threads)) {
-            nmatch++;
-            vstr_ds.erase(it--); // remove matched xstructures
-          }
-        }
-        degeneracy_cluster(i + 1) = nmatch;
-      }
-    }
-    else if (aurostd::tolower(algo) == "fast") {
-      vector<uint> index;
-      for (size_t i = 0; i < vstr.size(); i++) {index.push_back(i);}
-      // Shuffling the xstructures is important because it can avoid edge case scenarios where the reference centroid
-      // in Xtalfinder does not pick up the proper neighbors
-      aurostd::random_shuffle(index);
-      for (size_t i = 0; i < index.size(); i++) {vstr[i] = _vstr[index[i]];}
-      vstr_ds.insert(vstr_ds.begin(), vstr.begin(), vstr.end()); // concatenate xstructures, subtract by 1 in the end
-      XtalFinderCalculator xtal_calc;
-      vector<vector<uint>> dsg = xtal_calc.groupSimilarXstructures(vstr_ds); // costly part of the function
-      for (size_t i = 0; i < dsg.size(); i++) {
-        std::sort(dsg[i].begin(), dsg[i].end()); // first index is the cluster index
-        if (dsg[i][0] < (uint)degeneracy_cluster.rows) {
-          degeneracy_cluster(dsg[i][0] + 1) = dsg[i].size() - 1;
-          if (LDEBUG) {
-            cerr << __AFLOW_FUNC__ << " i=" << i << " | DG=" << dsg[i].size() - 1 << " | ";
-            for (size_t j = 0; j < dsg[i].size(); j++) {cerr << dsg[i][j] << " ";}
-            cerr << endl;
-          }
+    message << "Finding the degeneracy of clusters";
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
+    // Shuffling the xstructures is important because it can avoid edge case scenarios where the reference centroid
+    // in Xtalfinder does not pick up the proper neighbors
+    vector<uint> index;
+    for (size_t i = 0; i < vstr.size(); i++) {index.push_back(i);}
+    aurostd::random_shuffle(index);
+    for (size_t i = 0; i < index.size(); i++) {vstr[i] = _vstr[index[i]];}
+    vstr_ds.insert(vstr_ds.begin(), vstr.begin(), vstr.end()); // concatenate xstructures
+    XtalFinderCalculator xtal_calc;
+    vector<vector<uint>> vindex = xtal_calc.groupSimilarXstructures(vstr_ds); // costly part of the function
+    for (size_t i = 0; i < vindex.size(); i++) {
+      std::sort(vindex[i].begin(), vindex[i].end()); // first index is the cluster index
+      if (vindex[i][0] < vstr.size()) {
+        for (size_t j = 1; j < vindex[i].size(); j++) {
+          degeneracy_cluster(vindex[i][0] + 1) += pocc::getDGFromXStructureTitle(vstr_ds[vindex[i][j]].title);
         }
       }
-      xvector<int> _degeneracy_cluster = degeneracy_cluster;
-      for (size_t i = 0; i < index.size(); i++) {degeneracy_cluster(index[i] + 1) = _degeneracy_cluster(i + 1);}
     }
-    XHOST.QUIET = quiet;
-    int sum_calculated = aurostd::sum(degeneracy_cluster), sum_accepted = (int)vstr_sup.size() * (int)std::pow(elements.size(), max_num_atoms);
+    xvector<long int> _degeneracy_cluster = degeneracy_cluster;
+    for (size_t i = 0; i < index.size(); i++) {degeneracy_cluster(index[i] + 1) = _degeneracy_cluster(i + 1);} // reorder back to the original
+    sum_calculated = aurostd::sum(degeneracy_cluster);
     if (!aurostd::isequal(sum_calculated, sum_accepted)) {
       stringstream message;
       message << "Degeneracies do not satisfy the sum rule, the sum is " << sum_calculated << " but should be " << sum_accepted;
@@ -1245,9 +1276,13 @@ namespace qca {
   /// @mod{SD,20220718,created function}
   void runATAT(const string& cdirpath, const string& rundirpath, const uint min_sleep) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    stringstream message;
+    _aflags aflags;
+    ofstream FileMESSAGE;
+    ostream& p_oss = cout;
     uint iter = 0;
     if (aurostd::substring2bool(aurostd::execute2string("mmaps", stdouterr_fsio), "command not found")) {
-      string message = "Missing mmaps program";
+      message << "Missing mmaps program";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     aurostd::execute("touch " + rundirpath + "/stop"); // pre-kill mmaps gracefully
@@ -1256,11 +1291,13 @@ namespace qca {
     chdir(rundirpath.c_str());
     string tmpfile = aurostd::TmpStrCreate(), logstring = "";
     aurostd::execute("mmaps -d > " + tmpfile + " 2>&1 &");
+    message << "Running ATAT cluster expansion";
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     while (!aurostd::substring2bool(logstring, "true and predicted ground states agree") && !aurostd::substring2bool(logstring, "No other ground states")) {
       iter++;
       if (LDEBUG) {cerr << __AFLOW_FUNC__ << " Sleeping, iter=" << iter << endl;}
       if (iter > 60) { // wait 60 times the minimum sleep
-        string message = "mmaps is taking too long to predict structures, dir=" + rundirpath;
+        message << "mmaps is taking too long to predict structures, directory = " << rundirpath;
         aurostd::RemoveFile(tmpfile);
         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
@@ -1292,7 +1329,7 @@ namespace qca {
     aurostd::string2file(lat_atat, rundirpath + "/lat.in");
     // Generate str.out and energy files
     uint msize = mapstr.size();
-    for (uint i = 0; i < vstr_atat.size(); i++) {
+    for (size_t i = 0; i < vstr_atat.size(); i++) {
       aurostd::DirectoryMake(rundirpath + "/" + aurostd::utype2string<uint>(i));
       oss << vstr_atat[i];
       aurostd::string2file(oss.str(), rundirpath + "/" + aurostd::utype2string<uint>(i) + "/str.out");
@@ -1312,14 +1349,17 @@ namespace qca {
   ///
   /// @param plattice parent lattice of the alloy
   /// @param elements elements in the alloy
-  /// @param num_threads number of threads to run structure comparison
   /// @param use_sg compare initial and final xstructures only using their space groups
   ///
   /// @return xstructures from AFLOW runs
   ///
   /// @authors
   /// @mod{SD,20220718,created function}
-  vector<xstructure> getAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_threads, bool use_sg) {
+  vector<xstructure> getAFLOWXstructures(const string& plattice, const vector<string>& elements, bool use_sg) {
+    stringstream message;
+    _aflags aflags;
+    ofstream FileMESSAGE;
+    ostream& p_oss = cout;
     vector<xstructure> vstr;
     vector<string> vstrlabel;
     string aflowlib, aflowurl;
@@ -1361,6 +1401,8 @@ namespace qca {
         for (uint i = 115; i < 178; i++) {vstrlabel.push_back(aurostd::utype2string<uint>(i));}
       }
     }
+    message << "Reading AFLOW xstructures from AFLOW database";
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     for (size_t i = 0; i < vstrlabel.size(); i++) {
         entry.Load(aurostd::file2string(aflowlib + "/" + vstrlabel[i] + "/aflowlib.out"), oss);
         if (pflow::loadXstructures(entry, oss, false)) { // initial = unrelaxed; final = relaxed
@@ -1369,11 +1411,12 @@ namespace qca {
           if (use_sg && (entry.spacegroup_orig == entry.spacegroup_relax)) {
             vstr.push_back(entry.vstr[0]);
           }
-          else if (compare::structuresMatch(entry.vstr[0], entry.vstr.back(), true, num_threads)) {
+          else if (compare::structuresMatch(entry.vstr[0], entry.vstr.back(), true, true, false)) {
             vstr.push_back(entry.vstr[0]);
           }
         }
         entry.clear();
+        pflow::updateProgressBar(i, vstrlabel.size() - 1, p_oss);
     }
     return vstr;
   }
@@ -1381,20 +1424,25 @@ namespace qca {
   /// @brief gets the AFLOW xstructures from a given directory
   ///
   /// @param aflowlibpath path to the parent directory where the aflowlib output files are stored
-  /// @param num_threads number of threads to run AFLOW-SYM
   /// @param use_sg compare initial and final xstructures only using their space groups
   ///
   /// @return xstructures from AFLOW runs
   ///
   /// @authors
   /// @mod{SD,20220718,created function}
-  vector<xstructure> getAFLOWXstructures(const string& aflowlibpath, const int num_threads, bool use_sg) {
+  vector<xstructure> getAFLOWXstructures(const string& aflowlibpath, bool use_sg) {
+    stringstream message;
+    _aflags aflags;
+    ofstream FileMESSAGE;
+    ostream& p_oss = cout;
     vector<xstructure> vstr;
     vector<string> vdir;
     aurostd::SubDirectoryLS(aflowlibpath, vdir);
     string data;
     stringstream oss;
     aflowlib::_aflowlib_entry entry;
+    message << "Reading AFLOW xstructures from directory = " << aflowlibpath;
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     for (size_t i = 0; i < vdir.size(); i++) {
       if (!aurostd::FileExist(vdir[i] + "/aflowlib.out") ||
           !aurostd::FileExist(vdir[i] + "/POSCAR.orig") ||
@@ -1410,10 +1458,11 @@ namespace qca {
       if (use_sg && (entry.spacegroup_orig == entry.spacegroup_relax)) {
         vstr.push_back(entry.vstr[0]);
       }
-      else if (compare::structuresMatch(entry.vstr[0], entry.vstr.back(), true, num_threads)) {
+      else if (compare::structuresMatch(entry.vstr[0], entry.vstr.back(), true, true, false)) {
         vstr.push_back(entry.vstr[0]);
       }
       entry.clear();
+      pflow::updateProgressBar(i, vdir.size() - 1, p_oss);
     }
     return vstr;
   }
@@ -1502,20 +1551,27 @@ namespace qca {
   /// @authors
   /// @mod{SD,20220718,created function}
   vector<xstructure> getATATXstructures(const string& lat, const string& plattice, const vector<string>& elements, const uint max_num_atoms, const string& rundirpath) {
+    stringstream message;
+    _aflags aflags;
+    ofstream FileMESSAGE;
+    ostream& p_oss = cout;
     vector<xstructure> vstr;
     stringstream oss;
     if (!rundirpath.empty()) {
+      message << "Reading ATAT xstructures from directory = " << rundirpath;
+      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
       vector<string> files;
       vector<xstructure> vstr_tmp;
       vector<uint> index;
       aurostd::DirectoryLS(rundirpath, files);
-      for (uint i = 0; i < files.size(); i++) {
+      for (size_t i = 0; i < files.size(); i++) {
         if (aurostd::FileExist(rundirpath + "/" + files[i] + "/str.out")) {
           aurostd::file2stringstream(rundirpath + "/" + files[i] + "/str.out", oss);
           vstr_tmp.push_back(xstructure(oss, IOATAT_STR));
           index.push_back(aurostd::string2utype<uint>(files[i]));
           aurostd::StringstreamClean(oss);
         }
+        pflow::updateProgressBar(i, files.size() - 1, p_oss);
       }
       vstr.resize(index.size());
       for (size_t i = 0; i < index.size(); i++) {vstr[index[i]] = vstr_tmp[i];}
@@ -1541,14 +1597,16 @@ namespace qca {
     string sstr = aurostd::execute2string("genstr -n " + aurostd::utype2string<uint>(max_num_atoms) + " -l " + tmpfile, stdouterr_fsio);
     aurostd::RemoveFile(tmpfile);
     if (sstr.size() == 0 || aurostd::substring2bool(sstr, "Unable to open lattice file")) {
-      string message = "Invalid lat.in file";
+      message << "Invalid lat.in file";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     }
     else if (aurostd::substring2bool(sstr, "command not found")) {
-      string message = "Missing genstr program";
+      message << "Missing genstr program";
       throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     aurostd::string2vectorstring(sstr, vinput);
+    message << "Reading ATAT xstructures from genstr";
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
     for (size_t line = 0; line < vinput.size(); line++) {
       if (aurostd::substring2bool(vinput[line], "end")) {
         vstr.push_back(xstructure(oss, IOATAT_STR));
@@ -1559,6 +1617,7 @@ namespace qca {
       else {
         oss << vinput[line] << endl;
       }
+      pflow::updateProgressBar(line, vinput.size() - 1, p_oss);
     }
     return vstr;
   }
@@ -1572,74 +1631,59 @@ namespace qca {
   ///
   /// @param vstr1 first group of xstructures
   /// @param vstr2 second group of xstructures
-  /// @param num_threads number of threads to run structure comparison
-  /// @param algo algorithm to do the structure comparison
   ///
   /// @return xstructure map between the two groups
   ///
   /// @authors
   /// @mod{SD,20220718,created function}
-  vector<int> calcMapForXstructures(const vector<xstructure>& _vstr1, const vector<xstructure>& vstr2, const int num_threads, const string& algo) {
+  vector<int> calcMapForXstructures(const vector<xstructure>& _vstr1, const vector<xstructure>& vstr2) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
+    stringstream message;
+    _aflags aflags;
+    ofstream FileMESSAGE;
+    ostream& p_oss = cout;
     vector<int> mapstr;
     vector<xstructure> vstr1 = _vstr1;
-    if (aurostd::tolower(algo) == "slow") {
-      bool match;
-      for (size_t i = 0; i < vstr1.size(); i++) {
-        match = false;
-        for (size_t j = 0; j < vstr2.size() && !match; j++) {
-          if (compare::structuresMatch(vstr1[i], vstr2[j], true, num_threads)) {
-            match = true;
-            mapstr.push_back(j);
+    vector<uint> index;
+    message << "Mapping xstructures between AFLOW and ATAT";
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, p_oss, _LOGGER_MESSAGE_);
+    for (uint i = 0; i < vstr1.size(); i++) {index.push_back(i);}
+    // Shuffling the xstructures is important because it can avoid edge case scenarios where the reference centroid
+    // in Xtalfinder does not pick up the proper neighbors
+    aurostd::random_shuffle(index); 
+    for (size_t i = 0; i < index.size(); i++) {vstr1[i] = _vstr1[index[i]];}
+    vector<xstructure> vstr3 = vstr1;
+    vstr3.insert(vstr3.end(), vstr2.begin(), vstr2.end());
+    XtalFinderCalculator xtal_calc;
+    vector<vector<uint>> gsx = xtal_calc.groupSimilarXstructures(vstr3);
+    for (size_t i = 0; i < gsx.size(); i++) {
+      std::sort(gsx[i].begin(), gsx[i].end());
+      if (gsx[i][0] > vstr1.size() -  1) { // index is not part of vstr1
+        continue;
+      }
+      else if (gsx[i].size() == 1) { // no match for xstr in vstr1
+        mapstr.push_back(-1);
+      }
+      else { // take first match of xstr in vstr2 to xstr in vstr1
+        for (size_t j = 1; j < gsx[i].size(); j++) {
+          if (gsx[i][j] > vstr1.size() - 1) {
+            mapstr.push_back((int)gsx[i][j] - (int)vstr1.size());
+            break;
           }
         }
-        if (!match) {mapstr.push_back(-1);}
+      }
+      if (LDEBUG) {
+        cerr << __AFLOW_FUNC__ << " i=" << i << " | ";
+        for (size_t j = 0; j < gsx[i].size(); j++) {cerr << gsx[i][j] << " ";}
+        cerr << endl;
       }
     }
-    else if (aurostd::tolower(algo) == "fast") {
-      bool quiet = XHOST.QUIET;
-      XHOST.QUIET = true;
-      vector<uint> index;
-      for (uint i = 0; i < vstr1.size(); i++) {index.push_back(i);}
-      // Shuffling the xstructures is important because it can avoid edge case scenarios where the reference centroid
-      // in Xtalfinder does not pick up the proper neighbors
-      aurostd::random_shuffle(index); 
-      for (size_t i = 0; i < index.size(); i++) {vstr1[i] = _vstr1[index[i]];}
-      vector<xstructure> vstr3 = vstr1;
-      vstr3.insert(vstr3.end(), vstr2.begin(), vstr2.end());
-      XtalFinderCalculator xtal_calc;
-      vector<vector<uint>> gsx = xtal_calc.groupSimilarXstructures(vstr3);
-      XHOST.QUIET = quiet;
-      for (size_t i = 0; i < gsx.size(); i++) {
-        std::sort(gsx[i].begin(), gsx[i].end());
-        if (gsx[i][0] > vstr1.size() -  1) { // index is not part of vstr1
-          continue;
-        }
-        else if (gsx[i].size() == 1) { // no match for xstr in vstr1
-          mapstr.push_back(-1);
-        }
-        else { // take first match of xstr in vstr2 to xstr in vstr1
-          for (size_t j = 1; j < gsx[i].size(); j++) {
-            if (gsx[i][j] > vstr1.size() - 1) {
-              mapstr.push_back((int)gsx[i][j] - (int)vstr1.size());
-              break;
-            }
-          }
-        }
-        if (LDEBUG) {
-          cerr << __AFLOW_FUNC__ << " i=" << i << " | ";
-          for (size_t j = 0; j < gsx[i].size(); j++) {cerr << gsx[i][j] << " ";}
-          cerr << endl;
-        }
-      }
-      if (mapstr.size() != index.size()) {
-        stringstream message;
-        message << "Something went wrong in the mapping of the xstructures; index.size()=" << index.size() << " | mapstr.size()=" << mapstr.size() << endl;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
-      }
-      vector<int> _mapstr = mapstr;
-      for (size_t i = 0; i < index.size(); i++) {mapstr[index[i]] = _mapstr[i];}
+    if (mapstr.size() != index.size()) {
+      message << "Something went wrong in the mapping of the xstructures; index.size()=" << index.size() << " | mapstr.size()=" << mapstr.size() << endl;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
+    vector<int> _mapstr = mapstr;
+    for (size_t i = 0; i < index.size(); i++) {mapstr[index[i]] = _mapstr[i];} // reorder back to the original
     return mapstr;
   }
 }
@@ -1724,8 +1768,8 @@ namespace qca {
       json.addVector("Temperature range (K)", qca_data.temp);
       json.addNumber("Max atoms per cell", qca_data.max_num_atoms);
       json.addNumber("Cluster CV score (eV)", qca_data.cv_cluster);
-      json.addVector("Cluster number of atoms", aurostd::xvectorutype2xvectordouble(qca_data.num_atom_cluster));
-      json.addVector("Cluster degeneracy", aurostd::xvectorutype2xvectordouble(qca_data.degeneracy_cluster));
+      json.addVector("Cluster number of atoms", aurostd::xvectorutype2xvectorvtype<int, double>(qca_data.num_atom_cluster));
+      json.addVector("Cluster degeneracy", aurostd::xvectorutype2xvectorvtype<long int, double>(qca_data.degeneracy_cluster));
       json.addMatrix("Cluster concentration", qca_data.conc_cluster);
       json.addVector("Cluster excess energy (eV)", qca_data.excess_energy_cluster);
       json.addNumber("EC transition temperature (K)", qca_data.param_ec.second);
@@ -1801,7 +1845,7 @@ namespace qca {
     plotter::generateHeader(gpfile, plotoptions, false);
     if (qca_data.conc_curve) { // generic x-axis for the concentration curve
       xvector<double> a = aurostd::linspace(0.0, 1.0, qca_data.conc_macro.rows);
-      for (int i = 1; i <= qca_data.conc_macro.rows; i++) {data.push_back({a(i), qca_data.binodal_boundary(i)});}
+      for (int i = qca_data.conc_macro.lrows; i <= qca_data.conc_macro.urows; i++) {data.push_back({a(i), qca_data.binodal_boundary(i)});}
         // START - custom
         gpfile << "# Custom" << endl;
         gpfile << "set label '\\shortstack{c}{$" << qca_data.elements[0] << "$=" << qca_data.conc_macro(1, 1);
@@ -1818,7 +1862,7 @@ namespace qca {
     }
     else if (qca_data.elements.size() == 2) {
       xvector<double> a = qca_data.conc_macro.getcol(1);
-      for (int i = 1; i <= qca_data.conc_macro.rows; i++) {data.push_back({a(i), qca_data.binodal_boundary(i)});}
+      for (int i = qca_data.conc_macro.lrows; i <= qca_data.conc_macro.urows; i++) {data.push_back({a(i), qca_data.binodal_boundary(i)});}
       // START - custom
       gpfile << "# Custom" << endl;
       gpfile << "set label '$" << qca_data.elements[0] << "$' at 0.0,0.0 center offset 0.0,-2.5" << endl;

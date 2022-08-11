@@ -275,17 +275,16 @@ namespace apl {
   // Symmetrizes the force constant matrices using site point group symmetry
   void ForceConstantCalculator::symmetrizeForceConstantMatrices() {
     bool LDEBUG=(FALSE || _DEBUG_APL_HARM_IFCS_ || XHOST.DEBUG);
-    string soliloquy="apl::ForceConstantCalculator::symmetrizeForceConstantMatrices():"; //CO20190218
     string message = "";
     // Test of stupidity...
     if (!_supercell->getSupercellStructure().agroup_calculated) {
       message = "The site groups have not been calculated yet.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     //CO START
     if (_supercell->getEPS() == AUROSTD_NAN) {
       message = "Need to define symmetry tolerance.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     //CO END
 
@@ -297,12 +296,12 @@ namespace apl {
       const vector<_sym_op>& agroup = _supercell->getAGROUP(i);  //CO //CO20190218
       if (agroup.size() == 0) {
         message = "Site point group operations are missing.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
       }
 
       for (uint j = 0; j < _supercell->getNumberOfAtoms(); j++) {
         if(LDEBUG){ //CO20190218
-          cerr << soliloquy << " compare original m=" << std::endl;
+          cerr << __AFLOW_FUNC__ << " compare original m=" << std::endl;
           cerr << _forceConstantMatrices[i][j] << std::endl;
         }
         xmatrix<double> m(3, 3); //CO20190218
@@ -317,18 +316,18 @@ namespace apl {
             m = m + (inverse(symOp.Uc) * _forceConstantMatrices[i][l] * symOp.Uc);  //JAHNATEK ORIGINAL //CO20190218
             //m = m + (symOp.Uc * _forceConstantMatrices[i][l] * inverse(symOp.Uc));  //CO NEW //CO20190218
             if(LDEBUG){ //CO20190218
-              std::cerr << soliloquy << " atom[" << l << "].cpos=" << _supercell->getSupercellStructure().atoms[l].cpos << std::endl;
-              std::cerr << soliloquy << " atom[" << j << "].cpos=" << _supercell->getSupercellStructure().atoms[j].cpos << std::endl;
-              std::cerr << soliloquy << " agroup(" << l << " -> " << j << ")=" << std::endl;
+              std::cerr << __AFLOW_FUNC__ << " atom[" << l << "].cpos=" << _supercell->getSupercellStructure().atoms[l].cpos << std::endl;
+              std::cerr << __AFLOW_FUNC__ << " atom[" << j << "].cpos=" << _supercell->getSupercellStructure().atoms[j].cpos << std::endl;
+              std::cerr << __AFLOW_FUNC__ << " agroup(" << l << " -> " << j << ")=" << std::endl;
               std::cerr << symOp.Uc << std::endl;
-              std::cerr << soliloquy << " forceConstantMatrices[i=" << i << "][l=" << l << "]=" << std::endl;
+              std::cerr << __AFLOW_FUNC__ << " forceConstantMatrices[i=" << i << "][l=" << l << "]=" << std::endl;
               std::cerr << _forceConstantMatrices[i][l] << std::endl;
-              std::cerr << soliloquy << " with new m=" << std::endl;
+              std::cerr << __AFLOW_FUNC__ << " with new m=" << std::endl;
               std::cerr << (symOp.Uc * _forceConstantMatrices[i][l] * inverse(symOp.Uc)) << std::endl;
             }
           } catch (aurostd::xerror& e) {
             message = "Mapping problem " + aurostd::utype2string<int>(j);
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
           }
         }
         m = ( 1.0 / agroup.size() ) * m; //CO20190218
@@ -1277,7 +1276,6 @@ namespace apl {
 
   bool ForceConstantCalculator::runVASPCalculationsDM(_xinput& xInput, _aflags& _aflowFlags,
       _kflags& _kbinFlags, _xflags& _xFlags, string& _AflowIn) {
-    string soliloquy="apl::ForceConstantCalculator::runVASPCalculationsDM():"; //CO20190218
     stringstream message;
     bool stagebreak = false;
 
@@ -1736,7 +1734,6 @@ namespace apl {
 
   bool ForceConstantCalculator::calculateForceFields() {
     bool LDEBUG=(FALSE || _DEBUG_APL_HARM_IFCS_ || XHOST.DEBUG);
-    string soliloquy="apl::ForceConstantCalculator::calculateForceFields():"; //CO20190218
     // Extract all forces ////////////////////////////////////////////////////
 
     //first pass, just find if outfile is found ANYWHERE
@@ -1767,14 +1764,14 @@ namespace apl {
           force(1) = xInputs[idxRun].getXStr().qm_forces[k](1);
           force(2) = xInputs[idxRun].getXStr().qm_forces[k](2);
           force(3) = xInputs[idxRun].getXStr().qm_forces[k](3);
-          if(LDEBUG) { cerr << soliloquy << " force[idistortion=" << i << ",atom=" << k << ",+]=" << xInputs[idxRun].getXStr().qm_forces[k] << std::endl;} //CO20190218
+          if(LDEBUG) { cerr << __AFLOW_FUNC__ << " force[idistortion=" << i << ",atom=" << k << ",+]=" << xInputs[idxRun].getXStr().qm_forces[k] << std::endl;} //CO20190218
           if (generate_plus_minus) {  //CO
             force(1) = 0.5 * (force(1) - xInputs[idxRun + 1].getXStr().qm_forces[k](1));
             force(2) = 0.5 * (force(2) - xInputs[idxRun + 1].getXStr().qm_forces[k](2));
             force(3) = 0.5 * (force(3) - xInputs[idxRun + 1].getXStr().qm_forces[k](3));
-            if(LDEBUG) { cerr << soliloquy << " force[idistortion=" << i << ",atom=" << k << ",-]=" << xInputs[idxRun + 1].getXStr().qm_forces[k] << std::endl;} //CO20190218
+            if(LDEBUG) { cerr << __AFLOW_FUNC__ << " force[idistortion=" << i << ",atom=" << k << ",-]=" << xInputs[idxRun + 1].getXStr().qm_forces[k] << std::endl;} //CO20190218
           }
-          if(LDEBUG) { cerr << soliloquy << " force[idistortion=" << i << ",atom=" << k << ",AVG]=" << force << std::endl;} //CO20190218
+          if(LDEBUG) { cerr << __AFLOW_FUNC__ << " force[idistortion=" << i << ",atom=" << k << ",AVG]=" << force << std::endl;} //CO20190218
           forcefield.push_back(force);
           drift = drift + force;
         }
@@ -1786,14 +1783,14 @@ namespace apl {
         }
 
         // Remove drift
-        if(LDEBUG) { cerr << soliloquy << " drift[idistortion=" << i << ",total]=" << drift << std::endl;} //CO20190218
+        if(LDEBUG) { cerr << __AFLOW_FUNC__ << " drift[idistortion=" << i << ",total]=" << drift << std::endl;} //CO20190218
         drift(1) = drift(1) / forcefield.size();
         drift(2) = drift(2) / forcefield.size();
         drift(3) = drift(3) / forcefield.size();
-        if(LDEBUG) { cerr << soliloquy << " drift[idistortion=" << i << ",AVG]=" << drift << std::endl;} //CO20190218
+        if(LDEBUG) { cerr << __AFLOW_FUNC__ << " drift[idistortion=" << i << ",AVG]=" << drift << std::endl;} //CO20190218
         for (uint k = 0; k < forcefield.size(); k++) {
           forcefield[k] = forcefield[k] - drift;
-          if(LDEBUG) { cerr << soliloquy << " force[idistortion=" << i << ",atom=" << k << ",-drift]=" << forcefield[k] << std::endl;} //CO20190218
+          if(LDEBUG) { cerr << __AFLOW_FUNC__ << " force[idistortion=" << i << ",atom=" << k << ",-drift]=" << forcefield[k] << std::endl;} //CO20190218
         }
 
         // Store
@@ -1908,16 +1905,15 @@ namespace apl {
 
   void ForceConstantCalculator::projectToCartesianDirections() {
     bool LDEBUG=(FALSE || _DEBUG_APL_HARM_IFCS_ || XHOST.DEBUG);
-    string soliloquy="apl::ForceConstantCalculator::projectToCartesianDirections():"; //CO20190218
     for (uint i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO20190218
-      if(LDEBUG) {cerr << soliloquy << " looking at displaced atom[idistortion=" << i << "]" << std::endl;} //CO20190218
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking at displaced atom[idistortion=" << i << "]" << std::endl;} //CO20190218
       // Construct transformation matrix A
       xmatrix<double> A(3, 3), U(3, 3);
       for (uint j = 0; j < 3; j++) {
         // Ensure it is unit length
         _uniqueDistortions[i][j] = _uniqueDistortions[i][j] / aurostd::modulus(_uniqueDistortions[i][j]);
         if(LDEBUG){ //CO20190218
-          cerr << soliloquy << " checking if uniqueDistortion[" << i << "][" << j << "] is unit length: ";
+          cerr << __AFLOW_FUNC__ << " checking if uniqueDistortion[" << i << "][" << j << "] is unit length: ";
           cerr << "modulus(" << _uniqueDistortions[i][j] << ")=" << aurostd::modulus(_uniqueDistortions[i][j]) << std::endl;
         }
 
@@ -1932,9 +1928,9 @@ namespace apl {
       //keep for now
 
       if(LDEBUG){ //CO20190218
-        cerr << soliloquy << " distortion matrix U(distortion,direction):" << std::endl;
+        cerr << __AFLOW_FUNC__ << " distortion matrix U(distortion,direction):" << std::endl;
         cerr << U << std::endl;
-        cerr << soliloquy << " inverse matrix A:" << std::endl;
+        cerr << __AFLOW_FUNC__ << " inverse matrix A:" << std::endl;
         cerr << A << std::endl;
       }
 
@@ -1947,31 +1943,31 @@ namespace apl {
       _uniqueDistortions[i][2] = trasp(A) * _uniqueDistortions[i][2];
 
       if(LDEBUG){ //CO20190218
-        cerr << soliloquy << " new cartesian-direction-projected uniqueDistortions[" << i << "][0]=" << _uniqueDistortions[i][0] << std::endl;
-        cerr << soliloquy << " new cartesian-direction-projected uniqueDistortions[" << i << "][1]=" << _uniqueDistortions[i][1] << std::endl;
-        cerr << soliloquy << " new cartesian-direction-projected uniqueDistortions[" << i << "][2]=" << _uniqueDistortions[i][2] << std::endl;
-        //CO20190116 - cerr << soliloquy << " testing: trasp(A) * U should give same as above: trasp(A) * U = " << std::endl;  //U ~ m below
+        cerr << __AFLOW_FUNC__ << " new cartesian-direction-projected uniqueDistortions[" << i << "][0]=" << _uniqueDistortions[i][0] << std::endl;
+        cerr << __AFLOW_FUNC__ << " new cartesian-direction-projected uniqueDistortions[" << i << "][1]=" << _uniqueDistortions[i][1] << std::endl;
+        cerr << __AFLOW_FUNC__ << " new cartesian-direction-projected uniqueDistortions[" << i << "][2]=" << _uniqueDistortions[i][2] << std::endl;
+        //CO20190116 - cerr << __AFLOW_FUNC__ << " testing: trasp(A) * U should give same as above: trasp(A) * U = " << std::endl;  //U ~ m below
         //CO20190116 - cerr << trasp(A) * U << std::endl;
-        cerr << soliloquy << " testing: A * U should give same as above: A * U = " << std::endl;  //U ~ m below //DUH A = inverse(U), so A*U = I
+        cerr << __AFLOW_FUNC__ << " testing: A * U should give same as above: A * U = " << std::endl;  //U ~ m below //DUH A = inverse(U), so A*U = I
         cerr << A * U << std::endl;
       }
 
       // Update forces
       xmatrix<double> m(3, 3);
       for (uint j = 0; j < _supercell->getNumberOfAtoms(); j++) {
-        if(LDEBUG) {cerr << soliloquy << " looking at supercell atom[" << j << "]" << std::endl;} //CO20190218
+        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking at supercell atom[" << j << "]" << std::endl;} //CO20190218
         for (int k = 0; k < 3; k++)
           for (int l = 1; l <= 3; l++)
             m(k + 1, l) = _uniqueForces[i][k][j](l);
         if(LDEBUG){ //CO20190218
-          cerr << soliloquy << " BEFORE m = " << std::endl;
+          cerr << __AFLOW_FUNC__ << " BEFORE m = " << std::endl;
           cerr << m << std::endl;
         }
         // m = A * m * U; ??? I am not sure...
         m = A * m;
         // m = trasp(A) * m;  //CO NEW, treat forces exactly as distortion //CO20190116 - wrong, see above, trasp(A) is only for vectors
         if(LDEBUG){ //CO20190218
-          cerr << soliloquy << " AFTER m = " << std::endl;
+          cerr << __AFLOW_FUNC__ << " AFTER m = " << std::endl;
           cerr << m << std::endl;
         }
         for (int k = 0; k < 3; k++)
@@ -1985,17 +1981,16 @@ namespace apl {
 
   void ForceConstantCalculator::buildForceConstantMatrices() {
     bool LDEBUG=(FALSE || _DEBUG_APL_HARM_IFCS_ || XHOST.DEBUG);
-    string soliloquy="apl::ForceConstantCalculator::buildForceConstantMatrices():"; //CO20190218
     stringstream message;
     // Test of stupidity...
     if (DISTORTION_INEQUIVONLY && !_supercell->getSupercellStructure().fgroup_calculated) { //CO20190218
       message << "The factor group has not been calculated yet.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     //CO START
     if (DISTORTION_INEQUIVONLY && _supercell->getEPS() == AUROSTD_NAN) { //CO20190218
       message << "Need to define symmetry tolerance.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     //CO END
 
@@ -2048,7 +2043,7 @@ namespace apl {
         //row.push_back(m); //JAHNATEK ORIGINAL //CO20190218
         _forceConstantMatrices[basedAtomID][j] = m;  //CO NEW //CO20190218
         if(LDEBUG){ //CO20190218
-          cerr << soliloquy << " adding m to forceConstantMatrices[" << basedAtomID << "][" << j << "]=" << std::endl;
+          cerr << __AFLOW_FUNC__ << " adding m to forceConstantMatrices[" << basedAtomID << "][" << j << "]=" << std::endl;
           cerr << m << std::endl;
         }
       }
@@ -2071,7 +2066,7 @@ namespace apl {
             //printXVector(_supercell->getSupercellStructure().atoms[_supercell->getUniqueAtomID(i,j)].fpos);
           } catch (aurostd::xerror& e) {
             message << "Mapping problem " << _supercell->getUniqueAtomID(i, j) << " <-> " << basedAtomID << "?"; //CO20190218
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
           }
 
           for (uint k = 0; k < _supercell->getNumberOfAtoms(); k++) {
@@ -2086,12 +2081,12 @@ namespace apl {
               m = inverse(symOp.Uc) * _forceConstantMatrices[basedAtomID][l] * symOp.Uc;  //JAHNATEK ORIGINAL //CO20190218
               _forceConstantMatrices[_supercell->getUniqueAtomID(i, j)][k] = m;  //CO NEW //CO20190218
               if(LDEBUG){ //CO20190218
-                cerr << soliloquy << " adding m to forceConstantMatrices[" << _supercell->getUniqueAtomID(i, j) << "][" << k << "]=" << std::endl;
+                cerr << __AFLOW_FUNC__ << " adding m to forceConstantMatrices[" << _supercell->getUniqueAtomID(i, j) << "][" << k << "]=" << std::endl;
                 cerr << m << std::endl;
               }
             } catch (aurostd::xerror& e) {
               message << "Mapping problem " << k << " <-> ?.";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, "Mapping failed.");
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Mapping failed.");
             }
           }
           //_forceConstantMatrices.push_back(row);  //JAHNATEK ORIGINAL //CO20190218
@@ -2104,7 +2099,7 @@ namespace apl {
     // Test of correctness
     if (_forceConstantMatrices.size() != _supercell->getNumberOfAtoms()) {
       message << "Some problem with the application of factor group operations.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     //ME20200211 - force constants are -F/d, not F/d

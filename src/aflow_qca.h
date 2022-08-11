@@ -19,7 +19,6 @@
 // Struct _qca data
 struct _qca_data {
   // Input data
-  int num_threads;
   uint min_sleep;
   string print;
   bool screen_only;
@@ -53,7 +52,7 @@ struct _qca_data {
   // Cluster data
   double cv_cluster; // UNIT: eV
   xvector<int> num_atom_cluster; // DIM: Nj
-  xvector<int> degeneracy_cluster; // DIM: Nj
+  xvector<long int> degeneracy_cluster; // DIM: Nj
   xmatrix<double> conc_cluster; // UNIT: unitless | DIM: Nj, Nk
   xvector<double> excess_energy_cluster; // UNIT: eV | DIM: Nj
 
@@ -75,10 +74,10 @@ namespace qca {
   void calcBinodalData(_qca_data& qca_data);
   xvector<double> calcBinodalBoundary(const xmatrix<double>& rel_s, const double rel_s_ec, const xvector<double>& temp);
   xmatrix<double> calcRelativeEntropy(const vector<xmatrix<double>>& prob_cluster, const xmatrix<double>& prob_cluster_ideal);
-  std::pair<double, double> calcRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& temp, const int max_num_atoms, bool interp=true);
+  std::pair<double, double> calcRelativeEntropyEC(const xmatrix<double>& conc_cluster, const xvector<long int>& degeneracy_cluster, const xvector<double>& excess_energy_cluster, const xvector<double>& temp, const int max_num_atoms, bool interp=true);
   bool calcProbabilityCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& temp, const int max_num_atoms, vector<xmatrix<double>>& prob_cluster);
   double calcProbabilityConstraint(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<double>& excess_energy_cluster, const xmatrix<double>& prob_ideal_cluster, const xvector<double>& beta, const xmatrix<double>& natom_cluster, const int it, const int ix, const int ik, const int ideq, const xvector<double>& xvar);
-  xmatrix<double> calcProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<int>& degeneracy_cluster, const int max_num_atoms);
+  xmatrix<double> calcProbabilityIdealCluster(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xvector<long int>& degeneracy_cluster, const int max_num_atoms);
   void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob_ideal_cluster);
   void checkProbability(const xmatrix<double>& conc_macro, const xmatrix<double>& conc_cluster, const xmatrix<double>& prob_ideal_cluster, const vector<xmatrix<double>>& prob_cluster, const xvector<double>& temp);
   xmatrix<double> getConcentrationMacro(const vector<double>& conc_curve_range, const int conc_npts, const uint nelem);
@@ -88,15 +87,15 @@ namespace qca {
   xmatrix<double> getConcentrationCluster(const vector<xstructure>& vstr, const vector<string>& elements);
   xmatrix<double> getConcentrationCluster(const string& rundirpath, const int nstr, const int nelem);
   xvector<int> getNumAtomCluster(const vector<xstructure>& vstr);
-  xvector<int> calcDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const int num_threads, const string& rundirpath="", const string& algo="FAST");
+  xvector<long int> calcDegeneracyCluster(const string& plattice, const vector<xstructure>& vstr, const vector<string>& elements, const int max_num_atoms, const string& rundirpath="");
   double getCVCluster(const string& rundirpath, const double cv_cut);
   void runATAT(const string& cdirpath, const string& rundirpath, const uint min_sleep);
   void generateFilesForATAT(const string& rundirpath, const string& lat_atat, const vector<xstructure>& vstr_aflow, const vector<xstructure>& vstr_atat, const vector<int>& mapstr);
-  vector<xstructure> getAFLOWXstructures(const string& plattice, const vector<string>& elements, const int num_threads, bool use_sg);
-  vector<xstructure> getAFLOWXstructures(const string& aflowlibpath, const int num_threads, bool use_sg);
+  vector<xstructure> getAFLOWXstructures(const string& plattice, const vector<string>& elements, bool use_sg);
+  vector<xstructure> getAFLOWXstructures(const string& aflowlibpath, bool use_sg);
   string createLatForATAT(const string& plattice, const vector<string>& elements, bool scale=false);
   vector<xstructure> getATATXstructures(const string& lat, const string& plattice, const vector<string>& elements, const uint max_num_atoms, const string& rundirpath="");
-  vector<int> calcMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2, const int num_threads, const string& algo="FAST");
+  vector<int> calcMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2);
   void displayUsage(void);
   void writeData(const _qca_data& qca_data);
   void readData(_qca_data& qca_data);

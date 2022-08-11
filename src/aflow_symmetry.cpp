@@ -279,7 +279,7 @@ namespace SYM {
     //if(min_dist<_XPROTO_TOO_CLOSE_ERROR_){
     //  stringstream message;
     //  message << "Atoms appear to be overlapping (min_dist=" << min_dist << "<" << _XPROTO_TOO_CLOSE_ERROR_ << ")";
-    //  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
+    //  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_);
     //}
 
     return min_dist;
@@ -956,7 +956,6 @@ namespace SYM {
 
   bool FPOSMatch(const xvector<double>& fpos1, const xvector<double>& fpos2, const xmatrix<double>& lattice,
       const xmatrix<double>& f2c, bool skew, double tol){ //CO20190520 - removed pointers for bools and doubles, added const where possible //DX20190620 - lattice and f2c as input and remove "Atom" prefix in name
-    string soliloquy = XPID + "SYM::FPOSMatch():";
 
     //DX20190613 [OBSOLETE] xvector<double> fdiff = fpos1 - fpos2;
     if(XHOST.SKEW_TEST){
@@ -971,24 +970,24 @@ namespace SYM {
       double min_cdiff_dist = aurostd::modulus(min_cdiff); //DX20190613 - changed variable names
       stringstream message; 
       if((min_cdiff_dist<=tol)==(min_fdiff_dist<=tol) && aurostd::abs(min_cdiff_dist-min_fdiff_dist)<_ZERO_TOL_){
-        message << soliloquy << " minimum distances equal, and mappings same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, cerr, _LOGGER_MESSAGE_);
+        message << __AFLOW_FUNC__ << " minimum distances equal, and mappings same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, cerr, _LOGGER_MESSAGE_);
       }
       if((min_cdiff_dist<=tol)==(min_fdiff_dist<=tol) && min_cdiff_dist<=tol && aurostd::abs(min_cdiff_dist-min_fdiff_dist)>_ZERO_TOL_){
-        message << soliloquy << " WARNING-MAP: minimum distances unequal, but mapping outcome same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, cerr, _LOGGER_WARNING_);
+        message << __AFLOW_FUNC__ << " WARNING-MAP: minimum distances unequal, but mapping outcome same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, cerr, _LOGGER_WARNING_);
       }
       if((min_cdiff_dist<=tol)==(min_fdiff_dist<=tol) && min_cdiff_dist>tol && aurostd::abs(min_cdiff_dist-min_fdiff_dist)>_ZERO_TOL_){
-        message << soliloquy << " WARNING-NOMAP: minimum distances unequal, but mapping outcome same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
-        pflow::logger(_AFLOW_FILE_NAME_, soliloquy, message, cerr, _LOGGER_WARNING_);
+        message << __AFLOW_FUNC__ << " WARNING-NOMAP: minimum distances unequal, but mapping outcome same -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, cerr, _LOGGER_WARNING_);
       }
       if((min_cdiff_dist<=tol)!=(min_fdiff_dist<=tol) && aurostd::abs(min_cdiff_dist-min_fdiff_dist)>_ZERO_TOL_){
-        message << soliloquy << "ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_GENERIC_ERROR_);
+        message << __AFLOW_FUNC__ << "ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_GENERIC_ERROR_);
       }
       if((min_cdiff_dist-XHOST.SKEW_TOL<_ZERO_TOL_)!=(min_fdiff_dist-XHOST.SKEW_TOL<_ZERO_TOL_)){
-        message << soliloquy << "THRESHOLD ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_GENERIC_ERROR_);
+        message << __AFLOW_FUNC__ << "THRESHOLD ERROR: minimum distances unequal, and mappings unequal -- globally optimized: " << min_cdiff_dist << " | bring-in-cell: " << min_fdiff_dist << " || tol: " << tol << " || skew_tol: " << XHOST.SKEW_TOL;
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_GENERIC_ERROR_);
       }
     }
     double min_dist = aurostd::modulus(CPOSDistFromFPOS(fpos1,fpos2,lattice,f2c,skew)); //DX20190620
@@ -1000,12 +999,12 @@ namespace SYM {
     //DX20190620 [moved into CPOSDistFromFPOS()]   min_dist = aurostd::modulus(min_cdiff); //DX20190613
     //DX20190620 [moved into CPOSDistFromFPOS()] }
     //DX20190620 [moved into CPOSDistFromFPOS()] else {
-    //DX20190620 [moved into CPOSDistFromFPOS()]   if(VERBOSE){ cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;}
+    //DX20190620 [moved into CPOSDistFromFPOS()]   if(VERBOSE){ cerr << __AFLOW_FUNC__ << " fpos1-fpos2=" << (fpos1-fpos2) << endl;}
     //DX20190620 [moved into CPOSDistFromFPOS()]   //DX20190613 [OBSOLETE] PBC(fdiff);
     //DX20190620 [moved into CPOSDistFromFPOS()]   xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX20190613
-    //DX20190620 [moved into CPOSDistFromFPOS()]   if(VERBOSE){ cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;}
+    //DX20190620 [moved into CPOSDistFromFPOS()]   if(VERBOSE){ cerr << __AFLOW_FUNC__ << " min_fdiff=" << min_fdiff << endl;}
     //DX20190620 [moved into CPOSDistFromFPOS()]   min_dist = aurostd::modulus(f2c*min_fdiff); //DX20190613
-    //DX20190620 [moved into CPOSDistFromFPOS()]   if(VERBOSE){ cerr << soliloquy << " min_dist=" << min_dist << endl;}
+    //DX20190620 [moved into CPOSDistFromFPOS()]   if(VERBOSE){ cerr << __AFLOW_FUNC__ << " min_dist=" << min_dist << endl;}
     //DX20190620 [moved into CPOSDistFromFPOS()] }
     return (min_dist<tol); //DX20190613
   }
@@ -1023,7 +1022,6 @@ namespace SYM {
   xvector<double> FPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
       const xmatrix<double>& lattice,const xmatrix<double>& c2f,const xmatrix<double>& f2c,bool skew){  //CO20190525
     bool VERBOSE=FALSE; //DX20201210
-    string soliloquy = XPID + "SYM::FPOSDistFromFPOS():";
     xvector<double> min_fdiff;
     if(skew){
       xvector<double> cpos1 = f2c*fpos1;
@@ -1031,17 +1029,17 @@ namespace SYM {
       xvector<double> min_cdiff = minimizeDistanceCartesianMethod(cpos1,cpos2,lattice); //DX20190613
       min_fdiff = c2f*min_cdiff;
       if(VERBOSE){
-        cerr << soliloquy << " fpos1=" << fpos1 << endl;
-        cerr << soliloquy << " fpos2=" << fpos2 << endl;
+        cerr << __AFLOW_FUNC__ << " fpos1=" << fpos1 << endl;
+        cerr << __AFLOW_FUNC__ << " fpos2=" << fpos2 << endl;
       }
     }
     else {
       xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX20190613
       if(VERBOSE){
-        cerr << soliloquy << " fpos1=" << fpos1 << endl;
-        cerr << soliloquy << " fpos2=" << fpos2 << endl;
-        cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;
-        cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;
+        cerr << __AFLOW_FUNC__ << " fpos1=" << fpos1 << endl;
+        cerr << __AFLOW_FUNC__ << " fpos2=" << fpos2 << endl;
+        cerr << __AFLOW_FUNC__ << " fpos1-fpos2=" << (fpos1-fpos2) << endl;
+        cerr << __AFLOW_FUNC__ << " min_fdiff=" << min_fdiff << endl;
       }
     }
     return min_fdiff;
@@ -1064,28 +1062,27 @@ namespace SYM {
   xvector<double> CPOSDistFromFPOS(const xvector<double>& fpos1,const xvector<double>& fpos2,
       const xmatrix<double>& lattice,const xmatrix<double>& f2c,bool skew){  //CO20190525
     bool VERBOSE=FALSE; //using LDEBUG would pollute output
-    string soliloquy = XPID + "SYM::CPOSDistFromFPOS():";
     xvector<double> min_cdiff;
     if(skew){
       xvector<double> cpos1 = f2c*fpos1;
       xvector<double> cpos2 = f2c*fpos2;
       min_cdiff = minimizeDistanceCartesianMethod(cpos1,cpos2,lattice); //DX20190613
       if(VERBOSE){ //DX20201210 - only one if-statement, otherwise expensive
-        cerr << soliloquy << " fpos1=" << fpos1 << endl;
-        cerr << soliloquy << " fpos2=" << fpos2 << endl;
-        cerr << soliloquy << " cpos1-cpos2=" << (cpos1-cpos2) << endl;
-        cerr << soliloquy << " min_cdiff=" << min_cdiff << endl;
+        cerr << __AFLOW_FUNC__ << " fpos1=" << fpos1 << endl;
+        cerr << __AFLOW_FUNC__ << " fpos2=" << fpos2 << endl;
+        cerr << __AFLOW_FUNC__ << " cpos1-cpos2=" << (cpos1-cpos2) << endl;
+        cerr << __AFLOW_FUNC__ << " min_cdiff=" << min_cdiff << endl;
       }
     }
     else {
       xvector<double> min_fdiff = minimizeDistanceFractionalMethod(fpos1,fpos2); //DX20190613
       min_cdiff = f2c*min_fdiff;
       if(VERBOSE){ //DX20201210 - only one if-statement, otherwise expensive
-        cerr << soliloquy << " fpos1=" << fpos1 << endl;
-        cerr << soliloquy << " fpos2=" << fpos2 << endl;
-        cerr << soliloquy << " fpos1-fpos2=" << (fpos1-fpos2) << endl;
-        cerr << soliloquy << " min_fdiff=" << min_fdiff << endl;
-        cerr << soliloquy << " min_cdiff=" << min_cdiff << endl;
+        cerr << __AFLOW_FUNC__ << " fpos1=" << fpos1 << endl;
+        cerr << __AFLOW_FUNC__ << " fpos2=" << fpos2 << endl;
+        cerr << __AFLOW_FUNC__ << " fpos1-fpos2=" << (fpos1-fpos2) << endl;
+        cerr << __AFLOW_FUNC__ << " min_fdiff=" << min_fdiff << endl;
+        cerr << __AFLOW_FUNC__ << " min_cdiff=" << min_cdiff << endl;
       }
     }
     return min_cdiff;
@@ -4331,15 +4328,14 @@ namespace SYM {
 namespace SYM {
   bool CalculatePointGroup_20160801(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format) { 
     bool LDEBUG=(FALSE || XHOST.DEBUG); //CO20190520
-    string soliloquy = XPID + "SYM::CalculatePointGroup():";
     stringstream message;
-    if(LDEBUG) {cerr << soliloquy << " BEGIN" << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
     // Obtain the structure tolerance
     //DX20180526 [OBSOLETE] string directory=aurostd::execute2string("pwd"); //DX20180426 - added current working directory
     a.sym_eps=_eps_; //DX
 
     // AFLOW_FUNCTION_IMPLEMENTATION
-    if(DEBUG_SYMMETRY) cerr << soliloquy << " DEBUG" << endl;
+    if(DEBUG_SYMMETRY) cerr << __AFLOW_FUNC__ << " DEBUG" << endl;
     // ------------------------------------------------------------------------------
     // Some of this routine is inspired by AVDV structure::calc_point_group() code.
     //SC made modificatios for speed and consistency with aflow architecture
@@ -4555,13 +4551,13 @@ namespace SYM {
                             }
                             //DX _eps_ to _ZERO_TOL_
                             if(aurostd::sum(aurostd::abs(f2c*Uf*inverse(f2c)-Uc))>_ZERO_TOL_) //DX used to be _eps_
-                            {message << "Uf error[1] [dir=" << a.directory << "]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}
+                            {message << "Uf error[1] [dir=" << a.directory << "]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);}
                             if(aurostd::sum(aurostd::abs(c2f*Uc*inverse(c2f)-Uf))>_ZERO_TOL_) //DX used to be _eps_
-                            {message << "Uc error[2] [dir=" << a.directory << "]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}
+                            {message << "Uc error[2] [dir=" << a.directory << "]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);}
                             if(aurostd::sum(aurostd::abs(FF2CC(a.lattice,Uf)-Uc))>_ZERO_TOL_) //DX used to be _eps_
-                            {message << "Uc error[3] [dir=" << a.directory << "]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}
+                            {message << "Uc error[3] [dir=" << a.directory << "]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);}
                             if(aurostd::sum(aurostd::abs(CC2FF(a.lattice,Uc)-Uf))>_ZERO_TOL_) //DX used to be _eps_
-                            {message << "Uc error[4] [dir=" << a.directory << "]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}
+                            {message << "Uc error[4] [dir=" << a.directory << "]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);}
                             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
                             //DX _eps_ to _ZERO_TOL_
                           }
@@ -4612,9 +4608,8 @@ namespace SYM {
   //DX bool CalculatePointGroup(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_)        // AFLOW_FUNCTION_IMPLEMENTATION
   bool CalculatePointGroup_20160101(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_)        // AFLOW_FUNCTION_IMPLEMENTATION
   { //CO20200106 - patching for auto-indenting
-    string soliloquy = XPID + "SYM::CalculatePointGroup():";
     stringstream message;
-    if(DEBUG_SYMMETRY) cerr << soliloquy << " DEBUG" << endl;
+    if(DEBUG_SYMMETRY) cerr << __AFLOW_FUNC__ << " DEBUG" << endl;
     // ------------------------------------------------------------------------------
     // Some of this routine is inspired by AVDV structure::calc_point_group() code.
     //SC made modificatios for speed and consistency with aflow architecture
@@ -5461,14 +5456,13 @@ namespace SYM {
 namespace SYM {
   bool CalculateFactorGroup_20160801(ofstream &FileMESSAGE,xstructure &a,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "SYM::CalculateFactorGroup():";
     stringstream message;
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;    
     // Obtain the structure tolerance
     a.sym_eps=_eps_;
     bool skew = isLatticeSkewed(a.lattice,a.dist_nn_min,_eps_);
 
-    if(DEBUG_SYMMETRY) cerr << soliloquy << " DEBUG" << endl;
+    if(DEBUG_SYMMETRY) cerr << __AFLOW_FUNC__ << " DEBUG" << endl;
     // ------------------------------------------------------------------------------
     ostringstream aus;
     bool Krun=TRUE,sym_found;
@@ -5493,13 +5487,13 @@ namespace SYM {
     aus << XPID << (aflags.QUIET?"":"00000  MESSAGE ") << "FGROUP Symmetry: generating translations " << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,osswrite,oss);
 
-    if(LDEBUG) {cerr << soliloquy << " DEBUG breaking up by types" << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " DEBUG breaking up by types" << endl;}
     deque<deque<_atom> > atoms_by_type = break_up_by_type(a.atoms);
     if(atoms_by_type.size()==0){
-      cerr << soliloquy << " ERROR: Structure could not be broken up by atoms [dir=" << a.directory << "]" << endl;
+      cerr << __AFLOW_FUNC__ << " ERROR: Structure could not be broken up by atoms [dir=" << a.directory << "]" << endl;
       return false;
     }
-    if(LDEBUG) {cerr << soliloquy << " DEBUG breaking up by types DONE" << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " DEBUG breaking up by types DONE" << endl;}
     uint smallest_group = atoms_by_type[0].size();
     uint index_for_smallest_group = 0;
     for(uint i=1;i<atoms_by_type.size();i++){
@@ -5508,7 +5502,7 @@ namespace SYM {
         index_for_smallest_group = i;
       }
     }
-    if(LDEBUG) {cerr << soliloquy << " DEBUG grabbed index for smallest group" << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " DEBUG grabbed index for smallest group" << endl;}
 
     // ===== Loop over symmetry elements ===== //
     //xmatrix<double> R;
@@ -5528,20 +5522,20 @@ namespace SYM {
       //CO START
       symOp.Uf=a.pgroup[pg].Uf;
       symOp.Uc=a.pgroup[pg].Uc;
-      if(LDEBUG) {cerr << soliloquy << " DEBUG starting pg=" << pg << endl;}
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " DEBUG starting pg=" << pg << endl;}
       //symOp.str_Hermann_Mauguin=a.pgroup[pg].str_Hermann_Mauguin; //no longer necessary
       //CO END
       for(uint j=0;j<atoms_by_type[index_for_smallest_group].size();j++){
-        if(LDEBUG) {cerr << soliloquy << " DEBUG j=" << j << endl;}
-        if(LDEBUG) {cerr << soliloquy << " DEBUG index_for_smallest_group=" << index_for_smallest_group << endl;}
-        if(LDEBUG) {cerr << soliloquy << " DEBUG atoms_by_type.size()=" << atoms_by_type.size() << endl;}
-        if(LDEBUG) {cerr << soliloquy << " DEBUG atoms_by_type[index_for_smallest_group].size()=" << atoms_by_type[index_for_smallest_group].size() << endl;}
+        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " DEBUG j=" << j << endl;}
+        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " DEBUG index_for_smallest_group=" << index_for_smallest_group << endl;}
+        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " DEBUG atoms_by_type.size()=" << atoms_by_type.size() << endl;}
+        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " DEBUG atoms_by_type[index_for_smallest_group].size()=" << atoms_by_type[index_for_smallest_group].size() << endl;}
         //DX20190905 [OBSOLETE-no more mod_one_xvec] symOp.ftau = mod_one_xvec(atoms_by_type[index_for_smallest_group][0].fpos - a.pgroup[pg].Uf*atoms_by_type[index_for_smallest_group][j].fpos);
         symOp.ftau = atoms_by_type[index_for_smallest_group][0].fpos - a.pgroup[pg].Uf*atoms_by_type[index_for_smallest_group][j].fpos; //DX20190905 - uses new bring in cell function
         BringInCellInPlace(symOp.ftau); //DX20190905 - uses new bring in cell function
         //CO START
         symOp.ctau=a.f2c*symOp.ftau;
-        if(LDEBUG) {cerr << soliloquy << " DEBUG about to test symop" << endl;}
+        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " DEBUG about to test symop" << endl;}
         //CO END
         //if(getFullSymBasis(a.atoms,a.pgroup[pg].Uf,a.c2f,a.f2c,a.pgroup[pg].str_Hermann_Mauguin,symOp.ftau,skew,_eps_,basis_atoms_map,basis_types_map))
         if(getFullSymBasis(a.atoms,a.lattice,a.c2f,a.f2c,symOp,TRUE,skew,_eps_,basis_atoms_map,basis_types_map))
@@ -7046,7 +7040,6 @@ namespace SYM {
 namespace SYM {
   bool CalculateSitePointGroup_20160801(ofstream &FileMESSAGE,xstructure &a,int CALCULATION_MODE,_aflags &aflags,bool _write_,const bool& osswrite,ostream& oss,double _eps_,string format) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "SYM::CalculateSitePointGroup():";
     stringstream message;
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;
     string directory=aurostd::getPWD(); //DX20180426 - added current working directory  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
@@ -7055,7 +7048,7 @@ namespace SYM {
     //CALCULATION_MODE == 2 - calculate all atoms standard routine (go through pgroups), get full basis for all
     if(!(CALCULATION_MODE == 0 || CALCULATION_MODE == 1 || CALCULATION_MODE == 2)) {
       message << "Invalid calculation mode.  Must be 0, 1, or 2. [dir=" << a.directory << "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_);
     }
 
     // Obtain the structure tolerance
@@ -7349,7 +7342,6 @@ namespace SYM {
   bool CalculateSitePointGroup_EquivalentSites(xstructure &a,bool get_full_basis,double _eps_){
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     DEBUG_SYMMETRY=DEBUG_SYMMETRY || LDEBUG;
-    string soliloquy = XPID + "SYM::CalculateSitePointGroup_EquivalentSites():";
     string directory=aurostd::getPWD(); //DX20180426 - added current working directory  //[CO20191112 - OBSOLETE]aurostd::execute2string("pwd")
 
     // Obtain the structure tolerance
@@ -7426,7 +7418,7 @@ namespace SYM {
                 //  continue;
                 //} else {
                 if(DEBUG_SYMMETRY){ 
-                  cerr << soliloquy << " warning[1] - Cannot find full atom/types basis [dir=" << a.directory << "]" << endl;
+                  cerr << __AFLOW_FUNC__ << " warning[1] - Cannot find full atom/types basis [dir=" << a.directory << "]" << endl;
                 }
                 return FALSE; //CO REMOVE
                 //}
@@ -7444,12 +7436,12 @@ namespace SYM {
         } else {
           //if(!found_fgroup){  //[CO20200106 - close bracket for indenting]}
           if(DEBUG_SYMMETRY){
-            cerr << soliloquy << " warning[1a] - Cannot find fgroup mapping between atom " << eat << " and atom " << iat << " [dir=" << directory << "]" << endl; //DX20180426 - changed a.directory to directory (pwd)
+            cerr << __AFLOW_FUNC__ << " warning[1a] - Cannot find fgroup mapping between atom " << eat << " and atom " << iat << " [dir=" << directory << "]" << endl; //DX20180426 - changed a.directory to directory (pwd)
           }
           return FALSE;
           //cerr << "Not throwing though, just applying agroups of iatom " << iat << " to atom " << eat << endl;
           //a.agroup[eat]=a.agroup.at(iat);
-          //throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+          //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
         }
       } 
     }
@@ -7497,7 +7489,7 @@ namespace SYM {
     ////if(derivative_structure){
     ////  continue;
     ////} else {
-    //cerr << soliloquy << " error[2] - Cannot find full atom/types basis" << endl;
+    //cerr << __AFLOW_FUNC__ << " error[2] - Cannot find full atom/types basis" << endl;
     //return FALSE;
     ////}
     //}
@@ -7512,11 +7504,11 @@ namespace SYM {
     //}
     //} else {
     ////if(!found_fgroup){
-    //cerr << soliloquy << " error[1b] - Cannot find fgroup mapping between atom " << eat << " and atom " << iat << endl;
+    //cerr << __AFLOW_FUNC__ << " error[1b] - Cannot find fgroup mapping between atom " << eat << " and atom " << iat << endl;
     //return FALSE;
     ////cerr << "Not throwing though, just applying agroups of iatom " << iat << " to atom " << eat << endl;
     ////a.agroup[eat]=a.agroup.at(iat);
-    ////throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    ////throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
     //}
     //} 
     //}
@@ -7548,7 +7540,6 @@ namespace SYM {
     //written by wahyu@alumni.duke.edu (2009) with the block to calculate the point group taken from
     //SYM::CalculatePointGroup function.
 
-    string soliloquy = XPID + "SYM::CalculateSitePointGroup2():";
     stringstream message;
 
     uint i,j,ib,jp;
@@ -7688,13 +7679,13 @@ namespace SYM {
                             aus << a.pgroup[kk-1].angle << " " << " r=(" << a.pgroup[kk-1].axis << ")"
                               << endl;  // remember vectors start from 0
                             if(aurostd::sum(aurostd::abs(f2c*Uf*inverse(f2c)-Uc))>_eps_)
-                            {message << "Uf error[1]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}
+                            {message << "Uf error[1]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);}
                             if(aurostd::sum(aurostd::abs(c2f*Uc*inverse(c2f)-Uf))>_eps_)
-                            {message << "Uf error[2]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}
+                            {message << "Uf error[2]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);}
                             if(aurostd::sum(aurostd::abs(FF2CC(a.lattice,Uf)-Uc))>_eps_)
-                            {message << "Uf error[3]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}
+                            {message << "Uf error[3]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);}
                             if(aurostd::sum(aurostd::abs(CC2FF(a.lattice,Uc)-Uf))>_eps_)
-                            {message << "Uf error[4]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}
+                            {message << "Uf error[4]"; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);}
                           }
                         }
             }
@@ -7798,7 +7789,7 @@ namespace SYM {
             delete grid_flattice[i];
           grid_flattice.clear();
           message << "One of the rlatt points is outside radius, algorithm 1.5*Rsphere failed.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_);
+          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_RANGE_);
         }
 
         flog<<"rlatt row-lattice vectors new coord: "<<endl<<rlatt<<endl
@@ -7913,7 +7904,7 @@ namespace SYM {
                     delete grid_flattice[i];
                   grid_flattice.clear();
                   message << "Mid: One of the rlatt points is outside radius, algorithm 1.5*Rsphere failed.";
-                  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_);
+                  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_RANGE_);
                 }
                 //check mapping
                 sym_found=false;

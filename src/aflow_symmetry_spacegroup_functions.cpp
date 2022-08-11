@@ -2840,7 +2840,6 @@ namespace SYM {
     // this function will be circumvented when symbolic math is integrated
     //DX20190723
 
-    string soliloquy = XPID + "SYM::formatWyckoffPosition()";
 
     stringstream ss_eqn;ss_eqn.precision(precision);  //CO20220607 - added precision
     string coordinate = "";
@@ -2941,7 +2940,6 @@ namespace SYM {
     // this function will be circumvented when symbolic math is integrated
     //DX20190708
 
-    string soliloquy = XPID + "SYM::reorderWyckoffPosition()";
     stringstream message;
 
     // ---------------------------------------------------------------------------
@@ -2951,7 +2949,7 @@ namespace SYM {
 
     if(tokens.size()!=3){ 
       message << "Wyckoff position must have 3 fields (e.g., \"x, y, z\"), input: " << orig_position;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_);
     }
 
     // ---------------------------------------------------------------------------
