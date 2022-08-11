@@ -15,6 +15,7 @@
 
 #define CONC_SHIFT 0.01 // concentration shift away from 0
 #define QCA_FILE_PREFIX string("aflow_qca_")
+#define QCA_AFLOW_TAG string("[AFLOW_QCA]")
 
 // Struct _qca data
 struct _qca_data {

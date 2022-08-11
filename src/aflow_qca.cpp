@@ -1736,23 +1736,18 @@ namespace qca {
     string filepath = qca_data.rundirpath + "/" + QCA_FILE_PREFIX + "output." + qca_data.print;
     stringstream output;
     if (qca_data.print == "txt") {
-      string info_prefix = "";
-      output << "QCA DATA" << endl;
-      info_prefix = "Input data ";
-      output << " " << info_prefix << "Alloy name                     = " << qca_data.alloyname << endl;
-      output << " " << info_prefix << "Parent lattice                 = " << qca_data.plattice << endl;
-      output << " " << info_prefix << "Macroscopic concentration      = " << endl << qca_data.conc_macro << endl;
-      output << " " << info_prefix << "Temperature range (K)          = " << endl << trasp(qca_data.temp) << endl;
-      output << " " << info_prefix << "Max atoms per cell             = " << qca_data.max_num_atoms << endl;
-      info_prefix = "Cluster data ";
-      output << " " << info_prefix << "CV score (eV)                  = " << qca_data.cv_cluster << endl;
-      output << " " << info_prefix << "Number of atoms                = " << endl << trasp(qca_data.num_atom_cluster) << endl;
-      output << " " << info_prefix << "Degeneracy                     = " << endl << trasp(qca_data.degeneracy_cluster) << endl;
-      output << " " << info_prefix << "Concentration                  = " << endl << qca_data.conc_cluster << endl;
-      output << " " << info_prefix << "Excess energy (eV)             = " << endl << trasp(qca_data.excess_energy_cluster) << endl;
-      info_prefix = "Thermo data ";
-      output << " " << info_prefix << "EC transition temperature (K)  = " << qca_data.param_ec.second << endl;
-      output << " " << info_prefix << "Binodal boundary (K)           = " << endl << trasp(qca_data.binodal_boundary) << endl;
+      output << AFLOWIN_SEPARATION_LINE << endl;
+      output << QCA_AFLOW_TAG << "START" << endl;
+      output << "ALLOY=" << qca_data.alloyname << endl;
+      output << "PLATTICE=" << qca_data.plattice << endl;
+      output << "CONC_MACRO=" << endl << qca_data.conc_macro << endl;
+      output << "TEMP_RANGE=" << qca_data.temp_range[0] << "," << qca_data.temp_range[1] << endl;
+      output << "MAX_ATOMS_CELL=" << qca_data.max_num_atoms << endl;
+      output << "CV=" << qca_data.cv_cluster << endl;
+      output << "TEMP_EC=" << qca_data.param_ec.second << endl;
+      output << "BINODAL=" << endl << trasp(qca_data.binodal_boundary) << endl;
+      output << QCA_AFLOW_TAG << "END" << endl;
+      output << AFLOWIN_SEPARATION_LINE << endl;
       if (!qca_data.screen_only) {
         aurostd::stringstream2file(output, filepath);
         return;
