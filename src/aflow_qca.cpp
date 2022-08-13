@@ -11,6 +11,7 @@
 #define _AFLOW_QCA_CPP_
 
 #include "aflow_qca.h"
+using namespace std::placeholders;
 
 // ###############################################################################
 //            AFLOW Quasi-Chemical Approximation (QCA) (2022-)
@@ -105,13 +106,13 @@ namespace qca {
     nelem = 0;
     ncluster = 0;
     nconc = 0;
-    found_soln = false;
     cv_cluster = 0.0;
     num_atom_cluster.clear();
     degeneracy_cluster.clear();
     conc_cluster.clear();
     excess_energy_cluster.clear();
     prob_ideal_cluster.clear();
+    soln0.clear();
     prob_cluster.clear();
     param_ec.first = 0.0; param_ec.second = 0.0;
     rel_s.clear();
@@ -152,13 +153,13 @@ namespace qca {
     nelem = b.nelem;
     ncluster = b.ncluster;
     nconc = b.nconc;
-    found_soln = b.found_soln;
     cv_cluster = b.cv_cluster;
     num_atom_cluster = b.num_atom_cluster;
     degeneracy_cluster = b.degeneracy_cluster;
     conc_cluster = b.conc_cluster;
     excess_energy_cluster = b.excess_energy_cluster;
     prob_ideal_cluster = b.prob_ideal_cluster;
+    soln0 = b.soln0;
     prob_cluster = b.prob_cluster;
     param_ec = b.param_ec;
     rel_s = b.rel_s;
@@ -416,6 +417,9 @@ namespace qca {
         checkProbabilityEquilibrium();
       }
       catch (aurostd::xerror& err) {
+        stringstream message;
+        message << "Equilibrium probabilities do not satify the concentration constraints, skipping binodal curve calculation";
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         return;
       }
       calculateRelativeEntropy();
@@ -1132,102 +1136,133 @@ namespace qca {
     }
   }
 
+  /// @brief calculates the equilibrium cluster probability of a 1-D system at a particular concentration
+  ///
+  /// @param iix shifted concentration index
+  /// @param it temperature index
+  ///
+  /// @authors
+  /// @mod{SD,20220812,created function}
+  void QuasiChemApproxCalculator::calculateProbabilityCluster1D(int iix, int it) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    int ix = iix + prob_ideal_cluster.lrows;
+    xvector<double> soln(nelem - 1), p(max_num_atoms + 1), rr(max_num_atoms), ri(max_num_atoms);
+    bool found_soln = false;
+    for (int ic = prob_ideal_cluster.lcols; ic <= prob_ideal_cluster.ucols; ic++) {
+      p((int)num_elem_cluster(ic, 1) + 1) += prob_ideal_cluster(ix, ic) * std::exp(-beta(it) * excess_energy_cluster(ic)) * (conc_cluster(ic, 1) - conc_macro(ix, 1));
+    }
+    if (LDEBUG) {cerr << __AFLOW_FUNC__ << " it=" << it << " ix=" << ix << " | p=" << p << endl;}
+    aurostd::polynomialFindRoots(p, rr, ri);
+    if (LDEBUG) {
+      cerr << __AFLOW_FUNC__ << "   real roots=" << rr << endl;
+      cerr << __AFLOW_FUNC__ << "   imag roots=" << ri << endl;
+    }
+    for (int isol = rr.lrows; isol <= rr.urows; isol++) {
+      if (rr(isol) > soln(1) &&
+          aurostd::isequal(ri(isol), 0.0) &&
+          max_num_atoms * std::pow(rr(isol), max_num_atoms) != INFINITY) { // solution must be positive, real, and finite
+        soln(1) = rr(isol);
+        found_soln = true;
+      }
+    }
+    if (!found_soln) { // physical solution does not exist
+      stringstream message;
+      message << "Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]" << endl;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    }
+    for (int ic = prob_ideal_cluster.lcols; ic <= prob_ideal_cluster.ucols; ic++) {
+      prob_cluster[it - 1](ix, ic) = prob_ideal_cluster(ix, ic) * std::exp(-beta(it) * excess_energy_cluster(ic)) * std::pow(soln(1), num_elem_cluster(ic, 1));
+    }
+    prob_cluster[it - 1].setmat(prob_cluster[it - 1].getxmat(ix, ix, prob_ideal_cluster.lcols, prob_ideal_cluster.ucols) /
+                                aurostd::sum(prob_cluster[it - 1].getxmat(ix, ix, prob_ideal_cluster.lcols, prob_ideal_cluster.ucols)), ix, 1);
+  }
+
+  /// @brief calculates the equilibrium cluster probability of a N-D system at a particular concentration
+  ///
+  /// @param iix shifted concentration index
+  /// @param it temperature index
+  ///
+  /// @authors
+  /// @mod{SD,20220812,created function}
+  void QuasiChemApproxCalculator::calculateProbabilityClusterND(int iix, int it) {
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    int ix = iix + prob_ideal_cluster.lrows;
+    xvector<double> soln(nelem - 1);
+    xmatrix<double> msoln;
+    vector<std::function<double(xvector<double>)>> vpoly, vdpoly;
+    vector<vector<std::function<double(xvector<double>)>>> jac;
+    bool found_soln = false;
+    for (int ieq = 1; ieq <= (int)nelem - 1; ieq++) {
+      vpoly.push_back([this, it, ix, ieq](xvector<double> xvar) {return getProbabilityConstraint(it, ix, ieq, 0, xvar);});
+      for (int ideq = 1; ideq <= (int)nelem - 1; ideq++) {
+        vdpoly.push_back([this, it, ix, ieq, ideq](xvector<double> xvar) {return getProbabilityConstraint(it, ix, ieq, ideq, xvar);});
+      }
+      jac.push_back(vdpoly);
+      vdpoly.clear();
+    }
+    if (LDEBUG) {cerr << __AFLOW_FUNC__ << " it=" << it << " ix=" << ix << endl;}
+    found_soln = aurostd::findZeroDeflation(soln0.getcol(ix), vpoly, jac, msoln);
+    if (LDEBUG) {cerr << __AFLOW_FUNC__ << "   exist=" << found_soln << " | real roots=" << endl << msoln << endl;}
+    if (found_soln) { // if solution is found, it must also be positive, real, and finite
+      for (int isol = msoln.lcols; isol <= msoln.ucols; isol++) {
+        found_soln = true;
+        for (int ieq = 1; ieq <= (int)nelem - 1 && found_soln; ieq++) {
+          found_soln = !(msoln.getcol(isol)(ieq) <= 0.0);
+        }
+        if (found_soln) {
+          soln = msoln.getcol(isol);
+          break;
+        }
+      }
+    }
+    if (!found_soln) {
+      stringstream message;
+      message << "Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]" << endl;
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    }
+    soln0.setcol(soln, ix); // use the higher temperature solution as an initial guess for lower temperature solution
+    for (int ic = prob_ideal_cluster.lcols; ic <= prob_ideal_cluster.ucols; ic++) {
+      prob_cluster[it - 1](ix, ic) = prob_ideal_cluster(ix, ic) * std::exp(-beta(it) * excess_energy_cluster(ic)) *
+                                    aurostd::elements_product(aurostd::pow(soln, num_elem_cluster.getxvec(ic, ic, 1, nelem - 1)));
+    }
+    prob_cluster[it - 1].setmat(prob_cluster[it - 1].getxmat(ix, ix, prob_ideal_cluster.lcols, prob_ideal_cluster.ucols) /
+                                aurostd::sum(prob_cluster[it - 1].getxmat(ix, ix, prob_ideal_cluster.lcols, prob_ideal_cluster.ucols)), ix, 1); // normalize sum to 1
+  }
+
   /// @brief calculates the equilibrium cluster probability
   ///
   /// @authors
   /// @mod{SD,20220718,created function}
   void QuasiChemApproxCalculator::calculateProbabilityCluster() {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
     stringstream message;
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    xthread::xThread xt;
+    std::function<void(int, int&)> calculateProbabilityCluster1D_MT = std::bind(&QuasiChemApproxCalculator::calculateProbabilityCluster1D, this, _1, _2);
+    std::function<void(int, int&)> calculateProbabilityClusterND_MT = std::bind(&QuasiChemApproxCalculator::calculateProbabilityClusterND, this, _1, _2);
+#endif
     prob_cluster.clear();
     prob_cluster.assign(temp.rows, xmatrix<double>(nconc, ncluster)); // initialize
-    found_soln = false;
     message << "Calculating cluster probabilities";
     pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-    xvector<double> soln(nelem - 1);
     if (nelem - 1 == 1) {
-      xvector<double> p(max_num_atoms + 1), rr(max_num_atoms), ri(max_num_atoms);
       for (int it = temp.lrows; it <= temp.urows; it++) {
-        for (int ix = prob_ideal_cluster.lrows; ix <= prob_ideal_cluster.urows; ix++) {
-          p.reset();
-          soln.reset();
-          for (int ic = prob_ideal_cluster.lcols; ic <= prob_ideal_cluster.ucols; ic++) {
-            p((int)num_elem_cluster(ic, 1) + 1) += prob_ideal_cluster(ix, ic) * std::exp(-beta(it) * excess_energy_cluster(ic)) * (conc_cluster(ic, 1) - conc_macro(ix, 1));
-          }
-          if (LDEBUG) {cerr << __AFLOW_FUNC__ << " it=" << it << " ix=" << ix << " | p=" << p << endl;}
-          aurostd::polynomialFindRoots(p, rr, ri);
-          if (LDEBUG) {
-            cerr << __AFLOW_FUNC__ << "   real roots=" << rr << endl;
-            cerr << __AFLOW_FUNC__ << "   imag roots=" << ri << endl;
-          }
-          for (int isol = rr.lrows; isol <= rr.urows; isol++) {
-            if (rr(isol) > soln(1) && 
-                aurostd::isequal(ri(isol), 0.0) && 
-                max_num_atoms * std::pow(rr(isol), max_num_atoms) != INFINITY) { // solution must be positive, real, and finite
-              soln(1) = rr(isol);
-              found_soln = true;
-            }
-          }
-          if (!found_soln) { // physical solution does not exist
-            message << " Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]" << endl;
-            pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-            return;
-          }
-          for (int ic = prob_ideal_cluster.lcols; ic <= prob_ideal_cluster.ucols; ic++) {
-            prob_cluster[it - 1](ix, ic) = prob_ideal_cluster(ix, ic) * std::exp(-beta(it) * excess_energy_cluster(ic)) * std::pow(soln(1), num_elem_cluster(ic, 1));
-          }
-          prob_cluster[it - 1].setmat(prob_cluster[it - 1].getxmat(ix, ix, prob_ideal_cluster.lcols, prob_ideal_cluster.ucols) / 
-                                      aurostd::sum(prob_cluster[it - 1].getxmat(ix, ix, prob_ideal_cluster.lcols, prob_ideal_cluster.ucols)), ix, 1); // normalize sum to 1
-          pflow::updateProgressBar((it - temp.lrows) * prob_ideal_cluster.rows + (ix - prob_ideal_cluster.lrows) + 1, temp.rows * prob_ideal_cluster.rows, *p_oss);
-        }
+#ifdef AFLOW_MULTITHREADS_ENABLE
+        xt.run(prob_ideal_cluster.rows, calculateProbabilityCluster1D_MT, it);
+#else
+        for (int iix = 0; iix < prob_ideal_cluster.rows; iix++) {calculateProbabilityCluster1D(iix, it);}
+#endif
+        pflow::updateProgressBar(it - temp.lrows + 1, temp.rows, *p_oss);
       }
     }
     else {
-      xmatrix<double> soln0 = aurostd::ones_xm<double>(nelem - 1, nconc), msoln;
-      vector<std::function<double(xvector<double>)>> vpoly, vdpoly;
-      vector<vector<std::function<double(xvector<double>)>>> jac;
+      soln0 = aurostd::ones_xm<double>(nelem - 1, nconc);
       for (int it = temp.urows; it >= temp.lrows; it--) { // go backwards
-        for (int ix = prob_ideal_cluster.lrows; ix <= prob_ideal_cluster.urows; ix++) {
-          vpoly.clear();
-          vdpoly.clear();
-          jac.clear();
-          for (int ieq = 1; ieq <= (int)nelem - 1; ieq++) {
-            vpoly.push_back([this, it, ix, ieq](xvector<double> xvar) {return getProbabilityConstraint(it, ix, ieq, 0, xvar);});
-            for (int ideq = 1; ideq <= (int)nelem - 1; ideq++) {
-              vdpoly.push_back([this, it, ix, ieq, ideq](xvector<double> xvar) {return getProbabilityConstraint(it, ix, ieq, ideq, xvar);});
-            }
-            jac.push_back(vdpoly);
-            vdpoly.clear();
-          }
-          if (LDEBUG) {cerr << __AFLOW_FUNC__ << " it=" << it << " ix=" << ix << endl;}
-          found_soln = aurostd::findZeroDeflation(soln0.getcol(ix), vpoly, jac, msoln);
-          if (LDEBUG) {cerr << __AFLOW_FUNC__ << "   exist=" << found_soln << " | real roots=" << endl << msoln << endl;}
-          if (found_soln) { // if solution is found, it must also be positive, real, and finite
-            for (int isol = msoln.lcols; isol <= msoln.ucols; isol++) {
-              found_soln = true;
-              for (int ieq = 1; ieq <= (int)nelem - 1 && found_soln; ieq++) {
-                found_soln = !(msoln.getcol(isol)(ieq) <= 0.0);
-              }
-              if (found_soln) {
-                soln = msoln.getcol(isol);
-                break;
-              }
-            }
-          }
-          if (!found_soln) {
-            message << " Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]" << endl;
-            pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-            return;
-          }
-          soln0.setcol(soln, ix); // use the higher temperature solution as an initial guess for lower temperature solution
-          for (int ic = prob_ideal_cluster.lcols; ic <= prob_ideal_cluster.ucols; ic++) {
-            prob_cluster[it - 1](ix, ic) = prob_ideal_cluster(ix, ic) * std::exp(-beta(it) * excess_energy_cluster(ic)) * 
-                                          aurostd::elements_product(aurostd::pow(soln, num_elem_cluster.getxvec(ic, ic, 1, nelem - 1)));
-          }
-          prob_cluster[it - 1].setmat(prob_cluster[it - 1].getxmat(ix, ix, prob_ideal_cluster.lcols, prob_ideal_cluster.ucols) / 
-                                      aurostd::sum(prob_cluster[it - 1].getxmat(ix, ix, prob_ideal_cluster.lcols, prob_ideal_cluster.ucols)), ix, 1); // normalize sum to 1
-          pflow::updateProgressBar((temp.urows - it) * prob_ideal_cluster.rows + (ix - prob_ideal_cluster.lrows) + 1, temp.rows * prob_ideal_cluster.rows, *p_oss);
-        }
+#ifdef AFLOW_MULTITHREADS_ENABLE
+        xt.run(prob_ideal_cluster.rows, calculateProbabilityClusterND_MT, it);
+#else
+        for (int iix = 0; iix < prob_ideal_cluster.rows; iix++) {calculateProbabilityClusterND(iix, it);}
+#endif
+        pflow::updateProgressBar(temp.urows - it + 1, temp.rows, *p_oss);
       }
     }
   }
@@ -1310,11 +1345,17 @@ namespace qca {
     double dtemp = temp(2) - temp(1);
     message << "Checking for physical probabilites at equi-composition";
     pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-    calculateProbabilityCluster();
-    while (!found_soln && aurostd::min(temp) < DEFAULT_QCA_TEMP_MIN_LIMIT) {
-      temp += dtemp;
-      beta = aurostd::pow(KBOLTZEV * temp, -1.0);
-      calculateProbabilityCluster();
+    while (aurostd::min(temp) < DEFAULT_QCA_TEMP_MIN_LIMIT) {
+      try {
+        calculateProbabilityCluster();
+        break;
+      }
+      catch (aurostd::xerror& err) {
+        message << "Could not find physical solution at equi-concentration, increasing the temperature range";
+        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        temp += dtemp;
+        beta = aurostd::pow(KBOLTZEV * temp, -1.0);
+      }
     }
     if (aurostd::min(temp) > DEFAULT_QCA_TEMP_MIN_LIMIT) {
       message << "Could not find a temperature at equi-concentration that leads to a physical solution";

@@ -685,6 +685,15 @@ namespace xthread {
   >(int, std::function<void(int)>&
   );
 
+  //qca::QuasiChemApproxCalculator::calculateProbabilityCluster1D
+  //qca::QuasiChemApproxCalculator::calculateProbabilityClusterND
+  template void xThread::run<
+    std::function<void(int, int&)>,
+    int
+  >(int, std::function<void(int, int&)>&,
+    int&
+  );
+
   //lambda function inside aurostd::multithread_execute
   template void xThread::run<
     deque<string>,

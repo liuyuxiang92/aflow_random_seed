@@ -94,8 +94,8 @@ namespace qca {
       unsigned long int nelem;
       unsigned long int ncluster; // DIM: Nc
       unsigned long int nconc; // DIM: Nx
-      bool found_soln;
       xvector<double> beta; // UNIT: unitless | DIM: Nt
+      xmatrix<double> soln0;
 
       void readQCAFlags(const aurostd::xoption& qca_flags);
       string getLatForATAT(bool scale=false);
@@ -115,13 +115,14 @@ namespace qca {
       void calculateTemperatureRange();
       void calculateProbabilityIdealCluster();
       void checkProbabilityIdeal();
+      void calculateProbabilityCluster1D(int iix, int it);
+      void calculateProbabilityClusterND(int iix, int it);
       void calculateProbabilityCluster();
       double getProbabilityConstraint(const int it, const int ix, const int ie, const int ideq, const xvector<double>& xvar);
       void checkProbabilityEquilibrium();
       void calculateRelativeEntropyEC();
       void calculateRelativeEntropy();
       void calculateBinodalCurve();
-
   };
 }
 
