@@ -102,6 +102,10 @@ namespace qca {
     lat_atat = "";
     vstr_ce.clear();
     mapstr.clear();
+    nelem = 0;
+    ncluster = 0;
+    nconc = 0;
+    found_soln = false;
     cv_cluster = 0.0;
     num_atom_cluster.clear();
     degeneracy_cluster.clear();
@@ -145,6 +149,10 @@ namespace qca {
     lat_atat = b.lat_atat;
     vstr_ce = b.vstr_ce;
     mapstr = b.mapstr;
+    nelem = b.nelem;
+    ncluster = b.ncluster;
+    nconc = b.nconc;
+    found_soln = b.found_soln;
     cv_cluster = b.cv_cluster;
     num_atom_cluster = b.num_atom_cluster;
     degeneracy_cluster = b.degeneracy_cluster;
@@ -590,7 +598,7 @@ namespace qca {
     double alat = 0.0;
     for (size_t i = 0; i < nelem; i++) {alat += GetAtomRadiusCovalent(elements[i]);}
     alat /= nelem;
-    xmatrix<double> lattice(3,3);
+    xmatrix<double> lattice(3, 3);
     xvector<double> angles = 90.0 * aurostd::ones_xv<double>(3);
     xvector<double> coorsys = aurostd::ones_xv<double>(3);
     oss.precision(_DOUBLE_WRITE_PRECISION_MAX_);
