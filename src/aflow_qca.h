@@ -98,7 +98,7 @@ namespace qca {
       xvector<double> beta; // UNIT: unitless | DIM: Nt
 
       void readQCAFlags(const aurostd::xoption& qca_flags);
-      string createLatForATAT(bool scale=false);
+      string getLatForATAT(bool scale=false);
       void readAFLOWXstructures();
       vector<xstructure> getAFLOWXstructuresCustom();
       vector<xstructure> getATATXstructures(const int max_num_atoms=0, bool fromfile=false);

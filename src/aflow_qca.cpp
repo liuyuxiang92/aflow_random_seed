@@ -384,10 +384,10 @@ namespace qca {
     }
     else { // run ATAT
       readAFLOWXstructures();
-      lat_atat = createLatForATAT(); // unscaled
+      lat_atat = getLatForATAT(); // unscaled
       vstr_ce = getATATXstructures(max_num_atoms);
       calculateMapForXstructures(getATATXstructures(aflow_max_num_atoms), vstr_aflow); // map ATAT xstrs to AFLOW xstrs because ATAT cannot identify AFLOW xstrs
-      lat_atat = createLatForATAT(true); // scaled
+      lat_atat = getLatForATAT(true); // scaled
       generateFilesForATAT();
       runATAT();
     }
@@ -585,7 +585,7 @@ namespace qca {
   ///
   /// @authors
   /// @mod{SD,20220718,created function}
-  string QuasiChemApproxCalculator::createLatForATAT(bool scale) {
+  string QuasiChemApproxCalculator::getLatForATAT(bool scale) {
     stringstream oss;
     double alat = 0.0;
     for (size_t i = 0; i < nelem; i++) {alat += GetAtomRadiusCovalent(elements[i]);}
