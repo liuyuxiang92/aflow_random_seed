@@ -434,61 +434,100 @@ namespace qca {
   /// @mod{SD,20220718,created function}
   void QuasiChemApproxCalculator::readAFLOWXstructures() {
     stringstream message;
-    vector<string> vstrlabel;
-    string aflowlib, aflowurl;
-    string alloyname_PBE = "";
+    vector<string> vstr_aflowlib, vstr_aflowurl;
+    string alloyname_PBE = "", aflowlib = "", aflowurl = "";
     aflowlib::_aflowlib_entry entry;
     stringstream oss;
-    for (uint i = 0; i < nelem; i++) {alloyname_PBE += AVASP_Get_PseudoPotential_PAW_PBE(elements[i]);}
-    aflowlib = "/common/LIB" + aurostd::utype2string<uint>(nelem) + "/RAW/" + alloyname_PBE;
-    aflowurl = "aflowlib.duke.edu:AFLOWDATA/LIB" + aurostd::utype2string<uint>(nelem) + "_RAW/" + alloyname_PBE;
-    if (plattice == "fcc") {
-      if (nelem >= 2) {
-        for (uint i = 1; i < 30; i++) {vstrlabel.push_back(aurostd::utype2string<uint>(i));}
-      }
-      if (nelem >= 3) {
-        vstrlabel.push_back("TFCC001.ABC"); vstrlabel.push_back("TFCC002.ABC"); vstrlabel.push_back("TFCC003.ABC");
-        for (uint i = 4; i < 17; i++) {
-          vstrlabel.push_back("TFCC00" + aurostd::utype2string<uint>(i) + ".ABC");
-          vstrlabel.push_back("TFCC00" + aurostd::utype2string<uint>(i) + ".BCA");
-          vstrlabel.push_back("TFCC00" + aurostd::utype2string<uint>(i) + ".CAB");
+    aurostd::xcombos xc;
+    vector<string> elements_xc;
+    vector<int> index_xc;
+    for (uint ialloy = 2; ialloy <= 3; ialloy++) { // AFLOW database only contains data for binaries and ternaries
+      xc = aurostd::xcombos(elements.size(), ialloy, 'C');
+      while (xc.increment()) {
+        elements_xc.clear();
+        index_xc = xc.getCombo();
+        for (size_t i = 0; i < index_xc.size(); i++) {
+          if (index_xc[i] == 1) {elements_xc.push_back(elements[i]);}
         }
-      }
-    }
-    else if (plattice == "bcc") {
-      if (nelem >= 2) {
-        for (uint i = 58; i < 87; i++) {vstrlabel.push_back(aurostd::utype2string<uint>(i));}
-      }
-      if (nelem >= 3) {
-        vstrlabel.push_back("TBCC001.ABC"); vstrlabel.push_back("TBCC002.ABC"); vstrlabel.push_back("TBCC003.ABC");
-        for (uint i = 4; i < 17; i++) {
-          vstrlabel.push_back("TBCC00" + aurostd::utype2string<uint>(i) + ".ABC");
-          vstrlabel.push_back("TBCC00" + aurostd::utype2string<uint>(i) + ".BCA");
-          vstrlabel.push_back("TBCC00" + aurostd::utype2string<uint>(i) + ".CAB");
+        aurostd::sort(elements_xc);
+        alloyname_PBE = "";
+        for (size_t i = 0; i < elements_xc.size(); i++) {alloyname_PBE += AVASP_Get_PseudoPotential_PAW_PBE(elements_xc[i]);}
+        aflowlib = "/common/LIB" + aurostd::utype2string<uint>(ialloy) + "/RAW/" + alloyname_PBE;
+        aflowurl = "aflowlib.duke.edu:AFLOWDATA/LIB" + aurostd::utype2string<uint>(ialloy) + "_RAW/" + alloyname_PBE;
+        if (plattice == "fcc") {
+          if (ialloy == 2) {
+            for (uint i = 1; i < 30; i++) {
+              vstr_aflowlib.push_back(aflowlib + "/" + aurostd::utype2string<uint>(i) + "/aflowlib.out");
+              vstr_aflowurl.push_back(aflowurl + "/" + aurostd::utype2string<uint>(i));
+            }
+          }
+          if (ialloy == 3) {
+            vstr_aflowlib.push_back(aflowlib + "/" + "TFCC001.ABC" + "/aflowlib.out");
+            vstr_aflowurl.push_back(aflowurl + "/" + "TFCC001.ABC");
+            vstr_aflowlib.push_back(aflowlib + "/" + "TFCC002.ABC" + "/aflowlib.out");
+            vstr_aflowurl.push_back(aflowurl + "/" + "TFCC002.ABC");
+            vstr_aflowlib.push_back(aflowlib + "/" + "TFCC003.ABC" + "/aflowlib.out");
+            vstr_aflowurl.push_back(aflowurl + "/" + "TFCC003.ABC");
+            for (uint i = 4; i < 17; i++) {
+              vstr_aflowlib.push_back(aflowlib + "/" + "TFCC00" + aurostd::utype2string<uint>(i) + ".ABC" + "/aflowlib.out");
+              vstr_aflowurl.push_back(aflowurl + "/" + "TFCC00" + aurostd::utype2string<uint>(i) + ".ABC");
+              vstr_aflowlib.push_back(aflowlib + "/" + "TFCC00" + aurostd::utype2string<uint>(i) + ".BCA" + "/aflowlib.out");
+              vstr_aflowurl.push_back(aflowurl + "/" + "TFCC00" + aurostd::utype2string<uint>(i) + ".BCA");
+              vstr_aflowlib.push_back(aflowlib + "/" + "TFCC00" + aurostd::utype2string<uint>(i) + ".CAB" + "/aflowlib.out");
+              vstr_aflowurl.push_back(aflowurl + "/" + "TFCC00" + aurostd::utype2string<uint>(i) + ".CAB");
+            }
+          }
         }
-      }
-    }
-    else if (plattice == "hcp") {
-      if (nelem >= 2) {
-        for (uint i = 115; i < 178; i++) {vstrlabel.push_back(aurostd::utype2string<uint>(i));}
+        else if (plattice == "bcc") {
+          if (ialloy == 2) {
+            for (uint i = 58; i < 87; i++) {
+              vstr_aflowlib.push_back(aflowlib + "/" + aurostd::utype2string<uint>(i) + "/aflowlib.out");
+              vstr_aflowurl.push_back(aflowurl + "/" + aurostd::utype2string<uint>(i));
+            }
+          }
+          if (ialloy == 3) {
+            vstr_aflowlib.push_back(aflowlib + "/" + "TBCC001.ABC" + "/aflowlib.out");
+            vstr_aflowurl.push_back(aflowurl + "/" + "TBCC001.ABC");
+            vstr_aflowlib.push_back(aflowlib + "/" + "TBCC002.ABC" + "/aflowlib.out");
+            vstr_aflowurl.push_back(aflowurl + "/" + "TBCC002.ABC");
+            vstr_aflowlib.push_back(aflowlib + "/" + "TBCC003.ABC" + "/aflowlib.out");
+            vstr_aflowurl.push_back(aflowurl + "/" + "TBCC003.ABC");
+            for (uint i = 4; i < 17; i++) {
+              vstr_aflowlib.push_back(aflowlib + "/" + "TBCC00" + aurostd::utype2string<uint>(i) + ".ABC" + "/aflowlib.out");
+              vstr_aflowurl.push_back(aflowurl + "/" + "TBCC00" + aurostd::utype2string<uint>(i) + ".ABC");
+              vstr_aflowlib.push_back(aflowlib + "/" + "TBCC00" + aurostd::utype2string<uint>(i) + ".BCA" + "/aflowlib.out");
+              vstr_aflowurl.push_back(aflowurl + "/" + "TBCC00" + aurostd::utype2string<uint>(i) + ".BCA");
+              vstr_aflowlib.push_back(aflowlib + "/" + "TBCC00" + aurostd::utype2string<uint>(i) + ".CAB" + "/aflowlib.out");
+              vstr_aflowurl.push_back(aflowurl + "/" + "TBCC00" + aurostd::utype2string<uint>(i) + ".CAB");
+            }
+          }
+        }
+        else if (plattice == "hcp") {
+          if (ialloy == 2) {
+            for (uint i = 115; i < 178; i++) {
+              vstr_aflowlib.push_back(aflowlib + "/" + aurostd::utype2string<uint>(i) + "/aflowlib.out");
+              vstr_aflowurl.push_back(aflowurl + "/" + aurostd::utype2string<uint>(i));
+            }
+          }
+        }
       }
     }
     message << "Reading AFLOW xstructures from AFLOW database";
     pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-    for (size_t i = 0; i < vstrlabel.size(); i++) {
-        entry.Load(aurostd::file2string(aflowlib + "/" + vstrlabel[i] + "/aflowlib.out"), oss);
+    for (size_t i = 0; i < vstr_aflowlib.size(); i++) {
+        entry.Load(aurostd::file2string(vstr_aflowlib[i]), oss);
         if (pflow::loadXstructures(entry, oss, false)) { // initial = unrelaxed; final = relaxed
-          entry.aurl = aflowurl + "/" + vstrlabel[i];
+          entry.aurl = vstr_aflowurl[i];
           entry.vstr[0].qm_E_cell = entry.enthalpy_cell; // ATAT needs energy per cell
           if (use_sg && (entry.spacegroup_orig == entry.spacegroup_relax)) {
             vstr_aflow.push_back(entry.vstr[0]);
           }
-          else if (compare::structuresMatch(entry.vstr[0], entry.vstr.back(), true, true, false)) {
+          else {
             vstr_aflow.push_back(entry.vstr[0]);
           }
         }
         entry.clear();
-        pflow::updateProgressBar(i, vstrlabel.size() - 1, *p_oss);
+        pflow::updateProgressBar(i, vstr_aflowlib.size() - 1, *p_oss);
     }
     if (!aflowlibpath.empty()) {
       vector<xstructure> vstr = getAFLOWXstructuresCustom();
@@ -527,7 +566,7 @@ namespace qca {
       if (use_sg && (entry.spacegroup_orig == entry.spacegroup_relax)) {
         vstr.push_back(entry.vstr[0]);
       }
-      else if (compare::structuresMatch(entry.vstr[0], entry.vstr.back(), true, true, false)) {
+      else {
         vstr.push_back(entry.vstr[0]);
       }
       entry.clear();
@@ -731,11 +770,11 @@ namespace qca {
   /// @authors
   /// @mod{SD,20220718,created function}
   void QuasiChemApproxCalculator::generateFilesForATAT() {
-    stringstream oss;
-    // Generate lat.in file
-    aurostd::string2file(lat_atat, rundirpath + "/lat.in");
-    // Generate str.out and energy files
+    stringstream message, oss;
+    aurostd::string2file(lat_atat, rundirpath + "/lat.in"); // generate lat.in file
     uint msize = mapstr.size();
+    message << "Generating ATAT files";
+    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     for (size_t i = 0; i < vstr_ce.size(); i++) {
       aurostd::DirectoryMake(rundirpath + "/" + aurostd::utype2string<uint>(i));
       oss << vstr_ce[i];
@@ -744,6 +783,7 @@ namespace qca {
       if (i < msize && mapstr[i] != -1) {
         aurostd::string2file(aurostd::utype2string<double>(vstr_aflow[mapstr[i]].qm_E_cell) + "\n", rundirpath + "/" + aurostd::utype2string<uint>(i) + "/energy");
       }
+      pflow::updateProgressBar(i, vstr_ce.size() - 1, *p_oss);
     }
   }
 
