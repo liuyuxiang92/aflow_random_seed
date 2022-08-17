@@ -103,6 +103,7 @@ namespace qca {
     lat_atat = "";
     vstr_ce.clear();
     mapstr.clear();
+    skipstr.clear();
     nelem = 0;
     ncluster = 0;
     nconc = 0;
@@ -150,6 +151,7 @@ namespace qca {
     lat_atat = b.lat_atat;
     vstr_ce = b.vstr_ce;
     mapstr = b.mapstr;
+    skipstr = b.skipstr;
     nelem = b.nelem;
     ncluster = b.ncluster;
     nconc = b.nconc;
@@ -946,6 +948,24 @@ namespace qca {
     excess_energy_cluster = v2;
   }
 
+  /// @brief calculates the degeneracy of a particular cluster
+  ///
+  /// @param it iterator of xstructures to compare
+  /// @param ib begin iterator of xstructures to compare
+  /// @param ic index of the cluster
+  ///
+  /// @note helper function for parallelization
+  ///
+  /// @authors
+  /// @mod{SD,20220718,created function}
+  void QuasiChemApproxCalculator::calculateDegeneracyClusterSingle(vector<xstructure>::iterator& it, const vector<xstructure>::iterator& ib, const unsigned long int ic) {
+    unsigned long int i = it - ib;
+    if (skipstr(i + 1) == 0 && compare::structuresMatch(vstr_ce[ic], *it, true, true, false)) {
+      degeneracy_cluster(ic + 1) += pocc::getDGFromXStructureTitle((*it).title);
+      skipstr(i + 1) = 1;
+    }
+  }
+
   /// @brief calculates the cluster degeneracy
   ///
   /// @authors
@@ -1051,25 +1071,20 @@ namespace qca {
     // Find degenerate structures
     message << "Finding the degeneracy of clusters";
     pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-    // Shuffling the xstructures is important because it can avoid edge case scenarios where the reference centroid
-    // in Xtalfinder does not pick up the proper neighbors
-    vector<uint> index;
-    for (size_t i = 0; i < ncluster; i++) {index.push_back(i);}
-    aurostd::random_shuffle(index);
-    for (size_t i = 0; i < index.size(); i++) {_vstr_ce[i] = vstr_ce[index[i]];}
-    vstr_ds.insert(vstr_ds.begin(), _vstr_ce.begin(), _vstr_ce.end()); // concatenate xstructures
-    XtalFinderCalculator xtal_calc;
-    vector<vector<uint>> vindex = xtal_calc.groupSimilarXstructures(vstr_ds); // costly part of the function
-    for (size_t i = 0; i < vindex.size(); i++) {
-      std::sort(vindex[i].begin(), vindex[i].end()); // first index is the cluster index
-      if (vindex[i][0] < ncluster) {
-        for (size_t j = 1; j < vindex[i].size(); j++) {
-          degeneracy_cluster(vindex[i][0] + 1) += pocc::getDGFromXStructureTitle(vstr_ds[vindex[i][j]].title);
-        }
-      }
+    skipstr = xvector<int>(vstr_ds.size());
+    vector<xstructure>::iterator ib = vstr_ds.begin();
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    xthread::xThread xt;
+    std::function<void(vector<xstructure>::iterator&, const vector<xstructure>::iterator&, const unsigned long int&)> calculateDegeneracyClusterSingle_MT = std::bind(&QuasiChemApproxCalculator::calculateDegeneracyClusterSingle, this, _1, _2, _3);
+#endif
+    for (size_t i = 0; i < vstr_ce.size(); i++) {
+#ifdef AFLOW_MULTITHREADS_ENABLE
+      xt.run(vstr_ds, calculateDegeneracyClusterSingle_MT, ib, i);
+#else
+      for (vector<xstructure>::iterator it = vstr_ds.begin(); it != vstr_ds.end(); it++) {calculateDegeneracyClusterSingle(it, ib, i);}
+#endif
+      pflow::updateProgressBar(i, vstr_ce.size() - 1, *p_oss);
     }
-    xvector<long int> _degeneracy_cluster = degeneracy_cluster;
-    for (size_t i = 0; i < index.size(); i++) {degeneracy_cluster(index[i] + 1) = _degeneracy_cluster(i + 1);} // reorder back to the original
     sum_calculated = aurostd::sum(degeneracy_cluster);
     if (!aurostd::isequal(sum_calculated, sum_accepted)) {
       message << "Degeneracies do not satisfy the sum rule, the sum is " << sum_calculated << " but should be " << sum_accepted;
@@ -1181,9 +1196,11 @@ namespace qca {
   /// @param iix shifted concentration index
   /// @param it temperature index
   ///
+  /// @note helper function for parallelization
+  ///
   /// @authors
   /// @mod{SD,20220812,created function}
-  void QuasiChemApproxCalculator::calculateProbabilityCluster1D(int iix, int it) {
+  void QuasiChemApproxCalculator::calculateProbabilityCluster1D(int iix, const int it) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     int ix = iix + prob_ideal_cluster.lrows;
     xvector<double> soln(nelem - 1), p(max_num_atoms + 1), rr(max_num_atoms), ri(max_num_atoms);
@@ -1222,9 +1239,11 @@ namespace qca {
   /// @param iix shifted concentration index
   /// @param it temperature index
   ///
+  /// @note helper function for parallelization
+  ///
   /// @authors
   /// @mod{SD,20220812,created function}
-  void QuasiChemApproxCalculator::calculateProbabilityClusterND(int iix, int it) {
+  void QuasiChemApproxCalculator::calculateProbabilityClusterND(int iix, const int it) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     int ix = iix + prob_ideal_cluster.lrows;
     xvector<double> soln(nelem - 1);
@@ -1277,8 +1296,8 @@ namespace qca {
     stringstream message;
 #ifdef AFLOW_MULTITHREADS_ENABLE
     xthread::xThread xt;
-    std::function<void(int, int&)> calculateProbabilityCluster1D_MT = std::bind(&QuasiChemApproxCalculator::calculateProbabilityCluster1D, this, _1, _2);
-    std::function<void(int, int&)> calculateProbabilityClusterND_MT = std::bind(&QuasiChemApproxCalculator::calculateProbabilityClusterND, this, _1, _2);
+    std::function<void(int, const int&)> calculateProbabilityCluster1D_MT = std::bind(&QuasiChemApproxCalculator::calculateProbabilityCluster1D, this, _1, _2);
+    std::function<void(int, const int&)> calculateProbabilityClusterND_MT = std::bind(&QuasiChemApproxCalculator::calculateProbabilityClusterND, this, _1, _2);
 #endif
     prob_cluster.clear();
     prob_cluster.assign(temp.rows, xmatrix<double>(nconc, ncluster)); // initialize

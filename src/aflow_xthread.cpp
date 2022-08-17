@@ -688,9 +688,9 @@ namespace xthread {
   //qca::QuasiChemApproxCalculator::calculateProbabilityCluster1D
   //qca::QuasiChemApproxCalculator::calculateProbabilityClusterND
   template void xThread::run<
-    std::function<void(int, int&)>,
+    std::function<void(int, const int&)>,
     int
-  >(int, std::function<void(int, int&)>&,
+  >(int, std::function<void(int, const int&)>&,
     int&
   );
 
@@ -812,6 +812,19 @@ namespace xthread {
   >(uint, std::function<void(uint, vector<StructurePrototype>&, const aurostd::xoption&)>&,
     vector<StructurePrototype>&,
     aurostd::xoption&
+  );
+
+  //QuasiChemApproxCalculator::calculateDegeneracyClusterSingle
+  template void xThread::run<
+    vector<xstructure>,
+    std::function<void(vector<xstructure>::iterator&, const vector<xstructure>::iterator&, const unsigned long int&)>,
+    vector<xstructure>::iterator,
+    unsigned long int
+  >(
+    vector<xstructure>&,
+    std::function<void(vector<xstructure>::iterator&, const vector<xstructure>::iterator&, const unsigned long int&)>&,
+    vector<xstructure>::iterator&,
+    unsigned long int&
   );
 
   //aflowlib::AflowDB::createTable

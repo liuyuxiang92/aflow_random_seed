@@ -91,6 +91,7 @@ namespace qca {
       string lat_atat;
       vector<xstructure> vstr_ce;
       vector<int> mapstr;
+      xvector<int> skipstr;
       unsigned long int nelem;
       unsigned long int ncluster; // DIM: Nc
       unsigned long int nconc; // DIM: Nx
@@ -110,13 +111,14 @@ namespace qca {
       void calculateConcentrationCluster();
       void readExcessEnergyCluster();
       void setCongruentClusters();
+      void calculateDegeneracyClusterSingle(vector<xstructure>::iterator& it, const vector<xstructure>::iterator& ib, const unsigned long int ic);
       void calculateDegeneracyCluster();
       void calculateConcentrationMacro();
       void calculateTemperatureRange();
       void calculateProbabilityIdealCluster();
       void checkProbabilityIdeal();
-      void calculateProbabilityCluster1D(int iix, int it);
-      void calculateProbabilityClusterND(int iix, int it);
+      void calculateProbabilityCluster1D(int iix, const int it);
+      void calculateProbabilityClusterND(int iix, const int it);
       void calculateProbabilityCluster();
       double getProbabilityConstraint(const int it, const int ix, const int ie, const int ideq, const xvector<double>& xvar);
       void checkProbabilityEquilibrium();
