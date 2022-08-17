@@ -53,6 +53,55 @@ bool AFLOWLIB_VERBOSE=TRUE; // FALSE;
 using aurostd::FileExist;
 
 // ***************************************************************************
+// XPLUG/XUPDATE STUFF
+namespace aflowlib {  //CO20210302
+  //--------------------------------------------------------------------------------
+  // constructor
+  //--------------------------------------------------------------------------------
+  ARun::ARun(const string& dir,ostream& oss) : xStream(oss),m_initialized(false) {initialize(dir);}
+  ARun::ARun(const string& dir,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_initialized(false) {initialize(dir);}
+  ARun::ARun(const ARun& b) : xStream(*b.getOFStream(),*b.getOSS()) {copy(b);} // copy PUBLIC
+  
+  ARun::~ARun() {xStream::free();free();}
+
+  const ARun& ARun::operator=(const ARun& other) {
+    if(this!=&other) {copy(other);}
+    return *this;
+  }
+  
+  void ARun::clear() {free();}  //clear PUBLIC
+  
+  void ARun::free() {
+    m_initialized=false;
+    m_dir.clear();
+    m_aflowin.clear();
+    m_LOCK.clear();
+    m_completed=false;
+  }
+  
+  void ARun::copy(const ARun& b) {  //copy PRIVATE
+    xStream::copy(b);
+    m_initialized=b.m_initialized;
+    m_dir=b.m_dir;
+    m_aflowin=b.m_aflowin;
+    m_LOCK=b.m_LOCK;
+    m_completed=b.m_completed;
+  }
+
+  bool ARun::initialize(const string& dir) {
+    m_dir=dir;
+    m_initialized=(!m_dir.empty());
+
+    vector<string> vaflowins,vLOCKs;
+    aurostd::string2tokens("aflow.in,"+_AFLOWIN_AGL_DEFAULT_+",",vaflowins,",");
+    return true;
+  }
+
+}
+
+// ***************************************************************************
+
+// ***************************************************************************
 // aflowlib::TokenPresentAFLOWLIB
 // ***************************************************************************
 namespace aflowlib {
@@ -7550,7 +7599,7 @@ namespace aflowlib {
     vector<string> vAflowInName, vFileLockName;
 
     //[CO20200624 - OBSOLETE]if(pocc::structuresGenerated(directory_LIB)){KBIN::VASP_RunPOCC(directory_LIB);}  //CO20200624
-    //[CO20200624 - OBSOLETE]else if(aurostd::FileExist(directory_LIB+"/agl_aflow.in"))
+    //[CO20200624 - OBSOLETE]else if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_AGL_DEFAULT_))
     if(pocc::structuresGenerated(directory_LIB)){ //CO20200624
       run_directory=true;
       if(LDEBUG){cerr << soliloquy << " FOUND POCC" << endl;}
@@ -7578,7 +7627,7 @@ namespace aflowlib {
         vFileLockName.push_back(FileLockName);
       }
     } else {
-      // [OBSOLETE] else if(aurostd::FileExist(directory_LIB+"/agl_aflow.in"))
+      // [OBSOLETE] else if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_AGL_DEFAULT_))
       AGL_functions::AGL_Get_AflowInName(AflowInName, directory_LIB, agl_aflowin_found); //CT20200713 Call function to find correct aflow.in file name  //CO20210204 - fix aflow.in.xz inside
       if (agl_aflowin_found) {
         run_directory=true;
@@ -7601,7 +7650,7 @@ namespace aflowlib {
           aurostd::RemoveFile(directory_LIB+"/AEL_elastic_tensor.json"+XHOST.vext.at(iext));
           aurostd::RemoveFile(directory_LIB+"/AEL_energy_structures.json"+XHOST.vext.at(iext));
         }
-        // CORMAC FIX BELOW I NEED TO COMMENT TO RUN THE agl_aflow.in containing only statics.
+        // CORMAC FIX BELOW I NEED TO COMMENT TO RUN THE _AFLOWIN_AGL_DEFAULT_ containing only statics.
         FileLockName = "agl.LOCK";  //CO20210204 - reset from before
         if(aurostd::EFileExist(directory_LIB+"/"+FileLockName,stmp)&&aurostd::IsCompressed(stmp)){aurostd::UncompressFile(stmp);} //CO20210204 - fix LOCK.xz
         //[CO20210204 - OBSOLETE, force it to be agl.LOCK]if(aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
@@ -7610,8 +7659,8 @@ namespace aflowlib {
         //[CO20210204 - OBSOLETE, force it to be agl.LOCK]  // [OBSOLETE] aurostd::RemoveFile(directory_LIB+"/agl.LOCK");   //ME20191105 - otherwise aflow will not run
         //[CO20210204 - OBSOLETE, force it to be agl.LOCK]  FileLockName = "agl.LOCK";
         //[CO20210204 - OBSOLETE, force it to be agl.LOCK]}
-        // [OBSOLETE] if(aurostd::FileExist(directory_LIB+"/agl_aflow.in")) {
-        // [OBSOLETE]  AflowInName="agl_aflow.in";
+        // [OBSOLETE] if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_AGL_DEFAULT_)) {
+        // [OBSOLETE]  AflowInName=_AFLOWIN_AGL_DEFAULT_;
         // [OBSOLETE] }
 
         // AS20200904
@@ -7639,8 +7688,8 @@ namespace aflowlib {
           //[CO20210204 - OBSOLETE, force it to be ael.LOCK]  //[CO20200624 - do later]aurostd::RemoveFile(directory_LIB+"/ael.LOCK");   //ME20191105 - otherwise aflow will not run
           //[CO20210204 - OBSOLETE, force it to be ael.LOCK]  FileLockName = "ael.LOCK";
           //[CO20210204 - OBSOLETE, force it to be ael.LOCK]}
-          // [OBSOLETE] if(aurostd::FileExist(directory_LIB+"/ael_aflow.in")) {
-          // [OBSOLETE]  AflowInName="ael_aflow.in";
+          // [OBSOLETE] if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_AEL_DEFAULT_)) {
+          // [OBSOLETE]  AflowInName=_AFLOWIN_AEL_DEFAULT_;
           // [OBSOLETE] }
 
           // AS20200904
@@ -7712,9 +7761,9 @@ namespace aflowlib {
     //[CO20200624 - OBSOLETE]KBIN::VASP_RunPhonons_AGL_postprocess(directory_LIB, AflowInName, FileLockName); //CT20200624 
     //[CO20200624 - OBSOLETE]KBIN::VASP_RunPhonons_AEL_postprocess(directory_LIB, AflowInName, FileLockName); //CT20200624
     // [OBSOLETE] if (XHOST.QUIET) {      //CT20190903
-    // [OBSOLETE]   aurostd::execute("aflow --use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK --force --run=0 --postprocess --quiet -D \""+directory_LIB+"\""); // do not mess up subdirectories
+    // [OBSOLETE]   aurostd::execute("aflow --use_aflow.in="+_AFLOWIN_AGL_DEFAULT_+" --use_LOCK=agl.LOCK --force --run=0 --postprocess --quiet -D \""+directory_LIB+"\""); // do not mess up subdirectories
     // [OBSOLETE] } else {
-    // [OBSOLETE]   aurostd::execute("aflow --use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK --force --run=0 --postprocess -D \""+directory_LIB+"\"");	
+    // [OBSOLETE]   aurostd::execute("aflow --use_aflow.in="+_AFLOWIN_AGL_DEFAULT_+" --use_LOCK=agl.LOCK --force --run=0 --postprocess -D \""+directory_LIB+"\"");	
     // [OBSOLETE] }
 
     //KBIN::RUN_Directory() should be used instead of individual post-processing functions

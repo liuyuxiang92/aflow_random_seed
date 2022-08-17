@@ -237,8 +237,8 @@ namespace aflowlib {
                   ossLIB2AUID << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --lib2auid=\"" << directory_LIB << "\"" << endl;
                   fixes++;
                 }
-                //	  if(_AFLOWIN_=="agl_aflow.in" && !aurostd::FileExist(directory_LIB+"/LOCK") && aurostd::FileExist(directory_LIB+"/agl.LOCK"))
-                if(_AFLOWIN_=="agl_aflow.in" && aurostd::FileExist(directory_LIB+"/agl.LOCK")) 
+                //	  if(_AFLOWIN_==_AFLOWIN_AGL_DEFAULT_ && !aurostd::FileExist(directory_LIB+"/LOCK") && aurostd::FileExist(directory_LIB+"/agl.LOCK"))
+                if(_AFLOWIN_==_AFLOWIN_AGL_DEFAULT_ && aurostd::FileExist(directory_LIB+"/agl.LOCK")) 
                 { //CO20200106 - patching for auto-indenting
                   ossLIB2AUID << "aflow "<< "--use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK " << " --lib2auid=\"" << directory_LIB << "\"" << endl;
                   fixes++;
@@ -256,8 +256,8 @@ namespace aflowlib {
                 ossLIB2RAW << "aflow "<< "--use_aflow.in=" << _AFLOWIN_ << " --beep --force --showPID --lib2raw=\"" << directory_LIB << "\"" << endl;
                 fixes++;
               }
-              //	  if(_AFLOWIN_=="agl_aflow.in" && !aurostd::FileExist(directory_LIB+"/LOCK") && aurostd::FileExist(directory_LIB+"/agl.LOCK"))
-              if(_AFLOWIN_=="agl_aflow.in" && aurostd::FileExist(directory_LIB+"/agl.LOCK")) 
+              //	  if(_AFLOWIN_==_AFLOWIN_AGL_DEFAULT_ && !aurostd::FileExist(directory_LIB+"/LOCK") && aurostd::FileExist(directory_LIB+"/agl.LOCK"))
+              if(_AFLOWIN_==_AFLOWIN_AGL_DEFAULT_ && aurostd::FileExist(directory_LIB+"/agl.LOCK")) 
               { //CO20200106 - patching for auto-indenting
                 ossLIB2RAW << "aflow "<< "--use_aflow.in=agl_aflow.in --use_LOCK=agl.LOCK " << " --beep --force --showPID --lib2raw=\"" << directory_LIB << "\"" << endl;
                 fixes++;
@@ -313,8 +313,8 @@ namespace aflowlib {
           }
 
           // check AGL_FIX
-          if(aurostd::FileExist(directory_LIB+"/agl_aflow.in") && aurostd::FileExist(directory_LIB+"/LOCK") && !aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
-            listAGL2FIX.push_back(directory_LIB+"/agl_aflow.in");
+          if(aurostd::FileExist(directory_LIB+"/"+_AFLOWIN_AGL_DEFAULT_) && aurostd::FileExist(directory_LIB+"/LOCK") && !aurostd::FileExist(directory_LIB+"/agl.LOCK")) {
+            listAGL2FIX.push_back(directory_LIB+"/"+_AFLOWIN_AGL_DEFAULT_);
             ossAGL2FIX << "cp \"" << directory_LIB << "/" << "LOCK\"" << " \"" << directory_LIB << "/" << "agl.LOCK\"" << endl;
             fixes++;	    
           }
@@ -533,8 +533,8 @@ namespace aflowlib {
     if(VERBOSE) acerr << soliloquy + " BEGIN" << endl;
     string _entry=entry,directory_LIB,directory_RAW,directory_WEB;
     aurostd::StringSubst(_entry,"/aflow.in","");
-    aurostd::StringSubst(_entry,"/ael_aflow.in","");
-    aurostd::StringSubst(_entry,"/agl_aflow.in","");
+    aurostd::StringSubst(_entry,"/"+_AFLOWIN_AEL_DEFAULT_,"");
+    aurostd::StringSubst(_entry,"/"+_AFLOWIN_AGL_DEFAULT_,"");
     aurostd::StringSubst(_entry,"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT,"");
     aurostd::StringSubst(_entry,"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_JSON,"");
     aurostd::StringSubst(_entry,"RAW/","LIB/");

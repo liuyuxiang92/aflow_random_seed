@@ -626,8 +626,8 @@ namespace init {
     }    
     // DO aflow.in and LOCK
     if(INIT_VERBOSE) oss << "--- LOADING @ _AFLOWIN_ and _AFLOWLOCK_ --- " << endl;
-    _AFLOWIN_=aurostd::args2attachedstring(XHOST.argv,"--use_aflow.in=","aflow.in");
-    _AFLOWLOCK_=aurostd::args2attachedstring(XHOST.argv,"--use_LOCK=","LOCK");
+    _AFLOWIN_=aurostd::args2attachedstring(XHOST.argv,"--use_aflow.in=",_AFLOWIN_DEFAULT_);
+    _AFLOWLOCK_=aurostd::args2attachedstring(XHOST.argv,"--use_LOCK=",_AFLOWLOCK_DEFAULT_);
     _STOPFLOW_=aurostd::args2attachedstring(XHOST.argv,"--use_stop_file=","STOPFLOW");  //CO20210315
     if(INIT_VERBOSE) oss << "_AFLOWIN_=" << _AFLOWIN_ << endl;
     if(INIT_VERBOSE) oss << "_AFLOWLOCK_=" << _AFLOWLOCK_ << endl;

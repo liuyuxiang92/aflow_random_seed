@@ -171,6 +171,22 @@ extern const string _LOCK_LINK_SUFFIX_; //SD20220224
 
 const string VASP_KEYWORD_EXECUTION=" Executing: ";
 
+#define _AFLOWIN_DEFAULT_     string("aflow.in")  //CO20210302
+#define _AFLOWIN_AEL_DEFAULT_ string("ael_aflow.in")  //CO20210302
+#define _AFLOWIN_AGL_DEFAULT_ string("agl_aflow.in")  //CO20210302
+#define _AFLOWIN_QHA_DEFAULT_ string("aflow_qha.in")  //CO20210302 - moved from APL/aflow_qha.cpp
+
+#define _AFLOWIN_AEL_VARIANTS_ string("ael_aflow.in,aflow_ael.in")  //CO20210302
+#define _AFLOWIN_AGL_VARIANTS_ string("agl_aflow.in,aflow_agl.in")  //CO20210302
+
+#define _AFLOWLOCK_DEFAULT_     string("LOCK")  //CO20210302
+#define _AFLOWLOCK_AEL_DEFAULT_ string("ael.LOCK")  //CO20210302
+#define _AFLOWLOCK_AGL_DEFAULT_ string("agl.LOCK")  //CO20210302
+#define _AFLOWLOCK_QHA_DEFAULT_ string("LOCK.qha")  //CO20210302 - moved from APL/aflow_qha.cpp
+
+#define _AFLOWLOCK_AEL_VARIANTS_ string("ael.LOCK,LOCK.ael")  //CO20210302
+#define _AFLOWLOCK_AGL_VARIANTS_ string("agl.LOCK,LOCK.agl")  //CO20210302
+
 // --------------------------------------------------------------------------
 // definitions for aflow
 // aflow2 default definitions

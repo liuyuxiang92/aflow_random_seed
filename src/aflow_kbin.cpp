@@ -1674,12 +1674,12 @@ namespace KBIN {
     aurostd::StringSubst(directory,"/EIGENVAL","");      // so it is easier to search
 
     for(uint iext=1;iext<XHOST.vext.size();iext++) { // SKIP uncompressed
-      aurostd::StringSubst(directory,"/agl_aflow.in"+XHOST.vext[iext],"");  // so it is easier to search
-      aurostd::StringSubst(directory,"/ael_aflow.in"+XHOST.vext[iext],"");  // so it is easier to search    
+      aurostd::StringSubst(directory,"/"+_AFLOWIN_AGL_DEFAULT_+XHOST.vext[iext],"");  // so it is easier to search
+      aurostd::StringSubst(directory,"/"+_AFLOWIN_AEL_DEFAULT_+XHOST.vext[iext],"");  // so it is easier to search    
       aurostd::StringSubst(directory,"/aflow.in"+XHOST.vext[iext],"");      // so it is easier to search
     }   
-    aurostd::StringSubst(directory,"/agl_aflow.in","");  // so it is easier to search
-    aurostd::StringSubst(directory,"/ael_aflow.in","");  // so it is easier to search    
+    aurostd::StringSubst(directory,"/"+_AFLOWIN_AGL_DEFAULT_,"");  // so it is easier to search
+    aurostd::StringSubst(directory,"/"+_AFLOWIN_AEL_DEFAULT_,"");  // so it is easier to search    
     aurostd::StringSubst(directory,"/aflow.in","");      // so it is easier to search
 
     if(!aurostd::FileExist(string(directory+"/"+"NOCLEAN")) &&
@@ -1695,8 +1695,8 @@ namespace KBIN {
         !aurostd::FileExist(string(directory+"/"+"review.tex"))) {
       if(aurostd::FileExist(string(directory+"/"+_AFLOWIN_)) ||    // normal aflow.in or specified it
           aurostd::FileExist(string(directory+"/aflow.in")) ||      // normal aflow.in
-          aurostd::FileExist(string(directory+"/agl_aflow.in")) ||  // normal agl_aflow.in
-          aurostd::FileExist(string(directory+"/ael_aflow.in")) ) { // normal ael_aflow.in
+          aurostd::FileExist(string(directory+"/"+_AFLOWIN_AGL_DEFAULT_)) ||  // normal agl_aflow.in
+          aurostd::FileExist(string(directory+"/"+_AFLOWIN_AEL_DEFAULT_)) ) { // normal ael_aflow.in
 
         //CO20210716 - save contcar
         bool save_contcar=opts_clean.flag("SAVE_CONTCAR");
@@ -1721,8 +1721,8 @@ namespace KBIN {
           file_path=directory + "/" + vfiles[i];
           if(aurostd::substring2bool(vfiles[i],_AFLOWIN_)){continue;}
           if(aurostd::substring2bool(vfiles[i],"aflow.in")){continue;}
-          if(aurostd::substring2bool(vfiles[i],"agl_aflow.in")){continue;}
-          if(aurostd::substring2bool(vfiles[i],"ael_aflow.in")){continue;}
+          if(aurostd::substring2bool(vfiles[i],_AFLOWIN_AGL_DEFAULT_)){continue;}
+          if(aurostd::substring2bool(vfiles[i],_AFLOWIN_AEL_DEFAULT_)){continue;}
           if(aurostd::substring2bool(vfiles[i],DEFAULT_AFLOW_FROZSL_INPUT_OUT)){continue;}
           if(aurostd::IsDirectory(file_path)){                 
             if(aurostd::substring2bool(vfiles[i],KBIN_SUBDIRECTORIES)){ // only directories we don't ignore

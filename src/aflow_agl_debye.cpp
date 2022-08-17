@@ -538,7 +538,7 @@ namespace AGL_functions {
     _kflags kflags;
     _vflags vflags;
     ofstream FileMESSAGE;
-    // string AflowInName = "agl_aflow.in";
+    // string AflowInName = _AFLOWIN_AGL_DEFAULT_;
     // string FileLockName = "agl.LOCK";
     // string AflowInName = _AFLOWIN_;
     // string FileLockName = _AFLOWLOCK_;    
@@ -553,10 +553,10 @@ namespace AGL_functions {
       FileLockName = _AFLOWLOCK_;
     }
 
-    if (aurostd::FileExist(aurostd::CleanFileName(directory) + "agl_aflow.in")) {
-      AflowInName = "agl_aflow.in";
-    } else if (aurostd::FileExist(aurostd::CleanFileName(directory) + "ael_aflow.in")) {
-      AflowInName = "ael_aflow.in";
+    if (aurostd::FileExist(aurostd::CleanFileName(directory) + _AFLOWIN_AGL_DEFAULT_)) {
+      AflowInName = _AFLOWIN_AGL_DEFAULT_;
+    } else if (aurostd::FileExist(aurostd::CleanFileName(directory) + _AFLOWIN_AEL_DEFAULT_)) {
+      AflowInName = _AFLOWIN_AEL_DEFAULT_;
     } else {
       AflowInName = _AFLOWIN_;
     }

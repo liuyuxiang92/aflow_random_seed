@@ -49,8 +49,6 @@ enum PH_DATA_FILE {PH_DF_DIRECTORY, PH_DF_HARMIFC, PH_DF_PHPOSCAR};
 #define EOS_METHOD_FILE_BIRCH_MURNAGHAN4 "birch-murnaghan4."
 #define EOS_METHOD_FILE_MURNAGHAN "murnaghan."
 
-#define QHA_AFLOWIN_DEFAULT string("aflow_qha.in")
-
 // labels to specify what contributions to the free energy are included
 #define F_ELEC 1
 #define F_VIB  2
@@ -3611,7 +3609,7 @@ namespace apl{
     string stmp="";
     if (!AflowInName.empty()) vaflowins.push_back(AflowInName);
     if (!_AFLOWIN_.empty()) vaflowins.push_back(_AFLOWIN_);
-    vaflowins.push_back(QHA_AFLOWIN_DEFAULT);
+    vaflowins.push_back(_AFLOWIN_QHA_DEFAULT_);
 
     string aflowin_name = "", aflowin = "", fullpath_aflowin_name = "";
     for (uint i=0; i<vaflowins.size(); i++){

@@ -311,6 +311,41 @@ namespace aflowlib {
 }
 
 // ***************************************************************************
+// XPLUG/XUPDATE STUFF
+namespace aflowlib {  //CO20210302
+  class ARun: public xStream {  //CO20210302
+    private:
+      //NECESSARY PUBLIC CLASS METHODS - START
+      //constructors - START
+      ARun(const string& dir,ostream& oss=cout);
+      ARun(const string& dir,ofstream& FileMESSAGE, ostream& oss=cout);
+      ARun(const ARun& b);
+      //constructors - STOP
+      ~ARun();
+      const ARun& operator=(const ARun& other);
+      void clear();
+      //NECESSARY PUBLIC CLASS METHODS - STOP
+      
+      //attributes
+      bool m_initialized;
+      string m_dir;
+      string m_aflowin;
+      string m_LOCK;
+      bool m_completed;
+
+      //methods
+      bool initialize(const string& dir="");
+
+    public:
+      //NECESSARY private CLASS METHODS - START
+      void free();
+      void copy(const ARun& b);
+      //NECESSARY END CLASS METHODS - END
+  };
+}
+// ***************************************************************************
+
+// ***************************************************************************
 // AFLUX STUFF // Obsolete with aurostd::xhttp //HE20220407
 //namespace aflowlib {
 //  class APIget {
