@@ -19,6 +19,7 @@
 #define DUKE_QRATS_DEFAULT_KILL_MEM_CUTOFF 1.50
 #define DUKE_QFLOW_DEFAULT_KILL_MEM_CUTOFF 1.50
 #define DUKE_X_DEFAULT_KILL_MEM_CUTOFF 1.50 //CO20201220
+#define JHU_ROCKFISH_DEFAULT_KILL_MEM_CUTOFF 1.50 //CO20220818
 #define MPCDF_EOS_DEFAULT_KILL_MEM_CUTOFF 1.50
 #define MPCDF_DRACO_DEFAULT_KILL_MEM_CUTOFF 1.50
 #define MPCDF_COBRA_DEFAULT_KILL_MEM_CUTOFF 1.50
@@ -448,6 +449,11 @@ namespace KBIN {
     aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_X",aurostd::args2flag(argv,"--machine=x|--machine=duke_x")); //backwards compatible //CO20180409
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_X")) XHOST.maxmem=DUKE_X_DEFAULT_KILL_MEM_CUTOFF;
     //CO20201220 X STOP
+    //CO20220818 JHU_ROCKFISH START
+    // "MACHINE::JHU_ROCKFISH"
+    aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::JHU_ROCKFISH",aurostd::args2flag(argv,"--machine=rockfish|--machine=jhu_rockfish")); //backwards compatible //CO20180409
+    if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::JHU_ROCKFISH")) XHOST.maxmem=JHU_ROCKFISH_DEFAULT_KILL_MEM_CUTOFF;
+    //CO20220818 JHU_ROCKFISH STOP
     // "MACHINE::MPCDF_EOS"
     aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MPCDF_EOS",aurostd::args2flag(argv,"--machine=eos|--machine=mpcdf_eos|--machine=eos_mpiifort|--machine=mpcdf_eos_mpiifort"));
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MPCDF_EOS")) XHOST.maxmem=MPCDF_EOS_DEFAULT_KILL_MEM_CUTOFF;

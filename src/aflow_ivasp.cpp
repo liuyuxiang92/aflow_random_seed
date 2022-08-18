@@ -1769,6 +1769,7 @@ namespace KBIN {
       else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QRATS_MPICH")) {mpi_command=MPI_COMMAND_DUKE_QRATS_MPICH;vasp_path_full=MPI_BINARY_DIR_DUKE_QRATS_MPICH+kflags.KBIN_MPI_BIN;}
       else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QFLOW_OPENMPI")) {mpi_command=MPI_COMMAND_DUKE_QFLOW_OPENMPI;vasp_path_full=MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI+kflags.KBIN_MPI_BIN;}
       else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_X")) {mpi_command=MPI_COMMAND_DUKE_X;vasp_path_full=MPI_BINARY_DIR_DUKE_X+kflags.KBIN_MPI_BIN;}
+      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::JHU_ROCKFISH")) {mpi_command=MPI_COMMAND_JHU_ROCKFISH;vasp_path_full=MPI_BINARY_DIR_JHU_ROCKFISH+kflags.KBIN_MPI_BIN;}  //CO20220818
       else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) {mpi_command=MPI_COMMAND_MPCDF_EOS;vasp_path_full=MPI_BINARY_DIR_MPCDF_EOS+kflags.KBIN_MPI_BIN;}
       else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO")) {mpi_command=MPI_COMMAND_MPCDF_DRACO;vasp_path_full=MPI_BINARY_DIR_MPCDF_DRACO+kflags.KBIN_MPI_BIN;}
       else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA")) {mpi_command=MPI_COMMAND_MPCDF_COBRA;vasp_path_full=MPI_BINARY_DIR_MPCDF_COBRA+kflags.KBIN_MPI_BIN;}
