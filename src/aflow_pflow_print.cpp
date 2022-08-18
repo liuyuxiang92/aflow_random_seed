@@ -480,9 +480,9 @@ namespace pflow {
       oss << "_symmetry_Int_Tables_Number  " << 1 << endl;
     }
     oss << "loop_" << endl;
-    oss << "_symmetry_equiv_pos_site_id" << endl;
-    //oss << "_symmetry_equiv_pos_as_xyz_" << endl;
-    oss << "_symmetry_equiv_pos_as_xyz" << endl;  //CO fix 20170606
+    oss << " _symmetry_equiv_pos_site_id" << endl;
+    //oss << " _symmetry_equiv_pos_as_xyz_" << endl;
+    oss << " _symmetry_equiv_pos_as_xyz" << endl;  //CO fix 20170606
 
     // if the Wyckoff positions are stored/calculated
     if(str.wyccar_ITC.size()!=0){
@@ -503,7 +503,8 @@ namespace pflow {
       oss << " _atom_site_fract_x" << endl;
       oss << " _atom_site_fract_y" << endl;
       oss << " _atom_site_fract_z" << endl;
-      oss << " _atom_site_thermal_displace_type" << endl;
+      //[DX+CO20220715 - OBSOLETE]oss << " _atom_site_thermal_displace_type" << endl; //https://www.iucr.org/__data/iucr/cifdic_html/1/cif_core.dic/Iatom_site_thermal_displace_type.html
+      oss << " _atom_site_adp_type" << endl;  //DX+CO20220715
       oss << " _atom_site_B_iso_or_equiv" << endl;
       oss << " _atom_site_type_symbol" << endl;
       oss << " _atom_site_symmetry_multiplicity" << endl;
@@ -552,7 +553,8 @@ namespace pflow {
       oss << " _atom_site_fract_x" << endl;
       oss << " _atom_site_fract_y" << endl;
       oss << " _atom_site_fract_z" << endl;
-      oss << " _atom_site_thermal_displace_type" << endl;
+      //[DX+CO20220715 - OBSOLETE]oss << " _atom_site_thermal_displace_type" << endl; //https://www.iucr.org/__data/iucr/cifdic_html/1/cif_core.dic/Iatom_site_thermal_displace_type.html
+      oss << " _atom_site_adp_type" << endl;  //DX+CO20220715
       oss << " _atom_site_B_iso_or_equiv" << endl;
       oss << " _atom_site_type_symbol" << endl;
 

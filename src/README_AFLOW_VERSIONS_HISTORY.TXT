@@ -41,6 +41,7 @@
         -- fixed aurostd::getxvec() bug where lcols_out and lrows_out defaulted to AFLOW_MAX_INT (AZ)
         -- moved xmatrix2xvector functionality aurostd::getxvec() and use getxvec() in getmatInPlace (AZ)
         -- added --itc flag for structure generation (CO+DX)
+        -- fixing --cif with pocc structure (DX+CO)
 3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)

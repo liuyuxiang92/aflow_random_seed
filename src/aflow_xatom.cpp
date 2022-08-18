@@ -16576,8 +16576,10 @@ void xstructure::xstructure2itc(void) { //CO20220613
   char iomode_orig=iomode;  //save
   iomode=IOVASP_WYCKCAR;
   if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
-  (*this).spacegroupnumber = (*this).SpaceGroup_ITC();
-  (*this).lattice = (*this).standard_lattice_ITC; // need to update the lattice; may have rotated
+  if(!partial_occupation_flag){ //CO20220715
+    (*this).spacegroupnumber = (*this).SpaceGroup_ITC();
+    (*this).lattice = (*this).standard_lattice_ITC; // need to update the lattice; may have rotated
+  }
   stringstream ss;
   ss << (*this);
   (*this).clear();
@@ -16618,8 +16620,10 @@ void xstructure::xstructure2cif(void) { //DX20190131
   neg_scale=FALSE;
   coord_flag=_COORDS_FRACTIONAL_; 
   iomode=IOCIF;
-  (*this).spacegroupnumber = (*this).SpaceGroup_ITC();
-  (*this).lattice = (*this).standard_lattice_ITC; // need to update the lattice; may have rotated
+  if(!partial_occupation_flag){ //CO20220715
+    (*this).spacegroupnumber = (*this).SpaceGroup_ITC();
+    (*this).lattice = (*this).standard_lattice_ITC; // need to update the lattice; may have rotated
+  }
   if(title.empty()) {buildGenericTitle();}  //CO20171008 - pushed all of this to a function
   return;
 }
