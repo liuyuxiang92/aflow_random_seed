@@ -894,12 +894,13 @@ namespace aflowlib {
       case (aurostd::ctcrc64("Bravais_superlattice_lattice_variation_type")): { Bravais_superlattice_lattice_variation_type = content; } break;
       case (aurostd::ctcrc64("Bravais_superlattice_lattice_system")): { Bravais_superlattice_lattice_system = content; } break;
       case (aurostd::ctcrc64("Pearson_symbol_superlattice")): { Pearson_symbol_superlattice = content; } break;
+      case (aurostd::ctcrc64("reciprocal_geometry_relax")):
       case (aurostd::ctcrc64("reciprocal_geometry")): {
-        reciprocal_geometry = content;
-        vreciprocal_geometry = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+        reciprocal_geometry_relax = content;
+        vreciprocal_geometry_relax = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
         if (stokens.size() == 6)
           for (uint j = 0; j < stokens.size(); j++)
-            vreciprocal_geometry.at(j) = aurostd::string2utype<double>(stokens.at(j));
+            vreciprocal_geometry_relax.at(j) = aurostd::string2utype<double>(stokens.at(j));
         } break;
       case (aurostd::ctcrc64("reciprocal_volume_cell")): { reciprocal_volume_cell = aurostd::string2utype<double>(content); } break;
       case (aurostd::ctcrc64("reciprocal_lattice_type")): { reciprocal_lattice_type = content; } break;
