@@ -7,7 +7,7 @@
 // 2016 - Corey Oses (CHULL)
 // 2018 - Marco Esters (database design/integration)
 // 2018 - Frisco Rose (API requests)
-// 2020 - David Hicks (structural comparisons).
+// 2020 - David Hicks (structural comparisons)
 // 2022 - Hagen Eckert (unified EntryLoader for all available database sources)
 // hagen.eckert@duke.edu
 
@@ -25,6 +25,13 @@ namespace aflowlib {
 
   /// @class EntryLoader
   /// @brief unified interface to gather AFLOW lib entries from different sources
+  ///
+  /// @authors
+  /// @mod{CO,2016,CHULL}
+  /// @mod{ME,2018,database design/integration}
+  /// @mod{FR,2018,API requests}
+  /// @mod{DX,2020,structural comparisons}
+  /// @mod{HE,20220819,created EntryLoader}
   ///
   /// Basic usage
   /// @code
@@ -62,15 +69,11 @@ namespace aflowlib {
 
   /// @brief initialize the class (privat)
   /// create shared pointer used to store the data views and read default values from flags
-  /// @TODO use flags to overwrite defaults
   void EntryLoader::init() {
     m_out_silent = true;
     m_out_debug = (XHOST.DEBUG || _DEBUG_ENTRY_LOADER_);
     m_xstructure_relaxed = false;
     m_xstructure_original = false;
-    m_xstructure_original_file_name = {"POSCAR.orig", "POSCAR.relax1"} ;
-    m_xstructure_final_file_name = {"CONTCAR.relax2", "CONTCAR.relax", "POSCAR.static", "POSCAR.bands", "CONTCAR.static", "CONTCAR.bands"};
-
     m_sqlite_file = DEFAULT_AFLOW_DB_FILE;
     m_sqlite_alloy_file = DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE;
     m_sqlite_collection = "WEB";
@@ -111,8 +114,6 @@ namespace aflowlib {
     m_out_silent = b.m_out_silent;
     m_xstructure_relaxed = b.m_xstructure_relaxed;
     m_xstructure_original = b.m_xstructure_original;
-    m_xstructure_original_file_name = b.m_xstructure_original_file_name;
-    m_xstructure_final_file_name = b.m_xstructure_final_file_name;
     m_sqlite_file = b.m_sqlite_file;
     m_sqlite_alloy_file = b.m_sqlite_alloy_file;
     m_sqlite_collection = b.m_sqlite_collection;
@@ -145,6 +146,8 @@ namespace aflowlib {
 
   /// @brief load a single entry from a AUID
   /// @param AUID AFLOW unique ID
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note following AUIDs would be equivalent:
   /// @note `aflow:d912e209c81aeb94`
   /// @note `auid:d912e209c81aeb94`
@@ -194,6 +197,8 @@ namespace aflowlib {
 
   /// @brief load multiple entries from a vector of AUIDs
   /// @param AUID list of AURLs
+  /// @authors
+  /// @mod{HE,20220216,created}
   void EntryLoader::loadAUID(const std::vector<std::string> &AUID) {
     selectSource();
     std::vector <std::string> clean_AUID;
@@ -261,6 +266,8 @@ namespace aflowlib {
 
   /// @brief load a single entry from an AURL
   /// @param AURL AFLOW unique URL
+  /// @authors
+  /// @mod{HE,20220217,created}
   /// @note following AURLs would be equivalent:
   /// @note `aflowlib.duke.edu:AFLOWDATA/LIB2_RAW/Ca_svCu_pv/138`
   /// @note `AFLOWDATA/LIB2_RAW/Ca_svCu_pv/138`
@@ -316,6 +323,8 @@ namespace aflowlib {
 
   /// @brief load multiple entries from a vector of AURLs
   /// @param AURL list of AURLs
+  /// @authors
+  /// @mod{HE,20220322,created}
   void EntryLoader::loadAURL(const std::vector <std::string> &AURL) {
     selectSource();
 
@@ -383,6 +392,8 @@ namespace aflowlib {
   /// @brief load all entries that are available for a alloy set
   /// @param alloy alloy descriptor
   /// @param recursive include sub alloys
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note an alloy can be given as comma separated list `"Cu, Au, Fe"`
   ///       or as combined string `"CuAuFe"` (elements don't need to be sorted)
   /// @note `recursive=true` (default) will generate sub-alloys so `CuAuFe`
@@ -398,6 +409,8 @@ namespace aflowlib {
   /// @brief load all entries that are available for a set alloy
   /// @param alloy split alloy elements
   /// @param recursive include sub alloys
+  /// @authors
+  /// @mod{HE,20220216,created}
   void EntryLoader::loadAlloy(const std::vector <std::string> &alloy, bool recursive) {
     selectSource();
     std::vector <std::string> alloy_clean;
@@ -493,6 +506,8 @@ namespace aflowlib {
 
   /// @brief load entries based on a custom query against the internal AFLUX SQLITE DB
   /// @param where part of the SQLITE query after a `WHERE` keyword
+  /// @authors
+  /// @mod{HE,20220422,created}
   /// @note use setSource() to change the current source to Source::SQLITE to ensure that the database is connected
   void EntryLoader::loadSqliteWhere(const std::string &where) {
 //    std::vector <std::string> raw_lines = getRawSqliteWhere(where);
@@ -512,6 +527,8 @@ namespace aflowlib {
 
   /// @brief load entries from a costum AFLUX query
   /// @param query AFLUX query
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note #m_aflux_server and #m_aflux_path will be added
   void EntryLoader::loadAFLUXQuery(const std::string &query) {
     size_t start_size = m_entries_flat->size();
@@ -522,6 +539,8 @@ namespace aflowlib {
 
   /// @brief load entries from an AFLUX matchbook
   /// @param matchbook map with keyword and modifier
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note a pair creates `<keyword>(<modifier>)`
   /// @note if modifier is empty just the keyword is used
   void EntryLoader::loadAFLUXMatchbook(const std::map <std::string, std::string> &matchbook) {
@@ -529,6 +548,8 @@ namespace aflowlib {
   }
 
   /// @brief load entries from a list of REST API queries
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @param queries vector of queries
   /// @param full_url if `true` don't add #m_restapi_server, #m_restapi_path, and #m_restapi_directives
   void EntryLoader::loadRestAPIQueries(const std::vector <std::string> &queries, bool full_url) {
@@ -548,6 +569,8 @@ namespace aflowlib {
 
   /// @brief load entries from a list of file paths
   /// @param files list of file paths
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note doesn't add #m_filesystem_path or #m_filesystem_collection
   void EntryLoader::loadFiles(const std::vector <std::string> &files) {
     size_t start_size = m_entries_flat->size();
@@ -563,6 +586,8 @@ namespace aflowlib {
 
   /// @brief load entries from a list of strings
   /// @param raw_data_lines list of data strings
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note each entry in raw_data_lines should correspond to one AFLOW lib entry
   void EntryLoader::loadText(const std::vector <std::string> &raw_data_lines) {
     for (std::vector<std::string>::const_iterator line = raw_data_lines.begin(); line != raw_data_lines.end(); line++) {
@@ -581,6 +606,8 @@ namespace aflowlib {
   /// @brief load entries from vectors
   /// @param keys list of keys
   /// @param content list of keys
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note each entry in content should correspond to one AFLOW lib entry
   void EntryLoader::loadVector(const std::vector<std::string> &keys, const std::vector<std::vector<std::string>> & content) {
     std::vector<uint64_t> hash_list;
@@ -606,6 +633,8 @@ namespace aflowlib {
   /// @brief change the currently used source and prepares them
   /// @param new_source source to change to
   /// @param silent silent all logging when called from selectSource() (default false)
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note if the public alloy SQLITE DB is not found Source::FILESYSTEM and Source::RESTAPI
   ///       are mapped to Source::FILESYSTEM_RAW and Source::RESTAPI_RAW respectively
   bool EntryLoader::setSource(EntryLoader::Source new_source) {
@@ -733,6 +762,8 @@ namespace aflowlib {
 
   /// @brief query the internal AFLUX SQLITE DB
   /// @param where part of the SQLITE query after a `WHERE` keyword
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @return list of result query strings
   std::vector <std::string> EntryLoader::getRawSqliteWhere(const std::string &where) const{
     if (m_sqlite_db_ptr != nullptr) return m_sqlite_db_ptr->getEntrySet(where, aflow_ft);
@@ -741,6 +772,8 @@ namespace aflowlib {
 
   /// @brief query AFLUX using a matchbook
   /// @param matchbook map with keyword and modifier
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @return list of query result strings
   std::vector <std::string> EntryLoader::getRawAFLUXMatchbook(const std::map <std::string, std::string> &matchbook){
     return getRawAFLUXQuery(buildAFLUXQuery(matchbook));
@@ -748,6 +781,8 @@ namespace aflowlib {
 
   /// @brief query AFLUX using a raw query
   /// @param matchbook map with keyword and modifier
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @return list of query result strings
   /// @note #m_aflux_server and #m_aflux_path will be added
   std::vector <std::string> EntryLoader::getRawAFLUXQuery(const std::string &query){
@@ -766,6 +801,8 @@ namespace aflowlib {
   /// @brief query the REST API
   /// @param query REST API query
   /// @param full_url if `true` don't add #m_restapi_server, #m_restapi_path, and #m_restapi_directives
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @return query result string
   std::string EntryLoader::getRawRestAPIQuery(const std::string &query, bool full_url) {
     std::string output = "";
@@ -784,86 +821,44 @@ namespace aflowlib {
   /// @brief add an xstructure to an AFLOW lib entry
   /// @param entry AFLOW lib entry
   /// @param orig if `true` load the original structure otherwise the final structure (default)
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note use this function only if you want the xstructure for a subset of entries;
   ///       if you want xstructures for all entries set #m_xstructure_relaxed or #m_xstructure_original to `true`
   /// @note adds the structure to entry.vstr
   void EntryLoader::addXstructure(aflowlib::_aflowlib_entry &entry, bool orig) {
     if (orig) {
-      if (entry.catalog == "ICSD") return; // no original structures available for ICSD entries
       xstructure new_structure;
-      if (loadXstructureAflowIn(entry, new_structure)) { // load from aflow.in
+      if (loadXstructureAflowIn(entry, new_structure, 1)) { // load from aflow.in
         entry.vstr.push_back(new_structure);
-      } else { // if no valid entry in aflow.in try to load files from m_xstructure_original_file_name list
-        if (loadXstructureFile(entry, new_structure, true)) {
-          entry.vstr.push_back(new_structure);
-        } else {
+      } else {
           m_logger_message << "Failed to add original structure to " << entry.auid << " (" << entry.aurl << ")";
           outError(__AFLOW_FUNC__, __LINE__);
-        }
       }
     } else {
       xstructure new_structure;
       if (pflow::loadXstructureLibEntry(entry, new_structure)) { // load directly from the entry (AFLUX, SQLITE)
         entry.vstr.push_back(new_structure);
-      } else { // if positions are not present in aflowlib entry try to load files from m_xstructure_final_file_name list
-        if (loadXstructureFile(entry, new_structure, false)) {
-          entry.vstr.push_back(new_structure);
-        }
-        else {
+      } else if (loadXstructureAflowIn(entry, new_structure, -1)) { // load from aflow.in
+        entry.vstr.push_back(new_structure);
+      } else {
           m_logger_message << "Failed to add relaxed structure to " << entry.auid << " (" << entry.aurl << ")";
           outError(__AFLOW_FUNC__, __LINE__);
         }
       }
     }
-  }
 
-  /// @brief load a structure from a structure file
-  /// @param entry AFLOW lib entry
-  /// @param new_structure save-to structure
-  /// @param orig if `true` load the original structure otherwise the final structure (default)
-  /// @return xstructure
-  /// @note does not add the structure to entry.vstr
-  bool EntryLoader::loadXstructureFile(const aflowlib::_aflowlib_entry &entry, xstructure &new_structure, bool orig) {
-    std::string base_url = m_restapi_server + m_restapi_path + entry.aurl.substr(28) + "/";
-    std::string base_folder = m_filesystem_path + entry.aurl.substr(28) + "/";
-    base_folder = std::regex_replace(base_folder, m_re_aurl2file, "$1/" + m_filesystem_collection + "/");
-    std::string poscar;
-    if (entry.catalog =="LIB0" && !m_filesystem_available && entry.aurl.substr(entry.aurl.size() - 2)=="/0"){
-      return false; // no entries in RESTAPI for WEB0 /0
-    }
 
-    std::vector <std::string> possible_files;
-    if (orig) possible_files = m_xstructure_original_file_name;
-    else possible_files = m_xstructure_final_file_name;
-
-    std::vector <std::string> available_files;
-    if (m_filesystem_available) {
-      aurostd::DirectoryLS(base_folder, available_files);
-    } else {
-      listRestAPI(base_url, available_files, false);
-    }
-
-    std::string selected_file;
-    for (std::vector<std::string>::const_iterator file_name = possible_files.begin(); file_name != possible_files.end(); file_name++) {
-      if (aurostd::EWithinList(available_files, *file_name, selected_file)) {
-        if (m_filesystem_available) aurostd::efile2string(base_folder + selected_file, poscar);
-        else poscar = getRawRestAPIQuery(base_url + selected_file, true);
-        if (!poscar.empty()) { // load from aflow.in
-          new_structure = xstructure((std::stringstream) poscar, IOVASP_AUTO);
-          return true;
-        }
-      }
-    }
-    return false;
-  }
 
   /// @brief load the first structure in an `aflow.in` file
   /// @param entry AFLOW lib entry
   /// @param new_structure save-to structure
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @return xstructure
   /// @note this is always the original structure
   /// @note does not add the structure to entry.vstr
-  bool EntryLoader::loadXstructureAflowIn(const aflowlib::_aflowlib_entry &entry, xstructure &new_structure) {
+  bool EntryLoader::loadXstructureAflowIn(const aflowlib::_aflowlib_entry &entry, xstructure &new_structure, const int index) {
     std::string base_url = m_restapi_server + m_restapi_path + entry.aurl.substr(28) + "/";
     std::string base_folder = m_filesystem_path + entry.aurl.substr(28) + "/";
     base_folder = std::regex_replace(base_folder, m_re_aurl2file, "$1/" + m_filesystem_collection + "/");
@@ -880,7 +875,7 @@ namespace aflowlib {
       m_out_super_silent = false;
     }
     std::stringstream poscar;
-    bool poscar_loaded =  KBIN::ExtractPOSCARStringStreamFromAFLOWIN(aflowin_content, poscar, -1);
+    bool poscar_loaded =  KBIN::ExtractPOSCARStringStreamFromAFLOWIN(aflowin_content, poscar, index);
     if (poscar_loaded) { // load from aflow.in
       new_structure = xstructure((std::stringstream) poscar.str(), IOVASP_AUTO);
       return true;
@@ -889,7 +884,9 @@ namespace aflowlib {
   }
 
   /// @brief save the shared pointers to the AFLOW lib entries into an external vector
-  /// \param result save-to vector
+  /// @param result save-to vector
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note the underlying entries will not be copied and are likely not in a continuous chunk of memory
   /// @note creating a copy the smart pointer #m_entries_flat is a bit more efficient way to use
   ///       the loaded entries after the EntryLoader class goes out of scope
@@ -899,6 +896,8 @@ namespace aflowlib {
 
   /// @brief save the shared pointers to the AFLOW lib entries into a two layer vector
   /// @param result save-to vector
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note the underlying entries will not be copied and are likely not in a continuous chunk of memory
   /// @note the entries are grouped by number of elements (smallest to largest)
   void EntryLoader::getEntriesViewTwoLayer(vector<vector<std::shared_ptr < aflowlib::_aflowlib_entry>> > &result) const{
@@ -913,6 +912,8 @@ namespace aflowlib {
 
   /// @brief save the shared pointers to the AFLOW lib entries into a three layer vector
   /// @param result save-to vector
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note the underlying entries will not be copied and are likely not in a continuous chunk of memory
   /// @note the entries are grouped first by number of elements (smallest to largest) and then by alloy
   void EntryLoader::getEntriesViewThreeLayer(std::vector<std::vector<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> &result) const{
@@ -929,6 +930,8 @@ namespace aflowlib {
 
   /// @brief save the shared pointers to the AFLOW lib entries into a three layer map
   /// @param result save-to map
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note the underlying entries will not be copied and are likely not in a continuous chunk of memory
   /// @note the entries are grouped first by number of elements and then by alloy
   /// @note creating a copy of the smart pointer #m_entries_layered_map is a bit more efficient way to use
@@ -940,6 +943,8 @@ namespace aflowlib {
 
   /// @brief copy the AFLOW lib entries into a vector
   /// @param result save-to vector
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note the underlying entries are copied into a continuous chunk of memory
   void EntryLoader::getEntriesFlat(std::vector <aflowlib::_aflowlib_entry> &result) const {
     for (std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>::iterator entry = m_entries_flat->begin(); entry != m_entries_flat->end(); entry++){
@@ -949,6 +954,8 @@ namespace aflowlib {
 
   /// @brief copy the AFLOW lib entries into a two layer vector
   /// @param result save-to vector
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note the underlying entries are copied into a continuous chunk of memory
   /// @note the entries are grouped by number of elements (smallest to largest)
   void EntryLoader::getEntriesTwoLayer(std::vector <std::vector<aflowlib::_aflowlib_entry>> &result) const {
@@ -964,6 +971,8 @@ namespace aflowlib {
 
   /// @brief copy the AFLOW lib entries into a three layer vector
   /// @param result save-to vector
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note the underlying entries are copied into a continuous chunk of memory
   /// @note the entries are grouped first by number of elements (smallest to largest) and then by alloy
   void EntryLoader::getEntriesThreeLayer(std::vector<std::vector<vector<aflowlib::_aflowlib_entry>>> & result) const {
@@ -980,6 +989,8 @@ namespace aflowlib {
 
   // private functions
   /// @brief find the best available source
+  /// @authors
+  /// @mod{HE,20220216,created}
   void EntryLoader::selectSource() {
 
     if (m_current_source == Source::NONE || m_current_source == Source::FAILED) {
@@ -1020,6 +1031,8 @@ namespace aflowlib {
   }
 
   /// @brief list directories or files for the REST API
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @param url entry url
   /// @param result save-to vector
   /// @param directories list directories if `true` (default)
@@ -1040,6 +1053,8 @@ namespace aflowlib {
   /// @brief generate a list of AUID for a given list of alloys by querying the public alloy SQLITE DB
   /// @param alloy_list list of cleaned and sorted alloys
   /// @param auid_list resulting AUIDs
+  /// @authors
+  /// @mod{HE,20220216,created}
   void EntryLoader::getAlloyAUIDList(const std::vector<std::string> & alloy_list, std::vector<std::string> &auid_list) {
     if (m_sqlite_alloy_db_ptr == nullptr) {
       m_logger_message << "Public alloy SQLITE DB is not ready";
@@ -1055,6 +1070,8 @@ namespace aflowlib {
   /// @brief load AFLOW lib entries for a given alloy directly from the filesystem (source FILESYSTEM_RAW)
   /// @param alloy_list list of cleaned and sorted alloys
   /// @param lib_max number of elements in the largest alloy
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note if the public alloy SQLITE DB is available the results are expanded with missed entries
   void EntryLoader::loadAlloySearchFSR(const std::vector <std::string> &alloy_list, uint lib_max) {
     std::vector <std::string> found_entries;
@@ -1167,6 +1184,8 @@ namespace aflowlib {
   /// @brief load AFLOW lib entries for a given alloy set directly from the AFLOW REST API (source RESTAPI_RAW)
   /// @param alloy_list list of cleaned and sorted alloys
   /// @param lib_max number of elements in the largest alloy
+  /// @authors
+  /// @mod{HE,20220216,created}
   void EntryLoader::loadAlloySearchRR(const std::vector <std::string> & alloy_list, uint lib_max) {
     std::vector<std::string> rest_api_queries;
     std::vector<std::string> icsd_search_path_list;
@@ -1248,6 +1267,8 @@ namespace aflowlib {
   /// @brief map different AUID styles to a default
   /// @param AUID AUID to clean
   /// @return `false` if AUID is not valid
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note the AUID is cleaned in place
   bool EntryLoader::cleanAUID(std::string & AUID) {
     if (AUID.find('\"')!=std::string::npos) aurostd::StringSubst(AUID, "\"", "");
@@ -1260,6 +1281,8 @@ namespace aflowlib {
   /// @brief map different AURL styles to a default
   /// @param AUID AURL to clean
   /// @return `false` if AURL is not valid
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note AURL is not validated
   /// @note the AURL is cleaned in place
   bool EntryLoader::cleanAURL(std::string & AURL) {
@@ -1279,6 +1302,8 @@ namespace aflowlib {
   /// @brief create a AFLUX query string from a matchbook
   /// @param matchbook map with keyword and modifier
   /// @returns AFLUX query
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note does not include #m_aflux_server or #m_aflux_path
   /// @note the string is percent encoded
   std::string EntryLoader::buildAFLUXQuery(const std::map<std::string, std::string> & matchbook) const {
@@ -1298,6 +1323,8 @@ namespace aflowlib {
   /// @param name AFLOW run name (from path structure)
   /// @param lib_type indicate the LIB type | `I` for `ICSD` or `L` for 'LIBx'
   /// @return alloy string
+  /// @authors
+  /// @mod{HE,20220216,created}
   /// @note the alloy sting is sorted
   std::string EntryLoader::extractAlloy(std::string name, char lib_type) const {
     if (lib_type == 'I') { //ICSD

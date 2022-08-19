@@ -1228,19 +1228,6 @@ namespace unittest {
     }
 
     // ---------------------------------------------------------------------------
-    // Check | load xstructure from file
-    check_function = "EntryLoader::loadXstructureFile()";
-    check_description = "load xstructure extern";
-    if (!test_entry.auid.empty()) {
-      el.loadXstructureFile(test_entry, test_structure);
-      checkEqual(test_structure.atoms.size(), (size_t)
-      6, check_function, check_description, passed_checks, results);
-    } else {
-      check_description += " | failed to load example structure form AFLUX in previous test";
-      check(false, 0, 0, check_function, check_description, passed_checks, results);
-    }
-
-    // ---------------------------------------------------------------------------
     // Check | load AURL
     for (std::map<std::string, aflowlib::EntryLoader::Source>::iterator source = short_test_sources.begin();
          source != short_test_sources.end(); source++) {
