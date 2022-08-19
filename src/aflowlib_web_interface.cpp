@@ -1389,12 +1389,12 @@ namespace aflowlib {
     // FIX APENNSY
     structure_name=prototype;
     structure_description=prototype;
-    distance_gnd=999999; // gotta calculate it
-    distance_tie=999999; // gotta calculate it
+    distance_gnd=AUROSTD_MAX_DOUBLE; // gotta calculate it
+    distance_tie=AUROSTD_MAX_DOUBLE; // gotta calculate it
     pureA=FALSE;pureB=FALSE;
     fcc=FALSE; bcc=FALSE;hcp=FALSE;
-    stoich_a=999999;stoich_b=999999;
-    bond_aa=999999;bond_ab=999999;bond_bb=999999;
+    stoich_a=AUROSTD_MAX_DOUBLE;stoich_b=AUROSTD_MAX_DOUBLE;
+    bond_aa=AUROSTD_MAX_DOUBLE;bond_ab=AUROSTD_MAX_DOUBLE;bond_bb=AUROSTD_MAX_DOUBLE;
     vNsgroup.clear();vsgroup.clear();vstr.clear();  // apennsy
     // DONE
   }
