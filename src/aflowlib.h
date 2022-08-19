@@ -180,7 +180,7 @@ namespace aflowlib {
       string Bravais_superlattice_lattice_variation_type;
       string Bravais_superlattice_lattice_system;
       string Pearson_symbol_superlattice;
-      string reciprocal_geometry;vector<double> vreciprocal_geometry;
+      string reciprocal_geometry_relax;vector<double> vreciprocal_geometry_relax; //CO20220719 _relax
       double reciprocal_volume_cell;
       string reciprocal_lattice_type;
       string reciprocal_lattice_variation_type;

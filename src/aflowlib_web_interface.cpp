@@ -174,7 +174,7 @@ namespace aflowlib {
     Bravais_superlattice_lattice_variation_type=b.Bravais_superlattice_lattice_variation_type;
     Bravais_superlattice_lattice_system=b.Bravais_superlattice_lattice_system;
     Pearson_symbol_superlattice=b.Pearson_symbol_superlattice;
-    reciprocal_geometry=b.reciprocal_geometry;vreciprocal_geometry.clear();for(uint i=0;i<b.vreciprocal_geometry.size();i++) vreciprocal_geometry.push_back(b.vreciprocal_geometry.at(i));
+    reciprocal_geometry_relax=b.reciprocal_geometry_relax;vreciprocal_geometry_relax.clear();for(uint i=0;i<b.vreciprocal_geometry_relax.size();i++) vreciprocal_geometry_relax.push_back(b.vreciprocal_geometry_relax.at(i));  //CO20220719 _relax
     reciprocal_volume_cell=b.reciprocal_volume_cell; //DX20190124 - fix typo, add reciprocal
     reciprocal_lattice_type=b.reciprocal_lattice_type;
     reciprocal_lattice_variation_type=b.reciprocal_lattice_variation_type;
@@ -313,7 +313,7 @@ namespace aflowlib {
     //[CO20200829 - OBSOLETE]vspinD_magmom_orig.clear(); // clear all vectors
     //[CO20200829 - OBSOLETE]vsponsor.clear();
     //[CO20200829 - OBSOLETE]vstoichiometry.clear(); // clear all vectors
-    //[CO20200829 - OBSOLETE]vreciprocal_geometry.clear(); // clear all vectors //DX20180824 - added reciprocal lattice parameters
+    //[CO20200829 - OBSOLETE]vreciprocal_geometry_relax.clear(); // clear all vectors //DX20180824 - added reciprocal lattice parameters  //CO20220719 _relax
     //[CO20200829 - OBSOLETE]// BADER
     //[CO20200829 - OBSOLETE]vbader_net_charges.clear();
     //[CO20200829 - OBSOLETE]vbader_atomic_volumes.clear();
@@ -457,7 +457,7 @@ namespace aflowlib {
     Bravais_superlattice_lattice_variation_type.clear();
     Bravais_superlattice_lattice_system.clear();
     Pearson_symbol_superlattice.clear();
-    reciprocal_geometry.clear();vreciprocal_geometry.clear();
+    reciprocal_geometry_relax.clear();vreciprocal_geometry_relax.clear(); //CO20220719 _relax
     reciprocal_volume_cell=AUROSTD_NAN;
     reciprocal_lattice_type.clear();
     reciprocal_lattice_variation_type.clear();
@@ -1272,7 +1272,7 @@ namespace aflowlib {
       oss << "Bravais_superlattice_lattice_variation_type=" << Bravais_superlattice_lattice_variation_type << (html?"<br>":"") << endl;
       oss << "Bravais_superlattice_lattice_system=" << Bravais_superlattice_lattice_system << (html?"<br>":"") << endl;
       oss << "Pearson_symbol_superlattice=" << Pearson_symbol_superlattice << (html?"<br>":"") << endl;
-      oss << "reciprocal_geometry=" << reciprocal_geometry << "  vreciprocal_geometry= ";for(uint j=0;j<vreciprocal_geometry.size();j++) oss << vreciprocal_geometry.at(j) << " "; oss << (html?"<br>":"") << endl;
+      oss << "reciprocal_geometry_relax=" << reciprocal_geometry_relax << "  vreciprocal_geometry_relax= ";for(uint j=0;j<vreciprocal_geometry_relax.size();j++) oss << vreciprocal_geometry_relax.at(j) << " "; oss << (html?"<br>":"") << endl; //CO20220719 _relax
       oss << "reciprocal_volume_cell=" << reciprocal_volume_cell << (html?"<br>":"") << endl;
       oss << "reciprocal_lattice_type=" << reciprocal_lattice_type << (html?"<br>":"") << endl;
       oss << "reciprocal_lattice_variation_type=" << reciprocal_lattice_variation_type << (html?"<br>":"") << endl;
@@ -1561,7 +1561,7 @@ namespace aflowlib {
       if(Bravais_superlattice_lattice_variation_type.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "Bravais_superlattice_lattice_variation_type=" << Bravais_superlattice_lattice_variation_type << eendl;
       if(Bravais_superlattice_lattice_system.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "Bravais_superlattice_lattice_system=" << Bravais_superlattice_lattice_system << eendl;
       if(Pearson_symbol_superlattice.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "Pearson_symbol_superlattice=" << Pearson_symbol_superlattice << eendl;
-      if(reciprocal_geometry.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "reciprocal_geometry=" << reciprocal_geometry << eendl;
+      if(reciprocal_geometry_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "reciprocal_geometry_relax=" << reciprocal_geometry_relax << eendl; //CO20220719 _relax
       if(reciprocal_volume_cell!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "reciprocal_volume_cell=" << reciprocal_volume_cell << eendl;
       if(reciprocal_lattice_type.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "reciprocal_lattice_type=" << reciprocal_lattice_type << eendl;
       if(reciprocal_lattice_variation_type.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "reciprocal_lattice_variation_type=" << reciprocal_lattice_variation_type << eendl;
@@ -3047,11 +3047,11 @@ namespace aflowlib {
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
-      if(vreciprocal_geometry.size()) {
+      if(vreciprocal_geometry_relax.size()) { //CO20220719 _relax
         //aflowlib_libraries specifies precision of 7
-        sscontent_json << "\"reciprocal_geometry\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vreciprocal_geometry,7),",") << "]";
+        sscontent_json << "\"reciprocal_geometry_relax\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vreciprocal_geometry_relax,7),",") << "]";  //CO20220719 _relax
       } else {
-        if(PRINT_NULL) sscontent_json << "\"reciprocal_geometry\":null";
+        if(PRINT_NULL) sscontent_json << "\"reciprocal_geometry_relax\":null";  //CO20220719 _relax
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
