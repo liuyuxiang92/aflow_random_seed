@@ -1137,8 +1137,8 @@ vasp:	all
 send_version_updates_email:
 	rm -f version_updates_email.txt
 	$(MAKE) version_updates_email.txt
-	[ -s version_updates_email.txt ]
-	cat version_updates_email.txt | mail -r aflow@materials.duke.edu -s "AFLOW Code Update: v$(VERSNUMBER)" aflow+int+737+2740356048620877160@groups.io
+	[ -f version_updates_email.txt ] && [ -s version_updates_email.txt ]
+	send_aflow_code_update_email $(VERSNUMBER)
 	rm -f version_updates_email.txt
 #CO20190131 - STOP
 #CO20190218 - START
