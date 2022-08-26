@@ -74,6 +74,8 @@ namespace aflowlib {
     m_out_debug = (XHOST.DEBUG || _DEBUG_ENTRY_LOADER_);
     m_xstructure_relaxed = false;
     m_xstructure_original = false;
+    m_xstructure_final_file_name = {"CONTCAR.relax2", "CONTCAR.relax", "POSCAR.static", "POSCAR.bands", "CONTCAR.static", "CONTCAR.bands"};
+
     m_sqlite_file = DEFAULT_AFLOW_DB_FILE;
     m_sqlite_alloy_file = DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE;
     m_sqlite_collection = "WEB";
@@ -114,6 +116,7 @@ namespace aflowlib {
     m_out_silent = b.m_out_silent;
     m_xstructure_relaxed = b.m_xstructure_relaxed;
     m_xstructure_original = b.m_xstructure_original;
+    m_xstructure_final_file_name = b.m_xstructure_final_file_name;
     m_sqlite_file = b.m_sqlite_file;
     m_sqlite_alloy_file = b.m_sqlite_alloy_file;
     m_sqlite_collection = b.m_sqlite_collection;
@@ -832,23 +835,62 @@ namespace aflowlib {
       if (loadXstructureAflowIn(entry, new_structure, 1)) { // load from aflow.in
         entry.vstr.push_back(new_structure);
       } else {
-          m_logger_message << "Failed to add original structure to " << entry.auid << " (" << entry.aurl << ")";
-          outError(__AFLOW_FUNC__, __LINE__);
+        m_logger_message << "Failed to add original structure to " << entry.auid << " (" << entry.aurl << ")";
+        outError(__AFLOW_FUNC__, __LINE__);
       }
     } else {
       xstructure new_structure;
       if (pflow::loadXstructureLibEntry(entry, new_structure)) { // load directly from the entry (AFLUX, SQLITE)
         entry.vstr.push_back(new_structure);
+      } else if (loadXstructureFile(entry, new_structure)){
+        entry.vstr.push_back(new_structure);
       } else if (loadXstructureAflowIn(entry, new_structure, -1)) { // load from aflow.in
         entry.vstr.push_back(new_structure);
       } else {
-          m_logger_message << "Failed to add relaxed structure to " << entry.auid << " (" << entry.aurl << ")";
-          outError(__AFLOW_FUNC__, __LINE__);
+        m_logger_message << "Failed to add relaxed structure to " << entry.auid << " (" << entry.aurl << ")";
+        outError(__AFLOW_FUNC__, __LINE__);
+      }
+    }
+  }
+
+  /// @brief load a structure from a structure file
+  /// @param entry AFLOW lib entry
+  /// @param new_structure save-to structure
+  /// @param possible_files load the structure from the first exiting sources given (if list is empty use m_xstructure_final_file_name)
+  /// @return xstructure
+  /// @note does not add the structure to entry.vstr
+  bool EntryLoader::loadXstructureFile(const aflowlib::_aflowlib_entry &entry, xstructure &new_structure, std::vector <std::string> possible_files) {
+    std::string base_url = m_restapi_server + m_restapi_path + entry.aurl.substr(28) + "/";
+    std::string base_folder = m_filesystem_path + entry.aurl.substr(28) + "/";
+    base_folder = std::regex_replace(base_folder, m_re_aurl2file, "$1/" + m_filesystem_collection + "/");
+    std::string poscar;
+    if (entry.catalog =="LIB0" && !m_filesystem_available && entry.aurl.substr(entry.aurl.size() - 2)=="/0"){
+      return false; // no entries in RESTAPI for WEB0 /0
+    }
+
+    // if no file names given use the class defaults
+    if (possible_files.empty()) possible_files = m_xstructure_final_file_name;
+
+    std::vector <std::string> available_files;
+    if (m_filesystem_available) {
+      aurostd::DirectoryLS(base_folder, available_files);
+    } else {
+      listRestAPI(base_url, available_files, false);
+    }
+
+    std::string selected_file;
+    for (std::vector<std::string>::const_iterator file_name = possible_files.begin(); file_name != possible_files.end(); file_name++) {
+      if (aurostd::EWithinList(available_files, *file_name, selected_file)) {
+        if (m_filesystem_available) aurostd::efile2string(base_folder + selected_file, poscar);
+        else poscar = getRawRestAPIQuery(base_url + selected_file, true);
+        if (!poscar.empty()) { // load from aflow.in
+          new_structure = xstructure((std::stringstream) poscar, IOVASP_AUTO);
+          return true;
         }
       }
     }
-
-
+    return false;
+  }
 
   /// @brief load the first structure in an `aflow.in` file
   /// @param entry AFLOW lib entry

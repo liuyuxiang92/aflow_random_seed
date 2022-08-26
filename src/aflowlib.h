@@ -746,6 +746,9 @@ namespace aflowlib {
     bool m_xstructure_relaxed;  ///< add the relaxed structure into the lib entry
     bool m_xstructure_original; ///< add the original structure into the lib entry
 
+    /// sources for the relaxed structure (in order of priority)
+    std::vector<std::string> m_xstructure_final_file_name;
+
     std::string m_sqlite_file;          ///< location of the internal AFLUX SQLITE DB file
     std::string m_sqlite_alloy_file;    ///< location of the public alloy SQLITE DB file
     std::string m_sqlite_collection;    ///< collection to use for queries
@@ -823,7 +826,8 @@ namespace aflowlib {
 
     // xstructure loaders
     void addXstructure(aflowlib::_aflowlib_entry & entry, bool orig = false);
-    bool loadXstructureAflowIn(const aflowlib::_aflowlib_entry & entry, xstructure & new_structure, const int index);
+    bool loadXstructureFile(const aflowlib::_aflowlib_entry & entry, xstructure & new_structure, std::vector <std::string> possible_files={});
+    bool loadXstructureAflowIn(const aflowlib::_aflowlib_entry & entry, xstructure & new_structure, const int index=-1);
 
     // getter for views on the loaded aflowlib entries (using zero copy shared_ptr)
     void getEntriesViewFlat(std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>> & result) const;

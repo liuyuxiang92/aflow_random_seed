@@ -53,7 +53,13 @@
 // look into aflow.h for the definitions
 
 // constructors
-_atom::_atom() {
+_atom::_atom() {free();} 
+
+// destructor
+_atom::~_atom() {free();}
+
+
+void _atom::free() { // PRIVATE //HE20220826 changed constructor to use free() 
   fpos.clear();
   cpos.clear();
   corigin.clear();
@@ -93,14 +99,7 @@ _atom::_atom() {
   print_cartesian=FALSE;
 }
 
-// destructor
-_atom::~_atom() {free();}
-
-void _atom::free() { // PRIVATE
-}
-
 void _atom::copy(const _atom& b) { // copy PRIVATE
-  free();
   fpos=b.fpos;
   cpos=b.cpos;
   corigin=b.corigin;
@@ -141,7 +140,7 @@ void _atom::copy(const _atom& b) { // copy PRIVATE
 }
 
 const _atom& _atom::operator=(const _atom& b) {  // operator= PUBLIC
-  if(this!=&b) {free();copy(b);}
+  if(this!=&b) {copy(b);}
   return *this;
 }
 
@@ -150,7 +149,7 @@ _atom::_atom(const _atom& b) { // copy PUBLIC
   copy(b);
 }
 
-void _atom::clear(){_atom a; (*this)=a;}
+void _atom::clear(){free();}
 
 ostream& operator<<(ostream& oss,const _atom& atom) {
   oss.setf(std::ios::fixed,std::ios::floatfield);
