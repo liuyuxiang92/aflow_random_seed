@@ -99,6 +99,7 @@ namespace aflowlib {
     m_entries_layered_map = std::make_shared<std::map<short,
                                              std::map<std::string,
                                              std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>>>();
+
     m_current_source = Source::NONE;
     m_filesystem_available = false;
     m_out_super_silent = false;
@@ -1034,6 +1035,9 @@ namespace aflowlib {
   /// @authors
   /// @mod{HE,20220216,created}
   void EntryLoader::selectSource() {
+    if (m_current_source == Source::NONE){
+      EntryLoader::getCommandlineSource();
+    }
 
     if (m_current_source == Source::NONE || m_current_source == Source::FAILED) {
       m_out_super_silent = true;
@@ -1070,6 +1074,16 @@ namespace aflowlib {
       m_logger_message << "Failed to find a working source!";
       outHardError(__AFLOW_FUNC__, __LINE__, _GENERIC_ERROR_);
     }
+  }
+
+  bool EntryLoader::getCommandlineSource(){
+    string raw_source = XHOST.vflag_control.getattachedscheme("ENTRY_LOADER::SOURCE");
+    raw_source = aurostd::tolower(raw_source);
+    if (raw_source == "aflux") return EntryLoader::setSource(Source::AFLUX);
+    else if (raw_source == "sqlite") return EntryLoader::setSource(Source::SQLITE);
+    else if (raw_source == "file" || raw_source == "filesystem") return EntryLoader::setSource(Source::FILESYSTEM);
+    else if (raw_source == "rest" || raw_source == "restapi") return EntryLoader::setSource(Source::RESTAPI);
+    else return false;
   }
 
   /// @brief list directories or files for the REST API

@@ -857,6 +857,7 @@ namespace aflowlib {
     bool m_out_super_silent;     ///< mute all output - used for private checks
 
     void selectSource();
+    bool getCommandlineSource();
     void listRestAPI(std::string url, std::vector<std::string> & result, bool directories=true);
     void getAlloyAUIDList(const std::vector<std::string> & alloy_list, std::vector<std::string> & auid_list);
     void loadAlloySearchFSR(const std::vector<std::string> & alloy_list, uint lib_max); // FILESYSTEM_RAW
