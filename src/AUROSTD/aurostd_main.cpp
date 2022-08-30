@@ -8075,13 +8075,13 @@ namespace aurostd {
 
   //ME20220324
   template <typename utype>
-  string xmat2String(const xmatrix<utype>& xmat_in) {
-    vector<string> rows;
-    for (int i = xmat_in.lrows; i <= xmat_in.urows; i++) {
-      rows.push_back("[" + joinWDelimiter(xmat_in(i), ",") + "]");
+    string xmat2String(const xmatrix<utype>& xmat_in) {
+      vector<string> rows;
+      for (int i = xmat_in.lrows; i <= xmat_in.urows; i++) {
+        rows.push_back("[" + joinWDelimiter(xmat_in(i), ",") + "]");
+      }
+      return joinWDelimiter(rows, ",");
     }
-    return joinWDelimiter(rows, ",");
-  }
   template string xmat2String(const xmatrix<int>&);
   template string xmat2String(const xmatrix<uint>&);
 }

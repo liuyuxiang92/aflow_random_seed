@@ -3936,7 +3936,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
     // write the axes
     for (uint i = 1; i <= 3; i++) {
       for (uint j = 1; j <= 3; j++) {
-          oss << axes(i, j) << " ";
+        oss << axes(i, j) << " ";
       }
       oss << endl;
     }
