@@ -24,6 +24,23 @@
 #define AFLOWRC_DEFAULT_TMPFS_DIRECTORIES               string("/tmp/,/run/shm/,/dev/shm/")
 #define         DEFAULT_TMPFS_DIRECTORIES               XHOST.adefault.getattachedscheme("DEFAULT_TMPFS_DIRECTORIES")
 
+
+//HE20220218 START
+// DEFAULTS ENTRY LOADER
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE      string("~/.aflow/aflowlib_alloy.db")
+#define         DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE      XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE")
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_SERVER       string("aflowlib.duke.edu")
+#define         DEFAULT_ENTRY_LOADER_AFLUX_SERVER       XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_AFLUX_SERVER")
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_PATH         string("/API/aflux/")
+#define         DEFAULT_ENTRY_LOADER_AFLUX_PATH         XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_AFLUX_PATH")
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_SERVER     string("aflowlib.duke.edu")
+#define         DEFAULT_ENTRY_LOADER_RESTAPI_SERVER     XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_RESTAPI_SERVER")
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_PATH       string("/AFLOWDATA/")
+#define         DEFAULT_ENTRY_LOADER_RESTAPI_PATH       XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_RESTAPI_PATH")
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_FS_PATH            string("/common/")
+#define         DEFAULT_ENTRY_LOADER_FS_PATH            XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_FS_PATH")
+//HE20220218 STOP
+
 //ME20191001 START
 // DEFAULTS AFLOW DATABASE
 #define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/var/cache/aflow_data/AFLOWDB/aflowlib.db")
@@ -458,6 +475,8 @@
 #define         ARUN_DIRECTORY_PREFIX                         XHOST.adefault.getattachedscheme("ARUN_DIRECTORY_PREFIX")
 
 //DEFAULT POCC //CO20181226
+#define AFLOWRC_DEFAULT_POCC_STRUCTURE_GENERATION_ALGO            string("UFF")
+#define         DEFAULT_POCC_STRUCTURE_GENERATION_ALGO            XHOST.adefault.getattachedscheme("DEFAULT_POCC_STRUCTURE_GENERATION_ALGO")
 #define AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING                   string("0:2400:300")
 #define         DEFAULT_POCC_TEMPERATURE_STRING                   XHOST.adefault.getattachedscheme("DEFAULT_POCC_TEMPERATURE_STRING")
 #define AFLOWRC_DEFAULT_POCC_EXCLUDE_UNSTABLE                     true  //ME20210927
@@ -1155,10 +1174,11 @@ namespace aflowrc {
 namespace aflowrc {
   bool is_available(std::ostream& oss,bool AFLOWRC_VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || AFLOWRC_VERBOSE);   
+    string soliloquy="aflowrc::is_available():";  //CO20200122
     bool aflowrc_local=FALSE;
     bool aflowrc_global=FALSE;
-    if(LDEBUG) oss << "aflowrc::is_available: BEGIN" << endl;
-    if(LDEBUG) oss << "aflowrc::is_available: XHOST.home=" << XHOST.home << endl;
+    if(LDEBUG) oss << soliloquy << " BEGIN" << endl;
+    if(LDEBUG) oss << soliloquy << " XHOST.home=" << XHOST.home << endl;
     // TESTING LOCAL OR USER BASED
     if(XHOST.aflowrc_filename.empty()) XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
     aflowrc_local=aurostd::FileExist(AFLOWRC_FILENAME_LOCAL);
@@ -1166,38 +1186,38 @@ namespace aflowrc {
 
     // LOCAL=TRUE && GLOBAL=TRUE => take LOCAL
     if(aflowrc_local && aflowrc_global) {
-      if(LDEBUG) oss << "aflowrc::is_available: LOCAL=TRUE && GLOBAL=TRUE => LOCAL " << endl;
+      if(LDEBUG) oss << soliloquy << " LOCAL=TRUE && GLOBAL=TRUE => LOCAL " << endl;
       XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
-      if(LDEBUG) oss << "aflowrc::is_available: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
-      if(LDEBUG) oss << "aflowrc::is_available: END" << endl;
+      if(LDEBUG) oss << soliloquy << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+      if(LDEBUG) oss << soliloquy << " END" << endl;
       return TRUE;
     }
     // LOCAL=TRUE && GLOBAL=FALSE => take LOCAL
     if(aflowrc_local && !aflowrc_global) {
-      if(LDEBUG) oss << "aflowrc::is_available: LOCAL=TRUE && GLOBAL=FALSE => LOCAL " << endl;
+      if(LDEBUG) oss << soliloquy << " LOCAL=TRUE && GLOBAL=FALSE => LOCAL " << endl;
       XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL; 
-      if(LDEBUG) oss << "aflowrc::is_available: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
-      if(LDEBUG) oss << "aflowrc::is_available: END" << endl;
+      if(LDEBUG) oss << soliloquy << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+      if(LDEBUG) oss << soliloquy << " END" << endl;
       return TRUE;
     }
     // LOCAL=FALSE && GLOBAL=TRUE => take GLOBAL
     if(!aflowrc_local && aflowrc_global) {
-      if(LDEBUG) oss << "aflowrc::is_available: LOCAL=FALSE && GLOBAL=TRUE => GLOBAL " << endl;
+      if(LDEBUG) oss << soliloquy << " LOCAL=FALSE && GLOBAL=TRUE => GLOBAL " << endl;
       XHOST.aflowrc_filename=AFLOWRC_FILENAME_GLOBAL;
-      if(LDEBUG) oss << "aflowrc::is_available: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
-      if(LDEBUG) oss << "aflowrc::is_available: END" << endl;
+      if(LDEBUG) oss << soliloquy << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+      if(LDEBUG) oss << soliloquy << " END" << endl;
       return TRUE;
     }
     // LOCAL=FALSE && GLOBAL=FALSE => take NOTHING AND REWRITE
     if(!aflowrc_local && !aflowrc_global) {
-      if(LDEBUG) oss << "aflowrc::is_available: LOCAL=FALSE && GLOBAL=FALSE => NOTHING " << endl;
+      if(LDEBUG) oss << soliloquy << " LOCAL=FALSE && GLOBAL=FALSE => NOTHING " << endl;
       XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL; // because it is going to write it
-      if(LDEBUG) oss << "aflowrc::is_available: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
-      if(LDEBUG) oss << "aflowrc::is_available: END" << endl;
+      if(LDEBUG) oss << soliloquy << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+      if(LDEBUG) oss << soliloquy << " END" << endl;
       return FALSE;
     }
 
-    if(LDEBUG) oss << "aflowrc::is_available: END" << endl;
+    if(LDEBUG) oss << soliloquy << " END" << endl;
     return FALSE;
   }
 } // namespace aflowrc
@@ -1237,6 +1257,15 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_KZIP_BIN",AFLOWRC_DEFAULT_KZIP_BIN);
     aflowrc::load_default("DEFAULT_KZIP_EXT",AFLOWRC_DEFAULT_KZIP_EXT);
     aflowrc::load_default("DEFAULT_TMPFS_DIRECTORIES",AFLOWRC_DEFAULT_TMPFS_DIRECTORIES);
+
+    //HE20220218 START
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE", AFLOWRC_DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE);
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_AFLUX_SERVER", AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_SERVER);
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_AFLUX_PATH", AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_PATH);
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_RESTAPI_SERVER", AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_SERVER);
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_RESTAPI_PATH", AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_PATH);
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_FS_PATH", AFLOWRC_DEFAULT_ENTRY_LOADER_FS_PATH);
+    //HE20220218 STOP
 
     //ME20191001 START
     // AFLOW database files
@@ -1471,6 +1500,7 @@ namespace aflowrc {
     aflowrc::load_default("ARUN_DIRECTORY_PREFIX",AFLOWRC_ARUN_DIRECTORY_PREFIX);
 
     // DEFAULT POCC
+    aflowrc::load_default("DEFAULT_POCC_STRUCTURE_GENERATION_ALGO",AFLOWRC_DEFAULT_POCC_STRUCTURE_GENERATION_ALGO);
     aflowrc::load_default("DEFAULT_POCC_TEMPERATURE_STRING",AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING);
     aflowrc::load_default("DEFAULT_POCC_EXCLUDE_UNSTABLE",AFLOWRC_DEFAULT_POCC_EXCLUDE_UNSTABLE);  //ME20210927
     aflowrc::load_default("DEFAULT_POCC_SITE_TOL",AFLOWRC_DEFAULT_POCC_SITE_TOL);
@@ -1865,6 +1895,18 @@ namespace aflowrc {
     aflowrc << "DEFAULT_TMPFS_DIRECTORIES=\"" << AFLOWRC_DEFAULT_TMPFS_DIRECTORIES << "\"" << endl;
 
     aflowrc << " " << endl;
+
+    //HE20220218 START
+    aflowrc << "// DEFAULTS ENTRY LOADER" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE << "\"" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_AFLUX_SERVER=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_SERVER << "\"" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_AFLUX_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_PATH << "\"" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_RESTAPI_SERVER=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_SERVER << "\"" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_RESTAPI_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_PATH << "\"" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_FS_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_FS_PATH << "\"" << endl;
+    aflowrc << " " << endl;
+    //HE20220218 STOP
+
     //ME20191001 START
     aflowrc << "// DEFAULT AFLOW DATABASE" << endl;
     aflowrc << "DEFAULT_AFLOW_DB_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_FILE << "\"" << endl;
@@ -2113,6 +2155,7 @@ namespace aflowrc {
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS POCC" << endl;
+    aflowrc << "DEFAULT_POCC_STRUCTURE_GENERATION_ALGO=\"" << AFLOWRC_DEFAULT_POCC_STRUCTURE_GENERATION_ALGO << "\"" << " // UFF" << endl;
     aflowrc << "DEFAULT_POCC_TEMPERATURE_STRING=\"" << AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING << "\"" << endl;
     aflowrc << "DEFAULT_POCC_EXCLUDE_UNSTABLE=" << AFLOWRC_DEFAULT_POCC_EXCLUDE_UNSTABLE << endl;  //ME20210927
     aflowrc << "DEFAULT_POCC_SITE_TOL=" << AFLOWRC_DEFAULT_POCC_SITE_TOL << endl;
@@ -2482,6 +2525,16 @@ namespace aflowrc {
     if(LDEBUG) oss << "aflowrc::print_aflowrc: XHOST.home=" << XHOST.home << endl;
     if(LDEBUG) oss << "aflowrc::print_aflowrc: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
 
+    //HE20220218 START
+    if(LDEBUG) oss << "// DEFAULTS ENTRY LOADER" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_AFLUX_SERVER=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_SERVER << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_AFLUX_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_PATH << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_RESTAPI_SERVER=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_SERVER << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_RESTAPI_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_PATH << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_FS_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_FS_PATH << "\"" << endl;
+    //HE20220218 STOP
+
     //ME20191001 START
     if(LDEBUG) oss << "// DEFAULT AFLOW DATABASE" << endl;
     if(LDEBUG) oss << "DEFAULT_AFLOW_DB_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_FILE << "\"" << endl;
@@ -2719,6 +2772,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"ARUN_DIRECTORY_PREFIX\")=\"" << ARUN_DIRECTORY_PREFIX << "\"" << endl;
 
     if(LDEBUG) oss << "// DEFAULTS POCC" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_STRUCTURE_GENERATION_ALGO\")=\"" << DEFAULT_POCC_STRUCTURE_GENERATION_ALGO << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_TEMPERATURE_STRING\")=\"" << DEFAULT_POCC_TEMPERATURE_STRING << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_EXCLUDE_UNSTABLE\")=" << DEFAULT_POCC_EXCLUDE_UNSTABLE << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_SITE_TOL\")=" << DEFAULT_POCC_SITE_TOL << endl;

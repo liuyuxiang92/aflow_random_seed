@@ -119,9 +119,10 @@ namespace pflow {
         _atom a2=neigh_mat.at(ia1).at(ia2);
         xvector<double> a2pos=a2.cpos;
         for(int i=1;i<=3;i++) ijk(2,i)=a2.ijk(i);
-        for(uint ia3=0;(ia3<neigh_mat.at(a2.number).size() && ia3<MAX_NUM_ANGLE);ia3++) {
+        for(uint ia3=0;(ia3<neigh_mat.at(a2.basis).size() && ia3<MAX_NUM_ANGLE);ia3++) //[CO20200130 - number->basis]for(uint ia3=0;(ia3<neigh_mat.at(a2.number).size() && ia3<MAX_NUM_ANGLE);ia3++) 
+          {
           pflag(3)=1;
-          _atom a3=neigh_mat.at(a2.number).at(ia3);      
+          _atom a3=neigh_mat.at(a2.basis).at(ia3);       //[CO20200130 - number->basis]_atom a3=neigh_mat.at(a2.number).at(ia3);      
           xvector<double> a3pos=a3.cpos;
           for(int i=1;i<=3;i++) ijk(3,i)=a3.ijk(i);
           xvector<double> a1toa2(3),a2toa3(3),a1toa3(3);
@@ -135,7 +136,7 @@ namespace pflow {
             if(aurostd::abs(getcos(a1toa2,a2toa3)-1)<tol) angle=180;
             if(aurostd::abs(getcos(a1toa2,a2toa3)+1)<tol) angle=0;
             if(pflag(1)) {
-              oss << setw(4) << a1.number+1
+              oss << setw(4) << a1.basis+1 //[CO20200130 - number->basis]oss << setw(4) << a1.number+1
                 << " " << setw(4) << a1.name.c_str()
                 << " " << setw(3) << ijk(1,1)
                 << " " << setw(3) << ijk(1,2)
@@ -144,7 +145,7 @@ namespace pflow {
               oss << endl;
             } // if plag(1)
             if(pflag(2)) {
-              oss << "     " << setw(4) << a2.number+1
+              oss << "     " << setw(4) << a2.basis+1  //[CO20200130 - number->basis]oss << "     " << setw(4) << a2.number+1
                 << " " << setw(4) << a2.name.c_str()
                 << " " << setw(3) << ijk(2,1)
                 << " " << setw(3) << ijk(2,2)
@@ -153,7 +154,7 @@ namespace pflow {
               oss << endl;
             } // if plag(2)
             if(pflag(3)) {
-              oss << "          " << setw(4) << a3.number+1
+              oss << "          " << setw(4) << a3.basis+1 //[CO20200130 - number->basis]oss << "          " << setw(4) << a3.number+1
                 << " " << setw(4) << a3.name.c_str()
                 << " " << setw(3) << ijk(3,1)
                 << " " << setw(3) << ijk(3,2)
@@ -479,9 +480,9 @@ namespace pflow {
       oss << "_symmetry_Int_Tables_Number  " << 1 << endl;
     }
     oss << "loop_" << endl;
-    oss << "_symmetry_equiv_pos_site_id" << endl;
-    //oss << "_symmetry_equiv_pos_as_xyz_" << endl;
-    oss << "_symmetry_equiv_pos_as_xyz" << endl;  //CO fix 20170606
+    oss << " _symmetry_equiv_pos_site_id" << endl;
+    //oss << " _symmetry_equiv_pos_as_xyz_" << endl;
+    oss << " _symmetry_equiv_pos_as_xyz" << endl;  //CO fix 20170606
 
     // if the Wyckoff positions are stored/calculated
     if(str.wyccar_ITC.size()!=0){
@@ -502,7 +503,8 @@ namespace pflow {
       oss << " _atom_site_fract_x" << endl;
       oss << " _atom_site_fract_y" << endl;
       oss << " _atom_site_fract_z" << endl;
-      oss << " _atom_site_thermal_displace_type" << endl;
+      //[DX+CO20220715 - OBSOLETE]oss << " _atom_site_thermal_displace_type" << endl; //https://www.iucr.org/__data/iucr/cifdic_html/1/cif_core.dic/Iatom_site_thermal_displace_type.html
+      oss << " _atom_site_adp_type" << endl;  //DX+CO20220715
       oss << " _atom_site_B_iso_or_equiv" << endl;
       oss << " _atom_site_type_symbol" << endl;
       oss << " _atom_site_symmetry_multiplicity" << endl;
@@ -551,7 +553,8 @@ namespace pflow {
       oss << " _atom_site_fract_x" << endl;
       oss << " _atom_site_fract_y" << endl;
       oss << " _atom_site_fract_z" << endl;
-      oss << " _atom_site_thermal_displace_type" << endl;
+      //[DX+CO20220715 - OBSOLETE]oss << " _atom_site_thermal_displace_type" << endl; //https://www.iucr.org/__data/iucr/cifdic_html/1/cif_core.dic/Iatom_site_thermal_displace_type.html
+      oss << " _atom_site_adp_type" << endl;  //DX+CO20220715
       oss << " _atom_site_B_iso_or_equiv" << endl;
       oss << " _atom_site_type_symbol" << endl;
 
@@ -2607,7 +2610,7 @@ namespace pflow {
       _atom a = neigh_mat.at(ia).at(0);
 
       // Output reference atom info.
-      oss << setw(4) << a.number+1 << " " << setw(4) << a.name.c_str();
+      oss << setw(4) << a.basis+1 << " " << setw(4) << a.name.c_str(); //[CO20200130 - number->basis]oss << setw(4) << a.number+1 << " " << setw(4) << a.name.c_str();
       xvector<double> pos(3);
       if(str.coord_flag==FALSE) { // direct
         pos=a.fpos;
@@ -2624,7 +2627,7 @@ namespace pflow {
         xvector<int> ijk(3);
         ijk=an.ijk;
         oss << "        ";
-        oss << setw(4) << an.number+1 << " ";
+        oss << setw(4) << an.basis+1 << " "; //[CO20200130 - number->basis]oss << setw(4) << an.number+1 << " ";
         oss << setw(4) << an.name.c_str() << "   ";
         oss << setw(3) << ijk(1) << " " << setw(3) << ijk(2) << " " << setw(3) << ijk(3) << "   ";
         xvector<double> disp(3);
@@ -2676,7 +2679,7 @@ namespace pflow {
       _atom a = neigh_mat.at(ia).at(0);
 
       // Output reference atom info.
-      oss << setw(4) << a.number+1 << " " << setw(4) << a.name.c_str();
+      oss << setw(4) << a.basis+1 << " " << setw(4) << a.name.c_str(); //[CO20200130 - number->basis]oss << setw(4) << a.number+1 << " " << setw(4) << a.name.c_str();
       xvector<double> pos(3);
       if(str.coord_flag==FALSE) { // direct
         pos=a.fpos;
@@ -2694,7 +2697,7 @@ namespace pflow {
         xvector<double> fpos(3);fpos=neigh_mat.at(ia).at(in).fpos;
         xvector<double> cpos(3);cpos=neigh_mat.at(ia).at(in).cpos;
         oss << "      ";
-        oss << setw(4) << neigh_mat.at(ia).at(in).number+1 << " ";
+        oss << setw(4) << neigh_mat.at(ia).at(in).basis+1 << " ";  //[CO20200130 - number->basis]oss << setw(4) << neigh_mat.at(ia).at(in).number+1 << " ";
         oss << setw(4) << neigh_mat.at(ia).at(in).name.c_str() << "   ";
         oss << setw(3+xtra) <<  ijk(1) << " " << setw(3+xtra) <<  ijk(2) << " " << setw(3+xtra) <<  ijk(3) << "   ";
         //     oss << setw(3+xtra) << "F " << fpos(1) << " " << setw(3+xtra) << fpos(2) << " " << setw(3+xtra) << fpos(3) << "   ";
@@ -4449,7 +4452,7 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
         xvector<int> ijk(3);
         ijk=an.ijk;
         oss << "        ";
-        oss << setw(4) << an.number+1 << " ";
+        oss << setw(4) << an.basis+1 << " "; //[CO20200130 - number->basis]oss << setw(4) << an.number+1 << " ";
         oss << setw(4) << an.name.c_str() << "   ";
         oss << setw(3) << ijk(1) << " " << setw(3) << ijk(2) << " " << setw(3) << ijk(3) << "   ";
         oss << setprecision(4) << AtomDist(a,an);
@@ -4503,7 +4506,7 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
       xvector<int> ijk(3);
       ijk=an.ijk;
       oss << "        ";
-      oss << setw(4) << an.number+1 << " ";
+      oss << setw(4) << an.basis+1 << " "; //[CO20200130 - number->basis]oss << setw(4) << an.number+1 << " ";
       oss << setw(4) << an.name.c_str() << "   ";
       oss << setw(3) << ijk(1) << " " << setw(3) << ijk(2) << " " << setw(3) << ijk(3) << "   ";
       oss << setprecision(4) << AtomDist(a,an);
@@ -4548,7 +4551,7 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
     newatom.cleanname="XX";
     newatom.sd="";
     newatom.atomic_number=-1;
-    newatom.number=nat+iat;                 // reference position for convasp
+    //[CO20200130 - number->basis]newatom.number=nat+iat;                 // reference position for convasp
     newatom.basis=nat+iat;                  // position in the basis	
     clear(newatom.ijk);                     // position in the unit cell
     sstr.atoms.push_back(newatom);
