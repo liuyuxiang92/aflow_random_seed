@@ -1077,7 +1077,7 @@ namespace aflowlib {
     string soliloquy=XPID+"aflowlib::setAURL():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-    
+
     if(LOCAL) {
       aflowlib_data.aurl=aflowlib_data.auid=directory_LIB; //dummy
     } else {
@@ -1114,7 +1114,7 @@ namespace aflowlib {
       aurostd::StringSubst(aflowlib_data.aurl,":/AFLOWDATA",":AFLOWDATA");
 
       // cout << soliloquy << " AURL = " << aurostd::PaddedPOST(aflowlib_data.aurl,60) << endl;//"   " << directory_LIB << endl;  //CO20181226
-      
+
       if(LDEBUG){cerr << soliloquy << " aurl(POST)=" << aflowlib_data.aurl << endl;}
     }
   }
@@ -1418,7 +1418,7 @@ namespace aflowlib {
     aflowlib::setAURL(aflowlib_data,directory_LIB,LOCAL); // build aflowlib_data.aurl
 
     if(LOCAL==false){
-      
+
       // build aflowlib_data.auid
 
       if(LDEBUG) cerr << soliloquy << " [AUID=0] directory_LIB=" << directory_LIB << endl;

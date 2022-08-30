@@ -1408,7 +1408,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   //DEFAULT_VASP_FORCE_OPTION_BADER_STATIC depends on RUN type, it must be fixed above here
   if(DEFAULT_VASP_FORCE_OPTION_BADER_STATIC && 
       (xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS || xvasp.AVASP_flag_RUN_RELAX_STATIC || xvasp.AVASP_flag_RUN_STATIC || xvasp.AVASP_flag_RUN_STATIC_BANDS)
-    && ((xvasp.AVASP_arun_mode != "APL") && (xvasp.AVASP_arun_mode != "AAPL") && (xvasp.AVASP_arun_mode != "QHA"))){
+      && ((xvasp.AVASP_arun_mode != "APL") && (xvasp.AVASP_arun_mode != "AAPL") && (xvasp.AVASP_arun_mode != "QHA"))){
     xvasp.aopts.flag("FLAG::AVASP_BADER",TRUE);
   }
 

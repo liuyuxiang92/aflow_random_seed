@@ -106,7 +106,7 @@ static const string POCC_DOSCAR_PREFIX="DOSCAR.pocc_T";
 static const string POCC_PHDOSCAR_PREFIX="PHDOSCAR.pocc_T";  // ME20210927
 //CO20200731 END
 static const vector<std::string> BRAVAIS_LATTICES = {"BCC","BCT","CUB","FCC","HEX","MCL","MCLC",
-                                                     "ORC","ORCC","ORCF","ORCI","RHL","TET","TRI"}; //HE20220420
+  "ORC","ORCC","ORCF","ORCI","RHL","TET","TRI"}; //HE20220420
 
 //XRD
 #define XRAY_RADIATION_COPPER_Kalpha 1.5418   //Angstroms     //CO20190622
@@ -3000,22 +3000,22 @@ namespace xthread {
       void unsetProgressBar();
 
       template <typename F, typename... A>
-      void run(uint ntasks, F& func, A&... args);
+        void run(uint ntasks, F& func, A&... args);
       template <typename F, typename... A>
-      void run(int ntasks, F& func, A&... args);
+        void run(int ntasks, F& func, A&... args);
       template <typename F, typename... A>
-      void run(unsigned long long int ntasks, F& func, A&... args);
+        void run(unsigned long long int ntasks, F& func, A&... args);
       template <typename IT, typename F, typename... A>
-      void run(const IT& it, F& func, A&... args);
+        void run(const IT& it, F& func, A&... args);
       template <typename IT, typename F, typename... A>
-      void run(IT& it, F& func, A&... args);
+        void run(IT& it, F& func, A&... args);
 
       template <typename F, typename... A>
-      void runPredistributed(int ntasks, F& func, A&... args);
+        void runPredistributed(int ntasks, F& func, A&... args);
       template <typename F, typename... A>
-      void runPredistributed(uint ntasks, F& func, A&... args);
+        void runPredistributed(uint ntasks, F& func, A&... args);
       template <typename F, typename... A>
-      void runPredistributed(unsigned long long int ntasks, F& func, A&... args);
+        void runPredistributed(unsigned long long int ntasks, F& func, A&... args);
 
     private:
       void free();
@@ -3036,16 +3036,16 @@ namespace xthread {
       void freeThreads(int ncpus);
 
       template <typename I, typename F, typename... A>
-      void run(I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
+        void run(I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
       template <typename I, typename F, typename... A>
-      void spawnWorker(int ithread, I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
+        void spawnWorker(int ithread, I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
       template <typename I>
-      I advance(I& it, I& end, unsigned long long int ntasks, bool update_progress_bar=false);
+        I advance(I& it, I& end, unsigned long long int ntasks, bool update_progress_bar=false);
 
       template <typename I, typename F, typename... A>
-      void runPredistributed(I ntasks, F& func, A&... args);
+        void runPredistributed(I ntasks, F& func, A&... args);
       template <typename I, typename F, typename... A>
-      void spawnWorkerPredistributed(int ithread, I startIndex, I endIndex, F& func, A&... args);
+        void spawnWorkerPredistributed(int ithread, I startIndex, I endIndex, F& func, A&... args);
   };
 }
 #endif
@@ -5452,27 +5452,27 @@ namespace unittest {
       void displayResult(const xcheck& xchk);
 
       template <typename utype>
-      void check(const bool passed, const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
-          const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
+        void check(const bool passed, const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
+            const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
       void check(const bool passed, const vector<double>& calculated, const vector<double>& expected, const string& check_function,
           const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
       template <typename utype>
-      void check(const bool passed, const xmatrix<utype>& calculated, const xmatrix<utype>& expected, const string& check_function,
-          const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
+        void check(const bool passed, const xmatrix<utype>& calculated, const xmatrix<utype>& expected, const string& check_function,
+            const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
       void check(const bool passed, const xmatrix<double>& calculated, const xmatrix<double>& expected, const string& check_function,
           const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
       template <typename utype>
-      void check(const bool passed, const utype& calculated, const utype& expected, const string& check_function,
-          const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
+        void check(const bool passed, const utype& calculated, const utype& expected, const string& check_function,
+            const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
 
       template <typename utype>
-      void checkEqual(const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
-          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
+        void checkEqual(const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
+            const string& check_description, uint& passed_checks, vector<vector<string> >& results);
       void checkEqual(const vector<string>& calculated, const vector<string>& expected, const string& check_function,
           const string& check_description, uint& passed_checks, vector<vector<string> >& results);
       template <typename utype>
-      void checkEqual(const utype& calculated, const utype& expected, const string& check_function,
-          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
+        void checkEqual(const utype& calculated, const utype& expected, const string& check_function,
+            const string& check_description, uint& passed_checks, vector<vector<string> >& results);
       void checkEqual(const string& calculated, const string& expected, const string& check_function,
           const string& check_description, uint& passed_checks, vector<vector<string> >& results);
       void checkEqual(const bool calculated, const bool expected, const string& check_function,
