@@ -59,7 +59,8 @@
 
 #define _incarpad_ 48  //ME20181024
 
-string lattices[]={"","BCC","FCC","CUB","HEX","RHL","BCT","TET","ORC","ORCC","ORCF","ORCI","MCL","MCLC","TRI","XXX"};
+//HE20220420 OBSOLETE switch to global bravais lattices list
+//string lattices[]={"","BCC","FCC","CUB","HEX","RHL","BCT","TET","ORC","ORCC","ORCF","ORCI","MCL","MCLC","TRI","XXX"};
 
 #define _AVASP_DOUBLE2STRING_PRECISION_ 9
 
@@ -1407,7 +1408,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
   //DEFAULT_VASP_FORCE_OPTION_BADER_STATIC depends on RUN type, it must be fixed above here
   if(DEFAULT_VASP_FORCE_OPTION_BADER_STATIC && 
       (xvasp.AVASP_flag_RUN_RELAX_STATIC_BANDS || xvasp.AVASP_flag_RUN_RELAX_STATIC || xvasp.AVASP_flag_RUN_STATIC || xvasp.AVASP_flag_RUN_STATIC_BANDS)
-    && ((xvasp.AVASP_arun_mode != "APL") && (xvasp.AVASP_arun_mode != "AAPL") && (xvasp.AVASP_arun_mode != "QHA"))){
+      && ((xvasp.AVASP_arun_mode != "APL") && (xvasp.AVASP_arun_mode != "AAPL") && (xvasp.AVASP_arun_mode != "QHA"))){
     xvasp.aopts.flag("FLAG::AVASP_BADER",TRUE);
   }
 
@@ -6767,20 +6768,20 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
       if(DEBUG_SKIP) cerr << "SKIP (calculated): " << xvasp.AVASP_label << endl;
       return TRUE;
     }
-    for(uint ilattice=1;ilattice<=14;ilattice++) {
+    for(uint ilattice=0;ilattice<BRAVAIS_LATTICES.size();ilattice++) {//HE20220420 switch to global bravais lattices list
       // [OBSOLETE] if(aurostd::substring2bool(init::InitGlobalObject("Library_CALCULATED_ICSD_LIB"),lattices[ilattice]+"/"+xvasp.AVASP_label+" "))
-      if(aurostd::substring2bool(XHOST_Library_CALCULATED_ICSD_LIB,lattices[ilattice]+"/"+xvasp.AVASP_label+" ")) {
-        if(DEBUG_SKIP) cerr << "SKIP (calculated): " << lattices[ilattice] << "/" << xvasp.AVASP_label << endl;
+      if(aurostd::substring2bool(XHOST_Library_CALCULATED_ICSD_LIB,BRAVAIS_LATTICES[ilattice]+"/"+xvasp.AVASP_label+" ")) {
+        if(DEBUG_SKIP) cerr << "SKIP (calculated): " << BRAVAIS_LATTICES[ilattice] << "/" << xvasp.AVASP_label << endl;
         return TRUE;
       }
     }
     // TEST IF PREPARED
     string label;
     label="./ICSD/"+xvasp.AVASP_label+"/"+_AFLOWIN_;if(aurostd::FileExist(label)) {if(DEBUG_SKIP) cerr << "SKIP (prepared): " << xvasp.AVASP_label << endl; return TRUE;}
-    for(uint ilattice=1;ilattice<=14;ilattice++) {
-      label="./ICSD/"+lattices[ilattice]+"/"+xvasp.AVASP_label+"/"+_AFLOWIN_;
+    for(uint ilattice=0;ilattice<BRAVAIS_LATTICES.size();ilattice++) {//HE20220420 switch to global bravais lattices list
+      label="./ICSD/"+BRAVAIS_LATTICES[ilattice]+"/"+xvasp.AVASP_label+"/"+_AFLOWIN_;
       if(aurostd::FileExist(label)) {
-        if(DEBUG_SKIP) cerr << "SKIP (prepared): " << lattices[ilattice] << "/" << xvasp.AVASP_label << endl;
+        if(DEBUG_SKIP) cerr << "SKIP (prepared): " << BRAVAIS_LATTICES[ilattice] << "/" << xvasp.AVASP_label << endl;
         return TRUE;
       }
     }

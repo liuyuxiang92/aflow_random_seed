@@ -1028,7 +1028,7 @@ namespace aflowlib {
     string soliloquy=XPID+"aflowlib::setAURL():";
 
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
-    
+
     if(LOCAL) {
       aflowlib_data.aurl=aflowlib_data.auid=directory_LIB; //dummy
     } else {
@@ -1065,7 +1065,7 @@ namespace aflowlib {
       aurostd::StringSubst(aflowlib_data.aurl,":/AFLOWDATA",":AFLOWDATA");
 
       // cout << soliloquy << " AURL = " << aurostd::PaddedPOST(aflowlib_data.aurl,60) << endl;//"   " << directory_LIB << endl;  //CO20181226
-      
+
       if(LDEBUG){cerr << soliloquy << " aurl(POST)=" << aflowlib_data.aurl << endl;}
     }
   }
@@ -1369,7 +1369,7 @@ namespace aflowlib {
     aflowlib::setAURL(aflowlib_data,directory_LIB,LOCAL); // build aflowlib_data.aurl
 
     if(LOCAL==false){
-      
+
       // build aflowlib_data.auid
 
       if(LDEBUG) cerr << soliloquy << " [AUID=0] directory_LIB=" << directory_LIB << endl;
@@ -4645,11 +4645,11 @@ namespace aflowlib {
           if(data.Pearson_symbol_superlattice.empty()) { // Pearson_symbol_superlattice 
             data.Pearson_symbol_superlattice=vpflow_edata_relax.getattachedscheme("EDATA::PEARSON_SYMBOL_SUPERLATTICE"); 
           }
-          if(data.reciprocal_geometry.empty()) { // reciprocal_geometry
-            data.reciprocal_geometry=vpflow_edata_relax.getattachedscheme("EDATA::RECIPROCAL_LATTICE_PARAMETERS"); 
+          if(data.reciprocal_geometry_relax.empty()) { // reciprocal_geometry_relax //CO20220719 _relax
+            data.reciprocal_geometry_relax=vpflow_edata_relax.getattachedscheme("EDATA::RECIPROCAL_LATTICE_PARAMETERS");  //CO20220719 _relax
             vector<string> ktokens; 
-            aurostd::string2tokens(data.reciprocal_geometry,ktokens,",");
-            for(uint t=0;t<ktokens.size();t++) { data.vreciprocal_geometry.push_back(aurostd::string2utype<double>(ktokens[t])); }
+            aurostd::string2tokens(data.reciprocal_geometry_relax,ktokens,","); //CO20220719 _relax
+            for(uint t=0;t<ktokens.size();t++) { data.vreciprocal_geometry_relax.push_back(aurostd::string2utype<double>(ktokens[t])); }  //CO20220719 _relax
           }
           if(data.reciprocal_volume_cell==AUROSTD_NAN) { // reciprocal_volume_cell
             data.reciprocal_volume_cell=vpflow_edata_relax.getattachedutype<double>("EDATA::RECIPROCAL_SPACE_VOLUME"); 
@@ -4888,11 +4888,11 @@ namespace aflowlib {
           if(data.Pearson_symbol_superlattice.empty()) { // Pearson_symbol_superlattice 
             data.Pearson_symbol_superlattice=vpflow_edata_bands.getattachedscheme("EDATA::PEARSON_SYMBOL_SUPERLATTICE"); 
           }
-          if(data.reciprocal_geometry.empty()) { // reciprocal_geometry
-            data.reciprocal_geometry=vpflow_edata_bands.getattachedscheme("EDATA::RECIPROCAL_LATTICE_PARAMETERS"); 
+          if(data.reciprocal_geometry_relax.empty()) { // reciprocal_geometry_relax //CO20220719 _relax
+            data.reciprocal_geometry_relax=vpflow_edata_bands.getattachedscheme("EDATA::RECIPROCAL_LATTICE_PARAMETERS");  //CO20220719 _relax
             vector<string> ktokens;
-            aurostd::string2tokens(data.reciprocal_geometry,ktokens,",");
-            for(uint t=0;t<ktokens.size();t++) { data.vreciprocal_geometry.push_back(aurostd::string2utype<double>(ktokens[t])); }
+            aurostd::string2tokens(data.reciprocal_geometry_relax,ktokens,","); //CO20220719 _relax
+            for(uint t=0;t<ktokens.size();t++) { data.vreciprocal_geometry_relax.push_back(aurostd::string2utype<double>(ktokens[t])); }  //CO20220719 _relax
           }
           if(data.reciprocal_volume_cell==AUROSTD_NAN) { // reciprocal_volume_cell
             data.reciprocal_volume_cell=vpflow_edata_bands.getattachedutype<double>("EDATA::RECIPROCAL_SPACE_VOLUME"); 
@@ -6412,9 +6412,9 @@ namespace aflowlib {
       data.Bravais_superlattice_lattice_variation_type=data.Bravais_superlattice_lattice_variation_type_orig;
       data.Bravais_superlattice_lattice_system=data.Bravais_superlattice_lattice_system_orig;
       data.Pearson_symbol_superlattice=data.Pearson_symbol_superlattice_orig;
-      //reciprocal_geometry
-      data.vreciprocal_geometry=data.vreciprocal_geometry_orig;
-      data.reciprocal_geometry=data.reciprocal_geometry_orig;
+      //reciprocal_geometry_relax //CO20220719 _relax
+      data.vreciprocal_geometry_relax=data.vreciprocal_geometry_orig; //CO20220719 _relax
+      data.reciprocal_geometry_relax=data.reciprocal_geometry_orig; //CO20220719 _relax
       data.reciprocal_volume_cell=data.reciprocal_volume_cell_orig;
       //
       data.reciprocal_lattice_type=data.reciprocal_lattice_type_orig;
