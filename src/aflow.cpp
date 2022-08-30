@@ -410,16 +410,15 @@ int main(int _argc,char **_argv) {
 
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_proto1")) {
       vector<xstructure> vstr;
-      vector<string> vlattice;aurostd::string2tokens("BCC,BCT,CUB,FCC,HEX,MCL,MCLC,ORC,ORCC,ORCF,ORCI,RHL,TET,TRI",vlattice,",");
       aflowlib::_aflowlib_entry data;
       vector<aflowlib::_aflowlib_entry> vdata;
-      for(uint i=4;i<vlattice.size();i++) {
+      for(uint i=4;i<BRAVAIS_LATTICES.size();i++) { //HE20220420 switch to global bravais lattices list
         data.clear();
-        data.url2aflowlib("materials.duke.edu:AFLOWDATA/ICSD_WEB/"+vlattice.at(i)+"/?format=text",cout,FALSE);vdata.push_back(data);
-        cout << "AFLOWLIB " << vlattice.at(i) << "=" << data.vaflowlib_entries.size() << endl;
+        data.url2aflowlib("materials.duke.edu:AFLOWDATA/ICSD_WEB/"+BRAVAIS_LATTICES[i]+"/?format=text",cout,FALSE);vdata.push_back(data);
+        cout << "AFLOWLIB " << BRAVAIS_LATTICES[i] << "=" << data.vaflowlib_entries.size() << endl;
         for(uint j=0;j<data.vaflowlib_entries.size();j++) {
           aflowlib::_aflowlib_entry dataj;
-          dataj.url2aflowlib("materials.duke.edu:AFLOWDATA/ICSD_WEB/"+vlattice.at(i)+"/"+data.vaflowlib_entries.at(j),cout,TRUE);
+          dataj.url2aflowlib("materials.duke.edu:AFLOWDATA/ICSD_WEB/"+BRAVAIS_LATTICES[i]+"/"+data.vaflowlib_entries.at(j),cout,TRUE);
           aurostd::StringSubst(dataj.aurl,"aflowlib","materials");
           if(dataj.aurl!="") {
             xstructure str(dataj.aurl,"CONTCAR.relax.vasp",IOAFLOW_AUTO);
