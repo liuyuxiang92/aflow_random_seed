@@ -872,6 +872,13 @@ namespace init {
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::JPG\")=" << XHOST.vflag_control.flag("PRINT_MODE::JPG") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::PNG\")=" << XHOST.vflag_control.flag("PRINT_MODE::PNG") << endl;
 
+    // Allow the preselection of the EntryLoader source (will automatically fall back to the next best source if given source is not accessible)
+    XHOST.vflag_control.flag("ENTRY_LOADER::SOURCE",aurostd::args2attachedflag(argv,"--entry_loader_source=")); //HE20220826
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"ENTRY_LOADER::SOURCE\")=" << XHOST.vflag_control.flag("ENTRY_LOADER::SOURCE") << endl;  //HE20220826
+    if(XHOST.vflag_control.flag("ENTRY_LOADER::SOURCE")) XHOST.vflag_control.push_attached("ENTRY_LOADER::SOURCE",aurostd::args2attachedstring(argv,"--entry_loader_source=","")); //HE20220826
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"ENTRY_LOADER::SOURCE\")=" << XHOST.vflag_control.getattachedscheme("ENTRY_LOADER::SOURCE") << endl;  //HE20220826
+
+
     //[CO20191110]run pocc post-processing for particular temperatures from command line
     XHOST.vflag_control.flag("CALCULATION_TEMPERATURE",aurostd::args2attachedflag(argv,"--temperature=|--temp="));  //CO20191110
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"CALCULATION_TEMPERATURE\")=" << XHOST.vflag_control.flag("CALCULATION_TEMPERATURE") << endl;  //CO20191110

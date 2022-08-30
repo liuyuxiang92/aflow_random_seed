@@ -1172,13 +1172,23 @@ namespace aurostd {  // namespace aurostd
 }
 
 namespace aurostd {  // namespace aurostd
+  template<class utype>                          // function mod
+    xvector<utype> mod(const xvector<utype> &a,utype d) {  //CO20200127
+      xvector<utype> c(a.urows,a.lrows);
+      for(int i=a.lrows;i<=a.urows;i++)
+        c[i]=aurostd::mod(a[i],d);
+      return c;
+    }
+}
+
+namespace aurostd {  // namespace aurostd
   template<class utype>                                 // function mod_floored
     xvector<utype> mod_floored(const xvector<utype> &a,utype d) {  // SD20220117
       xvector<utype> c(a.urows,a.lrows);
       for(int i=a.lrows;i<=a.urows;i++)
           c[i]=mod_floored(a[i],d);
       return c;
-    }    
+    }
 }
 
 namespace aurostd {  // namespace aurostd
