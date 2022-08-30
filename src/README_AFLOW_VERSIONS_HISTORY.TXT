@@ -1,4 +1,4 @@
-3.2.13 - 2022/XX/XX
+3.2.13 - 2022/08/30
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz
         -- implemented QH-POCC and POCC+QHA (AS)
         -- improved formatting of aflow.qha.thermo.out file (AS)
@@ -42,6 +42,12 @@
         -- added KBIN::BIN2VASPVersion (SD)
         -- fixed KBIN::VASPVersionString2Double, aurostd::substring2bool, aurostd::kvpairfound (SD)
         -- added extract POSCAR from aflowin (SD)
+        (AFLOW: Makefile, Makefile.aflow, README_AFLOW.TXT, README_AFLOW_ACONVASP.TXT, README_AFLOW_AFLOWRC.TXT, README_AFLOW_CHULL.TXT, README_AFLOW_EXCEPTIONS.TXT, README_AFLOW_QHA_SCQHA_QHA3P.TXT, README_PROTO.TXT, aconvasp.cpp, aconvasp_main.cpp, aflow.cpp, aflow.h, aflowlib.h, aflowlib_database.cpp, aflowlib_entry_loader.cpp, aflowlib_libraries.cpp, aflowlib_web_interface.cpp, aflowlib_web_outreach.cpp, aflowrc.cpp, apennsy.cpp, avasp.cpp, bader.cpp, cce.cpp, chull.cpp, compare_structure.cpp, compare_structure.h, compare_structure_function.cpp, contrib_cormac.cpp, data.cpp, defects.cpp, iaims.cpp, ialien.cpp, ifrozsl.cpp, init.cpp, ivasp.cpp, kaims.cpp, kalien.cpp, kbin.cpp, kvasp.cpp, lattice.cpp, makefile.cpp, matlab.cpp, modules.cpp, ovasp.cpp, pflow.h, pflow_funcs.cpp, pflow_print.cpp, plotter.cpp, pocc.cpp, pocc.h, pocc_apl.cpp, pocc_old.cpp, pocc_qha.cpp, pocc_thermo.cpp, pthreads.cpp, qsub.cpp, surface.cpp, symmetry_spacegroup.h, symmetry_spacegroup_ITC_library.cpp, symmetry_spacegroup_functions.cpp, test.cpp, unit_test.cpp, wyckoff.cpp, xatom.cpp, xclasses.cpp, xelement.cpp, xproto.cpp, xthread.cpp)
+        (ANRL: README_AFLOW_ANRL.TXT, aflow_anrl.cpp)
+        (AEL: ael_elasticity.cpp, pocc_ael_agl.cpp)
+        (AGL: agl_debye.cpp, pocc_ael_agl.cpp)
+        (APL: README_AFLOW_APL.TXT, aapl_cluster.cpp, aapl_ifcs.cpp, aapl_tcond.cpp, apl.h, apl_atomic_disp.cpp, apl_doscalc.cpp, apl_fccalc.cpp, apl_kphonons.cpp, apl_pdisc.cpp, apl_phoncalc.cpp, apl_qmesh.cpp, apl_supercell.cpp, apl_thermalpc.cpp, qha.cpp)
+        (AUROSTD: argv.cpp, aurostd.cpp, aurostd.h, boot.cpp, crc64.cpp, main.cpp, xerror.cpp, xerror.h, xfit.cpp, xhttp.cpp, xhttp.h, xmatrix.cpp, xmatrix.h, xoption.cpp, xoption.h, xparser.cpp, xscalar.cpp, xscalar.h, xtensor.cpp, xvector.cpp, xvector.h)
 3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)
