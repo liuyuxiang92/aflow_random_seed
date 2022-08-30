@@ -1403,7 +1403,7 @@ namespace KBIN {
         //[SD20220520 - OBSOLETE]if(vflags.KBIN_VASP_POSCAR_MODE.flag("EXPLICIT_START_STOP")) {
         //[SD20220520 - OBSOLETE]  if(aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_START_) &&
         //[SD20220520 - OBSOLETE]      aurostd::substring2bool(AflowIn,_VASP_POSCAR_MODE_EXPLICIT_STOP_))
-            // [OBSOLETE]	  aurostd::ExtractLastToStringstreamEXPLICIT(FileAFLOWIN,xvasp.POSCAR,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_);
+        // [OBSOLETE]	  aurostd::ExtractLastToStringstreamEXPLICIT(FileAFLOWIN,xvasp.POSCAR,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_);
         //[SD20220520 - OBSOLETE]    aurostd::ExtractLastToStringstreamEXPLICIT(AflowIn,xvasp.POSCAR,_VASP_POSCAR_MODE_EXPLICIT_START_,_VASP_POSCAR_MODE_EXPLICIT_STOP_);
         //[SD20220520 - OBSOLETE]}
         if(!xvasp.POSCAR.str().empty()) {xvasp.str=xstructure(xvasp.POSCAR,IOVASP_AUTO);}   // load structure

@@ -1482,7 +1482,7 @@ namespace aurostd {
   string xmatDouble2String(const xmatrix<double>& xmat_in, int precision=AUROSTD_DEFAULT_PRECISION, bool roff=false, double tol=AUROSTD_ROUNDOFF_TOL, char FORMAT=DEFAULT_STREAM);
   // ME20220324
   template <typename utype>
-  string xmat2String(const xmatrix<utype>& mat_in);
+    string xmat2String(const xmatrix<utype>& mat_in);
 }
 
 //CO20171215 - more json functionality
