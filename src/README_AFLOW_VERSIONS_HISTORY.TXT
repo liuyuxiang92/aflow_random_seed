@@ -1,5 +1,6 @@
 3.2.13 - 2022/XX/XX
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz
+        -- constexp variant of crc64 hashing to enable string based switch cases (HE)
         -- changed the "alpha" Wyckoff position to "A" in space group 47, fixes corner cases prototype commands (DX)
         -- fixed bug in matching Wyckoff positions for isopointal structures (DX)
         -- updated README_PROTO.TXT for correct Bixbyte prototype label (DX)
@@ -11,6 +12,11 @@
         -- Added fallback solutions for reading CIF files with unregonized settings (ME)
         -- Added poscar2aflowin for non-POSCAR input files (ME)
         -- generalizing DOS averaging for pocc systems with ARUNs having different numbers of atoms (CO)
+        -- number->basis (CO)
+        -- adding findClosedPackingPlane, to be finished (CO)
+        -- testing new structure enumeration algorithm, to be finished (CO)
+        -- removing whitespaces and hyphens from chull input injected from web (CO)
+        -- patching IsDirectory() and IsFile(), used to trip over directory/file permissions (CO)
         -- added md5sum to --xplug (CO)
         -- allow naming of generic hosts using --machine_name in combination with --machine (HE)
         -- fixed logical statements in aflow_kvasp.cpp to be linear (SD)
@@ -25,6 +31,8 @@
         -- adding basic http1.1 functions to aurostd (HE)
         -- added const strings variant of aurostd::StringSubst (HE)
         -- added non decimal bases to aurostd::string2utype (HE)
+        -- new EntryLoader with automatic source selection (HE)
+        -- improved speed of aurostd::file2string (HE)
         -- removed "kill_vasp_all" and implemented a targeted kill vasp command (SD)
         -- added KBIN::BIN2VASPVersion (SD)
         -- fixed KBIN::VASPVersionString2Double, aurostd::substring2bool, aurostd::kvpairfound (SD)
@@ -35,6 +43,7 @@
         -- added --itc flag for structure generation (CO+DX)
         -- fixed RDF function (CO)
         -- added RDF to pocc (CO)
+        -- fixing --cif with pocc structure (DX+CO)
 3.2.12 - 2021/11/29
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.12.tar.xz
         -- Added python module install functionality. (ME)

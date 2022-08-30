@@ -324,7 +324,7 @@ _atom ConvertAtomToLat(const _atom& in_at, const xmatrix<double>& lattice) {
 // [OBSOLETE] 	    _atom a;
 // [OBSOLETE] 	    a=sstr.atoms.at(iat);
 // [OBSOLETE] 	    a.name=sstr.atoms.at(iat).name;
-// [OBSOLETE] 	    a.number=iat;
+// [OBSOLETE] 	    a.basis=iat;  //[CO20200130 - number->basis]a.number=iat;
 // [OBSOLETE] 	    a.ijk=ijk;
 // [OBSOLETE] 	    for(int ic=1;ic<=3;ic++)
 // [OBSOLETE] 	      ctpos(ic)=sstr.atoms.at(iat).cpos(ic)+ijk(1)*lat(1,ic)+ijk(2)*lat(2,ic)+ijk(3)*lat(3,ic);
@@ -397,7 +397,7 @@ _atom ConvertAtomToLat(const _atom& in_at, const xmatrix<double>& lattice) {
 //[CO20220623 - OBSOLETE]    for(uint iat=0;iat<sstr.atoms.size();iat++) {
 //[CO20220623 - OBSOLETE]      _atom a=sstr.atoms.at(iat);
 //[CO20220623 - OBSOLETE]      a.name=sstr.atoms.at(iat).name;
-//[CO20220623 - OBSOLETE]      a.number=iat;
+//[CO20220623 - OBSOLETE]      a.basis=iat; //[CO20200130 - number->basis]a.number=iat;
 //[CO20220623 - OBSOLETE]      a.ijk=sstr.atoms.at(iat).ijk;
 //[CO20220623 - OBSOLETE]      a.cpos=sstr.atoms.at(iat).cpos;
 //[CO20220623 - OBSOLETE]      a.fpos=sstr.atoms.at(iat).fpos;//cerr << sstr.atoms.at(iat).fpos << endl;
@@ -569,7 +569,7 @@ namespace pflow {
 namespace pflow {
   _atom SetNum(const _atom& a,const int in_num) {
     _atom b;b=a;
-    b.number=in_num;
+    b.basis=in_num;  //[CO20200130 - number->basis]b.number=in_num;
     return b;
   }
 }
@@ -813,9 +813,9 @@ namespace pflow {
       return b;
     }
     stringstream message;
-    message << "Must specify as many names as types/numbers: in.size()=" << (int) in.size();
-    message << "   =a.num_each_type.size()=" << (int) a.num_each_type.size();
-    message << "   =a.atoms.size()=" << (int) a.atoms.size();
+    message << "Must specify as many names as types/bases: in.size()=" << in.size();  //[CO20200130 - number->basis]
+    message << "   =a.num_each_type.size()=" << a.num_each_type.size();
+    message << "   =a.atoms.size()=" << a.atoms.size();
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_);
   }
 }
@@ -840,9 +840,9 @@ namespace pflow {
       return b;
     }
     stringstream message;
-    message << "Must specify as many names as types/numbers: in.size()=" << (int) in.size();
-    message << "   =a.num_each_type.size()=" << (int) a.num_each_type.size();
-    message << "   =a.atoms.size()=" << (int) a.atoms.size();
+    message << "Must specify as many names as types/bases: in.size()=" << in.size();  //[CO20200130 - number->basis]
+    message << "   =a.num_each_type.size()=" << a.num_each_type.size();
+    message << "   =a.atoms.size()=" << a.atoms.size();
     throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_NUMBER_);
   }
 }

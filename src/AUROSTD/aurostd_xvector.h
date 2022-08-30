@@ -279,6 +279,9 @@ namespace aurostd {
     xdouble(const xvector<utype>&) __xprototype;
 
   template<class utype> xvector<utype>
+    mod(const xvector<utype>&,utype d) __xprototype;  //CO20200127
+
+  template<class utype> xvector<utype>
     mod_floored(const xvector<utype>&,utype d) __xprototype;  //SD20220117
 
   template<class utype> xvector<double>

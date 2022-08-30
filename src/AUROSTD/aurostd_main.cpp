@@ -4282,7 +4282,24 @@ namespace aurostd {
   // Function file2string bz2file2string gzfile2string xzfile2string zipfile2string efile2string
   // ***************************************************************************
   // write file to string - Stefano Curtarolo
-  uint file2string(const string& _FileNameIN,string& StringIN) {  //CO20210624
+  uint file2string(const string& _FileNameIN,string& StringIN){
+    return file2string_20220221(_FileNameIN, StringIN);
+  }
+
+
+  uint file2string_20220221(const string& _FileNameIN,string& StringIN){ //HE20220221
+    // avoids the extra FileExist check (buffer.str() will always be empty if the file can't be open)
+    // avoids reading the file char by char
+    // speedup compared to file2string_20220101 10% (3000 files/ 5 warm runs)
+    string FileNameIN=aurostd::CleanFileName(_FileNameIN);
+    std::ifstream open_file(FileNameIN);
+    std::stringstream buffer;
+    buffer << open_file.rdbuf();
+    StringIN = buffer.str();
+    return StringIN.length();
+  }
+
+  uint file2string_20220101(const string& _FileNameIN,string& StringIN) {  //CO20210624
     string FileNameIN=aurostd::CleanFileName(_FileNameIN);
     if(!FileExist(FileNameIN)) {
       // cerr << "ERROR - aurostd::file2string: file=" << FileNameIN << " not present !" << endl;
@@ -4662,37 +4679,16 @@ namespace aurostd {
   // Function url2string
   // ***************************************************************************
   // wget URL to string - Stefano Curtarolo
+  // HE20220615 changed to aurostd http code to reduce system calls
+  // Use the function in aurostd_xhttp for new code
+  // Old use-cases of this function should be replaced, kept for now to maintain compatibility
+  // As the original this function does not support SSL (https)
   bool url2string(const string& url,string& stringIN,bool verbose) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    stringIN="";
-    if(!aurostd::IsCommandAvailable("wget")) {
-      cerr << "ERROR - aurostd::url2string(): command \"wget\" is necessary !" << endl;
-      return FALSE;
-    }
-    string _url=url;
-    aurostd::StringSubst(_url,"http://","");
-    aurostd::StringSubst(_url,"//","/");
-    if(LDEBUG) cerr << "aurostd::url2string(): Loading url=" << _url << endl;
-    if(verbose) cout << "aurostd::url2string(): Loading url=" << _url << endl;
-#ifndef _MACOSX_
-    stringIN=aurostd::execute2string("wget --quiet --no-cache -O /dev/stdout http://"+_url);
-#else
-    stringIN=aurostd::execute2string("wget --quiet -O /dev/stdout http://"+_url); // _MACOSX_
-#endif    
-    if(stringIN=="") {
-      aurostd::StringSubst(_url,":AFLOW","/AFLOW");
-#ifndef _MACOSX_
-      stringIN=aurostd::execute2string("wget --quiet --no-cache -O /dev/stdout http://"+_url);
-#else
-      stringIN=aurostd::execute2string("wget --quiet -O /dev/stdout http://"+_url); // _MACOSX_
-#endif    
-      if(stringIN=="") {
-        if(LDEBUG){cerr << "ERROR - aurostd::url2string(): URL not found http://" << _url << endl;} //CO20200731 - silence this, it's not an error
-        return FALSE;
-      }
-    }
-    //    aurostd::StringSubst(stringIN,"h1h","h1,"); // old Frisco php error patch
-    return TRUE;
+    if (verbose) cerr << __AFLOW_FUNC__ << " Loading url=" << url << endl;
+    int return_code = aurostd::httpGetStatus(url, stringIN);
+    if (verbose) cerr << __AFLOW_FUNC__ << " " << url << " returned " << return_code <<endl;
+    if(stringIN.empty()) return false;
+    else return true;
   }
 
   // ***************************************************************************
@@ -8151,10 +8147,10 @@ namespace aurostd {
   // individually wraps entries of vector with specified string
   // converts <a,b,c> to <'a','b','c'>
   // also works for deques
-  vector<string> wrapVecEntries(const vector<string>& vin,string wrap){
+  vector<string> wrapVecEntries(const vector<string>& vin,const string& wrap){
     return wrapVecEntries(vin,wrap,wrap);
   }
-  vector<string> wrapVecEntries(const vector<string>& vin,string wrap_start,string wrap_end){
+  vector<string> wrapVecEntries(const vector<string>& vin,const string& wrap_start,const string& wrap_end){
     vector<string> vout;
     for(uint i=0;i<vin.size();i++){
       if(vin[i].length()){
@@ -8163,10 +8159,10 @@ namespace aurostd {
     }
     return vout;
   }
-  deque<string> wrapVecEntries(const deque<string>& vin,string wrap){
+  deque<string> wrapVecEntries(const deque<string>& vin,const string& wrap){
     return wrapVecEntries(vin,wrap,wrap);
   }
-  deque<string> wrapVecEntries(const deque<string>& vin,string wrap_start,string wrap_end){
+  deque<string> wrapVecEntries(const deque<string>& vin,const string& wrap_start,const string& wrap_end){
     deque<string> vout;
     for(uint i=0;i<vin.size();i++){
       if(vin[i].length()){
