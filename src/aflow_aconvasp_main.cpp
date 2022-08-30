@@ -92,8 +92,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("AFLOWSYM_PYTHON",aurostd::args2attachedflag(argv,cmds,"--aflow_sym_python|--aflowsym_python")); //DX20210202
 
   //DX20190206 - add AFLUX functionality to command line - START
-  vpflow.args2addattachedscheme(argv,cmds,"AFLUX","--aflux=",""); 
-  if(vpflow.flag("AFLUX")){
+  vpflow.args2addattachedscheme(argv,cmds,"AFLUX::SUMMONS","--aflux=","");  //CO20200520 - AFLUX::SUMMONS
+  if(vpflow.flag("AFLUX::SUMMONS")){  //CO20200520 - AFLUX::SUMMONS
     vpflow.flag("AFLUX::USAGE",aurostd::args2flag(argv,cmds,"--usage"));
   }
   //DX20190206 - add AFLUX functionality to command line - END
@@ -580,6 +580,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     }
   }
   //DX20170818 - Added tolerance and no_scan options to Xgroups - END
+
+  vpflow.flag("FIND_CLOSED_PACKING_PLANE",aurostd::args2flag(argv,cmds,"--find_closed_packing_plane")); //CO20191110
 
   vpflow.flag("FRAC",aurostd::args2flag(argv,cmds,"--frac|-frac|--fractional|-fract|--fract|--direct|-direct|-f|-d"));
   vpflow.flag("FROZSL_VASPSETUP_AFLOW",aurostd::args2flag(argv,cmds,"--frozsl_vaspsetup_aflow|--frozsl_vaspsetup|--frozsl_vasp|--frozsl_setup|--phvaspsetup"));
@@ -1684,6 +1686,7 @@ namespace pflow {
       if(vpflow.flag("COMPARE_PERMUTATION")) {cout << compare::compareAtomDecorations(cin,vpflow); _PROGRAMRUN=true;} //DX20190201
       if(vpflow.flag("GFA::INIT")){pflow::GLASS_FORMING_ABILITY(vpflow); _PROGRAMRUN=true;} //DF20190329 - GFA
       if(vpflow.flag("ATOMIC_ENVIRONMENT::INIT")){pflow::ATOMIC_ENVIRONMENT(vpflow); _PROGRAMRUN=true;} //HE20210331 - Testing
+      if(vpflow.flag("FIND_CLOSED_PACKING_PLANE")){pflow::findClosedPackingPlane(cin); _PROGRAMRUN=true;} //CO20190808
       if(vpflow.flag("GENERATE_CERAMICS")){cout << pflow::GENERATE_CERAMICS_PRINT(vpflow) << endl; _PROGRAMRUN=true;} //CO20200731
       //DX+CO START
       if(vpflow.flag("FULLSYMMETRY")) {pflow::CalculateFullSymmetry(cin,vpflow,cout); _PROGRAMRUN=true;}
@@ -1771,6 +1774,7 @@ namespace pflow {
       if(vpflow.flag("AFLOWLIB_AURL2AUID")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AURL2AUID"),"AFLOWLIB_AURL2AUID"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWLIB_AUID2LOOP")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AUID2LOOP"),"AFLOWLIB_AUID2LOOP"); _PROGRAMRUN=true;}
       if(vpflow.flag("AFLOWLIB_AURL2LOOP")) {cout << aflowlib::AflowlibLocator(vpflow.getattachedscheme("AFLOWLIB_AURL2LOOP"),"AFLOWLIB_AURL2LOOP"); _PROGRAMRUN=true;}
+      if(vpflow.flag("AFLUX::SUMMONS")) {cout << aflowlib::AFLUXCall(vpflow) << endl; _PROGRAMRUN=true;}  //DX20190206 - add AFLUX command line functionality //CO20200520 - AFLUX::SUMMONS
       if(vpflow.flag("AFLOWSYM_PYTHON")){ SYM::writePythonScript(cout); _PROGRAMRUN=true;} //DX20210202
       if(vpflow.flag("AFLUX")) {cout << aflowlib::AFLUXCall(vpflow) << endl; _PROGRAMRUN=true;}  //DX20190206 - add AFLUX command line functionality
       //[CO20220614 - moved up]if(vpflow.flag("ATAT")) {cout << input2ATATxstr(cin); _PROGRAMRUN=true;} //SD20220123
@@ -8954,7 +8958,7 @@ namespace pflow {
 
     vector<vector<vector<aflowlib::_aflowlib_entry> > > naries;
     if(!loadEntries(vpflow, velements, server, naries, FileMESSAGE, oss)) { return false; }
-    if(!mergeEntries(entries, naries, true)) { return false; }
+    if(!aflowlib::mergeEntries(entries, naries, true)) { return false; }
     return true;
   }
 }  // namespace pflow
@@ -9028,7 +9032,7 @@ namespace pflow {
 
     vector<vector<vector<aflowlib::_aflowlib_entry> > > naries;
     if(!loadEntries(vpflow, velements, server, naries, FileMESSAGE, oss)) { return false; }
-    if(!mergeEntries(entries, naries)) { return false; }
+    if(!aflowlib::mergeEntries(entries, naries)) { return false; }
     return true;
   }
 }  // namespace pflow
@@ -9108,7 +9112,7 @@ namespace pflow {
     if(!loadLIBX(vpflow, LIB, combination, server, v_temp, FileMESSAGE, oss)) { return false; }
     if(vpflow.flag("PFLOW::LOAD_ENTRIES_NARIES_MINUS_ONE")) {
       for (uint i = 0; i < v_temp.size() - 1; i++) {
-        if(!mergeEntries(naries, v_temp[i], false)) {  //e.g. for ternary MnPdPt, there are 3 binary combinations
+        if(!aflowlib::mergeEntries(naries, v_temp[i], false)) {  //e.g. for ternary MnPdPt, there are 3 binary combinations
           if(LIB == "ICSD") // or LIB == "icsd")
           { //CO20200106 - patching for auto-indenting
             message << "Merging entries for ICSD (" + aurostd::utype2string(i + 1) + "-naries) failed";
@@ -9120,7 +9124,7 @@ namespace pflow {
         }
       }
     }
-    if(!mergeEntries(naries, v_temp[v_temp.size() - 1], true)) {  //e.g. for ternary MnPdPt, there is only ONE ternary combination
+    if(!aflowlib::mergeEntries(naries, v_temp[v_temp.size() - 1], true)) {  //e.g. for ternary MnPdPt, there is only ONE ternary combination
       if(LIB == "ICSD") // or LIB == "icsd")
       { //CO20200106 - patching for auto-indenting
         message << "Merging entries for ICSD (" + aurostd::utype2string(v_temp.size()) + "-naries) failed";
@@ -9307,7 +9311,7 @@ namespace pflow {
     vector<vector<aflowlib::_aflowlib_entry> > naries;  //most intuitive structure from LIBs construction (unary, binaries, etc.), always start here and merge to get other variants
 
     if(!loadLIBX(vpflow, LIB, velements, server, naries, FileMESSAGE, oss)) { return false; }
-    if(!mergeEntries(entries, naries)) { return false; }
+    if(!aflowlib::mergeEntries(entries, naries)) { return false; }
     return true;
   }
   // ***************************************************************************
@@ -9745,184 +9749,6 @@ namespace pflow {
 
 namespace pflow {
   // ***************************************************************************
-  // mergeEntries()
-  // ***************************************************************************
-  //simple helper function for loading multiple libraries together, will take
-  //combinations of nested vectors and convert them to other nested vectors
-  //naries is output, new_entries is input
-  //these assume vector<aflowlib::_aflowlib_entry> new_entries is all of the same
-  //type, e.g., binaries of MnPd (e.g., MnPd2, Mn2Pd, etc., similar structure to LIBS)
-  //also assumes ordered vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries
-  //outer most - unary, binary, etc.
-  //next outer - species match, Mn, Pd, MnPd, etc.
-  //inner most - entries
-  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,
-      vector<vector<vector<aflowlib::_aflowlib_entry> > >& new_entries) {
-    for (uint i = 0; i < new_entries.size(); i++) {
-      if(!mergeEntries(naries, new_entries[i], true)) { return false; }  //structured data
-    }
-    return true;
-  }
-
-  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,
-      vector<vector<aflowlib::_aflowlib_entry> >& new_entries, bool assume_same_type) {
-    for (uint i = 0; i < new_entries.size(); i++) {
-      if(naries.size() <= i + 1) {
-        naries.push_back(vector<vector<aflowlib::_aflowlib_entry> >(0));
-      }
-      if(!mergeEntries(naries[i], new_entries[i], assume_same_type, true)) {  //triple vector<> naries implies this structure
-        return false;
-      }
-    }
-    return true;
-  }
-
-  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,
-      vector<aflowlib::_aflowlib_entry>& new_entries, bool assume_same_type) {
-    if(!new_entries.size()) { return true; }
-    int match1, match2;
-    if(assume_same_type) {
-      if(!mergeEntries(naries, new_entries[0], match1, match2)) { return false; }
-      for (uint i = 1; i < new_entries.size(); i++) { naries[match1][match2].push_back(new_entries[i]); }
-    } else {
-      for (uint i = 0; i < new_entries.size(); i++) {
-        if(!new_entries[i].vspecies.size()) { return false; }  //what the heck is this?
-        if(!mergeEntries(naries, new_entries[i], match1, match2)) { return false; }
-      }
-    }
-    return true;
-  }
-
-  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,
-      aflowlib::_aflowlib_entry& new_entry) {
-    int match1 = -1;
-    int match2 = -1;
-    return mergeEntries(naries, new_entry, match1, match2);
-  }
-  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries,
-      aflowlib::_aflowlib_entry& new_entry, int& match1, int& match2) {
-    if(!new_entry.vspecies.size()) { return false; }    //what the heck is this?
-    while (naries.size() < new_entry.vspecies.size()) {  //assumes new_entries all have the same vspecies.size()
-      naries.push_back(vector<vector<aflowlib::_aflowlib_entry> >(0));
-    }
-    match1 = new_entry.vspecies.size() - 1;
-    return mergeEntries(naries[match1], new_entry, match2, true);  //triple vector<> naries implies this structure
-  }
-
-  //naries takes on two forms depending on sort_by_species
-  //if sort_by_species==true, then naries is truly a single nary (unary, binary, etc.) with
-  //the second layer consisting of different species
-  //otherwise, naries is the total entries (similar to naries above), where second layer
-  //is unaries, binary, etc. (no layer with different species)
-  //if sort_by_species and we are coming from LIBs (assume_same_type==true), then we don't need to check every entry, we already
-  //know they have the same type (binary of same species)
-  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,
-      vector<vector<aflowlib::_aflowlib_entry> >& new_entries, bool assume_same_type,
-      bool sort_by_species) {
-    for (uint i = 0; i < new_entries.size(); i++) {
-      if(!mergeEntries(naries, new_entries[i], assume_same_type, sort_by_species)) { return false; }
-    }
-    return true;
-  }
-
-  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,
-      vector<aflowlib::_aflowlib_entry>& new_entries, bool assume_same_type, bool sort_by_species) {
-    if(!new_entries.size()) { return true; }
-    int match;
-    if(assume_same_type) {
-      if(!mergeEntries(naries, new_entries[0], match, sort_by_species)) { return false; }
-      for (uint i = 1; i < new_entries.size(); i++) { naries[match].push_back(new_entries[i]); }
-    } else {
-      for (uint i = 0; i < new_entries.size(); i++) {
-        if(!mergeEntries(naries, new_entries[i], match, sort_by_species)) { return false; }
-      }
-    }
-    return true;
-  }
-
-  //naries takes on two forms depending on sort_by_species
-  //if sort_by_species==true, then naries is truly a single nary (unary, binary, etc.) with
-  //the second layer consisting of different species
-  //otherwise, naries is the total entries (similar to naries above), where second layer
-  //is unaries, binary, etc. (no layer with different species)
-  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,
-      aflowlib::_aflowlib_entry& new_entry, bool sort_by_species) {
-    int match = -1;
-    return mergeEntries(naries, new_entry, match, sort_by_species);
-  }
-
-  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,
-      aflowlib::_aflowlib_entry& new_entry, int& match, bool sort_by_species) {
-    if(!new_entry.vspecies.size()) { return false; }
-    match = -1;
-    if(sort_by_species) {
-      //all of naries is unary, binary, etc., now just need to match species
-      for (uint i = 0; i < naries.size() && match == -1; i++) {
-        //test of stupidity
-        if(naries[i][0].vspecies.size() != new_entry.vspecies.size()) { return false; }
-        if(naries[i][0].vspecies == new_entry.vspecies) { match = i; }
-      }
-      if(match == -1) {
-        naries.push_back(vector<aflowlib::_aflowlib_entry>(0));
-        match = naries.size() - 1;
-      }
-    } else {
-      //just need to create space for unary, binary, etc.
-      while (naries.size() < new_entry.vspecies.size()) {
-        naries.push_back(vector<aflowlib::_aflowlib_entry>(0));
-      }
-      match = new_entry.vspecies.size() - 1;
-    }
-    naries[match].push_back(new_entry);
-    return true;
-  }
-
-  //start combining
-  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries,
-      vector<vector<vector<aflowlib::_aflowlib_entry> > >& new_entries, bool sort_by_species) {
-    for (uint i = 0; i < new_entries.size(); i++) {
-      if(!mergeEntries(naries, new_entries[i], true, sort_by_species)) { return false; }
-    }
-    return true;
-  }
-
-  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,
-      vector<vector<vector<aflowlib::_aflowlib_entry> > >& new_entries) {
-    for (uint i = 0; i < new_entries.size(); i++) {
-      for (uint j = 0; j < new_entries[i].size(); j++) {
-        if(!mergeEntries(naries, new_entries[i][j])) { return false; }
-      }
-    }
-    return true;
-  }
-
-  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,
-      vector<vector<aflowlib::_aflowlib_entry> >& new_entries) {
-    for (uint i = 0; i < new_entries.size(); i++) {
-      if(!mergeEntries(naries, new_entries[i])) { return false; }
-    }
-    return true;
-  }
-
-  //trivial
-  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,
-      vector<aflowlib::_aflowlib_entry>& new_entries) {
-    for (uint i = 0; i < new_entries.size(); i++) {
-      if(!mergeEntries(naries, new_entries[i])) { return false; }
-    }
-    return true;
-  }
-
-  //trivial
-  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries,
-      aflowlib::_aflowlib_entry& new_entry) {
-    naries.push_back(new_entry);
-    return true;
-  }
-}  // namespace pflow
-
-namespace pflow {
-  // ***************************************************************************
   // pflow::getCombination(vector<string>& velements,uint nary)
   // ***************************************************************************
   // for given set of elements, will return nary combinations
@@ -10238,6 +10064,90 @@ namespace pflow {
     // END Loading fully-relaxed structures
     ////////////////////////////////////////////////////////////////////////////
 
+    return true;
+  }
+
+  /// @brief load a xstructure directly from a AFLOW lib entry
+  /// @param entry AFLOW lib entry
+  /// @param new_structure save-to structure
+  /// @return xstructure
+  /// @note this is always the final structure
+  /// @note does not add the structure to entry.vstr
+  bool loadXstructureLibEntry(const aflowlib::_aflowlib_entry &entry, xstructure &new_structure) { //HE20220606
+    if (entry.positions_cartesian.empty()) return false;
+    new_structure.title = "Relaxed AFLUX: " + entry.aurl;
+    new_structure.scale = 1.0;
+    new_structure.neg_scale = false;
+    new_structure.iomode = IOAFLOW_AUTO;
+    std::vector<double> geometry;
+    aurostd::string2tokens(entry.geometry, geometry, ",");
+    new_structure.a = geometry[0];
+    new_structure.b = geometry[1];
+    new_structure.c = geometry[2];
+    new_structure.alpha = geometry[3];
+    new_structure.beta = geometry[4];
+    new_structure.gamma = geometry[5];
+    new_structure.lattice = GetClat(new_structure.a, new_structure.b, new_structure.c,
+                                    new_structure.alpha, new_structure.beta, new_structure.gamma);
+    new_structure.spacegroupnumber = entry.spacegroup_relax;
+    new_structure.spacegrouplabel = GetSpaceGroupLabel(new_structure.spacegroupnumber);
+    if (new_structure.spacegroupnumber > 0 && new_structure.spacegroupnumber <= 230) {
+      new_structure.spacegroup = GetSpaceGroupName(new_structure.spacegroupnumber, new_structure.directory);
+    } else new_structure.spacegroup = "";
+    new_structure.coord_flag = _COORDS_FRACTIONAL_;
+    strcpy(new_structure.coord_type, "D");
+    new_structure.FixLattices();
+
+    std::vector<int> composition;
+    aurostd::string2tokens(entry.composition, composition, ",");
+    uint num_atoms = 0;
+    std::vector <std::vector<double>> positions_fractional;
+    std::vector<double> positions_fractional_raw;
+    std::vector <std::string> positions_fractional_raw_str;
+    aurostd::string2tokens(entry.positions_fractional, positions_fractional_raw_str, ";");
+    for (std::vector<std::string>::const_iterator pf_str = positions_fractional_raw_str.begin(); pf_str != positions_fractional_raw_str.end(); pf_str++) {
+      positions_fractional_raw.clear();
+      aurostd::string2tokens(*pf_str, positions_fractional_raw, ",");
+      positions_fractional.emplace_back(positions_fractional_raw);
+    }
+
+    std::vector <std::string> species;
+    aurostd::string2tokens(entry.species, species, ",");
+    xvector<double> v(3);
+    _atom atom;
+    for (uint type_idx = 0; type_idx < composition.size(); type_idx++) {
+      for (int atom_idx = 0; atom_idx < composition[type_idx]; atom_idx++) {
+        atom.clear();
+        v.clear();
+        v(1) = positions_fractional[num_atoms][0];
+        v(2) = positions_fractional[num_atoms][1];
+        v(3) = positions_fractional[num_atoms][2];
+        atom.fpos = v;
+        atom.cpos = new_structure.f2c * atom.fpos;
+        atom.basis = num_atoms;
+        atom.ijk(1) = 0;
+        atom.ijk(2) = 0;
+        atom.ijk(3) = 0;
+        atom.corigin(1) = 0.0;
+        atom.corigin(2) = 0.0;
+        atom.corigin(3) = 0.0; // inside the zero cell
+        atom.coord(1) = 0.0;
+        atom.coord(2) = 0.0;
+        atom.coord(3) = 0.0; // inside the zero cell
+        atom.spin = 0.0;
+        atom.noncoll_spin.clear();
+        atom.type = type_idx;
+        atom.order_parameter_value = 0;
+        atom.order_parameter_atom = false;
+        atom.partial_occupation_value = 1.0;
+        atom.partial_occupation_flag = false;
+        atom.name = species[type_idx];
+        atom.cleanname = species[type_idx];
+        atom.name_is_given = true;
+        new_structure.AddAtom(atom);
+        num_atoms++;
+      }
+    }
     return true;
   }
 }  // namespace pflow

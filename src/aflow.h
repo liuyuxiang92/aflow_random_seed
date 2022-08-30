@@ -105,6 +105,8 @@ static const string TAG_TITLE_POCC_ARUN=TAG_TITLE_ARUN+TAG_POCC+SEP_TAG2;
 static const string POCC_DOSCAR_PREFIX="DOSCAR.pocc_T";
 static const string POCC_PHDOSCAR_PREFIX="PHDOSCAR.pocc_T";  // ME20210927
 //CO20200731 END
+static const vector<std::string> BRAVAIS_LATTICES = {"BCC","BCT","CUB","FCC","HEX","MCL","MCLC",
+                                                     "ORC","ORCC","ORCF","ORCI","RHL","TET","TRI"}; //HE20220420
 
 //XRD
 #define XRAY_RADIATION_COPPER_Kalpha 1.5418   //Angstroms     //CO20190622
@@ -1218,7 +1220,7 @@ class _atom { // simple class.. nothing fancy
     string cleanname;                                      // a chemical clean version of the name
     int info;                                              // container for misc. information  //RHT
     int    atomic_number;                                  // 0 by defauls
-    int    number;                                         // atom number reference for convasp, from zero to the sky
+    //[CO20200130 - number->basis]int    number;                                         // atom number reference for convasp, from zero to the sky
     string sd;                                             // ?
     xvector<int> ijk;                                      // xvector identifier of the lattice (but you must give str)
     bool   isincell;                                       // is in cell ? (i==j==k==0 ?)
@@ -1549,6 +1551,7 @@ class AtomEnvironment{
 #define IOELK_AUTO    12 //DX20200310
 #define IOELK_GEOM    13 //DX20200310
 #define IOATAT_STR    14 //SD20220114
+#define IOAFLUX_QRY   15 //HE20220210
 
 #define NOSG string("NNN #0")
 
@@ -5025,10 +5028,6 @@ namespace makefile {
 #include "aflowlib.h"
 
 // ----------------------------------------------------------------------------
-// aflowlib.h stuff
-#include "aflowlib.h"
-
-// ----------------------------------------------------------------------------
 // aflow_pflow.h stuff
 #include "aflow_pflow.h"
 
@@ -5485,6 +5484,9 @@ namespace unittest {
 
       // ovasp
       void xoutcarTest(uint&, vector<vector<string> >&, vector<string>&);
+
+      // entryLoader
+      void entryLoaderTest(uint&, vector<vector<string> >&, vector<string>&);
   };
 
 }

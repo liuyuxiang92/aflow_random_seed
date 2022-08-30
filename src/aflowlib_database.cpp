@@ -918,6 +918,22 @@ namespace aflowlib {
 
   // Data --------------------------------------------------------------------
 
+
+  //getDataNames//////////////////////////////////////////////////////////////
+  // Gets the data names of the schema keys and converts them into SQLite
+  // types. Note that SQLite does not recognize arrays or Booleans, so they
+  // will be stored as text.
+  vector<string> getDataNames() { //CO20200520
+    vector<string> keys;
+    for (uint i = 0, n = XHOST.vschema.vxsghost.size(); i < n; i += 2) {
+      if(XHOST.vschema.vxsghost[i].find("SCHEMA::NAME:")!=string::npos) {
+        const string& key=XHOST.vschema.vxsghost[i+1];
+        keys.push_back(key);
+      }
+    }
+    return keys;
+  }
+
   //getDataTypes//////////////////////////////////////////////////////////////
   // Gets the data types of the schema keys and converts them into SQLite
   // types. Note that SQLite does not recognize arrays or Booleans, so they
@@ -1708,6 +1724,15 @@ namespace aflowlib {
   string AflowDB::getValue(sqlite3* cursor, const string& table, const string& col, const string& where) {
     string command = prepareSELECT(table, "", col, where, 0, "");
     return sql::SQLexecuteCommandSCALAR(cursor, command);
+  }
+
+  // Collects the values from a single column from all tables. //HE20220405
+  std::vector<std::string> AflowDB::getValuesMultiTable(const std::string & col, const std::string & where){
+    vector<string> tables = getTables();
+    uint ntables = tables.size();
+    vector<string> commands(ntables);
+    for (uint t = 0; t < ntables; t++) commands[t] = prepareSELECT(tables[t], "", col, where);
+    return sql::SQLexecuteCommandVECTOR(db, aurostd::joinWDelimiter(commands, " UNION ALL "));
   }
 
 
