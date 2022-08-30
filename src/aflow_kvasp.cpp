@@ -1499,7 +1499,7 @@ namespace KBIN {
         stringstream POSCAR;
         POSCAR.str(aurostd::substring2string(input_file.str(),START,STOP,-1));
         //[SD20220520 - OBSOLETE]if(aurostd::substring2bool(input_file.str(),START) && aurostd::substring2bool(input_file.str(),STOP))
-          //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(input_file.str(),POSCAR,START,STOP);
+        //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(input_file.str(),POSCAR,START,STOP);
         if(!POSCAR.str().empty()) vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRUCTURE.push_back(xstructure(POSCAR,IOVASP_AUTO));
       }
       if(LDEBUG) cerr << "DEBUG " << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size() << endl;
@@ -1851,7 +1851,7 @@ namespace KBIN {
         if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")) vflags.KBIN_VASP_INCAR_VERBOSE=FALSE; // TURN OFF VERBOSITY
         if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_DELSOL")) vflags.KBIN_VASP_INCAR_VERBOSE=FALSE; // TURN OFF VERBOSITY
       }
-      
+
       if(Krun && vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option) {  //CO20211217 - prevents VASP_Backup() from deleting and recycles for next run (VASP_RecycleExtraFile())
         xvasp.aopts.flag("FLAG::WAVECAR_PRESERVED",vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option); //passing flag to xvasp
         aus << "00000  MESSAGE Saving WAVECAR files" << Message(_AFLOW_FILE_NAME_,aflags) << endl;

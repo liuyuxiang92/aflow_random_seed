@@ -306,8 +306,8 @@ namespace pocc {
     xthread::xThread xt(KBIN::get_NCPUS(m_kflags), 1);
     std::function<void(uint, const vector<uint>&, const aurostd::xoption&, vector<apl::DOSCalculator>&,
         vector<xDOSCAR>&, std::mutex&)> fn = std::bind(&POccCalculator::calculatePhononDOSThread, this,
-        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-        std::placeholders::_4, std::placeholders::_5, std::placeholders::_6);
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5, std::placeholders::_6);
     xt.run(nruns, fn, vcalc, aplopts, vphdos, vxdos, m);
 #else
     for (uint i = 0; i < nruns; i++) calculatePhononDOSThread(i, vcalc, aplopts, vphdos, vxdos);
@@ -323,7 +323,7 @@ namespace pocc {
   void POccCalculator::calculatePhononDOSThread(uint i, const vector<uint>& vcalc,
       const aurostd::xoption& aplopts, vector<apl::DOSCalculator>& vphdos, vector<xDOSCAR>& vxdos)
 #endif
-      {
+  {
 
     // Normalize to number of branches in the parent structure
     double pocc_sum = aurostd::sum(xstr_pocc.comp_each_type);  // Will be needed for projections
