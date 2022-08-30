@@ -123,8 +123,8 @@ namespace KBIN {
     //CO20220818 JHU_ROCKFISH START
     // jhu_rockfish
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::JHU_ROCKFISH") ||
-        aurostd::substring2bool(AflowIn,"[AFLOW_HOST]ROCKFISH") ||  //backwards compatible //CO20180409
-        aurostd::substring2bool(AflowIn,"[AFLOW_HOST]JHU_ROCKFISH"))  //check JHU_ROCKFISH //CO20180409
+        aurostd::substring2bool(AflowIn,"[AFLOW_HOST]ROCKFISH") ||  //backwards compatible //CO20220830
+        aurostd::substring2bool(AflowIn,"[AFLOW_HOST]JHU_ROCKFISH"))  //check JHU_ROCKFISH //CO20220830
       aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
     if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::JHU_ROCKFISH")) {
       aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << Message(_AFLOW_FILE_NAME_,aflags) << endl; //HE20220309 use machine name

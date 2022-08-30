@@ -321,8 +321,7 @@ HOST: fix default things for the HOST
 
  [AFLOW_HOST]MACHINE
   MACHINE=DUKE_BETA | DUKE_BETA_OPENMPI | DUKE_QRATS | DUKE_QFLOW | DUKE_X | DUKE_MATERIALS | 
-                      DUKE_AFLOWLIB | DUKE_HABANA | JHU_ROCKFISH | DOD_CONRAD | DOD_ONYX | DOD_GORDON | DOD_COPPER | 
-                      DOD_GAFFNEY | DOD_KOEHR | DOD_MUSTANG | DOD_EULER |
+                      DUKE_AFLOWLIB | DUKE_HABANA | JHU_ROCKFISH | 
                       MPCDF_EOS | MPCDF_DRACO | MPCDF_COBRA | MPCDF_HYDRA |
                       FULTON_MARYLOU | MACHINE1 |
   With this option, AFLOW takes the mpirun commands as specified in aflow_aflowr.cpp for this machine.
