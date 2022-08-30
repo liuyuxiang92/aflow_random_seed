@@ -10114,9 +10114,10 @@ namespace pflow {
     std::vector <std::string> species;
     aurostd::string2tokens(entry.species, species, ",");
     xvector<double> v(3);
+    _atom atom;
     for (uint type_idx = 0; type_idx < composition.size(); type_idx++) {
       for (int atom_idx = 0; atom_idx < composition[type_idx]; atom_idx++) {
-        _atom atom;
+        atom.clear();
         v.clear();
         v(1) = positions_fractional[num_atoms][0];
         v(2) = positions_fractional[num_atoms][1];
