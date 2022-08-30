@@ -4334,15 +4334,15 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
 
   xthread::xThread xt(num_comparison_threads);
   std::function<void(uint, vector<StructurePrototype>&,
-  const vector<std::pair<uint, uint> >&, const vector<std::pair<uint, uint> >&,
-  bool, bool, bool)> fn = std::bind(&XtalFinderCalculator::runComparisonThreads, this, _1, _2, _3, _4, _5, _6, _7);
+      const vector<std::pair<uint, uint> >&, const vector<std::pair<uint, uint> >&,
+      bool, bool, bool)> fn = std::bind(&XtalFinderCalculator::runComparisonThreads, this, _1, _2, _3, _4, _5, _6, _7);
   xt.run(num_comparison_threads, fn,
-         comparison_schemes,
-         start_indices,
-         end_indices,
-         same_species,
-         scale_volume,
-         optimize_match);
+      comparison_schemes,
+      start_indices,
+      end_indices,
+      same_species,
+      scale_volume,
+      optimize_match);
 
 #else
 
@@ -4445,12 +4445,12 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
       start_indices.clear(); end_indices.clear();
       splitComparisonIntoThreads(comparison_schemes, num_comparison_threads, start_indices, end_indices);
       xt.run(num_comparison_threads, fn,
-             comparison_schemes,
-             start_indices,
-             end_indices,
-             same_species,
-             scale_volume,
-             optimize_match);
+          comparison_schemes,
+          start_indices,
+          end_indices,
+          same_species,
+          scale_volume,
+          optimize_match);
       // THREADED VERISON - END
 #else
       //SINGLE THREAD - START
@@ -6631,8 +6631,8 @@ void XtalFinderCalculator::latticeSearch(
     uint number_of_structures = vstrs_matched.size();
     xthread::xThread xt(num_proc);
     std::function<bool(const uint, const uint, const xstructure&,
-      const vector<double>&, const xstructure&, const string&,
-      vector<xmatrix<double> >&, vector<structure_mapping_info>&, bool, bool)> search_atom_mappings
+        const vector<double>&, const xstructure&, const string&,
+        vector<xmatrix<double> >&, vector<structure_mapping_info>&, bool, bool)> search_atom_mappings
       = std::bind(&XtalFinderCalculator::searchAtomMappings, this, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10);
 #else
     if (num_proc) {} // Suppress compiler warnings
@@ -6677,15 +6677,15 @@ void XtalFinderCalculator::latticeSearch(
             // threaded (DX20191107 thread pointer)
             if(LDEBUG){cerr << function_name << " Searching for possible matching structures [THREADED VERSION]" << endl;}
             xt.runPredistributed(number_of_structures, search_atom_mappings,
-                                 xstr1,
-                                 all_nn1,
-                                 xstr2,
-                                 lfa_str2,
-                                 lattices,
-                                 vstrs_matched,
-                                 same_species,
-                                 optimize_match
-            );
+                xstr1,
+                all_nn1,
+                xstr2,
+                lfa_str2,
+                lattices,
+                vstrs_matched,
+                same_species,
+                optimize_match
+                );
 #else
             // ---------------------------------------------------------------------------
             // non-threaded
@@ -7729,7 +7729,7 @@ void XtalFinderCalculator::calculateMatchingAFLOWPrototypes(
   // split task into threads
   xthread::xThread xt(num_proc);
   std::function<void(uint, vector<StructurePrototype>&, const aurostd::xoption&)> fn =
-  std::bind(&XtalFinderCalculator::getMatchingAFLOWPrototypes, this, _1, _2, _3);
+    std::bind(&XtalFinderCalculator::getMatchingAFLOWPrototypes, this, _1, _2, _3);
   xt.run(number_of_structures, fn, prototypes, vpflow_protos);
 #else
   // NON-THREADED

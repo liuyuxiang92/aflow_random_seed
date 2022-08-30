@@ -4900,10 +4900,10 @@ namespace chull {
     //HE20220412 START
     //collect directions already spanned by `points_to_avoid`
     vector<xvector<double>> directions;
-      for (size_t avoid_i=1; avoid_i<points_to_avoid.size(); avoid_i++){
-        // using the first extreme point as our starting point for all directions
-        directions.push_back(m_points[points_to_avoid[avoid_i].ch_index].h_coords - m_points[points_to_avoid[0].ch_index].h_coords);
-      }
+    for (size_t avoid_i=1; avoid_i<points_to_avoid.size(); avoid_i++){
+      // using the first extreme point as our starting point for all directions
+      directions.push_back(m_points[points_to_avoid[avoid_i].ch_index].h_coords - m_points[points_to_avoid[0].ch_index].h_coords);
+    }
     //HE20220412 END
     int h_coords_index=0;
     xvector<double> new_direction;

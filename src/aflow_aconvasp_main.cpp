@@ -1724,8 +1724,8 @@ namespace pflow {
       //CO20220613 - must go first, as many manipulations are now possible at once
       //do not micromanage the user, if they want to run nonsensical options simultaneously, let them
       if(vpflow.flag("ABCCAR")||vpflow.flag("ABINIT")||vpflow.flag("AIMS")||vpflow.flag("ATAT")||vpflow.flag("CIF")||vpflow.flag("ELK")||vpflow.flag("QE")||vpflow.flag("VASP")||vpflow.flag("VASP5")||vpflow.flag("ITC")||
-         vpflow.flag("INCELL")||vpflow.flag("INCOMPACT")||vpflow.flag("INWS")||vpflow.flag("MINKOWSKI_BASIS_REDUCTION")||vpflow.flag("NIGGLI")||vpflow.flag("STDCONVCELL")||vpflow.flag("STDPRIMCELL")||
-         vpflow.flag("CART")||vpflow.flag("FRAC")){
+          vpflow.flag("INCELL")||vpflow.flag("INCOMPACT")||vpflow.flag("INWS")||vpflow.flag("MINKOWSKI_BASIS_REDUCTION")||vpflow.flag("NIGGLI")||vpflow.flag("STDCONVCELL")||vpflow.flag("STDPRIMCELL")||
+          vpflow.flag("CART")||vpflow.flag("FRAC")){
         //use functions as much as possible to avoid repetition of the workflow
         xstructure xstr(cin);
         //change iomode - will also ReScale(1.0)
@@ -10090,7 +10090,7 @@ namespace pflow {
     new_structure.beta = geometry[4];
     new_structure.gamma = geometry[5];
     new_structure.lattice = GetClat(new_structure.a, new_structure.b, new_structure.c,
-                                    new_structure.alpha, new_structure.beta, new_structure.gamma);
+        new_structure.alpha, new_structure.beta, new_structure.gamma);
     new_structure.spacegroupnumber = entry.spacegroup_relax;
     new_structure.spacegrouplabel = GetSpaceGroupLabel(new_structure.spacegroupnumber);
     if (new_structure.spacegroupnumber > 0 && new_structure.spacegroupnumber <= 230) {
@@ -11984,10 +11984,10 @@ namespace pflow {
 } // namespace pflow
 
 namespace pflow {
-// ***************************************************************************
-// pflow::convertXStr2POCC
-// ***************************************************************************
-// ./aflow --proto=T0009.ABC:Br:Cl:Cs_sv:I:Pb_d:Sm --pocc_params=S0-1xC_S1-0.5xE-0.5xF_S2-0.3333xA-0.3333xB-0.3333xD
+  // ***************************************************************************
+  // pflow::convertXStr2POCC
+  // ***************************************************************************
+  // ./aflow --proto=T0009.ABC:Br:Cl:Cs_sv:I:Pb_d:Sm --pocc_params=S0-1xC_S1-0.5xE-0.5xF_S2-0.3333xA-0.3333xB-0.3333xD
   bool convertXStr2POCC(xstructure& xstr,const string& pocc_params,const vector<string>& _vspecies,const vector<double>& vvolumes){ //CO20181226
     if(pocc_params.empty()){return false;}
     vector<string> vspecies;
@@ -12709,11 +12709,11 @@ namespace pflow {
       // now checking ITC
       if(vpflow.flag("PROTO::ITC")) str.xstructure2itc(); //CO20220613
     }
-    
+
     //DX20190123 - add CIF/ABCCAR - START
     // now checking CIF
     if(vpflow.flag("PROTO::CIF")) str.xstructure2cif();
-    
+
     // now checking ABCCAR
     if(vpflow.flag("PROTO::ABCCAR")) str.xstructure2abccar();
     //DX20190123 - add CIF/ABCCAR - END

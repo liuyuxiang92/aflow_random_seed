@@ -144,7 +144,7 @@ namespace pocc {
   void POCC_Convolution(const aurostd::xoption& vpflow){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"pocc::POCC_Convolution():";
-    
+
     if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
     //CO+ME20220118
@@ -1187,7 +1187,7 @@ namespace pocc {
         //[NOT necessary, should be the same across all ARUNS]std::fill(m_xdoscar.venergy.begin(),m_xdoscar.venergy.end(),0.0);
         std::fill(m_xdoscar.venergyEf.begin(),m_xdoscar.venergyEf.end(),0.0); //NOT the same across all ARUNS
         for(ispin=0;ispin<m_xdoscar.viDOS.size();ispin++){std::fill(m_xdoscar.viDOS[ispin].begin(),m_xdoscar.viDOS[ispin].end(),0.0);}
-        
+
         if(m_xdoscar.vDOS.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"m_xdoscar.vDOS.size()==0",_INDEX_MISMATCH_);}
         if(perform_pdos_avg){vDOS_avg_size=m_xdoscar.vDOS.size();}
         else{
@@ -1827,11 +1827,11 @@ namespace pocc {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     string soliloquy=XPID+"pocc::POccCalculator::convolution():";
     stringstream message;
-    
+
     string inputs=m_p_flags.getattachedscheme("POCC::CONVOLUTION");
     vector<string> vinputs;
     aurostd::string2tokens(inputs,vinputs,",");
-    
+
     if(LDEBUG){
       cerr << soliloquy << " BEGIN" << endl;
       cerr << soliloquy << " vinputs=" << aurostd::joinWDelimiter(vinputs,",") << endl;
@@ -1935,15 +1935,15 @@ namespace pocc {
       cerr << soliloquy << " pocc_params0=" << pocc_params0 << endl;
       cerr << soliloquy << " pocc_params_new(pre)=" << pocc_params_new << endl;
     }
-    
+
     xstr_nopocc=createNonPOccStructure(xstr_pocc,pocc_sites);
     if(LDEBUG){cerr << soliloquy << " xstr_nopocc=" << endl << xstr_nopocc;}
     pflow::FIX_POCC_PARAMS(xstr_nopocc,pocc_params_new);
-    
+
     if(LDEBUG){cerr << soliloquy << " pocc_params_new(post)=" << pocc_params_new << endl;}
     aurostd::StringSubst(xstr_pocc.title,pocc_params0,pocc_params_new);
     if(LDEBUG){cerr << soliloquy << " xstr_pocc=" << endl << xstr_pocc;}
-    
+
     m_vflags.AFLOW_SYSTEM.isentry=true;
     m_vflags.AFLOW_SYSTEM.content_string=vsystems.front();
     aurostd::StringSubst(m_vflags.AFLOW_SYSTEM.content_string,pocc_params0,pocc_params_new);
@@ -4384,7 +4384,7 @@ namespace pocc {
         hnf_index++;
       }
     }else{  //group theory approach
-      
+
       uint i=0,j=0,k=0,site=0,occ=0,permut=0;
       int gi=0;
 
@@ -4480,7 +4480,7 @@ namespace pocc {
           }
         }
       }
-      
+
       resetSiteConfigurations();
       while(getNextSiteConfiguration()){vv_types_config.push_back(v_types_config);}
       if(LDEBUG){cerr << soliloquy << " vv_types_config.size()=" << vv_types_config.size() << endl;}

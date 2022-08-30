@@ -4932,7 +4932,7 @@ void xDOSCAR::convertSpinOFF2ON() { //CO20191217
   if(LDEBUG){cerr << soliloquy << " BEGIN" << endl;}
 
   uint iatom=0,iorbital=0;
-  
+
   //check that it is truly SPIN-OFF
   if(viDOS.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"viDOS.size()!=1",_INPUT_ERROR_);}; //no conversion needed
   for(iatom=0;iatom<vDOS.size();iatom++){
