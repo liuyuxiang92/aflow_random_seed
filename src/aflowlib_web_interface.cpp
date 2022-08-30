@@ -4861,7 +4861,6 @@ namespace aflowlib {
     string summons = aurostd::joinWDelimiter(matchbook,",");
     return AFLUXCall(summons);
   }
-
   string AFLUXCall(const string& summons){
     // Performs AFLUX call based on summons input
     // switched to aurostd::xhttp //HE20220407
