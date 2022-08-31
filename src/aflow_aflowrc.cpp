@@ -1005,6 +1005,15 @@
 #define         MPI_BINARY_DIR_DUKE_X                         XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_DUKE_X")
 //CO20201220 X STOP
 
+//CO20220818 JHU_ROCKFISH START
+#define AFLOWRC_MPI_OPTIONS_JHU_ROCKFISH                      string("ulimit -s unlimited ") // JHU_ROCKFISH_MPICH
+#define         MPI_OPTIONS_JHU_ROCKFISH                      XHOST.adefault.getattachedscheme("MPI_OPTIONS_JHU_ROCKFISH")
+#define AFLOWRC_MPI_COMMAND_JHU_ROCKFISH                      string("mpirun -n") // JHU_ROCKFISH_MPICH
+#define         MPI_COMMAND_JHU_ROCKFISH                      XHOST.adefault.getattachedscheme("MPI_COMMAND_JHU_ROCKFISH")
+#define AFLOWRC_MPI_BINARY_DIR_JHU_ROCKFISH                   string("~/bin/") // JHU_ROCKFISH_MPICH
+#define         MPI_BINARY_DIR_JHU_ROCKFISH                   XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_JHU_ROCKFISH")
+//CO20220818 JHU_ROCKFISH STOP
+
 //DX20190509 - MACHINE001 - START
 #define AFLOWRC_MPI_OPTIONS_MACHINE001                        string("") // MACHINE001
 #define         MPI_OPTIONS_MACHINE001                        XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE001")
@@ -1787,6 +1796,12 @@ namespace aflowrc {
     aflowrc::load_default("MPI_COMMAND_DUKE_X",AFLOWRC_MPI_COMMAND_DUKE_X); 
     aflowrc::load_default("MPI_BINARY_DIR_DUKE_X",AFLOWRC_MPI_BINARY_DIR_DUKE_X); 
     //CO20201220 X STOP
+    
+    //CO20220818 JHU_ROCKFISH START
+    aflowrc::load_default("MPI_OPTIONS_JHU_ROCKFISH",AFLOWRC_MPI_OPTIONS_JHU_ROCKFISH); 
+    aflowrc::load_default("MPI_COMMAND_JHU_ROCKFISH",AFLOWRC_MPI_COMMAND_JHU_ROCKFISH); 
+    aflowrc::load_default("MPI_BINARY_DIR_JHU_ROCKFISH",AFLOWRC_MPI_BINARY_DIR_JHU_ROCKFISH); 
+    //CO20220818 JHU_ROCKFISH STOP
 
     //DX20190509 - MACHINE001 - START
     aflowrc::load_default("MPI_OPTIONS_MACHINE001",AFLOWRC_MPI_OPTIONS_MACHINE001); 
@@ -2432,6 +2447,12 @@ namespace aflowrc {
     aflowrc << "MPI_COMMAND_DUKE_X=\"" << AFLOWRC_MPI_COMMAND_DUKE_X << "\"" << "  // DUKE_X" << endl;
     aflowrc << "MPI_BINARY_DIR_DUKE_X=\"" << AFLOWRC_MPI_BINARY_DIR_DUKE_X << "\"" << "  // DUKE_X" << endl; 
     //CO20201220 X STOP
+    
+    //CO20220818 JHU_ROCKFISH START
+    aflowrc << "MPI_OPTIONS_JHU_ROCKFISH=\"" << AFLOWRC_MPI_OPTIONS_JHU_ROCKFISH << "\"" << "  // JHU_ROCKFISH" << endl;
+    aflowrc << "MPI_COMMAND_JHU_ROCKFISH=\"" << AFLOWRC_MPI_COMMAND_JHU_ROCKFISH << "\"" << "  // JHU_ROCKFISH" << endl;
+    aflowrc << "MPI_BINARY_DIR_JHU_ROCKFISH=\"" << AFLOWRC_MPI_BINARY_DIR_JHU_ROCKFISH << "\"" << "  // JHU_ROCKFISH" << endl; 
+    //CO20220818 JHU_ROCKFISH STOP
 
     //DX20190509 - MACHINE001 - START
     aflowrc << "MPI_OPTIONS_MACHINE001=\"" << AFLOWRC_MPI_OPTIONS_MACHINE001 << "\"" << "// MACHINE001" << endl;
@@ -3040,6 +3061,12 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_DUKE_X\")=\"" << MPI_COMMAND_DUKE_X << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_DUKE_X\")=\"" << MPI_BINARY_DIR_DUKE_X << "\"" << endl;
     //CO20201220 X STOP
+    
+    //CO20220818 JHU_ROCKFISH START
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_JHU_ROCKFISH\")=\"" << MPI_OPTIONS_JHU_ROCKFISH << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_JHU_ROCKFISH\")=\"" << MPI_COMMAND_JHU_ROCKFISH << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_JHU_ROCKFISH\")=\"" << MPI_BINARY_DIR_JHU_ROCKFISH << "\"" << endl;
+    //CO20220818 JHU_ROCKFISH STOP
 
     //DX20190509 - MACHINE001 - START
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_MACHINE001\")=\"" << MPI_OPTIONS_MACHINE001 << "\"" << endl;
