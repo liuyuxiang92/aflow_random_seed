@@ -476,6 +476,11 @@ namespace init {
       oss << "MPI_COMMAND_DUKE_X=" << MPI_COMMAND_DUKE_X << "\"" << endl;
       oss << "MPI_BINARY_DIR_DUKE_X=" << MPI_BINARY_DIR_DUKE_X << "\"" << endl;
       //CO20201220 X STOP
+      //CO20220818 JHU_ROCKFISH START
+      oss << "MPI_OPTIONS_JHU_ROCKFISH=" << MPI_OPTIONS_JHU_ROCKFISH << "\"" << endl;
+      oss << "MPI_COMMAND_JHU_ROCKFISH=" << MPI_COMMAND_JHU_ROCKFISH << "\"" << endl;
+      oss << "MPI_BINARY_DIR_JHU_ROCKFISH=" << MPI_BINARY_DIR_JHU_ROCKFISH << "\"" << endl;
+      //CO20220818 JHU_ROCKFISH STOP
       oss << "MPI_OPTIONS_MPCDF_EOS=" << MPI_OPTIONS_MPCDF_EOS << "\"" << endl;
       oss << "MPI_COMMAND_MPCDF_EOS=" << MPI_COMMAND_MPCDF_EOS << "\"" << endl;
       oss << "MPI_NCPUS_MPCDF_EOS=" << MPI_NCPUS_MPCDF_EOS << "\"" << endl;

@@ -1179,13 +1179,16 @@ namespace unittest {
       check_description = source->first + " - " + test_alloy;
       if (recursive) {
         check_description += " - recursive";
-        expected_size_t = 2500;
+        expected_size_t = 3400;
       } else expected_size_t = 90;
       el.clear();
       el.m_out_silent = true;
       {
         long double start = aurostd::get_seconds();
         if (el.setSource(source->second)) { // don't test if basic requirements are not met for a source
+          if (source->first == "FILESYSTEM" || source->first == "FILESYSTEM_RAW") {
+            if (el.m_sqlite_alloy_db_ptr == nullptr) expected_size_t=1300;
+          }
           el.loadAlloy(test_alloy, recursive);
           long double duration = aurostd::get_delta_seconds(start);
           aurostd::StringstreamClean(check_description_helper);
