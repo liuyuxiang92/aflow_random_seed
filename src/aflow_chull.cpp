@@ -4101,7 +4101,8 @@ namespace chull {
       }
       return;
     }
-    if(LDEBUG) {cerr << "lastCoords(): " << sort(energies) << endl;}
+
+    if(LDEBUG) {xvector<double> temp_eng = energies; sort(temp_eng); cerr << "lastCoords(): " << temp_eng << endl;}
     double q1,q2,q3;
     //so we sort full anyway to be completely robust, should be easy considering how we sorted before
     aurostd::getQuartiles(energies,q1,q2,q3);  //we sort in here

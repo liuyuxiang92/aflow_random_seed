@@ -556,8 +556,8 @@ namespace aurostd {
   template<class utype> xvector<utype> getModeratedVectorProjection(const xvector<utype> c, const xvector<utype>& b, const xvector<utype>& a);  //ME20200511
 
   // SIMPLE SORT ROUTINES
-  template<class utype> xvector<utype>  // WRAP TO SHELL SHORT
-    sort(const xvector<utype>& a) __xprototype;
+  template<class utype> void // WRAP TO SHELL SHORT
+    sort(xvector<utype>& a) __xprototype;
 
   template<class utype> xvector<utype> // SHELLSORT
     shellsort(const xvector<utype>& a) __xprototype;

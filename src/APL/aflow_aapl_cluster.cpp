@@ -300,7 +300,7 @@ namespace apl {
                 cell.atoms[at2].cpos,
                 cell.lattice)); //DX20190613
         }
-        distances = aurostd::sort(distances);
+        aurostd::sort(distances);
         for (uint j = 1; j < natoms; j++) {
           if (distances[j] > distances[j - 1] + _APL_SHELL_TOL_ ){
             countshell++;

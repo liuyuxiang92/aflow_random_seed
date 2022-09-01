@@ -6812,29 +6812,18 @@ namespace aurostd {
 namespace aurostd {
   template<class utype1> // function quicksort
     void sort(vector<utype1>& arr) {
-      xvector<utype1> xarr(arr.size());
-      for(uint i=0;i<arr.size();i++) xarr[i+1]=arr[i];
-      //  aurostd::sort(xarr.rows,xarr);
+      xvector<utype1> xarr = aurostd::vector2xvector(arr);
       aurostd::sort(xarr);
-      arr.clear();
-      for(int i=0;i<xarr.rows;i++) {
-        arr.push_back(xarr[i+1]);
-      }
+      arr = aurostd::xvector2vector(xarr);
     }
 
   template<class utype1,class utype2> // function quicksort
     void sort(vector<utype1>& arr, vector<utype2>& brr) {
-      xvector<utype1> xarr(arr.size());
-      xvector<utype2> xbrr(brr.size());
-      for(uint i=0;i<arr.size();i++) xarr[i+1]=arr[i];
-      for(uint i=0;i<brr.size();i++) xbrr[i+1]=brr[i];
+      xvector<utype1> xarr = aurostd::vector2xvector(arr);
+      xvector<utype2> xbrr = aurostd::vector2xvector(brr);
       aurostd::sort2(xarr.rows,xarr,xbrr);
-      // aurostd::sort2(xarr,xbrr);
-      arr.clear();brr.clear();
-      for(int i=0;i<xarr.rows;i++) {
-        arr.push_back(xarr[i+1]);
-        brr.push_back(xbrr[i+1]);
-      }
+      arr = aurostd::xvector2vector(xarr);
+      brr = aurostd::xvector2vector(xbrr);
     }
 
   template<class utype1,class utype2> // function quicksort //CO20200915
@@ -6854,41 +6843,26 @@ namespace aurostd {
 
   template<class utype1,class utype2,class utype3> // function quicksort
     void sort(vector<utype1>& arr, vector<utype2>& brr, vector<utype3>& crr) {
-      xvector<utype1> xarr(arr.size());
-      xvector<utype2> xbrr(brr.size());
-      xvector<utype3> xcrr(crr.size());
-      for(uint i=0;i<arr.size();i++) xarr[i+1]=arr[i];
-      for(uint i=0;i<brr.size();i++) xbrr[i+1]=brr[i];
-      for(uint i=0;i<crr.size();i++) xcrr[i+1]=crr[i];
-      aurostd::sort3(xarr.rows,xarr,xbrr,xcrr);
-      // aurostd::sort3(xarr,xbrr,xcrr);
-      arr.clear();brr.clear();crr.clear();
-      for(int i=0;i<xarr.rows;i++) {
-        arr.push_back(xarr[i+1]);
-        brr.push_back(xbrr[i+1]);
-        crr.push_back(xcrr[i+1]);
-      }
+    xvector<utype1> xarr = aurostd::vector2xvector(arr);
+    xvector<utype2> xbrr = aurostd::vector2xvector(brr);
+    xvector<utype3> xcrr = aurostd::vector2xvector(crr);
+    aurostd::sort3(xarr.rows,xarr,xbrr, xcrr);
+    arr = aurostd::xvector2vector(xarr);
+    brr = aurostd::xvector2vector(xbrr);
+    crr = aurostd::xvector2vector(xcrr);
     }
 
   template<class utype1,class utype2,class utype3,class utype4> // function quicksort
     void sort(vector<utype1>& arr, vector<utype2>& brr, vector<utype3>& crr, vector<utype4>& drr) {
-      xvector<utype1> xarr(arr.size());
-      xvector<utype2> xbrr(brr.size());
-      xvector<utype3> xcrr(crr.size());
-      xvector<utype4> xdrr(drr.size());
-      for(uint i=0;i<arr.size();i++) xarr[i+1]=arr[i];
-      for(uint i=0;i<brr.size();i++) xbrr[i+1]=brr[i];
-      for(uint i=0;i<crr.size();i++) xcrr[i+1]=crr[i];
-      for(uint i=0;i<drr.size();i++) xdrr[i+1]=drr[i];
-      //    aurostd::sort4(xarr.rows,xarr,xbrr,xcrr,xdrr);
-      aurostd::sort4(xarr,xbrr,xcrr,xdrr);
-      arr.clear();brr.clear();crr.clear();drr.clear();
-      for(int i=0;i<xarr.rows;i++) {
-        arr.push_back(xarr[i+1]);
-        brr.push_back(xbrr[i+1]);
-        crr.push_back(xcrr[i+1]);
-        drr.push_back(xdrr[i+1]);
-      }
+    xvector<utype1> xarr = aurostd::vector2xvector(arr);
+    xvector<utype2> xbrr = aurostd::vector2xvector(brr);
+    xvector<utype3> xcrr = aurostd::vector2xvector(crr);
+    xvector<utype4> xdrr = aurostd::vector2xvector(drr);
+    aurostd::sort4(xarr.rows,xarr,xbrr,xcrr, xdrr);
+    arr = aurostd::xvector2vector(xarr);
+    brr = aurostd::xvector2vector(xbrr);
+    crr = aurostd::xvector2vector(xcrr);
+    drr = aurostd::xvector2vector(xdrr);
     }
 }
 
