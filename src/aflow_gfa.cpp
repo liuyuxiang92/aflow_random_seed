@@ -104,7 +104,7 @@ void FindGap(xvector<double>& maxGaps, xvector<double>& gapPositions, xmatrix<do
     for(uint j=1;j<=superStr.atoms.size();j++)
       individualDistances(j)=distances(i,j); //Temporary
 
-    individualDistances = sort(individualDistances);
+    sort(individualDistances);
 
     for(uint j=2;j<=superStr.atoms.size();j++){ 
 
@@ -135,7 +135,7 @@ void FindNewGap(uint i, xvector<double>& maxGaps, xvector<double>& gapPositions,
   for(uint j=1;j<=superStr.atoms.size();j++)
     individualDistances(j)=distances(i,j); //Temporary
 
-  individualDistances = sort(individualDistances);
+  sort(individualDistances);
 
   maxGaps(i)=0;
   gapPositions(i)=9999.666;
