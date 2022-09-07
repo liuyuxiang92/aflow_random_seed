@@ -1183,6 +1183,8 @@ version_updates_email.txt: README_AFLOW_VERSIONS_HISTORY.TXT Makefile
 #UNIT TESTS
 .PHONY: check
 check:
+#CO20220906 - run one quick instance of aflow to read/write aflow.rc
+	./aflow -v
 	$(MAKE) check_proto
 .PHONY: check_full
 check_full:

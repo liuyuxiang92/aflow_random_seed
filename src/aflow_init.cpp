@@ -64,6 +64,10 @@ namespace init {
     string message = "";
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [BEGIN]" << endl;
 
+    //CO20220906 WARNING - do not run ANYTHING before the aflowrc read/write/load below
+    //XHOST is largely unset before this
+    //aflowrc loads TMPDIR needed for many AUROSTD functions
+
     // AFLOWRC LOAD DEFAULTS FROM AFLOWRC.
     // XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
     // XHOST.vflag_control.flag("AFLOWRC::OVERWRITE",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=overwrite|--aflowrc_overwrite"));
@@ -72,16 +76,33 @@ namespace init {
     // always use aurostd::getenv2string that contains the necessary check HE20220701 //SD20220701
     XHOST.home = aurostd::getenv2string("HOME"); //AS SOON AS POSSIBLE
     XHOST.user = aurostd::getenv2string("USER");  //AS SOON AS POSSIBLE
+    //CO20220906 START - chicken and egg problem with /tmp file, need a temporary solution for XHOST.tmpfs as we need to write out tmp files immediately
+    XHOST.argv.clear();for(uint i=0;i<argv.size();i++){XHOST.argv.push_back(argv.at(i));} //AS SOON AS POSSIBLE
+    vector<string> tokens;
+    string tmpfs_str=AFLOWRC_DEFAULT_TMPFS_DIRECTORIES; //CO20220906 - always defined, does not require reading aflow.rc
+    const string tmpfs_str_input=aurostd::args2attachedstring(XHOST.argv,"--use_tmpfs=","");
+    if(!tmpfs_str_input.empty()){tmpfs_str=tmpfs_str_input;}  //override with input from command line, always takes precedence
+    tmpfs_str+=",./";    //CO20220906 - hack, add current directory at the end, should work unless there's a real problem
+    aurostd::string2tokens(tmpfs_str,tokens,",");
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " tokens[tmpfs_str]=\"" << aurostd::joinWDelimiter(tokens,",") << "\"" << endl;}
+    for(uint i=0;i<tokens.size() && XHOST.tmpfs.empty();i++){
+      if(aurostd::DirectoryWritable(tokens[i])){XHOST.tmpfs=tokens[i];}
+    }
+    if(XHOST.tmpfs.empty()){
+      message="tmp directories are not writable";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message);
+    }
+    XHOST.tmpfs=aurostd::CleanFileName(XHOST.tmpfs+"/");
+    //
     if(!aflowrc::is_available(oss,INIT_VERBOSE || XHOST.DEBUG)) aflowrc::write_default(oss,INIT_VERBOSE || XHOST.DEBUG);
     aflowrc::read(oss,INIT_VERBOSE || XHOST.DEBUG);
     XHOST.vflag_control.flag("AFLOWRC::READ",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=read|--aflowrc_read"));
     if(XHOST.vflag_control.flag("AFLOWRC::READ")) {aflowrc::print_aflowrc(oss,TRUE);return false;}
+    //
     // SD20220223 - read AFLOWRC to determine the temporary directory, which is needed for execute2string
     // SD20220223 - check to make sure the temporary directory is writable
-    vector<string> tokens;
-    string tmpfs_str=DEFAULT_TMPFS_DIRECTORIES;
-    string tmpfs_str_input=aurostd::args2attachedstring(XHOST.argv,"--use_tmpfs=","");
-    if(!tmpfs_str_input.empty()){tmpfs_str=tmpfs_str_input;}
+    tmpfs_str=DEFAULT_TMPFS_DIRECTORIES;  //CO20220906 - redefine with user aflow.rc parameters
+    if(!tmpfs_str_input.empty()){tmpfs_str=tmpfs_str_input;}  //override with input from command line (already snatched before), always takes precedence
     aurostd::string2tokens(tmpfs_str,tokens,",");
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " tokens[tmpfs_str]=\"" << aurostd::joinWDelimiter(tokens,",") << "\"" << endl;}
     for(uint i=0;i<tokens.size() && XHOST.tmpfs.empty();i++){
@@ -105,7 +126,6 @@ namespace init {
     if(INIT_VERBOSE) oss << "*********************************************************************************" << endl;
     if(INIT_VERBOSE) oss << "* AFLOW V=" << string(AFLOW_VERSION) << " - machine information " << endl;
     if(INIT_VERBOSE) oss << "*********************************************************************************" << endl;
-    XHOST.argv.clear();for(uint i=0;i<argv.size();i++)  XHOST.argv.push_back(argv.at(i));
 
     // IMMEDIATELY
     XHOST.QUIET=aurostd::args2flag(argv,cmds,"--quiet|-q");
