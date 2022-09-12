@@ -1088,8 +1088,7 @@ namespace aurostd {  // namespace aurostd
       xvector<utype> c(a.lrows,a.urows);
       for(int i=a.lrows;i<=a.urows;i++)
         for(int j=a.lcols;j<=a.ucols;j++)
-          //      c[i]+=a[i][j]*b[j-b.lrows+1];
-          c(i)+=a(i,j)*b(j-b.lrows+1);   // check... the 1 might be wrong
+          c(i)+=a(i,j)*b(j-a.lcols+b.lrows); //HE20220912 xmatrix and xvector can start at different lcols/lrows
       return  c;
     }
 }
@@ -1129,8 +1128,8 @@ namespace aurostd {
       xvector<xcomplex<utype> > c(a.lrows, a.urows);
       for (int i = a.lrows; i <= a.urows; i++) {
         for (int j = a.lcols; j <= a.ucols; j++) {
-          c[i].re += a[i][j] * b[j - b.lrows + 1].re;
-          c[i].im += a[i][j] * b[j - b.lrows + 1].im;
+          c[i].re += a[i][j] * b[j - a.lcols+b.lrows].re; //HE20220912 xmatrix and xvector can start at different lcols/lrows
+          c[i].im += a[i][j] * b[j - a.lcols+b.lrows].im;
         }
       }
       return c;
@@ -2624,7 +2623,7 @@ namespace aurostd {  // namespace aurostd
       printf("a.lcols=%i, a.ucols=%i\n",a.lcols,a.ucols);
 #endif
       if(!a.issquare) {
-        string message = "Identity only defined for square matrces.";
+        string message = "Identity only defined for square matrices.";
         throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
       for(int i=a.lrows;i<=a.urows;i++)
@@ -2976,45 +2975,25 @@ namespace aurostd {  // namespace aurostd
 // ****************************************************************************
 // ----------------------------------------------------------------------------
 namespace aurostd { // namespace aurostd
-
   template<class utype> void  // function shift lrows so first index is i
-    shiftlrows(xmatrix<utype>& a,int i){ //CO20191201
-      if(a.lrows==i){return;}
-      xmatrix<utype> b(a.rows+i-1,a.ucols,i,a.lcols);
-      int k=i;
-      for(int ii=a.lrows;ii<=a.urows;ii++){
-        for(int jj=a.lcols;jj<=a.ucols;jj++){
-          b[k++][jj]=a[ii][jj];
-        }
-      }
-      a=b;
-    }
-
+  shiftlrows(xmatrix<utype>& a,int i){ //CO20191201 //SD20220912 - removed degenerate code
+    aurostd::shiftlrowscols(a,i,a.lcols);
+  }
   template<class utype> void  // function shift lcols so first index is i
-    shiftlcols(xmatrix<utype>& a,int i){ //CO20191201
-      if(a.lcols==i){return;}
-      xmatrix<utype> b(a.urows,a.cols+i-1,a.lrows,i);
-      int k=i;
-      for(int ii=a.lrows;ii<=a.urows;ii++){
-        for(int jj=a.lcols;jj<=a.ucols;jj++){
-          b[ii][k++]=a[ii][jj];
-        }
-      }
-      a=b;
-    }
-
+  shiftlcols(xmatrix<utype>& a,int i){ //CO20191201 //SD20220912 - removed degenerate code
+    aurostd::shiftlrowscols(a,a.lrows,i);
+  }
   template<class utype> void  // function shift lrows and lcols so first index is i, j
-    shiftlrowscols(xmatrix<utype>& a,int i,int j){ //CO20191201
-      if(a.lrows==i && a.lcols==j){return;}
-      xmatrix<utype> b(a.rows+i-1,a.cols+j-1,i,j);
-      int k=i,l=j;
-      for(int ii=a.lrows;ii<=a.urows;ii++){
-        for(int jj=a.lcols;jj<=a.ucols;jj++){
-          b[k++][l++]=a[ii][jj];
-        }
+  shiftlrowscols(xmatrix<utype>& a,int i,int j){ //CO20191201
+    if(a.lrows==i && a.lcols==j){return;}
+    xmatrix<utype> b(a.rows+i-1,a.cols+j-1,i,j);
+    for(int ii=a.lrows;ii<=a.urows;ii++){
+      for(int jj=a.lcols;jj<=a.ucols;jj++){
+        b[i-a.lrows+ii][j-a.lcols+jj]=a[ii][jj];
       }
-      a=b;
     }
+    a=b;
+  }
 } // namespace aurostd
 
 // ****************************************************************************
