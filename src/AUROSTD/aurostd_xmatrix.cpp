@@ -3168,39 +3168,22 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd { // namespace aurostd
 
   template<class utype> void  // function shift lrows so first index is i
-    shiftlrows(xmatrix<utype>& a,int i){ //CO20191201
-      if(a.lrows==i){return;}
-      xmatrix<utype> b(a.rows+i-1,a.ucols,i,a.lcols);
-      int k=i;
-      for(int ii=a.lrows;ii<=a.urows;ii++){
-        for(int jj=a.lcols;jj<=a.ucols;jj++){
-          b[k++][jj]=a[ii][jj];
-        }
-      }
-      a=b;
+    shiftlrows(xmatrix<utype>& a,int i){ //CO20191201 //SD20220912 - removed degenerate code
+      aurostd::shiftlrowscols(a,i,a.lcols);
     }
 
   template<class utype> void  // function shift lcols so first index is i
-    shiftlcols(xmatrix<utype>& a,int i){ //CO20191201
-      if(a.lcols==i){return;}
-      xmatrix<utype> b(a.urows,a.cols+i-1,a.lrows,i);
-      int k=i;
-      for(int ii=a.lrows;ii<=a.urows;ii++){
-        for(int jj=a.lcols;jj<=a.ucols;jj++){
-          b[ii][k++]=a[ii][jj];
-        }
-      }
-      a=b;
+    shiftlcols(xmatrix<utype>& a,int i){ //CO20191201 //SD20220912 - removed degenerate code
+      aurostd::shiftlrowscols(a,a.lrows,i);
     }
 
   template<class utype> void  // function shift lrows and lcols so first index is i, j
     shiftlrowscols(xmatrix<utype>& a,int i,int j){ //CO20191201
       if(a.lrows==i && a.lcols==j){return;}
       xmatrix<utype> b(a.rows+i-1,a.cols+j-1,i,j);
-      int k=i,l=j;
       for(int ii=a.lrows;ii<=a.urows;ii++){
         for(int jj=a.lcols;jj<=a.ucols;jj++){
-          b[k++][l++]=a[ii][jj];
+          b[i-a.lrows+ii][j-a.lcols+jj]=a[ii][jj];
         }
       }
       a=b;
