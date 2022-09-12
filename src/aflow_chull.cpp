@@ -241,6 +241,8 @@ namespace chull {
       if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
       return FALSE;
     }
+    inputs=aurostd::RemoveWhiteSpaces(inputs);  //CO20200531 - sometimes web injects spaces
+    aurostd::StringSubst(inputs,"-","");;  //CO20200531 - removing '-' from web
     vector<string> tokens_comma;
     uint nary;
     string original_input;
@@ -4012,7 +4014,8 @@ namespace chull {
       }
       return;
     }
-    if(LDEBUG) {cerr << "lastCoords(): " << sort(energies) << endl;}
+
+    if(LDEBUG) {xvector<double> temp_eng = energies; sort(temp_eng); cerr << "lastCoords(): " << temp_eng << endl;}
     double q1,q2,q3;
     //so we sort full anyway to be completely robust, should be easy considering how we sorted before
     aurostd::getQuartiles(energies,q1,q2,q3);  //we sort in here
@@ -4824,10 +4827,10 @@ namespace chull {
     //HE20220412 START
     //collect directions already spanned by `points_to_avoid`
     vector<xvector<double>> directions;
-      for (size_t avoid_i=1; avoid_i<points_to_avoid.size(); avoid_i++){
-        // using the first extreme point as our starting point for all directions
-        directions.push_back(m_points[points_to_avoid[avoid_i].ch_index].h_coords - m_points[points_to_avoid[0].ch_index].h_coords);
-      }
+    for (size_t avoid_i=1; avoid_i<points_to_avoid.size(); avoid_i++){
+      // using the first extreme point as our starting point for all directions
+      directions.push_back(m_points[points_to_avoid[avoid_i].ch_index].h_coords - m_points[points_to_avoid[0].ch_index].h_coords);
+    }
     //HE20220412 END
     int h_coords_index=0;
     xvector<double> new_direction;

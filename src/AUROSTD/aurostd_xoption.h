@@ -57,11 +57,11 @@ namespace aurostd {
       bool flag(const string&) const;     // interrogate=TRUE/FALSE, same as ischeme //CO20180101  //SC20191227 //CO20210805 - const&
       bool flag(void) const;       // return if there is any scheme inside //CO20180101 //SC20191227
       // attached stuff..
-      bool isdefined(const string&) const;                                    //SC20200114  //CO20210805 - const&
-      uint opattachedscheme(const string&,const string&,bool);                       // add/remove attached_scheme if flag=TRUE, then returns vghost.size() //CO20210805 - const&
-      uint addattachedscheme(const string& scheme,const string& attached,bool flag); // add attached_scheme if flag=TRUE, then returns vghost.size()  //CO20210805 - const&
+      bool isdefined(const string&) const;                                            //SC20200114  //CO20210805 - const&
+      uint opattachedscheme(const string&,const string&,bool);                        // add/remove attached_scheme if flag=TRUE, then returns vghost.size() //CO20210805 - const&
+      uint addattachedscheme(const string& scheme,const string& attached,bool flag);  // add attached_scheme if flag=TRUE, then returns vghost.size()  //CO20210805 - const&
       // [OBSOLETE] uint purgeattachedscheme(string check);            // remove attached_scheme, then returns vghost.size() - same as pop_attached
-      uint push_attached(const string& scheme,const string& attached);               // add attached_scheme, then returns vghost.size() - like addattachedscheme with flag=TRUE //CO20210805 - const&
+      uint push_attached(const string& scheme,const string& attached);        // add attached_scheme, then returns vghost.size() - like addattachedscheme with flag=TRUE //CO20210805 - const&
       uint pop_attached(const string& check);                                 // remove attached_scheme, then returns vghost.size() //CO20210805 - const&
       string getattachedscheme(const string& scheme) const; //CO20180101
       template<class utype> utype getattachedutype(const string& scheme) const;  //CO20200731

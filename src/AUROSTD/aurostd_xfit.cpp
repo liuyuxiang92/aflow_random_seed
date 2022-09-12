@@ -268,6 +268,7 @@ namespace aurostd {
   /// @param y output value of the data points
   /// @param n order of the polynomial
   /// @param w weight of the data points
+  /// @param scale_input scale the input data for the fit
   ///
   /// @return coefficients of the polynomial
   ///
@@ -275,8 +276,9 @@ namespace aurostd {
   /// @mod{SD,20220422,created function}
   ///
   /// @note The weight w_i determines how much one wants to weight the point y_i when performing the fit
-  template<class utype> xvector<utype> polynomialCurveFit(const xvector<utype>& x, const xvector<utype>& _y, const int n, const xvector<utype>& _w) {
+  template<class utype> xvector<utype> polynomialCurveFit(const xvector<utype>& _x, const xvector<utype>& _y, const int n, const xvector<utype>& _w, const bool scale_input) {
     bool LDEBUG = (FALSE || DEBUG_XFIT || XHOST.DEBUG);
+    xvector<utype> x = scale_input ? (_x - aurostd::mean(_x)) / aurostd::stddev(_x) : _x;
     utype wtot = 0.0;
     for (int i = _w.lrows; i <= _w.urows; i++) {
       if (_w(i) < (utype)0.0) {

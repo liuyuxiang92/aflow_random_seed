@@ -4282,7 +4282,24 @@ namespace aurostd {
   // Function file2string bz2file2string gzfile2string xzfile2string zipfile2string efile2string
   // ***************************************************************************
   // write file to string - Stefano Curtarolo
-  uint file2string(const string& _FileNameIN,string& StringIN) {  //CO20210624
+  uint file2string(const string& _FileNameIN,string& StringIN){
+    return file2string_20220221(_FileNameIN, StringIN);
+  }
+
+
+  uint file2string_20220221(const string& _FileNameIN,string& StringIN){ //HE20220221
+    // avoids the extra FileExist check (buffer.str() will always be empty if the file can't be open)
+    // avoids reading the file char by char
+    // speedup compared to file2string_20220101 10% (3000 files/ 5 warm runs)
+    string FileNameIN=aurostd::CleanFileName(_FileNameIN);
+    std::ifstream open_file(FileNameIN);
+    std::stringstream buffer;
+    buffer << open_file.rdbuf();
+    StringIN = buffer.str();
+    return StringIN.length();
+  }
+
+  uint file2string_20220101(const string& _FileNameIN,string& StringIN) {  //CO20210624
     string FileNameIN=aurostd::CleanFileName(_FileNameIN);
     if(!FileExist(FileNameIN)) {
       // cerr << "ERROR - aurostd::file2string: file=" << FileNameIN << " not present !" << endl;
@@ -4662,37 +4679,16 @@ namespace aurostd {
   // Function url2string
   // ***************************************************************************
   // wget URL to string - Stefano Curtarolo
+  // HE20220615 changed to aurostd http code to reduce system calls
+  // Use the function in aurostd_xhttp for new code
+  // Old use-cases of this function should be replaced, kept for now to maintain compatibility
+  // As the original this function does not support SSL (https)
   bool url2string(const string& url,string& stringIN,bool verbose) {
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-    stringIN="";
-    if(!aurostd::IsCommandAvailable("wget")) {
-      cerr << "ERROR - aurostd::url2string(): command \"wget\" is necessary !" << endl;
-      return FALSE;
-    }
-    string _url=url;
-    aurostd::StringSubst(_url,"http://","");
-    aurostd::StringSubst(_url,"//","/");
-    if(LDEBUG) cerr << "aurostd::url2string(): Loading url=" << _url << endl;
-    if(verbose) cout << "aurostd::url2string(): Loading url=" << _url << endl;
-#ifndef _MACOSX_
-    stringIN=aurostd::execute2string("wget --quiet --no-cache -O /dev/stdout http://"+_url);
-#else
-    stringIN=aurostd::execute2string("wget --quiet -O /dev/stdout http://"+_url); // _MACOSX_
-#endif    
-    if(stringIN=="") {
-      aurostd::StringSubst(_url,":AFLOW","/AFLOW");
-#ifndef _MACOSX_
-      stringIN=aurostd::execute2string("wget --quiet --no-cache -O /dev/stdout http://"+_url);
-#else
-      stringIN=aurostd::execute2string("wget --quiet -O /dev/stdout http://"+_url); // _MACOSX_
-#endif    
-      if(stringIN=="") {
-        if(LDEBUG){cerr << "ERROR - aurostd::url2string(): URL not found http://" << _url << endl;} //CO20200731 - silence this, it's not an error
-        return FALSE;
-      }
-    }
-    //    aurostd::StringSubst(stringIN,"h1h","h1,"); // old Frisco php error patch
-    return TRUE;
+    if (verbose) cerr << __AFLOW_FUNC__ << " Loading url=" << url << endl;
+    int return_code = aurostd::httpGetStatus(url, stringIN);
+    if (verbose) cerr << __AFLOW_FUNC__ << " " << url << " returned " << return_code <<endl;
+    if(stringIN.empty()) return false;
+    else return true;
   }
 
   // ***************************************************************************
@@ -6917,29 +6913,18 @@ namespace aurostd {
 namespace aurostd {
   template<class utype1> // function quicksort
     void sort(vector<utype1>& arr) {
-      xvector<utype1> xarr(arr.size());
-      for(uint i=0;i<arr.size();i++) xarr[i+1]=arr[i];
-      //  aurostd::sort(xarr.rows,xarr);
+      xvector<utype1> xarr = aurostd::vector2xvector(arr);
       aurostd::sort(xarr);
-      arr.clear();
-      for(int i=0;i<xarr.rows;i++) {
-        arr.push_back(xarr[i+1]);
-      }
+      arr = aurostd::xvector2vector(xarr);
     }
 
   template<class utype1,class utype2> // function quicksort
     void sort(vector<utype1>& arr, vector<utype2>& brr) {
-      xvector<utype1> xarr(arr.size());
-      xvector<utype2> xbrr(brr.size());
-      for(uint i=0;i<arr.size();i++) xarr[i+1]=arr[i];
-      for(uint i=0;i<brr.size();i++) xbrr[i+1]=brr[i];
+      xvector<utype1> xarr = aurostd::vector2xvector(arr);
+      xvector<utype2> xbrr = aurostd::vector2xvector(brr);
       aurostd::sort2(xarr.rows,xarr,xbrr);
-      // aurostd::sort2(xarr,xbrr);
-      arr.clear();brr.clear();
-      for(int i=0;i<xarr.rows;i++) {
-        arr.push_back(xarr[i+1]);
-        brr.push_back(xbrr[i+1]);
-      }
+      arr = aurostd::xvector2vector(xarr);
+      brr = aurostd::xvector2vector(xbrr);
     }
 
   template<class utype1,class utype2> // function quicksort //CO20200915
@@ -6959,41 +6944,26 @@ namespace aurostd {
 
   template<class utype1,class utype2,class utype3> // function quicksort
     void sort(vector<utype1>& arr, vector<utype2>& brr, vector<utype3>& crr) {
-      xvector<utype1> xarr(arr.size());
-      xvector<utype2> xbrr(brr.size());
-      xvector<utype3> xcrr(crr.size());
-      for(uint i=0;i<arr.size();i++) xarr[i+1]=arr[i];
-      for(uint i=0;i<brr.size();i++) xbrr[i+1]=brr[i];
-      for(uint i=0;i<crr.size();i++) xcrr[i+1]=crr[i];
-      aurostd::sort3(xarr.rows,xarr,xbrr,xcrr);
-      // aurostd::sort3(xarr,xbrr,xcrr);
-      arr.clear();brr.clear();crr.clear();
-      for(int i=0;i<xarr.rows;i++) {
-        arr.push_back(xarr[i+1]);
-        brr.push_back(xbrr[i+1]);
-        crr.push_back(xcrr[i+1]);
-      }
+    xvector<utype1> xarr = aurostd::vector2xvector(arr);
+    xvector<utype2> xbrr = aurostd::vector2xvector(brr);
+    xvector<utype3> xcrr = aurostd::vector2xvector(crr);
+    aurostd::sort3(xarr.rows,xarr,xbrr, xcrr);
+    arr = aurostd::xvector2vector(xarr);
+    brr = aurostd::xvector2vector(xbrr);
+    crr = aurostd::xvector2vector(xcrr);
     }
 
   template<class utype1,class utype2,class utype3,class utype4> // function quicksort
     void sort(vector<utype1>& arr, vector<utype2>& brr, vector<utype3>& crr, vector<utype4>& drr) {
-      xvector<utype1> xarr(arr.size());
-      xvector<utype2> xbrr(brr.size());
-      xvector<utype3> xcrr(crr.size());
-      xvector<utype4> xdrr(drr.size());
-      for(uint i=0;i<arr.size();i++) xarr[i+1]=arr[i];
-      for(uint i=0;i<brr.size();i++) xbrr[i+1]=brr[i];
-      for(uint i=0;i<crr.size();i++) xcrr[i+1]=crr[i];
-      for(uint i=0;i<drr.size();i++) xdrr[i+1]=drr[i];
-      //    aurostd::sort4(xarr.rows,xarr,xbrr,xcrr,xdrr);
-      aurostd::sort4(xarr,xbrr,xcrr,xdrr);
-      arr.clear();brr.clear();crr.clear();drr.clear();
-      for(int i=0;i<xarr.rows;i++) {
-        arr.push_back(xarr[i+1]);
-        brr.push_back(xbrr[i+1]);
-        crr.push_back(xcrr[i+1]);
-        drr.push_back(xdrr[i+1]);
-      }
+    xvector<utype1> xarr = aurostd::vector2xvector(arr);
+    xvector<utype2> xbrr = aurostd::vector2xvector(brr);
+    xvector<utype3> xcrr = aurostd::vector2xvector(crr);
+    xvector<utype4> xdrr = aurostd::vector2xvector(drr);
+    aurostd::sort4(xarr.rows,xarr,xbrr,xcrr, xdrr);
+    arr = aurostd::xvector2vector(xarr);
+    brr = aurostd::xvector2vector(xbrr);
+    crr = aurostd::xvector2vector(xcrr);
+    drr = aurostd::xvector2vector(xdrr);
     }
 }
 
@@ -8160,13 +8130,13 @@ namespace aurostd {
 
   //ME20220324
   template <typename utype>
-  string xmat2String(const xmatrix<utype>& xmat_in) {
-    vector<string> rows;
-    for (int i = xmat_in.lrows; i <= xmat_in.urows; i++) {
-      rows.push_back("[" + joinWDelimiter(xmat_in(i), ",") + "]");
+    string xmat2String(const xmatrix<utype>& xmat_in) {
+      vector<string> rows;
+      for (int i = xmat_in.lrows; i <= xmat_in.urows; i++) {
+        rows.push_back("[" + joinWDelimiter(xmat_in(i), ",") + "]");
+      }
+      return joinWDelimiter(rows, ",");
     }
-    return joinWDelimiter(rows, ",");
-  }
   template string xmat2String(const xmatrix<int>&);
   template string xmat2String(const xmatrix<uint>&);
 }
@@ -8251,10 +8221,10 @@ namespace aurostd {
   // individually wraps entries of vector with specified string
   // converts <a,b,c> to <'a','b','c'>
   // also works for deques
-  vector<string> wrapVecEntries(const vector<string>& vin,string wrap){
+  vector<string> wrapVecEntries(const vector<string>& vin,const string& wrap){
     return wrapVecEntries(vin,wrap,wrap);
   }
-  vector<string> wrapVecEntries(const vector<string>& vin,string wrap_start,string wrap_end){
+  vector<string> wrapVecEntries(const vector<string>& vin,const string& wrap_start,const string& wrap_end){
     vector<string> vout;
     for(uint i=0;i<vin.size();i++){
       if(vin[i].length()){
@@ -8263,10 +8233,10 @@ namespace aurostd {
     }
     return vout;
   }
-  deque<string> wrapVecEntries(const deque<string>& vin,string wrap){
+  deque<string> wrapVecEntries(const deque<string>& vin,const string& wrap){
     return wrapVecEntries(vin,wrap,wrap);
   }
-  deque<string> wrapVecEntries(const deque<string>& vin,string wrap_start,string wrap_end){
+  deque<string> wrapVecEntries(const deque<string>& vin,const string& wrap_start,const string& wrap_end){
     deque<string> vout;
     for(uint i=0;i<vin.size();i++){
       if(vin[i].length()){

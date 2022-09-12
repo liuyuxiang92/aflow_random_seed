@@ -17,52 +17,11 @@ using namespace std::placeholders;
 //            AFLOW Quasi-Chemical Approximation (QCA) (2022-)
 // ###############################################################################
 
-// The QCA Calculator class
-// Relevant variables:
-//  min_sleep, int, Minimum number of seconds to sleep in between checks of ATAT.
-//  print, string, Output format.
-//  screen_only, bool, Output the data to terminal only.
-//  image_only, bool, Read the written data and creates and image.
-//  calc_binodal, bool, Calculate the binodal curve.
-//  use_sg, bool, Compare initial and final xstructures only using their space groups.
-//  workdirpath, string, Path to the directory where ATAT is running.
-//  rootdirpath, string, Path to the root directory where all calculations will be made.
-//  aflowlibpath, string, Path to the parent directory where the aflowlib output files are stored.
-//  plattice, string, Parent lattice of the alloy.
-//  elements, vector<string>, Elements in the alloy.
-//  aflow_max_num_atoms, int, Maximum number of atoms in the cluster expansion calculated by AFLOW.
-//  max_num_atoms, int, Maximum number of atoms in the cluster expansion.
-//  cv_cut, double, Coefficient of variation cut-off.
-//  conc_npts, int, Number of points used to evaluate the macroscopic concentration.
-//  conc_curve, bool, The macroscopic concentration curve is defined.
-//  conc_curve_range, vector<double>, Concentration endpoints used to evaluate the macroscopic concentration.
-//  conc_macro, xmatrix<double>, Macroscopic concentration of the alloy.
-//  temp_npts, int, Number of points used to evaluate the temperature range.
-//  temp_range, vector<double>, Temperature endpoints used to evaluate the temperature range.
-//  temp, xvector<double>, Temperature range.
-//  alloyname, string, Elemental name of the alloy.
-//  rundirpath, string, Path to the directory where AFLOW is running.
-//  vstr_aflow, vector<xstructure>, Xstructures from AFLOW runs.
-//  lat_atat, string, ATAT lattice.
-//  vstr_ce, vector<xstructure>, Xstructures from cluster expansion ATAT runs.
-//  mapstr, vector<int>, Xstructure map between AFLOW and ATAT.
-//  cv_cluster, double, Coefficient of variation of the cluster expansion.
-//  num_atom_cluster, xvector<int>, Number of atoms of the clusters.
-//  num_elem_cluster, xmatrix<double>, Number of each element of the clusters.
-//  degeneracy_cluster, xvector<int>, Degeneracy of the clusters.
-//  conc_cluster, xmatrix<double>, Concentration of the clusters.
-//  excess_energy_cluster, xvector<double>, Excess energy of the clusters.
-//  prob_ideal_cluster, xmatrix<double>, Ideal (high-T) probability of the clusters as a function of concentration and temperature.
-//  prob_cluster, vector<xmatrix<double>>, Equilibrium probability of the clusters as a function of concentration and temperature.
-//  param_ec, pair<double, double>, Relative entropy at the equi-concentration and the transition temperature.
-//  rel_s, xmatrix<double>, Relative entropy as a function of concentration and temperature.
-//  binodal_curve, xvector<double>, Binodal curve as a function of the concentration.
-
 namespace qca {
-  QuasiChemApproxCalculator::QuasiChemApproxCalculator(ostream& oss) : xStream(oss), initialized(false) {initialize();}
-  QuasiChemApproxCalculator::QuasiChemApproxCalculator(ofstream& FileMESSAGE, ostream& oss) : xStream(FileMESSAGE, oss), initialized(false) {initialize();}
-  QuasiChemApproxCalculator::QuasiChemApproxCalculator(const aurostd::xoption& qca_flags, ostream& oss) : xStream(oss), initialized(false) {initialize(qca_flags);}
-  QuasiChemApproxCalculator::QuasiChemApproxCalculator(const aurostd::xoption& qca_flags, ofstream& FileMESSAGE, ostream& oss) : xStream(FileMESSAGE, oss), initialized(false) {initialize(qca_flags);}
+  QuasiChemApproxCalculator::QuasiChemApproxCalculator(ostream& oss) : xStream(oss), m_initialized(false) {initialize();}
+  QuasiChemApproxCalculator::QuasiChemApproxCalculator(ofstream& FileMESSAGE, ostream& oss) : xStream(FileMESSAGE, oss), m_initialized(false) {initialize();}
+  QuasiChemApproxCalculator::QuasiChemApproxCalculator(const aurostd::xoption& qca_flags, ostream& oss) : xStream(oss), m_initialized(false) {initialize(qca_flags);}
+  QuasiChemApproxCalculator::QuasiChemApproxCalculator(const aurostd::xoption& qca_flags, ofstream& FileMESSAGE, ostream& oss) : xStream(FileMESSAGE, oss), m_initialized(false) {initialize(qca_flags);}
   QuasiChemApproxCalculator::QuasiChemApproxCalculator(const QuasiChemApproxCalculator& b) : xStream(*b.getOFStream(), *b.getOSS()) {copy(b);}
 
   QuasiChemApproxCalculator::~QuasiChemApproxCalculator() {xStream::free(); free();}
@@ -74,7 +33,7 @@ namespace qca {
   void QuasiChemApproxCalculator::clear() {QuasiChemApproxCalculator a; copy(a);}
 
   void QuasiChemApproxCalculator::free() {
-    initialized = false;
+    m_initialized = false;
     m_aflags.clear();
     min_sleep = 0;
     print = "";
@@ -122,7 +81,7 @@ namespace qca {
 
   void QuasiChemApproxCalculator::copy(const QuasiChemApproxCalculator& b) {
     xStream::copy(b);
-    initialized = b.initialized;
+    m_initialized = b.m_initialized;
     m_aflags = b.m_aflags;
     min_sleep = b.min_sleep;
     print = b.print;
@@ -178,7 +137,7 @@ namespace qca {
   }
   bool QuasiChemApproxCalculator::initialize() {
     free();
-    return initialized;
+    return m_initialized;
   }
   bool QuasiChemApproxCalculator::initialize(const aurostd::xoption& qca_flags, ostream& oss) {
     xStream::initialize(oss);
@@ -206,8 +165,8 @@ namespace qca {
     temp_npts = DEFAULT_QCA_TEMP_NPTS;
     print = DEFAULT_QCA_PRINT;
     readQCAFlags(qca_flags);
-    initialized = true;
-    return initialized;
+    m_initialized = true;
+    return m_initialized;
   }
 
   /// @brief reads the QCA flags
@@ -436,12 +395,10 @@ namespace qca {
   /// @mod{SD,20220718,created function}
   void QuasiChemApproxCalculator::readAFLOWXstructures() {
     stringstream message;
-    vector<string> vstr_aflowlib, vstr_aflowurl;
+    vector<string> vstr_aflowurl, elements_xc;
     string alloyname_PBE = "", aflowlib = "", aflowurl = "";
-    aflowlib::_aflowlib_entry entry;
     stringstream oss;
     aurostd::xcombos xc;
-    vector<string> elements_xc;
     vector<int> index_xc;
     for (uint ialloy = 2; ialloy <= 3; ialloy++) { // AFLOW database only contains data for binaries and ternaries
       xc = aurostd::xcombos(elements.size(), ialloy, 'C');
@@ -454,28 +411,20 @@ namespace qca {
         aurostd::sort(elements_xc);
         alloyname_PBE = "";
         for (size_t i = 0; i < elements_xc.size(); i++) {alloyname_PBE += AVASP_Get_PseudoPotential_PAW_PBE(elements_xc[i]);}
-        aflowlib = "/common/LIB" + aurostd::utype2string<uint>(ialloy) + "/RAW/" + alloyname_PBE;
         aflowurl = "aflowlib.duke.edu:AFLOWDATA/LIB" + aurostd::utype2string<uint>(ialloy) + "_RAW/" + alloyname_PBE;
         if (plattice == "fcc") {
           if (ialloy == 2) {
             for (uint i = 1; i < 30; i++) {
-              vstr_aflowlib.push_back(aflowlib + "/" + aurostd::utype2string<uint>(i) + "/aflowlib.out");
               vstr_aflowurl.push_back(aflowurl + "/" + aurostd::utype2string<uint>(i));
             }
           }
           if (ialloy == 3) {
-            vstr_aflowlib.push_back(aflowlib + "/" + "TFCC001.ABC" + "/aflowlib.out");
             vstr_aflowurl.push_back(aflowurl + "/" + "TFCC001.ABC");
-            vstr_aflowlib.push_back(aflowlib + "/" + "TFCC002.ABC" + "/aflowlib.out");
             vstr_aflowurl.push_back(aflowurl + "/" + "TFCC002.ABC");
-            vstr_aflowlib.push_back(aflowlib + "/" + "TFCC003.ABC" + "/aflowlib.out");
             vstr_aflowurl.push_back(aflowurl + "/" + "TFCC003.ABC");
             for (uint i = 4; i < 17; i++) {
-              vstr_aflowlib.push_back(aflowlib + "/" + "TFCC00" + aurostd::utype2string<uint>(i) + ".ABC" + "/aflowlib.out");
               vstr_aflowurl.push_back(aflowurl + "/" + "TFCC00" + aurostd::utype2string<uint>(i) + ".ABC");
-              vstr_aflowlib.push_back(aflowlib + "/" + "TFCC00" + aurostd::utype2string<uint>(i) + ".BCA" + "/aflowlib.out");
               vstr_aflowurl.push_back(aflowurl + "/" + "TFCC00" + aurostd::utype2string<uint>(i) + ".BCA");
-              vstr_aflowlib.push_back(aflowlib + "/" + "TFCC00" + aurostd::utype2string<uint>(i) + ".CAB" + "/aflowlib.out");
               vstr_aflowurl.push_back(aflowurl + "/" + "TFCC00" + aurostd::utype2string<uint>(i) + ".CAB");
             }
           }
@@ -483,23 +432,16 @@ namespace qca {
         else if (plattice == "bcc") {
           if (ialloy == 2) {
             for (uint i = 58; i < 87; i++) {
-              vstr_aflowlib.push_back(aflowlib + "/" + aurostd::utype2string<uint>(i) + "/aflowlib.out");
               vstr_aflowurl.push_back(aflowurl + "/" + aurostd::utype2string<uint>(i));
             }
           }
           if (ialloy == 3) {
-            vstr_aflowlib.push_back(aflowlib + "/" + "TBCC001.ABC" + "/aflowlib.out");
             vstr_aflowurl.push_back(aflowurl + "/" + "TBCC001.ABC");
-            vstr_aflowlib.push_back(aflowlib + "/" + "TBCC002.ABC" + "/aflowlib.out");
             vstr_aflowurl.push_back(aflowurl + "/" + "TBCC002.ABC");
-            vstr_aflowlib.push_back(aflowlib + "/" + "TBCC003.ABC" + "/aflowlib.out");
             vstr_aflowurl.push_back(aflowurl + "/" + "TBCC003.ABC");
             for (uint i = 4; i < 17; i++) {
-              vstr_aflowlib.push_back(aflowlib + "/" + "TBCC00" + aurostd::utype2string<uint>(i) + ".ABC" + "/aflowlib.out");
               vstr_aflowurl.push_back(aflowurl + "/" + "TBCC00" + aurostd::utype2string<uint>(i) + ".ABC");
-              vstr_aflowlib.push_back(aflowlib + "/" + "TBCC00" + aurostd::utype2string<uint>(i) + ".BCA" + "/aflowlib.out");
               vstr_aflowurl.push_back(aflowurl + "/" + "TBCC00" + aurostd::utype2string<uint>(i) + ".BCA");
-              vstr_aflowlib.push_back(aflowlib + "/" + "TBCC00" + aurostd::utype2string<uint>(i) + ".CAB" + "/aflowlib.out");
               vstr_aflowurl.push_back(aflowurl + "/" + "TBCC00" + aurostd::utype2string<uint>(i) + ".CAB");
             }
           }
@@ -507,7 +449,6 @@ namespace qca {
         else if (plattice == "hcp") {
           if (ialloy == 2) {
             for (uint i = 115; i < 178; i++) {
-              vstr_aflowlib.push_back(aflowlib + "/" + aurostd::utype2string<uint>(i) + "/aflowlib.out");
               vstr_aflowurl.push_back(aflowurl + "/" + aurostd::utype2string<uint>(i));
             }
           }
@@ -516,20 +457,23 @@ namespace qca {
     }
     message << "Reading AFLOW xstructures from AFLOW database";
     pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-    for (size_t i = 0; i < vstr_aflowlib.size(); i++) {
-        entry.Load(aurostd::file2string(vstr_aflowlib[i]), oss);
-        if (pflow::loadXstructures(entry, oss, false)) { // initial = unrelaxed; final = relaxed
-          entry.aurl = vstr_aflowurl[i];
-          entry.vstr[0].qm_E_cell = entry.enthalpy_cell; // ATAT needs energy per cell
-          if (use_sg && (entry.spacegroup_orig == entry.spacegroup_relax)) {
-            vstr_aflow.push_back(entry.vstr[0]);
-          }
-          else {
-            vstr_aflow.push_back(entry.vstr[0]);
-          }
-        }
-        entry.clear();
-        pflow::updateProgressBar(i, vstr_aflowlib.size() - 1, *p_oss);
+    vector<std::shared_ptr<aflowlib::_aflowlib_entry>> entries;
+    aflowlib::EntryLoader el;
+    el.m_xstructure_original = true;
+    el.m_xstructure_relaxed = true;
+    el.loadAURL(vstr_aflowurl);
+    el.getEntriesViewFlat(entries);
+    size_t ie = 0;
+    for (std::shared_ptr<aflowlib::_aflowlib_entry> entry : entries) {
+      ie++;
+      entry->vstr[0].qm_E_cell = entry->enthalpy_cell; // ATAT needs energy per cell
+      if (use_sg && (entry->spacegroup_orig == entry->spacegroup_relax)) {
+        vstr_aflow.push_back(entry->vstr[0]);
+      }
+      else {
+        vstr_aflow.push_back(entry->vstr[0]);
+      }
+      pflow::updateProgressBar(ie, entries.size(), *p_oss);
     }
     if (!aflowlibpath.empty()) {
       vector<xstructure> vstr = getAFLOWXstructuresCustom();
@@ -543,7 +487,7 @@ namespace qca {
   ///
   /// @authors
   /// @mod{SD,20220718,created function}
-  vector<xstructure> QuasiChemApproxCalculator::getAFLOWXstructuresCustom() {
+  vector<xstructure> QuasiChemApproxCalculator::getAFLOWXstructuresCustom() const {
     stringstream message;
     vector<xstructure> vstr;
     vector<string> vdir;
@@ -574,6 +518,12 @@ namespace qca {
       entry.clear();
       pflow::updateProgressBar(i, vdir.size() - 1, *p_oss);
     }
+
+    cerr<<"===DONE==="<<endl;
+    aurostd::Sleep(100);
+
+
+
     return vstr;
   }
 
@@ -638,7 +588,7 @@ namespace qca {
   ///
   /// @authors
   /// @mod{SD,20220718,created function}
-  string QuasiChemApproxCalculator::getLatForATAT(bool scale) {
+  string QuasiChemApproxCalculator::getLatForATAT(bool scale) const {
     stringstream oss;
     double alat = 0.0;
     for (size_t i = 0; i < nelem; i++) {alat += GetAtomRadiusCovalent(elements[i]);}
@@ -699,7 +649,7 @@ namespace qca {
   ///
   /// @authors
   /// @mod{SD,20220718,created function}
-  vector<xstructure> QuasiChemApproxCalculator::getATATXstructures(const int max_num_atoms, bool fromfile) {
+  vector<xstructure> QuasiChemApproxCalculator::getATATXstructures(const int max_num_atoms, bool fromfile) const {
     stringstream message;
     vector<xstructure> vstr;
     stringstream oss;
@@ -1025,7 +975,7 @@ namespace qca {
     vector<xvector<double>> vpocc;
     while (xcpocc.increment()) {
       if (aurostd::sum(xcpocc.getCombo()) == max_num_atoms) {
-        vpocc.push_back(aurostd::xvectorutype2xvectorvtype<int, double>(aurostd::vector2xvector(xcpocc.getCombo())) / (double)max_num_atoms);
+        vpocc.push_back(aurostd::xvector2utype<int, double>(aurostd::vector2xvector(xcpocc.getCombo())) / (double)max_num_atoms);
       }
     }
     vector<xstructure> vstr_ds, vstr_u;
@@ -1176,7 +1126,7 @@ namespace qca {
   ///
   /// @authors
   /// @mod{SD,20220718,created function}
-  void QuasiChemApproxCalculator::checkProbabilityIdeal() {
+  void QuasiChemApproxCalculator::checkProbabilityIdeal() const {
     for (int ix = prob_ideal_cluster.lrows; ix <= prob_ideal_cluster.urows; ix++) {
       if (!aurostd::isequal(aurostd::sum(prob_ideal_cluster(ix)), 1.0)) { // unnormalized
         stringstream message;
@@ -1338,7 +1288,7 @@ namespace qca {
   ///
   /// @authors
   /// @mod{SD,20220718,created function}
-  double QuasiChemApproxCalculator::getProbabilityConstraint(const int it, const int ix, const int ie, const int ideq, const xvector<double>& xvar) {
+  double QuasiChemApproxCalculator::getProbabilityConstraint(const int it, const int ix, const int ie, const int ideq, const xvector<double>& xvar) const {
     double totsum = 0.0, prodx = 1.0;
     for (int ic = prob_ideal_cluster.lcols; ic <= prob_ideal_cluster.ucols; ic++) {
       prodx = 1.0;
@@ -1360,7 +1310,7 @@ namespace qca {
   ///
   /// @authors
   /// @mod{SD,20220718,created function}
-  void QuasiChemApproxCalculator::checkProbabilityEquilibrium() {
+  void QuasiChemApproxCalculator::checkProbabilityEquilibrium() const {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     double diff = AUROSTD_MAX_DOUBLE, diff_old;
     for (int it = temp.lrows; it <= temp.urows; it++) {
@@ -1580,7 +1530,7 @@ namespace qca {
       json.addVector("Temperature range (K)", temp);
       json.addNumber("Max atoms per cell", max_num_atoms);
       json.addNumber("Cluster CV score (eV)", cv_cluster);
-      json.addVector("Cluster degeneracy", aurostd::xvectorutype2xvectorvtype<long int, double>(degeneracy_cluster));
+      json.addVector("Cluster degeneracy", aurostd::xvector2utype<long int, double>(degeneracy_cluster));
       json.addMatrix("Cluster concentration", conc_cluster);
       json.addVector("Cluster excess energy (eV)", excess_energy_cluster);
       json.addNumber("EC transition temperature (K)", param_ec.second);
@@ -1700,14 +1650,14 @@ namespace qca {
     qca_calc.printParams();
     // Only plot data from JSON file. This is useful when the plotting routine cannot be run on the machine
     // running the calculation.
-    if (qca_calc.image_only) {
+    if (vpflow.flag("QCA::IMAGE_ONLY")) {
       qca_calc.readData();
       qca_calc.plotData();
       return;
     }
     qca_calc.calculateBinodal();
     // Write and plot results
-    if (qca_calc.calc_binodal) {
+    if (vpflow.flag("QCA::BINODAL")) {
       qca_calc.writeData();
       qca_calc.plotData();
     }

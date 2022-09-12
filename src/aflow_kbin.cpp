@@ -19,6 +19,7 @@
 #define DUKE_QRATS_DEFAULT_KILL_MEM_CUTOFF 1.50
 #define DUKE_QFLOW_DEFAULT_KILL_MEM_CUTOFF 1.50
 #define DUKE_X_DEFAULT_KILL_MEM_CUTOFF 1.50 //CO20201220
+#define JHU_ROCKFISH_DEFAULT_KILL_MEM_CUTOFF 1.50 //CO20220818
 #define MPCDF_EOS_DEFAULT_KILL_MEM_CUTOFF 1.50
 #define MPCDF_DRACO_DEFAULT_KILL_MEM_CUTOFF 1.50
 #define MPCDF_COBRA_DEFAULT_KILL_MEM_CUTOFF 1.50
@@ -446,6 +447,11 @@ namespace KBIN {
     aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_X",aurostd::args2flag(argv,"--machine=x|--machine=duke_x")); //backwards compatible //CO20180409
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_X")) XHOST.maxmem=DUKE_X_DEFAULT_KILL_MEM_CUTOFF;
     //CO20201220 X STOP
+    //CO20220818 JHU_ROCKFISH START
+    // "MACHINE::JHU_ROCKFISH"
+    aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::JHU_ROCKFISH",aurostd::args2flag(argv,"--machine=rockfish|--machine=jhu_rockfish")); //backwards compatible //CO20180409
+    if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::JHU_ROCKFISH")) XHOST.maxmem=JHU_ROCKFISH_DEFAULT_KILL_MEM_CUTOFF;
+    //CO20220818 JHU_ROCKFISH STOP
     // "MACHINE::MPCDF_EOS"
     aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MPCDF_EOS",aurostd::args2flag(argv,"--machine=eos|--machine=mpcdf_eos|--machine=eos_mpiifort|--machine=mpcdf_eos_mpiifort"));
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MPCDF_EOS")) XHOST.maxmem=MPCDF_EOS_DEFAULT_KILL_MEM_CUTOFF;
@@ -1263,10 +1269,10 @@ namespace KBIN {
     //[SD20220224 - OBSOLETE]if(!FileSUBDIR) {                                                                                           // ******* Directory is non existent
     //[SD20220224 - OBSOLETE]  aus << "EEEEE  DIRECTORY_NOT_FOUND = "  << Message(_AFLOW_FILE_NAME_,aflags) << endl;
     //[SD20220224 - OBSOLETE]  aurostd::PrintMessageStream(aus,XHOST.QUIET);
-    //[SD20220224 - OBSOLETE]} else {                                                                                                    // ******* Directory EXISTS
+    //[SD20220224 - OBSOLETE]} else //CO20220830 - removing opening bracket for indenter
     //[SD20220224 - OBSOLETE]  // ***************************************************************************
     //[SD20220224 - OBSOLETE]  // Check LOCK again
-    //[SD20220224 - OBSOLETE]  if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_) || DirectorySkipped(aflags.Directory) || DirectoryAlreadyInDatabase(aflags.Directory,aflags.AFLOW_FORCE_RUN) || DirectoryUnwritable(aflags.Directory)) {
+    //[SD20220224 - OBSOLETE]  if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_) || DirectorySkipped(aflags.Directory) || DirectoryAlreadyInDatabase(aflags.Directory,aflags.AFLOW_FORCE_RUN) || DirectoryUnwritable(aflags.Directory)) //CO20220830 - removing opening bracket for indenter
     //[SD20220224 - OBSOLETE]    // ******* Directory is locked/skipped/unwritable
     //[SD20220224 - OBSOLETE]    // LOCK/SKIP/UNWRITABLE exist, then RUN already RUN
     //[SD20220224 - OBSOLETE]    if(aurostd::DirectoryLocked(aflags.Directory,_AFLOWLOCK_)) {
@@ -1452,9 +1458,9 @@ namespace KBIN {
     aurostd::execute(aus);  
     aurostd::ChmodFile("664",string(aflags.Directory+"/*"));
     aurostd::ChmodFile("777",string(aflags.Directory+"/*"));
-    
+
     FileAFLOWIN.clear();FileAFLOWIN.close();
-      
+
   };
 } // namespace
 

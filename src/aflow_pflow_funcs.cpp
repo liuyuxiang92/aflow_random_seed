@@ -444,7 +444,7 @@ namespace pflow {
 
     //[CO20190515 - WRONG, [hkl] WITH brackets is ALREADY in direct space]xvector<double> n_s=HKLPlane2Normal(xstr_bulk.lattice,hkl_s);  //we need UN-ROTATED lattice here so we can get the right distance
     //[CO20190515 - WRONG, [hkl] WITH brackets is ALREADY in direct space]double d_layers=getDistanceBetweenImages(xstr_bulk.lattice,h_s,k_s,l_s); //this depends on UN-ROTATED lattice
-    xvector<double> n_s=xstr_bulk.f2c*aurostd::xvectorutype2xvectorvtype<int,double>(hkl_s);n_s/=aurostd::modulus(n_s); //f2c=trasp(xstr_bulk.lattice)
+    xvector<double> n_s=xstr_bulk.f2c*aurostd::xvector2utype<int,double>(hkl_s);n_s/=aurostd::modulus(n_s); //f2c=trasp(xstr_bulk.lattice)
     xvector<double> n_s_ORIG=n_s;
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " n_s[hkl=" << hkl_s << "]=" << n_s << endl;}
 
@@ -625,9 +625,9 @@ namespace pflow {
         //cannot use n_s, as it is normalized
         //rotated hkl_s by v_pgroups
         //rotate in Cartesian coordinates, then convert to fractional
-        xvector<double> n_s_tmp=xstr_bulk.f2c*aurostd::xvectorutype2xvectorvtype<int,double>(hkl_s);  //do not normalize
+        xvector<double> n_s_tmp=xstr_bulk.f2c*aurostd::xvector2utype<int,double>(hkl_s);  //do not normalize
         n_s_tmp=v_pgroups[v_pgs[0]].Uc*n_s_tmp; //rotate
-        hkl_s=aurostd::xvectorutype2xvectorvtype<double,int>(xstr_bulk.c2f*n_s_tmp);  //convert to fractional
+        hkl_s=aurostd::xvector2utype<double,int>(xstr_bulk.c2f*n_s_tmp);  //convert to fractional
 
         message << "Selecting symmetrically equivalent hkl_s=" << hkl_s << endl;
         message << "n_s=" << n_s << endl;
@@ -1552,6 +1552,54 @@ namespace pflow {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // STOP - postprocessing
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  }
+} // namespace pflow
+
+namespace pflow {
+  bool findClosedPackingPlane(istream& input){xstructure xstr_in(input,IOAFLOW_AUTO);return findClosedPackingPlane(xstr_in);} //CO20191110
+  bool findClosedPackingPlane(const xstructure& xstr_in){ //CO20191110
+    bool LDEBUG=(FALSE || XHOST.DEBUG);
+    string soliloquy="pflow::findClosedPackingPlane():";
+
+    if(LDEBUG){cerr << soliloquy << " xstr_in=" << endl;cerr << xstr_in << endl;}
+
+    xstructure xstr_grid(xstr_in);
+    xstr_grid.GenerateGridAtoms(3); //-3:3 in every direction
+    const deque<_atom>& grid_atoms=xstr_grid.grid_atoms;
+
+    if(LDEBUG){cerr << soliloquy << " grid_atoms=" << endl;for(uint i=0;i<grid_atoms.size();i++){cerr << "i=" << i << ": cpos=" << grid_atoms[i].cpos << endl;}}
+
+    aurostd::xcombos xc(grid_atoms.size(),4,'C');  //need to check coplanarity: requires 4 points
+    vector<int> combo;
+
+    while(xc.increment()){
+      combo=xc.getCombo();
+      const _atom& a1=grid_atoms[combo[0]];
+      const _atom& a2=grid_atoms[combo[1]];
+      const _atom& a3=grid_atoms[combo[2]];
+      const _atom& a4=grid_atoms[combo[3]];
+
+      if(LDEBUG){
+        cerr << soliloquy << " checking coplanarity of:" << endl;
+        cerr << a1.cpos << endl;
+        cerr << a2.cpos << endl;
+        cerr << a3.cpos << endl;
+        cerr << a4.cpos << endl;
+      }
+
+
+      //check if they are coplanar
+      //use formula from https://en.wikipedia.org/wiki/Coplanarity
+      if(aurostd::isequal( aurostd::scalar_product( aurostd::vector_product( a2.cpos-a1.cpos , a4.cpos-a1.cpos ) , a3.cpos-a1.cpos ) , 0.0)){
+        if(LDEBUG){
+          cerr << soliloquy << " found coplanar set" << endl;
+
+
+        }
+      }
+    }
+
+    return true;
   }
 } // namespace pflow
 

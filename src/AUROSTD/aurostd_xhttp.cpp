@@ -252,7 +252,6 @@ namespace aurostd {
     }
   }
 
-
   /// @brief convert characters into their percent representation
   /// @param raw_str sting to escape
   /// @param characters replace just the given characters
@@ -290,7 +289,6 @@ namespace aurostd {
     return output.str();
 
   }
-
 
   /// @brief Fully percent encode a string
   /// @param work_str sting to escape

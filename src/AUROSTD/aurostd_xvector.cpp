@@ -1201,13 +1201,23 @@ namespace aurostd {  // namespace aurostd
 }
 
 namespace aurostd {  // namespace aurostd
+  template<class utype>                          // function mod
+    xvector<utype> mod(const xvector<utype> &a,utype d) {  //CO20200127
+      xvector<utype> c(a.urows,a.lrows);
+      for(int i=a.lrows;i<=a.urows;i++)
+        c[i]=aurostd::mod(a[i],d);
+      return c;
+    }
+}
+
+namespace aurostd {  // namespace aurostd
   template<class utype>                                 // function mod_floored
     xvector<utype> mod_floored(const xvector<utype> &a,utype d) {  // SD20220117
       xvector<utype> c(a.urows,a.lrows);
       for(int i=a.lrows;i<=a.urows;i++)
           c[i]=mod_floored(a[i],d);
       return c;
-    }    
+    }
 }
 
 namespace aurostd {  // namespace aurostd
@@ -1372,10 +1382,10 @@ namespace aurostd {                   // conversion to xvector<utype>
 
 //SD20220512
 namespace aurostd {                   // conversion from xvector<utype> to xvector<vtype>
-  template<class utype,class vtype>
-    xvector<vtype> xvectorutype2xvectorvtype(const xvector<utype>& a){
-      xvector<vtype> b(a.urows,a.lrows);
-      for(int i=a.lrows;i<=a.urows;i++){b[i]=(vtype)a[i];}
+  template<class utype1,class utype2>
+    xvector<utype2> xvector2utype(const xvector<utype1>& a){
+      xvector<utype2> b(a.urows,a.lrows);
+      for(int i=a.lrows;i<=a.urows;i++){b[i]=(utype2)a[i];}
       return b;
     }
 }
@@ -2651,9 +2661,9 @@ namespace aurostd {
 // ------------------------------------------------------- simple sort routines
 
 namespace aurostd {
-  template<class utype> xvector<utype>
-    sort(const xvector<utype>& a) {  // function shellsort xvector<utype>
-      return shellsort(a);  
+  template<class utype> void //HE20220901 switch to a void function to match std::sort()
+    sort(xvector<utype>& a) {  // function shellsort xvector<utype>
+      a = shellsort(a);
     }
 }
 
@@ -2805,6 +2815,11 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype1,class utype2>                                 // function quicksort
     void quicksort2(unsigned long n, xvector<utype1>& arr, xvector<utype2>&  brr) {
+    if (not ((int) n <= arr.rows && (int) n <= brr.rows)){//HE20220901 protect from out of bound reads/writes
+      stringstream message;
+      message << "Request length " << n << " is larger than the input xvectors ("<< arr.rows << " | " << brr.rows << ")";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+    }
       unsigned long i,ir=n,j,k,l=1;
       int jstack=0;
       utype1 a,atemp;
@@ -2884,6 +2899,11 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype1, class utype2, class utype3>                                 // function quicksort
     void quicksort3(unsigned long n, xvector<utype1>& arr, xvector<utype2>&  brr, xvector<utype3>&  crr) {
+      if (not ((int) n <= arr.rows && (int) n <= brr.rows && (int) n <= crr.rows)){//HE20220901 protect from out of bound reads/writes
+        stringstream message;
+        message << "Request length " << n << " is larger than the input xvectors ("<< arr.rows << " | " << brr.rows << " | " << crr.rows << ")";
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+      }
       unsigned long i,ir=n,j,k,l=1;
       int jstack=0;
       utype1 a,atemp;
@@ -2974,6 +2994,11 @@ namespace aurostd {  // namespace aurostd
 namespace aurostd {  // namespace aurostd
   template<class utype1, class utype2, class utype3, class utype4>                // function quicksort
     void quicksort4(unsigned long n, xvector<utype1>& arr, xvector<utype2>&  brr, xvector<utype3>&  crr, xvector<utype4>&  drr) {
+    if (not ((int) n <= arr.rows && (int) n <= brr.rows && (int) n <= crr.rows && (int) n <= drr.rows)){//HE20220901 protect from out of bound reads/writes
+      stringstream message;
+      message << "Request length " << n << " is larger than the input xvectors ("<< arr.rows << " | " << brr.rows << " | " << crr.rows << " | " << drr.rows << ")";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+    }
       unsigned long i,ir=n,j,k,l=1;
       int jstack=0;
       utype1 a,atemp;
@@ -3213,7 +3238,8 @@ namespace aurostd {
     getQuartiles(const xvector<utype>& _a,utype& q1,utype& q2,utype& q3){ //CO20180409
       q1=q2=q3=(utype)AUROSTD_NAN;
       if(_a.rows<4){return;} //not enough points to do statistics (need at least 3 quartile)
-      xvector<utype> a=sort(_a);  //unfortunate that we have to make a full copy here, but alas, we will
+      xvector<utype> a = _a; //unfortunate that we have to make a full copy here, but alas, we will
+      sort(a);
       shiftlrows(a,0);    //CO20180314 - even/odd specifications starting at 0
       //get first, second (median), and third quartiles
       int i1=a.rows/4+a.lrows;

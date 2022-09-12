@@ -7,6 +7,7 @@
 // Corey Oses
 // Frisco Rose (AFLUX)
 // Marco Esters (AFLOW DB)
+// Hagen Eckert (EntryLoader 2022)
 
 #ifndef _AFLOWLIB_H_
 #define _AFLOWLIB_H_
@@ -179,7 +180,7 @@ namespace aflowlib {
       string Bravais_superlattice_lattice_variation_type;
       string Bravais_superlattice_lattice_system;
       string Pearson_symbol_superlattice;
-      string reciprocal_geometry;vector<double> vreciprocal_geometry;
+      string reciprocal_geometry_relax;vector<double> vreciprocal_geometry_relax; //CO20220719 _relax
       double reciprocal_volume_cell;
       string reciprocal_lattice_type;
       string reciprocal_lattice_variation_type;
@@ -278,6 +279,9 @@ namespace aflowlib {
       void clear();                                              // free space
       uint Load(const stringstream& stream,ostream& oss);        // load from stringstream it std is cout
       uint Load(const string& entry,ostream& oss);               // load from string it std is cout
+      uint Load(const vector<uint64_t> & key_hash, const vector<std::string> & content); // Load variant for EntryLoader //HE20220404
+      void Set(const std::string & keyword, const std::string & content);   // set a class member to content // HE20220404
+      void SetByHash(const uint64_t key_hash, const std::string & content); // set a class member to content based on crc64 keyword hash // HE20220404
       uint file2aflowlib(const string& file,ostream& oss=std::cout);       // load from file
       uint url2aflowlib(const string& url,ostream& oss,bool=TRUE); // load from the web (VERBOSE)
       string aflowlib2string(string="out", bool=false);          //ME20210408 - added PRINT_NULL
@@ -300,6 +304,7 @@ namespace aflowlib {
     private:                                                     //
       void free();                                               // free space
       void copy(const _aflowlib_entry& b);                       //
+      void LoadCleanup();
   };
 }
 
@@ -330,15 +335,43 @@ namespace aflowlib {
 //  };
 //}
 
+namespace aflowlib {  //CO20201220
+  ////////////////////////////////////////////////////////////////////////////////
+  //merge vector entries lists
+  //3-vec
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new);
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, const vector<vector<aflowlib::_aflowlib_entry> >& entries_new, bool entries_new_same_type = false);
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, const vector<aflowlib::_aflowlib_entry>& entries_new, bool entries_new_same_type = false);
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, const aflowlib::_aflowlib_entry& entries_new);
+  bool mergeEntries(vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries, const aflowlib::_aflowlib_entry& entries_new, int& index_layer1, int& index_layer2);
+  //2-vec
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new, bool sort_by_species = true);
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, const vector<vector<aflowlib::_aflowlib_entry> >& entries_new, bool entries_new_same_type = false, bool sort_by_species = true);
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, const vector<aflowlib::_aflowlib_entry>& entries_new, bool entries_new_same_type = false, bool sort_by_species = true);
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, const aflowlib::_aflowlib_entry& entry_new, bool sort_by_species = true);
+  bool mergeEntries(vector<vector<aflowlib::_aflowlib_entry> >& naries, const aflowlib::_aflowlib_entry& entry_new, int& index, bool sort_by_species = true);
+  //1-vec
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, const vector<vector<vector<aflowlib::_aflowlib_entry> > >& entries_new);
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, const vector<vector<aflowlib::_aflowlib_entry> >& entries_new);
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, const vector<aflowlib::_aflowlib_entry>& entries_new);
+  bool mergeEntries(vector<aflowlib::_aflowlib_entry>& naries, const aflowlib::_aflowlib_entry& entry_new);
+}
+
 // ***************************************************************************
 namespace aflowlib {
   bool json2aflowlib(const string& json,string key,string& value); //ME I do not understand why you have out this function as a private member... it would have been simpler to be able to use everywhere
   uint auid2present(string auid,string& aurl,int mode=1); // returns json.size() if found...
   bool AflowlibLocator(const string& in,string& out,const string& mode);
   string AflowlibLocator(string options,string mode);
-  string AFLUXCall(const aurostd::xoption& vpflow); //DX20190206 - add AFLUX functionality for command line 
+  string AFLUXCall(const aurostd::xoption& vpflow); //DX20190206 - add AFLUX functionality for command line   //CO20200520
+  string AFLUXCall(const vector<string>& matchbook); //DX20190206 - add AFLUX functionality //CO20200520
+  string AFLUXCall(const string& summons); //DX20190206 - add AFLUX functionality   //CO20200520
+  vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(const string& response); //DX20190206 - get properties from AFLUX response  //CO20200520
+  string getSpaceGroupAFLUXSummons(const vector<uint>& space_groups, uint relaxation_step); //DX20200929
+  string getSpaceGroupAFLUXSummons(uint space_group_number, uint relaxation_step, bool only_one_sg=true); //DX20200929
+  string AFLUXCall(const aurostd::xoption& vpflow); //DX20190206 - add AFLUX functionality for command line
   string AFLUXCall(const vector<string>& matchbook); //DX20190206 - add AFLUX functionality
-  string AFLUXCall(const string& summons); //DX20190206 - add AFLUX functionality 
+  string AFLUXCall(const string& summons); //DX20190206 - add AFLUX functionality
   vector<vector<std::pair<string,string> > > getPropertiesFromAFLUXResponse(const string& response); //DX20190206 - get properties from AFLUX response
   string getSpaceGroupMatchbook(const vector<uint>& space_groups, uint relaxation_step); //DX20200929
   string getSpaceGroupMatchbook(uint space_group_number, uint relaxation_step, bool only_one_sg=true); //DX20200929
@@ -567,6 +600,11 @@ namespace aflowlib {
     string catalog;
   };
 
+  //CO20200520 START - moving from inside AflowDB
+  vector<string> getSchemaKeys();
+  vector<string> getDataNames();
+  //CO20200520 END - moving from inside AflowDB
+
   class AflowDB : public xStream {
     public:
       AflowDB(const string&, ostream& oss=std::cout);
@@ -611,6 +649,7 @@ namespace aflowlib {
       vector<vector<string> > getRowsMultiTables(sqlite3*, const vector<string>&, const string& where="");
       string getValue(const string&, const string&, const string& where="");
       string getValue(sqlite3*, const string&, const string&, const string& where="");
+      std::vector<std::string> getValuesMultiTable(const std::string & col, const std::string & where); //HE20220405
       string getDatabaseProperty(const string&, const string&, const string&, const string& where="");
       string getDatabaseProperty(sqlite3*, const string&, const string&, const string&, const string& where="");
       vector<string> getDatabasePropertyMultiTables(const string&, const vector<string>&, const string&, const string& where="");
@@ -628,7 +667,7 @@ namespace aflowlib {
       void close();
       void copy(const AflowDB&);
       void initialize(const string& db_file, const string& dt_path, const string& lck_file,
-                      int open_flags, const aurostd::xoption& schema_in, const aurostd::xoption& schema_internal_in);
+          int open_flags, const aurostd::xoption& schema_in, const aurostd::xoption& schema_internal_in);
 
       sqlite3* db;
       bool is_tmp;
@@ -673,7 +712,170 @@ namespace aflowlib {
       string prepareSELECT(const string&, const string&, const string&, const string& where="", int limit=0, const string& order_by="");
       string prepareSELECT(const string&, const string&, const vector<string>&, const string& where="", int limit=0, const string& order_by="");
   };
-}  // namespace aflowlib
+
+  //HE20220420 START
+  class EntryLoader : public xStream {
+    public:
+      //NECESSARY PUBLIC CLASS METHODS - START
+      //constructors - START
+      EntryLoader(std::ostream& oss=cout);
+      EntryLoader(std::ofstream& FileMESSAGE,std::ostream& oss=cout);
+      EntryLoader(const EntryLoader& b);
+      //constructors - STOP
+      ~EntryLoader();
+      const EntryLoader& operator=(const EntryLoader& other);
+      void clear();
+      //NECESSARY PUBLIC CLASS METHODS - STOP
+
+      /// @brief available sources to load lib entries
+      enum class Source {
+        SQLITE,         ///< internal AFLUX database
+        AFLUX,          ///< public AFLUX API
+        FILESYSTEM,     ///< search by public alloy DB, loaded from internal filesystem
+        FILESYSTEM_RAW, ///< internal filesystem
+        RESTAPI,        ///< search by public alloy DB, loaded from public REST API
+        RESTAPI_RAW,    ///< public REST API
+        NONE,           ///< no source set
+        FAILED          ///< setting a source failed
+      };
+
+      // Settings
+      bool m_out_silent; ///< silents all output
+      bool m_out_debug;  ///< verbose output (overwrites #m_out_silent)
+
+      bool m_xstructure_relaxed;  ///< add the relaxed structure into the lib entry
+      bool m_xstructure_original; ///< add the original structure into the lib entry
+
+      /// sources for the relaxed structure (in order of priority)
+      std::vector<std::string> m_xstructure_final_file_name;
+
+      std::string m_sqlite_file;          ///< location of the internal AFLUX SQLITE DB file
+      std::string m_sqlite_alloy_file;    ///< location of the public alloy SQLITE DB file
+      std::string m_sqlite_collection;    ///< collection to use for queries
+
+      std::string m_aflux_server;         ///< server that provides the AFLUX API
+      std::string m_aflux_path;           ///< base path including AFLUX API version
+      std::string m_aflux_collection;     ///< collection to use for queries
+      /// default AFLUX API directives to set format and disable paging
+      std::map<std::string, std::string> m_aflux_directives;
+
+      std::string m_restapi_server;        ///< server that provides the AFLOW RESTAPI
+      std::string m_restapi_path;          ///< AFLOW RESTAPI base path
+      std::string m_restapi_directives;    ///< directive to receive an entry (typically "?format=text" or "aflowlib.out")
+      std::string m_restapi_listing_dirs;  ///< directive to list sub entries
+      std::string m_restapi_listing_files; ///< directive to list files available for an entry
+      std::string m_restapi_collection;    ///< collection to use for queries
+
+      std::string m_filesystem_outfile;    ///< file name of the AFLOW lib entry
+      std::string m_filesystem_path;       ///< base path to the internal filesystem
+      std::string m_filesystem_collection; ///< collection to use for queries
+
+      // Attributes
+      std::unique_ptr<aflowlib::AflowDB> m_sqlite_db_ptr;       ///< pointer to an instance of the internal AFLUX SQLITE DB
+      std::unique_ptr<aflowlib::AflowDB> m_sqlite_alloy_db_ptr; ///< pointer to an instance of the public alloy SQLITE DB
+      /// @brief set that contains all loaded AUIDs
+      /// @note `std::set` is stored sorted and is therefore faster at finding entries compared to `std::vector`
+      std::vector<std::string> m_auid_list;
+
+      // Data views
+      /// @brief flat collection of loaded lib entries
+      std::shared_ptr<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>> m_entries_flat;
+      /// @brief tiered collection of loaded lib entries (number of elements -> alloy -> entries)
+      /// @note creating a copy of this smart pointer is the most efficient way to use
+      ///       the loaded entries after the EntryLoader class goes out of scope
+      std::shared_ptr<std::map<short, std::map<std::string, std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>>> m_entries_layered_map;
+
+      // REGEX expressions for quick finding/replacements in strings
+      /// REGEX to find all chemical elements in a string
+      const std::regex m_re_elements{"(A[cglmrstu]|B[aehikr]?|C[adeflmnorsu]?|D[bsy]|E[rsu]|F[elmr]?|G[ade]|H[efgos]?|I[nr]?|Kr?|L[airuv]|M[dgnot]|N[abdeiop]?|Os?|P[abdmortu]?|R[abefghnu]|S[bcegimnr]?|T[abcehilm]|U(u[opst])?|V|W|Xe|Yb?|Z[nr])"};
+      /// REGEX to find all pseudo potentials that contain uppercase letters from a string (could be mistaken for a chemical element)
+      const std::regex m_re_ppclean{"("+ std::regex_replace(CAPITAL_LETTERS_PP_LIST, std::regex(","), "|") + ")"};
+      /// @brief REGEX to help change a AURL into a file path
+      /// @note the content of the group `((?:(?:LIB\d{1,})|(?:ICSD)))` can be used in the replacement  with `$1`;
+      ///       the second group `(?:(?:RAW)|(?:LIB)|(?:WEB))` is there to select the full substring to be replaced
+      const std::regex m_re_aurl2file{"((?:(?:LIB\\d{1,})|(?:ICSD)))_(?:(?:RAW)|(?:LIB)|(?:WEB))\\/"};
+
+      // Generic entry loaders
+      void loadAUID(std::string AUID);
+      void loadAUID(const std::vector<std::string> &AUID);
+
+      void loadAURL(std::string AURL);
+      void loadAURL(const std::vector<std::string> &AURL);
+
+      void loadAlloy(const std::string & alloy, bool recursive=true);
+      void loadAlloy(const std::vector<std::string> &alloy, bool recursive=true);
+
+      // Direct entry loader
+      void loadSqliteWhere(const std::string & where);
+      void loadAFLUXQuery(const std::string & query);
+      void loadAFLUXMatchbook(const std::map<std::string, std::string> & matchbook);
+      void loadRestAPIQueries(const std::vector<std::string> & queries, bool full_url=false);
+      void loadFiles(const std::vector<std::string> & files);
+      void loadText(const std::vector<std::string> & raw_data_lines);
+      void loadVector(const std::vector<std::string> &keys, const std::vector<std::vector<std::string>> & content);
+
+      // Source setter and getter
+      bool setSource(EntryLoader::Source new_source);
+      EntryLoader::Source getSource() const;
+
+      // Getter for raw data
+      std::vector<std::string> getRawSqliteWhere(const std::string & where) const;
+      std::vector<std::string> getRawAFLUXMatchbook(const std::map<std::string, std::string> & matchbook);
+      std::vector<std::string> getRawAFLUXQuery(const std::string & query);
+      std::string getRawRestAPIQuery(const std::string &query, bool full_url=false);
+
+      // xstructure loaders
+      void addXstructure(aflowlib::_aflowlib_entry & entry, bool orig = false);
+      bool loadXstructureFile(const aflowlib::_aflowlib_entry & entry, xstructure & new_structure, std::vector <std::string> possible_files={});
+      bool loadXstructureAflowIn(const aflowlib::_aflowlib_entry & entry, xstructure & new_structure, const int index=-1);
+
+      // getter for views on the loaded aflowlib entries (using zero copy shared_ptr)
+      void getEntriesViewFlat(std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>> & result) const;
+      void getEntriesViewTwoLayer(vector<vector<std::shared_ptr<aflowlib::_aflowlib_entry>>> & result) const;
+      void getEntriesViewThreeLayer(std::vector<std::vector<std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> & result) const;
+      void getEntriesViewMap(std::map<short,std::map<std::string,std::vector<std::shared_ptr<aflowlib::_aflowlib_entry>>>> & result) const;
+
+      // getter that copies the loaded aflowlib entries into new structure
+      void getEntriesFlat(std::vector<aflowlib::_aflowlib_entry> & result) const;
+      void getEntriesTwoLayer(std::vector<std::vector<aflowlib::_aflowlib_entry>> & result) const;
+      void getEntriesThreeLayer(std::vector<std::vector<vector<aflowlib::_aflowlib_entry>>> & result) const;
+
+
+    private:
+      //NECESSARY private CLASS METHODS - START
+      void init();
+      void free();
+      void copy(const EntryLoader& b);
+
+      //NECESSARY END CLASS METHODS - END
+
+      /// @brief Determines which source is used to load data
+      /// @note should just be set by setSource()
+      Source m_current_source;
+      bool m_filesystem_available; ///< helper to avoid repeatedly testing if the filesystem is available
+      std::stringstream m_logger_message;  ///< reusable stringstream for logging
+      bool m_out_super_silent;     ///< mute all output - used for private checks
+
+      void selectSource();
+      bool getCommandlineSource();
+      void listRestAPI(std::string url, std::vector<std::string> & result, bool directories=true);
+      void getAlloyAUIDList(const std::vector<std::string> & alloy_list, std::vector<std::string> & auid_list);
+      void loadAlloySearchFSR(const std::vector<std::string> & alloy_list, uint lib_max); // FILESYSTEM_RAW
+      void loadAlloySearchRR(const std::vector<std::string> & alloy_list, uint lib_max); // RESTAPI_RAW
+      bool cleanAUID(std::string & AUID);
+      bool cleanAURL(std::string & AURL);
+      std::string buildAFLUXQuery(const std::map<std::string, std::string> & matchbook) const;
+      std::string extractAlloy(std::string name, char lib_type) const;
+
+      // Logging helper
+      void outInfo(const std::string & function_name);
+      void outDebug(const std::string & function_name);
+      void outError(const std::string & function_name, int line_number);
+      void outHardError(const std::string & function_name, int line_number, int error_type);
+
+  };
+  //HE20220420 END
+} // namespace aflowlib
 
 // ----------------------------------------------------------------------------
 // aflowlib_libraries_scrubber.cpp

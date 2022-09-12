@@ -2170,7 +2170,7 @@ namespace apl
             for (int j=1; j<=4; j++)
               energy_tetrahedron[j] = static_eigvals[id].venergy[static_ibzkpts[id].vtetrahedra[i][j+1]-1][band][s];
 
-            energy_tetrahedron = aurostd::sort(energy_tetrahedron);
+            aurostd::sort(energy_tetrahedron);
             Ef = Efermi_V[id];
 
             if (Ef < energy_tetrahedron[1] && energy_tetrahedron[4] < Ef) DEf += 0;

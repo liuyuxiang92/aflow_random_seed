@@ -284,6 +284,9 @@ namespace aurostd {
     xdouble(const xvector<utype>&) __xprototype;
 
   template<class utype> xvector<utype>
+    mod(const xvector<utype>&,utype d) __xprototype;  //CO20200127
+
+  template<class utype> xvector<utype>
     mod_floored(const xvector<utype>&,utype d) __xprototype;  //SD20220117
 
   template<class utype> xvector<double>
@@ -327,8 +330,8 @@ namespace aurostd {
   //[SD20220512 - OBSOLETE]xvector<double> xvectorint2double(const xvector<int>&); //CO20180515
   //[SD20220512 - OBSOLETE]xvector<int> xvectordouble2int(const xvector<double>&,bool check_int=true); //CO20180515
 
-  template<class utype,class vtype> xvector<vtype>
-    xvectorutype2xvectorvtype(const xvector<utype>& a) __xprototype; //SD20220512
+  template<class utype1,class utype2> xvector<utype2>
+    xvector2utype(const xvector<utype1>& a) __xprototype; //SD20220512
 
   // OPERATIONS ON XVECTORS
 
@@ -572,8 +575,8 @@ namespace aurostd {
   xvector<double> linspace(const double start, const double stop, const double n);
 
   // SIMPLE SORT ROUTINES
-  template<class utype> xvector<utype>  // WRAP TO SHELL SHORT
-    sort(const xvector<utype>& a) __xprototype;
+  template<class utype> void // WRAP TO SHELL SHORT
+    sort(xvector<utype>& a) __xprototype;
 
   template<class utype> xvector<utype> // SHELLSORT
     shellsort(const xvector<utype>& a) __xprototype;

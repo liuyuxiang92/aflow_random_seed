@@ -119,6 +119,18 @@ namespace KBIN {
       kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
     }
     //CO20201220 X STOP
+    //CO20220818 JHU_ROCKFISH START
+    // jhu_rockfish
+    if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::JHU_ROCKFISH") ||
+        aurostd::substring2bool(AflowIn,"[AFLOW_HOST]ROCKFISH") ||  //backwards compatible //CO20220830
+        aurostd::substring2bool(AflowIn,"[AFLOW_HOST]JHU_ROCKFISH"))  //check JHU_ROCKFISH //CO20220830
+      aflags.AFLOW_MACHINE_LOCAL=aflags.AFLOW_MACHINE_GLOBAL;
+    if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::JHU_ROCKFISH")) {
+      aus << "00000  MESSAGE Taking HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << Message(_AFLOW_FILE_NAME_,aflags) << endl; //HE20220309 use machine name
+      aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,oss);
+      kflags.KBIN_MPI=TRUE; // overrides the MPI for machines
+    }
+    //CO20220818 JHU_ROCKFISH STOP
     // mpcdf_eos	
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::MPCDF_EOS") ||
         aurostd::substring2bool(AflowIn,"[AFLOW_HOST]EOS") || 
@@ -1485,7 +1497,7 @@ namespace KBIN {
         stringstream POSCAR;
         POSCAR.str(aurostd::substring2string(input_file.str(),START,STOP,-1));
         //[SD20220520 - OBSOLETE]if(aurostd::substring2bool(input_file.str(),START) && aurostd::substring2bool(input_file.str(),STOP))
-          //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(input_file.str(),POSCAR,START,STOP);
+        //[SD20220520 - OBSOLETE]aurostd::ExtractToStringstreamEXPLICIT(input_file.str(),POSCAR,START,STOP);
         if(!POSCAR.str().empty()) vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRUCTURE.push_back(xstructure(POSCAR,IOVASP_AUTO));
       }
       if(LDEBUG) cerr << "DEBUG " << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size() << endl;
@@ -1836,7 +1848,7 @@ namespace KBIN {
         if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_BANDS")) vflags.KBIN_VASP_INCAR_VERBOSE=FALSE; // TURN OFF VERBOSITY
         if(vflags.KBIN_VASP_REPEAT.flag("REPEAT_DELSOL")) vflags.KBIN_VASP_INCAR_VERBOSE=FALSE; // TURN OFF VERBOSITY
       }
-      
+
       if(Krun && vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option) {  //CO20211217 - prevents VASP_Backup() from deleting and recycles for next run (VASP_RecycleExtraFile())
         xvasp.aopts.flag("FLAG::WAVECAR_PRESERVED",vflags.KBIN_VASP_FORCE_OPTION_WAVECAR.option); //passing flag to xvasp
         aus << "00000  MESSAGE Saving WAVECAR files" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
@@ -2707,6 +2719,7 @@ namespace KBIN {
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QRATS_MPICH")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QFLOW_OPENMPI")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_X")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //CO20201220 X
+                      if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::JHU_ROCKFISH")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5 //CO20220818 ROCKFISH
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5
                       if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA")) kflags.KBIN_MPI_NCPUS=AFLOWLIB_VASP5_CORES_DIELECTRIC;  // bug in mpivasp5
@@ -3988,6 +4001,11 @@ namespace KBIN {
     //   if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;
     // }
     // //CO20201220 X STOP
+    // //CO20220818 JHU_ROCKFISH START
+    // if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::JHU_ROCKFISH")) {	//CO
+    //   if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.PBS_NUM_PPN;
+    // }
+    // //CO20220818 JHU_ROCKFISH STOP
     // if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) {	//CO
     //   if(kflags.KBIN_MPI_NCPUS==0) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_CPUS_ON_NODE;
     // }
@@ -4187,6 +4205,21 @@ namespace KBIN {
               aurostd::execute(aus_exec);
             }
             //CO20201220 X STOP
+            //CO20220818 JHU_ROCKFISH START
+            // HOST JHU_ROCKFISH ------------------------------------------------------------------------
+            if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::JHU_ROCKFISH")) {
+              // verbosization
+              aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << "  MPI PARALLEL job - [" << xvasp.str.atoms.size() << "atoms] - " << " MPI=" << kflags.KBIN_MPI_NCPUS << "CPUs " << Message(_AFLOW_FILE_NAME_,aflags) << endl; //HE20220309 use machine name
+              aus << "00000  MESSAGE HOST=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << " " << VASP_KEYWORD_EXECUTION << MPI_COMMAND_JHU_ROCKFISH << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_JHU_ROCKFISH << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << Message(_AFLOW_FILE_NAME_,aflags,string(_AFLOW_MESSAGE_DEFAULTS_)+",memory") << endl; //HE20220309 use machine name  //CO20170628 - SLOW WITH MEMORY
+              aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
+              // run
+              aus_exec << kflags.KBIN_MPI_OPTIONS << endl;
+              aus_exec << MPI_OPTIONS_JHU_ROCKFISH << endl;
+              aus_exec << MPI_COMMAND_JHU_ROCKFISH << " " << kflags.KBIN_MPI_NCPUS << " " << MPI_BINARY_DIR_JHU_ROCKFISH << kflags.KBIN_MPI_BIN << " >> " << DEFAULT_VASP_OUT << endl;
+              //	    aurostd::PrintMessageStream(FileMESSAGE,aus_exec,XHOST.QUIET);
+              aurostd::execute(aus_exec);
+            }
+            //CO20220818 JHU_ROCKFISH STOP
             // HOST MPCDF_EOS_MPI ------------------------------------------------------------------------
             if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) {
               // verbosization

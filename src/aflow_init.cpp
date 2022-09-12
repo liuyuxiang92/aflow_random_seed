@@ -64,6 +64,10 @@ namespace init {
     string message = "";
     if(LDEBUG) cerr << "AFLOW V(" << string(AFLOW_VERSION) << ") init::InitMachine: [BEGIN]" << endl;
 
+    //CO20220906 WARNING - do not run ANYTHING before the aflowrc read/write/load below
+    //XHOST is largely unset before this
+    //aflowrc loads TMPDIR needed for many AUROSTD functions
+
     // AFLOWRC LOAD DEFAULTS FROM AFLOWRC.
     // XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
     // XHOST.vflag_control.flag("AFLOWRC::OVERWRITE",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=overwrite|--aflowrc_overwrite"));
@@ -72,16 +76,33 @@ namespace init {
     // always use aurostd::getenv2string that contains the necessary check HE20220701 //SD20220701
     XHOST.home = aurostd::getenv2string("HOME"); //AS SOON AS POSSIBLE
     XHOST.user = aurostd::getenv2string("USER");  //AS SOON AS POSSIBLE
+    //CO20220906 START - chicken and egg problem with /tmp file, need a temporary solution for XHOST.tmpfs as we need to write out tmp files immediately
+    XHOST.argv.clear();for(uint i=0;i<argv.size();i++){XHOST.argv.push_back(argv.at(i));} //AS SOON AS POSSIBLE
+    vector<string> tokens;
+    string tmpfs_str=AFLOWRC_DEFAULT_TMPFS_DIRECTORIES; //CO20220906 - always defined, does not require reading aflow.rc
+    const string tmpfs_str_input=aurostd::args2attachedstring(XHOST.argv,"--use_tmpfs=","");
+    if(!tmpfs_str_input.empty()){tmpfs_str=tmpfs_str_input;}  //override with input from command line, always takes precedence
+    tmpfs_str+=",./";    //CO20220906 - hack, add current directory at the end, should work unless there's a real problem
+    aurostd::string2tokens(tmpfs_str,tokens,",");
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " tokens[tmpfs_str]=\"" << aurostd::joinWDelimiter(tokens,",") << "\"" << endl;}
+    for(uint i=0;i<tokens.size() && XHOST.tmpfs.empty();i++){
+      if(aurostd::DirectoryWritable(tokens[i])){XHOST.tmpfs=tokens[i];}
+    }
+    if(XHOST.tmpfs.empty()){
+      message="tmp directories are not writable";
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message);
+    }
+    XHOST.tmpfs=aurostd::CleanFileName(XHOST.tmpfs+"/");
+    //
     if(!aflowrc::is_available(oss,INIT_VERBOSE || XHOST.DEBUG)) aflowrc::write_default(oss,INIT_VERBOSE || XHOST.DEBUG);
     aflowrc::read(oss,INIT_VERBOSE || XHOST.DEBUG);
     XHOST.vflag_control.flag("AFLOWRC::READ",aurostd::args2flag(XHOST.argv,cmds,"--aflowrc=read|--aflowrc_read"));
     if(XHOST.vflag_control.flag("AFLOWRC::READ")) {aflowrc::print_aflowrc(oss,TRUE);return false;}
+    //
     // SD20220223 - read AFLOWRC to determine the temporary directory, which is needed for execute2string
     // SD20220223 - check to make sure the temporary directory is writable
-    vector<string> tokens;
-    string tmpfs_str=DEFAULT_TMPFS_DIRECTORIES;
-    string tmpfs_str_input=aurostd::args2attachedstring(XHOST.argv,"--use_tmpfs=","");
-    if(!tmpfs_str_input.empty()){tmpfs_str=tmpfs_str_input;}
+    tmpfs_str=DEFAULT_TMPFS_DIRECTORIES;  //CO20220906 - redefine with user aflow.rc parameters
+    if(!tmpfs_str_input.empty()){tmpfs_str=tmpfs_str_input;}  //override with input from command line (already snatched before), always takes precedence
     aurostd::string2tokens(tmpfs_str,tokens,",");
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " tokens[tmpfs_str]=\"" << aurostd::joinWDelimiter(tokens,",") << "\"" << endl;}
     for(uint i=0;i<tokens.size() && XHOST.tmpfs.empty();i++){
@@ -105,7 +126,6 @@ namespace init {
     if(INIT_VERBOSE) oss << "*********************************************************************************" << endl;
     if(INIT_VERBOSE) oss << "* AFLOW V=" << string(AFLOW_VERSION) << " - machine information " << endl;
     if(INIT_VERBOSE) oss << "*********************************************************************************" << endl;
-    XHOST.argv.clear();for(uint i=0;i<argv.size();i++)  XHOST.argv.push_back(argv.at(i));
 
     // IMMEDIATELY
     XHOST.QUIET=aurostd::args2flag(argv,cmds,"--quiet|-q");
@@ -476,6 +496,11 @@ namespace init {
       oss << "MPI_COMMAND_DUKE_X=" << MPI_COMMAND_DUKE_X << "\"" << endl;
       oss << "MPI_BINARY_DIR_DUKE_X=" << MPI_BINARY_DIR_DUKE_X << "\"" << endl;
       //CO20201220 X STOP
+      //CO20220818 JHU_ROCKFISH START
+      oss << "MPI_OPTIONS_JHU_ROCKFISH=" << MPI_OPTIONS_JHU_ROCKFISH << "\"" << endl;
+      oss << "MPI_COMMAND_JHU_ROCKFISH=" << MPI_COMMAND_JHU_ROCKFISH << "\"" << endl;
+      oss << "MPI_BINARY_DIR_JHU_ROCKFISH=" << MPI_BINARY_DIR_JHU_ROCKFISH << "\"" << endl;
+      //CO20220818 JHU_ROCKFISH STOP
       oss << "MPI_OPTIONS_MPCDF_EOS=" << MPI_OPTIONS_MPCDF_EOS << "\"" << endl;
       oss << "MPI_COMMAND_MPCDF_EOS=" << MPI_COMMAND_MPCDF_EOS << "\"" << endl;
       oss << "MPI_NCPUS_MPCDF_EOS=" << MPI_NCPUS_MPCDF_EOS << "\"" << endl;
@@ -871,6 +896,13 @@ namespace init {
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::GIF\")=" << XHOST.vflag_control.flag("PRINT_MODE::GIF") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::JPG\")=" << XHOST.vflag_control.flag("PRINT_MODE::JPG") << endl;
     if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"PRINT_MODE::PNG\")=" << XHOST.vflag_control.flag("PRINT_MODE::PNG") << endl;
+
+    // Allow the preselection of the EntryLoader source (will automatically fall back to the next best source if given source is not accessible)
+    XHOST.vflag_control.flag("ENTRY_LOADER::SOURCE",aurostd::args2attachedflag(argv,"--entry_loader_source=")); //HE20220826
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.flag(\"ENTRY_LOADER::SOURCE\")=" << XHOST.vflag_control.flag("ENTRY_LOADER::SOURCE") << endl;  //HE20220826
+    if(XHOST.vflag_control.flag("ENTRY_LOADER::SOURCE")) XHOST.vflag_control.push_attached("ENTRY_LOADER::SOURCE",aurostd::args2attachedstring(argv,"--entry_loader_source=","")); //HE20220826
+    if(INIT_VERBOSE) oss << "XHOST.vflag_control.getattachedscheme(\"ENTRY_LOADER::SOURCE\")=" << XHOST.vflag_control.getattachedscheme("ENTRY_LOADER::SOURCE") << endl;  //HE20220826
+
 
     //[CO20191110]run pocc post-processing for particular temperatures from command line
     XHOST.vflag_control.flag("CALCULATION_TEMPERATURE",aurostd::args2attachedflag(argv,"--temperature=|--temp="));  //CO20191110
@@ -3558,9 +3590,9 @@ namespace init {
     nschema++;
 
     // schema is CAPITAL, content is not necessarily
-    XHOST.vschema.push_attached("SCHEMA::NAME:RECIPROCAL_GEOMETRY","reciprocal_geometry");
-    XHOST.vschema.push_attached("SCHEMA::UNIT:RECIPROCAL_GEOMETRY","");
-    XHOST.vschema.push_attached("SCHEMA::TYPE:RECIPROCAL_GEOMETRY","numbers");
+    XHOST.vschema.push_attached("SCHEMA::NAME:RECIPROCAL_GEOMETRY_RELAX","reciprocal_geometry_relax");  //CO20220719 _relax
+    XHOST.vschema.push_attached("SCHEMA::UNIT:RECIPROCAL_GEOMETRY_RELAX",""); //CO20220719 _relax
+    XHOST.vschema.push_attached("SCHEMA::TYPE:RECIPROCAL_GEOMETRY_RELAX","numbers");  //CO20220719 _relax
     nschema++;
 
     // schema is CAPITAL, content is not necessarily

@@ -174,7 +174,7 @@ namespace aflowlib {
     Bravais_superlattice_lattice_variation_type=b.Bravais_superlattice_lattice_variation_type;
     Bravais_superlattice_lattice_system=b.Bravais_superlattice_lattice_system;
     Pearson_symbol_superlattice=b.Pearson_symbol_superlattice;
-    reciprocal_geometry=b.reciprocal_geometry;vreciprocal_geometry.clear();for(uint i=0;i<b.vreciprocal_geometry.size();i++) vreciprocal_geometry.push_back(b.vreciprocal_geometry.at(i));
+    reciprocal_geometry_relax=b.reciprocal_geometry_relax;vreciprocal_geometry_relax.clear();for(uint i=0;i<b.vreciprocal_geometry_relax.size();i++) vreciprocal_geometry_relax.push_back(b.vreciprocal_geometry_relax.at(i));  //CO20220719 _relax
     reciprocal_volume_cell=b.reciprocal_volume_cell; //DX20190124 - fix typo, add reciprocal
     reciprocal_lattice_type=b.reciprocal_lattice_type;
     reciprocal_lattice_variation_type=b.reciprocal_lattice_variation_type;
@@ -313,7 +313,7 @@ namespace aflowlib {
     //[CO20200829 - OBSOLETE]vspinD_magmom_orig.clear(); // clear all vectors
     //[CO20200829 - OBSOLETE]vsponsor.clear();
     //[CO20200829 - OBSOLETE]vstoichiometry.clear(); // clear all vectors
-    //[CO20200829 - OBSOLETE]vreciprocal_geometry.clear(); // clear all vectors //DX20180824 - added reciprocal lattice parameters
+    //[CO20200829 - OBSOLETE]vreciprocal_geometry_relax.clear(); // clear all vectors //DX20180824 - added reciprocal lattice parameters  //CO20220719 _relax
     //[CO20200829 - OBSOLETE]// BADER
     //[CO20200829 - OBSOLETE]vbader_net_charges.clear();
     //[CO20200829 - OBSOLETE]vbader_atomic_volumes.clear();
@@ -457,7 +457,7 @@ namespace aflowlib {
     Bravais_superlattice_lattice_variation_type.clear();
     Bravais_superlattice_lattice_system.clear();
     Pearson_symbol_superlattice.clear();
-    reciprocal_geometry.clear();vreciprocal_geometry.clear();
+    reciprocal_geometry_relax.clear();vreciprocal_geometry_relax.clear(); //CO20220719 _relax
     reciprocal_volume_cell=AUROSTD_NAN;
     reciprocal_lattice_type.clear();
     reciprocal_lattice_variation_type.clear();
@@ -553,8 +553,9 @@ namespace aflowlib {
   } 
 
   void _aflowlib_entry::clear() {  // clear PRIVATE
-    _aflowlib_entry _temp;
-    copy(_temp);
+    //[CO20201220 - too slow]_aflowlib_entry _temp;
+    //[CO20201220 - too slow]copy(_temp);
+    free();
   }
 
   _aflowlib_entry::_aflowlib_entry(const string& file) { // constructur from file
@@ -567,6 +568,482 @@ namespace aflowlib {
     aurostd::efile2string(file,entry);
     Load(entry,oss);
   }
+
+  /// @brief Set the value of a member
+  /// @param keyword name of the member
+  /// @param content value to set
+  void _aflowlib_entry::Set(const std::string &keyword, const std::string &content) {
+    return SetByHash(aurostd::crc64(keyword), content);
+  }
+
+  ///@brief Set the value of members
+  ///@param key_hash aurostd::crc64 hash of the member name
+  ///@param content used to set the member value
+  void _aflowlib_entry::SetByHash(const uint64_t key_hash, const std::string &content) {
+    string function = "aflowlib::_aflowlib_entry::SetByHash()";  //ME20191119
+    if (content.empty()) return;  //CO20180319
+    if (content == "null") return; //CO20180319 - aflux integration!
+    vector<string> stokens;
+    aurostd::string2tokens(content, stokens, ",");
+    //CO20180409 - added the else if's for speed, no need to go through more checks than necessary
+    //HE20220404 - replace if else tree with hash switch/case - this replaces 26565 string comparisons with 230 jump table lookups
+    switch (key_hash) {
+      case (aurostd::ctcrc64("auid")): {
+        auid = content;
+        vauid.clear();
+        aflowlib::auid2vauid(auid, vauid); // create VAUID
+        } break;
+      case (aurostd::ctcrc64("aurl")): {
+        aurl = content;
+        aurostd::string2tokens(content, stokens, ":");
+        for (uint j = 0; j < stokens.size(); j++) vaurl.push_back(stokens.at(j));
+        } break;
+      //else if(keyword=="title") {title=content;}  //ME20190129 // OBSOLETE ME20200829 - not used anymore
+      case (aurostd::ctcrc64("keywords")): {
+        keywords = content;
+        aurostd::string2tokens(content, stokens, ",");
+        for (uint j = 0; j < stokens.size(); j++) vkeywords.push_back(stokens.at(j));
+        } break;
+      case (aurostd::ctcrc64("aflowlib_date")): {
+        aflowlib_date = content;
+        aurostd::string2tokens(content, stokens, ",");
+        for (uint j = 0; j < stokens.size(); j++) vaflowlib_date.push_back(stokens.at(j));
+        } break; //CO20200624 - adding LOCK date
+      case (aurostd::ctcrc64("aflowlib_version")): { aflowlib_version = content; } break;
+      case (aurostd::ctcrc64("aflowlib_entries")): {
+        aflowlib_entries = content;
+        aurostd::string2tokens(content, stokens, ",");
+        for (uint j = 0; j < stokens.size(); j++) vaflowlib_entries.push_back(stokens.at(j));
+        } break;
+      case (aurostd::ctcrc64("aflowlib_entries_number")): { aflowlib_entries_number = aurostd::string2utype<int>(content); } break;
+      case (aurostd::ctcrc64("aflow_version")): { aflow_version = content; } break;
+      case (aurostd::ctcrc64("catalog")): { catalog = content; } break;
+      case (aurostd::ctcrc64("data_api")): { data_api = content; } break;
+      case (aurostd::ctcrc64("data_source")): { data_source = content; } break;
+      case (aurostd::ctcrc64("data_language")): { data_language = content; } break;
+      case (aurostd::ctcrc64("error_status")): { error_status = content; } break;
+      case (aurostd::ctcrc64("author")): {
+        author = content;
+        aurostd::string2tokens(content, stokens, ",");
+        for (uint j = 0; j < stokens.size(); j++) vauthor.push_back(stokens.at(j));
+        } break;
+      case (aurostd::ctcrc64("calculation_cores")): { calculation_cores = aurostd::string2utype<int>(content); } break;
+      case (aurostd::ctcrc64("calculation_memory")): { calculation_memory = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("calculation_time")): { calculation_time = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("corresponding")): {
+        corresponding = content;
+        aurostd::string2tokens(content, stokens, ",");
+        for (uint j = 0; j < stokens.size(); j++) vcorresponding.push_back(stokens.at(j));
+        } break;
+      case (aurostd::ctcrc64("loop")): { vloop.push_back(content); } break;  // CHECK THIS OUT IN THE FITURE
+      case (aurostd::ctcrc64("node_CPU_Cores")): { node_CPU_Cores = aurostd::string2utype<int>(content); } break;
+      case (aurostd::ctcrc64("node_CPU_MHz")): { node_CPU_MHz = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("node_CPU_Model")): { node_CPU_Model = content; } break;
+      case (aurostd::ctcrc64("node_RAM_GB")): { node_RAM_GB = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("Bravais_lattice_orig")): { Bravais_lattice_orig = content; } break;
+      case (aurostd::ctcrc64("Bravais_lattice_relax")): { Bravais_lattice_relax = content; } break;
+      case (aurostd::ctcrc64("code")): { code = content; } break;
+      case (aurostd::ctcrc64("composition")): {
+        composition = content;
+        for (uint j = 0; j < stokens.size(); j++) vcomposition.push_back(aurostd::string2utype<double>(stokens.at(j)));
+        } break;
+      case (aurostd::ctcrc64("compound")): { compound = content; } break;
+      case (aurostd::ctcrc64("density")): { density = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("density_orig")): { density_orig = aurostd::string2utype<double>(content); } break; //DX20190124 - add original crystal info
+      case (aurostd::ctcrc64("dft_type")): {
+        dft_type = content;
+        aurostd::string2tokens(content, stokens, ",");
+        for (uint j = 0; j < stokens.size(); j++) vdft_type.push_back(stokens.at(j));
+        } break;
+      case (aurostd::ctcrc64("eentropy_cell")): { eentropy_cell = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("eentropy_atom")): { eentropy_atom = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("Egap")): { Egap = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("Egap_fit")): { Egap_fit = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("energy_cell")): { energy_cell = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("energy_atom")): { energy_atom = aurostd::string2utype<double>(content); energy_atom_relax1 = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("energy_cutoff")): { energy_cutoff = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("delta_electronic_energy_convergence")): { delta_electronic_energy_convergence = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("delta_electronic_energy_threshold")): { delta_electronic_energy_threshold = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("nkpoints")): { nkpoints = aurostd::string2utype<uint>(content); } break;
+      case (aurostd::ctcrc64("nkpoints_irreducible")): { nkpoints_irreducible = aurostd::string2utype<uint>(content); } break;
+      case (aurostd::ctcrc64("kppra")): { kppra = aurostd::string2utype<uint>(content); } break;
+      case (aurostd::ctcrc64("kpoints")): { kpoints = content; } break;
+      case (aurostd::ctcrc64("kpoints_relax")): {
+        vector<int> tokens;
+        aurostd::string2tokens(content, tokens, ",");
+        kpoints_nnn_relax = aurostd::vector2xvector(tokens);
+        } break;  //ME20190129
+      case (aurostd::ctcrc64("kpoints_static")): {
+        vector<int> tokens;
+        aurostd::string2tokens(content, tokens, ",");
+        kpoints_nnn_static = aurostd::vector2xvector(tokens);
+        } break;  //ME20190129
+      case (aurostd::ctcrc64("kpoints_bands_path")): { aurostd::string2tokens(content, kpoints_pairs, ","); } break;  //ME20190129
+      case (aurostd::ctcrc64("kpoints_bands_nkpts")): {kpoints_bands_path_grid = aurostd::string2utype<int>(content); } break;  //ME20190129
+      case (aurostd::ctcrc64("enthalpy_cell")): { enthalpy_cell = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("enthalpy_atom")): { enthalpy_atom = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("enthalpy_formation_cell")): { enthalpy_formation_cell = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("enthalpy_formation_cce_300K_cell")): { enthalpy_formation_cce_300K_cell = aurostd::string2utype<double>(content); } break; //CO20200624
+      case (aurostd::ctcrc64("enthalpy_formation_cce_0K_cell")): { enthalpy_formation_cce_0K_cell = aurostd::string2utype<double>(content); } break; //CO20200624
+      case (aurostd::ctcrc64("enthalpy_formation_atom")): { enthalpy_formation_atom = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("enthalpy_formation_cce_300K_atom")): { enthalpy_formation_cce_300K_atom = aurostd::string2utype<double>(content); } break; //CO20200624
+      case (aurostd::ctcrc64("enthalpy_formation_cce_0K_atom")): { enthalpy_formation_cce_0K_atom = aurostd::string2utype<double>(content); } break; //CO20200624
+      case (aurostd::ctcrc64("entropy_forming_ability")): { entropy_forming_ability = aurostd::string2utype<double>(content); } break; //CO20200624
+      case (aurostd::ctcrc64("entropic_temperature")): { entropic_temperature = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("files")): {
+        files = content;
+        for (uint j = 0; j < stokens.size(); j++) vfiles.push_back(stokens.at(j));
+        } break;
+      case (aurostd::ctcrc64("files_LIB")): {
+        files_LIB = content;
+        for (uint j = 0; j < stokens.size(); j++) vfiles_LIB.push_back(stokens.at(j));
+        } break;
+      case (aurostd::ctcrc64("files_RAW")): {
+        files_RAW = content;
+        for (uint j = 0; j < stokens.size(); j++) vfiles_RAW.push_back(stokens.at(j));
+        } break;
+      case (aurostd::ctcrc64("files_WEB")): {
+        files_WEB = content;
+        for (uint j = 0; j < stokens.size(); j++) vfiles_WEB.push_back(stokens.at(j));
+        } break;
+      case (aurostd::ctcrc64("forces")): {
+        forces = content;
+        for (uint j = 0; j < stokens.size(); j++) vforces.push_back(aurostd::string2utype<double>(stokens.at(j)));
+        } break;  // FIX
+      case (aurostd::ctcrc64("geometry")): {
+        geometry = content;
+        vgeometry = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; //HE20220404 compacted
+        if (stokens.size() == 6)
+          for (uint j = 0; j < stokens.size(); j++)
+            vgeometry.at(j) = aurostd::string2utype<double>(stokens.at(j));
+        } break;
+      //DX20190124 - add original crystal info - START
+      case (aurostd::ctcrc64("geometry_orig")): {
+        geometry_orig = content;
+        vgeometry_orig = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; //HE20220404 compacted
+        if (stokens.size() == 6)
+          for (uint j = 0; j < stokens.size(); j++)
+            vgeometry_orig.at(j) = aurostd::string2utype<double>(stokens.at(j));
+        } break;
+      //DX20190124 - add original crystal info - END
+      case (aurostd::ctcrc64("lattice_system_orig")): { lattice_system_orig = content; } break;
+      case (aurostd::ctcrc64("lattice_variation_orig")): { lattice_variation_orig = content; } break;
+      case (aurostd::ctcrc64("lattice_system_relax")): { lattice_system_relax = content; } break;
+      case (aurostd::ctcrc64("lattice_variation_relax")): { lattice_variation_relax = content; } break;
+      case (aurostd::ctcrc64("ldau_TLUJ")): { ldau_TLUJ = content; } break;
+      case (aurostd::ctcrc64("ldau_type")): { vLDAU[0].push_back(aurostd::string2utype<double>(content)); } break;   //ME20190129
+      case (aurostd::ctcrc64("ldau_l")): {
+        for (uint j = 0; j < stokens.size(); j++)
+          vLDAU[1].push_back(aurostd::string2utype<double>(stokens[j]));
+        } break;   //ME20190129
+      case (aurostd::ctcrc64("ldau_u")): {
+        for (uint j = 0; j < stokens.size(); j++)
+          vLDAU[2].push_back(aurostd::string2utype<double>(stokens[j]));
+        } break;   //ME20190129
+      case (aurostd::ctcrc64("ldau_j")): {
+        for (uint j = 0; j < stokens.size(); j++)
+          vLDAU[3].push_back(aurostd::string2utype<double>(stokens[j]));
+        } break;   //ME20190129
+      case (aurostd::ctcrc64("natoms")): { natoms = aurostd::string2utype<int>(content); } break;
+      case (aurostd::ctcrc64("natoms_orig")): { natoms_orig = aurostd::string2utype<int>(content); } break;  //DX20190124 - add original crystal info
+      case (aurostd::ctcrc64("nbondxx")): {
+        nbondxx = content;
+        for (uint j = 0; j < stokens.size(); j++) vnbondxx.push_back(aurostd::string2utype<double>(stokens.at(j)));
+        } break;
+      case (aurostd::ctcrc64("nspecies")): { nspecies = aurostd::string2utype<int>(content); } break;
+      case (aurostd::ctcrc64("Pearson_symbol_orig")): { Pearson_symbol_orig = content; } break;
+      case (aurostd::ctcrc64("Pearson_symbol_relax")): { Pearson_symbol_relax = content; } break;
+      case (aurostd::ctcrc64("positions_cartesian")): {
+        positions_cartesian = content;
+        for (uint j = 0; j < stokens.size(); j++)
+          vpositions_cartesian.push_back(aurostd::string2utype<double>(stokens.at(j)));
+        } break;   // FIX
+      case (aurostd::ctcrc64("positions_fractional")): {
+        positions_fractional = content;
+        for (uint j = 0; j < stokens.size(); j++)
+          vpositions_fractional.push_back(aurostd::string2utype<double>(stokens.at(j)));
+        } break;   // FIX
+      case (aurostd::ctcrc64("pressure")): { pressure = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("stress_tensor")): {
+        stress_tensor = content;
+        vstress_tensor = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+        if (stokens.size() == 9)
+          for (uint j = 0; j < stokens.size(); j++)
+            vstress_tensor.at(j) = aurostd::string2utype<double>(stokens.at(j));
+        } break;
+      case (aurostd::ctcrc64("pressure_residual")): { pressure_residual = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("Pulay_stress")): { Pulay_stress = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("prototype")): { prototype = content; } break;  // apennsy
+      case (aurostd::ctcrc64("PV_cell")): { PV_cell = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("PV_atom")): { PV_atom = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("scintillation_attenuation_length")): { scintillation_attenuation_length = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("sg")): {
+        sg = content;
+        for (uint j = 0; j < stokens.size(); j++) vsg.push_back(stokens.at(j));
+        } break; //CO20180101
+      case (aurostd::ctcrc64("sg2")): {
+        sg2 = content;
+        for (uint j = 0; j < stokens.size(); j++) vsg2.push_back(stokens.at(j));
+        } break; //CO20180101
+      case (aurostd::ctcrc64("spacegroup_orig")): { spacegroup_orig = aurostd::string2utype<int>(content); } break;  //CO20201111
+      case (aurostd::ctcrc64("spacegroup_relax")): { spacegroup_relax = aurostd::string2utype<int>(content); } break;  //CO20201111
+      case (aurostd::ctcrc64("species")): {
+        species = content;
+        for (uint j = 0; j < stokens.size(); j++) vspecies.push_back(stokens.at(j));
+        } break;
+      case (aurostd::ctcrc64("species_pp")): {
+        species_pp = content;
+        for (uint j = 0; j < stokens.size(); j++) vspecies_pp.push_back(stokens.at(j));
+        } break;
+      case (aurostd::ctcrc64("species_pp_version")): {
+        species_pp_version = content;
+        for (uint j = 0; j < stokens.size(); j++) vspecies_pp_version.push_back(stokens.at(j));
+        } break;
+      case (aurostd::ctcrc64("species_pp_ZVAL")): {
+        species_pp_ZVAL = content;
+        for (uint j = 0; j < stokens.size(); j++)
+          vspecies_pp_ZVAL.push_back(aurostd::string2utype<double>(stokens.at(j)));
+        } break;
+      case (aurostd::ctcrc64("species_pp_AUID")): {
+        species_pp_AUID = content;
+        for (uint j = 0; j < stokens.size(); j++) vspecies_pp_AUID.push_back(stokens.at(j));
+        } break;
+      case (aurostd::ctcrc64("metagga")): case (aurostd::ctcrc64("METAGGA")): { METAGGA = content; } break;
+      case (aurostd::ctcrc64("spin_cell")): { spin_cell = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("spin_atom")): { spin_atom = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("spinD")): {
+        spinD = content;
+        for (uint j = 0; j < stokens.size(); j++) vspinD.push_back(aurostd::string2utype<double>(stokens.at(j)));
+        } break;
+      case (aurostd::ctcrc64("spinD_magmom_orig")): {
+        spinD_magmom_orig = content;
+        for (uint j = 0; j < stokens.size(); j++)
+          vspinD_magmom_orig.push_back(aurostd::string2utype<double>(stokens.at(j)));
+        } break;
+      case (aurostd::ctcrc64("spinF")): { spinF = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("sponsor")): {
+        sponsor = content;
+        aurostd::string2tokens(content, stokens, ",");
+        for (uint j = 0; j < stokens.size(); j++) vsponsor.push_back(stokens.at(j));
+        } break;
+      case (aurostd::ctcrc64("stoichiometry")): {
+        stoichiometry = content;
+        for (uint j = 0; j < stokens.size(); j++) vstoichiometry.push_back(aurostd::string2utype<double>(stokens.at(j)));
+        } break;
+      case (aurostd::ctcrc64("Egap_type")): { Egap_type = content; } break;
+      case (aurostd::ctcrc64("valence_cell_std")): { valence_cell_std = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("valence_cell_iupac")): { valence_cell_iupac = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("volume_cell")): { volume_cell = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("volume_atom")): { volume_atom = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("volume_cell_orig")): { volume_cell_orig = aurostd::string2utype<double>(content); } break; //DX20190124 - add original crystal info
+      case (aurostd::ctcrc64("volume_atom_orig")): { volume_atom_orig = aurostd::string2utype<double>(content); } break; //DX20190124 - add original crystal info
+      // legacy
+      case (aurostd::ctcrc64("server")): { vserver.push_back(content); } break;
+      case (aurostd::ctcrc64("stoich")): {
+        // aurostd::string2tokens(ventry.at(i), tokens, "="); //HE20220404 stoken already defined TODO debug
+        // stoich = tokens.at(1);
+        // aurostd::string2tokens(stoich, stokens);
+        for (uint j = 0; j < stokens.size(); j++) vstoich.push_back(aurostd::string2utype<double>(stokens.at(j)));
+        } break;
+      //SYMMETRY
+      //DX20190124 - added original symmetry info - START
+      case (aurostd::ctcrc64("crystal_family_orig")): { crystal_family_orig = content; } break;
+      case (aurostd::ctcrc64("crystal_system_orig")): { crystal_system_orig = content; } break;
+      case (aurostd::ctcrc64("crystal_class_orig")): { crystal_class_orig = content; } break;
+      case (aurostd::ctcrc64("point_group_Hermann_Mauguin_orig")): { point_group_Hermann_Mauguin_orig = content; } break;
+      case (aurostd::ctcrc64("point_group_Schoenflies_orig")): { point_group_Schoenflies_orig = content; } break;
+      case (aurostd::ctcrc64("point_group_orbifold_orig")): { point_group_orbifold_orig = content; } break;
+      case (aurostd::ctcrc64("point_group_type_orig")): { point_group_type_orig = content; } break;
+      case (aurostd::ctcrc64("point_group_order_orig")): { point_group_order = aurostd::string2utype<uint>(content); } break;
+      case (aurostd::ctcrc64("point_group_structure_orig")): { point_group_structure_orig = content; } break;
+      case (aurostd::ctcrc64("Bravais_lattice_lattice_type_orig")): { Bravais_lattice_lattice_type_orig = content; } break;
+      case (aurostd::ctcrc64("Bravais_lattice_lattice_variation_type_orig")): { Bravais_lattice_lattice_variation_type_orig = content; } break;
+      case (aurostd::ctcrc64("Bravais_lattice_lattice_system_orig")): { Bravais_lattice_lattice_system_orig = content; } break;
+      case (aurostd::ctcrc64("Bravais_superlattice_lattice_type_orig")): { Bravais_superlattice_lattice_type_orig = content; } break;
+      case (aurostd::ctcrc64("Bravais_superlattice_lattice_variation_type_orig")): { Bravais_superlattice_lattice_variation_type_orig = content; } break;
+      case (aurostd::ctcrc64("Bravais_superlattice_lattice_system_orig")): { Bravais_superlattice_lattice_system_orig = content; } break;
+      case (aurostd::ctcrc64("Pearson_symbol_superlattice_orig")): { Pearson_symbol_superlattice_orig = content; } break;
+      case (aurostd::ctcrc64("reciprocal_geometry_orig")): {
+        reciprocal_geometry_orig = content;
+        vreciprocal_geometry_orig = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+        if (stokens.size() == 6)
+          for (uint j = 0; j < stokens.size(); j++)
+            vreciprocal_geometry_orig.at(j) = aurostd::string2utype<double>(stokens.at(j));
+        } break;
+      case (aurostd::ctcrc64("reciprocal_volume_cell_orig")): { reciprocal_volume_cell_orig = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("reciprocal_lattice_type_orig")): { reciprocal_lattice_type_orig = content; } break;
+      case (aurostd::ctcrc64("reciprocal_lattice_variation_type_orig")): { reciprocal_lattice_variation_type_orig = content; } break;
+      case (aurostd::ctcrc64("Wyckoff_letters_orig")): { Wyckoff_letters_orig = content; } break;
+      case (aurostd::ctcrc64("Wyckoff_multiplicities_orig")): { Wyckoff_multiplicities_orig = content; } break;
+      case (aurostd::ctcrc64("Wyckoff_site_symmetries_orig")): { Wyckoff_site_symmetries_orig = content; } break;
+      //DX20190124 - added original symmetry info - END
+      //DX20180823 - added more symmetry info - START
+      case (aurostd::ctcrc64("crystal_family")): { crystal_family = content; } break;
+      case (aurostd::ctcrc64("crystal_system")): { crystal_system = content; } break;
+      case (aurostd::ctcrc64("crystal_class")): { crystal_class = content; } break;
+      case (aurostd::ctcrc64("point_group_Hermann_Mauguin")): { point_group_Hermann_Mauguin = content; } break;
+      case (aurostd::ctcrc64("point_group_Schoenflies")): { point_group_Schoenflies = content; } break;
+      case (aurostd::ctcrc64("point_group_orbifold")): { point_group_orbifold = content; } break;
+      case (aurostd::ctcrc64("point_group_type")): { point_group_type = content; } break;
+      case (aurostd::ctcrc64("point_group_order")): { point_group_order = aurostd::string2utype<uint>(content); } break;
+      case (aurostd::ctcrc64("point_group_structure")): { point_group_structure = content; } break;
+      case (aurostd::ctcrc64("Bravais_lattice_lattice_type")): { Bravais_lattice_lattice_type = content; } break;
+      case (aurostd::ctcrc64("Bravais_lattice_lattice_variation_type")): { Bravais_lattice_lattice_variation_type = content; } break;
+      case (aurostd::ctcrc64("Bravais_lattice_lattice_system")): { Bravais_lattice_lattice_system = content; } break;
+      case (aurostd::ctcrc64("Bravais_superlattice_lattice_type")): { Bravais_superlattice_lattice_type = content; } break;
+      case (aurostd::ctcrc64("Bravais_superlattice_lattice_variation_type")): { Bravais_superlattice_lattice_variation_type = content; } break;
+      case (aurostd::ctcrc64("Bravais_superlattice_lattice_system")): { Bravais_superlattice_lattice_system = content; } break;
+      case (aurostd::ctcrc64("Pearson_symbol_superlattice")): { Pearson_symbol_superlattice = content; } break;
+      case (aurostd::ctcrc64("reciprocal_geometry_relax")):
+      case (aurostd::ctcrc64("reciprocal_geometry")): {
+        reciprocal_geometry_relax = content;
+        vreciprocal_geometry_relax = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+        if (stokens.size() == 6)
+          for (uint j = 0; j < stokens.size(); j++)
+            vreciprocal_geometry_relax.at(j) = aurostd::string2utype<double>(stokens.at(j));
+        } break;
+      case (aurostd::ctcrc64("reciprocal_volume_cell")): { reciprocal_volume_cell = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("reciprocal_lattice_type")): { reciprocal_lattice_type = content; } break;
+      case (aurostd::ctcrc64("reciprocal_lattice_variation_type")): { reciprocal_lattice_variation_type = content; } break;
+      case (aurostd::ctcrc64("Wyckoff_letters")): { Wyckoff_letters = content; } break;
+      case (aurostd::ctcrc64("Wyckoff_multiplicities")): { Wyckoff_multiplicities = content; } break;
+      case (aurostd::ctcrc64("Wyckoff_site_symmetries")): { Wyckoff_site_symmetries = content; } break;
+      //DX20180823 - added more symmetry info - END
+      //DX20190209 - added anrl info - START
+      case (aurostd::ctcrc64("aflow_prototype_label_orig")): { aflow_prototype_label_orig = content; } break;
+      case (aurostd::ctcrc64("aflow_prototype_params_list_orig")): { aflow_prototype_params_list_orig = content; } break;
+      case (aurostd::ctcrc64("aflow_prototype_params_values_orig")): { aflow_prototype_params_values_orig = content; } break;
+      case (aurostd::ctcrc64("aflow_prototype_label_relax")): { aflow_prototype_label_relax = content; } break;
+      case (aurostd::ctcrc64("aflow_prototype_params_list_relax")): { aflow_prototype_params_list_relax = content; } break;
+      case (aurostd::ctcrc64("aflow_prototype_params_values_relax")): { aflow_prototype_params_values_relax = content; } break;
+      //DX20190209 - added anrl info - END
+      case (aurostd::ctcrc64("pocc_parameters")): { pocc_parameters = content; } break;  //CO20200731
+      // AGL/AEL
+      case (aurostd::ctcrc64("agl_thermal_conductivity_300K")): { agl_thermal_conductivity_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("agl_debye")): { agl_debye = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("agl_acoustic_debye")): { agl_acoustic_debye = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("agl_gruneisen")): { agl_gruneisen = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("agl_heat_capacity_Cv_300K")): { agl_heat_capacity_Cv_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("agl_heat_capacity_Cp_300K")): { agl_heat_capacity_Cp_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("agl_thermal_expansion_300K")): { agl_thermal_expansion_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("agl_bulk_modulus_static_300K")): { agl_bulk_modulus_static_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("agl_bulk_modulus_isothermal_300K")): { agl_bulk_modulus_isothermal_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("agl_poisson_ratio_source")): { agl_poisson_ratio_source = content; } break; //CT20181212
+      case (aurostd::ctcrc64("agl_vibrational_free_energy_300K_cell")): { agl_vibrational_free_energy_300K_cell = aurostd::string2utype<double>(content); } break; //CT20181212
+      case (aurostd::ctcrc64("agl_vibrational_free_energy_300K_atom")): { agl_vibrational_free_energy_300K_atom = aurostd::string2utype<double>(content); } break; //CT20181212
+      case (aurostd::ctcrc64("agl_vibrational_entropy_300K_cell")): { agl_vibrational_entropy_300K_cell = aurostd::string2utype<double>(content); } break; //CT20181212
+      case (aurostd::ctcrc64("agl_vibrational_entropy_300K_atom")): {  agl_vibrational_entropy_300K_atom = aurostd::string2utype<double>(content); } break; //CT20181212
+      case (aurostd::ctcrc64("ael_poisson_ratio")): { ael_poisson_ratio = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("ael_bulk_modulus_voigt")): { ael_bulk_modulus_voigt = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("ael_bulk_modulus_reuss")): { ael_bulk_modulus_reuss = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("ael_shear_modulus_voigt")): { ael_shear_modulus_voigt = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("ael_shear_modulus_reuss")): { ael_shear_modulus_reuss = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("ael_bulk_modulus_vrh")): { ael_bulk_modulus_vrh = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("ael_shear_modulus_vrh")): { ael_shear_modulus_vrh = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("ael_elastic_anisotropy")): { ael_elastic_anisotropy = aurostd::string2utype<double>(content); } break; //CO20181129
+      case (aurostd::ctcrc64("ael_youngs_modulus_vrh")): { ael_youngs_modulus_vrh = aurostd::string2utype<double>(content); } break; //CT20181212
+      case (aurostd::ctcrc64("ael_speed_sound_transverse")): { ael_speed_sound_transverse = aurostd::string2utype<double>(content); } break; //CT20181212
+      case (aurostd::ctcrc64("ael_speed_sound_longitudinal")): { ael_speed_sound_longitudinal = aurostd::string2utype<double>(content); } break; //CT20181212
+      case (aurostd::ctcrc64("ael_speed_sound_average")): { ael_speed_sound_average = aurostd::string2utype<double>(content); } break; //CT20181212
+      case (aurostd::ctcrc64("ael_pughs_modulus_ratio")): { ael_pughs_modulus_ratio = aurostd::string2utype<double>(content); } break; //CT20181212
+      case (aurostd::ctcrc64("ael_debye_temperature")): { ael_debye_temperature = aurostd::string2utype<double>(content); } break; //CT20181212
+      case (aurostd::ctcrc64("ael_applied_pressure")): { ael_applied_pressure = aurostd::string2utype<double>(content); } break; //CT20181212
+      case (aurostd::ctcrc64("ael_average_external_pressure")): { ael_average_external_pressure = aurostd::string2utype<double>(content); } break; //CT20181212
+      //ME20191105 BEGIN
+      case (aurostd::ctcrc64("ael_stiffness_tensor")): {
+        xmatrix<double> tensor(6, 6);
+        vector<string> rows;
+        vector<double> r;
+        aurostd::string2tokens(content, rows, ";");
+        if (rows.size() != 6) {
+          stringstream message;
+          message << "Could not read ael_stiffness_tensor: wrong number of rows"
+                  << " (found " << rows.size() << ", need 6).";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+        } else {
+          for (int i = 0; i < 6; i++) {
+            aurostd::string2tokens(rows[i], r, ",");
+            if (r.size() != 6) {
+              stringstream message;
+              message << "Could not read ael_stiffness_tensor: wrong number of columns"
+                      << " in row " << (i + 1)
+                      << " (found " << rows.size() << ", need 6).";
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+            } else {
+              for (int j = 0; j < 6; j++) {
+                tensor[i + 1][j + 1] = r[j];
+              }
+            }
+          }
+        }
+        ael_stiffness_tensor = tensor;
+        } break;
+      case (aurostd::ctcrc64("ael_compliance_tensor")): {
+        xmatrix<double> tensor(6, 6);
+        vector<string> rows;
+        vector<double> r;
+        aurostd::string2tokens(content, rows, ";");
+        if (rows.size() != 6) {
+          stringstream message;
+          message << "Could not read ael_compliance_tensor: wrong number of rows"
+                  << " (found " << rows.size() << ", need 6).";
+          throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+        } else {
+          for (int i = 0; i < 6; i++) {
+            aurostd::string2tokens(rows[i], r, ",");
+            if (r.size() != 6) {
+              stringstream message;
+              message << "Could not read ael_compliance_tensor: wrong number of columns"
+                      << " in row " << (i + 1)
+                      << " (found " << rows.size() << ", need 6).";
+              throw aurostd::xerror(_AFLOW_FILE_NAME_, function, message, _FILE_CORRUPT_);
+            } else {
+              for (int j = 0; j < 6; j++) {
+                tensor[i + 1][j + 1] = r[j];
+              }
+            }
+          }
+        }
+        ael_compliance_tensor = tensor;
+        } break;
+      //ME20191105 END
+      //ME20210927 BEGIN
+      // APL
+      case (aurostd::ctcrc64("energy_free_vibrational_cell_apl_300K")): { energy_free_vibrational_cell_apl_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("energy_free_vibrational_atom_apl_300K")): { energy_free_vibrational_atom_apl_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("entropy_vibrational_cell_apl_300K")): { entropy_vibrational_cell_apl_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("entropy_vibrational_atom_apl_300K")): { entropy_vibrational_atom_apl_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("energy_internal_vibrational_cell_apl_300K")): { energy_internal_vibrational_cell_apl_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("energy_internal_vibrational_atom_apl_300K")): { energy_internal_vibrational_atom_apl_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("energy_zero_point_cell_apl")): { energy_zero_point_cell_apl = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("energy_zero_point_atom_apl")): { energy_zero_point_atom_apl = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("heat_capacity_Cv_cell_apl_300K")): { heat_capacity_Cv_cell_apl_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("heat_capacity_Cv_atom_apl_300K")): { heat_capacity_Cv_atom_apl_300K = aurostd::string2utype<double>(content); } break;
+      //ME20210927 END
+      //AS20200901 BEGIN
+      // QHA
+      case (aurostd::ctcrc64("gruneisen_qha")): { gruneisen_qha = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("gruneisen_qha_300K")): { gruneisen_qha_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("thermal_expansion_qha_300K")): {
+        thermal_expansion_qha_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("modulus_bulk_qha_300K")): { modulus_bulk_qha_300K = aurostd::string2utype<double>(content); } break;
+      //AS20200901 END
+      //AS20201008 BEGIN
+      case (aurostd::ctcrc64("modulus_bulk_derivative_pressure_qha_300K")): { modulus_bulk_derivative_pressure_qha_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("heat_capacity_Cv_atom_qha_300K")): { heat_capacity_Cv_atom_qha_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("heat_capacity_Cv_cell_qha_300K")): { heat_capacity_Cv_cell_qha_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("heat_capacity_Cp_atom_qha_300K")): { heat_capacity_Cp_atom_qha_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("heat_capacity_Cp_cell_qha_300K")): { heat_capacity_Cp_cell_qha_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("volume_atom_qha_300K")): { volume_atom_qha_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("energy_free_atom_qha_300K")): { energy_free_atom_qha_300K = aurostd::string2utype<double>(content); } break;
+      case (aurostd::ctcrc64("energy_free_cell_qha_300K")): { energy_free_cell_qha_300K = aurostd::string2utype<double>(content); } break;
+      //AS20201008 END
+      // BADER
+      case (aurostd::ctcrc64("bader_net_charges")): { bader_net_charges = content; aurostd::string2tokens<double>(content, vbader_net_charges, ","); } break;
+      case (aurostd::ctcrc64("bader_atomic_volumes")): { bader_atomic_volumes = content; aurostd::string2tokens<double>(content, vbader_atomic_volumes, ","); } break;
+    }
+  }
+
 
   // file2aflowlib
   uint _aflowlib_entry::file2aflowlib(const string& file,ostream& oss) {
@@ -598,12 +1075,27 @@ namespace aflowlib {
     return Load(entry,oss);
   }
 
+  // Load variant for EntryLoader //HE20220404
+  uint _aflowlib_entry::Load(const vector<uint64_t> & key_hash, const vector<string> & content) {
+    clear();
+    for (size_t member_index=0; member_index<content.size(); member_index++)  {
+      std::string single_content = content[member_index];
+      aurostd::StringSubst(single_content, "\"", "");
+      aurostd::StringSubst(single_content, "],[", ";");
+      aurostd::StringSubst(single_content, "[", "");
+      aurostd::StringSubst(single_content, "]", "");
+      SetByHash(key_hash[member_index], single_content);
+    }
+    LoadCleanup();
+    return key_hash.size();
+  }
+
   // Load overload
   uint _aflowlib_entry::Load(const string& _entry,ostream& oss) {
     clear(); // start from clean
     entry=_entry; // start from loading it up !
     if(entry.empty()) {cerr << "ERROR - _aflowlib_entry::Load: entry.empty()" << endl;return 0;}
-    vector<string> tokens,stokens;
+    vector<string> tokens;
     string keyword,content,line;
     aurostd::string2tokens(entry,ventry,"|");
     for(uint i=0;i<ventry.size();i++) {
@@ -612,375 +1104,12 @@ namespace aflowlib {
       if(tokens.size()>0) {
         keyword=tokens.at(0);
         if(tokens.size()>1) {content=tokens.at(1);} else {continue;} //{content="";}  //CO20180319, content="" screws up string2double(), better to leave as AUROSTD_NAN
-        if(content.empty()){continue;}  //CO20180319
-        if(content=="null"){continue;}  //CO20180319 - aflux integration!
-        aurostd::string2tokens(content,stokens,",");
-        if(keyword=="auid") {
-          auid=content; // AUID
-          vauid.clear();aflowlib::auid2vauid(auid,vauid);
-          // create VAUID
-        }
-        //CO20180409 - added the else if's for speed, no need to go through more checks than necessary
-        else if(keyword=="aurl") {aurl=content;aurostd::string2tokens(content,stokens,":");for(uint j=0;j<stokens.size();j++) vaurl.push_back(stokens.at(j));}
-        //else if(keyword=="title") {title=content;}  //ME20190129 // OBSOLETE ME20200829 - not used anymore
-        else if(keyword=="keywords") {keywords=content;aurostd::string2tokens(content,stokens,",");for(uint j=0;j<stokens.size();j++) vkeywords.push_back(stokens.at(j));}
-        else if(keyword=="aflowlib_date") {aflowlib_date=content;aurostd::string2tokens(content,stokens,",");for(uint j=0;j<stokens.size();j++) vaflowlib_date.push_back(stokens.at(j));} //CO20200624 - adding LOCK date
-        else if(keyword=="aflowlib_version") {aflowlib_version=content;}
-        else if(keyword=="aflowlib_entries") {aflowlib_entries=content;aurostd::string2tokens(content,stokens,",");for(uint j=0;j<stokens.size();j++) vaflowlib_entries.push_back(stokens.at(j));}
-        else if(keyword=="aflowlib_entries_number") {aflowlib_entries_number=aurostd::string2utype<int>(content);}
-        else if(keyword=="aflow_version") {aflow_version=content;}
-        else if(keyword=="catalog") {catalog=content;}
-        else if(keyword=="data_api") {data_api=content;}
-        else if(keyword=="data_source") {data_source=content;}
-        else if(keyword=="data_language") {data_language=content;}
-        else if(keyword=="error_status") {error_status=content;}
-        else if(keyword=="author") {author=content;aurostd::string2tokens(content,stokens,",");for(uint j=0;j<stokens.size();j++) vauthor.push_back(stokens.at(j));}
-        else if(keyword=="calculation_cores") {calculation_cores=aurostd::string2utype<int>(content);}
-        else if(keyword=="calculation_memory") {calculation_memory=aurostd::string2utype<double>(content);}
-        else if(keyword=="calculation_time") {calculation_time=aurostd::string2utype<double>(content);}
-        else if(keyword=="corresponding") {corresponding=content;aurostd::string2tokens(content,stokens,",");for(uint j=0;j<stokens.size();j++) vcorresponding.push_back(stokens.at(j));}
-        else if(keyword=="loop") {vloop.push_back(content);}  // CHECK THIS OUT IN THE FITURE
-        else if(keyword=="node_CPU_Cores") {node_CPU_Cores=aurostd::string2utype<int>(content);}
-        else if(keyword=="node_CPU_MHz") {node_CPU_MHz=aurostd::string2utype<double>(content);}
-        else if(keyword=="node_CPU_Model") {node_CPU_Model=content;}
-        else if(keyword=="node_RAM_GB") {node_RAM_GB=aurostd::string2utype<double>(content);}
-        else if(keyword=="Bravais_lattice_orig") {Bravais_lattice_orig=content;}
-        else if(keyword=="Bravais_lattice_relax") {Bravais_lattice_relax=content;}
-        else if(keyword=="code") {code=content;}
-        else if(keyword=="composition") {composition=content;for(uint j=0;j<stokens.size();j++) vcomposition.push_back(aurostd::string2utype<double>(stokens.at(j)));}
-        else if(keyword=="compound") {compound=content;}
-        else if(keyword=="density") {density=aurostd::string2utype<double>(content);}
-        else if(keyword=="density_orig") {density_orig=aurostd::string2utype<double>(content);} //DX20190124 - add original crystal info
-        else if(keyword=="dft_type") {dft_type=content;aurostd::string2tokens(content,stokens,",");for(uint j=0;j<stokens.size();j++) vdft_type.push_back(stokens.at(j));}
-        else if(keyword=="eentropy_cell") {eentropy_cell=aurostd::string2utype<double>(content);}
-        else if(keyword=="eentropy_atom") {eentropy_atom=aurostd::string2utype<double>(content);}
-        else if(keyword=="Egap") {Egap=aurostd::string2utype<double>(content);}
-        else if(keyword=="Egap_fit") {Egap_fit=aurostd::string2utype<double>(content);}
-        else if(keyword=="energy_cell") {energy_cell=aurostd::string2utype<double>(content);}
-        else if(keyword=="energy_atom") {energy_atom=aurostd::string2utype<double>(content);energy_atom_relax1=aurostd::string2utype<double>(content);}
-        else if(keyword=="energy_cutoff") {energy_cutoff=aurostd::string2utype<double>(content);}
-        else if(keyword=="delta_electronic_energy_convergence") {delta_electronic_energy_convergence=aurostd::string2utype<double>(content);}
-        else if(keyword=="delta_electronic_energy_threshold") {delta_electronic_energy_threshold=aurostd::string2utype<double>(content);}
-        else if(keyword=="nkpoints") {nkpoints=aurostd::string2utype<uint>(content);}
-        else if(keyword=="nkpoints_irreducible") {nkpoints_irreducible=aurostd::string2utype<uint>(content);}
-        else if(keyword=="kppra") {kppra=aurostd::string2utype<uint>(content);}
-        else if(keyword=="kpoints") {kpoints=content;}
-        else if(keyword=="kpoints_relax") {vector<int> tokens;aurostd::string2tokens(content,tokens,",");kpoints_nnn_relax=aurostd::vector2xvector(tokens);}  //ME20190129
-        else if(keyword=="kpoints_static") {vector<int> tokens;aurostd::string2tokens(content,tokens,",");kpoints_nnn_static=aurostd::vector2xvector(tokens);}  //ME20190129
-        else if(keyword=="kpoints_bands_path"){aurostd::string2tokens(content,kpoints_pairs,",");}  //ME20190129
-        else if(keyword=="kpoints_bands_nkpts"){kpoints_bands_path_grid=aurostd::string2utype<int>(content);}  //ME20190129
-        else if(keyword=="enthalpy_cell") {enthalpy_cell=aurostd::string2utype<double>(content);}
-        else if(keyword=="enthalpy_atom") {enthalpy_atom=aurostd::string2utype<double>(content);}
-        else if(keyword=="enthalpy_formation_cell") {enthalpy_formation_cell=aurostd::string2utype<double>(content);}
-        else if(keyword=="enthalpy_formation_cce_300K_cell") {enthalpy_formation_cce_300K_cell=aurostd::string2utype<double>(content);} //CO20200624
-        else if(keyword=="enthalpy_formation_cce_0K_cell") {enthalpy_formation_cce_0K_cell=aurostd::string2utype<double>(content);} //CO20200624
-        else if(keyword=="enthalpy_formation_atom") {enthalpy_formation_atom=aurostd::string2utype<double>(content);}
-        else if(keyword=="enthalpy_formation_cce_300K_atom") {enthalpy_formation_cce_300K_atom=aurostd::string2utype<double>(content);} //CO20200624
-        else if(keyword=="enthalpy_formation_cce_0K_atom") {enthalpy_formation_cce_0K_atom=aurostd::string2utype<double>(content);} //CO20200624
-        else if(keyword=="entropy_forming_ability") {entropy_forming_ability=aurostd::string2utype<double>(content);} //CO20200624
-        else if(keyword=="entropic_temperature") {entropic_temperature=aurostd::string2utype<double>(content);}
-        else if(keyword=="files") {files=content;for(uint j=0;j<stokens.size();j++) vfiles.push_back(stokens.at(j));}
-        else if(keyword=="files_LIB") {files_LIB=content;for(uint j=0;j<stokens.size();j++) vfiles_LIB.push_back(stokens.at(j));}
-        else if(keyword=="files_RAW") {files_RAW=content;for(uint j=0;j<stokens.size();j++) vfiles_RAW.push_back(stokens.at(j));}
-        else if(keyword=="files_WEB") {files_WEB=content;for(uint j=0;j<stokens.size();j++) vfiles_WEB.push_back(stokens.at(j));}
-        else if(keyword=="forces") {forces=content;for(uint j=0;j<stokens.size();j++) vforces.push_back(aurostd::string2utype<double>(stokens.at(j)));}  // FIX
-        else if(keyword=="geometry") {
-          geometry=content; 
-          vgeometry.push_back(0.0);vgeometry.push_back(0.0);vgeometry.push_back(0.0);
-          vgeometry.push_back(0.0);vgeometry.push_back(0.0);vgeometry.push_back(0.0);
-          if(stokens.size()==6) for(uint j=0;j<stokens.size();j++) vgeometry.at(j)=aurostd::string2utype<double>(stokens.at(j));
-        }
-        //DX20190124 - add original crystal info - START
-        else if(keyword=="geometry_orig") {
-          geometry_orig=content; 
-          vgeometry_orig.push_back(0.0);vgeometry_orig.push_back(0.0);vgeometry_orig.push_back(0.0);
-          vgeometry_orig.push_back(0.0);vgeometry_orig.push_back(0.0);vgeometry_orig.push_back(0.0);
-          if(stokens.size()==6) for(uint j=0;j<stokens.size();j++) vgeometry_orig.at(j)=aurostd::string2utype<double>(stokens.at(j));
-        }
-        //DX20190124 - add original crystal info - END
-        else if(keyword=="lattice_system_orig") {lattice_system_orig=content;}
-        else if(keyword=="lattice_variation_orig") {lattice_variation_orig=content;}
-        else if(keyword=="lattice_system_relax") {lattice_system_relax=content;}
-        else if(keyword=="lattice_variation_relax") {lattice_variation_relax=content;}
-        else if(keyword=="ldau_TLUJ") {ldau_TLUJ=content;}
-        else if(keyword=="ldau_type") {vLDAU[0].push_back(aurostd::string2utype<double>(content));}  //ME20190129
-        else if(keyword=="ldau_l") {for(uint j=0; j<stokens.size();j++) vLDAU[1].push_back(aurostd::string2utype<double>(stokens[j]));}  //ME20190129
-        else if(keyword=="ldau_u") {for(uint j=0; j<stokens.size();j++) vLDAU[2].push_back(aurostd::string2utype<double>(stokens[j]));}  //ME20190129
-        else if(keyword=="ldau_j") {for(uint j=0; j<stokens.size();j++) vLDAU[3].push_back(aurostd::string2utype<double>(stokens[j]));}  //ME20190129
-        else if(keyword=="natoms") {natoms=aurostd::string2utype<int>(content);}
-        else if(keyword=="natoms_orig") {natoms_orig=aurostd::string2utype<int>(content);} //DX20190124 - add original crystal info
-        else if(keyword=="nbondxx") {nbondxx=content;for(uint j=0;j<stokens.size();j++) vnbondxx.push_back(aurostd::string2utype<double>(stokens.at(j)));}
-        else if(keyword=="nspecies") {nspecies=aurostd::string2utype<int>(content);}
-        else if(keyword=="Pearson_symbol_orig") {Pearson_symbol_orig=content;}
-        else if(keyword=="Pearson_symbol_relax") {Pearson_symbol_relax=content;}
-        else if(keyword=="positions_cartesian") {positions_cartesian=content;for(uint j=0;j<stokens.size();j++) vpositions_cartesian.push_back(aurostd::string2utype<double>(stokens.at(j)));}  // FIX
-        else if(keyword=="positions_fractional") {positions_fractional=content;for(uint j=0;j<stokens.size();j++) vpositions_fractional.push_back(aurostd::string2utype<double>(stokens.at(j)));}  // FIX
-        else if(keyword=="pressure") {pressure=aurostd::string2utype<double>(content);}
-        else if(keyword=="stress_tensor") {
-          stress_tensor=content; 
-          vstress_tensor.push_back(0.0);vstress_tensor.push_back(0.0);vstress_tensor.push_back(0.0);
-          vstress_tensor.push_back(0.0);vstress_tensor.push_back(0.0);vstress_tensor.push_back(0.0);
-          vstress_tensor.push_back(0.0);vstress_tensor.push_back(0.0);vstress_tensor.push_back(0.0);
-          if(stokens.size()==6) for(uint j=0;j<stokens.size();j++) vstress_tensor.at(j)=aurostd::string2utype<double>(stokens.at(j));
-        }
-        else if(keyword=="pressure_residual") {pressure_residual=aurostd::string2utype<double>(content);}
-        else if(keyword=="Pulay_stress") {Pulay_stress=aurostd::string2utype<double>(content);}
-        else if(keyword=="prototype") {prototype=content;}  // apennsy
-        else if(keyword=="PV_cell") {PV_cell=aurostd::string2utype<double>(content);}
-        else if(keyword=="PV_atom") {PV_atom=aurostd::string2utype<double>(content);}
-        else if(keyword=="scintillation_attenuation_length") {scintillation_attenuation_length=aurostd::string2utype<double>(content);}
-        else if(keyword=="sg") {sg=content;for(uint j=0;j<stokens.size();j++) vsg.push_back(stokens.at(j));} //CO20180101
-        else if(keyword=="sg2") {sg2=content;for(uint j=0;j<stokens.size();j++) vsg2.push_back(stokens.at(j));} //CO20180101
-        else if(keyword=="spacegroup_orig") {spacegroup_orig=aurostd::string2utype<int>(content);}  //CO20201111
-        else if(keyword=="spacegroup_relax") {spacegroup_relax=aurostd::string2utype<int>(content);}  //CO20201111
-        else if(keyword=="species") {species=content;for(uint j=0;j<stokens.size();j++) vspecies.push_back(stokens.at(j));}
-        else if(keyword=="species_pp") {species_pp=content;for(uint j=0;j<stokens.size();j++) vspecies_pp.push_back(stokens.at(j));}
-        else if(keyword=="species_pp_version") {species_pp_version=content;for(uint j=0;j<stokens.size();j++) vspecies_pp_version.push_back(stokens.at(j));}
-        else if(keyword=="species_pp_ZVAL") {species_pp_ZVAL=content;for(uint j=0;j<stokens.size();j++) vspecies_pp_ZVAL.push_back(aurostd::string2utype<double>(stokens.at(j)));}
-        else if(keyword=="species_pp_AUID") {species_pp_AUID=content;for(uint j=0;j<stokens.size();j++) vspecies_pp_AUID.push_back(stokens.at(j));}
-        else if(keyword=="metagga" || keyword=="METAGGA") {METAGGA=content;}
-        else if(keyword=="spin_cell") {spin_cell=aurostd::string2utype<double>(content);}
-        else if(keyword=="spin_atom") {spin_atom=aurostd::string2utype<double>(content);}
-        else if(keyword=="spinD") {spinD=content;for(uint j=0;j<stokens.size();j++) vspinD.push_back(aurostd::string2utype<double>(stokens.at(j)));}
-        else if(keyword=="spinD_magmom_orig") {spinD_magmom_orig=content;for(uint j=0;j<stokens.size();j++) vspinD_magmom_orig.push_back(aurostd::string2utype<double>(stokens.at(j)));}
-        else if(keyword=="spinF") {spinF=aurostd::string2utype<double>(content);}
-        else if(keyword=="sponsor") {sponsor=content;aurostd::string2tokens(content,stokens,",");for(uint j=0;j<stokens.size();j++) vsponsor.push_back(stokens.at(j));}
-        else if(keyword=="stoichiometry") {stoichiometry=content;for(uint j=0;j<stokens.size();j++) vstoichiometry.push_back(aurostd::string2utype<double>(stokens.at(j)));}
-        else if(keyword=="Egap_type") {Egap_type=content;}
-        else if(keyword=="valence_cell_std") {valence_cell_std=aurostd::string2utype<double>(content);}
-        else if(keyword=="valence_cell_iupac") {valence_cell_iupac=aurostd::string2utype<double>(content);}
-        else if(keyword=="volume_cell") {volume_cell=aurostd::string2utype<double>(content);}
-        else if(keyword=="volume_atom") {volume_atom=aurostd::string2utype<double>(content);}
-        else if(keyword=="volume_cell_orig") {volume_cell_orig=aurostd::string2utype<double>(content);} //DX20190124 - add original crystal info
-        else if(keyword=="volume_atom_orig") {volume_atom_orig=aurostd::string2utype<double>(content);} //DX20190124 - add original crystal info
-        // legacy
-        else if(keyword=="server") {vserver.push_back(content);}
-        else if(keyword=="stoich") {aurostd::string2tokens(ventry.at(i),tokens,"=");stoich=tokens.at(1);aurostd::string2tokens(stoich,stokens);for(uint j=0;j<stokens.size();j++) vstoich.push_back(aurostd::string2utype<double>(stokens.at(j)));}
-        //DX20190124 - added original symmetry info - START
-        // SYMMETRY
-        else if(keyword=="crystal_family_orig") {crystal_family_orig=content;}
-        else if(keyword=="crystal_system_orig") {crystal_system_orig=content;}
-        else if(keyword=="crystal_class_orig") {crystal_class_orig=content;}
-        else if(keyword=="point_group_Hermann_Mauguin_orig") {point_group_Hermann_Mauguin_orig=content;}
-        else if(keyword=="point_group_Schoenflies_orig") {point_group_Schoenflies_orig=content;}
-        else if(keyword=="point_group_orbifold_orig") {point_group_orbifold_orig=content;}
-        else if(keyword=="point_group_type_orig") {point_group_type_orig=content;}
-        else if(keyword=="point_group_order_orig") {point_group_order=aurostd::string2utype<uint>(content);}
-        else if(keyword=="point_group_structure_orig") {point_group_structure_orig=content;}
-        else if(keyword=="Bravais_lattice_lattice_type_orig") {Bravais_lattice_lattice_type_orig=content;}
-        else if(keyword=="Bravais_lattice_lattice_variation_type_orig") {Bravais_lattice_lattice_variation_type_orig=content;}
-        else if(keyword=="Bravais_lattice_lattice_system_orig") {Bravais_lattice_lattice_system_orig=content;}
-        else if(keyword=="Bravais_superlattice_lattice_type_orig") {Bravais_superlattice_lattice_type_orig=content;}
-        else if(keyword=="Bravais_superlattice_lattice_variation_type_orig") {Bravais_superlattice_lattice_variation_type_orig=content;}
-        else if(keyword=="Bravais_superlattice_lattice_system_orig") {Bravais_superlattice_lattice_system_orig=content;}
-        else if(keyword=="Pearson_symbol_superlattice_orig") {Pearson_symbol_superlattice_orig=content;}
-        else if(keyword=="reciprocal_geometry_orig") {
-          reciprocal_geometry_orig=content; 
-          vreciprocal_geometry_orig.push_back(0.0);vreciprocal_geometry_orig.push_back(0.0);vreciprocal_geometry_orig.push_back(0.0);
-          vreciprocal_geometry_orig.push_back(0.0);vreciprocal_geometry_orig.push_back(0.0);vreciprocal_geometry_orig.push_back(0.0);
-          if(stokens.size()==6) for(uint j=0;j<stokens.size();j++) vreciprocal_geometry_orig.at(j)=aurostd::string2utype<double>(stokens.at(j));
-        }
-        else if(keyword=="reciprocal_volume_cell_orig") {reciprocal_volume_cell_orig=aurostd::string2utype<double>(content);}
-        else if(keyword=="reciprocal_lattice_type_orig") {reciprocal_lattice_type_orig=content;}
-        else if(keyword=="reciprocal_lattice_variation_type_orig") {reciprocal_lattice_variation_type_orig=content;}
-        else if(keyword=="Wyckoff_letters_orig") {Wyckoff_letters_orig=content;}
-        else if(keyword=="Wyckoff_multiplicities_orig") {Wyckoff_multiplicities_orig=content;}
-        else if(keyword=="Wyckoff_site_symmetries_orig") {Wyckoff_site_symmetries_orig=content;}
-        //DX20190124 - added original symmetry info - END
-        //DX20180823 - added more symmetry info - START
-        // SYMMETRY
-        else if(keyword=="crystal_family") {crystal_family=content;}
-        else if(keyword=="crystal_system") {crystal_system=content;}
-        else if(keyword=="crystal_class") {crystal_class=content;}
-        else if(keyword=="point_group_Hermann_Mauguin") {point_group_Hermann_Mauguin=content;}
-        else if(keyword=="point_group_Schoenflies") {point_group_Schoenflies=content;}
-        else if(keyword=="point_group_orbifold") {point_group_orbifold=content;}
-        else if(keyword=="point_group_type") {point_group_type=content;}
-        else if(keyword=="point_group_order") {point_group_order=aurostd::string2utype<uint>(content);}
-        else if(keyword=="point_group_structure") {point_group_structure=content;}
-        else if(keyword=="Bravais_lattice_lattice_type") {Bravais_lattice_lattice_type=content;}
-        else if(keyword=="Bravais_lattice_lattice_variation_type") {Bravais_lattice_lattice_variation_type=content;}
-        else if(keyword=="Bravais_lattice_lattice_system") {Bravais_lattice_lattice_system=content;}
-        else if(keyword=="Bravais_superlattice_lattice_type") {Bravais_superlattice_lattice_type=content;}
-        else if(keyword=="Bravais_superlattice_lattice_variation_type") {Bravais_superlattice_lattice_variation_type=content;}
-        else if(keyword=="Bravais_superlattice_lattice_system") {Bravais_superlattice_lattice_system=content;}
-        else if(keyword=="Pearson_symbol_superlattice") {Pearson_symbol_superlattice=content;}
-        else if(keyword=="reciprocal_geometry") {
-          reciprocal_geometry=content; 
-          vreciprocal_geometry.push_back(0.0);vreciprocal_geometry.push_back(0.0);vreciprocal_geometry.push_back(0.0);
-          vreciprocal_geometry.push_back(0.0);vreciprocal_geometry.push_back(0.0);vreciprocal_geometry.push_back(0.0);
-          if(stokens.size()==6) for(uint j=0;j<stokens.size();j++) vreciprocal_geometry.at(j)=aurostd::string2utype<double>(stokens.at(j));
-        }
-        else if(keyword=="reciprocal_volume_cell") {reciprocal_volume_cell=aurostd::string2utype<double>(content);}
-        else if(keyword=="reciprocal_lattice_type") {reciprocal_lattice_type=content;}
-        else if(keyword=="reciprocal_lattice_variation_type") {reciprocal_lattice_variation_type=content;}
-        else if(keyword=="Wyckoff_letters") {Wyckoff_letters=content;}
-        else if(keyword=="Wyckoff_multiplicities") {Wyckoff_multiplicities=content;}
-        else if(keyword=="Wyckoff_site_symmetries") {Wyckoff_site_symmetries=content;}
-        //DX20180823 - added more symmetry info - END
-        //DX20190209 - added anrl info - START
-        else if(keyword=="aflow_prototype_label_orig") {aflow_prototype_label_orig=content;}
-        else if(keyword=="aflow_prototype_params_list_orig") {aflow_prototype_params_list_orig=content;}
-        else if(keyword=="aflow_prototype_params_values_orig") {aflow_prototype_params_values_orig=content;}
-        else if(keyword=="aflow_prototype_label_relax") {aflow_prototype_label_relax=content;}
-        else if(keyword=="aflow_prototype_params_list_relax") {aflow_prototype_params_list_relax=content;}
-        else if(keyword=="aflow_prototype_params_values_relax") {aflow_prototype_params_values_relax=content;}
-        //DX20190209 - added anrl info - END
-        else if(keyword=="pocc_parameters") {pocc_parameters=content;}  //CO20200731
-        // AGL/AEL
-        else if(keyword=="agl_thermal_conductivity_300K") {agl_thermal_conductivity_300K=aurostd::string2utype<double>(content);}
-        else if(keyword=="agl_debye") {agl_debye=aurostd::string2utype<double>(content);}
-        else if(keyword=="agl_acoustic_debye") {agl_acoustic_debye=aurostd::string2utype<double>(content);}
-        else if(keyword=="agl_gruneisen") {agl_gruneisen=aurostd::string2utype<double>(content);}
-        else if(keyword=="agl_heat_capacity_Cv_300K") {agl_heat_capacity_Cv_300K=aurostd::string2utype<double>(content);}
-        else if(keyword=="agl_heat_capacity_Cp_300K") {agl_heat_capacity_Cp_300K=aurostd::string2utype<double>(content);}
-        else if(keyword=="agl_thermal_expansion_300K") {agl_thermal_expansion_300K=aurostd::string2utype<double>(content);}
-        else if(keyword=="agl_bulk_modulus_static_300K") {agl_bulk_modulus_static_300K=aurostd::string2utype<double>(content);}
-        else if(keyword=="agl_bulk_modulus_isothermal_300K") {agl_bulk_modulus_isothermal_300K=aurostd::string2utype<double>(content);}
-        else if(keyword=="agl_poisson_ratio_source") {agl_poisson_ratio_source=content;} //CT20181212
-        else if(keyword=="agl_vibrational_free_energy_300K_cell") {agl_vibrational_free_energy_300K_cell=aurostd::string2utype<double>(content);} //CT20181212
-        else if(keyword=="agl_vibrational_free_energy_300K_atom") {agl_vibrational_free_energy_300K_atom=aurostd::string2utype<double>(content);} //CT20181212
-        else if(keyword=="agl_vibrational_entropy_300K_cell") {agl_vibrational_entropy_300K_cell=aurostd::string2utype<double>(content);} //CT20181212
-        else if(keyword=="agl_vibrational_entropy_300K_atom") {agl_vibrational_entropy_300K_atom=aurostd::string2utype<double>(content);} //CT20181212
-        else if(keyword=="ael_poisson_ratio") {ael_poisson_ratio=aurostd::string2utype<double>(content);}
-        else if(keyword=="ael_bulk_modulus_voigt") {ael_bulk_modulus_voigt=aurostd::string2utype<double>(content);}
-        else if(keyword=="ael_bulk_modulus_reuss") {ael_bulk_modulus_reuss=aurostd::string2utype<double>(content);}
-        else if(keyword=="ael_shear_modulus_voigt") {ael_shear_modulus_voigt=aurostd::string2utype<double>(content);}
-        else if(keyword=="ael_shear_modulus_reuss") {ael_shear_modulus_reuss=aurostd::string2utype<double>(content);}
-        else if(keyword=="ael_bulk_modulus_vrh") {ael_bulk_modulus_vrh=aurostd::string2utype<double>(content);}
-        else if(keyword=="ael_shear_modulus_vrh") {ael_shear_modulus_vrh=aurostd::string2utype<double>(content);}
-        else if(keyword=="ael_elastic_anisotropy") {ael_elastic_anisotropy=aurostd::string2utype<double>(content);} //CO20181129
-        else if(keyword=="ael_youngs_modulus_vrh") {ael_youngs_modulus_vrh=aurostd::string2utype<double>(content);} //CT20181212
-        else if(keyword=="ael_speed_sound_transverse") {ael_speed_sound_transverse=aurostd::string2utype<double>(content);} //CT20181212
-        else if(keyword=="ael_speed_sound_longitudinal") {ael_speed_sound_longitudinal=aurostd::string2utype<double>(content);} //CT20181212
-        else if(keyword=="ael_speed_sound_average") {ael_speed_sound_average=aurostd::string2utype<double>(content);} //CT20181212
-        else if(keyword=="ael_pughs_modulus_ratio") {ael_pughs_modulus_ratio=aurostd::string2utype<double>(content);} //CT20181212
-        else if(keyword=="ael_debye_temperature") {ael_debye_temperature=aurostd::string2utype<double>(content);} //CT20181212
-        else if(keyword=="ael_applied_pressure") {ael_applied_pressure=aurostd::string2utype<double>(content);} //CT20181212
-        else if(keyword=="ael_average_external_pressure") {ael_average_external_pressure=aurostd::string2utype<double>(content);} //CT20181212
-        //ME20191105 BEGIN
-        else if(keyword=="ael_stiffness_tensor") {
-          xmatrix<double> tensor(6,6);
-          vector<string> rows;
-          vector<double> r;
-          aurostd::string2tokens(content, rows, ";");
-          if (rows.size() != 6) {
-            stringstream message;
-            message << "Could not read ael_stiffness_tensor: wrong number of rows"
-              << " (found " << rows.size() << ", need 6).";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
-          } else {
-            for (int i = 0; i < 6; i++) {
-              aurostd::string2tokens(rows[i], r, ",");
-              if (r.size() != 6) {
-                stringstream message;
-                message << "Could not read ael_stiffness_tensor: wrong number of columns"
-                  << " in row " << (i + 1)
-                  << " (found " << rows.size() << ", need 6).";
-                throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
-              } else {
-                for (int j = 0; j < 6; j++) {
-                  tensor[i + 1][j + 1] = r[j];
-                }
-              }
-            }
-          }
-          ael_stiffness_tensor = tensor;
-        } else if (keyword == "ael_compliance_tensor") {
-          xmatrix<double> tensor(6,6);
-          vector<string> rows;
-          vector<double> r;
-          aurostd::string2tokens(content, rows, ";");
-          if (rows.size() != 6) {
-            stringstream message;
-            message << "Could not read ael_compliance_tensor: wrong number of rows"
-              << " (found " << rows.size() << ", need 6).";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
-          } else {
-            for (int i = 0; i < 6; i++) {
-              aurostd::string2tokens(rows[i], r, ",");
-              if (r.size() != 6) {
-                stringstream message;
-                message << "Could not read ael_compliance_tensor: wrong number of columns"
-                  << " in row " << (i + 1)
-                  << " (found " << rows.size() << ", need 6).";
-                throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
-              } else {
-                for (int j = 0; j < 6; j++) {
-                  tensor[i + 1][j + 1] = r[j];
-                }
-              }
-            }
-          }
-          ael_compliance_tensor = tensor;
-        }
-        //ME20191105 END
-        //ME20210927 BEGIN
-        // APL
-        else if (keyword=="energy_free_vibrational_cell_apl_300K"){energy_free_vibrational_cell_apl_300K=aurostd::string2utype<double>(content);}
-        else if (keyword=="energy_free_vibrational_atom_apl_300K"){energy_free_vibrational_atom_apl_300K=aurostd::string2utype<double>(content);}
-        else if (keyword=="entropy_vibrational_cell_apl_300K"){entropy_vibrational_cell_apl_300K=aurostd::string2utype<double>(content);}
-        else if (keyword=="entropy_vibrational_atom_apl_300K"){entropy_vibrational_atom_apl_300K=aurostd::string2utype<double>(content);}
-        else if (keyword=="energy_internal_vibrational_cell_apl_300K"){energy_internal_vibrational_cell_apl_300K=aurostd::string2utype<double>(content);}
-        else if (keyword=="energy_internal_vibrational_atom_apl_300K"){energy_internal_vibrational_atom_apl_300K=aurostd::string2utype<double>(content);}
-        else if (keyword=="energy_zero_point_cell_apl"){energy_zero_point_cell_apl=aurostd::string2utype<double>(content);}
-        else if (keyword=="energy_zero_point_atom_apl"){energy_zero_point_atom_apl=aurostd::string2utype<double>(content);}
-        else if (keyword=="heat_capacity_Cv_cell_apl_300K"){heat_capacity_Cv_cell_apl_300K=aurostd::string2utype<double>(content);}
-        else if (keyword=="heat_capacity_Cv_atom_apl_300K"){heat_capacity_Cv_atom_apl_300K=aurostd::string2utype<double>(content);}
-        //ME20210927 END
-        //AS20200901 BEGIN
-        // QHA
-        else if(keyword=="gruneisen_qha") {gruneisen_qha=aurostd::string2utype<double>(content);}
-        else if(keyword=="gruneisen_qha_300K") {gruneisen_qha_300K=aurostd::string2utype<double>(content);}
-        else if(keyword=="thermal_expansion_qha_300K") {thermal_expansion_qha_300K=aurostd::string2utype<double>(content);}
-        else if(keyword=="modulus_bulk_qha_300K") {modulus_bulk_qha_300K=aurostd::string2utype<double>(content);}
-        //AS20200901 END
-        //AS20201008 BEGIN
-        else if(keyword=="modulus_bulk_derivative_pressure_qha_300K") {modulus_bulk_derivative_pressure_qha_300K=aurostd::string2utype<double>(content);}
-        else if(keyword=="heat_capacity_Cv_atom_qha_300K") {heat_capacity_Cv_atom_qha_300K=aurostd::string2utype<double>(content);}
-        else if(keyword=="heat_capacity_Cv_cell_qha_300K") {heat_capacity_Cv_cell_qha_300K=aurostd::string2utype<double>(content);}
-        else if(keyword=="heat_capacity_Cp_atom_qha_300K") {heat_capacity_Cp_atom_qha_300K=aurostd::string2utype<double>(content);}
-        else if(keyword=="heat_capacity_Cp_cell_qha_300K") {heat_capacity_Cp_cell_qha_300K=aurostd::string2utype<double>(content);}
-        else if(keyword=="volume_atom_qha_300K") {volume_atom_qha_300K=aurostd::string2utype<double>(content);}
-        else if(keyword=="energy_free_atom_qha_300K") {energy_free_atom_qha_300K=aurostd::string2utype<double>(content);}
-        else if(keyword=="energy_free_cell_qha_300K") {energy_free_cell_qha_300K=aurostd::string2utype<double>(content);}
-        //AS20201008 END
-        // BADER
-        else if(keyword=="bader_net_charges") {bader_net_charges=content;aurostd::string2tokens<double>(content,vbader_net_charges,",");}
-        else if(keyword=="bader_atomic_volumes") {bader_atomic_volumes=content;aurostd::string2tokens<double>(content,vbader_atomic_volumes,",");}
+        Set(keyword, content);
       }
     }
-    //ME20190129 - FIX vLDAU //CO20210713 - there's only 1 type, but the number is repeated for the number of species
-    if (vLDAU[0].size()) vLDAU[0].assign(vLDAU[1].size(), vLDAU[0][0]);
-    // FIX LOOP
-    loop="";
-    vloop.push_back("aflowlib");
-    //    for(uint j=0;j<vloop.size();j++) loop+=vloop.at(j)+(j<vloop.size()-1?", ":"");
-    for(uint j=0;j<vloop.size();j++) loop+=vloop.at(j)+(j<vloop.size()-1?",":""); // no space
-    // FIX SERVER
-    server="";
-    for(uint j=0;j<vserver.size();j++) {
-      server+=vserver.at(j)+(j<vserver.size()-1?", ":"");
-      vserverdir.push_back(*(new vector<string>(0))); // space
-    }
-    // FIX ICSD
-    if(aurostd::substring2bool(prototype,"_ICSD_")) {
-      aurostd::string2tokens(prototype,tokens,"_");
-      icsd=tokens.at(tokens.size()-1);
-    }
-    // FIX APENNSY
-    structure_name=prototype;
-    structure_description=prototype;
-    distance_gnd=999999; // gotta calculate it
-    distance_tie=999999; // gotta calculate it
-    pureA=FALSE;pureB=FALSE;
-    fcc=FALSE; bcc=FALSE;hcp=FALSE;
-    stoich_a=999999;stoich_b=999999;
-    bond_aa=999999;bond_ab=999999;bond_bb=999999;
-    vNsgroup.clear();vsgroup.clear();vstr.clear();  // apennsy
-    // DONE
+    LoadCleanup();
     if(0) {
-      bool html=TRUE;
+      bool html=FALSE; //TRUE;  //CO20201220
       oss << "Keywords" << endl;
       oss << "auid=" << auid << (html?"<br>":"") << endl;
       oss << "aurl=" << aurl << (html?"<br>":"") << endl;
@@ -1117,8 +1246,8 @@ namespace aflowlib {
       oss << "Bravais_superlattice_lattice_variation_type_orig=" << Bravais_superlattice_lattice_variation_type_orig << (html?"<br>":"") << endl;
       oss << "Bravais_superlattice_lattice_system_orig=" << Bravais_superlattice_lattice_system_orig << (html?"<br>":"") << endl;
       oss << "Pearson_symbol_superlattice_orig=" << Pearson_symbol_superlattice_orig << (html?"<br>":"") << endl;
-      oss << "reciprocal_geometry_orig==" << reciprocal_geometry_orig << "  vreciprocal_geometry_orig= ";for(uint j=0;j<vreciprocal_geometry_orig.size();j++) oss << vreciprocal_geometry_orig.at(j) << " "; oss << (html?"<br>":"") << endl;
-      oss << "reciprocal_volume_cell_orig==" << reciprocal_volume_cell_orig << (html?"<br>":"") << endl; 
+      oss << "reciprocal_geometry_orig=" << reciprocal_geometry_orig << "  vreciprocal_geometry_orig= ";for(uint j=0;j<vreciprocal_geometry_orig.size();j++) oss << vreciprocal_geometry_orig.at(j) << " "; oss << (html?"<br>":"") << endl;
+      oss << "reciprocal_volume_cell_orig=" << reciprocal_volume_cell_orig << (html?"<br>":"") << endl;
       oss << "reciprocal_lattice_type_orig=" << reciprocal_lattice_type_orig << (html?"<br>":"") << endl;
       oss << "reciprocal_lattice_variation_type_orig=" << reciprocal_lattice_variation_type_orig << (html?"<br>":"") << endl;
       oss << "Wyckoff_letters_orig=" << Wyckoff_letters_orig << (html?"<br>":"") << endl;
@@ -1143,8 +1272,8 @@ namespace aflowlib {
       oss << "Bravais_superlattice_lattice_variation_type=" << Bravais_superlattice_lattice_variation_type << (html?"<br>":"") << endl;
       oss << "Bravais_superlattice_lattice_system=" << Bravais_superlattice_lattice_system << (html?"<br>":"") << endl;
       oss << "Pearson_symbol_superlattice=" << Pearson_symbol_superlattice << (html?"<br>":"") << endl;
-      oss << "reciprocal_geometry==" << reciprocal_geometry << "  vreciprocal_geometry= ";for(uint j=0;j<vreciprocal_geometry.size();j++) oss << vreciprocal_geometry.at(j) << " "; oss << (html?"<br>":"") << endl;
-      oss << "reciprocal_volume_cell==" << reciprocal_volume_cell << (html?"<br>":"") << endl; 
+      oss << "reciprocal_geometry_relax=" << reciprocal_geometry_relax << "  vreciprocal_geometry_relax= ";for(uint j=0;j<vreciprocal_geometry_relax.size();j++) oss << vreciprocal_geometry_relax.at(j) << " "; oss << (html?"<br>":"") << endl; //CO20220719 _relax
+      oss << "reciprocal_volume_cell=" << reciprocal_volume_cell << (html?"<br>":"") << endl;
       oss << "reciprocal_lattice_type=" << reciprocal_lattice_type << (html?"<br>":"") << endl;
       oss << "reciprocal_lattice_variation_type=" << reciprocal_lattice_variation_type << (html?"<br>":"") << endl;
       oss << "Wyckoff_letters=" << Wyckoff_letters << (html?"<br>":"") << endl;
@@ -1192,8 +1321,8 @@ namespace aflowlib {
       oss << "ael_applied_pressure=" << ael_applied_pressure << (html?"<br>":"") << endl; //CT20181212 
       oss << "ael_average_external_pressure=" << ael_average_external_pressure << (html?"<br>":"") << endl; //CT20181212 
       //ME20191105 BEGIN
-      oss << "ael_stiffness_tensor="; for (int i = ael_stiffness_tensor.lrows; i <= ael_stiffness_tensor.urows; i++) {for (int j = 1; j <= 6; j++) oss << ael_stiffness_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
-      oss << "ael_compliance_tensor="; for (int i = 1; i <= ael_compliance_tensor.lrows; i++) {for (int j = 1; j <= ael_compliance_tensor.urows; j++) oss << ael_compliance_tensor[i][j]; oss << (html?"<br>":"") << endl;} //ME20191105
+      oss << "ael_stiffness_tensor="; for (int i = ael_stiffness_tensor.lrows; i <= ael_stiffness_tensor.urows; i++) {for (int j = ael_stiffness_tensor.lcols; j <= ael_stiffness_tensor.ucols; j++) {oss << ael_stiffness_tensor[i][j] << " ";} oss << (html?"<br>":"") << endl;} //ME20191105  //CO20201220
+      oss << "ael_compliance_tensor="; for (int i = ael_compliance_tensor.lrows; i <= ael_compliance_tensor.urows; i++) {for (int j = ael_compliance_tensor.lcols; j <= ael_compliance_tensor.ucols; j++) {oss << ael_compliance_tensor[i][j] << " ";} oss << (html?"<br>":"") << endl;} //ME20191105  //CO20201220
       //ME20191105 END
       //ME20210927 BEGIN
       oss << "energy_free_vibrational_cell_apl_300K=" << energy_free_vibrational_cell_apl_300K << (html?"<br>":"") << endl;
@@ -1235,7 +1364,41 @@ namespace aflowlib {
     return ventry.size();
   }
 
-  // aflowlib2string 
+  // seperated to allow two different load strategies without repeting the cleanup //HE20220404
+  void _aflowlib_entry::LoadCleanup() {
+    vector<string> tokens;
+    //ME20190129 - FIX vLDAU //CO20210713 - there's only 1 type, but the number is repeated for the number of species
+    if (vLDAU[0].size()) vLDAU[0].assign(vLDAU[1].size(), vLDAU[0][0]);
+    // FIX LOOP
+    loop="";
+    vloop.push_back("aflowlib");
+    //    for(uint j=0;j<vloop.size();j++) loop+=vloop.at(j)+(j<vloop.size()-1?", ":"");
+    for(uint j=0;j<vloop.size();j++) loop+=vloop.at(j)+(j<vloop.size()-1?",":""); // no space
+    // FIX SERVER
+    server="";
+    for(uint j=0;j<vserver.size();j++) {
+      server+=vserver.at(j)+(j<vserver.size()-1?", ":"");
+      vserverdir.push_back(*(new vector<string>(0))); // space
+    }
+    // FIX ICSD
+    if(aurostd::substring2bool(prototype,"_ICSD_")) {
+      aurostd::string2tokens(prototype,tokens,"_");
+      icsd=tokens.at(tokens.size()-1);
+    }
+    // FIX APENNSY
+    structure_name=prototype;
+    structure_description=prototype;
+    distance_gnd=AUROSTD_MAX_DOUBLE; // gotta calculate it
+    distance_tie=AUROSTD_MAX_DOUBLE; // gotta calculate it
+    pureA=FALSE;pureB=FALSE;
+    fcc=FALSE; bcc=FALSE;hcp=FALSE;
+    stoich_a=AUROSTD_MAX_DOUBLE;stoich_b=AUROSTD_MAX_DOUBLE;
+    bond_aa=AUROSTD_MAX_DOUBLE;bond_ab=AUROSTD_MAX_DOUBLE;bond_bb=AUROSTD_MAX_DOUBLE;
+    vNsgroup.clear();vsgroup.clear();vstr.clear();  // apennsy
+    // DONE
+  }
+
+  // aflowlib2string
   string _aflowlib_entry::aflowlib2string(string mode, bool PRINT_NULL) {
     stringstream sss("");
     //  string eendl="\n";
@@ -1397,7 +1560,7 @@ namespace aflowlib {
       if(Bravais_superlattice_lattice_variation_type.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "Bravais_superlattice_lattice_variation_type=" << Bravais_superlattice_lattice_variation_type << eendl;
       if(Bravais_superlattice_lattice_system.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "Bravais_superlattice_lattice_system=" << Bravais_superlattice_lattice_system << eendl;
       if(Pearson_symbol_superlattice.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "Pearson_symbol_superlattice=" << Pearson_symbol_superlattice << eendl;
-      if(reciprocal_geometry.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "reciprocal_geometry=" << reciprocal_geometry << eendl;
+      if(reciprocal_geometry_relax.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "reciprocal_geometry_relax=" << reciprocal_geometry_relax << eendl; //CO20220719 _relax
       if(reciprocal_volume_cell!=AUROSTD_NAN) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "reciprocal_volume_cell=" << reciprocal_volume_cell << eendl;
       if(reciprocal_lattice_type.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "reciprocal_lattice_type=" << reciprocal_lattice_type << eendl;
       if(reciprocal_lattice_variation_type.size()) sss << _AFLOWLIB_ENTRY_SEPARATOR_ << "reciprocal_lattice_variation_type=" << reciprocal_lattice_variation_type << eendl;
@@ -2883,11 +3046,11 @@ namespace aflowlib {
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
 
       //////////////////////////////////////////////////////////////////////////
-      if(vreciprocal_geometry.size()) {
+      if(vreciprocal_geometry_relax.size()) { //CO20220719 _relax
         //aflowlib_libraries specifies precision of 7
-        sscontent_json << "\"reciprocal_geometry\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vreciprocal_geometry,7),",") << "]";
+        sscontent_json << "\"reciprocal_geometry_relax\":[" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vreciprocal_geometry_relax,7),",") << "]";  //CO20220719 _relax
       } else {
-        if(PRINT_NULL) sscontent_json << "\"reciprocal_geometry\":null";
+        if(PRINT_NULL) sscontent_json << "\"reciprocal_geometry_relax\":null";  //CO20220719 _relax
       }
       vcontent_json.push_back(sscontent_json.str()); aurostd::StringstreamClean(sscontent_json);
       //////////////////////////////////////////////////////////////////////////
@@ -4664,42 +4827,33 @@ namespace aflowlib {
   string AFLUXCall(const aurostd::xoption& vpflow){
 
     // Performs AFLUX call based on summons input from command line
-
-    string usage="aflow --aflux=<summons>";
-    string options="";
-
     if(vpflow.flag("AFLUX::USAGE")) {
+      string usage="aflow --aflux=<summons>";
+      string options="";
       //[CO20200624 - OBSOLETE]stringstream ss_usage;
       //[CO20200624 - OBSOLETE]init::ErrorOption(ss_usage,vpflow.getattachedscheme("AFLUX"),"aflowlib::AFLUXCall()",aurostd::liststring2string(usage,options));
       //[CO20200624 - OBSOLETE]return ss_usage.str();
-      init::ErrorOption(vpflow.getattachedscheme("AFLUX"),"aflowlib::AFLUXCall()",aurostd::liststring2string(usage,options));
+      init::MessageOption(vpflow.getattachedscheme("AFLUX"),"aflowlib::AFLUXCall()",aurostd::liststring2string(usage,options));
       return "";
     }
 
     string summons = "";
-    if(vpflow.flag("AFLUX")) {
-      summons=vpflow.getattachedscheme("AFLUX");
-      // check if string is enclosed in double or single quotes 
+    if(vpflow.flag("AFLUX::SUMMONS")) { //CO20200520 - AFLUX::SUMMONS
+      summons=vpflow.getattachedscheme("AFLUX::SUMMONS"); //CO20200520 - AFLUX::SUMMONS
+      // check if string is enclosed in double or single quotes
       // (since bash throws error for unprotected parentheses)
-      if((summons[0] == '\"' && summons[summons.size()-1] == '\"') || (summons[0] == '\'' && summons[summons.size()-1] == '\'')){
+      if(!summons.empty() && ((summons[0] == '\"' && summons[summons.size()-1] == '\"') || (summons[0] == '\'' && summons[summons.size()-1] == '\''))){
         summons.erase(summons.begin()); summons.erase(summons.begin()+summons.size()-1);
       }
     }
     return AFLUXCall(summons);
   }
-}
-
-namespace aflowlib {
   string AFLUXCall(const vector<string>& matchbook){
 
     // Performs AFLUX call based on vector of matchbook entries
     string summons = aurostd::joinWDelimiter(matchbook,",");
-
     return AFLUXCall(summons);
   }
-}
-
-namespace aflowlib {
   string AFLUXCall(const string& summons){
     // Performs AFLUX call based on summons input
     // switched to aurostd::xhttp //HE20220407
@@ -4740,7 +4894,8 @@ namespace aflowlib {
     vector<vector<std::pair<string,string> > > properties_response;
 
     vector<string> entries,fields,key_value;
-    aurostd::string2tokens(response,entries,"\n");
+    aurostd::string2vectorstring(response,entries); //CO20200520
+    //[CO20200520 - OBSOLETE]aurostd::string2tokens(response,entries,"\n");
 
     // for each entry in response
     for(uint e=0;e<entries.size();e++){
@@ -4770,6 +4925,154 @@ namespace aflowlib {
 }
 
 //DX+FR20190206 - AFLUX functionality via command line - END
+
+namespace aflowlib {  //CO20201220
+  // ***************************************************************************
+  // mergeEntries()
+  // ***************************************************************************
+  //simple helper function for loading multiple libraries together, will take
+  //combinations of nested vectors and convert them to other nested vectors.
+  //naries is output, entries_new is input
+  //these assume vector<aflowlib::_aflowlib_entry> entries_new is all of the same
+  //type, e.g., binaries of MnPd (e.g., MnPd2, Mn2Pd, etc., similar structure to LIBS)
+  //also assumes ordered vector<vector<vector<aflowlib::_aflowlib_entry> > >& naries
+  //outer most - unary, binary, etc.
+  //next outer - species match, Mn, Pd, MnPd, etc.
+  //inner most - entries
+  bool mergeEntries(vector<vector<vector<_aflowlib_entry> > >& naries,const vector<vector<vector<_aflowlib_entry> > >& entries_new) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(!mergeEntries(naries, entries_new[i], true)) { return false; }  //structured data
+    }
+    return true;
+  }
+  bool mergeEntries(vector<vector<vector<_aflowlib_entry> > >& naries,const vector<vector<_aflowlib_entry> >& entries_new,bool entries_new_same_type) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(naries.size() <= i + 1) {
+        naries.push_back(vector<vector<_aflowlib_entry> >(0));
+      }
+      if(!mergeEntries(naries[i], entries_new[i], entries_new_same_type, true)) {  //triple vector<> naries implies this structure
+        return false;
+      }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<vector<vector<_aflowlib_entry> > >& naries,const vector<_aflowlib_entry>& entries_new,bool entries_new_same_type) {
+    if(!entries_new.size()) { return true; }
+    int index_layer1=-1, index_layer2=-1;
+    if(entries_new_same_type) {
+      if(!mergeEntries(naries, entries_new[0], index_layer1, index_layer2)) { return false; }
+      for (uint i = 1; i < entries_new.size(); i++) { naries[index_layer1][index_layer2].push_back(entries_new[i]); }
+    } else {
+      for (uint i = 0; i < entries_new.size(); i++) {
+        if(!entries_new[i].vspecies.size()) { return false; }  //what the heck is this?
+        if(!mergeEntries(naries, entries_new[i], index_layer1, index_layer2)) { return false; }
+      }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<vector<vector<_aflowlib_entry> > >& naries,const _aflowlib_entry& entry_new) {
+    int index_layer1 = -1;
+    int index_layer2 = -1;
+    return mergeEntries(naries, entry_new, index_layer1, index_layer2);
+  }
+  bool mergeEntries(vector<vector<vector<_aflowlib_entry> > >& naries,const _aflowlib_entry& entry_new,int& index_layer1,int& index_layer2) {
+    if(!entry_new.vspecies.size()) { return false; }    //what the heck is this?
+    while (naries.size() < entry_new.vspecies.size()) {  //assumes entries_new all have the same vspecies.size()
+      naries.push_back(vector<vector<_aflowlib_entry> >(0));
+    }
+    index_layer1 = entry_new.vspecies.size() - 1;
+    return mergeEntries(naries[index_layer1], entry_new, index_layer2, true);  //triple vector<> naries implies this structure
+  }
+  //naries takes on two forms depending on sort_by_species
+  //if sort_by_species==true, then naries is truly a single nary (unary, binary, etc.) with
+  //the second layer consisting of different species
+  //otherwise, naries is the total entries (similar to naries above), where second layer
+  //is unaries, binary, etc. (no layer with different species)
+  //if sort_by_species and we are coming from LIBs (entries_new_same_type==true), then we don't need to check every entry, we already
+  //know they have the same type (binary of same species)
+  bool mergeEntries(vector<vector<_aflowlib_entry> >& naries,const vector<vector<vector<_aflowlib_entry> > >& entries_new,bool sort_by_species) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(!mergeEntries(naries, entries_new[i], true, sort_by_species)) { return false; }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<vector<_aflowlib_entry> >& naries,const vector<vector<_aflowlib_entry> >& entries_new,bool entries_new_same_type,bool sort_by_species) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(!mergeEntries(naries, entries_new[i], entries_new_same_type, sort_by_species)) { return false; }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<vector<_aflowlib_entry> >& naries,const vector<_aflowlib_entry>& entries_new,bool entries_new_same_type,bool sort_by_species) {
+    if(!entries_new.size()) { return true; }
+    int index;
+    if(entries_new_same_type) {
+      if(!mergeEntries(naries, entries_new[0], index, sort_by_species)) { return false; }
+      for (uint i = 1; i < entries_new.size(); i++) { naries[index].push_back(entries_new[i]); }
+    } else {
+      for (uint i = 0; i < entries_new.size(); i++) {
+        if(!mergeEntries(naries, entries_new[i], index, sort_by_species)) { return false; }
+      }
+    }
+    return true;
+  }
+  //naries takes on two forms depending on sort_by_species
+  //if sort_by_species==true, then naries is truly a single nary (unary, binary, etc.) with
+  //the second layer consisting of different species
+  //otherwise, naries is the total entries (similar to naries above), where second layer
+  //is unaries, binary, etc. (no layer with different species)
+  bool mergeEntries(vector<vector<_aflowlib_entry> >& naries,const _aflowlib_entry& entry_new,bool sort_by_species) {
+    int index = -1;
+    return mergeEntries(naries, entry_new, index, sort_by_species);
+  }
+  bool mergeEntries(vector<vector<_aflowlib_entry> >& naries,const _aflowlib_entry& entry_new,int& index,bool sort_by_species) {
+    if(!entry_new.vspecies.size()) { return false; }
+    index = -1;
+    if(sort_by_species) {
+      //all of naries is unary, binary, etc., now just need to index species
+      for (uint i = 0; i < naries.size() && index == -1; i++) {
+        //test of stupidity
+        if(naries[i][0].vspecies.size() != entry_new.vspecies.size()) { return false; }
+        if(naries[i][0].vspecies == entry_new.vspecies) { index = i; }
+      }
+      if(index == -1) {
+        naries.push_back(vector<_aflowlib_entry>(0));
+        index = naries.size() - 1;
+      }
+    } else {
+      //just need to create space for unary, binary, etc.
+      while (naries.size() < entry_new.vspecies.size()) {
+        naries.push_back(vector<_aflowlib_entry>(0));
+      }
+      index = entry_new.vspecies.size() - 1;
+    }
+    naries[index].push_back(entry_new);
+    return true;
+  }
+  bool mergeEntries(vector<_aflowlib_entry>& naries,const vector<vector<vector<_aflowlib_entry> > >& entries_new) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      for (uint j = 0; j < entries_new[i].size(); j++) {
+        if(!mergeEntries(naries, entries_new[i][j])) { return false; }
+      }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<_aflowlib_entry>& naries,const vector<vector<_aflowlib_entry> >& entries_new) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(!mergeEntries(naries, entries_new[i])) { return false; }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<_aflowlib_entry>& naries,const vector<_aflowlib_entry>& entries_new) {
+    for (uint i = 0; i < entries_new.size(); i++) {
+      if(!mergeEntries(naries, entries_new[i])) { return false; }
+    }
+    return true;
+  }
+  bool mergeEntries(vector<_aflowlib_entry>& naries,const _aflowlib_entry& entry_new) {
+    naries.push_back(entry_new);
+    return true;
+  }
+}  // namespace pflow
 
 //DX20200929 - START
 namespace aflowlib {
@@ -4932,7 +5235,6 @@ namespace aflowlib {
       vflags.flag("FLAG::POCC",FALSE);           // will setup later  //CO20201220
 
       // check if ICSD inside (anyway)
-      string lattices[]={"BCC","BCT","CUB","FCC","HEX","MCL","MCLC","ORC","ORCC","ORCF","ORCI","RHL","TET","TRI"};
       vector<string> vline,tokens;
 
       string html_TAB=" target=\"_blank\"";
@@ -4990,8 +5292,7 @@ namespace aflowlib {
             vflags.flag("FLAG::FOUND",TRUE);
             catalog=entry_tmp.catalog;
             label=directory;
-            for(uint ilat=0;ilat<14;ilat++)
-              aurostd::StringSubst(label,lattices[ilat]+"/","");
+            for(uint ilat=0;ilat<BRAVAIS_LATTICES.size();ilat++) aurostd::StringSubst(label,BRAVAIS_LATTICES[ilat]+"/",""); //HE20220420 switch to global bravais lattices list
             aurostd::StringSubst(label,"/",".");
           }
         }
@@ -5029,9 +5330,9 @@ namespace aflowlib {
         for(uint i=0;i<vdir2test.size()&&!vflags.flag("FLAG::FOUND");i++) { // allow i=j=k so that 1 OR 2 OR 3 dots are also tested
           dir2test=vdir2test.at(i);
           //		cout << "testing(" << i << ") = " << dir2test << endl;
-          for(uint ilat=0;ilat<14&&!vflags.flag("FLAG::FOUND");ilat++) {
-            if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("ICSD")+"/RAW/"+lattices[ilat]+"/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
-              catalog="ICSD";directory=lattices[ilat]+"/"+dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);
+          for(uint ilat=0;ilat<BRAVAIS_LATTICES.size()&&!vflags.flag("FLAG::FOUND");ilat++) { //HE20220420 switch to global bravais lattices list
+            if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("ICSD")+"/RAW/"+BRAVAIS_LATTICES[ilat]+"/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
+              catalog="ICSD";directory=BRAVAIS_LATTICES[ilat]+"/"+dir2test;label=option;vflags.flag("FLAG::FOUND",TRUE);
             }
           }
           if(!vflags.flag("FLAG::FOUND") && aurostd::FileExist(init::AFLOW_Projects_Directories("LIB0")+"/RAW/"+dir2test+"/"+DEFAULT_FILE_AFLOWLIB_ENTRY_OUT)) {
