@@ -19,7 +19,7 @@ namespace aurostd {
   template<class utype> xvector<utype> evalPolynomialCoeff(const xvector<utype>& p, const uint n) __xprototype; //SD20220425
   template<class utype> xmatrix<utype> Vandermonde_matrix(const xvector<utype>& x, const int n) __xprototype;
   template<class utype> utype polynomialFindExtremum(const xvector<utype>& p, const utype xmin, const utype xmax,
-      const utype tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_) __xprototype;
+      const utype tol=AUROSTD_IDENTITY_TOL) __xprototype;
   template<class utype> xvector<utype> polynomialCurveFit(const xvector<utype>& x, const xvector<utype>& y, const int n, const xvector<utype>& w) __xprototype; //SD20220422
   template<class utype> xmatrix<utype> companion_matrix(const xvector<utype>& p) __xprototype; //SD20220318
   template<class utype> void polynomialFindRoots(const xvector<utype>& p, xvector<utype>& rr, xvector<utype>& ri) __xprototype; //SD20220318
@@ -29,16 +29,16 @@ namespace aurostd {
 // Root-finding algorithms
 //********************************************************************************
 namespace aurostd {
-  bool findZeroBrent(const double a, const double b, const std::function<double(double)>& f, double& zero, const uint niter=100, const double tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //SD20220517
-  bool findZeroNewtonRaphson(const xvector<double>& x0, const vector<std::function<double(xvector<double>)>>& vf, const vector<vector<std::function<double(xvector<double>)>>>& jac, xvector<double>& x, const uint niter=100, const double tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //SD20220616
-  bool findZeroDeflation(const xvector<double>& x0, const vector<std::function<double(xvector<double>)>>& vf, const vector<vector<std::function<double(xvector<double>)>>>& jac, xmatrix<double>& mx, const uint niter=100, const double tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //SD20220619
+  bool findZeroBrent(const double a, const double b, const std::function<double(double)>& f, double& zero, const uint niter=100, const double tol=AUROSTD_IDENTITY_TOL); //SD20220517
+  bool findZeroNewtonRaphson(const xvector<double>& x0, const vector<std::function<double(xvector<double>)>>& vf, const vector<vector<std::function<double(xvector<double>)>>>& jac, xvector<double>& x, const uint niter=100, const double tol=AUROSTD_IDENTITY_TOL); //SD20220616
+  bool findZeroDeflation(const xvector<double>& x0, const vector<std::function<double(xvector<double>)>>& vf, const vector<vector<std::function<double(xvector<double>)>>>& jac, xmatrix<double>& mx, const uint niter=100, const double tol=AUROSTD_IDENTITY_TOL); //SD20220619
 }
 
 //********************************************************************************
 // Auxiliary functions
 //********************************************************************************
 namespace aurostd {
-  bool checkDerivatives(const xvector<double>& x, const std::function<double(xvector<double>)>& f, const vector<std::function<double(xvector<double>)>>& df, const double tol=_AUROSTD_XSCALAR_TOLERANCE_IDENTITY_); //SD20220622
+  bool checkDerivatives(const xvector<double>& x, const std::function<double(xvector<double>)>& f, const vector<std::function<double(xvector<double>)>>& df, const double tol=AUROSTD_IDENTITY_TOL); //SD20220622
   vector<vector<std::function<double(xvector<double>)>>> calcNumericalJacobian(const vector<std::function<double(xvector<double>)>>& vf, const xvector<double>& _dx); //SD20220624
 }
 
