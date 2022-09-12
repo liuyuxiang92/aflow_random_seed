@@ -961,7 +961,10 @@ namespace aurostd {  // namespace aurostd
         string message = "(a.rows!=b.rows||a.cols!=b.cols)";
         throw xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
-      xmatrix<utype> c(a.rows,a.cols);
+      int lr=1, ur=1, lc=1, uc=1;
+      if ((a.lrows == b.lrows) && (a.lcols==b.lcols)) {lr = a.lrows; ur = a.urows; lc = a.lcols; uc = a.ucols;}
+      else { ur = a.rows; uc = a.cols;}
+      xmatrix<utype> c(ur, uc, lr, lc);
       int i,j;
       utype *bi,*ci,*ai;
       for(i=0;i<a.rows;i++) {
