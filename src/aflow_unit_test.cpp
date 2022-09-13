@@ -959,6 +959,30 @@ namespace unittest {
     calculated_xmatint = xmatrix<int>(2, 2);
     aurostd::getEHermite(5, 12, calculated_xmatint);
     checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | solve a linear system //HE20220912
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::inverse(xmatrix) * xvector";
+    check_description = "solve a simple linear system with shifted matrices ";
+    xvector<double> expected_xvecdouble = {5.0, 3.0, -2.0};
+    xvector<double> calculated_xvecdouble;
+    xvector<double> b = {6.0, -4, 27};
+    xmatrix<double> A = {{1.0, 1.0, 1.0}, {0.0,2.0,5.0}, {2.0,5.0,-1.0}};
+    bool shift_check = true;
+    // inv(A)*b should be solvable even when the xmatrix and xvector have different index boundaries
+    for (uint shift_row: {-2,-1,0,1,2}){
+      for (uint shift_col: {-2,-1,0,1,2}) {
+        aurostd::shiftlrowscols(A, shift_col, shift_row);
+        calculated_xvecdouble = aurostd::inverse(A) * b;
+        if (not aurostd::isequal(expected_xvecdouble, calculated_xvecdouble)) {
+          shift_check=false;
+          break;
+        }
+      }
+    }
+    check(shift_check, calculated_xvecdouble, expected_xvecdouble, check_function, check_description, passed_checks, results);
+
   }
 
   void UnitTest::aurostdMainTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
