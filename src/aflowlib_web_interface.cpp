@@ -269,6 +269,9 @@ namespace aflowlib {
     vNsgroup.clear();for(uint i=0;i<b.vNsgroup.size();i++) vNsgroup.push_back(b.vNsgroup.at(i));  // apennsy
     vsgroup.clear();for(uint i=0;i<b.vsgroup.size();i++) vsgroup.push_back(b.vsgroup.at(i));  // apennsy
     vstr.clear();for(uint i=0;i<b.vstr.size();i++) vstr.push_back(b.vstr.at(i));  // apennsy
+    // details from EntryLoader //HE20220913
+    el_source_type=b.el_source_type;
+    el_source=b.el_source;
   }
 
 
@@ -550,6 +553,9 @@ namespace aflowlib {
     vNsgroup.clear();  // apennsy
     vsgroup.clear();  // apennsy
     vstr.clear();  // apennsy
+    // details from EntryLoader //HE20220913
+    el_source_type.clear();
+    el_source.clear();
   } 
 
   void _aflowlib_entry::clear() {  // clear PRIVATE
