@@ -588,6 +588,75 @@ namespace aflowlib {
     outInfo(__AFLOW_FUNC__);
   }
 
+  /// @brief load a entry from a file path
+  /// @param file_path file paths
+  /// @authors
+  /// @mod{HE,20220913,created}
+  /// @note doesn't add #m_filesystem_path or #m_filesystem_collection
+  void EntryLoader::loadFiles(const std::string &file_path) {
+    loadFiles((vector<std::string>){file_path});
+  }
+
+  /// @brief load entries recursive based on a list of start folder
+  /// @param folders list of folder paths
+  /// @authors
+  /// @mod{HE,20220913,created}
+  void EntryLoader::loadFolders(const std::vector<std::string> &folders) {
+    std::vector <std::string> found_entries;
+
+    char **paths = new char*[folders.size()+1](); // initialize the array with nullptr, +1 ensures it is null terminated
+    for (size_t list_idx = 0; list_idx < folders.size(); list_idx++) {
+      paths[list_idx] = (char *) folders[list_idx].c_str();
+    }
+
+    size_t scanned = 0;
+    size_t found = 0;
+    struct stat file_stats{};
+
+    // initialize a file tree scan
+    // https://man7.org/linux/man-pages/man3/fts.3.html
+    // FTS_PHYSICAL - don't follow symlinks
+    // FTS_NOCHDIR - don't change the workdir of the program
+    // FTS_XDEV - don't descend into folders that are on a different device
+    FTS *tree = fts_open(paths, FTS_PHYSICAL | FTS_NOCHDIR | FTS_XDEV, nullptr);
+    FTSENT *node;
+    if (tree == nullptr) {
+      m_logger_message << "Failed to initialize the file tree used to search for alloys!";
+      outHardError(__AFLOW_FUNC__, __LINE__,_FILE_ERROR_);
+      return;
+    }
+
+    // Iterate over all entries found in the folders listed in paths
+    while ((node = fts_read(tree))) {
+      scanned += 1;
+      if (m_out_debug && ((scanned-1) % 1000 == 0)) {
+        m_logger_message << (scanned-1) << " objects scanned; " << found << " entries found; next scan: " << node->fts_path;
+        outDebug(__AFLOW_FUNC__);
+      }
+      if ((node->fts_info & FTS_D)) {
+        std::string base_path = node->fts_path;
+        std::string full_path = base_path + "/" + m_filesystem_outfile;
+        if (stat(full_path.c_str(), &file_stats) == 0) {
+          found += 1;
+          found_entries.emplace_back(full_path);
+        }
+      }
+    }
+    fts_close(tree);
+    delete[] paths;
+
+    m_logger_message << "Finishing search in the filesystem after scanning " << scanned << " objects";
+    outInfo(__AFLOW_FUNC__);
+    loadFiles(found_entries);
+  }
+
+  /// @brief load entries recursive based on a start folder
+  /// @param folder_path folder paths
+  /// @authors
+  /// @mod{HE,20220913,created}
+  void EntryLoader::loadFolders(const std::string &folder_path) {
+    loadFolders((vector<std::string>){folder_path});
+  }
   /// @brief load entries from a list of strings
   /// @param raw_data_lines list of data strings
   /// @authors
