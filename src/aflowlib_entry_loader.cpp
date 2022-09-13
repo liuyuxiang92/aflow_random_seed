@@ -597,10 +597,11 @@ namespace aflowlib {
     loadFiles((vector<std::string>){file_path});
   }
 
-  /// @brief load entries recursive based on a list of start folder
+  /// @brief load all entries in the given folders and their sub-folders
   /// @param folders list of folder paths
   /// @authors
   /// @mod{HE,20220913,created}
+  /// @note EntryLoader::m_filesystem_outfile (default aflowlib.out) is used to identify entries
   void EntryLoader::loadFolders(const std::vector<std::string> &folders) {
     std::vector <std::string> found_entries;
 
@@ -650,13 +651,15 @@ namespace aflowlib {
     loadFiles(found_entries);
   }
 
-  /// @brief load entries recursive based on a start folder
-  /// @param folder_path folder paths
+  /// @brief load all entries recursive in the given folder and its sub-folders
+  /// @param folder_path folder path
   /// @authors
   /// @mod{HE,20220913,created}
+  /// @note EntryLoader::m_filesystem_outfile (default aflowlib.out) is used to identify entries
   void EntryLoader::loadFolders(const std::string &folder_path) {
     loadFolders((vector<std::string>){folder_path});
   }
+
   /// @brief load entries from a list of strings
   /// @param raw_data_lines list of data strings
   /// @authors
