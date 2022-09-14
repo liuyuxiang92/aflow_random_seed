@@ -98,6 +98,7 @@ namespace bader_functions {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " BEGIN" << endl;
 
+    string empty_string(__AFLOW_FUNC__.size(), ' ');
     string directory=_directory;  //CO20200624
     FixDirectory(directory);  //CO20200624
 
@@ -154,9 +155,9 @@ namespace bader_functions {
           oss << __AFLOW_FUNC__ << " ERROR: Incorrect format for input - number of tokens (::)." << " "; //<< endl //CO20180502;
           oss << __AFLOW_FUNC__ << " [dir=" << directory << "]" << endl; //CO20180220
           oss << __AFLOW_FUNC__ << " Needs to be either: " << endl;
-          oss << "                             " << "CUTOFF1,CUTOFF2…[::DOWNSAMPLE], or " << endl;
-          oss << "                             " << "CUTOFF[::DOWNSAMPLE1,DOWNSAMPLE2,...], or" << endl;
-          oss << "                             " << "some combination." << endl;
+          oss << empty_string << "CUTOFF1,CUTOFF2…[::DOWNSAMPLE], or " << endl;
+          oss << empty_string << "CUTOFF[::DOWNSAMPLE1,DOWNSAMPLE2,...], or" << endl;
+          oss << empty_string << "some combination." << endl;
           oss << __AFLOW_FUNC__ << " Exiting." << endl;
           oss << endl;
           return FALSE;
