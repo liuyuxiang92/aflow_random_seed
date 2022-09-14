@@ -2421,7 +2421,7 @@ namespace apl
             order_begin = TaylorExpansionOrder - order;
             order_end = order_begin + 2*order;
             for (int i=order_begin, j=order; i<=order_end; i+=2, j--){
-              deriv += std::pow(-1,j) * combinations(order, j) * xomega[i+1];
+              deriv += std::pow(-1,j) * aurostd::combinations(order, j) * xomega[i+1];
             }
             deriv /= pow(2*gp_distortion*V0, order);
             result += deriv * pow(V-V0,order)/aurostd::factorial(order);
@@ -2478,7 +2478,7 @@ namespace apl
               order_begin = TaylorExpansionOrder - order;
               order_end = order_begin + 2*order;
               for (int i=order_begin, j=order; i<=order_end; i+=2, j--){
-                deriv += std::pow(-1,j) * combinations(order, j) * xomega[i+1];
+                deriv += std::pow(-1,j) * aurostd::combinations(order, j) * xomega[i+1];
               }
               deriv /= pow(2*gp_distortion*V0, order);
               // gamma = -V/w dw/dV: reduce power in (V-V0)^order expression

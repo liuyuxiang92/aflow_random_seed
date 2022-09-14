@@ -1317,8 +1317,10 @@ namespace aurostd {   // INT
 
 // ***************************************************************************
 // some statistical stuff
-template<class utype> utype combinations(utype n,utype k) __xprototype; // http://en.wikipedia.org/wiki/Combination
-template<class utype> utype Cnk(utype n,utype k) __xprototype; // http://en.wikipedia.org/wiki/Combination
+namespace aurostd {
+  template<class utype> utype combinations(utype n,utype k) __xprototype; // http://en.wikipedia.org/wiki/Combination
+  template<class utype> utype Cnk(utype n,utype k) __xprototype; // http://en.wikipedia.org/wiki/Combination
+}
 
 // ***************************************************************************
 namespace aurostd {

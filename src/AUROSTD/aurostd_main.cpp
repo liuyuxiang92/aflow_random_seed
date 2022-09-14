@@ -7200,13 +7200,14 @@ namespace aurostd {
 // Function some statistical stuff
 // combinations
 // ***************************************************************************
-template<class utype> utype combinations(utype n,utype k) { // http://en.wikipedia.org/wiki/Combination // C^n_k=n!/k!(n-k)!   hard to calculate
-  double cnk=1.0;
-  for(utype i=0;i<=k-1;i++) cnk=cnk*(n-i)/(k-i);
-  return (utype) cnk;
+namespace aurostd  {
+  template<class utype> utype combinations(utype n,utype k) { // http://en.wikipedia.org/wiki/Combination // C^n_k=n!/k!(n-k)!   hard to calculate
+    double cnk=1.0;
+    for(utype i=0;i<=k-1;i++) cnk=cnk*(n-i)/(k-i);
+    return (utype) cnk;
+  }
+  template<class utype> utype Cnk(utype n,utype k) { return combinations(n,k);}  // http://en.wikipedia.org/wiki/Combination
 }
-
-template<class utype> utype Cnk(utype n,utype k) { return combinations(n,k);}  // http://en.wikipedia.org/wiki/Combination
 
 // ***************************************************************************
 // aurostd::ShiftFirstColumn(const vector<vector<double> >& a, const double& value)
