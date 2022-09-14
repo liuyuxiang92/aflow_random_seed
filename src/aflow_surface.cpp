@@ -30,13 +30,13 @@ namespace surface {
     double eps=1.1*_eps_; // relax a little bit
     // xvector<double> point(_point);
     xvector<double> point(3);
-    //  if(surface::PlaneDistance(_point,v1,v2,v3)>eps)  {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"point too far = "+aurostd::utype2string(surface::PlaneDistance(_point,v1,v2,v3)),_INPUT_ILLEGAL_);}  //CO20200624
+    //  if(surface::PlaneDistance(_point,v1,v2,v3)>eps)  {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"point too far = "+aurostd::utype2string(surface::PlaneDistance(_point,v1,v2,v3)),_INPUT_ILLEGAL_);}  //CO20200624
     point=surface::PlaneGetProjection(_point,v1,v2,v3);
-    if(distance(point,_point)>eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"point too far = "+aurostd::utype2string(distance(point,_point)),_INPUT_ILLEGAL_);}  //CO20200624
+    if(distance(point,_point)>eps) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"point too far = "+aurostd::utype2string(distance(point,_point)),_INPUT_ILLEGAL_);}  //CO20200624
     // if(modulus(point-_point)>1e-8)  cout << 1e8*modulus(point-_point) << endl;  // DEBUG OK
-    if(distance(v1,v2)<eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"v1-v2",_INPUT_ILLEGAL_);}  //CO20200624
-    if(distance(v2,v3)<eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"v2-v3",_INPUT_ILLEGAL_);}  //CO20200624
-    if(distance(v3,v1)<eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"v3-v1",_INPUT_ILLEGAL_);}  //CO20200624
+    if(distance(v1,v2)<eps) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"v1-v2",_INPUT_ILLEGAL_);}  //CO20200624
+    if(distance(v2,v3)<eps) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"v2-v3",_INPUT_ILLEGAL_);}  //CO20200624
+    if(distance(v3,v1)<eps) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"v3-v1",_INPUT_ILLEGAL_);}  //CO20200624
     // is in vertices ?
     if(distance(point,v1)<eps) return angle(v1,v2,v3);
     if(distance(point,v2)<eps) return angle(v2,v3,v1);
@@ -171,14 +171,14 @@ namespace surface {
         if(LDEBUG) cerr << "Y axis INFINITE - h0l" << endl;
         v1=a1*(1.0/h);v2=a3*(1.0/l);
         v3=v1+a2;v4=v2+a2;  
-        if(hkl!=surface::PlaneGetHKL(v1,v2,v3,a1,a2,a3)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"hkl problem in \"[Y] axis INFINITE\"",_INPUT_ILLEGAL_);}  //CO20200624
+        if(hkl!=surface::PlaneGetHKL(v1,v2,v3,a1,a2,a3)) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"hkl problem in \"[Y] axis INFINITE\"",_INPUT_ILLEGAL_);}  //CO20200624
         isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
       }
       if(abs(h)>eps && abs(k)>eps && abs(l)<eps) {   // Z axis INFINITE
         if(LDEBUG) cerr << "Z axis INFINITE - hk0" << endl;
         v1=a1*(1.0/h);v2=a2*(1.0/k);
         v3=v1+a3;v4=v2+a3;
-        if(hkl!=surface::PlaneGetHKL(v1,v2,v3,a1,a2,a3)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"hkl problem in \"[Z] axis INFINITE\"",_INPUT_ILLEGAL_);}  //CO20200624
+        if(hkl!=surface::PlaneGetHKL(v1,v2,v3,a1,a2,a3)) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"hkl problem in \"[Z] axis INFINITE\"",_INPUT_ILLEGAL_);}  //CO20200624
         isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
       }
       if(abs(h)>eps && abs(k)<eps && abs(l)<eps) {   // YZ axis INFINITE
@@ -199,7 +199,7 @@ namespace surface {
         isrhombus=TRUE;area=2.0*surface::TriangleArea(v1,v2,v3);
       }
       if(abs(h)<eps && abs(k)<eps && abs(l)<eps) {   // XYZ axis INFINITE
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"h,k,l cannot be 0 0 0",_INPUT_ILLEGAL_);}  //CO20200624
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"h,k,l cannot be 0 0 0",_INPUT_ILLEGAL_);}  //CO20200624
     }
     for(int i=1;i<=3;i++) {
       if(abs(v1[i])<eps) v1[i]=0.0;
@@ -355,7 +355,7 @@ namespace surface {
               // P = P1 + u (P2 - P1)    rrr = rrr1 + u (rrr2 - rrr1)    
               num=a*rrr1(1)+b*rrr1[2]+c*rrr1[3]+d;
               den=a*(rrr1(1)-rrr2(1))+b*(rrr1[2]-rrr2[2])+c*(rrr1[3]-rrr2[3]);
-              // if(aurostd::abs(den)<eps/10.0 && aurostd::abs(num)>eps/10.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,aurostd::utype2string(num)+" "+aurostd::utype2string(den),_INPUT_ILLEGAL_);}  //CO20200624
+              // if(aurostd::abs(den)<eps/10.0 && aurostd::abs(num)>eps/10.0) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,aurostd::utype2string(num)+" "+aurostd::utype2string(den),_INPUT_ILLEGAL_);}  //CO20200624
               // if(aurostd::abs(den)<eps/10.0 && aurostd::abs(num)<=aurostd::abs(den)) {num=0.0;den=1.0;}
               if(aurostd::abs(den)>eps/10.0) // to avoid rrr1,rrr2,rrr coplanar with the plane
               { // found
@@ -363,7 +363,7 @@ namespace surface {
                 if(u<-2*eps || u>1.0+2*eps) cerr << "u=" << u << " num=" << num << " den=" << den << endl;
                 // if(u<0.0 && u>=-eps) u=0.0;
                 // if(u>1.0 && u<=1.0+eps) u=1.0;
-                // if(u<-eps || u>1+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"u="aurostd::utype2string(u),_INPUT_ILLEGAL_);}  //CO20200624
+                // if(u<-eps || u>1+eps) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"u="aurostd::utype2string(u),_INPUT_ILLEGAL_);}  //CO20200624
                 if(u<0.0) u=0.0;
                 if(u>1.0) u=1.0;
                 rrr=rrr1+u*(rrr2-rrr1);
@@ -677,7 +677,7 @@ namespace surface {
 
 
       //  if(mode==3 || mode==4) { // all three are given
-      if(mode!=3 && mode!=4) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"only mode 3 and 4 are defined",_INPUT_ILLEGAL_);}  //CO20200624
+      if(mode!=3 && mode!=4) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"only mode 3 and 4 are defined",_INPUT_ILLEGAL_);}  //CO20200624
       if(mode==3 || mode==4) {
         if(mode==3) bbfrac=_BBFRAC_;
         if(mode==4) bbfrac=iparams(4);
@@ -730,7 +730,7 @@ namespace surface {
         bool LDEBUG=(FALSE || XHOST.DEBUG);
         bool search_trivial=FALSE,search_simple=FALSE,search_complete=FALSE;
 
-        if(smode!="HKL_SEARCH_TRIVIAL" && smode!="HKL_SEARCH_SIMPLE" && smode!="HKL_SEARCH_COMPLETE") {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"unknown mode",_INPUT_ILLEGAL_);}  //CO20200624
+        if(smode!="HKL_SEARCH_TRIVIAL" && smode!="HKL_SEARCH_SIMPLE" && smode!="HKL_SEARCH_COMPLETE") {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"unknown mode",_INPUT_ILLEGAL_);}  //CO20200624
         if(smode=="HKL_SEARCH_TRIVIAL")  {search_trivial=TRUE;search_simple=FALSE;search_complete=FALSE;};
         if(smode=="HKL_SEARCH_SIMPLE" )  {search_trivial=FALSE;search_simple=TRUE;search_complete=FALSE;};
         if(smode=="HKL_SEARCH_COMPLETE") {search_trivial=FALSE;search_simple=FALSE;search_complete=TRUE;};
@@ -1943,7 +1943,7 @@ namespace slab {
             newatom.type=k-1;	//CO20180724 - assign type needed for AddAtom()
             specie=str_in.SpeciesLabel(k-1);	//CO20180724 - this should be NON-empty as per assigning_fake_names above
             if(specie.empty() || aurostd::substring2bool(specie,"name not given")){
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ERROR! Species label not found!",_FILE_WRONG_FORMAT_); //CO20180724
+              throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"ERROR! Species label not found!",_FILE_WRONG_FORMAT_); //CO20180724
             }
             newatom.name=specie;         //CO20180724 - assign name needed for AddAtom()
             newatom.name_is_given=TRUE;  //CO20180724 - assign name needed for AddAtom()
@@ -2002,7 +2002,7 @@ namespace slab {
     //[OBSOLETE CO20180727]  for(i=NumSites[j];i<NumSites[j+1]+NumSites[j];i++) {
     //[OBSOLETE CO20180727]    //CO20180202 - added safety
     //[OBSOLETE CO20180727]    if(i>(int)str_out.atoms.size()-1){
-    //[OBSOLETE CO20180727]      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"not as many atoms were created as should have been (likely a problem with AddAtom())",_RUNTIME_ERROR_);}  //CO20200624
+    //[OBSOLETE CO20180727]      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"not as many atoms were created as should have been (likely a problem with AddAtom())",_RUNTIME_ERROR_);}  //CO20200624
     //[OBSOLETE CO20180727]    }
     //[OBSOLETE CO20180727]str_out.atoms.at(i).name=str_in.SpeciesLabel(j);
     //[OBSOLETE CO20180727]  }
@@ -2115,7 +2115,7 @@ namespace slab {
     for(int i=dhkl_frac.lrows;i<=dhkl_frac.urows;i++){
       if(abs(dhkl_frac[i])>zero_tol && abs(dhkl_frac[i])<abs(min)){min=dhkl_frac[i];}
     }
-    if(min==AUROSTD_MAX_DOUBLE){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Could not find minimum value of dhkl_frac",_VALUE_ERROR_);}
+    if(min==AUROSTD_MAX_DOUBLE){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Could not find minimum value of dhkl_frac",_VALUE_ERROR_);}
     dhkl_frac/=min;
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " dhkl_frac=" << dhkl_frac << endl;}
 
@@ -2129,7 +2129,7 @@ namespace slab {
       if(aurostd::isinteger(dhkl,zero_tol)){found=true;break;}
     }
     if(!found){
-      //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Could not find valid hkl",_VALUE_ERROR_);
+      //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Could not find valid hkl",_VALUE_ERROR_);
       return false;
     }
 
@@ -2155,7 +2155,7 @@ namespace slab {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     stringstream message;
 
-    if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"hkl=(0,0,0)",_INPUT_ERROR_);}
+    if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"hkl=(0,0,0)",_INPUT_ERROR_);}
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " hkl=" << hkl << endl;}
 
     xmatrix<double> f2c=trasp(lattice);
@@ -2196,7 +2196,7 @@ namespace slab {
         intercepts.push_back( ((double)multiple/(double)hkl[1]) * a1 );
         intercepts.push_back( intercepts[0] + a2 );
         intercepts.push_back( ((double)multiple/(double)hkl[3]) * a3 );
-      }else{  //aurostd::WithinList(zero_indices,3)
+      }else{  //aurostd::WithinList(zero_indices,(uint)3)
         intercepts.push_back( ((double)multiple/(double)hkl[1]) * a1 );
         intercepts.push_back( ((double)multiple/(double)hkl[2]) * a2 );
         intercepts.push_back( intercepts[0] + a3 );
@@ -2211,7 +2211,7 @@ namespace slab {
         intercepts.push_back( a1 );
         intercepts.push_back( tmp );
         intercepts.push_back( a3 );
-      }else{  //!aurostd::WithinList(zero_indices,3)
+      }else{  //!aurostd::WithinList(zero_indices,(uint)3)
         intercepts.push_back( a1 );
         intercepts.push_back( a2 );
         intercepts.push_back( tmp );
@@ -2230,16 +2230,16 @@ namespace slab {
       cerr << __AFLOW_FUNC__ << " v3=" << v3 << endl;
     }
     xvector<double> fpos;
-    fpos=c2f*v1;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"v1 is not a Bravais lattice",_INPUT_ERROR_);}
-    fpos=c2f*v2;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"v2 is not a Bravais lattice",_INPUT_ERROR_);}
-    fpos=c2f*v3;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"v3 is not a Bravais lattice",_INPUT_ERROR_);}
+    fpos=c2f*v1;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"v1 is not a Bravais lattice",_INPUT_ERROR_);}
+    fpos=c2f*v2;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"v2 is not a Bravais lattice",_INPUT_ERROR_);}
+    fpos=c2f*v3;if(!aurostd::isinteger(fpos)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"v3 is not a Bravais lattice",_INPUT_ERROR_);}
 
     //check that normal is orthogonal with vectors created
     xvector<double> n=HKLPlane2Normal(lattice,hkl);
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " n=" << n << endl;}
-    if(!aurostd::isequal(aurostd::scalar_product(n,v1),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n,v1) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
-    if(!aurostd::isequal(aurostd::scalar_product(n,v2),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n,v2) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
-    if(!aurostd::isequal(aurostd::scalar_product(n,v3),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n,v3) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
+    if(!aurostd::isequal(aurostd::scalar_product(n,v1),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n,v1) << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
+    if(!aurostd::isequal(aurostd::scalar_product(n,v2),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n,v2) << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
+    if(!aurostd::isequal(aurostd::scalar_product(n,v3),0.0,_ZERO_TOL_)){message << "n[" << n << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n,v3) << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
 
     return intercepts;
   }
@@ -2412,7 +2412,7 @@ namespace slab {
     }
     if(starting_atom==AUROSTD_MAX_UINT){
       if(!atoms2skip.empty()){starting_atom=atoms2skip.back();}
-      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Cannot find starting atom",_INPUT_ERROR_);}
+      else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Cannot find starting atom",_INPUT_ERROR_);}
     }
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " fpos_starting matches atom[" << starting_atom << "]" << endl;}
     if(starting_atom!= AUROSTD_MAX_UINT && !aurostd::WithinList(atoms2skip,starting_atom)){atoms2skip.push_back(starting_atom);}  //no duplicates is better
@@ -2490,7 +2490,7 @@ namespace slab {
           cerr << "dist=" << dist_rorigin_new << "], ";
           cerr << "cpos_final=" << cpos_final << endl;
         }
-        if(!aurostd::isequal(dist_rorigin_new,0.0,sym_eps)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Mismatch between atom.fpos and fpos_final",_RUNTIME_ERROR_);}
+        if(!aurostd::isequal(dist_rorigin_new,0.0,sym_eps)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Mismatch between atom.fpos and fpos_final",_RUNTIME_ERROR_);}
         atoms2skip.push_back(ind_min);
         //[CO20190520 - safe-guard for working in fractional space (skew)]return atoms[ind_min].fpos;
         return cpos_final;
@@ -2518,7 +2518,7 @@ namespace slab {
             !(aurostd::isequal(line_plane_intersection_fpos_BIC[1],0.0) || 
               aurostd::isequal(line_plane_intersection_fpos_BIC[2],0.0) ||
               aurostd::isequal(line_plane_intersection_fpos_BIC[3],0.0))
-          ){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Line did not intersect plane",_RUNTIME_ERROR_);}
+          ){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Line did not intersect plane",_RUNTIME_ERROR_);}
         if(LDEBUG){
           cerr << __AFLOW_FUNC__ << " v_line_plane_intersect[i=" << i << "]=" << v_line_plane_intersect[i];
           cerr << ", v_d[i=" << i << "]=" << v_d[i]  << endl;
@@ -2545,7 +2545,7 @@ namespace slab {
         }
       }
 
-      if(ind_min==AUROSTD_MAX_UINT){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Cannot find intersecting plane",_RUNTIME_ERROR_);}
+      if(ind_min==AUROSTD_MAX_UINT){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Cannot find intersecting plane",_RUNTIME_ERROR_);}
 
       //[CO20190520 - do NOT take FPOSDistance(), we do not want to minimize vector]cpos_final += aurostd::modulus(f2c*SYM::FPOSDistance(fpos_current,v_line_plane_intersection_fpos[ind_min],lattice,c2f,f2c,skew)) + sym_eps;
 
@@ -2590,7 +2590,7 @@ namespace slab {
       loop_iteration++;
     }
 
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Cannot find next atom",_RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Cannot find next atom",_RUNTIME_ERROR_);
     //[CO20190520 - safe-guard for working in fractional space (skew)]return fpos_current;
     return cpos_final;
   }
@@ -2604,7 +2604,7 @@ namespace slab {
     if(distanceBetweenImages_HKL(xstr_in,n_cpos,dist,outside_cell)){return dist;}
     if(distanceBetweenImages_Tracing(xstr_in,n_cpos,dist,outside_cell)){return dist;}
 
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Cannot find distance between images",_INPUT_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Cannot find distance between images",_INPUT_ERROR_);
     return dist;
   }
   bool distanceBetweenImages_HKL(const xstructure& xstr_in,const xvector<double>& n_cpos,double& distance_between_images,bool outside_cell){ //CO20190320
@@ -2616,7 +2616,7 @@ namespace slab {
       cerr << __AFLOW_FUNC__ << " xstr_in" << endl;cerr << xstr_in << endl;
       cerr << __AFLOW_FUNC__ << " n_cpos" << n_cpos << endl;
     }
-    if(!xstr_in.atoms.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No atoms found in xstructure",_INPUT_ERROR_);}
+    if(!xstr_in.atoms.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No atoms found in xstructure",_INPUT_ERROR_);}
 
     //assume NO changes in xstr_in (too slow)
     const xmatrix<double>& lattice=xstr_in.lattice;
@@ -2648,7 +2648,7 @@ namespace slab {
     _sym_op symop; symop.is_fgroup=true;
     symop.Uc=symop.Uf=aurostd::eye<double>(); //no rotation
 
-    if(!xstr_in.atoms.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No atoms found in xstructure",_INPUT_ERROR_);}
+    if(!xstr_in.atoms.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No atoms found in xstructure",_INPUT_ERROR_);}
     vector<int> basis_atoms_map,basis_types_map;  //dummies
     uint loop_iteration=0;
     //[CO20190520 - safe-guard for working in fractional space (skew)]xvector<double> fpos_prev;
@@ -2673,7 +2673,7 @@ namespace slab {
     }
 
     if(loop_iteration==LOOP_ITERATION_MAX){
-      //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Cannot find distance between images",_RUNTIME_ERROR_);
+      //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Cannot find distance between images",_RUNTIME_ERROR_);
       return false;
     }
 
@@ -2722,7 +2722,7 @@ namespace slab {
       cerr << __AFLOW_FUNC__ << " xstr_in" << endl;cerr << xstr_in << endl;
       cerr << __AFLOW_FUNC__ << " n_cpos" << n_cpos << endl;
     }
-    if(!xstr_in.atoms.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No atoms found in xstructure",_INPUT_ERROR_);}
+    if(!xstr_in.atoms.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No atoms found in xstructure",_INPUT_ERROR_);}
 
     //assume NO changes in xstr_in (too slow)
     const xmatrix<double>& lattice=xstr_in.lattice;
@@ -2805,11 +2805,11 @@ namespace slab {
         cerr << __AFLOW_FUNC__ << " cpos_new(post)=" << cpos_new[1] << "," << cpos_new[2] << "," << cpos_new[3] << endl;
         cerr << __AFLOW_FUNC__ << " cpos_diff=" << cpos_diff << endl;
       }
-      if(!aurostd::isequal(cpos_diff,0.0,sym_eps)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"cpos_diff!=0 (cpos_diff="+aurostd::utype2string(cpos_diff)+")",_RUNTIME_ERROR_);}
+      if(!aurostd::isequal(cpos_diff,0.0,sym_eps)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"cpos_diff!=0 (cpos_diff="+aurostd::utype2string(cpos_diff)+")",_RUNTIME_ERROR_);}
     }
 
     if(loop_iteration==LOOP_ITERATION_MAX){
-      //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Cannot find distance between images",_RUNTIME_ERROR_);
+      //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Cannot find distance between images",_RUNTIME_ERROR_);
       return false;
     }
 
@@ -2913,7 +2913,7 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    l_i=aurostd::string2utype<int>(tokens[2]);
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  hkl[1]=h_i;hkl[2]=k_i;hkl[3]=l_i;
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"hkl=(0,0,0)",_INPUT_ERROR_);}
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"hkl=(0,0,0)",_INPUT_ERROR_);}
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  string total_layers_string=vpflow.getattachedscheme("CREATE_SLAB::TOTAL_LAYERS");
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(aurostd::isfloat(total_layers_string)){
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    int _total_layers=aurostd::string2utype<int>(total_layers_string);
@@ -2930,9 +2930,9 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message.precision(prec);
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message.unsetf(std::ios_base::floatfield);
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message << "plane_interest=" << hkl;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message << "total_layers=" << total_layers;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message << "vacuum=" << vacuum;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message << "plane_interest=" << hkl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message << "total_layers=" << total_layers;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message << "vacuum=" << vacuum;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message.precision(prec_original); //set back
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message.flags(ff_original); //set back
@@ -2996,12 +2996,12 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << __AFLOW_FUNC__ << " skew=" << skew << endl;
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message << "Constructing slab (rigid rotation) along (" << aurostd::joinWDelimiter(hkl_i,",") <<")";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message << "Constructing slab (rigid rotation) along (" << aurostd::joinWDelimiter(hkl_i,",") <<")";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(check_min_dist){ //sanity check as we rotate structure/atoms
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    min_dist=xstr_bulk.MinDist();
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3020,7 +3020,7 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //test that we can go back and forth between n and hkl
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!Normal2HKLPlane(xstr_bulk.lattice,n_i,hkl)){
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    message << "Cannot convert normal -> (hkl): normal=" << n_i;
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << __AFLOW_FUNC__ << " hkl_i=" << hkl_i << endl;
@@ -3029,7 +3029,7 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(hkl_i,hkl)){
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    message << "Normal2HKLPlane() function failed on hkl_i=" << hkl_i << " (Normal2HKLPlane(n_i=" << n_i << ")=" << hkl << ")" << endl;
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //test that hkl plane is orthogonal to n
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  intercepts=getHKLPlaneIntercepts(xstr_bulk.lattice,hkl_i);
@@ -3042,9 +3042,9 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]  cerr << __AFLOW_FUNC__ << " v2=" << v2 << endl;
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]  cerr << __AFLOW_FUNC__ << " v3=" << v3 << endl;
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]}
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v1),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n_i,v1) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v2),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n_i,v2) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v3),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n_i,v3) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v1),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n_i,v1) << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v2),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n_i,v2) << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_i,v3),0.0,_ZERO_TOL_)){message << "n[" << n_i << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n_i,v3) << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xvector<int> hkl_test;
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xvector<double> n_test;
@@ -3053,7 +3053,7 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  n_test=HKLPlane2Normal(xstr_bulk.lattice,hkl_test);
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!Normal2HKLPlane(xstr_bulk.lattice,n_test,hkl)){
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    message << "Cannot convert normal -> (hkl): normal=" << n_test;
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << __AFLOW_FUNC__ << " hkl_test=" << hkl_test << endl;
@@ -3062,7 +3062,7 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(hkl_test,hkl)){
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    message << "Normal2HKLPlane() function failed on hkl=" << hkl_test << " (Normal2HKLPlane(n_i=" << n_test << ")=" << hkl << ")" << endl;
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //test that hkl plane is orthogonal to n
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  intercepts=getHKLPlaneIntercepts(xstr_bulk.lattice,hkl_test);
@@ -3075,9 +3075,9 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]  cerr << __AFLOW_FUNC__ << " v2=" << v2 << endl;
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]  cerr << __AFLOW_FUNC__ << " v3=" << v3 << endl;
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]}
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v1),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n_test,v1) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v2),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n_test,v2) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v3),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n_test,v3) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v1),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v1[" << v1 << "]: scalar_product=" << aurostd::scalar_product(n_test,v1) << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v2),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v2[" << v2 << "]: scalar_product=" << aurostd::scalar_product(n_test,v2) << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190520 - test inside getHKLPlaneIntercepts()]if(!aurostd::isequal(aurostd::scalar_product(n_test,v3),0.0,_ZERO_TOL_)){message << "n[" << n_test << "] is not orthogonal to v3[" << v3 << "]: scalar_product=" << aurostd::scalar_product(n_test,v3) << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);}
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // STOP - defining hkl normals
@@ -3103,7 +3103,7 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << __AFLOW_FUNC__ << " pseudo_z=" << pseudo_z << endl;
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << __AFLOW_FUNC__ << " z=" << z << endl;
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << __AFLOW_FUNC__ << " aurostd::modulus(pseudo_z-z)=" << aurostd::modulus(pseudo_z - z) << endl;
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_); //CO20190226
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_); //CO20190226
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3114,7 +3114,7 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // START - rotate structure
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(aurostd::modulus(xstr_bulk.origin)>_ZERO_TOL_){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"xstr_bulk.origin!=0",_VALUE_ERROR_);}  //this will screw up Rotate()
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(aurostd::modulus(xstr_bulk.origin)>_ZERO_TOL_){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"xstr_bulk.origin!=0",_VALUE_ERROR_);}  //this will screw up Rotate()
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " rotating structure" << endl;}
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  xstr_slab_newbasis=Rotate(xstr_bulk,rotation); //WARNING! check if structure has origin, this will screw things up
@@ -3138,10 +3138,10 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    cerr << __AFLOW_FUNC__ << " vol_pre=" << vol_pre << endl;cerr << __AFLOW_FUNC__ << " vol_post=" << vol_post << endl;
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(aurostd::modulus(alat_pre),aurostd::modulus(alat_post))){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lattice vector a length changed",_VALUE_ERROR_);}
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(aurostd::modulus(blat_pre),aurostd::modulus(blat_post))){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lattice vector b length changed",_VALUE_ERROR_);}
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(aurostd::modulus(clat_pre),aurostd::modulus(clat_post))){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"lattice vector c length changed",_VALUE_ERROR_);}
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(vol_pre,vol_post)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"volume changed",_VALUE_ERROR_);}
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(aurostd::modulus(alat_pre),aurostd::modulus(alat_post))){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"lattice vector a length changed",_VALUE_ERROR_);}
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(aurostd::modulus(blat_pre),aurostd::modulus(blat_post))){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"lattice vector b length changed",_VALUE_ERROR_);}
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(aurostd::modulus(clat_pre),aurostd::modulus(clat_post))){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"lattice vector c length changed",_VALUE_ERROR_);}
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(!aurostd::isequal(vol_pre,vol_post)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"volume changed",_VALUE_ERROR_);}
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190423 - already done in Rotate()]xstr_slab_newbasis.FixLattices();
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //[CO20190423 - already done in Rotate()]const xmatrix<double>& f2c=xstr_slab_newbasis.f2c;
@@ -3153,7 +3153,7 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(check_min_dist){ //sanity check as we rotate structure/atoms
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    min_dist=xstr_slab_newbasis.MinDist();
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(0){  //WRONG, we are simply undoing the rotation we applied previously
@@ -3184,7 +3184,7 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      cerr << __AFLOW_FUNC__ << " sym_eps=" << sym_eps << endl;
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      cerr << __AFLOW_FUNC__ << " skew=" << skew << endl;
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    }
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(volume_original,volume_new)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"volume changed",_VALUE_ERROR_);}
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(volume_original,volume_new)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"volume changed",_VALUE_ERROR_);}
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    //now we can convert cpos for xstr_slab_newbasis.lattice
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    deque<_atom> atoms=xstr_slab_newbasis.atoms;
@@ -3200,7 +3200,7 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(check_min_dist){ //sanity check as we rotate structure/atoms
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      min_dist=xstr_slab_newbasis.MinDist();
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    }
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
@@ -3246,7 +3246,7 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(check_min_dist){ //sanity check as we rotate structure/atoms
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    min_dist=xstr_slab.MinDist();
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  //clean up structure
@@ -3288,14 +3288,14 @@ namespace slab {
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  if(check_min_dist){ //sanity check as we rotate structure/atoms
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    min_dist=xstr_slab.MinDist();
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]    if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  }
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  // STOP - add vacuum
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  
-  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message << "Slab (rigid rotation) along (" << aurostd::joinWDelimiter(hkl_i,",") <<") constructed";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+  //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  message << "Slab (rigid rotation) along (" << aurostd::joinWDelimiter(hkl_i,",") <<") constructed";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]  return xstr_slab;
   //[CO20190808 - OBSOLETE: does not work, need to redefine lattice vectors, use CreateSlab_SurfaceLattice() instead]}
@@ -3425,7 +3425,7 @@ namespace slab {
       }
     }
 
-    if(adiff_max==AUROSTD_MAX_DOUBLE){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Cannot find acceptable v3",_INPUT_ERROR_);}
+    if(adiff_max==AUROSTD_MAX_DOUBLE){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Cannot find acceptable v3",_INPUT_ERROR_);}
 
     //try linear combinations with v1, v2
     bool try_once=true;
@@ -3507,12 +3507,12 @@ namespace slab {
           if(LDEBUG){cerr << __AFLOW_FUNC__ << " S=" << endl;cerr << S << endl;}
           Q_tmp=Q*S;
           lat_tmp=S*lattice_slab_newbasis;
-          if(!aurostd::isequal(lattice_slab_origbasis,Q_tmp*lat_tmp)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"S matrix is not a viable triple-product correction",_RUNTIME_ERROR_);}
+          if(!aurostd::isequal(lattice_slab_origbasis,Q_tmp*lat_tmp)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"S matrix is not a viable triple-product correction",_RUNTIME_ERROR_);}
           trip_prod=det(lat_tmp);
           if(trip_prod>=0.0){Q=Q_tmp;lattice_slab_newbasis=lat_tmp;break;}
         }
       }
-      if(det(lattice_slab_newbasis)<0.0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Triple product of lattice remains negative despite attempts to rectify",_INPUT_ERROR_);}
+      if(det(lattice_slab_newbasis)<0.0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Triple product of lattice remains negative despite attempts to rectify",_INPUT_ERROR_);}
     }
 
     lattice_slab_newbasis=aurostd::roundoff(lattice_slab_newbasis,1e-12); //even smaller than _ZERO_TOL_  //do round-off - here it is important because householder introduces some noise (order of machine epsilon)
@@ -3616,7 +3616,7 @@ namespace slab {
       l_i=aurostd::string2utype<int>(tokens[2]);
     }
     hkl[1]=h_i;hkl[2]=k_i;hkl[3]=l_i;
-    if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"hkl=(0,0,0)",_INPUT_ERROR_);}
+    if(hkl[1]==0 && hkl[2]==0 && hkl[3]==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"hkl=(0,0,0)",_INPUT_ERROR_);}
     string total_layers_string=vpflow.getattachedscheme("CREATE_SLAB::TOTAL_LAYERS");
     if(aurostd::isfloat(total_layers_string)){
       int _total_layers=aurostd::string2utype<int>(total_layers_string);
@@ -3633,9 +3633,9 @@ namespace slab {
     message.precision(prec);
     message.unsetf(std::ios_base::floatfield);
 
-    message << "plane_interest=" << hkl;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-    message << "total_layers=" << total_layers;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-    message << "vacuum=" << vacuum;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "plane_interest=" << hkl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "total_layers=" << total_layers;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "vacuum=" << vacuum;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
     message.precision(prec_original); //set back
     message.flags(ff_original); //set back
@@ -3700,12 +3700,12 @@ namespace slab {
       cerr << __AFLOW_FUNC__ << " skew=" << skew << endl;
     }
 
-    message << "Constructing slab (surface lattice) along (" << aurostd::joinWDelimiter(hkl_i,",") <<")";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "Constructing slab (surface lattice) along (" << aurostd::joinWDelimiter(hkl_i,",") <<")";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
     if(check_min_dist){ //sanity check as we rotate structure/atoms
       min_dist=xstr_bulk.MinDist();
       if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
+      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3724,7 +3724,7 @@ namespace slab {
     //test that we can go back and forth between n and hkl
     if(!Normal2HKLPlane(xstr_bulk.lattice,n_i,hkl)){
       message << "Cannot convert normal -> (hkl): normal=" << n_i;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
     }
     if(LDEBUG) {
       cerr << __AFLOW_FUNC__ << " hkl_i=" << hkl_i << endl;
@@ -3733,7 +3733,7 @@ namespace slab {
     }
     if(!aurostd::isequal(hkl_i,hkl)){
       message << "Normal2HKLPlane() function failed on hkl_i=" << hkl_i << " (Normal2HKLPlane(n_i=" << n_i << ")=" << hkl << ")" << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
     }
     //test that hkl plane is orthogonal to n
     intercepts=getHKLPlaneIntercepts(xstr_bulk.lattice,hkl_i);
@@ -3746,7 +3746,7 @@ namespace slab {
     n_test=HKLPlane2Normal(xstr_bulk.lattice,hkl_test);
     if(!Normal2HKLPlane(xstr_bulk.lattice,n_test,hkl)){
       message << "Cannot convert normal -> (hkl): normal=" << n_test;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
     }
     if(LDEBUG) {
       cerr << __AFLOW_FUNC__ << " hkl_test=" << hkl_test << endl;
@@ -3755,7 +3755,7 @@ namespace slab {
     }
     if(!aurostd::isequal(hkl_test,hkl)){
       message << "Normal2HKLPlane() function failed on hkl=" << hkl_test << " (Normal2HKLPlane(n_i=" << n_test << ")=" << hkl << ")" << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
     }
     //test that hkl plane is orthogonal to n
     intercepts=getHKLPlaneIntercepts(xstr_bulk.lattice,hkl_test);
@@ -3772,7 +3772,7 @@ namespace slab {
     if(check_min_dist){ //sanity check as we rotate structure/atoms
       min_dist=xstr_bulk.MinDist();
       if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
+      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
     }
 
     //test whether fpos/cpos work
@@ -3781,8 +3781,8 @@ namespace slab {
     for(uint i=0;i<xstr_bulk.atoms.size();i++){
       fpos=xstr_bulk.c2f*xstr_bulk.atoms[i].cpos;
       cpos=xstr_bulk.f2c*xstr_bulk.atoms[i].fpos;
-      if(!aurostd::isequal(xstr_bulk.atoms[i].fpos,fpos)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"atoms[i="+aurostd::utype2string(i)+"].fpos mismatch",_INPUT_ERROR_);}
-      if(!aurostd::isequal(xstr_bulk.atoms[i].cpos,cpos)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"atoms[i="+aurostd::utype2string(i)+"].cpos mismatch",_INPUT_ERROR_);}
+      if(!aurostd::isequal(xstr_bulk.atoms[i].fpos,fpos)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"atoms[i="+aurostd::utype2string(i)+"].fpos mismatch",_INPUT_ERROR_);}
+      if(!aurostd::isequal(xstr_bulk.atoms[i].cpos,cpos)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"atoms[i="+aurostd::utype2string(i)+"].cpos mismatch",_INPUT_ERROR_);}
     }
 
     stringstream title;
@@ -3861,7 +3861,7 @@ namespace slab {
     if(check_min_dist){ //sanity check as we rotate structure/atoms
       min_dist=xstr_slab_newbasis.MinDist();
       if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
+      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3906,7 +3906,7 @@ namespace slab {
     if(check_min_dist){ //sanity check as we rotate structure/atoms
       min_dist=xstr_slab.MinDist();
       if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
+      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
     }
 
     //clean up structure
@@ -3941,14 +3941,14 @@ namespace slab {
     if(check_min_dist){ //sanity check as we rotate structure/atoms
       min_dist=xstr_slab.MinDist();
       if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
+      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // STOP - add vacuum
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    message << "Slab (surface lattice) along (" << aurostd::joinWDelimiter(hkl_i,",") <<") constructed";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "Slab (surface lattice) along (" << aurostd::joinWDelimiter(hkl_i,",") <<") constructed";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
     return xstr_slab;
   }

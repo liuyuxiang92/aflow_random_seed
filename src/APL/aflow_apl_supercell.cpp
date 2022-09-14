@@ -127,7 +127,7 @@ namespace apl {
     string message = "";
     if (!aurostd::EFileExist(filename)) {
       message = "Could not find file " + filename + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
 
     // Read data
@@ -153,7 +153,7 @@ namespace apl {
     }
     if (iline == nlines) {
       message = "SUPERCELL tag not found or incomplete.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     }
 
     // Structure
@@ -171,7 +171,7 @@ namespace apl {
     }
     if (iline == nlines) {
       message = "INPUT_STRUCTURE tag not found or incomplete.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     }
 
     // Build
@@ -216,7 +216,7 @@ namespace apl {
     if (VERBOSE) {
       stringstream message;
       message << "Estimating the symmetry of structure and calculating the input structure. Please be patient."; //primitive cell." << apl::endl; //CO20180216 - we do NOT primitivize unless requested via [VASP_FORCE_OPTION]CONVERT_UNIT_CELL
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     }
     calculateWholeSymmetry(_inStructure, VERBOSE);
     if(LDEBUG){ //CO20190218
@@ -295,7 +295,7 @@ namespace apl {
     if (!pflow::PerformFullSymmetry(xstr,*p_FileMESSAGE,_directory,kflags,VERBOSE,*p_oss)) //CO20181226
     { //CO20200106 - patching for auto-indenting
       string message = "Symmetry routine failed.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
   }
 
@@ -329,19 +329,19 @@ namespace apl {
     stringstream message;
     if (!_initialized) {
       message << "Not initialized.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
 
     xvector<int> dims(3);
     string method = opts.getattachedscheme("SUPERCELL::METHOD");
     if (method.empty()) {
       message << "Supercell method empty.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     string value = opts.getattachedscheme("SUPERCELL::VALUE");
     if (value.empty()) {
       message << "Supercell value empty.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     if (method == "SUPERCELL") {
       vector<int> tokens;
@@ -362,7 +362,7 @@ namespace apl {
         message << "Radius=" << aurostd::PaddedPOST(aurostd::utype2string<double>(radius, 3), 4)
           << " supercell=" << dims[1] << "x" << dims[2] << "x" << dims[3]
           << " natoms=" << natoms;
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
       }
     } else if (method == "MINATOMS_UNIFORM") {
       int minatoms = aurostd::string2utype<int>(value);
@@ -377,19 +377,19 @@ namespace apl {
         message << "Ni=" << Ni
           << " supercell=" << Ni << "x" << Ni << "x" << Ni
           << " natoms=" << natoms;
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
       }
     } else if (method == "SHELLS") {
       int shells = aurostd::string2utype<int>(value);
       if (opts.flag("SUPERCELL::VERBOSE")) {
         message << "Searching for suitable cell to handle " << shells << " shells...";
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
       }
       bool get_full_shells = true;
       dims = getSupercellDimensionsShell(shells, get_full_shells);
     } else {
       message << "Unknown supercell method " + method + ".";
-      aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+      aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     return dims;
   }
@@ -413,7 +413,7 @@ namespace apl {
     stringstream message;
     if (!_initialized) {
       message << "Not initialized.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     scell_dim = dims;
     _derivative_structure = ((dims.rows == 9) || !aurostd::identical(dims));
@@ -426,7 +426,7 @@ namespace apl {
       if (VERBOSE) {
         message << "The supercell is going to build as " << dimstring;
         message << " (" << (dims[1] * dims[2] * dims[3] * _inStructure.atoms.size()) << " atoms).";
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
       }
     } else {
       xmatrix<int> scmat = aurostd::reshape(dims, 3, 3);
@@ -435,13 +435,13 @@ namespace apl {
       if (VERBOSE) {
         message << "The supercell is going to build as [" << dimstring << "]";
         message << " (" << (aurostd::det(scmat) * _inStructure.atoms.size()) << " atoms).";
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
       }
     }
 
     if (VERBOSE && _derivative_structure) {
       message << "Derivative structure detected, be patient as we calculate the symmetry of the supercell.";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     }
 
     // Get supercell
@@ -454,7 +454,7 @@ namespace apl {
     // OK.
     if (VERBOSE) {
       message << "Supercell successfully created.";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     }
     _isConstructed = TRUE;
 
@@ -776,7 +776,7 @@ namespace apl {
       // something went seriously wrong
       string message = "Mapping between original structure and supercell failed.";
       message += " This is likely a bug in the code.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
   }
 
@@ -976,7 +976,7 @@ namespace apl {
       if (countshell < MAX_NN_SHELLS) {
         stringstream message;
         message << "The supercell is too small to set up shell restrictions for " << MAX_NN_SHELLS << " shells.";
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         break;
       }
       shell_radii[iat] = distances[at];
@@ -1088,7 +1088,7 @@ namespace apl {
 #ifndef __OPTIMIZE
     if (i >= (int)_scStructure.iatoms.size()) {
       string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
 #endif
     return _scStructure.iatoms[i].size();
@@ -1101,7 +1101,7 @@ namespace apl {
 #ifndef __OPTIMIZE
     if (i >= (int)_scStructure.iatoms.size()) {
       string message = "Wrong index " + aurostd::utype2string<int>(i) + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
 #endif
     return _scStructure.iatoms[i][0];
@@ -1114,12 +1114,12 @@ namespace apl {
 #ifndef __OPTIMIZE
     if (i >= (int)_scStructure.iatoms.size()) {
       string message = "Wrong index[1] " + aurostd::utype2string<int>(i) + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
 
     if (j >= (int)_scStructure.iatoms[i].size()) {
       string message = "Wrong index[2] " + aurostd::utype2string<int>(i) + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
 #endif
     return _scStructure.iatoms[i][j];
@@ -1142,12 +1142,12 @@ namespace apl {
 #ifndef __OPTIMIZE
     if (atomID >= (int)_scStructure.atoms.size()) {
       string message = "Wrong atomID index " + aurostd::utype2string<int>(atomID) + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
 
     if (centerID >= (int)_scStructure.atoms.size()) {
       string message = "Wrong centerID index " + aurostd::utype2string<int>(centerID) + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
 #endif
 
@@ -1163,7 +1163,7 @@ namespace apl {
     _atom rotatedAtom;
     if (!SYM::ApplyAtomValidate(_scStructure.atoms[atomID], rotatedAtom, symOp, _scStructure, _skew, TRUE, FALSE, _sym_eps)) {
       string message = "Illegitimate mapping.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     // Find its id...
@@ -1188,7 +1188,7 @@ namespace apl {
       }
 #endif
       string message = "Mapping failed.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     // Move center back to zero atom...
@@ -1214,12 +1214,12 @@ namespace apl {
 #ifndef __OPTIMIZE
     if (atomID >= (int)_scStructure.atoms.size()) {
       string message = "Wrong atomID index " + aurostd::utype2string<int>(atomID) + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
 
     if (centerID >= (int)_scStructure.atoms.size()) {
       string message = "Wrong centerID index " + aurostd::utype2string<int>(centerID) + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
 #endif
 
@@ -1231,7 +1231,7 @@ namespace apl {
       }
       // If the code makes it past the for-loop, the mapping failed
       string message = "Mapping failed.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     // Get the center atom center...
@@ -1244,7 +1244,7 @@ namespace apl {
       //DX _atom rotatedAtom = SYM::ApplyAtom(_scStructure.atoms[l], symOp, _scStructure, TRUE, FALSE, _derivative_structure);  //CO no roff
       if (!SYM::ApplyAtomValidate(_scStructure.atoms[l], rotatedAtom, symOp, _scStructure, _skew, TRUE, FALSE, _sym_eps)) {
         string message = "Illegitimate mapping.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
       if (SYM::FPOSMatch(rotatedAtom.fpos, _scStructure.atoms[atomID].fpos, _scStructure.lattice, _scStructure.f2c, _skew, _sym_eps)) {  //CO NEW, default to symmetry tolerance
         break;
@@ -1265,7 +1265,7 @@ namespace apl {
       }
 #endif
       string message = "Mapping failed.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     // Move center back to zero atom...
@@ -1289,12 +1289,12 @@ namespace apl {
 #ifndef __OPTIMIZE
     if (whichAtomID >= (int)_scStructure.atoms.size()) {
       string message = "Wrong atom1ID index " + aurostd::utype2string<int>(whichAtomID) + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
 
     if (toAtomID >= (int)_scStructure.atoms.size()) {
       string message = "Wrong atom2ID index " + aurostd::utype2string<int>(toAtomID) + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
 #endif
 
@@ -1305,7 +1305,7 @@ namespace apl {
       symPool = &_scStructure.fgroup;
     else {
       string message = "Unknown group type.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     // Apply all symmetry operations on atom1 and find which one produce atom2
@@ -1316,7 +1316,7 @@ namespace apl {
       //DX                               _scStructure, TRUE, FALSE, _derivative_structure);  //CO no roff
       if (!SYM::ApplyAtomValidate(_scStructure.atoms[whichAtomID], newAtom, (*symPool)[iSymOp], _scStructure, _skew, TRUE, FALSE, _sym_eps)) {
         string message = "Illegitimate mapping.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
       if (SYM::FPOSMatch(newAtom.fpos, _scStructure.atoms[toAtomID].fpos, _scStructure.lattice, _scStructure.f2c, _skew, _sym_eps)) {  //CO NEW, default to symmetry tolerance
         break;
@@ -1349,7 +1349,7 @@ namespace apl {
       }
 #endif
       string message = "Mapping failed.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
 #if MAP_VERBOSE
@@ -1433,10 +1433,10 @@ namespace apl {
   void Supercell::getFullBasisAGROUP() {
     string message = "Calculating the full basis for the site point groups of the supercell.";
     message += " This may take a few minutes for high-symmetry structures.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     if (!SYM::CalculateSitePointGroup_EquivalentSites(_scStructure, _sym_eps)) {
       message = "Could not calculate the bases of the site point groups.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
   }
 
@@ -1483,7 +1483,7 @@ namespace apl {
 #ifndef __OPTIMIZE
     if (i >= (int)_scStructure.iatoms.size()) {
       string message = "Wrong index " + aurostd::utype2string<int> (i) + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
 #endif
     return _scStructure.atoms[_scStructure.iatoms[i][0]].cleanname;
@@ -1496,7 +1496,7 @@ namespace apl {
 #ifndef __OPTIMIZE
     if (i >= (int)_scStructure.iatoms.size()) {
       string message = "Wrong index " + aurostd::utype2string<int> (i) + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
 #endif
     //return( GetAtomMass(_scStructure.atoms[_scStructure.iatoms[i][0]].cleanname) * KILOGRAM2AMU ); //JAHNATEK ORIGINAL
@@ -1505,7 +1505,7 @@ namespace apl {
     double mass = GetAtomMass(_scStructure.atoms[_scStructure.iatoms[i][0]].atomic_number);  //ME20190111
     if (mass == NNN) {
       string message = "Unknown atom types.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     return mass * KILOGRAM2AMU;
     //CO END
@@ -1517,7 +1517,7 @@ namespace apl {
 #ifndef __OPTIMIZE
     if (i >= (int)_scStructure.atoms.size()) {
       string message = "Wrong index " + aurostd::utype2string<int> (i) + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
 #endif
     //return (GetAtomMass(_scStructure.atoms[i].cleanname) * KILOGRAM2AMU); ME20190111 - too slow since version 3.216
@@ -1531,7 +1531,7 @@ namespace apl {
 #ifndef __OPTIMIZE
     if (i >= (int)_scStructure.atoms.size()) {
       string message = "Wrong index " + aurostd::utype2string<int> (i) + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
 #endif
     return ((int)GetAtomNumber(_scStructure.atoms[i].cleanname));

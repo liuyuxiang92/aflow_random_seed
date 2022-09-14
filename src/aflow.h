@@ -585,7 +585,14 @@ inline std::string aflowFunc(const std::string& pretty_func, const std::string& 
   return XPID + pretty_func.substr(begin, end - begin) + func + "():";
 }
 
+// SD+HE20220914
+// Get filename and line number
+inline std::string aflowFile(const std::string &file_name, const size_t line_number ){
+  return file_name + ":" + std::to_string(line_number);
+}
+
 #define __AFLOW_FUNC__ aflowFunc(__PRETTY_FUNCTION__, __func__)
+#define __AFLOW_FILE__ aflowFile(__FILE__, __LINE__)
 
 //DX20180131 - add symmetry definitions - START
 // symmetry 

@@ -976,10 +976,9 @@ namespace pflow {
       bool no_scan,
       int setting){
 
-    string function_name = XPID + "pflow::PrintData():";
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    if(LDEBUG) cerr << function_name << " BEGIN" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " BEGIN" << endl;
 
     stringstream oss;
     oss.setf(std::ios::fixed,std::ios::floatfield);
@@ -1681,7 +1680,6 @@ namespace pflow {
 namespace pflow {
   string PrintRealLatticeData(const xstructure& xstr, aurostd::xoption& vpflow, const string& smode, filetype ftype, bool standalone, bool already_calculated, double sym_eps){
 
-    string function_name = XPID + "pflow::PrintRealLatticeData():";
 
     // ---------------------------------------------------------------------------
     // calculate the real lattice symmetry if not already calculated
@@ -1811,7 +1809,7 @@ namespace pflow {
       if(standalone) { ss_output << endl; }
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Format type is not supported.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
     }
 
     // ---------------------------------------------------------------------------
@@ -1856,7 +1854,6 @@ namespace pflow {
 namespace pflow {
   string PrintLatticeLatticeData(const xstructure& xstr, aurostd::xoption& vpflow, filetype ftype, bool standalone, bool already_calculated, double sym_eps){
 
-    string function_name = XPID + "pflow::PrintLatticeLatticeData():";
 
     // ---------------------------------------------------------------------------
     // calculate the real lattice symmetry if not already calculated
@@ -1911,7 +1908,7 @@ namespace pflow {
 
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Format type is not supported.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
     }
 
     // ---------------------------------------------------------------------------
@@ -1946,7 +1943,6 @@ namespace pflow {
 namespace pflow {
   string PrintCrystalPointGroupData(const xstructure& xstr, aurostd::xoption& vpflow, filetype ftype, bool standalone, bool already_calculated, double sym_eps){
 
-    string function_name = XPID + "pflow::PrintCrystalPointGroupData():";
 
     // ---------------------------------------------------------------------------
     // calculate the real lattice symmetry (contains point group information)
@@ -2050,7 +2046,7 @@ namespace pflow {
 
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Format type is not supported.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
     }
 
     // ---------------------------------------------------------------------------
@@ -2097,7 +2093,6 @@ namespace pflow {
 namespace pflow {
   string PrintReciprocalLatticeData(const xstructure& xstr, aurostd::xoption& vpflow, filetype ftype, bool standalone, bool already_calculated, double sym_eps){
 
-    string function_name = XPID + "pflow::PrintReciprocalLatticeData():";
 
     // ---------------------------------------------------------------------------
     // calculate the reciprocal lattice symmetry if not already calculated
@@ -2172,7 +2167,7 @@ namespace pflow {
       if(standalone) { ss_output << endl; }
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Format type is not supported.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
     }
 
     // ---------------------------------------------------------------------------
@@ -2209,7 +2204,6 @@ namespace pflow {
 namespace pflow {
   string PrintSuperlatticeData(const xstructure& xstr, aurostd::xoption& vpflow, filetype ftype, bool standalone, bool already_calculated, double sym_eps){
 
-    string function_name = XPID + "pflow::PrintSuperlatticeData():";
 
     // ---------------------------------------------------------------------------
     // calculate the superlattice symmetry if not already calculated
@@ -2329,7 +2323,7 @@ namespace pflow {
       if(standalone) { ss_output << endl; }
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Format type is not supported.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
     }
 
     // ---------------------------------------------------------------------------
@@ -2903,7 +2897,7 @@ void PrintMSI(const xstructure& str, ostream& oss) {
   for(uint i=0;i<sstr.atoms.size();i++) {
     sstr.atoms.at(i).CleanName();
     if(sstr.atoms.at(i).atomic_number<1) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"atomic_number not found: sstr.atoms.at("+aurostd::utype2string(i)+").cleanname="+sstr.atoms.at(i).cleanname,_INPUT_ILLEGAL_);  //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"atomic_number not found: sstr.atoms.at("+aurostd::utype2string(i)+").cleanname="+sstr.atoms.at(i).cleanname,_INPUT_ILLEGAL_);  //CO20200624
     }
   }
 
@@ -3554,10 +3548,9 @@ namespace pflow {
       int setting,
       bool suppress_Wyckoff) {
 
-    string function_name = XPID + "pflow::PrintSGData():";
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    if(LDEBUG){ cerr << function_name << " BEGIN" << endl; }
+    if(LDEBUG){ cerr << __AFLOW_FUNC__ << " BEGIN" << endl; }
 
     // ---------------------------------------------------------------------------
     // calculate the space group symmetry if not already calculated
@@ -3842,10 +3835,9 @@ namespace pflow {
       bool no_scan,
       int setting) {
 
-    string function_name = XPID + "pflow::PrintWyckoffData():";
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    if(LDEBUG){ cerr << function_name << " BEGIN" << endl; }
+    if(LDEBUG){ cerr << __AFLOW_FUNC__ << " BEGIN" << endl; }
 
     // ---------------------------------------------------------------------------
     // calculate the space group symmetry if not already calculated

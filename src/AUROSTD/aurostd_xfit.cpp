@@ -214,7 +214,7 @@ namespace aurostd {
     // no root within a given interval
     if (sign(f_at_left_end) == sign(f_at_right_end)) {
       string message = "No root within the given interval";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     if (LDEBUG){
@@ -255,7 +255,7 @@ namespace aurostd {
     // utype-check that the convergence criterion was reached
     if (std::abs(f_at_middle) > tol) {
       string message = "Bisection method did not converge";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     if (LDEBUG) cerr << __AFLOW_FUNC__ << " end" << std::endl;
@@ -284,23 +284,23 @@ namespace aurostd {
       if (_w(i) < (utype)0.0) {
         stringstream message;
         message << "Negative weight i=" << i;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
       }
       else if (std::isnan(_w(i))) {
         stringstream message;
         message << "NaN weight i=" << i;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
       }
       else if (aurostd::abs(_w(i)) == (utype)INFINITY) {
         stringstream message;
         message << "Inf weight i=" << i;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
       }
       wtot += _w(i);
     }
     if (aurostd::isequal(wtot, (utype)0.0)) {
       string message = "All the weights cannot be zero";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     xmatrix<utype> VM = Vandermonde_matrix(x, n + 1);
     if (LDEBUG) {cerr << "VM old=" << VM << endl;}
@@ -331,7 +331,7 @@ namespace aurostd {
   template<class utype> xmatrix<utype> companion_matrix(const xvector<utype>& p) {
     if (p(p.urows) == 0.0) {
       string message = "Leading polynomial coefficient is zero";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     xmatrix<utype> CM(p.urows - 1, p.urows - 1, p.lrows, p.lrows);
     for (int i = p.lrows; i < p.urows - 1; i++) {CM(i, i + 1) = 1.0;}
@@ -357,12 +357,12 @@ namespace aurostd {
       if (std::isnan(p(i))) {
         stringstream message;
         message << "NaN in polynomial coefficient i=" << i;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
       }
       else if (aurostd::abs(p(i)) == (utype)INFINITY) {
         stringstream message;
         message << "Inf in polynomial coefficient i=" << i;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
       }
     }
     aurostd::eigen(companion_matrix(p), rr, ri);
@@ -396,7 +396,7 @@ namespace aurostd {
     if (aurostd::isequal(aurostd::sign(f(a)), aurostd::sign(f(b)))) {
       stringstream message;
       message << "Function evaluation at the endpoints have the same sign, F(a)=" << f(a) << " F(b)=" << f(b);
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     sa = a;
     zero = b;
@@ -494,7 +494,7 @@ namespace aurostd {
     if (n != vf.size() || n != jac[0].size() || n != jac.size()) {
       string message;
       message = "System of equations is not square";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     xvector<double> x0 = _x0, f(n);
     xmatrix<double> J(n, n), iJ, I = aurostd::identity(J);
@@ -632,7 +632,7 @@ namespace aurostd {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     if ((uint)_x.rows != df.size()) {
       string message = "Number of variables and derivatives must be equal";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     double dx = 10.0 * tol, df_approx, df_exact;
     xvector<double> x1 = _x, x2 = _x;

@@ -70,14 +70,14 @@ namespace aflowlib {
               for(uint m=0;m<tokens.size();m++) {
                 string digits_jklm="aflow:"+tokens.at(j)+tokens.at(k)+"/"+tokens.at(l)+tokens.at(m)+"/";
                 // 	acout << __AFLOW_FUNC__ << " TESTING /common/" << vlib.at(i) << "/RAW/"  << digits_jklm << "*.json links" << endl;
-                //	acout << __AFLOW_FUNC__ << " TIME" << Message(_AFLOW_FILE_NAME_,aflags,"user,host,time") << endl;
+                //	acout << __AFLOW_FUNC__ << " TIME" << Message(__AFLOW_FILE__,aflags,"user,host,time") << endl;
                 aurostd::string2vectorstring(aurostd::execute2string("find /common/AUID/"+digits_jklm+"* -name RAW"),list2found);
-                //	acout << __AFLOW_FUNC__ << " TIME" << Message(_AFLOW_FILE_NAME_,aflags,"user,host,time") << endl;
+                //	acout << __AFLOW_FUNC__ << " TIME" << Message(__AFLOW_FILE__,aflags,"user,host,time") << endl;
                 //	acout << __AFLOW_FUNC__ << " list2found.size()=" << list2found.size() << endl;
                 //	acout << __AFLOW_FUNC__ << " ordering " << endl;
                 sort(list2found.begin(),list2found.end());
                 //	acout << __AFLOW_FUNC__ << " list2found.size()=" << list2found.size() << endl;
-                //  acout << __AFLOW_FUNC__ << " TIME" << Message(_AFLOW_FILE_NAME_,aflags,"user,host,time") << endl;
+                //  acout << __AFLOW_FUNC__ << " TIME" << Message(__AFLOW_FILE__,aflags,"user,host,time") << endl;
                 for(uint n=0;n<list2found.size();n++) {
                   AUID_found++;
                   string filename_auid_json=list2found.at(n),filename_json;
@@ -568,7 +568,7 @@ namespace aflowlib {
       string auid=entry_tmp.auid;
       if(auid.size()!=22) {
         string message = "error on size of auid=";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
       directory_old_LIB_AUID=init::AFLOW_Projects_Directories("AUID")+"/LIB";
       directory_old_RAW_AUID=init::AFLOW_Projects_Directories("AUID")+"/RAW";

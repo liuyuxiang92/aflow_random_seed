@@ -117,7 +117,7 @@ namespace aurostd {
 
   xcombos& xcombos::operator++() {  //remember, this is PREFIX (faster than POSTFIX)
     if(!m_initialized) {
-      throw xerror(_AFLOW_FILE_NAME_,"xcombos::operator++()", "Cannot increment uninitialized xcombos class.",  _RUNTIME_INIT_);
+      throw xerror(__AFLOW_FILE__,"xcombos::operator++()", "Cannot increment uninitialized xcombos class.",  _RUNTIME_INIT_);
     }
     if(m_mode=='P') {incrementPermutation();}
     else {
@@ -279,7 +279,7 @@ namespace aurostd {
     std::vector<int> v_indices=m_current;
     if((m_mode=='C') && !(m_repeat)){v_indices.clear();v_indices=getIndices();} // combo indices
     for(uint i=0;i<v_indices.size();i++){
-      if(v_indices[i]>=(int)v_items.size()){throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Invalid index",_INDEX_MISMATCH_);}
+      if(v_indices[i]>=(int)v_items.size()){throw xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index",_INDEX_MISMATCH_);}
       v_items_new.push_back(v_items[v_indices[i]]);
     }
     return v_items_new;
@@ -290,7 +290,7 @@ namespace aurostd {
     if(m_mode!='E'){return v_items_new;} //only applies to enumerations
     std::vector<int> v_indices=m_current;
     for(uint i=0;i<v_indices.size();i++){
-      if(v_indices[i]>=(int)v_items[i].size()){throw xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Invalid index",_INDEX_MISMATCH_);}
+      if(v_indices[i]>=(int)v_items[i].size()){throw xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index",_INDEX_MISMATCH_);}
       v_items_new.push_back(v_items[i][v_indices[i]]);
     }
     return v_items_new;
@@ -347,11 +347,11 @@ namespace aurostd {
         }
       }
       if(count>safety){
-        throw xerror(_AFLOW_FILE_NAME_,"xcombos::incrementPermutation()", "[HEAP] Uncontrolled while loop. Algorithm is not working as expected.",  _RUNTIME_ERROR_);
+        throw xerror(__AFLOW_FILE__,"xcombos::incrementPermutation()", "[HEAP] Uncontrolled while loop. Algorithm is not working as expected.",  _RUNTIME_ERROR_);
       }
     }
     else{ //DX2020111
-      throw xerror(_AFLOW_FILE_NAME_,"xcombos::incrementPermutation()", "Invalide algorithm type, only Shen (shen_alg_xcombos) and Heap's (heap_alg_xcombos) algorithms are available.",  _INPUT_ERROR_);
+      throw xerror(__AFLOW_FILE__,"xcombos::incrementPermutation()", "Invalide algorithm type, only Shen (shen_alg_xcombos) and Heap's (heap_alg_xcombos) algorithms are available.",  _INPUT_ERROR_);
     }
   }
 

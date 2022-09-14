@@ -43,7 +43,7 @@ namespace cce {
       string python_directory=directory + '/' + aflow_cce_python_subdir;
       aurostd::DirectoryMake(python_directory);
       string aflow_cce_python=AFLOW_CCE_PYTHON_PY;
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Writing out python script to: "+python_directory, oss, _LOGGER_NOTICE_);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Writing out python script to: "+python_directory, oss, _LOGGER_NOTICE_);
       stringstream output;
       output << aflow_cce_python;
       aurostd::stringstream2file(output,python_directory+'/'+"aflow_cce_python.py");
@@ -60,7 +60,7 @@ namespace cce {
       string python_directory=directory + '/' + aflow_cce_python_subdir;
       aurostd::DirectoryMake(python_directory);
       string aflow_cce_python=AFLOW_CCE_PYTHON_PY;
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Writing out python script to: "+python_directory, oss, _LOGGER_NOTICE_);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Writing out python script to: "+python_directory, oss, _LOGGER_NOTICE_);
       stringstream output;
       output << aflow_cce_python;
       aurostd::stringstream2file(output,python_directory+'/'+"aflow_cce_python.py");
@@ -268,7 +268,7 @@ namespace cce {
     string functional=get_functional_from_aflow_in_outcar(structure, aflowin_file, outcar_file);
     if (functional.empty()) {
       message << " Functional cannot be determined from aflow.in. Corrections are available for PBE, LDA, SCAN, or PBE+U:ICSD.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     }
     return calculate_corrections(structure, functional, directory_path); // directory path must be propagated if ox. states are determined from Bader charges
   } // main CCE function for calling inside AFLOW with directory path
@@ -298,7 +298,7 @@ namespace cce {
     }
     if (!aurostd::WithinList(CCE_vallowed_functionals, functional) || get_offset(functional) == -1) {
       message << " Unknown functional " << functional << ". Please choose PBE, LDA, or SCAN.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     }
     cce_vars.vfunctionals.push_back(functional);
     cce_vars.offset.push_back(get_offset(functional));
@@ -308,7 +308,7 @@ namespace cce {
     // print oxidation_numbers
     message << print_output_oxidation_numbers(structure_to_use, cce_vars);
     _aflags aflags;aflags.Directory=aurostd::getPWD();
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
     // cce_vars.cce_corrections can be returned directly since there is always only one functional for this CCE function
     return cce_vars.cce_correction;
   } // main CCE function for calling inside AFLOW
@@ -325,7 +325,7 @@ namespace cce {
     // if there is only one species, it must be an elemental phase and is hence not correctable
     if (structure.species.size() == 1){
       message << " BAD NEWS: Only one species found. Enthalpies of elemental systems cannot be corrected with the CCE methodology.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
     }
     // set flag that full correction scheme is run and not just determination of ox. nums. or num. anion neighbors
     cce_flags.flag("RUN_FULL_CCE",TRUE);
@@ -521,13 +521,13 @@ namespace cce {
     _aflags aflags;aflags.Directory=aurostd::getPWD();
     if(functionals_input_str.empty() && cce_vars.enthalpies_dft.size() == 1){
       message << " Setting functionals=PBE since only 1 DFT formation enthalpy is provided and PBE is the default functional!";
-      pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+      pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       cce_vars.vfunctionals.push_back("PBE");
       // otherwise if sizes of provided DFT formation enthalpies and functionals do not match, throw error
       // if only functional argument is set corrections should only be returned for desired functional
     } else if(cce_vars.enthalpies_dft.size()!=cce_vars.vfunctionals.size() && !enthalpies_dft_input_str.empty() ){ 
       message << " BAD NEWS: The number of provided precalculated DFT formation enthalpies and functionals must match.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
     }
     //let the program spit out what it thinks
     if(LDEBUG){
@@ -549,7 +549,7 @@ namespace cce {
       }
       if (!aurostd::WithinList(CCE_vallowed_functionals, cce_vars.vfunctionals[k]) || get_offset(cce_vars.vfunctionals[k]) == -1) {
         message << " Unknown functional " << cce_vars.vfunctionals[k] << ". Please choose PBE, LDA, or SCAN.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
       }
       cce_vars.offset.push_back(get_offset(cce_vars.vfunctionals[k]));
     }
@@ -562,7 +562,7 @@ namespace cce {
       for(uint k=0,ksize=CCE_vdefault_output_functionals.size();k<ksize;k++){
         if (get_offset(CCE_vdefault_output_functionals[k]) == -1) {
           message << " Unknown functional " << cce_vars.vfunctionals[k] << ". Please choose PBE, LDA, or SCAN.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
         }
         cce_vars.vfunctionals.push_back(CCE_vdefault_output_functionals[k]); cce_vars.offset.push_back(get_offset(CCE_vdefault_output_functionals[k]));
       }
@@ -597,7 +597,7 @@ namespace cce {
       //sizes of oxidation numbers and atoms must match
       if(cce_vars.oxidation_states.size()!=structure.atoms.size()){ 
         message << " BAD NEWS: The number of provided oxidation numbers does not match the number of atoms in the structure! Please correct and rerun.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
       }
       // get sum of oxidation numbers and validate (system should not be regarded correctable if sum over oxidation states is not zero)
       cce_vars.oxidation_sum = get_oxidation_states_sum(cce_vars); // double because for superoxides O ox. number is -0.5
@@ -607,11 +607,11 @@ namespace cce {
         message << " The oxidation numbers that you provided do not add up to zero!" << endl;
         message << " Sum over all oxidation numbers is: " << cce_vars.oxidation_sum << endl;
         message << " Please correct and rerun." << endl;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INPUT_ILLEGAL_);	
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
       }
     } else {
       message << " It seems you forgot to provide the oxidation numbers after \"--oxidation_numbers=\". Please add them or omit the option.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
     }
     return cce_vars.oxidation_states;
   }
@@ -682,7 +682,7 @@ namespace cce {
       aurostd::string2tokens(vflags.KBIN_VASP_LDAU_PARAMETERS, ldau_params_vector, ";");
       if (ldau_params_vector.size() != 4){
         message << " BAD NEWS: The LDAU parameters are not of the right size. Please adapt and rerun.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
       }
       // get species
       string species_part = ldau_params_vector[0];
@@ -690,7 +690,7 @@ namespace cce {
       aurostd::string2tokens(species_part, species_vector, ",");
       if (species_vector.size() != structure.species.size()){
         message << " BAD NEWS: The number of species in the DFT+U settings differs from the total number of species for this structure. Please adapt and rerun.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
       }
       // get Us
       string Us_part = ldau_params_vector[2];
@@ -699,7 +699,7 @@ namespace cce {
       aurostd::string2tokens(Us_part, Us_vector,",");
       if (species_vector.size() != Us_vector.size()){
         message << " BAD NEWS: The number of species in the DFT+U settings differs from the number of provided U values. Please adapt and rerun.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
       }
       // get standard Us for PBE+U:ICSD
       vector<double> standard_ICSD_Us_vector;
@@ -719,7 +719,7 @@ namespace cce {
           message << "as used for the AFLOW ICSD database when obtaining the corrections to vLDAUtype[" << k << "]=" << vLDAUtype[k] << " now." << std::endl;
           message << "If the standard U values have also been changed, then the corrections might have been constructed for other U values than used in this calculation" << std::endl;
           message << "and should not be applied. Please check this carefully!";
-          pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+          pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
         }
         standard_ICSD_Us_vector.push_back(vLDAUU[k]);
       }
@@ -727,7 +727,7 @@ namespace cce {
       for (uint k = 0; k < species_vector.size(); k++) {
         if (Us_vector[k] != standard_ICSD_Us_vector[k]){
           message << " BAD NEWS: For this DFT+U calculation with Dudarev's method the provided U value of " << Us_vector[k] << " eV for " << species_vector[k] << " does not match the standard value of " << standard_ICSD_Us_vector[k] << " eV. There are no corrections for this case.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
         }
       }
       pbe_u_icsd = true;
@@ -735,7 +735,7 @@ namespace cce {
     // check whether it is a DFT+U calculation with different parameters than for PBE+U:ICSD
     if ((vflags.KBIN_VASP_FORCE_OPTION_LDAU1.isentry || vflags.KBIN_VASP_FORCE_OPTION_LDAU2.isentry) && !pbe_u_icsd){
       message << " BAD NEWS: It seems you are providing an aflow.in for a DFT+U calculation with different parameters than for the AFLOW ICSD database (Dudarev's approach, LDAU2=ON). There are no corrections for this case.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
     }
 
     if (pbe){
@@ -760,7 +760,7 @@ namespace cce {
     // if functional is still empty, i.e. cannot be determined from aflow.in, throw error
     if (functional.empty()) {
       message << " Functional cannot be determined from aflow.in. Corrections are available for PBE, LDA, SCAN, or PBE+U:ICSD.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     }
     return functional;
   }
@@ -854,7 +854,7 @@ namespace cce {
       xelement::xelement element(z);
       if (element.electronegativity_Allen == NNN) {
         message << " VERY BAD NEWS: There is no known electronegativity value for " << KBIN::VASP_PseudoPotential_CleanName(structure.species[k]) << ".";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
       } else{
         cce_vars.electronegativities[k] = element.electronegativity_Allen;
         if(LDEBUG){
@@ -872,7 +872,7 @@ namespace cce {
     cce_vars.standard_anion_charge = element.oxidation_states[element.oxidation_states.size()-1];
     if (cce_vars.standard_anion_charge > 0) {
       message << " VERY BAD NEWS: There is no known negative oxidation number for " << cce_vars.anion_species << " detected as anion species.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
     }
     if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " anion electronegativity: " << anion_electronegativity << endl;
@@ -974,7 +974,7 @@ namespace cce {
         }
         if (cce_vars.oxidation_states[i] > 0) {
           message << " VERY BAD NEWS: There is no known negative oxidation number for " << structure.atoms[i].cleanname << " detected as multi anion species.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
         }
       }
     }
@@ -1060,7 +1060,7 @@ namespace cce {
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
-          pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+          pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
         }
       }
       num_neighbors[i]=neighbors_count; // zero-based counting as for cutoffs array above
@@ -1129,10 +1129,10 @@ namespace cce {
           if (atom.cleanname == "O"){
             if (cce_vars.distances[i][j] <= DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF) { // distance must be larger than DEFAULT_CCE_SELF_DIST_TOL to savely exclude the anion itself having distance zero to itself; if O-O bond is shorter than in O2 molecule (approx. 1.21 Ang) the result of the structural relaxation is most likely wrong
               message << " THE DETERMINED OXYGEN-OXYGEN BOND LENGTH IS SHORTER THAN IN THE O2 MOLECULE; CHECK YOUR STRUCTURE! THE O-O BOND LENGTH IS: " << cce_vars.distances[i][j] << " Ang.";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+              throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
             } else if ((DEFAULT_CCE_O2_MOLECULE_LOWER_CUTOFF < cce_vars.distances[i][j]) && (cce_vars.distances[i][j] < DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF) ){
               message << " THE DETERMINED OXYGEN-OXYGEN BOND LENGTH IS ABOUT THE SAME AS IN THE O2 MOLECULE, I.E. THE STRUCTURE SEEMS TO INCLUDE MOLECULAR OXYGEN FOR WHICH NO CCE CORRECTION IS AVAILABLE! THE O-O BOND LENGTH IS: " << cce_vars.distances[i][j] << " Ang.";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+              throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
             } else if ((DEFAULT_CCE_O2_MOLECULE_UPPER_CUTOFF <= cce_vars.distances[i][j]) && (cce_vars.distances[i][j] <= DEFAULT_CCE_SUPEROX_CUTOFF) ){
               if(LDEBUG){
                 cerr << __AFLOW_FUNC__ << " WARNING: This should be a superoxide; the O-O bond length is: " << cce_vars.distances[i][j] << " Ang." << endl;
@@ -1161,7 +1161,7 @@ namespace cce {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
-        pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
     } else if (cce_vars.num_superox_bonds > 0) {
       stringstream message_so;
@@ -1171,7 +1171,7 @@ namespace cce {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
-        pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message_so, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message_so, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
     }
   }
@@ -1275,14 +1275,14 @@ namespace cce {
             message << "The formation enthalpy of this system is hence not correctable!"  << endl;
             message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
           }
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
         }
       } else{ // error message that oxidation numbers cannot be determined since for at least one species there are no known oxidation numbers is already included in load_ox_states_templates_each_species function
         cce_flags.flag("CORRECTABLE",FALSE);
         if(cce_flags.flag("RUN_FULL_CCE")){
           message << "The formation enthalpy of this system is hence not correctable!"  << endl;
           message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
         }
       }
     }
@@ -1401,7 +1401,7 @@ namespace cce {
           message << "The formation enthalpy of this system is hence not correctable!"  << endl;
           message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
         }
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
       }
     }
   }
@@ -1454,7 +1454,7 @@ namespace cce {
       Sb_O_ratio=amount_Sb/amount_O;
     } else {
       message << " SbO2 special case. Amount of O determined to be ZERO. Please check your structure.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     }
     if ( aurostd::isequal(Sb_O_ratio,0.5) ){
       stringstream message;
@@ -1466,7 +1466,7 @@ namespace cce {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
-        pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
       if ((structure.atoms.size() % 6) == 0) {
         uint num_formula_units_in_cell=structure.atoms.size()/6; // 6 for Sb2O4
@@ -1501,7 +1501,7 @@ namespace cce {
         }
       } else {
         message << " The total number of atoms is not divisible by 6 as needed for Sb2O4. Please check your structure.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
       }
       check_ox_nums_special_case(structure, cce_flags, cce_vars, oss);
     }
@@ -1538,7 +1538,7 @@ namespace cce {
       Pb_O_ratio=amount_Pb/amount_O;
     } else {
       message << " Pb3O4 special case. Amount of O determined to be ZERO. Please check your structure.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     }
     if ( aurostd::isequal(Pb_O_ratio,0.75) ){
       stringstream message;
@@ -1550,7 +1550,7 @@ namespace cce {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
-        pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
       if ((structure.atoms.size() % 7) == 0) {
         uint num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Pb3O4
@@ -1585,7 +1585,7 @@ namespace cce {
         }
       } else {
         message << " The total number of atoms is not divisible by 7 as needed for Pb3O4. Please check your structure.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
       }
       check_ox_nums_special_case(structure, cce_flags, cce_vars, oss);
     }
@@ -1626,7 +1626,7 @@ namespace cce {
       Ti_O_ratio=amount_Ti/amount_O;
     } else {
       message << " Ti-O Magneli phases special case. Amount of O determined to be ZERO. Please check your structure.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     }
     if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " ratio of Ti/O= " << Ti_O_ratio << endl;
@@ -1649,7 +1649,7 @@ namespace cce {
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
-          pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+          pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
         }
         magneli = true;
         num_formula_units_in_cell=amount_Ti/n;
@@ -1724,7 +1724,7 @@ namespace cce {
       Fe_O_ratio=amount_Fe/amount_O;
     } else {
       message << " Fe3O4 special case. Amount of O determined to be ZERO. Please check your structure.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     }
     if ( aurostd::isequal(Fe_O_ratio,0.75) ){
       stringstream message;
@@ -1736,7 +1736,7 @@ namespace cce {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
-        pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
       if ((structure.atoms.size() % 7) == 0) {
         uint num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Fe3O4
@@ -1771,7 +1771,7 @@ namespace cce {
         }
       } else {
         message << " The total number of atoms is not divisible by 7 as needed for Fe3O4. Please check your structure.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
       }
       check_ox_nums_special_case(structure, cce_flags, cce_vars, oss);
     }
@@ -1811,7 +1811,7 @@ namespace cce {
       cation_species_O_ratio=amount_cation_species/amount_O;
     } else {
       message << " " << cation_species << "3O4 special case. Amount of O determined to be ZERO. Please check your structure.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     }
     if ( aurostd::isequal(cation_species_O_ratio,0.75) ){
       stringstream message;
@@ -1823,7 +1823,7 @@ namespace cce {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
-        pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
       if ((structure.atoms.size() % 7) == 0) {
         uint num_formula_units_in_cell=structure.atoms.size()/7; // 7 for Mn3O4 and Co3O4
@@ -1858,7 +1858,7 @@ namespace cce {
         }
       } else {
         message << " The total number of atoms is not divisible by 7 as needed for " << cation_species << "3O4. Please check your structure.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
       }
       check_ox_nums_special_case(structure, cce_flags, cce_vars, oss);
     }
@@ -1909,7 +1909,7 @@ namespace cce {
       O_alkali_ratio=amount_O/amount_alkali;
     } else {
       message << " Alkali metal sesquioxide special case. Amount of alkali atoms determined to be ZERO. Please check your structure.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     }
     if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " ratio of O/" << alkali_metal << "= " << O_alkali_ratio << endl;
@@ -1925,7 +1925,7 @@ namespace cce {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
-        pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
       if ((structure.atoms.size() % 5) == 0) {
         uint num_formula_units_in_cell=structure.atoms.size()/5; // 5 for alkali_metal2O3
@@ -1964,7 +1964,7 @@ namespace cce {
         }
       } else {
         message << " The total number of atoms is not divisible by 5 as needed for alkali metal sesquioxide. Please check your structure.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
       }
       check_ox_nums_special_case(structure, cce_flags, cce_vars, oss);
     }
@@ -2005,7 +2005,7 @@ namespace cce {
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
-          pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+          pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
           if (structure.atoms[i].cleanname == "Mn"){
@@ -2025,7 +2025,7 @@ namespace cce {
       }
     } else {
       message << " MnMoO4 special case. Amount of Mo or O determined to be ZERO. Please check your structure.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     }
   }
 
@@ -2062,7 +2062,7 @@ namespace cce {
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
-          pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+          pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
           if (structure.atoms[i].cleanname == "Fe"){
@@ -2081,7 +2081,7 @@ namespace cce {
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
-          pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+          pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
           if (structure.atoms[i].cleanname == "Fe"){
@@ -2095,7 +2095,7 @@ namespace cce {
       }
     } else {
       message << " Ca2Fe2O5/CaFe2O4 special case. Amount of Fe or O determined to be ZERO. Please check your structure.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     }
   }
 
@@ -2133,7 +2133,7 @@ namespace cce {
           ostream& oss = cout;
           ofstream FileMESSAGE;
           _aflags aflags;aflags.Directory=aurostd::getPWD();
-          pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+          pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
         }
         for(uint i=0,isize=structure.atoms.size();i<isize;i++){ //loop over all atoms in structure
           if (structure.atoms[i].cleanname == "Ti"){
@@ -2147,7 +2147,7 @@ namespace cce {
       }
     } else {
       message << " FeTiO3 special case. Amount of Ti or O determined to be ZERO. Please check your structure.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     }
   }
 
@@ -2164,7 +2164,7 @@ namespace cce {
       message << "BAD NEWS: The formation enthalpy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
       message << "Sum over all oxidation numbers is: " << cce_vars.oxidation_sum << endl;
       message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     } else {
       cce_flags.flag("OX_STATES_DETERMINED",TRUE); // needed for algorithm determining oxidation numbers from electronegativities
     }
@@ -2349,7 +2349,7 @@ namespace cce {
                   message << "BAD NEWS: The formation enthalpy of this system is not correctable! The determined and fixed oxidation numbers do not add up to zero!"  << endl;
                   message << "Sum over all oxidation numbers is: " << cce_vars.oxidation_sum << endl;
                   message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-                  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+                  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
                 }
               }
             }
@@ -2357,18 +2357,18 @@ namespace cce {
             cce_flags.flag("CORRECTABLE",FALSE);
             message << "Bader file " << Bader_file << " (or xz, bz2, gz version) not found. A Bader file is required to determine the oxidation numbers." << endl;
             message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
           }
         }
       } else {
         cce_flags.flag("CORRECTABLE",FALSE);
         message << "aflow.in file not found. An aflow.in file is required to identify the functional and to find the Bader charges file to determine the oxidation numbers." << endl;
         message << "You can also provide oxidation numbers as a comma separated list as input via the option --oxidation_numbers=." << endl;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
       }
     } else {
       message << " BAD NEWS: The determination of oxidation numbers from Bader charges works currently only for oxides. Here the anion is determined to be " << cce_vars.anion_species << ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
     }
     return cce_vars.oxidation_states;
   }
@@ -2383,7 +2383,7 @@ namespace cce {
     functional=get_functional_from_aflow_in_outcar(structure, aflowin_file, outcar_file);
     if (functional.empty()) {
       message << " Functional cannot be determined from aflow.in. Corrections are available for PBE, LDA, SCAN, or PBE+U:ICSD.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     }
     // Bader implementation works currently only with Bader file and aflow.in in directory where AFLOW is run
     system_name=KBIN::ExtractSystemName(directory_path);  //CO20200928
@@ -2406,7 +2406,7 @@ namespace cce {
         ostream& oss = cout;
         ofstream FileMESSAGE;
         _aflags aflags;aflags.Directory=aurostd::getPWD();
-        pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
       }
     }
   }
@@ -2479,7 +2479,7 @@ namespace cce {
             vfunctional_aflow_in.push_back(functional);
             if (get_offset(functional) == -1) {
               message << " Unknown functional " << functional << ". Please choose PBE, LDA, or SCAN.";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+              throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
             }
             int offset=get_offset(functional); // define also local offset variable since offset must correspond to functional detected from aflow.in
             for (uint j = 0; j < vfunctional_aflow_in.size(); j++) {
@@ -2565,11 +2565,11 @@ namespace cce {
     if (error1) { // errors can only be thrown after loop over atoms is complete since the output should indicate all species for which corrections might be missing/cannot be identified
       message << " VERY BAD NEWS: The formation enthalpy of this system is not correctable since there are no corrections for " << aurostd::joinWDelimiter(species_missing_corrections, ", ") << " coordinated by " << cce_vars.anion_species << "!" << endl;
       message << " See also the output for details.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     } else if (error2) {
       message << " BAD NEWS: The oxidation numbers (and hence the corrections) of " << aurostd::joinWDelimiter(undetermined_ox_states, ", ") << " cannot be identified from the Bader charges!"  << endl;
       message << " See the output for details.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     }
     return cce_vars.oxidation_states;
   }
@@ -2586,7 +2586,7 @@ namespace cce {
       ostream& oss = cout;
       ofstream FileMESSAGE;
       _aflags aflags;aflags.Directory=aurostd::getPWD();
-      pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+      pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
     }
     // repairing only by considering non mixed valence oxides
     for(uint i=0,isize=structure.atoms.size();i<isize;i++){ 
@@ -2687,11 +2687,11 @@ namespace cce {
             }
             if ( corrections_line.find("*") != string::npos ) {
               message << " The correction for " << structure.atoms[i].cleanname << " (atom " << i+1 << ")" << " in oxidation state +" << cce_vars.oxidation_states[i] << " when coordinated by " << considered_anion_species << " might be less accurate since it was obtained from less well validated experimental data as the other corrections!";
-              pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, oss, _LOGGER_WARNING_,XHOST.vflag_control.flag("PRINT_MODE::JSON")); //CO20210623 - silent with json output
+              pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, oss, _LOGGER_WARNING_,XHOST.vflag_control.flag("PRINT_MODE::JSON")); //CO20210623 - silent with json output
             }
             if ( corrections_line.find("^") != string::npos ) {
               message << " The correction for " << structure.atoms[i].cleanname << " (atom " << i+1 << ")" << " in oxidation state +" << cce_vars.oxidation_states[i] << " when coordinated by " << considered_anion_species << " is only approximate since in this case the explicit oxidation state dependence was lifted!";
-              pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, oss, _LOGGER_WARNING_,XHOST.vflag_control.flag("PRINT_MODE::JSON"));  //CO20210623 - silent with json output
+              pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__, message, oss, _LOGGER_WARNING_,XHOST.vflag_control.flag("PRINT_MODE::JSON"));  //CO20210623 - silent with json output
             }
             // load cation corrections
             load_cation_corrections(structure, cce_vars, corrections_line, corrections_atom, i);
@@ -2706,7 +2706,7 @@ namespace cce {
       // errors can only be thrown after loop over atoms is complete since the output should indicate all species for which corrections might be missing/cannot be identified
       message << " BAD NEWS: No correction available for " << std::showpos << aurostd::joinWDelimiter(missing_corrections, ", ") << "." << endl;
       message << " See also the output for details.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
     }
   }
 
@@ -2890,7 +2890,7 @@ namespace cce {
             if (ref_enthalpy_shift == AUROSTD_NAN) { // for some species needing shifts, there is no reference (ground state) energy yet
               oss << print_output_oxidation_numbers(structure, cce_vars);
               message << " No ref. enthalpy shift for " << structure.atoms[i].cleanname << " for PBE+U:ICSD yet.";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+              throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
             } else if (ref_enthalpy_shift > 0) { // consider only species that need a ref. enthalpy shift, i.e. for which a U is used
               cce_vars.cce_correction[num_temps*k+l] += ref_enthalpy_shift;
             }

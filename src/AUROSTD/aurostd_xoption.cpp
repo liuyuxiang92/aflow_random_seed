@@ -267,7 +267,7 @@ namespace aurostd {
         << ", content_uint=" << content_uint
         << ", keyword=" << keyword
         << ", isentry=" << isentry;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     if(VERBOSE) cerr << "DEBUG - " << __AFLOW_FUNC__ << " END" << endl;
     // return isentry;

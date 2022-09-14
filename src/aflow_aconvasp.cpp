@@ -790,7 +790,7 @@ namespace pflow {
   xstructure SetAllAtomNames(const xstructure& a, const vector<string>& in) {
     xstructure b(a);
     if(in.size()==a.num_each_type.size()) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"this routine must be fixed, it does not work here",_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"this routine must be fixed, it does not work here",_RUNTIME_ERROR_);
 
       for(uint iat=0;iat<b.num_each_type.size();iat++) {
         b.atoms.at(iat).name=in.at(b.atoms.at(iat).type);       // CONVASP_MODE
@@ -815,7 +815,7 @@ namespace pflow {
     message << "Must specify as many names as types/bases: in.size()=" << in.size();  //[CO20200130 - number->basis]
     message << "   =a.num_each_type.size()=" << a.num_each_type.size();
     message << "   =a.atoms.size()=" << a.atoms.size();
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_NUMBER_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_NUMBER_);
   }
 }
 
@@ -826,7 +826,7 @@ namespace pflow {
   xstructure SetNamesWereGiven(const xstructure& a, const vector<int>& in) {
     xstructure b(a);
     if(in.size()==a.num_each_type.size()) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"this routine must be fixed... it does not work here",_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"this routine must be fixed... it does not work here",_RUNTIME_ERROR_);
       for(uint iat=0;iat<b.num_each_type.size();iat++)
         b.atoms.at(iat).name_is_given=in.at(b.atoms.at(iat).type);      // CONVASP_MODE
       return b;
@@ -841,7 +841,7 @@ namespace pflow {
     message << "Must specify as many names as types/bases: in.size()=" << in.size();  //[CO20200130 - number->basis]
     message << "   =a.num_each_type.size()=" << a.num_each_type.size();
     message << "   =a.atoms.size()=" << a.atoms.size();
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_NUMBER_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_NUMBER_);
   }
 }
 
@@ -1409,7 +1409,7 @@ namespace pflow {
     }
     h=xa[khi]-xa[klo];
     if(h == 0.0) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Bad xa input to routine splint",_INPUT_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Bad xa input to routine splint",_INPUT_ERROR_);
     }
     a=(xa[khi]-x)/h;
     b=(x-xa[klo])/h;

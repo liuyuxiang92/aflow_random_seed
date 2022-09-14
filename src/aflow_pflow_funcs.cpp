@@ -133,7 +133,7 @@ xvector<double> balanceChemicalEquation(const xmatrix<double>& composition_matri
   stringstream message;
   if(composition_matrix.rows<=composition_matrix.cols){
     message << "Composition matrix (m<=n) will NOT yield a viable null space for this analysis";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20190226
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20190226
   }
   //[CO20191110 - OBSOLETE]xmatrix<double> composition_matrix=_composition_matrix;
   //[CO20191110 - OBSOLETE]xmatrix<double> Q=aurostd::generalHouseHolderQRDecomposition(composition_matrix);
@@ -156,7 +156,7 @@ xvector<double> balanceChemicalEquation(const xmatrix<double>& composition_matri
   for(int i=1;i<coef.rows+1;i++){
     if(coef[i]<-_ZERO_TOL_){
       message << "Found negative coef[" << i << "], invalid chemical equation (run with --debug to see): coef=" << coef;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_RANGE_); //CO20190226
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_RANGE_); //CO20190226
     }
   }
   if(LDEBUG) {cerr << __AFLOW_FUNC__ << " checking: all scalar products should yield 0" << endl;}
@@ -168,7 +168,7 @@ xvector<double> balanceChemicalEquation(const xmatrix<double>& composition_matri
     if(LDEBUG) {cerr << sum << endl;}
     if(abs(sum)>_ZERO_TOL_){
       message << "Chemical equation was not balanced (run with --debug to see): coef=" << coef;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_RANGE_); //CO20190226
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_RANGE_); //CO20190226
     }
   }
   return coef;
@@ -218,7 +218,7 @@ namespace pflow {
     int count_check_min_dist=0;
 
     message << aflow::Banner("BANNER_NORMAL");
-    pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);  //first to screen (not logged, file not opened)
+    pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);  //first to screen (not logged, file not opened)
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting" << endl;}
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -234,7 +234,7 @@ namespace pflow {
     if(check_min_dist){ //sanity check as we rotate structure/atoms
       min_dist=xstr_bulk.MinDist();
       if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
+      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
     }
 
     bool convert_sconv=true;
@@ -244,8 +244,8 @@ namespace pflow {
       if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
       if(!aurostd::isequal(min_dist_orig,min_dist)){
         //throw a warning here instead, minimum distance MIGHT change with sconv
-        //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);
-        message << "Minimum distance changed (sprim -> sconv)";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+        //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);
+        message << "Minimum distance changed (sprim -> sconv)";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
         min_dist_orig=min_dist;
       }
     }
@@ -256,13 +256,13 @@ namespace pflow {
     if(LDEBUG) {xstr_bulk.write_DEBUG_flag=TRUE;}
     //xstr_bulk.coord_flag=_COORDS_CARTESIAN_;  //much more accurate for this type of calculation
 
-    message << "structure(standard conventional)=";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-    message << xstr_bulk << endl;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
+    message << "structure(standard conventional)=";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << xstr_bulk << endl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
 
     if(check_min_dist){ //sanity check as we rotate structure/atoms
       min_dist=xstr_bulk.MinDist();
       if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
+      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -309,7 +309,7 @@ namespace pflow {
       l_s=aurostd::string2utype<int>(tokens[2]);
     }
     hkl_s[1]=h_s;hkl_s[2]=k_s;hkl_s[3]=l_s;
-    if(hkl_s[1]==0 && hkl_s[2]==0 && hkl_s[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"hkl_s=(0,0,0)",_INPUT_ERROR_);}
+    if(hkl_s[1]==0 && hkl_s[2]==0 && hkl_s[3]==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"hkl_s=(0,0,0)",_INPUT_ERROR_);}
     hkl_s_ORIG=hkl_s;
     string step_size_string=vpflow.getattachedscheme("GENERALIZED_STACKING_FAULT_ENERGY::STEP_SIZE"); //step size
     if(aurostd::isfloat(step_size_string)){
@@ -334,11 +334,11 @@ namespace pflow {
     message.precision(prec);
     message.unsetf(std::ios_base::floatfield);
 
-    message << "shear_direction" << hkl_s;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-    message << "step_size=" << step_size;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-    message << "fixed_layers=" << fixed_layers;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-    message << "spin=" << (spin_off?"OFF":"ON");pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-    message << "partial_dissociation=" << (partial_dissociation?"ON":"OFF");pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "shear_direction" << hkl_s;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "step_size=" << step_size;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "fixed_layers=" << fixed_layers;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "spin=" << (spin_off?"OFF":"ON");pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "partial_dissociation=" << (partial_dissociation?"ON":"OFF");pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
     message.precision(prec_original); //set back
     message.flags(ff_original); //set back
@@ -353,7 +353,7 @@ namespace pflow {
     // START - create slab
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    message << "Creating slab";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "Creating slab";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
     xvector<int> hkl_i;
     int total_layers;
@@ -383,7 +383,7 @@ namespace pflow {
       cerr << __AFLOW_FUNC__ << " rotation=" << endl;cerr << rotation << endl;
     }
 
-    if(total_layers%2!=0){message << "total_layers is odd, it is better to pick an even number (top vs. bottom)";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);}
+    if(total_layers%2!=0){message << "total_layers is odd, it is better to pick an even number (top vs. bottom)";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);}
 
     //rotate n_s too
     //[CO20190408 - do rotation last!]bool rotate_shear=false;
@@ -401,7 +401,7 @@ namespace pflow {
     //[CO20190408 - do rotation last!]  } else {  //try ApplyAtomValidate
     //[CO20190408 - do rotation last!]    for(uint i=0;i<xstr_bulk.atoms.size();i++){
     //[CO20190408 - do rotation last!]      if(!SYM::ApplyAtomValidate(xstr_bulk.atoms[i],xstr_slab_newbasis.atoms[i],rot,xstr_bulk,true,false)){
-    //[CO20190408 - do rotation last!]        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ApplyAtomValidate() failed",_VALUE_ERROR_);
+    //[CO20190408 - do rotation last!]        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"ApplyAtomValidate() failed",_VALUE_ERROR_);
     //[CO20190408 - do rotation last!]      }
     //[CO20190408 - do rotation last!]    }
     //[CO20190408 - do rotation last!]  }
@@ -417,7 +417,7 @@ namespace pflow {
     //[CO20190408 - do rotation last!]if(check_min_dist){ //sanity check as we rotate structure/atoms
     //[CO20190408 - do rotation last!]  min_dist=xstr_slab_newbasis.MinDist();
     //[CO20190408 - do rotation last!]  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-    //[CO20190408 - do rotation last!]  if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
+    //[CO20190408 - do rotation last!]  if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
     //[CO20190408 - do rotation last!]}
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -439,7 +439,7 @@ namespace pflow {
     //[CO20190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]if(!aurostd::isequal(aurostd::scalar_product(n_i,n_s),0.0,0.1)){
     //[CO20190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]  message << "n_i(" << n_i << ") is not perpendicular to n_s(" << n_s << ")" << endl;
     //[CO20190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]  message << "n_i DOT n_s = " << aurostd::scalar_product(n_i,n_s) << endl;
-    //[CO20190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+    //[CO20190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
     //[CO20190515 - not necessarily true that n_i and n_s are perpendicular, n_s must have no 0 component AFTER rotation]}
 
     //[CO20190515 - WRONG, [hkl] WITH brackets is ALREADY in direct space]xvector<double> n_s=HKLPlane2Normal(xstr_bulk.lattice,hkl_s);  //we need UN-ROTATED lattice here so we can get the right distance
@@ -467,7 +467,7 @@ namespace pflow {
     if(!aurostd::isequal(abs(n_i_rotated[3]),1.0)){
       message << "Rotation unsuccessful, n_i should be aligned along the z-axis" << endl;
       message << "n_i(rotated)  =" << n_i_rotated << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
     }
 
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " n_s[hkl=" << hkl_s << "](unrotated)=" << n_s << endl;}
@@ -484,7 +484,7 @@ namespace pflow {
       message << "Rotation unsuccessful" << endl;
       message << "angle_ns(unrotated)=" << rad2deg*angle_ns_unrotated << endl;
       message << "angle_ns(rotated)  =" << rad2deg*angle_ns_rotated << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -498,7 +498,7 @@ namespace pflow {
     if(!partial_dissociation){
       if(!aurostd::isequal(rad2deg*angle_ns_unrotated,90.0) || aurostd::isequal(n_s_rotated[3],0.0)){ //not sure about partial dissociation
         message << "Need to find symmetrically equivalent n_s (angle_ns_unrotated(degrees)=" << rad2deg*angle_ns_unrotated << ",n_s(rotated)=" << n_s_rotated << ")";
-        pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+        pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
 
         const vector<_sym_op>& v_pgroups=xstr_sym.pgroup_xtal;
         vector<xvector<double> > v_n_s_sym,v_n_s_sym_rotated;
@@ -519,7 +519,7 @@ namespace pflow {
           }
         }
 
-        if(v_n_s_sym.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Cannot find any viable symmetrically equivalent n_s",_RUNTIME_ERROR_);}
+        if(v_n_s_sym.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Cannot find any viable symmetrically equivalent n_s",_RUNTIME_ERROR_);}
 
         //sort the two lists (symmetrically equivalent and rotated variants) by the rotated variants
         //look for 1 0 0 first, then -1 0 0, then
@@ -632,7 +632,7 @@ namespace pflow {
         message << "Selecting symmetrically equivalent hkl_s=" << hkl_s << endl;
         message << "n_s=" << n_s << endl;
         message << "n_s(rotated)=" << n_s_rotated << endl;
-        pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+        pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
       }
     }
 
@@ -675,7 +675,7 @@ namespace pflow {
       cerr << __AFLOW_FUNC__ << " layers_per_cell_s=" << layers_per_cell_s << endl;
       cerr << __AFLOW_FUNC__ << " supercell_layers_s=" << supercell_layers_s << endl;
     }
-    //[CO20190520 - do NOT reduce total_layers based on shear direction]if(layers_per_cell_s<1){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"layers_per_cell_s<1 (="+aurostd::utype2string(layers_per_cell_s)+")",_INPUT_ERROR_);}
+    //[CO20190520 - do NOT reduce total_layers based on shear direction]if(layers_per_cell_s<1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"layers_per_cell_s<1 (="+aurostd::utype2string(layers_per_cell_s)+")",_INPUT_ERROR_);}
     //[CO20190520 - do NOT reduce total_layers based on shear direction]if(layers_per_cell_s>1){  //let's adjust total_layers input to CreateSlab_RigidRotation() which builds supercell assuming layers_per_cell_s==1
     //[CO20190520 - do NOT reduce total_layers based on shear direction]  int total_layers=DEFAULT_TOTAL_LAYERS;
     //[CO20190520 - do NOT reduce total_layers based on shear direction]  string total_layers_string=vpflow.getattachedscheme("CREATE_SLAB::TOTAL_LAYERS");
@@ -709,7 +709,7 @@ namespace pflow {
         message << "rotation=" << endl; message << rotation << endl;
         message << "hkl_i=" << hkl_i << ", n_i(rotated)=" << n_i << endl;
         message << "hkl_s=" << hkl_s << ", n_s(rotated)=" << n_s << endl;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
       }
     }
 
@@ -737,11 +737,11 @@ namespace pflow {
     //[CO20190423 - too much work, rely on atom.ijk instead!]}
     //[CO20190423 - too much work, rely on atom.ijk instead!]if(count_above!=count_below){
     //[CO20190423 - too much work, rely on atom.ijk instead!]  message << "count_above!=count_below";
-    //[CO20190423 - too much work, rely on atom.ijk instead!]  pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+    //[CO20190423 - too much work, rely on atom.ijk instead!]  pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
     //[CO20190423 - too much work, rely on atom.ijk instead!]}
     //[CO20190423 - too much work, rely on atom.ijk instead!]if(count_above+count_below!=count_total){
     //[CO20190423 - too much work, rely on atom.ijk instead!]  message << "count_above+count_below!=count_total";
-    //[CO20190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_); //CO20190226
+    //[CO20190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_); //CO20190226
     //[CO20190423 - too much work, rely on atom.ijk instead!]}
     //[CO20190423 - too much work, rely on atom.ijk instead!]
     //[CO20190423 - too much work, rely on atom.ijk instead!]//half-plane is bad idea, too much room for error
@@ -793,7 +793,7 @@ namespace pflow {
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " k_min=" << k_min << ", k_max=" << k_max << endl;}
     if(k_max-k_min+1!=supercell_layers_i){  //test of stupidity
       message << "k_max-k_min+1!=supercell_layers_i";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
     }
 
     uint count_total_fixed=0,count_bottom_fixed=0,count_top_fixed=0; //tests of stupidity
@@ -828,7 +828,7 @@ namespace pflow {
     }
     if(count_total_fixed!=count_bottom_fixed+count_top_fixed){
       message << "count_total_fixed!=count_bottom_fixed+count_top_fixed (" << count_total_fixed << "!=" << count_bottom_fixed+count_top_fixed << ")";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_); //CO20190226
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_); //CO20190226
     }
 
     //[CO20190423 - too much work, rely on atom.ijk instead!]if(0){  //too much work, rely on atom.ijk instead!
@@ -857,7 +857,7 @@ namespace pflow {
     //[CO20190423 - too much work, rely on atom.ijk instead!]if(LDEBUG) {cerr << __AFLOW_FUNC__ << " count_keep_fixed=" << count_keep_fixed << endl;}
     //[CO20190423 - too much work, rely on atom.ijk instead!]if(2*count_keep_fixed>xstr_slab.atoms.size()){
     //[CO20190423 - too much work, rely on atom.ijk instead!]  message << "2*count_keep_fixed>xstr_slab.atoms.size()";
-    //[CO20190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_); //CO20190226
+    //[CO20190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_); //CO20190226
     //[CO20190423 - too much work, rely on atom.ijk instead!]}
     //[CO20190423 - too much work, rely on atom.ijk instead!]
     //[CO20190423 - too much work, rely on atom.ijk instead!]//fixed selective dynamics stuff at once
@@ -865,13 +865,13 @@ namespace pflow {
     //[CO20190423 - too much work, rely on atom.ijk instead!]for(uint i=0;i<count_keep_fixed;i++){xstr_slab.atoms[v_apd[i].index].sd="FFF";count_check++;} //bottom
     //[CO20190423 - too much work, rely on atom.ijk instead!]if(count_check!=count_keep_fixed){
     //[CO20190423 - too much work, rely on atom.ijk instead!]  message << "count_check!=count_keep_fixed [1]";
-    //[CO20190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_); //CO20190226
+    //[CO20190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_); //CO20190226
     //[CO20190423 - too much work, rely on atom.ijk instead!]}
     //[CO20190423 - too much work, rely on atom.ijk instead!]count_check=0;
     //[CO20190423 - too much work, rely on atom.ijk instead!]for(uint i=v_apd.size()-1;i>v_apd.size()-1-count_keep_fixed;i--){xstr_slab.atoms[v_apd[i].index].sd="FFF";count_check++;} //top
     //[CO20190423 - too much work, rely on atom.ijk instead!]if(count_check!=count_keep_fixed){
     //[CO20190423 - too much work, rely on atom.ijk instead!]  message << "count_check!=count_keep_fixed [2]";
-    //[CO20190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_); //CO20190226
+    //[CO20190423 - too much work, rely on atom.ijk instead!]  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_); //CO20190226
     //[CO20190423 - too much work, rely on atom.ijk instead!]}
     //[CO20190423 - too much work, rely on atom.ijk instead!]}
 
@@ -949,7 +949,7 @@ namespace pflow {
     }
     dir_count=0;shear_fraction=0.0;
 
-    if(!all_vasp_done){message << "Creating sheared VASP runs";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
+    if(!all_vasp_done){message << "Creating sheared VASP runs";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);}
 
     //create directories if vasp is not done
     int half_k=supercell_layers_i/2;  //floor
@@ -992,11 +992,11 @@ namespace pflow {
         }
         if(count_total!=xstr_shear.atoms.size()){
           message << "count_total!=xstr_shear.atoms.size()";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
         }
         if(count_total!=count_bottom+count_top){
           message << "count_total!=count_bottom+count_top";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
         }
 
         //[CO20190423 - too much work, rely on atom.ijk instead!]if(0){  //too much work, rely on atom.ijk instead!
@@ -1020,7 +1020,7 @@ namespace pflow {
         if(check_min_dist){ //sanity check as we rotate structure/atoms
           min_dist=xstr_shear.MinDist();
           if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << (count_check_min_dist++)+dir_count << "]=" << min_dist << endl;}
-          if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
+          if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
         }
 
         //if(0){
@@ -1083,7 +1083,7 @@ namespace pflow {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     if(!all_vasp_done){
-      message << "Now waiting for sheared VASP runs";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+      message << "Now waiting for sheared VASP runs";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
       return;
     }
 
@@ -1138,7 +1138,7 @@ namespace pflow {
     int count_check_min_dist=0;
 
     message << aflow::Banner("BANNER_NORMAL");
-    pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);  //first to screen (not logged, file not opened)
+    pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);  //first to screen (not logged, file not opened)
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting" << endl;}
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1154,7 +1154,7 @@ namespace pflow {
     if(check_min_dist){ //sanity check as we rotate structure/atoms
       min_dist=xstr_bulk.MinDist();
       if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
+      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
     }
 
     bool convert_sconv=true;
@@ -1164,8 +1164,8 @@ namespace pflow {
       if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
       if(!aurostd::isequal(min_dist_orig,min_dist)){
         //throw a warning here instead, minimum distance MIGHT change with sconv
-        //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);
-        message << "Minimum distance changed (sprim -> sconv)";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
+        //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);
+        message << "Minimum distance changed (sprim -> sconv)";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);
         min_dist_orig=min_dist;
       }
     }
@@ -1176,13 +1176,13 @@ namespace pflow {
     if(LDEBUG) {xstr_bulk.write_DEBUG_flag=TRUE;}
     //xstr_bulk.coord_flag=_COORDS_CARTESIAN_;  //much more accurate for this type of calculation
 
-    message << "structure(standard conventional)=";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-    message << xstr_bulk << endl;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
+    message << "structure(standard conventional)=";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << xstr_bulk << endl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
 
     if(check_min_dist){ //sanity check as we rotate structure/atoms
       min_dist=xstr_bulk.MinDist();
       if(LDEBUG) {cerr << __AFLOW_FUNC__ << " mindist[" << count_check_min_dist++ << "]=" << min_dist << endl;}
-      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
+      if(!aurostd::isequal(min_dist_orig,min_dist)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed",_VALUE_ERROR_);}
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1227,7 +1227,7 @@ namespace pflow {
       l_i=aurostd::string2utype<int>(tokens[2]);
     }
     hkl_i[1]=h_i;hkl_i[2]=k_i;hkl_i[3]=l_i;
-    if(hkl_i[1]==0 && hkl_i[2]==0 && hkl_i[3]==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"hkl_i=(0,0,0)",_INPUT_ERROR_);}
+    if(hkl_i[1]==0 && hkl_i[2]==0 && hkl_i[3]==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"hkl_i=(0,0,0)",_INPUT_ERROR_);}
     string relaxation_layers_string=vpflow.getattachedscheme("CLEAVAGE_ENERGY::RELAXATION_LAYERS"); //step size
     if(aurostd::isfloat(relaxation_layers_string)){
       int _relaxation_layers=aurostd::string2utype<int>(relaxation_layers_string);
@@ -1240,8 +1240,8 @@ namespace pflow {
     message.precision(prec);
     message.unsetf(std::ios_base::floatfield);
 
-    message << "relaxation_layers=" << relaxation_layers;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-    message << "spin=" << (spin_off?"OFF":"ON");pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "relaxation_layers=" << relaxation_layers;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "spin=" << (spin_off?"OFF":"ON");pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
     message.precision(prec_original); //set back
     message.flags(ff_original); //set back
@@ -1294,7 +1294,7 @@ namespace pflow {
 
     bool convert_sprim=true;
     if(!all_vasp_done){
-      message << "Creating bulk VASP run";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      message << "Creating bulk VASP run";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
       xvasp.clear();
 
@@ -1345,7 +1345,7 @@ namespace pflow {
     dir_count++;
 
     if(!all_vasp_done){
-      message << "Now waiting for the bulk VASP run";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+      message << "Now waiting for the bulk VASP run";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
       return;
     }
 
@@ -1358,8 +1358,8 @@ namespace pflow {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     xstructure xstr_relaxed=KBIN::GetMostRelaxedStructure(xvasp.Directory);
-    message << "structure(bulk_relaxed)=";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
-    message << xstr_relaxed << endl;pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
+    message << "structure(bulk_relaxed)=";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << xstr_relaxed << endl;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_RAW_);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // STOP - grab relaxed bulk
@@ -1369,7 +1369,7 @@ namespace pflow {
     // START - create slab
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    message << "Creating slab";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+    message << "Creating slab";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
     //xvector<int> hkl_i;
     int total_layers = 0;
@@ -1379,7 +1379,7 @@ namespace pflow {
 
     xstructure xstr_slab=slab::CreateSlab_SurfaceLattice(vpflow,xstr_relaxed,hkl_i,total_layers,rotation,xstr_slablattice,sc2pcMap_slab,pc2scMap_slab,aflags,FileMESSAGE,AUROSTD_MAX_DOUBLE,oss);
 
-    if(total_layers%2!=0){message << "total_layers is odd, it is better to pick an even number (top vs. bottom)";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);}
+    if(total_layers%2!=0){message << "total_layers is odd, it is better to pick an even number (top vs. bottom)";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_WARNING_);}
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // STOP - create slab
@@ -1431,7 +1431,7 @@ namespace pflow {
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " k_min=" << k_min << ", k_max=" << k_max << endl;}
     if(k_max-k_min+1!=supercell_layers){  //test of stupidity
       message << "k_max-k_min!=supercell_layers";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
     }
 
     uint count_total_relaxing=0,count_bottom_relaxing=0,count_top_relaxing=0; //tests of stupidity
@@ -1464,7 +1464,7 @@ namespace pflow {
     }
     if(count_total_relaxing!=count_bottom_relaxing+count_top_relaxing){
       message << "count_total_relaxing!=count_bottom_relaxing+count_top_relaxing (" << count_total_relaxing << "!=" << count_bottom_relaxing+count_top_relaxing << ")";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_); //CO20190226
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_); //CO20190226
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1493,7 +1493,7 @@ namespace pflow {
     if(!aurostd::EFileExist(FileName)){all_vasp_done=false;}
 
     if(!all_vasp_done){
-      message << "Creating slab VASP run";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      message << "Creating slab VASP run";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
       xvasp.clear();
       //load in xstructure
@@ -1537,7 +1537,7 @@ namespace pflow {
     dir_count++;
 
     if(!all_vasp_done){
-      message << "Now waiting for the slab VASP run";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+      message << "Now waiting for the slab VASP run";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
       return;
     }
 
@@ -1559,15 +1559,14 @@ namespace pflow {
   bool findClosedPackingPlane(istream& input){xstructure xstr_in(input,IOAFLOW_AUTO);return findClosedPackingPlane(xstr_in);} //CO20191110
   bool findClosedPackingPlane(const xstructure& xstr_in){ //CO20191110
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="pflow::findClosedPackingPlane():";
 
-    if(LDEBUG){cerr << soliloquy << " xstr_in=" << endl;cerr << xstr_in << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " xstr_in=" << endl;cerr << xstr_in << endl;}
 
     xstructure xstr_grid(xstr_in);
     xstr_grid.GenerateGridAtoms(3); //-3:3 in every direction
     const deque<_atom>& grid_atoms=xstr_grid.grid_atoms;
 
-    if(LDEBUG){cerr << soliloquy << " grid_atoms=" << endl;for(uint i=0;i<grid_atoms.size();i++){cerr << "i=" << i << ": cpos=" << grid_atoms[i].cpos << endl;}}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " grid_atoms=" << endl;for(uint i=0;i<grid_atoms.size();i++){cerr << "i=" << i << ": cpos=" << grid_atoms[i].cpos << endl;}}
 
     aurostd::xcombos xc(grid_atoms.size(),4,'C');  //need to check coplanarity: requires 4 points
     vector<int> combo;
@@ -1580,7 +1579,7 @@ namespace pflow {
       const _atom& a4=grid_atoms[combo[3]];
 
       if(LDEBUG){
-        cerr << soliloquy << " checking coplanarity of:" << endl;
+        cerr << __AFLOW_FUNC__ << " checking coplanarity of:" << endl;
         cerr << a1.cpos << endl;
         cerr << a2.cpos << endl;
         cerr << a3.cpos << endl;
@@ -1592,7 +1591,7 @@ namespace pflow {
       //use formula from https://en.wikipedia.org/wiki/Coplanarity
       if(aurostd::isequal( aurostd::scalar_product( aurostd::vector_product( a2.cpos-a1.cpos , a4.cpos-a1.cpos ) , a3.cpos-a1.cpos ) , 0.0)){
         if(LDEBUG){
-          cerr << soliloquy << " found coplanar set" << endl;
+          cerr << __AFLOW_FUNC__ << " found coplanar set" << endl;
 
 
         }
@@ -1778,8 +1777,8 @@ namespace pflow {
   vector<uint> GetXrayPeaks(const vector<double>& v_twotheta,const vector<double>& v_intensity,vector<double>& v_intensity_smooth) { //CO20190520 //CO20190620 - v_peaks_amplitude not needed
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    if(v_twotheta.size()<2){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"v_twotheta.size()<2",_VALUE_ILLEGAL_);}
-    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
+    if(v_twotheta.size()<2){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"v_twotheta.size()<2",_VALUE_ILLEGAL_);}
+    if(v_twotheta.size()!=v_intensity.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"v_twotheta.size()!=v_intensity.size()",_VALUE_ILLEGAL_);}
 
     xvector<double> xv_intensity=aurostd::vector2xvector<double>(v_intensity),xv_intensity_smooth;
     uint smoothing_iterations=4,avg_window=4;int width_maximum=1;double significance_multiplier=1.0;  //defaults
@@ -2176,7 +2175,7 @@ namespace pflow {
       _atom& atom=sstr.atoms[i]; atom.CleanName();
       if(atom.name_is_given==FALSE || atom.cleanname.empty()){  //CO20190322
         message << "Need to provide atom names";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
       }
       scatt_fact[i]=GetXrayScattFactor(atom.cleanname,lambda);
       mass[i]=GetAtomMass(atom.cleanname);
@@ -2460,7 +2459,7 @@ namespace pflow {
     std::deque<int> netype_B=str_B.num_each_type;
     // Exit if A and B have different numbers of any types of atoms.
     if(!pflow::VVequal(netype_A,netype_B) || netype_A.size()!=netype_B.size()) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"structures A and B do not have the same number of each type of atom",_INPUT_ILLEGAL_); //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"structures A and B do not have the same number of each type of atom",_INPUT_ILLEGAL_); //CO20200624
     }
     int nat=str_A.atoms.size();
     int nt=netype_A.size();
@@ -2974,7 +2973,7 @@ namespace pflow {
           string token,sval;
           int id=s.find('=');
           if(id>=(int)s.length()) {
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"the following token is incorrectly formatted: "+s,_INPUT_ILLEGAL_); //CO20200624
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"the following token is incorrectly formatted: "+s,_INPUT_ILLEGAL_); //CO20200624
           }
           token=s.substr(0,id);
           token=aurostd::RemoveSpaces(token);
@@ -3244,7 +3243,7 @@ namespace pflow {
       }// PLANECOLOR
 
       if(!found_token) {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"token is not recognized: "+tok,_INPUT_ILLEGAL_); //CO20200624
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"token is not recognized: "+tok,_INPUT_ILLEGAL_); //CO20200624
       }
 
     } // for i
@@ -3755,7 +3754,7 @@ namespace pflow {
       case 0:{ // A single file of structures.
                // Read in structure list.
                if(rtp.input_files.size()<1) {
-                 throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"must specify a structure list file to open with the token INFILE (e.g., INFILE = STRLIST)",_FILE_CORRUPT_); //CO20200624
+                 throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"must specify a structure list file to open with the token INFILE (e.g., INFILE = STRLIST)",_FILE_CORRUPT_); //CO20200624
                }
                ifstream strlist_inf(rtp.input_files[0].c_str());
                aurostd::InFileExistCheck("RayTraceFuncs.cc/RayTraceManager",rtp.input_files[0].c_str(),strlist_inf);
@@ -3831,7 +3830,7 @@ namespace pflow {
                break;
              }
       default:{
-                throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"invalid CALCTYPE = "+aurostd::utype2string(rtp.calc_type),_INPUT_ILLEGAL_); //CO20200624
+                throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"invalid CALCTYPE = "+aurostd::utype2string(rtp.calc_type),_INPUT_ILLEGAL_); //CO20200624
               }
     }//switch
   }
@@ -5062,7 +5061,7 @@ namespace pflow {
           string sval;
           int id=s.find('=');
           if(id>=(int)s.length()) {
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"the following token is incorrectly formatted: "+s,_INPUT_ILLEGAL_); //CO20200624
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"the following token is incorrectly formatted: "+s,_INPUT_ILLEGAL_); //CO20200624
           }
           token=s.substr(0,id);
           token=aurostd::RemoveSpaces(token);
@@ -5177,7 +5176,7 @@ namespace pflow {
       }// PRINT_PARAMS
 
       if(!found_token) {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"token is not recognized: "+tok,_INPUT_ILLEGAL_); //CO20200624
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"token is not recognized: "+tok,_INPUT_ILLEGAL_); //CO20200624
       }
 
     } // for i
@@ -5210,7 +5209,7 @@ namespace pflow {
           message << "Error in case: " << i+1 << endl;
           message << "too low or high an atom number has been entered in entry: " << ia+1 << endl;
           message << "Bad value is: " << atp << endl;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200624
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200624
         }
       }
       for(int ik=0;ik<(int)pdd.pdos_k[i].size();ik++) {
@@ -5219,7 +5218,7 @@ namespace pflow {
           message << "Error in case: " << i+1 << endl;
           message << "too low or high a kpt number has been entered in entry: " << ik+1 << endl;
           message << "Bad value is: " << kp << endl;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200624
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200624
         }
       }
       for(int ib=0;ib<(int)pdd.pdos_b[i].size();ib++) {
@@ -5228,7 +5227,7 @@ namespace pflow {
           message << "Error in case: " << i+1 << endl;
           message << "too low or high a bnd number has been entered in entry: " << ib+1 << endl;
           message << "Bad value is: " << bp << endl;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200624
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200624
         }
       }
       for(int ilm=0;ilm<(int)pdd.pdos_lm[i].size();ilm++) {
@@ -5237,7 +5236,7 @@ namespace pflow {
           message << "Error in case: " << i+1 << endl;
           message << "too low or high an lm number has been entered in entry: " << ilm+1 << endl;
           message << "Bad value is: " << lmp << endl;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200624
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200624
         }
       }
     }
@@ -5386,7 +5385,7 @@ namespace pflow {
     message << "You have used the token ATOMS this many times: " << atom_cnt << endl;
     message << "These must be equal and >0 - the token ATOMS must precede each case and must occurr at least once. "<< endl;
     message << "This error is probably due to your having forgot to use the ATOMS token. Please type ATOMS=*** as the first line for each case."<< endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"pflow::AtomCntError():",message,_INPUT_ILLEGAL_); //CO20200624
+    throw aurostd::xerror(__AFLOW_FILE__,"pflow::AtomCntError():",message,_INPUT_ILLEGAL_); //CO20200624
   }
 }
 
@@ -5429,7 +5428,7 @@ namespace pflow {
           string sval;
           int id=s.find('=');
           if(id>=(int)s.length()) {
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"the following token is incorrectly formatted: "+s,_INPUT_ILLEGAL_); //CO20200624
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"the following token is incorrectly formatted: "+s,_INPUT_ILLEGAL_); //CO20200624
           }
           token=s.substr(0,id);
           token=aurostd::RemoveSpaces(token);
@@ -5511,7 +5510,7 @@ namespace pflow {
         found_token=1;
       }// NLM
       if(!found_token) {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"token is not recognized: "+tok,_INPUT_ILLEGAL_); //CO20200624
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"token is not recognized: "+tok,_INPUT_ILLEGAL_); //CO20200624
       }
     } // for i over tokens
 
@@ -5523,7 +5522,7 @@ namespace pflow {
           message << "Error in case: " << i+1 << endl;
           message << "You have entered too low or high an lm number in entry: " << ilm+1 << endl;
           message << "Bad value is: " << lmp << endl;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200624
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200624
         }
       }
     }
@@ -5622,7 +5621,7 @@ namespace pflow {
           message << "You have entered too low or high an atom number in entry: " << ida+1 << endl;
           message << "Min/Max allowed values are: " << "1 / " << pdd.natoms << endl;
           message << "Bad value is: " << ia+1 << endl;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200624
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200624
         }
         // Loop over each lm
         for(int idlm=0;idlm<(int)pdd.pdos_lm[ic].size();idlm++) {
@@ -5633,7 +5632,7 @@ namespace pflow {
             message << "You have entered too low or high an lm number in entry: " << idlm+1 << endl;
             message << "Min/Max allowed values are: " << "1 / " << pdd.nlm << endl;
             message << "Bad value is: " << ilm << endl;
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200624
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200624
           }
           // Loop over each bin
           for(int ib=0;ib<pdd.nbins;ib++) {
@@ -5655,7 +5654,7 @@ namespace pflow {
                      message << "ERROR: You have entered too low or high an spin number" << endl;
                      message << "ERROR: Min/Max allowed values are: " << "1 / 2" << endl;
                      message << "ERROR: Bad value is: " << pdd.spin << endl;
-                     throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200624
+                     throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200624
             } // switch spin
           } // bin
         } // lm
@@ -6627,7 +6626,7 @@ namespace pflow {
       pdp.dpts[2]=pflow::CompAperpB(pdp.dpts[2],pdp.dpts[1]);
       double norm_new=norm(pdp.dpts[2]);
       if(norm_new<TOL) {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"two axis are parallel and no plane can be determined",_INPUT_ILLEGAL_); //CO20200624
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"two axis are parallel and no plane can be determined",_INPUT_ILLEGAL_); //CO20200624
       }
       pdp.dpts[2]=SVprod(norm_orig/norm_new,pdp.dpts[2]);
     }
@@ -7290,7 +7289,7 @@ namespace pflow {
       message << "vspecies.size() != vcomposition.rows" << endl;
       message << "vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;
       message << "vcomposition=" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(vcomposition),",") << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message, _INDEX_MISMATCH_);
     }
     // special case, unary
     if(vspecies.size() == 1) {
@@ -7304,8 +7303,8 @@ namespace pflow {
     if(vred==gcd_vrt){aurostd::reduceByGCD(comp,final_comp,ZERO_TOL);} //DX20191125 - new function form
     else if(vred==frac_vrt){final_comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
     else if(vred==no_vrt){;}
-    else {throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__,"Unknown reduce mode",_INPUT_UNKNOWN_);}
-    if(std::abs(aurostd::sum(final_comp)) < ZERO_TOL){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Empty composition");}
+    else {throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__,"Unknown reduce mode",_INPUT_UNKNOWN_);}
+    if(std::abs(aurostd::sum(final_comp)) < ZERO_TOL){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Empty composition");}
     for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
       output << vspecies[i];
       if(!(exclude1 && aurostd::identical(final_comp[i+final_comp.lrows],1.0,ZERO_TOL))) {
@@ -7529,7 +7528,7 @@ namespace pflow {
   }
   uint AQueue::getNCPUS(const string& user,const string& partition,const job_status& status) const {
     uint ipartition=partitionName2Index(partition);
-    if(ipartition>m_partitions.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ipartition>m_partitions.size()-1",_INDEX_BOUNDS_);}
+    if(ipartition>m_partitions.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"ipartition>m_partitions.size()-1",_INDEX_BOUNDS_);}
     return getNCPUS(user,m_partitions[ipartition],status);
   }
   uint AQueue::getNCPUS(const string& user,const APartition& partition,const job_status& status) const {
@@ -7539,7 +7538,7 @@ namespace pflow {
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " partition=" << partition.m_name << endl;}
     for(uint i=0;i<partition.m_vijobs.size();i++){
       ijob=partition.m_vijobs[i];
-      if(ijob>m_jobs.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ijob>m_jobs.size()-1",_INDEX_BOUNDS_);}
+      if(ijob>m_jobs.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"ijob>m_jobs.size()-1",_INDEX_BOUNDS_);}
       const AJob& job=m_jobs[ijob];
       if(job.m_user==user && job.m_status==status){
         if(LDEBUG){cerr << __AFLOW_FUNC__ << " job=" << job.m_id << " ncpus=" << job.m_ncpus << endl;}
@@ -7550,7 +7549,7 @@ namespace pflow {
   }
   double AQueue::getPercentage(const string& user,const string& partition,const job_status& status) const {
     uint ipartition=partitionName2Index(partition);
-    if(ipartition>m_partitions.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ipartition>m_partitions.size()-1",_INDEX_BOUNDS_);}
+    if(ipartition>m_partitions.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"ipartition>m_partitions.size()-1",_INDEX_BOUNDS_);}
     return getPercentage(user,m_partitions[ipartition],status);
   }
   double AQueue::getPercentage(const string& user,const APartition& partition,const job_status& status) const {
@@ -7565,7 +7564,7 @@ namespace pflow {
         return inode;
       }
     }
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No node found with name="+name,_INPUT_UNKNOWN_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No node found with name="+name,_INPUT_UNKNOWN_);
   }
   uint AQueue::partitionName2Index(const string& name) const {
     for(uint ipartition=0;ipartition<m_partitions.size();ipartition++){
@@ -7573,7 +7572,7 @@ namespace pflow {
         return ipartition;
       }
     }
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No partition found with name="+name,_INPUT_UNKNOWN_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No partition found with name="+name,_INPUT_UNKNOWN_);
   }
 
   uint getTORQUEIDFromString(const string& torqueid_str) {
@@ -7581,13 +7580,13 @@ namespace pflow {
     string tmp="";
     vector<string> tokens;
     aurostd::string2tokens(torqueid_str,tokens,".");
-    if(tokens.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"tokens.size()==0 [1]",_RUNTIME_ERROR_);}
+    if(tokens.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"tokens.size()==0 [1]",_RUNTIME_ERROR_);}
     tmp=tokens[0];
     aurostd::string2tokens(tmp,tokens,"/");
     if(tokens.size()==1){tmp=tokens[0];}  //no '/' found
     else if(tokens.size()==2){tmp=tokens[1];}
-    else{throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"tokens.size()!=1||2",_RUNTIME_ERROR_);}
-    if(!aurostd::isfloat(tmp)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"!aurostd::isfloat(tmp)",_RUNTIME_ERROR_);}
+    else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"tokens.size()!=1||2",_RUNTIME_ERROR_);}
+    if(!aurostd::isfloat(tmp)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"!aurostd::isfloat(tmp)",_RUNTIME_ERROR_);}
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " id=" << tmp << endl;}
     return aurostd::string2utype<uint>(tmp);
   }
@@ -7601,16 +7600,16 @@ namespace pflow {
       if(m_jobs[i].m_id==_job.m_id){
         //job found
         AJob& job=m_jobs[i];
-        if(job.m_status!=_job.m_status){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"job.m_status!=_job.m_status",_RUNTIME_ERROR_);}  //mismatch in statuses
+        if(job.m_status!=_job.m_status){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"job.m_status!=_job.m_status",_RUNTIME_ERROR_);}  //mismatch in statuses
         const job_status& jstat=job.m_status;
         if(jstat==JOB_RUNNING && _job.m_vinodes.size()==0){ //then where is it running? we should have node information (m_vinodes and m_vncpus)
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"RUNNING job="+aurostd::utype2string(_job.m_id)+" has not been assigned to a node",_RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"RUNNING job="+aurostd::utype2string(_job.m_id)+" has not been assigned to a node",_RUNTIME_ERROR_);
         }
         if(_job.m_vinodes.size()>0){  //node information is available for mapping to a node
           //to add a job, its record should have been taken from one node (at a time)
-          if(_job.m_vinodes.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"_job.m_vinodes.size()!=1",_RUNTIME_ERROR_);}
-          if(_job.m_vncpus.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"_job.m_vncpus.size()!=1",_RUNTIME_ERROR_);}
-          if(_job.m_vinodes.size()!=_job.m_vncpus.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"_job.m_vinodes.size()!=_job.m_vncpus.size()",_RUNTIME_ERROR_);}
+          if(_job.m_vinodes.size()!=1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"_job.m_vinodes.size()!=1",_RUNTIME_ERROR_);}
+          if(_job.m_vncpus.size()!=1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"_job.m_vncpus.size()!=1",_RUNTIME_ERROR_);}
+          if(_job.m_vinodes.size()!=_job.m_vncpus.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"_job.m_vinodes.size()!=_job.m_vncpus.size()",_RUNTIME_ERROR_);}
           const uint inode=_job.m_vinodes[0];
           const uint ncpus=_job.m_vncpus[0];
           found_node=false;
@@ -7651,14 +7650,14 @@ namespace pflow {
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " adding partition=" << partition.m_name << endl;}
     if(partition.m_properties_node.empty()){  //only available if user is root
       partition.m_properties_node=partition.m_name; //default string to search
-      //[resort to default]throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Not sure how to define partitions for HOST="+XHOST.hostname,_RUNTIME_ERROR_);
+      //[resort to default]throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Not sure how to define partitions for HOST="+XHOST.hostname,_RUNTIME_ERROR_);
       if(XHOST.hostname=="qrats.materials.duke.edu"){ //protection, ideally the aflow user would be "root"
         //hack
         if(partition.m_name=="priority"){partition.m_properties_node="sharedCompute";}
         else if(partition.m_name=="debug"){partition.m_properties_node="debug";}
         else if(partition.m_name=="batch"){partition.m_properties_node="sharedCompute";}
         else if(partition.m_name=="research"){partition.m_properties_node="sharedCompute";}
-        else{throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Unknown queue="+partition.m_name,_RUNTIME_ERROR_);}
+        else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown queue="+partition.m_name,_RUNTIME_ERROR_);}
       }
     }
     return partition_added;
@@ -7702,7 +7701,7 @@ namespace pflow {
       else if(node.m_status==NODE_FULL){cerr << "FULL";}
       else if(node.m_status==NODE_DOWN){cerr << "DOWN";}
       else if(node.m_status==NODE_OFFLINE){cerr << "OFFLINE";}
-      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Unknown node.status",_RUNTIME_ERROR_);}
+      else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown node.status",_RUNTIME_ERROR_);}
       cerr << " node=" << node.m_name << endl;
     }
     return node_added;
@@ -7733,7 +7732,7 @@ namespace pflow {
       APartition _partition;_partition.free();
       _partition.m_name=node.m_properties;
       //set m_properties_node inside addPartition()
-      if(!addPartition(_partition)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Partition already exists",_RUNTIME_ERROR_);}
+      if(!addPartition(_partition)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Partition already exists",_RUNTIME_ERROR_);}
       ipartition=m_partitions.size()-1;
       APartition& partition=m_partitions[ipartition];
       partition.m_inodes.push_back(node.m_index);
@@ -7747,10 +7746,10 @@ namespace pflow {
     uint i=0,ipartition=0;
     //map job to partition
     //mapping MUST have happened upon adding the job, just checking and verbose
-    if(job.m_vipartitions.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"job="+aurostd::utype2string(job.m_id)+" has not been assigned a partition",_INPUT_ERROR_);}
+    if(job.m_vipartitions.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"job="+aurostd::utype2string(job.m_id)+" has not been assigned a partition",_INPUT_ERROR_);}
     for(i=0;i<job.m_vipartitions.size();i++){
       ipartition=job.m_vipartitions[i];
-      if(ipartition>m_partitions.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ipartition>m_partitions.size()-1",_INDEX_BOUNDS_);}
+      if(ipartition>m_partitions.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"ipartition>m_partitions.size()-1",_INDEX_BOUNDS_);}
       APartition& partition=m_partitions[ipartition];
       partition.m_vijobs.push_back(job.m_index);
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " mapping job=" << job.m_id << " to partition=" << partition.m_name << endl;}
@@ -7760,13 +7759,13 @@ namespace pflow {
       //it's possible that, in the non-zero amount of time between processing pbsnodes and qstat, a job status changes from 'Q' or 'H' to 'R'
       //this "transition state' is always possible when the commands are not run at the exact same time
       //therefore, it is better to sleep for a few seconds, and re-reun the whole processing script again
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"RUNNING job="+aurostd::utype2string(job.m_id)+" has not been assigned a node",_RUNTIME_EXTERNAL_FAIL_); //this will issue a re-run
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"RUNNING job="+aurostd::utype2string(job.m_id)+" has not been assigned a node",_RUNTIME_EXTERNAL_FAIL_); //this will issue a re-run
     }
     if(job.m_vinodes.size()>0){
       uint inode=0;
       for(i=0;i<job.m_vinodes.size();i++){
         inode=job.m_vinodes[i];
-        if(inode>m_nodes.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"inode>m_nodes.size()-1",_INDEX_BOUNDS_);}
+        if(inode>m_nodes.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"inode>m_nodes.size()-1",_INDEX_BOUNDS_);}
         ANode& node=m_nodes[inode];
         node.m_vijobs.push_back(job.m_index);
         if(LDEBUG){cerr << __AFLOW_FUNC__ << " mapping job=" << job.m_id << " to node=" << node.m_name << endl;}
@@ -7774,7 +7773,7 @@ namespace pflow {
         //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]//we could check that ALL nodes belong to a partition, but we might have a separate node...
         //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]for(j=0;j<node.m_vipartitions.size();j++){
         //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]  ipartition=node.m_vipartitions[j];
-        //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]  if(ipartition>m_partitions.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ipartition>m_partitions.size()-1",_INDEX_BOUNDS_);}
+        //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]  if(ipartition>m_partitions.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"ipartition>m_partitions.size()-1",_INDEX_BOUNDS_);}
         //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]  APartition& partition=m_partitions[ipartition];
         //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]  partition.m_vijobs.push_back(job.m_index);
         //[WRONG - job maps to node and node to partitions, but job maps to 1 (usually) partition]  job.m_vipartitions.push_back(ipartition);
@@ -7818,7 +7817,7 @@ namespace pflow {
     //run sinfo
     //https://slurm.schedmd.com/sinfo.html
     if(!aurostd::IsCommandAvailable("sinfo")){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"no sinfo command found for SLURM configuration",_RUNTIME_EXTERNAL_MISS_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"no sinfo command found for SLURM configuration",_RUNTIME_EXTERNAL_MISS_);
     }
     lines=aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("sinfo")+" -N -l"));
     APartition _partition;_partition.free();
@@ -7830,7 +7829,7 @@ namespace pflow {
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " line=\"" << line << "\"" << endl;}
       _node.free();
       aurostd::string2tokens(line,tokens," ");
-      if(tokens.size()<11){continue;}   //skip date and header //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"tokens.size()<11",_RUNTIME_ERROR_);
+      if(tokens.size()<11){continue;}   //skip date and header //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"tokens.size()<11",_RUNTIME_ERROR_);
       _node.m_name=tokens[0];
       //tokens[2] is partition, addPartition() takes care of checking that it's not already in the list
       _partition.free();
@@ -7856,7 +7855,7 @@ namespace pflow {
           tokens[3]=="no_respond"||
           FALSE){_node.m_status=NODE_DOWN;} //leave for last, many variants to consider
       //tokens[4] is ncpus
-      if(!aurostd::isfloat(tokens[4])){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"tokens[4] is NOT a float (ncpus)",_RUNTIME_ERROR_);}
+      if(!aurostd::isfloat(tokens[4])){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"tokens[4] is NOT a float (ncpus)",_RUNTIME_ERROR_);}
       _node.m_ncpus=aurostd::string2utype<double>(tokens[4]);
       addNode(_node);
     }
@@ -7873,7 +7872,7 @@ namespace pflow {
 
     //run squeue
     if(!aurostd::IsCommandAvailable("squeue")){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"no squeue command found for SLURM configuration",_RUNTIME_EXTERNAL_MISS_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"no squeue command found for SLURM configuration",_RUNTIME_EXTERNAL_MISS_);
     }
     lines=aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("squeue")+" --format=\"\%.18i %.9P %.8j \%.8u %.2t %.10M \%.6D \%C \%R\"")); //man squeue
     AJob _job;_job.free();
@@ -7884,7 +7883,7 @@ namespace pflow {
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " line=\"" << line << "\"" << endl;}
       aurostd::string2tokens(line,tokens," ");
       //tokens[0] is job id
-      if(!aurostd::isfloat(tokens[0])){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"!aurostd::isfloat(tokens[0])",_RUNTIME_ERROR_);}
+      if(!aurostd::isfloat(tokens[0])){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"!aurostd::isfloat(tokens[0])",_RUNTIME_ERROR_);}
       _job.free();
       _job.m_id=aurostd::string2utype<uint>(tokens[0]);
       //tokens[1] is partition
@@ -7901,9 +7900,9 @@ namespace pflow {
           tokens[4]=="F"||
           tokens[4]=="PR"||
           FALSE){_job.m_status=JOB_DONE;}
-      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Unknown job status="+tokens[4],_RUNTIME_ERROR_);}
+      else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown job status="+tokens[4],_RUNTIME_ERROR_);}
       //tokens[7] is ncpus
-      if(!aurostd::isfloat(tokens[7])){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"!aurostd::isfloat(tokens[7])",_RUNTIME_ERROR_);}
+      if(!aurostd::isfloat(tokens[7])){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"!aurostd::isfloat(tokens[7])",_RUNTIME_ERROR_);}
       _job.m_ncpus=aurostd::string2utype<uint>(tokens[7]);
       //tokens[8] is node if running
       if(_job.m_status==JOB_RUNNING){
@@ -7923,7 +7922,7 @@ namespace pflow {
 
     //run qstat -f -Q
     if(!aurostd::IsCommandAvailable("qstat")){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"no qstat command found for TORQUE configuration",_RUNTIME_EXTERNAL_MISS_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"no qstat command found for TORQUE configuration",_RUNTIME_EXTERNAL_MISS_);
     }
     //'qstat -f' gives FULL job information, but takes a long time
     lines=aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("qstat")+" -f -Q"));
@@ -7937,13 +7936,13 @@ namespace pflow {
       if(line.find("Queue:")!=string::npos){
         if(!_partition.m_name.empty()){addPartition(_partition);}
         aurostd::string2tokens(line,tokens,":");
-        if(tokens.size()!=2){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"tokens.size()!=2",_RUNTIME_ERROR_);}
+        if(tokens.size()!=2){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"tokens.size()!=2",_RUNTIME_ERROR_);}
         _partition.free(); //reset
         _partition.m_name=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[1]);
       }
       else{
         aurostd::string2tokens(line,tokens,"=");
-        if(tokens.size()!=2){continue;}   //sometimes we get garbage lines like 'lete:0' //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"!tokens.size()",_RUNTIME_ERROR_);
+        if(tokens.size()!=2){continue;}   //sometimes we get garbage lines like 'lete:0' //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"!tokens.size()",_RUNTIME_ERROR_);
         key=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[0]);
         value=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[1]);
         if(LDEBUG){cerr << __AFLOW_FUNC__ << " key=" << key << endl;}
@@ -7963,7 +7962,7 @@ namespace pflow {
 
     //run pbsnodes
     if(!aurostd::IsCommandAvailable("pbsnodes")){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"no pbsnodes command found for TORQUE configuration",_RUNTIME_EXTERNAL_MISS_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"no pbsnodes command found for TORQUE configuration",_RUNTIME_EXTERNAL_MISS_);
     }
     lines=aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("pbsnodes")));
     ANode _node;_node.free();
@@ -7980,7 +7979,7 @@ namespace pflow {
       }
       else{
         aurostd::string2tokens(line,tokens,"=");
-        if(tokens.size()!=2){continue;}   //sometimes we get garbage lines like 'lete:0' //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"!tokens.size()",_RUNTIME_ERROR_);
+        if(tokens.size()!=2){continue;}   //sometimes we get garbage lines like 'lete:0' //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"!tokens.size()",_RUNTIME_ERROR_);
         key=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[0]);
         value=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(tokens[1]);
         if(LDEBUG){cerr << __AFLOW_FUNC__ << " key=" << key << endl;}
@@ -7992,7 +7991,7 @@ namespace pflow {
           else if(value.find("job-exclusive")!=string::npos){_node.m_status=NODE_OCCUPIED;}
           else if(value.find("free")!=string::npos){_node.m_status=NODE_FREE;}
           else{
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"unknown state from pbsnodes: state=\""+value+"\"",_RUNTIME_ERROR_);  //more states to account for
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"unknown state from pbsnodes: state=\""+value+"\"",_RUNTIME_ERROR_);  //more states to account for
           }
         }
         else if(key=="np"){_node.m_ncpus=aurostd::string2utype<uint>(value);}
@@ -8030,7 +8029,7 @@ namespace pflow {
 
     //get jobs user
     if(!aurostd::IsCommandAvailable("qstat")){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"no qstat command found for TORQUE configuration",_RUNTIME_EXTERNAL_MISS_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"no qstat command found for TORQUE configuration",_RUNTIME_EXTERNAL_MISS_);
     }
     //'qstat -f' gives FULL job information, but takes a long time
     lines=aurostd::string2vectorstring(aurostd::execute2string(XHOST.command("qstat")+" -a"));
@@ -8040,7 +8039,7 @@ namespace pflow {
       if(line.empty()){continue;}
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " line=\"" << line << "\"" << endl;}
       aurostd::string2tokens(line,tokens," ");
-      if(tokens.size()<11){continue;}   //skip date and header //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"tokens.size()<11",_RUNTIME_ERROR_);
+      if(tokens.size()<11){continue;}   //skip date and header //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"tokens.size()<11",_RUNTIME_ERROR_);
       //tokens[0] has job id
       tmp=tokens[0];
       if(tmp.find("---")!=string::npos){continue;}  //skip header //must be longer than 2 --, see 'Req'd Memory'
@@ -8064,7 +8063,7 @@ namespace pflow {
         //tokens[2] has queue, very important for non-running jobs
         _job.m_vipartitions.push_back(partitionName2Index(tokens[2]));
         //tokens[6] has ncpus
-        if(!aurostd::isfloat(tokens[6])){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"!aurostd::isfloat(tokens[6])",_RUNTIME_ERROR_);}
+        if(!aurostd::isfloat(tokens[6])){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"!aurostd::isfloat(tokens[6])",_RUNTIME_ERROR_);}
         _job.m_ncpus=aurostd::string2utype<uint>(tokens[6]);
         //tokens[9] has job status
         //http://docs.adaptivecomputing.com/torque/4-1-4/Content/topics/commands/qstat.htm
@@ -8072,7 +8071,7 @@ namespace pflow {
         else if(tokens[9]=="R"){_job.m_status=JOB_RUNNING;}
         else if(tokens[9]=="H"||tokens[9]=="S"){_job.m_status=JOB_HELD;}
         else if(tokens[9]=="C"||tokens[9]=="E"||tokens[9]=="W"){_job.m_status=JOB_DONE;} //not sure about W...
-        else{throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Unknown job status="+tokens[9],_RUNTIME_ERROR_);} //T?
+        else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown job status="+tokens[9],_RUNTIME_ERROR_);} //T?
         addJob(_job);
       }
     }
@@ -8085,7 +8084,7 @@ namespace pflow {
 
     if(aurostd::IsCommandAvailable("squeue")){m_qsys=QUEUE_SLURM;}
     else if(aurostd::IsCommandAvailable("pbsnodes")){m_qsys=QUEUE_TORQUE;}
-    else{throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"cannot identify queuing system",_RUNTIME_ERROR_);}
+    else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"cannot identify queuing system",_RUNTIME_ERROR_);}
 
     if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " m_qsys=";
@@ -8139,7 +8138,7 @@ namespace pflow {
         cerr << __AFLOW_FUNC__ << " node=" << node.m_name << " has jobs=";
         for(uint i=0;i<node.m_vijobs.size();i++){
           ijob=node.m_vijobs[i];
-          if(ijob>m_jobs.size()-1){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"ijob>m_jobs.size()-1",_INDEX_BOUNDS_);}
+          if(ijob>m_jobs.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"ijob>m_jobs.size()-1",_INDEX_BOUNDS_);}
           AJob& job=m_jobs[ijob];
           cerr << job.m_id << (i<node.m_vijobs.size()-1?",":"");
         }
@@ -8185,10 +8184,9 @@ namespace pflow{
     // Return vector of fake elements
     // Useful for determining "elements" for prototypes
 
-    string function_name = XPID + "pflow::getFakeElements():";
 
     if(nspecies>26){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"There are more than 26 species, this function must be modified to include more fake elements.",_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"There are more than 26 species, this function must be modified to include more fake elements.",_RUNTIME_ERROR_);
     }
 
     vector<string> elements;
@@ -8211,7 +8209,6 @@ namespace pflow{
     // Uses xelement
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string function_name = XPID + "pflow::hasRealElements():";
     stringstream message;
 
     if(xstr.species.size() > 0){
@@ -8222,13 +8219,13 @@ namespace pflow{
           element = xelement::xelement(KBIN::VASP_PseudoPotential_CleanName(xstr.species[i]));
         }
         catch(aurostd::xerror& re){
-          if(LDEBUG){ cerr << function_name << xstr.species[i] << " is not a real element." << endl; }
+          if(LDEBUG){ cerr << __AFLOW_FUNC__ << xstr.species[i] << " is not a real element." << endl; }
           return false;
         }
       }
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"The species are empty.",_INPUT_NUMBER_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"The species are empty.",_INPUT_NUMBER_);
     }
 
     return true;
@@ -8247,7 +8244,6 @@ namespace pflow{
     //  2) loose = min_nn_dist/10
     //  3) number = user defined (Angstroms)
 
-    string function_name = XPID + "pflow::getSymmetryTolerance():";
     stringstream message;
 
     double default_tolerance=SYM::defaultTolerance(xstr);
@@ -8268,7 +8264,7 @@ namespace pflow{
     }
     if(tolerance < 1e-10){
       message << "Tolerance cannot be zero (i.e. less than 1e-10): tol=" << tolerance << ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_VALUE_RANGE_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_RANGE_);
     }
 
     return tolerance;
@@ -8284,7 +8280,6 @@ namespace pflow{
     // Return the symmetry tolerance spectrum
     // Expected input: "start:end:step"
 
-    string function_name = XPID + "pflow::getSymmetryToleranceSpectrum():";
     stringstream message;
 
     vector<double> tolerance_spectrum;
@@ -8296,14 +8291,14 @@ namespace pflow{
       uint nsteps = aurostd::string2utype<uint>(tokens[2])-1;
       if(end<start){
         message << "End of the range cannot be less than the beginning of the range: start=" << start << ", end=" << end;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
       }
       double interval = (end-start)/(double)nsteps;
       for(uint i=0;i<=nsteps;i++){ tolerance_spectrum.push_back(start+((double)i*interval)); }
     }
     else{
       message << "Expected three inputs: first=range_start:second=range_end:third=nsteps.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
     }
 
     return tolerance_spectrum;
@@ -8355,7 +8350,7 @@ namespace pflow {
       if (LDEBUG) cerr << __AFLOW_FUNC__ << " AUID: " << auid << endl;
       if (LDEBUG) cerr << __AFLOW_FUNC__ << " AURL: " << aurl << endl;
     } else {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "could not load a structure", _INPUT_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "could not load a structure", _INPUT_ERROR_);
     }
 
     vector <AtomEnvironment> AE = getAtomEnvironments(str, aeMode);
@@ -8377,7 +8372,6 @@ namespace pflow{
     //  3) 3 (SG_SETTING_ANRL) = rhomobhedral: rhl setting, monoclinic: unique-axis b, centrosymmetric: origin on inversion site 
     // The mode_default variable is an optional input: --prototype command defaults to the AFLOW setting, while everything else defaults to SG_SETTING_1
 
-    string function_name = XPID + "pflow::getSpaceGroupSetting():";
     stringstream message;
 
     uint setting = mode_default; //default
@@ -8392,7 +8386,7 @@ namespace pflow{
         if(setting_num==1){setting=SG_SETTING_1;}
         else if(setting_num==2){setting=SG_SETTING_2;}
         if(setting_num!=SG_SETTING_1 && setting_num!=SG_SETTING_2){
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Setting must be 1, 2, or \"aflow\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c).",_INPUT_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Setting must be 1, 2, or \"aflow\" (for rhombohedral systems: 1=rhl setting and 2=hex setting; for monoclinic systems: 1=unique axis-b and 2=unique axis-c).",_INPUT_ILLEGAL_);
         }
       }
     }

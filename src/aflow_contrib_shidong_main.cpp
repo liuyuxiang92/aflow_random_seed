@@ -67,12 +67,12 @@ namespace pflow {
       str_list =  ReadInFitStructure(cin, structure_type);
       num_input_str = str_list.size();
     } else {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No structure",_INPUT_MISSING_); //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No structure",_INPUT_MISSING_); //CO20200624
     }
 
 
     if(num_input_str==0) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No input structure matches "+structure_type,_FILE_CORRUPT_); //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No input structure matches "+structure_type,_FILE_CORRUPT_); //CO20200624
     }
 
     vector<_ceatom> atom_species;
@@ -559,11 +559,11 @@ namespace pflow {
     bool ACEFlag = ACEGetStructureType(structure_type);
 
     if(!ACEFlag) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"structure types are fcc, bcc, hcp",_INPUT_ILLEGAL_); //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"structure types are fcc, bcc, hcp",_INPUT_ILLEGAL_); //CO20200624
     }
 
     if((tokens.size() != 3) && (tokens.size() != 7)) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"incorrect argument numbers",_INPUT_NUMBER_); //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"incorrect argument numbers",_INPUT_NUMBER_); //CO20200624
     }
 
     //////////////////////////////////////////////////////////////
@@ -616,7 +616,7 @@ namespace pflow {
       //SLtmp = ceSL(str_type);
 
       if(a.species.size() > 2) {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"only binary alloy is implemented",_INPUT_ILLEGAL_); //CO20200624
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"only binary alloy is implemented",_INPUT_ILLEGAL_); //CO20200624
       }
 
       SLtmp.SetStrCluster(allcluster);
@@ -709,7 +709,7 @@ namespace pflow {
 
     bool ACEFlag = ACEGetStructureType(structure_type);
     if(!ACEFlag) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No structure",_INPUT_MISSING_); //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No structure",_INPUT_MISSING_); //CO20200624
     }
 
     if(tokens.at(0)=="VASP") {
@@ -750,7 +750,7 @@ namespace pflow {
         message << "Please use the command" << endl;
         message << "    aflow --cluster=structure_type,minimun_site_num,maximum_site_num,minimum_nearest_neighbor,maximum_nearest_neighbor" << endl;
         message << "to generate it";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_CORRUPT_); //CO20200624
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_CORRUPT_); //CO20200624
 
       } else {
         myfile.close();
@@ -801,7 +801,7 @@ namespace pflow {
     }
     bool ACEFlag = ACEGetStructureType(structure_type);
     if(!ACEFlag) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No structure",_INPUT_MISSING_); //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No structure",_INPUT_MISSING_); //CO20200624
     }
 
     ceallclusters allcluster(structure_type);
