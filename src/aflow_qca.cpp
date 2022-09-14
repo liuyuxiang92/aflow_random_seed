@@ -388,7 +388,7 @@ namespace qca {
       }
       catch (aurostd::xerror& err) {
         stringstream message;
-        message << "Equilibrium probabilities do not satify the concentration constraints, skipping binodal curve calculation";
+        message << "Equilibrium probabilities do not satisfy the concentration constraints, skipping binodal curve calculation";
         pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         return;
       }
@@ -1310,7 +1310,7 @@ namespace qca {
     calculateProbabilityIdealCluster();
     // Check that the probability is physical, if not, shift the temperature range upward
     double dtemp = temp(2) - temp(1);
-    message << "Checking for physical probabilites at equi-composition";
+    message << "Checking for physical probabilities at equi-composition";
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     while (aurostd::min(temp) < DEFAULT_QCA_TEMP_MIN_LIMIT) {
       try {
