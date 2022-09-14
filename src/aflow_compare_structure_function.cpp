@@ -97,11 +97,11 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
   if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}  //CO20200508
 
   message << "Total number of structures to compare: " << structure_containers.size();
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
   if(structure_containers.size() == 0){
     message << "No structures to compare.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__,message,_RUNTIME_ERROR_);
   }
 
   // ---------------------------------------------------------------------------
@@ -182,14 +182,14 @@ vector<StructurePrototype> XtalFinderCalculator::compareMultipleStructures(
   // BETA TESTING (perhaps we shouldn't do this) - compare::checkPrototypes(num_proc,same_species,prototypes_final);
 
   message << "Number of unique prototypes: " << prototypes_final.size() << " (out of " << structure_containers.size() << " structures).";
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
 
   // ---------------------------------------------------------------------------
   // get unique atom decorations prototype (representative) structures
   if(!same_species && comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS")){
 
     message << "Determining the unique atom decorations for each prototype.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     // find unique atom decorations of prototype
     for(uint i=0;i<prototypes_final.size();i++){
       XtalFinderCalculator xtal_finder_permutations;
@@ -247,12 +247,12 @@ void XtalFinderCalculator::getOptions(
     message << "Matching misfit threshold must be less than the same family threshold:"
       << " misfit match threshold: " << misfit_match
       << " misfit family threshold: " << misfit_family;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   }
   message << "Misfit threshold for matched structures: " << misfit_match << " (default: " << DEFAULT_XTALFINDER_MISFIT_MATCH << ")";
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   message << "Misfit threshold for structures in the same family: " << misfit_family << " (default: " << DEFAULT_XTALFINDER_MISFIT_FAMILY << ")";
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
   // ---------------------------------------------------------------------------
   // FLAG: number of processors (multithreading)
@@ -265,7 +265,7 @@ void XtalFinderCalculator::getOptions(
   if(vpflow.flag("COMPARE::OPTIMIZE_MATCH")) {
     comparison_options.flag("COMPARISON_OPTIONS::OPTIMIZE_MATCH",TRUE);
     message << "OPTIONS: Finding optimal match; exploring all possible lattices and origins to find the best match (note: this will slow down the comparisons).";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
@@ -273,7 +273,7 @@ void XtalFinderCalculator::getOptions(
   if(vpflow.flag("COMPARE::NO_SCALE_VOLUME")) {
     comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME",FALSE);
     message << "OPTIONS: Suppressing volume scaling; useful for distinguishing structures at different pressures.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
@@ -282,7 +282,7 @@ void XtalFinderCalculator::getOptions(
   if(vpflow.flag("COMPARE::KEEP_UNMATCHED")) {
     comparison_options.flag("COMPARISON_OPTIONS::CLEAN_UNMATCHED",FALSE);
     message << "OPTIONS: Keep unmatched structure comparisons (reveals mappings despite being above the misfit_match threshold).";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
@@ -290,7 +290,7 @@ void XtalFinderCalculator::getOptions(
   if(vpflow.flag("COMPARE::IGNORE_WYCKOFF")) {
     comparison_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF",TRUE);
     message << "OPTIONS: Ignoring Wyckoff positions when grouping comparisons, but will group by space group (note: do not use for making prototypes; this will slow down the comparisons).";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
@@ -299,7 +299,7 @@ void XtalFinderCalculator::getOptions(
     comparison_options.flag("COMPARISON_OPTIONS::IGNORE_SYMMETRY",TRUE);
     comparison_options.flag("COMPARISON_OPTIONS::IGNORE_WYCKOFF",TRUE);
     message << "OPTIONS: Ignoring symmetry when grouping comparisons, i.e., do not group by space group and Wyckoff positions (note: do not use for making prototypes; this will slow down the comparisons).";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
@@ -307,7 +307,7 @@ void XtalFinderCalculator::getOptions(
   if(vpflow.flag("COMPARE::IGNORE_ENVIRONMENT_ANALYSIS")) {
     comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS",TRUE);
     message << "OPTIONS: Ignoring LFA environment analysis when grouping comparisons.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
@@ -315,7 +315,7 @@ void XtalFinderCalculator::getOptions(
   if(vpflow.flag("COMPARE::REMOVE_DUPLICATE_COMPOUNDS")) {
     comparison_options.flag("COMPARISON_OPTIONS::REMOVE_DUPLICATE_COMPOUNDS",TRUE);
     message << "OPTIONS: Remove duplicate compounds first, useful for non-biased prototype statistics.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
@@ -323,7 +323,7 @@ void XtalFinderCalculator::getOptions(
   if(vpflow.flag("COMPARE::MATCH_TO_AFLOW_PROTOS")) {
     comparison_options.flag("COMPARISON_OPTIONS::MATCH_TO_AFLOW_PROTOS",TRUE);
     message << "OPTIONS: Compare unique structures to the AFLOW prototypes.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
@@ -331,7 +331,7 @@ void XtalFinderCalculator::getOptions(
   if(vpflow.flag("COMPARE::ADD_AFLOW_PROTOTYPE_DESIGNATION")) {
     comparison_options.flag("COMPARISON_OPTIONS::ADD_AFLOW_PROTOTYPE_DESIGNATION",TRUE);
     message << "OPTIONS: Cast unique structures into AFLOW standard designation.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
@@ -339,7 +339,7 @@ void XtalFinderCalculator::getOptions(
   if(vpflow.flag("COMPARE::UNDECORATED_COMPARISON")) {
     comparison_options.flag("COMPARISON_OPTIONS::UNDECORATED_COMPARISON",TRUE);
     message << "OPTIONS: Undecorated comparison; compare structures as if they had one atom-type.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
@@ -347,7 +347,7 @@ void XtalFinderCalculator::getOptions(
   if(vpflow.flag("COMPARE::PRIMITIVIZE")) {
     comparison_options.flag("COMPARISON_OPTIONS::PRIMITIVIZE",TRUE);
     message << "OPTIONS: Converting all structures to a primitive representation.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
@@ -355,7 +355,7 @@ void XtalFinderCalculator::getOptions(
   if(vpflow.flag("COMPARE::MINKOWSKI")) {
     comparison_options.flag("COMPARISON_OPTIONS::MINKOWSKI",TRUE);
     message << "OPTIONS: Performing Minkowski lattice reduction on all structures.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
@@ -363,7 +363,7 @@ void XtalFinderCalculator::getOptions(
   if(vpflow.flag("COMPARE::NIGGLI")) {
     comparison_options.flag("COMPARISON_OPTIONS::NIGGLI",TRUE);
     message << "OPTIONS: Performing Niggli lattice reduction on all structures.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
@@ -372,7 +372,7 @@ void XtalFinderCalculator::getOptions(
   if(vpflow.flag("COMPARE::ICSD_COMPARISON")) {
     comparison_options.flag("COMPARISON_OPTIONS::ICSD_COMPARISON",TRUE);
     message << "OPTIONS: Running on ICSD structures; use oldest ICSD number as representative prototype.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
@@ -380,7 +380,7 @@ void XtalFinderCalculator::getOptions(
   if(vpflow.flag("COMPARE::DO_NOT_CALCULATE_UNIQUE_PERMUTATIONS")) {
     comparison_options.flag("COMPARISON_OPTIONS::CALCULATE_UNIQUE_PERMUTATIONS",FALSE);
     message << "OPTIONS: Do not calculate unique atom decorations.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
 }
@@ -401,7 +401,7 @@ string XtalFinderCalculator::getSpaceGroupMatchbookFromOptions(
 
     string space_group_input = vpflow.getattachedscheme("COMPARE_DATABASE_ENTRIES::SPACE_GROUP");
     message << "OPTIONS: Requesting the following space groups: " << space_group_input;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
     vector<string> vspace_group_strings;
     aurostd::string2tokens(space_group_input,vspace_group_strings,",");
@@ -411,7 +411,7 @@ string XtalFinderCalculator::getSpaceGroupMatchbookFromOptions(
       sg_tmp = aurostd::string2utype<uint>(vspace_group_strings[i]);
       if(sg_tmp<1 || sg_tmp>230){
         message << "Invalid space group requested: " << vspace_group_strings[i] << ". Please check input.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ERROR_);
       }
       vspace_groups_uint.push_back(sg_tmp);
     }
@@ -1058,7 +1058,7 @@ void XtalFinderCalculator::addStructure2container(
   // check if fake names for same species comparison
   if(same_species && !pflow::hasRealElements(str_rep_tmp.structure)){
     message << "Atomic species are not real/physical " << str_rep_tmp.name << " cannot perform material comparison; skipping structure.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     return; // not storing structure
   }
 
@@ -1115,7 +1115,7 @@ void XtalFinderCalculator::setStructureAsRepresentative(StructurePrototype& stru
   if(str_pointer == NULL){
     stringstream message;
     message << "Input is a null pointer.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ERROR_);
   }
 
   // point to the input
@@ -1159,7 +1159,7 @@ void XtalFinderCalculator::addStructure2duplicatesList(StructurePrototype& struc
   if(str_pointer == NULL){
     stringstream message;
     message << "Input is a null pointer.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ERROR_);
   }
 
   structure_tmp.structures_duplicate.push_back(str_pointer);
@@ -1192,7 +1192,7 @@ void XtalFinderCalculator::addStructure2sameFamilyList(StructurePrototype& struc
   if(structure_tmp.structures_duplicate[index] == NULL){
     stringstream message;
     message << "Pointer at index " << index << " is a null pointer.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ERROR_);
   }
 
   structure_tmp.structures_family.push_back(structure_tmp.structures_duplicate[index]);
@@ -1212,7 +1212,7 @@ void XtalFinderCalculator::addStructure2sameFamilyList(StructurePrototype& struc
   if(str_pointer == NULL){
     stringstream message;
     message << "Input is a null pointer.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ERROR_);
   }
 
   structure_tmp.structures_family.push_back(str_pointer);
@@ -1258,7 +1258,7 @@ void StructurePrototype::copyDuplicate(const StructurePrototype& b,
   if(b.structures_duplicate[index] == NULL){
     stringstream message;
     message << "Pointer at index " << index << " is a null pointer.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ERROR_);
   }
 
   // point to the structure in the container at correponding index
@@ -1690,7 +1690,7 @@ void XtalFinderCalculator::loadStructuresFromDirectory(
   std::sort(vfiles.begin(),vfiles.end()); //CO20180830
 
   message << "Loading " << vfiles.size() << " files in directory ... ";
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   for(uint i=0; i<vfiles.size(); i++){
     if(LDEBUG) {cerr << "compare:: " << i << "/" << vfiles.size() << " " << vfiles[i] << endl;}
     if(vfiles[i].find("comparison_output.json") != std::string::npos ||
@@ -1701,7 +1701,7 @@ void XtalFinderCalculator::loadStructuresFromDirectory(
         vfiles[i].find("duplicate_compounds_output.out") != std::string::npos ||
         vfiles[i].find("nohup.out") != std::string::npos){
       message << "Ignoring file=" << vfiles[i] << endl;
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       vfiles.erase(vfiles.begin()+i);
       i--;
     }
@@ -1713,7 +1713,7 @@ void XtalFinderCalculator::loadStructuresFromDirectory(
       // add magnetic
       if(magmoms_for_systems.size()==vfiles.size()){
         try { pflow::ProcessAndAddSpinToXstructure(xstr, magmoms_for_systems[i]); } //DX20190801
-        catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "."; throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_); } //DX20190801
+        catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "."; throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ERROR_); } //DX20190801
       }
 
       // adds the structure to a container in XtalFinderCalculator to be passed easily by reference
@@ -1749,14 +1749,14 @@ void XtalFinderCalculator::loadStructuresFromAflowlibEntries(
     try { xstr_tmp = entries[i].vstr.back(); } //back() is the most relaxed structure
     catch(aurostd::xerror& excpt) {
       message << "Could not load entry " << i << ": " << entries[i].auid << "...skipping entry";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       continue;
     }
     if(magmoms_for_systems.size()==entries.size()){
       try { pflow::ProcessAndAddSpinToXstructure(xstr_tmp, magmoms_for_systems[i]); }
       catch(aurostd::xerror& excpt) {
         message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "...skipping structure";
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         continue;
       }
     }
@@ -1813,7 +1813,7 @@ void XtalFinderCalculator::loadStructuresFromStringstream(
   aurostd::substring2strings(input_stream.str(),start_string,START);
 
   message << "Loading " << start_string.size() << " structures in file ... ";
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
   // parse all lines
   vector<string> structure_lines;
@@ -1847,7 +1847,7 @@ void XtalFinderCalculator::loadStructuresFromStringstream(
     // add magnetic
     if(magmoms_for_systems.size()==structure_lines.size()){
       try { pflow::ProcessAndAddSpinToXstructure(xstr, magmoms_for_systems[i]); } //DX20190801
-      catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "."; throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_); } //DX20190801
+      catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "."; throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ERROR_); } //DX20190801
     }
 
     // adds the structure to a container in XtalFinderCalculator to be passed easily by reference
@@ -1878,7 +1878,7 @@ void XtalFinderCalculator::loadStructuresFromStructureList(
   for(uint i=0;i<filenames.size();i++){
     if(!aurostd::FileExist(filenames[i])){
       message << filenames[i] << " file not found.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__,message,_FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__,message,_FILE_NOT_FOUND_);
     }
 
     // generate structure
@@ -1888,7 +1888,7 @@ void XtalFinderCalculator::loadStructuresFromStructureList(
     // add magnetic
     if(magmoms_for_systems.size()==filenames.size()){
       try { pflow::ProcessAndAddSpinToXstructure(xstr, magmoms_for_systems[i]); } //DX20190801
-      catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "."; throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_); } //DX20190801
+      catch(aurostd::xerror& excpt) { message << "Magnetic information could not be loaded (" << magmoms_for_systems[i] << "."; throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ERROR_); } //DX20190801
     }
 
     // adds the structure to a container in XtalFinderCalculator to be passed easily by reference
@@ -1970,7 +1970,7 @@ namespace compare {
       //DX20190326 - need to put url path, i.e., structure name, [OBSOLETE] if(!pflow::loadXstructures(entry,FileMESSAGE,oss,true,structure_name,true)){ cerr << __AFLOW_FUNC__ << "WARNING::Could not load structure via aurl..." << endl; return false;}
       //DX ORIG B4 20191105 - if(!pflow::loadXstructures(entry,FileMESSAGE,oss,true,structure_name,true)){ cerr << __AFLOW_FUNC__ << "WARNING::Could not load structure via aurl..." << endl; return false;} //DX20190326
       if(!pflow::loadXstructures(entry,structure_files,FileMESSAGE,oss,load_most_relaxed_structure_only)){
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Could not load structure (aurl="+entry.aurl+") ... skipping...", FileMESSAGE, oss, _LOGGER_WARNING_);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Could not load structure (aurl="+entry.aurl+") ... skipping...", FileMESSAGE, oss, _LOGGER_WARNING_);
         return false;
       }
       //DX20200225 - added compare to particular geometry files - START
@@ -2090,7 +2090,7 @@ namespace compare {
     else {
       stringstream message;
       message << "Structure location (from=" << structure_source << ") is not specified correctly for " << structure_name << " (i.e., input, aflow_prototype, aurl, etc.).";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, FileMESSAGE, _LOGGER_WARNING_); //DX20200103 - cerr to logger
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, _LOGGER_WARNING_); //DX20200103 - cerr to logger
       return false;
     }
 
@@ -2287,7 +2287,7 @@ void XtalFinderCalculator::compareAtomDecorations(
     if(mode==0){
       if(!quiet || LDEBUG){
         message << "Considering environment analysis in grouping permutations (mode=0)." << endl;
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
       }
     }
     if(mode==1){
@@ -2296,7 +2296,7 @@ void XtalFinderCalculator::compareAtomDecorations(
       permutation_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANGLES",TRUE); //DX20200320
       if(!quiet || LDEBUG){
         message << "Could not find commensurate pemutations when grouping via environment. Ignoring environment analysis in grouping permutations (mode=1)." << endl;
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
       }
     }
     final_permutations.clear();
@@ -2349,7 +2349,7 @@ void XtalFinderCalculator::compareAtomDecorations(
           }
         }
         message << "Trying to check if duplicates match better with other representative structures ... " << endl;
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
 
       // ---------------------------------------------------------------------------
@@ -2383,7 +2383,7 @@ void XtalFinderCalculator::compareAtomDecorations(
         }
         if(mode==1){  // exhausted checks
           message << "Please email aflow@groups.io and provide the corresponding example." << endl;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         }
       }
       else{ break; }
@@ -2695,14 +2695,14 @@ void XtalFinderCalculator::addDatabaseEntry2container(
   vector<string> structure_files;
   if(!pflow::loadXstructures(entry,structure_files,*p_FileMESSAGE,*p_oss,load_most_relaxed_structure_only)){
     message << "Could not load structure (auid=" << entry.auid << ") ... skipping...";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__,message,_RUNTIME_ERROR_);
   }
 
   // ---------------------------------------------------------------------------
   // ensure the correct relaxation type was extracted
   if(load_most_relaxed_structure_only && entry.vstr.size()!=1){
     message << "Expected only one structure to be loaded (the most relaxed structure). " << entry.vstr.size() << " were returned. Unexpected code behavior.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__,message,_RUNTIME_ERROR_);
   }
 
   uint structure_index = 0;
@@ -2728,12 +2728,12 @@ void XtalFinderCalculator::addDatabaseEntry2container(
       }
       else{
         message << "Unexpected file names: " << aurostd::joinWDelimiter(structure_files, ",") << ". Cannot verify relaxation based on filename.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__,message,_RUNTIME_ERROR_);
       }
     }
     else{
       message << "Expected three structures to be loaded (original, relax1, and the most relaxed). " << entry.vstr.size() << " were returned. Unexpected code behavior.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__,message,_RUNTIME_ERROR_);
     }
   }
 
@@ -2881,7 +2881,7 @@ bool XtalFinderCalculator::splitComparisonIntoThreads(
     }
     if(recovered != number_of_comparisons){
       message << "The splitting of jobs failed...not all were accounted for: " << recovered << " != " << number_of_comparisons;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
   }
   return true;
@@ -2930,7 +2930,7 @@ void XtalFinderCalculator::convertStructures(
   stringstream message;
 
   message << "Converting structures standard representation (primitive, Minkowski, and/or Niggli).";
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
   uint number_of_structures = structure_containers.size();
 
@@ -2989,7 +2989,7 @@ void XtalFinderCalculator::convertStructures(
   }
 #endif
   message << "All structures converted.";
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
 }
 
 // ***************************************************************************
@@ -3082,7 +3082,7 @@ void XtalFinderCalculator::calculateSymmetries(uint num_proc){
   stringstream message;
 
   message << "Calculating the symmetries of the structure(s).";
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
 #ifdef AFLOW_MULTITHREADS_ENABLE
   // THREADED VERISON - START
@@ -3109,7 +3109,7 @@ void XtalFinderCalculator::calculateSymmetries(uint num_proc){
 #endif
 
   message << "Symmetries calculated.";
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
 
 }
 
@@ -3160,7 +3160,7 @@ void XtalFinderCalculator::calculateLFAEnvironments(uint num_proc){
   stringstream message;
 
   message << "Calculating the environments of the structure(s).";
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
 #ifdef AFLOW_MULTITHREADS_ENABLE
   // THREADED VERISON - START
@@ -3181,7 +3181,7 @@ void XtalFinderCalculator::calculateLFAEnvironments(uint num_proc){
 
 #endif
   message << "Environments calculated.";
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
 
 }
 
@@ -3197,7 +3197,7 @@ void XtalFinderCalculator::getNearestNeighbors(uint num_proc){
   stringstream message;
 
   message << "Calculating the nearest neighbors of all the structure(s).";
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
 #ifdef AFLOW_MULTITHREADS_ENABLE
   // THREADED VERISON - START
@@ -3220,7 +3220,7 @@ void XtalFinderCalculator::getNearestNeighbors(uint num_proc){
 
 #endif
   message << "Nearest neighbors information calculated.";
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
 
 }
 
@@ -3774,7 +3774,7 @@ vector<StructurePrototype> XtalFinderCalculator::groupStructurePrototypes(
 
   if(!quiet){
     message << "Grouping sets of comparisons.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // variable to store structure sets to compare
@@ -3831,7 +3831,7 @@ vector<StructurePrototype> XtalFinderCalculator::groupStructurePrototypes(
 
   if(!quiet){
     message << "Number of comparison groups: " << comparison_schemes.size() << ".";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   return comparison_schemes;
@@ -3867,7 +3867,7 @@ void XtalFinderCalculator::findDuplicateCompounds(
   // ---------------------------------------------------------------------------
   // run multiple comparison function 
   message << "Comparing to remove duplicate materials.";
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   vector<StructurePrototype> unique_compounds = compareMultipleStructures(
       num_proc,
       tmp_same_species,
@@ -3875,7 +3875,7 @@ void XtalFinderCalculator::findDuplicateCompounds(
       remove_duplicates_options);
 
   message << "Duplicate materials removed.";
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
   // ---------------------------------------------------------------------------
   // include duplicate compounds count in object
@@ -3934,7 +3934,7 @@ vector<StructurePrototype> XtalFinderCalculator::checkForBetterMatches(
 
   if(!quiet || LDEBUG){
     message << "Check if initial structure groupings match better (lower similarity metric) with other groups." << endl;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
@@ -3975,7 +3975,7 @@ vector<StructurePrototype> XtalFinderCalculator::checkForBetterMatches(
                   false)){ // can check based on representatives; duplicate info matches its representative info //DX20200103 - condensed booleans to xoptions
               if(!quiet || LDEBUG){
                 message << "Found potential match for " << prototype_schemes[i].structures_duplicate[j]->name << ": " << prototype_schemes[k].structure_representative->name;
-                pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+                pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
               }
 
               // ---------------------------------------------------------------------------
@@ -4034,7 +4034,7 @@ vector<StructurePrototype> XtalFinderCalculator::checkForBetterMatches(
         if(prototype_schemes[j].structure_representative->name == other_matches_schemes[i].structures_duplicate[min_index]->name){
           if(!quiet || LDEBUG){
             message << other_matches_schemes[i].structure_representative->name << " matches better with " << prototype_schemes[j].structure_representative->name;
-            pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+            pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
           }
           addStructure2duplicatesList(prototype_schemes[j],other_matches_schemes[i].structure_representative); // store the current match structure
           prototype_schemes[j].mapping_info_duplicate.back()=other_matches_schemes[i].mapping_info_duplicate[min_index]; //DX20191218
@@ -4046,7 +4046,7 @@ vector<StructurePrototype> XtalFinderCalculator::checkForBetterMatches(
             if(prototype_schemes[j].structures_duplicate[k]->name == other_matches_schemes[i].structure_representative->name){
               if(!quiet || LDEBUG){
                 message << "removing " << other_matches_schemes[i].structure_representative->name << " from " << prototype_schemes[j].structure_representative->name << " set";
-                pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+                pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
               }
               prototype_schemes[j].removeNonDuplicate(k);
               break;
@@ -4058,7 +4058,7 @@ vector<StructurePrototype> XtalFinderCalculator::checkForBetterMatches(
     else{
       if(!quiet){
         message << other_matches_schemes[i].structure_representative->name << " matches better with original set " << other_matches_schemes[i].structures_duplicate[0]->name;
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
       }
     }
   }
@@ -4155,7 +4155,7 @@ void XtalFinderCalculator::runComparisonThreads(
       if(!structure_rep_tmp.is_structure_generated){
         if(!compare::generateStructure(structure_rep_tmp.name,structure_rep_tmp.source,structure_rep_tmp.relaxation_step,structure_rep_tmp.structure,*p_oss)){ //DX20200429
           message << "Could not generate representative structure (" << structure_rep_tmp.name << ").";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ERROR_);
         }
       }
       if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Loaded representative structure = " << structure_rep_tmp.name << endl; }
@@ -4166,7 +4166,7 @@ void XtalFinderCalculator::runComparisonThreads(
       if(!structure_dup_tmp.is_structure_generated){
         if(!compare::generateStructure(structure_dup_tmp.name,structure_dup_tmp.source,structure_dup_tmp.relaxation_step,structure_dup_tmp.structure,*p_oss)){ //DX20200429
           message << "Could not generate duplicate structure (" << structure_dup_tmp.name << ").";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ERROR_);
         }
       }
       if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Loaded duplicate structure = " << structure_dup_tmp.name << endl; }
@@ -4221,7 +4221,7 @@ void XtalFinderCalculator::runComparisons(
         if(!comparison_schemes[i].structure_representative->is_structure_generated){
           if(!compare::generateStructure(comparison_schemes[i].structure_representative->name,comparison_schemes[i].structure_representative->source,comparison_schemes[i].structure_representative->relaxation_step,comparison_schemes[i].structure_representative->structure,*p_oss)){
             message << "Could not generate representative structure (" << comparison_schemes[i].structure_representative->name << ").";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
+            throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ERROR_);
           }
         }
       }
@@ -4231,7 +4231,7 @@ void XtalFinderCalculator::runComparisons(
       if(!comparison_schemes[i].structures_duplicate[j]->is_structure_generated){
         if(!compare::generateStructure(comparison_schemes[i].structures_duplicate[j]->name,comparison_schemes[i].structures_duplicate[j]->source,comparison_schemes[i].structures_duplicate[j]->relaxation_step,comparison_schemes[i].structures_duplicate[j]->structure,*p_oss)){ //DX20200429
           message << "Could not generate duplicate structure (" << comparison_schemes[i].structures_duplicate[j]->name << ").";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ERROR_);
         }
       }
 
@@ -4273,7 +4273,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
 
   if(!quiet){
     message << "Running comparisons ...";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
@@ -4350,7 +4350,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
 
   if(num_mismatches > 0 && !comparison_options.flag("COMPARISON_OPTIONS::SINGLE_COMPARISON_ROUND") && !quiet){
     message << "Number of unmatched structures: " << num_mismatches << ". Continuing comparisons ...";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   // ---------------------------------------------------------------------------
@@ -4401,7 +4401,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
     if(number_of_comparisons>0){
       if(!quiet){
         message << "Continuing comparisons to match " << num_mismatches << " structures ...";
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
       }
       if(LDEBUG) { cerr << __AFLOW_FUNC__ << ": Number of comparisons is not zero... " << number_of_comparisons << endl; }
 #ifdef AFLOW_MULTITHREADS_ENABLE
@@ -4440,7 +4440,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
 
     if(num_mismatches > 0 && !quiet){
       message << "Number of unmatched structures: " << num_mismatches << ". Continuing comparisons ...";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     }
 
     // ensure while loop is controlled
@@ -4462,7 +4462,7 @@ vector<StructurePrototype> XtalFinderCalculator::runComparisonScheme(
 
   if(!quiet){
     message << "Comparisons complete!";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
   }
 
   return prototypes_final;
@@ -4674,7 +4674,7 @@ void XtalFinderCalculator::appendStructurePrototypes(
             << setw(MISFIT_WIDTH) << std::left << comparison_schemes[i].mapping_info_duplicate[d].misfit << endl;
         }
       }
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_); //DX+CO20201119
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_); //DX+CO20201119
     }
 
     // Store finished (already compared) schemes in prototypes_final
@@ -6864,7 +6864,7 @@ bool XtalFinderCalculator::searchAtomMappings(
       catch(aurostd::xerror& re){
         if(LDEBUG){
           message << "The basis transformation does not preserve crystal periodicity (different number of atoms). Skipping transformation.";
-          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, std::cerr, _LOGGER_WARNING_);
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, std::cerr, _LOGGER_WARNING_);
           continue;
         }
       }
@@ -7551,7 +7551,7 @@ void XtalFinderCalculator::calculatePrototypeDesignations(
   stringstream message;
 
   message << "Determining the AFLOW standard designation.";
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
 #ifdef AFLOW_MULTITHREADS_ENABLE
   if(LDEBUG) {cerr << __AFLOW_FUNC__ << " Number of threads=" << num_proc << endl;}
@@ -7645,7 +7645,7 @@ void XtalFinderCalculator::calculateMatchingAFLOWPrototypes(
   stringstream message;
 
   message << "Determining if representative structures map to any of the AFLOW prototypes.";
-  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
   aurostd::xoption vpflow_protos;
   vpflow_protos.flag("COMPARE2PROTOTYPES",TRUE);
@@ -7767,23 +7767,23 @@ void XtalFinderCalculator::writeComparisonOutputFile(const string& output,
   if(format==json_ft){
     aurostd::string2file(output,directory+"/"+file_prefix+".json");
     message << "RESULTS: See " << directory << "/"+file_prefix+".json" << " for list of unique/duplicate " << contents_info << ".";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
   }
   // ---------------------------------------------------------------------------
   // write TEXT file (human-readable)
   else if(format==txt_ft){
     aurostd::string2file(output,directory+"/"+file_prefix+".out");
     message << "RESULTS: See " << directory << "/"+file_prefix+".out" << " for list of unique/duplicate " << contents_info << ".";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
   }
   // ---------------------------------------------------------------------------
   // unexpected file specifications, write to logger rather than lose the
   // information
   else{
     message << "Unexpected file specifications. Printing results to the log rather than writing to a file.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
     message << output;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_);
   }
 }
 
@@ -7802,7 +7802,7 @@ namespace compare {
 
     aurostd::DirectoryMake(python_dir);
 
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Writing out python script to: "+python_dir, oss, _LOGGER_NOTICE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Writing out python script to: "+python_dir, oss, _LOGGER_NOTICE_);
     stringstream output;
 
     output << AFLOW_XTALFINDER_PYTHON_PY;

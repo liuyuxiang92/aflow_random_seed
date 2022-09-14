@@ -115,7 +115,7 @@ namespace apl {
     string message = "";
     if (!_sc_set) {
       message = "Supercell pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     xInputs.clear();
     _method = opts.getattachedscheme("ENGINE");
@@ -131,7 +131,7 @@ namespace apl {
       USER_GENERATE_PLUS_MINUS = opts.flag("DPM");
     } else if (_method != "LR") {  // Linear response - see README_AFLOW_APL.TXT
       message = "Unknown method " + _method + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     _initialized = true;
   }
@@ -180,21 +180,21 @@ namespace apl {
     string message = "";
     if (!_initialized) {
       message = "Not initialized";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     if (!_sc_set) {
       message = "Supercell pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
 
     if (!_supercell->isConstructed()) {
       message = "The supercell structure has not been initialized yet.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
 
     if (_method.empty()) {
       message = "Calculation method not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
 
     xInputs.clear();
@@ -222,26 +222,26 @@ namespace apl {
     string message = "";
     if (!_initialized) {
       message = "Not initialized";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     if (!_sc_set) {
       message = "Supercell pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     // Check if supercell is already built
     if (!_supercell->isConstructed()) {
       message = "The supercell structure has not been initialized yet.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
 
     if (_method.empty()) {
       message = "Calculation method not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
 
     if (xInputs.size() == 0) {
       message = "No DFT calculations found.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     // First pass - check if any of the calculations ran (gives no error message)
@@ -279,24 +279,24 @@ namespace apl {
     // Test of stupidity...
     if (!_supercell->getSupercellStructure().agroup_calculated) {
       message = "The site groups have not been calculated yet.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     //CO START
     if (_supercell->getEPS() == AUROSTD_NAN) {
       message = "Need to define symmetry tolerance.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     //CO END
 
     message = "Symmetrizing the force constant matrices.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
 
     vector<xmatrix<double> > row;
     for (uint i = 0; i < _supercell->getNumberOfAtoms(); i++) {
       const vector<_sym_op>& agroup = _supercell->getAGROUP(i);  //CO //CO20190218
       if (agroup.size() == 0) {
         message = "Site point group operations are missing.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
       }
 
       for (uint j = 0; j < _supercell->getNumberOfAtoms(); j++) {
@@ -327,7 +327,7 @@ namespace apl {
             }
           } catch (aurostd::xerror& e) {
             message = "Mapping problem " + aurostd::utype2string<int>(j);
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+            throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
           }
         }
         m = ( 1.0 / agroup.size() ) * m; //CO20190218
@@ -418,7 +418,7 @@ namespace apl {
       xInput.setDirectory(_directory + "/" + runname );
       if (!filesExistPhonons(xInput)) {
         string message = "Creating " + xInput.getDirectory();
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
         createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInput, *p_FileMESSAGE);
         stagebreak = true;
       }
@@ -440,13 +440,13 @@ namespace apl {
         infilename = directory + string("/OUTCAR");
         if (!aurostd::EFileExist(infilename, infilename)) {
           message << "The OUTCAR file in " << directory << " is missing.";
-          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
           return false;
         }
       }
     } else if (xinpBE.AFLOW_MODE_AIMS) {
       message << "This functionality has not been implemented yet.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     } else {
       return false;
     }
@@ -466,14 +466,14 @@ namespace apl {
       for (int b = 1; b <= 3; b++)
         message << std::fixed << std::setw(5) << std::setprecision(3) << _dielectricTensor(a, b) << " ";
 
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     return true;
   }
 
   //////////////////////////////////////////////////////////////////////////////
   void ForceConstantCalculator::readBornEffectiveChargesFromAIMSOUT(void) {
     string message = "This functionality has not been implemented yet.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
   }
 
   void ForceConstantCalculator::readBornEffectiveChargesFromOUTCAR(const _xinput& xinp) {  //ME20190113
@@ -496,7 +496,7 @@ namespace apl {
     if (!vlines.size()) {
       //CO END
       message = "Cannot open input file OUTCAR.static.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
 
     string line = "";
@@ -513,7 +513,7 @@ namespace apl {
       //CO START
       if (line_count == vlines.size()) {
         message = "No information on Born effective charges in OUTCAR file.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_ERROR_);
       }
       line = vlines[line_count++];  //CO
 
@@ -553,22 +553,22 @@ namespace apl {
     stringstream message;
     if (_supercell->getEPS() == AUROSTD_NAN) {
       message << "Symmetry tolerance not defined.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     //CO END
     // Show charges
     message << "Input born effective charge tensors (for primitive cell):";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     for (uint i = 0; i < _bornEffectiveChargeTensor.size(); i++) {
       int id = i;
       message << "Atom [" << aurostd::PaddedNumString(id, 3) << "] ("
         << std::setw(2) << _supercell->getInputStructure().atoms[id].cleanname
         << ") Born effective charge = ";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
       for (int a = 1; a <= 3; a++)
         for (int b = 1; b <= 3; b++)
           message << std::fixed << std::setw(5) << std::setprecision(3) << _bornEffectiveChargeTensor[i](a, b) << " ";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     }
 
     // Step1
@@ -585,7 +585,7 @@ namespace apl {
         catch (aurostd::xerror& e) {
           stringstream message;
           message << "Mapping problem " << _supercell->getUniqueAtomID(i, j) << " <-> " << basedUniqueAtomID << "?";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         }
         //CO END
       }
@@ -619,7 +619,7 @@ namespace apl {
 
     // Step 3
     message << "Forcing the acoustic sum rule (ASR). Resulting born effective charges (for the supercell):";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
 
     xmatrix<double> sum(3, 3);
     for (uint i = 0; i < _bornEffectiveChargeTensor.size(); i++)
@@ -644,14 +644,14 @@ namespace apl {
       for (int a = 1; a <= 3; a++)
         for (int b = 1; b <= 3; b++)
           message << std::fixed << std::setw(5) << std::setprecision(3) << _bornEffectiveChargeTensor[i](a, b) << " ";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     }
   }
 
   //////////////////////////////////////////////////////////////////////////////
   void ForceConstantCalculator::readDielectricTensorFromAIMSOUT(void) {
     string message = "This functionality has not been implemented yet.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -674,7 +674,7 @@ namespace apl {
     aurostd::efile2vectorstring(infilename, vlines);
     if (!vlines.size()) {
       message = "Cannot open input file OUTCAR.";
-      aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
+      aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
     //CO END
 
@@ -691,7 +691,7 @@ namespace apl {
       //CO START
       if (line_count == vlines.size()) {
         message = "No information on dielectric tensor in OUTCAR.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_ERROR_);
       }
       line = vlines[line_count++];
       //CO END
@@ -732,22 +732,22 @@ namespace apl {
     string message = "";
     if (!_initialized) {
       message = "Not initialized";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     if (!_sc_set) {
       message = "Supercell pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     string base = _directory + "/" + DEFAULT_APL_FILE_PREFIX;
     string filename = aurostd::CleanFileName(base + DEFAULT_APL_HARMIFC_FILE);
     message = "Writing harmonic IFCs into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     writeHarmonicIFCs(filename);
     if (_isPolarMaterial) {
       filename = aurostd::CleanFileName(base + DEFAULT_APL_POLAR_FILE);
       message = "Writing harmonic IFCs into file " + filename + ".";
       writeBornChargesDielectricTensor(filename);
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     }
   }
 
@@ -801,7 +801,7 @@ namespace apl {
     aurostd::stringstream2file(outfile, filename);
     if (!aurostd::FileExist(filename)) {
       string message = "Cannot open output file " + filename + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 
@@ -864,7 +864,7 @@ namespace apl {
     aurostd::stringstream2file(outfile, filename);
     if (!aurostd::FileExist(filename)) {
       string message = "Cannot open output file " + filename + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 
@@ -872,11 +872,11 @@ namespace apl {
     string message = "";
     if (!_sc_set) {
       message = "Supercell pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     if (xInputs.size() == 0) return;  // Nothing to write
     message = "Saving state of the force constant calculator into " + aurostd::CleanFileName(filename) + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     stringstream out;
     string tag = "[APL_FC_CALCULATOR]";
     out << AFLOWIN_SEPARATION_LINE << std::endl;
@@ -919,7 +919,7 @@ namespace apl {
     aurostd::stringstream2file(out, filename);
     if (!aurostd::FileExist(filename)) {
       message = "Could not save state into file " + filename + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
 
   }
@@ -933,13 +933,13 @@ namespace apl {
     string message = "";
     if (!_sc_set) {
       message = "Supercell pointer not set.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     message = "Reading state of the phonon calculator from " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     if (!aurostd::EFileExist(filename)) {
       message = "Could not find file " + filename + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
 
     // Find the ENGINE tag and whether the calculations are VASP or AIMS calculations
@@ -953,7 +953,7 @@ namespace apl {
         aurostd::string2tokens(vlines[iline], tokens, "=");
         if (tokens.size() != 2) {
           message = "Tag for AFLOW_MODE is broken.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
         }
         if (tokens[1] == "VASP") {
           xInput.AFLOW_MODE_VASP = true;
@@ -963,17 +963,17 @@ namespace apl {
           break;
         } else {
           message = "Unknown AFLOW_MODE " + tokens[1] + ".";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
         }
       } else if (aurostd::substring2bool(vlines[iline], "ENGINE")) {
         aurostd::string2tokens(vlines[iline], tokens, "=");
         if (tokens.size() != 2) {
           message = "Tag for ENGINE is broken.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
         }
         if ((tokens[1] != "LR") && (tokens[1] != "DM")) {
           message = "Unknown value for ENGINE " + tokens[1] + ".";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
         } else {
           _method = tokens[1];
         }
@@ -982,7 +982,7 @@ namespace apl {
     if (iline >= nlines) {
       if (_method.empty()) message = "ENGINE tag is missing.";
       else message = "AFLOW_MODE tag is missing.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     }
 
     // Defaults
@@ -1006,7 +1006,7 @@ namespace apl {
           aurostd::string2tokens(vlines[iline], tokens, "=");
           if (tokens.size() != 2) {
             message = "Tag for DISTORTION_MAGNITUDE is broken.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+            throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
           }
           DISTORTION_MAGNITUDE = aurostd::string2utype<double>(tokens[1]);
         } else if (aurostd::substring2bool(vlines[iline], "DISTORTION_INEQUIVONLY=")) {
@@ -1014,7 +1014,7 @@ namespace apl {
           aurostd::string2tokens(vlines[iline], tokens, "=");
           if (tokens.size() != 2) {
             message = "Tag for DISTORTION_INEQUIVONLY correction is broken.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+            throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
           }
           DISTORTION_INEQUIVONLY = aurostd::string2utype<bool>(tokens[1]);
         } else if (aurostd::substring2bool(vlines[iline], "DISTORTIONS=START")) {
@@ -1025,7 +1025,7 @@ namespace apl {
             aurostd::string2tokens(vlines[iline], tokens);
             if ((tokens.size() < 5) || (tokens.size() > 7)) {
               message = "Broken line in DISTORTIONS.";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+              throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
             }
             // Distortions
             idist = aurostd::string2utype<uint>(tokens[0]);
@@ -1050,20 +1050,20 @@ namespace apl {
           aurostd::string2tokens(vlines[iline], tokens, "=");
           if (tokens.size() != 2) {
             message = "Tag for ZEROSTATE calculation is broken.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+            throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
           }
           _calculateZeroStateForces = aurostd::string2utype<bool>(tokens[1]);
           if (_calculateZeroStateForces) {
             iline++;
             if (iline == nlines) {
               message = "Runname for ZEROSTATE calculation is missing.";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+              throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
             }
             tokens.clear();
             aurostd::string2tokens(vlines[iline], tokens, "=");
             if (tokens.size() != 2) {
               message = "Runname tag for ZEROSTATE calculation is broken.";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+              throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
             }
             xInputs.push_back(xInput);
             xInputs.back().setXStr(_supercell->getSupercellStructureLight());
@@ -1074,20 +1074,20 @@ namespace apl {
           aurostd::string2tokens(vlines[iline], tokens, "=");
           if (tokens.size() != 2) {
             message = "Tag for POLAR is broken.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+            throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
           }
           _isPolarMaterial = aurostd::string2utype<bool>(tokens[1]);
           if (_isPolarMaterial) {
             iline++;
             if (iline == nlines) {
               message = "Runname for polar correction is missing.";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+              throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
             }
             tokens.clear();
             aurostd::string2tokens(vlines[iline], tokens, "=");
             if (tokens.size() != 2) {
               message = "Runname tag for polar correction is broken.";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+              throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
             }
             xInputs.push_back(xInput);
             xInputs.back().setXStr(_supercell->getInputStructureLight());
@@ -1121,7 +1121,7 @@ namespace apl {
           aurostd::string2tokens(vlines[iline], tokens, "=");
           if (tokens.size() != 2) {
             string message = "Tag for POLAR is broken.";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+            throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
           }
           _isPolarMaterial = aurostd::string2utype<bool>(tokens[1]);
           if (_isPolarMaterial) {
@@ -1324,7 +1324,7 @@ namespace apl {
         generate_plus_minus = vvgenerate_plus_minus[i][j];
         if (AUTO_GENERATE_PLUS_MINUS && !generate_plus_minus) {
           message << "No negative distortion needed for distortion [atom=" << i << ",direction=" << j << "].";
-          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
         }
         for (uint k = 0; k < (generate_plus_minus ? 2 : 1); k++) {
           //CO END
@@ -1387,7 +1387,7 @@ namespace apl {
             xInputs[idxRun].setDirectory(_directory + "/" + runname);
             if (!filesExistPhonons(xInputs[idxRun])) {
               message << "Creating " << xInputs[idxRun].getDirectory();
-              pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+              pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
               createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInputs[idxRun], *p_FileMESSAGE);
               stagebreak = true;
             }
@@ -1429,7 +1429,7 @@ namespace apl {
         xInputs[idxRun].setDirectory(_directory + "/" + runname);
         if (!filesExistPhonons(xInputs[idxRun])) {
           message << "Creating " << xInputs[idxRun].getDirectory();
-          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
           createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInputs[idxRun], *p_FileMESSAGE);
           stagebreak = true;
         }
@@ -1462,7 +1462,7 @@ namespace apl {
     // Is there a list of inequivalent atoms?
     if (DISTORTION_INEQUIVONLY && !xstr.iatoms_calculated) { //CO20190218
       message << "The list of the inequivalent atoms is missing.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     // Clear old stuff
@@ -1550,7 +1550,7 @@ namespace apl {
         //cout << "atomID = " << atomID << std::endl; //CO20190218
         if (xstr.agroup[atomID].size() == 0) { //CO20190218
           message << "Site point group operations are missing.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         }
 
         // Loop over test directions vectors - we count the number of unique
@@ -1601,7 +1601,7 @@ namespace apl {
       testDistortions.clear();
     } else {
       message << "The list of the site point group operations is missing.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     // Print some information
@@ -1610,7 +1610,7 @@ namespace apl {
       dof += _uniqueDistortions[i].size();
     }
     message << "Found " << dof << " degree(s) of freedom.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
     uint natoms = DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms();
     for (uint i = 0; i < natoms; i++) {  //CO20200212 - int->uint
       uint id = (DISTORTION_INEQUIVONLY ? _supercell->getUniqueAtomID(i) : i); //CO20190218
@@ -1621,7 +1621,7 @@ namespace apl {
           << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](1) << ","
           << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](2) << ","
           << std::fixed << std::setw(5) << std::setprecision(3) << _uniqueDistortions[i][j](3) << "].";
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
       }
     }
   }
@@ -1812,12 +1812,12 @@ namespace apl {
     // Test of stupidity...
     if (_supercell->getEPS() == AUROSTD_NAN) {
       message << "Need to define symmetry tolerance.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     //CO END
     // Show info
     message << "Calculating the missing force fields by symmetry.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
 
     // Let's go
     for (uint i = 0; i < (DISTORTION_INEQUIVONLY ? _supercell->getNumberOfUniqueAtoms() : _supercell->getNumberOfAtoms()); i++) { //CO20190218
@@ -1847,7 +1847,7 @@ namespace apl {
                 testForce.push_back(symOp.Uc * _uniqueForces[i][idistor][l]);
               } catch (aurostd::xerror& e) {
                 message << "Mapping problem ? <-> " << k << ".";
-                throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+                throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
               }
             }
 
@@ -1896,7 +1896,7 @@ namespace apl {
       // I hope this will never happen...
       if (_uniqueDistortions[i].size() != 3) {
         string message = "Cannot complete force fields by symmetry.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
     }
   }
@@ -1985,12 +1985,12 @@ namespace apl {
     // Test of stupidity...
     if (DISTORTION_INEQUIVONLY && !_supercell->getSupercellStructure().fgroup_calculated) { //CO20190218
       message << "The factor group has not been calculated yet.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     //CO START
     if (DISTORTION_INEQUIVONLY && _supercell->getEPS() == AUROSTD_NAN) { //CO20190218
       message << "Need to define symmetry tolerance.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     //CO END
 
@@ -2017,7 +2017,7 @@ namespace apl {
 
     //
     message << "Calculating the force constant matrices.";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
 
     // We have a party. Let's fun with us...
     //vector<xmatrix<double> > row; //JAHNATEK ORIGINAL //CO20190218
@@ -2066,7 +2066,7 @@ namespace apl {
             //printXVector(_supercell->getSupercellStructure().atoms[_supercell->getUniqueAtomID(i,j)].fpos);
           } catch (aurostd::xerror& e) {
             message << "Mapping problem " << _supercell->getUniqueAtomID(i, j) << " <-> " << basedAtomID << "?"; //CO20190218
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+            throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
           }
 
           for (uint k = 0; k < _supercell->getNumberOfAtoms(); k++) {
@@ -2086,7 +2086,7 @@ namespace apl {
               }
             } catch (aurostd::xerror& e) {
               message << "Mapping problem " << k << " <-> ?.";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Mapping failed.");
+              throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "Mapping failed.");
             }
           }
           //_forceConstantMatrices.push_back(row);  //JAHNATEK ORIGINAL //CO20190218
@@ -2099,7 +2099,7 @@ namespace apl {
     // Test of correctness
     if (_forceConstantMatrices.size() != _supercell->getNumberOfAtoms()) {
       message << "Some problem with the application of factor group operations.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     //ME20200211 - force constants are -F/d, not F/d
@@ -2123,7 +2123,7 @@ namespace apl {
   // Writes the forces into a VASP DYNMAT format
   void ForceConstantCalculator::writeDYNMAT(const string& filename) {
     string message = "Writing forces into file " + filename + ".";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
 
     stringstream outfile;
 
@@ -2166,7 +2166,7 @@ namespace apl {
     aurostd::stringstream2file(outfile, filename);
     if (!aurostd::FileExist(filename)) {
       message = "Cannot open output file " + filename + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
   }
 
@@ -2177,13 +2177,13 @@ namespace apl {
 
   // [OBSOLETE] void ForceConstantCalculator::writeFORCES() {
   // [OBSOLETE]   string message = "Writing forces into file FORCES.";
-  // [OBSOLETE]   pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+  // [OBSOLETE]   pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
 
   // [OBSOLETE]   xstructure ix;
   // [OBSOLETE]   string filename = "SPOSCAR";
   // [OBSOLETE]   if (!aurostd::FileEmpty(filename)) {
   // [OBSOLETE]     message = "Reading " + filename;
-  // [OBSOLETE]     pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+  // [OBSOLETE]     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
   // [OBSOLETE]     stringstream SPOSCAR;
   // [OBSOLETE]     aurostd::efile2stringstream(filename, SPOSCAR);
   // [OBSOLETE]     SPOSCAR >> ix;
@@ -2224,7 +2224,7 @@ namespace apl {
   // [OBSOLETE]           cout << ix.atoms[k].fpos << std::endl;
   // [OBSOLETE]           cout << ix.atoms[k].cpos << std::endl;
   // [OBSOLETE]           message = "Mapping error.";
-  // [OBSOLETE]           throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+  // [OBSOLETE]           throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
   // [OBSOLETE]         }
 
   // [OBSOLETE]         outfile << setw(15) << _uniqueForces[i][j][l](1) << " "
@@ -2238,7 +2238,7 @@ namespace apl {
   // [OBSOLETE]   aurostd::stringstream2file(outfile, filename);
   // [OBSOLETE]   if (!aurostd::FileExist(filename)) {
   // [OBSOLETE]     message = "Cannot open output file.";
-  // [OBSOLETE]     throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
+  // [OBSOLETE]     throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_ERROR_);
   // [OBSOLETE]   }
 
   // [OBSOLETE] }
@@ -2247,7 +2247,7 @@ namespace apl {
 
   // [OBSOLETE] void ForceConstantCalculator::writeXCrysDenForces() {
   // [OBSOLETE]   string message = "Writing forces into file XCrysDenForces.";
-  // [OBSOLETE]   pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+  // [OBSOLETE]   pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
   // [OBSOLETE]   _supercell->center_original();  //CO
 
   // [OBSOLETE]   stringstream outfile;  //CO
@@ -2292,7 +2292,7 @@ namespace apl {
   // [OBSOLETE]       aurostd::stringstream2file(outfile, filename);
   // [OBSOLETE]       if (!aurostd::FileExist(filename)) {
   // [OBSOLETE]         string message = "Cannot create " + filename + " file.";
-  // [OBSOLETE]         throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
+  // [OBSOLETE]         throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_ERROR_);
   // [OBSOLETE]       }
 
   // [OBSOLETE]     }
@@ -2345,7 +2345,7 @@ namespace apl {
       xInput.setDirectory(_directory + "/" + runname);
       if (!filesExistPhonons(xInput)) {
         string message = "Creating " + xInput.getDirectory();
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
         createAflowInPhononsAIMS(_aflowFlags, _kbinFlags, _xFlags, _AflowIn, xInput, *p_FileMESSAGE);
         stagebreak = true;
       }
@@ -2358,7 +2358,7 @@ namespace apl {
   bool ForceConstantCalculator::readForceConstantsFromVasprun(_xinput& xinp) {
     stringstream message;
     message << "Reading force constants from vasprun.xml";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
 
     // Read vasprun.xml
     string filename = aurostd::CleanFileName(xinp.getDirectory() + "/vasprun.xml.static");
@@ -2366,7 +2366,7 @@ namespace apl {
       filename = aurostd::CleanFileName(xinp.getDirectory() + "/vasprun.xml");
       if (aurostd::EFileExist(filename)) {
         message << "Could not find vasprun.xml file for linear response calculations.";
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, _directory, *p_FileMESSAGE, *p_oss);
         return false;
       }
     }
@@ -2396,14 +2396,14 @@ namespace apl {
     // Check that the file was read successfully.
     if (iline == nlines) {
       message << "Hessian tag not found or incomplete.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     }
     uint natoms = _supercell->getSupercellStructure().atoms.size();
     uint nhessian = hessian.size();
     if (nhessian != 3 * natoms) {
       message << "Hessian matrix does not have the correct number of rows (has "
         << nhessian << ", should have " << (3 * natoms) << ")." << std::endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     }
     uint i = 0;
     for (i = 0; i < nhessian; i++) {
@@ -2412,7 +2412,7 @@ namespace apl {
     if (i != nhessian) {
       message << "Row " << (i + 1) << " of the Hessian matrix does not have the correct number of columns"
         << " (has " << hessian[i].size() << ", should have " << (3 * natoms) << ")." << std::endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     }
 
     _forceConstantMatrices.clear();

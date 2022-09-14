@@ -49,7 +49,7 @@ namespace makefile {
     trimPath(filename);
 
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " fetching dependencies for " << filename << endl;};
-    if(!aurostd::FileExist(filename)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"File \""+filename+"\" does not exist",_VALUE_ILLEGAL_);}
+    if(!aurostd::FileExist(filename)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"File \""+filename+"\" does not exist",_VALUE_ILLEGAL_);}
 
     if(aurostd::WithinList(files_already_explored,filename)){return;}
     files_already_explored.push_back(filename);
@@ -201,7 +201,7 @@ namespace makefile {
   //[CO20200508 - OBSOLETE]  
   //[CO20200508 - OBSOLETE]  string filename=aurostd::CleanFileName(directory+"/Makefile");
   //[CO20200508 - OBSOLETE]  aurostd::CleanStringASCII_InPlace(filename);
-  //[CO20200508 - OBSOLETE]  if(!aurostd::FileExist(filename)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"File \""+filename+"\" does not exist",_VALUE_ILLEGAL_);}
+  //[CO20200508 - OBSOLETE]  if(!aurostd::FileExist(filename)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"File \""+filename+"\" does not exist",_VALUE_ILLEGAL_);}
   //[CO20200508 - OBSOLETE]  vector<string> vlines;
   //[CO20200508 - OBSOLETE]  aurostd::file2vectorstring(filename,vlines);
   //[CO20200508 - OBSOLETE]  return readMakefileVariables(vlines,vvariables,vvdefinitions);
@@ -325,9 +325,9 @@ namespace makefile {
 
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " directory=" << directory << endl;}
 
-    if(!aurostd::IsDirectory(directory+"/AUROSTD")){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,directory+"/AUROSTD not found",_VALUE_ILLEGAL_);}  //check that AUROSTD exists (fast check that ANY object files exist)
-    if(!aurostd::FileExist(directory+"/aflow.h")){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,directory+"/aflow.h not found",_VALUE_ILLEGAL_);} //check we are in an aflow directory
-    //[not a good idea, circular flow of information]if(!aurostd::FileExist(directory+"/aflow.o")){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,directory+"/aflow.o not found",_VALUE_ILLEGAL_);}  //check that aflow.o exists (fast check that ANY object files exist)
+    if(!aurostd::IsDirectory(directory+"/AUROSTD")){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,directory+"/AUROSTD not found",_VALUE_ILLEGAL_);}  //check that AUROSTD exists (fast check that ANY object files exist)
+    if(!aurostd::FileExist(directory+"/aflow.h")){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,directory+"/aflow.h not found",_VALUE_ILLEGAL_);} //check we are in an aflow directory
+    //[not a good idea, circular flow of information]if(!aurostd::FileExist(directory+"/aflow.o")){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,directory+"/aflow.o not found",_VALUE_ILLEGAL_);}  //check that aflow.o exists (fast check that ANY object files exist)
 
     //[CO20200508 - OBSOLETE]vector<string> vvariables;
     //[CO20200508 - OBSOLETE]vector<vector<string> > vvdefinitions;
@@ -391,8 +391,8 @@ namespace makefile {
       else if(dep.find("AUROSTD")!=string::npos && dep.size()>2 && dep.find(".h")==dep.size()-2){vhpp_aurostd.push_back(dep);}
     }
     //stupidity test: make sure vcpp_aurostd[0]==directory+"/AUROSTD/aurostd.cpp" for $<
-    if(vcpp_aurostd.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"vcpp_aurostd.size()==0",_RUNTIME_ERROR_);}
-    if(vcpp_aurostd[0]!=file){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,file+" not set to first entry of vcpp_aurostd",_RUNTIME_ERROR_);}
+    if(vcpp_aurostd.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"vcpp_aurostd.size()==0",_RUNTIME_ERROR_);}
+    if(vcpp_aurostd[0]!=file){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,file+" not set to first entry of vcpp_aurostd",_RUNTIME_ERROR_);}
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " vcpp_aurostd=" << aurostd::joinWDelimiter(vcpp_aurostd,",") << endl;}
 
     //DX20200801 - SYMBOLIC MATH - START
@@ -418,8 +418,8 @@ namespace makefile {
       if(dep.find("SYMBOLICCPLUSPLUS")!=string::npos && dep.size()>4 && dep.find(".cpp")==dep.size()-4){vcpp_symbolic.push_back(dep);}
       else if(dep.find("SYMBOLICCPLUSPLUS")!=string::npos && dep.size()>2 && dep.find(".h")==dep.size()-2){vhpp_symbolic.push_back(dep);}
     }
-    if(vcpp_symbolic.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"vcpp_symbolic.size()==0",_RUNTIME_ERROR_);}
-    if(vcpp_symbolic[0]!=file){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,file+" not set to first entry of vcpp_symbolic",_RUNTIME_ERROR_);}
+    if(vcpp_symbolic.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"vcpp_symbolic.size()==0",_RUNTIME_ERROR_);}
+    if(vcpp_symbolic[0]!=file){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,file+" not set to first entry of vcpp_symbolic",_RUNTIME_ERROR_);}
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " vcpp_symbolic=" << aurostd::joinWDelimiter(vcpp_symbolic,",") << endl;}
 #endif
     //DX20200801 - SYMBOLIC MATH - END
@@ -461,7 +461,7 @@ namespace makefile {
       dir=vsubdirectories[i];
       trimPath(dir);
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " dir=" << dir << endl;}
-      if(!aurostd::IsDirectory(dir)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,dir+" directory not found",_VALUE_ILLEGAL_);}
+      if(!aurostd::IsDirectory(dir)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,dir+" directory not found",_VALUE_ILLEGAL_);}
       aurostd::DirectoryLS(dir,vfs);
       std::sort(vfs.begin(),vfs.end());
       for(j=0;j<vfs.size();j++){
@@ -556,7 +556,7 @@ namespace makefile {
       //DX20200801 - SYMBOLIC MATH - END
       //makefile_rules_ss << obj_file << ": " << vfiles[i] << " " << aurostd::joinWDelimiter(vvdependencies[i]," ") << endl;
       makefile_rules_ss << obj_file << ": " << aurostd::joinWDelimiter(vvdependencies[i]," ") << endl;
-      makefile_rules_ss << "\t" << "$(CPP) $(VERS) -D_AFLOW_FILE_NAME_=\\\"\"$<\"\\\" $(INCLUDE) $(CCFLAGS" << (vmt_required[i] ? "_MT" : "") << ") $(OPTS" << (vmt_required[i] ? "_MT" : "") << ") $(ARCH) $< -c -o $@" << endl;  //(obj_file=="AUROSTD/aurostd.o"?"$^":"$<")  //ME20200514 - Added CCFLAGS_MT
+      makefile_rules_ss << "\t" << "$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS" << (vmt_required[i] ? "_MT" : "") << ") $(OPTS" << (vmt_required[i] ? "_MT" : "") << ") $(ARCH) $< -c -o $@" << endl;  //(obj_file=="AUROSTD/aurostd.o"?"$^":"$<")  //ME20200514 - Added CCFLAGS_MT
     }
     //[CO20200521 - OBSOLETE]//unfortunate hacks that are needed
     //[CO20200508 - OBSOLETE]if(!aurostd::WithinList(vfile_obj,"aflow_matlab_funcs.cpp")){vfile_obj.push_back("aflow_matlab_funcs.cpp");}  //safety
@@ -575,7 +575,7 @@ namespace makefile {
     //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]//if another file 
     //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]file=directory+"/aflow_aflowrc.cpp";
     //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]trimPath(file);
-    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]if(vdep_aflowh.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"vdep_aflowh.size()==0",_RUNTIME_ERROR_);}
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]if(vdep_aflowh.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"vdep_aflowh.size()==0",_RUNTIME_ERROR_);}
     //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]bool found=false;
     //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]for(i=0;i<vdep_aflowh.size()&&found==false;i++){
     //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]  const string& dep=vdep_aflowh[i];
@@ -587,7 +587,7 @@ namespace makefile {
     //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]    found=true;
     //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]  }
     //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]}
-    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]if(vdep_aflowh[0]!=file){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,file+" not set to first entry of vdep_aflowh",_RUNTIME_ERROR_);}
+    //[CO20200521 - OBSOLETE WITH SUPER PROECTION FOR $< ABOVE]if(vdep_aflowh[0]!=file){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,file+" not set to first entry of vdep_aflowh",_RUNTIME_ERROR_);}
 
     stringstream makefile_definitions_ss;
     //MAIN DEPENDENCIES START

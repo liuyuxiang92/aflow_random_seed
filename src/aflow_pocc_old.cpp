@@ -49,7 +49,7 @@ namespace pflow {
     string aflowin, MESSAGE="pflow::POCC_INPUT ERROR";
     aflowin=string(aflags.Directory+_AFLOWIN_);
     if(!aurostd::FileExist(aflowin)) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,"pflow::POCC_INPUT():","file not found: "+aflowin,_FILE_CORRUPT_); //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,"pflow::POCC_INPUT():","file not found: "+aflowin,_FILE_CORRUPT_); //CO20200624
     }
     POCC_GENERATE_INPUT(oss,aflags);
   }
@@ -60,7 +60,7 @@ namespace pflow {
 // ***************************************************************************
 bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
   ostringstream aus;
-  aus << "00000  MESSAGE running POCC_GENERATE_INPUT files " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+  aus << "00000  MESSAGE running POCC_GENERATE_INPUT files " << Message(__AFLOW_FILE__,aflags) << endl;
   aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
 
   string aflowin=aflags.Directory+"/"+_AFLOWIN_;
@@ -122,7 +122,7 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
     } else {  //START CO
       pocc::POccCalculator pcalc(xstr_pocc,aflags,FileMESSAGE,cout);
       if(!pcalc.m_initialized){
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"POCC algorithm failed to initialize",_RUNTIME_ERROR_); //CO20200624
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"POCC algorithm failed to initialize",_RUNTIME_ERROR_); //CO20200624
       }
       pcalc.calculate();
 
@@ -142,7 +142,7 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
       ostream& oss=cout;
       //ofstream FileMESSAGE;
       message << "Creating list of (primitivized) unique derivative supercells. Please be patient as primitivization can be slow";
-      pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
+      pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,FileMESSAGE,oss,_LOGGER_MESSAGE_);
 
       for(unsigned long long int i=0;i<Num_calculated;i++) {
         ss.str("");
@@ -159,7 +159,7 @@ bool POCC_GENERATE_INPUT(ofstream &FileMESSAGE,_aflags &aflags) {
     file_aflowin.close();
   } 
   else {
-    aus << "00000  MESSAGE POCC input file already created " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    aus << "00000  MESSAGE POCC input file already created " << Message(__AFLOW_FILE__,aflags) << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     return FALSE;
   }
@@ -256,13 +256,13 @@ void UpdateXstr(xstructure &xstr_orig, ofstream &FileMESSAGE, _aflags &aflags) {
   //Update paritial occupation value
   if(xstr_orig.partial_occupation_flag) {
     ostringstream aus;
-    aus << "0000 MESSAGE    \"partial_occupation_site_tol\" is " << xstr_orig.partial_occupation_site_tol << " " << Message(_AFLOW_FILE_NAME_,aflags); //CO20180409
+    aus << "0000 MESSAGE    \"partial_occupation_site_tol\" is " << xstr_orig.partial_occupation_site_tol << " " << Message(__AFLOW_FILE__,aflags); //CO20180409
     if(xstr_orig.partial_occupation_site_tol>1E-6) { //CO20180409
       epsilon = xstr_orig.partial_occupation_site_tol; //CO20180409
     }
     else {
-      aus << "0000 MESSAGE    \"partial_occupation_site_tol\" is not set " << Message(_AFLOW_FILE_NAME_,aflags); //CO20180409
-      aus << "0000 MESSAGE    Default value (1E-2) of \"partial_occupation_site_tol\" is set " << Message(_AFLOW_FILE_NAME_,aflags); //CO20180409
+      aus << "0000 MESSAGE    \"partial_occupation_site_tol\" is not set " << Message(__AFLOW_FILE__,aflags); //CO20180409
+      aus << "0000 MESSAGE    Default value (1E-2) of \"partial_occupation_site_tol\" is set " << Message(__AFLOW_FILE__,aflags); //CO20180409
     }
     aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
     double partial_value_tmp;
@@ -282,10 +282,10 @@ void UpdateXstr(xstructure &xstr_orig, ofstream &FileMESSAGE, _aflags &aflags) {
 void OptimizeXstr(xstructure &a, ofstream &FileMESSAGE, _aflags &aflags) {
   //This function optimize partial values of xstructure
   ostringstream aus;
-  aus <<"0000 MESSAGE    Optimizing POSCAR " << Message(_AFLOW_FILE_NAME_,aflags);
+  aus <<"0000 MESSAGE    Optimizing POSCAR " << Message(__AFLOW_FILE__,aflags);
   aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
   UpdateXstr(a, FileMESSAGE, aflags);
-  aus <<"0000 MESSAGE    Printing optimized POSCAR " << Message(_AFLOW_FILE_NAME_,aflags);
+  aus <<"0000 MESSAGE    Printing optimized POSCAR " << Message(__AFLOW_FILE__,aflags);
   aus << AFLOWIN_SEPARATION_LINE << endl;
   aus << a;
   aus << AFLOWIN_SEPARATION_LINE << endl;
@@ -423,7 +423,7 @@ double CalculatePartialValueOfVacancy(xstructure& xstr, unsigned int k) {
   double SumTmp=0.0;
   vector<vector<int> > a=NormalisedNumberXstructure(xstr);
   if(k>=a.size()) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"CalculatePartialValueOfVacancy():","k>=a.size()",_INDEX_MISMATCH_); //CO20200624
+    throw aurostd::xerror(__AFLOW_FILE__,"CalculatePartialValueOfVacancy():","k>=a.size()",_INDEX_MISMATCH_); //CO20200624
   }
   if(a.at(k).size()==1) {
     int n_xstr_orig=a.at(k).at(0);
@@ -445,7 +445,7 @@ bool CheckVacancyOnOnesite(xstructure& xstr, unsigned int k) {
   bool RunFLAG=false;
   vector<vector<int> > a=NormalisedNumberXstructure(xstr);
   if(k>=a.size()) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"CheckVacancyOnOnesite():","k>=a.size()",_INDEX_MISMATCH_); //CO20200624
+    throw aurostd::xerror(__AFLOW_FILE__,"CheckVacancyOnOnesite():","k>=a.size()",_INDEX_MISMATCH_); //CO20200624
   }
 
   if(a.at(k).size()==1) {
@@ -517,7 +517,7 @@ bool CheckVacancy(xstructure& xstr)
           RunFLAG=true;
         }
         else if(SumOccupation.at(i)>1) {
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,"CheckVacancy():","total occupation on site exceeds 1.0",_INDEX_MISMATCH_); //CO20200624
+          throw aurostd::xerror(__AFLOW_FILE__,"CheckVacancy():","total occupation on site exceeds 1.0",_INDEX_MISMATCH_); //CO20200624
         }
       }
     }
@@ -620,7 +620,7 @@ int CalculateLcmofVector(vector<int> Num) {
   vector<int> vlcm;
   int lcmtmp=0;
   if(Num.size()<2) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"CalculateLcmofVector():","cannot find LCM: fewer than 2 inputs entered",_INPUT_NUMBER_); //CO20200624
+    throw aurostd::xerror(__AFLOW_FILE__,"CalculateLcmofVector():","cannot find LCM: fewer than 2 inputs entered",_INPUT_NUMBER_); //CO20200624
   }
   lcmtmp=lcm(Num.at(0),Num.at(1));
   vlcm.push_back(lcmtmp);
@@ -786,7 +786,7 @@ namespace pocc {
 namespace pocc {
   string POSCAR2GulpInput(xstructure& xstr, vector<string> AtomSpecies) {
     if(xstr.num_each_type.size()!=AtomSpecies.size()) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,"POSCAR2GulpInput():","xstr.num_each_type.size()!=AtomSpecies.size()",_INDEX_MISMATCH_); //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,"POSCAR2GulpInput():","xstr.num_each_type.size()!=AtomSpecies.size()",_INDEX_MISMATCH_); //CO20200624
     }
     //Assign names to xstructure 
     int iatom=0;
@@ -840,7 +840,7 @@ namespace pocc {
     string GulpTmp=aurostd::TmpFileCreate("GulpTmp");
 
     if(AtomSpecies.at(0).compare("unknown")==0) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,"pocc::CalculateEnergyUsingGulp():","atom species are not assigned",_INPUT_MISSING_); //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,"pocc::CalculateEnergyUsingGulp():","atom species are not assigned",_INPUT_MISSING_); //CO20200624
     }
 
     XstrGulpInput=pocc::POSCAR2GulpInput(xstr, AtomSpecies);
@@ -1042,7 +1042,7 @@ void combine(vector<int> &range, vector<int> &cur, vector<vector<int> > &final_r
 void combine(vector<int> &range, vector<vector<int> > &final_result, int n) {
   //Combine function, choose all the combinations of n numbers from range
   if(n > (int) range.size()) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"combine():","n > (int) range.size()",_INPUT_ILLEGAL_); //CO20200624
+    throw aurostd::xerror(__AFLOW_FILE__,"combine():","n > (int) range.size()",_INPUT_ILLEGAL_); //CO20200624
   }   
   vector<int> result(n);
   combine(range, result, final_result, 0, 0); 
@@ -1230,7 +1230,7 @@ xstructure XstrSubstitute(xstructure &a, vector<int> vec_n, string b) {
 // ***************************************************************************
 xstructure XstrSubstitute(xstructure &a, vector<int> vec_n, vector<string> b) {
   if(vec_n.size()!=b.size()) { 
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"XstrSubstitute():","vec_n.size()!=b.size()",_INDEX_MISMATCH_); //CO20200624
+    throw aurostd::xerror(__AFLOW_FILE__,"XstrSubstitute():","vec_n.size()!=b.size()",_INDEX_MISMATCH_); //CO20200624
   }
   vector<atom_number_name> vec_num_name;
   atom_number_name tmp;
@@ -1699,7 +1699,7 @@ vector<xstructure> Partial2Supercell(xstructure xstr_ori) {
 
   ostringstream aus;
   aus << AFLOWIN_SEPARATION_LINE << endl;
-  aus << "0000 MESSAGE    Printing Derivative Supercells ... " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+  aus << "0000 MESSAGE    Printing Derivative Supercells ... " << Message(__AFLOW_FILE__,aflags) << endl;
   for (uint i=0; i<vxstr_sorted.size();i++) {
     aus << AFLOWIN_SEPARATION_LINE << endl;
     aus << "[VASP_POSCAR_MODE_EXPLICIT]START.HNFCELL_" << i+1 << endl;
@@ -1720,13 +1720,13 @@ vector<xstructure> Partial2Supercell(xstructure xstr_ori) {
 vector<xstructure> CalculateInitialSupercell(xstructure xstr, int n, ofstream &FileMESSAGE, _aflags &aflags) {
   XHOST.QUIET=FALSE;
   ostringstream aus;
-  aus << "0000 MESSAGE    Calculating HNF index ... " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+  aus << "0000 MESSAGE    Calculating HNF index ... " << Message(__AFLOW_FILE__,aflags) << endl;
   aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
   aus.str("");
   vector<xmatrix<double> > sHNF=CalculateHNF(xstr, n);
   vector<xstructure> vxstr_init;
   xstructure b_tmp;
-  aus << "0000 MESSAGE    Generating supercells ... " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+  aus << "0000 MESSAGE    Generating supercells ... " << Message(__AFLOW_FILE__,aflags) << endl;
   aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
   aus.str("");
   stringstream ss;
@@ -1754,7 +1754,7 @@ vector<xstructure> CalculateInitialSupercell(xstructure xstr, int n, ofstream &F
     aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
     aus.str("");
   }
-  aus << "0000 MESSAGE    Total number of initial supercells is " << vxstr_init.size() <<" " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+  aus << "0000 MESSAGE    Total number of initial supercells is " << vxstr_init.size() <<" " << Message(__AFLOW_FILE__,aflags) << endl;
   aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
   aus.str("");
 
@@ -1782,7 +1782,7 @@ int InitializeXstr(xstructure &xstr, vector<string> vxstr_species_ori, ofstream 
   }
   if(xstr.partial_occupation_site_tol>0) {tolerance=xstr.partial_occupation_site_tol;}
   oss << "[AFLOW] hnf_tolerance=" << tolerance << endl;
-  oss << "Printing Input PARTCAR ... " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+  oss << "Printing Input PARTCAR ... " << Message(__AFLOW_FILE__,aflags) << endl;
   oss << AFLOWIN_SEPARATION_LINE << endl;    // --------------------------------
   oss << "[VASP_POSCAR_MODE_EXPLICIT]START" << endl;
   oss << AssignNameXstr(xstr, vxstr_species_ori);// << endl;
@@ -1842,7 +1842,7 @@ int InitializeXstr(xstructure &xstr, vector<string> vxstr_species_ori, ofstream 
     if(xstr.atoms.at(iatom).partial_occupation_value<1.0) {xstr.atoms.at(iatom).partial_occupation_value = effective_pocc_iatom.at(iatom) ;}
   }
   UpdateXstr_comp_each_type(xstr); //update partial occupation
-  oss << "Printing optimized input PARTCAR ..." << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+  oss << "Printing optimized input PARTCAR ..." << Message(__AFLOW_FILE__,aflags) << endl;
   oss << AFLOWIN_SEPARATION_LINE << endl;
   oss << "[VASP_POSCAR_MODE_EXPLICIT]START" << endl;
   oss << AssignNameXstr(xstr, vxstr_species_ori);// << endl;
@@ -2161,15 +2161,15 @@ vector<vector<xstructure> > Partial2Xstr(xstructure xstr, int nHNF, ofstream &Fi
 
   XHOST.QUIET= FALSE;
   ostringstream aus;
-  aus << "0000 MESSAGE    POCC running " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+  aus << "0000 MESSAGE    POCC running " << Message(__AFLOW_FILE__,aflags) << endl;
   aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
   aus.str("");
   xstructure xstr_c = NormalizeXstructure(xstr);  
 
   int n = nHNF;
   vector<xstructure> vxstr_init =  CalculateInitialSupercell(xstr_c, n, FileMESSAGE, aflags);
-  aus << "0000 MESSAGE    Generating derivate supercells ..." << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-  aus << "0000 MESSAGE    Please be patient ..." << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+  aus << "0000 MESSAGE    Generating derivate supercells ..." << Message(__AFLOW_FILE__,aflags) << endl;
+  aus << "0000 MESSAGE    Please be patient ..." << Message(__AFLOW_FILE__,aflags) << endl;
   aus << AFLOWIN_SEPARATION_LINE << endl;
   aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
 
@@ -2405,7 +2405,7 @@ vector<xstructure> RemoveEquivalentXstr(vector<xstructure> vec_xstr, ofstream &F
 
   int number = vec_xstr_energy.size() - vec_xstr_energy_final.size();
   ostringstream aus;
-  aus << "0000 MESSAGE    " << number << " equivalent structures are removed!" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+  aus << "0000 MESSAGE    " << number << " equivalent structures are removed!" << Message(__AFLOW_FILE__,aflags) << endl;
   aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
   aus.str("");
   vector<xstructure> vec_xstr_final;
@@ -2542,8 +2542,8 @@ namespace pocc {
     if(tokens.size()<2) {
       init::ErrorOption(options,__AFLOW_FUNC__,"aflow --diff=POSCAR1,POSCAR2");
     }
-    if(!aurostd::FileExist(tokens.at(0))) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"file not found: "+tokens.at(0),_FILE_CORRUPT_);} //CO20200624
-    if(!aurostd::FileExist(tokens.at(1))) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"file not found: "+tokens.at(1),_FILE_CORRUPT_);} //CO20200624
+    if(!aurostd::FileExist(tokens.at(0))) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"file not found: "+tokens.at(0),_FILE_CORRUPT_);} //CO20200624
+    if(!aurostd::FileExist(tokens.at(1))) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"file not found: "+tokens.at(1),_FILE_CORRUPT_);} //CO20200624
     xstructure xstr1, xstr2;
     xstr1 = xstructure(tokens.at(0), IOAFLOW_AUTO);
     xstr2 = xstructure(tokens.at(1), IOAFLOW_AUTO);
@@ -2683,7 +2683,7 @@ namespace pocc {
     _aflags aflags;
 
     ostringstream aus;
-    aus <<"0000 MESSAGE    Printing input POSCAR " << Message(_AFLOW_FILE_NAME_,aflags);
+    aus <<"0000 MESSAGE    Printing input POSCAR " << Message(__AFLOW_FILE__,aflags);
     aus <<AFLOWIN_SEPARATION_LINE << endl;
     aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
     aus << xstr_in;
@@ -2757,7 +2757,7 @@ namespace pocc {
 
     ostringstream aus;
     aus.str("");
-    aus <<"0000 MESSAGE    Printing \'struct_enum.in\' file " << Message(_AFLOW_FILE_NAME_,aflags);
+    aus <<"0000 MESSAGE    Printing \'struct_enum.in\' file " << Message(__AFLOW_FILE__,aflags);
     aus <<AFLOWIN_SEPARATION_LINE << endl;
     aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
     aus << oss.str();
@@ -2844,7 +2844,7 @@ namespace pocc {
     FileMESSAGE.open("LOG.ENUM");
     _aflags aflags;
     ostringstream aus;
-    aus << "0000 MESSAGE    Printing input POSCAR " << Message(_AFLOW_FILE_NAME_,aflags);
+    aus << "0000 MESSAGE    Printing input POSCAR " << Message(__AFLOW_FILE__,aflags);
     aus << AFLOWIN_SEPARATION_LINE<< endl;
     aus << xstr;
     aus << AFLOWIN_SEPARATION_LINE<< endl;
@@ -2867,7 +2867,7 @@ namespace pocc {
       oss << _VASP_POSCAR_MODE_EXPLICIT_STOP_ << ss.str() << endl; //CO20200624
       oss << AFLOWIN_SEPARATION_LINE<< endl;
     }
-    aus << "0000 MESSAGE    Printing derivate POSCARs " << Message(_AFLOW_FILE_NAME_,aflags);
+    aus << "0000 MESSAGE    Printing derivate POSCARs " << Message(__AFLOW_FILE__,aflags);
     aus << oss.str();
     aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
     FileMESSAGE.close();
@@ -2904,7 +2904,7 @@ namespace pocc {
 
 
     ostringstream aus;
-    aus << "0000 MESSAGE    Print multienum input file " << Message(_AFLOW_FILE_NAME_,aflags);
+    aus << "0000 MESSAGE    Print multienum input file " << Message(__AFLOW_FILE__,aflags);
     aus <<AFLOWIN_SEPARATION_LINE << endl;
     aus << pocc::POSCAR2ENUM(xstr);
     aus <<AFLOWIN_SEPARATION_LINE << endl;
@@ -3020,7 +3020,7 @@ namespace pocc {
     stringstream str_out;
     string filename_str_out="struct_enum.out";
     if(!aurostd::FileExist(filename_str_out)) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"file not found: struct_enum.out",_FILE_CORRUPT_); //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"file not found: struct_enum.out",_FILE_CORRUPT_); //CO20200624
     }
     string line,lastline;
     file2stringstream(filename_str_out, str_out);
@@ -3040,11 +3040,11 @@ namespace pocc {
       strNf=aurostd::string2utype<int>(vec_str_out.at(0));
     }
     else {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"multienum did not generate a valid struct_enum.out file",_FILE_CORRUPT_); //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"multienum did not generate a valid struct_enum.out file",_FILE_CORRUPT_); //CO20200624
     }
 
     ////output
-    aus << "0000 MESSAGE    Print multienum output file " << Message(_AFLOW_FILE_NAME_,aflags);
+    aus << "0000 MESSAGE    Print multienum output file " << Message(__AFLOW_FILE__,aflags);
     aus <<AFLOWIN_SEPARATION_LINE << endl;
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     aus << str_out.str();
@@ -3101,7 +3101,7 @@ namespace pocc {
     aurostd::string2tokens(xstr.SpeciesString(), AtomSpecies, " ");
 
     if(!xstr.atoms.at(0).name_is_given) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,"pocc::MultienumPrintSortedXstr():","atom species are not assigned",_INPUT_ILLEGAL_); //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,"pocc::MultienumPrintSortedXstr():","atom species are not assigned",_INPUT_ILLEGAL_); //CO20200624
     }
 
     ofstream FileMESSAGE;
@@ -3145,7 +3145,7 @@ namespace pocc {
       oss << _VASP_POSCAR_MODE_EXPLICIT_STOP_ << ss.str() << endl; //CO20200624
       oss << AFLOWIN_SEPARATION_LINE<< endl;
     }
-    aus << "0000 MESSAGE    Printing sorted derivate POSCARs " << Message(_AFLOW_FILE_NAME_,aflags);
+    aus << "0000 MESSAGE    Printing sorted derivate POSCARs " << Message(__AFLOW_FILE__,aflags);
     aus << oss.str();
     aurostd::PrintMessageStream(FileMESSAGE, aus,XHOST.QUIET);
     /*
@@ -3292,7 +3292,7 @@ namespace pocc {
 namespace pocc {
   vector<vector<double> > SpinFlipDOS(const vector<vector<double> >& vva) {
     vector<vector<double> > vvb; vvb.clear();
-    if(vva.at(0).size()%2==0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"pocc::SpinFlipDOS():","input not spin-polarized",_INPUT_ILLEGAL_);} //CO20200624
+    if(vva.at(0).size()%2==0) {throw aurostd::xerror(__AFLOW_FILE__,"pocc::SpinFlipDOS():","input not spin-polarized",_INPUT_ILLEGAL_);} //CO20200624
     for (uint i=0; i<vva.size();i++) {
       vector<double> vtmp; vtmp.clear();
       vtmp.push_back(vva.at(i).at(0));
@@ -3399,7 +3399,7 @@ void GetDegeneracyFromVPOSCAR(const vector<xstructure>& vxstr, vector<int>& vDE)
     title = vxstr.at(i).title;
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " title=\"" << title << "\"" << endl;}
     if(!aurostd::substring2bool(title, "DG=")) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"degeneracy data not found: "+_AFLOWIN_,_FILE_CORRUPT_); //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"degeneracy data not found: "+_AFLOWIN_,_FILE_CORRUPT_); //CO20200624
     }
     //CO20180220 - multiply occupied sites will yield titles with more than one DG= value
     vtitle.clear();
@@ -3411,7 +3411,7 @@ void GetDegeneracyFromVPOSCAR(const vector<xstructure>& vxstr, vector<int>& vDE)
       vtitle2.clear();
       aurostd::string2tokens(vtitle[j],vtitle2,"=");
       if(vtitle2.size()!=2){
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"cannot read degeneracy value: "+_AFLOWIN_,_FILE_CORRUPT_); //CO20200624
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"cannot read degeneracy value: "+_AFLOWIN_,_FILE_CORRUPT_); //CO20200624
       }
       DEI*=aurostd::string2utype<int>(vtitle2[1]);
     }
@@ -3438,7 +3438,7 @@ namespace pocc {
 
     string aflowin,MESSAGE="pocc::POCC_DOS ERROR";
     aflowin=string(directory +"/"+_AFLOWIN_);
-    if(!aurostd::FileExist(aflowin)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"file not found: "+aflowin,_FILE_CORRUPT_);} //CO20200624
+    if(!aurostd::FileExist(aflowin)) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"file not found: "+aflowin,_FILE_CORRUPT_);} //CO20200624
     string str_AflowIn; aurostd::file2string(aflowin, str_AflowIn);
     bool pocc_already_calculated_input=pocc::POCC_Already_Calculated_Input(str_AflowIn,directory);
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " pocc_already_calculated_input=" << pocc_already_calculated_input << endl;}
@@ -3519,7 +3519,7 @@ namespace pocc {
         }
       }
       if(!FLAG_ALLFILES_EXIST) {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"input files not found",_FILE_CORRUPT_); //CO20200624
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"input files not found",_FILE_CORRUPT_); //CO20200624
       }
 
       //ions, total energy, spin flag, magnetic moment
@@ -3538,7 +3538,7 @@ namespace pocc {
 
         xOUTCAR outcar_aus;
         if(!outcar_aus.GetPropertiesFile(voutcar_files.at(i))){
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, "xOUTCAR::GetPropertiesFile() failed", _RUNTIME_ERROR_); //CO20200404
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, "xOUTCAR::GetPropertiesFile() failed", _RUNTIME_ERROR_); //CO20200404
         }
         double EFERMI=outcar_aus.Efermi;
         outcar_aus.GetBandGap();
@@ -3626,7 +3626,7 @@ namespace pocc {
         //if no PDOS, exit
         //I will fix later
         if(!(estructure::GET_DOS_DATA(ss_doscar, ss_outcar, Efermi, TDOS, TOTALPDOS) && TOTALPDOS.size()>0)){
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"no PDOS found in DOSCAR",_FILE_CORRUPT_); //CO20200624
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"no PDOS found in DOSCAR",_FILE_CORRUPT_); //CO20200624
         }
         if(LDEBUG){
           cerr << __AFLOW_FUNC__ << " TDOS.size()=" << TDOS.size() << endl;
@@ -3663,7 +3663,7 @@ namespace pocc {
 namespace pocc {
   void POCC_COMBINE_TDOS_PDOS_ONEDOS(const vector<vector<double> >& TDOS, const vector<vector<double> >& PDOS, vector<vector<double> >& DOS, vector<vector<double> >& DOS_IDOS) {   //CO20190808 - one without IDOS and one with
     if(TDOS.size()!=PDOS.size()) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"TDOS and PDOS have different size",_FILE_CORRUPT_); //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"TDOS and PDOS have different size",_FILE_CORRUPT_); //CO20200624
     }
     vector<double> vtmp;
     if(TDOS.at(0).size()==3) { //non-spin
@@ -3785,8 +3785,8 @@ namespace pocc {
   void POCC_GENERATE_OUTPUT(const string& directory, const double& T, const double& DOS_Emin, double& DOS_Emax, const double& DOSSCALE) {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     //produce DOS data
-    if(!XHOST.is_command("gnuplot")) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"gnuplot is missing",_RUNTIME_INIT_);}  //CO20200624
-    if(!XHOST.is_command("convert")) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"convert is missing",_RUNTIME_INIT_);}  //CO20200624
+    if(!XHOST.is_command("gnuplot")) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"gnuplot is missing",_RUNTIME_INIT_);}  //CO20200624
+    if(!XHOST.is_command("convert")) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"convert is missing",_RUNTIME_INIT_);}  //CO20200624
     vector<vector<double> > TDOS_ONLY, PDOS_ONLY, DOS, DOS_IDOS;  vector<double> vEfermi,Egap,vprob; double mag,Egap_net; //CO20190808 - DOS_IDOS
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting" << endl;}
     POCC_GENERATE_DOSDATA(directory,T,TDOS_ONLY,PDOS_ONLY,vEfermi,mag,Egap_net,Egap,vprob);

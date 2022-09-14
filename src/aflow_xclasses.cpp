@@ -9,8 +9,6 @@
 #define _AFLOW_CLASSES_CPP
 #include "aflow.h"
 
-#define _AFLOW_FILE_NAME_ "aflow_xclasses.cpp"  //CO20191112 - this file is not compiled like the rest
-
 // ***************************************************************************
 // ***************************************************************************
 // ***************************************************************************
@@ -334,7 +332,7 @@ std::string _XHOST::command(const string& command) {
     }
   }
   //CO20180705 STOP
-  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"command="+command+" not found",_INPUT_MISSING_);
+  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"command="+command+" not found",_INPUT_MISSING_);
   return string();
 }
 
@@ -1941,7 +1939,7 @@ void _xinput::setXALIEN(_xalien& in_xalien) {
 
 xstructure& _xinput::getXStr() {
   if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS)) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"_xinput::getXStr():","No structure available.",_INPUT_MISSING_);
+    throw aurostd::xerror(__AFLOW_FILE__,XPID+"_xinput::getXStr():","No structure available.",_INPUT_MISSING_);
   }
   if(AFLOW_MODE_VASP) {return xvasp.str;}
   if(AFLOW_MODE_AIMS) {return xaims.str;}
@@ -1950,7 +1948,7 @@ xstructure& _xinput::getXStr() {
 
 string& _xinput::getDirectory() {
   if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS || AFLOW_MODE_ALIEN)) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"_xinput::getDirectory():","No directory available.",_INPUT_MISSING_);
+    throw aurostd::xerror(__AFLOW_FILE__,XPID+"_xinput::getDirectory():","No directory available.",_INPUT_MISSING_);
   }
   if(AFLOW_MODE_VASP) {return xvasp.Directory;}
   if(AFLOW_MODE_AIMS) {return xaims.Directory;}
@@ -1960,7 +1958,7 @@ string& _xinput::getDirectory() {
 
 void _xinput::setXStr(const xstructure& str,bool set_all) {
   if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS)) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"_xinput::setXStr():","No structure available.",_INPUT_MISSING_);
+    throw aurostd::xerror(__AFLOW_FILE__,XPID+"_xinput::setXStr():","No structure available.",_INPUT_MISSING_);
   }
   if(AFLOW_MODE_VASP || set_all) {xvasp.str=str;}
   if(AFLOW_MODE_AIMS || set_all) {xaims.str=str;}
@@ -1968,7 +1966,7 @@ void _xinput::setXStr(const xstructure& str,bool set_all) {
 
 void _xinput::setDirectory(string Directory,bool set_all) {
   if(!(AFLOW_MODE_VASP || AFLOW_MODE_AIMS || AFLOW_MODE_ALIEN)) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"_xinput::setDirectory():","No directory available.",_INPUT_MISSING_);
+    throw aurostd::xerror(__AFLOW_FILE__,XPID+"_xinput::setDirectory():","No directory available.",_INPUT_MISSING_);
   }
   if(AFLOW_MODE_VASP  || set_all) {xvasp.Directory=  Directory;}
   if(AFLOW_MODE_AIMS  || set_all) {xaims.Directory=  Directory;}

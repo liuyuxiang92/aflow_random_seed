@@ -1809,7 +1809,7 @@ namespace pflow {
       if(standalone) { ss_output << endl; }
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
     }
 
     // ---------------------------------------------------------------------------
@@ -1908,7 +1908,7 @@ namespace pflow {
 
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
     }
 
     // ---------------------------------------------------------------------------
@@ -2046,7 +2046,7 @@ namespace pflow {
 
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
     }
 
     // ---------------------------------------------------------------------------
@@ -2167,7 +2167,7 @@ namespace pflow {
       if(standalone) { ss_output << endl; }
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
     }
 
     // ---------------------------------------------------------------------------
@@ -2323,7 +2323,7 @@ namespace pflow {
       if(standalone) { ss_output << endl; }
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
     }
 
     // ---------------------------------------------------------------------------
@@ -2897,7 +2897,7 @@ void PrintMSI(const xstructure& str, ostream& oss) {
   for(uint i=0;i<sstr.atoms.size();i++) {
     sstr.atoms.at(i).CleanName();
     if(sstr.atoms.at(i).atomic_number<1) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"atomic_number not found: sstr.atoms.at("+aurostd::utype2string(i)+").cleanname="+sstr.atoms.at(i).cleanname,_INPUT_ILLEGAL_);  //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"atomic_number not found: sstr.atoms.at("+aurostd::utype2string(i)+").cleanname="+sstr.atoms.at(i).cleanname,_INPUT_ILLEGAL_);  //CO20200624
     }
   }
 

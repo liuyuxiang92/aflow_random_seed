@@ -238,7 +238,7 @@ namespace plotter {
       double version = aurostd::string2utype<double>(tokens[1]);
       if (version < 5.0) {
         string message = "Gnuplot needs to be version 5 or newer (found " + tokens[1] + ").";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
     }
     // ME20200609
@@ -316,12 +316,12 @@ namespace plotter {
           //https://www.itechlounge.net/2020/09/web-imagickexception-attempt-to-perform-an-operation-not-allowed-by-the-security-policy-pdf/
           if(output.find("not allowed by the security policy")!=string::npos){
             string message="The ImageMagick policy file disables ghostscript formats. Please see here and update the policy file: https://bugs.archlinux.org/task/60580";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
           }
         }
         if(!aurostd::FileExist("convert_output." + format)){
           string message="The ImageMagick policy file disables ghostscript formats. Please see here and update the policy file: https://bugs.archlinux.org/task/60580";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         }
         if(LDEBUG) cerr << __AFLOW_FUNC__ << aurostd::execute("ls -las "+directory_tmp) << endl;
         command="mv convert_output." + format + " \"" + filename_latex  + "." + format + "\"";
@@ -339,11 +339,11 @@ namespace plotter {
       // Clean up
       aurostd::RemoveDirectory(directory_tmp);
       if (!aurostd::FileExist(directory_work + "/" + filename + "." + format)) {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Error while generating plot.", _RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Error while generating plot.", _RUNTIME_ERROR_);
       }
     } else {
       string message = "The following binaries are missing: " + aurostd::joinWDelimiter(missing_binaries, " ") + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
   }
 
@@ -384,7 +384,7 @@ namespace plotter {
   // [OBSOLETE]   if (!aurostd::FileExist(directory_work + "/" + filename + "." + format)) {
   // [OBSOLETE]      string function = "plotter::savePlotGNUPLOT():";
   // [OBSOLETE]      string message = "Error while generating plot.";
-  // [OBSOLETE]     throw aurostd::xerror(_AFLOW_FILE_NAME_,function, message, _RUNTIME_ERROR_);
+  // [OBSOLETE]     throw aurostd::xerror(__AFLOW_FILE__,function, message, _RUNTIME_ERROR_);
   // [OBSOLETE]   }
   // [OBSOLETE] }
 
@@ -903,7 +903,7 @@ namespace plotter {
       std::sort(vpocc_doscars.begin(),vpocc_doscars.end());
       string pscheme=plotoptions.getattachedscheme("PROJECTION");
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " pscheme=" << pscheme << endl;}
-      if(pscheme.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No projection scheme provided",_INPUT_MISSING_);}
+      if(pscheme.empty()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No projection scheme provided",_INPUT_MISSING_);}
       double temperature=0.0;
       _aflags aflags;aflags.Directory=directory;
       bool see_sub_output=false;//true;
@@ -922,7 +922,7 @@ namespace plotter {
         vector<double> v_temperatures;
         pcalc.loadDataIntoCalculator();pcalc.setTemperatureStringParameters(v_temperatures); //needed for DOSCAR plots
         pocc::getTemperatureStringParameters(v_temperatures,temperature_precision,temperatures_int,zero_padding_temperature);
-        if(pcalc.m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No ARUN.POCC_* runs found",_FILE_CORRUPT_);}
+        if(pcalc.m_ARUN_directories.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No ARUN.POCC_* runs found",_FILE_CORRUPT_);}
         plotoptions.push_attached("ARUN_DIRECTORY",pcalc.m_ARUN_directories[0]);
       }else{
         pocc::getTemperatureStringParameters(temperature_precision,temperatures_int,zero_padding_temperature);
@@ -930,7 +930,7 @@ namespace plotter {
         //maybe someone is trying to plot in a directory only having aflow.in and DOSCAR's (but no ARUN's). 
         //we need the ARUNs if we want to do projection==species, but not if projection==orbital
         if(pscheme=="SPECIES"){ //we need ARUN_DIRECTORY
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Need ARUN.POCC_* runs for projection==\"species\"",_INPUT_MISSING_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Need ARUN.POCC_* runs for projection==\"species\"",_INPUT_MISSING_);
         }
       }
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " found POCC directory" << endl;}
@@ -1259,7 +1259,7 @@ namespace plotter {
       }
       if(not_all_names_given){ //CO20200404
         stringstream message;
-        message << "Species CANNOT be extracted from dir=" << directory << ", no labels can be supplied";pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_WARNING_);  //CO20200404
+        message << "Species CANNOT be extracted from dir=" << directory << ", no labels can be supplied";pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_WARNING_);  //CO20200404
       }else{ //CO20200404
         if(LDEBUG){cerr << __AFLOW_FUNC__ << " patching names of POSCAR with: " << aurostd::joinWDelimiter(atom_names,", ") << endl;}
         //CO20200404 - ALWAYS use AddAtom() for changing atom properties, indices of species/species_pp/etc will be a mess otherwise
@@ -1800,14 +1800,14 @@ namespace plotter {
         deque<deque<deque<deque<double> > > > vDOS_species=xdos.GetVDOSSpecies(xstr);
         if (!dosDataAvailable(vDOS_species, pdos)) {
           string message = "DOS data not available for pdos = " + aurostd::utype2string<int>(pdos);
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         }
         norbitals=vDOS_species.front().size();
         dos=vDOS_species[pdos];
       }else{  //CO20191010 - plot "atoms-projected"
         if (!dosDataAvailable(xdos.vDOS, pdos)) {
           string message = "DOS data not available for pdos = " + aurostd::utype2string<int>(pdos);
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         }
         if (xdos.lmResolved){norbitals = (int) std::sqrt(xdos.vDOS[pdos].size());}  // size is either 17 or 10
         else{norbitals = (int) xdos.vDOS[pdos].size() - 1;}
@@ -1841,11 +1841,11 @@ namespace plotter {
       // Safety check
       if (!xdos.lmResolved) {
         string message = "Projection scheme LM chosen, but DOSCAR is not lm-resolved.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
       if (!dosDataAvailable(xdos.vDOS, pdos)) {
         string message = "DOS data not available for pdos = " + aurostd::utype2string<int>(pdos);
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
       for (uint i = 1; i < xdos.vDOS[pdos].size(); i++) {
         labels.push_back("$" + LM_ORBITALS_LATEX[i-1] + "$");
@@ -1854,7 +1854,7 @@ namespace plotter {
     } else if (projection == "ATOMS") { //CO20191004 - "ATOMS" is really "IATOMS"
       if (!dosDataAvailable(xdos.vDOS, 0)) {
         string message = "Total DOS not available";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
       dos.push_back(xdos.vDOS[0][0]);
       xstructure xstr = getStructureWithNames(plotoptions,FileMESSAGE,xdos.carstring,oss);  //CO20200404
@@ -1863,7 +1863,7 @@ namespace plotter {
           for (uint i = 0; i < xstr.atoms.size(); i++) {
             if (!dosDataAvailable(xdos.vDOS, i + 1)) {
               string message = "DOS data not available for atom " + aurostd::utype2string<uint>(i + 1);
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+              throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
             }
             dos.push_back(xdos.vDOS[i + 1][0]);
             xstr.atoms[i].CleanName();
@@ -1879,7 +1879,7 @@ namespace plotter {
               iat = xstr.iatoms[i][0];
               if (!dosDataAvailable(xdos.vDOS, iat + 1)) {
                 string message = "DOS data not available for iatom " + aurostd::utype2string<int>(iat + 1);
-                throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+                throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
               }
               dos.push_back(xdos.vDOS[iat + 1][0]);
               xstr.atoms[iat].CleanName();
@@ -1889,7 +1889,7 @@ namespace plotter {
         } else { // In case someone uses pdos option and projection=atoms
           if (!dosDataAvailable(xdos.vDOS, pdos)) {
             string message = "DOS data not available for pdos = " + aurostd::utype2string<int>(pdos);
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
           }
           xstr.atoms[pdos - 1].CleanName();
           labels.push_back(xstr.atoms[pdos - 1].cleanname + "(" + aurostd::utype2string<int>(pdos) + ")");
@@ -1906,7 +1906,7 @@ namespace plotter {
           for (uint i = 0; i < xstr.species.size(); i++) {
             if (!dosDataAvailable(vDOS_species, i + 1)) {
               string message = "DOS data not available for species " + aurostd::utype2string<uint>(i + 1);
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+              throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
             }
             dos.push_back(vDOS_species[i+1][0]);
             labels.push_back(xstr.species[i]);
@@ -1919,19 +1919,19 @@ namespace plotter {
         int dos_index = xstr.atoms[pdos - 1].type + 1;
         if (!dosDataAvailable(vDOS_species, dos_index)) {
           string message = "DOS data not available for dos_index = " + aurostd::utype2string<int>(dos_index);
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         }
         dos.push_back(vDOS_species[dos_index][0]);//AS20201028
       }
     } else if (projection == "NONE") {  // Total DOS only without projections
       if (!dosDataAvailable(xdos.vDOS, 0)) {
         string message = "Total DOS not available";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
       dos.push_back(xdos.vDOS[0][0]);
     } else {
       string message = "Unknown projection scheme " + projection + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
     }
     if(plotoptions.flag("LEGEND_HORIZONTAL")==false && labels.size()>4){  //CO20211227, avoid overlap between legend and DOS
       plotoptions.flag("LEGEND_HORIZONTAL",true);
@@ -1958,7 +1958,7 @@ namespace plotter {
     // Make sure that the number of k-points is consistent with EIGENVAL
     if (xeigen.number_kpoints != nsegments * xkpts.path_grid) {
       string message = "Number of k-points in EIGENVAL and KPOINTS files do not match.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     // Labels
@@ -2718,7 +2718,7 @@ namespace plotter {
       }
     } else {
       string message = "Could not find file " + thermo_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
   }
 
@@ -2754,7 +2754,7 @@ namespace plotter {
         eos_model != "BM4" && eos_model != "M"){
       msg = "Wrong name of the EOS model was specified. ";
       msg += "Only SJ, BM2, BM3, BM4 or M labels are allowed.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, msg, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, msg, _INPUT_ILLEGAL_);
     }
     string keyword = "QHA_" + eos_model + "_THERMO";
 
@@ -2784,7 +2784,7 @@ namespace plotter {
       }
     } else {
       msg = "Could not find file " + thermo_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, msg, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, msg, _FILE_NOT_FOUND_);
     }
   }
   //AS20200909 END
@@ -2892,7 +2892,7 @@ namespace plotter {
       plotMatrix(plotoptions, out,FileMESSAGE,oss);  //CO20200404
     } else {
       string message = "Could not find file " + tcond_file + ".";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
   }
 
@@ -3024,13 +3024,13 @@ namespace plotter {
       if (vcontent[iline] == stopstring) break;
       if (iline == nlines) {
         message = "Wrong file format. No STOP tag found.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
       }
     }
     if (data.size() == 0) {
       message = "No data extracted from file " + path_to_file + ".";
       message += "File is either empty or has the wrong format.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
     }
     return data;
   }

@@ -254,7 +254,7 @@ namespace aflowlib {
 
         if(tokens_species.size()!=tokens_composition.size()) {
           string message = "tokens_species.size()!=tokens_composition.size()";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
         }
         // cerr << XPID << "GREP_Species_ALL: E=" << enthalpy << " ";
         for(uint k=0;k<nspecies;k++) // order by species, no entries
@@ -658,7 +658,7 @@ namespace aflowlib {
         if(LDEBUG || LVERBOSE) cerr << " ... size=" << (*pvLibrary).size() << " ..  ";// << endl;
       } else {
         string message = "AFLOW_LIBRARY not found!";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
         return FALSE;
       }
       if((*pvLibrary_tokens).size()==0) {
@@ -789,7 +789,7 @@ namespace aflowlib {
 
     if(PROJECT_LIBRARY=="NOTHING") {
       string message = "Nothing found from pwd or directory [directory=" + directory + "]   [pwd=" + directory_pwd + "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     return XHOST.tmpfs;
   }
@@ -915,7 +915,7 @@ namespace aflowlib {
       return TRUE;
     }
     string message = "Project Not Found";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     return FALSE;
   }
 }
@@ -933,7 +933,7 @@ namespace aflowlib {
 
     if(XHOST.vext.size()!=XHOST.vcat.size()) {
       string message = "XHOST.vext.size()!=XHOST.vcat.size()";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
 
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " vspecies.size()=" << vspecies.size() << " [1]" << endl;
@@ -1081,7 +1081,7 @@ namespace aflowlib {
     // Call to LIB2LIB function to run postprocessing - added by CT20181212
     bool perform_LIB2LIB=true; //CO20200624 - good for debugging the rest of lib2raw, lib2lib can be slow
     if(perform_LIB2LIB && !LIB2LIB(options, flag_FORCE, LOCAL)) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"aflowlib::LIB2LIB() failed",_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"aflowlib::LIB2LIB() failed",_RUNTIME_ERROR_);
       //[CO20200624 - OBSOLETE]cerr << __AFLOW_FUNC__ << " LIB2LIB failed" << endl;
     }
 
@@ -1275,7 +1275,7 @@ namespace aflowlib {
         aurostd::ZIP2ZIP(directory_LIB,"bz2","xz",FALSE,XHOST.sPID); // PATCH FOR REFRESH (to be removed)
         aurostd::ZIP2ZIP(directory_LIB,"gz","xz",FALSE,XHOST.sPID); // PATCH FOR REFRESH (to be removed)
 
-        cout << __AFLOW_FUNC__ << " ALREADY CALCULATED = " << directory_RAW << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(_AFLOW_FILE_NAME_,aflags,"time") << endl;
+        cout << __AFLOW_FUNC__ << " ALREADY CALCULATED = " << directory_RAW << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(__AFLOW_FILE__,aflags,"time") << endl;
         return FALSE;
       }
       if(perform_BANDS) {
@@ -1322,7 +1322,7 @@ namespace aflowlib {
 
     //[CO20200624 - OBSOLETE]if((perform_THERMODYNAMICS || perform_BANDS ||  perform_STATIC))
     _aflags aflags;
-    cout << __AFLOW_FUNC__ << " dir=" << directory_LIB << " BEGIN_DATE = " << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+    cout << __AFLOW_FUNC__ << " dir=" << directory_LIB << " BEGIN_DATE = " << Message(__AFLOW_FILE__,aflags) << endl;
     aurostd::ZIP2ZIP(directory_LIB,"bz2","xz",TRUE,XHOST.sPID); 
     aurostd::ZIP2ZIP(directory_LIB,"gz","xz",TRUE,XHOST.sPID);
 
@@ -1834,7 +1834,7 @@ namespace aflowlib {
     // DO THE FINAL WRITING
 
     if(aflowlib_data.vaflowlib_date.size()!=2){ //CO20200624 - this means we didn't get the LOCK dates, spit warning
-      pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"LOCK dates NOT found",_LOGGER_WARNING_);
+      pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"LOCK dates NOT found",_LOGGER_WARNING_);
     }
     aflowlib_data.vaflowlib_date.push_back(aurostd::get_datetime(true)); //CO20200624 - adding LOCK date  //CO20210624 - adding UTC offset
 
@@ -1935,8 +1935,8 @@ namespace aflowlib {
 
       // for(uint i=0;i<aflowlib_data.vauid.size();i++) { cout << __AFLOW_FUNC__ << " DEBUG  aflowlib_data.vauid.at(" << i << ")=" << aflowlib_data.vauid.at(i) << endl; }
       // DONE
-      //      cout << __AFLOW_FUNC__ << " dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2) << "] " << Message(_AFLOW_FILE_NAME_,aflags,"time") << endl;
-      cout << __AFLOW_FUNC__ << " dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(_AFLOW_FILE_NAME_,aflags,"time") << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2,FIXED_STREAM) << "] " << endl; //CO20200624 - added FIXED_STREAM
+      //      cout << __AFLOW_FUNC__ << " dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2) << "] " << Message(__AFLOW_FILE__,aflags,"time") << endl;
+      cout << __AFLOW_FUNC__ << " dir=" << directory_LIB << "   END_DATE - [v=" << string(AFLOW_VERSION) << "] -" << Message(__AFLOW_FILE__,aflags,"time") << " [time=" << aurostd::utype2string(aurostd::get_seconds(seconds_begin),2,FIXED_STREAM) << "] " << endl; //CO20200624 - added FIXED_STREAM
       if(XHOST.vflag_control.flag("BEEP")) aurostd::beep(aurostd::min(6000,aurostd::abs(int(1*aflowlib_data.aflowlib2string().length()-2000))),50);
     }
 
@@ -2039,7 +2039,7 @@ namespace aflowlib {
 
     if(XHOST.vext.size()!=XHOST.vzip.size()) {
       error_message = "XHOST.vext.size()!=XHOST.vzip.size()";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error_message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, error_message, _INDEX_MISMATCH_);
     }
 
     string file_LIB=directory_LIB+"/"+fileLIB;
@@ -2054,15 +2054,15 @@ namespace aflowlib {
     if(!aurostd::FileExist(file_LIB) && !aurostd::FileExist(file_LIB_nocompress) && !aurostd::EFileExist(file_LIB_nocompress)) {
       if(!aurostd::FileExist(file_LIB)) {
         error_message = MESSAGE + " file not found " + file_LIB;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error_message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, error_message, _FILE_NOT_FOUND_);
       }
       if(!aurostd::FileExist(file_LIB_nocompress)) {
         error_message = MESSAGE + " file not found " + file_LIB_nocompress;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error_message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, error_message, _FILE_NOT_FOUND_);
       }
       if(!aurostd::EFileExist(file_LIB_nocompress)) {
         error_message = MESSAGE + " file not found " + file_LIB_nocompress + ".EXT";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error_message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, error_message, _FILE_NOT_FOUND_);
       }
     }
     if(aurostd::FileExist(file_LIB)) aurostd::CopyFile(file_LIB,file_RAW);
@@ -2525,7 +2525,7 @@ namespace aflowlib {
     if(aurostd::abs(data_natoms-(double) xOUT.natoms)>0.1) {
       stringstream message;
       message << "data_natoms(" << data_natoms << ")!= (int) xOUT.natoms(" << xOUT.natoms << ").";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
     return flag;
   }
@@ -2739,15 +2739,15 @@ namespace aflowlib {
       //double check all of the pp match
       for(uint i=0;i<xstr.species_pp_version.size()&&!functional_cce.empty();i++){
         if(functional_cce=="PBE" && xstr.species_pp_version[i].find("PBE")==string::npos){
-          pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Mismatch in species_pp_version found ("+functional_cce+"), not calculating CCE correction",_LOGGER_WARNING_);
+          pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"Mismatch in species_pp_version found ("+functional_cce+"), not calculating CCE correction",_LOGGER_WARNING_);
           functional_cce="";
         }
         if(functional_cce=="LDA" && xstr.species_pp_version[i].find("LDA")!=string::npos){
-          pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Mismatch in species_pp_version found ("+functional_cce+"), not calculating CCE correction",_LOGGER_WARNING_);
+          pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"Mismatch in species_pp_version found ("+functional_cce+"), not calculating CCE correction",_LOGGER_WARNING_);
           functional_cce="";
         }
         if(functional_cce=="SCAN" && xstr.species_pp_version[i].find("SCAN")!=string::npos){
-          pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Mismatch in species_pp_version found ("+functional_cce+"), not calculating CCE correction",_LOGGER_WARNING_);
+          pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"Mismatch in species_pp_version found ("+functional_cce+"), not calculating CCE correction",_LOGGER_WARNING_);
           functional_cce="";
         }
       }
@@ -2867,7 +2867,7 @@ namespace aflowlib {
     // ZIP-AGNOSTIC
     if(XHOST.vext.size()!=XHOST.vzip.size()) {
       messagestream << "XHOST.vext.size()!=XHOST.vzip.size()";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
     }
     //CO+DX START 20170713 - adding symmetry output to RAW
     _aflags aflags;
@@ -3148,19 +3148,19 @@ namespace aflowlib {
         }
         if(aurostd::FileExist(fileX_RAW)) {
           messagestream << MESSAGE << " [1] - file not prepared " << fileX_LIB;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
         }
         if(aurostd::FileExist(fileE_RAW)) {
           messagestream << MESSAGE << " [2] - file not prepared " << fileE_LIB;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
         }
         if(aurostd::FileExist(fileK_RAW)) {
           messagestream << MESSAGE << " [3] - file not prepared " << fileK_LIB;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
         }
         if(aurostd::FileExist(fileI_RAW)) {
           messagestream << MESSAGE << " [4] - file not prepared " << fileI_LIB;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
         }
       }
     } // no LIB0
@@ -3195,19 +3195,19 @@ namespace aflowlib {
       }
       if(aurostd::FileExist(fileX_RAW)) {
         messagestream << MESSAGE << " [1] - file not prepared " << fileX_LIB;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
       }
       if(aurostd::FileExist(fileE_RAW)) {
         messagestream << MESSAGE << " [2] - file not prepared " << fileE_LIB;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
       }
       if(aurostd::FileExist(fileK_RAW)) {
         messagestream << MESSAGE << " [3] - file not prepared " << fileK_LIB;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
       }
       if(aurostd::FileExist(fileI_RAW)) {
         messagestream << MESSAGE << " [4] - file not prepared " << fileI_LIB;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
       }
     }
 
@@ -3243,11 +3243,11 @@ namespace aflowlib {
         }
         if(aurostd::FileExist(fileX_RAW)) {
           messagestream << MESSAGE << " [4] - file not prepared " << fileX_LIB;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
         }
         if(aurostd::FileExist(fileE_RAW)) {
           messagestream << MESSAGE << " [5] - file not prepared " << fileE_LIB;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _FILE_ERROR_);
         }
       }
     }
@@ -3595,7 +3595,7 @@ namespace aflowlib {
           //CO20210213 - check types are all the same, if not issue warning/error (mixing is not advisable)
           for(uint i=0;i<xOUT.species_pp_type.size();i++){
             if(xOUT.species_pp_type[i]!=xOUT.pp_type){
-              pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Mismatch in species_pp_types ("+xOUT.species_pp_type[i]+" vs. "+xOUT.pp_type+")",_LOGGER_WARNING_);
+              pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"Mismatch in species_pp_types ("+xOUT.species_pp_type[i]+" vs. "+xOUT.pp_type+")",_LOGGER_WARNING_);
             }
           }
           data.vdft_type.clear();data.vdft_type.push_back(xOUT.pp_type);  //CO, this is technically a vector (RESTAPI paper)
@@ -3625,7 +3625,7 @@ namespace aflowlib {
 
     if(str_relax.species.size()==0) {
       messagestream << "OUTCAR/POTCAR not FOUND in " << directory_LIB;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _FILE_NOT_FOUND_);
     }
 
     for(uint j=0;j<str_relax.species.size();j++) {
@@ -3636,35 +3636,35 @@ namespace aflowlib {
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " " << data.nspecies << " " << str_relax.species.size() << " " << str_relax.species_pp.size() << " " << str_relax.species_pp_type.size() << " " << str_relax.species_pp_version.size() << " " << str_relax.species_pp_ZVAL.size() << " " << str_relax.species_pp_vLDAU.size() << " " << str_relax.species_volume.size() << " " << str_relax.species_mass.size() << endl;
     if(data.nspecies!=str_relax.species.size()) {
       messagestream << MESSAGE << " [1] - data.nspecies[" << data.nspecies << "]!=str_relax.species.size()[" << str_relax.species.size() << "]" << endl << str_relax;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
     }
     if(data.nspecies!=str_relax.species_pp.size()) {
       messagestream << MESSAGE << " [2] - data.nspecies[" << data.nspecies << "]!=str_relax.species_pp.size()[" << str_relax.species_pp.size() << "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
     }
     if(data.nspecies!=str_relax.species_pp_type.size()) {
       messagestream << MESSAGE << " [3] - data.nspecies[" << data.nspecies << "]!=str_relax.species_pp_type.size()[" << str_relax.species_pp_type.size() << "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
     }
     if(data.nspecies!=str_relax.species_pp_version.size()) {
       messagestream << MESSAGE << " [4] - data.nspecies[" << data.nspecies << "]!=str_relax.species_pp_version.size()[" << str_relax.species_pp_version.size() << "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
     }
     if(data.nspecies!=str_relax.species_pp_ZVAL.size()) {
       messagestream << MESSAGE << " [5] - data.nspecies[" << data.nspecies << "]!=str_relax.species_pp_ZVAL.size()[" << str_relax.species_pp_ZVAL.size() << "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
     }
     if(data.nspecies!=data.vspecies_pp_AUID.size()) {
       messagestream << MESSAGE << " [5] - data.nspecies[" << data.nspecies << "]!=data.vspecies_pp_AUID.size()[" << data.vspecies_pp_AUID.size() << "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
     }
     if(data.nspecies!=str_relax.species_volume.size()) {
       messagestream << MESSAGE << " [6] - data.nspecies[" << data.nspecies << "]!=str_relax.species_volume.size()[" << str_relax.species_volume.size() << "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
     }
     if(data.nspecies!=str_relax.species_mass.size()) {
       messagestream << MESSAGE << " [7] - data.nspecies[" << data.nspecies << "]!=str_relax.species_mass.size()[" << str_relax.species_mass.size() << "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _INDEX_MISMATCH_);
     }
 
     data.compound="";
@@ -4002,7 +4002,7 @@ namespace aflowlib {
 
       if(aurostd::abs((double) data.vnbondxx.size()-data.nspecies*(data.nspecies+1.0)/2.0)>0.1){
         messagestream << "incompatible data.vnbondxx.size()[" << data.vnbondxx.size() << "]!=data.nspecies*(data.nspecies+1)/2)[" << (data.nspecies*(data.nspecies+1.0)/2.0) << "]";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,messagestream,_RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,messagestream,_RUNTIME_ERROR_);
       }
 
       //[CO20200731 - moving up and using stoich_each_type]//CO20200624 START - mimic stoich from PrintData1(): aflow_pflow_print.cpp, this is really obsolete
@@ -4123,7 +4123,7 @@ namespace aflowlib {
             }
         if(aurostd::abs((double) aus_data_nbondxx.size()-_nspecies*(_nspecies+1.0)/2.0)>0.1) {
           messagestream << MESSAGE << " incompatible aus_data_nbondxx.size()[" << aus_data_nbondxx.size() << "]!=_nspecies*(_nspecies+1)/2)[" << (_nspecies*(_nspecies+1.0)/2.0) << "]";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, messagestream, _RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, messagestream, _RUNTIME_ERROR_);
         }
         if(flag_LIB2==TRUE && _nspecies==1) { _nspecies++;aus_data_nbondxx.push_back("");aus_data_nbondxx.push_back(""); } // FIX for purity control and alien generation
         for(uint isp1=0,inbondxx=0;isp1<_nspecies;isp1++)
@@ -5578,7 +5578,7 @@ namespace aflowlib {
             stringstream message;
             message << "Could not read stiffness tensor: wrong number of lines"
               << " (found " << vline.size() << ", need 6).";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
           }
           for (int i = 0; i < 6; i++) {
             aurostd::string2tokens(vline[i], row);
@@ -5587,7 +5587,7 @@ namespace aflowlib {
               message << "Could not read stiffness tensor."
                 << " Wrong number of columns in line " << (i + 1)
                 << " (found " << row.size() << ", need 6).";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
+              throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
             }
             for (int j = 0; j < 6; j++) tensor[i + 1][j + 1] = row[j];
           }
@@ -5610,7 +5610,7 @@ namespace aflowlib {
             stringstream message;
             message << "Could not read compliance tensor: wrong number of lines"
               << " (found " << vline.size() << ", need 6).";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
           }
           for (int i = 0; i < 6; i++) {
             aurostd::string2tokens(vline[i], row);
@@ -5619,7 +5619,7 @@ namespace aflowlib {
               message << "Could not read compliance tensor:"
                 << " wrong number of columns in line " << (i + 1)
                 << " (found " << row.size() << ", need 6).";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
+              throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
             }
             for (int j = 0; j < 6; j++) tensor[i + 1][j + 1] = row[j];
           }
@@ -5932,7 +5932,7 @@ namespace aflowlib {
     string::size_type loc;
     loc=data.pocc_parameters.find(TAG_TITLE_POCC);
     data.pocc_parameters=data.pocc_parameters.substr(loc+TAG_TITLE_POCC.size(),string::npos);
-    if(data.pocc_parameters.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No pocc_parameters found",_INPUT_ILLEGAL_);}
+    if(data.pocc_parameters.empty()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No pocc_parameters found",_INPUT_ILLEGAL_);}
     data.pocc_parameters=pocc::addDefaultPOCCTOL2string(data.pocc_parameters);
     if(AFLOWLIB_VERBOSE) cout << MESSAGE << " pocc_parameters=" << data.pocc_parameters << endl;
 
@@ -5986,9 +5986,9 @@ namespace aflowlib {
       if(AFLOWLIB_VERBOSE && data.entropy_forming_ability!=AUROSTD_NAN) cout << MESSAGE << " entropy_forming_ability=" << data.entropy_forming_ability << endl;
     }
 
-    if(v_dgs.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No v_dgs found",_FILE_CORRUPT_);}
-    if(v_energies.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No v_energies found",_FILE_CORRUPT_);}
-    if(v_dgs.size()!=v_energies.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"v_dgs.size()!=v_energies.size()",_FILE_CORRUPT_);}
+    if(v_dgs.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No v_dgs found",_FILE_CORRUPT_);}
+    if(v_energies.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No v_energies found",_FILE_CORRUPT_);}
+    if(v_dgs.size()!=v_energies.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"v_dgs.size()!=v_energies.size()",_FILE_CORRUPT_);}
 
     if(aurostd::EFileExist(directory_LIB+"/"+POCC_FILE_PREFIX+POCC_ALL_HNF_MATRICES_FILE)) {  //old pocc doesn't print this
       aflowlib::LIB2RAW_FileNeeded(directory_LIB,POCC_FILE_PREFIX+POCC_ALL_HNF_MATRICES_FILE,directory_RAW,POCC_FILE_PREFIX+POCC_ALL_HNF_MATRICES_FILE,vfile,MESSAGE);  // aflow.pocc.hnf_matrices.out
@@ -6167,9 +6167,9 @@ namespace aflowlib {
     pocc::POccCalculator pcalc(aflags);
     pcalc.loadDataIntoCalculator();
     pcalc.setTemperatureStringParameters(); //needed for DOSCAR plots
-    if(pcalc.m_ARUN_directories.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No ARUN.POCC_* runs found",_FILE_CORRUPT_);}
-    if(pcalc.m_ARUN_directories.size()!=v_dgs.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"pcalc.m_ARUN_directories.size()!=v_dgs.size()",_FILE_CORRUPT_);}
-    if(pcalc.m_ARUN_directories.size()!=v_energies.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"pcalc.m_ARUN_directories.size()!=v_energies.size()",_FILE_CORRUPT_);}
+    if(pcalc.m_ARUN_directories.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No ARUN.POCC_* runs found",_FILE_CORRUPT_);}
+    if(pcalc.m_ARUN_directories.size()!=v_dgs.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"pcalc.m_ARUN_directories.size()!=v_dgs.size()",_FILE_CORRUPT_);}
+    if(pcalc.m_ARUN_directories.size()!=v_energies.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"pcalc.m_ARUN_directories.size()!=v_energies.size()",_FILE_CORRUPT_);}
     xvector<double> xv_dgs=aurostd::vector2xvector(v_dgs);  //for aurostd::meanWeighted()
 
     //do DOSCAR plots
@@ -6188,15 +6188,15 @@ namespace aflowlib {
 
     //xOUTCAR
     string filename="";
-    if(!aurostd::EFileExist(directory_LIB+"/"+pcalc.m_ARUN_directories[0]+"/OUTCAR.relax2",filename)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"xOUTCAR cannot be extracted",_FILE_CORRUPT_);}
+    if(!aurostd::EFileExist(directory_LIB+"/"+pcalc.m_ARUN_directories[0]+"/OUTCAR.relax2",filename)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"xOUTCAR cannot be extracted",_FILE_CORRUPT_);}
     xOUTCAR xOUT;xOUT.GetPropertiesFile(filename);
     //
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " xOUT.species.size()=" << xOUT.species.size() << endl;
-    if(xOUT.species.size()!=data.vspecies.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"xOUT.species.size()!=data.vspecies.size()",_FILE_CORRUPT_);}
+    if(xOUT.species.size()!=data.vspecies.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"xOUT.species.size()!=data.vspecies.size()",_FILE_CORRUPT_);}
     //
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " xOUT.species_pp.size()=" << xOUT.species_pp.size() << endl;
-    if(xOUT.species_pp.size()!=data.vspecies.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"xOUT.species_pp.size()!=data.vspecies.size()",_FILE_CORRUPT_);}
-    if(xOUT.species_pp.size()!=xstr_pocc.species.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"xOUT.species_pp.size()!=xstr_pocc.species.size()",_FILE_CORRUPT_);}
+    if(xOUT.species_pp.size()!=data.vspecies.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"xOUT.species_pp.size()!=data.vspecies.size()",_FILE_CORRUPT_);}
+    if(xOUT.species_pp.size()!=xstr_pocc.species.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"xOUT.species_pp.size()!=xstr_pocc.species.size()",_FILE_CORRUPT_);}
     //
     data.vspecies_pp.clear();xstr_pocc.species_pp.clear();
     for(i=0;i<xOUT.species_pp.size();i++){
@@ -6207,7 +6207,7 @@ namespace aflowlib {
     if(AFLOWLIB_VERBOSE && !data.species_pp.empty()) cout << MESSAGE << " species_pp=" << data.species_pp << endl;
     //
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " xOUT.species_pp_version.size()=" << xOUT.species_pp_version.size() << endl;
-    if(xOUT.species_pp_version.size()!=data.vspecies.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"xOUT.species_pp_version.size()!=data.vspecies.size()",_FILE_CORRUPT_);}
+    if(xOUT.species_pp_version.size()!=data.vspecies.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"xOUT.species_pp_version.size()!=data.vspecies.size()",_FILE_CORRUPT_);}
     data.vspecies_pp_version.clear();xstr_pocc.species_pp_version.clear();
     for(i=0;i<xOUT.species_pp_version.size();i++){
       data.vspecies_pp_version.push_back(xOUT.species_pp_version[i]); // for aflowlib_libraries.cpp
@@ -6217,7 +6217,7 @@ namespace aflowlib {
     if(AFLOWLIB_VERBOSE && !data.species_pp_version.empty()) cout << MESSAGE << " species_pp_version=" << data.species_pp_version << endl;
     //
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " xOUT.vZVAL.size()=" << xOUT.vZVAL.size() << endl;
-    if(xOUT.vZVAL.size()!=data.vspecies.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"xOUT.vZVAL.size()!=data.vspecies.size()",_FILE_CORRUPT_);}
+    if(xOUT.vZVAL.size()!=data.vspecies.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"xOUT.vZVAL.size()!=data.vspecies.size()",_FILE_CORRUPT_);}
     data.vspecies_pp_ZVAL.clear();xstr_pocc.species_pp_ZVAL.clear();
     for(i=0;i<xOUT.vZVAL.size();i++){
       data.vspecies_pp_ZVAL.push_back(xOUT.vZVAL[i]); // for aflowlib_libraries.cpp
@@ -6227,7 +6227,7 @@ namespace aflowlib {
     if(AFLOWLIB_VERBOSE && !data.species_pp_ZVAL.empty()) cout << MESSAGE << " species_pp_ZVAL=" << data.species_pp_ZVAL << endl;
     //
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " xOUT.species_pp_AUID.size()=" << xOUT.species_pp_AUID.size() << endl;
-    if(xOUT.species_pp_AUID.size()!=data.vspecies.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"xOUT.species_pp_AUID.size()!=data.vspecies.size()",_FILE_CORRUPT_);}
+    if(xOUT.species_pp_AUID.size()!=data.vspecies.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"xOUT.species_pp_AUID.size()!=data.vspecies.size()",_FILE_CORRUPT_);}
     data.vspecies_pp_AUID.clear();
     for(i=0;i<xOUT.species_pp_AUID.size();i++){data.vspecies_pp_AUID.push_back(xOUT.species_pp_AUID[i]);} // for aflowlib_libraries.cpp
     data.species_pp_AUID=aurostd::joinWDelimiter(data.vspecies_pp_AUID,",");
@@ -6292,39 +6292,39 @@ namespace aflowlib {
     }
     if(data.nspecies!=xstr_pocc.species.size()) {
       message << MESSAGE << " [1] - data.nspecies[" << data.nspecies << "]!=xstr_pocc.species.size()[" << xstr_pocc.species.size() << "]" << endl << xstr_pocc;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
     if(data.nspecies!=xstr_pocc.species_pp.size()) {
       message << MESSAGE << " [2] - data.nspecies[" << data.nspecies << "]!=xstr_pocc.species_pp.size()[" << xstr_pocc.species_pp.size() << "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
     if(data.nspecies!=xstr_pocc.species_pp_type.size()) {
       message << MESSAGE << " [3] - data.nspecies[" << data.nspecies << "]!=xstr_pocc.species_pp_type.size()[" << xstr_pocc.species_pp_type.size() << "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
     if(data.nspecies!=xstr_pocc.species_pp_version.size()) {
       message << MESSAGE << " [4] - data.nspecies[" << data.nspecies << "]!=xstr_pocc.species_pp_version.size()[" << xstr_pocc.species_pp_version.size() << "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
     if(data.nspecies!=xstr_pocc.species_pp_ZVAL.size()) {
       message << MESSAGE << " [5] - data.nspecies[" << data.nspecies << "]!=xstr_pocc.species_pp_ZVAL.size()[" << xstr_pocc.species_pp_ZVAL.size() << "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
     if(data.nspecies!=data.vspecies_pp_AUID.size()) {
       message << MESSAGE << " [5] - data.nspecies[" << data.nspecies << "]!=data.vspecies_pp_AUID.size()[" << data.vspecies_pp_AUID.size() << "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
     if(data.nspecies!=xstr_pocc.species_volume.size()) {
       message << MESSAGE << " [6] - data.nspecies[" << data.nspecies << "]!=xstr_pocc.species_volume.size()[" << xstr_pocc.species_volume.size() << "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
     if(data.nspecies!=xstr_pocc.species_mass.size()) {
       message << MESSAGE << " [7] - data.nspecies[" << data.nspecies << "]!=xstr_pocc.species_mass.size()[" << xstr_pocc.species_mass.size() << "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
 
     //parent structure
-    if(pcalc.xstr_sym.atoms.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"pcalc.xstr_sym was not found",_RUNTIME_ERROR_);}
+    if(pcalc.xstr_sym.atoms.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"pcalc.xstr_sym was not found",_RUNTIME_ERROR_);}
     const xstructure& xstr_pocc_parent=pcalc.xstr_sym;
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " xstr_pocc_parent=" << endl;cerr << xstr_pocc_parent << endl;}
     xstructure xstr_sp,xstr_sc;
@@ -6433,10 +6433,10 @@ namespace aflowlib {
     //build data.aflow_prototype_params_values_orig from scratch
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " prototype_parameter_values(PARENT)=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(xstr_anrl.prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),",") << endl;}
     vector<double> prototype_parameter_values=xstr_anrl.prototype_parameter_values;
-    if(prototype_parameter_values.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"AFLOW parameter values builder failed: prototype_parameter_values.empty()",_RUNTIME_ERROR_);}
+    if(prototype_parameter_values.empty()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"AFLOW parameter values builder failed: prototype_parameter_values.empty()",_RUNTIME_ERROR_);}
     prototype_parameter_values[0]*=(xstr_pocc.GetVolume()/xstr_pocc_parent.GetVolume());  //scale for the volume of the pocc structure, remember: anrl is based on std_conv, not the primitive
     if(prototype_parameter_values.size()!=xstr_anrl.prototype_parameter_values.size()){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"AFLOW parameter values builder failed: prototype_parameter_values.size()!=xstr_anrl.prototype_parameter_values.size()",_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"AFLOW parameter values builder failed: prototype_parameter_values.size()!=xstr_anrl.prototype_parameter_values.size()",_RUNTIME_ERROR_);
     }
     data.aflow_prototype_params_values_orig=aurostd::joinWDelimiter(aurostd::vecDouble2vecString(prototype_parameter_values,_AFLOWLIB_DATA_DOUBLE_PREC_),",");
     if(AFLOWLIB_VERBOSE && !data.aflow_prototype_params_values_orig.empty()) cout << MESSAGE << " aflow_prototype_params_values_orig=" << data.aflow_prototype_params_values_orig << endl;
@@ -6503,7 +6503,7 @@ namespace aflowlib {
             }
           }
         }
-        if(xstr_derivative.atoms.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"xstr_derivative cannot be extracted",_FILE_CORRUPT_);}
+        if(xstr_derivative.atoms.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"xstr_derivative cannot be extracted",_FILE_CORRUPT_);}
         //load in xstr_pocc (from xOUT)
         xstr_derivative.species.clear();for(j=0;j<xstr_pocc.species.size();j++){xstr_derivative.species.push_back(xstr_pocc.species[j]);} // for LIB2RAW_Calculate_FormationEnthalpy
         xstr_derivative.species_pp.clear();for(j=0;j<xstr_pocc.species_pp.size();j++){xstr_derivative.species_pp.push_back(xstr_pocc.species_pp[j]);}  // for LIB2RAW_Calculate_FormationEnthalpy
@@ -6541,7 +6541,7 @@ namespace aflowlib {
         //we gather v_Hfs as vector and convert to xvector for the function
         //keep as is: we don't want to create an xvector of defined size
         //the size of the vector tells us whether the values were extracted correctly
-        if(v_dgs.size()!=v_Hfs.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"v_dgs.size()!=v_Hfs.size()",_FILE_CORRUPT_);}
+        if(v_dgs.size()!=v_Hfs.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"v_dgs.size()!=v_Hfs.size()",_FILE_CORRUPT_);}
         if(LDEBUG){
           cerr << __AFLOW_FUNC__ << " xv_dgs=" << aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(xv_dgs,5),",") << endl;
           cerr << __AFLOW_FUNC__ << " v_Hfs=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(v_Hfs,5),",") << endl;
@@ -6556,7 +6556,7 @@ namespace aflowlib {
           data.enthalpy_formation_cce_0K_atom=aurostd::meanWeighted(aurostd::vector2xvector(v_Hfs_cce_0K),xv_dgs);
           data.enthalpy_formation_cce_0K_cell=data.enthalpy_formation_cce_0K_atom*data_natoms;
         }
-        if(v_dgs.size()!=v_Ts.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"v_dgs.size()!=v_Ts.size()",_FILE_CORRUPT_);}
+        if(v_dgs.size()!=v_Ts.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"v_dgs.size()!=v_Ts.size()",_FILE_CORRUPT_);}
         data.entropic_temperature=aurostd::meanWeighted(aurostd::vector2xvector(v_Ts),xv_dgs);
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY FORMATION total E0 (eV) = " << data.enthalpy_formation_cell << endl;
         if(AFLOWLIB_VERBOSE) cout << MESSAGE << " ENTHALPY FORMATION per atom E0/N (eV) = " << data.enthalpy_formation_atom << "   " << directory_LIB << endl;
@@ -7309,7 +7309,7 @@ namespace aflowlib {
         if(aurostd::FileExist(str_dir+"/"+FILE+".bands"+XHOST.vext.at(iext))) { sss << aurostd::execute2string(XHOST.vcat.at(iext)+" \""+ str_dir+"/"+FILE+".bands"+XHOST.vext.at(iext)+"\"");return sss.str().length(); }
       }
       message = FILE+" or "+FILE+".bands or "+FILE+".bands.EXT not found in the directory, aborting!";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
     if(!gfound && (FILE=="DOSCAR")) {
       gfound=TRUE;
@@ -7319,7 +7319,7 @@ namespace aflowlib {
         if(aurostd::FileExist(str_dir+"/"+FILE+".static"+XHOST.vext.at(iext))) { sss << aurostd::execute2string(XHOST.vcat.at(iext)+" \""+ str_dir+"/"+FILE+".static"+XHOST.vext.at(iext)+"\"");return sss.str().length(); }
       }
       message = FILE+" or "+FILE+".static or "+FILE+".static.EXT not found in the directory, aborting!";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
     if(!gfound && (FILE=="POSCAR")) {
       gfound=TRUE;
@@ -7331,7 +7331,7 @@ namespace aflowlib {
         if(aurostd::FileExist(str_dir+"/"+FILE+".relax1"+XHOST.vext.at(iext))) { sss << aurostd::execute2string(XHOST.vcat.at(iext)+" \""+ str_dir+"/"+FILE+".relax1"+XHOST.vext.at(iext)+"\"");return sss.str().length(); }
       }
       message = FILE+" or "+FILE+".bands/static/relax or "+FILE+".bands./static/relax.EXT not found in the directory, aborting!";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
     if(!gfound) {
       if(LDEBUG) cerr << __AFLOW_FUNC__ << " 3=" << FILE << endl;
@@ -7342,7 +7342,7 @@ namespace aflowlib {
         if(aurostd::FileExist(str_dir+"/"+FILE+".bands"+XHOST.vext.at(iext))) { sss << aurostd::execute2string(XHOST.vcat.at(iext)+" \""+ str_dir+"/"+FILE+".bands"+XHOST.vext.at(iext)+"\"");return sss.str().length(); }
       }
       message = FILE+" or "+FILE+".static/relax1/bands or "+FILE+".static/relax1/bands.EXT not found in the directory, aborting!";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
     }
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " END" << endl;
     return sss.str().length();
@@ -7376,7 +7376,7 @@ namespace aflowlib {
       }
       //ME20190627 BEGIN
       string message = FILE+" or "+FILE+".bands or "+FILE+".bands.EXT not found in the directory, aborting!";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
       //ME20190627 END
     }
     if(!gfound && (FILE=="DOSCAR")) {
@@ -7395,7 +7395,7 @@ namespace aflowlib {
       }
       //ME20190627 BEGIN
       string message = FILE+" or "+FILE+".static or "+FILE+".static.EXT not found in the directory, aborting!";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
       //ME20190627 END
     }
     if(!gfound && (FILE=="POSCAR" || FILE=="CONTCAR")) { //RF20200409
@@ -7414,7 +7414,7 @@ namespace aflowlib {
       }
       //ME20190627 BEGIN
       string message = FILE+" or "+FILE+".bands/static/relax or "+FILE+".bands./static/relax.EXT not found in the directory, aborting!";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
       //ME20190627 END
     }
     if(!gfound) {
@@ -7432,7 +7432,7 @@ namespace aflowlib {
       }
       //ME20190627 BEGIN
       string message = FILE+" or "+FILE+".static/relax1/bands or "+FILE+".static/relax1/bands.EXT not found in the directory, aborting!";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__,"aflowlib::vaspfile2stringstream()", message, _FILE_NOT_FOUND_);
       //ME20190627 END
     }
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " END" << endl;
@@ -7641,7 +7641,7 @@ namespace aflowlib {
         // was never run). Otherwise, lib2raw will run VASP.
         if (!aurostd::EFileExist(directory_LIB+"/"+DEFAULT_APL_PHPOSCAR_FILE)) {
           string message = "PHPOSCAR not found. Cannot run directory " + directory_LIB + " for post-processing.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
         }
         run_directory = true;
         aurostd::RemoveFile(directory_LIB+"/"+DEFAULT_APL_FILE_PREFIX + DEFAULT_APL_OUT_FILE);
@@ -7717,7 +7717,7 @@ namespace aflowlib {
       // a sanity check
       if (vAflowInName.size() != vFileLockName.size()){
         message << "vAflowInName.size()!=vFileLockName.size()";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
 
       //AS20200904 loop over all detected earlier submodules
@@ -7737,7 +7737,7 @@ namespace aflowlib {
         //otherwise aflow can't run in the directory
         if(XHOST.vext.size()!=XHOST.vzip.size()) {  //CO20200829 - check for LOCK.xz and decompress first
           message << "XHOST.vext.size()!=XHOST.vzip.size()";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
         }
         for(uint iext=1;iext<XHOST.vext.size();iext++) {  //CO20200829 - check for LOCK.xz and decompress first // SKIP uncompressed
           if(aurostd::FileExist(directory_LIB+"/"+_AFLOWLOCK_+XHOST.vext[iext])){
@@ -7813,7 +7813,7 @@ namespace aflowlib {
           vfeatures.push_back( d_tmp );
         }
       }
-      else{throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Unknown statistic type: "+vstats[k],_RUNTIME_ERROR_);}
+      else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown statistic type: "+vstats[k],_RUNTIME_ERROR_);}
     }
   }
 
@@ -7885,7 +7885,7 @@ namespace aflowlib {
             //for(j=0;j<vstats.size();j++){vheaders.push_back(vproperties.back()+"_4_stoich_"+vstats[j]);}
             //for(j=0;j<vstats.size();j++){vheaders.push_back(vproperties.back()+"_5_stoich_"+vstats[j]);}
           }
-          else{throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Unknown numbers type: "+vproperties.back(),_RUNTIME_ERROR_);}
+          else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown numbers type: "+vproperties.back(),_RUNTIME_ERROR_);}
         }
       }
     }
@@ -7922,7 +7922,7 @@ namespace aflowlib {
     //features
 
     uint nspecies=vspecies.size();
-    if(nspecies==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"nspecies==0",_RUNTIME_ERROR_);}
+    if(nspecies==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"nspecies==0",_RUNTIME_ERROR_);}
     xvector<double> nspecies_xv(nspecies);
 
     //L^p norms
@@ -7966,7 +7966,7 @@ namespace aflowlib {
         else if(vproperties[i]=="oxidation_states_preferred"||vproperties[i]=="energies_ionization"){
           if(vproperties[i]=="oxidation_states_preferred"){index_min=0;index_max=0;}
           else if(vproperties[i]=="energies_ionization"){index_min=0;index_max=_ENERGIES_IONIZATION_MAX_AFLOWMACHL_-1;}
-          else{throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Unknown numbers property (vector): "+vproperties[i],_RUNTIME_ERROR_);}
+          else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown numbers property (vector): "+vproperties[i],_RUNTIME_ERROR_);}
           for(index=index_min;index<=index_max;index++){
             for(j=0;j<nspecies;j++){
               const vector<double>& vec=vxel[j].getPropertyVectorDouble(vproperties[i]);
@@ -7976,7 +7976,7 @@ namespace aflowlib {
             insertStoichStats(vstats,nspecies_xv,stoich_xv,vfeatures);
           }
         }
-        else{throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Unknown numbers property: "+vproperties[i],_RUNTIME_ERROR_);}
+        else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown numbers property: "+vproperties[i],_RUNTIME_ERROR_);}
       }
     }
 
@@ -8000,7 +8000,7 @@ namespace aflowlib {
     aurostd::xcombos xc;
     for(j=0;j<nspecies&&!has_NaN;j++){
       const vector<double>& oxidation_states=vxel[j].getPropertyVectorDouble("oxidation_states");
-      if(oxidation_states.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No oxidation states found for element: "+vxel[j].symbol,_RUNTIME_ERROR_);}  //should have NNN
+      if(oxidation_states.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No oxidation states found for element: "+vxel[j].symbol,_RUNTIME_ERROR_);}  //should have NNN
       if(oxidation_states.size()==1 && aurostd::isNaN(oxidation_states[0])){has_NaN=true;}
       nspecies_v.push_back((int)oxidation_states.size());
     }
@@ -8016,7 +8016,7 @@ namespace aflowlib {
         for(j=0;j<nspecies&&!has_NaN;j++){
           const vector<double>& oxidation_states=vxel[j].getPropertyVectorDouble("oxidation_states");
           for(k=0;k<vcomposition[j];k++){
-            if(aurostd::isNaN(oxidation_states[indices[j]])){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Found NaN among populated oxidation_states",_RUNTIME_ERROR_);}
+            if(aurostd::isNaN(oxidation_states[indices[j]])){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Found NaN among populated oxidation_states",_RUNTIME_ERROR_);}
             natoms_xv[natoms_xv.lrows+(i++)]=oxidation_states[indices[j]];
           }
         }
@@ -8044,7 +8044,7 @@ namespace aflowlib {
       vfeatures.push_back( aurostd::scalar_product(pairs_xv,pairs2_xv) );
     }
 
-    if(vheaders.size()!=vfeatures.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"vheaders.size()!=vfeatures.size()",_RUNTIME_ERROR_);}
+    if(vheaders.size()!=vfeatures.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"vheaders.size()!=vfeatures.size()",_RUNTIME_ERROR_);}
 
     if(LDEBUG){
       for(i=0;i<vheaders.size();i++){cerr << __AFLOW_FUNC__ << " " << vheaders[i] << "=" << vfeatures[i] << endl;}

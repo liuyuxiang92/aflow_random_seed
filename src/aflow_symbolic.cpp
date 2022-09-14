@@ -187,7 +187,7 @@ namespace symbolic {
         << " a_vec (input) id: " << a_vec_info
         << " b_vec (input) id: " << b_vec_info
         << " SymbolicMatrix id: " << typeid(SymbolicMatrix).name();
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
     }
 
     bool VERBOSE=FALSE; // VERBOSE INSTEAD OF LDEBUG SINCE FUNCITON IS NESTED
@@ -220,7 +220,7 @@ namespace symbolic {
       stringstream message;
       message << "The input is not a SymbolicMatrix (i.e., typeids are different): lattice (input) id: "
         << lattice_info << " SymbolicMatrix id: " << typeid(SymbolicMatrix).name();
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
     }
 
     vector<vector<string> > vvstring;
@@ -448,7 +448,7 @@ namespace anrl {
       symbolic::Symbolic position("pos", 3);
       if(equations[i].size()!=3){
         message << "Equation " << i << " does not have 3 coordinates (problem with ITC library coordinates): " << aurostd::joinWDelimiter(equations[i],",");
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_GENERIC_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_GENERIC_ERROR_);
       }
       for(uint j=0;j<equations[i].size();j++){
         if(equations[i][j] == "0"){
@@ -699,7 +699,7 @@ namespace anrl {
     // ensure sizes of atoms and symbolic equations match 
     if(equations.size() != atoms.size()){
       message << "The number of equations and atoms do not match. Check tolerances. #equations=" << equations.size() << ", #atoms=" << atoms.size();
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
     }
 
     // ---------------------------------------------------------------------------

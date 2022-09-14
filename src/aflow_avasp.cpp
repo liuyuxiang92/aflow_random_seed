@@ -257,7 +257,7 @@ void AVASP_Get_LDAU_Parameters(string _species,bool &LDAU,vector<string>& vLDAUs
   // ELSE
   if(species=="Np") {
     string message = "LDAU for " + species + " is not implemented yet.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
   }
 
   // LDAU=FALSE; // dont modify
@@ -318,11 +318,11 @@ string AVASP_Get_PseudoPotential_PAW_PBE_KIN(string species) {
         species=="Np" || species=="Pu" || species=="Am" || species=="Cm" || species=="Bk" || species=="Cf" ||
         species=="Es" || species=="Fm" || species=="Md" || species=="No" || species=="Lw") {
       error="not producing Actinides";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
     }
     if(species=="D" || species=="T") {
       error="not producing heavy hydrogen";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
     }
   }
 
@@ -429,7 +429,7 @@ string AVASP_Get_PseudoPotential_PAW_PBE_KIN(string species) {
 
   // If not found then UNKNOWN
   error="Potential not found: "+species;
-  throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
+  throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
 }
 
 // ***************************************************************************
@@ -449,11 +449,11 @@ string AVASP_Get_PseudoPotential_PAW_PBE(string species) {
         species=="Np" || species=="Pu" || species=="Am" || species=="Cm" || species=="Bk" || species=="Cf" ||
         species=="Es" || species=="Fm" || species=="Md" || species=="No" || species=="Lw") {
       error="not producing Actinides";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
     }
     if(species=="D" || species=="T") {
       error="not producing heavy hydrogen";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
     }
   }
 
@@ -559,11 +559,11 @@ string AVASP_Get_PseudoPotential_PAW_PBE(string species) {
 
   if(species=="Po") {
     error="No pseudopotential available for "+species;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
   }
   // If not found then UNKNOWN
   error="Potential not found: "+species;
-  throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
+  throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, error, _VALUE_ILLEGAL_);
 }
 
 // ***************************************************************************
@@ -1594,7 +1594,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
           string FilePotcar,DataPotcar,AUIDPotcar;
           if (!XHOST.GENERATE_AFLOWIN_ONLY) { //CO20190116
             if(!KBIN::VASP_Find_FILE_POTCAR(xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i),FilePotcar,DataPotcar,AUIDPotcar)) {
-              cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message(_AFLOW_FILE_NAME_) << endl;
+              cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message(__AFLOW_FILE__) << endl;
               return FALSE; // dont die
             } else {
               if(LDEBUG) cerr << "DEBUG - " << __AFLOW_FUNC__ << "  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] = " << FilePotcar << endl;
@@ -1777,7 +1777,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
           pflow::setPOCCTOL(xvasp.str,xvasp.AVASP_pocc_tol);
           if(!pflow::checkAnionSublattice(xvasp.str)){  //CO20210201
             if(!XHOST.vflag_control.flag("FORCE_POCC")){
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Found non-anion in anion sublattice. Please check (and run with --force_pocc).",_VALUE_ILLEGAL_);
+              throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Found non-anion in anion sublattice. Please check (and run with --force_pocc).",_VALUE_ILLEGAL_);
             }
           }
           if(LDEBUG) {cerr << __AFLOW_FUNC__ << "POCC structure" << endl << xvasp.str << endl;}
@@ -1854,7 +1854,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     }
   }
 
-  if(system.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No system name information found",_INPUT_ILLEGAL_);}  //CO20200102
+  if(system.empty()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No system name information found",_INPUT_ILLEGAL_);}  //CO20200102
 
   if(LDEBUG) cerr << "DEBUG - " << __AFLOW_FUNC__ << " " << "[11]" << endl;
 
@@ -1880,14 +1880,14 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
         if(aurostd::substring2bool(existing_prototype_labels[0],"-")){ 
           vector<string> tmp_tokens; aurostd::string2tokens(existing_prototype_labels[0],tmp_tokens,"-");
           if(anrl_base_label!=tmp_tokens[0]){ //DX20200710 - check to make sure the labels are the same and not just isopointal
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"This system is equivalent to an existing ANRL prototype, but the labels are ordered differently: system="+anrl_base_label+" vs ANRL="+tmp_tokens[0],_INPUT_ILLEGAL_);
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"This system is equivalent to an existing ANRL prototype, but the labels are ordered differently: system="+anrl_base_label+" vs ANRL="+tmp_tokens[0],_INPUT_ILLEGAL_);
           }
           anrl_add_on = "-" + tmp_tokens[1]; // e.g., 001
         }
         // doesn't contain degree of freedom
         else {
           if(anrl_base_label!=existing_prototype_labels[0]){ //DX20200710 - check to make sure the labels are the same and not just isopointal
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"This system is equivalent to an existing ANRL prototype, but the labels are ordered differently: system="+anrl_base_label+" vs ANRL="+existing_prototype_labels[0],_INPUT_ILLEGAL_);
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"This system is equivalent to an existing ANRL prototype, but the labels are ordered differently: system="+anrl_base_label+" vs ANRL="+existing_prototype_labels[0],_INPUT_ILLEGAL_);
           }
           anrl_add_on = "";
         }
@@ -3245,7 +3245,7 @@ bool AVASP_MakeSingleAFLOWIN_20181226(_xvasp& xvasp_in,stringstream &_aflowin,bo
     if(1) {
       if(directory=="") {
         string message = "empty directory";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
       }
       if(pthread>=0)  pthread_mutex_lock(&mutex_AVASP);
       cout << "AFLOW V(" << string(AFLOW_VERSION) << ") creating " << directory << "/" + _AFLOWIN_;  //ME20211004 - added aflow.in file name
@@ -3611,7 +3611,7 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
           if(LDEBUG) cerr << "DEBUG - " << __AFLOW_FUNC__ << " [5a.2]" << endl;
           string FilePotcar,DataPotcar,AUIDPotcar;
           if(!KBIN::VASP_Find_FILE_POTCAR(xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i),FilePotcar,DataPotcar,AUIDPotcar)) {
-            cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message(_AFLOW_FILE_NAME_) << endl;
+            cerr << "EEEEE  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] not found! " << Message(__AFLOW_FILE__) << endl;
             return FALSE; // dont die
           } else {
             if(LDEBUG) cerr << "DEBUG - " << __AFLOW_FUNC__ << "  POTCAR [" << xvasp.AVASP_potential+"/"+xvasp.str.species_pp.at(i) << "] = " << FilePotcar << endl;
@@ -4745,7 +4745,7 @@ bool AVASP_MakeSingleAFLOWIN_20180101(_xvasp& xvasp_in,stringstream &_aflowin,bo
     if(1) {
       if(directory.empty()) {
         string message = "empty directory";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_NOT_FOUND_);
       }
       if(pthread>=0)  pthread_mutex_lock(&mutex_AVASP);
       cout << "AFLOW V(" << string(AFLOW_VERSION) << ") creating " << directory;
@@ -5130,7 +5130,7 @@ bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
   // --use_anrl_lattice_param forces the use of the original lattice parameter defined in ANRL (e.g., a=5.4)
   if(xvasp.AVASP_parameters.size()!=0 && PARAMS->vparams.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM")){
     message << "Cannot have both --params=<...> and --use_anrl_lattice_param at the same time; use one or the other.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   }
   else if(xvasp.AVASP_parameters.size()==0 && PARAMS->vparams.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM")){
     xvasp.AVASP_parameters="use_anrl_lattice_param";
@@ -5189,7 +5189,7 @@ bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
   if(PARAMS->ucell.size()==0){
     message << "No --aflow_proto input" << endl;
     message << "aflow --aflow_proto[=]label*:specieA*[:specieB*][:volumeA*[:volumeB*] | :volume]" << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_NUMBER_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_NUMBER_);
   }
 
   //make a working copy of PARAMS->ucell
@@ -5273,7 +5273,7 @@ bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
   if(vvstr.size()==0){
     message << "No species input" << endl;
     message << "aflow --aflow_proto[=]label*:specieA*[:specieB*][:volumeA*[:volumeB*] | :volume]" << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_NUMBER_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_NUMBER_);
   }
 
   //now check everything else, including vvstr.size()==nspecies
@@ -5449,13 +5449,13 @@ bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
   if(specieX.size()!=volumeX.size()){
     message << "specieX.size() != volumeX.size() ( " << specieX.size() << " != " << volumeX.size() << " )" << endl;
     message << "aflow --aflow_proto[=]label*:specieA*[:specieB*][:volumeA*[:volumeB*] | :volume]" << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_NUMBER_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_NUMBER_);
   }
   for(uint i=0;i<specieX.size();i++){
     if(specieX[i].size()!=volumeX[i].size()){
       message << "specieX[" << i << "].size() != volumeX[" << i << "].size() ( " << specieX[i].size() << " != " << volumeX[i].size() << " )" << endl;
       message << "aflow --aflow_proto[=]label*:specieA*[:specieB*][:volumeA*[:volumeB*] | :volume]" << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_NUMBER_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_NUMBER_);
     }
   }
 
@@ -5487,12 +5487,12 @@ bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
   //[CO20181226 OBSOLETE]    for(uint i=0;i<specieX.at(ispecies).size();i++) {
   //[CO20181226 OBSOLETE]      if(!aurostd::isfloat(tokens.at(tokens.size()-1))){ //CO20180729 - check for string stupidity
   //[CO20181226 OBSOLETE]        message << "Invalid volume specification (params[" << tokens.size()-1 << "]=" << tokens.at(tokens.size()-1) << "), must be float input";
-  //[CO20181226 OBSOLETE]        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+  //[CO20181226 OBSOLETE]        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   //[CO20181226 OBSOLETE]      }
   //[CO20181226 OBSOLETE]      vol=aurostd::string2utype<double>(tokens.at(tokens.size()-1));  //CO20180705
   //[CO20181226 OBSOLETE]      if(vol==0.0){ //CO20180705 - check for volume stupidity
   //[CO20181226 OBSOLETE]        message << "Invalid volume specification (params[" << 1+nspecies+1-1 << "]=" << tokens.at(tokens.size()-1) << "), must be >0";
-  //[CO20181226 OBSOLETE]        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+  //[CO20181226 OBSOLETE]        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   //[CO20181226 OBSOLETE]      }
   //[CO20181226 OBSOLETE]      volumeX.at(ispecies).push_back(vol);
   //[CO20181226 OBSOLETE]      //volumeX.at(ispecies).push_back(aurostd::string2utype<double>(tokens.at(tokens.size()-1)));
@@ -5510,12 +5510,12 @@ bool AVASP_MakePrototype_AFLOWIN_20181226(_AVASP_PROTO *PARAMS) {
   //[CO20181226 OBSOLETE]    for(uint i=0;i<tokens.size();i++) {
   //[CO20181226 OBSOLETE]      if(!aurostd::isfloat(tokens.at(i))){ //CO20180729 - check for string stupidity
   //[CO20181226 OBSOLETE]        message << "Invalid volume specification (params[" << i << "]=" << tokens.at(i) << "), must be float input";
-  //[CO20181226 OBSOLETE]        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+  //[CO20181226 OBSOLETE]        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   //[CO20181226 OBSOLETE]      }
   //[CO20181226 OBSOLETE]      vol=aurostd::string2utype<double>(tokens.at(i));
   //[CO20181226 OBSOLETE]      if(vol==0.0){ //CO20180705 - check for stupidity
   //[CO20181226 OBSOLETE]        message << "Invalid volume specification (params[" << i << "]=" << tokens.at(i) << "), must be >0";
-  //[CO20181226 OBSOLETE]        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+  //[CO20181226 OBSOLETE]        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   //[CO20181226 OBSOLETE]      }
   //[CO20181226 OBSOLETE]      volumeX.at(ispecies).push_back(vol);
   //[CO20181226 OBSOLETE]      //volumeX.at(ispecies).push_back(aurostd::string2utype<double>(tokens.at(i)));
@@ -5995,7 +5995,7 @@ bool AVASP_MakePrototype_AFLOWIN_20180101(_AVASP_PROTO *PARAMS) {
   // --use_anrl_lattice_param forces the use of the original lattice parameter defined in ANRL (e.g., a=5.4)
   if(xvasp.AVASP_parameters.size()!=0 && vpflow.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM")){
     message << "Cannot have both --params=<...> and --use_anrl_lattice_param at the same time; use one or the other.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   }
   else if(xvasp.AVASP_parameters.size()==0 && vpflow.flag("AFLOWIN_FLAG::USE_ANRL_LATTICE_PARAM")){
     xvasp.AVASP_parameters="use_anrl_lattice_param";
@@ -6115,7 +6115,7 @@ bool AVASP_MakePrototype_AFLOWIN_20180101(_AVASP_PROTO *PARAMS) {
     stringstream message;
     message << " need to specify more arguments... exiting" << endl;
     message << " aflow --aflow_proto[=]label*:specieA*[:specieB*][:volumeA*[:volumeB*] | :volume]";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_NUMBER_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_NUMBER_);
   }
 
   if(PARAMS->ucell.size()==1) {
@@ -6240,12 +6240,12 @@ bool AVASP_MakePrototype_AFLOWIN_20180101(_AVASP_PROTO *PARAMS) {
       for(uint i=0;i<specieX.at(ispecies).size();i++) {
         if(!aurostd::isfloat(tokens.at(tokens.size()-1))){ //CO20180729 - check for string stupidity
           message << "Invalid volume specification (params[" << tokens.size()-1 << "]=" << tokens.at(tokens.size()-1) << "), must be float input";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
         }
         vol=aurostd::string2utype<double>(tokens.at(tokens.size()-1));  //CO20180705
         if(vol==0.0){ //CO20180705 - check for volume stupidity
           message << "Invalid volume specification (params[" << 1+nspecies+1-1 << "]=" << tokens.at(tokens.size()-1) << "), must be >0";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
         }
         volumeX.at(ispecies).push_back(vol);
         //volumeX.at(ispecies).push_back(aurostd::string2utype<double>(tokens.at(tokens.size()-1)));
@@ -6262,12 +6262,12 @@ bool AVASP_MakePrototype_AFLOWIN_20180101(_AVASP_PROTO *PARAMS) {
       for(uint i=0;i<tokens.size();i++) {
         if(!aurostd::isfloat(tokens.at(i))){ //CO20180729 - check for string stupidity
           message << "Invalid volume specification (params[" << i << "]=" << tokens.at(i) << "), must be float input";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
         }
         vol=aurostd::string2utype<double>(tokens.at(i));
         if(vol==0.0){ //CO20180705 - check for stupidity
           message << "Invalid volume specification (params[" << i << "]=" << tokens.at(i) << "), must be >0";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
         }
         volumeX.at(ispecies).push_back(vol);
         //volumeX.at(ispecies).push_back(aurostd::string2utype<double>(tokens.at(i)));
@@ -6686,7 +6686,7 @@ bool AVASP_ADD_LDAU(_xvasp &xvasp) {
     LDAU=(xvasp.aopts.flag("FLAG::AVASP_LDAU1") || xvasp.aopts.flag("FLAG::AVASP_LDAU2"));
     if(xvasp.aopts.flag("FLAG::AVASP_LDAU1")==TRUE && xvasp.aopts.flag("FLAG::AVASP_LDAU2")==TRUE) {
       string message = "AVASP_ADD_LDAU: you can not be here: xvasp.aopts.flag(\"FLAG::AVASP_LDAU1\")==TRUE && xvasp.aopts.flag(\"FLAG::AVASP_LDAU2\")==TRUE: need to get different LDAU parameterization";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     stringstream aus;
     aus.clear();aus.str(std::string());
@@ -6792,11 +6792,11 @@ bool AVASP_MakePrototypeICSD_AFLOWIN(_AVASP_PROTO *PARAMS,bool flag_AFLOW_IN_ONL
   if(LATTICE::lattice_is_working(xvasp.str.bravais_lattice_type)==FALSE) {
     // DO NOT PRODUCE THE ONES NOT READY TO BRILLOUIN
     string message = "Brillouin zone not found for lattice type " + xvasp.str.bravais_lattice_type + ".";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
   }
   if(LDEBUG) cerr << __AFLOW_FUNC__ << " 0d-4" << endl;
   if(xvasp.str.error_flag==TRUE) {         // flag TRUE is error
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, xvasp.str.error_string, _RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, xvasp.str.error_string, _RUNTIME_ERROR_);
   }
   if(LDEBUG) cerr << __AFLOW_FUNC__ << " 0d-5" << endl;
 

@@ -479,13 +479,13 @@ void atoms_initialize(void) {
   //if(test!=valence_WSETYAWAN[j]) cerr << "   ****   ";
   //cerr << endl;
   //}
-  //throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"atoms_initialize():","Throw for debugging purposes.",_GENERIC_ERROR_);
+  //throw aurostd::xerror(__AFLOW_FILE__,XPID+"atoms_initialize():","Throw for debugging purposes.",_GENERIC_ERROR_);
 
 
   //   for(int i=1;i<90;i++) {
   //     cerr << i << " " <<  vatom_symbol[i] << " " << vatom_pettifor_scale[i] << endl;
   //   }
-  // cerr << i << " " << vatom_symbol[i] << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
+  // cerr << i << " " << vatom_symbol[i] << endl; throw aurostd::xerror(__AFLOW_FILE__,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
 
   // aconvasp stuff
   // All data collected from the NIST online tables:
@@ -967,7 +967,7 @@ double GetPearsonCoefficient(const string& symbol) {
   }
   // If not found throw xerror
   string message = symbol + " is not a valid element name or symbol.";
-  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
 }
 
 double GetPearsonCoefficient(const int& iat) {
@@ -981,7 +981,7 @@ double GetCompoundAttenuationLength(const vector<string>& species,const vector<d
   if(species.size()!=composition.size()) {
     stringstream message; //CO20190629
     message << "species.size()[" << species.size() << "]!=composition.size()[" << composition.size() << "]";  //CO20190629
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"GetCompoundAttenuationLength():",message,_INDEX_MISMATCH_);  //CO20190629
+    throw aurostd::xerror(__AFLOW_FILE__,"GetCompoundAttenuationLength():",message,_INDEX_MISMATCH_);  //CO20190629
   }
   // cout << "Density=" << density << "<br>" << endl;
   double numerator=0.0,denominator=0.0;
@@ -1093,19 +1093,19 @@ uint XATOM_SplitAlloySpecies(const string& alloy_in, vector<string> &speciesX) {
 //[CO20200624 - OBSOLETE]  string alloy=alloy_in,alloyn;
 //[CO20200624 - OBSOLETE]  string letters="QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
 //[CO20200624 - OBSOLETE]  string numbers="0123456789";
-//[CO20200624 - OBSOLETE]  cerr << alloy << endl;// throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
+//[CO20200624 - OBSOLETE]  cerr << alloy << endl;// throw aurostd::xerror(__AFLOW_FILE__,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
 //[CO20200624 - OBSOLETE]
 //[CO20200624 - OBSOLETE]  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
-//[CO20200624 - OBSOLETE]  cerr << alloy << endl;// throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
+//[CO20200624 - OBSOLETE]  cerr << alloy << endl;// throw aurostd::xerror(__AFLOW_FILE__,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
 //[CO20200624 - OBSOLETE]  alloy=KBIN::VASP_PseudoPotential_CleanName(alloy); // always some cleaning is good
-//[CO20200624 - OBSOLETE]  cerr << alloy << endl;// throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
+//[CO20200624 - OBSOLETE]  cerr << alloy << endl;// throw aurostd::xerror(__AFLOW_FILE__,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
 //[CO20200624 - OBSOLETE]  alloy=aurostd::CleanStringASCII(alloy);
-//[CO20200624 - OBSOLETE]  cerr << alloy << endl;// throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
+//[CO20200624 - OBSOLETE]  cerr << alloy << endl;// throw aurostd::xerror(__AFLOW_FILE__,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
 //[CO20200624 - OBSOLETE]  for(uint i=0;i<alloy.length();i++)
 //[CO20200624 - OBSOLETE]    for(uint j=0;j<letters.length();j++)
 //[CO20200624 - OBSOLETE]      if(alloy[i]==letters[j] && alloy[i]!=0) {cerr << alloy[i] << endl; alloy[i]='_';}
 //[CO20200624 - OBSOLETE]
-//[CO20200624 - OBSOLETE]  cerr << alloy << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
+//[CO20200624 - OBSOLETE]  cerr << alloy << endl; throw aurostd::xerror(__AFLOW_FILE__,XPID+"atoms_initialize","Throw for debugging purposes.",_GENERIC_ERROR_);
 //[CO20200624 - OBSOLETE]
 //[CO20200624 - OBSOLETE]  speciesX.clear();
 //[CO20200624 - OBSOLETE]  for(uint i=0;i<alloy.length();i++) {
@@ -1256,7 +1256,7 @@ vector<uint> getAtomIndicesByType(const xstructure& xstr, int type) {
 
   if(indices_atoms_subset.size() == 0){
     message << "No atoms found with type = " << type << ". Check structure.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
   }
 
   return indices_atoms_subset;
@@ -1281,7 +1281,7 @@ vector<uint> getAtomIndicesByName(const xstructure& xstr, const string& name) {
 
   if(indices_atoms_subset.size() == 0){
     message << "No atoms found with name = " << name << " (note, using name_clean=" << name_clean << "). Check structure.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
   }
 
   return indices_atoms_subset;
@@ -1310,7 +1310,7 @@ vector<uint> getLeastFrequentAtomTypes(const xstructure& xstr) {
   }
 
   if(lfa_types.size() == 0){
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"getLeastFrequentAtomTypes():","Least frequent atom type not found. Bad xstructure.",_INPUT_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,"getLeastFrequentAtomTypes():","Least frequent atom type not found. Bad xstructure.",_INPUT_ERROR_);
   }
 
   return lfa_types;
@@ -1342,7 +1342,7 @@ vector<string> getLeastFrequentAtomSpecies(const xstructure& xstr, bool clean) {
   }
 
   if(lfa_species.size() == 0){
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"getLeastFrequentAtomTypes():","Least frequent atom species not found. Bad xstructure.",_INPUT_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,"getLeastFrequentAtomTypes():","Least frequent atom species not found. Bad xstructure.",_INPUT_ERROR_);
   }
 
   return lfa_species;
@@ -1381,7 +1381,7 @@ vector<string> xstructure::GetElements(bool clean_name, bool fake_names) const{ 
     return pflow::getFakeElements(num_each_type.size());
   }
 
-  throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "There are no element names in the structure.",_RUNTIME_ERROR_);
+  throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "There are no element names in the structure.",_RUNTIME_ERROR_);
 }
 
 // **************************************************************************
@@ -1406,7 +1406,7 @@ vector<string> xstructure::GetElementsFromAtomNames(bool clean_name) const{ // M
         stringstream message;
         message << "The number of each type and atom names do not agree." << endl;
         message << (*this) << endl;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
       }
       iat++;
     }
@@ -2021,7 +2021,7 @@ xvector<double> AtomEnvironment::index2Point(uint index){
     if (index < coordinations_neighbor[i]) return coordinates_neighbor[i][index];
     else index -= coordinations_neighbor[i];
   }
-  throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "index out of bounds", _INDEX_BOUNDS_);
+  throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "index out of bounds", _INDEX_BOUNDS_);
 }
 
 // ***************************************************************************
@@ -2237,7 +2237,7 @@ void writeAtomEnvironments(vector<AtomEnvironment> AE, const std::map<string, st
 
   // for now just JSON is supported
   if(ftype != json_ft){
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "Just JSON is supported at the moment.", _INPUT_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "Just JSON is supported at the moment.", _INPUT_ERROR_);
   }
 
   // construct file path
@@ -3657,7 +3657,7 @@ ostream& operator<<(ostream& oss,const xstructure& a) { // operator<<
         oss << " " << aurostd::PaddedPOST(KBIN::VASP_PseudoPotential_CleanName(a.atoms.at(iat).name),5," ") << " ";
       } else {
         message << "QE needs atoms species names";  //CO20190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_MISSING_); //CO20190629
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_MISSING_); //CO20190629
       }
       for(uint j=1;j<=3;j++) {
         //  oss << " ";
@@ -4196,7 +4196,7 @@ bool sortAtomsTypes(const _atom& a1,const _atom& a2) {  //CO20180705
   //prettier (fpos standard)
   //if(a1.fpos.rows!=3 || a1.fpos.rows!=a2.fpos.rows){
   //  cerr << "XSTRUCTURE::sortAtomsNames:: bad cartesian coordinates" << endl;
-  //  throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"sortAtomsTypes():","Throw for debugging purposes.",_GENERIC_ERROR_);
+  //  throw aurostd::xerror(__AFLOW_FILE__,XPID+"sortAtomsTypes():","Throw for debugging purposes.",_GENERIC_ERROR_);
   //}
   //for(uint i=1;i<=3;i++){
   //  if(a1.fpos[i]!=a2.fpos[i]){return a1.fpos[i]<a2.fpos[i];}
@@ -4220,7 +4220,7 @@ bool sortAtomsNames(const _atom& a1,const _atom& a2) {  //CO20180705
   //prettier (fpos standard)
   //if(a1.fpos.rows!=3 || a1.fpos.rows!=a2.fpos.rows){
   //  cerr << "XSTRUCTURE::sortAtomsNames:: bad cartesian coordinates" << endl;
-  //  throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"sortAtomsNames():","Throw for debugging purposes.",_GENERIC_ERROR_);
+  //  throw aurostd::xerror(__AFLOW_FILE__,XPID+"sortAtomsNames():","Throw for debugging purposes.",_GENERIC_ERROR_);
   //}
   //for(uint i=1;i<=3;i++){
   //  if(a1.fpos[i]!=a2.fpos[i]){return a1.fpos[i]<a2.fpos[i];}
@@ -4308,7 +4308,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
   string input_no_spaces=aurostd::joinWDelimiter(vinput,"");
   input_no_spaces=aurostd::RemoveWhiteSpaces(input_no_spaces);
   if(input_no_spaces.empty()){
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No input",_INPUT_MISSING_);  //CO20190629
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No input",_INPUT_MISSING_);  //CO20190629
   }  //CO20180702
 
   if(LDEBUG) cerr << __AFLOW_FUNC__ << " DeStupidizer" << endl;
@@ -4330,10 +4330,10 @@ istream& operator>>(istream& cinput, xstructure& a) {
     DeStupidizer(vinput[i]);
   }
   if(vinput.size()==0) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"No input",_INPUT_MISSING_);  //CO20190629
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No input",_INPUT_MISSING_);  //CO20190629
   }  //CO20180420
 
-  //  for(uint i=0;i<vinput.size();i++) cerr << "[" << i << "] " <<  vinput[i] << " " << "[X]" << endl;   throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"sortAtomsTypes():","Throw for debugging purposes.",_GENERIC_ERROR_);
+  //  for(uint i=0;i<vinput.size();i++) cerr << "[" << i << "] " <<  vinput[i] << " " << "[X]" << endl;   throw aurostd::xerror(__AFLOW_FILE__,XPID+"sortAtomsTypes():","Throw for debugging purposes.",_GENERIC_ERROR_);
   string sstring,stmp;
   bool IOMODE_found=FALSE;
   vector<double> poccaus; // partial occupation local host
@@ -4392,7 +4392,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       }
     }
     if(QE==5 && QE_ERROR) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"QE input errors",_INPUT_MISSING_); //CO20190629
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"QE input errors",_INPUT_MISSING_); //CO20190629
     }
     if(QE==5 && !QE_ERROR) {
       a.iomode=IOQE_AUTO; // might need further discipline but for now it is ok.. 2013 May SC
@@ -4555,7 +4555,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
             message << "lattice_vector "; //CO20190629
             message << "at line[" << i+1 << "] is ill-defined" << endl; //CO20190629
             message << "line: " << vinput[i] << endl; //CO20190629
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
           }
           if(atom_found && tokens_line.size()<5){  //could be more, but not less (need name/type in last column)
             message << " AIMS input error, "; //CO20190629
@@ -4564,12 +4564,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
             if(tokens_line.size()==4){message << "is missing the atom name" << endl;} //CO20190629
             else {message << "is ill-defined" << endl;} //CO20190629
             message << "line: " << vinput[i] << endl;  //CO20190629
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
           }
         }
       }
       if(!atom_found_anywhere){
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"AIMS input error, no atoms found",_INPUT_ERROR_); //CO20190629
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"AIMS input error, no atoms found",_INPUT_ERROR_); //CO20190629
       }
       a.coord_flag=_COORDS_CARTESIAN_;
       if(lat_found_anywhere || frac_found_anywhere){
@@ -4585,12 +4585,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
             else if(lat_count==2){lat2_found=true;}
             else if(lat_count==3){lat3_found=true;}
             else {
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"AIMS input error, too many lattice vectors found",_INPUT_ERROR_);  //CO20190629
+              throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"AIMS input error, too many lattice vectors found",_INPUT_ERROR_);  //CO20190629
             }
           }
         }
         if(!lat1_found || !lat2_found || !lat3_found){
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"AIMS input error, incomplete lattice vector specification (needed if atom_frac found)",_INPUT_ERROR_);  //CO20190629
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"AIMS input error, incomplete lattice vector specification (needed if atom_frac found)",_INPUT_ERROR_);  //CO20190629
         }
       }
     }
@@ -4635,7 +4635,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(vinput.size()-1<iline) {
       message << "missing line[" << iline << "]" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }  //CO20180420 - check for missing lines
     //DX+ME20210525 [OBSOLETE - need to remove control code characters from input, important for web] a.title=vinput.at(iline++);
     aurostd::RemoveControlCodeCharactersFromString(vinput[iline++],a.title); //DX+ME20210525 - need to remove control code characters from input, important for web
@@ -4644,7 +4644,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(vinput.size()-1<iline) {
       message << "missing line[" << iline << "]" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }  //CO20180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::StringSubst(stmp,"\t"," ");aurostd::StringSubst(stmp,"  "," ");aurostd::StringSubst(stmp,"  "," ");
@@ -4652,9 +4652,9 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(tokens.size()==0) {
       message << "missing second line in poscar" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }
-    // oss << tokens.size() <<  " = " << tokens.at(0) << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    // oss << tokens.size() <<  " = " << tokens.at(0) << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
     a.scale=0.0;
     if(tokens.size()>0) {a.scale=aurostd::string2utype<double>(tokens.at(0));}
     if(tokens.size()>1) {/*a.neg_scale_second=TRUE;*/a.scale_second=aurostd::string2utype<double>(tokens.at(1));a.neg_scale_second=std::signbit(a.scale_second);} //CO20180409
@@ -4667,7 +4667,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(vinput.size()-1<iline) {
       message << "missing line[" << iline << "]" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }  //CO20180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::string2tokens(stmp,tokens);
@@ -4687,14 +4687,14 @@ istream& operator>>(istream& cinput, xstructure& a) {
       if(vinput.size()-1<iline) {
         message << "missing line[" << iline << "]" << endl; //CO20190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
       }  //CO20180420 - check for missing lines
       input_tmp.clear();input_tmp.str(vinput.at(iline++));
       input_tmp >> a.lattice(2,1) >> a.lattice(2,2) >> a.lattice(2,3);
       if(vinput.size()-1<iline) {
         message << "missing line[" << iline << "]" << endl; //CO20190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
       }  //CO20180420 - check for missing lines
       input_tmp.clear();input_tmp.str(vinput.at(iline++));
       input_tmp >> a.lattice(3,1) >> a.lattice(3,2) >> a.lattice(3,3);
@@ -4764,7 +4764,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       //[CO20190629 - OBSOLETE]message << "missing D/C/S line" << endl;  //CO20190629
       message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_MISSING_); //CO20190629
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_MISSING_); //CO20190629
     }
 
     // VASP 4
@@ -4789,7 +4789,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(!(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c')){
       message << "Missing \"Selective Dynamics\"/\"Direct\"/\"Cartesian\" line" << endl;  //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_MISSING_); //CO20190629
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_MISSING_); //CO20190629
     }
 
     //[CO20190629 - OBSOLETE]if(tokens[0][0]=='S' || tokens[0][0]=='s' || tokens[0][0]=='D' || tokens[0][0]=='d' || tokens[0][0]=='C' || tokens[0][0]=='c') {
@@ -4837,7 +4837,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       if(vinput.size()-1<iline) {
         message << "missing line[" << iline << "]" << endl; //CO20190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
       }  //CO20180420 - check for missing lines
       stmp=vinput.at(iline++);  // to skip toward vasp5
     }
@@ -4847,7 +4847,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(vinput.size()-1<iline) {
       message << "missing line[" << iline << "]" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }  //CO20180420 - check for missing lines
     stmp=vinput.at(iline++);
     // The following is necessary because if the last lattice parameter has
@@ -4860,7 +4860,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       if(vinput.size()-1<iline) {
         message << "missing line[" << iline << "]" << endl; //CO20190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
       }  //CO20180420 - check for missing lines
       stmp=vinput.at(iline++);
     }
@@ -4900,7 +4900,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
             if(tokens_k.size()==0) {
               message << "PARTIAL OCCUPATION error [1] tokens_k.size()==0, no *" << endl; //CO20190629
               for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+              throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
             }
             nnumber=aurostd::string2utype<int>(tokens_k.at(0));
             if(tokens_k.size()==1) dpocc=1.0;
@@ -4914,7 +4914,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
             if(tokens_k.size()>=3) {
               message << "PARTIAL OCCUPATION error [1] tokens_k.size()>=3, too many *" << endl; //CO20190629
               for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+              throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
             }
           } // loop on +
           a.num_each_type.push_back(number);
@@ -4922,7 +4922,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       }
       if(LDEBUG) {cerr << "P(" << poccaus.size()<< ") = ";for(uint j=0;j<poccaus.size();j++) cerr << poccaus.at(j) << " ";cerr << endl;}
     }
-    //  cerr << "num_atoms=" << num_atoms << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_); // num_atoms is the SUM of the atoms in the numbers
+    //  cerr << "num_atoms=" << num_atoms << endl; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_); // num_atoms is the SUM of the atoms in the numbers
     // -------------- COORDINATE TYPES
     // Type of coordinates (Fractional or Cartesian) - only 1st character matters (D/d or C/c).
     // This line might also be the Selective Dynamics line so you must check for that (S/s).
@@ -4932,7 +4932,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(vinput.size()-1<iline) {
       message << "missing line[" << iline << "]" << endl; //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }  //CO20180420 - check for missing lines
     stmp=vinput.at(iline++);
     aurostd::StringSubst(stmp,"\t"," ");
@@ -4942,7 +4942,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(stmp_tokens.size()==0) {
       message << "Found blank line on line 7. This line should give coordinate type or selective dynamics." << endl;  //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     } else {
       if(LDEBUG) cerr << __AFLOW_FUNC__ << " DEBUG [2]" << endl;
       string sstmp=stmp_tokens.at(0);
@@ -4952,7 +4952,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         if(vinput.size()-1<iline){
           message << "missing line[" << iline << "]" << endl; //CO20190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
         }  //CO20180420 - check for missing lines
         stmp=vinput.at(iline++);
         sstmp=aurostd::RemoveSpaces(stmp);
@@ -4970,12 +4970,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
           if(a.iomode==IOVASP_WYCKCAR) {
             message << "WYCKOFF mode requires FRACTIONAL coordinates (DIRECT)." << endl;  //CO20190629
             for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
           }
         } else {
           message << "Did not find coordinate type D/d or C/c." << endl;  //CO20190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
         }
       }
       a.coord_type[1]='\0';
@@ -5030,7 +5030,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         if(iline==vinput.size() && (iline-iline_ref<(uint) num_atoms)) {
           message << "Insufficient number of atom lines." << endl;  //CO20190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
         }  
         if(LDEBUG) cerr << __AFLOW_FUNC__ << " DEBUG [6]" << endl;
         stmp=aurostd::RemoveCharacter(stmp,'\t');
@@ -5041,7 +5041,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         if(stmp_tokens.size()<3) {
           message << "Insufficient number of atom entries in atom=" << iline-iline_ref << "" << endl; //CO20190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
         }  
 
         int id=0;
@@ -5111,7 +5111,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
               message << " where x,y,z are the coordinates " << endl; //CO20190629
               message << " Name is the symbol of the atom  " << endl; //CO20190629
               message << " Order parameter is -=none, *=consider, -1,0,1 (integer) values " << endl; //CO20190629
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+              throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
             }
           }
           if(stmp_tokens.size()==5 || stmp_tokens.size()==6) {
@@ -5396,7 +5396,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       if(stmp_tokens.size()<4) {
         message << "Insufficient number of atom entries in atom=" << i << "" << endl; //CO20190629
         for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
       }  
       int id=0;
       string name;
@@ -5516,7 +5516,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           }
           else{
             message << "Unable to parse the acell line; unexpected format. acell_line = " << acell_line << " tokens: " << aurostd::joinWDelimiter(tokens,",");
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
           }
         }
         if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER extracted acell = " << acell << endl; }
@@ -5567,7 +5567,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         else if(number_tokens==0){ continue; }
         else{
           message << "Unable to parse the rprim line; unexpected format.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
         }
       }
     }
@@ -5591,7 +5591,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         if(number_of_atoms == 0){ 
           message << "Unable to parse the natom line; unexpected format. vinput[i] = \"" << natom_line << "\".";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
         }
       }
     }
@@ -5613,7 +5613,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         if(number_of_atoms_to_read == 0){ 
           message << "Unable to parse the natrd line; unexpected format. natrd_line = \"" << natrd_line << "\".";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
         }
         if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER number of atoms to read; natrd = " << number_of_atoms_to_read << endl; }
       }
@@ -5622,7 +5622,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
     if(number_of_atoms != number_of_atoms_to_read){
       message << "The natoms != natrd, i.e., unit cell requires atoms (iatoms) to be expanded by symmetry. Functionality not yet supported.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
     }
 
     // ----------------------------------------------------------------------
@@ -5642,7 +5642,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         }
         if(number_of_atoms_to_read == 0){ 
           message << "Unable to parse the ntypat line; unexpected format. ntypat_line = \"" << ntypat_line << "\".";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
         }
         if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ABINIT READER number of atom types; ntypat = " << number_of_atom_types << endl; }
       }
@@ -5691,11 +5691,11 @@ istream& operator>>(istream& cinput, xstructure& a) {
     unique_types.erase(std::unique(unique_types.begin(),unique_types.end()),unique_types.end());
     if(found_ntypat && (unique_types.size() != number_of_atom_types)){
       message << "Number of atom types does not match ntypat variable. typat=" << aurostd::joinWDelimiter(unique_types,",") << " | ntypat=" << number_of_atom_types;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
     }
     if(atom_types.size() != number_of_atoms_to_read){ 
       message << "Number of atom types does not match the number of atoms to read. typat=" << aurostd::joinWDelimiter(atom_types,",") << " | natom=" << number_of_atoms;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
     }
 
     // ----------------------------------------------------------------------
@@ -5731,7 +5731,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // for backwards compatability, we will throw a warning (for now)
     if(nuclear_charge.size()==0){ 
       message << "The atom elements/types (znucl) are not specified. Using fictious atoms.";
-      pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,std::cerr,_LOGGER_WARNING_);
+      pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,std::cerr,_LOGGER_WARNING_);
     }
 
     // ----------------------------------------------------------------------
@@ -5808,7 +5808,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         else if(number_tokens==0){ continue; }
         else{
           message << "Unable to parse the atom line; unexpected format. vinput[i] = " << atom_line;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
         }
         if(atom_line_count == number_of_atoms_to_read){ break;}
       }
@@ -5824,7 +5824,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // ensure correct number of atoms
     if(atoms_temp.size() != number_of_atoms_to_read){ 
       message << "The number of atoms is not commensurate: number of atom positions found = " << atoms_temp.size() << " vs natom/natrd = " << number_of_atoms_to_read;
-      pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,std::cerr,_RUNTIME_ERROR_);
+      pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,std::cerr,_RUNTIME_ERROR_);
     }
 
     // ----------------------------------------------------------------------
@@ -5917,7 +5917,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
           if(anisotropic_scaling(vector_index)<_ZERO_TOL_){
             message << "Anisotropic scaling factor is zero or negative for " << vector_index << " component;; unable to parse the scale line; unexpected format. scaling_line = " << scaling_line;
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
           }
           if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ELK READER anisotropic scaling for vector " << vector_index << " = " << anisotropic_scaling(vector_index) << endl; }
         }
@@ -5929,7 +5929,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           isotropic_scaling = aurostd::string2utype<double>(scaling_line);
           if(isotropic_scaling<_ZERO_TOL_){
             message << "Isotropic scaling factor is zero or negative; unable to parse the scale line; unexpected format. scaling_line = " << scaling_line;
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
           }
           if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ELK READER isotropic scaling = " << isotropic_scaling << endl; }
         }
@@ -5975,7 +5975,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         else if(number_tokens==0){ continue; }
         else{
           message << "Unable to parse the avec line; unexpected format.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
         }
       }
     }
@@ -5995,7 +5995,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
 
         if(number_of_atom_types == 0){
           message << "Unable to parse the atoms line; unexpected format. atoms_line = \"" << tokens[0] << "\".";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
         }
         if(LDEBUG){ cerr << __AFLOW_FUNC__ << " ELK READER number of atom types atoms = " << number_of_atom_types << endl; }
         break;
@@ -6091,14 +6091,14 @@ istream& operator>>(istream& cinput, xstructure& a) {
     // check number of element types is consistent
     if(number_of_atom_types == 0 || number_of_atom_types != number_of_element_dot_in_files){
       message << "The number of atom types do not match the number of \"ELEMENT.in\" files: atom = " << number_of_atom_types << " vs # .in files = " << number_of_element_dot_in_files;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
     }
     // ----------------------------------------------------------------------
     // check number of total atoms is consistent
     uint sum_each_type = aurostd::sum(num_each_type);
     if(sum_each_type != a.atoms.size()){
       message << "The total number of atoms does not match the sum of each atom type: a.atoms.size() = " << a.atoms.size() << " vs sum(num_each_type) = " << sum_each_type;;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_WRONG_FORMAT_);
     }
 
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " ELK READER fixing atom information (alphabetize, make basis, set species, etc.)" << endl; }
@@ -6162,7 +6162,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
             a.spacegroupnumber = GetSpaceGroupNumber(spacegroupsymbol); 
           } //DX20191029 - added try/catch sequence
           catch(aurostd::xerror& re){ 
-            if(LDEBUG){ message << "Cannot determine space group setting from the Hermann-Mauguin symbol; non-standard setting."; pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, std::cerr, _LOGGER_WARNING_); } 
+            if(LDEBUG){ message << "Cannot determine space group setting from the Hermann-Mauguin symbol; non-standard setting."; pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, std::cerr, _LOGGER_WARNING_); }
           } //DX20191029 - added try/catch sequence
         }
       }
@@ -6187,7 +6187,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     //DX20191029 - check if space group number is found - START
     if(a.spacegroupnumber==0){
       message << "Either space group number was not given or it was given in a non-standard setting.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__,message,_VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__,message,_VALUE_ERROR_);
     }
     //DX20191029 - check if space group number is found - END
     //ME20220124 - Read symmetry operations without consistency checks first
@@ -6319,7 +6319,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
           //oss << "ERROR - xstructure::operator>>: Symmetry operations do not match between input operations and space group number/option." << endl; 
           //print(general_wyckoff_position);
           //print(spacegroup_symop_xyz);
-          //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
+          //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
           continue; //try a different setting
         }
         else {
@@ -6334,12 +6334,12 @@ istream& operator>>(istream& cinput, xstructure& a) {
       // ME20220124 - Changed to warning
       message << "Symmetry operations do not match between input operations and space group number/option.";  //CO20190629
       message << " Building structure using symmetry operations in CIF file with space group P1.";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, std::cerr, _LOGGER_WARNING_);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, std::cerr, _LOGGER_WARNING_);
       a.spacegroupnumber = 1;
       if (LDEBUG) {
         for(uint i=0;i<vinput.size();i++) std::cerr << vinput[i] << endl;  //CO20190629 // ME20220124 - moved to LDEBUG because outputting the entire CIF makes the error message unreadable
       }
-      //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+      //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }
     // get lattice
     for(uint i=0;i<vinput.size();i++) {
@@ -6481,7 +6481,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
         } else {
           message << "Unexpected number of input fields based on _atom_site_[] information (tokens=" << tokens.size() << ", atom_sites_[]=" << atom_site_fields.size() << ")." <<  endl;  //CO20190629
           for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
         }
       }
     }
@@ -6776,7 +6776,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
     if(poccaus.size()!=a.atoms.size()) {
       message << "poccaus.size()=" << poccaus.size() << " a.atoms.size()=" << a.atoms.size() << " " << endl;  //CO20190629
       for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }
     // create list (empty)
     a.comp_each_type.clear();
@@ -6854,7 +6854,7 @@ istream& operator>>(istream& cinput, xstructure& a) {
       message << "You need to specify the same number of species and atoms types" << endl;  //CO20190629
       message << "      a.num_each_type.size()=" << a.num_each_type.size() << endl; //CO20190629
       message << "      tokens.size()=" << tokens.size() << endl; //CO20190629
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
     }
     for(uint i=0;i<tokens.size();i++) {
       a.species.push_back(tokens.at(i));
@@ -7000,21 +7000,21 @@ istream& operator>>(istream& cinput, xstructure& a) {
   if(a.atoms.size()!=a.qm_atoms.size())     {
     message << "a.atoms.size()!=a.qm_atoms.size() " << endl;  //CO20190629
     for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
   }
   if(a.atoms.size()!=a.qm_forces.size())    {
     message << "a.atoms.size()!=a.qm_forces.size() " << endl; //CO20190629
     for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
   }
   if(a.atoms.size()!=a.qm_positions.size()) {
     message << "a.atoms.size()!=a.qm_positions.size() " << endl;  //CO20190629
     for(uint i=0;i<vinput.size();i++) message << vinput[i] << endl;  //CO20190629
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_); //CO20190629
   }
   if(det(a.lattice)<0.0){ //CO20200201
     message << "Found negative determinant for lattice (det()=" << det(a.lattice) << "). Flip your basis."; //CO20200201
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200201
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_); //CO20200201
   } //CO20200201
 
   // ---------------------------------------------------------------
@@ -7335,11 +7335,11 @@ xstructure GetStructure(const int& iomode,const string& Directory) {
 void xstructure::SetCoordinates(int mode)  {
   switch(mode) {
     case _UPDATE_LATTICE_VECTORS_TO_ABCANGLES_ : {
-                                                   throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"[1] mode="+aurostd::utype2string(mode),_INPUT_ERROR_);
+                                                   throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[1] mode="+aurostd::utype2string(mode),_INPUT_ERROR_);
                                                    break;
                                                  }
     case _UPDATE_LATTICE_ABCANGLES_TO_VECTORS_ : {
-                                                   throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"[2] mode="+aurostd::utype2string(mode),_INPUT_ERROR_);
+                                                   throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"[2] mode="+aurostd::utype2string(mode),_INPUT_ERROR_);
                                                    break;
                                                  }
     case _COORDS_CARTESIAN_ : {
@@ -7384,7 +7384,7 @@ void xstructure::MakeTypes(void) {
   for(uint itype=0;itype<num_each_type.size();itype++){sum_atoms+=num_each_type[itype];}
   if(sum_atoms!=atoms.size()){
     message << "num_each_type does not match atom count (sum_atoms=" << sum_atoms << " vs. atoms.size()=" << atoms.size() << ").";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
   }
 
   uint iat=0;
@@ -7793,7 +7793,7 @@ void xstructure::ShiftOriginToAtom(const int& iat) {
   //DX+CO START
   if(iat<0 || iat>=(int)atoms.size()) {
     message << "iat=" << iat << " out of boundaries (0," << atoms.size()-1 << ").";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   }
   xvector<double> frigin(3);
   origin=atoms[iat].cpos;
@@ -7912,7 +7912,7 @@ string GetSpaceGroupName(int spacegroupnumber, string directory) {
     stringstream message; //DX20190708 - for xerror
     message << "routine: space group specified invalid (1-230): "; //DX20190708 - for xerror
     message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX20190708 - for xerror
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
   }
   // OK
   //DX+ME20190708 - changed subsequent "if" to "else if" -> efficiency
@@ -8394,7 +8394,7 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
       spacegroupsymbol[0] != 'R' && spacegroupsymbol[0] != 'C' && spacegroupsymbol[0] != 'A') {
     message << "routine: space group specified invalid (lattice centering not identified: P,I,F,R,C,A): ";
     message << "input symbol=" << spacegroupsymbol << " [dir=" << directory << "]." << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
   }
   // OK
   //DX+ME20190708 - changed subsequent "if" to "else if" -> efficiency
@@ -8862,7 +8862,7 @@ int GetSpaceGroupNumber(const string& spacegroupsymbol, string directory) {
   else{
     message << "routine: space group specified invalid; perhaps non-ITC setting: ";
     message << "space group symbol=" << spacegroupsymbol << " [dir=" << directory << "].";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
   }
   return spacegroupnumber;
 }
@@ -8875,7 +8875,7 @@ string GetSpaceGroupSchoenflies(int spacegroupnumber, string directory) {
     stringstream message; //DX20190708 - for xerror
     message << "routine: space group specified invalid (1-230): "; //DX20190708 - for xerror
     message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX20190708 - for xerror
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
   }
   // OK
   //ME20210210 - converted to switch statement (faster)
@@ -9358,7 +9358,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   if(spacegroupnumber < 1 || spacegroupnumber > 230) { //DX20190708 - for xerror
     message << "routine: space group specified invalid (1-230): "; //DX20190708 - for xerror
     message << spacegroupnumber << " [dir=" << directory << "]." << endl; //DX20190708 - for xerror
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
   }
   // OK
   if(setting==SG_SETTING_ANRL){ setting = anrl::getANRLSettingChoice(spacegroupnumber); } //DX20210420
@@ -9375,7 +9375,7 @@ string GetSpaceGroupHall(int spacegroupnumber, int setting, string directory) {
   }
   if(setting < 1 || setting > 2) {
     message << "routine: setting choice is invalid (1 or 2 only): " << setting << " [dir=" << directory << "]."; //DX20190708 - for xerror
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_); //DX20190708 - for xerror
   }
   // OK
   //DX+ME20190708 - changed subsequent "if" to "else if" -> efficiency
@@ -9948,7 +9948,7 @@ xmatrix<double> MetricTensor(const xstructure& a) {return MetricTensor(a.lattice
 
 xmatrix<double> MetricTensor(const xmatrix<double>& lattice,double scale) {
   if(lattice.rows!=lattice.cols){
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Dimension mismatch, should be square lattice matrix.",_VALUE_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Dimension mismatch, should be square lattice matrix.",_VALUE_ILLEGAL_);
   }
   xmatrix<double> metric_tensor(lattice.rows,lattice.cols);
   for(int i=lattice.lrows;i<=lattice.urows;i++){ //CO20190520
@@ -10202,7 +10202,7 @@ int GetNBANDS(int electrons,int nions,int spineach,bool ispin,int NPAR) {
     out*=std::pow((double) nions,(double) 0.06);  //ME20191028 - prior scaling factor not sufficient for supercells
   }
   //  cerr << "GetNBANDS=" << out << endl;
-  // throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
+  // throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
   int nbands=(int)ceil(out);
   //CO20210315 START - adjust for NPAR
   if(NPAR>0){
@@ -10291,7 +10291,7 @@ double xstructure::GetZVAL(const vector<double>& vZVAL) {
   if(num_each_type.size()!=vZVAL.size()) {
     message << "num_each_type.size()=" << num_each_type.size() << endl;
     message << "vZVAL.size()=" << vZVAL.size() << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   }
   double CellZVAL=0.0;
   for(uint i=0;i<vZVAL.size();i++)  
@@ -10378,7 +10378,7 @@ double xstructure::GetPOMASS(const vector<double>& vPOMASS) {
   if(num_each_type.size()!=vPOMASS.size()) {
     message << "num_each_type.size()=" << num_each_type.size() << endl;
     message << "vPOMASS.size()=" << vPOMASS.size() << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   }
   double CellPOMASS=0.0;
   for(uint i=0;i<vPOMASS.size();i++)  
@@ -10538,7 +10538,7 @@ xmatrix<double> GetClat(const xvector<double>& abc_angles) {   // AFLOW_FUNCTION
   double bc= abc_angles[4]*deg2rad; // angle from b to c (remove a)
   double ca= abc_angles[5]*deg2rad; // angle from c to a (remove b)
   double ab= abc_angles[6]*deg2rad; // angle from a to b (remove c)
-  //  if(abs(bc)>6.3||abs(ca)>6.3||abs(ab)>6.3) { cerr << _AUROSTD_XLIBS_ERROR_ << "GetClat: angles must be in RADIANT " << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);}
+  //  if(abs(bc)>6.3||abs(ca)>6.3||abs(ab)>6.3) { cerr << _AUROSTD_XLIBS_ERROR_ << "GetClat: angles must be in RADIANT " << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);}
   clattice(1,1)=a;
   clattice(2,1)=b*cos(ab);
   clattice(2,2)=b*sin(ab);
@@ -10548,7 +10548,7 @@ xmatrix<double> GetClat(const xvector<double>& abc_angles) {   // AFLOW_FUNCTION
     message <<"gamma = " << ab << endl;
     message <<"STOPPING "<< endl;
     message << _AUROSTD_XLIBS_ERROR_ << "ERROR: STOPPING " << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   }
   clattice(3,2)=c*(cos(bc)-cos(ab)*cos(ca))/sin(ab);
   clattice(3,3)=sqrt(abs(c*c-clattice(3,2)*clattice(3,2)-clattice(3,1)*clattice(3,1)));
@@ -10561,7 +10561,7 @@ xmatrix<double> GetClat(const double &a,const double &b,const double &c,const do
   double bc= alpha*deg2rad; // angle from b to c (remove a)
   double ca= beta*deg2rad; // angle from c to a (remove b)
   double ab= gamma*deg2rad; // angle from a to b (remove c)
-  //  if(abs(bc)>6.3||abs(ca)>6.3||abs(ab)>6.3) { cerr << _AUROSTD_XLIBS_ERROR_ << "GetClat: angles must be in RADIANT " << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);}
+  //  if(abs(bc)>6.3||abs(ca)>6.3||abs(ab)>6.3) { cerr << _AUROSTD_XLIBS_ERROR_ << "GetClat: angles must be in RADIANT " << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);}
   clattice(1,1)=a;
   clattice(2,1)=b*cos(ab);
   clattice(2,2)=b*sin(ab);
@@ -10571,7 +10571,7 @@ xmatrix<double> GetClat(const double &a,const double &b,const double &c,const do
     message <<"gamma = " << ab << endl;
     message <<"STOPPING "<< endl;
     message << _AUROSTD_XLIBS_ERROR_ << "ERROR: STOPPING " << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   }
   clattice(3,2)=c*(cos(bc)-cos(ab)*cos(ca))/sin(ab);
   clattice(3,3)=sqrt(abs(c*c-clattice(3,2)*clattice(3,2)-clattice(3,1)*clattice(3,1)));
@@ -10600,7 +10600,7 @@ xstructure GetIntpolStr(xstructure strA, xstructure strB, const double& f,const 
   }
   // Get new cart. coords.
   if(strA.atoms.size()!=strB.atoms.size()) {
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,_AUROSTD_XLIBS_ERROR_+" number of atoms must be the same in both structures!!",_INPUT_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,_AUROSTD_XLIBS_ERROR_+" number of atoms must be the same in both structures!!",_INPUT_ILLEGAL_);
   }
   int size=strA.atoms.size();
   vector<xvector<double> > cposi(size,3);
@@ -10737,7 +10737,7 @@ xvector<int> LatticeDimensionSphere(const xmatrix<double>& _lattice, double radi
     dim(i)=(int)ceil(abs(frac_normals(i,i)));
   }
   if(max(dim)==0) { 
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,_AUROSTD_XLIBS_ERROR_+" dim=0!!",_INPUT_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,_AUROSTD_XLIBS_ERROR_+" dim=0!!",_INPUT_ILLEGAL_);
   }
   return dim;
 }
@@ -11699,7 +11699,7 @@ bool xstructure::SpeciesGetAlphabetic(void) {
     message << "species_pp.size()="<<species_pp.size()<< ": "; for(uint i=0;i<species_pp.size();i++) message << species_pp.at(i) << " "; message << endl;
     message << "species_volume.size()="<<species_volume.size()<< ": "; for(uint i=0;i<species_volume.size();i++) message << species_volume.at(i) << " "; message << endl;
     message << "species_mass.size()="<<species_mass.size()<< ": "; for(uint i=0;i<species_mass.size();i++) message << species_mass.at(i) << " "; message << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_RANGE_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_RANGE_);
   }
   // some useful checks
   if(species.size()==0) return TRUE; // empty structures are always alphabetic
@@ -11723,7 +11723,7 @@ bool xstructure::SpeciesPutAlphabetic(void) {
   stringstream message;
   if(num_each_type.size()!=species.size()) {
     message << "num_each_type.size()!=species.size()   ("<<num_each_type.size()<<","<<species.size()<<")";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_RANGE_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_RANGE_);
   }
   // some useful checks
   if(species.size()==0) return TRUE; // empty structures are always alphabetic
@@ -11766,11 +11766,11 @@ uint xstructure::SetSpecies(const deque<string>& vspecies) {
   stringstream message; //CO20190317
   if(vspecies.size()!=species.size() ) {
     message << "vspecies.size()!=species.size()"; //CO20190317
-    aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_RANGE_); //CO20190317
+    aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_RANGE_); //CO20190317
   }
   if(vspecies.size()!=num_each_type.size() ) {
     message << "vspecies.size()!=num_each_type.size()"; //CO20190317
-    aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_RANGE_); //CO20190317
+    aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_RANGE_); //CO20190317
   }
   int iatom=0;
   for(uint itype=0;itype<num_each_type.size();itype++) {
@@ -12747,7 +12747,7 @@ deque<_atom> foldAtomsInCell(const deque<_atom>& atoms,const xmatrix<double>& la
       cerr << __AFLOW_FUNC__ << " min_dist_orig=" << endl;cerr << min_dist_orig << endl;
       cerr << __AFLOW_FUNC__ << " min_dist_new=" << endl;cerr << min_dist_new << endl;
     }
-    if(!aurostd::isequal(min_dist_orig,min_dist_new,0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
+    if(!aurostd::isequal(min_dist_orig,min_dist_new,0.1)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
 
   // sort atoms //DX+CO20210119
@@ -12827,12 +12827,12 @@ void BringInCellInPlace(double& component, double tolerance, double upper_bound,
   if (component == INFINITY || component != component || component == -INFINITY) {
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component << ").";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_); //DX20190905 - replaced cerr with throw
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_); //DX20190905 - replaced cerr with throw
   }
   if (std::signbit(tolerance)) { //DX20191115 
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Sign of tolerance is negative (tolerance=" << tolerance << ").";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_);
   }
   while (component - upper_bound >= -tolerance){ component -= 1.0; } //note: non-symmetric, favors values closer to lower bound
   while (component - lower_bound < -tolerance){ component += 1.0; }
@@ -12874,12 +12874,12 @@ double BringInCell(double component_in, double tolerance, double upper_bound, do
   if (component_out == INFINITY || component_out != component_out || component_out == -INFINITY) {
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Value of component is invalid: (+-) INF or NAN value (component=" << component_out << ").";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_); //DX20190905 - replaced cerr with throw
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_); //DX20190905 - replaced cerr with throw
   }
   if (std::signbit(tolerance)) { //DX20191115 
     stringstream message; // Moving the stringstream outside the if-statement would add a lot to the run time (~1 sec). 
     message << "Sign of tolerance is negative (tolerance=" << tolerance << ").";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_);
   }
   while (component_out - upper_bound >= -tolerance) { component_out -= 1.0; } //note: non-symmetric, favors values closer to lower bound
   while (component_out - lower_bound < -tolerance) { component_out += 1.0; }
@@ -13355,7 +13355,7 @@ bool isTranslationVector(const xstructure& xstr, const xvector<double>& vec, dou
   if(tolerance<_ZERO_TOL_) {
     stringstream message;
     message << "Zero tolerance: " << tolerance;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
   }
 
   xvector<double> cvec, fvec;
@@ -13392,7 +13392,7 @@ bool IsTranslationFVectorFAST(const xstructure& a, const xvector<double>& ftvec)
   stringstream message;
   if(a.equiv_fpos_epsilon<1.0e-12) {
     message << "Zero tolerance: " << a.equiv_fpos_epsilon;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
   }
   double tolerance=a.equiv_fpos_epsilon;
   if(aurostd::modulus(ftvec)<=tolerance) return TRUE;
@@ -13429,7 +13429,7 @@ bool IsTranslationFVectorORIGINAL(const xstructure& a, const xvector<double>& ft
   stringstream message;
   if(a.equiv_fpos_epsilon<1.0e-12) {
     message << "Zero tolerance: " << a.equiv_fpos_epsilon;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
   }
   double tolerance=a.equiv_fpos_epsilon;
   if(aurostd::modulus(ftvec)<=tolerance) return TRUE;
@@ -13462,7 +13462,7 @@ bool IsTranslationFVectorFAST_2011(const xstructure& a, const xvector<double>& f
   stringstream message;
   if(a.equiv_fpos_epsilon<1.0e-12) {
     message << "Zero tolerance: " << a.equiv_fpos_epsilon;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
   }
   double tolerance=a.equiv_fpos_epsilon;
   if(aurostd::modulus(ftvec)<=tolerance) return TRUE;
@@ -13496,7 +13496,7 @@ bool IsTranslationFVectorORIGINAL_2011(const xstructure& a, const xvector<double
   stringstream message;
   if(a.equiv_fpos_epsilon<1.0e-12) {
     message << "Zero tolerance: " << a.equiv_fpos_epsilon;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
   }
   double tolerance=a.equiv_fpos_epsilon;
   if(aurostd::modulus(ftvec)<=tolerance) return TRUE;
@@ -13531,7 +13531,7 @@ bool IsTranslationCVector(const xstructure& a, const xvector<double>& ctvec) {
   stringstream message;
   if(a.equiv_fpos_epsilon<1.0e-12) {
     message << "Zero tolerance: " << a.equiv_fpos_epsilon;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
   }
   /* Input translation vector is expectd to be in cartesian coordinates. */
   return IsTranslationFVector(a,C2F(a.lattice,ctvec));
@@ -13875,7 +13875,7 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
   if(!aurostd::isinteger(reduction_factor,0.1)){
     stringstream message;
     message << "The original volume is not an integer multiple of the new volume: " << reduction_factor;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
   }
   uint reduction_factor_integer = (uint)round(reduction_factor);
   if(abs(natoms_orig-(double)reduction_factor_integer*prim.atoms.size())>0.1) {
@@ -13892,7 +13892,7 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
     message << "        reduction_factor   = " << reduction_factor << endl; //DX20210623
     message << "        supercell atoms    = " << reduction_factor*prim.atoms.size() << endl; //DX20210623
     message << prim << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
   }
   // everything ok
   if(LDEBUG){ cerr << __AFLOW_FUNC__ << " END [ok]=" << fraction << endl; }
@@ -14111,7 +14111,7 @@ void xstructure::GetPrimitive_20210322(double eps) { //DX20210406
 //ME20220208 [OBSOLETE - not used]     message << "        fraction           = " << fraction << endl;
 //ME20220208 [OBSOLETE - not used]     message << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
 //ME20220208 [OBSOLETE - not used]     message << b << endl;
-//ME20220208 [OBSOLETE - not used]     throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::GetPrimitive(void)",message,_RUNTIME_ERROR_);
+//ME20220208 [OBSOLETE - not used]     throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::GetPrimitive(void)",message,_RUNTIME_ERROR_);
 //ME20220208 [OBSOLETE - not used]   }
 //ME20220208 [OBSOLETE - not used]   // everything ok
 //ME20220208 [OBSOLETE - not used]   if(LDEBUG) cerr << __AFLOW_FUNC__ << " END [ok]=" << fraction_atoms << endl;  //CO20200201
@@ -14227,7 +14227,7 @@ xstructure GetPrimitiveSINGLE(const xstructure& _a,double tolerance) {  // APRIL
     message << "        fraction           = " << fraction << endl;
     message << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
     message << b << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::GetPrimitiveSINGLE()",message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::GetPrimitiveSINGLE()",message,_RUNTIME_ERROR_);
   }
   // everything ok
   b.ClearSymmetry();  //CO20181226 - new structure, symmetry not calculated
@@ -14240,7 +14240,7 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
   stringstream message;
   if(a.equiv_fpos_epsilon<1.0e-12) {
     message << "Zero tolerance: " << a.equiv_fpos_epsilon;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
   }
   double tolerance=a.equiv_fpos_epsilon;
 
@@ -14371,7 +14371,7 @@ xstructure GetPrimitive1(const xstructure& a) {  // MARCH 2009
     message << "        fraction           = " << fraction << endl;
     message << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
     message << b << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
   }
   // everything ok
   b.primitive_calculated = TRUE; //DX20201007
@@ -14385,7 +14385,7 @@ xstructure GetPrimitive2(const xstructure& a) {
   stringstream message;
   if(a.equiv_fpos_epsilon<1.0e-12) {
     message << "Zero tolerance: " << a.equiv_fpos_epsilon;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
   }
   double tolerance=a.equiv_fpos_epsilon;
 
@@ -14407,7 +14407,7 @@ xstructure GetPrimitive2(const xstructure& a) {
   //  cerr << sstr.scale << endl;
   sstr=BringInCell(sstr);
   // cerr << sstr.scale << endl;
-  // throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
+  // throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
   string title=sstr.title;
   int i;
   for(uint iat=0;iat<sstr.num_each_type.size();iat++) {
@@ -14546,7 +14546,7 @@ xstructure GetPrimitive2(const xstructure& a) {
     cerr << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
     cerr << GetVol(b.lattice) << endl;
     cerr << GetVol(a.lattice) << endl;
-    //   throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::GetPrimitive():","Throw for debugging purposes.",_GENERIC_ERROR_);
+    //   throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::GetPrimitive():","Throw for debugging purposes.",_GENERIC_ERROR_);
   }
   // rescale back to original scale.
   b=ReScale(b,a.scale);
@@ -14564,7 +14564,7 @@ xstructure GetPrimitive3(const xstructure& a) {
   stringstream message;
   if(a.equiv_fpos_epsilon<1.0e-12) {
     message << "Zero tolerance: " << a.equiv_fpos_epsilon;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ILLEGAL_);
   }
   double tolerance=a.equiv_fpos_epsilon;
 
@@ -14700,7 +14700,7 @@ xstructure GetPrimitive3(const xstructure& a) {
     message << "        fraction           = " << fraction << endl;
     message << "        supercell atoms    = " << fraction*b.atoms.size() << endl;
     message << b << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
   }
   // everything ok
   b.primitive_calculated = TRUE; //DX20201007
@@ -14892,7 +14892,7 @@ double NearestNeighborToAtom(const xstructure& xstr, uint k) {
 xstructure ReScale(const xstructure& a, const double &in_scale) {
   // This resets scale and changes the cell parameters and coordinates
   // appropriately.  Keeps volume fixed.
-  if(in_scale==0.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"ReScale()","in_scale must be non zero",_INPUT_ILLEGAL_);}
+  if(in_scale==0.0) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"ReScale()","in_scale must be non zero",_INPUT_ILLEGAL_);}
   xstructure b(a);
   if(aurostd::identical(b.scale,in_scale,_ZERO_TOL_)){return b;}  //try hard not to introduce precision errors, currently we print scale with precision 6
   b.lattice=b.lattice*b.scale/in_scale;
@@ -14922,7 +14922,7 @@ xstructure ReScale(const xstructure& a, const double &in_scale) {
 }
 
 void xstructure::ReScale(const double &in_scale) {
-  if(in_scale==0.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"ReScale()","in_scale must be non zero",_INPUT_ILLEGAL_);}
+  if(in_scale==0.0) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"ReScale()","in_scale must be non zero",_INPUT_ILLEGAL_);}
   if(aurostd::identical(scale,in_scale,_ZERO_TOL_)){return;}  //try hard not to introduce precision errors, currently we print scale with precision 6
   lattice=lattice*scale/in_scale;
   origin=origin*scale/in_scale;
@@ -14952,14 +14952,14 @@ void xstructure::ReScale(const double &in_scale) {
 // Function SetScale
 // ***************************************************************************
 void xstructure::SetScale(const double &in_scale) {
-  if(in_scale==0.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SetScale()","in_scale must be non zero",_INPUT_ILLEGAL_);}
+  if(in_scale==0.0) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"SetScale()","in_scale must be non zero",_INPUT_ILLEGAL_);}
   scale=in_scale;
   FixLattices();  // touched scale, then fix the lattices
 }
 
 xstructure SetScale(const xstructure& a,const double &in_scale) {
   // This resets scale.  Keeps volume fixed.
-  if(in_scale==0.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SetScale()","in_scale must be non zero",_INPUT_ILLEGAL_);}
+  if(in_scale==0.0) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"SetScale()","in_scale must be non zero",_INPUT_ILLEGAL_);}
   xstructure b;b=a;
   b.scale=in_scale;
   b.FixLattices();  // touched scale, then fix the lattices
@@ -14980,11 +14980,11 @@ void xstructure::UpdateCartesianCoordinates()
 // Function SetVolume
 // ***************************************************************************
 void xstructure::SetVolume(const double &in_volume) {
-  if(in_volume==0.0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()","in_scale must be non zero",_INPUT_ILLEGAL_);} //CO20200201
+  if(in_volume==0.0){throw aurostd::xerror(__AFLOW_FILE__,"SetVolume()","in_scale must be non zero",_INPUT_ILLEGAL_);} //CO20200201
   if(det(lattice)<0.0){ //CO20200201
     stringstream message; //CO20200201
     message << "Found negative determinant for lattice (det()=" << det(lattice) << "). Flip your basis."; //CO20200201
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()",message,_INPUT_ILLEGAL_); //CO20200201
+    throw aurostd::xerror(__AFLOW_FILE__,"SetVolume()",message,_INPUT_ILLEGAL_); //CO20200201
   } //CO20200201
   scale=std::pow((double) in_volume/det(lattice),(double) 1.0/3.0);
   FixLattices();  // touched scale, then fix the lattices
@@ -14994,12 +14994,12 @@ xstructure SetVolume(const xstructure& a,const double &in_volume) {
   xstructure b(a);
   b.SetVolume(in_volume);
   return b;
-  //[CO20200201 OBSOLETE]if(in_volume==0.0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()","in_scale must be non zero",_INPUT_ILLEGAL_);} //CO20200201
+  //[CO20200201 OBSOLETE]if(in_volume==0.0){throw aurostd::xerror(__AFLOW_FILE__,"SetVolume()","in_scale must be non zero",_INPUT_ILLEGAL_);} //CO20200201
   //[CO20200201 OBSOLETE]xstructure b;b=a;
   //[CO20200201 OBSOLETE]if(det(b.lattice)<0.0){ //CO20200201
   //[CO20200201 OBSOLETE]  stringstream message; //CO20200201
   //[CO20200201 OBSOLETE]  message << "Found negative determinant for lattice (det()=" << det(b.lattice) << "). Flip your basis."; //CO20200201
-  //[CO20200201 OBSOLETE]  throw aurostd::xerror(_AFLOW_FILE_NAME_,"SetVolume()",message,_INPUT_ILLEGAL_); //CO20200201
+  //[CO20200201 OBSOLETE]  throw aurostd::xerror(__AFLOW_FILE__,"SetVolume()",message,_INPUT_ILLEGAL_); //CO20200201
   //[CO20200201 OBSOLETE]} //CO20200201
   //[CO20200201 OBSOLETE]b.scale=std::pow((double) in_volume/det(b.lattice),(double) 1.0/3.0);
   //[CO20200201 OBSOLETE]b.FixLattices(); // touched scale, need to fix the lattices
@@ -15026,7 +15026,7 @@ void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO20191010
         if(voli==NNN || aurostd::isequal(voli,0.0,_ZERO_TOL_)){use_AFLOW_defaults=true;}
         if(aurostd::isequal(atoms[i].partial_occupation_value,0.0,_ZERO_TOL_)){
           message << "partial_occupation_value==0.0 for atom=" << i;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
         }
         volume+=atoms[i].partial_occupation_value*voli;
       }
@@ -15043,11 +15043,11 @@ void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO20191010
           voli=GetAtomVolume(atoms[i].name);
           if(voli==NNN || aurostd::isequal(voli,0.0,_ZERO_TOL_)){
             message << "No volume found for " << atoms[i].name << " (auto volumes)";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
           }
           if(aurostd::isequal(atoms[i].partial_occupation_value,0.0,_ZERO_TOL_)){
             message << "partial_occupation_value==0.0 for atom=" << i;
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
           }
           volume+=atoms[i].partial_occupation_value*voli;
         }
@@ -15056,7 +15056,7 @@ void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO20191010
   }
   if(abs(volume)<_XPROTO_ZERO_VOL_){
     message << "Final volume==0, check species default volumes";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   }
   SetVolume(volume);
   if(LDEBUG) {cerr << __AFLOW_FUNC__ << " volume_new=" << GetVolume() << endl;}
@@ -15066,7 +15066,7 @@ void xstructure::SetAutoVolume(bool use_AFLOW_defaults_in) {  //CO20191010
 // Function InflateLattice
 // ***************************************************************************
 void xstructure::InflateLattice(const double &coefficient) {
-  if(coefficient==0.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::InflateLattice()","coefficient must be non zero.",_INPUT_ILLEGAL_);}
+  if(coefficient==0.0) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::InflateLattice()","coefficient must be non zero.",_INPUT_ILLEGAL_);}
   //  scale=coefficient*scale;
   lattice=coefficient*lattice;
   FixLattices();  // touched scale/lattice, then fix the lattices
@@ -15074,7 +15074,7 @@ void xstructure::InflateLattice(const double &coefficient) {
 
 xstructure InflateLattice(const xstructure& a,const double &coefficient) {
   // This resets scale.  Keeps volume fixed.
-  if(coefficient==0.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::InflateLattice()","coefficient must be non zero.",_INPUT_ILLEGAL_);}
+  if(coefficient==0.0) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::InflateLattice()","coefficient must be non zero.",_INPUT_ILLEGAL_);}
   xstructure b;b=a;
   //  b.scale=coefficient*b.scale;
   b.lattice=coefficient*b.lattice;
@@ -15086,7 +15086,7 @@ xstructure InflateLattice(const xstructure& a,const double &coefficient) {
 // Function InflateVolume
 // ***************************************************************************
 void xstructure::InflateVolume(const double &coefficient) {
-  if(coefficient==0.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::InflateVolume()","coefficient must be non zero",_INPUT_ILLEGAL_);}
+  if(coefficient==0.0) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::InflateVolume()","coefficient must be non zero",_INPUT_ILLEGAL_);}
   // scale=std::pow((double) coefficient,(double) 1/3)*scale;
   lattice=std::pow((double) coefficient,(double) 1/3)*lattice;
   FixLattices();  // touched scale/lattice, then fix the lattices
@@ -15094,7 +15094,7 @@ void xstructure::InflateVolume(const double &coefficient) {
 }
 
 xstructure InflateVolume(const xstructure& a,const double &coefficient) {
-  if(coefficient==0.0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::InflateVolume()","coefficient must be non zero",_INPUT_ILLEGAL_);}
+  if(coefficient==0.0) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::InflateVolume()","coefficient must be non zero",_INPUT_ILLEGAL_);}
   xstructure b;b=a;
   //  b.scale=std::pow((double) coefficient,(double) 1/3)*b.scale;
   b.lattice=std::pow((double) coefficient,(double) 1/3)*b.lattice;
@@ -15252,7 +15252,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
   bool LDEBUG=(FALSE || XHOST.DEBUG);
   stringstream message;
   double vol_supercell=det(supercell);
-  if(abs(vol_supercell)<0.001){message << "Singular supercell matrix";throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_);}
+  if(abs(vol_supercell)<0.001){message << "Singular supercell matrix";throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_);}
   xstructure a(aa); a.ReScale(1.0); //the nuclear option, the only way not to mess around with scale EVERYWHERE
   //DO NOT MODIFY STRUCTURE IN HERE, WE WANT TO PROPAGATE SYMMETRY FROM PRIMITIVE STRUCTURE!
   //a.BringInCell();
@@ -15434,7 +15434,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
           // ME20210506 - Strict mapping is done outside to account for non-diagonal supercells
           //if(force_strict_pc2scMap){
           //  message << "pc2scMap not found for atom[i=" << a.iatoms[ia][iia] << "]";
-          //  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INDEX_MISMATCH_);
+          //  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INDEX_MISMATCH_);
           //}
           ignore_pcmap=true;
           pc2scMap.clear();
@@ -15527,7 +15527,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
       if(!ignore_pcmap && !pcmap && !force_strict_pc2scMap){
         //if(force_strict_pc2scMap){
         //  message << "pc2scMap not found for atom[i=" << ia << "]";
-        //  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+        //  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
         //}
         ignore_pcmap=true;
         pc2scMap.clear();
@@ -15559,7 +15559,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
     }
     if (s == nshifts) {
       message << "pc2scMap not found";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _INDEX_MISMATCH_);
     }
   }
 
@@ -15605,7 +15605,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
     message << "a.lattice          = " << endl;
     message << a.lattice << endl;
 
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
   }
 
   bool pretend_uniform=false;//true;  //CO TEST, REMOVE ME
@@ -15746,7 +15746,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
                 //if(!SYM::getFullSymBasis(b.atoms,b.lattice,b.c2f,b.f2c,fSymOp,TRUE,skew,b.sym_eps,fSymOp.basis_atoms_map,fSymOp.basis_types_map)) {
                 //cerr << "Unable to find atom/types basis for fgroup" << endl;
                 //cerr << fSymOp << endl;
-                //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
+                //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
                 //KRUN = FALSE;
                 //}
                 fSymOp.basis_map_calculated=KRUN;
@@ -15859,7 +15859,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
               //if(!SYM::getFullSymBasis(b_atoms,b.lattice,b.c2f,b.f2c,aSymOp,TRUE,skew,b.sym_eps,aSymOp.basis_atoms_map,aSymOp.basis_types_map)) {
               //cerr << "Unable to find atom/types basis for agroup" << endl;
               //cerr << aSymOp << endl;
-              //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
+              //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
               //KRUN = FALSE;
               //}
               aSymOp.basis_map_calculated=KRUN;
@@ -15878,7 +15878,7 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
             }
           }
           //KRUN = FALSE;
-          //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Unable to propagate site symmetry to equivalent atoms.",_RUNTIME_ERROR_);
+          //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unable to propagate site symmetry to equivalent atoms.",_RUNTIME_ERROR_);
         } else {
           //can be faster than procedure above because there are MANY fgroups
           KRUN = KRUN && SYM::CalculateSitePointGroup(FileMESSAGE,b,1,aflags,_write_,osswrite,oss);  //we already know get_full_basis==FALSE, so don't waste time calculating for eatoms
@@ -15898,8 +15898,8 @@ xstructure GetSuperCell(const xstructure& aa, const xmatrix<double> &supercell,v
       //////////////////////////////////////////////////////////////////////////
     }
     if(!KRUN){
-      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry propagation FAILED" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry retrying with symmetry scan" << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry propagation FAILED" << Message(__AFLOW_FILE__,aflags) << endl;
+      oss << (aflags.QUIET?"":"00000  MESSAGE ") << "SUPERCELL Symmetry retrying with symmetry scan" << Message(__AFLOW_FILE__,aflags) << endl;
       b.ClearSymmetry(); //CO20181226
       pflow::PerformFullSymmetry(b,FileMESSAGE,aflags,kflags,osswrite,oss);
       //FOOLPROOF!!!!!!!!!
@@ -15933,7 +15933,7 @@ xstructure GetSuperCell(const xstructure& a, const xvector<double>& supercell,ve
   }
   stringstream message;
   message << "Matrix must have 9 or 3 elements";
-  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_);
+  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_);
 }
 
 xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vector<int>& sc2pcMap,vector<int>& pc2scMap,
@@ -15953,7 +15953,7 @@ xstructure GetSuperCell(const xstructure& a, const xvector<int>& supercell,vecto
   }
   stringstream message;
   message << "Matrix must have 9 or 3 elements";
-  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_);
+  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_);
 }
 
 xstructure GetSuperCell(const xstructure& a, const int& sc11,const int& sc12,const int& sc13, const int& sc21,const int& sc22,const int& sc23, const int& sc31,const int& sc32,const int& sc33,vector<int>& sc2pcMap,vector<int>& pc2scMap,
@@ -17383,7 +17383,7 @@ int xstructure::GenerateGridAtoms_20190520(int i1,int i2,int j1,int j2,int k1,in
         }
       }
     }
-    if(!aurostd::isequal(min_dist,SYM::minimumDistance((*this)),0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
+    if(!aurostd::isequal(min_dist,SYM::minimumDistance((*this)),0.1)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
   grid_atoms_calculated=TRUE;
   grid_atoms_dimsL[1]=i1;grid_atoms_dimsL[2]=j1;grid_atoms_dimsL[3]=k1;
@@ -17521,7 +17521,7 @@ int xstructure::GenerateGridAtoms_20191218(int i1,int i2,int j1,int j2,int k1,in
         }
       }
     }
-    if(!aurostd::isequal(min_dist,SYM::minimumDistance((*this)),0.1)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
+    if(!aurostd::isequal(min_dist,SYM::minimumDistance((*this)),0.1)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Minimum distance changed, check that atoms are not rotated",_RUNTIME_ERROR_);}
   }
   grid_atoms_calculated=TRUE;
   grid_atoms_dimsL[1]=i1;grid_atoms_dimsL[2]=j1;grid_atoms_dimsL[3]=k1;
@@ -17616,14 +17616,14 @@ int xstructure::GenerateLIJK(double radius) {
 // LIJK table: L => IJK
 // **************************************************************************
 void l2ijk(const xstructure& str,const int &l,int &i,int &j,int &k) {
-  if(l<0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"l2ijk():","l2ijk error: l<0",_VALUE_RANGE_);}
-  if(l>(int) str.lijk_table.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"l2ijk():","l>str.lijk_table.size()",_VALUE_RANGE_);}
+  if(l<0) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"l2ijk():","l2ijk error: l<0",_VALUE_RANGE_);}
+  if(l>(int) str.lijk_table.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"l2ijk():","l>str.lijk_table.size()",_VALUE_RANGE_);}
   i=str.lijk_table[l][1];j=str.lijk_table[l][2];k=str.lijk_table[l][3];
 }
 
 void l2ijk(const xstructure& str,const int &l,xvector<int>& ijk) {
-  if(l<0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"l2ijk():","l2ijk error: l<0",_VALUE_RANGE_);}
-  if(l>(int) str.lijk_table.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"l2ijk():","l>str.lijk_table.size()",_VALUE_RANGE_);}
+  if(l<0) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"l2ijk():","l2ijk error: l<0",_VALUE_RANGE_);}
+  if(l>(int) str.lijk_table.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"l2ijk():","l>str.lijk_table.size()",_VALUE_RANGE_);}
   ijk[1]=str.lijk_table[l][1];ijk[2]=str.lijk_table[l][2];ijk[3]=str.lijk_table[l][3];
 }
 
@@ -17641,15 +17641,15 @@ xvector<int> l2ijk(const xstructure& str,const int &l) {
 // **************************************************************************
 void ijk2l(const xstructure& str,int &l,const int &i,const int &j,const int &k) {
   l=-1;
-  if(i<-str.lijk_dims(1) || i>str.lijk_dims(1)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"ijk2l():","i out of boundary",_VALUE_RANGE_);}
-  if(j<-str.lijk_dims(2) || j>str.lijk_dims(2)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"ijk2l():","j out of boundary",_VALUE_RANGE_);}
-  if(k<-str.lijk_dims(3) || k>str.lijk_dims(3)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"ijk2l():","k out of boundary",_VALUE_RANGE_);}
+  if(i<-str.lijk_dims(1) || i>str.lijk_dims(1)) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"ijk2l():","i out of boundary",_VALUE_RANGE_);}
+  if(j<-str.lijk_dims(2) || j>str.lijk_dims(2)) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"ijk2l():","j out of boundary",_VALUE_RANGE_);}
+  if(k<-str.lijk_dims(3) || k>str.lijk_dims(3)) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"ijk2l():","k out of boundary",_VALUE_RANGE_);}
   for(uint ll=0;ll<str.lijk_table.size();ll++) // start search
     if(str.lijk_table.at(ll)[1]==i)         // faster comparison one at a time
       if(str.lijk_table.at(ll)[2]==j)       // faster comparison one at a time
         if(str.lijk_table.at(ll)[3]==k)     // faster comparison one at a time
           l=ll;
-  if(l<0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"ijk2l():","l not found",_VALUE_RANGE_);}
+  if(l<0) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"ijk2l():","l not found",_VALUE_RANGE_);}
 }
 
 void ijk2l(const xstructure& str,int &l,const xvector<int>& ijk) {
@@ -17840,18 +17840,18 @@ void xstructure::checkStructure(){
   // check whether the species vector is populated, otherwise throw error
   if ((*this).species.size() == 0){
     message << " BAD NEWS: It seems there are no species in the structure. Please adjust the structure and rerun.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   }
   // check whether there are any atoms in the structure
   if ((*this).atoms.size() == 0){
     message << " BAD NEWS: It seems there are no atoms in the structure. Please adjust the structure and rerun.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
   }
   // if species of atoms are not known like in VASP4 format, throw error
   for(uint k=0,ksize=(*this).atoms.size();k<ksize;k++){
     if ((*this).atoms[k].cleanname == ""){
       message << " BAD NEWS: It seems you are providing a structure without complete species information as input. This implementation requires a structure with the species information included. For a VASP4 POSCAR, the species must be written on the right side next to the coordinates for each atom. Please adjust the structure and rerun.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
     }
   }
 }
@@ -18536,7 +18536,7 @@ void xstructure::ChangeBasis(const xmatrix<double>& transformation_matrix) {
       << " original: " << natoms_orig
       << " transformed: " << natoms_transformed
       << "; check the transformation matrix or same-atom tolerance.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
   }
 
   // ---------------------------------------------------------------------------
@@ -18655,16 +18655,16 @@ void xstructure::qm_clear(void) {
   qm_E_cell=0.0;qm_dE_cell=0.0;qm_H_cell=0.0;qm_PV_cell=0.0;qm_mag_cell=0.0;qm_P=0.0;
   qm_E_atom=0.0;qm_dE_atom=0.0;qm_H_atom=0.0;qm_PV_atom=0.0;qm_mag_atom=0.0; 
 
-  if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_clear():","[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
-  if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_clear():","[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
-  if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_clear():","[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
+  if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_clear():","[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
+  if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_clear():","[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
+  if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_clear():","[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
 
 }
 
 void xstructure::qm_recycle(void) {
-  if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_recycle():","[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
-  if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_recycle():","[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
-  if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_recycle():","[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
+  if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_recycle():","[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
+  if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_recycle():","[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
+  if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_recycle():","[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
   scale=qm_scale;
   lattice=qm_lattice;
   klattice=qm_klattice;
@@ -18681,10 +18681,10 @@ void xstructure::qm_recycle(void) {
 
 void xstructure::qm_load(const string& Directory,const string& suffix,int iomode) {
   double data_natoms=double(atoms.size());
-  if(iomode!=IOVASP_POSCAR) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","Only IOVASP_POSCAR is supported.",_FILE_WRONG_FORMAT_);};
+  if(iomode!=IOVASP_POSCAR) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","Only IOVASP_POSCAR is supported.",_FILE_WRONG_FORMAT_);};
   if(iomode==IOVASP_POSCAR) {
     xOUTCAR outcar;
-    if(aurostd::FileEmpty(Directory+"/OUTCAR"+suffix))   {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","Empty OUTCAR.",_FILE_CORRUPT_);}  //PN+JJPR FIXED BUG
+    if(aurostd::FileEmpty(Directory+"/OUTCAR"+suffix))   {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","Empty OUTCAR.",_FILE_CORRUPT_);}  //PN+JJPR FIXED BUG
 
     outcar.GetPropertiesFile(Directory+"/OUTCAR"+suffix,data_natoms,TRUE);
 
@@ -18694,24 +18694,24 @@ void xstructure::qm_load(const string& Directory,const string& suffix,int iomode
       message << "      Directory=" << Directory << endl;
       message << "      suffix=" << suffix << endl;
       message << "      iomode=" << iomode << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():",message,_FILE_WRONG_FORMAT_);;
+      throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():",message,_FILE_WRONG_FORMAT_);;
     }
 
     //    cerr << atoms.size() << endl;
     qm_clear();
-    if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
-    if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
-    if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
+    if(atoms.size()!=qm_atoms.size())     {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[1] atoms.size()!=qm_atoms.size().",_VALUE_ERROR_);}
+    if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[2] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
+    if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[3] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
 
     // NEW WITH xOUTCAR
     qm_forces.clear(); for(uint i=0;i<outcar.vforces.size();i++)  qm_forces.push_back(outcar.vforces.at(i)); 
     qm_positions.clear(); for(uint i=0;i<outcar.vpositions_cartesian.size();i++)  qm_positions.push_back(outcar.vpositions_cartesian.at(i)); 
-    if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","[4] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
-    if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","[5] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
+    if(atoms.size()!=qm_forces.size())    {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[4] atoms.size()!=qm_forces.size().",_VALUE_ERROR_);}
+    if(atoms.size()!=qm_positions.size()) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","[5] atoms.size()!=qm_positions.size().",_VALUE_ERROR_);}
 
     // NEW WITH xVASPRUNXML
     xVASPRUNXML vasprunxml;
-    if(aurostd::FileEmpty(Directory+"/vasprun.xml"+suffix))   {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"xstructure::qm_load():","Empty vasprun.xml.",_FILE_CORRUPT_);} //PN+JJPR FIXED BUG
+    if(aurostd::FileEmpty(Directory+"/vasprun.xml"+suffix))   {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","Empty vasprun.xml.",_FILE_CORRUPT_);} //PN+JJPR FIXED BUG
     //vasprunxml.GetPropertiesFile(Directory+"/vasprun.xml");
     vasprunxml.GetPropertiesFile(Directory+"/vasprun.xml"+suffix); //PN+JJPR FIXED BUG
     qm_forces.clear(); for(uint i=0;i<vasprunxml.vforces.size();i++)  qm_forces.push_back(vasprunxml.vforces.at(i)); 
@@ -18807,7 +18807,7 @@ bool PAULING_WyckoffDetector(vector<string> &vinput) {
     }
   }
 
-  throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"PAULING_WyckoffDetector():","Throw for debugging purposes.",_GENERIC_ERROR_);
+  throw aurostd::xerror(__AFLOW_FILE__,XPID+"PAULING_WyckoffDetector():","Throw for debugging purposes.",_GENERIC_ERROR_);
 }
 
 //DX20170831 - xstructure2json - START

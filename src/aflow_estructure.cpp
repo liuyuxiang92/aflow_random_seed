@@ -253,7 +253,7 @@ namespace estructure {
     double Efermi;
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_doscar, ss_outcar, Efermi, TDOS, TOTALPDOS) && TOTALPDOS.size()>0)){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
     }
 
     vector<vector<double> > vvDOS;
@@ -420,7 +420,7 @@ namespace estructure {
 
     if(!found) {
       message << "DOSCAR[.static][.EXT] not found in the directory, aborting.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);
     }
 
     int TotalNumberDOSCAR = aurostd::GetNLinesString(dosfile);
@@ -432,7 +432,7 @@ namespace estructure {
 
     if(TotalNumberDOSCAR < DOSGRID) {
       message << "TotalNumberDOSCAR (" << TotalNumberDOSCAR << ") is less than the DOSGRID (" << DOSGRID << ").";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_RANGE_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_RANGE_);
     }
     bool FLAG_PDOS = false;
     NIONS = (int (TotalNumberDOSCAR-5)/(DOSGRID+1))-1;
@@ -1161,7 +1161,7 @@ namespace estructure {
         }
       }
       else {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Unexpected size of the TOTALPDOS. Please check.",_VALUE_RANGE_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unexpected size of the TOTALPDOS. Please check.",_VALUE_RANGE_);
       }
       fin.close();
 
@@ -1454,7 +1454,7 @@ namespace estructure {
 
     bool isLSCOUPLING = pedos_outcar.isLSCOUPLING; 
     if(isLSCOUPLING) {   
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Not working on isLSCOUPLING now!",_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Not working on isLSCOUPLING now!",_RUNTIME_ERROR_);
     }
     NIONS = pedos_outcar.NIONS;
     //Efermi = pedos_outcar.Efermi;
@@ -1672,7 +1672,7 @@ namespace estructure {
     bool isLSCOUPLING = pedos_outcar.isLSCOUPLING;
     if(isLSCOUPLING) {
       message << "Not working on isLSCOUPLING now!";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
     }
     NIONS = pedos_outcar.NIONS;
     //Efermi = pedos_outcar.Efermi;
@@ -1684,7 +1684,7 @@ namespace estructure {
       //cout << "I REFUSE TO CONTINUE WITH THIS SICK JOB...,BYE!!!<----" << endl;
       //cout << "Anyway, I still give you a promot, the second input must be a digit!"<< endl;
       message << "The second input must be a digit!";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
     }
     Natom=aurostd::string2utype<int>(numatom); //directory
     if(Natom > NIONS) {
@@ -1692,14 +1692,14 @@ namespace estructure {
       //cout << "The number you put excceds the number of ions (" << NIONS << ")!!" << endl;
       //cout << "How silly you are!!!" << endl;
       message << "The number you put excceds the number of ions (" << NIONS << ")!";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_RANGE_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_RANGE_);
     }
     if(Natom==0) {
       //CO20170830 - let's not insult the user?
       //cout << "You input 0! I guess you want to plot TDOS, so I recommend you to use 'aflow --plotdos " + directory +"'" << endl;
       //cout << "I do not want to produce TDOS in this way! BYE!!!..." << endl;
       message << "No input! If you want to plot TDOS, use 'aflow --plotdos " + directory +"'";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_MISSING_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_MISSING_);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1962,7 +1962,7 @@ namespace estructure {
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_doscar, ss_outcar, Efermi, TDOS, TOTALPDOS) && TOTALPDOS.size()>0)){
       message << "DOSCAR extraction failed, perhaps there is no PDOS";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_MISSING_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_MISSING_);
     }
 
     vector<vector<double> > vvDOS;
@@ -1987,7 +1987,7 @@ namespace estructure {
 
     //***********************************DEALING WITH BANDSDATA**************************************************************
     aflowlib::vaspfile2stringstream(directory, "EIGENVAL", ss_engenval);
-    //  cout << ss_engenval.str() << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //  cout << ss_engenval.str() << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
     //Read FLAG of SPIN, if SPIN=1,Non-spin-polarized; IF SPIN=2, spin-polarized
     ss_engenval >> stmp >> stmp >> stmp >> ISPIN;	
@@ -2039,7 +2039,7 @@ namespace estructure {
     }
     else {
       message << "Can not detect spin flag! Error, Aborting!";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
     }
 
     //READ KPOINTS	
@@ -2115,7 +2115,7 @@ namespace estructure {
       message << "count=" << count << endl;
       message << "(count/2)*KPOINTSGRID=" << (count/2)*KPOINTSGRID << endl;
       message << "NKPOINTS=" << NKPOINTS << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
     }
 
     //Calcuating klinedirect from the direct points
@@ -2494,7 +2494,7 @@ namespace estructure {
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_doscar, ss_outcar, Efermi, TDOS, TOTALPDOS_SPIN) && TOTALPDOS_SPIN.size()>0)){
       message << "DOSCAR extraction failed, perhaps there is no PDOS" << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_MISSING_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_MISSING_);
     }
 
     vector<vector<double> >  TOTALPDOS;
@@ -2588,7 +2588,7 @@ namespace estructure {
     }
     else {
       message << "Can not detect spin flag! Error, Aborting!";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
     }
 
     //READ KPOINTS	
@@ -2658,7 +2658,7 @@ namespace estructure {
     if((count/2)*KPOINTSGRID!=NKPOINTS) {
       //  if(LDEBUG) cerr << __AFLOW_FUNC__ << " [26]" << endl;
       message << "ERROR: Please check your KPOINTS.bands and EIGENVALE.bands files! The number of kpoints are different!!!";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
     }
 
     //Calcuating klinedirect from the direct points
@@ -2977,7 +2977,7 @@ namespace estructure {
     }  
     if(!found) {
       message << "OUTCAR[.bands][.EXT] not found in the directory, aborting.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);
     }
 
     //GET Fermi Level, Number of IONS
@@ -3019,7 +3019,7 @@ namespace estructure {
     }
     if(!found) {
       message << "EIGENVAL[.bands][.EXT] not found in the directory, aborting.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);
     }
 
     //Read FLAG of SPIN, if SPIN=1,Non-spin-polarized; IF SPIN=2, spin-polarized
@@ -3072,7 +3072,7 @@ namespace estructure {
     }
     else {
       message << "Can not detect spin flag! Error, Aborting!";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
     }
 
     //READ KPOINTS	
@@ -3087,7 +3087,7 @@ namespace estructure {
     }
     if(!found) {
       message << "KPOINTS[.bands][.EXT] not found in the directory, aborting.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);
     }
 
     straus >> LattName >> stmp; getline(straus, stmp);
@@ -3156,7 +3156,7 @@ namespace estructure {
       message << "Please check your KPOINTS.bands and EIGENVAL.bands files! The number of kpoints are different!!!" << endl;
       message << "KPOINTSGRID=" << KPOINTSGRID << endl;
       message << "NKPOINTS=" << NKPOINTS << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
     }
 
     //Calcuating klinedirect from the direct points
@@ -3560,7 +3560,7 @@ namespace estructure {
         vtmp.push_back(TDOS[i][2]);
       }
       else {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Unexpected size of the TOTALPDOS. Please check.",_VALUE_RANGE_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unexpected size of the TOTALPDOS. Please check.",_VALUE_RANGE_);
       }
       vvDOS.push_back(vtmp);
     }
@@ -3577,7 +3577,7 @@ namespace estructure {
     vector<vector<double> > TOTALPDOS;
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(str_dir, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
     }
     return Efermi;
   }
@@ -3593,7 +3593,7 @@ namespace estructure {
     vector<vector<vector<double> > > PDOS;
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(str_dir, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
     }
     return Efermi;
   }
@@ -3609,7 +3609,7 @@ namespace estructure {
     vector<vector<vector<double> > > PDOS;
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(str_dir, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
     }
     return Efermi;
   }
@@ -3625,7 +3625,7 @@ namespace estructure {
     vector<vector<double> > TOTALPDOS;
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_dosfile, ss_outfile, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
     }
     return Efermi;
   }
@@ -3641,7 +3641,7 @@ namespace estructure {
     vector<vector<vector<double> > > PDOS;
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_dosfile, ss_outfile, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
     }
     return Efermi;
   }
@@ -3657,7 +3657,7 @@ namespace estructure {
     vector<vector<vector<double> > > PDOS;
     //CO20180216 - this function needs PDOS
     if(!(estructure::GET_DOS_DATA(ss_dosfile, ss_outfile, Efermi, TDOS, TOTALPDOS, PDOS) && TOTALPDOS.size()>0)){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"DOSCAR extraction failed, perhaps there is no PDOS",_INPUT_MISSING_);
     }
     return Efermi;
   }
@@ -5548,7 +5548,7 @@ namespace estructure {
     //***********************************DEALING WITH BANDSDATA**************************************************************
 
     aflowlib::vaspfile2stringstream(directory, "EIGENVAL", ss_engenval);
-    //cout << ss_engenval.str() << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //cout << ss_engenval.str() << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
     //Read FLAG of SPIN, if SPIN=1,Non-spin-polarized; IF SPIN=2, spin-polarized
     ss_engenval >> stmp >> stmp >> stmp >> ISPIN;   
@@ -5693,7 +5693,7 @@ namespace estructure {
       message << "count=" << count << endl;
       message << "(count/2)*KPOINTSGRID=" << (count/2)*KPOINTSGRID << endl;
       message << "NKPOINTS=" << NKPOINTS << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
     }
 
     //Calcuating klinedirect from the direct points

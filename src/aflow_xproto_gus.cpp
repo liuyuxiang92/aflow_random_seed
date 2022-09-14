@@ -55,7 +55,7 @@ namespace aflowlib {
         if(LDEBUG) { oaus << "00000  MESSAGE AFLOW LIBRARY  Found library file = [" << FileLibrary << "]" << endl; }
         if(LDEBUG) { aurostd::PrintMessageStream(oaus,XHOST.QUIET,oss); } //CO20200624
       } else {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"AFLOW_LIBRARY not found.",_RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"AFLOW_LIBRARY not found.",_RUNTIME_ERROR_);
       }
       // FOUND
       if(aurostd::substring2bool(FileLibrary,".gz")) {
@@ -242,7 +242,7 @@ namespace aflowlib {
         for( z2=(b*z1)/a; z2<=c+(b*z1)/a - 1; z2++) {
           for( z3 = z1*(d-(e*b)/c)/a+(e*z2)/c; z3<= f+z1*(d-(e*b)/c)/a+(e*z2)/c - 1; z3++) {
             ic++;
-            if(ic>(int) (nAt*nD)) { throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Problem in basis atoms.",_RUNTIME_ERROR_); }
+            if(ic>(int) (nAt*nD)) { throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Problem in basis atoms.",_RUNTIME_ERROR_); }
             // call inverse(real(HNF,dp),Sinv)
             //** Move this to outside the loop: aurostd::inverse(HNF,Sinv);
             ausv=Sinv*aurostd::reshape((double) z1,(double) z2,(double) z3)+aussLVinvXdvec; //**
@@ -255,7 +255,7 @@ namespace aflowlib {
     } // iD
     if(LDEBUG) { cerr << "DEBUG ic=" << ic << endl; }
     if(LDEBUG) { cerr << "DEBUG nD=" << nD << endl; }
-    if(ic!=(int) (nAt*nD)) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Not enough basis atoms.",_RUNTIME_ERROR_);}
+    if(ic!=(int) (nAt*nD)) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Not enough basis atoms.",_RUNTIME_ERROR_);}
     if(LDEBUG) { cerr << "DEBUG sLV=" << sLV << endl; }
     if(LDEBUG) { cerr << "DEBUG aBas=" << aBas << endl; }
 
@@ -287,7 +287,7 @@ namespace aflowlib {
     }
     if(natoms!=(nAt*nD)) {
       stringstream message; message << "natoms!=nAt  natoms=" << natoms << "  nAt=" << nAt;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
     };
     if(species_tmp.at(0)!="") {str.num_each_type.push_back(natomsA);str.comp_each_type.push_back((double) natomsA);nspecies++;}
     if(species_tmp.at(1)!="") {str.num_each_type.push_back(natomsB);str.comp_each_type.push_back((double) natomsB);nspecies++;}

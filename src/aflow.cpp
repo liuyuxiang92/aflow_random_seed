@@ -235,7 +235,7 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO20190601
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
-      if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}
+      if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}
 
       for(uint iext=0;iext<XHOST.vext.size();iext++) { 
         cout << "\"" << XHOST.vext.at(iext) << "\"" << " " << "\"" << XHOST.vcat.at(iext) << "\"" << endl;
@@ -598,13 +598,13 @@ int main(int _argc,char **_argv) {
   }
   //CO20180729 - OBSOLETE - use xerror
   //[OBSOLETE]catch(AFLOWRuntimeError& re){
-  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "AFLOWRuntimeError detected. Report on the AFLOW Forum: aflow.org/forum.", oss, _LOGGER_ERROR_);
-  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "AFLOWRuntimeError detected. Report on the AFLOW Forum: aflow.org/forum.", oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(__AFLOW_FILE__, re.where(), re.what(), oss, _LOGGER_ERROR_);
   //[OBSOLETE]  return 1;
   //[OBSOLETE]}
   //[OBSOLETE]catch(AFLOWLogicError& le){
-  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "AFLOWLogicError detected. Adjust your inputs accordingly.", oss, _LOGGER_ERROR_);
-  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, le.where(), le.what(), oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "AFLOWLogicError detected. Adjust your inputs accordingly.", oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(__AFLOW_FILE__, le.where(), le.what(), oss, _LOGGER_ERROR_);
   //[OBSOLETE]  return 1;
   //[OBSOLETE]}
   catch (aurostd::xerror& excpt) {

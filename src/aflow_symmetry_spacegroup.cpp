@@ -521,7 +521,7 @@ namespace SYM {
               SYM::FPOSMatch(atomic_basis_, obverse3, match_type3, lattice_basis_xmat, f2c, skew, sym_tol)) && //DX20190215 - _SYM_TOL_ to sym_tol //DX20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
             (match_type1 != match_type2 || match_type2 != match_type3 || match_type1 != match_type3)) {
           message << "PROBLEM TRANFORMING TO OBVERSE SETTING. QUITING PROGRAM [dir = " << xstr.directory << "].";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
         }
       }
       xstr.lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
@@ -1152,7 +1152,7 @@ namespace SYM {
     deque<_atom> out;
     if(xstr.atoms.size() == 0) {
       message << __AFLOW_FUNC__ << " atoms deque is empty! [dir=" << xstr.directory << "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_MISSING_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_MISSING_);
     }
     for (uint i = 0; i < expanded_lattice_points.size(); i++) {
       //cerr << "lattice point: " << expanded_lattice_points[i] << endl; //cartesian
@@ -1920,7 +1920,7 @@ namespace SYM {
     }
 
     if(conven.size() != 3) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"There should be three and only three 4-fold axes",_INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"There should be three and only three 4-fold axes",_INDEX_BOUNDS_);
     }
 
     // ==== Orient into positive quadrant ==== //
@@ -3776,7 +3776,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
     }
     //cerr << "FCG: " << endl;
     //print(FCG);
-    //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
     stringstream axis_cell;
     axis_cell.str(std::string());
@@ -4013,7 +4013,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
               wyckoffsymbols = SYM::get_symmetry_symbols(spacegroupstring);
               //cerr << "WYCKOFFSYMBOLS: " << endl;
               //print(wyckoffsymbols);
-              //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
+              //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
               //xb();
 
               // ========== Match equivalent atoms to Wyckoff positions consistent with ITC ========== //
@@ -4184,7 +4184,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
   }
   if(foundspacegroup == false) {
     message << "Failed to find WYCKOFF POSITIONS, ORIGIN SHIFT, or inconsistent number of GENERATORS [dir=" << (*this).directory << "].";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
   }
 
   if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Tolerance used to obtain this space group: " << CCell.sym_eps << " [dir=" << xstr.directory << "]." << endl; } //DX20190215 - _SYM_TOL_ to CCell.sym_eps

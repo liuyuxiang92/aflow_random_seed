@@ -750,7 +750,7 @@ namespace xelement {
       }
       return aurostd::joinWDelimiter(aurostd::vecDouble2vecString(vitems,_DOUBLE_WRITE_PRECISION_),delim); //CO20201111
     }
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::getPropertyStringVector():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
+    throw aurostd::xerror(__AFLOW_FILE__,"xelement::getPropertyStringVector():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
     return "";
   }
   string xelement::getPropertyString(const string& property,const string& delim,uint ncols) const { //CO20201111
@@ -846,7 +846,7 @@ namespace xelement {
     if(c==aurostd::toupper("HHIP")) return aurostd::utype2string(HHIP,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("HHIR")) return aurostd::utype2string(HHIR,_DOUBLE_WRITE_PRECISION_);
     if(c==aurostd::toupper("xray_scatt")) return aurostd::utype2string(xray_scatt,_DOUBLE_WRITE_PRECISION_);
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::getPropertyString():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
+    throw aurostd::xerror(__AFLOW_FILE__,"xelement::getPropertyString():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
     return "";
   }
   double xelement::getPropertyDouble(const string& property,int index) const {
@@ -961,7 +961,7 @@ namespace xelement {
     if(c==aurostd::toupper("HHIP")) return HHIP;
     if(c==aurostd::toupper("HHIR")) return HHIR;
     if(c==aurostd::toupper("xray_scatt")) return xray_scatt;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::getPropertyDouble():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
+    throw aurostd::xerror(__AFLOW_FILE__,"xelement::getPropertyDouble():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
     return NNN;
   }
   const xvector<double>& xelement::getPropertyXVectorDouble(const string& property) const {
@@ -1057,7 +1057,7 @@ namespace xelement {
     //if(c==aurostd::toupper("HHIP")) return HHIP;
     //if(c==aurostd::toupper("HHIR")) return HHIR;
     //if(c==aurostd::toupper("xray_scatt")) return xray_scatt;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::getPropertyXVectorDouble():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
+    throw aurostd::xerror(__AFLOW_FILE__,"xelement::getPropertyXVectorDouble():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
     return lattice_constants; //return dummy
   }
   const vector<double>& xelement::getPropertyVectorDouble(const string& property) const {
@@ -1153,7 +1153,7 @@ namespace xelement {
     //if(c==aurostd::toupper("HHIP")) return HHIP;
     //if(c==aurostd::toupper("HHIR")) return HHIR;
     //if(c==aurostd::toupper("xray_scatt")) return xray_scatt;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::getPropertyVectorDouble():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
+    throw aurostd::xerror(__AFLOW_FILE__,"xelement::getPropertyVectorDouble():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
     return energies_ionization; //return dummy
   }
   string xelement::getType(const string& property) const{ //CO20201111
@@ -1251,7 +1251,7 @@ namespace xelement {
     if(c==aurostd::toupper("HHIP")) return "number";
     if(c==aurostd::toupper("HHIR")) return "number";
     if(c==aurostd::toupper("xray_scatt")) return "number";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::getType():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
+    throw aurostd::xerror(__AFLOW_FILE__,"xelement::getType():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
     return "";
   }
   string xelement::getUnits(const string& property) const {
@@ -1348,7 +1348,7 @@ namespace xelement {
     if(c==aurostd::toupper("HHIP")) return units_HHIP;
     if(c==aurostd::toupper("HHIR")) return units_HHIR;
     if(c==aurostd::toupper("xray_scatt")) return units_xray_scatt;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::getPropertyString():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
+    throw aurostd::xerror(__AFLOW_FILE__,"xelement::getPropertyString():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
     return "";
   }
   void xelement::convertUnits(const string& property,const string& units_new){
@@ -1474,10 +1474,10 @@ namespace xelement {
       if(vproperties[i]==aurostd::toupper("xray_scatt")) {dptr=&xray_scatt;sptr=&units_xray_scatt;}
 
       if(dptr==NULL && dvptr==NULL && dxvptr==NULL){
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::convertUnits():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
+        throw aurostd::xerror(__AFLOW_FILE__,"xelement::convertUnits():","Property not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
       }
       if(sptr==NULL){
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::convertUnits():","Original units not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
+        throw aurostd::xerror(__AFLOW_FILE__,"xelement::convertUnits():","Original units not found: "+property,_INPUT_ILLEGAL_);  //CO20200520
       }
       if(units_new=="SI"){
         if(units_old=="kg"){converted=true;}  //done
@@ -1529,7 +1529,7 @@ namespace xelement {
             }
             converted=true;
           }else{
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::convertUnits():","No pointer found",_RUNTIME_ERROR_);  //CO20200520
+            throw aurostd::xerror(__AFLOW_FILE__,"xelement::convertUnits():","No pointer found",_RUNTIME_ERROR_);  //CO20200520
           }
         }
         else if(units_old=="A"){
@@ -1576,7 +1576,7 @@ namespace xelement {
             }
             converted=true;
           }else{
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::convertUnits():","No pointer found",_RUNTIME_ERROR_);  //CO20200520
+            throw aurostd::xerror(__AFLOW_FILE__,"xelement::convertUnits():","No pointer found",_RUNTIME_ERROR_);  //CO20200520
           }
         }
         else if(units_old=="d.u.^{1/3}"){
@@ -1629,14 +1629,14 @@ namespace xelement {
           converted=true;
         }
         else{
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::convertUnits():","Unknown units(_old) scheme: "+units_old,_RUNTIME_ERROR_);  //CO20200520
+          throw aurostd::xerror(__AFLOW_FILE__,"xelement::convertUnits():","Unknown units(_old) scheme: "+units_old,_RUNTIME_ERROR_);  //CO20200520
         }
       }
 
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " units_new=(" << (*sptr) << ")" << endl;}
 
       if(!converted){
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::convertUnits():","Unknown units(_new) scheme: "+units_new,_INPUT_ILLEGAL_);  //CO20200520
+        throw aurostd::xerror(__AFLOW_FILE__,"xelement::convertUnits():","Unknown units(_new) scheme: "+units_new,_INPUT_ILLEGAL_);  //CO20200520
       }
     }
   }
@@ -1668,7 +1668,7 @@ namespace xelement {
     verbose=FALSE;
     uint Z=isElement(element);
     if(Z!=0) {(*this)=xelement(Z,oxidation_state);loadDefaultUnits();return;}  //CO20200520
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::xelement():","Element symbol/name does not exist: "+element,_VALUE_ILLEGAL_); //CO20200520
+    throw aurostd::xerror(__AFLOW_FILE__,"xelement::xelement():","Element symbol/name does not exist: "+element,_VALUE_ILLEGAL_); //CO20200520
   }
 
   // ********************************************************************************************************************************************************
@@ -11302,7 +11302,7 @@ namespace xelement {
     // [AFLOW]STOP=Lawrencium
     // ********************************************************************************************************************************************************
 
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xelement::xelement():","Element number does not exist: "+aurostd::utype2string(ZZ),_VALUE_ILLEGAL_);  //CO20200520
+    throw aurostd::xerror(__AFLOW_FILE__,"xelement::xelement():","Element number does not exist: "+aurostd::utype2string(ZZ),_VALUE_ILLEGAL_);  //CO20200520
   }
 } // namespace xelement
 

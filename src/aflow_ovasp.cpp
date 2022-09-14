@@ -510,7 +510,7 @@ bool xOUTCAR::GetPropertiesFile(const string& fileIN,uint natoms_check,bool QUIE
     //[CO20200404 - OBSOLETE]cerr << "ERROR xOUTCAR::GetPropertiesFile: natoms_check(" << natoms_check << ")!= (int) natoms(" << natoms << ") ..." << endl;
     stringstream message;
     message << "natoms_check(" << natoms_check << ")!= (int) natoms(" << natoms << ")";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _VALUE_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _VALUE_ERROR_);
   }
   return flag;
 }
@@ -743,7 +743,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(tokens.size()==0) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of entries (entropy) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of entries (entropy) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   }
   eentropy_cell=0;
@@ -772,7 +772,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(tokens.size()==0) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of entries (energy_1) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of entries (energy_1) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   }
   if(tokens.size()>1) line=tokens.at(1);
@@ -780,7 +780,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(tokens.size()==0) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of entries (energy_2) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of entries (energy_2) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   }
   if(tokens.size()>0) energy_cell=aurostd::string2utype<double>(tokens.at(0));
@@ -809,7 +809,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(tokens.size()!=3) {
       //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of entries (PV) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;
       message << "Wrong number of entries (PV) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
       ERROR_flag=TRUE;
     }
     if(tokens.size()>2) PV_cell=aurostd::string2utype<double>(tokens.at(2));
@@ -922,7 +922,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(tokens.size()==0) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of entries (Pulay stress) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of entries (Pulay stress) in OUTCAR; line=[ " << line << "]" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   }
 
@@ -1035,7 +1035,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(vmag_x.size()!=vmag_y.size() || vmag_x.size()!=vmag_z.size()){
       //[CO20200404 - OBSOLETE]if(!QUIET){cerr << "WARNING - "<< __AFLOW_FUNC__ << " number of magnetization components (x, y, z) are not the same in OUTCAR; filename=[" << filename << "]" << endl;}
       message << "Number of magnetization components (x, y, z) are not the same in OUTCAR; filename=[" << filename << "]";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
       ERROR_flag=TRUE;
     }
     for(uint m=0;m<vmag_x.size();m++){
@@ -1070,7 +1070,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         if(tokens.size()<6) {
           //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of force/positions entries in OUTCAR; line=[ " << vcontent.at(iline+iat+2) << "]" << "   filename=[" << filename << "]" << endl;
           message << "Wrong number of force/positions entries in OUTCAR; line=[ " << vcontent.at(iline+iat+2) << "]" << "   filename=[" << filename << "]";
-          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
           ERROR_flag=TRUE;
         }
         vpositions_cartesian.at(iat)[1]=aurostd::string2utype<double>(tokens.at(0));
@@ -1123,7 +1123,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(vline.size()==0) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of \"Ionic relaxation\" in OUTCAR" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of \"Ionic relaxation\" in OUTCAR" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   }
   for(uint j=0;j<vline.size();j++) {   // to the back
@@ -1225,7 +1225,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(vline.size()==0) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of \"ENMAX ENMIN POMASS ZVAL EATOM RCORE RWIGS EAUG RAUG RMAX\" in OUTCAR" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of \"ENMAX ENMIN POMASS ZVAL EATOM RCORE RWIGS EAUG RAUG RMAX\" in OUTCAR" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   }
   for(uint j=0;j<vline.size();j++) {
@@ -1347,42 +1347,42 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(vTITEL.size()==0) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of pseudopotentials (TITEL) in OUTCAR" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of pseudopotentials (TITEL) in OUTCAR" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;  
   } //CO20200106 - patching for auto-indenting
   if(vLEXCH.size()==0) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of pseudopotentials (LEXCH) in OUTCAR" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of pseudopotentials (LEXCH) in OUTCAR" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;  
   } //CO20200106 - patching for auto-indenting
   if(vEATOM.size()==0) {
     message << "Wrong number of pseudopotentials (EATOM) in OUTCAR" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   } //CO20200106 - patching for auto-indenting
   if(vRMAX.size()==0) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of pseudopotentials (RMAX) in OUTCAR" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of pseudopotentials (RMAX) in OUTCAR" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   }   //CO20200106 - patching for auto-indenting
   if(vTITEL.size()!=vLEXCH.size()) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of pseudopotentials (TITEL/LEXCH) in OUTCAR" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of pseudopotentials (TITEL/LEXCH) in OUTCAR" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   } //CO20200106 - patching for auto-indenting
   if(vLEXCH.size()!=vEATOM.size()) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of pseudopotentials (LEXCH/EATOM) in OUTCAR" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of pseudopotentials (LEXCH/EATOM) in OUTCAR" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   } //CO20200106 - patching for auto-indenting
   if(vEATOM.size()!=vRMAX.size()) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of pseudopotentials (EATOM/RMAX) in OUTCAR" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of pseudopotentials (EATOM/RMAX) in OUTCAR" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   }   //CO20200106 - patching for auto-indenting
 
@@ -1434,7 +1434,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   //CO20210213 - check types are all the same, if not issue warning/error (mixing is not advisable)
   for(uint i=0;i<species_pp_type.size();i++){
     if(species_pp_type[i]!=pp_type){
-      pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Mismatch in species_pp_types ("+species_pp_type[i]+" vs. "+pp_type+")",*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_,QUIET);
+      pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"Mismatch in species_pp_types ("+species_pp_type[i]+" vs. "+pp_type+")",*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_,QUIET);
     }
   }
 
@@ -1452,7 +1452,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(species_pp_AUID_collisions.size()) {
     //[CO20200404 - OBSOLETE]cerr << __AFLOW_FUNC__ << " COLLISION species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size() << endl;
     message << "COLLISION species_pp_AUID_collisions.size()=" << species_pp_AUID_collisions.size();
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   }
 
@@ -1490,13 +1490,13 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(species_pp_vLDAU.size()!=species.size()) {
       //[CO20200404 - OBSOLETE]if(!QUIET) cerr << __AFLOW_FUNC__ << " ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != species.size()[" << species.size() << "]" << "   filename=[" << filename << "]" << endl;
       message << "species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != species.size()[" << species.size() << "]" << "   filename=[" << filename << "]";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
       ERROR_flag=TRUE;
     }
     if(species_pp_vLDAU.size()!=vLDAUL.size()) {
       //[CO20200404 - OBSOLETE]if(!QUIET) cerr << __AFLOW_FUNC__ << " ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUL.size()[" << vLDAUL.size() << "]" << "   filename=[" << filename << "]" << endl;
       message << "species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUL.size()[" << vLDAUL.size() << "]" << "   filename=[" << filename << "]";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
       ERROR_flag=TRUE;
     }
     if(species_pp_vLDAU.size()!=vLDAUU.size()) {
@@ -1507,7 +1507,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     if(species_pp_vLDAU.size()!=vLDAUJ.size()) {
       //[CO20200404 - OBSOLETE]if(!QUIET) cerr << __AFLOW_FUNC__ << " ERROR - species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUJ.size()[" << vLDAUJ.size() << "]" << "   filename=[" << filename << "]" << endl;
       message << "species_pp_vLDAU.size()[" << species_pp_vLDAU.size() << "] != vLDAUJ.size()[" << vLDAUJ.size() << "]" << "   filename=[" << filename << "]";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
       ERROR_flag=TRUE;
     }
     for(uint j=0;j<species.size();j++) {
@@ -1573,7 +1573,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(vline.size()==0) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of \"DOS related values\" in OUTCAR" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of \"DOS related values\" in OUTCAR" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   }
   for(uint j=0;j<vline.size();j++) {
@@ -1618,7 +1618,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(vline.size()==0) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of \"Electronic relaxation\" in OUTCAR" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of \"Electronic relaxation\" in OUTCAR" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   }
   for(uint j=0;j<vline.size();j++) {
@@ -1671,7 +1671,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(vline.size()==0) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of \"Intra band minimization\" in OUTCAR" << "   filename=[" << filename << "]" << endl;
     message << "Wrong number of \"Intra band minimization\" in OUTCAR" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   }
   for(uint j=0;j<vline.size();j++) {
@@ -1713,7 +1713,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   //[CO20200404 - breaks for all OUTCAR.bands]if(vline.size()==0) {
   //[CO20200404 - breaks for all OUTCAR.bands]  //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " wrong number of \" LOAD NWEIGHTS VKPOINT\" in OUTCAR" << "   filename=[" << filename << "]" << endl;
   //[CO20200404 - breaks for all OUTCAR.bands]  message << "Wrong number of \" LOAD NWEIGHTS VKPOINT\" in OUTCAR" << "   filename=[" << filename << "]";
-  //[CO20200404 - breaks for all OUTCAR.bands]  pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+  //[CO20200404 - breaks for all OUTCAR.bands]  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
   //[CO20200404 - breaks for all OUTCAR.bands]  ERROR_flag=TRUE;
   for(uint j=0;j<vline.size();j++) {
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " vline.at(" << j << ")=" << vline.at(j) << endl;
@@ -1797,7 +1797,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(line.empty()) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " in OUTCAR (no calculation_time)" << "   filename=[" << filename << "]" << endl;
     message << "In OUTCAR (no calculation_time)" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   }
   aurostd::string2tokens(line,tokens);
@@ -1814,7 +1814,7 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(line.empty()) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " in OUTCAR (no calculation_memory)" << "   filename=[" << filename << "]" << endl;
     message << "In OUTCAR (no calculation_memory)" << "   filename=[" << filename << "]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   }
   aurostd::string2tokens(line,tokens); //   cerr << tokens.at(3) << endl;
@@ -1829,8 +1829,8 @@ bool xOUTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - "<< __AFLOW_FUNC__ << " ERROR_flag set in xOUTCAR" << endl;
   if(ERROR_flag){
     message << "ERROR_flag set in xOUTCAR";
-    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-    else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
+    if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
     return FALSE;
   }
   return TRUE;
@@ -2585,7 +2585,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
     message << "GetProperties(const stringstream&);" << endl;
     message << "GetProperties(const string&);" << endl;
     message << "GetPropertiesFile(const string&);" << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INPUT_MISSING_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _INPUT_MISSING_);
   }
   if(LDEBUG) {cerr << __AFLOW_FUNC__ << " OUTCAR content found" << endl;}
 
@@ -2595,7 +2595,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       //[CO20200404 - OBSOLETE]ERROR = __AFLOW_FUNC__ + " GetProperties failed. \n";
       //[CO20200404 - OBSOLETE]return false;
       message << "GetProperties() failed";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
   }
   if(LDEBUG) {cerr << __AFLOW_FUNC__ << " OUTCAR properties retrieved" << endl;}
@@ -2620,7 +2620,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       //[CO20200404 - OBSOLETE]ERROR = __AFLOW_FUNC__ + " GetXStructure failed. \n";
       //[CO20200404 - OBSOLETE]return false;
       message << "GetXStructure() failed";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
   }
   if(LDEBUG) {cerr << __AFLOW_FUNC__ << " xstructure built from OUTCAR" << endl;}
@@ -2636,7 +2636,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
     //[CO20200404 - OBSOLETE]ERROR = __AFLOW_FUNC__ + " Unable to grab starting k-point lines. \n";
     //[CO20200404 - OBSOLETE]return false;
     message << "Unable to grab starting k-point lines";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
   }
   if(LDEBUG) {
     cerr << __AFLOW_FUNC__ << " reading k-points starting at line";
@@ -2678,7 +2678,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
           //[CO20200404 - OBSOLETE]  " (spin="+aurostd::utype2string(ispin+1)+") \n";
           //[CO20200404 - OBSOLETE]return false;
           message << "Missing k-point " << ikpt << " (spin=" << ispin+1 << ")";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
         }
       }
       if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking at k-point[" << ikpt << "]=" << kpoint << " (spin=" << ispin+1 << ")" << endl;}
@@ -2692,7 +2692,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
         //[CO20200404 - OBSOLETE]  " (spin="+aurostd::utype2string(ispin+1)+") \n";
         //[CO20200404 - OBSOLETE]return false;
         message << "Unable to process k-point " << ikpt << " (spin=" << ispin+1 << +")";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
       }
 
       //keep vedges, vVBT, vCBB same size as vkpoints
@@ -2743,7 +2743,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
         //[CO20200404 - OBSOLETE]  " (spin="+aurostd::utype2string(ispin+1)+") \n";
         //[CO20200404 - OBSOLETE]return false;
         message << "Missing k-point " << ikpt+1 << " (spin=" << ispin+1 << +")";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _FILE_CORRUPT_);
       }
     }
   }
@@ -2757,8 +2757,8 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       //[CO20200404 - OBSOLETE]  " (spin="+aurostd::utype2string(first_spin_empty+1)+"),"+
       //[CO20200404 - OBSOLETE]  " this system should be rerun with a wider energy range \n";
       message << "Unable to detect band edge for k-point " << first_kpt_empty << " (spin=" << first_spin_empty+1 << ")," << " this system should be rerun with a wider energy range";
-      if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-      else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
+      if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+      else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
     }
   }
 
@@ -2799,8 +2799,8 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
   for(uint ispin=0;ispin<(uint)ISPIN;ispin++){
     if(broad_type[ispin]==empty){
       message << "Unable to detect band edge for k-point " << first_kpt_empty << " (spin=" << first_spin_empty+1 << ")," << " this system should be rerun with a wider energy range";
-      if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-      else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
+      if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+      else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
     }
   }
 
@@ -2835,7 +2835,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       //[CO20200404 - OBSOLETE]  aurostd::utype2string(ispin+1)+") \n";
       //[CO20200404 - OBSOLETE]return false;
       message << "Unknown material type (!empty && !metal && !insulator) (spin=" << ispin+1 << ")";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " insulator found in spin=" << ispin+1 << endl;}
     max_VBT = (-1.0) * AUROSTD_MAX_DOUBLE;
@@ -2876,8 +2876,8 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       //[CO20200404 - OBSOLETE]ERROR = __AFLOW_FUNC__ + " cannot find equivalent band extrema (spin="+
       //[CO20200404 - OBSOLETE]  aurostd::utype2string(ispin+1)+") \n";
       message << "Cannot find equivalent band extrema (spin=" << ispin+1 << ")";
-      if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-      else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
+      if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+      else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
     }
     //if we found more than one possible extrema, minimize kpoint distance between max/min
     //this simulates the electron trying to reduce momentum needed to conduct
@@ -2902,7 +2902,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       //[CO20200404 - OBSOLETE]  aurostd::utype2string(ispin+1)+") \n";
       //[CO20200404 - OBSOLETE]return false;
       message << "Cannot calculate k-point distance between band extrema (spin=" << ispin+1 << ")";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " dist_min=" << dist_min << endl;}
     if(LDEBUG){
@@ -2918,8 +2918,8 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       //[CO20200404 - OBSOLETE]  aurostd::utype2string(ispin+1)+") \n";
       //[CO20200404 - OBSOLETE]return false;
       message << "Negative band gap found, something broke (spin=" << ispin+1 << ")";
-      if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-      else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
+      if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+      else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
     }
     gap_type[ispin]=(gap[ispin] < energy_tol ? zero_gap : non_zero_gap);
     insulator_type[ispin]=(abs(dist_min)<kpt_tol ? insulator_direct : insulator_indirect);
@@ -2956,7 +2956,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       //[CO20200404 - OBSOLETE]  aurostd::utype2string(ispin+1)+") \n";
       //[CO20200404 - OBSOLETE]return false;
       message << "Unknown material type (!empty && !metal && !insulator) (spin=" << ispin+1 << ")";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     } else {
       valence_band_max[ispin]=vVBT[ispin][vimax_VBTs[ispin]];
       conduction_band_min[ispin]=vCBB[ispin][vimin_CBBs[ispin]];
@@ -3018,7 +3018,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
     //[CO20200404 - OBSOLETE]ERROR = __AFLOW_FUNC__ + " unknown material type (!insulator_spin-polarized) (spin-averaged) \n";
     //[CO20200404 - OBSOLETE]return false;
     message << "Unknown material type (!insulator_spin-polarized) (spin-averaged)";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
   } else {  //do more work for 2 spin channels that are both insulating
     //get spin-averaged properties
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " we have a spin-polarized insulator, need to find spin-averaged gap" << endl;}
@@ -3070,8 +3070,8 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       //[CO20200404 - OBSOLETE]ERROR = __AFLOW_FUNC__ + " cannot find equivalent band extrema (spin-averaged) \n";
       //[CO20200404 - OBSOLETE]return false;
       message << "Cannot find equivalent band extrema (spin-averaged)";
-      if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-      else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
+      if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+      else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
     }
     //if we found more than one possible extrema, minimize kpoint distance between max/min
     //this simulates the electron trying to reduce momentum needed to conduct
@@ -3095,7 +3095,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       //[CO20200404 - OBSOLETE]ERROR = __AFLOW_FUNC__ + " cannot calculate k-point distance between band extrema (spin-averaged) \n";
       //[CO20200404 - OBSOLETE]return false;
       message << "Cannot calculate k-point distance between band extrema (spin-averaged)";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     valence_band_max_net=vVBT[ispin_VBT_net][imax_VBT_net];
     conduction_band_min_net=vCBB[ispin_CBB_net][imin_CBB_net];
@@ -3110,8 +3110,8 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       //[CO20200404 - OBSOLETE]ERROR = __AFLOW_FUNC__ + " negative band gap found, something broke (spin-averaged) \n";
       //[CO20200404 - OBSOLETE]return false;
       message << "Negative band gap found, something broke (spin-averaged)";
-      if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-      else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
+      if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+      else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
     }
     bool zero_gap_net=gap_net < energy_tol;
     bool spin_polarized_net=ispin_VBT_net!=ispin_CBB_net;
@@ -3160,7 +3160,7 @@ bool xOUTCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
 //[CO20200404 - OBSOLETE]    message << "GetProperties(const stringstream&);" << endl;
 //[CO20200404 - OBSOLETE]    message << "GetProperties(const string&);" << endl;
 //[CO20200404 - OBSOLETE]    message << "GetPropertiesFile(const string&);" << endl;
-//[CO20200404 - OBSOLETE]    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INPUT_MISSING_);
+//[CO20200404 - OBSOLETE]    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _INPUT_MISSING_);
 //[CO20200404 - OBSOLETE]  }
 //[CO20200404 - OBSOLETE]
 //[CO20200404 - OBSOLETE]  uint tagcount = 0;
@@ -4325,8 +4325,8 @@ void xOUTCAR::WriteMTPCFG(stringstream& output_ss,const string& outcar_path){  /
 }
 void xOUTCAR::WriteMTPCFG(stringstream& output_ss,const string& outcar_path,const vector<string>& _velements){  //CO20211106
 
-  if(vxstr_ionic.size()!=venergy_ionic.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"vxstr_ionic.size()!=venergy_ionic",_FILE_CORRUPT_);}
-  if(vxstr_ionic.size()!=vstresses_ionic.size()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"vxstr_ionic.size()!=vstresses_ionic",_FILE_CORRUPT_);}
+  if(vxstr_ionic.size()!=venergy_ionic.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"vxstr_ionic.size()!=venergy_ionic",_FILE_CORRUPT_);}
+  if(vxstr_ionic.size()!=vstresses_ionic.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"vxstr_ionic.size()!=vstresses_ionic",_FILE_CORRUPT_);}
 
   aflowlib::_aflowlib_entry data;
   populateAFLOWLIBEntry(data,outcar_path);
@@ -4382,7 +4382,7 @@ void xOUTCAR::WriteMTPCFG(stringstream& output_ss,const string& outcar_path,cons
             found_itype=true;
           }
         }
-        if(!found_itype){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"itype not found",_FILE_CORRUPT_);}
+        if(!found_itype){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"itype not found",_FILE_CORRUPT_);}
       }
       for(icoord=a.atoms[iatom].fpos.lrows;icoord<=a.atoms[iatom].fpos.urows;icoord++){
         if(!std::signbit(a.atoms[iatom].fpos[icoord])) output_ss << " ";
@@ -4605,7 +4605,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if (vcontent.size() < 7) {
     //[CO20200404 - OBSOLETE]string function = "xDOSCAR::GetProperties()";
     message << "Broken DOSCAR: no content";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _FILE_ERROR_);
   }
   for(uint iline = 0; iline < 7;iline++) { //ME20190614 - Read header
     aurostd::string2tokens(vcontent.at(iline),tokens);
@@ -4652,7 +4652,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if (partial) number_lines += number_atoms * (number_energies + 1);
   if (vcontent.size() < number_lines) {
     message << "Broken DOSCAR - not enough lines.";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+    throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
   }
   uint norbitals = 0;
   int d = 0, e = 0;
@@ -4725,7 +4725,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
             " DOSCAR is lm-resolved. If this is not the case, please put an"
             " INCAR" + ext + ", a vasprun.xml " + ext + ", or an"
             " OUTCAR" +  ext + " file into the working directory and try again.";
-          pflow::logger(_AFLOW_FILE_NAME_, "xDOSCAR::GetProperties()", message, std::cerr, _LOGGER_WARNING_,QUIET);
+          pflow::logger(__AFLOW_FILE__, "xDOSCAR::GetProperties()", message, std::cerr, _LOGGER_WARNING_,QUIET);
           isLSCOUPLING = true;
         }
         lmResolved = !(isLSCOUPLING);  // With 16 columns, it cannot be both
@@ -4756,7 +4756,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
       if (d == (int) ndos) {
         message << "DOSCAR contains more lines than the header suggests." << endl;
         message << "xDOSCAR object may not be properly populated.";
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_oss, _LOGGER_WARNING_,QUIET);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_oss, _LOGGER_WARNING_,QUIET);
         break;
       }
       e = 0;
@@ -4832,7 +4832,7 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if ((d + 1 < (int) ndos) || (e < (int) number_energies)) {  //ME20191010: needs to be d + 1
     //[CO20200404 - OBSOLETE]string function = "xDOSCAR::GetProperties()";
     message << "Broken DOSCAR: not enough lines";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _FILE_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _FILE_ERROR_);
   }
   // fix denergy
   denergy=venergy.at(1)-venergy.at(0);
@@ -4908,8 +4908,8 @@ bool xDOSCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - xDOSCAR::GetProperties: ERROR_flag set in xDOSCAR" << endl;
   if(ERROR_flag){
     message << "ERROR_flag set in xDOSCAR";
-    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-    else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
+    if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
     return FALSE;
   }
   return TRUE;
@@ -4923,18 +4923,18 @@ void xDOSCAR::convertSpinOFF2ON() { //CO20191217
   uint iatom=0,iorbital=0;
 
   //check that it is truly SPIN-OFF
-  if(viDOS.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"viDOS.size()!=1",_INPUT_ERROR_);}; //no conversion needed
+  if(viDOS.size()!=1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"viDOS.size()!=1",_INPUT_ERROR_);}; //no conversion needed
   for(iatom=0;iatom<vDOS.size();iatom++){
     for(iorbital=0;iorbital<vDOS[iatom].size();iorbital++){
-      if(vDOS[iatom][iorbital].size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"vDOS[iatom][iorbital].size()!=1",_INPUT_ERROR_);}; //no conversion needed
+      if(vDOS[iatom][iorbital].size()!=1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"vDOS[iatom][iorbital].size()!=1",_INPUT_ERROR_);}; //no conversion needed
     }
   }
-  if(conduction_band_min.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"conduction_band_min.size()!=1",_INPUT_ERROR_);}; //no conversion needed
-  if(valence_band_max.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"valence_band_max.size()!=1",_INPUT_ERROR_);}; //no conversion needed
-  if(Egap.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Egap!=1",_INPUT_ERROR_);}; //no conversion needed
-  if(Egap_fit.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Egap_fit!=1",_INPUT_ERROR_);}; //no conversion needed
-  if(Egap_type.size()!=1){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Egap_type!=1",_INPUT_ERROR_);}; //no conversion needed
-  if(spin!=0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"spin!=0",_INPUT_ERROR_);}; //no conversion needed
+  if(conduction_band_min.size()!=1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"conduction_band_min.size()!=1",_INPUT_ERROR_);}; //no conversion needed
+  if(valence_band_max.size()!=1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"valence_band_max.size()!=1",_INPUT_ERROR_);}; //no conversion needed
+  if(Egap.size()!=1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Egap!=1",_INPUT_ERROR_);}; //no conversion needed
+  if(Egap_fit.size()!=1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Egap_fit!=1",_INPUT_ERROR_);}; //no conversion needed
+  if(Egap_type.size()!=1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Egap_type!=1",_INPUT_ERROR_);}; //no conversion needed
+  if(spin!=0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"spin!=0",_INPUT_ERROR_);}; //no conversion needed
 
   //copy everything over
   viDOS.push_back(viDOS.back());
@@ -4956,9 +4956,9 @@ void xDOSCAR::addAtomChannel(){  //CO20211124
   if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
 
   string ERROR_out="";
-  if(!checkDOS(ERROR_out)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,ERROR_out,_INDEX_BOUNDS_);} //no conversion needed
+  if(!checkDOS(ERROR_out)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,ERROR_out,_INDEX_BOUNDS_);} //no conversion needed
 
-  uint atoms_size=vDOS.size();if(atoms_size==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"vDOS.size()==0",_INDEX_BOUNDS_);} //no conversion needed
+  uint atoms_size=vDOS.size();if(atoms_size==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"vDOS.size()==0",_INDEX_BOUNDS_);} //no conversion needed
   uint orbital_size=vDOS.front().size();
   uint spin_size=0;if(orbital_size>0){spin_size=vDOS.front().front().size();}
   uint energy_size=0;if(orbital_size>0 && spin_size>0){energy_size=vDOS.front().front().front().size();}
@@ -4981,9 +4981,9 @@ void xDOSCAR::addOrbitalChannel(){  //CO20211124
   if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
 
   string ERROR_out="";
-  if(!checkDOS(ERROR_out)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,ERROR_out,_INDEX_BOUNDS_);} //no conversion needed
+  if(!checkDOS(ERROR_out)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,ERROR_out,_INDEX_BOUNDS_);} //no conversion needed
 
-  uint atoms_size=vDOS.size();if(atoms_size==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"vDOS.size()==0",_INDEX_BOUNDS_);} //no conversion needed
+  uint atoms_size=vDOS.size();if(atoms_size==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"vDOS.size()==0",_INDEX_BOUNDS_);} //no conversion needed
   uint orbital_size=vDOS.front().size();
   uint spin_size=0;if(orbital_size>0){spin_size=vDOS.front().front().size();}
   uint energy_size=0;if(orbital_size>0 && spin_size>0){energy_size=vDOS.front().front().front().size();}
@@ -5069,12 +5069,12 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
     message << "GetProperties(const stringstream&);" << endl;
     message << "GetProperties(const string&);" << endl;
     message << "GetPropertiesFile(const string&);" << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _INPUT_MISSING_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _INPUT_MISSING_);
   }
   if(LDEBUG) {cerr << __AFLOW_FUNC__ << " DOSCAR content found" << endl;}
 
   string error_string="";
-  if(!checkDOS(error_string)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,error_string,_INPUT_ERROR_);};  //quick check if GetProperties() failed
+  if(!checkDOS(error_string)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,error_string,_INPUT_ERROR_);};  //quick check if GetProperties() failed
 
   //this should all work now that we checkDOS()
   uint IENERGY=venergy.size();
@@ -5148,8 +5148,8 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
     if(valence_band_max[ispin]!=AUROSTD_MAX_DOUBLE && conduction_band_min[ispin]==AUROSTD_MAX_DOUBLE){
       //[CO20200404 - OBSOLETE]ERROR = __AFLOW_FUNC__ + " conduction band maximum not found [ispin="+aurostd::utype2string(ispin)+"] \n";
       message << "Conduction band maximum not found [ispin=" << ispin << "]";
-      if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-      else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
+      if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+      else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
     }
   }
 
@@ -5157,7 +5157,7 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
     //[CO20200404 - OBSOLETE]ERROR = __AFLOW_FUNC__ + " E-fermi not found \n";
     //[CO20200404 - OBSOLETE]return false;
     message << " E-fermi not found";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
   }
 
   if(LDEBUG){
@@ -5177,8 +5177,8 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       if(valence_band_max[ispin]>conduction_band_min[ispin]){
         //[CO20200404 - OBSOLETE]ERROR = __AFLOW_FUNC__ + " Negative band gap found in ispin="+aurostd::utype2string(ispin)+", not expected \n";
         message << "Negative band gap found in ispin=" << ispin << ", not expected";
-        if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-        else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
+        if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+        else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
       }
       Egap[ispin]=conduction_band_min[ispin]-valence_band_max[ispin];
       Egap_fit[ispin]=1.348 * Egap[ispin] + 0.913;
@@ -5193,8 +5193,8 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
     }else{
       //[CO20200404 - OBSOLETE]ERROR = __AFLOW_FUNC__ + " valence_band_max/conduction_band_min not found [ispin="+aurostd::utype2string(ispin)+"] \n";
       message << "Valence_band_max/conduction_band_min not found [ispin=" << ispin << "]";
-      if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-      else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
+      if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+      else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
     }
   }
   if(ISPIN==1){
@@ -5213,8 +5213,8 @@ bool xDOSCAR::GetBandGap(double EFERMI,double efermi_tol,double energy_tol,doubl
       if(vbm>cbm){
         //[CO20200404 - OBSOLETE]ERROR = __AFLOW_FUNC__ + " Negative band gap found in net, not expected \n";
         message << "Negative band gap found in net, not expected";
-        if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-        else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
+        if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+        else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);return false;}
       }
       Egap_net=cbm-vbm;
       Egap_fit_net=1.348 * Egap_net + 0.913;
@@ -5249,12 +5249,12 @@ deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(deque<int> num_eac
     message << "       GetProperties(const stringstream&);" << endl;
     message << "       GetProperties(const string&);" << endl;
     message << "       GetPropertiesFile(const string&);";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_);
   }
   if(LDEBUG) {cerr << __AFLOW_FUNC__ << " DOSCAR content found" << endl;}
 
   string error_string=""; //keep this function const for plotter
-  if(!checkDOS(error_string)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,error_string,_INPUT_ERROR_);};  //quick check if GetProperties() failed
+  if(!checkDOS(error_string)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,error_string,_INPUT_ERROR_);};  //quick check if GetProperties() failed
 
   //this should all work now that we checkDOS()
   uint IENERGY=venergy.size();
@@ -5280,7 +5280,7 @@ deque<deque<deque<deque<double> > > > xDOSCAR::GetVDOSSpecies(deque<int> num_eac
   if(atoms_total+1!=IATOM){ //total column
     message << "Input xstructure and DOS mismatch: atoms_total+1!=vDOS.size()" << endl;
     message << "For POCC runs, check that all ARUN.POCC's have the same num_each_type" << endl;
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INDEX_MISMATCH_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INDEX_MISMATCH_);
   }
 
   //create vDOS_species with appropriate dimensions
@@ -5655,8 +5655,8 @@ bool xEIGENVAL::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - xEIGENVAL::GetProperties: ERROR_flag set in xEIGENVAL" << endl;
   if(ERROR_flag){
     message << "ERROR_flag set in xEIGENVAL";
-    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-    else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
+    if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
     return FALSE;
   }
   return TRUE;
@@ -5762,14 +5762,14 @@ bool GetEffectiveMass(xOUTCAR& xoutcar, xDOSCAR& xdoscar, xEIGENVAL& xeigenval, 
   else {
     //[CO20200404 - OBSOLETE]xoutcar.ERROR = "EIGENVAL spin value is neither 0 nor 1."; // probably unnecessary
     message << "EIGENVAL spin value is neither 0 nor 1"; //CO20200404
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_ERROR_); //CO20200404
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_ERROR_); //CO20200404
     return FALSE;
   }
   if(ispin == 1) {
     if(!SPIN_UP) {
       //[CO20200404 - OBSOLETE]xoutcar.ERROR = "Metallic system encountered";
       message << "Metallic system encountered"; //CO20200404
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_ERROR_); //CO20200404
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_ERROR_); //CO20200404
       return FALSE;
     }
   }
@@ -5777,7 +5777,7 @@ bool GetEffectiveMass(xOUTCAR& xoutcar, xDOSCAR& xdoscar, xEIGENVAL& xeigenval, 
     if(!SPIN_UP and !SPIN_DN) {
       //[CO20200404 - OBSOLETE]xoutcar.ERROR = "Metallic system encountered";
       message << "Metallic system encountered"; //CO20200404
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_ERROR_); //CO20200404
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_ERROR_); //CO20200404
       return FALSE;
     }
   }
@@ -6004,7 +6004,7 @@ bool GetEffectiveMass(xOUTCAR& xoutcar, xDOSCAR& xdoscar, xEIGENVAL& xeigenval, 
           if(SINGULAR) {
             //[CO20200404 - OBSOLETE]xoutcar.ERROR = "Singular system: ill-defined matrix problem encountered.";
             message << "Singular system: ill-defined matrix problem encountered."; //CO20200404
-            pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_WARNING_); //CO20200404
+            pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_WARNING_); //CO20200404
             return FALSE;
           }
         }
@@ -6235,7 +6235,7 @@ bool PrintBandGap(string& directory, ostream &oss) {
   if(!ss_outcar_bands.str().length() && aurostd::EFileExist(directory+"/OUTCAR.bands",path_outcar_bands)) aurostd::efile2stringstream(path_outcar_bands, ss_outcar_bands); //CO20200404
   if(!ss_outcar_bands.str().length()) {
     message << "OUTCAR.bands not found"; //CO20200404
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, oss, _LOGGER_WARNING_); //CO20200404
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, oss, _LOGGER_WARNING_); //CO20200404
     //[CO20200404 - OBSOLETE]oss << "WARNING " << __AFLOW_FUNC__ << " OUTCAR.bands not found here: " << directory << endl;
     //[CO20200404 - OBSOLETE]oss << endl;
     //[CO20200404 - OBSOLETE]return FALSE;
@@ -6244,7 +6244,7 @@ bool PrintBandGap(string& directory, ostream &oss) {
   if(!ss_outcar_bands.str().length() && aurostd::EFileExist(directory+"/OUTCAR",path_outcar_bands)) aurostd::efile2stringstream(path_outcar_bands, ss_outcar_bands); //CO20200404
   if(!ss_outcar_bands.str().length()) {  //CO20200404
     message << "OUTCAR not found"; //CO20200404
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, oss, _LOGGER_ERROR_); //CO20200404
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, oss, _LOGGER_ERROR_); //CO20200404
     return FALSE;
   }
 
@@ -6256,7 +6256,7 @@ bool PrintBandGap(string& directory, ostream &oss) {
   //CO20171002 - using tolerance from symmetry calc - STOP
 
   if(!xoutcar_bands.GetProperties(ss_outcar_bands)){
-    //[CO20200404 - OBSOLETE]pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, xoutcar_bands.ERROR, oss, _LOGGER_ERROR_); //CO20200404
+    //[CO20200404 - OBSOLETE]pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, xoutcar_bands.ERROR, oss, _LOGGER_ERROR_); //CO20200404
     //[CO20200404 - OBSOLETE]oss << "WARNING " << __AFLOW_FUNC__ << " " << xoutcar_bands.ERROR << endl << "   filename=[" << path_outcar_bands << "]" << endl;
     //[CO20200404 - OBSOLETE]oss << endl;
     return FALSE;
@@ -6264,7 +6264,7 @@ bool PrintBandGap(string& directory, ostream &oss) {
   //try to grab xstr from OUTCAR
   if(!xoutcar_bands.GetXStructure()){
     if(!aurostd::FileExist(directory+"/POSCAR.bands",path_POSCAR) && !aurostd::EFileExist(directory+"/POSCAR.bands",path_POSCAR)) {
-      //[CO20200404 - OBSOLETE]pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, xoutcar_bands.ERROR, oss, _LOGGER_ERROR_); //CO20200404
+      //[CO20200404 - OBSOLETE]pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, xoutcar_bands.ERROR, oss, _LOGGER_ERROR_); //CO20200404
       //[CO20200404 - OBSOLETE]oss << "WARNING " << __AFLOW_FUNC__ << " " << xoutcar_bands.ERROR << endl << "   filename=[" << path_outcar_bands << "]" << endl;
       //[CO20200404 - OBSOLETE]oss << endl;
       return FALSE;
@@ -6279,7 +6279,7 @@ bool PrintBandGap(string& directory, ostream &oss) {
   //[CO20200404 - OBSOLETE]if(!aurostd::FileExist(directory+"/OUTCAR.static",path_outcar_static) && !aurostd::EFileExist(directory+"/OUTCAR.static",path_outcar_static))
   if(!aurostd::EFileExist(directory+"/OUTCAR.static",path_outcar_static)){
     message << "OUTCAR.static not found, defaulting E-Fermi to that found in OUTCAR.bands";  //CO20200404
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, oss, _LOGGER_WARNING_); //CO20200404
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, oss, _LOGGER_WARNING_); //CO20200404
     //[CO20200404 - OBSOLETE]oss << "WARNING " << __AFLOW_FUNC__ << " OUTCAR.static not found here: " << directory << endl;
     //[CO20200404 - OBSOLETE]oss << "WARNING " << __AFLOW_FUNC__ << " Defaulting E-Fermi to that found in OUTCAR.bands" << endl;
     //[CO20200404 - OBSOLETE]oss << endl;
@@ -6290,7 +6290,7 @@ bool PrintBandGap(string& directory, ostream &oss) {
     if(!xoutcar_static.GetProperties(ss_outcar_static)){
       //[CO20200404 - OBSOLETE]message << xoutcar_bands.ERROR << endl;  //CO20200404
       message << "Defaulting E-Fermi to that found in OUTCAR.bands"; //CO20200404
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, oss, _LOGGER_WARNING_); //CO20200404
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, oss, _LOGGER_WARNING_); //CO20200404
       //[CO20200404 - OBSOLETE]oss << "WARNING " << __AFLOW_FUNC__ << " " << xoutcar_static.ERROR << endl << "   filename=[" << path_outcar_static << "]" << endl;
       //[CO20200404 - OBSOLETE]oss << "WARNING " << __AFLOW_FUNC__ << " Defaulting E-Fermi to that found in OUTCAR.bands" << endl;
       //[CO20200404 - OBSOLETE]oss << endl;
@@ -6302,7 +6302,7 @@ bool PrintBandGap(string& directory, ostream &oss) {
   }
 
   if(!xoutcar_bands.GetBandGap(EFERMI)){
-    //[CO20200404 - OBSOLETE]pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, xoutcar_bands.ERROR, oss, _LOGGER_ERROR_); //CO20200404
+    //[CO20200404 - OBSOLETE]pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, xoutcar_bands.ERROR, oss, _LOGGER_ERROR_); //CO20200404
     //[CO20200404 - OBSOLETE]oss << "WARNING " << __AFLOW_FUNC__ << " " << xoutcar_bands.ERROR << endl << "   filename=[" << path_outcar_bands << "]" << endl;
     //[CO20200404 - OBSOLETE]oss << endl;
     return FALSE;
@@ -6386,7 +6386,7 @@ bool PrintBandGap_DOS(string& directory, ostream &oss) { //CO20191110
   if(!ss_doscar_static.str().length() && aurostd::EFileExist(directory+"/DOSCAR.static",path_doscar_static)) aurostd::efile2stringstream(path_doscar_static, ss_doscar_static); //CO20200404
   if(!ss_doscar_static.str().length()) {
     message << "DOSCAR.static not found";  //CO20200404
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, oss, _LOGGER_WARNING_); //CO20200404
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, oss, _LOGGER_WARNING_); //CO20200404
     //[CO20200404 - OBSOLETE]oss << "ERROR " << __AFLOW_FUNC__ << " DOSCAR.static not found here: " << directory << endl;
     //[CO20200404 - OBSOLETE]oss << endl;
     //[CO20200404 - OBSOLETE]return FALSE;
@@ -6395,19 +6395,19 @@ bool PrintBandGap_DOS(string& directory, ostream &oss) { //CO20191110
   if(!ss_doscar_static.str().length() && aurostd::EFileExist(directory+"/DOSCAR",path_doscar_static)) aurostd::efile2stringstream(path_doscar_static, ss_doscar_static);  //CO20200404
   if(!ss_doscar_static.str().length()) { //CO20200404
     message << "DOSCAR not found"; //CO20200404
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, oss, _LOGGER_ERROR_); //CO20200404
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, oss, _LOGGER_ERROR_); //CO20200404
     return FALSE;
   }
 
   xDOSCAR xdoscar;
   if(!xdoscar.GetProperties(ss_doscar_static)){
-    //[CO20200404 - OBSOLETE]pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, xdoscar.ERROR, oss, _LOGGER_ERROR_); //CO20200404
+    //[CO20200404 - OBSOLETE]pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, xdoscar.ERROR, oss, _LOGGER_ERROR_); //CO20200404
     //[CO20200404 - OBSOLETE]oss << "ERROR " << __AFLOW_FUNC__ << " " << xdoscar.ERROR << endl << "   filename=[" << path_doscar_static << "]" << endl;
     //[CO20200404 - OBSOLETE]oss << endl;
     return FALSE;
   }
   if(!xdoscar.GetBandGap()){ //use EFERMI of doscar.static (most accurate)
-    //[CO20200404 - OBSOLETE]pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, xdoscar.ERROR, oss, _LOGGER_ERROR_); //CO20200404
+    //[CO20200404 - OBSOLETE]pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, xdoscar.ERROR, oss, _LOGGER_ERROR_); //CO20200404
     //[CO20200404 - OBSOLETE]oss << "ERROR " << __AFLOW_FUNC__ << " " << xdoscar.ERROR << endl << "   filename=[" << path_doscar_static << "]" << endl;
     //[CO20200404 - OBSOLETE]oss << endl;
     return FALSE;
@@ -6732,7 +6732,7 @@ bool PrintEigCurv(string& directory, ostream &oss) {
     oss << endl ;
     //[CO20200404 - OBSOLETE]xoutcar.ERROR = "Material is metallic." ;
     message << "Material is metallic";  //CO20200404
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, oss, _LOGGER_WARNING_); //CO20200404
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, oss, _LOGGER_WARNING_); //CO20200404
     return FALSE ;
   }
   return TRUE ;
@@ -7516,7 +7516,7 @@ bool IBZextrema(xEIGENVAL& xeigenval,
             }
             //ME20200724 - there used to be an exit here without comment or explanation
             string message = "branches.at(itr0).at(itr1)[1] > branches.at(itr0).at(itr1)[2])";
-            throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message);
+            throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message);
           } else if(branches.at(itr0).at(itr1)[1] < branches.at(itr0).at(itr1)[2]) {
             for(int itr2=branches.at(itr0).at(itr1)[1]+2; itr2<=branches.at(itr0).at(itr1)[2]-2; itr2++) {
               ndxvec[1] = itr2-2 ;
@@ -8124,7 +8124,7 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(vline.size()==0) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - " << __AFLOW_FUNC__ << " wrong number of \"EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX\" in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;
     message << "Wrong number of \"EATOM RCORE RWIGS EAUG RAUG ENMAX ENMIN POMASS ZVAL RMAX\" in POTCAR" << "   filename=[" << filename << "]" << endl;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   }
   for(uint j=0;j<vline.size();j++) {
@@ -8214,43 +8214,43 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(vTITEL.size()==0) {
     //[CO20200404 - OBSOLETE]if(!QUIET) cerr << "WARNING - " << __AFLOW_FUNC__ << " wrong number of pseudopotentials (TITEL) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;
     message << "Wrong number of pseudopotentials (TITEL) in POTCAR" << "   filename=[" << filename << "]" << endl;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   } //CO20200106 - patching for auto-indenting
   if(vLEXCH.size()==0) {
     //[CO20200604 - OBSOLETE]if(!QUIET) cerr << "WARNING - " << __AFLOW_FUNC__ << " wrong number of pseudopotentials (LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;
     message << "Wrong number of pseudopotentials (LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   } //CO20200106 - patching for auto-indenting
   if(vEATOM.size()==0) {
     //[CO20200604 - OBSOLETE]if(!QUIET) cerr << "WARNING - " << __AFLOW_FUNC__ << " wrong number of pseudopotentials (EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;
     message << "Wrong number of pseudopotentials (EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   } //CO20200106 - patching for auto-indenting
   if(vRMAX.size()==0) {
     //[CO20200604 - OBSOLETE]if(!QUIET) cerr << "WARNING - " << __AFLOW_FUNC__ << " wrong number of pseudopotentials (RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;
     message << "Wrong number of pseudopotentials (RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   }   //CO20200106 - patching for auto-indenting
   if(vTITEL.size()!=vLEXCH.size()) {
     //[CO20200604 - OBSOLETE]if(!QUIET) cerr << "WARNING - " << __AFLOW_FUNC__ << " wrong number of pseudopotentials (TITEL/LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;
     message << "Wrong number of pseudopotentials (TITEL/LEXCH) in POTCAR" << "   filename=[" << filename << "]" << endl;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   } //CO20200106 - patching for auto-indenting
   if(vLEXCH.size()!=vEATOM.size()) {
     //[CO20200604 - OBSOLETE]if(!QUIET) cerr << "WARNING - " << __AFLOW_FUNC__ << " wrong number of pseudopotentials (LEXCH/EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;
     message << "Wrong number of pseudopotentials (LEXCH/EATOM) in POTCAR" << "   filename=[" << filename << "]" << endl;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   } //CO20200106 - patching for auto-indenting
   if(vEATOM.size()!=vRMAX.size()) {
     //[CO20200604 - OBSOLETE]if(!QUIET) cerr << "WARNING - " << __AFLOW_FUNC__ << " wrong number of pseudopotentials (EATOM/RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;ERROR_flag=TRUE;
     message << "Wrong number of pseudopotentials (EATOM/RMAX) in POTCAR" << "   filename=[" << filename << "]" << endl;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
     ERROR_flag=TRUE;
   }   //CO20200106 - patching for auto-indenting
 
@@ -8378,8 +8378,8 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - " << __AFLOW_FUNC__ << " ERROR_flag set in xPOTCAR" << endl;
   if(ERROR_flag){
     message << "ERROR_flag set in xPOTCAR";
-    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-    else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
+    if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
     return FALSE;
   }
   return TRUE;
@@ -8527,7 +8527,7 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         } else {
           //[CO20200604 - OBSOLETE]if(!QUIET) cerr << __AFLOW_FUNC__ << " error in QM FORCES calculation" << endl;
           message << "Error in QM FORCES calculation" << endl;
-          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
           ERROR_flag=TRUE;
         }
       }
@@ -8561,7 +8561,7 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           } else {
             //[CO20200604 - OBSOLETE]if(!QUIET) cerr << __AFLOW_FUNC__ << " error in QM KPOINTLIST calculation" << endl;
             message << "Error in QM KPOINTLIST calculation" << endl;
-            pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+            pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
             ERROR_flag=TRUE;
           }
         }
@@ -8591,7 +8591,7 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
           } else {
             //[CO20200604 - OBSOLETE]if(!QUIET) cerr << __AFLOW_FUNC__ << " error in QM WEIGHTS calculation" << endl;
             message << "Error in QM WEIGHTS calculation" << endl;
-            pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+            pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
             ERROR_flag=TRUE;
           }
         }
@@ -8618,7 +8618,7 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         } else {
           //[CO20200604 - OBSOLETE]if(!QUIET) cerr << __AFLOW_FUNC__ << " error in QM STRESS calculation" << endl;
           message << "Error in QM STRESS calculation" << endl;
-          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
           ERROR_flag=TRUE;
         }
       }
@@ -8635,8 +8635,8 @@ bool xVASPRUNXML::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   //[CO20200604 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << XPID << "WARNING - " << __AFLOW_FUNC__ << " ERROR_flag set in xVASPRUNXML" << endl;
   if(ERROR_flag){
     message << "ERROR_flag set in xVASPRUNXML";
-    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-    else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
+    if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
     return FALSE;
   }
   return TRUE;
@@ -8687,7 +8687,7 @@ bool xVASPRUNXML::GetForces(stringstream& stringstreamIN, bool QUIET) {
           //[CO20200404 - OBSOLETE]if (!QUIET) cerr << XPID << "xVASPRUNXML::GetForces: error in QM FORCES calculation" << endl;
           //[CO20200404 - OBSOLETE]return false;
           message << "Error in QM FORCES calculation" << endl;
-          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
           ERROR_flag=TRUE;
         }
       }
@@ -8699,8 +8699,8 @@ bool xVASPRUNXML::GetForces(stringstream& stringstreamIN, bool QUIET) {
   //[CO20200404 - OBSOLETE]return false;
   if(ERROR_flag){
     message << "ERROR_flag set: forces not found";
-    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-    else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
+    if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
     return FALSE;
   }
   return false; //catch all false
@@ -8843,7 +8843,7 @@ bool xIBZKPT::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
         } else {
           //[CO20200604 - OBSOLETE]if(!QUIET) cerr << __AFLOW_FUNC__ << " error in QM NWEIGHTS/VKPOINT calculation" << endl;
           message << "Error in QM NWEIGHTS/VKPOINT calculation" << endl;
-          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_,QUIET);
           ERROR_flag=TRUE;
         }
       }
@@ -8901,8 +8901,8 @@ bool xIBZKPT::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   //[CO20200604 - OBSOLETE]if(ERROR_flag) return FALSE;
   if(ERROR_flag){
     message << "ERROR_flag set in xIBZKPT";
-    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-    else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
+    if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
     return FALSE;
   }
   return TRUE;
@@ -9159,8 +9159,8 @@ bool xKPOINTS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   //[CO20200404 - OBSOLETE]if(ERROR_flag) return FALSE;
   if(ERROR_flag){
     message << "ERROR_flag set in xKPOINTS";
-    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-    else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
+    if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
     return FALSE;
   }
   return TRUE;
@@ -9413,8 +9413,8 @@ bool xCHGCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   //[CO20200404 - OBSOLETE]if(ERROR_flag) return FALSE;
   if(ERROR_flag){
     message << "ERROR_flag set in xCHGCAR";
-    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-    else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
+    if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
     return FALSE;
   }
   return TRUE;
@@ -9539,7 +9539,7 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
         aurostd::string2tokens(vcontent[iline],tokens,"=");
         if(tokens.size()){aurostd::string2tokens(tokens[1],tokens2," ");}
         if(tokens2.size()){
-          if(!aurostd::isfloat(tokens2[0])){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"H_atom input cannot be parsed (!isfloat)",_INPUT_ERROR_);}
+          if(!aurostd::isfloat(tokens2[0])){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"H_atom input cannot be parsed (!isfloat)",_INPUT_ERROR_);}
           if(inside_relax){H_atom_relax=aurostd::string2utype<double>(tokens2[0]);}
           else if(inside_static){H_atom_static=aurostd::string2utype<double>(tokens2[0]);}
         }
@@ -9560,11 +9560,11 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
               if(aurostd::isfloat(tokens[i+2])){
                 vforces.back()[i]=aurostd::string2utype<double>(tokens[i+2]);
               } else {
-                throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Expected force input to be a number",_FILE_CORRUPT_);
+                throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Expected force input to be a number",_FILE_CORRUPT_);
               }
             }
           } else {
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Unexpected count of force components",_FILE_CORRUPT_);
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unexpected count of force components",_FILE_CORRUPT_);
           }
         }
       }
@@ -9580,8 +9580,8 @@ bool xQMVASP::GetProperties(const stringstream& stringstreamIN,bool QUIET) { //C
   //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - " << __AFLOW_FUNC__ << " ERROR_flag set in xQMVASP" << endl;
   if(ERROR_flag){
     message << "ERROR_flag set in xQMVASP";
-    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-    else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
+    if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
     return FALSE;
   }
   return TRUE;
@@ -9722,7 +9722,7 @@ bool xPLASMONICS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
     aurostd::string2tokens(vlines[iline],vtokens," ");
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " vtokens=" << aurostd::joinWDelimiter(vtokens,"|") << endl;}
     //there should be 5 columns
-    if(vtokens.size()!=5){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"vcols!=5 (="+aurostd::utype2string(vtokens.size())+")",_FILE_NOT_FOUND_);}
+    if(vtokens.size()!=5){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"vcols!=5 (="+aurostd::utype2string(vtokens.size())+")",_FILE_NOT_FOUND_);}
     //The file has 5 columns:
     //column1 = energy (eV)
     //column2 = do not consider this
@@ -9745,8 +9745,8 @@ bool xPLASMONICS::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   //[CO20200404 - OBSOLETE]if(ERROR_flag && !QUIET) cerr << "WARNING - " << __AFLOW_FUNC__ << " ERROR_flag set in xPLASMONICS" << endl;
   if(ERROR_flag){
     message << "ERROR_flag set in xPLASMONICS";
-    if(force_exit){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
-    else{pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
+    if(force_exit){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);}
+    else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_,QUIET);}
     return FALSE;
   }
   return TRUE;

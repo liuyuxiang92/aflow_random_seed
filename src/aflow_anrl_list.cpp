@@ -10121,7 +10121,7 @@ namespace anrl {
           for(uint i=0;i<vparameters.size();i++){
             message << "  " << anrl_label << "-" << std::setw(3) << std::setfill('0') << i+1 << " : " << vparameters[i] << endl;
           }
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _VALUE_RANGE_); //DX 20191118 - exit to throw
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _VALUE_RANGE_); //DX 20191118 - exit to throw
         }
       }
       else if((library=="" && choice==-1) || (vparameters.size() && (library=="part1" || library=="part2" || library=="misc"))){
@@ -10135,7 +10135,7 @@ namespace anrl {
           message << "  " << anrl_label << "-" << std::setw(3) << std::setfill('0') << i+1 << " : " << vparameters[i] << endl;
         }
         message << "Rerun command and specify the parameters or the preset suffix, e.g., aflow --proto=" << anrl_label << "-" << std::setw(3) << std::setfill('0') << 1; //DX 20190826 - changed "./aflow" to "aflow"
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _VALUE_ERROR_); //DX 20191118 - exit to throw
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _VALUE_ERROR_); //DX 20191118 - exit to throw
       }
     }
     return vparameters;  

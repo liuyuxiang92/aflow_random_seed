@@ -91,7 +91,7 @@ namespace AFLOW_PTHREADS {
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " multi_sh=" << multi_sh << endl;
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " AFLOW_PTHREADS::MAX_PTHREADS=" << AFLOW_PTHREADS::MAX_PTHREADS << endl;
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " AFLOW_PTHREADS::FLAG=" << AFLOW_PTHREADS::FLAG << endl;
-    //  if(LDEBUG) throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_); // for debug
+    //  if(LDEBUG) throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_); // for debug
     return AFLOW_PTHREADS::FLAG;
   }
 } // namespace AFLOW_PTHREADS
@@ -215,15 +215,15 @@ namespace KBIN {
     int ithread=aflags.AFLOW_PTHREADS_NUMBER;
     if(ithread<0) {
       message << "ithread<0  ithread=" << ithread;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INDEX_BOUNDS_);
     }
     if(ithread>=MAX_ALLOCATABLE_PTHREADS) {
       message << "ithread>=MAX_ALLOCATABLE_PTHREADS  ithread=" << ithread;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INDEX_BOUNDS_);
     }
     if(ithread>=AFLOW_PTHREADS::MAX_PTHREADS) {
       message << "ithread>=AFLOW_PTHREADS::MAX_PTHREADS  ithread=" << ithread;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INDEX_BOUNDS_);
     }
     taflags[ithread]=aflags;
     params[ithread].paflags=&taflags[ithread];
@@ -283,15 +283,15 @@ namespace KBIN {
     int ithread=aflags.AFLOW_PTHREADS_NUMBER;
     if(ithread<0) {
       message << "ithread<0  ithread=" << ithread;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INDEX_BOUNDS_);
     }
     if(ithread>=MAX_ALLOCATABLE_PTHREADS) {
       message << "ithread>=MAX_ALLOCATABLE_PTHREADS  ithread=" << ithread;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INDEX_BOUNDS_);
     }
     if(ithread>=AFLOW_PTHREADS::MAX_PTHREADS) {
       message << "ithread>=AFLOW_PTHREADS::MAX_PTHREADS  ithread=" << ithread;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INDEX_BOUNDS_);
     }
     taflags[ithread]=aflags;
     params[ithread].paflags=&taflags[ithread];
@@ -316,8 +316,8 @@ namespace AFLOW_PTHREADS {
     AFLOW_PTHREADS::FLAG=TRUE;
     AFLOW_PTHREADS::MAX_PTHREADS=PTHREAD_DEFAULT; // safety...
 
-    if(!aurostd::FileExist(file_name)) {message << "FILE_NOT_FOUND = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);}
-    if( aurostd::FileEmpty(file_name)) {message << "FILE_EMPTY = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_CORRUPT_);}
+    if(!aurostd::FileExist(file_name)) {message << "FILE_NOT_FOUND = " << file_name; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);}
+    if( aurostd::FileEmpty(file_name)) {message << "FILE_EMPTY = " << file_name; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_CORRUPT_);}
     aus << "MMMMM Loading File = " << file_name << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
     vector<string> vcmds;
     vcmds.clear();
@@ -410,7 +410,7 @@ namespace AFLOW_PTHREADS {
     }
     if(!AFLOW_PTHREADS::MULTISH_TIMESHARING_SEQUENTIAL_ && !AFLOW_PTHREADS::MULTISH_TIMESHARING_CONCURRENT_) {
       message << "You must specify MULTISH_TIMESHARING_SEQUENTIAL_ of MULTISH_TIMESHARING_CONCURRENT_";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_MISSING_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_MISSING_);
     }
     return NULL;
   }
@@ -429,8 +429,8 @@ namespace AFLOW_PTHREADS {
     //  bool free_thread;int ithread=0;
     bool VERBOSE=FALSE;
 
-    if(!aurostd::FileExist(file_name)) {message << "FILE_NOT_FOUND = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);}
-    if( aurostd::FileEmpty(file_name)) {message << "FILE_EMPTY = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_CORRUPT_);}
+    if(!aurostd::FileExist(file_name)) {message << "FILE_NOT_FOUND = " << file_name; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);}
+    if( aurostd::FileEmpty(file_name)) {message << "FILE_EMPTY = " << file_name; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_CORRUPT_);}
     if(VERBOSE) {aus << "MMMMM  Loading File = " << file_name << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}
     vector<string> vcmds;vcmds.clear();
     aurostd::file2vectorstring(file_name,vcmds);
@@ -538,8 +538,8 @@ namespace AFLOW_PTHREADS {
     if(XHOST.vflag_control.flag("FILE")) {
       string file_name=XHOST.vflag_control.getattachedscheme("FILE");
       // if(file_name.empty() || file_name=="--f") file_name=argv.at(argv.size()-1);
-      if(!aurostd::FileExist(file_name)) {message << "FILE_NOT_FOUND = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);}
-      if( aurostd::FileEmpty(file_name)) {message << "FILE_EMPTY = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_CORRUPT_);}
+      if(!aurostd::FileExist(file_name)) {message << "FILE_NOT_FOUND = " << file_name; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);}
+      if( aurostd::FileEmpty(file_name)) {message << "FILE_EMPTY = " << file_name; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_CORRUPT_);}
       if(VERBOSE) {aus << "MMMMM  Loading File = " << file_name << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);}
       aurostd::file2vectorstring(file_name,vdirs);
     }
@@ -569,13 +569,13 @@ namespace AFLOW_PTHREADS {
       }
       //    cerr << vdirs.at(i) << endl;
     }
-    //  cerr << vdirs.size() << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //  cerr << vdirs.size() << endl; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
     uint size=aurostd::args2attachedutype<uint>(argv,"--size=",(int) (100));if(size<=0) size=1;
     string prefix=aurostd::args2attachedstring(argv,"--prefix=",(string) "m");
     bool flag_ADD=aurostd::args2flag(argv,"--add");
 
-    //  cerr << prefix << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //  cerr << prefix << endl; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
     // delete POTCARs and AECCARs    
     vector<string> vremove;
@@ -623,7 +623,7 @@ namespace AFLOW_PTHREADS {
         tmpfile=aurostd::TmpFileCreate("multi_zip");vtmpfiles.push_back(tmpfile);
         if(LDEBUG){cerr << __AFLOW_FUNC__ << " tmpfile[izip=" << izip << "]=" << tmpfile << endl;}
         aurostd::vectorstring2file(vdirs2tmp,tmpfile);
-        if(aurostd::FileEmpty(tmpfile)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Tmp file empty: "+tmpfile,_FILE_CORRUPT_);}
+        if(aurostd::FileEmpty(tmpfile)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Tmp file empty: "+tmpfile,_FILE_CORRUPT_);}
         aurostd::StringstreamClean(zero_padding);
         zero_padding << std::setfill('0') << std::setw(aurostd::getZeroPadding(numzips)) << izip+ishift;
         zip_name=prefix+"_"+zero_padding.str()+"_of_"+aurostd::utype2string(numzips)+".zip"; //SC20200303 //CO20211103
@@ -670,8 +670,8 @@ namespace AFLOW_PTHREADS {
     for(i=0;i<vcommands.size();i++){cerr << __AFLOW_FUNC__ << " vcommands[i=" << i << "]=\"" << vcommands[i] << "\"" << endl;}
     cerr << __AFLOW_FUNC__ << " last command=\"" << command.str() << "\"" << endl; //sanity check that we didn't leave anything out
 
-    //[CO20211104 - OBSOLETE]// cerr << numzips << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
-    //[CO20211104 - OBSOLETE]// cerr << sysconf(_SC_ARG_MAX)  << endl;//throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //[CO20211104 - OBSOLETE]// cerr << numzips << endl; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //[CO20211104 - OBSOLETE]// cerr << sysconf(_SC_ARG_MAX)  << endl;//throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
     //[CO20211104 - OBSOLETE]for(i=0;i<(uint) numzips;i++) {
     //[CO20211104 - OBSOLETE]  command="zip -0rmv "+prefix; //SC20200303  //CO20211103
     //[CO20211104 - OBSOLETE]  if(numzips>1){command+="_"+aurostd::utype2string(i+ishift)+"_of_"+aurostd::utype2string(numzips);} //SC20200303 //CO20211103
@@ -698,12 +698,12 @@ namespace AFLOW_PTHREADS {
 
     aurostd::RemoveFile(vtmpfiles); //CO20211104
 
-    if(!aurostd::IsCommandAvailable("md5sum")){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"md5sum not available",_RUNTIME_ERROR_);}
+    if(!aurostd::IsCommandAvailable("md5sum")){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"md5sum not available",_RUNTIME_ERROR_);}
     string md5sum="";
     for(i=0;i<vzip_names.size();i++){ //CO20220207 - rename zip to include _MD5SUM.zip
-      if(!aurostd::FileExist(vzip_names[i])){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"zip file does not exist: "+vzip_names[i],_FILE_CORRUPT_);}
+      if(!aurostd::FileExist(vzip_names[i])){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"zip file does not exist: "+vzip_names[i],_FILE_CORRUPT_);}
       md5sum=aurostd::file2md5sum(vzip_names[i]);
-      if(md5sum.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"md5sum returned empty-string for file: \""+vzip_names[i]+"\"",_RUNTIME_ERROR_);}
+      if(md5sum.empty()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"md5sum returned empty-string for file: \""+vzip_names[i]+"\"",_RUNTIME_ERROR_);}
       zip_name_new=vzip_names[i];
       aurostd::StringSubst(zip_name_new,".zip","_"+md5sum+".zip");
       aurostd::file2file(vzip_names[i],zip_name_new);
@@ -867,8 +867,8 @@ namespace AFLOW_PTHREADS {
     if(file_name.empty() || file_name=="--f") file_name=argv.at(argv.size()-1);
     bool VERBOSE=FALSE;
 
-    if(!aurostd::FileExist(file_name)) {message << "FILE_NOT_FOUND = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);}
-    if( aurostd::FileEmpty(file_name)) {message << "FILE_EMPTY = " << file_name; throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_FILE_CORRUPT_);}
+    if(!aurostd::FileExist(file_name)) {message << "FILE_NOT_FOUND = " << file_name; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_NOT_FOUND_);}
+    if( aurostd::FileEmpty(file_name)) {message << "FILE_EMPTY = " << file_name; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_FILE_CORRUPT_);}
     aus << "MMMMM Loading File = " << file_name << endl;aurostd::PrintMessageStream(aus,XHOST.QUIET);
     vector<string> vcmds;
     vcmds.clear();
@@ -990,7 +990,7 @@ namespace sflow {
     }
 
     if(LDEBUG) cerr << __AFLOW_FUNC__ << " END" << endl;
-    //throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
   }  
 } // namespace sflow
 

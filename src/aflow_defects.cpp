@@ -121,10 +121,10 @@ bool GetSphereFromFourPoints(xvector<double>& orig,double& radius,
   orig[3]= (M14/M11)/2.0;
   radius=sqrt(orig[1]*orig[1]+orig[2]*orig[2]+orig[3]*orig[3]-M15/M11);
 
-  double d1=modulus(v1-orig);if(d1<radius-eps || d1>radius+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Sphere Error [d1]",_RUNTIME_ERROR_);} //CO20200624
-  double d2=modulus(v2-orig);if(d2<radius-eps || d2>radius+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Sphere Error [d2]",_RUNTIME_ERROR_);} //CO20200624
-  double d3=modulus(v3-orig);if(d3<radius-eps || d3>radius+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Sphere Error [d3]",_RUNTIME_ERROR_);} //CO20200624
-  double d4=modulus(v4-orig);if(d4<radius-eps || d4>radius+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Sphere Error [d4]",_RUNTIME_ERROR_);} //CO20200624
+  double d1=modulus(v1-orig);if(d1<radius-eps || d1>radius+eps) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Sphere Error [d1]",_RUNTIME_ERROR_);} //CO20200624
+  double d2=modulus(v2-orig);if(d2<radius-eps || d2>radius+eps) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Sphere Error [d2]",_RUNTIME_ERROR_);} //CO20200624
+  double d3=modulus(v3-orig);if(d3<radius-eps || d3>radius+eps) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Sphere Error [d3]",_RUNTIME_ERROR_);} //CO20200624
+  double d4=modulus(v4-orig);if(d4<radius-eps || d4>radius+eps) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Sphere Error [d4]",_RUNTIME_ERROR_);} //CO20200624
   return TRUE;
 }
 
@@ -181,7 +181,7 @@ bool EmptySphere(const deque<_atom>& grid_atoms,const xvector<double>& origin_cp
 }
 
 bool EmptySphere(const xstructure& str,const xvector<double>& origin_cpos,const double& radius) {
-  if(!str.grid_atoms_calculated) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"EmptySphere():","str.grid_atoms must be calculated",_INPUT_MISSING_);} //CO20200624
+  if(!str.grid_atoms_calculated) {throw aurostd::xerror(__AFLOW_FILE__,"EmptySphere():","str.grid_atoms must be calculated",_INPUT_MISSING_);} //CO20200624
   return EmptySphere(str.grid_atoms,origin_cpos,radius);
 }
 
@@ -203,7 +203,7 @@ uint CoordinationPoint(const deque<_atom>& atoms,deque<_atom>& ratoms,const xvec
 }
 
 uint CoordinationPoint(const xstructure& str,deque<_atom>& ratoms,const xvector<double>& point,const double& rmin,const double& rmax) {
-  if(!str.grid_atoms_calculated) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"CoordinationPoint():","str.grid_atoms must be calculated",_INPUT_MISSING_);} //CO20200624
+  if(!str.grid_atoms_calculated) {throw aurostd::xerror(__AFLOW_FILE__,"CoordinationPoint():","str.grid_atoms must be calculated",_INPUT_MISSING_);} //CO20200624
   return CoordinationPoint(str.grid_atoms,ratoms,point,rmin,rmax);
 }
 
