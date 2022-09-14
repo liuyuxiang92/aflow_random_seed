@@ -148,6 +148,11 @@ using std::vector;
 #define AUROSTD_MAX_DOUBLE std::numeric_limits<double>::max()
 #endif
 
+//SD20220914
+#ifndef AUROSTD_MAX_SIZET
+#define AUROSTD_MAX_SIZET std::numeric_limits<size_t>::max()
+#endif
+
 //CO20180101 - stream2stream modes
 #ifndef DEFAULT_STREAM
 #define DEFAULT_STREAM 'D'
