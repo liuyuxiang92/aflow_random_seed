@@ -989,15 +989,14 @@ namespace apl {
 
   void PathBuilder::transform(const aurostd::xmatrix<double>& m) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="PathBuilder::transform():";
     if(LDEBUG){
       cerr << "PathBuilder::transform():" << " matrix:" << std::endl;
       cerr << m;
     }
     for(uint i = 0; i < _points.size(); i++) {
-      if(LDEBUG){cerr << soliloquy << " IN: " << _labels[i] << ": " << _points[i] << std::endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " IN: " << _labels[i] << ": " << _points[i] << std::endl;}
       _points[i] = m * _points[i];
-      if(LDEBUG){cerr << soliloquy << " OUT: " << _labels[i] << ": " << _points[i] << std::endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " OUT: " << _labels[i] << ": " << _points[i] << std::endl;}
     }
   }
 
@@ -1035,7 +1034,6 @@ namespace apl {
 
   void PathBuilder::defineCustomPoints(const string& coords,const string& labels,const Supercell& sc,bool CARTESIAN_COORDS){ //CO20180409
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="PathBuilder::defineCustomPoints():";
     string message = "";
     vector<string> vcoords,vlabels;
     vector<double> coordinate;
@@ -1046,25 +1044,25 @@ namespace apl {
       //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); No input coordinates found");
       message = "No input coordinates found";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INPUT_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
     }
     if(vlabels.empty()){
       //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); No input labels found");
       message = "No input labels found";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INPUT_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
     }
     if(vcoords.size()!=vlabels.size()){
       //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); Size of input coordinates does not match size of input labels");
       message = "Size of input coordinates does not match size of input labels";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INPUT_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
     }
     if(vcoords.size()<2){
       //ME20191031 - use xerror
       //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); Path size should include at least two points");
       message = "Path size should include at least two points";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INPUT_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
     }
 
     for(uint i=0;i<vcoords.size();i++){
@@ -1073,9 +1071,9 @@ namespace apl {
         //ME20191031 - use xerror
         //throw APLRuntimeError("apl::PathBuilder::defineCustomPoints(); Input coordinate["+aurostd::utype2string(i)+"] is not dimension==3");
         message = "Input coordinate["+aurostd::utype2string(i)+"] is not dimension==3";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INPUT_ERROR_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ERROR_);
       }
-      if(LDEBUG){cerr << soliloquy << " found point " << vlabels[i] << ": (" << (CARTESIAN_COORDS?"cartesian":"fractional") << ") " << coordinate[0] << "," << coordinate[1] << "," << coordinate[2] << std::endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " found point " << vlabels[i] << ": (" << (CARTESIAN_COORDS?"cartesian":"fractional") << ") " << coordinate[0] << "," << coordinate[1] << "," << coordinate[2] << std::endl;}
       addPoint(vlabels[i],3,coordinate[0],coordinate[1],coordinate[2]);
     }
 

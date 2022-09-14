@@ -327,10 +327,9 @@ namespace SYM {
 
     // ---------------------------------------------------------------------------
     // error
-    string function_name = XPID + "SYM::spacegroup2latticeAndCentering():";
     stringstream message;
     message << "Could not classify space group into a Bravais lattice (most likely ranges are incorrect).";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
 
   }
 }
@@ -506,7 +505,6 @@ namespace SYM {
 // ******************************************************************************
 namespace SYM {
   vector<double> ExtractLatticeParametersFromWyccar(const vector<string>& wyccar_ITC){ //DX20191030 - added const
-    string function_name = XPID + "SYM::ExtractLatticeParametersFromWyccar():";
     vector<double> lattice_parameters;
     if(wyccar_ITC.size()>3){
       vector<string> tokens;
@@ -516,7 +514,7 @@ namespace SYM {
       }
     }
     else {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Invalid WYCCAR",_FILE_WRONG_FORMAT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Invalid WYCCAR",_FILE_WRONG_FORMAT_);
     }
     return lattice_parameters;
   }
@@ -635,7 +633,6 @@ namespace SYM {
     // Split the site symmetry symbol into its primary, secondary, and teriary
     // directions (see ITC-A pgs. 28-29 for site symmetry info).
 
-    string function_name = XPID + "SYM::splitSiteSymmetry():";
 
     vector<string> split_site_symmetry; 
     stringstream ss_primary, ss_secondary, ss_tertiary;
@@ -776,7 +773,7 @@ namespace SYM {
             }
           }
           else if(tmp.size()==4){
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
           }
         }
         if(dot_direction[0]=="secondary"){ 
@@ -821,7 +818,7 @@ namespace SYM {
             }
           }
           else if(tmp.size()==4){
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
+            throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
           }
           ss_tertiary << site_symmetry[dot_index[0]];
           split_site_symmetry.push_back(ss_tertiary.str());
@@ -868,7 +865,7 @@ namespace SYM {
     }
 
     if(split_site_symmetry.size()!=3){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
     }
 
     return split_site_symmetry;
@@ -2014,11 +2011,10 @@ namespace SYM {
 namespace SYM {
   vector<vector<string> > get_wyckoff_pos(string spaceg, int Wyckoff_multiplicity, string Wyckoff_letter) {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function_name = XPID + "SYM::get_wyckoff_pos()";
     vector<int> mult_vec = get_multiplicities(spaceg);
     //Error if mult is not contained in mult_vec (i.e., a wyckoff position with multiplicity mult does not exist for the space group spaceg)
     if(!aurostd::WithinList(mult_vec, Wyckoff_multiplicity)) { //DX20210422 - SYM::invec() -> aurostd::WithinList()
-      if(LDEBUG) { cerr << function_name << ": WARNING: no wyckoff position with multiplicity " << Wyckoff_multiplicity << "." << endl; }
+      if(LDEBUG) { cerr << __AFLOW_FUNC__ << ": WARNING: no wyckoff position with multiplicity " << Wyckoff_multiplicity << "." << endl; }
       vector<vector<string> > none;
       return none;
     }
@@ -2052,7 +2048,7 @@ namespace SYM {
     //DX20191030 - remove stringstream assignment (used to be here)
     //DX20191030 - use tokens instead of stringstream assignment - END
 
-    if(LDEBUG) {cerr << function_name << ": Wyckoff positions without centering(s): " << aurostd::joinWDelimiter(all_positions," ") << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << ": Wyckoff positions without centering(s): " << aurostd::joinWDelimiter(all_positions," ") << endl;}
 
     vector<vector<string> > non_shifted_Wyckoff_positions;
     vector<string> tokens;
@@ -2087,7 +2083,7 @@ namespace SYM {
     if(LDEBUG) {
       vector<string> tmp; 
       for(uint i=0;i<all_Wyckoff_positions.size();i++){tmp.push_back("("+aurostd::joinWDelimiter(all_Wyckoff_positions[i],",")+")");}
-      cerr << function_name << ": All Wyckoff positions: " << aurostd::joinWDelimiter(tmp," ") << endl;
+      cerr << __AFLOW_FUNC__ << ": All Wyckoff positions: " << aurostd::joinWDelimiter(tmp," ") << endl;
     }
 
     return all_Wyckoff_positions;
@@ -2220,7 +2216,6 @@ namespace SYM {
       uint& Wyckoff_multiplicity, string& site_symmetry, vector<vector<string> >& all_positions){
 
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function_name = XPID + "SYM::getWyckoffInformation()";
     bool reduce = true; // DEBUGGING variable: simplify/reduce Wyckoff coordinates (e.g., 0.25+0.5 -> 0.75)
     vector<string> split_Wyckoff_strings, Wyckoff_tokens, positions;
 
@@ -2247,7 +2242,7 @@ namespace SYM {
     }
 
 
-    if(LDEBUG) {cerr << function_name << ": Wyckoff positions without centering(s): " << aurostd::joinWDelimiter(positions," ") << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << ": Wyckoff positions without centering(s): " << aurostd::joinWDelimiter(positions," ") << endl;}
 
     vector<vector<string> > non_shifted_Wyckoff_positions;
     vector<string> tokens;
@@ -2298,7 +2293,7 @@ namespace SYM {
     if(LDEBUG) {
       vector<string> tmp_vposition; 
       for(uint i=0;i<all_positions.size();i++){tmp_vposition.push_back("("+aurostd::joinWDelimiter(all_positions[i],",")+")");}
-      cerr << function_name << ": All Wyckoff positions: " << aurostd::joinWDelimiter(tmp_vposition," ") << endl;
+      cerr << __AFLOW_FUNC__ << ": All Wyckoff positions: " << aurostd::joinWDelimiter(tmp_vposition," ") << endl;
     }
 
   }
@@ -2671,7 +2666,6 @@ void wyckoffsite_ITC::getWyckoffFromLetter(uint space_group_number, const string
 void wyckoffsite_ITC::getWyckoffFromLetter(const string& space_group_string, const string& Wyckoff_letter){
 
   bool LDEBUG = (FALSE || XHOST.DEBUG);
-  string function_name = XPID + "wyckoffsite_ITC::getWyckoffFromLetter()";
   stringstream message;
 
   //DX 20191030 - use tokens instead of stringstream assignment - START
@@ -2696,7 +2690,7 @@ void wyckoffsite_ITC::getWyckoffFromLetter(const string& space_group_string, con
         //}
         //else{
         //  message << "The first position of the Wyckoff string is not a number (multiplicity): " << all_Wyckoff_strings[i];
-        //  throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+        //  throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
         //}
         site_symmetry = Wyckoff_tokens[2];
         for(uint t=3;t<Wyckoff_tokens.size();t++){ //DX 20191030 - need loop to get all positions
@@ -2719,7 +2713,7 @@ void wyckoffsite_ITC::getWyckoffFromLetter(const string& space_group_string, con
   //DX 20191030 - remove stringstream assignment (used to be here)
   //DX 20191030 - use tokens instead of stringstream assignment - END
 
-  if(LDEBUG) {cerr << function_name << ": Wyckoff positions without centering(s): ";
+  if(LDEBUG) {cerr << __AFLOW_FUNC__ << ": Wyckoff positions without centering(s): ";
     for(uint i=0;i<equations_no_centering.size();i++){
       cerr << aurostd::joinWDelimiter(equations_no_centering[i],",") << endl;
     }
@@ -2740,7 +2734,7 @@ void wyckoffsite_ITC::getWyckoffFromLetter(const string& space_group_string, con
     }
   }
 
-  if(LDEBUG) {cerr << function_name << ": Wyckoff positions with centering(s): ";
+  if(LDEBUG) {cerr << __AFLOW_FUNC__ << ": Wyckoff positions with centering(s): ";
     for(uint i=0;i<equations.size();i++){
       cerr << aurostd::joinWDelimiter(equations[i],",") << endl;
     }
@@ -2840,7 +2834,6 @@ namespace SYM {
     // this function will be circumvented when symbolic math is integrated
     //DX20190723
 
-    string soliloquy = XPID + "SYM::formatWyckoffPosition()";
 
     stringstream ss_eqn;ss_eqn.precision(precision);  //CO20220607 - added precision
     string coordinate = "";
@@ -2941,7 +2934,6 @@ namespace SYM {
     // this function will be circumvented when symbolic math is integrated
     //DX20190708
 
-    string soliloquy = XPID + "SYM::reorderWyckoffPosition()";
     stringstream message;
 
     // ---------------------------------------------------------------------------
@@ -2951,7 +2943,7 @@ namespace SYM {
 
     if(tokens.size()!=3){ 
       message << "Wyckoff position must have 3 fields (e.g., \"x, y, z\"), input: " << orig_position;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_INPUT_ERROR_);
     }
 
     // ---------------------------------------------------------------------------

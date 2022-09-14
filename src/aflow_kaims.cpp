@@ -25,13 +25,12 @@ namespace KBIN{
 
   _aimsflags AIMS_Get_AIMSflags_from_AflowIN(string& AflowIn,ofstream& FileMESSAGE,_aflags& aflags,_kflags& kflags) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::AIMS_Get_AIMSflags_from_AflowIN():";
     _aimsflags aimsflags;
     AflowIn=aurostd::RemoveComments(AflowIn); // for safety
     vector<string> vAflowIn;aurostd::string2vectorstring(AflowIn,vAflowIn);
     string BflowIn=AflowIn;
 
-    if(LDEBUG) cerr << "DEBUG: " << soliloquy << " (START)" << endl;
+    if(LDEBUG) cerr << "DEBUG: " << __AFLOW_FUNC__ << " (START)" << endl;
 
     aimsflags.KBIN_AIMS_RUN.clear();
     if((aurostd::substring2bool(AflowIn,"[AIMS_RUN_GENERATE]") || aurostd::substring2bool(AflowIn,"[AIMS_RUN]GENERATE")) || aflags.KBIN_GEN_AIMS_FROM_AFLOWIN) 
@@ -90,7 +89,7 @@ namespace KBIN{
       if(LDEBUG) cerr << "DEBUG " << aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size() << endl;
       if(LDEBUG) cerr << "DEBUG " << aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size() << endl;
       if(aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size() != aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size()) {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size() != aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size()",_FILE_CORRUPT_);  //CO20200624
+        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size() != aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.size()",_FILE_CORRUPT_);  //CO20200624
       }
       for(uint i=0;i<aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRING.size();i++)
         if(LDEBUG) cerr << "DEBUG= " << aimsflags.KBIN_AIMS_GEOM_MODE_EXPLICIT_VSTRUCTURE.at(i) << endl;
@@ -130,18 +129,18 @@ namespace KBIN{
     }
 
     // DEBUG
-    if(LDEBUG) cerr << soliloquy << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.content_string=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.content_string  << endl;
-    if(LDEBUG) cerr << soliloquy << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_PRIMITIVE\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_PRIMITIVE") << endl;
-    if(LDEBUG) cerr << soliloquy << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_CONVENTIONAL\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_CONVENTIONAL") << endl;
-    if(LDEBUG) cerr << soliloquy << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"NIGGLI\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("NIGGLI") << endl;
-    if(LDEBUG) cerr << soliloquy << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"MINKOWSKI\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("MINKOWSKI") << endl;
-    if(LDEBUG) cerr << soliloquy << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"INCELL\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("INCELL") << endl;
-    if(LDEBUG) cerr << soliloquy << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"COMPACT\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("COMPACT") << endl;
-    if(LDEBUG) cerr << soliloquy << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"WIGNERSEITZ\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("WIGNERSEITZ") << endl;
-    if(LDEBUG) cerr << soliloquy << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"CARTESIAN\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("CARTESIAN") << endl;
-    if(LDEBUG) cerr << soliloquy << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"FRACTIONAL\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("FRACTIONAL") << endl;
-    if(LDEBUG) cerr << soliloquy << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"DIRECT\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("DIRECT") << endl;
-    if(LDEBUG) cerr << soliloquy << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"PRESERVE\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.content_string=" << aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.content_string  << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_PRIMITIVE\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_PRIMITIVE") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_CONVENTIONAL\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_CONVENTIONAL") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"NIGGLI\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("NIGGLI") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"MINKOWSKI\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("MINKOWSKI") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"INCELL\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("INCELL") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"COMPACT\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("COMPACT") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"WIGNERSEITZ\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("WIGNERSEITZ") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"CARTESIAN\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("CARTESIAN") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"FRACTIONAL\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("FRACTIONAL") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"DIRECT\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("DIRECT") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"PRESERVE\")=" <<  aimsflags.KBIN_AIMS_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE") << endl;
 
     // VOLUMES
     // [OBSOLETE] aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME_EQUAL_EQUAL      =    aurostd::substring2bool(AflowIn,_STROPT_+"VOLUME=",TRUE);
@@ -171,7 +170,7 @@ namespace KBIN{
 
     if(aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.xscheme!="") aimsflags.KBIN_AIMS_FORCE_OPTION_VOLUME.isentry=TRUE;
 
-    if(LDEBUG) cerr << "DEBUG: " << soliloquy << " (START)" << endl;
+    if(LDEBUG) cerr << "DEBUG: " << __AFLOW_FUNC__ << " (START)" << endl;
 
     return aimsflags;
   }

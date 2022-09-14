@@ -1518,17 +1518,16 @@ namespace apl {
   // creator in aflow_avasp.cpp
   bool createAflowInPhonons(const _aflags& _aflowFlags, const _kflags& _kbinFlags, const _xflags& _xFlags, _xinput& xinp) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="apl::createAflowInPhonons():";
     bool write = false;
     if (xinp.AFLOW_MODE_VASP) {
       if(LDEBUG){
-        std::cerr << soliloquy << " BEFORE xinp.xvasp.Directory=" << xinp.xvasp.Directory << std::endl;
-        std::cerr << soliloquy << " BEFORE xinp.getDirectory()=" << xinp.getDirectory() << std::endl;
+        std::cerr << __AFLOW_FUNC__ << " BEFORE xinp.xvasp.Directory=" << xinp.xvasp.Directory << std::endl;
+        std::cerr << __AFLOW_FUNC__ << " BEFORE xinp.getDirectory()=" << xinp.getDirectory() << std::endl;
       }
       AVASP_populateXVASP(_aflowFlags, _kbinFlags, _xFlags.vflags, xinp.xvasp);
       if(LDEBUG){
-        std::cerr << soliloquy << " AFTER xinp.xvasp.Directory=" << xinp.xvasp.Directory << std::endl;
-        std::cerr << soliloquy << " AFTER xinp.getDirectory()=" << xinp.getDirectory() << std::endl;
+        std::cerr << __AFLOW_FUNC__ << " AFTER xinp.xvasp.Directory=" << xinp.xvasp.Directory << std::endl;
+        std::cerr << __AFLOW_FUNC__ << " AFTER xinp.getDirectory()=" << xinp.getDirectory() << std::endl;
       }
       xinp.setDirectory(xinp.xvasp.Directory);
       if (!filesExistPhonons(xinp)) {

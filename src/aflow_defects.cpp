@@ -101,7 +101,6 @@ acage::acage(const acage& b) {
 bool GetSphereFromFourPoints(xvector<double>& orig,double& radius,
     const xvector<double>& v1,const xvector<double>& v2,
     const xvector<double>& v3,const xvector<double>& v4) {
-  string soliloquy=XPID+"GetSphereFromFourPoints():";
   double eps=_EPS_;
   xmatrix<double> A(5,5);
   A[1][1]=1.0;A[1][2]=1.0;A[1][3]=1.0;A[1][4]=0;A[1][5]=1.0;
@@ -122,10 +121,10 @@ bool GetSphereFromFourPoints(xvector<double>& orig,double& radius,
   orig[3]= (M14/M11)/2.0;
   radius=sqrt(orig[1]*orig[1]+orig[2]*orig[2]+orig[3]*orig[3]-M15/M11);
 
-  double d1=modulus(v1-orig);if(d1<radius-eps || d1>radius+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Sphere Error [d1]",_RUNTIME_ERROR_);} //CO20200624
-  double d2=modulus(v2-orig);if(d2<radius-eps || d2>radius+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Sphere Error [d2]",_RUNTIME_ERROR_);} //CO20200624
-  double d3=modulus(v3-orig);if(d3<radius-eps || d3>radius+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Sphere Error [d3]",_RUNTIME_ERROR_);} //CO20200624
-  double d4=modulus(v4-orig);if(d4<radius-eps || d4>radius+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Sphere Error [d4]",_RUNTIME_ERROR_);} //CO20200624
+  double d1=modulus(v1-orig);if(d1<radius-eps || d1>radius+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Sphere Error [d1]",_RUNTIME_ERROR_);} //CO20200624
+  double d2=modulus(v2-orig);if(d2<radius-eps || d2>radius+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Sphere Error [d2]",_RUNTIME_ERROR_);} //CO20200624
+  double d3=modulus(v3-orig);if(d3<radius-eps || d3>radius+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Sphere Error [d3]",_RUNTIME_ERROR_);} //CO20200624
+  double d4=modulus(v4-orig);if(d4<radius-eps || d4>radius+eps) {throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"Sphere Error [d4]",_RUNTIME_ERROR_);} //CO20200624
   return TRUE;
 }
 
@@ -522,7 +521,6 @@ bool GetCages(const xstructure& _str,_aflags& aflags,
     vector<acage>& cagesirreducible,vector<acage>& cagesreducible,
     vector<acage>& cages4,vector<acage>& cages3,vector<acage>& cages2,
     double _roughness,bool FFFflag, bool osswrite,ostream& oss) {
-  string soliloquy=XPID+"GetCages():";
   // oss << "CAGES BEGIN" << endl;
   bool Krun=TRUE;
   string species=string_species;

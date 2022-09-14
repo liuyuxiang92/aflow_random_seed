@@ -14,15 +14,14 @@
 // all vector./matrix must be loaded before
 
 void SpaceGroupOptionRequired(uint &spacegroup, uint &option) {
-  string function_name = XPID + "SpaceGroupOptionRequired():";
-  cerr << function_name << " Wyckoff Spacegroup " << spacegroup << " requires option 1 or 2 (" << option << ")" << endl;
+  cerr << __AFLOW_FUNC__ << " Wyckoff Spacegroup " << spacegroup << " requires option 1 or 2 (" << option << ")" << endl;
   if(option==0 || option>3) {
     option=1;
-    cerr << function_name << " Wyckoff Spacegroup " << spacegroup << " taking option=" << option << " (let`s hope it is the right one, check the concentrations and space-group)" << endl;
+    cerr << __AFLOW_FUNC__ << " Wyckoff Spacegroup " << spacegroup << " taking option=" << option << " (let`s hope it is the right one, check the concentrations and space-group)" << endl;
   }
   if(option==3) {
     option=2;
-    cerr << function_name << " Wyckoff Spacegroup " << spacegroup << " taking option=" << option << " (let`s hope it is the right one, check the concentrations and space-group)" << endl;
+    cerr << __AFLOW_FUNC__ << " Wyckoff Spacegroup " << spacegroup << " taking option=" << option << " (let`s hope it is the right one, check the concentrations and space-group)" << endl;
   }
 }
 

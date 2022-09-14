@@ -188,7 +188,6 @@ namespace apl {
 
   void Supercell::initialize(const xstructure& _xstr, bool VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="apl::Supercell::initialize():";
     string tmp_dir = _directory;  // Do not delete directory
     clear();
     _directory = tmp_dir;
@@ -198,7 +197,7 @@ namespace apl {
     xstructure xstr(_xstr);
 
     if(LDEBUG){
-      cerr << soliloquy << " input structure" << std::endl;
+      cerr << __AFLOW_FUNC__ << " input structure" << std::endl;
       cerr << _inStructure << std::endl;
     }
 
@@ -209,7 +208,7 @@ namespace apl {
     _inStructure.CleanStructure();
 
     if(LDEBUG){
-      cerr << soliloquy << " this is the structure to be analyzed (after sorting via iatoms)" << std::endl;
+      cerr << __AFLOW_FUNC__ << " this is the structure to be analyzed (after sorting via iatoms)" << std::endl;
       cerr << _inStructure << std::endl;
     }
 
@@ -223,7 +222,7 @@ namespace apl {
     if(LDEBUG){ //CO20190218
       bool write_inequivalent_flag=_inStructure.write_inequivalent_flag;
       _inStructure.write_inequivalent_flag=true;
-      cerr << soliloquy << " checking iatoms" << std::endl;
+      cerr << __AFLOW_FUNC__ << " checking iatoms" << std::endl;
       cerr << _inStructure << std::endl;
       _inStructure.write_inequivalent_flag=write_inequivalent_flag;
     }
@@ -411,11 +410,10 @@ namespace apl {
 
   void Supercell::build(const xvector<int>& dims, bool VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy="apl::Supercell::build():"; //CO20190218
     stringstream message;
     if (!_initialized) {
       message << "Not initialized.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _RUNTIME_INIT_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_INIT_);
     }
     scell_dim = dims;
     _derivative_structure = ((dims.rows == 9) || !aurostd::identical(dims));
@@ -468,7 +466,7 @@ namespace apl {
     calculatePhaseVectors();
 
     if(LDEBUG){
-      cerr << soliloquy << " this is the supercell to be analyzed" << std::endl; //CO20190218
+      cerr << __AFLOW_FUNC__ << " this is the supercell to be analyzed" << std::endl; //CO20190218
       cerr << _scStructure << std::endl;
     }
   }

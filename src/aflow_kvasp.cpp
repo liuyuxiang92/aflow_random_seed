@@ -49,16 +49,15 @@ namespace KBIN {
 namespace KBIN {
   _kflags VASP_Get_Kflags_from_AflowIN(const string &_AflowIn,ofstream &FileMESSAGE,_aflags &aflags,ostream& oss) {  //CO20200624
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string soliloquy = XPID + "KBIN::VASP_Get_Kflags_from_AflowIN():"; //CO20181113
     _kflags kflags;
     string AflowIn=aurostd::RemoveComments(_AflowIn); // for safety //CO20180502
     vector<string> vAflowIn;aurostd::string2vectorstring(AflowIn,vAflowIn);
     string BflowIn=AflowIn;
     ostringstream aus;
 
-    if(LDEBUG) cerr << "DEBUG: " << soliloquy << " (START)" << endl;
+    if(LDEBUG) cerr << "DEBUG: " << __AFLOW_FUNC__ << " (START)" << endl;
 
-    if(aflags.Directory.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"aflags.Directory not set",_INPUT_MISSING_);}  //CO20200624 - prevent segfault
+    if(aflags.Directory.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"aflags.Directory not set",_INPUT_MISSING_);}  //CO20200624 - prevent segfault
     if(aflags.Directory.at(0)!='/' && aflags.Directory.at(0)!='.' && aflags.Directory.at(0)!=' ') aflags.Directory="./"+aflags.Directory;
 
     // ***************************************************************************
@@ -692,7 +691,7 @@ namespace KBIN {
     aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET,oss);
     // ***************************************************************************
 
-    if(LDEBUG) cerr << "DEBUG: " << soliloquy << " (END)" << endl;
+    if(LDEBUG) cerr << "DEBUG: " << __AFLOW_FUNC__ << " (END)" << endl;
 
     return kflags;
   }
@@ -709,14 +708,13 @@ namespace KBIN {
 namespace KBIN {
   _vflags VASP_Get_Vflags_from_AflowIN(const string &_AflowIn,ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags,ostream& oss) {
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string soliloquy = XPID + "KBIN::VASP_Get_Vflags_from_AflowIN():"; //CO20181113
     string message = "";
     _vflags vflags;
     string AflowIn=aurostd::RemoveComments(_AflowIn); // for safety //CO20180502
     vector<string> vAflowIn;aurostd::string2vectorstring(AflowIn,vAflowIn);
     string BflowIn=AflowIn;
 
-    if(LDEBUG) cerr << "DEBUG: " << soliloquy << " (START)" << endl;
+    if(LDEBUG) cerr << "DEBUG: " << __AFLOW_FUNC__ << " (START)" << endl;
     // HOW TO RUN
     vflags.KBIN_VASP_RUN_NRELAX=0;
     // [OBSOLETE]  vflags.KBIN_VASP_RUN_GENERATE           =(aurostd::substring2bool(AflowIn,"[VASP_RUN_GENERATE]") || aurostd::substring2bool(AflowIn,"[VASP_RUN]GENERATE")) || aflags.KBIN_GEN_VASP_FROM_AFLOWIN;
@@ -917,7 +915,7 @@ namespace KBIN {
     vflags.KBIN_VASP_FORCE_OPTION_RELAX_MODE.scheme2scheme("FORCES_ENERGY","FORCES_ENERGY");vflags.KBIN_VASP_FORCE_OPTION_RELAX_MODE.scheme2scheme("FORCE_ENERGY","FORCES_ENERGY");
     if(vflags.KBIN_VASP_FORCE_OPTION_RELAX_MODE.isentry && vflags.KBIN_VASP_FORCE_OPTION_RELAX_MODE.xscheme==KBIN_WRONG_ENTRY_STRING) {
       message = "vflags.KBIN_VASP_FORCE_OPTION_RELAX_MODE.content_string=" + vflags.KBIN_VASP_FORCE_OPTION_RELAX_MODE.content_string;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
     }
 
     // FORCE OPTIONS
@@ -976,7 +974,7 @@ namespace KBIN {
     vflags.KBIN_VASP_FORCE_OPTION_PREC.scheme2scheme('P',"PHONONS"); //JJPR Modification
     if(vflags.KBIN_VASP_FORCE_OPTION_PREC.isentry && vflags.KBIN_VASP_FORCE_OPTION_PREC.xscheme==KBIN_WRONG_ENTRY_STRING) {
       message = "vflags.KBIN_VASP_FORCE_OPTION_PREC.content_string=" + vflags.KBIN_VASP_FORCE_OPTION_PREC.content_string;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
     }
 
     // ALGO AND PRIORITIES // (NORMAL | VERYFAST | FAST | ALL | DAMPED), PRESERVED
@@ -989,7 +987,7 @@ namespace KBIN {
     vflags.KBIN_VASP_FORCE_OPTION_ALGO.scheme2scheme('D',"DAMPED");
     if(vflags.KBIN_VASP_FORCE_OPTION_ALGO.isentry && vflags.KBIN_VASP_FORCE_OPTION_ALGO.xscheme==KBIN_WRONG_ENTRY_STRING) {
       message = "vflags.KBIN_VASP_FORCE_OPTION_ALGO.content_string=" + vflags.KBIN_VASP_FORCE_OPTION_ALGO.content_string;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
     }
     vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved= vflags.KBIN_VASP_FORCE_OPTION_ALGO.preserved || aurostd::substring2bool(AflowIn,_STROPT_+"ALGO_PRESERVED",TRUE); // FIX ALGO_PRESERVED
 
@@ -1003,11 +1001,11 @@ namespace KBIN {
     vflags.KBIN_VASP_FORCE_OPTION_ABMIX.scheme2scheme('P',"PAW");  // something with PAW..
     if(vflags.KBIN_VASP_FORCE_OPTION_ABMIX.isentry && vflags.KBIN_VASP_FORCE_OPTION_ABMIX.xscheme==KBIN_WRONG_ENTRY_STRING) {
       message =  "vflags.KBIN_VASP_FORCE_OPTION_ABMIX.content_string="  + vflags.KBIN_VASP_FORCE_OPTION_ABMIX.content_string;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
     }
 
     // METAGGA AND PRIORITIES // TPSS | RTPSS | M06L | MBJL | SCAN | MS0 | MS1 | MS2 | NONE
-    if(LDEBUG) cerr << soliloquy << " METAGGA" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " METAGGA" << endl;
     vflags.KBIN_VASP_FORCE_OPTION_METAGGA.options2entry(AflowIn,_STROPT_+"METAGGA=",FALSE,DEFAULT_VASP_FORCE_OPTION_METAGGA_SCHEME);
     // vflags.KBIN_VASP_FORCE_OPTION_METAGGA.xscheme=KBIN_WRONG_ENTRY_STRING;
     // vflags.KBIN_VASP_FORCE_OPTION_METAGGA.scheme2scheme('T',"TPSS");
@@ -1016,20 +1014,20 @@ namespace KBIN {
     // vflags.KBIN_VASP_FORCE_OPTION_METAGGA.scheme2scheme('N',"NONE");
     if(vflags.KBIN_VASP_FORCE_OPTION_METAGGA.isentry && vflags.KBIN_VASP_FORCE_OPTION_METAGGA.xscheme==KBIN_WRONG_ENTRY_STRING) {
       message = "vflags.KBIN_VASP_FORCE_OPTION_METAGGA.content_string="  +  vflags.KBIN_VASP_FORCE_OPTION_METAGGA.content_string;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
     } 
-    if(LDEBUG) cerr << soliloquy << " METAGGA vflags.KBIN_VASP_FORCE_OPTION_METAGGA.isentry=" << vflags.KBIN_VASP_FORCE_OPTION_METAGGA.isentry << endl;
-    if(LDEBUG) cerr << soliloquy << " METAGGA vflags.KBIN_VASP_FORCE_OPTION_METAGGA.xscheme=" << vflags.KBIN_VASP_FORCE_OPTION_METAGGA.xscheme << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " METAGGA vflags.KBIN_VASP_FORCE_OPTION_METAGGA.isentry=" << vflags.KBIN_VASP_FORCE_OPTION_METAGGA.isentry << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " METAGGA vflags.KBIN_VASP_FORCE_OPTION_METAGGA.xscheme=" << vflags.KBIN_VASP_FORCE_OPTION_METAGGA.xscheme << endl;
 
     // IVDW AND PRIORITIES // [number_for_VASP_see_manual_for_IVDW | 0] 
-    if(LDEBUG) cerr << soliloquy << " IVDW" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " IVDW" << endl;
     vflags.KBIN_VASP_FORCE_OPTION_IVDW.options2entry(AflowIn,_STROPT_+"IVDW=",FALSE,DEFAULT_VASP_FORCE_OPTION_IVDW_SCHEME);
     if(vflags.KBIN_VASP_FORCE_OPTION_IVDW.isentry && vflags.KBIN_VASP_FORCE_OPTION_IVDW.xscheme==KBIN_WRONG_ENTRY_STRING) {
       message = "vflags.KBIN_VASP_FORCE_OPTION_IVDW.content_string=" + vflags.KBIN_VASP_FORCE_OPTION_IVDW.content_string;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
     } 
-    if(LDEBUG) cerr << soliloquy << " IVDW vflags.KBIN_VASP_FORCE_OPTION_IVDW.isentry=" << vflags.KBIN_VASP_FORCE_OPTION_IVDW.isentry << endl;
-    if(LDEBUG) cerr << soliloquy << " IVDW vflags.KBIN_VASP_FORCE_OPTION_IVDW.xscheme=" << vflags.KBIN_VASP_FORCE_OPTION_IVDW.xscheme << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " IVDW vflags.KBIN_VASP_FORCE_OPTION_IVDW.isentry=" << vflags.KBIN_VASP_FORCE_OPTION_IVDW.isentry << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " IVDW vflags.KBIN_VASP_FORCE_OPTION_IVDW.xscheme=" << vflags.KBIN_VASP_FORCE_OPTION_IVDW.xscheme << endl;
 
     // NEGLECT_NOMIX
     vflags.KBIN_VASP_FORCE_OPTION_SKIP_NOMIX.options2entry(AflowIn,string(_STROPT_+"NEGLECT_IMMISCIBLE"+"|"+_STROPT_+"NEGLECT_NOMIX"+"|"+_STROPT_+"SKIP_NOMIX"));
@@ -1109,7 +1107,7 @@ namespace KBIN {
     if (vflags.KBIN_VASP_FORCE_OPTION_SPIN.isentry) { //ME+RF20200225; fixes bug that SPIN was switched OFF in static calc. when SPIN=ON in aflow.in and REMOVE_RELAX was set by default
       if(!vflags.KBIN_VASP_FORCE_OPTION_SPIN.option){
         if(aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_1") || aurostd::substring2bool(vflags.KBIN_VASP_FORCE_OPTION_SPIN.content_string,"REMOVE_RELAX_2")){
-          pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "SPIN is OFF. REMOVE_RELAX_1/2 will be switched off.", aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, "SPIN is OFF. REMOVE_RELAX_1/2 will be switched off.", aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
           vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_1=FALSE;
           vflags.KBIN_VASP_FORCE_OPTION_SPIN_REMOVE_RELAX_2=FALSE;
         }
@@ -1220,7 +1218,7 @@ namespace KBIN {
     vflags.KBIN_VASP_FORCE_OPTION_TYPE.scheme2scheme('D',"DEFAULT");
     if(vflags.KBIN_VASP_FORCE_OPTION_TYPE.isentry && vflags.KBIN_VASP_FORCE_OPTION_TYPE.xscheme==KBIN_WRONG_ENTRY_STRING) {
       message = "vflags.KBIN_VASP_FORCE_OPTION_TYPE.content_string=" + vflags.KBIN_VASP_FORCE_OPTION_TYPE.content_string;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
     }
 
     // PARAMETERS FOR INCAR
@@ -1454,7 +1452,7 @@ namespace KBIN {
       message="";
       message+="if you run RELAX_STATIC_BANDS, STATIC_BANDS, REPEAT_STATIC_BANDS, or REPEAT_BANDS, you must specify KBIN_VASP_KPOINTS_BANDS_GRID";
       message+="taking default KBIN_VASP_KPOINTS_BANDS_GRID="+vflags.KBIN_VASP_KPOINTS_BANDS_GRID.content_string;
-      pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,_LOGGER_WARNING_);
+      pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,_LOGGER_WARNING_);
     }
 
     // [OBSOLETE] vflags.KBIN_VASP_POSCAR_FILE_KEYWORD                 =    aurostd::substring2bool(AflowIn,"[VASP_POSCAR_FILE]"); 
@@ -1508,7 +1506,7 @@ namespace KBIN {
         message = "IN " + _AFLOWIN_ + " in Directory=" + aflags.Directory + '\n';
         message += "vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size()=" + aurostd::utype2string<uint>(vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size()) + '\n';
         message += "vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRUCTURE.size()=" + aurostd::utype2string<uint>(vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRUCTURE.size());
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _INDEX_MISMATCH_);
+        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
       for(uint i=0;i<vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRING.size();i++)
         if(LDEBUG) cerr << "DEBUG= " << vflags.KBIN_VASP_POSCAR_MODE_EXPLICIT_VSTRUCTURE.at(i) << endl;
@@ -1549,7 +1547,7 @@ namespace KBIN {
     // CONVERT_UNIT_CELL stuff
     BflowIn=AflowIn;aurostd::StringSubst(BflowIn,"=","_");aurostd::StringSubst(BflowIn,"CONVERT_UNIT_CELL_","CONVERT_UNIT_CELL="); // bypass for getting all "_"
     vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.options2entry(BflowIn,string(_STROPT_+"CONVERT_UNIT_CELL="),aurostd_xoptionMULTI,""); // stack them all
-    if(LDEBUG) cerr << soliloquy << " BEFORE vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme=" << vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme << endl; //ME20181113
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " BEFORE vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme=" << vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme << endl; //ME20181113
     // // PRIORITIES
     if(vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_PRIMITIVE") || vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_CONVENTIONAL")) {
       vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("MINKOWSKI",FALSE);
@@ -1560,21 +1558,21 @@ namespace KBIN {
     if(vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_PRIMITIVE") && vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_CONVENTIONAL")) {
       vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_CONVENTIONAL",FALSE);
     }
-    if(LDEBUG) cerr << soliloquy << " AFTER vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme=" << vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme << endl; //ME20181113
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " AFTER vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme=" << vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.xscheme << endl; //ME20181113
 
     // DEBUG
-    if(LDEBUG) cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.content_string=" << vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.content_string  << endl;
-    if(LDEBUG) cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_PRIMITIVE\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_PRIMITIVE") << endl;
-    if(LDEBUG) cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_CONVENTIONAL\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_CONVENTIONAL") << endl;
-    if(LDEBUG) cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"NIGGLI\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("NIGGLI") << endl;
-    if(LDEBUG) cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"MINKOWSKI\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("MINKOWSKI") << endl;
-    if(LDEBUG) cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"INCELL\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("INCELL") << endl;
-    if(LDEBUG) cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"COMPACT\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("COMPACT") << endl;
-    if(LDEBUG) cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"WIGNERSEITZ\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("WIGNERSEITZ") << endl;
-    if(LDEBUG) cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"CARTESIAN\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("CARTESIAN") << endl;
-    if(LDEBUG) cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"FRACTIONAL\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("FRACTIONAL") << endl;
-    if(LDEBUG) cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"DIRECT\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("DIRECT") << endl;
-    if(LDEBUG) cerr << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"PRESERVE\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.content_string=" << vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.content_string  << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_PRIMITIVE\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_PRIMITIVE") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"STANDARD_CONVENTIONAL\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("STANDARD_CONVENTIONAL") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"NIGGLI\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("NIGGLI") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"MINKOWSKI\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("MINKOWSKI") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"INCELL\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("INCELL") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"COMPACT\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("COMPACT") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"WIGNERSEITZ\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("WIGNERSEITZ") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"CARTESIAN\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("CARTESIAN") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"FRACTIONAL\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("FRACTIONAL") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"DIRECT\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("DIRECT") << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag(\"PRESERVE\")=" <<  vflags.KBIN_VASP_FORCE_OPTION_CONVERT_UNIT_CELL.flag("PRESERVE") << endl;
 
     // VOLUMES
     // [OBSOLETE] vflags.KBIN_VASP_FORCE_OPTION_VOLUME_EQUAL_EQUAL      =    aurostd::substring2bool(AflowIn,_STROPT_+"VOLUME=",TRUE);
@@ -1650,7 +1648,7 @@ namespace KBIN {
 
 
     // APL ENTRIES
-    if(LDEBUG) cerr << "DEBUG: " << soliloquy << " (APL)" << endl;
+    if(LDEBUG) cerr << "DEBUG: " << __AFLOW_FUNC__ << " (APL)" << endl;
 
     //CO20170601 START
     //CO make backwards and forwards compatible with all possible workflows
@@ -1684,9 +1682,9 @@ namespace KBIN {
     //CO20170601 END
 
     // FROZSL ENTRIES
-    if(LDEBUG) cerr << "DEBUG: " << soliloquy << " (FROZSL)" << endl;
+    if(LDEBUG) cerr << "DEBUG: " << __AFLOW_FUNC__ << " (FROZSL)" << endl;
 
-    if(LDEBUG) cerr << "DEBUG: " << soliloquy << " (STOP)" << endl;
+    if(LDEBUG) cerr << "DEBUG: " << __AFLOW_FUNC__ << " (STOP)" << endl;
 
     return vflags;
   }
@@ -1701,7 +1699,6 @@ namespace KBIN {
 namespace KBIN {
   bool VASP_Directory(ofstream &FileMESSAGE,_aflags &aflags,_kflags &kflags) { // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string soliloquy = XPID + "KBIN::VASP_Directory():";
     if(LDEBUG) cerr << "DEBUG: KBIN::VASP_Directory (BEGIN)" << endl;
     //  bool KBIN_MPI_LOCAL;KBIN_MPI_LOCAL=MPI;
     // bool KBIN_VASP_WRITE_KPOINTS;
@@ -2401,7 +2398,7 @@ namespace KBIN {
                       KBIN::VASP_Recycle(xvasp,"relax1");
                     } else {
                       aus << "REPEAT_STATIC: RELAX2 or RELAX1 must be present.";
-                      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, aus.str(), _RUNTIME_ERROR_);
+                      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, aus.str(), _RUNTIME_ERROR_);
                     }
                   }
                   //[CO20210315 - do before unzip]// clean up worthless stuff
@@ -2435,7 +2432,7 @@ namespace KBIN {
                       KBIN::VASP_Recycle(xvasp,"relax1");
                     } else {
                       aus << "REPEAT_STATIC_BANDS: RELAX2 or RELAX1 must be present.";
-                      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, aus.str(), _RUNTIME_ERROR_);
+                      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, aus.str(), _RUNTIME_ERROR_);
                     }
                   }
                   //[CO20210315 - do before unzip]// clean up worthless stuff
@@ -2467,7 +2464,7 @@ namespace KBIN {
                     KBIN::VASP_Recycle(xvasp,"static");
                   } else {
                     aus << "REPEAT_BANDS: STATIC must be present.";
-                    throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, aus.str(), _RUNTIME_ERROR_);
+                    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, aus.str(), _RUNTIME_ERROR_);
                   }
                   //[CO20210315 - do before unzip]// clean up worthless stuff
                   //[CO20210315 - do before unzip]aurostd::execute("cd "+xvasp.Directory+" && rm -f *bands* ");
@@ -2570,7 +2567,7 @@ namespace KBIN {
                     if(foundBZ==FALSE) {
                       aus << "Unrecoverable error, lattice not found:" << std::endl;
                       aus << xvasp.str;
-                      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, aus.str(), _RUNTIME_ERROR_);
+                      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, aus.str(), _RUNTIME_ERROR_);
                     }
                   }
                   // done with the fixing
@@ -2637,7 +2634,7 @@ namespace KBIN {
                   if(foundBZ==FALSE) {  //CO20210805
                     aus << "Unrecoverable error, lattice not found:" << std::endl;
                     aus << xvasp.str;
-                    throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, aus.str(), _RUNTIME_ERROR_);
+                    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, aus.str(), _RUNTIME_ERROR_);
                   }
                   // removed stuff BELOW
                   xvasp.KPOINTS << stringBZ;
@@ -2783,7 +2780,7 @@ namespace KBIN {
                   }
                   if(vflags.KBIN_VASP_RUN.flag("DSCF") && vflags.KBIN_VASP_RUN.flag("DIELECTRIC_DYNAMIC") && vflags.KBIN_VASP_RUN.flag("DIELECTRIC_STATIC")) {  // check for DIELECTRIC DYNAMIC
                     string message = "Dielectric calculations not implemented.";
-                    throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ILLEGAL_);
+                    throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
                   }
                 }
                 // FINISHED
@@ -3098,12 +3095,11 @@ int CheckStringInFile(string FileIn,string str,int PID,int TID) { //CO20200502 -
 namespace KBIN {
   bool ReachedAccuracy2bool(const string& scheme,const aurostd::xoption& xRequiresAccuracy,const aurostd::xoption& xmessage,bool vasp_still_running){ //CO20210315
     bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::ReachedAccuracy2bool():";
 
     if(LDEBUG){
-      cerr << soliloquy << " xRequiresAccuracy.flag(\"" << scheme << "\")=" << xRequiresAccuracy.flag(scheme) << endl;
-      cerr << soliloquy << " vasp_still_running=" << vasp_still_running << endl;
-      cerr << soliloquy << " xmessage.flag(\"REACHED_ACCURACY\")=" << xmessage.flag("REACHED_ACCURACY") << endl;
+      cerr << __AFLOW_FUNC__ << " xRequiresAccuracy.flag(\"" << scheme << "\")=" << xRequiresAccuracy.flag(scheme) << endl;
+      cerr << __AFLOW_FUNC__ << " vasp_still_running=" << vasp_still_running << endl;
+      cerr << __AFLOW_FUNC__ << " xmessage.flag(\"REACHED_ACCURACY\")=" << xmessage.flag("REACHED_ACCURACY") << endl;
     }
 
     if(xRequiresAccuracy.flag(scheme)==false){return true;}  //this scheme does not require xmessage.flag("REACHED_ACCURACY"), return true for '&&' logic
@@ -3121,7 +3117,6 @@ namespace KBIN {
   }
   void VASP_ProcessWarnings(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,aurostd::xoption& xmessage,aurostd::xoption& xwarning,aurostd::xoption& xmonitor,ofstream &FileMESSAGE) { //CO20210315
     bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::VASP_ProcessWarnings():";
     stringstream aus;
     bool VERBOSE=(FALSE || XHOST.vflag_control.flag("MONITOR_VASP")==false || LDEBUG);
 
@@ -3176,7 +3171,7 @@ namespace KBIN {
     //get INCAR
     VASP_Reread_INCAR(xvasp);  //preload incar
 
-    if(LDEBUG){aus << soliloquy << " [1]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(LDEBUG){aus << __AFLOW_FUNC__ << " [1]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
     //get whether relaxing or not
     bool relaxing=false;
@@ -3219,7 +3214,7 @@ namespace KBIN {
     //[SD20220406 - OBSOLETE]  vasp_still_running=VASP_instance_running(vasp_bin);
     //[SD20220406 - OBSOLETE]}
     bool vasp_still_running=VASP_instance_running(vasp_bin,vasp_pgid); //SD20220406 - we are not using the --kill_vasp_all flag anymore
-    if(LDEBUG){aus << soliloquy << " vasp_still_running=" << vasp_still_running << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(LDEBUG){aus << __AFLOW_FUNC__ << " vasp_still_running=" << vasp_still_running << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
     //vasp can spit out many warnings quickly, going from ~10MB to 1GB within 2 minutes
     //we will pass BYTES_MAX_VASP_OUT into substring_present_file_FAST as a stop condition
@@ -3250,7 +3245,7 @@ namespace KBIN {
     bool expect_near_end=true;  //cat vs. tac
 
     //WARNINGS START
-    if(LDEBUG){aus << soliloquy << " checking warnings" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(LDEBUG){aus << __AFLOW_FUNC__ << " checking warnings" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     xwarning.flag("OUTCAR_INCOMPLETE",vasp_still_running==false && !KBIN::VASP_RunFinished(xvasp,aflags,FileMESSAGE,false));  //CO20201111
     //CO20210601 - I am decoupling vasp_still_running and xmessage.flag("REACHED_ACCURACY") FOR RELAXATIONS ONLY
     //on qrats, I noticed that a calculation can reach accuracy, but not finish (incomplete OUTCAR), thus it is frozen
@@ -3261,10 +3256,10 @@ namespace KBIN {
     xmessage.flag("REACHED_ACCURACY",(reached_accuracy_relaxing || reached_accuracy_static));
 
     if(LDEBUG){
-      aus << soliloquy << " relaxing=" << relaxing << endl;
-      aus << soliloquy << " vasp_oszicar_unconverged=" << vasp_oszicar_unconverged << endl;
-      aus << soliloquy << " xwarning.flag(\"OUTCAR_INCOMPLETE\")=" << xwarning.flag("OUTCAR_INCOMPLETE") << endl;
-      aus << soliloquy << " xmessage.flag(\"REACHED_ACCURACY\")=" << xmessage.flag("REACHED_ACCURACY") << endl;
+      aus << __AFLOW_FUNC__ << " relaxing=" << relaxing << endl;
+      aus << __AFLOW_FUNC__ << " vasp_oszicar_unconverged=" << vasp_oszicar_unconverged << endl;
+      aus << __AFLOW_FUNC__ << " xwarning.flag(\"OUTCAR_INCOMPLETE\")=" << xwarning.flag("OUTCAR_INCOMPLETE") << endl;
+      aus << __AFLOW_FUNC__ << " xmessage.flag(\"REACHED_ACCURACY\")=" << xmessage.flag("REACHED_ACCURACY") << endl;
       cerr << aus.str();
       aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
     }
@@ -3531,7 +3526,7 @@ namespace KBIN {
     found_warning=(vasp_still_running==true && fsize_vaspout>=BYTES_MAX_VASP_OUT);  //100MB, make aflowrc parameter, 1GB is too large for NFS mounted nodes (NFS has to push the entire file over cable), when set to 100MB it still took 3 hours //CO20210315 - these stats were pre-renice, the processing time is much better now
     xwarning.flag(scheme,found_warning);
 
-    if(LDEBUG){aus << soliloquy << " [2]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(LDEBUG){aus << __AFLOW_FUNC__ << " [2]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
     if(renice){aurostd::ProcessRenice(vasp_bin,0);} //renice vasp back to normal after grep
 
@@ -3544,7 +3539,7 @@ namespace KBIN {
 
     bool wdebug=(FALSE && LDEBUG);
     if(1) {
-      if(LDEBUG){aus << soliloquy << " printing warnings" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      if(LDEBUG){aus << __AFLOW_FUNC__ << " printing warnings" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       if(!xmonitor.flag("IGNORING_MESSAGES:REACHED_ACCURACY") && (wdebug || xmessage.flag("REACHED_ACCURACY"))) aus << "MMMMM  MESSAGE xmessage.flag(\"REACHED_ACCURACY\")=" << xmessage.flag("REACHED_ACCURACY") << endl;
       if(wdebug) aus << "MMMMM  MESSAGE VASP_release=" << xmessage.getattachedscheme("SVERSION") << endl;
       if(wdebug) aus << "MMMMM  MESSAGE VASP_version=" << xmessage.getattachedscheme("DVERSION") << endl;
@@ -3624,10 +3619,10 @@ namespace KBIN {
         if(xwarning.flag(vwarnings_derivative[i])){n_derivative++;}
       }
       if(LDEBUG){
-        aus << soliloquy << " xwarning.vxscheme=" << aurostd::joinWDelimiter(xwarning.vxscheme,",") << endl;
-        aus << soliloquy << " xwarning.vxscheme.size()=" << xwarning.vxscheme.size() << endl;
-        aus << soliloquy << " n_require_accuracy=" << n_require_accuracy << endl;
-        aus << soliloquy << " n_derivative=" << n_derivative << endl;
+        aus << __AFLOW_FUNC__ << " xwarning.vxscheme=" << aurostd::joinWDelimiter(xwarning.vxscheme,",") << endl;
+        aus << __AFLOW_FUNC__ << " xwarning.vxscheme.size()=" << xwarning.vxscheme.size() << endl;
+        aus << __AFLOW_FUNC__ << " n_require_accuracy=" << n_require_accuracy << endl;
+        aus << __AFLOW_FUNC__ << " n_derivative=" << n_derivative << endl;
         cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
       if(xwarning.vxscheme.size()>(n_require_accuracy+n_derivative)){ //this means we have some real errors inside
@@ -3739,7 +3734,7 @@ namespace KBIN {
 
     //WARNINGS STOP
 
-    if(LDEBUG){aus << soliloquy << " [3]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(LDEBUG){aus << __AFLOW_FUNC__ << " [3]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
     //decide which warnings to ignore
 
@@ -3779,7 +3774,7 @@ namespace KBIN {
     //[try NIRMAT first]if(xwarning.flag("NIRMAT") && xwarning.flag("SGRCON")) xwarning.flag("SGRCON",FALSE);
     //[no must fix the LATTICE]if(xwarning.flag("EDDRMM")) xwarning.flag("ZPOTRF",FALSE);
 
-    if(LDEBUG){aus << soliloquy << " [4]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(LDEBUG){aus << __AFLOW_FUNC__ << " [4]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
   }
 } // namespace KBIN
 
@@ -3815,22 +3810,21 @@ namespace KBIN {
   }
   bool VASP_Error2Fix(const string& error,const string& mode,int& submode,bool try_last_ditch_efforts,_xvasp &xvasp,aurostd::xoption& xwarning,aurostd::xoption& xfixed,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {  //CO20210315
     bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::VASP_Error2Fix():";
     stringstream aus;
 
-    if(LDEBUG){aus << soliloquy << " [CHECK " << error << " PROBLEMS]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(LDEBUG){aus << __AFLOW_FUNC__ << " [CHECK " << error << " PROBLEMS]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
     bool apply_fix=xwarning.flag(error);
     bool VERBOSE=(FALSE || XHOST.vflag_control.flag("MONITOR_VASP")==false || LDEBUG);
     if(apply_fix && xfixed.flag("ALL")){
-      if(LDEBUG){aus << soliloquy << " xfixed.flag(\"ALL\")==TRUE: skipping " << error << " fix" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      if(LDEBUG){aus << __AFLOW_FUNC__ << " xfixed.flag(\"ALL\")==TRUE: skipping " << error << " fix" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       apply_fix=false;
     }
     if(apply_fix && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:ALL")){
-      if(LDEBUG){aus << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:ALL\")==TRUE: skipping " << error << " fix" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      if(LDEBUG){aus << __AFLOW_FUNC__ << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:ALL\")==TRUE: skipping " << error << " fix" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       apply_fix=false;
     }
     if(apply_fix && vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag("ERROR:"+error)){
-      if(LDEBUG){aus << soliloquy << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:" << error << "\")==TRUE: skipping " << error << " fix" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      if(LDEBUG){aus << __AFLOW_FUNC__ << " vflags.KBIN_VASP_FORCE_OPTION_IGNORE_AFIX.flag(\"ERROR:" << error << "\")==TRUE: skipping " << error << " fix" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
       apply_fix=false;
     }
     if(apply_fix && VERBOSE){
@@ -3839,7 +3833,7 @@ namespace KBIN {
     //do not reference submode below KBIN::XVASP_Afix(), as it will have been incremented (perhaps by 2)
     //if KBIN::XVASP_Afix() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
     if(apply_fix && !KBIN::XVASP_Afix(mode,submode,try_last_ditch_efforts,xfixed,xvasp,kflags,vflags,aflags,FileMESSAGE)){   //CO20210315
-      if(LDEBUG){aus << soliloquy << " KBIN::XVASP_Afix(mode=\"" << mode << "\"" << (submode>=0?",submode="+aurostd::utype2string(submode):"") << ") failed" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}  //if KBIN::XVASP_Afix() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
+      if(LDEBUG){aus << __AFLOW_FUNC__ << " KBIN::XVASP_Afix(mode=\"" << mode << "\"" << (submode>=0?",submode="+aurostd::utype2string(submode):"") << ") failed" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}  //if KBIN::XVASP_Afix() fails, submode will be restored to original, so it is okay to reference for the LDEBUG statement
       apply_fix=false;
     }
     if(apply_fix && VERBOSE){
@@ -3847,7 +3841,7 @@ namespace KBIN {
     }
     if(apply_fix){
       if(xvasp.aopts.flag("FLAG::AFIX_DRYRUN")==false){
-        KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+soliloquy+" \""+error+"\" problems"+Message(_AFLOW_FILE_NAME_,aflags));
+        KBIN::VASP_Error(xvasp,"WWWWW  ERROR "+__AFLOW_FUNC__+" \""+error+"\" problems"+Message(_AFLOW_FILE_NAME_,aflags));
         //[CO20210315 - old style]xfixed.flag(error,TRUE);
       }
       xfixed.flag("ALL",TRUE);
@@ -3962,13 +3956,12 @@ namespace KBIN {
   bool VASP_Run(_xvasp &xvasp,_aflags &aflags,_kflags &kflags,_vflags &vflags,ofstream &FileMESSAGE) {        // AFLOW_FUNCTION_IMPLEMENTATION
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
     string function="KBIN::VASP_Run";
-    string soliloquy=XPID+function+"():";
     ostringstream aus_exec,aus;
 
-    if(LDEBUG){aus << soliloquy << " BEGIN" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(LDEBUG){aus << __AFLOW_FUNC__ << " BEGIN" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
     if(XHOST.AVOID_RUNNING_VASP){  //CO20200624
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"VASP should NOT be running",_INPUT_ILLEGAL_);  //better to throw to avoid VASP_Backup(), etc.
+      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"VASP should NOT be running",_INPUT_ILLEGAL_);  //better to throw to avoid VASP_Backup(), etc.
       //return false;
     }
 
@@ -4069,7 +4062,7 @@ namespace KBIN {
         if(aurostd::FileEmpty(xvasp.Directory+"/POTCAR"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR "+function+": Empty POTCAR"+Message(_AFLOW_FILE_NAME_,aflags));error=TRUE;return FALSE;}
         if(error) return FALSE;
 
-        if(LDEBUG){aus << soliloquy << " [1]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        if(LDEBUG){aus << __AFLOW_FUNC__ << " [1]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
         // FIX INCAR if alternating
         if(vflags.KBIN_VASP_FORCE_OPTION_RELAX_TYPE.flag("IONS_CELL_VOLUME")) {
@@ -4119,8 +4112,8 @@ namespace KBIN {
             if(kflags.KBIN_MPI_OPTIONS!="") aus << "00000  MESSAGE MPI OPTIONS=[" << kflags.KBIN_MPI_OPTIONS << "]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;	      
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);	
             if(LDEBUG){
-              aus << soliloquy << " aflags.AFLOW_MACHINE_GLOBAL=" << aflags.AFLOW_MACHINE_GLOBAL.getattachedscheme("NAME") << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-              aus << soliloquy << " aflags.AFLOW_MACHINE_LOCAL=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << Message(_AFLOW_FILE_NAME_,aflags) << endl; //HE20220309 use machine name
+              aus << __AFLOW_FUNC__ << " aflags.AFLOW_MACHINE_GLOBAL=" << aflags.AFLOW_MACHINE_GLOBAL.getattachedscheme("NAME") << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+              aus << __AFLOW_FUNC__ << " aflags.AFLOW_MACHINE_LOCAL=" << aflags.AFLOW_MACHINE_LOCAL.getattachedscheme("NAME") << Message(_AFLOW_FILE_NAME_,aflags) << endl; //HE20220309 use machine name
               cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             }
             // NO HOST ------------------------------------------------------------------------
@@ -4526,7 +4519,7 @@ namespace KBIN {
         }
       }
       KBIN::WaitFinished(xvasp,aflags,FileMESSAGE,2,false);  //CO20201111 - try twice and NO verbose, we verbose in bigger VASP_Run() loop
-      if(LDEBUG){aus << soliloquy << " [2]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+      if(LDEBUG){aus << __AFLOW_FUNC__ << " [2]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
       if(aurostd::FileEmpty(xvasp.Directory+"/"+DEFAULT_VASP_OUT))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR "+function+": Empty "+DEFAULT_VASP_OUT+Message(_AFLOW_FILE_NAME_,aflags));return FALSE;}
       if(aurostd::FileEmpty(xvasp.Directory+"/OUTCAR"))  {KBIN::VASP_Error(xvasp,FileMESSAGE,"EEEEE  ERROR "+function+": Empty OUTCAR"+Message(_AFLOW_FILE_NAME_,aflags));return FALSE;}
@@ -4537,8 +4530,8 @@ namespace KBIN {
 
       // ***************** CHECK FOR ERRORS *********
       if(LDEBUG){
-        aus << soliloquy << " [3a]  nrun=" << nrun << Message(_AFLOW_FILE_NAME_,aflags) << endl;
-        aus << soliloquy << " [3b]  maxrun=" << maxrun << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+        aus << __AFLOW_FUNC__ << " [3a]  nrun=" << nrun << Message(_AFLOW_FILE_NAME_,aflags) << endl;
+        aus << __AFLOW_FUNC__ << " [3b]  maxrun=" << maxrun << Message(_AFLOW_FILE_NAME_,aflags) << endl;
         cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
       }
 
@@ -4566,14 +4559,14 @@ namespace KBIN {
 
       if(nrun<maxrun) {
 
-        if(LDEBUG){aus << soliloquy << " [4]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        if(LDEBUG){aus << __AFLOW_FUNC__ << " [4]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
         VASP_ProcessWarnings(xvasp,aflags,kflags,xmessage,xwarning,FileMESSAGE);
 
         xfixed.flag("ALL",FALSE);
         vasp_start=FALSE;
 
-        if(LDEBUG){aus << soliloquy << " [5]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+        if(LDEBUG){aus << __AFLOW_FUNC__ << " [5]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
         KBIN::VASP_FixErrors(xvasp,xmessage,xwarning,xfixed,aflags,kflags,vflags,FileMESSAGE);
 
@@ -4581,10 +4574,10 @@ namespace KBIN {
         //CO20210315 - NO, aflow patches if possible, otherwise let it run. we'll catch BIG issues with --xplug
 
         // ********* VASP TO BE RESTARTED *********
-        if(LDEBUG){cerr << soliloquy << " [DONE WITH CHECKS]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " [DONE WITH CHECKS]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;}
         if(xfixed.flag("ALL")) vasp_start=TRUE;
         if(vasp_start) {
-          if(LDEBUG){aus << soliloquy << " [VASP TO BE RESTARTED]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+          if(LDEBUG){aus << __AFLOW_FUNC__ << " [VASP TO BE RESTARTED]" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
           aus << "00000  RESTART VASP" << Message(_AFLOW_FILE_NAME_,aflags) << endl;aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
         }
       }
@@ -4600,9 +4593,9 @@ namespace KBIN {
     if(!aurostd::FileExist(xvasp.Directory+"/CONTCAR")) {Krun=FALSE;KBIN::VASP_Error(xvasp,"EEEEE  file does not exist=CONTCAR");}
     if(aurostd::FileEmpty(xvasp.Directory+"/CONTCAR")) {Krun=FALSE;KBIN::VASP_Error(xvasp,"EEEEE  file is empty=CONTCAR");}
 
-    if(LDEBUG) {aus << soliloquy << " Krun=" << Krun << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(LDEBUG) {aus << __AFLOW_FUNC__ << " Krun=" << Krun << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
-    if(LDEBUG) {aus << soliloquy << " END" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
+    if(LDEBUG) {aus << __AFLOW_FUNC__ << " END" << Message(_AFLOW_FILE_NAME_,aflags) << endl;cerr << aus.str();aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);}
 
     return Krun;
     // ********* FINISH
@@ -4735,7 +4728,6 @@ namespace KBIN {
 namespace KBIN {
   string VASP_Analyze(_xvasp &xvasp,bool qmwrite) {       // AFLOW_FUNCTION_IMPLEMENTATION
     string function="KBIN::VASP_Analyze";
-    string soliloquy=XPID+function+"():";
     // CHECK ERRORS
     bool error=FALSE;
     // if(aurostd::FileEmpty(xvasp.Directory+"/EIGENVAL")) {KBIN::VASP_Error(xvasp,"EEEEE  ERROR "+function+": Empty EIGENVAL");error=TRUE;}
@@ -5146,27 +5138,25 @@ namespace KBIN {
   //NSTEPS comes from xOSZICAR (to be created)
   uint VASP_getNELM(const string& outcar){ //CO20200624
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::VASP_getNELM():";
     stringstream command;
     command << aurostd::GetCatCommand(outcar) << " " << outcar << " | grep NELM | head -n 1 | cut -d ';' -f1 | cut -d '=' -f2 | awk '{print $1}'" << endl;
     string tmp=aurostd::execute2string(command);
-    if(LDEBUG){cerr << soliloquy << " " << outcar << " NELM grep response=\"" << tmp << "\"" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " " << outcar << " NELM grep response=\"" << tmp << "\"" << endl;}
     int NELM=60;  //VASP default
     if(!tmp.empty() && aurostd::isfloat(tmp)){NELM=aurostd::string2utype<int>(tmp);}
     return NELM;
   }
   uint VASP_getNSTEPS(const string& oszicar){  //CO20200624
     bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::VASP_getNSTEPS():";
     stringstream command;
     command << aurostd::GetCatCommand(oszicar) << " " << oszicar << " | grep ':' | tail -n 1 | cut -d ':' -f2 | awk '{print $1}'" << endl;
     string tmp=aurostd::execute2string(command);
-    if(LDEBUG){cerr << soliloquy << " " << oszicar << " NSTEPS grep response=\"" << tmp << "\"" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " " << oszicar << " NSTEPS grep response=\"" << tmp << "\"" << endl;}
     int NSTEPS=0;  //VASP default
     if(!tmp.empty()){
       if(aurostd::isfloat(tmp)){NSTEPS=aurostd::string2utype<int>(tmp);}
       else if(tmp.find("*")!=string::npos){
-        if(LDEBUG){cerr << soliloquy << " found number bigger than 999" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " found number bigger than 999" << endl;}
         vector<string> vlines,tokens;
         aurostd::efile2vectorstring(oszicar,vlines);
         bool found_F_line=false;
@@ -5180,11 +5170,11 @@ namespace KBIN {
             if(aurostd::isfloat(tmp)){
               nsteps=aurostd::string2utype<uint>(tmp);
               if(LDEBUG){
-                cerr << soliloquy << " last countable nstep: " << nsteps << endl;
-                cerr << soliloquy << " steps after last counterable NSTEP: " << j << endl;
+                cerr << __AFLOW_FUNC__ << " last countable nstep: " << nsteps << endl;
+                cerr << __AFLOW_FUNC__ << " steps after last counterable NSTEP: " << j << endl;
               }
               NSTEPS=nsteps+j;
-              if(LDEBUG){cerr << soliloquy << " NSTEPS=" << NSTEPS << endl;}
+              if(LDEBUG){cerr << __AFLOW_FUNC__ << " NSTEPS=" << NSTEPS << endl;}
             }
             else{j++;}
           }
@@ -5198,29 +5188,28 @@ namespace KBIN {
     //this function will read the whole OSZICAR looking for electronic sloshing issues
     //if there are $cutoff ionic steps that did not converge electronically, return true
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::VASP_OSZICARUnconverging():";
     vector<string> vlines,vrelax,tokens;
     aurostd::file2vectorstring(dir+"/OSZICAR",vlines);
     uint i=0;
     for(i=1;i<vlines.size();i++){ //start at 1 so i-1 isn't a problem
       if(vlines[i].find("F=")!=string::npos){vrelax.push_back(vlines[i-1]);}
     }
-    if(LDEBUG){cerr << soliloquy << " nionic=" << vrelax.size() << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " nionic=" << vrelax.size() << endl;}
     if(vrelax.size()<cutoff) return FALSE; // no problem
     // otherwise check for issues.
     uint NELM=KBIN::VASP_getNELM(dir+"/OUTCAR");
-    if(LDEBUG){cerr << soliloquy << " NELM=" << NELM << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " NELM=" << NELM << endl;}
     uint nsteps=0,nissues=0;
     for(i=0;i<vrelax.size()&&nissues<cutoff;i++) {
-      if(LDEBUG){cerr << soliloquy << " vrelax[i=" << i << "]=\"" << vrelax[i] << "\"" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " vrelax[i=" << i << "]=\"" << vrelax[i] << "\"" << endl;}
       aurostd::string2tokens(vrelax[i],tokens," ");
       if(tokens.size()>1){
         nsteps=aurostd::string2utype<uint>(tokens[1]);
-        if(LDEBUG){cerr << soliloquy << " nsteps=" << nsteps << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " nsteps=" << nsteps << endl;}
         if(nsteps!=0 && nsteps>=NELM){nissues++;}
       }
     }
-    if(LDEBUG){cerr << soliloquy << " nissues=" << nissues << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " nissues=" << nissues << endl;}
     if(nissues==cutoff) return true;
     return false;
   }
@@ -5228,12 +5217,11 @@ namespace KBIN {
     //this function only looks at the last electronic SC step (different than VASP_OSZICARUnconverging, good for STATIC calcs)
     //if it is unconverged, return true
     bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::VASP_OSZICARUnconverged():";
     uint NELM=KBIN::VASP_getNELM(outcar);
     uint NSTEPS=KBIN::VASP_getNSTEPS(oszicar);
     if(LDEBUG){
-      cerr << soliloquy << " NELM=" << NELM << endl;
-      cerr << soliloquy << " NSTEPS=" << NSTEPS << endl;
+      cerr << __AFLOW_FUNC__ << " NELM=" << NELM << endl;
+      cerr << __AFLOW_FUNC__ << " NSTEPS=" << NSTEPS << endl;
     }
     if(NELM!=0 && NSTEPS!=0 && NSTEPS>=NELM){return true;}
     return false;
@@ -5374,7 +5362,6 @@ namespace KBIN {
 namespace KBIN {
   string BIN2VASPVersion(const string& binfile){ //SD20220331
     //SD20220401 - based on ME20190219 getVASPVersionString; this works for vasp4, vasp5, and vasp6
-    string soliloquy=XPID+"KBIN::BIN2VASPVersion():";
     ifstream infile(binfile.c_str(), std::ios::in | std::ios::binary);
     if (!infile.is_open()) {return "";}
     int bufferSize = 1024, i;
@@ -5430,17 +5417,16 @@ namespace KBIN {
     //outcar -> vasp.4.6.35
     //outcar -> vasp.5.4.4.18Apr17-6-g9f103f2a35
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::OUTCAR2VASPVersion():";
-    if(LDEBUG){cerr << soliloquy << " outcar=" << outcar << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " outcar=" << outcar << endl;}
     if(!aurostd::FileExist(outcar)){return "";}
     vector<string> vlines;
     uint vlines_size=aurostd::file2vectorstring(outcar,vlines);
     vector<string> tokens;
     uint tokens_size=0;
     for(uint iline=0;iline<vlines_size;iline++){
-      if(LDEBUG){cerr << soliloquy << " vlines[iline]=\"" << vlines[iline] << "\"" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " vlines[iline]=\"" << vlines[iline] << "\"" << endl;}
       if(vlines[iline].find("vasp.")!=string::npos){
-        if(LDEBUG){cerr << soliloquy << " FOUND 'vasp.' line" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " FOUND 'vasp.' line" << endl;}
         tokens_size=aurostd::string2tokens(vlines[iline],tokens," ");
         for(uint i=0;i<tokens_size;i++){
           if(tokens[i].find("vasp.")!=string::npos){
@@ -5465,12 +5451,11 @@ namespace KBIN {
     //vasp.4.6.35 -> 4.6.35
     //vasp.5.4.4.18Apr17-6-g9f103f2a35 -> 5.4.4
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::VASPVersionString2Number():";
     string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vasp_version);
-    if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " version_str=\"" << version_str << "\"" << endl;}
     if(version_str.empty()){return "";}
     aurostd::StringSubst(version_str,"vasp.",""); //remove 'vasp.'
-    if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " version_str=\"" << version_str << "\"" << endl;}
     //isfloat() does not work here: "35 3Apr08" is considered float: 35
     vector<string> vtokens;
     aurostd::string2tokens(version_str,vtokens,".");  //split by '.', check if pieces are all digits
@@ -5492,7 +5477,7 @@ namespace KBIN {
     //[CO20210315 - not good, will catch 18 (date) in vasp.5.4.4.18Apr17-6-g9f103f2a35]    version_str_num+=version_str[i];
     //[CO20210315 - not good, will catch 18 (date) in vasp.5.4.4.18Apr17-6-g9f103f2a35]  }else{break;}
     //[CO20210315 - not good, will catch 18 (date) in vasp.5.4.4.18Apr17-6-g9f103f2a35]}
-    if(LDEBUG){cerr << soliloquy << " version_str_num=\"" << version_str_num << "\"" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " version_str_num=\"" << version_str_num << "\"" << endl;}
     if(version_str_num.empty()){return "";}  //repetita iuvant
     return version_str_num;
   }
@@ -5503,9 +5488,8 @@ namespace KBIN {
     //vasp.5.4.4.18Apr17-6-g9f103f2a35 -> 5.004004
     //differs from 2Number in that it returns a double
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::VASPVersionString2Double():";
     string version_str=aurostd::RemoveWhiteSpacesFromTheFrontAndBack(vasp_version);
-    if(LDEBUG){cerr << soliloquy << " version_str=\"" << version_str << "\"" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " version_str=\"" << version_str << "\"" << endl;}
     return aurostd::VersionString2Double(KBIN::VASPVersionString2Number(version_str));
   }
   //ME20190219 - getVASPVersionString
@@ -5521,17 +5505,16 @@ namespace KBIN {
     // /home/bin/vasp_std -> vasp.4.6.35
     // /home/bin/vasp_std -> vasp.5.4.4.18Apr17-6-g9f103f2a35
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string soliloquy=XPID+"KBIN::getVASPVersionString():";
     if(LDEBUG){
-      cerr << soliloquy << " binfile=" << binfile << endl;
-      cerr << soliloquy << " mpi_command=" << mpi_command << endl;
+      cerr << __AFLOW_FUNC__ << " binfile=" << binfile << endl;
+      cerr << __AFLOW_FUNC__ << " mpi_command=" << mpi_command << endl;
     }
     if (!XHOST.is_command(binfile)) return "";
     // Get the full path to the binary
     string fullPathBinaryName = XHOST.command(binfile);
     if (fullPathBinaryName.empty()) return "";
     string vaspVersion = KBIN::BIN2VASPVersion(binfile);
-    if(LDEBUG){cerr << soliloquy << " vaspVersion from BIN=" << vaspVersion << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " vaspVersion from BIN=" << vaspVersion << endl;}
     if (!vaspVersion.empty()) return vaspVersion; //SD20220401
 
     //CO20200610 START - run a dumb vasp to get vasp output file and grab version
@@ -5543,14 +5526,14 @@ namespace KBIN {
     aurostd::string2file("","./KPOINTS");
     aurostd::string2file("","./POSCAR");
     aurostd::string2file("","./POTCAR");
-    if(LDEBUG){cerr << soliloquy << " ls[1]=" << endl << aurostd::execute2string("ls") << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " ls[1]=" << endl << aurostd::execute2string("ls") << endl;}
     //execute2string does not work well here...
     string command="";
     if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
     command+=binfile+" > /dev/null 2>&1";
-    if(LDEBUG){cerr << soliloquy << " running command: \"" << command << "\"" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " running command: \"" << command << "\"" << endl;}
     aurostd::execute(command);  //ME20200610 - no output from vasp
-    if(LDEBUG){cerr << soliloquy << " ls[2]=" << endl << aurostd::execute2string("ls") << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " ls[2]=" << endl << aurostd::execute2string("ls") << endl;}
     if(!aurostd::FileExist("OUTCAR")){
       //first re-try, source intel
       vector<string> vintel_paths;
@@ -5569,15 +5552,15 @@ namespace KBIN {
             if(!mpi_command.empty()){command+=mpi_command+" 1 ";} //add mpi_command with -n 1
             command+=binfile+" > /dev/null 2>&1\"";  //ME20200610 - no output from vasp  //CO20210315 - source only works in bash
           }
-          if(LDEBUG){cerr << soliloquy << " running command: \"" << command << "\"" << endl;}
+          if(LDEBUG){cerr << __AFLOW_FUNC__ << " running command: \"" << command << "\"" << endl;}
           aurostd::execute(command);
-          if(LDEBUG){cerr << soliloquy << " ls[3]=" << endl << aurostd::execute2string("ls") << endl;}
+          if(LDEBUG){cerr << __AFLOW_FUNC__ << " ls[3]=" << endl << aurostd::execute2string("ls") << endl;}
           if(aurostd::FileExist("OUTCAR")){break;}
         }
       }
     }
     vaspVersion=KBIN::OUTCAR2VASPVersion("OUTCAR");
-    if(LDEBUG){cerr << soliloquy << " vaspVersion from OUTCAR=" << vaspVersion << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " vaspVersion from OUTCAR=" << vaspVersion << endl;}
     chdir(pwddir.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
     aurostd::RemoveDirectory(tmpdir);
