@@ -503,7 +503,7 @@ namespace plotter {
           vector<string> comp;
           protos.clear();
           aflowlib::GetAllPrototypeLabels(protos, comp, "htqc");
-          int index;
+          int index = 0;
           if (aurostd::WithinList(protos, proto, index)) {
             proto = aurostd::fixStringLatex(proto, false, false); // Prevent LaTeX errors
             vector<string> elements = aurostd::getElements(comp_str);

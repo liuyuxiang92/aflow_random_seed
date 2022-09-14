@@ -178,7 +178,7 @@ namespace qca {
   void QuasiChemApproxCalculator::readQCAFlags(const aurostd::xoption& qca_flags) {
     if (qca_flags.getattachedscheme("QCA::PLATTICE").empty() || qca_flags.getattachedscheme("QCA::ELEMENTS").empty()) {
       string message = "QCA::PLATTICE and QCA::ELEMENTS flags must be defined";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_MISSING_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_MISSING_);
     }
     plattice = qca_flags.getattachedscheme("QCA::PLATTICE");
     aurostd::string2tokens(qca_flags.getattachedscheme("QCA::ELEMENTS"), elements, ",");
@@ -203,30 +203,30 @@ namespace qca {
   void QuasiChemApproxCalculator::printParams() {
     stringstream message;
     message << "Root directory = " << rootdirpath;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     message << "AFLOWLIB directory = " << aflowlibpath;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     message << "Maximum number of atoms in AFLOW = " << aflow_max_num_atoms;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     message << "Parent lattice = " << plattice;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     message << "Alloy elements = " << aurostd::joinWDelimiter(elements, ",");
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     message << "Maximum number of atoms in cluster expansion = " << max_num_atoms;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     message << "Cross validation cutoff = " << cv_cut;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     message << "Concentration curve range = " << std::fixed << std::setprecision(4);
     for (size_t i = 0; i < conc_curve_range.size(); i++) {message << conc_curve_range[i] << " ";}
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     message << "Number of points (concentration) = " << conc_npts;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     message << "Temperature range (K) = " <<  std::fixed << std::setprecision(2) << temp_range[0] << " " << temp_range[1];
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     message << "Number of points (temperature) = " << temp_npts;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     message << "Output format = " << print;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
   /// @brief checks and fixes errors in the input variables
@@ -245,33 +245,33 @@ namespace qca {
     // Check if max number of atoms in cluster is valid
     if (aflow_max_num_atoms < 1 || max_num_atoms < 1) {
       string message = "Maximum number of atoms per cluster must be at least 1";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     // Check if directory is writable
     if (!aurostd::DirectoryMake(rootdirpath)) {
       string message = "Cannot create directory";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
     // Check if parent lattice is valid
     if (plattice != "fcc" && plattice != "bcc" && plattice != "hcp") {
       string message = "Parent lattice \"" + plattice + "\" is invalid";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
     }
     // Check if alloy is at least binary
     if (nelem < 2) {
       string message = "Alloy must be at least binary";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     // Check if HCP parent lattice is used for greater than binary
     if (plattice == "hcp" && nelem != 2) {
       string message = "HCP parent lattice of alloys greater than binary not supported";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
     }
     // Check if elements are valid, construct alloy name
     for (uint i = 0; i < nelem; i++) {
       if (!xelement::xelement::isElement(elements[i])) {
         string message = "Element \"" + elements[i] + "\" is invalid";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
       }
       alloyname += elements[i];
     }
@@ -279,13 +279,13 @@ namespace qca {
     // Check if concentration range has enough points
     if (conc_npts < 2) {
       string message = "Number of points for the concentration range must be at least 2";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     // Check if concentration curve format is valid
     if (conc_curve) {
       if (conc_curve_range.size() != 2 * nelem) {
         string message = "Concentration curve must have format [X1_start, X1_end, X2_start, X2_end,...X(K)_start, X(K)_end]";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
       }
       // Check if concentration curve is within [0,1] and sums to 1
       double totconc_init = 0.0, totconc_final = 0.0;
@@ -295,14 +295,14 @@ namespace qca {
         if (conc_curve_range[2 * i] < 0 || conc_curve_range[2 * i] > 1 ||
             conc_curve_range[2 * i + 1] < 0 || conc_curve_range[2 * i + 1] > 1) {
           string message = "Concentration curve must be defined on [0,1]";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
         }
         totconc_init += conc_curve_range[2 * i]; totconc_final += conc_curve_range[2 * i + 1];
         vconc_init.push_back(conc_curve_range[2 * i]); vconc_final.push_back(conc_curve_range[2 * i + 1]);
       }
       if (!aurostd::isequal(totconc_init, 1.0) || !aurostd::isequal(totconc_final, 1.0)) {
         string message = "Total concentration must sum to 1";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
       }
       // Redefine concentration curve from [0,1] to (0,1)
       aurostd::WithinList(vconc_init, 0.0, vzeros_init); aurostd::WithinList(vconc_final, 0.0, vzeros_final);
@@ -320,23 +320,23 @@ namespace qca {
     // Check if temperature range format is valid
     if (temp_range.size() != 2) {
       string message = "Temperature range must have format [T_start T_end]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
     }
     // Check if temperature range has enough points
     if (temp_npts < 2) {
       string message = "Number of points for the temperature range must be at least 2";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     // Check if temperature values are valid
     if (temp_range[0] < 0 || temp_range[1] < 0) {
       string message = "Temperature cannot be below 0K";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     // Check if output format is valid
     if (print != "txt" && print != "json" &&
         print != "pdf" && print != "eps" && print != "png") {
       string message = "Format \"" + print + "\" is invalid";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_WRONG_FORMAT_);
     }
   }
 
@@ -380,7 +380,7 @@ namespace qca {
       catch (aurostd::xerror& err) {
         stringstream message;
         message << "Equilibrium probabilities do not satify the concentration constraints, skipping binodal curve calculation";
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         return;
       }
       calculateRelativeEntropy();
@@ -456,7 +456,7 @@ namespace qca {
       }
     }
     message << "Reading AFLOW xstructures from AFLOW database";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     vector<std::shared_ptr<aflowlib::_aflowlib_entry>> entries;
     aflowlib::EntryLoader el;
     el.m_xstructure_original = true;
@@ -496,7 +496,7 @@ namespace qca {
     stringstream oss;
     aflowlib::_aflowlib_entry entry;
     message << "Reading AFLOW xstructures from directory = " << aflowlibpath;
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     for (size_t i = 0; i < vdir.size(); i++) {
       if (!aurostd::FileExist(vdir[i] + "/aflowlib.out") ||
           !aurostd::FileExist(vdir[i] + "/POSCAR.orig") ||
@@ -540,7 +540,7 @@ namespace qca {
     vector<xstructure> vstr1 = _vstr1;
     vector<uint> index;
     message << "Mapping xstructures between AFLOW and ATAT";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     for (uint i = 0; i < vstr1.size(); i++) {index.push_back(i);}
     // Shuffling the xstructures is important because it can avoid edge case scenarios where the reference centroid
     // in Xtalfinder does not pick up the proper neighbors
@@ -574,7 +574,7 @@ namespace qca {
     }
     if (mapstr.size() != index.size()) {
       message << "Something went wrong in the mapping of the xstructures; index.size()=" << index.size() << " | mapstr.size()=" << mapstr.size() << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     vector<int> _mapstr = mapstr;
     for (size_t i = 0; i < index.size(); i++) {mapstr[index[i]] = _mapstr[i];} // reorder back to the original
@@ -655,7 +655,7 @@ namespace qca {
     stringstream oss;
     if (fromfile) {
       message << "Reading ATAT xstructures from directory = " << rundirpath;
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
       vector<string> files;
       vector<xstructure> vstr_tmp;
       vector<uint> index;
@@ -693,15 +693,15 @@ namespace qca {
     aurostd::RemoveFile(tmpfile);
     if (sstr.size() == 0 || aurostd::substring2bool(sstr, "Unable to open lattice file")) {
       message << "Invalid lat.in file";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_CORRUPT_);
     }
     else if (aurostd::substring2bool(sstr, "command not found")) {
       message << "Missing genstr program";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     aurostd::string2vectorstring(sstr, vinput);
     message << "Reading ATAT xstructures from genstr";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     for (size_t line = 0; line < vinput.size(); line++) {
       if (aurostd::substring2bool(vinput[line], "end")) {
         vstr.push_back(xstructure(oss, IOATAT_STR));
@@ -726,7 +726,7 @@ namespace qca {
     aurostd::string2file(lat_atat, rundirpath + "/lat.in"); // generate lat.in file
     uint msize = mapstr.size();
     message << "Generating ATAT files";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     for (size_t i = 0; i < vstr_ce.size(); i++) {
       aurostd::DirectoryMake(rundirpath + "/" + aurostd::utype2string<uint>(i));
       oss << vstr_ce[i];
@@ -750,7 +750,7 @@ namespace qca {
     uint iter = 0;
     if (aurostd::substring2bool(aurostd::execute2string("mmaps", stdouterr_fsio), "command not found")) {
       message << "Missing mmaps program";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     aurostd::execute("touch " + rundirpath + "/stop"); // pre-kill mmaps gracefully
     aurostd::RemoveFile(rundirpath + "/maps_is_running");
@@ -759,14 +759,14 @@ namespace qca {
     string tmpfile = aurostd::TmpStrCreate(), logstring = "";
     aurostd::execute("mmaps -d > " + tmpfile + " 2>&1 &");
     message << "Running ATAT cluster expansion";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     while (!aurostd::substring2bool(logstring, "true and predicted ground states agree") && !aurostd::substring2bool(logstring, "No other ground states")) {
       iter++;
       if (LDEBUG) {cerr << __AFLOW_FUNC__ << " Sleeping, iter=" << iter << endl;}
       if (iter > 60) { // wait 60 times the minimum sleep
         message << "mmaps is taking too long to predict structures, directory = " << rundirpath;
         aurostd::RemoveFile(tmpfile);
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
       aurostd::Sleep(min_sleep);
       aurostd::file2string(rundirpath + "/maps.log", logstring);
@@ -785,13 +785,13 @@ namespace qca {
     aurostd::string2tokens(vinput.back(), tokens, " ");
     if (tokens[0] != "Crossvalidation") {
       string message = "ATAT run did not complete";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     cv_cluster = aurostd::string2utype<double>(tokens[2]);
     if (cv_cluster > cv_cut) {
       stringstream message;
       message << "Cluster cross-validation score is above the cut-off, CV_cluster=" << cv_cluster << ", CV_cutoff=" << cv_cut;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
   }
 
@@ -849,7 +849,7 @@ namespace qca {
     aurostd::string2tokens(vinput[0], tokens, " ");
     if (nelem > tokens.size()) {
       string message = "fit.out has the wrong output format";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     for (size_t line = 0; line < vinput.size(); line++) {
       aurostd::string2tokens(vinput[line], tokens, " ");
@@ -860,7 +860,7 @@ namespace qca {
     aurostd::string2tokens(vinput[0], tokens, " ");
     if (nelem > tokens.size()) {
       string message = "predstr.out has the wrong output format";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     for (size_t line = 0; line < vinput.size(); line++) {
       aurostd::string2tokens(vinput[line], tokens, " ");
@@ -935,7 +935,7 @@ namespace qca {
     }
     stringstream message;
     message << "Generating derivative structures";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     vector<xstructure> _vstr_ce = vstr_ce;
     xstructure str_pocc, str;
     deque<_atom> patoms, atoms;
@@ -1017,10 +1017,10 @@ namespace qca {
       sum_accepted += pcalc.total_permutations_count;
     }
     message << "Generated all unique derivative structures, count = " << vstr_ds.size();
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
     // Find degenerate structures
     message << "Finding the degeneracy of clusters";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     skipstr = xvector<int>(vstr_ds.size());
     vector<xstructure>::iterator ib = vstr_ds.begin();
 #ifdef AFLOW_MULTITHREADS_ENABLE
@@ -1038,7 +1038,7 @@ namespace qca {
     sum_calculated = aurostd::sum(degeneracy_cluster);
     if (!aurostd::isequal(sum_calculated, sum_accepted)) {
       message << "Degeneracies do not satisfy the sum rule, the sum is " << sum_calculated << " but should be " << sum_accepted;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
     if (!filepath.empty()) {
       stringstream ss;
@@ -1131,12 +1131,12 @@ namespace qca {
       if (!aurostd::isequal(aurostd::sum(prob_ideal_cluster(ix)), 1.0)) { // unnormalized
         stringstream message;
         message << "Ideal solution (high-T) probability is unnormalized for ix=" << ix << " | SUM[P_cluster]=" << aurostd::sum(prob_ideal_cluster(ix));
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
       }
       else if (!aurostd::isequal(prob_ideal_cluster(ix) * conc_cluster, conc_macro(ix))) { // does not satisfy concentration constraints
         stringstream message;
         message << "Ideal solution (high-T) probability does not satisfy concentration contraint X=[" << conc_macro(ix) << " ], X_calc=[" << prob_ideal_cluster(ix) * conc_cluster << "]";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
       }
     }
   }
@@ -1175,7 +1175,7 @@ namespace qca {
     if (!found_soln) { // physical solution does not exist
       stringstream message;
       message << "Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]" << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     for (int ic = prob_ideal_cluster.lcols; ic <= prob_ideal_cluster.ucols; ic++) {
       prob_cluster[it - 1](ix, ic) = prob_ideal_cluster(ix, ic) * std::exp(-beta(it) * excess_energy_cluster(ic)) * std::pow(soln(1), num_elem_cluster(ic, 1));
@@ -1227,7 +1227,7 @@ namespace qca {
     if (!found_soln) {
       stringstream message;
       message << "Physical equilibrium probability does not exist for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ]" << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     soln0.setcol(soln, ix); // use the higher temperature solution as an initial guess for lower temperature solution
     for (int ic = prob_ideal_cluster.lcols; ic <= prob_ideal_cluster.ucols; ic++) {
@@ -1252,7 +1252,7 @@ namespace qca {
     prob_cluster.clear();
     prob_cluster.assign(temp.rows, xmatrix<double>(nconc, ncluster)); // initialize
     message << "Calculating cluster probabilities";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     if (nelem - 1 == 1) {
       for (int it = temp.lrows; it <= temp.urows; it++) {
 #ifdef AFLOW_MULTITHREADS_ENABLE
@@ -1318,12 +1318,12 @@ namespace qca {
         if (!aurostd::isequal(aurostd::sum(prob_cluster[it - 1](ix)), 1.0)) { // unnormalized
           stringstream message;
           message << "Equilibrium probability is unnormalized for T=" << temp(it) << "K, ix=" << ix << " | SUM[P_cluster]=" << aurostd::sum(prob_cluster[it - 1](ix));
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
         }
         else if (!aurostd::isequal(prob_cluster[it - 1](ix) * conc_cluster, conc_macro(ix))) { // does not satisfy concentration constraints
           stringstream message;
           message << "Equilibrium probability does not satisfy concentration contraint for T=" << temp(it) << "K, X=[" << conc_macro(ix) << " ], X_calc=[" << prob_cluster[it - 1](ix) * conc_cluster << "]";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
         }
       }
       diff_old = diff;
@@ -1332,7 +1332,7 @@ namespace qca {
       if (diff > diff_old) { // P(T_inf) does not equal P0(T_inf)
         stringstream message;
         message << "Equilibrium probability does not converge to the high-T limit for T=" << temp(it) << "K";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
     }
   }
@@ -1353,7 +1353,7 @@ namespace qca {
     // Check that the probability is physical, if not, shift the temperature range upward
     double dtemp = temp(2) - temp(1);
     message << "Checking for physical probabilites at equi-composition";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     while (aurostd::min(temp) < DEFAULT_QCA_TEMP_MIN_LIMIT) {
       try {
         calculateProbabilityCluster();
@@ -1361,19 +1361,19 @@ namespace qca {
       }
       catch (aurostd::xerror& err) {
         message << "Could not find physical solution at equi-concentration, increasing the temperature range";
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         temp += dtemp;
         beta = aurostd::pow(KBOLTZEV * temp, -1.0);
       }
     }
     if (aurostd::min(temp) > DEFAULT_QCA_TEMP_MIN_LIMIT) {
       message << "Could not find a temperature at equi-concentration that leads to a physical solution";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
     xvector<double> temp_orig = temp; // store original temperature
     xvector<double> beta_orig = beta; // store original inverse temperature
     message << "Equi-composition temperature range = [" << temp(1) << "K, " << temp(temp.urows) << "K]";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     xvector<double> order_param(temp.rows);
     xmatrix<double> m1, m2, m3 = prob_ideal_cluster * aurostd::trasp(prob_ideal_cluster);
     for (int it = temp.lrows; it <= temp.urows; it++) {
@@ -1395,7 +1395,7 @@ namespace qca {
     // If the order parameter diverges, then we can interpolate
     if (low_t_div) {
       message << "Order parameter diverges at low temperature, using interpolation";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       xvector<double> dadt = aurostd::evalPolynomial_xv(temp_scaled, coeff1), temp_interp(temp.rows + 1), dadt_interp(temp.rows + 1);
       for (int i = temp.lrows; i <= temp.urows; i++) {temp_interp(i + 1) = temp(i);} // add T = 0K
       for (int i = dadt.lrows; i <= dadt.urows; i++) {dadt_interp(i + 1) = dadt(i);} // add Da/DT(0K) = 0
@@ -1433,7 +1433,7 @@ namespace qca {
     }
     param_ec.second = temp_std * param_ec.second + temp_mean;
     message << "Equi-composition transition temperature = " << param_ec.second << "K";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
     temp = xvector<double> {param_ec.second};
     beta = aurostd::pow(KBOLTZEV * temp, -1.0);
     calculateProbabilityCluster();
@@ -1476,7 +1476,7 @@ namespace qca {
     double temp_mean = aurostd::mean(temp), temp_std = aurostd::stddev(temp);
     xvector<double> temp_scaled = (temp - temp_mean) / temp_std; // scale for numerical stability
     message << "Calculating binodal curve";
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     for (int ix = rel_s.lrows; ix <= rel_s.urows; ix++) {
       coeff = aurostd::polynomialCurveFit(temp_scaled, rel_s(ix) - param_ec.first, n_fit, wts);
       aurostd::polynomialFindRoots(coeff, rootr, rooti);
@@ -1549,7 +1549,7 @@ namespace qca {
     string filepath = rundirpath + "/" + QCA_FILE_PREFIX + "output.json";
     if (!aurostd::FileExist(filepath)) {
       string message = "The JSON file does not exist, filepath=" + filepath; 
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _FILE_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _FILE_ERROR_);
     }
     string jsonfile = aurostd::file2string(filepath);
     alloyname = aurostd::extractJsonValueAflow(jsonfile, "Alloy name");
