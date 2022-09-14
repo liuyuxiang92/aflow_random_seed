@@ -1153,22 +1153,22 @@ namespace qca {
   void QuasiChemApproxCalculator::calculateProbabilityCluster1D(int iix, const int it) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     int ix = iix + prob_ideal_cluster.lrows;
-    xvector<double> soln(nelem - 1), p(max_num_atoms + 1), rr(max_num_atoms), ri(max_num_atoms);
+    xvector<double> soln(nelem - 1), coeff(max_num_atoms + 1), rootr(max_num_atoms), rooti(max_num_atoms);
     bool found_soln = false;
     for (int ic = prob_ideal_cluster.lcols; ic <= prob_ideal_cluster.ucols; ic++) {
-      p((int)num_elem_cluster(ic, 1) + 1) += prob_ideal_cluster(ix, ic) * std::exp(-beta(it) * excess_energy_cluster(ic)) * (conc_cluster(ic, 1) - conc_macro(ix, 1));
+      coeff((int)num_elem_cluster(ic, 1) + 1) += prob_ideal_cluster(ix, ic) * std::exp(-beta(it) * excess_energy_cluster(ic)) * (conc_cluster(ic, 1) - conc_macro(ix, 1));
     }
-    if (LDEBUG) {cerr << __AFLOW_FUNC__ << " it=" << it << " ix=" << ix << " | p=" << p << endl;}
-    aurostd::polynomialFindRoots(p, rr, ri);
+    if (LDEBUG) {cerr << __AFLOW_FUNC__ << " it=" << it << " ix=" << ix << " | coeff=" << coeff << endl;}
+    aurostd::polynomialFindRoots(coeff, rootr, rooti);
     if (LDEBUG) {
-      cerr << __AFLOW_FUNC__ << "   real roots=" << rr << endl;
-      cerr << __AFLOW_FUNC__ << "   imag roots=" << ri << endl;
+      cerr << __AFLOW_FUNC__ << "   real roots=" << rootr << endl;
+      cerr << __AFLOW_FUNC__ << "   imag roots=" << rooti << endl;
     }
-    for (int isol = rr.lrows; isol <= rr.urows; isol++) {
-      if (rr(isol) > soln(1) &&
-          aurostd::isequal(ri(isol), 0.0) &&
-          max_num_atoms * std::pow(rr(isol), max_num_atoms) != INFINITY) { // solution must be positive, real, and finite
-        soln(1) = rr(isol);
+    for (int isol = rootr.lrows; isol <= rootr.urows; isol++) {
+      if (rootr(isol) > soln(1) &&
+          aurostd::isequal(rooti(isol), 0.0) &&
+          max_num_atoms * std::pow(rootr(isol), max_num_atoms) != INFINITY) { // solution must be positive, real, and finite
+        soln(1) = rootr(isol);
         found_soln = true;
       }
     }
@@ -1390,44 +1390,44 @@ namespace qca {
     double temp_mean = aurostd::mean(temp), temp_std = aurostd::stddev(temp);
     xvector<double> temp_scaled = (temp - temp_mean) / temp_std; // scale for numerical stability
     xvector<double> wts = aurostd::ones_xv<double>(order_param.rows);
-    xvector<double> p = aurostd::polynomialCurveFit(temp_scaled, order_param, n_fit, wts);
-    xvector<double> p1 = aurostd::evalPolynomialCoeff(p, 1), p2 = aurostd::evalPolynomialCoeff(p, 2);
+    xvector<double> coeff = aurostd::polynomialCurveFit(temp_scaled, order_param, n_fit, wts);
+    xvector<double> coeff1 = aurostd::evalPolynomialCoeff(coeff, 1), coeff2 = aurostd::evalPolynomialCoeff(coeff, 2);
     // If the order parameter diverges, then we can interpolate
     if (low_t_div) {
       message << "Order parameter diverges at low temperature, using interpolation";
       pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-      xvector<double> dadt = aurostd::evalPolynomial_xv(temp_scaled, p1), temp_interp(temp.rows + 1), dadt_interp(temp.rows + 1);
+      xvector<double> dadt = aurostd::evalPolynomial_xv(temp_scaled, coeff1), temp_interp(temp.rows + 1), dadt_interp(temp.rows + 1);
       for (int i = temp.lrows; i <= temp.urows; i++) {temp_interp(i + 1) = temp(i);} // add T = 0K
       for (int i = dadt.lrows; i <= dadt.urows; i++) {dadt_interp(i + 1) = dadt(i);} // add Da/DT(0K) = 0
       temp_mean = aurostd::mean(temp_interp), temp_std = aurostd::stddev(temp_interp);
       temp_scaled = (temp_interp - temp_mean) / temp_std;
       wts = aurostd::exp(temp_scaled); // scale weights by temperature, since high-T is more accurate
       wts(1) = wts(wts.rows); // force convergence at T = 0K
-      p1 = aurostd::polynomialCurveFit(temp_scaled, dadt_interp, n_fit - 1, wts);
-      p2 = aurostd::evalPolynomialCoeff(p1, 1);
+      coeff1 = aurostd::polynomialCurveFit(temp_scaled, dadt_interp, n_fit - 1, wts);
+      coeff2 = aurostd::evalPolynomialCoeff(coeff1, 1);
     }
     if (LDEBUG) {
       cerr << __AFLOW_FUNC__ << " alpha_orig=" << order_param << endl;
-      cerr << __AFLOW_FUNC__ << " D[alpha, 0]=" << aurostd::evalPolynomial_xv(temp_scaled, p) << endl;
-      cerr << __AFLOW_FUNC__ << " D[alpha, 1]=" << aurostd::evalPolynomial_xv(temp_scaled, p1) << endl;
-      cerr << __AFLOW_FUNC__ << " D[alpha, 2]=" << aurostd::evalPolynomial_xv(temp_scaled, p2) << endl;
+      cerr << __AFLOW_FUNC__ << " D[alpha, 0]=" << aurostd::evalPolynomial_xv(temp_scaled, coeff) << endl;
+      cerr << __AFLOW_FUNC__ << " D[alpha, 1]=" << aurostd::evalPolynomial_xv(temp_scaled, coeff1) << endl;
+      cerr << __AFLOW_FUNC__ << " D[alpha, 2]=" << aurostd::evalPolynomial_xv(temp_scaled, coeff2) << endl;
     }
-    xvector<double> rr(n_fit - 2), ri(n_fit - 2);
-    aurostd::polynomialFindRoots(p2, rr, ri);
+    xvector<double> rootr(n_fit - 2), rooti(n_fit - 2);
+    aurostd::polynomialFindRoots(coeff2, rootr, rooti);
     if (LDEBUG) {
-      cerr << __AFLOW_FUNC__ << " p2=" << p2 << endl;
-      cerr << __AFLOW_FUNC__ << "   Real roots=" << rr << endl;
-      cerr << __AFLOW_FUNC__ << "   Imag roots=" << ri << endl;
+      cerr << __AFLOW_FUNC__ << " coeff2=" << coeff2 << endl;
+      cerr << __AFLOW_FUNC__ << "   Real roots=" << rootr << endl;
+      cerr << __AFLOW_FUNC__ << "   Imag roots=" << rooti << endl;
     }
     bool unset = true;
     for (int j = 1; j <= n_fit; j++) {
-      if (rr(j) >= temp_scaled(1) && rr(j) <= temp_scaled(temp.rows) && aurostd::isequal(ri(j), 0.0)) { // solution must be real and within temp range
+      if (rootr(j) >= temp_scaled(1) && rootr(j) <= temp_scaled(temp.rows) && aurostd::isequal(rooti(j), 0.0)) { // solution must be real and within temp range
         if (unset) {
-          param_ec.second = rr(j);
+          param_ec.second = rootr(j);
           unset = false;
         }
-        else if (aurostd::evalPolynomial(param_ec.second, p1) < aurostd::evalPolynomial(rr(j), p1)) { // keep largest gradient
-          param_ec.second = rr(j);
+        else if (aurostd::evalPolynomial(param_ec.second, coeff1) < aurostd::evalPolynomial(rootr(j), coeff1)) { // keep largest gradient
+          param_ec.second = rootr(j);
         }
       }
     }
@@ -1471,24 +1471,24 @@ namespace qca {
     stringstream message;
     int n_fit = 8;
     binodal_curve = xvector<double>(nconc);
-    xvector<double> p, rr(n_fit), ri(n_fit);
+    xvector<double> coeff, rootr(n_fit), rooti(n_fit);
     xvector<double> wts = aurostd::ones_xv<double>(temp_npts);
     double temp_mean = aurostd::mean(temp), temp_std = aurostd::stddev(temp);
     xvector<double> temp_scaled = (temp - temp_mean) / temp_std; // scale for numerical stability
     message << "Calculating binodal curve";
     pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     for (int ix = rel_s.lrows; ix <= rel_s.urows; ix++) {
-      p = aurostd::polynomialCurveFit(temp_scaled, rel_s(ix) - param_ec.first, n_fit, wts);
-      aurostd::polynomialFindRoots(p, rr, ri);
+      coeff = aurostd::polynomialCurveFit(temp_scaled, rel_s(ix) - param_ec.first, n_fit, wts);
+      aurostd::polynomialFindRoots(coeff, rootr, rooti);
       if (LDEBUG) {
-        cerr << __AFLOW_FUNC__ << " ix=" << ix << " | p=" << p << endl;
-        cerr << __AFLOW_FUNC__ << "   Real roots=" << rr << endl;
-        cerr << __AFLOW_FUNC__ << "   Imag roots=" << ri << endl;
+        cerr << __AFLOW_FUNC__ << " ix=" << ix << " | coeff=" << coeff << endl;
+        cerr << __AFLOW_FUNC__ << "   Real roots=" << rootr << endl;
+        cerr << __AFLOW_FUNC__ << "   Imag roots=" << rooti << endl;
       }
-      rr = temp_std * rr + temp_mean;
+      rootr = temp_std * rootr + temp_mean;
       for (int isol = 1; isol <= n_fit; isol++) {
-        if (rr(isol) >= temp(1) && rr(isol) <= temp(temp.rows) && aurostd::isequal(ri(isol), 0.0) && binodal_curve(ix) < rr(isol)) { // largest solution must be real and within temp range
-          binodal_curve(ix) = rr(isol);
+        if (rootr(isol) >= temp(1) && rootr(isol) <= temp(temp.rows) && aurostd::isequal(rooti(isol), 0.0) && binodal_curve(ix) < rootr(isol)) { // largest solution must be real and within temp range
+          binodal_curve(ix) = rootr(isol);
         }
       }
       pflow::updateProgressBar(ix - rel_s.lrows + 1, rel_s.rows, *p_oss);
