@@ -457,14 +457,12 @@ namespace qca {
     }
     message << "Reading AFLOW xstructures from AFLOW database";
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-    vector<std::shared_ptr<aflowlib::_aflowlib_entry>> entries;
     aflowlib::EntryLoader el;
     el.m_xstructure_original = true;
     el.m_xstructure_relaxed = true;
     el.loadAURL(vstr_aflowurl);
-    el.getEntriesViewFlat(entries);
     size_t ie = 0;
-    for (std::shared_ptr<aflowlib::_aflowlib_entry> entry : entries) {
+    for (std::shared_ptr<aflowlib::_aflowlib_entry> entry : *el.m_entries_flat) {
       ie++;
       entry->vstr[0].qm_E_cell = entry->enthalpy_cell; // ATAT needs energy per cell
       if (use_sg && (entry->spacegroup_orig == entry->spacegroup_relax)) {
@@ -473,7 +471,7 @@ namespace qca {
       else {
         vstr_aflow.push_back(entry->vstr[0]);
       }
-      pflow::updateProgressBar(ie, entries.size(), *p_oss);
+      pflow::updateProgressBar(ie, (*el.m_entries_flat).size(), *p_oss);
     }
     if (!aflowlibpath.empty()) {
       vector<xstructure> vstr = getAFLOWXstructuresCustom();
@@ -489,42 +487,26 @@ namespace qca {
   /// @mod{SD,20220718,created function}
   vector<xstructure> QuasiChemApproxCalculator::getAFLOWXstructuresCustom() const {
     stringstream message;
-    vector<xstructure> vstr;
-    vector<string> vdir;
-    aurostd::SubDirectoryLS(aflowlibpath, vdir);
-    string data;
-    stringstream oss;
-    aflowlib::_aflowlib_entry entry;
+    vector<xstructure> vstr_custom;
     message << "Reading AFLOW xstructures from directory = " << aflowlibpath;
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-    for (size_t i = 0; i < vdir.size(); i++) {
-      if (!aurostd::FileExist(vdir[i] + "/aflowlib.out") ||
-          !aurostd::FileExist(vdir[i] + "/POSCAR.orig") ||
-          !aurostd::FileExist(vdir[i] + "/POSCAR.relax2")) {
-        continue;
-      }
-      entry.Load(aurostd::file2string(vdir[i] + "/aflowlib.out"), oss);
-      oss.str(aurostd::file2string(vdir[i] + "/POSCAR.orig"));
-      entry.vstr.push_back(xstructure(oss));
-      oss.str(aurostd::file2string(vdir[i] + "/POSCAR.relax2"));
-      entry.vstr.push_back(xstructure(oss));
-      entry.vstr[0].qm_E_cell = entry.enthalpy_cell; // ATAT needs energy per cell
-      if (use_sg && (entry.spacegroup_orig == entry.spacegroup_relax)) {
-        vstr.push_back(entry.vstr[0]);
+    aflowlib::EntryLoader el;
+    el.m_xstructure_original = true;
+    el.m_xstructure_relaxed = true;
+    el.loadFolders(aflowlibpath);
+    size_t ie = 0;
+    for (std::shared_ptr<aflowlib::_aflowlib_entry> entry : *el.m_entries_flat) {
+      ie++;
+      entry->vstr[0].qm_E_cell = entry->enthalpy_cell; // ATAT needs energy per cell
+      if (use_sg && (entry->spacegroup_orig == entry->spacegroup_relax)) {
+        vstr_custom.push_back(entry->vstr[0]);
       }
       else {
-        vstr.push_back(entry.vstr[0]);
+        vstr_custom.push_back(entry->vstr[0]);
       }
-      entry.clear();
-      pflow::updateProgressBar(i, vdir.size() - 1, *p_oss);
+      pflow::updateProgressBar(ie, (*el.m_entries_flat).size(), *p_oss);
     }
-
-    cerr<<"===DONE==="<<endl;
-    aurostd::Sleep(100);
-
-
-
-    return vstr;
+    return vstr_custom;
   }
 
   /// @brief calculates the map between two groups of xstructures
