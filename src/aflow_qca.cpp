@@ -18,6 +18,15 @@ using namespace std::placeholders;
 // ###############################################################################
 
 namespace qca {
+  /// @class QuasiChemApproxCalculator
+  /// 
+  /// @brief calculator to perform the quasi-chemical approximation
+  ///
+  /// @authors
+  /// @mod{SD,20220204,created class}
+  ///
+  /// @see
+  /// @doi{10.1016/j.actamat.2018.07.042}
   QuasiChemApproxCalculator::QuasiChemApproxCalculator(ostream& oss) : xStream(oss), m_initialized(false) {initialize();}
   QuasiChemApproxCalculator::QuasiChemApproxCalculator(ofstream& FileMESSAGE, ostream& oss) : xStream(FileMESSAGE, oss), m_initialized(false) {initialize();}
   QuasiChemApproxCalculator::QuasiChemApproxCalculator(const aurostd::xoption& qca_flags, ostream& oss) : xStream(oss), m_initialized(false) {initialize(qca_flags);}
@@ -461,6 +470,7 @@ namespace qca {
     el.m_xstructure_original = true;
     el.m_xstructure_relaxed = true;
     el.loadAURL(vstr_aflowurl);
+    if (!aflowlibpath.empty()) {el.loadFolders(aflowlibpath);}
     size_t ie = 0;
     for (std::shared_ptr<aflowlib::_aflowlib_entry> entry : *el.m_entries_flat) {
       ie++;
@@ -473,40 +483,6 @@ namespace qca {
       }
       pflow::updateProgressBar(ie, (*el.m_entries_flat).size(), *p_oss);
     }
-    if (!aflowlibpath.empty()) {
-      vector<xstructure> vstr = getAFLOWXstructuresCustom();
-      vstr_aflow.insert(vstr_aflow.end(), vstr.begin(), vstr.end());
-    }
-  }
-
-  /// @brief gets the AFLOW xstructures from a given directory
-  ///
-  /// @return xstructures from custom AFLOW runs
-  ///
-  /// @authors
-  /// @mod{SD,20220718,created function}
-  vector<xstructure> QuasiChemApproxCalculator::getAFLOWXstructuresCustom() const {
-    stringstream message;
-    vector<xstructure> vstr_custom;
-    message << "Reading AFLOW xstructures from directory = " << aflowlibpath;
-    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-    aflowlib::EntryLoader el;
-    el.m_xstructure_original = true;
-    el.m_xstructure_relaxed = true;
-    el.loadFolders(aflowlibpath);
-    size_t ie = 0;
-    for (std::shared_ptr<aflowlib::_aflowlib_entry> entry : *el.m_entries_flat) {
-      ie++;
-      entry->vstr[0].qm_E_cell = entry->enthalpy_cell; // ATAT needs energy per cell
-      if (use_sg && (entry->spacegroup_orig == entry->spacegroup_relax)) {
-        vstr_custom.push_back(entry->vstr[0]);
-      }
-      else {
-        vstr_custom.push_back(entry->vstr[0]);
-      }
-      pflow::updateProgressBar(ie, (*el.m_entries_flat).size(), *p_oss);
-    }
-    return vstr_custom;
   }
 
   /// @brief calculates the map between two groups of xstructures

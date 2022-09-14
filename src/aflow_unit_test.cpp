@@ -482,31 +482,12 @@ namespace unittest {
       }
       check(passed, calculated, expected, check_function, check_description, passed_checks, results);
     }
-  //[SD20220705 - OBSOLETE]void UnitTest::checkEqual(const vector<string>& calculated, const vector<string>& expected, const string& check_function,
-  //[SD20220705 - OBSOLETE]    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-  //[SD20220705 - OBSOLETE]  bool passed = (calculated.size() == expected.size());
-  //[SD20220705 - OBSOLETE]  for (size_t i = 0; i < calculated.size() && passed; i++) {
-  //[SD20220705 - OBSOLETE]    passed = (calculated[i] == expected[i]);
-  //[SD20220705 - OBSOLETE]  }
-  //[SD20220705 - OBSOLETE]  check(passed, calculated, expected, check_function, check_description, passed_checks, results);
-  //[SD20220705 - OBSOLETE]}
-
   template <typename utype>
   void UnitTest::checkEqual(const utype& calculated, const utype& expected, const string& check_function,
       const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
     bool passed = (aurostd::isequal(calculated, expected));
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
   }
-  //[SD20220705 - OBSOLETE]void UnitTest::checkEqual(const string& calculated, const string& expected, const string& check_function,
-  //[SD20220705 - OBSOLETE]    const string& check_description, uint & passed_checks, vector<vector<string> >& results) {
-  //[SD20220705 - OBSOLETE]  bool passed = (calculated == expected);
-  //[SD20220705 - OBSOLETE]  check(passed, calculated, expected, check_function, check_description, passed_checks, results);
-  //[SD20220705 - OBSOLETE]}
-  //[SD20220705 - OBSOLETE]void UnitTest::checkEqual(const bool calculated, const bool expected, const string& check_function,
-  //[SD20220705 - OBSOLETE]    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-  //[SD20220705 - OBSOLETE]  bool passed = (calculated == expected);
-  //[SD20220705 - OBSOLETE]  check(passed, calculated, expected, check_function, check_description, passed_checks, results);
-  //[SD20220705 - OBSOLETE]}
 
   template <typename utype>
     void UnitTest::check(const bool passed, const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
@@ -2476,48 +2457,12 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
     cerr << __AFLOW_FUNC__ << " S=" << endl;cerr << S1 << endl;
   }
 
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[1][1]==24 && U1[1][2]==-13 && U1[1][3]==-1 &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[2][1]==13 && U1[2][2]==-7  && U1[2][3]==-1 &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[3][1]==2  && U1[3][2]==-1  && U1[3][3]==0  &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  if(LDEBUG){cerr << __AFLOW_FUNC__ << " U1(1) failed of getSmithNormalForm()" << endl;}
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[1][1]==0  && V1[1][2]==1  && V1[1][3]==3  &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[2][1]==-1 && V1[2][2]==-1 && V1[2][3]==-1 &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[3][1]==1  && V1[3][2]==0  && V1[3][3]==-1 &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  if(LDEBUG){cerr << __AFLOW_FUNC__ << " V1(1) failed of getSmithNormalForm()" << endl;}
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[1][1]==1 && S1[1][2]==0 && S1[1][3]==0 &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[2][1]==0 && S1[2][2]==1 && S1[2][3]==0 &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[3][1]==0 && S1[3][2]==0 && S1[3][3]==1 &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  if(LDEBUG){cerr << __AFLOW_FUNC__ << " S1(1) failed of getSmithNormalForm()" << endl;}
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
-
   xmatrix<long long int> A2(5,5),U2,V2,S2;  //long long int is CRUCIAL, Matlab actually gets this wrong because it uses long int by default
   A2 = {{ 25,  -300,   1050, -1400,   630},
     {-300,  4800, -18900, 26880, -12600},
     { 1050,-18900, 79380,-117600, 56700},
     {-1400, 26880,-117600,179200,-88200},
     { 630, -12600, 56700,-88200,  44100}};
-  //  A2[1][1]=25;    A2[1][2]=-300;   A2[1][3]=1050;    A2[1][4]=-1400;   A2[1][5]=630;
-  //  A2[2][1]=-300;  A2[2][2]=4800;   A2[2][3]=-18900;  A2[2][4]=26880;   A2[2][5]=-12600;
-  //  A2[3][1]=1050;  A2[3][2]=-18900; A2[3][3]=79380;   A2[3][4]=-117600; A2[3][5]=56700;
-  //  A2[4][1]=-1400; A2[4][2]=26880;  A2[4][3]=-117600; A2[4][4]=179200;  A2[4][5]=-88200;
-  //  A2[5][1]=630;   A2[5][2]=-12600; A2[5][3]=56700;   A2[5][4]=-88200;  A2[5][5]=44100;
 
   aurostd::getSmithNormalForm(A2,U2,V2,S2);
 

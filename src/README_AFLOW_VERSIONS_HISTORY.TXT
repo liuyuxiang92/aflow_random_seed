@@ -1,4 +1,4 @@
-3.2.14 - 2022/09/14
+3.2.14 - 
         -- added univariate polynomial solver (SD)
         -- added univariate polynomial fit with weights (SD)
         -- added LUP decomposition (SD)

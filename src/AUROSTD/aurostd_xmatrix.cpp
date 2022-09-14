@@ -2253,14 +2253,29 @@ namespace aurostd {  // namespace aurostd
       }
       traspInPlace(b);
     }
+
   template<class utype>                                 // function inverse xmatrix<>
     xmatrix<utype> adjoint(const xmatrix<utype>& a) { //CO20191201
       xmatrix<utype> b;
       adjointInPlace(a,b);
       return b;
     }
+
   template<class utype>                                 // function inverse xmatrix<>
     xmatrix<utype> inverseByAdjoint(const xmatrix<utype>& a) {return (utype)1.0/det(a) * adjoint(a);} //CO20191201
+
+  /// @brief calculates inverse of a square matrix
+  ///
+  /// @param a square matrix
+  ///
+  /// @return inverse of the square matrix
+  ///
+  /// @authors
+  /// @mod{CO,20191201,created function}
+  /// @mod{SD,20220427,added inverse by QR decomposition}
+  ///
+  /// @note The function will first try to find the inverse using the adjoint and if that fails
+  /// then using QR decomposition
   template<class utype>                                 // function inverse xmatrix<>
     xmatrix<utype> inverse(const xmatrix<utype>& a) {
       // returns the inverse
@@ -2379,6 +2394,14 @@ namespace aurostd {  // namespace aurostd
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
+  /// @brief calculates inverse of a square matrix using QR decomposition
+  ///
+  /// @param a square matrix
+  ///
+  /// @return inverse of the square matrix
+  ///
+  /// @authors
+  /// @mod{SD,20220426,created function}
   template<class utype>                                 // function inverse xmatrix<>
     xmatrix<utype> inverseByQR(const xmatrix<utype>& A) { //SD20220426
       xmatrix<utype> Q, R;
@@ -2389,10 +2412,22 @@ namespace aurostd {  // namespace aurostd
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
+  /// @brief calculates LUP decomposition of a square matrix
+  ///
+  /// @param A square matrix                            
+  /// @param LU lower triangular matrix times the upper triangular matrix
+  /// @param P permutation matrix
+  /// @param tol tolerance when two values are equal
+  ///
+  /// @authors
+  /// @mod{SD,20220426,created function} 
+  ///
+  /// @note A is a square matrix and LU is the LU decomposition, where LU=(L-I)+U such that A=trasp(P)*LU
+  ///
+  /// @see
+  /// @xlink{https://en.wikipedia.org/wiki/LU_decomposition}
   template<class utype>
     void LUPDecomposition(const xmatrix<utype>& A, xmatrix<double>& LU, xmatrix<double>& P, utype tol) { //SD20220426
-      // A is a square matrix and LU is the LU decomposition, where LU=(L-I)+U such that A=trasp(P)*LU
-      // See: https://en.wikipedia.org/wiki/LU_decomposition
       if (!A.issquare) {
         string message = "Matrix needs to be square for LU decomposition";
         throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INPUT_ILLEGAL_);
@@ -2444,9 +2479,21 @@ namespace aurostd {  // namespace aurostd
       for (int i = LU.lrows; i <= LU.urows; i++) {P(i, p(i)) = 1.0;}
     }
 
+  /// @brief calculates LUP decomposition of a square matrix
+  ///
+  /// @param A square matrix                            
+  /// @param L lower triangular matrix
+  /// @param U upper triangular matrix
+  /// @param P permutation matrix
+  /// @param tol tolerance when two values are equal
+  ///
+  /// @authors
+  /// @mod{SD,20220426,created function} 
+  ///
+  /// @see
+  /// @xlink{https://en.wikipedia.org/wiki/LU_decomposition}
   template<class utype>
     void LUPDecomposition(const xmatrix<utype>& A, xmatrix<double>& L, xmatrix<double>& U, xmatrix<double>& P, utype tol) { //SD20220426
-      // A is a square matrix and LU is the LU decomposition, where A=trasp(P)*LU
       xmatrix<double> LU;
       LUPDecomposition(A, LU, P, tol);
       L = aurostd::eye<double>(LU.urows, LU.ucols, LU.lrows, LU.lcols);
@@ -2457,6 +2504,14 @@ namespace aurostd {  // namespace aurostd
       U += LU - L;
     }
 
+  /// @brief calculates inverse of a square matrix using LUP decomposition
+  ///
+  /// @param a square matrix
+  ///
+  /// @return inverse of the square matrix
+  ///
+  /// @authors
+  /// @mod{SD,20220426,created function}
   template<class utype>                                 // function inverse xmatrix<>
     xmatrix<utype> inverseByLUP(const xmatrix<utype>& A) { //SD20220426
       xmatrix<double> LU, P, _IA;
@@ -2487,8 +2542,18 @@ namespace aurostd {  // namespace aurostd
 
 // ----------------------------------------------------------------------------
 namespace aurostd {  // namespace aurostd
+  /// @brief calculates condition number of a square matrix
+  ///
+  /// @param a square matrix
+  ///
+  /// @return condition number of the matrix
+  ///
+  /// @authors
+  /// @mod{SD,20220426,created function}
+  ///
+  /// @see
+  /// @xlink{https://en.wikipedia.org/wiki/Condition_number}
   template<class utype>
-    // See: https://en.wikipedia.org/wiki/Condition_number
     utype condition_number(const xmatrix<utype>& _a) { //SD20220425
       utype maxv = (utype)0.0, minv = (utype)INFINITY, v;
       xmatrix<utype> a = _a*trasp(_a);
@@ -2761,8 +2826,22 @@ namespace aurostd {  // namespace aurostd
 
 // ----------------------------------------------------------------------------
 namespace aurostd {
+  /// @brief calculates the Hadamard product of two matrices
+  ///
+  /// @param A first matrix
+  /// @param B second matrix
+  ///
+  /// @return Hadamard product
+  ///
+  /// @authors
+  /// @mod{SD,20220422,created function} 
+  ///
+  /// @note Also called element-wise product or Schur product
+  ///
+  /// @see
+  /// @xlink{https://en.wikipedia.org/wiki/Hadamard_product_(matrices)}
   template<class utype>
-    xmatrix<utype> HadamardProduct(const xmatrix<utype>& A, const xmatrix<utype>& B) { //SD20220422 - also called element-wise product or Schur product
+    xmatrix<utype> HadamardProduct(const xmatrix<utype>& A, const xmatrix<utype>& B) { //SD20220422
       if ((A.rows != B.rows) || (A.cols != B.cols)) {
         stringstream message;
         message << "A and B must have the same dimensions, A.rows=" << A.rows << " B.rows=" << B.rows
@@ -3441,12 +3520,20 @@ namespace aurostd {  // namespace aurostd
 }
 
 // ----------------------------------------------------------------------------
-// SD20220426
-// Least squares approximation of linear functions to the data
-// Solves A*x=b, where A is a m-by-n matrix and b is a m-by-1 vector and
-// the output x is a n-by-1 vector
-// See: https://en.wikipedia.org/wiki/Linear_least_squares
 namespace aurostd {  // namespace aurostd
+  /// @brief solves A*x=b, where A is a m-by-n matrix and b is a m-by-1 vector and
+  /// the output x is a n-by-1 vector
+  ///
+  /// @param A m-by-n matrix
+  /// @param b m-by-1 vector
+  ///
+  /// @return least squares approximation as a n-by-1 vector
+  ///
+  /// @authors
+  /// @mod{SD,20220426,created function}
+  ///
+  /// @see
+  /// @xlink{https://en.wikipedia.org/wiki/Linear_least_squares}
   template<class utype>                                   
     xvector<utype> LinearLeastSquares(const xmatrix<utype>& A, const xvector<utype>& b) {
     return aurostd::inverse(trasp(A) * A) * trasp(A) * b;
@@ -3856,12 +3943,23 @@ namespace aurostd {
 
 
 // ----------------------------------------------------------------------------
-// SD20220425
-// Equilibrates a general rectangular matrix such that it has max-norm 1 in every row and column.
-// The equilibrated matrix A can be written in terms of the original matrix as: A = R * A_orig * C
-// DOI: 10.1137/S0895479891222088
-// See also: https://cs.stanford.edu/people/paulliu/files/cs517-project.pdf
 namespace aurostd {
+  /// @brief equilibrates a matrix such that it has max-norm 1 in every row and column
+  ///
+  /// @param A_orig original matrix
+  /// @param A equilibrated matrix
+  /// @param R row scaling matrix
+  /// @param C column scaling matrix
+  /// @param tol tolerance when the equilibration is converged
+  ///
+  /// @authors
+  /// @mod{SD,20220425,created function}
+  ///
+  /// @note The equilibrated matrix A can be written in terms of the original matrix as: A = R * A_orig * C
+  ///
+  /// @see
+  /// @doi{10.1137/S0895479891222088}
+  /// @xlink{https://cs.stanford.edu/people/paulliu/files/cs517-project.pdf}
   template<class utype> void equilibrateMatrix(const xmatrix<utype>& A_orig, xmatrix<utype>& A, xmatrix<utype>& R, xmatrix<utype>& C, uint niter, utype tol) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     A = A_orig;
@@ -3878,7 +3976,7 @@ namespace aurostd {
     utype d;
     bool flag_conv = false;
     uint iter = 0;
-    if (LDEBUG) {cerr << "A_orig=" << A_orig << endl;}
+    if (LDEBUG) {cerr << __AFLOW_FUNC__ << " A_orig=" << A_orig << endl;}
     while (iter < niter && flag_conv != true) {
       flag_conv = true;
       for (int i = 1; i <= mn; i++) {
@@ -3895,8 +3993,8 @@ namespace aurostd {
     C = D.getxmat(m + 1, mn, m + 1, mn);
     A = R * A_orig * C;
     if (LDEBUG) {
-      cerr << "iter=" << iter << endl;
-      cerr << "A=" << endl << A;
+      cerr << __AFLOW_FUNC__ << " iter=" << iter << endl;
+      cerr << __AFLOW_FUNC__ << " A=" << endl << A << endl;
     }
   }
 }

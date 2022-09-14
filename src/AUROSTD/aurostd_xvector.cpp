@@ -2637,11 +2637,17 @@ namespace aurostd {
 // ***************************************************************************
 // GRID GENERATION
 // ----------------------------------------------------------------------------
-// SD20220324
-// linspace
-// Generates n linearly spaced points, the spacing between the points is (stop-start)/(n-1)
-// If n is a double, then round n
 namespace aurostd {
+  /// @brief generates n linearly spaces points
+  ///
+  /// @param start starting value
+  /// @param stop stoping value
+  /// @param n number of points to generate
+  ///
+  /// @return n linearly spaced points
+  ///
+  /// @authors
+  /// @mod{SD,20220324,created function}
   xvector<double> linspace(const double start, const double stop, const int n) {
     if (n <= 1) {
       string message = "Number of points must be greater than one";

@@ -252,44 +252,6 @@ namespace aurostd {
     }
   }
 
-  /// @brief convert characters into their percent representation
-  /// @param raw_str sting to escape
-  /// @param characters replace just the given characters
-  /// @return escaped string
-  /// @note https://www.rfc-editor.org/rfc/rfc3986#section-2.1
-  /// @note characters to be escaped need to be a single byte long (for utf-8 strings use httpPercentEncodingFull)
-  string httpPercentEncodingSelected(const string &raw_str, const string &characters){
-
-    bool LDEBUG = (false || XHOST.DEBUG || _DEBUG_XHTTP_);
-
-    const char *reserved=characters.c_str();
-
-    size_t start=0;
-    size_t pos=0;
-    int to_replace=0;
-
-    char * str_position;
-    char str[raw_str.length()];
-    strcpy(str, raw_str.c_str());
-    str_position=std::strpbrk(str, reserved);
-
-    std::stringstream output;
-    if (LDEBUG) cerr << __AFLOW_FUNC__ << " Escaping '" << raw_str << "'" << endl;
-
-    while (str_position!=NULL){
-      pos = str_position-str;
-      to_replace = str[pos];
-      if (to_replace<0) to_replace+=256;
-      output << raw_str.substr(start, pos-start) << "%" << std::uppercase << std::hex << std::setfill('0') << std::setw(2) << to_replace;
-      if (LDEBUG) cerr << " Match '" << str[pos] << "' (%" << std::uppercase << std::hex << std::setfill('0') << to_replace << std::dec << ") at " << pos << endl;
-      start = pos+1;
-      str_position=std::strpbrk(str_position+1,reserved);
-    }
-    output << raw_str.substr(start);
-    return output.str();
-
-  }
-
   /// @brief Fully percent encode a string
   /// @param work_str sting to escape
   /// @return escaped string

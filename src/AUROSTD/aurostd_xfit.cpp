@@ -19,13 +19,13 @@
 namespace aurostd {
   /// @brief evaluates the value of the polynomial with coefficients p at the value x
   ///
-  /// @param x value at which to evlaute the polynomial
+  /// @param x value at which to evaluates the polynomial
   /// @param p coefficients of the polynomial
   ///
   /// @return polynomial evaluated at x
   ///
   /// @authors
-  /// @mod{AS,,created function}
+  /// @mod{AS,20200825,created function}
   /// @mod{SD,20220718,created documentation}
   ///
   /// @note The polynomial is represented in the following form:
@@ -38,7 +38,7 @@ namespace aurostd {
 
   /// @brief evaluates the value of the polynomial with coefficients p at the values x
   ///
-  /// @param x values at which to evlaute the polynomial
+  /// @param x values at which to evaluates the polynomial
   /// @param p coefficients of the polynomial
   ///
   /// @return polynomial evaluated at x
@@ -80,7 +80,7 @@ namespace aurostd {
   /// @param dp coefficients of the derivative of the polynomial multiplied by the monomial base
   ///
   /// @authors
-  /// @mod{AS,,created function}
+  /// @mod{AS,20200825,created function}
   /// @mod{SD,20220718,created documentation}
   ///
   /// @note The highest derivative is determined by the size of the dp array and the result
@@ -110,7 +110,7 @@ namespace aurostd {
   /// @return Coefficients of the nth derivative of the polynomial multiplied by the monomial base.
   ///
   /// @authors
-  /// @mod{AS,,created function}
+  /// @mod{AS,20200825,created function}
   /// @mod{SD,20220718,created documentation}
   ///
   /// @note The result is stored in ascending order starting from the zero's derivative
@@ -125,14 +125,14 @@ namespace aurostd {
   ///
   /// @param x values at which to evaluate the polynomial
   /// @param p coefficients of the polynomial
-  /// @param n order of the derivartive
+  /// @param n order of the derivative
   ///
   /// @return coefficients of the nth derivative of the polynomial.
   ///
   /// @authors
   /// @mod{SD,SD20220422,created function}
   template<class utype> xvector<utype> evalPolynomialCoeff(const xvector<utype>& p, const uint n) {
-    if ((int)n >= p.urows) {return 0.0 * ones_xv<utype>(1);}
+    if ((int)n >= p.urows) {return xvector<utype>(1);}
     xvector<utype> dp(p.urows - n);
     for (int i = p.urows; i > (int)n; i--) {
       dp(i - n) = p(i) * aurostd::factorial<utype>(i - 1) / aurostd::factorial<utype>(i - n - 1);
@@ -149,7 +149,7 @@ namespace aurostd {
   /// @return Vandermonde matrix.
   ///
   /// @authors
-  /// @mod{AS,,created function}
+  /// @mod{AS,20200825,created function}
   /// @mod{SD,20220718,created documentation}
   ///
   /// Vandermonde matrix:
@@ -180,14 +180,14 @@ namespace aurostd {
   /// @return value at which the polynomial has an extremum
   ///
   /// @authors
-  /// @mod{AS,,created function}
+  /// @mod{AS,20200825,created function}
   /// @mod{SD,20220427,modified function to throw error rather than return zero when convergence cannot be reached}
   ///
   /// @note It is assumed that only one extremum exists between xmin and xmax.
   /// The specific use of this function is to search for the equilibrium volume of a given
   /// polynomial E(V) dependency.
   ///
-  /// The main idea: if a continuous function f(x) has the root f(x0)=0 in the interval [a,b], 
+  /// @note The main idea: if a continuous function f(x) has the root f(x0)=0 in the interval [a,b], 
   /// then its sign in the interval [a,x0) is opposite to its sign in the interval (x0,b].
   /// The root searching algorithm is iterative: one bisects the interval [a,b] into two 
   /// subintervals and for the next iteration picks a subinterval where f(x) has 
@@ -313,7 +313,7 @@ namespace aurostd {
     return aurostd::LinearLeastSquares(VM, y);
   }
 
-  /// @brief calculates the (tranpose) n-by-n companion matrix of a polynomial, where n is the polynomial degree
+  /// @brief calculates the (transpose) n-by-n companion matrix of a polynomial, where n is the polynomial degree
   /// transposed companion matrix
   ///
   /// @param p coefficients of the polynomial
@@ -382,9 +382,9 @@ namespace aurostd {
   /// @param f univeriate function, stored as a lambda expression
   /// @param zero value of the argument at which the function is zero
   /// @param niter number of iterations to perform
-  /// @param tol tolerence when to terminate the search
+  /// @param tol tolerance when to terminate the search
   ///
-  /// @return bolean whether the zero was found
+  /// @return boolean whether the zero was found
   ///
   /// @authors
   /// @mod{SD,20220517,created function}
@@ -481,13 +481,13 @@ namespace aurostd {
   /// @param jac vector of vector of the first derivatives of the functions (Jacobian), stored as lambda expressions
   /// @param x set of zeros of the system
   ///
-  /// @return bolean whether a set zeros was found
+  /// @return boolean whether a set zeros was found
   ///
   /// @authors
   /// @mod{SD,20220616,created function}
   ///
   /// @see
-  /// @xlink{Appendix A,https://link.springer.com/book/10.1007/978-3-319-69407-8}
+  /// @xlink{Appendix A in Power System Operations,https://link.springer.com/book/10.1007/978-3-319-69407-8}
   bool findZeroNewtonRaphson(const xvector<double>& _x0, const vector<std::function<double(xvector<double>)>>& vf, const vector<vector<std::function<double(xvector<double>)>>>& jac, xvector<double>& x, const uint niter, const double tol) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     uint n = (uint)_x0.rows;
@@ -534,7 +534,7 @@ namespace aurostd {
   /// @param jac vector of vector of the first derivatives of the functions (Jacobian), stored as lambda expressions
   /// @param mx matrix of zeros for the system, each column is a different set of zeros
   ///
-  /// @return bolean whether a set of zeros was found
+  /// @return boolean whether a set of zeros was found
   ///
   /// @authors
   /// @mod{SD,20220619,created function}
@@ -624,7 +624,7 @@ namespace aurostd {
   /// @param df vector of the first derivative of the function, stored as lambda expressions
   /// @param tol tolerance at which the numerical and analytical derivatives are equal
   ///
-  /// @return bolean whether the numerical and analytical derivatives are equal
+  /// @return boolean whether the numerical and analytical derivatives are equal
   ///
   /// @authors
   /// @mod{SD,20220619,created function}
