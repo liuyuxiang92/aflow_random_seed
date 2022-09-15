@@ -408,19 +408,18 @@ namespace aflowlib {
 namespace aflowlib {
   uint PrototypeLibrariesSpeciesNumber(const string& _label,ostream& oss) { //CO20181226
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "aflowlib::PrototypeLibrariesSpeciesNumber():"; //CO20181226
     stringstream message;
     bool silent=false;  //CO20181226
     if(LDEBUG) cerr << XPID << "aflowlib::PrototypeLibrariesSpeciesNumber: label=" << _label << endl;
     // search for _ICSD_XXXX or ICSD_XXXX
     //CO20180705 START
-    if(_label.empty()){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"label empty [1]",_VALUE_ILLEGAL_);}
+    if(_label.empty()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"label empty [1]",_VALUE_ILLEGAL_);}
     //in avasp, input here can be comma-separated series of labels
     //assume user intelligent and that all labels provided are same nspecies count
     //take first one
     vector<string> labeltokens;
     aurostd::string2tokens(_label,labeltokens,",");
-    if(labeltokens.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"label empty [2]",_VALUE_ILLEGAL_);}
+    if(labeltokens.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"label empty [2]",_VALUE_ILLEGAL_);}
     string label=labeltokens[0];
     if(aurostd::substring2bool(label,"ICSD_")) { // found ICSD //CO20181226
       vector<string> vline,tokens;
@@ -467,15 +466,14 @@ namespace aflowlib {
       if(!XHOST.vflag_control.flag("AFLOWLIB_SERVER") && !XHOST.vflag_control.flag("AFLOWLIB_SERVER"))
         XHOST.vflag_control.push_attached("AFLOWLIB_SERVER",AFLOWLIB_SERVER_DEFAULT); // some default
       // recognize __AFLOWLIB
-      vector<string> vlattice;aurostd::string2tokens("BCC,BCT,CUB,FCC,HEX,MCL,MCLC,ORC,ORCC,ORCF,ORCI,RHL,TET,TRI",vlattice,",");
       aflowlib::_aflowlib_entry data;
       vector<aflowlib::_aflowlib_entry> vdata;
       if(!silent){oss << "aflowlib::PrototypeLibraries: Contacting \"" <<  XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER") << "\"" << endl;}
-      for(uint i=0;i<vlattice.size();i++) {
+      for(uint i=0;i<BRAVAIS_LATTICES.size();i++) {//HE20220420 switch to global bravais lattices list
         data.clear();
-        if(!silent){oss << "aflowlib::PrototypeLibraries: Scanning " << vlattice.at(i) << " ";}
-        data.url2aflowlib(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+vlattice.at(i)+"/?format=text",oss,FALSE);vdata.push_back(data);
-        if(LDEBUG) { cerr << XPID << "aflowlib::PrototypeLibraries: AFLOWLIB " << vlattice.at(i) << "=" << data.vaflowlib_entries.size() << endl; }
+        if(!silent){oss << "aflowlib::PrototypeLibraries: Scanning " << BRAVAIS_LATTICES[i] << " ";}
+        data.url2aflowlib(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+BRAVAIS_LATTICES[i]+"/?format=text",oss,FALSE);vdata.push_back(data);
+        if(LDEBUG) { cerr << XPID << "aflowlib::PrototypeLibraries: AFLOWLIB " << BRAVAIS_LATTICES[i] << "=" << data.vaflowlib_entries.size() << endl; }
         for(uint j=0;j<data.vaflowlib_entries.size();j++) {
           _label2=data.vaflowlib_entries.at(j);
           aurostd::string2tokens(_label2,tokens,"_");
@@ -495,7 +493,7 @@ namespace aflowlib {
         if(!silent){oss << "[" << data.vaflowlib_entries.size() << " entries]" << endl;}
       }
     }
-    if(aurostd::substring2bool(label,"ICSD_")){throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,label+" cannot be found",_VALUE_ILLEGAL_);} //will NOT be found
+    if(aurostd::substring2bool(label,"ICSD_")){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,label+" cannot be found",_VALUE_ILLEGAL_);} //will NOT be found
     //CO20180705 STOP
     if(LDEBUG) { cerr << "uint aflowlib::PrototypeLibrariesSpeciesNumber(const string& label)" << endl; }
     // check ternaries 
@@ -541,13 +539,12 @@ namespace aflowlib {
 namespace aflowlib { 
   xstructure PrototypeLibraries(ostream &oss,string label,string parameters,deque<string> &atomX,int mode) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "aflowlib::PrototypeLibraries():"; //CO20181128
     if(LDEBUG) { cerr << XPID << "aflowlib::PrototypeLibraries(ostream &oss,string label,string parameters,deque<string> &atomX)" << endl; }
     deque<double> volumeX;
     for(uint i=0;i<atomX.size();i++){
       if(LDEBUG) { //CO20181106
-        cerr << soliloquy << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
-        cerr << soliloquy << " GetAtomVolume()=" << GetAtomVolume(atomX.at(i)) << endl;
+        cerr << __AFLOW_FUNC__ << " atomX.at(" << i << ")=" << atomX.at(i) << endl;
+        cerr << __AFLOW_FUNC__ << " GetAtomVolume()=" << GetAtomVolume(atomX.at(i)) << endl;
       }
       volumeX.push_back(GetAtomVolume(atomX.at(i)));
       //[CO20181106]volumeX.push_back(GetAtomVolume(KBIN::VASP_PseudoPotential_CleanName(atomX.at(i))));
@@ -590,7 +587,7 @@ namespace aflowlib {
     double fraction=aurostd::string2utype<double>(optionsTET);if(aurostd::substring2bool(optionsTET,"%")) fraction=fraction/100+1;
     if(LDEBUG) { oss << "DEBUG: (aflowlib::PrototypeFixTET) fraction=" << fraction << endl; }
     if(LDEBUG) { oss << "DEBUG: (aflowlib::PrototypeFixTET) optionsTET=" << optionsTET << endl; }
-    //  cerr << str.title << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"aflowlib::PrototypeFixTET():","Throw for debugging purposes.",_GENERIC_ERROR_);
+    //  cerr << str.title << endl;throw aurostd::xerror(__AFLOW_FILE__,XPID+"aflowlib::PrototypeFixTET():","Throw for debugging purposes.",_GENERIC_ERROR_);
     xmatrix<double> mlt(3,3);
     mlt(1,1)=1.0;mlt(2,2)=1.0;mlt(3,3)=fraction;
     if(abs(fraction-1.0)>0.001) {
@@ -613,7 +610,6 @@ namespace aflowlib {
   xstructure PrototypeLibraries(ostream &oss,string label,string parameters,deque<string> &vatomX,deque<double> &vvolumeX,double volume_in,int mode,bool flip_option) { // COMPLETE ONE
     // XHOST.DEBUG=TRUE;
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "aflowlib::PrototypeLibraries():"; //CO20181128
     stringstream message;
     if(LDEBUG) { cerr << XPID << "aflowlib::PrototypeLibraries(ostream &oss,string label,string parameters,deque<string> &vatomX,deque<double> &vvolumeX,double volume_in,int mode,bool flip_option)" << endl; }
     if(LDEBUG) { cerr << XPID << "aflowlib::PrototypeLibraries: label=" << label << endl; }
@@ -636,7 +632,7 @@ namespace aflowlib {
       if(aurostd::string2tokens(label,perm_tokens,".")==1) {
         string default_permutation = aurostd::RemoveNumbers(vlabel_ANRL[0]);
         label += "."+default_permutation;
-        if(LDEBUG) cerr << soliloquy << " added default permutation designation to ANRL label; label=" << label << endl;
+        if(LDEBUG) cerr << __AFLOW_FUNC__ << " added default permutation designation to ANRL label; label=" << label << endl;
       }
       //DX20190708 END
 #if USE_HARDCODED_PROTOTYPES //DX20200831 - defined in aflow.h
@@ -692,7 +688,7 @@ namespace aflowlib {
     // LDEBUG=TRUE;
     // ICSD
     if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [aflowlib::PrototypeLibraries] [0]" << endl; }
-    //  *voss << "MODE=" << mode << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //  *voss << "MODE=" << mode << endl; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
     found=FALSE; // start the search
     // *********************************************************************
     if(mode==LIBRARY_MODE_ICSD) {
@@ -750,7 +746,6 @@ namespace aflowlib {
       // recognize __AFLOWLIB
       if(LDEBUG) { if(mode==LIBRARY_MODE_ICSD_AFLOWLIB) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) mode==LIBRARY_MODE_ICSD_AFLOWLIB" << endl; } }
       if(LDEBUG) { if(mode==LIBRARY_MODE_HTQC_ICSD_AFLOWLIB) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) mode==LIBRARY_MODE_HTQC_ICSD_AFLOWLIB" << endl; } }
-      vector<string> vlattice;aurostd::string2tokens("BCC,BCT,CUB,FCC,HEX,MCL,MCLC,ORC,ORCC,ORCF,ORCI,RHL,TET,TRI",vlattice,",");
       aflowlib::_aflowlib_entry data;
       vector<aflowlib::_aflowlib_entry> vdata;
       string aurl="";
@@ -763,15 +758,15 @@ namespace aflowlib {
       if(tokensl.size()>1) label_postfix_ICSD_AFLOWLIB=tokensl.at(1);
 
 
-      for(uint i=0;i<vlattice.size()&&aurl.empty();i++) {
+      for(uint i=0;i<BRAVAIS_LATTICES.size()&&aurl.empty();i++) { //HE20220420 switch to global bravais lattices list
         data.clear();
-        *voss << "aflowlib::PrototypeLibraries: Scanning " << vlattice.at(i) << " ";
-        data.url2aflowlib(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+vlattice.at(i)+"/?format=text",*voss,FALSE);vdata.push_back(data);
-        if(LDEBUG) { *voss << "aflowlib::PrototypeLibraries: AFLOWLIB " << vlattice.at(i) << "=" << data.vaflowlib_entries.size() << endl; }
+        *voss << "aflowlib::PrototypeLibraries: Scanning " << BRAVAIS_LATTICES[i] << " ";
+        data.url2aflowlib(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+BRAVAIS_LATTICES[i]+"/?format=text",*voss,FALSE);vdata.push_back(data);
+        if(LDEBUG) { *voss << "aflowlib::PrototypeLibraries: AFLOWLIB " << BRAVAIS_LATTICES[i] << "=" << data.vaflowlib_entries.size() << endl; }
         for(uint j=0;j<data.vaflowlib_entries.size()&&aurl.empty();j++) {
           if(mode==LIBRARY_MODE_ICSD_AFLOWLIB) {
             if(data.vaflowlib_entries.at(j)==label) {
-              aurl=XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+vlattice.at(i)+"/"+data.vaflowlib_entries.at(j);
+              aurl=XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+BRAVAIS_LATTICES[i]+"/"+data.vaflowlib_entries.at(j);
               aurostd::StringSubst(aurl,AFLOWLIB_SERVER_DEFAULT,XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER"));
               found=TRUE;
               *voss << "found aurl=" << aurl;
@@ -781,7 +776,7 @@ namespace aflowlib {
             aurostd::string2tokens(data.vaflowlib_entries.at(j),tokensd,"_");
             if(tokensd.size()>0 && !label_icsd_ICSD_AFLOWLIB.empty()) {
               if(label_icsd_ICSD_AFLOWLIB==tokensd.at(tokensd.size()-1)) {
-                aurl=XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+vlattice.at(i)+"/"+data.vaflowlib_entries.at(j);
+                aurl=XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+BRAVAIS_LATTICES[i]+"/"+data.vaflowlib_entries.at(j);
                 aurostd::StringSubst(aurl,AFLOWLIB_SERVER_DEFAULT,XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER"));
                 found=TRUE;
                 *voss << "found aurl=" << aurl;
@@ -802,9 +797,9 @@ namespace aflowlib {
         xstructure str;
         if(XHOST.vflag_pflow.flag("PROTO::VASP")) {xstructure str_vasp(aurl,"CONTCAR.relax.vasp",IOVASP_AUTO);str=str_vasp;str.title+=" [ICSD from "+XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+"]" ;}
         if(XHOST.vflag_pflow.flag("PROTO::QE")) {xstructure str_qe(aurl,"CONTCAR.relax.qe",IOQE_AUTO);str=str_qe;str.title+=" [ICSD from "+XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+"]" ;}
-        if(XHOST.vflag_pflow.flag("PROTO::ABINIT")) {stream << aurl << endl;aurostd::url2stringstream(aurl+"/CONTCAR.relax.abinit",stream);cout << stream.str();throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"ABINIT constructor is not yet supported.",_GENERIC_ERROR_);}  // abinit constructor not prepared, yet
+        if(XHOST.vflag_pflow.flag("PROTO::ABINIT")) {stream << aurl << endl;aurostd::url2stringstream(aurl+"/CONTCAR.relax.abinit",stream);cout << stream.str();throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"ABINIT constructor is not yet supported.",_GENERIC_ERROR_);}  // abinit constructor not prepared, yet
         // if(XHOST.vflag_pflow.flag("PROTO::ABINIT")) {xstructure str_abinit(aurl,"CONTCAR.relax.abinit",IOABINIT_AUTO);return str_abinit;}
-        if(XHOST.vflag_pflow.flag("PROTO::AIMS")) {stream << aurl << endl;aurostd::url2stringstream(aurl+"/CONTCAR.relax.aims",stream);cout << stream.str();throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"AIMS constructor is not yet supported.",_GENERIC_ERROR_);}  // aims constructor not prepared, yet
+        if(XHOST.vflag_pflow.flag("PROTO::AIMS")) {stream << aurl << endl;aurostd::url2stringstream(aurl+"/CONTCAR.relax.aims",stream);cout << stream.str();throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"AIMS constructor is not yet supported.",_GENERIC_ERROR_);}  // aims constructor not prepared, yet
         // if(XHOST.vflag_pflow.flag("PROTO::AIMS")) {xstructure str_aims(aurl,"CONTCAR.relax.aims",IOAIMS_AUTO);return str_aims;}
         //CO20180622 - aflow_proto does not declare PROTO::VASP default for some reason
         if(str.atoms.size()==0){xstructure str_vasp(aurl,"CONTCAR.relax.vasp",IOVASP_AUTO);str=str_vasp;str.title+=" [ICSD from "+XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+"]" ;} //catch all
@@ -899,11 +894,11 @@ namespace aflowlib {
 
         // need to fix this because I could get stuff from WYCKOFIZATION
 
-        //  *voss << str << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+        //  *voss << str << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
         if(vatomX_tmp.size()!=label_postfix.size()) {
           message << "Your label needs to contain the right species number/order, i.e. " << label_icsd << ".ABC..." << endl;
           message << "vatomX.size()!=label_postfix.size() (" << vatomX_tmp.size() << "!=" << label_postfix.size() << ")" << endl;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);}
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);}
         // create the mapping
 
         vector<int> mapij;
@@ -936,7 +931,7 @@ namespace aflowlib {
         // }
         if(vatomX.size()>0 && vatomX.size()!=vatomX_tmp.size()) {
           message << "vatomX.size()!=vatomX_tmp.size() (" << vatomX.size() << "!=" << vatomX_tmp.size() << ")";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_GENERIC_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_GENERIC_ERROR_);
         }
 
         // fil A,B,C ..
@@ -963,8 +958,8 @@ namespace aflowlib {
             str.species_mass.push_back(GetAtomMass(abc.at(i)));//0.0);  //CO20181106 - if we can do volume, let's do mass too
             //[CO20181106]str.species_volume.push_back(GetAtomVolume(KBIN::VASP_PseudoPotential_CleanName(abc.at(i))));
             if(LDEBUG) {  //CO20181106
-              cerr << soliloquy << " abc.at(" << i << ")=" << abc.at(i) << endl;
-              cerr << soliloquy << " GetAtomVolume()=" << GetAtomVolume(abc.at(i)) << endl;
+              cerr << __AFLOW_FUNC__ << " abc.at(" << i << ")=" << abc.at(i) << endl;
+              cerr << __AFLOW_FUNC__ << " GetAtomVolume()=" << GetAtomVolume(abc.at(i)) << endl;
             }
             //	  *voss << "GetAtomVolume(KBIN::VASP_PseudoPotential_CleanName(abc.at(i)))=" << GetAtomVolume(KBIN::VASP_PseudoPotential_CleanName(abc.at(i))) << endl;
           }
@@ -1004,7 +999,7 @@ namespace aflowlib {
         if(LDEBUG) { //CO20181128
           cerr << "BEFORE SpeciesPutAlphabetic() " << endl;
           for(uint iat=0;iat<str.atoms.size();iat++) {
-            cerr << "DEBUG: " << soliloquy << " str.species_volume.at(str.atoms.at(iat).type)=" << str.species_volume.at(str.atoms.at(iat).type) << endl;
+            cerr << "DEBUG: " << __AFLOW_FUNC__ << " str.species_volume.at(str.atoms.at(iat).type)=" << str.species_volume.at(str.atoms.at(iat).type) << endl;
           }
         }
         // make alphabetic
@@ -1012,7 +1007,7 @@ namespace aflowlib {
         if(LDEBUG) { //CO20181128
           cerr << "AFTER SpeciesPutAlphabetic() " << endl;
           for(uint iat=0;iat<str.atoms.size();iat++) {
-            cerr << "DEBUG: " << soliloquy << " str.species_volume.at(str.atoms.at(iat).type)=" << str.species_volume.at(str.atoms.at(iat).type) << endl;
+            cerr << "DEBUG: " << __AFLOW_FUNC__ << " str.species_volume.at(str.atoms.at(iat).type)=" << str.species_volume.at(str.atoms.at(iat).type) << endl;
           }
         }
         // fix title
@@ -1029,7 +1024,7 @@ namespace aflowlib {
         for(uint i=0;i<vatomX.size();i++) str.title+=vatomX.at(i);
         str.title+="/"+label_icsd+"."+label_postfix+aus;
         if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) TITLE(5): " << str.title << endl; }
-        //      *voss << str.title << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+        //      *voss << str.title << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
         // done
         return str;
       }
@@ -1037,7 +1032,7 @@ namespace aflowlib {
 
     // *********************************************************************
     // HTQC
-    // *voss << "MODE=" << mode << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    // *voss << "MODE=" << mode << endl; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
     if(mode==LIBRARY_MODE_HTQC) { // mode =LIBRARY_MODE_HTQC
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) mode==LIBRARY_MODE_HTQC" << endl; }
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) vatomX.size()=" << vatomX.size() << endl; }
@@ -1126,7 +1121,7 @@ namespace aflowlib {
         // *voss  << "XHOST_vLibrary_ICSD.at(9).length()=" << XHOST_vLibrary_ICSD.at(9).length() << endl;
         // *voss  << "XHOST_vLibrary_ICSD.at(10).length()=" << XHOST_vLibrary_ICSD.at(10).length() << endl;
       }
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_);
     }
 
 
@@ -1205,12 +1200,12 @@ namespace aflowlib {
     if(mode_load==STRUCTURE_MODE_NONE) {
       message << "invalid mode" << endl;
       message << "rerun with --debug" << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
     }
 
     if(LDEBUG) { *voss <<"DEBUG: (aflowlib::PrototypeLibraries) mode=" << mode_load << endl; }
 
-    // *voss << "HERE" << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    // *voss << "HERE" << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
     // FIX TITLE
     if(mode_load!=STRUCTURE_MODE_ICSD) {
@@ -1230,7 +1225,7 @@ namespace aflowlib {
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [USE] (mode_load==STRUCTURE_MODE_USE)" << endl; }
       string aus_title=str.title;
       str=aflowlib::PrototypeLibraries(*voss,label_use,parameters,vatomX,vvolumeX,volume_in,mode);
-      // if(LDEBUG) { {oss << str << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);} }
+      // if(LDEBUG) { {oss << str << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);} }
       str.title=aus_title+" (use of "+label_use+")";
       if(LDEBUG) { *voss << str << endl; }
       str.FixLattices();
@@ -1287,7 +1282,7 @@ namespace aflowlib {
       // FIX THE SPECIES
       if(str_tmp.species.size() != str_tmp.num_each_type.size()) {
         message << "Error in the SWAP_AB MODE" << endl;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
       }
 
       nspecies=str_tmp.num_each_type.size();
@@ -1392,7 +1387,7 @@ namespace aflowlib {
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [SWAP(,)] 2 " << endl; }
       if(tokens.size()<2) {
         message << "tokens.size()>=2 in STRUCTURE_SWAP_XY.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_RANGE_);
       }
       vector<uint> ispecies(2);
       for(uint i=0;i<tokens.size();i++) {
@@ -1420,7 +1415,7 @@ namespace aflowlib {
         // FIX THE SPECIES
         if(str_tmp.species.size() != str_tmp.num_each_type.size()) {
           message << "Error in the SWAP_XY MODE." << endl;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
         }
 
         nspecies=str_tmp.num_each_type.size();
@@ -1617,7 +1612,7 @@ namespace aflowlib {
         KBIN::VASP_SplitAlloySpecies(aurostd::RemoveSubStringFirst(tokens[1],"C-"),speciesX);
       }
     }
-    //*voss << str << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //*voss << str << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
     if(mode_load==STRUCTURE_MODE_ABC) {
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) (mode_load==STRUCTURE_MODE_ABC)" << endl; }
       klattice=kmode+1;
@@ -1685,7 +1680,7 @@ namespace aflowlib {
       if(mode_load==STRUCTURE_MODE_ICSD) {
         if(nspecies!=nspecies_old) {
           message << "The number of species is not preserved: label=" << label << " nspecies!=nspecies_old (" << nspecies << "," << nspecies_old << ")";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
         }
       }
       // now I have nspecies
@@ -1806,7 +1801,7 @@ namespace aflowlib {
             << " str.species_volume.at(" << i << ")=" << str.species_volume.at(i)
             << " str.species_mass.at(" << i << ")=" << str.species_mass.at(i)
             << " natomsX.at(" << i << ")=" << natomsX.at(i) << endl;
-          // throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+          // throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
         }
       }
     }
@@ -1836,8 +1831,8 @@ namespace aflowlib {
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [USE_SPECIES]  label_use=" << label_use << endl;}
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [USE_SPECIES]  volume_in=" << volume_in << endl;}
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [USE_SPECIES]  mode=" << mode << endl;}
-      //    throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
-      //  if(LDEBUG) {oss << str << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);}
+      //    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
+      //  if(LDEBUG) {oss << str << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);}
       str.title=aus_title+" (use of "+label_use+")";
       if(LDEBUG) *voss << str << endl;
       str.FixLattices();
@@ -1849,14 +1844,14 @@ namespace aflowlib {
 
       // this is SPECIES
 
-      // *voss << str.scale << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+      // *voss << str.scale << endl; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
       tokens.clear();
       aurostd::string2tokens(label_species,tokens,",");
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [USE_SPECIES]  label_species=" << label_species << endl;}
       if(tokens.size()!=str.num_each_type.size()) {
         message << "The number of species does not match the number of types: tokens.size()=" << tokens.size() << " vs str.num_each_type.size()=" << str.num_each_type.size();
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
       }
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [USE_SPECIES]  tokens.size()=" << tokens.size() << endl;}
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [USE_SPECIES]  str.num_each_type.size()=" << str.num_each_type.size() << endl;}
@@ -1899,7 +1894,7 @@ namespace aflowlib {
       if(LDEBUG) {for(uint i=0;i<str.species.size();i++) *voss << str.species.at(i) << " "; *voss << endl;}
       str.SpeciesPutAlphabetic();
       if(LDEBUG) {for(uint i=0;i<str.species.size();i++) *voss << str.species.at(i) << " "; *voss << endl;}
-      //   throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+      //   throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
       // for(uint i=0;i<str.atoms.size();i++) *voss << str.atoms.at(i).type << " "; *voss << endl;
       for(uint i=0;i<str.species_volume.size();i++) vvolumeX.at(i)=str.species_volume.at(i);
       // make species together
@@ -1943,7 +1938,7 @@ namespace aflowlib {
       if(LDEBUG) {for(uint i=0;i<vatomX.size();i++) *voss << vatomX.at(i) << " "; *voss << endl;}
       if(LDEBUG) {for(uint i=0;i<str.atoms.size();i++) *voss << str.atoms.at(i).type << " "; *voss << endl;}
       if(LDEBUG) { *voss << str << endl; }
-      //   throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+      //   throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
       //   str.SpeciesPutAlphabetic();
     }
     // -------------------------------------------------------------------
@@ -1989,7 +1984,7 @@ namespace aflowlib {
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [FIX_ALL_ATOMS] vatomX.size()=[" << vatomX.size()  << "]" << endl;}
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [FIX_ALL_ATOMS] vvolumeX.size()=[" << vvolumeX.size()  << "]" << endl;}
 
-      //   *voss << str << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+      //   *voss << str << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [FIX_ALL_ATOMS] WYC/ICSD str.species.size()=" << str.species.size() << endl; }
       if(LDEBUG) {for(uint i=0;i<str.species.size();i++) *voss << str.species.at(i) << " "; *voss << endl;}
 
@@ -2019,7 +2014,7 @@ namespace aflowlib {
         }
       }
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) TITLE(7): " << str.title << endl; }
-      //  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+      //  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) WYC/ICSD str.species.size()=" << str.species.size() << endl; }
       if(0 && DEBUG_ICSD) {
@@ -2030,7 +2025,7 @@ namespace aflowlib {
         *voss << "  sgs(" << spacegroup_test << "," << str.spacegroupnumber << ")" << endl;
         if(spacegroup_test!=str.spacegroupnumber) {
           message << "The calculated space group does not match the input space group (check space group option): label=" << label << ", input=" << spacegroup_test << ", calculated=" << str.spacegroupnumber;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
         }
       }
       if(mode==LIBRARY_MODE_ICSD) {
@@ -2049,7 +2044,7 @@ namespace aflowlib {
           }
           stringstream message; //CO+DX20200213
           message << "atoms are too close (nn_dist=" << nn_dist << " Angstroms) and there is NO flip option"; //CO+DX20200213
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);}  //CO+DX20200213
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);}  //CO+DX20200213
       }
       if(mode==LIBRARY_MODE_ICSD) {
         if(DEBUG_ICSD) {
@@ -2077,7 +2072,7 @@ namespace aflowlib {
                 << " species=" << str.species.at(i)
                 << " conc_prototype=" << vnatomsX.at(i)/natoms_label << " "
                 << " conc_icsd=" << str.num_each_type.at(i)/natoms_icsd << " : CHECK ALSO THE SPACEGROUP";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+              throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
             }
           }
         }
@@ -2155,7 +2150,7 @@ namespace aflowlib {
       //  *voss << str << endl;
       message << "Nearest neighbors are too close: label=" << label << ", NNdist=" << NearestNeighbor(str) << ", spacegroup=" << str.spacegroupnumber << ", option=" << str.spacegroupnumberoption << endl;
       message << str << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
     }
 
     if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [7] symmetry 1" << endl; }
@@ -2252,7 +2247,7 @@ namespace aflowlib {
           str_sp.error_string="ERROR: Found lattice="+str_sp.bravais_lattice_type+"  SGlattice="+str.bravais_lattice_type+"  ";
         }
         // *voss << str_sp.bravais_lattice_type << endl;
-        // throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+        // throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
         str_sp.FixLattices();str_sp.BringInCell();
         str_sc.FixLattices();str_sc.BringInCell();
         str=str_sp; // standard primitive
@@ -2372,7 +2367,7 @@ namespace aflowlib {
     strstream << aflow::Banner("BANNER_BIG") << endl;
     strstream << init::InitGlobalObject("README_PROTO_TXT");
     strstream << " " << endl;
-    // throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"aflowlib::PrototypesHelp():","Throw for debugging purposes.",_GENERIC_ERROR_);
+    // throw aurostd::xerror(__AFLOW_FILE__,XPID+"aflowlib::PrototypesHelp():","Throw for debugging purposes.",_GENERIC_ERROR_);
     return strstream.str();
   }
 } // namespace aflowlib
@@ -2383,8 +2378,7 @@ namespace aflowlib {
 namespace aflowlib {
   string PrototypesIcsdHelp(string options) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "aflowlib::PrototypesIcsdHelp():";
-    if(LDEBUG) { cerr << soliloquy << " BEGIN" << endl; }
+    if(LDEBUG) { cerr << __AFLOW_FUNC__ << " BEGIN" << endl; }
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
     if(tokens.size()>1) {
@@ -2408,7 +2402,7 @@ namespace aflowlib {
 
     // TEST **********************************
     if(!XHOST.vflag_control.flag("AFLOWLIB_SERVER")) _pstrstream=LOAD_Library_ICSD("Library_ICSD2");
-    // cerr << "HERE *_pstrstream=\"" <<*_pstrstream << "\""<< endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    // cerr << "HERE *_pstrstream=\"" <<*_pstrstream << "\""<< endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
     if(!XHOST.vflag_control.flag("AFLOWLIB_SERVER") && *_pstrstream!="") { // FROM THE MACHINE **********************************
       for(uint i=0;i<vnspecies.size();i++)
         if(XHOST_vLibrary_ICSD.at(vnspecies.at(i)).length()==0) 
@@ -2435,29 +2429,28 @@ namespace aflowlib {
         }
       }
     }
-    //    cerr << "HERE" << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //    cerr << "HERE" << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
     //   if((!XHOST.vflag_control.flag("AFLOWLIB_SERVER") && _pstrstream==NULL) || XHOST.vflag_control.flag("AFLOWLIB_SERVER")) // FROM THE server **********************************
     if((!XHOST.vflag_control.flag("AFLOWLIB_SERVER") && *_pstrstream=="") || XHOST.vflag_control.flag("AFLOWLIB_SERVER")) // FROM THE server **********************************
     { //CO20200106 - patching for auto-indenting
       if(!XHOST.vflag_control.flag("AFLOWLIB_SERVER") && !XHOST.vflag_control.flag("AFLOWLIB_SERVER"))
         XHOST.vflag_control.push_attached("AFLOWLIB_SERVER",AFLOWLIB_SERVER_DEFAULT); // some default
       cerr << XPID << "aflowlib::PrototypeLibraries: Contacting \"" <<  XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER") << "\"" << endl;
-      vector<string> vlattice,speciesX,tokens;aurostd::string2tokens("BCC,BCT,CUB,FCC,HEX,MCL,MCLC,ORC,ORCC,ORCF,ORCI,RHL,TET,TRI",vlattice,",");
-      // vector<string> vlattice,speciesX,tokens;aurostd::string2tokens("BCC,BCT,CUB",vlattice,",");
+      vector<string> speciesX, tokens;
       vector<double> vnatomsX;
       vector<vector<string> > voutput;for(uint i=0;i<10;i++) voutput.push_back(*(new vector<string>(0)));
       aflowlib::_aflowlib_entry data;
       vector<aflowlib::_aflowlib_entry> vdata;
 
-      for(uint i=0;i<vlattice.size();i++) {
+      for(uint i=0;i<BRAVAIS_LATTICES.size();i++) { //HE20220420 switch to global bravais lattices list
         data.clear();
-        cerr << soliloquy << " Scanning " << vlattice.at(i) << " "; //CO20181128
-        data.url2aflowlib(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+vlattice.at(i)+"/?format=text",cout,FALSE);vdata.push_back(data);
+        cerr << __AFLOW_FUNC__ << " Scanning " << BRAVAIS_LATTICES[i] << " "; //CO20181128
+        data.url2aflowlib(XHOST.vflag_control.getattachedscheme("AFLOWLIB_SERVER")+":AFLOWDATA/ICSD_WEB/"+BRAVAIS_LATTICES[i]+"/?format=text",cout,FALSE);vdata.push_back(data);
         for(uint j=0;j<data.vaflowlib_entries.size();j++) {
           aurostd::string2tokens(data.vaflowlib_entries.at(j),tokens,"_");
           KBIN::VASP_SplitAlloySpecies(tokens.at(0),speciesX,vnatomsX);
           if(speciesX.size()<=voutput.size()) {
-            voutput.at(speciesX.size()-1).push_back(tokens.at(0)+" ["+tokens.at(0)+"] "+vlattice.at(i)+" "+data.vaflowlib_entries.at(j)+" ICSD_"+tokens.at(tokens.size()-1)+"       ("+aurostd::utype2string(speciesX.size())+")");
+            voutput.at(speciesX.size()-1).push_back(tokens.at(0)+" ["+tokens.at(0)+"] "+BRAVAIS_LATTICES[i]+" "+data.vaflowlib_entries.at(j)+" ICSD_"+tokens.at(tokens.size()-1)+"       ("+aurostd::utype2string(speciesX.size())+")");
           }
         }
         cerr << "[" << data.vaflowlib_entries.size() << " entries]" << endl;
@@ -2479,7 +2472,7 @@ namespace aflowlib {
         }
       }
     }
-    if(LDEBUG) { cerr << soliloquy << " END" << endl; }
+    if(LDEBUG) { cerr << __AFLOW_FUNC__ << " END" << endl; }
     return strstream.str();
 
   }
@@ -2646,7 +2639,6 @@ namespace aflowlib {
   xstructure _____PrototypeLibraries(ostream &oss,_PROTO_PARAMS *PARAMS) { // COMPLETE ONE
     //  DEBUG=TRUE;
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy = XPID + "aflowlib::PrototypeLibraries():";
     stringstream message;
     if(LDEBUG) { cerr << XPID << "aflowlib::PrototypeLibraries(ostream &oss,_PROTO_PARAMS *PARAMS)" << endl; }
     if(LDEBUG) { cerr << XPID << "aflowlib::PrototypeLibraries: PARAMS->label=" << PARAMS->label << endl; }
@@ -2696,7 +2688,7 @@ namespace aflowlib {
     // LDEBUG=TRUE;
     // ICSD
     if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) [aflowlib::PrototypeLibraries] [0]" << endl;
-    //  *voss << "PARAMS->MODE=" << PARAMS->mode << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //  *voss << "PARAMS->MODE=" << PARAMS->mode << endl; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
     found=FALSE; // start the search
     // *********************************************************************
     if(PARAMS->mode==LIBRARY_MODE_ICSD) {
@@ -2710,7 +2702,7 @@ namespace aflowlib {
       }
       nspecies=KBIN::VASP_SplitAlloySpecies(aurostd::RemoveSubStringFirst(icsd_label,"C-"),speciesX,vnatomsX);
 
-      //    for(uint i=0;i<speciesX.size();i++) if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) " << nspecies << " " << speciesX.at(i) << " " << vnatomsX.at(i) << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_); // some debug always helps
+      //    for(uint i=0;i<speciesX.size();i++) if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) " << nspecies << " " << speciesX.at(i) << " " << vnatomsX.at(i) << endl; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_); // some debug always helps
       if(aurostd::substring2bool(LibraryDEFAULT,PARAMS->label)) _pstrstream=&LibraryDEFAULT;
       else {
         if(nspecies<1||nspecies>10) {
@@ -2785,11 +2777,11 @@ namespace aflowlib {
 
         // need to fix this because I could get stuff from WYCKOFIZATION
 
-        //  cerr << str << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+        //  cerr << str << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
         if(vatomX_tmp.size()!=label_postfix.size()) {
           message << "Your label needs to contain the right species number/order, i.e. " << label_icsd << ".ABC..." << endl;
           message << "PARAMS->vatomX.size()!=label_postfix.size() (" << vatomX_tmp.size() << "!=" << label_postfix.size() << ")" << endl;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
         }
         // create the mapping
 
@@ -2804,7 +2796,7 @@ namespace aflowlib {
           }
         }
         // cerr << "mapij.size()=" << mapij.size() << endl; for(uint i=0;i<mapij.size();i++) cerr << "mapij.at(" << i << ")=" << mapij.at(i) << endl;
-        // throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+        // throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
         abc.clear();
         if(PARAMS->vatomX.size()==0 && PARAMS->vvolumeX.size()==0) for(uint i=0;i<vatomX_tmp.size();i++) {string digit=" ";digit[0]=65+mapij.at(i);abc.push_back(digit);}
         if(PARAMS->vatomX.size()==str.species.size() && (PARAMS->vvolumeX.size()==0 || PARAMS->vvolumeX.size()==str.species.size())) for(uint i=0;i<vatomX_tmp.size();i++)  {abc.push_back(PARAMS->vatomX.at(mapij.at(i)));}
@@ -2821,7 +2813,7 @@ namespace aflowlib {
         // }
         if(PARAMS->vatomX.size()>0 && PARAMS->vatomX.size()!=vatomX_tmp.size()) {
           message << "PARAMS->vatomX.size()!=vatomX_tmp.size() (" << PARAMS->vatomX.size() << "!=" << vatomX_tmp.size() << ")";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
         }
 
         // fil A,B,C ..
@@ -2905,7 +2897,7 @@ namespace aflowlib {
         for(uint i=0;i<PARAMS->vatomX.size();i++) str.title+=PARAMS->vatomX.at(i);
         str.title+="/"+label_icsd+"."+label_postfix+aus;
         if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) TITLE(5): " << str.title << endl;
-        //      cerr << str.title << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+        //      cerr << str.title << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
         // done
         return str;
       }
@@ -2913,7 +2905,7 @@ namespace aflowlib {
 
     // *********************************************************************
     // HTQC
-    // *voss << "PARAMS->MODE=" << PARAMS->mode << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    // *voss << "PARAMS->MODE=" << PARAMS->mode << endl; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
     if(PARAMS->mode==LIBRARY_MODE_HTQC) { // mode =LIBRARY_MODE_HTQC
       if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) PARAMS->mode==LIBRARY_MODE_HTQC" << endl;
       if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) PARAMS->vatomX.size()=" << PARAMS->vatomX.size() << endl;
@@ -2990,7 +2982,7 @@ namespace aflowlib {
         message  << "XHOST_vLibrary_ICSD.at(9).length()=" << XHOST_vLibrary_ICSD.at(9).length() << endl;
         message  << "XHOST_vLibrary_ICSD.at(10).length()=" << XHOST_vLibrary_ICSD.at(10).length() << endl;
       }
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
     }
     // FIND STRUCTURE kstop
     kstop=0;
@@ -3066,12 +3058,12 @@ namespace aflowlib {
     if(mode_load==STRUCTURE_MODE_NONE) {
       message << "invalid mode" << endl;
       message << "rerun with --debug" << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_INPUT_ILLEGAL_);
     }
 
     if(LDEBUG) *voss <<"DEBUG: (aflowlib::PrototypeLibraries) mode=" << mode_load << endl;
 
-    // *voss << "HERE" << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    // *voss << "HERE" << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
     // FIX TITLE
     if(mode_load!=STRUCTURE_MODE_ICSD) {
@@ -3091,7 +3083,7 @@ namespace aflowlib {
       if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) [USE] (mode_load==STRUCTURE_MODE_USE)" << endl;
       string aus_title=str.title;
       str=aflowlib::PrototypeLibraries(*voss,label_use,PARAMS->parameters,PARAMS->vatomX,PARAMS->vvolumeX,PARAMS->volume_in,PARAMS->mode);
-      // if(LDEBUG) {oss << str << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);}
+      // if(LDEBUG) {oss << str << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);}
       str.title=aus_title+" (use of "+label_use+")";
       if(LDEBUG) *voss << str << endl;
       str.FixLattices();
@@ -3145,7 +3137,7 @@ namespace aflowlib {
       // FIX THE SPECIES
       if(str_tmp.species.size() != str_tmp.num_each_type.size()) {
         message << "Error in the SWAP_AB MODE.";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
       }
 
       nspecies=str_tmp.num_each_type.size();
@@ -3245,7 +3237,7 @@ namespace aflowlib {
       if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) [SWAP(,)] 2 " << endl;
       if(tokens.size()<2) {
         message << "tokens.size()>=2 in STRUCTURE_SWAP_XY";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_RANGE_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_RANGE_);
       }
       vector<uint> ispecies(2);
       for(uint i=0;i<tokens.size();i++) {
@@ -3273,7 +3265,7 @@ namespace aflowlib {
         // FIX THE SPECIES
         if(str_tmp.species.size() != str_tmp.num_each_type.size()) {
           message << "Error in the SWAP_XY MODE.";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
         }
 
         nspecies=str_tmp.num_each_type.size();
@@ -3460,7 +3452,7 @@ namespace aflowlib {
         KBIN::VASP_SplitAlloySpecies(aurostd::RemoveSubStringFirst(tokens[1],"C-"),speciesX);
       }
     }
-    //cerr << str << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //cerr << str << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
     if(mode_load==STRUCTURE_MODE_ABC) {
       if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) (mode_load==STRUCTURE_MODE_ABC)" << endl;
       klattice=kmode+1;
@@ -3528,7 +3520,7 @@ namespace aflowlib {
       if(mode_load==STRUCTURE_MODE_ICSD) {
         if(nspecies!=nspecies_old) {
           message << "The number of species is not preserved: PARAMS->label=" << PARAMS->label << "  nspecies!=nspecies_old (" << nspecies << "," << nspecies_old;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
         }
       }
       // now I have nspecies
@@ -3643,7 +3635,7 @@ namespace aflowlib {
           << " str.species_volume.at(" << i << ")=" << str.species_volume.at(i)
           << " str.species_mass.at(" << i << ")=" << str.species_mass.at(i)
           << " natomsX.at(" << i << ")=" << natomsX.at(i) << endl;
-      // throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+      // throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
     }
 
     // --------------------------------------------------------------------------------------------------------------------------------------
@@ -3662,7 +3654,7 @@ namespace aflowlib {
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [USE_SPECIES]  PARAMS->vvolumeX="; for(uint i=0;i<PARAMS->vvolumeX.size();i++) *voss << PARAMS->vvolumeX.at(i) << " "; *voss << endl;}
 
       str=aflowlib::PrototypeLibraries(*voss,label_use,PARAMS->parameters,PARAMS->vatomX,PARAMS->vvolumeX,PARAMS->volume_in,PARAMS->mode);
-      //  if(LDEBUG) {oss << str << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);}
+      //  if(LDEBUG) {oss << str << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);}
       str.title=aus_title+" (use of "+label_use+")";
       if(LDEBUG) *voss << str << endl;
       str.FixLattices();
@@ -3674,14 +3666,14 @@ namespace aflowlib {
 
       // this is SPECIES
 
-      // *voss << str.scale << endl; throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+      // *voss << str.scale << endl; throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
       tokens.clear();
       aurostd::string2tokens(label_species,tokens,",");
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [USE_SPECIES]  label_species=" << label_species << endl;}
       if(tokens.size()!=str.num_each_type.size()) {
         message << "The number of species does not match the number of types: tokens.size()=" << tokens.size() << " vs str.num_each_type.size()=" << str.num_each_type.size();
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ILLEGAL_);
       }
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [USE_SPECIES]  tokens.size()=" << tokens.size() << endl;}
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) [USE_SPECIES]  str.num_each_type.size()=" << str.num_each_type.size() << endl;}
@@ -3723,7 +3715,7 @@ namespace aflowlib {
       if(LDEBUG) {for(uint i=0;i<str.species.size();i++) *voss << str.species.at(i) << " "; *voss << endl;}
       str.SpeciesPutAlphabetic();
       if(LDEBUG) {for(uint i=0;i<str.species.size();i++) *voss << str.species.at(i) << " "; *voss << endl;}
-      //   throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+      //   throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
       // for(uint i=0;i<str.atoms.size();i++) *voss << str.atoms.at(i).type << " "; *voss << endl;
       for(uint i=0;i<str.species_volume.size();i++) PARAMS->vvolumeX.at(i)=str.species_volume.at(i);
       // make species together
@@ -3767,7 +3759,7 @@ namespace aflowlib {
       if(LDEBUG) {for(uint i=0;i<PARAMS->vatomX.size();i++) *voss << PARAMS->vatomX.at(i) << " "; *voss << endl;}
       if(LDEBUG) {for(uint i=0;i<str.atoms.size();i++) *voss << str.atoms.at(i).type << " "; *voss << endl;}
       if(LDEBUG) *voss << str << endl;
-      //   throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+      //   throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
       //   str.SpeciesPutAlphabetic();
     }
     // -------------------------------------------------------------------
@@ -3800,7 +3792,7 @@ namespace aflowlib {
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) PARAMS->vatomX.size()=[" << PARAMS->vatomX.size()  << "]" << endl;}
       if(LDEBUG) { *voss << "DEBUG: (aflowlib::PrototypeLibraries) PARAMS->vvolumeX.size()=[" << PARAMS->vvolumeX.size()  << "]" << endl;}
 
-      //   cerr << str << endl;throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+      //   cerr << str << endl;throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
       if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) WYC/ICSD str.species.size()=" << str.species.size() << endl;
       if(LDEBUG) {for(uint i=0;i<str.species.size();i++) *voss << str.species.at(i) << " "; *voss << endl;}
       string sgstring=(SpaceGroupOptionRequired(str.spacegroupnumber)?aurostd::utype2string(str.spacegroupnumber)+"."+aurostd::utype2string(str.spacegroupnumberoption):aurostd::utype2string(str.spacegroupnumber));
@@ -3828,7 +3820,7 @@ namespace aflowlib {
         }
       }
       if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) TITLE(7): " << str.title << endl;
-      //  throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+      //  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
       if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) WYC/ICSD str.species.size()=" << str.species.size() << endl;
       if(0 && DEBUG_ICSD) {
@@ -3839,7 +3831,7 @@ namespace aflowlib {
         *voss << "  sgs(" << spacegroup_test << "," << str.spacegroupnumber << ")" << endl;
         if(spacegroup_test!=str.spacegroupnumber) {
           message << "The calculated space group does not match the input space group (check space group option): label=" << PARAMS->label << ", input=" << spacegroup_test << ", calculated=" << str.spacegroupnumber;
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
         }
       }
       if(PARAMS->mode==LIBRARY_MODE_ICSD) {
@@ -3885,7 +3877,7 @@ namespace aflowlib {
                 << " species=" << str.species.at(i)
                 << " conc_prototype=" << vnatomsX.at(i)/natoms_label << " "
                 << " conc_icsd=" << str.num_each_type.at(i)/natoms_icsd << " : CHECK ALSO THE SPACEGROUP";
-              throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+              throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
             }
           }
         }
@@ -3954,7 +3946,7 @@ namespace aflowlib {
       //  *voss << str << endl;
       message << "Nearest neighbors are too close: label=" << PARAMS->label << ", NNdist=" << NearestNeighbor(str) << ", spacegroup=" << str.spacegroupnumber << ", option=" << str.spacegroupnumberoption << endl;
       message << str << endl;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
     }
 
     if(LDEBUG) *voss << "DEBUG: (aflowlib::PrototypeLibraries) [7] symmetry 1" << endl;
@@ -4052,7 +4044,7 @@ namespace aflowlib {
           str_sp.error_string="ERROR: Found lattice="+str_sp.bravais_lattice_type+"  SGlattice="+str.bravais_lattice_type+"  ";
         }
         // *voss << str_sp.bravais_lattice_type << endl;
-        // throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"Throw for debugging purposes.",_GENERIC_ERROR_);
+        // throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
         str_sp.FixLattices();str_sp.BringInCell();
         str_sc.FixLattices();str_sc.BringInCell();
         str=str_sp; // standard primitive

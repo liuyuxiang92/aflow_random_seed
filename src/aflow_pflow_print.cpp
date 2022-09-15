@@ -119,9 +119,10 @@ namespace pflow {
         _atom a2=neigh_mat.at(ia1).at(ia2);
         xvector<double> a2pos=a2.cpos;
         for(int i=1;i<=3;i++) ijk(2,i)=a2.ijk(i);
-        for(uint ia3=0;(ia3<neigh_mat.at(a2.number).size() && ia3<MAX_NUM_ANGLE);ia3++) {
+        for(uint ia3=0;(ia3<neigh_mat.at(a2.basis).size() && ia3<MAX_NUM_ANGLE);ia3++) //[CO20200130 - number->basis]for(uint ia3=0;(ia3<neigh_mat.at(a2.number).size() && ia3<MAX_NUM_ANGLE);ia3++) 
+          {
           pflag(3)=1;
-          _atom a3=neigh_mat.at(a2.number).at(ia3);      
+          _atom a3=neigh_mat.at(a2.basis).at(ia3);       //[CO20200130 - number->basis]_atom a3=neigh_mat.at(a2.number).at(ia3);      
           xvector<double> a3pos=a3.cpos;
           for(int i=1;i<=3;i++) ijk(3,i)=a3.ijk(i);
           xvector<double> a1toa2(3),a2toa3(3),a1toa3(3);
@@ -135,7 +136,7 @@ namespace pflow {
             if(aurostd::abs(getcos(a1toa2,a2toa3)-1)<tol) angle=180;
             if(aurostd::abs(getcos(a1toa2,a2toa3)+1)<tol) angle=0;
             if(pflag(1)) {
-              oss << setw(4) << a1.number+1
+              oss << setw(4) << a1.basis+1 //[CO20200130 - number->basis]oss << setw(4) << a1.number+1
                 << " " << setw(4) << a1.name.c_str()
                 << " " << setw(3) << ijk(1,1)
                 << " " << setw(3) << ijk(1,2)
@@ -144,7 +145,7 @@ namespace pflow {
               oss << endl;
             } // if plag(1)
             if(pflag(2)) {
-              oss << "     " << setw(4) << a2.number+1
+              oss << "     " << setw(4) << a2.basis+1  //[CO20200130 - number->basis]oss << "     " << setw(4) << a2.number+1
                 << " " << setw(4) << a2.name.c_str()
                 << " " << setw(3) << ijk(2,1)
                 << " " << setw(3) << ijk(2,2)
@@ -153,7 +154,7 @@ namespace pflow {
               oss << endl;
             } // if plag(2)
             if(pflag(3)) {
-              oss << "          " << setw(4) << a3.number+1
+              oss << "          " << setw(4) << a3.basis+1 //[CO20200130 - number->basis]oss << "          " << setw(4) << a3.number+1
                 << " " << setw(4) << a3.name.c_str()
                 << " " << setw(3) << ijk(3,1)
                 << " " << setw(3) << ijk(3,2)
@@ -247,34 +248,33 @@ namespace pflow {
       const string& output_name,
       ostream& oss) {  
 
-    string soliloquy = XPID + "pflow::PrintCHGCAR():  ";     // so you know who's talking
 
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) oss << soliloquy << "BEGIN" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << "BEGIN" << endl;
     stringstream CHGCARout_ss;
     uint npts,natoms=pflow::GetNumAtoms(str),indx=0,numcolumns;
 
     // print POSCAR
-    if(LDEBUG) oss << soliloquy << "PRINTING POSCAR" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << "PRINTING POSCAR" << endl;
     CHGCARout_ss << chgcar_header.str();
     // empty line
     CHGCARout_ss << " " << endl;    //put space so AFLOW pick this up as a line
     // grid
     if(ngrid.size()!=3) {
       oss << endl;
-      oss << soliloquy << "ERROR: ngrid must be length 3." << endl;
-      oss << soliloquy << "Exiting." << endl;
+      oss << __AFLOW_FUNC__ << "ERROR: ngrid must be length 3." << endl;
+      oss << __AFLOW_FUNC__ << "Exiting." << endl;
       oss << endl;
       return FALSE;
     }
-    if(LDEBUG) oss << soliloquy << "PRINTING GRID" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << "PRINTING GRID" << endl;
     for(uint i=0;i<ngrid.size();i++) {
       CHGCARout_ss << "   " << ngrid.at(i);
     }
     CHGCARout_ss << " " << endl;    //put space so AFLOW pick this up as a line
     npts=ngrid.at(0)*ngrid.at(1)*ngrid.at(2);
     // chg_tot
-    if(LDEBUG) oss << soliloquy << "PRINTING CHG_TOT" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << "PRINTING CHG_TOT" << endl;
     for(uint i=0;i<npts;i+=format_dim.at(indx)) {
       // make sure we get exactly format_dim.at(indx) 0's and not more
       if(npts-i>=(uint)format_dim.at(indx)) {
@@ -294,8 +294,8 @@ namespace pflow {
     indx++;
     // augmentation occupancies, all set to 0
     if(format_dim.size()>1) {   // we have CHGCAR, not AECCAR
-      if(LDEBUG) oss << soliloquy << "THIS IS A CHGCAR FILE, NOT AN AECCAR FILE" << endl;
-      if(LDEBUG) oss << soliloquy << "PRINTING AUGMENTATION OCCUPANCIES (ALL SET TO 0)" << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << "THIS IS A CHGCAR FILE, NOT AN AECCAR FILE" << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << "PRINTING AUGMENTATION OCCUPANCIES (ALL SET TO 0)" << endl;
       for(uint i=1;i<(natoms+1);i++) {
         CHGCARout_ss << "augmentation occupancies " << i << " " << format_dim.at(indx) << endl;
         for(uint j=0;j<(uint)format_dim.at(indx);j+=(uint)format_dim.at(indx+1)) {
@@ -314,7 +314,7 @@ namespace pflow {
       }
     }
     if(chg_diff.size()>0) {     // we have spin-polarized
-      if(LDEBUG) oss << soliloquy << "THIS IS A SPIN-POLARIZED CALCULATION" << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << "THIS IS A SPIN-POLARIZED CALCULATION" << endl;
       // add line of 0's
       for(uint i=0;i<(uint)format_dim.at(indx);i++) { //mimic formatting of chg_diff for 0's line
         // standard shows +1 more 0
@@ -322,13 +322,13 @@ namespace pflow {
       }
       CHGCARout_ss << " " << endl;    //put space so AFLOW pick this up as a line
       // grid
-      if(LDEBUG) oss << soliloquy << "PRINTING GRID" << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << "PRINTING GRID" << endl;
       for(uint i=0;i<ngrid.size();i++) {
         CHGCARout_ss << "   " << ngrid.at(i);
       }
       CHGCARout_ss << " " << endl;    //put space so AFLOW pick this up as a line
       // chg_diff
-      if(LDEBUG) oss << soliloquy << "PRINTING CHG_DIFF" << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << "PRINTING CHG_DIFF" << endl;
       for(uint i=0;i<npts;i+=format_dim.at(indx)) {
         // make sure we get exactly format_dim.at(indx) 0's and not more
         if(npts-i>=(uint)format_dim.at(indx)) {
@@ -345,7 +345,7 @@ namespace pflow {
       indx++;
       // check for augmentation occupancies
       if(format_dim.size()>indx) { // we have more augmentation occupancies to write out, all set to 0
-        if(LDEBUG) oss << soliloquy << "PRINTING AUGMENTATION OCCUPANCIES (ALL SET TO 0)" << endl;
+        if(LDEBUG) oss << __AFLOW_FUNC__ << "PRINTING AUGMENTATION OCCUPANCIES (ALL SET TO 0)" << endl;
         for(uint i=1;i<(natoms+1);i++) {
           CHGCARout_ss << "augmentation occupancies " << i << " " << format_dim.at(indx) << endl;
           for(uint j=0;j<(uint)format_dim.at(indx);j+=(uint)format_dim.at(indx+1)) {
@@ -368,14 +368,14 @@ namespace pflow {
 
     // check if output file exists, delete it first
     if(aurostd::FileExist(output_name)) {
-      if(LDEBUG) oss << soliloquy << "DELETING EXISTING OUTPUT FILE" << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << "DELETING EXISTING OUTPUT FILE" << endl;
       aurostd::RemoveFile(output_name);
     }
 
     // write out to file
-    if(LDEBUG) oss << soliloquy << "WRITING OUTPUT FILE" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << "WRITING OUTPUT FILE" << endl;
     aurostd::stringstream2file(CHGCARout_ss,output_name);
-    if(LDEBUG) oss << soliloquy << "DONE" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << "DONE" << endl;
     return TRUE;
   }
 } // namespace pflow
@@ -479,9 +479,9 @@ namespace pflow {
       oss << "_symmetry_Int_Tables_Number  " << 1 << endl;
     }
     oss << "loop_" << endl;
-    oss << "_symmetry_equiv_pos_site_id" << endl;
-    //oss << "_symmetry_equiv_pos_as_xyz_" << endl;
-    oss << "_symmetry_equiv_pos_as_xyz" << endl;  //CO fix 20170606
+    oss << " _symmetry_equiv_pos_site_id" << endl;
+    //oss << " _symmetry_equiv_pos_as_xyz_" << endl;
+    oss << " _symmetry_equiv_pos_as_xyz" << endl;  //CO fix 20170606
 
     // if the Wyckoff positions are stored/calculated
     if(str.wyccar_ITC.size()!=0){
@@ -502,7 +502,8 @@ namespace pflow {
       oss << " _atom_site_fract_x" << endl;
       oss << " _atom_site_fract_y" << endl;
       oss << " _atom_site_fract_z" << endl;
-      oss << " _atom_site_thermal_displace_type" << endl;
+      //[DX+CO20220715 - OBSOLETE]oss << " _atom_site_thermal_displace_type" << endl; //https://www.iucr.org/__data/iucr/cifdic_html/1/cif_core.dic/Iatom_site_thermal_displace_type.html
+      oss << " _atom_site_adp_type" << endl;  //DX+CO20220715
       oss << " _atom_site_B_iso_or_equiv" << endl;
       oss << " _atom_site_type_symbol" << endl;
       oss << " _atom_site_symmetry_multiplicity" << endl;
@@ -551,7 +552,8 @@ namespace pflow {
       oss << " _atom_site_fract_x" << endl;
       oss << " _atom_site_fract_y" << endl;
       oss << " _atom_site_fract_z" << endl;
-      oss << " _atom_site_thermal_displace_type" << endl;
+      //[DX+CO20220715 - OBSOLETE]oss << " _atom_site_thermal_displace_type" << endl; //https://www.iucr.org/__data/iucr/cifdic_html/1/cif_core.dic/Iatom_site_thermal_displace_type.html
+      oss << " _atom_site_adp_type" << endl;  //DX+CO20220715
       oss << " _atom_site_B_iso_or_equiv" << endl;
       oss << " _atom_site_type_symbol" << endl;
 
@@ -578,10 +580,9 @@ namespace pflow {
 namespace pflow {
   void PrintClat(const xvector<double>& data, ostream& oss) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    string soliloquy=XPID+"pflow::PrintClat():";
-    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " BEGIN" << endl;
     if(data.rows!=6) {
-      init::ErrorOption("",soliloquy,aurostd::liststring2string("data.size()=",aurostd::utype2string(data.rows)));
+      init::ErrorOption("",__AFLOW_FUNC__,aurostd::liststring2string("data.size()=",aurostd::utype2string(data.rows)));
     }
     oss.setf(std::ios::fixed,std::ios::floatfield);
     oss.precision(10);
@@ -591,7 +592,7 @@ namespace pflow {
     oss << lattice(1,1) << " " << lattice(1,2) << " " << lattice(1,3) << endl;
     oss << lattice(2,1) << " " << lattice(2,2) << " " << lattice(2,3) << endl;
     oss << lattice(3,1) << " " << lattice(3,2) << " " << lattice(3,3) << endl;
-    if(LDEBUG) cerr << soliloquy << " BEGIN" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " BEGIN" << endl;
   }
 } // namespace pflow
 
@@ -975,10 +976,9 @@ namespace pflow {
       bool no_scan,
       int setting){
 
-    string function_name = XPID + "pflow::PrintData():";
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    if(LDEBUG) cerr << function_name << " BEGIN" << endl;
+    if(LDEBUG) cerr << __AFLOW_FUNC__ << " BEGIN" << endl;
 
     stringstream oss;
     oss.setf(std::ios::fixed,std::ios::floatfield);
@@ -1680,7 +1680,6 @@ namespace pflow {
 namespace pflow {
   string PrintRealLatticeData(const xstructure& xstr, aurostd::xoption& vpflow, const string& smode, filetype ftype, bool standalone, bool already_calculated, double sym_eps){
 
-    string function_name = XPID + "pflow::PrintRealLatticeData():";
 
     // ---------------------------------------------------------------------------
     // calculate the real lattice symmetry if not already calculated
@@ -1810,7 +1809,7 @@ namespace pflow {
       if(standalone) { ss_output << endl; }
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Format type is not supported.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
     }
 
     // ---------------------------------------------------------------------------
@@ -1855,7 +1854,6 @@ namespace pflow {
 namespace pflow {
   string PrintLatticeLatticeData(const xstructure& xstr, aurostd::xoption& vpflow, filetype ftype, bool standalone, bool already_calculated, double sym_eps){
 
-    string function_name = XPID + "pflow::PrintLatticeLatticeData():";
 
     // ---------------------------------------------------------------------------
     // calculate the real lattice symmetry if not already calculated
@@ -1910,7 +1908,7 @@ namespace pflow {
 
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Format type is not supported.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
     }
 
     // ---------------------------------------------------------------------------
@@ -1945,7 +1943,6 @@ namespace pflow {
 namespace pflow {
   string PrintCrystalPointGroupData(const xstructure& xstr, aurostd::xoption& vpflow, filetype ftype, bool standalone, bool already_calculated, double sym_eps){
 
-    string function_name = XPID + "pflow::PrintCrystalPointGroupData():";
 
     // ---------------------------------------------------------------------------
     // calculate the real lattice symmetry (contains point group information)
@@ -2049,7 +2046,7 @@ namespace pflow {
 
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Format type is not supported.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
     }
 
     // ---------------------------------------------------------------------------
@@ -2096,7 +2093,6 @@ namespace pflow {
 namespace pflow {
   string PrintReciprocalLatticeData(const xstructure& xstr, aurostd::xoption& vpflow, filetype ftype, bool standalone, bool already_calculated, double sym_eps){
 
-    string function_name = XPID + "pflow::PrintReciprocalLatticeData():";
 
     // ---------------------------------------------------------------------------
     // calculate the reciprocal lattice symmetry if not already calculated
@@ -2171,7 +2167,7 @@ namespace pflow {
       if(standalone) { ss_output << endl; }
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Format type is not supported.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
     }
 
     // ---------------------------------------------------------------------------
@@ -2208,7 +2204,6 @@ namespace pflow {
 namespace pflow {
   string PrintSuperlatticeData(const xstructure& xstr, aurostd::xoption& vpflow, filetype ftype, bool standalone, bool already_calculated, double sym_eps){
 
-    string function_name = XPID + "pflow::PrintSuperlatticeData():";
 
     // ---------------------------------------------------------------------------
     // calculate the superlattice symmetry if not already calculated
@@ -2328,7 +2323,7 @@ namespace pflow {
       if(standalone) { ss_output << endl; }
     }
     else{
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Format type is not supported.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Format type is not supported.",_INPUT_ILLEGAL_);
     }
 
     // ---------------------------------------------------------------------------
@@ -2607,7 +2602,7 @@ namespace pflow {
       _atom a = neigh_mat.at(ia).at(0);
 
       // Output reference atom info.
-      oss << setw(4) << a.number+1 << " " << setw(4) << a.name.c_str();
+      oss << setw(4) << a.basis+1 << " " << setw(4) << a.name.c_str(); //[CO20200130 - number->basis]oss << setw(4) << a.number+1 << " " << setw(4) << a.name.c_str();
       xvector<double> pos(3);
       if(str.coord_flag==FALSE) { // direct
         pos=a.fpos;
@@ -2624,7 +2619,7 @@ namespace pflow {
         xvector<int> ijk(3);
         ijk=an.ijk;
         oss << "        ";
-        oss << setw(4) << an.number+1 << " ";
+        oss << setw(4) << an.basis+1 << " "; //[CO20200130 - number->basis]oss << setw(4) << an.number+1 << " ";
         oss << setw(4) << an.name.c_str() << "   ";
         oss << setw(3) << ijk(1) << " " << setw(3) << ijk(2) << " " << setw(3) << ijk(3) << "   ";
         xvector<double> disp(3);
@@ -2676,7 +2671,7 @@ namespace pflow {
       _atom a = neigh_mat.at(ia).at(0);
 
       // Output reference atom info.
-      oss << setw(4) << a.number+1 << " " << setw(4) << a.name.c_str();
+      oss << setw(4) << a.basis+1 << " " << setw(4) << a.name.c_str(); //[CO20200130 - number->basis]oss << setw(4) << a.number+1 << " " << setw(4) << a.name.c_str();
       xvector<double> pos(3);
       if(str.coord_flag==FALSE) { // direct
         pos=a.fpos;
@@ -2694,7 +2689,7 @@ namespace pflow {
         xvector<double> fpos(3);fpos=neigh_mat.at(ia).at(in).fpos;
         xvector<double> cpos(3);cpos=neigh_mat.at(ia).at(in).cpos;
         oss << "      ";
-        oss << setw(4) << neigh_mat.at(ia).at(in).number+1 << " ";
+        oss << setw(4) << neigh_mat.at(ia).at(in).basis+1 << " ";  //[CO20200130 - number->basis]oss << setw(4) << neigh_mat.at(ia).at(in).number+1 << " ";
         oss << setw(4) << neigh_mat.at(ia).at(in).name.c_str() << "   ";
         oss << setw(3+xtra) <<  ijk(1) << " " << setw(3+xtra) <<  ijk(2) << " " << setw(3+xtra) <<  ijk(3) << "   ";
         //     oss << setw(3+xtra) << "F " << fpos(1) << " " << setw(3+xtra) << fpos(2) << " " << setw(3+xtra) << fpos(3) << "   ";
@@ -2886,7 +2881,6 @@ void PrintImages(xstructure strA, xstructure strB, const int& ni, const string& 
 //  This funtion prints out structural data in a msi format (for cerius).
 // Dane Morgan - Stefano Curtarolo
 void PrintMSI(const xstructure& str, ostream& oss) {
-  string soliloquy=XPID+"PrintMSI():";
   oss.setf(std::ios::fixed,std::ios::floatfield);
   oss.precision(10);
   xstructure sstr=str;
@@ -2903,7 +2897,7 @@ void PrintMSI(const xstructure& str, ostream& oss) {
   for(uint i=0;i<sstr.atoms.size();i++) {
     sstr.atoms.at(i).CleanName();
     if(sstr.atoms.at(i).atomic_number<1) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"atomic_number not found: sstr.atoms.at("+aurostd::utype2string(i)+").cleanname="+sstr.atoms.at(i).cleanname,_INPUT_ILLEGAL_);  //CO20200624
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"atomic_number not found: sstr.atoms.at("+aurostd::utype2string(i)+").cleanname="+sstr.atoms.at(i).cleanname,_INPUT_ILLEGAL_);  //CO20200624
     }
   }
 
@@ -3554,10 +3548,9 @@ namespace pflow {
       int setting,
       bool suppress_Wyckoff) {
 
-    string function_name = XPID + "pflow::PrintSGData():";
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    if(LDEBUG){ cerr << function_name << " BEGIN" << endl; }
+    if(LDEBUG){ cerr << __AFLOW_FUNC__ << " BEGIN" << endl; }
 
     // ---------------------------------------------------------------------------
     // calculate the space group symmetry if not already calculated
@@ -3842,10 +3835,9 @@ namespace pflow {
       bool no_scan,
       int setting) {
 
-    string function_name = XPID + "pflow::PrintWyckoffData():";
     bool LDEBUG=(FALSE || XHOST.DEBUG);
 
-    if(LDEBUG){ cerr << function_name << " BEGIN" << endl; }
+    if(LDEBUG){ cerr << __AFLOW_FUNC__ << " BEGIN" << endl; }
 
     // ---------------------------------------------------------------------------
     // calculate the space group symmetry if not already calculated
@@ -4449,7 +4441,7 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
         xvector<int> ijk(3);
         ijk=an.ijk;
         oss << "        ";
-        oss << setw(4) << an.number+1 << " ";
+        oss << setw(4) << an.basis+1 << " "; //[CO20200130 - number->basis]oss << setw(4) << an.number+1 << " ";
         oss << setw(4) << an.name.c_str() << "   ";
         oss << setw(3) << ijk(1) << " " << setw(3) << ijk(2) << " " << setw(3) << ijk(3) << "   ";
         oss << setprecision(4) << AtomDist(a,an);
@@ -4503,7 +4495,7 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
       xvector<int> ijk(3);
       ijk=an.ijk;
       oss << "        ";
-      oss << setw(4) << an.number+1 << " ";
+      oss << setw(4) << an.basis+1 << " "; //[CO20200130 - number->basis]oss << setw(4) << an.number+1 << " ";
       oss << setw(4) << an.name.c_str() << "   ";
       oss << setw(3) << ijk(1) << " " << setw(3) << ijk(2) << " " << setw(3) << ijk(3) << "   ";
       oss << setprecision(4) << AtomDist(a,an);
@@ -4548,7 +4540,7 @@ void PrintShell(const xstructure& str, const int& ns,const double& rmin, const d
     newatom.cleanname="XX";
     newatom.sd="";
     newatom.atomic_number=-1;
-    newatom.number=nat+iat;                 // reference position for convasp
+    //[CO20200130 - number->basis]newatom.number=nat+iat;                 // reference position for convasp
     newatom.basis=nat+iat;                  // position in the basis	
     clear(newatom.ijk);                     // position in the unit cell
     sstr.atoms.push_back(newatom);

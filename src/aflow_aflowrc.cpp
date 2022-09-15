@@ -24,6 +24,23 @@
 #define AFLOWRC_DEFAULT_TMPFS_DIRECTORIES               string("/tmp/,/run/shm/,/dev/shm/")
 #define         DEFAULT_TMPFS_DIRECTORIES               XHOST.adefault.getattachedscheme("DEFAULT_TMPFS_DIRECTORIES")
 
+
+//HE20220218 START
+// DEFAULTS ENTRY LOADER
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE      string("~/.aflow/aflowlib_alloy.db")
+#define         DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE      XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE")
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_SERVER       string("aflowlib.duke.edu")
+#define         DEFAULT_ENTRY_LOADER_AFLUX_SERVER       XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_AFLUX_SERVER")
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_PATH         string("/API/aflux/")
+#define         DEFAULT_ENTRY_LOADER_AFLUX_PATH         XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_AFLUX_PATH")
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_SERVER     string("aflowlib.duke.edu")
+#define         DEFAULT_ENTRY_LOADER_RESTAPI_SERVER     XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_RESTAPI_SERVER")
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_PATH       string("/AFLOWDATA/")
+#define         DEFAULT_ENTRY_LOADER_RESTAPI_PATH       XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_RESTAPI_PATH")
+#define AFLOWRC_DEFAULT_ENTRY_LOADER_FS_PATH            string("/common/")
+#define         DEFAULT_ENTRY_LOADER_FS_PATH            XHOST.adefault.getattachedscheme("DEFAULT_ENTRY_LOADER_FS_PATH")
+//HE20220218 STOP
+
 //ME20191001 START
 // DEFAULTS AFLOW DATABASE
 #define AFLOWRC_DEFAULT_AFLOW_DB_FILE                   string("/var/cache/aflow_data/AFLOWDB/aflowlib.db")
@@ -458,6 +475,8 @@
 #define         ARUN_DIRECTORY_PREFIX                         XHOST.adefault.getattachedscheme("ARUN_DIRECTORY_PREFIX")
 
 //DEFAULT POCC //CO20181226
+#define AFLOWRC_DEFAULT_POCC_STRUCTURE_GENERATION_ALGO            string("UFF")
+#define         DEFAULT_POCC_STRUCTURE_GENERATION_ALGO            XHOST.adefault.getattachedscheme("DEFAULT_POCC_STRUCTURE_GENERATION_ALGO")
 #define AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING                   string("0:2400:300")
 #define         DEFAULT_POCC_TEMPERATURE_STRING                   XHOST.adefault.getattachedscheme("DEFAULT_POCC_TEMPERATURE_STRING")
 #define AFLOWRC_DEFAULT_POCC_EXCLUDE_UNSTABLE                     true  //ME20210927
@@ -986,6 +1005,15 @@
 #define         MPI_BINARY_DIR_DUKE_X                         XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_DUKE_X")
 //CO20201220 X STOP
 
+//CO20220818 JHU_ROCKFISH START
+#define AFLOWRC_MPI_OPTIONS_JHU_ROCKFISH                      string("ulimit -s unlimited ") // JHU_ROCKFISH_MPICH
+#define         MPI_OPTIONS_JHU_ROCKFISH                      XHOST.adefault.getattachedscheme("MPI_OPTIONS_JHU_ROCKFISH")
+#define AFLOWRC_MPI_COMMAND_JHU_ROCKFISH                      string("mpirun -n") // JHU_ROCKFISH_MPICH
+#define         MPI_COMMAND_JHU_ROCKFISH                      XHOST.adefault.getattachedscheme("MPI_COMMAND_JHU_ROCKFISH")
+#define AFLOWRC_MPI_BINARY_DIR_JHU_ROCKFISH                   string("~/bin/") // JHU_ROCKFISH_MPICH
+#define         MPI_BINARY_DIR_JHU_ROCKFISH                   XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_JHU_ROCKFISH")
+//CO20220818 JHU_ROCKFISH STOP
+
 //DX20190509 - MACHINE001 - START
 #define AFLOWRC_MPI_OPTIONS_MACHINE001                        string("") // MACHINE001
 #define         MPI_OPTIONS_MACHINE001                        XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE001")
@@ -1157,8 +1185,8 @@ namespace aflowrc {
     bool LDEBUG=(FALSE || XHOST.DEBUG || AFLOWRC_VERBOSE);   
     bool aflowrc_local=FALSE;
     bool aflowrc_global=FALSE;
-    if(LDEBUG) oss << "aflowrc::is_available: BEGIN" << endl;
-    if(LDEBUG) oss << "aflowrc::is_available: XHOST.home=" << XHOST.home << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << " BEGIN" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << " XHOST.home=" << XHOST.home << endl;
     // TESTING LOCAL OR USER BASED
     if(XHOST.aflowrc_filename.empty()) XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
     aflowrc_local=aurostd::FileExist(AFLOWRC_FILENAME_LOCAL);
@@ -1166,38 +1194,38 @@ namespace aflowrc {
 
     // LOCAL=TRUE && GLOBAL=TRUE => take LOCAL
     if(aflowrc_local && aflowrc_global) {
-      if(LDEBUG) oss << "aflowrc::is_available: LOCAL=TRUE && GLOBAL=TRUE => LOCAL " << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << " LOCAL=TRUE && GLOBAL=TRUE => LOCAL " << endl;
       XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
-      if(LDEBUG) oss << "aflowrc::is_available: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
-      if(LDEBUG) oss << "aflowrc::is_available: END" << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << " END" << endl;
       return TRUE;
     }
     // LOCAL=TRUE && GLOBAL=FALSE => take LOCAL
     if(aflowrc_local && !aflowrc_global) {
-      if(LDEBUG) oss << "aflowrc::is_available: LOCAL=TRUE && GLOBAL=FALSE => LOCAL " << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << " LOCAL=TRUE && GLOBAL=FALSE => LOCAL " << endl;
       XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL; 
-      if(LDEBUG) oss << "aflowrc::is_available: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
-      if(LDEBUG) oss << "aflowrc::is_available: END" << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << " END" << endl;
       return TRUE;
     }
     // LOCAL=FALSE && GLOBAL=TRUE => take GLOBAL
     if(!aflowrc_local && aflowrc_global) {
-      if(LDEBUG) oss << "aflowrc::is_available: LOCAL=FALSE && GLOBAL=TRUE => GLOBAL " << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << " LOCAL=FALSE && GLOBAL=TRUE => GLOBAL " << endl;
       XHOST.aflowrc_filename=AFLOWRC_FILENAME_GLOBAL;
-      if(LDEBUG) oss << "aflowrc::is_available: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
-      if(LDEBUG) oss << "aflowrc::is_available: END" << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << " END" << endl;
       return TRUE;
     }
     // LOCAL=FALSE && GLOBAL=FALSE => take NOTHING AND REWRITE
     if(!aflowrc_local && !aflowrc_global) {
-      if(LDEBUG) oss << "aflowrc::is_available: LOCAL=FALSE && GLOBAL=FALSE => NOTHING " << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << " LOCAL=FALSE && GLOBAL=FALSE => NOTHING " << endl;
       XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL; // because it is going to write it
-      if(LDEBUG) oss << "aflowrc::is_available: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
-      if(LDEBUG) oss << "aflowrc::is_available: END" << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+      if(LDEBUG) oss << __AFLOW_FUNC__ << " END" << endl;
       return FALSE;
     }
 
-    if(LDEBUG) oss << "aflowrc::is_available: END" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << " END" << endl;
     return FALSE;
   }
 } // namespace aflowrc
@@ -1209,18 +1237,17 @@ namespace aflowrc {
 namespace aflowrc {
   bool read(std::ostream& oss,bool AFLOWRC_VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || AFLOWRC_VERBOSE);   
-    string soliloquy="aflowrc::read():";  //CO20200404
     stringstream message; //CO20200404
-    if(LDEBUG) oss << soliloquy << " BEGIN" << endl;
-    if(LDEBUG) oss << soliloquy << " XHOST.home=" << XHOST.home << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << " BEGIN" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << " XHOST.home=" << XHOST.home << endl;
     if(XHOST.aflowrc_filename.empty()) XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
-    if(LDEBUG) oss << soliloquy << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
 
     if(!aflowrc::is_available(oss,AFLOWRC_VERBOSE)){
       if(!XHOST.vflag_control.flag("WWW")){ //CO20200404 - new web flag
         if(!(aurostd::substring2bool(XHOST.aflowrc_filename,"/mnt/MAIN") || aurostd::substring2bool(XHOST.aflowrc_filename,"/mnt/uMAIN"))){ //CO20200404 - patching for new disk
           //[CO20200404 - OBSOLETE]cout << "WARNING: aflowrc::read: " << XHOST.aflowrc_filename << " not found, loading DEFAULT values" << endl;
-          message << XHOST.aflowrc_filename << " not found, loading DEFAULT values";pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,std::cerr,_LOGGER_MESSAGE_);  //CO20200404 - LEAVE std::cerr here, FR needs this for web
+          message << XHOST.aflowrc_filename << " not found, loading DEFAULT values";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,std::cerr,_LOGGER_MESSAGE_);  //CO20200404 - LEAVE std::cerr here, FR needs this for web
         }
       }
     }
@@ -1237,6 +1264,15 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_KZIP_BIN",AFLOWRC_DEFAULT_KZIP_BIN);
     aflowrc::load_default("DEFAULT_KZIP_EXT",AFLOWRC_DEFAULT_KZIP_EXT);
     aflowrc::load_default("DEFAULT_TMPFS_DIRECTORIES",AFLOWRC_DEFAULT_TMPFS_DIRECTORIES);
+
+    //HE20220218 START
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE", AFLOWRC_DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE);
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_AFLUX_SERVER", AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_SERVER);
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_AFLUX_PATH", AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_PATH);
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_RESTAPI_SERVER", AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_SERVER);
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_RESTAPI_PATH", AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_PATH);
+    aflowrc::load_default("DEFAULT_ENTRY_LOADER_FS_PATH", AFLOWRC_DEFAULT_ENTRY_LOADER_FS_PATH);
+    //HE20220218 STOP
 
     //ME20191001 START
     // AFLOW database files
@@ -1471,6 +1507,7 @@ namespace aflowrc {
     aflowrc::load_default("ARUN_DIRECTORY_PREFIX",AFLOWRC_ARUN_DIRECTORY_PREFIX);
 
     // DEFAULT POCC
+    aflowrc::load_default("DEFAULT_POCC_STRUCTURE_GENERATION_ALGO",AFLOWRC_DEFAULT_POCC_STRUCTURE_GENERATION_ALGO);
     aflowrc::load_default("DEFAULT_POCC_TEMPERATURE_STRING",AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING);
     aflowrc::load_default("DEFAULT_POCC_EXCLUDE_UNSTABLE",AFLOWRC_DEFAULT_POCC_EXCLUDE_UNSTABLE);  //ME20210927
     aflowrc::load_default("DEFAULT_POCC_SITE_TOL",AFLOWRC_DEFAULT_POCC_SITE_TOL);
@@ -1757,6 +1794,12 @@ namespace aflowrc {
     aflowrc::load_default("MPI_COMMAND_DUKE_X",AFLOWRC_MPI_COMMAND_DUKE_X); 
     aflowrc::load_default("MPI_BINARY_DIR_DUKE_X",AFLOWRC_MPI_BINARY_DIR_DUKE_X); 
     //CO20201220 X STOP
+    
+    //CO20220818 JHU_ROCKFISH START
+    aflowrc::load_default("MPI_OPTIONS_JHU_ROCKFISH",AFLOWRC_MPI_OPTIONS_JHU_ROCKFISH); 
+    aflowrc::load_default("MPI_COMMAND_JHU_ROCKFISH",AFLOWRC_MPI_COMMAND_JHU_ROCKFISH); 
+    aflowrc::load_default("MPI_BINARY_DIR_JHU_ROCKFISH",AFLOWRC_MPI_BINARY_DIR_JHU_ROCKFISH); 
+    //CO20220818 JHU_ROCKFISH STOP
 
     //DX20190509 - MACHINE001 - START
     aflowrc::load_default("MPI_OPTIONS_MACHINE001",AFLOWRC_MPI_OPTIONS_MACHINE001); 
@@ -1824,7 +1867,7 @@ namespace aflowrc {
     aflowrc::load_default("MPI_COMMAND_MACHINE2",AFLOWRC_MPI_COMMAND_MACHINE2); 
     aflowrc::load_default("MPI_BINARY_DIR_MACHINE2",AFLOWRC_MPI_BINARY_DIR_MACHINE2); 
 
-    if(LDEBUG) oss << soliloquy << " END" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << " END" << endl;
 
     return TRUE;
   }
@@ -1837,12 +1880,11 @@ namespace aflowrc {
 namespace aflowrc {
   bool write_default(std::ostream& oss,bool AFLOWRC_VERBOSE) {
     bool LDEBUG=(FALSE || XHOST.DEBUG || AFLOWRC_VERBOSE);   
-    string soliloquy="aflowrc::write_default():"; //CO20200404
     stringstream message;
-    if(LDEBUG) oss << soliloquy << " BEGIN" << endl;
-    if(LDEBUG) oss << soliloquy << " XHOST.home=" << XHOST.home << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << " BEGIN" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << " XHOST.home=" << XHOST.home << endl;
     if(XHOST.aflowrc_filename.empty()) XHOST.aflowrc_filename=AFLOWRC_FILENAME_LOCAL;
-    if(LDEBUG) oss << soliloquy << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << " XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
 
     stringstream aflowrc("");
     aflowrc << "// ****************************************************************************************************" << endl;
@@ -1865,6 +1907,18 @@ namespace aflowrc {
     aflowrc << "DEFAULT_TMPFS_DIRECTORIES=\"" << AFLOWRC_DEFAULT_TMPFS_DIRECTORIES << "\"" << endl;
 
     aflowrc << " " << endl;
+
+    //HE20220218 START
+    aflowrc << "// DEFAULTS ENTRY LOADER" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE << "\"" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_AFLUX_SERVER=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_SERVER << "\"" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_AFLUX_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_PATH << "\"" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_RESTAPI_SERVER=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_SERVER << "\"" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_RESTAPI_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_PATH << "\"" << endl;
+    aflowrc << "DEFAULT_ENTRY_LOADER_FS_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_FS_PATH << "\"" << endl;
+    aflowrc << " " << endl;
+    //HE20220218 STOP
+
     //ME20191001 START
     aflowrc << "// DEFAULT AFLOW DATABASE" << endl;
     aflowrc << "DEFAULT_AFLOW_DB_FILE=\"" << AFLOWRC_DEFAULT_AFLOW_DB_FILE << "\"" << endl;
@@ -2113,6 +2167,7 @@ namespace aflowrc {
 
     aflowrc << " " << endl;
     aflowrc << "// DEFAULTS POCC" << endl;
+    aflowrc << "DEFAULT_POCC_STRUCTURE_GENERATION_ALGO=\"" << AFLOWRC_DEFAULT_POCC_STRUCTURE_GENERATION_ALGO << "\"" << " // UFF" << endl;
     aflowrc << "DEFAULT_POCC_TEMPERATURE_STRING=\"" << AFLOWRC_DEFAULT_POCC_TEMPERATURE_STRING << "\"" << endl;
     aflowrc << "DEFAULT_POCC_EXCLUDE_UNSTABLE=" << AFLOWRC_DEFAULT_POCC_EXCLUDE_UNSTABLE << endl;  //ME20210927
     aflowrc << "DEFAULT_POCC_SITE_TOL=" << AFLOWRC_DEFAULT_POCC_SITE_TOL << endl;
@@ -2389,6 +2444,12 @@ namespace aflowrc {
     aflowrc << "MPI_COMMAND_DUKE_X=\"" << AFLOWRC_MPI_COMMAND_DUKE_X << "\"" << "  // DUKE_X" << endl;
     aflowrc << "MPI_BINARY_DIR_DUKE_X=\"" << AFLOWRC_MPI_BINARY_DIR_DUKE_X << "\"" << "  // DUKE_X" << endl; 
     //CO20201220 X STOP
+    
+    //CO20220818 JHU_ROCKFISH START
+    aflowrc << "MPI_OPTIONS_JHU_ROCKFISH=\"" << AFLOWRC_MPI_OPTIONS_JHU_ROCKFISH << "\"" << "  // JHU_ROCKFISH" << endl;
+    aflowrc << "MPI_COMMAND_JHU_ROCKFISH=\"" << AFLOWRC_MPI_COMMAND_JHU_ROCKFISH << "\"" << "  // JHU_ROCKFISH" << endl;
+    aflowrc << "MPI_BINARY_DIR_JHU_ROCKFISH=\"" << AFLOWRC_MPI_BINARY_DIR_JHU_ROCKFISH << "\"" << "  // JHU_ROCKFISH" << endl; 
+    //CO20220818 JHU_ROCKFISH STOP
 
     //DX20190509 - MACHINE001 - START
     aflowrc << "MPI_OPTIONS_MACHINE001=\"" << AFLOWRC_MPI_OPTIONS_MACHINE001 << "\"" << "// MACHINE001" << endl;
@@ -2464,10 +2525,10 @@ namespace aflowrc {
     if(aurostd::stringstream2file(aflowrc,XHOST.aflowrc_filename) && aurostd::FileExist(XHOST.aflowrc_filename)){
       if(!XHOST.vflag_control.flag("WWW")){ //CO20200404 - new web flag
         //[CO20200404 - OBSOLETE]cerr << "WARNING: aflowrc::write_default: WRITING default " << XHOST.aflowrc_filename << endl;  //CO20190808 - issue this ONLY if it was written, should fix www-data
-        message << "WRITING default " << XHOST.aflowrc_filename;pflow::logger(_AFLOW_FILE_NAME_,soliloquy,message,std::cerr,_LOGGER_MESSAGE_);  //CO20200404 - LEAVE std::cerr here, FR needs this for web
+        message << "WRITING default " << XHOST.aflowrc_filename;pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,std::cerr,_LOGGER_MESSAGE_);  //CO20200404 - LEAVE std::cerr here, FR needs this for web
       }
     }
-    if(LDEBUG) oss << soliloquy << " END" << endl;
+    if(LDEBUG) oss << __AFLOW_FUNC__ << " END" << endl;
     return TRUE;
   }
 } // namespace aflowrc
@@ -2481,6 +2542,16 @@ namespace aflowrc {
     if(LDEBUG) oss << "aflowrc::print_aflowrc: BEGIN" << endl;
     if(LDEBUG) oss << "aflowrc::print_aflowrc: XHOST.home=" << XHOST.home << endl;
     if(LDEBUG) oss << "aflowrc::print_aflowrc: XHOST.aflowrc_filename=" << XHOST.aflowrc_filename << endl;
+
+    //HE20220218 START
+    if(LDEBUG) oss << "// DEFAULTS ENTRY LOADER" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_AFLUX_SERVER=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_SERVER << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_AFLUX_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_AFLUX_PATH << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_RESTAPI_SERVER=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_SERVER << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_RESTAPI_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_RESTAPI_PATH << "\"" << endl;
+    if(LDEBUG) oss << "DEFAULT_ENTRY_LOADER_FS_PATH=\"" << AFLOWRC_DEFAULT_ENTRY_LOADER_FS_PATH << "\"" << endl;
+    //HE20220218 STOP
 
     //ME20191001 START
     if(LDEBUG) oss << "// DEFAULT AFLOW DATABASE" << endl;
@@ -2719,6 +2790,7 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"ARUN_DIRECTORY_PREFIX\")=\"" << ARUN_DIRECTORY_PREFIX << "\"" << endl;
 
     if(LDEBUG) oss << "// DEFAULTS POCC" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_STRUCTURE_GENERATION_ALGO\")=\"" << DEFAULT_POCC_STRUCTURE_GENERATION_ALGO << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_TEMPERATURE_STRING\")=\"" << DEFAULT_POCC_TEMPERATURE_STRING << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_EXCLUDE_UNSTABLE\")=" << DEFAULT_POCC_EXCLUDE_UNSTABLE << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_SITE_TOL\")=" << DEFAULT_POCC_SITE_TOL << endl;
@@ -2986,6 +3058,12 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_DUKE_X\")=\"" << MPI_COMMAND_DUKE_X << "\"" << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_DUKE_X\")=\"" << MPI_BINARY_DIR_DUKE_X << "\"" << endl;
     //CO20201220 X STOP
+    
+    //CO20220818 JHU_ROCKFISH START
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_JHU_ROCKFISH\")=\"" << MPI_OPTIONS_JHU_ROCKFISH << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_JHU_ROCKFISH\")=\"" << MPI_COMMAND_JHU_ROCKFISH << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_JHU_ROCKFISH\")=\"" << MPI_BINARY_DIR_JHU_ROCKFISH << "\"" << endl;
+    //CO20220818 JHU_ROCKFISH STOP
 
     //DX20190509 - MACHINE001 - START
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_MACHINE001\")=\"" << MPI_OPTIONS_MACHINE001 << "\"" << endl;

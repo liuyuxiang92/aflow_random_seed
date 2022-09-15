@@ -213,11 +213,11 @@ namespace pocc {
       bool operator<(const POccSuperCellSet& other) const;
       void clear();
       //NECESSARY PUBLIC CLASS METHODS - END
-    
+
       vector<POccSuperCell> m_psc_set;
       double m_energy_dft;  //only calculate this for the set
       double m_probability;
-      
+
       unsigned long long int getDegeneracy() const;
       const POccSuperCell& getSuperCell() const;
       double getHNFIndex() const; //ME20211006
@@ -474,6 +474,13 @@ namespace pocc {
       void calculateNNDistances(xstructure& xstr,vector<uint>& v_vacancies);
   };
 } // namespace pocc
+
+namespace pocc {
+  struct GroupMember {
+    int basis;  //basis is int in xatom
+    xvector<double> cpos;
+  };
+}
 
 namespace pocc {
   class POccCalculator : public POccCalculatorTemplate, public xStream {
@@ -913,13 +920,13 @@ namespace pocc {
       void writeThermodynamicProperties();
       void clear();
     private:
-     void readFVTParameters(const string &filename, const string &blockname,
-         uint &Nvolumes, uint &Ntemperatures);
+      void readFVTParameters(const string &filename, const string &blockname,
+          uint &Nvolumes, uint &Ntemperatures);
       void readFVTdata(const string & dirname, const string& filename,
-        const string& blockname, uint n_volumes, uint n_temperatures, xvector<double> &t,
-        xmatrix<double> &c, double &Vmin, double &Vmax);
+          const string& blockname, uint n_volumes, uint n_temperatures, xvector<double> &t,
+          xmatrix<double> &c, double &Vmin, double &Vmax);
       bool readCoeffData(const string& filename, const string& blockname,
-        xvector<double> &T, xmatrix<double> &coeffs);
+          xvector<double> &T, xmatrix<double> &coeffs);
       void readCoeffParameters(const string& filename, double &Vmin, double &Vmax);
       // mandatory
       void free();

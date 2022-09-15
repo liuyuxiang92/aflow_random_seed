@@ -181,7 +181,7 @@ namespace xprototype {
     }
     // ********************************************************************************************************************************************************
     
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,"xprototype::xprototype():","Prototype does not exist: "+prototype,_FILE_NOT_FOUND_);
+    throw aurostd::xerror(__AFLOW_FILE__,"xprototype::xprototype():","Prototype does not exist: "+prototype,_FILE_NOT_FOUND_);
   }
 } // namespace xprototype
 
