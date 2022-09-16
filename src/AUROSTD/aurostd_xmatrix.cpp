@@ -367,15 +367,25 @@ namespace aurostd {  // namespace aurostd
       message << "_xmatrix<utype>::reshape() failed! (original size: " << rows*cols << ") != (new size: " << new_rows*new_cols << ")";
       throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
     }
-    int row_shift = lrows - new_lrows;
-    int col_shift = lcols - new_lcols;
-    urows = new_urows;
-    ucols = new_ucols;
-    lrows = new_lrows;
-    lcols = new_lcols;
+    if ((lrows == new_lrows) && (lcols == new_lcols) && (urows == new_urows) && (ucols == new_ucols) ) return;
+    // save the position of the main data
+    utype* main_data_ptr =  corpus[lrows];
+    // free the old row pointer storage
+    delete [] (corpus+lrows-XXEND);
+
+    // change the xmatrix properties
+    urows = new_urows; ucols = new_ucols;
+    lrows = new_lrows; lcols = new_lcols;
     refresh();
-    corpus += row_shift;
-    corpus[lrows]+= col_shift;
+
+    // create new array to store row pointers
+    corpus = new utype *[rows+XXEND]();
+
+    // shift to fit lrows
+    corpus += -lrows+ XXEND;
+    // point the start back to the data
+    corpus[lrows]= main_data_ptr;
+    // fill the row pointer with start to the rows in the data array
     for(int i=lrows+1;i<=urows;i++){corpus[i]=corpus[i-1]+cols;}
 
   }

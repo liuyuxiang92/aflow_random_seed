@@ -156,17 +156,38 @@ namespace aurostd {  // namespace aurostd
       size=(char) (sizeof(utype));
       vsize=(long int) size*rows;
     }
+
+  /// @brief resize a xvector to the given dimensions
+  /// @param nu new upper bound for rows
+  /// @param nl new lower bound for rows
+  ///
+  /// @authors
+  /// @mod{CO,20201111,created function}
+  /// @mod{HE,20220916,fixed memory leak and added shift shortcut}
+  /// @note The higher value of (nu,nl) is always used as upper bound
   template<class utype>
-    void xvector<utype>::resize(int nh,int nl) {  //CO20201111
-      int lrows_old=lrows,urows_old=urows;long int vsize_old=vsize; //to check whether we need to make a new corpus
-      // allocate a xvector with subscript range [nl..nh]
-      lrows=std::min(nl,nh);// if(!nh)lrows=0; this messes up convasp
-      urows=std::max(nl,nh);// if(!nh)urows=0; this messes up convasp
+    void xvector<utype>::resize(int nu, int nl) {
+      if (nl>nu) std::swap(nl,nu);
+      int new_rows = nu-nl+1;
+
+      int lrows_old=lrows, urows_old=urows;
+      long int vsize_old = vsize; // to check whether we need to delete the old corpus
+      
+      // if the row count is not changed, simply shift the pointers
+      if (new_rows == rows) {
+        shift(nl);
+        return;
+      }
+      // set the xvector properties to the new values
+      lrows = nl; urows = nu;
       refresh(); //CO20191110
 #ifdef _AUROSTD_XVECTOR_DEBUG_CONSTRUCTORS
       cerr << "xxvector -> default constructor: lrows=" << lrows << ", urows=" << urows << ", rows=" << rows << endl;
 #endif
-      if(lrows!=lrows_old||urows!=urows_old||vsize!=vsize_old) { //vsize>0
+      if(lrows!=lrows_old||urows!=urows_old||vsize!=vsize_old) {
+        //remove previous allocated memory
+        if (vsize_old>0) delete [] (corpus+lrows_old-XXEND); //HE20220916
+        //recreate with new size
         corpus=new utype[rows+XXEND](); //HE20220613 initialize corpus memory
         if(!corpus) {throw aurostd::xerror(__AFLOW_FILE__,"aurostd::xvector<utype>::xvector():","allocation failure in default constructor",_ALLOC_ERROR_);}
         corpus+= -lrows+XXEND;
