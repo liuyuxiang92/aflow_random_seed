@@ -286,9 +286,9 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   getGeneralNormal(vxv);
   v=aurostd::args2xvectorutype<utype>(vstring,c,v);v=aurostd::args2xvectorutype<utype>(vstring,c,i);
   aurostd::args2vectorutype<utype>(vstring,c);aurostd::args2dequeutype<utype>(dstring,c);
-  v.clear();clear(v);reshape(xvi,2,1);reshape(x);reshape(x,x);reshape(x,x,x);reshape(x,x,x,x);reshape(x,x,x,x,x);reshape(x,x,x,x,x,x);
+  v.clear();clear(v);reshape(xvi,2,1);
   //  sort2((unsigned long)1,v,v);sort2((unsigned long)1,xvd,xvi);sort2((unsigned long)1,xvi,xvd);
-  o+=isequal(v,v)+isequal(v,v,(utype) 0)+isequal(v,v,x)+isdifferent(v,v)+isdifferent(v,v,x)+isinteger(v,x);swap(v,1,1);shiftlrows(v,1);
+  o+=isequal(v,v)+isequal(v,v,(utype) 0)+isequal(v,v,x)+isdifferent(v,v)+isdifferent(v,v,x)+isinteger(v,x);swap(v,1,1);
   getQuartiles(v,x,x,x);
   o+=aurostd::mean(v);aurostd::meanWeighted(v,v);aurostd::meanWeighted(v,v,x);o+=aurostd::var(v,1);o+=aurostd::stddev(v,1);o+=aurostd::mode(v);o+=aurostd::correlation_Pearson_fast(v,v);o+=aurostd::correlation_Pearson_slow(v,v);o+=aurostd::correlation_Pearson_fast(v,x,x,v,x,x); //CO20190520
   v=aurostd::box_filter_xv<utype>(1);v=aurostd::box_filter_xv<utype>(1,1); //CO20190520
@@ -333,14 +333,12 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   vector<string> vs;vxu=vector2xvector<utype>(vs,1); //CO20201111
   vector<vector<utype> > mvv=xmatrix2vectorvector(m);vectorvector2xmatrix(mvv);
   if(det(m)==0 || sum(m)==0) return FALSE;
-  reshape(m3,9,1);
-  reshape(v);reshape(v,v);reshape(v,v,v);reshape(v,v,v,v);reshape(v,v,v,v,v);reshape(v,v,v,v,v,v);
-  reshape_rows(v);reshape_rows(v,v);reshape_rows(v,v,v);reshape_rows(v,v,v,v);reshape_rows(v,v,v,v,v);reshape_rows(v,v,v,v,v,v);
-  reshape_cols(v);reshape_cols(v,v);reshape_cols(v,v,v);reshape_cols(v,v,v,v);reshape_cols(v,v,v,v,v);reshape_cols(v,v,v,v,v,v);
+  reshape(v);hstack(vxv);
+  reshape_rows(v);vstack(vxv);
   utype tol=(utype)0; //DX20171025
   o+=isequal(m,m)+isequal(m,m,(utype) 0)+isequal(m,m,x)+isdifferent(m,m)+isdifferent(m,m,x)+isinteger(m,x)+isdiagonal(m)+isdiagonal(m,tol)+issymmetric(m)+isantisymmetric(m);
   o+=isidentity(m); //CO
-  swap_cols(m,1,1);swap_columns(m,1,1);swap_rows(m,1,1);shiftlrows(m,1);shiftlcols(m,1);shiftlrowscols(m,1,1);  //CO20191201
+  swap_cols(m,1,1);swap_columns(m,1,1);swap_rows(m,1,1);  //CO20191201
   sin(m);sinh(m);cos(m);cosh(m);exp(m);
   aurostd::floor(m);aurostd::ceil(m);
   //ME20190718 - norms

@@ -280,6 +280,105 @@ namespace aurostd {  // namespace aurostd
       size=(char) (sizeof(utype));
       msize=(long int) size*rows*cols;
     }
+
+  /// @brief shift the lower bounds of an xmatrix to new values
+  /// \param new_lrows new lower bound for rows
+  /// \param new_lcols new lower bound for columns
+  ///
+  /// @authors
+  /// @mod{HE,20220915,created function}
+  /// @note modifies the pointers but not the underlying data field
+  template<class utype>
+  void xmatrix<utype>::shift(int new_lrows, int new_lcols) {
+    if (new_lrows == lrows && new_lcols == lcols) return;
+    int row_shift = lrows - new_lrows;
+    int col_shift = lcols - new_lcols;
+    corpus += row_shift;
+    lrows = new_lrows;
+    lcols = new_lcols;
+    urows = new_lrows + rows - 1;
+    ucols = new_lcols + cols - 1;
+    corpus[lrows]+= col_shift;
+    for(int i=lrows+1;i<=urows;i++){corpus[i]=corpus[i-1]+cols;}
+  }
+
+  /// @brief shift the lower row bound of an xmatrix to a new value
+  /// \param new_lrows new lower bound for rows
+  /// @note modifies the pointers but not the underlying data field
+  template<class utype>
+  void xmatrix<utype>::shiftrow(int new_lrows) {
+    shift(new_lrows, lcols);
+  }
+
+  /// @brief shift the lower column bound of an xmatrix to a new value
+  /// \param new_lcols new lower bound for columns
+  /// @note modifies the pointers but not the underlying data field
+  template<class utype>
+  void xmatrix<utype>::shiftcol(int new_lcols) {
+    shift(lrows, new_lcols);
+  }
+
+  /// @brief reshape a xmatrix to given dimensions
+  /// @param new_rows row count
+  /// @param new_cols column count
+  ///
+  /// @authors
+  /// @mod{HE,20220915,created function}
+  /// @note When new_rows or new_rows is set to 0, it is automatically calculated.
+  /// This is also true when new_cols is not given.
+  /// @note lower bound for rows and columns is not changed
+  /// @note modifies the pointers but not the underlying data field
+  template<class utype>
+  void xmatrix<utype>::reshape(uint new_rows, uint new_cols) {
+    if (new_rows+new_cols == 0 ) {
+      throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "_xmatrix<utype>::reshape() failed! rows or cols need to be defined", _INDEX_BOUNDS_);
+    }
+    if (new_rows == 0) new_rows = (rows*cols)/new_cols;
+    if (new_cols == 0) new_cols = (rows*cols)/new_rows;
+    if (new_rows < 1 || new_cols < 1) {
+      throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "New dimensions cannot be less than one", _VALUE_ILLEGAL_);
+    }
+    int new_urows = lrows + new_rows - 1;
+    int new_ucols = lcols + new_cols - 1;
+    reshape(new_urows, new_ucols, lrows, lcols);
+  }
+
+  /// @brief reshape a xmatrix to given dimensions
+  /// @param new_urows new upper bound for rows
+  /// @param new_ucols new upper bound for columns
+  /// @param new_lrows new lower bound for rows
+  /// @param new_lcols new lower bound for columns
+  ///
+  /// @authors
+  /// @mod{HE,20220915,created function}
+  /// @note When new_rows or new_rows is set to 0, it is automatically calculated.
+  /// This is also true when new_cols is not given.
+  /// @note lower bound for rows and columns is not changed
+  /// @note modifies the pointers but not the underlying data field
+  template<class utype>
+  void xmatrix<utype>::reshape(int new_urows, int new_ucols, int new_lrows, int new_lcols){
+    int new_rows = new_urows - new_lrows + 1;
+    int new_cols = new_ucols - new_lcols + 1;
+    if (new_rows < 1 || new_cols < 1) {
+      throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "New dimensions cannot be less than one", _VALUE_ILLEGAL_);
+    }
+    if (rows*cols != new_rows*new_cols) {
+      stringstream message;
+      message << "_xmatrix<utype>::reshape() failed! (original size: " << rows*cols << ") != (new size: " << new_rows*new_cols << ")";
+      throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_BOUNDS_);
+    }
+    int row_shift = lrows - new_lrows;
+    int col_shift = lcols - new_lcols;
+    urows = new_urows;
+    ucols = new_ucols;
+    lrows = new_lrows;
+    lcols = new_lcols;
+    refresh();
+    corpus += row_shift;
+    corpus[lrows]+= col_shift;
+    for(int i=lrows+1;i<=urows;i++){corpus[i]=corpus[i-1]+cols;}
+
+  }
 }
 
 // ----------------------------------------------------------------------------
@@ -1489,261 +1588,120 @@ namespace aurostd {  // namespace aurostd
 // ****************************************************************************
 // ------------------------------------------------------ xmatrix construction
 namespace aurostd {
-  // ME2021050 - Reshape given matrix dimensions
+  /// @brief reshape xvector to xmatrix with given dimensions
+  /// @param vec input vector
+  /// @param rows row count
+  /// @param cols column count
+  /// @return created matrix
+  /// @authors
+  /// @mod{ME,20210921,created function}
+  /// @mod{HE,20220915,migrated to direct reshape}
+  /// @note When new_rows or new_rows is set to 0, it is automatically calculated.
+  /// This is also true when new_cols is not given.
   template<class utype>
-    xmatrix<utype> reshape(const xvector<utype>& v1, int rows, int cols) {
-      if (rows * cols != v1.rows) {
+  xmatrix<utype> reshape(const xvector<utype> &vec, int rows, int cols) {
+    xmatrix<utype> mat = reshape(vec);
+    mat.reshape(rows, cols);
+    return mat;
+  }
+
+  /// @brief reshape xvector to xmatrix column
+  /// @param vec input vector
+  /// @return created xmatrix
+  /// @authors
+  /// @mod{ME,20190617,created function}
+  /// @mod{HE,20220915,using general stacking function}
+  template<class utype>
+  xmatrix<utype> reshape(const xvector<utype> &vec) {
+    xmatrix<utype> mat(vec.rows, 1);
+    for (int i = 1; i <= vec.rows; i++)
+      mat(i-vec.lrows+1, 1) = vec(i);
+    return mat;
+  }
+
+  /// @brief reshape xvector to xmatrix row
+  /// @param vec input vector
+  /// @return created xmatrix
+  /// @authors
+  /// @mod{ME,20190617,created function}
+  /// @mod{HE,20220915,using general stacking function}
+  template<class utype>
+  xmatrix<utype> reshape_rows(const xvector<utype> &vec) {
+    xmatrix<utype> mat = reshape(vec);
+    mat.reshape(1);
+    return mat;
+  }
+
+  /// @brief stack xvectors vertically into a xmatrix
+  /// @param vec_list list of xvectors
+  /// @return generated xmatrix
+  /// @authors
+  /// @mod{HE,20220915,created function}
+  /// @code{.cpp}
+  /// xvector<double> xv = {1.5, 3.0, 4.5};
+  /// xmatrix<double> smat = aurostd::vstack(vector<xvector<double>>({xv, xv, xv}));
+  /// cout << smat << endl;
+  /// // 1.5 1.5 1.5
+  /// // 3.0 3.0 3.0
+  /// // 4.5 4.5 4.5
+  /// @endcode
+  template<class utype>
+  xmatrix<utype> vstack(const vector <xvector<utype>> &vec_list) {
+    if (vec_list.empty()) return xmatrix<utype>();
+    int rows = vec_list[0].rows;
+    int cols = (int) vec_list.size();
+    for (xvector<utype> const &vec: vec_list) {
+      if (rows != vec.rows) {
         stringstream message;
-        message << "vector (rows = " << v1.rows << ") cannot be reshaped into "
-          << rows << "x" << cols << "matrix.";
+        message << "vectors must have the same dimensions " << rows << " != " << vec.rows;
         throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
-      xmatrix<utype> c(rows, cols);
-      for (int i = c.lrows; i <= c.urows; i++) {
-        for (int j = c.lcols; j <= c.ucols; j++) {
-          c(i, j) = v1(v1.lrows + c.ucols*(i-1) + j-1);
-        }
-      }
-      return c;
     }
-
-  // reshape by columns
-  template<class utype>
-    xmatrix<utype> reshape(const xvector<utype>& v1) {
-      xmatrix<utype> c(v1.rows,1);
-      for (int i=c.lrows;i<=c.urows;i++)
-        c(i,1)=v1(v1.lrows+(i-c.lrows+1));
-      return c;
-    }
-
-  // SD20220126 - Reshape matrix into another matrix
-  template<class utype>
-    xmatrix<utype> reshape(const xmatrix<utype>& _c, int rows, int cols) {
-      if (rows < 1 || cols < 1) { 
-        string message = "New dimensions cannot be less than one";
-        throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+    xmatrix<utype> mat(rows, cols);
+    for (int i = 1; i <= rows; i++) {
+      for (int j = 1; j <= cols; j++) {
+        mat[i][j] = vec_list[j-1][i];
       }
-      else if (_c.rows * _c.cols != rows * cols) {
+    }
+    return mat;
+  }
+
+
+
+  /// @brief Stack xvectors horizontally into a xmatrix
+  /// @param vec_list list of xvectors
+  /// @return generated xmatrix
+  /// @authors
+  /// @mod{HE,20220915,created function}
+  /// @note use list initializing to call this function
+  /// @code{.cpp}
+  /// xvector<double> xv = {1.5, 3.0, 4.5};
+  /// xmatrix<double> smat = aurostd::hstack(vector<xvector<double>>({xv, xv, xv}));
+  /// cout << smat << endl;
+  /// // 1.5 30. 4.5
+  /// // 1.5 3.0 4.5
+  /// // 1.5 3.0 4.5
+  /// @endcode
+  template<class utype>
+  xmatrix<utype> hstack(const vector <xvector<utype>> &vec_list) {
+    if (vec_list.empty()) return xmatrix<utype>();
+    int cols = vec_list[0].rows;
+    int rows = (int) vec_list.size();
+    for (xvector<utype> const &vec: vec_list) {
+      if (cols != vec.rows) {
         stringstream message;
-        message << "New shape (" << rows << "," << cols << ") not compatible with old shape (" << _c.rows << "," << _c.cols << ")";
-        throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
-      }
-      xmatrix<utype> c(rows, cols);
-      int irow = 0, icol = 0;
-      for (int i = _c.lrows; i <= _c.urows; i++) {
-        for (int j = _c.lcols; j <= _c.ucols; j++) {
-          c(c.lrows + irow, c.lcols + icol) = _c(i, j);
-          icol++;
-          if (c.lcols + icol > c.ucols) {irow++; icol = 0;}
-        }
-      }
-      return c;
-    }
-
-  template<class utype>
-    xmatrix<utype> reshape(const xvector<utype>& v1,const xvector<utype>& v2) {
-      if(v1.rows!=v2.rows) {
-        stringstream message;
-        message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows;
+        message << "vectors must have the same dimensions " << rows << " != " << vec.rows;
         throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
       }
-      xmatrix<utype> c(v1.rows,2);
-      for (int i=c.lrows;i<=c.urows;i++) {
-        c(i,1)=v1(v1.lrows+(i-c.lrows+1));
-        c(i,2)=v2(v2.lrows+(i-c.lrows+1));
-      }
-      return c;
     }
-
-  template<class utype> xmatrix<utype>
-    reshape(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3) {
-      if(v1.rows!=v2.rows || v2.rows!=v3.rows) {
-        stringstream message;
-        message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows << " " << v3.rows;
-        throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+    xmatrix<utype> mat(rows, cols);
+    for (int i = 1; i <= rows; i++) {
+      for (int j = 1; j <= cols; j++) {
+        mat[i][j] = vec_list[i-1][j];
       }
-      xmatrix<utype> c(v1.rows,3);
-      for (int i=c.lrows;i<=c.urows;i++) {
-        c(i,1)=v1(v1.lrows+(i-c.lrows+1));
-        c(i,2)=v2(v2.lrows+(i-c.lrows+1));
-        c(i,3)=v3(v3.lrows+(i-c.lrows+1));
-      }
-      return c;
     }
-
-  template<class utype> xmatrix<utype>
-    reshape(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3,const xvector<utype>& v4) {
-      if(v1.rows!=v2.rows || v2.rows!=v3.rows || v3.rows!=v4.rows) {
-        stringstream message;
-        message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows << " " << v3.rows << " " << v4.rows;
-        throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
-      }
-      xmatrix<utype> c(v1.rows,4);
-      for (int i=c.lrows;i<=c.urows;i++) {
-        c(i,1)=v1(v1.lrows+(i-c.lrows+1));
-        c(i,2)=v2(v2.lrows+(i-c.lrows+1));
-        c(i,3)=v3(v3.lrows+(i-c.lrows+1));
-        c(i,4)=v4(v4.lrows+(i-c.lrows+1));
-      }
-      return c;
-    }
-
-  template<class utype> xmatrix<utype>
-    reshape(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3,const xvector<utype>& v4,const xvector<utype>& v5) {
-      if(v1.rows!=v2.rows || v2.rows!=v3.rows || v3.rows!=v4.rows || v4.rows!=v5.rows) {
-        stringstream message;
-        message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows << " " << v3.rows << " " << v4.rows << " " << v5.rows;
-        throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
-      }
-      xmatrix<utype> c(v1.rows,5);
-      for (int i=c.lrows;i<=c.urows;i++) {
-        c(i,1)=v1(v1.lrows+(i-c.lrows+1));
-        c(i,2)=v2(v2.lrows+(i-c.lrows+1));
-        c(i,3)=v3(v3.lrows+(i-c.lrows+1));
-        c(i,4)=v4(v4.lrows+(i-c.lrows+1));
-        c(i,5)=v5(v5.lrows+(i-c.lrows+1));
-      }
-      return c;
-    }
-
-  template<class utype> xmatrix<utype>
-    reshape(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3,const xvector<utype>& v4,const xvector<utype>& v5,const xvector<utype>& v6) {
-      if(v1.rows!=v2.rows || v2.rows!=v3.rows || v3.rows!=v4.rows || v4.rows!=v5.rows || v5.rows!=v6.rows) {
-        stringstream message;
-        message << "vectors must have same the dimensions " << v1.rows << " " << v2.rows << " " << v3.rows << " " << v4.rows << " " << v5.rows << " " << v6.rows;
-        throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
-      }
-      xmatrix<utype> c(v1.rows,6);
-      for (int i=c.lrows;i<=c.urows;i++) {
-        c(i,1)=v1(v1.lrows+(i-c.lrows+1));
-        c(i,2)=v2(v2.lrows+(i-c.lrows+1));
-        c(i,3)=v3(v3.lrows+(i-c.lrows+1));
-        c(i,4)=v4(v4.lrows+(i-c.lrows+1));
-        c(i,5)=v5(v5.lrows+(i-c.lrows+1));
-        c(i,6)=v6(v6.lrows+(i-c.lrows+1));
-      }
-      return c;
-    }
-
-  // reshape by colums
-  template<class utype>
-    xmatrix<utype> reshape_cols(const xvector<utype>& v1) {
-      return reshape(v1);
-    }
-  template<class utype>
-    xmatrix<utype> reshape_cols(const xvector<utype>& v1,const xvector<utype>& v2) {
-      return reshape(v1,v2);
-    }
-  template<class utype>
-    xmatrix<utype> reshape_cols(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3) {
-      return reshape(v1,v2,v3);
-    }
-  template<class utype>
-    xmatrix<utype> reshape_cols(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3,const xvector<utype>& v4) {
-      return reshape(v1,v2,v3,v4);
-    }
-  template<class utype>
-    xmatrix<utype> reshape_cols(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3,const xvector<utype>& v4,const xvector<utype>& v5) {
-      return reshape(v1,v2,v3,v4,v5);
-    }
-  template<class utype>
-    xmatrix<utype> reshape_cols(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3,const xvector<utype>& v4,const xvector<utype>& v5,const xvector<utype>& v6) {
-      return reshape(v1,v2,v3,v4,v5,v6);
-    }
-
-  // reshape by rows
-  template<class utype>
-    xmatrix<utype> reshape_rows(const xvector<utype>& v1) {
-      xmatrix<utype> c(1,v1.rows);
-      for (int i=c.lcols;i<=c.urows;i++)
-        c(i,1)=v1(v1.lrows+(i-c.lcols+1));
-      return c;
-    }
-
-  template<class utype>
-    xmatrix<utype> reshape_rows(const xvector<utype>& v1,const xvector<utype>& v2) {
-      if(v1.rows!=v2.rows) {
-        stringstream message;
-        message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows;
-        throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
-      }
-      xmatrix<utype> c(2,v1.rows);
-      for (int i=c.lcols;i<=c.urows;i++) {
-        c(i,1)=v1(v1.lrows+(i-c.lcols+1));
-        c(i,2)=v2(v2.lrows+(i-c.lcols+1));
-      }
-      return c;
-    }
-
-  template<class utype> xmatrix<utype>
-    reshape_rows(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3) {
-      if(v1.rows!=v2.rows || v2.rows!=v3.rows) {
-        stringstream message;
-        message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows << " " << v3.rows;
-        throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
-      }
-      xmatrix<utype> c(3,v1.rows);
-      for (int i=c.lcols;i<=c.urows;i++) {
-        c(i,1)=v1(v1.lrows+(i-c.lcols+1));
-        c(i,2)=v2(v2.lrows+(i-c.lcols+1));
-        c(i,3)=v3(v3.lrows+(i-c.lcols+1));
-      }
-      return c;
-    }
-
-  template<class utype> xmatrix<utype>
-    reshape_rows(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3,const xvector<utype>& v4) {
-      if(v1.rows!=v2.rows || v2.rows!=v3.rows || v3.rows!=v4.rows) {
-        stringstream message;
-        message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows << " " << v3.rows << " " << v4.rows;
-        throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
-      }
-      xmatrix<utype> c(4,v1.rows);
-      for (int i=c.lcols;i<=c.urows;i++) {
-        c(i,1)=v1(v1.lrows+(i-c.lcols+1));
-        c(i,2)=v2(v2.lrows+(i-c.lcols+1));
-        c(i,3)=v3(v3.lrows+(i-c.lcols+1));
-        c(i,4)=v4(v4.lrows+(i-c.lcols+1));
-      }
-      return c;
-    }
-
-  template<class utype> xmatrix<utype>
-    reshape_rows(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3,const xvector<utype>& v4,const xvector<utype>& v5) {
-      if(v1.rows!=v2.rows || v2.rows!=v3.rows || v3.rows!=v4.rows || v4.rows!=v5.rows ) {
-        stringstream message;
-        message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows << " " << v3.rows << " " << v4.rows << " " << v5.rows;
-        throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
-      }
-      xmatrix<utype> c(5,v1.rows);
-      for (int i=c.lcols;i<=c.urows;i++) {
-        c(i,1)=v1(v1.lrows+(i-c.lcols+1));
-        c(i,2)=v2(v2.lrows+(i-c.lcols+1));
-        c(i,3)=v3(v3.lrows+(i-c.lcols+1));
-        c(i,4)=v4(v4.lrows+(i-c.lcols+1));
-        c(i,5)=v5(v5.lrows+(i-c.lcols+1));
-      }
-      return c;
-    }
-
-  template<class utype> xmatrix<utype>
-    reshape_rows(const xvector<utype>& v1,const xvector<utype>& v2,const xvector<utype>& v3,const xvector<utype>& v4,const xvector<utype>& v5,const xvector<utype>& v6) {
-      if(v1.rows!=v2.rows || v2.rows!=v3.rows || v3.rows!=v4.rows || v4.rows!=v5.rows ) {
-        stringstream message;
-        message << "vectors must have the same dimensions " << v1.rows << " " << v2.rows << " " << v3.rows << " " << v4.rows << " " << v5.rows << " " << v6.rows;
-        throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
-      }
-      xmatrix<utype> c(6,v1.rows);
-      for (int i=c.lcols;i<=c.urows;i++) {
-        c(i,1)=v1(v1.lrows+(i-c.lcols+1));
-        c(i,2)=v2(v2.lrows+(i-c.lcols+1));
-        c(i,3)=v3(v3.lrows+(i-c.lcols+1));
-        c(i,4)=v4(v4.lrows+(i-c.lcols+1));
-        c(i,5)=v5(v5.lrows+(i-c.lcols+1));
-        c(i,6)=v6(v6.lrows+(i-c.lcols+1));
-      }
-      return c;
-    }
+    return mat;
+  }
 
 }
 
@@ -2001,7 +1959,7 @@ namespace aurostd {  // namespace aurostd
     utype det(const xmatrix<utype>& a) {
       /* returns the determinant **/
       if(!a.issquare){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::det()","a must be square",_INPUT_ILLEGAL_);}
-      if(a.lrows!=1 || a.lcols!=1){xmatrix<utype> b=a;shiftlrowscols(b,1,1);return det(b);}
+      if(a.lrows!=1 || a.lcols!=1){xmatrix<utype> b=a;b.shift(1,1);return det(b);}
       int size=a.rows;
       //  cerr << "DET CALL size="<<size<< endl;
       if(size==1) { return (utype) a[1][1]; }
@@ -2230,9 +2188,9 @@ namespace aurostd {  // namespace aurostd
       if(!a.issquare){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::inverse()","a must be square",_INPUT_ILLEGAL_);}
       if(a.lrows!=1 || a.lcols!=1){
         xmatrix<utype> b(a);
-        shiftlrowscols(b,1,1);
+        b.shift(1,1);
         b=inverse(b);
-        shiftlrowscols(b,a.lrows,a.lcols);
+        b.shift(a.lrows,a.lcols);
         return b;
       }
       int size=a.rows;
@@ -2966,30 +2924,6 @@ namespace aurostd {  // namespace aurostd
       }
     }
 }
-
-// ****************************************************************************
-// ----------------------------------------------------------------------------
-namespace aurostd { // namespace aurostd
-  template<class utype> void  // function shift lrows so first index is i
-  shiftlrows(xmatrix<utype>& a,int i){ //CO20191201 //SD20220912 - removed degenerate code
-    aurostd::shiftlrowscols(a,i,a.lcols);
-  }
-  template<class utype> void  // function shift lcols so first index is i
-  shiftlcols(xmatrix<utype>& a,int i){ //CO20191201 //SD20220912 - removed degenerate code
-    aurostd::shiftlrowscols(a,a.lrows,i);
-  }
-  template<class utype> void  // function shift lrows and lcols so first index is i, j
-  shiftlrowscols(xmatrix<utype>& a,int i,int j){ //CO20191201
-    if(a.lrows==i && a.lcols==j){return;}
-    xmatrix<utype> b(a.rows+i-1,a.cols+j-1,i,j);
-    for(int ii=a.lrows;ii<=a.urows;ii++){
-      for(int jj=a.lcols;jj<=a.ucols;jj++){
-        b[i-a.lrows+ii][j-a.lcols+jj]=a[ii][jj];
-      }
-    }
-    a=b;
-  }
-} // namespace aurostd
 
 // ****************************************************************************
 // ----------------------------------------------------------------------------
@@ -4504,7 +4438,7 @@ namespace aurostd {
 
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " A=" << endl;cerr << A_in << endl;}
 
-      xmatrix<double> S=aurostd::xmatrixutype2double(A_in);aurostd::shiftlrowscols(S,1,1); //algorithm depends on lrows==lcols==1
+      xmatrix<double> S=aurostd::xmatrixutype2double(A_in);S.shift(1,1); //algorithm depends on lrows==lcols==1
 
       int m=S.rows,n=S.cols;
       int min_mn=std::min(m,n);
@@ -4920,9 +4854,9 @@ namespace aurostd {
       }
 
       //shift everything to match A_in
-      aurostd::shiftlrowscols(U_out,A_in.lrows,A_in.lcols);
-      aurostd::shiftlrowscols(V_out,A_in.lrows,A_in.lcols);
-      aurostd::shiftlrowscols(S_out,A_in.lrows,A_in.lcols);
+      U_out.shift(A_in.lrows,A_in.lcols);
+      V_out.shift(A_in.lrows,A_in.lcols);
+      S_out.shift(A_in.lrows,A_in.lcols);
 
       //Matlab gives SNF such that S=U*A*V
       if(!aurostd::isequal(S_out,U_out*A_in*V_out,(utype)tol)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"SNF decomposition failed AFTER Matlab transformations",_RUNTIME_ERROR_);}

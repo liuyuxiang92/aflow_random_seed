@@ -176,6 +176,22 @@ namespace aurostd {  // namespace aurostd
       cerr << " isfloat=" << isfloat << ", iscomplex=" << iscomplex << ", sizeof=" << size << ", vsize=" << vsize << endl;
 #endif
     }
+
+  /// @brief shift the lower row bound of an xmatrix to a new value
+  /// \param new_lrows new lower bound for rows
+  /// @authors
+  /// @mod{CO,20180409,first variant}
+  /// @mod{HE,20220915,created function}
+  /// @note modifies the pointers but not the underlying data field
+  template<class utype>
+    void xvector<utype>::shift(int new_lrows){
+      if(lrows==new_lrows) return;
+      int row_shift = lrows-new_lrows;
+      corpus += row_shift;
+      lrows = new_lrows;
+      urows = new_lrows + rows - 1;
+    }
+
 }
 
 // ----------------------------------------------------------------------------
@@ -1066,53 +1082,6 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// ----------------------------------------------------------------------------
-// ------------------------------------------------------ xvector constrtuction
-// reshape from scalars
-namespace aurostd {  
-  template<class utype>
-    xvector<utype> reshape(const utype& s1) {
-      xvector<utype> v(1);
-      v(1)=s1;
-      return v;
-    }
-
-  template<class utype>
-    xvector<utype> reshape(const utype& s1,const utype& s2) {
-      xvector<utype> v(2);
-      v(1)=s1;v(2)=s2;
-      return v;
-    }
-
-  template<class utype>
-    xvector<utype> reshape(const utype& s1,const utype& s2,const utype& s3) {
-      xvector<utype> v(3);
-      v(1)=s1;v(2)=s2;v(3)=s3;
-      return v;
-    }
-
-  template<class utype>
-    xvector<utype> reshape(const utype& s1,const utype& s2,const utype& s3,const utype& s4) {
-      xvector<utype> v(4);
-      v(1)=s1;v(2)=s2;v(3)=s3;v(4)=s4;
-      return v;
-    }
-
-  template<class utype>
-    xvector<utype> reshape(const utype& s1,const utype& s2,const utype& s3,const utype& s4,const utype& s5) {
-      xvector<utype> v(5);
-      v(1)=s1;v(2)=s2;v(3)=s3;v(4)=s4;v(5)=s5;
-      return v;
-    }
-
-  template<class utype>
-    xvector<utype> reshape(const utype& s1,const utype& s2,const utype& s3,const utype& s4,const utype& s5,const utype& s6) {
-      xvector<utype> v(6);
-      v(1)=s1;v(2)=s2;v(3)=s3;v(4)=s4;v(5)=s5;v(6)=s6;
-      return v;
-    }
-
-}
 
 namespace aurostd {
   template<class utype> xvector<utype> null_xv() __xprototype { //CO20200731
@@ -1133,7 +1102,7 @@ namespace aurostd {
     int half_width=(int) (sigma * STDDEV_TRUNCATE_GAUSSIAN);
     int window=2*half_width+1;
     if(window%2==0){window++;}
-    return gaussian_filter_xv<utype>(sigma,window); //if you need lrows!=1, use shiftlrows()
+    return gaussian_filter_xv<utype>(sigma,window); //if you need lrows!=1, use shift()
   }
   template<class utype> xvector<utype> gaussian_filter_xv(utype sigma,int window,int lrows) __xprototype { //CO20190419
     if(window%2==0){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::gaussian_filter_xv():","window should NOT be even (window="+aurostd::utype2string(window)+")",_INPUT_ILLEGAL_);}
@@ -1773,18 +1742,6 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// ----------------------------------------------------------------------------
-// shiftlrows operations  //CO20171128
-namespace aurostd {  // namespace aurostd
-  template<class utype> void  // function lrows shift lrows so first index is i
-    shiftlrows(xvector<utype>& a,const int& i) {
-      if(a.lrows==i){return;}
-      xvector<utype> b(a.rows+i-1,i);
-      int j=i;
-      for(int ii=a.lrows;ii<=a.urows;ii++){b[j++]=a[ii];}
-      a=b;
-    }
-}
 
 // ----------------------------------------------------------------------------
 // ---- Operations on complex vectors
@@ -2403,7 +2360,7 @@ namespace aurostd {
       //force vec to have lrows==0, so code always works (robust)
       //don't worry, we shift the solution back later
       xvector<utype> vec=_vec;
-      aurostd::shiftlrows(vec,0);
+      vec.shift(0);
       int i=(_i-_vec.lrows);
 
       //this is a nice generalizable formulation
@@ -2462,7 +2419,7 @@ namespace aurostd {
       vector<xvector<utype> > directive_vectors;
       for(int i=0;i<(int)_directive_vectors.size();i++){
         directive_vector=_directive_vectors[i];
-        aurostd::shiftlrows(directive_vector,0);
+        directive_vector.shift(0);
         directive_vectors.push_back(directive_vector);
       }
 
@@ -2507,7 +2464,7 @@ namespace aurostd {
       }
       normal/=modulus(normal);    //normalize
 
-      aurostd::shiftlrows(normal,lrows); //shift back to original!
+      normal.shift(lrows); //shift back to original!
       return normal;
     }
 }
@@ -3153,7 +3110,7 @@ namespace aurostd {
       if(_a.rows<4){return;} //not enough points to do statistics (need at least 3 quartile)
       xvector<utype> a = _a; //unfortunate that we have to make a full copy here, but alas, we will
       sort(a);
-      shiftlrows(a,0);    //CO20180314 - even/odd specifications starting at 0
+      a.shift(0);    //CO20180314 - even/odd specifications starting at 0
       //get first, second (median), and third quartiles
       int i1=a.rows/4+a.lrows;
       int i2=a.rows/2+a.lrows;
