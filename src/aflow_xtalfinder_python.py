@@ -26,7 +26,7 @@ class XtalFinder:
         elif type(path) == list:
             for p in path:
                 if not os.path.exists(p):
-                    raise OSError(path + ' not found')
+                    raise OSError(p + ' not found')
             return ','.join(path)
         else:
             raise TypeError('The path to input file/files/directory must be a string or a list.')
