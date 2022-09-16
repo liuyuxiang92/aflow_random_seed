@@ -324,7 +324,7 @@ namespace aurostd {  // namespace aurostd
   ///
   /// @authors
   /// @mod{HE,20220915,created function}
-  /// @note When new_rows or new_rows is set to 0, it is automatically calculated.
+  /// @note When new_rows or new_cols is set to 0, it is automatically calculated.
   /// This is also true when new_cols is not given.
   /// @note lower bound for rows and columns is not changed
   /// @note modifies the pointers but not the underlying data field
@@ -351,9 +351,6 @@ namespace aurostd {  // namespace aurostd
   ///
   /// @authors
   /// @mod{HE,20220915,created function}
-  /// @note When new_rows or new_rows is set to 0, it is automatically calculated.
-  /// This is also true when new_cols is not given.
-  /// @note lower bound for rows and columns is not changed
   /// @note modifies the pointers but not the underlying data field
   template<class utype>
   void xmatrix<utype>::reshape(int new_urows, int new_ucols, int new_lrows, int new_lcols){
@@ -1606,8 +1603,8 @@ namespace aurostd {
   /// @authors
   /// @mod{ME,20210921,created function}
   /// @mod{HE,20220915,migrated to direct reshape}
-  /// @note When new_rows or new_rows is set to 0, it is automatically calculated.
-  /// This is also true when new_cols is not given.
+  /// @note When rows or cols is set to 0, it is automatically calculated.
+  /// This is also true when cols is not given.
   template<class utype>
   xmatrix<utype> reshape(const xvector<utype> &vec, int rows, int cols) {
     xmatrix<utype> mat = reshape(vec);
@@ -1688,7 +1685,7 @@ namespace aurostd {
   /// xvector<double> xv = {1.5, 3.0, 4.5};
   /// xmatrix<double> smat = aurostd::hstack(vector<xvector<double>>({xv, xv, xv}));
   /// cout << smat << endl;
-  /// // 1.5 30. 4.5
+  /// // 1.5 3.0 4.5
   /// // 1.5 3.0 4.5
   /// // 1.5 3.0 4.5
   /// @endcode
