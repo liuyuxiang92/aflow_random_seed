@@ -241,7 +241,7 @@ namespace unittest {
         break;
       } else if (!isgroup && (test_functions.find(test) == test_functions.end())) {
         message << "Skipping unrecognized test name " << test << ".";
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       } else if (isgroup && !aurostd::WithinList(tasks, test)) {
         tasks.push_back(test);
         const vector<string>& members = test_groups[test];
@@ -256,7 +256,7 @@ namespace unittest {
     uint ntasks = tasks.size();
     if (ntasks == 0) {
       message << "No unit tests to run.";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
       return true;
     }
 
@@ -301,12 +301,12 @@ namespace unittest {
 
     if (nsuccess == ntasks) {
       message << "Unit tests passed successfully (passing " << ntasks << " task" + string((ntasks == 1)?"":"s") + ").";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
     } else {
       message << "Some unit tests failed (" << (ntasks - nsuccess) << " of " << ntasks << " failed).";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     }
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, formatResultsTable(summary), aflags, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, formatResultsTable(summary), aflags, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_);
     return (nsuccess == ntasks);
   }
 
@@ -348,10 +348,10 @@ namespace unittest {
         stringstream message;
         if (nsuccess == ntests_group) {
           message << "Unit tests of group " << group << " passed successfully (passing " << ntests_group << " test" << ((ntests_group == 1)?"":"s") << ").";
-          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
         } else {
           message << "Some unit tests of group " << group << " failed (" << (ntests_group - nsuccess) << " of " << ntests_group << " failed).";
-          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
         }
         for (size_t t = 0; t < vtests_group.size(); t++) {
           displayResult(test_functions[vtests_group[t]]);
@@ -448,19 +448,19 @@ namespace unittest {
         // All attempted checks passed, but there were errors.
         // This happens when a prerequisite for a test fails (e.g. file loading).
         message << "FAIL " << xchk.task_description << " due to runtime errors" << std::endl;
-        pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
+        pflow::logger(__AFLOW_FILE__,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
       } else {
         message << "SUCCESS " << xchk.task_description << " (passing " << check_num << " check" << ((check_num == 1)?"":"s") << ")" << std::endl;
-        pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
+        pflow::logger(__AFLOW_FILE__,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
       }
     } else {
       message << "FAIL " << xchk.task_description << " (" << (check_num - xchk.passed_checks) << " of " << check_num << " checks failed)" << std::endl;
-      pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
+      pflow::logger(__AFLOW_FILE__,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
     }
-    pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,formatResultsTable(xchk.results),aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+    pflow::logger(__AFLOW_FILE__,xchk.function_name,formatResultsTable(xchk.results),aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     if (xchk.errors.size() > 0) {
       message << "\nAdditional error messages:\n" << aurostd::joinWDelimiter(xchk.errors, "\n");
-      pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+      pflow::logger(__AFLOW_FILE__,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     }
   }
 }
@@ -959,6 +959,30 @@ namespace unittest {
     calculated_xmatint = xmatrix<int>(2, 2);
     aurostd::getEHermite(5, 12, calculated_xmatint);
     checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | solve a linear system //HE20220912
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::inverse(xmatrix) * xvector";
+    check_description = "solve a simple linear system with shifted matrices ";
+    xvector<double> expected_xvecdouble = {5.0, 3.0, -2.0};
+    xvector<double> calculated_xvecdouble;
+    xvector<double> b = {6.0, -4, 27};
+    xmatrix<double> A = {{1.0, 1.0, 1.0}, {0.0,2.0,5.0}, {2.0,5.0,-1.0}};
+    bool shift_check = true;
+    // inv(A)*b should be solvable even when the xmatrix and xvector have different index boundaries
+    for (uint shift_row: {-2,-1,0,1,2}){
+      for (uint shift_col: {-2,-1,0,1,2}) {
+        aurostd::shiftlrowscols(A, shift_col, shift_row);
+        calculated_xvecdouble = aurostd::inverse(A) * b;
+        if (not aurostd::isequal(expected_xvecdouble, calculated_xvecdouble)) {
+          shift_check=false;
+          break;
+        }
+      }
+    }
+    check(shift_check, calculated_xvecdouble, expected_xvecdouble, check_function, check_description, passed_checks, results);
+
   }
 
   void UnitTest::aurostdMainTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
@@ -2324,7 +2348,7 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
     cerr << __AFLOW_FUNC__ << " S=" << endl;cerr << S2 << endl;
   }
 
-  message << "smith test successful";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+  message << "smith test successful";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
   return TRUE; //CO20180419
 }
 

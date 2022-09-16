@@ -245,12 +245,11 @@ namespace aurostd {  // namespace aurostd
     fracpart=modf(x,&intpart);
 #ifdef _XSCALAR_DEBUG_
     if(LDEBUG){
-      string soliloquy="aurostd::round():";
-      cerr << soliloquy << " x=" << x << endl;
-      cerr << soliloquy << " fracpart=" << fracpart << endl;
-      cerr << soliloquy << " intpart=" << intpart << endl;
-      cerr << soliloquy << " floor(x)=" << std::floor(x) << endl;
-      cerr << soliloquy << " ceil(x)=" << std::ceil(x) << endl;
+      cerr << __AFLOW_FUNC__ << " x=" << x << endl;
+      cerr << __AFLOW_FUNC__ << " fracpart=" << fracpart << endl;
+      cerr << __AFLOW_FUNC__ << " intpart=" << intpart << endl;
+      cerr << __AFLOW_FUNC__ << " floor(x)=" << std::floor(x) << endl;
+      cerr << __AFLOW_FUNC__ << " ceil(x)=" << std::ceil(x) << endl;
     }
 #endif
     if(abs(fracpart)>=.5){return x>=0?std::ceil(x):std::floor(x);}  //not sure why fracpart would ever be negative, but it is for negative inputs
@@ -439,7 +438,7 @@ namespace aurostd {
   //note this implementation gives different results from matlab for gcd(1,1): either x or y can be 1, the other is zero
   template<class utype>
     void _GCD(utype a,utype b,utype& gcd,utype& x,utype& y){ //CO20180409
-      if(!a && !b){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_INPUT_ILLEGAL_);} //only special case needed, all other cases work perfectly
+      if(!a && !b){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::GCD():","gcd(0,0) is undefined",_INPUT_ILLEGAL_);} //only special case needed, all other cases work perfectly
       if(false && isequal(a,(utype)1) && isequal(b,(utype)1)){gcd=1;x=0;y=1;return;} //matlab implementation, this algorithm gives x=1,y=0 which IS valid
       utype a_orig=a,b_orig=b;
       x=(utype)0;y=(utype)1;
@@ -456,12 +455,12 @@ namespace aurostd {
       }
       gcd=b;
       if(std::signbit(gcd)){gcd=-gcd;x=-x;y=-y;}  //GCD(a,-b)==GCD(a,b), so flip all the signs
-      if(!isequal(a_orig*x+b_orig*y,gcd)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","Bezout's identity not satisfied",_RUNTIME_ERROR_);}
+      if(!isequal(a_orig*x+b_orig*y,gcd)){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::GCD():","Bezout's identity not satisfied",_RUNTIME_ERROR_);}
     }
   template<class utype>
     void _GCD(utype a,utype b,utype& gcd){ //CO20180409  //keep this one too, fewer operations than if you need x and y too
       // added for safety, will always give nonzero result, important for division!
-      if(a==(utype)0 && b==(utype)0) {throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","gcd(0,0) is undefined",_INPUT_ILLEGAL_);}  //special case
+      if(a==(utype)0 && b==(utype)0) {throw aurostd::xerror(__AFLOW_FILE__,"aurostd::GCD():","gcd(0,0) is undefined",_INPUT_ILLEGAL_);}  //special case
       else if(a==(utype)0) {gcd=b;return;} //special case
       else if(b==(utype)0) {gcd=a;return;} //special case
       // borrowed from KY aflow_contrib_kesong_pocc_basic.cpp
@@ -483,8 +482,8 @@ namespace aurostd {
   void GCD(unsigned long long int a,unsigned long long int b,unsigned long long int& gcd){return _GCD(a,b,gcd);}  //CO20191201
 
   void GCD(float a,float b,float& gcd,float& x,float& y,float tolerance){  //CO20191201
-    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
-    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
     long long int igcd=0,ix=0,iy=0; //CO20191201 - long long int as SNF matrices can get big
     GCD((long long int)aurostd::nint(a),(long long int)aurostd::nint(b),igcd,ix,iy);  //CO20191201 - long long int as SNF matrices can get big
     gcd=(float)igcd;
@@ -492,15 +491,15 @@ namespace aurostd {
     y=(float)iy;
   }
   void GCD(float a,float b,float& gcd,float tolerance){  //CO20191201
-    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
-    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
     long long int igcd=0; //CO20191201 - long long int as SNF matrices can get big
     GCD((long long int)aurostd::nint(a),(long long int)aurostd::nint(b),igcd);  //CO20191201 - long long int as SNF matrices can get big
     gcd=(float)igcd;
   }
   void GCD(double a,double b,double& gcd,double& x,double& y,double tolerance){  //CO20191201
-    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
-    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
     long long int igcd=0,ix=0,iy=0; //CO20191201 - long long int as SNF matrices can get big
     GCD((long long int)aurostd::nint(a),(long long int)aurostd::nint(b),igcd,ix,iy);  //CO20191201 - long long int as SNF matrices can get big
     gcd=(double)igcd;
@@ -508,15 +507,15 @@ namespace aurostd {
     y=(double)iy;
   }
   void GCD(double a,double b,double& gcd,double tolerance){  //CO20191201
-    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
-    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
     long long int igcd=0; //CO20191201 - long long int as SNF matrices can get big
     GCD((long long int)aurostd::nint(a),(long long int)aurostd::nint(b),igcd);  //CO20191201 - long long int as SNF matrices can get big
     gcd=(double)igcd;
   }
   void GCD(long double a,long double b,long double& gcd,long double& x,long double& y,long double tolerance){  //CO20191201
-    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
-    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
     long long int igcd=0,ix=0,iy=0; //CO20191201 - long long int as SNF matrices can get big
     GCD((long long int)aurostd::nint(a),(long long int)aurostd::nint(b),igcd,ix,iy);  //CO20191201 - long long int as SNF matrices can get big
     gcd=(long double)igcd;
@@ -524,8 +523,8 @@ namespace aurostd {
     y=(long double)iy;
   }
   void GCD(long double a,long double b,long double& gcd,long double tolerance){  //CO20191201
-    if(!isinteger(a,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
-    if(!isinteger(b,tolerance)){throw aurostd::xerror(_AFLOW_FILE_NAME_,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(a,tolerance)){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::GCD():","a[="+aurostd::utype2string(a)+"] is not an integer",_INPUT_ILLEGAL_);}
+    if(!isinteger(b,tolerance)){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::GCD():","b[="+aurostd::utype2string(b)+"] is not an integer",_INPUT_ILLEGAL_);}
     long long int igcd=0;
     GCD((long long int)aurostd::nint(a),(long long int)aurostd::nint(b),igcd);
     gcd=(long double)igcd;
@@ -637,7 +636,7 @@ namespace aurostd {
   bool factorial(bool x) {
     if(_isfloat(x)) {
       string message = "factorial(bool) implemented only for bool !";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     return TRUE;
   }
@@ -720,14 +719,12 @@ namespace aurostd {
       return (utype)-INFINITY;
     }
     else if (std::isnan(y)) {
-      string soliloquy = XPID + "aurostd::mod_floored():";
       string message = "NAN value in divisor";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     else if (std::isnan(x)) {
-      string soliloquy = XPID + "aurostd::mod_floored():";
       string message = "NAN value in dividend";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, soliloquy, message, _VALUE_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
     }
     else {
       return x - y * std::floor((double)x/y);
@@ -762,7 +759,7 @@ namespace aurostd {
     bool _isodd(utype x) {
       if(_isfloat(x)) {
         string message = "_isodd implemented only for integers !";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
       }
       if(!mod(x,(utype) 2)) return FALSE;
       else return TRUE;
@@ -798,7 +795,7 @@ namespace aurostd {
     bool _iseven(utype x) {
       if(_isfloat(x)) {
         string message = "_iseven implemented only for integers !";
-        throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
       }
       if(mod(x,(utype) 2)) return FALSE;
       else return TRUE;
@@ -837,7 +834,6 @@ namespace aurostd {
 namespace aurostd {
   string dbl2frac(double a, bool sign_prefix) {
 
-    string soliloquy = "aurostd::dbl2frac()";
     stringstream message;
 
     string out = ""; //DX20200427 - missing initialization
@@ -897,7 +893,7 @@ namespace aurostd {
     } //DX20180726 - added
     else {
       //DX20200427 [should not throw if not found, just return decimal] message << "Could not find hard-coded fraction for the double " << a << ".";
-      //DX20200427 [should not throw if not found, just return decimal] throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_VALUE_ERROR_);
+      //DX20200427 [should not throw if not found, just return decimal] throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
       out = aurostd::utype2string<double>(a);
     }
     if(sign_prefix){
@@ -958,7 +954,7 @@ namespace aurostd{
     }
     if(count==count_max){
       message << "The number of elements in the fraction sequence exceeded " << count_max << ". Increase the threshold or there is an issue with the while-loop.";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message,_RUNTIME_ERROR_);
     }
     if(LDEBUG){ cerr << __AFLOW_FUNC__ << " fraction_sequence=" << aurostd::joinWDelimiter(fraction_sequence, ",") << endl; }
 
@@ -981,7 +977,7 @@ namespace aurostd{
     }
     if(!aurostd::isequal(input_double,fraction2double,tol_diff)){
       message << "The fraction=" << numerator << "/" << denominator << " (=" << std::fixed << std::setprecision(15) << fraction2double << ") is not equal to the input_double=" << std::fixed << std::setprecision(15) << input_double << " (with tol_diff=" << std::fixed << std::setprecision(15) << tol_diff << ").";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message,_RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message,_RUNTIME_ERROR_);
     }
   }
 }
@@ -1038,19 +1034,19 @@ namespace aurostd {
       }
       else{ //DX20200424
         stringstream message; message << "The input is not a numeric: str = " << str;
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
     }
     else if(field_count != 2){
       stringstream message; message << "Expect two fields, i.e., numerator and denominator: str = " << str;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     // --------------------------------------------------------------------------
     // protect against non-numeric values //DX20200424
     if(!aurostd::isfloat(tokens[0]) || !aurostd::isfloat(tokens[1])){
       stringstream message; message << "The input is not a numeric: str = " << str;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     double numerator = aurostd::string2utype<double>(tokens[0]);
@@ -1060,7 +1056,7 @@ namespace aurostd {
     // protect against division by zero
     if(aurostd::isequal(denominator,_ZERO_TOL_)){
       stringstream message; message << "Denominator is zero: " << denominator;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, message, _RUNTIME_ERROR_);
     }
 
     return numerator/denominator;
