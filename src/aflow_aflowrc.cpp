@@ -1019,34 +1019,34 @@
 #define         MPI_OPTIONS_MACHINE001                        XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE001")
 #define AFLOWRC_MPI_COMMAND_MACHINE001                        string("aprun -n") // MACHINE001
 #define         MPI_COMMAND_MACHINE001                        XHOST.adefault.getattachedscheme("MPI_COMMAND_MACHINE001")
-#define AFLOWRC_MPI_BINARY_DIR_MACHINE001                     string("~/bin/") // MACHINE001
+#define AFLOWRC_MPI_BINARY_DIR_MACHINE001                     string("") // MACHINE001
 #define         MPI_BINARY_DIR_MACHINE001                     XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MACHINE001")
 //DX20190509 - MACHINE001 - END
 
 //DX20190509 - MACHINE002 - START
 #define AFLOWRC_MPI_OPTIONS_MACHINE002                       string("") // MACHINE002
 #define         MPI_OPTIONS_MACHINE002                       XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE002")
-#define AFLOWRC_MPI_COMMAND_MACHINE002                       string("/p/app/intel/parallel_studio_xe_2017_update4/impi/2017.3.196/intel64/bin/mpirun -np") // MACHINE002
+#define AFLOWRC_MPI_COMMAND_MACHINE002                       string("mpirun -np") // MACHINE002
 #define         MPI_COMMAND_MACHINE002                       XHOST.adefault.getattachedscheme("MPI_COMMAND_MACHINE002")
-#define AFLOWRC_MPI_BINARY_DIR_MACHINE002                    string("~/bin/") // MACHINE002
+#define AFLOWRC_MPI_BINARY_DIR_MACHINE002                    string("") // MACHINE002
 #define         MPI_BINARY_DIR_MACHINE002                    XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MACHINE002")
 //DX20190509 - MACHINE002 - END
 
 //DX20201005 - MACHINE003 - START
 #define AFLOWRC_MPI_OPTIONS_MACHINE003                       string("") // MACHINE003
 #define         MPI_OPTIONS_MACHINE003                       XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE003")
-#define AFLOWRC_MPI_COMMAND_MACHINE003                       string("/p/app/intel/parallel_studio_xe_2018_update1/impi/2018.1.163/intel64/bin/mpirun -np") // MACHINE003
+#define AFLOWRC_MPI_COMMAND_MACHINE003                       string("mpirun -np") // MACHINE003
 #define         MPI_COMMAND_MACHINE003                       XHOST.adefault.getattachedscheme("MPI_COMMAND_MACHINE003")
-#define AFLOWRC_MPI_BINARY_DIR_MACHINE003                    string("~/bin/") // MACHINE003
+#define AFLOWRC_MPI_BINARY_DIR_MACHINE003                    string("") // MACHINE003
 #define         MPI_BINARY_DIR_MACHINE003                    XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MACHINE003")
 //DX20201005 - MACHINE003 - END
 
 //DX20211011 - MACHINE004 - START
 #define AFLOWRC_MPI_OPTIONS_MACHINE004                       string("") // MACHINE004
 #define         MPI_OPTIONS_MACHINE004                       XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE004")
-#define AFLOWRC_MPI_COMMAND_MACHINE004                       string("/p/app/intel/parallel_studio_xe_2018_update1/impi/2018.1.163/intel64/bin/mpirun -np") // MACHINE004
+#define AFLOWRC_MPI_COMMAND_MACHINE004                       string("mpirun -np") // MACHINE004
 #define         MPI_COMMAND_MACHINE004                       XHOST.adefault.getattachedscheme("MPI_COMMAND_MACHINE004")
-#define AFLOWRC_MPI_BINARY_DIR_MACHINE004                    string("~/bin/") // MACHINE004
+#define AFLOWRC_MPI_BINARY_DIR_MACHINE004                    string("") // MACHINE004
 #define         MPI_BINARY_DIR_MACHINE004                    XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MACHINE004")
 //DX20211011 - MACHINE004 - END
 
