@@ -66,7 +66,7 @@ INCLUDE = -I ./
 #INCLUDE = -I ./ -I /opt/intel/mkl100/include
 
 # -fno-inline -fno-implicit-inline-templates-frepo
-OPTS=
+OPTS=-O3
 #-O2
 #-O1
 #-O3
