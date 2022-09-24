@@ -1772,16 +1772,9 @@ namespace KBIN {
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, std::cout, _LOGGER_WARNING_);
       return;
     }
-    if ((vaspVersion<5.0) && !xvasp.str.is_vasp4_poscar_format) { //CO20210713
-      if(LDEBUG){cerr << __AFLOW_FUNC__ << " converting POSCAR to vasp4 format" << endl;}
-      xvasp.str.is_vasp4_poscar_format = true;
-      xvasp.str.is_vasp5_poscar_format = false;
-      aurostd::StringstreamClean(xvasp.POSCAR);
-      xvasp.POSCAR.clear();
-      xvasp.POSCAR << xvasp.str;
-      if(LDEBUG){cerr << __AFLOW_FUNC__ << " xvasp.POSCAR=" << endl << xvasp.POSCAR.str() << endl;}
-    } else if ((vaspVersion>=5.0) && !xvasp.str.is_vasp5_poscar_format) { //CO20210713
-      if(LDEBUG){cerr << __AFLOW_FUNC__ << " converting POSCAR to vasp5 format" << endl;}
+    //SD20220923 - if version is not found, default to VASP5 format
+    if ((vaspVersion>=5.0 || vaspVersion==0.0) && !xvasp.str.is_vasp5_poscar_format) { //CO20210713
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " converting POSCAR to vasp5 format" << endl;} 
       xvasp.str.is_vasp4_poscar_format = false;
       xvasp.str.is_vasp5_poscar_format = true;
       aurostd::StringstreamClean(xvasp.POSCAR);
@@ -1789,6 +1782,15 @@ namespace KBIN {
       xvasp.POSCAR << xvasp.str;
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " xvasp.POSCAR=" << endl << xvasp.POSCAR.str() << endl;}
     }
+    else if ((vaspVersion<5.0) && !xvasp.str.is_vasp4_poscar_format) { //CO20210713
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " converting POSCAR to vasp4 format" << endl;}
+      xvasp.str.is_vasp4_poscar_format = true;
+      xvasp.str.is_vasp5_poscar_format = false;
+      aurostd::StringstreamClean(xvasp.POSCAR);
+      xvasp.POSCAR.clear();
+      xvasp.POSCAR << xvasp.str;
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " xvasp.POSCAR=" << endl << xvasp.POSCAR.str() << endl;}
+    } 
   }
 
   // CONVERT_UNIT_CELL STUFF
