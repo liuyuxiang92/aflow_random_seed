@@ -2897,12 +2897,8 @@ namespace aurostd {  // namespace aurostd
         string message = "Identity only defined for square matrices.";
         throw xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_ERROR_);
       }
-      xmatrix<utype> a = _a;
-      for(int i=a.lrows;i<=a.urows;i++)
-        for(int j=a.lcols;j<=a.ucols;j++)
-          a[i][j]=utype(0.0);
-      for(int i=a.lrows;i<=a.urows;i++)
-        a[i][i]=utype(1.0);
+      xmatrix<utype> a(_a.urows,_a.ucols,_a.lrows,_a.lcols);
+      for(int i=a.lrows;i<=a.urows;i++) a[i][i]=utype(1.0);
       return a;
     }
 }
