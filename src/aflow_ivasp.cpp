@@ -42,7 +42,7 @@ namespace KBIN {
           cerr << "xstr.species_pp[" << i << "]=" << xvasp.str.species_pp[i] << endl;
         }
       }
-      convertPOSCARFormat(xvasp, aflags, kflags); //ME20190220
+      convertPOSCARFormat(xvasp, kflags); //ME20190220
     } //CT20180719
     if(Krun) Krun=(Krun && KBIN::VASP_Produce_KPOINTS(xvasp,AflowIn,FileMESSAGE,aflags,kflags,vflags));
     return Krun;
@@ -1745,45 +1745,26 @@ namespace KBIN {
 }
 
 namespace KBIN {
-  //ME20190220
-  // Convert POSCAR into the format that is consistent with the binary version   
-  //ME20200114 - Throw a warning when the version could not be determined and
-  // leave as is. Aborting is not desirable for instances where VASP does not
-  // need to be run (e.g. post-processing).
-  //CO20210713 - fixing for all the machines with aflags
-  void convertPOSCARFormat(_xvasp& xvasp, const _aflags& aflags, const _kflags& kflags) {
+  /// @brief convert POSCAR into the format that is consistent with the binary version
+  ///
+  /// @param xvasp xvasp object
+  /// @param kflags KBIN flags
+  ///
+  /// @note Versions 6.3+ of VASP can only be compiled in parallel. Attemping to run VASP in serial
+  /// will cause VASP, as well as AFLOW, to hang (not crash), wasting precious CPU hours.
+  /// Therefore, either one would need to always call VASP using MPI commands or read the version
+  /// from the binary, which would need to be updated periodically. We have chosen to go with the
+  /// latter, as the worst case is an unknown VASP version.
+  ///
+  /// @authors
+  /// @mod{SD,20220923,updated for vasp6.3}
+  /// @mod{CO,20210713,added aflags}
+  /// @mod{ME,20190220,created function}
+  void convertPOSCARFormat(_xvasp& xvasp, const _kflags& kflags) {
     bool LDEBUG=(FALSE || _DEBUG_IVASP_ || XHOST.DEBUG);
-    string mpi_command="";
     string vasp_path_full=kflags.KBIN_BIN;
     double vaspVersion=KBIN::getVASPVersionDouble(vasp_path_full); //SD20220331
-    if(aurostd::isequal(vaspVersion,0.0) && kflags.KBIN_MPI){  //CO20210713 - adding all the machine information
-      vasp_path_full=kflags.KBIN_MPI_BIN;
-      if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_MPICH")) {mpi_command=MPI_COMMAND_DUKE_BETA_MPICH;vasp_path_full=MPI_BINARY_DIR_DUKE_BETA_MPICH+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_BETA_OPENMPI")) {mpi_command=MPI_COMMAND_DUKE_BETA_OPENMPI;vasp_path_full=MPI_BINARY_DIR_DUKE_BETA_OPENMPI+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QRATS_MPICH")) {mpi_command=MPI_COMMAND_DUKE_QRATS_MPICH;vasp_path_full=MPI_BINARY_DIR_DUKE_QRATS_MPICH+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_QFLOW_OPENMPI")) {mpi_command=MPI_COMMAND_DUKE_QFLOW_OPENMPI;vasp_path_full=MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_X")) {mpi_command=MPI_COMMAND_DUKE_X;vasp_path_full=MPI_BINARY_DIR_DUKE_X+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::JHU_ROCKFISH")) {mpi_command=MPI_COMMAND_JHU_ROCKFISH;vasp_path_full=MPI_BINARY_DIR_JHU_ROCKFISH+kflags.KBIN_MPI_BIN;}  //CO20220818
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_EOS")) {mpi_command=MPI_COMMAND_MPCDF_EOS;vasp_path_full=MPI_BINARY_DIR_MPCDF_EOS+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_DRACO")) {mpi_command=MPI_COMMAND_MPCDF_DRACO;vasp_path_full=MPI_BINARY_DIR_MPCDF_DRACO+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_COBRA")) {mpi_command=MPI_COMMAND_MPCDF_COBRA;vasp_path_full=MPI_BINARY_DIR_MPCDF_COBRA+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MPCDF_HYDRA")) {mpi_command=MPI_COMMAND_MPCDF_HYDRA;vasp_path_full=MPI_BINARY_DIR_MPCDF_HYDRA+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE001")) {mpi_command=MPI_COMMAND_MACHINE001;vasp_path_full=MPI_BINARY_DIR_MACHINE001+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE002")) {mpi_command=MPI_COMMAND_MACHINE002;vasp_path_full=MPI_BINARY_DIR_MACHINE002+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::MACHINE003")) {mpi_command=MPI_COMMAND_MACHINE003;vasp_path_full=MPI_BINARY_DIR_MACHINE003+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_MATERIALS")) {mpi_command=MPI_COMMAND_DUKE_MATERIALS;vasp_path_full=MPI_BINARY_DIR_DUKE_MATERIALS+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_AFLOWLIB")) {mpi_command=MPI_COMMAND_DUKE_AFLOWLIB;vasp_path_full=MPI_BINARY_DIR_DUKE_AFLOWLIB+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::DUKE_HABANA")) {mpi_command=MPI_COMMAND_DUKE_HABANA;vasp_path_full=MPI_BINARY_DIR_DUKE_HABANA+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::FULTON_MARYLOU")) {mpi_command=MPI_COMMAND_FULTON_MARYLOU;vasp_path_full=MPI_BINARY_DIR_FULTON_MARYLOU+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::CMU_EULER")) {mpi_command=MPI_COMMAND_CMU_EULER;vasp_path_full=MPI_BINARY_DIR_CMU_EULER+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::OHAD")) {mpi_command=MPI_COMMAND_MACHINE2;vasp_path_full=MPI_BINARY_DIR_MACHINE2+kflags.KBIN_MPI_BIN;}
-      else if(aflags.AFLOW_MACHINE_LOCAL.flag("MACHINE::HOST1")) {mpi_command=MPI_COMMAND_MACHINE1;vasp_path_full=MPI_BINARY_DIR_MACHINE1+kflags.KBIN_MPI_BIN;}
-      vaspVersion = KBIN::getVASPVersionDouble(vasp_path_full,mpi_command); //CO20200610
-    }
-    if(LDEBUG){
-      cerr << __AFLOW_FUNC__ << " mpi_command=\"" << mpi_command << "\"" << endl;
-      cerr << __AFLOW_FUNC__ << " vasp_path_full=\"" << vasp_path_full << "\"" << endl;
-    }
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " vasp_path_full=\"" << vasp_path_full << "\"" << endl;}
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " vaspVersion=" << vaspVersion << endl;}
     if (aurostd::isequal(vaspVersion,0.0)) {  //CO20210713
       stringstream message;
