@@ -248,14 +248,14 @@ namespace aurostd {
     return result;
   }
 
-  template std::string JSONReader::storage_object::operator std::vector<std::string>() const;
-  template double JSONReader::storage_object::operator std::vector<double>() const;
-  template float JSONReader::storage_object::operator std::vector<float>() const;
-  template long long JSONReader::storage_object::operator std::vector<long long>() const;
-  template long JSONReader::storage_object::operator std::vector<long>() const;
-  template int JSONReader::storage_object::operator std::vector<int>() const;
-  template uint JSONReader::storage_object::operator std::vector<uint>() const;
-  template bool JSONReader::storage_object::operator std::vector<bool>() const;
+  template JSONReader::storage_object::operator std::vector<std::string>() const;
+  template JSONReader::storage_object::operator std::vector<double>() const;
+  template JSONReader::storage_object::operator std::vector<float>() const;
+  template JSONReader::storage_object::operator std::vector<long long>() const;
+  template JSONReader::storage_object::operator std::vector<long>() const;
+  template JSONReader::storage_object::operator std::vector<int>() const;
+  template JSONReader::storage_object::operator std::vector<uint>() const;
+  template JSONReader::storage_object::operator std::vector<bool>() const;
 
   template<class utype> JSONReader::storage_object::operator std::map<std::string, utype>() const {
     if (type != object_types::DICTIONARY)
@@ -283,14 +283,14 @@ namespace aurostd {
     return result;
   }
 
-  template std::string JSONReader::storage_object::operator std::map<std::string, std::string>() const;
-  template double JSONReader::storage_object::operator std::map<std::string, double>() const;
-  template float JSONReader::storage_object::operator std::map<std::string, float>() const;
-  template long long JSONReader::storage_object::operator std::map<std::string, long long>() const;
-  template long JSONReader::storage_object::operator std::map<std::string, long>() const;
-  template int JSONReader::storage_object::operator std::map<std::string, int>() const;
-  template uint JSONReader::storage_object::operator std::map<std::string, uint>() const;
-  template bool JSONReader::storage_object::operator std::map<std::string, bool>() const;
+  template JSONReader::storage_object::operator std::map<std::string, std::string>() const;
+  template JSONReader::storage_object::operator std::map<std::string, double>() const;
+  template JSONReader::storage_object::operator std::map<std::string, float>() const;
+  template JSONReader::storage_object::operator std::map<std::string, long long>() const;
+  template JSONReader::storage_object::operator std::map<std::string, long>() const;
+  template JSONReader::storage_object::operator std::map<std::string, int>() const;
+  template JSONReader::storage_object::operator std::map<std::string, uint>() const;
+  template JSONReader::storage_object::operator std::map<std::string, bool>() const;
 
   template<class utype> JSONReader::storage_object::operator aurostd::xvector<utype>() const {
     if (type != object_types::LIST)
@@ -322,13 +322,13 @@ namespace aurostd {
     return result;
   }
 
-  template double JSONReader::storage_object::operator aurostd::xvector<double>() const;
-  template float JSONReader::storage_object::operator aurostd::xvector<float>() const;
-  template long long JSONReader::storage_object::operator aurostd::xvector<long long>() const;
-  template long JSONReader::storage_object::operator aurostd::xvector<long>() const;
-  template int JSONReader::storage_object::operator aurostd::xvector<int>() const;
-  template uint JSONReader::storage_object::operator aurostd::xvector<uint>() const;
-  template bool JSONReader::storage_object::operator aurostd::xvector<bool>() const;
+  template JSONReader::storage_object::operator aurostd::xvector<double>() const;
+  template JSONReader::storage_object::operator aurostd::xvector<float>() const;
+  template JSONReader::storage_object::operator aurostd::xvector<long long>() const;
+  template JSONReader::storage_object::operator aurostd::xvector<long>() const;
+  template JSONReader::storage_object::operator aurostd::xvector<int>() const;
+  template JSONReader::storage_object::operator aurostd::xvector<uint>() const;
+  template JSONReader::storage_object::operator aurostd::xvector<bool>() const;
 
   template<class utype> JSONReader::storage_object::operator aurostd::xmatrix<utype>() const {
     if (type != object_types::LIST)
@@ -382,13 +382,13 @@ namespace aurostd {
     return result;
   }
 
-  template double JSONReader::storage_object::operator aurostd::xmatrix<double>() const;
-  template float JSONReader::storage_object::operator aurostd::xmatrix<float>() const;
-  template long long JSONReader::storage_object::operator aurostd::xmatrix<long long>() const;
-  template long JSONReader::storage_object::operator aurostd::xmatrix<long>() const;
-  template int JSONReader::storage_object::operator aurostd::xmatrix<int>() const;
-  template uint JSONReader::storage_object::operator aurostd::xmatrix<uint>() const;
-  template bool JSONReader::storage_object::operator aurostd::xmatrix<bool>() const;
+  template JSONReader::storage_object::operator aurostd::xmatrix<double>() const;
+  template JSONReader::storage_object::operator aurostd::xmatrix<float>() const;
+  template JSONReader::storage_object::operator aurostd::xmatrix<long long>() const;
+  template JSONReader::storage_object::operator aurostd::xmatrix<long>() const;
+  template JSONReader::storage_object::operator aurostd::xmatrix<int>() const;
+  template JSONReader::storage_object::operator aurostd::xmatrix<uint>() const;
+  template JSONReader::storage_object::operator aurostd::xmatrix<bool>() const;
 
 }
 namespace aurostd {
