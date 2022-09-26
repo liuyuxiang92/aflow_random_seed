@@ -1150,13 +1150,43 @@ namespace unittest {
 
 //    {// test while developing TODO remove
 //      long double start = aurostd::get_seconds();
-//      string file_name = "history.json";
+//      string file_name = "/Users/nathan/Projects/AFLOW-orig/testing/soliquidy/aflow_AlCuV.json";
 //      aurostd::JSONReader jr;
 //      jr.loadFile(file_name);
 //      long double duration = aurostd::get_seconds()- start;
 //      cout << "Parsing of " << file_name << " took " << duration << " seconds." << endl;
 //    }
 
+//    aurostd::JSONReader jr;
+//    jr.root = 4652;
+//    cout << jr << endl;
+//    jr.root = 4652.64;
+//    cout << jr << endl;
+//    jr.root = "Hello";
+//    cout << jr << endl;
+//    jr.root = nullptr;
+//    cout << jr << endl;
+//    xvector<uint> a = {3,7,10};
+//    jr.root = a;
+//    cout << jr << endl;
+//    vector<float> b = {12.33,20.7,34.23454};
+//    jr.root = b;
+//    cout << jr << endl;
+//    xmatrix<float> c = {{1.0,2.0,3.0,4.0},{5,6,7,8},{9,10,11,12},{13,14,15,16}};
+//    jr.root = c;
+//    cout << jr << endl;
+//    std::vector<std::vector<std::string>> d = {{"Hello", "World"}, {"Hello2", "World2"}};
+//    jr.root = d;
+//    cout << jr << endl;
+//    std::vector<std::vector<int>> e = {{-2, -1}, {2, 1}};
+//    jr.root = e;
+//    cout << jr << endl;
+//    std::map<std::string, std::vector<float>> f;
+//    f.insert({"Hello", b});
+//    f.insert({"Hello2", b});
+//    jr.root = f;
+//    cout << jr << endl;
+//    exit(0);
 
     string task_description = "Test xparsers";
     stringstream result;

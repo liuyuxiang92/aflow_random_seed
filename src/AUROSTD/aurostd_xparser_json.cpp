@@ -117,6 +117,238 @@ namespace aurostd {
     return result.str();
   }
 
+
+
+  void JSONReader::storage_object::fromString(const std::string & content){
+    std::shared_ptr <std::string> new_string = std::make_shared<std::string>();
+    *new_string = content;
+    this->obj = new_string;
+    this->type = object_types::STRING;
+  }
+
+  template<class utype>  void JSONReader::storage_object::fromNumber(const utype content){
+    if (std::is_integral<utype>::value){
+      this->type = object_types::INTEGER;
+      std::shared_ptr <long long> new_content = std::make_shared<long long>();
+      *new_content = (long long) content;
+      this->obj = new_content;
+      return;
+    } else if (std::is_floating_point<utype>::value){
+      if (isnan(content)) {
+        this->type = object_types::NONE;
+        this->obj = nullptr;
+        return;
+      }
+      this->type = object_types::FLOAT;
+      std::shared_ptr <double> new_content = std::make_shared<double>();
+      *new_content = (double) content;
+      this->obj = new_content;
+      return;
+    }
+  }
+  template<class utype> void JSONReader::storage_object::fromXvector(const xvector<utype> &content) {
+    std::shared_ptr <JSONReader::List> new_list = std::make_shared<JSONReader::List>();
+    this->obj = new_list;
+    this->type = object_types::LIST;
+    for (int idx=content.lrows; idx<=content.urows; idx++) {
+      new_list->push_back(content[idx]);
+    }
+  }
+
+  template<class utype> void JSONReader::storage_object::fromXmatrix(const xmatrix<utype> &content) {
+    std::shared_ptr <JSONReader::List> new_list = std::make_shared<JSONReader::List>();
+    this->obj = new_list;
+    this->type = object_types::LIST;
+    for (int idx=content.lrows; idx<=content.urows; idx++) {
+      new_list->push_back(content(idx));
+    }
+  }
+
+  template<class utype> void JSONReader::storage_object::fromVector(const vector<utype> & content) {
+    std::shared_ptr <JSONReader::List> new_list = std::make_shared<JSONReader::List>();
+    this->obj = new_list;
+    this->type = object_types::LIST;
+    for (utype entry: content) {
+      new_list->push_back(entry);
+    }
+  }
+
+  template<class utype> void JSONReader::storage_object::fromMap(const std::map<std::string, utype> & content) {
+    std::shared_ptr <JSONReader::Dictionary> new_dictionary = std::make_shared<JSONReader::Dictionary>();
+    this->obj = new_dictionary;
+    this->type = object_types::DICTIONARY;
+    for (std::pair<std::string, utype> entry: content) {
+      new_dictionary->insert({entry.first, entry.second});
+    }
+  }
+
+
+  //converting constructors
+
+  JSONReader::storage_object::storage_object(const char* content) {
+    this->fromString(content);
+  }
+
+  JSONReader::storage_object::storage_object(const std::string &content) {
+    this->fromString(content);
+  }
+
+  JSONReader::storage_object::storage_object(bool content) {
+    if (content) this->type = object_types::T;
+    else this->type = object_types::F;
+  }
+
+  JSONReader::storage_object::storage_object(std::nullptr_t content) {
+    this->type = object_types::NONE;
+    this->obj = content;
+  }
+
+  template<class utype> JSONReader::storage_object::storage_object(const utype content) {
+    this->fromNumber(content);
+  }
+
+  template<class utype> JSONReader::storage_object::storage_object(const xvector<utype> & content) {
+    this->fromXvector(content);
+  }
+
+  template JSONReader::storage_object::storage_object(const xvector<int> &);
+  template JSONReader::storage_object::storage_object(const xvector<unsigned int> &);
+  template JSONReader::storage_object::storage_object(const xvector<long long> &);
+  template JSONReader::storage_object::storage_object(const xvector<unsigned long long> &);
+  template JSONReader::storage_object::storage_object(const xvector<float> &);
+  template JSONReader::storage_object::storage_object(const xvector<double> &);
+
+  template<class utype> JSONReader::storage_object::storage_object(const xmatrix<utype> & content) {
+    this->template fromXmatrix(content);
+  }
+
+  template JSONReader::storage_object::storage_object(const xmatrix<int> &);
+  template JSONReader::storage_object::storage_object(const xmatrix<unsigned int> &);
+  template JSONReader::storage_object::storage_object(const xmatrix<long long> &);
+  template JSONReader::storage_object::storage_object(const xmatrix<unsigned long long> &);
+  template JSONReader::storage_object::storage_object(const xmatrix<float> &);
+  template JSONReader::storage_object::storage_object(const xmatrix<double> &);
+
+  template<class utype> JSONReader::storage_object::storage_object(const vector<utype> & content) {
+    this->fromVector(content);
+  }
+
+  template JSONReader::storage_object::storage_object(const std::vector<int> &);
+  template JSONReader::storage_object::storage_object(const std::vector<unsigned int> &);
+  template JSONReader::storage_object::storage_object(const std::vector<long long> &);
+  template JSONReader::storage_object::storage_object(const std::vector<unsigned long long> &);
+  template JSONReader::storage_object::storage_object(const std::vector<float> &);
+  template JSONReader::storage_object::storage_object(const std::vector<double> &);
+  template JSONReader::storage_object::storage_object(const std::vector<std::string> &);
+  template JSONReader::storage_object::storage_object(const std::vector<std::vector<int>> &);
+  template JSONReader::storage_object::storage_object(const std::vector<std::vector<unsigned int>> &);
+  template JSONReader::storage_object::storage_object(const std::vector<std::vector<long long>> &);
+  template JSONReader::storage_object::storage_object(const std::vector<std::vector<unsigned long long>> &);
+  template JSONReader::storage_object::storage_object(const std::vector<std::vector<float>> &);
+  template JSONReader::storage_object::storage_object(const std::vector<std::vector<double>> &);
+  template JSONReader::storage_object::storage_object(const std::vector<std::vector<std::string>> &);
+
+  template<class utype> JSONReader::storage_object::storage_object(const std::map<std::string, utype> & content) {
+    this->template fromMap(content);
+  }
+  template JSONReader::storage_object::storage_object(const std::map<std::string, int> &);
+  template JSONReader::storage_object::storage_object(const std::map<std::string, unsigned int> &);
+  template JSONReader::storage_object::storage_object(const std::map<std::string, long long> &);
+  template JSONReader::storage_object::storage_object(const std::map<std::string, unsigned long long> &);
+  template JSONReader::storage_object::storage_object(const std::map<std::string, float> &);
+  template JSONReader::storage_object::storage_object(const std::map<std::string, double> &);
+  template JSONReader::storage_object::storage_object(const std::map<std::string, std::string> &);
+  template JSONReader::storage_object::storage_object(const std::map<std::string, std::vector<float>> &);
+
+
+  //operators
+  void JSONReader::storage_object::operator=(const char* content) {
+    this->fromString(content);
+  }
+
+  void JSONReader::storage_object::operator=(const std::string & content) {
+    this->fromString(content);
+  }
+
+
+  void JSONReader::storage_object::operator=(bool content) {
+      if (content) this->type = object_types::T;
+      else this->type = object_types::F;
+  }
+
+  void JSONReader::storage_object::operator=(std::nullptr_t content) {
+    this->type = object_types::NONE;
+    this->obj = content;
+  }
+
+  template<class utype> void JSONReader::storage_object::operator=(const utype content){
+    this->template fromNumber(content);
+  }
+
+  template void JSONReader::storage_object::operator=(const int);
+  template void JSONReader::storage_object::operator=(const unsigned int);
+  template void JSONReader::storage_object::operator=(const long long);
+  template void JSONReader::storage_object::operator=(const unsigned long long);
+  template void JSONReader::storage_object::operator=(const double);
+  template void JSONReader::storage_object::operator=(const float);
+
+  template<class utype> void JSONReader::storage_object::operator=(const xvector<utype> & content){
+    fromXvector(content);
+  }
+
+  template void JSONReader::storage_object::operator=(const xvector<int> &);
+  template void JSONReader::storage_object::operator=(const xvector<unsigned int> &);
+  template void JSONReader::storage_object::operator=(const xvector<long long> &);
+  template void JSONReader::storage_object::operator=(const xvector<unsigned long long> &);
+  template void JSONReader::storage_object::operator=(const xvector<float> &);
+  template void JSONReader::storage_object::operator=(const xvector<double> &);
+
+
+  template<class utype> void JSONReader::storage_object::operator=(const xmatrix<utype> & content){
+    fromXmatrix(content);
+  }
+
+  template void JSONReader::storage_object::operator=(const xmatrix<int> &);
+  template void JSONReader::storage_object::operator=(const xmatrix<unsigned int> &);
+  template void JSONReader::storage_object::operator=(const xmatrix<long long> &);
+  template void JSONReader::storage_object::operator=(const xmatrix<unsigned long long> &);
+  template void JSONReader::storage_object::operator=(const xmatrix<float> &);
+  template void JSONReader::storage_object::operator=(const xmatrix<double> &);
+
+  template<class utype> void JSONReader::storage_object::operator=(const std::vector<utype> & content){
+    fromVector(content);
+  }
+
+  template void JSONReader::storage_object::operator=(const std::vector<int> &);
+  template void JSONReader::storage_object::operator=(const std::vector<unsigned int> &);
+  template void JSONReader::storage_object::operator=(const std::vector<long long> &);
+  template void JSONReader::storage_object::operator=(const std::vector<unsigned long long> &);
+  template void JSONReader::storage_object::operator=(const std::vector<float> &);
+  template void JSONReader::storage_object::operator=(const std::vector<double> &);
+  template void JSONReader::storage_object::operator=(const std::vector<std::string> &);
+  template void JSONReader::storage_object::operator=(const std::vector<vector<int>> &);
+  template void JSONReader::storage_object::operator=(const std::vector<vector<unsigned int>> &);
+  template void JSONReader::storage_object::operator=(const std::vector<vector<long long>> &);
+  template void JSONReader::storage_object::operator=(const std::vector<vector<unsigned long long>> &);
+  template void JSONReader::storage_object::operator=(const std::vector<vector<float>> &);
+  template void JSONReader::storage_object::operator=(const std::vector<vector<double>> &);
+  template void JSONReader::storage_object::operator=(const std::vector<vector<std::string>> &);
+
+  template<class utype> void JSONReader::storage_object::operator=(const std::map<std::string, utype> & content){
+    fromMap(content);
+  }
+
+  template void JSONReader::storage_object::operator=(const std::map<std::string, int> &);
+  template void JSONReader::storage_object::operator=(const std::map<std::string, unsigned int> &);
+  template void JSONReader::storage_object::operator=(const std::map<std::string, long long> &);
+  template void JSONReader::storage_object::operator=(const std::map<std::string, unsigned long long> &);
+  template void JSONReader::storage_object::operator=(const std::map<std::string, float> &);
+  template void JSONReader::storage_object::operator=(const std::map<std::string, double> &);
+  template void JSONReader::storage_object::operator=(const std::map<std::string, std::string> &);
+  template void JSONReader::storage_object::operator=(const std::map<std::string, std::vector<float>> &);
+
+
+  //conversion functions
   JSONReader::storage_object::operator bool() const {
     switch (type) {
       {

@@ -121,11 +121,37 @@ namespace aurostd {
     };
     struct storage_object {
       object_types type = object_types::NONE;
-      std::shared_ptr<void> obj;
+      std::shared_ptr<void> obj = nullptr;
+
+      //operators
       JSONReader::storage_object &operator[](const size_t index);
       JSONReader::storage_object &operator[](const std::string key);
       JSONReader::storage_object &operator[](const char* key);
+      void operator= (const char* content); // for literal strings
+      void operator= (const std::string & content);
+      void operator= (bool content);
+      void operator= (std::nullptr_t content);
+      template<class utype> void operator=(const utype content);
+      template<class utype> void operator=(const std::vector<utype> & content);
+      template<class utype> void operator=(const std::map<std::string, utype> & content);
+      template<class utype> void operator=(const xvector<utype> & content);
+      template<class utype> void operator=(const xmatrix<utype> & content);
 
+
+      //converting constructors
+      storage_object(){};
+      storage_object(const char* content);
+      storage_object(const std::string & content);
+      storage_object(bool content);
+      storage_object(std::nullptr_t content);
+      template<typename utype> storage_object(const utype content);
+      template<typename utype> storage_object(const vector<utype> & content);
+      template<typename utype> storage_object(const std::map<std::string, utype> & content);
+      template<typename utype> storage_object(const xvector<utype> & content);
+      template<typename utype> storage_object(const xmatrix<utype> & content);
+
+
+      //conversion functions
       explicit operator bool() const;
       explicit operator std::string() const;
       explicit operator double() const;
@@ -137,27 +163,18 @@ namespace aurostd {
       template<class utype> operator std::map<std::string, utype>() const;
       template<class utype> operator aurostd::xvector<utype>() const;
       template<class utype> operator aurostd::xmatrix<utype>() const;
+
+      //conversion helper
+      void fromString(const std::string & content);
+      template<class utype> void fromNumber(const utype content);
+      template<class utype> void fromVector(const vector<utype> & content);
+      template<class utype> void fromMap(const std::map<std::string, utype> & content);
+      template<class utype> void fromXvector(const xvector<utype> & content);
+      template<class utype> void fromXmatrix(const xmatrix<utype> & content);
+
+
       std::string toString(const bool json_format=true) const;
     };
-  private:
-
-    void copy(const JSONReader &jsonReader);
-
-    typedef std::map<std::string, storage_object> Dictionary;
-    typedef std::vector<storage_object> List;
-
-    storage_object root;
-
-    std::pair<size_t, size_t> find_string(const std::string & raw_content, std::pair<size_t, size_t> border={0,0}) const;
-    std::pair<size_t, size_t> find_bracket(const std::string & raw_content, char kind_open, std::pair<size_t, size_t> border={0,0}) const;
-    std::pair<size_t, size_t> find_strip(const std::string & raw_content, std::pair<size_t, size_t> border={0,0}) const;
-
-    storage_object parse(const std::string &raw_content, std::pair<size_t, size_t> border={0,0}) const;
-    std::string parse_string(const std::string & raw_content, std::pair<size_t, size_t> border={0,0}) const;
-    std::string utf8(const std::string & cp) const;
-
-    friend struct storage_object;
-  public:
     JSONReader::storage_object &operator[](const size_t index);
     JSONReader::storage_object &operator[](const std::string key);
     JSONReader::storage_object &operator[](const char *key);
@@ -170,7 +187,25 @@ namespace aurostd {
     explicit operator storage_object() const;
     const JSONReader& operator=(const JSONReader &jr);
     void clear();
+    storage_object root;
 
+
+
+  private:
+
+    void copy(const JSONReader &jsonReader);
+    typedef std::map<std::string, storage_object> Dictionary;
+    typedef std::vector<storage_object> List;
+
+    std::pair<size_t, size_t> find_string(const std::string & raw_content, std::pair<size_t, size_t> border={0,0}) const;
+    std::pair<size_t, size_t> find_bracket(const std::string & raw_content, char kind_open, std::pair<size_t, size_t> border={0,0}) const;
+    std::pair<size_t, size_t> find_strip(const std::string & raw_content, std::pair<size_t, size_t> border={0,0}) const;
+
+    storage_object parse(const std::string &raw_content, std::pair<size_t, size_t> border={0,0}) const;
+    std::string parse_string(const std::string & raw_content, std::pair<size_t, size_t> border={0,0}) const;
+    std::string utf8(const std::string & cp) const;
+
+    friend struct storage_object;
   };
   ostream& operator<<(ostream& os, const JSONReader::storage_object& so);
   ostream& operator<<(ostream& os, const JSONReader& jr);
