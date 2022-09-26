@@ -62,6 +62,10 @@ namespace aurostd {
         void clear(void);
         void null(void);  //CO20200731 - to create null vector
         void resize(int=3,int nl=1); //CO20201111
+        //HE20220915 START
+        // xvector manipulation without copy (pointer manipulation)
+        void shift(int new_lrows);
+        //HE20220915 END
       private:
         utype *corpus;
         // bool isfloat,iscomplex;
@@ -176,13 +180,13 @@ namespace aurostd {
   template<class utype> xvector<utype>
     operator<<(const utype,const xvector<utype>&) __xprototype;
 
-  template<class utype> utype                        
+  template<class utype> utype
     operator*(const xvector<utype>&,const xvector<utype>&) __xprototype;
 
-  template<class utype> utype                        
+  template<class utype> utype
     scalar_product(const xvector<utype>&,const xvector<utype>&) __xprototype;
 
-  template<class utype> xvector<utype>                
+  template<class utype> xvector<utype>
     vector_product(const xvector<utype>&,const xvector<utype>&) __xprototype;
 
   //ME20200327
@@ -236,25 +240,7 @@ namespace aurostd {
 
   template<class utype> bool
     iszero(const xvector<utype>&, double tol=_AUROSTD_XVECTOR_TOLERANCE_IDENTITY_) __xprototype;  //ME20180702 //CO20191201 - 1e-7 seems arbitrary
-  // CONSTRUCTIONS OF VECTORS FROM SCALARS
 
-  template<class utype> xvector<utype>
-    reshape(const utype&) __xprototype;
-
-  template<class utype> xvector<utype>
-    reshape(const utype&,const utype&) __xprototype;
-
-  template<class utype> xvector<utype>
-    reshape(const utype&,const utype&,const utype&) __xprototype;
-
-  template<class utype> xvector<utype>
-    reshape(const utype&,const utype&,const utype&,const utype&) __xprototype;
-
-  template<class utype> xvector<utype>
-    reshape(const utype&,const utype&,const utype&,const utype&,const utype&) __xprototype;
-
-  template<class utype> xvector<utype>
-    reshape(const utype&,const utype&,const utype&,const utype&,const utype&,const utype&) __xprototype;
 }
 
 // ----------------------------------------------------------- xvector example types
@@ -263,7 +249,7 @@ namespace aurostd {
   template<class utype> xvector<utype> null_xv() __xprototype;  //CO20200731 - friend so it can access refresh()
   template<class utype> xvector<utype> ones_xv(int=3,int=1) __xprototype;
   template<class utype> xvector<utype> box_filter_xv(int window,int lrows=1) __xprototype;
-  template<class utype> xvector<utype> gaussian_filter_xv(utype sigma) __xprototype;  //if you need lrows!=1, use shiftlrows()
+  template<class utype> xvector<utype> gaussian_filter_xv(utype sigma) __xprototype;  //if you need lrows!=1, use shift()
   template<class utype> xvector<utype> gaussian_filter_xv(utype sigma,int window,int lrows=1) __xprototype;
 }
 
@@ -410,9 +396,6 @@ namespace aurostd {
 
   template<class utype> void                                   // swap
     swap(xvector<utype>&,const int&,const int&) __xprototype;  // swap
-
-  template<class utype> void                              //shift lrows so first index is i //CO20180409
-    shiftlrows(xvector<utype>&,const int&) __xprototype;  //shift lrows so first index is i //CO20180409
 
   // Complex operations
   template<class utype> xvector<utype>

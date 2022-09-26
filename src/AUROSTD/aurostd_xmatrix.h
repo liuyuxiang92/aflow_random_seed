@@ -81,6 +81,14 @@ namespace aurostd {
         void set(const utype&);
         void reset(void);
         void clear(void);
+        //HE20220915 START
+        // xmatrix manipulation without copy (pointer manipulation)
+        void shift(int new_lrows, int new_lcols);
+        void shiftrow(int new_lrows);
+        void shiftcol(int new_lcols);
+        void reshape(uint new_rows, uint new_cols=0);
+        void reshape(int new_urows, int new_ucols, int new_lrows, int new_lcols);
+        //HE20220915 END
       private:
         //  friend bool operator==(const xmatrix<utype>&,const xmatrix<utype>&);
         utype** corpus;
@@ -254,64 +262,23 @@ namespace aurostd {
 // ----------------------------------------------------------- xmatrix constrtuction
 namespace aurostd {
   template<class utype> xmatrix<utype>
-    reshape(const xvector<utype>&, int, int) __xprototype;  // ME20210505
-
-  template<class utype> xmatrix<utype>
-    reshape(const xmatrix<utype>&, int, int) __xprototype;  // SD20220126
+    reshape(const xvector<utype>& vec, int rows, int cols=0) __xprototype;  // ME20210505
 
   template<class utype> xmatrix<utype>
     reshape(const xvector<utype>&) __xprototype;
 
   template<class utype> xmatrix<utype>
-    reshape(const xvector<utype>&,const xvector<utype>&) __xprototype;
+    reshape_cols(const xvector<utype>& vec) __xprototype;
 
   template<class utype> xmatrix<utype>
-    reshape(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
+    reshape_rows(const xvector<utype>& vec) __xprototype;
 
   template<class utype> xmatrix<utype>
-    reshape(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
+    hstack(const vector<xvector<utype>>& vec_list) __xprototype;
 
   template<class utype> xmatrix<utype>
-    reshape(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
+    vstack(const vector<xvector<utype>>& vec_list) __xprototype;
 
-  template<class utype> xmatrix<utype>
-    reshape(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_cols(const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_cols(const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_cols(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_cols(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_cols(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_cols(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_rows(const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_rows(const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_rows(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_rows(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_rows(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_rows(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
 }
 
 // ----------------------------------------------------------- xmatrix example types
@@ -473,16 +440,7 @@ namespace aurostd {
   template<class utype> void                                           // swap_rows
     swap_rows(xmatrix<utype>&,const int&,const int&) __xprototype;    // swap_rows
 
-  template<class utype> void  // function shift lrows so first index is i
-    shiftlrows(xmatrix<utype>& a,int i); //CO20191201
-
-  template<class utype> void  // function shift lcols so first index is i
-    shiftlcols(xmatrix<utype>& a,int i); //CO20191201
-
-  template<class utype> void  // function shift lrows and lcols so first index is i, j
-    shiftlrowscols(xmatrix<utype>& a,int i,int j); //CO20191201
-
-  template<class utype> xmatrix<utype>
+    template<class utype> xmatrix<utype>
     identity(const xmatrix<utype>&) __xprototype;
 
   // template<class utype> xmatrix<utype>
