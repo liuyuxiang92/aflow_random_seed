@@ -1917,7 +1917,7 @@ namespace chull {
 
   void ChullPoint::setGenCoords(const xvector<double>& coord,bool formation_energy_coord) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    m_coords=coord;//aurostd::shiftlrows(m_coords,0);
+    m_coords=coord;
     m_formation_energy_coord=formation_energy_coord;
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " m_within_half_hull=" << isWithinHalfHull(m_formation_energy_coord) << endl;}  //m_formation_energy_coord===lower_hull
   }
@@ -5913,7 +5913,7 @@ namespace chull {
       rhs.push_back(m_points[decomp_phases[i]].getTruncatedReducedCoords(m_elements_present,vred));
     }
     xvector<double> coef=balanceChemicalEquation(lhs,rhs,true,ZERO_TOL);  //normalize
-    //aurostd::shiftlrows(coef,0);
+
     return coef;
   }
 

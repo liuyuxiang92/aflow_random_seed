@@ -896,21 +896,6 @@ namespace unittest {
     xmatrix<int> calculated_xmatint, expected_xmatint;
 
     // ---------------------------------------------------------------------------
-    // Check | reshape //SD20220319
-    // ---------------------------------------------------------------------------
-    check_function = "aurostd::reshape()";
-    check_description = "reshape a rectangular matrix";
-    expected_xmatint = {{1,2,3,4},
-      {5,6,7,8},
-      {9,10,11,12}};
-    calculated_xmatint = {{1,2,3},
-      {4,5,6},
-      {7,8,9},
-      {10,11,12}};
-    calculated_xmatint = aurostd::reshape(calculated_xmatint ,3,4);
-    checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
-
-    // ---------------------------------------------------------------------------
     // Check convert to xvector //AZ20220627
     // ---------------------------------------------------------------------------
     check_function = "aurostd::getxvec()";
@@ -963,25 +948,131 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     // Check | solve a linear system //HE20220912
     // ---------------------------------------------------------------------------
-    check_function = "aurostd::inverse(xmatrix) * xvector";
-    check_description = "solve a simple linear system with shifted matrices ";
-    xvector<double> expected_xvecdouble = {5.0, 3.0, -2.0};
-    xvector<double> calculated_xvecdouble;
-    xvector<double> b = {6.0, -4, 27};
-    xmatrix<double> A = {{1.0, 1.0, 1.0}, {0.0,2.0,5.0}, {2.0,5.0,-1.0}};
-    bool shift_check = true;
-    // inv(A)*b should be solvable even when the xmatrix and xvector have different index boundaries
-    for (uint shift_row: {-2,-1,0,1,2}){
-      for (uint shift_col: {-2,-1,0,1,2}) {
-        aurostd::shiftlrowscols(A, shift_col, shift_row);
-        calculated_xvecdouble = aurostd::inverse(A) * b;
-        if (not aurostd::isequal(expected_xvecdouble, calculated_xvecdouble)) {
-          shift_check=false;
-          break;
+    {
+      check_function = "aurostd::inverse(xmatrix) * xvector";
+      check_description = "solve a simple linear system with shifted matrices ";
+      xvector<double> expected_xvecdouble = {5.0, 3.0, -2.0};
+      xvector<double> calculated_xvecdouble;
+      xvector<double> b = {6.0, -4, 27};
+      xmatrix<double> A = {{1.0, 1.0, 1.0}, {0.0,2.0,5.0}, {2.0,5.0,-1.0}};
+      bool shift_check = true;
+      // inv(A)*b should be solvable even when the xmatrix and xvector have different index boundaries
+      for (int shift_row: {-2,-1,0,1,2}){
+        for (int shift_col: {-2,-1,0,1,2}) {
+          A.shift(shift_row, shift_col);
+          calculated_xvecdouble = aurostd::inverse(A) * b;
+          if (not aurostd::isequal(expected_xvecdouble, calculated_xvecdouble)) {
+            shift_check=false;
+            break;
+          }
         }
       }
+      check(shift_check, calculated_xvecdouble, expected_xvecdouble, check_function, check_description, passed_checks, results);
     }
-    check(shift_check, calculated_xvecdouble, expected_xvecdouble, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | shifting xmatrix
+    // ---------------------------------------------------------------------------
+    {
+      check_function = "aurostd::xmatrix.shift()";
+      check_description = "shift the lower bounds of an xmatrix to new values";
+      bool overall_check = true;
+      xmatrix<double> A = {{1.0, 2.0, 3.0},
+                           {4.0, 5.0, 6.0},
+                           {7.0, 8.0, 9.0}};
+      xmatrix<double> B = A;
+
+      for (std::pair<int, int> p : vector<std::pair<int, int>>({{-2,-4}, {0,3}, {5461, 8461}})){
+        A.shift(p.first, p.second);
+        for (std::pair<int, int> t : vector<std::pair<int, int>>({{1,1}, {2,2}, {3,2}})) {
+          overall_check = overall_check && (A[p.first+t.first-1][p.second+t.second-1] == B[t.first][t.second]);
+          if (!overall_check){
+            check(overall_check,A[p.first+t.first-1][p.second+t.second-1] , B[t.first][t.second], check_function, check_description, passed_checks, results);
+            break;
+          }
+          if (!overall_check) break;
+        }
+      }
+      if (overall_check){
+        check(overall_check, "", "", check_function, check_description, passed_checks, results);
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Check | reshaping xmatrix
+    // ---------------------------------------------------------------------------
+    {
+      check_function = "aurostd::xmatrix.reshape()";
+      check_description = "reshaping a xmatrix";
+      bool overall_check = true;
+      vector<int> B = {1,2,3,4,5,6,7,8,9,10,11,12};
+      xmatrix<int> A = {{1,2,3,4,5,6,7,8,9,10,11,12}};
+      int c, r;
+      for (const std::pair<int, int> &p : vector<std::pair<int, int>>({{4,3}, {2,6}, {3, 4}})){
+        A.reshape(p.first, p.second);
+        for (const int t : B) {
+          r = (t-1)/p.second+1;
+          c = t-(r-1)*(p.second);
+          overall_check = overall_check && (A[r][c] == t);
+          if (!overall_check) {
+            check(overall_check, A[r][c], t,  check_function, check_description, passed_checks, results);
+            break;
+          }
+        }
+        if (!overall_check) break;
+      }
+      if (overall_check){
+        check(overall_check, "", "", check_function, check_description, passed_checks, results);
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Check | reshaping xvector
+    // ---------------------------------------------------------------------------
+    {
+      check_function = "aurostd::reshape()";
+      check_description = "reshaping xvectors";
+      bool overall_check = true;
+      vector<int> B = {1,2,3,4,5,6,7,8,9,10,11,12};
+      xvector<int> xv = aurostd::vector2xvector(B);
+      aurostd::xmatrix<int> A;
+      int c, r;
+      cout << aurostd::reshape_rows(xv) << endl;
+      for (const std::pair<int, int> &p : vector<std::pair<int, int>>({{4,3}, {2,6}, {3, 4}})){
+        A = aurostd::reshape(xv, p.first, p.second);
+        for (const int t : B) {
+          r = (t-1)/p.second+1;
+          c = t-(r-1)*(p.second);
+          overall_check = overall_check && (A[r][c] == t);
+          if (!overall_check) {
+            check(overall_check, A[r][c], t,  check_function, check_description, passed_checks, results);
+            break;
+          }
+        }
+        if (!overall_check) break;
+      }
+      if (overall_check){
+        check(overall_check, "", "", check_function, check_description, passed_checks, results);
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Check | stacking xvector
+    // ---------------------------------------------------------------------------
+    {
+      xvector<int> xv = {1, 2, 3, 4};
+      xmatrix<int> smat;
+      xmatrix<int> vsmat = {{1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {4, 4, 4}};
+      xmatrix<int> hsmat = {{1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4}};
+      check_function = "aurostd::vstack()";
+      check_description = "stack xvectors vertically into a xmatrix";
+      smat = aurostd::vstack(vector<xvector<int>>({xv, xv, xv}));
+      checkEqual(smat, vsmat, check_function, check_description, passed_checks, results);
+      check_function = "aurostd::hstack()";
+      check_description = "stack xvectors horizontal into a xmatrix";
+      smat = aurostd::hstack(vector<xvector<int>>({xv, xv, xv}));
+      checkEqual(smat, hsmat, check_function, check_description, passed_checks, results);
+    }
 
   }
 
