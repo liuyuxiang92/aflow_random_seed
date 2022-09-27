@@ -410,12 +410,12 @@ namespace SYM {
             tolerance = std::pow(10.0,(std::log10(orig_tolerance)+(sign*range)));
           }
           if(LDEBUG) {
-            cerr << "SYM::change_tolerance: Inconsistent symmetry at this tolerance " << incomming_tolerance << ", changing tolerance to: " << tolerance << " [dir=" << directory << "]." << endl;
+            cerr << "SYM::change_tolerance: Inconsistent symmetry at this tolerance " << incomming_tolerance << ", changing tolerance to: " << tolerance << " [str.title=" << xstr.title << "] [dir=" << directory << "]." << endl; //DX20220926
           } 
           return TRUE; 
         }
         else {
-          cerr << "SYM::change_tolerance WARNING: Inconsistent symmetry, tolerance range (" << std::pow(10.0,(std::log10(orig_tolerance)-(max_range))) << " to " << std::pow(10.0,(std::log10(orig_tolerance)+(max_range))) << ") tested [dir=" << directory << "]." << endl; //DX20180426 - changed xstr.directory to directory (pwd)
+          cerr << "SYM::change_tolerance WARNING: Inconsistent symmetry, tolerance range (" << std::pow(10.0,(std::log10(orig_tolerance)-(max_range))) << " to " << std::pow(10.0,(std::log10(orig_tolerance)+(max_range))) << ") tested [str.title=" << xstr.title << "] [dir=" << directory << "]." << endl; //DX20180426 - changed xstr.directory to directory (pwd)
           //count -=1;
           xstr.sym_eps_change_count += 1; //DX20210330 - need to increase the count here too
           no_scan = true;
@@ -425,7 +425,7 @@ namespace SYM {
       }
       //count -=1;
       no_scan = true;
-      cerr << "SYM::change_tolerance WARNING: Inconsistent symmetry, but the tolerance scan is suppressed. [dir=" << directory << "]" << endl; //DX20180426 - changed xstr.directory to directory (pwd)
+      cerr << "SYM::change_tolerance WARNING: Inconsistent symmetry, but the tolerance scan is suppressed. [str.title=" << xstr.title << "] [dir=" << directory << "]" << endl; //DX20180426 - changed xstr.directory to directory (pwd)
       tolerance = orig_tolerance; //DX20170906
       return FALSE;
     }

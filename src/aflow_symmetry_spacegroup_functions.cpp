@@ -776,6 +776,7 @@ namespace SYM {
             }
           }
           else if(tmp.size()==4){
+            cerr << tmp << endl;
             throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
           }
         }
@@ -821,6 +822,7 @@ namespace SYM {
             }
           }
           else if(tmp.size()==4){
+            cerr << tmp << endl;
             throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
           }
           ss_tertiary << site_symmetry[dot_index[0]];
@@ -868,6 +870,7 @@ namespace SYM {
     }
 
     if(split_site_symmetry.size()!=3){
+      cerr << aurostd::joinWDelimiter(split_site_symmetry,",") << endl;
       throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
     }
 
@@ -1590,9 +1593,10 @@ namespace SYM{
     for (uint i = 0; i < multiplicities.size(); i++) {
       vector<string> site_syms;
       vector<string> letters;
-      vector<string> positions;
+      vector<vector<string> > all_positions;
       // get all Wyckoff positions associated with a given multiplicity and site symmetry 
-      SYM::get_certain_wyckoff_pos(spacegroupstring, multiplicities[i], site_symmetries[i], site_syms, letters, positions);
+      //SYM::get_certain_wyckoff_pos(spacegroupstring, multiplicities[i], site_symmetries[i], site_syms, letters, positions);
+      SYM::getWyckoffAutomorphismSets(spacegroupstring, multiplicities[i], site_symmetries[i], site_syms, letters, all_positions, false); // false = need to explore lattice axes swaps as well
 
       vector<int> enumerated_letters;
       int min_enumerated_letter = 1e9;
@@ -1601,9 +1605,9 @@ namespace SYM{
         int enumerated_letter = SYM::enumerate_wyckoff_letter(letters[j]);
         if(enumerated_letter<min_enumerated_letter){
           bool contains_variable = false;
-          if(aurostd::substring2bool(positions[j], "x") || 
-              aurostd::substring2bool(positions[j], "y") || 
-              aurostd::substring2bool(positions[j], "z")){
+          if(aurostd::substring2bool(all_positions[j][0], "x") || 
+              aurostd::substring2bool(all_positions[j][0], "y") || 
+              aurostd::substring2bool(all_positions[j][0], "z")){
             contains_variable = true;
           }
           bool found_minimum_letter = false;
@@ -1862,7 +1866,9 @@ namespace SYM {
     vector<xvector<double> > possible_shifts;
     // === Determine possible shifts; get all positions corresponding to the Wyckoff position with the smallest multiplicity in the set and same site symmetry === //
     vector<vector<string> > same_site_symmetry_positions;
-    SYM::get_all_wyckoff_for_site_symmetry(spacegroupstring, multiplicity, site_symmetry, same_site_symmetry_positions);
+    //SYM::get_all_wyckoff_for_site_symmetry(spacegroupstring, multiplicity, site_symmetry, same_site_symmetry_positions);
+    vector<string> site_symmetries, letters, positions;
+    SYM::getWyckoffAutomorphismSets(spacegroupstring, multiplicity, site_symmetry, site_symmetries, letters, same_site_symmetry_positions, true); // true = check origin shifts only, not axes swaps
     if(LDEBUG) {
       cerr << "SYM::get_possible_origin_shifts: All Wyckoff positions with multiplicty " << multiplicity << " and same site symmetry " << site_symmetry << "." << endl;
       for(uint s=0;s<same_site_symmetry_positions.size();s++){
@@ -1933,6 +1939,76 @@ namespace SYM {
           }
           temp.str(std::string());
           temp.clear();
+        }
+      }
+    }
+  }
+} //namespace SYM
+
+// ******************************************************************************
+// getWyckoffAutomorphismSets() //DX20220901
+// ******************************************************************************
+// Grabs the set of Wyckoff positions that are related by automorphisms of the
+// space group. Note: This function uses a trick of arbitrarily ordering the
+// Wyckoff site symmetry (the ordering may not be physical). The extracted
+// Wyckoff positions may also not be TRULY related by an automorphism; this
+// is a greedy algorithm to find the sets that "may" be related by an
+// automorphism. Generally, the functions that use this routine should check
+// if the sites can actually be mapped onto one another
+// The optional boolean "origin_shifts_only" will not consider automorphisms
+// related by swapping the lattice labelings
+namespace SYM {
+  void getWyckoffAutomorphismSets(const string& spaceg, int mult, string site_symmetry, vector<string>& site_symmetries, vector<string>& letters, vector<vector<string> >& all_positions, bool origin_shifts_only) {
+   
+    vector<string> split_site_symmetry_tmp;
+    // store the site symmetry string to match against
+    string site_symmetry_base = site_symmetry, site_symmetry_ITC_base = "";
+    
+    // if exploring all possible automorphisms, including different axes choices,
+    // then we need to sort the site symmetry string
+    if(!origin_shifts_only) {
+      // get sorted Wyckoff site symmetry (note: not necessarily physical, just a speed up trick)
+      split_site_symmetry_tmp = SYM::splitSiteSymmetry(site_symmetry);
+      std::sort(split_site_symmetry_tmp.begin(),split_site_symmetry_tmp.end());
+      site_symmetry_base = aurostd::joinWDelimiter(split_site_symmetry_tmp,"");
+    }
+
+    vector<string> all_Wyckoff_strings, Wyckoff_tokens;
+    int multiplicity = 0;
+    string letter = "", site_symm = "";
+
+    // split up Wyckoff positions
+    aurostd::string2tokens(spaceg, all_Wyckoff_strings, "\n");
+  
+    for(uint i=2; i<all_Wyckoff_strings.size();i++){ //DX 20191107 starting at 2 since the first two lines are header and centering, repectively
+      aurostd::string2tokens(all_Wyckoff_strings[i], Wyckoff_tokens, " ");
+
+      // expected sequence: "24 h ..2 (x, y, z) (x, 0, z) ..."
+      if(Wyckoff_tokens.size()>3){
+        letter = Wyckoff_tokens[1];
+        multiplicity = aurostd::string2utype<uint>(Wyckoff_tokens[0]);
+        if(multiplicity == mult) {
+          site_symm = Wyckoff_tokens[2];
+          site_symmetry_ITC_base=site_symm; 
+
+          // if exploring all possible automorphisms, including different axes choices,
+          // then we need to sort the site symmetry string
+          if(!origin_shifts_only) {
+            // sort ITC position
+            split_site_symmetry_tmp = SYM::splitSiteSymmetry(site_symm);
+            std::sort(split_site_symmetry_tmp.begin(),split_site_symmetry_tmp.end());
+            site_symmetry_ITC_base = aurostd::joinWDelimiter(split_site_symmetry_tmp,"");
+          }
+
+          if(site_symmetry_ITC_base == site_symmetry_base) {
+            site_symmetries.push_back(site_symm);
+            letters.push_back(letter);
+            vector<string> positions;
+            for(uint p=3;p<Wyckoff_tokens.size();p++) {
+              positions.push_back(Wyckoff_tokens[p]);
+            }
+            all_positions.push_back(positions);
+          }
         }
       }
     }
