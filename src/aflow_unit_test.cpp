@@ -1157,35 +1157,7 @@ namespace unittest {
 //      cout << "Parsing of " << file_name << " took " << duration << " seconds." << endl;
 //    }
 
-//    aurostd::JSONReader jr;
-//    jr.root = 4652;
-//    cout << jr << endl;
-//    jr.root = 4652.64;
-//    cout << jr << endl;
-//    jr.root = "Hello";
-//    cout << jr << endl;
-//    jr.root = nullptr;
-//    cout << jr << endl;
-//    xvector<uint> a = {3,7,10};
-//    jr.root = a;
-//    cout << jr << endl;
-//    vector<float> b = {12.33,20.7,34.23454};
-//    jr.root = b;
-//    cout << jr << endl;
-//    xmatrix<float> c = {{1.0,2.0,3.0,4.0},{5,6,7,8},{9,10,11,12},{13,14,15,16}};
-//    jr.root = c;
-//    cout << jr << endl;
-//    std::vector<std::vector<std::string>> d = {{"Hello", "World"}, {"Hello2", "World2"}};
-//    jr.root = d;
-//    cout << jr << endl;
-//    std::vector<std::vector<int>> e = {{-2, -1}, {2, 1}};
-//    jr.root = e;
-//    cout << jr << endl;
-//    std::map<std::string, std::vector<float>> f;
-//    f.insert({"Hello", b});
-//    f.insert({"Hello2", b});
-//    jr.root = f;
-//    cout << jr << endl;
+
 //    exit(0);
 
     string task_description = "Test xparsers";
@@ -1454,10 +1426,57 @@ namespace unittest {
       }
     }
 
-
+    // create JSON storage objects
+    {
+      check_function = "JSONReader";
+      check_description = "test converting ";
+      aurostd::JSONReader::storage_object so;
+      {
+        int exp = 4652;
+        so = exp;
+        checkEqual(so, exp, check_function, check_description + "int", passed_checks, results);
+      }
+      {
+        so = "Hello World";
+        checkEqual((std::string) so, "Hello World", check_function, check_description + "std::string", passed_checks, results);
+      }
+      {
+        so = nullptr;
+        checkEqual((std::string)so, "null", check_function, check_description + "nullptr", passed_checks, results);
+      }
+      {
+        vector<float> exp = {12.33,20.7,34.23454};
+        so = exp;
+        checkEqual((std::string)so, "[12.33,20.7,34.2345]", check_function, check_description + "vector<float>", passed_checks, results);
+      }
+      {
+        xvector<uint> exp = {3,7,10};
+        so = exp;
+        checkEqual((std::string)so, "[3,7,10]", check_function, check_description + "xvector<uint>", passed_checks, results);
+      }
+      {
+        xmatrix<float> exp = {{1.0,2.0,3.0,4.0},{5,6,7,8},{9,10,11,12},{13,14,15,16}};
+        so = exp;
+        checkEqual((std::string)so, "[[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]]", check_function, check_description + "xmatrix<float>", passed_checks, results);
+      }
+      {
+        std::vector<std::vector<std::string>> exp = {{"Hello", "World"}, {"Hello2", "World2"}};
+        so = exp;
+        checkEqual((std::string)so, "[[\"Hello\",\"World\"],[\"Hello2\",\"World2\"]]", check_function, check_description + "vector<vector<string>>", passed_checks, results);
+      }
+      {
+        vector<float> a = {12.33,20.7,34.23454};
+        vector<float> b = {89.6,2.243,76.432};
+        std::map<std::string, std::vector<float>> exp;
+        exp.insert({"Hello1", a});
+        exp.insert({"Hello2", b});
+        so = exp;
+        checkEqual((std::string)so, "{\"Hello1\":[12.33,20.7,34.2345],\"Hello2\":[89.6,2.243,76.432]}", check_function, check_description + "vector<vector<string>>", passed_checks, results);
+      }
+    }
   }
-
 }
+
 namespace unittest {
   void UnitTest::entryLoaderTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
     (void) errors;  // Suppress compiler warnings
