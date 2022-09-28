@@ -3576,7 +3576,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
       
 
    while(!tested_all_lattices) {
-    if(LDEBUG) { cerr << function_name << " [BEGINNING OF LOOP] iterate=" << iterate << " : min_wyckoff_sum=" << min_wyckoff_sum << " vs global=" << global_min_wyckoff_sum << endl; }
+    if(LDEBUG) { cerr << "SYM::SpaceGroup_ITC: [BEGINNING OF LOOP] iterate=" << iterate << " : min_wyckoff_sum=" << min_wyckoff_sum << " vs global=" << global_min_wyckoff_sum << endl; }
     ///// PUT IN STANDARD PRIMITIVE FORM /////
     // ========== Make the xstructure in primitive form if this is the first iteration, or the tolerance has been changed ========== //
     if(first_run_or_new_tol == true) {
@@ -3604,7 +3604,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
     if(last_orientation == true) {
       // If we found the space group in an earlier iteration
       if(foundspacegroup_global) {
-        if(LDEBUG) { cerr << function_name << " Explored all iterations, use the lattice and origin choice that found a valid space group." << endl; }
+        if(LDEBUG) { cerr << "SYM::SpaceGroup_ITC: Explored all iterations, use the lattice and origin choice that found a valid space group." << endl; }
         foundspacegroup = true;
         spacegroup = spacegroup_global;
         CCell = CCell_Wyckoff_min;
@@ -3663,7 +3663,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
       // ===== If the conventional cell was not found, change the tolerance ===== //
       if(symmetryfound == false) {
         if(foundspacegroup_global && last_orientation) {
-        if(LDEBUG) { cerr << function_name << " Last lattice choice/orientation was explored. Consistent symmetry was found with a different choice/orientation, so we will use that conventional cell." << endl; }
+        if(LDEBUG) { cerr << "SYM::SpaceGroup_ITC: Last lattice choice/orientation was explored. Consistent symmetry was found with a different choice/orientation, so we will use that conventional cell." << endl; }
           continue;
       }
         lattice_reformed = false;
@@ -4122,7 +4122,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
                         other_shifts_explored = true;
                       }
                       if(LDEBUG) {
-                        cerr << function_name << " Skipping shift of zero (already checked)." << endl;
+                        cerr << "SYM::SpaceGroup_ITC: Skipping shift of zero (already checked)." << endl;
                       }
                       continue;
                     }*/
@@ -4230,7 +4230,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
                   }
 
                   // ===== If we do not have the minimum enumerated Wyckoff letter set, check possible origin shifts ===== //
-                  if(LDEBUG){ cerr << function_name << " minimum_scheme_sum=" << minimum_scheme_sum << " vs current=" << sum_enumerated_found_letters << endl; }
+                  if(LDEBUG){ cerr << "SYM::SpaceGroup_ITC: minimum_scheme_sum=" << minimum_scheme_sum << " vs current=" << sum_enumerated_found_letters << endl; }
                   if(sum_enumerated_found_letters > minimum_scheme_sum) {
                     if(LDEBUG) {
                       cerr << __AFLOW_FUNC__ << " Enumerated Wyckoff letters is not minimized; check origin shifts." << endl;
@@ -4259,7 +4259,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
     }
     //cerr << "SPACEGROUP:: " <<spacegroup << endl;
     if(foundspacegroup == true) {
-      if(LDEBUG) { cerr << function_name << " spacegroup=" << spacegroup << " iterate=" << iterate << " : min_wyckoff_sum=" << min_wyckoff_sum << " vs global=" << global_min_wyckoff_sum << " (spacegroup_global=" << spacegroup_global << ")" <<  endl; }
+      if(LDEBUG) { cerr << "SYM::SpaceGroup_ITC: spacegroup=" << spacegroup << " iterate=" << iterate << " : min_wyckoff_sum=" << min_wyckoff_sum << " vs global=" << global_min_wyckoff_sum << " (spacegroup_global=" << spacegroup_global << ")" <<  endl; }
       foundspacegroup_global = true;
       spacegroup_global = spacegroup;
       foundspacegroup = false;
