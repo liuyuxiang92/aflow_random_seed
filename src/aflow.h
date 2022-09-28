@@ -105,6 +105,8 @@ static const string TAG_TITLE_POCC_ARUN=TAG_TITLE_ARUN+TAG_POCC+SEP_TAG2;
 static const string POCC_DOSCAR_PREFIX="DOSCAR.pocc_T";
 static const string POCC_PHDOSCAR_PREFIX="PHDOSCAR.pocc_T";  // ME20210927
 //CO20200731 END
+static const vector<std::string> BRAVAIS_LATTICES = {"BCC","BCT","CUB","FCC","HEX","MCL","MCLC",
+  "ORC","ORCC","ORCF","ORCI","RHL","TET","TRI"}; //HE20220420
 
 //XRD
 #define XRAY_RADIATION_COPPER_Kalpha 1.5418   //Angstroms     //CO20190622
@@ -345,6 +347,8 @@ class _XHOST {
     bool showPGID,showPID,showTID;       // aflow_init.cpp  check if --showPID
     // machinery
     bool QUIET,QUIET_CERR,QUIET_COUT,TEST,DEBUG,MPI;    // extra quiet SC20210617
+    vector<string> LOGGER_WHITELIST;  //HE+ME20220305 - for logging
+    vector<string> LOGGER_BLACKLIST;  //HE+ME20220305 - for logging
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
     bool POSTPROCESS; //CO20200624 - generic postprocessing, including --lib2raw and --lib2lib
     bool ARUN_POSTPROCESS; //CT20181212 - this is for the --postprocess flag needed for AEL/AGL, can be extended to other modules too
@@ -581,7 +585,14 @@ inline std::string aflowFunc(const std::string& pretty_func, const std::string& 
   return XPID + pretty_func.substr(begin, end - begin) + func + "():";
 }
 
+// SD+HE20220914
+// Get filename and line number
+inline std::string aflowFile(const std::string &file_name, const size_t line_number ){
+  return file_name + ":" + std::to_string(line_number);
+}
+
 #define __AFLOW_FUNC__ aflowFunc(__PRETTY_FUNCTION__, __func__)
+#define __AFLOW_FILE__ aflowFile(__FILE__, __LINE__)
 
 //DX20180131 - add symmetry definitions - START
 // symmetry 
@@ -1216,7 +1227,7 @@ class _atom { // simple class.. nothing fancy
     string cleanname;                                      // a chemical clean version of the name
     int info;                                              // container for misc. information  //RHT
     int    atomic_number;                                  // 0 by defauls
-    int    number;                                         // atom number reference for convasp, from zero to the sky
+    //[CO20200130 - number->basis]int    number;                                         // atom number reference for convasp, from zero to the sky
     string sd;                                             // ?
     xvector<int> ijk;                                      // xvector identifier of the lattice (but you must give str)
     bool   isincell;                                       // is in cell ? (i==j==k==0 ?)
@@ -1547,6 +1558,7 @@ class AtomEnvironment{
 #define IOELK_AUTO    12 //DX20200310
 #define IOELK_GEOM    13 //DX20200310
 #define IOATAT_STR    14 //SD20220114
+#define IOAFLUX_QRY   15 //HE20220210
 
 #define NOSG string("NNN #0")
 
@@ -1734,6 +1746,7 @@ class xstructure {
     void buildGenericTitle(bool vasp_input=false,bool force_fix=false); // build a nice title with atoms
     void xstructure2qe(void);                                     // some wrap up IOs to convert format to QE
     void xstructure2vasp(void);                                   // some wrap up IOs to convert format to VASP
+    void xstructure2itc(void);                                    // some wrap up IOs to convert format to ITC  //CO20220613
     void xstructure2abinit(void);                                 // some wrap up IOs to convert format to ABINIT
     void xstructure2aims(void);                                   // some wrap up IOs to convert format to AIMS
     void xstructure2cif(void);                                    // some wrap up IOs to convert format to CIF //DX20190123
@@ -2672,6 +2685,7 @@ xstructure input2AIMSxstr(istream& input);
 xstructure input2ABINITxstr(istream& input);
 xstructure input2QExstr(istream& input);
 xstructure input2VASPxstr(istream& input,bool vasp5=false);
+xstructure input2ITCxstr(istream& input); //CO20220613
 xstructure input2ELKxstr(istream& input); //DX20200313
 xstructure input2ATATxstr(istream& input); //SD20220123
 
@@ -2703,28 +2717,10 @@ void minimumCoordinationShell(const xstructure& xstr, uint center_index,
     double& min_dist, uint& frequency, vector<xvector<double> >& coordinates, const string& type); //DX20191122
 
 //makefile tests
-bool SchemaTest(ostream& oss=std::cout);  //ME20210408
-bool SchemaTest(ofstream& FileMESSAGE,ostream& oss=std::cout);  //ME20210408
-bool CeramGenTest(ostream& oss=cout);
-bool CeramGenTest(ofstream& FileMESSAGE,ostream& oss=cout);
-bool EgapTest(ostream& oss=cout);
-bool EgapTest(ofstream& FileMESSAGE,ostream& oss=cout);
-bool gcdTest(ostream& oss=cout);
-bool gcdTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool smithTest(ostream& oss=cout);
 bool smithTest(ofstream& FileMESSAGE,ostream& oss=cout);
-bool coordinationTest(ostream& oss=cout);
-bool coordinationTest(ofstream& FileMESSAGE,ostream& oss=cout);
 bool PrototypeGeneratorTest(ostream& oss=cout, bool check_symmetry=false, bool check_uniqueness=false); //DX20200928
 bool PrototypeGeneratorTest(ofstream& FileMESSAGE,ostream& oss=cout, bool check_symmetry=false, bool check_uniqueness=false); //DX20200928
-bool FoldAtomsInCellTest(ostream& oss=cout); //DX20210129
-bool FoldAtomsInCellTest(ofstream& FileMESSAGE,ostream& oss=cout); //DX20210129
-bool AtomicEnvironmentTest(ostream& oss=cout); //HE20210511
-bool AtomicEnvironmentTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210511
-bool aurostdTest(ostream& oss=cout); //HE20210512
-bool aurostdTest(ofstream& FileMESSAGE,ostream& oss=cout); //HE20210512
-bool cifParserTest(ostream& oss=cout); //ME20220125
-bool cifParserTest(ofstream& FileMESSAGE, ostream& oss=cout); //ME202201025
 // ----------------------------------------------------------------------------
 // Structure Prototypes
 // aflow_xproto.cpp
@@ -2995,22 +2991,22 @@ namespace xthread {
       void unsetProgressBar();
 
       template <typename F, typename... A>
-      void run(uint ntasks, F& func, A&... args);
+        void run(uint ntasks, F& func, A&... args);
       template <typename F, typename... A>
-      void run(int ntasks, F& func, A&... args);
+        void run(int ntasks, F& func, A&... args);
       template <typename F, typename... A>
-      void run(unsigned long long int ntasks, F& func, A&... args);
+        void run(unsigned long long int ntasks, F& func, A&... args);
       template <typename IT, typename F, typename... A>
-      void run(const IT& it, F& func, A&... args);
+        void run(const IT& it, F& func, A&... args);
       template <typename IT, typename F, typename... A>
-      void run(IT& it, F& func, A&... args);
+        void run(IT& it, F& func, A&... args);
 
       template <typename F, typename... A>
-      void runPredistributed(int ntasks, F& func, A&... args);
+        void runPredistributed(int ntasks, F& func, A&... args);
       template <typename F, typename... A>
-      void runPredistributed(uint ntasks, F& func, A&... args);
+        void runPredistributed(uint ntasks, F& func, A&... args);
       template <typename F, typename... A>
-      void runPredistributed(unsigned long long int ntasks, F& func, A&... args);
+        void runPredistributed(unsigned long long int ntasks, F& func, A&... args);
 
     private:
       void free();
@@ -3018,7 +3014,9 @@ namespace xthread {
 
       int ncpus_max;
       int ncpus_min;
+#ifdef AFLOW_MULTITHREADS_ENABLE
       std::mutex mtx;
+#endif
       ostream* progress_bar;
       unsigned long long int progress_bar_counter;
       bool progress_bar_set;
@@ -3029,16 +3027,16 @@ namespace xthread {
       void freeThreads(int ncpus);
 
       template <typename I, typename F, typename... A>
-      void run(I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
+        void run(I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
       template <typename I, typename F, typename... A>
-      void spawnWorker(int ithread, I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
+        void spawnWorker(int ithread, I& it, I& end, unsigned long long int ntasks, F& func, A&... args);
       template <typename I>
-      I advance(I& it, I& end, unsigned long long int ntasks, bool update_progress_bar=false);
+        I advance(I& it, I& end, unsigned long long int ntasks, bool update_progress_bar=false);
 
       template <typename I, typename F, typename... A>
-      void runPredistributed(I ntasks, F& func, A&... args);
+        void runPredistributed(I ntasks, F& func, A&... args);
       template <typename I, typename F, typename... A>
-      void spawnWorkerPredistributed(int ithread, I startIndex, I endIndex, F& func, A&... args);
+        void spawnWorkerPredistributed(int ithread, I startIndex, I endIndex, F& func, A&... args);
   };
 }
 #endif
@@ -3219,9 +3217,9 @@ namespace KBIN {
   double OUTCAR2VASPVersionDouble(const string& outcar);  //CO20210315
   string VASPVersionString2Number(const string& vasp_version);  //CO20210315
   double VASPVersionString2Double(const string& vasp_version);  //CO20210315
-  string getVASPVersion(const string& binfile,const string& mpi_command="");  //ME20190219
-  string getVASPVersionNumber(const string& binfile,const string& mpi_command="");  //CO20200610
-  double getVASPVersionDouble(const string& binfile,const string& mpi_command="");  //CO20200610
+  string getVASPVersion(const string& binfile);  //ME20190219
+  string getVASPVersionNumber(const string& binfile);  //CO20200610
+  double getVASPVersionDouble(const string& binfile);  //CO20200610
 }
 
 // ----------------------------------------------------------------------------
@@ -3243,7 +3241,7 @@ namespace KBIN {
   bool VASP_Produce_POSCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Produce_POSCAR(_xvasp& xvasp);
   bool VASP_Modify_POSCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_vflags& vflags);
-  void convertPOSCARFormat(_xvasp&, const _aflags& aflags, const _kflags&);  //ME20190220 //CO20210713 - aflags
+  void convertPOSCARFormat(_xvasp&, const _kflags&);  //ME20190220 //CO20210713 - aflags //SD20220923 - updated for vasp6.3
   bool VASP_Convert_Unit_Cell(_xvasp&, _vflags&, _aflags&, ofstream&, ostringstream&); //ME20181216
   bool VASP_Reread_POSCAR(_xvasp& xvasp); //CO20210315
   bool VASP_Reread_POSCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
@@ -3343,10 +3341,10 @@ namespace KBIN {
   string ExtractSystemName(const string& directory);  //ME20200217
   string ExtractSystemNameFromAFLOWIN(const string& directory);  //ME20200217
   string ExtractSystemNameFromVASP(const string& directory);  //ME20200217
-  xstructure ExtractPOSCARXStructureFromDirectory(const string& directory,const int iomode,const int index); //SD20220228
-  stringstream ExtractPOSCARStringStreamFromDirectory(const string& directory,int index); //SD20220228
-  xstructure ExtractPOSCARXStructureFromAFLOWIN(const string& AflowIn,const int iomode,const int index); //SD20220228
-  stringstream ExtractPOSCARStringStreamFromAFLOWIN(const string& AflowIn,const int index); //SD20220228
+  xstructure GetPOSCARXStructureFromDirectory(const string& directory,const int iomode,const int index); //SD20220228
+  bool ExtractPOSCARStringStreamFromDirectory(const string& directory,stringstream& poscar,const int index); //SD20220228
+  xstructure GetPOSCARXStructureFromAFLOWIN(const string& AflowIn,const int iomode,const int index); //SD20220228
+  bool ExtractPOSCARStringStreamFromAFLOWIN(const string& AflowIn,stringstream& poscar,const int index); //SD20220228
   double ExtractEfermiOUTCAR(string directory);
   xstructure GetMostRelaxedStructure(string directory); //CO20180627
   vector<string> ExtractAtomicSpecies(const string& directory,ostream& oss=cout);
@@ -4832,8 +4830,6 @@ namespace slab { //CO20190601
   xstructure CreateSlab_SurfaceLattice(istream& input,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout); //CO20190321
   xstructure CreateSlab_SurfaceLattice(const xstructure& xstr_in,const xvector<int>& hkl,int total_layers,double vacuum,xmatrix<double>& rotation,xstructure& xstr_slab_newbasis,vector<int>& sc2pcMap_slab,vector<int>& pc2scMap_slab,const _aflags& aflags,double v3len_max_strict=AUROSTD_MAX_DOUBLE,ostream& oss=cout);  //CO20190321
 
-  bool slabTest(ostream& oss=cout);  //CO20190520
-  bool slabTest(ofstream& FileMESSAGE,ostream& oss=cout);  //CO20190520
 } // namespace slab
 
 // ----------------------------------------------------------------------------
@@ -5033,10 +5029,6 @@ namespace makefile {
 // ----------------------------------------------------------------------------
 // aflow_apennsy stuff
 #include "aflow_apennsy.h"
-
-// ----------------------------------------------------------------------------
-// aflowlib.h stuff
-#include "aflowlib.h"
 
 // ----------------------------------------------------------------------------
 // aflowlib.h stuff
@@ -5389,6 +5381,121 @@ namespace xprototype {
       void free();                                       // free space
       void copy(const xprototype& b);                    // copy space
   };
+}
+
+// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+// Unit Tests - ME20220127
+
+namespace unittest {
+
+  typedef std::function<void(uint&, vector<vector<string> >&, vector<string>&)> unitTestFunction;
+
+  struct xcheck {
+    vector<string> errors;
+    unitTestFunction func;
+    string function_name;
+    string task_description;
+    string test_group;
+    uint passed_checks;
+    vector<vector<string> > results;
+    bool finished;
+  };
+
+  class UnitTest : public xStream {
+    public:
+      UnitTest(ostream& oss=std::cout);
+      UnitTest(ofstream& mf, ostream& oss=std::cout);
+      UnitTest(const UnitTest& ut);
+      const UnitTest& operator=(const UnitTest& ut);
+      ~UnitTest();
+
+      _aflags aflags;
+
+      void clear();
+
+      void resetUnitTest(const string& test_name);
+      bool runTestSuites(const string& unit_test);
+      bool runTestSuites(const vector<string>& unit_tests_in);
+
+    private:
+      std::map<string, xcheck> test_functions;
+      std::map<string, vector<string> > test_groups;
+      std::map<string, string> test2group;
+#ifdef AFLOW_MULTITHREADS_ENABLE
+      std::mutex mtx;
+#endif
+
+      void free();
+      void copy(const UnitTest& ut);
+
+      void initialize();
+      void initializeTestFunctions();
+      void initializeTestGroups();
+
+      void resetUnitTest(xcheck&);
+      xcheck initializeXCheck();
+
+      void runUnitTest(vector<string>::iterator& it, const vector<string>& tasks);
+      bool taskSuccessful(const string& task);
+
+      string formatResultsTable(const vector<vector<string> >& table);
+      void displayResult(const xcheck& xchk);
+
+      template <typename utype>
+        void check(const bool passed, const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
+            const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
+      void check(const bool passed, const vector<double>& calculated, const vector<double>& expected, const string& check_function,
+          const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
+      template <typename utype>
+        void check(const bool passed, const xmatrix<utype>& calculated, const xmatrix<utype>& expected, const string& check_function,
+            const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
+      void check(const bool passed, const xmatrix<double>& calculated, const xmatrix<double>& expected, const string& check_function,
+          const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
+      template <typename utype>
+        void check(const bool passed, const utype& calculated, const utype& expected, const string& check_function,
+            const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
+
+      template <typename utype>
+        void checkEqual(const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
+            const string& check_description, uint& passed_checks, vector<vector<string> >& results);
+      void checkEqual(const vector<string>& calculated, const vector<string>& expected, const string& check_function,
+          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
+      template <typename utype>
+        void checkEqual(const utype& calculated, const utype& expected, const string& check_function,
+            const string& check_description, uint& passed_checks, vector<vector<string> >& results);
+      void checkEqual(const string& calculated, const string& expected, const string& check_function,
+          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
+      void checkEqual(const bool calculated, const bool expected, const string& check_function,
+          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
+
+      // Test functions ---------------------------------
+
+      // aurostd
+      void xvectorTest(uint&, vector<vector<string> >&, vector<string>&);
+      void xscalarTest(uint&, vector<vector<string> >&, vector<string>&);
+      void xmatrixTest(uint&, vector<vector<string> >&, vector<string>&);
+      void aurostdMainTest(uint&, vector<vector<string> >&, vector<string>&);
+
+      // database
+      void schemaTest(uint&, vector<vector<string> >&, vector<string>&);
+
+      // xstructure
+      void atomicEnvironmentTest(uint&, vector<vector<string> >&, vector<string>&);
+      void xstructureParserTest(uint&, vector<vector<string> >&, vector<string>&);
+      void xstructureTest(uint&, vector<vector<string> >&, vector<string>&);
+
+      // structure generation
+      void ceramgenTest(uint&, vector<vector<string> >&, vector<string>&);
+      void prototypeGeneratorTest(uint&, vector<vector<string> >&, vector<string>&);
+
+      // ovasp
+      void xoutcarTest(uint&, vector<vector<string> >&, vector<string>&);
+
+      // entryLoader
+      void entryLoaderTest(uint&, vector<vector<string> >&, vector<string>&);
+  };
+
 }
 
 #endif

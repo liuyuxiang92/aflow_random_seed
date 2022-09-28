@@ -56,7 +56,6 @@
 //[OBSOLETE]//CO20180419 - global exception handling - STOP
 
 int main(int _argc,char **_argv) {
-  string soliloquy = XPID + "main():"; //CO20180419
   ostream& oss=cout;  //CO20180419
   try{
     bool LDEBUG=FALSE; // TRUE;
@@ -163,47 +162,46 @@ int main(int _argc,char **_argv) {
 
 
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_xmatrix")) { //CO20190911
-      string soliloquy = XPID + "test_xmatrix()::";
       bool LDEBUG=TRUE;// TRUE;
       xmatrix<double> mat;
       mat(1,1)=5;mat(1,2)=9;mat(1,3)=12;
       mat(2,1)=7;mat(2,2)=10;mat(2,3)=13;
       mat(3,1)=8;mat(3,2)=11;mat(3,3)=14;
-      if(LDEBUG){cerr << soliloquy << " mat=" << endl;cerr << mat << endl;}
-      //getmat()
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " mat=" << endl;cerr << mat << endl;}
+      //getxmat()
       xmatrix<double> submat;
-      mat.getmatInPlace(submat,2,3,2,3);
-      if(LDEBUG){cerr << soliloquy << " submat=" << endl;cerr << submat << endl;}
+      mat.getxmatInPlace(submat,2,3,2,3);
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " submat=" << endl;cerr << submat << endl;}
       //setmat()
       mat.setmat(submat,1,1); //do nothing
       if(LDEBUG){
-        cerr << soliloquy << " replacing with submat at 1,1" << endl;
-        cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+        cerr << __AFLOW_FUNC__ << " replacing with submat at 1,1" << endl;
+        cerr << __AFLOW_FUNC__ << " mat=" << endl;cerr << mat << endl;
       }
       xvector<double> xv;
       xv(1)=2;xv(2)=3;xv(3)=4;
-      if(LDEBUG){cerr << soliloquy << " xv=" << xv << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " xv=" << xv << endl;}
       mat.setmat(xv,1,false); //row
       if(LDEBUG){
-        cerr << soliloquy << " replacing with xv at row=1" << endl;
-        cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+        cerr << __AFLOW_FUNC__ << " replacing with xv at row=1" << endl;
+        cerr << __AFLOW_FUNC__ << " mat=" << endl;cerr << mat << endl;
       }
       mat.setmat(xv,2,true); //col
       if(LDEBUG){
-        cerr << soliloquy << " replacing with xv at col=2" << endl;
-        cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+        cerr << __AFLOW_FUNC__ << " replacing with xv at col=2" << endl;
+        cerr << __AFLOW_FUNC__ << " mat=" << endl;cerr << mat << endl;
       }
       //setrow()
       mat.setrow(xv,2);
       if(LDEBUG){
-        cerr << soliloquy << " replacing with xv at row=2" << endl;
-        cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+        cerr << __AFLOW_FUNC__ << " replacing with xv at row=2" << endl;
+        cerr << __AFLOW_FUNC__ << " mat=" << endl;cerr << mat << endl;
       }
       //setcol()
       mat.setcol(xv,3);
       if(LDEBUG){
-        cerr << soliloquy << " replacing with xv at col=3" << endl;
-        cerr << soliloquy << " mat=" << endl;cerr << mat << endl;
+        cerr << __AFLOW_FUNC__ << " replacing with xv at col=3" << endl;
+        cerr << __AFLOW_FUNC__ << " mat=" << endl;cerr << mat << endl;
       }
       return 1;
     }
@@ -225,22 +223,19 @@ int main(int _argc,char **_argv) {
       }
       return 0; //CO20180419
     }
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_schema|--schema_test")) {return (SchemaTest()?0:1);}  //ME20210408
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_CeramGen|--CeramGen_test")) {return (CeramGenTest()?0:1);}  //CO20190601
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_Egap|--Egap_test")) {return (EgapTest()?0:1);}  //CO20190601
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_gcd|--gcd_test")) {return (gcdTest()?0:1);}  //CO20190601
+    //ME20220128
+    if (!Arun && aurostd::args2attachedflag(argv,cmds,"--unit_test")) {
+      aurostd::xoption unittest_options;
+      unittest_options.args2addattachedscheme(argv, cmds, "UNIT_TESTS", "--unit_test=", "all");
+      vector<string> tests;
+      aurostd::string2tokens(unittest_options.getattachedscheme("UNIT_TESTS"), tests, ",");
+      unittest::UnitTest ut(std::cout);
+      return (ut.runTestSuites(tests)?0:1);
+    }
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_smith|--smith_test")) {return (smithTest()?0:1);}  //CO20190601
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_coordination|--coordination_test")) {return (coordinationTest()?0:1);}  //CO20190601
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_PrototypeGenerator|--PrototypeGenerator_test")) {return (PrototypeGeneratorTest()?0:1);}  //DX20200928
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_PrototypeSymmetry|--PrototypeSymmetry_test")) {return (PrototypeGeneratorTest(cout,true)?0:1);}  //DX20201105
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_PrototypeUniqueness|--PrototypeUniqueness_test")) {return (PrototypeGeneratorTest(cout,false,true)?0:1);}  //DX20210429
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_FoldAtomsInCell|--FoldAtomsInCell_test")) {return (FoldAtomsInCellTest(cout)?0:1);}  //DX20210129
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_AtomicEnvironment|--AtomicEnvironment_test")) {return (AtomicEnvironmentTest(cout)?0:1);}  //HE20210511
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_aurostd|--aurostd_test")) {return (aurostdTest(cout)?0:1);} //HE20210512
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_cif_parser|--cif_parser_test")) {return (cifParserTest(cout)?0:1);}
     if(!Arun && aurostd::args2flag(argv,cmds,"--test")) {
 
-      if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}
+      if(XHOST.vext.size()!=XHOST.vcat.size()) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"XHOST.vext.size()!=XHOST.vcat.size(), aborting.",_RUNTIME_ERROR_);}
 
       for(uint iext=0;iext<XHOST.vext.size();iext++) { 
         cout << "\"" << XHOST.vext.at(iext) << "\"" << " " << "\"" << XHOST.vcat.at(iext) << "\"" << endl;
@@ -413,16 +408,15 @@ int main(int _argc,char **_argv) {
 
     if(!Arun && aurostd::args2flag(argv,cmds,"--test_proto1")) {
       vector<xstructure> vstr;
-      vector<string> vlattice;aurostd::string2tokens("BCC,BCT,CUB,FCC,HEX,MCL,MCLC,ORC,ORCC,ORCF,ORCI,RHL,TET,TRI",vlattice,",");
       aflowlib::_aflowlib_entry data;
       vector<aflowlib::_aflowlib_entry> vdata;
-      for(uint i=4;i<vlattice.size();i++) {
+      for(uint i=4;i<BRAVAIS_LATTICES.size();i++) { //HE20220420 switch to global bravais lattices list
         data.clear();
-        data.url2aflowlib("materials.duke.edu:AFLOWDATA/ICSD_WEB/"+vlattice.at(i)+"/?format=text",cout,FALSE);vdata.push_back(data);
-        cout << "AFLOWLIB " << vlattice.at(i) << "=" << data.vaflowlib_entries.size() << endl;
+        data.url2aflowlib("materials.duke.edu:AFLOWDATA/ICSD_WEB/"+BRAVAIS_LATTICES[i]+"/?format=text",cout,FALSE);vdata.push_back(data);
+        cout << "AFLOWLIB " << BRAVAIS_LATTICES[i] << "=" << data.vaflowlib_entries.size() << endl;
         for(uint j=0;j<data.vaflowlib_entries.size();j++) {
           aflowlib::_aflowlib_entry dataj;
-          dataj.url2aflowlib("materials.duke.edu:AFLOWDATA/ICSD_WEB/"+vlattice.at(i)+"/"+data.vaflowlib_entries.at(j),cout,TRUE);
+          dataj.url2aflowlib("materials.duke.edu:AFLOWDATA/ICSD_WEB/"+BRAVAIS_LATTICES[i]+"/"+data.vaflowlib_entries.at(j),cout,TRUE);
           aurostd::StringSubst(dataj.aurl,"aflowlib","materials");
           if(dataj.aurl!="") {
             xstructure str(dataj.aurl,"CONTCAR.relax.vasp",IOAFLOW_AUTO);
@@ -450,7 +444,6 @@ int main(int _argc,char **_argv) {
     if(!Arun && aurostd::args2flag(argv,cmds,"--testJ")) {Arun=TRUE;PERFORM_TESTJ(cout);}
     // [OBSOLETE] if(!Arun && aurostd::args2flag(argv,cmds,"--test1")) {Arun=TRUE;PERFORM_TEST1(cout);}
     if(!Arun && aurostd::args2flag(argv,cmds,"--test3")) {Arun=TRUE;PERFORM_TEST3(cout);}
-    if(!Arun && aurostd::args2flag(argv,cmds,"--test_slab|--slab_test")) {return (slab::slabTest()?0:1);}  //CO20190601  //CO20190629 if TRUE(==1), return 0 (normal)
     if(!Arun && XHOST.vflag_control.flag("MACHINE")) {
       //ME20200724
       int code = init::InitMachine(FALSE,argv,cmds,cerr);
@@ -605,13 +598,13 @@ int main(int _argc,char **_argv) {
   }
   //CO20180729 - OBSOLETE - use xerror
   //[OBSOLETE]catch(AFLOWRuntimeError& re){
-  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "AFLOWRuntimeError detected. Report on the AFLOW Forum: aflow.org/forum.", oss, _LOGGER_ERROR_);
-  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, re.where(), re.what(), oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "AFLOWRuntimeError detected. Report on the AFLOW Forum: aflow.org/forum.", oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(__AFLOW_FILE__, re.where(), re.what(), oss, _LOGGER_ERROR_);
   //[OBSOLETE]  return 1;
   //[OBSOLETE]}
   //[OBSOLETE]catch(AFLOWLogicError& le){
-  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, soliloquy, "AFLOWLogicError detected. Adjust your inputs accordingly.", oss, _LOGGER_ERROR_);
-  //[OBSOLETE]  pflow::logger(_AFLOW_FILE_NAME_, le.where(), le.what(), oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "AFLOWLogicError detected. Adjust your inputs accordingly.", oss, _LOGGER_ERROR_);
+  //[OBSOLETE]  pflow::logger(__AFLOW_FILE__, le.where(), le.what(), oss, _LOGGER_ERROR_);
   //[OBSOLETE]  return 1;
   //[OBSOLETE]}
   catch (aurostd::xerror& excpt) {

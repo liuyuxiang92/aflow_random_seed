@@ -33,33 +33,38 @@ namespace aurostd {
   template<class utype>
     class xmatrix  {
       public:
-        //  xmatrix ();                                                     // default constructor
-        //  xmatrix (int=3);                                                // default constructor
+        // xmatrix ();                                                      // default constructor
+        // xmatrix (int=3);                                                 // default constructor
         xmatrix (int=3,int=3,int=1,int=1);                                  // default constructor
-        //    xmatrix (int,int,int,int);                                    // default constructor
+        // xmatrix (int,int,int,int);                                       // default constructor
+        xmatrix(const std::initializer_list<std::initializer_list<utype>>); // initializer_list constructor //HE20220616
         xmatrix (int,int,utype*);                                           // copy constructor
         xmatrix (const xmatrix<utype>&);                                    // copy constructor
         xmatrix (const xvector<utype>&);                                    // copy constructor
         xmatrix<utype>& operator=(const xmatrix<utype>&);                   // assignment
+        xmatrix<utype>& operator=(const std::initializer_list<std::initializer_list<utype>>); // initializer_list assignment //HE20220616
         ~xmatrix ();                                                        // default destructor
         utype* operator[](int) const;                                       // indicize i,j
         xvector<utype> operator()(int) const;                               // indicize i
         xvector<utype> getcol(int) const;                                   // return column i  //CO20191110
         xvector<utype> getdiag(int k=0,int _lrows=1) const;                 // return diagonal, k=0 is main diagonal, k>0 is above diagonal //CO20191201
-        void getmatInPlace(xmatrix<utype>& mat_out,int lrow,int urow,int lcol,int ucol,int lrows_out=AUROSTD_MAX_INT,int lcols_out=AUROSTD_MAX_INT) const; // return submatrix as xmatrix //CO20191110
-        void getmatInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol,int lrows_out=AUROSTD_MAX_INT,int lcols_out=AUROSTD_MAX_INT) const; //return submatrix as xvector //CO20191110
-        xmatrix<utype> getmat(int lrow,int urow,int lcol,int ucol,int lrows_out=AUROSTD_MAX_INT,int lcols_out=AUROSTD_MAX_INT) const; // return submatrix as xmatrix //CO20191110
-        xvector<utype> getvec(int lrow,int urow,int lcol,int ucol,int lrows_out=AUROSTD_MAX_INT,int lcols_out=AUROSTD_MAX_INT) const; //return submatrix as xvector //CO20191110
+        xvector<utype> getxvec() const;                                      // updated function to return a vector from a 1-d matrix //AZ20220704
+        xvector<utype> getxvec(int lrow,int urow,int lcol,int ucol, int lrows_out=1) const;   // return a vector from a matrix //AZ20220704
+        void getxmatInPlace(xmatrix<utype>& mat_out,int lrow,int urow,int lcol,int ucol,int lrows_out=1,int lcols_out=1) const; // return submatrix as xmatrix //CO20191110
+        void getxvecInPlace(xvector<utype>& xv_out,int lrow,int urow,int lcol,int ucol, int lrows_out=1) const; // return xvectorInPlace from xmatrix 
+        xmatrix<utype> getxmat(int lrow,int urow,int lcol,int ucol,int lrows_out=1,int lcols_out=1) const; // return submatrix as xmatrix //CO20191110
         void setrow(const xvector<utype>& row,int irow=1);                  // set row of matrix //CO20190808
         void setcol(const xvector<utype>& col,int icol=1);                  // set col of matrix //CO20190808
         void setmat(const xmatrix<utype>& mat,int irow=1,int icol=1);       // set submat  //CO20190808
         void setmat(const xvector<utype>& xv,int icol=1,bool col=true);     // set submat  //CO20190808
         utype& operator()(int,int) const;                                   // indicize i,j
         utype& operator()(int,int,bool) const;                              // indicize boundary conditions
-        //      xmatrix operator()(int,int,int,int) const;                  // indicize i1,j1,i2,j2
+        // xmatrix operator()(int,int,int,int) const;                       // indicize i1,j1,i2,j2
         // math operators
         xmatrix<utype>& operator +=(const xmatrix<utype>&);
+        xmatrix<utype>& operator +=(const std::initializer_list<std::initializer_list<utype>>); //HE20220616
         xmatrix<utype>& operator -=(const xmatrix<utype>&);
+        xmatrix<utype>& operator -=(const std::initializer_list<std::initializer_list<utype>>); //HE20220616
         xmatrix<utype>& operator *=(const xmatrix<utype>&);
         xmatrix<utype>& operator *=(utype r); //CO20190911
         // xmatrix<utype>& operator /=(const xmatrix<utype>&);
@@ -76,17 +81,28 @@ namespace aurostd {
         void set(const utype&);
         void reset(void);
         void clear(void);
+        //HE20220915 START
+        // xmatrix manipulation without copy (pointer manipulation)
+        void shift(int new_lrows, int new_lcols);
+        void shiftrow(int new_lrows);
+        void shiftcol(int new_lcols);
+        void reshape(uint new_rows, uint new_cols=0);
+        void reshape(int new_urows, int new_ucols, int new_lrows, int new_lcols);
+        //HE20220915 END
       private:
         //  friend bool operator==(const xmatrix<utype>&,const xmatrix<utype>&);
         utype** corpus;
         //  bool isfloat,iscomplex;
         char size;
         long int msize;
-
+        typedef typename std::initializer_list<utype>::const_iterator ili; // initializer list iterator //HE20220616
+        typedef typename std::initializer_list<std::initializer_list<utype>>::const_iterator il2i; // nested initializer list iterator //HE20220616
         //NECESSARY PRIVATE CLASS METHODS - START
+        void init();  //HE20220615
         void free();  //CO20190808
         void copy(const xmatrix<utype>& b);  //CO20190808
         void copy(const xvector<utype>& b);  //CO20190808
+        void copy(const std::initializer_list<std::initializer_list<utype>> ll); //HE20220616
         void refresh(); //CO20190808 - refresh internal properties dependent on lrows, urows, utype
         //NECESSARY END CLASS METHODS - END
     };
@@ -246,64 +262,23 @@ namespace aurostd {
 // ----------------------------------------------------------- xmatrix constrtuction
 namespace aurostd {
   template<class utype> xmatrix<utype>
-    reshape(const xvector<utype>&, int, int) __xprototype;  // ME20210505
-
-  template<class utype> xmatrix<utype>
-    reshape(const xmatrix<utype>&, int, int) __xprototype;  // SD20220126
+    reshape(const xvector<utype>& vec, int rows, int cols=0) __xprototype;  // ME20210505
 
   template<class utype> xmatrix<utype>
     reshape(const xvector<utype>&) __xprototype;
 
   template<class utype> xmatrix<utype>
-    reshape(const xvector<utype>&,const xvector<utype>&) __xprototype;
+    reshape_cols(const xvector<utype>& vec) __xprototype;
 
   template<class utype> xmatrix<utype>
-    reshape(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
+    reshape_rows(const xvector<utype>& vec) __xprototype;
 
   template<class utype> xmatrix<utype>
-    reshape(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
+    hstack(const vector<xvector<utype>>& vec_list) __xprototype;
 
   template<class utype> xmatrix<utype>
-    reshape(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
+    vstack(const vector<xvector<utype>>& vec_list) __xprototype;
 
-  template<class utype> xmatrix<utype>
-    reshape(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_cols(const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_cols(const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_cols(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_cols(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_cols(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_cols(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_rows(const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_rows(const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_rows(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_rows(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_rows(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
-
-  template<class utype> xmatrix<utype>
-    reshape_rows(const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&,const xvector<utype>&) __xprototype;
 }
 
 // ----------------------------------------------------------- xmatrix example types
@@ -340,9 +315,6 @@ namespace aurostd {
 
   template<class utype> xmatrix<utype>
     vectorvector2xmatrix(const vector<vector<utype> >& xmat) __xprototype;
-
-  template<class utype> xvector<utype>
-    xmatrix2xvector(const xmatrix<utype>& xmat,int urow,int ucol,int lrow,int lcol,int lrows_out) __xprototype; //CO20191110
 
   template<class utype> xmatrix<double> 
     xmatrixutype2double(const xmatrix<utype>& a); //CO20191201
@@ -468,16 +440,7 @@ namespace aurostd {
   template<class utype> void                                           // swap_rows
     swap_rows(xmatrix<utype>&,const int&,const int&) __xprototype;    // swap_rows
 
-  template<class utype> void  // function shift lrows so first index is i
-    shiftlrows(xmatrix<utype>& a,int i); //CO20191201
-
-  template<class utype> void  // function shift lcols so first index is i
-    shiftlcols(xmatrix<utype>& a,int i); //CO20191201
-
-  template<class utype> void  // function shift lrows and lcols so first index is i, j
-    shiftlrowscols(xmatrix<utype>& a,int i,int j); //CO20191201
-
-  template<class utype> xmatrix<utype>
+    template<class utype> xmatrix<utype>
     identity(const xmatrix<utype>&) __xprototype;
 
   // template<class utype> xmatrix<utype>

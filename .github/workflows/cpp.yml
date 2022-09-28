@@ -1,52 +1,33 @@
-name: AFLOW-src C++ build
+name: AFLOW inhouse build
 #c++ builds: https://github.community/t/conditional-matrices/17206
 #env var: https://dev.to/mihinduranasinghe/working-with-environment-variables-github-actions-part-2-46po
 
-on:
+on: 
+  workflow_dispatch:
+  push:
+    branches: [ master, staging ]
+  pull_request:
+    types: [ ready_for_review, opened, synchronize, reopened ]
+    branches: [ master, staging ]
+    
+  #[CO20220325 - now only PR]    branches: [ master, staging ]
+  #[CO20220325 - now only PR]  pull_request:
+  #[CO20220325 - now only PR]    branches: [ master, staging ]
+  #[HE20220701 - use self hosted runners on spin
   #[CO20220325 - now only PR]  push:
   #[CO20220325 - now only PR]    branches: [ master, staging ]
   #[CO20220325 - now only PR]  pull_request:
   #[CO20220325 - now only PR]    branches: [ master, staging ]
-  pull_request:
-    branches: staging
-
+  #[CO20220101 - reduce time]pull_request:
+  #[CO20220101 - reduce time]push:
+  #[CO20220101 - reduce time]  branches: staging
+  
 jobs:
-  build_ubuntu_1804:
-    runs-on: ubuntu-18.04
+  build_pod_ubuntu:
+    runs-on: [self-hosted, Linux, X64]
     steps:
     - uses: actions/checkout@v2
     - name: make
-      run: make -C src
-    - name: make check_full
-      #[CO20220325 - now only PR]if: github.event_name == 'push'
-      run: make -C src check_full
-#  build_ubuntu_1604:
-#    runs-on: ubuntu-16.04
-#    steps:
-#    - uses: actions/checkout@v2
-#    - name: make
-#      if: github.event_name == 'push'
-#      run: make -C src
-#    - name: make check_full
-#      if: github.event_name == 'push'
-#      run: make -C src check_full
-  build_mac_1100:
-    runs-on: macos-11.0
-    steps:
-    - uses: actions/checkout@v2
-    - name: make
-      #[CO20220325 - now only PR]if: github.event_name == 'push'
-      run: make -C src
-    - name: make check_full
-      #[CO20220325 - now only PR]if: github.event_name == 'push'
-      run: make -C src check_full
-  build_mac_1015:
-    runs-on: macos-10.15
-    steps:
-    - uses: actions/checkout@v2
-    - name: make
-      #[CO20220325 - now only PR]if: github.event_name == 'push'
-      run: make -C src
-    - name: make check_full
-      #[CO20220325 - now only PR]if: github.event_name == 'push'
-      run: make -C src check_full
+      run: make -j -C src
+    - name: run unit_test
+      run: ./src/aflow --unit_test aurostd,database,structure

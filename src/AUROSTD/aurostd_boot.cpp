@@ -247,6 +247,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   // initialize xvector sort
   xvector<utype> vxu;xvector<int> ixv;xvector<double> dxv;
   aurostd::quicksort2((uint) 0,ixv,dxv);aurostd::quicksort2((uint) 0,dxv,ixv);
+  vxu=aurostd::mod(vxu,(utype)1); //CO20200130
 
   // initialize scalars
   o+=nint(x)+factorial(x)+nCk(x,x)+fact(x)+isequal(x,x)+isequal(x,x,(utype) 0)+isequal(x,x,x)+isdifferent(x,x)+isdifferent(x,x,x);
@@ -259,7 +260,7 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   // initialize xvectors
   aurostd::xvector<utype> v(2),w(2),vv,vvvv(1,2);		//CO20190329 - clang doesn't like x=x, changing to x=y
   std::vector<aurostd::xvector<utype> > vxv;
-  v(1);v[1];o+=sum(v);sort(shellsort(heapsort(v+v)));o+=modulus(v);o+=modulus2(v);v=x*v*x/x;v=+w;v=-w;v+=w;v-=w;v+=x;v-=x;v*=x;v/=x;		//CO20190329 - clang doesn't like x=x, changing to x=y
+  v(1);v[1];o+=sum(v);shellsort(heapsort(v+v));o+=modulus(v);o+=modulus2(v);v=x*v*x/x;v=+w;v=-w;v+=w;v-=w;v+=x;v-=x;v*=x;v/=x;		//CO20190329 - clang doesn't like x=x, changing to x=y
   v=v*i;v=nint(v);v=sign(v);v=i*v;v=v*d;v=d*v;v=d*v*d/d;o+=min(v);o+=max(v);o+=mini(v);o+=maxi(v);v=v+v;v=v-v;v=v-x;v=-v+v;
   cout<<v<<endl;o+=scalar_product(v,v);o+=cos(v,v);o+=sin(v,v);o+=angle(v,v);v=vector_product(v,v);
   trasp(v);
@@ -285,9 +286,9 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   getGeneralNormal(vxv);
   v=aurostd::args2xvectorutype<utype>(vstring,c,v);v=aurostd::args2xvectorutype<utype>(vstring,c,i);
   aurostd::args2vectorutype<utype>(vstring,c);aurostd::args2dequeutype<utype>(dstring,c);
-  v.clear();clear(v);reshape(xvi,2,1);reshape(x);reshape(x,x);reshape(x,x,x);reshape(x,x,x,x);reshape(x,x,x,x,x);reshape(x,x,x,x,x,x);
+  v.clear();clear(v);reshape(xvi,2,1);
   //  sort2((unsigned long)1,v,v);sort2((unsigned long)1,xvd,xvi);sort2((unsigned long)1,xvi,xvd);
-  o+=isequal(v,v)+isequal(v,v,(utype) 0)+isequal(v,v,x)+isdifferent(v,v)+isdifferent(v,v,x)+isinteger(v,x);swap(v,1,1);shiftlrows(v,1);
+  o+=isequal(v,v)+isequal(v,v,(utype) 0)+isequal(v,v,x)+isdifferent(v,v)+isdifferent(v,v,x)+isinteger(v,x);swap(v,1,1);
   getQuartiles(v,x,x,x);
   o+=aurostd::mean(v);aurostd::meanWeighted(v,v);aurostd::meanWeighted(v,v,x);o+=aurostd::var(v,1);o+=aurostd::stddev(v,1);o+=aurostd::mode(v);o+=aurostd::correlation_Pearson_fast(v,v);o+=aurostd::correlation_Pearson_slow(v,v);o+=aurostd::correlation_Pearson_fast(v,x,x,v,x,x); //CO20190520
   v=aurostd::box_filter_xv<utype>(1);v=aurostd::box_filter_xv<utype>(1,1); //CO20190520
@@ -316,9 +317,12 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   utype* mstar;mstar=NULL;
   aurostd::xmatrix<utype> m(2),n(2),mm,mmm(2,3),m3(3,3),mmmmm(1,2,3,4),m5(1,2,mstar),mkron;		//CO20190329 - clang doesn't like x=x, changing to x=y
   xdouble(m);xint(m);m=+m;m=-m;o+=m(1)[1];o+=m(1,1);o+=m[1][1];m=identity(m);m=identity(x,1,1);m=identity(x,1);
-  vv=m.getcol(1);vv=m.getdiag(0,1);m.setrow(v);m.setcol(v);m.setmat(n);m.setmat(v);m=n;m=m+n;m=m-n;m=m*n;adjointInPlace(m,n);n=adjoint(m);m=inverseByAdjoint(m);m=inverse(m);isNonInvertible(m);m=reduce_to_shortest_basis(m);		//CO20190329 - clang doesn't like x=x, changing to x=y  //CO20191110  //CO20191201
+  vv=m.getcol(1);vv=m.getdiag(0,1);m.setrow(v);m.setcol(v);m.setmat(n);m.setmat(v);m=n;m=m+n;m=m-n;m=m*n;v=v*m;adjointInPlace(m,n);n=adjoint(m);m=inverseByAdjoint(m);m=inverse(m);isNonInvertible(m);m=reduce_to_shortest_basis(m);		//CO20190329 - clang doesn't like x=x, changing to x=y  //CO20191110  //CO20191201  //CO20200127
   m*=(utype)5;m/=(utype)6;  //CO20190911
-  m.getmatInPlace(m,1,1,1,1,1,1);m.getmatInPlace(vv,1,1,1,1,1,1); //CO20190911
+  m.getxmatInPlace(m,1,1,1,1,1,1); //CO20190911
+  m.getxmat(1,1,1,1,1); //AZ20220627
+  m.getxvecInPlace(vv,1,1,1,1,1); //AZ20220704 
+  vv=m.getxvec();vv=m.getxvec(1,1,1,1); //AZ20220704 
   m=x*m*x/x;o+=(m==m);o+=(m!=m);o+=trace(m);m=-n;traspSquareInPlace(m,false);traspInPlace(m,false);traspInPlace(m,m,false);m=trasp(m);clear(m);mkron=aurostd::KroneckerProduct(mm,mmm);		//CO20190329 - clang doesn't like x=x, changing to x=y
   o+=sum(m);o+=modulus(m);o+=modulussquare(m);o+=modulus2(m);m=nint(m);m=sign(m);o+=identical(m,m);o+=identical(m,m,x);o+=isdifferent(m,m);o+=isdifferent(m,m,x); //CO20191110
   o+=isequal(m,m);o+=isequal(m,m,x);cout<<m<<endl;
@@ -329,14 +333,12 @@ template<class utype> bool initialize_xscalar_xvector_xmatrix_xtensor(utype x) {
   vector<string> vs;vxu=vector2xvector<utype>(vs,1); //CO20201111
   vector<vector<utype> > mvv=xmatrix2vectorvector(m);vectorvector2xmatrix(mvv);
   if(det(m)==0 || sum(m)==0) return FALSE;
-  reshape(m3,9,1);
-  reshape(v);reshape(v,v);reshape(v,v,v);reshape(v,v,v,v);reshape(v,v,v,v,v);reshape(v,v,v,v,v,v);
-  reshape_rows(v);reshape_rows(v,v);reshape_rows(v,v,v);reshape_rows(v,v,v,v);reshape_rows(v,v,v,v,v);reshape_rows(v,v,v,v,v,v);
-  reshape_cols(v);reshape_cols(v,v);reshape_cols(v,v,v);reshape_cols(v,v,v,v);reshape_cols(v,v,v,v,v);reshape_cols(v,v,v,v,v,v);
+  reshape(v);hstack(vxv);
+  reshape_rows(v);vstack(vxv);
   utype tol=(utype)0; //DX20171025
   o+=isequal(m,m)+isequal(m,m,(utype) 0)+isequal(m,m,x)+isdifferent(m,m)+isdifferent(m,m,x)+isinteger(m,x)+isdiagonal(m)+isdiagonal(m,tol)+issymmetric(m)+isantisymmetric(m);
   o+=isidentity(m); //CO
-  swap_cols(m,1,1);swap_columns(m,1,1);swap_rows(m,1,1);shiftlrows(m,1);shiftlcols(m,1);shiftlrowscols(m,1,1);  //CO20191201
+  swap_cols(m,1,1);swap_columns(m,1,1);swap_rows(m,1,1);  //CO20191201
   sin(m);sinh(m);cos(m);cosh(m);exp(m);
   aurostd::floor(m);aurostd::ceil(m);
   //ME20190718 - norms
@@ -660,7 +662,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
 #endif
 #ifdef AUROSTD_INITIALIZE_LONG_LONG_INT
     o+=initialize_scalar((long long int)(1));
-    // o+=initialize_xscalar_xvector_xmatrix_xtensor((long long int)(1));
+    o+=initialize_xscalar_xvector_xmatrix_xtensor((long long int)(1));  //CO20200130
     // o+=initialize_xcomplex((long long int)(1));
     // xmatrix<(long long int)> m(1,1);GaussJordan(m,m);
     long long int lligcd=1;_GCD(lligcd,lligcd,lligcd,lligcd,lligcd);_GCD(lligcd,lligcd,lligcd);  //CO20191201
