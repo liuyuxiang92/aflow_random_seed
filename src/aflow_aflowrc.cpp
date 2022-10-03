@@ -999,7 +999,7 @@
 //CO20201220 X START
 #define AFLOWRC_MPI_OPTIONS_DUKE_X                            string("ulimit -s unlimited ") // DUKE_X_MPICH
 #define         MPI_OPTIONS_DUKE_X                            XHOST.adefault.getattachedscheme("MPI_OPTIONS_DUKE_X")
-#define AFLOWRC_MPI_COMMAND_DUKE_X                            string("mpirun -n") // DUKE_X_MPICH
+#define AFLOWRC_MPI_COMMAND_DUKE_X                            string("srun --mpi=pmix --cpus-per-task") // DUKE_X_MPICH
 #define         MPI_COMMAND_DUKE_X                            XHOST.adefault.getattachedscheme("MPI_COMMAND_DUKE_X")
 #define AFLOWRC_MPI_BINARY_DIR_DUKE_X                         string("/home/bin/") // DUKE_X_MPICH
 #define         MPI_BINARY_DIR_DUKE_X                         XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_DUKE_X")
