@@ -4114,18 +4114,17 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
                         << origin_shift_index << " (" << origin_shift_index+1 << " of " << possible_shifts.size() << "): "
                         << possible_shifts[origin_shift_index] << "." << endl;
                     }
-                    /*
-                    // if shift is zero, skip
-                    if(aurostd::iszero(possible_shifts[origin_shift_index])) {
-                      origin_shift_index++;
-                      if(origin_shift_index == possible_shifts.size()) {
-                        other_shifts_explored = true;
-                      }
-                      if(LDEBUG) {
-                        cerr << "SYM::SpaceGroup_ITC: Skipping shift of zero (already checked)." << endl;
-                      }
-                      continue;
-                    }*/
+                    //[DX20221001 - OBSOLETE]// if shift is zero, skip
+                    //[DX20221001 - OBSOLETE]if(aurostd::iszero(possible_shifts[origin_shift_index])) {
+                    //[DX20221001 - OBSOLETE]  origin_shift_index++;
+                    //[DX20221001 - OBSOLETE]  if(origin_shift_index == possible_shifts.size()) {
+                    //[DX20221001 - OBSOLETE]    other_shifts_explored = true;
+                    //[DX20221001 - OBSOLETE]  }
+                    //[DX20221001 - OBSOLETE]  if(LDEBUG) {
+                    //[DX20221001 - OBSOLETE]    cerr << "SYM::SpaceGroup_ITC: Skipping shift of zero (already checked)." << endl;
+                    //[DX20221001 - OBSOLETE]  }
+                    //[DX20221001 - OBSOLETE]  continue;
+                    //[DX20221001 - OBSOLETE]}
 
                     xvector<double> previous_shift;
                     if(origin_shift_index > 0) {
