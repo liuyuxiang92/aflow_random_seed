@@ -1,5 +1,7 @@
 3.2.14 -
         -- reworked reshape, shift and stack function for xvector and xmatrix (HE)
+        -- fixed minimum enumerated Wyckoff search to consider different lattice vector choices (DX)
+        -- fixed printing of Wyckoff POSCAR in extended crystallographic data output (DX)
 3.2.13 - 2022/08/30
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz
         -- implemented QH-POCC and POCC+QHA (AS)
