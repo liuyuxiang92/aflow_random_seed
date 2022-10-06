@@ -492,9 +492,18 @@ namespace init {
       oss << "MPI_COMMAND_DUKE_QFLOW_OPENMPI=" << MPI_COMMAND_DUKE_QFLOW_OPENMPI << "\"" << endl;
       oss << "MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI=" << MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << "\"" << endl;
       //CO20201220 X START
-      oss << "MPI_OPTIONS_DUKE_X=" << MPI_OPTIONS_DUKE_X << "\"" << endl;
-      oss << "MPI_COMMAND_DUKE_X=" << MPI_COMMAND_DUKE_X << "\"" << endl;
-      oss << "MPI_BINARY_DIR_DUKE_X=" << MPI_BINARY_DIR_DUKE_X << "\"" << endl;
+      oss << "MPI_OPTIONS_DUKE_X_X=" << MPI_OPTIONS_DUKE_X_X << "\"" << endl;
+      oss << "MPI_COMMAND_DUKE_X_X=" << MPI_COMMAND_DUKE_X_X << "\"" << endl;
+      oss << "MPI_BINARY_DIR_DUKE_X_X=" << MPI_BINARY_DIR_DUKE_X_X << "\"" << endl;
+      oss << "MPI_OPTIONS_DUKE_X_CRAY=" << MPI_OPTIONS_DUKE_X_CRAY << "\"" << endl;
+      oss << "MPI_COMMAND_DUKE_X_CRAY=" << MPI_COMMAND_DUKE_X_CRAY << "\"" << endl;
+      oss << "MPI_BINARY_DIR_DUKE_X_CRAY=" << MPI_BINARY_DIR_DUKE_X_CRAY << "\"" << endl;
+      oss << "MPI_OPTIONS_DUKE_X_OLDCRAY=" << MPI_OPTIONS_DUKE_X_OLDCRAY << "\"" << endl;
+      oss << "MPI_COMMAND_DUKE_X_OLDCRAY=" << MPI_COMMAND_DUKE_X_OLDCRAY << "\"" << endl;
+      oss << "MPI_BINARY_DIR_DUKE_X_OLDCRAY=" << MPI_BINARY_DIR_DUKE_X_OLDCRAY << "\"" << endl;
+      oss << "MPI_OPTIONS_DUKE_X_SMB=" << MPI_OPTIONS_DUKE_X_SMB << "\"" << endl;
+      oss << "MPI_COMMAND_DUKE_X_SMB=" << MPI_COMMAND_DUKE_X_SMB << "\"" << endl;
+      oss << "MPI_BINARY_DIR_DUKE_X_SMB=" << MPI_BINARY_DIR_DUKE_X_SMB << "\"" << endl;
       //CO20201220 X STOP
       //CO20220818 JHU_ROCKFISH START
       oss << "MPI_OPTIONS_JHU_ROCKFISH=" << MPI_OPTIONS_JHU_ROCKFISH << "\"" << endl;
