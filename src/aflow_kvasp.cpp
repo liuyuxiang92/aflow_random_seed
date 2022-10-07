@@ -4008,7 +4008,6 @@ namespace KBIN {
     aus << "DDDDD  SLURM_CPUS_ON_NODE=" << XHOST.SLURM_CPUS_ON_NODE << Message(__AFLOW_FILE__,aflags) << endl;
     aus << "DDDDD  SLURM_NNODES=" << XHOST.SLURM_NNODES << Message(__AFLOW_FILE__,aflags) << endl;
     aus << "DDDDD  SLURM_NTASKS=" << XHOST.SLURM_NTASKS << Message(__AFLOW_FILE__,aflags) << endl;
-    if(XHOST.SLURM_NTASKS>1 && XHOST.CPU_Cores>XHOST.SLURM_NTASKS && kflags.KBIN_MPI_NCPUS>XHOST.SLURM_NTASKS) kflags.KBIN_MPI_NCPUS=XHOST.SLURM_NTASKS; // to avoid HT
     aus << "DDDDD  kflags.KBIN_MPI_NCPUS=" << kflags.KBIN_MPI_NCPUS << Message(__AFLOW_FILE__,aflags) << endl;
     aus << "DDDDD  XHOST.CPU_Cores=" << XHOST.CPU_Cores << Message(__AFLOW_FILE__,aflags) << endl;
     aus << "DDDDD  aflags.AFLOW_GLOBAL_NCPUS=" << aflags.AFLOW_GLOBAL_NCPUS << Message(__AFLOW_FILE__,aflags) << endl;
