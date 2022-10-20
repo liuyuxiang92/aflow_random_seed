@@ -4800,7 +4800,7 @@ namespace KBIN {
     // if(aurostd::FileEmpty(xvasp.Directory+"/CHGCAR"))   {KBIN::VASP_Error(xvasp,"EEEEE  ERROR "+function+": Empty CHGCAR");error=TRUE;}
     // if(aurostd::FileEmpty(xvasp.Directory+"/DOSCAR"))   {KBIN::VASP_Error(xvasp,"EEEEE  ERROR "+function+": Empty DOSCAR");error=TRUE;}
     if(aurostd::FileEmpty(xvasp.Directory+"/CONTCAR"))  {KBIN::VASP_Error(xvasp,"EEEEE  ERROR "+function+": Empty CONTCAR");error=TRUE;}
-    if(aurostd::FileEmpty(xvasp.Directory+"/OUTCAR"))   {KBIN::VASP_Error(xvasp,"EEEEE  ERROR "+function+": Empty OUTCAR");error=TRUE;}
+    if(aurostd::FileEmpty(xvasp.Directory+"/OUTCAR") || !aurostd::substring_present_file_FAST(xvasp.Directory+"/OUTCAR","Total CPU time used (sec)",true,true,true))   {KBIN::VASP_Error(xvasp,"EEEEE  ERROR "+function+": Empty OUTCAR");error=TRUE;} // SD20221019 - OUTCAR does not exist or is incomplete
     if(aurostd::FileEmpty(xvasp.Directory+"/INCAR"))    {KBIN::VASP_Error(xvasp,"EEEEE  ERROR "+function+": Empty INCAR");error=TRUE;}
     if(aurostd::FileEmpty(xvasp.Directory+"/vasprun.xml"))    {KBIN::VASP_Error(xvasp,"EEEEE  ERROR "+function+": Empty vasprun.xml");error=TRUE;}
     if(error) return "";
