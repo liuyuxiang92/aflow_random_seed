@@ -5204,7 +5204,10 @@ namespace KBIN {
   //NSTEPS comes from xOSZICAR (to be created)
   uint VASP_getNELM(const string& outcar){ //CO20200624
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
-    string tmp=aurostd::kvpair2string(aurostd::file2string(outcar),"NELM"," = ");
+    ifstream FileOUTCAR;
+    FileOUTCAR.open(outcar.c_str(),std::ios::in);
+    string tmp=aurostd::kvpair2string(FileOUTCAR,"NELM","=");
+    FileOUTCAR.close();
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " " << outcar << " NELM grep response=\"" << tmp << "\"" << endl;}
     int NELM=60;  //VASP default
     if(!tmp.empty() && aurostd::isfloat(tmp)){NELM=aurostd::string2utype<int>(tmp);}
@@ -5212,9 +5215,10 @@ namespace KBIN {
   }
   uint VASP_getNSTEPS(const string& oszicar){  //CO20200624
     bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_KVASP_ || XHOST.DEBUG);
-    stringstream command;
-    command << aurostd::GetCatCommand(oszicar) << " " << oszicar << " | grep ':' | tail -n 1 | cut -d ':' -f2 | awk '{print $1}'" << endl;
-    string tmp=aurostd::execute2string(command);
+    ifstream FileOSZICAR;
+    FileOSZICAR.open(oszicar.c_str(),std::ios::in);
+    string tmp=aurostd::kvpair2string(FileOSZICAR,"DAV",":",-1);
+    FileOSZICAR.close();
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " " << oszicar << " NSTEPS grep response=\"" << tmp << "\"" << endl;}
     int NSTEPS=0;  //VASP default
     if(!tmp.empty()){
