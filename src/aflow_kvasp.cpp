@@ -5198,14 +5198,13 @@ namespace KBIN {
 } // namespace KBIN
 
 namespace KBIN {
+  //SD20221026 - eliminated subshell
   //CO20210315 - reconsider rewriting these functions to eliminate subshell
   //NELM comes from xOUTCAR
   //NSTEPS comes from xOSZICAR (to be created)
   uint VASP_getNELM(const string& outcar){ //CO20200624
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
-    stringstream command;
-    command << aurostd::GetCatCommand(outcar) << " " << outcar << " | grep NELM | head -n 1 | cut -d ';' -f1 | cut -d '=' -f2 | awk '{print $1}'" << endl;
-    string tmp=aurostd::execute2string(command);
+    string tmp=aurostd::kvpair2string(aurostd::file2string(outcar),"NELM"," = ");
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " " << outcar << " NELM grep response=\"" << tmp << "\"" << endl;}
     int NELM=60;  //VASP default
     if(!tmp.empty() && aurostd::isfloat(tmp)){NELM=aurostd::string2utype<int>(tmp);}

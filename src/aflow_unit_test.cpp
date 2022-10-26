@@ -1037,7 +1037,6 @@ namespace unittest {
       xvector<int> xv = aurostd::vector2xvector(B);
       aurostd::xmatrix<int> A;
       int c, r;
-      cout << aurostd::reshape_rows(xv) << endl;
       for (const std::pair<int, int> &p : vector<std::pair<int, int>>({{4,3}, {2,6}, {3, 4}})){
         A = aurostd::reshape(xv, p.first, p.second);
         for (const int t : B) {
