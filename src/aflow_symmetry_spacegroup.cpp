@@ -47,7 +47,6 @@ using namespace std;
 namespace SYM {
   void orient(xstructure& xstr, bool update_atom_positions) {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function_name = XPID + "SYM::orient():";
     stringstream message;
     double sym_tol = xstr.sym_eps; //DX20190215 - added sym_tol 
     double tol = _ZERO_TOL_;
@@ -422,7 +421,7 @@ namespace SYM {
 
       // ==================== RHOMBOHEDRAL IN HEXAGONAL SETTING ==================== //
       if(lattice_label == 'X') {  //
-        if(LDEBUG) { cerr << function_name << " RHOMBOHEDRAL IN HEXAGONAL SETTING" << endl; }
+        if(LDEBUG) { cerr << __AFLOW_FUNC__ << " RHOMBOHEDRAL IN HEXAGONAL SETTING" << endl; }
         double angle;
         xvector<double> rotaxis;
         Screw S;
@@ -522,7 +521,7 @@ namespace SYM {
               SYM::FPOSMatch(atomic_basis_, obverse3, match_type3, lattice_basis_xmat, f2c, skew, sym_tol)) && //DX20190215 - _SYM_TOL_ to sym_tol //DX20190619 - lattice_basis_xmat and f2c as input, remove "Atom" prefix from name
             (match_type1 != match_type2 || match_type2 != match_type3 || match_type1 != match_type3)) {
           message << "PROBLEM TRANFORMING TO OBVERSE SETTING. QUITING PROGRAM [dir = " << xstr.directory << "].";
-          throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+          throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
         }
       }
       xstr.lattice = xvec2xmat(lattice_basis[0], lattice_basis[1], lattice_basis[2]);
@@ -1149,12 +1148,11 @@ namespace SYM {
 // **************************************************************************************************************************************************
 namespace SYM {
   deque<_atom> add_basis(vector<xvector<double> >& expanded_lattice_points, xmatrix<double>& L, xstructure& xstr) {
-    string function_name = XPID + "SYM::add_basis():";
     stringstream message;
     deque<_atom> out;
     if(xstr.atoms.size() == 0) {
-      message << function_name << " atoms deque is empty! [dir=" << xstr.directory << "]";
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_INPUT_MISSING_);
+      message << __AFLOW_FUNC__ << " atoms deque is empty! [dir=" << xstr.directory << "]";
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_MISSING_);
     }
     for (uint i = 0; i < expanded_lattice_points.size(); i++) {
       //cerr << "lattice point: " << expanded_lattice_points[i] << endl; //cartesian
@@ -1895,7 +1893,6 @@ namespace SYM {
       vector<xmatrix<double> >& candidate_lattice_vectors, vector<char>& candidate_lattice_chars, double& tol) { //DX20190215 - added tol
     // CUBIC lattice vector criteria: Parallel to 3 equivalent fourfold axes.
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function_name = XPID + "SYM::findCubicLattice():";
 
     xmatrix<double> CL;
     xvector<double> conv_lattice_vec_a;
@@ -1910,7 +1907,7 @@ namespace SYM {
 
     // Check if any vectors are the same
     if(latticeVectorsSame(conven[0], conven[1], conven[2], tol)) { //DX20190215 - _SYM_TOL_ to tol
-      if(LDEBUG) { cerr << function_name << " Two or more of conventional basis vectors are the same..." << endl; }
+      if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Two or more of conventional basis vectors are the same..." << endl; }
       return false;
     }
 
@@ -1918,12 +1915,12 @@ namespace SYM {
     if(aurostd::abs(aurostd::modulus(conven[0]) - aurostd::modulus(conven[1])) > tol && //DX20190215 - _SYM_TOL_ to tol
         aurostd::abs(aurostd::modulus(conven[0]) - aurostd::modulus(conven[2])) > tol && //DX20190215 - _SYM_TOL_ to tol
         aurostd::abs(aurostd::modulus(conven[2]) - aurostd::modulus(conven[1])) > tol) { //DX20190215 - _SYM_TOL_ to tol
-      if(LDEBUG) { cerr << function_name << " Lattice vectors are not the same length..." << endl; }
+      if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Lattice vectors are not the same length..." << endl; }
       return false;
     }
 
     if(conven.size() != 3) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"There should be three and only three 4-fold axes",_INDEX_BOUNDS_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"There should be three and only three 4-fold axes",_INDEX_BOUNDS_);
     }
 
     // ==== Orient into positive quadrant ==== //
@@ -1968,7 +1965,6 @@ namespace SYM {
     //       lattice vector c        : Parallel to 6-fold axis
     //       lattice vectors a, b    : Parallel to 2-fold axes (angle=120 degrees); a=b
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function_name = XPID + "SYM::findTrigonalLattice():";
 
     xmatrix<double> CL;
     xvector<double> conv_lattice_vec_a;
@@ -1996,14 +1992,14 @@ namespace SYM {
     }
 
     if(six_or_threefold_lattice_vectors.size() == 0) {
-      if(LDEBUG) { cerr << function_name << " c-axis not found. Tolerances may be too tight." << endl; }
+      if(LDEBUG) { cerr << __AFLOW_FUNC__ << " c-axis not found. Tolerances may be too tight." << endl; }
       return false;
     }
 
     conv_lattice_vec_c = six_or_threefold_lattice_vectors[0];
 
     if(conv_lattice_vec_c == null) {
-      if(LDEBUG) { cerr << function_name << " c-axis is null." << endl; }
+      if(LDEBUG) { cerr << __AFLOW_FUNC__ << " c-axis is null." << endl; }
       return false;
     }
     if(conv_lattice_vec_c[2] < 0.0) {
@@ -2048,7 +2044,7 @@ namespace SYM {
     abc_vecs.push_back(conv_lattice_vec_b);
     abc_vecs.push_back(conv_lattice_vec_c);
     if(anyNullVectors(abc_vecs, tol)) { //DX20190215 - _SYM_TOL_ to tol
-      if(LDEBUG) { cerr << function_name << " One or more of the lattice vectors is null" << endl; }
+      if(LDEBUG) { cerr << __AFLOW_FUNC__ << " One or more of the lattice vectors is null" << endl; }
       return false;
     }
 
@@ -2076,7 +2072,6 @@ namespace SYM {
     //        lattice vector c        : Parallel to 4-fold axis
     //        lattice vectors a, b    : Parallel to 2-fold axes (angle=90 degrees); a=b
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function_name = XPID + "SYM::findTetragonalLattice():";
 
     xmatrix<double> CL;
     xvector<double> conv_lattice_vec_a;
@@ -2097,7 +2092,7 @@ namespace SYM {
     for (uint f = 0; f < fourfold_lattice_vectors.size(); f++) {
       conv_lattice_vec_c = fourfold_lattice_vectors[f];
       if(conv_lattice_vec_c == null) {
-        if(LDEBUG) { cerr << function_name << " c-axis is null." << endl; }
+        if(LDEBUG) { cerr << __AFLOW_FUNC__ << " c-axis is null." << endl; }
         return false;
       }
 
@@ -2167,7 +2162,7 @@ namespace SYM {
         if(f != fourfold_lattice_vectors.size() - 1) {
           continue;
         } else {
-          if(LDEBUG) { cerr << function_name << " One or more of the lattice vectors is null" << endl; }
+          if(LDEBUG) { cerr << __AFLOW_FUNC__ << " One or more of the lattice vectors is null" << endl; }
           return false;
         }
       }
@@ -2211,7 +2206,6 @@ namespace SYM {
     // num_reinitials : variable to scan through combinations of vectors in monoclinic plane (e,f, or g: shortest vectors in plane)
     // IT            : scan through unique axis b or c
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function_name = XPID + "SYM::findMonoclinicLattice():";
 
     xmatrix<double> CL;
     xvector<double> conv_lattice_vec_a;
@@ -2234,31 +2228,31 @@ namespace SYM {
           possible_h_lats.push_back(mirror_lattice_vectors[1]);
         }
         if(LDEBUG) {
-          cerr << function_name << " Two choices for unique axis. " << endl;
-          cerr << function_name << " choice 1: " << possible_h_lats[0] << " (mod=" << aurostd::modulus(possible_h_lats[0]) << ")" << endl;
-          cerr << function_name << " choice 2: " << possible_h_lats[1] << " (mod=" << aurostd::modulus(possible_h_lats[1]) << ")" << endl;
+          cerr << __AFLOW_FUNC__ << " Two choices for unique axis. " << endl;
+          cerr << __AFLOW_FUNC__ << " choice 1: " << possible_h_lats[0] << " (mod=" << aurostd::modulus(possible_h_lats[0]) << ")" << endl;
+          cerr << __AFLOW_FUNC__ << " choice 2: " << possible_h_lats[1] << " (mod=" << aurostd::modulus(possible_h_lats[1]) << ")" << endl;
         }
       } 
       else {
         possible_h_lats.push_back(mirror_lattice_vectors[0]);
         if(LDEBUG) {
-          cerr << function_name << " One choice for unique axis. " << endl;
-          cerr << function_name << " choice 1: " << possible_h_lats[0] << " (mod=" << aurostd::modulus(possible_h_lats[0]) << ")" << endl;
+          cerr << __AFLOW_FUNC__ << " One choice for unique axis. " << endl;
+          cerr << __AFLOW_FUNC__ << " choice 1: " << possible_h_lats[0] << " (mod=" << aurostd::modulus(possible_h_lats[0]) << ")" << endl;
         }
       }
     } else if(twofold_lattice_vectors.size() > 0) {
       possible_h_lats.push_back(twofold_lattice_vectors[0]);
       if(LDEBUG) {
-        cerr << function_name << " One choice for unique axis. " << endl;
-        cerr << function_name << " choice 1: " << possible_h_lats[0] << " (mod=" << aurostd::modulus(possible_h_lats[0]) << ")" << endl;
+        cerr << __AFLOW_FUNC__ << " One choice for unique axis. " << endl;
+        cerr << __AFLOW_FUNC__ << " choice 1: " << possible_h_lats[0] << " (mod=" << aurostd::modulus(possible_h_lats[0]) << ")" << endl;
       }
     }
     if(possible_h_lats.size() == 0) {
-      if(LDEBUG) { cerr << function_name << " No unique axis found" << endl; }
+      if(LDEBUG) { cerr << __AFLOW_FUNC__ << " No unique axis found" << endl; }
       return false;
     }
     if(possible_h_lats[0] == null) {
-      if(LDEBUG) { cerr << function_name << " Unique axis is null" << endl; }
+      if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Unique axis is null" << endl; }
       return false;
     }
     // ===== Determine direction of unique axis ===== //
@@ -2278,7 +2272,7 @@ namespace SYM {
       vector<vector<int> > index;  //DX20180110 - scoping issue; place here, not outside for loop
       vector<double> total_mod;  //DX20180110 - scoping issue; place here, not outside for loop
       if(LDEBUG) {
-        cerr << function_name << " Testing choice " << h+1  << ": " << possible_h_lats[h] << endl;
+        cerr << __AFLOW_FUNC__ << " Testing choice " << h+1  << ": " << possible_h_lats[h] << endl;
       }
       h_lat = possible_h_lats[h];
       possible_efg_vectors = find_vectors_inplane(big_expanded, h_lat, tol); //DX20190215 - added tol
@@ -2390,10 +2384,10 @@ namespace SYM {
       }
       // === Check if 2 or more vectors were chosen to comprise the monoclinic plane === //
       if(index.size() <= 1 && h == possible_h_lats.size() - 1) {
-        if(LDEBUG) { cerr << function_name << " No lattice vectors found in the monoclinic plane" << endl; }
+        if(LDEBUG) { cerr << __AFLOW_FUNC__ << " No lattice vectors found in the monoclinic plane" << endl; }
         return false;
       } else if(index.size() <= 1 && h < possible_h_lats.size() - 1) {
-        if(LDEBUG) { cerr << function_name << " Not enought lattice vectors found in monoclinic plane. Try the other unique axis." << endl; }
+        if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Not enought lattice vectors found in monoclinic plane. Try the other unique axis." << endl; }
         possible_efg_vectors.clear();
         index.clear();
         total_mod.clear();
@@ -2414,16 +2408,16 @@ namespace SYM {
       double mod_g = aurostd::modulus(tranvec_g);
 
       if(LDEBUG) { 
-        cerr << function_name << " 1st shortest vector in monoclinic plane (e): " << tranvec_e << " (mod=" << mod_e << ")." << endl;
-        cerr << function_name << " 2nd shortest vector in monoclinic plane (f): " << tranvec_f << " (mod=" << mod_f << ")." << endl;
-        cerr << function_name << " 3rd shortest vector in monoclinic plane (g): " << tranvec_g << " (mod=" << mod_g << ")." << endl;
-        cerr << function_name << " Angle between e and f: " << aurostd::angle(tranvec_e,tranvec_f)*180.0/Pi_r << endl;
-        cerr << function_name << " Angle between f and g: " << aurostd::angle(tranvec_f,tranvec_g)*180.0/Pi_r << endl;
-        cerr << function_name << " Angle between g and e: " << aurostd::angle(tranvec_g,tranvec_e)*180.0/Pi_r << endl;
+        cerr << __AFLOW_FUNC__ << " 1st shortest vector in monoclinic plane (e): " << tranvec_e << " (mod=" << mod_e << ")." << endl;
+        cerr << __AFLOW_FUNC__ << " 2nd shortest vector in monoclinic plane (f): " << tranvec_f << " (mod=" << mod_f << ")." << endl;
+        cerr << __AFLOW_FUNC__ << " 3rd shortest vector in monoclinic plane (g): " << tranvec_g << " (mod=" << mod_g << ")." << endl;
+        cerr << __AFLOW_FUNC__ << " Angle between e and f: " << aurostd::angle(tranvec_e,tranvec_f)*180.0/Pi_r << endl;
+        cerr << __AFLOW_FUNC__ << " Angle between f and g: " << aurostd::angle(tranvec_f,tranvec_g)*180.0/Pi_r << endl;
+        cerr << __AFLOW_FUNC__ << " Angle between g and e: " << aurostd::angle(tranvec_g,tranvec_e)*180.0/Pi_r << endl;
       }
 
       if(mod_e <= _ZERO_TOL_ || mod_f <= _ZERO_TOL_ || mod_g <= _ZERO_TOL_) {
-        if(LDEBUG) { cerr << function_name << " One or more lattice vectors in the monoclinic plane is null" << endl; }
+        if(LDEBUG) { cerr << __AFLOW_FUNC__ << " One or more lattice vectors in the monoclinic plane is null" << endl; }
         return false;
       }
 
@@ -2539,7 +2533,6 @@ namespace SYM {
     // ORTHORHOMBIC lattice vector criteria:
     //        lattice vectors a,b,c   : Parallel to 2-fold axis (or two 2-fold and one mirror)
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function_name = XPID + "SYM::findOrthorhombicLattice():";
 
     xmatrix<double> CL;
     vector<xvector<double> > conven;
@@ -2563,12 +2556,12 @@ namespace SYM {
           SYM::checkAngle(conven[1], conven[2], (Pi_r / 2.0), tol)) { //DX20190215 - _SYM_TOL_ to tol
         //print(conven);
         if(latticeVectorsSame(conven[0], conven[1], conven[2], tol)) { //DX20190215 - _SYM_TOL_ to tol
-          if(LDEBUG) { cerr << function_name << " Two or more of conventional basis vectors are the same..." << endl; }
+          if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Two or more of conventional basis vectors are the same..." << endl; }
           conven.clear();
         } else if(SYM::checkAngle(conven[0], conven[1], Pi_r, tol) && //DX20190215 - _SYM_TOL_ to tol
             SYM::checkAngle(conven[0], conven[2], Pi_r, tol) && //DX20190215 - _SYM_TOL_ to tol
             SYM::checkAngle(conven[1], conven[2], Pi_r, tol)) { //DX20190215 - _SYM_TOL_ to tol
-          if(LDEBUG) { cerr << function_name << " Two or more of conventional basis vectors are the same..." << endl; }
+          if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Two or more of conventional basis vectors are the same..." << endl; }
           conven.clear();
         } else {
           break;
@@ -2579,7 +2572,7 @@ namespace SYM {
       combiset = AllCombination42(3, totalcount, combiset);
     }
     if(conven.size() == 0) {
-      if(LDEBUG) { cerr << function_name << " No conventional basis vectors found...." << endl; }
+      if(LDEBUG) { cerr << __AFLOW_FUNC__ << " No conventional basis vectors found...." << endl; }
       return false;
     }
 
@@ -2618,7 +2611,6 @@ namespace SYM {
     //        lattice vector c       : Parallel to 6- or 3-fold axis
     //        lattice vectors a,b    : Parallel to 2-fold axes; Angle ab = 120 degrees
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function_name = XPID + "SYM::findRhombohedralLattice():";
 
     xmatrix<double> CL;
     xvector<double> conv_lattice_vec_a;
@@ -2645,13 +2637,13 @@ namespace SYM {
       }
     }
     if(six_or_threefold_lattice_vectors.size() == 0) {
-      if(LDEBUG) { cerr << function_name << " No 3- or 6-fold axis found." << endl; }
+      if(LDEBUG) { cerr << __AFLOW_FUNC__ << " No 3- or 6-fold axis found." << endl; }
       return false;
     }
 
     conv_lattice_vec_c = six_or_threefold_lattice_vectors[0];
     if(conv_lattice_vec_c == null) {
-      if(LDEBUG) { cerr << function_name << " No 3- or 6-fold axis found." << endl; }
+      if(LDEBUG) { cerr << __AFLOW_FUNC__ << " No 3- or 6-fold axis found." << endl; }
       return false;
     }
 
@@ -2687,7 +2679,7 @@ namespace SYM {
     abc_vecs.push_back(conv_lattice_vec_b);
     abc_vecs.push_back(conv_lattice_vec_c);
     if(anyNullVectors(abc_vecs, tol)) { //DX20190215 - _SYM_TOL_ to tol
-      if(LDEBUG) { cerr << function_name << " One or more of the lattice vectors is null." << endl; }
+      if(LDEBUG) { cerr << __AFLOW_FUNC__ << " One or more of the lattice vectors is null." << endl; }
       return false;
     }
 
@@ -2718,8 +2710,7 @@ namespace SYM {
     // help determine the length of and angles between the rhombohedral lattice vectors
 
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function_name = XPID + "SYM::findRhombohedralSetting():";
-    if(LDEBUG) { cerr << function_name << " Finding rhombohedral setting of structure ..." << endl; }
+    if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Finding rhombohedral setting of structure ..." << endl; }
 
     xmatrix<double> CL;
     xvector<double> conv_lattice_vec_a;
@@ -2740,14 +2731,14 @@ namespace SYM {
 
     double alpha_prime = std::acos(((2.0*mod_hex_c*mod_hex_c) - (3.0*mod_hex_a*mod_hex_a))/(2.0*(mod_hex_c*mod_hex_c + 3.0*mod_hex_a*mod_hex_a)));
 
-    if(LDEBUG) { cerr << function_name << " Modulus of rhombohedral lattice vectors (a prime) is " << mod_aprime << "." << endl; }
-    if(LDEBUG) { cerr << function_name << " Angle between all rhombohedral lattice vectors (alpha prime) is " << alpha_prime << "." << endl; }
+    if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Modulus of rhombohedral lattice vectors (a prime) is " << mod_aprime << "." << endl; }
+    if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Angle between all rhombohedral lattice vectors (alpha prime) is " << alpha_prime << "." << endl; }
 
     // find lattice vectors that are of size mod_aprime
     vector<xvector<double> > candidate_rhl_setting_vectors;
     for (uint i = 0; i < big_expanded.size(); i++) {
       if(aurostd::abs(aurostd::modulus(big_expanded[i]) - mod_aprime) < tol){ //DX20190215 - _SYM_TOL_ to tol
-        if(LDEBUG) { cerr << function_name << " Found candidate vector: " << big_expanded[i]  << "." << endl; }
+        if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Found candidate vector: " << big_expanded[i]  << "." << endl; }
         candidate_rhl_setting_vectors.push_back(big_expanded[i]);
       }
     }
@@ -2918,7 +2909,6 @@ namespace SYM {
 namespace SYM {
   symfolder check_ccell(xstructure& xstr, SymmetryInformationITC& ITC_sym_info) {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function_name = XPID + "SYM::check_ccell():";
 
     symfolder SOps;
     xstructure xstr_CCell = xstr;
@@ -3148,7 +3138,7 @@ namespace SYM {
         }
 
         if(ident_trans == 0) {
-          if(LDEBUG) { cerr << function_name << " ERROR: Could not find identity." << endl; }
+          if(LDEBUG) { cerr << __AFLOW_FUNC__ << " ERROR: Could not find identity." << endl; }
           SOps.latticesystem = "REDO";
           SOps.commensurate = false;
           return SOps;
@@ -3175,7 +3165,7 @@ namespace SYM {
 
       // === If not found, change tolerances and redo symmetry search (otherwise, segmentation fault) === //
       if(pointgroup_crystalsystem[0] == "REDO") {
-        if(LDEBUG) { cerr << function_name << " WARNING: Point group mapping failed (number of symmetry elements does not match with a given point group) [dir=" << xstr.directory << "]." << endl; }
+        if(LDEBUG) { cerr << __AFLOW_FUNC__ << " WARNING: Point group mapping failed (number of symmetry elements does not match with a given point group) [dir=" << xstr.directory << "]." << endl; }
         SOps.latticesystem = "REDO";
         SOps.commensurate = false;
         return SOps;
@@ -3220,7 +3210,7 @@ namespace SYM {
     if(centeringops.size() != centeringgroups) {
       // === If not restart from the beginning, changing the tolerance === //
       if(LDEBUG) { 
-        cerr << function_name << " WARNING: Centering operations incommensurate... [dir=" << xstr.directory << "]." << endl;
+        cerr << __AFLOW_FUNC__ << " WARNING: Centering operations incommensurate... [dir=" << xstr.directory << "]." << endl;
       }
       SOps.latticesystem = "REDO";
       SOps.commensurate = false;
@@ -3405,10 +3395,9 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& setting) {
 uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int& setting, bool& no_scan) //DX20180806 - added setting
 { //CO20200106 - patching for auto-indenting
   bool LDEBUG = (FALSE || XHOST.DEBUG);
-  string function_name = XPID + "xstructure::SpaceGroup_ITC():";
   stringstream message;
   if(use_tol < _ZERO_TOL_) {
-    cerr << function_name << " ERROR: Tolerance cannot be zero (i.e. less than 1e-10) [dir=" << (*this).directory << "]." << endl;
+    cerr << __AFLOW_FUNC__ << " ERROR: Tolerance cannot be zero (i.e. less than 1e-10) [dir=" << (*this).directory << "]." << endl;
     return 0;
   }
 
@@ -3418,7 +3407,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
   }
   min_dist = (*this).dist_nn_min;
   if(use_tol > min_dist) {
-    cerr << function_name << " ERROR: The tolerance cannot be larger than the minimum interatomic distance (" << min_dist << " Angstroms). [dir= " << (*this).directory << "]" << endl;
+    cerr << __AFLOW_FUNC__ << " ERROR: The tolerance cannot be larger than the minimum interatomic distance (" << min_dist << " Angstroms). [dir= " << (*this).directory << "]" << endl;
     return 0;
   }
 
@@ -3455,7 +3444,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
     }
   }
   if(num_species_label != xstr.atoms.size() && num_species_label != 0) {
-    cerr << function_name << " POSCAR ERROR (Some atoms labeled, others are not ... please label all atoms) [dir= " << (*this).directory << "]." << endl;
+    cerr << __AFLOW_FUNC__ << " POSCAR ERROR (Some atoms labeled, others are not ... please label all atoms) [dir= " << (*this).directory << "]." << endl;
     return 0;
   }
   // If iatoms output, assign fake names (useful for wyccar output)
@@ -3660,7 +3649,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
       }
     }
     if(LDEBUG) {
-      cerr << function_name << " Conventional cell: " << endl;
+      cerr << __AFLOW_FUNC__ << " Conventional cell: " << endl;
       cerr << CCell << endl;
     }
 
@@ -3703,7 +3692,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
       sg_search = SYM::PointGroup_SpaceGroup(pointgroup, 'R'); //DX20180807
     } //DX20180807
     if(LDEBUG) {
-      cerr << function_name << " Possible space groups based on point group (PG=" << pointgroup << "): ";
+      cerr << __AFLOW_FUNC__ << " Possible space groups based on point group (PG=" << pointgroup << "): ";
       for(uint s=0;s<sg_search.size();s++){
         cerr << sg_search[s] << " "; 
       }
@@ -3787,7 +3776,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
     }
     //cerr << "FCG: " << endl;
     //print(FCG);
-    //throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
+    //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
 
     stringstream axis_cell;
     axis_cell.str(std::string());
@@ -3807,7 +3796,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
       if(aurostd::WithinList(sg_search, ITC_sym_info.sgindex[j])) { //DX20210422 - SYM::invec() -> aurostd::WithinList()
         //DEBUGGER:
         if(LDEBUG) {
-          cerr << function_name << " Checking generators for space group: " << ITC_sym_info.sgindex[j] << " (with cell choice = " << axis_cell.str() << ")." <<  endl;
+          cerr << __AFLOW_FUNC__ << " Checking generators for space group: " << ITC_sym_info.sgindex[j] << " (with cell choice = " << axis_cell.str() << ")." <<  endl;
         }
         //cerr << "////////////////////////////////////////" << endl;
 
@@ -3920,7 +3909,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
         //cerr << "ITC_sym_info.generators[j].size()*(centeringgroups): " << ITC_sym_info.generators[j].size()*(centeringgroups) << endl;
         if(match_count == ITC_sym_info.generators[j].size() * (centeringgroups)) {
           if(LDEBUG) {
-            cerr << function_name << " Generator reduction matches for space group: " << ITC_sym_info.sgindex[j] << endl;
+            cerr << __AFLOW_FUNC__ << " Generator reduction matches for space group: " << ITC_sym_info.sgindex[j] << endl;
           }
           //cerr << "GENERATOR REDUCTION MATCH: SG" <<  ITC_sym_info.sgindex[j] << endl;
           //for(uint ix=0;ix<CG.size();ix++){
@@ -3954,7 +3943,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
             reduction_by_generator_set.push_back(j);
             if(SYM::solve_overdetermined_system(LHS, RHS, OriginShift, CCell.lattice, CCell.dist_nn_min, CCell.sym_eps)) { //DX20190215 - added sym_eps
               if(LDEBUG) {
-                cerr << function_name << " Generators and origin shift of space group #" << ITC_sym_info.sgindex[j] << " matched to ITC. Testing Wyckoff positions [dir=" << xstr.directory << "]." << endl;
+                cerr << __AFLOW_FUNC__ << " Generators and origin shift of space group #" << ITC_sym_info.sgindex[j] << " matched to ITC. Testing Wyckoff positions [dir=" << xstr.directory << "]." << endl;
               }
 
               //cerr << "Space Group " << ITC_sym_info.sgindex[j] << endl;
@@ -3972,7 +3961,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
             }
             else {
               if(LDEBUG) {
-                cerr << function_name << " Generators and origin shift of space group #" << ITC_sym_info.sgindex[j] << " COULD NOT be matched to ITC [dir=" << xstr.directory << "]." << endl;
+                cerr << __AFLOW_FUNC__ << " Generators and origin shift of space group #" << ITC_sym_info.sgindex[j] << " COULD NOT be matched to ITC [dir=" << xstr.directory << "]." << endl;
               }
             }
             //DX20180613 - do not break loop in case we need to check other generators - if(foundspacegroup == true) {
@@ -4012,7 +4001,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
               axis_cell.str(std::string());
               //DX20180806 [OBSOLETE] axis_cell << CCell.lattice_label_ITC << cell_choice;
               axis_cell << cell_choice; //DX20180806 - use setting
-              if(LDEBUG) { cerr << function_name << " Lattice type (unique axis if specified) and cell choice  : " << axis_cell.str() << endl; }
+              if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Lattice type (unique axis if specified) and cell choice  : " << axis_cell.str() << endl; }
               //DX20190215 [OBSOLETE] SYM::initsgs(axis_cell.str());
               ITC_sym_info.initsgs(axis_cell.str()); //DX20190215
               //DX20190215 [OBSOLETE]extern vector<string> gl_sgs;
@@ -4024,7 +4013,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
               wyckoffsymbols = SYM::get_symmetry_symbols(spacegroupstring);
               //cerr << "WYCKOFFSYMBOLS: " << endl;
               //print(wyckoffsymbols);
-              //throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Throw for debugging purposes.",_GENERIC_ERROR_);
+              //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Throw for debugging purposes.",_GENERIC_ERROR_);
               //xb();
 
               // ========== Match equivalent atoms to Wyckoff positions consistent with ITC ========== //
@@ -4059,7 +4048,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
                   // === If not the original origin shift trial === //
                   if(possible_shifts.size() > 0) {
                     if(LDEBUG) {
-                      cerr << function_name << " Exploring possible shifts to find minimum enumerated Wyckoff set. Testing shift "
+                      cerr << __AFLOW_FUNC__ << " Exploring possible shifts to find minimum enumerated Wyckoff set. Testing shift "
                         << origin_shift_index << " (" << origin_shift_index+1 << " of " << possible_shifts.size() << "): "
                         << possible_shifts[origin_shift_index] << "." << endl;
                     }
@@ -4079,7 +4068,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
                 } 
                 else {
                   if(LDEBUG) {
-                    cerr << function_name << " Tested (" << possible_shifts.size() << ") possible origin choices. Finding minimum enumerated Wyckoff letters from valid shifts." << endl;
+                    cerr << __AFLOW_FUNC__ << " Tested (" << possible_shifts.size() << ") possible origin choices. Finding minimum enumerated Wyckoff letters from valid shifts." << endl;
                   }
                   //If all possible origin shifts scanned, pick the one with the minimum sum of enumerated Wyckoff letters
                   int min_wyckoff_config = 0;
@@ -4165,7 +4154,7 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
                   // ===== If we do not have the minimum enumerated Wyckoff letter set, check possible origin shifts ===== //
                   if(sum_enumerated_found_letters > minimum_scheme_sum) {
                     if(LDEBUG) {
-                      cerr << function_name << " Enumerated Wyckoff letters is not minimized; check origin shifts." << endl;
+                      cerr << __AFLOW_FUNC__ << " Enumerated Wyckoff letters is not minimized; check origin shifts." << endl;
                     }
                     possible_shifts = SYM::get_possible_origin_shifts(spacegroupstring, min_multiplicity, min_site_sym);
                   }
@@ -4195,10 +4184,10 @@ uint xstructure::SpaceGroup_ITC(double& use_tol, const int& manual_it, const int
   }
   if(foundspacegroup == false) {
     message << "Failed to find WYCKOFF POSITIONS, ORIGIN SHIFT, or inconsistent number of GENERATORS [dir=" << (*this).directory << "].";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
   }
 
-  if(LDEBUG) { cerr << function_name << " Tolerance used to obtain this space group: " << CCell.sym_eps << " [dir=" << xstr.directory << "]." << endl; } //DX20190215 - _SYM_TOL_ to CCell.sym_eps
+  if(LDEBUG) { cerr << __AFLOW_FUNC__ << " Tolerance used to obtain this space group: " << CCell.sym_eps << " [dir=" << xstr.directory << "]." << endl; } //DX20190215 - _SYM_TOL_ to CCell.sym_eps
   if(CCell.sym_eps != use_tol) { //DX20190215 - _SYM_TOL_ to CCell.sym_eps
     //cerr << "TOL: " << CCell.sym_eps << endl; //DX20190215 - _SYM_TOL to CCell.sym_eps
     use_tol = CCell.sym_eps; //DX20190215 - _SYM_TOL to CCell.sym_eps

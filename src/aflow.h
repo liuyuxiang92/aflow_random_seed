@@ -589,7 +589,14 @@ inline std::string aflowFunc(const std::string& pretty_func, const std::string& 
   return XPID + pretty_func.substr(begin, end - begin) + func + "():";
 }
 
+// SD+HE20220914
+// Get filename and line number
+inline std::string aflowFile(const std::string &file_name, const size_t line_number ){
+  return file_name + ":" + std::to_string(line_number);
+}
+
 #define __AFLOW_FUNC__ aflowFunc(__PRETTY_FUNCTION__, __func__)
+#define __AFLOW_FILE__ aflowFile(__FILE__, __LINE__)
 
 //DX20180131 - add symmetry definitions - START
 // symmetry 
@@ -3214,9 +3221,9 @@ namespace KBIN {
   double OUTCAR2VASPVersionDouble(const string& outcar);  //CO20210315
   string VASPVersionString2Number(const string& vasp_version);  //CO20210315
   double VASPVersionString2Double(const string& vasp_version);  //CO20210315
-  string getVASPVersion(const string& binfile,const string& mpi_command="");  //ME20190219
-  string getVASPVersionNumber(const string& binfile,const string& mpi_command="");  //CO20200610
-  double getVASPVersionDouble(const string& binfile,const string& mpi_command="");  //CO20200610
+  string getVASPVersion(const string& binfile);  //ME20190219
+  string getVASPVersionNumber(const string& binfile);  //CO20200610
+  double getVASPVersionDouble(const string& binfile);  //CO20200610
 }
 
 // ----------------------------------------------------------------------------
@@ -3238,7 +3245,7 @@ namespace KBIN {
   bool VASP_Produce_POSCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Produce_POSCAR(_xvasp& xvasp);
   bool VASP_Modify_POSCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_vflags& vflags);
-  void convertPOSCARFormat(_xvasp&, const _aflags& aflags, const _kflags&);  //ME20190220 //CO20210713 - aflags
+  void convertPOSCARFormat(_xvasp&, const _kflags&);  //ME20190220 //CO20210713 - aflags //SD20220923 - updated for vasp6.3
   bool VASP_Convert_Unit_Cell(_xvasp&, _vflags&, _aflags&, ofstream&, ostringstream&); //ME20181216
   bool VASP_Reread_POSCAR(_xvasp& xvasp); //CO20210315
   bool VASP_Reread_POSCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);
