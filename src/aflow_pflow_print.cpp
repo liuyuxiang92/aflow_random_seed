@@ -3645,8 +3645,22 @@ namespace pflow {
         ss_output << "WYCCAR" << endl;
         // ---------------------------------------------------------------------------
         // expanded form of WYCCAR (i.e., poscar, not just the wyccar) //DX20210708
+        xstructure str_expanded;
+        str_expanded.title = str_sg.title; // transfer title over
+        str_expanded.sym_eps = str_sg.sym_eps; // transfer symmetry eps over
+        // ---------------------------------------------------------------------------
+        // add representative atoms only //DX20220921
+        _atom atom_tmp;
+        for(uint i=0;i<str_sg.wyckoff_sites_ITC.size();i++){
+          atom_tmp.fpos = str_sg.wyckoff_sites_ITC[i].coord;
+          atom_tmp.type = str_sg.wyckoff_sites_ITC[i].index;
+          atom_tmp.name = str_sg.wyckoff_sites_ITC[i].type;
+          atom_tmp.partial_occupation_flag = aurostd::isdifferent(str_sg.wyckoff_sites_ITC[i].site_occupation,1.0);
+          atom_tmp.partial_occupation_value = str_sg.wyckoff_sites_ITC[i].site_occupation;
+          str_expanded.AddAtom(atom_tmp);
+        }
         xvector<double> data = Getabc_angles(str_sg.standard_lattice_ITC,DEGREES);
-        xstructure str_expanded = WyckoffPOSITIONS(str_sg.space_group_ITC, str_sg.setting_ITC, str_sg);
+        str_expanded = WyckoffPOSITIONS(str_sg.space_group_ITC, str_sg.setting_ITC, str_expanded); //DX20220921 - changed str_sg to str_expanded in last argument
         str_expanded.lattice=str_sg.standard_lattice_ITC;
         str_expanded.ReScale(1.0);
         str_expanded.neg_scale=FALSE;
