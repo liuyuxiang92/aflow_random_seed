@@ -10894,10 +10894,10 @@ namespace chull {
     main_output_file=main_PDF_file;
     if(m_cflags.flag("CHULL::PNG_IMAGE")&&!m_cflags.flag("CHULL::LATEX_DOC")){destination=path+main_PNG_file;main_output_file=main_PNG_file;}
     string LATEX_dir = aurostd::TmpDirectoryCreate("chullLATEX");
-    if(0) chdir(LATEX_dir.c_str());
+    //[CO20221027 - suppressing warning]if(0) chdir(LATEX_dir.c_str());
     aurostd::stringstream2file(main_TEX_ss, LATEX_dir+"/"+main_TEX_file);
     if(!aurostd::FileExist(LATEX_dir+"/"+main_TEX_file)) {
-      if(0) chdir(PWD.c_str());
+      //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -10907,7 +10907,7 @@ namespace chull {
     if(!doc_only){
       aurostd::base642bin(_AFLOW_LOGO_SKINNY_BASE64_, LATEX_dir+"/"+aflow_logo_skinny_file);
       if(!aurostd::FileExist(LATEX_dir+"/"+aflow_logo_skinny_file)) {
-        if(0) chdir(PWD.c_str());
+        //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -10917,7 +10917,7 @@ namespace chull {
     if(print_aflow_logo_full) {
       aurostd::base642bin(_AFLOW_LOGO_FULL_BASE64_, LATEX_dir+"/"+aflow_logo_full_file);
       if(!aurostd::FileExist(LATEX_dir+"/"+aflow_logo_full_file)) {
-        if(0) chdir(PWD.c_str());
+        //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -10927,7 +10927,7 @@ namespace chull {
     if(print_logo_2) {
       aurostd::base642bin(_NOMAD_LOGO_BASE64_, LATEX_dir+"/"+logo_file_2);
       if(!aurostd::FileExist(LATEX_dir+"/"+logo_file_2)) {
-        if(0) chdir(PWD.c_str());
+        //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -10976,7 +10976,7 @@ namespace chull {
       pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
       aurostd::file2directory(files_2_move, path);
-      if(0) chdir(PWD.c_str());
+      //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -11017,7 +11017,7 @@ namespace chull {
         pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
         aurostd::file2directory(files_2_move, path);
-        if(0) chdir(PWD.c_str());
+        //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -11035,13 +11035,13 @@ namespace chull {
       pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     }
     if(!aurostd::file2directory(files_2_move, path)) {
-      if(0) chdir(PWD.c_str());
+      //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(LATEX_dir);
 #endif
       throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unable to move files out of temporary compilation directory");
     }
-    if(0) chdir(PWD.c_str());
+    //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
     aurostd::RemoveDirectory(LATEX_dir);
 #endif
