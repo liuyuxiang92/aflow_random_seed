@@ -498,6 +498,13 @@ namespace aurostd {
 //--------------------------------------------------------------- round
 namespace aurostd {
   double round(double x);
+  int roundDouble(double doub, int multiple, bool up);  //CO20220624 (moved from chull)
+  bool greaterEqualZero(double val);  //CO20220624 (moved from chull)
+  bool lessEqualZero(double val); //CO20220624 (moved from chull)
+  bool notPositive(double val,bool soft_cutoff,double tol);  //CO20220624 (moved from chull)
+  bool notNegative(double val,bool soft_cutoff,double tol);  //CO20220624 (moved from chull)
+  bool zeroWithinTol(double val,double tol); //CO20220624 (moved from chull)
+  bool nonZeroWithinTol(double val,double tol);  //CO20220624 (moved from chull)
 }
 
 //--------------------------------------------------------------- isequal
