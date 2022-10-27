@@ -3,6 +3,8 @@
         -- parallelized --chull --alloy (CO)
         -- fixed some logger, adding some QUIETs (CO)
         -- fixing --npmax and --np=max options (CO)
+        -- fixed RDF function (CO)
+        -- added RDF to pocc (CO)
         -- reworked reshape, shift and stack function for xvector and xmatrix (HE)
         -- fixed minimum enumerated Wyckoff search to consider different lattice vector choices (DX)
         -- fixed printing of Wyckoff POSCAR in extended crystallographic data output (DX)

@@ -1119,10 +1119,14 @@ namespace aurostd {
     return filter;
   }
 #define STDDEV_TRUNCATE_GAUSSIAN 4 //after 4 stddev's, gaussian is effectively 0
-  template<class utype> xvector<utype> gaussian_filter_xv(utype sigma) __xprototype { //CO20190419
-    int half_width=(int) (sigma * STDDEV_TRUNCATE_GAUSSIAN);
+  template<class utype> int gaussian_filter_get_window(utype sigma) __xprototype { //CO20190419
+    int half_width=(int) (sigma * (utype)STDDEV_TRUNCATE_GAUSSIAN);
     int window=2*half_width+1;
     if(window%2==0){window++;}
+    return window;
+  }
+  template<class utype> xvector<utype> gaussian_filter_xv(utype sigma) __xprototype { //CO20190419
+    int window=gaussian_filter_get_window(sigma);
     return gaussian_filter_xv<utype>(sigma,window); //if you need lrows!=1, use shift()
   }
   template<class utype> xvector<utype> gaussian_filter_xv(utype sigma,int window,int lrows) __xprototype { //CO20190419
@@ -3222,7 +3226,7 @@ namespace aurostd {
           cerr << __AFLOW_FUNC__ << " k=" << k << " j=" << j << " ind=" << ind << endl;
 #endif
           conv[k]+=signal_input[j]*response_input[ind];
-          sum_counts_full[k]++;
+          sum_counts_full[k-conv.lrows]++;  //CO20220627 - BIG BUG, need to make sure to subtract conv.lrows
         }else{ //keep k that require zero-padding (invalid indices), contains duplicates, but don't do work unless needed
           if(k_added==false){
             ind_zero_padding.push_back(k);
