@@ -1981,7 +1981,7 @@ namespace chull {
 
   void ChullPoint::setGenCoords(const xvector<double>& coord,bool formation_energy_coord) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    m_coords=coord;//aurostd::shiftlrows(m_coords,0);
+    m_coords=coord;
     m_formation_energy_coord=formation_energy_coord;
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " m_within_half_hull=" << isWithinHalfHull(m_formation_energy_coord) << endl;}  //m_formation_energy_coord===lower_hull
   }
@@ -5977,7 +5977,7 @@ namespace chull {
       rhs.push_back(m_points[decomp_phases[i]].getTruncatedReducedCoords(m_elements_present,vred));
     }
     xvector<double> coef=balanceChemicalEquation(lhs,rhs,true,ZERO_TOL);  //normalize
-    //aurostd::shiftlrows(coef,0);
+
     return coef;
   }
 
@@ -7215,7 +7215,7 @@ namespace chull {
   //[ME20190628 - moved to pflow_funcs.cpp] string ConvexHull::prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // main function
   //[ME20190628 - moved to pflow_funcs.cpp]   // creates compound_label for LaTeX and text docs, like adding $_{}$
   //[ME20190628 - moved to pflow_funcs.cpp]   // 2-D, we usually want vred=gcd_vrt true for convex points, and no_vrt elsewhere
-  //[ME20190628 - moved to pflow_funcs.cpp]  //[ME20190628 - moved to pflow_funcs.cpp]   uint precision=COEF_PRECISION;
+  //[ME20190628 - moved to pflow_funcs.cpp]   uint precision=COEF_PRECISION;
   //[ME20190628 - moved to pflow_funcs.cpp]   stringstream output;output.precision(precision);
   //[ME20190628 - moved to pflow_funcs.cpp]   if(vspecies.size()!=(uint)vcomposition.rows) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"vspecies.size() != vcomposition.rows");}
   //[ME20190628 - moved to pflow_funcs.cpp]   // special case, unary
@@ -7308,7 +7308,7 @@ namespace chull {
   //[CO20190419 - moved to aurostd_main.cpp]  // see http://tex.stackexchange.com/questions/34580/escape-character-in-latex
   //[CO20190419 - moved to aurostd_main.cpp]  // double_back_slash was needed SOMETIMES for gnuplot output, as one backslash
   //[CO20190419 - moved to aurostd_main.cpp]  // went away when writing to file, and  -- OBSOLETE NOW
-  //[CO20190419 - moved to aurostd_main.cpp]  //[CO20190419 - moved to aurostd_main.cpp]  string output;
+  //[CO20190419 - moved to aurostd_main.cpp]  string output;
   //[CO20190419 - moved to aurostd_main.cpp]  vector<char> problem_characters;
   //[CO20190419 - moved to aurostd_main.cpp]  problem_characters.push_back('&');
   //[CO20190419 - moved to aurostd_main.cpp]  problem_characters.push_back('%');
