@@ -362,7 +362,11 @@ class _XHOST {
     string sPGID,sPID,sTID;           // aflow_init.cpp  [PID=12345678]  [TID=12345678]
     bool showPGID,showPID,showTID;       // aflow_init.cpp  check if --showPID
     // machinery
-    bool QUIET,QUIET_CERR,QUIET_COUT,TEST,DEBUG,MPI;    // extra quiet SC20210617
+    bool QUIET;           //CO20220630 - can be overridden by LOGGER_WHITELIST/_BLACKLIST, modifiable within functions
+    bool QUIET_GLOBAL;    //CO20220630 - exclusively for --quiet (headless server), do not set/unset inside code (GLOBAL SILENCE)
+    bool QUIET_CERR;      //CO20220630 - silences cerr exclusively  // extra quiet SC20210617 
+    bool QUIET_COUT;      //CO20220630 - silences cout exclusively  // extra quiet SC20210617 
+    bool TEST,DEBUG,MPI;
     vector<string> LOGGER_WHITELIST;  //HE+ME20220305 - for logging
     vector<string> LOGGER_BLACKLIST;  //HE+ME20220305 - for logging
     bool GENERATE_AFLOWIN_ONLY; //CT20180719

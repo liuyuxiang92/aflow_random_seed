@@ -4639,7 +4639,7 @@ namespace AGL_functions {
           aglerror = AGL_functions::gibbsrun(AGL_data, FileMESSAGE);
           if (aglerror != 0) {
             aurostd::StringstreamClean(aus);
-            aus << _AGLSTR_WARNING_ + "Failure in re-run of GIBBS to get all pressure-temperature date to calculate Hugoniot" <<  endl;
+            aus << _AGLSTR_WARNING_ + "Failure in re-run of GIBBS to get all pressure-temperature data to calculate Hugoniot" <<  endl;
             aurostd::PrintMessageStream(FileMESSAGE,aus,XHOST.QUIET);
             return 9;
           }

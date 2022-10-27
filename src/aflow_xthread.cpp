@@ -857,6 +857,33 @@ namespace xthread {
       std::mutex&
   );
 
+  //convexHull  //ME+CO20220630
+  template void xthread::xThread::run<
+    std::function<void (
+        uint,
+        vector<string>&,
+        const aurostd::xoption&,
+        const _aflags&,
+        vector<uint>&,
+        std::ostream&
+        )>,
+    vector<string>,
+    aurostd::xoption,
+    _aflags,
+    vector<uint>,
+    std::ostream
+      >(uint,
+          std::function<void (
+            uint,
+            vector<string>&,
+            const aurostd::xoption&,
+            const _aflags&,
+            vector<uint>&,
+            std::ostream&
+            )>&,
+          vector<string>&,
+          aurostd::xoption&, _aflags&, vector<uint>&, std::ostream&);
+
   // runPredistributed --------------------------------------------------------
 
   //XTalFinderCalculator::calculateSpaceGroups
