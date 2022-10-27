@@ -4800,7 +4800,7 @@ namespace KBIN {
     // if(aurostd::FileEmpty(xvasp.Directory+"/CHGCAR"))   {KBIN::VASP_Error(xvasp,"EEEEE  ERROR "+function+": Empty CHGCAR");error=TRUE;}
     // if(aurostd::FileEmpty(xvasp.Directory+"/DOSCAR"))   {KBIN::VASP_Error(xvasp,"EEEEE  ERROR "+function+": Empty DOSCAR");error=TRUE;}
     if(aurostd::FileEmpty(xvasp.Directory+"/CONTCAR"))  {KBIN::VASP_Error(xvasp,"EEEEE  ERROR "+function+": Empty CONTCAR");error=TRUE;}
-    if(aurostd::FileEmpty(xvasp.Directory+"/OUTCAR"))   {KBIN::VASP_Error(xvasp,"EEEEE  ERROR "+function+": Empty OUTCAR");error=TRUE;}
+    if(aurostd::FileEmpty(xvasp.Directory+"/OUTCAR") || !aurostd::substring_present_file_FAST(xvasp.Directory+"/OUTCAR","Total CPU time used (sec)",true,true,true))   {KBIN::VASP_Error(xvasp,"EEEEE  ERROR "+function+": Empty OUTCAR");error=TRUE;} // SD20221019 - OUTCAR does not exist or is incomplete
     if(aurostd::FileEmpty(xvasp.Directory+"/INCAR"))    {KBIN::VASP_Error(xvasp,"EEEEE  ERROR "+function+": Empty INCAR");error=TRUE;}
     if(aurostd::FileEmpty(xvasp.Directory+"/vasprun.xml"))    {KBIN::VASP_Error(xvasp,"EEEEE  ERROR "+function+": Empty vasprun.xml");error=TRUE;}
     if(error) return "";
@@ -5198,14 +5198,16 @@ namespace KBIN {
 } // namespace KBIN
 
 namespace KBIN {
+  //SD20221026 - eliminated subshell
   //CO20210315 - reconsider rewriting these functions to eliminate subshell
   //NELM comes from xOUTCAR
   //NSTEPS comes from xOSZICAR (to be created)
   uint VASP_getNELM(const string& outcar){ //CO20200624
     bool LDEBUG=(FALSE || _DEBUG_KVASP_ || XHOST.DEBUG);
-    stringstream command;
-    command << aurostd::GetCatCommand(outcar) << " " << outcar << " | grep NELM | head -n 1 | cut -d ';' -f1 | cut -d '=' -f2 | awk '{print $1}'" << endl;
-    string tmp=aurostd::execute2string(command);
+    ifstream FileOUTCAR;
+    FileOUTCAR.open(outcar.c_str(),std::ios::in);
+    string tmp=aurostd::kvpair2string(FileOUTCAR,"NELM","=");
+    FileOUTCAR.close();
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " " << outcar << " NELM grep response=\"" << tmp << "\"" << endl;}
     int NELM=60;  //VASP default
     if(!tmp.empty() && aurostd::isfloat(tmp)){NELM=aurostd::string2utype<int>(tmp);}
@@ -5213,9 +5215,10 @@ namespace KBIN {
   }
   uint VASP_getNSTEPS(const string& oszicar){  //CO20200624
     bool LDEBUG=(FALSE || VERBOSE_MONITOR_VASP || _DEBUG_KVASP_ || XHOST.DEBUG);
-    stringstream command;
-    command << aurostd::GetCatCommand(oszicar) << " " << oszicar << " | grep ':' | tail -n 1 | cut -d ':' -f2 | awk '{print $1}'" << endl;
-    string tmp=aurostd::execute2string(command);
+    ifstream FileOSZICAR;
+    FileOSZICAR.open(oszicar.c_str(),std::ios::in);
+    string tmp=aurostd::kvpair2string(FileOSZICAR,"DAV",":",-1);
+    FileOSZICAR.close();
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " " << oszicar << " NSTEPS grep response=\"" << tmp << "\"" << endl;}
     int NSTEPS=0;  //VASP default
     if(!tmp.empty()){
