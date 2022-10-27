@@ -19,6 +19,18 @@
 #include "aflow_chull_jupyter_requirements.cpp"  //MB20190305
 #include "aflow_chull_python.cpp"  //MB20190305
 
+//[CO20220630 - OBSOLETE]// Some parts are written within the C++0x support in GCC, especially std::thread,
+//[CO20220630 - OBSOLETE]// which is implemented in gcc 4.4 and higher. For multithreads with std::thread see:
+//[CO20220630 - OBSOLETE]// http://www.justsoftwaresolutions.co.uk/threading/multithreading-in-c++0x-part-1-starting-threads.html
+//[CO20220630 - OBSOLETE]#if GCC_VERSION >= 40400
+//[CO20220630 - OBSOLETE]#define AFLOW_CHULL_MULTITHREADS_ENABLE
+//[CO20220630 - OBSOLETE]#include <thread>
+//[CO20220630 - OBSOLETE]#include <mutex>
+//[CO20220630 - OBSOLETE]static std::mutex m;
+//[CO20220630 - OBSOLETE]#else
+//[CO20220630 - OBSOLETE]#warning "The multithread parts of APL will not be included, since they need gcc 4.4 and higher (C++0x support)."
+//[CO20220630 - OBSOLETE]#endif
+
 #define _DEBUG_CHULL_ false  //CO20190116
 
 #define _AFLOW_CHULL_PRINT_LOGO_1 TRUE
@@ -86,6 +98,9 @@ namespace chull {
     ostream& oss = cout;
     ofstream FileMESSAGE;
     stringstream message;
+    
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
+    
     aurostd::xoption vpflow(_vpflow);
     string directory=getPath(vpflow,FileMESSAGE,oss);
     vpflow.flag("CHULL::PATH",true);
@@ -103,7 +118,7 @@ namespace chull {
     // START Display usage, if requested
     //////////////////////////////////////////////////////////////////////////////
 
-    string usage_usage="aflow --convex_hull=|--chull --alloy=MnPdPt[,AlCuZn,...] [chull_options] [--destination=[DIRECTORY]]";
+    string usage_usage="aflow --convex_hull=|--chull --alloy=MnPdPt[,AlCuZn,...] [--np=1] [chull_options] [--destination=[DIRECTORY]]";
     vector<string> usage_options;
     usage_options.push_back(usage_usage);
     usage_options.push_back(" ");
@@ -112,6 +127,7 @@ namespace chull {
     usage_options.push_back("GENERAL OPTIONS:");
     usage_options.push_back("--usage");
     usage_options.push_back("--print=|--p=|--output=|--o=latex|pdf|png|json|text|jupyter|jupyter2|jupyter3");
+    usage_options.push_back("--keep=tex|--keep_tex|--keeptex|--tex");
     usage_options.push_back("--keep=log|--keep_log|--keeplog|--log");
     usage_options.push_back("--keep=tex,log");
     usage_options.push_back(" ");
@@ -127,11 +143,11 @@ namespace chull {
     usage_options.push_back("ANALYSIS OPTIONS:");
     usage_options.push_back("--distance_to_hull=|--distancetohull=|--distance2hull=|--dist2hull=|--d2h=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774");
     usage_options.push_back("--stability_criterion=|--stabilitycriterion=|--stable_criterion=|--scriterion=|--sc=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774");
-    usage_options.push_back("--n+1_enthalpy_gain=|--=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=|--n+1_enthalpygain=|--n+1+energygain=|--n+1_egain=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774");
-    usage_options.push_back("--hull_formation_enthalpy=|--hull_energy=0.25,0.25");
+    usage_options.push_back("--n+1_enthalpy_gain=|--=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=|--n+1_enthalpygain=|--n+1+energygain=|--n+1_egain=|--nplus1=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774");
+    usage_options.push_back("--hull_formation_enthalpy=|--hull_enthalpy=|--hull_energy=0.25,0.25");
     usage_options.push_back("--skip_structure_comparison|--skipstructruecomparison|--skipstructcomp|--ssc");
-    usage_options.push_back("--skip_stability_criterion_analysis|--skipstabilitycriterionanalysis|--skipscriterion|--sscriterion");
-    usage_options.push_back("--skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skipnplus1|--snp1|--snpo");
+    usage_options.push_back("--skip_stability_criterion_analysis|--skipstabilitycriterionanalysis|--skip_scriterion|--skipscriterion|--sscriterion");
+    usage_options.push_back("--skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skip_nplus1|--skipnplus1|--snp1|--snpo");
     usage_options.push_back("--include_skewed_hulls|--include_skewed|--ish");
     usage_options.push_back("--include_unreliable_hulls|--include_unreliable|--iuh");
     usage_options.push_back("--include_outliers|--io");
@@ -143,13 +159,12 @@ namespace chull {
     usage_options.push_back("--image_only|--imageonly|--image");
     usage_options.push_back("--no_document|--nodocument|--no_doc|--nodoc|--full_page_image|--fullpageimage");
     usage_options.push_back("--document_only|--documentonly|--doc_only|--doconly|--doc");
-    usage_options.push_back("--keep=tex|--keep_tex|--keeptex|--tex");
     usage_options.push_back("--latex_output|--latexoutput");
     usage_options.push_back("--latex_interactive|--latexinteractive");
     usage_options.push_back("--light_contrast|--lightcontrast|--lc");
     usage_options.push_back("--large_font|--largefont|--large|--lf");
     usage_options.push_back("--png_resolution=|--pngresolution=|--pngr=300");
-    usage_options.push_back("--plot_iso_max_latent_heat|--iso_max|--isomax");
+    usage_options.push_back("--plot_iso_max_latent_heat|--plot_isomax|--iso_max|--isomax");
     usage_options.push_back(" ");
     // output usage
     if(vpflow.flag("CHULL::USAGE")) {
@@ -310,8 +325,7 @@ namespace chull {
       }
     } else {std::sort(vinputs.begin(),vinputs.end());vinputs.erase( std::unique( vinputs.begin(), vinputs.end() ), vinputs.end() );}
 
-    message << "Total convex hull inputs: " << vinputs.size();
-    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    message << "Total convex hull inputs: " << vinputs.size();pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
     //////////////////////////////////////////////////////////////////////////////
     // END Gathering hull inputs
@@ -338,501 +352,550 @@ namespace chull {
     //////////////////////////////////////////////////////////////////////////////
     // END Adding --sc=XX to CHULL::NEGLECT if --output=web
     //////////////////////////////////////////////////////////////////////////////
-
-
+    
     //////////////////////////////////////////////////////////////////////////////
     // START Looping over hull inputs and creating desired output
     //////////////////////////////////////////////////////////////////////////////
-    bool Krun=true;
-    string log_name;
-    string alloy="";
-    for(uint i=0,fl_size_i=vinputs.size();i<fl_size_i;i++) {
-      // go through each request
-      // create log specific to that request
-      velements = aurostd::getElements(vinputs[i],pp_string,FileMESSAGE,true,true,false,oss); //clean and sort, do not keep_pp  //CO20190712
-      //[CO20190712 - OBSOLETE]velements = pflow::getAlphabeticVectorString(vinputs[i], FileMESSAGE,oss);
-      if(!velements.size()){
-        message << "Invalid input (" << vinputs[i] << "), please capitalize element symbols";
-        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-        Krun=false;continue;/*return FALSE;*/
+    
+    //do NOT pass FileMESSAGE
+    //oss is attached to cout or cerr, so it doesn't matter
+
+    uint ntasks=vinputs.size();
+    bool Krun=true,KrunSingle=true;
+#ifdef AFLOW_MULTITHREADS_ENABLE
+    int ncpus=KBIN::get_NCPUS();
+    if(ncpus>1){
+      xthread::xThread xt(oss,KBIN::get_NCPUS(), 1);
+      vector<uint> vKrun(ntasks,1); //c++ doesn't like vector<bool>
+      std::function<void(uint,vector<string>&,const aurostd::xoption&,const _aflags&,vector<uint>&,ostream&)> fn = 
+        [&] (uint i,vector<string>& vinputs,const aurostd::xoption& xoptions,const _aflags& aflags,vector<uint>& vKrun,ostream& oss) {
+          vKrun[i]=(convexHull(vinputs[i],xoptions,aflags,oss,true)?1:0);
+        };
+      //create dumb oss for threaded environment
+      ofstream devnull("/dev/null");  //NULL
+      ostream oss_dn(devnull.rdbuf());
+      xt.run(ntasks,fn,vinputs,vpflow,aflags,vKrun,oss_dn);
+      char logger_type=_LOGGER_COMPLETE_;
+      for(uint i=0;i<ntasks;i++){
+        Krun=(vKrun[i]==1?true:false);
+        if(Krun){logger_type=_LOGGER_COMPLETE_;message << vinputs[i] << " completed successfully";}
+        else{logger_type=_LOGGER_ERROR_;message << vinputs[i] << " did not complete successfully, run serially";}
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, logger_type);
+        Krun=(Krun && KrunSingle);
       }
-      if(velements.size()<2){
-        message << "Trivial input (" << vinputs[i] << "), enter binaries or higher";
-        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-        Krun=false;continue;/*return FALSE;*/
+    }else{
+      for(uint i=0;i<ntasks;i++){
+        KrunSingle=convexHull(vinputs[i],vpflow,aflags,oss,(bool)i);
+        Krun=(Krun && KrunSingle);
       }
-      if(XHOST.vflag_control.flag("WWW")&&velements.size()>6){ //CO20200404 - new web flag
-        message << velements.size() << "-dimensional hulls cannot be calculated through the web portal (max=6D), please download the AFLOW binary";
-        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-        Krun=false;continue;/*return FALSE;*/
-      }
-      alloy=aurostd::joinWDelimiter(velements,"");
-      if(vpflow.flag("CHULL::LOG")) {
-        log_name = "aflow_" + aurostd::joinWDelimiter(velements,"") + "_hull.log";
-        string log_destination = directory + log_name;  // no output before banner //CO20180220
-        FileMESSAGE.open(log_destination.c_str());
-      }
-      // spit out banner for only the first request
-      message << aflow::Banner("BANNER_NORMAL");
-      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_RAW_, true);  //i //no screen, first to be logged
-      message << "Starting " << aurostd::joinWDelimiter(velements,"") << " " << pflow::arity_string(velements.size(),false,false) << " convex hull";
-      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
-      getPath(vpflow, FileMESSAGE, oss, false); //CO20180220 - directory stuff for logging
-      chull::flagCheck(vpflow, velements, FileMESSAGE, oss, i);  // spit out all flag options
-
-      ////////////////////////////////////////////////////////////////////////////
-      // START Stability criterion calculation
-      ////////////////////////////////////////////////////////////////////////////
-      //if(vpflow.flag("CHULL::STABILITY_CRITERION")) {
-      //  message << "Starting stable criterion calculation of " << vpflow.getattachedscheme("CHULL::STABILITY_CRITERION");
-      //  message << " on " << vinputs[i] << " hull";
-      //  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
-      //  vector<string> vauid;
-      //  vector<double> vscriterion;
-      //  aurostd::string2tokens(vpflow.getattachedscheme("CHULL::STABILITY_CRITERION"), vauid, ",");
-      //  if(!calculateStabilityCriterion(vpflow,velements,vauid,vscriterion,FileMESSAGE,oss)) {Krun=false;continue;/*return FALSE;*/} //HAS to be thermal hull by virtue of input
-      //  if(vpflow.flag("CHULL::SCREEN_ONLY")){
-      //    if(vpflow.flag("CHULL::TEXT_DOC")){
-      //      for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
-      //        message << vauid[ia] << ": " << chull::convertUnits(vscriterion[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_)) << endl;
-      //      }
-      //      oss << message.str();
-      //    } else if(vpflow.flag("CHULL::JSON_DOC")){
-      //      vector<string> vmes;
-      //      stringstream dummy;
-      //      for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
-      //        dummy << "\"" <<vauid[ia] << "\":" << chull::convertUnits(vscriterion[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_));
-      //        vmes.push_back(dummy.str()); dummy.str("");
-      //      }
-      //      oss << aurostd::wrapString(aurostd::joinWDelimiter(vmes,","),"{","}");
-      //    } else { //.log only, but obsolete now anyway since it defaults to json
-      //      message << "Unknown print option, only --print=text or --print=json available";
-      //      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-      //      if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
-      //      Krun=false;continue;/*return FALSE;*/
-      //    }
-      //  } else {
-      //    for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
-      //      if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {
-      //        message << vauid[ia] << " criterion = " << chull::convertUnits(vscriterion[ia], _m_) << " (meV/atom)";
-      //        if(std::signbit(vscriterion[ia])) {  //-4e-13 is still negative!
-      //          message << ", may NOT be on the hull (negative value)";
-      //          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-      //        } else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
-      //      } else {
-      //        message << vauid[ia] << " criterion = " << vscriterion[ia] << " (K)";
-      //        if(!std::signbit(vscriterion[ia])) {
-      //          message << ", may NOT be on the hull (positive value)";
-      //          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-      //        } else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
-      //      }
-      //    }
-      //  }
-      //  continue;
-      //}
-      ////////////////////////////////////////////////////////////////////////////
-      // END Stability criterion calculation
-      ////////////////////////////////////////////////////////////////////////////
-
-      ////////////////////////////////////////////////////////////////////////////
-      // START Jupyter notebook writing files
-      ////////////////////////////////////////////////////////////////////////////
-      //MB20190301: For generating Jupyter notebook
-      if(vpflow.flag("CHULL::WRITE_JUPYTER2") || vpflow.flag("CHULL::WRITE_JUPYTER3")){
-
-        string aflow_chull_jupyter_json=AFLOW_CHULL_JUPYTER_JSON;
-        string aflow_chull_jupyter_subdir = "AFLOW_CHULL_JUPYTER";
-        string jupyter_directory=directory + aflow_chull_jupyter_subdir;
-        aurostd::DirectoryMake(jupyter_directory);
-        aurostd::StringSubst(aflow_chull_jupyter_json,"AFLOW_ALLOY_INSERT_HERE",alloy);
-        string ver = (vpflow.flag("CHULL::WRITE_JUPYTER3")) ? "3" : "2";
-        string full_ver = (vpflow.flag("CHULL::WRITE_JUPYTER3")) ? "3" : "2";
-        aurostd::StringSubst(aflow_chull_jupyter_json,"<ver>",ver);
-        aurostd::StringSubst(aflow_chull_jupyter_json,"<full ver>",full_ver);	
-
-        stringstream output;
-        output << aflow_chull_jupyter_json;
-        aurostd::stringstream2file(output,jupyter_directory+'/'+"notebook.ipynb");
-
-        stringstream output2; 
-        string aflow_chull_jupyter_plotter_py=AFLOW_CHULL_JUPYTER_PLOTTER_PY;
-        output2 << aflow_chull_jupyter_plotter_py;
-        aurostd::stringstream2file(output2,jupyter_directory+'/'+"aflow_chull_plotter.py");
-
-        stringstream output3;
-        string aflow_chull_python_py=AFLOW_CHULL_PYTHON_PY;
-        output3 << aflow_chull_python_py;
-        aurostd::stringstream2file(output3,jupyter_directory+'/'+"aflow_chull.py");	
-
-        stringstream output4;
-        string aflow_chull_requirements_txt=AFLOW_CHULL_JUPYTER_REQUIREMENTS_TXT;
-        output4 << aflow_chull_requirements_txt;
-        aurostd::stringstream2file(output4,jupyter_directory+'/'+"requirements.txt");	
-
-        message << "Created " << aflow_chull_jupyter_subdir << " directory for " << vinputs[i] << " hull";
-        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
-
-        continue;
-      }     
-
-      ////////////////////////////////////////////////////////////////////////////
-      // STOP Jupyter notebook writing files
-      ////////////////////////////////////////////////////////////////////////////
-
-      //speed ups for command line options
-      if(vpflow.flag("CHULL::DIST2HULL") || vpflow.flag("CHULL::STABILITY_CRITERION") || vpflow.flag("CHULL::N+1_ENTHALPY_GAIN") || vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")) {
-        vpflow.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION",true);
-        message << "Skipping thermodynamic properties extraction";pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
-      }
-
-      //skip calculating all of the lower dimensional hulls
-      //this works if you are finding the hull_energy somewhere in the middle of the hull
-      //the edges are problematic (lower dimensional hulls)
-      //so only skip calculating these hulls if you are calculating hull_energy of the ND hull
-      if(0){  //not actually faster, lower dimensional hulls reduce number of points in ND hull, tested 7D-hull: 45 mins vs. 1 hr
-        if(vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")){
-          vector<double> _coords;
-          aurostd::string2tokens<double>(vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY"), _coords, ",");
-          if(_coords.size()==velements.size()-1||_coords.size()==velements.size()){
-            bool at_edge=false;
-            double sum=0.0;
-            for(uint ia=0;ia<(velements.size()-1)&&ia<_coords.size();ia++){
-              if(abs(_coords[ia])<ZERO_COEF_TOL||abs(1.0-_coords[ia])<ZERO_COEF_TOL){at_edge=true;}
-              sum+=_coords[ia];
-            }
-            double coord_last=1.0-sum;
-            at_edge=(at_edge || (abs(coord_last)<ZERO_COEF_TOL||abs(1.0-coord_last)<ZERO_COEF_TOL));
-            if(LDEBUG){
-              cerr << __AFLOW_FUNC__ << " coords=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(_coords,4),",") << endl;
-              cerr << __AFLOW_FUNC__ << " sum=" << sum << endl;
-              cerr << __AFLOW_FUNC__ << " coord_last=" << coord_last << endl;
-              cerr << __AFLOW_FUNC__ << " at_edge=" << at_edge << endl;
-            }
-            if(at_edge==false){
-              vpflow.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY",true);
-              message << "Calculating the highest dimensional hull ONLY";pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
-            }
-          }
-        }
-      }
-
-      ////////////////////////////////////////////////////////////////////////////
-      // START Hull initialization
-      ////////////////////////////////////////////////////////////////////////////
-
-      ConvexHull hull(vpflow,velements,FileMESSAGE,oss);
-      if(!hull.m_initialized) {
-        message << "Hull was not created successfully";
-        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-        if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
-        if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";}
-        Krun=false;continue;/*return FALSE;*/
-      }
-      uint dimension = hull.getDim();
-      if(!dimension) {
-        message << "Hull has no dimensions";
-        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-        if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
-        Krun=false;continue;/*return FALSE;*/
-      }
-      if(dimension < 2) {
-        message << "Unable to calculate hulls with dimensions less than 2";
-        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-        if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
-        Krun=false;continue;/*return FALSE;*/
-      }
-      if(dimension != velements.size()) {
-        message << "Dimension of hull does not reflect the number of elements";
-        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-        if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
-        Krun=false;continue;/*return FALSE;*/
-      }
-
-      ////////////////////////////////////////////////////////////////////////////
-      // END Hull initialization
-      ////////////////////////////////////////////////////////////////////////////
-
-      ////////////////////////////////////////////////////////////////////////////
-      // START Distance to hull calculation
-      ////////////////////////////////////////////////////////////////////////////
-      if(vpflow.flag("CHULL::DIST2HULL")) {
-        message << "Starting distance to hull calculation of " << vpflow.getattachedscheme("CHULL::DIST2HULL");
-        message << " on " << vinputs[i] << " hull";
-        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
-        vector<string> vauid;
-        aurostd::string2tokens(vpflow.getattachedscheme("CHULL::DIST2HULL"), vauid, ",");
-        vector<double> vdist2hull;
-        //NB: to anyone who is using the convex hull object
-        //outside of declaration/initialization, all functions should be wrapped
-        //in try/catch's to avoid hard exits
-        //proceed otherwise at your own risk
-        try{vdist2hull=hull.getDistancesToHull(vauid);}
-        catch(aurostd::xerror& err){
-          pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-          if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
-          if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
-          return false;
-        }
-
-        //set correct sign convention
-        //since this SHOULD be a positive distance (inside hull), we will negate for formation_energy_hull
-        //for (uint ia = 0; ia < vauid.size(); ia++) {
-        //  if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {vdist2hull[ia]=abs(vdist2hull[ia]);}
-        //}
-
-        for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
-          if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << vauid[ia] << " dist2hull = " << chull::convertUnits(vdist2hull[ia], _m_) << " (meV/atom)";}
-          else {message << vauid[ia] << " dist2hull = " << vdist2hull[ia] << " (K)";}
-          if(aurostd::zeroWithinTol(vdist2hull[ia],ZERO_TOL)) {  //do not issue a warning either way, it's simply the distance
-            message << ", may be on the hull";
-            pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
-          } else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
-          //if(0&&!std::signbit(vdist2hull[ia])) {  //do not issue a warning either way, it's simply the distance
-          //  message << ", may NOT be off the hull (positive value)";
-          //  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-          //} else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
-        }
-
-        if(vpflow.flag("CHULL::SCREEN_ONLY")){
-          if(vpflow.flag("CHULL::TEXT_DOC")){
-            for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
-              message << vauid[ia] << ": " << chull::convertUnits(vdist2hull[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_)) << endl;
-            }
-            oss << message.str();
-          } else if(vpflow.flag("CHULL::JSON_DOC")){
-            vector<string> vmes;
-            stringstream dummy;
-            for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
-              dummy << "\"" <<vauid[ia] << "\":" << chull::convertUnits(vdist2hull[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_));
-              vmes.push_back(dummy.str()); dummy.str("");
-            }
-            oss << aurostd::wrapString(aurostd::joinWDelimiter(vmes,","),"{","}");
-          } else { //.log only, but obsolete now anyway since it defaults to json
-            message << "Unknown print option, only --print=text or --print=json available";
-            pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-            if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
-            Krun=false;continue;/*return FALSE;*/
-          }
-        }
-        continue;
-      }
-      ////////////////////////////////////////////////////////////////////////////
-      // END Distance to hull calculation
-      ////////////////////////////////////////////////////////////////////////////
-
-      ////////////////////////////////////////////////////////////////////////////
-      // START Stability criterion calculation
-      ////////////////////////////////////////////////////////////////////////////
-      if(vpflow.flag("CHULL::STABILITY_CRITERION")) { //CO20210201 - chull-web SS plotter //&&(!vpflow.flag("CHULL::WEB_DOC"))
-        message << "Starting stable criterion calculation of " << vpflow.getattachedscheme("CHULL::STABILITY_CRITERION");
-        message << " on " << vinputs[i] << " hull";
-        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
-        vector<string> vauid;
-        aurostd::string2tokens(vpflow.getattachedscheme("CHULL::STABILITY_CRITERION"), vauid, ",");
-        vector<double> vscriterion;
-        //NB: to anyone who is using the convex hull object
-        //outside of declaration/initialization, all functions should be wrapped
-        //in try/catch's to avoid hard exits
-        //proceed otherwise at your own risk
-        try{vscriterion=hull.getStabilityCriterion(vauid);}
-        catch(aurostd::xerror& err){
-          pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-          if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
-          if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
-          return false;
-        }
-
-        ////set correct sign convention
-        ////since this SHOULD be a negative distance (outside hull), we will negate for formation_energy_hull
-        //for (uint ia = 0; ia < vauid.size(); ia++) {
-        //  if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {vscriterion[ia]=-vscriterion[ia];}
-        //}
-
-        for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
-          if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << vauid[ia] << " criterion = " << chull::convertUnits(vscriterion[ia], _m_) << " (meV/atom)";}
-          else {message << vauid[ia] << " criterion = " << vscriterion[ia] << " (K)";}
-          if(std::signbit(vscriterion[ia])) {
-            message << ", may NOT be on the hull (negative value)";
-            pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-          } else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
-        }
-
-        if(vpflow.flag("CHULL::SCREEN_ONLY")){
-          if(vpflow.flag("CHULL::TEXT_DOC")){
-            for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
-              message << vauid[ia] << ": " << chull::convertUnits(vscriterion[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_)) << endl;
-            }
-            oss << message.str();
-          } else if(vpflow.flag("CHULL::JSON_DOC")){
-            vector<string> vmes;
-            stringstream dummy;
-            for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
-              dummy << "\"" <<vauid[ia] << "\":" << chull::convertUnits(vscriterion[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_));
-              vmes.push_back(dummy.str()); dummy.str("");
-            }
-            oss << aurostd::wrapString(aurostd::joinWDelimiter(vmes,","),"{","}");
-          } else { //.log only, but obsolete now anyway since it defaults to json
-            message << "Unknown print option, only --print=text or --print=json available";
-            pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-            if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
-            Krun=false;continue;/*return FALSE;*/
-          }
-        }
-        continue;
-      }
-      ////////////////////////////////////////////////////////////////////////////
-      // END Stability criterion calculation
-      ////////////////////////////////////////////////////////////////////////////
-
-      ////////////////////////////////////////////////////////////////////////////
-      // START N+1 enthalpy gain calculation
-      ////////////////////////////////////////////////////////////////////////////
-      if(vpflow.flag("CHULL::N+1_ENTHALPY_GAIN")) {
-        message << "Starting N+1 enthalpy gain calculation of " << vpflow.getattachedscheme("CHULL::N+1_ENTHALPY_GAIN");
-        message << " on " << vinputs[i] << " hull";
-        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
-        vector<string> vauid;
-        aurostd::string2tokens(vpflow.getattachedscheme("CHULL::N+1_ENTHALPY_GAIN"), vauid, ",");
-        vector<double> vn1egain;
-        //NB: to anyone who is using the convex hull object
-        //outside of declaration/initialization, all functions should be wrapped
-        //in try/catch's to avoid hard exits
-        //proceed otherwise at your own risk
-        try{vn1egain=hull.getNPlus1EnthalpyGain(vauid);}
-        catch(aurostd::xerror& err){
-          pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-          if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
-          if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
-          return false;
-        }
-
-        ////set correct sign convention
-        ////since this SHOULD be a negative distance (outside hull), we will negate for formation_energy_hull
-        //for (uint ia = 0; ia < vauid.size(); ia++) {
-        //  if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {vn1egain[ia]=-vn1egain[ia];}
-        //}
-
-        for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
-          if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << vauid[ia] << " n+1_enthalpy_gain = " << chull::convertUnits(vn1egain[ia], _m_) << " (meV/atom)";}
-          else {message << vauid[ia] << " n+1_enthalpy_gain = " << vn1egain[ia] << " (K)";}
-          if(std::signbit(vn1egain[ia])) {
-            message << ", may NOT be on the hull (negative value)";
-            pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-          } else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
-        }
-
-        if(vpflow.flag("CHULL::SCREEN_ONLY")){
-          if(vpflow.flag("CHULL::TEXT_DOC")){
-            for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
-              message << vauid[ia] << ": " << chull::convertUnits(vn1egain[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_)) << endl;
-            }
-            oss << message.str();
-          } else if(vpflow.flag("CHULL::JSON_DOC")){
-            vector<string> vmes;
-            stringstream dummy;
-            for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
-              dummy << "\"" <<vauid[ia] << "\":" << chull::convertUnits(vn1egain[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_));
-              vmes.push_back(dummy.str()); dummy.str("");
-            }
-            oss << aurostd::wrapString(aurostd::joinWDelimiter(vmes,","),"{","}");
-          } else { //.log only, but obsolete now anyway since it defaults to json
-            message << "Unknown print option, only --print=text or --print=json available";
-            pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-            if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
-            Krun=false;continue;/*return FALSE;*/
-          }
-        }
-        continue;
-      }
-      ////////////////////////////////////////////////////////////////////////////
-      // END N+1 enthalpy gain calculation
-      ////////////////////////////////////////////////////////////////////////////
-
-      ////////////////////////////////////////////////////////////////////////////
-      // START Hull formation enthalpy calculation
-      ////////////////////////////////////////////////////////////////////////////
-      if(vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")) {
-        message << "Starting calculation of the formation enthalpy at " << vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY");
-        message << " on " << vinputs[i] << " hull";
-        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
-        vector<double> _coords;
-        xvector<double> coords(dimension);
-        aurostd::string2tokens<double>(vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY"), _coords, ",");
-        for(uint j=0,fl_size_j=_coords.size();j<fl_size_j&&j<dimension;j++){coords[j+coords.lrows]=_coords[j];}
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " coords=" << coords << endl;}
-        double dist2hull=0.0;
-        //NB: to anyone who is using the convex hull object
-        //outside of declaration/initialization, all functions should be wrapped
-        //in try/catch's to avoid hard exits
-        //proceed otherwise at your own risk
-        try{
-          ChullPoint cp(coords,FileMESSAGE,oss,hull.m_has_stoich_coords,hull.m_formation_energy_hull,false);  //not a real point
-          dist2hull=hull.getDistanceToHull(cp,false,true);  //do not redo, get signed distance (this is energy)
-          bool should_be_positive=!hull.m_lower_hull;
-          bool correct_sign_vertical_distance=chull::correctSignVerticalDistance(dist2hull,should_be_positive);
-          if(LDEBUG){
-            cerr << __AFLOW_FUNC__ << " dist2hull=" << dist2hull << endl;
-            cerr << __AFLOW_FUNC__ << " correct_sign_vertical_distance=" << correct_sign_vertical_distance << endl;
-          }
-          if(!correct_sign_vertical_distance){dist2hull*=-1.0;}
-        }
-        catch(aurostd::xerror& err){
-          pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
-          if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
-          if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
-          return false;
-        }
-
-        if(vpflow.flag("CHULL::SCREEN_ONLY")){
-          uint precision=COEF_PRECISION;
-          double roundoff_tol=5.0*pow(10,-((int)precision)-1);
-          stringstream hull_energy_ss;
-          hull_energy_ss << "\"hull_energy";
-          hull_energy_ss << aurostd::wrapString(aurostd::joinWDelimiter(xvecDouble2vecString(coords,precision,true,roundoff_tol,FIXED_STREAM),","),"[","]");
-          hull_energy_ss << "\": ";
-          hull_energy_ss << chull::convertUnits(dist2hull, (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_));
-          oss << aurostd::wrapString(hull_energy_ss.str(),"{","}");
-        } else {
-          //[CO20190801 - OBSOLETE]message << "hull_energy[coords=" << aurostd::joinWDelimiter(coords,",");
-          //[CO20190801 - OBSOLETE]for(int j=coords.lrows;j<=coords.urows;j++){
-          //[CO20190801 - OBSOLETE]  message << coords[j];
-          //[CO20190801 - OBSOLETE]  if(j!=((int)dimension)-1){message << ",";}
-          //[CO20190801 - OBSOLETE]}
-          //[CO20190801 - OBSOLETE]message << "] = ";
-          uint precision=COEF_PRECISION;
-          double roundoff_tol=5.0*pow(10,-((int)precision)-1);
-          message << "hull_energy" << aurostd::wrapString("coords="+aurostd::joinWDelimiter(xvecDouble2vecString(coords,precision,true,roundoff_tol,FIXED_STREAM),","),"[","]");
-          message << " = ";
-          if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << chull::convertUnits(dist2hull, _m_) << " (meV/atom)";}
-          else {message << dist2hull << " (K)";}
-          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
-        }
-        continue;
-      }
-      ////////////////////////////////////////////////////////////////////////////
-      // END Hull formation enthalpy calculation
-      ////////////////////////////////////////////////////////////////////////////
-
-      ////////////////////////////////////////////////////////////////////////////
-      // START outputs
-      ////////////////////////////////////////////////////////////////////////////
-
-      if(vpflow.flag("CHULL::TEXT_DOC")) {if(!hull.write(txt_ft)) {if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();} Krun=false;continue;/*return FALSE;*/}} // text doc
-      if(vpflow.flag("CHULL::JSON_DOC")) {if(!hull.write(json_ft)) {if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();} Krun=false;continue;/*return FALSE;*/}} // json doc
-      if(vpflow.flag("CHULL::WEB_DOC")) {if(!hull.write(chull_web_ft)) {if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();} Krun=false;continue;/*return FALSE;*/}} // web-specific json doc
-      if(vpflow.flag("CHULL::LATEX_DOC")||vpflow.flag("CHULL::PNG_IMAGE")) {if(!hull.write(latex_ft)) {if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();} Krun=false;continue;/*return FALSE;*/}} // latex doc, keep last as it will trip on useless plots
-
-      ////////////////////////////////////////////////////////////////////////////
-      // END outputs
-      ////////////////////////////////////////////////////////////////////////////
-
-      // close input specific log
-      if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
     }
+#else
+    for(uint i=0;i<ntasks;i++){
+      KrunSingle=convexHull(vinputs[i],vpflow,aflags,oss,(bool)i);
+      Krun=(Krun && KrunSingle);
+    }
+#endif
+
     //////////////////////////////////////////////////////////////////////////////
     // END Looping over hull inputs and creating desired output
     //////////////////////////////////////////////////////////////////////////////
-    return Krun;/*TRUE;*/
+    return Krun;
+  }
+
+  bool convexHull(const string& input,const aurostd::xoption& _vpflow,const _aflags& aflags,ostream& oss,bool silence_flag_check) {
+    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
+    stringstream message;
+
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN with input=" << input << endl;}
+
+    string directory=aflags.Directory;
+    string log_name="";
+    string alloy="";
+    aurostd::xoption vpflow(_vpflow);
+    ofstream FileMESSAGE;
+    
+    // go through each request
+    // create log specific to that request
+    vector<string> velements = aurostd::getElements(input,pp_string,FileMESSAGE,true,true,false,oss); //clean and sort, do not keep_pp  //CO20190712
+    //[CO20190712 - OBSOLETE]velements = pflow::getAlphabeticVectorString(input, FileMESSAGE,oss);
+    if(!velements.size()){
+      message << "Invalid input (" << input << "), please capitalize element symbols";
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      return false;/*Krun=false;*continue;*/
+    }
+    if(velements.size()<2){
+      message << "Trivial input (" << input << "), enter binaries or higher";
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      return false;/*Krun=false;*continue;*/
+    }
+    if(XHOST.vflag_control.flag("WWW")&&velements.size()>6){ //CO20200404 - new web flag
+      message << velements.size() << "-dimensional hulls cannot be calculated through the web portal (max=6D), please download the AFLOW binary";
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      return false;/*Krun=false;*continue;*/
+    }
+    alloy=aurostd::joinWDelimiter(velements,"");
+    if(vpflow.flag("CHULL::LOG")) {
+      log_name = "aflow_" + aurostd::joinWDelimiter(velements,"") + "_hull.log";
+      string log_destination = directory + log_name;  // no output before banner //CO20180220
+      FileMESSAGE.open(log_destination.c_str());
+    }
+    // spit out banner for only the first request
+    message << aflow::Banner("BANNER_NORMAL");
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_RAW_, true);  //i //no screen, first to be logged
+    message << "Starting " << aurostd::joinWDelimiter(velements,"") << " " << pflow::arity_string(velements.size(),false,false) << " convex hull";
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    getPath(vpflow, FileMESSAGE, oss, false); //CO20180220 - directory stuff for logging
+    chull::flagCheck(vpflow, velements, FileMESSAGE, oss, (bool)silence_flag_check);  // spit out all flag options
+
+    ////////////////////////////////////////////////////////////////////////////
+    // START Stability criterion calculation
+    ////////////////////////////////////////////////////////////////////////////
+    //if(vpflow.flag("CHULL::STABILITY_CRITERION")) {
+    //  message << "Starting stable criterion calculation of " << vpflow.getattachedscheme("CHULL::STABILITY_CRITERION");
+    //  message << " on " << input << " hull";
+    //  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    //  vector<string> vauid;
+    //  vector<double> vscriterion;
+    //  aurostd::string2tokens(vpflow.getattachedscheme("CHULL::STABILITY_CRITERION"), vauid, ",");
+    //  if(!calculateStabilityCriterion(vpflow,velements,vauid,vscriterion,FileMESSAGE,oss)) {return false;/*Krun=false;*continue;*/} //HAS to be thermal hull by virtue of input
+    //  if(vpflow.flag("CHULL::SCREEN_ONLY")){
+    //    if(vpflow.flag("CHULL::TEXT_DOC")){
+    //      for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
+    //        message << vauid[ia] << ": " << chull::convertUnits(vscriterion[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_)) << endl;
+    //      }
+    //      oss << message.str();
+    //    } else if(vpflow.flag("CHULL::JSON_DOC")){
+    //      vector<string> vmes;
+    //      stringstream dummy;
+    //      for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
+    //        dummy << "\"" <<vauid[ia] << "\":" << chull::convertUnits(vscriterion[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_));
+    //        vmes.push_back(dummy.str()); dummy.str("");
+    //      }
+    //      oss << aurostd::wrapString(aurostd::joinWDelimiter(vmes,","),"{","}");
+    //    } else { //.log only, but obsolete now anyway since it defaults to json
+    //      message << "Unknown print option, only --print=text or --print=json available";
+    //      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+    //      if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
+    //      return false;/*Krun=false;*continue;*/
+    //    }
+    //  } else {
+    //    for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
+    //      if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {
+    //        message << vauid[ia] << " criterion = " << chull::convertUnits(vscriterion[ia], _m_) << " (meV/atom)";
+    //        if(std::signbit(vscriterion[ia])) {  //-4e-13 is still negative!
+    //          message << ", may NOT be on the hull (negative value)";
+    //          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+    //        } else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+    //      } else {
+    //        message << vauid[ia] << " criterion = " << vscriterion[ia] << " (K)";
+    //        if(!std::signbit(vscriterion[ia])) {
+    //          message << ", may NOT be on the hull (positive value)";
+    //          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+    //        } else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+    //      }
+    //    }
+    //  }
+    //  continue;
+    //}
+    ////////////////////////////////////////////////////////////////////////////
+    // END Stability criterion calculation
+    ////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////
+    // START Jupyter notebook writing files
+    ////////////////////////////////////////////////////////////////////////////
+    //MB20190301: For generating Jupyter notebook
+    if(vpflow.flag("CHULL::WRITE_JUPYTER2") || vpflow.flag("CHULL::WRITE_JUPYTER3")){
+
+      string aflow_chull_jupyter_json=AFLOW_CHULL_JUPYTER_JSON;
+      string aflow_chull_jupyter_subdir = "AFLOW_CHULL_JUPYTER";
+      string jupyter_directory=directory + aflow_chull_jupyter_subdir;
+      aurostd::DirectoryMake(jupyter_directory);
+      aurostd::StringSubst(aflow_chull_jupyter_json,"AFLOW_ALLOY_INSERT_HERE",alloy);
+      string ver = (vpflow.flag("CHULL::WRITE_JUPYTER3")) ? "3" : "2";
+      string full_ver = (vpflow.flag("CHULL::WRITE_JUPYTER3")) ? "3" : "2";
+      aurostd::StringSubst(aflow_chull_jupyter_json,"<ver>",ver);
+      aurostd::StringSubst(aflow_chull_jupyter_json,"<full ver>",full_ver);	
+
+      stringstream output;
+      output << aflow_chull_jupyter_json;
+      aurostd::stringstream2file(output,jupyter_directory+'/'+"notebook.ipynb");
+
+      stringstream output2; 
+      string aflow_chull_jupyter_plotter_py=AFLOW_CHULL_JUPYTER_PLOTTER_PY;
+      output2 << aflow_chull_jupyter_plotter_py;
+      aurostd::stringstream2file(output2,jupyter_directory+'/'+"aflow_chull_plotter.py");
+
+      stringstream output3;
+      string aflow_chull_python_py=AFLOW_CHULL_PYTHON_PY;
+      output3 << aflow_chull_python_py;
+      aurostd::stringstream2file(output3,jupyter_directory+'/'+"aflow_chull.py");	
+
+      stringstream output4;
+      string aflow_chull_requirements_txt=AFLOW_CHULL_JUPYTER_REQUIREMENTS_TXT;
+      output4 << aflow_chull_requirements_txt;
+      aurostd::stringstream2file(output4,jupyter_directory+'/'+"requirements.txt");	
+
+      message << "Created " << aflow_chull_jupyter_subdir << " directory for " << input << " hull";
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
+
+      return true;
+    }     
+
+    ////////////////////////////////////////////////////////////////////////////
+    // STOP Jupyter notebook writing files
+    ////////////////////////////////////////////////////////////////////////////
+
+    //speed ups for command line options
+    if(vpflow.flag("CHULL::DIST2HULL") || vpflow.flag("CHULL::STABILITY_CRITERION") || vpflow.flag("CHULL::N+1_ENTHALPY_GAIN") || vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")) {
+      vpflow.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION",true);
+      message << "Skipping thermodynamic properties extraction";pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+    }
+
+    //skip calculating all of the lower dimensional hulls
+    //this works if you are finding the hull_energy somewhere in the middle of the hull
+    //the edges are problematic (lower dimensional hulls)
+    //so only skip calculating these hulls if you are calculating hull_energy of the ND hull
+    if(0){  //not actually faster, lower dimensional hulls reduce number of points in ND hull, tested 7D-hull: 45 mins vs. 1 hr
+      if(vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")){
+        vector<double> _coords;
+        aurostd::string2tokens<double>(vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY"), _coords, ",");
+        if(_coords.size()==velements.size()-1||_coords.size()==velements.size()){
+          bool at_edge=false;
+          double sum=0.0;
+          for(uint ia=0;ia<(velements.size()-1)&&ia<_coords.size();ia++){
+            if(abs(_coords[ia])<ZERO_COEF_TOL||abs(1.0-_coords[ia])<ZERO_COEF_TOL){at_edge=true;}
+            sum+=_coords[ia];
+          }
+          double coord_last=1.0-sum;
+          at_edge=(at_edge || (abs(coord_last)<ZERO_COEF_TOL||abs(1.0-coord_last)<ZERO_COEF_TOL));
+          if(LDEBUG){
+            cerr << __AFLOW_FUNC__ << " coords=" << aurostd::joinWDelimiter(aurostd::vecDouble2vecString(_coords,4),",") << endl;
+            cerr << __AFLOW_FUNC__ << " sum=" << sum << endl;
+            cerr << __AFLOW_FUNC__ << " coord_last=" << coord_last << endl;
+            cerr << __AFLOW_FUNC__ << " at_edge=" << at_edge << endl;
+          }
+          if(at_edge==false){
+            vpflow.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY",true);
+            message << "Calculating the highest dimensional hull ONLY";pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+          }
+        }
+      }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // START Hull initialization
+    ////////////////////////////////////////////////////////////////////////////
+
+    ConvexHull hull(vpflow,velements,FileMESSAGE,oss);
+    if(!hull.m_initialized) {
+      message << "Hull was not created successfully";
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
+      if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";}
+      return false;/*Krun=false;*continue;*/
+    }
+    uint dimension = hull.getDim();
+    if(!dimension) {
+      message << "Hull has no dimensions";
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
+      return false;/*Krun=false;*continue;*/
+    }
+    if(dimension < 2) {
+      message << "Unable to calculate hulls with dimensions less than 2";
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
+      return false;/*Krun=false;*continue;*/
+    }
+    if(dimension != velements.size()) {
+      message << "Dimension of hull does not reflect the number of elements";
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+      if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
+      return false;/*Krun=false;*continue;*/
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // END Hull initialization
+    ////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////
+    // START Distance to hull calculation
+    ////////////////////////////////////////////////////////////////////////////
+    if(vpflow.flag("CHULL::DIST2HULL")) {
+      message << "Starting distance to hull calculation of " << vpflow.getattachedscheme("CHULL::DIST2HULL");
+      message << " on " << input << " hull";
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+      vector<string> vauid;
+      aurostd::string2tokens(vpflow.getattachedscheme("CHULL::DIST2HULL"), vauid, ",");
+      vector<double> vdist2hull;
+      //NB: to anyone who is using the convex hull object
+      //outside of declaration/initialization, all functions should be wrapped
+      //in try/catch's to avoid hard exits
+      //proceed otherwise at your own risk
+      try{vdist2hull=hull.getDistancesToHull(vauid);}
+      catch(aurostd::xerror& err){
+        pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
+        if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
+        return true;
+      }
+
+      //set correct sign convention
+      //since this SHOULD be a positive distance (inside hull), we will negate for formation_energy_hull
+      //for (uint ia = 0; ia < vauid.size(); ia++) {
+      //  if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {vdist2hull[ia]=abs(vdist2hull[ia]);}
+      //}
+
+      for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
+        if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << vauid[ia] << " dist2hull = " << chull::convertUnits(vdist2hull[ia], _m_) << " (meV/atom)";}
+        else {message << vauid[ia] << " dist2hull = " << vdist2hull[ia] << " (K)";}
+        if(aurostd::zeroWithinTol(vdist2hull[ia],ZERO_TOL)) {  //do not issue a warning either way, it's simply the distance
+          message << ", may be on the hull";
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
+        } else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+        //if(0&&!std::signbit(vdist2hull[ia])) {  //do not issue a warning either way, it's simply the distance
+        //  message << ", may NOT be off the hull (positive value)";
+        //  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+        //} else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+      }
+
+      if(vpflow.flag("CHULL::SCREEN_ONLY")){
+        if(vpflow.flag("CHULL::TEXT_DOC")){
+          for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
+            message << vauid[ia] << ": " << chull::convertUnits(vdist2hull[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_)) << endl;
+          }
+          oss << message.str();
+        } else if(vpflow.flag("CHULL::JSON_DOC")){
+          vector<string> vmes;
+          stringstream dummy;
+          for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
+            dummy << "\"" <<vauid[ia] << "\":" << chull::convertUnits(vdist2hull[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_));
+            vmes.push_back(dummy.str()); dummy.str("");
+          }
+          oss << aurostd::wrapString(aurostd::joinWDelimiter(vmes,","),"{","}");
+        } else { //.log only, but obsolete now anyway since it defaults to json
+          message << "Unknown print option, only --print=text or --print=json available";
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
+          return false;/*Krun=false;*continue;*/
+        }
+      }
+      return true;
+    }
+    ////////////////////////////////////////////////////////////////////////////
+    // END Distance to hull calculation
+    ////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////
+    // START Stability criterion calculation
+    ////////////////////////////////////////////////////////////////////////////
+    if(vpflow.flag("CHULL::STABILITY_CRITERION")) { //CO20210201 - chull-web SS plotter //&&(!vpflow.flag("CHULL::WEB_DOC"))
+      message << "Starting stable criterion calculation of " << vpflow.getattachedscheme("CHULL::STABILITY_CRITERION");
+      message << " on " << input << " hull";
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+      vector<string> vauid;
+      aurostd::string2tokens(vpflow.getattachedscheme("CHULL::STABILITY_CRITERION"), vauid, ",");
+      vector<double> vscriterion;
+      //NB: to anyone who is using the convex hull object
+      //outside of declaration/initialization, all functions should be wrapped
+      //in try/catch's to avoid hard exits
+      //proceed otherwise at your own risk
+      try{vscriterion=hull.getStabilityCriterion(vauid);}
+      catch(aurostd::xerror& err){
+        pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
+        if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
+        return true;
+      }
+
+      ////set correct sign convention
+      ////since this SHOULD be a negative distance (outside hull), we will negate for formation_energy_hull
+      //for (uint ia = 0; ia < vauid.size(); ia++) {
+      //  if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {vscriterion[ia]=-vscriterion[ia];}
+      //}
+
+      for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
+        if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << vauid[ia] << " criterion = " << chull::convertUnits(vscriterion[ia], _m_) << " (meV/atom)";}
+        else {message << vauid[ia] << " criterion = " << vscriterion[ia] << " (K)";}
+        if(std::signbit(vscriterion[ia])) {
+          message << ", may NOT be on the hull (negative value)";
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+        } else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+      }
+
+      if(vpflow.flag("CHULL::SCREEN_ONLY")){
+        if(vpflow.flag("CHULL::TEXT_DOC")){
+          for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
+            message << vauid[ia] << ": " << chull::convertUnits(vscriterion[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_)) << endl;
+          }
+          oss << message.str();
+        } else if(vpflow.flag("CHULL::JSON_DOC")){
+          vector<string> vmes;
+          stringstream dummy;
+          for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
+            dummy << "\"" <<vauid[ia] << "\":" << chull::convertUnits(vscriterion[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_));
+            vmes.push_back(dummy.str()); dummy.str("");
+          }
+          oss << aurostd::wrapString(aurostd::joinWDelimiter(vmes,","),"{","}");
+        } else { //.log only, but obsolete now anyway since it defaults to json
+          message << "Unknown print option, only --print=text or --print=json available";
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
+          return false;/*Krun=false;*continue;*/
+        }
+      }
+      return true;
+    }
+    ////////////////////////////////////////////////////////////////////////////
+    // END Stability criterion calculation
+    ////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////
+    // START N+1 enthalpy gain calculation
+    ////////////////////////////////////////////////////////////////////////////
+    if(vpflow.flag("CHULL::N+1_ENTHALPY_GAIN")) {
+      message << "Starting N+1 enthalpy gain calculation of " << vpflow.getattachedscheme("CHULL::N+1_ENTHALPY_GAIN");
+      message << " on " << input << " hull";
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+      vector<string> vauid;
+      aurostd::string2tokens(vpflow.getattachedscheme("CHULL::N+1_ENTHALPY_GAIN"), vauid, ",");
+      vector<double> vn1egain;
+      //NB: to anyone who is using the convex hull object
+      //outside of declaration/initialization, all functions should be wrapped
+      //in try/catch's to avoid hard exits
+      //proceed otherwise at your own risk
+      try{vn1egain=hull.getNPlus1EnthalpyGain(vauid);}
+      catch(aurostd::xerror& err){
+        pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
+        if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
+        return true;
+      }
+
+      ////set correct sign convention
+      ////since this SHOULD be a negative distance (outside hull), we will negate for formation_energy_hull
+      //for (uint ia = 0; ia < vauid.size(); ia++) {
+      //  if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {vn1egain[ia]=-vn1egain[ia];}
+      //}
+
+      for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
+        if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << vauid[ia] << " n+1_enthalpy_gain = " << chull::convertUnits(vn1egain[ia], _m_) << " (meV/atom)";}
+        else {message << vauid[ia] << " n+1_enthalpy_gain = " << vn1egain[ia] << " (K)";}
+        if(std::signbit(vn1egain[ia])) {
+          message << ", may NOT be on the hull (negative value)";
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
+        } else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+      }
+
+      if(vpflow.flag("CHULL::SCREEN_ONLY")){
+        if(vpflow.flag("CHULL::TEXT_DOC")){
+          for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
+            message << vauid[ia] << ": " << chull::convertUnits(vn1egain[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_)) << endl;
+          }
+          oss << message.str();
+        } else if(vpflow.flag("CHULL::JSON_DOC")){
+          vector<string> vmes;
+          stringstream dummy;
+          for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
+            dummy << "\"" <<vauid[ia] << "\":" << chull::convertUnits(vn1egain[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_));
+            vmes.push_back(dummy.str()); dummy.str("");
+          }
+          oss << aurostd::wrapString(aurostd::joinWDelimiter(vmes,","),"{","}");
+        } else { //.log only, but obsolete now anyway since it defaults to json
+          message << "Unknown print option, only --print=text or --print=json available";
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+          if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
+          return false;/*Krun=false;*continue;*/
+        }
+      }
+      return true;
+    }
+    ////////////////////////////////////////////////////////////////////////////
+    // END N+1 enthalpy gain calculation
+    ////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////
+    // START Hull formation enthalpy calculation
+    ////////////////////////////////////////////////////////////////////////////
+    if(vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")) {
+      message << "Starting calculation of the formation enthalpy at " << vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY");
+      message << " on " << input << " hull";
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
+      vector<double> _coords;
+      xvector<double> coords(dimension);
+      aurostd::string2tokens<double>(vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY"), _coords, ",");
+      for(uint j=0,fl_size_j=_coords.size();j<fl_size_j&&j<dimension;j++){coords[j+coords.lrows]=_coords[j];}
+      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " coords=" << coords << endl;}
+      double dist2hull=0.0;
+      //NB: to anyone who is using the convex hull object
+      //outside of declaration/initialization, all functions should be wrapped
+      //in try/catch's to avoid hard exits
+      //proceed otherwise at your own risk
+      try{
+        ChullPoint cp(coords,FileMESSAGE,oss,hull.m_has_stoich_coords,hull.m_formation_energy_hull,false);  //not a real point
+        dist2hull=hull.getDistanceToHull(cp,false,true);  //do not redo, get signed distance (this is energy)
+        bool should_be_positive=!hull.m_lower_hull;
+        bool correct_sign_vertical_distance=chull::correctSignVerticalDistance(dist2hull,should_be_positive);
+        if(LDEBUG){
+          cerr << __AFLOW_FUNC__ << " dist2hull=" << dist2hull << endl;
+          cerr << __AFLOW_FUNC__ << " correct_sign_vertical_distance=" << correct_sign_vertical_distance << endl;
+        }
+        if(!correct_sign_vertical_distance){dist2hull*=-1.0;}
+      }
+      catch(aurostd::xerror& err){
+        pflow::logger(err.whereFileName(), err.whereFunction(), err.what(), aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
+        if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
+        if(vpflow.flag("CHULL::SCREEN_ONLY")&&vpflow.flag("CHULL::JSON_DOC")){oss << "{}";} //so JSON-reader doesn't bomb
+        return true;
+      }
+
+      if(vpflow.flag("CHULL::SCREEN_ONLY")){
+        uint precision=COEF_PRECISION;
+        double roundoff_tol=5.0*pow(10,-((int)precision)-1);
+        stringstream hull_energy_ss;
+        hull_energy_ss << "\"hull_energy";
+        hull_energy_ss << aurostd::wrapString(aurostd::joinWDelimiter(xvecDouble2vecString(coords,precision,true,roundoff_tol,FIXED_STREAM),","),"[","]");
+        hull_energy_ss << "\": ";
+        hull_energy_ss << chull::convertUnits(dist2hull, (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_));
+        oss << aurostd::wrapString(hull_energy_ss.str(),"{","}");
+      } else {
+        //[CO20190801 - OBSOLETE]message << "hull_energy[coords=" << aurostd::joinWDelimiter(coords,",");
+        //[CO20190801 - OBSOLETE]for(int j=coords.lrows;j<=coords.urows;j++){
+        //[CO20190801 - OBSOLETE]  message << coords[j];
+        //[CO20190801 - OBSOLETE]  if(j!=((int)dimension)-1){message << ",";}
+        //[CO20190801 - OBSOLETE]}
+        //[CO20190801 - OBSOLETE]message << "] = ";
+        uint precision=COEF_PRECISION;
+        double roundoff_tol=5.0*pow(10,-((int)precision)-1);
+        message << "hull_energy" << aurostd::wrapString("coords="+aurostd::joinWDelimiter(xvecDouble2vecString(coords,precision,true,roundoff_tol,FIXED_STREAM),","),"[","]");
+        message << " = ";
+        if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << chull::convertUnits(dist2hull, _m_) << " (meV/atom)";}
+        else {message << dist2hull << " (K)";}
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
+      }
+      return true;
+    }
+    ////////////////////////////////////////////////////////////////////////////
+    // END Hull formation enthalpy calculation
+    ////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////
+    // START outputs
+    ////////////////////////////////////////////////////////////////////////////
+
+    if(vpflow.flag("CHULL::TEXT_DOC")) {if(!hull.write(txt_ft)) {if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();} return false;/*Krun=false;*continue;*/}} // text doc
+    if(vpflow.flag("CHULL::JSON_DOC")) {if(!hull.write(json_ft)) {if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();} return false;/*Krun=false;*continue;*/}} // json doc
+    if(vpflow.flag("CHULL::WEB_DOC")) {if(!hull.write(chull_web_ft)) {if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();} return false;/*Krun=false;*continue;*/}} // web-specific json doc
+    if(vpflow.flag("CHULL::LATEX_DOC")||vpflow.flag("CHULL::PNG_IMAGE")) {if(!hull.write(latex_ft)) {if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();} return false;/*Krun=false;*continue;*/}} // latex doc, keep last as it will trip on useless plots
+
+    ////////////////////////////////////////////////////////////////////////////
+    // END outputs
+    ////////////////////////////////////////////////////////////////////////////
+
+    // close input specific log
+    if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
+    return true;
   }
 } // namespace chull
 
@@ -1089,7 +1152,7 @@ namespace chull {
 //    return calculateStabilityCriterion(vpflow,velements,scriterion,FileMESSAGE,oss);
 //  }
 //  bool calculateStabilityCriterion(const aurostd::xoption& vpflow,const vector<string>& velements,double& scriterion,ofstream& FileMESSAGE,ostream& oss){
-////    stringstream message;
+//    stringstream message;
 //    if(!vpflow.flag("CHULL::NEGLECT")) {
 //      pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"CHULL::NEGLECT not set",FileMESSAGE,oss,_LOGGER_ERROR_);
 //      return false;
@@ -1120,7 +1183,7 @@ namespace chull {
 //    return calculateStabilityCriterion(vpflow,velements,vscriterion,FileMESSAGE,oss);
 //  }
 //  bool calculateStabilityCriterion(const aurostd::xoption& vpflow,const vector<string>& velements,vector<double>& vscriterion,ofstream& FileMESSAGE,ostream& oss){
-////    stringstream message;
+//    stringstream message;
 //    if(!vpflow.flag("CHULL::NEGLECT")) {
 //      pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"CHULL::NEGLECT not set",FileMESSAGE,oss,_LOGGER_ERROR_);
 //      return FALSE;
@@ -1135,7 +1198,7 @@ namespace chull {
 //  }
 //  bool calculateStabilityCriterion(const aurostd::xoption& vpflow,const vector<string>& velements,const vector<string>& vauid,vector<double>& vscriterion,ofstream& FileMESSAGE,ostream& oss) {
 //    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-////    stringstream message;
+//    stringstream message;
 //    
 //    //don't only remove vauid, but also equivalent gstates
 //    //we need organized points, simply initialize dummy hull instead of calculating TWO full hulls
@@ -1459,6 +1522,7 @@ namespace chull {
     ChullPointLight::copy(b);
     m_entry=b.m_entry; if(m_entry.vsg.size()==0){m_entry.vsg.push_back(NOSG);} if(m_entry.vsg2.size()==0){m_entry.vsg2.push_back(NOSG);}  //hack so it doesn't break with front(),back(),[0]
     m_i_coord_group=b.m_i_coord_group;
+    m_i_icsd=b.m_i_icsd;
     s_coords=b.s_coords;
     c_coords=b.c_coords;
     m_elements_present=b.m_elements_present;
@@ -1891,7 +1955,7 @@ namespace chull {
 
   void ChullPoint::setGenCoords(const xvector<double>& coord,bool formation_energy_coord) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    m_coords=coord;//aurostd::shiftlrows(m_coords,0);
+    m_coords=coord;
     m_formation_energy_coord=formation_energy_coord;
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " m_within_half_hull=" << isWithinHalfHull(m_formation_energy_coord) << endl;}  //m_formation_energy_coord===lower_hull
   }
@@ -2040,6 +2104,7 @@ namespace chull {
   void ChullPoint::cleanPointForHullTransfer() {
     m_i_alloy=AUROSTD_MAX_UINT;
     m_i_coord_group=AUROSTD_MAX_UINT;
+    m_i_icsd=AUROSTD_MAX_UINT;
     m_is_on_hull=false;
     m_is_g_state=false;
     m_is_equivalent_g_state=false;
@@ -2159,7 +2224,7 @@ namespace chull {
     m_offset=AUROSTD_MAX_DOUBLE;
     m_facet_centroid.clear();
     m_hull_reference.clear();
-    m_hypercollinear=false;
+    m_is_hypercollinear=false;
     m_is_vertical=false;
     m_is_artificial=false;
     m_in_lower_hemisphere=false;
@@ -2184,7 +2249,7 @@ namespace chull {
     m_offset=b.m_offset;
     m_facet_centroid=b.m_facet_centroid;
     m_hull_reference=b.m_hull_reference;
-    m_hypercollinear=b.m_hypercollinear;
+    m_is_hypercollinear=b.m_is_hypercollinear;
     m_is_vertical=b.m_is_vertical;
     m_is_artificial=b.m_is_artificial;
     m_in_lower_hemisphere=b.m_in_lower_hemisphere;
@@ -2459,7 +2524,7 @@ namespace chull {
   void ChullFacet::setContent(){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     m_content=AUROSTD_MAX_DOUBLE;
-    m_hypercollinear=true;
+    m_is_hypercollinear=true;
     string error; if(!hasValidPoints(error)){return;}
     m_content=0.0;  //if we don't set later, it's because it's really zero
     xmatrix<double> B(m_vertices.size(),m_vertices.size(),1,1); //for determinant
@@ -2497,7 +2562,7 @@ namespace chull {
     m_content=sqrt(coef*CMdetB);
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " content=" << m_content << endl;}
     if(aurostd::zeroWithinTol(m_content,tol)){return;} //error="simplex content is zero, shows hyper-collinearity";
-    m_hypercollinear=false;
+    m_is_hypercollinear=false;
   }
 
   void ChullFacet::setDirectiveVectors(bool check_validity){  //perhaps we already checked...
@@ -3988,7 +4053,8 @@ namespace chull {
       }
       return;
     }
-    if(LDEBUG) {cerr << "lastCoords(): " << sort(energies) << endl;}
+
+    if(LDEBUG) {xvector<double> temp_eng = energies; sort(temp_eng); cerr << "lastCoords(): " << temp_eng << endl;}
     double q1,q2,q3;
     //so we sort full anyway to be completely robust, should be easy considering how we sorted before
     aurostd::getQuartiles(energies,q1,q2,q3);  //we sort in here
@@ -5392,7 +5458,7 @@ namespace chull {
       if(i_facet>m_facets.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within m_facets");}
       const ChullFacet& facet=m_facets[i_facet];
       if(!facet.m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Facet not initialized");}
-      if(facet.m_hypercollinear){continue;}
+      if(facet.m_is_hypercollinear){continue;}
       if(facet.m_is_vertical){continue;}
       if(facet.m_is_artificial){
         i_facet_artificial=i_facet;
@@ -5886,7 +5952,7 @@ namespace chull {
       rhs.push_back(m_points[decomp_phases[i]].getTruncatedReducedCoords(m_elements_present,vred));
     }
     xvector<double> coef=balanceChemicalEquation(lhs,rhs,true,ZERO_TOL);  //normalize
-    //aurostd::shiftlrows(coef,0);
+
     return coef;
   }
 
@@ -5964,7 +6030,7 @@ namespace chull {
     for(uint i=0,fl_size_i=i_facets.size();i<fl_size_i;i++){
       i_facet=i_facets[i];
       if(i_facet>m_facets.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within m_facets");}
-      if(ignore_hypercollinear && m_facets[i_facet].m_hypercollinear){continue;}  //really (d-1) facets
+      if(ignore_hypercollinear && m_facets[i_facet].m_is_hypercollinear){continue;}  //really (d-1) facets
       if(ignore_vertical && m_facets[i_facet].m_is_vertical){continue;}           //really (d-1) facets
       if(ignore_artificial && m_facets[i_facet].m_is_artificial){continue;}       //contains all unaries
       if(m_facets[i_facet].isPointOnFacet(hull_member)){adjacent_i_facets.push_back(i_facet);}
@@ -6243,6 +6309,12 @@ namespace chull {
 
     m_coord_groups[i_coord_group].m_icsd_g_state=icsd_g_state;
     m_coord_groups[i_coord_group].m_i_canonical_icsd=i_canonical_icsd;
+    
+    for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_equivalent_g_states.size();i<fl_size_i;i++){
+      i_point=m_coord_groups[i_coord_group].m_equivalent_g_states[i];
+      if(!m_points[i_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+      m_points[i_point].m_i_icsd=i_canonical_icsd;
+    }
 
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " stop" << endl;}
   }
@@ -6722,11 +6794,19 @@ namespace chull {
     cflags.flag("FAKE_HULL",true); //need to avoid "Very skewed ground-state..." and "Unreliable hull" issues, we're removing points, so these may (and likely will) come up
     cflags.flag("FORCE",true); //need to avoid outlier issues, we're removing points, so these may (and likely will) come up
     //let's skip all this extra output
-    bool see_sub_output=false;//true;
-    ostream& oss_empty=cout;if(!see_sub_output){oss_empty.setstate(std::ios_base::badbit);}  //like NULL
     ofstream devnull("/dev/null");  //NULL
-    fake_hull.initialize(cflags,new_points,velements,devnull,oss_empty,m_half_hull,m_add_artificial_unaries);
-    oss_empty.clear();  //clear badbit, as cout is GLOBAL
+    //https://stackoverflow.com/questions/366955/obtain-a-stdostream-either-from-stdcout-or-stdofstreamfile`
+    bool see_sub_output=false;//true;
+    std::streambuf* buf_fh;
+    if(see_sub_output){buf_fh=std::cout.rdbuf();} //to cout
+    else{buf_fh=devnull.rdbuf();} //to devnull
+    //ostream& oss_empty=cout;if(!see_sub_output){oss_empty.setstate(std::ios_base::badbit);}  //like NULL
+    //https://stackoverflow.com/questions/7818371/printing-to-nowhere-with-ostream
+    //stringstream oss_empty; //also an option, might be better than setting a badbit to cout
+    //ostream oss_empty(0); //setting badbit to entirely new instance of object
+    ostream oss_fh(buf_fh);
+    fake_hull.initialize(cflags,new_points,velements,devnull,oss_fh,m_half_hull,m_add_artificial_unaries);
+    //oss_empty.clear();  //clear badbit, as cout is GLOBAL
     if(!fake_hull.m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Could not create pseudo convex hull");}
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " New (pseudo) hull created" << endl;}
   }
@@ -7110,7 +7190,7 @@ namespace chull {
   //[ME20190628 - moved to pflow_funcs.cpp] string ConvexHull::prettyPrintCompound(const vector<string>& vspecies,const xvector<double>& vcomposition,vector_reduction_type vred,bool exclude1,filetype ftype) const {  // main function
   //[ME20190628 - moved to pflow_funcs.cpp]   // creates compound_label for LaTeX and text docs, like adding $_{}$
   //[ME20190628 - moved to pflow_funcs.cpp]   // 2-D, we usually want vred=gcd_vrt true for convex points, and no_vrt elsewhere
-  //[ME20190628 - moved to pflow_funcs.cpp]  //[ME20190628 - moved to pflow_funcs.cpp]   uint precision=COEF_PRECISION;
+  //[ME20190628 - moved to pflow_funcs.cpp]   uint precision=COEF_PRECISION;
   //[ME20190628 - moved to pflow_funcs.cpp]   stringstream output;output.precision(precision);
   //[ME20190628 - moved to pflow_funcs.cpp]   if(vspecies.size()!=(uint)vcomposition.rows) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"vspecies.size() != vcomposition.rows");}
   //[ME20190628 - moved to pflow_funcs.cpp]   // special case, unary
@@ -7203,7 +7283,7 @@ namespace chull {
   //[CO20190419 - moved to aurostd_main.cpp]  // see http://tex.stackexchange.com/questions/34580/escape-character-in-latex
   //[CO20190419 - moved to aurostd_main.cpp]  // double_back_slash was needed SOMETIMES for gnuplot output, as one backslash
   //[CO20190419 - moved to aurostd_main.cpp]  // went away when writing to file, and  -- OBSOLETE NOW
-  //[CO20190419 - moved to aurostd_main.cpp]  //[CO20190419 - moved to aurostd_main.cpp]  string output;
+  //[CO20190419 - moved to aurostd_main.cpp]  string output;
   //[CO20190419 - moved to aurostd_main.cpp]  vector<char> problem_characters;
   //[CO20190419 - moved to aurostd_main.cpp]  problem_characters.push_back('&');
   //[CO20190419 - moved to aurostd_main.cpp]  problem_characters.push_back('%');
@@ -7638,10 +7718,10 @@ namespace chull {
 
     string headers="";
     if(!(ftype==latex_ft && !compounds_column_report)){headers+=(!headers.empty()?string(","):string(""))+"compound";}
-    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"reduced_compound";}
-    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"reduced_compound_latex";}
-    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"fractional_compound";}
-    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"fractional_compound_latex";}
+    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"compound_reduced";}
+    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"compound_reduced_latex";}
+    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"compound_fractional";}
+    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"compound_fractional_latex";}
     headers+=(!headers.empty()?string(","):string(""))+"prototype";
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"prototype_latex";}
     headers+=(!headers.empty()?string(","):string(""))+"auid";
@@ -7656,18 +7736,18 @@ namespace chull {
     headers+=(!headers.empty()?string(","):string(""))+"enthalpy_formation_atom";
     headers+=(!headers.empty()?string(","):string(""))+"entropic_temperature";
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"ground_state";}
-    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"equivalent_structures_auid";}
-    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"icsd_ground_state";}
-    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"icsd_canonical_auid";}
-    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"phases_equilibrium_compound";}
-    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"phases_equilibrium_auid";}
-    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"phases_decomposition_compound";}
-    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"phases_decomposition_auid";}
-    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"phases_decomposition_coefficient";}
-    if(m_formation_energy_hull){headers+=(!headers.empty()?string(","):string(""))+"enthalpy_formation_atom_difference";}
-    else {headers+=(!headers.empty()?string(","):string(""))+"entropic_temperature_difference";}
+    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"auid_equivalent_structures";}
+    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"ground_state_icsd";}
+    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"auid_icsd";}
+    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"compound_phases_equilibrium";}
+    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"auid_phases_equilibrium";}
+    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"compound_phases_decomposition";}
+    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"auid_phases_decomposition";}
+    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"coefficient_phases_decomposition";}
+    if(m_formation_energy_hull){headers+=(!headers.empty()?string(","):string(""))+"distance_hull_enthalpy_formation_atom";}
+    else {headers+=(!headers.empty()?string(","):string(""))+"distance_hull_entropic_temperature";}
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"stability_criterion";}
-    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"relative_stability_criterion";}
+    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"stability_criterion_relative";}
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"N+1_enthalpy_gain";}
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"entropy_stabilization_coefficient";}
 
@@ -7675,6 +7755,10 @@ namespace chull {
   }
 
   string ConvexHull::getDelta(bool helvetica_font) const {return (helvetica_font?"\\Updelta":"\\Delta");}
+  string ConvexHull::getStabilityCriterionSymbol(bool helvetica_font) const {
+    return getDelta(helvetica_font)+" H_{\\mathrm{sc}}";
+    //return "\\delta_{\\mathrm{sc}}";
+  }
 
   string ConvexHull::getSnapshotTableHeader(string headers,bool designate_HEADER) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
@@ -7694,8 +7778,8 @@ namespace chull {
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else if(vheaders[i]=="spin_atom"){vlabels.push_back("spin $\\left(\\mu_{\\mathrm{B}}\\mathrm{/atom}\\right)$"); vpaddings.push_back(30); valignments_headertable_string.push_back("X[2,c,m]");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else if(vheaders[i]=="enthalpy_formation_atom"){vlabels.push_back("$H_{\\mathrm{f}}$ (meV/atom)"); vpaddings.push_back(30); valignments_headertable_string.push_back("X[2,c,m]");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else if(vheaders[i]=="entropic_temperature"){vlabels.push_back("$T_{\\mathrm{S}}$ (K)"); vpaddings.push_back(30); valignments_headertable_string.push_back("X[2,c,m]");}
-    //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else if(vheaders[i]=="enthalpy_formation_atom_difference"){vlabels.push_back("$"+getDelta(helvetica_font)+" H_{\\mathrm{f}}$ (meV/atom)"); vpaddings.push_back(30); valignments_headertable_string.push_back("X[2,c,m]");}
-    //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else if(vheaders[i]=="entropic_temperature_difference"){vlabels.push_back("$"+getDelta(helvetica_font)+" T_{\\mathrm{S}}$ (K)"); vpaddings.push_back(30); valignments_headertable_string.push_back("X[2,c,m]");}
+    //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else if(vheaders[i]=="distance_hull_enthalpy_formation_atom"){vlabels.push_back("$"+getDelta(helvetica_font)+" H_{\\mathrm{hull}}$ (meV/atom)"); vpaddings.push_back(30); valignments_headertable_string.push_back("X[2,c,m]");}
+    //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else if(vheaders[i]=="distance_hull_entropic_temperature"){vlabels.push_back("$"+getDelta(helvetica_font)+" T_{\\mathrm{S}}$ (K)"); vpaddings.push_back(30); valignments_headertable_string.push_back("X[2,c,m]");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]  }
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]}
@@ -7711,8 +7795,8 @@ namespace chull {
       else if(vheaders[i]=="spin_atom"){vlabels.push_back("spin $\\left(\\mu_{\\mathrm{B}}\\mathrm{/atom}\\right)$"); vpaddings.push_back(30); valignments_headertable_uint.push_back(2); total_alignment+=valignments_headertable_uint.back();}
       else if(vheaders[i]=="enthalpy_formation_atom"){vlabels.push_back("$H_{\\mathrm{f}}$ (meV/atom)"); vpaddings.push_back(30); valignments_headertable_uint.push_back(2); total_alignment+=valignments_headertable_uint.back();}
       else if(vheaders[i]=="entropic_temperature"){vlabels.push_back("$T_{\\mathrm{S}}$ (K)"); vpaddings.push_back(30); valignments_headertable_uint.push_back(2); total_alignment+=valignments_headertable_uint.back();}
-      else if(vheaders[i]=="enthalpy_formation_atom_difference"){vlabels.push_back("$"+getDelta(helvetica_font)+" H_{\\mathrm{f}}$ (meV/atom)"); vpaddings.push_back(30); valignments_headertable_uint.push_back(2); total_alignment+=valignments_headertable_uint.back();}
-      else if(vheaders[i]=="entropic_temperature_difference"){vlabels.push_back("$"+getDelta(helvetica_font)+" T_{\\mathrm{S}}$ (K)"); vpaddings.push_back(30); valignments_headertable_uint.push_back(2); total_alignment+=valignments_headertable_uint.back();}
+      else if(vheaders[i]=="distance_hull_enthalpy_formation_atom"){vlabels.push_back("$"+getDelta(helvetica_font)+" H_{\\mathrm{hull}}$ (meV/atom)"); vpaddings.push_back(30); valignments_headertable_uint.push_back(2); total_alignment+=valignments_headertable_uint.back();}
+      else if(vheaders[i]=="distance_hull_entropic_temperature"){vlabels.push_back("$"+getDelta(helvetica_font)+" T_{\\mathrm{S}}$ (K)"); vpaddings.push_back(30); valignments_headertable_uint.push_back(2); total_alignment+=valignments_headertable_uint.back();}
       else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
     }
 
@@ -8173,8 +8257,8 @@ namespace chull {
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]  else if(vheaders[i]=="spin_atom"){valignments.push_back("X[2,r,m]");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]  else if(vheaders[i]=="enthalpy_formation_atom"){valignments.push_back("X[2,r,m]");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]  else if(vheaders[i]=="entropic_temperature"){valignments.push_back("X[2,r,m]");}
-    //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]  else if(vheaders[i]=="enthalpy_formation_atom_difference"){valignments.push_back("X[2,r,m]");}
-    //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]  else if(vheaders[i]=="entropic_temperature_difference"){valignments.push_back("X[2,r,m]");}
+    //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]  else if(vheaders[i]=="distance_hull_enthalpy_formation_atom"){valignments.push_back("X[2,r,m]");}
+    //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]  else if(vheaders[i]=="distance_hull_entropic_temperature"){valignments.push_back("X[2,r,m]");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]  else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]}
 
@@ -8190,8 +8274,8 @@ namespace chull {
       else if(vheaders[i]=="spin_atom"){valignments_entrytable_uint.push_back(2); total_alignment_entrytable+=valignments_entrytable_uint.back();}
       else if(vheaders[i]=="enthalpy_formation_atom"){valignments_entrytable_uint.push_back(2); total_alignment_entrytable+=valignments_entrytable_uint.back();}
       else if(vheaders[i]=="entropic_temperature"){valignments_entrytable_uint.push_back(2); total_alignment_entrytable+=valignments_entrytable_uint.back();}
-      else if(vheaders[i]=="enthalpy_formation_atom_difference"){valignments_entrytable_uint.push_back(2); total_alignment_entrytable+=valignments_entrytable_uint.back();}
-      else if(vheaders[i]=="entropic_temperature_difference"){valignments_entrytable_uint.push_back(2); total_alignment_entrytable+=valignments_entrytable_uint.back();}
+      else if(vheaders[i]=="distance_hull_enthalpy_formation_atom"){valignments_entrytable_uint.push_back(2); total_alignment_entrytable+=valignments_entrytable_uint.back();}
+      else if(vheaders[i]=="distance_hull_entropic_temperature"){valignments_entrytable_uint.push_back(2); total_alignment_entrytable+=valignments_entrytable_uint.back();}
       else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
     }
 
@@ -8211,8 +8295,8 @@ namespace chull {
       else if(vheaders[i]=="spin_atom"){valignments_entrytable_string.push_back("R{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
       else if(vheaders[i]=="enthalpy_formation_atom"){valignments_entrytable_string.push_back("R{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
       else if(vheaders[i]=="entropic_temperature"){valignments_entrytable_string.push_back("R{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
-      else if(vheaders[i]=="enthalpy_formation_atom_difference"){valignments_entrytable_string.push_back("R{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
-      else if(vheaders[i]=="entropic_temperature_difference"){valignments_entrytable_string.push_back("R{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
+      else if(vheaders[i]=="distance_hull_enthalpy_formation_atom"){valignments_entrytable_string.push_back("R{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
+      else if(vheaders[i]=="distance_hull_entropic_temperature"){valignments_entrytable_string.push_back("R{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
       else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
       if(LDEBUG) {cerr << __AFLOW_FUNC__ << " " << valignments_entrytable_string.back() << endl;}
     }
@@ -8391,7 +8475,7 @@ namespace chull {
               if(m_formation_energy_hull) {
                 if(point.getDist2Hull(_m_) > dist_filter_cutoff) {
                   //[CO20181226 - print later]message << "Excluding entry " << point.m_entry.auid;
-                  //[CO20181226 - print later]message << " with enthalpy_formation_atom_difference = " << aurostd::utype2string(point.getDist2Hull(_m_),CHULL_PRECISION);
+                  //[CO20181226 - print later]message << " with distance_hull_enthalpy_formation_atom = " << aurostd::utype2string(point.getDist2Hull(_m_),CHULL_PRECISION);
                   //[CO20181226 - print later]message << " (meV/atom) from plot";
                   //[CO20181226 - print later]pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);  // too much output to screen
                   continue;
@@ -8399,7 +8483,7 @@ namespace chull {
               } else {
                 if(point.getDist2Hull(_std_) < dist_filter_cutoff) {
                   //[CO20181226 - print later]message << "Excluding entry " << point.m_entry.auid;
-                  //[CO20181226 - print later]message << " with entropic_temperature_difference = " << aurostd::utype2string(point.getDist2Hull(_std_),CHULL_PRECISION);
+                  //[CO20181226 - print later]message << " with distance_hull_entropic_temperature = " << aurostd::utype2string(point.getDist2Hull(_std_),CHULL_PRECISION);
                   //[CO20181226 - print later]message << " (K) from plot";
                   //[CO20181226 - print later]pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);  // too much output to screen
                   continue;
@@ -8480,7 +8564,7 @@ namespace chull {
               if(m_formation_energy_hull) {
                 if(point.getDist2Hull(_m_) > dist_filter_cutoff) {
                   message << "Excluding entry " << point.m_entry.auid;
-                  message << " with enthalpy_formation_atom_difference = " << aurostd::utype2string(point.getDist2Hull(_m_),CHULL_PRECISION);
+                  message << " with distance_hull_enthalpy_formation_atom = " << aurostd::utype2string(point.getDist2Hull(_m_),CHULL_PRECISION);
                   message << " (meV/atom) from plot";
                   pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);  // too much output to screen
                   continue;
@@ -8488,7 +8572,7 @@ namespace chull {
               } else {
                 if(point.getDist2Hull(_std_) < dist_filter_cutoff) {
                   message << "Excluding entry " << point.m_entry.auid;
-                  message << " with entropic_temperature_difference = " << aurostd::utype2string(point.getDist2Hull(_std_),CHULL_PRECISION);
+                  message << " with distance_hull_entropic_temperature = " << aurostd::utype2string(point.getDist2Hull(_std_),CHULL_PRECISION);
                   message << " (K) from plot";
                   pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);  // too much output to screen
                   continue;
@@ -9810,7 +9894,7 @@ namespace chull {
                 // shortstack newline
                 node_content_ss << "\\\\";
                 if(m_formation_energy_hull) {
-                  node_content_ss << "$" << getDelta(helvetica_font) << " H_{\\mathrm{f}}$=" << aurostd::utype2string(point.getDist2Hull(_m_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";  //CHULL_PRECISION
+                  node_content_ss << "$" << getDelta(helvetica_font) << " H_{\\mathrm{hull}}$=" << aurostd::utype2string(point.getDist2Hull(_m_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";  //CHULL_PRECISION
                 } else {
                   node_content_ss << "$" << getDelta(helvetica_font) << " T_{\\mathrm{S}}$=" << aurostd::utype2string(point.getDist2Hull(_std_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " K"; //CHULL_PRECISION
                 }
@@ -10676,8 +10760,7 @@ namespace chull {
                   print_scriterion=true;
                   precision_tmp=0;
                   tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
-                  //scriterion_data_ss << "$\\mathit{\\Delta}_{\\mathrm{sc}}="; //this delta is okay, should be italicized
-                  scriterion_data_ss << "$\\delta_{\\mathrm{sc}}="; //this delta is okay, should be italicized
+                  scriterion_data_ss << "$" << getStabilityCriterionSymbol(helvetica_font) << "="; //this delta is okay, should be italicized
                   scriterion_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_stability_criterion,(m_formation_energy_hull?_m_:_std_)),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
                   scriterion_data_ss << "$~" << (m_formation_energy_hull?string("meV/atom"):string("K"));
                 }
@@ -10685,11 +10768,10 @@ namespace chull {
                   print_np1=true;
                   precision_tmp=0;
                   tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
-                  //np1_data_ss << "$\\mathit{\\Delta}_{\\mathrm{sc}}="; //this delta is okay, should be italicized
                   if(0){
-                    np1_data_ss << "$\\Delta H[N|\\{1,\\cdots,N-1\\}]="; //this delta is okay, should be italicized
+                    np1_data_ss << "$" << getDelta(helvetica_font) << " H[N|\\{1,\\cdots,N-1\\}]="; //this delta is okay, should be italicized
                   }else{
-                    np1_data_ss << "$\\Delta H[" << m_coord_groups[i_coord_group].m_i_nary+1 << "|"; //this delta is okay, should be italicized
+                    np1_data_ss << "$" << getDelta(helvetica_font) << " H[" << m_coord_groups[i_coord_group].m_i_nary+1 << "|"; //this delta is okay, should be italicized
                     if(m_coord_groups[i_coord_group].m_i_nary==0){np1_data_ss << "0";}  //not allowed anymore, but we can print the value
                     else if(m_coord_groups[i_coord_group].m_i_nary==1){np1_data_ss << "1";}
                     else if(m_coord_groups[i_coord_group].m_i_nary==2){np1_data_ss << "\\{1,2\\}";}
@@ -10812,10 +10894,10 @@ namespace chull {
     main_output_file=main_PDF_file;
     if(m_cflags.flag("CHULL::PNG_IMAGE")&&!m_cflags.flag("CHULL::LATEX_DOC")){destination=path+main_PNG_file;main_output_file=main_PNG_file;}
     string LATEX_dir = aurostd::TmpDirectoryCreate("chullLATEX");
-    chdir(LATEX_dir.c_str());
-    aurostd::stringstream2file(main_TEX_ss, main_TEX_file);
-    if(!aurostd::FileExist(main_TEX_file)) {
-      chdir(PWD.c_str());
+    if(0) chdir(LATEX_dir.c_str());
+    aurostd::stringstream2file(main_TEX_ss, LATEX_dir+"/"+main_TEX_file);
+    if(!aurostd::FileExist(LATEX_dir+"/"+main_TEX_file)) {
+      if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -10823,9 +10905,9 @@ namespace chull {
     }
     //watermark
     if(!doc_only){
-      aurostd::base642bin(_AFLOW_LOGO_SKINNY_BASE64_, aflow_logo_skinny_file);
-      if(!aurostd::FileExist(aflow_logo_skinny_file)) {
-        chdir(PWD.c_str());
+      aurostd::base642bin(_AFLOW_LOGO_SKINNY_BASE64_, LATEX_dir+"/"+aflow_logo_skinny_file);
+      if(!aurostd::FileExist(LATEX_dir+"/"+aflow_logo_skinny_file)) {
+        if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -10833,9 +10915,9 @@ namespace chull {
       }
     }
     if(print_aflow_logo_full) {
-      aurostd::base642bin(_AFLOW_LOGO_FULL_BASE64_, aflow_logo_full_file);
-      if(!aurostd::FileExist(aflow_logo_full_file)) {
-        chdir(PWD.c_str());
+      aurostd::base642bin(_AFLOW_LOGO_FULL_BASE64_, LATEX_dir+"/"+aflow_logo_full_file);
+      if(!aurostd::FileExist(LATEX_dir+"/"+aflow_logo_full_file)) {
+        if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -10843,9 +10925,9 @@ namespace chull {
       }
     }
     if(print_logo_2) {
-      aurostd::base642bin(_NOMAD_LOGO_BASE64_, logo_file_2);
-      if(!aurostd::FileExist(logo_file_2)) {
-        chdir(PWD.c_str());
+      aurostd::base642bin(_NOMAD_LOGO_BASE64_, LATEX_dir+"/"+logo_file_2);
+      if(!aurostd::FileExist(LATEX_dir+"/"+logo_file_2)) {
+        if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -10855,6 +10937,7 @@ namespace chull {
     command.str("");
     stringstream clean_command;
     uint num_compile;
+    command << "cd " << LATEX_dir << " && ";
     command << XHOST.command("pdflatex") << " ";
     clean_command << XHOST.command("pdflatex") << " ";
     if(!show_latex_output) {command << "-interaction=nonstopmode -halt-on-error ";}  //-interaction=batchmode
@@ -10878,14 +10961,14 @@ namespace chull {
       if(latex_interactive_mode) {for (uint i = 0; i < num_compile; i++) {aurostd::execute(command.str());}} // will not save output, allows you to interact with LaTEX
       else {for (uint i = 0; i < num_compile; i++) {*p_oss << aurostd::execute2string(command.str()) << endl;}} // saves output
     } else {for (uint i = 0; i < num_compile; i++) {aurostd::execute(command.str());}} // no output to save
-    if(!aurostd::FileExist(main_PDF_file)) {
+    if(!aurostd::FileExist(LATEX_dir+"/"+main_PDF_file)) {
       message << main_PDF_file << " was not created successfully, likely a LaTeX issue";
       pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
       files_2_move.clear(); //only move these files
-      files_2_move.push_back(main_TEX_file);
-      if(!doc_only){files_2_move.push_back(aflow_logo_skinny_file);}
-      if(print_aflow_logo_full){files_2_move.push_back(aflow_logo_full_file);}
-      if(print_logo_2){files_2_move.push_back(logo_file_2);}
+      files_2_move.push_back(LATEX_dir+"/"+main_TEX_file);
+      if(!doc_only){files_2_move.push_back(LATEX_dir+"/"+aflow_logo_skinny_file);}
+      if(print_aflow_logo_full){files_2_move.push_back(LATEX_dir+"/"+aflow_logo_full_file);}
+      if(print_logo_2){files_2_move.push_back(LATEX_dir+"/"+logo_file_2);}
 
       message << "Moving " << aurostd::joinWDelimiter(files_2_move,", "," and ",", and ") << " to " << path; //CO20180220 - current directory";
       pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
@@ -10893,7 +10976,7 @@ namespace chull {
       pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
       aurostd::file2directory(files_2_move, path);
-      chdir(PWD.c_str());
+      if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -10916,6 +10999,7 @@ namespace chull {
       }
       message << "Attempting to convert " << main_PDF_file << " to " << main_PNG_file;  //CO20180220 //the .tex file";
       pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      command << "cd " << LATEX_dir << " && ";
       command << XHOST.command("convert") << " -density " << resolution << " " << main_PDF_file << " " << main_PNG_file;
       clean_command << XHOST.command("convert") << " -density " << resolution << " " << main_PDF_file << " " << main_PNG_file;
       command << " 1>/dev/null 2>&1";
@@ -10925,7 +11009,7 @@ namespace chull {
         message << main_PNG_file << " was not created successfully, likely a convert issue";
         pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
         files_2_move.clear(); //only move these files
-        files_2_move.push_back(main_PDF_file);
+        files_2_move.push_back(LATEX_dir+"/"+main_PDF_file);
 
         message << "Moving " << aurostd::joinWDelimiter(files_2_move,", "," and ",", and ") << " to " << path; //CO20180220 - current directory";
         pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
@@ -10933,31 +11017,31 @@ namespace chull {
         pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
         aurostd::file2directory(files_2_move, path);
-        chdir(PWD.c_str());
+        if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveDirectory(LATEX_dir);
 #endif
         throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Issues converting PDF to PNG file");
       }
     }
-    if(m_cflags.flag("CHULL::LATEX_DOC")){files_2_move.push_back(main_PDF_file);}
-    if(m_cflags.flag("CHULL::PNG_IMAGE")){files_2_move.push_back(main_PNG_file);}
+    if(m_cflags.flag("CHULL::LATEX_DOC")){files_2_move.push_back(LATEX_dir+"/"+main_PDF_file);}
+    if(m_cflags.flag("CHULL::PNG_IMAGE")){files_2_move.push_back(LATEX_dir+"/"+main_PNG_file);}
     if(keep_tex) {
-      files_2_move.push_back(main_TEX_file);
-      if(!doc_only){files_2_move.push_back(aflow_logo_skinny_file);}
-      if(print_aflow_logo_full){files_2_move.push_back(aflow_logo_full_file);} //files_2_move.push_back(aflow_logo_skinny_file);
-      if(print_logo_2){files_2_move.push_back(logo_file_2);}
+      files_2_move.push_back(LATEX_dir+"/"+main_TEX_file);
+      if(!doc_only){files_2_move.push_back(LATEX_dir+"/"+aflow_logo_skinny_file);}
+      if(print_aflow_logo_full){files_2_move.push_back(LATEX_dir+"/"+aflow_logo_full_file);} //files_2_move.push_back(LATEX_dir+"/"+aflow_logo_skinny_file);
+      if(print_logo_2){files_2_move.push_back(LATEX_dir+"/"+logo_file_2);}
       message << "Moving " << aurostd::joinWDelimiter(files_2_move,", "," and ",", and ") << " to " << path; //CO20180220 - current directory";
       pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     }
     if(!aurostd::file2directory(files_2_move, path)) {
-      chdir(PWD.c_str());
+      if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(LATEX_dir);
 #endif
       throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unable to move files out of temporary compilation directory");
     }
-    chdir(PWD.c_str());
+    if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
     aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -11096,13 +11180,13 @@ namespace chull {
     bool latex_property=false;
     bool math_mode=false;
     //[OBSOLETE]bool reduced=false;
-    if(property=="compound"||property=="compound_latex"||property=="reduced_compound"||property=="reduced_compound_latex"||property=="fractional_compound"||property=="fractional_compound_latex"){
+    if(property=="compound"||property=="compound_latex"||property=="compound_reduced"||property=="compound_reduced_latex"||property=="compound_fractional"||property=="compound_fractional_latex"){
       math_mode=false;  //do not wrap these, they are automatically wrapped inside prettyPrint
-      latex_property=(property=="compound_latex"||property=="reduced_compound_latex"||property=="fractional_compound_latex");
+      latex_property=(property=="compound_latex"||property=="compound_reduced_latex"||property=="compound_fractional_latex");
       vector_reduction_type vred=no_vrt;
-      if(property=="reduced_compound"||property=="reduced_compound_latex"){vred=gcd_vrt;}
-      if(property=="fractional_compound"||property=="fractional_compound_latex"){vred=frac_vrt;}
-      //[OBSOLETE]reduced=(property=="reduced_compound"||property=="reduced_compound_latex");
+      if(property=="compound_reduced"||property=="compound_reduced_latex"){vred=gcd_vrt;}
+      if(property=="compound_fractional"||property=="compound_fractional_latex"){vred=frac_vrt;}
+      //[OBSOLETE]reduced=(property=="compound_reduced"||property=="compound_reduced_latex");
       value=prettyPrintCompound(point,vred,(ftype==latex_ft||latex_property||vred==gcd_vrt||vred==frac_vrt),(latex_property?latex_ft:ftype));
       if((ftype==latex_ft||latex_property)&&math_mode&&!value.empty()){value=aurostd::wrapString(value,string_wrapper_math_mode);}
       value=aurostd::wrapString(value,string_wrapper);
@@ -11157,7 +11241,7 @@ namespace chull {
       value=aurostd::utype2string(point.m_entry.entropic_temperature,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
     }
     else if(property=="ground_state"){value=(point.isGState()?"true":"false");}
-    else if(property=="equivalent_structures_auid"){
+    else if(property=="auid_equivalent_structures"){
       if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No latex rule defined for "+property);}
       if(point.isGState()){
         //need to grab from coord_group
@@ -11179,7 +11263,7 @@ namespace chull {
         }
       }
     }
-    else if(property=="icsd_ground_state"){
+    else if(property=="ground_state_icsd"){
       bool icsd_g_state=false;
       if(point.isGState()){
         //need to grab from coord_group
@@ -11191,7 +11275,7 @@ namespace chull {
       }
       value=(icsd_g_state?"true":"false");
     }
-    else if(property=="icsd_canonical_auid"){
+    else if(property=="auid_icsd"){
       if(point.isGState()){
         //need to grab from coord_group
         uint i_coord_group=AUROSTD_MAX_UINT;
@@ -11205,7 +11289,7 @@ namespace chull {
         }
       }
     }
-    else if(property=="phases_equilibrium_compound"){
+    else if(property=="compound_phases_equilibrium"){
       if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No latex rule defined for "+property);}
       if(point.isGState()&&!point.isUnary()){ //unaries are always gstates, but do NOT have any mixture context
         //need to grab from coord_group
@@ -11233,7 +11317,7 @@ namespace chull {
         }
       }
     }
-    else if(property=="phases_equilibrium_auid"){
+    else if(property=="auid_phases_equilibrium"){
       if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No latex rule defined for "+property);}
       if(point.isGState()&&!point.isUnary()){
         //need to grab from coord_group
@@ -11261,7 +11345,7 @@ namespace chull {
         }
       }
     }
-    else if(property=="phases_decomposition_compound"){
+    else if(property=="compound_phases_decomposition"){
       if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No latex rule defined for "+property);}
       if(GET_DECOMPOSITION_POLYMORPHS||!point.isGState()){
         //need to grab from coord_group
@@ -11286,7 +11370,7 @@ namespace chull {
         }
       }
     }
-    else if(property=="phases_decomposition_auid"){
+    else if(property=="auid_phases_decomposition"){
       if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No latex rule defined for "+property);}
       if(GET_DECOMPOSITION_POLYMORPHS||!point.isGState()){
         //need to grab from coord_group
@@ -11311,7 +11395,7 @@ namespace chull {
         }
       }
     }
-    else if(property=="phases_decomposition_coefficient"){
+    else if(property=="coefficient_phases_decomposition"){
       if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No latex rule defined for "+property);}
       if(GET_DECOMPOSITION_POLYMORPHS||!point.isGState()){
         //need to grab from coord_group
@@ -11342,7 +11426,7 @@ namespace chull {
       }
       value=aurostd::utype2string(i_nary);  //no precision needed here, simple uint
     }
-    else if(property=="enthalpy_formation_atom_difference"){
+    else if(property=="distance_hull_enthalpy_formation_atom"){
       d_tmp=point.getDist2Hull(_m_);
       if(d_tmp!=AUROSTD_MAX_DOUBLE){
         precision_tmp=precision;
@@ -11350,7 +11434,7 @@ namespace chull {
         value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
       }
     }
-    else if(property=="entropic_temperature_difference"){
+    else if(property=="distance_hull_entropic_temperature"){
       d_tmp=point.getDist2Hull(_std_);
       if(d_tmp!=AUROSTD_MAX_DOUBLE){
         precision_tmp=precision;
@@ -11371,7 +11455,7 @@ namespace chull {
         }
       }
     }
-    else if(property=="relative_stability_criterion"){
+    else if(property=="stability_criterion_relative"){
       if(m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")||point.getRelativeStabilityCriterion()>=AUROSTD_NAN){value=null_value;}
       else {
         if(point.isGState()){
@@ -11435,14 +11519,14 @@ namespace chull {
       null_value="null";
     }
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting property=" << property << endl;}
-    if(property=="vertices_position"){
+    if(property=="position_vertices"){
       vector<string> vstr;
       for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
         vstr.push_back(aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(facet.m_vertices[i].ch_point.h_coords,precision,true,roundoff_tol,FIXED_STREAM),vector_delimiter));
       }
       value=aurostd::wrapString(aurostd::joinWDelimiter(aurostd::wrapVecEntries(vstr,"[","]"),","),list_prefix,list_suffix);
     }
-    else if(property=="vertices_compound"){
+    else if(property=="compound_vertices"){
       vector<string> compounds;
       for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
         if(facet.m_vertices[i].ch_point.m_has_entry){
@@ -11459,7 +11543,7 @@ namespace chull {
       }
       value=aurostd::wrapString(aurostd::joinWDelimiter(compounds,","),list_prefix,list_suffix);
     }
-    else if(property=="vertices_auid"){
+    else if(property=="auid_vertices"){
       vector<string> auids;
       for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
         if(facet.m_vertices[i].ch_point.m_has_entry){
@@ -11480,9 +11564,9 @@ namespace chull {
     else if(property=="normal"){value="["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(facet.m_normal,precision,true,roundoff_tol,FIXED_STREAM),vector_delimiter)+"]";}
     else if(property=="offset"){value=aurostd::utype2string(facet.m_offset,precision,true,roundoff_tol,FIXED_STREAM);}
     else if(property=="centroid"){value="["+aurostd::joinWDelimiter(aurostd::xvecDouble2vecString(facet.m_facet_centroid,precision,true,roundoff_tol,FIXED_STREAM),vector_delimiter)+"]";}
-    else if(property=="hypercollinear"){value=(facet.m_hypercollinear?"true":"false");}
-    else if(property=="vertical"){value=(facet.m_is_vertical?"true":"false");}
-    else if(property=="artificial"){value=(facet.m_is_artificial?"true":"false");}
+    else if(property=="is_hypercollinear"){value=(facet.m_is_hypercollinear?"true":"false");}
+    else if(property=="is_vertical"){value=(facet.m_is_vertical?"true":"false");}
+    else if(property=="is_artificial"){value=(facet.m_is_artificial?"true":"false");}
     else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
     if(value.empty()){value=null_value;}
     return value;
@@ -11532,12 +11616,12 @@ namespace chull {
         //if(vproperties[i]=="url_entry_page"){header="entry_page_url";}
         //if(vproperties[i]=="enthalpy_formation_atom"){header="formation_enthalpy";}
         //if(vproperties[i]=="spin_atom"){header="spin";}
-        //if(vproperties[i]=="phases_equilibrium_compound"){header="equilibrium_phases";}
-        //if(vproperties[i]=="phases_equilibrium_auid"){header="equilibrium_phases_auids";}
-        //if(vproperties[i]=="phases_decomposition_compound"){header="decomposition_phases";}
-        //if(vproperties[i]=="phases_decomposition_auid"){header="decomposition_phases_auids";}
-        //if(vproperties[i]=="phases_decomposition_coefficient"){header="decomposition_coefficients";}
-        //if(vproperties[i]=="enthalpy_formation_atom_difference"){header="formation_enthalpy_difference";}
+        //if(vproperties[i]=="compound_phases_equilibrium"){header="equilibrium_phases";}
+        //if(vproperties[i]=="auid_phases_equilibrium"){header="equilibrium_phases_auids";}
+        //if(vproperties[i]=="compound_phases_decomposition"){header="decomposition_phases";}
+        //if(vproperties[i]=="auid_phases_decomposition"){header="decomposition_phases_auids";}
+        //if(vproperties[i]=="coefficient_phases_decomposition"){header="decomposition_coefficients";}
+        //if(vproperties[i]=="distance_hull_enthalpy_formation_atom"){header="formation_enthalpy_difference";}
         //add any processing here before upper
         header=aurostd::toupper(header);
         //units are nice, but again, NON-STANDARD
@@ -11546,8 +11630,8 @@ namespace chull {
         //if(vproperties[i]=="enthalpy_formation_atom"){header+="_[meV/atom]";}
         //if(vproperties[i]=="entropic_temperature"){header+="_[K]";}
         //if(vproperties[i]=="spin_atom"){header+="_[mu_B/atom]";}
-        //if(vproperties[i]=="enthalpy_formation_atom_difference"){header+="_[meV/atom]";}
-        //if(vproperties[i]=="entropic_temperature_difference"){header+="_[K]";}
+        //if(vproperties[i]=="distance_hull_enthalpy_formation_atom"){header+="_[meV/atom]";}
+        //if(vproperties[i]=="distance_hull_entropic_temperature"){header+="_[K]";}
         headers.push_back(header);
       }
     }
@@ -11698,16 +11782,16 @@ namespace chull {
     string properties_str_points=getPointsPropertyHeaderList(ftype);
 
     bool terse_output=false;
-    string facet_properties_str="vertices_position";
-    if(!terse_output){facet_properties_str+=",vertices_compound";}
-    facet_properties_str+=",vertices_auid";
+    string facet_properties_str="position_vertices";
+    if(!terse_output){facet_properties_str+=",compound_vertices";}
+    facet_properties_str+=",auid_vertices";
     facet_properties_str+=",content";
     facet_properties_str+=",normal";
     facet_properties_str+=",offset";
     facet_properties_str+=",centroid";
-    facet_properties_str+=",hypercollinear";
-    facet_properties_str+=",vertical";
-    facet_properties_str+=",artificial";
+    facet_properties_str+=",is_hypercollinear";
+    facet_properties_str+=",is_vertical";
+    facet_properties_str+=",is_artificial";
 
     stringstream main_text_ss;main_text_ss.str("");
     vector<string> vout;        //json only
@@ -12055,7 +12139,7 @@ namespace chull {
             distances_data_JSON_ss << ",";
             num_ss.str("");
 
-            num_ss << ConvexHull::grabCHPointProperty(point,"phases_decomposition_auid",json_ft);
+            num_ss << ConvexHull::grabCHPointProperty(point,"auid_phases_decomposition",json_ft);
             distances_data_JSON_ss << "\"decompositionAuids\":" << num_ss.str();
             num_ss.str("");
             //SK20200825 end
@@ -12160,7 +12244,7 @@ namespace chull {
     bool found=false;
     for(uint i=0,fl_size_i=m_facets.size();i<fl_size_i;i++) {
       //const xvector<double> normal = m_facets[i].m_normal;
-      if(!(/*m_facets[i].m_hypercollinear||*/m_facets[i].m_is_vertical||m_facets[i].m_is_artificial)&&m_facets[i].m_dim==m_dim){  //keep hypercollinear, might create small gaps in visualization otherwise //CO20190423 - EG needs three-dimensional only for 3D
+      if(!(/*m_facets[i].m_is_hypercollinear||*/m_facets[i].m_is_vertical||m_facets[i].m_is_artificial)&&m_facets[i].m_dim==m_dim){  //keep is_hypercollinear, might create small gaps in visualization otherwise //CO20190423 - EG needs three-dimensional only for 3D
         v_ch_indices=m_facets[i].getCHIndices();
         if(LDEBUG) {cerr << __AFLOW_FUNC__ << " v_ch_indices=" << aurostd::joinWDelimiter(v_ch_indices,",") << endl;}
         v_vertices_indices.clear();
@@ -12363,7 +12447,7 @@ namespace chull {
 
     if(m_auto_sort_energy){
       if(fi.m_in_lower_hemisphere!=fj.m_in_lower_hemisphere){return fi.m_in_lower_hemisphere>fj.m_in_lower_hemisphere;} //upper hemisphere last
-      if(fi.m_hypercollinear!=fj.m_hypercollinear){return fi.m_hypercollinear>fj.m_hypercollinear;} //hypercollinearity last within hemisphere
+      if(fi.m_is_hypercollinear!=fj.m_is_hypercollinear){return fi.m_is_hypercollinear>fj.m_is_hypercollinear;} //hypercollinearity last within hemisphere
       if(fi.m_is_vertical!=fj.m_is_vertical){return fi.m_is_vertical>fj.m_is_vertical;} //vertical above hypercollinearity
     }
 

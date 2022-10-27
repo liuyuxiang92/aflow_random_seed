@@ -71,6 +71,7 @@ namespace chull {
   class ChullPoint; //forward declaration
   class ConvexHull; //forward declaration
   bool convexHull(const aurostd::xoption& vpflow);
+  bool convexHull(const string& input,const aurostd::xoption& vpflow,const _aflags& aflags,ostream& oss=cout,bool silence_flag_check=false);
   ////////////////////////////////////////////////////////////////////////////////
   // gets path to redirect output
   string getPath(bool add_backslash=true);
@@ -209,6 +210,7 @@ namespace chull {
 
       //for organization of points
       uint m_i_coord_group;
+      uint m_i_icsd;                    //index of equivalent icsd in m_points
 
       //stoich_coords only!
       xvector<double> s_coords;         //stoich_coords, m_coords[0:rows-1]+hidden_dimension
@@ -364,7 +366,7 @@ namespace chull {
       double m_offset;
       xvector<double> m_facet_centroid;
       xvector<double> m_hull_reference;
-      bool m_hypercollinear;
+      bool m_is_hypercollinear;
       bool m_is_vertical;
       bool m_is_artificial;
       bool m_in_lower_hemisphere;                //this determines how we sort wrt stoich (descending in lower_hemisphere)
@@ -908,6 +910,7 @@ namespace chull {
       bool unwantedFacetLine(uint vi,uint vj,vector<vector<uint> >& facet_lines,bool check_border=true) const;
       string getPointsPropertyHeaderList(filetype ftype) const;
       string getDelta(bool helvetica_font) const;
+      string getStabilityCriterionSymbol(bool helvetica_font) const;
       string getSnapshotTableHeader(string headers,bool designate_HEADER=false) const;
       bool addInternalHyperlinks(bool internal_links_graph2report=true,bool internal_links_withinreport=true) const;
       bool addExternalHyperlinks() const;

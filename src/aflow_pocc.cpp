@@ -4817,7 +4817,6 @@ namespace pocc {
   // The maps are combined in the end.
   vector<uint> POccCalculator::getMapToPARTCAR(unsigned long long int isupercell, const xstructure& xstr_in) {
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG); 
-    string __AFLOW_FUNC__ = XPID + "POccCalculator::getMapToPARTCAR():";
     string message = "";
     if (isupercell > l_supercell_sets.size() - 1) {
       throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__, "Invalid supercell index.");
@@ -5956,7 +5955,6 @@ namespace pocc {
 
   // ME20211004
   void POccCalculator::createModuleAflowIns(const _xvasp& xvasp_in, const string& MODULE) {
-    string __AFLOW_FUNC__ = XPID + "POccCalculator::createModuleAflowIns():";
     string message = "";
 
     if (m_ARUN_directories.size() == 0) loadDataIntoCalculator();

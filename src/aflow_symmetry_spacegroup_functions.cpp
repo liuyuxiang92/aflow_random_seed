@@ -327,10 +327,9 @@ namespace SYM {
 
     // ---------------------------------------------------------------------------
     // error
-    string function_name = XPID + "SYM::spacegroup2latticeAndCentering():";
     stringstream message;
     message << "Could not classify space group into a Bravais lattice (most likely ranges are incorrect).";
-    throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+    throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
 
   }
 }
@@ -376,7 +375,7 @@ namespace SYM {
 namespace SYM {
   bool getAtomGCD(deque<_atom>& atomic_basis, deque<deque<_atom> >& split_atom_types, int& gcd_num) {
     split_atom_types = SYM::break_up_by_type(atomic_basis);
-    if(split_atom_types.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SYM::getAtomGCD():","split_atom_types.size()==0",_INPUT_ERROR_);}
+    if(split_atom_types.size()==0){throw aurostd::xerror(__AFLOW_FILE__,"SYM::getAtomGCD():","split_atom_types.size()==0",_INPUT_ERROR_);}
     gcd_num=1;  //CO+DX20191201
     if(split_atom_types.size() > 1) { // If only one type of atom, set to 1
       gcd_num=(int)split_atom_types[0].size();  //CO+DX20191201
@@ -506,7 +505,6 @@ namespace SYM {
 // ******************************************************************************
 namespace SYM {
   vector<double> ExtractLatticeParametersFromWyccar(const vector<string>& wyccar_ITC){ //DX20191030 - added const
-    string function_name = XPID + "SYM::ExtractLatticeParametersFromWyccar():";
     vector<double> lattice_parameters;
     if(wyccar_ITC.size()>3){
       vector<string> tokens;
@@ -516,7 +514,7 @@ namespace SYM {
       }
     }
     else {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"Invalid WYCCAR",_FILE_WRONG_FORMAT_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid WYCCAR",_FILE_WRONG_FORMAT_);
     }
     return lattice_parameters;
   }
@@ -635,7 +633,6 @@ namespace SYM {
     // Split the site symmetry symbol into its primary, secondary, and teriary
     // directions (see ITC-A pgs. 28-29 for site symmetry info).
 
-    string function_name = XPID + "SYM::splitSiteSymmetry():";
 
     vector<string> split_site_symmetry; 
     stringstream ss_primary, ss_secondary, ss_tertiary;
@@ -776,7 +773,7 @@ namespace SYM {
             }
           }
           else if(tmp.size()==4){
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
           }
         }
         if(dot_direction[0]=="secondary"){ 
@@ -821,7 +818,7 @@ namespace SYM {
             }
           }
           else if(tmp.size()==4){
-            throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
+            throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
           }
           ss_tertiary << site_symmetry[dot_index[0]];
           split_site_symmetry.push_back(ss_tertiary.str());
@@ -868,7 +865,7 @@ namespace SYM {
     }
 
     if(split_site_symmetry.size()!=3){
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"More site symmetry characters than anticipated.",_INPUT_ILLEGAL_);
     }
 
     return split_site_symmetry;
@@ -881,7 +878,7 @@ namespace SYM {
 //// ******************************************************************************
 //void AtomicEnvironment(istream & cin, vector<string> av ){
 //
-//  if(av.size() != 3) {throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"AtomicEnvironment():","Please enter a radius.",_INPUT_NUMBER_);}
+//  if(av.size() != 3) {throw aurostd::xerror(__AFLOW_FILE__,XPID+"AtomicEnvironment():","Please enter a radius.",_INPUT_NUMBER_);}
 //  double radius = atof(av[2].c_str());
 //  //double tol = 1e-6;
 //  CrystalStructure C(cin);//Gives primitive lattice
@@ -2014,11 +2011,10 @@ namespace SYM {
 namespace SYM {
   vector<vector<string> > get_wyckoff_pos(string spaceg, int Wyckoff_multiplicity, string Wyckoff_letter) {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function_name = XPID + "SYM::get_wyckoff_pos()";
     vector<int> mult_vec = get_multiplicities(spaceg);
     //Error if mult is not contained in mult_vec (i.e., a wyckoff position with multiplicity mult does not exist for the space group spaceg)
     if(!aurostd::WithinList(mult_vec, Wyckoff_multiplicity)) { //DX20210422 - SYM::invec() -> aurostd::WithinList()
-      if(LDEBUG) { cerr << function_name << ": WARNING: no wyckoff position with multiplicity " << Wyckoff_multiplicity << "." << endl; }
+      if(LDEBUG) { cerr << __AFLOW_FUNC__ << ": WARNING: no wyckoff position with multiplicity " << Wyckoff_multiplicity << "." << endl; }
       vector<vector<string> > none;
       return none;
     }
@@ -2052,7 +2048,7 @@ namespace SYM {
     //DX20191030 - remove stringstream assignment (used to be here)
     //DX20191030 - use tokens instead of stringstream assignment - END
 
-    if(LDEBUG) {cerr << function_name << ": Wyckoff positions without centering(s): " << aurostd::joinWDelimiter(all_positions," ") << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << ": Wyckoff positions without centering(s): " << aurostd::joinWDelimiter(all_positions," ") << endl;}
 
     vector<vector<string> > non_shifted_Wyckoff_positions;
     vector<string> tokens;
@@ -2087,7 +2083,7 @@ namespace SYM {
     if(LDEBUG) {
       vector<string> tmp; 
       for(uint i=0;i<all_Wyckoff_positions.size();i++){tmp.push_back("("+aurostd::joinWDelimiter(all_Wyckoff_positions[i],",")+")");}
-      cerr << function_name << ": All Wyckoff positions: " << aurostd::joinWDelimiter(tmp," ") << endl;
+      cerr << __AFLOW_FUNC__ << ": All Wyckoff positions: " << aurostd::joinWDelimiter(tmp," ") << endl;
     }
 
     return all_Wyckoff_positions;
@@ -2220,7 +2216,6 @@ namespace SYM {
       uint& Wyckoff_multiplicity, string& site_symmetry, vector<vector<string> >& all_positions){
 
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    string function_name = XPID + "SYM::getWyckoffInformation()";
     bool reduce = true; // DEBUGGING variable: simplify/reduce Wyckoff coordinates (e.g., 0.25+0.5 -> 0.75)
     vector<string> split_Wyckoff_strings, Wyckoff_tokens, positions;
 
@@ -2247,7 +2242,7 @@ namespace SYM {
     }
 
 
-    if(LDEBUG) {cerr << function_name << ": Wyckoff positions without centering(s): " << aurostd::joinWDelimiter(positions," ") << endl;}
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << ": Wyckoff positions without centering(s): " << aurostd::joinWDelimiter(positions," ") << endl;}
 
     vector<vector<string> > non_shifted_Wyckoff_positions;
     vector<string> tokens;
@@ -2298,7 +2293,7 @@ namespace SYM {
     if(LDEBUG) {
       vector<string> tmp_vposition; 
       for(uint i=0;i<all_positions.size();i++){tmp_vposition.push_back("("+aurostd::joinWDelimiter(all_positions[i],",")+")");}
-      cerr << function_name << ": All Wyckoff positions: " << aurostd::joinWDelimiter(tmp_vposition," ") << endl;
+      cerr << __AFLOW_FUNC__ << ": All Wyckoff positions: " << aurostd::joinWDelimiter(tmp_vposition," ") << endl;
     }
 
   }
@@ -2671,7 +2666,6 @@ void wyckoffsite_ITC::getWyckoffFromLetter(uint space_group_number, const string
 void wyckoffsite_ITC::getWyckoffFromLetter(const string& space_group_string, const string& Wyckoff_letter){
 
   bool LDEBUG = (FALSE || XHOST.DEBUG);
-  string function_name = XPID + "wyckoffsite_ITC::getWyckoffFromLetter()";
   stringstream message;
 
   //DX 20191030 - use tokens instead of stringstream assignment - START
@@ -2696,7 +2690,7 @@ void wyckoffsite_ITC::getWyckoffFromLetter(const string& space_group_string, con
         //}
         //else{
         //  message << "The first position of the Wyckoff string is not a number (multiplicity): " << all_Wyckoff_strings[i];
-        //  throw aurostd::xerror(_AFLOW_FILE_NAME_,function_name,message,_RUNTIME_ERROR_);
+        //  throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_RUNTIME_ERROR_);
         //}
         site_symmetry = Wyckoff_tokens[2];
         for(uint t=3;t<Wyckoff_tokens.size();t++){ //DX 20191030 - need loop to get all positions
@@ -2719,7 +2713,7 @@ void wyckoffsite_ITC::getWyckoffFromLetter(const string& space_group_string, con
   //DX 20191030 - remove stringstream assignment (used to be here)
   //DX 20191030 - use tokens instead of stringstream assignment - END
 
-  if(LDEBUG) {cerr << function_name << ": Wyckoff positions without centering(s): ";
+  if(LDEBUG) {cerr << __AFLOW_FUNC__ << ": Wyckoff positions without centering(s): ";
     for(uint i=0;i<equations_no_centering.size();i++){
       cerr << aurostd::joinWDelimiter(equations_no_centering[i],",") << endl;
     }
@@ -2740,7 +2734,7 @@ void wyckoffsite_ITC::getWyckoffFromLetter(const string& space_group_string, con
     }
   }
 
-  if(LDEBUG) {cerr << function_name << ": Wyckoff positions with centering(s): ";
+  if(LDEBUG) {cerr << __AFLOW_FUNC__ << ": Wyckoff positions with centering(s): ";
     for(uint i=0;i<equations.size();i++){
       cerr << aurostd::joinWDelimiter(equations[i],",") << endl;
     }
@@ -2840,7 +2834,6 @@ namespace SYM {
     // this function will be circumvented when symbolic math is integrated
     //DX20190723
 
-    string soliloquy = XPID + "SYM::formatWyckoffPosition()";
 
     stringstream ss_eqn;ss_eqn.precision(precision);  //CO20220607 - added precision
     string coordinate = "";
@@ -2941,7 +2934,6 @@ namespace SYM {
     // this function will be circumvented when symbolic math is integrated
     //DX20190708
 
-    string soliloquy = XPID + "SYM::reorderWyckoffPosition()";
     stringstream message;
 
     // ---------------------------------------------------------------------------
@@ -2951,7 +2943,7 @@ namespace SYM {
 
     if(tokens.size()!=3){ 
       message << "Wyckoff position must have 3 fields (e.g., \"x, y, z\"), input: " << orig_position;
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,soliloquy,message,_INPUT_ERROR_);
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_INPUT_ERROR_);
     }
 
     // ---------------------------------------------------------------------------
@@ -3734,7 +3726,7 @@ namespace SYM {
 //DX20210422 [OBSOLETE]  double distance_between_points(const xvector<double>& a, const xvector<double>& b) {
 //DX20210422 [OBSOLETE]    double dist = 0;
 //DX20210422 [OBSOLETE]    if(a.urows != b.urows) {
-//DX20210422 [OBSOLETE]      throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::distance_between_points():","Vectors are not equal length.",_VALUE_RANGE_);
+//DX20210422 [OBSOLETE]      throw aurostd::xerror(__AFLOW_FILE__,XPID+"SYM::distance_between_points():","Vectors are not equal length.",_VALUE_RANGE_);
 //DX20210422 [OBSOLETE]    }
 //DX20210422 [OBSOLETE]    for (uint i = 1; i <= (uint)a.urows; i++) {
 //DX20210422 [OBSOLETE]      dist += (a(i) - b(i)) * (a(i) - b(i));
@@ -3839,7 +3831,7 @@ namespace SYM{
         } else if(havechar(oss.str(), '*')) {
           vector<string> tokens; aurostd::string2tokens(oss.str(),tokens,"*");
           if(tokens.size()==2){ num += atof(tokens[0].c_str())*atof(tokens[1].c_str()); }
-          else { throw aurostd::xerror(_AFLOW_FILE_NAME_,"SYM::simplify","Expected two fields surrounding '*': "+oss.str(),_RUNTIME_ERROR_); }
+          else { throw aurostd::xerror(__AFLOW_FILE__,"SYM::simplify","Expected two fields surrounding '*': "+oss.str(),_RUNTIME_ERROR_); }
         } else {
           num += atof(oss.str().c_str());
         }
@@ -4823,7 +4815,7 @@ namespace SYM {
       return false;
     }
     bool consistent_ratio = true;
-    if(split_atom_types.size()==0){throw aurostd::xerror(_AFLOW_FILE_NAME_,"SYM::GCD_conventional_atomic_basis():","split_atom_types.size()==0",_INPUT_ERROR_);}
+    if(split_atom_types.size()==0){throw aurostd::xerror(__AFLOW_FILE__,"SYM::GCD_conventional_atomic_basis():","split_atom_types.size()==0",_INPUT_ERROR_);}
     int GCD_num = 1;  //CO+DX20191201
     if(split_atom_types.size() > 1) { // If only one type of atom, set to 1
       GCD_num=(int)split_atom_types[0].size();  //CO+DX20191201
@@ -5402,7 +5394,7 @@ namespace SYM {
     //cerr << gl_sgs[spacegroupnum] << endl;
     //cerr << "WYCKOFF POSTIONS: " << endl;
     //print_wyckoff_pos(tmpvvvstring);
-    //throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::ReturnITCGenShift():","Throw for debugging purposes.",_GENERIC_ERROR_);
+    //throw aurostd::xerror(__AFLOW_FILE__,XPID+"SYM::ReturnITCGenShift():","Throw for debugging purposes.",_GENERIC_ERROR_);
 
     //for(int k=0;k<tmpvvvsd[s].size();k++){
     //  for(int j=0;j<tmpvvvsd[s][k].size();j++){
@@ -5455,7 +5447,7 @@ namespace SYM {
       l = atoi(num[5].c_str());  // which sub group within multiplicity group (first, second, third, etc)
     }
     if(l < 1) {
-      throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::ReverseSpaceGroup():","Sub multiplicity groups start at 1.",_INPUT_ILLEGAL_);
+      throw aurostd::xerror(__AFLOW_FILE__,XPID+"SYM::ReverseSpaceGroup():","Sub multiplicity groups start at 1.",_INPUT_ILLEGAL_);
     }
 
     string axis_cell = "";
@@ -5752,7 +5744,7 @@ namespace SYM {
     int size = points[0].urows;
     for (uint i = 0; i < points.size(); i++) {
       if(points[i].urows != size) {
-        throw aurostd::xerror(_AFLOW_FILE_NAME_,XPID+"SYM::get_mod_angle_tensor():","Points must have the same dimension.",_VALUE_RANGE_);
+        throw aurostd::xerror(__AFLOW_FILE__,XPID+"SYM::get_mod_angle_tensor():","Points must have the same dimension.",_VALUE_RANGE_);
       }
     }
     //Choose first point as origin
