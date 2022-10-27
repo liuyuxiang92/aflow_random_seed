@@ -241,7 +241,7 @@ namespace unittest {
         break;
       } else if (!isgroup && (test_functions.find(test) == test_functions.end())) {
         message << "Skipping unrecognized test name " << test << ".";
-        pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
+        pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       } else if (isgroup && !aurostd::WithinList(tasks, test)) {
         tasks.push_back(test);
         const vector<string>& members = test_groups[test];
@@ -256,7 +256,7 @@ namespace unittest {
     uint ntasks = tasks.size();
     if (ntasks == 0) {
       message << "No unit tests to run.";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_NOTICE_);
       return true;
     }
 
@@ -301,12 +301,12 @@ namespace unittest {
 
     if (nsuccess == ntasks) {
       message << "Unit tests passed successfully (passing " << ntasks << " task" + string((ntasks == 1)?"":"s") + ").";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
     } else {
       message << "Some unit tests failed (" << (ntasks - nsuccess) << " of " << ntasks << " failed).";
-      pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
     }
-    pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, formatResultsTable(summary), aflags, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_);
+    pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, formatResultsTable(summary), aflags, *p_FileMESSAGE, *p_oss, _LOGGER_RAW_);
     return (nsuccess == ntasks);
   }
 
@@ -348,10 +348,10 @@ namespace unittest {
         stringstream message;
         if (nsuccess == ntests_group) {
           message << "Unit tests of group " << group << " passed successfully (passing " << ntests_group << " test" << ((ntests_group == 1)?"":"s") << ").";
-          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_COMPLETE_);
         } else {
           message << "Some unit tests of group " << group << " failed (" << (ntests_group - nsuccess) << " of " << ntests_group << " failed).";
-          pflow::logger(_AFLOW_FILE_NAME_, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, *p_FileMESSAGE, *p_oss, _LOGGER_ERROR_);
         }
         for (size_t t = 0; t < vtests_group.size(); t++) {
           displayResult(test_functions[vtests_group[t]]);
@@ -448,19 +448,19 @@ namespace unittest {
         // All attempted checks passed, but there were errors.
         // This happens when a prerequisite for a test fails (e.g. file loading).
         message << "FAIL " << xchk.task_description << " due to runtime errors" << std::endl;
-        pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
+        pflow::logger(__AFLOW_FILE__,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
       } else {
         message << "SUCCESS " << xchk.task_description << " (passing " << check_num << " check" << ((check_num == 1)?"":"s") << ")" << std::endl;
-        pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
+        pflow::logger(__AFLOW_FILE__,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_COMPLETE_);
       }
     } else {
       message << "FAIL " << xchk.task_description << " (" << (check_num - xchk.passed_checks) << " of " << check_num << " checks failed)" << std::endl;
-      pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
+      pflow::logger(__AFLOW_FILE__,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
     }
-    pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,formatResultsTable(xchk.results),aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+    pflow::logger(__AFLOW_FILE__,xchk.function_name,formatResultsTable(xchk.results),aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     if (xchk.errors.size() > 0) {
       message << "\nAdditional error messages:\n" << aurostd::joinWDelimiter(xchk.errors, "\n");
-      pflow::logger(_AFLOW_FILE_NAME_,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
+      pflow::logger(__AFLOW_FILE__,xchk.function_name,message,aflags,*p_FileMESSAGE,*p_oss,_LOGGER_RAW_);
     }
   }
 }
@@ -468,14 +468,14 @@ namespace unittest {
 // Collection of generic check functions, to streamline testing.
 namespace unittest {
   template <typename utype>
-  void UnitTest::checkEqual(const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
-      const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-    bool passed = (calculated.size() == expected.size());
-    for (size_t i = 0; i < calculated.size() && passed; i++) {
-      passed = aurostd::isequal(calculated[i], expected[i]);
+    void UnitTest::checkEqual(const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
+        const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
+      bool passed = (calculated.size() == expected.size());
+      for (size_t i = 0; i < calculated.size() && passed; i++) {
+        passed = aurostd::isequal(calculated[i], expected[i]);
+      }
+      check(passed, calculated, expected, check_function, check_description, passed_checks, results);
     }
-    check(passed, calculated, expected, check_function, check_description, passed_checks, results);
-  }
   void UnitTest::checkEqual(const vector<string>& calculated, const vector<string>& expected, const string& check_function,
       const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
     bool passed = (calculated.size() == expected.size());
@@ -486,11 +486,11 @@ namespace unittest {
   }
 
   template <typename utype>
-  void UnitTest::checkEqual(const utype& calculated, const utype& expected, const string& check_function,
-      const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-    bool passed = (aurostd::isequal(calculated, expected));
-    check(passed, calculated, expected, check_function, check_description, passed_checks, results);
-  }
+    void UnitTest::checkEqual(const utype& calculated, const utype& expected, const string& check_function,
+        const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
+      bool passed = (aurostd::isequal(calculated, expected));
+      check(passed, calculated, expected, check_function, check_description, passed_checks, results);
+    }
   void UnitTest::checkEqual(const string& calculated, const string& expected, const string& check_function,
       const string& check_description, uint & passed_checks, vector<vector<string> >& results) {
     bool passed = (calculated == expected);
@@ -503,22 +503,22 @@ namespace unittest {
   }
 
   template <typename utype>
-  void UnitTest::check(const bool passed, const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
-    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-    check(passed, aurostd::joinWDelimiter(calculated, ","), aurostd::joinWDelimiter(expected, ","), check_function, check_description, passed_checks, results);
-  }
+    void UnitTest::check(const bool passed, const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
+        const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
+      check(passed, aurostd::joinWDelimiter(calculated, ","), aurostd::joinWDelimiter(expected, ","), check_function, check_description, passed_checks, results);
+    }
   void UnitTest::check(const bool passed, const vector<double>& calculated, const vector<double>& expected, const string& check_function,
-    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
+      const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
     check(passed, aurostd::vecDouble2String(calculated), aurostd::vecDouble2String(expected), check_function, check_description, passed_checks, results);
   }
 
   template <typename utype>
-  void UnitTest::check(const bool passed, const xmatrix<utype>& calculated, const xmatrix<utype>& expected, const string& check_function,
-    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-    check(passed, aurostd::xmat2String(calculated), aurostd::xmat2String(expected), check_function, check_description, passed_checks, results);
-  }
+    void UnitTest::check(const bool passed, const xmatrix<utype>& calculated, const xmatrix<utype>& expected, const string& check_function,
+        const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
+      check(passed, aurostd::xmat2String(calculated), aurostd::xmat2String(expected), check_function, check_description, passed_checks, results);
+    }
   void UnitTest::check(const bool passed, const xmatrix<double>& calculated, const xmatrix<double>& expected, const string& check_function,
-    const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
+      const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
     check(passed, aurostd::xmatDouble2String(calculated), aurostd::xmatDouble2String(expected), check_function, check_description, passed_checks, results);
   }
 
@@ -532,26 +532,26 @@ namespace unittest {
   /// @param passed_checks     Number of passed checks.
   /// @param results           Results data - doubles as number of performed checks.
   template <typename utype>
-  void UnitTest::check(const bool passed, const utype& calculated, const utype& expected, const string& check_function,
-      const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-    vector<string> result;
-    uint check_num = results.size() + 1;
-    result.push_back(aurostd::utype2string<uint>(check_num));
-    if (passed) {
-      passed_checks++;
-      result.push_back("pass");
-    } else {
-      result.push_back("FAIL");
+    void UnitTest::check(const bool passed, const utype& calculated, const utype& expected, const string& check_function,
+        const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
+      vector<string> result;
+      uint check_num = results.size() + 1;
+      result.push_back(aurostd::utype2string<uint>(check_num));
+      if (passed) {
+        passed_checks++;
+        result.push_back("pass");
+      } else {
+        result.push_back("FAIL");
+      }
+      result.push_back(check_function);
+      result.push_back(check_description);
+      if (!passed) {
+        stringstream failstring;
+        failstring << " (result: " << calculated << " | expected: " << expected << ")";
+        result.back() += failstring.str();
+      }
+      results.push_back(result);
     }
-    result.push_back(check_function);
-    result.push_back(check_description);
-    if (!passed) {
-      stringstream failstring;
-      failstring << " (result: " << calculated << " | expected: " << expected << ")";
-      result.back() += failstring.str();
-    }
-    results.push_back(result);
-  }
 
 }
 
@@ -560,7 +560,7 @@ namespace unittest {
 
   void UnitTest::xscalarTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
     (void) errors;  // Suppress compiler warnings
-    // setup test environment
+                    // setup test environment
     string check_function = "", check_description = "";
     double calculated_dbl = 0.0, expected_dbl = 0.0;
     int calculated_int = 0, expected_int = 0;
@@ -662,7 +662,7 @@ namespace unittest {
 
   void UnitTest::xvectorTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
     (void) errors;  // Suppress compiler warnings
-    // setup test environment
+                    // setup test environment
     string check_function = "", check_description = "";
 
     //HE20210511
@@ -776,11 +776,11 @@ namespace unittest {
       if (e.whatCode() == expected_int) check(true, "", "", check_function, check_description, passed_checks, results);
       else
         check(false, aurostd::utype2string(e.whatCode()), expected_str, check_function, check_description,
-              passed_checks, results);
+            passed_checks, results);
     }
     catch (...) {
       check(false, std::string("not an xerror"), expected_str, check_function, check_description, passed_checks,
-            results);
+          results);
     }
 
     // ---------------------------------------------------------------------------
@@ -810,11 +810,11 @@ namespace unittest {
       if (e.whatCode() == expected_int) check(true, "", "", check_function, check_description, passed_checks, results);
       else
         check(false, aurostd::utype2string(e.whatCode()), expected_str, check_function, check_description,
-              passed_checks, results);
+            passed_checks, results);
     }
     catch (...) {
       check(false, std::string("not an xerror"), expected_str, check_function, check_description, passed_checks,
-            results);
+          results);
     }
 
     // ---------------------------------------------------------------------------
@@ -837,10 +837,10 @@ namespace unittest {
     for (size_t i_point=0; i_point<points.size(); i_point++){
       ipoints.push_back({(int) points[i_point][1], (int) points[i_point][2], (int) points[i_point][3]});
     }
-//    points.push_back(p0); points.push_back(p1); points.push_back(p2); points.push_back(p3); points.push_back(p4);
-//    points.push_back(p5);
-//    ipoints.push_back(p0i); ipoints.push_back(p1i); ipoints.push_back(p2i); ipoints.push_back(p3i); ipoints.push_back(p4i);
-//    ipoints.push_back(p5i);
+    //    points.push_back(p0); points.push_back(p1); points.push_back(p2); points.push_back(p3); points.push_back(p4);
+    //    points.push_back(p5);
+    //    ipoints.push_back(p0i); ipoints.push_back(p1i); ipoints.push_back(p2i); ipoints.push_back(p3i); ipoints.push_back(p4i);
+    //    ipoints.push_back(p5i);
 
     calculated_dbl = aurostd::areaPointsOnPlane(points);
     checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
@@ -890,25 +890,10 @@ namespace unittest {
 
   void UnitTest::xmatrixTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
     (void) errors;  // Suppress compiler warnings
-    // setup test environment
+                    // setup test environment
     string check_function = "", check_description = "";
 
     xmatrix<int> calculated_xmatint, expected_xmatint;
-
-    // ---------------------------------------------------------------------------
-    // Check | reshape //SD20220319
-    // ---------------------------------------------------------------------------
-    check_function = "aurostd::reshape()";
-    check_description = "reshape a rectangular matrix";
-    expected_xmatint = {{1,2,3,4},
-                        {5,6,7,8},
-                        {9,10,11,12}};
-    calculated_xmatint = {{1,2,3},
-                          {4,5,6},
-                          {7,8,9},
-                          {10,11,12}};
-    calculated_xmatint = aurostd::reshape(calculated_xmatint ,3,4);
-    checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
     // Check convert to xvector //AZ20220627
@@ -918,8 +903,8 @@ namespace unittest {
     // need this matrix to test slicing
     full_xmatint = xmatrix<int>(3,4);
     full_xmatint = {{1,2,3,4},
-                    {5,6,7,8},
-                    {9,10,11,12}};
+      {5,6,7,8},
+      {9,10,11,12}};
     check_description = "getxvec() test for type conversion";
     xvector<int> expected_xvecint(3);
     xvector<int> calculated_xvecint(3);
@@ -933,7 +918,7 @@ namespace unittest {
     check_description = "get column xvector from xmatrix";
     calculated_xvecint = full_xmatint.getxvec(1,3,1,1);
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
-    
+
     // ---------------------------------------------------------------------------
     // Check | row xvector //AZ20220627
     // ---------------------------------------------------------------------------
@@ -949,7 +934,7 @@ namespace unittest {
     expected_xvecint = {12};
     calculated_xvecint = full_xmatint.getxvec(3,3,4,4);
     checkEqual(calculated_xvecint, expected_xvecint, check_function, check_description, passed_checks, results);
-    
+
     // ---------------------------------------------------------------------------
     // Check | ehermite //CO20190520
     // ---------------------------------------------------------------------------
@@ -959,6 +944,135 @@ namespace unittest {
     calculated_xmatint = xmatrix<int>(2, 2);
     aurostd::getEHermite(5, 12, calculated_xmatint);
     checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | solve a linear system //HE20220912
+    // ---------------------------------------------------------------------------
+    {
+      check_function = "aurostd::inverse(xmatrix) * xvector";
+      check_description = "solve a simple linear system with shifted matrices ";
+      xvector<double> expected_xvecdouble = {5.0, 3.0, -2.0};
+      xvector<double> calculated_xvecdouble;
+      xvector<double> b = {6.0, -4, 27};
+      xmatrix<double> A = {{1.0, 1.0, 1.0}, {0.0,2.0,5.0}, {2.0,5.0,-1.0}};
+      bool shift_check = true;
+      // inv(A)*b should be solvable even when the xmatrix and xvector have different index boundaries
+      for (int shift_row: {-2,-1,0,1,2}){
+        for (int shift_col: {-2,-1,0,1,2}) {
+          A.shift(shift_row, shift_col);
+          calculated_xvecdouble = aurostd::inverse(A) * b;
+          if (not aurostd::isequal(expected_xvecdouble, calculated_xvecdouble)) {
+            shift_check=false;
+            break;
+          }
+        }
+      }
+      check(shift_check, calculated_xvecdouble, expected_xvecdouble, check_function, check_description, passed_checks, results);
+    }
+
+    // ---------------------------------------------------------------------------
+    // Check | shifting xmatrix
+    // ---------------------------------------------------------------------------
+    {
+      check_function = "aurostd::xmatrix.shift()";
+      check_description = "shift the lower bounds of an xmatrix to new values";
+      bool overall_check = true;
+      xmatrix<double> A = {{1.0, 2.0, 3.0},
+                           {4.0, 5.0, 6.0},
+                           {7.0, 8.0, 9.0}};
+      xmatrix<double> B = A;
+
+      for (std::pair<int, int> p : vector<std::pair<int, int>>({{-2,-4}, {0,3}, {5461, 8461}})){
+        A.shift(p.first, p.second);
+        for (std::pair<int, int> t : vector<std::pair<int, int>>({{1,1}, {2,2}, {3,2}})) {
+          overall_check = overall_check && (A[p.first+t.first-1][p.second+t.second-1] == B[t.first][t.second]);
+          if (!overall_check){
+            check(overall_check,A[p.first+t.first-1][p.second+t.second-1] , B[t.first][t.second], check_function, check_description, passed_checks, results);
+            break;
+          }
+          if (!overall_check) break;
+        }
+      }
+      if (overall_check){
+        check(overall_check, "", "", check_function, check_description, passed_checks, results);
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Check | reshaping xmatrix
+    // ---------------------------------------------------------------------------
+    {
+      check_function = "aurostd::xmatrix.reshape()";
+      check_description = "reshaping a xmatrix";
+      bool overall_check = true;
+      vector<int> B = {1,2,3,4,5,6,7,8,9,10,11,12};
+      xmatrix<int> A = {{1,2,3,4,5,6,7,8,9,10,11,12}};
+      int c, r;
+      for (const std::pair<int, int> &p : vector<std::pair<int, int>>({{4,3}, {2,6}, {3, 4}})){
+        A.reshape(p.first, p.second);
+        for (const int t : B) {
+          r = (t-1)/p.second+1;
+          c = t-(r-1)*(p.second);
+          overall_check = overall_check && (A[r][c] == t);
+          if (!overall_check) {
+            check(overall_check, A[r][c], t,  check_function, check_description, passed_checks, results);
+            break;
+          }
+        }
+        if (!overall_check) break;
+      }
+      if (overall_check){
+        check(overall_check, "", "", check_function, check_description, passed_checks, results);
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Check | reshaping xvector
+    // ---------------------------------------------------------------------------
+    {
+      check_function = "aurostd::reshape()";
+      check_description = "reshaping xvectors";
+      bool overall_check = true;
+      vector<int> B = {1,2,3,4,5,6,7,8,9,10,11,12};
+      xvector<int> xv = aurostd::vector2xvector(B);
+      aurostd::xmatrix<int> A;
+      int c, r;
+      for (const std::pair<int, int> &p : vector<std::pair<int, int>>({{4,3}, {2,6}, {3, 4}})){
+        A = aurostd::reshape(xv, p.first, p.second);
+        for (const int t : B) {
+          r = (t-1)/p.second+1;
+          c = t-(r-1)*(p.second);
+          overall_check = overall_check && (A[r][c] == t);
+          if (!overall_check) {
+            check(overall_check, A[r][c], t,  check_function, check_description, passed_checks, results);
+            break;
+          }
+        }
+        if (!overall_check) break;
+      }
+      if (overall_check){
+        check(overall_check, "", "", check_function, check_description, passed_checks, results);
+      }
+    }
+
+    // ---------------------------------------------------------------------------
+    // Check | stacking xvector
+    // ---------------------------------------------------------------------------
+    {
+      xvector<int> xv = {1, 2, 3, 4};
+      xmatrix<int> smat;
+      xmatrix<int> vsmat = {{1, 1, 1}, {2, 2, 2}, {3, 3, 3}, {4, 4, 4}};
+      xmatrix<int> hsmat = {{1, 2, 3, 4}, {1, 2, 3, 4}, {1, 2, 3, 4}};
+      check_function = "aurostd::vstack()";
+      check_description = "stack xvectors vertically into a xmatrix";
+      smat = aurostd::vstack(vector<xvector<int>>({xv, xv, xv}));
+      checkEqual(smat, vsmat, check_function, check_description, passed_checks, results);
+      check_function = "aurostd::hstack()";
+      check_description = "stack xvectors horizontal into a xmatrix";
+      smat = aurostd::hstack(vector<xvector<int>>({xv, xv, xv}));
+      checkEqual(smat, hsmat, check_function, check_description, passed_checks, results);
+    }
+
   }
 
   void UnitTest::aurostdMainTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
@@ -1110,7 +1224,7 @@ namespace unittest {
     check_function = "aurostd::ctcrc64()";
     check_description = "compiler hashing (constexpr)";
     static constexpr uint64_t
-    calculated_const_uint64 = aurostd::ctcrc64("aflowlib_date");
+      calculated_const_uint64 = aurostd::ctcrc64("aflowlib_date");
     checkEqual(calculated_const_uint64, expected_uint64, check_function, check_description, passed_checks, results);
   }
 }
@@ -1134,66 +1248,69 @@ namespace unittest {
 
     size_t expected_size_t = 0;
     std::vector <std::string> test_AUIDs = {
-        "aflow:2de63b1ebe0a1a83",
-        "4d8cf7edb50d1901",
-        "auid:6d47aa3f4f1286d0",
-        "aflow:7dd846bc04c764e8",
-        "9d84facf8161aa60",
-        "broken"
+      "aflow:2de63b1ebe0a1a83",
+      "4d8cf7edb50d1901",
+      "auid:6d47aa3f4f1286d0",
+      "aflow:7dd846bc04c764e8",
+      "9d84facf8161aa60",
+      "broken"
     };
     std::string test_AUID = "aflow:0d16c1946df2435c";
 
     std::vector <std::string> test_AURLs = {
-        "aflowlib.duke.edu:AFLOWDATA/LIB2_WEB/Ca_svCu_pv/84",
-        "AFLOWDATA/LIB2_WEB/Ca_svCu_pv/546",
-        "aurl:AFLOWDATA/LIB2_WEB/Ca_svCu_pv/724.BA",
-        "LIB2_WEB/Ca_svCu_pv/253",
-        "aflowlib.duke.edu:AFLOWDATA/LIB2_WEB/Ca_svCu_pv/230"
+      "aflowlib.duke.edu:AFLOWDATA/LIB2_WEB/Ca_svCu_pv/84",
+      "AFLOWDATA/LIB2_WEB/Ca_svCu_pv/546",
+      "aurl:AFLOWDATA/LIB2_WEB/Ca_svCu_pv/724.BA",
+      "LIB2_WEB/Ca_svCu_pv/253",
+      "aflowlib.duke.edu:AFLOWDATA/LIB2_WEB/Ca_svCu_pv/230"
     };
     std::string test_AURL = "aflowlib.duke.edu:AFLOWDATA/LIB2_WEB/Ca_svCu_pv/539";
 
     std::map <std::string, aflowlib::EntryLoader::Source> test_sources = {
-        {"AUTO SELECT",    aflowlib::EntryLoader::Source::NONE},
-        {"SQLITE",         aflowlib::EntryLoader::Source::SQLITE},
-        {"AFLUX",          aflowlib::EntryLoader::Source::AFLUX},
-        {"FILESYSTEM",     aflowlib::EntryLoader::Source::FILESYSTEM},
-        {"RESTAPI",        aflowlib::EntryLoader::Source::RESTAPI},
-        {"FILESYSTEM_RAW", aflowlib::EntryLoader::Source::FILESYSTEM_RAW},
-        {"RESTAPI_RAW",    aflowlib::EntryLoader::Source::RESTAPI_RAW}
+      {"AUTO SELECT",    aflowlib::EntryLoader::Source::NONE},
+      {"SQLITE",         aflowlib::EntryLoader::Source::SQLITE},
+      {"AFLUX",          aflowlib::EntryLoader::Source::AFLUX},
+      {"FILESYSTEM",     aflowlib::EntryLoader::Source::FILESYSTEM},
+      {"RESTAPI",        aflowlib::EntryLoader::Source::RESTAPI},
+      {"FILESYSTEM_RAW", aflowlib::EntryLoader::Source::FILESYSTEM_RAW},
+      {"RESTAPI_RAW",    aflowlib::EntryLoader::Source::RESTAPI_RAW}
     };
 
     std::map <std::string, aflowlib::EntryLoader::Source> short_test_sources = {
-        {"SQLITE",     aflowlib::EntryLoader::Source::SQLITE},
-        {"AFLUX",      aflowlib::EntryLoader::Source::AFLUX},
-        {"FILESYSTEM", aflowlib::EntryLoader::Source::FILESYSTEM},
-        {"RESTAPI",    aflowlib::EntryLoader::Source::RESTAPI},
+      {"SQLITE",     aflowlib::EntryLoader::Source::SQLITE},
+      {"AFLUX",      aflowlib::EntryLoader::Source::AFLUX},
+      {"FILESYSTEM", aflowlib::EntryLoader::Source::FILESYSTEM},
+      {"RESTAPI",    aflowlib::EntryLoader::Source::RESTAPI},
     };
 
     // ---------------------------------------------------------------------------
     // Check | load alloys
     for (std::map<std::string, aflowlib::EntryLoader::Source>::iterator source = test_sources.begin();
-         source != test_sources.end(); source++) {
+        source != test_sources.end(); source++) {
       check_function = "EntryLoader::loadAlloy()";
       if (source->first == "RESTAPI" || source->first == "RESTAPI_RAW") recursive = false;
       else recursive = true;
       check_description = source->first + " - " + test_alloy;
       if (recursive) {
         check_description += " - recursive";
-        expected_size_t = 2500;
+        expected_size_t = 3400;
       } else expected_size_t = 90;
       el.clear();
       el.m_out_silent = true;
       {
         long double start = aurostd::get_seconds();
         if (el.setSource(source->second)) { // don't test if basic requirements are not met for a source
+          if (source->first == "FILESYSTEM" || source->first == "FILESYSTEM_RAW") {
+            if (el.m_sqlite_alloy_db_ptr == nullptr) expected_size_t=1300;
+          }
           el.loadAlloy(test_alloy, recursive);
           long double duration = aurostd::get_delta_seconds(start);
           aurostd::StringstreamClean(check_description_helper);
           check_description_helper << " | speed " << el.m_entries_flat->size() / duration << " entries/s; "
-                            << el.m_entries_flat->size() << " entries";
+            << el.m_entries_flat->size() << " entries";
           check_description += check_description_helper.str();
           check((expected_size_t < el.m_entries_flat->size()), el.m_entries_flat->size(), expected_size_t,
-                check_function, check_description, passed_checks, results);
+              check_function, check_description, passed_checks, results);
         }
       }
     }
@@ -1201,7 +1318,7 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     // Check | load AUID + Xstructure
     for (std::map<std::string, aflowlib::EntryLoader::Source>::iterator source = short_test_sources.begin();
-         source != short_test_sources.end(); source++) {
+        source != short_test_sources.end(); source++) {
       check_function = "EntryLoader::loadAUID()";
       check_description = source->first + " + xstructure";
       expected_size_t = 6;
@@ -1220,10 +1337,10 @@ namespace unittest {
         long double duration = aurostd::get_delta_seconds(start);
         aurostd::StringstreamClean(check_description_helper);
         check_description_helper << " | speed " << el.m_entries_flat->size() / duration << " entries/s; "
-                                 << el.m_entries_flat->size() << " entries";
+          << el.m_entries_flat->size() << " entries";
         check_description += check_description_helper.str();
         checkEqual(el.m_entries_flat->size(), expected_size_t, check_function,
-                   check_description, passed_checks, results);
+            check_description, passed_checks, results);
       }
     }
 
@@ -1234,7 +1351,7 @@ namespace unittest {
     if (!test_entry.auid.empty()) {
       el.loadXstructureFile(test_entry, test_structure, {"CONTCAR.relax"});
       checkEqual(test_structure.atoms.size(), (size_t)
-      6, check_function, check_description, passed_checks, results);
+          6, check_function, check_description, passed_checks, results);
     } else {
       check_description += " | failed to load example structure form AFLUX in previous test";
       check(false, 0, 0, check_function, check_description, passed_checks, results);
@@ -1243,7 +1360,7 @@ namespace unittest {
     // ---------------------------------------------------------------------------
     // Check | load AURL
     for (std::map<std::string, aflowlib::EntryLoader::Source>::iterator source = short_test_sources.begin();
-         source != short_test_sources.end(); source++) {
+        source != short_test_sources.end(); source++) {
       check_function = "EntryLoader::loadAURL()";
       check_description = source->first;
       expected_size_t = 6;
@@ -1257,10 +1374,10 @@ namespace unittest {
           long double duration = aurostd::get_delta_seconds(start);
           aurostd::StringstreamClean(check_description_helper);
           check_description_helper << " | speed " << el.m_entries_flat->size() / duration << " entries/s; "
-                                   << el.m_entries_flat->size() << " entries";
+            << el.m_entries_flat->size() << " entries";
           check_description += check_description_helper.str();
           checkEqual(el.m_entries_flat->size(), expected_size_t, check_function,
-                     check_description, passed_checks, results);
+              check_description, passed_checks, results);
         }
       }
     }
@@ -1311,8 +1428,8 @@ namespace unittest {
     vector<string> json_keys = aurostd::extractJsonKeysAflow(aflowlib_json);
 
     vector<string> vkeys_ignore = {"data_language", "error_status", "natoms_orig",
-                                   "density_orig", "volume_cell_orig", "volume_atom_orig",
-                                   "spinD_magmom_orig"};
+      "density_orig", "volume_cell_orig", "volume_atom_orig",
+      "spinD_magmom_orig"};
     for (size_t k = 0; k < json_keys.size(); k++) {
       const string& key = json_keys[k];
       if (!aurostd::WithinList(vkeys_ignore, key) && !aurostd::WithinList(vschema_keys, key)) {
@@ -1820,7 +1937,7 @@ namespace unittest {
     stringstream xstrss;
     double min_dist = 0.0, min_dist_orig = 0.0;
     xvector<int> hkl({1, 0, 4});
-//    hkl[1] = 1; hkl[2] = 0; hkl[3] = 4;
+    //    hkl[1] = 1; hkl[2] = 0; hkl[3] = 4;
 
     //create input structure
     xstr_str =
@@ -1875,51 +1992,51 @@ namespace unittest {
 
     //create xstr_slab (correct answer)
     xstr_str =
-    "FeO\n"
-    "1.0\n"
-    " -4.73623366665202   0.00000000000000   0.00000000000000\n"
-    " -9.47247466669728  21.24210623923067   0.00000000000000\n"
-    " -2.36811866667432   3.16803536641816   2.60528076661565\n"
-    "12 18\n"
-    "Direct\n"
-    "   0.66666667      0.31943935     0.38890928   Fe\n"
-    "  -0.00000000      0.65277268     0.38890928   Fe\n"
-    "   0.33333333      0.98610601     0.38890928   Fe\n"
-    "   0.33333333      0.18056065     0.61109072   Fe\n"
-    "   0.66666667      0.51389399     0.61109072   Fe\n"
-    "   0.00000000      0.84722732     0.61109072   Fe\n"
-    "  -0.00000000      0.15277364     0.38890544   Fe\n"
-    "   0.33333333      0.48610697     0.38890544   Fe\n"
-    "   0.66666667      0.81944031     0.38890544   Fe\n"
-    "   0.66666667      0.01389303     0.61109456   Fe\n"
-    "   0.00000000      0.34722636     0.61109456   Fe\n"
-    "   0.33333333      0.68055969     0.61109456   Fe\n"
-    "   0.31486812      0.25000000     0.00000000   O \n"
-    "   0.64820145      0.58333333     0.00000000   O \n"
-    "   0.98153478      0.91666667     0.00000000   O \n"
-    "   0.68513188      0.25000000     0.31486812   O \n"
-    "   0.01846522      0.58333333     0.31486812   O \n"
-    "   0.35179855      0.91666667     0.31486812   O \n"
-    "  -0.00000000      0.25000000     0.68513188   O \n"
-    "   0.33333333      0.58333333     0.68513188   O \n"
-    "   0.66666667      0.91666667     0.68513188   O \n"
-    "   0.33333333      0.08333333     0.31486896   O \n"
-    "   0.66666667      0.41666667     0.31486896   O \n"
-    "   0.00000000      0.75000000     0.31486896   O \n"
-    "   0.64820229      0.08333333     0.68513104   O \n"
-    "   0.98153562      0.41666667     0.68513104   O \n"
-    "   0.31486896      0.75000000     0.68513104   O \n"
-    "   0.01846438      0.08333333     0.00000000   O \n"
-    "   0.35179771      0.41666667     0.00000000   O \n"
-    "   0.68513104      0.75000000     0.00000000   O \n";
+      "FeO\n"
+      "1.0\n"
+      " -4.73623366665202   0.00000000000000   0.00000000000000\n"
+      " -9.47247466669728  21.24210623923067   0.00000000000000\n"
+      " -2.36811866667432   3.16803536641816   2.60528076661565\n"
+      "12 18\n"
+      "Direct\n"
+      "   0.66666667      0.31943935     0.38890928   Fe\n"
+      "  -0.00000000      0.65277268     0.38890928   Fe\n"
+      "   0.33333333      0.98610601     0.38890928   Fe\n"
+      "   0.33333333      0.18056065     0.61109072   Fe\n"
+      "   0.66666667      0.51389399     0.61109072   Fe\n"
+      "   0.00000000      0.84722732     0.61109072   Fe\n"
+      "  -0.00000000      0.15277364     0.38890544   Fe\n"
+      "   0.33333333      0.48610697     0.38890544   Fe\n"
+      "   0.66666667      0.81944031     0.38890544   Fe\n"
+      "   0.66666667      0.01389303     0.61109456   Fe\n"
+      "   0.00000000      0.34722636     0.61109456   Fe\n"
+      "   0.33333333      0.68055969     0.61109456   Fe\n"
+      "   0.31486812      0.25000000     0.00000000   O \n"
+      "   0.64820145      0.58333333     0.00000000   O \n"
+      "   0.98153478      0.91666667     0.00000000   O \n"
+      "   0.68513188      0.25000000     0.31486812   O \n"
+      "   0.01846522      0.58333333     0.31486812   O \n"
+      "   0.35179855      0.91666667     0.31486812   O \n"
+      "  -0.00000000      0.25000000     0.68513188   O \n"
+      "   0.33333333      0.58333333     0.68513188   O \n"
+      "   0.66666667      0.91666667     0.68513188   O \n"
+      "   0.33333333      0.08333333     0.31486896   O \n"
+      "   0.66666667      0.41666667     0.31486896   O \n"
+      "   0.00000000      0.75000000     0.31486896   O \n"
+      "   0.64820229      0.08333333     0.68513104   O \n"
+      "   0.98153562      0.41666667     0.68513104   O \n"
+      "   0.31486896      0.75000000     0.68513104   O \n"
+      "   0.01846438      0.08333333     0.00000000   O \n"
+      "   0.35179771      0.41666667     0.00000000   O \n"
+      "   0.68513104      0.75000000     0.00000000   O \n";
     xstructure xstr_slab_correct;
     aurostd::StringstreamClean(xstrss);
     xstrss << xstr_str;
     try {
       xstrss >> xstr_slab_correct; //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
     } catch (aurostd::xerror& excpt) {} //CO20200404 - this WILL throw an error because det(lattice)<0.0, leave alone
-    // ---------------------------------------------------------------------------
-    // test 1: compare min distance of bulk and correct slab
+                                        // ---------------------------------------------------------------------------
+                                        // test 1: compare min distance of bulk and correct slab
     min_dist = xstr_slab_correct.MinDist();
     if(LDEBUG) {
       std::cerr << __AFLOW_FUNC__ << " xstr_slab_correct=\n" << xstr_slab_correct << std::endl;
@@ -2025,9 +2142,9 @@ namespace unittest {
   //ME20220324 - refactored to run in parallel
   void _testPrototype(uint i, const vector<string>& prototype_labels, vector<uint>& nprotos, vector<string>& errors
 #ifdef AFLOW_MULTITHREADS_ENABLE
-    , std::mutex& m
+      , std::mutex& m
 #endif
-  ) {
+      ) {
     double tolerance_sym = 0.0;
     string label_input = "";
     bool generated = false, sym = false, unique = false;
@@ -2059,8 +2176,8 @@ namespace unittest {
         string updated_label_and_params = "";
         if(!anrl::structureAndLabelConsistent(xstr, prototype_labels[i], updated_label_and_params, tolerance_sym)){ //DX20201105 - added symmetry tolerance
           error = "The structure has a higher symmetry than indicated by the label (orig: proto="
-              + prototype_labels[i] + ", params=" + parameter_sets[j] + ")."
-              + " The correct label and parameters for this structure are:\n" + updated_label_and_params;
+            + prototype_labels[i] + ", params=" + parameter_sets[j] + ")."
+            + " The correct label and parameters for this structure are:\n" + updated_label_and_params;
         } else {
           sym = true;
         }
@@ -2074,16 +2191,16 @@ namespace unittest {
         // if it matches to more than one
         if(protos_matching.size() > 1 && !anrl::isSpecialCaseEquivalentPrototypes(protos_matching)) {
           error = prototype_labels[i] + ", params=" + parameter_sets[j]
-              + " matches multiple prototypes (and not a documented special case): "
-              + aurostd::joinWDelimiter(protos_matching,",") + "."
-              + " If the prototype was newly added, ONLY include it in the encyclopedia"
-              + " for a valid reason (e.g., historical, special designation, etc.)"
-              + " and document this in anrl::isSpecialCaseEquivalentPrototypes().";
-        // if it doesn't match with ITSELF
+            + " matches multiple prototypes (and not a documented special case): "
+            + aurostd::joinWDelimiter(protos_matching,",") + "."
+            + " If the prototype was newly added, ONLY include it in the encyclopedia"
+            + " for a valid reason (e.g., historical, special designation, etc.)"
+            + " and document this in anrl::isSpecialCaseEquivalentPrototypes().";
+          // if it doesn't match with ITSELF
         } else if (protos_matching.size() == 0) {
           error = prototype_labels[i] + ", params=" + parameter_sets[j]
-              + " does not match to any prototypes"
-              + " (requires special symmetry tolerance or there is a bug with XtalFinder).";
+            + " does not match to any prototypes"
+            + " (requires special symmetry tolerance or there is a bug with XtalFinder).";
         } else {
           unique = true;
         }
@@ -2256,9 +2373,9 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
 
   xmatrix<int> A1(3,3),U1,V1,S1;
   A1 ={{3,2,1}, {5,3,1}, {6,8,9}};
-//  A1[1][1]=3;A1[1][2]=2;A1[1][3]=1;
-//  A1[2][1]=5;A1[2][2]=3;A1[2][3]=1;
-//  A1[3][1]=6;A1[3][2]=8;A1[3][3]=9;
+  //  A1[1][1]=3;A1[1][2]=2;A1[1][3]=1;
+  //  A1[2][1]=5;A1[2][2]=3;A1[2][3]=1;
+  //  A1[3][1]=6;A1[3][2]=8;A1[3][3]=9;
 
   aurostd::getSmithNormalForm(A1,U1,V1,S1);
 
@@ -2302,15 +2419,15 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
 
   xmatrix<long long int> A2(5,5),U2,V2,S2;  //long long int is CRUCIAL, Matlab actually gets this wrong because it uses long int by default
   A2 = {{ 25,  -300,   1050, -1400,   630},
-        {-300,  4800, -18900, 26880, -12600},
-        { 1050,-18900, 79380,-117600, 56700},
-        {-1400, 26880,-117600,179200,-88200},
-        { 630, -12600, 56700,-88200,  44100}};
-//  A2[1][1]=25;    A2[1][2]=-300;   A2[1][3]=1050;    A2[1][4]=-1400;   A2[1][5]=630;
-//  A2[2][1]=-300;  A2[2][2]=4800;   A2[2][3]=-18900;  A2[2][4]=26880;   A2[2][5]=-12600;
-//  A2[3][1]=1050;  A2[3][2]=-18900; A2[3][3]=79380;   A2[3][4]=-117600; A2[3][5]=56700;
-//  A2[4][1]=-1400; A2[4][2]=26880;  A2[4][3]=-117600; A2[4][4]=179200;  A2[4][5]=-88200;
-//  A2[5][1]=630;   A2[5][2]=-12600; A2[5][3]=56700;   A2[5][4]=-88200;  A2[5][5]=44100;
+    {-300,  4800, -18900, 26880, -12600},
+    { 1050,-18900, 79380,-117600, 56700},
+    {-1400, 26880,-117600,179200,-88200},
+    { 630, -12600, 56700,-88200,  44100}};
+  //  A2[1][1]=25;    A2[1][2]=-300;   A2[1][3]=1050;    A2[1][4]=-1400;   A2[1][5]=630;
+  //  A2[2][1]=-300;  A2[2][2]=4800;   A2[2][3]=-18900;  A2[2][4]=26880;   A2[2][5]=-12600;
+  //  A2[3][1]=1050;  A2[3][2]=-18900; A2[3][3]=79380;   A2[3][4]=-117600; A2[3][5]=56700;
+  //  A2[4][1]=-1400; A2[4][2]=26880;  A2[4][3]=-117600; A2[4][4]=179200;  A2[4][5]=-88200;
+  //  A2[5][1]=630;   A2[5][2]=-12600; A2[5][3]=56700;   A2[5][4]=-88200;  A2[5][5]=44100;
 
   aurostd::getSmithNormalForm(A2,U2,V2,S2);
 
@@ -2321,7 +2438,7 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
     cerr << __AFLOW_FUNC__ << " S=" << endl;cerr << S2 << endl;
   }
 
-  message << "smith test successful";pflow::logger(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
+  message << "smith test successful";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,aflags,FileMESSAGE,oss,_LOGGER_COMPLETE_);
   return TRUE; //CO20180419
 }
 
