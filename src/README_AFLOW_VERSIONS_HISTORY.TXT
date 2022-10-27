@@ -3,6 +3,8 @@
         -- parallelized --chull --alloy (CO)
         -- fixed some logger, adding some QUIETs (CO)
         -- fixing --npmax and --np=max options (CO)
+        -- fixed RDF function (CO)
+        -- added RDF to pocc (CO)
         -- reworked reshape, shift and stack function for xvector and xmatrix (HE)
 3.2.13 - 2022/08/30
         Location: http://materials.duke.edu/AFLOW/aflow.3.2.13.tar.xz
