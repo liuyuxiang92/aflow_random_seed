@@ -1017,6 +1017,78 @@ namespace pocc {
     return t_ss.str();
   }
 
+  void POccCalculator::setAvgRDF(double temperature){
+    bool LDEBUG=(true || _DEBUG_POCC_ || XHOST.DEBUG);
+    stringstream message;
+
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
+
+    if(m_ARUN_directories.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
+    if(m_ARUN_directories.size()!=l_supercell_sets.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"m_ARUN_directories.size()!=l_supercell_sets.size()",_RUNTIME_ERROR_);}
+
+    setPOccStructureProbabilities(temperature); //done in calculateRELAXProperties() - repetita iuvant
+
+    //check if pdos can be averaged
+    //depends not only the number of atoms (after relaxation), but also whether species/num_each_type are identical
+    bool perform_rdf=true;
+    vector<string> vspecies,_vspecies;
+    deque<int> num_each_type;
+    xstructure xstr;
+    unsigned long long int isupercell=0;
+    string POSCAR_file="";
+    bool found_POSCAR_file=false;
+    uint i=0;
+    bool raw_counts=false;  //make options for these later
+    double sigma=0; //make options for these later
+    int window_gaussian=0;  //make options for these later
+    aurostd::xmatrix<double> rdf_all;
+    m_rdf_all.clear();
+    m_rdf_rmax=DEFAULT_POCC_RDF_RMAX;
+    m_rdf_nbins=DEFAULT_POCC_RDF_NBINS;
+    for(std::list<POccSuperCellSet>::iterator it=l_supercell_sets.begin();it!=l_supercell_sets.end()&&perform_rdf==true;++it){
+      isupercell=std::distance(l_supercell_sets.begin(),it);
+      if(aflowlib::GetSpeciesDirectory(getARUNDirectoryPath(isupercell),_vspecies)==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Cannot extract vspecies from "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);}
+      found_POSCAR_file=false;
+      if(found_POSCAR_file==false){found_POSCAR_file=aurostd::EFileExist(getARUNDirectoryPath(isupercell)+"/CONTCAR.relax",POSCAR_file);}
+      if(found_POSCAR_file==false){found_POSCAR_file=aurostd::EFileExist(getARUNDirectoryPath(isupercell)+"/CONTCAR.relax"+aurostd::utype2string(m_relaxation_max),POSCAR_file);}
+      if(found_POSCAR_file==false){
+        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"CONTCAR.relax"+aurostd::utype2string(m_relaxation_max)+" not found in "+m_ARUN_directories[isupercell],_FILE_NOT_FOUND_);
+      }
+      message << "Processing CONTCAR.relax of " << m_ARUN_directories[isupercell] << " for the RDF (takes some time)";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+      xstr.clear();
+      xstr.initialize(POSCAR_file,IOVASP_POSCAR);
+      if(LDEBUG){
+        cerr << __AFLOW_FUNC__ << " xstr[isupercell=" << isupercell << "]=" << endl << xstr;
+        cerr << __AFLOW_FUNC__ << " xstr.atoms.size()=" << xstr.atoms.size() << endl;
+        cerr << __AFLOW_FUNC__ << " xstr.num_each_type=" << aurostd::joinWDelimiter(xstr.num_each_type,",") << endl;
+        cerr << __AFLOW_FUNC__ << " vspecies=" << aurostd::joinWDelimiter(_vspecies,",") << endl;
+      }
+      if(xstr.species.empty()||(xstr.species.size()>0 && xstr.species[0].empty())){xstr.SetSpecies(aurostd::vector2deque(_vspecies));}
+      if(isupercell==0){
+        vspecies.clear();for(i=0;i<_vspecies.size();i++){vspecies.push_back(_vspecies[i]);}
+        num_each_type.clear();for(i=0;i<xstr.num_each_type.size();i++){num_each_type.push_back(xstr.num_each_type[i]);}
+        //
+        pflow::GetRDF(xstr,rdf_all,m_rdf_rmax,m_rdf_nbins,raw_counts,sigma,window_gaussian);
+        m_rdf_all=(*it).m_probability * rdf_all;
+      }else{
+        if(perform_rdf && (vspecies!=_vspecies)){
+          message << "Found a mismatch in vspecies in " << m_ARUN_directories[isupercell] << ", not performing pdos averaging";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+          perform_rdf=false;
+        }
+        if(perform_rdf && (num_each_type!=xstr.num_each_type)){
+          message << "Found a mismatch in num_each_type in " << m_ARUN_directories[isupercell] << ", not performing pdos averaging";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+          perform_rdf=false;
+        }
+        //
+        pflow::GetRDF(xstr,rdf_all,m_rdf_rmax,m_rdf_nbins,raw_counts,sigma,window_gaussian);
+        m_rdf_all+=(*it).m_probability * rdf_all;
+      }
+      PrintRDF(xstr,m_rdf_rmax,m_rdf_nbins,rdf_all,*p_oss);
+    }
+    if(perform_rdf==false){m_rdf_all.clear();return;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " m_rdf_all=" << endl << m_rdf_all << endl;}
+  }
+
   void POccCalculator::setAvgDOSCAR(double temperature){
     bool LDEBUG=(FALSE || _DEBUG_POCC_ || XHOST.DEBUG);
     stringstream message;
@@ -1308,14 +1380,15 @@ namespace pocc {
     if(m_ARUN_directories.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"m_ARUN_directories.size()==0",_RUNTIME_ERROR_);}
 
     //get most relaxed outcar
-    uint i=0,max=10,max_found=0;
+    uint i=0,max=10;
+    m_relaxation_max=AUROSTD_MAX_UINT;
     for(i=1;i<=max;i++){  //i=max;i<=max;i--
-      if(aurostd::EFileExist(getARUNDirectoryPath(0)+"/OUTCAR.relax"+aurostd::utype2string(i))){max_found=i;}
+      if(aurostd::EFileExist(getARUNDirectoryPath(0)+"/OUTCAR.relax"+aurostd::utype2string(i))){m_relaxation_max=i;}
       else{break;}
     }
-    if(max_found==0){return;} //no runs completed
+    if(m_relaxation_max==AUROSTD_MAX_UINT){return;} //no runs completed
 
-    string OUTCAR_relax="OUTCAR.relax"+aurostd::utype2string(max_found);
+    string OUTCAR_relax="OUTCAR.relax"+aurostd::utype2string(m_relaxation_max);
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " OUTCAR_relax=" << OUTCAR_relax << endl;}
 
     bool found_all_OUTCARs=true;
@@ -1328,6 +1401,7 @@ namespace pocc {
     if(!found_all_OUTCARs){return;}
 
     setPOccStructureProbabilities(temperature);
+    setAvgRDF(temperature);
   }
 
   void POccCalculator::calculateSTATICProperties(double temperature){
@@ -1556,6 +1630,12 @@ namespace pocc {
       //pocc_out_ss << "probability[" << m_ARUN_directories[isupercell] << "]=" << aurostd::utype2string((*it).m_probability,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << endl;
       pocc_out_ss << "probability_supercell_" << std::setfill('0') << std::setw(aurostd::getZeroPadding(l_supercell_sets.size())) << isupercell+1  << "=" << aurostd::utype2string((*it).m_probability,pocc_precision,true,pocc_roundoff_tol,SCIENTIFIC_STREAM) << "  [" << m_ARUN_directories[isupercell] << "]" << endl; //+1 so we start at 1, not 0 (count)
     }
+    
+    if(m_rdf_all.rows!=0){
+      pocc_out_ss << POCC_AFLOWIN_tag << "START_RDF" << endl;
+      pocc_out_ss << RDF2string(xstr_pocc,m_rdf_rmax,m_rdf_nbins,m_rdf_all);
+      pocc_out_ss << POCC_AFLOWIN_tag << "STOP_RDF" << endl;
+    }
 
     //fix m_Egap and m_Egap_net for metals (Egap==0!)
     vector<double> Egap;Egap.assign(m_Egap.size(),0.0);
@@ -1616,14 +1696,17 @@ namespace pocc {
     if(m_ARUN_directories.size()!=l_supercell_sets.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"m_ARUN_directories.size()!=l_supercell_sets.size()",_RUNTIME_ERROR_);}
 
     bool found_all_QMVASPs=true;
-    for(unsigned long long int isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_QMVASPs==true;isupercell++){
-      if(!aurostd::EFileExist(getARUNDirectoryPath(isupercell)+"/"+DEFAULT_AFLOW_QMVASP_OUT)){
+    string qmvasp_file="";
+    unsigned long long int isupercell=0;
+    for(isupercell=0;isupercell<m_ARUN_directories.size()&&found_all_QMVASPs==true;isupercell++){
+      qmvasp_file=getARUNDirectoryPath(isupercell)+"/"+DEFAULT_AFLOW_QMVASP_OUT;
+      if(!aurostd::EFileExist(qmvasp_file)){
         if(LDEBUG){cerr << __AFLOW_FUNC__ << " " << DEFAULT_AFLOW_QMVASP_OUT << " not found in "+m_ARUN_directories[isupercell] << endl;}
         found_all_QMVASPs=false;
       }
     }
     if(!found_all_QMVASPs){
-      message << "Waiting for complete VASP calculations";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_NOTICE_);
+      message << "Waiting for complete VASP calculations (" << qmvasp_file << " is missing)";pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_NOTICE_);
       return false;
     }
 
@@ -1867,14 +1950,14 @@ namespace pocc {
           aurostd::string2tokens(index_str,tokens,"_");
           index_str=tokens[0];
           if(!aurostd::isfloat(index_str)){  //non-recognizable input
-            pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown format for ARUN2SKIP[i="+aurostd::utype2string(i)+"]="+v_aruns2skip[i],m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
+            pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown format for ARUN2SKIP[i="+aurostd::utype2string(i)+"]="+v_aruns2skip[i],m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_); 
             continue;
           }
         }
         //now index_str should be good - assume index_str = index_str+1
         index=aurostd::string2utype<uint>(index_str);
         if((index-1)>=m_ARUN_directories.size()){
-          pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"ARUN2SKIP[i="+aurostd::utype2string(i)+"]="+v_aruns2skip[i]+" is out of range",m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
+          pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"ARUN2SKIP[i="+aurostd::utype2string(i)+"]="+v_aruns2skip[i]+" is out of range",m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_); 
           continue;
         }
         v_indices.push_back(index-1);
@@ -1883,7 +1966,7 @@ namespace pocc {
         std::sort(v_indices.rbegin(),v_indices.rend());  //sort backwards so we erase
         std::list<POccSuperCellSet>::iterator it;
         for(i=0;i<v_indices.size();i++){
-          pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"Ignoring "+m_ARUN_directories[v_indices[i]],m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_NOTICE_);
+          pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,"Ignoring "+m_ARUN_directories[v_indices[i]],m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_NOTICE_); 
           m_ARUN_directories.erase(m_ARUN_directories.begin()+v_indices[i]);
 
           //erase
@@ -2390,8 +2473,12 @@ namespace pocc {
     m_temperature_precision=TEMPERATURE_PRECISION;
     m_zero_padding_temperature=0;
     m_temperatures_int=false;
+    m_relaxation_max=AUROSTD_MAX_UINT;
     m_energy_dft_ground=AUROSTD_MAX_DOUBLE;
     m_ARUN_directory_ground=AUROSTD_MAX_UINT;
+    m_rdf_all.clear();
+    m_rdf_rmax=AUROSTD_MAX_DOUBLE;
+    m_rdf_nbins=AUROSTD_MAX_INT;
     m_xdoscar.clear();
     m_Egap_DOS.clear();
     m_Egap.clear();
@@ -2433,10 +2520,14 @@ namespace pocc {
     m_temperature_precision=b.m_temperature_precision;
     m_zero_padding_temperature=b.m_zero_padding_temperature;
     m_temperatures_int=b.m_temperatures_int;
+    m_relaxation_max=b.m_relaxation_max;
     m_energy_dft_ground=b.m_energy_dft_ground;
     m_convolution=b.m_convolution;
     m_ARUN_directory_ground=b.m_ARUN_directory_ground;
     m_ARUN_directories.clear();for(uint i=0;i<b.m_ARUN_directories.size();i++){m_ARUN_directories.push_back(b.m_ARUN_directories[i]);}
+    m_rdf_all=b.m_rdf_all;
+    m_rdf_rmax=b.m_rdf_rmax;
+    m_rdf_nbins=b.m_rdf_nbins;
     m_xdoscar=b.m_xdoscar;
     m_Egap_DOS.clear();for(uint ispin=0;ispin<b.m_Egap_DOS.size();ispin++){m_Egap_DOS.push_back(b.m_Egap_DOS[ispin]);}
     m_Egap.clear();for(uint ispin=0;ispin<b.m_Egap.size();ispin++){m_Egap.push_back(b.m_Egap[ispin]);}
@@ -4039,7 +4130,7 @@ namespace pocc {
 
     unsigned long long int i_pscs=std::distance(l_supercell_sets.begin(),it_pscs);
     message << "Performing robust structure comparison for structure group[" << i_pscs+1 << "/" << std::distance(l_supercell_sets.begin(),l_supercell_sets.end()) << "]";
-    pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
+    pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_); 
 
     bool are_equivalent=false,found_equivalent=false;
     bool test_iterator_insertion=false; //short circuit
@@ -4094,7 +4185,7 @@ namespace pocc {
 
     message << "Splitting structure group[" << std::distance(l_supercell_sets.begin(),it_pscs)+1;
     message << "] into " << unique_structure_bins.size() << " groups as determined by the robust structure comparison";
-    pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_);
+    pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags,*p_FileMESSAGE,*p_oss,_LOGGER_WARNING_); 
 
     vector<uint> vi_psc_to_remove;
     std::list<POccSuperCellSet>::iterator it=it_pscs;

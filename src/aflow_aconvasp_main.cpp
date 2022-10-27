@@ -314,8 +314,8 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("CHULL::ENTROPIC_TEMPERATURE",aurostd::args2flag(argv,cmds,"--entropic_temperature|--entropictemperature|--entroptemp"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::INCLUDE_PAW_GGA",aurostd::args2flag(argv,cmds,"--include_paw_gga|--paw_gga")); //include entries calculated with PAW_GGA
     vpflow.flag("CHULL::SKIP_STRUCTURE_COMPARISON",aurostd::args2flag(argv,cmds,"--skip_structure_comparison|--skipstructruecomparison|--skipstructcomp|--ssc"));    //use entropic temperature instead of enthalpy of formation
-    vpflow.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS",aurostd::args2flag(argv,cmds,"--skip_stability_criterion_analysis|--skip_stability_criterion|--skipstabilitycriterionanalysis|--skipstabilitycriterion|--skipscriterion|--sscriterion"));    //use entropic temperature instead of enthalpy of formation
-    vpflow.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS",aurostd::args2flag(argv,cmds,"--skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skipnplus1|--snp1|--snpo"));    //use entropic temperature instead of enthalpy of formation
+    vpflow.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS",aurostd::args2flag(argv,cmds,"--skip_stability_criterion_analysis|--skip_stability_criterion|--skipstabilitycriterionanalysis|--skipstabilitycriterion|--skip_scriterion|--skipscriterion|--sscriterion"));    //use entropic temperature instead of enthalpy of formation
+    vpflow.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS",aurostd::args2flag(argv,cmds,"--skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skip_nplus1|--skipnplus1|--snp1|--snpo"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::INCLUDE_SKEWED_HULLS",aurostd::args2flag(argv,cmds,"--include_skewed_hulls|--include_skewed|--ish"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::INCLUDE_UNRELIABLE_HULLS",aurostd::args2flag(argv,cmds,"--include_unreliable_hulls|--include_unreliable|--iuh"));    //use entropic temperature instead of enthalpy of formation
     vpflow.flag("CHULL::INCLUDE_OUTLIERS",aurostd::args2flag(argv,cmds,"--include_outliers|--io"));    //use entropic temperature instead of enthalpy of formation
@@ -325,7 +325,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.flag("CHULL::LATEX_OUTPUT",aurostd::args2flag(argv,cmds,"--latex_output|--latexoutput"));    //verbose latex output (cout and FileMESSAGE)
     vpflow.flag("CHULL::LATEX_INTERACTIVE",aurostd::args2flag(argv,cmds,"--latex_interactive|--latexinteractive"));  //interact with latex (execute vs. execute2string)
     if(vpflow.flag("CHULL::LATEX_INTERACTIVE")&&!vpflow.flag("CHULL::LATEX_OUTPUT")){vpflow.flag("CHULL::LATEX_OUTPUT",TRUE);}    //keep verbose latex output
-    vpflow.flag("CHULL::PLOT_ISO_MAX_LATENT_HEAT",aurostd::args2flag(argv,cmds,"--plot_iso_max_latent_heat|--iso_max|--isomax"));    //plot iso-max latent heat lines for hull points
+    vpflow.flag("CHULL::PLOT_ISO_MAX_LATENT_HEAT",aurostd::args2flag(argv,cmds,"--plot_iso_max_latent_heat|--plot_isomax|--iso_max|--isomax"));    //plot iso-max latent heat lines for hull points
     //need to determine output type immediately, so we can accept/ignore output specific flags (SAFE)
     vpflow.args2addattachedscheme(argv,cmds,"CHULL::OUTPUT","--print=|--p=|--output=|--o=",""); //determine how to get output, could pull from XHOST, but --output was used previously (backwards compatibility)
     if(vpflow.flag("CHULL::OUTPUT")){
@@ -365,11 +365,11 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     } else {vpflow.flag("CHULL::LATEX_DOC",TRUE);}   //default
     vpflow.args2addattachedscheme(argv,cmds,"CHULL::DIST2HULL","--distance_to_hull=|--distancetohull=|--distance2hull=|--dist2hull=|--d2h=",""); //calculate distance to hull for point
     vpflow.args2addattachedscheme(argv,cmds,"CHULL::STABILITY_CRITERION","--stability_criterion=|--stabilitycriterion=|--stable_criterion=|--scriterion=|--sc=",""); //calculate stable criterion for point
-    vpflow.args2addattachedscheme(argv,cmds,"CHULL::N+1_ENTHALPY_GAIN","--n+1_enthalpy_gain=|--n+1_energy_gain=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=|--n+1_enthalpygain=|--n+1+energygain=|--n+1_egain=",""); //calculate stable criterion for point
+    vpflow.args2addattachedscheme(argv,cmds,"CHULL::N+1_ENTHALPY_GAIN","--n+1_enthalpy_gain=|--n+1_energy_gain=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=|--n+1_enthalpygain=|--n+1+energygain=|--n+1_egain=|--nplus1=",""); //calculate stable criterion for point
     vpflow.args2addattachedscheme(argv,cmds,"CHULL::CALCULATE_FAKE_HULL_STABILITY_CRITERION","--fake_hull_sc=",""); //CO20210315
     vpflow.flag("CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN",aurostd::args2flag(argv,cmds,"--fake_hull_np1eg")); //SK20200325 - skip all n-dimensional points and calculate new hull
     vpflow.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY",aurostd::args2flag(argv,cmds,"--calculate_highest_dimension_only|--calc_ND_only")); //CO20210407
-    vpflow.args2addattachedscheme(argv,cmds,"CHULL::HULL_FORMATION_ENTHALPY","--hull_formation_enthalpy=|--hull_energy=",""); //calculate stable criterion for point
+    vpflow.args2addattachedscheme(argv,cmds,"CHULL::HULL_FORMATION_ENTHALPY","--hull_formation_enthalpy=|--hull_enthalpy=|--hull_energy=",""); //calculate stable criterion for point
     if(vpflow.flag("CHULL::STABILITY_CRITERION")||vpflow.flag("CHULL::N+1_ENTHALPY_GAIN")||vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")){
       //vpflow.flag("CHULL::TEXT_DOC",FALSE);   //turn off  //leave on, as user might request json/text format output
       //vpflow.flag("CHULL::JSON_DOC",FALSE);   //turn off  //leave on, as user might request json/text format output
@@ -1270,7 +1270,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
   vpflow.flag("RBANAL",aurostd::args2flag(argv,cmds,"--rbanal") && argv.at(1)=="--rbanal");
   vpflow.flag("RBDIST",aurostd::args2flag(argv,cmds,"--rbdist") && argv.at(1)=="--rbdist");
   // [OBSOLETE]  vvpflow.flag("RDF",(aurostd::args2flag(argv,cmds,"--rdf") && argv.at(1)=="--rdf"));
-  vpflow.args2addattachedscheme(argv,cmds,"RDF","--rdf=","");
+  vpflow.flag("RDF",aurostd::args2flag(argv,cmds,"--rdf")); //CO20220711
+  if(!vpflow.flag("RDF")){vpflow.args2addattachedscheme(argv,cmds,"RDF","--rdf=","");}  //CO20220711 - also look for '=' variant, must be XOR with flag (without '=')
+  vpflow.flag("RDF::RAW_COUNTS",aurostd::args2flag(argv,cmds,"--raw_counts"));  //CO20220627
   // [OBSOLETE]  vpflow.flag("RDFCMP",(aurostd::args2flag(argv,cmds,"--rdfcmp") && argv.at(1)=="--rdfcmp"));
   vpflow.args2addattachedscheme(argv,cmds,"RDFCMP","--rdfcmp=","");
 
@@ -2045,7 +2047,7 @@ namespace pflow {
       if(vpflow.flag("QMVASP")) {pflow::QMVASP(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("QSUB")) {sflow::QSUB(vpflow.getattachedscheme("QSUB")); _PROGRAMRUN=true;} // NEW
       // R
-      if(vpflow.flag("RDF")) {pflow::RDF(vpflow.getattachedscheme("RDF"),cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("RDF")) {pflow::RDF(vpflow.getattachedscheme("RDF"),cin,vpflow.flag("RDF::RAW_COUNTS")); _PROGRAMRUN=true;}  //CO20220627
       if(vpflow.flag("RDFCMP")) {pflow::RDFCMP(vpflow.getattachedscheme("RDFCMP")); _PROGRAMRUN=true;}
       if(vpflow.flag("RMCOPIES")) {cout << pflow::RMCOPIES(cin); _PROGRAMRUN=true;}
       if(vpflow.flag("RSM")) {pflow::RSM(argv,cin); _PROGRAMRUN=true;}
@@ -2428,13 +2430,14 @@ namespace pflow {
     strstream << tab << x << " --compare_database_entries [--alloy=AlgAlMn...] [--nspecies=<number>] [--stoichiometry=1,2,3,...] [--space_group=225,186,227,...]" << endl; //DX20210611
     strstream << tab << x << " --compare_materials=POSCAR1,POSCAR2,...| -D <path> | -F=<filename> [--np=xx (default 1)]" << endl; //DX20210611
     strstream << tab << x << " --compare_structures=POSCAR1,POSCAR2,...| -D <path> | -F=<filename> [--np=xx (default 1)]" << endl; //DX20210611
-    strstream << tab << x << " --convex_hull=|--chull --alloy=MnPdPt[,AlCuZn,...] [options] [--destination=[DIRECTORY]]" << endl;
-    strstream << tab << xspaces << " " << "options are:" << endl;
+    strstream << tab << x << " --convex_hull=|--chull --alloy=MnPdPt[,AlCuZn,...] [--np=1] [chull_options] [--destination=[DIRECTORY]]" << endl;
+    strstream << tab << xspaces << " " << "chull_options are:" << endl;
     strstream << endl;
     strstream << tab << xspaces << " " << "GENERAL OPTIONS:" << endl;
     strstream << tab << xspaces << " " << "              --usage" << endl;
     strstream << tab << xspaces << " " << "              --output=|--o=|--print=|--p=latex|pdf|png|json|text|jupyter|jupyter2|jupyter3" << endl;
     strstream << tab << xspaces << " " << "              --screen_only" << endl;
+    strstream << tab << xspaces << " " << "              --keep=tex|--keep_tex|--keeptex|--tex" << endl;
     strstream << tab << xspaces << " " << "              --keep=log|--keep_log|--keeplog|--log" << endl;
     strstream << tab << xspaces << " " << "              --keep=tex,log" << endl;
     strstream << endl;
@@ -2451,8 +2454,8 @@ namespace pflow {
     strstream << tab << xspaces << " " << "ANALYSIS OPTIONS:" << endl;
     strstream << tab << xspaces << " " << "              --distance_to_hull=|--distancetohull=|--distance2hull=|--dist2hull=|--d2h=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774" << endl;
     strstream << tab << xspaces << " " << "              --stability_criterion=|--stabilitycriterion=|--stable_criterion=|--scriterion=|--sc=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774" << endl;
-    strstream << tab << xspaces << " " << "              --n+1_enthalpy_gain=|--=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=|--n+1_enthalpygain=|--n+1+energygain=|--n+1_egain=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774" << endl;
-    strstream << tab << xspaces << " " << "              --hull_formation_enthalpy=|--hull_energy=0.25,0.25" << endl;
+    strstream << tab << xspaces << " " << "              --n+1_enthalpy_gain=|--=|--n+1enthalpygain=|--n+1energygain=|--n+1egain=|--n1egain=|--n+1_enthalpygain=|--n+1+energygain=|--n+1_egain=|--nplus1=aflow:bb0d45ab555bc208,aflow:fb9eaa58604ce774" << endl;
+    strstream << tab << xspaces << " " << "              --hull_formation_enthalpy=|--hull_enthalpy=|--hull_energy=0.25,0.25" << endl;
     strstream << tab << xspaces << " " << "              --skip_structure_comparison|--skipstructruecomparison|--skipstructcomp|--ssc" << endl;
     strstream << tab << xspaces << " " << "              --skip_stability_criterion_analysis|--skipstabilitycriterionanalysis|--skipscriterion|--sscriterion" << endl;
     strstream << tab << xspaces << " " << "              --skip_n_plus_1_enthalpy_gain_analysis|--skip_n_plus_1_energy_gain_analysis|--skipnplus1enthalpygainanalysis|--skipnplus1energygainanalysis|--skipnplus1|--snp1|--snpo" << endl;
@@ -2467,13 +2470,12 @@ namespace pflow {
     strstream << tab << xspaces << " " << "              --image_only|--imageonly|--image" << endl;
     strstream << tab << xspaces << " " << "              --no_document|--nodocument|--no_doc|--nodoc|--full_page_image|--fullpageimage" << endl;
     strstream << tab << xspaces << " " << "              --document_only|--documentonly|--doc_only|--doconly|--doc" << endl;
-    strstream << tab << xspaces << " " << "              --keep=tex|--keep_tex|--keeptex|--tex" << endl;
     strstream << tab << xspaces << " " << "              --latex_output|--latexoutput" << endl;
     strstream << tab << xspaces << " " << "              --latex_interactive|--latexinteractive" << endl;
     strstream << tab << xspaces << " " << "              --light_contrast|--lightcontrast|--lc" << endl;
     strstream << tab << xspaces << " " << "              --large_font|--largefont|--large|--lf" << endl;
     strstream << tab << xspaces << " " << "              --png_resolution=|--pngresolution=|--pngr=300" << endl;
-    strstream << tab << xspaces << " " << "              --plot_iso_max_latent_heat|--iso_max|--isomax" << endl;
+    strstream << tab << xspaces << " " << "              --plot_iso_max_latent_heat|--plot_isomax|--iso_max|--isomax" << endl;
     strstream << tab << x << " --corners|--corner < POSCAR" << endl;
     strstream << tab << x << " --data[=<tolerance_value>|=tight|=loose] [--no_scan] [--print=txt|json] < POSCAR" << endl;
     strstream << tab << x << " --data1=rcut < POSCAR" << endl;
@@ -2593,7 +2595,7 @@ namespace pflow {
     strstream << tab << x << " --revsg [#] [n] [l] [m]" << endl;
     strstream << tab << x << " --rm_atom iatom < POSCAR" << endl;
     strstream << tab << x << " --rm_copies < POSCAR" << endl;
-    strstream << tab << x << " --rdf[=rmax[,nbins[,sigma]]] < POSCAR" << endl;
+    strstream << tab << x << " --rdf[=rmax[,nbins[,sigma[,window_gaussian]]]] [--raw_counts] < POSCAR" << endl; //CO20220627
     strstream << tab << x << " --scale=s < POSCAR" << endl;
     strstream << tab << x << " --sd A1 A2 ... < POSCAR" << endl;
     strstream << tab << x << " --setcm cm1 cm2 cm3 < POSCAR" << endl;
@@ -10230,7 +10232,13 @@ namespace pflow {
   // ME20200512 - Created by CO for POCC.
   const int BAR_WIDTH = 70;
   void updateProgressBar(unsigned long long int current, unsigned long long int end, ostream& oss){
-    if(XHOST.QUIET || XHOST.vflag_control.flag("WWW")){return;} //CO20190520 - no progress bar for web stuff  //CO20200404 - new web flag // ME20210428 - do not update when quiet either
+    //CO20220630 - decide if we should print
+    //this is one of the few functions that escapes pflow::logger() and aurostd::PrintXXStream() for printing
+    //all other printing should route through pflow::logger() (routing directly through aurostd::PrintXXStream() is obsolete)
+    if(XHOST.QUIET || XHOST.QUIET_GLOBAL || XHOST.vflag_control.flag("WWW")){return;} //CO20190520 - no progress bar for web stuff  //CO20200404 - new web flag // ME20210428 - do not update when quiet either
+    if((&oss==&cout) && XHOST.QUIET_COUT){return;}
+    if((&oss==&cerr) && XHOST.QUIET_CERR){return;}
+
     double progress = (double)current/(double)end;
     int pos = BAR_WIDTH * progress;
 
@@ -10404,6 +10412,9 @@ namespace pflow {
     if (XHOST.QUIET) quiet = !aurostd::substringlist2bool(function_name, XHOST.LOGGER_WHITELIST, false);
     else quiet = aurostd::substringlist2bool(function_name, XHOST.LOGGER_BLACKLIST, false);
 
+    //CO20220630 - note about osswrite, it is redundant with quiet, so it would be nice to get rid of it in the future
+    //but it would require a full overhaul of many critical aflow printing functions
+    //better not to touch and leave the overloads
     bool osswrite=!silent;
     if (type == _LOGGER_ERROR_) {aurostd::PrintErrorStream(FileMESSAGE,stream,quiet,osswrite);} //oss - DEFAULT TO cerr
     else if (type == _LOGGER_WARNING_) {aurostd::PrintWarningStream(FileMESSAGE,stream,quiet,osswrite);}  //oss - DEFAULT TO cerr
@@ -10798,13 +10809,13 @@ namespace pflow {
     if(aflowlib_legacy_format){
       for(uint itype=0;itype<first_itypes.size();itype++){
         for(uint jtype=itype;jtype<first_itypes.size();jtype++){
-          output << aurostd::PaddedPOST("BOND_"+names[itype]+names[jtype],11) << " " << aurostd::utype2string(nbondxx[iat++],6) << " [Angst]" << endl;
+          output << aurostd::PaddedPOST("BOND_"+names[itype]+names[jtype],11) << " " << aurostd::utype2string(nbondxx[iat++],6,FIXED_STREAM) << " [Angst]" << endl; //CO20220627
         }
       }
     } else {
       for(uint itype=0;itype<first_itypes.size();itype++){
         for(uint jtype=itype;jtype<first_itypes.size();jtype++){
-          output << aurostd::PaddedPOST(names[itype]+"-"+names[jtype]+":",8) << " " << aurostd::utype2string(nbondxx[iat++],6) << " [Angst]" << endl;
+          output << aurostd::PaddedPOST(names[itype]+"-"+names[jtype]+":",8) << " " << aurostd::utype2string(nbondxx[iat++],6,FIXED_STREAM) << " [Angst]" << endl;  //CO20220627
         }
       }
     }
@@ -13789,37 +13800,46 @@ namespace pflow {
 // pflow::RDF
 // ***************************************************************************
 namespace pflow {
-  void RDF(const string& options,istream& input) {
+  void RDF(const string& options,istream& input,bool raw_counts) {  //CO220627 - rewritten
     bool LDEBUG=(FALSE || XHOST.DEBUG);
-    if(LDEBUG) cerr << __AFLOW_FUNC__ << " BEGIN" << endl;
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;} //CO2020062
     vector<string> tokens;
     aurostd::string2tokens(options,tokens,",");
-    if(tokens.size()>3) {
-      init::ErrorOption(options,__AFLOW_FUNC__,"aflow --rdf[=rmax[,nbins[,sigma]]] < POSCAR");
-    } 
+    if(tokens.size()>4){init::ErrorOption(options,__AFLOW_FUNC__,"aflow --rdf[=rmax[,nbins[,sigma[,window_gaussian]]]] [--raw_counts] < POSCAR");}
 
     xstructure a(input,IOAFLOW_AUTO);
+    if(a.species.size()==0){a.species=aurostd::vector2deque(pflow::getFakeElements(a.num_each_type.size()));}
     double rmax=(double) 5.0;
     int nbins=(int) 25;
-    int smooth_width=(int) 0;
-    if(LDEBUG) cerr << XPID << "pflow::RDF: tokens.size()=" << tokens.size() << endl;
-    if(tokens.size()>=1) rmax=aurostd::string2utype<double>(tokens.at(0));
-    if(tokens.size()>=1) cerr << XPID << "pflow::RDF: tokens.at(0)=" << tokens.at(0) << endl;
-    if(tokens.size()>=2) nbins=aurostd::string2utype<int>(tokens.at(1));
-    if(tokens.size()>=3) smooth_width=aurostd::string2utype<int>(tokens.at(2));
+    double sigma=(int) 0;
+    int window_gaussian=(int) 0;
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " tokens.size()=" << tokens.size() << endl;}
+    if(tokens.size()>=1){rmax=aurostd::string2utype<double>(tokens[0]);}
+    if(tokens.size()>=2){nbins=aurostd::string2utype<int>(tokens[1]);}
+    if(tokens.size()>=3){sigma=aurostd::string2utype<double>(tokens[2]);}
+    if(tokens.size()>=4){window_gaussian=aurostd::string2utype<int>(tokens[3]);}
 
-    aurostd::matrix<double> rdf_all; //CO20200404 pflow::matrix()->aurostd::matrix()
-    cerr << "[1]" << endl;
-    pflow::GetRDF(a,rmax,nbins,rdf_all);
-    cerr << "[1]" << endl;
-    // for(int i=0;i<rdf_all.size();i++) {for(int j=0;j<rdf_all[i].size();j++) cerr << rdf_all[i][j] << " "; cerr << endl;}
-    aurostd::matrix<double> rdf_all_sm;  //CO20200404 pflow::matrix()->aurostd::matrix()
-    rdf_all_sm=pflow::GetSmoothRDF(rdf_all,smooth_width);
-    aurostd::matrix<double> rdfsh_all; //CO20200404 pflow::matrix()->aurostd::matrix()
-    aurostd::matrix<double> rdfsh_loc; // Radial location of rdf shells. //CO20200404 pflow::matrix()->aurostd::matrix()
-    pflow::GetRDFShells(a,rmax,nbins,smooth_width,rdf_all_sm,rdfsh_all,rdfsh_loc);
-    PrintRDF(a,rmax,nbins,smooth_width,rdf_all_sm,rdfsh_all,rdfsh_loc,cout);
-    if(LDEBUG) cerr << __AFLOW_FUNC__ << " END" << endl;
+    aurostd::xmatrix<double> rdf_all;
+    pflow::GetRDF(a,rdf_all,rmax,nbins,raw_counts,sigma,window_gaussian);
+    //to be implemented/patched later: GetRDFShells()
+    //this function is supposed to count the number of wiggles in the rdf above/below horizontal asymptote (constant)
+    cout << aflow::Banner("BANNER_TINY") << endl;
+    PrintRDF(a,rmax,nbins,rdf_all,cout);
+
+    //stringstream gout;
+    //xoption plotoptions;
+
+    //[CO20220625 - OBSOLETE]cerr << "[1]" << endl;
+    //[CO20220625 - OBSOLETE]cerr << "[1]" << endl;
+    //[CO20220625 - OBSOLETE]// for(int i=0;i<rdf_all.size();i++) {for(int j=0;j<rdf_all[i].size();j++) cerr << rdf_all[i][j] << " "; cerr << endl;}
+    //[CO20220625 - OBSOLETE]aurostd::matrix<double> rdf_all_sm;  //CO20200404 pflow::matrix()->aurostd::matrix()
+    //[CO20220625 - OBSOLETE]rdf_all_sm=pflow::GetSmoothRDF(rdf_all,smooth_width);
+    //[CO20220625 - OBSOLETE]aurostd::matrix<double> rdfsh_all; //CO20200404 pflow::matrix()->aurostd::matrix()
+    //[CO20220625 - OBSOLETE]aurostd::matrix<double> rdfsh_loc; // Radial location of rdf shells. //CO20200404 pflow::matrix()->aurostd::matrix()
+    //[CO20220625 - OBSOLETE]pflow::GetRDFShells(a,rmax,nbins,smooth_width,rdf_all_sm,rdfsh_all,rdfsh_loc);
+    //[CO20220625 - OBSOLETE]PrintRDF_20220101(a,rmax,nbins,smooth_width,rdf_all_sm,rdfsh_all,rdfsh_loc,cout);
+    
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " END" << endl;}
   }
 } // namespace pflow
 
@@ -13851,8 +13871,8 @@ namespace pflow {
     // Get rdfs
     aurostd::matrix<double> rdf_all_A; //CO20200404 pflow::matrix()->aurostd::matrix()
     aurostd::matrix<double> rdf_all_B; //CO20200404 pflow::matrix()->aurostd::matrix()
-    pflow::GetRDF(strA,rmax,nbins,rdf_all_A);
-    pflow::GetRDF(strB,rmax,nbins,rdf_all_B);
+    pflow::GetRDF_20220101(strA,rmax,nbins,rdf_all_A);  //CO20220627 - rewrite later
+    pflow::GetRDF_20220101(strB,rmax,nbins,rdf_all_B);  //CO20220627 - rewrite later
     aurostd::matrix<double> rdf_all_A_sm=pflow::GetSmoothRDF(rdf_all_A,smooth_width);  //CO20200404 pflow::matrix()->aurostd::matrix()
     aurostd::matrix<double> rdf_all_B_sm=pflow::GetSmoothRDF(rdf_all_B,smooth_width);  //CO20200404 pflow::matrix()->aurostd::matrix()
     // Get shells
