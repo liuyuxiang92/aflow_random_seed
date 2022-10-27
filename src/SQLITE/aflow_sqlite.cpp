@@ -32,7 +32,7 @@ namespace sql {
     if (sql_code != SQLITE_OK) {
       std::string function = "sql::SQLexecuteCommand():";
       std::string message = string(sqlErrMsg) + " in command " + command;
-      throw aurostd::xerror(__AFLOW_FILE__, function, message, _RUNTIME_SQL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_SQL_);
     }
   }
 
@@ -45,7 +45,7 @@ namespace sql {
       string function = XPID + "sql::SQLexecuteCommandSCALAR():";
       string message = string(sqlErrMsg) + " in command " + command;
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
-      throw aurostd::xerror(__AFLOW_FILE__, function, message, _RUNTIME_SQL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_SQL_);
     } else {
       return returnstring;
     }
@@ -60,7 +60,7 @@ namespace sql {
       string function = XPID + "sql::SQLexecuteCommandVECTOR():";
       string message = string(sqlErrMsg) + " in command " + command;
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
-      throw aurostd::xerror(__AFLOW_FILE__, function, message, _RUNTIME_SQL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_SQL_);
     } else {
       return returnvector;
     }
@@ -75,7 +75,7 @@ namespace sql {
       string function = XPID + "sql::SQLexecuteCommand2DVECTOR():";
       string message = string(sqlErrMsg) + " in command " + command;
       message += " (SQL code " + aurostd::utype2string<int>(sql_code) + ").";
-      throw aurostd::xerror(__AFLOW_FILE__, function, message, _RUNTIME_SQL_);
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _RUNTIME_SQL_);
     } else {
       return returnvector;
     }
