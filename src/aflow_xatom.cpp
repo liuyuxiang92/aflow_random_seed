@@ -18686,7 +18686,7 @@ void xstructure::qm_load(const string& Directory,const string& suffix,int iomode
     xOUTCAR outcar;
     if(aurostd::FileEmpty(Directory+"/OUTCAR"+suffix))   {throw aurostd::xerror(__AFLOW_FILE__,XPID+"xstructure::qm_load():","Empty OUTCAR.",_FILE_CORRUPT_);}  //PN+JJPR FIXED BUG
 
-    outcar.GetPropertiesFile(Directory+"/OUTCAR"+suffix,data_natoms,TRUE);
+    outcar.GetPropertiesFile(Directory+"/OUTCAR"+suffix); //SD20221019 - don't perform natoms check yet
 
     if(abs(data_natoms-(double) outcar.natoms)>0.1) {
       stringstream message;

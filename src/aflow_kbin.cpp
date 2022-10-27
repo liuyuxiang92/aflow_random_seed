@@ -18,7 +18,10 @@
 #define DUKE_BETANEW_DEFAULT_KILL_MEM_CUTOFF 1.50
 #define DUKE_QRATS_DEFAULT_KILL_MEM_CUTOFF 1.50
 #define DUKE_QFLOW_DEFAULT_KILL_MEM_CUTOFF 1.50
-#define DUKE_X_DEFAULT_KILL_MEM_CUTOFF 1.50 //CO20201220
+#define DUKE_X_X_DEFAULT_KILL_MEM_CUTOFF 1.50 //CO20201220
+#define DUKE_X_CRAY_DEFAULT_KILL_MEM_CUTOFF 1.50 //SD20221006
+#define DUKE_X_OLDCRAY_DEFAULT_KILL_MEM_CUTOFF 1.50 //SD20221006
+#define DUKE_X_SMB_DEFAULT_KILL_MEM_CUTOFF 1.50 //SD20221006
 #define JHU_ROCKFISH_DEFAULT_KILL_MEM_CUTOFF 1.50 //CO20220818
 #define MPCDF_EOS_DEFAULT_KILL_MEM_CUTOFF 1.50
 #define MPCDF_DRACO_DEFAULT_KILL_MEM_CUTOFF 1.50
@@ -443,9 +446,18 @@ namespace KBIN {
     aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_QFLOW_OPENMPI",aurostd::args2flag(argv,"--machine=qflow|--machine=duke_qflow|--machine=qflow_openmpi|--machine=duke_qflow_openmpi|--machine=quser|--machine=duke_quser|--machine=quser_openmpi|--machine=duke_quser_openmpi")); //backwards compatible //CO20180409
     if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_QFLOW_OPENMPI")) XHOST.maxmem=DUKE_QFLOW_DEFAULT_KILL_MEM_CUTOFF;
     //CO20201220 X START
-    // "MACHINE::DUKE_X"
-    aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_X",aurostd::args2flag(argv,"--machine=x|--machine=duke_x")); //backwards compatible //CO20180409
-    if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_X")) XHOST.maxmem=DUKE_X_DEFAULT_KILL_MEM_CUTOFF;
+    // "MACHINE::DUKE_X_X"
+    aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_X_X",aurostd::args2flag(argv,"--machine=x_x|--machine=duke_x_x")); //backwards compatible //CO20180409
+    if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_X_X")) XHOST.maxmem=DUKE_X_X_DEFAULT_KILL_MEM_CUTOFF;
+    // "MACHINE::DUKE_X_CRAY"
+    aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_X_CRAY",aurostd::args2flag(argv,"--machine=x_cray|--machine=duke_x_cray")); //SD20221006
+    if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_X_CRAY")) XHOST.maxmem=DUKE_X_CRAY_DEFAULT_KILL_MEM_CUTOFF;
+    // "MACHINE::DUKE_X_OLDCRAY"
+    aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_X_OLDCRAY",aurostd::args2flag(argv,"--machine=x_oldcray|--machine=duke_x_oldcray")); //SD20221006
+    if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_X_OLDCRAY")) XHOST.maxmem=DUKE_X_OLDCRAY_DEFAULT_KILL_MEM_CUTOFF;
+    // "MACHINE::DUKE_X_SMB"
+    aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_X_SMB",aurostd::args2flag(argv,"--machine=x_smb|--machine=duke_x_smb")); //SD20221006
+    if(aflags.AFLOW_MACHINE_GLOBAL.flag("MACHINE::DUKE_X_SMB")) XHOST.maxmem=DUKE_X_SMB_DEFAULT_KILL_MEM_CUTOFF;
     //CO20201220 X STOP
     //CO20220818 JHU_ROCKFISH START
     // "MACHINE::JHU_ROCKFISH"
@@ -1822,14 +1834,15 @@ namespace KBIN {
     return get_NCPUS(kflags);
   }
 
-  int get_NCPUS(const _kflags& kflags) {
-    string ncpus_str = "MAX";
-    int ncpus = 1;
-    if (kflags.KBIN_MPI_NCPUS > 0) ncpus_str = aurostd::utype2string<int>(kflags.KBIN_MPI_NCPUS);
-    if (XHOST.vflag_control.isdefined("XPLUG_NUM_THREADS")) ncpus_str = XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS");
-    if (ncpus_str == "MAX") ncpus = MPI_NCPUS_MAX;
-    else ncpus = aurostd::string2utype<int>(ncpus_str);
-    if (ncpus < 1) ncpus = 1;
+  int get_NCPUS(const _kflags& kflags) {  //CO20220630 - rewritten
+    int ncpus=1;
+    if(kflags.KBIN_MPI_NCPUS>0){ncpus=kflags.KBIN_MPI_NCPUS;} //aflow.in is lowest priority
+    if(XHOST.vflag_control.flag("XPLUG_NUM_THREADS")){  //command line argument overrides
+      string ncpus_str=XHOST.vflag_control.getattachedscheme("XPLUG_NUM_THREADS");
+      if(aurostd::isfloat(ncpus_str)){ncpus=aurostd::string2utype<int>(ncpus_str);}
+      if(ncpus_str=="MAX"){ncpus=MPI_NCPUS_MAX;}
+    }
+    if(ncpus<1){ncpus=1;}
     return ncpus;
   }
 }  // namespace KBIN
