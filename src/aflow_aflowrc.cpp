@@ -491,6 +491,10 @@
 #define         DEFAULT_UFF_ENERGY_TOLERANCE                      XHOST.adefault.getattachedutype<double>("DEFAULT_UFF_ENERGY_TOLERANCE")
 #define AFLOWRC_DEFAULT_UFF_CLUSTER_RADIUS                        10
 #define         DEFAULT_UFF_CLUSTER_RADIUS                        XHOST.adefault.getattachedutype<double>("DEFAULT_UFF_CLUSTER_RADIUS")
+#define AFLOWRC_DEFAULT_POCC_RDF_RMAX                             50
+#define         DEFAULT_POCC_RDF_RMAX                             XHOST.adefault.getattachedutype<double>("DEFAULT_POCC_RDF_RMAX")
+#define AFLOWRC_DEFAULT_POCC_RDF_NBINS                            50
+#define         DEFAULT_POCC_RDF_NBINS                            XHOST.adefault.getattachedutype<double>("DEFAULT_POCC_RDF_NBINS")
 #define AFLOWRC_DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON  FALSE
 #define         DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON  XHOST.adefault.getattachedutype<bool>("DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON")
 #define AFLOWRC_DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS             TRUE
@@ -997,12 +1001,30 @@
 #define         MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI             XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI")
 
 //CO20201220 X START
-#define AFLOWRC_MPI_OPTIONS_DUKE_X                            string("ulimit -s unlimited ") // DUKE_X_MPICH
-#define         MPI_OPTIONS_DUKE_X                            XHOST.adefault.getattachedscheme("MPI_OPTIONS_DUKE_X")
-#define AFLOWRC_MPI_COMMAND_DUKE_X                            string("mpirun -n") // DUKE_X_MPICH
-#define         MPI_COMMAND_DUKE_X                            XHOST.adefault.getattachedscheme("MPI_COMMAND_DUKE_X")
-#define AFLOWRC_MPI_BINARY_DIR_DUKE_X                         string("/home/bin/") // DUKE_X_MPICH
-#define         MPI_BINARY_DIR_DUKE_X                         XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_DUKE_X")
+#define AFLOWRC_MPI_OPTIONS_DUKE_X_X                          string("ulimit -s unlimited ") // DUKE_X_X_MPICH
+#define         MPI_OPTIONS_DUKE_X_X                          XHOST.adefault.getattachedscheme("MPI_OPTIONS_DUKE_X_X")
+#define AFLOWRC_MPI_COMMAND_DUKE_X_X                          string("srun --mpi=pmix --cpus-per-task") // DUKE_X_X_MPICH
+#define         MPI_COMMAND_DUKE_X_X                          XHOST.adefault.getattachedscheme("MPI_COMMAND_DUKE_X_X")
+#define AFLOWRC_MPI_BINARY_DIR_DUKE_X_X                       string("~/bin/x/") // DUKE_X_X_MPICH
+#define         MPI_BINARY_DIR_DUKE_X_X                       XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_DUKE_X_X")
+#define AFLOWRC_MPI_OPTIONS_DUKE_X_CRAY                       string("ulimit -s unlimited ") // DUKE_X_CRAY_MPICH
+#define         MPI_OPTIONS_DUKE_X_CRAY                       XHOST.adefault.getattachedscheme("MPI_OPTIONS_DUKE_X_CRAY")
+#define AFLOWRC_MPI_COMMAND_DUKE_X_CRAY                       string("srun --mpi=pmix --cpus-per-task") // DUKE_X_CRAY_MPICH
+#define         MPI_COMMAND_DUKE_X_CRAY                       XHOST.adefault.getattachedscheme("MPI_COMMAND_DUKE_X_CRAY")
+#define AFLOWRC_MPI_BINARY_DIR_DUKE_X_CRAY                    string("~/bin/cray/") // DUKE_X_CRAY_MPICH
+#define         MPI_BINARY_DIR_DUKE_X_CRAY                    XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_DUKE_X_CRAY")
+#define AFLOWRC_MPI_OPTIONS_DUKE_X_OLDCRAY                    string("ulimit -s unlimited ") // DUKE_X_OLDCRAY_MPICH
+#define         MPI_OPTIONS_DUKE_X_OLDCRAY                    XHOST.adefault.getattachedscheme("MPI_OPTIONS_DUKE_X_OLDCRAY")
+#define AFLOWRC_MPI_COMMAND_DUKE_X_OLDCRAY                    string("srun --mpi=pmix --cpus-per-task") // DUKE_X_OLDCRAY_MPICH
+#define         MPI_COMMAND_DUKE_X_OLDCRAY                    XHOST.adefault.getattachedscheme("MPI_COMMAND_DUKE_X_OLDCRAY")
+#define AFLOWRC_MPI_BINARY_DIR_DUKE_X_OLDCRAY                 string("~/bin/oldcray/") // DUKE_X_OLDCRAY_MPICH
+#define         MPI_BINARY_DIR_DUKE_X_OLDCRAY                 XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_DUKE_X_OLDCRAY")
+#define AFLOWRC_MPI_OPTIONS_DUKE_X_SMB                        string("ulimit -s unlimited ") // DUKE_X_SMB_MPICH
+#define         MPI_OPTIONS_DUKE_X_SMB                        XHOST.adefault.getattachedscheme("MPI_OPTIONS_DUKE_X_SMB")
+#define AFLOWRC_MPI_COMMAND_DUKE_X_SMB                        string("srun --mpi=pmix --cpus-per-task") // DUKE_X_SMB_MPICH
+#define         MPI_COMMAND_DUKE_X_SMB                        XHOST.adefault.getattachedscheme("MPI_COMMAND_DUKE_X_SMB")
+#define AFLOWRC_MPI_BINARY_DIR_DUKE_X_SMB                     string("~/bin/smb/") // DUKE_X_SMB_MPICH
+#define         MPI_BINARY_DIR_DUKE_X_SMB                     XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_DUKE_X_SMB")
 //CO20201220 X STOP
 
 //CO20220818 JHU_ROCKFISH START
@@ -1019,7 +1041,7 @@
 #define         MPI_OPTIONS_MACHINE001                        XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE001")
 #define AFLOWRC_MPI_COMMAND_MACHINE001                        string("aprun -n") // MACHINE001
 #define         MPI_COMMAND_MACHINE001                        XHOST.adefault.getattachedscheme("MPI_COMMAND_MACHINE001")
-#define AFLOWRC_MPI_BINARY_DIR_MACHINE001                     string("") // MACHINE001
+#define AFLOWRC_MPI_BINARY_DIR_MACHINE001                     string("~/bin/") // MACHINE001
 #define         MPI_BINARY_DIR_MACHINE001                     XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MACHINE001")
 //DX20190509 - MACHINE001 - END
 
@@ -1028,7 +1050,7 @@
 #define         MPI_OPTIONS_MACHINE002                       XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE002")
 #define AFLOWRC_MPI_COMMAND_MACHINE002                       string("mpirun -np") // MACHINE002
 #define         MPI_COMMAND_MACHINE002                       XHOST.adefault.getattachedscheme("MPI_COMMAND_MACHINE002")
-#define AFLOWRC_MPI_BINARY_DIR_MACHINE002                    string("") // MACHINE002
+#define AFLOWRC_MPI_BINARY_DIR_MACHINE002                    string("~/bin/") // MACHINE002
 #define         MPI_BINARY_DIR_MACHINE002                    XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MACHINE002")
 //DX20190509 - MACHINE002 - END
 
@@ -1037,7 +1059,7 @@
 #define         MPI_OPTIONS_MACHINE003                       XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE003")
 #define AFLOWRC_MPI_COMMAND_MACHINE003                       string("mpirun -np") // MACHINE003
 #define         MPI_COMMAND_MACHINE003                       XHOST.adefault.getattachedscheme("MPI_COMMAND_MACHINE003")
-#define AFLOWRC_MPI_BINARY_DIR_MACHINE003                    string("") // MACHINE003
+#define AFLOWRC_MPI_BINARY_DIR_MACHINE003                    string("~/bin/") // MACHINE003
 #define         MPI_BINARY_DIR_MACHINE003                    XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MACHINE003")
 //DX20201005 - MACHINE003 - END
 
@@ -1046,7 +1068,7 @@
 #define         MPI_OPTIONS_MACHINE004                       XHOST.adefault.getattachedscheme("MPI_OPTIONS_MACHINE004")
 #define AFLOWRC_MPI_COMMAND_MACHINE004                       string("mpirun -np") // MACHINE004
 #define         MPI_COMMAND_MACHINE004                       XHOST.adefault.getattachedscheme("MPI_COMMAND_MACHINE004")
-#define AFLOWRC_MPI_BINARY_DIR_MACHINE004                    string("") // MACHINE004
+#define AFLOWRC_MPI_BINARY_DIR_MACHINE004                    string("~/bin/") // MACHINE004
 #define         MPI_BINARY_DIR_MACHINE004                    XHOST.adefault.getattachedscheme("MPI_BINARY_DIR_MACHINE004")
 //DX20211011 - MACHINE004 - END
 
@@ -1515,6 +1537,8 @@ namespace aflowrc {
     aflowrc::load_default("DEFAULT_UFF_BONDING_DISTANCE",AFLOWRC_DEFAULT_UFF_BONDING_DISTANCE);
     aflowrc::load_default("DEFAULT_UFF_ENERGY_TOLERANCE",AFLOWRC_DEFAULT_UFF_ENERGY_TOLERANCE);
     aflowrc::load_default("DEFAULT_UFF_CLUSTER_RADIUS",AFLOWRC_DEFAULT_UFF_CLUSTER_RADIUS);
+    aflowrc::load_default("DEFAULT_POCC_RDF_RMAX",AFLOWRC_DEFAULT_POCC_RDF_RMAX);
+    aflowrc::load_default("DEFAULT_POCC_RDF_NBINS",AFLOWRC_DEFAULT_POCC_RDF_NBINS);
     aflowrc::load_default("DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON",AFLOWRC_DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON);
     aflowrc::load_default("DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS",AFLOWRC_DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS);
     aflowrc::load_default("POCC_FILE_PREFIX",AFLOWRC_POCC_FILE_PREFIX);
@@ -1790,9 +1814,18 @@ namespace aflowrc {
     aflowrc::load_default("MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI",AFLOWRC_MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI); 
 
     //CO20201220 X START
-    aflowrc::load_default("MPI_OPTIONS_DUKE_X",AFLOWRC_MPI_OPTIONS_DUKE_X); 
-    aflowrc::load_default("MPI_COMMAND_DUKE_X",AFLOWRC_MPI_COMMAND_DUKE_X); 
-    aflowrc::load_default("MPI_BINARY_DIR_DUKE_X",AFLOWRC_MPI_BINARY_DIR_DUKE_X); 
+    aflowrc::load_default("MPI_OPTIONS_DUKE_X_X",AFLOWRC_MPI_OPTIONS_DUKE_X_X); 
+    aflowrc::load_default("MPI_COMMAND_DUKE_X_X",AFLOWRC_MPI_COMMAND_DUKE_X_X); 
+    aflowrc::load_default("MPI_BINARY_DIR_DUKE_X_X",AFLOWRC_MPI_BINARY_DIR_DUKE_X_X); 
+    aflowrc::load_default("MPI_OPTIONS_DUKE_X_CRAY",AFLOWRC_MPI_OPTIONS_DUKE_X_CRAY); 
+    aflowrc::load_default("MPI_COMMAND_DUKE_X_CRAY",AFLOWRC_MPI_COMMAND_DUKE_X_CRAY); 
+    aflowrc::load_default("MPI_BINARY_DIR_DUKE_X_CRAY",AFLOWRC_MPI_BINARY_DIR_DUKE_X_CRAY); 
+    aflowrc::load_default("MPI_OPTIONS_DUKE_X_OLDCRAY",AFLOWRC_MPI_OPTIONS_DUKE_X_OLDCRAY); 
+    aflowrc::load_default("MPI_COMMAND_DUKE_X_OLDCRAY",AFLOWRC_MPI_COMMAND_DUKE_X_OLDCRAY); 
+    aflowrc::load_default("MPI_BINARY_DIR_DUKE_X_OLDCRAY",AFLOWRC_MPI_BINARY_DIR_DUKE_X_OLDCRAY); 
+    aflowrc::load_default("MPI_OPTIONS_DUKE_X_SMB",AFLOWRC_MPI_OPTIONS_DUKE_X_SMB); 
+    aflowrc::load_default("MPI_COMMAND_DUKE_X_SMB",AFLOWRC_MPI_COMMAND_DUKE_X_SMB); 
+    aflowrc::load_default("MPI_BINARY_DIR_DUKE_X_SMB",AFLOWRC_MPI_BINARY_DIR_DUKE_X_SMB); 
     //CO20201220 X STOP
     
     //CO20220818 JHU_ROCKFISH START
@@ -2175,6 +2208,8 @@ namespace aflowrc {
     aflowrc << "DEFAULT_UFF_BONDING_DISTANCE=" << AFLOWRC_DEFAULT_UFF_BONDING_DISTANCE << endl;
     aflowrc << "DEFAULT_UFF_ENERGY_TOLERANCE=" << AFLOWRC_DEFAULT_UFF_ENERGY_TOLERANCE << endl;
     aflowrc << "DEFAULT_UFF_CLUSTER_RADIUS=" << AFLOWRC_DEFAULT_UFF_CLUSTER_RADIUS << endl;
+    aflowrc << "DEFAULT_POCC_RDF_RMAX=" << AFLOWRC_DEFAULT_POCC_RDF_RMAX << endl;
+    aflowrc << "DEFAULT_POCC_RDF_NBINS=" << AFLOWRC_DEFAULT_POCC_RDF_NBINS << endl;
     aflowrc << "DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON=" << AFLOWRC_DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON << endl;
     aflowrc << "DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS=" << AFLOWRC_DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS << endl;
     aflowrc << "POCC_FILE_PREFIX=\"" << AFLOWRC_POCC_FILE_PREFIX << "\"" << endl;
@@ -2440,9 +2475,18 @@ namespace aflowrc {
     aflowrc << "MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI=\"" << AFLOWRC_MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << "\"" << "  // DUKE_QFLOW_OPENMPI" << endl; 
 
     //CO20201220 X START
-    aflowrc << "MPI_OPTIONS_DUKE_X=\"" << AFLOWRC_MPI_OPTIONS_DUKE_X << "\"" << "  // DUKE_X" << endl;
-    aflowrc << "MPI_COMMAND_DUKE_X=\"" << AFLOWRC_MPI_COMMAND_DUKE_X << "\"" << "  // DUKE_X" << endl;
-    aflowrc << "MPI_BINARY_DIR_DUKE_X=\"" << AFLOWRC_MPI_BINARY_DIR_DUKE_X << "\"" << "  // DUKE_X" << endl; 
+    aflowrc << "MPI_OPTIONS_DUKE_X_X=\"" << AFLOWRC_MPI_OPTIONS_DUKE_X_X << "\"" << "  // DUKE_X_X" << endl;
+    aflowrc << "MPI_COMMAND_DUKE_X_X=\"" << AFLOWRC_MPI_COMMAND_DUKE_X_X << "\"" << "  // DUKE_X_X" << endl;
+    aflowrc << "MPI_BINARY_DIR_DUKE_X_X=\"" << AFLOWRC_MPI_BINARY_DIR_DUKE_X_X << "\"" << "  // DUKE_X_X" << endl; 
+    aflowrc << "MPI_OPTIONS_DUKE_X_CRAY=\"" << AFLOWRC_MPI_OPTIONS_DUKE_X_CRAY << "\"" << "  // DUKE_X_CRAY" << endl;
+    aflowrc << "MPI_COMMAND_DUKE_X_CRAY=\"" << AFLOWRC_MPI_COMMAND_DUKE_X_CRAY << "\"" << "  // DUKE_X_CRAY" << endl;
+    aflowrc << "MPI_BINARY_DIR_DUKE_X_CRAY=\"" << AFLOWRC_MPI_BINARY_DIR_DUKE_X_CRAY << "\"" << "  // DUKE_X_CRAY" << endl; 
+    aflowrc << "MPI_OPTIONS_DUKE_X_OLDCRAY=\"" << AFLOWRC_MPI_OPTIONS_DUKE_X_OLDCRAY << "\"" << "  // DUKE_X_OLDCRAY" << endl;
+    aflowrc << "MPI_COMMAND_DUKE_X_OLDCRAY=\"" << AFLOWRC_MPI_COMMAND_DUKE_X_OLDCRAY << "\"" << "  // DUKE_X_OLDCRAY" << endl;
+    aflowrc << "MPI_BINARY_DIR_DUKE_X_OLDCRAY=\"" << AFLOWRC_MPI_BINARY_DIR_DUKE_X_OLDCRAY << "\"" << "  // DUKE_X_OLDCRAY" << endl; 
+    aflowrc << "MPI_OPTIONS_DUKE_X_SMB=\"" << AFLOWRC_MPI_OPTIONS_DUKE_X_SMB << "\"" << "  // DUKE_X_SMB" << endl;
+    aflowrc << "MPI_COMMAND_DUKE_X_SMB=\"" << AFLOWRC_MPI_COMMAND_DUKE_X_SMB << "\"" << "  // DUKE_X_SMB" << endl;
+    aflowrc << "MPI_BINARY_DIR_DUKE_X_SMB=\"" << AFLOWRC_MPI_BINARY_DIR_DUKE_X_SMB << "\"" << "  // DUKE_X_SMB" << endl; 
     //CO20201220 X STOP
     
     //CO20220818 JHU_ROCKFISH START
@@ -2798,6 +2842,8 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_UFF_BONDING_DISTANCE\")=" << DEFAULT_UFF_BONDING_DISTANCE << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_UFF_ENERGY_TOLERANCE\")=" << DEFAULT_UFF_ENERGY_TOLERANCE << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_UFF_CLUSTER_RADIUS\")=" << DEFAULT_UFF_CLUSTER_RADIUS << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_RDF_RMAX\")=" << DEFAULT_POCC_RDF_RMAX << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_RDF_NBINS\")=" << DEFAULT_POCC_RDF_NBINS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON\")=" << DEFAULT_POCC_PERFORM_ROBUST_STRUCTURE_COMPARISON << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS\")=" << DEFAULT_POCC_WRITE_OUT_ALL_SUPERCELLS << endl;
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"POCC_FILE_PREFIX\")=\"" << POCC_FILE_PREFIX << "\"" << endl;
@@ -3054,9 +3100,18 @@ namespace aflowrc {
     if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI\")=\"" << MPI_BINARY_DIR_DUKE_QFLOW_OPENMPI << "\"" << endl;
 
     //CO20201220 X START
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_DUKE_X\")=\"" << MPI_OPTIONS_DUKE_X << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_DUKE_X\")=\"" << MPI_COMMAND_DUKE_X << "\"" << endl;
-    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_DUKE_X\")=\"" << MPI_BINARY_DIR_DUKE_X << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_DUKE_X_X\")=\"" << MPI_OPTIONS_DUKE_X_X << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_DUKE_X_X\")=\"" << MPI_COMMAND_DUKE_X_X << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_DUKE_X_X\")=\"" << MPI_BINARY_DIR_DUKE_X_X << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_DUKE_X_CRAY\")=\"" << MPI_OPTIONS_DUKE_X_CRAY << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_DUKE_X_CRAY\")=\"" << MPI_COMMAND_DUKE_X_CRAY << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_DUKE_X_CRAY\")=\"" << MPI_BINARY_DIR_DUKE_X_CRAY << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_DUKE_X_OLDCRAY\")=\"" << MPI_OPTIONS_DUKE_X_OLDCRAY << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_DUKE_X_OLDCRAY\")=\"" << MPI_COMMAND_DUKE_X_OLDCRAY << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_DUKE_X_OLDCRAY\")=\"" << MPI_BINARY_DIR_DUKE_X_OLDCRAY << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_OPTIONS_DUKE_X_SMB\")=\"" << MPI_OPTIONS_DUKE_X_SMB << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_COMMAND_DUKE_X_SMB\")=\"" << MPI_COMMAND_DUKE_X_SMB << "\"" << endl;
+    if(LDEBUG) oss << "XHOST.adefault.getattachedscheme(\"MPI_BINARY_DIR_DUKE_X_SMB\")=\"" << MPI_BINARY_DIR_DUKE_X_SMB << "\"" << endl;
     //CO20201220 X STOP
     
     //CO20220818 JHU_ROCKFISH START

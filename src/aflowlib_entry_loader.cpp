@@ -729,6 +729,7 @@ namespace aflowlib {
       case Source::RESTAPI_RAW: return "RESTAPI_RAW";
       case Source::NONE: return "NONE";
       case Source::FAILED: return "FAILED";
+      default: return "NONE";
     }
   }
 
