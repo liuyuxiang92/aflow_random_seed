@@ -318,7 +318,7 @@ namespace chull {
       for(uint i=1,fl_size_i=_vinputs.size();i<fl_size_i;i++){ //VERBOSE
         if(aurostd::WithinList(vinputs,_vinputs[i])){
           message << "Ignoring duplicate input (" << _vinputs[i] << ")";
-          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);  
+          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
           continue;
         }
         vinputs.push_back(_vinputs[i]);
@@ -650,7 +650,7 @@ namespace chull {
       for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
         if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << vauid[ia] << " dist2hull = " << chull::convertUnits(vdist2hull[ia], _m_) << " (meV/atom)";}
         else {message << vauid[ia] << " dist2hull = " << vdist2hull[ia] << " (K)";}
-        if(zeroWithinTol(vdist2hull[ia])) {  //do not issue a warning either way, it's simply the distance
+        if(aurostd::zeroWithinTol(vdist2hull[ia],ZERO_TOL)) {  //do not issue a warning either way, it's simply the distance
           message << ", may be on the hull";
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
         } else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
@@ -1069,10 +1069,10 @@ namespace chull {
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "CHULL::SEE_NEGLECT set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::CALCULATE_FAKE_HULL_STABILITY_CRITERION")) { //CO20210315
-      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "CHULL::CALCULATE_FAKE_HULL_STABILITY_CRITERION set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent); 
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "CHULL::CALCULATE_FAKE_HULL_STABILITY_CRITERION set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN")) { //SK20200327
-      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent); 
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "CHULL::CALCULATE_FAKE_HULL_N+1_ENTHALPY_GAIN set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::REMOVE_EXTREMA")) {
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "CHULL::REMOVE_EXTREMA set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
@@ -1357,37 +1357,11 @@ namespace chull {
     return convertUnits(d_tmp,units);
   }
 
-  int roundDouble(double doub, int multiple, bool up) {
-    // rounds double to the nearest (multiple), choose round up or down
-    // http://stackoverflow.com/questions/3407012/c-rounding-up-to-the-nearest-multiple-of-a-number
-    // round up - round further from 0 if doub is positive, closer to 0 if doub is negative
-    // opposite for round down
-    // round up === MORE positive
-    // round down === MORE negative
-    // a little confusing, but a very powerful way to define for AXES MAX/MIN + INTERVALS
-    int numToRound = round(doub);
-    if(multiple == 0) {return numToRound;}
-    int remainder = abs(numToRound) % multiple;
-    if(remainder == 0) {return numToRound;}
-    if(up) {
-      if(numToRound < 0) {return -(abs(numToRound) - remainder);}
-      else {return numToRound + multiple - remainder;}
-    } else {  //down
-      if(numToRound < 0) {return -(abs(numToRound) + (multiple - remainder));}
-      else {return numToRound - remainder;}
-    }
-  }
 
   //for stoichiometries and results of an algorithm (distances from hull), use soft cutoff
   //otherwise, for above/below hull (stability from energy), use hard cutoff (per artificial points)
-  //bool greaterEqualZero(double val,bool soft_cutoff){return ( soft_cutoff? val>=ZERO_TOL : val>=0.0 );}
-  //bool lessEqualZero(double val,bool soft_cutoff){return ( soft_cutoff? val<=-ZERO_TOL : val<=0.0 );}
-  bool greaterEqualZero(double val){return (val>=0.0);}
-  bool lessEqualZero(double val){return (val<=0.0);}
-  bool notPositive(double val,bool soft_cutoff,double tol){return (soft_cutoff? val<=tol : lessEqualZero(val));}
-  bool notNegative(double val,bool soft_cutoff,double tol){return (soft_cutoff? val>=-tol : greaterEqualZero(val));}
-  bool zeroWithinTol(double val,double tol){return notPositive(abs(val),true,tol);}
-  bool nonZeroWithinTol(double val,double tol){return !zeroWithinTol(val,tol);}
+  //bool aurostd::greaterEqualZero(double val,bool soft_cutoff){return ( soft_cutoff? val>=ZERO_TOL : val>=0.0 );}
+  //bool aurostd::lessEqualZero(double val,bool soft_cutoff){return ( soft_cutoff? val<=-ZERO_TOL : val<=0.0 );}
 
   bool subspaceBelongs(const xvector<int>& space,const xvector<int>& subspace){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
@@ -1403,8 +1377,8 @@ namespace chull {
   }
 
   bool correctSignVerticalDistance(double dist_2_hull,bool should_be_positive) {
-    if( should_be_positive && notPositive(dist_2_hull,true)){return false;}
-    if(!should_be_positive && notNegative(dist_2_hull,true)){return false;}
+    if( should_be_positive && aurostd::notPositive(dist_2_hull,true,ZERO_TOL)){return false;}
+    if(!should_be_positive && aurostd::notNegative(dist_2_hull,true,ZERO_TOL)){return false;}
     return true;
   }
 
@@ -1630,7 +1604,7 @@ namespace chull {
   }
 
   //use hard cutoff here
-  bool ChullPoint::isWithinHalfHull(bool lower_hull) const {return (lower_hull ? lessEqualZero(getLastCoord()) : greaterEqualZero(getLastCoord()) );}
+  bool ChullPoint::isWithinHalfHull(bool lower_hull) const {return (lower_hull ? aurostd::lessEqualZero(getLastCoord()) : aurostd::greaterEqualZero(getLastCoord()) );}
 
   bool ChullPoint::isGState() const {
     if(!m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized point");}
@@ -1740,7 +1714,7 @@ namespace chull {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(getDist2Hull()==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
     if(getEntropyFormingAbility()==AUROSTD_NAN){return AUROSTD_MAX_DOUBLE;}
-    if(zeroWithinTol(getEntropyFormingAbility())){return 0.0;} //protect from division by zero
+    if(aurostd::zeroWithinTol(getEntropyFormingAbility(),ZERO_TOL)){return 0.0;} //protect from division by zero
     if(LDEBUG) {
       cerr << __AFLOW_FUNC__ << " dist2hull=" << getDist2Hull() << endl;
       cerr << __AFLOW_FUNC__ << " EFA=" << getEntropyFormingAbility() << endl;
@@ -2055,7 +2029,7 @@ namespace chull {
     if(!m_has_stoich_coords){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Non-stoich coordinates");}
     if(elements_present.rows!=s_coords.rows){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Dimension mismatch between point and elements_present");}
     for(int i=elements_present.lrows;i<=elements_present.urows;i++){
-      if(elements_present[i]==0 && nonZeroWithinTol(s_coords[i])){
+      if(elements_present[i]==0 && aurostd::nonZeroWithinTol(s_coords[i],ZERO_TOL)){
         stringstream message;
         message << "Attempting to reduce non-zero coord (i=" << i << ",s_coords=" << s_coords << "), ";
         message << "elements_present=" << elements_present;
@@ -2075,16 +2049,16 @@ namespace chull {
     for(int j=m_coords.lrows;j<=m_coords.urows-1;j++){
       if(std::signbit(m_coords[j])){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Negative stoich coordinate found: aurl="+m_entry.aurl);} //no negative numbers in stoich coordinates, only energy
       stoich[j]=m_coords[j];
-      if(nonZeroWithinTol(m_coords[j])){elements_present[j]=1;}
+      if(aurostd::nonZeroWithinTol(m_coords[j],ZERO_TOL)){elements_present[j]=1;}
       c_sum+=m_coords[j];
     }
     stoich[stoich.urows]=(1.0-c_sum); //hidden dimension
     if(std::signbit(stoich[stoich.urows])){
       //necessary check now because POCC entries have no composition, only stoich, so write-out errors will be prevalent
-      if(zeroWithinTol(stoich[stoich.urows])){stoich[stoich.urows]=0.0;}  //only zero out for the last coord, as it's derived from the subtraction of the others
+      if(aurostd::zeroWithinTol(stoich[stoich.urows],ZERO_TOL)){stoich[stoich.urows]=0.0;}  //only zero out for the last coord, as it's derived from the subtraction of the others
       else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Negative stoich coordinate found: aurl="+m_entry.aurl);}
     }  //no negative numbers
-    if(nonZeroWithinTol(stoich[stoich.urows])){elements_present[elements_present.urows]=1;}   //check if nary++
+    if(aurostd::nonZeroWithinTol(stoich[stoich.urows],ZERO_TOL)){elements_present[elements_present.urows]=1;}   //check if nary++
     s_coords=stoich;
     c_coords=s_coords;
     if(m_has_entry){
@@ -2343,7 +2317,7 @@ namespace chull {
     //  for(int i=ref.lrows;i<=ref.urows-1;i++){ref[i]=1.0/m_dim;}
     //  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " ref=" << ref << endl;}
     //  double dist_ref=getSignedPointPlaneDistance(point);
-    //  is_outside=(std::signbit(dist_point)!=std::signbit(dist_ref) && nonZeroWithinTol(dist_point,true));
+    //  is_outside=(std::signbit(dist_point)!=std::signbit(dist_ref) && aurostd::nonZeroWithinTol(dist_point,ZERO_TOL));
     //  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " sign of distance indicates point is " << (is_outside?"OUTSIDE":"INSIDE") << " hull" << endl;}
     //  return is_outside;
     //}
@@ -2358,7 +2332,7 @@ namespace chull {
       cerr << __AFLOW_FUNC__ << " dist=" << dist_point << endl;
     }     
     //point is on facet
-    if(zeroWithinTol(dist_point)){
+    if(aurostd::zeroWithinTol(dist_point,ZERO_TOL)){
       if(LDEBUG) {cerr << __AFLOW_FUNC__ << " point appears to be right on top of facet" << endl;}
       return false;
     }
@@ -2578,7 +2552,7 @@ namespace chull {
     //the coef will ONLY decrease the content (fraction)
     //if we don't check CMdetB before multiplying the coef, we might get -nan
     //therefore, use tol for both CHdetB and content
-    if(zeroWithinTol(CMdetB,tol)){return;} //error="CMdet(B) is zero, shows hyper-collinearity";
+    if(aurostd::zeroWithinTol(CMdetB,tol)){return;} //error="CMdet(B) is zero, shows hyper-collinearity";
     double j=m_vertices.size()-1; //two vertices == line segment == 1-simplex
     double coef=pow(-1.0,j+1.0)/(pow(2.0,j)*pow(aurostd::factorial(j),2));
     if(LDEBUG) {
@@ -2587,7 +2561,7 @@ namespace chull {
     }
     m_content=sqrt(coef*CMdetB);
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " content=" << m_content << endl;}
-    if(zeroWithinTol(m_content,tol)){return;} //error="simplex content is zero, shows hyper-collinearity";
+    if(aurostd::zeroWithinTol(m_content,tol)){return;} //error="simplex content is zero, shows hyper-collinearity";
     m_is_hypercollinear=false;
   }
 
@@ -2616,7 +2590,7 @@ namespace chull {
     for(uint i=1,fl_size_i=m_directive_vectors.size();i<fl_size_i;i++){
       if(m_directive_vectors[i].rows!=m_directive_vectors[0].rows){error="Dimension mismatch among directive vectors coordinates";return false;}
     }
-    for(uint i=0,fl_size_i=m_directive_vectors.size();i<fl_size_i;i++){if(zeroWithinTol(modulus(m_directive_vectors[i]))){error="Ill-defined directive vectors";return false;}}
+    for(uint i=0,fl_size_i=m_directive_vectors.size();i<fl_size_i;i++){if(aurostd::zeroWithinTol(modulus(m_directive_vectors[i]),ZERO_TOL)){error="Ill-defined directive vectors";return false;}}
     return true;
   }
 
@@ -2664,7 +2638,7 @@ namespace chull {
     }
     if(!m_directive_vectors.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No directive vectors calculated");}
     m_normal=aurostd::getGeneralNormal(m_directive_vectors);
-    if(zeroWithinTol(aurostd::modulus(m_normal))){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid normal calculated");}
+    if(aurostd::zeroWithinTol(aurostd::modulus(m_normal),ZERO_TOL)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid normal calculated");}
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " normal=" << m_normal << endl;}
   }
 
@@ -2688,7 +2662,7 @@ namespace chull {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking if vertical hull: normal=" << m_normal << endl;}
     double tol=(m_has_stoich_coords&&m_formation_energy_coord ? ZERO_COEF_TOL : ZERO_TOL);  //1e-4 if stoich coords
-    m_is_vertical=zeroWithinTol(m_normal[m_normal.urows],tol); //simple
+    m_is_vertical=aurostd::zeroWithinTol(m_normal[m_normal.urows],tol); //simple
   }
 
   void ChullFacet::setArtificial(){  //in half hulls, this finds the facet of all artificial points
@@ -2869,13 +2843,13 @@ namespace chull {
     double hid_dim=1.0-sum(m_coords);
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " hid_dim=" << hid_dim << endl;}
     if(std::signbit(hid_dim) || hid_dim>1.0) {
-      if(zeroWithinTol(hid_dim)){hid_dim=0.0;}  //only zero out for the last coord, as it's derived from the subtraction of the others
+      if(aurostd::zeroWithinTol(hid_dim,ZERO_TOL)){hid_dim=0.0;}  //only zero out for the last coord, as it's derived from the subtraction of the others
       else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Coord("+aurostd::utype2string(m_coords.rows)+") is outside of [0,1] range of a generalized stoichiometry coordinate");}
     }
 
     xvector<int> elements_present(m_coords.lrows,m_coords.urows+1);
-    for(int i=m_coords.lrows;i<=m_coords.urows;i++){if(nonZeroWithinTol(m_coords[i])){elements_present[i]=1;}}
-    if(nonZeroWithinTol(hid_dim)){elements_present[elements_present.urows]=1;}
+    for(int i=m_coords.lrows;i<=m_coords.urows;i++){if(aurostd::nonZeroWithinTol(m_coords[i],ZERO_TOL)){elements_present[i]=1;}}
+    if(aurostd::nonZeroWithinTol(hid_dim,ZERO_TOL)){elements_present[elements_present.urows]=1;}
 
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " elements_present=" << elements_present << endl;}
     return elements_present;
@@ -4306,7 +4280,7 @@ namespace chull {
       i_point=m_coord_groups[i_coord_group].m_points[0];        //lowest point for lower_hull, highest point for upper_hull
       if(!m_points[i_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
       if(m_lower_hull){
-        if(lessEqualZero(m_points[i_point].getLastCoord())) //std::signbit(m_points[i_point].getLastCoord()))
+        if(aurostd::lessEqualZero(m_points[i_point].getLastCoord())) //std::signbit(m_points[i_point].getLastCoord()))
         { //CO20200106 - patching for auto-indenting
           m_coord_groups[i_coord_group].m_candidate_hull_points.push_back(i_point);
           if(LDEBUG) {
@@ -4315,7 +4289,7 @@ namespace chull {
           }
         }
       } else {
-        if(greaterEqualZero(m_points[i_point].getLastCoord()))  //!std::signbit(m_points[i_point].getLastCoord()))
+        if(aurostd::greaterEqualZero(m_points[i_point].getLastCoord()))  //!std::signbit(m_points[i_point].getLastCoord()))
         { //CO20200106 - patching for auto-indenting
           m_coord_groups[i_coord_group].m_candidate_hull_points.push_back(i_point);
           if(LDEBUG) {
@@ -4446,13 +4420,13 @@ namespace chull {
     if(remove_extreme){
       extrema_val=aurostd::string2utype<double>(m_cflags.getattachedscheme("CHULL::REMOVE_EXTREMA"));
       if(m_formation_energy_hull){
-        if(greaterEqualZero(extrema_val)){
+        if(aurostd::greaterEqualZero(extrema_val)){
           message << "Ignoring remove extreme points flag -- you provided a number >= 0. H_f convex hull sits below 0";
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
           remove_extreme=false;
         }
       } else {
-        if(lessEqualZero(extrema_val)){
+        if(aurostd::lessEqualZero(extrema_val)){
           message << "Ignoring remove extreme points flag -- you provided a number <= 0. T_S convex hull sits above 0";
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
           remove_extreme=false;
@@ -5829,9 +5803,9 @@ namespace chull {
         if( m_lower_hull && !correct_sign_vertical_distance){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"(lower half hull) found point BELOW hull (entry="+point.m_entry.auid+",dist2Hull="+aurostd::utype2string(dist_2_hull,4)+")");}
         if(!m_lower_hull && !correct_sign_vertical_distance){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"(upper half hull) found point ABOVE hull (entry="+point.m_entry.auid+",dist2Hull="+aurostd::utype2string(dist_2_hull,4)+")");}
         //[OBSOLETE CO20180828]if(m_lower_hull){
-        //[OBSOLETE CO20180828]  if(notNegative(dist_2_hull,true)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"(lower half hull) found point BELOW hull (entry="+point.m_entry.auid+",dist2Hull="+aurostd::utype2string(dist_2_hull,4)+")");}
+        //[OBSOLETE CO20180828]  if(aurostd::notNegative(dist_2_hull,true,ZERO_TOL)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"(lower half hull) found point BELOW hull (entry="+point.m_entry.auid+",dist2Hull="+aurostd::utype2string(dist_2_hull,4)+")");}
         //[OBSOLETE CO20180828]} else {
-        //[OBSOLETE CO20180828]  if(notPositive(dist_2_hull,true)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"(upper half hull) found point ABOVE hull (entry="+point.m_entry.auid+",dist2Hull="+aurostd::utype2string(dist_2_hull,4)+")");}
+        //[OBSOLETE CO20180828]  if(aurostd::notPositive(dist_2_hull,true,ZERO_TOL)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"(upper half hull) found point ABOVE hull (entry="+point.m_entry.auid+",dist2Hull="+aurostd::utype2string(dist_2_hull,4)+")");}
         //[OBSOLETE CO20180828]}
       }
     }
@@ -6967,7 +6941,7 @@ namespace chull {
       //[OBSOLETE - this is a DISTANCE so it is always positive]i  //sign of distance:
       //[OBSOLETE - this is a DISTANCE so it is always positive]i  //independent of lower/upper hull:  above hull is negative, below hull is positive
       //[OBSOLETE - this is a DISTANCE so it is always positive]i  if(m_lower_hull){
-      //[OBSOLETE - this is a DISTANCE so it is always positive]    if(notPositive(scriterion,true)) //std::signbit(scriterion))
+      //[OBSOLETE - this is a DISTANCE so it is always positive]    if(aurostd::notPositive(scriterion,true,ZERO_TOL)) //std::signbit(scriterion))
       //[OBSOLETE - this is a DISTANCE so it is always positive]    { //CO20200106 - patching for auto-indenting
       //[OBSOLETE - this is a DISTANCE so it is always positive]      message << "(lower half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
       //[OBSOLETE - this is a DISTANCE so it is always positive]      message << " (i_point=" << i_point;
@@ -6976,7 +6950,7 @@ namespace chull {
       //[OBSOLETE - this is a DISTANCE so it is always positive]      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message);
       //[OBSOLETE - this is a DISTANCE so it is always positive]    }
       //[OBSOLETE - this is a DISTANCE so it is always positive]  } else {
-      //[OBSOLETE - this is a DISTANCE so it is always positive]    if(notNegative(scriterion,true)) //!std::signbit(scriterion))
+      //[OBSOLETE - this is a DISTANCE so it is always positive]    if(aurostd::notNegative(scriterion,true,ZERO_TOL)) //!std::signbit(scriterion))
       //[OBSOLETE - this is a DISTANCE so it is always positive]    { //CO20200106 - patching for auto-indenting
       //[OBSOLETE - this is a DISTANCE so it is always positive]      message << "(upper half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
       //[OBSOLETE - this is a DISTANCE so it is always positive]      message << " (i_point=" << i_point;
@@ -7054,7 +7028,7 @@ namespace chull {
     //[OBSOLETE - this is a DISTANCE so it is always positive]    //sign of distance:
     //[OBSOLETE - this is a DISTANCE so it is always positive]    //independent of lower/upper hull:  above hull is negative, below hull is positive
     //[OBSOLETE - this is a DISTANCE so it is always positive]    if(m_lower_hull){
-    //[OBSOLETE - this is a DISTANCE so it is always positive]      if(notPositive(np1egain,true)) //std::signbit(np1egain))
+    //[OBSOLETE - this is a DISTANCE so it is always positive]      if(aurostd::notPositive(np1egain,true,ZERO_TOL)) //std::signbit(np1egain))
     //[OBSOLETE - this is a DISTANCE so it is always positive]      { //CO20200106 - patching for auto-indenting
     //[OBSOLETE - this is a DISTANCE so it is always positive]        message << "(lower half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
     //[OBSOLETE - this is a DISTANCE so it is always positive]        message << " (i_point=" << i_point;
@@ -7063,7 +7037,7 @@ namespace chull {
     //[OBSOLETE - this is a DISTANCE so it is always positive]        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message);
     //[OBSOLETE - this is a DISTANCE so it is always positive]      }
     //[OBSOLETE - this is a DISTANCE so it is always positive]    } else {
-    //[OBSOLETE - this is a DISTANCE so it is always positive]      if(notNegative(np1egain,true)) //!std::signbit(np1egain))
+    //[OBSOLETE - this is a DISTANCE so it is always positive]      if(aurostd::notNegative(np1egain,true,ZERO_TOL)) //!std::signbit(np1egain))
     //[OBSOLETE - this is a DISTANCE so it is always positive]      { //CO20200106 - patching for auto-indenting
     //[OBSOLETE - this is a DISTANCE so it is always positive]        message << "(upper half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
     //[OBSOLETE - this is a DISTANCE so it is always positive]        message << " (i_point=" << i_point;
@@ -7230,7 +7204,7 @@ namespace chull {
   //[ME20190628 - moved to pflow_funcs.cpp]   else if(vred==frac_vrt){comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
   //[ME20190628 - moved to pflow_funcs.cpp]   else if(vred==no_vrt){;}
   //[ME20190628 - moved to pflow_funcs.cpp]   else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown reduce mode",_INPUT_UNKNOWN_);}
-  //[ME20190628 - moved to pflow_funcs.cpp]   if(zeroWithinTol(aurostd::sum(comp))){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Empty composition");}
+  //[ME20190628 - moved to pflow_funcs.cpp]   if(aurostd::zeroWithinTol(aurostd::sum(comp),ZERO_TOL)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Empty composition");}
   //[ME20190628 - moved to pflow_funcs.cpp]   for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
   //[ME20190628 - moved to pflow_funcs.cpp]     output << vspecies[i];
   //[ME20190628 - moved to pflow_funcs.cpp]     if(!(exclude1 && aurostd::identical(comp[i+comp.lrows],1.0,ZERO_TOL))) {
@@ -7894,9 +7868,9 @@ namespace chull {
     while(delta_pow<round_to_value){exponent+=1;delta_pow=delta*pow(10,exponent);}
     delta=delta_pow;
     int y_tick_distance_int;
-    y_tick_distance_int=roundDouble(delta,(int)round_to_value,false);  //divisor is ~ # of ticks  //CO20190724 - explicit double->int conversion (floor is fine)
+    y_tick_distance_int=aurostd::roundDouble(delta,(int)round_to_value,false);  //divisor is ~ # of ticks  //CO20190724 - explicit double->int conversion (floor is fine)
     if(y_tick_distance_int==0){ //aflow_BSm_hull.pdf, we need some NONZERO y_tick_distance_int
-      y_tick_distance_int=roundDouble(delta,(int)round_to_value,true);  //divisor is ~ # of ticks //CO20190724 - explicit double->int conversion (floor is fine)
+      y_tick_distance_int=aurostd::roundDouble(delta,(int)round_to_value,true);  //divisor is ~ # of ticks //CO20190724 - explicit double->int conversion (floor is fine)
     }
     double y_tick_distance=y_tick_distance_int*pow(10,-exponent);
     if(LDEBUG) {
@@ -8438,7 +8412,7 @@ namespace chull {
       if(filter_by_distance) {
         dist_filter_cutoff = filter_cutoff; 
         if(LDEBUG) {cerr << __AFLOW_FUNC__ << " DIST dist_filter_cutoff=" << dist_filter_cutoff << endl;}
-        if(zeroWithinTol(dist_filter_cutoff) && plot_off_hull) {
+        if(aurostd::zeroWithinTol(dist_filter_cutoff,ZERO_TOL) && plot_off_hull) {
           plot_off_hull=false;
           message << "CHULL::OFF_HULL set to FALSE, filter_by_distance=0.0";
           pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
@@ -8932,8 +8906,8 @@ namespace chull {
       double y_range=abs(ymax-ymin);
       double round_to_value=getRoundToValue(point_range);
       double extra_padding=(point_range)*extra_padding_multiplier; //to avoid label clashing with axis, 20% should be enough
-      //int extra_padding=roundDouble((point_range)*0.2, (int)round_to_value, false);  //round down to keep tight, unless you get 0, need more padding  //CO20190724 - explicit double->int conversion (floor is fine)
-      //if(extra_padding==0){extra_padding=roundDouble((point_range)*0.2, (int)round_to_value, true);}  //CO20190724 - explicit double->int conversion (floor is fine)
+      //int extra_padding=aurostd::roundDouble((point_range)*0.2, (int)round_to_value, false);  //round down to keep tight, unless you get 0, need more padding  //CO20190724 - explicit double->int conversion (floor is fine)
+      //if(extra_padding==0){extra_padding=aurostd::roundDouble((point_range)*0.2, (int)round_to_value, true);}  //CO20190724 - explicit double->int conversion (floor is fine)
 
       //adding conversion between meV/atom to kJ/mol
       bool showkJmolaxis = m_formation_energy_hull;  //default
@@ -8988,7 +8962,7 @@ namespace chull {
           message << "CHULL::HEAT_MAP set to FALSE, not enough non-unary entries found";
           pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
         }
-        if(zeroWithinTol(point_range)) {
+        if(aurostd::zeroWithinTol(point_range,ZERO_TOL)) {
           message << "CHULL::COLOR_BAR set to FALSE, hull has no depth";
           pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
           message << "CHULL::COLOR_GRADIENT set to FALSE, hull has no depth";
@@ -9031,7 +9005,7 @@ namespace chull {
           ymin=min_point;
           if(dimension==2){ //only do rounding for dim==2, dim==3 we need EXACT values or colorbar gets screwed up
             if(m_formation_energy_hull){ymin-=extra_padding;}  //CO20180227 - we need to avoid labels here
-            ymin=roundDouble(ymin,(int)round_to_value,false);  //we want min to be MORE NEGATIVE, so round DOWN //CO20190724 - explicit double->int conversion (floor is fine)
+            ymin=aurostd::roundDouble(ymin,(int)round_to_value,false);  //we want min to be MORE NEGATIVE, so round DOWN //CO20190724 - explicit double->int conversion (floor is fine)
           }
         }
         // between highest label and top line, increase if need more
@@ -9041,7 +9015,7 @@ namespace chull {
           ymax=max_point;
           if(dimension==2){ //only do rounding for dim==2, dim==3 we need EXACT values or colorbar gets screwed up
             if(!m_formation_energy_hull){ymax+=extra_padding;}  //CO20180227 - we need to avoid labels here
-            ymax=roundDouble(ymax,(int)round_to_value,true);  //we want max to be MORE POSITIVE, so round UP  //CO20190724 - explicit double->int conversion (floor is fine)
+            ymax=aurostd::roundDouble(ymax,(int)round_to_value,true);  //we want max to be MORE POSITIVE, so round UP  //CO20190724 - explicit double->int conversion (floor is fine)
           }
         }
         y_range=abs(ymax-ymin);
@@ -9059,8 +9033,8 @@ namespace chull {
           cerr << __AFLOW_FUNC__ << " min_point                                          = " << min_point << endl;
           cerr << __AFLOW_FUNC__ << " max_point                                          = " << max_point << endl;
           cerr << __AFLOW_FUNC__ << " round_to_value                                     = " << round_to_value << endl;
-          //cerr << __AFLOW_FUNC__ << " roundDouble(min_point,(int)round_to_value,false)        = " << roundDouble(min_point, (int)round_to_value, false) << endl; //CO20190724 - explicit double->int conversion (floor is fine)
-          //cerr << __AFLOW_FUNC__ << " roundDouble(max_point,(int)round_to_value,true)         = " << roundDouble(max_point, (int)round_to_value, true) << endl;  //CO20190724 - explicit double->int conversion (floor is fine)
+          //cerr << __AFLOW_FUNC__ << " aurostd::roundDouble(min_point,(int)round_to_value,false)        = " << aurostd::roundDouble(min_point, (int)round_to_value, false) << endl; //CO20190724 - explicit double->int conversion (floor is fine)
+          //cerr << __AFLOW_FUNC__ << " aurostd::roundDouble(max_point,(int)round_to_value,true)         = " << aurostd::roundDouble(max_point, (int)round_to_value, true) << endl;  //CO20190724 - explicit double->int conversion (floor is fine)
           cerr << __AFLOW_FUNC__ << " extra_padding                                      = " << extra_padding << endl;
           cerr << __AFLOW_FUNC__ << " ymin                                               = " << ymin << endl;
           cerr << __AFLOW_FUNC__ << " ymax                                               = " << ymax << endl;
@@ -10920,10 +10894,10 @@ namespace chull {
     main_output_file=main_PDF_file;
     if(m_cflags.flag("CHULL::PNG_IMAGE")&&!m_cflags.flag("CHULL::LATEX_DOC")){destination=path+main_PNG_file;main_output_file=main_PNG_file;}
     string LATEX_dir = aurostd::TmpDirectoryCreate("chullLATEX");
-    if(0) chdir(LATEX_dir.c_str());
+    //[CO20221027 - suppressing warning]if(0) chdir(LATEX_dir.c_str());
     aurostd::stringstream2file(main_TEX_ss, LATEX_dir+"/"+main_TEX_file);
     if(!aurostd::FileExist(LATEX_dir+"/"+main_TEX_file)) {
-      if(0) chdir(PWD.c_str());
+      //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -10933,7 +10907,7 @@ namespace chull {
     if(!doc_only){
       aurostd::base642bin(_AFLOW_LOGO_SKINNY_BASE64_, LATEX_dir+"/"+aflow_logo_skinny_file);
       if(!aurostd::FileExist(LATEX_dir+"/"+aflow_logo_skinny_file)) {
-        if(0) chdir(PWD.c_str());
+        //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -10943,7 +10917,7 @@ namespace chull {
     if(print_aflow_logo_full) {
       aurostd::base642bin(_AFLOW_LOGO_FULL_BASE64_, LATEX_dir+"/"+aflow_logo_full_file);
       if(!aurostd::FileExist(LATEX_dir+"/"+aflow_logo_full_file)) {
-        if(0) chdir(PWD.c_str());
+        //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -10953,7 +10927,7 @@ namespace chull {
     if(print_logo_2) {
       aurostd::base642bin(_NOMAD_LOGO_BASE64_, LATEX_dir+"/"+logo_file_2);
       if(!aurostd::FileExist(LATEX_dir+"/"+logo_file_2)) {
-        if(0) chdir(PWD.c_str());
+        //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -11002,7 +10976,7 @@ namespace chull {
       pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
       aurostd::file2directory(files_2_move, path);
-      if(0) chdir(PWD.c_str());
+      //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -11043,7 +11017,7 @@ namespace chull {
         pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
         aurostd::file2directory(files_2_move, path);
-        if(0) chdir(PWD.c_str());
+        //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
         aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -11061,13 +11035,13 @@ namespace chull {
       pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
     }
     if(!aurostd::file2directory(files_2_move, path)) {
-      if(0) chdir(PWD.c_str());
+      //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
       aurostd::RemoveDirectory(LATEX_dir);
 #endif
       throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unable to move files out of temporary compilation directory");
     }
-    if(0) chdir(PWD.c_str());
+    //[CO20221027 - suppressing warning]if(0) chdir(PWD.c_str());
 #ifndef _AFLOW_TEMP_PRESERVE_
     aurostd::RemoveDirectory(LATEX_dir);
 #endif
@@ -11385,7 +11359,7 @@ namespace chull {
               i_point=artificialMap(m_coord_groups[i_coord_group].m_decomp_phases[i]);
               const xvector<double>& decomposition_coefficients=m_coord_groups[i_coord_group].m_decomp_coefs;
               //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]const xvector<double>& decomposition_coefficients=point.m_decomp_coefs;
-              if((decomposition_coefficients.lrows+i+1<=(uint)decomposition_coefficients.urows)&&(nonZeroWithinTol(decomposition_coefficients[decomposition_coefficients.lrows+i+1]))){
+              if((decomposition_coefficients.lrows+i+1<=(uint)decomposition_coefficients.urows)&&(aurostd::nonZeroWithinTol(decomposition_coefficients[decomposition_coefficients.lrows+i+1],ZERO_TOL))){
                 if(m_points[i_point].m_has_entry){
                   compounds.push_back(aurostd::wrapString(m_points[i_point].m_entry.compound,string_wrapper));
                 } else {compounds.push_back(null_value);} //already did artificialMap()
@@ -11410,7 +11384,7 @@ namespace chull {
               i_point=artificialMap(m_coord_groups[i_coord_group].m_decomp_phases[i]);
               const xvector<double>& decomposition_coefficients=m_coord_groups[i_coord_group].m_decomp_coefs;
               //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]const xvector<double>& decomposition_coefficients=point.m_decomp_coefs;
-              if((decomposition_coefficients.lrows+i+1<=(uint)decomposition_coefficients.urows)&&(nonZeroWithinTol(decomposition_coefficients[decomposition_coefficients.lrows+i+1]))){
+              if((decomposition_coefficients.lrows+i+1<=(uint)decomposition_coefficients.urows)&&(aurostd::nonZeroWithinTol(decomposition_coefficients[decomposition_coefficients.lrows+i+1],ZERO_TOL))){
                 if(m_points[i_point].m_has_entry){
                   auids.push_back(aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper));
                 } else {auids.push_back(null_value);} //already did artificialMap()
@@ -11431,10 +11405,10 @@ namespace chull {
           if(m_coord_groups[i_coord_group].m_decomp_phases.size()){
             vector<double> nonzero_coefs;
             //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]for(int i=point.m_decomp_coefs.lrows;i<=point.m_decomp_coefs.urows;i++){
-            //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]  if(nonZeroWithinTol(point.m_decomp_coefs[i])){nonzero_coefs.push_back(point.m_decomp_coefs[i]);}
+            //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]  if(aurostd::nonZeroWithinTol(point.m_decomp_coefs[i],ZERO_TOL)){nonzero_coefs.push_back(point.m_decomp_coefs[i]);}
             //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]}
             for(int i=m_coord_groups[i_coord_group].m_decomp_coefs.lrows;i<=m_coord_groups[i_coord_group].m_decomp_coefs.urows;i++){
-              if(nonZeroWithinTol(m_coord_groups[i_coord_group].m_decomp_coefs[i])){nonzero_coefs.push_back(m_coord_groups[i_coord_group].m_decomp_coefs[i]);}
+              if(aurostd::nonZeroWithinTol(m_coord_groups[i_coord_group].m_decomp_coefs[i],ZERO_TOL)){nonzero_coefs.push_back(m_coord_groups[i_coord_group].m_decomp_coefs[i]);}
             }
             precision_tmp=precision;
             tmp_roundoff_tol=5.0*pow(10,-((int)precision_tmp)-1);
