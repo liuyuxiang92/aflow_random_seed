@@ -8082,6 +8082,7 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
   if(LDEBUG) cerr << __AFLOW_FUNC__ << " BEGIN (" << time_delay(seconds) << ")" << endl;
   clear(); // so it does not mess up vector/deque
   content=stringstreamIN.str();
+  if(1&&LDEBUG){cerr << __AFLOW_FUNC__ << endl;cerr << content;}
   vcontent.clear();
   vector<string> vline,tokens;
   aurostd::string2vectorstring(content,vcontent);
@@ -8288,6 +8289,12 @@ bool xPOTCAR::GetProperties(const stringstream& stringstreamIN,bool QUIET) {
 
     vTITEL.at(j)=aurostd::RemoveWhiteSpaces(vTITEL.at(j));
     vLEXCH.at(j)=aurostd::RemoveWhiteSpaces(vLEXCH.at(j));   
+    if(LDEBUG){
+      cerr << __AFLOW_FUNC__ << " vTITEL.at(j)=" << vTITEL.at(j) << endl;
+      cerr << __AFLOW_FUNC__ << " vLEXCH.at(j)=" << vLEXCH.at(j) << endl;
+      cerr << __AFLOW_FUNC__ << " vEATOM.at(j)=" << vEATOM.at(j) << endl;
+      cerr << __AFLOW_FUNC__ << " vRMAX.at(j)=" << vRMAX.at(j) << endl;
+    }
     xPOTCAR xPOT(xPOTCAR_Finder(species_pp_AUID,species_pp_AUID_collisions,vTITEL.at(j),vLEXCH.at(j),vEATOM.at(j),vRMAX.at(j),LDEBUG)); // FIXES species_pp_AUID,species_pp_AUID_collisions
     species_pp_groundstate_energy.push_back(xPOT.species_pp_groundstate_energy.at(0));
     species_pp_groundstate_structure.push_back(xPOT.species_pp_groundstate_structure.at(0));
