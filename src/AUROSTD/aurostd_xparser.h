@@ -124,9 +124,9 @@ namespace aurostd {
       std::shared_ptr<void> obj = nullptr;
 
       //operators
-      JSONReader::storage_object &operator[](const size_t index);
-      JSONReader::storage_object &operator[](const std::string key);
-      JSONReader::storage_object &operator[](const char* key);
+      JSONReader::storage_object &operator[](const size_t index) const;
+      JSONReader::storage_object &operator[](const std::string key) const;
+      JSONReader::storage_object &operator[](const char* key) const;
       void operator= (const char* content); // for literal strings
       void operator= (const std::string & content);
       void operator= (bool content);
@@ -152,13 +152,18 @@ namespace aurostd {
 
 
       //conversion functions
-      explicit operator bool() const;
-      explicit operator std::string() const;
-      explicit operator double() const;
-      explicit operator float() const;
+      operator bool() const;
+      operator std::string() const;
+      operator double() const;
+      operator float() const;
       operator long long() const;
-      explicit operator unsigned long long () const;
-      explicit operator unsigned long () const;
+      operator long() const;
+      operator int() const;
+      operator unsigned long long () const;
+      operator unsigned long () const;
+      operator unsigned int () const;
+      operator std::map<std::string, storage_object> () const;
+//      explicit operator std::vector<storage_object> () const;
       template<class utype> operator std::vector<utype>() const;
       template<class utype> operator std::map<std::string, utype>() const;
       template<class utype> operator aurostd::xvector<utype>() const;
@@ -188,14 +193,13 @@ namespace aurostd {
     const JSONReader& operator=(const JSONReader &jr);
     void clear();
     storage_object root;
-
-
+    typedef std::map<std::string, storage_object> Dictionary;
+    typedef std::vector<storage_object> List;
 
   private:
 
     void copy(const JSONReader &jsonReader);
-    typedef std::map<std::string, storage_object> Dictionary;
-    typedef std::vector<storage_object> List;
+
 
     std::pair<size_t, size_t> find_string(const std::string & raw_content, std::pair<size_t, size_t> border={0,0}) const;
     std::pair<size_t, size_t> find_bracket(const std::string & raw_content, char kind_open, std::pair<size_t, size_t> border={0,0}) const;

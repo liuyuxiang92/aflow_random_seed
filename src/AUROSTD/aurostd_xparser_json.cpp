@@ -25,7 +25,7 @@ namespace aurostd {
   /// @authors
   /// @mod{HE,20220924,created struct}
 
-  JSONReader::storage_object &JSONReader::storage_object::operator[](const size_t index) {
+  JSONReader::storage_object &JSONReader::storage_object::operator[](const size_t index) const{
     if (this->type == JSONReader::object_types::LIST) {
       std::shared_ptr <JSONReader::List> content = std::static_pointer_cast<JSONReader::List>(this->obj);
       return content->operator[](index);
@@ -34,7 +34,7 @@ namespace aurostd {
     }
   }
 
-  JSONReader::storage_object &JSONReader::storage_object::operator[](const std::string key) {
+  JSONReader::storage_object &JSONReader::storage_object::operator[](const std::string key) const{
     if (this->type == JSONReader::object_types::DICTIONARY) {
       std::shared_ptr <JSONReader::Dictionary> content = std::static_pointer_cast<JSONReader::Dictionary>(this->obj);
       return content->operator[](key);
@@ -43,7 +43,7 @@ namespace aurostd {
     }
   }
 
-  JSONReader::storage_object &JSONReader::storage_object::operator[](const char *key) {
+  JSONReader::storage_object &JSONReader::storage_object::operator[](const char *key) const {
     if (this->type == JSONReader::object_types::DICTIONARY) {
       std::shared_ptr <JSONReader::Dictionary> content = std::static_pointer_cast<JSONReader::Dictionary>(this->obj);
       return content->operator[](key);
@@ -134,7 +134,7 @@ namespace aurostd {
       this->obj = new_content;
       return;
     } else if (std::is_floating_point<utype>::value){
-      if (isnan(content)) {
+      if (std::isnan(content)) {
         this->type = object_types::NONE;
         this->obj = nullptr;
         return;
@@ -211,6 +211,7 @@ namespace aurostd {
     this->fromXvector(content);
   }
 
+  template JSONReader::storage_object::storage_object(const xvector<char> &);
   template JSONReader::storage_object::storage_object(const xvector<int> &);
   template JSONReader::storage_object::storage_object(const xvector<unsigned int> &);
   template JSONReader::storage_object::storage_object(const xvector<long long> &);
@@ -285,6 +286,7 @@ namespace aurostd {
     this->template fromNumber(content);
   }
 
+  template void JSONReader::storage_object::operator=(const char);
   template void JSONReader::storage_object::operator=(const int);
   template void JSONReader::storage_object::operator=(const unsigned int);
   template void JSONReader::storage_object::operator=(const long long);
@@ -451,6 +453,18 @@ namespace aurostd {
     return (unsigned long long) *this;
   }
 
+  JSONReader::storage_object::operator unsigned int() const {
+    return (unsigned long long) *this;
+  }
+
+  JSONReader::storage_object::operator long() const {
+    return (long long) *this;
+  }
+
+  JSONReader::storage_object::operator int() const {
+    return (long long) *this;
+  }
+
   JSONReader::storage_object::operator std::string() const {
     return this->toString(false);
   }
@@ -488,6 +502,13 @@ namespace aurostd {
   template JSONReader::storage_object::operator std::vector<int>() const;
   template JSONReader::storage_object::operator std::vector<uint>() const;
   template JSONReader::storage_object::operator std::vector<bool>() const;
+
+  JSONReader::storage_object::operator std::map<std::string, JSONReader::storage_object> () const {
+    if (type != object_types::DICTIONARY)
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON std::map conversion failed: element is not a DICTIONARY: " + (std::string) *this, _VALUE_ILLEGAL_);
+    std::shared_ptr <JSONReader::Dictionary> content = std::static_pointer_cast<JSONReader::Dictionary>(obj);
+    return *content;
+  }
 
   template<class utype> JSONReader::storage_object::operator std::map<std::string, utype>() const {
     if (type != object_types::DICTIONARY)
