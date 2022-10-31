@@ -680,6 +680,22 @@ namespace aurostd {
   template JSONReader::storage_object::operator aurostd::xmatrix<uint>() const;
   template JSONReader::storage_object::operator aurostd::xmatrix<bool>() const;
 
+
+  template<class utype>
+    void JSONReader::storage_object::push_back(const utype content){
+    if (type == JSONReader::object_types::LIST) {
+      std::shared_ptr <JSONReader::List> list_obj = std::static_pointer_cast<JSONReader::List>(obj);
+      list_obj->push_back(content);
+    }
+    else {
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "push_back is just allowed for a JSON LIST ", _VALUE_ILLEGAL_);
+
+    }
+
+  }
+  template void JSONReader::storage_object::push_back(const JSONReader::storage_object content);
+
+
 }
 namespace aurostd {
   /// @class JSONReader

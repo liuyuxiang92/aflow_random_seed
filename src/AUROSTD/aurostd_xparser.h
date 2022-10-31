@@ -169,6 +169,9 @@ namespace aurostd {
       template<class utype> operator std::map<std::string, utype>() const;
       template<class utype> operator aurostd::xvector<utype>() const;
       template<class utype> operator aurostd::xmatrix<utype>() const;
+      // type specific functions
+      template<class utype> void push_back(const utype content);
+
 
       //conversion helper
       void fromString(const std::string & content);
