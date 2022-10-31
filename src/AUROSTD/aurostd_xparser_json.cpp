@@ -211,6 +211,43 @@ namespace aurostd {
     this->fromXvector(content);
   }
 
+  JSONReader::storage_object::storage_object(object_types create_type) {
+    this->type = create_type;
+    switch (create_type) {
+      {
+        case object_types::DICTIONARY: {
+          std::shared_ptr <JSONReader::Dictionary> content = std::make_shared<JSONReader::Dictionary>();
+          this->obj = content;
+          cout << "define content" << endl;
+          break;
+        }
+        case object_types::LIST: {
+          std::shared_ptr <JSONReader::List> content = std::make_shared<JSONReader::List>();
+          this->obj = content;
+          break;
+        }
+        case object_types::STRING: {
+          std::shared_ptr <std::string> content = std::make_shared<std::string>();
+          this->obj = content;
+          break;
+        }
+        case object_types::INTEGER: {
+          std::shared_ptr<long long int> content = std::make_shared<long long int>();
+          this->obj = content;
+          break;
+        }
+        case object_types::FLOAT: {
+          std::shared_ptr<double> content = std::make_shared<double>();
+          this->obj = content;
+          break;
+        }
+        default: {
+          this->obj = nullptr;
+        }
+      }
+    }
+  }
+
   template JSONReader::storage_object::storage_object(const xvector<char> &);
   template JSONReader::storage_object::storage_object(const xvector<int> &);
   template JSONReader::storage_object::storage_object(const xvector<unsigned int> &);

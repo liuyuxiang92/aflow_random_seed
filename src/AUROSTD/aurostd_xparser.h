@@ -144,6 +144,7 @@ namespace aurostd {
       storage_object(const std::string & content);
       storage_object(bool content);
       storage_object(std::nullptr_t content);
+      storage_object(object_types create_type);
       template<typename utype> storage_object(const utype content);
       template<typename utype> storage_object(const vector<utype> & content);
       template<typename utype> storage_object(const std::map<std::string, utype> & content);
