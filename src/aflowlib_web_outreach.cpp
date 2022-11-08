@@ -21,7 +21,7 @@
 #define AUTHOR_RECENT_ARTICLES  300
 #define AUTHOR_RECENT_YEARS     30
 
-#define MAX_YEAR_PRESENTATIONS  2021
+#define MAX_YEAR_PRESENTATIONS  2022
 
 // ******************************************************************************************************************************************************
 // _OUTREACH CLASS
@@ -37,6 +37,7 @@ _outreach::_outreach() {
   journal="";
   arxiv="";
   supplementary="";
+  supplementary_url="";
   place="";
   date="";
   link="";
@@ -80,6 +81,7 @@ void _outreach::copy(const _outreach& b) {
   journal=b.journal;
   arxiv=b.arxiv;
   supplementary=b.supplementary;
+  supplementary_url=b.supplementary_url;
   place=b.place;
   date=b.date;
   link=b.link;
@@ -303,6 +305,9 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
       // 6th line SUPPLEMENTARY
       if(XHOST.vflag_control.flag("PRINT_MODE::PDF") && outreach.supplementary.size())
         oss << "\"supplementary\":\"" << WEB_PDF << outreach.supplementary << "\",";
+     // 6th line SUPPLEMENTARY_URL
+      if(XHOST.vflag_control.flag("PRINT_MODE::DOI") && outreach.supplementary_url.size())
+        oss << "\"supplementary_url\":\"" << outreach.supplementary_url << "\",";
       // 6th line ARXIV
       if(outreach.arxiv.size())
         oss << "\"arxiv\":\"" << outreach.arxiv << "\",";
@@ -371,6 +376,9 @@ ostream& operator<<(ostream& oss,const _outreach& outreach) {
       // 6th line SUPPLEMENTARY
       if(XHOST.vflag_control.flag("PRINT_MODE::PDF") && outreach.supplementary.size())
         oss << "[<a href="+WEB_PDF+outreach.supplementary << "><b>suppl</b></a>] " << (compact?" ":newline.str());
+      // 6th line SUPPLEMENTARY_URL
+      if(XHOST.vflag_control.flag("PRINT_MODE::DOI") && outreach.supplementary_url.size())
+        oss << "[<a href="+outreach.supplementary_url << "><b>suppl</b></a>] " << (compact?" ":newline.str());
       // 6th line ARXIV
       if(outreach.arxiv.size())
         oss << "[<a href="+outreach.arxiv << "><b>arxiv</b></a>] " << (compact?" ":newline.str());
@@ -1334,6 +1342,7 @@ int voutreach_call=0;
 uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
   // if(!XHOST.QUIET_CERR) cerr << voutreach_call++ << endl;
   // check cache
+  bool LDEBUG=0;
   voutreach.clear();
   vector<string> valabel;
   vector<string> vjlabel;
@@ -1355,12 +1364,15 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
   // <b><font size="3"><font COLOR=blue><i>2010-current.</i> </font></b><br><br>
   _outreach ptmp;
 
+  if(LDEBUG) cerr << "voutreach_load [0]" << endl;
+
   string cv2open="f144468a7ccc2d3a72ba44000715efdb";
   // if(!XHOST.QUIET_CERR) cerr << XHOST.vflag_control.getattachedscheme("CV::AUTHOR") << endl;
   if(aurostd::toupper(XHOST.vflag_control.getattachedscheme("CV::AUTHOR"))=="CURTAROLO" || aurostd::toupper(XHOST.vflag_control.getattachedscheme("CV::AUTHOR"))=="SCURTAROLO") cv2open="f144468a7ccc2d3a72ba44000715efdb";
   // [OBSOLETE] if(aurostd::toupper(XHOST.vflag_control.getattachedscheme("CV::AUTHOR"))=="OSES" || aurostd::toupper(XHOST.vflag_control.getattachedscheme("CV::AUTHOR"))=="COSES") cv2open="d0f1b0e47f178ae627a388d3bf65d2d2";
   // [OBSOLETE] if(aurostd::toupper(XHOST.vflag_control.getattachedscheme("CV::AUTHOR"))=="TOHER" || aurostd::toupper(XHOST.vflag_control.getattachedscheme("CV::AUTHOR"))=="CTOHER") cv2open="decf00ca3ad2fe494eea8e543e929068";
 
+  if(LDEBUG) cerr << "voutreach_load [1]" << endl;
   vector<string> vpres,ktokens,tokens;
   if(aurostd::substring2bool(what2print,"ARTICLE") || aurostd::substring2bool(what2print,"PUBLICATION")) aurostd::string2vectorstring(aurostd::RemoveComments(init::InitGlobalObject(cv2open)),vpres);
   if(aurostd::substring2bool(what2print,"PRESENTATION")) aurostd::string2vectorstring(aurostd::RemoveComments(init::InitGlobalObject(cv2open)),vpres);
@@ -1375,6 +1387,8 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
   if(aurostd::substring2bool(what2print,"PRESS")) aurostd::string2vectorstring(aurostd::RemoveComments(init::InitGlobalObject(cv2open)),vpres);
   if(aurostd::substring2bool(what2print,"AWARDS")) aurostd::string2vectorstring(aurostd::RemoveComments(init::InitGlobalObject(cv2open)),vpres);
 
+   if(LDEBUG) cerr << "voutreach_load [2]" << endl;
+
   string iline,jline,kline;
   uint i,j,k,l;
 
@@ -1382,6 +1396,9 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
     //  cout << vpres.at(i) << endl;
 
     iline=vpres.at(i);
+
+    if(LDEBUG) cerr << "voutreach_load [2.line]=" << iline << endl;
+
     iline=aurostd::StringSubst(iline," ","");
     if(iline=="OBJECT={") { // found an object
       for(j=i;i<vpres.size();j++) {
@@ -1446,6 +1463,7 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
           if(ktokens.at(0)=="LINK" || ktokens.at(0)=="link") ptmp.link=object; // check link
           if(ktokens.at(0)=="ARXIV" || ktokens.at(0)=="arxiv") ptmp.arxiv=object; // check arxiv
           if(ktokens.at(0)=="SUPPLEMENTARY" || ktokens.at(0)=="supplementary") ptmp.supplementary=object; // check supplementary
+	  if(ktokens.at(0)=="SUPPLEMENTARY_URL" || ktokens.at(0)=="supplementary_url") ptmp.supplementary_url=object; // check supplementary_url
           if(ktokens.at(0)=="BIBTEX" || ktokens.at(0)=="bibtex") ptmp.bibtex=object; // check bibtex
           if(ktokens.at(0)=="BIBTEX_JOURNAL" || ktokens.at(0)=="bibtex_journal") ptmp.bibtex_journal=object; // check bibtex_journal
           if(ktokens.at(0)=="BIBTEX_VOLUME" || ktokens.at(0)=="bibtex_volume") ptmp.bibtex_volume=object; // check bibtex_volume
@@ -1498,6 +1516,8 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
     }
   }
 
+  if(LDEBUG) cerr << "voutreach_load [3]" << endl;
+
   for(uint i=0;i<voutreach.size();i++) {
     fixlabel(valabel,voutreach.at(i).vauthor);
     //   cout << voutreach.at(i).vauthor.size() << endl;
@@ -1516,6 +1536,8 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
     }
   }
 
+  if(LDEBUG) cerr << "voutreach_load [4]" << endl;
+
   for(uint i=0;i<voutreach.size();i++) fixlabel(valabel,voutreach.at(i).vextra_html);
   for(uint i=0;i<voutreach.size();i++) fixlabel(valabel,voutreach.at(i).vextra_latex);
   for(uint i=0;i<voutreach.size();i++) fixlabel(vjlabel,voutreach.at(i).journal);
@@ -1532,6 +1554,8 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
   for(uint i=0;i<voutreach.size();i++) if(voutreach_global_min_year>voutreach.at(i).year) voutreach_global_min_year=voutreach.at(i).year;
   // DONE
 
+  if(LDEBUG) cerr << "voutreach_load [5]" << endl;
+
   // save cache
   if(aurostd::substring2bool(ptmp.type,"ARTICLE") || aurostd::substring2bool(ptmp.type,"PUBLICATION")) {
     voutreach_publications.clear();
@@ -1540,11 +1564,16 @@ uint voutreach_load(vector<_outreach>& voutreach,string what2print) {
       // if(!XHOST.QUIET_CERR) cerr << voutreach.at(i) << endl;
     }
   } 
+  if(LDEBUG) cerr << "voutreach_load [6]" << endl;
+
   if(aurostd::substring2bool(ptmp.type,"PRESENTATION")) {
     voutreach_presentations.clear();
     for(uint i=0;i<voutreach.size();i++)
       voutreach_presentations.push_back(voutreach.at(i));
   }
+
+  if(LDEBUG) cerr << "voutreach_load [9]" << endl;
+
   return voutreach.size();
 }
 
