@@ -1085,7 +1085,8 @@ namespace aurostd {  // namespace aurostd
           // }                                                // for index [n]
           //    sprintf(buf1,iobuf.c_str()+((xi >=0) ? 0 :1 ),xi);
           if(!aurostd::_iscomplex(xi)) {
-            sprintf(buf1,iobuf.c_str(),aurostd::_real(xi));
+            //HE20221102 switching from deprecated sprintf to snprintf (eliminates the chance of buffer overflows)
+            snprintf(buf1,80,iobuf.c_str(),aurostd::_real(xi));
             buf << buf1;
           } else {
             //      sprintf(buf1,iobuf.c_str(),real(xi),imag(xi));
