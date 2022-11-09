@@ -1234,6 +1234,67 @@ namespace unittest {
     checkEqual(calculated_const_uint64, expected_uint64, check_function, check_description, passed_checks, results);
   }
 
+  inline unsigned int to_uint(char ch)
+  {
+    // EDIT: multi-cast fix as per David Hammen's comment
+    return static_cast<unsigned int>(static_cast<unsigned char>(ch));
+  }
+
+  std::string char32_to_string(char32_t cp) {
+    string out;
+    if (cp < 0x80) {
+      out += static_cast<char>(cp);
+      return out;
+    }
+
+    if (cp < 0x800) {
+      out += static_cast<char>((cp >> 6) | 0xc0);
+      out += static_cast<char>((cp & 0x3f) | 0x80);
+      return out;
+    }
+
+    if (cp < 0x10000) {
+      out += static_cast<char>((cp >> 12) | 0xe0);
+      out += static_cast<char>(((cp >> 6) & 0x3f) | 0x80);
+      out += static_cast<char>((cp & 0x3f) | 0x80);
+      return out;
+    }
+
+    {
+      out += static_cast<char>((cp >> 18) | 0xf0);
+      out += static_cast<char>(((cp >> 12) & 0x3f) | 0x80);
+      out += static_cast<char>(((cp >> 6) & 0x3f) | 0x80);
+      out += static_cast<char>((cp & 0x3f) | 0x80);
+      return out;
+    }
+  }
+
+
+  std::string test_utf8(const std::string & raw_content, std::pair <size_t, size_t> border) {
+    cout << raw_content.substr(border.first, 4) << endl;
+
+    char32_t cp = (char32_t) aurostd::string2utype<uint>(raw_content.substr(border.first, 4), 16);
+
+    if (cp < 0xd800 || cp > 0xdfff) return char32_to_string(cp);
+    else if (cp > 0xdbff) throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON parsing failed: undefined unicode character", _FILE_WRONG_FORMAT_);
+    else {
+      if (raw_content[border.first+4] == '\\' and raw_content[border.first+5] == 'u'){
+        cout << raw_content.substr(border.first+6, 4) << endl;
+        char32_t trailing_cp = (char32_t) aurostd::string2utype<uint>(raw_content.substr(border.first+6, 4), 16);
+        if (trailing_cp < 0xdc00 || trailing_cp > 0xdfff) throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON parsing failed: undefined unicode character", _FILE_WRONG_FORMAT_);
+        char32_t combo_cp = ((cp - 0xd800) << 10) + (trailing_cp - 0xdc00) + 0x10000;
+        return char32_to_string(combo_cp);
+      }
+      else throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON parsing failed: undefined unicode character", _FILE_WRONG_FORMAT_);
+    }
+  }
+
+
+
+
+
+
+
 
   void UnitTest::xparserTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
     (void) errors; // Suppress compiler warnings
@@ -1241,7 +1302,7 @@ namespace unittest {
 //    {// test while developing TODO remove
 //      long double start = aurostd::get_seconds();
 //      string file_name = "/Users/nathan/Projects/AFLOW-orig/testing/soliquidy/aflow_AlCuV.json";
-//      aurostd::JSONReader jr;
+//      aurostd::JSON jr;
 //      jr.loadFile(file_name);
 //      long double duration = aurostd::get_seconds()- start;
 //      cout << "Parsing of " << file_name << " took " << duration << " seconds." << endl;
@@ -1262,7 +1323,7 @@ namespace unittest {
     // read single numbers
     // Tests based on https://seriot.ch/projects/parsing_json.html
     {
-      check_function = "JSONReader";
+      check_function = "JSON";
       check_description = "test number parsing (double, long long)";
       std::string number_json= "{\"0e+1\":0e+1,\n"
                                 "\"0e1\":0e1,\n"
@@ -1288,7 +1349,7 @@ namespace unittest {
                                 "\"null\":null,\n"
                                 "}";
 
-      aurostd::JSONReader jr;
+      aurostd::JSON jr;
       jr.loadString(number_json);
 
       std::map < string, double > double_results( {{"0e+1", 0},  {"0e1", 0},  {"after_space", 4},  {"double_close_to_zero", -1e-78},
@@ -1330,14 +1391,14 @@ namespace unittest {
 
     // read xvectors
     {
-      check_function = "JSONReader";
+      check_function = "JSON";
       check_description = "test parsing xvector<";
       std::string number_json= "{\"xvector_double\" : [923.49445786, -441.74004105, 465.49355057, 96.15610686, 557.6834903 , 147.6777196 , 871.81485459, 287.89958188, 863.66132302, 876.36635155],\n"
                                " \"xvector_ll\" : [449644208, -252515403, 601496576, 725767871, 502088591, 946128279, 65015635, 352203056, 717938486, 762013152],\n"
                                " \"xvector_mixed\" : [449644208, -441.74004105, 465.49355057, 725767871, true, 946128279, 65015635, 287.89958188, 863.66132302, 762013152],\n"
                                " \"xvector_nan\" : [449644208, -441.74004105, null, 725767871, true, 946128279, 65015635, 287.89958188, 863.66132302, 762013152]}";
 
-      aurostd::JSONReader jr;
+      aurostd::JSON jr;
       jr.loadString(number_json);
 
       xvector<double> xvd_res = jr["xvector_double"];
@@ -1369,7 +1430,7 @@ namespace unittest {
 
     // read xmatrix
     {
-      check_function = "JSONReader";
+      check_function = "JSON";
       check_description = "test parsing xmatrix<";
 
       std::string matrix_json = "{\n"
@@ -1382,7 +1443,7 @@ namespace unittest {
                                 "      [-2.98263326e+04, 5.39915781e+05,  1.28198687e+09,  2.69529424e+07,  7.47855186e+01,      1538912783, 2.55027330e+02]]\n"
                                 "}";
 
-      aurostd::JSONReader jr;
+      aurostd::JSON jr;
       jr.loadString(matrix_json);
 
       xmatrix<double> xmd_exp = {{ 2.85899214e+07, 2.70836286e+04,              82,  7.47207733e+08,  4.67299748e+04, -6.25361399e+09, 8.00388892e+08},
@@ -1408,7 +1469,7 @@ namespace unittest {
 
     // read std::map
     {
-      check_function = "JSONReader";
+      check_function = "JSON";
       check_description = "test parsing std:map<string,";
       std::string map_json= "{\"map\": {\n"
                             "    \"VNZPC\": 2,\n"
@@ -1432,7 +1493,7 @@ namespace unittest {
                                          {"SQBER", -2056},
                                          {"XGPXD", 853427.8245249396},
                                          {"UASBY", 4474520688}};
-      aurostd::JSONReader jr;
+      aurostd::JSON jr;
       jr.loadString(map_json);
       std::map<string, double> md_res = jr["map"];
       bool overall_test = true;
@@ -1472,7 +1533,7 @@ namespace unittest {
 
     // read std::vector
     {
-      check_function = "JSONReader";
+      check_function = "JSON";
       check_description = "test parsing vector<";
 
       std::string vector_json = "{\"mixed_vector\": [{\"VNZPC\": 2, \"HQPZP\": -2472285305.2312846, \"DUKPG\": 24171}, 568E-8, 152.324, 784, \"A string\", true, false, null, [\"A\", \"nested\", \"list\"]],\n"
@@ -1481,7 +1542,7 @@ namespace unittest {
                                 " \"bool>\": [true, false, false, false, true],\n"
                                 " \"bool> mixed\": [1, null, 0.0, 0, true]}";
 
-      aurostd::JSONReader jr;
+      aurostd::JSON jr;
       jr.loadString(vector_json);
       std::vector<std::string> vs_res = jr["string_vector"];
       std::vector<std::string> vs_exp = {"First w\"ord", "Second word", "Last word"};
@@ -1518,9 +1579,9 @@ namespace unittest {
 
     // create JSON storage objects
     {
-      check_function = "JSONReader";
+      check_function = "JSON";
       check_description = "test converting ";
-      aurostd::JSONReader::storage_object so;
+      aurostd::JSON::object so;
       {
         int exp = 4652;
         so = exp;

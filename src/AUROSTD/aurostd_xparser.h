@@ -107,7 +107,8 @@ namespace aurostd {
 //Moved from the AflowDB class
 
 namespace aurostd {
-  class JSONReader{
+  // JSON class for reading and writing //HE20221109
+  class JSON{
   public:
     enum class object_types{ // order is important!
       DICTIONARY,
@@ -119,14 +120,15 @@ namespace aurostd {
       F,
       NONE
     };
-    struct storage_object {
+
+    struct object {
       object_types type = object_types::NONE;
       std::shared_ptr<void> obj = nullptr;
 
-      //operators
-      JSONReader::storage_object &operator[](const size_t index) const;
-      JSONReader::storage_object &operator[](const std::string key) const;
-      JSONReader::storage_object &operator[](const char* key) const;
+      // operators
+      JSON::object &operator[](const size_t index) const;
+      JSON::object &operator[](const std::string key) const;
+      JSON::object &operator[](const char* key) const;
       void operator= (const char* content); // for literal strings
       void operator= (const std::string & content);
       void operator= (bool content);
@@ -137,22 +139,20 @@ namespace aurostd {
       template<class utype> void operator=(const xvector<utype> & content);
       template<class utype> void operator=(const xmatrix<utype> & content);
 
+      // converting constructors
+      object(){};
+      object(const char* content);
+      object(const std::string & content);
+      object(bool content);
+      object(std::nullptr_t content);
+      object(object_types create_type);
+      template<typename utype> object(const utype content);
+      template<typename utype> object(const vector<utype> & content);
+      template<typename utype> object(const std::map<std::string, utype> & content);
+      template<typename utype> object(const xvector<utype> & content);
+      template<typename utype> object(const xmatrix<utype> & content);
 
-      //converting constructors
-      storage_object(){};
-      storage_object(const char* content);
-      storage_object(const std::string & content);
-      storage_object(bool content);
-      storage_object(std::nullptr_t content);
-      storage_object(object_types create_type);
-      template<typename utype> storage_object(const utype content);
-      template<typename utype> storage_object(const vector<utype> & content);
-      template<typename utype> storage_object(const std::map<std::string, utype> & content);
-      template<typename utype> storage_object(const xvector<utype> & content);
-      template<typename utype> storage_object(const xmatrix<utype> & content);
-
-
-      //conversion functions
+      // conversion functions
       operator bool() const;
       operator std::string() const;
       operator double() const;
@@ -163,8 +163,8 @@ namespace aurostd {
       operator unsigned long long () const;
       operator unsigned long () const;
       operator unsigned int () const;
-      operator std::map<std::string, storage_object> () const;
-//      explicit operator std::vector<storage_object> () const;
+      operator std::map<std::string, object> () const;
+      // explicit operator std::vector<object> () const;
       template<class utype> operator std::vector<utype>() const;
       template<class utype> operator std::map<std::string, utype>() const;
       template<class utype> operator aurostd::xvector<utype>() const;
@@ -172,8 +172,7 @@ namespace aurostd {
       // type specific functions
       template<class utype> void push_back(const utype content);
 
-
-      //conversion helper
+      // conversion helper
       void fromString(const std::string & content);
       template<class utype> void fromNumber(const utype content);
       template<class utype> void fromVector(const vector<utype> & content);
@@ -181,42 +180,57 @@ namespace aurostd {
       template<class utype> void fromXvector(const xvector<utype> & content);
       template<class utype> void fromXmatrix(const xmatrix<utype> & content);
 
-
-      std::string toString(const bool json_format=true) const;
+      std::string toString(const bool json_format=true, const bool escape=true) const;
     };
-    JSONReader::storage_object &operator[](const size_t index);
-    JSONReader::storage_object &operator[](const std::string key);
-    JSONReader::storage_object &operator[](const char *key);
-    void loadFile(const std::string & file_path);
-    void loadString(const std::string & content);
-    std::string toString() const;
-    JSONReader();
-    JSONReader(const JSONReader &jr);
-    ~JSONReader();
-    explicit operator storage_object() const;
-    const JSONReader& operator=(const JSONReader &jr);
-    void clear();
-    storage_object root;
-    typedef std::map<std::string, storage_object> Dictionary;
-    typedef std::vector<storage_object> List;
 
+    JSON::object &operator[](const size_t index);
+    JSON::object &operator[](const std::string key);
+    JSON::object &operator[](const char *key);
+
+    // initializer and destructors
+    JSON();
+    JSON(const JSON &jr);
+    ~JSON();
+    explicit operator object() const;
+    const JSON& operator=(const JSON &jr);
+    void clear();
+
+    // shortcuts for dict and list definitions
+    typedef std::map<std::string, object> Dictionary;
+    typedef std::vector<object> List;
+
+    // unicode helper function
+    static std::string unescape_unicode(const std::string & raw, size_t & pos);
+    static std::string escape_unicode(const std::string & raw);
+    static std::string char32_to_string(const char32_t cp);
+
+    // basic functions
+    void loadFile(const std::string & file_path);
+    void saveFile(const std::string & file_path, const bool escape=true);
+    void loadString(const std::string & content);
+    std::string toString(const bool escape = false) const;
+
+    // JSON root object (data starting point)
+    object root;
   private:
 
-    void copy(const JSONReader &jsonReader);
+    void copy(const JSON &jsonReader);
 
-
+    // navigation functions
     std::pair<size_t, size_t> find_string(const std::string & raw_content, std::pair<size_t, size_t> border={0,0}) const;
     std::pair<size_t, size_t> find_bracket(const std::string & raw_content, char kind_open, std::pair<size_t, size_t> border={0,0}) const;
     std::pair<size_t, size_t> find_strip(const std::string & raw_content, std::pair<size_t, size_t> border={0,0}) const;
 
-    storage_object parse(const std::string &raw_content, std::pair<size_t, size_t> border={0,0}) const;
+    // parser core
+    object parse(const std::string &raw_content, std::pair<size_t, size_t> border={0,0}) const;
     std::string parse_string(const std::string & raw_content, std::pair<size_t, size_t> border={0,0}) const;
-    std::string utf8(const std::string & cp) const;
 
-    friend struct storage_object;
+    friend struct object;
   };
-  ostream& operator<<(ostream& os, const JSONReader::storage_object& so);
-  ostream& operator<<(ostream& os, const JSONReader& jr);
+
+  // enable easy interaction with cout
+  ostream& operator<<(ostream& os, const JSON::object& so);
+  ostream& operator<<(ostream& os, const JSON& jr);
 }
 
 namespace aurostd {

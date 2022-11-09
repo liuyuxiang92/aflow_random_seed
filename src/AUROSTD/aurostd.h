@@ -38,7 +38,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <string>
-#include <codecvt> //HE20220922 for JSONReader
+#include <codecvt> //HE20220922 for JSON
 #include <sys/stat.h>
 #ifndef __CYGWIN__  //ME20190327 - Cygwin support
 //#include <sys/sysctl.h>
