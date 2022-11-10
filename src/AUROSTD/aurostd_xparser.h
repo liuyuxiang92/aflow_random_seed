@@ -108,8 +108,7 @@ namespace aurostd {
 
 namespace aurostd {
   // JSON class for reading and writing //HE20221109
-  class JSON{
-  public:
+  namespace JSON{
     enum class object_types{ // order is important!
       DICTIONARY,
       LIST,
@@ -183,54 +182,46 @@ namespace aurostd {
       std::string toString(const bool json_format=true, const bool escape=true) const;
     };
 
-    JSON::object &operator[](const size_t index);
-    JSON::object &operator[](const std::string key);
-    JSON::object &operator[](const char *key);
+//    object &operator[](const size_t index);
+//    object &operator[](const std::string key);
+//    object &operator[](const char *key);
 
     // initializer and destructors
-    JSON();
-    JSON(const JSON &jr);
-    ~JSON();
-    explicit operator object() const;
-    const JSON& operator=(const JSON &jr);
-    void clear();
+//    JSON();
+//    JSON(const JSON &jr);
+//    ~JSON();
+//    explicit operator object() const;
+//    const JSON& operator=(const JSON &jr);
+//    void clear();
 
     // shortcuts for dict and list definitions
     typedef std::map<std::string, object> Dictionary;
     typedef std::vector<object> List;
 
     // unicode helper function
-    static std::string unescape_unicode(const std::string & raw, size_t & pos);
-    static std::string escape_unicode(const std::string & raw);
-    static std::string char32_to_string(const char32_t cp);
+    std::string unescape_unicode(const std::string & raw, size_t & pos);
+    std::string escape_unicode(const std::string & raw);
+    std::string char32_to_string(const char32_t cp);
 
     // basic functions
-    void loadFile(const std::string & file_path);
-    void saveFile(const std::string & file_path, const bool escape=true);
-    void loadString(const std::string & content);
-    std::string toString(const bool escape = false) const;
-
-    // JSON root object (data starting point)
-    object root;
-  private:
-
-    void copy(const JSON &jsonReader);
+    object loadFile(const std::string & file_path);
+    object loadString(const std::string & content);
+    void saveFile(const object & root, const std::string & file_path, const bool escape=true);
+    std::string toString(const object & root, const bool escape = false);
 
     // navigation functions
-    std::pair<size_t, size_t> find_string(const std::string & raw_content, std::pair<size_t, size_t> border={0,0}) const;
-    std::pair<size_t, size_t> find_bracket(const std::string & raw_content, char kind_open, std::pair<size_t, size_t> border={0,0}) const;
-    std::pair<size_t, size_t> find_strip(const std::string & raw_content, std::pair<size_t, size_t> border={0,0}) const;
+    std::pair<size_t, size_t> find_string(const std::string & raw_content, std::pair<size_t, size_t> border={0,0});
+    std::pair<size_t, size_t> find_bracket(const std::string & raw_content, char kind_open, std::pair<size_t, size_t> border={0,0});
+    std::pair<size_t, size_t> find_strip(const std::string & raw_content, std::pair<size_t, size_t> border={0,0});
 
     // parser core
-    object parse(const std::string &raw_content, std::pair<size_t, size_t> border={0,0}) const;
-    std::string parse_string(const std::string & raw_content, std::pair<size_t, size_t> border={0,0}) const;
-
-    friend struct object;
+    object parse(const std::string &raw_content, std::pair<size_t, size_t> border={0,0});
+    std::string parse_string(const std::string & raw_content, std::pair<size_t, size_t> border={0,0});
   };
 
-  // enable easy interaction with cout
-  ostream& operator<<(ostream& os, const JSON::object& so);
-  ostream& operator<<(ostream& os, const JSON& jr);
+//  // enable easy interaction with cout
+//  ostream& operator<<(ostream& os, const JSON::object& so);
+//  ostream& operator<<(ostream& os, const JSON& jr);
 }
 
 namespace aurostd {

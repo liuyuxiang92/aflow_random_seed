@@ -1349,8 +1349,7 @@ namespace unittest {
                                 "\"null\":null,\n"
                                 "}";
 
-      aurostd::JSON jr;
-      jr.loadString(number_json);
+      aurostd::JSON::object jo = aurostd::JSON::loadString(number_json);
 
       std::map < string, double > double_results( {{"0e+1", 0},  {"0e1", 0},  {"after_space", 4},  {"double_close_to_zero", -1e-78},
                                                    {"double__too_close_to_zero", NAN},  {"int_with_exp", 200},  {"minus_zero", -0},
@@ -1369,18 +1368,18 @@ namespace unittest {
 
       bool overall_test = true;
       for (const auto &entry: double_results) {
-        if ((double) jr[entry.first] != entry.second) {
-          if (std::isnan((double)jr[entry.first]) && std::isnan(entry.second)) continue;
+        if ((double) jo[entry.first] != entry.second) {
+          if (std::isnan((double)jo[entry.first]) && std::isnan(entry.second)) continue;
           check_description += "(at " + entry.first + " subtest)";
-              check(false, (double) jr[entry.first], entry.second, check_function, check_description, passed_checks,results);
+              check(false, (double) jo[entry.first], entry.second, check_function, check_description, passed_checks,results);
           overall_test = false;
           break;
         }
       }
       for (const auto &entry: ll_results) {
-        if ((long long) jr[entry.first] != entry.second) {
+        if ((long long) jo[entry.first] != entry.second) {
           check_description += "(at " + entry.first + " subtest)";
-          check(false, (long long) jr[entry.first], entry.second, check_function, check_description, passed_checks,results);
+          check(false, (long long) jo[entry.first], entry.second, check_function, check_description, passed_checks,results);
           overall_test = false;
           break;
         }
@@ -1398,30 +1397,29 @@ namespace unittest {
                                " \"xvector_mixed\" : [449644208, -441.74004105, 465.49355057, 725767871, true, 946128279, 65015635, 287.89958188, 863.66132302, 762013152],\n"
                                " \"xvector_nan\" : [449644208, -441.74004105, null, 725767871, true, 946128279, 65015635, 287.89958188, 863.66132302, 762013152]}";
 
-      aurostd::JSON jr;
-      jr.loadString(number_json);
+      aurostd::JSON::object jo = aurostd::JSON::loadString(number_json);
 
-      xvector<double> xvd_res = jr["xvector_double"];
+      xvector<double> xvd_res = jo["xvector_double"];
       xvector<double> xvd_exp = {923.49445786, -441.74004105, 465.49355057, 96.15610686, 557.6834903 , 147.6777196 , 871.81485459, 287.89958188, 863.66132302, 876.36635155};
       checkEqual( xvd_res, xvd_exp, check_function, check_description + "double>", passed_checks, results);
 
-      xvd_res = jr["xvector_nan"];
+      xvd_res = jo["xvector_nan"];
       xvd_exp = {449644208, -441.74004105, NAN, 725767871, 1.0, 946128279, 65015635, 287.89958188, 863.66132302, 762013152};
       checkEqual( xvd_res, xvd_exp, check_function, check_description + "double> mixed + NAN", passed_checks, results);
 
-      xvector<float> xvf_res = jr["xvector_nan"];
+      xvector<float> xvf_res = jo["xvector_nan"];
       xvector<float> xvf_exp = {449644224, -441.74004105, NAN, 725767872, 1.0, 946128256, 65015636, 287.89958188, 863.66132302, 762013184}; // values different from double -> narrowing
       checkEqual( xvf_res, xvf_exp, check_function, check_description + "float> mixed + NAN", passed_checks, results);
 
-      xvector<long long> xvll_res = jr["xvector_ll"];
+      xvector<long long> xvll_res = jo["xvector_ll"];
       xvector<long long> xvll_exp = {449644208, -252515403, 601496576, 725767871, 502088591, 946128279, 65015635, 352203056, 717938486, 762013152};
       checkEqual( xvll_res, xvll_exp, check_function, check_description + "long long>", passed_checks, results);
 
-      xvll_res = jr["xvector_mixed"];
+      xvll_res = jo["xvector_mixed"];
       xvll_exp = {449644208, -441, 465, 725767871, 1, 946128279, 65015635, 287, 863, 762013152};
       checkEqual( xvll_res, xvll_exp, check_function, check_description + "long long> mixed", passed_checks, results);
 
-      xvector<int> xvi_res = jr["xvector_mixed"];
+      xvector<int> xvi_res = jo["xvector_mixed"];
       xvector<int> xvi_exp = {449644208, -441, 465, 725767871, 1, 946128279, 65015635, 287, 863, 762013152};
       checkEqual( xvi_res, xvi_exp, check_function, check_description + "int> mixed", passed_checks, results);
 
@@ -1443,8 +1441,7 @@ namespace unittest {
                                 "      [-2.98263326e+04, 5.39915781e+05,  1.28198687e+09,  2.69529424e+07,  7.47855186e+01,      1538912783, 2.55027330e+02]]\n"
                                 "}";
 
-      aurostd::JSON jr;
-      jr.loadString(matrix_json);
+      aurostd::JSON::object jo = aurostd::JSON::loadString(matrix_json);
 
       xmatrix<double> xmd_exp = {{ 2.85899214e+07, 2.70836286e+04,              82,  7.47207733e+08,  4.67299748e+04, -6.25361399e+09, 8.00388892e+08},
                                 {-2.50841390e+04, 1.86048071e+07,  7.18691607e+04, -7.18492121e+00,  5.11971140e+02,  8.97364584e+06, 1.68446225e+02},
@@ -1452,7 +1449,7 @@ namespace unittest {
                                 {           8499, 1.73734230e+03,  3.28957479e+08, -5.41490015e+03,  5.52617678e+00,  2.64034084e+09, 4.76561709e+01},
                                 { 3.31904798e+04,     2288175298, -2.96213531e+07,  1.22631199e+02, -8.83941811e+00, -2.17327450e+04, 3.77389069e+03},
                                 {-2.98263326e+04, 5.39915781e+05,  1.28198687e+09,  2.69529424e+07,  7.47855186e+01,      1538912783, 2.55027330e+02}};
-      xmatrix<double> xmd_res = jr["xmatrix_double_mix"];
+      xmatrix<double> xmd_res = jo["xmatrix_double_mix"];
       checkEqual( xmd_res, xmd_exp, check_function, check_description + "double> mixed", passed_checks, results);
 
 
@@ -1462,7 +1459,7 @@ namespace unittest {
                                {      8499,        1737,  328957479,     -5414,     5, -1654626456,        47},
                                {     33190, -2006791998,  -29621353,       122,    -8,      -21732,      3773},
                                {    -29826,      539915, 1281986870,  26952942,    74,  1538912783,       255}};
-      xmatrix<int> xmll_res = jr["xmatrix_double_mix"];
+      xmatrix<int> xmll_res = jo["xmatrix_double_mix"];
       checkEqual( xmll_res, xmll_exp, check_function, check_description + "int> mixed", passed_checks, results);
       // <long long> would fail as operator << xmatrix<long long> does not exist yet
     }
@@ -1493,9 +1490,8 @@ namespace unittest {
                                          {"SQBER", -2056},
                                          {"XGPXD", 853427.8245249396},
                                          {"UASBY", 4474520688}};
-      aurostd::JSON jr;
-      jr.loadString(map_json);
-      std::map<string, double> md_res = jr["map"];
+      aurostd::JSON::object jo = aurostd::JSON::loadString(map_json);
+      std::map<string, double> md_res = jo["map"];
       bool overall_test = true;
       for (const std::pair<string, double> entry: md_exp){
         if (entry.second != md_res[entry.first]) {
@@ -1517,7 +1513,7 @@ namespace unittest {
                                              {"SQBER", -2056},
                                              {"XGPXD", 853427},
                                              {"UASBY", 4474520688}};
-      std::map<string, long long> mll_res = jr["map"];
+      std::map<string, long long> mll_res = jo["map"];
       overall_test = true;
       for (const std::pair<string, long long> entry: mll_exp){
         if (entry.second != mll_res[entry.first]) {
@@ -1542,26 +1538,25 @@ namespace unittest {
                                 " \"bool>\": [true, false, false, false, true],\n"
                                 " \"bool> mixed\": [1, null, 0.0, 0, true]}";
 
-      aurostd::JSON jr;
-      jr.loadString(vector_json);
-      std::vector<std::string> vs_res = jr["string_vector"];
+      aurostd::JSON::object jo = aurostd::JSON::loadString(vector_json);
+      std::vector<std::string> vs_res = jo["string_vector"];
       std::vector<std::string> vs_exp = {"First w\"ord", "Second word", "Last word"};
       checkEqual( vs_res, vs_exp, check_function, check_description + "string>", passed_checks, results);
 
-      vs_res = jr["mixed_vector"];
+      vs_res = jo["mixed_vector"];
       vs_exp = {"{\"DUKPG\":24171,\"HQPZP\":-2.47229e+09,\"VNZPC\":2}", "5.68e-06", "152.324", "784", "A string", "true", "false", "null", "[\"A\",\"nested\",\"list\"]"};
       checkEqual( vs_res, vs_exp, check_function, check_description + "string> mixed", passed_checks, results);
 
-      std::vector<double> vd_res = jr["number_vector"];
+      std::vector<double> vd_res = jo["number_vector"];
       std::vector<double> vd_exp = {449644208, 441.74004105, 465.49355057, 725767871, 1.0, 946128279, 65015635, 287.89958188, 863.66132302, 762013152};
       checkEqual( vd_res, vd_exp, check_function, check_description + "double> mixed", passed_checks, results);
 
-      std::vector<int> vll_res = jr["number_vector"];
+      std::vector<int> vll_res = jo["number_vector"];
       std::vector<int> vll_exp = {449644208, 441, 465, 725767871, 1, 946128279, 65015635, 287, 863, 762013152};
       checkEqual( vll_res, vll_exp, check_function, check_description + "int> mixed", passed_checks, results);
 
       for (string key: {"bool>", "bool> mixed"}) {// aurostd::joinWDelimiter does not work for bool
-        std::vector<bool> vb_res = jr[key];
+        std::vector<bool> vb_res = jo[key];
         std::vector<bool> vb_exp = {true, false, false, false, true};
         bool overall_test = true;
         for (size_t idx = 0; idx < vb_exp.size(); idx++) {

@@ -758,8 +758,8 @@ namespace aurostd {
 
 }
 namespace aurostd {
-  /// @class JSON
-  /// @brief unified class to read and write JSON
+  /// @namespace JSON
+  /// @brief unified namespace to read and write JSON
   ///
   /// @authors
   /// @mod{AS,2020,created JSONWriter}
@@ -767,63 +767,29 @@ namespace aurostd {
   ///
   /// Basic usage
   /// @code
-  /// aurostd::JSON jr;
-  /// jr.loadFile("testcases.json");
+  /// aurostd::JSON::object jo;
+  /// jo = aurostd::JSON::loadFile("testcases.json");
   /// // output complete file as JSON
-  /// cout << jr << endl;
+  /// cout << jo << endl;
   /// // output element
-  /// cout << jr["xvector"][3] << endl;
+  /// cout << jo["xvector"][3] << endl;
   /// // save element
-  /// xvector<double> xvd = jr["xvector"];
+  /// xvector<double> xvd = jo["xvector"];
   /// cout << xvd << endl;
   /// // save sub element
-  /// uint el_uint = jr["xvector"][3];
+  /// uint el_uint = jo["xvector"][3];
   /// cout << el_uint << endl;
   /// // cast to type
-  /// cout << (float) jr["xvector"][3] << endl;
+  /// cout << (float) jo["xvector"][3] << endl;
   /// @endcode
 
-  void JSON::clear() { *this = {}; }  // calling the constructor
-  void JSON::copy(const JSON &jr) {
-    root = jr.root;
-  }
-
-  JSON::JSON() {}
-
-  JSON::JSON(const JSON &jr) {
-    copy(jr);
-  }
-
-  JSON::~JSON() {}
-
-  const JSON &JSON::operator=(const JSON &jr) {
-    copy(jr);
-    return *this;
-  }
-
-  ostream &operator<<(ostream &os, const JSON &jr) {
-    os << jr.toString(false);
-    return os;
-  }
-
-  JSON::object &JSON::operator[](const size_t index) {
-    return root[index];
-  }
-
-  JSON::object &JSON::operator[](const std::string key) {
-    return root[key];
-  }
-
-  JSON::object &JSON::operator[](const char *key) {
-    return root[key];
-  }
 
   static inline size_t range_find(const char *content_ptr, std::pair <size_t, size_t> border, char to_find) {
     return (char *) memchr(content_ptr + border.first, to_find, border.second - border.first + 1) - content_ptr;
   }
 
 
-  std::string JSON::parse_string(const std::string &raw_content, std::pair <size_t, size_t> border) const {
+  std::string JSON::parse_string(const std::string &raw_content, std::pair <size_t, size_t> border)  {
     if (border.second == 0) {
       border.second = raw_content.size() - 1;
     }
@@ -945,7 +911,7 @@ namespace aurostd {
     }
   }
 
-  std::pair <size_t, size_t> JSON::find_strip(const std::string &raw_content, std::pair <size_t, size_t> border) const {
+  std::pair <size_t, size_t> JSON::find_strip(const std::string &raw_content, std::pair <size_t, size_t> border) {
     if (border.second == 0) border.second = raw_content.size() - 1;
     size_t start = raw_content.find_first_not_of(" \n\t\r\v\f", border.first);
     size_t end = raw_content.find_last_not_of(" \n\t\r\v\f", border.second);
@@ -953,7 +919,7 @@ namespace aurostd {
   }
 
 
-  std::pair <size_t, size_t> JSON::find_string(const std::string &raw_content, std::pair <size_t, size_t> border) const {
+  std::pair <size_t, size_t> JSON::find_string(const std::string &raw_content, std::pair <size_t, size_t> border) {
     if (border.second == 0) border.second = raw_content.size() - 1;
     size_t start = range_find(raw_content.c_str(), border, '"');
     if (start >= border.second) return {std::string::npos, std::string::npos};
@@ -967,7 +933,7 @@ namespace aurostd {
     return {start, end};
   }
 
-  std::pair <size_t, size_t> JSON::find_bracket(const std::string &raw_content, char kind_open, std::pair <size_t, size_t> border) const {
+  std::pair <size_t, size_t> JSON::find_bracket(const std::string &raw_content, char kind_open, std::pair <size_t, size_t> border) {
     char kind_close;
     switch (kind_open) {
       case '[':
@@ -1018,7 +984,7 @@ namespace aurostd {
 
   }
 
-  JSON::object JSON::parse(const std::string &raw_content, std::pair <size_t, size_t> border) const {
+  JSON::object JSON::parse(const std::string &raw_content, std::pair <size_t, size_t> border) {
     if (border.second == 0) border.second = raw_content.size() - 1;
     object result;
     result.type = object_types::NONE;
@@ -1144,25 +1110,24 @@ namespace aurostd {
         }
       }
     }
-//    cout << "result: " << obj_to_string(result) << endl;
     return result;
   }
 
-  void JSON::loadFile(const std::string &file_path) {
+  JSON::object JSON::loadFile(const std::string &file_path) {
     std::string raw_content = aurostd::file2string(file_path);
-    root = parse(raw_content);
+    return parse(raw_content);
   }
 
-  void JSON::loadString(const std::string &content) {
-    root = parse(content);
+  JSON::object JSON::loadString(const std::string &content) {
+    return parse(content);
   }
 
-  std::string JSON::toString(const bool escape) const {
+  std::string JSON::toString(const object & root, const bool escape) {
     return root.toString(true, escape);
   }
 
-  JSON::operator object() const{
-    return this->root;
+  void JSON::saveFile(const object & root, const std::string & file_path, const bool escape) {
+    aurostd::string2file(root.toString(true, escape), file_path);
   }
 
 }
