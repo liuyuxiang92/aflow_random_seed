@@ -1234,82 +1234,11 @@ namespace unittest {
     checkEqual(calculated_const_uint64, expected_uint64, check_function, check_description, passed_checks, results);
   }
 
-  inline unsigned int to_uint(char ch)
-  {
-    // EDIT: multi-cast fix as per David Hammen's comment
-    return static_cast<unsigned int>(static_cast<unsigned char>(ch));
-  }
-
-  std::string char32_to_string(char32_t cp) {
-    string out;
-    if (cp < 0x80) {
-      out += static_cast<char>(cp);
-      return out;
-    }
-
-    if (cp < 0x800) {
-      out += static_cast<char>((cp >> 6) | 0xc0);
-      out += static_cast<char>((cp & 0x3f) | 0x80);
-      return out;
-    }
-
-    if (cp < 0x10000) {
-      out += static_cast<char>((cp >> 12) | 0xe0);
-      out += static_cast<char>(((cp >> 6) & 0x3f) | 0x80);
-      out += static_cast<char>((cp & 0x3f) | 0x80);
-      return out;
-    }
-
-    {
-      out += static_cast<char>((cp >> 18) | 0xf0);
-      out += static_cast<char>(((cp >> 12) & 0x3f) | 0x80);
-      out += static_cast<char>(((cp >> 6) & 0x3f) | 0x80);
-      out += static_cast<char>((cp & 0x3f) | 0x80);
-      return out;
-    }
-  }
-
-
-  std::string test_utf8(const std::string & raw_content, std::pair <size_t, size_t> border) {
-    cout << raw_content.substr(border.first, 4) << endl;
-
-    char32_t cp = (char32_t) aurostd::string2utype<uint>(raw_content.substr(border.first, 4), 16);
-
-    if (cp < 0xd800 || cp > 0xdfff) return char32_to_string(cp);
-    else if (cp > 0xdbff) throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON parsing failed: undefined unicode character", _FILE_WRONG_FORMAT_);
-    else {
-      if (raw_content[border.first+4] == '\\' and raw_content[border.first+5] == 'u'){
-        cout << raw_content.substr(border.first+6, 4) << endl;
-        char32_t trailing_cp = (char32_t) aurostd::string2utype<uint>(raw_content.substr(border.first+6, 4), 16);
-        if (trailing_cp < 0xdc00 || trailing_cp > 0xdfff) throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON parsing failed: undefined unicode character", _FILE_WRONG_FORMAT_);
-        char32_t combo_cp = ((cp - 0xd800) << 10) + (trailing_cp - 0xdc00) + 0x10000;
-        return char32_to_string(combo_cp);
-      }
-      else throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON parsing failed: undefined unicode character", _FILE_WRONG_FORMAT_);
-    }
-  }
-
-
-
-
-
-
 
 
   void UnitTest::xparserTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
     (void) errors; // Suppress compiler warnings
 
-//    {// test while developing TODO remove
-//      long double start = aurostd::get_seconds();
-//      string file_name = "/Users/nathan/Projects/AFLOW-orig/testing/soliquidy/aflow_AlCuV.json";
-//      aurostd::JSON jr;
-//      jr.loadFile(file_name);
-//      long double duration = aurostd::get_seconds()- start;
-//      cout << "Parsing of " << file_name << " took " << duration << " seconds." << endl;
-//    }
-
-
-//    exit(0);
 
     string task_description = "Test xparsers";
     stringstream result;
@@ -1320,8 +1249,85 @@ namespace unittest {
     // Check | aurostd::JSON
     // ---------------------------------------------------------------------------
 
+    // read strings
+    // tests based on https://seriot.ch/projects/parsing_json.html
+    {
+      check_function = "JSON";
+      check_description = "test string parsing";
+      std::string string_json= "{\"1_2_3_bytes_UTF-8_sequences\": \"\\u0060\\u012a\\u12AB\", \n"
+                               "\"allowed_escapes\": \"\\\"\\\\\\/\\b\\f\\n\\r\\t\", \n"
+                               "\"pi\": \"π\", \n"
+                               "\"escaped_noncharacter\": \"\\uFFFF\", \n"
+                               "\"last_surrogates_1_and_2\": \"\\uDBFF\\uDFFF\", \n"
+                               "\"accepted_surrogate_pair\": \"\\uD801\\udc37\", \n"
+                               "\"unicode\": \"\\uA66D\", \n"
+                               "\"unicode_U+1FFFE_nonchar\": \"\\uD83F\\uDFFE\", \n"
+                               "\"backslash_and_u_escaped_zero\": \"\\\\u0000\", \n"
+                               "\"three-byte-utf-8\": \"\\u0821\", \n"
+                               "\"backslash_doublequotes\": \"\\\"\", \n"
+                               "\"uescaped_newline\": \"new\\u000Aline\", \n"
+                               "\"unicode_escaped_double_quote\": \"\\u0022\", \n"
+                               "\"double_escape_a\": \"\\\\a\", \n"
+                               "\"comments\": \"a/*b*/c/*d//e\", \n"
+                               "\"space\": \" \", \n"
+                               "\"uEscape\": \"\\u0061\\u30af\\u30EA\\u30b9\", \n"
+                               "\"unicode_U+200B_ZERO_WIDTH_SPACE\": \"\\u200B\", \n"
+                               "\"u+2028_line_sep\": \"\u2028\", \n"
+                               "\"two-byte-utf-8\": \"\\u0123\", \n"
+                               "\"unicodeEscapedBackslash\": \"\\u005C\", \n"
+                               "\"unicode_U+2064_invisible_plus\": \"\\u2064\", \n"
+                               "\"escaped_control_character\": \"\\u0012\", \n"
+                               "\"simple_ascii\": \"asd \", \n"
+                               "\"unicode_U+10FFFE_nonchar\": \"\\uDBFF\\uDFFE\", \n"
+                               "\"utf8\": \"€𝄞\", \n"
+                               "\"unescaped_char_delete\": \"\u007F\", \n"
+                               "\"surrogates_U+1D11E_MUSICAL_SYMBOL_G_CLEF\": \"\\uD834\\uDd1e\", \n"
+                               "\"double_escape_n\": \"\\\\n\", \n"
+                               "\"with_del_character\": \"a\u007Fa\", \n"
+                               "\"nonCharacterInUTF-8_U+FFFF\": \"\uFFFF\", \n"
+                               "\"accepted_surrogate_pairs\": \"\\ud83d\\ude39\\ud83d\\udc8d\", \n"
+                               "\"in_array_with_leading_space\": \"asd\", \n"
+                               "\"nonCharacterInUTF-8_U+10FFFF\": \"􏿿\", \n"
+                               "\"one-byte-utf-8\": \"\\u002c\", \n"
+                               "\"unicode_2\": \"⍂㈴⍂\", \n"
+                               "\"unicode_U+FDD0_nonchar\": \"\\uFDD0\", \n"
+                               "\"nbsp_uescaped\": \"new\\u00A0line\", \n"
+                               "\"unicode_U+FFFE_nonchar\": \"\\uFFFE\", \n"
+                               "\"reservedCharacterInUTF-8_U+1BFFF\": \"𛿿\", \n"
+                               "\"u+2029_par_sep\": \"\u2029\"}";
+
+      std::map < string, string > string_results({{"1_2_3_bytes_UTF-8_sequences", "\u0060\u012a\u12AB"},
+                                                  {"allowed_escapes", "\"\\/\b\f\n\r\t"}, {"pi", "π"}, {"escaped_noncharacter", "\uFFFF"},
+                                                  {"last_surrogates_1_and_2", "􏿿"}, {"accepted_surrogate_pair", "𐐷"},
+                                                  {"unicode", "\uA66D"}, {"unicode_U+1FFFE_nonchar", "🿾"}, {"backslash_and_u_escaped_zero", "\\u0000"},
+                                                  {"three-byte-utf-8", "\u0821"}, {"backslash_doublequotes", "\""}, {"uescaped_newline", "new\u000Aline"},
+                                                  {"unicode_escaped_double_quote", "\u0022"}, {"double_escape_a", "\\a"}, {"comments", "a/*b*/c/*d//e"},
+                                                  {"space", " "}, {"uEscape", "\u0061\u30af\u30EA\u30b9"}, {"unicode_U+200B_ZERO_WIDTH_SPACE", "\u200B"},
+                                                  {"u+2028_line_sep", " "}, {"two-byte-utf-8", "\u0123"}, {"unicodeEscapedBackslash", "\u005C"},
+                                                  {"unicode_U+2064_invisible_plus", "\u2064"}, {"escaped_control_character", "\u0012"}, {"simple_ascii", "asd "},
+                                                  {"unicode_U+10FFFE_nonchar", "􏿾"}, {"utf8", "€𝄞"}, {"unescaped_char_delete", ""},
+                                                  {"surrogates_U+1D11E_MUSICAL_SYMBOL_G_CLEF", "𝄞"}, {"double_escape_n", "\\n"},
+                                                  {"with_del_character", "aa"}, {"nonCharacterInUTF-8_U+FFFF", "￿"},
+                                                  {"accepted_surrogate_pairs", "😹💍"}, {"in_array_with_leading_space", "asd"},
+                                                  {"nonCharacterInUTF-8_U+10FFFF", "􏿿"}, {"one-byte-utf-8", "\u002c"}, {"unicode_2", "⍂㈴⍂"},
+                                                  {"unicode_U+FDD0_nonchar", "\uFDD0"}, {"nbsp_uescaped", "new\u00A0line"}, {"unicode_U+FFFE_nonchar", "\uFFFE"},
+                                                  {"reservedCharacterInUTF-8_U+1BFFF", "𛿿"}, {"u+2029_par_sep", " "}});
+
+      aurostd::JSON::object jo = aurostd::JSON::loadString(string_json);
+      bool overall_test = true;
+      for (const auto &entry: string_results) {
+        if ((string) jo[entry.first] != entry.second) {
+          check_description += "(at " + entry.first + " subtest)";
+          check(false, (string) jo[entry.first], entry.second, check_function, check_description, passed_checks,results);
+          overall_test = false;
+          break;
+        }
+      }
+      if (overall_test) check(overall_test, 0, 0, check_function, check_description, passed_checks, results);
+    }
+
     // read single numbers
-    // Tests based on https://seriot.ch/projects/parsing_json.html
+    // tests based on https://seriot.ch/projects/parsing_json.html
     {
       check_function = "JSON";
       check_description = "test number parsing (double, long long)";

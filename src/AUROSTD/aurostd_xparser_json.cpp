@@ -16,7 +16,6 @@
 
 #endif
 
-
 namespace aurostd {
 
   /// @struct JSON::object
@@ -24,6 +23,10 @@ namespace aurostd {
   ///
   /// @authors
   /// @mod{HE,20220924,created struct}
+  ///
+  /// @see
+  /// @xlink{"JSON definition",https://www.json.org/json-en.html}
+  /// @xlink{"Parsing JSON is a Minefield",https://seriot.ch/projects/parsing_json.html}
 
   /// @brief direct index access to JSON::object_types::LIST objects
   /// @param index list index
@@ -61,6 +64,13 @@ namespace aurostd {
     }
   }
 
+  /// @brief insertion operator: for creating toString
+  /// @note does not work externally - the implicit conversion of jo would interfere with the rest of the code
+  ostream &operator<<(ostream &os, const JSON::object &jo) {
+    os << jo.toString();
+    return os;
+  }
+
   /// @brief direct key access to JSON::object_types::DICTIONARY objects
   JSON::object &JSON::object::operator[](const char *key) const {
     if (this->type == JSON::object_types::DICTIONARY) {
@@ -71,20 +81,14 @@ namespace aurostd {
     }
   }
 
-  /// @brief enables the direct use of JSON::object with `cout`
-  ostream &operator<<(ostream &os, const JSON::object &so) {
-    os << so.toString();
-    return os;
-  }
-
   /// @brief converts a JSON::object into a string
   /// @param json_format if `true` add encapsulate strings in `"` (default: `true`)
-  /// @param escape if `true` escape unicode in strings - `αβγ` becomes `\u03b1\u03b2\u03b3` (default: `true`)
+  /// @param escape_unicode if `true` escape unicode in strings - `αβγ` becomes `\u03b1\u03b2\u03b3` (default: `true`)
   /// @return JSON formatted string
   ///
   /// @authors
   /// @mod{HE,20220924,created}
-  std::string JSON::object::toString(const bool json_format, const bool escape) const {
+  std::string JSON::object::toString(const bool json_format, const bool escape_unicode) const {
     bool first = true;
     stringstream result;
     switch (type) {
@@ -112,8 +116,7 @@ namespace aurostd {
         break;
       case object_types::STRING: {
         std::shared_ptr <std::string> content = std::static_pointer_cast<std::string>(obj);
-        if (json_format && escape) result << "\"" << JSON::escape_unicode(*content) << "\"";
-        else if (json_format) result << "\"" << *content << "\"";
+        if (json_format) result << "\"" << JSON::escape(*content, escape_unicode) << "\"";
         else return *content;
       }
         break;
@@ -145,6 +148,14 @@ namespace aurostd {
     return result.str();
   }
 
+  /// @brief save JSON::object to file
+  /// @param file_path path to save to
+  /// @param escape_unicode if `true` escape unicode in strings - `αβγ` becomes `\u03b1\u03b2\u03b3` (default: `true`)
+  /// @authors
+  /// @mod{HE,20221110,created}
+  void JSON::object::saveFile(const std::string & file_path, const bool escape_unicode) const {
+    aurostd::string2file(this->toString(true, escape_unicode), file_path);
+  }
 
   /// @brief change this JSON::object to a JSON::object_types::STRING
   /// @authors
@@ -325,7 +336,6 @@ namespace aurostd {
         case object_types::DICTIONARY: {
           std::shared_ptr <JSON::Dictionary> content = std::make_shared<JSON::Dictionary>();
           this->obj = content;
-          cout << "define content" << endl;
           break;
         }
         case object_types::LIST: {
@@ -354,7 +364,6 @@ namespace aurostd {
       }
     }
   }
-
 
   ///@brief assignment operator for char
   void JSON::object::operator=(const char* content) {
@@ -391,10 +400,11 @@ namespace aurostd {
   template void JSON::object::operator=(const double);
   template void JSON::object::operator=(const float);
 
+  ///@brief assignment operator for xvector
   template<class utype> void JSON::object::operator=(const xvector<utype> & content){
     fromXvector(content);
   }
-
+  // template instantiation for xvector types
   template void JSON::object::operator=(const xvector<int> &);
   template void JSON::object::operator=(const xvector<unsigned int> &);
   template void JSON::object::operator=(const xvector<long long> &);
@@ -402,11 +412,11 @@ namespace aurostd {
   template void JSON::object::operator=(const xvector<float> &);
   template void JSON::object::operator=(const xvector<double> &);
 
-
+  ///@brief assignment operator for xmatrix
   template<class utype> void JSON::object::operator=(const xmatrix<utype> & content){
     fromXmatrix(content);
   }
-
+  // template instantiation for xmatrix types
   template void JSON::object::operator=(const xmatrix<int> &);
   template void JSON::object::operator=(const xmatrix<unsigned int> &);
   template void JSON::object::operator=(const xmatrix<long long> &);
@@ -414,10 +424,11 @@ namespace aurostd {
   template void JSON::object::operator=(const xmatrix<float> &);
   template void JSON::object::operator=(const xmatrix<double> &);
 
+  ///@brief assignment operator for vector
   template<class utype> void JSON::object::operator=(const std::vector<utype> & content){
     fromVector(content);
   }
-
+  // template instantiation for vector types
   template void JSON::object::operator=(const std::vector<int> &);
   template void JSON::object::operator=(const std::vector<unsigned int> &);
   template void JSON::object::operator=(const std::vector<long long> &);
@@ -433,10 +444,11 @@ namespace aurostd {
   template void JSON::object::operator=(const std::vector<vector<double>> &);
   template void JSON::object::operator=(const std::vector<vector<std::string>> &);
 
+  ///@brief assignment operator for map
   template<class utype> void JSON::object::operator=(const std::map<std::string, utype> & content){
     fromMap(content);
   }
-
+  // template instantiation for map types (key is always a sting in JSON)
   template void JSON::object::operator=(const std::map<std::string, int> &);
   template void JSON::object::operator=(const std::map<std::string, unsigned int> &);
   template void JSON::object::operator=(const std::map<std::string, long long> &);
@@ -447,7 +459,9 @@ namespace aurostd {
   template void JSON::object::operator=(const std::map<std::string, std::vector<float>> &);
 
 
-  //conversion functions
+  ///@brief conversion function for bool
+  ///@note for LIST, DICTIONARY and STRING tests emptiness
+  ///@note for NULL returns always false
   JSON::object::operator bool() const {
     switch (type) {
       {
@@ -492,6 +506,7 @@ namespace aurostd {
     }
   }
 
+  ///@brief conversion function for double
   JSON::object::operator double() const {
     switch (type) {
       {
@@ -515,10 +530,12 @@ namespace aurostd {
     }
   }
 
+  ///@brief conversion function for float
   JSON::object::operator float() const {
     return (double) *this;
   }
 
+  ///@brief conversion function for long long
   JSON::object::operator long long() const {
     switch (type) {
       {
@@ -528,6 +545,10 @@ namespace aurostd {
         }
         case object_types::FLOAT: {
           std::shared_ptr<double> content = std::static_pointer_cast<double>(obj);
+          if (*content > std::numeric_limits<long long>::max())
+            return std::numeric_limits<long long>::lowest();
+          if (*content < std::numeric_limits<long long>::lowest())
+            return std::numeric_limits<long long>::lowest();
           return (long long) *content;
         }
         case object_types::T:
@@ -540,32 +561,39 @@ namespace aurostd {
     }
   }
 
+  ///@brief conversion function for unsigned long long
   JSON::object::operator unsigned long long() const {
     long long result = (long long) *this;
     if (result >= 0) return result;
     else throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON unsigned long long conversion failed: element is not a positive number: " + (std::string) * this, _VALUE_ILLEGAL_);
   }
 
+  ///@brief conversion function for unsigned long
   JSON::object::operator unsigned long() const {
     return (unsigned long long) *this;
   }
 
+  ///@brief conversion function for int
   JSON::object::operator unsigned int() const {
     return (unsigned long long) *this;
   }
 
+  ///@brief conversion function for long
   JSON::object::operator long() const {
     return (long long) *this;
   }
 
+  ///@brief conversion function for int
   JSON::object::operator int() const {
     return (long long) *this;
   }
 
+  ///@brief conversion function for string
   JSON::object::operator std::string() const {
     return this->toString(false, false);
   }
 
+  ///@brief conversion function for vector
   template<class utype> JSON::object::operator std::vector<utype>() const {
     if (type != object_types::LIST)
       throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON vector conversion failed: element is not a LIST: " + (std::string) * this, _VALUE_ILLEGAL_);
@@ -590,7 +618,7 @@ namespace aurostd {
     }
     return result;
   }
-
+  // template instantiation for vector types
   template JSON::object::operator std::vector<std::string>() const;
   template JSON::object::operator std::vector<double>() const;
   template JSON::object::operator std::vector<float>() const;
@@ -600,6 +628,7 @@ namespace aurostd {
   template JSON::object::operator std::vector<uint>() const;
   template JSON::object::operator std::vector<bool>() const;
 
+  ///@brief conversion function for map of JSON::object
   JSON::object::operator std::map<std::string, JSON::object> () const {
     if (type != object_types::DICTIONARY)
       throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON std::map conversion failed: element is not a DICTIONARY: " + (std::string) *this, _VALUE_ILLEGAL_);
@@ -607,6 +636,7 @@ namespace aurostd {
     return *content;
   }
 
+  ///@brief conversion function for map with type conversion
   template<class utype> JSON::object::operator std::map<std::string, utype>() const {
     if (type != object_types::DICTIONARY)
       throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON std::map conversion failed: element is not a DICTIONARY: " + (std::string) *this, _VALUE_ILLEGAL_);
@@ -632,7 +662,7 @@ namespace aurostd {
     }
     return result;
   }
-
+  // template instantiation for map types (key is always a sting in JSON)
   template JSON::object::operator std::map<std::string, std::string>() const;
   template JSON::object::operator std::map<std::string, double>() const;
   template JSON::object::operator std::map<std::string, float>() const;
@@ -642,6 +672,7 @@ namespace aurostd {
   template JSON::object::operator std::map<std::string, uint>() const;
   template JSON::object::operator std::map<std::string, bool>() const;
 
+  ///@brief conversion function for xvector
   template<class utype> JSON::object::operator aurostd::xvector<utype>() const {
     if (type != object_types::LIST)
       throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON xvector conversion failed: element is not a LIST: " + (std::string) * this, _VALUE_ILLEGAL_);
@@ -671,7 +702,7 @@ namespace aurostd {
     }
     return result;
   }
-
+  // template instantiation for xvector types
   template JSON::object::operator aurostd::xvector<double>() const;
   template JSON::object::operator aurostd::xvector<float>() const;
   template JSON::object::operator aurostd::xvector<long long>() const;
@@ -680,6 +711,7 @@ namespace aurostd {
   template JSON::object::operator aurostd::xvector<uint>() const;
   template JSON::object::operator aurostd::xvector<bool>() const;
 
+  ///@brief conversion function for xmatrix
   template<class utype> JSON::object::operator aurostd::xmatrix<utype>() const {
     if (type != object_types::LIST)
       throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON xmatrix conversion failed: element is not a LIST: " + (std::string) *this, _VALUE_ILLEGAL_);
@@ -731,7 +763,7 @@ namespace aurostd {
     }
     return result;
   }
-
+  // template instantiation for xmatrix types
   template JSON::object::operator aurostd::xmatrix<double>() const;
   template JSON::object::operator aurostd::xmatrix<float>() const;
   template JSON::object::operator aurostd::xmatrix<long long>() const;
@@ -741,38 +773,41 @@ namespace aurostd {
   template JSON::object::operator aurostd::xmatrix<bool>() const;
 
 
-  template<class utype>
-    void JSON::object::push_back(const utype content){
+  ///@brief allow to append to JSON::object_tpe::LIST
+  template<class utype> void JSON::object::push_back(const utype content){
     if (type == JSON::object_types::LIST) {
       std::shared_ptr <JSON::List> list_obj = std::static_pointer_cast<JSON::List>(obj);
       list_obj->push_back(content);
     }
     else {
       throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "push_back is just allowed for a JSON LIST ", _VALUE_ILLEGAL_);
-
     }
-
   }
+  // template instantiation for push_back (things that can be converted into JSON::object can also be used)
   template void JSON::object::push_back(const JSON::object content);
 
 
 }
 namespace aurostd {
-  /// @namespace JSON
+  /// @namespace aurostd::JSON
   /// @brief unified namespace to read and write JSON
   ///
   /// @authors
   /// @mod{AS,2020,created JSONWriter}
-  /// @mod{HE,20220924,rewrite to enable parsing}
+  /// @mod{HE,20220924,rewrite to include parsing}
   ///
-  /// Basic usage
+  /// @see
+  /// @xlink{"JSON definition",https://www.json.org/json-en.html}
+  /// @xlink{"Parsing JSON is a Minefield",https://seriot.ch/projects/parsing_json.html}
+  ///
+  /// Load data example
   /// @code
   /// aurostd::JSON::object jo;
   /// jo = aurostd::JSON::loadFile("testcases.json");
   /// // output complete file as JSON
-  /// cout << jo << endl;
-  /// // output element
-  /// cout << jo["xvector"][3] << endl;
+  /// cout << jo.toString() << endl;
+  /// // output element (alternative to .toSring())
+  /// cout << (string) jo["xvector"][3] << endl;
   /// // save element
   /// xvector<double> xvd = jo["xvector"];
   /// cout << xvd << endl;
@@ -782,13 +817,37 @@ namespace aurostd {
   /// // cast to type
   /// cout << (float) jo["xvector"][3] << endl;
   /// @endcode
+  ///
+  /// Save data example
+  /// @code
+  /// aurostd::JSON::object jo(aurostd::JSON::object_types::DICTIONARY);
+  /// jo["string"] = "Hello World";
+  /// jo["number"] = 4562318;
+  /// jo["null"] = nullptr;
+  /// jo["unicode"] = "🎃";
+  /// jo["vector"] = (vector<float>){2.3,5.6,34.6};
+  /// jo["xvector"] = (vector<double>){9.634,4.6,1E20};
+  /// cout << jo.toString() << endl;
+  /// jo.saveFile("testme.json");
+  /// // or
+  /// aurostd::JSON::saveFile(jo, "testme.json");
+  /// @endcode
 
-
+  /// @brief find a char inbetween a boundary
+  /// @param content_ptr string pointer (string.c_str())
+  /// @param border search boundary
+  /// @param to_find char to find
+  /// @return position
   static inline size_t range_find(const char *content_ptr, std::pair <size_t, size_t> border, char to_find) {
     return (char *) memchr(content_ptr + border.first, to_find, border.second - border.first + 1) - content_ptr;
   }
 
-
+  /// @brief parse JSON string
+  /// @param raw_content full json string
+  /// @param border string borders
+  /// @return c++ string
+  /// @authors
+  /// @mod{HE,20220924,created}
   std::string JSON::parse_string(const std::string &raw_content, std::pair <size_t, size_t> border)  {
     if (border.second == 0) {
       border.second = raw_content.size() - 1;
@@ -854,29 +913,64 @@ namespace aurostd {
     return result;
   }
 
-  std::string JSON::escape_unicode(const std::string & raw) {
+  ///@brief escape characters to JSON
+  std::string JSON::char_escape(const char16_t c){
+    switch(c){
+      default: return "";
+      case('"'): return "\\\"";
+      case('\\'): return "\\\\";
+      case('/'): return "\\/";
+      case('\b'): return "\\b";
+      case('\f'): return "\\f";
+      case('\n'): return "\\n";
+      case('\r'): return "\\r";
+      case('\t'): return "\\t";
+    }
+  }
+
+  /// @brief prepare string for JSON output with or without unicode escapes
+  /// @param raw string to escape
+  /// @param unicode if true escape unicode charaters (default true)
+  /// @return JSON string
+  /// @authors
+  /// @mod{HE,20221109,created}
+  std::string JSON::escape(const std::string & raw, const bool unicode) {
     std::stringstream out;
-    std::u16string utf16 = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes(raw.data());
-    for (char16_t c : utf16){
-      if (c<0x80) out << (char)c;
-      else out << "\\u"  << std::hex << std::setw(4)  << std::setfill('0') <<  c;
+    if (unicode) {
+      std::u16string utf16 = std::wstring_convert < std::codecvt_utf8_utf16 < char16_t >, char16_t > {}.from_bytes(raw.data());
+      for (char16_t c: utf16) {
+        if (c < 0x80) {
+          if (char_escape(c).empty()) out << (char) c;
+          else out << char_escape(c);
+          }
+        else out << "\\u" << std::hex << std::setw(4) << std::setfill('0') << c;
+      }
+    }
+    else {
+      for (char16_t c: raw) {
+        if (char_escape(c).empty()) out << (char) c;
+        else out << char_escape(c);
+      }
     }
     return out.str();
   }
 
+  /// @brief convert a unicode codepoint to a series of utf8 chars
+  /// @param cp 32bit codepoint
+  /// @return utf8 representation
+  /// @authors
+  /// @mod{HE,20221109,created}
   std::string JSON::char32_to_string(const char32_t cp)  {
     string out;
     if (cp < 0x80) {
       out += static_cast<char>(cp);
       return out;
     }
-
     if (cp < 0x800) {
       out += static_cast<char>((cp >> 6) | 0xc0);
       out += static_cast<char>((cp & 0x3f) | 0x80);
       return out;
     }
-
     if (cp < 0x10000) {
       out += static_cast<char>((cp >> 12) | 0xe0);
       out += static_cast<char>(((cp >> 6) & 0x3f) | 0x80);
@@ -884,15 +978,21 @@ namespace aurostd {
       return out;
     }
 
-    {
-      out += static_cast<char>((cp >> 18) | 0xf0);
-      out += static_cast<char>(((cp >> 12) & 0x3f) | 0x80);
-      out += static_cast<char>(((cp >> 6) & 0x3f) | 0x80);
-      out += static_cast<char>((cp & 0x3f) | 0x80);
-      return out;
-    }
+    out += static_cast<char>((cp >> 18) | 0xf0);
+    out += static_cast<char>(((cp >> 12) & 0x3f) | 0x80);
+    out += static_cast<char>(((cp >> 6) & 0x3f) | 0x80);
+    out += static_cast<char>((cp & 0x3f) | 0x80);
+    return out;
+
   }
 
+  /// @brief unescape JSON unicode instances
+  /// @param raw raw content string
+  /// @param pos starting position of the hex representation
+  /// @return unescaped utf8 characters
+  /// @note this function supports pairs
+  /// @authors
+  /// @mod{HE,20221109,created}
   std::string JSON::unescape_unicode(const std::string & raw, size_t & pos) {
     pos += 2;
     char32_t cp = (char32_t) aurostd::string2utype<uint>(raw.substr(pos, 4), 16);
@@ -911,6 +1011,12 @@ namespace aurostd {
     }
   }
 
+  /// @brief strip whitespaces
+  /// @param raw_content full json string
+  /// @param border working border
+  /// @return stripped raw string borders
+  /// @authors
+  /// @mod{HE,20220924,created}
   std::pair <size_t, size_t> JSON::find_strip(const std::string &raw_content, std::pair <size_t, size_t> border) {
     if (border.second == 0) border.second = raw_content.size() - 1;
     size_t start = raw_content.find_first_not_of(" \n\t\r\v\f", border.first);
@@ -918,21 +1024,40 @@ namespace aurostd {
     return {start, min(end, border.second)};
   }
 
-
+  /// @brief find the border of a JSON string
+  /// @param raw_content full json string
+  /// @param border working border
+  /// @return string borders
+  /// @authors
+  /// @mod{HE,20220924,created}
   std::pair <size_t, size_t> JSON::find_string(const std::string &raw_content, std::pair <size_t, size_t> border) {
     if (border.second == 0) border.second = raw_content.size() - 1;
     size_t start = range_find(raw_content.c_str(), border, '"');
     if (start >= border.second) return {std::string::npos, std::string::npos};
     size_t end = start;
+    uint escape_check = 0;
+    size_t escape_check_pos = 0;
     if (start == std::string::npos) return {start, end};
     do {
       end = range_find(raw_content.c_str(), {end + 1, border.second}, '"');
-    } while (raw_content[end - 1] == '\\' && (end <= border.second));
+      escape_check_pos=end-1;
+      escape_check = 0;
+      while (raw_content[escape_check_pos] == '\\' and escape_check_pos >= start){
+        escape_check++;
+        escape_check_pos--;
+      }
+    } while ((escape_check%2!=0) && (end <= border.second));
     if (end > border.second)
       throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "JSON parsing failed: string not closed", _FILE_WRONG_FORMAT_);
     return {start, end};
   }
 
+  /// @brief find the border of a encapsulated by brackets
+  /// @param raw_content full json string
+  /// @param border working border
+  /// @return bracket borders
+  /// @authors
+  /// @mod{HE,20220924,created}
   std::pair <size_t, size_t> JSON::find_bracket(const std::string &raw_content, char kind_open, std::pair <size_t, size_t> border) {
     char kind_close;
     switch (kind_open) {
@@ -951,12 +1076,12 @@ namespace aurostd {
     size_t start = raw_content.find(kind_open, border.first);
     size_t end = start;
     if (start > border.second) return {std::string::npos, std::string::npos};
-    size_t next_open;
-    size_t next_close;
+    size_t next_open=0;
+    size_t next_close=0;
     std::pair <size_t, size_t> string_section;
     size_t open_count = 1;
     do {
-//       cout <<"end: " << end << " | "  << "open: " << open_count << " | current selection: " << raw_content.substr(start, end-start+1) << endl;
+//       cerr <<"end: " << end << " | "  << "open: " << open_count << " | current selection: " << raw_content.substr(start, end-start+1) << endl;
       string_section = find_string(raw_content, {end + 1, border.second});
       next_close = range_find(raw_content.c_str(), {end + 1, border.second}, kind_close);
       next_open = range_find(raw_content.c_str(), {end + 1, border.second}, kind_open);
@@ -984,6 +1109,12 @@ namespace aurostd {
 
   }
 
+  /// @brief parse a raw JSON string
+  /// @param raw_content full json string
+  /// @param border working border
+  /// @return parsed json object
+  /// @authors
+  /// @mod{HE,20220924,created}
   JSON::object JSON::parse(const std::string &raw_content, std::pair <size_t, size_t> border) {
     if (border.second == 0) border.second = raw_content.size() - 1;
     object result;
@@ -1113,21 +1244,35 @@ namespace aurostd {
     return result;
   }
 
+  /// @brief create a JSON::object from file
+  /// @param file_path file path to load from
+  /// @return parsed JSON::object
   JSON::object JSON::loadFile(const std::string &file_path) {
     std::string raw_content = aurostd::file2string(file_path);
     return parse(raw_content);
   }
 
+  /// @brief create a JSON::object from raw string
+  /// @param content raw JSON content
+  /// @return parsed JSON::object
   JSON::object JSON::loadString(const std::string &content) {
     return parse(content);
   }
 
-  std::string JSON::toString(const object & root, const bool escape) {
-    return root.toString(true, escape);
+  /// @brief convert JSON::object to string
+  /// @param root JSON::object to convert
+  /// @param escape_unicode if true escape unicode characters
+  /// @return converted string
+  std::string JSON::toString(const object & root, const bool escape_unicode) {
+    return root.toString(true, escape_unicode);
   }
 
-  void JSON::saveFile(const object & root, const std::string & file_path, const bool escape) {
-    aurostd::string2file(root.toString(true, escape), file_path);
+  /// @brief save JSON::object to file
+  /// @param root JSON::object to save
+  /// @param file_path file path to save to
+  /// @param escape_unicode if true escape unicode characters
+  void JSON::saveFile(const object & root, const std::string & file_path, const bool escape_unicode) {
+    aurostd::string2file(root.toString(true, escape_unicode), file_path);
   }
 
 }

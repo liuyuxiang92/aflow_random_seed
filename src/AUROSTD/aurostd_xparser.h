@@ -107,7 +107,7 @@ namespace aurostd {
 //Moved from the AflowDB class
 
 namespace aurostd {
-  // JSON class for reading and writing //HE20221109
+  // JSON namespace for reading and writing //HE20221109
   namespace JSON{
     enum class object_types{ // order is important!
       DICTIONARY,
@@ -179,35 +179,25 @@ namespace aurostd {
       template<class utype> void fromXvector(const xvector<utype> & content);
       template<class utype> void fromXmatrix(const xmatrix<utype> & content);
 
-      std::string toString(const bool json_format=true, const bool escape=true) const;
+      std::string toString(const bool json_format=true, const bool escape_unicode=true) const;
+      void saveFile(const std::string & file_path, const bool escape_unicode=true) const;
+
     };
 
-//    object &operator[](const size_t index);
-//    object &operator[](const std::string key);
-//    object &operator[](const char *key);
-
-    // initializer and destructors
-//    JSON();
-//    JSON(const JSON &jr);
-//    ~JSON();
-//    explicit operator object() const;
-//    const JSON& operator=(const JSON &jr);
-//    void clear();
-
-    // shortcuts for dict and list definitions
-    typedef std::map<std::string, object> Dictionary;
-    typedef std::vector<object> List;
+    typedef std::map<std::string, object> Dictionary; ///< shortcut for JSON::object_types::DICTIONARY
+    typedef std::vector<object> List;                 ///< shortcut for JSON::object_types::LIST
 
     // unicode helper function
     std::string unescape_unicode(const std::string & raw, size_t & pos);
-    std::string escape_unicode(const std::string & raw);
+    std::string escape(const std::string & raw, const bool unicode=true);
     std::string char32_to_string(const char32_t cp);
+    std::string char_escape(const char16_t c);
 
     // basic functions
     object loadFile(const std::string & file_path);
     object loadString(const std::string & content);
-    void saveFile(const object & root, const std::string & file_path, const bool escape=true);
-    std::string toString(const object & root, const bool escape = false);
+    void saveFile(const object & root, const std::string & file_path, const bool escape_unicode=true);
+    std::string toString(const object & root, const bool escape_unicode=false);
 
     // navigation functions
     std::pair<size_t, size_t> find_string(const std::string & raw_content, std::pair<size_t, size_t> border={0,0});
@@ -217,12 +207,15 @@ namespace aurostd {
     // parser core
     object parse(const std::string &raw_content, std::pair<size_t, size_t> border={0,0});
     std::string parse_string(const std::string & raw_content, std::pair<size_t, size_t> border={0,0});
+
   };
 
-//  // enable easy interaction with cout
-//  ostream& operator<<(ostream& os, const JSON::object& so);
-//  ostream& operator<<(ostream& os, const JSON& jr);
+  // insertion operator: enable easy interaction with cout
+  ostream& operator<<(ostream& os, const JSON::object& jo);
 }
+
+
+
 
 namespace aurostd {
   vector<string> extractJsonKeysAflow(const string& json);
