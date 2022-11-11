@@ -547,7 +547,7 @@ class _outreach {
     vector<string> vauthor;
     vector<string> vcorrespondingauthor;
     string title;
-    string journal,link,arxiv,supplementary; 
+    string journal,link,arxiv,supplementary,supplementary_url;
     string place,date;
     string type;   // ARTICLE PRESENTATION_TALK PRESENTATION_SEMINAR PRESENTATION_COLLOQUIUM PRESENTATION_KEYNOTE PRESENTATION_PLENARY PRESENTATION_TUTORIAL PRESENTATION_CONTRIBUTED PRESENTATION_POSTER
     bool _isinvited;       // YES
