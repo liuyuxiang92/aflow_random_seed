@@ -45,10 +45,12 @@
   /// @note some light reminder
   ///
   /// @see
-  /// @xlink{Wikipedia Article, https://en.wikipedia.org/wiki/Polyhedron#Volume}
+  /// @xlink{Wikipedia Article, https://en.wikipedia.org/wiki/Polyhedron}
+  /// @xlink{Wikipedia Article, https://en.wikipedia.org/wiki/Polyhedron#Volume, how to calculate the volume}
   /// @xlink{http://google.com}
   /// @xlink{aurostd::xvector}
   /// @doi{10.1109/ICIP.2001.958278}
+  /// @doi{10.1038/s41578-019-0170-8, see the rock-salt structure in Fig. 2}
   ///
   /// @todo a missing piece
   template<class utype>
