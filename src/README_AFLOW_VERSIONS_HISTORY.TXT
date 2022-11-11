@@ -6,6 +6,7 @@
         -- fixed RDF function (CO)
         -- added RDF to pocc (CO)
         -- reworked reshape, shift and stack function for xvector and xmatrix (HE)
+        -- new JSON parser and writer added (HE)
         -- fixed minimum enumerated Wyckoff search to consider different lattice vector choices (DX)
         -- fixed printing of Wyckoff POSCAR in extended crystallographic data output (DX)
 3.2.13 - 2022/08/30
