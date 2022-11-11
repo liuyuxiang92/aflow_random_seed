@@ -545,9 +545,9 @@ namespace aurostd {
         }
         case object_types::FLOAT: {
           std::shared_ptr<double> content = std::static_pointer_cast<double>(obj);
-          if (*content > std::numeric_limits<long long>::max())
-            return std::numeric_limits<long long>::lowest();
-          if (*content < std::numeric_limits<long long>::lowest())
+          if (*content > (double) std::numeric_limits<long long>::max())
+            return std::numeric_limits<long long>::max();
+          if (*content < (double) std::numeric_limits<long long>::lowest())
             return std::numeric_limits<long long>::lowest();
           return (long long) *content;
         }

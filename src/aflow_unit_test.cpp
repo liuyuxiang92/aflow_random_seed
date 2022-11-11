@@ -1313,12 +1313,39 @@ namespace unittest {
                                                   {"unicode_U+FDD0_nonchar", "\uFDD0"}, {"nbsp_uescaped", "new\u00A0line"}, {"unicode_U+FFFE_nonchar", "\uFFFE"},
                                                   {"reservedCharacterInUTF-8_U+1BFFF", "𛿿"}, {"u+2029_par_sep", " "}});
 
+      std::map<string,string> escaped_results ({{"1_2_3_bytes_UTF-8_sequences","`\\u012a\\u12ab"},{"accepted_surrogate_pair","\\ud801\\udc37"},
+                                                {"accepted_surrogate_pairs","\\ud83d\\ude39\\ud83d\\udc8d"},{"allowed_escapes","\\\"\\\\\\/\\b\\f\\n\\r\\t"},
+                                                {"backslash_and_u_escaped_zero","\\\\u0000"},{"backslash_doublequotes","\\\""},{"comments","a\\/*b*\\/c\\/*d\\/\\/e"},
+                                                {"double_escape_a","\\\\a"},{"double_escape_n","\\\\n"},{"escaped_control_character",""},{"escaped_noncharacter","\\uffff"},
+                                                {"in_array_with_leading_space","asd"},{"last_surrogates_1_and_2","\\udbff\\udfff"},{"nbsp_uescaped","new\\u00a0line"},
+                                                {"nonCharacterInUTF-8_U+10FFFF","\\udbff\\udfff"},{"nonCharacterInUTF-8_U+FFFF","\\uffff"},{"one-byte-utf-8",","},
+                                                {"pi","\\u03c0"},{"reservedCharacterInUTF-8_U+1BFFF","\\ud82f\\udfff"},{"simple_ascii","asd "},{"space"," "},
+                                                {"surrogates_U+1D11E_MUSICAL_SYMBOL_G_CLEF","\\ud834\\udd1e"},{"three-byte-utf-8","\\u0821"},{"two-byte-utf-8","\\u0123"},
+                                                {"u+2028_line_sep","\\u2028"},{"u+2029_par_sep","\\u2029"},{"uEscape","a\\u30af\\u30ea\\u30b9"},
+                                                {"uescaped_newline","new\\nline"},{"unescaped_char_delete",""},{"unicode","\\ua66d"},{"unicodeEscapedBackslash","\\\\"},
+                                                {"unicode_2","\\u2342\\u3234\\u2342"},{"unicode_U+10FFFE_nonchar","\\udbff\\udffe"},{"unicode_U+1FFFE_nonchar","\\ud83f\\udffe"},
+                                                {"unicode_U+200B_ZERO_WIDTH_SPACE","\\u200b"},{"unicode_U+2064_invisible_plus","\\u2064"},
+                                                {"unicode_U+FDD0_nonchar","\\ufdd0"},{"unicode_U+FFFE_nonchar","\\ufffe"},{"unicode_escaped_double_quote","\\\""},
+                                                {"utf8","\\u20ac\\ud834\\udd1e"},{"with_del_character","aa"}});
+
       aurostd::JSON::object jo = aurostd::JSON::loadString(string_json);
       bool overall_test = true;
       for (const auto &entry: string_results) {
         if ((string) jo[entry.first] != entry.second) {
           check_description += "(at " + entry.first + " subtest)";
           check(false, (string) jo[entry.first], entry.second, check_function, check_description, passed_checks,results);
+          overall_test = false;
+          break;
+        }
+      }
+      if (overall_test) check(overall_test, 0, 0, check_function, check_description, passed_checks, results);
+
+      check_description = "test string conversion to JSON";
+      overall_test = true;
+      for (const auto &entry: escaped_results) {
+        if (jo[entry.first].toString(true, true) != "\""+entry.second+"\"") {
+          check_description += "(at " + entry.first + " subtest)";
+          check(false, (string) jo[entry.first], "\""+entry.second+"\"", check_function, check_description, passed_checks,results);
           overall_test = false;
           break;
         }
