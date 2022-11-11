@@ -7114,6 +7114,54 @@ namespace aurostd {
   }
 }
 
+// ----------------------------------------------------------------------------
+// reorder vector //CO20221111
+namespace aurostd {
+  template<class utype> // function quicksort
+    void reorder(vector<utype>& vec,vector<uint>& vorder,uint mode){	//CO20221111
+			//algorithms and discussion from here: https://stackoverflow.com/questions/838384/reorder-vector-using-a-vector-of-indices (very good!)
+			//solution by chmike
+      //reorder a vector given input indices
+      //there are two ways this can be done depending on what is inside vorder
+      //input: vec={7,5,9,6}; vorder={1,3,0,2}
+      //
+      //mode 1: ``draw the elements of vector from the position of the indices''
+      //result: {5,6,7,9}
+      //NOTE: this is the default mode
+      //
+      //mode 2: ``move elements of vector to the position of the indices''
+      //result: {9,7,6,5}
+      //NOTE: this can also be accomplished with aurostd::sort(vorder,vec) but it requires vec to be C++ type or string
+      //this function seems to run faster than aurostd::sort() as well
+			uint i=0,j=0;
+			if(mode==1){
+				for(i=0;i<vec.size()-1;i++){
+					if(vorder[i]==i){continue;}
+					for(j=i+1;j<vorder.size();j++){
+						if(vorder[j]==i){break;}
+					}
+					std::iter_swap(vec.begin()+i,vec.begin()+vorder[i]);
+					std::iter_swap(vorder.begin()+i,vorder.begin()+j);
+				}
+        return;
+      }
+      else if(mode==2) {
+				uint alt=0;
+				// for all elements to put in place
+				for(i=0;i<vec.size()-1;++i){
+					// while the element i is not yet in place 
+					while(i!=vorder[i]){
+						// swap it with the element at its final place
+						alt=vorder[i];
+            std::iter_swap(vec.begin()+i,vec.begin()+alt);
+            std::iter_swap(vorder.begin()+i,vorder.begin()+alt);
+					}
+				}
+			}
+			else{throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, "Unknown mode", _INPUT_ILLEGAL_);}
+    }
+}
+
 // ***************************************************************************
 // Function some statistical stuff
 // combinations

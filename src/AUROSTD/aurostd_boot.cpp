@@ -571,6 +571,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
     deque<uint> dui; jwui.addVector("",dui);//AS20201217
     vector<vector<uint> > vvui; jwui.addMatrix("",vvui);//AS20201217
     deque<deque<uint> > ddui; jwui.addMatrix("",ddui);//AS20201217
+    vector<aflowlib::_aflowlib_entry> ventries;aurostd::reorder(ventries,vui,1);  //CO20221111
 #endif
 #ifdef AUROSTD_INITIALIZE_FLOAT
     if(1) { // AUROSTD_INITIALIZE_FLOAT

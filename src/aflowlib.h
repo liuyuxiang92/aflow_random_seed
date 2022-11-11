@@ -297,10 +297,11 @@ namespace aflowlib {
       void correctBadDatabase(ofstream& FileMESSAGE,bool verbose=true,ostream& oss=cout);   //CO20171202 - apennsy fixes
       bool ignoreBadDatabase() const;                                                       //CO20171202 - apennsy fixes
       bool ignoreBadDatabase(string& reason) const;                                         //CO20171202 - apennsy fixes
-      string getPathAURL(ostream& oss=cout, bool load_from_common=false);                   // converts entry.aurl to url/path (common)
-      string getPathAURL(ofstream& FileMESSAGE, ostream& oss, bool load_from_common=false); // converts entry.aurl to url/path (common)
-      vector<string> getSpeciesAURL(ostream& oss);                                          //CO20210201 - extracts species from aurl
-      vector<string> getSpeciesAURL(ofstream& FileMESSAGE,ostream& oss);                    //CO20210201 - extracts species from aurl
+      string getPathAURL(ostream& oss=cout, bool load_from_common=false) const;                   // converts entry.aurl to url/path (common)
+      string getPathAURL(ofstream& FileMESSAGE, ostream& oss, bool load_from_common=false) const; // converts entry.aurl to url/path (common)
+      vector<string> getSpecies() const;                                                          //CO20221110 - extracts species from restapi
+      vector<string> getSpeciesAURL(ostream& oss) const;                                          //CO20210201 - extracts species from aurl
+      vector<string> getSpeciesAURL(ofstream& FileMESSAGE,ostream& oss) const;                    //CO20210201 - extracts species from aurl
       //ML stoich features
       void getStoichFeatures(vector<string>& vheaders,const string& e_props=_AFLOW_XELEMENT_PROPERTIES_ALL_);
       void getStoichFeatures(vector<string>& vheaders,vector<double>& vfeatures,bool vheaders_only=false,const string& e_props=_AFLOW_XELEMENT_PROPERTIES_ALL_);

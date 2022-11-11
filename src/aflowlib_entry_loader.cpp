@@ -680,7 +680,7 @@ namespace aflowlib {
       entry->el_source = source;
       if (!entry->auid.empty() && (std::find(m_auid_list.begin(),m_auid_list.end(), entry->auid) == m_auid_list.end())) {
         m_entries_flat->push_back(entry);
-        (*m_entries_layered_map)[entry->nspecies][entry->species_pp].push_back(entry);
+        (*m_entries_layered_map)[entry->nspecies][entry->species].push_back(entry);
         m_auid_list.emplace_back(entry->auid);
         if (m_xstructure_original) addXstructure(*entry, true);
         if (m_xstructure_relaxed) addXstructure(*entry);
@@ -705,7 +705,7 @@ namespace aflowlib {
       entry->el_source = source;
       if (!entry->auid.empty() && (std::find(m_auid_list.begin(),m_auid_list.end(), entry->auid) == m_auid_list.end())) {
         m_entries_flat->push_back(entry);
-        (*m_entries_layered_map)[entry->nspecies][entry->species_pp].push_back(entry);
+        (*m_entries_layered_map)[entry->nspecies][entry->species].push_back(entry);
         m_auid_list.emplace_back(entry->auid);
         if (m_xstructure_original) addXstructure(*entry, true);
         if (m_xstructure_relaxed) addXstructure(*entry);

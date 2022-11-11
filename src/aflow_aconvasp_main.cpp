@@ -9839,7 +9839,8 @@ namespace pflow {
     }
 
     vector<string> vspecies=entry.vspecies;
-    if(vspecies.empty()){vspecies=entry.getSpeciesAURL(FileMESSAGE,oss);}
+    //[CO20221110 - fails for unaries in LIB2]if(vspecies.empty()){vspecies=entry.getSpeciesAURL(FileMESSAGE,oss);}
+    if(vspecies.empty()){vspecies=entry.getSpecies();}
 
     xstructure xstrAux;
     stringstream ss;

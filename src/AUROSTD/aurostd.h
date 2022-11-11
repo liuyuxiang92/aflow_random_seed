@@ -1302,6 +1302,11 @@ namespace aurostd {   // INT
 }
 
 // ***************************************************************************
+// reorder //CO20221111
+namespace aurostd {
+  template<class utype> void reorder(vector<utype>& vec,vector<uint>& vorder,uint mode=1);
+}
+// ***************************************************************************
 // some statistical stuff
 template<class utype> utype combinations(utype n,utype k) __xprototype; // http://en.wikipedia.org/wiki/Combination
 template<class utype> utype Cnk(utype n,utype k) __xprototype; // http://en.wikipedia.org/wiki/Combination

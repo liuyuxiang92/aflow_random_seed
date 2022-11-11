@@ -337,6 +337,22 @@ namespace chull {
     bool operator() (const FacetPoint& fpi,const FacetPoint& fpj) const;
     bool operator() (const ChullPointLight& ci,const ChullPointLight& cj) const;  //upcasting is allowed, works for ChullPointLight and ChullPoint
   };
+  //[CO20221111 - VERY SLOW]struct sortLIB2Entries: public xStream { //fixes issue with AFLUX
+  //[CO20221111 - VERY SLOW]  sortLIB2Entries(const vector<string>& velements,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_velements(velements) {;}
+  //[CO20221111 - VERY SLOW]  ~sortLIB2Entries() {xStream::free();}
+  //[CO20221111 - VERY SLOW]  const vector<string>& m_velements;
+  //[CO20221111 - VERY SLOW]  bool operator() (const aflowlib::_aflowlib_entry i_entry,const aflowlib::_aflowlib_entry j_entry) const;
+  //[CO20221111 - VERY SLOW]};
+  struct _aflowlib_entry_LIB2sorting: public xStream {  //for sorting LIB2 unaries
+    _aflowlib_entry_LIB2sorting(aflowlib::_aflowlib_entry& entry,uint index,vector<string>& velements_chull,ofstream& FileMESSAGE,ostream& oss);
+    ~_aflowlib_entry_LIB2sorting();
+    //
+    aflowlib::_aflowlib_entry* m_entry; //BE CAREFUL: this is a pointer, do not use out of scope
+    uint m_index;
+    vector<string>* m_velements_chull;  //BE CAREFUL: this is a pointer, do not use out of scope
+    vector<string> m_species_AURL;
+    bool operator<(const _aflowlib_entry_LIB2sorting& other) const;
+  };
 } // namespace chull
 
 namespace chull {
