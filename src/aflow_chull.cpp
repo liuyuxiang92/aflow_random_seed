@@ -8982,6 +8982,7 @@ namespace chull {
       doc_header_TEX_ss << "\\pgfdeclarelayer{background}" << " \%HEADER" << endl;
       doc_header_TEX_ss << "\\pgfdeclarelayer{foreground}" << " \%HEADER" << endl;
       doc_header_TEX_ss << "\\pgfsetlayers{background,main,foreground}" << " \%HEADER" << endl;
+      doc_header_TEX_ss << "\\AtBeginEnvironment{tikzpicture}{\\tracinglostchars=0\\relax}" << " \%HEADER" << endl; //CO20221111 - avoids printing dumb warnings
 
       //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{L}[1]{>{\\raggedright\\arraybackslash}p{#1} }" << " \%HEADER" << endl;
       //[MOVED UP]doc_header_TEX_ss << "\\newcolumntype{C}[1]{>{\\centering  \\arraybackslash}p{#1} }" << " \%HEADER" << endl;
