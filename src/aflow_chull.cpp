@@ -182,7 +182,7 @@ namespace chull {
     aurostd::string2tokens(vpflow.getattachedscheme("PFLOW::LOAD_LIBRARY"),vlibraries,",");
     // special case, all
     if((vlibraries.size() == 1) && (vlibraries[0] == "all")) {pflow::defaultLoadEntriesFlags(vpflow, FileMESSAGE, oss, std::string("A"), false, true);}
-    else {
+    else{
       bool found=false;
       for(uint i=0,fl_size_i=vlibraries.size();i<fl_size_i;i++) {
         found = false;
@@ -197,7 +197,7 @@ namespace chull {
           pflow::defaultLoadEntriesFlags(vpflow, FileMESSAGE, oss, "ICSD", false, true);
           found = true;
         }
-        //} else {
+        //}else{
         if(!found) {
           message << "Incorrect input for loadlibraries \"" << vlibraries[i] << "\"";
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
@@ -280,14 +280,14 @@ namespace chull {
         original_input=aurostd::joinWDelimiter(velements,"");
         std::sort(velements.begin(),velements.end());velements.erase( std::unique( velements.begin(), velements.end() ), velements.end() );  //MnMnPd is same as MnPd
         if(velements.size()==nary){vinputs.push_back(aurostd::joinWDelimiter(velements,""));}  //ignore MnPd if requested ternaries
-        else {
+        else{
           if(verbose_elimination){
             message << "Ignoring degenerate (duplicate-element) input (" << original_input << ")";
             pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
           }
         }
       }
-    } else {  //simple list mode
+    }else{  //simple list mode
       aurostd::string2tokens(inputs, tokens_comma, ",");
       for(uint i=0,fl_size_i=tokens_comma.size();i<fl_size_i;i++){
         velements=aurostd::getElements(tokens_comma[i],pp_string,FileMESSAGE,true,true,false,oss);  //clean and sort, do not keep_pp  //CO20190712
@@ -296,7 +296,7 @@ namespace chull {
         original_input=aurostd::joinWDelimiter(velements,"");
         std::sort(velements.begin(),velements.end());velements.erase( std::unique( velements.begin(), velements.end() ), velements.end() );  //MnMnPd is same as MnPd
         if(velements.size()==nary){vinputs.push_back(aurostd::joinWDelimiter(velements,""));}  //ignore MnPd if requested ternaries
-        else {
+        else{
           if(verbose_elimination){
             message << "Ignoring degenerate (duplicate-element) input (" << original_input << ")";
             pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
@@ -317,7 +317,7 @@ namespace chull {
         }
         vinputs.push_back(_vinputs[i]);
       }
-    } else {std::sort(vinputs.begin(),vinputs.end());vinputs.erase( std::unique( vinputs.begin(), vinputs.end() ), vinputs.end() );}
+    }else{std::sort(vinputs.begin(),vinputs.end());vinputs.erase( std::unique( vinputs.begin(), vinputs.end() ), vinputs.end() );}
 
     message << "Total convex hull inputs: " << vinputs.size();pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
 
@@ -458,7 +458,7 @@ namespace chull {
     //        message << vauid[ia] << ": " << chull::convertUnits(vscriterion[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_)) << endl;
     //      }
     //      oss << message.str();
-    //    } else if(vpflow.flag("CHULL::JSON_DOC")){
+    //    }else if(vpflow.flag("CHULL::JSON_DOC")){
     //      vector<string> vmes;
     //      stringstream dummy;
     //      for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
@@ -466,26 +466,26 @@ namespace chull {
     //        vmes.push_back(dummy.str()); dummy.str("");
     //      }
     //      oss << aurostd::wrapString(aurostd::joinWDelimiter(vmes,","),"{","}");
-    //    } else { //.log only, but obsolete now anyway since it defaults to json
+    //    }else{ //.log only, but obsolete now anyway since it defaults to json
     //      message << "Unknown print option, only --print=text or --print=json available";
     //      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
     //      if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
     //      return false;/*Krun=false;*continue;*/
     //    }
-    //  } else {
+    //  }else{
     //    for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
     //      if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {
     //        message << vauid[ia] << " criterion = " << chull::convertUnits(vscriterion[ia], _m_) << " (meV/atom)";
     //        if(std::signbit(vscriterion[ia])) {  //-4e-13 is still negative!
     //          message << ", may NOT be on the hull (negative value)";
     //          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-    //        } else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
-    //      } else {
+    //        }else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+    //      }else{
     //        message << vauid[ia] << " criterion = " << vscriterion[ia] << " (K)";
     //        if(!std::signbit(vscriterion[ia])) {
     //          message << ", may NOT be on the hull (positive value)";
     //          pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-    //        } else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+    //        }else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
     //      }
     //    }
     //  }
@@ -643,15 +643,15 @@ namespace chull {
 
       for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
         if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << vauid[ia] << " dist2hull = " << chull::convertUnits(vdist2hull[ia], _m_) << " (meV/atom)";}
-        else {message << vauid[ia] << " dist2hull = " << vdist2hull[ia] << " (K)";}
+        else{message << vauid[ia] << " dist2hull = " << vdist2hull[ia] << " (K)";}
         if(aurostd::zeroWithinTol(vdist2hull[ia],ZERO_TOL)) {  //do not issue a warning either way, it's simply the distance
           message << ", may be on the hull";
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
-        } else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+        }else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
         //if(0&&!std::signbit(vdist2hull[ia])) {  //do not issue a warning either way, it's simply the distance
         //  message << ", may NOT be off the hull (positive value)";
         //  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-        //} else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+        //}else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
       }
 
       if(vpflow.flag("CHULL::SCREEN_ONLY")){
@@ -660,7 +660,7 @@ namespace chull {
             message << vauid[ia] << ": " << chull::convertUnits(vdist2hull[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_)) << endl;
           }
           oss << message.str();
-        } else if(vpflow.flag("CHULL::JSON_DOC")){
+        }else if(vpflow.flag("CHULL::JSON_DOC")){
           vector<string> vmes;
           stringstream dummy;
           for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
@@ -668,7 +668,7 @@ namespace chull {
             vmes.push_back(dummy.str()); dummy.str("");
           }
           oss << aurostd::wrapString(aurostd::joinWDelimiter(vmes,","),"{","}");
-        } else { //.log only, but obsolete now anyway since it defaults to json
+        }else{ //.log only, but obsolete now anyway since it defaults to json
           message << "Unknown print option, only --print=text or --print=json available";
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
@@ -711,11 +711,11 @@ namespace chull {
 
       for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
         if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << vauid[ia] << " criterion = " << chull::convertUnits(vscriterion[ia], _m_) << " (meV/atom)";}
-        else {message << vauid[ia] << " criterion = " << vscriterion[ia] << " (K)";}
+        else{message << vauid[ia] << " criterion = " << vscriterion[ia] << " (K)";}
         if(std::signbit(vscriterion[ia])) {
           message << ", may NOT be on the hull (negative value)";
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-        } else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+        }else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
       }
 
       if(vpflow.flag("CHULL::SCREEN_ONLY")){
@@ -724,7 +724,7 @@ namespace chull {
             message << vauid[ia] << ": " << chull::convertUnits(vscriterion[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_)) << endl;
           }
           oss << message.str();
-        } else if(vpflow.flag("CHULL::JSON_DOC")){
+        }else if(vpflow.flag("CHULL::JSON_DOC")){
           vector<string> vmes;
           stringstream dummy;
           for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
@@ -732,7 +732,7 @@ namespace chull {
             vmes.push_back(dummy.str()); dummy.str("");
           }
           oss << aurostd::wrapString(aurostd::joinWDelimiter(vmes,","),"{","}");
-        } else { //.log only, but obsolete now anyway since it defaults to json
+        }else{ //.log only, but obsolete now anyway since it defaults to json
           message << "Unknown print option, only --print=text or --print=json available";
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
@@ -775,11 +775,11 @@ namespace chull {
 
       for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
         if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << vauid[ia] << " n+1_enthalpy_gain = " << chull::convertUnits(vn1egain[ia], _m_) << " (meV/atom)";}
-        else {message << vauid[ia] << " n+1_enthalpy_gain = " << vn1egain[ia] << " (K)";}
+        else{message << vauid[ia] << " n+1_enthalpy_gain = " << vn1egain[ia] << " (K)";}
         if(std::signbit(vn1egain[ia])) {
           message << ", may NOT be on the hull (negative value)";
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_WARNING_);
-        } else {pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
+        }else{pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);}
       }
 
       if(vpflow.flag("CHULL::SCREEN_ONLY")){
@@ -788,7 +788,7 @@ namespace chull {
             message << vauid[ia] << ": " << chull::convertUnits(vn1egain[ia], (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_)) << endl;
           }
           oss << message.str();
-        } else if(vpflow.flag("CHULL::JSON_DOC")){
+        }else if(vpflow.flag("CHULL::JSON_DOC")){
           vector<string> vmes;
           stringstream dummy;
           for(uint ia=0,fl_size_ia=vauid.size();ia<fl_size_ia;ia++) {
@@ -796,7 +796,7 @@ namespace chull {
             vmes.push_back(dummy.str()); dummy.str("");
           }
           oss << aurostd::wrapString(aurostd::joinWDelimiter(vmes,","),"{","}");
-        } else { //.log only, but obsolete now anyway since it defaults to json
+        }else{ //.log only, but obsolete now anyway since it defaults to json
           message << "Unknown print option, only --print=text or --print=json available";
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_ERROR_);
           if(vpflow.flag("CHULL::LOG")) {FileMESSAGE.close();}
@@ -820,7 +820,7 @@ namespace chull {
       xvector<double> coords(dimension);
       aurostd::string2tokens<double>(vpflow.getattachedscheme("CHULL::HULL_FORMATION_ENTHALPY"), _coords, ",");
       for(uint j=0,fl_size_j=_coords.size();j<fl_size_j&&j<dimension;j++){coords[j+coords.lrows]=_coords[j];}
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " coords=" << coords << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " coords=" << coords << endl;}
       double dist2hull=0.0;
       //NB: to anyone who is using the convex hull object
       //outside of declaration/initialization, all functions should be wrapped
@@ -853,7 +853,7 @@ namespace chull {
         hull_energy_ss << "\": ";
         hull_energy_ss << chull::convertUnits(dist2hull, (!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")?_m_:_std_));
         oss << aurostd::wrapString(hull_energy_ss.str(),"{","}");
-      } else {
+      }else{
         //[CO20190801 - OBSOLETE]message << "hull_energy[coords=" << aurostd::joinWDelimiter(coords,",");
         //[CO20190801 - OBSOLETE]for(int j=coords.lrows;j<=coords.urows;j++){
         //[CO20190801 - OBSOLETE]  message << coords[j];
@@ -865,7 +865,7 @@ namespace chull {
         message << "hull_energy" << aurostd::wrapString("coords="+aurostd::joinWDelimiter(xvecDouble2vecString(coords,precision,true,roundoff_tol,FIXED_STREAM),","),"[","]");
         message << " = ";
         if(!vpflow.flag("CHULL::ENTROPIC_TEMPERATURE")) {message << chull::convertUnits(dist2hull, _m_) << " (meV/atom)";}
-        else {message << dist2hull << " (K)";}
+        else{message << dist2hull << " (K)";}
         pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_COMPLETE_);
       }
       return true;
@@ -954,7 +954,7 @@ namespace chull {
     if(_path.empty() || (!_path.empty() && _path[0] != '/')) {
       path = pwd + "/";
       path += _path;
-    } else {
+    }else{
       path = _path;
     }
 
@@ -1231,7 +1231,7 @@ namespace chull {
 //      dummy.m_coord_groups[i_coord_group].m_is_on_hull=true;
 //      g_state=dummy.m_coord_groups[i_coord_group].m_ref_state;
 //      dummy.m_points[g_state].m_is_g_state=true;
-//      eq_gstates=dummy.getEquivalentGStates(g_state);
+//      eq_gstates=dummy.getEquivalentEntries(g_state);
 //      if(!eq_gstates.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No equivalent states found (not even self)");}
 //      //check to make sure entry with specified auid among gstates
 //      found=false;
@@ -1287,9 +1287,9 @@ namespace chull {
 //        return false;
 //      }
 //      if(point.isUnary()){point.setHullCoords();} //set to most general coords (m_coords), this reflects relevantFacets()
-//      else {
+//      else{
 //        xvector<int> elements_present=dummy.m_naries[i_nary].m_alloys[i_alloy].m_elements_present;
-//        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " elements_present=" << elements_present << endl;}
+//        if(LDEBUG){cerr << __AFLOW_FUNC__ << " elements_present=" << elements_present << endl;}
 //        point.setHullCoords(elements_present);  //just to be sure
 //      }
 //      try{vscriterion.push_back(hull.getDistanceToHull(point));}
@@ -1359,14 +1359,14 @@ namespace chull {
 
   bool subspaceBelongs(const xvector<int>& space,const xvector<int>& subspace){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " space=" << space << endl;
       cerr << __AFLOW_FUNC__ << " subspace=" << subspace << endl;
     }
     if(subspace.rows!=space.rows){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Dimension mismatch between space and subspace");}
     if(sum(subspace)>sum(space)){return false;}  //cannot be of higher dimension
     for(int i=subspace.lrows;i<=subspace.urows;i++){if(subspace[i]==1&&space[i]==0){return false;}}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " is relevant!" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " is relevant!" << endl;}
     return true;
   }
 
@@ -1391,7 +1391,7 @@ namespace chull {
     for(int i=elements_present.lrows;i<=elements_present.urows;i++){
       if(elements_present[i]==1){relevant_indices.push_back(i);}
     }
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " relevant indices=";
       for(uint i=0,fl_size_i=relevant_indices.size();i<fl_size_i;i++){cerr << relevant_indices[i] << (i!=relevant_indices.size()-1?",":"");}
       cerr << " (elements_present=" << elements_present << ")" << endl;
@@ -1624,7 +1624,7 @@ namespace chull {
   xvector<double> ChullPoint::getTruncatedReducedCoords(const xvector<int>& elements_present,vector_reduction_type vred) const {
     if(vred==frac_vrt || vred==no_vrt){return getTruncatedSCoords(elements_present);}
     else if(vred==gcd_vrt){return getTruncatedCCoords(elements_present,true);}
-    else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown reduce mode",_INPUT_UNKNOWN_);}
+    else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown reduce mode",_INPUT_UNKNOWN_);}
     xvector<double> out;return out;
   }
 
@@ -1632,7 +1632,7 @@ namespace chull {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(!m_has_stoich_coords){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Non-stoich coordinates");}
     xvector<double> coords=getTruncatedCoords(s_coords,elements_present);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " truncated stoich for " << s_coords << " is " << coords << " (elements_present=" << elements_present << ")" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " truncated stoich for " << s_coords << " is " << coords << " (elements_present=" << elements_present << ")" << endl;}
     return coords;
   }
 
@@ -1641,11 +1641,11 @@ namespace chull {
     if(!m_has_stoich_coords){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Non-stoich coordinates");}
     xvector<double> coords=getTruncatedCoords(c_coords,elements_present);
     //DX20191125 [OBSOLETE] if(reduce){coords=aurostd::reduceByGCD(coords);}
-    //DX20191125 [OBSOLETE] if(LDEBUG) {cerr << __AFLOW_FUNC__ << " truncated " << (reduce?"reduced":"") << " comp for " << c_coords << " is " << coords << " (elements_present=" << elements_present << ")" << endl;}
+    //DX20191125 [OBSOLETE] if(LDEBUG){cerr << __AFLOW_FUNC__ << " truncated " << (reduce?"reduced":"") << " comp for " << c_coords << " is " << coords << " (elements_present=" << elements_present << ")" << endl;}
     //DX20191125 [OBSOLETE] return coords;
     xvector<double> final_coords=coords; //DX20191125
     if(reduce){ aurostd::reduceByGCD(coords, final_coords);} //DX20191125 - new form of function
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " truncated " << (reduce?"reduced":"") << " comp for " << c_coords << " is " << final_coords << " (elements_present=" << elements_present << ")" << endl;} //DX20191125 - changed coords to final_coords
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " truncated " << (reduce?"reduced":"") << " comp for " << c_coords << " is " << final_coords << " (elements_present=" << elements_present << ")" << endl;} //DX20191125 - changed coords to final_coords
     return final_coords; //DX20191125 - changed coords to final_coords
   }
 
@@ -1653,7 +1653,7 @@ namespace chull {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(!m_has_stoich_coords){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Non-stoich coordinates");}
     xvector<double> coords; aurostd::reduceByGCD(c_coords,coords,ZERO_TOL); //DX20191125 - new form of function
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " reduced comp for " << c_coords << " is " << coords << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " reduced comp for " << c_coords << " is " << coords << endl;}
     return coords;
   }
 
@@ -1682,18 +1682,18 @@ namespace chull {
   double ChullPoint::getDist2Hull(char units) const {
     if(m_dist_2_hull==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
     if(m_formation_energy_coord){return convertUnits(m_dist_2_hull,units);}
-    else {return m_dist_2_hull;}  //no unit conversions coded yet here
+    else{return m_dist_2_hull;}  //no unit conversions coded yet here
   }
   double ChullPoint::getStabilityCriterion(char units) const {
     if(m_stability_criterion==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
     if(m_formation_energy_coord){return convertUnits(m_stability_criterion,units);}
-    else {return m_stability_criterion;}  //no unit conversions coded yet here
+    else{return m_stability_criterion;}  //no unit conversions coded yet here
   }
   double ChullPoint::getRelativeStabilityCriterion() const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(m_stability_criterion==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
     if(aurostd::identical(getLastCoord(),0.0,ZERO_TOL)){return 0.0;}
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " m_stability_criterion=" << m_stability_criterion << endl;
       cerr << __AFLOW_FUNC__ << " getLastCoord()=" << getLastCoord() << endl;
     }
@@ -1702,14 +1702,14 @@ namespace chull {
   double ChullPoint::getNPlus1EnthalpyGain(char units) const {
     if(m_n_plus_1_enthalpy_gain==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
     if(m_formation_energy_coord){return convertUnits(m_n_plus_1_enthalpy_gain,units);}
-    else {return m_n_plus_1_enthalpy_gain;}  //no unit conversions coded yet here
+    else{return m_n_plus_1_enthalpy_gain;}  //no unit conversions coded yet here
   }
   double ChullPoint::getEntropyStabilizationCoefficient(char units) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(getDist2Hull()==AUROSTD_MAX_DOUBLE){return AUROSTD_MAX_DOUBLE;}
     if(getEntropyFormingAbility()==AUROSTD_NAN){return AUROSTD_MAX_DOUBLE;}
     if(aurostd::zeroWithinTol(getEntropyFormingAbility(),ZERO_TOL)){return 0.0;} //protect from division by zero
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " dist2hull=" << getDist2Hull() << endl;
       cerr << __AFLOW_FUNC__ << " EFA=" << getEntropyFormingAbility() << endl;
     }
@@ -1816,10 +1816,10 @@ namespace chull {
           remove_facet.push_back(i1);
           remove_facet.push_back(i2);
         }
-        else {
+        else{
           if (LDEBUG) cerr << __AFLOW_FUNC__ << " NO  | ";
         }
-        if (LDEBUG) {
+        if (LDEBUG){
           cerr << check_angle << " | ";
           cerr << i1 << ", " << i2 << " | ";
           for (uint k=1; k<4; k++) cerr << normals[i1][k] << ", ";
@@ -1951,7 +1951,7 @@ namespace chull {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     m_coords=coord;
     m_formation_energy_coord=formation_energy_coord;
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " m_within_half_hull=" << isWithinHalfHull(m_formation_energy_coord) << endl;}  //m_formation_energy_coord===lower_hull
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " m_within_half_hull=" << isWithinHalfHull(m_formation_energy_coord) << endl;}  //m_formation_energy_coord===lower_hull
   }
 
   void ChullPoint::setGenCoords(const vector<string>& velements,const aflowlib::_aflowlib_entry& entry,bool formation_energy_coord) {
@@ -2013,7 +2013,7 @@ namespace chull {
       }
     }
     if(formation_energy_coord){coord[coord.urows]=H_f_atom(entry);} //entry.enthalpy_formation_atom
-    else {coord[coord.urows]=entry.entropic_temperature;}  //entropic temperature is positive for stable compounds (we want upper half convex-hull)
+    else{coord[coord.urows]=entry.entropic_temperature;}  //entropic temperature is positive for stable compounds (we want upper half convex-hull)
     setGenCoords(coord,formation_energy_coord);
   }
 
@@ -2039,7 +2039,7 @@ namespace chull {
     double c_sum=0.0; //concentration sum
     xvector<double> stoich(m_coords.urows,m_coords.lrows);
     xvector<int> elements_present(m_coords.urows,m_coords.lrows);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " m_coords=" << m_coords << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " m_coords=" << m_coords << endl;}
     for(int j=m_coords.lrows;j<=m_coords.urows-1;j++){
       if(std::signbit(m_coords[j])){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Negative stoich coordinate found: aurl="+m_entry.aurl);} //no negative numbers in stoich coordinates, only energy
       stoich[j]=m_coords[j];
@@ -2069,7 +2069,7 @@ namespace chull {
   void ChullPoint::setHullCoords(const xvector<double>& coords) {h_coords=coords;}
   void ChullPoint::setHullCoords(const xvector<int>& elements_present) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " elements_present=" << elements_present << endl;
       cerr << __AFLOW_FUNC__ << " s_coords=" << s_coords << endl;
       cerr << __AFLOW_FUNC__ << " c_coords=" << c_coords << endl;
@@ -2078,7 +2078,7 @@ namespace chull {
     //vector<uint> relevant_indices=getRelevantIndices(elements_present);
     //for(uint i=0,fl_size_i=relevant_indices.size();i<fl_size_i;i++){coords[i+coords.lrows]=m_coords[relevant_indices[i]];}
     coords[coords.urows]=getLastCoord(); //overwrite last coord appropriately
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " setting h_coords=" << coords << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " setting h_coords=" << coords << endl;}
     setHullCoords(coords);
   }
 
@@ -2149,13 +2149,13 @@ namespace chull {
 
 //nice sorters for points we know sit on a thermo hull (stoich coords + energy dimension)
 namespace chull {
-  bool sortThermoPoints::operator() (const FacetPoint& fpi,const FacetPoint& fpj) const{
+  bool sortThermoPoints::operator() (const FacetPoint& fpi,const FacetPoint& fpj) const {
     const ChullPointLight& ci=fpi.ch_point;
     const ChullPointLight& cj=fpj.ch_point;
     return (*this).operator()(ci,cj);
   }
 
-  bool sortThermoPoints::operator() (const ChullPointLight& ci,const ChullPointLight& cj) const{  //upcasting is allowed, works for ChullPointLight and ChullPoint
+  bool sortThermoPoints::operator() (const ChullPointLight& ci,const ChullPointLight& cj) const {  //upcasting is allowed, works for ChullPointLight and ChullPoint
     if(!(ci.m_initialized && cj.m_initialized)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Points not initialized");}
     //do not first sort binaries from ternaries, screws up facet sorting
     //keep sorting based on concentration of elements in relative order
@@ -2173,7 +2173,7 @@ namespace chull {
     }
     return false; //true; //breaks if true
   }
-  //[CO20221111 - VERY SLOW]bool sortLIB2Entries::operator() (const aflowlib::_aflowlib_entry i_entry,const aflowlib::_aflowlib_entry j_entry) const{
+  //[CO20221111 - VERY SLOW]bool sortLIB2Entries::operator() (const aflowlib::_aflowlib_entry i_entry,const aflowlib::_aflowlib_entry j_entry) const {
   //[CO20221111 - VERY SLOW]  bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
   //[CO20221111 - VERY SLOW]  if(i_entry.catalog!=j_entry.catalog){return i_entry.catalog<j_entry.catalog;}
   //[CO20221111 - VERY SLOW]  if(i_entry.prototype!=j_entry.prototype){return i_entry.prototype<j_entry.prototype;}
@@ -2201,7 +2201,7 @@ namespace chull {
       m_species_AURL=m_entry->getSpeciesAURL(*p_FileMESSAGE,*p_oss);
     }
   _aflowlib_entry_LIB2sorting::~_aflowlib_entry_LIB2sorting(){xStream::free();m_species_AURL.clear();}
-  bool _aflowlib_entry_LIB2sorting::operator<(const _aflowlib_entry_LIB2sorting& other) const{
+  bool _aflowlib_entry_LIB2sorting::operator<(const _aflowlib_entry_LIB2sorting& other) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(m_entry->catalog!=other.m_entry->catalog){return m_entry->catalog<other.m_entry->catalog;}
     if(m_entry->prototype!=other.m_entry->prototype){return m_entry->prototype<other.m_entry->prototype;}
@@ -2300,21 +2300,21 @@ namespace chull {
     f_neighbors.clear(); for(uint i=0,fl_size_i=b.f_neighbors.size();i<fl_size_i;i++){f_neighbors.push_back(b.f_neighbors[i]);}
   }
 
-  bool ChullFacet::shareRidge(const ChullFacet& other) const{
+  bool ChullFacet::shareRidge(const ChullFacet& other) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     bool match;
     for(uint i=0,fl_size_i=m_ridges.size();i<fl_size_i;i++){
       const vector<uint>& ridge_indices1=m_ridges[i].getCHIndices();
       for(uint j=0,fl_size_j=other.m_ridges.size();j<fl_size_j;j++){
         const vector<uint>& ridge_indices2=other.m_ridges[j].getCHIndices();
-        if(LDEBUG) {
+        if(LDEBUG){
           cerr << __AFLOW_FUNC__ << " comparing ";
           for(uint ri=0,fl_size_ri=ridge_indices1.size();ri<fl_size_ri;ri++){cerr << ridge_indices1[ri] << " ";}
           cerr << " vs. ";
           for(uint rj=0,fl_size_rj=ridge_indices1.size();rj<fl_size_rj;rj++){cerr << ridge_indices2[rj] << " ";}
         }
         match=(ridge_indices1==ridge_indices2);
-        if(LDEBUG) {cerr << (match?"MATCH":"NO") << endl;}
+        if(LDEBUG){cerr << (match?"MATCH":"NO") << endl;}
         if(match){return true;}
       }
     }
@@ -2330,12 +2330,12 @@ namespace chull {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(m_vertices.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Facet has no vertices");}
     //if(!m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized facet");}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " checking if point[" << i_point << "] is on this facet" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " checking if point[" << i_point << "] is on this facet" << endl;}
     for(uint i=0,fl_size_i=m_vertices.size();i<fl_size_i;i++){
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " m_vertices[i].ch_index==" << m_vertices[i].ch_index << " ?= i_point==" << i_point << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " m_vertices[i].ch_index==" << m_vertices[i].ch_index << " ?= i_point==" << i_point << endl;}
       if(m_vertices[i].ch_index==i_point){return true;}
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " point[" << i_point << "] is not on this facet" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " point[" << i_point << "] is not on this facet" << endl;}
     return false;
   }
 
@@ -2352,17 +2352,17 @@ namespace chull {
     bool is_outside=false;
     //special case no longer needed, but we keep here just in case
     //if(m_is_vertical){
-    //  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " performing special VERTICAL facet check for outside-ness" << endl;}
+    //  if(LDEBUG){cerr << __AFLOW_FUNC__ << " performing special VERTICAL facet check for outside-ness" << endl;}
     //  xvector<double> ref=m_hull_reference;
     //  for(int i=ref.lrows;i<=ref.urows-1;i++){ref[i]=1.0/m_dim;}
-    //  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " ref=" << ref << endl;}
+    //  if(LDEBUG){cerr << __AFLOW_FUNC__ << " ref=" << ref << endl;}
     //  double dist_ref=getSignedPointPlaneDistance(point);
     //  is_outside=(std::signbit(dist_point)!=std::signbit(dist_ref) && aurostd::nonZeroWithinTol(dist_point,ZERO_TOL));
-    //  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " sign of distance indicates point is " << (is_outside?"OUTSIDE":"INSIDE") << " hull" << endl;}
+    //  if(LDEBUG){cerr << __AFLOW_FUNC__ << " sign of distance indicates point is " << (is_outside?"OUTSIDE":"INSIDE") << " hull" << endl;}
     //  return is_outside;
     //}
-    //if(LDEBUG) {cerr << __AFLOW_FUNC__ << " performing normal check for outside-ness (not vertical facet)" << endl;}
-    if(LDEBUG) {
+    //if(LDEBUG){cerr << __AFLOW_FUNC__ << " performing normal check for outside-ness (not vertical facet)" << endl;}
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " looking at facet with vertices: ";
       for(uint i=0,fl_size_i=m_vertices.size();i<fl_size_i;i++){
         cerr << m_vertices[i].ch_point.m_coords << " | ";
@@ -2373,11 +2373,11 @@ namespace chull {
     }     
     //point is on facet
     if(aurostd::zeroWithinTol(dist_point,ZERO_TOL)){
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " point appears to be right on top of facet" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " point appears to be right on top of facet" << endl;}
       return false;
     }
     is_outside=(std::signbit(dist_point));
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " sign of distance indicates point is " << (is_outside?"OUTSIDE":"INSIDE") << " hull" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " sign of distance indicates point is " << (is_outside?"OUTSIDE":"INSIDE") << " hull" << endl;}
     return is_outside;                //shortcut with inward-aligned normal
   }
 
@@ -2402,7 +2402,7 @@ namespace chull {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(!m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized facet");}
     if(m_normal.rows!=point.rows){
-      if(LDEBUG) {
+      if(LDEBUG){
         cerr << __AFLOW_FUNC__ << " normal=" << m_normal << endl;
         cerr << __AFLOW_FUNC__ << " point=" << point << endl;
       }
@@ -2411,7 +2411,7 @@ namespace chull {
     double dist=-m_offset;
     for(int i=point.lrows;i<=point.urows-1;i++){dist-=m_normal[i]*point[i];} //note that we don't go to rows (because we assume it is zero)
     dist/=m_normal[m_normal.urows];
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " point=" << point << " projected onto facet with normal=" << m_normal << " and offset=" << m_offset << endl;
       cerr << __AFLOW_FUNC__ << " dist=" << dist << endl;
     }
@@ -2473,19 +2473,19 @@ namespace chull {
     if(m_vertices.size()==0){
       m_has_stoich_coords=point.m_has_stoich_coords;
       m_formation_energy_coord=point.m_formation_energy_coord;
-      if(LDEBUG) {
+      if(LDEBUG){
         cerr << __AFLOW_FUNC__ << " setting has_stoich_coords=" << m_has_stoich_coords << endl;
         cerr << __AFLOW_FUNC__ << " setting formation_energy_coord=" << m_formation_energy_coord << endl;
       }
     }
-    else {
+    else{
       //if(m_has_stoich_coords && !point.m_has_stoich_coords)
       if(m_has_stoich_coords != point.m_has_stoich_coords) //spit warning for either mismatch
       { //CO20200106 - patching for auto-indenting
         message << "Mismatch among coord types (stoich vs. non-stoich coords), assuming non-stoich coords";
         pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         m_has_stoich_coords=false; //(m_has_stoich_coords && point.m_has_stoich_coords);
-        if(LDEBUG) {
+        if(LDEBUG){
           cerr << __AFLOW_FUNC__ << " facet.m_has_stoich_coords=" << m_has_stoich_coords << endl;
           for(uint i=0,fl_size_i=m_vertices.size();i<fl_size_i;i++){
             cerr << __AFLOW_FUNC__ << " m_vertices[" << i << "].ch_point.m_has_stoich_coords=" << m_vertices[i].ch_point.m_has_stoich_coords;
@@ -2500,7 +2500,7 @@ namespace chull {
         message << "Mismatch among coord types (formation_energy vs. non-formation_energy), assuming non-formation_energy coords";
         pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         m_formation_energy_coord=false; //(m_formation_energy_coord && point.m_formation_energy_coord);
-        if(LDEBUG) {
+        if(LDEBUG){
           cerr << __AFLOW_FUNC__ << " facet.m_formation_energy_coord=" << m_formation_energy_coord << endl;
           for(uint i=0,fl_size_i=m_vertices.size();i<fl_size_i;i++){
             cerr << __AFLOW_FUNC__ << " m_vertices[" << i << "].ch_point.m_formation_energy_coord=" << m_vertices[i].ch_point.m_formation_energy_coord;
@@ -2515,7 +2515,7 @@ namespace chull {
 
   void ChullFacet::initialize(const xvector<double>& ref,uint h_dim,bool check_validity){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " initialize facet with points: " << endl;
       for(uint i=0,fl_size_i=m_vertices.size();i<fl_size_i;i++){cerr << "    " << m_vertices[i].ch_point.h_coords << endl;}
     }
@@ -2539,14 +2539,14 @@ namespace chull {
     if(!m_vertices.size()){error="Facet has no defining points";return false;}
     for(uint i=0,fl_size_i=m_vertices.size();i<fl_size_i;i++){if(!m_vertices[i].m_initialized){error="Uninitialized facetpoint";}}
     if((uint)m_vertices[0].ch_point.h_coords.rows!=m_vertices.size()){
-      if(LDEBUG) {
+      if(LDEBUG){
         cerr << __AFLOW_FUNC__ << " m_vertices[0].ch_point.h_coords.rows=" << m_vertices[0].ch_point.h_coords.rows;
         cerr << " vs. m_vertices.size()=" << m_vertices.size() << endl;
       }
       error="Dimension mismatch among points and coordinates";return false;
     }
     for(uint i=1,fl_size_i=m_vertices.size();i<fl_size_i;i++){
-      if(LDEBUG) {
+      if(LDEBUG){
         cerr << __AFLOW_FUNC__ << " " << m_vertices[i].ch_index << "  h_coords=" << m_vertices[i].ch_point.h_coords << endl;
         cerr << __AFLOW_FUNC__ << " m_vertices[i].ch_point.h_coords.rows=" << m_vertices[i].ch_point.h_coords.rows << " vs. m_vertices[0].ch_point.h_coords.rows=" << m_vertices[0].ch_point.h_coords.rows << endl;
       }
@@ -2570,16 +2570,16 @@ namespace chull {
     xmatrix<double> B(m_vertices.size(),m_vertices.size(),1,1); //for determinant
     for(uint i=0,fl_size_i=m_vertices.size();i<fl_size_i;i++){
       for(uint k=0,fl_size_k=m_vertices.size();k<fl_size_k;k++){
-        if(LDEBUG) {
+        if(LDEBUG){
           cerr << __AFLOW_FUNC__ << "B(" << i << "+1," << k << "+1)=";
           cerr << "aurostd::modulussquare([" << m_vertices[i].ch_point.h_coords << "] - [" << m_vertices[k].ch_point.h_coords << "])" << endl;
         }
         B(i+1,k+1)=aurostd::modulussquare(m_vertices[i].ch_point.h_coords-m_vertices[k].ch_point.h_coords);
       }
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " B=" << endl; cerr << B << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " B=" << endl; cerr << B << endl;}
     double CMdetB=aurostd::CMdet(B);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " m_has_stoich_coords=" << std::boolalpha << m_has_stoich_coords << ", m_formation_energy_coord=" << std::boolalpha << m_formation_energy_coord << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " m_has_stoich_coords=" << std::boolalpha << m_has_stoich_coords << ", m_formation_energy_coord=" << std::boolalpha << m_formation_energy_coord << endl;}
     //tolerance is CRITICAL, because we could accidentally skip a facet and get the wrong decomposition coefficients (negative sign)
     //tolerance should scale with dimension, i.e., if we are measuring length of line, use TOL, area of triangle, use TOL^2, volume of tetrahedron, use TOL^3
     //it is not clear to me what TOL should be, but I believe it is related to ZERO_COEF_TOL
@@ -2588,19 +2588,19 @@ namespace chull {
     //double tol=(m_has_stoich_coords&&m_formation_energy_coord ? ZERO_COEF_TOL : ZERO_TOL);  //1e-4 if stoich coords
     double tol=ZERO_TOL;
     if((m_dim<4) && m_has_stoich_coords && m_formation_energy_coord){tol=ZERO_COEF_TOL;}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " CMdet(B)=" << CMdetB << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " CMdet(B)=" << CMdetB << endl;}
     //the coef will ONLY decrease the content (fraction)
     //if we don't check CMdetB before multiplying the coef, we might get -nan
     //therefore, use tol for both CHdetB and content
     if(aurostd::zeroWithinTol(CMdetB,tol)){return;} //error="CMdet(B) is zero, shows hyper-collinearity";
     double j=m_vertices.size()-1; //two vertices == line segment == 1-simplex
     double coef=pow(-1.0,j+1.0)/(pow(2.0,j)*pow(aurostd::factorial(j),2));
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " j=" << j << endl;
       cerr << __AFLOW_FUNC__ << " coef=" << coef << endl;
     }
     m_content=sqrt(coef*CMdetB);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " content=" << m_content << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " content=" << m_content << endl;}
     if(aurostd::zeroWithinTol(m_content,tol)){return;} //error="simplex content is zero, shows hyper-collinearity";
     m_is_hypercollinear=false;
   }
@@ -2660,7 +2660,7 @@ namespace chull {
     if(!pointsMatchDirectiveVectors(error)){return false;}
     if(!hasValidDirectiveVectors(error)){return false;} //we need to preserve neighbors, so do not kill these pseudo-facets
     if(0&&hasCollinearVectors(false)){  //we need to preserve neighbors, so do not kill these pseudo-facets
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " shows collinarity" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " shows collinarity" << endl;}
       error="Directive vectors are collinear";return false;
     }
     return true;
@@ -2671,7 +2671,7 @@ namespace chull {
     m_normal.clear();
     string error;
     if(check_validity && !isValid(error)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,error);}
-    if(LDEBUG) {
+    if(LDEBUG){
       for(uint i=0,fl_size_i=m_directive_vectors.size();i<fl_size_i;i++){
         cerr << __AFLOW_FUNC__ << " directive_vector[" << i << "]=" << m_directive_vectors[i] << endl;
       }
@@ -2679,7 +2679,7 @@ namespace chull {
     if(!m_directive_vectors.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No directive vectors calculated");}
     m_normal=aurostd::getGeneralNormal(m_directive_vectors);
     if(aurostd::zeroWithinTol(aurostd::modulus(m_normal),ZERO_TOL)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid normal calculated");}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " normal=" << m_normal << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " normal=" << m_normal << endl;}
   }
 
   void ChullFacet::setOffset(){
@@ -2694,13 +2694,13 @@ namespace chull {
     vector<xvector<double> > points;
     for(uint i=0,fl_size_i=m_vertices.size();i<fl_size_i;i++){points.push_back(m_vertices[i].ch_point.h_coords);}
     m_facet_centroid=aurostd::getCentroid(points);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " centroid: " << m_facet_centroid << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " centroid: " << m_facet_centroid << endl;}
   }
 
   //_AFLOW_CHULL_VERTICAL_PLANE_TOLERANCE_ = 1e-4 for H_f_atom, else 1e-9 for T_S
   void ChullFacet::setVertical(){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking if vertical hull: normal=" << m_normal << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking if vertical hull: normal=" << m_normal << endl;}
     double tol=(m_has_stoich_coords&&m_formation_energy_coord ? ZERO_COEF_TOL : ZERO_TOL);  //1e-4 if stoich coords
     m_is_vertical=aurostd::zeroWithinTol(m_normal[m_normal.urows],tol); //simple
   }
@@ -2714,18 +2714,18 @@ namespace chull {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     //we want normal pointing inward
     double dist=scalar_product(m_normal,m_hull_reference)+m_offset;  //point-plane distance formula without normalization
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " m_normal=" << m_normal << endl;
       cerr << __AFLOW_FUNC__ << " h_reference=" << m_hull_reference << endl;
       cerr << __AFLOW_FUNC__ << " dist=" << dist << endl;
     }
     bool negate=std::signbit(dist);
     if(negate){
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " NEGATING" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " NEGATING" << endl;}
       m_normal=-m_normal; 
       m_offset=-m_offset; //flips sign of offset
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " aligned normal=" << m_normal << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " aligned normal=" << m_normal << endl;}
   }
 
   void ChullFacet::setHemisphere() {
@@ -2738,17 +2738,17 @@ namespace chull {
     f_furthest_point.clear();
     if(!m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Facet not initialized");}
     if(!f_outside_set.size()){return;}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " getting furthest point for facet with normal " << m_normal << " (is_artificial=" << m_is_artificial << ")" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " getting furthest point for facet with normal " << m_normal << " (is_artificial=" << m_is_artificial << ")" << endl;}
     double dist=AUROSTD_MAX_DOUBLE,max_dist=0;
     for(uint i=0,fl_size_i=f_outside_set.size();i<fl_size_i;i++){
       dist=abs(getSignedPointPlaneDistance(f_outside_set[i].ch_point.h_coords)); //we only care about magnitude here
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " point=" << f_outside_set[i].ch_point.h_coords << " is " << dist << " from facet" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " point=" << f_outside_set[i].ch_point.h_coords << " is " << dist << " from facet" << endl;}
       if(dist>max_dist){
         max_dist=dist;
         f_furthest_point=f_outside_set[i];
       }
     }
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " furthest point from facet:" << endl;
       for(uint i=0,fl_size_i=m_vertices.size();i<fl_size_i;i++){cerr << "       point[" << m_vertices[i].ch_index << "]=" << m_vertices[i].ch_point.h_coords << endl;}
       cerr << "    is point[" << f_furthest_point.ch_index << "]=" << f_furthest_point.ch_point.h_coords << endl;
@@ -2769,7 +2769,7 @@ namespace chull {
     }
     std::sort(m_ridges.begin(),m_ridges.end());
 
-    if(LDEBUG) {
+    if(LDEBUG){
       for(uint i=0,fl_size_i=m_ridges.size();i<fl_size_i;i++){
         cerr << __AFLOW_FUNC__ << " ridges[" << i << "]: ";
         for(uint j=0,fl_size_j=m_ridges[i].m_vertices.size();j<fl_size_j;j++){
@@ -2881,7 +2881,7 @@ namespace chull {
       if(std::signbit(m_coords[i]) || m_coords[i]>1.0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Coord("+aurostd::utype2string(i)+") is outside of [0,1] range of a generalized stoichiometry coordinate");}
     }
     double hid_dim=1.0-sum(m_coords);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " hid_dim=" << hid_dim << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " hid_dim=" << hid_dim << endl;}
     if(std::signbit(hid_dim) || hid_dim>1.0) {
       if(aurostd::zeroWithinTol(hid_dim,ZERO_TOL)){hid_dim=0.0;}  //only zero out for the last coord, as it's derived from the subtraction of the others
       else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Coord("+aurostd::utype2string(m_coords.rows)+") is outside of [0,1] range of a generalized stoichiometry coordinate");}
@@ -2891,7 +2891,7 @@ namespace chull {
     for(int i=m_coords.lrows;i<=m_coords.urows;i++){if(aurostd::nonZeroWithinTol(m_coords[i],ZERO_TOL)){elements_present[i]=1;}}
     if(aurostd::nonZeroWithinTol(hid_dim,ZERO_TOL)){elements_present[elements_present.urows]=1;}
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " elements_present=" << elements_present << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " elements_present=" << elements_present << endl;}
     return elements_present;
   }
 
@@ -3429,7 +3429,7 @@ namespace chull {
         if(m_points[i_point].m_is_artificial){continue;}
         if(only_within_half_hull&&m_half_hull){
           if(m_points[i_point].isWithinHalfHull(m_lower_hull)){count++;}
-        } else {count++;}
+        }else{count++;}
       }
     }
     return count;
@@ -3459,7 +3459,7 @@ namespace chull {
         if(m_points[i_point].m_is_artificial){continue;}
         if(only_within_half_hull&&m_half_hull){
           if(m_points[i_point].isWithinHalfHull(m_lower_hull)){count++;}
-        } else {count++;}
+        }else{count++;}
       }
     }
     return count;
@@ -3573,7 +3573,7 @@ namespace chull {
   bool ConvexHull::isViablePoint(uint i_point) const {return i_point<m_points.size();}
   bool ConvexHull::isViableGState(uint g_state) const {return isViablePoint(g_state) && m_points[g_state].m_has_entry;}
 
-  bool ConvexHull::findPoint(const string& auid,uint& i_point) const{
+  bool ConvexHull::findPoint(const string& auid,uint& i_point) const {
     uint _i_point;
     //do NOT go through m_points, this may include some duplicates we previously excluded (now not duplicates since we are removing points: AlFe hull)
     for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
@@ -3586,7 +3586,7 @@ namespace chull {
     return false;
   }
 
-  bool ConvexHull::findPoint(const xvector<double>& coords,uint& i_point) const{
+  bool ConvexHull::findPoint(const xvector<double>& coords,uint& i_point) const {
     uint _i_point;
     //do NOT go through m_points, this may include some duplicates we previously excluded (now not duplicates since we are removing points: AlFe hull)
     for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
@@ -3598,12 +3598,12 @@ namespace chull {
     return false;
   }
 
-  bool ConvexHull::getNariesIndex(uint i_point,uint& i_nary,uint& i_alloy,uint& i_coord_group,bool redo) const{
+  bool ConvexHull::getNariesIndex(uint i_point,uint& i_nary,uint& i_alloy,uint& i_coord_group,bool redo) const {
     if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
     return getNariesIndex(m_points[i_point],i_nary,i_alloy,i_coord_group,redo);
   }
 
-  bool ConvexHull::getNariesIndex(const ChullPoint& point,uint& i_nary,uint& i_alloy,uint& i_coord_group,bool redo) const{
+  bool ConvexHull::getNariesIndex(const ChullPoint& point,uint& i_nary,uint& i_alloy,uint& i_coord_group,bool redo) const {
     if(!point.m_has_stoich_coords){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point does not have stoich coordinates");}
     return (getAlloyIndex(point,i_nary,i_alloy,redo) && getCoordGroupIndex(point,i_coord_group,redo));
   }
@@ -3668,11 +3668,11 @@ namespace chull {
 
   bool ConvexHull::getAlloyIndex(const xvector<int>& elements_present,uint& i_nary,uint& i_alloy) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " BEGIN" << endl;}
     i_nary=sum(elements_present)-1;
     if(i_nary>m_naries.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within m_naries");}
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized nary");}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " elements_present=" << elements_present << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " elements_present=" << elements_present << endl;}
     for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys.size();i<fl_size_i;i++){
       if(!m_naries[i_nary].m_alloys[i].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized alloy");}
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " m_naries[i_nary=" << i_nary << "].m_alloys[i=" << i << "].m_elements_present=" << m_naries[i_nary].m_alloys[i].m_elements_present << endl;}
@@ -3684,7 +3684,7 @@ namespace chull {
     return false;
   }
 
-  uint ConvexHull::artificialMap(uint i_point) const{
+  uint ConvexHull::artificialMap(uint i_point) const {
     if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within m_points");}
     if(!m_points[i_point].m_is_artificial){return i_point;}
     //we found an artificial point, but was it supposed to be here?
@@ -3903,7 +3903,7 @@ namespace chull {
     xvector<double> dummy(m_dim);
     if(dim!=m_dim-1){dummy[dim+dummy.lrows]=1;}
     m_points.push_back(ChullPoint(dummy,*p_FileMESSAGE,*p_oss,m_has_stoich_coords,m_formation_energy_hull,true));
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " new artificial point=" << m_points.back().m_coords << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " new artificial point=" << m_points.back().m_coords << endl;}
   }
 
   void ConvexHull::addArtificialUnaries(){for(uint i=0;i<m_dim;i++){addArtificialUnaries(i);}}
@@ -3916,7 +3916,7 @@ namespace chull {
     for(uint fl_size_i=unique_entries.size(),i=fl_size_i-1;i<fl_size_i;i--){
       const ChullPoint& point=m_points[unique_entries[i]];
       if(point.entryIdentical(entry)){
-        if(LDEBUG) {
+        if(LDEBUG){
           cerr << __AFLOW_FUNC__ << " entry[auid=" << point.m_entry.auid << ",compound=" << point.m_entry.compound << ",prototype=" << point.m_entry.prototype << "] == ";
           cerr << "entry[auid=" << entry.auid << ",compound=" << entry.compound << ",prototype=" << entry.prototype << "]" << endl;
         }
@@ -3929,7 +3929,7 @@ namespace chull {
 
   void ConvexHull::loadPoints(const string& alloy) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " initializing alloy, compound=" << alloy << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " initializing alloy, compound=" << alloy << endl;}
     vector<string> velements = aurostd::getElements(alloy, pp_string, *p_FileMESSAGE, true, true, false, *p_oss); //clean and sort, do not keep_pp  //CO20190712
     //[CO20190712 - OBSOLETE]vector<string> velements = pflow::getAlphabeticVectorString(alloy, *p_FileMESSAGE, *p_oss);
     return loadPoints(velements);
@@ -3942,7 +3942,7 @@ namespace chull {
     for(uint i=0,fl_size_i=_velements.size();i<fl_size_i;i++){velements.push_back(_velements[i]);}
     std::sort(velements.begin(),velements.end()); //safe
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " initializing velements, velements=" << aurostd::joinWDelimiter(velements,",") << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " initializing velements, velements=" << aurostd::joinWDelimiter(velements,",") << endl;}
     
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Loading raw entries from the database", m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
@@ -4050,7 +4050,7 @@ namespace chull {
     velements.clear(); for(uint i=0,fl_size_i=_velements.size();i<fl_size_i;i++){velements.push_back(_velements[i]);}
     std::sort(velements.begin(),velements.end()); //safe
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " initializing velements WITH entries, velements=" << aurostd::joinWDelimiter(velements,",") << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " initializing velements WITH entries, velements=" << aurostd::joinWDelimiter(velements,",") << endl;}
 
     m_has_stoich_coords=true;
     m_formation_energy_hull=!m_cflags.flag("CHULL::ENTROPIC_TEMPERATURE");    //energy vs. entropic_temperature hull
@@ -4075,7 +4075,7 @@ namespace chull {
       message << "No entries loaded";
       //simply always die here, we cannot grab dimensionality of hull without ANY points
       if(0&&m_cflags.flag("FORCE")){pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
-      else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message);}
+      else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message);}
     }
     return loadPoints(points,velements,m_formation_energy_hull,m_add_artificial_unaries);
   }
@@ -4083,7 +4083,7 @@ namespace chull {
   void ConvexHull::loadPoints(const vector<xvector<double> >& vcoords,bool has_stoich_coords,bool formation_energy_hull,bool add_artificial_unaries) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     vector<ChullPoint> points;
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " initializing vcoords (has_stoich_coords==" << has_stoich_coords << "), count=" << vcoords.size() << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " initializing vcoords (has_stoich_coords==" << has_stoich_coords << "), count=" << vcoords.size() << endl;}
     ChullPoint cp;
     for(uint i=0,fl_size_i=vcoords.size();i<fl_size_i;i++){
       cp.initialize(vcoords[i],*p_FileMESSAGE,*p_oss,has_stoich_coords,formation_energy_hull);
@@ -4106,7 +4106,7 @@ namespace chull {
       std::sort(m_velements.begin(),m_velements.end()); //safe
     }
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " initializing chullpoints, count=" << vpoints.size() << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " initializing chullpoints, count=" << vpoints.size() << endl;}
     for(uint i=0,fl_size_i=vpoints.size();i<fl_size_i;i++){m_points.push_back(vpoints[i]);};
     if(!m_points.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No points loaded, no way to determine dimensionality of hull");}
 
@@ -4135,7 +4135,7 @@ namespace chull {
     }
 
     if(m_half_hull && m_has_stoich_coords && m_add_artificial_unaries){m_thermo_hull=true;}
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " thermo_hull=" << m_thermo_hull << endl;
       cerr << __AFLOW_FUNC__ << " has_stoich_coords=" << m_has_stoich_coords << endl;
       cerr << __AFLOW_FUNC__ << " half_hull=" << m_half_hull << endl;
@@ -4152,7 +4152,7 @@ namespace chull {
     if(m_has_stoich_coords){for(uint i=0,fl_size_i=m_points.size();i<fl_size_i;i++){m_points[i].setStoichCoords();}} //repetita iuvant
 
     //if(0){  //do NOT resort points, keep in same order as user input
-    //  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " resorting all points (including artificial points) by coord/stoich (descending) and energy (ascending)" << endl;}
+    //  if(LDEBUG){cerr << __AFLOW_FUNC__ << " resorting all points (including artificial points) by coord/stoich (descending) and energy (ascending)" << endl;}
     //  std::sort(m_points.begin(),m_points.end());
     //}
 
@@ -4181,13 +4181,13 @@ namespace chull {
       if(m_cflags.flag("FAKE_HULL")){aurostd::StringstreamClean(message);}  //don't want to see these errors, they are expected
       else if(m_cflags.flag("CHULL::STRICT_OUTLIER_ANALYSIS")&&(!m_cflags.flag("FORCE"))){
         message << " (results may not be reliable). Terminating hull analysis.";throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_RANGE_);
-      } else {
+      }else{
         message << ", skipping outlier analysis.";pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
       }
       return;
     }
 
-    if(LDEBUG) {xvector<double> temp_eng = energies; sort(temp_eng); cerr << "lastCoords(): " << temp_eng << endl;}
+    if(LDEBUG){xvector<double> temp_eng = energies; sort(temp_eng); cerr << "lastCoords(): " << temp_eng << endl;}
     double q1,q2,q3;
     //so we sort full anyway to be completely robust, should be easy considering how we sorted before
     aurostd::getQuartiles(energies,q1,q2,q3);  //we sort in here
@@ -4198,7 +4198,7 @@ namespace chull {
       upper_anchor=q3;
       range=q3-q1;      //interquartile range, iqr
       //multiplier=3.25;  //default=1.5, but we need to be more conservative from trials
-    } else {  //absolute deviation around the median (MAD)
+    }else{  //absolute deviation around the median (MAD)
       lower_anchor=q2;
       upper_anchor=q2;
       range=aurostd::getMAD(energies,q2); //better iqr IF normal distribution, otherwise we need to know type of distribution (quartiles)
@@ -4206,7 +4206,7 @@ namespace chull {
     }
     multiplier=DEFAULT_CHULL_OUTLIER_MULTIPLIER;
 
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " lower_anchor=" << lower_anchor << ", median=" << q2 << ", upper_anchor=" << upper_anchor << ", range=" << range << endl;
     }
 
@@ -4225,7 +4225,7 @@ namespace chull {
     //bool keep_outliers=m_cflags.flag("CHULL::INCLUDE_OUTLIERS");
     bool show_warnings=true;
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " starting" << endl;}
 
     //get vector of last coords (we want to find outliers in this dimension)
     vector<double> _energies;  //vector and not xvector because we need push_back()
@@ -4281,7 +4281,7 @@ namespace chull {
     //  pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
     //  m_points.erase(m_points.begin()+outliers[i]);
     //}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " done" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " done" << endl;}
     return outliers;
   }
 
@@ -4315,17 +4315,17 @@ namespace chull {
           i_point=m_coord_groups[i_coord_group].m_points[i];
           if(!m_points[i_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
           if(m_points[i_point].isWithinHalfHull(m_lower_hull)){points_to_consider.push_back(i_point);} //!std::signbit(m_points[i_point].getLastCoord())) //positive
-          else {
+          else{
             silent=(!see_neglect && LOGGER_TYPE==_LOGGER_OPTION_);
             message << "Neglecting ";
             if(m_points[i_point].m_has_entry){message << "[auid=" << m_points[i_point].m_entry.auid << ",aurl=" << m_points[i_point].m_entry.aurl << "] ";}
-            else {message << "[i_point=" << i_point << "] ";}
+            else{message << "[i_point=" << i_point << "] ";}
             message << "from outlier analysis: entry not within " << (m_lower_hull?"lower":"upper") << " half hull";
             pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, LOGGER_TYPE, silent);
           }
         }
       }
-    } else {
+    }else{
       for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
         if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized coordgroup");}
         if(m_coord_groups[i_coord_group].getElementsPresent()!=elements_present){continue;}
@@ -4345,7 +4345,7 @@ namespace chull {
         if(m_cflags.flag("FAKE_HULL")){aurostd::StringstreamClean(message);}  //don't want to see these errors, they are expected
         else if(m_cflags.flag("CHULL::STRICT_OUTLIER_ANALYSIS")&&(!m_cflags.flag("FORCE"))){
           message << " (results may not be reliable). Terminating hull analysis.";throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_RANGE_);
-        } else {
+        }else{
           message << ", skipping outlier analysis.";pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
         }
         vector<uint> outliers;
@@ -4390,7 +4390,7 @@ namespace chull {
     if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within coordgroups");}
     if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized coordgroup");}
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " finding min/max energy point(s) for coord_group[" << i_coord_group << "]" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " finding min/max energy point(s) for coord_group[" << i_coord_group << "]" << endl;}
 
     m_coord_groups[i_coord_group].m_candidate_hull_points.clear();
     uint p_size=m_coord_groups[i_coord_group].m_points.size();
@@ -4399,9 +4399,9 @@ namespace chull {
     //the sole purpose of an artificial point is to sit on the hull, ignore all others
     uint i_point=AUROSTD_MAX_UINT;
     if(m_coord_groups[i_coord_group].m_has_artificial_unary){
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking for artificial point in coord_group[" << i_coord_group << "]" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking for artificial point in coord_group[" << i_coord_group << "]" << endl;}
       i_point=findArtificialUnary(i_coord_group);
-      if(LDEBUG) {
+      if(LDEBUG){
         cerr << __AFLOW_FUNC__ << " found artificial point in coord_group[" << i_coord_group << "]: ";
         cerr << "point[" << i_point << "]=" << m_points[i_point].m_coords << endl;
       }
@@ -4416,16 +4416,16 @@ namespace chull {
         if(aurostd::lessEqualZero(m_points[i_point].getLastCoord())) //std::signbit(m_points[i_point].getLastCoord()))
         { //CO20200106 - patching for auto-indenting
           m_coord_groups[i_coord_group].m_candidate_hull_points.push_back(i_point);
-          if(LDEBUG) {
+          if(LDEBUG){
             cerr << __AFLOW_FUNC__ << " lower half hull point found: ";
             cerr << "point[" << i_point << "]=" << m_points[i_point].m_coords << endl;
           }
         }
-      } else {
+      }else{
         if(aurostd::greaterEqualZero(m_points[i_point].getLastCoord()))  //!std::signbit(m_points[i_point].getLastCoord()))
         { //CO20200106 - patching for auto-indenting
           m_coord_groups[i_coord_group].m_candidate_hull_points.push_back(i_point);
-          if(LDEBUG) {
+          if(LDEBUG){
             cerr << __AFLOW_FUNC__ << " upper half hull point found: ";
             cerr << "point[" << i_point << "]=" << m_points[i_point].m_coords << endl;
           }
@@ -4437,7 +4437,7 @@ namespace chull {
     i_point=m_coord_groups[i_coord_group].m_points[0];        //lowest energy point
     if(!m_points[i_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
     m_coord_groups[i_coord_group].m_candidate_hull_points.push_back(i_point);
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " hull point found: ";
       cerr << "point[" << i_point << "]=" << m_points[i_point].m_coords << endl;
     }
@@ -4445,7 +4445,7 @@ namespace chull {
       i_point=m_coord_groups[i_coord_group].m_points[p_size-1];
       if(!m_points[i_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
       m_coord_groups[i_coord_group].m_candidate_hull_points.push_back(i_point);
-      if(LDEBUG) {
+      if(LDEBUG){
         cerr << __AFLOW_FUNC__ << " hull point found: ";
         cerr << "point[" << i_point << "]=" << m_points[i_point].m_coords << endl;
       }
@@ -4455,7 +4455,7 @@ namespace chull {
   void ConvexHull::organizeHullPoints() {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(!m_coord_groups.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Points have not been structured correctly");}
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " filtering points definitely NOT on the hull by energy" << endl;
       cerr << __AFLOW_FUNC__ << " only looking for min/max energy points in all coord_groups" << endl;
     }
@@ -4496,7 +4496,7 @@ namespace chull {
       std::sort(m_naries[i_nary].m_alloys.rbegin(),m_naries[i_nary].m_alloys.rend()); //descending order
     }
     std::sort(m_naries.begin(),m_naries.end());
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " m_naries.size()=" << m_naries.size() << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " m_naries.size()=" << m_naries.size() << endl;}
   }
 
   void ConvexHull::structurePoints() {
@@ -4505,14 +4505,14 @@ namespace chull {
     m_coord_groups.clear();
     m_naries.clear();
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " starting" << endl;}
 
     //NOTE, m_points is UNTOUCHED (unsorted, fully populated) input, i.e., identical input of user
     //HOWEVER, m_coord_groups[].m_points only contain indices to points that we will consider for the hull calculation, i.e., does not contain
     //any points to be neglected (requested or otherwise)
     //if you want input of the user, use m_points
     //if you want points for the hull, go through m_coord_groups
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " gathering points to neglect" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " gathering points to neglect" << endl;}
 
     bool fhsc_requested=m_cflags.flag("CHULL::CALCULATE_FAKE_HULL_STABILITY_CRITERION"); //CO20210315
     bool perform_structure_comparison=(1&&(!m_cflags.flag("CHULL::SKIP_STRUCTURE_COMPARISON"))); //(1&&!(m_cflags.flag("CHULL::SKIP_STRUCTURE_COMPARISON")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
@@ -4544,7 +4544,7 @@ namespace chull {
     bool perform_outliers_analysis=DEFAULT_CHULL_PERFORM_OUTLIER_ANALYSIS;
     bool keep_outliers=(!perform_outliers_analysis || m_cflags.flag("CHULL::INCLUDE_OUTLIERS"));
     bool remove_outliers=!keep_outliers;
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " remove_outliers=" << remove_outliers << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " remove_outliers=" << remove_outliers << endl;}
 
     vector<string> points_neglect;
     double extrema_val = 0.0;
@@ -4558,7 +4558,7 @@ namespace chull {
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
           remove_extreme=false;
         }
-      } else {
+      }else{
         if(aurostd::lessEqualZero(extrema_val)){
           message << "Ignoring remove extreme points flag -- you provided a number <= 0. T_S convex hull sits above 0";
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
@@ -4585,10 +4585,10 @@ namespace chull {
 
     //ignore bad database
     bool ignore_bad_database=(DEFAULT_CHULL_IGNORE_KNOWN_ILL_CONVERGED && !m_cflags.flag("CHULL::INCLUDE_ILL_CONVERGED"));
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " ignore_bad_database=" << ignore_bad_database << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " ignore_bad_database=" << ignore_bad_database << endl;}
 
     //organize into coordgroups
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " organizing into coordgroups" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " organizing into coordgroups" << endl;}
     vector<uint> unique_entries;
     string invalid_reason,canonical_auid;
     char LOGGER_TYPE=_LOGGER_OPTION_;
@@ -4655,7 +4655,7 @@ namespace chull {
               pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
               continue;
             }
-          } else {
+          }else{
             if(chull::T_S(entry) > extrema_val){
               message << "Neglecting [auid=" << entry.auid << ",aurl=" << entry.aurl << "]: flagged as extreme with T_S = " << chull::T_S(entry) << " (K)";
               pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
@@ -4672,7 +4672,7 @@ namespace chull {
       //comparison of stoichiometry is more general, but less reliable than composition (to within tol)
       //nevermind, vcomposition is a double anyway (in anticipation for POCC), so floating point comparisons are inevitable
       r_coords=point.getStoichiometricCoords();
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " point[" << i << "]: m_coords=" << point.m_coords << ", r_coords=" << r_coords << ", compound=\"" << point.m_entry.compound << "\", dim=" << point.m_i_nary+1 << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " point[" << i << "]: m_coords=" << point.m_coords << ", r_coords=" << r_coords << ", compound=\"" << point.m_entry.compound << "\", dim=" << point.m_i_nary+1 << endl;}
       if(!getCoordGroupIndex(r_coords,i_coord_group_sort)){
         cg.initialize(r_coords,point.m_has_stoich_coords);
         m_coord_groups.push_back(cg);
@@ -4703,7 +4703,7 @@ namespace chull {
           _outliers=getOutliers(elements_present);
           outliers.insert(outliers.end(),_outliers.begin(),_outliers.end());
         }
-      } else {outliers=getOutliers();}
+      }else{outliers=getOutliers();}
     }
 
     if(keep_outliers){
@@ -4723,21 +4723,21 @@ namespace chull {
         found_outlier=false;
         for(uint j=0,fl_size_j=outliers.size();j<fl_size_j&&!found_outlier;j++){if(i_point==outliers[j]){found_outlier=true;}}
         if(found_outlier){points_to_remove.push_back(i);} //not i_point, so I can remove this index
-        else {if(!m_points[i_point].m_is_artificial){valid_count++;}}
+        else{if(!m_points[i_point].m_is_artificial){valid_count++;}}
       }
       if(points_to_remove.size()){
         std::sort(points_to_remove.rbegin(),points_to_remove.rend()); //descending
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " before outlier removal, count = " << m_coord_groups[i_coord_group].m_points.size() << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " before outlier removal, count = " << m_coord_groups[i_coord_group].m_points.size() << endl;}
         for(uint i=0,fl_size_i=points_to_remove.size();i<fl_size_i;i++){
           i_point=m_coord_groups[i_coord_group].m_points[points_to_remove[i]];
           if(!m_points[i_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
           message << "Removing outlier ";
           if(m_points[i_point].m_has_entry){message << "auid=" << m_points[i_point].m_entry.auid;}
-          else {message << "m_coords=" << m_points[i_point].m_coords;}
+          else{message << "m_coords=" << m_points[i_point].m_coords;}
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_OPTION_);
           m_coord_groups[i_coord_group].m_points.erase(m_coord_groups[i_coord_group].m_points.begin()+points_to_remove[i]);
         }
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " after outlier removal, m_coord_groups[" << i_coord_group << "].m_points.size() = " << m_coord_groups[i_coord_group].m_points.size() << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " after outlier removal, m_coord_groups[" << i_coord_group << "].m_points.size() = " << m_coord_groups[i_coord_group].m_points.size() << endl;}
       }
     }
     message << "Employing " << valid_count << " total entries for " << pflow::arity_string(m_dim,false,false) << " convex hull analysis";
@@ -4770,11 +4770,11 @@ namespace chull {
         m_points[i_point].m_i_coord_group=i_coord_group;
       }
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " done organizing into coordgroups" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " done organizing into coordgroups" << endl;}
 
     organizeHullPoints();
 
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " coord_groups structure:" << endl;
       for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
         cerr << __AFLOW_FUNC__ << " coord_group[" << i_coord_group << "] coords=" << m_coord_groups[i_coord_group].m_coords << endl;
@@ -4788,7 +4788,7 @@ namespace chull {
     }
 
     if(m_has_stoich_coords){
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " stoich_coords found, also sorting into n-aries and alloys" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " stoich_coords found, also sorting into n-aries and alloys" << endl;}
       message << "Stoichiometric coordinates detected, structuring entries by arity";
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
@@ -4832,7 +4832,7 @@ namespace chull {
         }
       }
 
-      if(LDEBUG) {
+      if(LDEBUG){
         for(uint i_nary=0,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
           cerr << __AFLOW_FUNC__ << " " << pflow::arity_string(i_nary+1,false,false) << ":" << endl;
           for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
@@ -4852,7 +4852,7 @@ namespace chull {
         }
       }
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " done" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " done" << endl;}
   }
 
   vector<string> ConvexHull::alloyToElements(const ChullPoint& point) const {return alloyToElements(point.m_i_nary,point.m_i_alloy);}
@@ -4872,7 +4872,7 @@ namespace chull {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     stringstream message;
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " starting" << endl;}
 
     bool binary_statistics_check=m_naries.size()>1; //unary hull //true;
 
@@ -4894,7 +4894,7 @@ namespace chull {
           i_point=m_coord_groups[i_coord_group].m_points[i];
           if(!m_points[i_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
           if(m_points[i_point].m_is_artificial){found_artificial=true;}
-          else {
+          else{
             if(!found_real){i_point_real=i_point;}  //grab first i_point that's real
             found_real=true;
           }
@@ -4916,13 +4916,13 @@ namespace chull {
               message << " (please report on AFLOW Forum: aflow.org/forum)";
               if(m_cflags.flag("FAKE_HULL")){aurostd::StringstreamClean(message);}  //don't want to see these errors, they are expected
               else if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_SKEWED_HULLS")){pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
-              else {
+              else{
                 message << ". Override with --force (results may not be reliable).";
                 throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message);
               }
             }
           }
-        } else {
+        }else{
           if(!m_cflags.flag("FAKE_HULL")){
             message << "No ground-state available for";
             if(i_alloy<m_velements.size()){message << " " << m_velements[i_alloy];}
@@ -4948,7 +4948,7 @@ namespace chull {
             message << pflow::arity_string(i_nary+1,true,false) <<  " hull " << hull.str() << " is unreliable (total_entry_count=" << count << " < " << count_threshold_binaries_total << ")";
             if(m_cflags.flag("FAKE_HULL")){aurostd::StringstreamClean(message);}  //don't want to see these errors, they are expected
             else if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_UNRELIABLE_HULLS")){pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
-            else {
+            else{
               message << ". Override with --force (results may not be reliable).";
               throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message);
             }
@@ -4957,14 +4957,14 @@ namespace chull {
       }
       //BINARIES - STOP
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " done" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " done" << endl;}
   }
 
   void ConvexHull::addPointToFacet(ChullFacet& facet,uint i_point) {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
     facet.addVertex(m_points[i_point],i_point);
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " facet.m_vertices.size()=" << facet.m_vertices.size() << endl;
       for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
         cerr << facet.m_vertices[i].ch_index << "  h_coords=" << facet.m_vertices[i].ch_point.h_coords << endl;
@@ -4986,7 +4986,7 @@ namespace chull {
     uint i_point=AUROSTD_MAX_UINT;
     double extreme=-1.0;  //since it's the abs() we check below, -1 is FINE
     bool avoid=false;
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " h_points:" << endl;
       for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
         cerr << h_points[i] << "  h_coords=" << m_points[h_points[i]].h_coords << endl;
@@ -5045,7 +5045,7 @@ namespace chull {
       message << "No point found, points_to_avoid is too restrictive (points_to_avoid.size()==" << points_to_avoid.size() << ")";
       throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message.str()); message.str("");
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " i_point=" << i_point << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " i_point=" << i_point << endl;}
     return i_point;
   }
 
@@ -5059,12 +5059,12 @@ namespace chull {
     //  for(int i=h_centroid.lrows;i<=h_centroid.urows-1;i++){h_centroid[i]=0.5;}
     //  h_centroid[h_centroid.urows]=-0.01;
     //}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " centroid: " << h_centroid << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " centroid: " << h_centroid << endl;}
   }
 
   vector<FacetPoint> ConvexHull::getInitialExtremePoints() {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " start" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " start" << endl;}
     ChullFacet facet(*p_FileMESSAGE,*p_oss);  //CO20180305
     string error;
     //get first h_dim points from just the extremes, and plug into facet
@@ -5079,13 +5079,13 @@ namespace chull {
       if(facet.isPointOnFacet(h_points[i])){continue;}
       f_point.initialize(m_points[h_points[i]],h_points[i]);
       facet.f_outside_set.push_back(f_point);
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " adding to facet[" << 0 << "] outside set: " << h_points[i] << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " adding to facet[" << 0 << "] outside set: " << h_points[i] << endl;}
     }
     if(facet.f_outside_set.size()){ //in special case where there are only 2 points in 2D, we simply return facet and not simplex
       facet.setFurthestPoint();
       facet.addVertex(facet.f_furthest_point); //already have a vector<uint> in m_points, simply append and return
     }
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " building initial simplex with extreme points:" << endl;
       for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
         cerr << facet.m_vertices[i].ch_point.h_coords << endl;
@@ -5098,7 +5098,7 @@ namespace chull {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
 
     //print ridges so far
-    if(LDEBUG) {
+    if(LDEBUG){
       vector<uint> indices;
       for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){
         indices=h_facets[i].getCHIndices();
@@ -5122,7 +5122,7 @@ namespace chull {
       //can only perform this check if we have more than one h_facet, otherwise NO neighbors
       if(h_facets.size()>1&&h_facets[i].f_neighbors.size()!=h_dim){
         stringstream message;
-        if(LDEBUG) {
+        if(LDEBUG){
           cerr << __AFLOW_FUNC__ << " neighbors for facet[i_facet=" << i << ",coords=";
           for(uint j=0,fl_size_j=h_facets[i].m_vertices.size();j<fl_size_j;j++){cerr << h_facets[i].m_vertices[j].ch_point.h_coords << (j!=h_facets[i].m_vertices.size()-1?", ":"");}
           cerr << "]: ";
@@ -5134,12 +5134,12 @@ namespace chull {
         }
         message << "Neighbor count (" << h_facets[i].f_neighbors.size() << ") and facet dimension (" << h_dim << ") mismatch";
         if(0&&m_cflags.flag("FORCE")){pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}  //h_facets[i].m_is_vertical
-        else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message);}
+        else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message);}
       }
     }
     for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){std::sort(h_facets[i].f_neighbors.begin(),h_facets[i].f_neighbors.end());}
 
-    if(LDEBUG) {
+    if(LDEBUG){
       for(uint i=0,fl_size_i=h_facets.size();i<fl_size_i;i++){
         cerr << __AFLOW_FUNC__ << " neighbors for facet[i_facet=" << i << ",coords=";
         for(uint j=0,fl_size_j=h_facets[i].m_vertices.size();j<fl_size_j;j++){cerr << h_facets[i].m_vertices[j].ch_point.h_coords << (j!=h_facets[i].m_vertices.size()-1?", ":"");}
@@ -5169,13 +5169,13 @@ namespace chull {
     vector<xvector<double> > points;
     for(uint i=0,fl_size_i=initial_extreme_points.size();i<fl_size_i;i++){points.push_back(initial_extreme_points[i].ch_point.h_coords);}
     h_reference=aurostd::getCentroid(points);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " new h_reference=" << h_reference << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " new h_reference=" << h_reference << endl;}
 
     //new first facet of endpoints
 
-    if(initial_extreme_points.size()==h_dim+1){if(LDEBUG) {cerr << __AFLOW_FUNC__ << " building initial simplex" << endl;}}
-    else if(initial_extreme_points.size()==h_dim){if(LDEBUG) {cerr << __AFLOW_FUNC__ << " not enough points to build a simplex, will settle for a facet instead" << endl;}}
-    else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Not enough points to construct initial simplex/facet");}
+    if(initial_extreme_points.size()==h_dim+1){if(LDEBUG){cerr << __AFLOW_FUNC__ << " building initial simplex" << endl;}}
+    else if(initial_extreme_points.size()==h_dim){if(LDEBUG){cerr << __AFLOW_FUNC__ << " not enough points to build a simplex, will settle for a facet instead" << endl;}}
+    else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Not enough points to construct initial simplex/facet");}
 
     //get dim combos of points
     string error;
@@ -5185,7 +5185,7 @@ namespace chull {
       //remember, indices are NOT the indices themselves, but a place holder as to whether to include the number at the index
       //e.g., indices==1,1,0; therefore, include indices 0,1
       indices=xc.getCombo();
-      if(LDEBUG) {
+      if(LDEBUG){
         cerr << __AFLOW_FUNC__ << " indices=";
         for(uint i=0,fl_size_i=indices.size();i<fl_size_i;i++){cerr << indices[i] << (i!=indices.size()-1?",":"");}
         cerr << endl;
@@ -5194,39 +5194,39 @@ namespace chull {
       for(uint i=0,fl_size_i=indices.size();i<fl_size_i;i++){
         if(indices[i]==1){h_facets.back().addVertex(initial_extreme_points[i]);}
       }
-      if(LDEBUG) {
+      if(LDEBUG){
         cerr << __AFLOW_FUNC__ << " initial facet[" << h_facets.size() << "] new point[" << h_facets.back().m_vertices.size() << "] ";
         cerr << "coords=" << m_points[h_facets.back().m_vertices.back().ch_index].h_coords << endl;
       }
       if(!h_facets.back().isValid(error)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"An initial facet cannot be created, invalid points input: "+error);}
       initializeFacet(h_facets.back(),false); //already validated
     }
-    if(initial_extreme_points.size()==h_dim+1){if(LDEBUG) {cerr << __AFLOW_FUNC__ << " initial simplex built" << endl;}}
-    else if(initial_extreme_points.size()==h_dim){if(LDEBUG) {cerr << __AFLOW_FUNC__ << " initial (single) facet built" << endl;}}
-    else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Not enough points to construct initial simplex/facet");}
+    if(initial_extreme_points.size()==h_dim+1){if(LDEBUG){cerr << __AFLOW_FUNC__ << " initial simplex built" << endl;}}
+    else if(initial_extreme_points.size()==h_dim){if(LDEBUG){cerr << __AFLOW_FUNC__ << " initial (single) facet built" << endl;}}
+    else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Not enough points to construct initial simplex/facet");}
 
     //if net distance, then it must be outside hull
     bool associated;
     FacetPoint f_point;
     for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
       associated=false;
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " associating point[" << h_points[i] << "] to a facet's outside set" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " associating point[" << h_points[i] << "] to a facet's outside set" << endl;}
       f_point.initialize(m_points[h_points[i]],h_points[i]);
       for(uint i_facet=0,fl_size_i_facet=h_facets.size();i_facet<fl_size_i_facet && !associated;i_facet++){
         if(h_facets[i_facet].isPointOnFacet(f_point)){associated=true;} //skip the obvious
         if(!associated && h_facets[i_facet].isPointOutside(f_point)){
           h_facets[i_facet].f_outside_set.push_back(f_point);
           associated=true;
-          if(LDEBUG) {cerr << __AFLOW_FUNC__ << " associating point[" << h_points[i] << "] with facet[" << i_facet << "].f_outside_set" << endl;}
+          if(LDEBUG){cerr << __AFLOW_FUNC__ << " associating point[" << h_points[i] << "] with facet[" << i_facet << "].f_outside_set" << endl;}
         }
       }
       if(!associated){
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " NOT associating point[" << h_points[i] << "] with any facet outside set" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " NOT associating point[" << h_points[i] << "] with any facet outside set" << endl;}
       }
     }
     //get furthest point
     for(uint i_facet=0,fl_size_i_facet=h_facets.size();i_facet<fl_size_i_facet;i_facet++){
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " facet[" << i_facet << "] has " << h_facets[i_facet].f_outside_set.size() << " outside points" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " facet[" << i_facet << "] has " << h_facets[i_facet].f_outside_set.size() << " outside points" << endl;}
       h_facets[i_facet].setFurthestPoint();
     }
     setNeighbors();
@@ -5259,7 +5259,7 @@ namespace chull {
       //the neighbors of a facet do not change here
     }
 
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " visible facets for facet[" << i_facet << "]: ";
       for(uint i=0,fl_size_i=h_visible_facets.size();i<fl_size_i;i++){cerr << h_visible_facets[i] << " ";}
       cerr << endl;
@@ -5286,7 +5286,7 @@ namespace chull {
       }
     }
 
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " horizon ridges: ";
       for(uint i=0,fl_size_i=h_horizon_ridges.size();i<fl_size_i;i++){
         for(uint j=0,fl_size_j=h_horizon_ridges[i].m_vertices.size();j<fl_size_j;j++){
@@ -5306,24 +5306,24 @@ namespace chull {
     for(uint i=0,fl_size_i=h_horizon_ridges.size();i<fl_size_i;i++){
       //check obvious
       if(h_horizon_ridges[i].isPointOnFacet(furthest_point)){
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " skipping new facet: duplicate point" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " skipping new facet: duplicate point" << endl;}
         continue;
       }
       h_horizon_ridges[i].addVertex(furthest_point);
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " furthest point for new facet: " << furthest_point.ch_index << " " << m_points[furthest_point.ch_index].h_coords << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " furthest point for new facet: " << furthest_point.ch_index << " " << m_points[furthest_point.ch_index].h_coords << endl;}
       if(!h_horizon_ridges[i].isValid(error)){  //corner case, happens when creating new facets on edges or corners of hull
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " skipping new facet: " << error << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " skipping new facet: " << error << endl;}
         continue;
       }
       initializeFacet(h_horizon_ridges[i],false); //already validated
       h_facets.push_back(h_horizon_ridges[i]);
-      if(LDEBUG) {
+      if(LDEBUG){
         cerr << __AFLOW_FUNC__ << " new facet: ";
         for(uint j=0,fl_size_j=h_facets.back().m_vertices.size();j<fl_size_j;j++){cerr << m_points[h_facets.back().m_vertices[j].ch_index].h_coords << " | ";}
         cerr << endl;
       }
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " " << h_facets.size()-old_facet_count << " new facets" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " " << h_facets.size()-old_facet_count << " new facets" << endl;}
     return h_facets.size()-old_facet_count;
     //do neighbors at the end!
   }
@@ -5338,19 +5338,19 @@ namespace chull {
       for(uint j=0,fl_size_j=h_facets[i_visible].f_outside_set.size();j<fl_size_j;j++){
         FacetPoint& f_point=h_facets[i_visible].f_outside_set[j];
         associated=false;
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " re-associating point[" << f_point.ch_index << "] with a new facet" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " re-associating point[" << f_point.ch_index << "] with a new facet" << endl;}
         for(uint fl_size_i_facet=h_facets.size(),i_facet=fl_size_i_facet-new_facet_count;i_facet<fl_size_i_facet&&!associated;i_facet++){
           if(h_facets[i_facet].isPointOnFacet(f_point)){associated=true;} //skip the obvious
           if(!associated && h_facets[i_facet].isPointOutside(f_point)){
             h_facets[i_facet].f_outside_set.push_back(f_point);
             associated=true;
-            if(LDEBUG) {cerr << __AFLOW_FUNC__ << " associating point[" << f_point.ch_index << "] with facet[" << i_facet << "].f_outside_set" << endl;}
+            if(LDEBUG){cerr << __AFLOW_FUNC__ << " associating point[" << f_point.ch_index << "] with facet[" << i_facet << "].f_outside_set" << endl;}
           }
         }
       }
     }
     for(uint fl_size_i_facet=h_facets.size(),i_facet=fl_size_i_facet-new_facet_count;i_facet<fl_size_i_facet;i_facet++){
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " NEW facet[" << i_facet << "] has " << h_facets[i_facet].f_outside_set.size() << " outside points" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " NEW facet[" << i_facet << "] has " << h_facets[i_facet].f_outside_set.size() << " outside points" << endl;}
       h_facets[i_facet].setFurthestPoint();
     }
   }
@@ -5365,7 +5365,7 @@ namespace chull {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     std::sort(h_points.begin(),h_points.end());h_points.erase( std::unique( h_points.begin(), h_points.end() ), h_points.end() );  //first remove duplicate indices
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " starting" << endl;}
     vector<uint> indices_2_remove;
     for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
       for(uint j=i+1,fl_size_j=h_points.size();j<fl_size_j;j++){
@@ -5374,14 +5374,14 @@ namespace chull {
         }
       }
     }
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " removing points: ";
       for(uint i=0,fl_size_i=indices_2_remove.size();i<fl_size_i;i++){cerr << indices_2_remove[i] << " ";}
       cerr << endl;
     }
     std::sort(indices_2_remove.rbegin(),indices_2_remove.rend()); //descending
     for(uint i=0,fl_size_i=indices_2_remove.size();i<fl_size_i;i++){h_points.erase(h_points.begin()+indices_2_remove[i]);}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " done" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " done" << endl;}
   }
 
   void ConvexHull::calculateFacets() {
@@ -5397,7 +5397,7 @@ namespace chull {
       if((uint)m_points[h_points[i]].h_coords.rows!=h_dim){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid initialization of hull coordinates");}
     }
 
-    if(LDEBUG) {
+    if(LDEBUG){
       for(uint i=0,fl_size_i=h_points.size();i<fl_size_i;i++){
         cerr << __AFLOW_FUNC__ << " m_coords=" << m_points[h_points[i]].m_coords << "; h_coords=" << m_points[h_points[i]].h_coords << endl; //<< "; relevant " << m_points[h_points[i]].isRelevantPoint(elements_present) << endl;
       }
@@ -5434,7 +5434,7 @@ namespace chull {
     }
     std::sort(h_facets.begin(),h_facets.end(),sortFacetsByPoints(m_points));  //auto sort
 
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " hull points:" << endl;
       for(uint i_facet=0,fl_size_i_facet=h_facets.size();i_facet<fl_size_i_facet;i_facet++){
         cerr << __AFLOW_FUNC__ << " facet " << i_facet << ": ";
@@ -5499,7 +5499,7 @@ namespace chull {
   void ConvexHull::addLowerDimensionPointsToHullCalculation(uint i_nary_max){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(i_nary_max>m_naries.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within m_naries");}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " starting" << endl;}
     //grab from m_naries[i_nary].m_alloys[i_alloy].m_facets
     //we already added unaries, so there will be duplicates, but we safely remove in calculateFacets()
     //don't worry about this yet
@@ -5521,7 +5521,7 @@ namespace chull {
         }
       }
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " done" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " done" << endl;}
   }
 
   void ConvexHull::addPointToHullCalculation(uint i_point){
@@ -5541,7 +5541,7 @@ namespace chull {
     if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within m_naries");}
     if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized nary");}
     if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized alloy");}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " starting" << endl;}
     h_points.clear();
     addRelevantUnariesToHullCalculation(i_nary,i_alloy);
     addLowerDimensionPointsToHullCalculation(i_nary); //don't worry about adding unary duplicates, we remove them robustly in calculateFacets()
@@ -5555,7 +5555,7 @@ namespace chull {
         addPointToHullCalculation(i_point,m_naries[i_nary].m_alloys[i_alloy].m_elements_present);
       }
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " done" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " done" << endl;}
   }
 
   void ConvexHull::preparePointsForHullCalculation() {
@@ -5573,14 +5573,14 @@ namespace chull {
     }
   }
 
-  uint ConvexHull::getNearestFacetVertically(const vector<uint>& i_facets,const ChullPoint& point) const{
+  uint ConvexHull::getNearestFacetVertically(const vector<uint>& i_facets,const ChullPoint& point) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(!point.m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized point");}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " m_coords=" << point.m_coords << ", h_coords=" << point.h_coords << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " m_coords=" << point.m_coords << ", h_coords=" << point.h_coords << endl;}
     return getNearestFacetVertically(i_facets,point.h_coords);
   }
 
-  uint ConvexHull::getNearestFacetVertically(const vector<uint>& i_facets,const xvector<double>& point) const{
+  uint ConvexHull::getNearestFacetVertically(const vector<uint>& i_facets,const xvector<double>& point) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     //determines nearness by vertical distance
     uint i_facet = 0, i_facet_min = 0;
@@ -5597,7 +5597,7 @@ namespace chull {
         i_facet_artificial=i_facet;
         continue;
       }
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking at facet[" << i_facet << "]" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking at facet[" << i_facet << "]" << endl;}
       vdist=abs(facet.getSignedVerticalDistanceToZero(point));  //abs, //(repetita iuvant)
       if(vdist<dist){
         i_facet_min=i_facet;
@@ -5625,7 +5625,7 @@ namespace chull {
           if(m_naries[i_nary].m_alloys[i_alloy].m_facets.size()){return m_naries[i_nary].m_alloys[i_alloy].m_facets;}
         }
       }
-    } else {
+    }else{
       if(m_naries[i_nary].m_alloys[i_alloy].m_facets.size()){return m_naries[i_nary].m_alloys[i_alloy].m_facets;}
     }
     throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Facets not calculated");
@@ -5680,7 +5680,7 @@ namespace chull {
     const vector<uint>& i_facets=getRelevantFacets(i_nary,i_alloy);//m_naries[i_nary].m_alloys[i_alloy].m_facets;
     uint i_facet=getNearestFacetVertically(i_facets,point);
     m_coord_groups[i_coord_group].m_nearest_facet=i_facet;
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " nearest_facet[i_nary=" << i_nary << ",i_alloy=" << i_alloy << ",i_coord_group=" << i_coord_group;
       cerr << "]=" << m_coord_groups[i_coord_group].m_nearest_facet << endl;
     }
@@ -5704,7 +5704,7 @@ namespace chull {
     double ref_dist=0.0;
     //if(m_coord_groups[i_coord_group].m_is_on_hull){ //just a check //bad check, doesn't apply to unaries
     //if(!m_points[ref_point].m_is_on_hull){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Coordgroup is on the hull, but hull point not found");}  //not the case for unaries
-    //} else {  //[CO20200106 - close bracket for indenting]}
+    //}else{  //[CO20200106 - close bracket for indenting]}
     if(!m_coord_groups[i_coord_group].m_is_on_hull){
       uint i_facet=m_coord_groups[i_coord_group].m_nearest_facet;
       if(i_facet>m_facets.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within m_facets");}
@@ -5722,7 +5722,7 @@ namespace chull {
     }
     double delta=(point.getLastCoord()-m_points[ref_point].getLastCoord());
     double dist=ref_dist-delta;
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " point.m_entry.auid=" << point.m_entry.auid << endl;
       cerr << __AFLOW_FUNC__ << " m_points[ref_point].m_entry.auid=" << m_points[ref_point].m_entry.auid << endl;
       cerr << __AFLOW_FUNC__ << " point.m_entry.prototype=" << point.m_entry.prototype << endl;
@@ -5736,39 +5736,39 @@ namespace chull {
     return dist;
   }
 
-  double ConvexHull::getDistanceToHull(uint i_point,bool redo,bool get_signed_distance) const{
+  double ConvexHull::getDistanceToHull(uint i_point,bool redo,bool get_signed_distance) const {
     if(i_point>(m_points.size()-1)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");} //HE20210629 make comparison more precise
     return getDistanceToHull(m_points[i_point],redo,get_signed_distance);
   }
 
-  double ConvexHull::getDistanceToHull(const ChullPoint& point,bool redo,bool get_signed_distance) const{
+  double ConvexHull::getDistanceToHull(const ChullPoint& point,bool redo,bool get_signed_distance) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(!point.m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized point");}
     //const vector<uint>& i_facets=m_i_facets;
     double dist;
     if(!redo){
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " attempting to find coordgroup for fast distance calculation" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " attempting to find coordgroup for fast distance calculation" << endl;}
       uint i_coord_group=AUROSTD_MAX_UINT;
       //only if the distances have already been found for all points, and we can identify the coordgroup (point may legitimately be outside)
       //the redo in the getCoordGroupIndex() is VERY safe, so let's keep it
       if(getCoordGroupIndex(point,i_coord_group,true)){
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " found coordgroup[" << i_coord_group << "] (coords=" << m_coord_groups[i_coord_group].m_coords << ")" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " found coordgroup[" << i_coord_group << "] (coords=" << m_coord_groups[i_coord_group].m_coords << ")" << endl;}
         dist=getSignedVerticalDistanceWithinCoordGroup(i_coord_group,point);
         if(get_signed_distance==false){dist=abs(dist);} //CO20180828 //CO20190808
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " dist=" << dist << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " dist=" << dist << endl;}
         return dist;
       }
       //  uint ref_point=m_coord_groups[i_coord_group].m_ref_state;
-      //  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " preliminarily setting ref_point=" << ref_point << endl;}
+      //  if(LDEBUG){cerr << __AFLOW_FUNC__ << " preliminarily setting ref_point=" << ref_point << endl;}
       //  double dist=AUROSTD_NAN;
       //  if(isViablePoint(ref_point)){dist=m_points[ref_point].getDist2Hull(_std_);}
-      //  else {
+      //  else{
       //    if(m_coord_groups[i_coord_group].m_is_on_hull){
       //      ref_point=m_coord_groups[i_coord_group].m_points[0];
       //      if(isViablePoint(ref_point) && m_points[ref_point].m_is_on_hull){dist=0.0;} //some safety checks, but ultimately set to 0
       //    }
       //  }
-      //  if(LDEBUG) {
+      //  if(LDEBUG){
       //    cerr << __AFLOW_FUNC__ << " m_points[ref_point=" << ref_point << "].m_coords=";
       //    for(int i=m_points[ref_point].m_coords.lrows;i<=m_points[ref_point].m_coords.urows;i++){cerr << m_points[ref_point].m_coords[i] << " ";}
       //    cerr << endl;
@@ -5777,44 +5777,44 @@ namespace chull {
       //  if(!m_points[ref_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized point");}
       //  if(dist<AUROSTD_NAN){ //safety
       //    double delta=(m_points[ref_point].getLastCoord()-point.getLastCoord());
-      //    if(LDEBUG) {
+      //    if(LDEBUG){
       //      cerr << __AFLOW_FUNC__ << " delta = " << delta << endl;
       //      cerr << __AFLOW_FUNC__ << " dist+delta = " << dist+delta << endl;
       //      cerr << __AFLOW_FUNC__ << " dist-delta = " << dist-delta << endl;
       //      cerr << __AFLOW_FUNC__ << " delta-dist = " << delta-dist << endl;
       //    }
-      //    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " getSignedVerticalDistanceWithinCoordGroup()=" << getSignedVerticalDistanceWithinCoordGroup(i_coord_group,point) << endl;}
+      //    if(LDEBUG){cerr << __AFLOW_FUNC__ << " getSignedVerticalDistanceWithinCoordGroup()=" << getSignedVerticalDistanceWithinCoordGroup(i_coord_group,point) << endl;}
       //    return delta-dist;
       //  }
     }
     vector<uint> i_facets=m_i_facets;
     //if we have stoich_coords, we need to find relevant facets
     if(m_has_stoich_coords){
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " stoich_coords detected, trying to find relevant facets" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " stoich_coords detected, trying to find relevant facets" << endl;}
       uint i_nary,i_alloy;
       if(!getAlloyIndex(point,i_nary,i_alloy)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Cannot get alloys index");}
       if(i_nary==0){  //unaries are special cases, they RARELY work with normal getSignedVerticalDistance()
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " found unary, need to use coordgroup to find distance (rarely works with normal getSignedVerticalDistance()" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " found unary, need to use coordgroup to find distance (rarely works with normal getSignedVerticalDistance()" << endl;}
         uint i_coord_group=AUROSTD_MAX_UINT;
         if(!getCoordGroupIndex(point,i_coord_group,true)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Cannot find unary coordgroup");}
         dist=getSignedVerticalDistanceWithinCoordGroup(i_coord_group,point);
         if(get_signed_distance==false){dist=abs(dist);} //CO20180828 //CO20190808
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " dist=" << dist << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " dist=" << dist << endl;}
         return dist;
       }
       i_facets=getRelevantFacets(i_nary,i_alloy);
-    } else {
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " searching through ALL facets for closest vertical distance" << endl;}
+    }else{
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " searching through ALL facets for closest vertical distance" << endl;}
     }
     //otherwise, all facets are relevant (same dimension)
     uint i_facet=getNearestFacetVertically(i_facets,point);
     dist=m_facets[i_facet].getSignedVerticalDistance(point);
     if(get_signed_distance==false){dist=abs(dist);} //CO20180828 //CO20190808
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " dist=" << dist << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " dist=" << dist << endl;}
     return dist;
   }
 
-  vector<double> ConvexHull::getDistancesToHull(const vector<string>& vauid,bool redo) const{
+  vector<double> ConvexHull::getDistancesToHull(const vector<string>& vauid,bool redo) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     stringstream message;
     vector<double> vdist2hull;
@@ -5823,7 +5823,7 @@ namespace chull {
       const string& auid=vauid[i];
       if(auid.empty()){message << "Empty auid found";throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message);}
       if(!findPoint(auid,i_point)){message << "Specified auid not found on hull (auid=" << auid << ")";throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message);}
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " grabbing distance to hull for i_point=" << i_point << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " grabbing distance to hull for i_point=" << i_point << endl;}
       vdist2hull.push_back(getDistanceToHull(i_point,redo));
     }
     return vdist2hull;
@@ -5894,7 +5894,7 @@ namespace chull {
       i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[i];
       if(!m_coord_groups[i_coord_group].m_points.size()){continue;}
       if(!m_coord_groups[i_coord_group].m_initialized){continue;}
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking at i_coord_group=" << i_coord_group << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking at i_coord_group=" << i_coord_group << endl;}
       if(!m_coord_groups[i_coord_group].m_is_on_hull){setNearestFacet(i_nary,i_alloy,i_coord_group);} //only off-hull need nearest facets
       setDistancesToHull(i_nary,i_alloy,i_coord_group);
     }
@@ -5920,7 +5920,7 @@ namespace chull {
     if(!m_coord_groups[i_coord_group].m_is_on_hull){ //off-hull, this is the reason it works for unaries, unaries coordgroup are declared ON-HULL, so dist==0 automatically
       uint i_facet=m_coord_groups[i_coord_group].m_nearest_facet;
       dist_2_hull=m_facets[i_facet].getSignedVerticalDistance(point);  //do this "expensive" calculation only once, others are simply z-scaled
-      if(LDEBUG) {
+      if(LDEBUG){
         cerr << __AFLOW_FUNC__ << " dist[coord=" << point.h_coords << "]=" << dist_2_hull << endl;
         if(check_dist_2_hull){
           cerr << __AFLOW_FUNC__ << " comparing fast dist calculation = "  << dist_2_hull;
@@ -5937,7 +5937,7 @@ namespace chull {
         if(!m_lower_hull && !correct_sign_vertical_distance){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"(upper half hull) found point ABOVE hull (entry="+point.m_entry.auid+",dist2Hull="+aurostd::utype2string(dist_2_hull,4)+")");}
         //[OBSOLETE CO20180828]if(m_lower_hull){
         //[OBSOLETE CO20180828]  if(aurostd::notNegative(dist_2_hull,true,ZERO_TOL)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"(lower half hull) found point BELOW hull (entry="+point.m_entry.auid+",dist2Hull="+aurostd::utype2string(dist_2_hull,4)+")");}
-        //[OBSOLETE CO20180828]} else {
+        //[OBSOLETE CO20180828]}else{
         //[OBSOLETE CO20180828]  if(aurostd::notPositive(dist_2_hull,true,ZERO_TOL)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"(upper half hull) found point ABOVE hull (entry="+point.m_entry.auid+",dist2Hull="+aurostd::utype2string(dist_2_hull,4)+")");}
         //[OBSOLETE CO20180828]}
       }
@@ -5948,7 +5948,7 @@ namespace chull {
     //dist_2_hull=-abs(dist_2_hull); //force positive, the value is what we care about now
     //[OBSOLETE CO20180828]point.m_dist_2_hull=m_coord_groups[i_coord_group].m_nearest_distance=dist_2_hull;
     point.m_dist_2_hull=m_coord_groups[i_coord_group].m_nearest_distance=abs(dist_2_hull);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " |dist|=" << point.m_dist_2_hull << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " |dist|=" << point.m_dist_2_hull << endl;}
     uint j_point;
     for(uint j=0,fl_size_j=m_coord_groups[i_coord_group].m_points.size();j<fl_size_j;j++){
       j_point=m_coord_groups[i_coord_group].m_points[j];
@@ -5958,7 +5958,7 @@ namespace chull {
       if(i_point!=j_point){m_points[j_point].m_dist_2_hull+=abs(point.getLastCoord() - m_points[j_point].getLastCoord());}  //simply ADD difference
       //it's possible that h_coords has not been set (we only do it to points that make it to hull calc)
       //so set again (repetita iuvant)
-      if(LDEBUG) {
+      if(LDEBUG){
         xvector<int>& elements_present=m_naries[i_nary].m_alloys[i_alloy].m_elements_present;
         m_points[j_point].setHullCoords(elements_present);
         cerr << __AFLOW_FUNC__ << " dist[coord=" << m_points[j_point].h_coords << "]=" << m_points[j_point].m_dist_2_hull << endl;
@@ -5966,7 +5966,7 @@ namespace chull {
     }
   }
 
-  vector<uint> ConvexHull::extractDecompositionPhases(const ChullFacet& facet) const{
+  vector<uint> ConvexHull::extractDecompositionPhases(const ChullFacet& facet) const {
     uint i_point=AUROSTD_MAX_UINT;
     vector<uint> decomp_phases;
     for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
@@ -5980,12 +5980,12 @@ namespace chull {
     return decomp_phases;
   }
 
-  vector<uint> ConvexHull::getDecompositionPhases(uint i_point) const{
+  vector<uint> ConvexHull::getDecompositionPhases(uint i_point) const {
     if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
     return getDecompositionPhases(m_points[i_point]);
   }
 
-  vector<uint> ConvexHull::getDecompositionPhases(const ChullPoint& point) const{
+  vector<uint> ConvexHull::getDecompositionPhases(const ChullPoint& point) const {
     if(!point.m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized point");}
     if(point.m_is_on_hull){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No decomposition coefficients for hull members");}
     uint i_facet=AUROSTD_MAX_UINT;
@@ -6029,12 +6029,12 @@ namespace chull {
     m_coord_groups[i_coord_group].m_decomp_phases=extractDecompositionPhases(facet);
   }
 
-  xvector<double> ConvexHull::getDecompositionCoefficients(uint i_point,vector_reduction_type vred) const{
+  xvector<double> ConvexHull::getDecompositionCoefficients(uint i_point,vector_reduction_type vred) const {
     if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
     return getDecompositionCoefficients(m_points[i_point],vred);
   }
 
-  xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point,vector_reduction_type vred) const{
+  xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point,vector_reduction_type vred) const {
     if(!point.m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized point");}
     //[returns self]if(point.m_is_on_hull){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No decomposition coefficients for hull members");}
     uint i_coord_group=AUROSTD_MAX_UINT;
@@ -6052,12 +6052,12 @@ namespace chull {
     return getDecompositionCoefficients(point,getDecompositionPhases(point),vred);
   }
 
-  xvector<double> ConvexHull::getDecompositionCoefficients(uint i_point,const vector<uint>& decomp_phases,vector_reduction_type vred) const{
+  xvector<double> ConvexHull::getDecompositionCoefficients(uint i_point,const vector<uint>& decomp_phases,vector_reduction_type vred) const {
     if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
     return getDecompositionCoefficients(m_points[i_point],decomp_phases,vred);
   }
 
-  xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point,const vector<uint>& decomp_phases,vector_reduction_type vred) const{
+  xvector<double> ConvexHull::getDecompositionCoefficients(const ChullPoint& point,const vector<uint>& decomp_phases,vector_reduction_type vred) const {
     //do m_coords_group first (REDUCED)
     if(!point.m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized point");}
     if(!decomp_phases.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No decomposition phases found");}
@@ -6117,7 +6117,6 @@ namespace chull {
     //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]  m_points[i_point].m_decomp_coefs=getDecompositionCoefficients(i_point,decomp_phases,frac_vrt);
     //[OBSOLETE - reduce by frac_vrt always! so use coord_group values]}
   }
-
   void ConvexHull::setOffHullProperties(uint i_nary,uint i_alloy){
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     stringstream message;
@@ -6137,7 +6136,7 @@ namespace chull {
       if(!m_coord_groups[i_coord_group].m_points.size()){continue;}
       if(!m_coord_groups[i_coord_group].m_initialized){continue;}
       if(m_coord_groups[i_coord_group].m_is_on_hull){continue;}
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking at i_coord_group=" << i_coord_group << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking at i_coord_group=" << i_coord_group << endl;}
       //setNearestFacet(i_nary,i_alloy,i_coord_group);    //we now do separately and previously (setDistancesToHull())
       //setDistancesToHull(i_nary,i_alloy,i_coord_group); //we now do separately and previously (setDistancesToHull())
       setDecompositionPhases(i_nary,i_alloy,i_coord_group);
@@ -6151,7 +6150,7 @@ namespace chull {
     vector<uint> adjacent_i_facets;
     if(!m_points[hull_member].m_is_on_hull){return adjacent_i_facets;}
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " starting" << endl;}
 
     uint i_nary=m_points[hull_member].m_i_nary;
     uint i_alloy=m_points[hull_member].m_i_alloy;
@@ -6169,7 +6168,7 @@ namespace chull {
       if(m_facets[i_facet].isPointOnFacet(hull_member)){adjacent_i_facets.push_back(i_facet);}
     }
     if(adjacent_i_facets.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No adjacent facets found");}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " stop" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " stop" << endl;}
     return adjacent_i_facets;
   }
 
@@ -6196,14 +6195,14 @@ namespace chull {
 
     uint i_point=AUROSTD_MAX_UINT;
     for(uint i_facet=0,fl_size_i_facet=adjacent_facets.size();i_facet<fl_size_i_facet;i_facet++){
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " found new relevant facet[" << i_facet << "] with points: ";}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " found new relevant facet[" << i_facet << "] with points: ";}
       equilibrium_phases.push_back(vector<uint>(0));
       for(uint i=0,fl_size_i=adjacent_facets[i_facet].m_vertices.size();i<fl_size_i;i++){
         i_point=adjacent_facets[i_facet].m_vertices[i].ch_index;
         equilibrium_phases.back().push_back(i_point);
-        if(LDEBUG) {cerr << m_points[i_point].h_coords << " [" << i_point << "]" << (i!=adjacent_facets[i_facet].m_vertices.size()-1?", ":"");}
+        if(LDEBUG){cerr << m_points[i_point].h_coords << " [" << i_point << "]" << (i!=adjacent_facets[i_facet].m_vertices.size()-1?", ":"");}
       }
-      if(LDEBUG) {cerr << endl;}
+      if(LDEBUG){cerr << endl;}
     }
     return equilibrium_phases;
   }
@@ -6224,11 +6223,11 @@ namespace chull {
     if(!m_points[hull_member].m_is_on_hull){return;}
     if(m_points[hull_member].isUnary()){return;} //others are in equilibrium with it, must be context of mixture!
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking at hull-member[" << hull_member << "]=" << m_points[hull_member].h_coords << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking at hull-member[" << hull_member << "]=" << m_points[hull_member].h_coords << endl;}
 
     m_coord_groups[i_coord_group].m_equilibrium_phases=getEquilibriumPhases(hull_member);
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " stop" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " stop" << endl;}
   }
 
   bool ConvexHull::phasesEquivalent(uint i_point1,uint i_point2,bool perform_structure_comparison) const {
@@ -6244,7 +6243,7 @@ namespace chull {
     if(!m_points[i_point1].m_has_entry){return false;}
     if(!m_points[i_point2].m_has_entry){return false;}
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " comparing [auid=" << m_points[i_point1].m_entry.auid << "] and [auid=" << m_points[i_point2].m_entry.auid << "]" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " comparing [auid=" << m_points[i_point1].m_entry.auid << "] and [auid=" << m_points[i_point2].m_entry.auid << "]" << endl;}
 
     //strict==false, there might be entries in the database without a formation_enthalpy or sg calculated
     //ultimately, we want to compare structures
@@ -6259,7 +6258,7 @@ namespace chull {
   //strict === strictly differ
   //if we don't know, because of AUROSTD_NAN's or NOSG's, we may still return false anyway to 
   //continue on to more strict determination later
-  bool ConvexHull::energiesDiffer(uint i_point1,uint i_point2,bool strict) const{
+  bool ConvexHull::energiesDiffer(uint i_point1,uint i_point2,bool strict) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(i_point1>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
     if(i_point2>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
@@ -6270,18 +6269,18 @@ namespace chull {
 
     const double& energy1=m_points[i_point1].getFormationEnthalpy();
     const double& energy2=m_points[i_point2].getFormationEnthalpy();
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << energy1 << " vs. " << energy2 << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << energy1 << " vs. " << energy2 << endl;}
     if(energy1>=AUROSTD_NAN || energy2>=AUROSTD_NAN){return strict;} //if strict, then return that they do differ (true)
 
     bool differs=aurostd::isdifferent(energy1,energy2,ENERGY_TOL);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " energies do " << (differs?"":"NOT ") << "differ" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " energies do " << (differs?"":"NOT ") << "differ" << endl;}
     return differs;
   }
 
   //strict === strictly differ
   //if we don't know, because of AUROSTD_NAN's or NOSG's, we may still return false anyway to 
   //continue on to more strict determination later
-  bool ConvexHull::spacegroupsDiffer(uint i_point1,uint i_point2,bool strict) const{
+  bool ConvexHull::spacegroupsDiffer(uint i_point1,uint i_point2,bool strict) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(i_point1>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
     if(i_point2>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
@@ -6292,15 +6291,15 @@ namespace chull {
 
     const string& sg1=m_points[i_point1].getSG();
     const string& sg2=m_points[i_point2].getSG();
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << sg1 << " vs. " << sg2 << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << sg1 << " vs. " << sg2 << endl;}
     if(sg1==NOSG || sg2==NOSG){return strict;}  //if strict, then return that they do differ (true)
 
     bool differs=(sg1!=sg2);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " spacegroups do " << (differs?"":"NOT ") << "differ" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " spacegroups do " << (differs?"":"NOT ") << "differ" << endl;}
     return differs;
   }
 
-  bool ConvexHull::structuresEquivalent(uint i_point1,uint i_point2) const{
+  bool ConvexHull::structuresEquivalent(uint i_point1,uint i_point2) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(i_point1>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
     if(i_point2>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
@@ -6318,7 +6317,7 @@ namespace chull {
 
     //const xstructure& a=m_points[i_point1].m_entry.vstr[0];
     //const xstructure& b=m_points[i_point2].m_entry.vstr[0];
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " loaded both structures" << endl;
       cerr << __AFLOW_FUNC__ << " structure 1" << endl;
       cerr << a;
@@ -6326,11 +6325,11 @@ namespace chull {
       cerr << b;
     }
     bool are_equivalent=compare::structuresMatch(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " structures are " << (are_equivalent?"":"NOT ") << "equivalent" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " structures are " << (are_equivalent?"":"NOT ") << "equivalent" << endl;}
     return are_equivalent;
   }
 
-  vector<uint> ConvexHull::getEquivalentGStates(uint g_state) const{
+  vector<uint> ConvexHull::getEquivalentEntries(uint g_state,bool on_hull_only) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(g_state>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
     const ChullPoint& point=m_points[g_state];
@@ -6344,14 +6343,14 @@ namespace chull {
 
     vector<uint> equivalent_g_states;
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " starting" << endl;}
     uint i_point=AUROSTD_MAX_UINT;
     for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
       i_point=m_coord_groups[i_coord_group].m_points[i];
       if(!phasesEquivalent(g_state,i_point,perform_structure_comparison)){continue;}
       equivalent_g_states.push_back(i_point);
     }
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " g-state[" << g_state << "]=" << m_points[g_state].h_coords;
       cerr << " equivalent structures=";
       for(uint i=0,fl_size_i=equivalent_g_states.size();i<fl_size_i;i++){cerr << equivalent_g_states[i] << (i!=equivalent_g_states.size()-1?", ":"");}
@@ -6361,22 +6360,23 @@ namespace chull {
   }
 
   bool ConvexHull::isICSD(uint i_point) const {
-    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
+    //this function is important because ICSD_XX is a prototype and may not actually correspond to compound A1B1_ICSD_XX
+    bool LDEBUG=(true || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
     string point_icsd_number=getICSDNumber(i_point,true);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking for icsd_number=" << point_icsd_number << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking for icsd_number=" << point_icsd_number << endl;}
     if(point_icsd_number.empty()){return false;}  //no possible match
     if(m_icsd_entries.size()==0){return false;} //no possible match
-    string entry_icsd_number;
+    string entry_icsd_number="";
     for(uint i=0,fl_size_i=m_icsd_entries.size();i<fl_size_i;i++){
       if(i_point==m_icsd_entries[i]){return true;} //instant match
       entry_icsd_number=getICSDNumber(m_icsd_entries[i],true);
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " comparing with entry_icsd_number=" << entry_icsd_number << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " comparing with entry_icsd_number=" << entry_icsd_number << endl;}
       if(entry_icsd_number.empty()){continue;}  //this is weird/bad, but let's not exit the whole program
       //we need to get the STRING number (may have 0's in the front) and species/stoichiometry equivalent
       //this can be done by looking at elements_present, since they map to species
       if(point_icsd_number==entry_icsd_number && m_points[i_point].m_elements_present==m_points[m_icsd_entries[i]].m_elements_present){
-        if(LDEBUG) {
+        if(LDEBUG){
           cerr << __AFLOW_FUNC__ << " found match: point[i_point=" << i_point << "].prototype=" << m_points[i_point].m_entry.prototype;
           cerr << " vs. point[i_point=" << m_icsd_entries[i] << "].prototype=" << m_points[m_icsd_entries[i]].m_entry.prototype << endl;
         }
@@ -6403,16 +6403,15 @@ namespace chull {
     if(g_state>m_points.size()-1){return;}
     if(!m_points[g_state].m_has_entry){return;} //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No entry (structure) found"); //only point in coordgroup
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking at g-state[" << g_state << "]=" << m_points[g_state].h_coords << endl;}
-    m_coord_groups[i_coord_group].m_equivalent_g_states=getEquivalentGStates(g_state);
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking at g-state[" << g_state << "]=" << m_points[g_state].h_coords << endl;}
+    m_coord_groups[i_coord_group].m_equivalent_g_states=getEquivalentEntries(g_state);
     if(!m_coord_groups[i_coord_group].m_equivalent_g_states.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No equivalent states found (not even self)");}
     m_coord_groups[i_coord_group].m_calculated_equivalent_g_states=true;
     uint i_point=AUROSTD_MAX_UINT;
-    bool icsd_g_state,_icsd_g_state;              //whether icsd exists among g_states
+    bool icsd_g_state=false,_icsd_g_state=false;  //whether icsd exists among g_states
     uint i_canonical_icsd=AUROSTD_MAX_UINT;       //index of canonical icsd
     uint canonical_icsd_number=AUROSTD_MAX_UINT;  //lowest number
-    uint icsd_number;
-    icsd_g_state=false;
+    uint icsd_number=AUROSTD_MAX_UINT;
     for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_equivalent_g_states.size();i<fl_size_i;i++){
       i_point=m_coord_groups[i_coord_group].m_equivalent_g_states[i];
       if(!m_points[i_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
@@ -6421,7 +6420,7 @@ namespace chull {
       //we were strict in creating m_icsd_entries (only _ICSD_), but we need to check LIBs for ICSD_
       if(aurostd::substring2bool(m_points[i_point].m_entry.prototype,"ICSD_")){  //remember, _ICSD_ means icsd catalog, but ICSD_ means LIBs
         _icsd_g_state=isICSD(i_point);
-        icsd_g_state|=_icsd_g_state;
+        icsd_g_state=(icsd_g_state||_icsd_g_state); //short circuit bit OR
         if(_icsd_g_state){  //find lowest icsd number
           icsd_number=aurostd::string2utype<uint>(getICSDNumber(i_point,true));
           if(icsd_number<canonical_icsd_number){
@@ -6449,10 +6448,10 @@ namespace chull {
       m_points[i_point].m_i_icsd=i_canonical_icsd;
     }
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " stop" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " stop" << endl;}
   }
 
-  vector<uint> ConvexHull::getSymEquivalentGStates(uint g_state) const{
+  vector<uint> ConvexHull::getSymEquivalentGStates(uint g_state) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
     if(g_state>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
     const ChullPoint& point=m_points[g_state];
@@ -6463,7 +6462,7 @@ namespace chull {
 
     vector<uint> sym_equivalent_g_states;
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " starting" << endl;}
     uint i_point=AUROSTD_MAX_UINT;
     for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
       i_point=m_coord_groups[i_coord_group].m_points[i];
@@ -6471,7 +6470,7 @@ namespace chull {
       if(g_state!=i_point){if(spacegroupsDiffer(g_state,i_point,true)){continue;}}
       sym_equivalent_g_states.push_back(i_point);
     }
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " g-state[" << g_state << "]=" << m_points[g_state].h_coords;
       cerr << " symmetrically equivalent structures=";
       for(uint i=0,fl_size_i=sym_equivalent_g_states.size();i<fl_size_i;i++){cerr << sym_equivalent_g_states[i] << (i!=sym_equivalent_g_states.size()-1?", ":"");}
@@ -6496,7 +6495,7 @@ namespace chull {
     if(g_state>m_points.size()-1){return;}
     if(!m_points[g_state].m_has_entry){return;} //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No entry (structure) found"); //only point in coordgroup
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking at g-state[" << g_state << "]=" << m_points[g_state].h_coords << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking at g-state[" << g_state << "]=" << m_points[g_state].h_coords << endl;}
     m_coord_groups[i_coord_group].m_sym_equivalent_g_states=getSymEquivalentGStates(g_state);
     uint i_point=AUROSTD_MAX_UINT;
     for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_sym_equivalent_g_states.size();i<fl_size_i;i++){
@@ -6504,7 +6503,7 @@ namespace chull {
       if(!m_points[i_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
       m_points[i_point].m_is_sym_equivalent_g_state=true; //g_state and sym_equivalent_g_state should stay separate
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " stop" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " stop" << endl;}
   }
 
   void ConvexHull::setOnHullProperties(uint i_nary,uint i_alloy){
@@ -6527,7 +6526,7 @@ namespace chull {
       if(!m_coord_groups[i_coord_group].m_points.size()){continue;}
       if(!m_coord_groups[i_coord_group].m_initialized){continue;}
       if(!m_coord_groups[i_coord_group].m_is_on_hull){continue;}
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking at i_coord_group=" << i_coord_group << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking at i_coord_group=" << i_coord_group << endl;}
       //setDistancesToHull(i_nary,i_alloy,i_coord_group); //we now do separately and previously (setDistancesToHull())
       //very important that you do not simply go through all facet points and find equilibrium points
       //this will overwrite binary information with ternary information
@@ -6554,7 +6553,7 @@ namespace chull {
       m_naries[i_nary].m_alloys[i_alloy].m_facets.push_back(m_facets.size()-1);
     }
     setHullMembers(i_nary,i_alloy);
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " hull points for i_nary=" << i_nary << ",i_alloy=" << i_alloy << endl;
       for(uint i=0,fl_size_i=m_points.size();i<fl_size_i;i++){
         if(m_points[i].m_is_on_hull){
@@ -6650,7 +6649,7 @@ namespace chull {
       m_coord_groups[i_coord_group].m_is_on_hull=false; //completely refresh
     }
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " starting" << endl;}
     //we first run through alloy hulls IF stoich_coords, grabbing hull_members
     if(m_has_stoich_coords){
       if(!m_naries.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Points have yet to be structured");}
@@ -6703,16 +6702,16 @@ namespace chull {
         gstate_count=getGStateCount(i_nary);
         message << "Found " << gstate_count << " " << pflow::arity_string(i_nary+1,false,false) << " ";
         if(m_thermo_hull){message << "ground-state phases";}
-        else {message << "points on the hull";}
+        else{message << "points on the hull";}
         pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
         total_gstate_count+=gstate_count;
       }
       message << "Found " << total_gstate_count << " ";
       if(m_thermo_hull){message << "ground-state phases";}
-      else {message << "points on the hull";}
+      else{message << "points on the hull";}
       message << " total";
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-    } else {
+    }else{
       message << "Entering default convex hull calculation (full-dimensional)";
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
       cleanHull();
@@ -6732,7 +6731,7 @@ namespace chull {
     for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
       std::sort(m_coord_groups[i_coord_group].m_points.begin(),m_coord_groups[i_coord_group].m_points.end(),sortWithinCoordGroup(m_points,m_sort_energy_ascending));  //ascending order
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " done" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " done" << endl;}
   }
 
   double ConvexHull::getStabilityCriterion(const string& cauid) const {
@@ -6802,14 +6801,14 @@ namespace chull {
       //in the case that it is not a unary, leverage i_alloy of REAL hull first, then clean
       //if(point.isUnary()){
       //  point.setHullCoords(); //set to most general coords (m_coords), this reflects relevantFacets()
-      //} else {
+      //}else{
       //  if(!getAlloyIndex(point,i_nary,i_alloy)){message << "Alloy index not set (auid=" << point.m_entry.auid << ")";throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message);}
       //  xvector<int> elements_present=m_naries[i_nary].m_alloys[i_alloy].m_elements_present;
-      //  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " elements_present=" << elements_present << endl;}
+      //  if(LDEBUG){cerr << __AFLOW_FUNC__ << " elements_present=" << elements_present << endl;}
       //  point.setHullCoords(elements_present);  //just to be sure
       //}
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " m.coords=" << point.m_coords << endl;}
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " h.coords=" << point.h_coords << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " m.coords=" << point.m_coords << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " h.coords=" << point.h_coords << endl;}
       vscriterion.push_back(fake_hull.getDistanceToHull(point,false));
     }
     return vscriterion;
@@ -6831,7 +6830,7 @@ namespace chull {
     //get full set of points to neglect
     uint i_point=AUROSTD_MAX_UINT,i_coord_group=AUROSTD_MAX_UINT,g_state=AUROSTD_MAX_UINT;
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " initial points_to_neglect.size()=" << vcpoints.size() << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " initial points_to_neglect.size()=" << vcpoints.size() << endl;}
 
     //vector<ChullPoint> points_to_neglect; //not sure why it needs to be vector of chullpoints, simply hold indices
     vector<uint> points_to_neglect;
@@ -6851,7 +6850,7 @@ namespace chull {
         if(!m_points[g_state].m_is_g_state){message << "Coordgroup reference is not a ground-state structure (input[" << i << "])";throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message);}
         //const vector<uint>& eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;
         if(m_coord_groups[i_coord_group].m_calculated_equivalent_g_states){eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;}
-        else {eq_gstates=getEquivalentGStates(g_state);}
+        else{eq_gstates=getEquivalentEntries(g_state);}
         if(!eq_gstates.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No equivalent states found (not even self)");}
         //for(uint j=0,fl_size_j=eq_gstates.size();j<fl_size_j;j++){points_to_neglect.push_back(m_points[eq_gstates[j]]);}
         for(uint j=0,fl_size_j=eq_gstates.size();j<fl_size_j;j++){points_to_neglect.push_back(eq_gstates[j]);}
@@ -6860,7 +6859,7 @@ namespace chull {
 
     std::sort(points_to_neglect.begin(),points_to_neglect.end());points_to_neglect.erase( std::unique( points_to_neglect.begin(), points_to_neglect.end() ), points_to_neglect.end() );  //first remove duplicate indices
 
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " points_to_neglect.size()=" << points_to_neglect.size() << endl;
       cerr << __AFLOW_FUNC__ << " points_to_neglect: ";
       for(uint i=0,fl_size_i=points_to_neglect.size();i<fl_size_i;i++){cerr << points_to_neglect[i] << " ";} 
@@ -6880,13 +6879,13 @@ namespace chull {
     for(uint i_coord_group=0,fl_size_i_coord_group=m_coord_groups.size();i_coord_group<fl_size_i_coord_group;i_coord_group++){
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " m_coord_groups[i_coord_group=" << i_coord_group << "].getElementsPresent()=" << m_coord_groups[i_coord_group].getElementsPresent() << endl;}
       if(!subspaceBelongs(elements_present_points,m_coord_groups[i_coord_group].getElementsPresent())){
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " Ignoring irrelevant subspace of m_coord_groups[i_coord_group=" << i_coord_group << "] (m_coord_groups[i_coord_group=" << i_coord_group << "].getElementsPresent()=" << m_coord_groups[i_coord_group].getElementsPresent() << ")" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " Ignoring irrelevant subspace of m_coord_groups[i_coord_group=" << i_coord_group << "] (m_coord_groups[i_coord_group=" << i_coord_group << "].getElementsPresent()=" << m_coord_groups[i_coord_group].getElementsPresent() << ")" << endl;}
         continue;
       }
       for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
         i_point=m_coord_groups[i_coord_group].m_points[i];
         if(aurostd::WithinList(points_to_neglect,i_point)){
-          if(LDEBUG) {cerr << __AFLOW_FUNC__ << " Removing point from fake hull (i_point=" << i_point << ",auid=" << m_points[i_point].m_entry.auid << ")" << endl;}
+          if(LDEBUG){cerr << __AFLOW_FUNC__ << " Removing point from fake hull (i_point=" << i_point << ",auid=" << m_points[i_point].m_entry.auid << ")" << endl;}
           continue;
         }
         const ChullPoint& point=m_points[i_point];
@@ -6894,15 +6893,15 @@ namespace chull {
         //found=false;
         //for(uint j=0,fl_size_j=points_to_neglect.size();j<fl_size_j&&!found;j++){
         //  if(point.m_entry.auid==points_to_neglect[j].m_entry.auid){
-        //    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " Removing (equivalent) ground-state (auid=" << points_to_neglect[j].m_entry.auid << ")" << endl;}
+        //    if(LDEBUG){cerr << __AFLOW_FUNC__ << " Removing (equivalent) ground-state (auid=" << points_to_neglect[j].m_entry.auid << ")" << endl;}
         //    found=true;
         //  }
         //}
         //if(found){continue;}
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " including point[i_point=" << i_point << ",auid=" << m_points[i_point].m_entry.auid << "].compound=" << point.m_entry.compound << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " including point[i_point=" << i_point << ",auid=" << m_points[i_point].m_entry.auid << "].compound=" << point.m_entry.compound << endl;}
         new_points.push_back(point);
         new_points.back().reduceCoords(elements_present_hull);
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " point[" << i_point << "].m_coords=" << new_points.back().m_coords << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " point[" << i_point << "].m_coords=" << new_points.back().m_coords << endl;}
         new_points.back().cleanPointForHullTransfer();
       }
     }
@@ -6917,7 +6916,7 @@ namespace chull {
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " velements=" << aurostd::joinWDelimiter(velements,",") << endl;}
     }
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " Creating new (pseudo) hull without relevant g-states" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " Creating new (pseudo) hull without relevant g-states" << endl;}
     aurostd::xoption cflags=m_cflags;
     //[do NOT do, we need hull distance calculation]cflags.flag("CHULL::SKIP_HULL_DISTANCE_CALCULATION",true);  //no need to get the distances for ALL points, we will do for the one after hull creation
     cflags.flag("CHULL::SKIP_THERMO_PROPERTIES_EXTRACTION",true); //thermo properties NOT needed, just need hull
@@ -6941,7 +6940,7 @@ namespace chull {
     fake_hull.initialize(cflags,new_points,velements,devnull,oss_fh,m_half_hull,m_add_artificial_unaries);
     //oss_empty.clear();  //clear badbit, as cout is GLOBAL
     if(!fake_hull.m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Could not create pseudo convex hull");}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " New (pseudo) hull created" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " New (pseudo) hull created" << endl;}
   }
 
   double ConvexHull::getNPlus1EnthalpyGain(const string& cauid) const {
@@ -7015,7 +7014,7 @@ namespace chull {
       uint i_coord_group=AUROSTD_MAX_UINT;
       vector<uint> vcpoints;
       for(uint fl_size_i_nary=m_naries.size(),i_nary=(fl_size_i_nary-1);i_nary<fl_size_i_nary&&i_nary>=j_nary;i_nary--){ //go backwards!
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " removing i_nary=" << i_nary << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " removing i_nary=" << i_nary << endl;}
         for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
           for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups.size();i<fl_size_i;i++){
             i_coord_group=m_naries[i_nary].m_alloys[i_alloy].m_coord_groups[i];
@@ -7026,7 +7025,7 @@ namespace chull {
         }
       }
 
-      if(LDEBUG) {
+      if(LDEBUG){
         cerr << __AFLOW_FUNC__ << " points_to_neglect.size()=" << vcpoints.size() << endl;
         std::sort(vcpoints.begin(),vcpoints.end());
         cerr << __AFLOW_FUNC__ << " points_to_neglect: ";
@@ -7039,13 +7038,13 @@ namespace chull {
 
     //since j_nary and j_alloy don't change, the getDistanceToHull function should work fine (getRelevantFacets())
     //xvector<int> elements_present=m_naries[j_nary].m_alloys[j_alloy].m_elements_present;
-    //if(LDEBUG) {cerr << __AFLOW_FUNC__ << " elements_present=" << elements_present << endl;}
+    //if(LDEBUG){cerr << __AFLOW_FUNC__ << " elements_present=" << elements_present << endl;}
     //point.setHullCoords(elements_present);  //just to be sure
     point.cleanPointForHullTransfer();      //clean now
     point.reduceCoords(elements_present_hull);  //reduce to minimum hull necessary to calculate scriterion (for unaries this will be a binary)
     point.setHullCoords(); //set to most general coords (m_coords), this reflects relevantFacets()
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " m.coords=" << point.m_coords << endl;}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " h.coords=" << point.h_coords << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " m.coords=" << point.m_coords << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " h.coords=" << point.h_coords << endl;}
 
     return fake_hull.getDistanceToHull(point,false);
   }
@@ -7066,7 +7065,7 @@ namespace chull {
       i_point=g_states[i];
       if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
       if(!m_points[i_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking at point[i_point=" << i_point << "].m_coords=" << m_points[i_point].m_coords << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking at point[i_point=" << i_point << "].m_coords=" << m_points[i_point].m_coords << endl;}
       scriterion=getStabilityCriterion(i_point);
       //CONSISTENCY CHECKS?
       //[OBSOLETE - this is a DISTANCE so it is always positive]if(m_half_hull){
@@ -7082,7 +7081,7 @@ namespace chull {
       //[OBSOLETE - this is a DISTANCE so it is always positive]      message << ",scriterion=" << scriterion << ")";
       //[OBSOLETE - this is a DISTANCE so it is always positive]      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message);
       //[OBSOLETE - this is a DISTANCE so it is always positive]    }
-      //[OBSOLETE - this is a DISTANCE so it is always positive]  } else {
+      //[OBSOLETE - this is a DISTANCE so it is always positive]  }else{
       //[OBSOLETE - this is a DISTANCE so it is always positive]    if(aurostd::notNegative(scriterion,true,ZERO_TOL)) //!std::signbit(scriterion))
       //[OBSOLETE - this is a DISTANCE so it is always positive]    { //CO20200106 - patching for auto-indenting
       //[OBSOLETE - this is a DISTANCE so it is always positive]      message << "(upper half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
@@ -7115,7 +7114,7 @@ namespace chull {
       m_coord_groups[i_coord_group].m_stability_criterion=m_points[i_point].m_stability_criterion;
       //const vector<uint>& eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;
       if(m_coord_groups[i_coord_group].m_calculated_equivalent_g_states){eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;}
-      else {eq_gstates=getEquivalentGStates(i_point);}
+      else{eq_gstates=getEquivalentEntries(i_point);}
       if(!eq_gstates.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No equivalent states found (not even self)");}
       for(uint j=0,fl_size_j=eq_gstates.size();j<fl_size_j;j++){
         if(eq_gstates[j]>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
@@ -7123,7 +7122,7 @@ namespace chull {
         scriterion=m_points[i_point].m_stability_criterion;
         scriterion+=(m_points[i_point].getLastCoord()-m_points[eq_gstates[j]].getLastCoord());
         //if(m_formation_energy_hull){scriterion+=abs(H_f_atom(m_points[i_point])-H_f_atom(m_points[eq_gstates[j]]));}
-        //else {scriterion+=abs(T_S(m_points[i_point])-T_S(m_points[eq_gstates[j]]));}
+        //else{scriterion+=abs(T_S(m_points[i_point])-T_S(m_points[eq_gstates[j]]));}
         //unaries could be really close to 0
         //don't set if it becomes positive
         if(std::signbit(m_points[i_point].m_stability_criterion)!=std::signbit(scriterion)){scriterion=0;}  //define these to be 0, AlFe hull look at Fe
@@ -7141,7 +7140,7 @@ namespace chull {
     if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
     if(!m_points[i_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
     //[CO20200404 - not useful, we still want values for binaries, this would skip over value assignment]if(test_binary_np1==false&&m_points[i_point].m_i_nary<2){continue;} //unaries would be trivial, and binaries is simply H_f
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking at point[i_point=" << i_point << "].m_coords=" << m_points[i_point].m_coords << ", compound=" << m_points[i_point].m_entry.compound << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking at point[i_point=" << i_point << "].m_coords=" << m_points[i_point].m_coords << ", compound=" << m_points[i_point].m_entry.compound << endl;}
     double np1egain=getNPlus1EnthalpyGain(i_point,fake_hull,hull_set);
     //CONSISTENCY CHECKS?
     //yes - for unaries/binaries N+1 == formation enthalpy
@@ -7169,7 +7168,7 @@ namespace chull {
     //[OBSOLETE - this is a DISTANCE so it is always positive]        message << ",np1egain=" << np1egain << ")";
     //[OBSOLETE - this is a DISTANCE so it is always positive]        throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message);
     //[OBSOLETE - this is a DISTANCE so it is always positive]      }
-    //[OBSOLETE - this is a DISTANCE so it is always positive]    } else {
+    //[OBSOLETE - this is a DISTANCE so it is always positive]    }else{
     //[OBSOLETE - this is a DISTANCE so it is always positive]      if(aurostd::notNegative(np1egain,true,ZERO_TOL)) //!std::signbit(np1egain))
     //[OBSOLETE - this is a DISTANCE so it is always positive]      { //CO20200106 - patching for auto-indenting
     //[OBSOLETE - this is a DISTANCE so it is always positive]        message << "(upper half hull) found ground-state structure INSIDE hull, suggesting it was not really a ground-state";
@@ -7207,7 +7206,7 @@ namespace chull {
     vector<uint> eq_gstates;
     //const vector<uint>& eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;
     if(m_coord_groups[i_coord_group].m_calculated_equivalent_g_states){eq_gstates=m_coord_groups[i_coord_group].m_equivalent_g_states;}
-    else {eq_gstates=getEquivalentGStates(i_point);}
+    else{eq_gstates=getEquivalentEntries(i_point);}
     if(!eq_gstates.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No equivalent states found (not even self)");}
     for(uint j=0,fl_size_j=eq_gstates.size();j<fl_size_j;j++){
       if(eq_gstates[j]>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
@@ -7215,7 +7214,7 @@ namespace chull {
       np1egain=m_points[i_point].m_n_plus_1_enthalpy_gain;
       np1egain+=(m_points[i_point].getLastCoord()-m_points[eq_gstates[j]].getLastCoord());
       //if(m_formation_energy_hull){np1egain+=abs(H_f_atom(m_points[i_point])-H_f_atom(m_points[eq_gstates[j]]));}
-      //else {np1egain+=abs(T_S(m_points[i_point])-T_S(m_points[eq_gstates[j]]));}
+      //else{np1egain+=abs(T_S(m_points[i_point])-T_S(m_points[eq_gstates[j]]));}
       //unaries could be really close to 0
       //don't set if it becomes positive
       if(std::signbit(m_points[i_point].m_n_plus_1_enthalpy_gain)!=std::signbit(np1egain)){np1egain=0;}  //define these to be 0, AlFe hull look at Fe
@@ -7244,7 +7243,7 @@ namespace chull {
       if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
       if(!m_points[i_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
       //[CO20200404 - not useful, we still want values for binaries, this would skip over value assignment]if(test_binary_np1==false&&m_points[i_point].m_i_nary<2){continue;} //unaries would be trivial, and binaries is simply H_f
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking at point[i_point=" << i_point << "].m_coords=" << m_points[i_point].m_coords << ", compound=" << m_points[i_point].m_entry.compound << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking at point[i_point=" << i_point << "].m_coords=" << m_points[i_point].m_coords << ", compound=" << m_points[i_point].m_entry.compound << endl;}
 
       found=false;
       for(j=0,fl_size_j=v_elements_present.size();j<fl_size_j&&found==false;j++){
@@ -7336,13 +7335,13 @@ namespace chull {
   //[ME20190628 - moved to pflow_funcs.cpp]   if(vred==gcd_vrt){comp=aurostd::reduceByGCD(comp,ZERO_TOL);}
   //[ME20190628 - moved to pflow_funcs.cpp]   else if(vred==frac_vrt){comp=aurostd::normalizeSumToOne(comp,ZERO_TOL);}
   //[ME20190628 - moved to pflow_funcs.cpp]   else if(vred==no_vrt){;}
-  //[ME20190628 - moved to pflow_funcs.cpp]   else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown reduce mode",_INPUT_UNKNOWN_);}
+  //[ME20190628 - moved to pflow_funcs.cpp]   else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown reduce mode",_INPUT_UNKNOWN_);}
   //[ME20190628 - moved to pflow_funcs.cpp]   if(aurostd::zeroWithinTol(aurostd::sum(comp),ZERO_TOL)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Empty composition");}
   //[ME20190628 - moved to pflow_funcs.cpp]   for(uint i=0,fl_size_i=vspecies.size();i<fl_size_i;i++) {
   //[ME20190628 - moved to pflow_funcs.cpp]     output << vspecies[i];
   //[ME20190628 - moved to pflow_funcs.cpp]     if(!(exclude1 && aurostd::identical(comp[i+comp.lrows],1.0,ZERO_TOL))) {
   //[ME20190628 - moved to pflow_funcs.cpp]       if(ftype==latex_ft) {output << "$_{";
-  //[ME20190628 - moved to pflow_funcs.cpp]       } else if(ftype==gnuplot_ft){output<< "_{";}
+  //[ME20190628 - moved to pflow_funcs.cpp]       }else if(ftype==gnuplot_ft){output<< "_{";}
   //[ME20190628 - moved to pflow_funcs.cpp]       output << comp[i+comp.lrows];
   //[ME20190628 - moved to pflow_funcs.cpp]       if(ftype==latex_ft) {output << "}$";}
   //[ME20190628 - moved to pflow_funcs.cpp]       else if(ftype==gnuplot_ft){output<< "}";}
@@ -7351,18 +7350,18 @@ namespace chull {
   //[ME20190628 - moved to pflow_funcs.cpp]   return output.str();
   //[ME20190628 - moved to pflow_funcs.cpp] }
 
-  string ConvexHull::getICSDNumber(uint i_point,bool remove_suffix) const{
+  string ConvexHull::getICSDNumber(uint i_point,bool remove_suffix) const {
     if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
     return getICSDNumber(m_points[i_point],remove_suffix);
   }
 
-  string ConvexHull::getICSDNumber(const ChullPoint& point,bool remove_suffix) const{
+  string ConvexHull::getICSDNumber(const ChullPoint& point,bool remove_suffix) const {
     if(!point.m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized point");}
     if(!point.m_has_entry){return "";}
     return getICSDNumber(point.m_entry,remove_suffix);
 
   }
-  string ConvexHull::getICSDNumber(const aflowlib::_aflowlib_entry& entry,bool remove_suffix) const{
+  string ConvexHull::getICSDNumber(const aflowlib::_aflowlib_entry& entry,bool remove_suffix) const {
     const string& proto=entry.prototype;
     if(!aurostd::substring2bool(proto,"ICSD_")){return "";}
     vector<string> tokens;
@@ -7445,13 +7444,13 @@ namespace chull {
   //[CO20190419 - moved to aurostd_main.cpp]        // very important, we don't want to add hyphen, just replace
   //[CO20190419 - moved to aurostd_main.cpp]        // with overline, so continue
   //[CO20190419 - moved to aurostd_main.cpp]        continue;
-  //[CO20190419 - moved to aurostd_main.cpp]      } else {
+  //[CO20190419 - moved to aurostd_main.cpp]      }else{
   //[CO20190419 - moved to aurostd_main.cpp]        // second enter loop, do nothing but turn this flag on
   //[CO20190419 - moved to aurostd_main.cpp]        // allow us to add input[i]
   //[CO20190419 - moved to aurostd_main.cpp]        found_hyphen_symmetry = false;
   //[CO20190419 - moved to aurostd_main.cpp]        solved_hyphen_symmetry = true;
   //[CO20190419 - moved to aurostd_main.cpp]      }
-  //[CO20190419 - moved to aurostd_main.cpp]    } else {
+  //[CO20190419 - moved to aurostd_main.cpp]    }else{
   //[CO20190419 - moved to aurostd_main.cpp]      if(symmetry_string && solved_hyphen_symmetry) {
   //[CO20190419 - moved to aurostd_main.cpp]        // last step of symmetry_string fix, but we have to do this in part of
   //[CO20190419 - moved to aurostd_main.cpp]        // the loop to allow for next character to be identified as problem
@@ -7474,7 +7473,7 @@ namespace chull {
   //[CO20190419 - moved to aurostd_main.cpp]            // if we find one, give two backslashes
   //[CO20190419 - moved to aurostd_main.cpp]            output.append("\\\\");
   //[CO20190419 - moved to aurostd_main.cpp]            break;
-  //[CO20190419 - moved to aurostd_main.cpp]          } else {
+  //[CO20190419 - moved to aurostd_main.cpp]          }else{
   //[CO20190419 - moved to aurostd_main.cpp]            // if we find one, but it has single backslash, leave alone
   //[CO20190419 - moved to aurostd_main.cpp]            // doesn't matter what it is, if it has single backslash it's good
   //[CO20190419 - moved to aurostd_main.cpp]            // if we find one, give single backslash
@@ -7536,7 +7535,7 @@ namespace chull {
         throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Input dimension mode (2D) and function mode mismatch");
       }
       if(m_velements.size() != 2) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Input dimension mode (2D) and elements.size() mismatch");}
-    } else if(dimension == 3) {
+    }else if(dimension == 3) {
       if(function_mode != ADDPLOT_MODE_HULL_POINTS &&
           function_mode != ADDPLOT_MODE_OFF_HULL_POINTS &&
           function_mode != ADDPLOT_MODE_HULL_FACETS &&
@@ -7545,22 +7544,22 @@ namespace chull {
         throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Input dimension mode (3D) and function mode mismatch");
       }
       if(m_velements.size() != 3) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Input dimension mode (3D) and elements.size() mismatch");}
-    } else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Input dimension mode out of scope");}
+    }else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Input dimension mode out of scope");}
 
     //also check column_header
     bool found=false;
-    for(uint i=0,fl_size_i=m_velements.size();i<fl_size_i;i++){found|=(column_header==m_velements[i]);}
-    found|=(column_header=="H_f_meVatom");
-    found|=(column_header=="H_f_kJmol");
-    found|=(column_header=="T_S");
-    found|=(column_header=="Dist2hull");
+    for(uint i=0,fl_size_i=m_velements.size();i<fl_size_i;i++){found=(found||(column_header==m_velements[i]));}
+    found=(found||(column_header=="H_f_meVatom"));
+    found=(found||(column_header=="H_f_kJmol"));
+    found=(found||(column_header=="T_S"));
+    found=(found||(column_header=="Dist2hull"));
     if(!found){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Input column_header mode out of scope ("+column_header+")");}
 
     // main addplot function
     if(dimension == 2) {addplot_output_ss << "\\addplot+[" << endl;}
-    else {  // dimension==3
+    else{  // dimension==3
       if(function_mode == ADDPLOT_MODE_HEAT_MAPS) {addplot_output_ss << "\\addplot3[" << endl;}
-      else {addplot_output_ss << "\\addplot3+[" << endl;}
+      else{addplot_output_ss << "\\addplot3+[" << endl;}
     }
 
     if(function_mode == ADDPLOT_MODE_HULL_FACETS ||
@@ -7570,7 +7569,7 @@ namespace chull {
         addplot_output_ss << "color=white," << endl;
         addplot_output_ss << "solid," << endl;
         addplot_output_ss << "line width=2.0pt," << endl;
-      } else {  // function_mode==ADDPLOT_MODE_HULL_FACETS
+      }else{  // function_mode==ADDPLOT_MODE_HULL_FACETS
         addplot_output_ss << "color=black," << endl;
         addplot_output_ss << "solid," << endl;
         if(dimension == 3) {addplot_output_ss << "line width=2pt," << endl;}
@@ -7578,29 +7577,29 @@ namespace chull {
       addplot_output_ss << "] table ";
       if(dimension == 2) {
         if(reverse_axes){addplot_output_ss << "[x=" << m_velements[0];}
-        else {addplot_output_ss << "[x=" << m_velements[1];}
+        else{addplot_output_ss << "[x=" << m_velements[1];}
         addplot_output_ss << ",y=" << column_header;
         addplot_output_ss << "]";
-      } else {  // dimension==3
+      }else{  // dimension==3
         addplot_output_ss << "[x=" << m_velements[1];
         addplot_output_ss << ",y=" << m_velements[0];
         addplot_output_ss << ",z=" << m_velements[2] << "]";  // flipping x and y
       }
-    } else {  // function_mode==ADDPLOT_MODE_HULL_POINTS||function_mode==ADDPLOT_MODE_OFF_HULL_POINTS||function_mode==ADDPLOT_MODE_HEAT_MAPS
+    }else{  // function_mode==ADDPLOT_MODE_HULL_POINTS||function_mode==ADDPLOT_MODE_OFF_HULL_POINTS||function_mode==ADDPLOT_MODE_HEAT_MAPS
       if(function_mode == ADDPLOT_MODE_HEAT_MAPS) {
         addplot_output_ss << "patch," << endl;
         addplot_output_ss << "patch type=triangle," << endl;
         addplot_output_ss << "shader=interp," << endl;
-      } else {
+      }else{
         addplot_output_ss << "only marks," << endl;  // IMPORTANT, no lines
         if(function_mode == ADDPLOT_MODE_HULL_POINTS) {
           addplot_output_ss << "mark=*," << endl;
           if(dimension == 2) {addplot_output_ss << "mark size=4," << endl;}
-          else {  // dimension==3
+          else{  // dimension==3
             addplot_output_ss << "mark size=5," << endl;
             addplot_output_ss << "line width=2pt," << endl;
           }
-        } else {  // function_mode==ADDPLOT_MODE_OFF_HULL_POINTS
+        }else{  // function_mode==ADDPLOT_MODE_OFF_HULL_POINTS
           addplot_output_ss << "mark=x," << endl;
           addplot_output_ss << "mark options={scale=2,line width=2,solid";
         }
@@ -7614,17 +7613,17 @@ namespace chull {
         // GOT IT! // http://tex.stackexchange.com/questions/59070/pgfplots-remove-darker-borders-on-marks
         if(function_mode == ADDPLOT_MODE_HULL_POINTS) {addplot_output_ss << dark_border_points_command << "," << endl;}
         addplot_output_ss << "visualization depends on={\\thisrow{" << column_header << "} \\as \\" << column_header << "}," << endl;  // defines visualization dependency
-      } else {
+      }else{
         if(function_mode == ADDPLOT_MODE_HULL_POINTS) {addplot_output_ss << "mark options={draw=black,fill=blue,solid}," << endl;}
-        else {addplot_output_ss << ",draw=red}," << endl;}// function_mode==ADDPLOT_MODE_OFF_HULL_POINTS
+        else{addplot_output_ss << ",draw=red}," << endl;}// function_mode==ADDPLOT_MODE_OFF_HULL_POINTS
       }
       addplot_output_ss << "] table ";
       if(dimension == 2) {
         if(reverse_axes){addplot_output_ss << "[x=" << m_velements[0];}
-        else {addplot_output_ss << "[x=" << m_velements[1];}
+        else{addplot_output_ss << "[x=" << m_velements[1];}
         addplot_output_ss << ",y=" << column_header;
         addplot_output_ss << "]";
-      } else {  // dimension==3
+      }else{  // dimension==3
         addplot_output_ss << "[x=" << m_velements[1];
         addplot_output_ss << ",y=" << m_velements[0];
         addplot_output_ss << ",z=" << m_velements[2] << "]";  // flipping x and y
@@ -7645,7 +7644,7 @@ namespace chull {
 
   string ConvexHull::getPlotPointContentPDF(const ChullPoint& point,bool zero_end_point,bool zero_dist_2_hull) const {  //true,false
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " starting" << endl;}
 
     // initializations
     stringstream addplot_output_ss;
@@ -7665,7 +7664,7 @@ namespace chull {
       addplot_output_ss << aurostd::PaddedPOST(0, 30); //aurostd::PaddedPOST(aurostd::utype2string(0.0,CHULL_PRECISION,false,ROUNDOFF_TOL,FIXED_STREAM), 30);
       // entropic temperature, row 6
       addplot_output_ss << aurostd::PaddedPOST(0, 30); //aurostd::PaddedPOST(aurostd::utype2string(0.0,CHULL_PRECISION,false,ROUNDOFF_TOL,FIXED_STREAM), 30);
-    } else {
+    }else{
       // no need for precision for next few columns, leave it same way as received from AFLOW
       num_ss << chull::H_f_atom(point, _m_);
       addplot_output_ss << aurostd::PaddedPOST(num_ss.str(), 30);
@@ -7682,11 +7681,11 @@ namespace chull {
     if(PRINT_DIST2HULL_COL_TEX){
       // dist_2_hull, row 7
       if(zero_dist_2_hull) {addplot_output_ss << aurostd::PaddedPOST(0, 30);} //aurostd::PaddedPOST(aurostd::utype2string(0.0,CHULL_PRECISION,false,ROUNDOFF_TOL,FIXED_STREAM), 30);
-      else {addplot_output_ss << aurostd::PaddedPOST(aurostd::utype2string(point.getDist2Hull(_m_),CHULL_PRECISION), 30);}
+      else{addplot_output_ss << aurostd::PaddedPOST(aurostd::utype2string(point.getDist2Hull(_m_),CHULL_PRECISION), 30);}
     }
     // end line
     addplot_output_ss << endl;
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " done" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " done" << endl;}
     return addplot_output_ss.str();
   }
 
@@ -7701,7 +7700,7 @@ namespace chull {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
     // produces node latex output
     stringstream message;
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " starting" << endl;}
 
     double sum_C;
     stringstream output;
@@ -7714,27 +7713,27 @@ namespace chull {
     // first do a check that the function_mode is not out of scope
     if(dimension == 2) {
       if(coord.rows != 2) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Input dimension mode (2D) and coordinate size mismatch");}
-    } else if(dimension == 3) {
+    }else if(dimension == 3) {
       if(coord.rows != 3) {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Input dimension mode (3D) and coordinate size mismatch");}
-    } else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Input dimension mode out of scope");}
+    }else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Input dimension mode out of scope");}
 
     output << "axis cs:";  // define axis as relevant "coordinate system"
 
     if(dimension == 2) {
       // don't need for loop, just 1 coord
       if(!reverse_axes) {output << aurostd::utype2string(1.0 - coord[coord.lrows],FULL_PRECISION);}
-      else {output << aurostd::utype2string(coord[coord.lrows],FULL_PRECISION);}
+      else{output << aurostd::utype2string(coord[coord.lrows],FULL_PRECISION);}
       output << ",";
       if(m_formation_energy_hull) {
         num_ss << chull::H_f_atom(entry, _m_);
         output << num_ss.str();
         num_ss.str("");
-      } else {
+      }else{
         num_ss << chull::T_S(entry);
         output << num_ss.str();
         num_ss.str("");
       }
-    } else {  // dimension==3
+    }else{  // dimension==3
       sum_C = 0.0;
       for(int j=coord.urows-1;j>=coord.lrows;j--) {
         output << aurostd::utype2string(coord[j],FULL_PRECISION);
@@ -7743,7 +7742,7 @@ namespace chull {
       }
       output << aurostd::utype2string(1.0-sum_C,FULL_PRECISION);
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " done" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " done" << endl;}
     return output.str();
   }
 
@@ -7777,7 +7776,7 @@ namespace chull {
     // checks if the facet created by this combination of chullPoints is necessary
     // for 3D hull
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " starting" << endl;}
     if(vi>m_points.size()-1 || vj>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
     if(check_border) {
       const ChullPoint& ci=m_points[vi];
@@ -7790,22 +7789,22 @@ namespace chull {
       const aflowlib::_aflowlib_entry& entryB = cj.m_entry;
       // unary to unary
       if(endpointA && endpointB) {
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " unary to unary" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " unary to unary" << endl;}
         return true;
       }
       // unary to binary, only if dot product of coords is not 0 (unary to crossing binary line)
       if(endpointA && entryB.vspecies.size() == 2 && scalar_product(coordAR, coordBR) >= ZERO_TOL) {
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " unary to binary" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " unary to binary" << endl;}
         return true;
       }
       // binary to unary, only if dot product of coords is not 0 (unary to crossing binary line)
       if(entryA.vspecies.size() == 2 && endpointB && scalar_product(coordAR, coordBR) >= ZERO_TOL) {
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " binary to unary" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " binary to unary" << endl;}
         return true;
       }
       // binary to binary, if same species
       if(entryA.vspecies.size() == 2 && entryA.vspecies == entryB.vspecies) {
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " binary to binary" << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " binary to binary" << endl;}
         return true;
       }
     }
@@ -7815,7 +7814,7 @@ namespace chull {
     // xvector, not the energy
     for(uint i=0,fl_size_i=facet_lines.size();i<fl_size_i;i++) {
       if(facet_lines[i][0]==vi && facet_lines[i][1]==vj){
-        if(LDEBUG) {
+        if(LDEBUG){
           cerr << __AFLOW_FUNC__ << " found match! ";
           cerr << facet_lines[i][0] << "==" << vi;
           cerr << ", ";
@@ -7825,7 +7824,7 @@ namespace chull {
         return true;
       }
       if(facet_lines[i][0]==vj && facet_lines[i][1]==vi){
-        if(LDEBUG) {
+        if(LDEBUG){
           cerr << __AFLOW_FUNC__ << " found match! ";
           cerr << facet_lines[i][0] << "==" << vj;
           cerr << ", ";
@@ -7838,7 +7837,7 @@ namespace chull {
     facet_lines.push_back(vector<uint>(0));
     facet_lines.back().push_back(vi);
     facet_lines.back().push_back(vj);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " saving facet lines: " << vi << "," << vj << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " saving facet lines: " << vi << "," << vj << endl;}
     return false;
   }
 
@@ -7878,7 +7877,7 @@ namespace chull {
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"auid_phases_decomposition";}
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"coefficient_phases_decomposition";}
     if(m_formation_energy_hull){headers+=(!headers.empty()?string(","):string(""))+"distance_hull_enthalpy_formation_atom";}
-    else {headers+=(!headers.empty()?string(","):string(""))+"distance_hull_entropic_temperature";}
+    else{headers+=(!headers.empty()?string(","):string(""))+"distance_hull_entropic_temperature";}
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"stability_criterion";}
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"stability_criterion_relative";}
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"N+1_enthalpy_gain";}
@@ -7913,7 +7912,7 @@ namespace chull {
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else if(vheaders[i]=="entropic_temperature"){vlabels.push_back("$T_{\\mathrm{S}}$ (K)"); vpaddings.push_back(30); valignments_headertable_string.push_back("X[2,c,m]");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else if(vheaders[i]=="distance_hull_enthalpy_formation_atom"){vlabels.push_back("$"+getDelta(helvetica_font)+" H_{\\mathrm{hull}}$ (meV/atom)"); vpaddings.push_back(30); valignments_headertable_string.push_back("X[2,c,m]");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else if(vheaders[i]=="distance_hull_entropic_temperature"){vlabels.push_back("$"+getDelta(helvetica_font)+" T_{\\mathrm{S}}$ (K)"); vpaddings.push_back(30); valignments_headertable_string.push_back("X[2,c,m]");}
-    //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
+    //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]    else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]  }
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]}
 
@@ -7930,7 +7929,7 @@ namespace chull {
       else if(vheaders[i]=="entropic_temperature"){vlabels.push_back("$T_{\\mathrm{S}}$ (K)"); vpaddings.push_back(30); valignments_headertable_uint.push_back(2); total_alignment+=valignments_headertable_uint.back();}
       else if(vheaders[i]=="distance_hull_enthalpy_formation_atom"){vlabels.push_back("$"+getDelta(helvetica_font)+" H_{\\mathrm{hull}}$ (meV/atom)"); vpaddings.push_back(30); valignments_headertable_uint.push_back(2); total_alignment+=valignments_headertable_uint.back();}
       else if(vheaders[i]=="distance_hull_entropic_temperature"){vlabels.push_back("$"+getDelta(helvetica_font)+" T_{\\mathrm{S}}$ (K)"); vpaddings.push_back(30); valignments_headertable_uint.push_back(2); total_alignment+=valignments_headertable_uint.back();}
-      else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
+      else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
     }
 
     vector<string> vlabels_styled;
@@ -7945,7 +7944,7 @@ namespace chull {
     for(uint i=0,fl_size_i=valignments_headertable_uint.size();i<fl_size_i;i++){
       page_width_fraction=page_width*(double)valignments_headertable_uint[i]/(double)total_alignment;
       valignments_headertable_string.push_back("X{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}"); 
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " " << valignments_headertable_string.back() << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " " << valignments_headertable_string.back() << endl;}
     }
 
     stringstream output;
@@ -7990,7 +7989,7 @@ namespace chull {
 
   double ConvexHull::getYTickDistance(double y_range,int approx_num_ticks,double round_to_value) const {
     bool LDEBUG = (FALSE || XHOST.DEBUG);
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " y_range=" << y_range << endl;
       cerr << __AFLOW_FUNC__ << " approx_num_ticks=" << approx_num_ticks << endl;
       cerr << __AFLOW_FUNC__ << " round_to_value=" << round_to_value << endl;
@@ -8006,7 +8005,7 @@ namespace chull {
       y_tick_distance_int=aurostd::roundDouble(delta,(int)round_to_value,true);  //divisor is ~ # of ticks //CO20190724 - explicit double->int conversion (floor is fine)
     }
     double y_tick_distance=y_tick_distance_int*pow(10,-exponent);
-    if(LDEBUG) {
+    if(LDEBUG){
       cerr << __AFLOW_FUNC__ << " y_tick_distance=" << y_tick_distance << endl;
     }
     return y_tick_distance;
@@ -8021,7 +8020,7 @@ namespace chull {
     aurostd::string2tokens(banned_colors_str,banned_colors,",");
     return grabAcceptableLatexColors(banned_colors,replace_pranab_standard,allow_dvips_colors,count);
   }
-  vector<string> ConvexHull::grabAcceptableLatexColors(const vector<string>& banned_colors,bool replace_pranab_standard,bool allow_dvips_colors,uint count) const{
+  vector<string> ConvexHull::grabAcceptableLatexColors(const vector<string>& banned_colors,bool replace_pranab_standard,bool allow_dvips_colors,uint count) const {
     vector<string> _latex_colors,latex_colors;
     string color,lower_color,colors=LATEX_DEFAULT_COLORS;
     uint loop=0;
@@ -8036,7 +8035,7 @@ namespace chull {
         if(latex_colors.size()==count){return latex_colors;}
       }
       if(allow_dvips_colors&&(loop++%2==0)){colors=LATEX_DVIPS_COLORS;}
-      else {colors=LATEX_DEFAULT_COLORS;}
+      else{colors=LATEX_DEFAULT_COLORS;}
     }
     return latex_colors;
   }
@@ -8062,24 +8061,24 @@ namespace chull {
           prototype_labels=true;
           no_labels=false;
           break;
-        } else if(vlabelstring[i][0] == 'I' || vlabelstring[i][0] == 'i') {  // ICSD
+        }else if(vlabelstring[i][0] == 'I' || vlabelstring[i][0] == 'i') {  // ICSD
           icsd_labels=true;
           no_labels=false;
           if(!compound_labels&&!prototype_labels){compound_labels=true;}  //default for icsd
-        } else if(vlabelstring[i][0] == 'N' || vlabelstring[i][0] == 'n' || vlabelstring[i][0] == 'O' || vlabelstring[i][0] == 'o') {  // none,off
+        }else if(vlabelstring[i][0] == 'N' || vlabelstring[i][0] == 'n' || vlabelstring[i][0] == 'O' || vlabelstring[i][0] == 'o') {  // none,off
           compound_labels=false;
           prototype_labels=false;
           icsd_labels=false;
           meta_labels=false;
           no_labels=true;
           break;
-        } else if(vlabelstring[i][0] == 'C' || vlabelstring[i][0] == 'c') {  // compound
+        }else if(vlabelstring[i][0] == 'C' || vlabelstring[i][0] == 'c') {  // compound
           compound_labels=true;
           no_labels=false;
-        } else if(vlabelstring[i][0] == 'P' || vlabelstring[i][0] == 'p') {  // prototype
+        }else if(vlabelstring[i][0] == 'P' || vlabelstring[i][0] == 'p') {  // prototype
           prototype_labels=true;
           no_labels=false;
-        } else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Incorrect input for plot labels \""+vlabelstring[i]+"\"");}
+        }else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Incorrect input for plot labels \""+vlabelstring[i]+"\"");}
       }
     }
     if(no_labels){
@@ -8157,7 +8156,7 @@ namespace chull {
     int plot_off_hull_setting=DEFAULT_CHULL_LATEX_PLOT_OFF_HULL;     //does not include unstable
     bool plot_off_hull;
     if(plot_off_hull_setting==-1){plot_off_hull=(getDim()==2?true:false);}
-    else {plot_off_hull=(plot_off_hull_setting==0?false:true);}
+    else{plot_off_hull=(plot_off_hull_setting==0?false:true);}
     if(filter_by_z||filter_by_distance){plot_off_hull=true;}
 
     bool plot_unstable=DEFAULT_CHULL_LATEX_PLOT_UNSTABLE;
@@ -8209,28 +8208,28 @@ namespace chull {
     //[MOVED to resolvePlotLabelSettings()]      icsd_labels=false;
     //[MOVED to resolvePlotLabelSettings()]      no_labels=false;
     //[MOVED to resolvePlotLabelSettings()]      break;
-    //[MOVED to resolvePlotLabelSettings()]    } else if(vlabelstring[i][0] == 'I' || vlabelstring[i][0] == 'i') {  // ICSD
+    //[MOVED to resolvePlotLabelSettings()]    }else if(vlabelstring[i][0] == 'I' || vlabelstring[i][0] == 'i') {  // ICSD
     //[MOVED to resolvePlotLabelSettings()]      compound_labels=false;
     //[MOVED to resolvePlotLabelSettings()]      prototype_labels=false;
     //[MOVED to resolvePlotLabelSettings()]      icsd_labels=true;
     //[MOVED to resolvePlotLabelSettings()]      no_labels=false;
     //[MOVED to resolvePlotLabelSettings()]      break;
-    //[MOVED to resolvePlotLabelSettings()]    } else if(vlabelstring[i][0] == 'N' || vlabelstring[i][0] == 'n' || vlabelstring[i][0] == 'O' || vlabelstring[i][0] == 'o') {  // none,off
+    //[MOVED to resolvePlotLabelSettings()]    }else if(vlabelstring[i][0] == 'N' || vlabelstring[i][0] == 'n' || vlabelstring[i][0] == 'O' || vlabelstring[i][0] == 'o') {  // none,off
     //[MOVED to resolvePlotLabelSettings()]      compound_labels=false;
     //[MOVED to resolvePlotLabelSettings()]      prototype_labels=false;
     //[MOVED to resolvePlotLabelSettings()]      icsd_labels=false;
     //[MOVED to resolvePlotLabelSettings()]      meta_labels=false;
     //[MOVED to resolvePlotLabelSettings()]      no_labels=true;
     //[MOVED to resolvePlotLabelSettings()]      break;
-    //[MOVED to resolvePlotLabelSettings()]    } else if(vlabelstring[i][0] == 'C' || vlabelstring[i][0] == 'c') {  // compound
+    //[MOVED to resolvePlotLabelSettings()]    }else if(vlabelstring[i][0] == 'C' || vlabelstring[i][0] == 'c') {  // compound
     //[MOVED to resolvePlotLabelSettings()]      compound_labels=true;
     //[MOVED to resolvePlotLabelSettings()]      icsd_labels=false;
     //[MOVED to resolvePlotLabelSettings()]      no_labels=false;
-    //[MOVED to resolvePlotLabelSettings()]    } else if(vlabelstring[i][0] == 'P' || vlabelstring[i][0] == 'p') {  // prototype
+    //[MOVED to resolvePlotLabelSettings()]    }else if(vlabelstring[i][0] == 'P' || vlabelstring[i][0] == 'p') {  // prototype
     //[MOVED to resolvePlotLabelSettings()]      prototype_labels=true;
     //[MOVED to resolvePlotLabelSettings()]      icsd_labels=false;
     //[MOVED to resolvePlotLabelSettings()]      no_labels=false;
-    //[MOVED to resolvePlotLabelSettings()]    } else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Incorrect input for plot labels \""+vlabelstring[i]+"\"");}
+    //[MOVED to resolvePlotLabelSettings()]    }else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Incorrect input for plot labels \""+vlabelstring[i]+"\"");}
     //[MOVED to resolvePlotLabelSettings()]  }
     //[MOVED to resolvePlotLabelSettings()]}
     if(no_labels){
@@ -8250,7 +8249,7 @@ namespace chull {
     int plot_reduced_composition_setting=DEFAULT_CHULL_LATEX_PLOT_REDUCED_COMPOSITION;
     bool plot_reduced_composition;
     if(plot_reduced_composition_setting==-1){plot_reduced_composition=(!(getDim()==2&&compound_labels&&plot_labels));}
-    else {plot_reduced_composition=(plot_reduced_composition_setting==0?false:true);}
+    else{plot_reduced_composition=(plot_reduced_composition_setting==0?false:true);}
     if(no_labels){
       if(plot_reduced_composition){
         message << "LABEL_NAME set to NONE but PLOT_REDUCED_COMPOSITION requested (fix .aflow.rc), toggling PLOT_REDUCED_COMPOSITION off";
@@ -8280,10 +8279,10 @@ namespace chull {
     if(font_size.empty()){
       if(large_font) {
         if(helvetica_font) {font_size="huge";}
-        else {font_size="Large";}
-      } else {
+        else{font_size="Large";}
+      }else{
         if(image_only){font_size="LARGE";}
-        else {font_size="large";} //safely, I can do large
+        else{font_size="large";} //safely, I can do large
       }
     }
 
@@ -8334,7 +8333,7 @@ namespace chull {
     input_hyphened=aurostd::joinWDelimiter(m_velements,"-");
     main_file="aflow_"+input+"_hull";
     if(image_only) {main_TEX_file = main_file + "_IMAGEONLY.tex";}
-    else {main_TEX_file = main_file + ".tex";}
+    else{main_TEX_file = main_file + ".tex";}
     main_PDF_file = main_file + ".pdf";
     main_PNG_file = main_file + ".png";
     string aflow_logo_full_file = "aflow_logo_full.pdf";
@@ -8342,7 +8341,7 @@ namespace chull {
     string logo_file_2 = "logo2.png";
     string DEFAULT_PLOT_COLUMN_HEADER = "";
     if(m_formation_energy_hull){DEFAULT_PLOT_COLUMN_HEADER="H_f_meVatom";}
-    else {DEFAULT_PLOT_COLUMN_HEADER="T_S";}
+    else{DEFAULT_PLOT_COLUMN_HEADER="T_S";}
 
     // other initialization
     uint plot_points_count = 0;                // points to put on ternary plot
@@ -8392,7 +8391,7 @@ namespace chull {
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]  else if(vheaders[i]=="entropic_temperature"){valignments.push_back("X[2,r,m]");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]  else if(vheaders[i]=="distance_hull_enthalpy_formation_atom"){valignments.push_back("X[2,r,m]");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]  else if(vheaders[i]=="distance_hull_entropic_temperature"){valignments.push_back("X[2,r,m]");}
-    //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]  else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
+    //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]  else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
     //[CO20190226 - TABU IS BROKEN IN TeX Live 2019]}
 
     //get alignments
@@ -8409,7 +8408,7 @@ namespace chull {
       else if(vheaders[i]=="entropic_temperature"){valignments_entrytable_uint.push_back(2); total_alignment_entrytable+=valignments_entrytable_uint.back();}
       else if(vheaders[i]=="distance_hull_enthalpy_formation_atom"){valignments_entrytable_uint.push_back(2); total_alignment_entrytable+=valignments_entrytable_uint.back();}
       else if(vheaders[i]=="distance_hull_entropic_temperature"){valignments_entrytable_uint.push_back(2); total_alignment_entrytable+=valignments_entrytable_uint.back();}
-      else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
+      else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
     }
 
     double page_width=(LATEX_WIDTH_LETTER_STD-(LATEX_LEFT_MARGIN_LETTER_STD+LATEX_RIGHT_MARGIN_LETTER_STD));
@@ -8430,8 +8429,8 @@ namespace chull {
       else if(vheaders[i]=="entropic_temperature"){valignments_entrytable_string.push_back("R{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
       else if(vheaders[i]=="distance_hull_enthalpy_formation_atom"){valignments_entrytable_string.push_back("R{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
       else if(vheaders[i]=="distance_hull_entropic_temperature"){valignments_entrytable_string.push_back("R{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
-      else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " " << valignments_entrytable_string.back() << endl;}
+      else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " " << valignments_entrytable_string.back() << endl;}
     }
 
     //for compound name / ground state thermo properties (2 columns)
@@ -8449,7 +8448,7 @@ namespace chull {
       page_width_fraction=page_width*(double)valignments_compoundname_thermopropstable_uint[i]/(double)total_alignment_compoundname_thermoprops;
       if(i==0){valignments_compoundname_thermopropstable_string.push_back("L{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
       if(i==1){valignments_compoundname_thermopropstable_string.push_back("R{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " " << valignments_compoundname_thermopropstable_string.back() << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " " << valignments_compoundname_thermopropstable_string.back() << endl;}
     }
 
     //for 1 column tables (left align)
@@ -8465,7 +8464,7 @@ namespace chull {
     for(uint i=0,fl_size_i=valignments_onecol_lefttable_uint.size();i<fl_size_i;i++){
       page_width_fraction=page_width*(double)valignments_onecol_lefttable_uint[i]/(double)total_alignment_onecol_left;
       if(i==0){valignments_onecol_lefttable_string.push_back("L{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " " << valignments_onecol_lefttable_string.back() << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " " << valignments_onecol_lefttable_string.back() << endl;}
     }
 
     //for equilibrium/decomposition reactions
@@ -8483,7 +8482,7 @@ namespace chull {
       page_width_fraction=page_width*(double)valignments_reactiontable_uint[i]/(double)total_alignment_reaction;
       if(i==0){valignments_reactiontable_string.push_back("L{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
       if(i==1){valignments_reactiontable_string.push_back("R{"+aurostd::utype2string( page_width_fraction - penalty_tabcolsep - penalty_arrayrulewidth )+"in}");}
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " " << valignments_reactiontable_string.back() << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " " << valignments_reactiontable_string.back() << endl;}
     }
 
     //ymin needs to change with iso_max plot
@@ -8509,7 +8508,7 @@ namespace chull {
         iso_max=isoMaxLatentHeat(m_points[i_point],0.5,_m_);
         if(iso_max<iso_max_latent_heat_min){iso_max_latent_heat_min=iso_max;}
       }
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " iso-max-latent-lines min=" << iso_max_latent_heat_min << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " iso-max-latent-lines min=" << iso_max_latent_heat_min << endl;}
     }
 
     bool unary_g_state_unstable=false;  //the only way this is true is if we plot the unary g_state and it's unstable
@@ -8529,22 +8528,22 @@ namespace chull {
           //let's automatically override plot_unstable if z_filter_cutoff is set appropriately
           bool plot_unstable_old=plot_unstable;
           if(m_formation_energy_hull){if(z_filter_cutoff > 0.0){plot_unstable=true;}}
-          else {if(z_filter_cutoff < 0.0){plot_unstable=true;}}
+          else{if(z_filter_cutoff < 0.0){plot_unstable=true;}}
           if(plot_unstable_old!=plot_unstable){
             message << "CHULL::PLOT_UNSTABLE set to TRUE, z_filter_cutoff=" << z_filter_cutoff;
             pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);
           }
           //[OBSOLETE CO20180227]if(!plot_unstable) {
           //[OBSOLETE CO20180227]  if(m_formation_energy_hull){if(z_filter_cutoff > 0.0){z_filter_cutoff = 0.0;}}
-          //[OBSOLETE CO20180227]  else {if(z_filter_cutoff < 0.0){z_filter_cutoff = 0.0;}}
+          //[OBSOLETE CO20180227]  else{if(z_filter_cutoff < 0.0){z_filter_cutoff = 0.0;}}
           //[OBSOLETE CO20180227]}
-          //[OBSOLETE CO20180227]else {z_filter_cutoff = 0.0;}
+          //[OBSOLETE CO20180227]else{z_filter_cutoff = 0.0;}
         }
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " z_filter_cutoff=" << z_filter_cutoff << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " z_filter_cutoff=" << z_filter_cutoff << endl;}
       }
       if(filter_by_distance) {
         dist_filter_cutoff = filter_cutoff; 
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " DIST dist_filter_cutoff=" << dist_filter_cutoff << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " DIST dist_filter_cutoff=" << dist_filter_cutoff << endl;}
         if(aurostd::zeroWithinTol(dist_filter_cutoff,ZERO_TOL) && plot_off_hull) {
           plot_off_hull=false;
           message << "CHULL::OFF_HULL set to FALSE, filter_by_distance=0.0";
@@ -8592,7 +8591,7 @@ namespace chull {
                   //[CO20181226 - print later]}
                   continue;
                 }
-              } else {
+              }else{
                 if(chull::T_S(point) < z_filter_cutoff) {
                   //[CO20181226 - print later]if(filter_by_z) {
                   //[CO20181226 - print later]  message << "Excluding entry " << point.m_entry.auid;
@@ -8613,7 +8612,7 @@ namespace chull {
                   //[CO20181226 - print later]pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);  // too much output to screen
                   continue;
                 }
-              } else {
+              }else{
                 if(point.getDist2Hull(_std_) < dist_filter_cutoff) {
                   //[CO20181226 - print later]message << "Excluding entry " << point.m_entry.auid;
                   //[CO20181226 - print later]message << " with distance_hull_entropic_temperature = " << aurostd::utype2string(point.getDist2Hull(_std_),CHULL_PRECISION);
@@ -8628,8 +8627,8 @@ namespace chull {
           if(point.getLastCoord()>max_point){max_point=point.getLastCoord();}
           //[CO20181226 - set later]if(point.isUnary()){
           //[CO20181226 - set later]  if(m_formation_energy_hull) {if(chull::H_f_atom(point, _m_) > z_filter_cutoff) {unary_g_state_unstable=true;}}
-          //[CO20181226 - set later]  else {if(chull::T_S(point) < z_filter_cutoff) {unary_g_state_unstable=true;}}
-          //[CO20181226 - set later]} else {plot_points_count_no_end_points++;}
+          //[CO20181226 - set later]  else{if(chull::T_S(point) < z_filter_cutoff) {unary_g_state_unstable=true;}}
+          //[CO20181226 - set later]}else{plot_points_count_no_end_points++;}
           plot_points_count++;
           //[CO20181226 - set later]plot_points.push_back(i_point);
           point_added=true;
@@ -8639,7 +8638,7 @@ namespace chull {
         filter_by_z=true;filter_by_distance=false;
         plot_unstable=true;
         if(m_formation_energy_hull) {z_filter_cutoff=1000.0;} //1000 meV
-        else {z_filter_cutoff=1.0/(((double)KBOLTZEV)*(0.5*log(0.5)+(1.0-0.5)*log(1.0-0.5)));}  //1.0 eV / (kB * 2 * 0.5 log(0.5))
+        else{z_filter_cutoff=1.0/(((double)KBOLTZEV)*(0.5*log(0.5)+(1.0-0.5)*log(1.0-0.5)));}  //1.0 eV / (kB * 2 * 0.5 log(0.5))
         message << "CHULL::FILTER_SCHEME set to Z-axis (no stable points found)" << endl;
         message << "CHULL::FILTER_VALUE set to " << z_filter_cutoff << " (no stable found)" << endl;
         message << "CHULL::PLOT_UNSTABLE set to TRUE (no stable found)" << endl;
@@ -8681,7 +8680,7 @@ namespace chull {
                   }
                   continue;
                 }
-              } else {
+              }else{
                 if(chull::T_S(point) < z_filter_cutoff) {
                   if(filter_by_z) {
                     message << "Excluding entry " << point.m_entry.auid;
@@ -8702,7 +8701,7 @@ namespace chull {
                   pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_OPTION_);  // too much output to screen
                   continue;
                 }
-              } else {
+              }else{
                 if(point.getDist2Hull(_std_) < dist_filter_cutoff) {
                   message << "Excluding entry " << point.m_entry.auid;
                   message << " with distance_hull_entropic_temperature = " << aurostd::utype2string(point.getDist2Hull(_std_),CHULL_PRECISION);
@@ -8717,8 +8716,8 @@ namespace chull {
           if(point.getLastCoord()>max_point){max_point=point.getLastCoord();}
           if(point.isUnary()){
             if(m_formation_energy_hull) {if(chull::H_f_atom(point, _m_) > z_filter_cutoff) {unary_g_state_unstable=true;}}
-            else {if(chull::T_S(point) < z_filter_cutoff) {unary_g_state_unstable=true;}}
-          } else {plot_points_count_no_end_points++;}
+            else{if(chull::T_S(point) < z_filter_cutoff) {unary_g_state_unstable=true;}}
+          }else{plot_points_count_no_end_points++;}
           plot_points_count++;
           plot_points.push_back(i_point);
           point_added=true;
@@ -8854,7 +8853,7 @@ namespace chull {
           if(!print_aflow_logo_full){_doc_header_TEX_ss << "\\shortstack[l]{";}
           if(external_links) {_doc_header_TEX_ss << "\\href{http://aflow.org}";}
           if(print_aflow_logo_full) {_doc_header_TEX_ss << "{\\includegraphics[scale=0.2]{" << aflow_logo_full_file << "}}";}
-          else {
+          else{
             _doc_header_TEX_ss << "{\\LARGE AFLOW V" << string(AFLOW_VERSION) << "}";
             _doc_header_TEX_ss << "\\\\";
             _doc_header_TEX_ss << "{\\large C. Oses and S. Curtarolo}";
@@ -8868,7 +8867,7 @@ namespace chull {
           if(print_logo_2){
             if(external_links) {_doc_header_TEX_ss << "\\href{http://www.nomad-coe.eu/}";}
             _doc_header_TEX_ss << "{\\includegraphics[scale=0.1]{" << logo_file_2 << "}}";
-          } else {  //print_aflow_webaddress_logo
+          }else{  //print_aflow_webaddress_logo
             if(external_links) {_doc_header_TEX_ss << "\\href{http://aflow.org}";}
             _doc_header_TEX_ss << "{" << label_image_font_size << "{\\fontfamily{\\sfdefault}\\selectfont{aflow.org}}}";  //\\fontfamily{\\phv}\\selectfont
           }
@@ -8899,7 +8898,7 @@ namespace chull {
       if(!print_aflow_logo_full){_doc_header_TEX_ss << "\\shortstack[l]{";}
       if(external_links) {_doc_header_TEX_ss << "\\href{" << AFLOW_WEB << "}";}
       if(print_aflow_logo_full) {_doc_header_TEX_ss << "{\\raisebox{-.5\\height}{\\includegraphics[scale=0.25]{" << aflow_logo_full_file << "}}}";}
-      else {
+      else{
         _doc_header_TEX_ss << "{\\LARGE AFLOW V" << string(AFLOW_VERSION) << "}";
         _doc_header_TEX_ss << "\\\\";
         _doc_header_TEX_ss << "{\\large C. Oses and S. Curtarolo}";
@@ -9050,7 +9049,7 @@ namespace chull {
 
       if(showkJmolaxis){y_tick_distance_right/=10.0;} //default value, store AFTER setting showkJmolaxis
 
-      if(LDEBUG) {
+      if(LDEBUG){
         cerr << __AFLOW_FUNC__ << " range" << endl;
         cerr << __AFLOW_FUNC__ << " max:     " << max_point << endl;
         cerr << __AFLOW_FUNC__ << " min:     " << min_point << endl;
@@ -9076,7 +9075,7 @@ namespace chull {
         include_color_bar=false;
         show_heat_map=false;
         display_color_gradient=false;
-        if(LDEBUG) {
+        if(LDEBUG){
           cerr << __AFLOW_FUNC__ << " plot points count = " << plot_points_count << endl;
           cerr << __AFLOW_FUNC__ << " plot points count no end points = " << plot_points_count_no_end_points << endl;
         }
@@ -9130,12 +9129,12 @@ namespace chull {
         //
         //ymin=-ZERO_RANGE_TOL;
         //ymax=ZERO_RANGE_TOL;
-      } else {
+      }else{
         // easier to figure out ranges in meV, stays meV
         // between lowest label and bottom line, increase if need more
         // we might have hull endpoints higher than 0
         if(!m_formation_energy_hull && !(plot_unaries && unary_g_state_unstable) && (!plot_unstable || abs(min_point) < ZERO_TOL)) {ymin=0;}
-        else {
+        else{
           ymin=min_point;
           if(dimension==2){ //only do rounding for dim==2, dim==3 we need EXACT values or colorbar gets screwed up
             if(m_formation_energy_hull){ymin-=extra_padding;}  //CO20180227 - we need to avoid labels here
@@ -9145,7 +9144,7 @@ namespace chull {
         // between highest label and top line, increase if need more
         // we might have hull endpoints higher than 0
         if(m_formation_energy_hull && !(plot_unaries && unary_g_state_unstable) && (!plot_unstable || abs(max_point) < ZERO_TOL)) {ymax=0;}
-        else {
+        else{
           ymax=max_point;
           if(dimension==2){ //only do rounding for dim==2, dim==3 we need EXACT values or colorbar gets screwed up
             if(!m_formation_energy_hull){ymax+=extra_padding;}  //CO20180227 - we need to avoid labels here
@@ -9162,7 +9161,7 @@ namespace chull {
           y_tick_distance_right=getYTickDistance(meVatom2kJmol*y_range,approx_num_ticks,round_to_value_right);
         }
 
-        if(0||LDEBUG) {
+        if(0||LDEBUG){
           cerr << __AFLOW_FUNC__ << " point_range                                        = " << point_range << endl;
           cerr << __AFLOW_FUNC__ << " min_point                                          = " << min_point << endl;
           cerr << __AFLOW_FUNC__ << " max_point                                          = " << max_point << endl;
@@ -9199,18 +9198,18 @@ namespace chull {
 
       if(dimension==3){common_settings_TEX_ss << "axis line style={line width=3pt}," << endl;}
       //if(dimension == 2) {common_settings_TEX_ss << 20;}
-      //else {  // dimension==3
+      //else{  // dimension==3
       //  //CO change me if we see otherwise
       //  //if(include_color_bar) {
       //  //  if(image_only) {common_settings_TEX_ss << 21;}
-      //  //  else {common_settings_TEX_ss << 17;}  // only time we change size
-      //  //} else {common_settings_TEX_ss << 21;}
+      //  //  else{common_settings_TEX_ss << 17;}  // only time we change size
+      //  //}else{common_settings_TEX_ss << 21;}
       //}
       //common_settings_TEX_ss << "cm," << endl;
       //if(dimension == 2) {
       //  if(image_only) {common_settings_TEX_ss << "height=0.8\\hsize," << endl;}
-      //  else {common_settings_TEX_ss << "height=0.55\\hsize," << endl;}
-      //} else {
+      //  else{common_settings_TEX_ss << "height=0.55\\hsize," << endl;}
+      //}else{
       //  common_settings_TEX_ss << "height=\\hsize," << endl;
       //  common_settings_TEX_ss << "axis line style={line width=3pt}," << endl;
       //}
@@ -9230,7 +9229,7 @@ namespace chull {
         if(!reverse_axes) {
           top_axis_point = 0;
           bottom_axis_point = 1;
-        } else {
+        }else{
           top_axis_point = 1;
           bottom_axis_point = 0;
         }
@@ -9249,7 +9248,7 @@ namespace chull {
             //  //if(!plot_unaries && isViableGState(g_state)) {
             //  //  if(internal_links_graph2report) {
             //  //    pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-            //  //  } else if(no_doc && external_links) {
+            //  //  }else if(no_doc && external_links) {
             //  //    pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
             //  //  }
             //  //}
@@ -9293,7 +9292,7 @@ namespace chull {
           //  //if(!plot_unaries && isViableGState(g_state)) {
           //  //  if(internal_links_graph2report) {
           //  //    pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-          //  //  } else if(no_doc && external_links) {
+          //  //  }else if(no_doc && external_links) {
           //  //    pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
           //  //  }
           //  //}
@@ -9336,7 +9335,7 @@ namespace chull {
           if(!plot_unaries && isViableGState(g_state)) {
             if(internal_links_graph2report) {
               pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-            } else if(no_doc && external_links) {
+            }else if(no_doc && external_links) {
               pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
             }
           }
@@ -9376,7 +9375,7 @@ namespace chull {
         //if(!plot_unaries && isViableGState(g_state)) {
         //  if(internal_links_graph2report) {
         //    pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-        //  } else if(no_doc && external_links) {
+        //  }else if(no_doc && external_links) {
         //    pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
         //  }
         //}
@@ -9386,7 +9385,7 @@ namespace chull {
         pseudo_preliminary_axes_TEX_ss << "ylabel={{" << (m_formation_energy_hull?"$H_{\\mathrm{f}}$ (meV/atom)":"$T_{\\mathrm{S}}$ (K)") << "}}," << endl;
         //pseudo_preliminary_axes_TEX_ss << "ylabel={{" << (m_formation_energy_hull?"formation enthalpy (meV/atom)":"entropic temperature (K)") << "}}," << endl;
         //if(m_formation_energy_hull) {pseudo_preliminary_axes_TEX_ss << "{formation enthalpy (meV/atom)}";}
-        //else {pseudo_preliminary_axes_TEX_ss << "{entropic temperature (K)}";}
+        //else{pseudo_preliminary_axes_TEX_ss << "{entropic temperature (K)}";}
         //pseudo_preliminary_axes_TEX_ss << "}," << endl;
         pseudo_preliminary_axes_TEX_ss << "ylabel style={font=" << label_image_font_size << "}," << endl;
         //add "max space between ticks=60" to change colorbar tick density
@@ -9402,7 +9401,7 @@ namespace chull {
         if(!plot_unaries && isViableGState(g_state)) {
           if(internal_links_graph2report) {
             pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-          } else if(no_doc && external_links) {
+          }else if(no_doc && external_links) {
             pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
           }
         }
@@ -9414,7 +9413,7 @@ namespace chull {
         if(!plot_unaries && isViableGState(g_state)) {
           if(internal_links_graph2report) {
             pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-          } else if(no_doc && external_links) {
+          }else if(no_doc && external_links) {
             pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
           }
         }
@@ -9427,7 +9426,7 @@ namespace chull {
         pseudo_preliminary_axes_TEX_ss << "}," << endl;
         if(set_y_range_exactly){pseudo_preliminary_axes_TEX_ss << "ytick distance={" << y_tick_distance << "}," << endl;}
         pseudo_preliminary_axes_TEX_ss << "scaled y ticks=false," << endl;
-      } else {  // dimension==3
+      }else{  // dimension==3
         //first axis - kJ/mol, only for right color bar
         if(showkJmolaxis){
           if(display_color_gradient) {
@@ -9439,7 +9438,7 @@ namespace chull {
               if(!plot_unaries && isViableGState(g_state)) {
                 if(internal_links_graph2report) {
                   pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-                } else if(no_doc && external_links) {
+                }else if(no_doc && external_links) {
                   pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
                 }
               }
@@ -9452,7 +9451,7 @@ namespace chull {
               if(!plot_unaries && isViableGState(g_state)) {
                 if(internal_links_graph2report) {
                   pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-                } else if(no_doc && external_links) {
+                }else if(no_doc && external_links) {
                   pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
                 }
               }
@@ -9465,7 +9464,7 @@ namespace chull {
               if(!plot_unaries && isViableGState(g_state)) {
                 if(internal_links_graph2report) {
                   pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-                } else if(no_doc && external_links) {
+                }else if(no_doc && external_links) {
                   pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
                 }
               }
@@ -9518,9 +9517,9 @@ namespace chull {
                   const ChullFacet& facet=m_facets[m_i_facets[i]];
                   if(facet.m_is_artificial){continue;}
                   if(facet.m_is_vertical) {
-                    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " NOT plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
-                  } else {
-                    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
+                    if(LDEBUG){cerr << __AFLOW_FUNC__ << " NOT plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
+                  }else{
+                    if(LDEBUG){cerr << __AFLOW_FUNC__ << " plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
                     num_horizontal_planes++;
                   }
                   chull_points = facet.getCHIndices();
@@ -9580,7 +9579,7 @@ namespace chull {
               if(1){
                 node_option_ss << "opacity=" << 0 << ",shift={(" << watermark_x_shift << ",0cm)},anchor=north"; // << ",anchor=north west";
                 //if(include_banner){node_position_ss << "axis cs:0.75,0.125,0.125";} //more complicated than necessary
-                //else {
+                //else{
                 node_position_ss << "axis cs:1,0,0";
                 //}
                 node_content_ss << "\\includegraphics[scale=0.25]{" << aflow_logo_skinny_file << "}";
@@ -9613,7 +9612,7 @@ namespace chull {
         if(!plot_unaries && isViableGState(g_state)) {
           if(internal_links_graph2report) {
             pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-          } else if(no_doc && external_links) {
+          }else if(no_doc && external_links) {
             pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
           }
         }
@@ -9626,7 +9625,7 @@ namespace chull {
         if(!plot_unaries && isViableGState(g_state)) {
           if(internal_links_graph2report) {
             pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-          } else if(no_doc && external_links) {
+          }else if(no_doc && external_links) {
             pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
           }
         }
@@ -9639,7 +9638,7 @@ namespace chull {
         if(!plot_unaries && isViableGState(g_state)) {
           if(internal_links_graph2report) {
             pseudo_preliminary_axes_TEX_ss << "\\hyperrefTitle{" << input << "_" << m_points[g_state].m_entry.auid << "}";
-          } else if(no_doc && external_links) {
+          }else if(no_doc && external_links) {
             pseudo_preliminary_axes_TEX_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << m_points[g_state].m_entry.auid << "}";
           }
         }
@@ -9653,7 +9652,7 @@ namespace chull {
       if(dimension == 2) {
         tikzpic_settings_TEX_ss << "ymin=" << ymin << "," << endl;
         tikzpic_settings_TEX_ss << "ymax=" << ymax << "," << endl;
-      } else {  // dimension==3
+      }else{  // dimension==3
         tikzpic_settings_TEX_ss << "ymin=0," << endl;
         tikzpic_settings_TEX_ss << "ymax=1," << endl;
         tikzpic_settings_TEX_ss << "zmin=0," << endl;
@@ -9749,7 +9748,7 @@ namespace chull {
           }
         }
         if(added_header){tikzpic_TEX_ss << "};" << endl;}
-      } else {  // dimension==3
+      }else{  // dimension==3
         //////////////////////////////////////////////////////////////////////////
         // START 3D Heat maps and facet lines
         //////////////////////////////////////////////////////////////////////////
@@ -9761,9 +9760,9 @@ namespace chull {
             const ChullFacet& facet=m_facets[m_i_facets[i]];
             if(facet.m_is_artificial){continue;}
             if(facet.m_is_vertical) {
-              if(LDEBUG) {cerr << __AFLOW_FUNC__ << " NOT plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
-            } else {
-              if(LDEBUG) {cerr << __AFLOW_FUNC__ << " plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
+              if(LDEBUG){cerr << __AFLOW_FUNC__ << " NOT plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
+            }else{
+              if(LDEBUG){cerr << __AFLOW_FUNC__ << " plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
               num_horizontal_planes++;
             }
             chull_points = facet.getCHIndices();
@@ -9794,7 +9793,7 @@ namespace chull {
               heat_map_TEX_ss << "};" << endl;
             }
           }
-        } else {
+        }else{
           // no choice but to go through planes twice, once for
           // heatmap, the other for facet lines/drop shadows
 
@@ -9805,9 +9804,9 @@ namespace chull {
               const ChullFacet& facet=m_facets[m_i_facets[i]];
               if(facet.m_is_artificial){continue;}
               if(facet.m_is_vertical) {
-                if(LDEBUG) {cerr << __AFLOW_FUNC__ << " NOT plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
-              } else {
-                if(LDEBUG) {cerr << __AFLOW_FUNC__ << " plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
+                if(LDEBUG){cerr << __AFLOW_FUNC__ << " NOT plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
+              }else{
+                if(LDEBUG){cerr << __AFLOW_FUNC__ << " plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
                 num_horizontal_planes++;
               }
               chull_points = facet.getCHIndices();
@@ -9835,18 +9834,18 @@ namespace chull {
             const ChullFacet& facet=m_facets[m_i_facets[i]];
             if(facet.m_is_artificial){continue;}
             if(facet.m_is_vertical) {
-              if(LDEBUG) {cerr << __AFLOW_FUNC__ << " NOT plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
-            } else {
-              if(LDEBUG) {cerr << __AFLOW_FUNC__ << " plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
+              if(LDEBUG){cerr << __AFLOW_FUNC__ << " NOT plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
+            }else{
+              if(LDEBUG){cerr << __AFLOW_FUNC__ << " plane: " << abs(facet.m_normal[facet.m_normal.urows]) << endl;}
               num_horizontal_planes++;
             }
             chull_points = facet.getCHIndices();
             chull_points.push_back(chull_points[0]);  // that way we get full facet
-            if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking for all unwanted facets" << endl;}
+            if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking for all unwanted facets" << endl;}
             for(uint l=0,fl_size_l=chull_points.size();l<fl_size_l - 1;l++) {
-              if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking at point l=" << l << " and l=" << l + 1 << endl;}
+              if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking at point l=" << l << " and l=" << l + 1 << endl;}
               if(!unwantedFacetLine(chull_points[l], chull_points[l+1], facet_lines, true)) {
-                if(LDEBUG) {cerr << __AFLOW_FUNC__ << " plotting point l=" << l << " and l=" << l + 1 << endl;}
+                if(LDEBUG){cerr << __AFLOW_FUNC__ << " plotting point l=" << l << " and l=" << l + 1 << endl;}
                 // convex hull facets (lines)
                 convex_hull_facets_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_FACETS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
                 for(uint j=0;j<2;j++) {
@@ -9855,8 +9854,8 @@ namespace chull {
                 }
                 // end line for connecting facet lines
                 convex_hull_facets_TEX_ss << "};" << endl;
-              } else {
-                if(LDEBUG) {
+              }else{
+                if(LDEBUG){
                   cerr << __AFLOW_FUNC__ << " skipping l=" << l << " and l=" << l + 1 << endl;
                   cerr << __AFLOW_FUNC__ << " l=" << l << " is " << m_points[chull_points[l]].m_coords << endl;
                   cerr << __AFLOW_FUNC__ << " l=" << l+1 << " is " << m_points[chull_points[l+1]].m_coords << endl;
@@ -9864,7 +9863,7 @@ namespace chull {
               }
               if(hull_drop_shadow) {
                 if(!unwantedFacetLine(chull_points[l], chull_points[l+1], facet_lines_dropshadow, false)){
-                  if(LDEBUG) {cerr << __AFLOW_FUNC__ << " plotting drop shadow l=" << l << " and l=" << l + 1 << endl;}
+                  if(LDEBUG){cerr << __AFLOW_FUNC__ << " plotting drop shadow l=" << l << " and l=" << l + 1 << endl;}
                   // thick white line for contrast
                   convex_hull_facets_drop_shadow_TEX_ss << getPlotHeaderPDF(ADDPLOT_MODE_HULL_FACETSDROP_SHADOWS,DEFAULT_PLOT_COLUMN_HEADER,display_color_gradient);
                   for(uint j=0;j<2;j++) {
@@ -9873,8 +9872,8 @@ namespace chull {
                   }
                   // end line for connecting facet lines
                   convex_hull_facets_drop_shadow_TEX_ss << "};" << endl;
-                } else {
-                  if(LDEBUG) {
+                }else{
+                  if(LDEBUG){
                     cerr << __AFLOW_FUNC__ << " skipping drop shadow l=" << l << " and l=" << l + 1 << endl;
                     cerr << __AFLOW_FUNC__ << " l=" << l << " is " << m_points[chull_points[l]].m_coords << endl;
                     cerr << __AFLOW_FUNC__ << " l=" << l+1 << " is " << m_points[chull_points[l+1]].m_coords << endl;
@@ -9934,7 +9933,7 @@ namespace chull {
       // START Plotting off hull points
       ////////////////////////////////////////////////////////////////////////////
 
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " start plotting off hull points" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " start plotting off hull points" << endl;}
       if(plot_off_hull || !no_labels || internal_links_graph2report || no_doc) {
         string compound_label;
         bool found_icsd_label=false;
@@ -9960,7 +9959,7 @@ namespace chull {
             node_content_ss << "\\tiny";
             node_content_ss << "{";
             if(no_doc && external_links) {node_content_ss << "\\href{" << ENTRY_PAGE_URL_PREFIX << entry.auid << "}";}
-            else {
+            else{
               //uint i_coord_group;
               if(getCoordGroupIndex(point,i_coord_group)){
                 uint ref_state=m_coord_groups[i_coord_group].m_ref_state;
@@ -10029,7 +10028,7 @@ namespace chull {
                 node_content_ss << "\\\\";
                 if(m_formation_energy_hull) {
                   node_content_ss << "$" << getDelta(helvetica_font) << " H_{\\mathrm{hull}}$=" << aurostd::utype2string(point.getDist2Hull(_m_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " meV/atom";  //CHULL_PRECISION
-                } else {
+                }else{
                   node_content_ss << "$" << getDelta(helvetica_font) << " T_{\\mathrm{S}}$=" << aurostd::utype2string(point.getDist2Hull(_std_),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM) << " K"; //CHULL_PRECISION
                 }
               }
@@ -10042,7 +10041,7 @@ namespace chull {
               // END Meta-labels (lots of info)
               //////////////////////////////////////////////////////////////////
 
-            } else {  // no metadata
+            }else{  // no metadata
               // special case
               // create two nodes, one with compound name below ground-state
               // node, another with prototype above each node
@@ -10072,8 +10071,8 @@ namespace chull {
                 // get node option
                 if(point.isUnary()) {
                   if(entry.vspecies[0] == m_velements[0]) {node_option_ss << "anchor=east";}
-                  else {node_option_ss << "anchor=west";}
-                } else {node_option_ss << "anchor=" << (m_formation_energy_hull?"south,above=0.1cm":"north,below=0.1cm");}
+                  else{node_option_ss << "anchor=west";}
+                }else{node_option_ss << "anchor=" << (m_formation_energy_hull?"south,above=0.1cm":"north,below=0.1cm");}
                 // get node position
                 node_position_ss << getNodeCoordPosition(point);
                 // get node content
@@ -10091,7 +10090,7 @@ namespace chull {
                 // END Special case labels (2D with prototypes)
                 ////////////////////////////////////////////////////////////////
 
-              } else {  // normal case
+              }else{  // normal case
 
                 ////////////////////////////////////////////////////////////////
                 // START Normal labels
@@ -10102,36 +10101,36 @@ namespace chull {
                   if(dimension == 2) {
                     if(!point.isUnary()) {  //deal with unaries later
                       if(point.m_is_g_state) {node_option_ss << "rotate=90,anchor=" << (m_formation_energy_hull?"east":"west");}
-                      else {node_option_ss << "anchor=" << (m_formation_energy_hull?"south,above=0.1cm":"north,below=0.1cm");}
+                      else{node_option_ss << "anchor=" << (m_formation_energy_hull?"south,above=0.1cm":"north,below=0.1cm");}
                     }
-                  } else {  // dimension==3
+                  }else{  // dimension==3
                     // ordered to optimize speed (binaries are bulk, then ternaries, then unaries)
                     if(entry.vspecies.size() == 2) {
                       // / side of triangle
                       if(entry.vspecies[0] == m_velements[0] && entry.vspecies[1] == m_velements[1]) {
                         node_option_ss << "rotate=-30,anchor=east";
                         // \ side of triangle
-                      } else if(entry.vspecies[0] == m_velements[1] && entry.vspecies[1] == m_velements[2]) {
+                      }else if(entry.vspecies[0] == m_velements[1] && entry.vspecies[1] == m_velements[2]) {
                         node_option_ss << "rotate=30,anchor=west";
                         // _ side of triangle
-                      } else if(entry.vspecies[0] == m_velements[0] && entry.vspecies[1] == m_velements[2]) {
+                      }else if(entry.vspecies[0] == m_velements[0] && entry.vspecies[1] == m_velements[2]) {
                         node_option_ss << "rotate=90,anchor=east";
                       }
-                    } else if(entry.vspecies.size() == 3) {
+                    }else if(entry.vspecies.size() == 3) {
                       if(!show_heat_map) {node_option_ss << "anchor=south,above=0.1cm";}
-                    } else if(entry.vspecies.size() == 1) {
+                    }else if(entry.vspecies.size() == 1) {
                       // bottom two edges of triangle
                       if(entry.vspecies[0] == m_velements[0] || entry.vspecies[0] == m_velements[2]) {
                         node_option_ss << "anchor=north,below=0.1cm";
                         // top of triangle
-                      } else {node_option_ss << "anchor=south,above=0.1cm";}
+                      }else{node_option_ss << "anchor=south,above=0.1cm";}
                     }
                   }
                 }
                 if(dimension == 2) {  //deal with unaries separately
                   if(point.isUnary()) {
                     if(entry.vspecies[0] == m_velements[0]) {node_option_ss << "anchor=east";}
-                    else {node_option_ss << "anchor=west";}
+                    else{node_option_ss << "anchor=west";}
                   }
                 }
                 // get node position
@@ -10139,7 +10138,7 @@ namespace chull {
                 // get node content
                 if(dimension == 3 && entry.vspecies.size() == 3) {node_content_ss << "\\color{" << ternary_label_color << "}";}
                 if(compound_labels && prototype_labels) {node_content_ss << "\\scriptsize{";} //these are sort of "special" font settings meant to reduce clutter, no need to add to aflowrc
-                else {node_content_ss << "\\" << font_size << "{";}  //already gets wrapped with brackets in nodeCreator(), just leave alone so you mitigate spaces
+                else{node_content_ss << "\\" << font_size << "{";}  //already gets wrapped with brackets in nodeCreator(), just leave alone so you mitigate spaces
                 if(bold_labels || (entry.vspecies.size() == 3 && bold_labels_ternaries)/* && !helvetica_font*/) {node_content_ss << "\\textbf{";}
 
                 // add space for rotation
@@ -10148,7 +10147,7 @@ namespace chull {
                     if(!point.isUnary()){ //handle unaries later
                       if(!m_formation_energy_hull && point.m_is_g_state){node_content_ss << "~";}
                     }
-                  } else {  // dimension==3
+                  }else{  // dimension==3
                     if(entry.vspecies.size() == 2) {
                       // \ side of triangle
                       if(entry.vspecies[0] == m_velements[1] && entry.vspecies[1] == m_velements[2]) {
@@ -10190,7 +10189,7 @@ namespace chull {
                         node_content_ss << "::";
                         node_content_ss << output_name;
                       }
-                    } else {node_content_ss << output_name;}
+                    }else{node_content_ss << output_name;}
                   }
                 }
 
@@ -10199,13 +10198,13 @@ namespace chull {
                     if(!point.isUnary()){ //handle unaries later
                       if(m_formation_energy_hull && point.m_is_g_state){node_content_ss << "~~";} // only works if we put two?
                     }
-                  } else {  // dimension==3
+                  }else{  // dimension==3
                     if(entry.vspecies.size() == 2) {
                       // / side of triangle
                       if(entry.vspecies[0] == m_velements[0] && entry.vspecies[1] == m_velements[1]) {
                         node_content_ss << "~~";  // only works if we put two?
                         // _ side of triangle
-                      } else if(entry.vspecies[0] == m_velements[0] && entry.vspecies[1] == m_velements[2]) {
+                      }else if(entry.vspecies[0] == m_velements[0] && entry.vspecies[1] == m_velements[2]) {
                         node_content_ss << "~~";  // only works if we put two?
                       }
                     }
@@ -10259,7 +10258,7 @@ namespace chull {
           tikzpic_TEX_ss << "\\end{pgfonlayer}{foreground}" << endl;
         }
       }
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " start plotting logos" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " start plotting logos" << endl;}
       if(1){
         //add node with logo inside first
         tikzpic_TEX_ss << "\\begin{pgfonlayer}{background}" << endl;  // for overlap
@@ -10295,7 +10294,7 @@ namespace chull {
           node_position_ss << "axis cs:0," << ymin;
           node_content_ss << "\\includegraphics[scale=0.25]{" << aflow_logo_skinny_file << "}";
           tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
-        } else {  //dimension==3
+        }else{  //dimension==3
           //// / side
           //node_option_ss << "opacity=" << opacity_watermark << ",rotate=60,anchor=south";
           //node_position_ss << "axis cs:0.5,0.5,0";
@@ -10317,10 +10316,10 @@ namespace chull {
           { //CO20200106 - patching for auto-indenting
             node_option_ss << "opacity=" << opacity_watermark << ",shift={(" << watermark_x_shift << ",0cm)},anchor=north"; // << ",anchor=north west";
             //if(include_color_bar){node_position_ss << "axis cs:0.75,0.125,0.125";}  //more complicated than necessary
-            //else {
+            //else{
             node_position_ss << "axis cs:1,0,0";
             //}
-          } else {
+          }else{
             node_option_ss << "opacity=" << opacity_watermark << ",shift={(-" << watermark_x_shift << ",0cm)},anchor=north"; // << ",anchor=north west";
             node_position_ss << "axis cs:1,0,0";
           }
@@ -10339,7 +10338,7 @@ namespace chull {
             node_position_ss << "axis cs:1," << ymax;
             node_content_ss << general_image_font_size << " \\today";
             tikzpic_TEX_ss << nodeCreator(node_option_ss, node_position_ss, node_content_ss);
-          } else {  //dimension==3
+          }else{  //dimension==3
             //node_option_ss << "shift={(0in,5in)}";
             //node_position_ss << "axis cs:0,1,0";
             node_option_ss << "anchor=south,shift={(-" << watermark_x_shift << "," << sqrt(2.0*unary_distance_axis_3D*unary_distance_axis_3D) << "cm)}";
@@ -10364,8 +10363,8 @@ namespace chull {
       ////////////////////////////////////////////////////////////////////////////
 
       if(dimension == 2) {tikzpic_TEX_ss << "\\end{axis}" << endl;}
-      else {tikzpic_TEX_ss << "\\end{ternaryaxis}" << endl;}
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " ending axis" << endl;}
+      else{tikzpic_TEX_ss << "\\end{ternaryaxis}" << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " ending axis" << endl;}
 
       ////////////////////////////////////////////////////////////////////////////
       // END Axis
@@ -10383,18 +10382,18 @@ namespace chull {
       //    ////////////////////////////////////////////////////////////////////////
       //
       //    if(image_only){tikzpic_TEX_ss << "\\begin{scope}[remember picture,on background layer]" << endl;}
-      //    else {tikzpic_TEX_ss << "\\begin{scope}[remember picture,overlay,on background layer]" << endl;}
+      //    else{tikzpic_TEX_ss << "\\begin{scope}[remember picture,overlay,on background layer]" << endl;}
       //    
       //    if(!small_banner) {
       //      // get node option
       //      if(print_aflow_logo_full) {
       //        if(image_only) {
       //          if(print_logo_2){node_option_ss << "shift={(2.75cm,0.75cm)}";}  //DONE
-      //          else {node_option_ss << "shift={(2.75cm,0.5cm)}";} //DONE
-      //        } else {node_option_ss << "shift={(2.25cm,0.5cm)}";} //DONE
-      //      } else {
+      //          else{node_option_ss << "shift={(2.75cm,0.5cm)}";} //DONE
+      //        }else{node_option_ss << "shift={(2.25cm,0.5cm)}";} //DONE
+      //      }else{
       //        if(image_only){node_option_ss << "shift={(4.0cm,0.75cm)}";} //DONE
-      //        else {node_option_ss << "shift={(3.25cm,0.75cm)}";} //DONE
+      //        else{node_option_ss << "shift={(3.25cm,0.75cm)}";} //DONE
       //			}
       //      // get node position
       //      node_position_ss << "current bounding box.north west";
@@ -10402,7 +10401,7 @@ namespace chull {
       //      if(print_aflow_logo_full) {
       //        if(external_links) {node_content_ss << "\\href{" << AFLOW_WEB << "}";}
       //        node_content_ss << "{\\includegraphics[scale=0.2]{" << aflow_logo_full_file << "}}";
-      //      } else {
+      //      }else{
       //        node_content_ss << "\\shortstack[l]{";
       //        if(external_links) {node_content_ss << "\\href{" << AFLOW_WEB << "}";}
       //        node_content_ss << "{\\LARGE AFLOW V" << string(AFLOW_VERSION) << "}";
@@ -10427,21 +10426,21 @@ namespace chull {
       //    if(image_only){
       //      if(!small_banner&&print_logo_2){
       //        if(print_aflow_logo_full){node_option_ss << "shift={(-2cm,-0.5cm)}";} //1
-      //        else {node_option_ss << "shift={(-2cm,-0.75cm)}";}   //2
-      //      } else {
+      //        else{node_option_ss << "shift={(-2cm,-0.75cm)}";}   //2
+      //      }else{
       //        if(print_aflow_logo_full){
       //          if(!small_banner) {node_option_ss << "shift={(-2cm,-1.0cm)}";} //3
-      //          else {node_option_ss << "shift={(-2cm,0.75cm)}";} //4
-      //        } else {node_option_ss << "shift={(-2cm,-0.75cm)}";}  //5
+      //          else{node_option_ss << "shift={(-2cm,0.75cm)}";} //4
+      //        }else{node_option_ss << "shift={(-2cm,-0.75cm)}";}  //5
       //      }
-      //    } else {node_option_ss << "shift={(-1.25cm,0.75cm)}";}  //6
+      //    }else{node_option_ss << "shift={(-1.25cm,0.75cm)}";}  //6
       //    // get node position
       //    node_position_ss << "current bounding box.north east";
       //    // get node content
       //    if(!small_banner&&print_logo_2){
       //      if(external_links) {node_content_ss << "\\href{" << NOMAD_WEB << "}";}
       //      node_content_ss << "{\\includegraphics[scale=0.1]{" << logo_file_2 << "}}";
-      //    } else {
+      //    }else{
       //      node_content_ss << "\\large";
       //      node_content_ss << "{\\fontfamily{phv}\\selectfont";
       //      if(external_links) {node_content_ss << "\\href{" << AFLOW_WEB << "}";}
@@ -10462,7 +10461,7 @@ namespace chull {
       //
       //      // get node option
       //      if(image_only) {node_option_ss << "shift={(2.5cm,-1.0cm)}";}  //
-      //      else {node_option_ss << "shift={(1.5cm,-0.75cm)}";}  //
+      //      else{node_option_ss << "shift={(1.5cm,-0.75cm)}";}  //
       //      // get node position
       //      node_position_ss << "current bounding box.south west";
       //      // get node content
@@ -10480,7 +10479,7 @@ namespace chull {
       //
       //      // get node option
       //      if(image_only) {node_option_ss << "shift={(-4.25cm,0.375cm)}";} //
-      //      else {node_option_ss << "shift={(-2.5cm,-0.75cm)}";} //
+      //      else{node_option_ss << "shift={(-2.5cm,-0.75cm)}";} //
       //      // get node position
       //      node_position_ss << "current bounding box.south east";
       //      // get node content
@@ -10494,7 +10493,7 @@ namespace chull {
       //    }
       //    tikzpic_TEX_ss << "\\end{scope}" << endl;
       //  
-      //  } else {  // dimension==3
+      //  }else{  // dimension==3
       //
       //    ////////////////////////////////////////////////////////////////////////
       //    // START Full banner on left (logo,count,date)
@@ -10507,18 +10506,18 @@ namespace chull {
       //      if(include_color_bar) {
       //        if(print_aflow_logo_full) {
       //          if(image_only){node_option_ss << "shift={(3.75cm,-2.5cm)}";}
-      //          else {node_option_ss << "shift={(3.25cm,-1.0cm)}";}
-      //        } else {
+      //          else{node_option_ss << "shift={(3.25cm,-1.0cm)}";}
+      //        }else{
       //          if(image_only){node_option_ss << "shift={(4cm,-2.25cm)}";}
-      //          else {node_option_ss << "shift={(3.25cm,-1.25cm)}";}
+      //          else{node_option_ss << "shift={(3.25cm,-1.25cm)}";}
       //        }
-      //      } else {
+      //      }else{
       //        if(print_aflow_logo_full) {
       //          if(image_only){node_option_ss << "shift={(3.25cm,-2.25cm)}";}
-      //          else {node_option_ss << "shift={(2.25cm,-1.5cm)}";}
-      //        } else {
+      //          else{node_option_ss << "shift={(2.25cm,-1.5cm)}";}
+      //        }else{
       //          if(image_only){node_option_ss << "shift={(4cm,-2.25cm)}";}
-      //          else {node_option_ss << "shift={(2cm,-1.5cm)}";}
+      //          else{node_option_ss << "shift={(2cm,-1.5cm)}";}
       //        }
       //      }
       //      // get node position
@@ -10527,7 +10526,7 @@ namespace chull {
       //      if(print_aflow_logo_full) {
       //        if(external_links) {node_content_ss << "\\href{" << AFLOW_WEB << "}";}
       //        node_content_ss << "{\\includegraphics[scale=0.25]{" << aflow_logo_full_file << "}}";
-      //      } else {
+      //      }else{
       //        if(external_links) {node_content_ss << "\\href{" << AFLOW_WEB << "}";}
       //        node_content_ss << "{\\LARGE AFLOW V" << string(AFLOW_VERSION) << "}";
       //        node_content_ss << "\\\\";
@@ -10556,18 +10555,18 @@ namespace chull {
       //    if(!small_banner&&print_logo_2){
       //      if(include_color_bar) {
       //        if(image_only){node_option_ss << "shift={(-2cm,-0.75cm)}";}
-      //        else {node_option_ss << "shift={(-1.5cm,0.0cm)}";} //
-      //      } else {
+      //        else{node_option_ss << "shift={(-1.5cm,0.0cm)}";} //
+      //      }else{
       //        if(image_only) {node_option_ss << "shift={(-2.5cm,-1.25cm)}";}
-      //        else {node_option_ss << "shift={(-0.25cm,-0.5cm)}";}
+      //        else{node_option_ss << "shift={(-0.25cm,-0.5cm)}";}
       //      }
-      //    } else {
+      //    }else{
       //      if(include_color_bar) {
       //        if(image_only){node_option_ss << "shift={(-2cm,-0.75cm)}";}
-      //        else {node_option_ss << "shift={(-1.5cm,0.0cm)}";} //
-      //      } else {
+      //        else{node_option_ss << "shift={(-1.5cm,0.0cm)}";} //
+      //      }else{
       //        if(image_only) {node_option_ss << "shift={(-2.5cm,-1.25cm)}";}
-      //        else {node_option_ss << "shift={(-0.25cm,-0.5cm)}";}
+      //        else{node_option_ss << "shift={(-0.25cm,-0.5cm)}";}
       //      }
       //    }
       //    // get node position
@@ -10593,14 +10592,14 @@ namespace chull {
       //}
       tikzpic_TEX_ss << "\\end{tikzpicture}" << endl;
       if(image_only) {tikzpic_TEX_ss << "\\endpgfgraphicnamed" << endl;}
-      else {
+      else{
         tikzpic_TEX_ss << "\\vspace*{\\fill}" << endl;
         tikzpic_TEX_ss << "}" << endl;
         tikzpic_TEX_ss << "\\end{landscape}" << endl;
         //if(!no_doc) {tikzpic_TEX_ss << "\\restoregeometry" << endl;}
       }
       tikzpic_TEX_ss << "\\restoregeometry" << endl;
-    } else {
+    }else{
       // make sure to add this in
       doc_header_TEX_ss << "\\usepackage{graphicx}  \%HEADER" << endl;
       // contains begin{document}, which needs to go in sooner
@@ -10686,7 +10685,7 @@ namespace chull {
       uint precision_tmp=0;
       double tmp_roundoff_tol;
       if(compounds_column_report){pdftable_font_sizes="\\fontsize{4}{6}\\selectfont";}
-      else {pdftable_font_sizes="\\fontsize{5}{7}\\selectfont";}
+      else{pdftable_font_sizes="\\fontsize{5}{7}\\selectfont";}
 
       ////////////////////////////////////////////////////////////////////////////
       // START Stoichiometry group loop
@@ -10727,7 +10726,7 @@ namespace chull {
                       _report_data_ss << m_velements[j] << "$_{" << aurostd::utype2string(point.s_coords[j],COEF_PRECISION) << "}$";
                     }
                   }
-                } else {_report_data_ss << prettyPrintCompound(entry,gcd_vrt,true,latex_ft);}
+                }else{_report_data_ss << prettyPrintCompound(entry,gcd_vrt,true,latex_ft);}
 
                 //////////////////////////////////////////////////////////////////////
                 // START Concentration label
@@ -10743,7 +10742,7 @@ namespace chull {
                   const vector<vector<uint> >& equilibrium_phases=m_coord_groups[i_coord_group].m_equilibrium_phases;
                   //nice fast way to toggle equivalent_phases on/off
                   //if(include_equilibrium_phases) {equilibrium_phases = m_coord_groups[i_coord_group].m_equilibrium_phases;}
-                  //else {equilibrium_phases.clear();}
+                  //else{equilibrium_phases.clear();}
 
                   if(include_equilibrium_phases && !equilibrium_phases.empty()) {
                     for(uint k=0,fl_size_k=equilibrium_phases.size();k<fl_size_k;k++) {
@@ -10754,7 +10753,7 @@ namespace chull {
                           // we need to adjust for missing unaries
                           // look for coords
                           output_name=aurostd::joinWDelimiter(alloyToElements(eq_phase),"");  //unary, so "" delimiter doesn't play a role
-                        } else {
+                        }else{
                           const aflowlib::_aflowlib_entry& equation_entry = eq_phase.m_entry;
 
                           output_name=prettyPrintCompound(equation_entry,gcd_vrt,true,latex_ft);
@@ -10772,7 +10771,7 @@ namespace chull {
                         _equilibrium_phases_vs.push_back(output_name);
                       }
                       if(m_coord_groups[i_coord_group].getDim() > 6) {equilibrium_phases_vs.push_back(aurostd::joinWDelimiter(_equilibrium_phases_vs, " -- "));}  // that way, we don't run off the line
-                      else {equilibrium_phases_vs.push_back(aurostd::joinWDelimiter(_equilibrium_phases_vs, "--"));}
+                      else{equilibrium_phases_vs.push_back(aurostd::joinWDelimiter(_equilibrium_phases_vs, "--"));}
                       _equilibrium_phases_vs.clear();
                     }
                     equilibrium_phases_TEX_ss << aurostd::joinWDelimiter(equilibrium_phases_vs, ", ", " and ", ", and ");
@@ -10784,7 +10783,7 @@ namespace chull {
                     //equilibrium_phases_header_TEX_ss << " with " << misc;
                     //equilibrium_phases_header_TEX_ss << ":";
                   }
-                } else {
+                }else{
                   // decomposition equation
                   const vector<uint>& decomposition_phases = m_coord_groups[i_coord_group].m_decomp_phases;
                   const xvector<double>& decomposition_coefficients = m_coord_groups[i_coord_group].m_decomp_coefs;
@@ -10803,7 +10802,7 @@ namespace chull {
                         // we need to adjust for missing unaries
                         // look for coords
                         output_name=aurostd::joinWDelimiter(alloyToElements(dc_phase),"");  //unary, so "" delimiter doesn't play a role
-                      } else {
+                      }else{
                         const aflowlib::_aflowlib_entry& equation_entry = dc_phase.m_entry;
                         output_name=prettyPrintCompound(equation_entry,frac_vrt,true,latex_ft);
                         if(internal_links_withinreport) {
@@ -10844,7 +10843,7 @@ namespace chull {
               if(point.isGState()) {report_data_ss << aurostd::PaddedPOST("\\rowcolor{green!85!blue} ", 30);} //red!25
               else if(point.m_is_sym_equivalent_g_state) {report_data_ss << aurostd::PaddedPOST("\\rowcolor{orange!85} ", 30);}  // odd should be white
               else if(counter % 2) {report_data_ss << aurostd::PaddedPOST("\\rowcolor{white} ", 30);}  // odd should be white
-              else {report_data_ss << aurostd::PaddedPOST("\\rowcolor{gray!25} ", 30);}
+              else{report_data_ss << aurostd::PaddedPOST("\\rowcolor{gray!25} ", 30);}
               chpoint_properties.clear();
               for(uint i=0,fl_size_i=vheaders.size();i<fl_size_i;i++){chpoint_properties.push_back(grabCHPointProperty(point,vheaders[i],latex_ft));}
               report_data_ss << aurostd::joinWDelimiter(chpoint_properties," & ");
@@ -10883,7 +10882,7 @@ namespace chull {
               //if(internal_links && isViablePoint(m_coord_groups[i_coord_group].m_ref_state)) {
               //  uint ref_state=m_coord_groups[i_coord_group].m_ref_state;
               //  main_TEX_ss << "\\multicolumn{" << vheaders.size() << "}{l}{\\phantomsection\\label{"+input + "_" + m_points[ref_state].m_entry.auid + "}} \\\\[0.1cm]" << endl;
-              //} else {main_TEX_ss << "\\multicolumn{" << vheaders.size() << "}{l}{} \\\\[0.1cm]" << endl;}  //padding and spacing preservation
+              //}else{main_TEX_ss << "\\multicolumn{" << vheaders.size() << "}{l}{} \\\\[0.1cm]" << endl;}  //padding and spacing preservation
               print_scriterion=false;
               print_np1=false;
               scriterion_data_ss.str("");
@@ -10916,7 +10915,7 @@ namespace chull {
                   np1_data_ss << aurostd::utype2string(convertUnits(m_coord_groups[i_coord_group].m_n_plus_1_enthalpy_gain,(m_formation_energy_hull?_m_:_std_)),precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
                   np1_data_ss << "$~" << (m_formation_energy_hull?string("meV/atom"):string("K"));
                 }
-              } else {
+              }else{
                 _report_data_ss << " " << "(unstable)"; // if above hull	  
               }
               // compound name
@@ -10924,7 +10923,7 @@ namespace chull {
               if(internal_links && isViablePoint(m_coord_groups[i_coord_group].m_ref_state)) {
                 uint ref_state=m_coord_groups[i_coord_group].m_ref_state;
                 main_TEX_ss << "\\multicolumn{" << (m_coord_groups[i_coord_group].m_is_on_hull?n_cols_compoundname_thermoprops:n_cols_onecol_left) << "}{l}{\\phantomsection\\label{"+input + "_" + m_points[ref_state].m_entry.auid + "}} \\\\[0.1cm]" << endl;
-              } else {main_TEX_ss << "\\multicolumn{" << (m_coord_groups[i_coord_group].m_is_on_hull?n_cols_compoundname_thermoprops:n_cols_onecol_left) << "}{l}{} \\\\[0.1cm]" << endl;}  //padding and spacing preservation
+              }else{main_TEX_ss << "\\multicolumn{" << (m_coord_groups[i_coord_group].m_is_on_hull?n_cols_compoundname_thermoprops:n_cols_onecol_left) << "}{l}{} \\\\[0.1cm]" << endl;}  //padding and spacing preservation
               //main_TEX_ss << "\\multicolumn{" << vheaders.size()-((print_scriterion?num_cols_scriterion:0)+(print_np1?num_cols_np1:0)) << "}{l}{";
               main_TEX_ss << "\\cellcolor{white}\\normalsize{" + _report_data_ss.str() << "}";
               //main_TEX_ss << "}";
@@ -10946,7 +10945,7 @@ namespace chull {
               //if(internal_links && isViablePoint(m_coord_groups[i_coord_group].m_ref_state)) {
               //  uint ref_state=m_coord_groups[i_coord_group].m_ref_state;
               //  main_TEX_ss << "\\multicolumn{" << vheaders.size() << "}{l}{\\phantomsection\\label{"+input + "_" + m_points[ref_state].m_entry.auid + "}} \\\\[0.1cm]" << endl;
-              //} else {main_TEX_ss << "\\multicolumn{" << vheaders.size() << "}{l}{} \\\\[0.1cm]" << endl;}  //padding and spacing preservation
+              //}else{main_TEX_ss << "\\multicolumn{" << vheaders.size() << "}{l}{} \\\\[0.1cm]" << endl;}  //padding and spacing preservation
               main_TEX_ss << "\\hline" << endl;
               main_TEX_ss << report_data_ss.str();
               main_TEX_ss << "\\hline" << endl;
@@ -10972,7 +10971,7 @@ namespace chull {
                     main_TEX_ss << " & ";
                     main_TEX_ss << equilibrium_phases_TEX_ss.str() << endl;
                   }
-                } else {
+                }else{
                   if(!reaction_chem_eq_TEX_ss.str().empty()) {
                     main_TEX_ss << "decomposition reaction: & ";
                     main_TEX_ss << reaction_chem_eq_TEX_ss.str() << endl;
@@ -11079,13 +11078,13 @@ namespace chull {
       command << "--jobname=" << main_file << " " << main_TEX_file << " ";
       clean_command << "--jobname=" << main_file << " " << main_TEX_file << " ";
       num_compile = 1;
-    } else {
+    }else{
       command << main_TEX_file << " ";
       clean_command << main_TEX_file << " ";
 
       //if(doc_only && no internal_links) { //[CO20200106 - close bracket for indenting]}
       if(!internal_links) {num_compile = 1;}
-      else {num_compile = 2;}
+      else{num_compile = 2;}
     }
     if(!show_latex_output) {command << "1>/dev/null ";}
     message << "Attempting to compile " << main_TEX_file;  //CO20180220 //the .tex file";
@@ -11093,8 +11092,8 @@ namespace chull {
 
     if(show_latex_output) {
       if(latex_interactive_mode) {for (uint i = 0; i < num_compile; i++) {aurostd::execute(command.str());}} // will not save output, allows you to interact with LaTEX
-      else {for (uint i = 0; i < num_compile; i++) {*p_oss << aurostd::execute2string(command.str()) << endl;}} // saves output
-    } else {for (uint i = 0; i < num_compile; i++) {aurostd::execute(command.str());}} // no output to save
+      else{for (uint i = 0; i < num_compile; i++) {*p_oss << aurostd::execute2string(command.str()) << endl;}} // saves output
+    }else{for (uint i = 0; i < num_compile; i++) {aurostd::execute(command.str());}} // no output to save
     if(!aurostd::FileExist(LATEX_dir+"/"+main_PDF_file)) {
       message << main_PDF_file << " was not created successfully, likely a LaTeX issue";
       pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_ERROR_);
@@ -11124,7 +11123,7 @@ namespace chull {
         if(!aurostd::isfloat(resolution_input)){
           message << "PNG_RESOLUTION input is not a number, defaulting to " << default_resolution;
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
-        } else {resolution=aurostd::string2utype<int>(resolution_input);}
+        }else{resolution=aurostd::string2utype<int>(resolution_input);}
         if(resolution==0){
           message << "PNG_RESOLUTION input is 0, defaulting to " << default_resolution;
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
@@ -11137,7 +11136,7 @@ namespace chull {
       command << XHOST.command("convert") << " -density " << resolution << " " << main_PDF_file << " " << main_PNG_file;
       clean_command << XHOST.command("convert") << " -density " << resolution << " " << main_PDF_file << " " << main_PNG_file;
       command << " 1>/dev/null 2>&1";
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " executing: " << clean_command.str() << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " executing: " << clean_command.str() << endl;}
       string convert_output=aurostd::execute2string(command.str());
       if(!aurostd::RemoveWhiteSpaces(convert_output).empty()){
         message << main_PNG_file << " was not created successfully, likely a convert issue";
@@ -11284,7 +11283,7 @@ namespace chull {
 
   string ConvexHull::grabCHPointProperty(const ChullPoint& point,const string& property,filetype ftype) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " start" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " start" << endl;}
     uint precision=COEF_PRECISION,precision_tmp=COEF_PRECISION;
     double tmp_roundoff_tol=5.0*pow(10,-((int)precision)-1);
     double d_tmp=0.0;
@@ -11310,7 +11309,7 @@ namespace chull {
       compounds_column_report=DEFAULT_CHULL_LATEX_COMPOUNDS_COLUMN; //only grab if necessary, not an inexpensive string search
       external_links=addExternalHyperlinks(); //only grab if necessary, not an inexpensive string search
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting property=" << property << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " starting property=" << property << endl;}
     bool latex_property=false;
     bool math_mode=false;
     //[OBSOLETE]bool reduced=false;
@@ -11328,13 +11327,13 @@ namespace chull {
     else if(property=="prototype"||property=="prototype_latex"){
       latex_property=(property=="prototype_latex");
       if(ftype==latex_ft||latex_property){value=prettyPrintPrototype(point,ftype==json_ft,false);}  //JSON needs double backslash
-      else {value=point.m_entry.prototype;}
+      else{value=point.m_entry.prototype;}
       value=aurostd::wrapString(value,string_wrapper);
       padding=100;  //latex only
     }
     else if(property=="auid"){
       if(ftype==latex_ft){value="\\texttt{"+aurostd::wrapString(point.m_entry.auid,string_wrapper)+"}";}
-      else {value=aurostd::wrapString(point.m_entry.auid,string_wrapper);}
+      else{value=aurostd::wrapString(point.m_entry.auid,string_wrapper);}
     }
     else if(property=="aurl"){value=aurostd::wrapString(point.m_entry.aurl,string_wrapper);}
     else if(property=="url_entry_page"){value=aurostd::wrapString(ENTRY_PAGE_URL_PREFIX+point.m_entry.auid,string_wrapper);}
@@ -11390,7 +11389,7 @@ namespace chull {
               i_point=artificialMap(equivalent_g_states[i]);
               if(m_points[i_point].m_has_entry){
                 auids.push_back(aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper));
-              } else {auids.push_back(null_value);}
+              }else{auids.push_back(null_value);}
             }
             value=aurostd::wrapString(aurostd::joinWDelimiter(auids,","),list_prefix,list_suffix);
           }
@@ -11443,7 +11442,7 @@ namespace chull {
               i_point=artificialMap(equilibrium_phases[i][j]);
               if(m_points[i_point].m_has_entry){
                 _compounds.push_back(aurostd::wrapString(m_points[i_point].m_entry.compound,string_wrapper));
-              } else {_compounds.push_back(null_value);}
+              }else{_compounds.push_back(null_value);}
             }
             compounds.push_back(aurostd::wrapString(aurostd::joinWDelimiter(_compounds,equilibrium_phases_delimiter),list_prefix,list_suffix));
           }
@@ -11471,7 +11470,7 @@ namespace chull {
               i_point=artificialMap(equilibrium_phases[i][j]);
               if(m_points[i_point].m_has_entry){
                 _auids.push_back(aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper));
-              } else {_auids.push_back(null_value);}
+              }else{_auids.push_back(null_value);}
             }
             auids.push_back(aurostd::wrapString(aurostd::joinWDelimiter(_auids,equilibrium_phases_delimiter),list_prefix,list_suffix));
           }
@@ -11496,8 +11495,8 @@ namespace chull {
               if((decomposition_coefficients.lrows+i+1<=(uint)decomposition_coefficients.urows)&&(aurostd::nonZeroWithinTol(decomposition_coefficients[decomposition_coefficients.lrows+i+1],ZERO_TOL))){
                 if(m_points[i_point].m_has_entry){
                   compounds.push_back(aurostd::wrapString(m_points[i_point].m_entry.compound,string_wrapper));
-                } else {compounds.push_back(null_value);} //already did artificialMap()
-              } //else {compounds.push_back(null_value);}
+                }else{compounds.push_back(null_value);} //already did artificialMap()
+              } //else{compounds.push_back(null_value);}
             }
             value=aurostd::wrapString(aurostd::joinWDelimiter(compounds,","),list_prefix,list_suffix);
           }
@@ -11521,8 +11520,8 @@ namespace chull {
               if((decomposition_coefficients.lrows+i+1<=(uint)decomposition_coefficients.urows)&&(aurostd::nonZeroWithinTol(decomposition_coefficients[decomposition_coefficients.lrows+i+1],ZERO_TOL))){
                 if(m_points[i_point].m_has_entry){
                   auids.push_back(aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper));
-                } else {auids.push_back(null_value);} //already did artificialMap()
-              } //else {auids.push_back(null_value);}
+                }else{auids.push_back(null_value);} //already did artificialMap()
+              } //else{auids.push_back(null_value);}
             }
             value=aurostd::wrapString(aurostd::joinWDelimiter(auids,","),list_prefix,list_suffix);
           }
@@ -11554,7 +11553,7 @@ namespace chull {
     else if(property=="nspecies"){
       uint i_nary=point.m_i_nary;
       if(i_nary!=AUROSTD_MAX_UINT){i_nary+=1;}  //m_i_nary is just index, increment by count to get nspecies
-      else {i_nary=0;}  //set to something reasonable
+      else{i_nary=0;}  //set to something reasonable
       if(i_nary==0){    //potential other ways of defining nspecies
         if(point.m_has_entry){i_nary=point.m_entry.nspecies;}
       }
@@ -11578,7 +11577,7 @@ namespace chull {
     }
     else if(property=="stability_criterion"){
       if(m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")||point.getStabilityCriterion(_m_)>=AUROSTD_NAN){value=null_value;}
-      else {
+      else{
         if(point.isGState()){
           d_tmp=point.getStabilityCriterion(_m_);
           if(d_tmp!=AUROSTD_MAX_DOUBLE){
@@ -11591,7 +11590,7 @@ namespace chull {
     }
     else if(property=="stability_criterion_relative"){
       if(m_cflags.flag("CHULL::SKIP_STABILITY_CRITERION_ANALYSIS")||point.getRelativeStabilityCriterion()>=AUROSTD_NAN){value=null_value;}
-      else {
+      else{
         if(point.isGState()){
           d_tmp=point.getRelativeStabilityCriterion();
           if(d_tmp!=AUROSTD_MAX_DOUBLE){
@@ -11604,7 +11603,7 @@ namespace chull {
     }
     else if(property=="N+1_enthalpy_gain"){
       if(m_cflags.flag("CHULL::SKIP_N+1_ENTHALPY_GAIN_ANALYSIS")||point.getNPlus1EnthalpyGain(_m_)>=AUROSTD_NAN){value=null_value;}
-      else {
+      else{
         if(point.isGState()){
           d_tmp=point.getNPlus1EnthalpyGain(_m_);
           if(d_tmp!=AUROSTD_MAX_DOUBLE){
@@ -11623,7 +11622,7 @@ namespace chull {
         value=aurostd::utype2string(d_tmp,precision_tmp,true,tmp_roundoff_tol,FIXED_STREAM);
       }
     }
-    else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
+    else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
     if(value.empty()){value=null_value;}
     if(ftype==latex_ft){
       if(external_links && (property=="compound"||(!compounds_column_report&&property=="prototype"))){
@@ -11631,7 +11630,7 @@ namespace chull {
       }
       value=aurostd::PaddedPOST(value,padding);
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " done" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " done" << endl;}
     return value;
   }
 
@@ -11652,7 +11651,7 @@ namespace chull {
       list_suffix="]";
       null_value="null";
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " starting property=" << property << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " starting property=" << property << endl;}
     if(property=="position_vertices"){
       vector<string> vstr;
       for(uint i=0,fl_size_i=facet.m_vertices.size();i<fl_size_i;i++){
@@ -11666,14 +11665,14 @@ namespace chull {
         if(facet.m_vertices[i].ch_point.m_has_entry){
           if(!m_points[facet.m_vertices[i].ch_index].m_entry.compound.empty()){
             compounds.push_back(aurostd::wrapString(m_points[facet.m_vertices[i].ch_index].m_entry.compound,string_wrapper));
-          } else {compounds.push_back(null_value);}
+          }else{compounds.push_back(null_value);}
         }
         else if(facet.m_vertices[i].ch_point.m_is_artificial){
           uint i_nary=facet.m_vertices[i].ch_point.m_i_nary;
           uint i_alloy=facet.m_vertices[i].ch_point.m_i_alloy;
           string elements=aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"");  //unary, so "" delimiter doesn't play a role
           compounds.push_back(aurostd::wrapString("artificial:"+elements,string_wrapper));
-        } else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown print setting");}
+        }else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown print setting");}
       }
       value=aurostd::wrapString(aurostd::joinWDelimiter(compounds,","),list_prefix,list_suffix);
     }
@@ -11683,14 +11682,14 @@ namespace chull {
         if(facet.m_vertices[i].ch_point.m_has_entry){
           if(!m_points[facet.m_vertices[i].ch_index].m_entry.auid.empty()){
             auids.push_back(aurostd::wrapString(m_points[facet.m_vertices[i].ch_index].m_entry.auid,string_wrapper));
-          } else {auids.push_back(null_value);}
+          }else{auids.push_back(null_value);}
         }
         else if(facet.m_vertices[i].ch_point.m_is_artificial){
           uint i_nary=facet.m_vertices[i].ch_point.m_i_nary;
           uint i_alloy=facet.m_vertices[i].ch_point.m_i_alloy;
           string elements=aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"");  //unary, so "" delimiter doesn't play a role
           auids.push_back(aurostd::wrapString("artificial:"+elements,string_wrapper));
-        } else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown print setting");}
+        }else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown print setting");}
       }
       value=aurostd::wrapString(aurostd::joinWDelimiter(auids,","),list_prefix,list_suffix);
     }
@@ -11701,7 +11700,7 @@ namespace chull {
     else if(property=="is_hypercollinear"){value=(facet.m_is_hypercollinear?"true":"false");}
     else if(property=="is_vertical"){value=(facet.m_is_vertical?"true":"false");}
     else if(property=="is_artificial"){value=(facet.m_is_artificial?"true":"false");}
-    else {throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
+    else{throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Unknown property");}
     if(value.empty()){value=null_value;}
     return value;
   }
@@ -11741,7 +11740,7 @@ namespace chull {
         //add any processing here
         headers.push_back(header);
       }
-    } else {
+    }else{
       //for text response, we decorate nicely by replacing _atom with _[/atom]
       for(uint i=0,fl_size_i=vproperties.size();i<fl_size_i;i++){
         header=vproperties[i];
@@ -11787,20 +11786,20 @@ namespace chull {
     for(uint i_nary=1,fl_size_i_nary=m_naries.size();i_nary<fl_size_i_nary;i_nary++){
       if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized nary["+aurostd::utype2string(i_nary)+"]");}
       if(m_naries[i_nary].m_alloys.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No alloys found in nary["+aurostd::utype2string(i_nary)+"]");}
-      if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking at i_nary=" << i_nary << endl;}
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking at i_nary=" << i_nary << endl;}
       ventries.push_back(vector<vector<vector<string> > >(0));
       for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
         if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized nary[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+"]");}
         if(!m_cflags.flag("CHULL::CALCULATE_HIGHEST_DIMENSION_ONLY")){
           if(m_naries[i_nary].m_alloys[i_alloy].m_facets.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No facets found in nary[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+"]");}
         }
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking at i_nary=" << i_nary << ",i_alloy=" << i_alloy << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking at i_nary=" << i_nary << ",i_alloy=" << i_alloy << endl;}
         ventries.back().push_back(vector<vector<string> >(0));
         for(uint i=0,fl_size_i=m_naries[i_nary].m_alloys[i_alloy].m_facets.size();i<fl_size_i;i++){
           i_facet=m_naries[i_nary].m_alloys[i_alloy].m_facets[i];
           const ChullFacet& facet=m_facets[i_facet];
           if(!facet.m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Facet[i_nary="+aurostd::utype2string(i_nary)+",i_alloy="+aurostd::utype2string(i_alloy)+",i_facet="+aurostd::utype2string(i_facet)+"] is not initialized");}
-          if(LDEBUG) {cerr << __AFLOW_FUNC__ << " looking at i_nary=" << i_nary << ",i_alloy=" << i_alloy << ",i_facet=" << i_facet << endl;}
+          if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking at i_nary=" << i_nary << ",i_alloy=" << i_alloy << ",i_facet=" << i_facet << endl;}
           ventries.back().back().push_back(vector<string>(0));
           for(uint j=0,fl_size_j=vproperties.size();j<fl_size_j;j++){
             value=grabCHFacetProperty(facet,vproperties[j],ftype);
@@ -11809,7 +11808,7 @@ namespace chull {
         }
       }
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " created ventries" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " created ventries" << endl;}
 
     string header;
     headers.clear();
@@ -11820,7 +11819,7 @@ namespace chull {
         //add any processing here
         headers.push_back(header);
       }
-    } else {
+    }else{
       //for text response, we decorate nicely by replacing _atom with _[/atom]
       for(uint i=0,fl_size_i=vproperties.size();i<fl_size_i;i++){
         header=vproperties[i];
@@ -11830,7 +11829,7 @@ namespace chull {
         headers.push_back(header);
       }
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " created headers" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " created headers" << endl;}
     return ventries;
   }
 
@@ -11857,8 +11856,8 @@ namespace chull {
     stringstream message;
     sizes.clear();
     getPlainTextColumnSizes(headers,ventries,sizes);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " sizes=" << sizes.size() << endl;}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " determined sizes" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " sizes=" << sizes.size() << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " determined sizes" << endl;}
   }
 
   void ConvexHull::getPlainTextColumnSizesFacets(const vector<string>& headers,const vector<vector<vector<vector<string> > > >& ventries,vector<uint>& sizes) const {
@@ -11870,8 +11869,8 @@ namespace chull {
         getPlainTextColumnSizes(headers,ventries[i][j],sizes);
       }
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " sizes=" << sizes.size() << endl;}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " determined sizes" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " sizes=" << sizes.size() << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " determined sizes" << endl;}
   }
 
   string ConvexHull::getPlainTextTable(const vector<string>& headers,const vector<vector<string> >& ventries,const vector<uint>& sizes) const {
@@ -11910,7 +11909,7 @@ namespace chull {
     if(!m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Hull not initialized");}
 
     if(ftype==txt_ft){message << "Starting plain text generator";}
-    else {message << "Starting JSON generator";}
+    else{message << "Starting JSON generator";}
     pflow::logger(__AFLOW_FILE__,__AFLOW_FUNC__,message,m_aflags, *p_FileMESSAGE,*p_oss,_LOGGER_MESSAGE_);
 
     string properties_str_points=getPointsPropertyHeaderList(ftype);
@@ -11934,29 +11933,29 @@ namespace chull {
     //POINTS DATA
     vector<string> headers_points;
     vector<vector<string> > ventries_points=getPointsData(properties_str_points,headers_points,ftype);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " got points data" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " got points data" << endl;}
 
     //FACETS DATA
     vector<string> headers_facets;
     //first layer=nary, second=alloy, third=facet, fourth=properties
     vector<vector<vector<vector<string> > > > ventries_facets=getFacetsData(facet_properties_str,headers_facets,ftype);
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " got facets data" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " got facets data" << endl;}
 
     //HEADER
     if(ftype==json_ft){vout.push_back("\"hull_data\":"+getJSONHeader());}
-    else {main_text_ss << getPlainTextHeader();}
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " created doc header" << endl;}
+    else{main_text_ss << getPlainTextHeader();}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " created doc header" << endl;}
 
     //points data
     if(ftype==json_ft){vout.push_back("\"points_data\":"+getJSONTable(headers_points,ventries_points));}
-    else {
+    else{
       getPlainTextColumnSizesPoints(headers_points,ventries_points,column_sizes);
       main_text_ss << endl;
       main_text_ss << "POINTS DATA" << endl;
       main_text_ss << getPlainTextTable(headers_points,ventries_points,column_sizes);
       main_text_ss << endl;
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " added points data" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " added points data" << endl;}
 
     //facets data
     if(ftype==json_ft){
@@ -11966,20 +11965,20 @@ namespace chull {
         for(uint j=0,fl_size_j=ventries_facets[i].size();j<fl_size_j;j++){
           misc_ss << "\"" << i+2 << "-nary:";
           if(m_velements.size()){misc_ss << aurostd::joinWDelimiter(alloyToElements(i+1,j),"-");}
-          else {misc_ss << j+1;}
+          else{misc_ss << j+1;}
           misc_ss << "\":" << getJSONTable(headers_facets,ventries_facets[i][j]);
           _vout.push_back(misc_ss.str()); misc_ss.str("");
         }
       }
       vout.push_back("\"facets_data\":"+aurostd::wrapString(aurostd::joinWDelimiter(_vout,","),"{","}"));
-    } else {
+    }else{
       getPlainTextColumnSizesFacets(headers_facets,ventries_facets,column_sizes);
       main_text_ss << endl;
       for(uint i=0,fl_size_i=ventries_facets.size();i<fl_size_i;i++){
         for(uint j=0,fl_size_j=ventries_facets[i].size();j<fl_size_j;j++){
           main_text_ss << "FACETS DATA " << i+2 << "-nary ";
           if(m_velements.size()){main_text_ss << "(" << aurostd::joinWDelimiter(alloyToElements(i+1,j),"-") << ")";}
-          else {main_text_ss << "(" << j+1 << ")";}
+          else{main_text_ss << "(" << j+1 << ")";}
           main_text_ss << endl;
           main_text_ss << getPlainTextTable(headers_facets,ventries_facets[i][j],column_sizes);
           if(!(i==ventries_facets.size()-1 && j==ventries_facets[i].size()-1)){main_text_ss << endl;}
@@ -11987,20 +11986,20 @@ namespace chull {
         if(i!=ventries_facets.size()-1){main_text_ss << endl;}
       }
     }
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " added facets data" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " added facets data" << endl;}
 
     if(ftype==json_ft){main_text_ss << aurostd::wrapString(aurostd::joinWDelimiter(vout,","),"{","}");}
 
     string file_name="aflow_"+aurostd::joinWDelimiter(m_velements,"")+"_hull";
     if(ftype==json_ft){file_name+=".json";}
-    else {file_name+=".txt";}
+    else{file_name+=".txt";}
 
     if(m_cflags.flag("CHULL::SCREEN_ONLY")){
       *p_oss << main_text_ss.str();
       return;
     }
 
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " now writting to file" << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " now writting to file" << endl;}
     string path = getPath(m_cflags, *p_FileMESSAGE, *p_oss);
     string destination = path + file_name;
     aurostd::stringstream2file(main_text_ss,destination);
@@ -12154,7 +12153,7 @@ namespace chull {
                 // we need to adjust for missing unaries
                 // look for coords
                 decomp_data_JSON_ss << "\"entry\":\"" << AFLOW_HULL_ENDPOINT_STRING << ":" << aurostd::joinWDelimiter(alloyToElements(dc_phase),"") << "\","; //unary, so "" delimiter doesn't play a role
-              } else {
+              }else{
                 const aflowlib::_aflowlib_entry& equation_entry = dc_phase.m_entry;
                 decomp_data_JSON_ss << "\"entry\":\"" << equation_entry.auid << "\",";
               }
@@ -12200,7 +12199,7 @@ namespace chull {
           data_helper_ss << "\"" << AFLOW_HULL_ENDPOINT_STRING << ":" << aurostd::joinWDelimiter(alloyToElements(point),"") << "\"";  //unary, so "" delimiter doesn't play a role
           if(point.m_is_g_state) {hull_points_data_JSON_ss << data_helper_ss.str();}
           data_helper_ss.str(""); //WSCHMITT20190731 - patching quaternary hull writer issues
-        } else {
+        }else{
           data_helper_ss << "\"" << entry.auid << "\"";
           points_data_JSON_vs.push_back(data_helper_ss.str());
           distances_data_JSON_ss << data_helper_ss.str();
@@ -12242,7 +12241,7 @@ namespace chull {
             distances_data_JSON_ss << ",";
             distances_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
             //WSCHMITT20190620 - adding in np1 and stab criterion to webApp - STOP
-          } else {
+          }else{
             // enthalpy of formation, row 4
             // no need for precision for next few columns, leave it same way as
             // received from AFLOW
@@ -12314,7 +12313,7 @@ namespace chull {
             hull_points_data_JSON_ss << ",";
             hull_points_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
             //WSCHMITT20190620 - adding in np1 and stab criterion to webApp - STOP
-          } else {
+          }else{
             // enthalpy of formation, row 4
             // no need for precision for next few columns, leave it same way as
             // received from AFLOW
@@ -12372,7 +12371,7 @@ namespace chull {
     // index specific, so we can't loop through stoichGroups
 
     vector<uint> vertices=getHullPoints(false); //moved up for faces
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " vertices=" << aurostd::joinWDelimiter(vertices,",") << endl;}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " vertices=" << aurostd::joinWDelimiter(vertices,",") << endl;}
 
     vector<uint> v_ch_indices,v_vertices_indices;
     bool found=false;
@@ -12380,7 +12379,7 @@ namespace chull {
       //const xvector<double> normal = m_facets[i].m_normal;
       if(!(/*m_facets[i].m_is_hypercollinear||*/m_facets[i].m_is_vertical||m_facets[i].m_is_artificial)&&m_facets[i].m_dim==m_dim){  //keep is_hypercollinear, might create small gaps in visualization otherwise //CO20190423 - EG needs three-dimensional only for 3D
         v_ch_indices=m_facets[i].getCHIndices();
-        if(LDEBUG) {cerr << __AFLOW_FUNC__ << " v_ch_indices=" << aurostd::joinWDelimiter(v_ch_indices,",") << endl;}
+        if(LDEBUG){cerr << __AFLOW_FUNC__ << " v_ch_indices=" << aurostd::joinWDelimiter(v_ch_indices,",") << endl;}
         v_vertices_indices.clear();
         for(uint j=0,fl_size_j=v_ch_indices.size();j<fl_size_j;j++){
           found=false;
@@ -12418,7 +12417,7 @@ namespace chull {
 
       if(!point.m_has_entry) {
         vertices_data_JSON_ss << "\"" << AFLOW_HULL_ENDPOINT_STRING << ":" << aurostd::joinWDelimiter(alloyToElements(point),"") << "\""; //unary, so "" delimiter doesn't play a role
-      } else {vertices_data_JSON_ss << "\"" << entry.auid << "\"";}
+      }else{vertices_data_JSON_ss << "\"" << entry.auid << "\"";}
 
       vertices_data_JSON_ss << ",";
       vertices_data_JSON_ss << "\"compound\": \"" << entry.compound << "\","; 
@@ -12446,7 +12445,7 @@ namespace chull {
         vertices_data_JSON_ss << ",";
         vertices_data_JSON_ss << "\"stabilityCriterion\":" << aurostd::utype2string(0.0, CHULL_PRECISION);
         //WSCHMITT20190620 - adding in np1 and stab criterion to webApp - STOP
-      } else {
+      }else{
         // enthalpy of formation, row 4
         // no need for precision for next few columns, leave it same way as
         // received from AFLOW
@@ -12563,10 +12562,10 @@ namespace chull {
            (ci.m_entry.prototype == cj.m_entry.prototype) && 
            (ci.m_entry.compound == cj.m_entry.compound) && 
            (ci.m_entry.aurl<cj.m_entry.aurl)) );  //aurl is guaranteed to be unique (more so than auid)
-    } else {return energy_sort;}
+    }else{return energy_sort;}
   }
 
-  bool ConvexHull::sortCHullPoints::operator() (uint i,uint j) const{
+  bool ConvexHull::sortCHullPoints::operator() (uint i,uint j) const {
     if(i>m_points.size()-1 || j>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index for m_points");}
     const ChullPoint& ci=m_points[i];
     const ChullPoint& cj=m_points[j];

@@ -753,7 +753,7 @@ namespace chull {
       xvector<double> getDecompositionCoefficients(const ChullPoint& point,const vector<uint>& decomp_phases,vector_reduction_type vred=frac_vrt) const;
       vector<uint> getAdjacentFacets(uint hull_member,bool ignore_hypercollinear=true,bool ignore_vertical=true,bool ignore_artificial=true) const;
       vector<vector<uint> > getEquilibriumPhases(uint hull_member) const;
-      vector<uint> getEquivalentGStates(uint g_state) const;
+      vector<uint> getEquivalentEntries(uint g_state,bool on_hull_only=true) const;
       vector<uint> getSymEquivalentGStates(uint g_state) const;
       double getStabilityCriterion(const string& cauid) const;
       double getStabilityCriterion(uint cpoint) const;
