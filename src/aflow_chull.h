@@ -210,8 +210,7 @@ namespace chull {
 
       //for organization of points
       uint m_i_coord_group;
-      bool m_calculated_equivalent_entries;
-      vector<uint> m_equivalent_entries;
+      bool m_found_icsd;
       uint m_i_icsd;                    //index of equivalent icsd in m_points
 
       //stoich_coords only!
@@ -220,6 +219,8 @@ namespace chull {
       xvector<int> m_elements_present;  //1 if s_coords[i]>ZERO_TOL, zero otherwise, that way, nary=sum(m_elements_present)
 
       //calculate per hull
+      bool m_calculated_equivalent_entries; //equivalent entries have been calculated
+      vector<uint> m_equivalent_entries;    //equivalent entries
       bool m_is_on_hull;  //one max per coordgroup
       bool m_is_g_state;  //one max per coordgroup, must have m_entry (artificialMap())
       bool m_is_equivalent_g_state; //can be many, includes original g_state
@@ -518,8 +519,8 @@ namespace chull {
       vector<uint> m_sym_equivalent_g_states; //structure comparison
       double m_stability_criterion; //g-states only
       double m_n_plus_1_enthalpy_gain;     //g-states only
-      bool m_icsd_g_state;          //whether icsd exists among equivalent states
-      uint m_i_canonical_icsd;      //canonical icsd entry (lowest number)
+      bool m_found_icsd_g_state;          //whether icsd exists among equivalent states
+      uint m_i_icsd_g_state;      //canonical icsd entry (lowest number)
 
       friend class ConvexHull;  //ConvexHull defines everything!
     private:
@@ -892,8 +893,9 @@ namespace chull {
       bool energiesDiffer(uint i_point1,uint i_point2,bool strict=true) const;
       bool spacegroupsDiffer(uint i_point1,uint i_point2,bool strict=true) const;
       bool structuresEquivalent(uint i_point1,uint i_point2) const;
-      bool isICSD(uint i_point) const;
+      bool isICSD(uint i_point,uint& i_point_icsd) const;
       void setEquivalentGStates(uint i_nary,uint i_alloy,uint i_coord_group);
+      void setEquivalentStates(uint i_nary,uint i_alloy,uint i_coord_group);
       void setSymEquivalentGStates(uint i_nary,uint i_alloy,uint i_coord_group);
       void setOnHullProperties(uint i_nary,uint i_alloy);
       void storeHullData(uint i_nary,uint i_alloy);

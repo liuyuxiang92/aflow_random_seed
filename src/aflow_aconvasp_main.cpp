@@ -330,7 +330,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
     vpflow.args2addattachedscheme(argv,cmds,"CHULL::OUTPUT","--print=|--p=|--output=|--o=",""); //determine how to get output, could pull from XHOST, but --output was used previously (backwards compatibility)
     if(vpflow.flag("CHULL::OUTPUT")){
       vector<string> out_forms;
-      string out_form;
+      string out_form="";
       aurostd::string2tokens(vpflow.getattachedscheme("CHULL::OUTPUT"),out_forms,",");
       if(out_forms.size()>1){vpflow.flag("CHULL::MULTI_OUTPUT",TRUE);} //CO20180409
       for(uint i=0;i<out_forms.size();i++){
@@ -397,6 +397,7 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
         vpflow.args2addattachedscheme(argv,cmds,"CHULL::PNG_RESOLUTION","--png_resolution=|--pngresolution=|--pngr=",""); //calculate distance to hull for point
       }
     }
+    vpflow.args2addattachedscheme(argv,cmds,"CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS","--distance_for_equivalence_analysis=|--dist4equi=|--d4e=","0.0"); //calculate distance to hull for point
   }
 
   // [OBSOLETE] vpflow.flag("CLAT",aurostd::args2flag(argv,cmds,"--clat"));

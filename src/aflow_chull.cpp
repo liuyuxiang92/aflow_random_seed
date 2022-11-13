@@ -1086,6 +1086,9 @@ namespace chull {
     if(vpflow.flag("CHULL::HULL_FORMATION_ENTHALPY")) {
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "CHULL::HULL_FORMATION_ENTHALPY set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
+    if(vpflow.flag("CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS")) {
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    }
     if(vpflow.flag("CHULL::SKIP_STRUCTURE_COMPARISON")) {
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "CHULL::SKIP_STRUCTURE_COMPARISON set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
@@ -1516,12 +1519,13 @@ namespace chull {
     ChullPointLight::copy(b);
     m_entry=b.m_entry; if(m_entry.vsg.size()==0){m_entry.vsg.push_back(NOSG);} if(m_entry.vsg2.size()==0){m_entry.vsg2.push_back(NOSG);}  //hack so it doesn't break with front(),back(),[0]
     m_i_coord_group=b.m_i_coord_group;
-    m_calculated_equivalent_entries=b.m_calculated_equivalent_entries;
-    m_equivalent_entries=b.m_equivalent_entries;
     m_i_icsd=b.m_i_icsd;
+    m_found_icsd=b.m_found_icsd;
     s_coords=b.s_coords;
     c_coords=b.c_coords;
     m_elements_present=b.m_elements_present;
+    m_calculated_equivalent_entries=b.m_calculated_equivalent_entries;
+    m_equivalent_entries=b.m_equivalent_entries;
     m_is_on_hull=b.m_is_on_hull;
     m_is_g_state=b.m_is_g_state;
     m_is_equivalent_g_state=b.m_is_equivalent_g_state;
@@ -2100,9 +2104,10 @@ namespace chull {
   void ChullPoint::cleanPointForHullTransfer() {
     m_i_alloy=AUROSTD_MAX_UINT;
     m_i_coord_group=AUROSTD_MAX_UINT;
+    m_i_icsd=AUROSTD_MAX_UINT;
+    m_found_icsd=false;
     m_calculated_equivalent_entries=false;
     m_equivalent_entries.clear();
-    m_i_icsd=AUROSTD_MAX_UINT;
     m_is_on_hull=false;
     m_is_g_state=false;
     m_is_equivalent_g_state=false;
@@ -2838,8 +2843,8 @@ namespace chull {
     m_sym_equivalent_g_states.clear();
     m_stability_criterion=AUROSTD_MAX_DOUBLE;
     m_n_plus_1_enthalpy_gain=AUROSTD_MAX_DOUBLE;
-    m_icsd_g_state=false;
-    m_i_canonical_icsd=AUROSTD_MAX_UINT;
+    m_found_icsd_g_state=false;
+    m_i_icsd_g_state=AUROSTD_MAX_UINT;
   }
 
   void CoordGroup::copy(const CoordGroup& b) {
@@ -2864,8 +2869,8 @@ namespace chull {
     m_sym_equivalent_g_states.clear(); for(uint i=0,fl_size_i=b.m_sym_equivalent_g_states.size();i<fl_size_i;i++){m_sym_equivalent_g_states.push_back(b.m_sym_equivalent_g_states[i]);}
     m_stability_criterion=b.m_stability_criterion;
     m_n_plus_1_enthalpy_gain=b.m_n_plus_1_enthalpy_gain;
-    m_icsd_g_state=b.m_icsd_g_state;
-    m_i_canonical_icsd=b.m_i_canonical_icsd;
+    m_found_icsd_g_state=b.m_found_icsd_g_state;
+    m_i_icsd_g_state=b.m_i_icsd_g_state;
   }
 
   void CoordGroup::initialize(const xvector<double>& coord,bool has_stoich_coords) {
@@ -4828,7 +4833,7 @@ namespace chull {
         for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
           message << "Entries structure: employing " << getEntriesCount(i_nary,i_alloy,only_within_half_hull);
           if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-          message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+          message << " [i_nary=" << i_nary << ",i_alloy=" << i_alloy << "]";
           message << " entries, ";
           message << hull_sizes[i_nary][i_alloy] << " entries total for ";
           message << pflow::arity_string(i_nary+1,false,false) << " convex hull analysis";
@@ -4906,7 +4911,7 @@ namespace chull {
         if(m_add_artificial_unaries&&!found_artificial){
           message << "Missing artificial points for";
           if(i_alloy<m_velements.size()){message << " " << m_velements[i_alloy];}
-          message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+          message << " [i_nary=" << i_nary << ",i_alloy=" << i_alloy << "]";
           throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message.str()); message.str("");
         }
         if(found_real){
@@ -4914,7 +4919,7 @@ namespace chull {
             if(abs(m_points[i_point_real].getLastCoord())>=ENERGY_TOL){
               message << "Very skewed ground-state end point for";
               if(i_alloy<m_velements.size()){message << " " << m_velements[i_alloy];}
-              message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+              message << " [i_nary=" << i_nary << ",i_alloy=" << i_alloy << "]";
               message << " (auid=" << m_points[i_point_real].m_entry.auid << ")";
               message << ": abs(" << m_points[i_point_real].getLastCoord() << ")>=" << ENERGY_TOL << " [eV]";
               message << " (please report on AFLOW Forum: aflow.org/forum)";
@@ -4930,7 +4935,7 @@ namespace chull {
           if(!m_cflags.flag("FAKE_HULL")){
             message << "No ground-state available for";
             if(i_alloy<m_velements.size()){message << " " << m_velements[i_alloy];}
-            message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+            message << " [i_nary=" << i_nary << ",i_alloy=" << i_alloy << "]";
             pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);
           }
         }
@@ -4948,7 +4953,7 @@ namespace chull {
             stringstream hull;
             //safe in case m_velements was not set
             if(m_velements.size()){hull << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-") << " ";}
-            hull << "[i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+            hull << "[i_nary=" << i_nary << ",i_alloy=" << i_alloy << "]";
             message << pflow::arity_string(i_nary+1,true,false) <<  " hull " << hull.str() << " is unreliable (total_entry_count=" << count << " < " << count_threshold_binaries_total << ")";
             if(m_cflags.flag("FAKE_HULL")){aurostd::StringstreamClean(message);}  //don't want to see these errors, they are expected
             else if(m_cflags.flag("FORCE")||m_cflags.flag("CHULL::INCLUDE_UNRELIABLE_HULLS")){pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_WARNING_);}
@@ -5890,7 +5895,7 @@ namespace chull {
 
     message << "Gathering hull distance data for";
     if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-    message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+    message << " [i_nary=" << i_nary << ",i_alloy=" << i_alloy << "]";
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
     uint i_coord_group=AUROSTD_MAX_UINT;
@@ -6131,7 +6136,7 @@ namespace chull {
 
     message << "Gathering decomposition reaction data for";
     if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-    message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+    message << " [i_nary=" << i_nary << ",i_alloy=" << i_alloy << "]";
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
     uint i_coord_group=AUROSTD_MAX_UINT;
@@ -6145,6 +6150,7 @@ namespace chull {
       //setDistancesToHull(i_nary,i_alloy,i_coord_group); //we now do separately and previously (setDistancesToHull())
       setDecompositionPhases(i_nary,i_alloy,i_coord_group);
       setDecompositionCoefficients(i_nary,i_alloy,i_coord_group);
+      setEquivalentStates(i_nary,i_alloy,i_coord_group);
     }
   }
 
@@ -6361,9 +6367,10 @@ namespace chull {
     return equivalent_entries;
   }
 
-  bool ConvexHull::isICSD(uint i_point) const {
+  bool ConvexHull::isICSD(uint i_point,uint& i_point_icsd) const {
     //this function is important because ICSD_XX is a prototype and may not actually correspond to compound A1B1_ICSD_XX
-    bool LDEBUG=(true || _DEBUG_CHULL_ || XHOST.DEBUG);
+    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
+    i_point_icsd=AUROSTD_MAX_UINT;
     if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
     string point_icsd_number=getICSDNumber(i_point,true);
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking for icsd_number=" << point_icsd_number << endl;}
@@ -6371,7 +6378,7 @@ namespace chull {
     if(m_icsd_entries.size()==0){return false;} //no possible match
     string entry_icsd_number="";
     for(uint i=0,fl_size_i=m_icsd_entries.size();i<fl_size_i;i++){
-      if(i_point==m_icsd_entries[i]){return true;} //instant match
+      if(i_point==m_icsd_entries[i]){i_point_icsd=m_icsd_entries[i];return true;} //instant match
       entry_icsd_number=getICSDNumber(m_icsd_entries[i],true);
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " comparing with entry_icsd_number=" << entry_icsd_number << endl;}
       if(entry_icsd_number.empty()){continue;}  //this is weird/bad, but let's not exit the whole program
@@ -6382,6 +6389,7 @@ namespace chull {
           cerr << __AFLOW_FUNC__ << " found match: point[i_point=" << i_point << "].prototype=" << m_points[i_point].m_entry.prototype;
           cerr << " vs. point[i_point=" << m_icsd_entries[i] << "].prototype=" << m_points[m_icsd_entries[i]].m_entry.prototype << endl;
         }
+        i_point_icsd=m_icsd_entries[i];
         return true;
       }
     }
@@ -6409,8 +6417,8 @@ namespace chull {
     m_coord_groups[i_coord_group].m_equivalent_g_states=getEquivalentEntries(g_state);
     if(!m_coord_groups[i_coord_group].m_equivalent_g_states.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No equivalent states found (not even self)");}
     m_coord_groups[i_coord_group].m_calculated_equivalent_g_states=true;
-    uint i_point=AUROSTD_MAX_UINT;
-    bool icsd_g_state=false,_icsd_g_state=false;  //whether icsd exists among g_states
+    uint i_point=AUROSTD_MAX_UINT,i_point_icsd=AUROSTD_MAX_UINT;
+    bool found_icsd=false,_found_icsd=false;  //whether icsd exists among g_states
     uint i_canonical_icsd=AUROSTD_MAX_UINT;       //index of canonical icsd
     uint canonical_icsd_number=AUROSTD_MAX_UINT;  //lowest number
     uint icsd_number=AUROSTD_MAX_UINT;
@@ -6418,15 +6426,17 @@ namespace chull {
       i_point=m_coord_groups[i_coord_group].m_equivalent_g_states[i];
       if(!m_points[i_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
       m_points[i_point].m_is_equivalent_g_state=true; //g_state and equivalent_g_state should stay separate
+      m_points[i_point].m_calculated_equivalent_entries=true;
+      m_points[i_point].m_equivalent_entries=m_coord_groups[i_coord_group].m_equivalent_g_states;
       //get icsd information
       //we were strict in creating m_icsd_entries (only _ICSD_), but we need to check LIBs for ICSD_
       if(aurostd::substring2bool(m_points[i_point].m_entry.prototype,"ICSD_")){  //remember, _ICSD_ means icsd catalog, but ICSD_ means LIBs
-        _icsd_g_state=isICSD(i_point);
-        icsd_g_state=(icsd_g_state||_icsd_g_state); //short circuit bit OR
-        if(_icsd_g_state){  //find lowest icsd number
+        _found_icsd=isICSD(i_point,i_point_icsd);
+        found_icsd=(found_icsd||_found_icsd); //short circuit bit OR
+        if(_found_icsd){  //find lowest icsd number
           icsd_number=aurostd::string2utype<uint>(getICSDNumber(i_point,true));
           if(icsd_number<canonical_icsd_number){
-            i_canonical_icsd=i_point;
+            i_canonical_icsd=i_point_icsd;
             canonical_icsd_number=icsd_number;
           }
         }
@@ -6441,13 +6451,118 @@ namespace chull {
       }
     }
 
-    m_coord_groups[i_coord_group].m_icsd_g_state=icsd_g_state;
-    m_coord_groups[i_coord_group].m_i_canonical_icsd=i_canonical_icsd;
+    m_coord_groups[i_coord_group].m_found_icsd_g_state=found_icsd;
+    m_coord_groups[i_coord_group].m_i_icsd_g_state=i_canonical_icsd;
     
     for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_equivalent_g_states.size();i<fl_size_i;i++){
       i_point=m_coord_groups[i_coord_group].m_equivalent_g_states[i];
       if(!m_points[i_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+      m_points[i_point].m_found_icsd=found_icsd;
       m_points[i_point].m_i_icsd=i_canonical_icsd;
+    }
+
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " stop" << endl;}
+  }
+  
+  void ConvexHull::setEquivalentStates(uint i_nary,uint i_alloy,uint i_coord_group){
+    bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
+    if(i_nary>m_naries.size()-1 || i_alloy>m_naries[i_nary].m_alloys.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within m_naries");}
+    if(!m_naries[i_nary].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized nary");}
+    if(!m_naries[i_nary].m_alloys[i_alloy].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized alloy");}
+    if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within coordgroups");}
+    if(m_coord_groups[i_coord_group].m_points.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] has no points");}
+    if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized coordgroup");}
+    
+    stringstream message;
+    vector<uint> vpoints2check;
+
+    if(m_coord_groups[i_coord_group].m_is_on_hull){
+      m_coord_groups[i_coord_group].m_equivalent_g_states.clear();
+      m_coord_groups[i_coord_group].m_calculated_equivalent_g_states=false;
+      //we need to do a structure comparison, so get artificial map (did already before)
+      uint g_state=m_coord_groups[i_coord_group].m_ref_state;
+      vpoints2check.push_back(g_state);
+    }
+    double dist=0.0;
+    uint i_point=AUROSTD_MAX_UINT;
+    if(m_cflags.flag("CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS")){dist=aurostd::string2utype<double>(m_cflags.getattachedscheme("CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS"));}
+    if(aurostd::nonZeroWithinTol(dist,ZERO_TOL)){
+      message << "Performing equivalence analysis for points within " << aurostd::utype2string(dist) << " (meV/atom) of hull for";
+      if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
+      message << " [i_nary=" << i_nary << ",i_alloy=" << i_alloy << ",i_coord_group=" << i_coord_group << "]";
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
+      for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
+        i_point=m_coord_groups[i_coord_group].m_points[i];
+        if(aurostd::WithinList(vpoints2check,i_point)){continue;}
+        if(!m_points[i_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+        if(m_points[i_point].getDist2Hull(_m_)<=dist){vpoints2check.push_back(i_point);}
+      }
+    }
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " vpoints2check=" << aurostd::joinWDelimiter(vpoints2check,",") << endl;}
+
+    if(vpoints2check.empty()){return;}
+    
+    uint j_point=AUROSTD_MAX_UINT,j_point_icsd=AUROSTD_MAX_UINT;
+    //
+    bool found_icsd=false,_found_icsd=false;  //whether icsd exists among equivalent entries
+    uint i_canonical_icsd=AUROSTD_MAX_UINT;       //index of canonical icsd
+    uint canonical_icsd_number=AUROSTD_MAX_UINT;  //lowest number
+    uint icsd_number=AUROSTD_MAX_UINT;
+    
+    for(uint i=0,fl_size_i=vpoints2check.size();i<fl_size_i;i++){
+      i_point=vpoints2check[i];
+      if(i_point>m_points.size()-1){continue;}
+      ChullPoint& point_i=m_points[i_point];
+      if(!point_i.m_has_entry){continue;} //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No entry (structure) found"); //only point in coordgroup
+      if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking at i_point[" << i_point << "]=" << m_points[i_point].h_coords << endl;}
+      point_i.m_equivalent_entries=getEquivalentEntries(i_point);
+      if(!point_i.m_equivalent_entries.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No equivalent states found (not even self)");}
+      point_i.m_calculated_equivalent_entries=true;
+      if(m_coord_groups[i_coord_group].m_is_on_hull && i_point==m_coord_groups[i_coord_group].m_ref_state){ //is on hull
+        m_coord_groups[i_coord_group].m_equivalent_g_states=point_i.m_equivalent_entries;
+        m_coord_groups[i_coord_group].m_calculated_equivalent_g_states=true;
+      }
+      j_point_icsd=AUROSTD_MAX_UINT;
+      found_icsd=false,_found_icsd=false;  //whether icsd exists among equivalent entries
+      i_canonical_icsd=AUROSTD_MAX_UINT;       //index of canonical icsd
+      canonical_icsd_number=AUROSTD_MAX_UINT;  //lowest number
+      icsd_number=AUROSTD_MAX_UINT;
+      for(uint j=0,fl_size_j=point_i.m_equivalent_entries.size();j<fl_size_j;j++){
+        j_point=point_i.m_equivalent_entries[j];
+        if(!m_points[j_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(j_point)+"] is not initialized");}
+        ChullPoint& point_j=m_points[j_point];
+        if(i_point!=j_point){
+          point_j.m_equivalent_entries=point_i.m_equivalent_entries;
+          point_j.m_calculated_equivalent_entries=true;
+        }
+        if(m_coord_groups[i_coord_group].m_is_on_hull && i_point==m_coord_groups[i_coord_group].m_ref_state){ //is on hull
+          point_j.m_is_equivalent_g_state=true; //g_state and equivalent_g_state should stay separate
+        }
+        //get icsd information
+        //we were strict in creating m_icsd_entries (only _ICSD_), but we need to check LIBs for ICSD_
+        if(aurostd::substring2bool(point_j.m_entry.prototype,"ICSD_")){  //remember, _ICSD_ means icsd catalog, but ICSD_ means LIBs
+          _found_icsd=isICSD(j_point,j_point_icsd);
+          found_icsd=(found_icsd||_found_icsd); //short circuit bit OR
+          if(_found_icsd){  //find lowest icsd number
+            icsd_number=aurostd::string2utype<uint>(getICSDNumber(j_point,true));
+            if(icsd_number<canonical_icsd_number){
+              i_canonical_icsd=j_point_icsd;
+              canonical_icsd_number=icsd_number;
+            }
+          }
+        }
+      }
+      for(uint j=0,fl_size_j=point_i.m_equivalent_entries.size();j<fl_size_j;j++){
+        j_point=point_i.m_equivalent_entries[j];
+        if(!m_points[j_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(j_point)+"] is not initialized");}
+        ChullPoint& point_j=m_points[j_point];
+        point_j.m_found_icsd=found_icsd;
+        point_j.m_i_icsd=i_canonical_icsd;
+      }
+      if(m_coord_groups[i_coord_group].m_is_on_hull && i_point==m_coord_groups[i_coord_group].m_ref_state){ //is on hull  //if(m_coord_groups[i_coord_group].m_is_on_hull){
+        m_coord_groups[i_coord_group].m_found_icsd_g_state=found_icsd;
+        m_coord_groups[i_coord_group].m_i_icsd_g_state=i_canonical_icsd;
+      }
     }
 
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " stop" << endl;}
@@ -6518,7 +6633,7 @@ namespace chull {
 
     message << "Gathering equilibrium phases and determining equivalent ground-states for";
     if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-    message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+    message << " [i_nary=" << i_nary << ",i_alloy=" << i_alloy << "]";
     message << ", please be patient";
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
 
@@ -6537,7 +6652,7 @@ namespace chull {
       setDecompositionCoefficients(i_nary,i_alloy,i_coord_group);
       setEquilibriumPhases(i_nary,i_alloy,i_coord_group);
       setSymEquivalentGStates(i_nary,i_alloy,i_coord_group);
-      setEquivalentGStates(i_nary,i_alloy,i_coord_group);
+      setEquivalentStates(i_nary,i_alloy,i_coord_group);
     }
   }
 
@@ -6565,7 +6680,7 @@ namespace chull {
     }
     message << "Hull properties stored for";
     if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-    message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+    message << " [i_nary=" << i_nary << ",i_alloy=" << i_alloy << "]";
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
@@ -6599,7 +6714,7 @@ namespace chull {
 
     message << "Thermodynamic hull detected, gathering on/off hull properties for";
     if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-    message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+    message << " [i_nary=" << i_nary << ",i_alloy=" << i_alloy << "]";
     if(i_nary==0){message << " (last)";}
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     setOffHullProperties(i_nary,i_alloy);
@@ -6607,7 +6722,7 @@ namespace chull {
 
     message << "Thermodynamic properties calculated for";
     if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-    message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+    message << " [i_nary=" << i_nary << ",i_alloy=" << i_alloy << "]";
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
   }
 
@@ -6669,7 +6784,7 @@ namespace chull {
         for(uint i_alloy=0,fl_size_i_alloy=m_naries[i_nary].m_alloys.size();i_alloy<fl_size_i_alloy;i_alloy++){
           message << "Calculating " << pflow::arity_string(i_nary+1,false,false) << " hull for";
           if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-          message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+          message << " [i_nary=" << i_nary << ",i_alloy=" << i_alloy << "]";
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
           cleanHull();
           setElementsPresent(i_nary,i_alloy); //m_has_stoich_coords only
@@ -6681,7 +6796,7 @@ namespace chull {
           calculateFacets();
           message << pflow::arity_string(i_nary+1,true,false) << " hull calculated for";
           if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
-          message << " [i_nary=" << i_nary <<",i_alloy=" << i_alloy << "]";
+          message << " [i_nary=" << i_nary << ",i_alloy=" << i_alloy << "]";
           pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
           storeHullData(i_nary,i_alloy);
           setDistancesToHull(i_nary,i_alloy); //do this always
@@ -7873,6 +7988,7 @@ namespace chull {
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"auid_equivalent_structures";}
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"ground_state_icsd";}
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"auid_icsd";}
+    if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"prototype_icsd";}
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"compound_phases_equilibrium";}
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"auid_phases_equilibrium";}
     if(ftype==txt_ft || ftype==json_ft){headers+=(!headers.empty()?string(","):string(""))+"compound_phases_decomposition";}
@@ -10168,7 +10284,7 @@ namespace chull {
                 if(icsd_labels){  //icsd_labels mutually exclusive with compound/prototype
                   //uint i_coord_group;
                   if(getCoordGroupIndex(point,i_coord_group)){
-                    uint canonical_icsd=m_coord_groups[i_coord_group].m_i_canonical_icsd;
+                    uint canonical_icsd=m_coord_groups[i_coord_group].m_i_icsd_g_state;
                     if(isViablePoint(canonical_icsd)){
                       compound_label = prettyPrintPrototype(m_points[canonical_icsd],false,true);  // only one backslash needed  //icsd_skim_label=true
                       if(!compound_label.empty()){
@@ -11378,25 +11494,37 @@ namespace chull {
     else if(property=="ground_state"){value=(point.isGState()?"true":"false");}
     else if(property=="auid_equivalent_structures"){
       if(!(ftype==txt_ft || ftype==json_ft)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No latex rule defined for "+property);}
-      if(point.isGState()){
-        //need to grab from coord_group
-        uint i_coord_group=AUROSTD_MAX_UINT;
-        if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Coordgroup index not set");}
-        if(m_coord_groups[i_coord_group].m_is_on_hull){
-          vector<string> auids;
-          uint i_point=AUROSTD_MAX_UINT;
-          const vector<uint>& equivalent_g_states=m_coord_groups[i_coord_group].m_equivalent_g_states;
-          if(equivalent_g_states.size()){
-            for(uint i=0,fl_size_i=equivalent_g_states.size();i<fl_size_i;i++){
-              i_point=artificialMap(equivalent_g_states[i]);
-              if(m_points[i_point].m_has_entry){
-                auids.push_back(aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper));
-              }else{auids.push_back(null_value);}
-            }
-            value=aurostd::wrapString(aurostd::joinWDelimiter(auids,","),list_prefix,list_suffix);
-          }
+      if(!point.m_equivalent_entries.empty()){
+        const vector<uint>& equivalent_g_states=point.m_equivalent_entries;
+        vector<string> auids;
+        uint i_point=AUROSTD_MAX_UINT;
+        for(uint i=0,fl_size_i=equivalent_g_states.size();i<fl_size_i;i++){
+          i_point=artificialMap(equivalent_g_states[i]);
+          if(m_points[i_point].m_has_entry){
+            auids.push_back(aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper));
+          }else{auids.push_back(null_value);}
         }
+        value=aurostd::wrapString(aurostd::joinWDelimiter(auids,","),list_prefix,list_suffix);
       }
+      //[CO20221112 - OBSOLETE]if(point.isGState()){
+      //[CO20221112 - OBSOLETE]  //need to grab from coord_group
+      //[CO20221112 - OBSOLETE]  uint i_coord_group=AUROSTD_MAX_UINT;
+      //[CO20221112 - OBSOLETE]  if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Coordgroup index not set");}
+      //[CO20221112 - OBSOLETE]  if(m_coord_groups[i_coord_group].m_is_on_hull){
+      //[CO20221112 - OBSOLETE]    vector<string> auids;
+      //[CO20221112 - OBSOLETE]    uint i_point=AUROSTD_MAX_UINT;
+      //[CO20221112 - OBSOLETE]    const vector<uint>& equivalent_g_states=m_coord_groups[i_coord_group].m_equivalent_g_states;
+      //[CO20221112 - OBSOLETE]    if(equivalent_g_states.size()){
+      //[CO20221112 - OBSOLETE]      for(uint i=0,fl_size_i=equivalent_g_states.size();i<fl_size_i;i++){
+      //[CO20221112 - OBSOLETE]        i_point=artificialMap(equivalent_g_states[i]);
+      //[CO20221112 - OBSOLETE]        if(m_points[i_point].m_has_entry){
+      //[CO20221112 - OBSOLETE]          auids.push_back(aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper));
+      //[CO20221112 - OBSOLETE]        }else{auids.push_back(null_value);}
+      //[CO20221112 - OBSOLETE]      }
+      //[CO20221112 - OBSOLETE]      value=aurostd::wrapString(aurostd::joinWDelimiter(auids,","),list_prefix,list_suffix);
+      //[CO20221112 - OBSOLETE]    }
+      //[CO20221112 - OBSOLETE]  }
+      //[CO20221112 - OBSOLETE]}
     }
     else if(property=="ground_state_icsd"){
       bool icsd_g_state=false;
@@ -11405,23 +11533,35 @@ namespace chull {
         uint i_coord_group=AUROSTD_MAX_UINT;
         if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Coordgroup index not set");}
         if(m_coord_groups[i_coord_group].m_is_on_hull){
-          icsd_g_state=m_coord_groups[i_coord_group].m_icsd_g_state;
+          icsd_g_state=m_coord_groups[i_coord_group].m_found_icsd_g_state;
         }
       }
       value=(icsd_g_state?"true":"false");
     }
     else if(property=="auid_icsd"){
-      if(point.isGState()){
-        //need to grab from coord_group
-        uint i_coord_group=AUROSTD_MAX_UINT;
-        if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Coordgroup index not set");}
-        if(m_coord_groups[i_coord_group].m_is_on_hull){
-          if(m_coord_groups[i_coord_group].m_icsd_g_state){
-            uint i_point=m_coord_groups[i_coord_group].m_i_canonical_icsd;
-            if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
-            if(m_points[i_point].m_has_entry){value=aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper);}
-          }
-        }
+      if(point.m_found_icsd){
+        uint i_point=point.m_i_icsd;
+        if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
+        value=aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper);
+      }
+      //[CO20221112 - OBSOLETE]if(point.isGState()){
+      //[CO20221112 - OBSOLETE]  //need to grab from coord_group
+      //[CO20221112 - OBSOLETE]  uint i_coord_group=AUROSTD_MAX_UINT;
+      //[CO20221112 - OBSOLETE]  if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Coordgroup index not set");}
+      //[CO20221112 - OBSOLETE]  if(m_coord_groups[i_coord_group].m_is_on_hull){
+      //[CO20221112 - OBSOLETE]    if(m_coord_groups[i_coord_group].m_found_icsd_g_state){
+      //[CO20221112 - OBSOLETE]      uint i_point=m_coord_groups[i_coord_group].m_i_icsd_g_state;
+      //[CO20221112 - OBSOLETE]      if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
+      //[CO20221112 - OBSOLETE]      if(m_points[i_point].m_has_entry){value=aurostd::wrapString(m_points[i_point].m_entry.auid,string_wrapper);}
+      //[CO20221112 - OBSOLETE]    }
+      //[CO20221112 - OBSOLETE]  }
+      //[CO20221112 - OBSOLETE]}
+    }
+    else if(property=="prototype_icsd"){
+      if(point.m_found_icsd){
+        uint i_point=point.m_i_icsd;
+        if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
+        value=aurostd::wrapString(m_points[i_point].m_entry.prototype,string_wrapper);
       }
     }
     else if(property=="compound_phases_equilibrium"){
