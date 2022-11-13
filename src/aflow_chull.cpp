@@ -1516,6 +1516,8 @@ namespace chull {
     ChullPointLight::copy(b);
     m_entry=b.m_entry; if(m_entry.vsg.size()==0){m_entry.vsg.push_back(NOSG);} if(m_entry.vsg2.size()==0){m_entry.vsg2.push_back(NOSG);}  //hack so it doesn't break with front(),back(),[0]
     m_i_coord_group=b.m_i_coord_group;
+    m_calculated_equivalent_entries=b.m_calculated_equivalent_entries;
+    m_equivalent_entries=b.m_equivalent_entries;
     m_i_icsd=b.m_i_icsd;
     s_coords=b.s_coords;
     c_coords=b.c_coords;
@@ -2098,6 +2100,8 @@ namespace chull {
   void ChullPoint::cleanPointForHullTransfer() {
     m_i_alloy=AUROSTD_MAX_UINT;
     m_i_coord_group=AUROSTD_MAX_UINT;
+    m_calculated_equivalent_entries=false;
+    m_equivalent_entries.clear();
     m_i_icsd=AUROSTD_MAX_UINT;
     m_is_on_hull=false;
     m_is_g_state=false;
@@ -6329,34 +6333,32 @@ namespace chull {
     return are_equivalent;
   }
 
-  vector<uint> ConvexHull::getEquivalentEntries(uint g_state,bool on_hull_only) const {
+  vector<uint> ConvexHull::getEquivalentEntries(uint i_point) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    if(g_state>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
-    const ChullPoint& point=m_points[g_state];
+    if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
+    const ChullPoint& point=m_points[i_point];
     if(!point.m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized point");}
-    if(!point.m_is_g_state){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No equivalent g-states for non ground-state structures");}
     uint i_coord_group=AUROSTD_MAX_UINT;
     if(!getCoordGroupIndex(point,i_coord_group)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within coordgroups");}
     if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized coordgroup");}
-    if(!m_coord_groups[i_coord_group].m_is_on_hull){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Coordgroup is not on the hull");}
     bool perform_structure_comparison=(1&&(!m_cflags.flag("CHULL::SKIP_STRUCTURE_COMPARISON"))); //(1&&!(m_cflags.flag("CHULL::SKIP_STRUCTURE_COMPARISON")||(!m_cflags.flag("CHULL::MULTI_OUTPUT")&&m_cflags.flag("CHULL::LATEX_DOC")&&m_cflags.flag("CHULL::IMAGE_ONLY"))));
 
-    vector<uint> equivalent_g_states;
+    vector<uint> equivalent_entries;
 
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " starting" << endl;}
-    uint i_point=AUROSTD_MAX_UINT;
+    uint j_point=AUROSTD_MAX_UINT;
     for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
-      i_point=m_coord_groups[i_coord_group].m_points[i];
-      if(!phasesEquivalent(g_state,i_point,perform_structure_comparison)){continue;}
-      equivalent_g_states.push_back(i_point);
+      j_point=m_coord_groups[i_coord_group].m_points[i];
+      if(!phasesEquivalent(i_point,j_point,perform_structure_comparison)){continue;}
+      equivalent_entries.push_back(j_point);
     }
     if(LDEBUG){
-      cerr << __AFLOW_FUNC__ << " g-state[" << g_state << "]=" << m_points[g_state].h_coords;
+      cerr << __AFLOW_FUNC__ << " g-state[" << i_point << "]=" << m_points[i_point].h_coords;
       cerr << " equivalent structures=";
-      for(uint i=0,fl_size_i=equivalent_g_states.size();i<fl_size_i;i++){cerr << equivalent_g_states[i] << (i!=equivalent_g_states.size()-1?", ":"");}
+      for(uint i=0,fl_size_i=equivalent_entries.size();i<fl_size_i;i++){cerr << equivalent_entries[i] << (i!=equivalent_entries.size()-1?", ":"");}
       cerr << endl;
     }
-    return equivalent_g_states;
+    return equivalent_entries;
   }
 
   bool ConvexHull::isICSD(uint i_point) const {
