@@ -942,7 +942,7 @@ namespace chull {
     stringstream message;
     string pwd = getPath(false);
     string home = XHOST.home; //aurostd::execute2string(XHOST.command("echo") + " $HOME");
-    string path;
+    string path="";
     // add '/' if _path doesn't already have it
     if(_path[_path.length() - 1] != '/') {
       _path += "/";
@@ -972,6 +972,7 @@ namespace chull {
     }
 
     //test of stupidity
+    aurostd::DirectoryMake(path);
     if(!aurostd::IsDirectory(path)){
       message << path << " does not seem to be a viable directory, changing to pwd=" << pwd;
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_WARNING_);
@@ -1101,6 +1102,9 @@ namespace chull {
     }
     if(vpflow.flag("CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS")) {
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
+    }
+    if(vpflow.flag("CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS_ND_ONLY")){
+      pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS_ND_ONLY set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
     }
     if(vpflow.flag("CHULL::SKIP_STRUCTURE_COMPARISON")) {
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "CHULL::SKIP_STRUCTURE_COMPARISON set to TRUE", aflags, FileMESSAGE, oss, _LOGGER_OPTION_, silent);
@@ -2218,30 +2222,35 @@ namespace chull {
   //[CO20221111 - VERY SLOW]  return i_entry.aurl<j_entry.aurl; //they cannot be identical as they are physical directories, sort like `ls`
   //[CO20221111 - VERY SLOW]}
   _aflowlib_entry_LIB2sorting::_aflowlib_entry_LIB2sorting(aflowlib::_aflowlib_entry& entry,uint index,vector<string>& velements_chull,ofstream& FileMESSAGE,ostream& oss) : xStream(FileMESSAGE,oss),m_index(index) {
-      m_entry=&entry;
-      m_velements_chull=&velements_chull;
-      m_species_AURL=m_entry->getSpeciesAURL(*p_FileMESSAGE,*p_oss);
+      //[CO20221112 - no pointers]m_entry=&entry;
+      m_auid=entry.auid;
+      m_aurl=entry.aurl;
+      m_catalog=entry.catalog;
+      m_prototype=entry.prototype;
+      m_nspecies=entry.nspecies;
+      m_velements_chull=velements_chull;
+      m_species_AURL=entry.getSpeciesAURL(*p_FileMESSAGE,*p_oss);
     }
   _aflowlib_entry_LIB2sorting::~_aflowlib_entry_LIB2sorting(){xStream::free();m_species_AURL.clear();}
   bool _aflowlib_entry_LIB2sorting::operator<(const _aflowlib_entry_LIB2sorting& other) const {
     bool LDEBUG=(FALSE || _DEBUG_CHULL_ || XHOST.DEBUG);
-    if(m_entry->catalog!=other.m_entry->catalog){return m_entry->catalog<other.m_entry->catalog;}
-    if(m_entry->prototype!=other.m_entry->prototype){return m_entry->prototype<other.m_entry->prototype;}
-    if(m_entry->catalog=="LIB2" && m_entry->vspecies.size()==1 && other.m_entry->vspecies.size()==1){
+    if(m_catalog!=other.m_catalog){return m_catalog<other.m_catalog;}
+    if(m_prototype!=other.m_prototype){return m_prototype<other.m_prototype;}
+    if(m_catalog=="LIB2" && m_nspecies==1 && other.m_nspecies==1){
       if(m_species_AURL.size()!=other.m_species_AURL.size()){return m_species_AURL.size()<other.m_species_AURL.size();} //effectively sorting by catalog
       if(LDEBUG){
-        cerr << __AFLOW_FUNC__ << " m_entry->auid=" << m_entry->auid << " m_entry->aurl=" << m_entry->aurl << " m_species_AURL=" << aurostd::joinWDelimiter(m_species_AURL,",") << endl;
-        cerr << __AFLOW_FUNC__ << " other.m_entry->auid=" << other.m_entry->auid << " other.m_entry->aurl=" << other.m_entry->aurl << " other.m_species_AURL=" << aurostd::joinWDelimiter(other.m_species_AURL,",") << endl;
+        cerr << __AFLOW_FUNC__ << " m_auid=" << m_auid << " m_aurl=" << m_aurl << " m_species_AURL=" << aurostd::joinWDelimiter(m_species_AURL,",") << endl;
+        cerr << __AFLOW_FUNC__ << " other.m_auid=" << other.m_auid << " other.m_aurl=" << other.m_aurl << " other.m_species_AURL=" << aurostd::joinWDelimiter(other.m_species_AURL,",") << endl;
       }
       uint k=0;
-      bool i_within_hull=true;for(k=0;k<m_species_AURL.size()&&i_within_hull;k++){if(!aurostd::WithinList(*m_velements_chull,m_species_AURL[k])){i_within_hull=false;}}
-      bool j_within_hull=true;for(k=0;k<other.m_species_AURL.size()&&j_within_hull;k++){if(!aurostd::WithinList(*m_velements_chull,other.m_species_AURL[k])){j_within_hull=false;}}
+      bool i_within_hull=true;for(k=0;k<m_species_AURL.size()&&i_within_hull;k++){if(!aurostd::WithinList(m_velements_chull,m_species_AURL[k])){i_within_hull=false;}}
+      bool j_within_hull=true;for(k=0;k<other.m_species_AURL.size()&&j_within_hull;k++){if(!aurostd::WithinList(m_velements_chull,other.m_species_AURL[k])){j_within_hull=false;}}
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " i_within_hull=" << i_within_hull << " j_within_hull=" << j_within_hull << endl;}
       if(i_within_hull!=j_within_hull){return i_within_hull;}
       for(k=0;k<m_species_AURL.size();k++){if(m_species_AURL[k]!=other.m_species_AURL[k]){return m_species_AURL[k]<other.m_species_AURL[k];}}
     }
     //
-    return m_entry->aurl<other.m_entry->aurl; //they cannot be identical as they are physical directories, sort like `ls`
+    return m_aurl<other.m_aurl; //they cannot be identical as they are physical directories, sort like `ls`
   }
 } //namespace chull
 
@@ -6347,7 +6356,7 @@ namespace chull {
       cerr << __AFLOW_FUNC__ << " structure 2" << endl;
       cerr << b;
     }
-    bool are_equivalent=compare::structuresMatch(a,b,true,false,false); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false
+    bool are_equivalent=(compare::structuresMatch(a,b,true,false,false)||compare::structuresMatch(b,a,true,false,false)); //match species and use fast match, but not scale volume, two structures with different volumes (pressures) are different! //DX20180123 - added fast_match = true //DX20190318 - not fast_match but optimized_match=false //CO20221112 - bit OR short circuit, there are some structures where compare_materials is input-specific
     if(LDEBUG){cerr << __AFLOW_FUNC__ << " structures are " << (are_equivalent?"":"NOT ") << "equivalent" << endl;}
     return are_equivalent;
   }
@@ -6485,27 +6494,44 @@ namespace chull {
     if(i_coord_group>m_coord_groups.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within coordgroups");}
     if(m_coord_groups[i_coord_group].m_points.size()==0){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Coordgroup["+aurostd::utype2string(i_coord_group)+"] has no points");}
     if(!m_coord_groups[i_coord_group].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Uninitialized coordgroup");}
-    
     stringstream message;
-    vector<uint> vpoints2check;
 
+    //clear all
     if(m_coord_groups[i_coord_group].m_is_on_hull){
       m_coord_groups[i_coord_group].m_equivalent_g_states.clear();
       m_coord_groups[i_coord_group].m_calculated_equivalent_g_states=false;
+      m_coord_groups[i_coord_group].m_found_icsd_g_state=false;
+      m_coord_groups[i_coord_group].m_i_icsd_g_state=AUROSTD_MAX_UINT;
+    }
+    uint i_point=AUROSTD_MAX_UINT;
+    for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
+      i_point=m_coord_groups[i_coord_group].m_points[i];
+      if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
+      if(!m_points[i_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
+      m_points[i_point].m_equivalent_entries.clear();
+      m_points[i_point].m_calculated_equivalent_entries=false;
+      m_points[i_point].m_found_icsd=false;
+      m_points[i_point].m_i_icsd=AUROSTD_MAX_UINT;
+    }
+     
+    //get vpoints2check
+    vector<uint> vpoints2check;
+    if(m_coord_groups[i_coord_group].m_is_on_hull){
       //we need to do a structure comparison, so get artificial map (did already before)
       uint g_state=m_coord_groups[i_coord_group].m_ref_state;
       vpoints2check.push_back(g_state);
     }
     double dist=0.0;
-    uint i_point=AUROSTD_MAX_UINT;
     if(m_cflags.flag("CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS")){dist=aurostd::string2utype<double>(m_cflags.getattachedscheme("CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS"));}
-    if(aurostd::nonZeroWithinTol(dist,ZERO_TOL)){
-      message << "Performing equivalence analysis for points within " << aurostd::utype2string(dist) << " (meV/atom) of hull for";
-      if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-");}
+    bool ND_only=m_cflags.flag("CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS_ND_ONLY");
+    if((!(ND_only && i_nary!=(m_dim-1))) && aurostd::nonZeroWithinTol(dist,ZERO_TOL)){
+      message << "Performing equivalence analysis for points within " << aurostd::utype2string(dist) << " (meV/atom) for the";
+      if(m_velements.size()){message << " " << aurostd::joinWDelimiter(alloyToElements(i_nary,i_alloy),"-") << " hull";}
       message << " [i_nary=" << i_nary << ",i_alloy=" << i_alloy << ",i_coord_group=" << i_coord_group << "]";
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
       for(uint i=0,fl_size_i=m_coord_groups[i_coord_group].m_points.size();i<fl_size_i;i++){
         i_point=m_coord_groups[i_coord_group].m_points[i];
+        if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
         if(aurostd::WithinList(vpoints2check,i_point)){continue;}
         if(!m_points[i_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(i_point)+"] is not initialized");}
         if(m_points[i_point].getDist2Hull(_m_)<=dist){vpoints2check.push_back(i_point);}
@@ -6524,10 +6550,11 @@ namespace chull {
     
     for(uint i=0,fl_size_i=vpoints2check.size();i<fl_size_i;i++){
       i_point=vpoints2check[i];
-      if(i_point>m_points.size()-1){continue;}
+      if(i_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
       ChullPoint& point_i=m_points[i_point];
       if(!point_i.m_has_entry){continue;} //throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No entry (structure) found"); //only point in coordgroup
       if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking at i_point[" << i_point << "]=" << m_points[i_point].h_coords << endl;}
+      if(point_i.m_calculated_equivalent_entries==true){continue;}  //speed up
       point_i.m_equivalent_entries=getEquivalentEntries(i_point);
       if(!point_i.m_equivalent_entries.size()){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"No equivalent states found (not even self)");}
       point_i.m_calculated_equivalent_entries=true;
@@ -6542,8 +6569,10 @@ namespace chull {
       icsd_number=AUROSTD_MAX_UINT;
       for(uint j=0,fl_size_j=point_i.m_equivalent_entries.size();j<fl_size_j;j++){
         j_point=point_i.m_equivalent_entries[j];
+        if(j_point>m_points.size()-1){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Invalid index within points");}
         if(!m_points[j_point].m_initialized){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Point["+aurostd::utype2string(j_point)+"] is not initialized");}
         ChullPoint& point_j=m_points[j_point];
+        //[CO20221112 - should not be necessary, might mess up consistency of data, just let it redo]if(point_j.m_calculated_equivalent_entries==true){continue;}  //speed up
         if(i_point!=j_point){
           point_j.m_equivalent_entries=point_i.m_equivalent_entries;
           point_j.m_calculated_equivalent_entries=true;

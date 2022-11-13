@@ -398,6 +398,9 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
       }
     }
     vpflow.args2addattachedscheme(argv,cmds,"CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS","--distance_for_equivalence_analysis=|--dist4equi=|--d4e=","0.0"); //calculate distance to hull for point
+    if(vpflow.flag("CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS")){
+      vpflow.flag("CHULL::DIST_FOR_EQUIVALENCE_ANALYSIS_ND_ONLY",aurostd::args2attachedflag(argv,cmds,"--d4e_ND|--d4e_nd"));
+    }
   }
 
   // [OBSOLETE] vpflow.flag("CLAT",aurostd::args2flag(argv,cmds,"--clat"));

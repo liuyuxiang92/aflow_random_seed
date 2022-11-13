@@ -350,9 +350,14 @@ namespace chull {
     _aflowlib_entry_LIB2sorting(aflowlib::_aflowlib_entry& entry,uint index,vector<string>& velements_chull,ofstream& FileMESSAGE,ostream& oss);
     ~_aflowlib_entry_LIB2sorting();
     //
-    aflowlib::_aflowlib_entry* m_entry; //BE CAREFUL: this is a pointer, do not use out of scope
+    //[CO20221112 - no pointers]aflowlib::_aflowlib_entry* m_entry; //BE CAREFUL: this is a pointer, do not use out of scope
+    string m_auid;
+    string m_aurl;
+    string m_catalog;
+    string m_prototype;
+    uint m_nspecies;
     uint m_index;
-    vector<string>* m_velements_chull;  //BE CAREFUL: this is a pointer, do not use out of scope
+    vector<string> m_velements_chull;  //BE CAREFUL: this is a pointer, do not use out of scope
     vector<string> m_species_AURL;
     bool operator<(const _aflowlib_entry_LIB2sorting& other) const;
   };
