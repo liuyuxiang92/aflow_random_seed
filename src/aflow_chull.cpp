@@ -252,6 +252,7 @@ namespace chull {
     }
     inputs=aurostd::RemoveWhiteSpaces(inputs);  //CO20200531 - sometimes web injects spaces
     aurostd::StringSubst(inputs,"-","");;  //CO20200531 - removing '-' from web
+    //
     vector<string> tokens_comma;
     uint nary;
     string original_input;
@@ -288,6 +289,18 @@ namespace chull {
         }
       }
     }else{  //simple list mode
+      if(inputs=="LIB3ALL"&&aurostd::FileExist("/common/LIB3/LIB")){
+      //[CO20221112 - might have ':', messing up combination input below]inputs=aurostd::execute2string("ls /common/LIB3/LIB | tr -s '\\r\\n' ',' | sed -e 's/,$/\\n/'");
+        inputs=aurostd::joinWDelimiter(aurostd::string2vectorstring(aurostd::execute2string("ls /common/LIB3/LIB")),",");
+        //[CO20221112 - too slow]velements.clear();
+        //[CO20221112 - too slow]for(uint i=0;i<vlib3.size();i++){
+        //[CO20221112 - too slow]  velements=aurostd::getElements(vlib3[i],pp_string,FileMESSAGE,true,true,false,oss);
+        //[CO20221112 - too slow]  vlib3[i]=aurostd::joinWDelimiter(velements,"");
+        //[CO20221112 - too slow]}
+        //[CO20221112 - too slow]inputs=aurostd::joinWDelimiter(vlib3,",");
+        //[CO20221112 - too slow]velements.clear();
+      }
+      //
       aurostd::string2tokens(inputs, tokens_comma, ",");
       for(uint i=0,fl_size_i=tokens_comma.size();i<fl_size_i;i++){
         velements=aurostd::getElements(tokens_comma[i],pp_string,FileMESSAGE,true,true,false,oss);  //clean and sort, do not keep_pp  //CO20190712
