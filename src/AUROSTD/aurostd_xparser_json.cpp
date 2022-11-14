@@ -623,6 +623,7 @@ namespace aurostd {
   template JSON::object::operator std::vector<double>() const;
   template JSON::object::operator std::vector<float>() const;
   template JSON::object::operator std::vector<long long>() const;
+  template JSON::object::operator std::vector<unsigned long long>() const;
   template JSON::object::operator std::vector<long>() const;
   template JSON::object::operator std::vector<int>() const;
   template JSON::object::operator std::vector<uint>() const;
@@ -706,6 +707,7 @@ namespace aurostd {
   template JSON::object::operator aurostd::xvector<double>() const;
   template JSON::object::operator aurostd::xvector<float>() const;
   template JSON::object::operator aurostd::xvector<long long>() const;
+  template JSON::object::operator aurostd::xvector<unsigned long long>() const;
   template JSON::object::operator aurostd::xvector<long>() const;
   template JSON::object::operator aurostd::xvector<int>() const;
   template JSON::object::operator aurostd::xvector<uint>() const;
@@ -767,6 +769,7 @@ namespace aurostd {
   template JSON::object::operator aurostd::xmatrix<double>() const;
   template JSON::object::operator aurostd::xmatrix<float>() const;
   template JSON::object::operator aurostd::xmatrix<long long>() const;
+  template JSON::object::operator aurostd::xmatrix<unsigned long long>() const;
   template JSON::object::operator aurostd::xmatrix<long>() const;
   template JSON::object::operator aurostd::xmatrix<int>() const;
   template JSON::object::operator aurostd::xmatrix<uint>() const;

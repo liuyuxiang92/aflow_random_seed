@@ -1427,6 +1427,7 @@ namespace unittest {
       check_description = "test parsing xvector<";
       std::string number_json= "{\"xvector_double\" : [923.49445786, -441.74004105, 465.49355057, 96.15610686, 557.6834903 , 147.6777196 , 871.81485459, 287.89958188, 863.66132302, 876.36635155],\n"
                                " \"xvector_ll\" : [449644208, -252515403, 601496576, 725767871, 502088591, 946128279, 65015635, 352203056, 717938486, 762013152],\n"
+                               " \"xvector_ull\" : [449644208, 252515403, 601496576, 725767871, 502088591, 946128279, 65015635, 352203056, 717938486, 762013152],\n"
                                " \"xvector_mixed\" : [449644208, -441.74004105, 465.49355057, 725767871, true, 946128279, 65015635, 287.89958188, 863.66132302, 762013152],\n"
                                " \"xvector_nan\" : [449644208, -441.74004105, null, 725767871, true, 946128279, 65015635, 287.89958188, 863.66132302, 762013152]}";
 
@@ -1435,6 +1436,7 @@ namespace unittest {
       xvector<double> xvd_res = jo["xvector_double"];
       xvector<double> xvd_exp = {923.49445786, -441.74004105, 465.49355057, 96.15610686, 557.6834903 , 147.6777196 , 871.81485459, 287.89958188, 863.66132302, 876.36635155};
       checkEqual( xvd_res, xvd_exp, check_function, check_description + "double>", passed_checks, results);
+
 
       xvd_res = jo["xvector_nan"];
       xvd_exp = {449644208, -441.74004105, NAN, 725767871, 1.0, 946128279, 65015635, 287.89958188, 863.66132302, 762013152};
@@ -1447,6 +1449,12 @@ namespace unittest {
       xvector<long long> xvll_res = jo["xvector_ll"];
       xvector<long long> xvll_exp = {449644208, -252515403, 601496576, 725767871, 502088591, 946128279, 65015635, 352203056, 717938486, 762013152};
       checkEqual( xvll_res, xvll_exp, check_function, check_description + "long long>", passed_checks, results);
+
+      // initialize_xscalar_xvector_xmatrix_xtensor in boot is not called for unsigned ints
+      // xvector<unsigned long long> xvull_res = jo["xvector_ull"];
+      // xvector<unsigned long long> xvull_exp = {449644208, 252515403, 601496576, 725767871, 502088591, 946128279, 65015635, 352203056, 717938486, 762013152};
+      // checkEqual( xvull_res, xvull_exp, check_function, check_description + "unsigned long long>", passed_checks, results);
+
 
       xvll_res = jo["xvector_mixed"];
       xvll_exp = {449644208, -441, 465, 725767871, 1, 946128279, 65015635, 287, 863, 762013152};

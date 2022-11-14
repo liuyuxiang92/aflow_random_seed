@@ -621,7 +621,7 @@ bool initialize_templates_never_call_this_procedure(bool flag) {
       //[CO20191201 - should NOT be needed here, the output should be an int type]getSmithNormalForm(z,z,z,z); //CO20191201
       vector<double> vd;getElements("MnPd",vd);getElements("MnPd",vd,pp_string);getElements("MnPd",vd,pp_string,FileMESSAGE); //CO20200624
     }
-#endif   
+#endif
 #ifdef AUROSTD_INITIALIZE_LONG_DOUBLE
     if(1) { // AUROSTD_INITIALIZE_LONG_DOUBLE
       o+=initialize_scalar((long double)(1));
