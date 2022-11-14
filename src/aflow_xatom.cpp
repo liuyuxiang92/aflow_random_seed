@@ -1392,14 +1392,20 @@ vector<string> xstructure::GetElementsFromAtomNames(bool clean_name) const{ // M
   // Extracts the species from the atom names
 
 
-  vector<string> species;
-  if(atoms.size()==0){ return species; }
-  if(!atoms[0].name_is_given) { return species; }
+  vector<string> species_found;
+  if(atoms.size()==0){ return species_found; }
+  if(!atoms[0].name_is_given) { return species_found; }
 
   uint iat=0;
   string species_tmp = "";
   for(uint i=0;i<num_each_type.size();i++){
     species_tmp = atoms[iat].name; //always the first in the species set
+    if(species_tmp.empty()){
+      stringstream message;
+      message << "Found 1 non-specified species within structure:" << endl;
+      message << (*this) << endl;
+      throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_ERROR_);
+    }
     for(int j=0;j<num_each_type[i];j++){
       // check all atoms of the same type have the same name
       if(atoms[iat].name!=species_tmp){
@@ -1410,10 +1416,10 @@ vector<string> xstructure::GetElementsFromAtomNames(bool clean_name) const{ // M
       }
       iat++;
     }
-    if(clean_name){ species.push_back(KBIN::VASP_PseudoPotential_CleanName(species_tmp)); }
-    else{ species.push_back(species_tmp); }
+    if(clean_name){ species_found.push_back(KBIN::VASP_PseudoPotential_CleanName(species_tmp)); }
+    else{ species_found.push_back(species_tmp); }
   }
-  return species;
+  return species_found;
 }
 
 // **************************************************************************
@@ -11762,30 +11768,35 @@ string xstructure::SpeciesString(void) {
 // Function SetSpecies
 // ***************************************************************************
 // Set the species  Stefano Curtarolo Nov 2014
-uint xstructure::SetSpecies(const deque<string>& vspecies) {
-  stringstream message; //CO20190317
-  if(vspecies.size()!=species.size() ) {
-    message << "vspecies.size()!=species.size()"; //CO20190317
-    aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_RANGE_); //CO20190317
+// CO20221112 - do not set species explicitly, always use add/remove atoms, it updates EVERYTHING all at once and avoids seg faults
+uint xstructure::SetSpecies(const deque<string>& species_in) {
+  bool LDEBUG=(FALSE || XHOST.DEBUG); 
+  if(LDEBUG){
+    cerr << __AFLOW_FUNC__ << " species_in=" << aurostd::joinWDelimiter(species_in,",") << endl;
+    cerr << __AFLOW_FUNC__ << " xstr=" << endl << (*this) << endl;
+    cerr << __AFLOW_FUNC__ << " xstr.species=" << aurostd::joinWDelimiter(species,",") << endl;
+    cerr << __AFLOW_FUNC__ << " xstr.num_each_type=" << aurostd::joinWDelimiter(num_each_type,",") << endl;
   }
-  if(vspecies.size()!=num_each_type.size() ) {
-    message << "vspecies.size()!=num_each_type.size()"; //CO20190317
-    aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,message,_VALUE_RANGE_); //CO20190317
-  }
-  int iatom=0;
-  for(uint itype=0;itype<num_each_type.size();itype++) {
-    //      string species=string(argv.at(2+b.atoms.at(iatom).type));
-    string itype_species=vspecies.at(itype);
-    species.at(itype)=itype_species;
-    for(int j=0;j<num_each_type.at(itype);j++) {
-      atoms.at(iatom).name=itype_species;    // CONVASP_MODE
-      atoms.at(iatom).CleanName();
-      //DX20170921 - Need to keep spin info atoms.at(iatom).CleanSpin();
-      atoms.at(iatom).name_is_given=TRUE;
-      iatom++;
+  if(species_in.size()!=species.size()){aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"species_in.size()!=species.size()",_VALUE_RANGE_);} //CO20190317
+  if(species_in.size()!=num_each_type.size()){aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"species_in.size()!=num_each_type.size()",_VALUE_RANGE_);} //CO20190317
+  uint iatom=0;
+  deque<_atom> atoms_new;
+  for(uint itype=0;itype<num_each_type.size();itype++){
+    for(int j=0;j<num_each_type[itype];j++){
+      atoms_new.push_back(atoms[iatom++]);
+      atoms_new.back().name=species_in[itype];
+      atoms_new.back().CleanName();
+      //[DX20170921 - Need to keep spin info]atoms_new.back().CleanSpin();
+      atoms_new.back().name_is_given=(!atoms_new.back().name.empty());
     }
   }
-  return vspecies.size();
+  ReplaceAtoms(atoms_new);
+  if(LDEBUG){
+    cerr << __AFLOW_FUNC__ << " xstr_updated=" << endl << (*this) << endl;
+    cerr << __AFLOW_FUNC__ << " xstr_updated.species=" << aurostd::joinWDelimiter(species,",") << endl;
+    cerr << __AFLOW_FUNC__ << " xstr_updated.num_each_type=" << aurostd::joinWDelimiter(num_each_type,",") << endl;
+  }
+  return species_in.size();
 }
 
 // ***************************************************************************

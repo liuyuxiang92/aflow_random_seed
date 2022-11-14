@@ -289,9 +289,10 @@ namespace chull {
         }
       }
     }else{  //simple list mode
-      if(inputs=="LIB3ALL"&&aurostd::FileExist("/common/LIB3/LIB")){
-      //[CO20221112 - might have ':', messing up combination input below]inputs=aurostd::execute2string("ls /common/LIB3/LIB | tr -s '\\r\\n' ',' | sed -e 's/,$/\\n/'");
-        inputs=aurostd::joinWDelimiter(aurostd::string2vectorstring(aurostd::execute2string("ls /common/LIB3/LIB")),",");
+      if(inputs=="LIB3HEUSLERS"&&aurostd::FileExist("/common/LIB3/LIB")){
+        //[CO20221112 - might have ':', messing up combination input below]inputs=aurostd::execute2string("ls /common/LIB3/LIB | tr -s '\\r\\n' ',' | sed -e 's/,$/\\n/'");
+        //[CO20221112 - too slow]inputs=aurostd::joinWDelimiter(aurostd::string2vectorstring(aurostd::execute2string("ls /common/LIB3/LIB")),",");
+        inputs=aurostd::execute2string("find /common/LIB3/LIB -maxdepth 2 -name 'T000*' | grep 'T0001\\|T0002\\|T0003' | xargs dirname | sed 's/\\/common\\/LIB3\\/LIB\\///' | sort | uniq | tr -s '\\r\\n' ',' | sed -e 's/,$/\\n/'");
         //[CO20221112 - too slow]velements.clear();
         //[CO20221112 - too slow]for(uint i=0;i<vlib3.size();i++){
         //[CO20221112 - too slow]  velements=aurostd::getElements(vlib3[i],pp_string,FileMESSAGE,true,true,false,oss);
@@ -372,10 +373,10 @@ namespace chull {
 #ifdef AFLOW_MULTITHREADS_ENABLE
     int ncpus=KBIN::get_NCPUS();
     if(ncpus>1){
-      xthread::xThread xt(oss,KBIN::get_NCPUS(), 1);
+      xthread::xThread xt(oss,ncpus, 1);
       vector<uint> vKrun(ntasks,1); //c++ doesn't like vector<bool>
-      std::function<void(uint,vector<string>&,const aurostd::xoption&,const _aflags&,vector<uint>&,ostream&)> fn = 
-        [&] (uint i,vector<string>& vinputs,const aurostd::xoption& xoptions,const _aflags& aflags,vector<uint>& vKrun,ostream& oss) {
+      std::function<void(uint,const vector<string>&,const aurostd::xoption&,const _aflags&,vector<uint>&,ostream&)> fn = 
+        [&] (uint i,const vector<string>& vinputs,const aurostd::xoption& xoptions,const _aflags& aflags,vector<uint>& vKrun,ostream& oss) {
           vKrun[i]=(convexHull(vinputs[i],xoptions,aflags,oss,true)?1:0);
         };
       //create dumb oss for threaded environment
@@ -442,14 +443,14 @@ namespace chull {
     }
     alloy=aurostd::joinWDelimiter(velements,"");
     if(vpflow.flag("CHULL::LOG")) {
-      log_name = "aflow_" + aurostd::joinWDelimiter(velements,"") + "_hull.log";
+      log_name = "aflow_" + alloy + "_hull.log";
       string log_destination = directory + log_name;  // no output before banner //CO20180220
       FileMESSAGE.open(log_destination.c_str());
     }
     // spit out banner for only the first request
     message << aflow::Banner("BANNER_NORMAL");
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_RAW_, true);  //i //no screen, first to be logged
-    message << "Starting " << aurostd::joinWDelimiter(velements,"") << " " << pflow::arity_string(velements.size(),false,false) << " convex hull";
+    message << "Starting " << alloy << " " << pflow::arity_string(velements.size(),false,false) << " convex hull";
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, aflags, FileMESSAGE, oss, _LOGGER_MESSAGE_);
     getPath(vpflow, FileMESSAGE, oss, false); //CO20180220 - directory stuff for logging
     chull::flagCheck(vpflow, velements, FileMESSAGE, oss, (bool)silence_flag_check);  // spit out all flag options

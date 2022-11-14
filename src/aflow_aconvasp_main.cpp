@@ -9831,25 +9831,26 @@ namespace pflow {
     stringstream message;
 
     //get path if not provided
-    if (path.empty()) {
-      path = entry.getPathAURL(FileMESSAGE,oss,true); is_url_path=false;
-      if(!(!path.empty()&&aurostd::IsDirectory(path))){path = "";}  //reset
+    if(path.empty()){
+      path=entry.getPathAURL(FileMESSAGE,oss,true); is_url_path=false;
+      if(!(!path.empty()&&aurostd::IsDirectory(path))){path="";}  //reset
     }
     if(path.empty()){path = entry.getPathAURL(FileMESSAGE,oss,false);is_url_path=true;}
-    if (path.empty()) {
+    if(path.empty()){
       message << "Path cannot be loaded from entry, skipping loadXstructure()";
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, FileMESSAGE, oss, _LOGGER_WARNING_);
       return false;
     }
+    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " path=" << path << endl;}
 
     vector<string> vspecies=entry.vspecies;
     //[CO20221110 - fails for unaries in LIB2]if(vspecies.empty()){vspecies=entry.getSpeciesAURL(FileMESSAGE,oss);}
     if(vspecies.empty()){vspecies=entry.getSpecies();}
+    if(LDEBUG){cerr << __AFLOW_FUNC__ << " vspecies=" << aurostd::joinWDelimiter(vspecies,",") << endl;}
 
     xstructure xstrAux;
     stringstream ss;
     vector<string> files;
-    if(LDEBUG) {cerr << __AFLOW_FUNC__ << " path=" << path << endl;}
 
     if(is_url_path){aurostd::url2tokens(path + "/?files", files, ",");}
     else {aurostd::DirectoryLS(path,files);}
@@ -9915,7 +9916,7 @@ namespace pflow {
           }
         }
       }
-      if (!xstrAux.atoms.size()) {
+      if(!xstrAux.atoms.size()) {
         pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Cannot load original structure", FileMESSAGE, oss, _LOGGER_WARNING_);
         return false;
       }
@@ -9935,7 +9936,7 @@ namespace pflow {
         if(aurostd::EWithinList(files,poscar_files_relax_mid[i],efile)) {
           if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking for " << path+"/"+efile << endl;}
           ss.str("");
-          if ( (is_url_path ? 
+          if( (is_url_path ? 
                 aurostd::eurl2stringstream(path+"/"+efile,ss,false) : 
                 aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
             try{ 
@@ -9955,7 +9956,7 @@ namespace pflow {
           }
         }
       }
-      if (!xstrAux.atoms.size()) {
+      if(!xstrAux.atoms.size()) {
         pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Cannot load mid-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
         return false;
       }
@@ -9976,7 +9977,7 @@ namespace pflow {
       if(aurostd::EWithinList(files,poscar_files_relax_final[i],efile)) {
         if(LDEBUG){cerr << __AFLOW_FUNC__ << " looking for " << path+"/"+efile << endl;}
         ss.str("");
-        if ( (is_url_path ? 
+        if( (is_url_path ? 
               aurostd::eurl2stringstream(path+"/"+efile,ss,false) : 
               aurostd::efile2stringstream(path+"/"+efile,ss)) ) {
           try{ 
@@ -9996,7 +9997,7 @@ namespace pflow {
         }
       }
     }
-    if (!xstrAux.atoms.size()) {
+    if(!xstrAux.atoms.size()) {
       pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, "Cannot load fully-relaxed structure", FileMESSAGE, oss, _LOGGER_WARNING_);
       return false;
     }
