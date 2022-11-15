@@ -5203,9 +5203,14 @@ namespace aurostd {
   }
   template<typename utype> utype string2utype(const string& from, const uint base) {
     if(from.empty()){return (utype) stream2stream<utype>("0",AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);} //CO20210315 - stream2stream behavior is not defined for empty string input: https://stackoverflow.com/questions/4999650/c-how-do-i-check-if-the-cin-buffer-is-empty
-    string FROM=aurostd::toupper(from); //CO20210315
-    if(FROM=="TRUE"||FROM=="T"||FROM==".TRUE."){return (utype) stream2stream<utype>("1",AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);;}  //CO20210315 - safe because inputs are generally digits
-    if(FROM=="FALSE"||FROM=="F"||FROM==".FALSE."){return (utype) stream2stream<utype>("0",AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);;}  //CO20210315 - safe because inputs are generally digits
+    if(from.find("T")!=string::npos||from.find("t")!=string::npos||from.find("F")!=string::npos||from.find("f")!=string::npos){ //CO20221112
+      //CO20221112 - gdb died here when running chull in parallel
+      //seems toupper might have some issues with threaded processes
+      //adding this guard to mitigate the issue
+      string FROM=aurostd::toupper(from); //CO20210315
+      if(FROM=="TRUE"||FROM=="T"||FROM==".TRUE."){return (utype) stream2stream<utype>("1",AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);;}  //CO20210315 - safe because inputs are generally digits
+      if(FROM=="FALSE"||FROM=="F"||FROM==".FALSE."){return (utype) stream2stream<utype>("0",AUROSTD_DEFAULT_PRECISION,DEFAULT_STREAM);;}  //CO20210315 - safe because inputs are generally digits
+    }
     if (base != 10) { //HE20220324 add non-decimal bases (will ignore positions behind a point)
       std::stringstream temp;
       temp << std::stoll(from, nullptr, base); // stoll -> string to long long

@@ -1689,6 +1689,7 @@ namespace chull {
 
   bool ChullPoint::getMostRelaxedXstructure(xstructure& xstr) const { //this is const!
     if(m_entry.prototype.find("POCC")!=string::npos){return false;} //POCC entries have no composition
+    if(pflow::loadXstructureLibEntry(m_entry,xstr)){return true;}
     aflowlib::_aflowlib_entry entry; entry.auid=m_entry.auid; entry.aurl=m_entry.aurl; entry.vspecies=m_entry.vspecies;  //fast copy  //CO20221110 - pass vspecies here to populate xstructure
     if(!pflow::loadXstructures(entry,*p_FileMESSAGE,*p_oss,true)){return false;}
     if(entry.vstr.size()==1){xstr=entry.vstr[0]; return true;}
