@@ -1242,8 +1242,8 @@ namespace unittest {
 
     string task_description = "Test xparsers";
     stringstream result;
-    string check_description;
-    string check_function;
+    string check_description="";
+    string check_function="";
 
     // ---------------------------------------------------------------------------
     // Check | aurostd::JSON
@@ -1671,7 +1671,7 @@ namespace unittest {
     // setup test environment
     string task_description = "Testing EntryLoader";
     stringstream result;
-    string check_description;
+    string check_description = "";
     stringstream check_description_helper;
     string check_function = "";
 
