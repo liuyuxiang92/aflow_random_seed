@@ -110,7 +110,6 @@ namespace qca {
       void calculateConcentrationCluster();
       void readExcessEnergyCluster();
       void setCongruentClusters();
-      void calculateDegeneracyClusterSingle(vector<xstructure>::iterator& it, const vector<xstructure>::iterator& ib, const unsigned long int ic);
       void calculateDegeneracyCluster();
       void calculateConcentrationMacro();
       void calculateTemperatureRange();

@@ -814,19 +814,6 @@ namespace xthread {
     aurostd::xoption&
   );
 
-  //QuasiChemApproxCalculator::calculateDegeneracyClusterSingle
-  template void xThread::run<
-    vector<xstructure>,
-    std::function<void(vector<xstructure>::iterator&, const vector<xstructure>::iterator&, const unsigned long int&)>,
-    vector<xstructure>::iterator,
-    unsigned long int
-  >(
-    vector<xstructure>&,
-    std::function<void(vector<xstructure>::iterator&, const vector<xstructure>::iterator&, const unsigned long int&)>&,
-    vector<xstructure>::iterator&,
-    unsigned long int&
-  );
-
   //aflowlib::AflowDB::createTable
   template void xThread::run<
     std::function<void(int, const vector<string>&, const vector<string>&)>,

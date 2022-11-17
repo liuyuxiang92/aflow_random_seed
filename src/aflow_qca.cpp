@@ -492,18 +492,12 @@ namespace qca {
   ///
   /// @authors
   /// @mod{SD,20220718,created function}
-  void QuasiChemApproxCalculator::calculateMapForXstructures(const vector<xstructure>& _vstr1, const vector<xstructure>& vstr2) {
+  void QuasiChemApproxCalculator::calculateMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     stringstream message;
-    vector<xstructure> vstr1 = _vstr1;
     vector<uint> index;
     message << "Mapping xstructures between AFLOW and ATAT";
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-    for (uint i = 0; i < vstr1.size(); i++) {index.push_back(i);}
-    // Shuffling the xstructures is important because it can avoid edge case scenarios where the reference centroid
-    // in Xtalfinder does not pick up the proper neighbors
-    aurostd::random_shuffle(index); 
-    for (size_t i = 0; i < index.size(); i++) {vstr1[i] = _vstr1[index[i]];}
     vector<xstructure> vstr3 = vstr1;
     vstr3.insert(vstr3.end(), vstr2.begin(), vstr2.end());
     XtalFinderCalculator xtal_calc;
@@ -534,8 +528,6 @@ namespace qca {
       message << "Something went wrong in the mapping of the xstructures; index.size()=" << index.size() << " | mapstr.size()=" << mapstr.size() << endl;
       throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
-    vector<int> _mapstr = mapstr;
-    for (size_t i = 0; i < index.size(); i++) {mapstr[index[i]] = _mapstr[i];} // reorder back to the original
   }
 
   /// @brief gets the lattice file for ATAT
@@ -856,24 +848,6 @@ namespace qca {
     excess_energy_cluster = v2;
   }
 
-  /// @brief calculates the degeneracy of a particular cluster
-  ///
-  /// @param it iterator of xstructures to compare
-  /// @param ib begin iterator of xstructures to compare
-  /// @param ic index of the cluster
-  ///
-  /// @note helper function for parallelization
-  ///
-  /// @authors
-  /// @mod{SD,20220718,created function}
-  void QuasiChemApproxCalculator::calculateDegeneracyClusterSingle(vector<xstructure>::iterator& it, const vector<xstructure>::iterator& ib, const unsigned long int ic) {
-    unsigned long int i = it - ib;
-    if (skipstr(i + 1) == 0 && compare::structuresMatch(vstr_ce[ic], *it, true, true, false)) {
-      degeneracy_cluster(ic + 1) += pocc::getDGFromXStructureTitle((*it).title);
-      skipstr(i + 1) = 1;
-    }
-  }
-
   /// @brief calculates the cluster degeneracy
   ///
   /// @authors
@@ -894,7 +868,6 @@ namespace qca {
     stringstream message;
     message << "Generating derivative structures";
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-    vector<xstructure> _vstr_ce = vstr_ce;
     xstructure str_pocc, str;
     deque<_atom> patoms, atoms;
     _atom atom;
@@ -979,19 +952,18 @@ namespace qca {
     // Find degenerate structures
     message << "Finding the degeneracy of clusters";
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
-    skipstr = xvector<int>(vstr_ds.size());
-    vector<xstructure>::iterator ib = vstr_ds.begin();
-#ifdef AFLOW_MULTITHREADS_ENABLE
-    xthread::xThread xt;
-    std::function<void(vector<xstructure>::iterator&, const vector<xstructure>::iterator&, const unsigned long int&)> calculateDegeneracyClusterSingle_MT = std::bind(&QuasiChemApproxCalculator::calculateDegeneracyClusterSingle, this, _1, _2, _3);
-#endif
-    for (size_t i = 0; i < vstr_ce.size(); i++) {
-#ifdef AFLOW_MULTITHREADS_ENABLE
-      xt.run(vstr_ds, calculateDegeneracyClusterSingle_MT, ib, i);
-#else
-      for (vector<xstructure>::iterator it = vstr_ds.begin(); it != vstr_ds.end(); it++) {calculateDegeneracyClusterSingle(it, ib, i);}
-#endif
-      pflow::updateProgressBar(i, vstr_ce.size() - 1, *p_oss);
+    vstr_ds.insert(vstr_ds.begin(), vstr_ce.begin(), vstr_ce.end()); // concatenate xstructures
+    XtalFinderCalculator xtal_calc;
+    aurostd::xoption comparison_options = compare::loadDefaultComparisonOptions();
+    comparison_options.flag("COMPARISON_OPTIONS::IGNORE_ENVIRONMENT_ANALYSIS", true);
+    vector<vector<uint>> vindex = xtal_calc.groupSimilarXstructures(vstr_ds, comparison_options); // costly part of the function
+    for (size_t i = 0; i < vindex.size(); i++) {
+      std::sort(vindex[i].begin(), vindex[i].end()); // first index is the cluster index
+      if (vindex[i][0] < ncluster) {
+        for (size_t j = 1; j < vindex[i].size(); j++) {
+          degeneracy_cluster(vindex[i][0] + 1) += pocc::getDGFromXStructureTitle(vstr_ds[vindex[i][j]].title);
+        }
+      }
     }
     sum_calculated = aurostd::sum(degeneracy_cluster);
     if (!aurostd::isequal(sum_calculated, sum_accepted)) {
