@@ -5485,8 +5485,11 @@ namespace unittest {
       template <typename utype>
       void checkEqual(const utype& calculated, const utype& expected, const string& check_function,
           const string& check_description, uint& passed_checks, vector<vector<string> >& results);
+      void checkEqual(const string &calculated, const string &expected, const string& check_function,
+          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
 
-      // Test functions ---------------------------------
+
+    // Test functions ---------------------------------
 
       // aurostd
       void xvectorTest(uint&, vector<vector<string> >&, vector<string>&);

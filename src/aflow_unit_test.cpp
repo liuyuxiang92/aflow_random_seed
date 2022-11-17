@@ -489,9 +489,16 @@ namespace unittest {
       check(passed, calculated, expected, check_function, check_description, passed_checks, results);
     }
   template <typename utype>
+
   void UnitTest::checkEqual(const utype& calculated, const utype& expected, const string& check_function,
       const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
     bool passed = (aurostd::isequal(calculated, expected));
+    check(passed, calculated, expected, check_function, check_description, passed_checks, results);
+  }
+
+  void UnitTest::checkEqual(const string& calculated, const string& expected, const string& check_function,
+                            const string& check_description, uint & passed_checks, vector<vector<string> >& results) {
+    bool passed = (calculated == expected);
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
   }
 
@@ -1634,7 +1641,7 @@ namespace unittest {
       {
         int exp = 4652;
         so = exp;
-        checkEqual(so, exp, check_function, check_description + "int", passed_checks, results);
+        checkEqual((int)so, exp, check_function, check_description + "int", passed_checks, results);
       }
       {
         so = "Hello World";
