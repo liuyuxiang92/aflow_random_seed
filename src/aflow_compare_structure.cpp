@@ -1957,10 +1957,22 @@ namespace compare {
 // ***************************************************************************
 // XtalFinderCalculator::groupSimilarXstructures() //DX20201229
 // ***************************************************************************
+/// @brief Compares a vector of xstructures and groups the indices of the
+/// xstructures by structural similarity
+///
+/// @param vxstrs vector of xstructures
+/// @param same_species require the same atom decorations/types
+/// @param comparison_options options to be used for the comparison
+///
+/// @return vector of a vector of indicies of the grouped structures
+///
+/// @authors
+/// @mod{DX,20201229,created function}
+/// @mod{SD,20221117,require explicit comparison options input}
 vector<vector<uint> > XtalFinderCalculator::groupSimilarXstructures(
     const vector<xstructure>& vxstrs,
-    bool same_species,
-    bool scale_volume) {
+    aurostd::xoption& comparison_options,
+    bool same_species) {
 
   // Compares a vector of xstructures and groups the indices of the
   // xstructures by structural similarity
@@ -1978,11 +1990,6 @@ vector<vector<uint> > XtalFinderCalculator::groupSimilarXstructures(
     structure_name << i; // name by index
     addStructure2container(vxstrs[i], structure_name.str(), source, relaxation_step, same_species);
   }
-
-  // ---------------------------------------------------------------------------
-  // set comparison options
-  aurostd::xoption comparison_options = compare::loadDefaultComparisonOptions();
-  comparison_options.flag("COMPARISON_OPTIONS::SCALE_VOLUME",scale_volume);
 
   // ---------------------------------------------------------------------------
   // compare structures returns vector<StructureProtoype> of unique/duplicate info
@@ -2006,6 +2013,26 @@ vector<vector<uint> > XtalFinderCalculator::groupSimilarXstructures(
   }
 
   return grouped_indices;
+}
+
+// ***************************************************************************
+// XtalFinderCalculator::groupSimilarXstructures()
+// ***************************************************************************
+/// @brief Compares a vector of xstructures and groups the indices of the
+/// xstructures by structural similarity
+///
+/// @param vxstrs vector of xstructures
+/// @param same_species require the same atom decorations/types
+///
+/// @return vector of a vector of indicies of the grouped structures
+///
+/// @authors
+/// @mod{SD,20221117,created function}
+vector<vector<uint> > XtalFinderCalculator::groupSimilarXstructures(
+    const vector<xstructure>& vxstrs,
+    bool same_species) {
+  aurostd::xoption comparison_options = compare::loadDefaultComparisonOptions();
+  return groupSimilarXstructures(vxstrs, comparison_options, same_species);
 }
 
 // ***************************************************************************

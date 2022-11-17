@@ -62,7 +62,7 @@ namespace aurostd {
 // ----------------------------------------------------------------------------
 // -------------------------- uniform function and procedures on xvector, xmatrix
 
-#ifdef __XVECTOR_CPP
+#ifdef _AUROSTD_XVECTOR_CPP_
 
 namespace aurostd {
   // namespace aurostd
@@ -100,7 +100,7 @@ namespace aurostd {
 
 // ---------------------------------- uniform function and procedures on xmatrix
 
-#ifdef __XMATRIX_CPP
+#ifdef _AUROSTD_XMATRIX_CPP_
 
 namespace aurostd {
   // namespace aurostd

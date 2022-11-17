@@ -5480,17 +5480,17 @@ namespace unittest {
             const string& checkDescription, uint& passed_checks, vector<vector<string> >& results);
 
       template <typename utype>
-        void checkEqual(const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
-            const string& check_description, uint& passed_checks, vector<vector<string> >& results);
-      void checkEqual(const vector<string>& calculated, const vector<string>& expected, const string& check_function,
+      void checkEqual(const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
           const string& check_description, uint& passed_checks, vector<vector<string> >& results);
+      //[SD20220705 - OBSOLETE]void checkEqual(const vector<string>& calculated, const vector<string>& expected, const string& check_function,
+      //[SD20220705 - OBSOLETE]    const string& check_description, uint& passed_checks, vector<vector<string> >& results);
       template <typename utype>
-        void checkEqual(const utype& calculated, const utype& expected, const string& check_function,
-            const string& check_description, uint& passed_checks, vector<vector<string> >& results);
-      void checkEqual(const string& calculated, const string& expected, const string& check_function,
+      void checkEqual(const utype& calculated, const utype& expected, const string& check_function,
           const string& check_description, uint& passed_checks, vector<vector<string> >& results);
-      void checkEqual(const bool calculated, const bool expected, const string& check_function,
-          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
+      //[SD20220705 - OBSOLETE]void checkEqual(const string& calculated, const string& expected, const string& check_function,
+      //[SD20220705 - OBSOLETE]    const string& check_description, uint& passed_checks, vector<vector<string> >& results);
+      //[SD20220705 - OBSOLETE]void checkEqual(const bool calculated, const bool expected, const string& check_function,
+      //[SD20220705 - OBSOLETE]    const string& check_description, uint& passed_checks, vector<vector<string> >& results);
 
       // Test functions ---------------------------------
 
@@ -5499,6 +5499,7 @@ namespace unittest {
       void xscalarTest(uint&, vector<vector<string> >&, vector<string>&);
       void xmatrixTest(uint&, vector<vector<string> >&, vector<string>&);
       void aurostdMainTest(uint&, vector<vector<string> >&, vector<string>&);
+      void xfitTest(uint&, vector<vector<string> >&, vector<string>&);
 
       // database
       void schemaTest(uint&, vector<vector<string> >&, vector<string>&);

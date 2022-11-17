@@ -109,6 +109,8 @@ namespace aurostd {
 namespace aurostd {
   vector<string> extractJsonKeysAflow(const string& json);
   string extractJsonValueAflow(const string& json, string key);
+  vector<string> extractJsonVectorAflow(const string& json, string key); //SD20220504
+  vector<vector<string>> extractJsonMatrixAflow(const string& json, string key); //SD20220504
 }
 
 #endif // _AUROSTD_XPARSER_H_
