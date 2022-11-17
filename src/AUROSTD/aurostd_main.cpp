@@ -35,6 +35,13 @@ using aurostd::ran0;
 #define COMMENT_NEGLECT_2 string("//")
 #define COMMENT_NEGLECT_3 string("!")
 
+#ifdef AFLOW_MULTITHREADS_ENABLE  //CO+HE20221116
+// Global mutex that prevents two xThread instances from executing a system call.
+// system calls are not generally thread-safe: https://stackoverflow.com/questions/12025640/how-can-i-know-whether-a-linux-syscall-is-thread-safe
+static std::mutex xthread_execute;
+#endif
+
+
 //CO20171215 - moved to xscalar
 // ***************************************************************************
 // ROUNDOFF for scalars
@@ -3380,7 +3387,9 @@ namespace aurostd {
   }
 
   bool execute(const string& _command) {
-
+#ifdef AFLOW_MULTITHREADS_ENABLE  //CO+HE20221116
+    std::lock_guard<std::mutex> lk(xthread_execute);
+#endif
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // cerr << "COMMAND " <<  command.c_str() << endl;
     string command=aurostd::CleanCommand4Execute(_command); //CO20200624
