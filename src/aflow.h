@@ -5482,23 +5482,21 @@ namespace unittest {
       template <typename utype>
       void checkEqual(const vector<utype>& calculated, const vector<utype>& expected, const string& check_function,
           const string& check_description, uint& passed_checks, vector<vector<string> >& results);
-      //[SD20220705 - OBSOLETE]void checkEqual(const vector<string>& calculated, const vector<string>& expected, const string& check_function,
-      //[SD20220705 - OBSOLETE]    const string& check_description, uint& passed_checks, vector<vector<string> >& results);
       template <typename utype>
       void checkEqual(const utype& calculated, const utype& expected, const string& check_function,
           const string& check_description, uint& passed_checks, vector<vector<string> >& results);
-      //[SD20220705 - OBSOLETE]void checkEqual(const string& calculated, const string& expected, const string& check_function,
-      //[SD20220705 - OBSOLETE]    const string& check_description, uint& passed_checks, vector<vector<string> >& results);
-      //[SD20220705 - OBSOLETE]void checkEqual(const bool calculated, const bool expected, const string& check_function,
-      //[SD20220705 - OBSOLETE]    const string& check_description, uint& passed_checks, vector<vector<string> >& results);
+      void checkEqual(const string &calculated, const string &expected, const string& check_function,
+          const string& check_description, uint& passed_checks, vector<vector<string> >& results);
 
-      // Test functions ---------------------------------
+
+    // Test functions ---------------------------------
 
       // aurostd
       void xvectorTest(uint&, vector<vector<string> >&, vector<string>&);
       void xscalarTest(uint&, vector<vector<string> >&, vector<string>&);
       void xmatrixTest(uint&, vector<vector<string> >&, vector<string>&);
       void aurostdMainTest(uint&, vector<vector<string> >&, vector<string>&);
+      void xparserTest(uint&, vector<vector<string> >&, vector<string>&);
       void xfitTest(uint&, vector<vector<string> >&, vector<string>&);
 
       // database

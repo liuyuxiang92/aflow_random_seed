@@ -4034,15 +4034,15 @@ namespace aurostd {  // namespace aurostd
 #ifdef _XMATH_DEBUG_OUTPUT
       buf << iobuf2;
       for(j=x.lcols;j<=x.ucols;j++) {
-        sprintf(buf1,iobuf4.c_str(),j);                                            // above
-        buf << buf1 << iobuf5;
+        snprintf(buf2,80,iobuf4.c_str(),j);                                            // above
+        buf << buf2 << iobuf5;
       }
       buf << endl ;
 #endif
       for(i=x.lrows;i<=x.urows;i++) {
 #ifdef _XMATH_DEBUG_OUTPUT
-        sprintf(buf1,iobuf4.c_str(),i);                                             // near
-        buf << buf1 ;
+        snprintf(buf2,80,iobuf4.c_str(),i);                                             // near
+        buf << buf2 ;
 #endif
 #ifdef _XMATH_LATGEN_AL_GULP
         buf << "Al core" ;
@@ -4052,17 +4052,17 @@ namespace aurostd {  // namespace aurostd
           if(!_iscomplex(xij)) {
             if(_isfloat(xij)) {
               if(abs(xij)> (double) _xmatrix_epsilon) {
-                sprintf(buf2,iobuf1.c_str(),aurostd::_real(xij));
+                snprintf(buf2,80,iobuf1.c_str(),aurostd::_real(xij));
               } else {
                 //	      sprintf(buf2,iobuf3);
-                sprintf(buf2,iobuf1.c_str(),aurostd::_real(xij));
+                snprintf(buf2,80,iobuf1.c_str(),aurostd::_real(xij));
               }
             } else {
               if(aurostd::_real(xij)!=0) {
-                sprintf(buf2,iobuf1.c_str(),aurostd::_real(xij));
+                snprintf(buf2,80,iobuf1.c_str(),aurostd::_real(xij));
               } else {
                 //  sprintf(buf2,iobuf3.c_str());
-                sprintf(buf2,iobuf1.c_str(),aurostd::_real(xij));
+                snprintf(buf2,80,iobuf1.c_str(),aurostd::_real(xij));
               }
             }
             buf << string(buf2) << " ";
