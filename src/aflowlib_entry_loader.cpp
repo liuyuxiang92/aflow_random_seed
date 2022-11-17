@@ -43,7 +43,7 @@ namespace aflowlib {
   ///   el.loadAUID("aflow:7dd846bc04c764e8"); // no duplicates will be stored
   ///   el.getEntriesViewFlat(results);
   /// }
-  /// for (std::shared_ptr<aflowlib::_aflowlib_entry>> & entry : results) std::cout << entry->auid << std::endl;
+  /// for (std::shared_ptr<aflowlib::_aflowlib_entry>> entry : results) std::cout << entry->auid << std::endl;
   /// @endcode
 
   // class constructor

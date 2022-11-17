@@ -2034,7 +2034,7 @@ namespace slab {
     //useful relationship: kM=(2*PI)^2*inverse(M)
     //https://it.iucr.org/Ba/ch1o1v0001/ - metric tensors of the covariant (direct) and contravariant (reciprocal) bases
     //http://physastro-msci.tripod.com/webonmediacontents/notes1.pdf
-    xvector<double> dhkl=aurostd::xvectorint2double(hkl); //need double for operations
+    xvector<double> dhkl=aurostd::xvector2utype<int,double>(hkl); //need double for operations
     xmatrix<double> klattice=ReciprocalLattice(lattice);
     xmatrix<double> kf2c=trasp(klattice);       //convert fractional to cartesian
     //[CO20190520 - this is wrong, do not convert to real space]#if !HKL_DUAL_TEST
@@ -2186,32 +2186,32 @@ namespace slab {
       intercepts.push_back( ((double)multiple/(double)hkl[2]) * a2 );
       intercepts.push_back( ((double)multiple/(double)hkl[3]) * a3 );
     }else if(count_zeros==1){ 
-      if(aurostd::WithinList(zero_indices,1)){
+      if(aurostd::WithinList(zero_indices,(uint)1)){
         intercepts.push_back( ((double)multiple/(double)hkl[2]) * a2 );
         intercepts.push_back( ((double)multiple/(double)hkl[3]) * a3 );
         //intercepts.push_back( intercepts[0] + a1 ); //consistent order, but it really doesn't matter
         xvector<double> tmp=( intercepts[0] + a1 );   //consistent order, but it really doesn't matter
         intercepts.insert(intercepts.begin(),tmp);    //consistent order, but it really doesn't matter
-      }else if(aurostd::WithinList(zero_indices,2)){
+      }else if(aurostd::WithinList(zero_indices,(uint)2)){
         intercepts.push_back( ((double)multiple/(double)hkl[1]) * a1 );
         intercepts.push_back( intercepts[0] + a2 );
         intercepts.push_back( ((double)multiple/(double)hkl[3]) * a3 );
-      }else{  //aurostd::WithinList(zero_indices,3)
+      }else{  //aurostd::WithinList(zero_indices,(uint)3)
         intercepts.push_back( ((double)multiple/(double)hkl[1]) * a1 );
         intercepts.push_back( ((double)multiple/(double)hkl[2]) * a2 );
         intercepts.push_back( intercepts[0] + a3 );
       }
     }else{  //count_zeros==2
       xvector<double> tmp;  //0,0,0
-      if(!aurostd::WithinList(zero_indices,1)){
+      if(!aurostd::WithinList(zero_indices,(uint)1)){
         intercepts.push_back( tmp );
         intercepts.push_back( a2 );
         intercepts.push_back( a3 );
-      }else if(!aurostd::WithinList(zero_indices,2)){
+      }else if(!aurostd::WithinList(zero_indices,(uint)2)){
         intercepts.push_back( a1 );
         intercepts.push_back( tmp );
         intercepts.push_back( a3 );
-      }else{  //!aurostd::WithinList(zero_indices,3)
+      }else{  //!aurostd::WithinList(zero_indices,(uint)3)
         intercepts.push_back( a1 );
         intercepts.push_back( a2 );
         intercepts.push_back( tmp );
@@ -2253,7 +2253,7 @@ namespace slab {
     //http://lafactoria.lec.csic.es/mcc/attachments/article/12/Introduction%20to%20Reciprocal%20Space.pdf
     //https://web.stanford.edu/group/glam/xlab/MatSci162_172/LectureNotes/02_Geometry,%20RecLattice.pdf
     //useful relationship: kM=(2*PI)^2*inverse(M)
-    xvector<double> dhkl=aurostd::xvectorint2double(hkl); //need double for operations
+    xvector<double> dhkl=aurostd::xvector2utype<int,double>(hkl); //need double for operations
     xmatrix<double> klattice=ReciprocalLattice(lattice);
     xmatrix<double> kM=MetricTensor(klattice);
     double d_spacing=2.0*PI/sqrt(aurostd::scalar_product(dhkl,kM*dhkl));  //2*pi factor here is very important (counters the one in ReciprocalLattice())
@@ -2275,8 +2275,8 @@ namespace slab {
     //http://lafactoria.lec.csic.es/mcc/attachments/article/12/Introduction%20to%20Reciprocal%20Space.pdf
     //https://web.stanford.edu/group/glam/xlab/MatSci162_172/LectureNotes/02_Geometry,%20RecLattice.pdf
     //useful relationship: kM=(2*PI)^2*inverse(M)
-    xvector<double> dhkl1=aurostd::xvectorint2double(hkl1); //need double for operations
-    xvector<double> dhkl2=aurostd::xvectorint2double(hkl2); //need double for operations
+    xvector<double> dhkl1=aurostd::xvector2utype<int,double>(hkl1); //need double for operations
+    xvector<double> dhkl2=aurostd::xvector2utype<int,double>(hkl2); //need double for operations
     xmatrix<double> klattice=ReciprocalLattice(lattice);
     xmatrix<double> kf2c=trasp(klattice);       //convert fractional to cartesian
     xvector<double> n1=kf2c*dhkl1;              //h*b1+k*b2+l*b3

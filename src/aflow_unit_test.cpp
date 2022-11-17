@@ -103,6 +103,12 @@ namespace unittest {
     xchk.task_description = "xparser functions";
     test_functions["xparser"] = xchk;
 
+    xchk = initializeXCheck();
+    xchk.func = std::bind(&UnitTest::xfitTest, this, _1, _2, _3);
+    xchk.function_name = "xfitTest():";
+    xchk.task_description = "xfit functions";
+    test_functions["xfit"] = xchk;
+
     // database
     xchk = initializeXCheck();
     xchk.func = std::bind(&UnitTest::schemaTest, this, _1, _2, _3);
@@ -189,7 +195,7 @@ namespace unittest {
   void UnitTest::initializeTestGroups() {
     test_groups.clear();
 
-    test_groups["aurostd"] = {"xscalar", "xvector", "xmatrix", "aurostd_main", "xparser"};
+    test_groups["aurostd"] = {"xscalar", "xvector", "xmatrix", "xfit", "aurostd_main", "xparser"};
     test_groups["database"] = {"schema", "entry_loader"};
     test_groups["structure"] = {"atomic_environment", "xstructure", "xstructure_parser"};
     test_groups["structure_gen"] = {"ceramgen", "proto"};
@@ -482,29 +488,10 @@ namespace unittest {
       }
       check(passed, calculated, expected, check_function, check_description, passed_checks, results);
     }
-  void UnitTest::checkEqual(const vector<string>& calculated, const vector<string>& expected, const string& check_function,
-      const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-    bool passed = (calculated.size() == expected.size());
-    for (size_t i = 0; i < calculated.size() && passed; i++) {
-      passed = (calculated[i] == expected[i]);
-    }
-    check(passed, calculated, expected, check_function, check_description, passed_checks, results);
-  }
-
   template <typename utype>
-    void UnitTest::checkEqual(const utype& calculated, const utype& expected, const string& check_function,
-        const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-      bool passed = (aurostd::isequal(calculated, expected));
-      check(passed, calculated, expected, check_function, check_description, passed_checks, results);
-    }
-  void UnitTest::checkEqual(const string& calculated, const string& expected, const string& check_function,
-      const string& check_description, uint & passed_checks, vector<vector<string> >& results) {
-    bool passed = (calculated == expected);
-    check(passed, calculated, expected, check_function, check_description, passed_checks, results);
-  }
-  void UnitTest::checkEqual(const bool calculated, const bool expected, const string& check_function,
+  void UnitTest::checkEqual(const utype& calculated, const utype& expected, const string& check_function,
       const string& check_description, uint& passed_checks, vector<vector<string> >& results) {
-    bool passed = (calculated == expected);
+    bool passed = (aurostd::isequal(calculated, expected));
     check(passed, calculated, expected, check_function, check_description, passed_checks, results);
   }
 
@@ -673,6 +660,7 @@ namespace unittest {
 
     //HE20210511
     double expected_dbl = 0.0, calculated_dbl = 0.0;
+    xvector<double> calculated_xvecdbl, expected_xvecdbl;
     int expected_int = 0;
     string expected_str = "";
     vector <xvector<double>> points;
@@ -892,6 +880,15 @@ namespace unittest {
 
     calculated_dbl = aurostd::areaPointsOnPlane(ipoints);
     checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | linspace //SD20220324
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::linspace()";
+    check_description = "generate n linearly spaced points";
+    expected_xvecdbl = {1.0, 1.375, 1.75, 2.125, 2.5};
+    calculated_xvecdbl = aurostd::linspace(1.0, 2.5, 5);
+    checkEqual(calculated_xvecdbl, expected_xvecdbl, check_function, check_description, passed_checks, results);
   }
 
   void UnitTest::xmatrixTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
@@ -899,6 +896,7 @@ namespace unittest {
                     // setup test environment
     string check_function = "", check_description = "";
 
+    bool calculated_bool = false, expected_bool = false;
     xmatrix<int> calculated_xmatint, expected_xmatint;
 
     // ---------------------------------------------------------------------------
@@ -950,6 +948,26 @@ namespace unittest {
     calculated_xmatint = xmatrix<int>(2, 2);
     aurostd::getEHermite(5, 12, calculated_xmatint);
     checkEqual(calculated_xmatint, expected_xmatint, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | equilibrateMatrix //SD20220505
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::equilibrateMatrix()";
+    check_description = "pre-condition a Hilbert matrix, lowers the condition number";
+    xmatrix<double> icm(10, 10);
+    // define a Hilbert matrix
+    for (int i = 1; i <= icm.rows; i++) {
+      for (int j = 1; j <= icm.cols; j++) {
+        icm(i, j) = 1.0 / (i + j - 1.0);
+      }
+    }
+    xmatrix<double> em, rm, cm;
+    aurostd::equilibrateMatrix(icm, em, rm, cm);
+    expected_bool = true;
+    calculated_bool = aurostd::isequal(1.0, aurostd::sign(aurostd::condition_number(icm) - aurostd::condition_number(em)));
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+    check_description = "pre-condition a Hilbert matrix, finds the inverse";
+    checkEqual(icm, aurostd::inverse(rm) * em * aurostd::inverse(cm), check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
     // Check | solve a linear system //HE20220912
@@ -1078,7 +1096,6 @@ namespace unittest {
       smat = aurostd::hstack(vector<xvector<int>>({xv, xv, xv}));
       checkEqual(smat, hsmat, check_function, check_description, passed_checks, results);
     }
-
   }
 
   void UnitTest::aurostdMainTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
@@ -1151,7 +1168,6 @@ namespace unittest {
     string test_string = "_FILE_START_\nIALGO==48\nALGO==FAST\nIALGO==49\nALGO==MEDIUM\nIALGO==50\nALGO==SLOW\n_FILE_END_";
     calculated_string = aurostd::substring2string(test_string, "ALGO", 3);
     expected_string = "==49";
-
     checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
@@ -1161,7 +1177,6 @@ namespace unittest {
     check_description = "return the second match of the kvpair";
     calculated_string = aurostd::kvpair2string(test_string, "ALGO", "==", 2);
     expected_string = "MEDIUM";
-
     checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
@@ -1171,7 +1186,6 @@ namespace unittest {
     check_description = "return the last match of the substring";
     calculated_string = aurostd::substring2string(test_string, "ALGO", -1);
     expected_string = "==SLOW";
-
     checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
@@ -1181,7 +1195,6 @@ namespace unittest {
     check_description = "return the last match of the kvpair";
     calculated_string = aurostd::kvpair2string(test_string, "ALGO", "==", -1);
     expected_string = "SLOW";
-
     checkEqual(calculated_string, expected_string, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
@@ -1665,6 +1678,154 @@ namespace unittest {
 }
 
 namespace unittest {
+
+  void UnitTest::xfitTest(uint& passed_checks, vector<vector<string> >& results, vector<string>& errors) {
+    (void) errors;  // Suppress compiler warnings
+    // setup test environment
+    string check_function = "", check_description = "";
+
+    bool calculated_bool, expected_bool;
+    double calculated_dbl, expected_dbl;
+    xvector<double> calculated_xvecdbl, expected_xvecdbl;
+    xvector<double> calculated_xvecdbl_r, expected_xvecdbl_r;
+    xvector<double> calculated_xvecdbl_i, expected_xvecdbl_i;
+    xmatrix<double> calculated_xmatdbl, expected_xmatdbl;
+
+    // ---------------------------------------------------------------------------
+    // Check | companion matrix //SD20220318
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::companion_matrix()";
+    check_description = "calculate the companion matrix of a univariate polynomial";
+    xvector<double> pc = {6.0, -5.0, -2.0, 3.0};
+    expected_xmatdbl = {{0.0, 1.0, 0.0}, {0.0, 0.0, 1.0}, {-6.0 / 3.0, 5.0 / 3.0, 2.0 / 3.0}};
+    calculated_xmatdbl = aurostd::companion_matrix(pc);
+    checkEqual(calculated_xmatdbl, expected_xmatdbl, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | polynomialFindRoots //SD20220318
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::polynomialFindRoots()";
+    expected_xvecdbl_r = {1.05576592536838, 1.05576592536838, -1.44486518407010};
+    expected_xvecdbl_i = {-0.519201791550296, 0.519201791550296, 0.0};
+    calculated_xvecdbl_r = xvector<double>(3), calculated_xvecdbl_i = xvector<double>(3);
+    aurostd::polynomialFindRoots(pc, calculated_xvecdbl_r, calculated_xvecdbl_i);
+    check_description = "calculate the roots of a univariate polynomial (real part)";
+    checkEqual(calculated_xvecdbl_r, expected_xvecdbl_r, check_function, check_description, passed_checks, results);
+    check_description = "calculate the roots of a univariate polynomial (imag part)";
+    checkEqual(calculated_xvecdbl_i, expected_xvecdbl_i, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | polynomialCurveFit //SD20220422
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::polynomialCurveFit()";
+    check_description = "calculate the coefficients for a quintic polynomial that fits the data";
+    xvector<double> xdata = {0.551878738140095, 0.815194385592879, -1.436650500869055, 0.837122604741089, 0.024588378708606,
+                             -1.521792147897101, -0.998568921765830, -0.222562772922286, 0.964723358008907, 0.986066878262693};
+    xvector<double> ydata = {-1.895746346279865, -2.426516802630079, -0.329326356733414, -2.476265605752963, -1.148143476025739,
+                             -0.304622388440250, -0.471352985639471, -0.911928012994989, -2.783990433247946, -2.838593165314427};
+    xvector<double> wdata = {0.757740130578333, 0.743132468124916, 0.392227019534168, 0.655477890177557, 0.171186687811562,
+                             0.706046088019609, 0.031832846377421, 0.276922984960890, 0.046171390631154, 0.097131781235848};
+    expected_xvecdbl = {-1.121837858162905, -1.056905122203599, -0.543168130435282, -0.145858244844311, -0.007682867520147, 0.000748981621075};
+    calculated_xvecdbl = aurostd::polynomialCurveFit(xdata, ydata, 5, wdata);
+    checkEqual(expected_xvecdbl, calculated_xvecdbl, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | findZeroBrent //SD20220517
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::findZeroBrent()";
+    check_description = "find the zero of a univariate function";
+    std::function<double(double)> func = [](double x) {return std::pow(x, 2.0) - 3.0;};
+    expected_dbl = 1.732050807568877;
+    aurostd::findZeroBrent(0.0, 10.0, func, calculated_dbl);
+    checkEqual(calculated_dbl, expected_dbl, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | checkDerivatives //SD20220622
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::checkDerivatives()";
+    check_description = "check that the analytical derivatives of a 2D function are correct";
+    xvector<double> x0 = {aurostd::ran2(), aurostd::ran2()};
+    std::function<double(xvector<double>)> testf = [](xvector<double> x) {return std::sin(x(1)) + std::cos(x(2));};
+    vector<std::function<double(xvector<double>)>> testdf;
+    testdf.push_back([](xvector<double> x) {return std::cos(x(1));});
+    testdf.push_back([](xvector<double> x) {return -1.0 * std::sin(x(2));});
+    expected_bool = true;
+    calculated_bool = checkDerivatives(x0, testf, testdf);
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | calcNumericalJacobian //SD20220624
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::calcNumericalJacobian()";
+    check_description = "calculate the numerical Jacobian of a 3D rectangular system";
+    xvector<double> dx = 10.0 * _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_ * aurostd::ones_xv<double>(3);
+    x0 = {aurostd::ran2(), aurostd::ran2(), aurostd::ran2()};
+    vector<std::function<double(xvector<double>)>> vfunc, vdfunc;
+    vector<vector<std::function<double(xvector<double>)>>> jac;
+    vfunc.push_back([](xvector<double> x) {return std::exp(1.0 * x(1) + 2.0 * x(2) + 3.0 * x(3));});
+    vfunc.push_back([](xvector<double> x) {return std::cos(1.0 * x(1) + 2.0 * x(2) + 3.0 * x(3));});
+    for (int i = 1; i <= 3; i++) {vdfunc.push_back([i](xvector<double> x) {return (double)i * std::exp(1.0 * x(1) + 2.0 * x(2) + 3.0 * x(3));});}
+    jac.push_back(vdfunc);
+    vdfunc.clear();
+    for (int i = 1; i <= 3; i++) {vdfunc.push_back([i](xvector<double> x) {return -1.0 * (double)i * std::sin(1.0 * x(1) + 2.0 * x(2) + 3.0 * x(3));});}
+    jac.push_back(vdfunc);
+    expected_bool = true;
+    calculated_bool = true;
+    vector<vector<std::function<double(xvector<double>)>>> testjac = aurostd::calcNumericalJacobian(vfunc, dx);
+    for (uint i = 0; i < jac.size(); i++) {
+      for (uint j = 0; j < jac[0].size(); j++) {
+        calculated_bool = calculated_bool && aurostd::isequal(jac[i][j](x0), testjac[i][j](x0));
+      }
+    }
+    checkEqual(calculated_bool, expected_bool, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | findZeroNewtonRaphson //SD20220616
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::findZeroNewtonRaphson()";
+    check_description = "find the zeros of a 2D nonlinear square system";
+    x0 = {aurostd::ran2(), aurostd::ran2()};
+    vfunc.clear();
+    vdfunc.clear();
+    jac.clear();
+    vfunc.push_back([](xvector<double> x) {return std::exp(-std::exp(-(x(1) + x(2)))) - x(2) * (1.0 + std::pow(x(1), 2.0));});
+    vfunc.push_back([](xvector<double> x) {return x(1) * std::cos(x(2)) + x(2) * std::sin(x(1)) - 0.5;});
+    vdfunc.push_back([](xvector<double> x) {return std::exp(-std::exp(-(x(1) - x(2))) - x(1) - x(2)) - 2 * x(1) * x(2);});
+    vdfunc.push_back([](xvector<double> x) {return std::exp(-std::exp(-(x(1) - x(2))) - x(1) - x(2)) - (1.0 + std::pow(x(1), 2.0));});
+    jac.push_back(vdfunc);
+    vdfunc.clear();
+    vdfunc.push_back([](xvector<double> x) {return x(2) * std::cos(x(1)) + std::cos(x(2));});
+    vdfunc.push_back([](xvector<double> x) {return std::sin(x(1)) - x(1) * std::sin(x(2));});
+    jac.push_back(vdfunc);
+    expected_xvecdbl = {0.353246561918931, 0.606082026502552};
+    aurostd::findZeroNewtonRaphson(x0, vfunc, jac, calculated_xvecdbl);
+    checkEqual(calculated_xvecdbl, expected_xvecdbl, check_function, check_description, passed_checks, results);
+
+    // ---------------------------------------------------------------------------
+    // Check | findZeroDeflation //SD20220616
+    // ---------------------------------------------------------------------------
+    check_function = "aurostd::findZeroDeflation()";
+    check_description = "find multiple zeros of a 2D nonlinear square system";
+    vfunc.clear();
+    vdfunc.clear();
+    jac.clear();
+    vfunc.push_back([](xvector<double> x) {return x(1) * x(2) - 1.0;});
+    vfunc.push_back([](xvector<double> x) {return std::pow(x(1), 2.0) + std::pow(x(2), 2.0) - 4.0;});
+    vdfunc.push_back([](xvector<double> x) {return x(2);});
+    vdfunc.push_back([](xvector<double> x) {return x(1);});
+    jac.push_back(vdfunc);
+    vdfunc.clear();
+    vdfunc.push_back([](xvector<double> x) {return 2.0 * x(1);});
+    vdfunc.push_back([](xvector<double> x) {return 2.0 * x(2);});
+    jac.push_back(vdfunc);
+    expected_xmatdbl = {{0.517638090205041, 1.93185165257813, -1.93185165257813}, {1.93185165257813, 0.517638090205041, -0.517638090205041}};
+    aurostd::findZeroDeflation(aurostd::vector2xvector<double>({0.0, 1.0}), vfunc, jac, calculated_xmatdbl);
+    checkEqual(calculated_xmatdbl, expected_xmatdbl, check_function, check_description, passed_checks, results);
+  }
+}
+
+namespace unittest {
+
   void UnitTest::entryLoaderTest(uint &passed_checks, vector <vector<string>> &results, vector <string> &errors) {
     (void) errors;  // Suppress compiler warnings
 
@@ -1851,7 +2012,7 @@ namespace unittest {
         }
       }
     }
-    checkEqual(ninconsistent, 0, check_function, check_description, passed_checks, results);
+    checkEqual(ninconsistent, (uint)0, check_function, check_description, passed_checks, results);
 
     // ---------------------------------------------------------------------------
     // Check | consistency between _aflowlib_entry and schema
@@ -1872,7 +2033,7 @@ namespace unittest {
         if (LDEBUG) std::cerr << __AFLOW_FUNC__ << " " << key << " not found in schema." << std::endl;
       }
     }
-    checkEqual(ninconsistent, 0, check_function, check_description, passed_checks, results);
+    checkEqual(ninconsistent, (uint)0, check_function, check_description, passed_checks, results);
   }
 
 }
@@ -2821,48 +2982,12 @@ bool smithTest(ofstream& FileMESSAGE,ostream& oss){  //CO20190520
     cerr << __AFLOW_FUNC__ << " S=" << endl;cerr << S1 << endl;
   }
 
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[1][1]==24 && U1[1][2]==-13 && U1[1][3]==-1 &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[2][1]==13 && U1[2][2]==-7  && U1[2][3]==-1 &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      U1[3][1]==2  && U1[3][2]==-1  && U1[3][3]==0  &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  if(LDEBUG){cerr << __AFLOW_FUNC__ << " U1(1) failed of getSmithNormalForm()" << endl;}
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[1][1]==0  && V1[1][2]==1  && V1[1][3]==3  &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[2][1]==-1 && V1[2][2]==-1 && V1[2][3]==-1 &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      V1[3][1]==1  && V1[3][2]==0  && V1[3][3]==-1 &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  if(LDEBUG){cerr << __AFLOW_FUNC__ << " V1(1) failed of getSmithNormalForm()" << endl;}
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]if(!(
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[1][1]==1 && S1[1][2]==0 && S1[1][3]==0 &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[2][1]==0 && S1[2][2]==1 && S1[2][3]==0 &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      S1[3][1]==0 && S1[3][2]==0 && S1[3][3]==1 &&
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]      TRUE
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]    )
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  ){
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  if(LDEBUG){cerr << __AFLOW_FUNC__ << " S1(1) failed of getSmithNormalForm()" << endl;}
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]  return FALSE;
-  //[CO20191201 - OBSOLETE: robust check inside getSmithNormalForm()]}
-
   xmatrix<long long int> A2(5,5),U2,V2,S2;  //long long int is CRUCIAL, Matlab actually gets this wrong because it uses long int by default
   A2 = {{ 25,  -300,   1050, -1400,   630},
     {-300,  4800, -18900, 26880, -12600},
     { 1050,-18900, 79380,-117600, 56700},
     {-1400, 26880,-117600,179200,-88200},
     { 630, -12600, 56700,-88200,  44100}};
-  //  A2[1][1]=25;    A2[1][2]=-300;   A2[1][3]=1050;    A2[1][4]=-1400;   A2[1][5]=630;
-  //  A2[2][1]=-300;  A2[2][2]=4800;   A2[2][3]=-18900;  A2[2][4]=26880;   A2[2][5]=-12600;
-  //  A2[3][1]=1050;  A2[3][2]=-18900; A2[3][3]=79380;   A2[3][4]=-117600; A2[3][5]=56700;
-  //  A2[4][1]=-1400; A2[4][2]=26880;  A2[4][3]=-117600; A2[4][4]=179200;  A2[4][5]=-88200;
-  //  A2[5][1]=630;   A2[5][2]=-12600; A2[5][3]=56700;   A2[5][4]=-88200;  A2[5][5]=44100;
 
   aurostd::getSmithNormalForm(A2,U2,V2,S2);
 

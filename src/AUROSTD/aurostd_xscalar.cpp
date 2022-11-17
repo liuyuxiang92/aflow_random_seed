@@ -209,6 +209,7 @@ namespace aurostd {
   double sqrt(double x) { return (double) std::sqrt(x);}
   long int sqrt(long int x) { return (long int) std::sqrt((double) x);}
   long long int sqrt(long long int x) { return (long long int) std::sqrt((double) x);}
+  unsigned long int sqrt(unsigned long int x) { return (unsigned long int) std::sqrt((double) x);}
   unsigned long long int sqrt(unsigned long long int x) { return (unsigned long long int) std::sqrt((double) x);}
   long double sqrt(long double x) { return (long double) sqrtl(x);}
 #ifdef _AUROSTD_XCOMPLEX_
@@ -219,64 +220,61 @@ namespace aurostd {
 }
 
 // ----------------------------------------------------------------------------
+// exp  exp  exp  exp  exp
+namespace aurostd {
+  // namespace aurostd
+  // EXP(X)
+  char exp(char x) { return (char) std::exp((double) x);}
+  int exp(int x) { return (int) std::exp((double) x);}
+  uint exp(uint x) { return (uint) std::exp((double) x);}
+  float exp(float x) { return (float) expf(x);}
+  double exp(double x) { return (double) std::exp(x);}
+  long int exp(long int x) { return (long int) std::exp((double) x);}
+  long long int exp(long long int x) { return (long long int) std::exp((double) x);}
+  unsigned long int exp(unsigned long int x) { return (unsigned long int) std::exp((double) x);}
+  unsigned long long int exp(unsigned long long int x) { return (unsigned long long int) std::exp((double) x);}
+  long double exp(long double x) { return (long double) expl(x);}
+}
+
+// ----------------------------------------------------------------------------
+// pow  pow  pow  pow  pow
+namespace aurostd {
+  // namespace aurostd
+  // POW(X)
+  char pow(char x,char d) { return (char) std::pow((double) x,(double) d);}
+  int pow(int x,int d) { return (int) std::pow((double) x,(double) d);}
+  uint pow(uint x,uint d) { return (uint) std::pow((double) x,(double) d);}
+  float pow(float x,float d) { return (float) powf(x,d);}
+  double pow(double x,double d) { return (double) std::pow(x,d);}
+  long int pow(long int x,long int d) { return (long int) std::pow((double) x,(double) d);}
+  long long int pow(long long int x,long long int d) { return (long long int) std::pow((double) x,(double) d);}
+  unsigned long int pow(unsigned long int x,unsigned long int d) { return (unsigned long int) std::pow((double) x,(double) d);}
+  unsigned long long int pow(unsigned long long int x,unsigned long long int d) { return (unsigned long long int) std::pow((double) x,(double) d);}
+  long double pow(long double x,long double d) { return (long double) powl(x,d);}
+}
+
+// ----------------------------------------------------------------------------
 // round  floor ceil trunc
 namespace aurostd {  // namespace aurostd
-  // ROUND(X)
-  double round(double x) { //CO20210701 //std::round() only works in C++11
-    //algo inspired from here: http://www.cplusplus.com/forum/articles/3638/
-    //https://stackoverflow.com/questions/12696764/round-is-not-a-member-of-std - it's a gcc bug
-    //1.2   ->   1
-    //-1.2  ->  -1
-    //0.1   ->   0
-    //-0.1  ->  -0  //this is ok, (int)round(-0.1)=0
-    //2.5   ->   3
-    //-2.5  ->  -3
-    //2.7   ->   3
-    //-2.7  ->  -3
-    //2.1   ->   2
-    //-2.1  ->  -2
-    //10.7  ->   11
-    //-10.7 ->  -11
-    //[CO20210624 - does not work for negative numbers]return std::floor( x + 0.5 );
-#ifdef _XSCALAR_DEBUG_
-    bool LDEBUG=(FALSE || XHOST.DEBUG);
-#endif
-    double fracpart=0.0,intpart=0.0;
-    fracpart=modf(x,&intpart);
-#ifdef _XSCALAR_DEBUG_
-    if(LDEBUG){
-      cerr << __AFLOW_FUNC__ << " x=" << x << endl;
-      cerr << __AFLOW_FUNC__ << " fracpart=" << fracpart << endl;
-      cerr << __AFLOW_FUNC__ << " intpart=" << intpart << endl;
-      cerr << __AFLOW_FUNC__ << " floor(x)=" << std::floor(x) << endl;
-      cerr << __AFLOW_FUNC__ << " ceil(x)=" << std::ceil(x) << endl;
-    }
-#endif
-    if(abs(fracpart)>=.5){return x>=0?std::ceil(x):std::floor(x);}  //not sure why fracpart would ever be negative, but it is for negative inputs
-    else{return x<0?std::ceil(x):std::floor(x);}
+  /// @brief rounds a real number to arbitrary digits
+  ///
+  /// @param x real number
+  /// @param digits number of digits after the decimal point
+  ///
+  /// @return rounded number
+  ///
+  /// @authors
+  /// @mod{SD,20220603,created function}
+  ///
+  /// @note Uses the "round half away from zero" rounding strategy. This is the strategy employed by
+  /// Python (except for +-0.5) and Matlab
+  ///
+  /// @see
+  /// @xlink{https://en.wikipedia.org/wiki/Rounding}
+  double round(double x, uint digits) { //SD20220603
+    double mult = std::pow(10.0, (double) digits);
+    return -aurostd::sign(x) * std::ceil(-std::abs(x) * mult - 0.5) / mult;
   }
-  // [OBSOLETE]  float round(float x) { return (float) std::roundf(float(x));}
-  // [OBSOLETE]  long double round(long double x) { return (long double) std::roundl((long double) x);}
-  // [OBSOLETE]  int round(int x) { return (int) std::round(double(x));}
-  // [OBSOLETE]  long round(long x) { return (long) std::round(double(x));}
-  // [OBSOLETE]  // FLOOR(X)
-  // [OBSOLETE]  //  double floor(double x) { return (double) std::floor(double(x));}
-  // [OBSOLETE]  float floor(float x) { return (float) std::floorf(float(x));}
-  // [OBSOLETE]  long double floor(long double x) { return (long double) std::floorl((long double) x);}
-  // [OBSOLETE]  int floor(int x) { return (int) std::floor(double(x));}
-  // [OBSOLETE]  long floor(long x) { return (long) std::floor(double(x));}
-  // [OBSOLETE]  // CEIL(X)
-  // [OBSOLETE]  double ceil(double x) { return (double) std::ceil(double(x));}
-  // [OBSOLETE]  float ceil(float x) { return (float) std::ceilf(float(x));}
-  // [OBSOLETE]  long double ceil(long double x) { return (long double) std::ceill((long double) x);}
-  // [OBSOLETE]  int ceil(int x) { return (int) std::ceil(double(x));}
-  // [OBSOLETE]  long ceil(long x) { return (long) std::ceil(double(x));}
-  // [OBSOLETE]  // TRUNC(X)
-  // [OBSOLETE]  double trunc(double x) { return (double) std::trunc(double(x));}
-  // [OBSOLETE]  float trunc(float x) { return (float) std::truncf(float(x));}
-  // [OBSOLETE]  long double trunc(long double x) { return (long double) std::truncl((long double) x);}
-  // [OBSOLETE]  int trunc(int x) { return (int) std::trunc(double(x));}
-  // [OBSOLETE]  long trunc(long x) { return (long) std::trunc(double(x));}
   
   int roundDouble(double doub, int multiple, bool up) { //CO20220624 (moved from chull)
     // rounds double to the nearest (multiple), choose round up or down
@@ -647,7 +645,7 @@ namespace aurostd {
   bool iszero(uint x,uint){return (bool) x==(uint)0;}  //CO20191201
   bool iszero(int x,int){return (bool) x==(int)0;}  //CO20191201
   bool iszero(long int x,long int){return (bool) x==(long int)0;}  //CO20191201
-  bool iszero(unsigned long int x,long int){return (bool) x==(unsigned long int)0;}  //CO20191201
+  bool iszero(unsigned long int x,unsigned long int){return (bool) x==(unsigned long int)0;}  //CO20191201
   bool iszero(long long int x,long long int){return (bool) x==(long long int)0;}  //CO20191201
   bool iszero(unsigned long long int x,unsigned long long int){return (bool) x==(unsigned long long int)0;}  //CO20191201
   bool iszero(float x,float tolerance){return _iszero(x,tolerance);}  //CO20191201
@@ -1116,18 +1114,30 @@ namespace aurostd {
 }
 
 // ----------------------------------------------------------------------------
-//--------------------------------------------------------------- extra_minmax min/max
+//--------------------------------------------------------------- isequal/isdifferent
 namespace aurostd {
   // with const utype&
   template<class utype> bool                             // is scalar == scalar ?
     identical(const utype& a,const utype& b,const utype& _tol_) {
-      if(abs(a-b)<=_tol_) return TRUE;
-      return FALSE;
+      if(abs(a-b)<=_tol_) return true;
+      return false;
     }
   template<class utype> bool                             // is scalar == scalar ?
     identical(const utype& a,const utype& b) {
       return (bool) identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
     } 
+  bool identical (const bool a,const bool b) { //SD20220705
+      if(a==b) return true;
+      return false;
+  }
+  bool identical (const char a,const char b) { //SD20220705
+      if(a==b) return true;
+      return false;
+  }
+  bool identical (const string& a,const string& b) { //SD20220705
+      if(a==b) return true;
+      return false;
+  }
   template<class utype> bool                             // is scalar != scalar ?
     isdifferent(const utype& a,const utype& b,const utype& _tol_) {
       return (bool) !identical(a,b,_tol_);
@@ -1136,6 +1146,15 @@ namespace aurostd {
     isdifferent(const utype& a,const utype& b) {
       return (bool) !identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
     }
+  bool isdifferent(const bool a,const bool b) { //SD20220705
+      return (bool) !identical(a,b);
+  }
+  bool isdifferent(const char a,const char b) { //SD20220705
+      return (bool) !identical(a,b);
+  }
+  bool isdifferent(const string& a,const string& b) { //SD20220705
+      return (bool) !identical(a,b);
+  }
   template<class utype> bool                             // is scalar == scalar ?
     isequal(const utype& a,const utype& b,const utype& _tol_) {
       return (bool) identical(a,b,_tol_);
@@ -1144,6 +1163,15 @@ namespace aurostd {
     isequal(const utype& a,const utype& b) {
       return (bool) identical(a,b,(utype) _AUROSTD_XSCALAR_TOLERANCE_IDENTITY_);
     }
+  bool isequal(const bool a,const bool b) { //SD20220705
+      return (bool) identical(a,b);
+  }
+  bool isequal(const char a,const char b) { //SD20220705
+      return (bool) identical(a,b);
+  }
+  bool isequal(const string& a,const string& b) { //SD20220705
+      return (bool) identical(a,b);
+  }
   //// with utype
   //template<class utype> bool                             // is scalar == scalar ?
   //identical(utype a,utype b,utype _tol_) {

@@ -354,6 +354,7 @@ namespace aurostd {  // namespace aurostd
       return *this;
     }
 }
+
 // --------------------------------------------------------- operator += xvector
 namespace aurostd {  // namespace aurostd
   template<class utype>
@@ -370,7 +371,8 @@ namespace aurostd {  // namespace aurostd
    return *this;
   }
 }
-// --------------------------------------------------------- operator += xvector
+
+// --------------------------------------------------------- operator += scalar
 namespace aurostd {  // namespace aurostd
   template<class utype> xvector<utype>&
     // removed inline
@@ -404,7 +406,7 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// --------------------------------------------------------- operator -= xvector
+// --------------------------------------------------------- operator -= scalar
 namespace aurostd {  // namespace aurostd
   template<class utype>
   xvector<utype> & xvector<utype>::operator-=(const std::initializer_list <utype> l) { // HE20220616
@@ -432,7 +434,7 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// --------------------------------------------------------- operator *= double
+// --------------------------------------------------------- operator *= scalar
 namespace aurostd {  // namespace aurostd
   template<class utype> xvector<utype>&
     // removed inline
@@ -449,7 +451,7 @@ namespace aurostd {  // namespace aurostd
     }
 }
 
-// --------------------------------------------------------- operator /= double
+// --------------------------------------------------------- operator /= scalar
 namespace aurostd {  // namespace aurostd
   template<class utype> xvector<utype>&
     // removed inline
@@ -562,6 +564,33 @@ namespace aurostd {  // namespace aurostd
       c(2)=a(3)*b(1)-a(1)*b(3);
       c(3)=a(1)*b(2)-a(2)*b(1);
       return c;
+    }
+}
+
+//SD20220422
+namespace aurostd {  // namespace aurostd
+  template<class utype> xvector<utype>
+    elementwise_product(const xvector<utype>& a,const xvector<utype>& b) {
+      if(a.rows != b.rows) {
+        stringstream message;
+        message << "xvectors do not have the same size, a.rows=" << a.rows << " b.rows=" << b.rows;
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+      }
+      xvector<utype> c(a.urows, a.lrows);
+      for(int i=a.lrows; i<=a.urows; i++)
+        c[i] = a[i] * b[b.lrows - a.lrows + i];
+      return c;
+    }
+}
+
+//SD20220617
+namespace aurostd {  // namespace aurostd
+  template<class utype> utype
+    elements_product(const xvector<utype>& a) {
+      utype prod = (utype)1.0;
+      for(int i=a.lrows; i<=a.urows; i++)
+        prod *= a[i];
+      return prod;
     }
 }
 
@@ -1229,6 +1258,31 @@ namespace aurostd {  // namespace aurostd
 }
 
 namespace aurostd {  // namespace aurostd
+  template<class utype>                                 // function pow
+    xvector<utype> pow(const xvector<utype> &a,const utype d) {  // SD20220324
+      xvector<utype> c(a.urows,a.lrows);
+      for(int i=a.lrows;i<=a.urows;i++)
+          c[i]=pow(a[i],d);
+      return c;
+    }
+}
+
+namespace aurostd {  // namespace aurostd
+  template<class utype>                                 // function pow
+    xvector<utype> pow(const xvector<utype> &a,const xvector<utype> &b) {  // SD20220324
+      if(a.rows != b.rows) {
+        stringstream message;
+        message << "xvectors do not have the same size, a.rows=" << a.rows << " b.rows=" << b.rows;
+        throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _INDEX_MISMATCH_);
+      }
+      xvector<utype> c(a.urows,a.lrows);
+      for(int i=a.lrows;i<=a.urows;i++)
+          c[i]=pow(a[i],b[i]);
+      return c;
+    }
+}
+
+namespace aurostd {  // namespace aurostd
   template<class utype>                                 // conversion to float
     xvector<float> xfloat(const xvector<utype> &a) {
       xvector<float> c(a.urows,a.lrows);
@@ -1298,27 +1352,37 @@ namespace aurostd {                   // conversion to xvector<utype>
     }
 }
 
-//CO20190516
-namespace aurostd {                   // conversion from xvector<int> to xvector<double>
-  xvector<double> xvectorint2double(const xvector<int>& a){
-    xvector<double> b(a.urows,a.lrows);
-    for(int i=a.lrows;i<=a.urows;i++){b[i]=(double)a[i];}  //nint is for safety
-    return b;
-  }
-}
+//[SD20220512 - OBSOLETE]//CO20190516
+//[SD20220512 - OBSOLETE]namespace aurostd {                   // conversion from xvector<int> to xvector<double>
+//[SD20220512 - OBSOLETE]  xvector<double> xvectorint2double(const xvector<int>& a){
+//[SD20220512 - OBSOLETE]    xvector<double> b(a.urows,a.lrows);
+//[SD20220512 - OBSOLETE]    for(int i=a.lrows;i<=a.urows;i++){b[i]=(double)a[i];}
+//[SD20220512 - OBSOLETE]    return b;
+//[SD20220512 - OBSOLETE]  }
+//[SD20220512 - OBSOLETE]}
 
-//CO20190516
-namespace aurostd {                   // conversion from xvector<double> to xvector<int>
-  xvector<int> xvectordouble2int(const xvector<double>& a,bool check_int){
-    xvector<int> b(a.urows,a.lrows);
-    if(check_int){
-      for(int i=a.lrows;i<=a.urows;i++){
-        if(!isinteger(a[i])){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::xvectordouble2int():","non-integer found",_INPUT_ILLEGAL_);}
-      }
+//[SD20220512 - OBSOLETE]//CO20190516
+//[SD20220512 - OBSOLETE]namespace aurostd {                   // conversion from xvector<double> to xvector<int>
+//[SD20220512 - OBSOLETE]  xvector<int> xvectordouble2int(const xvector<double>& a,bool check_int){
+//[SD20220512 - OBSOLETE]    xvector<int> b(a.urows,a.lrows);
+//[SD20220512 - OBSOLETE]    if(check_int){
+//[SD20220512 - OBSOLETE]      for(int i=a.lrows;i<=a.urows;i++){
+//[SD20220512 - OBSOLETE]        if(!isinteger(a[i])){throw aurostd::xerror(__AFLOW_FILE__,"aurostd::xvectordouble2int():","non-integer found",_INPUT_ILLEGAL_);}
+//[SD20220512 - OBSOLETE]      }
+//[SD20220512 - OBSOLETE]    }
+//[SD20220512 - OBSOLETE]    for(int i=a.lrows;i<=a.urows;i++){b[i]=(int)nint(a[i]);}  //nint is for safety
+//[SD20220512 - OBSOLETE]    return b;
+//[SD20220512 - OBSOLETE]  }
+//[SD20220512 - OBSOLETE]}
+
+//SD20220512
+namespace aurostd {                   // conversion from xvector<utype> to xvector<vtype>
+  template<class utype1,class utype2>
+    xvector<utype2> xvector2utype(const xvector<utype1>& a){
+      xvector<utype2> b(a.urows,a.lrows);
+      for(int i=a.lrows;i<=a.urows;i++){b[i]=(utype2)a[i];}
+      return b;
     }
-    for(int i=a.lrows;i<=a.urows;i++){b[i]=(int)nint(a[i]);}  //nint is for safety
-    return b;
-  }
 }
 
 // ----------------------------------------------------------------------------
@@ -2554,6 +2618,35 @@ namespace aurostd {
       return (c * (utype) (scalar_product(a, b)/scalar_product(a, a)));
     }
 
+}
+
+// ***************************************************************************
+// GRID GENERATION
+// ----------------------------------------------------------------------------
+namespace aurostd {
+  /// @brief generates n linearly spaces points
+  ///
+  /// @param start starting value
+  /// @param stop stoping value
+  /// @param n number of points to generate
+  ///
+  /// @return n linearly spaced points
+  ///
+  /// @authors
+  /// @mod{SD,20220324,created function}
+  xvector<double> linspace(const double start, const double stop, const int n) {
+    if (n <= 1) {
+      string message = "Number of points must be greater than one";
+      throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
+    }
+    xvector<double> v(n);
+    double dx = stop - start;
+    for (int i = v.lrows; i <= v.urows; i++) {
+      v(i) = start + (i - 1) * dx / (n - 1);
+    }
+    return v;
+  }
+  xvector<double> linspace(const double start, const double stop, const double n) {int m = (int)aurostd::round(n); return linspace(start, stop, m);}
 }
 
 // ----------------------------------------------------------------------------
