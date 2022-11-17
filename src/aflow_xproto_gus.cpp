@@ -245,7 +245,7 @@ namespace aflowlib {
             if(ic>(int) (nAt*nD)) { throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"Problem in basis atoms.",_RUNTIME_ERROR_); }
             // call inverse(real(HNF,dp),Sinv)
             //** Move this to outside the loop: aurostd::inverse(HNF,Sinv);
-            ausv=Sinv*aurostd::reshape((double) z1,(double) z2,(double) z3)+aussLVinvXdvec; //**
+            ausv=Sinv*aurostd::xvector<double>({(double) z1,(double) z2,(double) z3})+aussLVinvXdvec; //**
             // aurostd::inverse(HNF,Sinv);
             // ausv=Sinv*aurostd::reshape((double) z1,(double) z2,(double) z3);
             for(j=1;j<=3;j++) aBas(j,ic)=ausv(j);

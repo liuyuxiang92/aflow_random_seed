@@ -173,6 +173,22 @@ extern const string _LOCK_LINK_SUFFIX_; //SD20220224
 
 const string VASP_KEYWORD_EXECUTION=" Executing: ";
 
+#define _AFLOWIN_DEFAULT_     string("aflow.in")  //CO20210302
+#define _AFLOWIN_AEL_DEFAULT_ string("ael_aflow.in")  //CO20210302
+#define _AFLOWIN_AGL_DEFAULT_ string("agl_aflow.in")  //CO20210302
+#define _AFLOWIN_QHA_DEFAULT_ string("aflow_qha.in")  //CO20210302 - moved from APL/aflow_qha.cpp
+
+#define _AFLOWIN_AEL_VARIANTS_ string("ael_aflow.in,aflow_ael.in")  //CO20210302
+#define _AFLOWIN_AGL_VARIANTS_ string("agl_aflow.in,aflow_agl.in")  //CO20210302
+
+#define _AFLOWLOCK_DEFAULT_     string("LOCK")  //CO20210302
+#define _AFLOWLOCK_AEL_DEFAULT_ string("ael.LOCK")  //CO20210302
+#define _AFLOWLOCK_AGL_DEFAULT_ string("agl.LOCK")  //CO20210302
+#define _AFLOWLOCK_QHA_DEFAULT_ string("LOCK.qha")  //CO20210302 - moved from APL/aflow_qha.cpp
+
+#define _AFLOWLOCK_AEL_VARIANTS_ string("ael.LOCK,LOCK.ael")  //CO20210302
+#define _AFLOWLOCK_AGL_VARIANTS_ string("agl.LOCK,LOCK.agl")  //CO20210302
+
 // --------------------------------------------------------------------------
 // definitions for aflow
 // aflow2 default definitions
@@ -346,7 +362,11 @@ class _XHOST {
     string sPGID,sPID,sTID;           // aflow_init.cpp  [PID=12345678]  [TID=12345678]
     bool showPGID,showPID,showTID;       // aflow_init.cpp  check if --showPID
     // machinery
-    bool QUIET,QUIET_CERR,QUIET_COUT,TEST,DEBUG,MPI;    // extra quiet SC20210617
+    bool QUIET;           //CO20220630 - can be overridden by LOGGER_WHITELIST/_BLACKLIST, modifiable within functions
+    bool QUIET_GLOBAL;    //CO20220630 - exclusively for --quiet (headless server), do not set/unset inside code (GLOBAL SILENCE)
+    bool QUIET_CERR;      //CO20220630 - silences cerr exclusively  // extra quiet SC20210617 
+    bool QUIET_COUT;      //CO20220630 - silences cout exclusively  // extra quiet SC20210617 
+    bool TEST,DEBUG,MPI;
     vector<string> LOGGER_WHITELIST;  //HE+ME20220305 - for logging
     vector<string> LOGGER_BLACKLIST;  //HE+ME20220305 - for logging
     bool GENERATE_AFLOWIN_ONLY; //CT20180719
@@ -2032,9 +2052,12 @@ class xstructure {
     //
     // NEIGHBORS OBEJCTS OLD-ACONVASP BUT WORKS                  // NEIGHBORS OBEJCTS 
     // GetNeighData collects all the neighbor data between rmin and rmax and stores it for each atom in a vector of atom objects in order of increasing distance.  
-    void GetNeighData(const deque<_atom>& in_atom_vec,const double& rmin, const double& rmax,deque<deque<_atom> >& neigh_mat);
-    // GetStrNeighData collects all the neighbor data out to some cutoff and stores it for each atom in the structure.
-    void GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat) const; //RF+CO20200513
+    void GetNeighData(const double rmax,deque<deque<_atom> >& neigh_mat,const double rmin=_ZERO_TOL_) const; //CO20220623 - use this function
+    void GetNeighData(deque<_atom>& atoms_cell,const double rmax,deque<deque<_atom> >& neigh_mat,const double rmin=_ZERO_TOL_) const; //CO20220623 - use this function
+    void GetNeighData_20220101(const deque<_atom>& in_atom_vec,const double rmin, const double rmax,deque<deque<_atom> >& neigh_mat) const; //CO20220623 - AVOID this function, use one above
+    //[CO20220623 - OBSOLETE]// GetStrNeighData collects all the neighbor data out to some cutoff and stores it for each atom in the structure.
+    //[CO20220623 - OBSOLETE]void GetStrNeighData(const double cutoff,deque<deque<_atom> >& neigh_mat) const; //RF+CO20200513
+    //[CO20220623 - OBSOLETE]void GetStrNeighData_20220101(const double cutoff,deque<deque<_atom> >& neigh_mat) const; //RF+CO20200513
 
     // ----------------------------------------------------------------------------------------
     // OUTPUT/ERROR FLAGS                                         // --------------------------------------
@@ -3217,9 +3240,9 @@ namespace KBIN {
   double OUTCAR2VASPVersionDouble(const string& outcar);  //CO20210315
   string VASPVersionString2Number(const string& vasp_version);  //CO20210315
   double VASPVersionString2Double(const string& vasp_version);  //CO20210315
-  string getVASPVersion(const string& binfile,const string& mpi_command="");  //ME20190219
-  string getVASPVersionNumber(const string& binfile,const string& mpi_command="");  //CO20200610
-  double getVASPVersionDouble(const string& binfile,const string& mpi_command="");  //CO20200610
+  string getVASPVersion(const string& binfile);  //ME20190219
+  string getVASPVersionNumber(const string& binfile);  //CO20200610
+  double getVASPVersionDouble(const string& binfile);  //CO20200610
 }
 
 // ----------------------------------------------------------------------------
@@ -3241,7 +3264,7 @@ namespace KBIN {
   bool VASP_Produce_POSCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_kflags& kflags,_vflags& vflags);
   bool VASP_Produce_POSCAR(_xvasp& xvasp);
   bool VASP_Modify_POSCAR(_xvasp& xvasp,const string& AflowIn,ofstream& FileERROR,_aflags& aflags,_vflags& vflags);
-  void convertPOSCARFormat(_xvasp&, const _aflags& aflags, const _kflags&);  //ME20190220 //CO20210713 - aflags
+  void convertPOSCARFormat(_xvasp&, const _kflags&);  //ME20190220 //CO20210713 - aflags //SD20220923 - updated for vasp6.3
   bool VASP_Convert_Unit_Cell(_xvasp&, _vflags&, _aflags&, ofstream&, ostringstream&); //ME20181216
   bool VASP_Reread_POSCAR(_xvasp& xvasp); //CO20210315
   bool VASP_Reread_POSCAR(_xvasp& xvasp,ofstream &FileMESSAGE,_aflags &aflags);

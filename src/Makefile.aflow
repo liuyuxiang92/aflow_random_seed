@@ -68,7 +68,7 @@ aflow_bader.o: aflow_bader.cpp $(AFLOW_H_DEPS) Makefile.aflow aflow_bader.h
 aflow_cce.o: aflow_cce.cpp $(AFLOW_H_DEPS) Makefile.aflow aflow_cce.h aflow_cce_python.cpp
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_chull.o: aflow_chull.cpp $(AFLOW_H_DEPS) Makefile.aflow aflow_chull.h aflow_chull_jupyter.cpp aflow_chull_jupyter_plotter.cpp aflow_chull_jupyter_requirements.cpp aflow_chull_python.cpp
-	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
+	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS_MT) $(OPTS_MT) $(ARCH) $< -c -o $@
 aflow_compare_structure.o: aflow_compare_structure.cpp $(AFLOW_H_DEPS) Makefile.aflow aflow_symmetry_spacegroup.h
 	$(CPP) $(VERS) $(INCLUDE) $(CCFLAGS) $(OPTS) $(ARCH) $< -c -o $@
 aflow_compare_structure_function.o: aflow_compare_structure_function.cpp $(AFLOW_H_DEPS) Makefile.aflow aflow_symmetry_spacegroup.h aflow_xtalfinder_python.cpp

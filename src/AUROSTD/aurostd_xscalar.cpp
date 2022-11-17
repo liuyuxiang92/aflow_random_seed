@@ -256,76 +256,52 @@ namespace aurostd {
 // ----------------------------------------------------------------------------
 // round  floor ceil trunc
 namespace aurostd {  // namespace aurostd
-  // ROUND(X)
-  double round(double x, uint decimals) { //SD20220603
-    //Uses the "round half away from zero" rounding strategy, see: https://en.wikipedia.org/wiki/Rounding
-    //This is the strategy employed by Python (except for +-0.5) and Matlab
-    //  0.5  ->   1
-    // -0.5  ->  -1
-    //  1.2  ->   1
-    // -1.2  ->  -1
-    //  1.5  ->   2
-    // -1.5  ->  -2
-    //  1.7  ->   2
-    // -1.7  ->  -2
-    double mult = std::pow(10.0, (double) decimals);
+  /// @brief rounds a real number to arbitrary digits
+  ///
+  /// @param x real number
+  /// @param digits number of digits after the decimal point
+  ///
+  /// @return rounded number
+  ///
+  /// @authors
+  /// @mod{SD,20220603,created function}
+  ///
+  /// @note Uses the "round half away from zero" rounding strategy. This is the strategy employed by
+  /// Python (except for +-0.5) and Matlab
+  ///
+  /// @see
+  /// @xlink{https://en.wikipedia.org/wiki/Rounding}
+  double round(double x, uint digits) { //SD20220603
+    double mult = std::pow(10.0, (double) digits);
     return -aurostd::sign(x) * std::ceil(-std::abs(x) * mult - 0.5) / mult;
   }
- //[SD20220603 - OBSOLETE] double round(double x) { //CO20210701 //std::round() only works in C++11
- //[SD20220603 - OBSOLETE]   //algo inspired from here: http://www.cplusplus.com/forum/articles/3638/
- //[SD20220603 - OBSOLETE]   //https://stackoverflow.com/questions/12696764/round-is-not-a-member-of-std - it's a gcc bug
- //[SD20220603 - OBSOLETE]   //1.2   ->   1
- //[SD20220603 - OBSOLETE]   //-1.2  ->  -1
- //[SD20220603 - OBSOLETE]   //0.1   ->   0
- //[SD20220603 - OBSOLETE]   //-0.1  ->  -0  //this is ok, (int)round(-0.1)=0
- //[SD20220603 - OBSOLETE]   //2.5   ->   3
- //[SD20220603 - OBSOLETE]   //-2.5  ->  -3
- //[SD20220603 - OBSOLETE]   //2.7   ->   3
- //[SD20220603 - OBSOLETE]   //-2.7  ->  -3
- //[SD20220603 - OBSOLETE]   //2.1   ->   2
- //[SD20220603 - OBSOLETE]   //-2.1  ->  -2
- //[SD20220603 - OBSOLETE]   //10.7  ->   11
- //[SD20220603 - OBSOLETE]   //-10.7 ->  -11
- //[SD20220603 - OBSOLETE]   //[CO20210624 - does not work for negative numbers]return std::floor( x + 0.5 );
- //[SD20220603 - OBSOLETE]#ifdef _XSCALAR_DEBUG_
- //[SD20220603 - OBSOLETE]   bool LDEBUG=(FALSE || XHOST.DEBUG);
- //[SD20220603 - OBSOLETE]#endif
- //[SD20220603 - OBSOLETE]   double fracpart=0.0,intpart=0.0;
- //[SD20220603 - OBSOLETE]   fracpart=modf(x,&intpart);
- //[SD20220603 - OBSOLETE]#ifdef _XSCALAR_DEBUG_
- //[SD20220603 - OBSOLETE]   if(LDEBUG){
- //[SD20220603 - OBSOLETE]     cerr << __AFLOW_FUNC__ << " x=" << x << endl;
- //[SD20220603 - OBSOLETE]     cerr << __AFLOW_FUNC__ << " fracpart=" << fracpart << endl;
- //[SD20220603 - OBSOLETE]     cerr << __AFLOW_FUNC__ << " intpart=" << intpart << endl;
- //[SD20220603 - OBSOLETE]     cerr << __AFLOW_FUNC__ << " floor(x)=" << std::floor(x) << endl;
- //[SD20220603 - OBSOLETE]     cerr << __AFLOW_FUNC__ << " ceil(x)=" << std::ceil(x) << endl;
- //[SD20220603 - OBSOLETE]   }
- //[SD20220603 - OBSOLETE]#endif
- //[SD20220603 - OBSOLETE]   if(abs(fracpart)>=.5){return x>=0?std::ceil(x):std::floor(x);}  //not sure why fracpart would ever be negative, but it is for negative inputs
- //[SD20220603 - OBSOLETE]   else{return x<0?std::ceil(x):std::floor(x);}
- //[SD20220603 - OBSOLETE] }
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  float round(float x) { return (float) std::roundf(float(x));}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  long double round(long double x) { return (long double) std::roundl((long double) x);}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  int round(int x) { return (int) std::round(double(x));}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  long round(long x) { return (long) std::round(double(x));}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  // FLOOR(X)
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  //  double floor(double x) { return (double) std::floor(double(x));}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  float floor(float x) { return (float) std::floorf(float(x));}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  long double floor(long double x) { return (long double) std::floorl((long double) x);}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  int floor(int x) { return (int) std::floor(double(x));}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  long floor(long x) { return (long) std::floor(double(x));}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  // CEIL(X)
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  double ceil(double x) { return (double) std::ceil(double(x));}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  float ceil(float x) { return (float) std::ceilf(float(x));}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  long double ceil(long double x) { return (long double) std::ceill((long double) x);}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  int ceil(int x) { return (int) std::ceil(double(x));}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  long ceil(long x) { return (long) std::ceil(double(x));}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  // TRUNC(X)
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  double trunc(double x) { return (double) std::trunc(double(x));}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  float trunc(float x) { return (float) std::truncf(float(x));}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  long double trunc(long double x) { return (long double) std::truncl((long double) x);}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  int trunc(int x) { return (int) std::trunc(double(x));}
- //[SD20220603 - OBSOLETE] // [OBSOLETE]  long trunc(long x) { return (long) std::trunc(double(x));}
+  
+  int roundDouble(double doub, int multiple, bool up) { //CO20220624 (moved from chull)
+    // rounds double to the nearest (multiple), choose round up or down
+    // http://stackoverflow.com/questions/3407012/c-rounding-up-to-the-nearest-multiple-of-a-number
+    // round up - round further from 0 if doub is positive, closer to 0 if doub is negative
+    // opposite for round down
+    // round up === MORE positive
+    // round down === MORE negative
+    // a little confusing, but a very powerful way to define for AXES MAX/MIN + INTERVALS
+    int numToRound = round(doub);
+    if(multiple == 0) {return numToRound;}
+    int remainder = abs(numToRound) % multiple;
+    if(remainder == 0) {return numToRound;}
+    if(up) {
+      if(numToRound < 0) {return -(abs(numToRound) - remainder);}
+      else {return numToRound + multiple - remainder;}
+    } else {  //down
+      if(numToRound < 0) {return -(abs(numToRound) + (multiple - remainder));}
+      else {return numToRound - remainder;}
+    }
+  }
+  bool greaterEqualZero(double val){return (val>=0.0);} //CO20220624 (moved from chull)
+  bool lessEqualZero(double val){return (val<=0.0);}  //CO20220624 (moved from chull)
+  bool notPositive(double val,bool soft_cutoff,double tol){return (soft_cutoff? val<=tol : lessEqualZero(val));}  //CO20220624 (moved from chull)
+  bool notNegative(double val,bool soft_cutoff,double tol){return (soft_cutoff? val>=-tol : greaterEqualZero(val));}  //CO20220624 (moved from chull)
+  bool zeroWithinTol(double val,double tol){return notPositive(abs(val),true,tol);} //CO20220624 (moved from chull)
+  bool nonZeroWithinTol(double val,double tol){return !zeroWithinTol(val,tol);} //CO20220624 (moved from chull)
 }
 
 namespace aurostd {

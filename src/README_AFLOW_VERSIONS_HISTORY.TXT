@@ -1,4 +1,13 @@
-3.2.14 - 
+3.2.14 - 2022/XX/XX
+        Location: http://materials.duke.edu/AFLOW/aflow.3.2.14.tar.xz
+        -- parallelized --chull --alloy (CO)
+        -- fixed some logger, adding some QUIETs (CO)
+        -- fixing --npmax and --np=max options (CO)
+        -- fixed RDF function (CO)
+        -- added RDF to pocc (CO)
+        -- reworked reshape, shift and stack function for xvector and xmatrix (HE)
+        -- fixed minimum enumerated Wyckoff search to consider different lattice vector choices (DX)
+        -- fixed printing of Wyckoff POSCAR in extended crystallographic data output (DX)
         -- added univariate polynomial solver (SD)
         -- added univariate polynomial fit with weights (SD)
         -- added LUP decomposition (SD)
