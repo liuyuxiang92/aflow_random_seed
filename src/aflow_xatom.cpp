@@ -1650,19 +1650,20 @@ ostream& operator<<(ostream& oss,const _sym_op& symop) {
   //DX20180115 - adding SU(2) and su(2); specific xcomplex printing - START
   char buf11_re[80],buf11_im[80],buf12_re[80],buf12_im[80],buf21_re[80],buf21_im[80],buf22_re[80],buf22_im[80];
   string iobuf="%11.4le";
-  sprintf(buf11_re,iobuf.c_str(),symop.SU2_matrix(1,1).re);sprintf(buf11_im,iobuf.c_str(),symop.SU2_matrix(1,1).im);
-  sprintf(buf12_re,iobuf.c_str(),symop.SU2_matrix(1,2).re);sprintf(buf12_im,iobuf.c_str(),symop.SU2_matrix(1,2).im);
-  sprintf(buf21_re,iobuf.c_str(),symop.SU2_matrix(2,1).re);sprintf(buf21_im,iobuf.c_str(),symop.SU2_matrix(2,1).im);
-  sprintf(buf22_re,iobuf.c_str(),symop.SU2_matrix(2,2).re);sprintf(buf22_im,iobuf.c_str(),symop.SU2_matrix(2,2).im);
+  //HE20221102 switching from deprecated sprintf to snprintf (eliminates the chance of buffer overflows)
+  snprintf(buf11_re,80,iobuf.c_str(),symop.SU2_matrix(1,1).re);snprintf(buf11_im,80,iobuf.c_str(),symop.SU2_matrix(1,1).im);
+  snprintf(buf12_re,80,iobuf.c_str(),symop.SU2_matrix(1,2).re);snprintf(buf12_im,80,iobuf.c_str(),symop.SU2_matrix(1,2).im);
+  snprintf(buf21_re,80,iobuf.c_str(),symop.SU2_matrix(2,1).re);snprintf(buf21_im,80,iobuf.c_str(),symop.SU2_matrix(2,1).im);
+  snprintf(buf22_re,80,iobuf.c_str(),symop.SU2_matrix(2,2).re);snprintf(buf22_im,80,iobuf.c_str(),symop.SU2_matrix(2,2).im);
   oss << " (" << buf11_re << "," << buf11_im << ") ";
   oss << " (" << buf12_re << "," << buf12_im << ")" << endl; 
   oss << " (" << buf21_re << "," << buf21_im << ") "; 
   oss << " (" << buf22_re << "," << buf22_im << ")" << "  SU(2) complex matrix [(real,imaginary)]" << endl; 
   //DX - formatting issues with xcomplex: oss << " " << symop.SU2_matrix << "  SU(2) complex matrix [(real,imaginary)]" << endl;
   char buf1_re[80],buf1_im[80],buf2_re[80],buf2_im[80],buf3_re[80],buf3_im[80];
-  sprintf(buf1_re,iobuf.c_str(),symop.su2_coefficients(1).re);sprintf(buf1_im,iobuf.c_str(),symop.su2_coefficients(1).im);
-  sprintf(buf2_re,iobuf.c_str(),symop.su2_coefficients(2).re);sprintf(buf2_im,iobuf.c_str(),symop.su2_coefficients(2).im);
-  sprintf(buf3_re,iobuf.c_str(),symop.su2_coefficients(3).re);sprintf(buf3_im,iobuf.c_str(),symop.su2_coefficients(3).im);
+  snprintf(buf1_re,80,iobuf.c_str(),symop.su2_coefficients(1).re);snprintf(buf1_im,80,iobuf.c_str(),symop.su2_coefficients(1).im);
+  snprintf(buf2_re,80,iobuf.c_str(),symop.su2_coefficients(2).re);snprintf(buf2_im,80,iobuf.c_str(),symop.su2_coefficients(2).im);
+  snprintf(buf3_re,80,iobuf.c_str(),symop.su2_coefficients(3).re);snprintf(buf3_im,80,iobuf.c_str(),symop.su2_coefficients(3).im);
   oss << " (" << buf1_re << "," << buf1_im << ") ";
   oss << " (" << buf2_re << "," << buf2_im << ") ";
   oss << " (" << buf3_re << "," << buf3_im << ")" << "  su(2) expansion coefficients on Pauli matrices [(real,imaginary)]" << endl;

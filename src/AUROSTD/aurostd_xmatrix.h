@@ -136,6 +136,12 @@ namespace aurostd {
   template<class utype> xvector<xcomplex<utype> >
     operator*(const xmatrix<utype>&, const xvector<xcomplex<utype> >&) __xprototype;
 
+  template<class utype> xmatrix<utype>                                   // scalar+matrix
+    operator+(const utype,const xmatrix<utype>&) __xprototype;           // scalar+matrix
+
+  template<class utype> xmatrix<utype>                                   // matrix+scalar
+    operator+(const xmatrix<utype>&,const utype) __xprototype;           // matrix+scalar
+
   template<class utype> xmatrix<utype>                                   // scalar*matrix
     operator*(const utype,const xmatrix<utype>&) __xprototype;           // scalar*matrix
 
@@ -314,7 +320,9 @@ namespace aurostd {
     xmatrix2vectorvector(const xmatrix<utype>& xmat) __xprototype;
 
   template<class utype> xmatrix<utype>
-    vectorvector2xmatrix(const vector<vector<utype> >& xmat) __xprototype;
+    vectorvector2xmatrix(const vector<vector<utype> >&, int lrows=1, int lcols=1) __xprototype;
+  template<class utype> xmatrix<utype>
+    vectorvector2xmatrix(const vector<vector<string> >&, int lrows=1, int lcols=1) __xprototype;
 
   template<class utype> xmatrix<double> 
     xmatrixutype2double(const xmatrix<utype>& a); //CO20191201
@@ -369,6 +377,20 @@ namespace aurostd {
   template<class utype> bool
     isNonInvertible(const xmatrix<utype>&, xmatrix<utype>&) __xprototype; // RETURN ERROR if non invertible
 
+  template<class utype> xmatrix<utype>
+    inverseByQR(const xmatrix<utype>&) __xprototype;  //SD20220426
+
+  template<class utype> void
+    LUPDecomposition(const xmatrix<utype>& A, xmatrix<double>& LU, xmatrix<double>& P, utype tol=_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_) __xprototype; //SD20220426
+  template<class utype> void
+    LUPDecomposition(const xmatrix<utype>& A, xmatrix<double>& L, xmatrix<double>& U, xmatrix<double>& P, utype tol=_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_) __xprototype; //SD20220426
+
+  template<class utype> xmatrix<utype>
+    inverseByLUP(const xmatrix<utype>&) __xprototype;  //SD20220426
+
+  template<class utype> utype
+    condition_number(const xmatrix<utype>&) __xprototype; //SD20220425
+
   template<class utype> xmatrix<utype>                  // clear values too small
     roundoff(const xmatrix<utype>&,utype) __xprototype; // claar values too small
 
@@ -415,6 +437,9 @@ namespace aurostd {
   //DX20180115 [OBSOLETE]  trace(const xmatrix<utype>&) __xprototype;
   template<class utype> utype                     //DX20180115 - double to utype
     trace(const xmatrix<utype>&) __xprototype;    //DX20180115 - double to utype
+
+  template<class utype> xmatrix<utype>
+    HadamardProduct(const xmatrix<utype>&, const xmatrix<utype>&) __xprototype;  //SD20220422
 
   template<class utype> xmatrix<utype>
     KroneckerProduct(const xmatrix<utype>&, const xmatrix<utype>&) __xprototype;  //ME20180614
@@ -551,6 +576,9 @@ namespace aurostd {
   template<class utype> xmatrix<utype>
     atanh(const xmatrix<utype>&) __xprototype;   // MISSING
 
+  template<class utype>
+    xvector<utype> LinearLeastSquares(const xmatrix<utype>&, const xvector<utype>&) __xprototype; //SD20220426
+
   template<class utype>                          // 25 april 2007
     void GaussJordan(xmatrix<utype>&, xmatrix<utype>&) __xprototype;
 
@@ -599,6 +627,9 @@ namespace aurostd {
         xmatrix<utype>& rotation,
         xmatrix<utype>& deformation,
         bool check_orthogonal_rotation=true); __xprototype;
+
+  template<class utype> void equilibrateMatrix(const xmatrix<utype>& A_orig, xmatrix<utype>& A, xmatrix<utype>& R, xmatrix<utype>& C, uint niter=100, utype tol=_AUROSTD_XMATRIX_TOLERANCE_IDENTITY_); __xprototype; //SD20220425
+
 }
 
 namespace aurostd {

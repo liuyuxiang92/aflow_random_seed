@@ -5137,6 +5137,28 @@ namespace aurostd {
     return out;
   }
 
+  //SD20220504 - string2tokens, but using a single delimiter that can have more than one char. Makes use of "find" rather than "find_first_of"
+  uint string2tokensByDelimiter(const string& str, vector<string>& tokens, const string& delimiter) { //SD20220504
+    tokens.clear();
+    uint dlen = delimiter.length();
+    if (dlen == 1) {return aurostd::string2tokens(str, tokens, delimiter);}
+    string::size_type lpos = 0, cpos = str.find(delimiter, lpos);
+    while (cpos != string::npos) {
+      tokens.push_back(str.substr(lpos, cpos - lpos));
+      lpos = cpos + dlen;
+      cpos = str.find(delimiter, lpos);
+    }
+    tokens.push_back(str.substr(lpos, str.length() - lpos));
+    return tokens.size();
+  }
+  uint string2tokensByDelimiter(const string& str, deque<string>& tokens, const string& delimiter) { //SD20220504
+    tokens.clear();
+    vector<string> vtokens;
+    aurostd::string2tokensByDelimiter(str, vtokens, delimiter);
+    tokens = aurostd::vector2deque(vtokens);
+    return tokens.size();
+  }
+
   // ***************************************************************************
   // Function string2tokensAdd string2tokensAdd<utype>
   // ***************************************************************************
@@ -5628,65 +5650,144 @@ namespace aurostd {
     return aurostd::substring2bool(strstream.str(),strsub1,RemoveWS,RemoveComments);
   }
 
-  bool WithinList(const vector<string>& list,const string& input,bool sorted) { //CO20181010
-    //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
-    //return false;  OBSOLETE ME20190905
-    int index=-1;
-    return WithinList(list, input, index, sorted);
+  /// @brief Determines whether a specific value exists inside a list
+  ///
+  /// @param list List of values
+  /// @param input Specific value to match the values within the list
+  /// @param index Index of the element that matched the input
+  /// @param sorted Whether the list is sorted
+  /// @return Boolean if the input was found in the list or not
+  ///
+  /// @note index is assigned the value of 0 if the input is not found in the list
+  template<class utype> bool WithinList(const vector<utype>& list, const utype& input, size_t& index, bool sorted) { //SD20220705
+    for (size_t i = 0; i < list.size(); i++) {
+      if(sorted && list[i]>input){break;}
+      if(aurostd::isequal(list[i],input)) {
+        index = i;
+        return true;
+      }
+    }
+    index = 0;
+    return false;
   }
-  bool WithinList(const deque<string>& list,const string& input,bool sorted) { //CO20181010
-    int index=-1;
+  bool WithinList(const vector<string>& list, const string& input, size_t& index, bool sorted) { //SD20220705
+    for (size_t i = 0; i < list.size(); i++) {
+      if(sorted && list[i]>input){break;}
+      if(aurostd::isequal(list[i],input)) {
+        index = i;
+        return true;
+      }
+    }
+    index = 0;
+    return false;
+  }
+  template<class utype> bool WithinList(const deque<utype>& list, const utype& input, size_t& index, bool sorted) { //SD20220705
     return WithinList(aurostd::deque2vector(list), input, index, sorted);
   }
-  bool WithinList(const vector<int>& list,int input,bool sorted) {  //CO20181010
-    //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
-    //return false;  OBSOLETE ME20190905
-    int index=-1;
+  bool WithinList(const deque<string>& list, const string& input, size_t& index, bool sorted) { //SD20220705
+    return WithinList(aurostd::deque2vector(list), input, index, sorted);
+  }
+  template<class utype> bool WithinList(const vector<utype>& list, const utype& input, bool sorted) { //SD20220705
+    size_t index=0;
     return WithinList(list, input, index, sorted);
   }
-  bool WithinList(const vector<uint>& list,uint input,bool sorted) {  //CO20181010
-    //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
-    //return false;  OBSOLETE ME20190905
-    int index=-1;
+  bool WithinList(const vector<string>& list, const string& input, bool sorted) { //SD20220705
+    size_t index=0;
     return WithinList(list, input, index, sorted);
   }
-
-  //ME20190813 - added versions that also determine the index of the item in the list
-  bool WithinList(const vector<string>& list, const string& input, int& index, bool sorted) {
-    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
-      if(sorted && list[i]>input){break;} //CO20201111
-      if(list[i]==input) {
-        index = i;
-        return true;
-      }
-    }
-    index = -1;
-    return false;
+  template<class utype> bool WithinList(const deque<utype>& list, const utype& input, bool sorted) { //SD20220705
+    return WithinList(aurostd::deque2vector(list), input, sorted);
+  }
+  bool WithinList(const deque<string>& list, const string& input, bool sorted) { //SD20220705
+    return WithinList(aurostd::deque2vector(list), input, sorted);
   }
 
-  bool WithinList(const vector<int>& list, int input, int& index, bool sorted) {
-    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
-      if(sorted && list[i]>input){break;} //CO20201111
-      if(list[i]==input) {
-        index = i;
-        return true;
+  template<class utype> bool WithinList(const vector<utype>& list, const utype& input, vector<size_t>& index, bool sorted) { //SD20220705
+    index.clear();
+    for (size_t i = 0; i < list.size(); i++) {
+      if(sorted && list[i]>input){break;}
+      if(aurostd::isequal(list[i],input)) {
+        index.push_back(i);
       }
     }
-    index = -1;
-    return false;
+    return !index.empty();
+  }
+  bool WithinList(const vector<string>& list, const string& input, vector<size_t>& index, bool sorted) { //SD20220705
+    index.clear();
+    for (size_t i = 0; i < list.size(); i++) {
+      if(sorted && list[i]>input){break;}
+      if(aurostd::isequal(list[i],input)) {
+        index.push_back(i);
+      }
+    }
+    return !index.empty();
+  }
+  template<class utype> bool WithinList(const deque<utype>& list, const utype& input, vector<size_t>& index, bool sorted) { //SD20220705
+    return WithinList(aurostd::deque2vector(list), input, index, sorted);
+  }
+  bool WithinList(const deque<string>& list, const string& input, vector<size_t>& index, bool sorted) { //SD20220705
+    return WithinList(aurostd::deque2vector(list), input, index, sorted);
   }
 
-  bool WithinList(const vector<uint>& list, uint input, int& index, bool sorted) {
-    for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
-      if(sorted && list[i]>input){break;} //CO20201111
-      if(list[i]==input) {
-        index = i;
-        return true;
-      }
-    }
-    index = -1;
-    return false;
-  }
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<string>& list,const string& input,bool sorted) { //CO20181010
+  //[SD20220705 - OBSOLETE]  //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
+  //[SD20220705 - OBSOLETE]  //return false;  OBSOLETE ME20190905
+  //[SD20220705 - OBSOLETE]  int index=-1;
+  //[SD20220705 - OBSOLETE]  return WithinList(list, input, index, sorted);
+  //[SD20220705 - OBSOLETE]}
+  //[SD20220705 - OBSOLETE]bool WithinList(const deque<string>& list,const string& input,bool sorted) { //CO20181010
+  //[SD20220705 - OBSOLETE]  int index=-1;
+  //[SD20220705 - OBSOLETE]  return WithinList(aurostd::deque2vector(list), input, index, sorted);
+  //[SD20220705 - OBSOLETE]}
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<int>& list,int input,bool sorted) {  //CO20181010
+  //[SD20220705 - OBSOLETE]  //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
+  //[SD20220705 - OBSOLETE]  //return false;  OBSOLETE ME20190905
+  //[SD20220705 - OBSOLETE]  int index=-1;
+  //[SD20220705 - OBSOLETE]  return WithinList(list, input, index, sorted);
+  //[SD20220705 - OBSOLETE]}
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<uint>& list,uint input,bool sorted) {  //CO20181010
+  //[SD20220705 - OBSOLETE]  //for(uint i=0;i<list.size();i++){if(list[i]==input){return true;}}  OBSOLETE ME20190905
+  //[SD20220705 - OBSOLETE]  //return false;  OBSOLETE ME20190905
+  //[SD20220705 - OBSOLETE]  int index=-1;
+  //[SD20220705 - OBSOLETE]  return WithinList(list, input, index, sorted);
+  //[SD20220705 - OBSOLETE]}
+
+  //[SD20220705 - OBSOLETE]//ME20190813 - added versions that also determine the index of the item in the list
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<string>& list, const string& input, int& index, bool sorted) {
+  //[SD20220705 - OBSOLETE]  for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+  //[SD20220705 - OBSOLETE]    if(sorted && list[i]>input){break;} //CO20201111
+  //[SD20220705 - OBSOLETE]    if(list[i]==input) {
+  //[SD20220705 - OBSOLETE]      index = i;
+  //[SD20220705 - OBSOLETE]      return true;
+  //[SD20220705 - OBSOLETE]    }
+  //[SD20220705 - OBSOLETE]  }
+  //[SD20220705 - OBSOLETE]  index = -1;
+  //[SD20220705 - OBSOLETE]  return false;
+  //[SD20220705 - OBSOLETE]}
+
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<int>& list, int input, int& index, bool sorted) {
+  //[SD20220705 - OBSOLETE]  for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+  //[SD20220705 - OBSOLETE]    if(sorted && list[i]>input){break;} //CO20201111
+  //[SD20220705 - OBSOLETE]    if(list[i]==input) {
+  //[SD20220705 - OBSOLETE]      index = i;
+  //[SD20220705 - OBSOLETE]      return true;
+  //[SD20220705 - OBSOLETE]    }
+  //[SD20220705 - OBSOLETE]  }
+  //[SD20220705 - OBSOLETE]  index = -1;
+  //[SD20220705 - OBSOLETE]  return false;
+  //[SD20220705 - OBSOLETE]}
+
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<uint>& list, uint input, int& index, bool sorted) {
+  //[SD20220705 - OBSOLETE]  for (int i = 0, nlist = (int) list.size(); i < nlist; i++) {
+  //[SD20220705 - OBSOLETE]    if(sorted && list[i]>input){break;} //CO20201111
+  //[SD20220705 - OBSOLETE]    if(list[i]==input) {
+  //[SD20220705 - OBSOLETE]      index = i;
+  //[SD20220705 - OBSOLETE]      return true;
+  //[SD20220705 - OBSOLETE]    }
+  //[SD20220705 - OBSOLETE]  }
+  //[SD20220705 - OBSOLETE]  index = -1;
+  //[SD20220705 - OBSOLETE]  return false;
+  //[SD20220705 - OBSOLETE]}
 
   //ME20220503
   bool SubstringWithinList(const deque<string>& list, const string& input) {
@@ -7182,14 +7283,14 @@ namespace aurostd {
 // Function some statistical stuff
 // combinations
 // ***************************************************************************
-template<class utype> utype combinations(utype n,utype k) { // http://en.wikipedia.org/wiki/Combination // C^n_k=n!/k!(n-k)!   hard to calculate
-  double cnk=1.0;
-  for(utype i=0;i<=k-1;i++) cnk=cnk*(n-i)/(k-i);
-  return (utype) cnk;
+namespace aurostd  {
+  template<class utype> utype combinations(utype n,utype k) { // http://en.wikipedia.org/wiki/Combination // C^n_k=n!/k!(n-k)!   hard to calculate
+    double cnk=1.0;
+    for(utype i=0;i<=k-1;i++) cnk=cnk*(n-i)/(k-i);
+    return (utype) cnk;
+  }
+  template<class utype> utype Cnk(utype n,utype k) { return combinations(n,k);}  // http://en.wikipedia.org/wiki/Combination
 }
-
-template<class utype> utype Cnk(utype n,utype k) { return combinations(n,k);}  // http://en.wikipedia.org/wiki/Combination
-
 
 // ***************************************************************************
 // aurostd::ShiftFirstColumn(const vector<vector<double> >& a, const double& value)

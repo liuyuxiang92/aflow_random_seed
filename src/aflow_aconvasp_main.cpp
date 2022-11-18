@@ -29,6 +29,7 @@
 #include "aflow_gfa.h" //DF20190329
 #include "aflow_cce.h" //RF20200203
 #include "APL/aflow_apl.h"  //ME20200330
+#include "aflow_qca.h" //SD20220323
 
 extern double NearestNeighbor(const xstructure& a);
 
@@ -1267,6 +1268,27 @@ uint PflowARGs(vector<string> &argv,vector<string> &cmds,aurostd::xoption &vpflo
 
   vpflow.flag("PFLOW::QUEUE_STATUS",aurostd::args2flag(argv,cmds,"--queue_status|--queue|--q"));  //CO20200526
 
+  vpflow.flag("QCA::INIT", aurostd::args2flag(argv,cmds,"--quasi_chem_approx|--qca")); //SD20220323 - initiate quasi-chemical approx calculation
+  if(vpflow.flag("QCA::INIT")) {
+    vpflow.flag("QCA::USAGE", aurostd::args2flag(argv,cmds,"--usage"));
+    vpflow.flag("QCA::BINODAL", aurostd::args2flag(argv,cmds,"--binodal"));
+    vpflow.flag("QCA::USE_SG", aurostd::args2flag(argv,cmds,"--use_sg"));
+    vpflow.flag("QCA::SCREEN_ONLY", aurostd::args2flag(argv,cmds,"--screen_only"));
+    vpflow.flag("QCA::IMAGE_ONLY", aurostd::args2flag(argv,cmds,"--image_only|--image"));
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::PRINT","--print=|--p=|--output=|--o=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::DIRECTORY","--directory=","./");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::PLATTICE","--plattice=|--plat=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::ELEMENTS","--elements=|--elem=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::MAX_NUM_ATOMS","--max_num_atoms=|--mna=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::CV_CUTOFF","--cv_cutoff=|--cv_cut=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::CONC_CURVE_RANGE","--conc_curve_range=|--conc_curve=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::CONC_NPTS","--conc_npts=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::TEMP_RANGE","--temp_range=|--temp=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::TEMP_NPTS","--temp_npts=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::AFLOWLIB_DIRECTORY","--aflowlib_directory=|--aflowlib_dir=","");
+    vpflow.args2addattachedscheme(argv,cmds,"QCA::AFLOW_MAX_NUM_ATOMS","--aflow_max_num_atoms=","");
+  }
+
   // [OBSOLETE]  vpflow.flag("RASMOL",aurostd::args2flag(argv,cmds,"--rasmol"));
   vpflow.args2addattachedscheme(argv,cmds,"RASMOL","--rasmol=","");
 
@@ -2047,6 +2069,7 @@ namespace pflow {
 
       // Q
       //[CO20220614 - moved up]if(vpflow.flag("QE")) {cout << input2QExstr(cin); _PROGRAMRUN=true;}
+      if(vpflow.flag("QCA::INIT")) {qca::quasiChemicalApprox(vpflow); _PROGRAMRUN=true;} //SD20220323
       if(vpflow.flag("QDEL")) {sflow::QDEL(vpflow.getattachedscheme("QDEL")); _PROGRAMRUN=true;} // NEW
       if(vpflow.flag("QMVASP")) {pflow::QMVASP(vpflow); _PROGRAMRUN=true;}
       if(vpflow.flag("QSUB")) {sflow::QSUB(vpflow.getattachedscheme("QSUB")); _PROGRAMRUN=true;} // NEW
@@ -2380,6 +2403,7 @@ namespace pflow {
     strstream << tab << x << " --aflowlib_aurl2auid=aurl1,aurl2.... [ --aurl2auid=..." << endl;
     strstream << tab << x << " --aflowlib_auid2loop=auid1,auid2....|--auid2loop=..." << endl;
     strstream << tab << x << " --aflowlib_aurl2loop=aurl1,aurl2.... [ --aurl2loop=..." << endl;
+    strstream << tab << x << " --atat < POSCAR" << endl;
     strstream << tab << x << " [options] --bader -D DIRECTORY" << endl;
     strstream << tab << xspaces << " " << "options are:  --usage" << endl;
     strstream << tab << xspaces << " " << "              --critical_points|--cp" << endl;
@@ -2595,6 +2619,26 @@ namespace pflow {
     strstream << tab << x << " --python_modules[=module1,module2] | --create_python_modules=[module1,module2] [-D directory]" << endl;
     strstream << tab << x << " --qe < POSCAR" << endl;
     strstream << tab << x << " --qmvasp [--static] [-D directory]" << endl;
+    strstream << tab << x << " --quasi_chem_approx|--qca --plattice=|--plat=fcc --elements=|--elem=Au,Pt[,Zn] [qca_options] [--directory=[DIRECTORY]]" << endl;
+    strstream << tab << xspaces << " " << "options are:" << endl;
+    strstream << endl;
+    strstream << tab << xspaces << " " << "GENERAL OPTIONS:" << endl;
+    strstream << tab << xspaces << " " << "              --usage" << endl;
+    strstream << tab << xspaces << " " << "              --screen_only" << endl;
+    strstream << tab << xspaces << " " << "              --image_only|--image" << endl;
+    strstream << tab << xspaces << " " << "              --aflowlib_directory=|--aflowlib_dir=..." << endl;
+    strstream << tab << xspaces << " " << "              --print=|--p=|--output=|--o=txt" << endl;
+    strstream << endl;
+    strstream << tab << xspaces << " " << "BINODAL OPTIONS:" << endl;
+    strstream << tab << xspaces << " " << "              --binodal" << endl;
+    strstream << tab << xspaces << " " << "              --use_sg" << endl;
+    strstream << tab << xspaces << " " << "              --aflow_max_num_atoms=4" << endl;
+    strstream << tab << xspaces << " " << "              --max_num_atoms=|--mna=8" << endl;
+    strstream << tab << xspaces << " " << "              --cv_cutoff=|--cv_cut=0.05" << endl;
+    strstream << tab << xspaces << " " << "              --conc_curve_range=|--conc_curve=0,1,1,0" << endl;
+    strstream << tab << xspaces << " " << "              --conc_npts=20" << endl;
+    strstream << tab << xspaces << " " << "              --temp_range=|--temp=300,5000" << endl;
+    strstream << tab << xspaces << " " << "              --temp_npts=150" << endl;
     strstream << tab << x << " --rasmol[=n1[,n2[,n3]]] < POSCAR" << endl;
     strstream << tab << x << " --revsg [#] [n] [l] [m]" << endl;
     strstream << tab << x << " --rm_atom iatom < POSCAR" << endl;
@@ -3896,8 +3940,8 @@ namespace pflow {
       test_int_xv_b[i] =  rand() % _max_int;
       test_float_xv_a[i] = PI * float((rand()%_max_int));
       test_float_xv_b[i] = PI * float((rand()%_max_int));
-      test_double_xv_a[i] = _mm_e * float((rand()%_max_int));
-      test_double_xv_b[i] = _mm_e * float((rand()%_max_int));
+      test_double_xv_a[i] = EULERSNUMBER * float((rand()%_max_int));
+      test_double_xv_b[i] = EULERSNUMBER * float((rand()%_max_int));
     }
 
     const int line_width = 60;
@@ -4395,8 +4439,8 @@ namespace pflow {
         test_int_xm_b[i][j] =  rand() % _max_int;
         test_float_xm_a[i][j] = PI * float((rand()%_max_int));
         test_float_xm_b[i][j] = PI * float((rand()%_max_int));
-        test_double_xm_a[i][j] = _mm_e * double((rand()%_max_int));
-        test_double_xm_b[i][j] = _mm_e * double((rand()%_max_int));
+        test_double_xm_a[i][j] = EULERSNUMBER * double((rand()%_max_int));
+        test_double_xm_b[i][j] = EULERSNUMBER * double((rand()%_max_int));
       }
     }
 

@@ -444,7 +444,7 @@ namespace pflow {
 
     //[CO20190515 - WRONG, [hkl] WITH brackets is ALREADY in direct space]xvector<double> n_s=HKLPlane2Normal(xstr_bulk.lattice,hkl_s);  //we need UN-ROTATED lattice here so we can get the right distance
     //[CO20190515 - WRONG, [hkl] WITH brackets is ALREADY in direct space]double d_layers=getDistanceBetweenImages(xstr_bulk.lattice,h_s,k_s,l_s); //this depends on UN-ROTATED lattice
-    xvector<double> n_s=xstr_bulk.f2c*aurostd::xvectorint2double(hkl_s);n_s/=aurostd::modulus(n_s); //f2c=trasp(xstr_bulk.lattice)
+    xvector<double> n_s=xstr_bulk.f2c*aurostd::xvector2utype<int,double>(hkl_s);n_s/=aurostd::modulus(n_s); //f2c=trasp(xstr_bulk.lattice)
     xvector<double> n_s_ORIG=n_s;
     if(LDEBUG) {cerr << __AFLOW_FUNC__ << " n_s[hkl=" << hkl_s << "]=" << n_s << endl;}
 
@@ -625,9 +625,9 @@ namespace pflow {
         //cannot use n_s, as it is normalized
         //rotated hkl_s by v_pgroups
         //rotate in Cartesian coordinates, then convert to fractional
-        xvector<double> n_s_tmp=xstr_bulk.f2c*aurostd::xvectorint2double(hkl_s);  //do not normalize
+        xvector<double> n_s_tmp=xstr_bulk.f2c*aurostd::xvector2utype<int,double>(hkl_s);  //do not normalize
         n_s_tmp=v_pgroups[v_pgs[0]].Uc*n_s_tmp; //rotate
-        hkl_s=aurostd::xvectordouble2int(xstr_bulk.c2f*n_s_tmp);  //convert to fractional
+        hkl_s=aurostd::xvector2utype<double,int>(xstr_bulk.c2f*n_s_tmp);  //convert to fractional
 
         message << "Selecting symmetrically equivalent hkl_s=" << hkl_s << endl;
         message << "n_s=" << n_s << endl;
@@ -2312,7 +2312,7 @@ namespace pflow {
           for(k=0;k<vvitypes.size()&&itype==AUROSTD_MAX_INT;k++){
             if(vitypes==vvitypes[k]){itype=k;}
           }
-          if(itype==AUROSTD_MAX_INT){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"could not find itype",_INDEX_MISMATCH_);}
+          if(itype==AUROSTD_MAX_INT){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"could not find itype",_INDEX_MISMATCH_);}
           itype+=rdf_all.lcols; //+1 because xmatrix starts with 1
           if(LDEBUG){
             cerr << __AFLOW_FUNC__ << " ibin=" << ibin << " (dist=" << dist << ")" << endl;
@@ -2326,7 +2326,7 @@ namespace pflow {
     if(raw_counts==false){
       for(ibin=rdf_all.lrows;ibin<=rdf_all.urows;ibin++){
         rad=drad*(ibin-rdf_all.lrows);
-        if(ibin==rdf_all.lrows && !aurostd::iszero(rdf_all[ibin][rdf_all.ucols],_ZERO_TOL_)){throw aurostd::xerror(_AFLOW_FILE_NAME_,__AFLOW_FUNC__,"first bin cannot be normalized (rad==0), increase nbins",_VALUE_ILLEGAL_);}
+        if(ibin==rdf_all.lrows && !aurostd::iszero(rdf_all[ibin][rdf_all.ucols],_ZERO_TOL_)){throw aurostd::xerror(__AFLOW_FILE__,__AFLOW_FUNC__,"first bin cannot be normalized (rad==0), increase nbins",_VALUE_ILLEGAL_);}
         for(itype=rdf_all.lcols;itype<=rdf_all.ucols;itype++){
           if(aurostd::nonZeroWithinTol(rad,_ZERO_TOL_)){rdf_all[ibin][itype]/=(4.0*PI*std::pow(rad,2.0)*drad);}
         }

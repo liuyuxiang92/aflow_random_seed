@@ -189,6 +189,12 @@ namespace aurostd {
   template<class utype> xvector<utype>
     vector_product(const xvector<utype>&,const xvector<utype>&) __xprototype;
 
+  template<class utype> xvector<utype>                
+    elementwise_product(const xvector<utype>&,const xvector<utype>&) __xprototype; //SD20220422
+
+  template<class utype> utype
+    elements_product(const xvector<utype>&) __xprototype; //SD20220617
+
   //ME20200327
   template<class utype> xmatrix<utype>
     outer_product(const xvector<utype>&, const xvector<utype>&) __xprototype;
@@ -285,6 +291,12 @@ namespace aurostd {
   template<class utype> xvector<float>
     xfloat(const xvector<utype>&) __xprototype;
 
+  template<class utype> xvector<utype>
+    pow(const xvector<utype>&,const utype d) __xprototype;  //SD20220324
+
+  template<class utype> xvector<utype>
+    pow(const xvector<utype>&,const xvector<utype>&) __xprototype;  //SD20220324
+
   template<class utype> xvector<long int>
     xlongint(const xvector<utype>&) __xprototype;
 
@@ -302,8 +314,11 @@ namespace aurostd {
   template<class utype> xvector<utype>
     vector2xvector(const vector<string>&,int lrows=1) __xprototype; //CO20180409
 
-  xvector<double> xvectorint2double(const xvector<int>&); //CO20180515
-  xvector<int> xvectordouble2int(const xvector<double>&,bool check_int=true); //CO20180515
+  //[SD20220512 - OBSOLETE]xvector<double> xvectorint2double(const xvector<int>&); //CO20180515
+  //[SD20220512 - OBSOLETE]xvector<int> xvectordouble2int(const xvector<double>&,bool check_int=true); //CO20180515
+
+  template<class utype1,class utype2> xvector<utype2>
+    xvector2utype(const xvector<utype1>& a) __xprototype; //SD20220512
 
   // OPERATIONS ON XVECTORS
 
@@ -538,6 +553,10 @@ namespace aurostd {
 
   template<class utype> xvector<utype> getVectorProjection(const xvector<utype>& b, const xvector<utype>& a);  //ME20200511
   template<class utype> xvector<utype> getModeratedVectorProjection(const xvector<utype> c, const xvector<utype>& b, const xvector<utype>& a);  //ME20200511
+
+  // grid generation
+  xvector<double> linspace(const double start, const double stop, const int n);
+  xvector<double> linspace(const double start, const double stop, const double n);
 
   // SIMPLE SORT ROUTINES
   template<class utype> void // WRAP TO SHELL SHORT

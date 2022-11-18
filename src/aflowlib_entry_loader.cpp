@@ -43,7 +43,7 @@ namespace aflowlib {
   ///   el.loadAUID("aflow:7dd846bc04c764e8"); // no duplicates will be stored
   ///   el.getEntriesViewFlat(results);
   /// }
-  /// for (std::shared_ptr<aflowlib::_aflowlib_entry>> & entry : results) std::cout << entry->auid << std::endl;
+  /// for (std::shared_ptr<aflowlib::_aflowlib_entry>> entry : results) std::cout << entry->auid << std::endl;
   /// @endcode
 
   // class constructor
@@ -67,7 +67,7 @@ namespace aflowlib {
     return *this;
   }
 
-  /// @brief initialize the class (privat)
+  /// @brief initialize the class (private)
   /// create shared pointer used to store the data views and read default values from flags
   void EntryLoader::init() {
     m_out_silent = true;
@@ -78,7 +78,7 @@ namespace aflowlib {
 
     m_sqlite_file = DEFAULT_AFLOW_DB_FILE;
     m_sqlite_alloy_file = DEFAULT_ENTRY_LOADER_ALLOY_DB_FILE;
-    m_sqlite_collection = "WEB";
+    m_sqlite_collection = "RAW";
 
     m_aflux_server = DEFAULT_ENTRY_LOADER_AFLUX_SERVER;
     m_aflux_path = DEFAULT_ENTRY_LOADER_AFLUX_PATH;
@@ -203,6 +203,7 @@ namespace aflowlib {
   /// @param AUID list of AURLs
   /// @authors
   /// @mod{HE,20220216,created}
+  /// @mod{HE,20221117,ensure that aflux URL is not longer than 8000 characters}
   void EntryLoader::loadAUID(const std::vector<std::string> &AUID) {
     selectSource();
     std::vector <std::string> clean_AUID;
@@ -223,7 +224,24 @@ namespace aflowlib {
     switch (m_current_source) {
 
       case Source::AFLUX: {
-        std::string AUID_combined = aurostd::joinWDelimiter(clean_AUID, "':'");
+        std::string AUID_combined = "";
+        bool first = true;
+        for (size_t i=0; i<clean_AUID.size(); i++){
+          if ((AUID_combined+ clean_AUID[i]).size()  < 5000) {
+            if (first) {
+              AUID_combined=clean_AUID[i];
+              first=false;
+            }
+            else AUID_combined+="':'" + clean_AUID[i];
+          }
+          else {
+            AUID_combined = "'" + AUID_combined + "'";
+            loadAFLUXMatchbook({{"*",    ""},
+                                {"auid", AUID_combined}});
+            AUID_combined = clean_AUID[i];
+          }
+        }
+
         AUID_combined = "'" + AUID_combined + "'";
         loadAFLUXMatchbook({{"*",    ""},
                             {"auid", AUID_combined}});
@@ -329,6 +347,7 @@ namespace aflowlib {
   /// @param AURL list of AURLs
   /// @authors
   /// @mod{HE,20220322,created}
+  /// @mod{HE,20221117,ensure that aflux URL is not longer than 8000 characters}
   void EntryLoader::loadAURL(const std::vector <std::string> &AURL) {
     selectSource();
 
@@ -349,7 +368,25 @@ namespace aflowlib {
     switch (m_current_source) {
 
       case Source::AFLUX: {
-        std::string AURL_combined = aurostd::joinWDelimiter(clean_AURL, "':'");
+        std::string AURL_combined = "";
+        bool first = true;
+        for (size_t i=0; i<clean_AURL.size(); i++){
+          if ((AURL_combined+ clean_AURL[i]).size()  < 5000) {
+            if (first) {
+              AURL_combined=clean_AURL[i];
+              first=false;
+            }
+            else AURL_combined+="':'" + clean_AURL[i];
+          }
+          else {
+            AURL_combined = "'" + AURL_combined + "'";
+            AURL_combined = std::regex_replace(AURL_combined, m_re_aurl2file, "$1_" + m_aflux_collection + "/");
+            loadAFLUXMatchbook({{"*",    ""},
+                                {"aurl", AURL_combined}});
+            AURL_combined = clean_AURL[i];
+          }
+        }
+
         AURL_combined = "'" + AURL_combined + "'";
         AURL_combined = std::regex_replace(AURL_combined, m_re_aurl2file, "$1_" + m_aflux_collection + "/");
         loadAFLUXMatchbook({{"*",    ""},
