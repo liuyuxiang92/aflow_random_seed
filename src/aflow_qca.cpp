@@ -495,7 +495,6 @@ namespace qca {
   void QuasiChemApproxCalculator::calculateMapForXstructures(const vector<xstructure>& vstr1, const vector<xstructure>& vstr2) {
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     stringstream message;
-    vector<uint> index;
     message << "Mapping xstructures between AFLOW and ATAT";
     pflow::logger(__AFLOW_FILE__, __AFLOW_FUNC__, message, m_aflags, *p_FileMESSAGE, *p_oss, _LOGGER_MESSAGE_);
     vector<xstructure> vstr3 = vstr1;
@@ -524,8 +523,8 @@ namespace qca {
         cerr << endl;
       }
     }
-    if (mapstr.size() != index.size()) {
-      message << "Something went wrong in the mapping of the xstructures; index.size()=" << index.size() << " | mapstr.size()=" << mapstr.size() << endl;
+    if (mapstr.size() != vstr1.size()) {
+      message << "Something went wrong in the mapping of the xstructures; vstr1.size()=" << vstr1.size() << " | mapstr.size()=" << mapstr.size() << endl;
       throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ERROR_);
     }
   }
