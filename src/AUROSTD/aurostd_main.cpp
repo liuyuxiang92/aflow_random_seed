@@ -816,6 +816,8 @@ namespace aurostd {
     //[old way - need to convert char array -> string]char work_dir[PATH_LENGTH_MAX];
     //[old way - need to convert char array -> string]getcwd(work_dir, PATH_LENGTH_MAX); 
 
+    string pwd=aurostd::getenv2string("PWD");
+    if(!pwd.empty()){return pwd;}
     return aurostd::execute2string("pwd"); //XHOST.command("pwd") ?
   }
 
@@ -3388,7 +3390,7 @@ namespace aurostd {
 
   bool execute(const string& _command) {
 #ifdef AFLOW_MULTITHREADS_ENABLE  //CO+HE20221116
-    std::lock_guard<std::mutex> lk(xthread_execute);
+    std::lock_guard<std::mutex> lk(xthread_execute);  //prevents race conditions likely caused by system calls
 #endif
     bool LDEBUG=(FALSE || XHOST.DEBUG);
     // cerr << "COMMAND " <<  command.c_str() << endl;
