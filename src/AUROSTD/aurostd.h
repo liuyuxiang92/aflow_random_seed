@@ -38,6 +38,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <string>
+#include <codecvt> //HE20220922 for JSON
 #include <sys/stat.h>
 #ifndef __CYGWIN__  //ME20190327 - Cygwin support
 //#include <sys/sysctl.h>
@@ -146,6 +147,11 @@ using std::vector;
 //CO20171002 - USEFUL!
 #ifndef AUROSTD_MAX_DOUBLE
 #define AUROSTD_MAX_DOUBLE std::numeric_limits<double>::max()
+#endif
+
+//SD20220914
+#ifndef AUROSTD_MAX_SIZET
+#define AUROSTD_MAX_SIZET std::numeric_limits<size_t>::max()
 #endif
 
 //CO20180101 - stream2stream modes
@@ -743,6 +749,8 @@ namespace aurostd {
   uint string2tokensAdd(const string& str,deque<string>& tokens,const string& delimiters = " ") __xprototype;
   template<class utype> uint string2tokensAdd(const string& str,std::vector<utype>& tokens,const string& delimiters = " ") __xprototype;
   template<class utype> uint string2tokensAdd(const string& str,std::deque<utype>& tokens,const string& delimiters = " ") __xprototype;
+  uint string2tokensByDelimiter(const string& str, vector<string>& tokens, const string& delimiter); //SD20220504
+  uint string2tokensByDelimiter(const string& str, deque<string>& tokens, const string& delimiter); //SD20220504
 
   //[CO20210315 - OBSOLETE use stream2stream()]template<typename typeTo, typename typeFrom> typeTo StringStreamConvert(const typeFrom& from);  //CO20210315 - cleaned up
   //[CO20210315 - OBSOLETE use stream2stream()]template<typename typeFrom> string StringConvert(const typeFrom& from);  //CO20210315 - cleaned up
@@ -828,13 +836,25 @@ namespace aurostd {
   bool substringlist2bool(const string& strin, const deque<string>& substrings, bool match_all=true);  //ME20220505
   bool substring_present_file(const string& FileName,const string& strsub1,bool RemoveWS=false,bool RemoveComments=true); //CO20210315 - cleaned up
   bool substring_present_file_FAST(const string& FileName,const string& strsub1,bool RemoveWS=false,bool case_insensitive=false,bool expect_near_end=false,unsigned long long int size_max=AUROSTD_MAX_ULLINT);  //CO20210315 - cleaned up
-  bool WithinList(const vector<string>& list,const string& input,bool sorted=false);  //CO20181010
-  bool WithinList(const deque<string>& list,const string& input,bool sorted=false);  //CO20181010
-  bool WithinList(const vector<int>& list,int input,bool sorted=false); //CO20181010
-  bool WithinList(const vector<uint>& list,uint input,bool sorted=false); //CO20181010
-  bool WithinList(const vector<string>&, const string&, int&,bool sorted=false);  //ME20190905
-  bool WithinList(const vector<int>&, int, int&,bool sorted=false);  //ME20190905
-  bool WithinList(const vector<uint>&, uint, int&,bool sorted=false);  //ME20190905
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<string>& list,const string& input,bool sorted=false);  //CO20181010
+  //[SD20220705 - OBSOLETE]bool WithinList(const deque<string>& list,const string& input,bool sorted=false);  //CO20181010
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<int>& list,int input,bool sorted=false); //CO20181010
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<uint>& list,uint input,bool sorted=false); //CO20181010
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<string>&, const string&, int&,bool sorted=false);  //ME20190905
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<int>&, int, int&,bool sorted=false);  //ME20190905
+  //[SD20220705 - OBSOLETE]bool WithinList(const vector<uint>&, uint, int&,bool sorted=false);  //ME20190905
+  template<class utype> bool WithinList(const vector<utype>& list, const utype& input, size_t& index, bool sorted=false); //SD20220705
+  bool WithinList(const vector<string>& list, const string& input, size_t& index, bool sorted=false); //SD20220705
+  template<class utype> bool WithinList(const deque<utype>& list, const utype& input, size_t& index, bool sorted=false); //SD20220705
+  bool WithinList(const deque<string>& list, const string& input, size_t& index, bool sorted=false); //SD20220705
+  template<class utype> bool WithinList(const vector<utype>& list, const utype& input, bool sorted=false); //SD20220705
+  bool WithinList(const vector<string>& list, const string& input, bool sorted=false); //SD20220705
+  template<class utype> bool WithinList(const deque<utype>& list, const utype& input, bool sorted=false); //SD20220705
+  bool WithinList(const deque<string>& list, const string& input, bool sorted=false); //SD20220705
+  template<class utype> bool WithinList(const vector<utype>& list, const utype& input, vector<size_t>& index, bool sorted=false); //SD20220705
+  bool WithinList(const vector<string>& list, const string& input, vector<size_t>& index, bool sorted=false); //SD20220705
+  template<class utype> bool WithinList(const deque<utype>& list, const utype& input, vector<size_t>& index, bool sorted=false); //SD20220705
+  bool WithinList(const deque<string>& list, const string& input, vector<size_t>& index, bool sorted=false); //SD20220705
   bool EWithinList(const vector<string>& list,const string& input); //CO20200223
   bool EWithinList(const vector<string>& list, const string& input, string& output); //CO20200223
   bool SubstringWithinList(const deque<string>& list, const string& input);  //ME20220503
@@ -1304,8 +1324,10 @@ namespace aurostd {   // INT
 
 // ***************************************************************************
 // some statistical stuff
-template<class utype> utype combinations(utype n,utype k) __xprototype; // http://en.wikipedia.org/wiki/Combination
-template<class utype> utype Cnk(utype n,utype k) __xprototype; // http://en.wikipedia.org/wiki/Combination
+namespace aurostd {
+  template<class utype> utype combinations(utype n,utype k) __xprototype; // http://en.wikipedia.org/wiki/Combination
+  template<class utype> utype Cnk(utype n,utype k) __xprototype; // http://en.wikipedia.org/wiki/Combination
+}
 
 // ***************************************************************************
 namespace aurostd {

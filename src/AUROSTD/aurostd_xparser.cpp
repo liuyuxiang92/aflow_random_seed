@@ -802,10 +802,31 @@ namespace aurostd {
           throw aurostd::xerror(__AFLOW_FILE__, __AFLOW_FUNC__, message, _VALUE_ILLEGAL_);
         }
       }
-    } else {
-      value = "";
     }
     return value;
+  }
+
+  //extractJsonVectorAflow/////////////////////////////////////////////////////
+  vector<string> extractJsonVectorAflow(const string& json, string key) { //SD20220504
+    string value = extractJsonValueAflow(json, key);
+    string::size_type start = value.find("["), stop = value.rfind("]");
+    vector<string> vec;
+    aurostd::string2tokens(value.substr(start + 1, stop - 1), vec, ",");
+    return vec;
+  }
+
+  //extractJsonMatrixAflow/////////////////////////////////////////////////////
+  vector<vector<string>> extractJsonMatrixAflow(const string& json, string key) { //SD20220504
+    string value = extractJsonValueAflow(json, key);
+    string::size_type start = value.find("[["), stop = value.rfind("]]");
+    vector<vector<string>> mat;
+    vector<string> vec, tokens;
+    aurostd::string2tokensByDelimiter(value.substr(start + 2, stop - 2), tokens, "],[");
+    for (uint i = 0; i < tokens.size(); i++) {
+      aurostd::string2tokens(tokens[i], vec, ",");
+      mat.push_back(vec);
+    }
+    return mat;
   }
 
 }
